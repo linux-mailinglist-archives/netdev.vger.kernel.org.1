@@ -1,239 +1,164 @@
-Return-Path: <netdev+bounces-258695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258696-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id JS03ItpPkGkUYgEAu9opvQ
-	(envelope-from <netdev+bounces-258695-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 11:35:06 +0100
+	id IAlzDmVnkGkXZQEAu9opvQ
+	(envelope-from <netdev+bounces-258696-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 13:15:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7BE913BB02
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 11:35:05 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3948713BD14
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 13:15:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E73623018AC1
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 10:35:03 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 89D343004CBC
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 12:15:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D3CD2D8387;
-	Sat, 14 Feb 2026 10:35:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C2C63016EB;
+	Sat, 14 Feb 2026 12:15:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="hOCYFvQO"
+	dkim=pass (2048-bit key) header.d=poleshift.se header.i=@poleshift.se header.b="IMWwiVTC";
+	dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b="N13hJtPN";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=poleshift.se header.i=@poleshift.se header.b="BBxj/c4r"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-bc0f.mail.infomaniak.ch (smtp-bc0f.mail.infomaniak.ch [45.157.188.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from e240-5.smtp-out.eu-north-1.amazonses.com (e240-5.smtp-out.eu-north-1.amazonses.com [23.251.240.5])
+	(using TLSv1.2 with cipher AES128-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7169A220F3E
-	for <netdev@vger.kernel.org>; Sat, 14 Feb 2026 10:34:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90EA2FE58F;
+	Sat, 14 Feb 2026 12:15:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.251.240.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771065303; cv=none; b=GYsu4DtpJcBCydfOQtkEVqUyBv1afcpzi8Xllpz0HmQ/WvYladL/sWEef8AwMBvtfKw75yu7X72CpBWhQGXwxUxF2zDWrrwkxO2tp+x5Y+VxfkJsVQwqxKDA84bhJti/d92AYeWt/R5ouN9N5VKx/fonpHz0AwyEkCC7GXgZJdM=
+	t=1771071328; cv=none; b=duTfQiVZRLphsJOMLqP/bB4JVdzHlCfPXpsTnXQmxQcvBM/sRqElYXfIBsx3r3ux4JQVN/5FmEM4jX+znrbS+Q8nqW+iAjW0o8+4uh/4rcsRKTZGYVw6vpbgDMQE+Hbs6b13ldCP2wuw6QZVRKOZwKqdD5q/u/byxESetDkJCJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771065303; c=relaxed/simple;
-	bh=u1Wxja1gauD1O5RiEDGyoOwkz98nJacqW2IThEPcaK4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u/T3AznRFOFFuvQgxz7X/9l57b7hQ/hMjmWSkfgsIApERD9NLNIMGBxNRfYh+UcSSjB5lMcJRfMRG7qtUQYsjHEDflkoirFCNuotuvyvkcOAQ8ux35J/djQsvV5wsMVERZZ3cDufdQzrzpyUYtKCO66R2qUhKEMH8wqqs8gZ4aU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=hOCYFvQO; arc=none smtp.client-ip=45.157.188.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0000.mail.infomaniak.ch (smtp-4-0000.mail.infomaniak.ch [10.7.10.107])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4fCllt1NvKzh1S;
-	Sat, 14 Feb 2026 11:34:50 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1771065290;
-	bh=X/Bqhtx4te0C9TSLyPEcs9ydTX8U6OfW0sl5QAGJkks=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hOCYFvQOlFOzisHjaZeLTFBdAqry8nalMLT6DYD7rgXBCaMvdofcOXJ77pD/vlxGR
-	 giXVKn0HCCnZID6SZh3kSVvykYwHHdgOwhuqestsDv95fHpgMjZZ3qe0RhyfgRGgcr
-	 LPaqIB5hyuYlIfxMrcrq3gVbPDu6ldq2tSs56XgU=
-Received: from unknown by smtp-4-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4fClls0w7Fzb5G;
-	Sat, 14 Feb 2026 11:34:49 +0100 (CET)
-Date: Sat, 14 Feb 2026 11:34:44 +0100
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Matthieu Buffet <matthieu@buffet.re>, Paul Moore <paul@paul-moore.com>
-Cc: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, 
-	linux-security-module@vger.kernel.org, Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>, 
-	konstantin.meskhidze@huawei.com, netdev@vger.kernel.org, Tingmao Wang <m@maowtm.org>, 
-	Justin Suess <utilityemal77@gmail.com>
-Subject: Re: [RFC PATCH v3 0/8] landlock: Add UDP access control support
-Message-ID: <20260214.aicie1xiquiT@digikod.net>
-References: <20251212163704.142301-1-matthieu@buffet.re>
+	s=arc-20240116; t=1771071328; c=relaxed/simple;
+	bh=rFlgiUhbRa59lDQuTF6+GPlvrsi3zx3UKYbAFtUx9IQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:Cc; b=ia8FAcHJz62a4WPjCeFo35IDCl+ZtG3EXz4fmC2PtzhfAN13uDxtTCqFqlJH8nSj6RowsnQjfY/cYE0cnxok7ez2CIUC6+H78FUkomu5TNz3kEJk2S01wrpVcgwFmaodxvO5hmoZWs6aH4bdLDN7Txj9mCNm6Q5Z5hBJdAsuX/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=poleshift.se; spf=pass smtp.mailfrom=eu-north-1.amazonses.com; dkim=pass (2048-bit key) header.d=poleshift.se header.i=@poleshift.se header.b=IMWwiVTC; dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b=N13hJtPN; dkim=fail (0-bit key) header.d=poleshift.se header.i=@poleshift.se header.b=BBxj/c4r reason="key not found in DNS"; arc=none smtp.client-ip=23.251.240.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=poleshift.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eu-north-1.amazonses.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+	s=n6aiayff3zq3manwyovyvpolm4pou2ef; d=poleshift.se; t=1771071321;
+	h=From:Date:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:To:Cc;
+	bh=rFlgiUhbRa59lDQuTF6+GPlvrsi3zx3UKYbAFtUx9IQ=;
+	b=IMWwiVTCmdar/Uhb/2jpXwqmhFrJWZVYEM0AbyHoBjUpQm9J6kEZI6dPhVdz8CBf
+	BRRGyTldQUZbdn8ZB7J5h3COVhXS4UPUKtG3nt+n780lQYKlaKgoS74adCpPzzOD4zg
+	GmcmaUDlfMHtQy6pabRUEvZg+ZtMMCDQtGPtWB/kLcrenghz011cx7HMNgM7UnEsuGj
+	h3sXKHWkBjkC8Mr2+y6KvZ4AAjqDER5h8w2bD7OeKrGUOAd2KIM4z0YQjU2FXKk44Ua
+	47u1LeTn7QvH/VDh0x59BtJLLoul9lwo3J8dNlfBSCqWen0ImMm+9AJFuv+Bb1kkNhy
+	wtYV8leIFw==
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+	s=icdr7g7fbtu2nwxgaimytihkt42k3kiy; d=amazonses.com; t=1771071321;
+	h=From:Date:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:To:Cc:Feedback-ID;
+	bh=rFlgiUhbRa59lDQuTF6+GPlvrsi3zx3UKYbAFtUx9IQ=;
+	b=N13hJtPNUVjB1iv7w7AHY/h9FiQ6dsjzcfpion0zhoiEzvmz7hqhGwcgtf4B9kpt
+	w1LPyYGymytJRH5XbEOjWm1LfikC1/FMuULfCaTtsPTllFL6FC4qM5nECnl5JB05loN
+	1kX8oSWwdhKfGTmNV2R0hv+NoGa5spjVBxoZNXq4=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=poleshift.se;
+	s=20230429; t=1771071319;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=yq1Yi+g/1PPOy4yvt0Qjkyz18T5vp1xuhQ51csxeR08=;
+	b=BBxj/c4rHbZ7jB1/a4dfP5ENbflvy1BBh1h02ZzBFCpumejhpzx4tgVcPZ3Tu/38S0gWAQ
+	+jR6u2vGHyVXMx4AfNvYtJMa0VxpfNL/3P0p30IaAoL6nMkPE+h7f7O8b4plFqvmvKvY8n
+	a9QOZ/C/pcDt1XUF2aPAsSq50PHqQpo=
+From: =?utf-8?q?Martin_P=C3=A5lsson?= <martin@poleshift.se>
+Date: Sat, 14 Feb 2026 12:15:21 +0000
+Subject: [PATCH] net: usb: lan78xx: scan all MDIO addresses on LAN7801
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251212163704.142301-1-matthieu@buffet.re>
-X-Infomaniak-Routing: alpha
+Message-ID: <0110019c5c13b668-dd1f5db3-309a-442a-b483-262c4edbb360-000000@eu-north-1.amazonses.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2MSwqAMAwFryJZG7ClfvAq4iJo1KBWaUEq4t0NL
+ ucNbx6IHIQjtNkDgS+JcngFk2cwLORnRhmVwRa2KqxxuJGvm5TwXG7cKa44SUJyakc2JbkB9Ho
+ G1vnPdv37fnqamtVmAAAA
+X-Change-ID: 20260214-lan78xx-phy-mask-fix-a4260de15a4c
+To: Thangaraj Samynathan <Thangaraj.S@microchip.com>, 
+	Rengarajan Sundararajan <Rengarajan.S@microchip.com>, 
+	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, martin@poleshift.se
+Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+X-Mailer: b4 0.14.3
+Feedback-ID: ::1.eu-north-1.nVsitYrO9p3qnPLcZXP017jV0c/PN62ZbS4lYSSQpnA=:AmazonSES
+X-SES-Outgoing: 2026.02.14-23.251.240.5
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.99 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.67)[subject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[digikod.net:s=20191114];
+	DMARC_POLICY_ALLOW(-0.50)[poleshift.se,reject];
+	R_DKIM_ALLOW(-0.20)[poleshift.se:s=n6aiayff3zq3manwyovyvpolm4pou2ef,amazonses.com:s=icdr7g7fbtu2nwxgaimytihkt42k3kiy];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	URIBL_MULTI_FAIL(0.00)[digikod.net:server fail,sea.lore.kernel.org:server fail];
-	FREEMAIL_CC(0.00)[google.com,vger.kernel.org,huawei-partners.com,huawei.com,maowtm.org,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[digikod.net];
-	TAGGED_FROM(0.00)[bounces-258695-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258696-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[digikod.net:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[mic@digikod.net,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_COUNT_THREE(0.00)[3];
+	MIME_TRACE(0.00)[0:+];
+	R_DKIM_PERMFAIL(0.00)[poleshift.se:s=20230429];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[poleshift.se:+,amazonses.com:+,poleshift.se:~];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C7BE913BB02
+	FROM_NEQ_ENVFROM(0.00)[martin@poleshift.se,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_MIXED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amazonses.com:dkim,eu-north-1.amazonses.com:mid,poleshift.se:email,poleshift.se:dkim]
+X-Rspamd-Queue-Id: 3948713BD14
 X-Rspamd-Action: no action
 
-I had a chat with Matthieu and here is a summary of our discussion
-(Matthieu, please complete if necessary):
+The LAN7801 is designed exclusively for external PHYs (unlike the
+LAN7800/LAN7850 which have internal PHYs), but lan78xx_mdio_init()
+restricts PHY scanning to MDIO addresses 0-7 by setting phy_mask to
+~(0xFF). This prevents discovery of external PHYs wired to addresses
+outside that range.
 
-First, this patch series is hight quality.  The remaining issues are
-related to the semantic and the capabilities of the enforced
-restrictions.
+One such case is the DP83TC814 100BASE-T1 PHY, which is typically
+configured at MDIO address 10 via PHYAD bootstrap pins and goes
+undetected with the current mask.
 
-1/ Simplify access rights
+Set phy_mask to 0 for the LAN7801 so that all 32 MDIO addresses are
+scanned during bus registration, allowing any external PHY to be
+discovered regardless of its address.
 
-It would make more sense to have only two access rights, one to set the
-source port and another to set the destination port.  The source port is
-should be handled by LANDLOCK_ACCESS_NET_BIND_UDP, but the destination
-port is should also be handle by a unique access right, something like
-LANDLOCK_ACCESS_NET_CONNECT_SEND_UDP because it can be set with
-connect(2) or sendmsg(2).  Any suggestion for a better name?
+Signed-off-by: Martin Pålsson <martin@poleshift.se>
+---
+ drivers/net/usb/lan78xx.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-2/ Autobind handling
+diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
+index 00397a807393..9d8f1ff7028d 100644
+--- a/drivers/net/usb/lan78xx.c
++++ b/drivers/net/usb/lan78xx.c
+@@ -2094,8 +2094,8 @@ static int lan78xx_mdio_init(struct lan78xx_net *dev)
+ 		dev->mdiobus->phy_mask = ~(1 << 1);
+ 		break;
+ 	case ID_REV_CHIP_ID_7801_:
+-		/* scan thru PHYAD[2..0] */
+-		dev->mdiobus->phy_mask = ~(0xFF);
++		/* scan all 32 MDIO addresses for external PHYs */
++		dev->mdiobus->phy_mask = 0;
+ 		break;
+ 	}
+ 
 
-If an UDP socket is not explicitly binded to a port, inet_autobind() is
-called and provides an implicit port.  In this case, the socket_bind
-hook is not called and we cannot enforce any kind of restriction
-(without relying on Netfilter like SELinux does).
+---
+base-commit: ee5492fd88cfc079c19fbeac78e9e53b7f6c04f3
+change-id: 20260214-lan78xx-phy-mask-fix-a4260de15a4c
 
-The idea would be to lazily detect previous autobinds when one of the
-socket_bind, socket_connect, socket_sendmsg, or socket_recvmsg hook is
-called.  This would mean to attach a Landlock security blob to all
-sockets and store their state there.  A better alternative would be to
-only rely on the struct socket to infer this information, but we're not
-sure if this is possible.
+Best regards,
+-- 
+Martin Pålsson <martin@poleshift.se>
 
-3/ AF_UNSPEC trick
-
-As explained in patch 5/8, the network stack behaves differntly when
-AF_UNSPEC is used with sendmsg(2) against an IPv4 or an IPv6 socket.
-In a nutshell, because the LSM hook is not called while the socket is
-locked, there is a possible race condition that Landlock needs to
-handle to avoid policy bypass.
-
-It's not clear yet what can be implemented safely but one new solution
-would be to implement a socket_setsockopt hook to detect (potentially
-concurrent) change of a socket type and store in a new Landlock socket
-security blob the state of the socket (e.g. if it was IPv6 and it is now
-IPv4).  This would enables us to detect a malicious race condition while
-allowing legitimate use cases.
-
-When such deny would be triggered, Landlock should log that, probably
-with a new dedicated blocker.  One reason is because this should help
-users to understand the issue (which should be very rare), and another
-reason is because audit_log_lsm_data() currently ignores
-LSM_AUDIT_DATA_NET records if the socket family is not AF_INET* nor
-AF_UNIX.
-
-Paul, not sure we'll need it now but, do you think it would be OK to add
-a new case for LSM_AUDIT_DATA_NET to log the socket family for
-AF_INET/AF_INET6/AF_UNIX and also for currently unhandled families?
-Something like " family=%x" .
-
-
-On Fri, Dec 12, 2025 at 05:36:56PM +0100, Matthieu Buffet wrote:
-> Hi Mickaël, Günther, Mikhail, Konstantin,
-> 
-> Here is v3 of UDP support for Landlock. My apologies for the delay, I've
-> had to deal with unrelated problems. All feedback from v1/v2 should be
-> merged, thanks again for taking the time to review them.
-> 
-> I based these patches on linux-mic/next commit 1a3cedbdc156 ("landlock:
-> Fix wrong type usage") plus my previous patch "landlock: Fix TCP
-> handling of short AF_UNSPEC addresses" to avoid adding UDP with already
-> known bugs, duplicated from TCP. I waited a bit to get feedback on that
-> patch and no one yelled, so I hope it's acceptable, tell me if it's not.
-> Link: https://lore.kernel.org/linux-security-module/20251027190726.626244-4-matthieu@buffet.re/
-> 
-> Changes since v2
-> ================
-> Link: https://lore.kernel.org/all/20241214184540.3835222-1-matthieu@buffet.re/
-> - removed support for sending datagrams with explicit destination
->   address of family AF_UNSPEC, which allowed to bypass restrictions with
->   a race condition
-> - rebased on linux-mic/next => add support for auditing
-> - fixed mistake in selftests when using unspec_srv variables, which were
->   implicitly of type SOCK_STREAM and did not actually test UDP code
-> - add tests for IPPROTO_IP
-> - improved docs, split off TCP-related refactoring into another commit
-> 
-> Changes since v1
-> ================
-> Link: https://lore.kernel.org/all/20240916122230.114800-1-matthieu@buffet.re/
-> - recvmsg hook is gone and sendmsg hook doesn't apply to connected
->   sockets anymore, to improve performance
-> - don't add a get_addr_port() helper function, which required a weird
->   "am I in IPv4 or IPv6 context" to avoid a addrlen > sizeof(struct
->   sockaddr_in) check in connect(AF_UNSPEC) IPv6 context. A helper was
->   useful when ports also needed to be read in a recvmsg() hook, now it
->   is just a simple switch case in the sendmsg() hook, more readable
-> - rename sendmsg access right to LANDLOCK_ACCESS_NET_UDP_SENDTO
-> - reorder hook prologue for consistency: check domain, then type and
->   family
-> - add additional selftests cases around minimal address length
-> - update documentation
-> 
-> All important cases should have a selftest now. lcov gives me net.c
-> going from 91.9% lines/82.5% branches to 93.4% lines/87% branches.
-> Thank you for taking the time to read this!
-> 
-> Closes: https://github.com/landlock-lsm/linux/issues/10
-> 
-> Matthieu Buffet (8):
->   landlock: Minor reword of docs for TCP access rights
->   landlock: Refactor TCP socket type check
->   landlock: Add UDP bind+connect access control
->   selftests/landlock: Add UDP bind/connect tests
->   landlock: Add UDP sendmsg access control
->   selftests/landlock: Add tests for UDP sendmsg
->   samples/landlock: Add sandboxer UDP access control
->   landlock: Add documentation for UDP support
-> 
->  Documentation/userspace-api/landlock.rst     |  94 ++-
->  include/uapi/linux/landlock.h                |  46 +-
->  samples/landlock/sandboxer.c                 |  58 +-
->  security/landlock/audit.c                    |   3 +
->  security/landlock/limits.h                   |   2 +-
->  security/landlock/net.c                      | 119 +++-
->  security/landlock/syscalls.c                 |   2 +-
->  tools/testing/selftests/landlock/base_test.c |   2 +-
->  tools/testing/selftests/landlock/net_test.c  | 691 ++++++++++++++++---
->  9 files changed, 869 insertions(+), 148 deletions(-)
-> 
-> 
-> base-commit: 1a3cedbdc156e100eb1a5208a8562a3265c35d87
-> prerequisite-patch-id: 22051d5d4076a87481b22798c127ce84e219ca97
-> prerequisite-patch-id: 37a1b44596a2d861ba91989edb1d7aac005931d6
-> prerequisite-patch-id: c7be1c906699a2590ab7112cdf2ab6892178ec07
-> -- 
-> 2.47.3
-> 
-> 
 
