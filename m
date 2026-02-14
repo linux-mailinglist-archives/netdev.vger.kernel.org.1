@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-258734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258735-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sHZ9GhLpkGkadwEAu9opvQ
-	(envelope-from <netdev+bounces-258734-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:28:50 +0100
+	id MJq5MGXpkGkOdwEAu9opvQ
+	(envelope-from <netdev+bounces-258735-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:30:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E492513D734
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:28:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E70E13D83E
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:30:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 166803021EBE
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 21:25:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 545B130A85E6
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 21:25:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B6028DB46;
-	Sat, 14 Feb 2026 21:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 689B930BB81;
+	Sat, 14 Feb 2026 21:25:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LWyKkMlu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DLtCwVfS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0D843C2D;
-	Sat, 14 Feb 2026 21:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44CDA30B538;
+	Sat, 14 Feb 2026 21:25:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771104332; cv=none; b=IKwbTpUZHcBulu6tPvkxNfSwoQDE54aSlZXbLzuR0gfJZr2QKc1AePQor2R80j+yu06NLVnagZquLtLTUI71q3Bxj9AiSQGI3akL1dvgvPqwG3C/PvNC2kI4txfVlVcTt1lTvOnHDHJCPeuRb/WrH6KGfC/kLPc2fNLmhbwPODQ=
+	t=1771104353; cv=none; b=mC+YwnztZI5U6su0BFKxCN67U7MFbre76oKBBOydXBNgtSHS+hIVFB390KwAvPCVjanh71ReFJRdjbgbbjcOd78xEjLon9BAaOgXXMDqRoDExunBB99QFoPvCt46qzU/0u6FLg9R7sZmN2RtPV1gPmSEPMjhTHO9rHWrXt1LrjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771104332; c=relaxed/simple;
-	bh=IEolZjLt9W5K7QPJw1wk3fFPTdzpWuj9VU77DHTEGR8=;
+	s=arc-20240116; t=1771104353; c=relaxed/simple;
+	bh=a6AFDtak2ZeymRim/dSLlx+Pr0RgsP92jVYL9T3nWmA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NTgYBwybWY0SzwsHkZxYNKjUP7+LDauBWiKVvVVpqG+Ew1gBo/0QuI7VkZEYDOTYq5HHxm2F/On0rNSv77D0BWwKCH6SswNyj+d6r1XcjO8uFMuSbGT6rPWgcacdR0ZTFGj8+2yZ22PghRZEUNfx3zeGXjZkL4xU8MDj3Wo54Cs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LWyKkMlu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74A81C19423;
-	Sat, 14 Feb 2026 21:25:31 +0000 (UTC)
+	 MIME-Version:Content-Type; b=UTTmZSBf9Dz+74uD7nT3EYjftxoValLxhYlx8av79qHaTvJiqM2VCYHvGvY3KoJyCk5CKZDjirXE5H0QPu3HtCW3gBsLbtJewGWQdlDySjpAYAOfLwfcHu9YjUjaIQOLUuT6xvAR/2DDewmEvvJEQwlbI3JXwM2iOdTgPLqT5Nk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DLtCwVfS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 409F2C16AAE;
+	Sat, 14 Feb 2026 21:25:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771104332;
-	bh=IEolZjLt9W5K7QPJw1wk3fFPTdzpWuj9VU77DHTEGR8=;
+	s=k20201202; t=1771104353;
+	bh=a6AFDtak2ZeymRim/dSLlx+Pr0RgsP92jVYL9T3nWmA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LWyKkMlus429KIrrUbgC1HbODZFcj36X+CD4nexWBsawkwDovnam5LsyjpPTwo0Zd
-	 oPKDDDVc6RsLZVF34BamLva+J5UFJ4vOqRmJ7vhg/5qREG/njw7TrOTPNOFUJQvfsx
-	 UEb+gXpkcPx0pw3KgMTvLL4Ad/6doVaFrIeXYYQ5asvT0/750v2KDTF8EYYw0SSRJy
-	 NI5VhPOHye85GUupGWDZE4+Z3DCUFDdreIZV0Ot+e8riKzd5T7bko1+O/PM2J09Drl
-	 6dr+sRne1mYPGhWL0abBvZCHutVG91JuIbxfJpEHlXWNl4oRJfYGMqsZb0eQn9CANX
-	 MK8lhlFbyEzVw==
+	b=DLtCwVfSHG5bKyYvX8hsUlHsTmXFEyzIZ2TBY8YiJJQDpUFLklmgHZHJ+FIONJxQi
+	 GESr4B4DIalRK3Bkiu+OKeG3Qb4zag7GiH83VqckX+kPmZkt2AFYVUGtixMhSY6FmF
+	 aDNueaNqL+/tGXyI55b386GxlpmXfbi0IQjNZoLDNI8Q63zKMzb5noeP8dtVnzc9WD
+	 EqL7E/6xGPXTFniyjErn9tp9PGu4YY/xoZXbWrmw84G6p3QHNsRcVpIybfRoaBzvnW
+	 RpysaJycJ8qCtbok7b3myz0rjcLpjAUQnVhvMbipA7UeQRwRsqbyCpUc7fasVgqtbM
+	 wD4xRv3WpB/Jw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -53,11 +53,10 @@ Cc: Eric Dumazet <edumazet@google.com>,
 	Sasha Levin <sashal@kernel.org>,
 	davem@davemloft.net,
 	dsahern@kernel.org,
-	ncardwell@google.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.19-6.12] ipv6: annotate data-races over sysctl.flowlabel_reflect
-Date: Sat, 14 Feb 2026 16:22:48 -0500
-Message-ID: <20260214212452.782265-23-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.19-5.15] ipv6: exthdrs: annotate data-race over multiple sysctl
+Date: Sat, 14 Feb 2026 16:22:59 -0500
+Message-ID: <20260214212452.782265-34-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260214212452.782265-1-sashal@kernel.org>
 References: <20260214212452.782265-1-sashal@kernel.org>
@@ -78,196 +77,198 @@ X-Spamd-Result: default: False [-1.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258734-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-258735-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E492513D734
+X-Rspamd-Queue-Id: 5E70E13D83E
 X-Rspamd-Action: no action
 
 From: Eric Dumazet <edumazet@google.com>
 
-[ Upstream commit 5ade47c974b46eb2a1279185962a0ffa15dc5450 ]
+[ Upstream commit 978b67d28358b0b4eacfa94453d1ad4e09b123ad ]
 
-Add missing READ_ONCE() when reading ipv6.sysctl.flowlabel_reflect,
-as its value can be changed under us.
+Following four sysctls can change under us, add missing READ_ONCE().
+
+- ipv6.sysctl.max_dst_opts_len
+- ipv6.sysctl.max_dst_opts_cnt
+- ipv6.sysctl.max_hbh_opts_len
+- ipv6.sysctl.max_hbh_opts_cnt
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
-Link: https://patch.msgid.link/20260115094141.3124990-6-edumazet@google.com
+Link: https://patch.msgid.link/20260115094141.3124990-8-edumazet@google.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-## Analysis of Commit: "ipv6: annotate data-races over
-sysctl.flowlabel_reflect"
+## Analysis of commit: "ipv6: exthdrs: annotate data-race over multiple
+sysctl"
 
 ### 1. COMMIT MESSAGE ANALYSIS
 
-The commit message is clear and direct: it adds missing `READ_ONCE()`
-annotations when reading `ipv6.sysctl.flowlabel_reflect` because this
-sysctl value can be changed concurrently by another CPU (via the sysctl
-write path). The author is Eric Dumazet, a top-tier networking
-maintainer known for systematically fixing data races in the networking
-stack. Reviewed by Simon Horman, another well-known networking reviewer.
+The commit message is straightforward: it adds `READ_ONCE()` annotations
+to four sysctl variables that can be modified concurrently from
+userspace while being read in the packet processing path. The author is
+Eric Dumazet, a prolific and highly respected networking maintainer at
+Google, who frequently contributes data-race annotations and fixes.
+Reviewed by Simon Horman, another well-known networking reviewer.
+
+The four sysctls affected:
+- `ipv6.sysctl.max_dst_opts_len`
+- `ipv6.sysctl.max_dst_opts_cnt`
+- `ipv6.sysctl.max_hbh_opts_len`
+- `ipv6.sysctl.max_hbh_opts_cnt`
 
 ### 2. CODE CHANGE ANALYSIS
 
-The patch modifies exactly 3 locations across 3 files, adding
-`READ_ONCE()` around reads of `net->ipv6.sysctl.flowlabel_reflect`:
+The changes are minimal and mechanical - wrapping four sysctl reads with
+`READ_ONCE()`:
 
-1. **net/ipv6/af_inet6.c** (`inet6_create`): Socket creation path —
-   reads the sysctl to set the `REPFLOW` bit on new IPv6 sockets.
+1. **`ipv6_destopt_rcv()`** (line ~317):
+   `net->ipv6.sysctl.max_dst_opts_len` →
+   `READ_ONCE(net->ipv6.sysctl.max_dst_opts_len)`
+2. **`ipv6_destopt_rcv()`** (line ~326):
+   `net->ipv6.sysctl.max_dst_opts_cnt` →
+   `READ_ONCE(net->ipv6.sysctl.max_dst_opts_cnt)`
+3. **`ipv6_parse_hopopts()`** (line ~1053):
+   `net->ipv6.sysctl.max_hbh_opts_len` →
+   `READ_ONCE(net->ipv6.sysctl.max_hbh_opts_len)`
+4. **`ipv6_parse_hopopts()`** (line ~1056):
+   `net->ipv6.sysctl.max_hbh_opts_cnt` →
+   `READ_ONCE(net->ipv6.sysctl.max_hbh_opts_cnt)`
 
-2. **net/ipv6/icmp.c** (`icmpv6_echo_reply`): ICMPv6 echo reply path —
-   reads the sysctl to decide whether to reflect the flowlabel in echo
-   replies.
+These are in the IPv6 extension header packet receive path - hot path
+code that processes every incoming IPv6 packet with destination options
+or hop-by-hop options. The sysctl values can be changed from userspace
+at any time via `/proc/sys/net/ipv6/`, creating a data race.
 
-3. **net/ipv6/tcp_ipv6.c** (`tcp_v6_send_reset`): TCP reset sending path
-   — reads the sysctl to decide whether to reflect the flowlabel in TCP
-   resets.
+### 3. BUG MECHANISM
 
-In all three cases, the pattern is identical: a plain read of
-`net->ipv6.sysctl.flowlabel_reflect` is wrapped with `READ_ONCE()`. This
-is a textbook KCSAN data-race annotation fix.
+Without `READ_ONCE()`, the compiler is free to:
+- Re-read the value multiple times (store tearing), potentially getting
+  different values in the same function
+- Optimize based on assumptions about the value not changing
 
-### 3. BUG CLASSIFICATION
+This is a real data race detectable by KCSAN (Kernel Concurrency
+Sanitizer). While the practical consequences of this particular race are
+relatively mild (the comparison values might be slightly stale or torn),
+the race is real and in a networking hot path.
 
-This is a **data race fix**. The sysctl `flowlabel_reflect` can be
-modified at any time from another CPU via the sysctl interface. Without
-`READ_ONCE()`, the compiler is free to:
-- Load the value multiple times (potentially seeing different values
-  within a single check)
-- Optimize the read in ways that produce undefined behavior under the C
-  memory model
+### 4. CLASSIFICATION
 
-This is the exact pattern of KCSAN-detected data races that Eric Dumazet
-has been systematically fixing across the networking stack. These are
-real data races even if the consequences in practice may be minor (store
-tearing or inconsistent reads).
+This is a **data-race fix** — category 3 (Race Conditions) from the
+analysis framework. `READ_ONCE()`/`WRITE_ONCE()` annotations are a
+common pattern for KCSAN-detected data races and are regularly
+backported to stable.
 
-### 4. SCOPE AND RISK ASSESSMENT
+### 5. SCOPE AND RISK ASSESSMENT
 
-- **Size**: Extremely small — 3 locations, each changing a single read
-  to `READ_ONCE()`.
-- **Risk**: Essentially zero. `READ_ONCE()` is a pure annotation that
-  prevents compiler optimization issues. It cannot introduce new bugs.
-- **Files touched**: 3 files in net/ipv6/, all well-established code
-  paths.
-- **Subsystem**: Core IPv6 networking — widely used.
-
-### 5. STABLE KERNEL CRITERIA
-
-- **Obviously correct**: Yes — adding `READ_ONCE()` for a concurrently-
-  modified sysctl is a textbook fix.
-- **Fixes a real bug**: Yes — data races are real bugs, detectable by
-  KCSAN, and can cause undefined behavior.
-- **Small and contained**: Yes — minimal change, 3 lines modified.
-- **No new features**: Correct — pure bug fix annotation.
-- **Tested**: Reviewed by Simon Horman, authored by Eric Dumazet
-  (networking co-maintainer).
+- **Lines changed**: ~8 lines across one file
+- **Files touched**: 1 (`net/ipv6/exthdrs.c`)
+- **Risk**: Extremely low. `READ_ONCE()` is a pure compiler annotation
+  that generates identical or near-identical machine code on most
+  architectures. It cannot introduce regressions.
+- **Subsystem**: IPv6 networking — core infrastructure used by virtually
+  all systems
 
 ### 6. USER IMPACT
 
-The `flowlabel_reflect` sysctl affects IPv6 flow label behavior for:
-- New socket creation
-- ICMPv6 echo replies
-- TCP reset packets
+- **Who is affected**: Any system processing IPv6 packets with extension
+  headers where sysctl values might be modified concurrently
+- **Severity**: Low to medium — the race could theoretically cause
+  inconsistent enforcement of the max length/count limits, but more
+  importantly it silences KCSAN reports and ensures correct compiler
+  behavior
+- **In the networking hot path**: These functions process packets, so
+  correctness matters
 
-While the practical impact of the data race is likely limited (a torn
-read of an integer sysctl would just result in a brief wrong decision),
-the fix is important for:
-- KCSAN cleanliness (preventing false positives that mask real bugs)
-- Correctness under the kernel memory model
-- Preventing potential compiler-induced bugs on architectures with weak
-  memory ordering
+### 7. STABILITY INDICATORS
 
-### 7. DEPENDENCY CHECK
+- **Author**: Eric Dumazet (Google, top networking contributor) — very
+  high trust
+- **Reviewer**: Simon Horman — respected networking reviewer
+- **Pattern**: This is part of a series (patch 8 of a set) of data-race
+  annotations, which is a well-established pattern in the networking
+  subsystem
 
-This commit is self-contained. It only adds `READ_ONCE()` wrappers and
-has no dependencies on other commits. The code being modified exists in
-all recent stable trees.
+### 8. DEPENDENCY CHECK
 
-### 8. RISK vs BENEFIT
+This commit is self-contained. `READ_ONCE()` is a basic kernel primitive
+available in all stable trees. The sysctl variables being annotated have
+existed for a long time. No dependencies on other patches.
 
-- **Risk**: Near zero. `READ_ONCE()` is a safe, well-understood
-  annotation.
-- **Benefit**: Fixes real data races in the IPv6 networking path,
-  prevents potential compiler-induced misbehavior, enables clean KCSAN
-  runs.
+### 9. VERDICT
 
-This is the type of small, surgical, zero-risk fix that is ideal for
-stable backporting. Eric Dumazet's data-race annotation series in
-networking has been consistently backported to stable trees.
+This is a small, surgical, zero-risk fix for a real data race in the
+IPv6 networking path. It follows the well-established pattern of
+`READ_ONCE()` annotations that Eric Dumazet has been systematically
+adding across the networking stack. These annotations are routinely
+backported to stable trees. The fix is obviously correct, has
+essentially zero regression risk, and addresses a real concurrency issue
+in core networking code.
 
 **YES**
 
- net/ipv6/af_inet6.c | 4 ++--
- net/ipv6/icmp.c     | 3 ++-
- net/ipv6/tcp_ipv6.c | 3 ++-
- 3 files changed, 6 insertions(+), 4 deletions(-)
+ net/ipv6/exthdrs.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
-index b705751eb73c6..bd29840659f34 100644
---- a/net/ipv6/af_inet6.c
-+++ b/net/ipv6/af_inet6.c
-@@ -224,8 +224,8 @@ static int inet6_create(struct net *net, struct socket *sock, int protocol,
- 	inet6_set_bit(MC6_LOOP, sk);
- 	inet6_set_bit(MC6_ALL, sk);
- 	np->pmtudisc	= IPV6_PMTUDISC_WANT;
--	inet6_assign_bit(REPFLOW, sk, net->ipv6.sysctl.flowlabel_reflect &
--				     FLOWLABEL_REFLECT_ESTABLISHED);
-+	inet6_assign_bit(REPFLOW, sk, READ_ONCE(net->ipv6.sysctl.flowlabel_reflect) &
-+				      FLOWLABEL_REFLECT_ESTABLISHED);
- 	sk->sk_ipv6only	= net->ipv6.sysctl.bindv6only;
- 	sk->sk_txrehash = READ_ONCE(net->core.sysctl_txrehash);
- 
-diff --git a/net/ipv6/icmp.c b/net/ipv6/icmp.c
-index 9d37e7711bc2b..1a25ecb926951 100644
---- a/net/ipv6/icmp.c
-+++ b/net/ipv6/icmp.c
-@@ -958,7 +958,8 @@ static enum skb_drop_reason icmpv6_echo_reply(struct sk_buff *skb)
- 	tmp_hdr.icmp6_type = type;
- 
- 	memset(&fl6, 0, sizeof(fl6));
--	if (net->ipv6.sysctl.flowlabel_reflect & FLOWLABEL_REFLECT_ICMPV6_ECHO_REPLIES)
-+	if (READ_ONCE(net->ipv6.sysctl.flowlabel_reflect) &
-+	    FLOWLABEL_REFLECT_ICMPV6_ECHO_REPLIES)
- 		fl6.flowlabel = ip6_flowlabel(ipv6_hdr(skb));
- 
- 	fl6.flowi6_proto = IPPROTO_ICMPV6;
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 280fe59785598..4ae664b05fa91 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -1085,7 +1085,8 @@ static void tcp_v6_send_reset(const struct sock *sk, struct sk_buff *skb,
- 			txhash = inet_twsk(sk)->tw_txhash;
- 		}
- 	} else {
--		if (net->ipv6.sysctl.flowlabel_reflect & FLOWLABEL_REFLECT_TCP_RESET)
-+		if (READ_ONCE(net->ipv6.sysctl.flowlabel_reflect) &
-+		    FLOWLABEL_REFLECT_TCP_RESET)
- 			label = ip6_flowlabel(ipv6h);
+diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
+index a23eb8734e151..54088fa0c09d0 100644
+--- a/net/ipv6/exthdrs.c
++++ b/net/ipv6/exthdrs.c
+@@ -314,7 +314,7 @@ static int ipv6_destopt_rcv(struct sk_buff *skb)
  	}
  
+ 	extlen = (skb_transport_header(skb)[1] + 1) << 3;
+-	if (extlen > net->ipv6.sysctl.max_dst_opts_len)
++	if (extlen > READ_ONCE(net->ipv6.sysctl.max_dst_opts_len))
+ 		goto fail_and_free;
+ 
+ 	opt->lastopt = opt->dst1 = skb_network_header_len(skb);
+@@ -322,7 +322,8 @@ static int ipv6_destopt_rcv(struct sk_buff *skb)
+ 	dstbuf = opt->dst1;
+ #endif
+ 
+-	if (ip6_parse_tlv(false, skb, net->ipv6.sysctl.max_dst_opts_cnt)) {
++	if (ip6_parse_tlv(false, skb,
++			  READ_ONCE(net->ipv6.sysctl.max_dst_opts_cnt))) {
+ 		skb->transport_header += extlen;
+ 		opt = IP6CB(skb);
+ #if IS_ENABLED(CONFIG_IPV6_MIP6)
+@@ -1049,11 +1050,12 @@ int ipv6_parse_hopopts(struct sk_buff *skb)
+ 	}
+ 
+ 	extlen = (skb_transport_header(skb)[1] + 1) << 3;
+-	if (extlen > net->ipv6.sysctl.max_hbh_opts_len)
++	if (extlen > READ_ONCE(net->ipv6.sysctl.max_hbh_opts_len))
+ 		goto fail_and_free;
+ 
+ 	opt->flags |= IP6SKB_HOPBYHOP;
+-	if (ip6_parse_tlv(true, skb, net->ipv6.sysctl.max_hbh_opts_cnt)) {
++	if (ip6_parse_tlv(true, skb,
++			  READ_ONCE(net->ipv6.sysctl.max_hbh_opts_cnt))) {
+ 		skb->transport_header += extlen;
+ 		opt = IP6CB(skb);
+ 		opt->nhoff = sizeof(struct ipv6hdr);
 -- 
 2.51.0
 
