@@ -1,229 +1,157 @@
-Return-Path: <netdev+bounces-258745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258746-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wBFrE1PpkGkadwEAu9opvQ
-	(envelope-from <netdev+bounces-258745-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:29:55 +0100
+	id CPK6Ign1kGkCeAEAu9opvQ
+	(envelope-from <netdev+bounces-258746-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 23:19:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D1BC13D7FA
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:29:55 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D494513DB24
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 23:19:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BFF97304950E
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 21:27:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6D3D5301457F
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:19:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC8A03C2D;
-	Sat, 14 Feb 2026 21:27:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AEBE312826;
+	Sat, 14 Feb 2026 22:19:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JhhUwZ5t"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gGyW9r/Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8E1930B538;
-	Sat, 14 Feb 2026 21:27:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31DF53148A6
+	for <netdev@vger.kernel.org>; Sat, 14 Feb 2026 22:19:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771104444; cv=none; b=rjYpj8n/scayZpAMIqq+yfmvAdAC8+ZUYwd5dfUWQIevh+6WNLfA7HfryFzoPnPQJNLAFfodOVUxdO1uKP1A6ini+gR93QbU+cbEdtN8Fwc6BB2A55b2fxQQfWn7CQ4qpTqUZAf9mBun47rjVagGqYrKsoyRwu84IpvxqAMIZ+Q=
+	t=1771107590; cv=none; b=kFEw5xc4Czm5UwiXalikhkPAXtgKRQiGaIHq1x3nTbt6QyqDfyowOf0be5ghaDsYZpl3vxJQ3lU2zhiog8hQd986F/2aSF16j1Fu2tV2IknT8bo10nvT7nWwcN78Y74aP+Svzz00Fe06QSX/QmlwK/hctuZaStRcExEO+1OkbJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771104444; c=relaxed/simple;
-	bh=2Sb6YVj2l1Ok2Mmg0zsL+12yGub/lIm0PQt6q4Zz3I8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BzFbX/GnRn8o86+O4AAIaP/J3kX9T/ENbn36DG/iAe0ylifjIh9qjf6zgAy5ENkHl5M6B6/5MW4cVBhxGf4qIIJAFFDegSs53nzLvmuUcD4kgNwuYd5qsO/xkjetXkESmjWF8igmpcQGQrIt1kaqJ5nzn+6pgD/y7mVAp+Ymrwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JhhUwZ5t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72A03C19423;
-	Sat, 14 Feb 2026 21:27:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771104444;
-	bh=2Sb6YVj2l1Ok2Mmg0zsL+12yGub/lIm0PQt6q4Zz3I8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JhhUwZ5tW3s2UEWpMPNXYf/fF8kh0MH5TjH1uc1rWoK0Wy+sVY6KA5gq2tNsTIggF
-	 4clcOhmCbi1LAEAD8GI5TtS+zJTne928NVip559MUkvRRMfxOJ76HcHA4ZxbTCSwsc
-	 stoWCucP5AggKh0lfpgSLx05Wt0sP+HQ8qw4/zLa/0VYq59Tdww2amEakonatA+wBf
-	 abl6fSkBBiEKPYkgqqh539zdGLg2ck3To0Rt1hZZUEAak7TmLSV35PyzMFJZuE3M+0
-	 B+is1JzXQjQMVpFMSd5SBtVqJiSZqbnI20mexklBB59AP/SDcNrP7txAClPIkIQ3qz
-	 wB1VX5OZE/lTQ==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
-	linux@armlinux.org.uk,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
+	s=arc-20240116; t=1771107590; c=relaxed/simple;
+	bh=zvgYwbndzjuLdn+N1S5WxooWnhAkhdeY9CsN2L6FyGs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Tgd/2NyAeOYIXydrUVkc6fuBdvmtxX6LBns/ccm3QppAuHhtiPK7jlB41B2bkeyOltn5gexJiRMBQC+NBf5mB6ZyT/o8XqVzxbz8EIWKEB9dCvZoHwv3RBTGy7Rv0nu+Iy2EpB/+460kNGBHYQXLHind/ChoIhBxrAPmznEh3bE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gGyW9r/Z; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-48370174e18so13276405e9.2
+        for <netdev@vger.kernel.org>; Sat, 14 Feb 2026 14:19:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771107587; x=1771712387; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IfWuWXCGCqCd6Ahs+RwT6PL0vAxh8vICPMFNyO+e8dk=;
+        b=gGyW9r/ZI8r8fJP/pcWI+rDrKEGARFCDRoFZwydWXNoI3RSSD96OMOmpDWZtNhoTAU
+         Lbrd0tDnH5ZqCrGfVrfzTq+g35/BxDVnCFzsXfNOVSWq4mwIXWEIxZu35PRP7fAHjQgB
+         8TLWUWiDuySiiTz6i6rujX264PrFZVniBsXUHXdeWkZNIPhfcKx+JDvQDD2itoEhgkss
+         N8ENIsvmHgDyOopWySQKfLN6lsY4I04eyHWvRbFAV6UmlkLdUTBDqYZWytdkoljX8QJh
+         P+rXECqfFpUP2h8UM9w0vcEFYIjFCsT5CuE9dB/y0hYvhRIkbZbo3ZQXFw1pP4eLM4dc
+         +jcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771107587; x=1771712387;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IfWuWXCGCqCd6Ahs+RwT6PL0vAxh8vICPMFNyO+e8dk=;
+        b=ka+q5uyJ37Y2k390bzRft6cfiy9dO0K+s6R9LLfDzcdpO+efcurDJ8pAzBY/DLakV9
+         mewwa2Ot/Oh1mxcLUJwqOddXLcgBknHaZSHo7pwq/q4LG2trTJVWYIgw1FAHvi9XDPtW
+         Don+CChp3UFRityDcdQFrCOIjVGSaMyWO7B1gPQM40hVuAhgRJWFkG70ZfNArWqhJsFj
+         OcO1U5Cs7Ddgetwxs5K2NAhsENZ11HmRayOX6ODat4SarU4szklw/jBj9usIVCcbOLyd
+         CpVc9sJVQz0JPB0U2mDiw6DrnJYe8All8DrvfYZOf1uHtngGoY5LxEsvSoNRfajov4ho
+         Zb2g==
+X-Forwarded-Encrypted: i=1; AJvYcCVGoDX3hka+ozqotVWgmjzb/tvrBh7Rjq0JVrTu0en82TcLPb0rsuEWeXQGjEAJp2GqMIQyD7c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxz3VPrmhrifTdASae/1Bp8urKzuFY8UT50kQT0Y0xmAfHqCfW0
+	vzAJMEiETLasi0BlIFs/kclheWpcDdoSE6VDdmFrpK8zS84Qa4NwJgsoTDNnKA==
+X-Gm-Gg: AZuq6aKEeXN+7GsXsaD/bty1w4qs12+k9GY0UF0lbvToUPPOuUCw3Au5CIAAbegsM3a
+	iV4uVHT1DrpUPNwEJhJNulUAZBSrV03JOY88i1E3940mvXOXhkDrQP5c5oTjW9bya+OrfJxnYzT
+	lhuGOwVHhbWpA6CB2+5iMTpJhumSPwWB7qr9yh/3shUeth9g5Totfogce3YnBcpP1v3EgWPZXmm
+	zy1zTyYm0QR6pB383wd2bNZ1uk4n+003wYMb/iipYxU56Eit2qNVXBjnA+xEyhkk6GCgyBABRKE
+	j3raKRQn1ffgF3Dt1W8REF3N1XtW0lX6y/CrW5t79Yv26invJ3yE+v1p+VmO+mK32iVkrBdoNgU
+	g4TNT+o88AJ9XjRwcXK7MwpdJ2MabufMAvp82PgYWwR8cBvvvwWCq2tt6xroMSR4zTNmoU3k1R2
+	QiWvy6zGQmSNviYzG+UJ4zfi0uDZxOBpKOAIhQlDTgpW+8vCfr6YJxbOBl4K6xXwj9dBFUyEUHL
+	xNXigPblvmWaWUsCi2BqGDqO5ZC2g==
+X-Received: by 2002:a05:600c:8189:b0:482:f12f:f35e with SMTP id 5b1f17b1804b1-48379b98ff9mr60265975e9.12.1771107587038;
+        Sat, 14 Feb 2026 14:19:47 -0800 (PST)
+Received: from 127.mynet ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4837e565f5esm82462235e9.10.2026.02.14.14.19.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 14 Feb 2026 14:19:46 -0800 (PST)
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: io-uring@vger.kernel.org
+Cc: asml.silence@gmail.com,
+	axboe@kernel.dk,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.19-6.12] net: sfp: add quirk for Lantech 8330-265D
-Date: Sat, 14 Feb 2026 16:23:53 -0500
-Message-ID: <20260214212452.782265-88-sashal@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260214212452.782265-1-sashal@kernel.org>
-References: <20260214212452.782265-1-sashal@kernel.org>
+Subject: [PATCH 1/1] io_uring/zcrx: fix sgtable leak on mapping failures
+Date: Sat, 14 Feb 2026 22:19:32 +0000
+Message-ID: <de01fd4111d3f89ddbddb70bdd427c741f0cda46.1771091730.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.19
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258745-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,armlinux.org.uk,lunn.ch,gmail.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258746-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.dk,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
+	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_THREE(0.00)[4];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,msgid.link:url]
-X-Rspamd-Queue-Id: 2D1BC13D7FA
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D494513DB24
 X-Rspamd-Action: no action
 
-From: Marek Behún <kabel@kernel.org>
+In an unlikely case when io_populate_area_dma() fails, which could only
+happen on a PAGE_POOL_32BIT_ARCH_WITH_64BIT_DMA machine,
+io_zcrx_map_area() will have an initialised and not freed table. It was
+supposed to be cleaned up in the error path, but !is_mapped prevents
+that.
 
-[ Upstream commit 86a8e8e0ddbc3d14c799536eb888180b84d002f3 ]
-
-Similar to Lantech 8330-262D-E, the Lantech 8330-265D also reports
-2500MBd instead of 3125MBd.
-
-Also, all 8330-265D report normal RX_LOS in EEPROM, but some signal
-inverted RX_LOS. We therefore need to ignore RX_LOS on these modules.
-
-Signed-off-by: Marek Behún <kabel@kernel.org>
-Link: https://patch.msgid.link/20260128170044.15576-1-kabel@kernel.org
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Fixes: 439a98b972fbb ("io_uring/zcrx: deduplicate area mapping")
+Cc: stable@vger.kernel.org
+Reported-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
+ io_uring/zcrx.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-LLM Generated explanations, may be completely bogus:
-
-## Analysis of SFP Quirk Addition for Lantech 8330-265D
-
-### Commit Message Analysis
-
-The commit adds a hardware quirk for the Lantech 8330-265D SFP module.
-It addresses two specific hardware issues:
-
-1. **Incorrect speed reporting**: The module reports 2500MBd instead of
-   the correct 3125MBd in its EEPROM, preventing it from being
-   recognized as a 2500base-X capable module.
-2. **Inverted RX_LOS signal**: Some units of this module report inverted
-   Loss-of-Signal, while the EEPROM claims normal LOS behavior. Since
-   the behavior is inconsistent across units, the fix ignores LOS
-   entirely.
-
-The commit explicitly references similarity to an existing quirk
-(Lantech 8330-262D-E), establishing a pattern.
-
-### Code Change Analysis
-
-The change is minimal and contained:
-- **2 lines added**: A new `SFP_QUIRK()` entry for "Lantech" /
-  "8330-265D" with `sfp_quirk_2500basex` and `sfp_fixup_ignore_los`
-- **Comment updated**: The existing comment for the 8330-262D-E is
-  expanded to cover the 8330-265D as well, and explains the LOS issue
-- **No new functions or infrastructure**: Uses existing quirk macros
-  (`SFP_QUIRK`) and existing fixup functions (`sfp_quirk_2500basex`,
-  `sfp_fixup_ignore_los`)
-
-### Classification: Hardware Quirk
-
-This falls squarely into the **SFP/Network Quirks** exception category
-explicitly mentioned in the stable backport guidelines. SFP quirks for
-optical modules with broken behavior are specifically called out as
-appropriate for stable trees.
-
-### Risk Assessment
-
-- **Risk: Extremely Low** — The quirk only triggers for modules with
-  vendor string "Lantech" and product string "8330-265D". It cannot
-  affect any other hardware.
-- **Scope: Minimal** — Two lines of data-driven code in an existing
-  quirk table. No logic changes.
-- **Dependencies: None** — The `SFP_QUIRK` macro, `sfp_quirk_2500basex`,
-  and `sfp_fixup_ignore_los` all already exist in the codebase. This
-  commit is fully self-contained.
-
-### User Impact
-
-Without this quirk:
-- The Lantech 8330-265D SFP module **cannot operate at 2500base-X**
-  because the kernel misinterprets its EEPROM data
-- Some units exhibit **random link drops or failure to establish link**
-  due to inverted RX_LOS being treated as actual signal loss
-
-These are real, user-impacting hardware issues that make the SFP module
-non-functional or unreliable.
-
-### Stability Indicators
-
-- Author is **Marek Behún**, the SFP subsystem maintainer — he deeply
-  understands this code
-- Reviewed and merged by **Jakub Kicinski**, the networking subsystem
-  maintainer
-- Follows an established pattern (identical approach to existing
-  8330-262D-E quirk)
-- The fixup functions used (`sfp_quirk_2500basex`,
-  `sfp_fixup_ignore_los`) are well-tested and used by other quirk
-  entries
-
-### Conclusion
-
-This is a textbook example of a hardware quirk that belongs in stable
-trees. It's a tiny, self-contained, zero-risk addition to an existing
-quirk table that makes specific hardware work correctly. It uses only
-pre-existing infrastructure, was authored and reviewed by the relevant
-maintainers, and fixes real hardware issues (incorrect speed negotiation
-and unreliable link due to inverted LOS).
-
-**YES**
-
- drivers/net/phy/sfp.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-index 3e023723887c4..43aefdd8b70f7 100644
---- a/drivers/net/phy/sfp.c
-+++ b/drivers/net/phy/sfp.c
-@@ -532,9 +532,13 @@ static const struct sfp_quirk sfp_quirks[] = {
- 	SFP_QUIRK("HUAWEI", "MA5671A", sfp_quirk_2500basex,
- 		  sfp_fixup_ignore_tx_fault),
+diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+index 69567e19b4ca..006e1bfefa5f 100644
+--- a/io_uring/zcrx.c
++++ b/io_uring/zcrx.c
+@@ -288,6 +288,9 @@ static int io_zcrx_map_area(struct io_zcrx_ifq *ifq, struct io_zcrx_area *area)
+ 	}
  
--	// Lantech 8330-262D-E can operate at 2500base-X, but incorrectly report
--	// 2500MBd NRZ in their EEPROM
-+	// Lantech 8330-262D-E and 8330-265D can operate at 2500base-X, but
-+	// incorrectly report 2500MBd NRZ in their EEPROM.
-+	// Some 8330-265D modules have inverted LOS, while all of them report
-+	// normal LOS in EEPROM. Therefore we need to ignore LOS entirely.
- 	SFP_QUIRK_S("Lantech", "8330-262D-E", sfp_quirk_2500basex),
-+	SFP_QUIRK("Lantech", "8330-265D", sfp_quirk_2500basex,
-+		  sfp_fixup_ignore_los),
- 
- 	SFP_QUIRK_S("UBNT", "UF-INSTANT", sfp_quirk_ubnt_uf_instant),
- 
+ 	ret = io_populate_area_dma(ifq, area);
++	if (ret && !area->mem.is_dmabuf)
++		dma_unmap_sgtable(ifq->dev, &area->mem.page_sg_table,
++				  DMA_FROM_DEVICE, IO_DMA_ATTR);
+ 	if (ret == 0)
+ 		area->is_mapped = true;
+ 	return ret;
 -- 
-2.51.0
+2.52.0
 
 
