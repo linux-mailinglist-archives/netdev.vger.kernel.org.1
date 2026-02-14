@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-258732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258733-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eOWKK2nokGkMdwEAu9opvQ
-	(envelope-from <netdev+bounces-258732-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:26:01 +0100
+	id qLX2KN/okGkOdwEAu9opvQ
+	(envelope-from <netdev+bounces-258733-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:27:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28F2F13D552
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:26:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D37113D677
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:27:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DDE283020877
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 21:25:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5525A3074E33
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 21:25:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE5191C84DE;
-	Sat, 14 Feb 2026 21:25:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 732C03C2D;
+	Sat, 14 Feb 2026 21:25:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jOSOAlch"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="caJJOp4j"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB1073C2D;
-	Sat, 14 Feb 2026 21:25:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F27F3090C1;
+	Sat, 14 Feb 2026 21:25:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771104319; cv=none; b=qeZ3eTSvOXHcxSsgpeBeq7jVN7HGTk1SMbOYVTU6W9muZq5DLcUKnSWp5YShPagsp6TwRwJs7pa6nwmwmYXw/TlS8Z8yrck9Vcz2vZ6PjKMlBKlfYIfU1L0emuGP/YaUbTvi8Fmc1So62uBPLIMS4QMzVe21hCQ2d/b4WeZP24c=
+	t=1771104323; cv=none; b=qJ8g7UBzhzfjZe48aKFi9KPeMnZJGHfPSjSU2oDEa2NH0JU2zAUWyyyoDTESZUPYYLR9sz1RNUKV1f+9EX9WO0RNVbQEllpoPub70ZGALVPO+S6zO6x4wURcFICdqcXVQ9InS9uDwizk4dbHgNaCRIItPGrXO+6exgxAawiHabE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771104319; c=relaxed/simple;
-	bh=SYr2jZH/JP9Q2+T65btHGzZV/xMCQcU2k3NTQZNlZYo=;
+	s=arc-20240116; t=1771104323; c=relaxed/simple;
+	bh=HNsIIUiNfMcrVXGaTxbgUw3HY9PSkBjZ42JbycFGdt0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=i9l46Uo8O1Jc9LjizRE6eDTt2D+I3LHG2gb8VWeybHFEwtxFN+xe4/PMe2mQ2bIV0QE48SU5n8/vxq7bFPynt062p7gztE8iywidWLxQhUZ6LjuGlqYGk6Y37BU9XgaQIsC8PM56ZKv2a6M56hG2I9EmTekHUZGseX3N1zJAAS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jOSOAlch; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9948C16AAE;
-	Sat, 14 Feb 2026 21:25:18 +0000 (UTC)
+	 MIME-Version:Content-Type; b=l0yxUDBySc3GvVAJFjrD7IEN4/fGalNyjoYJytLgNxaKiUFVgnaG1Wf5r2EVacmz5yQ7OQZbSxWDzP+4ju4GSCYOg6elbUc8Pr0yl6az9L2Z96JzWz6plLWP+LzCYICILZZU0l7ukvxywmWEP44y6euIgMRv0g0q764lfnoax7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=caJJOp4j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 183FBC19422;
+	Sat, 14 Feb 2026 21:25:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771104319;
-	bh=SYr2jZH/JP9Q2+T65btHGzZV/xMCQcU2k3NTQZNlZYo=;
+	s=k20201202; t=1771104323;
+	bh=HNsIIUiNfMcrVXGaTxbgUw3HY9PSkBjZ42JbycFGdt0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jOSOAlchxPkQsgbn//peqQenf9TNeqzgjGmjfjqUJt5TEy6MaVk+XG/R18x9sdEHP
-	 PcdLnpcRb/odVkhmd5bSyKXwp5S682fVl+G7bbTIotNfZXFdYP8SZVmeHH/ZkqVM/h
-	 VjilcQkMmEkLtlqBFBxwqpFrutEXCWEJNVMeLBlmXOHTBB5xwEtjlu4nP3IWYLNV9o
-	 E8TOtmI1HeAJtMe+Ldz17ekoDSSFKMuIzG5/kxZZXoSCDb3j4yiGLtg5ZcUXvswZq+
-	 jqJKCpQn3nSv5I5CzlIP/ZI3Z6MLXan4x34qNKw2K81Xy3Gb5hpDDAUwvdf7/06lcL
-	 XN5MrqgsgeP0w==
+	b=caJJOp4jgcuE8lQYjBZkLH56mw4XeyDSLXdulLpETeLjXZX8n0CNM058qL36d5tTD
+	 IMeflfNc0GVS21dATaKXiKopBjDNJVhptJ5zBvrwWuzUskOHwOF0zXZ+P4N+qg7dfc
+	 ZjMQPuS4PJkOTU7Lj2BoMUYivJ4oVeukj3VtDoOAl0+9UZWXj0kcTlyxZEGwrzOkTH
+	 8UXBNrWy8H3I4eZmPxquko1F0yznKZ7VO+XIBp96TTb6+HHrTkR2Iyq3PUTD3/uigm
+	 95a0I76V0I27UwZW0pTYJG2Tj9XEataKjmHhg9gcYqupuwgknq400Hzts2rheTuAZH
+	 8BU7Nxi1KdRZw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Slark Xiao <slark_xiao@163.com>,
+Cc: =?UTF-8?q?H=C3=A5kon=20Bugge?= <haakon.bugge@oracle.com>,
+	Allison Henderson <allison.henderson@oracle.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	loic.poulain@oss.qualcomm.com,
-	ryazanov.s.a@gmail.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.19-6.12] net: wwan: mhi: Add network support for Foxconn T99W760
-Date: Sat, 14 Feb 2026 16:22:39 -0500
-Message-ID: <20260214212452.782265-14-sashal@kernel.org>
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	rds-devel@oss.oracle.com
+Subject: [PATCH AUTOSEL 6.19-5.10] net/rds: Clear reconnect pending bit
+Date: Sat, 14 Feb 2026 16:22:42 -0500
+Message-ID: <20260214212452.782265-17-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260214212452.782265-1-sashal@kernel.org>
 References: <20260214212452.782265-1-sashal@kernel.org>
@@ -65,144 +66,149 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.19
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[163.com,kernel.org,oss.qualcomm.com,gmail.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-258733-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258732-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 28F2F13D552
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,msgid.link:url]
+X-Rspamd-Queue-Id: 1D37113D677
 X-Rspamd-Action: no action
 
-From: Slark Xiao <slark_xiao@163.com>
+From: Håkon Bugge <haakon.bugge@oracle.com>
 
-[ Upstream commit 915a5f60ad947e8dd515d2cc77a96a14dffb3f15 ]
+[ Upstream commit b89fc7c2523b2b0750d91840f4e52521270d70ed ]
 
-T99W760 is designed based on Qualcomm SDX35 chip. It use similar
-architecture with SDX72/SDX75 chip. So we need to assign initial
-link id for this device to make sure network available.
+When canceling the reconnect worker, care must be taken to reset the
+reconnect-pending bit. If the reconnect worker has not yet been
+scheduled before it is canceled, the reconnect-pending bit will stay
+on forever.
 
-Signed-off-by: Slark Xiao <slark_xiao@163.com>
-Link: https://patch.msgid.link/20260105022646.10630-1-slark_xiao@163.com
+Signed-off-by: Håkon Bugge <haakon.bugge@oracle.com>
+Signed-off-by: Allison Henderson <allison.henderson@oracle.com>
+Link: https://patch.msgid.link/20260203055723.1085751-6-achender@kernel.org
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-## Analysis
+### 3. BUG MECHANISM — CLEAR AND CRITICAL
 
-### Commit Message Analysis
+Now the full picture is clear:
 
-The commit adds network support for a new device, the Foxconn T99W760,
-which is based on the Qualcomm SDX35 chip. The commit message explains
-that this device uses a similar architecture to SDX72/SDX75 and needs an
-initial link ID assignment to make networking functional.
+**The flow:**
+1. `rds_queue_reconnect()` at line 138 sets `RDS_RECONNECT_PENDING` and
+   queues the delayed work.
+2. `rds_connect_worker()` (the worker function) at line 173 clears
+   `RDS_RECONNECT_PENDING` when it runs.
+3. `rds_conn_path_connect_if_down()` at line 911 uses
+   `test_and_set_bit(RDS_RECONNECT_PENDING, ...)` — if the bit is
+   already set, it returns without queuing work, trusting that a
+   reconnect is already pending.
 
-### Code Change Analysis
+**The bug:**
+In `rds_conn_shutdown()`, `cancel_delayed_work_sync()` cancels the
+queued worker. If the worker hadn't started yet, it never runs
+`clear_bit(RDS_RECONNECT_PENDING, ...)`. The bit stays set. Then when
+`rds_conn_path_connect_if_down()` is later called (e.g., when trying to
+send data), `test_and_set_bit` finds the bit already set and skips
+queuing — **forever**. The connection can never reconnect.
 
-The change is extremely minimal — a single line addition:
+This is a **permanent connection failure** bug — once triggered, the RDS
+connection path is effectively dead until the system is rebooted or the
+module is reloaded.
 
-```c
-strcmp(cntrl->name, "foxconn-t99w760") == 0)
-```
+### 4. CLASSIFICATION
 
-This adds the "foxconn-t99w760" device name to the
-`mhi_mbim_get_link_mux_id()` function so that it returns
-`WDS_BIND_MUX_DATA_PORT_MUX_ID` instead of `0`. This is the same
-treatment already given to "foxconn-dw5934e" and "foxconn-t99w640".
+- **Bug type:** State corruption / logic bug leading to permanent loss
+  of network connectivity
+- **Severity:** HIGH — RDS is used in production Oracle RAC clusters and
+  RDMA-based environments
+- **Trigger:** Race between shutdown and reconnect scheduling —
+  realistic in production with network flaps
 
-### Classification: Device ID / Hardware Enablement
+### 5. SCOPE AND RISK
 
-This falls squarely into the **"New Device IDs"** exception category for
-stable backports. It's adding support for a specific device to an
-existing driver by matching its name and applying the same configuration
-that other similar devices already use.
+- **Change size:** 1 functional line (plus 1 blank line) — extremely
+  small and surgical
+- **Files changed:** 1 file (`net/rds/connection.c`)
+- **Risk of regression:** Very low — `clear_bit` is idempotent. If the
+  worker already ran and cleared the bit, clearing it again is harmless.
+  If the worker didn't run, this is the correct fix.
+- **The fix is placed correctly:** After `cancel_delayed_work_sync()`
+  guarantees the worker won't run, and before `rds_queue_reconnect()`
+  which will set the bit again if needed.
 
-Without this change, users with the Foxconn T99W760 WWAN modem cannot
-use networking — the device gets the wrong mux ID (0 instead of
-`WDS_BIND_MUX_DATA_PORT_MUX_ID`), making the network interface non-
-functional.
+### 6. STABLE KERNEL CRITERIA
 
-### Risk Assessment
+- **Obviously correct:** Yes — the logic is straightforward and well-
+  explained
+- **Fixes a real bug:** Yes — permanent loss of RDS connectivity
+- **Important issue:** Yes — affects network reliability for RDS users
+  (Oracle, RDMA environments)
+- **Small and contained:** Yes — 1 line in 1 file
+- **No new features:** Correct — purely a bug fix
+- **No new APIs:** Correct
 
-- **Scope**: 1 line added, 1 file changed
-- **Risk**: Extremely low — the change only affects devices matching the
-  exact name "foxconn-t99w760". No other hardware is affected.
-- **Pattern**: Follows the exact same pattern as existing devices in the
-  same function
-- **Complexity**: Trivial string comparison addition
+### 7. DEPENDENCY CHECK
 
-### User Impact
-
-Users with the Foxconn T99W760 WWAN modem (a real shipping hardware
-device) cannot use network connectivity without this patch. This is a
-real-world hardware enablement fix.
-
-### Stability Assessment
-
-- The driver (`mhi_wwan_mbim.c`) already exists in stable trees
-- The function `mhi_mbim_get_link_mux_id()` already exists
-- The pattern is identical to existing entries
-- Zero risk of regression for any other hardware
-
-### Dependencies
-
-No dependencies on other commits. The change is entirely self-contained.
+This fix is self-contained. It only adds a `clear_bit()` call after an
+existing `cancel_delayed_work_sync()` call. The `RDS_RECONNECT_PENDING`
+flag and the surrounding code have been in the kernel for a long time.
+This should apply cleanly to any stable tree that has the RDS subsystem.
 
 ### Conclusion
 
-This is a textbook device ID addition to an existing driver — one of the
-explicitly allowed exception categories for stable backports. It enables
-real hardware for real users, is trivially small, has zero regression
-risk, and follows an established pattern in the same function.
+This is a textbook stable backport candidate: a tiny, obviously correct,
+one-line fix for a serious bug (permanent connection failure) in
+networking code used in production environments. The fix has zero risk
+of regression due to the idempotent nature of `clear_bit`, and the bug
+mechanism is clearly explained and verified through code analysis.
 
 **YES**
 
- drivers/net/wwan/mhi_wwan_mbim.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ net/rds/connection.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/wwan/mhi_wwan_mbim.c b/drivers/net/wwan/mhi_wwan_mbim.c
-index f8bc9a39bfa30..1d7e3ad900c12 100644
---- a/drivers/net/wwan/mhi_wwan_mbim.c
-+++ b/drivers/net/wwan/mhi_wwan_mbim.c
-@@ -98,7 +98,8 @@ static struct mhi_mbim_link *mhi_mbim_get_link_rcu(struct mhi_mbim_context *mbim
- static int mhi_mbim_get_link_mux_id(struct mhi_controller *cntrl)
- {
- 	if (strcmp(cntrl->name, "foxconn-dw5934e") == 0 ||
--	    strcmp(cntrl->name, "foxconn-t99w640") == 0)
-+	    strcmp(cntrl->name, "foxconn-t99w640") == 0 ||
-+	    strcmp(cntrl->name, "foxconn-t99w760") == 0)
- 		return WDS_BIND_MUX_DATA_PORT_MUX_ID;
- 
- 	return 0;
+diff --git a/net/rds/connection.c b/net/rds/connection.c
+index ad8027e6f54ef..dbfea6fa11260 100644
+--- a/net/rds/connection.c
++++ b/net/rds/connection.c
+@@ -429,6 +429,8 @@ void rds_conn_shutdown(struct rds_conn_path *cp)
+ 	 * to the conn hash, so we never trigger a reconnect on this
+ 	 * conn - the reconnect is always triggered by the active peer. */
+ 	cancel_delayed_work_sync(&cp->cp_conn_w);
++
++	clear_bit(RDS_RECONNECT_PENDING, &cp->cp_flags);
+ 	rcu_read_lock();
+ 	if (!hlist_unhashed(&conn->c_hash_node)) {
+ 		rcu_read_unlock();
 -- 
 2.51.0
 
