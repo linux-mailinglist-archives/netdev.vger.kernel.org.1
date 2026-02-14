@@ -1,156 +1,187 @@
-Return-Path: <netdev+bounces-258697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258698-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iLOvDzdokGk7ZQEAu9opvQ
-	(envelope-from <netdev+bounces-258697-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 13:19:03 +0100
+	id GKPVBYtpkGllZQEAu9opvQ
+	(envelope-from <netdev+bounces-258698-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 13:24:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E40013BD35
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 13:19:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B54A13BD76
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 13:24:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 895C83001FD1
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 12:19:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EBBE1301D310
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 12:24:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68E622FFF89;
-	Sat, 14 Feb 2026 12:18:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C3030B52A;
+	Sat, 14 Feb 2026 12:24:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=m.fudan.edu.cn header.i=@m.fudan.edu.cn header.b="Jq3PVJql"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x0dYZuJ9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7609654758;
-	Sat, 14 Feb 2026 12:18:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771071539; cv=none; b=IlwB/958gb2fYaXRhm4CZfZfRVqq8Ktepa4liF3eIu1JFAAMkCScXNeYjGy60FCS9QZmdTuUYm0M4U/SlDSaL1pwvWd+1ikfaXsmLmlmfy9MLBRs0WW3q/pcsiTD6KEDNFynBsmk3T2bQsYAQfWfGKPxz/5d+JKzwCA7lHfOBWk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771071539; c=relaxed/simple;
-	bh=Pr63MeFRXsNlhMExsxDqhDjQEG1jqVI7YHXsDt25dHA=;
-	h=From:To:Cc:Subject:Mime-Version:Content-Type:Date:Message-ID; b=Iwo6HqElHTY1WB0BAm/rQGBCjpr54mo1RjoeFpZOr3rzuSVb7iJ5hHsf1Or7jhjlwMwk2Duoa0B29chBTzJRxYnPxkJF00AF3DWpLTSyCGowW6eCHHcgfiZIeVzAdc/EGHdiGpoz3dgmXBS9Q5yHwKpcuDgNPZulcb8Sk+rvgCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=m.fudan.edu.cn; spf=pass smtp.mailfrom=m.fudan.edu.cn; dkim=pass (1024-bit key) header.d=m.fudan.edu.cn header.i=@m.fudan.edu.cn header.b=Jq3PVJql; arc=none smtp.client-ip=54.204.34.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=m.fudan.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=m.fudan.edu.cn
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=m.fudan.edu.cn;
-	s=sorc2401; t=1771071469;
-	bh=Pr63MeFRXsNlhMExsxDqhDjQEG1jqVI7YHXsDt25dHA=;
-	h=From:To:Subject:Mime-Version:Date:Message-ID;
-	b=Jq3PVJql7u389K0LQA8SpFyAE9O9eu2EDCR341GLEMN6c47s1blyo5aC9MeCbkQDP
-	 u6tir8I/G353cgjvr6/hhiBGTa8/mbFeldfGPatNYu4xxv9jDWZ8zgMGu0eZA32TzI
-	 s2fen8IEViaCqa5XiwxKlLcrziLFl7RwIecX1IQQ=
-EX-QQ-RecipientCnt: 7
-X-QQ-GoodBg: 2
-X-QQ-SSF: 00400000000000F0
-X-QQ-FEAT: D4aqtcRDiqSLhR1udr7El38hsqP75oNJnfS6o7szs44=
-X-QQ-BUSINESS-ORIGIN: 2
-X-QQ-Originating-IP: qqTASKJVjn+p99mq+3BZArJQqMA03LUtlIl29VdFMfo=
-X-QQ-STYLE: 
-X-QQ-mid: lv3gz6b-1t1771071462teb8a41fb
-From: "=?utf-8?B?5Yav5ZiJ5Luq?=" <23210240148@m.fudan.edu.cn>
-To: "=?utf-8?B?ZHNhaGVybg==?=" <dsahern@kernel.org>
-Cc: "=?utf-8?B?ZGF2ZW0=?=" <davem@davemloft.net>, "=?utf-8?B?ZWR1bWF6ZXQ=?=" <edumazet@google.com>, "=?utf-8?B?a3ViYQ==?=" <kuba@kernel.org>, "=?utf-8?B?cGFiZW5p?=" <pabeni@redhat.com>, "=?utf-8?B?bmV0ZGV2?=" <netdev@vger.kernel.org>, "=?utf-8?B?bGludXgta2VybmVs?=" <linux-kernel@vger.kernel.org>
-Subject: [BUG] Potential Null Pointer Dereference in nexthop_create_group Function
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33BAD30AD0A
+	for <netdev@vger.kernel.org>; Sat, 14 Feb 2026 12:24:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771071880; cv=pass; b=tHIjnJljG3VCFQxsGeZ+/021cZXX+5k/A7E0H2LbzkiLQScJ6sLi9CdWkx/xNh4d2DZZ5mDGWQhRnm6ArjkdzBWf96mSsKVPuZp2uDRDVcoKGI9HjXK7f8cvzVxoDPfWbTOJmyvzC+tWqy0r7B7BaXCX/eWfEZi21OVXx+Twh3M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771071880; c=relaxed/simple;
+	bh=q4cxUOMCfCrqAwr+TojVQFPymtMs9sCnyVT0/hhpuUA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=B/1CgvzWr8JRRLqbZA9cggOq8aclr4HCjnyfxt90PhXka8HIV49qiKDLgG3LAmnMsbeQsXVEE/om1qu72JB5UFiiF8kpTewy2B53ztJyGcIrIJBWVgTyCIwdKcsogpIF6Q6EH14WX85hMLn0yOIhecq58d4NyIFIxvuhBxO2Zaw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x0dYZuJ9; arc=pass smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-503347dea84so21077791cf.3
+        for <netdev@vger.kernel.org>; Sat, 14 Feb 2026 04:24:38 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771071878; cv=none;
+        d=google.com; s=arc-20240605;
+        b=lxOrB8m8vVt9lpg+ESJ+/BbrOK60QMDfHjhwFq7uChiRyNXV9Up4WOhtYwT/sOHh0g
+         436B08ZJXG7lbzrCKILgMH1gld8LnPlFSpxub08SGqWN1zW2Q9YH6eexBjhoQzwK8Npi
+         GMJYvs1HrrrM+x5GfN+ZFRarE4j9k94PngbjneZreHXs9rhn2F808rs+oSHKf2r1F8K7
+         e8wK5hnhbanGZu4Z6d6+nRQDIwhZ5YYq2rwnWopUII13RqoN6ooh7ESRPZoLL7pga/C3
+         LwllQFbgJ9pVktJFLyj0rdcisBCyVfh8N282OLf99GvxyCrbVkVBPy+yrqZEtZMicnvI
+         1Pmw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=sPWTyjs9tozXoPPAmQmRuCCI7Ivl22mO14D7dHHGmaQ=;
+        fh=q2mEcYn48fMIopFhjCmQJeGNJCcCE+o/YMGzVH3JhYA=;
+        b=XwUS7GZRiquZJDPtH/BqzV/gCpe4wJY1ejko6nx7CgVqPb3gvY++/QkVfYo6wlZzks
+         30UjZN1VBF1hCeN3blnmJiZyo6SC6MKgBnPJQ+62LkvTRbiGhUCcHdJPWinc1PLyvGdu
+         SX7DVrhM9NXBAQjNnGO9h6sehStLJSSY+ExOj2Z8+5ktCKwsWH+FXgBCGcih4ryqdm1n
+         ZYNRK5y6dM3AqoKgH5e+OnKwciHFuXppLnlHA34PSr8Jptd6oQPqyZYfAsszWBOQ/7su
+         VTEMY5clL28vIfPJyqOpkVDTYQtoRTr4uBz3s6WzLZkoCxaHdXXv6B/LVgcXsqNt86/K
+         TEnA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1771071878; x=1771676678; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sPWTyjs9tozXoPPAmQmRuCCI7Ivl22mO14D7dHHGmaQ=;
+        b=x0dYZuJ9c/0PbgDeJhd+EdfB/T6XAPYAyG4J8QJFdUxWHP9G8gp+/fx7C2FDqnCCGw
+         CTDJQJOHGy2r6x+0aoOA2pLdCaXdbOjCp0ND8rl7fBRgnPP6Sda34+dUUKmoqzNqfi5y
+         V0tm7JVJXbCJQrSc3aA+if2mm6dHsar2eRYYYBIebHTolm30vqIgf48q4avcSZ26G9yB
+         Ab/L2ZBcPz2n4t33qUxrcRje9FcyA+iiHg5lOekva4hhudhMrn6Kzv957vgOKQQWXnw5
+         Pc+FZLi675AuJsaM5C/QUSVSzT9S6pUiAlSX4CmqeKvDWpfJxRt2mMV1ly/QHtZTnePY
+         zwzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771071878; x=1771676678;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=sPWTyjs9tozXoPPAmQmRuCCI7Ivl22mO14D7dHHGmaQ=;
+        b=A4Z9kOHcKucPoIDoJ4Zn6i8BlkWRviVUKxXuZ9DT+WoUOP6bV5CfJwnb0kKEy28CoS
+         ehrzkHBwMFY1TPdoF8uHsosQKjSBJ0pwisBcGR5d0Aoo4XWoeQItyMlq4Vxkdimz8bpc
+         BgYtH6FyteXsq64ryjAclB6HVzpukZdcOy9IpD9h9l/1lDYIWUaugkx2Icod+ajfCD8t
+         0CyMa5qv7hGu45MNMxz68a8ezjU/5KvCoQbgkR1NfzHFawMYQej7nIVzkt55xXB2gZwl
+         plHgkcvkamDtEHrOqWMpuTY8ZFfxkyv0T5RqlL568x5OIJJzo/HqVZ/XJ/WHYVtMenRu
+         O1QQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUlD8R56Q52ttbLjPTX4nHSxqe/pKbiRlkGGwVcUXXt85CUW3QCOY8fMeV9eN1eHkHWpQrA/2s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBKsV0Gud2LElbwKDJ6OcMq1Ci/2nDTl7cD8q+tGQTDFhHZQbk
+	kEmiJQhyCeJ44EbfZteatv0Easnfvf3HoleHkpRxHkO3bLwPTGZuW7XJABQSo6/pYdf19P8lb4P
+	6NSXzkyPcjcs+KXZ2dztLHiaiBWjamMvW9cqVV63eJqV4suwQZzBS6oBJ
+X-Gm-Gg: AZuq6aLo4cw/kUCq9mkeZQ6grMezeBWDxlkdL7iN09bqRTJB7+rqrIJXB4Ua3dvcCVY
+	ko6aIzCUmFK6L1EnP659oiVrn3bDiwvYsmHh25FT+P8zI5VmeVCXIZ2RWO1LwEpg7B5nDH4Ey+C
+	zAE3MJVW4J9cTS51irJ3BBwfulL+usDU2I8vFM62Uu03QoZuDR8o3h6HFT/yDTRv3XDU+8wJ5hF
+	bkfok2/IyhathIuOHkJsqPM0VAw6oGUj1hE11fIcbrcybYDFt/eYZBmoewxAf23ZMT0iIrqqRGr
+	jbCevWo=
+X-Received: by 2002:ac8:584f:0:b0:506:1c3b:c8a3 with SMTP id
+ d75a77b69052e-506b3fa63dfmr37029201cf.27.1771071877607; Sat, 14 Feb 2026
+ 04:24:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: base64
-Date: Sat, 14 Feb 2026 20:17:42 +0800
-X-Priority: 3
-Message-ID: <tencent_5E937E37585390AB0DB7DEE4@qq.com>
-X-QQ-MIME: TCMime 1.0 by Tencent
-X-Mailer: QQMail 2.x
-X-QQ-Mailer: QQMail 2.x
-X-BIZMAIL-ID: 6074213619220883086
-X-Address-Ticket:version=;type=;ticket_id=;id_list=;display_name=;session_id=;
-X-QQ-SENDSIZE: 520
-Received: from qq.com (unknown [127.0.0.1])
-	by smtp.qq.com (ESMTP) with SMTP
-	id ; Sat, 14 Feb 2026 20:17:43 +0800 (CST)
-Feedback-ID: lv:m.fudan.edu.cn:qybglogicsvrsz:qybglogicsvrsz4b-0
-X-QQ-XMAILINFO: MtrCxSnAE68rVcK5PTSu42suEW+hTa7SWxgjINpEH2xbySirjMXmbJKn
-	0UMQyl7EFrGi0ddJIago61Vf8tVPi8ifivRRYQM8r1bZKSMmfneIju1ZShTbh417EG8+XWt
-	/ewMd2lAZdEXHMAIQWJDXiZnAGOZdFz/hlpJhG/FZFddpmp2zbxfEPBQUbTcyf2azsPKqmN
-	FXObCelbL/rcJdHHJ5joQo1DQdbABr/tPGvsRVqs6uIpvenqjxj6Zx+GSMusj0lMxi03Ehc
-	Y8ciLhErnS/GsEg8SErQaI0Mw2kkcO7m6a0bdjAMnStw4Q1MYavaBLzzSBbhj74MmsIQdvq
-	CFbL2imkzAKz1W4xjy0pMvOuzTvZqfbEApQpUWsU/LYKkrWKHIg+inyBUKG+4jaHtPmxKZR
-	w1CSvD1YujWc1st3fkVqoAL764yIF+cR6A905mQuOFyxaY9XXuP7x13ZkZYszdhMhhzkXmF
-	EhJEpSfENrJWzYwcUIp9M/fA+fpZCVVr/VzqieKwRrIMlE+Avi7rNIWBFhEcwct7yq6GtH3
-	77BgMMqXOKOpkHYw/bp+27g8g1BT7DcqCo/XtBLSGTROATtI1MRYQpKnreXg7QxWm7ueFhD
-	/igtw2UQ5hAIdlrqdqJtodDovjCri0jnsxvHMyJwgkcpF42X7+c8j56z/J4h8fWpSMSXAGk
-	AhYg7vSj5zftRgi7UtzLNjEOWOmNeG9zJ1nDCLxqWMSu464de2ZUJHDZmqsZHmU8Y2n6tBo
-	R/Jk7QB/8UBUDkyLdqTGpt6tOpxKgoPNmAWqMWz4Xnncr8GvfXR4+sRzPmxS3KVbLrfbjqz
-	H1QPhfCdbqzYVQa4h8CcPcpEEmgmwGmLCtQ64fbmcBfZ808nunWA52hAG0C/f2GpHLEerRp
-	MVZw6XxXKMiZstv9ccsBsHDSXTpREUw22UTfEnClLGmIdmVjxKiRvRfJEttH+jsBAo2RRyx
-	GfJlQ95VzkCUnXp1W2IUhau21WYTaWFFBcewvrl2dT4XVAMkWxP0MMZG4X7c3HROALMOoIe
-	TNNfuc14RFY4PuQ0J/32CbopewjvPzthMy9Po6mg==
-X-QQ-XMRINFO: NyFYKkN4Ny6FuXrnB5Ye7Aabb3ujjtK+gg==
-X-QQ-RECHKSPAM: 0
+MIME-Version: 1.0
+References: <tencent_6C4DE85B2264772717871054@qq.com>
+In-Reply-To: <tencent_6C4DE85B2264772717871054@qq.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sat, 14 Feb 2026 13:24:26 +0100
+X-Gm-Features: AZwV_QgV5MxgRMem_HGIt9AWJ5J0rfvRC-rw-r8Ln-A3GBEh8D1mAtWxIcKK5XM
+Message-ID: <CANn89iJKp2sXJU5jO0+D8+5qTe4TWgzgZmCN_SDy0CwydWEfwQ@mail.gmail.com>
+Subject: Re: [BUG] Potential Null Pointer Dereference in tcp_mtu_probe Function
+To: =?UTF-8?B?5Yav5ZiJ5Luq?= <23210240148@m.fudan.edu.cn>
+Cc: davem <davem@davemloft.net>, dsahern <dsahern@kernel.org>, kuba <kuba@kernel.org>, 
+	pabeni <pabeni@redhat.com>, netdev <netdev@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.44 / 15.00];
-	CC_EXCESS_BASE64(1.50)[];
-	TO_EXCESS_BASE64(1.50)[];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[m.fudan.edu.cn,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[m.fudan.edu.cn:s=sorc2401];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_ALL(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258697-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[m.fudan.edu.cn:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[23210240148@m.fudan.edu.cn,netdev@vger.kernel.org];
-	HAS_X_PRIO_THREE(0.00)[3];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,fudan.edu.cn:email,mail.gmail.com:mid];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4E40013BD35
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-258698-lists,netdev=lfdr.de];
+	PRECEDENCE_BULK(0.00)[];
+	TO_DN_ALL(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+]
+X-Rspamd-Queue-Id: 6B54A13BD76
 X-Rspamd-Action: no action
 
-RGVhciBNYWludGFpbmVyLA0KDQpPdXIgdGVhbSByZWNlbnRseSBkZXZlbG9wZWQgYSBudWxs
-LXBvaW50ZXItZGVyZWZlcmVuY2UgKE5QRCkgdnVsbmVyYWJpbGl0eSBkZXRlY3Rpb24gdG9v
-bCwgYW5kIHdlIHVzZWQgaXQgdG8gc2NhbiB0aGUgTGludXggS2VybmVsICh2ZXJzaW9uIDYu
-OS42KS4gQWZ0ZXIgbWFudWFsIHJldmlldywgd2UgaWRlbnRpZmllZCBhIHBvdGVudGlhbGx5
-IHZ1bG5lcmFibGUgY29kZSBzbmlwcGV0IHRoYXQgY291bGQgbGVhZCB0byBhIG51bGwtcG9p
-bnRlciBkZXJlZmVyZW5jZSBidWcuIFdlIHdvdWxkIGFwcHJlY2lhdGUgeW91ciBleHBlcnQg
-aW5zaWdodCB0byBjb25maXJtIHdoZXRoZXIgdGhpcyB2dWxuZXJhYmlsaXR5IGNvdWxkIGlu
-ZGVlZCBwb3NlIGEgcmlzayB0byB0aGUgc3lzdGVtLg0KDQpWdWxuZXJhYmlsaXR5IERlc2Ny
-aXB0aW9uOg0KRmlsZTogIG5ldC9pcHY0L25leHRob3AuYw0KSW4gdGhlIGZ1bmN0aW9uIG5l
-eHRob3BfY3JlYXRlX2dyb3VwLCB3ZSBmb3VuZCB0aGUgZm9sbG93aW5nIGxpbmUgb2YgY29k
-ZToNCg0KaWYgKCFuZXh0aG9wX2dldChuaGUpKSB7DQoNClRoZSBpc3N1ZSBhcmlzZXMgYmVj
-YXVzZSB0aGUgbmhlIHBvaW50ZXIgbWF5IGJlIHBhc3NlZCBhcyBOVUxMIGluIGNlcnRhaW4g
-c2l0dWF0aW9ucy4gVGhlIHN0YXRlbWVudCBwYXNzZXMgdGhlIG5oZSBwb2ludGVyIHRvIG5l
-eHRob3BfZ2V0IHdpdGhvdXQgYW55IGNoZWNrLCBidXQgbmV4dGhvcF9nZXQgbWlnaHQgY29u
-dGFpbiBhIGRlcmVmZXJlbmNlIG9wZXJhdGlvbiBvbiB0aGUgbmhlIHBvaW50ZXIsIHdoaWNo
-IGNvdWxkIHJlc3VsdCBpbiBhIG51bGwtcG9pbnRlciBkZXJlZmVyZW5jZS4NCg0KUHJvcG9z
-ZWQgRml4Og0KVG8gcHJldmVudCB0aGUgcG90ZW50aWFsIG51bGwtcG9pbnRlciBkZXJlZmVy
-ZW5jZSwgd2Ugc3VnZ2VzdCBhZGRpbmcgYSBOVUxMIGNoZWNrIGZvciB0aGUgbmhlIHBvaW50
-ZXIgYmVmb3JlIGF0dGVtcHRpbmcgdG8gcGFzcyB0aGUgcG9pbnRlciB0byBuZXh0aG9wX2dl
-dC4NCg0KUmVxdWVzdCBmb3IgUmV2aWV3Og0KV2Ugd291bGQgYXBwcmVjaWF0ZSB5b3VyIGV4
-cGVydCBpbnNpZ2h0IHRvIGNvbmZpcm0gd2hldGhlciB0aGlzIHZ1bG5lcmFiaWxpdHkgaW5k
-ZWVkIHBvc2VzIGEgcmlzayB0byB0aGUgc3lzdGVtLCBhbmQgaWYgdGhlIHByb3Bvc2VkIGZp
-eCBpcyBhcHByb3ByaWF0ZS4gSWYgdGhlcmUgYXJlIHJlYXNvbnMgd2h5IHRoaXMgaXNzdWUg
-ZG9lcyBub3QgcHJlc2VudCBhIHJlYWwgcmlzayAoZS5nLiwgdGhlIE5VTEwgY2hlY2sgaXMg
-cmVkdW5kYW50IG9yIHVubmVjZXNzYXJ5KSwgd2Ugd291bGQgYmUgZ3JhdGVmdWwgZm9yIGNs
-YXJpZmljYXRpb24uDQoNClRoYW5rIHlvdSBmb3IgeW91ciB0aW1lIGFuZCBjb25zaWRlcmF0
-aW9uLg==
+On Sat, Feb 14, 2026 at 1:11=E2=80=AFPM =E5=86=AF=E5=98=89=E4=BB=AA <232102=
+40148@m.fudan.edu.cn> wrote:
+>
+> Dear Maintainer,
+>
+> Our team recently developed a null-pointer-dereference (NPD) vulnerabilit=
+y detection tool, and we used it to scan the Linux Kernel (version 6.9.6). =
+After manual review, we identified a potentially vulnerable code snippet th=
+at could lead to a null-pointer dereference bug. We would appreciate your e=
+xpert insight to confirm whether this vulnerability could indeed pose a ris=
+k to the system.
+>
+> Vulnerability Description:
+> File:  net/ipv4/tcp_output.c
+> In the function tcp_mtu_probe, we found the following line of code:
+>
+> TCP_SKB_CB(nskb)->seq =3D TCP_SKB_CB(skb)->seq
+>
+> The issue arises because the skb pointer may be passed as NULL in certain=
+ situations.  The statement passes the skb pointer to TCP_SKB_CB without an=
+y check, but TCP_SKB_CB might contain a dereference operation on the skb po=
+inter, which could result in a null-pointer dereference.
 
+Which pointer could be NULL here ? Be specific please.
+
+>
+> Proposed Fix:
+> To prevent the potential null-pointer dereference, we suggest adding a NU=
+LL check for the skb pointer before attempting to pass the pointer to TCP_S=
+KB_CB.
+>
+> Request for Review:
+> We would appreciate your expert insight to confirm whether this vulnerabi=
+lity indeed poses a risk to the system, and if the proposed fix is appropri=
+ate. If there are reasons why this issue does not present a real risk (e.g.=
+, the NULL check is redundant or unnecessary), we would be grateful for cla=
+rification.
+>
+> Thank you for your time and consideration.
+
+I think you probably should fix your tool, and use a more recent kernel any=
+way.
+
+Try to have a human validation before sending such reports, thank you.
 
