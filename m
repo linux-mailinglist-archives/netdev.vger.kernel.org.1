@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-258731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258732-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EIFULk3okGkOdwEAu9opvQ
-	(envelope-from <netdev+bounces-258731-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:25:33 +0100
+	id eOWKK2nokGkMdwEAu9opvQ
+	(envelope-from <netdev+bounces-258732-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:26:01 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 504E713D50A
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:25:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 28F2F13D552
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:26:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B5A58301939E
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 21:25:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DDE283020877
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 21:25:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79C122E5B19;
-	Sat, 14 Feb 2026 21:25:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE5191C84DE;
+	Sat, 14 Feb 2026 21:25:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ameAn710"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jOSOAlch"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55C431C84DE;
-	Sat, 14 Feb 2026 21:25:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB1073C2D;
+	Sat, 14 Feb 2026 21:25:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771104309; cv=none; b=aWRbuKHdV3UiUcB7BmwiabMqfyeyuQ9WC55WiStpNu3yBmXCjEqMbYJCNUROVazuS5gZr1zMyf221mo8Uv7W9v7dWx2bp2gj6FnFOa74BjiZjBmH7SRYe+Sm0tPktbgsGKZqYhBCAG2ELL7Mp4T484ReWahF7Slb4wfcy1KlSO4=
+	t=1771104319; cv=none; b=qeZ3eTSvOXHcxSsgpeBeq7jVN7HGTk1SMbOYVTU6W9muZq5DLcUKnSWp5YShPagsp6TwRwJs7pa6nwmwmYXw/TlS8Z8yrck9Vcz2vZ6PjKMlBKlfYIfU1L0emuGP/YaUbTvi8Fmc1So62uBPLIMS4QMzVe21hCQ2d/b4WeZP24c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771104309; c=relaxed/simple;
-	bh=QP1Mxt56RkhuEfSgRzgq6bcfzX827a6zZrXFGKW3xUc=;
+	s=arc-20240116; t=1771104319; c=relaxed/simple;
+	bh=SYr2jZH/JP9Q2+T65btHGzZV/xMCQcU2k3NTQZNlZYo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XrZD2WgFHok14HmytZFSuaBk36mEDrLkLd3XKNzeDeDFCfjb0YHUPb9iazVyxAIuQfxiEUWZ2Wq1nDkkadzHlKh8CGIRDFBb2EbgiApAXSMi130tYp4ObQ+2EfpTJjeO/psQEaWzho6DNZLbnxp6jQ6KN9RgSh2VsMmA/t+gkDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ameAn710; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6239DC16AAE;
-	Sat, 14 Feb 2026 21:25:08 +0000 (UTC)
+	 MIME-Version:Content-Type; b=i9l46Uo8O1Jc9LjizRE6eDTt2D+I3LHG2gb8VWeybHFEwtxFN+xe4/PMe2mQ2bIV0QE48SU5n8/vxq7bFPynt062p7gztE8iywidWLxQhUZ6LjuGlqYGk6Y37BU9XgaQIsC8PM56ZKv2a6M56hG2I9EmTekHUZGseX3N1zJAAS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jOSOAlch; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9948C16AAE;
+	Sat, 14 Feb 2026 21:25:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771104309;
-	bh=QP1Mxt56RkhuEfSgRzgq6bcfzX827a6zZrXFGKW3xUc=;
+	s=k20201202; t=1771104319;
+	bh=SYr2jZH/JP9Q2+T65btHGzZV/xMCQcU2k3NTQZNlZYo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ameAn710/kEid/UYZ80rYKucPl+wirxkYv0tKEZ5cGhRfk1i0yVRCdJQlH3QCKdnw
-	 luckSf62VJlsyOX4jnmtUFC/5RQ3/0B0IdbKLtCWvTqpYaPwoivvfYwiZb5Sw7YNPT
-	 +KQ67h4IgskVhvVR0FZi+SHcDvPMv7eVRMsLmGbDLcquuaOJPshVQsYSyj5fRBSHY/
-	 E3SYF9jzWLvx1/ce9r+fBLwdrbJk0TRRyW60SB610/suxaGpSe9D3FWgODIRtIGCiT
-	 v86gY9e2uyStrRauQ7a5pBX+bfjFwZGO/RO/yu0JqNdtY2Xiuy15EHXM+F8XVv5Qmc
-	 mBvsgXKOxD1pw==
+	b=jOSOAlchxPkQsgbn//peqQenf9TNeqzgjGmjfjqUJt5TEy6MaVk+XG/R18x9sdEHP
+	 PcdLnpcRb/odVkhmd5bSyKXwp5S682fVl+G7bbTIotNfZXFdYP8SZVmeHH/ZkqVM/h
+	 VjilcQkMmEkLtlqBFBxwqpFrutEXCWEJNVMeLBlmXOHTBB5xwEtjlu4nP3IWYLNV9o
+	 E8TOtmI1HeAJtMe+Ldz17ekoDSSFKMuIzG5/kxZZXoSCDb3j4yiGLtg5ZcUXvswZq+
+	 jqJKCpQn3nSv5I5CzlIP/ZI3Z6MLXan4x34qNKw2K81Xy3Gb5hpDDAUwvdf7/06lcL
+	 XN5MrqgsgeP0w==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Jian Zhang <zhangjian.3032@bytedance.com>,
+Cc: Slark Xiao <slark_xiao@163.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	jk@codeconstruct.com.au,
-	matt@codeconstruct.com.au,
+	loic.poulain@oss.qualcomm.com,
+	ryazanov.s.a@gmail.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.19-6.1] net: mctp-i2c: fix duplicate reception of old data
-Date: Sat, 14 Feb 2026 16:22:33 -0500
-Message-ID: <20260214212452.782265-8-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.19-6.12] net: wwan: mhi: Add network support for Foxconn T99W760
+Date: Sat, 14 Feb 2026 16:22:39 -0500
+Message-ID: <20260214212452.782265-14-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260214212452.782265-1-sashal@kernel.org>
 References: <20260214212452.782265-1-sashal@kernel.org>
@@ -71,185 +71,138 @@ X-stable-base: Linux 6.19
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258731-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[163.com,kernel.org,oss.qualcomm.com,gmail.com,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258732-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bytedance.com:email]
-X-Rspamd-Queue-Id: 504E713D50A
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 28F2F13D552
 X-Rspamd-Action: no action
 
-From: Jian Zhang <zhangjian.3032@bytedance.com>
+From: Slark Xiao <slark_xiao@163.com>
 
-[ Upstream commit ae4744e173fadd092c43eda4ca92dcb74645225a ]
+[ Upstream commit 915a5f60ad947e8dd515d2cc77a96a14dffb3f15 ]
 
-The MCTP I2C slave callback did not handle I2C_SLAVE_READ_REQUESTED
-events. As a result, i2c read event will trigger repeated reception of
-old data, reset rx_pos when a read request is received.
+T99W760 is designed based on Qualcomm SDX35 chip. It use similar
+architecture with SDX72/SDX75 chip. So we need to assign initial
+link id for this device to make sure network available.
 
-Signed-off-by: Jian Zhang <zhangjian.3032@bytedance.com>
-Link: https://patch.msgid.link/20260108101829.1140448-1-zhangjian.3032@bytedance.com
+Signed-off-by: Slark Xiao <slark_xiao@163.com>
+Link: https://patch.msgid.link/20260105022646.10630-1-slark_xiao@163.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-## Analysis of net: mctp-i2c: fix duplicate reception of old data
+## Analysis
 
-### 1. Commit Message Analysis
+### Commit Message Analysis
 
-The commit message clearly describes a **bug fix**: the MCTP I2C slave
-callback was not handling `I2C_SLAVE_READ_REQUESTED` events, which
-caused **duplicate reception of old data** when an I2C read event
-occurred. The fix resets `rx_pos` when a read request is received.
+The commit adds network support for a new device, the Foxconn T99W760,
+which is based on the Qualcomm SDX35 chip. The commit message explains
+that this device uses a similar architecture to SDX72/SDX75 and needs an
+initial link ID assignment to make networking functional.
 
-Keywords: "fix duplicate reception of old data" — this is an explicit
-bug fix.
+### Code Change Analysis
 
-### 2. Code Change Analysis
+The change is extremely minimal — a single line addition:
 
-The patch makes two changes:
-
-**Change 1: Handle `I2C_SLAVE_READ_REQUESTED` in the switch statement**
 ```c
-case I2C_SLAVE_READ_REQUESTED:
-    midev->rx_pos = 0;
-    break;
+strcmp(cntrl->name, "foxconn-t99w760") == 0)
 ```
-This adds handling for a previously unhandled I2C slave event. When a
-read request comes in, `rx_pos` is reset to 0, preventing stale data
-from being re-processed. Without this, the `rx_pos` would retain its old
-value from a previous transaction, and when `I2C_SLAVE_STOP` fires,
-`mctp_i2c_recv()` would process stale data in the buffer — resulting in
-duplicate/ghost packet reception.
 
-**Change 2: Early return in `mctp_i2c_recv()` when `rx_pos == 0`**
-```c
-if (midev->rx_pos == 0)
-    return 0;
-```
-This is a defensive guard: if `rx_pos` was reset to 0 (by the new
-READ_REQUESTED handler), `mctp_i2c_recv()` should do nothing since
-there's no valid write data to process. Without this check, the function
-would proceed with invalid state (`rx_pos == 0`), potentially causing
-incorrect length calculations or accessing uninitialized buffer data.
+This adds the "foxconn-t99w760" device name to the
+`mhi_mbim_get_link_mux_id()` function so that it returns
+`WDS_BIND_MUX_DATA_PORT_MUX_ID` instead of `0`. This is the same
+treatment already given to "foxconn-dw5934e" and "foxconn-t99w640".
 
-### 3. Bug Mechanism
+### Classification: Device ID / Hardware Enablement
 
-The I2C slave callback handles events during I2C bus transactions. The
-MCTP-over-I2C protocol involves the bus master writing MCTP packets.
-However, the I2C bus can also generate `I2C_SLAVE_READ_REQUESTED` events
-(when the master reads from this slave). Without handling this event:
+This falls squarely into the **"New Device IDs"** exception category for
+stable backports. It's adding support for a specific device to an
+existing driver by matching its name and applying the same configuration
+that other similar devices already use.
 
-1. `rx_pos` retains its value from a previous write transaction
-2. When `I2C_SLAVE_STOP` fires after the read, `mctp_i2c_recv()`
-   processes the stale buffer
-3. This causes **duplicate reception of old MCTP packets** — a data
-   integrity/correctness bug
+Without this change, users with the Foxconn T99W760 WWAN modem cannot
+use networking — the device gets the wrong mux ID (0 instead of
+`WDS_BIND_MUX_DATA_PORT_MUX_ID`), making the network interface non-
+functional.
 
-### 4. Classification
+### Risk Assessment
 
-- **Bug fix**: Yes — fixes incorrect behavior (duplicate packet
-  reception)
-- **New feature**: No — this handles an existing I2C event that was
-  previously ignored
-- **Scope**: Very small — adds 5 lines of code across two locations in
-  one file
+- **Scope**: 1 line added, 1 file changed
+- **Risk**: Extremely low — the change only affects devices matching the
+  exact name "foxconn-t99w760". No other hardware is affected.
+- **Pattern**: Follows the exact same pattern as existing devices in the
+  same function
+- **Complexity**: Trivial string comparison addition
 
-### 5. Stable Criteria Assessment
+### User Impact
 
-| Criterion | Assessment |
-|-----------|------------|
-| Obviously correct and tested | Yes — simple, logical fix; accepted by
-net maintainer Jakub Kicinski |
-| Fixes a real bug | Yes — duplicate reception of stale MCTP data |
-| Important issue | Moderate — data correctness issue in networking
-stack |
-| Small and contained | Yes — 5 lines added in a single file |
-| No new features | Correct — just handles a missing event case |
-| Applies cleanly | Likely — small, localized change |
+Users with the Foxconn T99W760 WWAN modem (a real shipping hardware
+device) cannot use network connectivity without this patch. This is a
+real-world hardware enablement fix.
 
-### 6. Risk Assessment
+### Stability Assessment
 
-**Risk: Very low**
-- The change is minimal and purely additive (no existing code modified)
-- Adding a case to a switch statement with a simple assignment is very
-  safe
-- The early return guard in `mctp_i2c_recv()` is a standard defensive
-  check
-- Only affects MCTP-over-I2C users — very narrow blast radius
+- The driver (`mhi_wwan_mbim.c`) already exists in stable trees
+- The function `mhi_mbim_get_link_mux_id()` already exists
+- The pattern is identical to existing entries
+- Zero risk of regression for any other hardware
 
-**Benefit: Moderate to High for affected users**
-- MCTP (Management Component Transport Protocol) over I2C is used in
-  server/BMC management
-- Duplicate packet reception causes incorrect behavior in management
-  stacks
-- Without this fix, any I2C read event corrupts the MCTP receive path
+### Dependencies
 
-### 7. Dependencies
+No dependencies on other commits. The change is entirely self-contained.
 
-No dependencies on other commits. The fix is self-contained and modifies
-only the existing `mctp_i2c_slave_cb()` function and `mctp_i2c_recv()`
-function.
+### Conclusion
 
-### 8. Conclusion
-
-This is a clean, small, obviously correct bug fix that addresses a real
-data corruption/correctness issue (duplicate reception of stale data) in
-the MCTP I2C driver. It meets all stable kernel criteria: it's small,
-contained, fixes a real bug, introduces no new features, and has very
-low regression risk.
+This is a textbook device ID addition to an existing driver — one of the
+explicitly allowed exception categories for stable backports. It enables
+real hardware for real users, is trivially small, has zero regression
+risk, and follows an established pattern in the same function.
 
 **YES**
 
- drivers/net/mctp/mctp-i2c.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/net/wwan/mhi_wwan_mbim.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/mctp/mctp-i2c.c b/drivers/net/mctp/mctp-i2c.c
-index f782d93f826ef..ecda1cc36391c 100644
---- a/drivers/net/mctp/mctp-i2c.c
-+++ b/drivers/net/mctp/mctp-i2c.c
-@@ -242,6 +242,9 @@ static int mctp_i2c_slave_cb(struct i2c_client *client,
- 		return 0;
+diff --git a/drivers/net/wwan/mhi_wwan_mbim.c b/drivers/net/wwan/mhi_wwan_mbim.c
+index f8bc9a39bfa30..1d7e3ad900c12 100644
+--- a/drivers/net/wwan/mhi_wwan_mbim.c
++++ b/drivers/net/wwan/mhi_wwan_mbim.c
+@@ -98,7 +98,8 @@ static struct mhi_mbim_link *mhi_mbim_get_link_rcu(struct mhi_mbim_context *mbim
+ static int mhi_mbim_get_link_mux_id(struct mhi_controller *cntrl)
+ {
+ 	if (strcmp(cntrl->name, "foxconn-dw5934e") == 0 ||
+-	    strcmp(cntrl->name, "foxconn-t99w640") == 0)
++	    strcmp(cntrl->name, "foxconn-t99w640") == 0 ||
++	    strcmp(cntrl->name, "foxconn-t99w760") == 0)
+ 		return WDS_BIND_MUX_DATA_PORT_MUX_ID;
  
- 	switch (event) {
-+	case I2C_SLAVE_READ_REQUESTED:
-+		midev->rx_pos = 0;
-+		break;
- 	case I2C_SLAVE_WRITE_RECEIVED:
- 		if (midev->rx_pos < MCTP_I2C_BUFSZ) {
- 			midev->rx_buffer[midev->rx_pos] = *val;
-@@ -279,6 +282,9 @@ static int mctp_i2c_recv(struct mctp_i2c_dev *midev)
- 	size_t recvlen;
- 	int status;
- 
-+	if (midev->rx_pos == 0)
-+		return 0;
-+
- 	/* + 1 for the PEC */
- 	if (midev->rx_pos < MCTP_I2C_MINLEN + 1) {
- 		ndev->stats.rx_length_errors++;
+ 	return 0;
 -- 
 2.51.0
 
