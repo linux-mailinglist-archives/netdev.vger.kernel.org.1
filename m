@@ -1,129 +1,366 @@
-Return-Path: <netdev+bounces-258729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258730-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +JXrA7vkkGnDdgEAu9opvQ
-	(envelope-from <netdev+bounces-258729-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:10:19 +0100
+	id YGq8AD7okGkMdwEAu9opvQ
+	(envelope-from <netdev+bounces-258730-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:25:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ECA213D420
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:10:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73B2513D4DB
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:25:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C5FB430059A3
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 21:10:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 86E163037E4F
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 21:24:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F0ED311973;
-	Sat, 14 Feb 2026 21:10:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51AF4283159;
+	Sat, 14 Feb 2026 21:24:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hrNJgHnH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aWWRUliX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A08A3115A2
-	for <netdev@vger.kernel.org>; Sat, 14 Feb 2026 21:10:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA4A3C2D;
+	Sat, 14 Feb 2026 21:24:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771103416; cv=none; b=fN7SxqmAAGR9KW3YJHWEL4agXiaXuLmfhzXRdAYixho/sPg0gTfY/FonXnlViKO0pR/gAfREm3YK+uurMBabloKSDCnz4v1+c7mQR/L5RcJ/7Bh6DRz/2i9cHhDQkKrfSAbJsW7sspVnz4p+CE5vkafoyIYpnUB2n0cDLOjAm4k=
+	t=1771104299; cv=none; b=JoW5DYf1ZeGn+tBhTky8+Oxr1ks68IXzcHhYDp6iFOdhs/S4/812vmfBpJPmv9zgEBinDXvRubD39Z/9IekavQB0Nb+UmrFjYgrIdNkPmXH2eOwTPZyo8WoOKxoaZSsDKe6gpYDqQlz+w2isHW2ZEFAaThyhf0xsNMN5yNBNRFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771103416; c=relaxed/simple;
-	bh=7kaUQxEhVfFysL1JzcBxYK+t3yg5Sp0fGkUcKR6inAs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cwn62+ErgnZI7ogkI56huxOhnAcrLaI9Er95iEsUqNEzc02Sj+0DeUZbg9W0Qjgky+lU5WiPCmElfGJUrcGIJ5wrCX6Po7NoMzNGnpa+s2Azp8enHE4D+mUBQxwefF9h4HES79NNEZEKUy7lFfwfrqw2uPpJS1IIAcT+m7wYfOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hrNJgHnH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E0A5C16AAE;
-	Sat, 14 Feb 2026 21:10:16 +0000 (UTC)
+	s=arc-20240116; t=1771104299; c=relaxed/simple;
+	bh=5WmlLR1ZsEQCtJFKRU48Ql7qv4HCh319ycm8oSOdYXo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Qyu/uj0+ohYzYNZi8XIkMSHhT5m+u7ld3gt2/hUTDfLu134dZbv9okdVO6zwqBY79MW3Hv5zmmPlEAx+/8f9ftQ6UFyHhQYU9qfnkP3Qe/zLcKNkZocOhQHGE82dBAe0Qv1thPXMBgeKyamRpifwqC+pkEsoglotsseelEW9tdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aWWRUliX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5F1DC19422;
+	Sat, 14 Feb 2026 21:24:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771103416;
-	bh=7kaUQxEhVfFysL1JzcBxYK+t3yg5Sp0fGkUcKR6inAs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hrNJgHnHjUDMOsvGChxjofmkYewYNW9l+FjZiOolGVM8uAg0TTkfvtTS07dq/0gaq
-	 7zWJ3MTGIPqOkx9ls2hQKJ2VXcW0EXR7jPuQUouS8191WeEWW2c08TK6GF6d8INpXJ
-	 wCvfw0xeUOxnafe2qUJ5HnSZPeu0v3hd+PPKwufb98PFbogzh/vbXcwaEvQiRB9Gua
-	 cIbh98cn/HF7Nv8rdxoExhZTRwut11GfT4hS1/A+/nUF6pQACBsmMsPHtvG/4WqFpJ
-	 b5m2+m5tZI/a3Bb1CCWxcSBEmrGcS2n9qJuP/jBvJYKcKcfV7zweh6ndGoDxVgW0c4
-	 6SJMqt70BR5fw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 851C0393091F;
-	Sat, 14 Feb 2026 21:10:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1771104299;
+	bh=5WmlLR1ZsEQCtJFKRU48Ql7qv4HCh319ycm8oSOdYXo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=aWWRUliXq1MwGxmM/xM5SZWRVKlfmnrYVmLKHr1L4za79Jmh2ZMmdWd29xUtLOBzy
+	 66CGUR/xf+3q1W34QKth5/c09UTIiEZSaSGvLgumu1JsRYhxWKmQG22bqEpTdwnl0n
+	 voHvyctpWVVNyaq25nnT0iHsedsUGcMIAeQBf2EPk79iu7wq1OPJPMjpSaIVUQv+5/
+	 dDeFRPiDYs+QGkz6WxjiMc28+1LEYZl3jdVpaPQjBCzUjeSPPenVs/VqB7k9/9QiY8
+	 HaYeZiMA/pS9mm4wNY2Wc0ZIqqnnkZRzduLpF11W8bNiHrGfA4dKcYrkxhoogfX+yA
+	 VXw6pa1YwCsHw==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	mingo@kernel.org,
+	neil.armstrong@linaro.org,
+	tglx@kernel.org,
+	bhelgaas@google.com,
+	giovanni.cabiddu@intel.com,
+	yelangyan@huaqin.corp-partner.google.com,
+	lukas@wunner.de,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.19-5.10] myri10ge: avoid uninitialized variable use
+Date: Sat, 14 Feb 2026 16:22:28 -0500
+Message-ID: <20260214212452.782265-3-sashal@kernel.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260214212452.782265-1-sashal@kernel.org>
+References: <20260214212452.782265-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.19
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH ethtool v1] ethtool: add --show-mse netlink support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177110340908.2902005.18220812521324209200.git-patchwork-notify@kernel.org>
-Date: Sat, 14 Feb 2026 21:10:09 +0000
-References: <20260113142031.555787-1-o.rempel@pengutronix.de>
-In-Reply-To: <20260113142031.555787-1-o.rempel@pengutronix.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: mkubecek@suse.cz, kernel@pengutronix.de, netdev@vger.kernel.org
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258729-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-258730-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_THREE(0.00)[4];
-	FROM_NO_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,8.in:url]
-X-Rspamd-Queue-Id: 5ECA213D420
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 73B2513D4DB
 X-Rspamd-Action: no action
 
-Hello:
+From: Arnd Bergmann <arnd@arndb.de>
 
-This patch was applied to ethtool/ethtool.git (master)
-by Jakub Kicinski <kuba@kernel.org>:
+[ Upstream commit fd24173439c033ffb3c2a2628fcbc9cb65e62bdb ]
 
-On Tue, 13 Jan 2026 15:20:31 +0100 you wrote:
-> Add support for querying PHY Mean Square Error (MSE) diagnostics via
-> ETHTOOL_MSG_MSE_GET. This exposes MSE capability information and the
-> latest available snapshots for supported PHYs.
-> 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> ---
->  Makefile.am      |   1 +
->  ethtool.8.in     |  46 ++++++
->  ethtool.c        |   7 +
->  netlink/extapi.h |   2 +
->  netlink/mse.c    | 388 +++++++++++++++++++++++++++++++++++++++++++++++
->  5 files changed, 444 insertions(+)
->  create mode 100644 netlink/mse.c
-> 
-> [...]
+While compile testing on less common architectures, I noticed that gcc-10 on
+s390 finds a bug that all other configurations seem to miss:
 
-Here is the summary with links:
-  - [ethtool,v1] ethtool: add --show-mse netlink support
-    https://git.kernel.org/pub/scm/network/ethtool/ethtool.git/commit/?id=de3d3c94132c
+drivers/net/ethernet/myricom/myri10ge/myri10ge.c: In function 'myri10ge_set_multicast_list':
+drivers/net/ethernet/myricom/myri10ge/myri10ge.c:391:25: error: 'cmd.data0' is used uninitialized in this function [-Werror=uninitialized]
+  391 |  buf->data0 = htonl(data->data0);
+      |                         ^~
+drivers/net/ethernet/myricom/myri10ge/myri10ge.c:392:25: error: '*((void *)&cmd+4)' is used uninitialized in this function [-Werror=uninitialized]
+  392 |  buf->data1 = htonl(data->data1);
+      |                         ^~
+drivers/net/ethernet/myricom/myri10ge/myri10ge.c: In function 'myri10ge_allocate_rings':
+drivers/net/ethernet/myricom/myri10ge/myri10ge.c:392:13: error: 'cmd.data1' is used uninitialized in this function [-Werror=uninitialized]
+  392 |  buf->data1 = htonl(data->data1);
+drivers/net/ethernet/myricom/myri10ge/myri10ge.c:1939:22: note: 'cmd.data1' was declared here
+ 1939 |  struct myri10ge_cmd cmd;
+      |                      ^~~
+drivers/net/ethernet/myricom/myri10ge/myri10ge.c:393:13: error: 'cmd.data2' is used uninitialized in this function [-Werror=uninitialized]
+  393 |  buf->data2 = htonl(data->data2);
+drivers/net/ethernet/myricom/myri10ge/myri10ge.c:1939:22: note: 'cmd.data2' was declared here
+ 1939 |  struct myri10ge_cmd cmd;
 
-You are awesome, thank you!
+It would be nice to understand how to make other compilers catch this as
+well, but for the moment I'll just shut up the warning by fixing the
+undefined behavior in this driver.
+
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Link: https://patch.msgid.link/20260205162935.2126442-1-arnd@kernel.org
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+
+LLM Generated explanations, may be completely bogus:
+
+### Understanding the Bug
+
+The analysis reveals this is a **real, meaningful bug**, not just a
+compiler warning cleanup:
+
+1. **`struct myri10ge_cmd`** has three `u32` fields: `data0`, `data1`,
+   `data2`
+2. **`myri10ge_send_cmd()`** unconditionally copies ALL THREE fields to
+   hardware via:
+  ```c
+  buf->data0 = htonl(data->data0);
+  buf->data1 = htonl(data->data1);
+  buf->data2 = htonl(data->data2);
+  ```
+  Then sends them to the NIC via `myri10ge_pio_copy()`.
+
+3. In many call sites, the `cmd` struct is declared on the stack but
+   **not all fields are initialized** before being passed to
+   `myri10ge_send_cmd()`. This means **random stack garbage is sent to
+   hardware**.
+
+### Bug Impact
+
+- **Undefined behavior**: Uninitialized stack variables being used is
+  undefined behavior in C
+- **Hardware commands with garbage data**: The NIC firmware receives
+  commands with random data in unused fields, which could cause
+  unpredictable behavior depending on firmware implementation
+- **Potential data corruption or connectivity issues**: If the firmware
+  interprets garbage values in unexpected ways
+- **Build failure**: On gcc-10 on s390 with `-Werror`, this prevents
+  compilation entirely
+
+### Scope of Changes
+
+The fix is purely additive — it adds zero-initialization of `cmd.data0`,
+`cmd.data1`, `cmd.data2` at each call site where they were previously
+uninitialized. The changes span **one file** with simple, repetitive
+initialization statements. There's also a minor cleanup moving the `cmd`
+variable declaration to a narrower scope in `myri10ge_close()`.
+
+Functions fixed:
+- `myri10ge_get_firmware_capabilities()`
+- `myri10ge_update_mac_address()`
+- `myri10ge_change_pause()`
+- `myri10ge_change_promisc()`
+- `myri10ge_allocate_rings()`
+- `myri10ge_get_txrx()`
+- `myri10ge_open()`
+- `myri10ge_close()`
+- `myri10ge_set_multicast_list()`
+
+### Stable Kernel Criteria Assessment
+
+| Criterion | Assessment |
+|-----------|-----------|
+| Obviously correct? | Yes — initializing variables to zero before use
+is trivially correct |
+| Fixes a real bug? | Yes — undefined behavior (uninitialized data sent
+to hardware) and build failure on s390 |
+| Small and contained? | Yes — single file, simple initialization
+additions |
+| No new features? | Correct — purely a bug fix |
+| Risk of regression? | Very low — adding zero-initialization cannot
+break correct code |
+
+### Risk vs Benefit
+
+- **Risk**: Extremely low. Zero-initializing struct fields before
+  passing them to a function is the safest possible change. The only
+  conceivable risk is if the hardware somehow relied on receiving
+  specific non-zero garbage values, which would be absurd.
+- **Benefit**: Fixes undefined behavior, prevents hardware from
+  receiving garbage command data, and fixes a build failure on s390 with
+  gcc-10.
+
+### Concerns
+
+- The myri10ge driver is for Myricom 10-Gigabit Ethernet adapters, which
+  are older hardware (Myricom was acquired by CSPI years ago). However,
+  users with this hardware in stable kernels still benefit from correct
+  behavior.
+- No dependency on other commits — this is fully self-contained.
+- Note the use of commas instead of semicolons in some initializations
+  (e.g., `cmd.data0 = 0,` instead of `cmd.data0 = 0;`) — this is
+  syntactically valid C (comma operator) but unusual. It won't cause
+  issues.
+
+### Conclusion
+
+This commit fixes real undefined behavior where uninitialized stack data
+is sent to network hardware. It's a textbook example of a safe,
+contained bug fix: zero-initializing variables before use in a single
+driver file. The fix prevents both runtime undefined behavior and a
+build failure on certain architectures. The risk of regression is
+negligible.
+
+**YES**
+
+ .../net/ethernet/myricom/myri10ge/myri10ge.c  | 28 ++++++++++++++++++-
+ 1 file changed, 27 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/myricom/myri10ge/myri10ge.c b/drivers/net/ethernet/myricom/myri10ge/myri10ge.c
+index 7be30a8df2685..2f0cdbd4e2ac9 100644
+--- a/drivers/net/ethernet/myricom/myri10ge/myri10ge.c
++++ b/drivers/net/ethernet/myricom/myri10ge/myri10ge.c
+@@ -688,6 +688,9 @@ static int myri10ge_get_firmware_capabilities(struct myri10ge_priv *mgp)
+ 
+ 	/* probe for IPv6 TSO support */
+ 	mgp->features = NETIF_F_SG | NETIF_F_HW_CSUM | NETIF_F_TSO;
++	cmd.data0 = 0,
++	cmd.data1 = 0,
++	cmd.data2 = 0,
+ 	status = myri10ge_send_cmd(mgp, MXGEFW_CMD_GET_MAX_TSO6_HDR_SIZE,
+ 				   &cmd, 0);
+ 	if (status == 0) {
+@@ -806,6 +809,7 @@ static int myri10ge_update_mac_address(struct myri10ge_priv *mgp,
+ 		     | (addr[2] << 8) | addr[3]);
+ 
+ 	cmd.data1 = ((addr[4] << 8) | (addr[5]));
++	cmd.data2 = 0;
+ 
+ 	status = myri10ge_send_cmd(mgp, MXGEFW_SET_MAC_ADDRESS, &cmd, 0);
+ 	return status;
+@@ -817,6 +821,9 @@ static int myri10ge_change_pause(struct myri10ge_priv *mgp, int pause)
+ 	int status, ctl;
+ 
+ 	ctl = pause ? MXGEFW_ENABLE_FLOW_CONTROL : MXGEFW_DISABLE_FLOW_CONTROL;
++	cmd.data0 = 0,
++	cmd.data1 = 0,
++	cmd.data2 = 0,
+ 	status = myri10ge_send_cmd(mgp, ctl, &cmd, 0);
+ 
+ 	if (status) {
+@@ -834,6 +841,9 @@ myri10ge_change_promisc(struct myri10ge_priv *mgp, int promisc, int atomic)
+ 	int status, ctl;
+ 
+ 	ctl = promisc ? MXGEFW_ENABLE_PROMISC : MXGEFW_DISABLE_PROMISC;
++	cmd.data0 = 0;
++	cmd.data1 = 0;
++	cmd.data2 = 0;
+ 	status = myri10ge_send_cmd(mgp, ctl, &cmd, atomic);
+ 	if (status)
+ 		netdev_err(mgp->dev, "Failed to set promisc mode\n");
+@@ -1946,6 +1956,8 @@ static int myri10ge_allocate_rings(struct myri10ge_slice_state *ss)
+ 	/* get ring sizes */
+ 	slice = ss - mgp->ss;
+ 	cmd.data0 = slice;
++	cmd.data1 = 0;
++	cmd.data2 = 0;
+ 	status = myri10ge_send_cmd(mgp, MXGEFW_CMD_GET_SEND_RING_SIZE, &cmd, 0);
+ 	tx_ring_size = cmd.data0;
+ 	cmd.data0 = slice;
+@@ -2238,12 +2250,16 @@ static int myri10ge_get_txrx(struct myri10ge_priv *mgp, int slice)
+ 	status = 0;
+ 	if (slice == 0 || (mgp->dev->real_num_tx_queues > 1)) {
+ 		cmd.data0 = slice;
++		cmd.data1 = 0;
++		cmd.data2 = 0;
+ 		status = myri10ge_send_cmd(mgp, MXGEFW_CMD_GET_SEND_OFFSET,
+ 					   &cmd, 0);
+ 		ss->tx.lanai = (struct mcp_kreq_ether_send __iomem *)
+ 		    (mgp->sram + cmd.data0);
+ 	}
+ 	cmd.data0 = slice;
++	cmd.data1 = 0;
++	cmd.data2 = 0;
+ 	status |= myri10ge_send_cmd(mgp, MXGEFW_CMD_GET_SMALL_RX_OFFSET,
+ 				    &cmd, 0);
+ 	ss->rx_small.lanai = (struct mcp_kreq_ether_recv __iomem *)
+@@ -2312,6 +2328,7 @@ static int myri10ge_open(struct net_device *dev)
+ 	if (mgp->num_slices > 1) {
+ 		cmd.data0 = mgp->num_slices;
+ 		cmd.data1 = MXGEFW_SLICE_INTR_MODE_ONE_PER_SLICE;
++		cmd.data2 = 0;
+ 		if (mgp->dev->real_num_tx_queues > 1)
+ 			cmd.data1 |= MXGEFW_SLICE_ENABLE_MULTIPLE_TX_QUEUES;
+ 		status = myri10ge_send_cmd(mgp, MXGEFW_CMD_ENABLE_RSS_QUEUES,
+@@ -2414,6 +2431,8 @@ static int myri10ge_open(struct net_device *dev)
+ 
+ 	/* now give firmware buffers sizes, and MTU */
+ 	cmd.data0 = dev->mtu + ETH_HLEN + VLAN_HLEN;
++	cmd.data1 = 0;
++	cmd.data2 = 0;
+ 	status = myri10ge_send_cmd(mgp, MXGEFW_CMD_SET_MTU, &cmd, 0);
+ 	cmd.data0 = mgp->small_bytes;
+ 	status |=
+@@ -2472,7 +2491,6 @@ static int myri10ge_open(struct net_device *dev)
+ static int myri10ge_close(struct net_device *dev)
+ {
+ 	struct myri10ge_priv *mgp = netdev_priv(dev);
+-	struct myri10ge_cmd cmd;
+ 	int status, old_down_cnt;
+ 	int i;
+ 
+@@ -2491,8 +2509,13 @@ static int myri10ge_close(struct net_device *dev)
+ 
+ 	netif_tx_stop_all_queues(dev);
+ 	if (mgp->rebooted == 0) {
++		struct myri10ge_cmd cmd;
++
+ 		old_down_cnt = mgp->down_cnt;
+ 		mb();
++		cmd.data0 = 0;
++		cmd.data1 = 0;
++		cmd.data2 = 0;
+ 		status =
+ 		    myri10ge_send_cmd(mgp, MXGEFW_CMD_ETHERNET_DOWN, &cmd, 0);
+ 		if (status)
+@@ -2956,6 +2979,9 @@ static void myri10ge_set_multicast_list(struct net_device *dev)
+ 
+ 	/* Disable multicast filtering */
+ 
++	cmd.data0 = 0;
++	cmd.data1 = 0;
++	cmd.data2 = 0;
+ 	err = myri10ge_send_cmd(mgp, MXGEFW_ENABLE_ALLMULTI, &cmd, 1);
+ 	if (err != 0) {
+ 		netdev_err(dev, "Failed MXGEFW_ENABLE_ALLMULTI, error status: %d\n",
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.51.0
 
 
