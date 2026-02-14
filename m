@@ -1,191 +1,276 @@
-Return-Path: <netdev+bounces-258722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258723-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ufNbBY+8kGntcgEAu9opvQ
-	(envelope-from <netdev+bounces-258722-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 19:18:55 +0100
+	id wF3+KRi+kGn7cgEAu9opvQ
+	(envelope-from <netdev+bounces-258723-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 19:25:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A64513CCB1
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 19:18:54 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10F1913CE06
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 19:25:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 45A46301465C
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 18:18:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 42E463004C3B
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 18:25:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B91B2D5A19;
-	Sat, 14 Feb 2026 18:18:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DF203033DC;
+	Sat, 14 Feb 2026 18:25:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vo9DZrym";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="qdIvS4YA"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ErYQhGxG";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="vnFtf4G1";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ErYQhGxG";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="vnFtf4G1"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4588277029
-	for <netdev@vger.kernel.org>; Sat, 14 Feb 2026 18:18:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB67C22A7F0
+	for <netdev@vger.kernel.org>; Sat, 14 Feb 2026 18:25:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771093130; cv=none; b=c1dCkdDZGQMbZESWBpZ/zF1ZoOAW5TjGLvo8fDo6VB2qXM385RixxmsPB/of/aOc0FVTmgxVnNJcLnUYa8zRSFuDymRUwJ2zxgeH1+TTFM/N3xoRZ6Tl9KQOJWTNZW2zRl154sfLZdfMnNTGheDymxweoK4qIZfpDdbobtTJf4Q=
+	t=1771093519; cv=none; b=scvgeRMNjWu5GZkHfPWINoVt42r6q0rFROOeemCngRolJeA9Mrj8vLjlNEMUSmtgFHkINI8xPnPLZ4KIspdn0puxdDoexrqnN25dlsBRgPlQ0WKmcDSFbIGPdYyUlfA+lL5sf9VRbFAmTwJa9OZoneK8u4Xe29kUwVLuaR46Nno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771093130; c=relaxed/simple;
-	bh=yEelQuIDmS5A4nF6l+/HEJSY7JzkT8eOu+50RPHRcm0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ncsljQ0ZyXTjeOU4/Jj7sg28pxuibKub5Z3FEAp1dlSbx2YoL0X5s1Ku1FG3IND1NLiIifhVTbuYHrDi5N88m4vcSFiQiJ8saoeQY0hU0IeBhk2xWpzlsmKRoC9JYdvhLyqOq9KP+i4j7+gK2oY9++tn22OtifmerFc65p4yH4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vo9DZrym; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=qdIvS4YA; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1771093127;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	s=arc-20240116; t=1771093519; c=relaxed/simple;
+	bh=eqszYYsuEQFwdlsViPWxpT7lUQRhoNI9dCbw3tbgSgI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PKFqHxHdgYhLKW5EPbmR/1kdZjIHwJMpGXojfMqO46673kcds1YTWovVV0qWWy2+JsQE1Uju/8e/1BChJyB723hGh1peSNnQKro+UGWNljZhnoL0VbrVn/aPrRm75Ztr0VmiOcHKMkZnu9jkhzr98vatx8QU8+cEntAFI10TyYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ErYQhGxG; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=vnFtf4G1; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ErYQhGxG; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=vnFtf4G1; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 0B31F5BCEF;
+	Sat, 14 Feb 2026 18:25:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1771093516; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=hGvEkNLWiFwc7xvXmNfeTPVLJWvbXxlHncgYSGzv/5o=;
-	b=Vo9DZrymcApH6zTFCb14CAigQ435Eu7rpwULe8eBeZhvuXMc1dK/jpQ2bJEdCqqm3IMxJF
-	0IN05htTHQ+lG5e5FME4DIr8qQoWvRRjvvwNw6N89rGqxpAmygASWZHAKWXVKvUOTs9SvQ
-	f1nxi9i5d/Db0XLMgjE59KKsOrgpM6k=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-445-EvnQkPjTPs6KK1bZhX5POA-1; Sat, 14 Feb 2026 13:18:46 -0500
-X-MC-Unique: EvnQkPjTPs6KK1bZhX5POA-1
-X-Mimecast-MFC-AGG-ID: EvnQkPjTPs6KK1bZhX5POA_1771093125
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-48372facfedso16317705e9.0
-        for <netdev@vger.kernel.org>; Sat, 14 Feb 2026 10:18:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1771093125; x=1771697925; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hGvEkNLWiFwc7xvXmNfeTPVLJWvbXxlHncgYSGzv/5o=;
-        b=qdIvS4YAkVnmIoOstaP/B0Uq5mvZXin2Kw/oE0qZ+AGOlpqQB5S4kzO5UtIXmqdzJq
-         MjttFGFrX2hq7X9X/7ixu8LObFTlMs91edNW1hO1yHD5mRlOAbQorfkVKf7JZZW7Zofn
-         HBb9U/2tqy8BSCugSz4FaJN1b/eEg5vAgWWjMDymZimEZOwAO00wbMcCgKrLyC2Ow+dB
-         9TkbDswNKZtB+X3T2CGTufhi/NCrgNXvpmBUCMnd/BUjSOzoXwX8wNyhQSHZEFux1Ofg
-         dSjQd2hQTwEgLEUI4DoBwTQqDkftSCz3DAO6h3J+78Zq2EqUloMK2m7wyRTwhjZnP56O
-         QyiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771093125; x=1771697925;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hGvEkNLWiFwc7xvXmNfeTPVLJWvbXxlHncgYSGzv/5o=;
-        b=VZKyqFCRx1cLFQxUk3ykqn/6I+S52BTT1DhZg0CRbpCUrMooDqqa1vynep/a9vieRT
-         QlDDN9RX1aX52W1N+cKWIW4Y5rnGiA6oJ1woWc17WK98FEGDfSbXu/rWVlUTlUR1zxcX
-         7UfuYxjHk2A1RlHunH4+yGJ2ehTnw0Xn0FPbOovXmOMintmWk+vx+aFJc7477eXae8x2
-         do9Dd+Gl1CZtF10OJM/uHHtYzX/6ouYFS3sfS2GQsV9+Mx8ZazSwa2ACSQwMKW8009WY
-         W9EhhGTDbuZD7zWLuQVHy4+2yS+nfBwlnOMOFhIkEgzKZlnQBwFlXa72r1ug6jX0BtMj
-         BruA==
-X-Forwarded-Encrypted: i=1; AJvYcCX98w/uNysCfybxv5Gac4HjrDJGqa3gUFKlPWVygD7cswwvFPpB2b5jcJrNscetMlMAzB8a9Pk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhZg3fInEKcHggUb+2kNsiY6KLkztkgCFVumdtACVt0if5YoCo
-	NCSB7fM3oRouKmeDBRyMGbrh/JDMvyfAUe+CF/H/vRAMlIjcpMXVBpxvARMiJvd/RqKmhcrFAh7
-	IQgTaOwK0xvof3C8NH7THWQ9WIIvuby1SdJY/2zO+jsGF+S8jlc3jtCfuKw==
-X-Gm-Gg: AZuq6aJfRtswQ0UQo/UwRIhGYiH2krf297e6R3aEFTsneZC6/BavQxQ6widKjYuXcUX
-	z9ji2FfQeb7y0IuaAgmwi7OPRYOhIiFfUaXfLrfEvYSgWFekse64A/o5g64nLJJ3NixVc0QC8H0
-	p7ksRqBBnACgYd4UIpdZQBM68k4lgN5YzUlnN15BtSN0Y7gVyQPgg+raiI96tnTdRAKby47uqy3
-	kDmCxW43HKsOhKUmabQpkWZcEyFNBVvJwjW9v33riNQGyXR0SCJJ9Zj2XmsmDU4vwq5tbx5hlmy
-	vbFcLlNkp7psGnnNE+UTQni3IH3DgJFBZ4TGBT14Uqa7GDKZD1+EmRTjA6OGnsfNVL22BCTvxx+
-	K5pJBiKQB41HBjnnR7w==
-X-Received: by 2002:a05:600c:40c4:b0:47d:403a:277 with SMTP id 5b1f17b1804b1-48378f062b0mr48481415e9.4.1771093125061;
-        Sat, 14 Feb 2026 10:18:45 -0800 (PST)
-X-Received: by 2002:a05:600c:40c4:b0:47d:403a:277 with SMTP id 5b1f17b1804b1-48378f062b0mr48481055e9.4.1771093124647;
-        Sat, 14 Feb 2026 10:18:44 -0800 (PST)
-Received: from redhat.com ([2a06:c701:73e3:8f00:866c:5eeb:fc46:7674])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4837e565f5esm65320555e9.10.2026.02.14.10.18.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Feb 2026 10:18:44 -0800 (PST)
-Date: Sat, 14 Feb 2026 13:18:41 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Simon Schippers <simon.schippers@tu-dortmund.de>
-Cc: Jason Wang <jasowang@redhat.com>, willemdebruijn.kernel@gmail.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
-	leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
-	tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH net-next v7 3/9] tun/tap: add ptr_ring consume helper
- with netdev queue wakeup
-Message-ID: <20260214131703-mutt-send-email-mst@kernel.org>
-References: <CACGkMEtnLw2b8iDysQzRbXxTj2xbgzKqEZUbhmZz9tXPLTE6Sw@mail.gmail.com>
- <0ebc00ba-35e7-4570-a44f-b0ae634f2316@tu-dortmund.de>
- <CACGkMEsJtE3RehWQ8BaDL2HdFPK=iW+ZaEAN1TekAMWwor5tjQ@mail.gmail.com>
- <197573a1-df52-4928-adb9-55a7a4f78839@tu-dortmund.de>
- <CACGkMEveEXky_rTrvRrfi7qix12GG91GfyqnwB6Tu-dnjqAm9A@mail.gmail.com>
- <0c776172-2f02-47fc-babf-2871adca42cb@tu-dortmund.de>
- <CACGkMEte=LwvkxPh-tesJHLVYQV1YZF4is1Yamokhkzaf5GOWw@mail.gmail.com>
- <205aa139-975d-4092-aa04-a2c570ae43a6@tu-dortmund.de>
- <CACGkMEtRikexX=cJz8zmuvW7mcO7uCFdG7AoHQLOezrsb5nbgQ@mail.gmail.com>
- <59529fd2-2a08-4a89-a853-27198b76f842@tu-dortmund.de>
+	bh=toMJsawatT3XsMU3R6Ki8vJr4mt/rtjnT1MUnjtT/AA=;
+	b=ErYQhGxGgyI+qIzVvIQtFgnlCy+lAMr8DAybYERCxQRyuBqtsPO39bUHetIPov8j70aRDD
+	QaoLQlAYBI6v+B3Jijr8GwatELUkrNM+dFVI1LjCfeXuILUQ3sBW3z1+AKeyMgf/qc1l5U
+	vfxZyiXaUiYZwj7TQNcko0lJwQe3aYA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1771093516;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=toMJsawatT3XsMU3R6Ki8vJr4mt/rtjnT1MUnjtT/AA=;
+	b=vnFtf4G1Rhzc2/lKWI7KuWvlu8kSVrwpMaO0Bnw4Vw0ibC8HJpCtlRw9nmw4KyH+libEz1
+	JSEllPB8yI8eaQDg==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1771093516; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=toMJsawatT3XsMU3R6Ki8vJr4mt/rtjnT1MUnjtT/AA=;
+	b=ErYQhGxGgyI+qIzVvIQtFgnlCy+lAMr8DAybYERCxQRyuBqtsPO39bUHetIPov8j70aRDD
+	QaoLQlAYBI6v+B3Jijr8GwatELUkrNM+dFVI1LjCfeXuILUQ3sBW3z1+AKeyMgf/qc1l5U
+	vfxZyiXaUiYZwj7TQNcko0lJwQe3aYA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1771093516;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=toMJsawatT3XsMU3R6Ki8vJr4mt/rtjnT1MUnjtT/AA=;
+	b=vnFtf4G1Rhzc2/lKWI7KuWvlu8kSVrwpMaO0Bnw4Vw0ibC8HJpCtlRw9nmw4KyH+libEz1
+	JSEllPB8yI8eaQDg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 54CE53EA62;
+	Sat, 14 Feb 2026 18:25:15 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id /O82EQu+kGlZPwAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Sat, 14 Feb 2026 18:25:15 +0000
+Message-ID: <c57f2565-a6b2-45dd-8307-871a02ae1a7a@suse.de>
+Date: Sat, 14 Feb 2026 19:25:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <59529fd2-2a08-4a89-a853-27198b76f842@tu-dortmund.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot] [net?] possible deadlock in inet6_getname
+To: Gerd Rausch <gerd.rausch@oracle.com>, Eric Dumazet <edumazet@google.com>,
+ syzbot <syzbot+5efae91f60932839f0a5@syzkaller.appspotmail.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, horms@kernel.org,
+ kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+References: <698f15e6.a70a0220.2c38d7.00c1.GAE@google.com>
+ <CANn89i+mVCLW2g1+tnbK8k9E0AkEuX7AZ+2LbO1_s2L=Gxaaeg@mail.gmail.com>
+ <50e88063-14fb-4912-a65d-172a85def1ee@oracle.com>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <50e88063-14fb-4912-a65d-172a85def1ee@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Score: -2.80
+X-Spam-Level: 
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258722-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[suse.de:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email,appspotmail.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-258723-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5A64513CCB1
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,5efae91f60932839f0a5];
+	SUBJECT_HAS_QUESTION(0.00)[]
+X-Rspamd-Queue-Id: 10F1913CE06
 X-Rspamd-Action: no action
 
-On Sat, Feb 14, 2026 at 06:13:14PM +0100, Simon Schippers wrote:
-
-...
-
-> Patched: Waking on __ptr_ring_produce_created_space() is too early. The
->          stop/wake cycle occurs too frequently which slows down
->          performance as can be seen for TAP.
+On 2/13/26 7:51 PM, Gerd Rausch wrote:
+> Hi,
 > 
-> Wake on empty variant: Waking on __ptr_ring_empty() is (slightly) too
->                        late. The consumer starves because the producer
->                        first has to produce packets again. This slows
->                        down performance aswell as can be seen for TAP
-> 		       and TAP+vhost-net (both down ~30-40Kpps).
+> On 2026-02-13 09:26, Eric Dumazet wrote:
+>> On Fri, Feb 13, 2026 at 1:15 PM syzbot
+>> <syzbot+5efae91f60932839f0a5@syzkaller.appspotmail.com> wrote:
+>>>
+>>>
+> [...]
+>>> ============================================
+>>> WARNING: possible recursive locking detected
+>>> syzkaller #0 Not tainted
+>>> --------------------------------------------
+>>> kworker/u8:6/2985 is trying to acquire lock:
+>>> ffff88807a07aa20 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock 
+>>> include/net/sock.h:1709 [inline]
+>>> ffff88807a07aa20 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: 
+>>> inet6_getname+0x15d/0x650 net/ipv6/af_inet6.c:533
+>>>
+>>> but task is already holding lock:
+>>> ffff88807a07aa20 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock 
+>>> include/net/sock.h:1709 [inline]
+>>> ffff88807a07aa20 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: 
+>>> tcp_sock_set_cork+0x2c/0x2e0 net/ipv4/tcp.c:3694
+>>>
+> [...]
+>>>   lock_sock_nested+0x48/0x100 net/core/sock.c:3780
+>>>   lock_sock include/net/sock.h:1709 [inline]
+>>>   inet6_getname+0x15d/0x650 net/ipv6/af_inet6.c:533
+>>>   rds_tcp_get_peer_sport net/rds/tcp_listen.c:70 [inline]
+>>>   rds_tcp_conn_slots_available+0x288/0x470 net/rds/tcp_listen.c:149
+>>>   rds_recv_hs_exthdrs+0x60f/0x7c0 net/rds/recv.c:265
+>>>   rds_recv_incoming+0x9f6/0x12d0 net/rds/recv.c:389
+>>>   rds_tcp_data_recv+0x7f1/0xa40 net/rds/tcp_recv.c:243
+>>>   __tcp_read_sock+0x196/0x970 net/ipv4/tcp.c:1702
+>>>   rds_tcp_read_sock net/rds/tcp_recv.c:277 [inline]
+>>>   rds_tcp_data_ready+0x369/0x950 net/rds/tcp_recv.c:331
+>>>   tcp_rcv_established+0x19e9/0x2670 net/ipv4/tcp_input.c:6675
+>>>   tcp_v6_do_rcv+0x8eb/0x1ba0 net/ipv6/tcp_ipv6.c:1609
+>>>   sk_backlog_rcv include/net/sock.h:1185 [inline]
+>>>   __release_sock+0x1b8/0x3a0 net/core/sock.c:3213
+>>
+> [...]
+>> Gerd, please take a look, thanks.
+>>
+>> commit 9d27a0fb122f19b6d01d02f4b4f429ca28811ace
+>> Author: Gerd Rausch <gerd.rausch@oracle.com>
+>> Date:   Mon Feb 2 22:57:23 2026 -0700
+>>
+>>      net/rds: Trigger rds_send_ping() more than once
 > 
-> I think something inbetween should be used.
-> The wake should be done as late as possible to have as few
-> NET_TX_SOFTIRQs as possible but early enough that there are still
-> consumable packets remaining to not starve the consumer.
+> Syzbot is right:
 > 
-> However, I can not think of a proper way to implement this right now.
+> inet_getname() acquires a lock_sock() that was already held
+> as () is about to give it up, but before
+> doing so, handles the backlog receives & callbacks.
 > 
-> Thanks!
+> Just need to figure out a way to obtain the peer's port number,
+> without ending up in such a recursive lock scenario.
+> 
 
-What is the difficulty?
+Hi,
 
-Your patches check __ptr_ring_consume_created_space(..., 1).
+Shouldn't this be enough?
 
-How about __ptr_ring_consume_created_space(..., 8) then? 16?
+diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
+index 6fb5c928b8fd..a36e5dfd6c66 100644
+--- a/net/rds/tcp_listen.c
++++ b/net/rds/tcp_listen.c
+@@ -59,30 +59,12 @@ void rds_tcp_keepalive(struct socket *sock)
+  static int
+  rds_tcp_get_peer_sport(struct socket *sock)
+  {
+-	union {
+-		struct sockaddr_storage storage;
+-		struct sockaddr addr;
+-		struct sockaddr_in sin;
+-		struct sockaddr_in6 sin6;
+-	} saddr;
+-	int sport;
+-
+-	if (kernel_getpeername(sock, &saddr.addr) >= 0) {
+-		switch (saddr.addr.sa_family) {
+-		case AF_INET:
+-			sport = ntohs(saddr.sin.sin_port);
+-			break;
+-		case AF_INET6:
+-			sport = ntohs(saddr.sin6.sin6_port);
+-			break;
+-		default:
+-			sport = -1;
+-		}
+-	} else {
+-		sport = -1;
+-	}
++	struct sock *sk = sock->sk;
++
++	if (!sk)
++		return -1;
 
--- 
-MST
+-	return sport;
++	return ntohs(inet_sk(sk)->inet_dport);
+  }
+
+It would be safe from rds_tcp_accept_one() path as the new_sock has a 
+reference count of 1 and no other component should be to release it.
+
+In rds_tcp_conn_slots_available() path, fan-out can be only performed 
+from receive path, AFAIU if data is being processed from the socket we 
+should always be holding a lock.
+
+If these premises are not correct, we can always make this conditional. 
+But getting rid of the kernel_getpeername() call is performance-wise too.
+
+I am testing this against the syzbot report/reproducer.
+
+Thanks,
+Fernando.
+
+> Thanks for forwarding this,
+> 
+>    Gerd
+> 
+> 
 
 
