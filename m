@@ -1,179 +1,172 @@
-Return-Path: <netdev+bounces-258747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258748-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EKswHk71kGkCeAEAu9opvQ
-	(envelope-from <netdev+bounces-258747-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 23:21:02 +0100
+	id YvAtF0/5kGl4eAEAu9opvQ
+	(envelope-from <netdev+bounces-258748-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 23:38:07 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE3FC13DB36
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 23:21:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9540D13DB97
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 23:38:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7F8953014645
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:21:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9ECA7301918A
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:38:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB735311956;
-	Sat, 14 Feb 2026 22:20:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5FEC3195FD;
+	Sat, 14 Feb 2026 22:38:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X/wMUkSn"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c5d2CgS/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80FC023C8A0
-	for <netdev@vger.kernel.org>; Sat, 14 Feb 2026 22:20:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 545E5318EF8;
+	Sat, 14 Feb 2026 22:38:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771107659; cv=none; b=LcJ6ZAuCtVxwt4OFMNFFVVLgM/deS8eR5ol8ZklhMGGKUg4E/H/d8eDxMGNtRo60mLyMAZip4Qw3exWZyCZM93x4N6HIoN5DHT4BLZX2J0bV3W34yH0c4Q88BLOLqlJV3kuYqrEsixAknwcuWTQ/2pP9tDdevOv61TslH2giEj4=
+	t=1771108682; cv=none; b=fwUS4g8pbBqg802pgIpxqJXxjR1VqRzYz80XvOE+D6psCMWIMZXm23jVKlxBO2RGnfLxE8IyNcUilN51Vf8Um4GutjAXdCmZ5xhzl2ARJYorcykxI0w12U4uUGvNseyoFRC518w8/IKFRS/oEZfxdYavE+Ch5apPmKDQeJqBOFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771107659; c=relaxed/simple;
-	bh=frTtZD09f8Bf8Zgam8XeXKfFPpeUui99DGoCniHzJ5E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kOfltWpPsNRUlbCjvaw/+WyVHTT9iatDxSXO1RCMWyxihRq2R5mN2e5V1r4b2a9ctEkZCc2sRX1B7jWOa+FnxvEtJqR8cxrG2qF0xN7Onz1uck2I6CukpssA6jQYgGky2eKvi822WNt+zhjGkYo6PNojmvGNKTRbAITxuKzTyU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X/wMUkSn; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4833115090dso18390515e9.3
-        for <netdev@vger.kernel.org>; Sat, 14 Feb 2026 14:20:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771107657; x=1771712457; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tdYzr1MdBQ+TSUvklAXfAzoZEsF9B2NkCtirq2Cu9Bg=;
-        b=X/wMUkSnC2FZrPH9FGQFcQXiqsHWe53NgwSGGUl8OdYTzSp6D8Byv8SX8NuL9KyQFy
-         bkqfJF55I8ccEpi/R8cQBlY+1V12FGnunfARN+FhNOAtZd3k7OD74mDxTFD/JcPz0cg4
-         EePJFxe97hGjH20lmCqD8nUz6z0m4QZyg9K41AZZPmfSs3donTWIKkQk9UdAr+AivSwi
-         fR7U24fnY0tsEa1tstYZXzL+StSsr7HgIha8o29Ddt1ZQXrevwwsYgEHA4YTyr2NA0uk
-         DsMHeT9/ekO//m1Df48pfoSGrih7s1ekWMVhKmNsZsiy0aaz4YkIKC9b3ANcYZ9st8LY
-         Dqpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771107657; x=1771712457;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tdYzr1MdBQ+TSUvklAXfAzoZEsF9B2NkCtirq2Cu9Bg=;
-        b=fh+0Cwxs93thmQWG/iFpK0EZ+9qvqcnaoBazcTApUBMMHCZ1zUURsIleF/fpH3xxlo
-         yBDWTG/hdKJjgq5pdFnnnjRoOVxHTQphWkiNY0Cd2Dp6VmdJvrJqy4PjgDelWSyGP5vH
-         zn9liplq95a7z07VQ43bDpqnK4Y52ys+1kex2brIRefZdK3MnfDreHeSu5Kv13HSzbRD
-         gCu7C03vls5sxsx3XseOM94YwS9IqbVYM9H8ZrLB1Q6Mkbrbrynqicd7nrgpkhmZRzne
-         PxiT9Pr6l3qt2rw9xsL+QoZ/zlpRe3XUvFS2lB2SUhiZu6UzAr7wktLrfPRowrWU4MLu
-         T/ng==
-X-Forwarded-Encrypted: i=1; AJvYcCUmutw+KgQv+8bgA3ddv3JG4AhQWRmC0ULL87xXn4Y5Mmtr03fojPoIwyIQ4mXdjmicd8W9D4o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx53jEhftdQ9GpQU8dQxLeIu061Jd77b0WIuJ83hm+n+YJkm8Ai
-	KIwRiTXQf4XhgR5wf1LqlwzknDNwbU3O18soDB6rmfTU8MoBhmDTCtxM
-X-Gm-Gg: AZuq6aLeVxE1NpIqTCNq5wc/pj8IAE0Zh5mWP132SylseeKLKILjcdlgmuL96BoxYpG
-	JOYnVhCn8T3BlTVR/ea9UJ2BpoQW20oe1CTyUftyJHeBBVNwSK0/5OZsWgtCsWdiwXfo7/EiDX6
-	P4Sy4a6KU718UevfftOZHwfkhry24YwXQ0APWcXaVFL+SnE5F6LN+tW89/MFqfGk+5pF5z8ixUu
-	MWyWXdy0RQ6KZRDtaleABUpGSVh4mG0+dF2Z1Hi2ByFHOJDCaBj/iACvcNr71q0eubVSjcg878s
-	B8S1zptpfblTv2dTn2v7NB29bCC8+vFz5c/YoRxQl06A3O4p60bnEhvrlbNlOwRQ3V6qQbWD7kc
-	UhhShn0VuPvT7tidpAKkQYQaOhos7a3qOJnVUtmxTG8C/TSfr+Md8xn1kFTnxjSZV+ywlcevORQ
-	J8xMQoLTxg1NtVzPV0UQCPpKjYU5n3qmNeDlyWe0xsZsp5dsAR3Q9rHBF0OUhVAPrrR8DpDX8EA
-	hMV0FUhPdNENmVi13Dak7rCZEsyxA==
-X-Received: by 2002:a05:600c:1d0a:b0:483:3380:ca12 with SMTP id 5b1f17b1804b1-48373a74357mr93484705e9.29.1771107656914;
-        Sat, 14 Feb 2026 14:20:56 -0800 (PST)
-Received: from 127.mynet ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483801ff9b3sm38743745e9.13.2026.02.14.14.20.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Feb 2026 14:20:55 -0800 (PST)
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: io-uring@vger.kernel.org
-Cc: asml.silence@gmail.com,
-	axboe@kernel.dk,
-	netdev@vger.kernel.org
-Subject: [PATCH 1/1] io_uring/zcrx: fix post open error handling
-Date: Sat, 14 Feb 2026 22:20:47 +0000
-Message-ID: <9d9cdc9ae6c6d59154e68f65054d75893a749d14.1771091720.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1771108682; c=relaxed/simple;
+	bh=sfeKRemoRP6AGEZUVLY7EUXiLIlvcJ1lUcv39EjqSMc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M8BEyoWsA13bnEYSv9Fan3oe1R8aj7AZcGE0X6VKbzjX/vgxwHtbR+tB2qMugmUOjg9AVNFAH9KWtJTopcP01K+Tay/HOVIQVSntz4vwWoN5XQKZxxtnQhh2teo93/reebE/uaXZ1RFiU7FmWJiGSWGqboN8ugW0Yp7rEu4382k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c5d2CgS/; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1771108681; x=1802644681;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=sfeKRemoRP6AGEZUVLY7EUXiLIlvcJ1lUcv39EjqSMc=;
+  b=c5d2CgS/eXcKQNk+TdEDdTId9wOk6sKwIkKfGvidSRnXUxfb7ljvb9je
+   UJ1xwvmZQX3bjhAuZDhoy7eO0B/ggEfstu3c/KVzd97kMy6of71SrcCbv
+   FhlCydBdWozrZhc9aAm+5re3bRnFpfDUyM+jS8waXz5WQIFuwXd8zbsbM
+   9aYT0G1Zi/Zy2jEt3V3GbjEapH4U3+lHTAKPFfsY6C+/cCLDIbCAWXpGx
+   cC62yxPxkkh4ys54JLtzoykeGgQc/Pk6zYAs5sjIMgJfQ3KEya9mPqUVp
+   jhY1nMHEYGTHi1OIkdYtV/0V2lINCG5qoeM7x64DUbNmi4mL4Po1JM2uQ
+   Q==;
+X-CSE-ConnectionGUID: 4NsjmrPYTOybQ7ZABGo4lA==
+X-CSE-MsgGUID: mgVXMR+iTK6ZF745tLaB6A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11701"; a="83354015"
+X-IronPort-AV: E=Sophos;i="6.21,291,1763452800"; 
+   d="scan'208";a="83354015"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2026 14:38:01 -0800
+X-CSE-ConnectionGUID: oYm+91+EQvy97mKuuZOM8g==
+X-CSE-MsgGUID: Si/FvinmTdWUIhox4TQ8qw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,291,1763452800"; 
+   d="scan'208";a="217787009"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by orviesa004.jf.intel.com with ESMTP; 14 Feb 2026 14:37:56 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vrOGw-00000000x32-0UiW;
+	Sat, 14 Feb 2026 22:37:54 +0000
+Date: Sun, 15 Feb 2026 06:37:49 +0800
+From: kernel test robot <lkp@intel.com>
+To: Chris J Arges <carges@cloudflare.com>, michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com, hawk@kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	kernel-team@cloudflare.com, jbrandeburg@cloudflare.com,
+	Chris J Arges <carges@cloudflare.com>, linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH 2/2] bnxt_en: Implement XDP RSS hash metadata extraction
+Message-ID: <202602150651.wYfne7oq-lkp@intel.com>
+References: <20260213192449.1294830-3-carges@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260213192449.1294830-3-carges@cloudflare.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258747-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.dk,vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258748-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[cloudflare.com,broadcom.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,iogearbox.net,gmail.com,fomichev.me];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_THREE(0.00)[4];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CE3FC13DB36
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[git-scm.com:url,intel.com:mid,intel.com:dkim,intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9540D13DB97
 X-Rspamd-Action: no action
 
-Closing a queue doesn't guarantee that all associated page pools are
-terminated right away, let the refcounting do the work instead of
-releasing the zcrx ctx directly.
+Hi Chris,
 
-Cc: stable@vger.kernel.org
-Fixes: e0793de24a9f6 ("io_uring/zcrx: set pp memory provider for an rx queue")
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
- io_uring/zcrx.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+kernel test robot noticed the following build errors:
 
-diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
-index 006e1bfefa5f..b24d1da2e1ca 100644
---- a/io_uring/zcrx.c
-+++ b/io_uring/zcrx.c
-@@ -515,9 +515,6 @@ static void io_close_queue(struct io_zcrx_ifq *ifq)
- 		.mp_priv = ifq,
- 	};
- 
--	if (ifq->if_rxq == -1)
--		return;
--
- 	scoped_guard(mutex, &ifq->pp_lock) {
- 		netdev = ifq->netdev;
- 		netdev_tracker = ifq->netdev_tracker;
-@@ -525,7 +522,8 @@ static void io_close_queue(struct io_zcrx_ifq *ifq)
- 	}
- 
- 	if (netdev) {
--		net_mp_close_rxq(netdev, ifq->if_rxq, &p);
-+		if (ifq->if_rxq != -1)
-+			net_mp_close_rxq(netdev, ifq->if_rxq, &p);
- 		netdev_put(netdev, &netdev_tracker);
- 	}
- 	ifq->if_rxq = -1;
-@@ -833,13 +831,12 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
- 	}
- 	return 0;
- netdev_put_unlock:
--	netdev_put(ifq->netdev, &ifq->netdev_tracker);
- 	netdev_unlock(ifq->netdev);
- err:
- 	scoped_guard(mutex, &ctx->mmap_lock)
- 		xa_erase(&ctx->zcrx_ctxs, id);
- ifq_free:
--	io_zcrx_ifq_free(ifq);
-+	zcrx_unregister(ifq);
- 	return ret;
- }
- 
+[auto build test ERROR on v6.19]
+[cannot apply to linus/master next-20260213]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Chris-J-Arges/bnxt_en-use-bnxt_xdp_buff-for-xdp-context/20260214-032849
+base:   v6.19
+patch link:    https://lore.kernel.org/r/20260213192449.1294830-3-carges%40cloudflare.com
+patch subject: [PATCH 2/2] bnxt_en: Implement XDP RSS hash metadata extraction
+config: openrisc-allmodconfig (https://download.01.org/0day-ci/archive/20260215/202602150651.wYfne7oq-lkp@intel.com/config)
+compiler: or1k-linux-gcc (GCC) 15.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260215/202602150651.wYfne7oq-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202602150651.wYfne7oq-lkp@intel.com/
+
+All error/warnings (new ones prefixed by >>):
+
+>> drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c:476:12: error: static declaration of 'bnxt_xdp_rx_hash' follows non-static declaration
+     476 | static int bnxt_xdp_rx_hash(const struct xdp_md *ctx, u32 *hash,
+         |            ^~~~~~~~~~~~~~~~
+   In file included from drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c:22:
+   drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h:44:5: note: previous declaration of 'bnxt_xdp_rx_hash' with type 'int(const struct xdp_md *, u32 *, enum xdp_rss_hash_type *)' {aka 'int(const struct xdp_md *, unsigned int *, enum xdp_rss_hash_type *)'}
+      44 | int bnxt_xdp_rx_hash(const struct xdp_md *ctx, u32 *hash,
+         |     ^~~~~~~~~~~~~~~~
+>> drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c:476:12: warning: 'bnxt_xdp_rx_hash' defined but not used [-Wunused-function]
+     476 | static int bnxt_xdp_rx_hash(const struct xdp_md *ctx, u32 *hash,
+         |            ^~~~~~~~~~~~~~~~
+
+
+vim +/bnxt_xdp_rx_hash +476 drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+
+   475	
+ > 476	static int bnxt_xdp_rx_hash(const struct xdp_md *ctx, u32 *hash,
+
 -- 
-2.52.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
