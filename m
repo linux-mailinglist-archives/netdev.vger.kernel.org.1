@@ -1,66 +1,61 @@
-Return-Path: <netdev+bounces-258730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258731-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YGq8AD7okGkMdwEAu9opvQ
-	(envelope-from <netdev+bounces-258730-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:25:18 +0100
+	id EIFULk3okGkOdwEAu9opvQ
+	(envelope-from <netdev+bounces-258731-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:25:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73B2513D4DB
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:25:17 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 504E713D50A
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:25:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 86E163037E4F
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 21:24:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B5A58301939E
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 21:25:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51AF4283159;
-	Sat, 14 Feb 2026 21:24:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79C122E5B19;
+	Sat, 14 Feb 2026 21:25:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aWWRUliX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ameAn710"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA4A3C2D;
-	Sat, 14 Feb 2026 21:24:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55C431C84DE;
+	Sat, 14 Feb 2026 21:25:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771104299; cv=none; b=JoW5DYf1ZeGn+tBhTky8+Oxr1ks68IXzcHhYDp6iFOdhs/S4/812vmfBpJPmv9zgEBinDXvRubD39Z/9IekavQB0Nb+UmrFjYgrIdNkPmXH2eOwTPZyo8WoOKxoaZSsDKe6gpYDqQlz+w2isHW2ZEFAaThyhf0xsNMN5yNBNRFI=
+	t=1771104309; cv=none; b=aWRbuKHdV3UiUcB7BmwiabMqfyeyuQ9WC55WiStpNu3yBmXCjEqMbYJCNUROVazuS5gZr1zMyf221mo8Uv7W9v7dWx2bp2gj6FnFOa74BjiZjBmH7SRYe+Sm0tPktbgsGKZqYhBCAG2ELL7Mp4T484ReWahF7Slb4wfcy1KlSO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771104299; c=relaxed/simple;
-	bh=5WmlLR1ZsEQCtJFKRU48Ql7qv4HCh319ycm8oSOdYXo=;
+	s=arc-20240116; t=1771104309; c=relaxed/simple;
+	bh=QP1Mxt56RkhuEfSgRzgq6bcfzX827a6zZrXFGKW3xUc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Qyu/uj0+ohYzYNZi8XIkMSHhT5m+u7ld3gt2/hUTDfLu134dZbv9okdVO6zwqBY79MW3Hv5zmmPlEAx+/8f9ftQ6UFyHhQYU9qfnkP3Qe/zLcKNkZocOhQHGE82dBAe0Qv1thPXMBgeKyamRpifwqC+pkEsoglotsseelEW9tdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aWWRUliX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5F1DC19422;
-	Sat, 14 Feb 2026 21:24:57 +0000 (UTC)
+	 MIME-Version:Content-Type; b=XrZD2WgFHok14HmytZFSuaBk36mEDrLkLd3XKNzeDeDFCfjb0YHUPb9iazVyxAIuQfxiEUWZ2Wq1nDkkadzHlKh8CGIRDFBb2EbgiApAXSMi130tYp4ObQ+2EfpTJjeO/psQEaWzho6DNZLbnxp6jQ6KN9RgSh2VsMmA/t+gkDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ameAn710; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6239DC16AAE;
+	Sat, 14 Feb 2026 21:25:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771104299;
-	bh=5WmlLR1ZsEQCtJFKRU48Ql7qv4HCh319ycm8oSOdYXo=;
+	s=k20201202; t=1771104309;
+	bh=QP1Mxt56RkhuEfSgRzgq6bcfzX827a6zZrXFGKW3xUc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aWWRUliXq1MwGxmM/xM5SZWRVKlfmnrYVmLKHr1L4za79Jmh2ZMmdWd29xUtLOBzy
-	 66CGUR/xf+3q1W34QKth5/c09UTIiEZSaSGvLgumu1JsRYhxWKmQG22bqEpTdwnl0n
-	 voHvyctpWVVNyaq25nnT0iHsedsUGcMIAeQBf2EPk79iu7wq1OPJPMjpSaIVUQv+5/
-	 dDeFRPiDYs+QGkz6WxjiMc28+1LEYZl3jdVpaPQjBCzUjeSPPenVs/VqB7k9/9QiY8
-	 HaYeZiMA/pS9mm4wNY2Wc0ZIqqnnkZRzduLpF11W8bNiHrGfA4dKcYrkxhoogfX+yA
-	 VXw6pa1YwCsHw==
+	b=ameAn710/kEid/UYZ80rYKucPl+wirxkYv0tKEZ5cGhRfk1i0yVRCdJQlH3QCKdnw
+	 luckSf62VJlsyOX4jnmtUFC/5RQ3/0B0IdbKLtCWvTqpYaPwoivvfYwiZb5Sw7YNPT
+	 +KQ67h4IgskVhvVR0FZi+SHcDvPMv7eVRMsLmGbDLcquuaOJPshVQsYSyj5fRBSHY/
+	 E3SYF9jzWLvx1/ce9r+fBLwdrbJk0TRRyW60SB610/suxaGpSe9D3FWgODIRtIGCiT
+	 v86gY9e2uyStrRauQ7a5pBX+bfjFwZGO/RO/yu0JqNdtY2Xiuy15EHXM+F8XVv5Qmc
+	 mBvsgXKOxD1pw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Arnd Bergmann <arnd@arndb.de>,
+Cc: Jian Zhang <zhangjian.3032@bytedance.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	mingo@kernel.org,
-	neil.armstrong@linaro.org,
-	tglx@kernel.org,
-	bhelgaas@google.com,
-	giovanni.cabiddu@intel.com,
-	yelangyan@huaqin.corp-partner.google.com,
-	lukas@wunner.de,
+	jk@codeconstruct.com.au,
+	matt@codeconstruct.com.au,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.19-5.10] myri10ge: avoid uninitialized variable use
-Date: Sat, 14 Feb 2026 16:22:28 -0500
-Message-ID: <20260214212452.782265-3-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.19-6.1] net: mctp-i2c: fix duplicate reception of old data
+Date: Sat, 14 Feb 2026 16:22:33 -0500
+Message-ID: <20260214212452.782265-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260214212452.782265-1-sashal@kernel.org>
 References: <20260214212452.782265-1-sashal@kernel.org>
@@ -77,289 +72,184 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-258731-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258730-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 73B2513D4DB
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bytedance.com:email]
+X-Rspamd-Queue-Id: 504E713D50A
 X-Rspamd-Action: no action
 
-From: Arnd Bergmann <arnd@arndb.de>
+From: Jian Zhang <zhangjian.3032@bytedance.com>
 
-[ Upstream commit fd24173439c033ffb3c2a2628fcbc9cb65e62bdb ]
+[ Upstream commit ae4744e173fadd092c43eda4ca92dcb74645225a ]
 
-While compile testing on less common architectures, I noticed that gcc-10 on
-s390 finds a bug that all other configurations seem to miss:
+The MCTP I2C slave callback did not handle I2C_SLAVE_READ_REQUESTED
+events. As a result, i2c read event will trigger repeated reception of
+old data, reset rx_pos when a read request is received.
 
-drivers/net/ethernet/myricom/myri10ge/myri10ge.c: In function 'myri10ge_set_multicast_list':
-drivers/net/ethernet/myricom/myri10ge/myri10ge.c:391:25: error: 'cmd.data0' is used uninitialized in this function [-Werror=uninitialized]
-  391 |  buf->data0 = htonl(data->data0);
-      |                         ^~
-drivers/net/ethernet/myricom/myri10ge/myri10ge.c:392:25: error: '*((void *)&cmd+4)' is used uninitialized in this function [-Werror=uninitialized]
-  392 |  buf->data1 = htonl(data->data1);
-      |                         ^~
-drivers/net/ethernet/myricom/myri10ge/myri10ge.c: In function 'myri10ge_allocate_rings':
-drivers/net/ethernet/myricom/myri10ge/myri10ge.c:392:13: error: 'cmd.data1' is used uninitialized in this function [-Werror=uninitialized]
-  392 |  buf->data1 = htonl(data->data1);
-drivers/net/ethernet/myricom/myri10ge/myri10ge.c:1939:22: note: 'cmd.data1' was declared here
- 1939 |  struct myri10ge_cmd cmd;
-      |                      ^~~
-drivers/net/ethernet/myricom/myri10ge/myri10ge.c:393:13: error: 'cmd.data2' is used uninitialized in this function [-Werror=uninitialized]
-  393 |  buf->data2 = htonl(data->data2);
-drivers/net/ethernet/myricom/myri10ge/myri10ge.c:1939:22: note: 'cmd.data2' was declared here
- 1939 |  struct myri10ge_cmd cmd;
-
-It would be nice to understand how to make other compilers catch this as
-well, but for the moment I'll just shut up the warning by fixing the
-undefined behavior in this driver.
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Link: https://patch.msgid.link/20260205162935.2126442-1-arnd@kernel.org
+Signed-off-by: Jian Zhang <zhangjian.3032@bytedance.com>
+Link: https://patch.msgid.link/20260108101829.1140448-1-zhangjian.3032@bytedance.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-### Understanding the Bug
+## Analysis of net: mctp-i2c: fix duplicate reception of old data
 
-The analysis reveals this is a **real, meaningful bug**, not just a
-compiler warning cleanup:
+### 1. Commit Message Analysis
 
-1. **`struct myri10ge_cmd`** has three `u32` fields: `data0`, `data1`,
-   `data2`
-2. **`myri10ge_send_cmd()`** unconditionally copies ALL THREE fields to
-   hardware via:
-  ```c
-  buf->data0 = htonl(data->data0);
-  buf->data1 = htonl(data->data1);
-  buf->data2 = htonl(data->data2);
-  ```
-  Then sends them to the NIC via `myri10ge_pio_copy()`.
+The commit message clearly describes a **bug fix**: the MCTP I2C slave
+callback was not handling `I2C_SLAVE_READ_REQUESTED` events, which
+caused **duplicate reception of old data** when an I2C read event
+occurred. The fix resets `rx_pos` when a read request is received.
 
-3. In many call sites, the `cmd` struct is declared on the stack but
-   **not all fields are initialized** before being passed to
-   `myri10ge_send_cmd()`. This means **random stack garbage is sent to
-   hardware**.
+Keywords: "fix duplicate reception of old data" — this is an explicit
+bug fix.
 
-### Bug Impact
+### 2. Code Change Analysis
 
-- **Undefined behavior**: Uninitialized stack variables being used is
-  undefined behavior in C
-- **Hardware commands with garbage data**: The NIC firmware receives
-  commands with random data in unused fields, which could cause
-  unpredictable behavior depending on firmware implementation
-- **Potential data corruption or connectivity issues**: If the firmware
-  interprets garbage values in unexpected ways
-- **Build failure**: On gcc-10 on s390 with `-Werror`, this prevents
-  compilation entirely
+The patch makes two changes:
 
-### Scope of Changes
+**Change 1: Handle `I2C_SLAVE_READ_REQUESTED` in the switch statement**
+```c
+case I2C_SLAVE_READ_REQUESTED:
+    midev->rx_pos = 0;
+    break;
+```
+This adds handling for a previously unhandled I2C slave event. When a
+read request comes in, `rx_pos` is reset to 0, preventing stale data
+from being re-processed. Without this, the `rx_pos` would retain its old
+value from a previous transaction, and when `I2C_SLAVE_STOP` fires,
+`mctp_i2c_recv()` would process stale data in the buffer — resulting in
+duplicate/ghost packet reception.
 
-The fix is purely additive — it adds zero-initialization of `cmd.data0`,
-`cmd.data1`, `cmd.data2` at each call site where they were previously
-uninitialized. The changes span **one file** with simple, repetitive
-initialization statements. There's also a minor cleanup moving the `cmd`
-variable declaration to a narrower scope in `myri10ge_close()`.
+**Change 2: Early return in `mctp_i2c_recv()` when `rx_pos == 0`**
+```c
+if (midev->rx_pos == 0)
+    return 0;
+```
+This is a defensive guard: if `rx_pos` was reset to 0 (by the new
+READ_REQUESTED handler), `mctp_i2c_recv()` should do nothing since
+there's no valid write data to process. Without this check, the function
+would proceed with invalid state (`rx_pos == 0`), potentially causing
+incorrect length calculations or accessing uninitialized buffer data.
 
-Functions fixed:
-- `myri10ge_get_firmware_capabilities()`
-- `myri10ge_update_mac_address()`
-- `myri10ge_change_pause()`
-- `myri10ge_change_promisc()`
-- `myri10ge_allocate_rings()`
-- `myri10ge_get_txrx()`
-- `myri10ge_open()`
-- `myri10ge_close()`
-- `myri10ge_set_multicast_list()`
+### 3. Bug Mechanism
 
-### Stable Kernel Criteria Assessment
+The I2C slave callback handles events during I2C bus transactions. The
+MCTP-over-I2C protocol involves the bus master writing MCTP packets.
+However, the I2C bus can also generate `I2C_SLAVE_READ_REQUESTED` events
+(when the master reads from this slave). Without handling this event:
+
+1. `rx_pos` retains its value from a previous write transaction
+2. When `I2C_SLAVE_STOP` fires after the read, `mctp_i2c_recv()`
+   processes the stale buffer
+3. This causes **duplicate reception of old MCTP packets** — a data
+   integrity/correctness bug
+
+### 4. Classification
+
+- **Bug fix**: Yes — fixes incorrect behavior (duplicate packet
+  reception)
+- **New feature**: No — this handles an existing I2C event that was
+  previously ignored
+- **Scope**: Very small — adds 5 lines of code across two locations in
+  one file
+
+### 5. Stable Criteria Assessment
 
 | Criterion | Assessment |
-|-----------|-----------|
-| Obviously correct? | Yes — initializing variables to zero before use
-is trivially correct |
-| Fixes a real bug? | Yes — undefined behavior (uninitialized data sent
-to hardware) and build failure on s390 |
-| Small and contained? | Yes — single file, simple initialization
-additions |
-| No new features? | Correct — purely a bug fix |
-| Risk of regression? | Very low — adding zero-initialization cannot
-break correct code |
+|-----------|------------|
+| Obviously correct and tested | Yes — simple, logical fix; accepted by
+net maintainer Jakub Kicinski |
+| Fixes a real bug | Yes — duplicate reception of stale MCTP data |
+| Important issue | Moderate — data correctness issue in networking
+stack |
+| Small and contained | Yes — 5 lines added in a single file |
+| No new features | Correct — just handles a missing event case |
+| Applies cleanly | Likely — small, localized change |
 
-### Risk vs Benefit
+### 6. Risk Assessment
 
-- **Risk**: Extremely low. Zero-initializing struct fields before
-  passing them to a function is the safest possible change. The only
-  conceivable risk is if the hardware somehow relied on receiving
-  specific non-zero garbage values, which would be absurd.
-- **Benefit**: Fixes undefined behavior, prevents hardware from
-  receiving garbage command data, and fixes a build failure on s390 with
-  gcc-10.
+**Risk: Very low**
+- The change is minimal and purely additive (no existing code modified)
+- Adding a case to a switch statement with a simple assignment is very
+  safe
+- The early return guard in `mctp_i2c_recv()` is a standard defensive
+  check
+- Only affects MCTP-over-I2C users — very narrow blast radius
 
-### Concerns
+**Benefit: Moderate to High for affected users**
+- MCTP (Management Component Transport Protocol) over I2C is used in
+  server/BMC management
+- Duplicate packet reception causes incorrect behavior in management
+  stacks
+- Without this fix, any I2C read event corrupts the MCTP receive path
 
-- The myri10ge driver is for Myricom 10-Gigabit Ethernet adapters, which
-  are older hardware (Myricom was acquired by CSPI years ago). However,
-  users with this hardware in stable kernels still benefit from correct
-  behavior.
-- No dependency on other commits — this is fully self-contained.
-- Note the use of commas instead of semicolons in some initializations
-  (e.g., `cmd.data0 = 0,` instead of `cmd.data0 = 0;`) — this is
-  syntactically valid C (comma operator) but unusual. It won't cause
-  issues.
+### 7. Dependencies
 
-### Conclusion
+No dependencies on other commits. The fix is self-contained and modifies
+only the existing `mctp_i2c_slave_cb()` function and `mctp_i2c_recv()`
+function.
 
-This commit fixes real undefined behavior where uninitialized stack data
-is sent to network hardware. It's a textbook example of a safe,
-contained bug fix: zero-initializing variables before use in a single
-driver file. The fix prevents both runtime undefined behavior and a
-build failure on certain architectures. The risk of regression is
-negligible.
+### 8. Conclusion
+
+This is a clean, small, obviously correct bug fix that addresses a real
+data corruption/correctness issue (duplicate reception of stale data) in
+the MCTP I2C driver. It meets all stable kernel criteria: it's small,
+contained, fixes a real bug, introduces no new features, and has very
+low regression risk.
 
 **YES**
 
- .../net/ethernet/myricom/myri10ge/myri10ge.c  | 28 ++++++++++++++++++-
- 1 file changed, 27 insertions(+), 1 deletion(-)
+ drivers/net/mctp/mctp-i2c.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/net/ethernet/myricom/myri10ge/myri10ge.c b/drivers/net/ethernet/myricom/myri10ge/myri10ge.c
-index 7be30a8df2685..2f0cdbd4e2ac9 100644
---- a/drivers/net/ethernet/myricom/myri10ge/myri10ge.c
-+++ b/drivers/net/ethernet/myricom/myri10ge/myri10ge.c
-@@ -688,6 +688,9 @@ static int myri10ge_get_firmware_capabilities(struct myri10ge_priv *mgp)
+diff --git a/drivers/net/mctp/mctp-i2c.c b/drivers/net/mctp/mctp-i2c.c
+index f782d93f826ef..ecda1cc36391c 100644
+--- a/drivers/net/mctp/mctp-i2c.c
++++ b/drivers/net/mctp/mctp-i2c.c
+@@ -242,6 +242,9 @@ static int mctp_i2c_slave_cb(struct i2c_client *client,
+ 		return 0;
  
- 	/* probe for IPv6 TSO support */
- 	mgp->features = NETIF_F_SG | NETIF_F_HW_CSUM | NETIF_F_TSO;
-+	cmd.data0 = 0,
-+	cmd.data1 = 0,
-+	cmd.data2 = 0,
- 	status = myri10ge_send_cmd(mgp, MXGEFW_CMD_GET_MAX_TSO6_HDR_SIZE,
- 				   &cmd, 0);
- 	if (status == 0) {
-@@ -806,6 +809,7 @@ static int myri10ge_update_mac_address(struct myri10ge_priv *mgp,
- 		     | (addr[2] << 8) | addr[3]);
+ 	switch (event) {
++	case I2C_SLAVE_READ_REQUESTED:
++		midev->rx_pos = 0;
++		break;
+ 	case I2C_SLAVE_WRITE_RECEIVED:
+ 		if (midev->rx_pos < MCTP_I2C_BUFSZ) {
+ 			midev->rx_buffer[midev->rx_pos] = *val;
+@@ -279,6 +282,9 @@ static int mctp_i2c_recv(struct mctp_i2c_dev *midev)
+ 	size_t recvlen;
+ 	int status;
  
- 	cmd.data1 = ((addr[4] << 8) | (addr[5]));
-+	cmd.data2 = 0;
- 
- 	status = myri10ge_send_cmd(mgp, MXGEFW_SET_MAC_ADDRESS, &cmd, 0);
- 	return status;
-@@ -817,6 +821,9 @@ static int myri10ge_change_pause(struct myri10ge_priv *mgp, int pause)
- 	int status, ctl;
- 
- 	ctl = pause ? MXGEFW_ENABLE_FLOW_CONTROL : MXGEFW_DISABLE_FLOW_CONTROL;
-+	cmd.data0 = 0,
-+	cmd.data1 = 0,
-+	cmd.data2 = 0,
- 	status = myri10ge_send_cmd(mgp, ctl, &cmd, 0);
- 
- 	if (status) {
-@@ -834,6 +841,9 @@ myri10ge_change_promisc(struct myri10ge_priv *mgp, int promisc, int atomic)
- 	int status, ctl;
- 
- 	ctl = promisc ? MXGEFW_ENABLE_PROMISC : MXGEFW_DISABLE_PROMISC;
-+	cmd.data0 = 0;
-+	cmd.data1 = 0;
-+	cmd.data2 = 0;
- 	status = myri10ge_send_cmd(mgp, ctl, &cmd, atomic);
- 	if (status)
- 		netdev_err(mgp->dev, "Failed to set promisc mode\n");
-@@ -1946,6 +1956,8 @@ static int myri10ge_allocate_rings(struct myri10ge_slice_state *ss)
- 	/* get ring sizes */
- 	slice = ss - mgp->ss;
- 	cmd.data0 = slice;
-+	cmd.data1 = 0;
-+	cmd.data2 = 0;
- 	status = myri10ge_send_cmd(mgp, MXGEFW_CMD_GET_SEND_RING_SIZE, &cmd, 0);
- 	tx_ring_size = cmd.data0;
- 	cmd.data0 = slice;
-@@ -2238,12 +2250,16 @@ static int myri10ge_get_txrx(struct myri10ge_priv *mgp, int slice)
- 	status = 0;
- 	if (slice == 0 || (mgp->dev->real_num_tx_queues > 1)) {
- 		cmd.data0 = slice;
-+		cmd.data1 = 0;
-+		cmd.data2 = 0;
- 		status = myri10ge_send_cmd(mgp, MXGEFW_CMD_GET_SEND_OFFSET,
- 					   &cmd, 0);
- 		ss->tx.lanai = (struct mcp_kreq_ether_send __iomem *)
- 		    (mgp->sram + cmd.data0);
- 	}
- 	cmd.data0 = slice;
-+	cmd.data1 = 0;
-+	cmd.data2 = 0;
- 	status |= myri10ge_send_cmd(mgp, MXGEFW_CMD_GET_SMALL_RX_OFFSET,
- 				    &cmd, 0);
- 	ss->rx_small.lanai = (struct mcp_kreq_ether_recv __iomem *)
-@@ -2312,6 +2328,7 @@ static int myri10ge_open(struct net_device *dev)
- 	if (mgp->num_slices > 1) {
- 		cmd.data0 = mgp->num_slices;
- 		cmd.data1 = MXGEFW_SLICE_INTR_MODE_ONE_PER_SLICE;
-+		cmd.data2 = 0;
- 		if (mgp->dev->real_num_tx_queues > 1)
- 			cmd.data1 |= MXGEFW_SLICE_ENABLE_MULTIPLE_TX_QUEUES;
- 		status = myri10ge_send_cmd(mgp, MXGEFW_CMD_ENABLE_RSS_QUEUES,
-@@ -2414,6 +2431,8 @@ static int myri10ge_open(struct net_device *dev)
- 
- 	/* now give firmware buffers sizes, and MTU */
- 	cmd.data0 = dev->mtu + ETH_HLEN + VLAN_HLEN;
-+	cmd.data1 = 0;
-+	cmd.data2 = 0;
- 	status = myri10ge_send_cmd(mgp, MXGEFW_CMD_SET_MTU, &cmd, 0);
- 	cmd.data0 = mgp->small_bytes;
- 	status |=
-@@ -2472,7 +2491,6 @@ static int myri10ge_open(struct net_device *dev)
- static int myri10ge_close(struct net_device *dev)
- {
- 	struct myri10ge_priv *mgp = netdev_priv(dev);
--	struct myri10ge_cmd cmd;
- 	int status, old_down_cnt;
- 	int i;
- 
-@@ -2491,8 +2509,13 @@ static int myri10ge_close(struct net_device *dev)
- 
- 	netif_tx_stop_all_queues(dev);
- 	if (mgp->rebooted == 0) {
-+		struct myri10ge_cmd cmd;
++	if (midev->rx_pos == 0)
++		return 0;
 +
- 		old_down_cnt = mgp->down_cnt;
- 		mb();
-+		cmd.data0 = 0;
-+		cmd.data1 = 0;
-+		cmd.data2 = 0;
- 		status =
- 		    myri10ge_send_cmd(mgp, MXGEFW_CMD_ETHERNET_DOWN, &cmd, 0);
- 		if (status)
-@@ -2956,6 +2979,9 @@ static void myri10ge_set_multicast_list(struct net_device *dev)
- 
- 	/* Disable multicast filtering */
- 
-+	cmd.data0 = 0;
-+	cmd.data1 = 0;
-+	cmd.data2 = 0;
- 	err = myri10ge_send_cmd(mgp, MXGEFW_ENABLE_ALLMULTI, &cmd, 1);
- 	if (err != 0) {
- 		netdev_err(dev, "Failed MXGEFW_ENABLE_ALLMULTI, error status: %d\n",
+ 	/* + 1 for the PEC */
+ 	if (midev->rx_pos < MCTP_I2C_MINLEN + 1) {
+ 		ndev->stats.rx_length_errors++;
 -- 
 2.51.0
 
