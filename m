@@ -1,276 +1,129 @@
-Return-Path: <netdev+bounces-258723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258724-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wF3+KRi+kGn7cgEAu9opvQ
-	(envelope-from <netdev+bounces-258723-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 19:25:28 +0100
+	id kLeAB9TGkGmqcwEAu9opvQ
+	(envelope-from <netdev+bounces-258724-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 20:02:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10F1913CE06
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 19:25:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5791D13CFAD
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 20:02:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 42E463004C3B
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 18:25:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AC428301AD03
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 19:02:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DF203033DC;
-	Sat, 14 Feb 2026 18:25:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C85EC2853E0;
+	Sat, 14 Feb 2026 19:02:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ErYQhGxG";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="vnFtf4G1";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ErYQhGxG";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="vnFtf4G1"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="s/RJfSbH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB67C22A7F0
-	for <netdev@vger.kernel.org>; Sat, 14 Feb 2026 18:25:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31A261F8755;
+	Sat, 14 Feb 2026 19:02:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771093519; cv=none; b=scvgeRMNjWu5GZkHfPWINoVt42r6q0rFROOeemCngRolJeA9Mrj8vLjlNEMUSmtgFHkINI8xPnPLZ4KIspdn0puxdDoexrqnN25dlsBRgPlQ0WKmcDSFbIGPdYyUlfA+lL5sf9VRbFAmTwJa9OZoneK8u4Xe29kUwVLuaR46Nno=
+	t=1771095760; cv=none; b=Y2LbjLML2xvgh7K3Wbu7igQH+/yEoXV+HLsy91bPECmcAnqnumR6F54Pr/Qpi68kP1TifGExmjcpMxVPmcjrNeWzYB79cI1zFBjFYUqoU//zQzwQa0IK5fVD8qacsQ6Xwm0rccIyiY69mnXGPe6VLF3cKONCUJU+IgffHaou0es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771093519; c=relaxed/simple;
-	bh=eqszYYsuEQFwdlsViPWxpT7lUQRhoNI9dCbw3tbgSgI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PKFqHxHdgYhLKW5EPbmR/1kdZjIHwJMpGXojfMqO46673kcds1YTWovVV0qWWy2+JsQE1Uju/8e/1BChJyB723hGh1peSNnQKro+UGWNljZhnoL0VbrVn/aPrRm75Ztr0VmiOcHKMkZnu9jkhzr98vatx8QU8+cEntAFI10TyYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ErYQhGxG; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=vnFtf4G1; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ErYQhGxG; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=vnFtf4G1; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 0B31F5BCEF;
-	Sat, 14 Feb 2026 18:25:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1771093516; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=toMJsawatT3XsMU3R6Ki8vJr4mt/rtjnT1MUnjtT/AA=;
-	b=ErYQhGxGgyI+qIzVvIQtFgnlCy+lAMr8DAybYERCxQRyuBqtsPO39bUHetIPov8j70aRDD
-	QaoLQlAYBI6v+B3Jijr8GwatELUkrNM+dFVI1LjCfeXuILUQ3sBW3z1+AKeyMgf/qc1l5U
-	vfxZyiXaUiYZwj7TQNcko0lJwQe3aYA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1771093516;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=toMJsawatT3XsMU3R6Ki8vJr4mt/rtjnT1MUnjtT/AA=;
-	b=vnFtf4G1Rhzc2/lKWI7KuWvlu8kSVrwpMaO0Bnw4Vw0ibC8HJpCtlRw9nmw4KyH+libEz1
-	JSEllPB8yI8eaQDg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1771093516; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=toMJsawatT3XsMU3R6Ki8vJr4mt/rtjnT1MUnjtT/AA=;
-	b=ErYQhGxGgyI+qIzVvIQtFgnlCy+lAMr8DAybYERCxQRyuBqtsPO39bUHetIPov8j70aRDD
-	QaoLQlAYBI6v+B3Jijr8GwatELUkrNM+dFVI1LjCfeXuILUQ3sBW3z1+AKeyMgf/qc1l5U
-	vfxZyiXaUiYZwj7TQNcko0lJwQe3aYA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1771093516;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=toMJsawatT3XsMU3R6Ki8vJr4mt/rtjnT1MUnjtT/AA=;
-	b=vnFtf4G1Rhzc2/lKWI7KuWvlu8kSVrwpMaO0Bnw4Vw0ibC8HJpCtlRw9nmw4KyH+libEz1
-	JSEllPB8yI8eaQDg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 54CE53EA62;
-	Sat, 14 Feb 2026 18:25:15 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id /O82EQu+kGlZPwAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Sat, 14 Feb 2026 18:25:15 +0000
-Message-ID: <c57f2565-a6b2-45dd-8307-871a02ae1a7a@suse.de>
-Date: Sat, 14 Feb 2026 19:25:09 +0100
+	s=arc-20240116; t=1771095760; c=relaxed/simple;
+	bh=qT6IKyTgPgoWtq/pv4/ob9KiVzrzF9Y3L9t2eY2mF7o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=L1PDEaHQCRVa67D4Ig674qJwsrZq3KymStmx7CJLD0vSHdVsKV/CNSKekNO4teP++Q0kuG8RL5yH0NssJtO6lB+dJoElZVp4rZCP/C0j5hoWFhZbVKUOeQ+a8AxQoJbbWDRB8T4rSKVPdP92/8rzYSEDvLANkuKo95oyimgreKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=s/RJfSbH; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=cu+TqsuHAXYizEfNBI0UDoQ498p1s8mX09LKRbQR0g4=; b=s/RJfSbHpNem+gp3NJ6JTnqJQS
+	fxoaewFnUWkdh4CzkZq5dJSLKkncMY/reCTtwACFwPCnPpv44SQAt42IKKzn6aCVxsEAH+SX85IR+
+	VwPDaw3zr14DSsm5ODITZJEKB7aJCHRburoWQYIOqTMmv/3FaoxszQu1K0kJiPryY8eFAooGLmgVZ
+	ZgGE8NBwDSy+MaKcNPNLN0WiUscah3Oq/QL3NsxXQ3Z8GD+deTqyGTGr8tZymD3FeDNg9GqTBoaAQ
+	GJRHzuHVAHv6TLa0HgGoXqvTyjrtIkFUTImQKXRVHznsFd2sT+q2G8jVryzQKfAS2TwyQ+WT3nIpD
+	YaIVBGkQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52392)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vrKuC-0000000060D-2rUa;
+	Sat, 14 Feb 2026 19:02:12 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vrKu8-000000006zz-2kpK;
+	Sat, 14 Feb 2026 19:02:08 +0000
+Date: Sat, 14 Feb 2026 19:02:08 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Yao Zi <me@ziyao.cc>, Heiko Stuebner <heiko@sntech.de>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	linux-rockchip@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org
+Subject: Re: Problematic understanding of phy-mode in Rockchip DWMAC driver
+Message-ID: <aZDGsJNLZIty0242@shell.armlinux.org.uk>
+References: <aY9s5PXP4zZ7R6fa@pie>
+ <aY9xsslT56D9LGLe@shell.armlinux.org.uk>
+ <f1e047e1-3f1c-4562-ab43-af2fe358fe04@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot] [net?] possible deadlock in inet6_getname
-To: Gerd Rausch <gerd.rausch@oracle.com>, Eric Dumazet <edumazet@google.com>,
- syzbot <syzbot+5efae91f60932839f0a5@syzkaller.appspotmail.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, horms@kernel.org,
- kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-References: <698f15e6.a70a0220.2c38d7.00c1.GAE@google.com>
- <CANn89i+mVCLW2g1+tnbK8k9E0AkEuX7AZ+2LbO1_s2L=Gxaaeg@mail.gmail.com>
- <50e88063-14fb-4912-a65d-172a85def1ee@oracle.com>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <50e88063-14fb-4912-a65d-172a85def1ee@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -2.80
-X-Spam-Level: 
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f1e047e1-3f1c-4562-ab43-af2fe358fe04@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email,appspotmail.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	TAGGED_FROM(0.00)[bounces-258724-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[ziyao.cc,sntech.de,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,lists.infradead.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258723-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,5efae91f60932839f0a5];
-	SUBJECT_HAS_QUESTION(0.00)[]
-X-Rspamd-Queue-Id: 10F1913CE06
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:url,shell.armlinux.org.uk:mid]
+X-Rspamd-Queue-Id: 5791D13CFAD
 X-Rspamd-Action: no action
 
-On 2/13/26 7:51 PM, Gerd Rausch wrote:
-> Hi,
-> 
-> On 2026-02-13 09:26, Eric Dumazet wrote:
->> On Fri, Feb 13, 2026 at 1:15 PM syzbot
->> <syzbot+5efae91f60932839f0a5@syzkaller.appspotmail.com> wrote:
->>>
->>>
-> [...]
->>> ============================================
->>> WARNING: possible recursive locking detected
->>> syzkaller #0 Not tainted
->>> --------------------------------------------
->>> kworker/u8:6/2985 is trying to acquire lock:
->>> ffff88807a07aa20 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock 
->>> include/net/sock.h:1709 [inline]
->>> ffff88807a07aa20 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: 
->>> inet6_getname+0x15d/0x650 net/ipv6/af_inet6.c:533
->>>
->>> but task is already holding lock:
->>> ffff88807a07aa20 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock 
->>> include/net/sock.h:1709 [inline]
->>> ffff88807a07aa20 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: 
->>> tcp_sock_set_cork+0x2c/0x2e0 net/ipv4/tcp.c:3694
->>>
-> [...]
->>>   lock_sock_nested+0x48/0x100 net/core/sock.c:3780
->>>   lock_sock include/net/sock.h:1709 [inline]
->>>   inet6_getname+0x15d/0x650 net/ipv6/af_inet6.c:533
->>>   rds_tcp_get_peer_sport net/rds/tcp_listen.c:70 [inline]
->>>   rds_tcp_conn_slots_available+0x288/0x470 net/rds/tcp_listen.c:149
->>>   rds_recv_hs_exthdrs+0x60f/0x7c0 net/rds/recv.c:265
->>>   rds_recv_incoming+0x9f6/0x12d0 net/rds/recv.c:389
->>>   rds_tcp_data_recv+0x7f1/0xa40 net/rds/tcp_recv.c:243
->>>   __tcp_read_sock+0x196/0x970 net/ipv4/tcp.c:1702
->>>   rds_tcp_read_sock net/rds/tcp_recv.c:277 [inline]
->>>   rds_tcp_data_ready+0x369/0x950 net/rds/tcp_recv.c:331
->>>   tcp_rcv_established+0x19e9/0x2670 net/ipv4/tcp_input.c:6675
->>>   tcp_v6_do_rcv+0x8eb/0x1ba0 net/ipv6/tcp_ipv6.c:1609
->>>   sk_backlog_rcv include/net/sock.h:1185 [inline]
->>>   __release_sock+0x1b8/0x3a0 net/core/sock.c:3213
->>
-> [...]
->> Gerd, please take a look, thanks.
->>
->> commit 9d27a0fb122f19b6d01d02f4b4f429ca28811ace
->> Author: Gerd Rausch <gerd.rausch@oracle.com>
->> Date:   Mon Feb 2 22:57:23 2026 -0700
->>
->>      net/rds: Trigger rds_send_ping() more than once
-> 
-> Syzbot is right:
-> 
-> inet_getname() acquires a lock_sock() that was already held
-> as () is about to give it up, but before
-> doing so, handles the backlog receives & callbacks.
-> 
-> Just need to figure out a way to obtain the peer's port number,
-> without ending up in such a recursive lock scenario.
-> 
+On Sat, Feb 14, 2026 at 05:50:15PM +0100, Andrew Lunn wrote:
+> Rockchip have recently started adding support for a new version, and
+> appear to of listened to what we have been saying. So it could be the
+> next generation of chips get this correct.
 
-Hi,
+Have you seen any proposed code from Rockchip for their new scheme?
 
-Shouldn't this be enough?
-
-diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
-index 6fb5c928b8fd..a36e5dfd6c66 100644
---- a/net/rds/tcp_listen.c
-+++ b/net/rds/tcp_listen.c
-@@ -59,30 +59,12 @@ void rds_tcp_keepalive(struct socket *sock)
-  static int
-  rds_tcp_get_peer_sport(struct socket *sock)
-  {
--	union {
--		struct sockaddr_storage storage;
--		struct sockaddr addr;
--		struct sockaddr_in sin;
--		struct sockaddr_in6 sin6;
--	} saddr;
--	int sport;
--
--	if (kernel_getpeername(sock, &saddr.addr) >= 0) {
--		switch (saddr.addr.sa_family) {
--		case AF_INET:
--			sport = ntohs(saddr.sin.sin_port);
--			break;
--		case AF_INET6:
--			sport = ntohs(saddr.sin6.sin6_port);
--			break;
--		default:
--			sport = -1;
--		}
--	} else {
--		sport = -1;
--	}
-+	struct sock *sk = sock->sk;
-+
-+	if (!sk)
-+		return -1;
-
--	return sport;
-+	return ntohs(inet_sk(sk)->inet_dport);
-  }
-
-It would be safe from rds_tcp_accept_one() path as the new_sock has a 
-reference count of 1 and no other component should be to release it.
-
-In rds_tcp_conn_slots_available() path, fan-out can be only performed 
-from receive path, AFAIU if data is being processed from the socket we 
-should always be holding a lock.
-
-If these premises are not correct, we can always make this conditional. 
-But getting rid of the kernel_getpeername() call is performance-wise too.
-
-I am testing this against the syzbot report/reproducer.
-
-Thanks,
-Fernando.
-
-> Thanks for forwarding this,
-> 
->    Gerd
-> 
-> 
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
