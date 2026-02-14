@@ -1,172 +1,188 @@
-Return-Path: <netdev+bounces-258689-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258690-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gIa2M8MrkGmiWgEAu9opvQ
-	(envelope-from <netdev+bounces-258689-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 09:01:07 +0100
+	id 2I8ZJDYtkGm3WgEAu9opvQ
+	(envelope-from <netdev+bounces-258690-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 09:07:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 275BF13B55E
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 09:01:06 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFF6D13B592
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 09:07:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 99D593014848
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 08:01:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3444E301A919
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 08:07:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8B452820A4;
-	Sat, 14 Feb 2026 08:01:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8449283FCF;
+	Sat, 14 Feb 2026 08:07:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WR3Zi17l"
+	dkim=pass (1024-bit key) header.d=sphalerite.org header.i=@sphalerite.org header.b="Huo1g6C/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from sosiego.soundray.org (sosiego.soundray.org [116.203.207.114])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B24011C860A;
-	Sat, 14 Feb 2026 08:01:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48949271464
+	for <netdev@vger.kernel.org>; Sat, 14 Feb 2026 08:07:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.207.114
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771056064; cv=none; b=qZppbN0B4osD4mt6Kkq3PENrLGb+HUOKK6aLgAWqrd9in04q/Af6amddO2usURytqbaHaRBXad/bWIUSvCTHHAwC2pJY2M7+aQxq2Y3gOoczGlyWg+rkwh/ZOS+2nZXHAIEq8M5wvpENvwJf2IX+72VF9WqgeWTUDP7ApvWkrDs=
+	t=1771056421; cv=none; b=sJkixxtGq4dprWHFWzG6xd0Iw++KwNm7biIu7iGOeCEpl9/IlqxhmkbFjO4h+QdxVMXL77Getul6WynyYnTn/MX/tKee1MTKv/KozLT4UND18ZNj3UeLBCHa436FV0ZEGFoEktPxj6imdGLF0t7Iltb8MIYA1vjNzxZFAPh0CnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771056064; c=relaxed/simple;
-	bh=zHHZHSpFNz8VdD6TZxtjd43NGQRTsenYiTPnEOHMl00=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TCNDm85pT0/p6SAAjGW0yJo1FhUt7HjgKdvCl0GhjF3wIYg0dOQmobk2AfppyTKcUWNNY/ZbwF2AMgUJy8z+3RwbK1HNNRSywepvDtzmboTcq2bB1ha4fwd+rRaJxaeaIbg0Ik9qMy+cTfKsnqj0IQoKlqJniFFKeXDKtlORN5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WR3Zi17l; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1771056062; x=1802592062;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=zHHZHSpFNz8VdD6TZxtjd43NGQRTsenYiTPnEOHMl00=;
-  b=WR3Zi17l6yKhLNn8oAzrJ6IU1SFJi9wDbgRubQzq8m0D5IMFLHRfCkGH
-   SoM8/GmfM9naWTcIafCDUSOQ8fw/VRaXl4RxZHLFHshS5DdUJJU7zgUWT
-   VDeTDIrOn7GZ0MRmGjy3m+lHNYiDEMZE0Gi+uIw2+dlNGSKRSdp9wZs1t
-   R06yxIKDN/qnqk+DdsgmCEt4jT31MTip95Sgh/K+W4sjJgKxYF2fiJ8s3
-   hJzz4/Wx5NbQflmYo2MAdm0GoKRzBCycNCmdGj5XqPPAGPev/dZiDmFBy
-   SOWJqwJBcogU7zkyxe8WV1m0oBdT1ah8GxQzVH6r0jJzvIlxtzWk5XfH9
-   A==;
-X-CSE-ConnectionGUID: VTujn0GVTYKjHnLoQTE/0Q==
-X-CSE-MsgGUID: GTkqIN2dQZCrasuPib9wQQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11700"; a="83595507"
-X-IronPort-AV: E=Sophos;i="6.21,290,1763452800"; 
-   d="scan'208";a="83595507"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2026 00:01:01 -0800
-X-CSE-ConnectionGUID: oNpYrDVRR7WyI3DWrXNRKg==
-X-CSE-MsgGUID: leycIjwNQ5iXJiU9xiBbNw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,290,1763452800"; 
-   d="scan'208";a="213231962"
-Received: from igk-lkp-server01.igk.intel.com (HELO e5404a91d123) ([10.211.93.152])
-  by orviesa007.jf.intel.com with ESMTP; 14 Feb 2026 00:00:57 -0800
-Received: from kbuild by e5404a91d123 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vrAaE-000000001nt-0zKp;
-	Sat, 14 Feb 2026 08:00:54 +0000
-Date: Sat, 14 Feb 2026 09:00:05 +0100
-From: kernel test robot <lkp@intel.com>
-To: Chris J Arges <carges@cloudflare.com>, michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com, hawk@kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	kernel-team@cloudflare.com, jbrandeburg@cloudflare.com,
-	Chris J Arges <carges@cloudflare.com>, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH 2/2] bnxt_en: Implement XDP RSS hash metadata extraction
-Message-ID: <202602140829.b2xx1hxx-lkp@intel.com>
-References: <20260213192449.1294830-3-carges@cloudflare.com>
+	s=arc-20240116; t=1771056421; c=relaxed/simple;
+	bh=FDKHFxncRn13iDTcrsQ2kzNlmIEbXmK1dizXIA5zyjI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Gt6bYrnEGswLLI8V8Jh9+d8i/5rh+/XMrMzoDYtwlqs8cVsHgxH7syFW1PTO+GgnDdAUVGfPVdGTX/DO0Ii4VKjdLoze1Q5Xy8FL+/vNYh9vh7ILkFgospArwRLBXm4kORqjPyns62JSiPf2ABdBVtjyGikZziIi8O5p+MyFeSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sphalerite.org; spf=pass smtp.mailfrom=sphalerite.org; dkim=pass (1024-bit key) header.d=sphalerite.org header.i=@sphalerite.org header.b=Huo1g6C/; arc=none smtp.client-ip=116.203.207.114
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sphalerite.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sphalerite.org
+From: Linus Heckemann <git@sphalerite.org>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sphalerite.org;
+	s=sosiego; t=1771056410;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=4ndp31Nq0BrH5gpGv+1gDSXPSLt/ARY5/16E9fsEEUs=;
+	b=Huo1g6C/7WEn8fLQXf4oWj6vN1gdSzCfOLQYhQVJqBnhQwXaDb0VI7sSb4uoCtVFFSr+i5
+	zlbyqa+KMQg98L5pH1Is1c4d4vwNOuYMC9f5WHYdbyW5og5kkHVCWIC/PWyMNXCE3EcS66
+	ZHWYvYvhzG88gCzOLDt7DBIhVvNnJlQ=
+To: edumazet@google.com,
+	liuhangbin@gmail.com,
+	kuba@kernel.org
+Cc: davem@davemloft.net,
+	eric.dumazet@gmail.com,
+	horms@kernel.org,
+	morikw2@gmail.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzbot+d4dda070f833dc5dc89a@syzkaller.appspotmail.com,
+	rbm@suse.com,
+	Linus Heckemann <git@sphalerite.org>
+Subject: [PATCH v3] selftests/net: add test for IP-in-IPv6 tunneling
+Date: Sat, 14 Feb 2026 09:05:54 +0100
+Message-ID: <20260214080553.1317672-2-git@sphalerite.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260213192449.1294830-3-carges@cloudflare.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[sphalerite.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[sphalerite.org:s=sosiego];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258689-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[cloudflare.com,broadcom.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,iogearbox.net,gmail.com,fomichev.me];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-258690-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[google.com,gmail.com,kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	DKIM_TRACE(0.00)[sphalerite.org:+];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[git@sphalerite.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,gmail.com,kernel.org,vger.kernel.org,redhat.com,syzkaller.appspotmail.com,suse.com,sphalerite.org];
+	TAGGED_RCPT(0.00)[netdev,d4dda070f833dc5dc89a];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[git-scm.com:url,01.org:url]
-X-Rspamd-Queue-Id: 275BF13B55E
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ip6_tunnel.sh:url]
+X-Rspamd-Queue-Id: EFF6D13B592
 X-Rspamd-Action: no action
 
-Hi Chris,
+commit 81c734dae203 ("ip6_tunnel: use skb_vlan_inet_prepare() in
+__ip6_tnl_rcv()") was fine in and of itself, but its backport to 6.12
+(and 6.6) broke IPv4-in-IPv6 tunneling, see [1]. This adds a self-test
+for basic IPv4-in-IPv6 and IPv6-in-IPv6 functionality.
 
-kernel test robot noticed the following build errors:
+[1]: https://lore.kernel.org/all/CAA2RiuSnH_2xc+-W6EnFEG00XjS-dszMq61JEvRjcGS31CBw=g@mail.gmail.com/
 
-[auto build test ERROR on v6.19]
-[cannot apply to linus/master next-20260213]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Signed-off-by: Linus Heckemann <git@sphalerite.org>
+--
+Compared to previous version:
+* Added DCO as requested by Jakub
+* Suppressed output of ping and the expected-to-fail `ip link delete` cleanup invocation as suggested by Jakub
+* Added `set -e` as suggested by Hangbin
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Chris-J-Arges/bnxt_en-use-bnxt_xdp_buff-for-xdp-context/20260214-032849
-base:   v6.19
-patch link:    https://lore.kernel.org/r/20260213192449.1294830-3-carges%40cloudflare.com
-patch subject: [PATCH 2/2] bnxt_en: Implement XDP RSS hash metadata extraction
-config: x86_64-rhel-9.4 (https://download.01.org/0day-ci/archive/20260214/202602140829.b2xx1hxx-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260214/202602140829.b2xx1hxx-lkp@intel.com/reproduce)
+Not sure about the etiquette regarding the Tested-by line: Ricardo
+tested v1 of the patch, I guess I shouldn't add it to a respin?
+---
+ tools/testing/selftests/net/Makefile      |  1 +
+ tools/testing/selftests/net/ip6_tunnel.sh | 44 +++++++++++++++++++++++
+ 2 files changed, 45 insertions(+)
+ create mode 100644 tools/testing/selftests/net/ip6_tunnel.sh
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202602140829.b2xx1hxx-lkp@intel.com/
-
-All error/warnings (new ones prefixed by >>):
-
->> drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c:476:12: error: static declaration of 'bnxt_xdp_rx_hash' follows non-static declaration
-     476 | static int bnxt_xdp_rx_hash(const struct xdp_md *ctx, u32 *hash,
-         |            ^~~~~~~~~~~~~~~~
-   In file included from drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c:22:
-   drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h:44:5: note: previous declaration of 'bnxt_xdp_rx_hash' with type 'int(const struct xdp_md *, u32 *, enum xdp_rss_hash_type *)' {aka 'int(const struct xdp_md *, unsigned int *, enum xdp_rss_hash_type *)'}
-      44 | int bnxt_xdp_rx_hash(const struct xdp_md *ctx, u32 *hash,
-         |     ^~~~~~~~~~~~~~~~
->> drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c:476:12: warning: 'bnxt_xdp_rx_hash' defined but not used [-Wunused-function]
-     476 | static int bnxt_xdp_rx_hash(const struct xdp_md *ctx, u32 *hash,
-         |            ^~~~~~~~~~~~~~~~
-
-
-vim +/bnxt_xdp_rx_hash +476 drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-
-   475	
- > 476	static int bnxt_xdp_rx_hash(const struct xdp_md *ctx, u32 *hash,
-
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index 45c4ea381bc36..5037a344ad826 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -43,6 +43,7 @@ TEST_PROGS := \
+ 	io_uring_zerocopy_tx.sh \
+ 	ioam6.sh \
+ 	ip6_gre_headroom.sh \
++	ip6_tunnel.sh \
+ 	ip_defrag.sh \
+ 	ip_local_port_range.sh \
+ 	ipv6_flowlabel.sh \
+diff --git a/tools/testing/selftests/net/ip6_tunnel.sh b/tools/testing/selftests/net/ip6_tunnel.sh
+new file mode 100644
+index 0000000000000..fe081a5218199
+--- /dev/null
++++ b/tools/testing/selftests/net/ip6_tunnel.sh
+@@ -0,0 +1,44 @@
++#!/bin/bash
++# Test that IPv4-over-IPv6 tunneling works.
++
++source lib.sh
++set -e
++
++setup_prepare() {
++  ip link add transport1 type veth peer name transport2
++
++  setup_ns ns1
++  ip link set transport1 netns $ns1
++  ip -n $ns1 address add 2001:db8::1/64 dev transport1 nodad
++  ip -n $ns1 address add 2001:db8::3/64 dev transport1 nodad
++  ip -n $ns1 link set transport1 up
++  ip -n $ns1 link add link transport1 name tunnel4 type ip6tnl mode ipip6 local 2001:db8::1 remote 2001:db8::2
++  ip -n $ns1 address add 172.0.0.1/32 peer 172.0.0.2/32 dev tunnel4
++  ip -n $ns1 link set tunnel4 up
++  ip -n $ns1 link add link transport1 name tunnel6 type ip6tnl mode ip6ip6 local 2001:db8::3 remote 2001:db8::4
++  ip -n $ns1 address add 2001:db8:6::1/64 dev tunnel6
++  ip -n $ns1 link set tunnel6 up
++
++  setup_ns ns2
++  ip link set transport2 netns $ns2
++  ip -n $ns2 address add 2001:db8::2/64 dev transport2 nodad
++  ip -n $ns2 address add 2001:db8::4/64 dev transport2 nodad
++  ip -n $ns2 link set transport2 up
++  ip -n $ns2 link add link transport2 name tunnel4 type ip6tnl mode ipip6 local 2001:db8::2 remote 2001:db8::1
++  ip -n $ns2 address add 172.0.0.2/32 peer 172.0.0.1/32 dev tunnel4
++  ip -n $ns2 link set tunnel4 up
++  ip -n $ns2 link add link transport2 name tunnel6 type ip6tnl mode ip6ip6 local 2001:db8::4 remote 2001:db8::3
++  ip -n $ns2 address add 2001:db8:6::2/64 dev tunnel6
++  ip -n $ns2 link set tunnel6 up
++}
++
++cleanup() {
++  cleanup_all_ns
++  # in case the namespaces haven't been set up yet
++  ip link delete transport1 &>/dev/null || true
++}
++
++trap cleanup EXIT
++setup_prepare
++ip netns exec $ns1 ping -q -W1 -c1 172.0.0.2 >/dev/null
++ip netns exec $ns1 ping -q -W1 -c1 2001:db8:6::2 >/dev/null
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.52.0
+
 
