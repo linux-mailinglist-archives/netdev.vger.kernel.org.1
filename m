@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-258701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258702-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QE8lNytvkGk8ZgEAu9opvQ
-	(envelope-from <netdev+bounces-258701-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 13:48:43 +0100
+	id KXZMOy1wkGmkZgEAu9opvQ
+	(envelope-from <netdev+bounces-258702-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 13:53:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2721713BF64
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 13:48:42 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DD3913BF7F
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 13:53:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 40B50301ECF3
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 12:48:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 59A043014123
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 12:52:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA71C1A3166;
-	Sat, 14 Feb 2026 12:48:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8F7E1E51E0;
+	Sat, 14 Feb 2026 12:52:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=m.fudan.edu.cn header.i=@m.fudan.edu.cn header.b="mCXOmw+t"
+	dkim=pass (1024-bit key) header.d=m.fudan.edu.cn header.i=@m.fudan.edu.cn header.b="IzhqrfaB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+Received: from bg1.exmail.qq.com (bg1.exmail.qq.com [114.132.124.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1D441DFF0;
-	Sat, 14 Feb 2026 12:48:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBF951A3166;
+	Sat, 14 Feb 2026 12:52:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.132.124.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771073305; cv=none; b=s1IUMD0Hc+rBxdbzqraE7L8TxABU2gKCFAAqUxJV35f2YuVWQZRXkGTfory2XbPJ0m38oCEIYZjL27JLz8gvxm8RP3wegjMvF+9WSzApHxElaBdPEvSWz4tXhB2pwHxrmxVt475VEFSnvhbL/KnjmU+/UE+E5l6IcBnQ1zzAK+c=
+	t=1771073575; cv=none; b=R4q9J2uU9MjN267PGbZ4XxCotX6t0iJRyregn8XwR9VcIdiXU46SktRQDICCi3Tva3jiP43mLAV/UAeAlEj5o9pcLf+cmSXTdG9AbK8kxT7aH0kNbFWFnK3PNDb8/NNuQSfQ9CzkBTi1bLFpUMfIvnO4//rwb7vcShYiAsVBIAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771073305; c=relaxed/simple;
-	bh=jIGZJ7iO+1Zv2oo0BKUYzYFa8I1ANZ+4XSUTzXvaZrE=;
-	h=From:To:Cc:Subject:Mime-Version:Content-Type:Date:Message-ID; b=d1D61q3uqeQQlXpWPhMzV1j5DNKThBpIG9aInOSdQS7nSmz+U1ndSaVTOaFXhEc/UAl4J8ERCZXkWpaExgRU5AXRIhexPzSLowAnDj9050XdW3J5BkfGnceEwNi/7xj3e5D1Bn7IrG76BKaFdoiC15rSaecbehwJXiQM5WjoQU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=m.fudan.edu.cn; spf=pass smtp.mailfrom=m.fudan.edu.cn; dkim=pass (1024-bit key) header.d=m.fudan.edu.cn header.i=@m.fudan.edu.cn header.b=mCXOmw+t; arc=none smtp.client-ip=18.132.163.193
+	s=arc-20240116; t=1771073575; c=relaxed/simple;
+	bh=VwJrVAfiy9kCDSTZ7XHcCpxzJkbVmXP/PETs7p5E0uM=;
+	h=From:To:Cc:Subject:Mime-Version:Content-Type:Date:Message-ID; b=nyl8rg1F8fcmp9dZD9R1jaFkSwq5yWX4ggs7gwFIswNqp7hhkgUbMnrSbVZwCAobDWEdUEuvW7WFpSNCfmHXR0wAwVQLA/9J7YrXLwfQcBi4Vn9jfBJbH5D0535LSZ0phZVwi3uUDjC1mhGG2Ow7WrGvrHwAaA1iC608kJf88+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=m.fudan.edu.cn; spf=pass smtp.mailfrom=m.fudan.edu.cn; dkim=pass (1024-bit key) header.d=m.fudan.edu.cn header.i=@m.fudan.edu.cn header.b=IzhqrfaB; arc=none smtp.client-ip=114.132.124.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=m.fudan.edu.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=m.fudan.edu.cn
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=m.fudan.edu.cn;
-	s=sorc2401; t=1771073265;
-	bh=jIGZJ7iO+1Zv2oo0BKUYzYFa8I1ANZ+4XSUTzXvaZrE=;
+	s=sorc2401; t=1771073526;
+	bh=VwJrVAfiy9kCDSTZ7XHcCpxzJkbVmXP/PETs7p5E0uM=;
 	h=From:To:Subject:Mime-Version:Date:Message-ID;
-	b=mCXOmw+t4CN+x9ypoRPNMAovtWnbeDwY0YK385Mwv+NhEvNj7Deb/+VsfIkhJvPrQ
-	 yIJLMtLr21rorCWrN+DKMfk3Oup7Vtl/JweMLcRitNj2I6B1NboRdHrCNdZQYooiKl
-	 j3WLbqYYN2wKYLVRYjUHSlJZT2GyzMcE164jGiUU=
+	b=IzhqrfaB9I4fAFcX8KGMN1m/4nZ4x0JBKELP1bCXAtZTN0ouJtCMkXSnlLE/nDxSL
+	 jSIIhnXJMQEDLvEPw/z1QLwqdGzsHmz4ASCg70j3wJLjUibFLxyutEnPP4GI5Vi/Eo
+	 Wj6uj7isUTIck4sWmwPBND0rrg8sS8i7qmkUMo9U=
 EX-QQ-RecipientCnt: 7
 X-QQ-GoodBg: 2
 X-QQ-SSF: 00400000000000F0
-X-QQ-FEAT: D4aqtcRDiqTSsxwgbpkr0LCSZa5nmih4aWEFJau9uz8=
+X-QQ-FEAT: D4aqtcRDiqR3BzPw6xF2yYOMzhADaK1k6/GpcrrpT/I=
 X-QQ-BUSINESS-ORIGIN: 2
-X-QQ-Originating-IP: vmURUJTSK9IshxV5uilEpoM9Z9Nw00BZad7D+QH3YCc=
+X-QQ-Originating-IP: zQxz3uRvsQv4OvYREDCA5C7bKQZyzVt2/GPUKeHLt+A=
 X-QQ-STYLE: 
-X-QQ-mid: lv3gz6b-1t1771073259t9a99ad35
+X-QQ-mid: lv3gz6b-1t1771073520t75c3c79d
 From: "=?utf-8?B?5Yav5ZiJ5Luq?=" <23210240148@m.fudan.edu.cn>
 To: "=?utf-8?B?ZGF2ZW0=?=" <davem@davemloft.net>
 Cc: "=?utf-8?B?ZHNhaGVybg==?=" <dsahern@kernel.org>, "=?utf-8?B?ZWR1bWF6ZXQ=?=" <edumazet@google.com>, "=?utf-8?B?a3ViYQ==?=" <kuba@kernel.org>, "=?utf-8?B?cGFiZW5p?=" <pabeni@redhat.com>, "=?utf-8?B?bmV0ZGV2?=" <netdev@vger.kernel.org>, "=?utf-8?B?bGludXgta2VybmVs?=" <linux-kernel@vger.kernel.org>
-Subject: [BUG] Potential Null Pointer Dereference in udp_gro_receive_segment Function
+Subject: [BUG] Potential Null Pointer Dereference in fib6_purge_rt Function
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,36 +61,36 @@ Mime-Version: 1.0
 Content-Type: text/plain;
 	charset="utf-8"
 Content-Transfer-Encoding: base64
-Date: Sat, 14 Feb 2026 20:47:38 +0800
+Date: Sat, 14 Feb 2026 20:51:59 +0800
 X-Priority: 3
-Message-ID: <tencent_5F0CA7F84A4F08C62E08F769@qq.com>
+Message-ID: <tencent_6071B97978D6B5C13EFB5B01@qq.com>
 X-QQ-MIME: TCMime 1.0 by Tencent
 X-Mailer: QQMail 2.x
 X-QQ-Mailer: QQMail 2.x
-X-BIZMAIL-ID: 14860153300059240389
+X-BIZMAIL-ID: 10229671259526440466
 X-Address-Ticket:version=;type=;ticket_id=;id_list=;display_name=;session_id=;
 X-QQ-SENDSIZE: 520
 Received: from qq.com (unknown [127.0.0.1])
 	by smtp.qq.com (ESMTP) with SMTP
-	id ; Sat, 14 Feb 2026 20:47:39 +0800 (CST)
+	id ; Sat, 14 Feb 2026 20:52:01 +0800 (CST)
 Feedback-ID: lv:m.fudan.edu.cn:qybglogicsvrsz:qybglogicsvrsz4b-0
-X-QQ-XMAILINFO: N8WrbzObJSkE5HSqKRmqBXn6j8wziwIs7uifF7Zel/h0ByS85rXx9DOU
-	yT7Uwmh+ZqrZ2R1mgkqH0oaL25cRerKDFK7Qfw0ui+GGxCU7aI9GXxxeD5LDuU2InYhh3bz
-	qMtfQCgkrRr2aT2tS6zJ7P02wKRJuQwOoO44HCt4Xc7cU1eB2YhRC2BUT/hRsd9g7ul6ZD/
-	dE6s7p/wMaGTHSoxZ3R24KnVLwZb/FDvdYHOR3J2nGWfHgu9YXtVyOi6/5S0Q4Pg2uy2TTV
-	LICrXaW2cz1iw5iREfyXMADst0xK9icKO0W8szgVwKnY42ppIQl7WHhl6wBwTZr7FBEHfgb
-	oNQ2N+SdV0YorfEbbz7coztoY9cxgf4l5XibuGGZlq9sw9kH6bP0VXrv9ZFY/L3hYVb9qmX
-	VFPME3UssBPxmkmR7C+ulhoK6/qxYbqjJwoy+Y8/beV7lNyuu4wzb7xM+w9GotDA0MDJqaS
-	BR50x3sLEAi69u6DhLRXDvHB4CwvXV67aTaYfqYGIZR/j/wnmAdlXgVLnoHX/JRmcRvc6BG
-	ipQJYVcuPl/zZF3ejV1PT3RXly8JK/xwHk+Zor5H6mUm1A2ycoehrUEx1Jq1e+GqIliwpf6
-	24Nb3dvWiRxC6AZbR9KwSojKxtlAO6ddgXMssnUJbriDCl8wEcfQtpZs6roa8UjVjqGtwdE
-	8daJuYLDU5RzPX/e8m3s6sf1Jh0/LpZhNw2I+m8rNEnqt/Zjtaff68URD5PY4O+QTVGXoLB
-	ANbfvpeD3/RVOzFwNycaUoRBELTbmFRUR4LqbNgv1lYycNQrplkzYRjdGlZ9S128qfmrxeI
-	LaBSD10P3Vc2K9qbybPy3Q4ZE3tG3POYOuoDlj+xv2kKCO9u+CJKpa/Yc/Elv4B5rLDxc2y
-	FpryZLh7UNTb9wmrQSvX94kkB4qm8+Hq+8jH/N2JCcbrCEeTd/5Iv50d/uRX6BKwtXm1Og9
-	vwOiw2Imd/KlajNoZIkDx+FERhMI9eLQHlf0UkUAgWJst060FV+etw+oaW9eL3AQYjVW1H1
-	lCTkU9QNUafTMKWqGo
-X-QQ-XMRINFO: M/715EihBoGS47X28/vv4NpnfpeBLnr4Qg==
+X-QQ-XMAILINFO: M2GOzXfxLYLpm1eRUlSIoX7W+44QUwGOWVmmpXMC/Ru+/adYbtaaSYwT
+	1uUhaGnX+XjbYQexms5fvk6Oz9xW4BOSf6OVZ5EoKuNdWnitzdOF9zLOH9M3ykNDXiBIU6I
+	le1c7trVX5qlKZAsU3k/0viGMv7SnhtZXlicmHrwSB74IHECyFC4vqHd7j/QXdGQM31yLls
+	TD1c8cD0Q7PwAsIF6n4JmvUKi7QCiPYl14PTTEZAyokZr7kQ99gwedlG6iEr8JVS1Lpg8TK
+	/S9mZq24xN/tCmVWk3MeeHSyEKEWvdTJOpK23MmjSeg1HIfPoVUwNLQQDA5kwUGjQDdGFd4
+	0baSmRzx9VBUSG4w73vZ5evYzIUPyoAO5T7dE+LDy2mh9qsFFpXS9Ah3yIuvCHFqTYWe6Da
+	/VWHyz4MJujUDPl3Oij5NH3jEJ1pRPnIiBWkCTlAIwGN7INvs1yLs+7sg7Vn5HG8/ItzvJp
+	AuxsfCHg6YfTj3Y3a2aHv3+hu9xDRDZ/YeJsYFjcNjmFx7qrrO9LlXzWlRX5qwcHEOiKueg
+	TWBsdn53JXAreC4k56utasKqNj/ZzvYOdPTaBZ0lgEkbOK9kVrs2FvvpamO+XVCh3QdZhF4
+	qtcFVuXciMVc1tMCQ7fJBGVbUziAp5MDrk2+ZERGIz9bfYl761Ku7I3r75DP+ouRAVHH6yC
+	j3yzmxKpgrrfDtJsy6oejE4uN9rqNHfQezdZ9e7NVIw0EdhbvAK2uX1Rhqkh/VN1DiDd+ED
+	lTTtwZP3vPlvru2kFghrf3YKjLooOjrGmVUvLdZzU23rUPwboXV3L5orGpK19Vgrq9Guy26
+	9EfIizlx8CGaRpziashY0KVyQhxs3kJk42aYfvTHTuqbXVmt5Khm3jvFGx0g3KmCLXiebsl
+	hls4bha57LHi3hRWPZRT+TdtEX0mvf7gonUOfs6Q0e8HvWEnGFYCBkRzJb8IqtafnbvcRYZ
+	b3ClNDVGiQ5bN4hz205cyPyCqOZgxvgYzsTMgHP22aieDydqS5vzqD6VDI9kmmPqRz3TE3W
+	gqFRx3I4Bo1/imJp+rbaQBRDkhEp6hpHXWqOVNTFR1+d3Bjg61
+X-QQ-XMRINFO: NI4Ajvh11aEjEMj13RCX7UuhPEoou2bs1g==
 X-QQ-RECHKSPAM: 0
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [2.44 / 15.00];
@@ -100,7 +100,7 @@ X-Spamd-Result: default: False [2.44 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[m.fudan.edu.cn,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[m.fudan.edu.cn:s=sorc2401];
 	MAILLIST(-0.15)[generic];
 	MIME_BASE64_TEXT(0.10)[];
@@ -111,18 +111,18 @@ X-Spamd-Result: default: False [2.44 / 15.00];
 	TO_DN_ALL(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258701-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-258702-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[m.fudan.edu.cn:+];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[23210240148@m.fudan.edu.cn,netdev@vger.kernel.org];
 	HAS_X_PRIO_THREE(0.00)[3];
 	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,m.fudan.edu.cn:dkim,qq.com:mid]
-X-Rspamd-Queue-Id: 2721713BF64
+	DBL_BLOCKED_OPENRESOLVER(0.00)[m.fudan.edu.cn:dkim,qq.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5DD3913BF7F
 X-Rspamd-Action: no action
 
 RGVhciBNYWludGFpbmVyLA0KDQpPdXIgdGVhbSByZWNlbnRseSBkZXZlbG9wZWQgYSBudWxs
@@ -133,22 +133,24 @@ IHZ1bG5lcmFibGUgY29kZSBzbmlwcGV0IHRoYXQgY291bGQgbGVhZCB0byBhIG51bGwtcG9p
 bnRlciBkZXJlZmVyZW5jZSBidWcuIFdlIHdvdWxkIGFwcHJlY2lhdGUgeW91ciBleHBlcnQg
 aW5zaWdodCB0byBjb25maXJtIHdoZXRoZXIgdGhpcyB2dWxuZXJhYmlsaXR5IGNvdWxkIGlu
 ZGVlZCBwb3NlIGEgcmlzayB0byB0aGUgc3lzdGVtLg0KDQpWdWxuZXJhYmlsaXR5IERlc2Ny
-aXB0aW9uOg0KRmlsZTogIG5ldC9pcHY0L3VkcF9vZmZsb2FkLmMNCkluIHRoZSBmdW5jdGlv
-biB1ZHBfZ3JvX3JlY2VpdmVfc2VnbWVudCwgd2UgZm91bmQgdGhlIGZvbGxvd2luZyBsaW5l
-IG9mIGNvZGU6DQoNCmlmICghdWgtPmNoZWNrKSB7DQoNClRoZSBpc3N1ZSBhcmlzZXMgYmVj
-YXVzZSB0aGUgdWggcG9pbnRlciBtYXkgYmUgcGFzc2VkIGFzIE5VTEwgaW4gY2VydGFpbiBz
-aXR1YXRpb25zLiBTaW5jZSB1aCBpcyBOVUxMLCBhY2Nlc3NpbmcgdWgtPmNoZWNrIGluIHRo
-ZSBzdGF0ZW1lbnQgY291bGQgcmVzdWx0IGluIGEgbnVsbC1wb2ludGVyIGRlcmVmZXJlbmNl
-Lg0KDQpQcm9wb3NlZCBGaXg6DQpUbyBwcmV2ZW50IHRoZSBwb3RlbnRpYWwgbnVsbC1wb2lu
-dGVyIGRlcmVmZXJlbmNlLCB3ZSBzdWdnZXN0IGFkZGluZyBhIE5VTEwgY2hlY2sgZm9yIHRo
-ZSB1aCBwb2ludGVyIGJlZm9yZSBhdHRlbXB0aW5nIHRvIGRlcmVmZXJlbmNlIHVoLT5jaGVj
-ayBpbiB0aGUgbGluZS4NCg0KUmVxdWVzdCBmb3IgUmV2aWV3Og0KV2Ugd291bGQgYXBwcmVj
-aWF0ZSB5b3VyIGV4cGVydCBpbnNpZ2h0IHRvIGNvbmZpcm0gd2hldGhlciB0aGlzIHZ1bG5l
-cmFiaWxpdHkgaW5kZWVkIHBvc2VzIGEgcmlzayB0byB0aGUgc3lzdGVtLCBhbmQgaWYgdGhl
-IHByb3Bvc2VkIGZpeCBpcyBhcHByb3ByaWF0ZS4gSWYgdGhlcmUgYXJlIHJlYXNvbnMgd2h5
-IHRoaXMgaXNzdWUgZG9lcyBub3QgcHJlc2VudCBhIHJlYWwgcmlzayAoZS5nLiwgdGhlIE5V
-TEwgY2hlY2sgaXMgcmVkdW5kYW50IG9yIHVubmVjZXNzYXJ5KSwgd2Ugd291bGQgYmUgZ3Jh
-dGVmdWwgZm9yIGNsYXJpZmljYXRpb24uDQoNClRoYW5rIHlvdSBmb3IgeW91ciB0aW1lIGFu
-ZCBjb25zaWRlcmF0aW9uLg==
+aXB0aW9uOg0KRmlsZTogIG5ldC9pcHY2L2lwNl9maWIuYw0KSW4gdGhlIGZ1bmN0aW9uIGZp
+YjZfcHVyZ2VfcnQsIHdlIGZvdW5kIHRoZSBmb2xsb3dpbmcgbGluZSBvZiBjb2RlOg0KDQpm
+aWI2X2luZm9faG9sZChuZXdfbGVhZik7DQoNClRoZSBpc3N1ZSBhcmlzZXMgYmVjYXVzZSB0
+aGUgbmV3X2xlYWYgcG9pbnRlciBtYXkgYmUgcGFzc2VkIGFzIE5VTEwgaW4gY2VydGFpbiBz
+aXR1YXRpb25zLiBUaGUgc3RhdGVtZW50IHBhc3NlcyB0aGUgbmV3X2xlYWYgcG9pbnRlciB0
+byBmaWI2X2luZm9faG9sZCB3aXRob3V0IGFueSBjaGVjaywgYnV0IGZpYjZfaW5mb19ob2xk
+IG1pZ2h0IGNvbnRhaW4gYSBkZXJlZmVyZW5jZSBvcGVyYXRpb24gb24gdGhlIG5ld19sZWFm
+IHBvaW50ZXIsIHdoaWNoIGNvdWxkIHJlc3VsdCBpbiBhIG51bGwtcG9pbnRlciBkZXJlZmVy
+ZW5jZS4NCg0KUHJvcG9zZWQgRml4Og0KVG8gcHJldmVudCB0aGUgcG90ZW50aWFsIG51bGwt
+cG9pbnRlciBkZXJlZmVyZW5jZSwgd2Ugc3VnZ2VzdCBhZGRpbmcgYSBOVUxMIGNoZWNrIGZv
+ciB0aGUgbmV3X2xlYWYgcG9pbnRlciBiZWZvcmUgYXR0ZW1wdGluZyB0byBwYXNzIHRoZSBw
+b2ludGVyIHRvIGZpYjZfaW5mb19ob2xkLg0KDQpSZXF1ZXN0IGZvciBSZXZpZXc6DQpXZSB3
+b3VsZCBhcHByZWNpYXRlIHlvdXIgZXhwZXJ0IGluc2lnaHQgdG8gY29uZmlybSB3aGV0aGVy
+IHRoaXMgdnVsbmVyYWJpbGl0eSBpbmRlZWQgcG9zZXMgYSByaXNrIHRvIHRoZSBzeXN0ZW0s
+IGFuZCBpZiB0aGUgcHJvcG9zZWQgZml4IGlzIGFwcHJvcHJpYXRlLiBJZiB0aGVyZSBhcmUg
+cmVhc29ucyB3aHkgdGhpcyBpc3N1ZSBkb2VzIG5vdCBwcmVzZW50IGEgcmVhbCByaXNrIChl
+LmcuLCB0aGUgTlVMTCBjaGVjayBpcyByZWR1bmRhbnQgb3IgdW5uZWNlc3NhcnkpLCB3ZSB3
+b3VsZCBiZSBncmF0ZWZ1bCBmb3IgY2xhcmlmaWNhdGlvbi4NCg0KVGhhbmsgeW91IGZvciB5
+b3VyIHRpbWUgYW5kIGNvbnNpZGVyYXRpb24u
 
 
