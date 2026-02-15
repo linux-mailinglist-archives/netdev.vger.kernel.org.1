@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-258774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258775-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8Ou2HHXakWlpnQEAu9opvQ
-	(envelope-from <netdev+bounces-258774-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 15:38:45 +0100
+	id IBLMM4XakWlpnQEAu9opvQ
+	(envelope-from <netdev+bounces-258775-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 15:39:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE89513EE04
-	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 15:38:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 142B713EE0B
+	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 15:39:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D14A030115B1
-	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 14:38:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E800130182BA
+	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 14:38:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B01CC2C234A;
-	Sun, 15 Feb 2026 14:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90CB72D1F40;
+	Sun, 15 Feb 2026 14:38:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e5GTsMkG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jjENw4Qw"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B5822DA755
-	for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 14:38:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F9272DF13B
+	for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 14:38:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771166307; cv=none; b=c4qEpUmYzpsBD2MQ1ULpyYDrhLde8dr//o5zDlBsEois0IZgocdy7ma+2d88dGW/WMSzzeZz1K2sDIiNPaQxB3V1CWHW9IIFgaqi2kjJdy6pKyLqV3P/jHPTMjPIx1IdDFYl56J9awM4yjlNjeXGQKiuXo5T5/bNYGqsPtHDUvg=
+	t=1771166309; cv=none; b=TMWc8yqReVQpujAr7KzbcteT/HLc70Pg4YnC1ya/JCTKIYynxTrkf1iHyvy7MevSLfa20b3pfFj4PkLh5mBOrAPxSnQOhepFY7ZQWnnU5MyDMnk9Yt/TjAHfoAstC7LKHegMqpyOuMazOrRSiJ+EujZEpnGElug1CdddWWwDwQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771166307; c=relaxed/simple;
-	bh=UPByaHYqhgtSWyyv7t7+b/UInadkg2EQnjWHBcbGAwc=;
+	s=arc-20240116; t=1771166309; c=relaxed/simple;
+	bh=yxOr2kluMioQMt3tV/KkrXrdM5pHECCvwTACLD6tRjI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hO3fjnQFA/PAvvUhibS0JxB6WPyh8nYJ4EYH2R4I0u2DvxEmys1sJiP/MABz8VhviWKgSIS83iyzHFr6c/ldvvKGmtGN4EPMoaSUCL82NeS1EBozKSRxkx4k41vZQ4XBw8xnr6aorOceu5dZJobBIpR7TY8+oOyze/bWUvzf1kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e5GTsMkG; arc=none smtp.client-ip=209.85.222.201
+	 To:Cc:Content-Type; b=hCt1td7qDgk+z6Ua4EkEurKGJh1Ys3cOZLhujwnBvsn5ItUjzTziPYuNckgaOfDxhfu4FXGqQp+Zz5x6w6BjpqsEcyr9ZYSvZu5pYtvtGoYVTNxUrtXfw1zQulbxXQf7WW7CLRtiuiuolZQANktmdTeDOUsgB74F2enPJnyUa+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jjENw4Qw; arc=none smtp.client-ip=209.85.222.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8cb42f56c4aso1251383685a.3
-        for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 06:38:26 -0800 (PST)
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8c71304beb4so879675885a.3
+        for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 06:38:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771166305; x=1771771105; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1771166307; x=1771771107; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RLUcxzfG/P+L6JhuOmSXXl/39/xLTcg4e+nAUP6rNvQ=;
-        b=e5GTsMkGtAegaov3a3ypGWi9w2OZ3U9IKp4TWApUBvbaaLWC1PazuOa7myrTy4iqeO
-         vXpugoN8zk3kOg7BMlDBj8sot/KN7fzgavN/w+Da3P09t/LTAuCO9khWAWDDa5mv0LzW
-         606i5cSmVRdf+0LmGVVegXr38JZF6ieCA+NeixIbxPOx/nvHkjpP9a5TYYLPT4n2+/v1
-         FRjnCJNjoEIyIGgLt7w2c+JTqw3xBviI8UAEuJscHCNAiYtXlCiuKPy+PKdggA2K4Wla
-         Jvkj14N3GoCvyfcTrPtl/ZGP5K45VlqdmWBWUjSL37X8/WzyhlaQR6D6YNPh54MlPIDN
-         VrcA==
+        bh=Azswv4fbDw4O/n3cFN1cs2tHhhNKI1EhYGqKEm1PXuw=;
+        b=jjENw4Qwm2OPQ+EW7REO6WliH5HKsy8n312lG+YBXdJNzdcJyIopq3F8Rx3uF6pbYC
+         3R3N/hCfoZHCsyIzlqp6SFSoTdRK0P0iKdUeMB8ZANUtocFrjAYgg51eLgK5XcJSazJK
+         JZuqGqBYMCkFz9YDgxObenjhpb6+kaS+hj3FCiTbrXRayB1YeIw/Opgx88O1s2MhfEt4
+         GPiUwnO6lMeUD+jx5h8H9zelSpl+71i6ZvuDAnDPUGYZ0x6HNef5e2rccoP/p4MIRQxR
+         kOsaV6aQsEKMgvHGBYi5uGlxRYXU1b3wywM6hWdRnanPNn0zY1Iwn81sQTwkYlVA/2C1
+         I+Aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771166305; x=1771771105;
+        d=1e100.net; s=20230601; t=1771166307; x=1771771107;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RLUcxzfG/P+L6JhuOmSXXl/39/xLTcg4e+nAUP6rNvQ=;
-        b=xBt433GkbgJo9rPe/AzPPmU/mIWTE8GrwQNp9FEDZwbct6w1C/0U7dpKQxaJ4yqSm3
-         fzpnAMlAW0oDfs+xMrNogZz5pxFE4HIgKg4hmsrtlnhsZSSVTPpF8b1tT1hV0CmFauIz
-         b3SekjOWnMMTYnuLyNvaVDD8u/KlJabA6BVp7cajDesZ1Kj9+8FDwGJ6/Km2W4680n9H
-         pszre2Wv3njL/zF7l2DjG2G3cxuVTaxHxm028WQXvzVGU9qYYDEq7dYyqXLIOZ2dYq0N
-         cwfhFp7grOHdZS3Fec+3/mUNbHVmMvKTgBkBhhhkwAJt+7ItNp893m1xjJuuf9KeaX4T
-         RgMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU9VquosSzPUUsrVeRRRf/2wFP9+NyF1/sXMcbDHxVuSR7qzeErtBaJMi3ZMZlGVbijDSqdiPM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHtekVG8zvilW+k0yPw+55HtBYN1ihiNFSLZ+3eGuD7Mgz1DOG
-	krBIfJgkFTWxofGDfUSfPgmUrbUMyX5J5mM8trkh4mfUgzp6oViV5naQL4x6dAGJ3ds/NhR3rLM
-	y87eWuztSqAve4Q==
-X-Received: from qkps15.prod.google.com ([2002:a05:620a:29cf:b0:8ca:5ca:a250])
+        bh=Azswv4fbDw4O/n3cFN1cs2tHhhNKI1EhYGqKEm1PXuw=;
+        b=mJ77aMPfqvCAOAV7S92QJCg77nxSuX6LtPPSP5KkrvUNogBiEKqbxGQXOrRxxLd2AW
+         1z3l6I1eayLpzArIaBowpVnpR5o1ySrkSLDsnFQjYsN6yowSEhicLOebxh9Zrhk+INgC
+         gppVKS+Av6CheqL5WksfYUS8RiGmZpfcLDzd706gUIQrsbzjwQ2X36JvqczpdwoNx497
+         u+dF3FNzozAIbDpMEb5v+17P1CD/eikOmUQObA8ncmVtCTZc4YEEs/iFKAynuccuMM/y
+         jnIkaxcuMFEBPXl/S02dSEsjK4brWyRx8HaWrLRBlQi8IPiKTuPWZrUzS/6L88ViUAAE
+         DMrw==
+X-Forwarded-Encrypted: i=1; AJvYcCU15l5crSVMlIYmy/hWTI/VsSJLzGAW4dz4v6C/bG4i8L46HsUHTffYuy9giE8unMkk3scblbA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YydZ3PLuNPrYK/gz5J0/iRCUusxZ8qivqIRoMhTNJK3lCZalV+f
+	Ead7aLztKSideidHbcbSv89/JOsjytsrAvaliVRgdJpWG0eysJkDpGmrSMWolY5vya7+jp/y2+A
+	x+47YVnlfiP0L2Q==
+X-Received: from qknvv4.prod.google.com ([2002:a05:620a:5624:b0:8c1:b06c:8a99])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:4554:b0:8c7:f61:fd7b with SMTP id af79cd13be357-8cb4243c329mr920052385a.57.1771166305191;
- Sun, 15 Feb 2026 06:38:25 -0800 (PST)
-Date: Sun, 15 Feb 2026 14:38:17 +0000
+ 2002:a05:620a:4003:b0:8cb:38f2:6a5e with SMTP id af79cd13be357-8cb422823efmr916203785a.25.1771166306858;
+ Sun, 15 Feb 2026 06:38:26 -0800 (PST)
+Date: Sun, 15 Feb 2026 14:38:18 +0000
 In-Reply-To: <20260215143821.2330791-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260215143821.2330791-1-edumazet@google.com>
 X-Mailer: git-send-email 2.53.0.310.g728cabbaf7-goog
-Message-ID: <20260215143821.2330791-2-edumazet@google.com>
-Subject: [PATCH net 1/5] icmp: prevent possible overflow in icmp_global_allow()
+Message-ID: <20260215143821.2330791-3-edumazet@google.com>
+Subject: [PATCH net 2/5] inet: move icmp_global_{credit,stamp} to a separate
+ cache line
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -93,14 +94,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258774-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-258775-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
@@ -110,37 +111,53 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: DE89513EE04
+X-Rspamd-Queue-Id: 142B713EE0B
 X-Rspamd-Action: no action
 
-Following expression can can overflow
-if sysctl_icmp_msgs_per_sec is big enough.
+icmp_global_credit was meant to be changed ~1000 times per second,
+but if an admin sets net.ipv4.icmp_msgs_per_sec to a very high value,
+icmp_global_credit changes can inflict false sharing to surrounding
+fields that are read mostly.
 
-sysctl_icmp_msgs_per_sec * delta / HZ;
+Move icmp_global_credit and icmp_global_stamp to a separate
+cacheline aligned group.
 
-Fixes: 4cdf507d5452 ("icmp: add a global rate limitation")
+Fixes: b056b4cd9178 ("icmp: move icmp_global.credit and icmp_global.stamp to per netns storage")
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/ipv4/icmp.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ include/net/netns/ipv4.h | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index e216b6df633123ed475e28907d788db6bfb42115..eff8487c0aba8df0d1e515b9ac6ff7f9ac1de436 100644
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@ -250,7 +250,8 @@ bool icmp_global_allow(struct net *net)
- 	if (delta < HZ / 50)
- 		return false;
+diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
+index 2dbd46fc4734b78201818ecf6065237d475101ce..8e971c7bf164642344f40a07e021b0037f27ee7d 100644
+--- a/include/net/netns/ipv4.h
++++ b/include/net/netns/ipv4.h
+@@ -88,6 +88,12 @@ struct netns_ipv4 {
+ 	int sysctl_tcp_rcvbuf_low_rtt;
+ 	__cacheline_group_end(netns_ipv4_read_rx);
  
--	incr = READ_ONCE(net->ipv4.sysctl_icmp_msgs_per_sec) * delta / HZ;
-+	incr = READ_ONCE(net->ipv4.sysctl_icmp_msgs_per_sec);
-+	incr = div_u64((u64)incr * delta, HZ);
- 	if (!incr)
- 		return false;
++	/* ICMP rate limiter hot cache line. */
++	__cacheline_group_begin_aligned(icmp);
++	atomic_t	icmp_global_credit;
++	u32		icmp_global_stamp;
++	__cacheline_group_end_aligned(icmp);
++
+ 	struct inet_timewait_death_row tcp_death_row;
+ 	struct udp_table *udp_table;
  
+@@ -141,8 +147,7 @@ struct netns_ipv4 {
+ 	int sysctl_icmp_ratemask;
+ 	int sysctl_icmp_msgs_per_sec;
+ 	int sysctl_icmp_msgs_burst;
+-	atomic_t icmp_global_credit;
+-	u32 icmp_global_stamp;
++
+ 	u32 ip_rt_min_pmtu;
+ 	int ip_rt_mtu_expires;
+ 	int ip_rt_min_advmss;
 -- 
 2.53.0.310.g728cabbaf7-goog
 
