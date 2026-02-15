@@ -1,276 +1,182 @@
-Return-Path: <netdev+bounces-258779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258780-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AulvDhXckWmHnQEAu9opvQ
-	(envelope-from <netdev+bounces-258779-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 15:45:41 +0100
+	id 0NCwJkrckWmHnQEAu9opvQ
+	(envelope-from <netdev+bounces-258780-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 15:46:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76A3613EE3E
-	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 15:45:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01DA413EE4D
+	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 15:46:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 97025300399E
-	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 14:45:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5A24C300D147
+	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 14:46:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CD3128C849;
-	Sun, 15 Feb 2026 14:45:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="QMWfSevp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577EB2D46A1;
+	Sun, 15 Feb 2026 14:46:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012046.outbound.protection.outlook.com [52.101.43.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com [209.85.161.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC38686331;
-	Sun, 15 Feb 2026 14:45:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771166736; cv=fail; b=KuFl2yMx7ntv+UzMm2rOaRFZ/G1wE0Jt5R0UKVoCehmXYFM9o9E+V8hUh+XQFpfBYvuFmElAVDDjtR1RE5AcrZ4pKw0/vZyPMwF4Bj7zgknOu4RoNd8EQrvNSl26DVsUTYaDpYgHz6yRTvwW/lo429H+6+mo67XkY6BqVqxxcp8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771166736; c=relaxed/simple;
-	bh=NZ62VnmgFFBERQtplcrvV5DbFHK8Oz97DsbjbOKWTn4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Shm4UAY7seFCrZwc+QIx165WE9j97gsxYbFJmxLRWXJFHPf4utYCFyDk18jgkZ6btq8SuodaY8Q8xwi0LPvXeMxnTJ5ixiv3PvOSS4WSLLrEjnnFLRDEUigJUcI73FoNUe93TC//IeQLSJLn2Y3O+kUFxlTSTNcfbzGStXL1+vA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=QMWfSevp; arc=fail smtp.client-ip=52.101.43.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=jAnvnTOsPjlqKTUnDv61aoYktEidIEEOcHH+LdZXmXqun9Se4Txn8mem4yg7c60JwMOt4NPCgxL8VrByDLmWEPoy3E/CfM3ylEPLhtk1xQK5JyLwcmadMUQ0pvEyQ7Q2IpUj9JaUoQgl6CkX2g2V3L0zAD15hG84pMG/hUr/kiP9pOVRCS4/Wd5DN7wvAunF8raNvN+fMqT6b31ASSpOVwbQ5ApcpyJlGxzwnwt48pTV69LntXHBytew8eC4zkw1UZVxkZEI+NG1w23qG5LAtvF7exe0xZdlwZ+baJsNs2/y3uk3dSde8KU0tf8wBdbQWGmUeG5uyiPXo/zB5ZQQmg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=El56DphfvOe28WhOR/YsG/k7ebDe0COpBiMiopS9+vQ=;
- b=okuuUtk6gUa3VCG6bDvmFK0Y5eZ9q4JXg5BoHFLQXbtxxRyhnKBEYnndJ5EmIsu8UKg/HRUxGmRMYsiNAAkzJRqYY1EHDZi/cfbrz348WsuhRVblHYNc06Ufv3rudAYgMxdmSUB5j08G6pFsyr2Q6I6UPUj+KHOk5RsHHKcUCWDeQuxtVDYcc+4EUQ+BKnp/3LGBd1u49MaOXxfZS51pZyaDYkSh2Wy6Cyr/GtWIzUhNE0JbZ5Sc5QDwY+J66ey8CuZlG4YfKmFPfHVOps7Zt1UaIs+22r7HaAgs7RZ2njyXkzCZAjFfefEHJdyhIkEpmFJZyAzBFkjnRb7HK8rSNQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.21.195) smtp.rcpttodomain=lunn.ch smtp.mailfrom=ti.com; dmarc=pass
- (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
- (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=El56DphfvOe28WhOR/YsG/k7ebDe0COpBiMiopS9+vQ=;
- b=QMWfSevpKn3JmeuZjVyYh5sZTS+Dw0FanqKa79q8DHrqspDW3JVU41MehHScoN3wBCW4jS5wxoilOgxaVEDGz/Kmay0deTVli89iCsGtNJyL/l0MmzLvqDidTVW5AyeeGsfnXnl65MCq/Z77hXt3XIpzedDfBcB+e/6Fcd96qeQ=
-Received: from CY5P221CA0127.NAMP221.PROD.OUTLOOK.COM (2603:10b6:930:1f::13)
- by LV8PR10MB7965.namprd10.prod.outlook.com (2603:10b6:408:204::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9611.16; Sun, 15 Feb
- 2026 14:45:30 +0000
-Received: from CY4PEPF0000E9D4.namprd03.prod.outlook.com
- (2603:10b6:930:1f:cafe::98) by CY5P221CA0127.outlook.office365.com
- (2603:10b6:930:1f::13) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9611.16 via Frontend Transport; Sun,
- 15 Feb 2026 14:45:33 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.21.195)
- smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
- action=none header.from=ti.com;
-Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.21.195 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.21.195; helo=flwvzet201.ext.ti.com; pr=C
-Received: from flwvzet201.ext.ti.com (198.47.21.195) by
- CY4PEPF0000E9D4.mail.protection.outlook.com (10.167.241.139) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9632.12 via Frontend Transport; Sun, 15 Feb 2026 14:45:28 +0000
-Received: from DFLE206.ent.ti.com (10.64.6.64) by flwvzet201.ext.ti.com
- (10.248.192.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 15 Feb
- 2026 08:45:28 -0600
-Received: from DFLE214.ent.ti.com (10.64.6.72) by DFLE206.ent.ti.com
- (10.64.6.64) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 15 Feb
- 2026 08:45:27 -0600
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DFLE214.ent.ti.com
- (10.64.6.72) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Sun, 15 Feb 2026 08:45:27 -0600
-Received: from [10.249.132.38] ([10.249.132.38])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 61FEjNdF319905;
-	Sun, 15 Feb 2026 08:45:24 -0600
-Message-ID: <06ff0e10-f412-44f5-932d-f14a0044181e@ti.com>
-Date: Sun, 15 Feb 2026 20:15:23 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B6462F3632
+	for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 14:46:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.72
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771166791; cv=none; b=Yz909Ect+d2FSwTGfNX8+eGBv2CANrNj5/dUBBsuVtWte77QNvGc2LHkCsVpsz9au4I1fJYebuKnSHLwMzvhqBXou8GgrJUOnXhAfTIv9cr+sDOYlh4LItTUwGnsqSgZb6OKXXeITcXZpqh1VQiTsrpW4gi4ot6ZzgbN2Oc/89s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771166791; c=relaxed/simple;
+	bh=kANZWyVz5SSkoFnZZKgZ7WKpFnYcom0kMPLXYSv6y8s=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=jO3rjIDulRYF4bp7kRKfFm32kIti1g8bQy8++oY24n9LuKRXsrzws7A1UkGvfdP7xKXOYZk0TdVF74wX0wFHIWwVyzZzomEFbb1GW0h+YmsWB6XqOTGm8ZueBUpPubjXvOZ8vgGOVmtrEKzFukmUp8awkKvRdhcBU7gAwbHekKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-66308f16ea1so22148533eaf.2
+        for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 06:46:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771166787; x=1771771587;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3HYMGBC3NRRKUc9X+aGwgpZ7aHFzS6lDTXhZs7CIQeQ=;
+        b=gsIUt66SJ/ZXCJEOIkhu86b9VgjcXNzncvUW8nOX36wpYzhgMKHc5cMw6PbzJNh8xE
+         GZuziJ+FXoVJoB7gKQYrncI4we1jFaDvmj1LnEcmJpt8oTyFYrOU+hZDhE62y/JWeVaM
+         KQ2oNu+8FA/zaARHFJGPbCjLhgu82sjsf6wDTkVM7Ok9brXZ3rB/qX+aYeH2loQRx6T8
+         0pXtmYt3c9c1grpg1VltTJPtZjY6KHBVjUZXEKMRlEdKsWDW5fiqx0P7jK2PN7sTn+x8
+         rodz5sPqeKREKt2bDav5tP9370ffymmbZ6sds3mvHjMzuZ31NO4NVr8RZfvzHbnV0TUm
+         tjEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUgPFypQjhTD3tYgP/vyZonHM/1TF3XHPUHezI5DKmFN9PAwkOhbJSo1qYIWuG7Ad/ccuTSJtI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx69Jck4s8B5+m3ZJ22Ng6LKWEmSjVkwdrlqyA8QPnHQOMx8t3u
+	87kX3M+Yjcpi2lFWZ5wGCxTCaIFtjZO5JGb1rPS6UStToE2MbzSQEaFWHtMcusLqglNI60oveI8
+	D1KZWRAGVXcyG0dJZqi5epj8CQ1pWT0S22QqivgbTXkLez73EukFuyRsYfS0=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [EXTERNAL] Re: [PATCH net] net: phy: dp83869: Set auto mdix bit
- for forced 100Base-Tx mode
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-CC: <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
-	<davem@davemloft.net>, <linux@armlinux.org.uk>, <hkallweit1@gmail.com>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>, Roger Quadros <rogerq@kernel.org>,
-	<danishanwar@ti.com>, Andrew Lunn <andrew@lunn.ch>
-References: <20260211131033.2525617-1-m-malladi@ti.com>
- <0a9d0ec8-09c4-4029-8449-8c8f08c6dca0@lunn.ch>
- <a498b310-29f1-4775-aa65-fda027a3124b@ti.com>
- <5929eafb-6101-4570-beaf-ed08ae109423@bootlin.com>
-Content-Language: en-US
-From: "Malladi, Meghana" <m-malladi@ti.com>
-In-Reply-To: <5929eafb-6101-4570-beaf-ed08ae109423@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D4:EE_|LV8PR10MB7965:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1d4b3720-05cc-46ce-3845-08de6ca0dcad
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|376014|7416014|1800799024|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?YUVJWDRaT2VOSVJ3V056TnZZcEYxaXl1WDVwY2JpcGFVbmJqY1NWbUIveERW?=
- =?utf-8?B?bCtBYUprTDhpcmhLb3hqT1NPSEEwUGNQMjVGejZLUlg5YzhxbXJzTTZpUWJY?=
- =?utf-8?B?NzdraTQ1MmR2RkE5Yk1jcTJQQ1hFREJKdnAvM1VTY2lvMkRLTDd3OEFsUUM4?=
- =?utf-8?B?Rk51R1Nqdk1NT3hHcWtvbW1qY0RhQ0xzQlNqc3NNZi96YmZiMzUzaHIwRTJv?=
- =?utf-8?B?WXZHT0N3YlQvWjJsV2E1OXRscURGcHFaQXhMMGt6RkE0RkF1ZkFSQnk3SEJh?=
- =?utf-8?B?Y2djeFdsYndWeTN0T3pvK2lrNnBSdW1VdTBuQktScnBqMWpQUHBYdmZ0UUFZ?=
- =?utf-8?B?emkvUCtLUHZ4WDh3ZExoVjgvbVJ6MGRyWmN6ZGlwTGtjS3NPYmNaa25TSCs5?=
- =?utf-8?B?ZjBXTFVkVVdqSW5QVUdRMUJaRi9XeUZSdU4wSzVrUVgwNkR0aUhWVVFyQXFx?=
- =?utf-8?B?NmhUeEwvaGc2cHVIZFJvdklTNVpVSmxGYnd6K3FZMFc1aUowQU9JRXpnVUZF?=
- =?utf-8?B?djZ1YUdqdVFPK2FUUnhLZytMb0tGY1p4ZU8wZjhVTkdVL2tNYVdkNXlCVEpN?=
- =?utf-8?B?K3VvbnQzVHVIUGFoaTRRREdBWXVDcmI3emVhQnNvOTZBQkI1UnlaZzNqUTR5?=
- =?utf-8?B?RGpHeWVlU1R6bURwVVRzaHBhcUp5NzJoMEZKbTB3OXd3VCtvdFpXNzB0b1Za?=
- =?utf-8?B?NnVVNnhFREQ4ZUZWT1NFUm5WLzB1eEQ0ZXV3Sjh4R01ad0kzUWs4OGVFSlBI?=
- =?utf-8?B?dzJEYmM0L0xnM3BiMVhkeVdsZlBDK29ORGRPODJ4c2ZSZ2FiRkZwNUJZVEdJ?=
- =?utf-8?B?dlBiY212TW5DOU10bEtGUnFzbkhvT0Yrd1hRNEVjMlJPQ3FDMmFWWkNiQkc0?=
- =?utf-8?B?ZDF3dUZFbXZKRkxDSkRadDJja1VvdzcwTHZ4b2pvU3pDWktoUVAvOG9kbzNS?=
- =?utf-8?B?dkxNZXZSeFEyajhsYnJucm1QZVRiZW5hSllEanppM3RUaStrZGZuSkZEOG9E?=
- =?utf-8?B?Y3kwYUNDVkJPejBwdWFWN1RwcjQrR2RzUWRncWs0aFFWYkxKSFNvc2JTam53?=
- =?utf-8?B?dFpkMGd0aWpOUHNKUTFkSlNuZUNrRW9NaHl2R1lUcmtuMk5GRVhKMGFKQ2xV?=
- =?utf-8?B?VXlLVnJPRWt6cWZweVBZbkNYNkpGWmpVaGthUW9JVXljUXNKb0p2aVd4c2VE?=
- =?utf-8?B?b2xLZ0dPUlcvNVpWVEhWeFJKNVZHQWRXMlB0dEZjc1VMTHd1N1NjcEFYdkVM?=
- =?utf-8?B?VEVrckpQVG5zNXBBQURSVDBmODRzcUpkb3lMUVc0ekpNbnl1ZnN4YVpOQVZ1?=
- =?utf-8?B?dWdxZTNYNStMdUVmYjk3THFzSEkyZDhlekk3bERabHN2UlFpaE9tbnI3RlFw?=
- =?utf-8?B?Y1h2QTkwWjIzQWhoK3BORUdRRE01MFR6M1hQdGYvWXVLM3dXU1NxUWVHR1ZE?=
- =?utf-8?B?NWRuaHdBbmhGTlFDTm1DNTRXaFhDclZnNjVsMjhCR0Y0VzltRHJXOWFSSzBn?=
- =?utf-8?B?UG9nQVpTbmxGa2V6K2x0U0g5YUVXNExEOWhpTHl5ZlU4aXJPZ0JTU1ljQkpj?=
- =?utf-8?B?bGh5T1lrNWJMWXZGclNVanJsc2NuemZrSHVTcFdFUlljY2xkZUlKclBlQzBC?=
- =?utf-8?B?MkhCQTRBeGx3NWVHOGV2NHNNY21BZXVtUnZSaXhheDB4Y3FjN3VYUTRlUnBj?=
- =?utf-8?B?VWJXT2lQaHB0WHZRTHozcmVVMklpQWVscE5rQmorSW9aNzB6MzMxSnd0ajlE?=
- =?utf-8?B?QW4rUHJ6Ri8vZEZlWFBRTDFEa2JjWUttN3BEamNhaE5NZUtVMm43MnY3SHIv?=
- =?utf-8?B?eU9sSnIzNy9XbHQvUStuN0luQi9FenRXcW9vZnJ6Z2ZGdUV3ZDFWTTlmb0Fm?=
- =?utf-8?B?TGd5QVFzUU5qeDloUExIN3Z1dHF2RjFBcVBiSE1jOFRsMGU3VzQ4NmFCaExY?=
- =?utf-8?B?SlpaOGgzdGc0STNaTHlYR1lzM1dyYkJZN3lXb0VEOURzM2YvOWJxcnRoOFdT?=
- =?utf-8?B?SUtlZ09GaW1yN1JrWTRBMm5qWVl3TVZEcTFndHg4KytUMCtGMmFKa0xKS2Rk?=
- =?utf-8?B?SmtCTmdFejBYcWFlNlYrdXZ6QWpYOVJmeWpIYjZsTnQzdTQydHdpQjFrMHRS?=
- =?utf-8?B?Q1RPUlE1NElFN2RFQ3l5eXlNVGQwY3FDUmZMT29rZGlmWjF6clA5NDlJWE5l?=
- =?utf-8?B?c0o1ck4rSUcwKzlMRGxRcUdMcW9PeVo5aGxHdUdza25ZRFFraXdzZDFyTmFt?=
- =?utf-8?B?VWpQZk44cHh1VFp5K3hmdlRSWVBBPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:198.47.21.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:flwvzet201.ext.ti.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(36860700013)(376014)(7416014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	onBzw+ceAhLif8sHM9OTE27IxzvNjX59STCPinLGBCRfEJ2yzYrZ1EWnNFpwMxGJdT0CdyW7jc/1Dd/kC8mTqfxN1F5wFj87h3dsA812tVdMFt1cH1M+R5QOWkvP1hoWikY7DMoSPJfJrvnIb7MDfF7BOIRVBidE3138zrKoXPG3I5oFQLKKByNL3QSVoDJK4uUuITtuTVSIpz6tqCKsHqmi2EOhFZm0CUHSJ5pkrzOJzIwO68Emr2Is2PE4ccjOamEUI4k9vafTlwiMqkyq+3nbXUWZWKRuOp6YtKxJbbe33+IzLh+UhbflkaAvMDIwGnXO65RLow51yWAhuovxTavxG30HT5Ut9nEB/gGljqVhg0KoaYXQJz62Ol8c09QqKLydd451cPFz8WitpJxhF8BTH5RDCemEdXbTNSBt4DdMzwOO+7ZJMk8VsRS+NQMV
-X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Feb 2026 14:45:28.5284
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1d4b3720-05cc-46ce-3845-08de6ca0dcad
-X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.21.195];Helo=[flwvzet201.ext.ti.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000E9D4.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR10MB7965
+X-Received: by 2002:a05:6820:f021:b0:66a:ebc4:66ca with SMTP id
+ 006d021491bc7-67769d69f1bmr3535770eaf.83.1771166787426; Sun, 15 Feb 2026
+ 06:46:27 -0800 (PST)
+Date: Sun, 15 Feb 2026 06:46:27 -0800
+In-Reply-To: <68e4b5d8.050a0220.256323.0018.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6991dc43.a70a0220.2c38d7.00df.GAE@google.com>
+Subject: Re: [syzbot] [bridge?] KMSAN: uninit-value in netif_skb_features (4)
+From: syzbot <syzbot+1543a7d954d9c6d00407@syzkaller.appspotmail.com>
+To: bridge@lists.linux.dev, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, idosch@nvidia.com, jhs@mojatatu.com, jiri@resnulli.us, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, razor@blackwall.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
-	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
+X-Spamd-Result: default: False [-0.36 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=4b4f2aab682301f1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258779-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[redhat.com,kernel.org,google.com,davemloft.net,armlinux.org.uk,gmail.com,vger.kernel.org,ti.com,lunn.ch];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258780-lists,netdev=lfdr.de,1543a7d954d9c6d00407];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	SUBJECT_HAS_QUESTION(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[m-malladi@ti.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[ti.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	REDIRECTOR_URL(0.00)[proofpoint.com];
+	R_DKIM_NA(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 76A3613EE3E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,storage.googleapis.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,appspotmail.com:email]
+X-Rspamd-Queue-Id: 01DA413EE4D
 X-Rspamd-Action: no action
 
-Hi Maxime,
+syzbot has found a reproducer for the following issue on:
 
-On 2/13/2026 12:10 AM, Maxime Chevallier wrote:
-> Hi Meghana, On 12/02/2026 07: 21, Meghana Malladi wrote: > Hi Andrew, > 
->  > On 2/11/26 19: 42, Andrew Lunn wrote: >> On Wed, Feb 11, 2026 at 06:  
-> 40: 32PM +0530, Meghana Malladi wrote: >>> When using DP83869 in force 
-> 100Base-Tx
-> ZjQcmQRYFpfptBannerStart
-> This message was sent from outside of Texas Instruments.
-> Do not click links or open attachments unless you recognize the source 
-> of this email and know the content is safe.
-> Report Suspicious
-> <https://us-phishalarm-ewt.proofpoint.com/EWT/v1/G3vK! 
-> uvdqvDfOXMcx4EXE_POD_-6kkowIhAz8zXLHMFm81_iVEIIhL4AZYTCCg5LBLfOFsQIbaQidTlj5ZWaMhdH1sacfSO1-r-L7$>
-> ZjQcmQRYFpfptBannerEnd
-> 
-> Hi Meghana,
-> 
-> On 12/02/2026 07:21, Meghana Malladi wrote:
->> Hi Andrew,
->> 
->> On 2/11/26 19:42, Andrew Lunn wrote:
->>> On Wed, Feb 11, 2026 at 06:40:32PM +0530, Meghana Malladi wrote:
->>>> When using DP83869 in force 100Base-Tx mode, the PHY is required
->>>> to have robust Auto-MDIX feature enabled from register 1Eh.
->>>> Refer to 7.4.1.2 100BASE-TX section in the TRM [1] for more details.
->>>
->>> What are the results of not enabling this? How would somebody know
->>> they need this patch?
->> 
->> This is the fix for 100M full duplex when auto-neg gets disabled, it 
->> fails to have a link up and this patch fixes it. I will add more 
->> description to the commit message.
-> 
-> I have a board here with a DP83869 + imx93's dwmac, but I couldn't
-> trigger the bug locally. I forced speed, dpx and aneg settings with :
-> 
-> ethtool -s eth0 speed 100 duplex full autoneg off
-> 
-> I did the same on the link partner, but I was still able to get link-up.
-> 
+HEAD commit:    ca4ee40bf13d Partly revert "drm/hyperv: Remove reference t..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1575c722580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4b4f2aab682301f1
+dashboard link: https://syzkaller.appspot.com/bug?extid=1543a7d954d9c6d00407
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1044ec02580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10e3fe5a580000
 
-Your steps so far are correct. But I didn't do the same settings on the 
-link partner. With other speeds (10M, 1G) I was seeing a link up without 
-the need to force speed on the link partner side. So I was expecting the 
-same with 100M as well.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/68f5e4558a91/disk-ca4ee40b.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/ea1eab60444d/vmlinux-ca4ee40b.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/cc7e3debdec4/bzImage-ca4ee40b.xz
 
-> I'm not saying the bug isn't real, I mostly curious about the kind of
-> circumstances that causes this prblem to show-up. Do you have any
-> clarifications on that ?
-> 
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+1543a7d954d9c6d00407@syzkaller.appspotmail.com
 
-Also when I tried the same between DP83869 PHYs of two AM64x (TI DUTs) I 
-couldn't see this issue. When I tried between DP83869 PHY and an 
-external switch or PC I was able to reproduce this issue.
+=====================================================
+BUG: KMSAN: uninit-value in gso_features_check net/core/dev.c:3804 [inline]
+BUG: KMSAN: uninit-value in netif_skb_features+0x6fb/0x1870 net/core/dev.c:3828
+ gso_features_check net/core/dev.c:3804 [inline]
+ netif_skb_features+0x6fb/0x1870 net/core/dev.c:3828
+ validate_xmit_skb+0xb6/0x2400 net/core/dev.c:4003
+ validate_xmit_skb_list+0xd4/0x320 net/core/dev.c:4065
+ sch_direct_xmit+0xd4/0xcf0 net/sched/sch_generic.c:332
+ __dev_xmit_skb net/core/dev.c:4179 [inline]
+ __dev_queue_xmit+0x3016/0x5a50 net/core/dev.c:4795
+ dev_queue_xmit include/linux/netdevice.h:3384 [inline]
+ packet_xmit+0x8f/0x710 net/packet/af_packet.c:275
+ packet_snd net/packet/af_packet.c:3077 [inline]
+ packet_sendmsg+0x91d9/0xa320 net/packet/af_packet.c:3109
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0xfe7/0x1080 net/socket.c:2592
+ ___sys_sendmsg+0x271/0x3b0 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0x211/0x3e0 net/socket.c:2681
+ x64_sys_call+0x1e20/0x3ea0 arch/x86/include/generated/asm/syscalls_64.h:47
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x134/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-May be I missing lot of detail in this patch. Let me know if this helped 
-you with reproducing the issue. Thanks a lot :)
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:4466 [inline]
+ slab_alloc_node mm/slub.c:4788 [inline]
+ kmem_cache_alloc_node_noprof+0x3cd/0x12d0 mm/slub.c:4840
+ kmalloc_reserve net/core/skbuff.c:613 [inline]
+ __alloc_skb+0x855/0x1190 net/core/skbuff.c:713
+ alloc_skb include/linux/skbuff.h:1383 [inline]
+ alloc_skb_with_frags+0xc5/0xa60 net/core/skbuff.c:6750
+ sock_alloc_send_pskb+0xacb/0xc60 net/core/sock.c:2995
+ packet_alloc_skb net/packet/af_packet.c:2927 [inline]
+ packet_snd net/packet/af_packet.c:3020 [inline]
+ packet_sendmsg+0x7477/0xa320 net/packet/af_packet.c:3109
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0xfe7/0x1080 net/socket.c:2592
+ ___sys_sendmsg+0x271/0x3b0 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0x211/0x3e0 net/socket.c:2681
+ x64_sys_call+0x1e20/0x3ea0 arch/x86/include/generated/asm/syscalls_64.h:47
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x134/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-> I'll be happy to give the fix a try, if I can manage to reproduce the
-> issue :)
-> 
-> Maxime
-> 
-> 
+CPU: 0 UID: 0 PID: 6045 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2026
+=====================================================
 
--- 
-Thanks,
-Meghana Malladi
 
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
