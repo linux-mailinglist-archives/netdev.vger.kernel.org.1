@@ -1,137 +1,144 @@
-Return-Path: <netdev+bounces-258772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258773-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id LAtVJ+3EkWnImQEAu9opvQ
-	(envelope-from <netdev+bounces-258772-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 14:06:53 +0100
+	id oMOlHmTakWlpnQEAu9opvQ
+	(envelope-from <netdev+bounces-258773-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 15:38:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 395AE13EB49
-	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 14:06:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF91013EDFD
+	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 15:38:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3C3E33003D0B
-	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 13:06:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8C99A300CC18
+	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 14:38:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A95E2285C91;
-	Sun, 15 Feb 2026 13:06:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E6D12C234A;
+	Sun, 15 Feb 2026 14:38:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZcO6PAQG"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 751CFE571;
-	Sun, 15 Feb 2026 13:06:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCD43277CA4
+	for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 14:38:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771160808; cv=none; b=r0m5Melt411yavl1nQqueSmfv8P0RcAqr+v4bDsOW3oKMxhjXH1YmQ/Q9c/xcv/+Ay6gpBE9b8+X3wXiagd+7veQcT0JVZvFIUENxru5Z4tKz5Nl1UbadNt0Yne6jBrAyn/wgSNw2Knve7U96sHZcZhGYujh0SboX5od2Nthyco=
+	t=1771166306; cv=none; b=MXbq+iSsvXlb1lFE9hm2P8+Zt+KwhDkDHUA1qftQdg0DBTRKUOJ6S27G7ryOL6Sadh0Pa7vWNPrP6a8i2Fx3tYyfzxuehHZP2gMya5ChADJDgZBT6PtOL8K7qbhHwyPXa+o1L5UrrlBXN7obx/5CklJcrRD/Vb3OLyiVBw1soSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771160808; c=relaxed/simple;
-	bh=Ez17805DvVJAxopmP2LRlw7R4OGZ7ZhkD2NeUWMnc+0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G3+9iteC9/4mzjxOlXcobjAK2quU2NzP1HsD9WiOtME1xChDrGdrG3tHdb9Us9n1TN6YTtoyQQ1isvPK7pogFxR3WhLQ7+7JdD0KNhXuIM510OkK1GPo/eRQclZ0OJNgXXGz5l260xkXUoIevyJ77HxIS5LvSWULs9esCB+A3mY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id D45EB60218; Sun, 15 Feb 2026 14:06:43 +0100 (CET)
-Date: Sun, 15 Feb 2026 14:06:42 +0100
-From: Florian Westphal <fw@strlen.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Shigeru Yoshida <syoshida@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>,
-	syzbot+5a66db916cdde0dbcc1c@syzkaller.appspotmail.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH net] net: flow_offload: protect driver_block_list in
- flow_block_cb_setup_simple()
-Message-ID: <aZHE4r18hkxdITD-@strlen.de>
-References: <20260208110054.2525262-1-syoshida@redhat.com>
- <aYxw2CpxOKLh1wOz@strlen.de>
- <20260212183447.2d577f5b@kernel.org>
- <aY8LcgPsoYYGEH5s@strlen.de>
- <20260213081749.3b3ede9c@kernel.org>
+	s=arc-20240116; t=1771166306; c=relaxed/simple;
+	bh=Wd9bVZLzZdLdCFvX7VM2/EOv11A4D9K1ZgZHqeUbDf0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=MTBAt3fmKlCnSKi4LDw0RvQ7p1Rp22dq+U7uQElBLuBIlvSa3R1KwnzcuvK5J6uKD3mCz8EzMmhUgfr5bG6PLrVAj2A1I/IL4RAkI50zxgdwgXFkXbsQBXQe72KtA5lfWvzoW89L997YA2mAEnxZv8dqi/yy309CbR9d1KDsCxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZcO6PAQG; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8c71655aa11so1585444185a.3
+        for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 06:38:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1771166304; x=1771771104; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=lD+UUJbjVGxWu+cO9I99VoBlg0cYRrQSWMxbmuIJzAA=;
+        b=ZcO6PAQG4mF3MSH1NZVEhhbRP2xn4ahZX0ZhOCcHibE5Fy3JHPoJu0HQaxnkip8Vyq
+         Qhhso9SdBa4Qc//apE1ohr1E4uTxFMwLolo8VpbcGtVoPP4cbQ7E8mVTSIawgUyJ+hKu
+         UfBnqFfYo/cauoewuT8c5Y0MYV5m1O0t/fAURu/U/FDgxQoLV/Y4O9BORj0n+s97cs8f
+         9VvCtBG54QRZfTTNalwW2dCN/STBV3VQdFYHFi40otjVAZlzEDA4Ui6X4Eg/LFduC+3U
+         ApaHWwqYcjuYgCVgk46qqfQkThn9ka+vk/GaCvA+wqAdj80wbW8UHXkzQYM/9y15/yvj
+         /bZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771166304; x=1771771104;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lD+UUJbjVGxWu+cO9I99VoBlg0cYRrQSWMxbmuIJzAA=;
+        b=s2V4JsRuxj0449incq2RGWiXAWaUreB3tcAMeW763q1zLnlETrFePvbeRdetDF8sLE
+         rwB0eWfHf2U6F/Da8LxSnim6sGk+N4ir9P6LGL1wy/PusiGbvmBpdNiRAwJHmBzNG+ti
+         VdploxXWLYUq/peCxvunksMVpZCnx934WRHm9bG8bs4yQSi/qywVTf3M8L1IWLH04mPi
+         Fnjc77kvA2bIXg4LJfIFK+i7FMLotm8t6/o5S4lJs4ZzK3BLQQDp3+UI5ZgKUsiz3aj8
+         B6xcM0TcWCd9mz8UAsVOLAiq8JWfLWxTrl4mg9T1H5VuDfMjKDRKMXVHH+xRGNRsiprk
+         LAnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVEk56HGaXBx8oBJoCsFkbJv3BYKNXoJtR5FyeR1nqMmbGN0RW3J7EgfJAkMffVdcmCagL6AV0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyhw7o3tMO6L5Y4nLrXN2pbHcDgEQ70MFEP/69eZPQEZl47oe7V
+	DnBuAQpPOGwomCp4gT6pLwJpHKFUpqrusXSBwZ6hcfWCBhi7zKhD26QpJmmvsPQBlE5XohmPA/c
+	fxq94UIh1LDSwKA==
+X-Received: from qklv11.prod.google.com ([2002:a05:620a:f0b:b0:8cb:5ab6:5a6a])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:4709:b0:8ca:a950:238f with SMTP id af79cd13be357-8cb4224b3b5mr877484585a.10.1771166303516;
+ Sun, 15 Feb 2026 06:38:23 -0800 (PST)
+Date: Sun, 15 Feb 2026 14:38:16 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260213081749.3b3ede9c@kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.310.g728cabbaf7-goog
+Message-ID: <20260215143821.2330791-1-edumazet@google.com>
+Subject: [PATCH net 0/5] icmp: better deal with DDOS
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, David Ahern <dsahern@kernel.org>, 
+	Martin KaFai Lau <martin.lau@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[strlen.de];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258772-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-258773-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,5a66db916cdde0dbcc1c];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,strlen.de:mid]
-X-Rspamd-Queue-Id: 395AE13EB49
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: CF91013EDFD
 X-Rspamd-Action: no action
 
-Jakub Kicinski <kuba@kernel.org> wrote:
-> On Fri, 13 Feb 2026 12:30:58 +0100 Florian Westphal wrote:
-> > > > Looking at the *upper layer*, I don't think it expected drivers to use
-> > > > a single global list for this bit something that is scoped to the
-> > > > net_device.  
-> > > 
-> > > Maybe subjective but the fix seems a little off to me.
-> > > Isn't flow_block_cb_setup_simple() just a "simple" implementation 
-> > > for reuse in drivers locking in there doesn't really guarantee much?  
-> > 
-> > Not sure what you mean.  I see the same pattern as netdevsim in all
-> > drivers using this API. 
-> 
-> Grep for flow_block_cb_add(). Not all drivers use
+When dealing with death of big UDP servers, admins might want to
+increase net.ipv4.icmp_msgs_per_sec and net.ipv4.icmp_msgs_burst
+to big values (2,000,000 or more).
 
-static int
-mtk_eth_setup_tc_block(struct net_device *dev, struct flow_block_offload *f)
-{
-        struct mtk_mac *mac = netdev_priv(dev);
-        struct mtk_eth *eth = mac->hw;
-        static LIST_HEAD(block_cb_list);
-	~~~~~~
-I have a question.
+They also might need to tune the per-host ratelimit to 1ms or 0ms
+in favor of the global rate limit.
 
-[..]
-        f->driver_block_list = &block_cb_list;
+This series fixes bugs showing up in all these needs.
 
-Now I have many questions!
+Eric Dumazet (5):
+  icmp: prevent possible overflow in icmp_global_allow()
+  inet: move icmp_global_{credit,stamp} to a separate cache line
+  ipv6: icmp: remove obsolete code in icmpv6_xrlim_allow()
+  ipv4: icmp: icmpv4_xrlim_allow() optimization if
+    net.ipv4.icmp_ratelimit is zero
+  ipv6: icmp: icmpv6_xrlim_allow() optimization if
+    net.ipv4.icmp_ratelimit is zero
 
-How is this supposed to work?
-How is ownership handled, what locks protect, or what locks are supposed
-to protect this?
+ Documentation/networking/ip-sysctl.rst |  7 ++++---
+ include/net/netns/ipv4.h               |  9 +++++++--
+ net/ipv4/icmp.c                        | 17 ++++++++++++-----
+ net/ipv6/af_inet6.c                    |  2 +-
+ net/ipv6/icmp.c                        | 15 +++++++--------
+ 5 files changed, 31 insertions(+), 19 deletions(-)
 
-> the flow_block_cb_setup_simple() helper, it's just a convenience helper,
-> not a mandatory part of the flow. We should probably add a helper for
-> add like the one added for  flow_block_cb_remove_driver() instead of
-> taking the lock directly in flow_block_cb_setup_simple()?
+-- 
+2.53.0.310.g728cabbaf7-goog
 
-No idea, I don't understand how any of this is supposed to work.
-
-I will try to play with this next week but I'm not sure I will send
-patches.  AFAICS there are not even netdevsim based tests for this
-feature anywhere.
 
