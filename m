@@ -1,287 +1,252 @@
-Return-Path: <netdev+bounces-258798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258799-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CIrwDrUwkmk8rwEAu9opvQ
-	(envelope-from <netdev+bounces-258798-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 21:46:45 +0100
+	id iG0fItAwkmk8rwEAu9opvQ
+	(envelope-from <netdev+bounces-258799-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 21:47:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 893ED13FB1E
-	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 21:46:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E204013FB2D
+	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 21:47:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 394C1305DA7E
-	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 20:44:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 715E03035A8E
+	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 20:45:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86D10304BDC;
-	Sun, 15 Feb 2026 20:44:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF306307AD6;
+	Sun, 15 Feb 2026 20:45:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c10KYD+l"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="ibfGqydY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28332305E01
-	for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 20:44:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771188247; cv=none; b=jW02j2OCO0r72mp2PCPbLGq+IQMIJAD7lcbkqmkcMwYGu0qCliBH3KYzUljWhzj6O+6lpKvrcjJMG0f5oiVKymZQll56oluVjnqWC38rbjMqML0BIVpr8uwzf7XECvXWjZUO46DrSrMPBJftgJkSUP1B+0wxK7cv+rtGFXHhHIk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771188247; c=relaxed/simple;
-	bh=EM12ncaYKDLeWOM4JIAyz5vhPEoYuAX7MamgZblsr04=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=b21lpQCbJ1xOAdGulIG6UAjaoM+NnOMD/vvU/QgWjh49PYSIHscNCQeIsnbTpvtoGs/+5ttjufq7kyJmeidMmL5SUncywrGZONYBgmD1fmIeyiD592MX5+wHsfkrbN+uakn6GKKTV5Gg6DH9SwydqDl0QuOQaX37hTKP/xaZupM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c10KYD+l; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3562bdba6f7so11962665a91.2
-        for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 12:44:06 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E838283FC8
+	for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 20:45:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771188355; cv=pass; b=sSyAPYwlcjppzOI8V7Lw9z+MI82abShZJaTUELxeMi95vqCImphI5InK/0UyvbOqYHVNybG6ET8kyMLwa5wUU2V9ebEa2AGgDPFHMoAPOeackvuGAv7wALDzmdnPBueU7JSbXh9qOV9wWUP+9Tya++CyXSItvRxHASXFKCUdGOM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771188355; c=relaxed/simple;
+	bh=Ds1v+eswAQASNf0hpI4AxWNGtflZxsZg+jHzXoyFoeo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=k+6UEwdCesgWpqDKGK2Fl4yr4I0ISkKFAS00KXbBGweYxxjC1oXiXFry+WDwIhKW5hG+qUP/XI8vCKhqEc1nbPg6cxauYwVT63CxvRVVIhXinRRVrLwHkWwRX2eq128TmIhh+ym5KYUIdQK2+O/o6hojhszh94fmsAED69S9mgQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=ibfGqydY; arc=pass smtp.client-ip=74.125.224.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-64aefa98fe6so2368954d50.1
+        for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 12:45:54 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771188353; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Z4E1yDWgwljUU+TMixMHpRszW8nIylzg+zJUfY2vLhOJk0o5jaN12hfrHayMdeWWsM
+         FchaOYHVrbrQXjHEfycyaMiOBYsL3wWNVmX+7AfgYl5enwfEqFOFpGAtD3oddmuZvxjB
+         9hllb9+p8lGY08IIeKaE0H26PM8ai7Kt2LKCyD9nO4IPwR7L0bpXGpzdlw57MPSrryJS
+         Ry9bAb2D1L79NGRSnyUIJfQx7rETOkMPIVDM6QSiljTj4FTsHTZDWLVO24p1oviYL8OK
+         BdgphZ4MIXC9a6kvOlHH2hlDvXX87YTkUFLV2E6wnF72bh7ax1ML3Ukt23Km1Bh85Pcz
+         TYqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Oo6CzlM7VCP6Q08h+JHjGQ7qEb9AnSPDb+La4GMe/pg=;
+        fh=iGj4WkGPkKJz2y19eL4DJDm3UoUXGf4XAfhi+PyXKGk=;
+        b=iH5UIrLv790YqPIKC4iBQspW83FqaA/zeH5sluzckzRyUCJA0N4XV3WsCrQNjMkZ9O
+         +/Ikl2Dt8kSVnCPKzUtnEEWuq8WvFMHkA9y5SVhmtNjEgh0ImwQs3+Hx3BlIkIE6e6VC
+         PXCutYeYRMbp0Pnv7kLurBQPAOUw1bbyk/UUR98qzEAgvF7I9kQtekDi+Q4m14zECDF8
+         HMbLwthj+hVnTpwiWZf/odLiRM8M1Wpl3xXF5Ny1Hhc/tbzwEFETzwpxo4/qO0idxs91
+         V1ivyZCp/XCEHCzLBAui/s4Y5Sw83nKJQrk+4e9x5Wx3nM/ZY2kAQFW17XW1z9BVfIBj
+         23aw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771188246; x=1771793046; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4ltyuNIF9ixa7QtZxA/X6OKaqcjHCw5q2loB/yV8O+8=;
-        b=c10KYD+lx46NVRUs5ixmYaIXMx0RUlGLEaGJLDEm1fXgVv2Q7e7aqBX9NYG3vVZV4s
-         4K8p7wmxchs4J5+lYgBwVcyFNRkzJI88cICR8jzdhojPsk28tLeN6kS6kcThMB4dHolQ
-         zQD1J4ZIT4rKtMZ5AyuhU6f6bql1OXUNVYLfnArUzW6Psduj+NdzB7J12czR6MyhIldS
-         IsNgs2R3wBgU5ze/QpxSPh0PnJOB1G1Ki456VEa3z01jfmTNh06YDx203hS6VhbKr0Eg
-         FA32JDr0Zv/+2n8iIy7xIbodOSqyq+FlG1KF1C5lAfhOMxrjcA5HtZRlDpwDFS1bPzBT
-         Tj3A==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1771188353; x=1771793153; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Oo6CzlM7VCP6Q08h+JHjGQ7qEb9AnSPDb+La4GMe/pg=;
+        b=ibfGqydYU4sLq7R4H3NPDplUcl77UxdcOQQYg4doFoKMXtetTwP5xOev4u9a5YT3z7
+         iqXrziQEmYbs3fd/wunDwAyDLmW0TLD/47pnOkMArti683CM4T4A7efDkOH/b/eLSSFF
+         ScLVN4tTFjE8AGU6DyVZcaA0hFREKZ+kjhDh0Deex5fyOtAr6pAvPlIDTy+zrXabgGrB
+         sR6By92k0lxLbk6CeeuAeiH5UpYglY++sk2H12OHgJlqjxFdQhJV5QQTHgJoIyMi5ZrW
+         iUwRnlJoMl/oKPOtcOTMLhv24/rohtj1D3PKdn/scvhSb+erqls7ql3tS6mSrLLqGK0j
+         njkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771188246; x=1771793046;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4ltyuNIF9ixa7QtZxA/X6OKaqcjHCw5q2loB/yV8O+8=;
-        b=K0+EbD9u1DjKBU3rT0BTlTNNlqHOyST/QnAAaudrbvGbf9FgsyEhURTE9nsuztHseH
-         DYsGw+9qZug/cCzCVSUlgbfRRA5Md9f6Bg9VHATecCgKhcnyhwuCZ6Wk4J/JzAM2OPLB
-         MbIKq4CEoimZhiHnUjLMztTx0c9R+WECiLgaI38FWaLhiBpQqFk/TTbs5RjVLkK8PdG1
-         3ZnUHsThkoqTc2jbPaTvmScpVah2/+FfH3aGM066eHd6qwPdOYwzZA73XM6J/b6yswTX
-         /QMXeQtL24eVpO3RTjL1nDouj+ifTMqHK6A6XaosfQuuhu+T8I5PzCvbfOnaqHewptcN
-         dmqw==
-X-Forwarded-Encrypted: i=1; AJvYcCXFw5t/SAzmm3b8VOHXETJWsJR6jCViDqPQWa4UfthYr1b7us49/TgmAGf/KZ7fDUjvY1TD3S0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHCAsgDE7p5xM/PsRFZo1atiCFZdCBiyHmQlu10OG6YspnReRV
-	Mhn1HzsDTtyRhpgUZ5fobm08vu8jQF7+JDAb8qK5pEF0e9zUR8vbxBt00NAJz7TGtlmAI73LUC9
-	R4TaMyA==
-X-Received: from pjbjz3.prod.google.com ([2002:a17:90b:14c3:b0:353:d0b3:8611])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:e7cc:b0:349:9d63:8511
- with SMTP id 98e67ed59e1d1-356a7a6d587mr6306337a91.25.1771188245471; Sun, 15
- Feb 2026 12:44:05 -0800 (PST)
-Date: Sun, 15 Feb 2026 20:41:41 +0000
-In-Reply-To: <20260215204353.3645744-1-kuniyu@google.com>
+        d=1e100.net; s=20230601; t=1771188353; x=1771793153;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Oo6CzlM7VCP6Q08h+JHjGQ7qEb9AnSPDb+La4GMe/pg=;
+        b=TMb3H7hZPUvOI0LmroacMxQz6D+RPW5r8TmdjDKEWHDuO1qju9Krvzcrd6TZRLogqj
+         Lo39PFCOLmqqreK6MQkqWxJi3GE/4UipebaosYWVfE22YIDd90K1pYeogBlxQqdlxLJ+
+         TrAD8oTotvABlP/0Xfufxquq2c/X4CVCDB2+rjx9AT92YgBTJ8nCEj8arjO9pKYkJH4s
+         t53teZPk+6srV6MpAobXnMf5QaB3zWkkkfcYVejoa5LoaGy0mc1VqjXHor950f7l/LnY
+         4gmqKxhcQHFRPviPNoMFmNtbfJI+zOk7hM5+rP6k59c+0xJF6NIBeZCkSf3C3FDQxBSi
+         PQfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWIgl0vnr4NZxp9D1pzwOBYMhL2Rk2BY7kJuvk59cw1AYY4A7uQme0mhMT6gGOGZZqfzEX9E2c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWAw9XXZhScXLvp9Rv0Rz5AF0G7Pz5M/AaQbbD2bt6oVP8pBbI
+	gJ64WW39AUsRkwyRdnwQlPUTYOT4IyPUu88ZWPOGc7S3zgDTBcNRXsW52Rjv8LNoXS13Q9gaV7r
+	nmWwigG4vF6GHJ6EihTxQ6fghk1OgwXuWM9Fzae9s
+X-Gm-Gg: AZuq6aJx0RjxXT2DwjQ/n/xqIzyNSsedTUesx0geBECjQwJVCg8htE6h+Xi8s7qG+01
+	X6S7LgtZ3sThNWDI5UzV8aVAnSMBHN5TnYvfKsG+KKqF8uK9XY7vDLT/oWkUryBo6sitCCmNc9j
+	3TgteewBt5IlFKyHYcZYK04i+HumxXDREsdEHQ21G68vxtm6zBsRhBLQ2e4ClXBWc8Vl+dIuqKv
+	HLU5GPRcHJUxtzsGQY4ktfO09izFBuCfQHBMxpKzD/52CMHURUlTuJNTa4w+BKx0gBbSTMD8rx4
+	zqSDnLd2L+svAqbPaha62A==
+X-Received: by 2002:a05:690c:e3e6:b0:794:ecaf:c501 with SMTP id
+ 00721157ae682-797a0cc95d1mr132565667b3.46.1771188353173; Sun, 15 Feb 2026
+ 12:45:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260215204353.3645744-1-kuniyu@google.com>
-X-Mailer: git-send-email 2.53.0.310.g728cabbaf7-goog
-Message-ID: <20260215204353.3645744-7-kuniyu@google.com>
-Subject: [PATCH v1 bpf/net 6/6] sockmap: Fix broken memory accounting for UDP.
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: John Fastabend <john.fastabend@gmail.com>, Jakub Sitnicki <jakub@cloudflare.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Cong Wang <cong.wang@bytedance.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, syzbot+5b3b7e51dda1be027b7a@syzkaller.appspotmail.com
+MIME-Version: 1.0
+References: <20260213113849.136695-1-p@1g4.org> <20260213113849.136695-2-p@1g4.org>
+In-Reply-To: <20260213113849.136695-2-p@1g4.org>
+From: Victor Nogueira <victor@mojatatu.com>
+Date: Sun, 15 Feb 2026 17:45:42 -0300
+X-Gm-Features: AaiRm50bUFQOD3H73oRgDuJ6_T-ZnN2l_KlSeCgNXBjOKlK31-17mnd8s7B7Xek
+Message-ID: <CA+NMeC805yf4CECdjJh4EmP0RK1AgxAN25V7n+qvOqNMrhVyNA@mail.gmail.com>
+Subject: Re: [PATCH net v6 1/1] net/sched: act_gate: snapshot parameters with
+ RCU on replace
+To: Paul Moses <p@1g4.org>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258798-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,cloudflare.com];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[mojatatu.com];
+	TAGGED_FROM(0.00)[bounces-258799-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
+	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,bytedance.com,google.com,vger.kernel.org,syzkaller.appspotmail.com];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,5b3b7e51dda1be027b7a];
+	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[mojatatu.com,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,appspotmail.com:email]
-X-Rspamd-Queue-Id: 893ED13FB1E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: E204013FB2D
 X-Rspamd-Action: no action
 
-syzbot reported imbalanced sk->sk_forward_alloc [0] and
-demonstrated that UDP memory accounting by SOCKMAP is broken.
+On Fri, Feb 13, 2026 at 8:39=E2=80=AFAM Paul Moses <p@1g4.org> wrote:
+>
+> The gate action can be replaced while the hrtimer callback or dump path i=
+s
+> walking the schedule list.
+>
+> Convert the parameters to an RCU-protected snapshot and swap updates unde=
+r
+> tcf_lock, freeing the previous snapshot via call_rcu(). When REPLACE omit=
+s
+> the entry list, preserve the existing schedule so the effective state is
+> unchanged.
+> [...]
+> diff --git a/net/sched/act_gate.c b/net/sched/act_gate.c
+> index c1f75f2727576..60c80e609ec3d 100644
+> --- a/net/sched/act_gate.c
+> +++ b/net/sched/act_gate.c
+> [...]
+> @@ -56,11 +59,10 @@ static void gate_start_timer(struct tcf_gate *gact, k=
+time_t start)
+>  {
+>         ktime_t expires;
+>
+> -       expires =3D hrtimer_get_expires(&gact->hitimer);
+> -       if (expires =3D=3D 0)
+> -               expires =3D KTIME_MAX;
+> -
+> -       start =3D min_t(ktime_t, start, expires);
+> +       if (hrtimer_active(&gact->hitimer)) {
+> +               expires =3D hrtimer_get_expires(&gact->hitimer);
+> +               start =3D min_t(ktime_t, start, expires);
+> +       }
 
-The repro put a UDP sk into SOCKMAP and redirected skb to itself,
-where skb->truesize was 4240.
+Is this change really necessary?
 
-First, udp_rmem_schedule() set sk->sk_forward_alloc to 8192
-(2 * PAGE_SIZE), and skb->truesize was charged:
+> [...]
+>  static int parse_gate_list(struct nlattr *list_attr,
+>                            struct tcf_gate_params *sched,
+>                            struct netlink_ext_ack *extack)
+> @@ -261,7 +294,6 @@ static int parse_gate_list(struct nlattr *list_attr,
+>         }
+>
+>         sched->num_entries =3D i;
+> -
+>         return i;
 
-  sk->sk_forward_alloc = 0 + 8192 - 4240;  // => 3952
+Removing this line also seems unnecessary.
 
-Then, udp_read_skb() dequeued the skb by skb_recv_udp(), which finally
-calls udp_rmem_release() and _partially_ reclaims sk->sk_forward_alloc
-because skb->truesize was larger than PAGE_SIZE:
+> [...]
+> +static void gate_setup_timer(struct tcf_gate *gact, s32 clockid,
+> +                            enum tk_offsets tko)
+> +{
+> +       WRITE_ONCE(gact->tk_offset, tko);
 
-  sk->sk_forward_alloc += 4240;  // => 8192 (PAGE_SIZE is reclaimable)
-  sk->sk_forward_alloc -= 4096;  // => 4096
+Why do you need this WRITE_ONCE?
 
-Later, sk_psock_skb_ingress_self() called skb_set_owner_r() to
-charge the skb again, triggering an sk->sk_forward_alloc underflow:
+>  static int tcf_gate_init(struct net *net, struct nlattr *nla,
+> [...]
+> @@ -366,6 +407,60 @@ static int tcf_gate_init(struct net *net, struct nla=
+ttr *nla,
+> [...]
+> +       if (ret !=3D ACT_P_CREATED) {
+> [...]
+> +               if (use_old_entries) {
+> +                       err =3D tcf_gate_copy_entries(p, cur_p, extack);
+> +                       if (!err && !tb[TCA_GATE_CYCLE_TIME])
 
-  sk->sk_forward_alloc -= 4240   // => -144
+This check for TCA_GATE_CYCLE_TIME seems unnecessary.
+If I understand your code correctly, cycletime will be overwritten
+further down if TCA_GATE_CYCLE_TIME was specified.
 
-Another problem is that UDP memory accounting is not performed
-under spin_lock_bh(&sk->sk_receive_queue.lock).
+> +                               cycletime =3D cur_p->tcfg_cycletime;
+> [...]
+> @@ -434,33 +532,47 @@ static int tcf_gate_init(struct net *net, struct nl=
+attr *nla,
+> [...]
+> -chain_put:
+> +unlock:
+>         spin_unlock_bh(&gact->tcf_lock);
+>
+> +err_free:
+> +       release_entry_list(&p->entries);
+> +       kfree(p);
+> +release_idr:
+>         if (goto_ch)
+>                 tcf_chain_put_by_act(goto_ch);
+> -release_idr:
+> [...]
 
-skb_set_owner_r() and sock_rfree() are called locklessly and
-corrupt sk->sk_forward_alloc, leading to the splat.
+This looks weird.
+You will go to the release_idr label when tcf_action_check_ctrlact fails,
+so the "if (goto_ch)" part of the code will be reached in that code path.
+I believe it would be better to keep the "chain_put" label and keep
+"release_idr" below it (as it was before your change).
+Something like:
 
-Let's not skip memory accounting for UDP and ensure the proper
-lock is held.
+chain_put:
+        if (goto_ch)
+                tcf_chain_put_by_act(goto_ch);
+release_idr:
+        ...
 
-[0]:
-WARNING: net/ipv4/af_inet.c:157 at inet_sock_destruct+0x62d/0x740 net/ipv4/af_inet.c:157, CPU#0: ksoftirqd/0/15
-Modules linked in:
-CPU: 0 UID: 0 PID: 15 Comm: ksoftirqd/0 Not tainted syzkaller #0 PREEMPT(full)
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/13/2026
-RIP: 0010:inet_sock_destruct+0x62d/0x740 net/ipv4/af_inet.c:157
-Code: 0f 0b 90 e9 58 fe ff ff e8 40 55 b3 f7 90 0f 0b 90 e9 8b fe ff ff e8 32 55 b3 f7 90 0f 0b 90 e9 b1 fe ff ff e8 24 55 b3 f7 90 <0f> 0b 90 e9 d7 fe ff ff 89 f9 80 e1 07 80 c1 03 38 c1 0f 8c 95 fc
-RSP: 0018:ffffc90000147a48 EFLAGS: 00010246
-RAX: ffffffff8a1121dc RBX: dffffc0000000000 RCX: ffff88801d2c3d00
-RDX: 0000000000000100 RSI: 0000000000000f70 RDI: 0000000000000000
-RBP: 0000000000000f70 R08: ffff888030ce1327 R09: 1ffff1100619c264
-R10: dffffc0000000000 R11: ffffed100619c265 R12: ffff888030ce1080
-R13: dffffc0000000000 R14: ffff888030ce130c R15: ffffffff8fa87e00
-FS:  0000000000000000(0000) GS:ffff8881256f8000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000200000000700 CR3: 000000007200c000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- __sk_destruct+0x85/0x880 net/core/sock.c:2350
- rcu_do_batch kernel/rcu/tree.c:2605 [inline]
- rcu_core+0xc9e/0x1750 kernel/rcu/tree.c:2857
- handle_softirqs+0x22a/0x7c0 kernel/softirq.c:622
- run_ksoftirqd+0x36/0x60 kernel/softirq.c:1063
- smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
- kthread+0x726/0x8b0 kernel/kthread.c:463
- ret_from_fork+0x51b/0xa40 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
- </TASK>
-
-Fixes: d7f571188ecf ("udp: Implement ->read_sock() for sockmap")
-Reported-by: syzbot+5b3b7e51dda1be027b7a@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/698f84c6.a70a0220.2c38d7.00cb.GAE@google.com/
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- include/net/udp.h |  2 ++
- net/core/skmsg.c  | 21 ++++++++++++++++++---
- net/ipv4/udp.c    |  9 +++++++++
- 3 files changed, 29 insertions(+), 3 deletions(-)
-
-diff --git a/include/net/udp.h b/include/net/udp.h
-index 700dbedcb15f..a94a5ca9d924 100644
---- a/include/net/udp.h
-+++ b/include/net/udp.h
-@@ -455,6 +455,8 @@ struct sock *__udp6_lib_lookup(const struct net *net,
- 			       struct sk_buff *skb);
- struct sock *udp6_lib_lookup_skb(const struct sk_buff *skb,
- 				 __be16 sport, __be16 dport);
-+
-+void udp_sock_rfree(struct sk_buff *skb);
- int udp_read_skb(struct sock *sk, skb_read_actor_t recv_actor);
- 
- /* UDP uses skb->dev_scratch to cache as much information as possible and avoid
-diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-index 28df767f3ac4..8ab53c83b178 100644
---- a/net/core/skmsg.c
-+++ b/net/core/skmsg.c
-@@ -7,6 +7,7 @@
- 
- #include <net/sock.h>
- #include <net/tcp.h>
-+#include <net/udp.h>
- #include <net/tls.h>
- #include <trace/events/sock.h>
- 
-@@ -576,6 +577,7 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
- 				u32 off, u32 len, gfp_t gfp_flags, bool take_ref)
- {
- 	struct sock *sk = psock->sk;
-+	bool is_udp = sk_is_udp(sk);
- 	struct sk_msg *msg;
- 	int err = -EAGAIN;
- 
-@@ -583,12 +585,15 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
- 	if (!msg)
- 		goto out;
- 
--	if (skb->sk != sk) {
-+	if (is_udp)
-+		spin_lock_bh(&sk->sk_receive_queue.lock);
-+
-+	if (skb->sk != sk || is_udp) {
- 		if (atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf)
--			goto free;
-+			goto unlock;
- 
- 		if (!sk_rmem_schedule(sk, skb, skb->truesize))
--			goto free;
-+			goto unlock;
- 	}
- 
- 	/* This will transition ownership of the data from the socket where
-@@ -598,11 +603,21 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
- 	 * into user buffers.
- 	 */
- 	skb_set_owner_r(skb, sk);
-+
-+	if (is_udp) {
-+		skb->destructor = udp_sock_rfree;
-+		spin_unlock_bh(&sk->sk_receive_queue.lock);
-+	}
-+
- 	err = sk_psock_skb_ingress_enqueue(skb, off, len, psock, sk, msg, take_ref);
- 	if (err < 0)
- 		goto free;
- out:
- 	return err;
-+
-+unlock:
-+	if (is_udp)
-+		spin_unlock_bh(&sk->sk_receive_queue.lock);
- free:
- 	kfree(msg);
- 	goto out;
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 422c96fea249..831d26748a90 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -2039,6 +2039,15 @@ struct sk_buff *__skb_recv_udp(struct sock *sk, unsigned int flags,
- }
- EXPORT_SYMBOL(__skb_recv_udp);
- 
-+void udp_sock_rfree(struct sk_buff *skb)
-+{
-+	struct sock *sk = skb->sk;
-+
-+	spin_lock_bh(&sk->sk_receive_queue.lock);
-+	sock_rfree(skb);
-+	spin_unlock_bh(&sk->sk_receive_queue.lock);
-+}
-+
- int udp_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
- {
- 	struct sk_buff *skb;
--- 
-2.53.0.310.g728cabbaf7-goog
-
+cheers,
+Victor
 
