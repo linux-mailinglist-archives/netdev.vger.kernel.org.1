@@ -1,149 +1,191 @@
-Return-Path: <netdev+bounces-258804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258805-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sN9hO3Y/kml8sQEAu9opvQ
-	(envelope-from <netdev+bounces-258804-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 22:49:42 +0100
+	id YLZWAbc/kml8sQEAu9opvQ
+	(envelope-from <netdev+bounces-258805-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 22:50:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BCDA13FD1D
-	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 22:49:42 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A12513FD2C
+	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 22:50:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 58B493010B99
-	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 21:49:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0AAEF3028812
+	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 21:50:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24EAA2FBDFD;
-	Sun, 15 Feb 2026 21:49:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87A3B2BEC34;
+	Sun, 15 Feb 2026 21:50:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="N0WWeaSR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HGmZd2Ta"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 567DD2580EE
-	for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 21:49:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63DAA23C4FA;
+	Sun, 15 Feb 2026 21:50:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771192181; cv=none; b=aER+z+1ds6i8HFDJfJUCCezp8ZmyBUzpBEf9wkl9IWx36o4Sbn4sIJzcykIzWv9+95Ii2BA8GMTSHjPrwGbQZo83brIYSA1UYm23eKWJIoWPm52PLOPxbNk50f8+Tu2L15Cbxw1bl4IiUfYK/5BuzBgxmNIxh32byK+FlmbCJ4U=
+	t=1771192244; cv=none; b=prwKyMAHnm3GP4Cmvn6P1+D9xTlfvpbGmqd0WDoQlvuojATFZZ2mfY1ZVUOAi+ufLhy6Z05HiUK56/dx+y2Fd3KmQw/d7TNK3Ha2pNLkRkXm9kxkj9WSHbIIoKjnEw6bqf2PqQjtYOfwFuQ+oNfyOo658LpkN3wefEeGDABZJ7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771192181; c=relaxed/simple;
-	bh=7HVhe/DfYShgIGWXWpxUxGUKYO6YjXLOrca2JZIGxqk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YZ1txuRZQ+gnKiT/p3Ner6FrEK9ihp1k1Z5/VaFfIbA07eyUckwHh5FfrpSOXhHgrEGdXHG5tCYh1v0Od2LNUbR+PFGDfS7oYwLeivZ+6kKv2Yv9Xr6S46/j/TDQJPTcJ2/Cuf2rtyYLQ7YX9FJDV+PBoQrkumU4Ayw5kFK+glo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=N0WWeaSR; arc=none smtp.client-ip=209.85.210.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7d4c307db9aso1494217a34.3
-        for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 13:49:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1771192177; x=1771796977; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HY4iKSdZnOC2lD9r2U/xlpJrxAQ+ri4/u1JX8B2xnrQ=;
-        b=N0WWeaSRia/VO19q112Q3BLQdYXnRswu9GG7YV5wPazRLgtDedQTLhGJk+o3NEMv3r
-         Steyaadr6zfVaLu0zad0U2ERQJCZv5DzBDlhrBWiCMJdtemW+gUtvWeVmb+wku9J9q16
-         9+At/L4fUvKo0nFbcH28OBOdSnUMrXS+FoXM/Cdo0/PN1AltLWUSVuyUF5Mt8cdhgums
-         B8DgBjPLAKzYGPvdBt4tXybxfSItVZ9/v1pVgggIj56YjcIMpDv7oP+Xo6JFWTKJAc6g
-         qC6UD0umffssA9y3zn3JrVIAMrWOPAgE6c1O+fp18YtPzVr6b6ujE9+LX7NWrPe9MRU7
-         lZ/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771192177; x=1771796977;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HY4iKSdZnOC2lD9r2U/xlpJrxAQ+ri4/u1JX8B2xnrQ=;
-        b=nCPu51tqheAL8PDQaorUM28k3k/RED39YHaGUvtfy8SROuQXQ5lvdZ+jyZgHkW62jY
-         6dMXcZ/yeNxEwb5r+vU59t5HBMYy7lZ6Ao7Go+7N+T2fKeufWWqtqq8xWt0eMRp1yXYE
-         Nko7RltajeQOv2fkREuEDC8O6f5NZfr7/e6ZuvUK0wKBMNgvq1VbCwImlfsaN5s/siTV
-         wJHa+j4WE1JevdXZrOdna/KLIWfm0zeoemFgdeASwNp+N5nAoK0F/tnWLjJDT7SF/jbn
-         hWJ7/OeDOp9NSFEH0WQVd4VEMD9XUZwcx/Xb3lD5tNxlzllIUuL6Qg9RDgCqYpTBkoHl
-         OECA==
-X-Gm-Message-State: AOJu0Yw37V8ieN/SOT3gKV3WVV6UlM9+1Xr9JeMjTBd4UqDXaOPf6+hC
-	Kjj72SkJfD4BQa/dthMe5E13mRwWtlMhWzpU//jxxzJ7MgN+w7nKT0s542bRkrP8If4=
-X-Gm-Gg: AZuq6aIleEXzdu4RaCNy5WMIXWsiimodWjasNrRNUYpNfl+chiq52UXM9iga7tUoCej
-	06Bv6AVI8/tKEg+IgmNfB8tWpdpwcBnYL3/RWIYbAenOEJeO/0xDluTEfCYBvRiw68S2jYF36eQ
-	V6/B9KG5jpCjjBw1xTqrMej3X6DJ/TTde20R+67RXkgWzOt+OHsimi8tNoSjJWn/JEHS/ALx6kp
-	cwCgGmYNtxqwdgVDE/YlM6o/67sQ3rO3oc1gm+2jjwqT2VvoeYtDfAn8habzuSxjOTrRTu3ctT5
-	yJTxdQefmagh67tqywYqM3DT1MX13+OQTZDtNfzGiGG8+tNQdeMQxgnVWzKAOm2m5UhBRe9jto9
-	OEVSRxvPTfTNXWYPsphdMcyXpk2UvQDlZRcV6WRdeiXao4OLtJTJqGxpZ1Zpgnrv4k/zP8GEizN
-	x9CnZdxg3gzwmWpM1hEVvAtzQIadHw+mmO4fShjWNgIgGaTCg5ELfMMcSjGnZxZ5Fb/qIAMpHXQ
-	MAYoTPXYw==
-X-Received: by 2002:a05:6830:a90:b0:7cf:d9ba:c9a6 with SMTP id 46e09a7af769-7d4d090525dmr4389599a34.0.1771192177368;
-        Sun, 15 Feb 2026 13:49:37 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d4a75309bcsm11301383a34.1.2026.02.15.13.49.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 15 Feb 2026 13:49:36 -0800 (PST)
-Message-ID: <540635ba-d96b-449c-95f8-bc2a0ad7931d@kernel.dk>
-Date: Sun, 15 Feb 2026 14:49:36 -0700
+	s=arc-20240116; t=1771192244; c=relaxed/simple;
+	bh=Dtf+8iAY0/nR0Q1UvYDCOzOiMW4PSm3WaauDupv65LU=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=OTlmG9yDN5em5890JKFKSO1UggoaQz2DZwuN0dX6pVMAazt2KPfbWYOvGoHguOM5K/+opQqpBaN916awvMjBzV2pmbX7TUUsfTgsCumROSHN2+9hmEUhxgqa8RMMLrcLT8unBt/sG98ONv0/1vKhgzNrHeuDz0lkUi/AqFX2do0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HGmZd2Ta; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3DD3C4CEF7;
+	Sun, 15 Feb 2026 21:50:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771192243;
+	bh=Dtf+8iAY0/nR0Q1UvYDCOzOiMW4PSm3WaauDupv65LU=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=HGmZd2TayGfTVjnC6M4T0MtMekwYqP2xEApEHXKgi00h7y1zKt0UNUS8btbBMd7S3
+	 TL0WQ3XSc+98f3pF4DGDw8jbgn6dzoz5DoUKZQwCNjaPcjRtTT3sJxOecRbFfCwSDL
+	 fC73vjQwPoSa94b5t29EAepiCqTO0SqtSZb4xTED6AAoVnVi8dDJxaf2T4BJdhJYnM
+	 OqZnJItNUKIdoErFfIj0D3qW191z9q1xCHhEXFU5aBdNA7Y16ol67S6ANyQMxpsCRL
+	 OeoQY/+2qIk+Im/eQB6edop8p4ZFWwlxH189stkXeTs/v4Rv9UdOxJUWMhB8YVLtZY
+	 DWTLTXnrUfBlw==
+Content-Type: multipart/mixed; boundary="===============0197281021437678642=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH io_uring-7.0] io_uring/query: return support for custom rx
- page size
-To: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org
-Cc: netdev@vger.kernel.org
-References: <2e8280467c93ead0c61ed3d68c036d6a0474bb78.1771188227.git.asml.silence@gmail.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <2e8280467c93ead0c61ed3d68c036d6a0474bb78.1771188227.git.asml.silence@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Message-Id: <0e28e4c337ddd569844020f2a999c7becc918fa9cfe2a0e0fa21ca363d3bb1f7@mail.kernel.org>
+In-Reply-To: <20260215204353.3645744-6-kuniyu@google.com>
+References: <20260215204353.3645744-6-kuniyu@google.com>
+Subject: Re: [PATCH v1 bpf/net 5/6] sockmap: Consolidate sk_psock_skb_ingress_self().
+From: bot+bpf-ci@kernel.org
+To: kuniyu@google.com,john.fastabend@gmail.com,jakub@cloudflare.com
+Cc: willemdebruijn.kernel@gmail.com,cong.wang@bytedance.com,kuniyu@google.com,kuni1840@gmail.com,bpf@vger.kernel.org,netdev@vger.kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Sun, 15 Feb 2026 21:50:43 +0000 (UTC)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	CTYPE_MIXED_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[kernel-dk.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258804-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+,1:+];
+	FREEMAIL_TO(0.00)[google.com,gmail.com,cloudflare.com];
+	FREEMAIL_CC(0.00)[gmail.com,bytedance.com,google.com,vger.kernel.org,kernel.org,iogearbox.net,linux.dev,meta.com];
+	TAGGED_FROM(0.00)[bounces-258805-lists,netdev=lfdr.de,bpf-ci];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[kernel.dk];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel-dk.20230601.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[axboe@kernel.dk,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[3];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[kernel.dk:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6BCDA13FD1D
+	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.kernel.org:mid]
+X-Rspamd-Queue-Id: 5A12513FD2C
 X-Rspamd-Action: no action
 
-On 2/15/26 2:34 PM, Pavel Begunkov wrote:
-> Add an ability to query if the zcrx rx page size setting is available.
-> 
-> Note, even when the API is supported by io_uring, the registration can
-> still get rejected for various reasons, e.g. when the NIC or the driver
-> doesn't support it, when the particular specified size is unsupported,
-> when the memory area doesn't satisfy all requirements, etc.
-> 
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> ---
-> 
-> It's a simple change, would be great to have in 7.0 so it comes in the
-> same release with the feature.
+--===============0197281021437678642==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Looks fine, only replying to say that I think all of the ones posted
-today should just hit 7.0, no reason to defer any of them.
+> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+> --- a/net/core/skmsg.c
+> +++ b/net/core/skmsg.c
 
--- 
-Jens Axboe
+[ ... ]
 
+> static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
+>-				u32 off, u32 len, gfp_t gfp_flags)
+>+				u32 off, u32 len, gfp_t gfp_flags, bool take_ref)
+> {
+> 	struct sock *sk = psock->sk;
+> 	struct sk_msg *msg;
+> 	int err = -EAGAIN;
+>
+> 	msg = alloc_sk_msg(gfp_flags);
+> 	if (!msg)
+> 		goto out;
+
+[ ... ]
+
+> 	skb_set_owner_r(skb, sk);
+>-	err = sk_psock_skb_ingress_enqueue(skb, off, len, psock, sk, msg, true);
+>+	err = sk_psock_skb_ingress_enqueue(skb, off, len, psock, sk, msg, take_ref);
+
+[ ... ]
+
+>-/* Puts an skb on the ingress queue of the socket already assigned to the
+>- * skb. In this case we do not need to check memory limits or skb_set_owner_r
+>- * because the skb is already accounted for here.
+>- */
+>-static int sk_psock_skb_ingress_self(struct sk_psock *psock, struct sk_buff *skb,
+>-				     u32 off, u32 len, bool take_ref)
+>-{
+>-	struct sk_msg *msg = alloc_sk_msg(GFP_ATOMIC);
+>-	struct sock *sk = psock->sk;
+>-	int err;
+>-
+>-	if (unlikely(!msg))
+>-		return -EAGAIN;
+>-	skb_set_owner_r(skb, sk);
+>-
+>-	/* This is used in tcp_bpf_recvmsg_parser() to determine whether the
+>-	 * data originates from the socket's own protocol stack. No need to
+>-	 * refcount sk because msg's lifetime is bound to sk via the ingress_msg.
+>-	 */
+>-	msg->sk = sk;
+
+The consolidated sk_psock_skb_ingress() does not carry forward this
+msg->sk = sk assignment. alloc_sk_msg() uses kzalloc, so msg->sk
+will be NULL for self-ingress messages.
+
+In __sk_msg_recvmsg(), the from_self flag is set based on msg->sk:
+
+    from_self = msg_rx->sk == sk;
+
+This controls copied_from_self accumulation, which
+tcp_bpf_recvmsg_parser() uses to advance tcp->copied_seq:
+
+    seq += copied_from_self;
+    ...
+    WRITE_ONCE(tcp->copied_seq, seq);
+
+With msg->sk now always NULL, copied_from_self will always be zero
+for TCP sockets using a BPF verdict program that returns SK_PASS.
+tcp->copied_seq won't advance, which would affect TCP receive window
+advertisement.
+
+Should this assignment be preserved in the consolidated function
+when skb->sk == sk?
+
+>-	err = sk_psock_skb_ingress_enqueue(skb, off, len, psock, sk, msg, take_ref);
+>-	if (err < 0)
+>-		kfree(msg);
+>-	return err;
+>-}
+
+
+---
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/22042899757
+
+AI-authorship-score: low
+AI-authorship-explanation: Commit is part of a coherent series from a known kernel maintainer addressing specific syzbot bugs, with typical kernel commit style and mechanical refactoring consistent with human development workflow.
+issues-found: 1
+issue-severity-score: medium
+issue-severity-explanation: Dropped msg->sk assignment breaks TCP copied_seq tracking for sockmap verdict SK_PASS path, affecting TCP receive window advertisement and potentially stalling connections under sustained traffic.
+
+--===============0197281021437678642==--
 
