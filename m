@@ -1,147 +1,373 @@
-Return-Path: <netdev+bounces-258812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258813-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QByoLUpXkmmjtAEAu9opvQ
-	(envelope-from <netdev+bounces-258812-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 00:31:22 +0100
+	id SGe6BGRXkmmjtAEAu9opvQ
+	(envelope-from <netdev+bounces-258813-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 00:31:48 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBACE140155
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 00:31:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8189D140163
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 00:31:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DBF9B300E725
-	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 23:31:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5653930097C2
+	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 23:31:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D0BC1D8E01;
-	Sun, 15 Feb 2026 23:31:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7A8C221DB1;
+	Sun, 15 Feb 2026 23:31:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=osuchow.ski header.i=@osuchow.ski header.b="Bx+05q8A"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LxgcbX2w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16EF02BB13
-	for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 23:31:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3126A1D8E01
+	for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 23:31:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771198278; cv=none; b=CstaPi0xMARp2noU7JPttG1YznVreYKsNitZ9jVDDsIB2vM1koPMyVrS7HM71pGou2IAH/dpXnaQNg3UEpYLJPH9amjHOJIFWGNocZklR7U+TVSQ2+7PIGWujC4ES0Uolw1N/CWEhTZrhrTpzfH2fBgY2OxZYOQ9TXzfsY9ff78=
+	t=1771198291; cv=none; b=P2MixjlsXkFMe44mfOZmaQ1s8ASvoSsHcdfK10zAb1WdKgwYhOYc4wTpkLu+BaEyxjStzXe+DV8whubokmoIqFjkAdVBxWIuIX1ZKmzZwu5DrEIX6PfTK2uWSYuEAmcvTDCEc+CuOlZHORjHOkEMcgDKEZV92YiRYNSNhgJqEx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771198278; c=relaxed/simple;
-	bh=iivCrwTDj2e0lDHcqehqUw25vpus3xOewUA9Y848Dp8=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=iXlr0yBeXS0C4IA+ZV8zMLZWBrrzKEY/Vpl9+W7qEYNOhdpEhWaJbWv3n0GUHjjkcjRU3K6Jm4PjbInQ7MUHtQe/HXaCGX/i1Rfcfo3UI4DCqUGiqYQReXLrqLuCDt2vqT3hsJCMOeIARxgZWsEVnfp1FqYFWJOwywyq27AIGjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=osuchow.ski; spf=pass smtp.mailfrom=osuchow.ski; dkim=pass (2048-bit key) header.d=osuchow.ski header.i=@osuchow.ski header.b=Bx+05q8A; arc=none smtp.client-ip=80.241.56.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=osuchow.ski
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=osuchow.ski
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4fDhxB1sr8z9t7G;
-	Mon, 16 Feb 2026 00:31:10 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=osuchow.ski; s=MBO0001;
-	t=1771198270;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0K8eqE2iYjh6T9LLAq+lk1JsTdCZpb+JpruUem7Wtig=;
-	b=Bx+05q8AaOisxwkloMG2Zl6zQdJubaxhwiFDn9QmEaS/sYvH4wz/7zMFQrBZ4atUu16LT5
-	bfxKvTrY+LfxKK+sK0xSA1kavWAjzSS2XJjdoCIbYYrZi5/RsO+47vY7PZTxzOTMMlQz5+
-	k9+x+onOXiKUwGjbaP5NhcCDnHjVPsYewhDExLFQZlYW/QvnpmekNa87Jenc7yjLtcCp59
-	pLBYlrLggSxdPuEHBoiWcrgutM9IYVTTbyu61tDwCbOgZpSvshvP/Trw9QudQ6rRQs6rz5
-	ajGP5xOQQa+MWKp1193rEiy6g726OYiQ2UmtHt+VdOBvZn7APRz19ZUXhLNSFg==
-Authentication-Results: outgoing_mbo_mout;
-	dkim=none;
-	spf=pass (outgoing_mbo_mout: domain of linux@osuchow.ski designates 2001:67c:2050:b231:465::102 as permitted sender) smtp.mailfrom=linux@osuchow.ski
-Message-ID: <d3e7fa70-4035-47e0-89cc-92d636497198@osuchow.ski>
-Date: Mon, 16 Feb 2026 00:31:08 +0100
+	s=arc-20240116; t=1771198291; c=relaxed/simple;
+	bh=/UTZ3+eESrAxvzZCIeUe9RqgzV+4GH08uO+QHKmgYvU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YX7H3nebUgptyz/vN0LvJeouTlv9bNl+tyOoxuoZLJGIYcft4rhZqfy+uUhGCtb4L5kAF65AzU9eV0Rt/cgvcy3EAq5yb/UMGoGGxm/DNg9S90iSVTlNrnj+m38RWgDtU7LKz3/cJVLTwshPv0LoIvn/RQ2TDpWTPsLP9vHh2qw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LxgcbX2w; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4834826e5a0so25732355e9.2
+        for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 15:31:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771198288; x=1771803088; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=StVXhxzh9g9psFpbjyJgn5evB1o+q9oCzqQx6kpImaM=;
+        b=LxgcbX2wis8B9KUKx89WHjhR7rDv4RLlywBc79iI2Ef033eYbgO8b1B/mwBpC4UNPZ
+         tTeNliqHe0hb9K8TpqflQ/T7C8pETy/5X+VmEJq6nb/uOmahFOJtYHWOdYdDVqPaS4iG
+         9WJBYvW/T67Eq/L26wsQjAnuCXr0yVWjVtwNb6NYtw3bfA5C6WY5xspsvCI7XDE1D5hR
+         VVuEQMf1jqMdXLcL7Ibd2x38+SQG4SE4ZU5IHn0AupZ+zRWc6U7fEF5F5z4zdZaWL+rA
+         2qWJRyF6a4fLbYzn/K7UDsreWtDuyqzLX0aLGiyIjp2i5mmykdXp3baojL7djx5au/3T
+         swxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771198288; x=1771803088;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=StVXhxzh9g9psFpbjyJgn5evB1o+q9oCzqQx6kpImaM=;
+        b=feZGnl+9BGsjFxUlVgGy3PeEmXABrIRcZ72P3tALWEuv7XXxQ+qE6HidZ0HWO7Nue9
+         krw7LZiPJU3JTaV4DFgUsgamhA0JVAJrrF7/2cBu3KDnNdwMN6HClwJUI93M2Z4ZuK0+
+         RIzE7HSpYlEqOuh0F+NwjSHVlyDJRBUs4TC7vpuzMmfqNGwej6QZWw6lQvA97BgOKF+Y
+         Efd1036TXADHT93DUbFGsxIz3o7l+iVLVBTa43J+xL7SgGcReU9BWf64wkJmegBO2VOG
+         kv+A+jepRTC/XptjZHLYCafVYVTlBILvliaenOjbIBktgGcvw86SImL+isWgMDwJVgtg
+         POww==
+X-Forwarded-Encrypted: i=1; AJvYcCXlx0aYBvL9sz/0H9wwUQo99JMy5viCJCS5m4CSgJIG7wo+ic7Xymv2sTedZIYvqt6FRArN3mQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQfREb7wAcPTl7jatSYcngn+iH0UQBJv8ob2NaDr5kpipAxzTh
+	l/fulk8wABzELtrs8UKUM0lP4RGTVVBWc23dzxWyQOHVxhW1nziRnpyl
+X-Gm-Gg: AZuq6aKuA2K+YyHLlPqrqgTF4yCslTKcvMnnY/SnD4N1/QQGrW2QNtOB0r7vbj+CTH8
+	c45LEPHvQKIkEGXkN/JX8o4PrtVsKQLcvq10UIHUCF1nqt2fJsaS6m6HTnSotCgJEyxdfgOrApb
+	ST1fMQrcN2J/3I7bTJMZpE3LWbiDKL2EXOl78uCHd4vtsWC/1tTG5hTQnnLqrueWlY9jm/TtacP
+	r8rZBwkNPlCl9Xu8bSjckOOICVPsrxplYQoNLOUqn2fTL2zs+j33t1s9d7Nqe3lihojno31qYlc
+	SowPTVV1cu0TUbKV3HLamzdl7+Zbwr0uqaFFAMezTBgL97C97ChwHigfC+9PQxm9IZ/qU3WssMT
+	F8uHZU76cF7BugFODpCYbGHoeKVFJTSbH57g7+S1Xv+IEtYUsvtLN2T710nisnTfDIxGm+34a4r
+	5JK/XRgbYXnlvjs2e8/uwQFOHmeZ0/b/e6/8zhyf1fa4p8txhczwGXXmkB0B8rXrSeGXtdXuxN/
+	VkQ4RWP9P5WrqVV8mNGRXXoEun58Q==
+X-Received: by 2002:a05:600c:524d:b0:483:4807:210c with SMTP id 5b1f17b1804b1-48373a5d7a0mr179075505e9.24.1771198288454;
+        Sun, 15 Feb 2026 15:31:28 -0800 (PST)
+Received: from 127.mynet ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43796ad112bsm22924803f8f.36.2026.02.15.15.31.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 15 Feb 2026 15:31:27 -0800 (PST)
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: io-uring@vger.kernel.org
+Cc: asml.silence@gmail.com,
+	axboe@kernel.dk,
+	netdev@vger.kernel.org
+Subject: [PATCH 1/1] io_uring/zcrx: move zcrx uapi into separate header
+Date: Sun, 15 Feb 2026 23:31:20 +0000
+Message-ID: <14826e580830261478a74ed89941694538209bab.1771198073.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Dawid Osuchowski <linux@osuchow.ski>
-Subject: Re: [ANN] netdev development stats for 7.0 (and some AI review
- thoughts)
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org
-References: <20260212124208.187e53ae@kernel.org>
-Content-Language: en-US
-In-Reply-To: <20260212124208.187e53ae@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[osuchow.ski,none];
-	R_DKIM_ALLOW(-0.20)[osuchow.ski:s=MBO0001];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	TAGGED_FROM(0.00)[bounces-258812-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258813-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.dk,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linux@osuchow.ski,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[osuchow.ski:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
+	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_THREE(0.00)[4];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: BBACE140155
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8189D140163
 X-Rspamd-Action: no action
 
-On 12/02/2026 21:42, Jakub Kicinski wrote:
-> Hi!
-> 
+Split out zcrx uapi into a separate file. It'll be easier to manage it
+this way, and that reduces the size of a not so small io_uring.h. Since
+there are users that expect that zcrx definitions come with io_uring.h,
+it includes the new file.
 
-<snip>
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+---
 
-> 
-> Testing
-> -------
-> 
+Depends on the patch that added querying zcrx features
 
-<snip>
 
-> One more note on testing, we have completed the migration of NIPA
-> to netdev foundation machines. Due to DRAM shortage, however,
-> the shipment of additional machines is delayed.
+ include/uapi/linux/io_uring.h      |  96 +------------------------
+ include/uapi/linux/io_uring/zcrx.h | 108 +++++++++++++++++++++++++++++
+ 2 files changed, 110 insertions(+), 94 deletions(-)
+ create mode 100644 include/uapi/linux/io_uring/zcrx.h
 
-Just something I noticed that might be connected to this is that the 
-links to "Raw output" in these announcements broke for each previous 
-message you posted.
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index 6750c383a2ab..7a70ec70ff04 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -10,6 +10,8 @@
+ 
+ #include <linux/fs.h>
+ #include <linux/types.h>
++#include <linux/io_uring/zcrx.h>
++
+ /*
+  * this file is shared with liburing and that has to autodetect
+  * if linux/time_types.h is available or not, it can
+@@ -1049,100 +1051,6 @@ struct io_timespec {
+ 	__u64		tv_nsec;
+ };
+ 
+-/* Zero copy receive refill queue entry */
+-struct io_uring_zcrx_rqe {
+-	__u64	off;
+-	__u32	len;
+-	__u32	__pad;
+-};
+-
+-struct io_uring_zcrx_cqe {
+-	__u64	off;
+-	__u64	__pad;
+-};
+-
+-/* The bit from which area id is encoded into offsets */
+-#define IORING_ZCRX_AREA_SHIFT	48
+-#define IORING_ZCRX_AREA_MASK	(~(((__u64)1 << IORING_ZCRX_AREA_SHIFT) - 1))
+-
+-struct io_uring_zcrx_offsets {
+-	__u32	head;
+-	__u32	tail;
+-	__u32	rqes;
+-	__u32	__resv2;
+-	__u64	__resv[2];
+-};
+-
+-enum io_uring_zcrx_area_flags {
+-	IORING_ZCRX_AREA_DMABUF		= 1,
+-};
+-
+-struct io_uring_zcrx_area_reg {
+-	__u64	addr;
+-	__u64	len;
+-	__u64	rq_area_token;
+-	__u32	flags;
+-	__u32	dmabuf_fd;
+-	__u64	__resv2[2];
+-};
+-
+-enum zcrx_reg_flags {
+-	ZCRX_REG_IMPORT	= 1,
+-};
+-
+-enum zcrx_features {
+-	/*
+-	 * The user can ask for the desired rx page size by passing the
+-	 * value in struct io_uring_zcrx_ifq_reg::rx_buf_len.
+-	 */
+-	ZCRX_FEATURE_RX_PAGE_SIZE	= 1 << 0,
+-};
+-
+-/*
+- * Argument for IORING_REGISTER_ZCRX_IFQ
+- */
+-struct io_uring_zcrx_ifq_reg {
+-	__u32	if_idx;
+-	__u32	if_rxq;
+-	__u32	rq_entries;
+-	__u32	flags;
+-
+-	__u64	area_ptr; /* pointer to struct io_uring_zcrx_area_reg */
+-	__u64	region_ptr; /* struct io_uring_region_desc * */
+-
+-	struct io_uring_zcrx_offsets offsets;
+-	__u32	zcrx_id;
+-	__u32	rx_buf_len;
+-	__u64	__resv[3];
+-};
+-
+-enum zcrx_ctrl_op {
+-	ZCRX_CTRL_FLUSH_RQ,
+-	ZCRX_CTRL_EXPORT,
+-
+-	__ZCRX_CTRL_LAST,
+-};
+-
+-struct zcrx_ctrl_flush_rq {
+-	__u64		__resv[6];
+-};
+-
+-struct zcrx_ctrl_export {
+-	__u32		zcrx_fd;
+-	__u32 		__resv1[11];
+-};
+-
+-struct zcrx_ctrl {
+-	__u32	zcrx_id;
+-	__u32	op; /* see enum zcrx_ctrl_op */
+-	__u64	__resv[2];
+-
+-	union {
+-		struct zcrx_ctrl_export		zc_export;
+-		struct zcrx_ctrl_flush_rq	zc_flush;
+-	};
+-};
+-
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/include/uapi/linux/io_uring/zcrx.h b/include/uapi/linux/io_uring/zcrx.h
+new file mode 100644
+index 000000000000..3163a4b8aeb0
+--- /dev/null
++++ b/include/uapi/linux/io_uring/zcrx.h
+@@ -0,0 +1,108 @@
++/* SPDX-License-Identifier: (GPL-2.0 WITH Linux-syscall-note) OR MIT */
++/*
++ * Header file for the io_uring zerocopy receive (zcrx) interface.
++ *
++ * Copyright (C) 2026 Pavel Begunkov
++ * Copyright (C) 2026 David Wei
++ * Copyright (C) Meta Platforms, Inc.
++ */
++#ifndef LINUX_IO_ZCRX_H
++#define LINUX_IO_ZCRX_H
++
++#include <linux/types.h>
++
++/* Zero copy receive refill queue entry */
++struct io_uring_zcrx_rqe {
++	__u64	off;
++	__u32	len;
++	__u32	__pad;
++};
++
++struct io_uring_zcrx_cqe {
++	__u64	off;
++	__u64	__pad;
++};
++
++/* The bit from which area id is encoded into offsets */
++#define IORING_ZCRX_AREA_SHIFT	48
++#define IORING_ZCRX_AREA_MASK	(~(((__u64)1 << IORING_ZCRX_AREA_SHIFT) - 1))
++
++struct io_uring_zcrx_offsets {
++	__u32	head;
++	__u32	tail;
++	__u32	rqes;
++	__u32	__resv2;
++	__u64	__resv[2];
++};
++
++enum io_uring_zcrx_area_flags {
++	IORING_ZCRX_AREA_DMABUF		= 1,
++};
++
++struct io_uring_zcrx_area_reg {
++	__u64	addr;
++	__u64	len;
++	__u64	rq_area_token;
++	__u32	flags;
++	__u32	dmabuf_fd;
++	__u64	__resv2[2];
++};
++
++enum zcrx_reg_flags {
++	ZCRX_REG_IMPORT	= 1,
++};
++
++enum zcrx_features {
++	/*
++	 * The user can ask for the desired rx page size by passing the
++	 * value in struct io_uring_zcrx_ifq_reg::rx_buf_len.
++	 */
++	ZCRX_FEATURE_RX_PAGE_SIZE	= 1 << 0,
++};
++
++/*
++ * Argument for IORING_REGISTER_ZCRX_IFQ
++ */
++struct io_uring_zcrx_ifq_reg {
++	__u32	if_idx;
++	__u32	if_rxq;
++	__u32	rq_entries;
++	__u32	flags;
++
++	__u64	area_ptr; /* pointer to struct io_uring_zcrx_area_reg */
++	__u64	region_ptr; /* struct io_uring_region_desc * */
++
++	struct io_uring_zcrx_offsets offsets;
++	__u32	zcrx_id;
++	__u32	rx_buf_len;
++	__u64	__resv[3];
++};
++
++enum zcrx_ctrl_op {
++	ZCRX_CTRL_FLUSH_RQ,
++	ZCRX_CTRL_EXPORT,
++
++	__ZCRX_CTRL_LAST,
++};
++
++struct zcrx_ctrl_flush_rq {
++	__u64		__resv[6];
++};
++
++struct zcrx_ctrl_export {
++	__u32		zcrx_fd;
++	__u32 		__resv1[11];
++};
++
++struct zcrx_ctrl {
++	__u32	zcrx_id;
++	__u32	op; /* see enum zcrx_ctrl_op */
++	__u64	__resv[2];
++
++	union {
++		struct zcrx_ctrl_export		zc_export;
++		struct zcrx_ctrl_flush_rq	zc_flush;
++	};
++};
++
++#endif /* LINUX_IO_ZCRX_H */
+-- 
+2.52.0
 
-It is possible to use the new link convention/format:
-
-	Raw output: https://netdev.bots.linux.dev/ml-stats/stats-7.0
-
-to go back as far as 6.18 stats e.g.:
-
-	https://netdev.bots.linux.dev/ml-stats/stats-6.18
-
-but beyond that (6.17 and older) it doesn't work. The "old" nipa links:
-
-	Raw output: https://netdev.bots.linux.dev/static/nipa/stats-6.19/stdout
-
-are completely broken.
-
-P.S. I am using a freshly setup email client on a new machine so 
-apologies if the formatting is wrong on my end. I did send this message 
-to myself for testing and I think it's okay, but I might be missing 
-something :)
-
-Kind regards,
-Dawid
 
