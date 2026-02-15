@@ -1,220 +1,394 @@
-Return-Path: <netdev+bounces-258767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258768-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eA2kA0+ikWnnkwEAu9opvQ
-	(envelope-from <netdev+bounces-258767-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 11:39:11 +0100
+	id OGMEEHelkWmWlAEAu9opvQ
+	(envelope-from <netdev+bounces-258768-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 11:52:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3452D13E7EB
-	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 11:39:10 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F9B813E83B
+	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 11:52:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E24AA3002F6B
-	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 10:39:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 47F463011BE5
+	for <lists+netdev@lfdr.de>; Sun, 15 Feb 2026 10:52:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C451A2BE7C6;
-	Sun, 15 Feb 2026 10:39:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09BEB2D8DD9;
+	Sun, 15 Feb 2026 10:52:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZFztg3Ui";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="IcH2trGG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RStWDGb2"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77EF8285CB9
-	for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 10:39:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 538C929D275
+	for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 10:52:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771151945; cv=none; b=RAgrVOycLymDgc2/yKWVuhoPEKQNNS6h1zzB6EXSXX/w74t9ZZPqMK+E34/APZR7FuTujrwdSeIijO8fBKatV9U0vEimzKhX51jjd1ooH1O4eKMJ2YdAyOvNbeg+mHIitKX6dVlo3n5A2LaCX6styypJpCsAzT37Eb4OGEb9xYo=
+	t=1771152753; cv=none; b=W8JzQ2+mcY3ijj1rb6tBQIuKSUiRLqTo+mdBuVOIJesmZU3ddncjuG6T8Cxh25FdIuxWJeidXuIaVbQJFK1nXkJDLJ5PP1brGVRL/6cUF/6ClxKn1EwXsi/dFtRf6WnZvAjAg9fbQc9AdeOjbbkNtGoaXHiPnwGK3xl9Pbofmns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771151945; c=relaxed/simple;
-	bh=s0Gz1lbX6oWHaXjniFNDuQXFzRewjGHyGyA3SEPcAvc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P8lw1d2ktN0jcq7i3wfSLQma70fg12qi6O14QUwzdqDpguRf5VoHAh88HIMHLPk9ckcuImOD3qqqJqNUeJJN487rQ4DuP1qMp6HrWxnRTnxg6o++MnEiMyw+bmGAChDsb4ALaXXJG8EfhiJqmz0JkCKHk3dtIW7739bBqPQlNpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZFztg3Ui; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=IcH2trGG; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1771151943;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OaK+6zMcYsiCWtoK8iSxqAKGi6QUUb+Bn/H6Es8PiBw=;
-	b=ZFztg3UiRYdFfJXbeFjUZxd0Qs/UNBZ4HXWrIwC1N+VzUkYEDctO/G90819GpWCEZWMGHe
-	ktw+BM1vx2hO2m9dx8ypX85EaZIj4CcPRkKxWOkRk9ZTX0ogo5S3I/dXsSeH7qmaV6kQ9E
-	yfUz6tlGAS2P8exkQ4nfVTnrl7pI2uk=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-100-q4JxoF_5P-CbumjAkN9Ydw-1; Sun, 15 Feb 2026 05:39:01 -0500
-X-MC-Unique: q4JxoF_5P-CbumjAkN9Ydw-1
-X-Mimecast-MFC-AGG-ID: q4JxoF_5P-CbumjAkN9Ydw_1771151940
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-437159d3ff2so2643943f8f.1
-        for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 02:39:01 -0800 (PST)
+	s=arc-20240116; t=1771152753; c=relaxed/simple;
+	bh=wQuYZonEityn8PlExbzzBrW46hHoaJy6JwsTaQiJkyo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kog3XAQb7pRKiFQbmJzE49APs61b/zV0mqeq/YJDDmTzXwlPdGmp13OA/ni8LdoBvGsK5YsHsNodx8L3vH7MnKcpNTPsIKthHduhBTI7n4nY2JSJtqhbBHDGz/3Nly+MzP1BIeqRzkT4xdQ7SLmABmhQXNbcxwKDMpu5rvgezY8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RStWDGb2; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-4377174e1ebso1621761f8f.3
+        for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 02:52:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1771151940; x=1771756740; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OaK+6zMcYsiCWtoK8iSxqAKGi6QUUb+Bn/H6Es8PiBw=;
-        b=IcH2trGGVaOayp9/6bklHqS5tNfKvUpNMZjjbYTFwXtRaLHOeY3ouk+taFEJvV9Vie
-         wauenIrpUFF4UD2eL5dmZ579ZUs/39oRhvWV2olcq6pmHV0hwGRCTAPfHE4aSsqzR2Ug
-         tXFTTi3X+ri4k6dUIDGh3YU0LFFd1bsZ5PQSIIVNZMKd7W6ybjTHdNYiawZZt7slHTma
-         QIZpvB5umd6qRLoJe6vyAWHg0Biaet5wNyPy9h24KsnoT/a840xvxTSeQriVOAKlFCI0
-         s4DdpN70QHeE24wOzjt2LFtbZpYiU3/68JWmeCg6fVpBTgA5JeI1vMYYiwYJPYXTZbSJ
-         Mbqg==
+        d=gmail.com; s=20230601; t=1771152750; x=1771757550; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6ZI0LjX6XMnvD2HmZqsxyHHzFAJmwROlDjLzHkLvEUk=;
+        b=RStWDGb2oYBRKhQ7WYujNb5AIMA7kPvyYVKAKJZx1Ps061Afat+a6qC0whPI0Npctt
+         pQWLfReKYMhHbNx21dpmgqmwDhs/LYJR68MK7c3OqIzubG17gdqr2Jh85WbYhKyQZaqb
+         HMdBql8EwvM/fw2M3hobFrc14Ynryov2WDtRtb7LEd9ft1XbL/HkFGVIKKMe4VVa7Yo1
+         lvmq8tFzEtm7EuqeSr1UhShzbwXGbkQ+HhAYA8WaPP4NkPY5Nx2qFaamjZWX8Jyjugeu
+         6TVmgQAX4jUdoWRJky2XRWkgP8dwEDPaBXW2cXkwbXb1ZqdiVDouRctL2AeVK4/Syqlq
+         fEfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771151940; x=1771756740;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OaK+6zMcYsiCWtoK8iSxqAKGi6QUUb+Bn/H6Es8PiBw=;
-        b=kOlpr1o1oN8//tTGem84ig7uLSEfDLoAhmClKE6XvTkjsYoxbltS+0utyxySs3wAwG
-         2kiRsVLoJPXB1vjlx1rd5OPi1V7sm6pcq3GdgGnsXTrxHcxBOuEbw9rqCANn74JctVo9
-         jYqqES/bRQpq+qRUf14ygEqCrHoLlKIOZYtVJliknmf5d1nGv6cB5ZmlIQWJtviuRj0v
-         tzESCB91be37ERvEs6ItOSSYImvofcckafDLzoUk6ZTT4WxZPm9vyVKcUZD8MvsSgEt1
-         ft2b+K3aLBWxo00ohkNijV8NVAar87hF++x57e7s+75XlLD6z0v4YOfSfG079/bvwZ28
-         rIJg==
-X-Forwarded-Encrypted: i=1; AJvYcCUMVZ/l56UtgtzopHDln0RtFDzdJkOMbhU169j7YWaOxC4rmP0N9lY2W0TS/xjWg4d3FXXD0tQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKZF7oyuYU6wvh90FpvMLvJrlmAOnygR3ws+L/404p8ZT+pIIq
-	8JGcfFlvkmI2hPmBQIk03dZZxQI/MODwXaob2kjzhWG9ZB+x7p9ArVUXR5Mc4JzICB/VD+rYk5n
-	tiasyw2zOChDZLxQSNPLM9itFJdCNp/NkvbHxpKUVCzAzANUWm+eu4fqm7Q==
-X-Gm-Gg: AZuq6aIHwIAejvLPWrpp8bdCUJSMiZHKRMfZRmopJkfAhMz9Fl7aWNSetJv5ggCBUa5
-	FhcY1zuU+iCR4FgSQGexGiyyGmIeAp83M5Pd7tGJeHPIiOBgOzCQAKGuWRj6mOl+hg44uVcCJRp
-	I/AsILrON0qL8Tf2XkJID9Yj20dca/dDs7pqCoKSFUhze6aIfjmJtknHP8c/iuKZdey6ntLvVxY
-	v7zrIkpR3P6pFPmyNHrfSrtp0H3HmSShIGp3z5f0ZXXjFTUJBbUu7dIfnrmdikWE0uVmCZf4boK
-	TVJqOBnkZ1aBEaf0wURxFibpfACArA+jeweACfEWwFoUzxqB5jdu/wSleggLfHiutzv4TJkwLEb
-	wrpnwQvJGRGOGU+4oLJXHdPWX1/I65FLW+wbVeL6VwNApAA==
-X-Received: by 2002:a05:6000:26cd:b0:435:a815:dd8d with SMTP id ffacd0b85a97d-43796b04f57mr14262758f8f.55.1771151940325;
-        Sun, 15 Feb 2026 02:39:00 -0800 (PST)
-X-Received: by 2002:a05:6000:26cd:b0:435:a815:dd8d with SMTP id ffacd0b85a97d-43796b04f57mr14262729f8f.55.1771151939812;
-        Sun, 15 Feb 2026 02:38:59 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-34-155.inter.net.il. [80.230.34.155])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43796ad112bsm19183634f8f.36.2026.02.15.02.38.57
+        d=1e100.net; s=20230601; t=1771152751; x=1771757551;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6ZI0LjX6XMnvD2HmZqsxyHHzFAJmwROlDjLzHkLvEUk=;
+        b=D8+lGt6VuZHvGrpYu9MSNAdRMYDJhUSl//sflqc9dVRbSfiu8VjpCDsm342Sns1kT4
+         S0Zx0nqMsdsx+55rzTqx2dHMqbUpsm4ts3DwlG6HUg4hCjDY2cmAX5a8cCzNB4uqCa9F
+         IL6Hmo68so8NjavqzZzSiXmvwp/dWXrccWhajdt3r71IPH4o3JAmav59cOlLDg50lB39
+         e+D4qaazYMeZDgnYNx3gwMmtTzj78J9nq6vtKMTdoqb+wHn6JASBuu876KX8Dx8tKoD0
+         tGkwb2YOj9d5jx+Efhe6fOWNYkDR+9j2EiV39+kuzaEnqNnrG+JN7KmGZnI9M33DOFKc
+         I4Fw==
+X-Forwarded-Encrypted: i=1; AJvYcCUF1Dxn8+y9iWVDJKKPvqd4YPmKJTBu0MOGZc7Azim+QENuNovz86YhqptxG7GGVcnWbXmYHOA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQr4NL+iea5wzinHR9AOVihqR87zoVk2mmPNEQW3h3UxGPCqUr
+	/7ExvzMoaM+PTDRssZAUwCLD/5hH2tUJyuKg3xLASWlKCiPqMSUBYlH0
+X-Gm-Gg: AZuq6aKVBX7BI1b3KIH1FgJwnK/xwzQdqqWDSqzN26d/USpe8KLGKgKgO86q/W2YXUX
+	aCZNWTNbCKAcnn5H+dlXLT+VxbpmXtWnIHjnarrx+Rs+ODZiSET9IP09MLGDJNAyhaXZu0BuXOq
+	OWr6IEr7tAYT7YTPT0bn2IQwlBm5QXc8alGoyEXFzzWQ89cUMkp4RR8JVwZOC12WOkDNQe949Ic
+	gJH9tSqwPaX1/wof31g3dNGiXF6149Gm+cRr4DWw7oWogJS5YSRDCHxbhkD+Fis0OaGnXsNA2sp
+	hRUbGAK2TNuppDCtTlwY2Rhhk7k2INBMEE9/W0tDTTLKslAD4p3TRLYwlX/A8rOEyGHrGyGz9EF
+	gSZOmMV0Uy39LmLjrco6csU8qkj9aeTIQbgxRmSQcJvqtvDYDJW6H6+Pn7F+VtQTbgjBpS3eL7+
+	bZYXfdPTwfZiRTuEvfe8rT7+1xBqnrLqLu8I5ZqLaTuXueSvDM4GXd1z3j4cI=
+X-Received: by 2002:a05:6000:1447:b0:436:42cc:25ef with SMTP id ffacd0b85a97d-437978c19a0mr12316116f8f.13.1771152750163;
+        Sun, 15 Feb 2026 02:52:30 -0800 (PST)
+Received: from localhost (ip87-106-108-193.pbiaas.com. [87.106.108.193])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43796a5ac7csm16733231f8f.7.2026.02.15.02.52.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Feb 2026 02:38:59 -0800 (PST)
-Date: Sun, 15 Feb 2026 05:38:55 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Simon Schippers <simon.schippers@tu-dortmund.de>
-Cc: Jason Wang <jasowang@redhat.com>, willemdebruijn.kernel@gmail.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
-	leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
-	tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH net-next v7 3/9] tun/tap: add ptr_ring consume helper
- with netdev queue wakeup
-Message-ID: <20260215053411-mutt-send-email-mst@kernel.org>
-References: <CACGkMEsJtE3RehWQ8BaDL2HdFPK=iW+ZaEAN1TekAMWwor5tjQ@mail.gmail.com>
- <197573a1-df52-4928-adb9-55a7a4f78839@tu-dortmund.de>
- <CACGkMEveEXky_rTrvRrfi7qix12GG91GfyqnwB6Tu-dnjqAm9A@mail.gmail.com>
- <0c776172-2f02-47fc-babf-2871adca42cb@tu-dortmund.de>
- <CACGkMEte=LwvkxPh-tesJHLVYQV1YZF4is1Yamokhkzaf5GOWw@mail.gmail.com>
- <205aa139-975d-4092-aa04-a2c570ae43a6@tu-dortmund.de>
- <CACGkMEtRikexX=cJz8zmuvW7mcO7uCFdG7AoHQLOezrsb5nbgQ@mail.gmail.com>
- <59529fd2-2a08-4a89-a853-27198b76f842@tu-dortmund.de>
- <20260214131703-mutt-send-email-mst@kernel.org>
- <1ab166aa-8e9c-4742-a80a-c2fa806218db@tu-dortmund.de>
+        Sun, 15 Feb 2026 02:52:29 -0800 (PST)
+From: =?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack3000@gmail.com>
+To: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
+	"John Johansen" <john.johansen@canonical.com>,
+	"Paul Moore" <paul@paul-moore.com>,
+	James Morris <jmorris@namei.org>,
+	"Serge E . Hallyn" <serge@hallyn.com>
+Cc: =?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack3000@gmail.com>,
+	linux-security-module@vger.kernel.org,
+	"Tingmao Wang" <m@maowtm.org>,
+	"Justin Suess" <utilityemal77@gmail.com>,
+	"Samasth Norway Ananda" <samasth.norway.ananda@oracle.com>,
+	"Matthieu Buffet" <matthieu@buffet.re>,
+	"Mikhail Ivanov" <ivanov.mikhail1@huawei-partners.com>,
+	konstantin.meskhidze@huawei.com,
+	"Demi Marie Obenour" <demiobenour@gmail.com>,
+	"Alyssa Ross" <hi@alyssa.is>,
+	"Jann Horn" <jannh@google.com>,
+	"Tahera Fahimi" <fahimitahera@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>
+Subject: [PATCH v5 0/9] landlock: UNIX connect() control by pathname and scope
+Date: Sun, 15 Feb 2026 11:51:48 +0100
+Message-ID: <20260215105158.28132-1-gnoack3000@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1ab166aa-8e9c-4742-a80a-c2fa806218db@tu-dortmund.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258767-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,maowtm.org,oracle.com,buffet.re,huawei-partners.com,huawei.com,alyssa.is,google.com,kernel.org,zeniv.linux.org.uk];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-258768-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[gnoack3000@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3452D13E7EB
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 8F9B813E83B
 X-Rspamd-Action: no action
 
-On Sat, Feb 14, 2026 at 08:51:53PM +0100, Simon Schippers wrote:
-> On 2/14/26 19:18, Michael S. Tsirkin wrote:
-> > On Sat, Feb 14, 2026 at 06:13:14PM +0100, Simon Schippers wrote:
-> > 
-> > ...
-> > 
-> >> Patched: Waking on __ptr_ring_produce_created_space() is too early. The
-> >>          stop/wake cycle occurs too frequently which slows down
-> >>          performance as can be seen for TAP.
-> >>
-> >> Wake on empty variant: Waking on __ptr_ring_empty() is (slightly) too
-> >>                        late. The consumer starves because the producer
-> >>                        first has to produce packets again. This slows
-> >>                        down performance aswell as can be seen for TAP
-> >> 		       and TAP+vhost-net (both down ~30-40Kpps).
-> >>
-> >> I think something inbetween should be used.
-> >> The wake should be done as late as possible to have as few
-> >> NET_TX_SOFTIRQs as possible but early enough that there are still
-> >> consumable packets remaining to not starve the consumer.
-> >>
-> >> However, I can not think of a proper way to implement this right now.
-> >>
-> >> Thanks!
-> > 
-> > What is the difficulty?
-> 
-> There is no way to tell how many entries are currently in the ring.
-> 
-> > 
-> > Your patches check __ptr_ring_consume_created_space(..., 1).
-> 
-> Yes, and this returns if either 0 space or a batch size space was
-> created.
-> (In the current implementation it would be false or true, but as
-> discussed earlier this can be changed.)
-> 
-> > 
-> > How about __ptr_ring_consume_created_space(..., 8) then? 16?
-> > 
-> 
-> This would return how much space the last 8/16 consume operations
-> created. But in tap_ring_consume() we only consume a single entry.
-> 
-> Maybe we could avoid __ptr_ring_consume_created_space with this:
-> 1. Wait for the queue to stop with netif_tx_queue_stopped()
-> 2. Then count the numbers of consumes we did after the queue stopped
-> 3. Wake the queue if count >= threshold with threshold >= ring->batch
-> 
-> I would say that such a threshold could be something like ring->size/2.
+Hello!
 
+This patch set introduces a filesystem-based Landlock restriction
+mechanism for connecting to UNIX domain sockets (or addressing them
+with sendmsg(2)).  It introduces the filesystem access right
+LANDLOCK_ACCESS_FS_RESOLVE_UNIX.
 
-To add to what i wrote, size/2 means:
-leave half a ring for consumer, half a ring for producer.
+For the connection-oriented SOCK_STREAM and SOCK_SEQPACKET type
+sockets, the access right makes the connect(2) operation fail with
+EACCES, if denied.
 
-If one of the two is more bursty, we might want a different
-balance. Offhand, the kernel is less bursty and userspace is
-more bursty.
+SOCK_DGRAM-type UNIX sockets can be used both with connect(2), or by
+passing an explicit recipient address with every sendmsg(2)
+invocation.  In the latter case, the Landlock check is done when an
+explicit recipient address is passed to sendmsg(2) and can make
+sendmsg(2) return EACCES.  When UNIX datagram sockets are connected
+with connect(2), a fixed recipient address is associated with the
+socket and the check happens during connect(2) and may return EACCES.
 
-So it's an interesting question but size/2 is a good start.
+When LANDLOCK_ACCESS_FS_RESOLVE_UNIX is handled within a Landlock
+domain, this domain will only allow connect(2) and sendmsg(2) to
+server sockets that were created within the same domain.  Or, to
+phrase it the other way around: Unless it is allow-listed with a
+LANDLOCK_PATH_BENEATH rule, the newly created domain denies connect(2)
+and sendmsg(2) actions that are directed *outwards* of that domain.
+In that regard, LANDLOCK_ACCESS_FS_RESOLVE_UNIX has the same semantics
+as one of the "scoped" access rights.
+
+== Motivation
+
+Currently, landlocked processes can connect to named UNIX sockets
+through the BSD socket API described in unix(7), by invoking socket(2)
+followed by connect(2) with a suitable struct sockname_un holding the
+socket's filename.  This is a surprising gap in Landlock's sandboxing
+capabilities for users (e.g. in [1]) and it can be used to escape a
+sandbox when a Unix service offers command execution (various such
+scenarios were listed by Tingmao Wang in [2]).
+
+The original feature request is at [4].
+
+== Alternatives and Related Work
+
+=== Alternative: Use existing LSM hooks
+
+We have carefully and seriously considered the use of existing LSM
+hooks, but still came to the conclusion that a new LSM hook is better
+suited in this case:
+
+The existing hooks security_unix_stream_connect(),
+security_unix_may_send() and security_socket_connect() do not give
+access to the resolved filesystem path.
+
+* Resolving the filesystem path in the struct sockaddr_un again within
+  a Landlock would produce a TOCTOU race, so this is not an option.
+* We would therefore need to wire through the resolved struct path
+  from unix_find_bsd() to one of the existing LSM hooks which get
+  called later.  This would be a more substantial change to af_unix.c.
+
+The struct path that is available in the listening-side struct sock is
+can be read through the existing hooks, but it is not an option to use
+this information: As the listening socket may have been bound from
+within a different namespace, the path that was used for that can is
+in the general case not meaningful for a sandboxed process.  In
+particular, it is not possible to use this path (or prefixes thereof)
+when constructing a sandbox policy in the client-side process.
+
+Paul Moore also chimed in in support of adding a new hook, with the
+rationale that the simplest change to the LSM hook interface has
+traditionally proven to be the most robust. [11]
+
+More details are on the Github issue at [6] and on the LKML at [9].
+
+In a the discussion of the V2 review, started by Christian Brauner
+[10], we have further explored the approach of reusing the existing
+LSM hooks but still ended up leaning on the side of introducing a new
+hook, with Paul Moore and me (gnoack) arguing for that option.
+
+Further insights about the LSM hook were shared in the V3 review by
+Tingmao Wang [12], who spotted additional requirements due to the two
+approaches being merged into one patch set.  The summary of that
+discussion is in [13].
+
+=== Related work: Scope Control for Pathname Unix Sockets
+
+The motivation for this patch is the same as in Tingmao Wang's patch
+set for "scoped" control for pathname Unix sockets [2], originally
+proposed in the Github feature request [5].
+
+In [14], we have settled on the decision to merge the two patch sets
+into this one, whose primary way of controlling connect(2) is
+LANDLOCK_ACCESS_FS_RESOLVE_UNIX, but where this flag additionally has
+the semantics of only restricting this unix(7) IPC *outwards* of the
+created Landlock domain, in line with the logic that exists for the
+existing "scoped" flags already.
+
+By having LANDLOCK_ACCESS_FS_RESOLVE_UNIX implement "scoping"
+semantics, we can avoid introducing two separate interacting flags for
+now, but we retain the option of introducing
+LANDLOCK_SCOPE_PATHNAME_UNIX_SOCKET at a later point in time, should
+such a flag be needed to express additional rules.
+
+== Credits
+
+The feature was originally suggested by Jann Horn in [7].
+
+Tingmao Wang and Demi Marie Obenour have taken the initiative to
+revive this discussion again in [1], [4] and [5].
+
+Tingmao Wang has sent the patch set for the scoped access control for
+pathname Unix sockets [2] and has contributed substantial insights
+during the code review, shaping the form of the LSM hook and agreeing
+to merge the pathname and scoped-flag patch sets.
+
+Justin Suess has sent the patch for the LSM hook in [8] and
+subsequently through this patch set.
+
+Christian Brauner and Paul Moore have contributed to the design of the
+new LSM hook, discussing the tradeoffs in [10].
+
+Ryan Sullivan has started on an initial implementation and has brought
+up relevant discussion points on the Github issue at [4].
+
+As maintainer of Landlock, Mickaël Salaün has done the main review so
+far and particularly pointed out ways in which the UNIX connect()
+patch sets interact with each other and what we need to look for with
+regards to UAPI consistency as Landlock evolves.
+
+[1] https://lore.kernel.org/landlock/515ff0f4-2ab3-46de-8d1e-5c66a93c6ede@gmail.com/
+[2] Tingmao Wang's "Implement scope control for pathname Unix sockets"
+    https://lore.kernel.org/all/cover.1767115163.git.m@maowtm.org/
+[3] https://lore.kernel.org/all/20251230.bcae69888454@gnoack.org/
+[4] Github issue for FS-based control for named Unix sockets:
+    https://github.com/landlock-lsm/linux/issues/36
+[5] Github issue for scope-based restriction of named Unix sockets:
+    https://github.com/landlock-lsm/linux/issues/51
+[6] https://github.com/landlock-lsm/linux/issues/36#issuecomment-2950632277
+[7] https://lore.kernel.org/linux-security-module/CAG48ez3NvVnonOqKH4oRwRqbSOLO0p9djBqgvxVwn6gtGQBPcw@mail.gmail.com/
+[8] Patch for the LSM hook:
+    https://lore.kernel.org/all/20251231213314.2979118-1-utilityemal77@gmail.com/
+[9] https://lore.kernel.org/all/20260108.64bd7391e1ae@gnoack.org/
+[10] https://lore.kernel.org/all/20260113-kerngesund-etage-86de4a21da24@brauner/
+[11] https://lore.kernel.org/all/CAHC9VhQHZCe0LMx4xzSo-h1SWY489U4frKYnxu4YVrcJN3x7nA@mail.gmail.com/
+[12] https://lore.kernel.org/all/e6b6b069-384c-4c45-a56b-fa54b26bc72a@maowtm.org/
+[13] https://lore.kernel.org/all/aYMenaSmBkAsFowd@google.com/
+[14] https://lore.kernel.org/all/20260205.Kiech3gupee1@digikod.net/
+
+---
+
+== Patch set history
+
+V1: https://lore.kernel.org/all/20260101134102.25938-1-gnoack3000@gmail.com/
+V2: https://lore.kernel.org/all/20260110143300.71048-2-gnoack3000@gmail.com/
+V3: https://lore.kernel.org/all/20260119203457.97676-2-gnoack3000@gmail.com/
+V4: https://lore.kernel.org/all/20260208231017.114343-1-gnoack3000@gmail.com/
+
+Changes in V5:
+
+This change primarily adds tests, changing the testing approach for
+the main test to use the scoped_domains fixture as in Tingmao's patch
+set [2], and adding tests for the audit and coredump cases.
+
+* Selftests:
+  * Replaced the main selftest with one based on scoped_domains
+  * Added audit test
+  * Added test for the coredump case
+  * Added a follow-up commit that simplifies ruleset enforcement
+* Kernel code:
+  * Mark coredump check as unlikely (per Justin's review)
+  * Drop check for socket type (per Mickaël's review)
+
+Changes in V4:
+
+Since this version, this patch set subsumes the scoping semantics from
+Tingmao Wang's "Scope Control" patch set [2], per discussion with
+Tingmao Wang and Mickaël Salaün in [14] and in the thread leading up
+to it.
+
+Now, LANDLOCK_SCOPE_PATHNAME_UNIX_SOCKET only restricts connect(2) and
+sendmsg(2) *outwards* of the domain where it is restricted, *with the
+same semantics as a "scoped" flag*.
+
+ * Implement a layer-mask based version of domain_is_scoped():
+   unmask_scoped_access().  Rationale: domain_is_scoped() returns
+   early, which we can't do in the layer masks based variant.  The two
+   variants are similar enough.
+ * LSM hook: Replace 'type' argument with 'sk' argument,
+   per discussion in [12] and [13].
+ * Bump ABI version to 9 (pessimistically assuming that we won't make
+   it for 7.0)
+ * Documentation fixes in header file and in Documentation/
+ * selftests: more test variants, now also parameterizing whether the
+   server socket gets created within the Landlock domain or before that
+ * selftests: use EXPECT_EQ() for test cleanup
+
+Changes in V3:
+ * LSM hook: rename it to security_unix_find() (Justin Suess)
+   (resolving the previously open question about the LSM hook name)
+   Related discussions:
+   https://lore.kernel.org/all/20260112.Wufar9coosoo@digikod.net/
+   https://lore.kernel.org/all/CAHC9VhSRiHwLEWfFkQdPEwgB4AXKbXzw_+3u=9hPpvUTnu02Bg@mail.gmail.com/
+ * Reunite the three UNIX resolving access rights back into one
+   (resolving the previously open question about the access right
+   structuring) Related discussion:
+   https://lore.kernel.org/all/20260112.Wufar9coosoo@digikod.net/)
+ * Sample tool: Add new UNIX lookup access rights to ACCESS_FILE
+
+Changes in V2:
+ * Send Justin Suess's LSM hook patch together with the Landlock
+   implementation
+ * LSM hook: Pass type and flags parameters to the hook, to make the
+   access right more generally usable across LSMs, per suggestion from
+   Paul Moore (Implemented by Justin)
+ * Split the access right into the three types of UNIX domain sockets:
+   SOCK_STREAM, SOCK_DGRAM and SOCK_SEQPACKET.
+ * selftests: More exhaustive tests.
+ * Removed a minor commit from V1 which adds a missing close(fd) to a
+   test (it is already in the mic-next branch)
+
+Günther Noack (8):
+  landlock: Control pathname UNIX domain socket resolution by path
+  samples/landlock: Add support for named UNIX domain socket
+    restrictions
+  landlock/selftests: Test LANDLOCK_ACCESS_FS_RESOLVE_UNIX
+  landlock/selftests: Audit test for LANDLOCK_ACCESS_FS_RESOLVE_UNIX
+  landlock/selftests: Check that coredump sockets stay unrestricted
+  landlock/selftests: fs_test: Simplify ruleset creation and enforcement
+  landlock: Document FS access right for pathname UNIX sockets
+  landlock: Document design rationale for scoped access rights
+
+Justin Suess (1):
+  lsm: Add LSM hook security_unix_find
+
+ Documentation/security/landlock.rst          |   38 +
+ Documentation/userspace-api/landlock.rst     |   16 +-
+ include/linux/lsm_hook_defs.h                |    5 +
+ include/linux/security.h                     |   11 +
+ include/uapi/linux/landlock.h                |   10 +
+ net/unix/af_unix.c                           |    8 +
+ samples/landlock/sandboxer.c                 |   15 +-
+ security/landlock/access.h                   |   11 +-
+ security/landlock/audit.c                    |    1 +
+ security/landlock/fs.c                       |  102 +-
+ security/landlock/limits.h                   |    2 +-
+ security/landlock/syscalls.c                 |    2 +-
+ security/security.c                          |   20 +
+ tools/testing/selftests/landlock/base_test.c |    2 +-
+ tools/testing/selftests/landlock/fs_test.c   | 1301 ++++++++++--------
+ 15 files changed, 942 insertions(+), 602 deletions(-)
+
+-- 
+2.52.0
 
 
