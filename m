@@ -1,229 +1,136 @@
-Return-Path: <netdev+bounces-258864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258865-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UJ4TK8MIk2nO1AEAu9opvQ
-	(envelope-from <netdev+bounces-258864-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 13:08:35 +0100
+	id 0NjeLI4Jk2ni1AEAu9opvQ
+	(envelope-from <netdev+bounces-258865-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 13:11:58 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAF3E14339F
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 13:08:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E838C1433EC
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 13:11:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3DC0A300158A
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 12:08:32 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0A1963002535
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 12:11:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2BE030C36C;
-	Mon, 16 Feb 2026 12:08:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54FE630C61E;
+	Mon, 16 Feb 2026 12:11:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Omjdcv3r";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="T+P+p3HJ";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Omjdcv3r";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="T+P+p3HJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LOFLYMeq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9014030C602
-	for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 12:08:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 318EF30C613;
+	Mon, 16 Feb 2026 12:11:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771243710; cv=none; b=Y1SB9OoKAZKijbEy3RjhU/GpdMRcPhiTN7LHC2dXTyyDc4oNwzUinX0aOwyav6swdGp8up+DlZ4Uo0GFLFD8+gjik3/0+ZXju5iDLtmEEEVdi8Z3fq6qf/FyfPitxWQroSmCu7xaPLlK6gRhNtuaw6jEN4I1A2vINuU2L9kf5ik=
+	t=1771243905; cv=none; b=f4X+HDeCWHJGULlrQpEyiPE6V4n5UKLFdpoE9KAuMCTcJ0SvAV2UY1XnVoJ79BAbz+9TxT5TMPak4c9gFp4lEC9MDlou6RMwWVtJFhgj8oTgbfuopBoZoworBbqyncQX96gE/huLpgxVWNBKX0A03ilrjTa80nBQaFmxTNQduzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771243710; c=relaxed/simple;
-	bh=6GPXy7vXHQlTym7ySv+gPvl8Qg7QGZUPlVsI+isqPbk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=duZ6hR7mM/Snuuo0B5K3C4tptQAQZDxcCQc96cuY5BOivPuCYi9jpzBif9JymeUcT2H+Zs049wPjzqCHFQcMdRBCN2td2WSN9It2MAOxC4HfRlQNUJN+xfoMQZQQgXateUnT5AhPEf7OR69XKwwOxOn+8Vn3gk0afp2P0cA7+ew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Omjdcv3r; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=T+P+p3HJ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Omjdcv3r; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=T+P+p3HJ; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id C32CC3E786;
-	Mon, 16 Feb 2026 12:08:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1771243706; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=F5eHPdfnUZ49Jdwt5KIEyLMIFSoJX6GP49O+mT8nS3M=;
-	b=Omjdcv3rzEAILDh7zR0NLm2g/EWq01P7kZginytGzLymwWd8WrdPUPUJWk3RjevDSVCBsn
-	+AdybnAE30bAHXbvq9zsErkqBMyuqhQfR816RZGEBO/vfOc0RcmZ/zZPgXRhWdbXQapwAJ
-	6l/Tx5hZmcE/sKjCW2TEbVrGuvVXe50=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1771243706;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=F5eHPdfnUZ49Jdwt5KIEyLMIFSoJX6GP49O+mT8nS3M=;
-	b=T+P+p3HJ7U69VXjV4VBrqqbkcP4cqCdxnv0B8oKIRH4xKb9atlCEQ64FXkkQcZwurBs7Zs
-	UWM6W64gSIGlM8Cg==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=Omjdcv3r;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=T+P+p3HJ
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1771243706; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=F5eHPdfnUZ49Jdwt5KIEyLMIFSoJX6GP49O+mT8nS3M=;
-	b=Omjdcv3rzEAILDh7zR0NLm2g/EWq01P7kZginytGzLymwWd8WrdPUPUJWk3RjevDSVCBsn
-	+AdybnAE30bAHXbvq9zsErkqBMyuqhQfR816RZGEBO/vfOc0RcmZ/zZPgXRhWdbXQapwAJ
-	6l/Tx5hZmcE/sKjCW2TEbVrGuvVXe50=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1771243706;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=F5eHPdfnUZ49Jdwt5KIEyLMIFSoJX6GP49O+mT8nS3M=;
-	b=T+P+p3HJ7U69VXjV4VBrqqbkcP4cqCdxnv0B8oKIRH4xKb9atlCEQ64FXkkQcZwurBs7Zs
-	UWM6W64gSIGlM8Cg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E0A473EA62;
-	Mon, 16 Feb 2026 12:08:25 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id uXoMLbkIk2lKHAAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Mon, 16 Feb 2026 12:08:25 +0000
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-To: netdev@vger.kernel.org
-Cc: rds-devel@oss.oracle.com,
-	linux-rdma@vger.kernel.org,
-	gerd.rausch@oracle.com,
-	horms@kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	allison.henderson@oracle.com,
-	Fernando Fernandez Mancera <fmancera@suse.de>,
-	syzbot+5efae91f60932839f0a5@syzkaller.appspotmail.com
-Subject: [PATCH net] net/rds: fix recursive lock in rds_tcp_conn_slots_available
-Date: Mon, 16 Feb 2026 13:08:04 +0100
-Message-ID: <20260216120804.14840-1-fmancera@suse.de>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1771243905; c=relaxed/simple;
+	bh=VrzPRqY2WAT6Xt7UjSu8aww5moulArYPq1BlYuYkS9Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZLnslJlBL7EHXyU8Ei9BphqYntL2bYf6U9WqWn/GO8+4hiDv/LTTGbmglF6jW9yNavUExNbeYCcvPEbLIZoGuNPQLdP/XRWNjy4nCku9JXgDxJ/KJsiOb25I0M5NQuCsiz7wGwnXiS144lrTNWDsLJL+UjALb4mbyRuj9rM+ihY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LOFLYMeq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF2AAC19423;
+	Mon, 16 Feb 2026 12:11:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771243904;
+	bh=VrzPRqY2WAT6Xt7UjSu8aww5moulArYPq1BlYuYkS9Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LOFLYMeqWPd4M5tToXP5cuD0dGmL+Rlcvcl/DjcdlTeUQJ4RGOzXNur28NDZSe9TK
+	 iDrPinK0s0tEoJ0hAJe3be+PUchsT5De8xjEzgRXa2EUREtNSKTYvFdx6UZCVEKix4
+	 YXaL2wZEyjE2Sb+jneFANXDWbkG8wNpJwqS9PXVhm7/Qv9PIcRYhXiguX9bT9wGw9P
+	 Gbs7b2fmfolVQHrRRvt2Ndg8X2EqwtRmVDZJka5zJp9GKLI4D4sX/G5uZp3JwbRAoP
+	 IxdNxDMcZIUZinDYhS0yYgSteSa2MNj0qP7GX5pMPu5/TB7s3OQ2g6LdXVMJxt4YvL
+	 +4NknfF+DL6Xg==
+Date: Mon, 16 Feb 2026 12:11:40 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, shuah@kernel.org,
+	marcelo.leitner@gmail.com, jhs@mojatatu.com, dcaratti@redhat.com,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net] selftests: tc_actions: don't dump 2MB of \0 to stdout
+Message-ID: <aZMJfBldbj20FrUx@horms.kernel.org>
+References: <20260214035159.2119699-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -1.51
-X-Spam-Level: 
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260214035159.2119699-1-kuba@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-258864-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-258865-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,mojatatu.com];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,5efae91f60932839f0a5];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,suse.de:mid,suse.de:dkim,suse.de:email]
-X-Rspamd-Queue-Id: CAF3E14339F
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nmap.org:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: E838C1433EC
 X-Rspamd-Action: no action
 
-syzbot reported a recursive lock warning in rds_tcp_get_peer_sport() as
-it calls inet6_getname() which acquires the socket lock that was already
-held by __release_lock().
+On Fri, Feb 13, 2026 at 07:51:59PM -0800, Jakub Kicinski wrote:
+> Since we started running selftests in NIPA we have been seeing
+> tc_actions.sh generate a soft lockup warning on ~20% of the runs.
+> On the pre-netdev foundation setup it was actually a missed irq
+> splat from the console. Now it's either that or a lockup.
+> 
+> I initially suspected a socket locking issue since the test
+> is exercising local loopback with act_mirred.
+> After hours of staring at this I noticed in strace that ncat
 
- kworker/u8:6/2985 is trying to acquire lock:
- ffff88807a07aa20 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1709 [inline]
- ffff88807a07aa20 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: inet6_getname+0x15d/0x650 net/ipv6/af_inet6.c:533
+Ouch!
 
- but task is already holding lock:
- ffff88807a07aa20 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1709 [inline]
- ffff88807a07aa20 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: tcp_sock_set_cork+0x2c/0x2e0 net/ipv4/tcp.c:3694
-   lock_sock_nested+0x48/0x100 net/core/sock.c:3780
-   lock_sock include/net/sock.h:1709 [inline]
-   inet6_getname+0x15d/0x650 net/ipv6/af_inet6.c:533
-   rds_tcp_get_peer_sport net/rds/tcp_listen.c:70 [inline]
-   rds_tcp_conn_slots_available+0x288/0x470 net/rds/tcp_listen.c:149
-   rds_recv_hs_exthdrs+0x60f/0x7c0 net/rds/recv.c:265
-   rds_recv_incoming+0x9f6/0x12d0 net/rds/recv.c:389
-   rds_tcp_data_recv+0x7f1/0xa40 net/rds/tcp_recv.c:243
-   __tcp_read_sock+0x196/0x970 net/ipv4/tcp.c:1702
-   rds_tcp_read_sock net/rds/tcp_recv.c:277 [inline]
-   rds_tcp_data_ready+0x369/0x950 net/rds/tcp_recv.c:331
-   tcp_rcv_established+0x19e9/0x2670 net/ipv4/tcp_input.c:6675
-   tcp_v6_do_rcv+0x8eb/0x1ba0 net/ipv6/tcp_ipv6.c:1609
-   sk_backlog_rcv include/net/sock.h:1185 [inline]
-   __release_sock+0x1b8/0x3a0 net/core/sock.c:3213
+> when -o $file is specified _both_ saves the output to the file
+> and still prints it to stdout. Because the file being sent
+> is constructed with:
+> 
+>   dd conv=sparse status=none if=/dev/zero bs=1M count=2 of=$mirred
+>                                 ^^^^^^^^^
+> 
+> the data printed is all \0. Most terminals don't display nul
+> characters (and neither does vng output capture save them).
+> But QEMU's serial console still has to poke them thru which
+> is very slow and causes the lockup (if the file is >600kB).
+> 
+> Replace the '-o $file' with '> $file'. This speeds the test up
+> from 2m20s to 18s on debug kernels, and prevents the warnings.
+> 
+> Fixes: ca22da2fbd69 ("act_mirred: use the backlog for nested calls to mirred ingress")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Reading from the socket struct directly is safe from both possible
-paths, rds_tcp_accept_one() and rds_tcp_conn_slots_available() when
-performing fan-out.
+I exercise this by running ncat locally on Fedora 43.
 
-Fixes: 9d27a0fb122f ("net/rds: Trigger rds_send_ping() more than once")
-Reported-by: syzbot+5efae91f60932839f0a5@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=5efae91f60932839f0a5
-Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
----
-Note: syzbot failed to apply the patch for some reason. I don't
-understand why.
----
- net/rds/tcp_listen.c | 28 +++++-----------------------
- 1 file changed, 5 insertions(+), 23 deletions(-)
+$ ncat --version
+Ncat: Version 7.92 ( https://nmap.org/ncat )
 
-diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
-index 6fb5c928b8fd..a36e5dfd6c66 100644
---- a/net/rds/tcp_listen.c
-+++ b/net/rds/tcp_listen.c
-@@ -59,30 +59,12 @@ void rds_tcp_keepalive(struct socket *sock)
- static int
- rds_tcp_get_peer_sport(struct socket *sock)
- {
--	union {
--		struct sockaddr_storage storage;
--		struct sockaddr addr;
--		struct sockaddr_in sin;
--		struct sockaddr_in6 sin6;
--	} saddr;
--	int sport;
--
--	if (kernel_getpeername(sock, &saddr.addr) >= 0) {
--		switch (saddr.addr.sa_family) {
--		case AF_INET:
--			sport = ntohs(saddr.sin.sin_port);
--			break;
--		case AF_INET6:
--			sport = ntohs(saddr.sin6.sin6_port);
--			break;
--		default:
--			sport = -1;
--		}
--	} else {
--		sport = -1;
--	}
-+	struct sock *sk = sock->sk;
-+
-+	if (!sk)
-+		return -1;
- 
--	return sport;
-+	return ntohs(inet_sk(sk)->inet_dport);
- }
- 
- /* rds_tcp_accept_one_path(): if accepting on cp_index > 0, make sure the
--- 
-2.53.0
+And confirmed the behaviour you describe.
 
+Reviewed-by: Simon Horman <horms@kernel.org>
 
