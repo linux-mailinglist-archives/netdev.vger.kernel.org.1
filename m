@@ -1,59 +1,56 @@
-Return-Path: <netdev+bounces-258865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258866-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0NjeLI4Jk2ni1AEAu9opvQ
-	(envelope-from <netdev+bounces-258865-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 13:11:58 +0100
+	id YF3pJngKk2nw1AEAu9opvQ
+	(envelope-from <netdev+bounces-258866-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 13:15:52 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id E838C1433EC
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 13:11:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 394A3143430
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 13:15:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0A1963002535
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 12:11:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 863B53013A62
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 12:15:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54FE630C61E;
-	Mon, 16 Feb 2026 12:11:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LOFLYMeq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 799843081D6;
+	Mon, 16 Feb 2026 12:15:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 318EF30C613;
-	Mon, 16 Feb 2026 12:11:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A3082690C0;
+	Mon, 16 Feb 2026 12:15:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771243905; cv=none; b=f4X+HDeCWHJGULlrQpEyiPE6V4n5UKLFdpoE9KAuMCTcJ0SvAV2UY1XnVoJ79BAbz+9TxT5TMPak4c9gFp4lEC9MDlou6RMwWVtJFhgj8oTgbfuopBoZoworBbqyncQX96gE/huLpgxVWNBKX0A03ilrjTa80nBQaFmxTNQduzI=
+	t=1771244147; cv=none; b=X6YyJjQOpYtoBWa50VoG5cMZrUdtl8QXOFJ5iS6iy8PR0rNCe62U7p8LSgR/cxluBIJUh9Ez0buR4emQQgWzHk1rNR9WgFnUXp7GwZQqUj6gNd0vvR8cDP/xxQJbiCs+gGPHvsG32XyfVaChY9L5JPid9XexcowSEoIzTPjkhnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771243905; c=relaxed/simple;
-	bh=VrzPRqY2WAT6Xt7UjSu8aww5moulArYPq1BlYuYkS9Q=;
+	s=arc-20240116; t=1771244147; c=relaxed/simple;
+	bh=P/0XkNFt6Y7qOtSbIlMVIVDPWkCJW8egWendUV2pzoU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZLnslJlBL7EHXyU8Ei9BphqYntL2bYf6U9WqWn/GO8+4hiDv/LTTGbmglF6jW9yNavUExNbeYCcvPEbLIZoGuNPQLdP/XRWNjy4nCku9JXgDxJ/KJsiOb25I0M5NQuCsiz7wGwnXiS144lrTNWDsLJL+UjALb4mbyRuj9rM+ihY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LOFLYMeq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF2AAC19423;
-	Mon, 16 Feb 2026 12:11:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771243904;
-	bh=VrzPRqY2WAT6Xt7UjSu8aww5moulArYPq1BlYuYkS9Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LOFLYMeqWPd4M5tToXP5cuD0dGmL+Rlcvcl/DjcdlTeUQJ4RGOzXNur28NDZSe9TK
-	 iDrPinK0s0tEoJ0hAJe3be+PUchsT5De8xjEzgRXa2EUREtNSKTYvFdx6UZCVEKix4
-	 YXaL2wZEyjE2Sb+jneFANXDWbkG8wNpJwqS9PXVhm7/Qv9PIcRYhXiguX9bT9wGw9P
-	 Gbs7b2fmfolVQHrRRvt2Ndg8X2EqwtRmVDZJka5zJp9GKLI4D4sX/G5uZp3JwbRAoP
-	 IxdNxDMcZIUZinDYhS0yYgSteSa2MNj0qP7GX5pMPu5/TB7s3OQ2g6LdXVMJxt4YvL
-	 +4NknfF+DL6Xg==
-Date: Mon, 16 Feb 2026 12:11:40 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, shuah@kernel.org,
-	marcelo.leitner@gmail.com, jhs@mojatatu.com, dcaratti@redhat.com,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net] selftests: tc_actions: don't dump 2MB of \0 to stdout
-Message-ID: <aZMJfBldbj20FrUx@horms.kernel.org>
-References: <20260214035159.2119699-1-kuba@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=OIdLl45bGChVhWdLbNkLXT2OcKUcA3IA1Kf4rcBljR5rkzBLwDnmtvryOfcNamcuE7s0SqgW6WhFXI14fOqnXwo9Df777LdTAoF/V8Se8jJPZumJaW5zWzDwTt9lKWCPJ97QBvG9PQkwEOPSKx7mJLnj9UBvbXP7KXlbmSbFTB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vrxVj-0000000006z-44Ze;
+	Mon, 16 Feb 2026 12:15:32 +0000
+Date: Mon, 16 Feb 2026 12:15:25 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Guenter Roeck <linux@roeck-us.net>, Arnd Bergmann <arnd@arndb.de>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hwmon@vger.kernel.org
+Subject: Re: [PATCH] net: dsa: MxL862xx: don't force-enable MAXLINEAR_GPHY
+Message-ID: <aZMKXavVQPelSXcG@makrotopia.org>
+References: <20260216105522.2382373-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,75 +59,87 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260214035159.2119699-1-kuba@kernel.org>
+In-Reply-To: <20260216105522.2382373-1-arnd@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258865-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,mojatatu.com];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258866-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[makrotopia.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,roeck-us.net,arndb.de,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nmap.org:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: E838C1433EC
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,arndb.de:email]
+X-Rspamd-Queue-Id: 394A3143430
 X-Rspamd-Action: no action
 
-On Fri, Feb 13, 2026 at 07:51:59PM -0800, Jakub Kicinski wrote:
-> Since we started running selftests in NIPA we have been seeing
-> tc_actions.sh generate a soft lockup warning on ~20% of the runs.
-> On the pre-netdev foundation setup it was actually a missed irq
-> splat from the console. Now it's either that or a lockup.
+On Mon, Feb 16, 2026 at 11:55:17AM +0100, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
-> I initially suspected a socket locking issue since the test
-> is exercising local loopback with act_mirred.
-> After hours of staring at this I noticed in strace that ncat
-
-Ouch!
-
-> when -o $file is specified _both_ saves the output to the file
-> and still prints it to stdout. Because the file being sent
-> is constructed with:
+> The newly added dsa driver attempts to enable the corresponding PHY driver,
+> but that one has additional dependencies that may not be available:
 > 
->   dd conv=sparse status=none if=/dev/zero bs=1M count=2 of=$mirred
->                                 ^^^^^^^^^
+> WARNING: unmet direct dependencies detected for MAXLINEAR_GPHY
+>   Depends on [m]: NETDEVICES [=y] && PHYLIB [=y] && (HWMON [=m] || HWMON [=m]=n [=n])
+>   Selected by [y]:
+>   - NET_DSA_MXL862 [=y] && NETDEVICES [=y] && NET_DSA [=y]
+> aarch64-linux-ld: drivers/net/phy/mxl-gpy.o: in function `gpy_probe':
+> mxl-gpy.c:(.text.gpy_probe+0x13c): undefined reference to `devm_hwmon_device_register_with_info'
+> aarch64-linux-ld: drivers/net/phy/mxl-gpy.o: in function `gpy_hwmon_read':
+> mxl-gpy.c:(.text.gpy_hwmon_read+0x48): undefined reference to `polynomial_calc'
+
+I assume this happens in case CONFIG_MAXLINEAR_GPHY=y and
+CONFIG_HWMON=m, right?
+
+None of the PHY drivers seem to adequately prevent such situations,
+which in my opinion would be worth correcting, ie. by preventing any
+PHY driver using HWMON from being built-in while CONFIG_HWMON=m.
+
 > 
-> the data printed is all \0. Most terminals don't display nul
-> characters (and neither does vng output capture save them).
-> But QEMU's serial console still has to poke them thru which
-> is very slow and causes the lockup (if the file is >600kB).
+> There is actually no compile-time dependency, as DSA correctly uses the
+> PHY abstractions. Remove the 'select' statement to reduce the complexity.
 > 
-> Replace the '-o $file' with '> $file'. This speeds the test up
-> from 2m20s to 18s on debug kernels, and prevents the warnings.
+> Fixes: 23794bec1cb6 ("net: dsa: add basic initial driver for MxL862xx switches")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+
+As there is no compile-time dependency, this change is fine.
+
+Reviewed-by: Daniel Golle <daniel@makrotopia.org>
+
+> ---
+>  drivers/net/dsa/mxl862xx/Kconfig | 1 -
+>  1 file changed, 1 deletion(-)
 > 
-> Fixes: ca22da2fbd69 ("act_mirred: use the backlog for nested calls to mirred ingress")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-
-I exercise this by running ncat locally on Fedora 43.
-
-$ ncat --version
-Ncat: Version 7.92 ( https://nmap.org/ncat )
-
-And confirmed the behaviour you describe.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
+> diff --git a/drivers/net/dsa/mxl862xx/Kconfig b/drivers/net/dsa/mxl862xx/Kconfig
+> index 4db7bab21a71..3e772298cc89 100644
+> --- a/drivers/net/dsa/mxl862xx/Kconfig
+> +++ b/drivers/net/dsa/mxl862xx/Kconfig
+> @@ -2,7 +2,6 @@
+>  config NET_DSA_MXL862
+>  	tristate "MaxLinear MxL862xx"
+>  	depends on NET_DSA
+> -	select MAXLINEAR_GPHY
+>  	select NET_DSA_TAG_MXL_862XX
+>  	help
+>  	  This enables support for the MaxLinear MxL862xx switch family.
+> -- 
+> 2.39.5
+> 
 
