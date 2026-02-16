@@ -1,341 +1,198 @@
-Return-Path: <netdev+bounces-258940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258941-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KAAZIwxfk2kr4AEAu9opvQ
-	(envelope-from <netdev+bounces-258940-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 19:16:44 +0100
+	id GG/iJzxfk2kr4AEAu9opvQ
+	(envelope-from <netdev+bounces-258941-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 19:17:32 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07131146F36
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 19:16:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 199BC146F46
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 19:17:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C79003020FCC
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 18:16:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AE45130185AC
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 18:17:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D7B8281341;
-	Mon, 16 Feb 2026 18:16:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FB551C7012;
+	Mon, 16 Feb 2026 18:17:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="tY8ZnOor"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pg5w7+UL"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010048.outbound.protection.outlook.com [52.101.201.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1191B23AB88;
-	Mon, 16 Feb 2026 18:15:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 137E435949
+	for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 18:16:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771265762; cv=fail; b=ZBSU2CHBAy50rWSG4Dc+ptSXS8JbCJPScHCOSq5vNpDjbv/1CftliMWURDhIltAMf5cdYbgFLqqO/onan9ssesh2zFGECf4bcHFlthfKaFvbcWHcsluXQjFcqJLNyXVMXYyitMzqzWUpN9qT1Bhg5WYTP38AWsz4vcJbiQ2Y/aA=
+	t=1771265820; cv=pass; b=boejEiF/DJdnHRZwjxpjP93/grJ4iZeHc9+zAsiXIfwyQ7gAl4vg/fl4sGFT1D2C9pGuzeuMZAwud9etU24MZD91w+4yxdWscd+OsFBBSAQqA8yB7fp53s9LLE9WVUZeSUE5M0S6nDwLgSymQIpgvKqJTsGNmng9WvlkU0zvLj4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771265762; c=relaxed/simple;
-	bh=R+mXBH+VmtZ5mx4q3iITxG0uym9KrBkmg2pE5gHut70=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=X6+ADB4JdcBZWt47oZf3JB41SWS8aIta7aVwAUVLNfa3J6eXQosJQa7zjKnzW75fgLzsw6CyPD6WzZ2zvoL01T8XA+/mNmp5QoIzCZ9T+xBeRdzbAevPVp1Lduv+Q/HMGzMmp8/VChztDvuPFm1Hc8W3BhEAQPRc5BXZaHspa3w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=tY8ZnOor; arc=fail smtp.client-ip=52.101.201.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wSOO5YYjhu6TQLLnesKZjRivn5sUsGxJ6wfLFJY5uRtw/T5T4tjCg6O6pAKJMpr5kGjHeECT3nZfc25e60noh4W9OetvBP57etW1q63QRKYwfpcSIfJ7gMEp9NYyL24BpSoRGfkwgfHboVhUg6/HU4EB+a5Ousb20qfcklnH6wDjGl3z8bKVe1nJISyai/b6RuA7LEEoQiZ0/amd2VW6vFOWO0saOBbnwiiYKHam9zCkAI/TFxMZCbJAps8xeusJgzW5JRSjaTSQN/FhkH5XLYxkm4sRACXUVVhwdr9gBW6Dm3NvRDI8GaEM55N9kNQU4LNJwo021gYPojLBywyyoQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MBxceX5dGLr2HSsiqm9Y0o2roSPqeccgXOBPigWemyM=;
- b=sj5KStMC+WA4XWMWw/wQdqs6qfCw/YCx6A3MveBVTD8vZ+jwRuAIMXssx+DgpNbRaRPPw2oEVpZxVz1+64hzAoO/03a4f+X6h+m/B4RPdIKd08QvQAnBKkNniR0kvcZuDVVYnCdAxFHR4xwTGO3LUTNHL5b1K3R4xA2MhZmgkos9eZ4FBgsigFrpKOFajYxIXTtnTGUoAm8XFg/KA98PqC6C9TglhdNPUUiMup2rLuUMbstgLtF9iQ63mQv/mOcB2J4NIHjFL2t5caeqiolAx+0AS9iui5JtWkK/whl/xP7uRxMJXkf4SZXQnNSc4pVyE6ziWWqTOkx9wQg9qetXkQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.21.195) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=ti.com;
- dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MBxceX5dGLr2HSsiqm9Y0o2roSPqeccgXOBPigWemyM=;
- b=tY8ZnOor8lSAchZiEE+juRWD6dJDPwrifKeankW+NFnL0gck2QGrndDdA3xL2JwOkO7T+tsNsD21qytel3hjIpu47wq3lvP3Wl62bLqJapMewbYGD+gfrq3NkC2yrvNTYV3Z3LC4su8gZ5DRpFwmYPBSIpce+sS3RlPOTM8sDwQ=
-Received: from CH0PR04CA0111.namprd04.prod.outlook.com (2603:10b6:610:75::26)
- by SJ2PR10MB7735.namprd10.prod.outlook.com (2603:10b6:a03:578::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9611.16; Mon, 16 Feb
- 2026 18:15:57 +0000
-Received: from CH1PEPF0000A34B.namprd04.prod.outlook.com
- (2603:10b6:610:75:cafe::e3) by CH0PR04CA0111.outlook.office365.com
- (2603:10b6:610:75::26) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9611.16 via Frontend Transport; Mon,
- 16 Feb 2026 18:15:57 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.21.195)
- smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
- action=none header.from=ti.com;
-Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.21.195 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.21.195; helo=flwvzet201.ext.ti.com; pr=C
-Received: from flwvzet201.ext.ti.com (198.47.21.195) by
- CH1PEPF0000A34B.mail.protection.outlook.com (10.167.244.10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9632.12 via Frontend Transport; Mon, 16 Feb 2026 18:15:55 +0000
-Received: from DFLE206.ent.ti.com (10.64.6.64) by flwvzet201.ext.ti.com
- (10.248.192.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 16 Feb
- 2026 12:15:54 -0600
-Received: from DFLE209.ent.ti.com (10.64.6.67) by DFLE206.ent.ti.com
- (10.64.6.64) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 16 Feb
- 2026 12:15:54 -0600
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DFLE209.ent.ti.com
- (10.64.6.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Mon, 16 Feb 2026 12:15:54 -0600
-Received: from [172.24.231.164] (chintan-thinkstation-p360-tower.dhcp.ti.com [172.24.231.164])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 61GIFnXf2129783;
-	Mon, 16 Feb 2026 12:15:50 -0600
-Message-ID: <0249c0bb-ca88-417e-b5d6-903882f9a68c@ti.com>
-Date: Mon, 16 Feb 2026 23:45:49 +0530
+	s=arc-20240116; t=1771265820; c=relaxed/simple;
+	bh=Uo4JNKiF2/A9aQO02FToRCjqDOgG61bwBbeyQGs+97I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=d4BkPJsLQ3SznBjo0H6dFNwOpdvajMynuk0UK+CKR1pyqJZMa7/drMINhRtwF3Y47wePbp1WoVaosNdTKB/Mtv4vcla3fc27EgiXn6IPEqrLzOySHq8RF8MNKLIHNQtvZSZjuLb2rO74HKQ9TLHQ73q3J7S5MFhmERgMGy+mIkk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pg5w7+UL; arc=pass smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-506a7bbe9d0so26757811cf.0
+        for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 10:16:58 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771265818; cv=none;
+        d=google.com; s=arc-20240605;
+        b=D79tvnyRZOPnyqu9FAKdNn+Cf+fGkgfPqAuoeOoWgKVUzDJV8/ZCnYF3LHh3ByE4Vs
+         f2qpzQKe74/znJM9TrEmNyup0XKymSAh/cA4A223bn7x78Pvpb7FGUKaETN8YUUCMWAX
+         21H/ygsIHgofyQZgYgnr6m+dTrlfl4spIB5wRFXRbo2TLdLL8Q4NMzC+SC6rF/idmts4
+         dImogpYDXGveneuvfx6everdv/iWWWQZj8Q4IJFm3ncwpHgPHv875NPKJdKeEdRrQ+Mz
+         UZD/ni9aIKxci3d7gxX2TlU63iTyqYgGs83nKNvmSfzkSY/QM3WeX6lSw5UUvJF6PN9W
+         J4WA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=I9yEWBPrKOblvd34VDWmHAD2jvVK0y+VhzSO4cxEb3g=;
+        fh=KzakYQ6u0fult4nWXIwyudwK/uTroBScW+Vh8G4BMGM=;
+        b=km6aB9ziTw+Mu/qHJf8N3xrz+jAfeu2rwwO4qKm1YAshOhcJBn/jDZ4jN1JBNhSmXv
+         zoxqAi3q0dX0rY5HbTob/mcegsbzZdauKqd3P9s9sYPqz5V45dh5t25H4uNMygZLlKG7
+         9kLerko2C4aBmvVGjuosPWnLPuePj5mOU6tXtxnOe4LlmP2xamtUf06rkMYYjs87a8zb
+         76LMFH/4QP5bkcYta/NqhG/ryFFa19mElrX/t9qEux3Ej6OALZTSsInAeZ2w4BKsmP8h
+         L855BlTM7yk8iPCglU6Hq6cs9/aOxtvFBcDepnVxRssR37h55FCXZKxBdJ8UhBZfTpzP
+         c43Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1771265818; x=1771870618; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I9yEWBPrKOblvd34VDWmHAD2jvVK0y+VhzSO4cxEb3g=;
+        b=pg5w7+ULbI9+Z9//nLaGw4PzZB3gcyjF1NV5d+Orr/SjT+5lghvzg4kIPM0u/D+CpC
+         ghTJ85qSUj5VCrp5gcLMos6w2r2v+OAUSrv0Rj2UT93tSkm2RyCkituaFpWDgrxKNmTj
+         1VvJWv1zIRLZ/BOSfBlDYdOFG4mcG9J9RP3PITgqAxvFRGr1lNu/d8fQQsbPMLp/qzLL
+         /jPoDVJcV8SpaPhy0dAwL9U60ZIaMR1F4JMmhZgnMP2h0ek0FlddT9gZNnaZYsvrQEvl
+         zrehCNtW8u0Aa52VvDFkiie6UzIjN49NkaxsWZerYmTbymUkDAiMkF2u5nXPb81Yx7pH
+         Sb7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771265818; x=1771870618;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=I9yEWBPrKOblvd34VDWmHAD2jvVK0y+VhzSO4cxEb3g=;
+        b=alk/u2M9zt8Acj/TAKnR5UbNfRBqEyZbBK6NiN4lWmIFEkKfRIeC7kEcXsCIIry8gq
+         xKMJwJYwFHRZSB+EY6W08Awzva0a2FHHW2Wt8BjRMK1G8QcMcAhg6uhVE/skfJCzEj/W
+         8fvRgZgsx0SWfMNEUqcwK98nttVn/+z8L6AqjeC9jP6LhP9BNG1U2Ir3vtW1whahi4C1
+         D6EPGglXNWOR17dg462x2bxo7ip5GHYX57ibn+SNssSbKi34spVTwXMl8oB4zn9xu76V
+         0OyU53Qf8T3DRpjxUhMRmz+AXaAhI8NhyZFycIPbANGwpmb7ZR0K8eNOBFRhbEN07WYe
+         LhbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVEAyd/nswfjgnDOOiTaR8QISm1BrnePRI33Lwb5bXa1J6FpZpAorAqo+u4QO2dfc9hMNLeVGY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyY8pVXOvVZq2JDNqN3icwdAmMijv6A66miaQnj7XCbxrwUv5jq
+	nsJyuouNY3VP1veomTLDymr/BspoQ4Az1+C5HV0RDn1+OiiHy5CHG/QUmeDMxh4SgP3Ag4gyp/7
+	QIchuiGutC6tV2BHCVVd40eqhWBVG53FTH1Xm0HT0
+X-Gm-Gg: AZuq6aII4OZY6F0+fj4rWjERUZ9/n6fZ1ofuRMBFUoubJdD8mO8LA2G514UTJ0RXk3/
+	grb3yK2ZjXct9TteEMz300oqiMsbYocA5HbD8TC19SqnNBgYvnvQHGAyeuuBke93PymYeVACOHx
+	zY6VfZHNlFa/Bv3YRByRFGPmG25x5ECucI+sokG5GYFxSgKk8fF8CPBdmoalB1nUv6qn9WLVvAM
+	sp79aU1hh/QJITWodLfdkWj5uYOWor/y+RVot8hR1VH/dLzKjsB1bFAbxKiYFjFZQZXpk68nLQI
+	ER3DRQ==
+X-Received: by 2002:ac8:5715:0:b0:4f4:c104:9519 with SMTP id
+ d75a77b69052e-506a8319083mr152419991cf.42.1771265817256; Mon, 16 Feb 2026
+ 10:16:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/2] net: ethernet: ti: am65-cpsw-nuss: Update
- port_mask while adding multicast entry
-To: Siddharth Vadapalli <s-vadapalli@ti.com>
-CC: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@kernel.org>,
-	"Vignesh Raghavendra" <vigneshr@ti.com>, Vadim Fedorenko
-	<vadim.fedorenko@linux.dev>, Matthias Schiffer
-	<matthias.schiffer@ew.tq-group.com>, Nishanth Menon <nm@ti.com>, Michael
- Walle <mwalle@kernel.org>, Simon Horman <horms@kernel.org>, Roger Quadros
-	<rogerq@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski
-	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, "David S. Miller"
-	<davem@davemloft.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	<linux-omap@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>
-References: <20260205070951.3170631-1-c-vankar@ti.com>
- <20260205070951.3170631-2-c-vankar@ti.com>
- <83a867729ac8fa08709c52e2a357c97ef1bac27e.camel@ti.com>
- <fd5c557f-b6a6-44e0-b66d-8fd7defc7203@ti.com>
- <fecaeb94-c004-40f0-86e6-6b7c553a2fd8@ti.com>
-Content-Language: en-US
-From: Chintan Vankar <c-vankar@ti.com>
-In-Reply-To: <fecaeb94-c004-40f0-86e6-6b7c553a2fd8@ti.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000A34B:EE_|SJ2PR10MB7735:EE_
-X-MS-Office365-Filtering-Correlation-Id: f284632c-cba7-4631-03dd-08de6d876d51
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|7416014|376014|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?UFZDekJMbG01L256YnFDTm5LSU1RVWhMcDREVENhZS9UVVZ1SUtTS1phQW9x?=
- =?utf-8?B?ZWVMUHRCVm1XbXRiVHpyVXFJeUIvdlZKNWY2OW5ydXdzYitZZFZwYVh6azJv?=
- =?utf-8?B?OVI3R1o5VzRVaFUyMGR0c1UyM2hjeHBBOUIyS0hmVlFDTjVueTd4cWdvNDdj?=
- =?utf-8?B?cjhpM3FnSGNrWWZIR01WM0ZDWE5GVU50c3NLeGRwK3JkcWNzVUJEQXJYdVhO?=
- =?utf-8?B?UzNUYTl3aEpGVWhZKzhOYnZGZWgvVXdXZXRpWmpjQVRoVlNoWHRxMkJLMnRE?=
- =?utf-8?B?ck1WRURwdGFXTkI2RGtveUE1cGhjakVZQnIwMUh1TFl0dXI1by83S0tNa1Jt?=
- =?utf-8?B?UXplblBSSFlPN01sZnhPdEpzQzJzeVMwbVFvWWVMb3YwcGpFR3ZYd01OMTlo?=
- =?utf-8?B?dWhkZDFRUHlOcGtqZ3VpUGhZVHVnUWdqUXFrOGV3M20yQlJjU0t2cGhZL2V4?=
- =?utf-8?B?QkdIbGdEdVg5YndTdCtPYzNIYktIdXFGaWhBakwrak5ISzU1eVJZb1ZuNDRU?=
- =?utf-8?B?cTNQUTdweVpsWjVJandVNmQxcTJWaXhMVUpTR1hEcThDYktMUFpiWFB3RjNl?=
- =?utf-8?B?cDFOSnR4STdQWGVEZm9abXNaSFBNTkEvNGpTU20rc0JMUEUyNklhVkRjaER2?=
- =?utf-8?B?VXIxaFZIQ3RqYmIzZ1FBbkhUUUdqWHFmY1BGRllrblY0TjJJc0wxQ01YWFgy?=
- =?utf-8?B?Z0R0U2RHVEZ0MTJlQXRVT2tTYi9GMHFUZEN2SnJSTHdpNm1TbFhhVU1ReTBv?=
- =?utf-8?B?SnZJSFVqR0F3Vlp4Q1VQVXI0L2xNeUlBbVQvNEMvZndGYjQ2Q2VSWjFabkk1?=
- =?utf-8?B?bFdLQ1JPUHJtUnNvOEc1UzhwUjdENERFYUNXbUptWGdZZjJBNVNvRWZSUlVz?=
- =?utf-8?B?NzIrMzhwYjNUNmtVZkRkY3QwUWhYd0RHZXhKVWpxejRlK1JFSlQ5L1EwdEMr?=
- =?utf-8?B?cXlENk5hWFMrZnR4cllQRFYwYVlBRG5KR0dLcktEQjZmcHBUN1A0dkxiUEU1?=
- =?utf-8?B?SkxJY01tM3I5akxHMjB0V3FmRU9vaXdVTXQvY243MFNzcGlZNGZVMTgxb1ZR?=
- =?utf-8?B?TFY3dXE1WS8xcmx1ck9MUzc2RUJWUkdkT3N5K3RBN2E3WkFxUnUxQjRRVmZX?=
- =?utf-8?B?NUlFd2NwVllNRUZ0SmxhdE11S0Yvd3VpdjY1OFpLc3RUWTdramNMVzczOFZv?=
- =?utf-8?B?NVI1SmZqY21aOFJyMFdxK1FSbndPMW5ZSlB6QXBKOWs5Y2t6SXZwY1pRZzVF?=
- =?utf-8?B?S1h6OUhtR1BGNkN0U1VPRjBOWjdpQlloblV2clFqT1YwNjlNQ3FvamRZVUp4?=
- =?utf-8?B?VFVvc04zNEhFUkVBNTlnQVkxUnFRazFlemo5SndCUUZ4UVZHOUdXYnRMSmxC?=
- =?utf-8?B?dlczQ1d3L0R1ME1ibUtuUC8wWVJXblVFM1JGSU5uZmxSQnJ5QWFROFI0dnFp?=
- =?utf-8?B?OFVaOFMrYWxKS3paSGNZYlhUM2hjR3hWRU5BTVhwa0lHWDVmZDhOcllGSndT?=
- =?utf-8?B?U0pmU0NrS3FsQUZwRVlHTUFyeERIVkRsM0hVZDVPLzBhQmhyRDAxcVlnUlEz?=
- =?utf-8?B?OUNBblhQWmIxOExNaXcwVkxhYi9oMndzWk1OM2IvdDJwZWtSVERKTHQxQ2Z6?=
- =?utf-8?B?aGRNMWhRMlRoZXhqeDNjaE5TMHFuWVkzSUY3TXBwYi9zNnRQd0w5WjlUYUxX?=
- =?utf-8?B?aXVyTXpNV2RFTFgxc1FYOThCTE1PaEZHUnhyWDdudklUL0UxSFd2TXZURVZI?=
- =?utf-8?B?Y0ZMZnJaNzczTi9jUUJqaWxtamNvb1l5WWRWSGpXNDAvc2NZMnN1UmVTbVdm?=
- =?utf-8?B?M1V2Q3B1NVZvTDFwOXQvblQ4SURCVGdVQ25vTm9uTG8rVGhNMXZCcmQ1dkVs?=
- =?utf-8?B?QjNNaEZWT0RmWEFyVGd1bVg3anlOaUNRakNHWnNOMkFGYTlLSHM0ZGJFVHc2?=
- =?utf-8?B?am9OdEN3VTd0WGtSN0NRTFNoVUVlajlyS3FkYzNUNU5zb2ZrWmM2UFozcDQ1?=
- =?utf-8?B?eU9iNEtObjV1WGdzL1I5bDJiZy93S01YK3VUK1h6cFpGMGticGdUTkVGZlYy?=
- =?utf-8?B?WDBmcGtJbnhONGdBaFVXTjdNOFlhdWJ6ZDk4Znd6MVFRUVZBUGJ6akNqZDE5?=
- =?utf-8?B?QmRwZWlXcjNyMlJwemducTlIamtHazIrSkY4TUJvcDVhdlRYamdFajZvSzlr?=
- =?utf-8?B?WFp2N0lDZE9rR0t3d0EyVklxWG1KNGkwcG04MVlzNTlzYU9LMTd2WFBPRk9H?=
- =?utf-8?B?QkZMRGlBbzh0NTZSREdtN1JabFRRPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:198.47.21.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:flwvzet201.ext.ti.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(7416014)(376014)(36860700013);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	8G/FZZ8QnD1C/OCDK70w51Tq2H3+fDzZU65I4z/LGjxEYH6QsEeSC96gSS7YCLfof9cRT0h4lnTJeylJ/Cd4jNZLcvsBNAlZVQHpDpqaPCnUxBfOEFep5Y2aauDVWOQN4BM1DPQ72tsgok5AQMDnt2YSPIG4RNZG+seFvP61HLy9o/pNzRL73eF80rithPYr7yoSoKFHcHO7MjolcvF6fjRlwOGD+vjoi/8MyxV+X5wU/SGpW2QOBpkbsl9LPkJBsYc/bqeSd4nXOE2cLYz0SiwKxxw6e/ktyxucvt5ZlCUYwS26ZuuubyiMu6Usbs5/igHB7nm3D5OgcGLOSeth8+G7HUUBJP+qAr85qmRuJZ0TZLE/m2km6WQgoPlhuKUkAvmLp2Q6awd7FhFjwSLVI00qVn96MlyNGtzhx3vjqfK0twY61/fwWGO0bTMc6AEj
-X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Feb 2026 18:15:55.4278
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f284632c-cba7-4631-03dd-08de6d876d51
-X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.21.195];Helo=[flwvzet201.ext.ti.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000A34B.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR10MB7735
+References: <20260117164255.785751-1-kuba@kernel.org> <CANn89iKmuoXJtw4WZ0MRZE3WE-a-VtfTiWamSzXX0dx8pUcRqg@mail.gmail.com>
+ <20260117150346.72265ac3@kernel.org> <CANn89iJ8+5OaWS2VzJqo4QVN6VY9zJvrJfP0TGRGv85mj09kjA@mail.gmail.com>
+ <20260119090435.44b1da2d@kernel.org> <20260129150459.29419003@kernel.org>
+ <CANn89i+P86WVVUY-4WppUAH1TGix1Z3KhgX9vSHok5nXqQAiHQ@mail.gmail.com>
+ <20260216094936.5bf9d789@kernel.org> <CANn89iL+kzhRqwBr5wAcEBMdC_wbLFanHJ6VxS1r5ppGKUhftA@mail.gmail.com>
+ <20260216101108.6b2319b2@kernel.org>
+In-Reply-To: <20260216101108.6b2319b2@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 16 Feb 2026 19:16:46 +0100
+X-Gm-Features: AaiRm53p4l0QkjSg25AvVWQ9VhgOc973Fy1GRiwGgJxpQmK2v1WZn9St9avpXyY
+Message-ID: <CANn89iLURfPA69TjXjdBJjbc+Ad8X8XO-fiDQp=Uc8J+0PU5JQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: try to defer / return acked skbs to
+ originating CPU
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: kuniyu@google.com, ncardwell@google.com, netdev@vger.kernel.org, 
+	davem@davemloft.net, pabeni@redhat.com, andrew+netdev@lunn.ch, 
+	horms@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258940-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258941-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[c-vankar@ti.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[ti.com:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 07131146F36
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 199BC146F46
 X-Rspamd-Action: no action
 
-Hello Siddharth,
+On Mon, Feb 16, 2026 at 7:11=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Mon, 16 Feb 2026 18:58:08 +0100 Eric Dumazet wrote:
+> > > > I think I totally missed your email :/
+> > > >
+> > > > What about not attempting defer for zero copy skbs ?
+> > > >
+> > > > It turns out existing patch e20dfbad8aab ("net: fix napi_consume_sk=
+b()
+> > > > with alien skbs") is already a problem for zcopy.
+> > >
+> > > We definitely need either this or the timer patch I attached, for UDP=
+.
+> > >
+> > > I put the TCP write side on a back burner because slab sheaves got
+> > > merged, I think skb defer free will still make a difference but IDK
+> > > how much. Maybe juice will no longer be worth the squeeze?
+> >
+> > It depends how many frags are attached to each skb.
+> >
+> > page frags are not yet handled by SLUB sheaves :)
+>
+> Ack, my recollection is that more of the cycles are spent in slab than
+> pcp handling, tho. I could be misremembering. But my thinking was that
+> if we both:
+>  - lose zc sends due to the unbounded completion time
+>  - lose the slab benefit due to sheaves
+> we are only left with fairly narrow case of page handling of small skbs.
+> My gut feeling was that however unclean the timer fix would be best
+> since it gives us zc back. But I don't have a way to experiment with
+> sheaves yet to get data. All of this is pure speculation.
+>
+> Regardless the patch you shared earlier is probably best as a fix for
+> zero-copy UDP for now.
 
-On 05/02/26 20:31, Siddharth Vadapalli wrote:
-> On 05/02/26 5:05 PM, Chintan Vankar wrote:
->> Hello Siddharth
->>
->> On 05/02/26 13:45, Siddharth Vadapalli wrote:
->>> On Thu, 2026-02-05 at 12:39 +0530, Chintan Vankar wrote:
->>>> Multicast entry rules are mainly evaluated for receiving traffic and 
->>>> do not
->>>> require MAC ports to be explicitly associated with them. However, 
->>>> setting
->>>> associated MAC port's bit to the port_mask of the ALE entry ensures
->>>> technical correctness and helps maintaining ALE entries linked to MAC
->>>> ports.
->>>>
->>>> Signed-off-by: Chintan Vankar <c-vankar@ti.com>
->>>> ---
->>>>   drivers/net/ethernet/ti/am65-cpsw-nuss.c | 2 +-
->>>>   1 file changed, 1 insertion(+), 1 deletion(-)
->>>>
->>>> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ 
->>>> ethernet/ti/am65-cpsw-nuss.c
->>>> index 5924db6be3fe..967918050433 100644
->>>> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
->>>> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
->>>> @@ -391,7 +391,7 @@ static void 
->>>> am65_cpsw_nuss_ndo_slave_set_rx_mode(struct net_device *ndev)
->>>>       cpsw_ale_set_allmulti(common->ale,
->>>>                     ndev->flags & IFF_ALLMULTI, port->port_id);
->>>> -    port_mask = ALE_PORT_HOST;
->>>> +    port_mask = BIT(port->port_id) | ALE_PORT_HOST;
->>>
->>> Since the port_mask setup above is passed to 
->>> 'cpsw_ale_flush_multicast()'
->>> below, wouldn't it temporarily cause the forwarded multicast traffic 
->>> to be
->>> dropped?
->>>
->>>>       /* Clear all mcast from ALE */
->>>>       cpsw_ale_flush_multicast(common->ale, port_mask, -1);
->>>>
->>>>
->>>
->>> The code in the driver following the above function call is:
->>>
->>>     if (!netdev_mc_empty(ndev)) {
->>>         struct netdev_hw_addr *ha;
->>>
->>>         /* program multicast address list into ALE register */
->>>         netdev_for_each_mc_addr(ha, ndev) {
->>>             cpsw_ale_add_mcast(common->ale, ha->addr,
->>>                        port_mask, 0, 0, 0);
->>>         }
->>>     }
->>>
->>> So we do add back the multicast entries for the same 'port_mask' that we
->>> removed earlier during cpsw_ale_flush_multicast(), but, there is a delay
->>> between flushing the entries in cpsw_ale_flush_multicast() and adding 
->>> them
->>> back via cpsw_ale_add_mcast(). During that period, the multicast 
->>> traffic on
->>> the forwarding path between MAC Ports will be momentarily dropped. 
->>> Please
->>> clarify if that isn't the case.
->>>
->>
->> When "cpsw_ale_flush_multicast()" is called, it only deletes entries
->> where the resulting port_mask becomes "0x0" or "ALE_PORT_HOST" (as per
->> the function implementation "cpsw_ale_flush_multicast()" in cpsw_ale.c).
->>
->> For multicast entries shared across multiple ports, the function only
->> clears the specific port's bit from the port_mask without deleting the
->> entry itself. This prevents any traffic disruption for other active
->> ports.
-> 
-> Consider two MAC Ports P1 and P2. P1 belongs to multicast group M1 and 
-> M2, while P2 belongs only to multicast group M2.
-> 
-> If M1 is deleted from the interface for P1, it will trigger the 
-> execution of 'am65_cpsw_nuss_ndo_slave_set_rx_mode()' function.
-> In the function, we have:
-> 
->      port_mask = BIT(port->port_id) | ALE_PORT_HOST;
->      cpsw_ale_flush_multicast(common->ale, port_mask, -1);
-> 
->      => At this point, M2 would have also been removed in addition
->         to M1 for P1. As a result, Multicast traffic M2 from P2 to
->         P1 is dropped.
+I am cooking a formal patch, but I do not see why UDP is a problem today ?
 
-The scenario you have described applies to switch mode operation.
-However, the fix specifically addresses the issue with the MAC mode.
-The fix ensures that in MAC mode, multicast entries are correctly
-associated with the Host port and MAC mode, and it doesn't disrupt the
-traffic as mentioned in the previous reply.
+Definitely I am seeing problems with  e20dfbad8aab ("net: fix napi_consume_=
+skb()
+with alien skbs"), so was tempted to use it for the FIxes: tag.
 
-I believe I should be more clear with the issue and the fix. I will post
-the next version with more clarity.
+This is the first time a TX skb would be potentially delayed.
 
-Regards,
-Chintan.
+UDP use of skb_attempt_defer_free() is  with RX skbs, and normally
+their zcopy status has been cleared ?
 
-> 
->      if (!netdev_mc_empty(ndev)) {
->          struct netdev_hw_addr *ha;
-> 
->          /* program multicast address list into ALE register */
->          netdev_for_each_mc_addr(ha, ndev) {
->          cpsw_ale_add_mcast(common->ale, ha->addr,
->                     port_mask, 0, 0, 0);
->          }
->      }
-> 
->      => We are adding back M2 to P1 above, but since it is not
->         instantaneous, it will take time for the Multicast traffic
->         M2 to be forwarded from P2 to P1.
-> 
-> Please let me know if I have overlooked something.
-> 
-
-The fix in the second patch is for the MAC mode of operation and it
-won't disrupt traffic forwarding considering your scenario.
-
-Regards,
-Chintan.
-
-> Regards,
-> Siddharth.
-
+Thanks !
 
