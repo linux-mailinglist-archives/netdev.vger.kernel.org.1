@@ -1,63 +1,88 @@
-Return-Path: <netdev+bounces-258850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258851-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +B+AJoTokmlSzwEAu9opvQ
-	(envelope-from <netdev+bounces-258850-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 10:51:00 +0100
+	id sPTmBSTpkmlSzwEAu9opvQ
+	(envelope-from <netdev+bounces-258851-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 10:53:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3122D142142
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 10:51:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52B861421E6
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 10:53:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 97FDF3016810
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 09:50:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7EF3D303AB4A
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 09:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A26292EF665;
-	Mon, 16 Feb 2026 09:50:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E0B82F260E;
+	Mon, 16 Feb 2026 09:51:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pKrUyLK4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lLcmOhQc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EE2A2EDD69
-	for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 09:50:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D01832F0C76
+	for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 09:51:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771235448; cv=none; b=f9U+ZDT4wINbDFXeLPL6cwkGn0GT8PS/hC2WGVR5PZSvmM8+m9cLJAQyO759RGM0MqXZwUsDvIsgDrLlAi8Kb5BUpQp7z08MWHkra7/8tCz5uDV769/HUTu2RghCTfGkl562C/fLeDSTypSl6wGxf0SU1ajoCOcp2r4l7NzsdSA=
+	t=1771235516; cv=none; b=WMLhr9GShpkdCFrmZrMm13uO1jgA4RMoGck6y8ww1OcDYk3ydkcLf3rPNTjFPxRueU2OYPQw3wv3xri67zNvNrVcAAoNa9Z58o/cMPSztzAdLBodu7u6ja+BKcJ4SnTeso8yBJpq0O/pRAuTNYWdQuN1+J9zk+VuNTFPV1dBdvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771235448; c=relaxed/simple;
-	bh=MwWFjpb1C+eOhzKyQeFDWoURC8HYjjTPP6Wc+G77Bq4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bvPq50eB4lloyy8Ih90rQSKpVvE2NWR5kCIRpT5eKjBoV6AdmsOzIEuyipE2yOilJXNDYilewXBHlxl0DRuivow02TYujWMAizhwSqfq1GWgJ6yp8x0D8fW3U24sf11jarWv/Fg+uo+96shSJYxhVGsxBVgu3DwNhHcWO13ZjiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pKrUyLK4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C2BAC116C6;
-	Mon, 16 Feb 2026 09:50:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771235447;
-	bh=MwWFjpb1C+eOhzKyQeFDWoURC8HYjjTPP6Wc+G77Bq4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pKrUyLK44/9uaqJs/pgx/NLvTJrhpGuj7l9ECuOkQqIgxoNnSviLXGZEdM1oPtXK6
-	 MXin4UOBzV8koqPc0T6lwxz/GscMAicdLpNWLBoihzsCKZdJIfo/1jNebJPXe4PnKo
-	 7VLnyyZvLwaRKQIV288K34y9aPhd2nAG2qU2E9pYWs7h3RADKQqGP5iFIsCq/Wlljj
-	 P8fpK4i53GXa5DZNG0FPJBilE02g4XkOrlVH1N6qe8bzq/RYH9rTBDfFuy4/sXsS/x
-	 VrsIW4rzJrZk1YL1g+6z7JoxEUepih40UK0+m8WLc2XdhbVsdGnnYKLAqIMxE4tC3K
-	 qSTBz3rH0A/1g==
-Date: Mon, 16 Feb 2026 09:50:44 +0000
-From: Simon Horman <horms@kernel.org>
-To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-Cc: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"pmenzel@molgen.mpg.de" <pmenzel@molgen.mpg.de>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [iwl-next,v3] ixgbe: fix unaligned u32 access in
- ixgbe_update_flash_X550()
-Message-ID: <aZLodORhpbrDPJaO@horms.kernel.org>
-References: <20260213030940.1809797-1-aleksandr.loktionov@intel.com>
- <20260213151344.2513857-1-horms@kernel.org>
- <IA3PR11MB89860CF09BBD00129F59A4FFE561A@IA3PR11MB8986.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1771235516; c=relaxed/simple;
+	bh=c1tONeWLndexREHnhvNJE8lcdbJdgra9xE477TBB+EQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=I5IJ56bBu4taqnz3G0YZGgAsJMxX/bNA7cWPxTCIx3UjQ+N9aUjLYHeHChHNEz2Otw8McbU0sHgfqWL42/VMrRTVQ0uDfysPrA2Jas8kYLGPZweqdvZ7RlSgEIRncaz+SKPSa9sSmo5+Y32uh0sUR3ixMdfLzXO73PKQuZxECNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lLcmOhQc; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-352f60d6c2fso2038517a91.1
+        for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 01:51:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771235514; x=1771840314; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GafzzW88JeRD1FqpxjH3p2Ng1n+SZGzfP5Etdtebed0=;
+        b=lLcmOhQcYsj20yCYP9KId2+HrhTnHGC+aLFAwnUnNTBojPuC6W2AM4mc5ZmyNxXTB3
+         9T7iiqKp9RjACZnLyZkJfL4Ve+9J9UW13GhUCRuuGMVu8mG7bB/1+PFswzX3sHC2OynZ
+         qj2/aCCeCA2evBsumY8Nv+hT0kviWT7c0G56R/6hjsEIxrOUpGTC8x1hFFqEXMxZYJe6
+         wacLvXKkF+Z0V++WoIHE80CNegGj+N4G+jRlXIrMx6TS+kp+PbPxrwsDEVBP+nKtelYD
+         Ghu6HXF+8Ei9eL/9gZS24x/pRBt7BBroicQ23ahh1QesH0joGfIjWjzdwSpGowa8x4pc
+         J5Sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771235514; x=1771840314;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GafzzW88JeRD1FqpxjH3p2Ng1n+SZGzfP5Etdtebed0=;
+        b=utRwIDZgl1CUih63dAR2IcNgiHL3YT74EL/yvXXvqvLTZXibJqCksdkhUn3AftRyN4
+         GgDuf3pPVyMpXpULuaYav5t//vGQ3/pwdhrR/moYGEcBpQ94Ng1Qfa8DBgfL3I6aoj0F
+         0DWhFCwLumYLFIjKyjVkqVZJ/wbN3wjlzIY+KjhaiMvC8ww02DtykAPDTmYXbS4eNjVW
+         V2hmAOhcz/5nn/hI+OPGbNMpfAC1cyI49/5xsX/bP4mN53EQsCSCs/Z3ZaBFb8KUw53g
+         YWNM+aPzAOoBq+EphDN8vlMVNco25Q/RVVoYtbf5mh8lPvkBk3yzJHlnKoDjXTr1jF1M
+         toGg==
+X-Forwarded-Encrypted: i=1; AJvYcCUew76/Pjd0S/OhFFHSp7egpdDxeMGNpajL9hEgZ6ZA20+YvY0Jvb3n083jK3ARP0TfGxBMiQA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzmi4KxfWUOkVcP4OpPdB5R/7YOH1w/TgFW0zxUemghLrJnmcF4
+	XHe1iBYg06IJnQDyskvOqKaTUD8lIhESsJzJygrQJEMTrIG2RfwcVd4QN9RtwA==
+X-Gm-Gg: AZuq6aJJKWFGsWdS2jIh5CS4sseCDMpwmV16bzJnKGck7YAFlg3uN/7ovBZhgqa7d2v
+	FZZpBX9rkDYvqwnzFFi64EcDZ4e1F8WyVrmjVxQRLh+66bkp51FkzTWtJJyCKEu4WPes6Kd4i6Q
+	MPDK9iYOU5MgL7cnREVAyEQ3OsPhGfiGGNwVIdKVv4CIQS2b8r0A+Pegl/T/bniLfjnbD/vkOnU
+	2ATx3mdZ+YCQmbtYEBvM5qhLMEjDB9mB6EphV5EyYm6z4G0UOqluHge4yzpJKmdmEGgl5JMd2pM
+	csMuwFdIoXDEI4F73Zat1DbUMyY7ajr45Srzi1HbinsMpLb5tZaCUop7CxYdzTokDv1LFdpq4Ky
+	xjlmtYdSAdGSbO8+02Nsvtp7B/Pp/VKLupcB3EqLltLs3NxcxpqysydGIGbZMRp0X7XVEayZy6c
+	DGbfH0WIK/ApOBiBDksPGhod8S+mumlDbyiDHr8l1tnA==
+X-Received: by 2002:a17:90b:4cc4:b0:34c:2db6:578f with SMTP id 98e67ed59e1d1-35844f95e58mr7960191a91.19.1771235514130;
+        Mon, 16 Feb 2026 01:51:54 -0800 (PST)
+Received: from v4bel ([58.123.110.97])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3567ebc3af1sm15130598a91.15.2026.02.16.01.51.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Feb 2026 01:51:53 -0800 (PST)
+Date: Mon, 16 Feb 2026 18:51:50 +0900
+From: Hyunwoo Kim <imv4bel@gmail.com>
+To: john.fastabend@gmail.com, kuba@kernel.org, sd@queasysnail.net,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com
+Cc: horms@kernel.org, netdev@vger.kernel.org, imv4bel@gmail.com
+Subject: [PATCH] net: tls: Use disable_delayed_work_sync() instead of
+ cancel_delayed_work_sync() in tls_sw_cancel_work_tx()
+Message-ID: <aZLotq3aZY0b-dI8@v4bel>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,93 +91,88 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <IA3PR11MB89860CF09BBD00129F59A4FFE561A@IA3PR11MB8986.namprd11.prod.outlook.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-258850-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258851-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org,queasysnail.net,davemloft.net,google.com,redhat.com];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,mpg.de:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,osuosl.org:email,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: 3122D142142
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 52B861421E6
 X-Rspamd-Action: no action
 
-On Fri, Feb 13, 2026 at 04:02:53PM +0000, Loktionov, Aleksandr wrote:
-> 
-> 
-> > -----Original Message-----
-> > From: Simon Horman <horms@kernel.org>
-> > Sent: Friday, February 13, 2026 4:14 PM
-> > To: Loktionov, Aleksandr <aleksandr.loktionov@intel.com>
-> > Cc: Simon Horman <horms@kernel.org>; intel-wired-lan@lists.osuosl.org;
-> > Jagielski, Jedrzej <jedrzej.jagielski@intel.com>; Nguyen, Anthony L
-> > <anthony.l.nguyen@intel.com>; pmenzel@molgen.mpg.de;
-> > netdev@vger.kernel.org
-> > Subject: Re: [iwl-next,v3] ixgbe: fix unaligned u32 access in
-> > ixgbe_update_flash_X550()
-> > 
-> > This is an AI-generated review of your patch. The human sending this
-> > email has considered the AI review valid, or at least plausible.
-> > 
-> > For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-
-> > local.html
-> > ---
-> > ixgbe: fix unaligned u32 access in ixgbe_update_flash_X550()
-> > 
-> > This commit adds a u32 member to union ixgbe_hic_hdr2 to ensure 4-byte
-> > alignment on the stack, preventing unaligned 32-bit accesses when
-> > ixgbe_host_interface_command() treats the buffer as a u32 array.
-> > 
-> > > ixgbe: fix unaligned u32 access in ixgbe_update_flash_X550()
-> > >
-> > > ixgbe_host_interface_command() treats its buffer as a u32 array. The
-> > > local buffer we pass in was a union of byte-sized fields, which
-> > gives
-> > > it 1-byte alignment on the stack. On strict-align architectures this
-> > > can cause unaligned 32-bit accesses.
-> > >
-> > > Add a u32 member to union ixgbe_hic_hdr2 so the object is 4-byte
-> > > aligned, and pass the u32 member when calling
-> > > ixgbe_host_interface_command().
-> > >
-> > > No functional change on x86; prevents unaligned accesses on
-> > > architectures that enforce natural alignment.
-> > >
-> > > Fixes: 49425dfc7451 ("ixgbe: Add support for x550em_a 10G MAC type")
-> > 
-> > Does this Fixes tag point to the correct commit? The alignment issue
-> > appears to have been introduced by commit 6a14ee0cfb19 ("ixgbe: Add
-> > X550 support function pointers") from 2014-12-05, which introduced
-> > both the union ixgbe_hic_hdr2 without a u32 member for proper
-> > alignment and the
-> > ixgbe_update_flash_X550() function that passes this buffer to
-> > ixgbe_host_interface_command().
-> 
-> Commit is correct, please configure your AI to look all the history of the patch, where I explained that it was a 0 day issue.
+After cancel_delayed_work_sync() is called from tls_sk_proto_close(), 
+tx_work_handler() can still be scheduled from paths such as the 
+Delayed ACK handler or ksoftirqd.
+As a result, the tx_work_handler() worker may dereference a freed 
+TLS object.
 
-Sorry about that. I did look over this myself, but I guess I must
-a have forgotten to look over the patch history at the time.
+To prevent this race condition, cancel_delayed_work_sync() is 
+replaced with disable_delayed_work_sync().
 
-...
+Fixes: f87e62d45e51 ("net/tls: remove close callback sock unlock/lock around TX work flush")
+Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+---
+ net/tls/tls_sw.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index 9937d4c810f2..b1fa62de9dab 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -2533,7 +2533,7 @@ void tls_sw_cancel_work_tx(struct tls_context *tls_ctx)
+ 
+ 	set_bit(BIT_TX_CLOSING, &ctx->tx_bitmask);
+ 	set_bit(BIT_TX_SCHEDULED, &ctx->tx_bitmask);
+-	cancel_delayed_work_sync(&ctx->tx_work.work);
++	disable_delayed_work_sync(&ctx->tx_work.work);
+ }
+ 
+ void tls_sw_release_resources_tx(struct sock *sk)
+-- 
+2.43.0
+---
+
+Dear,
+
+The following is a simplified scenario illustrating how each race can occur. Since tls_sw_cancel_work_tx() does not hold lock_sock(), it can race with tls_write_space().
+```
+          cpu0                                             cpu1
+
+tls_sk_proto_close()
+  tls_sw_cancel_work_tx()
+                                                    tls_write_space()
+                                                      tls_sw_write_space()
+                                                      if (!test_and_set_bit(BIT_TX_SCHEDULED, &tx_ctx->tx_bitmask))
+    set_bit(BIT_TX_SCHEDULED, &ctx->tx_bitmask);
+    cancel_delayed_work_sync(&ctx->tx_work.work);
+                                                      schedule_delayed_work(&tx_ctx->tx_work.work, 0);
+```
+
+Best regards,
+Hyunwoo Kim
 
