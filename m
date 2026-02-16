@@ -1,56 +1,67 @@
-Return-Path: <netdev+bounces-258866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258867-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YF3pJngKk2nw1AEAu9opvQ
-	(envelope-from <netdev+bounces-258866-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 13:15:52 +0100
+	id eN2xAjQLk2nw1AEAu9opvQ
+	(envelope-from <netdev+bounces-258867-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 13:19:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 394A3143430
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 13:15:52 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2CEB143475
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 13:18:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 863B53013A62
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 12:15:48 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 084593006830
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 12:18:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 799843081D6;
-	Mon, 16 Feb 2026 12:15:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63F7C30BF5C;
+	Mon, 16 Feb 2026 12:18:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iydi1NuJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A3082690C0;
-	Mon, 16 Feb 2026 12:15:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B9A2690C0;
+	Mon, 16 Feb 2026 12:18:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771244147; cv=none; b=X6YyJjQOpYtoBWa50VoG5cMZrUdtl8QXOFJ5iS6iy8PR0rNCe62U7p8LSgR/cxluBIJUh9Ez0buR4emQQgWzHk1rNR9WgFnUXp7GwZQqUj6gNd0vvR8cDP/xxQJbiCs+gGPHvsG32XyfVaChY9L5JPid9XexcowSEoIzTPjkhnY=
+	t=1771244337; cv=none; b=e9Pe3bXo9XBeHPexMokiF3Sx3ANwE20/BRo3APPRnZ1ZzIKUPLekFg7yjID5iEhjKe3J06Dgf9NdZsDojmivvsSzNtxaQS7iTwGpEg7JiJw/I3QcbampDxS1JJhXHT5IrHmp0nfdFJ13PRntpNcm2tuHcOncdvYg8EaPDrWw4Ic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771244147; c=relaxed/simple;
-	bh=P/0XkNFt6Y7qOtSbIlMVIVDPWkCJW8egWendUV2pzoU=;
+	s=arc-20240116; t=1771244337; c=relaxed/simple;
+	bh=Hr6sWNozHcIqkYyQhJ753UqohgXVIZtkIn4+7uzTfok=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OIdLl45bGChVhWdLbNkLXT2OcKUcA3IA1Kf4rcBljR5rkzBLwDnmtvryOfcNamcuE7s0SqgW6WhFXI14fOqnXwo9Df777LdTAoF/V8Se8jJPZumJaW5zWzDwTt9lKWCPJ97QBvG9PQkwEOPSKx7mJLnj9UBvbXP7KXlbmSbFTB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vrxVj-0000000006z-44Ze;
-	Mon, 16 Feb 2026 12:15:32 +0000
-Date: Mon, 16 Feb 2026 12:15:25 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Guenter Roeck <linux@roeck-us.net>, Arnd Bergmann <arnd@arndb.de>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hwmon@vger.kernel.org
-Subject: Re: [PATCH] net: dsa: MxL862xx: don't force-enable MAXLINEAR_GPHY
-Message-ID: <aZMKXavVQPelSXcG@makrotopia.org>
-References: <20260216105522.2382373-1-arnd@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=s4tLapRrBT9ND4mBdh3ZfugNhinOD3f6jh7OzSOEEwmQbAp01ALziAJUeUGmShJ/16etR2WPeYgqEYYOECQwNvwyJwsb3zVWTb0cvbdxCp3TG8nQNAfYJ++91gAckfWe5t/KjuOWGgWOXoHGGOu/9S4ay/QlGvmIPPbPOL21I7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iydi1NuJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0117C116C6;
+	Mon, 16 Feb 2026 12:18:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771244337;
+	bh=Hr6sWNozHcIqkYyQhJ753UqohgXVIZtkIn4+7uzTfok=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iydi1NuJLyQmwfBLduz7qcgfJ0i7MIIkdgYNPFV/pPY3E6fq+phL/izkA+oZRN1YM
+	 +JzJL5EdfN/VQ8DkN9hUUwbj/POiQZTJFv1P31OCBkIQLW9OmGDOGXxtvdL0H9Ns2w
+	 1RqVEX3+jQ7vBIu5Js2g+ZuP6pwVytZZYQINQgZCyHZfKm8fBMQhKUvzAoxwKKTwKE
+	 pL2jD6TxCf6JPAV2XdVl7K8kZgCuEDes5+ryH6xjLFjTjX27e6fTGRqXINk4eLJQKp
+	 QU+fFHD3aIfQXd7713p+Dz0Ciu+WX2UY+VmzdOmV6e9ulTSiyNz6o69WJNGSBDRERO
+	 6/9/X7M3HKvvg==
+Date: Mon, 16 Feb 2026 12:18:51 +0000
+From: Simon Horman <horms@kernel.org>
+To: Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Mohsin Bashir <mohsin.bashr@gmail.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net] eth: fbnic: Add validation for MTU changes
+Message-ID: <aZMLK7CVV6hSbUOg@horms.kernel.org>
+References: <20260214171949.772493-1-dimitri.daskalakis1@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,87 +70,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260216105522.2382373-1-arnd@kernel.org>
+In-Reply-To: <20260214171949.772493-1-dimitri.daskalakis1@gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258867-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258866-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[makrotopia.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,roeck-us.net,arndb.de,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,fb.com,kernel.org,google.com,redhat.com,lunn.ch,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,arndb.de:email]
-X-Rspamd-Queue-Id: 394A3143430
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: A2CEB143475
 X-Rspamd-Action: no action
 
-On Mon, Feb 16, 2026 at 11:55:17AM +0100, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
+On Sat, Feb 14, 2026 at 09:19:49AM -0800, Dimitri Daskalakis wrote:
+> Increasing the MTU beyond the HDS threshold causes the hardware to
+> fragment packets across multiple buffers. If a single-buffer XDP program
+> is attached, the driver will drop all multi-frag frames. While we can't
+> prevent a remote sender from sending non-TCP packets larger than the MTU,
+> this will prevent users from inadvertently breaking new TCP streams.
 > 
-> The newly added dsa driver attempts to enable the corresponding PHY driver,
-> but that one has additional dependencies that may not be available:
+> Traditionally, drivers supported XDP with MTU less than 4Kb
+> (packet per page). Fbnic currently prevents attaching XDP when MTU is too high.
+> But it does not prevent increasing MTU after XDP is attached.
 > 
-> WARNING: unmet direct dependencies detected for MAXLINEAR_GPHY
->   Depends on [m]: NETDEVICES [=y] && PHYLIB [=y] && (HWMON [=m] || HWMON [=m]=n [=n])
->   Selected by [y]:
->   - NET_DSA_MXL862 [=y] && NETDEVICES [=y] && NET_DSA [=y]
-> aarch64-linux-ld: drivers/net/phy/mxl-gpy.o: in function `gpy_probe':
-> mxl-gpy.c:(.text.gpy_probe+0x13c): undefined reference to `devm_hwmon_device_register_with_info'
-> aarch64-linux-ld: drivers/net/phy/mxl-gpy.o: in function `gpy_hwmon_read':
-> mxl-gpy.c:(.text.gpy_hwmon_read+0x48): undefined reference to `polynomial_calc'
+> Fixes: 1b0a3950dbd4 ("eth: fbnic: Add XDP pass, drop, abort support")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>
 
-I assume this happens in case CONFIG_MAXLINEAR_GPHY=y and
-CONFIG_HWMON=m, right?
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-None of the PHY drivers seem to adequately prevent such situations,
-which in my opinion would be worth correcting, ie. by preventing any
-PHY driver using HWMON from being built-in while CONFIG_HWMON=m.
-
-> 
-> There is actually no compile-time dependency, as DSA correctly uses the
-> PHY abstractions. Remove the 'select' statement to reduce the complexity.
-> 
-> Fixes: 23794bec1cb6 ("net: dsa: add basic initial driver for MxL862xx switches")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-
-As there is no compile-time dependency, this change is fine.
-
-Reviewed-by: Daniel Golle <daniel@makrotopia.org>
-
-> ---
->  drivers/net/dsa/mxl862xx/Kconfig | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/drivers/net/dsa/mxl862xx/Kconfig b/drivers/net/dsa/mxl862xx/Kconfig
-> index 4db7bab21a71..3e772298cc89 100644
-> --- a/drivers/net/dsa/mxl862xx/Kconfig
-> +++ b/drivers/net/dsa/mxl862xx/Kconfig
-> @@ -2,7 +2,6 @@
->  config NET_DSA_MXL862
->  	tristate "MaxLinear MxL862xx"
->  	depends on NET_DSA
-> -	select MAXLINEAR_GPHY
->  	select NET_DSA_TAG_MXL_862XX
->  	help
->  	  This enables support for the MaxLinear MxL862xx switch family.
-> -- 
-> 2.39.5
-> 
 
