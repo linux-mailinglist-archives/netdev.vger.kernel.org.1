@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-258899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258900-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4KE1L6Apk2kI2AEAu9opvQ
-	(envelope-from <netdev+bounces-258899-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 15:28:48 +0100
+	id EJ21JK0pk2kI2AEAu9opvQ
+	(envelope-from <netdev+bounces-258900-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 15:29:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2CE6144AA1
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 15:28:48 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7978144AB7
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 15:29:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A96CB300824E
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 14:28:47 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1DD573004045
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 14:28:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68A09310774;
-	Mon, 16 Feb 2026 14:28:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A261311C05;
+	Mon, 16 Feb 2026 14:28:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JKErVwHY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yEQR7OKw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13F053112BC
-	for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 14:28:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E414B31195B
+	for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 14:28:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771252125; cv=none; b=EeBHgTlD9bssWzNRKQGIm8aK8VVJ0K2TeBNlCBYwObJhzo8kWykUJF+paBi7M+hcI7WLYGRfm1Bk+QM1wDN0QVwsLIu4q3HW4up1YkmZG+u1kQrUhfUl8kRRQbyfc6f3y14HRYA/tPvNgSkRKnobXECxtwuxnjjxA8EXjEjCrzg=
+	t=1771252127; cv=none; b=E8MOUEYugBTMSmxbkNNc8TSKOwjitMAGWLFZy1T8msjCMCDj2AgzWneCV+fH+vAKB78GH+gbvIA8Y+hSB4y0VoswidsnUd6hlkZ4vcJ2llq1SSNJmvKBW730om7uo7HsDJIYaXKFO2518VJyG1FqMT1MYYgMV90Bw8pamFl0GPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771252125; c=relaxed/simple;
-	bh=cYg9oGM9M9PPw6Ds3AMCWiv7eBZ5h1Ugbg8UUUm45tE=;
+	s=arc-20240116; t=1771252127; c=relaxed/simple;
+	bh=HRQUdjNHcx45JM5FV/QnOASISlDMoH0fxf7DDrcl0mg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=k8VHtw0nn9Z+mJtk0HTVCO6SufKx9YFzKKB0w47jWvk+nTOw+fn8CvRcXMz0NYAuBNnP6wnW7RzCsMLhRTrkTpHHOhCiRhPk+4cBXaPqAdwSCGFKSaPmyAvIf8RY3BooI/VoSXwHs2lmzas3VPG8yLGZ0qly7du6VRhqi81UANs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JKErVwHY; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=HXUPGTepINWZs5FU2AN1gtao2foeIY2jugGDef0UthlMOBGooVSXzaizOYgu/CXWw0I/wrlxuvS1cREdZNGfvq0AoL1EGvVN7RkU15E4v8VPwsN54Ol/QxtUiSvoEQu6ZFyqMsP3aJ0+Cc+Ncbkg7m+c0d7PtU5qAkPvBLdswOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yEQR7OKw; arc=none smtp.client-ip=209.85.219.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-797a47ee354so41089847b3.1
-        for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 06:28:43 -0800 (PST)
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-89718626897so270903556d6.1
+        for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 06:28:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771252123; x=1771856923; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1771252125; x=1771856925; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lcVh1dn4lH+XFgy2aWFDh/Ta/CqUiXLWNssPFQD/xu4=;
-        b=JKErVwHYlRu6c7FQ0RPZEZvgm+jSkSLwvrNPziz01Yj4XBzY1GmBSk2LBXY9ft6505
-         rw4DJeancsM9FXc2GKf2J62AHcL+VAlGeopPM7cAlAtJ9xqmviaBhfjE9K13jQcLDfXQ
-         eX0HiRkkKWk1K4q90e8M5egWMqcPKY4FtCBk/lIdt0QwhrBJfXcgfju4BSGZe0QAOWge
-         apKkrEt6uGmVGG6KSzwWCYJqfCiz+nU5bbvFxpnEb0AzDcBWvjt75+dMI5aqVNQB7ZD4
-         IGiKmZXNCggaod3pkrTtDT2L2R3wWz74tsGU4o+tusq0ax5y3MsiVPLqBUhLIL0oSfyz
-         8Ebg==
+        bh=IzU6nx/oBVaaUM6MYagj9F9aD46n6bFr5nZ3eoCS0fg=;
+        b=yEQR7OKwHWyyxDPjWYMSa5wox8TF9rzBaKTSaDQjONVvyDAb8bFsUmx95L67FOJ0XS
+         E9bu2NJnzoTlAs8yLKHQYkCSfenBq1LV4KRdAk+0rPhwLuxu3818H8g3bySoy/3MXsvC
+         ADkAAzXG5/rs4WlMe/eHfHM2iqbAJdBfLQU2cTVr7lb12ySYhniSKdl6sGk+Q8UVFUQ9
+         aXsg+z2+EcR8Kx3mZfz8UJ1k+WQaIhZX0RiITVFbjqVIxpGq0xy/sV9UOdrXrScnH035
+         8twFhIF380o+U8QYuY2zvIboZX5tsvpmQfHAFAm3u+FS2RqPvSh8hRpwAE+D4bxl3osv
+         Jd8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771252123; x=1771856923;
+        d=1e100.net; s=20230601; t=1771252125; x=1771856925;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lcVh1dn4lH+XFgy2aWFDh/Ta/CqUiXLWNssPFQD/xu4=;
-        b=LwirCaAijHPbTR9b317rn5XJaWjz/e0q03V4wJQpqZ6xd693gm8kSSjPCZA2Ll6N9r
-         gA6QSg5m7Hrtu6tWj4M80yLM8sEMhJ1BaOmiGL3rFQloX3KkwRKthFMRKZEMJpGlZG2u
-         sJy7uQ2SAQKpWhPpQJE3yPW7DzD7rN2kIQLBHArgOCOyfXtoN4s14DBbFMuRJTUGQUmf
-         7+VtOW+dqLA/755MXXWdhW0Wbpvb0cHV7je8f7Ole3Us/KEIdXw3oqbEZaNIQWrsejb5
-         p3SstJNmBVwzBifRFQAa8VjM5XJuDulmFivSdsR8zCxKapBVEVrSWlSLvwOuqxH5MNyr
-         D+rQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW5BKxZqDvb9sRn8dYMsbKI0ZW4Vow+TlwqflDGBfH+knfBjTX0JrTaW4s1NHkCWFsFhmdQgh8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKxI0lnYXg5eXBUjUqpAIZUfTRkQXH+YeNrGACF4/6lPIpsRu+
-	Isp1ddAsOQvUckz274D6b+j+5CFNhrpe2w2LBr/U+bq+xWros4xqUmoJmia+cTewsu2YrRZlsur
-	sVV0PdIMfxUKJnA==
-X-Received: from ywbdc21.prod.google.com ([2002:a05:690c:f15:b0:797:d3c9:d45f])
+        bh=IzU6nx/oBVaaUM6MYagj9F9aD46n6bFr5nZ3eoCS0fg=;
+        b=YDco/nP6fFhNP0YvWDktQQJFlQsrgk7h7sDTTQRs/z1K3BgTekffH6KTy4Ul9HnLa2
+         OXh4UW2PXf8AbbIb69fj3hEJ6I1eZxoh6rRrLLIJ6HCEJVAINOIcgdu5iTW+bOhB3kFD
+         SeYABbkh2RFXsZ2gdaMznOOZaRvsX+ji17782P9Zmxz6nULKMPHz5qmetrVJysj4WUHT
+         1Z40mpmSfzdWtc5j4VLIRbmX5vLA2E7W9qy9PNfy/Sfhy0+So3iQqzi8OF2m671JXIme
+         TMgpP6xWpL3YNugAhS+WqWkjEuR4+iiLvNJouuCzz8bnPp9c86QHVa0FhZI88L4un+7G
+         Uq3g==
+X-Forwarded-Encrypted: i=1; AJvYcCU2D+41ov++0IRdsmCElLSGyULJ3t7P0qE/4j5FjveOq4y66s0u+QyfO1Qbz7qzCqV6dtNgeo4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzMlJag7UCpcRqUxeV5GOzkvFMkk5lP2xWMPCS82xv/0EuLhNg
+	rs4IzC6D8UTYGYSIs7909YX9jleuvKOV4NTCxY8IHaMSW4LZMnEE7neNLGfjONR6aErIr2jVGUv
+	9z8FzHVnq45z5Tg==
+X-Received: from qvdg11.prod.google.com ([2002:a05:6214:1ccb:b0:895:4b04:aea])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:690c:c510:b0:796:3917:72ab with SMTP id 00721157ae682-797ac654e25mr55575407b3.61.1771252122905;
- Mon, 16 Feb 2026 06:28:42 -0800 (PST)
-Date: Mon, 16 Feb 2026 14:28:30 +0000
+ 2002:a05:6214:1c48:b0:895:46e:e8ec with SMTP id 6a1803df08f44-897402d45eemr124526016d6.14.1771252124459;
+ Mon, 16 Feb 2026 06:28:44 -0800 (PST)
+Date: Mon, 16 Feb 2026 14:28:31 +0000
 In-Reply-To: <20260216142832.3834174-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,15 +76,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260216142832.3834174-1-edumazet@google.com>
 X-Mailer: git-send-email 2.53.0.310.g728cabbaf7-goog
-Message-ID: <20260216142832.3834174-4-edumazet@google.com>
-Subject: [PATCH v2 net 3/5] ipv6: icmp: remove obsolete code in icmpv6_xrlim_allow()
+Message-ID: <20260216142832.3834174-5-edumazet@google.com>
+Subject: [PATCH v2 net 4/5] ipv4: icmp: icmpv4_xrlim_allow() optimization if
+ net.ipv4.icmp_ratelimit is zero
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
 Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
 	Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
-	Martin KaFai Lau <martin.lau@kernel.org>
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
@@ -93,12 +93,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258899-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-258900-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -110,93 +110,62 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A2CE6144AA1
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B7978144AB7
 X-Rspamd-Action: no action
 
-Following part was needed before the blamed commit, because
-inet_getpeer_v6() second argument was the prefix.
+If net.ipv4.icmp_ratelimit is zero, we do not have to call
+inet_getpeer_v4() and inet_peer_xrlim_allow().
 
-	/* Give more bandwidth to wider prefixes. */
-	if (rt->rt6i_dst.plen < 128)
-		tmo >>= ((128 - rt->rt6i_dst.plen)>>5);
+Both can be very expensive under DDOS.
 
-Now inet_getpeer_v6() retrieves hosts, we need to remove
-@tmo adjustement or wider prefixes likes /24 allow 8x
-more ICMP to be sent for a given ratelimit.
-
-As we had this issue for a while, this patch changes net.ipv6.icmp.ratelimit
-default value from 1000ms to 100ms to avoid potential regressions.
-
-Also add a READ_ONCE() when reading net->ipv6.sysctl.icmpv6_time.
-
-Fixes: fd0273d7939f ("ipv6: Remove external dependency on rt6i_dst and rt6i_src")
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Martin KaFai Lau <martin.lau@kernel.org>
 ---
- Documentation/networking/ip-sysctl.rst | 7 ++++---
- net/ipv6/af_inet6.c                    | 2 +-
- net/ipv6/icmp.c                        | 7 +------
- 3 files changed, 6 insertions(+), 10 deletions(-)
+ net/ipv4/icmp.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-index 28c7e4f5ecf9e6b7519659e4e3eee7da508ded29..6921d8594b8493a25d62ffd586d0b9f6527409cb 100644
---- a/Documentation/networking/ip-sysctl.rst
-+++ b/Documentation/networking/ip-sysctl.rst
-@@ -3234,12 +3234,13 @@ enhanced_dad - BOOLEAN
- ===========
+diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
+index eff8487c0aba8df0d1e515b9ac6ff7f9ac1de436..a62b4c4033ccbaa5f6de1345ab33f89b4096b691 100644
+--- a/net/ipv4/icmp.c
++++ b/net/ipv4/icmp.c
+@@ -316,23 +316,29 @@ static bool icmpv4_xrlim_allow(struct net *net, struct rtable *rt,
+ 	struct dst_entry *dst = &rt->dst;
+ 	struct inet_peer *peer;
+ 	struct net_device *dev;
++	int peer_timeout;
+ 	bool rc = true;
  
- ratelimit - INTEGER
--	Limit the maximal rates for sending ICMPv6 messages.
-+	Limit the maximal rates for sending ICMPv6 messages to a particular
-+	peer.
+ 	if (!apply_ratelimit)
+ 		return true;
  
- 	0 to disable any limiting,
--	otherwise the minimal space between responses in milliseconds.
-+	otherwise the space between responses in milliseconds.
++	peer_timeout = READ_ONCE(net->ipv4.sysctl_icmp_ratelimit);
++	if (!peer_timeout)
++		goto out;
++
+ 	/* No rate limit on loopback */
+ 	rcu_read_lock();
+ 	dev = dst_dev_rcu(dst);
+ 	if (dev && (dev->flags & IFF_LOOPBACK))
+-		goto out;
++		goto out_unlock;
  
--	Default: 1000
-+	Default: 100
- 
- ratemask - list of comma separated ranges
- 	For ICMPv6 message types matching the ranges in the ratemask, limit
-diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
-index 31ba677d0442a861fc87e163b43a0aa1df88d8d4..69be0a67a14009771b8662328fff9de7bb98101b 100644
---- a/net/ipv6/af_inet6.c
-+++ b/net/ipv6/af_inet6.c
-@@ -952,7 +952,7 @@ static int __net_init inet6_net_init(struct net *net)
- 	int err = 0;
- 
- 	net->ipv6.sysctl.bindv6only = 0;
--	net->ipv6.sysctl.icmpv6_time = 1*HZ;
-+	net->ipv6.sysctl.icmpv6_time = HZ / 10;
- 	net->ipv6.sysctl.icmpv6_echo_ignore_all = 0;
- 	net->ipv6.sysctl.icmpv6_echo_ignore_multicast = 0;
- 	net->ipv6.sysctl.icmpv6_echo_ignore_anycast = 0;
-diff --git a/net/ipv6/icmp.c b/net/ipv6/icmp.c
-index 375ecd779fda5e323841c3d664ded6aadd653dfd..0f41ca6f3d83e86ce97ce5a30613f58f4dc22dad 100644
---- a/net/ipv6/icmp.c
-+++ b/net/ipv6/icmp.c
-@@ -217,14 +217,9 @@ static bool icmpv6_xrlim_allow(struct sock *sk, u8 type,
- 	} else if (dev && (dev->flags & IFF_LOOPBACK)) {
- 		res = true;
- 	} else {
--		struct rt6_info *rt = dst_rt6_info(dst);
--		int tmo = net->ipv6.sysctl.icmpv6_time;
-+		int tmo = READ_ONCE(net->ipv6.sysctl.icmpv6_time);
- 		struct inet_peer *peer;
- 
--		/* Give more bandwidth to wider prefixes. */
--		if (rt->rt6i_dst.plen < 128)
--			tmo >>= ((128 - rt->rt6i_dst.plen)>>5);
--
- 		peer = inet_getpeer_v6(net->ipv6.peers, &fl6->daddr);
- 		res = inet_peer_xrlim_allow(peer, tmo);
- 	}
+ 	peer = inet_getpeer_v4(net->ipv4.peers, fl4->daddr,
+ 			       l3mdev_master_ifindex_rcu(dev));
+-	rc = inet_peer_xrlim_allow(peer,
+-				   READ_ONCE(net->ipv4.sysctl_icmp_ratelimit));
+-out:
++	rc = inet_peer_xrlim_allow(peer, peer_timeout);
++
++out_unlock:
+ 	rcu_read_unlock();
++out:
+ 	if (!rc)
+ 		__ICMP_INC_STATS(net, ICMP_MIB_RATELIMITHOST);
+ 	else
 -- 
 2.53.0.310.g728cabbaf7-goog
 
