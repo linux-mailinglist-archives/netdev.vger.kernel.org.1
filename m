@@ -1,171 +1,156 @@
-Return-Path: <netdev+bounces-258846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258847-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mOZNH0PikmmrzgEAu9opvQ
-	(envelope-from <netdev+bounces-258846-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 10:24:19 +0100
+	id MLnVJ8fmkmlSzwEAu9opvQ
+	(envelope-from <netdev+bounces-258847-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 10:43:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD5F7141EE1
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 10:24:18 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47D3E14207B
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 10:43:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8D5DA300C91C
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 09:24:17 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8AE1630022EF
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 09:43:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B87D22BE056;
-	Mon, 16 Feb 2026 09:24:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEEEE2E541F;
+	Mon, 16 Feb 2026 09:43:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="VATDK8RJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S+LjmAc6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1A5A2848A8;
-	Mon, 16 Feb 2026 09:24:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCDCE267B89
+	for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 09:43:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771233856; cv=none; b=hyVyBCwu62j0dw60DiuD+MpXiMr2KCFQyXsy0Lqdggdljj2/lA2LicLxE9B40dTZlY78omYVQUQCUxk+fXtnw9QQxkZnmNT1Kb5/uCd4S4G+bIpNuE4YNOuo9Spz0bNz6f7uBLgDKSRWSDQL1XXafSrFvizJeac2fVGn9Q7yhYo=
+	t=1771235011; cv=none; b=dAmdQipJhQFwMb5zjIfb/dSzFROrrJFlm9o2ow+Icv7oEABQfnm4aUTTfuRInbWXBBUxMX4hEAbCLC7xkRZjWgAnzB0EEUocwtAZe6aX4xbrN5aJjBgRe6rqc/RhA+I5rboYyWJ+L1ienXs+++mZA/9sRpKWXSrV2BQhDMfxgrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771233856; c=relaxed/simple;
-	bh=jUieC0lBFZSQ/SZySCEiOOp4+YSwNd1XEU2ZN/W1gaI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=V1Nzs1FialL3SLzeJ6vxd0Frz67lsODcbMTa2srPOF2KaI2TqqMlYlER/qKiU4JLktPTMu7M+4W+6ftJzbDekscdnkPd9PGwVeAb069An+u2S/aWFxBHIVc7ZtWcIMPd3f8oVMXuLyepsJ9SDxxOoXh2TWxPoids8aGgiB5ZiaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=VATDK8RJ; arc=none smtp.client-ip=80.241.56.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4fDy5R1Rxqz9tVQ;
-	Mon, 16 Feb 2026 10:24:11 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1771233851;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x2vy6a1Meu+skf7rOG8rJ02x19jQsoOB+N+i06OG6jo=;
-	b=VATDK8RJSlC2sJH92HI3+Xk72/x56bq1logEqJaAjaGfbVTFDoqdqEEVJyGNMxIZoODhNy
-	c3eE1WaySM1Kdvks+bvwiLBIt9hjoBmJTXLZEESlvEhzNvu/OB5vTVGbsCzqr779/j+UPn
-	YRaVzcu1RhRq2oZ4qOkJFJPKi3kFtpZnPfTUMNC8wdmqg9yY2ajeEu1+OuwQBIcHD5qNRI
-	uIIqfutbvd6YMH892tkQqrw4Ynka/UNeLGJjanx7RLglG+XMkzwDPe2Zzs7zZjXtZAggj5
-	lCNYEA3j+Alg39iq6OAVvW8AgSULz3cGOrXSmU7r+tkPHjPnqSBLhBmYahv35w==
-Date: Mon, 16 Feb 2026 10:23:59 +0100
-From: =?UTF-8?B?xYF1a2Fzeg==?= Majewski <lukasz.majewski@mailbox.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
- <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, Richard Cochran
- <richardcochran@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
- <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>, Andrew Lunn
- <andrew@lunn.ch>
-Subject: Re: [net-next v23 2/7] net: mtip: The L2 switch driver for imx287
-Message-ID: <20260216102359.37586219@wsk>
-In-Reply-To: <20260206112454.2e9a686f@wsk>
-References: <20260204232135.1024665-1-lukasz.majewski@mailbox.org>
-	<20260204232135.1024665-3-lukasz.majewski@mailbox.org>
-	<20260205182805.196fd832@kernel.org>
-	<20260206112454.2e9a686f@wsk>
-Organization: mailbox.org
+	s=arc-20240116; t=1771235011; c=relaxed/simple;
+	bh=Z973ykrQZ4TuhrmDtyToSNOz6AN5KfrHo9ArYpm2osk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=K2HeZ5OoCWpy9sf2JVveR1jn8Kx0wZatoFwDEDGJVfi9Sz5yr079gCdVT1pDhMfaPhasF2V+IAxH+sanhaVLwPB6KU8MgcA+JyIYlSPQmkEgOSH5Kjx6aSTfUBA4G+5aEIIJI0IpGd0Hl2vIzHLEr4YxWYmiafiWQC58WLMxaPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S+LjmAc6; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-8230c839409so2622152b3a.3
+        for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 01:43:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771235010; x=1771839810; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=opFxkpTldrnxn9AG8jl+J5ZXpQfa5In3y5MA4J00UQM=;
+        b=S+LjmAc6gvd4U36z6b0UK50ZvzZErWQOh28H2BMCUmBdmEXWWjmianFT+PiiAo7rPQ
+         cfc+GekFCD+waRY2Ajnstmm9LxAFh4MdqaIuEHXrjQ+f3Y5AM0K/7XgUgFtvFyPTfdhk
+         f7VbpxMgjoQFIu9ZHamaDxQzV0TJpTsA/s1csSYDTjHgVm6hzH2Wxkze+N7NAfFLUTOR
+         ysyc2a8LSkvdPc9gKocjilSO0Esykhn2RB92TbjPAECRpgyvbBCFWDM0Kx/g6NQhWjuH
+         beQHqVqsSmzGUaOP+pvcTRXGnM2HxWhKoBwipo1EWtSzDSO2ELtLStDmcOVLsvN8JpmC
+         gx8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771235010; x=1771839810;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=opFxkpTldrnxn9AG8jl+J5ZXpQfa5In3y5MA4J00UQM=;
+        b=h/4wEw32eIKI9zSQdGTbfXRdaX6Wdydc5d7gDRz5NzE5p0+ne85CvY4bw2BmwFYwOs
+         dn4NP6UQr93Oih+LM85U8GZD9YdO0EjzBLvV5ibaoBnsYYvW6/9KbUu5QUKBaFp+7OmV
+         79HPmQ6iKPPD4Wy71BbOKxupEk4ZAmMC1Qa0c9Dj3/+jKKAN9kS4Wxm0Gq1cbfL5xQhW
+         jAz5YbDVNfGNc+z6VTfKRR28QDEYhGRtwNwpu1o1cyk0JKAfy7Jmwjg3eRhwv3DbjZ4t
+         Dyilxr1HtaMcbBm16zXd1vsaelHH2VReU5OwJTHQNnEDwu4LdEnYeta2AtyoM1zOhOG0
+         nUhg==
+X-Gm-Message-State: AOJu0YxdlcV+iR71niutokroFIP9ODfp9725QbVTPaaceu4MY0vNFvdn
+	HKuf2yW71lAWS3lioNHnXBHDgfVksCz3YAmJpB9dBGpCo1YAf1Jhzc1R
+X-Gm-Gg: AZuq6aKavQ+uLzckr9u+Urvca15ILLD32qH3O9yt3qKrN+h5LRtmLskRBaVRIu66JPK
+	5hwkfTF3+D2IgS/wJ0v/UsTaZLZmO3nmZWmqRebUx2AOHeaUc4M9zReDsc8aOIqNpUtc5Rv5JqJ
+	S6kYBDG47WgZP0q3Xpi8ke2mHLCbVPQd4ylXsxGk4xDO+gHxiprrQBVQfyl7wzW+68Pgoqh3VyR
+	WUulCIKXoePGBDy6GtBUik3ZXeTJM7miyOJA8sQOcwLh+q15S/0aZS6OHDYFpB+CJPYImk+CkaQ
+	jLpmIY2PqxTlRxP1NLcBwCqXGYDQGBsTgxr1L1Ta2Cq5gsHQ+oWL10TWD13KH54keEInDsOJl4T
+	EdLH9bLLi170WuDlvcnSLlWEYnxyFK8etZl1VXrOjjmNvRT/5gjQpb4BMXfDUZkXs6rr4zjna9i
+	PypESypL9fYapLJPJrejn3fGBFPxqW6JaezMOLgcuwQw==
+X-Received: by 2002:a05:6a00:3996:b0:81f:4675:c2a9 with SMTP id d2e1a72fcca58-824c9310c16mr8796350b3a.0.1771235010183;
+        Mon, 16 Feb 2026 01:43:30 -0800 (PST)
+Received: from v4bel ([58.123.110.97])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-824c6b94009sm10100604b3a.52.2026.02.16.01.43.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Feb 2026 01:43:29 -0800 (PST)
+Date: Mon, 16 Feb 2026 18:43:26 +0900
+From: Hyunwoo Kim <imv4bel@gmail.com>
+To: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org
+Cc: netdev@vger.kernel.org, imv4bel@gmail.com
+Subject: [PATCH] espintcp: Use disable_work_sync() instead of
+ cancel_work_sync() in espintcp_close()
+Message-ID: <aZLmvv51f5Iu9G7b@v4bel>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-MBO-RS-ID: 251ff2ea1f4baad21a7
-X-MBO-RS-META: z4bao4g3s7pd9hey7cm8gwcj5wtksdmj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258846-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[mailbox.org:+];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lukasz.majewski@mailbox.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,pengutronix.de,gmail.com,vger.kernel.org,lists.linux.dev,lists.infradead.org,gmx.net];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258847-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DD5F7141EE1
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com]
+X-Rspamd-Queue-Id: 47D3E14207B
 X-Rspamd-Action: no action
 
-Hi Jakub,
+After cancel_work_sync() is called from espintcp_close(), 
+espintcp_tx_work() can still be scheduled from paths such as 
+the Delayed ACK handler or ksoftirqd.
+As a result, the espintcp_tx_work() worker may dereference a 
+freed espintcp ctx or sk.
 
-> Hi Jakub,
->=20
-> > On Thu,  5 Feb 2026 00:21:30 +0100 Lukasz Majewski wrote: =20
-> > > This patch series provides support for More Than IP L2 switch
-> > > embedded in the imx287 SoC.
-> > >=20
-> > > This is a two port switch (placed between uDMA[01] and
-> > > MAC-NET[01]), which can be used for offloading the network
-> > > traffic.
-> > >=20
-> > > It can be used interchangeably with current FEC driver - to be
-> > > more specific: one can use either of it, depending on the
-> > > requirements.
-> > >=20
-> > > The biggest difference is the usage of DMA - when FEC is used,
-> > > separate DMAs are available for each ENET-MAC block.
-> > > However, with switch enabled - only the DMA0 is used to
-> > > send/receive data to/form switch (and then switch sends them to
-> > > respecitive ports).
-> > >=20
-> > > Signed-off-by: Lukasz Majewski <lukasz.majewski@mailbox.org>
-> > > Reviewed-by: Stefan Wahren <wahrenst@gmx.net>
-> > > Reviewed-by: Andrew Lunn <andrew@lunn.ch>   =20
-> >=20
-> > Transient build failure here:
-> >=20
-> > drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c:1072:32: warning:
-> > variable =E2=80=98priv=E2=80=99 set but not used [-Wunused-but-set-vari=
-able] 1072 |
-> >       struct mtip_ndev_priv *priv; |
-> > ^~~~
-> >=20
-> > I sent out the AI code reviews while at it, without looking at them.
-> > So please approach them with caution.. =20
->=20
-> IMHO, issues pointed with AI review have been at discussed and
-> (to my best knowledge) addressed.
->=20
-> Shall I prepare next version of this patch set?
->=20
+To prevent this race condition, cancel_work_sync() is 
+replaced with disable_work_sync().
 
-I'm a bit confused regarding the next steps for this driver.
+Fixes: e27cca96cd68 ("xfrm: add espintcp (RFC 8229)")
+Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+---
+ net/xfrm/espintcp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-There was no reply regarding my last question - and I don't know how I
-shall proceed...
+diff --git a/net/xfrm/espintcp.c b/net/xfrm/espintcp.c
+index bf744ac9d5a7..8709df716e98 100644
+--- a/net/xfrm/espintcp.c
++++ b/net/xfrm/espintcp.c
+@@ -536,7 +536,7 @@ static void espintcp_close(struct sock *sk, long timeout)
+ 	sk->sk_prot = &tcp_prot;
+ 	barrier();
+ 
+-	cancel_work_sync(&ctx->work);
++	disable_work_sync(&ctx->work);
+ 	strp_done(&ctx->strp);
+ 
+ 	skb_queue_purge(&ctx->out_queue);
+-- 
+2.43.0
 
---=20
-Best regards,
-
-=C5=81ukasz Majewski
 
