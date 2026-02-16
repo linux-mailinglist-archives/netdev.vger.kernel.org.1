@@ -1,169 +1,178 @@
-Return-Path: <netdev+bounces-258831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258832-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AN/pDrqkkmnCwAEAu9opvQ
-	(envelope-from <netdev+bounces-258831-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 06:01:46 +0100
+	id SO8eNoKlkmnSwAEAu9opvQ
+	(envelope-from <netdev+bounces-258832-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 06:05:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81851140EB3
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 06:01:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48387140EC4
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 06:05:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3F65430067BB
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 05:01:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 492B4300C5B0
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 05:05:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB90C186E58;
-	Mon, 16 Feb 2026 05:01:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB2A5298CB2;
+	Mon, 16 Feb 2026 05:05:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2g9pNTU4"
+	dkim=pass (2048-bit key) header.d=poleshift.se header.i=@poleshift.se header.b="c1u2LF8T";
+	dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b="EZLmlQhW";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=poleshift.se header.i=@poleshift.se header.b="R6n7AY0x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from e240-2.smtp-out.eu-north-1.amazonses.com (e240-2.smtp-out.eu-north-1.amazonses.com [23.251.240.2])
+	(using TLSv1.2 with cipher AES128-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2291391
-	for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 05:01:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.180
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771218103; cv=pass; b=Iu8Jfx6PS9PqOGhy5+TTi8gSouxfxxErxQPQLeBmw36eAG0P27X+xLX43BjASXWwrtZCZi+X93sU+cAffsKVHs7RUn7uarlFfZjY/qD0EqnmdtGCyI/KnwrUYBzqwvKzE7CSWoZv/fnEAUxLTgAoMy3oVBmrBBZFtk+7vpRaxi0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771218103; c=relaxed/simple;
-	bh=hB4EONdthUZNgMd3tuVKHVCvzviJ7IZrB7vtc0TYFQ0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E3M/yyJHnXnYDbd8imZNZw89ESF9l4Te1QcP0QQSf2fvkaVn1/4LDR3zotnfeTPcVP9eQnXcpGmoUp79ZtvGabjb3lYFEiiDin2VE35qSjkz05rIdquU5esUz5kXzRqRUgI6h+zpyB8PVxWZOLvdQ3X1huO38k6fmhDf5OGX/GA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2g9pNTU4; arc=pass smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-8c6f21c2d81so312380985a.2
-        for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 21:01:42 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771218101; cv=none;
-        d=google.com; s=arc-20240605;
-        b=gcaWgXqAIxCVOBmC+lvZ0WCg/6Zjjo1qtEE6W+2yLzKV9j6F2g4TIvehG8M0DNwjb/
-         t3nJ787fOJWrfXiqnU4CepdcHyiG3Itj3YCQb/FXDbgtNNrB6rDGnyJmnsQK0LtEUc8p
-         AJ4UnRhtxkxQeEtuoTf3kCmrVJ96bMD5o82arKYPI1eZbL9+s3j1TC5nUoWqE9k/ARci
-         fRJua516pV8f42BYI+PPxD/09zJ0EXvUag5gdd2/7DUejga4dV9wIXUjE94008SgiKxG
-         T8RY9XV78hNdD378dPuCHFV+NpgWT1F9sswxzqymn5LvJ8wThMQY7s+ZRJPdAuTm3kWT
-         bx7g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=hB4EONdthUZNgMd3tuVKHVCvzviJ7IZrB7vtc0TYFQ0=;
-        fh=pE+IGbmTOr7WYNEn+oRNb2x5GGUKJnIAlpKVHC0SEq8=;
-        b=MkQoBeFkcDjPWghMkrprGyO8OC9ONHgY8XCJafVh2wwUXvpKDLcK/KOM//5N/XfIeU
-         VxFTnn04hK4NPXh3JVge/Twsvwhmv0SFpNzx9JZs9N+Jv+wZkspE76XwhZy4zeEYwQ+t
-         fDFrerDukhIOiG/F4+emNRVy2zSiKjvDIcR8cjU4tWwN9a1PVmJELzxBhG7pzE3f7i1q
-         p8AQzB0zkEwkL2IU104hjnAPAHMjEehPwz4W12GI31gbtMEDPQpP5cNXJABV3f5V0zvl
-         Yd3Zc5+Z03teimYH3eX6kNf3Bn2GxsHsJdep4OFqfvi10chPKH0bFQniqQfBMI9R7dhL
-         /XZg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771218101; x=1771822901; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hB4EONdthUZNgMd3tuVKHVCvzviJ7IZrB7vtc0TYFQ0=;
-        b=2g9pNTU4VxUAMsI5JDa2gh9PP4pMP33JfDOo9e+1uBwNbR3evi3zkW7o0K0NFPJW+n
-         VabVU8cTR0D5XPTukT9mkoCGk2VKZj/wMcdEfd/udYAVlGeThmtOKe9dPoHMvPRG8RiX
-         INulMcHCgr9NhKFqHQssRbGNRcqAcZ6QQ2HIc9s4RCY/ktUMFQWm/mvoxhukjq3CgUV5
-         kEnmcCFcDmdvON47wpI4QbNTEAbe0mdzqAes0FK7BqsCsoSw8GOI4DISFvQPeyNTBaR0
-         CFiSi74sdZ2eziOKyaS2LX64SBxC5rt19MtOcEZHs1LKrxik9Mb9HlOvI+n0z36J8CBe
-         QJZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771218101; x=1771822901;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=hB4EONdthUZNgMd3tuVKHVCvzviJ7IZrB7vtc0TYFQ0=;
-        b=Abm9/bcf+hnS2FW6Yc3dRQbn8FOHWaF5IdlKhQa57IO2qCuHeTQZ2rrTAbsBlwmxcX
-         OCtHPx47lUqWhQlBrB89Ru99MNaRz+zlpmwYd41R89jCFsztFGBhy3gK/LYoiYHd1K9R
-         WTWP2mFveh8ZCAXsCzczfIzNXtUjs1R+B1peiSEQ9vo8j7BABITnrcFLbDV0BrdiJvcB
-         c36Xtr0XlFLgsTkPU6rzjYInHfspK+8H+FR3NHTAFBp1L8Elh8sRXWjwnrHNZfv/6Q7O
-         GiR3NGkzPtL/W/lA//vyk4iOI0FXdGHbQqE4gDhmwSkMPYMarwceiBp65vrP3+13detY
-         Jrrw==
-X-Forwarded-Encrypted: i=1; AJvYcCUvGVXgPV1hgkWdXsmAXEmeIgv6ylAz9WDEEv4e8X5TusEgG4U3tpa6s78uzTReJl4v9lpZcyM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxi97lC6PQbq87NooEbjY2HQLF2T6adOfx+GagKj4AQAVNst44s
-	bR7lqKQ9rmxLOt1daUbGI0SHBRBI+utFdgQRzoHrBkDUXc/l0bLb2wXWzTTRpM8pPh1GLRtWJsG
-	xd9D50RzQB8mul5WCzOxNiCp5oU7/JmyOhdNT/lsm
-X-Gm-Gg: AZuq6aJsb4/QAOUSVMgbmi6RaWdpiGxbxXD/bHYh4TIZCqxHGDuZ6easlUqx+uk+dIC
-	Ob8mdfGtoZfLY2aRkovn/Z4gFardIY5YQb/KF1ZNqfVWP68VXG9TOb+aM3Kh70IG+hthXSV1aTw
-	Q5vELyr8eOtd9tko9/FXKa/AWizXyK/mJAPP4pHyBu7nytBakN3DCZlNDHDpipz1Z7rM+P3028t
-	GLij2R1AytiKw6qyAx/YzjcOc1qW+oifibr1rjL3FtQ6x9gACMNxXsd9wtB2P3VO1fj/zG8g2pJ
-	lngj+CuY
-X-Received: by 2002:a05:620a:40c2:b0:8c7:8cf:537c with SMTP id
- af79cd13be357-8cb422a70d2mr1126105485a.37.1771218100858; Sun, 15 Feb 2026
- 21:01:40 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 560742765FF;
+	Mon, 16 Feb 2026 05:04:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.251.240.2
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771218300; cv=none; b=MaV/OEgC/s8m/fCHHZWWbCTSJvRNRyvtHEZ5sfJjrsYfY4108tqHSyreUZoBYYI03TTrPvyQyrZugtqQebAxdXTEFX1+jBUoFnVbemrNHPawGdxovt9RCxUCg2DRimFGS4uMDuHc2D0jUrkeIBa0Cp/eJEYOdENkCdv218j8Uso=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771218300; c=relaxed/simple;
+	bh=vykWrZ6pC3R6DCA8YVVhJCmQ9aqRf8RTLTtVVUlRK6Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IBmUVzqQ/gyClB/CgYiX0uUMiqvk/cx/+JdMHcGBwRP1sLleZxF4+RNlp+2CeMjuMIrv9dsuVREi9vqW864c/8IdPdmdodYfcQG2MdeSn4lNf0Z6XK3XCb3SIG9NMXO/c0yW5Pa0rmMT3/ynNXO05iy9FCpJ0X2nnc+JU6Y11ZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=poleshift.se; spf=pass smtp.mailfrom=eu-north-1.amazonses.com; dkim=pass (2048-bit key) header.d=poleshift.se header.i=@poleshift.se header.b=c1u2LF8T; dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b=EZLmlQhW; dkim=fail (0-bit key) header.d=poleshift.se header.i=@poleshift.se header.b=R6n7AY0x reason="key not found in DNS"; arc=none smtp.client-ip=23.251.240.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=poleshift.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eu-north-1.amazonses.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+	s=n6aiayff3zq3manwyovyvpolm4pou2ef; d=poleshift.se; t=1771218295;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=vykWrZ6pC3R6DCA8YVVhJCmQ9aqRf8RTLTtVVUlRK6Q=;
+	b=c1u2LF8To4sddjhXKrn3ZdIkcxqDtU/pJGz104kHU1RfBUm0gs2yV2oco1VhS2c4
+	7LKo37uDuPfLVDb0Q//UId8Gql1HUuP+APuUPxQ8in3g2WSM6weoabz/FtkcVEsmcQ7
+	nI7P+8Twow3qulTsZ7zdNoKoqN/dWqzuzvL3OVh+nN0SE8YcUmHXJLDI3kNT1FpAGvc
+	WP6MBfhrTEfHNFeX80mas17Ou7TB+dWom2lHUuQSN8UT/rsBkJ8BSj2aT+oF3mKKWcC
+	dvUkSeb1KbB8sCPq9flzUXwAnY0VkLnMy8oc6nM+64LHHnPnBsnu+qenilI4H+rSVgF
+	Dc88bkOMOw==
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+	s=icdr7g7fbtu2nwxgaimytihkt42k3kiy; d=amazonses.com; t=1771218295;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Feedback-ID;
+	bh=vykWrZ6pC3R6DCA8YVVhJCmQ9aqRf8RTLTtVVUlRK6Q=;
+	b=EZLmlQhWNbq+1sOdSJClNi0iepT20UruxIpq9w+tOdpfvrRVJrO68pWgF17Zrlvx
+	abH0/urclU8cLmR7PNoQlSv9kjMvw6Ka88s590gKbDC2FEb+R9/ar7tJyKb5PN6LGJD
+	YHNJ6cVq5EzGzd8c8R7vSGZasx1KJb3AAuDMjAPQ=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=poleshift.se;
+	s=20230429; t=1771218292;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8I+MDTFKthMwICJO5pCCKZlR1NlGLo4krg+z6zbaYIs=;
+	b=R6n7AY0x1JW5Lo6m2FQzm4QqXj2pc4IWcFAxrInZui2dU1bhd34aFZZKstifUF7HcJrTxq
+	GGkTBbAhhPHXYypFme2s4yf/aoHoP25i98I1I6/anb0N0Ai9NguUvMsWlyVYR5bDoQIWnl
+	U63p2p44E0ubL/wG5gdJpXyJNxlZuc0=
+Message-ID: <0110019c64d659d2-815ad63f-3a90-4967-ac0e-850ec981ec27-000000@eu-north-1.amazonses.com>
+Date: Mon, 16 Feb 2026 05:04:55 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260215143821.2330791-1-edumazet@google.com> <20260215143821.2330791-6-edumazet@google.com>
- <CAAVpQUCt9R2=0UpPJioLTd_T6Nb5zHsp-qfF-CJCQ7RPPbwcNw@mail.gmail.com>
-In-Reply-To: <CAAVpQUCt9R2=0UpPJioLTd_T6Nb5zHsp-qfF-CJCQ7RPPbwcNw@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 16 Feb 2026 06:01:29 +0100
-X-Gm-Features: AaiRm53qw_E5SiKUC9hviopFwbBH6qizX8KmTjsLWl8YyESPKZoQ5Azeow_mSg8
-Message-ID: <CANn89iLSGkY8zni9HcnO+rxv1+9YpQ-t7EL_fdeR+skv9btD6g@mail.gmail.com>
-Subject: Re: [PATCH net 5/5] ipv6: icmp: icmpv6_xrlim_allow() optimization if
- net.ipv4.icmp_ratelimit is zero
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
-	Martin KaFai Lau <martin.lau@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Betterbird (Linux)
+Subject: Re: [PATCH] net: usb: lan78xx: scan all MDIO addresses on LAN7801
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Thangaraj Samynathan <Thangaraj.S@microchip.com>, 
+	Rengarajan Sundararajan <Rengarajan.S@microchip.com>, 
+	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <0110019c5c13b668-dd1f5db3-309a-442a-b483-262c4edbb360-000000@eu-north-1.amazonses.com>
+ <d5e4a2e9-4ecd-4103-9537-74fbb58692ed@lunn.ch>
+Content-Language: en-US
+From: =?UTF-8?Q?Martin_P=C3=A5lsson?= <martin@poleshift.se>
+Organization: Poleshift AB
+In-Reply-To: <d5e4a2e9-4ecd-4103-9537-74fbb58692ed@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Feedback-ID: ::1.eu-north-1.nVsitYrO9p3qnPLcZXP017jV0c/PN62ZbS4lYSSQpnA=:AmazonSES
+X-SES-Outgoing: 2026.02.16-23.251.240.2
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.65 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[poleshift.se,reject];
+	R_DKIM_ALLOW(-0.20)[poleshift.se:s=n6aiayff3zq3manwyovyvpolm4pou2ef,amazonses.com:s=icdr7g7fbtu2nwxgaimytihkt42k3kiy];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258831-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-258832-lists,netdev=lfdr.de];
+	R_DKIM_PERMFAIL(0.00)[poleshift.se:s=20230429];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[martin@poleshift.se,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_MIXED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 81851140EB3
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DKIM_TRACE(0.00)[poleshift.se:+,amazonses.com:+,poleshift.se:~];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amazonses.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,eu-north-1.amazonses.com:mid]
+X-Rspamd-Queue-Id: 48387140EC4
 X-Rspamd-Action: no action
 
-On Mon, Feb 16, 2026 at 2:01=E2=80=AFAM Kuniyuki Iwashima <kuniyu@google.co=
-m> wrote:
+Hi Andrew.
+
+Thank you for reviewing.
+
+As for the PHY interface mode: the RGMII configuration (including TX/RX 
+clock internal delays) is set via the configuration EEPROM on the 
+device, so PHY_INTERFACE_MODE_RGMII_ID as set by lan78xx_get_phy() is 
+correct for this hardware. The DP83TC814 supports RGMII and the link 
+works well as-is, so no change is needed there.
+
+I will resend with the Fixes: tag added.
+
+
+Best regards
+
+Martin
+
+
+On 2/16/26 3:54 AM, Andrew Lunn wrote:
+> On Sat, Feb 14, 2026 at 12:15:21PM +0000, Martin Pålsson wrote:
+>> The LAN7801 is designed exclusively for external PHYs (unlike the
+>> LAN7800/LAN7850 which have internal PHYs), but lan78xx_mdio_init()
+>> restricts PHY scanning to MDIO addresses 0-7 by setting phy_mask to
+>> ~(0xFF). This prevents discovery of external PHYs wired to addresses
+>> outside that range.
+>>
+>> One such case is the DP83TC814 100BASE-T1 PHY, which is typically
+>> configured at MDIO address 10 via PHYAD bootstrap pins and goes
+>> undetected with the current mask.
+>>
+>> Set phy_mask to 0 for the LAN7801 so that all 32 MDIO addresses are
+>> scanned during bus registration, allowing any external PHY to be
+>> discovered regardless of its address.
+>>
+>> Signed-off-by: Martin Pålsson <martin@poleshift.se>
+> Since you are submitting this for net, it should have a Fixes: tag.
 >
-> On Sun, Feb 15, 2026 at 6:38=E2=80=AFAM Eric Dumazet <edumazet@google.com=
-> wrote:
-> >
-> > If net.ipv6.icmp.ratelimit is zero we do not have to call
-> > inet_getpeer_v6() and inet_peer_xrlim_allow().
-> >
-> > Both can be very expensive under DDOS.
-> >
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Also, since this is a 100Base PHY, i assume dev->interface needs to be
+> PHY_INTERFACE_MODE_MII? But it looks like lan78xx_get_phy() is hard
+> coding it to PHY_INTERFACE_MODE_RGMII_ID for the 7801. How is this
+> working out for you?
 >
-> Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+> 	Andrew
 
-Thanks for your reviews Kuniyuki.
+-- 
+Best regards / Bästa hälsningar / Mit freundlichen Grüßen
 
-I just noticed this patch title should have mentioned
-net.ipv6.icmp.ratelimit instead of net.ipv4.icmp_ratelimit
+Martin Pålsson
+Poleshift AB - Local Automotive Ethernet Solutions
++46 706 26 49 90
+martin@poleshift.se
 
-I will fix it in V2 and include your Reviewed-by tags.
 
