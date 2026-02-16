@@ -1,425 +1,243 @@
-Return-Path: <netdev+bounces-258908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258906-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iNSDC3w2k2mV2gEAu9opvQ
-	(envelope-from <netdev+bounces-258908-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 16:23:40 +0100
+	id YIipLBo2k2mV2gEAu9opvQ
+	(envelope-from <netdev+bounces-258906-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 16:22:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 979D81457C8
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 16:23:39 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B69C14573D
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 16:22:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 639A030333C5
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 15:19:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 31081301C910
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 15:17:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5325F3242BC;
-	Mon, 16 Feb 2026 15:19:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25FB931DD86;
+	Mon, 16 Feb 2026 15:17:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DGhXesiV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lYzaxfOI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4368D3242AD;
-	Mon, 16 Feb 2026 15:19:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771255169; cv=fail; b=W+WHIfoRBfqEMovSU/4XTq4eQLXcgJ17BTEkaD5fGR++0lgZzLC9c3CPfm5wwOCCJoL9NsN//pYd3wpV8m5eaG6B7iHrTS8Zx7F103pqdaSGXryJzor3LP/POiMiEzIZg3DQDkgcd7fP9oJNCkLqBBQIW4R37tEbd4K3Wc7UXj0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771255169; c=relaxed/simple;
-	bh=UMaRkRkN7zKJB1p+GGkdXvnXLAJ7Esde1mrJHLNq3aE=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=iQOx7m2fHy1GDs9uVT/eFLyZiY0LYrXjD3n66rYHhjRO+Ft6A8ElYnx2m5nmHsyh2YQc6Bg5SMTnOesTy16MZ78CrizEQZjFRSYhRri08345PXeflez2vAj9Drk8XOy3ouaVbt+CQB/irALB44MproOZNT3YFxQXw7pUeo1j07c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DGhXesiV; arc=fail smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1771255166; x=1802791166;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=UMaRkRkN7zKJB1p+GGkdXvnXLAJ7Esde1mrJHLNq3aE=;
-  b=DGhXesiV7cPTy9xW1fOfwj9V25U2o/PSAkwnRsAFUU2MFfSr3o7PWOeF
-   7FVZhfJGi685bYfCcGc4AI6KkqeoyzEkgcu8PAYMeac6VIk9sEhTEGSvY
-   xIPft7+ajiC4JCayqQX7Tl7hJ3pw4xb2lejYWUbdGlVTudH8re5FVR7j+
-   x7R6oDYqUFZqoXLoA00nlW4ds1oeHjiq7CYrSNa7eriV3lZBPDqVekKJm
-   fY5vFrkaBZw91Wax6Kk11uFGL9Wqd2SwyEHNsnYmGkCEWjGcAf2BQo4qm
-   uPTHkBRc4dkcwLOf0As8GCOB6ep1Vqs1DLWSGzq+6yKIz0Iube+NAVfW4
-   g==;
-X-CSE-ConnectionGUID: uBBnyvuDStahA/kXWarn3A==
-X-CSE-MsgGUID: 9pll+Wg2SASd0Oj4PVyorQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11702"; a="72244381"
-X-IronPort-AV: E=Sophos;i="6.21,294,1763452800"; 
-   d="scan'208";a="72244381"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2026 07:19:25 -0800
-X-CSE-ConnectionGUID: eJmIfSmeRtuAxzftRxIxgA==
-X-CSE-MsgGUID: qqfs31bpRm+U5++ilzL7Vw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,294,1763452800"; 
-   d="scan'208";a="218168600"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2026 07:19:26 -0800
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35; Mon, 16 Feb 2026 07:19:24 -0800
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35 via Frontend Transport; Mon, 16 Feb 2026 07:19:24 -0800
-Received: from CH5PR02CU005.outbound.protection.outlook.com (40.107.200.2) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35; Mon, 16 Feb 2026 07:19:24 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=n/q+GGHYpNkcJEh+NoY/LFE0kyPSGDNo+JDSZEDQ0cIsOYW0l32Ejk0XiHOzH8frx9A8YAY138IlV4d4bnOEbhvr5JbVYvh+gR3VS7hIAxE1ltLDwc0ZsVnIIuv+fZ/OgQuNXG3RHEpj8AUIjNbryXoWLQx28zqmp27tDaqM8fu0kqX8rKF8WiMlvHSO4Kp42eBiU5mw3DSVIaJ9V+Cz2N8SbrnjSVUV0ZIDzJDTsSHtZPipZJEOzp/zGqKMuOJelb/FvgTfD+BQSt8l3xUjBiKQpDfRHXaXJmH5JOKYxlaKxjrbuGK0RXQYT3tao8V7oNxKiLfIEs7yYTk+LfWsng==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=G/6by+MpMwcB4YkiRK/DcEfZ82YlGsnEA/PhC9bmnBs=;
- b=e6/+no9bK67xyH03xbw0JBHAKWFye2/3uRPXXEfQxunAc2EqdNWm5+AcCWlpjLDbhP6cv2oRDbQafT5+rNSAd1K8iRMwFb9OnT8qDBUBGvf0mrk+Yz+1oG/k2BKwtqcdiDX1cnexnm8QBeXR2j4K0RQkph5e3WPM5tIQ/Asm4IswxIXvx4K6ABEwZK6y+FkpDpFA14pzvxWw8tW6lh1fIYXyVz1L4VyUykK5yBdAiyIj8nylVpRB5pSWSQHmDuB0nn0FKNPcxG7pmaawuAqDMD3dgUSwoOJ3jmweEs6hlD1I00cmcmWB7alM5BqW8oXz3RrqYDHNsTsYIQJNz6v6RA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by CH3PR11MB8465.namprd11.prod.outlook.com (2603:10b6:610:1bc::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9611.16; Mon, 16 Feb
- 2026 15:19:20 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::6aa:411d:4bfa:619c]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::6aa:411d:4bfa:619c%5]) with mapi id 15.20.9611.013; Mon, 16 Feb 2026
- 15:19:20 +0000
-Message-ID: <60a57ae1-72e7-4848-9cfc-0fab1d92fdab@intel.com>
-Date: Mon, 16 Feb 2026 16:17:03 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf v2 7/9] idpf: use truesize as XDP RxQ info frag_size
-To: Larysa Zaremba <larysa.zaremba@intel.com>
-CC: <bpf@vger.kernel.org>, Claudiu Manoil <claudiu.manoil@nxp.com>, "Vladimir
- Oltean" <vladimir.oltean@nxp.com>, Wei Fang <wei.fang@nxp.com>, Clark Wang
-	<xiaoning.wang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
-	<john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, "Andrii
- Nakryiko" <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
-	"Eduard Zingerman" <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong
- Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Hao Luo
-	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Simon Horman
-	<horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Maciej Fijalkowski
-	<maciej.fijalkowski@intel.com>, "Bastien Curutchet (eBPF Foundation)"
-	<bastien.curutchet@bootlin.com>, Tushar Vyavahare
-	<tushar.vyavahare@intel.com>, Jason Xing <kernelxing@tencent.com>,
-	=?UTF-8?Q?Ricardo_B=2E_Marli=C3=A8re?= <rbm@suse.com>, Eelco Chaudron
-	<echaudro@redhat.com>, Lorenzo Bianconi <lorenzo@kernel.org>, "Toke
- Hoiland-Jorgensen" <toke@redhat.com>, <imx@lists.linux.dev>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>, <linux-kselftest@vger.kernel.org>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>, Dragos Tatulea
-	<dtatulea@nvidia.com>
-References: <20260212183328.1883148-2-larysa.zaremba@intel.com>
- <20260212183328.1883148-9-larysa.zaremba@intel.com>
- <5b7b1746-54e7-4281-a008-aa3496610ccc@intel.com>
- <de0cc1e0-63d3-486f-a7a3-f1957a4116f0@intel.com>
- <aZMjSSiZ5cvwi_Ig@soc-5CG4396X81.clients.intel.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <aZMjSSiZ5cvwi_Ig@soc-5CG4396X81.clients.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DUZPR01CA0173.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4b3::27) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C4131D72D
+	for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 15:17:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771255039; cv=none; b=R6zDisFOZPBaOkJiyaq1XGJLUkta2rh0oevp0nUyzgJfo3ztF8uKlCC3DvK707sBR/wOcum+AcDvqJK2GwEgoTtxvAgJWuOP25r/ZGarvuLcwIS5tr0kjTv80ISnnJS6P87o1tGCVHTufGmFf+Pw9spnYuesFhZjnCBf5PcZWgc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771255039; c=relaxed/simple;
+	bh=HVqIbhWqa2dWbzKPrO+eXBu0tIwhzEG5l+aITsm6uoI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KM8QySlFo5T6IuS4GBMtBzfudWHfbZBdh1l5sSO8ezg9KsHfJvAodC/5EkTGPCTkseNRtFL7z5rjTDyFzN943JO4FEkRM0shpqW/vcha09XaKSp5FdTCCmboCUnKvFG3a0esEqaWrZ41kgGLGrEKr077shZ5tqKikiDGCnUKIc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lYzaxfOI; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2a7a9b8ed69so32681445ad.2
+        for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 07:17:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771255037; x=1771859837; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=dCE3gF12Qsuc0Q0S4BkQq+M+t5dj53pHezYMH10XfpU=;
+        b=lYzaxfOI4Zr8wlkdwGOezn/+ni9zjEQwEoNrtDNJ8r8C9GQw5cNh4LBHKDc6jDfQqj
+         BrITYa/dHg0zitjKuBiTjIy9T22QpLLc+GOHJAlobd67u7AIGFTXA9/B+PIL2/RUkxB6
+         IXQE1TkGxinFNpDBotgx4PcpsgTbTrXpPkGIJrgn4NWt8XqpLZ6/LvNQ16nQoBEjIwF5
+         Zl914immoAN7rAnMfbP8d5e3CK2Vsp6IgEJTz3V4LqMg4qW96w93vTMf5jCPYNv3qY83
+         bnjpOSiUphLRoM+XdnM0zXzaOBjKBPO6teFy7Ft6Co782ThrPInSfQ9iCLX4o5TqJtdj
+         P51Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771255037; x=1771859837;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:sender:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dCE3gF12Qsuc0Q0S4BkQq+M+t5dj53pHezYMH10XfpU=;
+        b=cKpoNU4LOdKneGAvylvqkAKJamIOltfizCAI4AqgYxaKJwZtkgEE8w+s0VEYz62osh
+         jBtLAUk9dsR2VTRdmltueZa9RYOSSD+b1x3m5Jp9DcIpgX7g/sxfpD++5M1wdcNRHuf7
+         LjdsEwK/mczYgqmWzClAkCgh9l83ikvCgjhhpooJRdboAUfej/Jlk8Y20+GgTWAwpkCP
+         vZkvQdbYYQWVjTTT/U14hYxuqRp2EpcZFLImrfAzhWzTBl7uQCQAcyO4VQhCEtPCgqbh
+         5AOxWl3XvX6b/vfVz9RvXVkH1tPe6I6p13EaboOm96ufcn5P8nsSr75so3YRYWumGlUY
+         BFjg==
+X-Forwarded-Encrypted: i=1; AJvYcCWZbjEyQcMjCosQN52cxLfvDjxZQjhNcQnuXvnkCEOmLAXsI6t4uiZ2ptvHDWJZJHF1178spfA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywjhiqtwj00S47+tJUQpJ9YtTCztlYfPwrmRYeyXFXYuVG/GgPh
+	c5aGzxO1nUb1WEQHL4bnDLlxZRP7z/dInf77B19Yr8nvOXR2Jgt1wg0B
+X-Gm-Gg: AZuq6aJCa83YOIpfPP0njm7clj0pO3323KuqmFs7KLn6WpvuaYKHJm/lcfMNWaf4z+b
+	IhwLLJd7yyY+yV3h+Xlf1a7GbO5jaWh4u07+ZXDlQve9UBKQk17koCsjQoLT7DBCXZJz7U//env
+	OCtGX/0WVpFzyj2JtKqNcqTQF6JW9HQfmwlO10M2+9NN9rhDHVlQxTfn8DoGEJ0V7Y4vp5K9liq
+	fz8JCuzQxdE1Cn4194r1gCj09LHV19EVTnVr0rNAyQawXp8Hf0E/v54IdQjdGZutkTl2+yjvDac
+	F+GU+IDxlLZ3MOz1FRvOGI+rpyTYKXSrXpf7+zO11fTo+C3ppF09+dzROISOvtCijYc6M047MDD
+	Y4r4JyzDGC90laDmewh3uyX1jyI7wSWL/jmH1P1AVN61u2Z+1lSBB/lIr6hBmn4f5wcqB95J5Hl
+	qjV0e/E/E3+25tQdtxVqWjtEIxSBARQtnZzDI31SUFsjjn5/G75clatMi8nxRoneErjR+uegWv3
+	nSjS6XZzVA=
+X-Received: by 2002:a17:90a:e18b:b0:354:a1b8:24a6 with SMTP id 98e67ed59e1d1-356aad7a8f0mr9075642a91.31.1771255036757;
+        Mon, 16 Feb 2026 07:17:16 -0800 (PST)
+Received: from ?IPV6:2600:1700:e321:62f0:da43:aeff:fecc:bfd5? ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-356a6b17c47sm5781823a91.2.2026.02.16.07.17.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Feb 2026 07:17:16 -0800 (PST)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Message-ID: <306e79fb-f3ee-434e-a90e-547e97d2a5aa@roeck-us.net>
+Date: Mon, 16 Feb 2026 07:17:14 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|CH3PR11MB8465:EE_
-X-MS-Office365-Filtering-Correlation-Id: d842f7a9-8e9a-4a04-9c99-08de6d6ec207
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?ZVBjbDhKc1pERFVCc2dBM1dzWjArcVgyUkpmYlZqUWxSUVN6SHgwR0VTNVph?=
- =?utf-8?B?NHltc05zWEozM0ljWk0vWk1RcytuMGRrNXZncVNWRUpXL3UrNWRVN2tuUmhh?=
- =?utf-8?B?S2NQaTFFSU5xcXBXakd3Wjhtb2llN3V3VU5jeFJWZkxsWUxXbnc1cXUwNDE1?=
- =?utf-8?B?b2R6d2NNM01lVzlvNjhNbS9PdmN6aXNtbmhDM1hydmlPd3c3YUpyRGhLUlpO?=
- =?utf-8?B?UHNhNWNlTnd0VU9QL2crNTFRK1l3Y2lXUldSYm0yNXk1YU56Qk50b0J5L0RL?=
- =?utf-8?B?NHk2MCtCMnBkT2VJVHZPVkxCVVJybnRCSmhIKzJnRVBqUzBINjhvYkpKVlMr?=
- =?utf-8?B?VlM3aHRPTnNqY0pUcXZMbDd5NVBTRE03Z0lsU205THdaVGM4S3lxaFlMRXRW?=
- =?utf-8?B?M0l0ZEx1MVF6R1J5VmxvSktRK2hYRm9kN001Y2oyblJScmJGNWIrb3JYTnBF?=
- =?utf-8?B?djg2YTBGZ0tMZERrTVorMUFCb3BnY2RPYmxsVDlzbW5hSCtpL1BOYmhCKzc1?=
- =?utf-8?B?MTM3bE5RSGVXSWp2SThaUjJENWYxK3dzckhvN0k3dCs0V1RUNll6Z00zN2Zn?=
- =?utf-8?B?N3VjeGg1YjdiRm9UWGJlSHZPbS9aTmJqTzVpUG5XSk9nMnZGaFE3OStYOXJl?=
- =?utf-8?B?KzlNZXA5eWlPc2daWUpvWDU5VDBiZlhqZW1OTnJOQkx3TllieWI4Sk91YThP?=
- =?utf-8?B?QXZralJxM0p5VDNqZWpIL1VDYmtrOUNPSEk1bmxHcUNEWmo2NlB0OHFKWmFn?=
- =?utf-8?B?dkJCNmVjSEdOVWVmUEdLenh5K1dlNUdZL1RxZS9WblVRZVIxNHY1MWowSVJF?=
- =?utf-8?B?emJsWGJoV254cm1DNWpDS2JPd2cvM0hBREZWMEZWZWJqM0gxTWR3S0R2TEtN?=
- =?utf-8?B?dko2bk1Xa3J5a1BiR3ZwdDBEUU9WTndkanRCc3VGMkFNcGs0cjUxM1NqQy9w?=
- =?utf-8?B?VFVsOHJlbVpFYXhkcUthY3BXTE1aT0VXbWNBZUYrcEFWaVgza1hQMldKa2JQ?=
- =?utf-8?B?eXpoYmU1QmdKajB5Q1NpdVF2aXFFNU5CVlBzZk4vQkJSTGgwWUZVUzE4ZmQ1?=
- =?utf-8?B?VHpDZjFVdnpGU2RUM09IMjBiV3hidXFZVkE5b3ZXNWV3Uk5wQ01VV1JRQjB1?=
- =?utf-8?B?QllXQ3AvRHBQbjQyUzlLV0oycEdWRlRHL2x0T0ZpLzBwSGVCWXFoRVhBVlh4?=
- =?utf-8?B?QUpmSlJXbXNWTUhFSGJLYlBweXV0Z2FEVm5Xc0Y4UzFhSjlyNkZZN1I5SjdW?=
- =?utf-8?B?M1NPcFNHcjNLcE81cnhZWjA5c09OWTBrRnJqaXl2djNnaENZV09UVjRoeW42?=
- =?utf-8?B?Y0ZzaTMyM0hhcUxidS92ZVZNZkVkVHBDTWJlZmw4Y1pJTXZSNTByNm5aWnlO?=
- =?utf-8?B?MUdNb0JLVlFqbkVEUnhnQkEvMERzUmlUNzhScHFPMGpnbkdXQTA1eWZoVkxv?=
- =?utf-8?B?K04vMmh2K2hQQ2pRN2h2S0h2Tm44OWs0NmM4REdDQXh5ZHdaVW4rZCt5Vmsv?=
- =?utf-8?B?aU5WQmZJZkNVeUVMS3ZUcWtpQmtCK3VGSTgrZVpXWHRKWWszSlQwMzhlZWQw?=
- =?utf-8?B?N2F1ZGwyTXhETlJPRzNGYUFYem44RUtldUFzZG9aNmIzM25Eelo3K2pYOHRn?=
- =?utf-8?B?TDAwNlNOcWMreWxLZkhDbHFEUWsrVStpY0hJUG9hODMwNzN0RUFRQnp4dmwy?=
- =?utf-8?B?dnBRWlhtZWk2OTJxa0lPdTVCN0RLV3RuMjkrNEYvVys3S3ZDd0VVU3Z3VzNx?=
- =?utf-8?B?R2JZTVZ6RVhjdzhmNnVXb2g0K3FkSTJ0SkZLYWt5SWZTL0IwekxDSnUxczc3?=
- =?utf-8?B?bTBjS29YaWduVXRzYjdQNGZPTkJrbklqd0NjTDlOZm1TOXp4Z3N0VFpIZWpE?=
- =?utf-8?B?bEpYQ21GbGtMYU9oWnBIeGRUNUhkeXc4TnRvYnFmOENUbHJDT01IRC8rVTFz?=
- =?utf-8?B?ZFFUOVB1amEvYU5mZ05TVHhSTFJ4OEdWQkxKRlRBWmcvbnlCS20wajBsMERL?=
- =?utf-8?B?ZDZkZzhydWJsVTVWbXArb0tUK2VRdHFSWEoreG1ReVd0Wk92bjlBUDc5ZFRa?=
- =?utf-8?B?UEljdG55TnkveGV0NHFkeUZObW9PcmFDNUhZTE5XTGxxZVJFcitkUmFDckx6?=
- =?utf-8?Q?hMBs=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aG5oTDRPK2wyMzM5ZXlleUlOeCtvMnV1eDAvdDViYWhUUmhyY1N3OENpRGRY?=
- =?utf-8?B?SFZqVjI3dWZXVi8zd1BmR0dvdnhyQWZUYnZCRExOKzNZQm9lMVkrWndldVZ0?=
- =?utf-8?B?NlVEUjF1YTBjZ3hrOE1tUXpzYkVsNEF6anpRZnJ1TDhZM3ZFUHBJOHBQME0y?=
- =?utf-8?B?djdkUlV1bXoxSVhCV3prVlhMeWR2czkzZmlBVWNKVm9SOC95Y0xDUWhxNmxr?=
- =?utf-8?B?OTR4V1F0Tm9NUFNQVzhKckFhWTc0STZhVVorUTNNNzhxY3lhYks0M0JTYVV6?=
- =?utf-8?B?KzFUYUV6dW96c2dXeGNwdFZBQUZPa1dmVHlLcWhDZW5pUXdPYldWdzBkQkNw?=
- =?utf-8?B?dStxMlBWYjdBdVZleWMvTVQ3UmF5ZExQb1FlcGdnWHFOQVdPOTBtNm95VVYw?=
- =?utf-8?B?ZVJURjhqUE9ETkVKMldoMVQvcGFFNC9PMndpQzVFak00NThReXByaUhBWFBs?=
- =?utf-8?B?K1h5bjN5VEZEOXJUcTFrNzdLTUJDWWY5YVE4WjJjb0JucVE0OGhUWHN3Mmhz?=
- =?utf-8?B?ZFV2c2NpODRDTjhlbFRFNDNDaUpoVkdUQlpiQ2RUZFAxZ3lFWDAyWlZVa3Zv?=
- =?utf-8?B?MWxMelZiOFp3SDRwdlhsd01ZOWtNOGJQR0l3TEFjd3gvUzI4YUJncGZZay9R?=
- =?utf-8?B?bUM1UmhUbTNoMGI3V09MK080dEpGYWMzNFUwV3NFL3dISTJ1V21yL1hKZjdH?=
- =?utf-8?B?Vk1rOWRUZWZOeEtIQ2tCbFlrNEtGYXcrU1lINXBuTUFjSzdybk03d0dhaERS?=
- =?utf-8?B?ME1lWGtGbXBDU1Z0eXgyMFN0a3UyNDdxS0k5ZkxVMG1kSk54eGpUYjVLMmVU?=
- =?utf-8?B?cUJOM0MwekZONy9VQ0pJeEtGeVNtZy9pTldzclF3NU1RaisrZkR1RG5YK2VF?=
- =?utf-8?B?aEtHbmhoRUZYWDFKY3gwOVIvTGdDQWl3WWJGVk1iSDg3clM0dnJhWW8rdzBX?=
- =?utf-8?B?UE9sSGxxT0RRbDUxdFFoUjdpRks4VEt0Ujh6SGxyWVdQS3dyNmNQTEVPUk5n?=
- =?utf-8?B?SUcramp6bHhxUTlINWsrSGFiclNTU21GT0VRSUpHeENJNGVNeXA5dXh0ZE9H?=
- =?utf-8?B?eWlrNnVubmg3QWRQamlyakVMYU9JZWIzL2pzakNUcmdXTHZuQ1ZwZFVlOU5U?=
- =?utf-8?B?OEtkbFgxL3lmaUlKdjdSWjUxQXp1VUdHRytWMFdYNFJWOGRNK0Y3SS9zMlY3?=
- =?utf-8?B?TTdlc3BWVDZUMmdIU2RzSTUwN0JYaEFmS29Ma2NxTXRLaEwrYmpoZ2s1Y1Q0?=
- =?utf-8?B?MXN3OTB1TVJSN3VLajZQSGpxVHViclhPTjRRTFhxa0J4NjgrN3c0a0wxa2Vo?=
- =?utf-8?B?QjhKRXZQWnB0VjNYcG1kOFAweThXU0Z4RXhVTzlOTFJnUjBTdUNHWW9SbS9L?=
- =?utf-8?B?TFlSOTBKQVQ3MndXenNrek54VEk4WlhKOEZmUXpZK1IyNjR2NDN2Ui81WlUy?=
- =?utf-8?B?MVpYWngzYTJYbEZkUEw2S0lQWlFyTGhUN0JUZVk4ZXlxNTJ4dEZ1SlVmYWgr?=
- =?utf-8?B?ajVCQmIxZGxCYUhCS0k1SStUaTlaRDI0U1JSNUwwODkvUjQzS0VQNzBOWW1D?=
- =?utf-8?B?eGpROWVZRU5QaTM2VHk2cnhFa29OWnorMUp5QTAzS0JIQTZONm4zazRPTllm?=
- =?utf-8?B?YUZoNGd3S2dLOEdmcUFnRGdsdFRIS2t6VEU3UWFMYnlnODNnbjgySDNxaFJh?=
- =?utf-8?B?c0tpM05xUGxwbjVwTmM0Z3BXcG1XY1R1MnVlTEI2alUwSm1KeEVwalRFL2F2?=
- =?utf-8?B?VE1EV1FxbjZjQ2FROHM0Q0ZVUEloZUV3Y0h0enl5cEJMcHhPRFNHMVJuVG8w?=
- =?utf-8?B?dmRseXE0ZldTVGkxUCtmdFdXbjBnQ3dXMmZLanpqMkZDZjVqSTkwVHpodUoz?=
- =?utf-8?B?N09kMFlZWW1VbmxOdnZlV1JaNTRtRC92SFFCMklsMHJMQXkzcjFWMVFhcHhw?=
- =?utf-8?B?bUdFRG5oemxoRmNLRnNaNVJWb1RiUm9JQ0hkNTZscFlGeFJHVkdoQVFlT0N5?=
- =?utf-8?B?NUhSc3liOHpFd3VNUXVUYlFHRDVEUG9lNzBqMCsvSndoUDRXUkdtUWJ3bWZv?=
- =?utf-8?B?NGNQL1RQb2kxTHNjZ0g0RXRzekVid1c0TW56dlJtd1M0eHptR0UyNytNS2I1?=
- =?utf-8?B?Z0N4QU8xV0VRUEVCY3VHK1Y3ay9HSUh0b3lmU3FHY0FtYkphcjZFdW5wd1VG?=
- =?utf-8?B?ajFCNHdYb0xTbThzcVRTY0hBUklqUVZmUVRidzludityNFBZTzFOQXJkaUFQ?=
- =?utf-8?B?YVVJRHVhSGVkNGhGZVdqaDMyL2dVZkRuM00zK2VKNkp1aVVLR2o3MDBvNEQ5?=
- =?utf-8?B?VCszUHNjaTBDNkpybmQ0TDRObkFrSUNXSDFqcXQrN0piMlBmUDhML3JjWGZp?=
- =?utf-8?Q?x0wYINY/m4NDD7yA=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: d842f7a9-8e9a-4a04-9c99-08de6d6ec207
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Feb 2026 15:19:20.6001
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nfYCkG/4TLSoSbfwLWnw1DASc9/e0r2hpqSlI14uUo08LzE4czK+MkA5NYIC+Uwm5r9in6FGkAACuNx33O6WgOWofKK3VYgAXbAzOWH0bPo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8465
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: dsa: MxL862xx: don't force-enable MAXLINEAR_GPHY
+To: Daniel Golle <daniel@makrotopia.org>, Arnd Bergmann <arnd@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Arnd Bergmann <arnd@arndb.de>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hwmon@vger.kernel.org
+References: <20260216105522.2382373-1-arnd@kernel.org>
+ <aZMKXavVQPelSXcG@makrotopia.org>
+Content-Language: en-US
+From: Guenter Roeck <linux@roeck-us.net>
+Autocrypt: addr=linux@roeck-us.net; keydata=
+ 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
+ np3900V20aS7eD9K8GTU0TGC1pyz6IVJwIE=
+In-Reply-To: <aZMKXavVQPelSXcG@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258908-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim,intel.com:email];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258906-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[43];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,intel.com,iogearbox.net,gmail.com,fomichev.me,linux.dev,bootlin.com,tencent.com,suse.com,lists.linux.dev,lists.osuosl.org,nvidia.com];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksander.lobakin@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[roeck-us.net];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,arndb.de,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linux@roeck-us.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 979D81457C8
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[makrotopia.org:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,roeck-us.net:mid]
+X-Rspamd-Queue-Id: 4B69C14573D
 X-Rspamd-Action: no action
 
-From: Zaremba, Larysa <larysa.zaremba@intel.com>
-Date: Mon, 16 Feb 2026 15:01:45 +0100
-
-> On Mon, Feb 16, 2026 at 11:48:27AM +0100, Alexander Lobakin wrote:
->> From: Alexander Lobakin <aleksander.lobakin@intel.com>
->> Date: Mon, 16 Feb 2026 11:46:05 +0100
+On 2/16/26 04:15, Daniel Golle wrote:
+> On Mon, Feb 16, 2026 at 11:55:17AM +0100, Arnd Bergmann wrote:
+>> From: Arnd Bergmann <arnd@arndb.de>
 >>
->>> From: Zaremba, Larysa <larysa.zaremba@intel.com>
->>> Date: Thu, 12 Feb 2026 19:33:22 +0100
->>>
->>>> The only user of frag_size field in XDP RxQ info is
->>>> bpf_xdp_frags_increase_tail(). It clearly expects whole buffer size instead
->>>> of DMA write size. Different assumptions in idpf driver configuration lead
->>>> to negative tailroom.
->>>>
->>>> To make it worse, buffer sizes are not actually uniform in idpf when
->>>> splitq is enabled, as there are several buffer queues, so rxq->rx_buf_size
->>>> is meaningless in this case.
->>>>
->>>> Use rxq->truesize as a frag_size for singleq and truesize of the first bufq
->>>> in AF_XDP ZC, as there is only one. Disable growinf tail for regular
->>>> splitq.
->>>>
->>>> Fixes: ac8a861f632e ("idpf: prepare structures to support XDP")
->>>> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
->>>> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
->>>> ---
->>>>  drivers/net/ethernet/intel/idpf/xdp.c | 8 +++++++-
->>>>  drivers/net/ethernet/intel/idpf/xsk.c | 1 +
->>>>  2 files changed, 8 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/drivers/net/ethernet/intel/idpf/xdp.c b/drivers/net/ethernet/intel/idpf/xdp.c
->>>> index 958d16f87424..a152c9a26976 100644
->>>> --- a/drivers/net/ethernet/intel/idpf/xdp.c
->>>> +++ b/drivers/net/ethernet/intel/idpf/xdp.c
->>>> @@ -46,11 +46,17 @@ static int __idpf_xdp_rxq_info_init(struct idpf_rx_queue *rxq, void *arg)
->>>>  {
->>>>  	const struct idpf_vport *vport = rxq->q_vector->vport;
->>>>  	bool split = idpf_is_queue_model_split(vport->rxq_model);
->>>> +	u32 frag_size = 0;
->>>>  	int err;
->>>>  
->>>> +	if (idpf_queue_has(XSK, rxq) && split)
->>>> +		frag_size = rxq->bufq_sets[0].bufq.truesize;
->>>> +	else if (!split)
->>>> +		frag_size = rxq->truesize;
->>>
->>> XDP and XSk are supported only in mode splitq mode, so you can remove
->>> the second condition and change the first one to just `has(XSK)`.
->>>
-> 
-> But the function itself handles singleq case. I do not see why frag_size should 
-> be treated differently.
-
-singleq will still be handled and will always receive 0 here as in case
-when XSk is not enabled.
-
-> 
-> Not that I am against of removing this logic, it would look more neat without 
-> these conditions.
-> 
->>>> +
->>>>  	err = __xdp_rxq_info_reg(&rxq->xdp_rxq, vport->netdev, rxq->idx,
->>>>  				 rxq->q_vector->napi.napi_id,
->>>> -				 rxq->rx_buf_size);
->>>> +				 frag_size);
->>>>  	if (err)
->>>>  		return err;
->>>>  
->>>> diff --git a/drivers/net/ethernet/intel/idpf/xsk.c b/drivers/net/ethernet/intel/idpf/xsk.c
->>>> index fd2cc43ab43c..febe1073b9b4 100644
->>>> --- a/drivers/net/ethernet/intel/idpf/xsk.c
->>>> +++ b/drivers/net/ethernet/intel/idpf/xsk.c
->>>> @@ -401,6 +401,7 @@ int idpf_xskfq_init(struct idpf_buf_queue *bufq)
->>>>  	bufq->pending = fq.pending;
->>>>  	bufq->thresh = fq.thresh;
->>>>  	bufq->rx_buf_size = fq.buf_len;
->>>> +	bufq->truesize = xsk_pool_get_rx_frag_step(fq.pool);
+>> The newly added dsa driver attempts to enable the corresponding PHY driver,
+>> but that one has additional dependencies that may not be available:
 >>
->> Better to do that in libeth_xdp rather than here?
+>> WARNING: unmet direct dependencies detected for MAXLINEAR_GPHY
+>>    Depends on [m]: NETDEVICES [=y] && PHYLIB [=y] && (HWMON [=m] || HWMON [=m]=n [=n])
+>>    Selected by [y]:
+>>    - NET_DSA_MXL862 [=y] && NETDEVICES [=y] && NET_DSA [=y]
+>> aarch64-linux-ld: drivers/net/phy/mxl-gpy.o: in function `gpy_probe':
+>> mxl-gpy.c:(.text.gpy_probe+0x13c): undefined reference to `devm_hwmon_device_register_with_info'
+>> aarch64-linux-ld: drivers/net/phy/mxl-gpy.o: in function `gpy_hwmon_read':
+>> mxl-gpy.c:(.text.gpy_hwmon_read+0x48): undefined reference to `polynomial_calc'
+> 
+> I assume this happens in case CONFIG_MAXLINEAR_GPHY=y and
+> CONFIG_HWMON=m, right?
+> 
+> None of the PHY drivers seem to adequately prevent such situations,
+> which in my opinion would be worth correcting, ie. by preventing any
+> PHY driver using HWMON from being built-in while CONFIG_HWMON=m.
+> 
+
+Technically, with "select MAXLINEAR_GPHY", NET_DSA_MXL862 should depend
+on "depends on HWMON || HWMON=n". That would prevent NET_DSA_MXL862=y
+and with it MAXLINEAR_GPHY=y.
+
+Maybe it is time to implement dummy functions for hwmon API calls
+to avoid all this.
+
+Guenter
+
+>>
+>> There is actually no compile-time dependency, as DSA correctly uses the
+>> PHY abstractions. Remove the 'select' statement to reduce the complexity.
+>>
+>> Fixes: 23794bec1cb6 ("net: dsa: add basic initial driver for MxL862xx switches")
+>> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> 
+> As there is no compile-time dependency, this change is fine.
+> 
+> Reviewed-by: Daniel Golle <daniel@makrotopia.org>
+> 
+>> ---
+>>   drivers/net/dsa/mxl862xx/Kconfig | 1 -
+>>   1 file changed, 1 deletion(-)
+>>
+>> diff --git a/drivers/net/dsa/mxl862xx/Kconfig b/drivers/net/dsa/mxl862xx/Kconfig
+>> index 4db7bab21a71..3e772298cc89 100644
+>> --- a/drivers/net/dsa/mxl862xx/Kconfig
+>> +++ b/drivers/net/dsa/mxl862xx/Kconfig
+>> @@ -2,7 +2,6 @@
+>>   config NET_DSA_MXL862
+>>   	tristate "MaxLinear MxL862xx"
+>>   	depends on NET_DSA
+>> -	select MAXLINEAR_GPHY
+>>   	select NET_DSA_TAG_MXL_862XX
+>>   	help
+>>   	  This enables support for the MaxLinear MxL862xx switch family.
+>> -- 
+>> 2.39.5
 >>
 > 
-> Smth like that?
-> 
-> diff --git a/drivers/net/ethernet/intel/idpf/xsk.c b/drivers/net/ethernet/intel/idpf/xsk.c
-> index febe1073b9b4..de87455b92d7 100644
-> --- a/drivers/net/ethernet/intel/idpf/xsk.c
-> +++ b/drivers/net/ethernet/intel/idpf/xsk.c
-> @@ -401,7 +401,7 @@ int idpf_xskfq_init(struct idpf_buf_queue *bufq)
->         bufq->pending = fq.pending;
->         bufq->thresh = fq.thresh;
->         bufq->rx_buf_size = fq.buf_len;
-> -       bufq->truesize = xsk_pool_get_rx_frag_step(fq.pool);
-> +       bufq->truesize = fq.chunk_align;
-> 
->         if (!idpf_xskfq_refill(bufq))
->                 netdev_err(bufq->pool->netdev,
-> diff --git a/drivers/net/ethernet/intel/libeth/xsk.c b/drivers/net/ethernet/intel/libeth/xsk.c
-> index 846e902e31b6..5b298558ecfd 100644
-> --- a/drivers/net/ethernet/intel/libeth/xsk.c
-> +++ b/drivers/net/ethernet/intel/libeth/xsk.c
-> @@ -167,6 +167,7 @@ int libeth_xskfq_create(struct libeth_xskfq *fq)
->         fq->pending = fq->count;
->         fq->thresh = libeth_xdp_queue_threshold(fq->count);
->         fq->buf_len = xsk_pool_get_rx_frame_size(fq->pool);
-> +       fq->chunk_align = xsk_pool_get_rx_frag_step(fq->pool);
-> 
->         return 0;
->  }
-> diff --git a/include/net/libeth/xsk.h b/include/net/libeth/xsk.h
-> index 481a7b28e6f2..a3ea90d30d17 100644
-> --- a/include/net/libeth/xsk.h
-> +++ b/include/net/libeth/xsk.h
-> @@ -598,6 +598,7 @@ __libeth_xsk_run_pass(struct libeth_xdp_buff *xdp,
->   * @thresh: threshold below which the queue is refilled
->   * @buf_len: HW-writeable length per each buffer
->   * @nid: ID of the closest NUMA node with memory
-> + * @chunk_align: step between consecutive buffers, 0 if none exists
->   */
->  struct libeth_xskfq {
->         struct_group_tagged(libeth_xskfq_fp, fp,
-> @@ -615,6 +616,8 @@ struct libeth_xskfq {
-> 
->         u32                     buf_len;
->         int                     nid;
-> +
-> +       u32                     chunk_align;
->  };
-> 
->  int libeth_xskfq_create(struct libeth_xskfq *fq);
 
-Ah, I forgot that for XSkFQ we have a separate structure...
-
-I'd do it like that:
-
-	u32 buf_len;
-	u32 truesize; // new field
-
-	int nid;
-};
-
-Maybe it's not really truesize, but it will be more straightforward and
-clear to the users what it means and which field they should assign the
-value to.
-truesize/chunk_align is related closely to buf_len, so I'd group them
-together in the struct, while nid is a different story, so it might stay
-separated by a newline.
-
-> 
-> 
->>>>  
->>>>  	if (!idpf_xskfq_refill(bufq))
->>>>  		netdev_err(bufq->pool->netdev,
-Thanks,
-Olek
 
