@@ -1,155 +1,160 @@
-Return-Path: <netdev+bounces-258855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258856-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aM9mNNDvkmkQ0QEAu9opvQ
-	(envelope-from <netdev+bounces-258855-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 11:22:08 +0100
+	id wM5hBbLykmlA0QEAu9opvQ
+	(envelope-from <netdev+bounces-258856-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 11:34:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E7A41424D1
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 11:22:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A5B1142628
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 11:34:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E35EA300C93A
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 10:22:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F28A2300F123
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 10:34:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC3A62FF66A;
-	Mon, 16 Feb 2026 10:22:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D00E2FFDD6;
+	Mon, 16 Feb 2026 10:34:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hegog2NH"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="RI7NKw8P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B808A2FF669
-	for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 10:22:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C8FC1DC1AB;
+	Mon, 16 Feb 2026 10:34:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771237325; cv=none; b=UfolVjxFJiU1FSETEuNxQ3mwgSIkbPx+0HcSCDKseFzw0APGwO2pW0AFjMvRuMNarQbY99Mmcqw33eqEvA3gMx5cJExxz97TJdENFfNJgn8CjP0TuXWZZMTjNn3wZCOuYn0j/8yjK3SXNdY4s2hmr0B7H3LmSBho7ynumsbtstM=
+	t=1771238063; cv=none; b=FtJNqREhdz7hS5MtjLZKaFGHYEwuRfGzYZFTofIKMrRgcAFrhzBlTxELdF9zmCKRFdFc/QK3cy+HDmJgGGxek7yhwPEAFpo+mUREURPGKF3G0av8586SgUSTvDzKURE0D2XOnexMBHP1XLlXNRgEcXsUbHwoRalMDQViN2t5pAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771237325; c=relaxed/simple;
-	bh=dzIh5HLHMjACK3joTcj7CkUbYuIelQm3aP8ZVXYPHHE=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Y/UfmkKvT4vAhjRsK01ywrkFTNt9VMmfmX4UOxO8c/6omhcmZZW7+8xP2du7CfwL0Z7yzOVm0RWagb2y2htHmNwM6Wl86b9u/JxQvjpKLkZ8eTwNg/kIt201TYY32aNErRB+tNLX0gC574ZOI+ai+3dzQVJC2Ptl+2ewczPYbxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Hegog2NH; arc=none smtp.client-ip=209.85.222.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8c6ae763d03so325000885a.3
-        for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 02:22:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771237323; x=1771842123; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=4OwKE2ukVIDKM2GXGcheB6FaHo/Hvgq7dk878FzVDUY=;
-        b=Hegog2NHxSlWqqOuRULB543Xnk1te/G34mAoJadaIGGWL+m0g7pvmZS1RqD1zr6NFK
-         iMUgWja+LaPIIOvjfm0Zyxs34kENZ2tu+gHBWDi2UA778hIwFtx367kYXIcyki1imQ5Q
-         1H79/I92rZ3PWT+N/HB3mrqOjI6D+yDKMOraiI5QaxoTQuIAFszv+kF1cXCI2moa9woO
-         L47B6RsvK4vvBq6lMdc5TolirrHbuJwHWDXy50vO/9h9Z7YR69w+VHEKz03iExB31O3s
-         8Bj4MizPI4mTXBlP56otZh/mJh250D0dgv/G+D7OSnRFHsD750t/pPo95tdN+rKpKhzm
-         LfnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771237323; x=1771842123;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4OwKE2ukVIDKM2GXGcheB6FaHo/Hvgq7dk878FzVDUY=;
-        b=FHc+eDBlWyEo62lHwRjPsYKF18dX5dN9k7+pcY3xIvTNR0GMud6dY0nKkple1wPx/k
-         Kn1GQkcBB/8xhvtl9RawuBOXf+XzWT9B40QNcGSHXDfzYiiE8lbLWrU7VD+LUwNe9xwB
-         RWBsYyQ2+72KwAVlQ5UR/O//YgR94XEQaCEUTBd9gDEcJfM+qN3dksF3TygE26lUaeyh
-         3O4RCbDValuz8SC0EMB62sNvr733C5ZUJxyX/fPwcm6cd+01A59zXhsUlEzXCRURBGaF
-         A5Z8j+rWfgIiCjjtltCn1snh3NgBfAjdRWQiiEd3qWWaS222crOqDzGnCeoJpI5l4z7p
-         fddg==
-X-Forwarded-Encrypted: i=1; AJvYcCUZ9c8hmdMoO3oVb8XwIjeSRAAxL846cpy/bmQ0L1JHpu7eKotI2bwjg8Bj7PIBuWEVIZ8fUGk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGwYxZN1I/OGSNb/fpOA8hnXOJSXKW/kCZS72jM9b6fCii+D14
-	rWqM/ZFic7froYYJn92e+r+GLGQPpAgrepXTyJ36K1Xz7+E8qnGb8QajyD6mlo7It+EdQX+yEuk
-	ubzKIVUBRsVeDog==
-X-Received: from qknpa4.prod.google.com ([2002:a05:620a:8304:b0:8cb:a9b:63e5])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:4709:b0:8c6:d309:f9c0 with SMTP id af79cd13be357-8cb42262ee3mr1188207685a.8.1771237323134;
- Mon, 16 Feb 2026 02:22:03 -0800 (PST)
-Date: Mon, 16 Feb 2026 10:22:02 +0000
+	s=arc-20240116; t=1771238063; c=relaxed/simple;
+	bh=ZgFvXqB7OIIq3cqHaAayaKmI3aY/GQrJ1CCVyI+LHOI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mdoOGMrIfuav155NG3aWsyURwTG02FHwr5VjyXoYjP+fiFj+VNykMXKmz/NyYKnA4yDB76kNPlSdDBexRqw7XDDEOS6V/w4FHdksUmyVLtuvZ1j3AuuU6fFzkWWHNwXaN01+3eEj+63QpjnHecow+1TVpQ+3cll5ydxpVoIU9WU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=RI7NKw8P; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id AF2514E40E5C;
+	Mon, 16 Feb 2026 10:34:18 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 7FBB6606CF;
+	Mon, 16 Feb 2026 10:34:18 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2CF2B10369103;
+	Mon, 16 Feb 2026 11:34:13 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1771238057; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=j0JfYH/N+5qnt8WjrKjK2dQuFGoBJxtP7j0yVksQMnw=;
+	b=RI7NKw8PlHoVYWB/13lxZPb2BAikDJPH7BvjDeucaA3sjv+PVCgRcBEV7lv3lB92KiB+D8
+	gRBOpc+L+1sFaScDaSve7hyWUXnZWDxi9K0DTkg6Gf8fEpMTqQm84WSsXeIgojulJE1cYF
+	ozGmWPmSV0j0QqCfzK1Izuz6wHH6B2H0ePI3ijqMzNRcUDQrjuZRpCy/FOhHnb/Hy6HmM8
+	rnRfavAc8lrcMmY/4yFE3uR/JDIMhdGCNWuoAXfF5bBfdfdgr1s5ay4dlEJdB3T67QQjFj
+	3c7YW8yHawYCUJlDaZqHaRIQrkaxrSO+g6CJ8ksxpB52u90YPeYqwg9yZU1iIg==
+Message-ID: <b598aad8-5151-47b2-949f-321b87baa638@bootlin.com>
+Date: Mon, 16 Feb 2026 11:34:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.310.g728cabbaf7-goog
-Message-ID: <20260216102202.3343588-1-edumazet@google.com>
-Subject: [PATCH net] ipv6: fix a race in ip6_sock_set_v6only()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] net: usb: lan78xx: scan all MDIO addresses on LAN7801
+To: =?UTF-8?Q?Martin_P=C3=A5lsson?= <martin@poleshift.se>,
+ Thangaraj Samynathan <Thangaraj.S@microchip.com>,
+ Rengarajan Sundararajan <Rengarajan.S@microchip.com>,
+ UNGLinuxDriver@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <0110019c64da3c2a-d4a4adbe-c78b-4051-a95b-e7ed5db247a1-000000@eu-north-1.amazonses.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <0110019c64da3c2a-d4a4adbe-c78b-4051-a95b-e7ed5db247a1-000000@eu-north-1.amazonses.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258855-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-258856-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3E7A41424D1
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,poleshift.se:email]
+X-Rspamd-Queue-Id: 6A5B1142628
 X-Rspamd-Action: no action
 
-It is unlikely that this function will be ever called
-with isk->inet_num being not zero.
+Hi Martin,
 
-Perform the check on isk->inet_num inside the locked section
-for complete safety.
+On 16/02/2026 06:09, Martin Pålsson wrote:
+> The LAN7801 is designed exclusively for external PHYs (unlike the
+> LAN7800/LAN7850 which have internal PHYs), but lan78xx_mdio_init()
+> restricts PHY scanning to MDIO addresses 0-7 by setting phy_mask to
+> ~(0xFF). This prevents discovery of external PHYs wired to addresses
+> outside that range.
+> 
+> One such case is the DP83TC814 100BASE-T1 PHY, which is typically
+> configured at MDIO address 10 via PHYAD bootstrap pins and goes
+> undetected with the current mask.
+> 
+> Set phy_mask to 0 for the LAN7801 so that all 32 MDIO addresses are
+> scanned during bus registration, allowing any external PHY to be
+> discovered regardless of its address.
+> 
+> Fixes: 02dc1f3d613d ("lan78xx: add LAN7801 MAC only support")
+> 
+> Signed-off-by: Martin Pålsson <martin@poleshift.se>
+> ---
+> Changes in v2:
+> - Added Fixes: tag
+> - Link to v1: https://lore.kernel.org/r/20260214-lan78xx-phy-mask-fix-v1-1-3baa100861e4@poleshift.se
+> ---
+>  drivers/net/usb/lan78xx.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
+> index 00397a807393..9d8f1ff7028d 100644
+> --- a/drivers/net/usb/lan78xx.c
+> +++ b/drivers/net/usb/lan78xx.c
+> @@ -2094,8 +2094,8 @@ static int lan78xx_mdio_init(struct lan78xx_net *dev)
+>  		dev->mdiobus->phy_mask = ~(1 << 1);
+>  		break;
+>  	case ID_REV_CHIP_ID_7801_:
+> -		/* scan thru PHYAD[2..0] */
+> -		dev->mdiobus->phy_mask = ~(0xFF);
+> +		/* scan all 32 MDIO addresses for external PHYs */
+> +		dev->mdiobus->phy_mask = 0;
 
-Fixes: 9b115749acb24 ("ipv6: add ip6_sock_set_v6only")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/ipv6.h | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+As this is the default behaviour for mdio bus controllers, and the
+default value for the mask is 0, I think you can simply discard that
+assignment.
 
-diff --git a/include/net/ipv6.h b/include/net/ipv6.h
-index cc56e09525d03b8e12dd92cec2751c2a13f16c10..53c5056508be543ae5d312e26dea6ed78fcc04ee 100644
---- a/include/net/ipv6.h
-+++ b/include/net/ipv6.h
-@@ -1213,12 +1213,15 @@ int ipv6_sock_mc_drop(struct sock *sk, int ifindex,
- 
- static inline int ip6_sock_set_v6only(struct sock *sk)
- {
--	if (inet_sk(sk)->inet_num)
--		return -EINVAL;
-+	int ret = 0;
-+
- 	lock_sock(sk);
--	sk->sk_ipv6only = true;
-+	if (inet_sk(sk)->inet_num)
-+		ret = -EINVAL;
-+	else
-+		sk->sk_ipv6only = true;
- 	release_sock(sk);
--	return 0;
-+	return ret;
- }
- 
- static inline void ip6_sock_set_recverr(struct sock *sk)
--- 
-2.53.0.310.g728cabbaf7-goog
+I don't even think we need a comment, as the other cases for 7800/7850
+already have a comment explaining why they are special cases.
+
+Maxime
 
 
