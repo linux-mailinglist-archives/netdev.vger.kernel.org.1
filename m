@@ -1,153 +1,184 @@
-Return-Path: <netdev+bounces-258947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258949-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mGNOH+d4k2mb5gEAu9opvQ
-	(envelope-from <netdev+bounces-258947-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 21:07:03 +0100
+	id kDspJN96k2nV5gEAu9opvQ
+	(envelope-from <netdev+bounces-258949-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 21:15:27 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECCD11475EA
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 21:07:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAA4514764F
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 21:15:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B83C6301C93E
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 20:07:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 81506301589D
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 20:15:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CE8B234994;
-	Mon, 16 Feb 2026 20:07:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C286139D;
+	Mon, 16 Feb 2026 20:15:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Oq41XslW"
+	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="giXTq+6l"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DACF58F48;
-	Mon, 16 Feb 2026 20:06:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0020B3EBF07
+	for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 20:15:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771272420; cv=none; b=WxukrpDMbnWnte91b4CkHDpy19b0hPqN3FgyNLyF6asc6QjfIF0zftG4NpARfn51x6/bmNi7pE/XfDtgDCGxTcsN0JdOPPSNZsZI4IXm3iqlLsahzd9zcDez9QzvEpjWhtbJTNP0R1amYA/mm9rw1Hp6YM+EwimRk6ajdMtGSUs=
+	t=1771272924; cv=none; b=TDjCkpMjcL01yX3sYKr4uxGARqAsdx2XmptOMb7EEIJzUAz7VEW2dxaAYE/IXB3IfkF+QyiCf8RG3ZVy4HcH133OBAw9iogr124fKSVJKI8HIPai8Lrhy5eZFenQixtq2s7jO+VWUapkO8moxtFxS1wNfIIdaB0T9JPCUseks84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771272420; c=relaxed/simple;
-	bh=5GBMCRE8UCLJ9erqNAlkjoQpsSVsvIhltKco9VN9c0U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pRmOwcvKq6yu6xe0T2Bqvvy1PMNdkN01EYapaHxCb9Fgd16QMy6mmhfRN4q11/pBL3cW+Wi1CahcG2pdADnIfKCZ3BiZBQ/FrQl4AI4saW8RWutwVun/9SR0ytBAgOv0HbH0rMWRESKUAw69V6gXFqoVO5bprNxz828z1BPUeLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Oq41XslW; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=VfiQCERnDN/V9UQWqJheCNEEa/e8Tkm80+erHpLO2ZU=; b=Oq41XslWxQLPIPB5QZdSAh646j
-	DPEEy8BxGU+btilCkYJFQ/1ZecYARusx+O6RDmQj0HAFQiIIGyphGlVCwkpleyFxY8vMek38Jlcad
-	Hl3Q+eTaj3QK/GYmqKf32B7LwFFlORBWw0seh2no7NH/4uldV6ICGndNGo8M1DgTkq2E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vs4rq-007XKK-Bx; Mon, 16 Feb 2026 21:06:50 +0100
-Date: Mon, 16 Feb 2026 21:06:50 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sean Chang <seanwascoding@gmail.com>
-Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
-	trond.myklebust@hammerspace.com, anna@kernel.org,
-	netdev@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] nfs: fix unused variable warnings
-Message-ID: <2e3bf4db-cea6-4f55-a82b-4e99bb3f44fe@lunn.ch>
-References: <20260216174950.455244-1-seanwascoding@gmail.com>
- <20260216174950.455244-2-seanwascoding@gmail.com>
+	s=arc-20240116; t=1771272924; c=relaxed/simple;
+	bh=yHTub/6dAaEppxaLT/BoJuX2CsZN5Kva6LgQBUw/3UY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Z1WkQsEjNVp4Un3hu49r2/ynenrknuBMw4PDgZ8EUflaps/pynGESQvlOIiCsu3J6KT+QriHVuJZthDkKLNfhkIibRk25V3fXBp92WelNE1yVRSTyrkdNfV8HDJVcRI4NNM1NEmWlGfcHm94WM9BK7uwy8kSkQ5Ke/EQ7TEbfsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=giXTq+6l; arc=none smtp.client-ip=49.212.198.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
+Received: from ms-a2 (211.4.31.150.dy.iij4u.or.jp [150.31.4.211])
+	(authenticated bits=0)
+	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 61GKETWq039148
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Tue, 17 Feb 2026 05:14:29 +0900 (JST)
+	(envelope-from kohei@enjuk.jp)
+DKIM-Signature: a=rsa-sha256; bh=W8IeNTYHbP+UZ6w1LZGRpiOEWQPTM5igsV4ZklRjJo0=;
+        c=relaxed/relaxed; d=enjuk.jp;
+        h=From:To:Subject:Date:Message-ID;
+        s=rs20251215; t=1771272870; v=1;
+        b=giXTq+6lC392xS8Tuyu9eFxsSOYzlbx15Ey56klUB/S3TAZRoak29AuiwGidYwP5
+         3GbE6RQPTQ/Tyh/jAXvupNtup3s+X4VjCTXGstwMwtVsoDkAzzQusnjbGd5dgWXk
+         hpvZw5qZZpmaRHf8PBBHgzgypOLz7RDVzC8rabLlFsIO4R2Ib9BNjPqo0Q2cpEdU
+         7mTAS/A7VUFjMNoRKc1pQjUazPpbAi3rfOFbRGaGBBbeSNuZlPpcivjioW+3E9mB
+         XBQksoVntObcey5L0ZN+btyHHq7knlg5Sj7HbZ6/xaNOpgAU3Wgqph8NpKggqZ81
+         eR5zA32/pFiWZR5pHXhWSQ==
+From: Kohei Enju <kohei@enjuk.jp>
+To: netdev@vger.kernel.org, bpf@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Stanislav Fomichev <sdf@fomichev.me>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Martin KaFai Lau <martin.lau@linux.dev>,
+        Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+        Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
+        Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+        Jussi Maki <joamaki@gmail.com>, kohei.enju@gmail.com,
+        Kohei Enju <kohei@enjuk.jp>,
+        syzbot+10cc7f13760b31bd2e61@syzkaller.appspotmail.com
+Subject: [PATCH v1 bpf] bpf: devmap: fix stack-out-of-bounds write in get_upper_ifindexes()
+Date: Mon, 16 Feb 2026 20:13:07 +0000
+Message-ID: <20260216201428.65641-1-kohei@enjuk.jp>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260216174950.455244-2-seanwascoding@gmail.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258947-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: ECCD11475EA
+	TAGGED_FROM(0.00)[bounces-258949-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[enjuk.jp:+];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,linux.dev,google.com,enjuk.jp,syzkaller.appspotmail.com];
+	TAGGED_RCPT(0.00)[netdev,10cc7f13760b31bd2e61];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: EAA4514764F
 X-Rspamd-Action: no action
 
-On Tue, Feb 17, 2026 at 01:49:49AM +0800, Sean Chang wrote:
-> Add __maybe_unused to variables only used in specific configurations
-> to silence compiler warnings found during RISC-V builds.
+get_upper_ifindexes() iterates over all upper devices and writes their
+indices into an array without checking bounds.
 
-Could you give more details.
+Also the callers assume that the max number of upper devices is
+MAX_NEST_DEV and allocate excluded_devices[1+MAX_NEST_DEV] on the stack,
+but that assumption is not correct and the number of upper devices could
+be larger than MAX_NEST_DEV (e.g., many macvlans), causing a
+stack-out-of-bounds write.
 
->  int nfs4_proc_create_session(struct nfs_client *clp, const struct cred *cred)
->  {
->  	int status;
-> -	unsigned *ptr;
-> +	unsigned *ptr __maybe_unused;
->  	struct nfs4_session *session = clp->cl_session;
->  	struct nfs4_add_xprt_data xprtdata = {
->  		.clp = clp,
+Add a max parameter to get_upper_ifindexes() to avoid the issue.
 
-Lets look at this function
+To reproduce, create more than MAX_NEST_DEV(8) macvlans on a device with
+an XDP program attached using BPF_F_BROADCAST | BPF_F_EXCLUDE_INGRESS.
+Then send a packet to the device to trigger the XDP redirect path.
 
-int nfs4_proc_create_session(struct nfs_client *clp, const struct cred *cred)
-{
-	int status;
-	unsigned *ptr;
-	struct nfs4_session *session = clp->cl_session;
-	struct nfs4_add_xprt_data xprtdata = {
-		.clp = clp,
-	};
-	struct rpc_add_xprt_test rpcdata = {
-		.add_xprt_test = clp->cl_mvops->session_trunk,
-		.data = &xprtdata,
-	};
+Reported-by: syzbot+10cc7f13760b31bd2e61@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/698c4ce3.050a0220.340abe.000b.GAE@google.com/T/
+Fixes: aeea1b86f936 ("bpf, devmap: Exclude XDP broadcast to master device")
+Signed-off-by: Kohei Enju <kohei@enjuk.jp>
+---
+ kernel/bpf/devmap.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-	dprintk("--> %s clp=%p session=%p\n", __func__, clp, session);
-
-	status = _nfs4_proc_create_session(clp, cred);
-	if (status)
-		goto out;
-
-	/* Init or reset the session slot tables */
-	status = nfs4_setup_session_slot_tables(session);
-	dprintk("slot table setup returned %d\n", status);
-	if (status)
-		goto out;
-
-	ptr = (unsigned *)&session->sess_id.data[0];
-	dprintk("%s client>seqid %d sessionid %u:%u:%u:%u\n", __func__,
-		clp->cl_seqid, ptr[0], ptr[1], ptr[2], ptr[3]);
-	rpc_clnt_probe_trunked_xprts(clp->cl_rpcclient, &rpcdata);
-out:
-	return status;
-}
-
-There is no #ifdef'ery here. How is ptr not used? Is status always
-true, so the goto it always taken? But then rpcdata should also be
-unused?
-
-	Andrew
+diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
+index 2625601de76e..cdc4299a5955 100644
+--- a/kernel/bpf/devmap.c
++++ b/kernel/bpf/devmap.c
+@@ -588,16 +588,18 @@ static inline bool is_ifindex_excluded(int *excluded, int num_excluded, int ifin
+ }
+ 
+ /* Get ifindex of each upper device. 'indexes' must be able to hold at
+- * least MAX_NEST_DEV elements.
++ * least 'max' elements.
+  * Returns the number of ifindexes added.
+  */
+-static int get_upper_ifindexes(struct net_device *dev, int *indexes)
++static int get_upper_ifindexes(struct net_device *dev, int *indexes, int max)
+ {
+ 	struct net_device *upper;
+ 	struct list_head *iter;
+ 	int n = 0;
+ 
+ 	netdev_for_each_upper_dev_rcu(dev, upper, iter) {
++		if (n >= max)
++			break;
+ 		indexes[n++] = upper->ifindex;
+ 	}
+ 	return n;
+@@ -615,7 +617,9 @@ int dev_map_enqueue_multi(struct xdp_frame *xdpf, struct net_device *dev_rx,
+ 	int err;
+ 
+ 	if (exclude_ingress) {
+-		num_excluded = get_upper_ifindexes(dev_rx, excluded_devices);
++		num_excluded =
++			get_upper_ifindexes(dev_rx, excluded_devices,
++					    ARRAY_SIZE(excluded_devices) - 1);
+ 		excluded_devices[num_excluded++] = dev_rx->ifindex;
+ 	}
+ 
+@@ -733,7 +737,9 @@ int dev_map_redirect_multi(struct net_device *dev, struct sk_buff *skb,
+ 	int err;
+ 
+ 	if (exclude_ingress) {
+-		num_excluded = get_upper_ifindexes(dev, excluded_devices);
++		num_excluded =
++			get_upper_ifindexes(dev, excluded_devices,
++					    ARRAY_SIZE(excluded_devices) - 1);
+ 		excluded_devices[num_excluded++] = dev->ifindex;
+ 	}
+ 
+-- 
+2.51.0
 
 
