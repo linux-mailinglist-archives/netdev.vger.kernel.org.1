@@ -1,150 +1,125 @@
-Return-Path: <netdev+bounces-258948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258950-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +IwjL3d6k2nV5gEAu9opvQ
-	(envelope-from <netdev+bounces-258948-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 21:13:43 +0100
+	id SLBXD218k2ko5wEAu9opvQ
+	(envelope-from <netdev+bounces-258950-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 21:22:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19C8C14762D
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 21:13:43 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4580A1476E9
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 21:22:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F22193025D2F
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 20:13:40 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 86DBD300AC8B
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 20:22:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31A112DF707;
-	Mon, 16 Feb 2026 20:13:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC5D12E1758;
+	Mon, 16 Feb 2026 20:22:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="aRUICT1r"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ALxmtIkg"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF10B28D8DB;
-	Mon, 16 Feb 2026 20:13:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A13652E22B5;
+	Mon, 16 Feb 2026 20:21:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771272820; cv=none; b=SsRCDsqwZnEFpp0ujexCFvgYjFfstDAF+6zW8TymwTCc0RYfhPZZJ3Hxbbrs8Ej70/KEGZA1YTV28rpvk/dH/HOKYExZ8Aaf5I8figP0swzNQB89kpiD0TaubB1o2ByDMpv3rag0xa0n1utpdPEhZXJgIgwBWaPzuNUmVcBFNJY=
+	t=1771273320; cv=none; b=qvGISu28YLb4eBXSzFJwFCFRCZ6T0a58yqZpnWmsqPCj3bGM2+WYW5bsQ9Wh2MiZroqxfptwq0ZV1nmhS/CbKGcZrYZUbt1QLhJqqodNppUGtDHKyrngIQPra1Cumpr7U/b9ElCvjc7Dk4PCPahe5J18qulcmr/d4ltlFqDCBrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771272820; c=relaxed/simple;
-	bh=IE5HoO8HWJTuHPBPnLwIKsMKbbBbg5iNPVQzRfN+AIQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SKfvAHTPHhWOLE/Y1ADm2k46g34uyAuY3myBTNrdjGjPSe155UJsN9PN4WZwp8ShpVgVkw/m1PRAL6hDvZiuNOCS6JQN+SvJoS4IisSYf9eAGgkbgsTrxD/iR3nYXbtPcUwI/6Hik6ZNA/r2pixAyBNM0HAh6162diXp3GP/k3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=aRUICT1r; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=nqY1zFk/Ql6M+VyHSIk1GNbgl32SNTksZ6fx1kYYdT4=; b=aRUICT1rS+kUDwna0wkLu8ffeK
-	VysFFZ4uheQmytzrHh50uCyI17ca+F5UrE/Sy0C+Et9bo3WhU73HhCoc5K7uyDtgJq+297VZImOC4
-	HvYOuSmpDAssuIY242B4xqHj/TL1MY9q08lB3r60EViBjT301l25FJYmGjEHU6EYJVNI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vs4yD-007XMg-SV; Mon, 16 Feb 2026 21:13:25 +0100
-Date: Mon, 16 Feb 2026 21:13:25 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Fabian Druschke <fabian@druschke.network>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org, Fabian Druschke <fdruschke@outlook.com>
-Subject: Re: [PATCH] r8169: avoid OOM when allocating RX buffers
-Message-ID: <64b1a578-5325-4d51-9b10-2b54fcaa0a7f@lunn.ch>
-References: <20260216185245.182450-1-fabian@druschke.network>
+	s=arc-20240116; t=1771273320; c=relaxed/simple;
+	bh=i/njuAwIIlHN67tm3b4SyqKsCR5KnzOIE7TbVsSRq/I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GwsC30LqJDDgpdQ4X0QV7gb7Q+Oj05a242rTRrLvi9UldqAfA0eqKKYhZBjd7fprvLqP7AUiktPlMsjAVZjGaRzKFYHQ4YYanksCo1L4LZUNAKqglj64yttK8xyfjJSpHnFCV7BxgEClh6TkuEW0noT/vYCOJcnSw0CzA0t3qXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ALxmtIkg; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=sgq3DEY4sfVv45q1ksreQHAfcaX+hCQ8IiejSVMHmfw=; b=ALxmtIkgHb0LLQ9026xxTHCA7w
+	oDQYHFSz6FjRpR3DNi+SIs4L/dMcA65DcVB1L637qRYjhxKYa4XpY6op6H/ypP28sUTih+D2SXVdG
+	Fp+KVYTtv+wUy/6eD7UD5ZGb5UUsRYZxM0mXWmlCwd/8ILRHiWUqYGPzTfHhC+6c6cz8H2RQHwJkA
+	We5aZrgpwVgEgCEKwBHUR4NVUUwjC8ThohyYVnuYCvkS+PvusGC5z0DYZsXfCmEAPSVgpxAzU4QyQ
+	vcTmcXt9dLkM9dkTGOyP72xRiG8S3IpZNNGuTDhVg22+HLcgQ+qJHD+RJxpGpeAt15eBP95cPVLz3
+	/MTupUfw==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vs56K-00000007FW8-3t82;
+	Mon, 16 Feb 2026 20:21:48 +0000
+Message-ID: <1f0bf8ac-d61f-411b-ab49-3785e069e528@infradead.org>
+Date: Mon, 16 Feb 2026 12:21:47 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260216185245.182450-1-fabian@druschke.network>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] vsock: document namespace mode sysctls
+To: Stefano Garzarella <sgarzare@redhat.com>, netdev@vger.kernel.org
+Cc: Shuah Khan <skhan@linuxfoundation.org>,
+ Bobby Eshleman <bobbyeshleman@meta.com>, linux-kernel@vger.kernel.org,
+ Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
+References: <20260216163147.236844-1-sgarzare@redhat.com>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20260216163147.236844-1-sgarzare@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=bombadil.20210309];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,realtek.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,outlook.com];
-	TAGGED_FROM(0.00)[bounces-258948-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 19C8C14762D
+	FROM_HAS_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258950-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[rdunlap@infradead.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[infradead.org:+]
+X-Rspamd-Queue-Id: 4580A1476E9
 X-Rspamd-Action: no action
 
-On Mon, Feb 16, 2026 at 07:52:45PM +0100, Fabian Druschke wrote:
-> From: Fabian Druschke <fdruschke@outlook.com>
+
+
+On 2/16/26 8:31 AM, Stefano Garzarella wrote:
+> From: Stefano Garzarella <sgarzare@redhat.com>
 > 
-> r8169 allocates order-2 pages for RX buffers during rtl_open(). Under heavy
-> memory fragmentation this allocation may trigger the global OOM killer,
-> causing unrelated user processes to be killed.
+> Add documentation for the vsock per-namespace sysctls (`ns_mode` and
+> `child_ns_mode`) to Documentation/admin-guide/sysctl/net.rst.
+> These sysctls were introduced by by commit eafb64f40ca4 ("vsock: add
+> netns to vsock core").
 > 
-> Use a GFP mask that avoids OOM killer invocation so the allocation can fail
-> gracefully and rtl_open() returns -ENOMEM instead.
+> Document the two namespace modes (`global` and `local`), the
+> inheritance behavior of `child_ns_mode`, and the restriction preventing
+> local namespaces from setting `child_ns_mode` to `global`.
 > 
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Fabian Druschke <fdruschke@outlook.com>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 > ---
->  drivers/net/ethernet/realtek/r8169_main.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index 3507c2e28110..3525e889ec1c 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -3952,7 +3952,8 @@ static struct page *rtl8169_alloc_rx_data(struct rtl8169_private *tp,
->  	dma_addr_t mapping;
->  	struct page *data;
->  
-> -	data = alloc_pages_node(node, GFP_KERNEL, get_order(R8169_RX_BUF_SIZE));
-> +	gfp_t gfp = GFP_KERNEL | __GFP_RETRY_MAYFAIL | __GFP_NOWARN;
-> +	data = alloc_pages_node(node, gfp, get_order(R8169_RX_BUF_SIZE));
->  	if (!data)
->  		return NULL;
 
-~/linux/drivers/net$ grep -r alloc_pages_node
-ethernet/chelsio/cxgb4/cxgb4_main.c:		newpage = alloc_pages_node(node, __GFP_NOWARN | GFP_KERNEL |
-ethernet/chelsio/cxgb4/sge.c:		pg = alloc_pages_node(node, gfp | __GFP_COMP, s->fl_pg_order);
-ethernet/chelsio/cxgb4/sge.c:		pg = alloc_pages_node(node, gfp, 0);
-ethernet/amd/xgbe/xgbe-desc.c:		pages = alloc_pages_node(node, gfp, order);
-ethernet/fungible/funcore/fun_queue.c:		rqinfo->page = alloc_pages_node(node, GFP_KERNEL, 0);
-ethernet/fungible/funeth/funeth_rx.c:	p = __alloc_pages_node(node, gfp | __GFP_NOWARN, 0);
-ethernet/mellanox/mlx5/core/pagealloc.c:	page = alloc_pages_node(nid, GFP_HIGHUSER, 0);
-ethernet/mellanox/mlx5/core/en_main.c:		struct page *page = alloc_pages_node(node, GFP_KERNEL, 0);
-ethernet/mellanox/mlx4/icm.c:	page = alloc_pages_node(node, gfp_mask, order);
-ethernet/realtek/r8169_main.c:	data = alloc_pages_node(node, GFP_KERNEL, get_order(R8169_RX_BUF_SIZE));
-ethernet/google/gve/gve_main.c:	*page = alloc_pages_node(priv->numa_node, gfp_flags, 0);
-ethernet/google/gve/gve_rx.c:			struct page *page = alloc_pages_node(priv->numa_node,
-ethernet/google/gve/gve_rx_dqo.c:	struct page *page = alloc_pages_node(rx->gve->numa_node, GFP_ATOMIC, 0);
-ethernet/hisilicon/hns3/hns3_enet.c:	page = alloc_pages_node(dev_to_node(ring_to_dev(ring)),
+>  Documentation/admin-guide/sysctl/net.rst | 52 +++++++++++++++++++++++-
+>  1 file changed, 50 insertions(+), 2 deletions(-)
 
-:~/linux/drivers/net$ grep -r __GFP_RETRY_MAYFAIL
-veth.c:			    GFP_KERNEL_ACCOUNT | __GFP_RETRY_MAYFAIL);
+Tested-by: Randy Dunlap <rdunlap@infradead.org>
+Acked-by: Randy Dunlap <rdunlap@infradead.org>
 
-What makes the r8169 special?
-
-     Andrew
+Thanks.
+-- 
+~Randy
 
