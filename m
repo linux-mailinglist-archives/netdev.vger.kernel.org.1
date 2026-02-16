@@ -1,182 +1,201 @@
-Return-Path: <netdev+bounces-258871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258872-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KOkfH1YZk2nD1QEAu9opvQ
-	(envelope-from <netdev+bounces-258871-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 14:19:18 +0100
+	id UHAzIHobk2mM1gEAu9opvQ
+	(envelope-from <netdev+bounces-258872-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 14:28:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFF46143C36
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 14:19:17 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE951143CBE
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 14:28:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7538A3007F4B
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 13:19:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4E308301D4FF
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 13:28:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2860F2F83AE;
-	Mon, 16 Feb 2026 13:19:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3F3830E839;
+	Mon, 16 Feb 2026 13:28:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BTiHqB0r"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="C67w/Z7q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E582E9757
-	for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 13:19:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB8833090D4;
+	Mon, 16 Feb 2026 13:28:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771247955; cv=none; b=J23EMjon/AhB5Yb7ChSgm5oJV7Xt79oEPcGIGcAWXXS1kt0Aiv1vIi3wIwXy3TsB+zIkzctaKcygt2HkYH70VqpEBezGOZBYwrga8hbvelK3SyAiDPwEXqeQfP09Ub+xkQEKfHu821AsR+5dxsah6uW99tkIKOqF0jgb3IydVVk=
+	t=1771248487; cv=none; b=FDrGzbhhuBh4jOqnc/ILTDdIpj8VxEm9gJ1aSN7HZXhRtDRR9UyRsvdtzaK7dsfsbTkWaoNqc2u1vjJhgH5tusiM6hXopRdf5MRy/oC8qon6iN/ewcbUfKl+8waTJfEz7ZdTztTFKxC69+wixJT6UWUn0WDxEBQOEm3pRD3OSdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771247955; c=relaxed/simple;
-	bh=L+SuQDcvBCHqR3x9W5Om/Gh8l0QgbINjVgOff6HAL+8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SzlQ0j8CSl/PPk42zCY0D07X0vNHpEbG7coTHvLCVlQzEBxkBT09A72zgG4vEvPcdYlE3jv9Em/A4/7YTpqQf82hOEtyS7GeAe/qL8oAqpbhfKpl6fApq/6fmfKxX0+DJOEzqIv75Wqn/xYD+YlqhcdTqV7/IKebCjhS/ugp98k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BTiHqB0r; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0704EC116C6;
-	Mon, 16 Feb 2026 13:19:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771247954;
-	bh=L+SuQDcvBCHqR3x9W5Om/Gh8l0QgbINjVgOff6HAL+8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BTiHqB0rP48PVxvQLTUYs9bSqEf1NSYD2bs+/j6lInOtin3m/NKf+Sruuc55l0vWW
-	 7JwMX+oAkhgNTyXgXgz70WTTK7gczZc08TIlDSKHNSxAOfTfBqhOkOHZ9WzEcZovrK
-	 M4vLVtTZqK3EDibwvl9UUIh/cp2HNe4NwapXFe84t0eY1wDCO+k3do/WpjC/dQHBM0
-	 dt+nNNqC5Gj4HA+DDIfxZiEKuPdhxLUF6wK+2qXP4j4SYaLImHvJyar8ZUjYQ5B/X2
-	 MLXzY2MmGvpjNJ5jZvASwVRFeF6vm41TP4bfbXsO3M2pDPu9yHfMSzVl/xXafbezTX
-	 F/uUjVs6IHjPA==
-Date: Mon, 16 Feb 2026 13:19:09 +0000
-From: Simon Horman <horms@kernel.org>
-To: Kohei Enju <kohei@enjuk.jp>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Mateusz Palczewski <mateusz.palczewski@intel.com>,
-	Witold Fijalkowski <witoldx.fijalkowski@intel.com>,
-	Przemyslaw Patynowski <przemyslawx.patynowski@intel.com>,
-	kohei.enju@gmail.com
-Subject: Re: [PATCH v1 iwl-net] iavf: fix out-of-bounds writes in
- iavf_get_ethtool_stats()
-Message-ID: <aZMZTTXWtIO1ERpm@horms.kernel.org>
-References: <20260214191502.267670-1-kohei@enjuk.jp>
+	s=arc-20240116; t=1771248487; c=relaxed/simple;
+	bh=Q9GxoeGeSHdPBrcOB/A8/Eud4D4QnZYsPLmlsC6CaP4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kJv00oEx8AukVs+ktKfzSDmCpafeR2woFcG/E1YM/WqJyLShE80UV+IJT60uPVD8aT5kwrrSGo4kr3P6sYSwK9xZXtkxG2eOQQhyeQHS+rgIIx3FEVGSjzAHRf0Uxkxp60rFSe/b2E4oSijB2pDc9McC3YaD838Y5GbMD8tDmzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=C67w/Z7q; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from [192.168.178.143] (p5dc880d2.dip0.t-ipconnect.de [93.200.128.210])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.1.16/8.18.1.16) with ESMTPSA id 61GDRpGP020196
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 16 Feb 2026 14:27:52 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1771248474;
+	bh=Q9GxoeGeSHdPBrcOB/A8/Eud4D4QnZYsPLmlsC6CaP4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=C67w/Z7qMrbkC06uTiYSuP7lOPFQJHlSiWcmVkYQxlSaJw+kJYzE0R+FTXvuuPMh4
+	 ooBZw1Na0/BFVt3mGEh1d1C9yaJXCQjykXBbuJ/FrPgsiXK9T8mT/WsUNEN9ho6bKw
+	 I+ta05lMo0ykF/rECo7IifwDNanOol6gh42YCvlU=
+Message-ID: <4aeb991b-26e9-4a2e-81a2-85e3ecd6a8a5@tu-dortmund.de>
+Date: Mon, 16 Feb 2026 14:27:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260214191502.267670-1-kohei@enjuk.jp>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 3/9] tun/tap: add ptr_ring consume helper with
+ netdev queue wakeup
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, willemdebruijn.kernel@gmail.com,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
+        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev
+References: <CACGkMEsJtE3RehWQ8BaDL2HdFPK=iW+ZaEAN1TekAMWwor5tjQ@mail.gmail.com>
+ <197573a1-df52-4928-adb9-55a7a4f78839@tu-dortmund.de>
+ <CACGkMEveEXky_rTrvRrfi7qix12GG91GfyqnwB6Tu-dnjqAm9A@mail.gmail.com>
+ <0c776172-2f02-47fc-babf-2871adca42cb@tu-dortmund.de>
+ <CACGkMEte=LwvkxPh-tesJHLVYQV1YZF4is1Yamokhkzaf5GOWw@mail.gmail.com>
+ <205aa139-975d-4092-aa04-a2c570ae43a6@tu-dortmund.de>
+ <CACGkMEtRikexX=cJz8zmuvW7mcO7uCFdG7AoHQLOezrsb5nbgQ@mail.gmail.com>
+ <59529fd2-2a08-4a89-a853-27198b76f842@tu-dortmund.de>
+ <20260214131703-mutt-send-email-mst@kernel.org>
+ <1ab166aa-8e9c-4742-a80a-c2fa806218db@tu-dortmund.de>
+ <20260215053411-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <20260215053411-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258871-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lists.osuosl.org,vger.kernel.org,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-258872-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[redhat.com,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tu-dortmund.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: CFF46143C36
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tu-dortmund.de:mid,tu-dortmund.de:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EE951143CBE
 X-Rspamd-Action: no action
 
-On Sat, Feb 14, 2026 at 07:14:25PM +0000, Kohei Enju wrote:
-> iavf incorrectly uses real_num_tx_queues for ETH_SS_STATS. Since the
-> value could change in runtime, we should use num_tx_queues instead.
+On 2/15/26 11:38, Michael S. Tsirkin wrote:
+> On Sat, Feb 14, 2026 at 08:51:53PM +0100, Simon Schippers wrote:
+>> On 2/14/26 19:18, Michael S. Tsirkin wrote:
+>>> On Sat, Feb 14, 2026 at 06:13:14PM +0100, Simon Schippers wrote:
+>>>
+>>> ...
+>>>
+>>>> Patched: Waking on __ptr_ring_produce_created_space() is too early. The
+>>>>          stop/wake cycle occurs too frequently which slows down
+>>>>          performance as can be seen for TAP.
+>>>>
+>>>> Wake on empty variant: Waking on __ptr_ring_empty() is (slightly) too
+>>>>                        late. The consumer starves because the producer
+>>>>                        first has to produce packets again. This slows
+>>>>                        down performance aswell as can be seen for TAP
+>>>> 		       and TAP+vhost-net (both down ~30-40Kpps).
+>>>>
+>>>> I think something inbetween should be used.
+>>>> The wake should be done as late as possible to have as few
+>>>> NET_TX_SOFTIRQs as possible but early enough that there are still
+>>>> consumable packets remaining to not starve the consumer.
+>>>>
+>>>> However, I can not think of a proper way to implement this right now.
+>>>>
+>>>> Thanks!
+>>>
+>>> What is the difficulty?
+>>
+>> There is no way to tell how many entries are currently in the ring.
+>>
+>>>
+>>> Your patches check __ptr_ring_consume_created_space(..., 1).
+>>
+>> Yes, and this returns if either 0 space or a batch size space was
+>> created.
+>> (In the current implementation it would be false or true, but as
+>> discussed earlier this can be changed.)
+>>
+>>>
+>>> How about __ptr_ring_consume_created_space(..., 8) then? 16?
+>>>
+>>
+>> This would return how much space the last 8/16 consume operations
+>> created. But in tap_ring_consume() we only consume a single entry.
+>>
+>> Maybe we could avoid __ptr_ring_consume_created_space with this:
+>> 1. Wait for the queue to stop with netif_tx_queue_stopped()
+>> 2. Then count the numbers of consumes we did after the queue stopped
+>> 3. Wake the queue if count >= threshold with threshold >= ring->batch
+>>
+>> I would say that such a threshold could be something like ring->size/2.
 > 
-> Moreover iavf_get_ethtool_stats() uses num_active_queues while
-> iavf_get_sset_count() and iavf_get_stat_strings() use
-> real_num_tx_queues, which triggers out-of-bounds writes when we do
-> "ethtool -L" and "ethtool -S" simultaneously [1].
 > 
-> For example when we change channels from 1 to 8, Thread 3 could be
-> scheduled before Thread 2, and out-of-bounds writes could be triggered
-> in Thread 3:
+> To add to what i wrote, size/2 means:
+> leave half a ring for consumer, half a ring for producer.
 > 
-> Thread 1 (ethtool -L)       Thread 2 (work)        Thread 3 (ethtool -S)
-> iavf_set_channels()
-> ...
-> iavf_alloc_queues()
-> -> num_active_queues = 8
-> iavf_schedule_finish_config()
->                                                    iavf_get_sset_count()
->                                                    real_num_tx_queues: 1
->                                                    -> buffer for 1 queue
->                                                    iavf_get_ethtool_stats()
->                                                    num_active_queues: 8
->                                                    -> out-of-bounds!
->                             iavf_finish_config()
->                             -> real_num_tx_queues = 8
+> If one of the two is more bursty, we might want a different
+> balance. Offhand, the kernel is less bursty and userspace is
+> more bursty.
+> 
+> So it's an interesting question but size/2 is a good start.
+> 
 
-...
+I implemented this (I can post the implementation if you want)
+and I got:
+- 1216Kpps for TAP --> worse performance than stock (1293 Kpps) and
+  also worse performance than wake on empty (1248 Kpps)
+- 1408Kpps for TAP+vhost-net --> pretty much same performance as
+  stock (1411 Kpps)
 
-> Fixes: 64430f70ba6f ("iavf: Fix displaying queue statistics shown by ethtool")
-> Signed-off-by: Kohei Enju <kohei@enjuk.jp>
+I also tried 7/8 for producer, 1/8 for consumer the results did not
+really get better: 
+- 1227Kpps for TAP --> worse performance than stock (1293 Kpps) and
+  also worse performance than wake on empty (1248 Kpps); better
+  performance than 1/2
+- 1350Kpps for TAP+vhost-net --> worse performance than everything
 
-...
 
-> @@ -345,19 +344,19 @@ static void iavf_get_ethtool_stats(struct net_device *netdev,
->  	iavf_add_ethtool_stats(&data, adapter, iavf_gstrings_stats);
->  
->  	rcu_read_lock();
-> -	/* As num_active_queues describe both tx and rx queues, we can use
-> -	 * it to iterate over rings' stats.
-> +	/* Use num_tx_queues to report stats for the maximum number of queues.
-> +	 * Queues beyond num_active_queues will report zero.
->  	 */
-> -	for (i = 0; i < adapter->num_active_queues; i++) {
-> -		struct iavf_ring *ring;
-> +	for (i = 0; i < netdev->num_tx_queues; i++) {
-> +		struct iavf_ring *tx_ring = NULL, *rx_ring = NULL;
->  
-> -		/* Tx rings stats */
-> -		ring = &adapter->tx_rings[i];
-> -		iavf_add_queue_stats(&data, ring);
-> +		if (i < adapter->num_active_queues) {
+So my theory of using something inbetween did not hold up here.
+Judging from my benchmarking the best solution would be to use:
+- Wake on empty for TAP --> 1248Kpps (1293 Kpps stock, 3% worse)
+- Wake on __ptr_ring_consume_created_space() for TAP+vhost-net
+  --> 1410Kpps (1411 Kpps stock, 0% worse)
 
-Hi Enju-san,
+This would also keep the implementation simple.
 
-If I understand things correctly, in the scenario described in the patch
-description, num_active_queues will be 8 here.
-
-Won't that result in an overflow?
-
-> +			tx_ring = &adapter->tx_rings[i];
-> +			rx_ring = &adapter->rx_rings[i];
-> +		}
->  
-> -		/* Rx rings stats */
-> -		ring = &adapter->rx_rings[i];
-> -		iavf_add_queue_stats(&data, ring);
-> +		iavf_add_queue_stats(&data, tx_ring);
-> +		iavf_add_queue_stats(&data, rx_ring);
->  	}
->  	rcu_read_unlock();
->  }
-
-...
 
