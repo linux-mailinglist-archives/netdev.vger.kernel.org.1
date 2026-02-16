@@ -1,174 +1,201 @@
-Return-Path: <netdev+bounces-258918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258919-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SDkDCAA9k2kg2wEAu9opvQ
-	(envelope-from <netdev+bounces-258918-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 16:51:28 +0100
+	id QHtnD7ZAk2kg2wEAu9opvQ
+	(envelope-from <netdev+bounces-258919-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 17:07:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B41EC145CA8
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 16:51:27 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 492BF145EE7
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 17:07:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1B2C63008D6E
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 15:51:27 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3BE30300118F
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 16:07:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31989330667;
-	Mon, 16 Feb 2026 15:51:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A102C328B56;
+	Mon, 16 Feb 2026 16:07:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sYpUhyTo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C6ao6Gqx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E0BF26FD93;
-	Mon, 16 Feb 2026 15:51:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771257085; cv=none; b=uvMlTvP3UmTiINUQ9fcUbsemkVwgQAKY2JZ1sHqAVW9NR2291bR4OitCj5MdfX9Nt3IHacAWFeFcYw4oqAEGy7VzLRvYuHsp2tAtxjyrOCckl+LG/Yd7XYrziFj0mDk7gZwUsf78ZarpIGp3wIglG1PsbxeB+c5MulH1Upy5YMQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771257085; c=relaxed/simple;
-	bh=CG6O/xmgix3IcZCgf9wWoa5TQi++ix89E7733DM8MWk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ckOP+0MwfZ6WnvACFOONF5gNG7I9GZMieXSVn9zRyMfaRelOQNInowbUm6tWvD+q66dHJMbY+0rGMkDMcQyd+Ivs0Ofwf/KHqq/9jVvrAJR9eWYtkaoH8HDKzL2TQRNN+J+nIuJ+35RPlvxW+zLQNoDSMFdB0mmI/ALxo7Ui+IM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sYpUhyTo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CD3CC116C6;
-	Mon, 16 Feb 2026 15:51:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771257084;
-	bh=CG6O/xmgix3IcZCgf9wWoa5TQi++ix89E7733DM8MWk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sYpUhyTo2t1y+lnNfrw8ZUbJQWIzChzZEUIp1pZRQsMd5J+pwBmlD5uUl4Kwh0dFd
-	 gPpb0I2hE3uKxy+L0hvKTameKxXavbbh5UpmLTIdCSZex/pTGKCg6qLkvVhNMoNLKA
-	 x0FyXyYfVoInmdbeMW+wEpm9ksKYmskcMgo70lx/6NQEsFGmpMBr7XwZnUyzD2fOYg
-	 zz99tmtYz3+PovkTgoO3bDlMhSrT8m/VzxufG8Lvx/tq6SRqZBsgrN04NwHowYp+6U
-	 n3K0TZWq7mbNlGybpYrGzMee25S4IDjts/zP183q0sK1Iy2KE4Hzo0C1HAAwNzMkJi
-	 TiDQkJ+nJP8bg==
-Date: Mon, 16 Feb 2026 09:51:21 -0600
-From: Bjorn Andersson <andersson@kernel.org>
-To: Vishnu Santhosh <vishnu.santhosh@oss.qualcomm.com>
-Cc: Manivannan Sadhasivam <mani@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	bjorn.andersson@oss.qualcomm.com, chris.lew@oss.qualcomm.com, 
-	Deepak Kumar Singh <deepak.singh@oss.qualcomm.com>, Stephen Smalley <stephen.smalley.work@gmail.com>
-Subject: Re: [PATCH v2] net: qrtr: Expand control port access to root
-Message-ID: <szn3j7huoz6sayxxrmbm2undysbai2ac3xkeu4i7qadbcczd3l@ykrbiqzyyrc4>
-References: <20260216-qrtr-control-port-access-permission-v2-1-71c15f2c5c7f@oss.qualcomm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E8B03D544
+	for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 16:07:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.172
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771258032; cv=pass; b=ig20T05nIiptoxNeke3y/S+askXP55C+tM6MnXOc3ERIaFe+U878eVt1KRSH143s08ZhnhLXq1L7SGU3xUp5oY2bzzKpuWkubEY5INwT2yKLvtkrWYpR+Ey5OWoKb7vEXqpRDcivTJtuLSjIGPJcSpxOu06KR3/Oj/8VKnyM0Kc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771258032; c=relaxed/simple;
+	bh=6b8vDgPzIwdUh9Ok/QRRxDI8ecJcUWlWTQdW1Ycdenk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WJnKSFNj67Ry4sSrfxIw4WCjkh3DYUeQMyWEADwlpIpNgFWicA99J0KU50G/J/Fr8JAFbplRxi7UJRMlDWFhysa6dK6VGQaX/76+pM4YS4xqJF0Fn9oInPEgkjNbGh8EwHBCVDqekvQxxpc3TIPDupqCIgyZm+tU6aj/Fc0kQsI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C6ao6Gqx; arc=pass smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-506362ac5f7so31826331cf.1
+        for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 08:07:11 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771258030; cv=none;
+        d=google.com; s=arc-20240605;
+        b=lN6+RFfQRbSEGgygSPxQXzMeKK6ClLDKp2TodZY46KazZGyb1GI1ybg442Hu/Vbzgc
+         eaUrjqV6aL9lBr+PuGhBamSq40OCSxRYQP3j7OTJ04lXo6LrzjnxEFM9RHJTTD5VKMG3
+         aZAqsucPVIIV4tlROP9382PEixqkeIHcU0dyLhrHd5iykJwwrdOvHDrgV4qM52vIdxrc
+         Xmu3/6EJHLY2L6nsRn9cJwscCJnHk8ZlmCbitWxz/+wTiOG5HbToWzgK2wbNb0gf6fho
+         aoTf2VWa6rextD9umY/Fsu+tgqgL/vt/cscteGaytJIw8UUzK1yEqi3YobHpL1il2XUl
+         cY3A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=8zlDyvi4DRDOCouJ5+b6j+eu1S8NYnmHy0tgJik9WcE=;
+        fh=feeEZj1iPSSNCcqWOeLob9QFyjBxWHPE7fnYFfrnRt8=;
+        b=lMERrxHZAb4qYhnf4FMZ9CYgsCSINbwb/3JVkn/3CrRMr7N0G+XDCTpPwYFvniwU+x
+         +Uq4w9amTUplMCaKc5wvFYZAZakQcPP8rwRgeQQjXrOgHvRdCaZ/FR58M6ivN+d2B3YO
+         PZtJVg5NmsDFe7KZH0qVi7Am3d0aT3T6J4V4iCDECfpUqWitxYmi5dXaOTpoRnHuqbR1
+         tR+bkBekVZuKeRfVUGfQtI7l3s2DXO9ayKJ7gQiyKIejd3GjdZ2tUDYJzWoOEvSwmEcj
+         dAxAIreyHlQqeTeUhzb/fGjD7NvYm+ne7mLulLa+CGDHOH8xZ8ov9xFpvx0Uurc9VkY2
+         b5Sg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1771258030; x=1771862830; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8zlDyvi4DRDOCouJ5+b6j+eu1S8NYnmHy0tgJik9WcE=;
+        b=C6ao6Gqxztd8QQXSkR6lMx5a9uwUdpej0Y41QCSPs2Mpv8oVq5WVoLchiLfsy9GMkk
+         XnRxKFlmuIO5NVdI9eC7v4zwa8McMzyk/TbE2VTGhydYqGDchC1U5ggwOUoMC+znTKhj
+         09wbZqrQzY7w5ebDGNRZBSC05jRuniZEiip6l+dcv3qVrE5Cl13j9QUJWnJyQu3TOQ2p
+         En0zDmgQJbBDB8LrNb65PS0bKgROJX2dbjrmAIiT7AY3IMVYAym1/lyFRBbQdAvn/hNp
+         wKKx8lB6XcdFcfU8JxzEM2vA9Ch2ai/ZABwXfTlf/bDOyJQMko9CrmRju2zrHOJejnwv
+         CR8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771258030; x=1771862830;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=8zlDyvi4DRDOCouJ5+b6j+eu1S8NYnmHy0tgJik9WcE=;
+        b=Hpomedsjwj3+5pqGMEuziuWjWJ0j/1GEP1fqtT36+8g0SlJ3mnqmPObVWFc15HmoZR
+         3XduuI+xFzMqb40oPSEFdbPE5E8KrlHSQN9NBwPZgNrJgseQ1wJhF6m7r9OA9rExNHnO
+         qLSg15lSXv/vmpmk7dVEmfebOw8xb9wSIBxyWtQibZfUA3og8+n/vcjFXkVWNL01zRzv
+         jseHwQaTvxiJpO4l+tkb3fYUzY1OGDrq3wy4fwxE8fnukIfs7YVHZiCdcja2bZkvkH1b
+         il/AH927Rasc6THSO+AAnRXvWJ5O+CbUrPliZBJ8WH2aztJMLXqsGvTP1SsdHGX+5GsT
+         AdtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWMAUjdFNpXeTxeY8G8mJae8mt1QkjAHDYmmuL+V3UNNtrwluhEvC/mOub5qghth48JknyD9+c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwF/j8ZrvXrU9yFuQ8NUFQ4tGSIBus9sFOY9j2zLBamofszRSKY
+	60+osh7K7TD507SDaogyo+aen/m2eIAFa6GquViFo9Z0N+2bVFg//EIqfZ7N9a2XNfjpObKaKxH
+	mBsDT4OtUecMglHaE/nBO3GqnGjUhiDYGkOAIri5Y
+X-Gm-Gg: AZuq6aLYg6N+R9kPRiu/DnWEhmmBz8MHbL6LdLoL2BL6VK6PO9LqK7MUYGH+vb9ROeX
+	WZinKcJx1UAu/oO4ssDnoYeTwt0tWc8ZYVvLr4eZvB84sPkPGc4Jccwt7dRyNw7+g4tikRSVqei
+	rjcNAYkEb4h62XMrs2H8Im69qpruEF4hijzkebUoz20kRbBcnkWGpJRjiBRFZJiyk0yj6CLuZvN
+	fGMta/IDbajuBqLe0I1EFiUTyEOWDtpGwFN9sCL0FJxwCn+gst5h8zNj9+U/2vXs8xZTxZUXFVB
+	Iapebg==
+X-Received: by 2002:ac8:57d4:0:b0:501:17a1:4ccf with SMTP id
+ d75a77b69052e-506b3f7e2b2mr114398501cf.3.1771258029713; Mon, 16 Feb 2026
+ 08:07:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260216-qrtr-control-port-access-permission-v2-1-71c15f2c5c7f@oss.qualcomm.com>
+References: <20260117164255.785751-1-kuba@kernel.org> <CANn89iKmuoXJtw4WZ0MRZE3WE-a-VtfTiWamSzXX0dx8pUcRqg@mail.gmail.com>
+ <20260117150346.72265ac3@kernel.org> <CANn89iJ8+5OaWS2VzJqo4QVN6VY9zJvrJfP0TGRGv85mj09kjA@mail.gmail.com>
+ <20260119090435.44b1da2d@kernel.org> <20260129150459.29419003@kernel.org>
+In-Reply-To: <20260129150459.29419003@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 16 Feb 2026 17:06:58 +0100
+X-Gm-Features: AaiRm52zncSMWX3vevjblnq0W9e0cJALeB3fNX7GrYeCk6GXW9p-oUMomb8MVNI
+Message-ID: <CANn89i+P86WVVUY-4WppUAH1TGix1Z3KhgX9vSHok5nXqQAiHQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: try to defer / return acked skbs to
+ originating CPU
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: kuniyu@google.com, ncardwell@google.com, netdev@vger.kernel.org, 
+	davem@davemloft.net, pabeni@redhat.com, andrew+netdev@lunn.ch, 
+	horms@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258918-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-258919-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andersson@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org,oss.qualcomm.com,gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B41EC145CA8
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 492BF145EE7
 X-Rspamd-Action: no action
 
-On Mon, Feb 16, 2026 at 02:11:45PM +0530, Vishnu Santhosh wrote:
-> When qrtr is loaded as module, QRTR NS runs from SELinux kmod_t
-> domain. On targets using upstream SELinux policies, this domain
-> does not receive CAP_NET_ADMIN, which prevents it from binding
-> control port even though QRTR NS is a trusted system component.
-> 
+On Fri, Jan 30, 2026 at 12:05=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Mon, 19 Jan 2026 09:04:35 -0800 Jakub Kicinski wrote:
+> > > > Not sure if there's much we can do about that.. Perhaps we should h=
+ave
+> > > > a shrinker that flushes the defer queues? I chatted with Shakeel br=
+iefly
+> > > > and it sounded fairly straightforward.
+> > >
+> > > I was mostly concerned about latency spikes, I did some tests here an=
+d
+> > > this seems fine.
+> >
+> > Looks like selftests run into the zerocopy Tx latency issue.
+> > I'll drop this version from patchwork..
+>
+> Delaying zero copy forever is a bit of an annoyance.
+> I believe the same thing can happen in net-next with UDP
+> but I haven't tested to confirm.
+>
+> I assume the attached patch is out of question since it came up before?
 
-This part looks better now.
+I think I totally missed your email :/
 
-> Granting kmod_t the CAP_NET_ADMIN capability in policy is possible,
-> but not desirable, as kmod_t is not expected to perform networking
-> operations and widening its capability set is discouraged.
-> 
+What about not attempting defer for zero copy skbs ?
 
-Where is this discouraged? Who discouraged you do to this? Wasn't this
-exactly what Stephen suggested you do in his feedback on v1?
+It turns out existing patch e20dfbad8aab ("net: fix napi_consume_skb()
+with alien skbs")
+is already a problem for zcopy.
 
-Regards,
-Bjorn
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 699c401a5eae9c497a42b6bdd8593af7890529f4..dc47d3efc72ed86dce5e382d505=
+eda7bc863669a
+100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -7266,10 +7266,15 @@ void skb_attempt_defer_free(struct sk_buff *skb)
+ {
+        struct skb_defer_node *sdn;
+        unsigned long defer_count;
+-       int cpu =3D skb->alloc_cpu;
+        unsigned int defer_max;
+        bool kick;
++       int cpu;
 
-> To address this in a contained way within qrtr, extend the control
-> port permission check to allow binding when either:
-> 
->   - the process has CAP_NET_ADMIN, or
->   - the process belongs to GLOBAL_ROOT_GID (root-equivalent tasks)
-> 
-> This permits QRTR NS to successfully bind its control port in
-> kmod_t restricted environments without broadening SELinux capability
-> assignments.
-> 
-> Co-developed-by: Deepak Kumar Singh <deepak.singh@oss.qualcomm.com>
-> Signed-off-by: Deepak Kumar Singh <deepak.singh@oss.qualcomm.com>
-> Signed-off-by: Vishnu Santhosh <vishnu.santhosh@oss.qualcomm.com>
-> ---
-> Changes in v2:
-> - Replaced "qrtr-ns" with "QRTR NS" in the commit message to avoid
->   confusion with the deprecated userspace qrtr-ns tool and the NS
->   implementation inside the QRTR driver.
-> - Link to v1: https://lore.kernel.org/r/20260205-qrtr-control-port-access-permission-v1-1-e900039e92d5@oss.qualcomm.com
-> ---
->  net/qrtr/af_qrtr.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/qrtr/af_qrtr.c b/net/qrtr/af_qrtr.c
-> index dab839f61ee93b876021d904ae6b8dca8ed43745..b0e252c16f156c05973988fbdf317a149ad9840d 100644
-> --- a/net/qrtr/af_qrtr.c
-> +++ b/net/qrtr/af_qrtr.c
-> @@ -8,6 +8,7 @@
->  #include <linux/qrtr.h>
->  #include <linux/termios.h>	/* For TIOCINQ/OUTQ */
->  #include <linux/spinlock.h>
-> +#include <linux/uidgid.h>
->  #include <linux/wait.h>
->  
->  #include <net/sock.h>
-> @@ -738,7 +739,8 @@ static int qrtr_port_assign(struct qrtr_sock *ipc, int *port)
->  	if (!*port) {
->  		rc = xa_alloc(&qrtr_ports, port, ipc, QRTR_EPH_PORT_RANGE,
->  				GFP_KERNEL);
-> -	} else if (*port < QRTR_MIN_EPH_SOCKET && !capable(CAP_NET_ADMIN)) {
-> +	} else if (*port < QRTR_MIN_EPH_SOCKET && !(capable(CAP_NET_ADMIN) ||
-> +						   in_egroup_p(GLOBAL_ROOT_GID))) {
->  		rc = -EACCES;
->  	} else if (*port == QRTR_PORT_CTRL) {
->  		rc = xa_insert(&qrtr_ports, 0, ipc, GFP_KERNEL);
-> 
-> ---
-> base-commit: 0f2acd3148e0ef42bdacbd477f90e8533f96b2ac
-> change-id: 20260205-qrtr-control-port-access-permission-bfea19994a58
-> 
-> Best regards,
-> -- 
-> Vishnu Santhosh <vishnu.santhosh@oss.qualcomm.com>
-> 
++       /* zero copy notifications should not be delayed. */
++       if (skb_zcopy(skb))
++               goto nodefer;
++
++       cpu =3D skb->alloc_cpu;
+        if (cpu =3D=3D raw_smp_processor_id() ||
+            WARN_ON_ONCE(cpu >=3D nr_cpu_ids) ||
+            !cpu_online(cpu)) {
 
