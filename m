@@ -1,219 +1,131 @@
-Return-Path: <netdev+bounces-258891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258892-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iHgtDvcgk2kX1wEAu9opvQ
-	(envelope-from <netdev+bounces-258891-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 14:51:51 +0100
+	id 8CZLGwwik2kX1wEAu9opvQ
+	(envelope-from <netdev+bounces-258892-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 14:56:28 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3A07144289
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 14:51:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E723814445D
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 14:56:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8132A304C916
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 13:45:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2B78130347B1
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 13:47:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 161D4310630;
-	Mon, 16 Feb 2026 13:43:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6306630FF06;
+	Mon, 16 Feb 2026 13:47:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sYjor/Wf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gx/YoIjM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E575231062C;
-	Mon, 16 Feb 2026 13:43:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EAD830EF71;
+	Mon, 16 Feb 2026 13:47:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771249438; cv=none; b=M8zHH0R34uUQwrO5kOTny99yq0yJjLmCYKO0mVkg7xzK7RqjM9x6CF1i2/8GzkXASrLspPtxapnoGEWUDrD9Q/fZ66QuKjIqhlhFnDaCRsZdq4W1fEcaeZrqd2Oxl+c73+2ZjGyX4kxE7AId9qLl8xZXmRVwVVQ4CRl6YyB/m08=
+	t=1771249643; cv=none; b=dZBzAFoxfgZgfSdiMVTyWrt+3k5Fil1OgsI/OYMJ8jiwI5ZuM4ZEMiWA1TFPJq+oSPxVb4Ns2sM8H0J3/+AXmv3aLJGQfeGOFuyLfAoAQHwbzP9y5KC1UjPz00OeEzPTKOGqfbQIE9pptBtUncVOkXcUCXLqp5XIArW3nar54I4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771249438; c=relaxed/simple;
-	bh=gPs/j8mZ4JtTMpJPUAAZlBBO1MdiCcHejBR8z4toN1s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NiREhi04+RaTfF9tGfz7KMaUIO4UicD08estQ5LIvnHB0hRymeKmm5litgcAJn0pyZKYkVJkhzn23gVEvzDP9tszE6gL6P7d1RGMJpv/zvauvkKxbZSbcqt2I/nvK0w59RAyoTPns9wLcMcz9+tX2taAqQadpecbE1p6bK8hJdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sYjor/Wf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6B65C116C6;
-	Mon, 16 Feb 2026 13:43:55 +0000 (UTC)
+	s=arc-20240116; t=1771249643; c=relaxed/simple;
+	bh=XOBgEIM7Lu9hd+RuAv/bHWbuHCTf1O5fu12o+3qT31A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D0XOhOq4obMBFGnyDeuioWsggQ1webAwEa/1kROjN8G1OmFo22rACzxxO46VoQ5pOncIAlFAsb7C2x+Vuq+92dsOoqPgVQxzPwJ/FRW4OCQdvYIWst6yxZj4trzpXjelVCdvRLCa/E/TKKTtBj33o6DWJdR22/zWHs294FrA8hI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gx/YoIjM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B128BC116C6;
+	Mon, 16 Feb 2026 13:47:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771249437;
-	bh=gPs/j8mZ4JtTMpJPUAAZlBBO1MdiCcHejBR8z4toN1s=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sYjor/WfszggvDY4zzNZsRcNjwFp0pvhV0H7ol7/sO/z5RSgBeB4zyUXnNYNQMH5E
-	 NhL/+dgkayOz20oB5jcz/q5itAzqXYDVE0AWUeSM+2OvzNlmNWEIir8xluWHoIuRfb
-	 eznsqS4/k2TW+ngiTTqCmN7niKu0KEKG/xHniLzkB0xntMiSX6gHHCXROKgd3zn9RV
-	 VUJglxPNzEBlAjm8KMBCkeM44sf0Wrs8Dgpr8Zrhw1OdxsAamiNWXzdgAdSkcdxmOp
-	 IC28gLTw9zJYN8fKjxiTXDnFhdkXm8ehDThZ0D0hENjssCH+jO+9UDqFUQoszJBuhk
-	 GDCpreIeBzG+Q==
+	s=k20201202; t=1771249642;
+	bh=XOBgEIM7Lu9hd+RuAv/bHWbuHCTf1O5fu12o+3qT31A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Gx/YoIjMAQSs1k5yfxgt+kE6A/usXZpB+R53mPHZX1we+0/JqTXIxBH5ALUOKB4jg
+	 ZJrri+X9jWVcNz0I6IjJHKxvyqz6wW63F3hXLBkh93u8vx3vHKbt/HmV8dlI1MmXyi
+	 F7mLCkXy3WCPFMTtAKLRn3TK1AjlyghEUTykxrguF33tEMgKVO80ST5TpD5HpjezwF
+	 7z+yXmnuuxpStD9r4xaVlt0UaqBf7HXHrUyNhNTSH26Hv0e5VXwsXigDcdsQpckeSd
+	 C8TlZDCHlkVvDW1F1ZyLvPE4q5LRvpB5a1U0rhx47IHz0I6J5ipPQA65CLL5d7lz5q
+	 sB/Y5ellxURWQ==
+Date: Mon, 16 Feb 2026 13:47:18 +0000
 From: Simon Horman <horms@kernel.org>
-To: shuangpeng.kernel@gmail.com
-Cc: Simon Horman <horms@kernel.org>,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
-	pabeni@redhat.com,
-	edumazet@google.com
-Subject: Re: [net,v2,1/1] serial: caif: fix remaining ser->tty UAF in TX path
-Date: Mon, 16 Feb 2026 13:43:40 +0000
-Message-ID: <20260216134340.68496-1-horms@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260215025141.1106576-2-shuangpeng.kernel@gmail.com>
-References: <20260215025141.1106576-2-shuangpeng.kernel@gmail.com>
+To: Tiernan Hubble <thubble@thubble.ca>
+Cc: Igor Russkikh <irusskikh@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lorenz Brun <lorenz@brun.one>, Andrew Lunn <andrew@lunn.ch>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: atlantic: fix reading SFP module info on some
+ AQC100 cards
+Message-ID: <aZMf5mhI3TutuPvT@horms.kernel.org>
+References: <20260215212609.193815-1-thubble@thubble.ca>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260215212609.193815-1-thubble@thubble.ca>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-258891-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258892-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: B3A07144289
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: E723814445D
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+On Sun, Feb 15, 2026 at 03:26:08PM -0600, Tiernan Hubble wrote:
+> Commit 853a2944aaf3 ("net: atlantic: support reading SFP module info")
+> added support for reading SFP module info on AQC100-based cards. However,
+> it only supports reading directly from the controller's hardware
+> registers, and this does not seem to be supported on certain cards,
+> including my TRENDnet TEG-10GECSFP V3. "ethtool -m" times out when reading
+> certain registers, even when I increase the read poll timeout values.
+> 
+> The DPDK "atlantic" driver reads module info via firmware calls instead of
+> directly reading the hardware registers, provided that the NIC's firmware
+> version supports it.
+> 
+> This change adapts the DPDK firmware call code to the kernel driver. It
+> preserves the old hardware-based module read code as a fallback when the
+> firmware does not support it, to avoid breaking cards that are currently
+> working.
+> 
+> Tested on 2 different TRENDnet TEG-10GECSFP V3 cards, both with firmware
+> version 3.1.121 (current at the time of this patch). Both cards correctly
+> reported module info for a passive DAC cable and 2 different 10G optical
+> transceivers.
+> 
+> Fixes: 853a2944aaf3 ("net: atlantic: support reading SFP module info")
+> 
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-serial: caif: fix remaining ser->tty UAF in TX path
+No blank line here please.
 
-This patch addresses a KASAN use-after-free in the caif_serial TX path
-by adding a spinlock to serialize access to ser->tty. The TX path now
-takes a tty kref under the lock, and ser_release() clears ser->tty under
-the same lock before dropping the reference.
+> Signed-off-by: Tiernan Hubble <thubble@thubble.ca>
 
-Link: https://groups.google.com/g/syzkaller/c/usNe0oKtoXw/m/x8qUc3yUAQAJ
-
-> diff --git a/drivers/net/caif/caif_serial.c b/drivers/net/caif/caif_serial.c
-> --- a/drivers/net/caif/caif_serial.c
-> +++ b/drivers/net/caif/caif_serial.c
-> @@ -68,6 +68,7 @@ struct ser_device {
->  	struct net_device *dev;
->  	struct sk_buff_head head;
->  	struct tty_struct *tty;
-> +	spinlock_t tty_lock; /* protects ser->tty */
->  	bool tx_started;
->  	unsigned long state;
->  #ifdef CONFIG_DEBUG_FS
-> @@ -197,12 +198,21 @@ static int handle_tx(struct ser_device *ser)
->  	struct sk_buff *skb;
->  	int tty_wr, len, room;
->
-> +	spin_lock(&ser->tty_lock);
->  	tty = ser->tty;
-> +	tty_kref_get(tty);
-> +	spin_unlock(&ser->tty_lock);
-
-handle_tx() is called from caif_xmit(), which is the ndo_start_xmit
-handler. This can run in softirq context (NET_TX softirq). ser_release()
-runs in process context (workqueue). If ser_release() holds tty_lock in
-process context and a softirq fires on the same CPU, calling caif_xmit()
--> handle_tx() -> spin_lock(&ser->tty_lock), won't this deadlock?
-
-Should this use spin_lock_bh()/spin_unlock_bh() instead?
-
-> +
-> +	if (!tty)
-> +		return 0;
-> +
->  	ser->tx_started = true;
->
->  	/* Enter critical section */
-> -	if (test_and_set_bit(CAIF_SENDING, &ser->state))
-> +	if (test_and_set_bit(CAIF_SENDING, &ser->state)) {
-> +		tty_kref_put(tty);
->  		return 0;
-> +	}
->
->  	/* skb_peek is safe because handle_tx is called after skb_queue_tail */
->  	while ((skb = skb_peek(&ser->head)) != NULL) {
-
-[ ... ]
-
->  		if (!ser_loop) {
->  			tty_wr = tty->ops->write(tty, skb->data, len);
->  			update_tty_status(ser);
->  		} else {
-
-After ser_release() sets ser->tty = NULL (the new code from this patch),
-a concurrent handle_tx() that already passed the NULL check above can
-reach update_tty_status(ser) here. Looking at update_tty_status(), it
-dereferences ser->tty directly:
-
-drivers/net/caif/caif_serial.c:update_tty_status() {
-    inline_decode(ser->common.flowctrl,
-        ser->tty->flow.stopped << 5 |
-        ser->tty->flow.tco_stopped << 3 |
-        ser->tty->ctrl.packet << 2);
-}
-
-Won't this cause a NULL pointer dereference? Should update_tty_status()
-take the local tty pointer as a parameter instead of reading ser->tty?
-
-> @@ -245,9 +255,11 @@
->  		ser->common.flowctrl != NULL)
->  				ser->common.flowctrl(ser->dev, ON);
->  	clear_bit(CAIF_SENDING, &ser->state);
-> +	tty_kref_put(tty);
->  	return 0;
->  error:
->  	clear_bit(CAIF_SENDING, &ser->state);
-> +	tty_kref_put(tty);
->  	return tty_wr;
->  }
->
-> @@ -293,7 +305,10 @@ static void ser_release(struct work_struct *work)
->  	if (!list_empty(&list)) {
->  		rtnl_lock();
->  		list_for_each_entry_safe(ser, tmp, &list, node) {
-> +			spin_lock(&ser->tty_lock);
->  			tty = ser->tty;
-> +			ser->tty = NULL;
-> +			spin_unlock(&ser->tty_lock);
->  			dev_close(ser->dev);
->  			unregister_netdevice(ser->dev);
->  			debugfs_deinit(ser);
-
-[ ... ]
-
-Jakub Kicinski's review of v1 (commit 308e7e4d0a84) pointed out that
-moving tty_kref_put() to ser_release() doesn't fully prevent the UAF
-because handle_tx() can still fetch ser->tty while ser_release() is
-dropping the last tty reference. The current patch addresses this by
-adding the tty_lock synchronization. While the v1/v2 review thread
-didn't explicitly mark this as blocking, it represents a legitimate
-race window that this patch fixes.
-
-Reference: https://lore.kernel.org/netdev/20260206022526.3191971-1-kuba@kernel.org/
--- 
-pw-bot: changes-requested
+...
 
