@@ -1,145 +1,169 @@
-Return-Path: <netdev+bounces-258830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258831-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KAICCzOikmnqvwEAu9opvQ
-	(envelope-from <netdev+bounces-258830-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 05:50:59 +0100
+	id AN/pDrqkkmnCwAEAu9opvQ
+	(envelope-from <netdev+bounces-258831-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 06:01:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEA5E140E18
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 05:50:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81851140EB3
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 06:01:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 605D630022C5
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 04:45:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3F65430067BB
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 05:01:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 712202DC791;
-	Mon, 16 Feb 2026 04:45:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB90C186E58;
+	Mon, 16 Feb 2026 05:01:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ziyao.cc header.i=me@ziyao.cc header.b="bjyVvXSl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2g9pNTU4"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40CE6145348;
-	Mon, 16 Feb 2026 04:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2291391
+	for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 05:01:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.180
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771217111; cv=pass; b=ngUquaOW2rHmBAkSJvvwbig5Cly+uY9XpB28pCbR628YYRroYX0X9agIuLtHZl5zljYNV9nFZMzmHDORRlgFmIK802ySuddHcaTiWggG4WDUu38mvSfkB0W6t9yTcTxq74cei08d0D66c5aG/KLplFe9Dzb10fWqhhJiC5ejdjM=
+	t=1771218103; cv=pass; b=Iu8Jfx6PS9PqOGhy5+TTi8gSouxfxxErxQPQLeBmw36eAG0P27X+xLX43BjASXWwrtZCZi+X93sU+cAffsKVHs7RUn7uarlFfZjY/qD0EqnmdtGCyI/KnwrUYBzqwvKzE7CSWoZv/fnEAUxLTgAoMy3oVBmrBBZFtk+7vpRaxi0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771217111; c=relaxed/simple;
-	bh=P/1qhIyAZEiykNohWV1DmzJhR7R+Knovx2ve5mqgFG8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M1gLwWzCpht2fgj7X7Yo3HGzXRKrY8lUqOw67iWTlxbyeAiwwgSDKEI9YI3tRnT/tEnjKHLKTrPUAcwMgoBwnZtIbHYkdp8gvDOHDy9oInrwWcbcg4n3aFyGOsRWaYtesi5R/UTm0JK7ur2ZIO/UBRU6ALIPswVM8BmpuDMay5Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ziyao.cc; spf=pass smtp.mailfrom=ziyao.cc; dkim=pass (1024-bit key) header.d=ziyao.cc header.i=me@ziyao.cc header.b=bjyVvXSl; arc=pass smtp.client-ip=136.143.188.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ziyao.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziyao.cc
-ARC-Seal: i=1; a=rsa-sha256; t=1771217081; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=B7wCwXOO1D7g0K+7R5ASkP5b3rvxhtu5zZxL8YqVpQFt1/JZ0OGfTEvtEhSvZ1aG9kzbcuyqRKjnrFiKzDTa1D6As2i02L5aF3EGxVt4I9o78gOelgMF8pM6sBw+iyy8hJiZq6gYg1rV20YRQVOBiKThhEWsQIDzQegXKAbQSMY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1771217081; h=Content-Type:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=mlee/apZf5PJS46oj3LoJC3aGU8uMTOOND+HuontO9M=; 
-	b=dplu+3QZvL7/81pGX2ryCEfkAGq6mlrKFOaZeiFG//OurBZ8Uqc5PGxtrF7/HlodlIydn7QFlPrXT/SvAmP6M5rsqw62Qw2FGcZSvtxzaA5bHjIiEUsle5GGq5B9lXnACv666S9z3iBNE/mp6hEijEQTvFglYPkiAo898Hw24VA=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=ziyao.cc;
-	spf=pass  smtp.mailfrom=me@ziyao.cc;
-	dmarc=pass header.from=<me@ziyao.cc>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1771217081;
-	s=zmail; d=ziyao.cc; i=me@ziyao.cc;
-	h=Date:Date:From:From:To:To:Cc:Cc:Subject:Subject:Message-ID:References:MIME-Version:Content-Type:In-Reply-To:Message-Id:Reply-To;
-	bh=mlee/apZf5PJS46oj3LoJC3aGU8uMTOOND+HuontO9M=;
-	b=bjyVvXSlGZiyFG6yYoHm9AktJOZNCeprYLUxXM/NS63tlxpFiaDSAVLC5FMVjqVB
-	YeHyDUJPkr+EIwpzIhvu1Gs/0dwaYQMJZ6UJI6UErZdBEkgTxZ7ER9u6McAe5Eyz6ws
-	/tGSrhTmCseqKZbrvvx7+WAmQxNMrSBxn2Xy4Gko=
-Received: by mx.zohomail.com with SMTPS id 1771217079900392.5437106229082;
-	Sun, 15 Feb 2026 20:44:39 -0800 (PST)
-Date: Mon, 16 Feb 2026 04:44:27 +0000
-From: Yao Zi <me@ziyao.cc>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Heiko Stuebner <heiko@sntech.de>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	linux-rockchip@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org
-Subject: Re: Problematic understanding of phy-mode in Rockchip DWMAC driver
-Message-ID: <aZKgq0-aptu-PnsB@pie>
-References: <aY9s5PXP4zZ7R6fa@pie>
- <aY9xsslT56D9LGLe@shell.armlinux.org.uk>
+	s=arc-20240116; t=1771218103; c=relaxed/simple;
+	bh=hB4EONdthUZNgMd3tuVKHVCvzviJ7IZrB7vtc0TYFQ0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=E3M/yyJHnXnYDbd8imZNZw89ESF9l4Te1QcP0QQSf2fvkaVn1/4LDR3zotnfeTPcVP9eQnXcpGmoUp79ZtvGabjb3lYFEiiDin2VE35qSjkz05rIdquU5esUz5kXzRqRUgI6h+zpyB8PVxWZOLvdQ3X1huO38k6fmhDf5OGX/GA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2g9pNTU4; arc=pass smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-8c6f21c2d81so312380985a.2
+        for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 21:01:42 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771218101; cv=none;
+        d=google.com; s=arc-20240605;
+        b=gcaWgXqAIxCVOBmC+lvZ0WCg/6Zjjo1qtEE6W+2yLzKV9j6F2g4TIvehG8M0DNwjb/
+         t3nJ787fOJWrfXiqnU4CepdcHyiG3Itj3YCQb/FXDbgtNNrB6rDGnyJmnsQK0LtEUc8p
+         AJ4UnRhtxkxQeEtuoTf3kCmrVJ96bMD5o82arKYPI1eZbL9+s3j1TC5nUoWqE9k/ARci
+         fRJua516pV8f42BYI+PPxD/09zJ0EXvUag5gdd2/7DUejga4dV9wIXUjE94008SgiKxG
+         T8RY9XV78hNdD378dPuCHFV+NpgWT1F9sswxzqymn5LvJ8wThMQY7s+ZRJPdAuTm3kWT
+         bx7g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=hB4EONdthUZNgMd3tuVKHVCvzviJ7IZrB7vtc0TYFQ0=;
+        fh=pE+IGbmTOr7WYNEn+oRNb2x5GGUKJnIAlpKVHC0SEq8=;
+        b=MkQoBeFkcDjPWghMkrprGyO8OC9ONHgY8XCJafVh2wwUXvpKDLcK/KOM//5N/XfIeU
+         VxFTnn04hK4NPXh3JVge/Twsvwhmv0SFpNzx9JZs9N+Jv+wZkspE76XwhZy4zeEYwQ+t
+         fDFrerDukhIOiG/F4+emNRVy2zSiKjvDIcR8cjU4tWwN9a1PVmJELzxBhG7pzE3f7i1q
+         p8AQzB0zkEwkL2IU104hjnAPAHMjEehPwz4W12GI31gbtMEDPQpP5cNXJABV3f5V0zvl
+         Yd3Zc5+Z03teimYH3eX6kNf3Bn2GxsHsJdep4OFqfvi10chPKH0bFQniqQfBMI9R7dhL
+         /XZg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1771218101; x=1771822901; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hB4EONdthUZNgMd3tuVKHVCvzviJ7IZrB7vtc0TYFQ0=;
+        b=2g9pNTU4VxUAMsI5JDa2gh9PP4pMP33JfDOo9e+1uBwNbR3evi3zkW7o0K0NFPJW+n
+         VabVU8cTR0D5XPTukT9mkoCGk2VKZj/wMcdEfd/udYAVlGeThmtOKe9dPoHMvPRG8RiX
+         INulMcHCgr9NhKFqHQssRbGNRcqAcZ6QQ2HIc9s4RCY/ktUMFQWm/mvoxhukjq3CgUV5
+         kEnmcCFcDmdvON47wpI4QbNTEAbe0mdzqAes0FK7BqsCsoSw8GOI4DISFvQPeyNTBaR0
+         CFiSi74sdZ2eziOKyaS2LX64SBxC5rt19MtOcEZHs1LKrxik9Mb9HlOvI+n0z36J8CBe
+         QJZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771218101; x=1771822901;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=hB4EONdthUZNgMd3tuVKHVCvzviJ7IZrB7vtc0TYFQ0=;
+        b=Abm9/bcf+hnS2FW6Yc3dRQbn8FOHWaF5IdlKhQa57IO2qCuHeTQZ2rrTAbsBlwmxcX
+         OCtHPx47lUqWhQlBrB89Ru99MNaRz+zlpmwYd41R89jCFsztFGBhy3gK/LYoiYHd1K9R
+         WTWP2mFveh8ZCAXsCzczfIzNXtUjs1R+B1peiSEQ9vo8j7BABITnrcFLbDV0BrdiJvcB
+         c36Xtr0XlFLgsTkPU6rzjYInHfspK+8H+FR3NHTAFBp1L8Elh8sRXWjwnrHNZfv/6Q7O
+         GiR3NGkzPtL/W/lA//vyk4iOI0FXdGHbQqE4gDhmwSkMPYMarwceiBp65vrP3+13detY
+         Jrrw==
+X-Forwarded-Encrypted: i=1; AJvYcCUvGVXgPV1hgkWdXsmAXEmeIgv6ylAz9WDEEv4e8X5TusEgG4U3tpa6s78uzTReJl4v9lpZcyM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxi97lC6PQbq87NooEbjY2HQLF2T6adOfx+GagKj4AQAVNst44s
+	bR7lqKQ9rmxLOt1daUbGI0SHBRBI+utFdgQRzoHrBkDUXc/l0bLb2wXWzTTRpM8pPh1GLRtWJsG
+	xd9D50RzQB8mul5WCzOxNiCp5oU7/JmyOhdNT/lsm
+X-Gm-Gg: AZuq6aJsb4/QAOUSVMgbmi6RaWdpiGxbxXD/bHYh4TIZCqxHGDuZ6easlUqx+uk+dIC
+	Ob8mdfGtoZfLY2aRkovn/Z4gFardIY5YQb/KF1ZNqfVWP68VXG9TOb+aM3Kh70IG+hthXSV1aTw
+	Q5vELyr8eOtd9tko9/FXKa/AWizXyK/mJAPP4pHyBu7nytBakN3DCZlNDHDpipz1Z7rM+P3028t
+	GLij2R1AytiKw6qyAx/YzjcOc1qW+oifibr1rjL3FtQ6x9gACMNxXsd9wtB2P3VO1fj/zG8g2pJ
+	lngj+CuY
+X-Received: by 2002:a05:620a:40c2:b0:8c7:8cf:537c with SMTP id
+ af79cd13be357-8cb422a70d2mr1126105485a.37.1771218100858; Sun, 15 Feb 2026
+ 21:01:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aY9xsslT56D9LGLe@shell.armlinux.org.uk>
-X-ZohoMailClient: External
+References: <20260215143821.2330791-1-edumazet@google.com> <20260215143821.2330791-6-edumazet@google.com>
+ <CAAVpQUCt9R2=0UpPJioLTd_T6Nb5zHsp-qfF-CJCQ7RPPbwcNw@mail.gmail.com>
+In-Reply-To: <CAAVpQUCt9R2=0UpPJioLTd_T6Nb5zHsp-qfF-CJCQ7RPPbwcNw@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 16 Feb 2026 06:01:29 +0100
+X-Gm-Features: AaiRm53qw_E5SiKUC9hviopFwbBH6qizX8KmTjsLWl8YyESPKZoQ5Azeow_mSg8
+Message-ID: <CANn89iLSGkY8zni9HcnO+rxv1+9YpQ-t7EL_fdeR+skv9btD6g@mail.gmail.com>
+Subject: Re: [PATCH net 5/5] ipv6: icmp: icmpv6_xrlim_allow() optimization if
+ net.ipv4.icmp_ratelimit is zero
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
+	Martin KaFai Lau <martin.lau@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [9.34 / 15.00];
-	URIBL_BLACK(7.50)[ziyao.cc:dkim];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_RHS_NOT_FQDN(0.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
-	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	R_DKIM_ALLOW(0.00)[ziyao.cc:s=zmail];
-	GREYLIST(0.00)[pass,body];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258830-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-258831-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[sntech.de,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,lists.infradead.org];
-	DMARC_POLICY_ALLOW(0.00)[ziyao.cc,quarantine];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	R_SPF_ALLOW(0.00)[+ip4:172.232.135.74];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[me@ziyao.cc,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DKIM_TRACE(0.00)[ziyao.cc:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ziyao.cc:dkim,armlinux.org.uk:url]
-X-Rspamd-Queue-Id: BEA5E140E18
-X-Rspamd-Action: add header
-X-Spam: Yes
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 81851140EB3
+X-Rspamd-Action: no action
 
-On Fri, Feb 13, 2026 at 06:47:14PM +0000, Russell King (Oracle) wrote:
-> On Fri, Feb 13, 2026 at 06:26:44PM +0000, Yao Zi wrote:
-> > Hi folks,
-> > 
-> > I was looking through the RGMII delay setup logic found in
-> > rk_gmac_powerup() of dwmac-rk.c, and found its behavior is strange,
-> 
-> dwmac-rk is very broken and is unfixable thanks to Rockchip not
-> understanding the RGMII interface modes used by the kernel.
-> 
-> It is what it is, we can't change it without causing regressions.
-> Please do not try to fix it.
+On Mon, Feb 16, 2026 at 2:01=E2=80=AFAM Kuniyuki Iwashima <kuniyu@google.co=
+m> wrote:
+>
+> On Sun, Feb 15, 2026 at 6:38=E2=80=AFAM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > If net.ipv6.icmp.ratelimit is zero we do not have to call
+> > inet_getpeer_v6() and inet_peer_xrlim_allow().
+> >
+> > Both can be very expensive under DDOS.
+> >
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+>
+> Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
-Thanks for confirming. I understand concerns about regressions and
-agree keeping the driver/dts as-is is better.
+Thanks for your reviews Kuniyuki.
 
-However, should we mention the difference between "phy-mode" defined
-ethernet-controller.yaml and "phy-mode" understood by dwmac-rk
-driver in rockchip-dwmac.yaml to avoid confusion in the future?
+I just noticed this patch title should have mentioned
+net.ipv6.icmp.ratelimit instead of net.ipv4.icmp_ratelimit
 
-Regards,
-Yao Zi
-
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+I will fix it in V2 and include your Reviewed-by tags.
 
