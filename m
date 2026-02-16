@@ -1,141 +1,158 @@
-Return-Path: <netdev+bounces-258815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258816-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6I0MD9VjkmmhtgEAu9opvQ
-	(envelope-from <netdev+bounces-258815-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 01:24:53 +0100
+	id eQL3I+9nkmkltwEAu9opvQ
+	(envelope-from <netdev+bounces-258816-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 01:42:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBE91140733
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 01:24:51 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEC931407A3
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 01:42:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 458203009179
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 00:24:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 96D44300CE48
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 00:42:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A83243376;
-	Mon, 16 Feb 2026 00:24:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07D6A2475CE;
+	Mon, 16 Feb 2026 00:42:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="J3SVqDYV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CknASVuP"
 X-Original-To: netdev@vger.kernel.org
-Received: from r3-19.sinamail.sina.com.cn (r3-19.sinamail.sina.com.cn [202.108.3.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f48.google.com (mail-dl1-f48.google.com [74.125.82.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1911A1A317D
-	for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 00:24:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.19
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771201489; cv=none; b=oxy53hG5QW4lFn7H2L4xdLlGlOGfHLYpdH435lyJOn8vF4N4wNUhTy/0RXY9x+qSUJ6rtW895+Y9bJeH2gluNLmKlSdHHun7erUk59b8+GTD6XkEqyWD73y7AqSLt8I07IZMiXcvW1TiEfPVSPzfTyuZzTtZDYbwlShIB8D7ZwI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771201489; c=relaxed/simple;
-	bh=tjGxmyA1ofYXGJt2E5hGcWP9CvbSQjwK08aV25c16xs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eLvPpvQ4PAnYI3FzHLIt1fHBzZHpMaIPEe+m4p1QS5YK2LY/ulWpYVM3PN7Bo58fbjjJ2wJIAoVZm1fICW+3LNE7ZlkfwO4drn4hR2kjjFdaAMHwjrT3AuE2Sw2V1/lFrK7IepxwQpk53BR5cwY+hqdOYuVlqcWt6TRHCpzUIWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=J3SVqDYV; arc=none smtp.client-ip=202.108.3.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1771201486;
-	bh=2d5JqkSKmCl+h/DkDuPedLTA33Petj9L1eNR5vAuIVA=;
-	h=From:Subject:Date:Message-ID;
-	b=J3SVqDYVf7ZQM/217belDyhgr1LQb+ZGA0A3yXTWmDfCFRE2Q8n5MubStxYe/KbUo
-	 dN0IX79j//yBuAYx+A5tYocM5S3+we3VKABmKLH9aohIW8pC1W14AWn3zt35GHwOPu
-	 bUdctjbyr6kaJZ6nf9Rtj71XATsAtd5azzhM7ERQ=
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([114.249.62.144])
-	by sina.com (10.54.253.32) with ESMTP
-	id 699263C300002AF9; Mon, 16 Feb 2026 08:24:37 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 3763764456638
-X-SMAIL-UIID: B619DCA30F1C498090FDE6828E84EE81-20260216-082437-1
-From: Hillf Danton <hdanton@sina.com>
-To: Shuangpeng <shuangpeng.kernel@gmail.com>
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	linux-kernel@vger.kernel.org,
-	Jiayuan Chen <jiayuan.chen@shopee.com>
-Subject: Re: [PATCH net v2 1/1] serial: caif: fix remaining ser->tty UAF in TX path
-Date: Mon, 16 Feb 2026 08:24:23 +0800
-Message-ID: <20260216002425.3101-1-hdanton@sina.com>
-In-Reply-To: <2CCEDE30-6BDF-4815-9975-40EF6C982520@gmail.com>
-References: 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD61F19FA93
+	for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 00:42:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771202540; cv=pass; b=I+0J9SxZZIVHzVLcO4CxgbaK14cC47hp3R075eRJLJaN2h6iIgJlQmcJGqsRka7REpZKbvj9T931mXQ2ezyzUh3+JO4x6cKOBS0aBuC5iQU6q/U/dKyqS37MB+BO3P/nqeESqUj4hJHSAuHmnkZKrp5j/B9LsuqYEuStmY8VCXw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771202540; c=relaxed/simple;
+	bh=WhNo2r6N6M1Eu9j86jU48A6jKnJw+sGT36QQpXnq6SA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=D7x72Pfpqns9gDm0qlu/skrOVdLLyQ2hr3roUiWjypn2sSeAsP7SQ1ZnGVnCxrtn3PFhc4NFDhHZkzvIkLlbE5aaSoRm0+08dTtYvmZAXcIc4RTtNoU59f18GtaFgzyjW/db8VLd7Bkkt6YbBrrDq+jVnazE1qd+dUj+q7rwz5w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CknASVuP; arc=pass smtp.client-ip=74.125.82.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f48.google.com with SMTP id a92af1059eb24-124a95e592fso2090891c88.0
+        for <netdev@vger.kernel.org>; Sun, 15 Feb 2026 16:42:19 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771202539; cv=none;
+        d=google.com; s=arc-20240605;
+        b=FkQ065KObmB6//wF/B22drijlb5kZ2xWujAtb7OYSND/Fq2N/vNiEF+J/Vfiy0RmOa
+         4ouSp0F4vOgaAY7ZyWdOHja9y1EYUmH11+P6HJUwgZ5ExhcsotqvCy/o2GKKke0i920D
+         U8lpJQcBnZKisFfuzflaaw4pilOvd7Zvsmr2uyld2uu6I85pK9yeKT1+fv6/W8AuVY3H
+         LlsUeKAzVrvDTJy4PHkEIBafnEF4EVtAn6CElizc0uvgKtdimwstnkTq5STr6h0NHZw/
+         1+uCCe7FuODHQ4pYFbxmtXsk8FTo65AeABXsDe8cNNauQkCIEunATnyCupr5eRvFahaV
+         OemQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=WhNo2r6N6M1Eu9j86jU48A6jKnJw+sGT36QQpXnq6SA=;
+        fh=eJOoqzbj4SvqWRDXZQCqEMyFnKomGhIVZ5BRCGkKh5w=;
+        b=WeaJAW4m5cB8LYLZi5RU5lYjAvtYIVTP+k8qK3QuKku86Kpe5UDXT7tacKWlll+eLu
+         7jpcc/eA6vDowZdVgGoFBdezop5CexY9TDs51GEaUQjHs9BaJ4D2Nq5v4vJ2onJ4+K/S
+         qZLcSUdg+GrOmzthU8Dkhp0cwOosXHR2NxhG4aMcIlEthmMYoKpfOXWM5sWzTpbRuqQC
+         cM6MKt31HQKVa1yNJLfp1b3kAv4TEAbBDUm5/UF403yNPXcJPegFomEULLlBSpOvpqYj
+         I9ysWqhObROpJE4lEVmKxj34jXVYtPzBbtPQ1+qkQ7egn6tafleRXc+c525hENxQDxaE
+         s90g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1771202539; x=1771807339; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WhNo2r6N6M1Eu9j86jU48A6jKnJw+sGT36QQpXnq6SA=;
+        b=CknASVuPoy8BrHiwGOmsTyAjOCMwruGBsbF4akJJoGktJMgtlVA08v3hX7zhB9+H/w
+         QvwDfmY5PYZr1CEVGazObwlrwORnnDls0KgjzjbSM0xc/zlH7RIdosKkUTtC43/t/0Bn
+         Mg8RKyzADGJjzyJb3tKjuRcHXWodUzLQN34svms0IhFy7KiuSiKgrohiqEFkCdapP6Sl
+         XI8cJlzrYmT9gHaECaODLcBp1i3a/r8j0HTELQks5zrLzHwVJ2B2Opa2gQ71jUPu9Svf
+         HCp2lD0Wuiq6uiBTgjGGU1LjmXsR9HGe/eE0iOCeFrkqy1sOcxecGcbrA5rB6XRfz2EO
+         RFYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771202539; x=1771807339;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=WhNo2r6N6M1Eu9j86jU48A6jKnJw+sGT36QQpXnq6SA=;
+        b=s9DGxAFDGAPjpveMO7EgLk+EqnouqjMhhFTX9S1cijW5l36sV9Yspf34ek+u4Rif0N
+         brgmObmLg8Li2dID0oUzx9eN1uoBAOjeXp3kSzv4/1PRKocpIy0HDhAlyJpwNkxwFAgG
+         PeHKyVSyfjTu7Hnqv5z/+nIg8+PaQMZZLp4qTqqxQAYs6lsbaxXedxvO3ESKYmPF8JXG
+         MeU3zZPCnYjXmK7bOSiSWnQJfxE9/9TYnDVxtCibMmmC2gTy9knP2MLeUFpW97VBe5dT
+         w0JZxUOCM+0dZh4HXCiAeM/kxXNUsppX9a3yfmCV/pCdEmIiWSlOGk9eNrfu/ETfnS0k
+         c5Gw==
+X-Forwarded-Encrypted: i=1; AJvYcCVqMMpgw7WiFTZQrSPqQt5TlDAi80Pe8kfB/iZBgk3b5XFzZu1WeF6p/BxZMILuJTypHSi2I3U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXDQRLnU8lcplS2QPAwEyfkv5jAUS6arXorHie/cK1nRgTbO0X
+	6POrgV6pgiQXJfmYE2SWNYtfCiolspfUKxVHrUKl6oR94GwL5N6m6yfx7T59spdxZDgSvccMsMZ
+	pZvh5jJ5Qr+0ujjA5/2BJBPlgYwEyIiLbEt16WhUl
+X-Gm-Gg: AZuq6aL5aeohRFIzm/nN7J8uX2OjKvIWJOXbR7qlcX7J+nFWus1F5yFa3nXOy6HvBgQ
+	fSYY0ypdlwd/waWSYdkDA25EoVfDMaC+3nuzlvBi6L9P2VZQ3K24JGbACdffJYe6FK1zim4i+1T
+	nPfPpbcxxbbW6Qb7Jdq4tdNk6sIKXVjlfJrJ0JC9pHn9TSe5dmmqpOHcRQQg/M2pk5F1DtgwmvY
+	gU8LqG9UtBlLW1KihfadSkAVJKo9U8qd6Aw6aU5qvmumgFbBXt9qgPxG18PmJ+6kZ8EBMewBWdS
+	OJfITlpjTt4L4ah/PdUxiDunuS9SkUCQW+rs6MtjksJiv5SbjcghfB8YImOTETmwuzts/g==
+X-Received: by 2002:a05:7022:49f:b0:11a:29e5:12e5 with SMTP id
+ a92af1059eb24-1273ae33110mr3890386c88.30.1771202538440; Sun, 15 Feb 2026
+ 16:42:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260215143821.2330791-1-edumazet@google.com> <20260215143821.2330791-2-edumazet@google.com>
+In-Reply-To: <20260215143821.2330791-2-edumazet@google.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Sun, 15 Feb 2026 16:42:07 -0800
+X-Gm-Features: AaiRm50O1sNUm7sbYQOQqbZNGKrY8dQJSF50Ov5KTtOoPlfuMOicd-7_imY5rFo
+Message-ID: <CAAVpQUCZ9nm1XFSmfQVb_zXFX5zDskDNz11a+2uf3NoojaZM1Q@mail.gmail.com>
+Subject: Re: [PATCH net 1/5] icmp: prevent possible overflow in icmp_global_allow()
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
+	Martin KaFai Lau <martin.lau@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[sina.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[sina.com:s=201208];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_FROM(0.00)[sina.com];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258816-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-258815-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[sina.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hdanton@sina.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DBE91140733
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: DEC931407A3
 X-Rspamd-Action: no action
 
-On Sun, 15 Feb 2026 14:22:02 -0500 Shuangpeng Bai wrote:
->> On Feb 15, 2026, at 03:55, Hillf Danton <hdanton@sina.com> wrote:
->> On Sat, 14 Feb 2026 21:51:41 -0500 Shuangpeng Bai wrote:
->>> A reproducer exposes a KASAN use-after-free in caif_serial's TX path
->>> (e.g., via tty_write_room() / tty->ops->write()) on top of commit
->>> <308e7e4d0a84> ("serial: caif: fix use-after-free in caif_serial
->>> ldisc_close()").
->>> 
->>> That commit moved tty_kref_put() to ser_release(). There is still a race
->>> because the TX path may fetch ser->tty and use it while ser_release()
->>> drops the last tty reference:
->>> 
->>>    CPU 0 (ser_release worker)         CPU 1 (xmit)
->>>    -------------------------        ------------
->>>                                      caif_xmit()
->>>                                      handle_tx()
->>>                                        tty = ser->tty
->>> 
->>>    ser_release()
->>>      tty = ser->tty
->>>      dev_close(ser->dev)
->>>      unregister_netdevice(ser->dev)
->>>      debugfs_deinit(ser)
->>>      tty_kref_put(tty)        // may drop the last ref
->>>                     <-- race window -->
->>>                                        tty->ops->write(tty, ...)  // UAF
->>> 
->> What is unclear is -- why is the xmit callback still active after
->> unregister_netdevice().
+On Sun, Feb 15, 2026 at 6:38=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
 >
-> In my understanding, no new ndo_start_xmit should begin after
-> unregister_netdevice() has completed, but an in-flight TX still needs
-> proper synchronization with teardown.
+> Following expression can can overflow
+> if sysctl_icmp_msgs_per_sec is big enough.
 >
-Could you shed some light on that sync Eric? Is it missed?
+> sysctl_icmp_msgs_per_sec * delta / HZ;
+>
+> Fixes: 4cdf507d5452 ("icmp: add a global rate limitation")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
