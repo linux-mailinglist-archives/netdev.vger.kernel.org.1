@@ -1,62 +1,74 @@
-Return-Path: <netdev+bounces-258921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258922-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iBqhIItEk2kP3AEAu9opvQ
-	(envelope-from <netdev+bounces-258921-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 17:23:39 +0100
+	id GNJHCu5Ek2kP3AEAu9opvQ
+	(envelope-from <netdev+bounces-258922-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 17:25:18 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4156146146
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 17:23:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 808561461D1
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 17:25:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EA61C307AA0D
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 16:18:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 133F63028809
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 16:19:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 695053128DF;
-	Mon, 16 Feb 2026 16:18:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E96D632A3C0;
+	Mon, 16 Feb 2026 16:19:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OmiHrJNq"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="L9W+Hhct";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="VwhCZboZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45FE5242D76;
-	Mon, 16 Feb 2026 16:18:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C58B1330B23
+	for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 16:19:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771258732; cv=none; b=M9RGtWTS2FkvT9k6B/9mLq2tbvzKq7BM13/k1h/DiSeAOK7P5dR8/Xt3KDXQiim/XXIPoU/wzrB8JHIylL0hC6OErHvLywzyFjHNmLIR4EwcThnh9DCFmG7FMwOV/cbQZDMjglWJ8GTTtJ8OL6MST3WVUykaFwYqhSQoRQmATvs=
+	t=1771258793; cv=none; b=DNiEC7E7bqPR9VpeNQwwsYWdA/1pxrsrFkHjD6GA15qBoBNTQBUj9OD8/dDyx2vtWsVzyb2wRPqcVvzBH8eK7SAprdIKZOWEO8W8nuZ702sgKUHNfnWPafP1v4eNB1cl5rVYzUHJkZ5Et15+ZEbAWUBZFlGw4lTXuMzJvG250uM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771258732; c=relaxed/simple;
-	bh=F/7kMux7UiS30cFkbQa7Csbuon+UVNw6jKcpxOTHHLQ=;
+	s=arc-20240116; t=1771258793; c=relaxed/simple;
+	bh=f4CScdoQc9Du9AAdv3GIpSknPl1HwUyD4MTaWR847Dc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SIAQ4GkjCc6eqeqIP24mWlshVVeuvopHn8l81uci4hF61x1ons9nbr9Q192c9IZM8XHMjJSW4eHZR+sYh/hLTnZe4OjJ3js8RLrUdqgYpXVgVbv2INVbyjmDKO7AKJs+Z8elcYt2Q/XpqFdeMRtm9POPcLBNyBJadKygeVD7gO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OmiHrJNq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2B58C19423;
-	Mon, 16 Feb 2026 16:18:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771258731;
-	bh=F/7kMux7UiS30cFkbQa7Csbuon+UVNw6jKcpxOTHHLQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OmiHrJNqtsChwmJr9CphEWVcyUxaVUVsNEDVEjtsV6ah/QJg0yltcPCUqR7uMKbv+
-	 ZbineVo0UHpfkmMdjhND02XJyolmL3yr9r488RNM+/DBrC8EHC3pN3uksRE0/0WKvH
-	 Kiqrj/yRslyWZaxgk6vsZjBe866nWwVZCe4Ub7Occq0WtOCd8Xkd1j9xqhnzEo6R0u
-	 t9Zo9G5CQx1MIOo9jd433xoqR/Zwjxbe5Exwoq9QmFPrrGXAnDTJgzbv3o+uLt7C7X
-	 6zbz763icAaAz7gJzYijAamw1F70YlkoHB1wDGysBYFWE//ykmRZZRvNPCvyP6dUQg
-	 rfB/1XqV+XCag==
-Date: Mon, 16 Feb 2026 21:48:36 +0530
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Bjorn Andersson <andersson@kernel.org>
-Cc: Vishnu Santhosh <vishnu.santhosh@oss.qualcomm.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	bjorn.andersson@oss.qualcomm.com, chris.lew@oss.qualcomm.com, 
-	Deepak Kumar Singh <deepak.singh@oss.qualcomm.com>, Stephen Smalley <stephen.smalley.work@gmail.com>
-Subject: Re: [PATCH v2] net: qrtr: Expand control port access to root
-Message-ID: <hxf347brl3ujlnrntfqfyc4snim43athuhx7bduyjj74mlysi7@vbtyz25shsqq>
-References: <20260216-qrtr-control-port-access-permission-v2-1-71c15f2c5c7f@oss.qualcomm.com>
- <szn3j7huoz6sayxxrmbm2undysbai2ac3xkeu4i7qadbcczd3l@ykrbiqzyyrc4>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qhDccjV4lQWs0ddqu2+sazdjU/+3tIcmPDpi/z+P+6QioX6KGNT1XsQTImWKphs7YPprfJ6/SZaQSTNf1xTX9MSLwQqywx1a5qF8BwFpuwn35Oeqzw0nGKYs+ppdRajApwjUC+VIkc8Jt3a49/WS9flkR2KrLFmmB0VazmF4VC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=L9W+Hhct; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=VwhCZboZ; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Mon, 16 Feb 2026 17:19:49 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1771258791;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=f4CScdoQc9Du9AAdv3GIpSknPl1HwUyD4MTaWR847Dc=;
+	b=L9W+HhctmzmXp4PiDwGbzmMRsdExGFi17Ez6aXdthVPZ+nK5oIAJq20ixTpmCuG9M/ho2y
+	7eQsmA2xRLZh/LTHL4BykLooacnJqAsoH9jFtHqTg9tVcYNExAgSuYnoyMKQ10tSdYi0tJ
+	5HWgj7ldjSoD5uqTOALFsGkDtiP5oIHXbLUho/Pmm4J5YyMmDygL3Pc2DxZN3w0MCpxTJd
+	/6ZYcVYY/FfVXbxxqBYdJMNbDdi4RWCfd8vGpylOcyKlilmBTMaV5bK8Zeih87zdoySvUp
+	PzEe2Na+/1ZhA14fFLbh/qNo+zo8G8VaKov1avk8H3Y/a+RBa8ReaNZQsEAM2w==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1771258791;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=f4CScdoQc9Du9AAdv3GIpSknPl1HwUyD4MTaWR847Dc=;
+	b=VwhCZboZfZsUdYtLEE5n0lOFXHrtSvvzdgYCrjpDZajsRh4fruSLKpCnBeOJOavebauokY
+	4nZSsxn/QU/yhNAQ==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Felix Maurer <fmaurer@redhat.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH RFC net-next 0/2] hsr: Add additional info to send/
+ receive skbs
+Message-ID: <20260216161949.hMR3d6iT@linutronix.de>
+References: <20260204-hsr_ptp-v1-0-b421c69a77da@linutronix.de>
+ <aZNBfh81p1zBvbi2@thinkpad>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,121 +77,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <szn3j7huoz6sayxxrmbm2undysbai2ac3xkeu4i7qadbcczd3l@ykrbiqzyyrc4>
+In-Reply-To: <aZNBfh81p1zBvbi2@thinkpad>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258921-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-258922-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mani@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[oss.qualcomm.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D4156146146
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linutronix.de:mid,linutronix.de:dkim]
+X-Rspamd-Queue-Id: 808561461D1
 X-Rspamd-Action: no action
 
-On Mon, Feb 16, 2026 at 09:51:21AM -0600, Bjorn Andersson wrote:
-> On Mon, Feb 16, 2026 at 02:11:45PM +0530, Vishnu Santhosh wrote:
-> > When qrtr is loaded as module, QRTR NS runs from SELinux kmod_t
-> > domain. On targets using upstream SELinux policies, this domain
-> > does not receive CAP_NET_ADMIN, which prevents it from binding
-> > control port even though QRTR NS is a trusted system component.
-> > 
-> 
-> This part looks better now.
-> 
-> > Granting kmod_t the CAP_NET_ADMIN capability in policy is possible,
-> > but not desirable, as kmod_t is not expected to perform networking
-> > operations and widening its capability set is discouraged.
-> > 
-> 
-> Where is this discouraged? Who discouraged you do to this? Wasn't this
-> exactly what Stephen suggested you do in his feedback on v1?
-> 
+On 2026-02-16 17:10:38 [+0100], Felix Maurer wrote:
+> Hi Sebastian,
+Hi Felix,
 
-Yes. There is no point in respinning without addressing all the comments.
+> I had to read quite a bit about PTP and how it's supposed to be handled
+> in HSR rings. I've got no experience with PTP in the real world, but
+> here we go.
 
-- Mani
+Thank you two. I will re-read the thread tomorrow and get back to both
+of you.
 
-> Regards,
-> Bjorn
-> 
-> > To address this in a contained way within qrtr, extend the control
-> > port permission check to allow binding when either:
-> > 
-> >   - the process has CAP_NET_ADMIN, or
-> >   - the process belongs to GLOBAL_ROOT_GID (root-equivalent tasks)
-> > 
-> > This permits QRTR NS to successfully bind its control port in
-> > kmod_t restricted environments without broadening SELinux capability
-> > assignments.
-> > 
-> > Co-developed-by: Deepak Kumar Singh <deepak.singh@oss.qualcomm.com>
-> > Signed-off-by: Deepak Kumar Singh <deepak.singh@oss.qualcomm.com>
-> > Signed-off-by: Vishnu Santhosh <vishnu.santhosh@oss.qualcomm.com>
-> > ---
-> > Changes in v2:
-> > - Replaced "qrtr-ns" with "QRTR NS" in the commit message to avoid
-> >   confusion with the deprecated userspace qrtr-ns tool and the NS
-> >   implementation inside the QRTR driver.
-> > - Link to v1: https://lore.kernel.org/r/20260205-qrtr-control-port-access-permission-v1-1-e900039e92d5@oss.qualcomm.com
-> > ---
-> >  net/qrtr/af_qrtr.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/net/qrtr/af_qrtr.c b/net/qrtr/af_qrtr.c
-> > index dab839f61ee93b876021d904ae6b8dca8ed43745..b0e252c16f156c05973988fbdf317a149ad9840d 100644
-> > --- a/net/qrtr/af_qrtr.c
-> > +++ b/net/qrtr/af_qrtr.c
-> > @@ -8,6 +8,7 @@
-> >  #include <linux/qrtr.h>
-> >  #include <linux/termios.h>	/* For TIOCINQ/OUTQ */
-> >  #include <linux/spinlock.h>
-> > +#include <linux/uidgid.h>
-> >  #include <linux/wait.h>
-> >  
-> >  #include <net/sock.h>
-> > @@ -738,7 +739,8 @@ static int qrtr_port_assign(struct qrtr_sock *ipc, int *port)
-> >  	if (!*port) {
-> >  		rc = xa_alloc(&qrtr_ports, port, ipc, QRTR_EPH_PORT_RANGE,
-> >  				GFP_KERNEL);
-> > -	} else if (*port < QRTR_MIN_EPH_SOCKET && !capable(CAP_NET_ADMIN)) {
-> > +	} else if (*port < QRTR_MIN_EPH_SOCKET && !(capable(CAP_NET_ADMIN) ||
-> > +						   in_egroup_p(GLOBAL_ROOT_GID))) {
-> >  		rc = -EACCES;
-> >  	} else if (*port == QRTR_PORT_CTRL) {
-> >  		rc = xa_insert(&qrtr_ports, 0, ipc, GFP_KERNEL);
-> > 
-> > ---
-> > base-commit: 0f2acd3148e0ef42bdacbd477f90e8533f96b2ac
-> > change-id: 20260205-qrtr-control-port-access-permission-bfea19994a58
-> > 
-> > Best regards,
-> > -- 
-> > Vishnu Santhosh <vishnu.santhosh@oss.qualcomm.com>
-> > 
-
--- 
-மணிவண்ணன் சதாசிவம்
+Sebastian
 
