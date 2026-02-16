@@ -1,188 +1,171 @@
-Return-Path: <netdev+bounces-258845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258846-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IBizNxDhkmknzgEAu9opvQ
-	(envelope-from <netdev+bounces-258845-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 10:19:12 +0100
+	id mOZNH0PikmmrzgEAu9opvQ
+	(envelope-from <netdev+bounces-258846-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 10:24:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65A14141E98
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 10:19:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD5F7141EE1
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 10:24:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C435C3020D45
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 09:17:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8D5DA300C91C
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 09:24:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A409D2BE056;
-	Mon, 16 Feb 2026 09:17:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B87D22BE056;
+	Mon, 16 Feb 2026 09:24:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MTcBImxV"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="VATDK8RJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D01D0280331
-	for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 09:17:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1A5A2848A8;
+	Mon, 16 Feb 2026 09:24:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771233470; cv=none; b=C2Gxv1B7zVMhkOmWUDFvRN+OaTPWYiUrdpQgsKQ0am0jhBjkNMTAal+aSjvJ2ZKWDFgr+3CWZfnfBt8Uu0LaugHm+D5eXX6uJ5qArFv8zyFEyeL2JEGZtuR28oo0kkj82S0mStA5SklEyLiiSGp0kPniRGOGHiJPQT4eJUb6X/g=
+	t=1771233856; cv=none; b=hyVyBCwu62j0dw60DiuD+MpXiMr2KCFQyXsy0Lqdggdljj2/lA2LicLxE9B40dTZlY78omYVQUQCUxk+fXtnw9QQxkZnmNT1Kb5/uCd4S4G+bIpNuE4YNOuo9Spz0bNz6f7uBLgDKSRWSDQL1XXafSrFvizJeac2fVGn9Q7yhYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771233470; c=relaxed/simple;
-	bh=DUj1q3S9plQ/ik7kavX5wCg3EzXWkwMftLCre1+2IxM=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=Bwe/Km3uJfgNhMOljc3U/YsIOKGlbSIaa+C7IizyYd/Q+d8pXwkwTMc/LiYb/jbMCpc++QARgXvRx1J4KUgQFp6Cm3GbVeQP4IoCI2GNSc/SrN1Upb2XrDn52b8acVz8Z8JrTzEtQH2RFhT5JmZInyiNC8fdEorfa6yvW6Dvs04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MTcBImxV; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id F0EB9C17B7B;
-	Mon, 16 Feb 2026 09:17:56 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 0E25B606CF;
-	Mon, 16 Feb 2026 09:17:46 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B9081103690D9;
-	Mon, 16 Feb 2026 10:17:40 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1771233465; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=l3TO8n/wRyQGCJy/aBsWiJ+MfIrq3l6NUOGJGd+lfvU=;
-	b=MTcBImxVR80dswiYnsKAruysamVC5KsDeJG9hk1Vp/PH4El6aG6cH3RvP+rtDeS3kn1zui
-	8JSm2JQ47SMnqqCoXOlm6t+6ulB9S2AsP+1pEdvJSybP0XPFTJzXEtFZoUwujfv7tWM1JM
-	DWHWWVaGqEbKdgUY0QfKqzWPImPL/1j2e/UgiFdu4q/TJpkD6M+Qd8TL/5FN6dbZuFdSPx
-	kHc9vtbJUYGouqMQb4TafJzX1ZDqtTF1iDTGhMOvSbc/TfxL5QTJ/4gZHkgPloGyQJEcHY
-	onE7AHYXh03XL9tduCYkFXOo8fpLsb1HVYWWKfh3HrhBXy9rIur+PSljYpbCDw==
+	s=arc-20240116; t=1771233856; c=relaxed/simple;
+	bh=jUieC0lBFZSQ/SZySCEiOOp4+YSwNd1XEU2ZN/W1gaI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V1Nzs1FialL3SLzeJ6vxd0Frz67lsODcbMTa2srPOF2KaI2TqqMlYlER/qKiU4JLktPTMu7M+4W+6ftJzbDekscdnkPd9PGwVeAb069An+u2S/aWFxBHIVc7ZtWcIMPd3f8oVMXuLyepsJ9SDxxOoXh2TWxPoids8aGgiB5ZiaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=VATDK8RJ; arc=none smtp.client-ip=80.241.56.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4fDy5R1Rxqz9tVQ;
+	Mon, 16 Feb 2026 10:24:11 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1771233851;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=x2vy6a1Meu+skf7rOG8rJ02x19jQsoOB+N+i06OG6jo=;
+	b=VATDK8RJSlC2sJH92HI3+Xk72/x56bq1logEqJaAjaGfbVTFDoqdqEEVJyGNMxIZoODhNy
+	c3eE1WaySM1Kdvks+bvwiLBIt9hjoBmJTXLZEESlvEhzNvu/OB5vTVGbsCzqr779/j+UPn
+	YRaVzcu1RhRq2oZ4qOkJFJPKi3kFtpZnPfTUMNC8wdmqg9yY2ajeEu1+OuwQBIcHD5qNRI
+	uIIqfutbvd6YMH892tkQqrw4Ynka/UNeLGJjanx7RLglG+XMkzwDPe2Zzs7zZjXtZAggj5
+	lCNYEA3j+Alg39iq6OAVvW8AgSULz3cGOrXSmU7r+tkPHjPnqSBLhBmYahv35w==
+Date: Mon, 16 Feb 2026 10:23:59 +0100
+From: =?UTF-8?B?xYF1a2Fzeg==?= Majewski <lukasz.majewski@mailbox.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
+ <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, Richard Cochran
+ <richardcochran@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
+ <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>, Andrew Lunn
+ <andrew@lunn.ch>
+Subject: Re: [net-next v23 2/7] net: mtip: The L2 switch driver for imx287
+Message-ID: <20260216102359.37586219@wsk>
+In-Reply-To: <20260206112454.2e9a686f@wsk>
+References: <20260204232135.1024665-1-lukasz.majewski@mailbox.org>
+	<20260204232135.1024665-3-lukasz.majewski@mailbox.org>
+	<20260205182805.196fd832@kernel.org>
+	<20260206112454.2e9a686f@wsk>
+Organization: mailbox.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date: Mon, 16 Feb 2026 10:17:39 +0100
-Message-Id: <DGG9UYCB17KB.4V0H8BECUV57@bootlin.com>
-Subject: Re: [PATCH net-next 0/8] net: macb: Add XDP support and page pool
- integration
-Cc: "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
- <claudiu.beznea@tuxon.dev>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Lorenzo Bianconi" <lorenzo@kernel.org>, =?utf-8?q?Gr=C3=A9gory_Clement?=
- <gregory.clement@bootlin.com>, "Thomas Petazzoni"
- <thomas.petazzoni@bootlin.com>
-To: "Paolo Valerio" <pvalerio@redhat.com>, =?utf-8?q?Th=C3=A9o_Lebrun?=
- <theo.lebrun@bootlin.com>, <netdev@vger.kernel.org>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260115222531.313002-1-pvalerio@redhat.com>
- <DGDZR8L3E9WI.2MEYVL01KQ2YN@bootlin.com> <874inj72uv.fsf@redhat.com>
-In-Reply-To: <874inj72uv.fsf@redhat.com>
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: quoted-printable
+X-MBO-RS-ID: 251ff2ea1f4baad21a7
+X-MBO-RS-META: z4bao4g3s7pd9hey7cm8gwcj5wtksdmj
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258845-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-258846-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	HAS_ORG_HEADER(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[mailbox.org:+];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:mid,bootlin.com:dkim,bootlin.com:url,bootlin.com:email]
-X-Rspamd-Queue-Id: 65A14141E98
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lukasz.majewski@mailbox.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,pengutronix.de,gmail.com,vger.kernel.org,lists.linux.dev,lists.infradead.org,gmx.net];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DD5F7141EE1
 X-Rspamd-Action: no action
 
-On Sat Feb 14, 2026 at 4:37 PM CET, Paolo Valerio wrote:
-> On 13 Feb 2026 at 05:57:17 PM, Th=C3=A9o Lebrun <theo.lebrun@bootlin.com>=
- wrote:
->> My XSK series (based on top of yours) is ready.
->> I won't be sending it while net-next is closed, of course.
->
-> Nice!
-> Same for this series, will respin when net-next will reopen.
->
->> It starts with a few cleanup/rework patches that have no direct link to
->> XSK and touch code you add in this series. They could be appended to
->> your next revision or even squashed (with the right SoB &
->> Co-developed-by trailers) for most.
->>
->> Some contain bug fixes, mostly related to stats accounting. I expect
->> some amount of discussion as well, mostly regarding the page pool DMA
->> direction.
->
-> I quickly looked at the patches.
->
-> As we briefly discussed off-list, in my plans stats were considered as a
-> follow up. I intentionally kept them out of the series and to keep it
-> smaller.
-> Given you added them, I guess it's perfectly fine if you include
-> the patch directly in your series (unless maintainers prefer/suggest
-> otherwise). The same should apply for macb_tx_complete() rework.
-> That being said, IMO, we should account xdp stats separately instead of
-> including them in the generic ones.
+Hi Jakub,
 
-ACK so I keep those patches in my series.
+> Hi Jakub,
+>=20
+> > On Thu,  5 Feb 2026 00:21:30 +0100 Lukasz Majewski wrote: =20
+> > > This patch series provides support for More Than IP L2 switch
+> > > embedded in the imx287 SoC.
+> > >=20
+> > > This is a two port switch (placed between uDMA[01] and
+> > > MAC-NET[01]), which can be used for offloading the network
+> > > traffic.
+> > >=20
+> > > It can be used interchangeably with current FEC driver - to be
+> > > more specific: one can use either of it, depending on the
+> > > requirements.
+> > >=20
+> > > The biggest difference is the usage of DMA - when FEC is used,
+> > > separate DMAs are available for each ENET-MAC block.
+> > > However, with switch enabled - only the DMA0 is used to
+> > > send/receive data to/form switch (and then switch sends them to
+> > > respecitive ports).
+> > >=20
+> > > Signed-off-by: Lukasz Majewski <lukasz.majewski@mailbox.org>
+> > > Reviewed-by: Stefan Wahren <wahrenst@gmx.net>
+> > > Reviewed-by: Andrew Lunn <andrew@lunn.ch>   =20
+> >=20
+> > Transient build failure here:
+> >=20
+> > drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c:1072:32: warning:
+> > variable =E2=80=98priv=E2=80=99 set but not used [-Wunused-but-set-vari=
+able] 1072 |
+> >       struct mtip_ndev_priv *priv; |
+> > ^~~~
+> >=20
+> > I sent out the AI code reviews while at it, without looking at them.
+> > So please approach them with caution.. =20
+>=20
+> IMHO, issues pointed with AI review have been at discussed and
+> (to my best knowledge) addressed.
+>=20
+> Shall I prepare next version of this patch set?
+>=20
 
-  [PATCH 4/_] net: macb: account for stats in Rx XDP codepaths
-  [PATCH 6/_] net: macb: rework macb_tx_complete() processing loop
+I'm a bit confused regarding the next steps for this driver.
 
-If my diff related to statistics grows bigger, it'll deserve its own
-series. Until then I'll keep it part of XSK.
+There was no reply regarding my last question - and I don't know how I
+shall proceed...
 
-> The one about DMA_BIDIRECTIONAL is already part of this review cycle
-> (see bot's reply to 5/8) and already incorporated. I'm also considering
-> the possibility a change that make this no longer relevant anyways, but
-> I'm not sure as it was planned as a follow up.
+--=20
+Best regards,
 
-Yes indeed, Jakub's LLM pointed it out. I looked into this for a bit and
-couldn't find any good solution. In the end I couldn't find any
-measurable performance improvement so no need to worry about it (on my
-platform). I guess the only valid option is to reopen
-if `running && (!!old_prog !=3D !!new_prog)`?
-
-  [PATCH 3/_] net: macb: always use DMA_BIDIRECTIONAL on page pool buffers
-
-> Regarding the patches containing simple renames, I don't think they
-> require a Co-developed-by. The reasoning follows the same logic I
-> applied to the patch you authored in my series; while I addressed a NULL
-> dereference, it didn't seem significant enough to mark the entire patch
-> as co-developed.
-> The same goes for the style change patch, it doesn't change any logic,
-> it's just a cosmetic change that normally go through the regular review
-> process, but if you think it requires a separate patch, feel free to
-> follow up on this in your series.
-
-Yes for sure! Squash the remaining patches as if they were ordinary
-review messages. It was simpler for me to send those as patches along
-the other three.
-
-  [PATCH 1/_] net: macb: rename release_buff() -> macb_tx_release_buff()
-  [PATCH 2/_] net: macb: drop two labels in gem_rx()
-  [PATCH 5/_] net: macb: improve Rx refill error message
-
-Thanks,
-
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+=C5=81ukasz Majewski
 
