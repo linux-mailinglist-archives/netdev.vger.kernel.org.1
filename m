@@ -1,130 +1,171 @@
-Return-Path: <netdev+bounces-258952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258954-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id E3M7NlONk2nC6QEAu9opvQ
-	(envelope-from <netdev+bounces-258952-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 22:34:11 +0100
+	id ZZpSJ6qZk2mh6wEAu9opvQ
+	(envelope-from <netdev+bounces-258954-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 23:26:50 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42D0B147C66
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 22:34:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 42341147EC1
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 23:26:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3923D3014529
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 21:34:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F2623301628E
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 22:26:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D63F1251793;
-	Mon, 16 Feb 2026 21:34:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B2C42BEC2B;
+	Mon, 16 Feb 2026 22:26:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="pg4lzm1v"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FoMsLmms"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2FDE221FBD
-	for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 21:34:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 127F13C2E;
+	Mon, 16 Feb 2026 22:26:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771277649; cv=none; b=tuTnfoIXcZNyDPg4lxQ0RX65imYKVo05t6EVulsR9ZQcQnuV/WI4FPSUB/SUp3cXWAM/OErUObyCcnPIoieP6Jn68yd+YlQapF3X0ZQhxYcr+6Vm9QoyPAg6PQdjfgmQUZKxa/y5aXgMEaL/BTNyH5bTzEArXyzhNRLt+0dd7U8=
+	t=1771280805; cv=none; b=qtAKKkGc3J2GJM/qEXH6qd6r8M5BGZBkp0+CHOVah31jI6Vj3ojG4Wq4o3OEc0uFZ9VgEj1d78+TCmHvPTcZG8pIMQPD34fSgzDDRan1X+TUlKtUF/Fe6piOrCn/FXb9QPFFXt3MvSaHcn2oJtsRP/ODIJWMApeW8uJoMJWrNKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771277649; c=relaxed/simple;
-	bh=4Jhi0Vr3WXvd41rWnA4mEWtsa/pMMuB6bKxFzG1Y6MM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZgE2/GvSAagO/y6sft8NCEN8KMqz4BOC7J77IoUwqgdfz2jTdblCZ6dSQbo81WsIzC58GPGWnnUlPeNcMHx61gYZSofcgiSlQ5bsUzmY2saWoYwiODZIWO7s7DpDFbB7nspf7SYxqb7JhRcNDKTJDcDD/QDh7TiMRQgWwL2nAoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=pg4lzm1v; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 470DAC19424
-	for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 21:34:09 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="pg4lzm1v"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1771277645;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4Jhi0Vr3WXvd41rWnA4mEWtsa/pMMuB6bKxFzG1Y6MM=;
-	b=pg4lzm1vGCmu3Lu10RGonaCTVeTzyusq3restCYrd/AEXLzYE8PfHFjVd3+jZ3uOoLLmI4
-	VPvkGDF9hoHbRHyncFTN9uUqaepKkrJXo5+5QnpEMX+I3sHfkvGwdWm90fRt0cnd3kN8P3
-	ep0/rRtvafVpdJnQOOizS8N/2gUFxgk=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 94651d68 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO)
-	for <netdev@vger.kernel.org>;
-	Mon, 16 Feb 2026 21:34:05 +0000 (UTC)
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-7d4ba9abbecso4098214a34.1
-        for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 13:34:05 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVvUW3QOXSbsd/+lX+P/kEH8gY5am/DoJ56ZJx8wYP7FxbdtCiIGeiz3fRHyabnOu9m0tRbw7o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiI7ctR/2i6RB6ecxUpVVVrkWkcVIBLB64CVDXzIw/s3ERreb6
-	Orgu4T2e/fnIJL6zhJeZ11MloFJy1OSfSHQFbJsN9Kgf1NBZx+TCUMDpAUNYkXxm518g5ioPlCn
-	WgUoJSr8qxyMtRC0OcJRgeQe0HTt4h5E=
-X-Received: by 2002:a05:6830:378d:b0:7d4:96c3:3f96 with SMTP id
- 46e09a7af769-7d4c2fe5e18mr8466173a34.6.1771277644702; Mon, 16 Feb 2026
- 13:34:04 -0800 (PST)
+	s=arc-20240116; t=1771280805; c=relaxed/simple;
+	bh=L1DVbrsGFzyALm0nKzCBtpdVzc8lMjvPzRU08oHWagA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FhCtyUbAHGmOa+C99KfdRgtgax9GcHCZuS3pPGOPJXuoKf1Z+uAJFnmsmUiHwa/ZVcgeQlU1Teozj2V39YqSp9bi07uSCSW//hAPEpurJuxaawX+Id+3+X6IYXiUIWn5RKWChZNyOOqX3aqtsHv3Yottf478zAffJdGMbr6u6Lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FoMsLmms; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E852EC116C6;
+	Mon, 16 Feb 2026 22:26:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771280804;
+	bh=L1DVbrsGFzyALm0nKzCBtpdVzc8lMjvPzRU08oHWagA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=FoMsLmmsmMWunKHZt8sS3wdJhJnjy8qoAAbK+RrVLodZIChBuPSfwnHbHK/YsnPA5
+	 V89+Nq9ld2pYboOuR9b9AsYMMaMZfEc5Z2c7pndHkNNpySbKxL8hWFv1SERyWq6zNw
+	 SUeZmlbnTWexC/Wumdm/w3yCsiOX4lW6jj/xs+/Btw9PdwlqtY2LIrFut/N7/QbmUS
+	 EzbsoAp+4GANZx1emB3m9PCTS9c40R0+KSBDhqt6bpzE+rsUbfqQhiXGCY3RvfRnZY
+	 zZw3VHlwBVAJsJD6K+B1Dzmc0cUiUeyIszxlXDdtgvq6Tpkf1O51LjGI3DadAFr7c1
+	 qAPBUYrrm/q2g==
+From: Allison Henderson <achender@kernel.org>
+To: netdev@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	rds-devel@oss.oracle.com,
+	kuba@kernel.org,
+	horms@kernel.org,
+	linux-rdma@vger.kernel.org,
+	allison.henderson@oracle.com
+Subject: [PATCH net] net/rds: Fix NULL pointer dereference in rds_tcp_accept_one
+Date: Mon, 16 Feb 2026 15:26:43 -0700
+Message-ID: <20260216222643.2391390-1-achender@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <c05f3968fa63b630ce22d65aa03e6dcef4bf4e83.1771277247.git.daniel@iogearbox.net>
-In-Reply-To: <c05f3968fa63b630ce22d65aa03e6dcef4bf4e83.1771277247.git.daniel@iogearbox.net>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Mon, 16 Feb 2026 22:33:53 +0100
-X-Gmail-Original-Message-ID: <CAHmME9rsvaargjbZO8SkswOToUATuWpkQDVykEUty-kWPyu7gA@mail.gmail.com>
-X-Gm-Features: AaiRm50xU5jthBlVzEVvTQWKub0ovtPSQ-UjS9U-vZNQZmb0qL-2F9sAcjUof5k
-Message-ID: <CAHmME9rsvaargjbZO8SkswOToUATuWpkQDVykEUty-kWPyu7gA@mail.gmail.com>
-Subject: Re: [PATCH stable v5.15,v6.1] Revert "wireguard: device: enable
- threaded NAPI"
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: gregkh@linuxfoundation.org, stable@vger.kernel.org, netdev@vger.kernel.org, 
-	kuba@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[zx2c4.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
-	R_DKIM_ALLOW(-0.20)[zx2c4.com:s=20210105];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258952-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-258954-lists,netdev=lfdr.de];
+	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[zx2c4.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Jason@zx2c4.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,zx2c4.com:email,zx2c4.com:dkim]
-X-Rspamd-Queue-Id: 42D0B147C66
+	RCPT_COUNT_SEVEN(0.00)[9];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,syzkaller.appspot.com:url]
+X-Rspamd-Queue-Id: 42341147EC1
 X-Rspamd-Action: no action
 
-On Mon, Feb 16, 2026 at 10:31=E2=80=AFPM Daniel Borkmann <daniel@iogearbox.=
-net> wrote:
-> Technically, the backport of commit db9ae3b6b43c ("wireguard: device:
-> enable threaded NAPI") to stable should not have happened since it is
-> more of an optimization rather than a pure fix and addresses a NAPI
-> situation with utilizing many WireGuard tunnel devices in parallel.
+Save a local pointer to new_sock->sk and hold a reference before
+installing callbacks in rds_tcp_accept_one. After
+rds_tcp_set_callbacks() or rds_tcp_reset_callbacks(), tc->t_sock is
+set to new_sock which may race with the shutdown path.  A concurrent
+rds_tcp_conn_path_shutdown() may call sock_release(), which sets
+new_sock->sk = NULL and may eventually free sk when the refcount
+reaches zero.
 
-Indeed.
+Subsequent accesses to new_sock->sk->sk_state would dereference NULL,
+causing the crash. The fix saves a local sk pointer before callbacks
+are installed so that sk_state can be accessed safely even after
+new_sock->sk is nulled, and uses sock_hold()/sock_put() to ensure
+sk itself remains valid for the duration.
 
-> Revert it from stable given the backport triggers a regression for
-> mentioned kernels.
+Fixes: 826c1004d4ae ("net/rds: rds_tcp_conn_path_shutdown must not discard messages")
+Reported-by: syzbot+96046021045ffe6d7709@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=96046021045ffe6d7709
+Signed-off-by: Allison Henderson <achender@kernel.org>
+---
+ net/rds/tcp_listen.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
 
-Thanks.
+diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
+index 6fb5c928b8fd..b4ab68a1da6d 100644
+--- a/net/rds/tcp_listen.c
++++ b/net/rds/tcp_listen.c
+@@ -177,6 +177,7 @@ int rds_tcp_accept_one(struct rds_tcp_net *rtn)
+ 	struct rds_tcp_connection *rs_tcp = NULL;
+ 	int conn_state;
+ 	struct rds_conn_path *cp;
++	struct sock *sk;
+ 	struct in6_addr *my_addr, *peer_addr;
+ #if !IS_ENABLED(CONFIG_IPV6)
+ 	struct in6_addr saddr, daddr;
+@@ -298,6 +299,17 @@ int rds_tcp_accept_one(struct rds_tcp_net *rtn)
+ 		rds_conn_path_drop(cp, 0);
+ 		goto rst_nsk;
+ 	}
++	/* Save a local pointer to sk and hold a reference before setting
++	 * callbacks. Once callbacks are set, a concurrent
++	 * rds_tcp_conn_path_shutdown() may call sock_release(), which
++	 * sets new_sock->sk to NULL and drops a reference on sk.
++	 * The local pointer lets us safely access sk_state below even
++	 * if new_sock->sk has been nulled, and sock_hold() keeps sk
++	 * itself valid until we are done.
++	 */
++	sk = new_sock->sk;
++	sock_hold(sk);
++
+ 	if (rs_tcp->t_sock) {
+ 		/* Duelling SYN has been handled in rds_tcp_accept_one() */
+ 		rds_tcp_reset_callbacks(new_sock, cp);
+@@ -316,13 +328,15 @@ int rds_tcp_accept_one(struct rds_tcp_net *rtn)
+ 	 * knowing that "rds_tcp_conn_path_shutdown" will
+ 	 * dequeue pending messages.
+ 	 */
+-	if (new_sock->sk->sk_state == TCP_CLOSE_WAIT ||
+-	    new_sock->sk->sk_state == TCP_LAST_ACK ||
+-	    new_sock->sk->sk_state == TCP_CLOSE)
++	if (READ_ONCE(sk->sk_state) == TCP_CLOSE_WAIT ||
++	    READ_ONCE(sk->sk_state) == TCP_LAST_ACK ||
++	    READ_ONCE(sk->sk_state) == TCP_CLOSE)
+ 		rds_conn_path_drop(cp, 0);
+ 	else
+ 		queue_delayed_work(cp->cp_wq, &cp->cp_recv_w, 0);
+ 
++	sock_put(sk);
++
+ 	new_sock = NULL;
+ 	ret = 0;
+ 	if (conn->c_npaths == 0)
+-- 
+2.43.0
 
-Acked-by: Jason A. Donenfeld <Jason@zx2c4.com>
-
-If that helps with Greg queueing this up.
-
-Jason
 
