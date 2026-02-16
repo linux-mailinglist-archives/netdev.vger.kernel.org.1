@@ -1,173 +1,139 @@
-Return-Path: <netdev+bounces-258903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258904-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yGfaMWAvk2ke2QEAu9opvQ
-	(envelope-from <netdev+bounces-258903-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 15:53:20 +0100
+	id 0AhWA2syk2mI2QEAu9opvQ
+	(envelope-from <netdev+bounces-258904-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 16:06:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E3BA144D7C
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 15:53:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6129F1450DD
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 16:06:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1AEC030090BD
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 14:53:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DD28A30515C7
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 15:01:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B98A0313272;
-	Mon, 16 Feb 2026 14:53:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6709313E2C;
+	Mon, 16 Feb 2026 15:01:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ycq6Dfc4"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="w6PjxASX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 994483128CF
-	for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 14:53:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E1DB314A9B;
+	Mon, 16 Feb 2026 15:01:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771253594; cv=none; b=t8qDTx3oVcbrbku6VxPASoND6aM1lCGXhrsorUXUrhP3gdVkfX+71k8zVjcerGdAmFQMNAOBGeDozpfjDoiSeSQNCutLvKkuQV8kS9wxhDktmeVKnDCj2d7NglJhirzL0pWXYUIZm0Sj/5IhUwxfsHZJ+RYP7xbQM51vG2zjNeI=
+	t=1771254093; cv=none; b=nmVG7oLB3Hj6L9dPkihq72pYyMl1ofNOq1qqeQae96fCYLDermGPCtmxHGmikAWOL3Oy7vn1sBcNtvS2gFrFNSB/WR2+kEc6hktrtr9Rgo0jNwmQS7gaw9JSi+Mu8Fybp/s3RUIzeh4PO25c10Jnnm9aSiWtye1B4SEZeOY4kXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771253594; c=relaxed/simple;
-	bh=k1OBCTVrSeNRrFsqs5C+Zz2ho34W9SpeXsRrjeRBMnA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=V8I2WK8bLOtW6EQ0Dd0R0sBhwIFvMguNDsBYOMOR8HcI1HOlrLjokwqtOns0AflH8sR84z5lxR4a5REMTUai60VwrEs4R65Y55rKqTTQwr5IYZAZzUZwAmHF+ySUToiU3pyS+FIqiLLWSadnMpo430Up3x8Hn9RjzfFdFXWYmg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ycq6Dfc4; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-8230d228372so1982458b3a.1
-        for <netdev@vger.kernel.org>; Mon, 16 Feb 2026 06:53:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771253593; x=1771858393; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3BzPXx4/xU1OyhG3PzSrYUGxFAh6ykIsO6RQoTNEOyc=;
-        b=Ycq6Dfc4lElKz2kKBhicUjc7SbLK8z3PWUn+zM3AEoZLvn+Mafq1cPR0ISfYdAesql
-         pWdfVFqWohMrVVpLWr1/7ISJ/8WyPPWBMZXLINIhZNAr+HtETISGNCE4PBDju23nk1Dc
-         rKnjtSQSN93Kb3xdeInzzf4shHYdEZZ/tlZJIFL7zSbWgsKSzIEVQuwse0joLG9uMiNZ
-         VvTUqjFweuL6uXwn5vnPjNVRZ99d7/g3lcx9VlsjW0vgWKWgudKh4Drs2OYXFC5J2eMr
-         cjA0oe51va9VfQCMuu9LirNbbU7f6rHLuot2qk5+9uarMkCl5c7Huwarjk6gDHWJZcxN
-         8p6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771253593; x=1771858393;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3BzPXx4/xU1OyhG3PzSrYUGxFAh6ykIsO6RQoTNEOyc=;
-        b=D28m5RWxSqXwr1ZUr3k347k4+HeDft4rWzbrAWUTRditvpNyQpNplj0Qrm5DZEcngE
-         xtzXVewcnVhVBfAI6bDxEb6U4vm45sxxq6BXu2FwwSvGGs9uwZ/F8KBOccfp0gE9csuH
-         LxYuELKENynJUA2aG0HT+CZTbmy14qwJTJYzTQCpiHhX0Obat5oXdEZcCaj9aK/g9fyT
-         pcXA88TQ6zeXWLokbM6Ma638W7c9xH5mYo8b5fPaxLiUgvBn1uzc0l6i4rrsuznubsgd
-         y4SzARK+MofqagzKT0dPiKzSQ+6haWSWetEB0eaMI2IcbxpceRtovlM49o938ofOenxP
-         VbgA==
-X-Gm-Message-State: AOJu0YzMhZ65GWozenp0QchtXoxgoxUZ48SP718BRJXb8uy7yexRw1ca
-	ZAv49MbsNyfhIvxFKV0gd7BSjKn8LH+6Fk0jCkmB8HNcHwuhC+1ancLe
-X-Gm-Gg: AZuq6aIA2wgd/XEjW31Jt23oPyYN8KOgub7MwFY0N4bXrUm5Un686CoGafHElOp1pRC
-	nbBDnj9QZMSP7FGK2XaqH8noHRcZ0y3ZYiOGIQWC0GheCCeg4RDJaX0v7PTqWpwToyQJV2YdXIE
-	9qTH/yfxmZUzeOtW7qwTq8tvQdt86UCP2OhG2Pvc7hLabHx8T6yifpF0vBmw5EH4Dh3XJbzkrA2
-	plso+EpDtrWbWcV3a3zHl8DRLdmLq6pG454Q5byerYgIPRmqoe57/u3GxoXO2UpcdHLjKeQ8EAe
-	2spxBnZcGbMLdUK2X9CnnHZ94qbl0BF+aR7MKDpWKPlwTmz2afG48Pn6AluRG80Lfo3wvhbQYAk
-	K6Nl4rdOAP7htLSd1tN6w1my9QeowOSvqxC1FCV/nS9qb1/Iej0/BFPREOJoJxfpFjYQ2W58NCy
-	ALoXEAsw/dPWyLIhbPWJL/z6bvc3Ae7dzksij8KdmTktwFfhCYb8ZBVPpCCDgIGY785Fguausfl
-	UQ9mQu3G+dUmMFx9j4=
-X-Received: by 2002:a05:6a20:9c9b:b0:38d:fa22:8ef1 with SMTP id adf61e73a8af0-3946c718148mr11383953637.3.1771253592775;
-        Mon, 16 Feb 2026 06:53:12 -0800 (PST)
-Received: from localhost.localdomain ([49.207.200.48])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c6e532f211csm7238610a12.23.2026.02.16.06.53.08
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 16 Feb 2026 06:53:12 -0800 (PST)
-From: Anand Kumar Shaw <anandkrshawheritage@gmail.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	sdf@fomichev.me,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	Anand Kumar Shaw <anandkrshawheritage@gmail.com>
-Subject: [PATCH] bpf: devmap: hoist loop-invariant xdp buff pointer setup
-Date: Mon, 16 Feb 2026 20:23:06 +0530
-Message-Id: <20260216145306.96108-1-anandkrshawheritage@gmail.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1771254093; c=relaxed/simple;
+	bh=vWuDr3Tx4NiEtoueri5s7dOMix7kqoaTVHP12WT4dMM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XvolYd2yVKneQptDm3d1kwzhwzw7eW81DqzpDFEvP2DZY9vUO0bpFYUHwkNtJzDS3+6xNyeXyCYkYDifOybD1q0kKVWLnNRj2ISjqvDQvnE5Dt+EgnM0c+rkGwz3H0b/C53H49RDEpD4wJtMR91tJwiCxtJedy9JjKBwVMgsJWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=w6PjxASX; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=fZ0BCqVUH5xPPVxomeaJKF0H4wRC7cRMGuNTgfAR7WI=; b=w6PjxASXJb/jnKoq7U4mc7F09F
+	M+xmz3gOYR7Ca1HJInWEsV5zH2bW7wTOmUURs8Iqd/CedefWZsl40Eml0ThMfyZS96rueKMgBG4zv
+	Z3GYZTxYKJKEl1eD6d/vndPPB7BzF8znThFBD5KMyrGoWDlc50i6brFtlE32V91VSFrC/qEaiauFh
+	LgDo4370TZ7ofHrDPYb31I8cSwTfqRp4vVCbBly/4F8zr87B0JN3GmwCfaL9Df0ReNWQYLYuZZ/ZA
+	/dJjNkCQ+lPvU0WaSAfDlkFOELE+aN5C3/GsLc2AgZRHIp306ODXzaPchHtcOCqIKglF+c+m5/O7W
+	GOxrcLrQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47910)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vs05t-0000000073K-1oiw;
+	Mon, 16 Feb 2026 15:01:01 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vs05p-000000000K6-2pxV;
+	Mon, 16 Feb 2026 15:00:57 +0000
+Date: Mon, 16 Feb 2026 15:00:57 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Yao Zi <me@ziyao.cc>, Heiko Stuebner <heiko@sntech.de>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	linux-rockchip@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org
+Subject: Re: Problematic understanding of phy-mode in Rockchip DWMAC driver
+Message-ID: <aZMxKdkl2Qa7e1WU@shell.armlinux.org.uk>
+References: <aY9s5PXP4zZ7R6fa@pie>
+ <aY9xsslT56D9LGLe@shell.armlinux.org.uk>
+ <f1e047e1-3f1c-4562-ab43-af2fe358fe04@lunn.ch>
+ <aZDGsJNLZIty0242@shell.armlinux.org.uk>
+ <a4aebacc-c273-4e42-97ff-0cdd88d771dd@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a4aebacc-c273-4e42-97ff-0cdd88d771dd@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,gmail.com,davemloft.net,fomichev.me,linux.dev];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-258903-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[anandkrshawheritage@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-258904-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FREEMAIL_CC(0.00)[ziyao.cc,sntech.de,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,lists.infradead.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3E3BA144D7C
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:url,shell.armlinux.org.uk:mid]
+X-Rspamd-Queue-Id: 6129F1450DD
 X-Rspamd-Action: no action
 
-In dev_map_bpf_prog_run(), xdp.txq and xdp.rxq are assigned the same
-stack-local pointers on every iteration. xdp_convert_frame_to_buff()
-does not modify these fields, so the assignments are loop-invariant.
+On Mon, Feb 16, 2026 at 02:57:48AM +0100, Andrew Lunn wrote:
+> On Sat, Feb 14, 2026 at 07:02:08PM +0000, Russell King (Oracle) wrote:
+> > On Sat, Feb 14, 2026 at 05:50:15PM +0100, Andrew Lunn wrote:
+> > > Rockchip have recently started adding support for a new version, and
+> > > appear to of listened to what we have been saying. So it could be the
+> > > next generation of chips get this correct.
+> > 
+> > Have you seen any proposed code from Rockchip for their new scheme?
+> 
+> There was a patch, including a rather odd formulae to convert register
+> value to delay. I gave some feedback, but it has been silence
+> afterwards.
 
-Hoist them before the loop, matching the pattern already used by
-cpu_map_bpf_prog_run_xdp() in cpumap.c.
+Searching lore's netdev archive doesn't seem to bring anything up.
 
-No functional change.
-
-Signed-off-by: Anand Kumar Shaw <anandkrshawheritage@gmail.com>
----
- kernel/bpf/devmap.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
-index 2625601de..568477ce7 100644
---- a/kernel/bpf/devmap.c
-+++ b/kernel/bpf/devmap.c
-@@ -341,14 +341,15 @@ static int dev_map_bpf_prog_run(struct bpf_prog *xdp_prog,
- 	struct xdp_buff xdp;
- 	int i, nframes = 0;
- 
-+	xdp.txq = &txq;
-+	xdp.rxq = &rxq;
-+
- 	for (i = 0; i < n; i++) {
- 		struct xdp_frame *xdpf = frames[i];
- 		u32 act;
- 		int err;
- 
- 		xdp_convert_frame_to_buff(xdpf, &xdp);
--		xdp.txq = &txq;
--		xdp.rxq = &rxq;
- 
- 		act = bpf_prog_run_xdp(xdp_prog, &xdp);
- 		switch (act) {
 -- 
-2.39.5 (Apple Git-154)
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
