@@ -1,69 +1,61 @@
-Return-Path: <netdev+bounces-258917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258918-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SGYbImY8k2kg2wEAu9opvQ
-	(envelope-from <netdev+bounces-258917-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 16:48:54 +0100
+	id SDkDCAA9k2kg2wEAu9opvQ
+	(envelope-from <netdev+bounces-258918-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 16:51:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE63F145C3F
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 16:48:53 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id B41EC145CA8
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 16:51:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5F40C3001047
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 15:48:51 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1B2C63008D6E
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 15:51:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE35310644;
-	Mon, 16 Feb 2026 15:48:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31989330667;
+	Mon, 16 Feb 2026 15:51:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rI2tUXye"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sYpUhyTo"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 661C22690EC;
-	Mon, 16 Feb 2026 15:48:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E0BF26FD93;
+	Mon, 16 Feb 2026 15:51:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771256929; cv=none; b=Aqv7GCvAcnlWbgyACyljk9GukG1yg2n6vUUm1u+5PAsl+gvF6Q41uOgLwgL/xYbvRV9gsJedEh4h3jah0T8NGZf2BNhImBfNaaaglCd+1uEh9RbhMwdUkZ4AcOCyj8nelFRAIeIn6rGw0vZvHTq+aEQlLbs1rH3vq3jT42E3J2A=
+	t=1771257085; cv=none; b=uvMlTvP3UmTiINUQ9fcUbsemkVwgQAKY2JZ1sHqAVW9NR2291bR4OitCj5MdfX9Nt3IHacAWFeFcYw4oqAEGy7VzLRvYuHsp2tAtxjyrOCckl+LG/Yd7XYrziFj0mDk7gZwUsf78ZarpIGp3wIglG1PsbxeB+c5MulH1Upy5YMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771256929; c=relaxed/simple;
-	bh=q+g/DlkJNq74PkDhASSFNfZPUvOBH5818ThhmdshVsk=;
+	s=arc-20240116; t=1771257085; c=relaxed/simple;
+	bh=CG6O/xmgix3IcZCgf9wWoa5TQi++ix89E7733DM8MWk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lDIpZ7CIOjHFiStacNkUrllpvBjHuSkSmjpfs0ljWvUcU0dCqy0kq0/0qY7FFehrYnxssN99NdouYBhqdcE2lZJjq0nBMAdlDrjIoRFaYrW+B94U0UoSEPxaDarnt3l8RlwwMlzfg2NywgkHvMsSBskK/w6P/SrmGoteQmb/NL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rI2tUXye; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=aSeE11hwULDq1Qr2S0vwgJhcVhLNVAv9uROXpPzDh+s=; b=rI2tUXyeeBZZjXVwiBZvt4GiGS
-	02n4dK2eJnvWLYlxm+8UAkFMSvbiWu6+T4X/3ciBZffmyv4uSsDAKpZ9f38wk6Ekh2W+Eq7Dr3Q9O
-	jB8chtJY7vZyeWSFNvkSI5jH+oja7Ezy1kh8GvNBVAIg5CuLUQvz44VQkksjdepKlttM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vs0pp-007Vn1-VN; Mon, 16 Feb 2026 16:48:29 +0100
-Date: Mon, 16 Feb 2026 16:48:29 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yao Zi <me@ziyao.cc>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	linux-rockchip@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org
-Subject: Re: Problematic understanding of phy-mode in Rockchip DWMAC driver
-Message-ID: <90322c98-802f-4c88-8684-568f352d424f@lunn.ch>
-References: <aY9s5PXP4zZ7R6fa@pie>
- <aY9xsslT56D9LGLe@shell.armlinux.org.uk>
- <aZKgq0-aptu-PnsB@pie>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ckOP+0MwfZ6WnvACFOONF5gNG7I9GZMieXSVn9zRyMfaRelOQNInowbUm6tWvD+q66dHJMbY+0rGMkDMcQyd+Ivs0Ofwf/KHqq/9jVvrAJR9eWYtkaoH8HDKzL2TQRNN+J+nIuJ+35RPlvxW+zLQNoDSMFdB0mmI/ALxo7Ui+IM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sYpUhyTo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CD3CC116C6;
+	Mon, 16 Feb 2026 15:51:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771257084;
+	bh=CG6O/xmgix3IcZCgf9wWoa5TQi++ix89E7733DM8MWk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sYpUhyTo2t1y+lnNfrw8ZUbJQWIzChzZEUIp1pZRQsMd5J+pwBmlD5uUl4Kwh0dFd
+	 gPpb0I2hE3uKxy+L0hvKTameKxXavbbh5UpmLTIdCSZex/pTGKCg6qLkvVhNMoNLKA
+	 x0FyXyYfVoInmdbeMW+wEpm9ksKYmskcMgo70lx/6NQEsFGmpMBr7XwZnUyzD2fOYg
+	 zz99tmtYz3+PovkTgoO3bDlMhSrT8m/VzxufG8Lvx/tq6SRqZBsgrN04NwHowYp+6U
+	 n3K0TZWq7mbNlGybpYrGzMee25S4IDjts/zP183q0sK1Iy2KE4Hzo0C1HAAwNzMkJi
+	 TiDQkJ+nJP8bg==
+Date: Mon, 16 Feb 2026 09:51:21 -0600
+From: Bjorn Andersson <andersson@kernel.org>
+To: Vishnu Santhosh <vishnu.santhosh@oss.qualcomm.com>
+Cc: Manivannan Sadhasivam <mani@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	bjorn.andersson@oss.qualcomm.com, chris.lew@oss.qualcomm.com, 
+	Deepak Kumar Singh <deepak.singh@oss.qualcomm.com>, Stephen Smalley <stephen.smalley.work@gmail.com>
+Subject: Re: [PATCH v2] net: qrtr: Expand control port access to root
+Message-ID: <szn3j7huoz6sayxxrmbm2undysbai2ac3xkeu4i7qadbcczd3l@ykrbiqzyyrc4>
+References: <20260216-qrtr-control-port-access-permission-v2-1-71c15f2c5c7f@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,67 +64,111 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aZKgq0-aptu-PnsB@pie>
+In-Reply-To: <20260216-qrtr-control-port-access-permission-v2-1-71c15f2c5c7f@oss.qualcomm.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258917-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[armlinux.org.uk,sntech.de,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,lists.infradead.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258918-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	FROM_NEQ_ENVFROM(0.00)[andersson@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org,oss.qualcomm.com,gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AE63F145C3F
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B41EC145CA8
 X-Rspamd-Action: no action
 
-On Mon, Feb 16, 2026 at 04:44:27AM +0000, Yao Zi wrote:
-> On Fri, Feb 13, 2026 at 06:47:14PM +0000, Russell King (Oracle) wrote:
-> > On Fri, Feb 13, 2026 at 06:26:44PM +0000, Yao Zi wrote:
-> > > Hi folks,
-> > > 
-> > > I was looking through the RGMII delay setup logic found in
-> > > rk_gmac_powerup() of dwmac-rk.c, and found its behavior is strange,
-> > 
-> > dwmac-rk is very broken and is unfixable thanks to Rockchip not
-> > understanding the RGMII interface modes used by the kernel.
-> > 
-> > It is what it is, we can't change it without causing regressions.
-> > Please do not try to fix it.
+On Mon, Feb 16, 2026 at 02:11:45PM +0530, Vishnu Santhosh wrote:
+> When qrtr is loaded as module, QRTR NS runs from SELinux kmod_t
+> domain. On targets using upstream SELinux policies, this domain
+> does not receive CAP_NET_ADMIN, which prevents it from binding
+> control port even though QRTR NS is a trusted system component.
 > 
-> Thanks for confirming. I understand concerns about regressions and
-> agree keeping the driver/dts as-is is better.
+
+This part looks better now.
+
+> Granting kmod_t the CAP_NET_ADMIN capability in policy is possible,
+> but not desirable, as kmod_t is not expected to perform networking
+> operations and widening its capability set is discouraged.
 > 
-> However, should we mention the difference between "phy-mode" defined
-> ethernet-controller.yaml and "phy-mode" understood by dwmac-rk
-> driver in rockchip-dwmac.yaml to avoid confusion in the future?
 
-I've been telling DT developers to set the correct phy-mode,
-'rgmii-id', and the vendor properties for MAC delays to 0. That works,
-and it consistent with the documentation.
+Where is this discouraged? Who discouraged you do to this? Wasn't this
+exactly what Stephen suggested you do in his feedback on v1?
 
-As far as i know, dwmac-rk only gets things wrong when you try to get
-the MAC to add the 2ns delays. And that is not a recommended
-configuration. So i don't think it is too important to document a not
-recommended configuration is broken.
+Regards,
+Bjorn
 
-	Andrew
+> To address this in a contained way within qrtr, extend the control
+> port permission check to allow binding when either:
+> 
+>   - the process has CAP_NET_ADMIN, or
+>   - the process belongs to GLOBAL_ROOT_GID (root-equivalent tasks)
+> 
+> This permits QRTR NS to successfully bind its control port in
+> kmod_t restricted environments without broadening SELinux capability
+> assignments.
+> 
+> Co-developed-by: Deepak Kumar Singh <deepak.singh@oss.qualcomm.com>
+> Signed-off-by: Deepak Kumar Singh <deepak.singh@oss.qualcomm.com>
+> Signed-off-by: Vishnu Santhosh <vishnu.santhosh@oss.qualcomm.com>
+> ---
+> Changes in v2:
+> - Replaced "qrtr-ns" with "QRTR NS" in the commit message to avoid
+>   confusion with the deprecated userspace qrtr-ns tool and the NS
+>   implementation inside the QRTR driver.
+> - Link to v1: https://lore.kernel.org/r/20260205-qrtr-control-port-access-permission-v1-1-e900039e92d5@oss.qualcomm.com
+> ---
+>  net/qrtr/af_qrtr.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/qrtr/af_qrtr.c b/net/qrtr/af_qrtr.c
+> index dab839f61ee93b876021d904ae6b8dca8ed43745..b0e252c16f156c05973988fbdf317a149ad9840d 100644
+> --- a/net/qrtr/af_qrtr.c
+> +++ b/net/qrtr/af_qrtr.c
+> @@ -8,6 +8,7 @@
+>  #include <linux/qrtr.h>
+>  #include <linux/termios.h>	/* For TIOCINQ/OUTQ */
+>  #include <linux/spinlock.h>
+> +#include <linux/uidgid.h>
+>  #include <linux/wait.h>
+>  
+>  #include <net/sock.h>
+> @@ -738,7 +739,8 @@ static int qrtr_port_assign(struct qrtr_sock *ipc, int *port)
+>  	if (!*port) {
+>  		rc = xa_alloc(&qrtr_ports, port, ipc, QRTR_EPH_PORT_RANGE,
+>  				GFP_KERNEL);
+> -	} else if (*port < QRTR_MIN_EPH_SOCKET && !capable(CAP_NET_ADMIN)) {
+> +	} else if (*port < QRTR_MIN_EPH_SOCKET && !(capable(CAP_NET_ADMIN) ||
+> +						   in_egroup_p(GLOBAL_ROOT_GID))) {
+>  		rc = -EACCES;
+>  	} else if (*port == QRTR_PORT_CTRL) {
+>  		rc = xa_insert(&qrtr_ports, 0, ipc, GFP_KERNEL);
+> 
+> ---
+> base-commit: 0f2acd3148e0ef42bdacbd477f90e8533f96b2ac
+> change-id: 20260205-qrtr-control-port-access-permission-bfea19994a58
+> 
+> Best regards,
+> -- 
+> Vishnu Santhosh <vishnu.santhosh@oss.qualcomm.com>
+> 
 
