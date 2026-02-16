@@ -1,150 +1,138 @@
-Return-Path: <netdev+bounces-258916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258917-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SC6hKTs7k2mV2gEAu9opvQ
-	(envelope-from <netdev+bounces-258916-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 16:43:55 +0100
+	id SGYbImY8k2kg2wEAu9opvQ
+	(envelope-from <netdev+bounces-258917-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 16:48:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF4F8145BBC
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 16:43:54 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE63F145C3F
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 16:48:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9B6A93006176
-	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 15:42:27 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5F40C3001047
+	for <lists+netdev@lfdr.de>; Mon, 16 Feb 2026 15:48:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84E393191BF;
-	Mon, 16 Feb 2026 15:42:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE35310644;
+	Mon, 16 Feb 2026 15:48:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="qgb3v+Vt"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rI2tUXye"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02B40306D2A;
-	Mon, 16 Feb 2026 15:42:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 661C22690EC;
+	Mon, 16 Feb 2026 15:48:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771256546; cv=none; b=nXj7wTe52jiIsaZ0WSBoGEbeBGsDAK8JWfQWiGmYwcQoDXF2ryeTRQaccg81BcxMK2/IoVnedPcHUIOz1k+R98ZNKV/YYR+rOrYz9QZ7ELXJD/9NeIVR/9r+FzZR/4ZXIp7eFuxcb+EoPYAg351s6Y/oWXlJUQQREMwd8U+DSkU=
+	t=1771256929; cv=none; b=Aqv7GCvAcnlWbgyACyljk9GukG1yg2n6vUUm1u+5PAsl+gvF6Q41uOgLwgL/xYbvRV9gsJedEh4h3jah0T8NGZf2BNhImBfNaaaglCd+1uEh9RbhMwdUkZ4AcOCyj8nelFRAIeIn6rGw0vZvHTq+aEQlLbs1rH3vq3jT42E3J2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771256546; c=relaxed/simple;
-	bh=6s3znu4j+iODnWook2IfmD2/Bnh5JhU8+Zk8gOlMEik=;
+	s=arc-20240116; t=1771256929; c=relaxed/simple;
+	bh=q+g/DlkJNq74PkDhASSFNfZPUvOBH5818ThhmdshVsk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vs916nWwkGO0NfwEvzRuAAcgeSzk/E9+740yS7SCCdQ5hkWq6hjcjYWyAQJBoy1KO6XmGulf0fzwdoTx5/t6h2+ecCWFcSf0FAMlbvjXPshwEJt0nBHu74aFZaJ3y6aJSNwzjeJtFGNrvXuxA2UdjwLeDoqh/CeqQsOuyD6g4jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=qgb3v+Vt; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=rtQGx8JaIvXg61aL8RGWRy89nLOrlWoGMW1moSYdF4U=; b=qgb3v+Vtq+yIqIbp+EvMyer2d5
-	aOqdWJwZ9wUpJHfFUZg/NtJFsYcn/IHj3N2S1wrjFCYxQXNLsM8BItrnXAGIbqG4X2KQ/8IFu1yXS
-	+LZDKwysogk6ieqLtopJz7trniT9lskIKGT8X/CsHCOX84pP8XxLP1HxAMdxEd14HLYzKLiinKjC9
-	OPe2deRHvKTMwuR0v+6bHA2Sk/VpIV7ycJZxjZbC5uC121xwaPqGdUNIyXi6tm2NoiZWUybjBiNwv
-	JbPEOk44dfUlk60GIKz7RGCa3DxR5B3JXaWpI5c3zUvC+ZJcijQXdPm8U/W6gn9SFnZH2cenlVfqM
-	kY2cNW4Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39088)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vs0jl-0000000075q-0Ygn;
-	Mon, 16 Feb 2026 15:42:13 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vs0jh-000000000MC-0xiX;
-	Mon, 16 Feb 2026 15:42:09 +0000
-Date: Mon, 16 Feb 2026 15:42:09 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	Vinod Koul <vkoul@kernel.org>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=lDIpZ7CIOjHFiStacNkUrllpvBjHuSkSmjpfs0ljWvUcU0dCqy0kq0/0qY7FFehrYnxssN99NdouYBhqdcE2lZJjq0nBMAdlDrjIoRFaYrW+B94U0UoSEPxaDarnt3l8RlwwMlzfg2NywgkHvMsSBskK/w6P/SrmGoteQmb/NL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rI2tUXye; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=aSeE11hwULDq1Qr2S0vwgJhcVhLNVAv9uROXpPzDh+s=; b=rI2tUXyeeBZZjXVwiBZvt4GiGS
+	02n4dK2eJnvWLYlxm+8UAkFMSvbiWu6+T4X/3ciBZffmyv4uSsDAKpZ9f38wk6Ekh2W+Eq7Dr3Q9O
+	jB8chtJY7vZyeWSFNvkSI5jH+oja7Ezy1kh8GvNBVAIg5CuLUQvz44VQkksjdepKlttM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vs0pp-007Vn1-VN; Mon, 16 Feb 2026 16:48:29 +0100
+Date: Mon, 16 Feb 2026 16:48:29 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Yao Zi <me@ziyao.cc>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Frank Li <Frank.Li@nxp.com>,
-	imx@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Sascha Hauer <s.hauer@pengutronix.de>
-Subject: Re: [PATCH RFC net-next 0/9] net: stmmac: qcom-ethqos: cleanups and
- re-organise SerDes handling
-Message-ID: <aZM60XiDOrgxHqeA@shell.armlinux.org.uk>
-References: <aY0aJppQWUC52OUq@shell.armlinux.org.uk>
- <aY95qbcG2BLGVzHy@oss.qualcomm.com>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	linux-rockchip@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org
+Subject: Re: Problematic understanding of phy-mode in Rockchip DWMAC driver
+Message-ID: <90322c98-802f-4c88-8684-568f352d424f@lunn.ch>
+References: <aY9s5PXP4zZ7R6fa@pie>
+ <aY9xsslT56D9LGLe@shell.armlinux.org.uk>
+ <aZKgq0-aptu-PnsB@pie>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aY95qbcG2BLGVzHy@oss.qualcomm.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <aZKgq0-aptu-PnsB@pie>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258916-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-258917-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_CC(0.00)[armlinux.org.uk,sntech.de,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,lists.infradead.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,shell.armlinux.org.uk:mid]
-X-Rspamd-Queue-Id: DF4F8145BBC
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AE63F145C3F
 X-Rspamd-Action: no action
 
-Hi,
-
-On Sat, Feb 14, 2026 at 12:51:13AM +0530, Mohd Ayaan Anwar wrote:
-> Hello Russell,
+On Mon, Feb 16, 2026 at 04:44:27AM +0000, Yao Zi wrote:
+> On Fri, Feb 13, 2026 at 06:47:14PM +0000, Russell King (Oracle) wrote:
+> > On Fri, Feb 13, 2026 at 06:26:44PM +0000, Yao Zi wrote:
+> > > Hi folks,
+> > > 
+> > > I was looking through the RGMII delay setup logic found in
+> > > rk_gmac_powerup() of dwmac-rk.c, and found its behavior is strange,
+> > 
+> > dwmac-rk is very broken and is unfixable thanks to Rockchip not
+> > understanding the RGMII interface modes used by the kernel.
+> > 
+> > It is what it is, we can't change it without causing regressions.
+> > Please do not try to fix it.
 > 
-> Things look pretty stable on the QCS9100 Ride R3 board (with the AQR115C
-> PHY). I would like to test a bit more and should be happy to provide a
-> Tested-by once that's complete.
+> Thanks for confirming. I understand concerns about regressions and
+> agree keeping the driver/dts as-is is better.
 > 
-> I may also get access to a board with an RGMII PHY on Monday, so I’m
-> hoping to verify the changes to ethqos_rgmii_macro_init as well as your
-> patch from the previous series (“net: stmmac: qcom-ethqos: convert to
-> set_clk_tx_rate() method”) soon.
+> However, should we mention the difference between "phy-mode" defined
+> ethernet-controller.yaml and "phy-mode" understood by dwmac-rk
+> driver in rockchip-dwmac.yaml to avoid confusion in the future?
 
-Looking forward to hearing the results, thanks!
+I've been telling DT developers to set the correct phy-mode,
+'rgmii-id', and the vendor properties for MAC delays to 0. That works,
+and it consistent with the documentation.
 
-As you seem to be fairly active with the qcom-ethqos stuff, please
-consider adding yourself to the "QUALCOMM ETHQOS ETHERNET DRIVER"
-maintainers entry. Thanks.
+As far as i know, dwmac-rk only gets things wrong when you try to get
+the MAC to add the 2ns delays. And that is not a recommended
+configuration. So i don't think it is too important to document a not
+recommended configuration is broken.
 
-Vinod, are you still actively involved with this, and if not,
-should Mohd remove you from the entry for the dwmac-qcom-ethqos
-driver?
-
-Thanks.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+	Andrew
 
