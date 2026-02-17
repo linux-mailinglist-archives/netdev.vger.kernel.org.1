@@ -1,150 +1,154 @@
-Return-Path: <netdev+bounces-259028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259029-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cDKMHA5tlGkEDwIAu9opvQ
-	(envelope-from <netdev+bounces-259028-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 14:28:46 +0100
+	id GOXJGoltlGkEDwIAu9opvQ
+	(envelope-from <netdev+bounces-259029-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 14:30:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2EEC14C91F
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 14:28:45 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A93114C95C
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 14:30:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B4DB9300AEF2
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 13:28:44 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4BC2130089B3
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 13:30:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A93BF36AB5B;
-	Tue, 17 Feb 2026 13:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F387B36B057;
+	Tue, 17 Feb 2026 13:30:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="XtN9DsKn";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="umWQX51f"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kw4OzJxB"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D6512DF6E9
-	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 13:28:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCB3A361676;
+	Tue, 17 Feb 2026 13:30:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771334922; cv=none; b=eOe/y8sqm3uWeTI+JXLQmH91aLQdV8LyUBhs4yZ31tTSdJcQ2qmfGvVqF7pcw8v+v/IdB42+rzIwmCqvHrO0ccmoXvjtyw7fbhEiFXSm64dEmJDV0VpKiMGQrAnjXCrgxMT4MfPi/I9ZMQPs1Dmf5wxWkHbJlNt3Hn+pv9nrc64=
+	t=1771335041; cv=none; b=o++6eKxRxpIw/g+idRPM0v/294dAAK7gGQasOA9s4KUd+0cDo5Iu/Z8EejN4sRmHwTBpwkQaTJsYODr0F8MJBEI8IvvxTZnLJyM2PVvphM7iXBf97CYv5NUMdQAIvBCWOYaOLXXygPSAKRZlxlMi6TNLEEWbkjyLSZO7C1xGO1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771334922; c=relaxed/simple;
-	bh=dzF54vHa4qv4qsKiqfLWwFCBx2jgiBg+WXVjMwwVwiU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BdvAdjYySsFdj8Vhmy54t4G9PmQo3rWX/6EYfQMg6inj1fbFenVGevyUZeRPFZaZIvqjhNI3FfXlVopK1iCfXF9UMqtR2yS3ys1TZ0Sl/VZzZZcgGFnnx9XPqlCobwNCCjms3PPsHQPVbIc+uBPwn77YXQx/0G6G8HLMamVzdKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=XtN9DsKn; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=umWQX51f; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Tue, 17 Feb 2026 14:28:38 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1771334919;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WWmu+0Yz56GzeboLvFV77hV87S/DSzzD383ahe/Igrg=;
-	b=XtN9DsKn+9pP7YRN9O7o4++GYJ7ynPFtyns4igqPlfQRc3mV0t6QaM9zWEIvsqJGS8i2Uy
-	fSn9iMk1rQ4ncKpWbeJCgcWdJfz/IWgf1PUu8ijbFaR6c9og1Ek4Hv/Nhxdkas27AKAQ8V
-	STW8v01622cvjIeS6oEs35r7D+6HE7mhU2v1aAd4aY5q0CrXRx4JJqTMrVf9Q4meCKXN5X
-	LXx1GQx13sMBN6wrBA9dOaVJeSY/EH6VerqFirBsNZl728NIqmbC/SaCIsGZWdua/aMEXS
-	exgYiRS3wONu0uRvA9E0bgT3FZeHrvQVujXncFr8mBIQ+84L7VeSp+Ukj/S7ug==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1771334919;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WWmu+0Yz56GzeboLvFV77hV87S/DSzzD383ahe/Igrg=;
-	b=umWQX51fWOH5sjmbIxfmpnaRclf0YtshuvDaupf7OwVgGeUeZ1GrDfIcS9ZbREuoRXXYeb
-	JxduCWfRYUKS4FCQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Kurt Kanzenbach <kurt@linutronix.de>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Willem de Bruijn <willemb@google.com>
-Subject: Re: [PATCH net] net: Drop the lock in skb_may_tx_timestamp()
-Message-ID: <20260217132838.kgRAQ87W@linutronix.de>
-References: <20260214232456.A37oV4KQ@linutronix.de>
- <willemdebruijn.kernel.1682a93525c87@gmail.com>
- <20260215184608.8dk4hemG@linutronix.de>
- <9130dfca-1e85-4975-8df9-4de8bd9e8f5e@linux.dev>
- <willemdebruijn.kernel.3b597169afaae@gmail.com>
+	s=arc-20240116; t=1771335041; c=relaxed/simple;
+	bh=lFvCw1gG47YA8ohMtL+dMOuMfLFj1PNhjD/Mbeay6SU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=XMfw3Obo73keIV22nPpZvfNwEUoDdAbg481vmfu8BBBbyw8QdmnBo8qBM0b+SDbUoSI1dxuLqII433yIZcYRjFrfPXH6SrdMl3ZW/k/XaxwbroNh7E7gcla+894G86TDEZDbtKSzgke1VUOyoJVoIaMowqrnzso+JILyMkTs3Vg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kw4OzJxB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7A1EC4CEF7;
+	Tue, 17 Feb 2026 13:30:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771335041;
+	bh=lFvCw1gG47YA8ohMtL+dMOuMfLFj1PNhjD/Mbeay6SU=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Kw4OzJxBSoCXrh57IX+79w9kL83u+j5ODAwbd+1Bmt2HDLW8GIZIcgIbyZw742tnK
+	 q7Z2oJ/zG8F3c/d8kB465f0DIl/hVsROaRv2lMV1JXHyJtLOtEYTnRX7ApF78usgPQ
+	 wUzjnfhGqGJ5hJYQ/7nS8Kj1geEvBKmiOfMbnTrXmy0B1qT4Xup5n8N4I+36cJaw2t
+	 lV72qiYaIIfVkchZW0ji1DGijLadZ3VqyYBt4jxYGRy/2AE3LxtkKrxoybK02VnNZ3
+	 TlLBQnqU3Di78+pafacK8D9WjSp5JE0DIbbhx5GRqmMy03z0yxFyVNIhSXDRE/kRPW
+	 P+g6akM/qr59w==
+From: Konrad Dybcio <konradybcio@kernel.org>
+Subject: [net-next PATCH v3 0/3] Grab IPA IMEM slice through DT
+Date: Tue, 17 Feb 2026 14:30:30 +0100
+Message-Id: <20260217-topic-ipa_imem-v3-0-d6d8ed1dfb67@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <willemdebruijn.kernel.3b597169afaae@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3XM0QqCMBTG8VeRXTdxs03tqveIiLkd80Bzttkox
+ HdvehVUNwf+B77fTAJ4hEAO2Uw8RAzohhTlLiO6V8MVKJrUhBdcFIKXdHIjaoqjuqAFSw10Umq
+ t6hoESaPRQ4fPDTydU/cYJudfmx/Z+v1LRUYL2gojSskbpqvu6ELI7w91087aPB2yipF/KtWXw
+ pMiDVPKNKyt9+yHsizLG5jpQdH5AAAA
+X-Change-ID: 20250523-topic-ipa_imem-def66cca88e5
+To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Alex Elder <elder@kernel.org>
+Cc: Marijn Suijten <marijn.suijten@somainline.org>, 
+ linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
+ Alex Elder <elder@riscstar.com>, 
+ Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
+ Simon Horman <horms@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1771335036; l=1681;
+ i=konrad.dybcio@oss.qualcomm.com; s=20230215; h=from:subject:message-id;
+ bh=lFvCw1gG47YA8ohMtL+dMOuMfLFj1PNhjD/Mbeay6SU=;
+ b=Jr/3+5yKT0LxYX9YFBnxni6rMEaxgFFY3fbA7nB3o0kJAY1oYOsd1/ZdYQhaAo9nsfQ8I/MVX
+ OEKkcQUSTQ7D8TUv43vD+SWDjkBANo3KCwI1o3j6CuLUhxSjcCkmg7y
+X-Developer-Key: i=konrad.dybcio@oss.qualcomm.com; a=ed25519;
+ pk=iclgkYvtl2w05SSXO5EjjSYlhFKsJ+5OSZBjOkQuEms=
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259028-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-259029-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linutronix.de:mid,linutronix.de:dkim]
-X-Rspamd-Queue-Id: E2EEC14C91F
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[konradybcio@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,oss.qualcomm.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0A93114C95C
 X-Rspamd-Action: no action
 
-On 2026-02-16 13:08:43 [-0500], Willem de Bruijn wrote:
-> It will be great to have this additional context in the commit
-> message.
->=20
-> And a Link: to the original discussion thread.
+This adds the necessary driver change to migrate over from
+hardcoded-per-IPA-version-but-varying-per-implementation numbers, while
+unfortunately keeping them in there for backwards compatibility.
 
-Okay.
+The DT changes will be submitted in a separate series, this one is OK
+to merge independently.
 
-> Btw, the commit states that a few drivers already call this from their
-> hard interrupt handler. Can you point to one or two?
+Signed-off-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+---
+Changes in v3:
+- Pick up tags, rebase (effectively a NOP)
+- Add actual binding constraints for modem-tables, drop Alex's r-b
+- Better describe the purpose of this region, as much as I can anyway
+- Link to v2: https://lore.kernel.org/r/20250527-topic-ipa_imem-v2-0-6d1aad91b841@oss.qualcomm.com
 
-- bxcan_tx_isr() -> can_get_echo_skb() -> __can_get_echo_skb() ->
-  skb_tstamp_tx()
+Changes in v2:
+- Actually pass the retrieved data to the target function
+- Re-wrap comments to match net/ style
+- Mention next-next in the mail subjects
+- Pick up tags
+- Link to v1: https://lore.kernel.org/r/20250523-topic-ipa_imem-v1-0-b5d536291c7f@oss.qualcomm.com
 
-- at91_irq() -> at91_irq_tx() -> can_get_echo_skb() -> =E2=80=A6 ->
-  skb_tstamp_tx()
+---
+Konrad Dybcio (3):
+      dt-bindings: sram: qcom,imem: Allow modem-tables subnode
+      dt-bindings: net: qcom,ipa: Add sram property for describing IMEM slice
+      net: ipa: Grab IMEM slice base/size from DTS
 
-- hclge_misc_irq_handle() -> hclge_ptp_clean_tx_hwts() ->
-  skb_tstamp_tx()
+ Documentation/devicetree/bindings/net/qcom,ipa.yaml |  7 +++++++
+ .../devicetree/bindings/sram/qcom,imem.yaml         | 14 ++++++++++++++
+ drivers/net/ipa/ipa_data.h                          |  4 ++++
+ drivers/net/ipa/ipa_mem.c                           | 21 ++++++++++++++++++++-
+ 4 files changed, 45 insertions(+), 1 deletion(-)
+---
+base-commit: 350adaf7fde9fdbd9aeed6d442a9ae90c6a3ab97
+change-id: 20250523-topic-ipa_imem-def66cca88e5
 
-- igc_intr_msi() -> igc_tsync_interrupt() -> igc_ptp_tx_tstamp_event()
-  -> igc_ptp_tx_hwtstamp() -> igc_ptp_tx_reg_to_stamp() ->
-  skb_tstamp_tx()
+Best regards,
+-- 
+Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 
-> If this is only for new drivers, it would be vastly preferable if this
-> can go through net-next.
-
-I found three, I knew about igc. I don't mind net-next but if we keep
-the stable tag, it will be backported anyway, it will just take longer.
-But if we want to do this in order to catch problems with it before it
-hits stable then it makes sense.
-
-Sebastian
 
