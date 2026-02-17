@@ -1,150 +1,352 @@
-Return-Path: <netdev+bounces-259067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259068-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wHklAO6ElGlBFQIAu9opvQ
-	(envelope-from <netdev+bounces-259067-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 16:10:38 +0100
+	id 6EDsEgGFlGlBFQIAu9opvQ
+	(envelope-from <netdev+bounces-259068-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 16:10:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68BEB14D719
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 16:10:37 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A96C214D721
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 16:10:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B95963042D74
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 15:08:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2451B3021732
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 15:10:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DF6B36CDEB;
-	Tue, 17 Feb 2026 15:08:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6555D36CDE2;
+	Tue, 17 Feb 2026 15:10:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="srypdZja"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BqoYNelb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C49224B15;
-	Tue, 17 Feb 2026 15:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771340931; cv=none; b=ob7Elia/XjJ/5P3T6jJzdGAjs9UaPT3hTacTg0iuaUeTG3f5gXuPQuFw3Oo/OXvDQBqvxYghXgLIK1EK0lrjyx1xXjNMLSM39346eLzTq3BNWHPQsjfIln76wgl7C9BYmV8jwbAe7FAmgvbVyRU5I3TUB64TXI9jn39UATs4qQQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771340931; c=relaxed/simple;
-	bh=qUqviPhC+lO0du3PPdFxNHa7+5RLBocFe9qTDdmhvrg=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=CeOjFkJTyLgLCP8lrPsy7jt8tlF0ontXwRPM+A3OpSKqVhEsP2O6OrsxIo+jxSBAPSMZOJhXIHvs/zqmvLnPVgLo4s5kK6CqWbTfnnQ4E6sIxLfI7mmkSyhox0becnfcKbDuV0jDWr5lu3qGM/51eIzGG3Z+juE7l+77DXQBv9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=srypdZja; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74216C4CEF7;
-	Tue, 17 Feb 2026 15:08:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771340930;
-	bh=qUqviPhC+lO0du3PPdFxNHa7+5RLBocFe9qTDdmhvrg=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=srypdZjaxy6DSK2rmNUiDxEVszJLu1m+IzeNxtokBlVgQqT9LxJkljhSwS38hoHMd
-	 rXRkLHc7Fe+ftAPTPfQFZw8gttgus19i+Y8sjueVwOraE+h5Sdo3eYQTd4HnSO7fyi
-	 1gMKgN6hYhXNRGX5eyYVabMNqsRo4vSXpyadPsQ4ispmURf2LldGxZXSpHyqdBLVn2
-	 JGTBNjhWf0wX6BPdtUeX9l3LnN5uXLjz6CEmV9WLD4SATpa3SPv/wFzPPCQDfq9P4b
-	 LWrNNe+mCDE4PehCTWOfHRXizE4ZeROOpSe9u3u/z0p34tJdrpGfAUwkMXse91Olan
-	 XZBfCQ98wxX0w==
-Content-Type: multipart/mixed; boundary="===============8182911979985705380=="
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2CA036AB78;
+	Tue, 17 Feb 2026 15:10:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771341053; cv=fail; b=sVroAguG7T7h30KNZdbEZL5ZL/aajAh2TPSF+pwTXn0NabBi8gCur4tokwPr/OaosN7l51h3FIHoleDjDa9BlfL2XM6t6i+vlWGoAAy5TxNGXjGKKy4iYKqFkrhUVGdO7Iz29ttD13WdXuCSmSlAh1DbFn1wGkSsKo6tbY5CBz8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771341053; c=relaxed/simple;
+	bh=aNsK+yG22F/fe7sn057D7yyWl4LrkeTg3l66ag5C/GI=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Z6EbeGV76GCxAoqIaYu+3PDlJrRBHhsW5lb4qVO0abmZivfIJRnGG7x8wyUHcnbOBfqahYpbRqK1+0dq/dBqJmNx8eKMJHcj/tcIh4ojDpu9BRy1fJatLh5poWHF/9e1+Vz6KV6FKCksDu51P1OHh0YdtQVUz0LUWlH0OMViuE4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BqoYNelb; arc=fail smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1771341052; x=1802877052;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=aNsK+yG22F/fe7sn057D7yyWl4LrkeTg3l66ag5C/GI=;
+  b=BqoYNelb/JvFsObYVkJZz1za8R1ChmS4m0SXkNe6gGW7hAESM2dLurMJ
+   44DL5vnrre9+rAnwoDSGR81/kvpXoGZ+yXR/2d1kg/BcWCmKuqcdQ+0kJ
+   fJAHzmXBXKH8MwW5oZEUvpheLwsZ0VaC2zDelBx1+dFHla0Fu6cFfrJPQ
+   nlPMXG4OwzxfRSNvWApx8rC1oBL9my42fcSwOrWH9gmWLMRF6qQXmI9Uz
+   CI4Y+dbOIf2KHTumw6UDpHbUAd48xtRwzZcmRvbjyPS1X+64N8QtDj0wk
+   gdUtBt5lET1VAfjmDBro4IW8b4ZIZwem7qMH8OIifnXGx2IGoew7oXjY0
+   Q==;
+X-CSE-ConnectionGUID: O0s6UnC7TjSSjzZLOf/dTQ==
+X-CSE-MsgGUID: UGMsZTngSBmlbchYiO9Uaw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11704"; a="83131108"
+X-IronPort-AV: E=Sophos;i="6.21,296,1763452800"; 
+   d="scan'208";a="83131108"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2026 07:10:51 -0800
+X-CSE-ConnectionGUID: 7+xKaTJ+R2uxhZ4TwawBQg==
+X-CSE-MsgGUID: YTONUtceSqms1DPcN34kDw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,296,1763452800"; 
+   d="scan'208";a="242878413"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2026 07:10:50 -0800
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Tue, 17 Feb 2026 07:10:50 -0800
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35 via Frontend Transport; Tue, 17 Feb 2026 07:10:50 -0800
+Received: from PH0PR06CU001.outbound.protection.outlook.com (40.107.208.50) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Tue, 17 Feb 2026 07:10:49 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=UoK5A/tVaDkLRFKNyvV1jXUPDkzo6kmNICsPYCyyrGm1wCmd6lBvSyAFOzn6qHPkaPEA3ToiuUJPPw5AQ3DThbAt2Dp/2H73gxxnSRhgRGevyLC/6kT31zU8tN1XqwLbdKCxMXBHAl8i2/DxOr/IPiLxkgrugsiI+/lwz1BthbcFtKDsubCQFvFQ7AEs3/lSnWRzUzMbDYrdsctMd9+LSfXG2xVpup7yEo4cajsAlEW8OaRoCPGoGQpoqA9jsEZCRBKoQR5nqw8L2mxk8zKeTxEJfGBeCppRHWOUg3IEiKm7BXWa4ap36djrTIR0G670Ad4iDqAzcUb0N/7G2edvog==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tUECKbxfLVShPe5UMD7qWJDr5GoPfGTRH3PgXTW4NW4=;
+ b=gr7JJbmDdIMqhjs92bw/M/RbsPqS82Mi8boSAV//NiJ0OSETVRRMLuH7mT4QiBwdFzZR3rCiufSHs23O0BxyaSyb5DOYfZksq5DjtrwSH9Qzc59HwhZB5nnIZu2ajP3sHxn/nzIsZvDT6RFBBiPPF7DDFEAEsOLTi2HTSLrBMrftjQllIHn7qo31acGXFcwg8e6ptP9qZnUpQOuN9QoZCGgxteGUaVOHC9wEj7guEzHCnvZyZ90GdB/u8iG/ifTbFKi+8egXZp3lltq42u80QY6ml53HxZuEibLtW0rXlSl2hbKYsrfDic7hnYZ84XPDdet037cTlbhvu+SB1Zznag==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by CH3PR11MB7300.namprd11.prod.outlook.com (2603:10b6:610:150::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.13; Tue, 17 Feb
+ 2026 15:10:45 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c%5]) with mapi id 15.20.9611.008; Tue, 17 Feb 2026
+ 15:10:45 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: "Zaremba, Larysa" <larysa.zaremba@intel.com>, "bpf@vger.kernel.org"
+	<bpf@vger.kernel.org>
+CC: Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean
+	<vladimir.oltean@nxp.com>, Wei Fang <wei.fang@nxp.com>, Clark Wang
+	<xiaoning.wang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Nguyen,
+ Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, Alexei Starovoitov <ast@kernel.org>, "Daniel
+ Borkmann" <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev
+	<sdf@fomichev.me>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+	<martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
+	<song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP Singh
+	<kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa
+	<jolsa@kernel.org>, Simon Horman <horms@kernel.org>, Shuah Khan
+	<shuah@kernel.org>, "Lobakin, Aleksander" <aleksander.lobakin@intel.com>,
+	"Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>, "Bastien Curutchet
+ (eBPF Foundation)" <bastien.curutchet@bootlin.com>, "Vyavahare, Tushar"
+	<tushar.vyavahare@intel.com>, Jason Xing <kernelxing@tencent.com>,
+	=?iso-8859-1?Q?Ricardo_B=2E_Marli=E8re?= <rbm@suse.com>, Eelco Chaudron
+	<echaudro@redhat.com>, Lorenzo Bianconi <lorenzo@kernel.org>, "Toke
+ Hoiland-Jorgensen" <toke@redhat.com>, "imx@lists.linux.dev"
+	<imx@lists.linux.dev>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Dragos
+ Tatulea" <dtatulea@nvidia.com>
+Subject: RE: [PATCH bpf v3 1/9] xdp: use modulo operation to calculate XDP
+ frag tailroom
+Thread-Topic: [PATCH bpf v3 1/9] xdp: use modulo operation to calculate XDP
+ frag tailroom
+Thread-Index: AQHcoBT5voqJlm2/pUKrZXpypf8UjrWG/vHA
+Date: Tue, 17 Feb 2026 15:10:45 +0000
+Message-ID: <IA3PR11MB8986E32FECA1E2C5129B8509E56DA@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20260217132450.1936200-1-larysa.zaremba@intel.com>
+ <20260217132450.1936200-2-larysa.zaremba@intel.com>
+In-Reply-To: <20260217132450.1936200-2-larysa.zaremba@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|CH3PR11MB7300:EE_
+x-ms-office365-filtering-correlation-id: 56a6c49d-cc39-4d40-ee62-08de6e36b9d2
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024|7053199007|38070700021;
+x-microsoft-antispam-message-info: =?iso-8859-1?Q?n5lJh3DkW27Mi8Hbk8Vzj14o6S9s37ZMzbwPwqbpGdWg1swUicQGfjSScH?=
+ =?iso-8859-1?Q?HfBNy0j/uymg1WgheQOXntgyXKHqwmAbDneLWwygEe3LRhl0tCS7XgHzAd?=
+ =?iso-8859-1?Q?BmYxTAsE5UsGl0+mrdGfqedXJ8DUmbErLMfHmKy867XISsP+WMHhoXYAgt?=
+ =?iso-8859-1?Q?lXY398xBNXlf/DLe9AhpXebaoJnOiYRJC1LMPjRQ5fvkhBN9aR3buNIIaS?=
+ =?iso-8859-1?Q?mCnbraVbJNntjy6rrbwkhvuWVVF6z620Lf2gx7FNZmn3wpM4+LNiS+Em6D?=
+ =?iso-8859-1?Q?X8/Fck8J5oo2xCUEJSFU2govrwCPIqmYqmS/aJ9MQ5/xhdl7mNrHL0ohGV?=
+ =?iso-8859-1?Q?jA1JOEN2sMf07TUj0HgSFZwerfbJHlpr7s6f/u46+qw74gIPUcfePU942P?=
+ =?iso-8859-1?Q?ADSRu1YbyZYeNlx4g6bjfuaP5WeiZmC31IGW3anDAaE/rK2izUqZt2HV6X?=
+ =?iso-8859-1?Q?fWBct8cCLRASsYTIHA0EfXKS02gMzkojDQkaVdfpH9Z5qJqXxvm7tBSOGD?=
+ =?iso-8859-1?Q?Rvo1fc+n3W8WSq0FWK7/cAu9oIjydMHIdwbZrzAnUq0nmOxONSG9BJRIZS?=
+ =?iso-8859-1?Q?gNEsCs6m/884hOsUwrOj87oH7AG2cuIIu31189gRNGdsfM31VCHG1yDEDt?=
+ =?iso-8859-1?Q?fh+4BouiYixjlQwG8MH8QrJJzS9Se1DNballExWR29M937atjkymBnwh+b?=
+ =?iso-8859-1?Q?YQPANx1uyAcGmLqwFGT3wKn9gCY3/D4wLCBmLnaN71UUdfIA4wOv318X7w?=
+ =?iso-8859-1?Q?iFr4gu1bjKdqYcYDnPQbVzmioXzoSZx3w4rMlM4/om34ZNL+BLn6OjQpKy?=
+ =?iso-8859-1?Q?7OQnaR2wXc6o/Z/fNsk8vnHB9OeBkfPrCqdjRN/ktIESbU7ukwVeATRcZg?=
+ =?iso-8859-1?Q?yr6yDK87HU8q69ki/XVfNxhI5+O0ost6cJ+orAs4YXWXQjjlyTAq8ayqrL?=
+ =?iso-8859-1?Q?bQxYSkcSBt6muCHZ1/B1oDpg9qcrObdKif4yyaf0xbV1aYPCXiCKTxt2h8?=
+ =?iso-8859-1?Q?StoXZ1QNf6KHMFgbNVtIP9+uwXeT9nojo+kx+6+kBqg9NiD0RijLQm4cJS?=
+ =?iso-8859-1?Q?pSP5cq2f6zk5AXvJO7RV+OZUC988m6PKMM0xEXfEXqittQ8otLmtzPCZ0U?=
+ =?iso-8859-1?Q?VHIPUYY8ahs/KKMRwQmugGG+Q6gh23pfripICG9hhIKc/yTzTOytS9t0Cx?=
+ =?iso-8859-1?Q?wClpUHtTA6QOemkg+cO1l1CGhuCwc53MFotFzWQAgV1y9A3Y/zdrpHE/am?=
+ =?iso-8859-1?Q?NjS3Mum6NYt5EK7vwotWxCGf/F6JgRcjUS1TInHwrCvCZA+Mh0QQBQIkjO?=
+ =?iso-8859-1?Q?P0ilRW0h2BGxqQFa9DLYxQbDjPMXAjHFLBSVNHTnOGeho0JEaR1fKI/evM?=
+ =?iso-8859-1?Q?XDqgznB8rxXfMd5YMAwdUmyMXgEcN9cWYifqApFtlMhSjBpy7ATxcYhniv?=
+ =?iso-8859-1?Q?z+IflQE0TF7kyW8EPjDTjupau9yxpznYNS/3Re5j/VvxS3eT4EO/BociVx?=
+ =?iso-8859-1?Q?90z8jBofG1Jh19yeg6MopbR9VZz4/d3bcmkcR5fkOcgmqEnwZXdRWv5Kmd?=
+ =?iso-8859-1?Q?NouYvmrlCGSiQvCkaY2888cdlTcjCU2R6OYj9993O1G3T5OK8pqrKOkQGd?=
+ =?iso-8859-1?Q?oX95DsBPrfw9xXRbWdVsWsc1tVT+TgYrl0XH5VFOoD7LipH/jB2qRbwZMh?=
+ =?iso-8859-1?Q?wV9zhqckeCzdkAGYDjw=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(7053199007)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?UorK7wz2Y6uZAA0B+wA5vZXczEKzPi8SfFovmcBN2945WWwTMzO/DkwY5q?=
+ =?iso-8859-1?Q?WsgqlGLSw54/dWLJo+Zj6+mkxV4m7a8ScnVs4dPa2oMXm/i9z2ed6yYVZ/?=
+ =?iso-8859-1?Q?snPEI4ngiU/CeG12g7QMDWIaZGKuHw00lHBOrBlVif8B7S/Z1PYxjciPc+?=
+ =?iso-8859-1?Q?LvcSz/Z0REwY1b/5gk5rL80yCu72lA9FbC6qulABGKHp+dXiy8X3zV90X4?=
+ =?iso-8859-1?Q?LiviWA8iIEfemTBod9le3psKr/cqUeN3/1lISjm2JFrhUdVLBn45AroVep?=
+ =?iso-8859-1?Q?JtKspYSQAKuPp9TT+lj+7d44FvCZAZ70JUN6C/rMuoUMbyBAbG19QrQ7Ks?=
+ =?iso-8859-1?Q?D4OTG9HRlqBitJCZKmkxuwuzB34zPDWzKUmFcCY4Ltkq9r++KJrFE4VVCY?=
+ =?iso-8859-1?Q?b4VbbiKJYlH86egvlAbVAUkqd3q2w0MOxMVG9F5nEWmOw5t2LY09MzBGjI?=
+ =?iso-8859-1?Q?ZtJQ/ZNWQxxQoO9hz8VODBCl2uUh6LB2L6jmhRh/5QixYWi9xB94W39Tmf?=
+ =?iso-8859-1?Q?CH5LCCD7Tcv3/PDzUqrlzDKDpm9X0awsdD4YM6itkoCJZmnTnVOyFYy6+t?=
+ =?iso-8859-1?Q?7BWsXa334uxPxzbVj6uanImSsThTMBtvVeKgCLnwmOCcffbAj/bPSnqEtr?=
+ =?iso-8859-1?Q?qWLPxjzIGiBe907rEncmRav+PoseUT3o6IHR0Z7RIElJqlHxQNZ6mHxur3?=
+ =?iso-8859-1?Q?a7cqZPYPwidZA5M+G2KIT5W1op6ka+3P0oe+VdAgeI8QMYaxFKpu7pA+Jt?=
+ =?iso-8859-1?Q?JQGXQH+6B2V2u7Ot8smqum09o1NN5ooEabnBU2XjcFDvJ0Rel7Yn2joM0J?=
+ =?iso-8859-1?Q?dpV4NblXzvSgVKs7tkrr1BEoau5q0nKTyYWxnbk9Q43c2oBD2YWLr70pQQ?=
+ =?iso-8859-1?Q?bSPodQ97QUTwbT//OUp7KtPdBPtAA11L1GYIBSF9IdF885ylPF8Lg7s/mg?=
+ =?iso-8859-1?Q?VjdmSxtDaTf3kvxD6tRxrcYUV8+KD+pag5AOciMtpE5hZgd+FcCB6epGFi?=
+ =?iso-8859-1?Q?RND1pujFB9Hxu+YaF75u6l8uPfKPm2vVdwiph+nhAS3167c8nfo6EqHEjI?=
+ =?iso-8859-1?Q?cmq9AyWVmYdOIK6cD+GuKoTl1CBZyP4XujoGR7HDnlTJGOlrx2HQ5y0K9U?=
+ =?iso-8859-1?Q?MLQ0geSBBedkjjZR6mepKgEPJ1RFfprpdL6fW40qW3oZ7A+/PklC6sLhLZ?=
+ =?iso-8859-1?Q?w12bDd70TFbCiZ8ZgCyCIyVgoH5Xl3bx6VjZvKEtiXg3Q36DgH7XCtRwYY?=
+ =?iso-8859-1?Q?+5hPtIm+TNUQodxcUyc4si/faV9TZPM3bvSzs9PflhPl8k94bWCQF2doI4?=
+ =?iso-8859-1?Q?JlAMHmm6HhK06YKbePBkdKctNLbSelR3Os1RhRJaSoySH5yo20nFcxhOKI?=
+ =?iso-8859-1?Q?Gjaf+ak7UlzsTMJvEmWdkbt2G4xBzkk62r4bWf5P48nxyshg8Kzv8pIXRI?=
+ =?iso-8859-1?Q?BpbNoPt+h7UtIEA0lMxFalVWxIpznmG0BY35SVfJWRkBmA2AdLN9Sir3D5?=
+ =?iso-8859-1?Q?uCn44yfh2Z/xZ2VbTGXDnWLGLEPysOYhPUJwQ+kWzTrTr45ldZu/3aDzlJ?=
+ =?iso-8859-1?Q?6wV7H9dp7GcYaY6jBKBnGyBCA1thYLllgOansJJaCmrnn0WVXqk8bwjmj8?=
+ =?iso-8859-1?Q?28jlH4xojuefITYq7rX2S1dsFkekmGEbFT6szDmAYuUxdy7vh06R9eX1Hq?=
+ =?iso-8859-1?Q?TTLc86XNiJjRLGVnTuS2uCDLj7AN7SPn/K8Z7D30NzuNSW4namA8TXc97u?=
+ =?iso-8859-1?Q?9Wv1xRw1RCPWBZoIi6F/spYObf0/XvHYjm5ZHH1a1a7nnyk2s9ZUdOEyI6?=
+ =?iso-8859-1?Q?OCrJelS0FgN6DBKHpe2L9Ml3cxYHEn4=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <19800f868f20c395527ee8a9a7af3ef09991109715686acb92c08b20d2dfef04@mail.kernel.org>
-In-Reply-To: <a44f6bff92b7f2d0f86c10214c2e861164e52a03.1771338602.git.anandkumarshaw@users.noreply.github.com>
-References: <a44f6bff92b7f2d0f86c10214c2e861164e52a03.1771338602.git.anandkumarshaw@users.noreply.github.com>
-Subject: Re: [PATCH 2/2] bpf: report queue_index to xdp_rxq_info in cpumap and devmap
-From: bot+bpf-ci@kernel.org
-To: anandkrshawheritage@gmail.com,bpf@vger.kernel.org,netdev@vger.kernel.org
-Cc: ast@kernel.org,daniel@iogearbox.net,hawk@kernel.org,john.fastabend@gmail.com,davem@davemloft.net,kuba@kernel.org,sdf@fomichev.me,edumazet@google.com,pabeni@redhat.com,horms@kernel.org,andrii@kernel.org,martin.lau@linux.dev,eddyz87@gmail.com,song@kernel.org,yonghong.song@linux.dev,kpsingh@kernel.org,haoluo@google.com,jolsa@kernel.org,linux-kernel@vger.kernel.org,anandkrshawheritage@gmail.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Tue, 17 Feb 2026 15:08:50 +0000 (UTC)
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 56a6c49d-cc39-4d40-ee62-08de6e36b9d2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Feb 2026 15:10:45.7485
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 3z8fyGgvPq7Yg8J1wtgMMx7+9aOz/SrdQ5i7wl8rg2vLw6451uPoGYtXqFkWw5x8LseOOApV3nhjQkSoRePAMZzNeFntxLFeQUSQfnzkRMw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7300
+X-OriginatorOrg: intel.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	CTYPE_MIXED_BOGUS(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+,1:+];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,gmail.com,davemloft.net,fomichev.me,google.com,redhat.com,linux.dev,vger.kernel.org,meta.com];
-	TAGGED_FROM(0.00)[bounces-259067-lists,netdev=lfdr.de,bpf-ci];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[43];
+	TAGGED_FROM(0.00)[bounces-259068-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[31];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,intel.com,iogearbox.net,gmail.com,fomichev.me,linux.dev,bootlin.com,tencent.com,suse.com,lists.linux.dev,vger.kernel.org,lists.osuosl.org,nvidia.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[rxq.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.kernel.org:mid]
-X-Rspamd-Queue-Id: 68BEB14D719
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: A96C214D721
 X-Rspamd-Action: no action
 
---===============8182911979985705380==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-> diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
-> --- a/kernel/bpf/cpumap.c
-> +++ b/kernel/bpf/cpumap.c
-> @@ -195,7 +195,7 @@ struct xdp_rxq_info rxq = {};
->
->  		rxq.dev = xdpf->dev_rx;
->  		rxq.mem.type = xdpf->mem_type;
-> -		/* TODO: report queue_index to xdp_rxq_info */
-> +		rxq.queue_index = xdpf->queue_index;
-
-This approach of adding queue_index to struct xdp_frame was previously
-submitted by Lorenzo Bianconi and discussed in January 2026 when
-saiaunghlyanhtet posted the same change (v1 through v3).
-
-Toke Hoiland-Jorgensen pointed out the earlier submission was rejected
-because adding fields to xdp_frame ad-hoc was not the preferred
-direction:
-
-https://lore.kernel.org/bpf/87h5so1n49.fsf@toke.dk/
-
-Jesper Dangaard Brouer (XDP maintainer) further noted that queue_index
-is not the most interesting metadata to propagate through cpumap, and
-pointed to his RX hints series as the proper mechanism for restoring
-metadata lost during XDP redirect:
-
-https://lore.kernel.org/bpf/dcad6dc7-b152-4511-becf-9e7721996f6a@kernel.org/
-
-Has the design concern about ad-hoc xdp_frame field additions been
-resolved since January, or should this wait for the RX hints
-infrastructure?
-
-> diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
-
-[ ... ]
 
 
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+> -----Original Message-----
+> From: Zaremba, Larysa <larysa.zaremba@intel.com>
+> Sent: Tuesday, February 17, 2026 2:25 PM
+> To: bpf@vger.kernel.org
+> Cc: Zaremba, Larysa <larysa.zaremba@intel.com>; Claudiu Manoil
+> <claudiu.manoil@nxp.com>; Vladimir Oltean <vladimir.oltean@nxp.com>;
+> Wei Fang <wei.fang@nxp.com>; Clark Wang <xiaoning.wang@nxp.com>;
+> Andrew Lunn <andrew+netdev@lunn.ch>; David S. Miller
+> <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
+> Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Nguyen,
+> Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; Alexei Starovoitov <ast@kernel.org>;
+> Daniel Borkmann <daniel@iogearbox.net>; Jesper Dangaard Brouer
+> <hawk@kernel.org>; John Fastabend <john.fastabend@gmail.com>;
+> Stanislav Fomichev <sdf@fomichev.me>; Andrii Nakryiko
+> <andrii@kernel.org>; Martin KaFai Lau <martin.lau@linux.dev>; Eduard
+> Zingerman <eddyz87@gmail.com>; Song Liu <song@kernel.org>; Yonghong
+> Song <yonghong.song@linux.dev>; KP Singh <kpsingh@kernel.org>; Hao Luo
+> <haoluo@google.com>; Jiri Olsa <jolsa@kernel.org>; Simon Horman
+> <horms@kernel.org>; Shuah Khan <shuah@kernel.org>; Lobakin, Aleksander
+> <aleksander.lobakin@intel.com>; Fijalkowski, Maciej
+> <maciej.fijalkowski@intel.com>; Bastien Curutchet (eBPF Foundation)
+> <bastien.curutchet@bootlin.com>; Vyavahare, Tushar
+> <tushar.vyavahare@intel.com>; Jason Xing <kernelxing@tencent.com>;
+> Ricardo B. Marli=E8re <rbm@suse.com>; Eelco Chaudron
+> <echaudro@redhat.com>; Lorenzo Bianconi <lorenzo@kernel.org>; Toke
+> Hoiland-Jorgensen <toke@redhat.com>; imx@lists.linux.dev;
+> netdev@vger.kernel.org; linux-kernel@vger.kernel.org; intel-wired-
+> lan@lists.osuosl.org; linux-kselftest@vger.kernel.org; Loktionov,
+> Aleksandr <aleksandr.loktionov@intel.com>; Dragos Tatulea
+> <dtatulea@nvidia.com>
+> Subject: [PATCH bpf v3 1/9] xdp: use modulo operation to calculate XDP
+> frag tailroom
+>=20
+> The current formula for calculating XDP tailroom in mbuf packets works
+> only if each frag has its own page (if rxq->frag_size is PAGE_SIZE),
+> this defeats the purpose of the parameter overall and without any
+> indication leads to negative calculated tailroom on at least half of
+> frags, if shared pages are used.
+>=20
+> There are not many drivers that set rxq->frag_size. Among them:
+> * i40e and enetc always split page uniformly between frags, use shared
+>   pages
+> * ice uses page_pool frags via libeth, those are power-of-2 and
+> uniformly
+>   distributed across page
+> * idpf has variable frag_size with XDP on, so current API is not
+> applicable
+> * mlx5, mtk and mvneta use PAGE_SIZE or 0 as frag_size for page_pool
+>=20
+> As for AF_XDP ZC, only ice, i40e and idpf declare frag_size for it.
+> Modulo operation yields good results for aligned chunks, they are all
+> power-of-2, between 2K and PAGE_SIZE. Formula without modulo fails
+> when chunk_size is 2K. Buffers in unaligned mode are not distributed
+> uniformly, so modulo operation would not work.
+>=20
+> To accommodate unaligned buffers, we could define frag_size as data +
+> tailroom, and hence do not subtract offset when calculating tailroom,
+> but this would necessitate more changes in the drivers.
+>=20
+> Define rxq->frag_size as an even portion of a page that fully belongs
+> to a single frag. When calculating tailroom, locate the data start
+> within such portion by performing a modulo operation on page offset.
+>=20
+> Fixes: bf25146a5595 ("bpf: add frags support to the
+> bpf_xdp_adjust_tail() API")
+> Acked-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> ---
+>  net/core/filter.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/net/core/filter.c b/net/core/filter.c index
+> ba019ded773d..5f5489665c58 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -4156,7 +4156,8 @@ static int bpf_xdp_frags_increase_tail(struct
+> xdp_buff *xdp, int offset)
+>  	if (!rxq->frag_size || rxq->frag_size > xdp->frame_sz)
+>  		return -EOPNOTSUPP;
+>=20
+> -	tailroom =3D rxq->frag_size - skb_frag_size(frag) -
+> skb_frag_off(frag);
+> +	tailroom =3D rxq->frag_size - skb_frag_size(frag) -
+> +		   skb_frag_off(frag) % rxq->frag_size;
+>  	if (unlikely(offset > tailroom))
+>  		return -EINVAL;
+>=20
+> --
+> 2.52.0
 
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/22103049906
-
-AI-authorship-score: medium
-AI-authorship-explanation: Polished commit messages and cover letter with precise technical details for an apparent first-time contributor resubmitting a recently rejected approach suggest possible AI assistance, though the code itself is too simple to determine.
-issues-found: 1
-issue-severity-score: low
-issue-severity-explanation: Unaddressed design concern from XDP maintainer about ad-hoc xdp_frame field additions; the code itself is correct but the approach was previously rejected.
-
---===============8182911979985705380==--
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
