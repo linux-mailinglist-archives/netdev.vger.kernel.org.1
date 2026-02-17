@@ -1,136 +1,186 @@
-Return-Path: <netdev+bounces-259073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259074-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SBWuKxiLlGnTFQIAu9opvQ
-	(envelope-from <netdev+bounces-259073-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 16:36:56 +0100
+	id SPy7GC+LlGnTFQIAu9opvQ
+	(envelope-from <netdev+bounces-259074-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 16:37:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F2CF14D9EF
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 16:36:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB2C714DA04
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 16:37:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BAFAA3019827
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 15:36:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7247C301992F
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 15:37:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2352833509F;
-	Tue, 17 Feb 2026 15:36:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABBC236B05F;
+	Tue, 17 Feb 2026 15:37:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="j9hYjGdR";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="05Wgg74O"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IYucySqW"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2D4A36923F
-	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 15:36:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D9735D5E2
+	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 15:37:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771342614; cv=none; b=JNLEc5dyyzy3zzdHnCO0wwKf8YQ6sC2q5k1t6bMj4LYdxab3ow6Bmts98f1cOogmq1OyplGbxQ7gdSNloC2EHpFHQfrHx1AI+p3QrHfwrbu0jKlCHp7Bn/Rn9GvvqcyevPXy5Au1RmqlxI/Y6gxWlYLmSJkXi1IbgcwJerNOeYY=
+	t=1771342625; cv=none; b=Cs8l0Hku8o97i5ZqefRc363qG2vL7J9uk0Bu32ZSWliJ+PQWDN42s51XxXPPK80gG3xX4dvSTqMp/Ednoz/ITvbTp18lwkM1P08RaybGZNL/h/9YrjFFs4eS0M1H4i/CFVHuLpdwU/ed7nxnm+nYTyUUHHsaNbX3toFkGZeQLB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771342614; c=relaxed/simple;
-	bh=CUGPqxftphH1B2oNAPSzfpqmx09sO4Dkf5L6AOrA8gg=;
+	s=arc-20240116; t=1771342625; c=relaxed/simple;
+	bh=+hQqWLubS7KMSAh2xl7ApuJordRXcLSUhTiJ+0dEOyY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=te8my8pUxheh8YFMuUClI41LJk17vHlsw8cla1NeUXI0EK1Mk2MijJlCWf/zxh2BIX+aG4ATmWS5bPSVaZTN2mStcTuO3btR21jwkYiblONEP1VwhwRBRBX93MYvKUKqxKVQr+HcC2Rnl3tKeAsRlK4l4/zsaxZqxFtm32sLTBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=j9hYjGdR; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=05Wgg74O; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Tue, 17 Feb 2026 16:36:50 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1771342611;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=H6rxBWCbGVE2uNOdzdIFGI2cWHxiqCTDkKQY/fKY0oQ=;
-	b=j9hYjGdRMcwAfxgxNqZdH381dJjk5t3P1y+qmwxIaSE4hE7DhIsiVXQpbNgkAACdxhTon/
-	njOp0OKy/XAoXkYZKcrZNNMVaSP8kGNnv6VUA9z7xhHRtKGs+VX72oB6Xw0Aeo5nrzWF5g
-	vfvcLw1G78zyhvMorNxkdPGck1ZAJQZ2vLABPQVLnTHDjwgi1De98okC5aYgrO5/Il7XdV
-	pVlQANhJorTYkxEA2pzDPj58xAc+mfkwq2p2kbQV32yuj2Z3t7fQq1ApnzBPvhd4ABoG+f
-	nXzhDLfxR2i/zXGRPr34D71uU9ZcMyzuV5phva6cJM4WgbdISdxFDv/M8Ma/oA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1771342611;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=H6rxBWCbGVE2uNOdzdIFGI2cWHxiqCTDkKQY/fKY0oQ=;
-	b=05Wgg74OkmPnpduDxUdMqZTFzyZq4I6ebYSUW/YWCgJ/0OUbeV1kn7wBdTs3Oo2Sii651L
-	nHhyTBk7VPItLfDw==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Felix Maurer <fmaurer@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH RFC net-next 1/2] hsr: Allow to send a specific port and
- with HSR header
-Message-ID: <20260217153650.MQtAZ8Jz@linutronix.de>
-References: <20260204-hsr_ptp-v1-0-b421c69a77da@linutronix.de>
- <20260204-hsr_ptp-v1-1-b421c69a77da@linutronix.de>
- <willemdebruijn.kernel.2d4b5c08dd442@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pKkKRr22SAoC/oFmH9XPxwyT099FXXN/0Odggka0OFXDK5DguQZezXs3IouibVdlcLUic0pku/0xezvkQ5y3h3W/pfkJjgruXjFcry2KX0cETLyHe9/NxjQUrQnz7ALp0YTRAce0Wmj8A7sI4hTm4P4/b/4KVsNUT0FVtJ3ty9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IYucySqW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BCDBC4CEF7;
+	Tue, 17 Feb 2026 15:37:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771342625;
+	bh=+hQqWLubS7KMSAh2xl7ApuJordRXcLSUhTiJ+0dEOyY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IYucySqW6hhApWavBUynAzTlgIjd/KZXB9tNd0H9Hugk0GOxuVIeygSC0dnm5y/RO
+	 0ursXBDrDNXT8rwbdXcsPIq9g9g9clF1cyknHPs9KbF7MFHEsv20uMq+ot2WmfvGMZ
+	 YSOwaH26NeBWttjqIhAjWWKkQUI0dzO28/AmMdCZ7HxqlSr1p7HzaXw/o3BovI6Yk5
+	 QQ1kDqetejWokHzA4kcxBnwFMK4AnFNsNPRfBjqWejHZzxsnyO/heYod1t6HihGHSa
+	 w/jbPi8EWQFu38p/eC9fZUbdm7n3nhRsq/+fPCSXjCSnFUvfeJix3ahUJt8R9PHO4T
+	 yVxHbL45FMPSw==
+Date: Tue, 17 Feb 2026 15:37:01 +0000
+From: Simon Horman <horms@kernel.org>
+To: Hyunwoo Kim <imv4bel@gmail.com>
+Cc: john.fastabend@gmail.com, kuba@kernel.org, sd@queasysnail.net,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH] net: tls: Use disable_delayed_work_sync() instead of
+ cancel_delayed_work_sync() in tls_sw_cancel_work_tx()
+Message-ID: <aZSLHaFj7k8DPmLG@horms.kernel.org>
+References: <aZLotq3aZY0b-dI8@v4bel>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <willemdebruijn.kernel.2d4b5c08dd442@gmail.com>
+In-Reply-To: <aZLotq3aZY0b-dI8@v4bel>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-259074-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259073-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,queasysnail.net,davemloft.net,google.com,redhat.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0F2CF14D9EF
+X-Rspamd-Queue-Id: BB2C714DA04
 X-Rspamd-Action: no action
 
-On 2026-02-04 12:30:47 [-0500], Willem de Bruijn wrote:
-> > --- a/include/linux/skbuff.h
-> > +++ b/include/linux/skbuff.h
-> > @@ -605,6 +605,7 @@ struct skb_shared_info {
-> >  	};
-> >  	unsigned int	gso_type;
-> >  	u32		tskey;
-> > +	u32		hsr_ptp;
+On Mon, Feb 16, 2026 at 06:51:50PM +0900, Hyunwoo Kim wrote:
+> After cancel_delayed_work_sync() is called from tls_sk_proto_close(), 
+> tx_work_handler() can still be scheduled from paths such as the 
+> Delayed ACK handler or ksoftirqd.
+> As a result, the tx_work_handler() worker may dereference a freed 
+> TLS object.
 > 
-> skb_shared_info cannot easily be expanded.
+> To prevent this race condition, cancel_delayed_work_sync() is 
+> replaced with disable_delayed_work_sync().
 > 
-> This is too specific a use-case to warrant fields in every packet.
-> 
-> I'm not super familiar with High-availability Seamless Redundancy
-> (HSR). Perhaps you can use either an skb_extension. Or the skb->cb[]
-> field if this data is only needed within the HSR protocol logic, so
-> can be assured to not be overwritten by other users of the control
-> block.
+> Fixes: f87e62d45e51 ("net/tls: remove close callback sock unlock/lock around TX work flush")
+> Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
 
-Okay, will look into this.
+Hi Hyunwoo,
 
-Sebastian
+Thanks for your patch(es).
+
+Some feedback on process from my side.
+You can read more about that at
+https://docs.kernel.org/process/maintainer-netdev.html
+
+* I think it would be good to mention how this problem was found.
+
+* As a bug fix for code present in the net tree, it should be targeted
+  at that tree like this.
+
+  Subject: [PATCH net]: ...
+
+* Looking over git history, it seems that an appropriate prefix
+  for patches for this code is 'tls: '
+
+  Subject [PATCH net]: tls: ...
+
+* Also, please try to make the subject a bit more succinct
+
+> ---
+>  net/tls/tls_sw.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+> index 9937d4c810f2..b1fa62de9dab 100644
+> --- a/net/tls/tls_sw.c
+> +++ b/net/tls/tls_sw.c
+> @@ -2533,7 +2533,7 @@ void tls_sw_cancel_work_tx(struct tls_context *tls_ctx)
+>  
+>  	set_bit(BIT_TX_CLOSING, &ctx->tx_bitmask);
+>  	set_bit(BIT_TX_SCHEDULED, &ctx->tx_bitmask);
+> -	cancel_delayed_work_sync(&ctx->tx_work.work);
+> +	disable_delayed_work_sync(&ctx->tx_work.work);
+>  }
+>  
+>  void tls_sw_release_resources_tx(struct sock *sk)
+> -- 
+> 2.43.0
+> ---
+> 
+> Dear,
+> 
+> The following is a simplified scenario illustrating how each race can occur. Since tls_sw_cancel_work_tx() does not hold lock_sock(), it can race with tls_write_space().
+> ```
+>           cpu0                                             cpu1
+> 
+> tls_sk_proto_close()
+>   tls_sw_cancel_work_tx()
+>                                                     tls_write_space()
+>                                                       tls_sw_write_space()
+>                                                       if (!test_and_set_bit(BIT_TX_SCHEDULED, &tx_ctx->tx_bitmask))
+>     set_bit(BIT_TX_SCHEDULED, &ctx->tx_bitmask);
+>     cancel_delayed_work_sync(&ctx->tx_work.work);
+>                                                       schedule_delayed_work(&tx_ctx->tx_work.work, 0);
+> ```
+
+I think that the text above would be best included in the patch description.
+At least for me it is fundamental to understanding the problem.
+
+> 
+> Best regards,
+> Hyunwoo Kim
+> 
+
+I see three similar patches on the mailing list.
+The comments above go for them too.
+And It would probably be useful to just handle one at a time,
+to allow for proper feedback. Or bundle them in a patchset.
+
+-- 
+pw-bot: changes-requested
 
