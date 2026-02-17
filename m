@@ -1,318 +1,234 @@
-Return-Path: <netdev+bounces-259104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259105-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oMIUEKWclGmrFwIAu9opvQ
-	(envelope-from <netdev+bounces-259104-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 17:51:49 +0100
+	id kDeoCAidlGmrFwIAu9opvQ
+	(envelope-from <netdev+bounces-259105-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 17:53:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BD0014E699
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 17:51:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F9E814E6B8
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 17:53:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B73BA3018AD6
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 16:51:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 199AA302295D
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 16:53:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E129B36E48D;
-	Tue, 17 Feb 2026 16:51:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CEFA36E483;
+	Tue, 17 Feb 2026 16:53:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="e9KywhR5";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="VdzV/iiD"
+	dkim=pass (2048-bit key) header.d=web.de header.i=spasswolf@web.de header.b="JBBaHXfT"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b8-smtp.messagingengine.com (fout-b8-smtp.messagingengine.com [202.12.124.151])
+Received: from mout.web.de (mout.web.de [212.227.17.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B23B21D5B0;
-	Tue, 17 Feb 2026 16:51:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B386521D5B0;
+	Tue, 17 Feb 2026 16:53:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771347105; cv=none; b=dFnxdw0XlURdFthn4rxFqayax0c06LzcNF18kc8KYOb4mWEVGC8gHtYrFjum+ch87WpVeWix8smF4Vsvo6BulT6qRkg1AwR0xrlmZakNzT6OejzH0+0B/NJaYYekE6pC2lsSXNhnysUnD7JZRfAdTvSBEZASpHEvJRLADB3tNiI=
+	t=1771347205; cv=none; b=P1J2Z3uB+CCebremXyB7kaBG5oS95u8q4GjfRl5CulV44IdqKeCl6/gF9K/m+6sj0kr6ViAKXY6dbvkQp05Tq43ql5rsFFlVod7I6Avd4VOq24PqYeBBDRYG6WJfy8sOYuYLTdzSlcEpFYS2N2NHO6WOSd882evOxWfJWo+0JnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771347105; c=relaxed/simple;
-	bh=BSi3S2dZEPzNzAFDEVV13PQ53p7wkd2tpUn0QpbhpSw=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=RdvNRG/eiGNkmugd0eNF9jftUZvldjRi8m7WCDSO7g7hlbdPPmXA+Y/yBvtS4HRqMrcKoBLp4mLf4QfToHylTzm7LJr4H5buG1PlB5G1gxgru5kaE/rGCZ35PTOK73cVtdnXY4XnZXjQceZKprddbzP73wCZHUkL26FTuylONg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=e9KywhR5; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=VdzV/iiD; arc=none smtp.client-ip=202.12.124.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.im
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfout.stl.internal (Postfix) with ESMTP id 229831D00067;
-	Tue, 17 Feb 2026 11:51:41 -0500 (EST)
-Received: from phl-imap-13 ([10.202.2.103])
-  by phl-compute-10.internal (MEProxy); Tue, 17 Feb 2026 11:51:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1771347100;
-	 x=1771433500; bh=gTmXdQ6x0zAJ455xiBa36oRFZfaGcb1DbTWyp/DHGRg=; b=
-	e9KywhR5y2hxP/dm/IgwOhcv417kvQQrmOKx/MQxuaLdheeME9ALh0xKeLHUJQrx
-	jO+jB46bjoobaTPA+Q0DizuWsgESjwfJ32UntKGojc+NsenzB06JRDrA5rWEeQIM
-	jnVrLcBhIH7/EzMcJGo1N2sbFjKRzNjI/w8OUpf5vXo0ieXgPwmS4UhtL+pQijJy
-	QEUIbYZXwx590dvrvFPEEoyGVdEFZMcdZ2bKjM1iGFLybOxxS6WMlFFvzBJRRKPc
-	icCcphvmDcMoT1WWtqWrx0gtMuIhAD/POPcDMUdLbUOh8E+QmpstnXf/sSdkoQsH
-	SLzvomH9h/TStIxGnkGUuA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1771347100; x=
-	1771433500; bh=gTmXdQ6x0zAJ455xiBa36oRFZfaGcb1DbTWyp/DHGRg=; b=V
-	dzV/iiDWvatJURxZtyxnn+yfu+SRtp5d1R71dVukwhWvkRA/UOA6yWffz6C5ADA5
-	5tcoIcUusuE2QjdkouMUJMWj3Uoq3dyFOPiaBpaXMr9xfwlG1CDKLTamEM8+1Xg/
-	ovYbbGal6KLclCeVve444sRiaN11LS8ZCsibRHfF/4rtCKu1GZyGcqGO9gyM3Fbl
-	b01biSpgibxTdS/tEqMoW1DHuNwdhVCIQ0vd2/y0lL8eOrnpLle1WNWWn9FbfYdR
-	9QdUZCRMpftLvOH0cnxD3cFdx428jnI1AoMZ5+o2GHlaPhauNlJyUd1KLcgduPlZ
-	ZnzyEO+5bvN5EuMEKgjcg==
-X-ME-Sender: <xms:nJyUaa-fmgw6d0RsUFRcDnp4OqgMrVxamKC2k8uJnOUJkVxd3a6G8w>
-    <xme:nJyUaVgLMByj6_0uWENMEi_hubN4BSrt79oyXejyAhKHztOyApgEBEiLfdf12Oy-X
-    P6glCMwlZ5lTsRlzzlrSXGoqTVGTb1YVbs9kd2xCOJ78DmfachpDjzF>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvvddtvdelucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehlihgt
-    vgcuofhikhhithihrghnshhkrgdfuceorghlihgtvgdrkhgvrhhnvghlsehfrghsthhmrg
-    hilhdrihhmqeenucggtffrrghtthgvrhhnpefhgfevgeeljeegleeiffduheegieehtdff
-    tdetvdffieelkedthfejleejgfeftdenucffohhmrghinhepkhgvrhhnvghlrdhorhhgne
-    cuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghlihgt
-    vgdrkhgvrhhnvghlsehfrghsthhmrghilhdrihhmpdhnsggprhgtphhtthhopedvfedpmh
-    houggvpehsmhhtphhouhhtpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdr
-    nhgvthdprhgtphhtthhopegufiesuggrvhhiugifvghirdhukhdprhgtphhtthhopehjoh
-    hhnhdrfhgrshhtrggsvghnugesghhmrghilhdrtghomhdprhgtphhtthhopegvughumhgr
-    iigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepuggrnhhivghlsehiohhgvggrrh
-    gsohigrdhnvghtpdhrtghpthhtoheprghlihgtvgesihhsohhvrghlvghnthdrtghomhdp
-    rhgtphhtthhopegrshhtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehhrgifkheskh
-    gvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:nJyUaT-B8aqYlapHkcRqNFMuvR6rIYbffH0sG4OTLYQQ_8XWBvPjNw>
-    <xmx:nJyUaUmVV40_RWITVWiyQ8kHZego9PaMGCiAHON-Rj-V4OAxmqx08A>
-    <xmx:nJyUaek24iPNytAhqpQNY26E--BOxVEAbq127U6TpOc9xvbpJb5ETA>
-    <xmx:nJyUaRiHFT5d9u5zqinZB-_jISVazcKyrhUmlPK8KTLlq9_N0dHs_w>
-    <xmx:nJyUaZ4HSzRzH76kH1UENPYBaqRZbEwgWq22ws5JRLn8Z70DJfJ6Pf57>
-Feedback-ID: i559e4809:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 1810533E0099; Tue, 17 Feb 2026 11:51:40 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1771347205; c=relaxed/simple;
+	bh=DTUjvtxX3VM9Ywdq+F5DETu+4ooD7bS3SOw1o22oDpE=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Tedxd2BCFQ5U00IDbCFyjIhoU04J4kxmeDc9qjwNWR/LHWBjTSX5mgdgrwWiQh+/akvxrBW0fOcQrmQkdtC2a2KbjxYY1pgyqpfc3g3FIDwO0VMUwcUH4YfMeR1NZv5IUs5DJEyp6h7wJU8koDX/vEgD4bo3dQykk2v3Kwy+0Y0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=spasswolf@web.de header.b=JBBaHXfT; arc=none smtp.client-ip=212.227.17.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1771347169; x=1771951969; i=spasswolf@web.de;
+	bh=6B6bjmA2LWx4EtNJZvRrdS+2jf9wBb4Vg2X94UdrU2s=;
+	h=X-UI-Sender-Class:Message-ID:Subject:From:To:Cc:Date:In-Reply-To:
+	 References:Content-Type:MIME-Version:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=JBBaHXfTZ6MckhcYpD3jqGdJO1kYS111olGXHf0+C1KMAZZ0rO8z1u94Ybb7rfNg
+	 xi7Ii+Jd6jWvrBDSS5otPvdG4LmAlZ72MM2bo4TGbIOcpRQxr33UNlHNovxNi7gdi
+	 76/FHwmaROyLeVm2fsfFEF4+f+RFgvjthodrUQZmq3HkqDD4ezSvvq0LaZ0yOQ8as
+	 90gogjeAq3cBJKKOFwKON1o6eZ+gcA6eWZVjvMej6xkPXKnJQQEreG20z1kBe/Z6T
+	 qA2+DLVRCzHLuDG71kERflH0Qm3zsmtRU/WCcSSaAwq+xI1+MuLUQfpURdoHpHSK3
+	 dyuNmBJT3T9KNkd04Q==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.0.101] ([95.223.134.88]) by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1N7xeb-1vfy421Eqh-00ranO; Tue, 17
+ Feb 2026 17:52:49 +0100
+Message-ID: <2369ba83d204290dcfe157aed3f943206213b979.camel@web.de>
+Subject: Re: "Dead loop on virtual device" error without softirq-BKL on
+ PREEMPT_RT
+From: Bert Karwatzki <spasswolf@web.de>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org, 
+	linux-rt-devel@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>, Eric
+ Dumazet	 <edumazet@google.com>, netdev@vger.kernel.org, spasswolf@web.de
+Date: Tue, 17 Feb 2026 17:52:48 +0100
+In-Reply-To: <fd609cfe186ee48e0e9a08e35764175a2516dd14.camel@web.de>
+References: <20260216134333.412332-1-spasswolf@web.de>
+				 <6274de932f4a62c51b424b65fc875ef3cb5ffd60.camel@web.de>
+				 <20260216153745.CA3__zRc@linutronix.de>
+				 <37d6e27f96afb57c5716798530cb3560d25202e5.camel@web.de>
+				 <20260217071952.WCXLGs5-@linutronix.de>
+				 <80114792206dc00d0099f00999a209e717debb12.camel@web.de>
+				 <20260217095700.SjYjM8RO@linutronix.de>
+			 <4fba57892e5bd6a1afc4a36a80b40e3ecc28cac5.camel@web.de>
+	 <fd609cfe186ee48e0e9a08e35764175a2516dd14.camel@web.de>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.56.2-0+deb13u1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: A6vJis2OPFsV
-Date: Tue, 17 Feb 2026 18:48:32 +0200
-From: "Alice Mikityanska" <alice.kernel@fastmail.im>
-To: "Tariq Toukan" <tariqt@nvidia.com>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Andrew Lunn" <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>
-Cc: "Saeed Mahameed" <saeedm@nvidia.com>, "Leon Romanovsky" <leon@kernel.org>,
- "Mark Bloch" <mbloch@nvidia.com>, "Alexei Starovoitov" <ast@kernel.org>,
- "Daniel Borkmann" <daniel@iogearbox.net>,
- "Jesper Dangaard Brouer" <hawk@kernel.org>,
- "John Fastabend" <john.fastabend@gmail.com>, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, "Gal Pressman" <gal@nvidia.com>,
- "Moshe Shemesh" <moshe@nvidia.com>, "William Tu" <witu@nvidia.com>,
- "David Wei" <dw@davidwei.uk>, "Dragos Tatulea" <dtatulea@nvidia.com>,
- alice@isovalent.com
-Message-Id: <aa5dc734-f122-42ec-b382-f464d02ddc35@app.fastmail.com>
-In-Reply-To: <20260217074525.1761454-1-tariqt@nvidia.com>
-References: <20260217074525.1761454-1-tariqt@nvidia.com>
-Subject: Re: [PATCH net] net/mlx5e: XSK, Fix unintended ICOSQ change
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:VNueBJLi7+C4SvJhPiiu5lUUE2TRosSISCXzE3rYIZgoqaPG1wc
+ sICl2R2xMU4d65YMBc6LCEJuHMH5LMeDDZvFHaFicbzHvwn8bqool13SibsfRXxq+kFxYr5
+ d2/7f+7lrATZH8sqS3wkEQqmIXFWrPyfO2y3hzoMatwu1ukR5g6FU0pgw74feBqpk1ikA47
+ 5R6lGanGiK6j6cM7JIp3w==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:JACKPkEq/9Y=;lWgyLJHsHZZ4or8MFYsfBp+aoAA
+ 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
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.65 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[fastmail.im,none];
-	R_DKIM_ALLOW(-0.20)[fastmail.im:s=fm3,messagingengine.com:s=fm3];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[web.de,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[web.de:s=s29768273];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	XM_UA_NO_VERSION(0.01)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259105-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-259104-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[fastmail.im];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[fastmail.im:+,messagingengine.com:+];
+	FREEMAIL_CC(0.00)[linutronix.de,vger.kernel.org,lists.linux.dev,kernel.org,google.com,web.de];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alice.kernel@fastmail.im,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[nvidia.com,kernel.org,iogearbox.net,gmail.com,vger.kernel.org,davidwei.uk,isovalent.com];
-	RCVD_COUNT_FIVE(0.00)[6];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email,messagingengine.com:dkim,app.fastmail.com:mid,iogearbox.net:email,fastmail.im:email,fastmail.im:dkim]
-X-Rspamd-Queue-Id: 2BD0014E699
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[spasswolf@web.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[web.de:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[web.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7F9E814E6B8
 X-Rspamd-Action: no action
 
-On Tue, Feb 17, 2026, at 09:45, Tariq Toukan wrote:
-> XSK wakeup must use the async ICOSQ (with proper locking), as it is not
-> guaranteed to run on the same CPU as the channel.
->
-> The commit that converted the NAPI trigger path to use the sync ICOSQ
-> incorrectly applied the same change to XSK, causing XSK wakeups to use
-> the sync ICOSQ as well. Revert XSK flows to use the async ICOSQ.
->
-> XDP program attach/detach triggers channel reopen, while XSK pool
-> enable/disable can happen on-the-fly via NDOs without reopening
-> channels. As a result, xsk_pool state cannot be reliably used at
-> mlx5e_open_channel() time to decide whether an async ICOSQ is needed.
->
-> Update the async_icosq_needed logic to depend on the presence of an XDP
-> program rather than the xsk_pool, ensuring the async ICOSQ is available
-> when XSK wakeups are enabled.
->
-> This fixes multiple issues:
->
-> 1. Illegal synchronize_rcu() in an RCU read- side critical section via
->    mlx5e_xsk_wakeup() -> mlx5e_trigger_napi_icosq() ->
->    synchronize_net(). The stack holds RCU read-lock in xsk_poll().
->
-> 2. Hitting a NULL pointer dereference in mlx5e_xsk_wakeup():
->
-> [] BUG: kernel NULL pointer dereference, address: 0000000000000240
-> [] #PF: supervisor read access in kernel mode
-> [] #PF: error_code(0x0000) - not-present page
-> [] PGD 0 P4D 0
-> [] Oops: Oops: 0000 [#1] SMP
-> [] CPU: 0 UID: 0 PID: 2255 Comm: qemu-system-x86 Not tainted 
-> 6.19.0-rc5+ #229 PREEMPT(none)
-> [] Hardware name: [...]
-> [] RIP: 0010:mlx5e_xsk_wakeup+0x53/0x90 [mlx5_core]
->
-> Reported-by: Daniel Borkmann <daniel@iogearbox.net>
-> Closes: 
-> https://lore.kernel.org/all/20260123223916.361295-1-daniel@iogearbox.net/
-> Fixes: 56aca3e0f730 ("net/mlx5e: Use regular ICOSQ for triggering NAPI")
-> Tested-by: Daniel Borkmann <daniel@iogearbox.net>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-> ---
->  drivers/net/ethernet/mellanox/mlx5/core/en.h  |  1 +
->  .../ethernet/mellanox/mlx5/core/en/xsk/pool.c |  4 ++--
->  .../ethernet/mellanox/mlx5/core/en/xsk/tx.c   |  2 +-
->  .../net/ethernet/mellanox/mlx5/core/en_main.c | 24 +++++++++++++------
->  4 files changed, 21 insertions(+), 10 deletions(-)
->
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h 
-> b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-> index a7de3a3efc49..19fce51117c9 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-> @@ -1103,6 +1103,7 @@ int mlx5e_open_locked(struct net_device *netdev);
->  int mlx5e_close_locked(struct net_device *netdev);
-> 
->  void mlx5e_trigger_napi_icosq(struct mlx5e_channel *c);
-> +void mlx5e_trigger_napi_async_icosq(struct mlx5e_channel *c);
->  void mlx5e_trigger_napi_sched(struct napi_struct *napi);
-> 
->  int mlx5e_open_channels(struct mlx5e_priv *priv,
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/pool.c 
-> b/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/pool.c
-> index db776e515b6a..5c5360a25c64 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/pool.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/pool.c
-> @@ -127,7 +127,7 @@ static int mlx5e_xsk_enable_locked(struct 
-> mlx5e_priv *priv,
->  		goto err_remove_pool;
-> 
->  	mlx5e_activate_xsk(c);
-> -	mlx5e_trigger_napi_icosq(c);
-> +	mlx5e_trigger_napi_async_icosq(c);
-> 
->  	/* Don't wait for WQEs, because the newer xdpsock sample doesn't 
-> provide
->  	 * any Fill Ring entries at the setup stage.
-> @@ -179,7 +179,7 @@ static int mlx5e_xsk_disable_locked(struct 
-> mlx5e_priv *priv, u16 ix)
->  	c = priv->channels.c[ix];
-> 
->  	mlx5e_activate_rq(&c->rq);
-> -	mlx5e_trigger_napi_icosq(c);
-> +	mlx5e_trigger_napi_async_icosq(c);
->  	mlx5e_wait_for_min_rx_wqes(&c->rq, MLX5E_RQ_WQES_TIMEOUT);
-> 
->  	mlx5e_rx_res_xsk_update(priv->rx_res, &priv->channels, ix, false);
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/tx.c 
-> b/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/tx.c
-> index 9e33156fac8a..8aeab4b21035 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/tx.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/tx.c
-> @@ -34,7 +34,7 @@ int mlx5e_xsk_wakeup(struct net_device *dev, u32 qid, 
-> u32 flags)
->  				     &c->async_icosq->state))
->  			return 0;
-> 
-> -		mlx5e_trigger_napi_icosq(c);
-> +		mlx5e_trigger_napi_async_icosq(c);
->  	}
-> 
->  	return 0;
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c 
-> b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> index 4b8084420816..6a7ca4571c19 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> @@ -2744,16 +2744,26 @@ static int mlx5e_channel_stats_alloc(struct 
-> mlx5e_priv *priv, int ix, int cpu)
-> 
->  void mlx5e_trigger_napi_icosq(struct mlx5e_channel *c)
->  {
-> +	struct mlx5e_icosq *sq = &c->icosq;
->  	bool locked;
-> 
-> -	if (!test_and_set_bit(MLX5E_SQ_STATE_LOCK_NEEDED, &c->icosq.state))
-> -		synchronize_net();
-> +	set_bit(MLX5E_SQ_STATE_LOCK_NEEDED, &sq->state);
-> +	synchronize_net();
-> 
-> -	locked = mlx5e_icosq_sync_lock(&c->icosq);
-> -	mlx5e_trigger_irq(&c->icosq);
-> -	mlx5e_icosq_sync_unlock(&c->icosq, locked);
-> +	locked = mlx5e_icosq_sync_lock(sq);
-> +	mlx5e_trigger_irq(sq);
-> +	mlx5e_icosq_sync_unlock(sq, locked);
-> 
-> -	clear_bit(MLX5E_SQ_STATE_LOCK_NEEDED, &c->icosq.state);
-> +	clear_bit(MLX5E_SQ_STATE_LOCK_NEEDED, &sq->state);
-> +}
-> +
-> +void mlx5e_trigger_napi_async_icosq(struct mlx5e_channel *c)
-> +{
-> +	struct mlx5e_icosq *sq = c->async_icosq;
-> +
-> +	spin_lock_bh(&sq->lock);
-> +	mlx5e_trigger_irq(sq);
-> +	spin_unlock_bh(&sq->lock);
->  }
-> 
->  void mlx5e_trigger_napi_sched(struct napi_struct *napi)
-> @@ -2836,7 +2846,7 @@ static int mlx5e_open_channel(struct mlx5e_priv 
-> *priv, int ix,
->  	netif_napi_add_config_locked(netdev, &c->napi, mlx5e_napi_poll, ix);
->  	netif_napi_set_irq_locked(&c->napi, irq);
-> 
-> -	async_icosq_needed = !!xsk_pool || priv->ktls_rx_was_enabled;
-> +	async_icosq_needed = !!params->xdp_prog || priv->ktls_rx_was_enabled;
+Am Dienstag, dem 17.02.2026 um 12:24 +0100 schrieb Bert Karwatzki:
+> Am Dienstag, dem 17.02.2026 um 11:42 +0100 schrieb Bert Karwatzki:
+> >=20
+> > I just wondered if we can completely skip the
+> >=20
+> > 	if (READ_ONCE(txq->xmit_lock_owner) !=3D cpu) {
+> > 		[...]
+> > 	} else=C2=A0
+> > 	{
+> > 		/* "Recursion" alert */
+> > 	}
+> > =20
+> > check, as the synchronization will we provided by HARD_TX_{LOCK,UNLOCK=
+}.
+> >=20
+>=20
+> I thought about that again, and it seems like a bad idea as (in the non-=
+preempt) case
+> other threads trying to access the queue would wait for the spinlock to =
+be freed, perhaps
+> one can just change the code like this:
 
-Acked-by: Alice Mikityanska <alice.kernel@fastmail.im>
+My argument above seems wrong: In the non-preempt case we cannot have anot=
+her thread accessing the txq
+from the same CPU if the lock is taken (it is not preemptible) and for oth=
+er threads
+accessing the txq from different CPUs the check (txq->xmit_lock_owner !=3D=
+ cpu) would succeed
+and they would try the spinlock anyway, So this would not speak against ki=
+lling the lock owner
+check. As for the recursion detection, perhaps dev_xmit_recursion() is eno=
+ugh?
 
-With a follow-up suggestion that we discussed at:
 
-https://lore.kernel.org/netdev/8a3a3ff4-16c7-4d99-8854-38d741cc6b82@gmail.com/
+Another Idea (more vague ...):
 
->  	err = mlx5e_open_queues(c, params, cparam, async_icosq_needed);
->  	if (unlikely(err))
->  		goto err_napi_del;
->
-> base-commit: ee5492fd88cfc079c19fbeac78e9e53b7f6c04f3
-> -- 
-> 2.44.0
+Using the CPU Id as the lock_owner seems to make sense for locks that are =
+not
+preemptible (raw_spinlock in the RT case). For preemptible locks a thread =
+ID (which one exactly I'm not sure ...)
+would perhaps make a better lock owner ...
+
+Bert Karwatzki
 
