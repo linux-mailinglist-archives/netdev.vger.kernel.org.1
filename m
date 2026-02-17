@@ -1,194 +1,299 @@
-Return-Path: <netdev+bounces-259111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259113-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cN/2CVOllGnTGAIAu9opvQ
-	(envelope-from <netdev+bounces-259111-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 18:28:51 +0100
+	id cCR9ESmolGkRGQIAu9opvQ
+	(envelope-from <netdev+bounces-259113-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 18:40:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABEFE14E99A
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 18:28:50 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D671214EB40
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 18:40:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3BDD8301ECC4
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 17:28:43 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3C130301253B
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 17:40:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E425336F433;
-	Tue, 17 Feb 2026 17:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2E1437107F;
+	Tue, 17 Feb 2026 17:40:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EOPsKze7"
+	dkim=pass (4096-bit key) header.d=venev.name header.i=@venev.name header.b="DTcF0Yy0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from a1-bg02.venev.name (a1-bg02.venev.name [213.240.239.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8435236E49E
-	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 17:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771349322; cv=pass; b=mLMWQeonUhTBhFQPhwiAMYT+Kb3yHzrHEEOyPFc+9SxkcMJ3JkrW9yHEkTpvI09jaW/XUmGMw+rjXUGErgrAK8EpAydvcKr0DDgrl1HULkVLSSOz1TwN2potRli7/mtCFnAuC96cd0DR7fHADDZo3g9TCBnnwojQjEiz7FYL1nA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771349322; c=relaxed/simple;
-	bh=P2irtnBFLiL4JYCfo1k5W4sPeUJoEEcGJRi89IOhnS4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fOT4QZi1hHFr5vIbiqxABvpCxOB34mBen68QTMx8FKYWEFh04OVJDZQeVSUcI395xcF/No3eiBUxX28QIHdw0W/JA7O2UatlK0l8dZH/wSd0TYUBHNMKKD+v1VHAHSfbH3ZyHWdL/II6zIiMDqqHCffHssCQr1GBSvJ3J/ntn7I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EOPsKze7; arc=pass smtp.client-ip=209.85.217.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-5fac15a7b88so783183137.3
-        for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 09:28:40 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771349319; cv=none;
-        d=google.com; s=arc-20240605;
-        b=XRFCZ+6DyCDz//XUFhP2R9MFGT9ESjFdUl0vCnp4vDRGMLRCDyLClm4AYVJkLNwoq1
-         Z+zn+9c+7VzYD1Nc6D6rZLB0B5XCitSxA+Sv9ALVOiNigW0gBhRM9V/jthkH0AYsj1qA
-         au1ENAIEZ7u2hr5Ul4/fvQx0lWwSCuQuLxFlOR4S3ijOTbhU9TCpSvsJtJcby66IDpK/
-         CtU89NT/Bb+pZoSZ+I489J2hLw56nYPdFiG5/iCBWYGrGVDgf/HsbxVOXjOv6JLUg81R
-         jFiY/TRPMTO5RRJw2ObbawSri9jJe25htogdgRx6i7dQa72WhBDWW0vLS+EZGgWatoWN
-         Pguw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=y1/0i5LwTTeLSjrN/WmRILs65aDQDF4d5uLmTIRIiIc=;
-        fh=cbkYnr6q0eSHJDiKdmTwqu57iHJPnIcaqBmC0ySB0Hw=;
-        b=f6eDhnxmjjCIYcQTMupe9mozIuQJhMJpRmfrPHnSeDNkMIxXFqxUE/8uFZ7fmi/cML
-         vMFkxnawq8Jprchh0NZxUZQfnGyzpxAvcfau0eMSisHs7h+q2sMpPuxHFFNQPbe8tH/H
-         z+634pEBuFBJnIOD4oAdVAS/vUPY5si6g9KH5sPZrWuBOazYIBVuWtobPAyaLpz1u/gw
-         SI6I4VXeGLmPA0yi4rwrUabWwAzNYRGHUbG6nVx7Kh/ihaIO3S19a3ouP90F4m/F8rIi
-         NQaYDNE3XloAHSeucUiaom8YD60ei4BVPZIOdKMqBkjwK3XHe/fjGsGvhY13ot7xE5PJ
-         Nerw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771349319; x=1771954119; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y1/0i5LwTTeLSjrN/WmRILs65aDQDF4d5uLmTIRIiIc=;
-        b=EOPsKze7YnYK549Zsf0xwpf6goqGtD5zgbDaeeSZR+M56YAjvduMH9glvboRJgB61z
-         90v7IVlpIoqu/PESfhSrwwisPhWSLHB/vg/ZbKZW5WtG2VVCUdnwCwjZtL+iAX514ike
-         ireX6tbKsjI8o3/UuEIK/8Lp4OnPgwKupSaaSVU4pGqaQUTWDoQqy03x+acKkD95e4Om
-         HXER70dkUQhI6+49sY+bSHQYACAw42BD0jOvcwBC7P1MEDJ0dAjqxNm/BSziOuG6NBlb
-         j6Y1RiQDz2+WUlCInNZ+LPJC4lz5XeIEVrJLu8oxRM3geHkdjwF9X+WKekMywPhFICQn
-         h2ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771349319; x=1771954119;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=y1/0i5LwTTeLSjrN/WmRILs65aDQDF4d5uLmTIRIiIc=;
-        b=sm5E5+A8p0gnm4nVZGr0qnYS9TRXarzXlbrvaVvVbKg6cgqVN8sqNI5nd1WR2gfYet
-         rtNpMCCb4oS1Y2ngMSEgBOOmHHip5+bWv/EdyNiugz5aV0n823W68Xfxh1+HmXNX8xqg
-         sS7yx0GBNynh9+hhGkD9zkcipnuQIz/CZ+xcCBZdVAk+YxIe8Nx1i7PL3pR5m7hWKYlA
-         Wv1VVJa2td9Ih5UtRa/G0VBqwLg3AKdYYNhwwy1aTyDn/zs3WqOTq+e3lx7r4xdFr+U6
-         jFi3T+zXd6N4g2iii8PRu0rHCSA9EZRWvUSA/8uuQbBOcDVJNo/oq6Z/Spqhke7ludan
-         sN+A==
-X-Forwarded-Encrypted: i=1; AJvYcCWysR1ik3BaM1MQJXLjeein+zagBVkXHTEvsoBrD7GSRjV78nFSTYbeAFXW7MD8VJe+qy8TMxQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCLAthbkughGk00hHP4OHK998ESiLPRLFx5bZQ3DKB1Zf62nCP
-	k8uPK8DDstiQxTEdcn/FD2/DedomtcoKSEYJkmdBBjOcWNrA5QwzNtv6paAPQogI1rOd8d79CQm
-	VkGqeCLomS7VMEW1AWBJH2+kFL0cOOZk=
-X-Gm-Gg: AZuq6aLdlFZKz4YBTQEx1K76nm+4QQiO5h23s8TvMwDsFvtvW1oYFd9HxVuY4Z30/EQ
-	5ew2qX/6KGBdU9ZEsBLj3U6v/EsRgThK3o4BXCoiw3P036AQyruS1GP3ZDI+5RUcxMmyKaTU7IA
-	qLVAEdFPt7/1MjZnllmZFlaWSXcAD9CRWxqOCqPmnsdpzYMxhnrZLeKXLeRfqKwNooUyAKG+d/n
-	oSavphaYBhuOvoeiZWMmbriOOBZRT8Qf1dBepRbtrwbPQQhtFZ4ZmmumC/qF8Ph06InujgFmr7E
-	gC/wpsyUqB8yqXfz
-X-Received: by 2002:a05:6102:c8f:b0:5f5:4d9c:de4c with SMTP id
- ada2fe7eead31-5fe16c003camr4631312137.3.1771349319506; Tue, 17 Feb 2026
- 09:28:39 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5502837107A;
+	Tue, 17 Feb 2026 17:40:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.240.239.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771350052; cv=none; b=qADrPJ4zXqEkOYpATvjXkoOl+wsW3mKN/HPTJ5bUnTCL/CBbvzYeWhB9aLW2P/QNIhnNA9nksH6F5m3dSI2zGbnMeWckGcyxHTO9k47UXz9MvfmCd5Ko/UjVm1DKuMegOAuECOC9+Hd1kj2C8FoLt+9NdnYmZjPrrohAfuvGYnM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771350052; c=relaxed/simple;
+	bh=bx8ltbMTWp0UveWQZhheXSavSfUUgDZEwTgmD9Qwd3Y=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=LHock5MjhCM+iYV7is8dLLob+gUPG7UXJgI92+lqt4BpVFHyY1bfxY4ntgufmGcZ+40G2hmQmMp0BRMuKkssTktNOOY1YWwSmFWIS/OU4UMjt09nNRCVYQEm5Wyw35MEmoHpCxd47QYllbcmwYp/dDg6F8lHh9Oc++GFnZRk72k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=venev.name; spf=pass smtp.mailfrom=venev.name; dkim=pass (4096-bit key) header.d=venev.name header.i=@venev.name header.b=DTcF0Yy0; arc=none smtp.client-ip=213.240.239.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=venev.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=venev.name
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=venev.name;
+	s=default; h=Content-Transfer-Encoding:Content-Type:Date:To:From:Subject:
+	Message-ID:Reply-To:Sender; bh=bx8ltbMTWp0UveWQZhheXSavSfUUgDZEwTgmD9Qwd3Y=; 
+	b=DTcF0Yy0rXsDwsUQfNzovoYC28DkESS92+TD0RHEkAkgJqacalxbwWzjp8eZX5JsOquyxk270UC
+	URVGDI+DJuSmz3qVtJjpklrGPCeWPl/LCoveJXrmfSvmIZc03Pleiiy8eXMF70HF0L9ALRnv7udpF
+	iaP8fyAyGEIQbmdbpjybubn/+MKm56M7eqgabj3mIFide+zHxHvMS0pgsWPV9EjYkALu4T4ZktKXV
+	XfeBUG8DyuAseVFwSIczwF6j7TV88AHBVEBqcRv04nJuDrkaddK3I/bHTKyk3NSAUQ8Ss8o2pMfmD
+	m8+UQ0ekuXF4L8ShUZV/fVSNwWsgOR4uNuxwaapuY/uOlFHrLscWmjV73boY3WK9m779sB8T3n+Gt
+	O26QNNe2tUFb9NcYfwDmHOO1E0ABZu/h9Al9ah4Roh6+w+vhYkzo5xDiUjZD6psvX4YFtjjEMvI7s
+	uQXiq412q66WsaZQpvnoS0yNiR2DNQhZ4Guk9sb8/HXeWMNdn8uRpJ/9rZBpvMoXEbnzJbxT0ui2H
+	LbRW6vXGg0iDLXaF+f/GuThGxxvRD5iJyJZ0b2U4deQzy8nnDUMpkC9lPNHuiRqCH4wEeGNBwFEvK
+	CMgQ6Oj6reAlVAs/Nlxfr/fatoxnjv3IpCTpOkrLqZj2OQi7baltxvvnqJlK4ugokNDbM=;
+Received: from a1-bg02.venev.name ([213.240.239.49] helo=pmx1.venev.name)
+	by a1-bg02.venev.name with esmtps
+	id 1vsP3r-0000000EX02-2lII
+	(TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	(envelope-from <hristo@venev.name>);
+	Tue, 17 Feb 2026 17:40:35 +0000
+Received: from box.m.venev.name ([213.240.239.49])
+	by pmx1.venev.name with ESMTPSA
+	id AbcRMxGolGkU2TQAdB6GMg
+	(envelope-from <hristo@venev.name>); Tue, 17 Feb 2026 17:40:35 +0000
+Message-ID: <6a1339999b091edaaa15e34aceb7961dfc61581b.camel@venev.name>
+Subject: Re: [PATCH] netlink: specs: add specification for NBD
+From: Hristo Venev <hristo@venev.name>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	netdev@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>, Jens Axboe	
+ <axboe@kernel.dk>, linux-block@vger.kernel.org, nbd@other.debian.org
+Date: Tue, 17 Feb 2026 19:40:33 +0200
+In-Reply-To: <m2o6lnlg2y.fsf@gmail.com>
+References: <20260215180309.2255721-3-hristo@venev.name>
+	 <m2o6lnlg2y.fsf@gmail.com>
+Autocrypt: addr=hristo@venev.name; prefer-encrypt=mutual;
+ keydata=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
+ AjQ6o01lu
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260216174950.455244-1-seanwascoding@gmail.com>
- <20260216174950.455244-3-seanwascoding@gmail.com> <f71cdfa7-25f8-487d-b727-39ae962401a4@lunn.ch>
-In-Reply-To: <f71cdfa7-25f8-487d-b727-39ae962401a4@lunn.ch>
-From: Sean Chang <seanwascoding@gmail.com>
-Date: Wed, 18 Feb 2026 01:28:28 +0800
-X-Gm-Features: AaiRm51KC7GN5Nv3xktbA0iIhez-RTH-PxLrpczQXSdcrQEcbb1UDvHXkYyG9ew
-Message-ID: <CAAb=EJWNSvTHuUX862vLmA2s1uKO0vy_x9OSZ6VXqY9X-+JNsg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] net: macb: fix format-truncation warning
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev, 
-	trond.myklebust@hammerspace.com, anna@kernel.org, netdev@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[venev.name,quarantine];
+	R_DKIM_ALLOW(-0.20)[venev.name:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259111-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanwascoding@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[venev.name:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259113-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hristo@venev.name,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: ABEFE14E99A
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: D671214EB40
 X-Rspamd-Action: no action
 
-On Tue, Feb 17, 2026 at 2:35=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
-> > diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/eth=
-ernet/cadence/macb_main.c
-> > index 43cd013bb70e..26f9ccadd9f6 100644
-> > --- a/drivers/net/ethernet/cadence/macb_main.c
-> > +++ b/drivers/net/ethernet/cadence/macb_main.c
-> > @@ -3159,8 +3159,8 @@ static void gem_get_ethtool_strings(struct net_de=
-vice *dev, u32 sset, u8 *p)
-> >
-> >               for (q =3D 0, queue =3D bp->queues; q < bp->num_queues; +=
-+q, ++queue) {
-> >                       for (i =3D 0; i < QUEUE_STATS_LEN; i++, p +=3D ET=
-H_GSTRING_LEN) {
-> > -                             snprintf(stat_string, ETH_GSTRING_LEN, "q=
-%d_%s",
-> > -                                             q, queue_statistics[i].st=
-at_string);
-> > +                             snprintf(stat_string, ETH_GSTRING_LEN, "q=
-%u_%.19s",
-> > +                                      q, queue_statistics[i].stat_stri=
-ng);
+On Tue, 2026-02-17 at 12:17 +0000, Donald Hunter wrote:
+> There are yamllint errors:
+>=20
+> make -C tools/net/ynl lint
+> make: Entering directory '/home/donaldh/net-next/tools/net/ynl'
+> yamllint ../../../Documentation/netlink/specs
+> ../../../Documentation/netlink/specs/nbd.yaml
+> =C2=A0 159:81=C2=A0=C2=A0=C2=A0 error=C2=A0=C2=A0=C2=A0 line too long (10=
+4 > 80 characters)=C2=A0 (line-
+> length)
+> =C2=A0 169:6=C2=A0=C2=A0=C2=A0=C2=A0 error=C2=A0=C2=A0=C2=A0 syntax error=
+: expected <block end>, but found
+> '<block mapping start>' (syntax)
+> =C2=A0 170:7=C2=A0=C2=A0=C2=A0=C2=A0 error=C2=A0=C2=A0=C2=A0 wrong indent=
+ation: expected 5 but found 6=C2=A0
+> (indentation)
+
+Thanks, I will fix the lint errors in v2.
+
+> > +doc: See :file:`drivers/block/nbd.c`
+>=20
+> Prefer to see a meaningful doc string here.
+
+I will add more proper documentation in v2. I couldn't find any
+existing documentation of this netlink interface, so I guess I will
+write it myself.
+
+> > +attribute-sets:
+> > +=C2=A0 -
+> > +=C2=A0=C2=A0=C2=A0 name: nbd-attrs
+> > +=C2=A0=C2=A0=C2=A0 name-prefix: nbd-attr-
+> > +=C2=A0=C2=A0=C2=A0 doc: Configuration policy attributes, used for CONN=
+ECT
+> > +=C2=A0=C2=A0=C2=A0 attributes:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 name: unspec
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 value: 0
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 type: unused
+>=20
+> No need for unspec in the attribute list, ynl codegen does the right
+> thing.
+
+For me `pyynl.ynl_gen_c --mode uapi --header` no longer generates
+`NBD_ATTR_UNSPEC` if I remove this. Is there a YNL property to specify
+the name of the zero value of the attribute set? If not, should I
+remove it anyway, changing the generated header?
+
+> > +=C2=A0=C2=A0=C2=A0 name: device-item-attrs
+> > +=C2=A0=C2=A0=C2=A0 name-prefix: nbd-device-item-
+> > +=C2=A0=C2=A0=C2=A0 doc: |
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 This is the format for multiple devices=
+ with
+> > :code:`NBD_ATTR_DEVICE_LIST`
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .. code-block::
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [NBD_ATTR_DEVICE_LIST]
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [NBD_DEVICE_ITE=
+M]
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [NB=
+D_DEVICE_INDEX]
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [NB=
+D_DEVICE_CONNECTED]
+> > +=C2=A0=C2=A0=C2=A0 attributes:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 name: unspec
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 value: 0
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 type: unused
+>=20
+> Not required.
+
+The same question applies here.
+
+> > +=C2=A0=C2=A0=C2=A0 name: device-attrs
+> > +=C2=A0=C2=A0=C2=A0 name-prefix: nbd-device-
+> > +=C2=A0=C2=A0=C2=A0 attr-max-name: nbd-device-attr-max
+> > +=C2=A0=C2=A0=C2=A0 attributes:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 name: unspec
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 value: 0
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 type: unused
+>=20
+> Not required.
+
+The same question applies here.
+
+> > +=C2=A0=C2=A0=C2=A0 name: sock-item-attrs
+> > +=C2=A0=C2=A0=C2=A0 name-prefix: nbd-sock-item-
+> > +=C2=A0=C2=A0=C2=A0 doc: |
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 This is the format for multiple sockets=
+ with
+> > :code:`NBD_ATTR_SOCKETS`
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .. code-block::
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [NBD_ATTR_SOCKETS]
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [NBD_SOCK_ITEM]
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [NB=
+D_SOCK_FD]
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [NBD_SOCK_ITEM]
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [NB=
+D_SOCK_FD]
+> > +=C2=A0=C2=A0=C2=A0 attributes:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 name: unspec
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 value: 0
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 type: unused
+>=20
+> Not required.
+
+The same question applies here.
+
+> > +=C2=A0=C2=A0=C2=A0 name: sock-attrs
+> > +=C2=A0=C2=A0=C2=A0 name-prefix: nbd-sock-
+> > +=C2=A0=C2=A0=C2=A0 attributes:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 name: unspec
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 value: 0
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 type: unused
+>=20
+> Not required.
+
+The same question applies here.
+
+> > +operations:
+> > +=C2=A0 enum-model: unified
+> > +=C2=A0 name-prefix: nbd-cmd-
+> > +=C2=A0 list:
+> > +=C2=A0=C2=A0=C2=A0 -
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 name: unspec
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 value: 0
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 doc: NBD_CMD_UNSPEC
+
+A similar question applies here. If I remove this, `pyynl.ynl_gen_c
+--mode uapi --header` no longer generates `NBD_CMD_UNSPEC`. Is there a
+YNL property to generate it? If not, should I remove it anyway?
+
+> > +=C2=A0=C2=A0=C2=A0 -
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 name: connect
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 doc: See :file:`drivers/block/nbd.c`,
+> > :code:`nbd_genl_connect()`
+>=20
+> Prefer to see meaningful doc string (same for other ops)
+
+I guess I will have to document the four operations in v2 as well.
+
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 attribute-set: nbd-attrs
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dont-validate: [strict]
 >
-> These strings are special, in that they are fixed length, 32 bytes
-> long, and not \0 terminated. There are some helpers at the end of
-> linux/ethtool.h for dealing with these strings. You might want to use
-> them.
->
+> nbd.c has strict & dump, should this be [strict, dump] ? (same for
+> other ops)
 
-Yes, I've switched to ethtool_sprintf() from linux/ethtool.h and
-removed the manual
-snprintf() and memcpy() calls. After testing, it behaves exactly as expecte=
-d,
-so I will send out [PATCH V3] shortly.
-
-> I also wounder, why is just one architecture complaining about this?
-
-Regarding the architecture-specific nature of the warning: I have verified =
-that
-this warning is not triggered on x86_64, even with W=3D1. It appears to
-be specific
-to the RISC-V toolchain's diagnostic analysis.
-
-Regardless, converting to ethtool_sprintf() is the correct approach
-which does not throw
-any warning on the both platforms.
-
-Best regards,
-Sean
+The NBD operations don't have `dump`, only `do`, so adding `dump` to
+`dont-validate` does not change the output of `pyynl.ynl_gen_c --mode
+kernel --source`. Should I add it anyway?
 
