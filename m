@@ -1,198 +1,191 @@
-Return-Path: <netdev+bounces-259116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259117-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yKc8El2qlGl7GQIAu9opvQ
-	(envelope-from <netdev+bounces-259116-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 18:50:21 +0100
+	id qPHnFDGtlGl7GQIAu9opvQ
+	(envelope-from <netdev+bounces-259117-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 19:02:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A10B14EBC8
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 18:50:20 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD62B14ED96
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 19:02:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 234CA301D6A4
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 17:50:19 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id F346630217C6
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 18:01:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C8DB36EABF;
-	Tue, 17 Feb 2026 17:50:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8597137472B;
+	Tue, 17 Feb 2026 18:01:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=u-northwestern-edu.20230601.gappssmtp.com header.i=@u-northwestern-edu.20230601.gappssmtp.com header.b="ooIlxA//"
+	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="fNWPonfh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BBB33596F1
-	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 17:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E424036F43E
+	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 18:01:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771350617; cv=none; b=bmdYhSlvRrGEWRl8iiar/5bKz4DgiTVcHQp2ake4t3oZhlCePDMahQ1ind+qrolrmv27l1h327pkI9FIcid8Q78KV8xfKDIZCoH4JMLWvWJl/GnZ3teYoKZ/Nyr1l+w/rjgMXu5y7OqySGIilLNlM9OIC9YtQmLe22hMHKEKwFU=
+	t=1771351282; cv=none; b=o0V9l17LhhiryfuXI/pTlAuFgqlRpkFp+cu3iwfIO0KI9LDtQSm72htwdUcrdXP7qOff12wXi3+3a31ku4B7dxVOLdQoE8Gsxh1SH/dTMsVg7L+t8pGLNAcfF1CxY//gCDLbQV5LznoGjN2H3GiImuLtYvdOgHJcc+ln6kiQnVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771350617; c=relaxed/simple;
-	bh=IJAhYnN8LRPGZyhkVx59hrOzpdCmz9BMmhTWUhgh22o=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tzlRB6lbPSwALpCXAaD8XLFx+1cgW35SKJ/+1IFi6uTXUbLtyJwmSsuMlk9gt2avKUqtaI/d6fgNkXnPSDpf0SPTRE/Hj+0Cy5sOO2DqlbJWWqG50vMCneTcgxseBpg440KjGSxez7e/8krqb62LSkxFCp6PXvpLR75cJMN9D4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=u.northwestern.edu; spf=pass smtp.mailfrom=u.northwestern.edu; dkim=pass (2048-bit key) header.d=u-northwestern-edu.20230601.gappssmtp.com header.i=@u-northwestern-edu.20230601.gappssmtp.com header.b=ooIlxA//; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=u.northwestern.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=u.northwestern.edu
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-506a7bbe9d0so34180311cf.0
-        for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 09:50:16 -0800 (PST)
+	s=arc-20240116; t=1771351282; c=relaxed/simple;
+	bh=yo7VpR7y2IWG6CuidAdMoCeu5zTOZrbNb5c7C6ANnvQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GK7JpuQnCd9601XP8845iSal1K9dPi2FO5jmgsFVr5JnQH4jCoZ/3Ems3f13I0bz3HjNp90zwn6Ii1deyp/SyEwcM1soiopOKqu/Q+e3Hbsbh6CqDupmx29kO8eynHmsydS++sYwsm5/B9O05Ri4r96c6X771vukx+1YmcBWeSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ieee.org; spf=pass smtp.mailfrom=ieee.org; dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b=fNWPonfh; arc=none smtp.client-ip=209.85.210.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ieee.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ieee.org
+Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-7d18d02af68so3019077a34.2
+        for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 10:01:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=u-northwestern-edu.20230601.gappssmtp.com; s=20230601; t=1771350615; x=1771955415; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tg4p4mgVuyaqYrmRkJ0CRO2fk4lsHW/JKl6dW870fR0=;
-        b=ooIlxA//Od+3hxkecOWHnTyl4pYvWkY/cwH4IDod5CQd4/bT3hRwRgqZt4aTNvLIuQ
-         X+3Qv7eTu6en1BYAavLRNRzP4pe3DVhVkoIO/dcUTGTaI4dF/apYDzW4eq9ilzvQqJDo
-         nPNB9MY/8MnGQDJPRhjAb96+vGfFne99Ei0NXL1l136KdXCa3egd+qKoLICnVTOPYlsP
-         DCAL97/FOcgslq5DZHY8+nLItFmW4VXQLXxLS9CbWPb9QmygZtnjwrCXXuwI7898rIB6
-         Ki/ypNU40N5Hw1OUfs+iOUNjHKDQjLq5iM28waFY1czu9mS3xxmAynTMlw0t8ZVWKO9h
-         LM4g==
+        d=ieee.org; s=google; t=1771351278; x=1771956078; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=D7kdTF2Cckub7dO3x1Hq31N4AgYFSFS+VW8IKBBKDHI=;
+        b=fNWPonfhTbwPC0obmOgax4GPc8OzoshhngF0ukfvZPG7NtMG45n++27OEsMXzA86PW
+         jKJg42kAvnpAmvsXHsBmV7t7H1JOTgXxi6ViriMkjjE+5M2eJvsW6Vf99WYwHGC1el55
+         FdbJx5GO/hA8qhzBEP8YCez4hL1bFae6u0ApQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771350615; x=1771955415;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Tg4p4mgVuyaqYrmRkJ0CRO2fk4lsHW/JKl6dW870fR0=;
-        b=DV9JK7UmUwvmujonrdaDqvamJiEKn308Cu1/mxI5AgdzFCN4vGB6I8j/4/Ggaw86bU
-         kiUqOz4/GAxi2s8JKxljQS+iqq+2SdH6JRZDkkojxi9xHRS/UNwYxNFvBzZQgvEr/yH3
-         2Uvt0RWmxupbHvzykW6x+xd53hiUnM16xDNclAFnb2Y+PB/CREMC/BSjODYJZNcyl5jj
-         6+qgQdUMApZRlBTTFlVJA7XJu3Pt7RkV0hIaegtQSuLZGG87TIzu/GOv/mZKlOvz1MyH
-         NjwVNq+WsgW/rzbw+rTHd4bHhI1tIaXUC+L1H7UNGE8t+sRa3kdWCQejoboGPbJws710
-         oqvw==
-X-Forwarded-Encrypted: i=1; AJvYcCVel/5b2YMa805koedYJjzdJVWP0FLtapWplxd5fXWw4qDqdN+MU/Ni1biXnNCHhkHwiHPiAcM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxv+GmujQ+WyuMVcdrBKmkOI1xSmpT547Sojk0jjnWg/xdYZeMC
-	QmBNyHBpDiHw/ZreqXOuUHmiGqgbCQyk4jazoeuqGppBWSNrU6rKnXnlAB5cI6CJsc4=
-X-Gm-Gg: AZuq6aL7DHbg28AcbYnQio+/At/cttSUg9WqVsJqOGGVOHHBRZMbjkWxp7NU30iJFlc
-	0cXXeS4zQSIVDxXov8Qg2mBiVCGXz0eH3ypujbjHKYp6eGb1qubvdPSARQO/N+i9/LO6AU27Nuc
-	N8lH5m7bn+KYFKKR/C12DSf54ns8FExBEjbefnMZWYhIk2DdzpOgiE8l0YJqMEYqh05t/09dyD7
-	jWbNdpzFFxG2tTDVEeRCZCYVV856im3Ygco5YniLKR3akO9jvm9HA2snjzMU3C1sJ8AO80DwQhp
-	X0LRHsa8PSCXX0SfUB5sGvPpYR46/1aQzCKmbxRMBRDq4sEN2a60jPL9EUhmOLRUUW+Pd15pNEK
-	QVCUjPLFc5/tzSoGnmpQr9nlFLQ19STbpfp0ZwsQnQb1x8RALhIK83/Go7egPeNLe25MygYUw9q
-	7N2H8pdLlXYRKHj7RkUPKVxbEhesp4oeHG4rbiYT0YkvZ8G9L9kTy+UOMeyM/e1UCFZ5sQg/1oZ
-	FQGnl6QEbhyoo1IW22qbvgjh260WmQmxTgv/OS/q34=
-X-Received: by 2002:ac8:7f44:0:b0:500:d108:275b with SMTP id d75a77b69052e-506a8261401mr189490801cf.5.1771350615435;
-        Tue, 17 Feb 2026 09:50:15 -0800 (PST)
-Received: from security.cs.northwestern.edu (security.cs.northwestern.edu. [165.124.184.136])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-506847d9852sm186225731cf.7.2026.02.17.09.50.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Feb 2026 09:50:14 -0800 (PST)
-From: Ziyi Guo <n7l8m4@u.northwestern.edu>
-To: Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ziyi Guo <n7l8m4@u.northwestern.edu>
-Subject: [PATCH net v2] net: usb: kaweth: remove TX queue manipulation in kaweth_set_rx_mode
-Date: Tue, 17 Feb 2026 17:50:12 +0000
-Message-Id: <20260217175012.1234494-1-n7l8m4@u.northwestern.edu>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1771351278; x=1771956078;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=D7kdTF2Cckub7dO3x1Hq31N4AgYFSFS+VW8IKBBKDHI=;
+        b=wjbMRAIm2htxqLv0Ib0FFeL3mIoUIfA97JwxsLii+TpcqNpENS4f1plTdGYnjLqqqO
+         Y6GO+GuU03GdhLc4SMdKFtXRSU7ybWl+yU5mLy2Mswh+QMIknY0R+ct/jM8zhwmorMUA
+         GJgcsMxWaIs18rOrfyY+4IK6JOGej26W6mmZaKH+wxsnK+JzK5as1MNl9jhwZUkwubT7
+         dn3F/IXmQLKzWPSTJtjunXSII9bmPpYBNjHNE7xxAwmeWy3qWyXc9DSYmLGrXUJ6kWZt
+         zIoKyyrczOfG2ySau8xGqRa2EEDmJATCXWL2/RvDKSF0mITM1n9fAS2LvQ+WzqwjKS+9
+         22YQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX/k2NJ/QnRMjE5zlj5hgMqbMFLGxneSwCq7im1uZXTvfNz0waHhXIv8ZyscECG2vljydI8sgk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxUGrIpMkjwTJNniCZziE0pMmbZuaaQ+fYteY8750j7wcwVxX8/
+	SFnw8mQGEOEuevU/IVgKGqcVLREg4tQbN5LFSJAyU6+7CoKy63O4jo/Kp6D1lJzBhA==
+X-Gm-Gg: AZuq6aJYnvXo4sjgGRpDLmw5W2LsmqKJ8V7ItLrE3R1QHnYUR6t/fTo1wrYOsgepdLl
+	UU7f7/MjRn5Kb6PW4mYcTe7ZCeGi26O6ABOrZaJubS97yPFnwqqr6syD2rfBWA9dCAH1h1JZhvK
+	kmEjh0BTmkkqU6h2gjYbR+NvVWovbXqO3gVGK+gWwtQHjIxEMalqw7IiDui6zCwlvIrEAWOY+eW
+	7YlDwbjS9lH93in+SFSKc5CyA0XV17PzuXXAXcOqhUQA/Rrs4ivBrEADYb7VCgE1CZsCLANGz3r
+	kTkNf1raLRe0OoyC3NZXNsTcj6biUenhNswLMC0LjSDKe5ukrb1nK4xIt9slp241p5H2eTvtyR3
+	d6I9KfuqFV7vxX3tayT7edL1x22LFgkNU+/QIZJLXtX9AI1PCk3kPn8NekSW4p2slvJ0meCYe5Z
+	EjVUkiPxHdC3OUfbfr4eTBgvqQmgWPWesubrVcn80zHvrngAWkmQ0e60YB1HHHrqPXaWpG
+X-Received: by 2002:a05:6830:348a:b0:7bc:f443:fa3c with SMTP id 46e09a7af769-7d4c31c488emr8662896a34.25.1771351277518;
+        Tue, 17 Feb 2026 10:01:17 -0800 (PST)
+Received: from [172.22.22.28] (c-75-72-117-212.hsd1.mn.comcast.net. [75.72.117.212])
+        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-7d4a771bcebsm16698857a34.25.2026.02.17.10.01.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Feb 2026 10:01:16 -0800 (PST)
+Message-ID: <6160ac44-dba3-400c-96cf-ec03393cc141@ieee.org>
+Date: Tue, 17 Feb 2026 12:01:14 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 1/3] dt-bindings: sram: qcom,imem: Allow
+ modem-tables subnode
+To: Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alex Elder <elder@kernel.org>
+Cc: Marijn Suijten <marijn.suijten@somainline.org>,
+ linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+References: <20260217-topic-ipa_imem-v3-0-d6d8ed1dfb67@oss.qualcomm.com>
+ <20260217-topic-ipa_imem-v3-1-d6d8ed1dfb67@oss.qualcomm.com>
+Content-Language: en-US
+From: Alex Elder <elder@ieee.org>
+In-Reply-To: <20260217-topic-ipa_imem-v3-1-d6d8ed1dfb67@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.44 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[u-northwestern-edu.20230601.gappssmtp.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[ieee.org,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[ieee.org:s=google];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[northwestern.edu : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259116-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259117-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RSPAMD_URIBL_FAIL(0.00)[ieee.org:query timed out,riscstar.com:query timed out];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[n7l8m4@u.northwestern.edu,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	DKIM_TRACE(0.00)[u-northwestern-edu.20230601.gappssmtp.com:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	DKIM_TRACE(0.00)[ieee.org:+];
+	RSPAMD_EMAILBL_FAIL(0.00)[elder.riscstar.com:query timed out];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,u-northwestern-edu.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 8A10B14EBC8
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[elder@ieee.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,qualcomm.com:email,riscstar.com:email]
+X-Rspamd-Queue-Id: CD62B14ED96
 X-Rspamd-Action: no action
 
-kaweth_set_rx_mode(), the ndo_set_rx_mode callback, calls
-netif_stop_queue() and netif_wake_queue(). These are TX queue flow
-control functions unrelated to RX multicast configuration.
+On 2/17/26 7:30 AM, Konrad Dybcio wrote:
+> From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+> 
+> The IP Accelerator hardware/firmware owns a sizeable region within the
+> IMEM, named 'modem-tables', containing various packet processing
+> configuration data.
+> 
+> It's not actually accessed by the OS, although we have to IOMMU-map it
+> with the IPA device, so that presumably the firmware can act upon it.
+> 
+> Allow it as a subnode of IMEM.
 
-The premature netif_wake_queue() can re-enable TX while tx_urb is still
-in-flight, leading to a double usb_submit_urb() on the same URB:
+OK so you'll define a "modem-tables@" property in the SRAM node,
+whose phandle will then be referred to by the "sram" property
+in the IPA node.
 
-kaweth_start_xmit() {
-    netif_stop_queue();
-    usb_submit_urb(kaweth->tx_urb);
-}
+That sounds good to me.  Thanks Konrad.
 
-kaweth_set_rx_mode() {
-    netif_stop_queue();
-    netif_wake_queue();             // wakes TX queue before URB is done
-}
+Reviewed-by: Alex Elder <elder@riscstar.com>
 
-kaweth_start_xmit() {
-    netif_stop_queue();
-    usb_submit_urb(kaweth->tx_urb); // URB submitted while active
-}
-
-This triggers the WARN in usb_submit_urb():
-
-  "URB submitted while active"
-
-This is a similar class of bug fixed in rtl8150 by
-
-- commit 958baf5eaee3 ("net: usb: Remove disruptive netif_wake_queue in rtl8150_set_multicast").
-
-Also kaweth_set_rx_mode() is already functionally broken, the
-real set_rx_mode action is performed by kaweth_async_set_rx_mode(),
-which in turn is not a no-op only at ndo_open() time.
-
-Suggested-by: Paolo Abeni <pabeni@redhat.com>
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Ziyi Guo <n7l8m4@u.northwestern.edu>
----
-v2:
- - Add fixes tag, net prefix and Suggested-by tag.
- - Add explanation of safety of removing netif_stop_queue().
-
- drivers/net/usb/kaweth.c | 2 --
- 1 file changed, 2 deletions(-)
-
-diff --git a/drivers/net/usb/kaweth.c b/drivers/net/usb/kaweth.c
-index c9efb7df892e..e01d14f6c366 100644
---- a/drivers/net/usb/kaweth.c
-+++ b/drivers/net/usb/kaweth.c
-@@ -765,7 +765,6 @@ static void kaweth_set_rx_mode(struct net_device *net)
- 
- 	netdev_dbg(net, "Setting Rx mode to %d\n", packet_filter_bitmap);
- 
--	netif_stop_queue(net);
- 
- 	if (net->flags & IFF_PROMISC) {
- 		packet_filter_bitmap |= KAWETH_PACKET_FILTER_PROMISCUOUS;
-@@ -775,7 +774,6 @@ static void kaweth_set_rx_mode(struct net_device *net)
- 	}
- 
- 	kaweth->packet_filter_bitmap = packet_filter_bitmap;
--	netif_wake_queue(net);
- }
- 
- /****************************************************************
--- 
-2.34.1
+> 
+> Signed-off-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+> ---
+>   Documentation/devicetree/bindings/sram/qcom,imem.yaml | 14 ++++++++++++++
+>   1 file changed, 14 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/sram/qcom,imem.yaml b/Documentation/devicetree/bindings/sram/qcom,imem.yaml
+> index 6a627c57ae2f..c63026904061 100644
+> --- a/Documentation/devicetree/bindings/sram/qcom,imem.yaml
+> +++ b/Documentation/devicetree/bindings/sram/qcom,imem.yaml
+> @@ -67,6 +67,20 @@ properties:
+>       $ref: /schemas/power/reset/syscon-reboot-mode.yaml#
+>   
+>   patternProperties:
+> +  "^modem-tables@[0-9a-f]+$":
+> +    type: object
+> +    description:
+> +      Region containing packet processing configuration for the IP Accelerator.
+> +
+> +    properties:
+> +      reg:
+> +        maxItems: 1
+> +
+> +    required:
+> +      - reg
+> +
+> +    additionalProperties: false
+> +
+>     "^pil-reloc@[0-9a-f]+$":
+>       $ref: /schemas/remoteproc/qcom,pil-info.yaml#
+>       description: Peripheral image loader relocation region
+> 
 
 
