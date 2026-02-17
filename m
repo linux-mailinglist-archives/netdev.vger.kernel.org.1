@@ -1,186 +1,229 @@
-Return-Path: <netdev+bounces-259132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259133-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uKY2C2W3lGlMHQIAu9opvQ
-	(envelope-from <netdev+bounces-259132-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 19:45:57 +0100
+	id qN88MU64lGlmHQIAu9opvQ
+	(envelope-from <netdev+bounces-259133-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 19:49:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AFC814F4F4
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 19:45:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B24C14F56C
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 19:49:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5B18C302D964
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 18:45:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C2149300F11B
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 18:47:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 910DE37417B;
-	Tue, 17 Feb 2026 18:45:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16A0937419C;
+	Tue, 17 Feb 2026 18:47:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fzhkq4U4"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vm1SvlrW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46553372B2E
-	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 18:45:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B37F7372B2D
+	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 18:47:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771353954; cv=none; b=CulDw0p+7cn37JneLt6zvopctTHV/PR9egLBoVjOUb/i8g4RIKi1xW60li4YcM2C3Jexb/ysZrK2+peV0+rrlxx1sx4zoU+Lzygg/jnLjKWArA8KKF2gA6NGqiWq/HQtx9oooDJOjYq8eM5wsao2rwJY2XCIjdXfmDUGnt1Y3+I=
+	t=1771354037; cv=none; b=VuRGjBTA+Z5AOIQbYLjPJBM9Tg6ewp0TjDmtRi+78oxBbhmPD6TCN6PU0xzqzJMIPAZhmKZO2y5cORSl8XcC5TvDR8Ej9qQFZzyFYYKXWszoAJ8dbte1wqPr1/K5pFt5Nyd0TE2DY+moLvQMsLmuWfwjT7nocEoFpn4/vZaKz2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771353954; c=relaxed/simple;
-	bh=ORWEn33cr8TezltWTg7HhteV+K8N7yMVo8rWvGI/V38=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y3I9Bv6Z6yijGUWkeNNPgoZxLrBhKdcLZjS4Onc00m/jKhnzviuYAAyM+oZrF1X1MYdmow7aF5m9x05jxRtFF9PX2sv8si5rP07hknfvIUV2cnABLg81b1UVRiezVNh0IKVKXf2QV01o3bdaCnKXrOFMaaaGz43ZbusEV2vu0pM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fzhkq4U4; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-8cb39647a70so463243885a.0
-        for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 10:45:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771353952; x=1771958752; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9A3D21adMciyC71cYHrKoVOKLOG80kizDTsQCYR5dlk=;
-        b=Fzhkq4U4345JJH3lEtbC8BILX3PobhYlJ2eLutY6PDp1Sz2c1Z2olHmK5tSlSoe1vV
-         m9Rw6E5iqvk3vsFUZVohuqDsPZOD04NRjiPuB6KpzuwmQuPXbesBCZjMm8PkJUGo7G4j
-         Pfg6UhmareZE6JrNmjqWplIT329CmUurZ8MlerEHQGUSaeBZ5GS3S6yCF0Qy8y77cmuc
-         UwdDSTlp22nsV36E3ex3svos7KTXXV4p4j3UVZLHaKRHSF+mnSmvOlQHS+FV5a9E41uA
-         bRlnDhzVLCHLYOKqH4owx/foDym8RotCS2/YZ8CUJbhoLcZkpsnulTMHXgMJ5B5Xhdqi
-         sJ9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771353952; x=1771958752;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9A3D21adMciyC71cYHrKoVOKLOG80kizDTsQCYR5dlk=;
-        b=OVWU6H1QiiHaN9ZCyHSIxAmYKXTppkqPU+y7F1jtsvP7i8toRzuSw2Z2RW3DYtQJpL
-         8xslAQ3KlvIw/xMrIu9bMHu6dfJpRy+vg0sQPlAMuF2GQ4GM6+wg5tiX/lOX8cTyItJf
-         kaE74WxPwEao+WyH8ISA7X87jm9ib8cgfgQ/e78z5uNDvn7aEtExuGkCywn8yXD6FUWQ
-         FzRdr4Z2Didr9NC5wcjmTC60aygqw9gg6HFjHn0trqIMIDHSLpfejFhiZxeyIbomH6th
-         nIKeaoND0zU7N9a6vBaA5azk/80aJOnwzp4Oe8SlLBnwlFeh7HhB8VNJHjzOAK11YIz4
-         xYjw==
-X-Forwarded-Encrypted: i=1; AJvYcCXc99Gj+qDblU3rqzpkKwDqm9Rh2Iy3HGwShWJDOlIfIFsPZyXe9nUJfDZIf5gOs/0mtLgxRQA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxh/3ajWkHiNQQoKsKRyNzBtkl2noLRNveiHiZ2yk1sBDo4vyBC
-	hE3OGnC6cfr/Gl7gG+9g4ATqAvqXhMjxwwSnrfJPk8tBT9SueOPdslH/
-X-Gm-Gg: AZuq6aKWkhFZcx228V9tzgl5ZGioxDUvZOUOmNSZP/yFYe80LZ+rpOf7LWPxqFL06HZ
-	Xj/DvxhzVFafOAz0n2BwwtfXf+kVCOMbQIyWCkBCepQ10pw50QKpUI/pn9rz6tye7pOgW1eJlwB
-	uX4V4dlMOqCqFSQch7PPMk19VhonAWWV9cq7e7P7Cvr7u1AFtWGLjQnyt8Lu6C+LrI761QyrqIu
-	xRpOVIP0bRVI8L5U1QvcYXTUTvhwJ+lWAGU9FmE9yOpAUok3sjLB3B4v4hXzECILKL72Gm5Ug5J
-	fSHqXk2KEpooXiaWxqyfgxX2iVW1etg6kpCVm90TiuVOuD9zaZLFBAo3N+1c0BNFeAMCKTKs6ZR
-	af+J+A1vcnGon1jZuPQt3uyC0iT0gPj4UfulrsyX/RvrdZUNb0To1lRyfd67U3TvAFzKgH9qavM
-	j641q/N/XKtfpdMHuLcrKFyGWzwJxsY/knt5gO3MhM0d1owtBmb0kzr4KhwTFuCu4=
-X-Received: by 2002:a05:620a:4809:b0:8c7:1b3c:8e8 with SMTP id af79cd13be357-8cb4bfb97c0mr1463999185a.40.1771353952153;
-        Tue, 17 Feb 2026 10:45:52 -0800 (PST)
-Received: from ?IPV6:2a03:83e0:1145:4:15c9:280a:146e:89e4? ([2620:10d:c091:500::5aa8])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8971cc7f540sm167126456d6.5.2026.02.17.10.45.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Feb 2026 10:45:51 -0800 (PST)
-Message-ID: <a0f6ef89-e884-4e87-8b4b-2035bc0cc302@gmail.com>
-Date: Tue, 17 Feb 2026 13:45:50 -0500
+	s=arc-20240116; t=1771354037; c=relaxed/simple;
+	bh=iI17eKY7831I4v/LSqilRIb3i55bBiPkk0Q8j+MduH8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BICmD7NqrBDbtMeSTiYj+VSJQrl4CSJ0MoJPRfA9Q9kMTnaYgt6UCD5eR76d+pqX/9KvL0gTM8Q/B6kjyjILFF5g5nJeqwsgXHhGJak/AfYuMwAZ08R3MbuAI74dTyhGqjEBiejaX9uqtion7b0OqSbwFs+iHhfe1N4jIpvr04E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vm1SvlrW; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=jkDG/6fbm0MndLXoxY+/V4qbC0GcfzAF/K4oVMflivw=; b=vm1SvlrWNEqPnPJVHxa2p3gE5l
+	qHA8U43DvaIRVrJc40x3c0Zqw3Hrcgi6aLkbhfsI8FW2G6B7MHeHCEihN/Mx+LXeaRGcW4RtyHA22
+	B62VZ/qaj08NnIv8SDuRwxGmMSYyWsSnVjj+dzFStCjMY56iKT+8vih6m1Jc6ZVolUq0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vsQ6F-007g9S-Aw; Tue, 17 Feb 2026 19:47:07 +0100
+Date: Tue, 17 Feb 2026 19:47:07 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Oliver Neukum <oneukum@suse.com>
+Cc: netdev@vger.kernel.org, hayeswang@realtek.com, bjorn@mork.no,
+	o.rempel@pengutronix.de, Oliver Neukum <oneukum@suse.de>
+Subject: Re: [RFC net-next 2/3] net: usb: usbnet: switch to dynamic
+ allocation of private data
+Message-ID: <8d1bf5ab-f154-4e64-84a2-929d06fb4e6e@lunn.ch>
+References: <20260210151416.42254-1-oneukum@suse.com>
+ <20260210151416.42254-3-oneukum@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: psp: select CONFIG_SKB_EXTENSIONS
-To: Arnd Bergmann <arnd@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Simon Horman <horms@kernel.org>,
- Geert Uytterhoeven <geert+renesas@glider.be>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260216105500.2382181-1-arnd@kernel.org>
-Content-Language: en-US
-From: Daniel Zahka <daniel.zahka@gmail.com>
-In-Reply-To: <20260216105500.2382181-1-arnd@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260210151416.42254-3-oneukum@suse.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259132-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,gmail.com,davemloft.net,google.com,redhat.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259133-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[danielzahka@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,renesas];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9AFC814F4F4
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2B24C14F56C
 X-Rspamd-Action: no action
 
-
-
-On 2/16/26 5:54 AM, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
->
-> psp now uses skb extensions, failing to build when that is disabled:
->
-> In file included from include/net/psp.h:7,
->                   from net/psp/psp_sock.c:9:
-> include/net/psp/functions.h: In function '__psp_skb_coalesce_diff':
-> include/net/psp/functions.h:60:13: error: implicit declaration of function 'skb_ext_find'; did you mean 'skb_ext_copy'? [-Wimplicit-function-declaration]
->     60 |         a = skb_ext_find(one, SKB_EXT_PSP);
->        |             ^~~~~~~~~~~~
->        |             skb_ext_copy
-> include/net/psp/functions.h:60:31: error: 'SKB_EXT_PSP' undeclared (first use in this function)
->     60 |         a = skb_ext_find(one, SKB_EXT_PSP);
->        |                               ^~~~~~~~~~~
-> include/net/psp/functions.h:60:31: note: each undeclared identifier is reported only once for each function it appears in
-> include/net/psp/functions.h: In function '__psp_sk_rx_policy_check':
-> include/net/psp/functions.h:94:53: error: 'SKB_EXT_PSP' undeclared (first use in this function)
->     94 |         struct psp_skb_ext *pse = skb_ext_find(skb, SKB_EXT_PSP);
->        |                                                     ^~~~~~~~~~~
-> net/psp/psp_sock.c: In function 'psp_sock_recv_queue_check':
-> net/psp/psp_sock.c:164:41: error: 'SKB_EXT_PSP' undeclared (first use in this function)
->    164 |                 pse = skb_ext_find(skb, SKB_EXT_PSP);
->        |                                         ^~~~~~~~~~~
->
-> Select the Kconfig symbol as we do from its other users.
->
-> Fixes: 6b46ca260e22 ("net: psp: add socket security association code")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+On Tue, Feb 10, 2026 at 04:11:13PM +0100, Oliver Neukum wrote:
+> usbnet used an unsigned long[5] scratchpad space for private
+> use of subdrivers. That is inelegant and not enough space
+> for some drivers. Switch to letting drivers specify how much
+> room they need in their driver_info.
+> 
+> Signed-off-by: Oliver Neukum <oneukum@suse.de>
 > ---
->   net/psp/Kconfig | 1 +
->   1 file changed, 1 insertion(+)
->
-> diff --git a/net/psp/Kconfig b/net/psp/Kconfig
-> index 371e8771f3bd..84d6b0f25460 100644
-> --- a/net/psp/Kconfig
-> +++ b/net/psp/Kconfig
-> @@ -6,6 +6,7 @@ config INET_PSP
->   	bool "PSP Security Protocol support"
->   	depends on INET
->   	select SKB_DECRYPTED
-> +	select SKB_EXTENSIONS
->   	select SOCK_VALIDATE_XMIT
->   	help
->   	Enable kernel support for the PSP Security Protocol (PSP).
+>  drivers/net/usb/ax88172a.c   |  1 +
+>  drivers/net/usb/cdc_mbim.c   |  4 ++
+>  drivers/net/usb/cdc_ncm.c    | 82 +++++++++++++++++-------------------
+>  drivers/net/usb/sierra_net.c | 21 +++------
+>  drivers/net/usb/smsc75xx.c   |  4 +-
+>  drivers/net/usb/usbnet.c     |  2 +-
+>  include/linux/usb/usbnet.h   |  5 ++-
+>  7 files changed, 56 insertions(+), 63 deletions(-)
+> 
+> diff --git a/drivers/net/usb/ax88172a.c b/drivers/net/usb/ax88172a.c
+> index 1694d6ca2b7b..34884805730d 100644
+> --- a/drivers/net/usb/ax88172a.c
+> +++ b/drivers/net/usb/ax88172a.c
+> @@ -355,4 +355,5 @@ const struct driver_info ax88172a_info = {
+>  		 FLAG_MULTI_PACKET,
+>  	.rx_fixup = ax88172a_rx_fixup,
+>  	.tx_fixup = asix_tx_fixup,
+> +	.required_room = sizeof(struct ax88172a_private),
 
-Indeed that is and has always been a mandatory config dependency for psp.
+A change like this makes sense, given the commit message.
 
-Reviewed-by: Daniel Zahka <daniel.zahka@gmail.com>
+> @@ -107,7 +107,7 @@ static void cdc_ncm_get_ethtool_stats(struct net_device *netdev,
+>  				    u64 *data)
+>  {
+>  	struct usbnet *dev = netdev_priv(netdev);
+> -	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->private[0];
+> +	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->private;
+
+But it is not clear why changes like this belong on this patch. Can
+they be moved into another patch with a good commit message?
+
+>  static void cdc_ncm_free(struct cdc_ncm_ctx *ctx)
+>  {
+> -	if (ctx == NULL)
+> -		return;
+> -
+
+Maybe a patch of its own?
+
+>  	if (ctx->tx_rem_skb != NULL) {
+>  		dev_kfree_skb_any(ctx->tx_rem_skb);
+>  		ctx->tx_rem_skb = NULL;
+> @@ -782,12 +779,13 @@ static void cdc_ncm_free(struct cdc_ncm_ctx *ctx)
+>  		ctx->tx_curr_skb = NULL;
+>  	}
+>  
+> -	if (ctx->is_ndp16)
+> +	if (ctx->is_ndp16) {
+>  		kfree(ctx->delayed_ndp16);
+> -	else
+> +		ctx->delayed_ndp16 = NULL;
+> +	} else {
+>  		kfree(ctx->delayed_ndp32);
+> -
+> -	kfree(ctx);
+> +		ctx->delayed_ndp32 = NULL;
+> +	}
+
+Another patch, with an commit message explaining why this is needed.
+
+> --- a/drivers/net/usb/sierra_net.c
+> +++ b/drivers/net/usb/sierra_net.c
+> @@ -190,14 +190,7 @@ static const struct net_device_ops sierra_net_device_ops = {
+>  /* get private data associated with passed in usbnet device */
+>  static inline struct sierra_net_data *sierra_net_get_private(struct usbnet *dev)
+>  {
+> -	return (struct sierra_net_data *)dev->private[0];
+> -}
+> -
+> -/* set private data associated with passed in usbnet device */
+> -static inline void sierra_net_set_private(struct usbnet *dev,
+> -			struct sierra_net_data *priv)
+> -{
+> -	dev->private[0] = (unsigned long)priv;
+> +	return (struct sierra_net_data *)dev->private;
+>  }
+>  
+>  /* is packet IPv4/IPv6 */
+> @@ -653,7 +646,7 @@ static int sierra_net_bind(struct usbnet *dev, struct usb_interface *intf)
+>  	u8	numendpoints;
+>  	u16	fwattr = 0;
+>  	int	status;
+> -	struct sierra_net_data *priv;
+> +	struct sierra_net_data *priv = (struct sierra_net_data *)dev->private;
+>  	static const u8 sync_tmplate[sizeof(priv->sync_msg)] = {
+>  		0x00, 0x00, SIERRA_NET_HIP_MSYNC_ID, 0x00};
+>  	static const u8 shdwn_tmplate[sizeof(priv->shdwn_msg)] = {
+> @@ -682,11 +675,8 @@ static int sierra_net_bind(struct usbnet *dev, struct usb_interface *intf)
+>  		dev_err(&dev->udev->dev, "No status endpoint found");
+>  		return -ENODEV;
+>  	}
+> -	/* Initialize sierra private data */
+> -	priv = kzalloc(sizeof *priv, GFP_KERNEL);
+> -	if (!priv)
+> -		return -ENOMEM;
+
+Removing the sierra drivers own memory management should be a separate
+patch.
+
+> @@ -1500,7 +1500,7 @@ static int smsc75xx_bind(struct usbnet *dev, struct usb_interface *intf)
+>  	cancel_work_sync(&pdata->set_multicast);
+>  free_pdata:
+>  	kfree(pdata);
+> -	memset(dev->private, 0, sizeof(dev->private));
+> +	memset(dev->private, 0, sizeof(struct smsc75xx_priv *));
+>  	return ret;
+>  }
+>  
+> @@ -1511,7 +1511,7 @@ static void smsc75xx_unbind(struct usbnet *dev, struct usb_interface *intf)
+>  		cancel_work_sync(&pdata->set_multicast);
+>  		netif_dbg(dev, ifdown, dev->net, "free pdata\n");
+>  		kfree(pdata);
+> -		memset(dev->private, 0, sizeof(dev->private));
+> +		memset(dev->private, 0, sizeof(struct smsc75xx_priv *));
+
+These also might need investigating. Why is it necessary to memset
+this memory? Has the life cycle of the memory changed? Can these be
+removed? Again, a separate patch, with a good commit message
+explaining why?
+
+I think the general idea is good, it just needs breaking up into
+smaller patches with good commit messages, and you should try to make
+it look more normal, void *, little wrappers, no casts, etc.
+
+   Andrew
 
