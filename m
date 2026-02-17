@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-259040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259041-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2MruLLhzlGnVDwIAu9opvQ
-	(envelope-from <netdev+bounces-259040-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 14:57:12 +0100
+	id kH5WLN9zlGnVDwIAu9opvQ
+	(envelope-from <netdev+bounces-259041-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 14:57:51 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B57514CD51
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 14:57:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A56E14CD79
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 14:57:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 402B430300D6
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 13:55:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 762A4303E38C
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 13:55:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9185336BCFC;
-	Tue, 17 Feb 2026 13:54:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7933A36CDF5;
+	Tue, 17 Feb 2026 13:54:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gb8ZRwvg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KWuqxCR0"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40A3136AB74;
-	Tue, 17 Feb 2026 13:54:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E20036B057;
+	Tue, 17 Feb 2026 13:54:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771336484; cv=none; b=lgNuR/NWMcrQKpQ3HRxRM9kwL7+/VSp39vaMIR/ntl1fz+ruqabLExj8kwFbYcBNF9ZtVJuGfEzPjaxuUklwnVRuMAHqLeRiPm6PaX236xY02Uu5BlzNAo+2/sckvSd5FUqBR2U06D7JTIIFNMaMYFlDix8Hvoz+TALDlNY0AVk=
+	t=1771336487; cv=none; b=WozCQV/F2KnPIgl9R1MKJzpODtXt2Hsrb8fAeHt48hOeJHuD5Mb+gI9dq9GmCDMZtNQtWtbNZP3UoWdDKBezrqxUt0gNnL3Bi3wtXl849vlvRVoQvI+EL89SeW/I/uJl2+OIupJU52EzUsTWOUGAwHB2i7gDBnJp47KV+CsR+z4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771336484; c=relaxed/simple;
-	bh=2d5txlEQAOFqOdUpFD2V/T7FiaZwo8ubtwK2yRi/b6A=;
+	s=arc-20240116; t=1771336487; c=relaxed/simple;
+	bh=IM78JRWt+y/w2RyjvbJ7PZHjrkyXfpiFs71/8NtY6q8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=isx4udkscM6GnOlQQUFMrl6k5tvxjo76Osvf0sxGaYSfpYKLUBVn7QzOiDLHpgd+m5YTLY1fQWNJXJ7gVV/PJiy1EeqKuAsW9PSpUgd2UpX7VdgYqp4424JlKQ/bnOOugzspkE7rOj1seK0Cu3gQfJhMBZ5G5mJ02SeebN5eV9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gb8ZRwvg; arc=none smtp.client-ip=192.198.163.14
+	 MIME-Version; b=mFwegtqwLENtpK2ymwFTztSYY4VPB5lZ4Hq00W6DWQGqoCZEHDTq0Jb6tSWDiWik5tYIhKCIWunOtV8fyOuDwvXqDTWXAVU2LPEv6FTduEWUdvTsxqZf9q6HDnO3bNp/w3gwbchJd192k/e5LACUxvEHr7Y5A5MBxRb7gEyBCFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KWuqxCR0; arc=none smtp.client-ip=192.198.163.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1771336483; x=1802872483;
+  t=1771336486; x=1802872486;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=2d5txlEQAOFqOdUpFD2V/T7FiaZwo8ubtwK2yRi/b6A=;
-  b=gb8ZRwvg66PRXNIFbd5D00g2r56TPGhPIt/i5mnXPgjww950uRuYyoYF
-   hojzdZnefRxLO5wc1wOmEuc8yHVhk6etHrnguFqgIw7sUfK5smZj+m8e4
-   mSHR3pGnJaKjyKOdcsoTF/LKNP12NyGPFc1rVeAZmTtG659TNjiF1FTZQ
-   qvECA3XN65coogHK+S1g3cGpnkm7Vy6HUnWkIVRvuSj7eMTFZhxdfqSCT
-   XQbOnqimNsg7QcL98yTRUGzMWDcWJW5mNLAEFkeUDwKKtuQEqgUU6gCRN
-   gHvbptMwyWscbrk32Ik+sJOTvvvaBFFH01q0whnCg+86WdYVu3lF4L2f7
-   Q==;
-X-CSE-ConnectionGUID: qtuSoNp9R8WQpS8Pj/hseQ==
-X-CSE-MsgGUID: LGX5t6pMR9CMgj7JdmNTrQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11703"; a="72470408"
+  bh=IM78JRWt+y/w2RyjvbJ7PZHjrkyXfpiFs71/8NtY6q8=;
+  b=KWuqxCR0HxnyHzX4I7xCBJJw6t18kX7DoPR8DymeHX6r1MJo0os8ha4H
+   rgEw5LUzBLCf7Al0zq3b5xdLhwADp5cy/wp2GV8Mey5zSw5QzY4T7wWYW
+   Qlr3c3dkyFhekXZIN6KwcTuQh0FESwDLMJ0Gfm2fwJP9BK4el01BC8Uzv
+   InoS8DhcAalYX2k4ynAuPPcsCzIiju/rv9Kqb0w6+F1TyTZJ77fdeT8/H
+   mQEaSFKr6qmLsELyGSAPs9aw2qPxdPNgoyrkfsUk+R5uiyXqVpDquxYAv
+   /hUmXUQew+BO2j/MVxRDQ8LfX1VT/jP/KR1pmtvJAgG8goQIhhHb47blO
+   w==;
+X-CSE-ConnectionGUID: 8mipo/31RIqY3KYgT7M1eA==
+X-CSE-MsgGUID: 8DMoOBLBSg2DfOKn60grcA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11703"; a="72470428"
 X-IronPort-AV: E=Sophos;i="6.21,296,1763452800"; 
-   d="scan'208";a="72470408"
+   d="scan'208";a="72470428"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2026 05:54:43 -0800
-X-CSE-ConnectionGUID: 7jK9LTbDQAiS33Lvxj6GIw==
-X-CSE-MsgGUID: EO9s9ieDT9eSHMx5SL8p1w==
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2026 05:54:46 -0800
+X-CSE-ConnectionGUID: p2FlM6ICS0+Ihjnu2sPCug==
+X-CSE-MsgGUID: XQnBphauQpupyoljDthLNw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,296,1763452800"; 
-   d="scan'208";a="213904603"
+   d="scan'208";a="213904633"
 Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orviesa008.jf.intel.com with ESMTP; 17 Feb 2026 05:54:34 -0800
+  by orviesa008.jf.intel.com with ESMTP; 17 Feb 2026 05:54:38 -0800
 Received: from lincoln.igk.intel.com (lincoln.igk.intel.com [10.102.21.235])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 173E128791;
-	Tue, 17 Feb 2026 13:54:31 +0000 (GMT)
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 93BB228794;
+	Tue, 17 Feb 2026 13:54:34 +0000 (GMT)
 From: Larysa Zaremba <larysa.zaremba@intel.com>
 To: bpf@vger.kernel.org
 Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
@@ -109,9 +109,9 @@ Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
 	linux-kselftest@vger.kernel.org,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
 	Dragos Tatulea <dtatulea@nvidia.com>
-Subject: [PATCH bpf v3 3/9] ice: fix rxq info registering in mbuf packets
-Date: Tue, 17 Feb 2026 14:24:41 +0100
-Message-ID: <20260217132450.1936200-4-larysa.zaremba@intel.com>
+Subject: [PATCH bpf v3 4/9] ice: change XDP RxQ frag_size from DMA write length to xdp.frame_sz
+Date: Tue, 17 Feb 2026 14:24:42 +0100
+Message-ID: <20260217132450.1936200-5-larysa.zaremba@intel.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260217132450.1936200-1-larysa.zaremba@intel.com>
 References: <20260217132450.1936200-1-larysa.zaremba@intel.com>
@@ -138,7 +138,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[intel.com,nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,linux.dev,bootlin.com,tencent.com,suse.com,lists.linux.dev,vger.kernel.org,lists.osuosl.org,nvidia.com];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[44];
-	TAGGED_FROM(0.00)[bounces-259040-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-259041-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -150,103 +150,68 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2B57514CD51
+X-Rspamd-Queue-Id: 6A56E14CD79
 X-Rspamd-Action: no action
 
-XDP RxQ info contains frag_size, which depends on the MTU. This makes the
-old way of registering RxQ info before calculating new buffer sizes
-invalid. Currently, it leads to frag_size being outdated, making it
-sometimes impossible to grow tailroom in a mbuf packet. E.g. fragments are
-actually 3K+, but frag size is still as if MTU was 1500.
+The only user of frag_size field in XDP RxQ info is
+bpf_xdp_frags_increase_tail(). It clearly expects whole buff size instead
+of DMA write size. Different assumptions in ice driver configuration lead
+to negative tailroom.
 
-Always register new XDP RxQ info after reconfiguring memory pools.
+This allows to trigger kernel panic, when using
+XDP_ADJUST_TAIL_GROW_MULTI_BUFF xskxceiver test and changing packet size to
+6912 and the requested offset to a huge value, e.g.
+XSK_UMEM__MAX_FRAME_SIZE * 100.
 
-Fixes: 93f53db9f9dc ("ice: switch to Page Pool")
+Due to other quirks of the ZC configuration in ice, panic is not observed
+in ZC mode, but tailroom growing still fails when it should not.
+
+Use fill queue buffer truesize instead of DMA write size in XDP RxQ info.
+Fix ZC mode too by using the new helper.
+
+Fixes: 2fba7dc5157b ("ice: Add support for XDP multi-buffer on Rx side")
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_base.c | 26 ++++++-----------------
- drivers/net/ethernet/intel/ice/ice_txrx.c |  3 ++-
- drivers/net/ethernet/intel/ice/ice_xsk.c  |  3 +++
- 3 files changed, 12 insertions(+), 20 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_base.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
-index eadb1e3d12b3..511d803cf0a4 100644
+index 511d803cf0a4..27ab899a4052 100644
 --- a/drivers/net/ethernet/intel/ice/ice_base.c
 +++ b/drivers/net/ethernet/intel/ice/ice_base.c
-@@ -663,23 +663,12 @@ static int ice_vsi_cfg_rxq(struct ice_rx_ring *ring)
+@@ -659,7 +659,6 @@ static int ice_vsi_cfg_rxq(struct ice_rx_ring *ring)
+ {
+ 	struct device *dev = ice_pf_to_dev(ring->vsi->back);
+ 	u32 num_bufs = ICE_DESC_UNUSED(ring);
+-	u32 rx_buf_len;
  	int err;
  
  	if (ring->vsi->type == ICE_VSI_PF || ring->vsi->type == ICE_VSI_SF) {
--		if (!xdp_rxq_info_is_reg(&ring->xdp_rxq)) {
--			err = __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
--						 ring->q_index,
--						 ring->q_vector->napi.napi_id,
--						 ring->rx_buf_len);
--			if (err)
--				return err;
--		}
--
- 		ice_rx_xsk_pool(ring);
- 		err = ice_realloc_rx_xdp_bufs(ring, ring->xsk_pool);
- 		if (err)
+@@ -669,12 +668,12 @@ static int ice_vsi_cfg_rxq(struct ice_rx_ring *ring)
  			return err;
  
  		if (ring->xsk_pool) {
--			xdp_rxq_info_unreg(&ring->xdp_rxq);
--
- 			rx_buf_len =
- 				xsk_pool_get_rx_frame_size(ring->xsk_pool);
+-			rx_buf_len =
+-				xsk_pool_get_rx_frame_size(ring->xsk_pool);
++			u32 frag_size =
++				xsk_pool_get_rx_frag_step(ring->xsk_pool);
  			err = __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
-@@ -702,14 +691,13 @@ static int ice_vsi_cfg_rxq(struct ice_rx_ring *ring)
+ 						 ring->q_index,
+ 						 ring->q_vector->napi.napi_id,
+-						 rx_buf_len);
++						 frag_size);
  			if (err)
  				return err;
- 
--			if (!xdp_rxq_info_is_reg(&ring->xdp_rxq)) {
--				err = __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
--							 ring->q_index,
--							 ring->q_vector->napi.napi_id,
--							 ring->rx_buf_len);
--				if (err)
--					goto err_destroy_fq;
--			}
-+			err = __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
-+						 ring->q_index,
-+						 ring->q_vector->napi.napi_id,
-+						 ring->rx_buf_len);
-+			if (err)
-+				goto err_destroy_fq;
-+
- 			xdp_rxq_info_attach_page_pool(&ring->xdp_rxq,
- 						      ring->pp);
- 		}
-diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
-index ad76768a4232..4c294ab7df30 100644
---- a/drivers/net/ethernet/intel/ice/ice_txrx.c
-+++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
-@@ -560,7 +560,8 @@ void ice_clean_rx_ring(struct ice_rx_ring *rx_ring)
- 			i = 0;
- 	}
- 
--	if (rx_ring->vsi->type == ICE_VSI_PF &&
-+	if ((rx_ring->vsi->type == ICE_VSI_PF ||
-+	     rx_ring->vsi->type == ICE_VSI_SF) &&
- 	    xdp_rxq_info_is_reg(&rx_ring->xdp_rxq)) {
- 		xdp_rxq_info_detach_mem_model(&rx_ring->xdp_rxq);
- 		xdp_rxq_info_unreg(&rx_ring->xdp_rxq);
-diff --git a/drivers/net/ethernet/intel/ice/ice_xsk.c b/drivers/net/ethernet/intel/ice/ice_xsk.c
-index 989ff1fd9110..102631398af3 100644
---- a/drivers/net/ethernet/intel/ice/ice_xsk.c
-+++ b/drivers/net/ethernet/intel/ice/ice_xsk.c
-@@ -900,6 +900,9 @@ void ice_xsk_clean_rx_ring(struct ice_rx_ring *rx_ring)
- 	u16 ntc = rx_ring->next_to_clean;
- 	u16 ntu = rx_ring->next_to_use;
- 
-+	if (xdp_rxq_info_is_reg(&rx_ring->xdp_rxq))
-+		xdp_rxq_info_unreg(&rx_ring->xdp_rxq);
-+
- 	while (ntc != ntu) {
- 		struct xdp_buff *xdp = *ice_xdp_buf(rx_ring, ntc);
+ 			err = xdp_rxq_info_reg_mem_model(&ring->xdp_rxq,
+@@ -694,7 +693,7 @@ static int ice_vsi_cfg_rxq(struct ice_rx_ring *ring)
+ 			err = __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
+ 						 ring->q_index,
+ 						 ring->q_vector->napi.napi_id,
+-						 ring->rx_buf_len);
++						 ring->truesize);
+ 			if (err)
+ 				goto err_destroy_fq;
  
 -- 
 2.52.0
