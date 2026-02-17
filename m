@@ -1,186 +1,170 @@
-Return-Path: <netdev+bounces-258993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258994-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YAjwAXo6lGntAgIAu9opvQ
-	(envelope-from <netdev+bounces-258993-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 10:52:58 +0100
+	id aB3BDlk7lGntAgIAu9opvQ
+	(envelope-from <netdev+bounces-258994-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 10:56:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E76514A8E8
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 10:52:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B63514A98A
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 10:56:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E00843008C18
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 09:52:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BD3EF3034E35
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 09:55:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF66331A568;
-	Tue, 17 Feb 2026 09:52:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F089B31AA82;
+	Tue, 17 Feb 2026 09:55:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="wi75lAlt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MrIQ6pfK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFB7331A55B
-	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 09:52:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771321975; cv=none; b=GooRd89MZxnqOIui1Tco0Axt45bpSCuRzLbAnWnfq9CKmVi3t75yioH3CNIVH156c0jaL9GNCfUkKO1x8DK9wsYUXwmJ+KD7C7+pe5YPMjF2LdLaU1OUaqL74fWlB68QKtbhTsTCV3qsEPoIPCw1J9JYOZDHDvSKN7oBG2Rf8y4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771321975; c=relaxed/simple;
-	bh=urBAo1uE+9Oyo4pvlXX3YvRNxi0nKsHUyTDoo/qLv4o=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JMCM4peKERdAYD4XmJijdIe6oBfK7g629QPPQEPOSnNY+DwfCSOO/rYaFrvjncNzqKNy0ycnYg9qd9CSJNnJOgcU2MFRLuyvc8+fSdwEqwxfP3wQ4TcQdK8WIDbG+VAM73dfTjl0GKOXSjaWPfLgAeqD0ZVrIojM3P2cE1h39cI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=wi75lAlt; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 7D15E20508;
-	Tue, 17 Feb 2026 10:52:45 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tE6ZPodfIbeR; Tue, 17 Feb 2026 10:52:44 +0100 (CET)
-Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 79169201CC;
-	Tue, 17 Feb 2026 10:52:44 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 79169201CC
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1771321964;
-	bh=UWhs/rVcbJWRSCN11hOjwD4iKxtYTROMwtADZVuCsuI=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=wi75lAltdCbDr1Ly+v2coGve4Gi+RrVZaxW93ZiFL8oXI8J45TqsarO/wM9sfGAeO
-	 dFj1gRXHb4CMggEdtWIQ3Rodcd6f450JWB/DXWDIxKNIhcGUASJhK5f/KVQizkfNhB
-	 5EeNklV3yv1zEoFYg88W2nDxF/j2xzJXWbFgXT9atmszvDGgXYvsBMLVsiobTcE8wL
-	 PBvRawiwD7ZLRDKBSU1CzrP2q1mclKL4o6e36QPzro9cxskNVIiEPGcy3FRpP0Pz3g
-	 clbFvNhNzHSetDgg/P3SrCTvmwsoDX150Fgg13j4mrORLBjava0rrVsSrt7aZFu39q
-	 xpDptd2Ggyxzw==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Tue, 17 Feb
- 2026 10:52:43 +0100
-Received: (nullmailer pid 2052322 invoked by uid 1000);
-	Tue, 17 Feb 2026 09:52:43 -0000
-Date: Tue, 17 Feb 2026 10:52:43 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-CC: Sabrina Dubroca <sd@queasysnail.net>, Leon Romanovsky <leon@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Ilan Tayari <ilant@mellanox.com>, Guy Shapiro
-	<guysh@mellanox.com>, Yossi Kuperman <yossiku@mellanox.com>, Network
- Development <netdev@vger.kernel.org>
-Subject: Re: [PATCH net v2] xfrm: always flush state and policy upon
- NETDEV_UNREGISTER event
-Message-ID: <aZQ6a3PfFfJGcOeW@secunet.com>
-References: <cea4b855-fe94-4b4e-9c2d-3cef7aac1be3@I-love.SAKURA.ne.jp>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B46F931A800
+	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 09:55:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771322157; cv=pass; b=LFAJTcVLLgyc9dDpfmbD1bYLtXbXgu/ISci0FPZwpHYZJs+rKA4mVexPThmn/lpKVktbIABdDzqqJ/MEKgK/VU6D0XqZVrP1+1hm2L/7/04GcG9aS6cpyAWWpVayPemuo9EpiDJSWXlqhwJiRvPjIRZY5cOoIa8F0f8LW9FL0uk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771322157; c=relaxed/simple;
+	bh=uQcxrS5XtLzaUDzx5mBZIEaJIdBq7YHFdQeDi+x5Y28=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=loT//iudDlRexqjQWTspYNuDy/jwFcUpfbpGiC1OZVG71PnEbEype47Nwq/DeQRLkXFbyRjHc3n9p3OIPjhQoHYdzQjrCMZkvVkain7DmoHRjwaTvtqA9jjhm1AltQ/GR5qF1Kg9UZ/K+B0A7vnGWu8OyGBskIXrtG2zKgQheU0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MrIQ6pfK; arc=pass smtp.client-ip=209.85.222.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-948ab1c79ebso1067955241.1
+        for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 01:55:56 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771322155; cv=none;
+        d=google.com; s=arc-20240605;
+        b=h4gCnGvReNDEuHlZW7QZccNfRBpMcWVW2DfSE2HUWKJbzAQzhpD+JTsr3vuwFukyo7
+         FaVY9GxwSYHk0lc1koxM7ZlhTLuS5gkqvLquS7pI0zVWx0DtXVmu9atKMl3nTZ8H6mDK
+         hr+o5DBzDMx01nyl9zGzaxrQE1Vck2MN2H3JM5XeHB9JLuDemsXamfMdAWj8UdpAxTqd
+         LF5Xu8BPa0Zs8aoT7p2D5yuOl1tu6DUQsQ9sFNtQuXVC4GeT960IEfZQhoY0/UUMDTmr
+         BkYRYA2evXCxAQtCzvWMJkZnvVah3Pd5p0JsgFMdT3r19GnWt6QzJYQnsqiXG2QUWolL
+         Jt9w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=uQcxrS5XtLzaUDzx5mBZIEaJIdBq7YHFdQeDi+x5Y28=;
+        fh=8h3FT6j6f0+y57n6bMmrvT75AmOPhvDFWlMtbXlAKnA=;
+        b=DNI0jtlIjUA+XAayjOQlK/R3u+O14PyIulmHm2k73fIfav/cSeGICq+T0/9SnvZeIV
+         jpUKqQGdGMZd2/qyI0GZ/sGz2TXrnw3x9n/L7n11weK/BMxNO3nPu/93+VVUWHnT5Dml
+         O9V+ys/X8gj8XyL2QB15esjw1HrL9S2fvlwB+I59AyBFEPdY5ukcq/ejC0C91Xa4QmGX
+         NkN8LJnvvve3dujYcEOfzmUfKL2oJdZ1SGG+/vVHBBeNQG90++hjsN3Ao/MU4o0alp8f
+         HkQLkJi7+bsIilMgxMgQizoZ3EZbFsyvGtmR4el4Ip96/YK/m4F65rmJVX2hGl0qbwgQ
+         TdZQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771322155; x=1771926955; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uQcxrS5XtLzaUDzx5mBZIEaJIdBq7YHFdQeDi+x5Y28=;
+        b=MrIQ6pfKM/YNhSYduwhPxzWa5RmJtXm959CSceSEV//q8COdGQ2p6/AwwWpJ1rtcp/
+         QTCOQZAZZ2e9KAjV3NsAvhqxkshKRhlARd2J7UCh7D550iPSWSZgARWJcOFK9RRGNRuv
+         XnQCWlHNYklgwHqKy1GkcxMWYg8Eufp6OOGgU/bHM5KkHXYB3K14RHkLieLQz+HnfCBA
+         OtBhAqmpR0usvWGETI4f7liyW2mC3ANFz6NbpoBkwL7Vn7uy4iooVn2G2/hhepHL/XjV
+         ePp7/L0urHDohTUgrDZNBd0t7JCdEyejfI+7Uh8lUuV3NqJjWiAn8nJaqju+/ARX0e7n
+         UmpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771322155; x=1771926955;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=uQcxrS5XtLzaUDzx5mBZIEaJIdBq7YHFdQeDi+x5Y28=;
+        b=buArD4nZE4Wp3KBB910ctfXFgm3bsnhAqlaNvfxZKsbpmHTemZ8EPFZwwoB/Ije3Nf
+         fQC8PTFLZun8NKPMUL0dx77hj0YfMWdMAfRtoCqyhjMJfCh3Cz2oBVfWGlScU7oCYn2o
+         kvmrl8+dlgekZNqhMMDjiYuQrDqhe8SXX8ogvoVWq3Kma58Nw1NbUdP9M8+5Jxx00mK3
+         feviqzd9lp50+oAiVCz/oMrz44NY2MrHexpAG+Kvmjscuo+6yxcEnR6DafFXNI2OimQu
+         Gzw8vp4WauOchBRgf4MVCRR5DtrViSI73fXmxgLHA9JHXbzYxTGHhzYh13QrnVEYgw43
+         vXNA==
+X-Forwarded-Encrypted: i=1; AJvYcCXbAhInw2U22XHXj8DfrKWF2YDuyJLiq9h+3tyLNVbZtd9V7Hh12iKikRNHlatDhvFhCJhaEMg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yytag7jtiPDSflGVrOOBBnw8Jh3aLGohpqjc+WOo8WQaKl4v6E5
+	5gOGm6oo28YGkDmFgyA2GwJjH6uAEe/o56CbjZ+sG/vsXNA1z+VPavP1zWrF+4AvfaoAD90v9lK
+	K7VECZt8gg9aNzTcGaWV4FaWO3BHAL7M=
+X-Gm-Gg: AZuq6aKwbd5y9hlbw8d4XU0g22zZiMLUuZ4RRjkLF99gPBucJUYjrsPRnjpPQcI3iKT
+	3P3Ok5X7G6+43MmNa48sSJyIr/93SiNHIpyE3+tBwC3DWYQgO6RUOhsZq/s13o1mhyYrBFjIf5T
+	AUPVMoQHIYCRyWmEyrjZYwUAkwCYeYC0xczgCtSXfYt7CjAFjEvTbc+qJ95uoga2m9FsK7yPcE4
+	dkY/7QwWRBAi3SO4W1DQqXo+l2+tHPYCKehEKEeriao/QVCu6lwPUFXF/bxmxVp9QRpQ145nqlB
+	T1mCCo42ykSJwAWC
+X-Received: by 2002:a05:6102:3f08:b0:5f5:4121:9b0a with SMTP id
+ ada2fe7eead31-5fe16f5d356mr4577718137.36.1771322155559; Tue, 17 Feb 2026
+ 01:55:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <cea4b855-fe94-4b4e-9c2d-3cef7aac1be3@I-love.SAKURA.ne.jp>
-X-ClientProxiedBy: EXCH-02.secunet.de (10.32.0.172) To EXCH-01.secunet.de
- (10.32.0.171)
+References: <20260216174950.455244-1-seanwascoding@gmail.com>
+ <20260216174950.455244-2-seanwascoding@gmail.com> <2e3bf4db-cea6-4f55-a82b-4e99bb3f44fe@lunn.ch>
+In-Reply-To: <2e3bf4db-cea6-4f55-a82b-4e99bb3f44fe@lunn.ch>
+From: Sean <seanwascoding@gmail.com>
+Date: Tue, 17 Feb 2026 17:55:43 +0800
+X-Gm-Features: AaiRm53vZLvkKhlBjILeLIYC1fodHSKYlOPAnjQL4nEJLrwpsrtIJFsCO7n8eJg
+Message-ID: <CAAb=EJVmDS7vKHsw77SARnD9uff-9vBrg97jo3tbYJS-z1KAgw@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] nfs: fix unused variable warnings
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev, 
+	trond.myklebust@hammerspace.com, anna@kernel.org, netdev@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258993-lists,netdev=lfdr.de];
-	TO_DN_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,syzkaller.appspot.com:url,appspotmail.com:email];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[secunet.com:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-258994-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanwascoding@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 7E76514A8E8
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,lunn.ch:email]
+X-Rspamd-Queue-Id: 9B63514A98A
 X-Rspamd-Action: no action
 
-On Fri, Jan 30, 2026 at 07:42:47PM +0900, Tetsuo Handa wrote:
-> syzbot is reporting that "struct xfrm_state" refcount is leaking.
-> 
->   unregister_netdevice: waiting for netdevsim0 to become free. Usage count = 2
->   ref_tracker: netdev@ffff888052f24618 has 1/1 users at
->        __netdev_tracker_alloc include/linux/netdevice.h:4400 [inline]
->        netdev_tracker_alloc include/linux/netdevice.h:4412 [inline]
->        xfrm_dev_state_add+0x3a5/0x1080 net/xfrm/xfrm_device.c:316
->        xfrm_state_construct net/xfrm/xfrm_user.c:986 [inline]
->        xfrm_add_sa+0x34ff/0x5fa0 net/xfrm/xfrm_user.c:1022
->        xfrm_user_rcv_msg+0x58e/0xc00 net/xfrm/xfrm_user.c:3507
->        netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2550
->        xfrm_netlink_rcv+0x71/0x90 net/xfrm/xfrm_user.c:3529
->        netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
->        netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1344
->        netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1894
->        sock_sendmsg_nosec net/socket.c:727 [inline]
->        __sock_sendmsg net/socket.c:742 [inline]
->        ____sys_sendmsg+0xa5d/0xc30 net/socket.c:2592
->        ___sys_sendmsg+0x134/0x1d0 net/socket.c:2646
->        __sys_sendmsg+0x16d/0x220 net/socket.c:2678
->        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->        do_syscall_64+0xcd/0xf80 arch/x86/entry/syscall_64.c:94
->        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> This is because commit d77e38e612a0 ("xfrm: Add an IPsec hardware
-> offloading API") implemented xfrm_dev_unregister() as no-op despite
-> xfrm_dev_state_add() from xfrm_state_construct() acquires a reference
-> to "struct net_device".
-> I guess that that commit expected that NETDEV_DOWN event is fired before
-> NETDEV_UNREGISTER event fires, and also assumed that xfrm_dev_state_add()
-> is called only if (dev->features & NETIF_F_HW_ESP) != 0.
-> 
-> Sabrina Dubroca identified steps to reproduce the same symptoms as below.
-> 
->   echo 0 > /sys/bus/netdevsim/new_device
->   dev=$(ls -1 /sys/bus/netdevsim/devices/netdevsim0/net/)
->   ip xfrm state add src 192.168.13.1 dst 192.168.13.2 proto esp \
->      spi 0x1000 mode tunnel aead 'rfc4106(gcm(aes))' $key 128   \
->      offload crypto dev $dev dir out
->   ethtool -K $dev esp-hw-offload off
->   echo 0 > /sys/bus/netdevsim/del_device
-> 
-> Like these steps indicate, the NETIF_F_HW_ESP bit can be cleared after
-> xfrm_dev_state_add() acquired a reference to "struct net_device".
-> Also, xfrm_dev_state_add() does not check for the NETIF_F_HW_ESP bit
-> when acquiring a reference to "struct net_device".
-> 
-> Commit 03891f820c21 ("xfrm: handle NETDEV_UNREGISTER for xfrm device")
-> re-introduced the NETDEV_UNREGISTER event to xfrm_dev_event(), but that
-> commit for unknown reason chose to share xfrm_dev_down() between the
-> NETDEV_DOWN event and the NETDEV_UNREGISTER event.
-> I guess that that commit missed the behavior in the previous paragraph.
-> 
-> Therefore, we need to re-introduce xfrm_dev_unregister() in order to
-> release the reference to "struct net_device" by unconditionally flushing
-> state and policy.
-> 
-> Reported-by: syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
-> Fixes: d77e38e612a0 ("xfrm: Add an IPsec hardware offloading API")
-> Cc: Sabrina Dubroca <sd@queasysnail.net>
-> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+On Tue, Feb 17, 2026 at 4:06=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+>
+> There is no #ifdef'ery here. How is ptr not used? Is status always
+> true, so the goto it always taken? But then rpcdata should also be
+> unused?
+>
 
-Now applied to the ipsec tree, thanks a lot!
+If CONFIG_SUNRPC_DEBUG is not enabled, dprintk expands to
+do {} while (0) during preprocessing. This means unsigned *ptr has
+no remaining references in the function, as its only 'read' was inside
+the macro.
+
+Regarding rpcdata, the compiler's unused-variable check doesn't care if a
+specific branch (like the goto out) might skip the variable's usage at runt=
+ime.
+As long as there is at least one valid code path where the variable is
+referenced
+which there is for rpcdata in the call to
+rpc_clnt_probe_trunked_xprts() -> the warning is avoided.
+For ptr, the macro expansion leaves it with zero references in any path.
+
+Best regards,
+Sean
 
