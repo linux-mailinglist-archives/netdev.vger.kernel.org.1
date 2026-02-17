@@ -1,265 +1,186 @@
-Return-Path: <netdev+bounces-259083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259084-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2Le4OXySlGl3FgIAu9opvQ
-	(envelope-from <netdev+bounces-259083-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 17:08:28 +0100
+	id uCF/BiyTlGl3FgIAu9opvQ
+	(envelope-from <netdev+bounces-259084-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 17:11:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D6A014DE3E
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 17:08:28 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D43814DEBD
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 17:11:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C2F0F3034A07
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 16:08:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 42B84301588C
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 16:10:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9685B36D51E;
-	Tue, 17 Feb 2026 16:08:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 407D836BCF4;
+	Tue, 17 Feb 2026 16:10:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="t12cETo0";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="pNNg3Ojd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3886E36D516
-	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 16:08:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F03EA36BCC5
+	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 16:10:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771344503; cv=none; b=QlskDpfzUpXUv+uDdD8ePhY5Hq9ZDG9v5frvNxzsfod98b8XTYWnNTo7B+is9FYujo1TPO84uK8DlSDq+joIk9KAB0V89f3YYVAlqEliFiLeMEfstxNy8j/u+hknfFd6J9LI3M8KoAfZogkHJXLfa7qq2uZgnxKdJNZhDiIZsQE=
+	t=1771344658; cv=none; b=AMmHoh06MMcVjyi9a/YH82dsx4wCFkZYVFV7K210NfzyNnCMNemtDv8wIgQIUlbd+VvXV0P8wLo1XtloEdkRKj6t6rR8psB9loCS2OrXTiApaVZFU3Cbqu9ZQJuxaVDAgP281v+pem9YADQATQimR8TE6ggoDMZBBFbGSArsLrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771344503; c=relaxed/simple;
-	bh=JliyW7zepwjvQZbLMGbch8OU0DTaqQTYQv2hTda1lDU=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=gdF7nO4ZAKeSchLu/W8xKGHkvwSqag/XPZQjyYdclc62u5b7dpz6vemBJbc7IQLKXmrW/7fT+n3CUrpe37CupXOvzWj5EReJOsG8d7nUIAwEw94pfGBCNClBiY7v7+eitQVsc02id8Gi/pesbPflNeTWcr3erPgt8BCERXfjA40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-6781479fe9dso46311332eaf.1
-        for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 08:08:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771344501; x=1771949301;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UaZk6k1MJUvmTXwEbhhr17OQUKYfol3DA5TSzMsaSLM=;
-        b=kAKZiOQceyXBTEBgNaHy5MAeFG9ri+7sNrfnmEVuGu9a0yFKAqESD6maaFWcIfxHwl
-         prn8w25orvjw4R5b33czb8Awy9IzJgpHhiFfvrBTRMhKJA0rmRKdJV1qioEZ6XfVwj2k
-         HYL/MiiJUZVxl22TJauvrxHCTaDDYHzfdgITEvBB1uLJjuXu/SXvMzwHSyyEq7Rm0Ip2
-         Fa3WNa26N2efWWGiaSt3N4xqWlBKkKo59O9+yr4i283nuB7NGTKeCuZGIqmFGJEXTW6r
-         PBsE4oxBGcb1rmMmg+/pZ9sMXh3AVJX5ot8aMh7DdYoHOUC3luu4sSa+yMbVeG521XfM
-         QJUA==
-X-Forwarded-Encrypted: i=1; AJvYcCXzxSaiT1yfmbKXA+w83WvsmIZxfkaBBAwTIK13xiDnVjlMd+As3UEgH67u1NZRSx5pC/dC6oY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6EH5eyaS+z+1tW2wbpbW37Kqu+kqGz0LxcBF9TFIuTqfVuq6+
-	uiOHwSfikSK0W1hvoxFQbaXm2VSPZybsGsjqwBq0ui7gwQn06/N9Y4I6nhGMwQ7E+68ycmhz4l4
-	EF6gUtd/pgliY1nHMv7/XMvCqvhWOhLEI2+PM/PXmE28QU3S8eCUZo7YttqE=
+	s=arc-20240116; t=1771344658; c=relaxed/simple;
+	bh=p+uCUKhVP8DzvkBlCG/a5C0OAUe9Iw5kiDqsEYWg3LU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tk09s4cNyqo1zIqx660dwZknQjcfHE4aIVPAueN0sn+FMenjkfbODG8Byg1KyAtUFqLlSXr9CGO+niBkOeTQUP4ahizNjvjwIu5+0x9+JiJKV2fTUuSSMjsepifV88m+r6l54ReeFHlL3Tax9qR87DUUQ1OtA6AmPZf2s/W5eK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=t12cETo0; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=pNNg3Ojd; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Tue, 17 Feb 2026 17:10:53 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1771344655;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qp3z3cLWxmI2ZKIW4Hi+ySZosFYVscIFYciVpCgFXII=;
+	b=t12cETo0nFqqFSfP6psu6XPvSAvB7LDd4oMCZvCnE5PmZp1gZDqxGTs8KvC3qOzPaolF34
+	EJT6HDHl6+VJxOoomxiG7fm2kuiVfujz27vbHXQhVKX1LpBcTcgTaMx0ECX7juqj8ZRrPQ
+	K/CF8ZyUUolKQsXoAxGaLHQ37i/tpXbIhD7OV5ZeIUJT+t+cwv+zB5uidcmMMBWMs+SVZe
+	ai3tCv0TSpHdkjTCMwSL8kuNpy4mB78WigSvDZhndMY1EEDfIwmn05R+1Fjx/hnL+XsSvS
+	DLpBHDOqz9V69P6L+VblcVpr0WKMiU5c8uQwdWv75Y61MZTLCWPYZ9xJie5jSg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1771344655;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qp3z3cLWxmI2ZKIW4Hi+ySZosFYVscIFYciVpCgFXII=;
+	b=pNNg3OjdSAgQvJq6jLl6/ee7MIzZ/pUl7jE8AS9u6aQzOW/wvi9hM1hgSERHCfV9udg9Lh
+	S224Xrpe5yHz0XBg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Felix Maurer <fmaurer@redhat.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH RFC net-next 0/2] hsr: Add additional info to send/
+ receive skbs
+Message-ID: <20260217161053.XMFBwFXg@linutronix.de>
+References: <20260204-hsr_ptp-v1-0-b421c69a77da@linutronix.de>
+ <aZNBfh81p1zBvbi2@thinkpad>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:2283:b0:66e:b5fa:db0a with SMTP id
- 006d021491bc7-6781fff0e68mr6912382eaf.5.1771344501268; Tue, 17 Feb 2026
- 08:08:21 -0800 (PST)
-Date: Tue, 17 Feb 2026 08:08:21 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69949275.050a0220.2eeac1.0145.GAE@google.com>
-Subject: [syzbot] [net?] KCSAN: data-race in tcp_assign_congestion_control / tcp_v6_syn_recv_sock
-From: syzbot <syzbot+937b5bbb6a815b3e5d0b@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, kuniyu@google.com, 
-	linux-kernel@vger.kernel.org, ncardwell@google.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aZNBfh81p1zBvbi2@thinkpad>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=a6d4a8c8877f1220];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-259083-lists,netdev=lfdr.de,937b5bbb6a815b3e5d0b];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	R_DKIM_NA(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-259084-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[storage.googleapis.com:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,goo.gl:url,syzkaller.appspot.com:url]
-X-Rspamd-Queue-Id: 5D6A014DE3E
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6D43814DEBD
 X-Rspamd-Action: no action
 
-Hello,
+On 2026-02-16 17:10:38 [+0100], Felix Maurer wrote:
+> Hi Sebastian,
+Hi,
 
-syzbot found the following issue on:
+> I agree with Willem that the changes are pretty invasive in core parts
+> of the stack for a pretty narrow use case. It got me thinking what would
+> already be supported at the moment without any changes in the kernel or
+> pretty small changes. For that, I see three parts:
+> 
+> 1. Userspace needs to get the full HSR+PTP frames including the headers
+>    and including the rx port information.
+>      a) Userspace should have a way to _only_ receive HSR+PTP frames
+>         instead of all traffic on one of the ports.
+> 2. We should not forward HSR+PTP frames in HSR interface to prevent
+>    creating inaccurate timing information.
+> 3. Userspace needs a way to send packets a) over just port A or B of an
+>    HSR interface, that b) already include an HSR header and should
+>    therefore go mostly unmodified.
+> 
+> Is that about a correct summary?
 
-HEAD commit:    cee73b1e840c Merge tag 'riscv-for-linus-7.0-mw1' of git://..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1188e15a580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a6d4a8c8877f1220
-dashboard link: https://syzkaller.appspot.com/bug?extid=937b5bbb6a815b3e5d0b
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+Yes. Point 3b needs to be extended by
+  " + or does not contain a HSR/PRP header and requires one by the
+  system."
 
-Unfortunately, I don't have any reproducer for this issue yet.
+> If I understand your patch 2 correctly, you will be maintaining two
+> sockets in userspace (one bound to each of the ports A and B through the
+> HSR interface using PACKET_HSR_BIND_PORT). Binding through the HSR
+> interface to port A/B has the very special meaning of making a socket
+> only receive a very small subset of the packets, that is PTP traffic at
+> the moment. This seems like a somewhat hidden property of the bound
+> sockets and should at least be very explicit.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/c607da3ff440/disk-cee73b1e.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/0ca19d705091/vmlinux-cee73b1e.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/6c9182a73e86/bzImage-cee73b1e.xz
+Technically four sockets (two for A and two for B) but in general yes.
+What you mean by hidden property/ very explicit? Document
+PACKET_HSR_BIND_PORT in packet(7) or something else?
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+937b5bbb6a815b3e5d0b@syzkaller.appspotmail.com
+> Is there a reason not to create and bind one socket directly to each of
+> the underlying slave interfaces, with a socket filter attached to only
+> receive the HSR+PTP packets you want? The rx port information is
+> inherent to the socket this way. I'm not sure if sending over the
+> sockets works out of the box, but if something is needed for that, I'd
+> assume it's less invasive and more generally usable.
 
-==================================================================
-BUG: KCSAN: data-race in tcp_assign_congestion_control / tcp_v6_syn_recv_sock
+This was v1. The missing part is sending a new packet and not forwarding
+one. The specification mandates to use system's sequence number.
 
-read-write to 0xffff888103ccb073 of 1 bytes by interrupt on cpu 0:
- tcp_assign_congestion_control+0x2d3/0x310 net/ipv4/tcp_cong.c:-1
- tcp_ca_openreq_child+0x196/0x1d0 net/ipv4/tcp_minisocks.c:522
- tcp_v4_syn_recv_sock+0x4ce/0xa90 net/ipv4/tcp_ipv4.c:1760
- tcp_v6_syn_recv_sock+0xb1/0xe70 net/ipv6/tcp_ipv6.c:1340
- tcp_check_req+0xddd/0x1150 net/ipv4/tcp_minisocks.c:927
- tcp_v4_rcv+0xeda/0x1d90 net/ipv4/tcp_ipv4.c:2238
- ip_protocol_deliver_rcu+0x395/0x790 net/ipv4/ip_input.c:207
- ip_local_deliver_finish+0x1fc/0x2f0 net/ipv4/ip_input.c:241
- NF_HOOK include/linux/netfilter.h:318 [inline]
- ip_local_deliver+0xe8/0x1e0 net/ipv4/ip_input.c:262
- dst_input include/net/dst.h:480 [inline]
- ip_rcv_finish+0x194/0x1c0 net/ipv4/ip_input.c:453
- NF_HOOK include/linux/netfilter.h:318 [inline]
- ip_rcv+0x62/0x160 net/ipv4/ip_input.c:573
- __netif_receive_skb_one_core net/core/dev.c:6149 [inline]
- __netif_receive_skb net/core/dev.c:6262 [inline]
- process_backlog+0x341/0x670 net/core/dev.c:6614
- __napi_poll+0x5f/0x310 net/core/dev.c:7678
- napi_poll net/core/dev.c:7741 [inline]
- net_rx_action+0x452/0x930 net/core/dev.c:7893
- handle_softirqs+0xb9/0x280 kernel/softirq.c:622
- do_softirq+0x45/0x60 kernel/softirq.c:523
- __local_bh_enable_ip+0x70/0x80 kernel/softirq.c:450
- local_bh_enable include/linux/bottom_half.h:33 [inline]
- rcu_read_unlock_bh include/linux/rcupdate.h:924 [inline]
- __dev_queue_xmit+0x139a/0x1f20 net/core/dev.c:4856
- dev_queue_xmit include/linux/netdevice.h:3384 [inline]
- neigh_hh_output include/net/neighbour.h:540 [inline]
- neigh_output include/net/neighbour.h:554 [inline]
- ip_finish_output2+0x705/0x8c0 net/ipv4/ip_output.c:237
- __ip_finish_output net/ipv4/ip_output.c:-1 [inline]
- ip_finish_output+0x114/0x2a0 net/ipv4/ip_output.c:325
- NF_HOOK_COND include/linux/netfilter.h:307 [inline]
- ip_output+0xbd/0x1c0 net/ipv4/ip_output.c:438
- dst_output include/net/dst.h:470 [inline]
- ip_local_out net/ipv4/ip_output.c:131 [inline]
- __ip_queue_xmit+0xbb0/0xbf0 net/ipv4/ip_output.c:534
- ip_queue_xmit+0x39/0x50 net/ipv4/ip_output.c:548
- __tcp_transmit_skb+0x1af2/0x1f10 net/ipv4/tcp_output.c:1693
- tcp_transmit_skb net/ipv4/tcp_output.c:1711 [inline]
- tcp_write_xmit+0x1597/0x3640 net/ipv4/tcp_output.c:3064
- __tcp_push_pending_frames+0x6d/0x1b0 net/ipv4/tcp_output.c:3247
- tcp_push_pending_frames include/net/tcp.h:2282 [inline]
- __tcp_sock_set_cork net/ipv4/tcp.c:3688 [inline]
- tcp_sock_set_cork+0xe1/0x100 net/ipv4/tcp.c:3695
- rds_tcp_xmit_path_complete+0x3b/0x50 net/rds/tcp_send.c:52
- rds_send_xmit+0x128c/0x16f0 net/rds/send.c:480
- rds_send_worker+0x44/0x1b0 net/rds/threads.c:200
- process_one_work kernel/workqueue.c:3275 [inline]
- process_scheduled_works+0x4cd/0x9d0 kernel/workqueue.c:3358
- worker_thread+0x581/0x770 kernel/workqueue.c:3439
- kthread+0x22a/0x280 kernel/kthread.c:467
- ret_from_fork+0x150/0x360 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+> We'd still need to address 2. for this to work, but blocking forwarding
+> for PTP could be done in hsr_forward and friends with a much simpler
+> patch.
 
-read to 0xffff888103ccb040 of 128 bytes by interrupt on cpu 1:
- tcp_v6_syn_recv_sock+0x103/0xe70 net/ipv6/tcp_ipv6.c:1353
- tcp_check_req+0xddd/0x1150 net/ipv4/tcp_minisocks.c:927
- tcp_v4_rcv+0xeda/0x1d90 net/ipv4/tcp_ipv4.c:2238
- ip_protocol_deliver_rcu+0x395/0x790 net/ipv4/ip_input.c:207
- ip_local_deliver_finish+0x1fc/0x2f0 net/ipv4/ip_input.c:241
- NF_HOOK include/linux/netfilter.h:318 [inline]
- ip_local_deliver+0xe8/0x1e0 net/ipv4/ip_input.c:262
- dst_input include/net/dst.h:480 [inline]
- ip_rcv_finish+0x194/0x1c0 net/ipv4/ip_input.c:453
- NF_HOOK include/linux/netfilter.h:318 [inline]
- ip_rcv+0x62/0x160 net/ipv4/ip_input.c:573
- __netif_receive_skb_one_core net/core/dev.c:6149 [inline]
- __netif_receive_skb net/core/dev.c:6262 [inline]
- process_backlog+0x341/0x670 net/core/dev.c:6614
- __napi_poll+0x5f/0x310 net/core/dev.c:7678
- napi_poll net/core/dev.c:7741 [inline]
- net_rx_action+0x452/0x930 net/core/dev.c:7893
- handle_softirqs+0xb9/0x280 kernel/softirq.c:622
- do_softirq+0x45/0x60 kernel/softirq.c:523
- __local_bh_enable_ip+0x70/0x80 kernel/softirq.c:450
- local_bh_enable include/linux/bottom_half.h:33 [inline]
- rcu_read_unlock_bh include/linux/rcupdate.h:924 [inline]
- __dev_queue_xmit+0x139a/0x1f20 net/core/dev.c:4856
- dev_queue_xmit include/linux/netdevice.h:3384 [inline]
- neigh_hh_output include/net/neighbour.h:540 [inline]
- neigh_output include/net/neighbour.h:554 [inline]
- ip_finish_output2+0x705/0x8c0 net/ipv4/ip_output.c:237
- __ip_finish_output net/ipv4/ip_output.c:-1 [inline]
- ip_finish_output+0x114/0x2a0 net/ipv4/ip_output.c:325
- NF_HOOK_COND include/linux/netfilter.h:307 [inline]
- ip_output+0xbd/0x1c0 net/ipv4/ip_output.c:438
- dst_output include/net/dst.h:470 [inline]
- ip_local_out net/ipv4/ip_output.c:131 [inline]
- __ip_queue_xmit+0xbb0/0xbf0 net/ipv4/ip_output.c:534
- ip_queue_xmit+0x39/0x50 net/ipv4/ip_output.c:548
- __tcp_transmit_skb+0x1af2/0x1f10 net/ipv4/tcp_output.c:1693
- tcp_transmit_skb net/ipv4/tcp_output.c:1711 [inline]
- tcp_write_xmit+0x1597/0x3640 net/ipv4/tcp_output.c:3064
- __tcp_push_pending_frames+0x6d/0x1b0 net/ipv4/tcp_output.c:3247
- tcp_send_fin+0x58a/0x6a0 net/ipv4/tcp_output.c:3846
- __tcp_close+0x67d/0x1130 net/ipv4/tcp.c:3258
- tcp_close+0x28/0xd0 net/ipv4/tcp.c:3349
- inet_release+0xcd/0xf0 net/ipv4/af_inet.c:437
- inet6_release+0x3e/0x60 net/ipv6/af_inet6.c:487
- __sock_release net/socket.c:662 [inline]
- sock_release+0x4b/0xe0 net/socket.c:690
- rds_tcp_accept_one+0x4a1/0x830 net/rds/tcp_listen.c:345
- rds_tcp_accept_worker+0x1a/0x60 net/rds/tcp.c:524
- process_one_work kernel/workqueue.c:3275 [inline]
- process_scheduled_works+0x4cd/0x9d0 kernel/workqueue.c:3358
- worker_thread+0x581/0x770 kernel/workqueue.c:3439
- kthread+0x22a/0x280 kernel/kthread.c:467
- ret_from_fork+0x150/0x360 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+Blocking forwarding is simple as it needs just to look at the ethernet
+protocol and drop it if it is PTP. Here I additionally add some
+hints to get the port right and the time stamp.
 
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 1 UID: 0 PID: 1918 Comm: kworker/u8:5 Tainted: G        W           syzkaller #0 PREEMPT(full) 
-Tainted: [W]=WARN
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/24/2026
-Workqueue: krdsd rds_tcp_accept_worker
-==================================================================
+> The other thing that came to my mind: this sounds like XDP with AF_XDP
+> could be a solution that could be used already today; not so much
+> because of their speed but because you can program what goes to the
+> stack and what ends up in userspace. It fulfills 1) + a) directly, 2)
+> implicitly by not letting these frames enter the stack, and 3) directly.
+> But I also see that handling AF_XDP sockets in userspace is quite some
+> work to do if all you really need is to separate out some traffic.
 
+Not forwarding PTP traffic needs to happen unconditionally and not to
+wait until the system is up and has the software running. However if we
+ignore this detail and can receive on interface A and send on interface
+B over XDP and get timestamps right then we have the same as the packet
+interface on the two eth devices. What is missing is sending with HSR/
+PRP header.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> Thanks,
+>    Felix
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Sebastian
 
