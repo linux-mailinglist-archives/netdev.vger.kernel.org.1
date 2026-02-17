@@ -1,205 +1,184 @@
-Return-Path: <netdev+bounces-259036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259044-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QFZZAYxylGntDwIAu9opvQ
-	(envelope-from <netdev+bounces-259036-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 14:52:12 +0100
+	id uAqAA1t0lGnVDwIAu9opvQ
+	(envelope-from <netdev+bounces-259044-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 14:59:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59D4D14CC5B
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 14:52:11 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76B1414CE20
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 14:59:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 354853007F4C
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 13:51:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3BFB6308B2CC
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 13:55:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2777336AB72;
-	Tue, 17 Feb 2026 13:51:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53E2536E462;
+	Tue, 17 Feb 2026 13:54:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="BYlL+joc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LnA7tQCh"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0FE36164C;
-	Tue, 17 Feb 2026 13:51:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9991E36D4E1
+	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 13:54:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771336300; cv=none; b=J/vAqeRVe6lXzCoIbJFfCbz2USSJaSOTT7CYLPbLPG+4NU9vYgbmtRsD1N2BqzBOnNSsquLPwJynlCsPzexPuUl0XPCLc5b1b/8US7Au2BnrF9ftSnk00VVdMZCY9dvNLLJ1RVHfBx+dG8+1946qEKbtb/Iv60Q6rezehPyJzCo=
+	t=1771336496; cv=none; b=RBISgjsgiSJoOzpT8niOcBp2bRYnPUTaCBkgMiUX0CgEAk0eUGDRCtLDJUpWvrrXIrAEF6eyw0sBhPz1xo2EisUgfoawj2qcUh/lxZ70TTSqNkgfREZIUwjyRkf0Z35KiFVoHaWrLNT81HQfr8MdEhLvp7FYKP8xYRqzNcymJ0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771336300; c=relaxed/simple;
-	bh=JifY4cxqIDgOnWSv7Xr6rpbR1tA6sL7TqoYA3RTL4Mc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M7XM+RPQ1TQCVimPz/xiCrz6D5OtS/YpMMgc5hxeQNIlmsFdc6+BOAvv58wdPB9OpcK1wVEwWbIYpKnBkTPpr4KJZ4Vk1M78ndK/sYj6T6oVRj7wnPfxRZpU0jIFgB8FK/gHvlg3DG+AFi6BE71HtyHm6gzoZhxDB8NpANLNXeo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=BYlL+joc; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=KzubmU1ZR4qO5tPvu/ggmGbkoORAmw+LYtfRmNPB2jQ=; b=BYlL+jocubRl5wCDYBd959Aj7t
-	4LEbIlRcac51FFL8xp0I/ACvEOKcl4dTMdwzQajHApt4Aaa5GO4BJFpFFxhoyPo8uBF4ge2tVli9K
-	Zs7YCt/CexEPgN4vhsH/3o2ik/fcGElLK1oBKmIiTrAq5Vb6ER7IPNnWaF/tR9mUkEpo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vsLU5-007dwd-Vg; Tue, 17 Feb 2026 14:51:25 +0100
-Date: Tue, 17 Feb 2026 14:51:25 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phylink: guard link replay helpers against
- NULL phylink instance
-Message-ID: <877b4780-9f99-478c-82fa-a32817d72004@lunn.ch>
-References: <20260205192344.21797-1-vladimir.oltean@nxp.com>
- <173190b1-aed6-4366-bb7d-c6ea64d26899@redhat.com>
+	s=arc-20240116; t=1771336496; c=relaxed/simple;
+	bh=tpVz+/9KZhMiHs88YAAeN8j1bHrbz5eQ3HN+VNf5ImU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UlRsw70Adv78mvxZFSWBlzJhGidK4fOeGpkWYePrqGmhIfRAhwNfsIguAOo9RFrQyGtx9JYrn4qw6Uls8MUisz3D+qjzKToD8XSVKhAddsTSzBCV51l0dgafRwBbIOigOAbjvEPD+Jo4BW3tWuNts+z7kZf8Ec64UVv3SHbNY0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LnA7tQCh; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-482f2599980so46233215e9.0
+        for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 05:54:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771336493; x=1771941293; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9/Db8GHeRwj5/JWbCcVvx6pqqRvI6zmNzmG5BE40n8U=;
+        b=LnA7tQChJjVFuMVz2uv9kN5bp4ZrKtmIO/ltHP6mhlpfgYZ6pB8BgiYSVD40Ym5oBZ
+         oBMLCoIbDsyc/ZOlz8KMq0lwk4+Pk+M2qdgPQ1fuxnpayM5bTz/ugEorif8cSQYFjjM3
+         i+Yjj8bxv+OYNInlZChXTPcpILkb7tie/+1+TwnCn7gCJwb1RRaiV5Is6RCyrs8qgHAK
+         +LhLDRjtsUbe0e2KNtFmA/te3GHSQBLWll3RbC2CjpLASW4owSIToSsPN5HCKLoR/3Dl
+         Aermv9Y2Ys6By+HS0inXPK5Cy1v+mTN4MyrQM9+MWQttQT7tBeyqweSiqfQ6aIiX4X44
+         UxEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771336493; x=1771941293;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9/Db8GHeRwj5/JWbCcVvx6pqqRvI6zmNzmG5BE40n8U=;
+        b=ePaoa/VZt60uflUaYEADVJyHVxcSwIKnnprldoYFUl7BcGTYG/E1a2kWq50DI7aVS2
+         faNa3SXUhJrV6T8S0aI6GfNxqGw0v+GwhpjyuYf12Kg646Ie+HlsuIvQBiTR+9Fg1mp6
+         o+bt5HHsEvThVNPUHAZnwT48ANAudQbxFpX5Y1p+18coBUKfmlIudP1PweABvpikWcDt
+         /20End5kv5SgK/lg/Cc1tCdzFR9PQP62k5S5gLFvFMBwhJIsh6hBvhVOnoKKWOFOp/rC
+         nHuLkjxhW6aV1GWYN6hM0v85qd7QUrSz9fIsAUpX9JH4MmEGPhHhgOPi701sd9tK0SAX
+         wzTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWvjTRHhyJWteaHq2DplqMkLsSjEYm+ohagH17o0cIgVHlGLgWRIFjRVaFLXNoNe4vNZKvt6qc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdYKdPOVjtHvtbsfhnKbJVysqWOasAlkA9J5AMZZ7AXGFQLZLI
+	uqt8bj/jMxaO0856kalQxSxk8Qg6wz7+piPB3avxHEMrMWHAiv1E0Ltq
+X-Gm-Gg: AZuq6aIq+y6VQs8rhbCJ/kRd6PnD25q9qq3N9QFKr9eJggPHSthRj+TQ0xhNksCxb8g
+	l1zP7zlFjz7LUV4FaUIjGy4sVicX1+ERfUH1cos5Xzz8syDeWU+R6W11aw8X/+pcNL+dl+n1Xs9
+	h/fP/x42hEKscFVOrQlu2w3069ckh6pki42op/bX3sE5c/8ttYfwlMtnBwgtxfpRy/Z4/CVlITa
+	F6PglGZqniMiGFGG0v/qBa8UOq6P1OdO+hPCRKG4ycMCD0C97QdMzqdFF7LomJIniEQ7endg1xo
+	HS3SdHwLvgNGmqPU0WFdIl/9N4vIFft5K17bebsrx1f3gu1tvbWGgEl7TasgYNjZ2elBkyIE3MM
+	YfAw/ZCdiLo4Q3Cde0/IWjTZJelYnG3VdfIaZ/FRSF94TPtrStFRSoQn1z6fX8rQSHC+wA3GgGX
+	k87wtdigRPciYHuVfktJImoR/xqgKgQ4I849+pLN8TtFg+0w/DP2efjOYSL8HQ55+3jQ==
+X-Received: by 2002:a05:600c:524d:b0:483:4807:210c with SMTP id 5b1f17b1804b1-48373a5d7a0mr285729075e9.24.1771336492692;
+        Tue, 17 Feb 2026 05:54:52 -0800 (PST)
+Received: from tabrez-VivoBook-ASUSLaptop-X513UA-KM513UA.. ([27.4.206.211])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43796a5b07fsm33993120f8f.2.2026.02.17.05.54.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Feb 2026 05:54:51 -0800 (PST)
+From: Tabrez Ahmed <tabreztalks@gmail.com>
+To: allison.henderson@oracle.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	gerd.rausch@oracle.com,
+	charmitro@posteo.net,
+	linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Tabrez Ahmed <tabreztalks@gmail.com>,
+	syzbot+aae646f09192f72a68dc@syzkaller.appspotmail.com
+Subject: [PATCH net v2] rds: tcp: fix uninit-value in __inet_bind
+Date: Tue, 17 Feb 2026 19:23:49 +0530
+Message-ID: <20260217135350.33641-1-tabreztalks@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <173190b1-aed6-4366-bb7d-c6ea64d26899@redhat.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[nxp.com,vger.kernel.org,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org];
-	TAGGED_FROM(0.00)[bounces-259036-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,oracle.com,posteo.net,vger.kernel.org,gmail.com,syzkaller.appspotmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-259044-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,lunn.ch:mid,lunn.ch:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 59D4D14CC5B
+	FROM_NEQ_ENVFROM(0.00)[tabreztalks@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,aae646f09192f72a68dc];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,syzkaller.appspot.com:url,appspotmail.com:email]
+X-Rspamd-Queue-Id: 76B1414CE20
 X-Rspamd-Action: no action
 
-On Tue, Feb 17, 2026 at 09:22:25AM +0100, Paolo Abeni wrote:
-> On 2/5/26 8:23 PM, Vladimir Oltean wrote:
-> > There is a crash when unbinding the sja1105 driver under special
-> > circumstances:
-> > 
-> > Unable to handle kernel NULL pointer dereference at virtual address 0000000000000030
-> > Call trace:
-> > phylink_run_resolve_and_disable+0x10/0x90
-> > sja1105_static_config_reload+0xc0/0x410
-> > sja1105_vlan_filtering+0x100/0x140
-> > dsa_port_vlan_filtering+0x13c/0x368
-> > dsa_port_reset_vlan_filtering.isra.0+0xe8/0x198
-> > dsa_port_bridge_leave+0x130/0x248
-> > dsa_user_changeupper.part.0+0x74/0x158
-> > dsa_user_netdevice_event+0x50c/0xa50
-> > notifier_call_chain+0x78/0x148
-> > raw_notifier_call_chain+0x20/0x38
-> > call_netdevice_notifiers_info+0x58/0xa8
-> > __netdev_upper_dev_unlink+0xac/0x220
-> > netdev_upper_dev_unlink+0x38/0x70
-> > del_nbp+0x1a4/0x320
-> > br_del_if+0x3c/0xd8
-> > br_device_event+0xf8/0x2d8
-> > notifier_call_chain+0x78/0x148
-> > raw_notifier_call_chain+0x20/0x38
-> > call_netdevice_notifiers_info+0x58/0xa8
-> > unregister_netdevice_many_notify+0x314/0x848
-> > unregister_netdevice_queue+0xe8/0xf8
-> > dsa_user_destroy+0x50/0xa8
-> > dsa_port_teardown+0x80/0x98
-> > dsa_switch_teardown_ports+0x4c/0xb8
-> > dsa_switch_deinit+0x94/0xb8
-> > dsa_switch_put_tree+0x2c/0xc0
-> > dsa_unregister_switch+0x38/0x60
-> > sja1105_remove+0x24/0x40
-> > spi_remove+0x38/0x60
-> > device_remove+0x54/0x90
-> > device_release_driver_internal+0x1d4/0x230
-> > device_driver_detach+0x20/0x38
-> > unbind_store+0xbc/0xc8
-> > ---[ end trace 0000000000000000 ]---
-> > 
-> > which requires an explanation.
-> > 
-> > When a port offloads a bridge, the switch must be reset to change
-> > the VLAN awareness state (the SJA1105_VLAN_FILTERING reason for
-> > sja1105_static_config_reload()). When the port leaves a VLAN-aware
-> > bridge, it must also be reset for the same reason: it is returning
-> > to operation as a VLAN-unaware standalone port.
-> > 
-> > sja1105_static_config_reload() triggers the phylink link replay helpers.
-> > 
-> > Because sja1105 is a switch, it has multiple user ports. During unbind,
-> > ports are torn down one by one in dsa_switch_teardown_ports() ->
-> > dsa_port_teardown() -> dsa_user_destroy().
-> > 
-> > The crash happens when the numerically first user port is not part of
-> > the VLAN-aware bridge, but any other user port is.
-> > 
-> > Tearing down the first user port causes phylink_destroy() to be called
-> > on dp->pl, and this pointer to be set to NULL. Then, when the second
-> > user port is torn down, this was offloading a VLAN-aware bridge port, so
-> > indirectly it will trigger sja1105_static_config_reload().
-> > 
-> > The latter function iterates using dsa_switch_for_each_available_port(),
-> > and unconditionally dereferences dp->pl, including for the
-> > aforementioned torn down previous port, and passes that to phylink.
-> > This is where the NULL pointer is coming from.
-> > 
-> > There are multiple levels at which this could be avoided:
-> > - add an "if (dp->pl)" in sja1105_static_config_reload()
-> > - make the phylink replay helpers NULL-tolerant
-> > - mark ports as DSA_PORT_TYPE_UNUSED after dsa_port_phylink_destroy()
-> >   has run, such that subsequent dsa_switch_for_each_available_port()
-> >   iterations skip them
-> > - disconnect the entire switch at once from switchdev and
-> >   NETDEV_CHANGEUPPER events while unbinding, not just port by port,
-> >   likely using a "ds->unbinding = true" mechanism or similar
-> > 
-> > however options 3 and 4 are quite heavy and might have side effects,
-> > option 1 is very unassuming and option 2 seems a more elegant variant
-> > of 1, given the fact that sja1105 is the only user of these phylink
-> > replay helpers. It allows to keep the driver simple and is the option
-> > I went with.
-> > 
-> > Functionally speaking, transforming the replay helpers into no-ops for
-> > ports without a phylink instance is fine, because that only happens
-> > during driver removal (an operation which cannot be cancelled). The
-> > ports are not required to work.
-> > 
-> > Fixes: 0b2edc531e0b ("net: dsa: sja1105: let phylink help with the replay of link callbacks")
-> > Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> 
-> I think this patch could land on current net, but it would be nice an
-> ack from phylib SMEs.
+KMSAN reported an uninit-value access in __inet_bind() when binding
+an RDS TCP socket.
 
-Sorry, weekend away.
+The uninitialized memory originates from rds_tcp_conn_alloc(),
+which uses kmem_cache_alloc() to allocate the rds_tcp_connection structure.
 
-I prefer option 1. I _think_ option 2 only works because the MAC
-driver set dp->pl to NULL. phylink is not responsible for the NULL, so
-it seems odd for phylink to assume there is a NULL. Only the MAC
-driver knows if the MAC driver has set dp->pl to NULL.
+Specifically, the field 't_client_port_group' is incremented in
+rds_tcp_conn_path_connect() without being initialized first:
 
-       Andrew
+    if (++tc->t_client_port_group >= port_groups)
+
+Since kmem_cache_alloc() does not zero the memory, this field contains
+garbage, leading to the KMSAN report.
+
+Fix this by using kmem_cache_zalloc() to ensure the structure is
+zero-initialized upon allocation.
+
+Reported-by: syzbot+aae646f09192f72a68dc@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=aae646f09192f72a68dc
+Tested-by: syzbot+aae646f09192f72a68dc@syzkaller.appspotmail.com
+Fixes: a20a6992558f ("net/rds: Encode cp_index in TCP source port")
+
+Signed-off-by: Tabrez Ahmed <tabreztalks@gmail.com>
+---
+v2:
+ - Updated Fixes tag to point to commit a20a6992558f as requested by
+   Charalampos Mitrodimas and Allison Henderson.
+ - Explicitly mentioned 't_client_port_group' in the commit message.
+ - Fixed line wrapping to be under 75 characters. 
+
+ net/rds/tcp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/rds/tcp.c b/net/rds/tcp.c
+index 45484a93d75f..04f310255692 100644
+--- a/net/rds/tcp.c
++++ b/net/rds/tcp.c
+@@ -373,7 +373,7 @@ static int rds_tcp_conn_alloc(struct rds_connection *conn, gfp_t gfp)
+ 	int ret = 0;
+ 
+ 	for (i = 0; i < RDS_MPATH_WORKERS; i++) {
+-		tc = kmem_cache_alloc(rds_tcp_conn_slab, gfp);
++		tc = kmem_cache_zalloc(rds_tcp_conn_slab, gfp);
+ 		if (!tc) {
+ 			ret = -ENOMEM;
+ 			goto fail;
+-- 
+2.43.0
+
 
