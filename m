@@ -1,166 +1,318 @@
-Return-Path: <netdev+bounces-259103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259104-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4HVaMeablGmrFwIAu9opvQ
-	(envelope-from <netdev+bounces-259103-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 17:48:38 +0100
+	id oMIUEKWclGmrFwIAu9opvQ
+	(envelope-from <netdev+bounces-259104-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 17:51:49 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CD8414E678
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 17:48:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BD0014E699
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 17:51:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2C815300E391
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 16:48:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B73BA3018AD6
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 16:51:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6E3736D51B;
-	Tue, 17 Feb 2026 16:48:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E129B36E48D;
+	Tue, 17 Feb 2026 16:51:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=u-northwestern-edu.20230601.gappssmtp.com header.i=@u-northwestern-edu.20230601.gappssmtp.com header.b="QzQzXVYF"
+	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="e9KywhR5";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="VdzV/iiD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-b8-smtp.messagingengine.com (fout-b8-smtp.messagingengine.com [202.12.124.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CB2321D5B0
-	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 16:48:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.180
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771346906; cv=pass; b=aC6EpTKSrJWb8nfbePxzT8sr8/4MDYkEosCN4QqFE98eptSOoxTyd09dg4Vxr4p3cN0gnFCbQDKq71oRkoan3Fq0fkofgNvY45iSM6n1miM0AYSsLtggqaLMxIYr3xEftQ/q/QzI+vqbbFF+RqpsraTL7Lnw5Jb4nzb2C82A3nk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771346906; c=relaxed/simple;
-	bh=x8lmkK8Z+Mhh81BsN5M5VArNcC6K8Rk9DEJnryMwc28=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pQk2/oZ4WFT8TQUxRiikXnlf8tx6QjemnVgxS16zEaMHuiVizECiSk6CHHn9cifmMW9FqJPfqsmeXVgogUYdPIFWBAvVWG8abkpX1lpI+ZondG6ZJF7lDQ6dYiMclSzjD5nvQ36A54UNTgDS4L3MetQh5N1nCbE/6wfIBmeZeiw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=u.northwestern.edu; spf=pass smtp.mailfrom=u.northwestern.edu; dkim=pass (2048-bit key) header.d=u-northwestern-edu.20230601.gappssmtp.com header.i=@u-northwestern-edu.20230601.gappssmtp.com header.b=QzQzXVYF; arc=pass smtp.client-ip=209.85.167.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=u.northwestern.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=u.northwestern.edu
-Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-46390d4ac7bso2645594b6e.0
-        for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 08:48:25 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771346904; cv=none;
-        d=google.com; s=arc-20240605;
-        b=fTdZJiF5GxVT6injCqdHNzqxpTGq92aENqpF9J+rc9Zhn70p/xkxCscerIQ2wgZr1b
-         Cb4rnam2ugm2svY9cVDYi1J0ofqGobF+ctmfxNRiYrXLQ03FVqtIGlXNKizOTcRSMc3q
-         FW5BVUlpl+mPZtaGGT090DFfOVugBcCVW18BSD+QekT0lp1XBfX/5sabKgO2m/n6F5ok
-         2P7Un/e9bUHefNaqN+ui0EkosLZYh+1PKId67BCVV6Wy+g0ylhCvzZI2mMNip9k6Dl+o
-         +HsM8wwt6e8WzQKJQX5rQON7DPFJl6dVTM+one13cq+6MjykiCJ5gbfI7Oivu0Xf8sr7
-         sn5A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=x8lmkK8Z+Mhh81BsN5M5VArNcC6K8Rk9DEJnryMwc28=;
-        fh=b1OY5y36x/ZQKiJIuFLeBQcT8wq5PAYf2s3XDJcnPGE=;
-        b=Z+tORdBuk/hNobPNJj7MhN7uTJFxNsjw+7a+RJsK3awSZ7sBw52QGBJvSL/pMCmm7G
-         ZECXTs9YNWeU6NI6nw5WkbgQ9nvizsHcAPJwbwv69SAdGlLf23KxaHd5E9A69NGCSNFE
-         pFwZhFBqnts+jE1IuFgQE07d0Zer62pyZpzgpCDIVd8FZr5790RVsYd6Pz5I7XD44Pwe
-         wIO6w3R+qwoCsPWbuBzEEsEoWMYCB8G6c3hoYB12knZnH2OLkwxaChz1qMfFq2vnb6NF
-         B+Nzru6dDYPgGrUD/w90B1mv8EL0H89nkn9CTgpHZcqKkY/NEHCK+v6D1YBFDWFyh58q
-         PMcw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=u-northwestern-edu.20230601.gappssmtp.com; s=20230601; t=1771346904; x=1771951704; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x8lmkK8Z+Mhh81BsN5M5VArNcC6K8Rk9DEJnryMwc28=;
-        b=QzQzXVYF/1OEsitoUdgFjGBzz02recZS7BzmNMBX8E7ngMQfrW6LzWry5t115DoE3M
-         MMbnzJ7s5//dq4HmYBULCjaFbCAvQRrdACYf1qfgcW4rrn5VgNIs8psRJ22emce1ZCh3
-         wyPiStn57rsqrzmqyrdfXVVjd03HO6+Hlf8wOmnIL06zT6Zia1U21VY7RUNRHpnZfM9e
-         yLkhnHHZL8qdri/BZTVD9KsthDfVdUntOSn+jEcKqQkJtvM7azQyLRyOW+1rIAea7odC
-         Ng4xWk9aHKA7MYZKMZW7tORLxLTP4yUa839owJ9JSPomqatiwYCeXsQ+ur2KP8rNH64u
-         GXZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771346904; x=1771951704;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=x8lmkK8Z+Mhh81BsN5M5VArNcC6K8Rk9DEJnryMwc28=;
-        b=jlWR3IfbsX+FYybljQhgG3khN2c/cIBsTsNWjymwGaZ9Jn7/OwfPbPTMsJ3CbHr/rK
-         KFNCcDhZKcvA14Bcm+IIo9CJy5kDkU73iZHLeBN9Jrp0BBdmgW1/mP18dlmOTs2LVbec
-         ulti7c7VS673xwE81vO+EZCJVIOHwK680W/nSwhJ31TDBdRh3Pewg6mmZOEd8bOltQ9/
-         aFd4bESbMi4G/geuevqzK5U5wSpn+Y7PhOO2p+fuIqLz1Y7+nlWXBzZ7Qmwb5CZpzVb2
-         8iO9bhaKAc8KQCFjHQj85WM1xgicvauSz6wP+B4JtJjtS+PSiykOefohuiV2wg12ZTIt
-         adIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU9FI+wEFyJBAAEEbsKTc/envuFms2bBxlt2dEe4MXszYEYGpauxs+gx79ZqnY33cgdNOEtRno=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYoCYiw9ePKfDJwQNMwXyvD58LMwW+hXctnBB4o74/Ai6ffcsT
-	Dd9BCPLEyThAxsBkNJBkCuNIJpy/mV+GImercennidLH5Jq4ahgcJd2XIog9UaRi0eL3mnU6iDU
-	wZWRbQHXiebog3nC7fcKHR795T7m2dJywE6XbFljzXA==
-X-Gm-Gg: AZuq6aKzbKyChqSSfVDGHmrHyWSwQw2JaLhsMQxuOlrXl8I6HAZQU7FGrKNjc274UCz
-	VRMTlb9rezpjWZ0sM0AXRpXX6txKd6W0sBsYOSDzxDzwbRmyUHjgm3/XKdWnfA6hnvUnb28GCF2
-	eTFkusBmFprCS9Vc84mfTq+rF5D7lOdwwSaa8s1iF0EuAVFZgRPz/+zDRRxttsUkmv8Cx5dfcmO
-	GYkQYXdD+trewFbIg8xeVb1/u1379BskngaIQd1Isug38ZfWhx2RA5AXIG7munRfDyzSeOS6I3p
-	whTymm8NliGyRrMqVUQFcKlxSa4MJplCLjPI4iHAUHKfXl0787HQ1fURKNGgaj63I97waBmDSw=
-	=
-X-Received: by 2002:a05:6808:1208:b0:451:4cc3:912f with SMTP id
- 5614622812f47-4639eebef6emr7303805b6e.7.1771346904143; Tue, 17 Feb 2026
- 08:48:24 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B23B21D5B0;
+	Tue, 17 Feb 2026 16:51:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.151
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771347105; cv=none; b=dFnxdw0XlURdFthn4rxFqayax0c06LzcNF18kc8KYOb4mWEVGC8gHtYrFjum+ch87WpVeWix8smF4Vsvo6BulT6qRkg1AwR0xrlmZakNzT6OejzH0+0B/NJaYYekE6pC2lsSXNhnysUnD7JZRfAdTvSBEZASpHEvJRLADB3tNiI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771347105; c=relaxed/simple;
+	bh=BSi3S2dZEPzNzAFDEVV13PQ53p7wkd2tpUn0QpbhpSw=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=RdvNRG/eiGNkmugd0eNF9jftUZvldjRi8m7WCDSO7g7hlbdPPmXA+Y/yBvtS4HRqMrcKoBLp4mLf4QfToHylTzm7LJr4H5buG1PlB5G1gxgru5kaE/rGCZ35PTOK73cVtdnXY4XnZXjQceZKprddbzP73wCZHUkL26FTuylONg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=e9KywhR5; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=VdzV/iiD; arc=none smtp.client-ip=202.12.124.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.im
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfout.stl.internal (Postfix) with ESMTP id 229831D00067;
+	Tue, 17 Feb 2026 11:51:41 -0500 (EST)
+Received: from phl-imap-13 ([10.202.2.103])
+  by phl-compute-10.internal (MEProxy); Tue, 17 Feb 2026 11:51:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1771347100;
+	 x=1771433500; bh=gTmXdQ6x0zAJ455xiBa36oRFZfaGcb1DbTWyp/DHGRg=; b=
+	e9KywhR5y2hxP/dm/IgwOhcv417kvQQrmOKx/MQxuaLdheeME9ALh0xKeLHUJQrx
+	jO+jB46bjoobaTPA+Q0DizuWsgESjwfJ32UntKGojc+NsenzB06JRDrA5rWEeQIM
+	jnVrLcBhIH7/EzMcJGo1N2sbFjKRzNjI/w8OUpf5vXo0ieXgPwmS4UhtL+pQijJy
+	QEUIbYZXwx590dvrvFPEEoyGVdEFZMcdZ2bKjM1iGFLybOxxS6WMlFFvzBJRRKPc
+	icCcphvmDcMoT1WWtqWrx0gtMuIhAD/POPcDMUdLbUOh8E+QmpstnXf/sSdkoQsH
+	SLzvomH9h/TStIxGnkGUuA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1771347100; x=
+	1771433500; bh=gTmXdQ6x0zAJ455xiBa36oRFZfaGcb1DbTWyp/DHGRg=; b=V
+	dzV/iiDWvatJURxZtyxnn+yfu+SRtp5d1R71dVukwhWvkRA/UOA6yWffz6C5ADA5
+	5tcoIcUusuE2QjdkouMUJMWj3Uoq3dyFOPiaBpaXMr9xfwlG1CDKLTamEM8+1Xg/
+	ovYbbGal6KLclCeVve444sRiaN11LS8ZCsibRHfF/4rtCKu1GZyGcqGO9gyM3Fbl
+	b01biSpgibxTdS/tEqMoW1DHuNwdhVCIQ0vd2/y0lL8eOrnpLle1WNWWn9FbfYdR
+	9QdUZCRMpftLvOH0cnxD3cFdx428jnI1AoMZ5+o2GHlaPhauNlJyUd1KLcgduPlZ
+	ZnzyEO+5bvN5EuMEKgjcg==
+X-ME-Sender: <xms:nJyUaa-fmgw6d0RsUFRcDnp4OqgMrVxamKC2k8uJnOUJkVxd3a6G8w>
+    <xme:nJyUaVgLMByj6_0uWENMEi_hubN4BSrt79oyXejyAhKHztOyApgEBEiLfdf12Oy-X
+    P6glCMwlZ5lTsRlzzlrSXGoqTVGTb1YVbs9kd2xCOJ78DmfachpDjzF>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvvddtvdelucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehlihgt
+    vgcuofhikhhithihrghnshhkrgdfuceorghlihgtvgdrkhgvrhhnvghlsehfrghsthhmrg
+    hilhdrihhmqeenucggtffrrghtthgvrhhnpefhgfevgeeljeegleeiffduheegieehtdff
+    tdetvdffieelkedthfejleejgfeftdenucffohhmrghinhepkhgvrhhnvghlrdhorhhgne
+    cuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghlihgt
+    vgdrkhgvrhhnvghlsehfrghsthhmrghilhdrihhmpdhnsggprhgtphhtthhopedvfedpmh
+    houggvpehsmhhtphhouhhtpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdr
+    nhgvthdprhgtphhtthhopegufiesuggrvhhiugifvghirdhukhdprhgtphhtthhopehjoh
+    hhnhdrfhgrshhtrggsvghnugesghhmrghilhdrtghomhdprhgtphhtthhopegvughumhgr
+    iigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepuggrnhhivghlsehiohhgvggrrh
+    gsohigrdhnvghtpdhrtghpthhtoheprghlihgtvgesihhsohhvrghlvghnthdrtghomhdp
+    rhgtphhtthhopegrshhtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehhrgifkheskh
+    gvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:nJyUaT-B8aqYlapHkcRqNFMuvR6rIYbffH0sG4OTLYQQ_8XWBvPjNw>
+    <xmx:nJyUaUmVV40_RWITVWiyQ8kHZego9PaMGCiAHON-Rj-V4OAxmqx08A>
+    <xmx:nJyUaek24iPNytAhqpQNY26E--BOxVEAbq127U6TpOc9xvbpJb5ETA>
+    <xmx:nJyUaRiHFT5d9u5zqinZB-_jISVazcKyrhUmlPK8KTLlq9_N0dHs_w>
+    <xmx:nJyUaZ4HSzRzH76kH1UENPYBaqRZbEwgWq22ws5JRLn8Z70DJfJ6Pf57>
+Feedback-ID: i559e4809:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 1810533E0099; Tue, 17 Feb 2026 11:51:40 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260209053013.1701134-1-n7l8m4@u.northwestern.edu>
- <d697a88f-dd8c-4ec1-ae4d-c97578a98498@lunn.ch> <CAMFT1=bFkHFsh-3U+Ca7Dey1mzPdz0rpQweCLmXFrattwZ_uMw@mail.gmail.com>
- <119e20b9-4ecd-480d-b629-1c57b2088a41@redhat.com> <65665dd2-90ee-4f52-9238-55ef79832967@redhat.com>
-In-Reply-To: <65665dd2-90ee-4f52-9238-55ef79832967@redhat.com>
-From: Ziyi Guo <n7l8m4@u.northwestern.edu>
-Date: Tue, 17 Feb 2026 11:48:13 -0500
-X-Gm-Features: AaiRm500f0v5aRhtJGmxgFt3WT-gB1Yh-Z-L_IP4NgW6HPMHGVpCSq9goY6JB_o
-Message-ID: <CAMFT1=ZfO6QkDKbwM6GPL-DS1CcJ0pQEwz2XsCUUt8fJQS6yaw@mail.gmail.com>
-Subject: Re: [PATCH] net: usb: kaweth: remove TX queue manipulation in kaweth_set_rx_mode
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, linux-usb@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-ThreadId: A6vJis2OPFsV
+Date: Tue, 17 Feb 2026 18:48:32 +0200
+From: "Alice Mikityanska" <alice.kernel@fastmail.im>
+To: "Tariq Toukan" <tariqt@nvidia.com>, "Eric Dumazet" <edumazet@google.com>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Andrew Lunn" <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>
+Cc: "Saeed Mahameed" <saeedm@nvidia.com>, "Leon Romanovsky" <leon@kernel.org>,
+ "Mark Bloch" <mbloch@nvidia.com>, "Alexei Starovoitov" <ast@kernel.org>,
+ "Daniel Borkmann" <daniel@iogearbox.net>,
+ "Jesper Dangaard Brouer" <hawk@kernel.org>,
+ "John Fastabend" <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, "Gal Pressman" <gal@nvidia.com>,
+ "Moshe Shemesh" <moshe@nvidia.com>, "William Tu" <witu@nvidia.com>,
+ "David Wei" <dw@davidwei.uk>, "Dragos Tatulea" <dtatulea@nvidia.com>,
+ alice@isovalent.com
+Message-Id: <aa5dc734-f122-42ec-b382-f464d02ddc35@app.fastmail.com>
+In-Reply-To: <20260217074525.1761454-1-tariqt@nvidia.com>
+References: <20260217074525.1761454-1-tariqt@nvidia.com>
+Subject: Re: [PATCH net] net/mlx5e: XSK, Fix unintended ICOSQ change
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.06 / 15.00];
+X-Spamd-Result: default: False [-0.65 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[fastmail.im,none];
+	R_DKIM_ALLOW(-0.20)[fastmail.im:s=fm3,messagingengine.com:s=fm3];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[u-northwestern-edu.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[northwestern.edu : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259103-lists,netdev=lfdr.de];
+	XM_UA_NO_VERSION(0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-259104-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[fastmail.im];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[fastmail.im:+,messagingengine.com:+];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[n7l8m4@u.northwestern.edu,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[u-northwestern-edu.20230601.gappssmtp.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[alice.kernel@fastmail.im,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[nvidia.com,kernel.org,iogearbox.net,gmail.com,vger.kernel.org,davidwei.uk,isovalent.com];
+	RCVD_COUNT_FIVE(0.00)[6];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1CD8414E678
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email,messagingengine.com:dkim,app.fastmail.com:mid,iogearbox.net:email,fastmail.im:email,fastmail.im:dkim]
+X-Rspamd-Queue-Id: 2BD0014E699
 X-Rspamd-Action: no action
 
-On Tue, Feb 17, 2026 at 3:56=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
+On Tue, Feb 17, 2026, at 09:45, Tariq Toukan wrote:
+> XSK wakeup must use the async ICOSQ (with proper locking), as it is not
+> guaranteed to run on the same CPU as the channel.
 >
-> On 2/17/26 9:50 AM, Paolo Abeni wrote:
-> > It looks like kaweth_set_rx_mode() is already functionally broken: the
-> > real set_rx_mode action is performed by kaweth_async_set_rx_mode, which
-> > in turn is not a no-op only at ndo_open() time.
-> >
-> > So this looks safe to me.
+> The commit that converted the NAPI trigger path to use the sync ICOSQ
+> incorrectly applied the same change to XSK, causing XSK wakeups to use
+> the sync ICOSQ as well. Revert XSK flows to use the async ICOSQ.
 >
-> @Ziyi Guo: I'm sorry I'm low on coffee and I did not notice a couple of
-> relevant things. This needs a fixes tag. Also please specify the target
-> tree ('net' in this case) on re-submit.
+> XDP program attach/detach triggers channel reopen, while XSK pool
+> enable/disable can happen on-the-fly via NDOs without reopening
+> channels. As a result, xsk_pool state cannot be reliably used at
+> mlx5e_open_channel() time to decide whether an async ICOSQ is needed.
 >
+> Update the async_icosq_needed logic to depend on the presence of an XDP
+> program rather than the xsk_pool, ensuring the async ICOSQ is available
+> when XSK wakeups are enabled.
+>
+> This fixes multiple issues:
+>
+> 1. Illegal synchronize_rcu() in an RCU read- side critical section via
+>    mlx5e_xsk_wakeup() -> mlx5e_trigger_napi_icosq() ->
+>    synchronize_net(). The stack holds RCU read-lock in xsk_poll().
+>
+> 2. Hitting a NULL pointer dereference in mlx5e_xsk_wakeup():
+>
+> [] BUG: kernel NULL pointer dereference, address: 0000000000000240
+> [] #PF: supervisor read access in kernel mode
+> [] #PF: error_code(0x0000) - not-present page
+> [] PGD 0 P4D 0
+> [] Oops: Oops: 0000 [#1] SMP
+> [] CPU: 0 UID: 0 PID: 2255 Comm: qemu-system-x86 Not tainted 
+> 6.19.0-rc5+ #229 PREEMPT(none)
+> [] Hardware name: [...]
+> [] RIP: 0010:mlx5e_xsk_wakeup+0x53/0x90 [mlx5_core]
+>
+> Reported-by: Daniel Borkmann <daniel@iogearbox.net>
+> Closes: 
+> https://lore.kernel.org/all/20260123223916.361295-1-daniel@iogearbox.net/
+> Fixes: 56aca3e0f730 ("net/mlx5e: Use regular ICOSQ for triggering NAPI")
+> Tested-by: Daniel Borkmann <daniel@iogearbox.net>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+> ---
+>  drivers/net/ethernet/mellanox/mlx5/core/en.h  |  1 +
+>  .../ethernet/mellanox/mlx5/core/en/xsk/pool.c |  4 ++--
+>  .../ethernet/mellanox/mlx5/core/en/xsk/tx.c   |  2 +-
+>  .../net/ethernet/mellanox/mlx5/core/en_main.c | 24 +++++++++++++------
+>  4 files changed, 21 insertions(+), 10 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h 
+> b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+> index a7de3a3efc49..19fce51117c9 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+> @@ -1103,6 +1103,7 @@ int mlx5e_open_locked(struct net_device *netdev);
+>  int mlx5e_close_locked(struct net_device *netdev);
+> 
+>  void mlx5e_trigger_napi_icosq(struct mlx5e_channel *c);
+> +void mlx5e_trigger_napi_async_icosq(struct mlx5e_channel *c);
+>  void mlx5e_trigger_napi_sched(struct napi_struct *napi);
+> 
+>  int mlx5e_open_channels(struct mlx5e_priv *priv,
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/pool.c 
+> b/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/pool.c
+> index db776e515b6a..5c5360a25c64 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/pool.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/pool.c
+> @@ -127,7 +127,7 @@ static int mlx5e_xsk_enable_locked(struct 
+> mlx5e_priv *priv,
+>  		goto err_remove_pool;
+> 
+>  	mlx5e_activate_xsk(c);
+> -	mlx5e_trigger_napi_icosq(c);
+> +	mlx5e_trigger_napi_async_icosq(c);
+> 
+>  	/* Don't wait for WQEs, because the newer xdpsock sample doesn't 
+> provide
+>  	 * any Fill Ring entries at the setup stage.
+> @@ -179,7 +179,7 @@ static int mlx5e_xsk_disable_locked(struct 
+> mlx5e_priv *priv, u16 ix)
+>  	c = priv->channels.c[ix];
+> 
+>  	mlx5e_activate_rq(&c->rq);
+> -	mlx5e_trigger_napi_icosq(c);
+> +	mlx5e_trigger_napi_async_icosq(c);
+>  	mlx5e_wait_for_min_rx_wqes(&c->rq, MLX5E_RQ_WQES_TIMEOUT);
+> 
+>  	mlx5e_rx_res_xsk_update(priv->rx_res, &priv->channels, ix, false);
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/tx.c 
+> b/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/tx.c
+> index 9e33156fac8a..8aeab4b21035 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/tx.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/tx.c
+> @@ -34,7 +34,7 @@ int mlx5e_xsk_wakeup(struct net_device *dev, u32 qid, 
+> u32 flags)
+>  				     &c->async_icosq->state))
+>  			return 0;
+> 
+> -		mlx5e_trigger_napi_icosq(c);
+> +		mlx5e_trigger_napi_async_icosq(c);
+>  	}
+> 
+>  	return 0;
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c 
+> b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> index 4b8084420816..6a7ca4571c19 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> @@ -2744,16 +2744,26 @@ static int mlx5e_channel_stats_alloc(struct 
+> mlx5e_priv *priv, int ix, int cpu)
+> 
+>  void mlx5e_trigger_napi_icosq(struct mlx5e_channel *c)
+>  {
+> +	struct mlx5e_icosq *sq = &c->icosq;
+>  	bool locked;
+> 
+> -	if (!test_and_set_bit(MLX5E_SQ_STATE_LOCK_NEEDED, &c->icosq.state))
+> -		synchronize_net();
+> +	set_bit(MLX5E_SQ_STATE_LOCK_NEEDED, &sq->state);
+> +	synchronize_net();
+> 
+> -	locked = mlx5e_icosq_sync_lock(&c->icosq);
+> -	mlx5e_trigger_irq(&c->icosq);
+> -	mlx5e_icosq_sync_unlock(&c->icosq, locked);
+> +	locked = mlx5e_icosq_sync_lock(sq);
+> +	mlx5e_trigger_irq(sq);
+> +	mlx5e_icosq_sync_unlock(sq, locked);
+> 
+> -	clear_bit(MLX5E_SQ_STATE_LOCK_NEEDED, &c->icosq.state);
+> +	clear_bit(MLX5E_SQ_STATE_LOCK_NEEDED, &sq->state);
+> +}
+> +
+> +void mlx5e_trigger_napi_async_icosq(struct mlx5e_channel *c)
+> +{
+> +	struct mlx5e_icosq *sq = c->async_icosq;
+> +
+> +	spin_lock_bh(&sq->lock);
+> +	mlx5e_trigger_irq(sq);
+> +	spin_unlock_bh(&sq->lock);
+>  }
+> 
+>  void mlx5e_trigger_napi_sched(struct napi_struct *napi)
+> @@ -2836,7 +2846,7 @@ static int mlx5e_open_channel(struct mlx5e_priv 
+> *priv, int ix,
+>  	netif_napi_add_config_locked(netdev, &c->napi, mlx5e_napi_poll, ix);
+>  	netif_napi_set_irq_locked(&c->napi, irq);
+> 
+> -	async_icosq_needed = !!xsk_pool || priv->ktls_rx_was_enabled;
+> +	async_icosq_needed = !!params->xdp_prog || priv->ktls_rx_was_enabled;
 
-Hi Paolo and other folks, thank you so much for your time and review,
-and sure, I'll revise and send a v2 version patch, with the fixes tag
-and target tree.
+Acked-by: Alice Mikityanska <alice.kernel@fastmail.im>
+
+With a follow-up suggestion that we discussed at:
+
+https://lore.kernel.org/netdev/8a3a3ff4-16c7-4d99-8854-38d741cc6b82@gmail.com/
+
+>  	err = mlx5e_open_queues(c, params, cparam, async_icosq_needed);
+>  	if (unlikely(err))
+>  		goto err_napi_del;
+>
+> base-commit: ee5492fd88cfc079c19fbeac78e9e53b7f6c04f3
+> -- 
+> 2.44.0
 
