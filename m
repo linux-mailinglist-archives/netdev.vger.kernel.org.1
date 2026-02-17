@@ -1,59 +1,63 @@
-Return-Path: <netdev+bounces-259161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259165-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +BD2MmvolGmjIgIAu9opvQ
-	(envelope-from <netdev+bounces-259161-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 23:15:07 +0100
+	id +LdPI9rslGnUIwIAu9opvQ
+	(envelope-from <netdev+bounces-259165-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 23:34:02 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3EC51515F6
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 23:15:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B781A15183C
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 23:34:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 46D4A300692C
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 22:15:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 791C630095F4
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 22:33:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B0EE314A90;
-	Tue, 17 Feb 2026 22:15:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C6F42F5A08;
+	Tue, 17 Feb 2026 22:33:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mkGHQ3aA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sD2Htsze"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D3B3148AC
-	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 22:15:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 394BD28469F;
+	Tue, 17 Feb 2026 22:33:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771366502; cv=none; b=ET9Pqe6Mm5vfOkBGJ3j28JMLU1Zw2G+uE04RIFjLsj2BROaNtVwyDq5JDLkyiKXf3tn2PS86LVK6V0DpdtKWD1ATQTGClz7BmMpM+FArpfVDFPTvDS9VdsslXRUZ/T1vZHYd5gZJrx54i8VzJKnT3b1jcpU0QDERG0B7kO37DXc=
+	t=1771367636; cv=none; b=aifD01hfTaY5rxE3dhGTkSjNASshEGXY5h9JwXJU2vvmrWS3rKFvILrDuM2Sjjikzg0qL9L5h0izi/bBCHItM1i5D+TA+foxmbFpyc6m5G3TYhwEFeNmEuLNH32rFM7vGTrQsTl6GNxTgrJjbKTy9fPg0Faug7MDy1w9Uu+nTsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771366502; c=relaxed/simple;
-	bh=RGsEEAf3fe9o1b4Xmh/yFSBg989GwNii5JhVr5MAnS0=;
+	s=arc-20240116; t=1771367636; c=relaxed/simple;
+	bh=LlrpJcHFap7X5mLuKnk4GuwG/MJaw1lF4+KlirxoQsU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nF6YsMnpi8uwh7b8/YhEQuvHj6F9O4GehrvQyQ+lQwF+x6TFH4vAQvN+mBNq6tVa6yrhqPgKTAx4lGDer2B/ApvG21RCsRNAi/6i5CwxTxAqQXixacgwQMBncKJ6yMR9J7Hdh2tifMevN04IeaVJD3zVwiIGofp3P1jcOTCCWwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mkGHQ3aA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C48C4C4CEF7;
-	Tue, 17 Feb 2026 22:15:01 +0000 (UTC)
+	 MIME-Version:Content-Type; b=rkmmVGZJNNr8o291H7Aa4iA83ItMPgAiHIONIb5VlR9LhBoDPKKBjkPQhnargweuL3XC8dxOcIq+96eLlj9R4AdJUT3F2TGsyzsh6yN7vpQCT3Br8FLyNPSx8JnJXRM3UzmudIgxVzMDWFP4MU4cLvgH+WG9qjhWQcU4Hw0YLxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sD2Htsze; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 582D9C4CEF7;
+	Tue, 17 Feb 2026 22:33:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771366501;
-	bh=RGsEEAf3fe9o1b4Xmh/yFSBg989GwNii5JhVr5MAnS0=;
+	s=k20201202; t=1771367635;
+	bh=LlrpJcHFap7X5mLuKnk4GuwG/MJaw1lF4+KlirxoQsU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mkGHQ3aARG/4ZJ4FSKoD0eLBtN+G20kqEMb3TSl5T6J3hqFltQ42pS8QdxZPtQ/B0
-	 rFSlhhwbpDAhR7nDJjoEin/KNFUIwQDXlo+Nkci0Ai+T0McXs9ZIZPC8j/+sSnYt00
-	 SQ4j2kgo0WJceZ2IdpBEL9jCFt+adq7Dz0tGOV457UJLW2pBBnde+4KIj/IJ+lXfx+
-	 t0e61m3DQDbjW9PEnFkEAxlQ1Zu7h09ktDYpVmsCHLFV4qEzjDsL9AEVUFjU6dFBlb
-	 nlbW9V9ARSnO0Vlm92JyQpzwoD/nzwEZfrjwsx5Dn7R4D07CLzz+PEZF0JmMsuKWLy
-	 RKjpgzqv3JgHQ==
-Date: Tue, 17 Feb 2026 14:15:00 -0800
+	b=sD2Htsze+iZt25IH8dAnf2DJw4ZsoPTkKAPtN5Ye2aU0EcKrki7UIIQdIwDzkTnMg
+	 +p5cFlEmi8RiSfyfqH0WFd92Q5C/QPKRcptTLFOMgCSP4HN7cfi8u2Jv6rbT0pDyI1
+	 KhvLbXIqrrcIk6ROYypQTNkrrlUDM5yL4bjN1/XCquDZi8IhscHqCOq+BCfx3Mq25p
+	 XMxX3bNOnJLRNnTd1KNznSlC8fPP648e3XjdRtNhI0ScEIU/EL+np1vf7WG5y6ZIFy
+	 KQXxqXCc/vqriOBt15Uq65/AXFvbY7aJPzhfrvIkaQo2OHeIkXW3jwwH3WCWQz/9vC
+	 0etW/OG9elpPQ==
+Date: Tue, 17 Feb 2026 14:33:54 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Dawid Osuchowski <linux@osuchow.ski>
-Cc: netdev@vger.kernel.org
-Subject: Re: [ANN] netdev development stats for 7.0 (and some AI review
- thoughts)
-Message-ID: <20260217141500.00c3fa2d@kernel.org>
-In-Reply-To: <d3e7fa70-4035-47e0-89cc-92d636497198@osuchow.ski>
-References: <20260212124208.187e53ae@kernel.org>
-	<d3e7fa70-4035-47e0-89cc-92d636497198@osuchow.ski>
+To: Fabian Druschke <fdruschke@outlook.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Fabian Druschke <fabian@druschke.network>,
+ Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com, "David S .
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] r8169: avoid OOM when allocating RX buffers
+Message-ID: <20260217143354.3366db18@kernel.org>
+In-Reply-To: <GVZP280MB1013A39E6B154E88E8CBB87EAF6DA@GVZP280MB1013.SWEP280.PROD.OUTLOOK.COM>
+References: <20260216185245.182450-1-fabian@druschke.network>
+	<64b1a578-5325-4d51-9b10-2b54fcaa0a7f@lunn.ch>
+	<GVZP280MB1013A39E6B154E88E8CBB87EAF6DA@GVZP280MB1013.SWEP280.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,64 +75,43 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259161-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,druschke.network,gmail.com,realtek.com,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-259165-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
+	FREEMAIL_TO(0.00)[outlook.com];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: F3EC51515F6
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B781A15183C
 X-Rspamd-Action: no action
 
-On Mon, 16 Feb 2026 00:31:08 +0100 Dawid Osuchowski wrote:
-> > One more note on testing, we have completed the migration of NIPA
-> > to netdev foundation machines. Due to DRAM shortage, however,
-> > the shipment of additional machines is delayed.  
+On Tue, 17 Feb 2026 22:50:30 +0100 Fabian Druschke wrote:
+> Ahoy! Thanks for clarification! Didn't know it was intended behaviour.
 > 
-> Just something I noticed that might be connected to this is that the 
-> links to "Raw output" in these announcements broke for each previous 
-> message you posted.
+> We've encountered this issue specifically with this Realtek NIC on 
+> ShredOS due to lack of mlx5, mlx4 etc.
 > 
-> It is possible to use the new link convention/format:
-> 
-> 	Raw output: https://netdev.bots.linux.dev/ml-stats/stats-7.0
-> 
-> to go back as far as 6.18 stats e.g.:
-> 
-> 	https://netdev.bots.linux.dev/ml-stats/stats-6.18
-> 
-> but beyond that (6.17 and older) it doesn't work. The "old" nipa links:
-> 
-> 	Raw output: https://netdev.bots.linux.dev/static/nipa/stats-6.19/stdout
-> 
-> are completely broken.
+> For NICs like ixgbe we didn't encounter this issue so i was thinking 
+> about a bug.
 
-Yup, this is due to the NIPA migration from Meta systems to netdev
-foundation machines. I can regenerate the outputs if you need them
-(modulo the JSON format changing since), LMK if and how far back.
+Most / all "professional grade"(??) NICs support scatter, where larger 
+frames are written into multiple chunks, 4kB each. order-2 allocations
+on the fast path are a bad idea. One way to alleviate the performance
+implications would be to use page pool, but that doesn't help with the
+initial fill, just the datapath :(
 
-I did copy the "time based" stats from old machines (3mo, 6mo etc) FWIW:
-https://netdev.bots.linux.dev/ml-stats/
-which I suspect to be more useful for actionable tracking of activity
-than the release-by-release. Release stats are mostly an excuse to send
-an email to the list and thank people :)
-
-> P.S. I am using a freshly setup email client on a new machine so 
-> apologies if the formatting is wrong on my end. I did send this message 
-> to myself for testing and I think it's okay, but I might be missing 
-> something :)
-
-Looks fine :)
+reminder: please avoid top posting when replying on the mailing list
 
