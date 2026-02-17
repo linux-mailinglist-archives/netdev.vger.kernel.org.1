@@ -1,144 +1,143 @@
-Return-Path: <netdev+bounces-259157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259159-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4Ae1F/PklGmjIgIAu9opvQ
-	(envelope-from <netdev+bounces-259157-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 23:00:19 +0100
+	id 2BAUF0DmlGmjIgIAu9opvQ
+	(envelope-from <netdev+bounces-259159-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 23:05:52 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E36F01513DB
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 23:00:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F214D151467
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 23:05:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AB38B300D96E
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 22:00:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6533D301FA7C
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 22:05:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C351130BB80;
-	Tue, 17 Feb 2026 22:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF2BD3128BA;
+	Tue, 17 Feb 2026 22:05:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W9QfSzp3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cz6l3Fev"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F63730B52B;
-	Tue, 17 Feb 2026 22:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A601330B52B;
+	Tue, 17 Feb 2026 22:05:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771365602; cv=none; b=RVUfc/HD/LjHP/TJbkvtLYKodk7bk8jE3sowQ54btsTR1BgIsfYsK3sZJ9lHjo5qooeOIbzatkM9RpEETElJLpjR3c1NImsV38qg+fq6HnfEYEaNc4MSAUUuwc0gD2s+zsJ+UjhfJW3Kp5Q2K6lD8LVhgJkNZmdp1mLCCWev4w8=
+	t=1771365947; cv=none; b=VyZ5z/QeIZQZFDZfzNVhSOkiI4Hin71+LxAdp+waLCfuSCQPS7FRQHb8FI8Qv+wMo2SiKhM1qqmrW3w5sY85Wowr5+rHsOHOqutjfxqdwqIZ1ifdtmpzSSnMC64N8IlL0uIsdrHsaC/aOuQJyrITiHdljlD6I6PyLX/ENChyV2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771365602; c=relaxed/simple;
-	bh=1KFybEk9QuwRToTqNIi6MYrhV9F6EZyrTfHdFSJR2ls=;
+	s=arc-20240116; t=1771365947; c=relaxed/simple;
+	bh=N352cReU/v+Zqk74ksFe2bI5YmBJMQ10oDYOnJpnozQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=vBjnacY42oCrjsNJLIgc/P7AIgmP/KC0JWCFy8nWfcRVMlFeeEzbFsGHXZIytVC52a+viAdXpllEc43G0sotwq3eHYYm0MJLnqmlJSwFQNRsjdGEBYEduuy91eqtQ3+035YKVRYvL2sYYt+7XLrzawfu00vw6R5n8xBjVhNEhm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W9QfSzp3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B80A1C4CEF7;
-	Tue, 17 Feb 2026 21:59:59 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Tdhez4jQPzIKysNmZJzfbOy6pJeddFhifMjtwVIdm7E+O9lZOAOId9GlF650oiZE/ic9iFrecZGyaOVxUdpcNC9yny4/u77tcAwts/O+P3bmjMu7iWIMm23JTmROmSVCzJJU3dqCwbM53VKCqJN2Po/eFyebiblB80ybbbghtcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cz6l3Fev; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A84B9C4CEF7;
+	Tue, 17 Feb 2026 22:05:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771365602;
-	bh=1KFybEk9QuwRToTqNIi6MYrhV9F6EZyrTfHdFSJR2ls=;
+	s=k20201202; t=1771365947;
+	bh=N352cReU/v+Zqk74ksFe2bI5YmBJMQ10oDYOnJpnozQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=W9QfSzp3ldumQT1aE8LOijpEvQAALFIwANolJ7sdxMavTJcN0uMXFxnmM9MAd05Xw
-	 cXa29f74Lk/r8uGv1DK1LoIrAU+1Eb8KfxLJNdbNCgrNRKVVM0qzsazXwAgWObf+jZ
-	 63JLwtHnXGsfrsrnDWiYLMVaWNibFqNX/5Zr0vuXVshzJ2w0e/CqwDKvNfGEFpWAje
-	 t3+QMd7Om4CKratdUrgiNGq6edfthSqzYQILdms7MdEPnSY5OmG3/+vWalIfBOF65v
-	 LL78kMrrNSDeWIvW1BKf3q5ONhw/Q/knExm5tBA+/3qpteCOrTe72w8BOa4lstY+nJ
-	 L193hg62sI0bQ==
-Date: Tue, 17 Feb 2026 13:59:58 -0800
+	b=cz6l3FevT8m57fUF5vkT2hXikEzplXJDCyA/dICZ7WiMnC4+IWrcAHGS+0xPo3z5B
+	 t0Qbgb8SIAh5aDkFekwdWqhq1FpQGmp4gub8Gr5o2BXuBCqX3Hg8GWBbYm2rdGeMOY
+	 fhEgy5ipWGrQywWWfdeSwQJVSpRLuGGGSy+jq8Sevh+bVmK1ZeLcO6X5ftTSSjP0cg
+	 bWKZI4K6RQfmf0lGOmpuD1j2T4+v9N1hDHAZpyjacBCbCR1F/KRn+uVrzBd12eDhXJ
+	 Wa2IyYvF+2xfFIfu3f8gIpvSjULetr2Kjd8RB9dQhUKxhg8xgwXYFlE4c0RgDe5lHp
+	 ykUJJLtcxhYzg==
+Date: Tue, 17 Feb 2026 14:05:45 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?xYF1a2Fzeg==?= Majewski <lukasz.majewski@mailbox.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
- <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, Richard Cochran
- <richardcochran@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
- <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>, Andrew Lunn
- <andrew@lunn.ch>
-Subject: Re: [net-next v23 2/7] net: mtip: The L2 switch driver for imx287
-Message-ID: <20260217135958.216c30b6@kernel.org>
-In-Reply-To: <20260216102359.37586219@wsk>
-References: <20260204232135.1024665-1-lukasz.majewski@mailbox.org>
-	<20260204232135.1024665-3-lukasz.majewski@mailbox.org>
-	<20260205182805.196fd832@kernel.org>
-	<20260206112454.2e9a686f@wsk>
-	<20260216102359.37586219@wsk>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Florian Westphal <fw@strlen.de>, Shigeru Yoshida <syoshida@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Phil Sutter <phil@nwl.cc>,
+ syzbot+5a66db916cdde0dbcc1c@syzkaller.appspotmail.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+Subject: Re: [PATCH net] net: flow_offload: protect driver_block_list in
+ flow_block_cb_setup_simple()
+Message-ID: <20260217140545.325067c0@kernel.org>
+In-Reply-To: <aZRUFQGKzEdcjNHG@chamomile>
+References: <20260208110054.2525262-1-syoshida@redhat.com>
+	<aYxw2CpxOKLh1wOz@strlen.de>
+	<20260212183447.2d577f5b@kernel.org>
+	<aY8LcgPsoYYGEH5s@strlen.de>
+	<20260213081749.3b3ede9c@kernel.org>
+	<aZHE4r18hkxdITD-@strlen.de>
+	<aZRUFQGKzEdcjNHG@chamomile>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259157-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-259159-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,pengutronix.de,gmail.com,vger.kernel.org,lists.linux.dev,lists.infradead.org,gmx.net];
-	RCPT_COUNT_TWELVE(0.00)[21];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,5a66db916cdde0dbcc1c];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E36F01513DB
+X-Rspamd-Queue-Id: F214D151467
 X-Rspamd-Action: no action
 
-On Mon, 16 Feb 2026 10:23:59 +0100 =C5=81ukasz Majewski wrote:
-> > > Transient build failure here:
-> > >=20
-> > > drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c:1072:32: warning:
-> > > variable =E2=80=98priv=E2=80=99 set but not used [-Wunused-but-set-va=
-riable] 1072 |
-> > >       struct mtip_ndev_priv *priv; |
-> > > ^~~~
-> > >=20
-> > > I sent out the AI code reviews while at it, without looking at them.
-> > > So please approach them with caution..   =20
-> >=20
-> > IMHO, issues pointed with AI review have been at discussed and
-> > (to my best knowledge) addressed.
-> >=20
-> > Shall I prepare next version of this patch set?
->=20
-> I'm a bit confused regarding the next steps for this driver.
+On Tue, 17 Feb 2026 12:42:13 +0100 Pablo Neira Ayuso wrote:
+> > static int
+> > mtk_eth_setup_tc_block(struct net_device *dev, struct flow_block_offload *f)
+> > {
+> >         struct mtk_mac *mac = netdev_priv(dev);
+> >         struct mtk_eth *eth = mac->hw;
+> >         static LIST_HEAD(block_cb_list);
+> > 	~~~~~~
+> > I have a question.
+> > 
+> > [..]
+> >         f->driver_block_list = &block_cb_list;
+> > 
+> > Now I have many questions!
+> > 
+> > How is this supposed to work?  
+> 
+> Last time I met people, I asked how is hw offload actually working
+> with netns (6 years ago?), someone told me: "maybe there is a driver
+> that supports it...". I have never seen one, but I am very much
+> outdates on how this has evolved TBH, I might be wrong.
+> 
+> I don't think any driver really supports netns + hardware offload, so
+> I suggest to restrict it, see attached patch.
+> 
+> It would be better to add a helper function such as int net_setup_tc()
+> for the myriad of ->ndo_setup_tc() calls in the code, then move this
+> check in it to consolidate, but I think you want something you can
+> pass to -stable at this stage?
 
-1. This version didn't build, so it's out.
-2. Take the AI review under consideration.
-3. Address issues from 1+2.
-4. Post v24
-
-Well before posting:=20
-
-4a) wait for net-next to open up, it's close right now
-
-> There was no reply regarding my last question - and I don't know how I
-> shall proceed...
-
-Hope above clarifies.
-
-I strongly advise you to follow the ML so you have a better
-understanding of the process.
+I don't think we need this restriction for TC side, it should be under
+rtnl_lock, IIUC. I have a... strong suspicion(?) that TC works, some
+drivers explicitly support devlink reload into a specified netns. 
+I always assumed this is for the cases where something like OvS offload
+is supposed to be handled outside init_net to avoid netdev explosion. 
+I could be wrong, tho, could be an RDMA thing.
 
