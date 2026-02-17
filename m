@@ -1,128 +1,229 @@
-Return-Path: <netdev+bounces-259140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259141-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8CpRDMLOlGlGIAIAu9opvQ
-	(envelope-from <netdev+bounces-259140-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 21:25:38 +0100
+	id iJ08Bz7PlGlGIAIAu9opvQ
+	(envelope-from <netdev+bounces-259141-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 21:27:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5BD414FF19
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 21:25:37 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7620214FF65
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 21:27:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 74C27301A72E
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 20:25:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1A69F30086D8
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 20:26:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52EA82DA76C;
-	Tue, 17 Feb 2026 20:25:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8985C330311;
+	Tue, 17 Feb 2026 20:26:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VIrKo+Y8"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="0Nm6HDb1";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="PtyNL1Yc";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="0Nm6HDb1";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="PtyNL1Yc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BE9E17993;
-	Tue, 17 Feb 2026 20:25:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F5131A9F91
+	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 20:26:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771359914; cv=none; b=Mb/eEESh40vAGJcAeoS24wrAn8N5hthabdKUHveB4zdQ4loux2Zpfgy1/ZRPKI9WVfezGN8QxpG1yRkwrKf5mrsYym0q8BVVAEKVK/TCUYfxipyM3f7czz/1gSr7eb+JYtIRTTb+D57+AfFSQXmKJGWxTl0mPufV+c81RuASUZU=
+	t=1771359997; cv=none; b=tvmJEFmPhimG/IU+9YB5xktlmngl/R2xZsGqXgVVpMv/uMfbRlL8yA9tHyWorMBYTFToNVvCsnLJuckOOtXzHE6iI4SEstV2FmjHBTCig1cekKzZHlgrtibvttPY0FavvmeEkzJsn1MuSESoYQvJnJNFxH5QychQnu+JHr/+87Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771359914; c=relaxed/simple;
-	bh=3euLIddiuagHcub65etrQEVoDD3rOgtcv3u0gHoR4VU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WjpzJVXRyaoR1O+gU+PCbCLgagIRA03tRRD2BkOmfHh94ixrcN9j3vqF7KOrEl4jw30uD9Y4IZOohW3fpRA/PMQs8lka8ejO2MGhba4xyXeEAXIkPIk3f3Gv+DO6bsnDF/W04xlF4Ds5MfjVlnmitZZy5kdgY2UzxFVEr7eYdbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VIrKo+Y8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51B3CC4CEF7;
-	Tue, 17 Feb 2026 20:25:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771359913;
-	bh=3euLIddiuagHcub65etrQEVoDD3rOgtcv3u0gHoR4VU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VIrKo+Y8n/ukFxMchUyQAe2XdteU2CRpeHqGWHEPOl03fPD6T2mr8eb26Ukh3Ozft
-	 oc2vS7116IE+JLIhrD7hCF4sDTOCCNA5j2q1m+jAajZs3xXrg5GJcyAcf6dRiWgjf7
-	 1zYitlH2IMs5hr7ZYNPcQGWE/2kl0cb1Rc858vhaJpbmNeEOD+AwtdgfjKUPT1MczG
-	 sbo9w8yqA+i2nAbJPX5SPykHtRSKvWbumjI1XW0E/SHoRw356N6VCQ25q6R2ZCs1xO
-	 VcsRdaFM3DOU4pp1iQMuW/8PZ0JnTUI9ZmshYrhAxDiMFliJ75eX486W83b0G0a8zn
-	 d5UEiGqC4Ls9Q==
-Date: Tue, 17 Feb 2026 21:25:11 +0100
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Konrad Dybcio <konradybcio@kernel.org>
-Cc: Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alex Elder <elder@kernel.org>, 
-	Marijn Suijten <marijn.suijten@somainline.org>, linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Subject: Re: [PATCH net-next v3 1/3] dt-bindings: sram: qcom,imem: Allow
- modem-tables subnode
-Message-ID: <20260217-godlike-silent-owl-0a8487@quoll>
-References: <20260217-topic-ipa_imem-v3-0-d6d8ed1dfb67@oss.qualcomm.com>
- <20260217-topic-ipa_imem-v3-1-d6d8ed1dfb67@oss.qualcomm.com>
+	s=arc-20240116; t=1771359997; c=relaxed/simple;
+	bh=srD6WOkQ94BgQVVeWT2K5qwtvkHAjtjmwb7CIVhlWdc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s5IjZwZkk3WL4DADQU1MtcoTIApU7cyQ1AdstrAQ8N/5OXg2N2tAzube4jOYepavA6EAcbUZfxtojnUmffF2WmY7gJR63wbRBV91G0nTkUVIfTkMagkNZgu3i+ZUMlklt1Lr6YzGHtA/22caGq4eBWS+gdVcWgsi1EnK0YYgHlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=0Nm6HDb1; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=PtyNL1Yc; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=0Nm6HDb1; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=PtyNL1Yc; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 4A7655BCEB;
+	Tue, 17 Feb 2026 20:26:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1771359994; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vK1h5Svw5aq5idzigSDQxU4eMvbeIsemOIltmqDzv7o=;
+	b=0Nm6HDb1yZCpd34QKJKvlF7wIxNafD22n+4xRp0iSSvCwZie09i47NiMRxZxURhdRPIiHz
+	lzRYnB5z6Co5XzWDsRadn7ijQWe/zy/pOuHAF67zGZxEauYlUIQ3ClSPaUU1rL3YXfjbco
+	TsRHdmAq2/aIOuJxeQtkfv+vRzb3+TU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1771359994;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vK1h5Svw5aq5idzigSDQxU4eMvbeIsemOIltmqDzv7o=;
+	b=PtyNL1YcwQaHnCbs2C2FpvEDVG+px34x43BQBvMhQS/xqQ+D+ne8RAT99WarW6mjW9oXAj
+	0AJX7hGqHOXuHpAA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1771359994; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vK1h5Svw5aq5idzigSDQxU4eMvbeIsemOIltmqDzv7o=;
+	b=0Nm6HDb1yZCpd34QKJKvlF7wIxNafD22n+4xRp0iSSvCwZie09i47NiMRxZxURhdRPIiHz
+	lzRYnB5z6Co5XzWDsRadn7ijQWe/zy/pOuHAF67zGZxEauYlUIQ3ClSPaUU1rL3YXfjbco
+	TsRHdmAq2/aIOuJxeQtkfv+vRzb3+TU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1771359994;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vK1h5Svw5aq5idzigSDQxU4eMvbeIsemOIltmqDzv7o=;
+	b=PtyNL1YcwQaHnCbs2C2FpvEDVG+px34x43BQBvMhQS/xqQ+D+ne8RAT99WarW6mjW9oXAj
+	0AJX7hGqHOXuHpAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7AD233EA65;
+	Tue, 17 Feb 2026 20:26:33 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 0YytGvnOlGmNUAAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Tue, 17 Feb 2026 20:26:33 +0000
+Message-ID: <da88f34d-8bfc-4517-aaf1-bfd0eca9c639@suse.de>
+Date: Tue, 17 Feb 2026 21:26:27 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260217-topic-ipa_imem-v3-1-d6d8ed1dfb67@oss.qualcomm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot] [net?] possible deadlock in inet6_getname
+To: Gerd Rausch <gerd.rausch@oracle.com>, Eric Dumazet <edumazet@google.com>,
+ syzbot <syzbot+5efae91f60932839f0a5@syzkaller.appspotmail.com>,
+ Allison Henderson <allison.henderson@oracle.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, horms@kernel.org,
+ kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+References: <698f15e6.a70a0220.2c38d7.00c1.GAE@google.com>
+ <CANn89i+mVCLW2g1+tnbK8k9E0AkEuX7AZ+2LbO1_s2L=Gxaaeg@mail.gmail.com>
+ <50e88063-14fb-4912-a65d-172a85def1ee@oracle.com>
+ <c57f2565-a6b2-45dd-8307-871a02ae1a7a@suse.de>
+ <db06aa20-ca31-4b66-9a53-e4305974d1f5@oracle.com>
+ <1c5ce96c-3b01-44e0-8dc9-5c54e504cb95@suse.de>
+ <4cd4099b-328d-45eb-990d-793df79cd639@oracle.com>
+ <2677c7cb-efb7-4f19-8000-4ed127f33847@suse.de>
+ <4acdfdf8-a69c-4020-8a8c-2edccd482a6b@oracle.com>
+ <6d46a465-0f1f-48a3-8b4d-da063f6c45f3@oracle.com>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <6d46a465-0f1f-48a3-8b4d-da063f6c45f3@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Score: -2.80
+X-Spam-Level: 
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259140-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259141-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[suse.de:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:mid,suse.de:dkim];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev,5efae91f60932839f0a5];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C5BD414FF19
+	SUBJECT_HAS_QUESTION(0.00)[]
+X-Rspamd-Queue-Id: 7620214FF65
 X-Rspamd-Action: no action
 
-On Tue, Feb 17, 2026 at 02:30:31PM +0100, Konrad Dybcio wrote:
-> From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+On 2/17/26 7:58 PM, Gerd Rausch wrote:
+> Hi,
 > 
-> The IP Accelerator hardware/firmware owns a sizeable region within the
-> IMEM, named 'modem-tables', containing various packet processing
-> configuration data.
+> +Allison
 > 
-> It's not actually accessed by the OS, although we have to IOMMU-map it
-> with the IPA device, so that presumably the firmware can act upon it.
+> On 2026-02-17 09:28, Gerd Rausch wrote:
+>> On 2026-02-17 09:19, Fernando Fernandez Mancera wrote:
+>>> On 2/17/26 6:13 PM, Gerd Rausch wrote:
+>>>> If someone were to change the code to pass in "fan_out == true"
+>>>> from a context not already holding a socket lock,
+>>>> would they remember to change rds_tcp_conn_slots_available()
+>>>> to acquire that lock?
+>>>>
+>>>
+>>> Usually kernel requires the developer to understand when do they need 
+>>> to acquire a lock or not.
+>>> Anyway, what would you suggest? To check whether we have acquired the 
+>>> lock or not and do it conditionally?> 
+>>
+>> Something along those lines.
+>>
+>> Either a "_locked" version of "conn_slots_available" function pointer,
+>> a parameter, or a check.
+>>
+>> What you suggested is fine though for the immediate syzbot need.
+>>
 > 
-> Allow it as a subnode of IMEM.
+> FWIW, in UEK (the modified Linux kernel that Oracle uses),
+> this issue reported by syzbot was addressed differently:
+> 
+> https://github.com/oracle/linux-uek/commit/a94abc444c487
+> 
+> The commit under discussion here originally came from:
+> https://github.com/oracle/linux-uek/commit/ebf71f5b6c29c
+> 
+> and pre-dates:
+> 9dfc685e0262 ("inet: remove races in inet{6}_getname()")
+> 
+> which is why UEK didn't have this deadlock issue reported by syszbot.
+> 
+> If the objective is to keep divergence of UEK and Upstream to a minimum,
+> it may be worthwhile to consider adopting the same fix we carry in UEK.
+>
 
-You do not have compatible, so rely on the node name as ABI, which is
-fine in general but... I do not see usage of it in the driver. Why do
-you need to define modem-tables child then?
+I see, I don't really have a strong opinion here. Although, the solution 
+at UEK seems a bit overkill to me. As RDS do not really need all the 
+information that inet_getname() provides. It just needs the source port 
+and it can be used without acquiring the lock (because it was already done).
 
+The ideal solution to me would be the patch proposed here [1] + a 
+comment on the shutdown path to remember the developer that acquiring a 
+lock is needed to enable fan-out. Having said that, I cannot tell if it 
+would be better to keep divergence of UEK and Upstream or be more 
+efficient. I am leaving this dilemma to you and Allison and any other 
+maintainer that would like to chime in.
+
+Just let me know so I can a send a v2 of my proposed patch with a more 
+detailed commit message and also a comment on the mentioned path.
+
+[1] https://lore.kernel.org/netdev/20260216120804.14840-1-fmancera@suse.de/
+
+Thanks,
+Fernando.
+
+> Thanks,
 > 
-> Signed-off-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-> ---
->  Documentation/devicetree/bindings/sram/qcom,imem.yaml | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
-
-Best regards,
-Krzysztof
+>    Gerd
+> 
+> 
 
 
