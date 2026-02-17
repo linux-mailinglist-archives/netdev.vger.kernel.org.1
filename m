@@ -1,198 +1,204 @@
-Return-Path: <netdev+bounces-259007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259008-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2OurF4lKlGn0BwIAu9opvQ
-	(envelope-from <netdev+bounces-259007-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 12:01:29 +0100
+	id IHqRM6lKlGm/CAIAu9opvQ
+	(envelope-from <netdev+bounces-259008-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 12:02:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5797714B1BB
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 12:01:27 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0FE514B1C6
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 12:01:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C34B83003BE1
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 11:01:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 712043023E09
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 11:01:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB0DB324B38;
-	Tue, 17 Feb 2026 11:01:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="flsdjPtf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 237D82F5A32;
+	Tue, 17 Feb 2026 11:01:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f72.google.com (mail-oa1-f72.google.com [209.85.160.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EE88263C8C;
-	Tue, 17 Feb 2026 11:01:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA5332ED43
+	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 11:01:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771326083; cv=none; b=KFuVw+r0xDb504csvuoyzZ+zIr3549cjiEwRuS2FfwTuHr3GsQlRRUG79QQ7fqXdG3RwdClm05uCno2ons1PFnJsJzlQAGDdvX2GZeJSSGjNjA9db/bALPNAztGK+EY2Gf2g1Bmn+JMsIKHuZxBqAFNwdZam4KEAPEalWi8lV2Q=
+	t=1771326101; cv=none; b=P3QmTMa3DWh5gn0Z1BIeSBHOMWC+eiF+Yd/IBxRMqEefdC+11A77ThANdw5l88vhyQ6vILAEABB7ThQc0uo6h+ptiFyRZYmrlZTp1IioXkbTm4y/RlYK3VlqtwF1qrF2eWC8+1EKII8g+FGnGnDvOf1aDns6Ka2IpUnhS/wtMcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771326083; c=relaxed/simple;
-	bh=VxGl9z+uxIMYDk3nPnK22O7QLpg45gS/RqqCl9+dlY8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=olEqTTKPXrM+LaQFXMNAqP90f+/hyAXwJJPVc2u1D1WySr4JXQ7XxMTiOy31aXJoFuJab1s56wnCDEaHq2/LN3KbLCWCxqj/zRYapzuV+BMcUxLK+qlEHYBagtLNIu61ms2aZ7LRaz17UTtAVWLfs4ezB0dfl5sODMaYUKH7bno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=flsdjPtf; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=UH36pejiCMvxLP8VHcap4NrdPodNndZt8dGU6zRJNE8=; b=flsdjPtfZGH1AAANhG/jBahY0U
-	vu8nUJSB+akczAw6DBqgRZaqE9/liYAoD5eCwO1VrouRU4aBQISN8gVlNd8Ds5Iv8RMy2RbHdIc46
-	l0+CxuXa4slcBZe6SQbN6plw3rXvEXCTOMM09pBv81SEc63Yj1sxGDdVeuuWt1fONwTTBaehq+7Fy
-	kv9/Kq0mDgmd1ll7JK0+nijFepv36NFAfyyhcy4nt6DW8UXKvNhG4nfVauXv8GUlynseZ1V8GiNgA
-	CxkuRNMp7HRYXEqB/M8JjiSDi/Q8bW5I/uWugw4xQjE7iM/yB2AEYWY/a8SItH48w7l81cV6niKpU
-	0holIxLQ==;
-Received: from sslproxy08.your-server.de ([78.47.166.52])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1vsIpR-000Ith-14;
-	Tue, 17 Feb 2026 12:01:16 +0100
-Received: from localhost ([127.0.0.1])
-	by sslproxy08.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1vsIpP-000ALd-36;
-	Tue, 17 Feb 2026 12:01:16 +0100
-Message-ID: <cf804cbc-a8d3-4b11-9a46-679f4d10fd38@iogearbox.net>
-Date: Tue, 17 Feb 2026 12:01:15 +0100
+	s=arc-20240116; t=1771326101; c=relaxed/simple;
+	bh=f9Sn65bMDeQFADkZz2X3ALt7rkOgQHXefFnV6ZTP2iU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=rwomy34UXPKISVEvanewO2DfpV+7dNG6XpSCvXNVTzcdHc+kAih4f1ZyCfHWS7w8g5jGbv/RJLdiWBbzz48eM0kG6KPVdvlW8M/efyTO+bxwWVdeAtNi+CYfO/27eWvleFGoKfzgDJFbxMMdJAGzP+Kfyue4TlVVXbwVjKmBdi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oa1-f72.google.com with SMTP id 586e51a60fabf-40ef793e45eso9882077fac.3
+        for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 03:01:37 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771326097; x=1771930897;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=49KmW+xMN4yjOJq5KWsrgNTbzky5ua/zIOKn1y7eBTg=;
+        b=sBjSBHPYqwXkhDed5li02lrHZF1/X04huTO/YMbM+ppy9BKtfPQZU6OHTUCWIgzObn
+         OlyUmuM0byOELQ/qNfCWEGB35ot6mx5nJfcRbPa0oZTCAmUaDb6Vo7fjWQjmqgy6EWUZ
+         i7R6WbVSgEZHO1nmYDanL3YwTrB4FvOjiQfTpxLmzc1OPJzogH8Q9dgnYc0RRyivm0fc
+         ynm0OqNeXTJmUiLTdHMaWVICB8l+uqTElPuk3/emr172Mnxl1DORZoJg8XhwA4tX7EkA
+         bgXgglwvc3RZvbEMUiVqMt3Lshu4CnzVyw0FUKilMzMoCR0rZKkfZNb/salQqa5IwHKy
+         qTjA==
+X-Forwarded-Encrypted: i=1; AJvYcCVH3j/y7fpdDiutoU9uv4IjjYjIUmuURx1KoODm2oStwGInbnChK5UiS+4ZPEoJOwYs898y9CA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzhdw2K7CrzkwStHTkBXvGudaDOvzoqJ/ByB7JV76y+qpPdL60k
+	vmOFs5PeDsafTx4cX1ggQE2iqMYGm/H6NRoONuZl5dP4Z326p/zykTl9ih8za3wENM+8stOBll4
+	CazSHEiY5CEHsOdyqIY5ciIBw7v3DgofAlb2zOrZC70q0MN5ZP/eepJ9EBgk=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH stable v5.15,v6.1] Revert "wireguard: device: enable
- threaded NAPI"
-To: Greg KH <gregkh@linuxfoundation.org>, "Jason A. Donenfeld"
- <Jason@zx2c4.com>
-Cc: stable@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org,
- Daniel Dao <dqminh@cloudflare.com>, Ignat Korchagin <ignat@cloudflare.com>,
- Jakub Sitnicki <jakub@cloudflare.com>
-References: <c05f3968fa63b630ce22d65aa03e6dcef4bf4e83.1771277247.git.daniel@iogearbox.net>
- <CAHmME9rsvaargjbZO8SkswOToUATuWpkQDVykEUty-kWPyu7gA@mail.gmail.com>
- <2026021715-confetti-endanger-21eb@gregkh>
-Content-Language: en-US
-From: Daniel Borkmann <daniel@iogearbox.net>
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- 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
-In-Reply-To: <2026021715-confetti-endanger-21eb@gregkh>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: Clear (ClamAV 1.4.3/27915/Tue Feb 17 08:24:54 2026)
+X-Received: by 2002:a05:6820:180e:b0:663:a6e:49a1 with SMTP id
+ 006d021491bc7-67766ad5dfcmr5634892eaf.14.1771326097053; Tue, 17 Feb 2026
+ 03:01:37 -0800 (PST)
+Date: Tue, 17 Feb 2026 03:01:37 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69944a91.a70a0220.2c38d7.00fc.GAE@google.com>
+Subject: [syzbot] [wireless?] KMSAN: uninit-value in ieee80211_radiotap_iterator_next
+From: syzbot <syzbot+b09c1af8764c0097bb19@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=4b4f2aab682301f1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-259008-lists,netdev=lfdr.de,b09c1af8764c0097bb19];
+	ASN_FAIL(0.00)[1.2.3.5.c.f.2.1.0.0.0.0.0.0.0.0.c.6.3.0.1.0.0.e.4.0.c.3.0.0.6.2.asn6.rspamd.com:query timed out];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-259007-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[iogearbox.net:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[storage.googleapis.com:url,goo.gl:url,googlegroups.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,syzkaller.appspot.com:url];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[zx2c4.com:email,iogearbox.net:mid,iogearbox.net:dkim,iogearbox.net:email]
-X-Rspamd-Queue-Id: 5797714B1BB
+	R_DKIM_NA(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	SUBJECT_HAS_QUESTION(0.00)[]
+X-Rspamd-Queue-Id: A0FE514B1C6
 X-Rspamd-Action: no action
 
-On 2/17/26 11:33 AM, Greg KH wrote:
-> On Mon, Feb 16, 2026 at 10:33:53PM +0100, Jason A. Donenfeld wrote:
->> On Mon, Feb 16, 2026 at 10:31 PM Daniel Borkmann <daniel@iogearbox.net> wrote:
->>> Technically, the backport of commit db9ae3b6b43c ("wireguard: device:
->>> enable threaded NAPI") to stable should not have happened since it is
->>> more of an optimization rather than a pure fix and addresses a NAPI
->>> situation with utilizing many WireGuard tunnel devices in parallel.
->>
->> Indeed.
->>
->>> Revert it from stable given the backport triggers a regression for
->>> mentioned kernels.
->>
->> Thanks.
->>
->> Acked-by: Jason A. Donenfeld <Jason@zx2c4.com>
->>
->> If that helps with Greg queueing this up.
-> 
-> I'll go queue it up now, thanks for the revert.  But it's ok being in
-> the 6.6.y and 6.12.y and newer kernels, right?
-Great question; from a stable kernel PoV that commit to enable threaded
-NAPI for wireguard by default went in natively (aka not via backports) in
-linux-6.18.y branch.
+Hello,
 
-Given there have been backports around threaded NAPI and then reverts again
-e.g. [0-2] I think it would be best to also queue this revert here for 6.6.y
-and 6.12.y stable kernels. The same applies that it's more of an optimization
-rather than a pure fix.
+syzbot found the following issue on:
 
-I've added CF folks to Cc given they have been testing v6.6 with [2] but
-then it later got reverted again in [1] upon request. Feel free to holler
-if you think otherwise.
+HEAD commit:    ca4ee40bf13d Partly revert "drm/hyperv: Remove reference t..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=175d1b3a580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4b4f2aab682301f1
+dashboard link: https://syzkaller.appspot.com/bug?extid=b09c1af8764c0097bb19
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+userspace arch: i386
 
-Thanks,
-Daniel
+Unfortunately, I don't have any reproducer for this issue yet.
 
-   [0] https://lore.kernel.org/netdev/CA+wXwBTT74RErDGAnj98PqS=wvdh8eM1pi4q6tTdExtjnokKqA@mail.gmail.com/
-   [1] https://lore.kernel.org/stable/20260204143848.216983148@linuxfoundation.org/
-   [2] https://lore.kernel.org/all/20260120103833.4kssDD1Y@linutronix.de/
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/5f321eee08a1/disk-ca4ee40b.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e93195c44eb5/vmlinux-ca4ee40b.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c3f7091036e0/bzImage-ca4ee40b.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b09c1af8764c0097bb19@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in ieee80211_radiotap_iterator_next+0x11f8/0x1620 net/wireless/radiotap.c:317
+ ieee80211_radiotap_iterator_next+0x11f8/0x1620 net/wireless/radiotap.c:317
+ ieee80211_parse_tx_radiotap+0x4bb/0x2160 net/mac80211/tx.c:2122
+ ieee80211_monitor_start_xmit+0x125e/0x1750 net/mac80211/tx.c:2451
+ __netdev_start_xmit include/linux/netdevice.h:5275 [inline]
+ netdev_start_xmit include/linux/netdevice.h:5284 [inline]
+ xmit_one net/core/dev.c:3864 [inline]
+ dev_hard_start_xmit+0x24e/0xad0 net/core/dev.c:3880
+ __dev_queue_xmit+0x35e0/0x5a50 net/core/dev.c:4829
+ dev_queue_xmit include/linux/netdevice.h:3384 [inline]
+ packet_xmit+0x8f/0x710 net/packet/af_packet.c:275
+ packet_snd net/packet/af_packet.c:3077 [inline]
+ packet_sendmsg+0x91d9/0xa320 net/packet/af_packet.c:3109
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ __sys_sendto+0xa77/0xb90 net/socket.c:2206
+ __do_sys_sendto net/socket.c:2213 [inline]
+ __se_sys_sendto net/socket.c:2209 [inline]
+ __ia32_sys_sendto+0x12f/0x200 net/socket.c:2209
+ ia32_sys_call+0x372f/0x4360 arch/x86/include/generated/asm/syscalls_32.h:370
+ do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
+ __do_fast_syscall_32+0x17f/0x3f0 arch/x86/entry/syscall_32.c:307
+ do_fast_syscall_32+0x37/0x80 arch/x86/entry/syscall_32.c:332
+ do_SYSENTER_32+0x1f/0x30 arch/x86/entry/syscall_32.c:370
+ entry_SYSENTER_compat_after_hwframe+0x84/0x8e
+
+Uninit was stored to memory at:
+ ieee80211_radiotap_iterator_next+0x14c8/0x1620 net/wireless/radiotap.c:251
+ ieee80211_parse_tx_radiotap+0x4bb/0x2160 net/mac80211/tx.c:2122
+ ieee80211_monitor_start_xmit+0x125e/0x1750 net/mac80211/tx.c:2451
+ __netdev_start_xmit include/linux/netdevice.h:5275 [inline]
+ netdev_start_xmit include/linux/netdevice.h:5284 [inline]
+ xmit_one net/core/dev.c:3864 [inline]
+ dev_hard_start_xmit+0x24e/0xad0 net/core/dev.c:3880
+ __dev_queue_xmit+0x35e0/0x5a50 net/core/dev.c:4829
+ dev_queue_xmit include/linux/netdevice.h:3384 [inline]
+ packet_xmit+0x8f/0x710 net/packet/af_packet.c:275
+ packet_snd net/packet/af_packet.c:3077 [inline]
+ packet_sendmsg+0x91d9/0xa320 net/packet/af_packet.c:3109
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ __sys_sendto+0xa77/0xb90 net/socket.c:2206
+ __do_sys_sendto net/socket.c:2213 [inline]
+ __se_sys_sendto net/socket.c:2209 [inline]
+ __ia32_sys_sendto+0x12f/0x200 net/socket.c:2209
+ ia32_sys_call+0x372f/0x4360 arch/x86/include/generated/asm/syscalls_32.h:370
+ do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
+ __do_fast_syscall_32+0x17f/0x3f0 arch/x86/entry/syscall_32.c:307
+ do_fast_syscall_32+0x37/0x80 arch/x86/entry/syscall_32.c:332
+ do_SYSENTER_32+0x1f/0x30 arch/x86/entry/syscall_32.c:370
+ entry_SYSENTER_compat_after_hwframe+0x84/0x8e
+
+Local variable iterator created at:
+ ieee80211_parse_tx_radiotap+0xc4/0x2160 net/mac80211/tx.c:2093
+ ieee80211_monitor_start_xmit+0x125e/0x1750 net/mac80211/tx.c:2451
+
+CPU: 1 UID: 0 PID: 12634 Comm: syz.4.1919 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2026
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
