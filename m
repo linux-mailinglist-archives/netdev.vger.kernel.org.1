@@ -1,295 +1,250 @@
-Return-Path: <netdev+bounces-259119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259120-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ILx0NrGulGkPGgIAu9opvQ
-	(envelope-from <netdev+bounces-259119-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 19:08:49 +0100
+	id YDiyCtCxlGlbGgIAu9opvQ
+	(envelope-from <netdev+bounces-259120-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 19:22:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D67614EEA1
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 19:08:49 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73C7614F053
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 19:22:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BA5A130107B1
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 18:08:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 616663009558
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 18:22:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D0C7293C4E;
-	Tue, 17 Feb 2026 18:08:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FB5136E497;
+	Tue, 17 Feb 2026 18:22:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VsSJSaeR"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="JOlzXKG8";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="QDBj1lde"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CC4C296BD0
-	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 18:08:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A0636C59B
+	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 18:22:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771351726; cv=none; b=YLeE4H24VL6CwVG9WXRJ17g6eC1fss8JijBqi1RoBg8cL3V+pM2+CvKx7vdTyRaT62nuEAQvqb5ZGhhFfjYKOP3vutIWLbCwAQ9wc0RwW6yRRME4qgVdXo8BWvfSXfgyrDD7iTdssdxpFna+FtblqMtzJICWT3hWmesTxy/oDro=
+	t=1771352525; cv=none; b=LbgDedOS4m3Fuh7hkHB9ceafqEbBp7SfrgUV9C3kAuL03s2gD+iStT7mDASqVRTQV9Tf7dm79A+3DXXldG5lEC5ADOrPyXRyRpGKc3KJ3rybLp3rFw0+PQX45ZSWAIV5F/7rfys4HA/LI9y3EqZ4pTHvpHPiS6NfOOlXdPLxX9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771351726; c=relaxed/simple;
-	bh=ycF+7v42zRTnHi/GMd/x4i9qxB7SeD/1V8IUjeTQCxk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A6MvwSO3fNhoCvSuxqBMZlToaHu3iBEgqDhtGflv8SUOj4V7BVciCCRqxBEg/18c67/vJxSufTewnbwgwaxCcBWhxIwL3bPf2Rq8NeHJ2mTDzy/60ENUVysXD6mxy7tc4/tlKsJWST2xG2O7tgYxrs/005dk0hBBr1Y+5lFkDbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VsSJSaeR; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <6528c028-1224-4737-b902-e631641ddb37@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1771351719;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fEE/Z1fbaRezKoZH3eRr6XBTIsw8MYEL8z8yb4RF9ZQ=;
-	b=VsSJSaeRoYlY1pmRFMhKo2ybO1nHNgoDdYZuXdUGMb6LZeuvxLHT6OjoRaNZzhRWy35bYi
-	Md0AW+wlfz1CZQCB4KkVDBXXI9tVaHZBj6CczumRCuIK43djV+t6HxETf8pGhPc+DUaX9L
-	myyaZDRGiQCVv0/2uig/oaTf3Pq3fG0=
-Date: Tue, 17 Feb 2026 10:08:29 -0800
+	s=arc-20240116; t=1771352525; c=relaxed/simple;
+	bh=3cODNmrDc+V6CnI9ACLWrEZy5byvM2aUGYtq+5+AhIU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uuRdfEcV3opFqlbjSK9T9kXZ9/KjDHpA5c5yJQSEqM9eDeDyZ3W5hswLZltRHejCjGdPRBDNHObDEDNa9nL8dzkkJriMaoFVo4a8wOU1I8jPmoqmiNYW7Px+g2GVd/dYuGMc7Zr31Yq7IcR2OJDHYcqsBn1jDqzZJhCFS/6CUhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=JOlzXKG8; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=QDBj1lde; arc=none smtp.client-ip=103.168.172.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 8D2D8140012A;
+	Tue, 17 Feb 2026 13:22:00 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Tue, 17 Feb 2026 13:22:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1771352520; x=
+	1771438920; bh=xeTAXDKnau0wtprxCHYPgn9Fjs2QV1a5JsYUOzCDu4I=; b=J
+	OlzXKG8Bh6RHEqoNVB0lfL0ukAAWV9ZPkpvOFx0fZR3SeEcuR34id6fWTzx/pvtJ
+	9foAxK+0D8ZFPhROTCbn3lPG6KGjP33n2Od/blAJ3ugWE3GbF8/A50PVjzSxPnv4
+	6o5R8CGQGNtZi48qqOB4ByokCGB6AIfQFeRaepqjvEUYx7Ogkj5SnIrstH+b4moM
+	lZQHtvmGf05W4NrmGSsx/cNKlWIq0o9D5TtxnqDON/MpF5b1hcwQDFNsBE4GVP+F
+	fRJC27ZC5Z4Lt+S7AY02vajTtomupjBtJtmSvXIeBitD5K9y2aom6MJr3u9StC64
+	xKkuwSWYNv5+JutFBRZzw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1771352520; x=1771438920; bh=xeTAXDKnau0wtprxCHYPgn9Fjs2QV1a5JsY
+	UOzCDu4I=; b=QDBj1lde0G1I0BHB6/ANmWhHaJS4GLmh9I7DpJt/tbPqTJVXgYd
+	9UXA8z7LjntjA94AjSoK+hMrpzNN++NmA6b9Wt5HT7t1cCQCCoUbQA75RNZnVnjx
+	AeBqKXH+iTVh808sU18UlVD8MwRxtzq3A4Rbee+wF7O2DKlvUqh5ngVbuE7ouo4C
+	A+NrR9MMzbVvld9B5/4VRsB8O2/ZEncDoD66iv0ocLiNKVGEJ3AeXBy8GpNBgPBf
+	wuEHusekfeVBS3rpg3EMapf34A++Zj8jKPmtBt6ny0Dth1OuK5nMTCvu706fOSzd
+	XbP7vL3Chj+vkK/oIjIvCB+uRtL0yKLaugQ==
+X-ME-Sender: <xms:x7GUaXRMsbAm_ihvvm6EXb8f2VvVSe5ow1DklYvr6NHu046tZ3kz_w>
+    <xme:x7GUaVWs6RDxsjpHHDS7_AhZ9peAAohjUqX3xyITDSoOtkNyo7ciWJTQ7lwa_FDiu
+    ck48SpmoqhKGpY45afY66-Bv_sWASOzx-_yjwbUOCnSd028Zc0psqri>
+X-ME-Received: <xmr:x7GUaRT3VCwv9NHGmlUa_Vtaadjy-djM0huwxTLPPP0LDRGEhV9JazBgFFeB>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvvddtgeejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfhfgggtuggjsehttdertd
+    dttdejnecuhfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghs
+    hihsnhgrihhlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuieduge
+    dtfefhkeegteehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedt
+    necurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvth
+    dpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehi
+    mhhvgegsvghlsehgmhgrihhlrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmh
+    hlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhm
+    pdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvg
+    hnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdho
+    rhhgpdhrtghpthhtohepnhgrthgvrdhkrghrshhtvghnshesghgrrhhmihhnrdgtohhmpd
+    hrtghpthhtoheplhhinhhugiesthhrvggslhhighdrohhrghdprhgtphhtthhopehjuhhl
+    ihgrrdhlrgifrghllhesihhnrhhirgdrfhhr
+X-ME-Proxy: <xmx:x7GUad0sDoUxRtAFssORBuTP8t12GH8TZgR5RGHzBLt3Hh9uXeykQQ>
+    <xmx:yLGUaReAMcEVVzuePRkLl9Itbw9YTK7QHby3ybJ8tpIIShSJYCSFfw>
+    <xmx:yLGUaVOrXpvxNfm1qq84EYR4UytxEWfGP2b0RbcnFCgIq003yr-QQw>
+    <xmx:yLGUaVXtf7M2gVEFeFBXyc7xSuqpSET5dI4RJlm3gYdr4Sd0czatJg>
+    <xmx:yLGUaX_b7i7CCX6bJyvScJ4ujMpyfSTaQd8ripDLV8sPBtAXhGTizvsL>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 17 Feb 2026 13:21:59 -0500 (EST)
+Date: Tue, 17 Feb 2026 19:21:57 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Hyunwoo Kim <imv4bel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, nate.karstens@garmin.com,
+	linux@treblig.org, Julia.Lawall@inria.fr, netdev@vger.kernel.org
+Subject: Re: [PATCH] strparser: Use worker disable API instead of
+ cancellation in strp_done()
+Message-ID: <aZSxxdNWGLGBj1lD@krikkit>
+References: <aZLn2Faeg1FB7XOf@v4bel>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v5] bpf: test_run: Fix the null pointer dereference issue
- in bpf_lwt_xmit_push_encap
-To: Feng Yang <yangfeng59949@163.com>
-Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
- daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com,
- horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com
-References: <249d6576-2259-4785-87b6-619052b4ce75@linux.dev>
- <20260211075240.70095-1-yangfeng59949@163.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20260211075240.70095-1-yangfeng59949@163.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aZLn2Faeg1FB7XOf@v4bel>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[163.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259119-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	DMARC_NA(0.00)[queasysnail.net];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-259120-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,linux.dev:mid,linux.dev:dkim,linux.dev:email,kylinos.cn:email]
-X-Rspamd-Queue-Id: 7D67614EEA1
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 73C7614F053
 X-Rspamd-Action: no action
 
+2026-02-16, 18:48:08 +0900, Hyunwoo Kim wrote:
+> When strp_stop() and strp_done() are called without holding lock_sock(), 
+> they can race with worker-scheduling paths such as the Delayed ACK handler 
+> and ksoftirqd.
+> Specifically, after cancel_delayed_work_sync() and cancel_work_sync() are 
+> invoked from strp_done(), the workers may still be scheduled.
+> As a result, the workers may dereference freed objects.
+> 
+> To prevent these races, the cancellation APIs are replaced with 
+> worker-disabling APIs.
+> 
+> Fixes: 829385f08ae9 ("strparser: Use delayed work instead of timer for msg timeout")
+
+That's the correct commit for msg_timer_work, but not for
+strp->work. No race was possible when msg timeout was using a timer?
+Your second scenario relies only on strp->work so I would think yes.
+
+> Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+> ---
+>  net/strparser/strparser.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/strparser/strparser.c b/net/strparser/strparser.c
+> index fe0e76fdd1f1..15cd9cadbd1a 100644
+> --- a/net/strparser/strparser.c
+> +++ b/net/strparser/strparser.c
+> @@ -503,8 +503,8 @@ void strp_done(struct strparser *strp)
+>  {
+>  	WARN_ON(!strp->stopped);
+>  
+> -	cancel_delayed_work_sync(&strp->msg_timer_work);
+> -	cancel_work_sync(&strp->work);
+> +	disable_delayed_work_sync(&strp->msg_timer_work);
+> +	disable_work_sync(&strp->work);
+
+The change itself looks reasonable.
+
+>  	if (strp->skb_head) {
+>  		kfree_skb(strp->skb_head);
+> -- 
+> 2.43.0
+> 
+> ---
+> Dear,
+> 
+> The following is a simplified scenario illustrating how each race can occur. Since espintcp_close() does not hold lock_sock(), the race is possible.
+> Although cancel_work_sync(&strp->work) does not appear to be easy to trigger in practice here, it still seems better to fix it as well.
+
+What about the other users of strp? Only espintcp is racy?
+
+If strp_done can run concurrently with __strp_recv, it seems we could
+also end up leaking strp->skb_head, if __strp_recv stores a new one
+after we've cleared the old?
 
 
-On 2/10/26 11:52 PM, Feng Yang wrote:
-> On Tue, 10 Feb 2026 11:10:03 -0800 Martin KaFai Lau <martin.lau@linux.dev> wrote:
+> ```
+>                  cpu0                                cpu1
 > 
->> On 2/10/26 1:06 AM, Feng Yang wrote:
->>> From: Feng Yang <yangfeng@kylinos.cn>
->>>
->>> The bpf_lwt_xmit_push_encap helper needs to access skb_dst(skb)->dev to
->>> calculate the needed headroom:
->>>
->>> 	err = skb_cow_head(skb,
->>> 			   len + LL_RESERVED_SPACE(skb_dst(skb)->dev));
->>>
->>> But skb->_skb_refdst may not be initialized when the skb is set up by
->>> bpf_prog_test_run_skb function. Executing bpf_lwt_push_ip_encap function
->>> in this scenario will trigger null pointer dereference, causing a kernel
->>> crash as Yinhao reported:
->>>
->>> [  105.186365] BUG: kernel NULL pointer dereference, address: 0000000000000000
->>> [  105.186382] #PF: supervisor read access in kernel mode
->>> [  105.186388] #PF: error_code(0x0000) - not-present page
->>> [  105.186393] PGD 121d3d067 P4D 121d3d067 PUD 106c83067 PMD 0
->>> [  105.186404] Oops: 0000 [#1] PREEMPT SMP NOPTI
->>> [  105.186412] CPU: 3 PID: 3250 Comm: poc Kdump: loaded Not tainted 6.19.0-rc5 #1
->>> [  105.186423] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
->>> [  105.186427] RIP: 0010:bpf_lwt_push_ip_encap+0x1eb/0x520
->>> [  105.186443] Code: 0f 84 de 01 00 00 0f b7 4a 04 66 85 c9 0f 85 47 01 00 00 31 c0 5b 5d 41 5c 41 5d 41 5e c3 cc cc cc cc 48 8b 73 58 48 83 e6 fe <48> 8b 36 0f > b7 be ec 00 00 00 0f b7 b6 e6 00 00 00 01 fe 83 e6 f0
->>> [  105.186449] RSP: 0018:ffffbb0e0387bc50 EFLAGS: 00010246
->>> [  105.186455] RAX: 000000000000004e RBX: ffff94c74e036500 RCX: ffff94c74874da00
->>> [  105.186460] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff94c74e036500
->>> [  105.186463] RBP: 0000000000000001 R08: 0000000000000002 R09: 0000000000000000
->>> [  105.186467] R10: ffffbb0e0387bd50 R11: 0000000000000000 R12: ffffbb0e0387bc98
->>> [  105.186471] R13: 0000000000000014 R14: 0000000000000000 R15: 0000000000000002
->>> [  105.186484] FS:  00007f166aa4d680(0000) GS:ffff94c8b7780000(0000) knlGS:0000000000000000
->>> [  105.186490] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>> [  105.186494] CR2: 0000000000000000 CR3: 000000015eade001 CR4: 0000000000770ee0
->>> [  105.186499] PKRU: 55555554
->>> [  105.186502] Call Trace:
->>> [  105.186507]  <TASK>
->>> [  105.186513]  bpf_lwt_xmit_push_encap+0x2b/0x40
->>> [  105.186522]  bpf_prog_a75eaad51e517912+0x41/0x49
->>> [  105.186536]  ? kvm_clock_get_cycles+0x18/0x30
->>> [  105.186547]  ? ktime_get+0x3c/0xa0
->>> [  105.186554]  bpf_test_run+0x195/0x320
->>> [  105.186563]  ? bpf_test_run+0x10f/0x320
->>> [  105.186579]  bpf_prog_test_run_skb+0x2f5/0x4f0
->>> [  105.186590]  __sys_bpf+0x69c/0xa40
->>> [  105.186603]  __x64_sys_bpf+0x1e/0x30
->>> [  105.186611]  do_syscall_64+0x59/0x110
->>> [  105.186620]  entry_SYSCALL_64_after_hwframe+0x76/0xe0
->>> [  105.186649] RIP: 0033:0x7f166a97455d
->>>
->>> Temporarily add the setting of skb->_skb_refdst before bpf_test_run to resolve the issue.
->>>
->>> Fixes: 52f278774e79 ("bpf: implement BPF_LWT_ENCAP_IP mode in bpf_lwt_push_encap")
->>> Reported-by: Yinhao Hu <dddddd@hust.edu.cn>
->>> Reported-by: Kaiyan Mei <M202472210@hust.edu.cn>
->>> Closes: https://groups.google.com/g/hust-os-kernel-patches/c/8-a0kPpBW2s
->>> Signed-off-by: Yun Lu <luyun@kylinos.cn>
->>> Signed-off-by: Feng Yang <yangfeng@kylinos.cn>
->>> Tested-by: syzbot@syzkaller.appspotmail.com
->>> ---
->>> Changes in v5:
->>> - Refer to the bpf_lwt_xmit_reroute function to configure the dst parameter.
->>> - Link to v4: https://lore.kernel.org/all/20260209015111.28144-1-yangfeng59949@163.com/
->>> Changes in v4:
->>> - add rcu lock
->>> - Link to v3: https://lore.kernel.org/all/20260206055113.63476-1-yangfeng59949@163.com/
->>> Changes in v3:
->>> - use dst_init
->>> - Link to v2: https://lore.kernel.org/all/20260205092227.126665-1-yangfeng59949@163.com/
->>> Changes in v2:
->>> - Link to v1: https://lore.kernel.org/all/20260127084520.13890-1-luyun_611@163.com/
->>
->> The earlier syzbot reports are crying for a selftest which is still
->> missing in v5.
->>
->> The CI has also reported errors in the test_progs. Did you run any test
->> before posting ?
-> 
-> My apologies. I only tested whether a crash would occur
-> when using `bpf_prog_test_run_skb` to execute `bpf_lwt_push_ip_encap` without a dst entry.
-> I will include a selftest in my next submission.
-> 
->> pw-bot: cr
->>
->>> ---
->>>    net/bpf/test_run.c | 47 ++++++++++++++++++++++++++++++++++++++++++++++
->>>    1 file changed, 47 insertions(+)
->>>
->>> diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
->>> index 178c4738e63b..dbd2c44da7e5 100644
->>> --- a/net/bpf/test_run.c
->>> +++ b/net/bpf/test_run.c
->>> @@ -24,6 +24,7 @@
->>>    #include <net/netdev_rx_queue.h>
->>>    #include <net/xdp.h>
->>>    #include <net/netfilter/nf_bpf_link.h>
->>> +#include <net/ip6_route.h>
->>>    
->>>    #define CREATE_TRACE_POINTS
->>>    #include <trace/events/bpf_test_run.h>
->>> @@ -992,6 +993,7 @@ int bpf_prog_test_run_skb(struct bpf_prog *prog, const union bpf_attr *kattr,
->>>    	u32 headroom = NET_SKB_PAD + NET_IP_ALIGN;
->>>    	u32 linear_sz = kattr->test.data_size_in;
->>>    	u32 repeat = kattr->test.repeat;
->>> +	struct dst_entry *dst = NULL;
->>>    	struct __sk_buff *ctx = NULL;
->>>    	struct sk_buff *skb = NULL;
->>>    	struct sock *sk = NULL;
->>> @@ -1156,6 +1158,51 @@ int bpf_prog_test_run_skb(struct bpf_prog *prog, const union bpf_attr *kattr,
->>>    		skb->ip_summed = CHECKSUM_COMPLETE;
->>>    	}
->>>    
->>> +	if (prog->type == BPF_PROG_TYPE_LWT_XMIT && !skb_dst(skb)) {
->>> +		struct flowi4 fl4 = {};
->>> +		struct flowi6 fl6 = {};
->>> +		struct rtable *rt;
->>> +
->>> +		switch (skb->protocol) {
->>> +		case htons(ETH_P_IP):
->>> +			if (sizeof(struct iphdr) <= skb_headlen(skb)) {
->>> +				fl4.saddr = ip_hdr(skb)->saddr;
->>> +				fl4.daddr = ip_hdr(skb)->daddr;
->>> +			}
->>> +
->>> +			rt = ip_route_output_key(net, &fl4);
->>
->> What can be expected from the return value rt if fl4 is 0.
-> 
-> If it is empty, `ip_route_output_key_hash_rcu` will assign the loopback address,
-> and the returned `rt` is valid, not an error value.
-> 
->>> +			if (IS_ERR(rt)) {
->>> +				ret = PTR_ERR(rt);
->>
->> I suspect this is probably what failed in CI. Add a NULL check in
->> bpf_lwt_push_ip_encap instead. No change is needed in the
->> bpf_prog_test_run_skb.
-> 
-> The root cause of the CI failure is that the default path was taken, resulting in a return value of -EINVAL.
-> So, is your suggestion to modify the bpf_lwt_push_ip_encap function as in the v1(https://lore.kernel.org/all/20260127084520.13890-1-luyun_611@163.com/) version?
-> However, the previous suggestion was to make changes to the bpf_prog_test_run_skb function instead.
-> 
-> Thank you very much for your reply.
-> 
->>> +				goto out;
->>> +			}
->>> +			dst = &rt->dst;
->>> +			break;
->>> +#if IS_ENABLED(CONFIG_IPV6)
->>> +		case htons(ETH_P_IPV6):
->>> +			if (sizeof(struct ipv6hdr) <= skb_headlen(skb)) {
->>> +				fl6.saddr = ipv6_hdr(skb)->saddr;
->>> +				fl6.daddr = ipv6_hdr(skb)->daddr;
->>> +			}
->>> +
->>> +			dst = ip6_route_output(net, NULL, &fl6);
->>> +			if (IS_ERR(dst)) {
->>> +				ret = PTR_ERR(dst);
->>> +				goto out;
->>> +			}
->>> +			break;
->>> +#endif
->>> +		default:
->>> +			ret = -EINVAL;
-> 
-> The reason for the CI test failure.
+> espintcp_close()
+>                                          espintcp_data_ready()
+>                                            if (unlikely(strp->stopped)) return;
+>   strp_stop()
+>     strp->stopped = 1;
+>   strp_done()
+>     cancel_delayed_work_sync(&strp->msg_timer_work);
+>                                            strp_data_ready()
 
-Make sense, but the early point stays the same: the user-provided skb 
-can have unexpected data. Either an skb->protocol is not handled here, 
-or the earlier dst lookup has an error. I don't know what the current 
-active users left in lwt are. Unless there is an issue with missing 
-skb_dst() in other mainstream program types (e.g., tc), I would prefer 
-to add a check in bpf_lwt_push_ip_encap() instead of complicating 
-bpf_prog_test_run_skb() further.
+In this order, strp_data_ready will see strp->stopped and return
+without doing anything.
 
-> 
->>> +			goto out;
->>> +		}
->>> +
->>> +		if (unlikely(dst->error)) {
->>> +			ret = dst->error;
->>> +			dst_release(dst);
->>> +			goto out;
->>> +		}
->>> +		skb_dst_set(skb, dst);
->>> +	}
->>>    	ret = bpf_test_run(prog, skb, repeat, &retval, &duration, false);
->>>    	if (ret)
->>>    		goto out;
-> 
+(I'm confused by the "if (unlikely(strp->stopped))" above though,
+maybe you meant espintcp_data_ready -> strp_data_ready -> if (...))
 
+>                                              strp_read_sock()
+>                                                tcp_read_sock()
+>                                                  __tcp_read_sock()
+>                                                    strp_recv()
+>                                                      __strp_recv()
+>                                                        strp_start_timer()
+>                                                          mod_delayed_work(strp_wq, &strp->msg_timer_work, timeo);  
+> ```
+> ```
+>                  cpu0                                cpu1
+> 
+> espintcp_close()
+>                                           sk->sk_data_ready()
+>                                             espintcp_data_ready()
+>                                               if (unlikely(strp->stopped)) return;
+>   strp_stop()
+>     strp->stopped = 1;
+>   strp_done()
+>     cancel_work_sync(&strp->work);
+>                                               if (strp_read_sock(strp) == -ENOMEM)
+>                                               queue_work()
+
+Here the problem would be if we enter do_strp_work after all the
+socket data has already been freed? Otherwise again the test on
+strp->stopped will make do_strp_work return early. (this would be
+unexpected but should be safe)
+
+> ```
+> 
+> Best regards,
+> Hyunwoo Kim
+
+-- 
+Sabrina
 
