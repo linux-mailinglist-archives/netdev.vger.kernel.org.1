@@ -1,76 +1,70 @@
-Return-Path: <netdev+bounces-259149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259150-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cCt4I67hlGlqIgIAu9opvQ
-	(envelope-from <netdev+bounces-259149-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 22:46:22 +0100
+	id YIrANrfilGmjIgIAu9opvQ
+	(envelope-from <netdev+bounces-259150-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 22:50:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3004A150DE3
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 22:46:22 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6E8C1510CC
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 22:50:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 94F363021722
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 21:46:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6579630266FA
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 21:50:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9753F2F549C;
-	Tue, 17 Feb 2026 21:46:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5F482FD66B;
+	Tue, 17 Feb 2026 21:50:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NM2L0K0e"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EjJENHkI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D7BB2797B5;
-	Tue, 17 Feb 2026 21:46:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33712FD1BF
+	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 21:50:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771364774; cv=none; b=Zp7YEzXIbVhqp3V6b93xO6xXD30t7YO/+1yAZ8qYVsfB4uZpIBUJGHJVI2Wev0DYodpr5j11S5sT2QOThwQ7+xxxLQ1fb0o2Ax0ze+JpN9Ln9oA46lS1qqTRDX4eVEBQu/Y8CVxs/RnwABSnUitwDEEdq0c0zSzaEYC69wJKscc=
+	t=1771365009; cv=none; b=KlV/wnyL4dUsO7xK7mMCUA3mIaTsMLB3aOeRxGPsGPUOthkeIlVwGUy+ILHj958iQR3qbiQ42yrsOanxJ5765ldO5XHi373lciOvLLbBtVsWTiDIC0MjrwS/q1plQkNac3CIAoczLueQEA6lBgpMwF3ggLQzn7vu4zAasvOm47o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771364774; c=relaxed/simple;
-	bh=6CLuKS02vxtfsIgKG+naWusfHTGgQQP5ho9Y7sEgdBE=;
+	s=arc-20240116; t=1771365009; c=relaxed/simple;
+	bh=pvDZPoLzl55yumLqYP4PLy4xQzkiAuiTqZbKLIP8ny0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZyBxBKJ099DagpnzkR+O7AieOYhqF4Ed4Rqp0OFl+YqYJfwEi4GbsQQlWxPLvLNghGoMhL2O/BHQMbXXz3D1QoUqSI+B3e1SOsVSJWXGZCo/SFE31Qi2/er4x/izpSfcX8ssAb2R+W9TGiZdpSFr/bLog1KcxXTQn47/IaYlvTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NM2L0K0e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E33EBC4CEF7;
-	Tue, 17 Feb 2026 21:46:12 +0000 (UTC)
+	 MIME-Version:Content-Type; b=EPYgeLXVttVmhircX0kHUxELOfEGlbGnK42DiC2eUUWzUsxAvJAGRHTv6NFXfltVlwAbXr2AiN4V32rCfRnThEWw6o3/pBCe97OnAUsRsbXS6gkiYSF6Nq254R8liE8c5lRIkviPoi1n+WfcnvGK+WsZI76ZXk3lX0eHPJgNA68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EjJENHkI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CD2AC2BC9E;
+	Tue, 17 Feb 2026 21:50:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771364774;
-	bh=6CLuKS02vxtfsIgKG+naWusfHTGgQQP5ho9Y7sEgdBE=;
+	s=k20201202; t=1771365009;
+	bh=pvDZPoLzl55yumLqYP4PLy4xQzkiAuiTqZbKLIP8ny0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NM2L0K0ezt9SLP/8l3fw3BuzW6wB0MPGfRmJWQBbYi9xMvSECKRrANm0oo5QWloep
-	 Ac5s1jVVU7wv0Aec2SeSPcfwoQFD/sMyQ20eDxqM8QIzVi55GILsVcnGCSggKN2GKK
-	 fKuG4BaRXvpZ4EgbnXgTD6ULHlyWWhWyjV7OClJ/oEofSw3p9AqhE885XnnSHeviBN
-	 dFsQWo2U/p5cYzmaJCm5qQm/IPee9Vrr+FcI0pEupDmiZUP5jOmEocbj+SUNtw3bUM
-	 aJ83wwXd4RyONDystnOFzKq/MF4mUN7Xk39XYskMOEiBarmm1eyp3xozd6r9QM84qQ
-	 gLyGj3PIDxfEg==
-Date: Tue, 17 Feb 2026 13:46:12 -0800
+	b=EjJENHkICMOQEUfGJtHfBsGzutK2mmgKF1Uby00PIc6IYiOgsEpFrlM2Bm+dklilC
+	 fAMg8+0uYB35+0giIrIUHZVdvKHJKxpisMHRmw0XUYAh03+Mv6t18fmP2+/e2O3R8g
+	 XHotOmu4yoRhxNAU/EDHRhJqIOBukDpDlr2l+aDar37XnolKeUOr4Xo4qFHL+mj7Qj
+	 yx0W9SmU0TwRgdZNN+h0swTzTPzFqPMUWpVi5LnYzzqAIRb+OCdQvVMOpR5ilcOYLb
+	 cDPz+tUvL8qRVytPBQcU843MSTiU+SPOT4/MmBQn/jsFJdbDfaixONvgGO5bUyt6zO
+	 bXZ/G348j1fmg==
+Date: Tue, 17 Feb 2026 13:50:08 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Bobby Eshleman <bobbyeshleman@gmail.com>, Paolo Abeni
- <pabeni@redhat.com>, Daan De Meyer <daan.j.demeyer@gmail.com>, "Michael S.
- Tsirkin" <mst@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, Stefan
- Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>, Eugenio
- =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, "K. Y. Srinivasan" <kys@microsoft.com>,
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
- Dexuan Cui <decui@microsoft.com>, Bryan Tan <bryan-bt.tan@broadcom.com>,
- Vishnu Dasa <vishnu.dasa@broadcom.com>, Broadcom internal kernel review
- list <bcm-kernel-feedback-list@broadcom.com>, Shuah Khan
- <shuah@kernel.org>, Long Li <longli@microsoft.com>, Jonathan Corbet
- <corbet@lwn.net>, linux-kernel@vger.kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
- linux-kselftest@vger.kernel.org, berrange@redhat.com, Sargun Dhillon
- <sargun@sargun.me>, linux-doc@vger.kernel.org, Bobby Eshleman
- <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v16 01/12] vsock: add netns to vsock core
-Message-ID: <20260217134612.69cfd902@kernel.org>
-In-Reply-To: <aZNNBc390y6V09qO@sgarzare-redhat>
-References: <20260121-vsock-vmtest-v16-0-2859a7512097@meta.com>
-	<20260121-vsock-vmtest-v16-1-2859a7512097@meta.com>
-	<aZNNBc390y6V09qO@sgarzare-redhat>
+To: Eric Dumazet <edumazet@google.com>
+Cc: kuniyu@google.com, ncardwell@google.com, netdev@vger.kernel.org,
+ davem@davemloft.net, pabeni@redhat.com, andrew+netdev@lunn.ch,
+ horms@kernel.org
+Subject: Re: [PATCH net-next] tcp: try to defer / return acked skbs to
+ originating CPU
+Message-ID: <20260217135008.30561ad9@kernel.org>
+In-Reply-To: <CANn89iLURfPA69TjXjdBJjbc+Ad8X8XO-fiDQp=Uc8J+0PU5JQ@mail.gmail.com>
+References: <20260117164255.785751-1-kuba@kernel.org>
+	<CANn89iKmuoXJtw4WZ0MRZE3WE-a-VtfTiWamSzXX0dx8pUcRqg@mail.gmail.com>
+	<20260117150346.72265ac3@kernel.org>
+	<CANn89iJ8+5OaWS2VzJqo4QVN6VY9zJvrJfP0TGRGv85mj09kjA@mail.gmail.com>
+	<20260119090435.44b1da2d@kernel.org>
+	<20260129150459.29419003@kernel.org>
+	<CANn89i+P86WVVUY-4WppUAH1TGix1Z3KhgX9vSHok5nXqQAiHQ@mail.gmail.com>
+	<20260216094936.5bf9d789@kernel.org>
+	<CANn89iL+kzhRqwBr5wAcEBMdC_wbLFanHJ6VxS1r5ppGKUhftA@mail.gmail.com>
+	<20260216101108.6b2319b2@kernel.org>
+	<CANn89iLURfPA69TjXjdBJjbc+Ad8X8XO-fiDQp=Uc8J+0PU5JQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,36 +78,37 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259149-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,redhat.com,davemloft.net,google.com,kernel.org,linux.alibaba.com,microsoft.com,broadcom.com,lwn.net,vger.kernel.org,lists.linux.dev,sargun.me,meta.com];
-	RCPT_COUNT_TWELVE(0.00)[32];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-259150-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3004A150DE3
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B6E8C1510CC
 X-Rspamd-Action: no action
 
-On Tue, 17 Feb 2026 16:08:33 +0100 Stefano Garzarella wrote:
-> If we go for 1, maybe we can do it in 7.0, or not?
+On Mon, 16 Feb 2026 19:16:46 +0100 Eric Dumazet wrote:
+> UDP use of skb_attempt_defer_free() is  with RX skbs, and normally
+> their zcopy status has been cleared ?
 
-Just my preference but changing the behavior ASAP in 7.0 seems better,
-but the code must be ready very soon for that to happen.
+I meant coming in via napi_consume_skb() -> skb_attempt_defer_free().
+There we are freeing Tx skbs, which for UDP these may legitimately 
+have zc state. No?
 
