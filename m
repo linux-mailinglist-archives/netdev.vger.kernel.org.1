@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-259045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259046-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mHjLFIp0lGnVDwIAu9opvQ
-	(envelope-from <netdev+bounces-259045-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 15:00:42 +0100
+	id UOLCBdJ0lGnVDwIAu9opvQ
+	(envelope-from <netdev+bounces-259046-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 15:01:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AF4D14CE62
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 15:00:42 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFD5114CE9F
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 15:01:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D95F6309E7AF
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 13:55:46 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8317D30B75C3
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 13:55:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A7E836E488;
-	Tue, 17 Feb 2026 13:54:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E494436EA93;
+	Tue, 17 Feb 2026 13:55:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I8iCjyu0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CvxopN7F"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87BDE36E466;
-	Tue, 17 Feb 2026 13:54:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DAB3191F98;
+	Tue, 17 Feb 2026 13:54:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771336497; cv=none; b=huXsEVVYsMoadt3mWT1YXDKiIuzzvViTBSV+D4bku2S1BF8nGl4aha00RNUkyxSroZu9mc0PAshvlsZNQJBbmxFG2IvvyuwmK7+TPS7xf8Df6evLBqsqbIjv1DXnNwbMtGyxqB/O2lDSofaYZJAb5ET1HQr0n6KhA2qzHj2wMJ4=
+	t=1771336500; cv=none; b=OqKeWsuBcb8eK8+hx15pQxhPsLsIGosSH5dZsdpiUU4a7jSV9tZJVLylWQjdMeIvbzDj7OPJT3s0aeDjcrPJmQ1QTt3zuvppSflLxHzpcTgcAEzytTMzSLtVoNJda/xjaDqTssgL+gs87D/pkDCj9NBipz98n/6DmGZGzVhaek0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771336497; c=relaxed/simple;
-	bh=0CKsXmjygWfgTfW6+ScFYR6A19xBLdaV5AkI9EKjkjI=;
+	s=arc-20240116; t=1771336500; c=relaxed/simple;
+	bh=X6taDzmINZdFPhQwcrbXFyu0msho2fTc06cUuvUuvqc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Foaxgwo9PU4/vdrSMmEYwxUrg24+vDmY/nkdkAe/iCRSph4tfUTfo7N6nW3HKPW16MjO81tqKXmn2Q/3ed2XF24X6m8Ed2EJEiE6KhV13wTGF++Zzuoaet1OXr8GCTt2ytosCyiNQdo1MabfJ4GSKqQ4Tq5756DkMyMdHK2Jl3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I8iCjyu0; arc=none smtp.client-ip=192.198.163.14
+	 MIME-Version; b=CRQ3bxqfS8mLjPcT8kWM+Kzx0SF3BzBnCdNUoDdDzrw6WKRtiE6xfkwDMPIMEq7yg8hU6MMIYOhXsVmc28xGV43oxF1ZeTP+yDBhFWIkpCLHtUIPlbbOWHA3ORLR2lZgJVfZOE6g447I4fPcDu2WUN8xADR5lv7pVEwNzNr4QFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CvxopN7F; arc=none smtp.client-ip=192.198.163.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1771336497; x=1802872497;
+  t=1771336500; x=1802872500;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=0CKsXmjygWfgTfW6+ScFYR6A19xBLdaV5AkI9EKjkjI=;
-  b=I8iCjyu0HcRQwSQ2QtjkfThiCqzKAy36x/XozUbD/S2BrVkmC/lPDVZD
-   WuiatTgWrftsSumt4MriZmLW4UA2BzGrjaZ2m83gV9KE+vKBC49+ISgY+
-   lKolFAUVdQv7L/xu0hBDP1QqxsyjHl+zX5LgSj0qxhBL73iufnXWokO1x
-   QWt81RCN95HGGsSg8MxyDepEaJCdwfTRWQgEWrzvPK95Fl+VGbSfwONri
-   x/QVNvdJF/3vVpZbocwfX/w8QKWoW3isaX8EExornfsmkqrk+LQrMLaE0
-   3ZcDUcGPQLkn3qqOXdVA4FVGdRqSAX2eSERYKtRGvFyCv/ovA9w7TdiIo
-   g==;
-X-CSE-ConnectionGUID: XeS2oKx3T/qYcNFxXtWmoQ==
-X-CSE-MsgGUID: 6hZZh12NRCGNGqehpn8tuw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11703"; a="72470502"
+  bh=X6taDzmINZdFPhQwcrbXFyu0msho2fTc06cUuvUuvqc=;
+  b=CvxopN7Frm2tnNAdj0AzmoG/ji6eU7COShut/Dn5N+9R+i5jSswocqs7
+   lhPJr1BDuE6G9iSPuEg6F6av2yGdn3t3aAEnYIw4ZshCycdBSY+Vwg48g
+   4raEplLuu5kvVN5AxLj23gUOpXdqt9naXfoecwMKdqYcT3eqNuTlNGn4A
+   M/+XmRAEFLYkeZ3P+6Zxty+A501E0GMhQlLQ6j+MBeGfIqKQbWJJJiJrH
+   7v+1/oO0vWyP7xK8UOwBjwYcBM2cLc0e9iVcMtbgA9mOpYfrADslfnxKI
+   UV/7xEva0er56DRcXuNkKPZSVjwCubcN+nKlZJWSZVHXx6wY88Kiux1+F
+   w==;
+X-CSE-ConnectionGUID: zUYTRVEGTxaPcJTb0NNLEQ==
+X-CSE-MsgGUID: zo6vHkNRRAiYfqq2y5aGHA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11703"; a="72470527"
 X-IronPort-AV: E=Sophos;i="6.21,296,1763452800"; 
-   d="scan'208";a="72470502"
+   d="scan'208";a="72470527"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2026 05:54:56 -0800
-X-CSE-ConnectionGUID: DcAtXpXOSXCSBXD8zcmS6g==
-X-CSE-MsgGUID: 8QTap2nWTwK2/ES9dO5soA==
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2026 05:54:59 -0800
+X-CSE-ConnectionGUID: DCUX6GVZQq2kQLfV3Geb1g==
+X-CSE-MsgGUID: J6pN7idWRPeGzm5iSvwzmg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,296,1763452800"; 
-   d="scan'208";a="213904668"
+   d="scan'208";a="213904685"
 Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orviesa008.jf.intel.com with ESMTP; 17 Feb 2026 05:54:48 -0800
+  by orviesa008.jf.intel.com with ESMTP; 17 Feb 2026 05:54:52 -0800
 Received: from lincoln.igk.intel.com (lincoln.igk.intel.com [10.102.21.235])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id E7C7828791;
-	Tue, 17 Feb 2026 13:54:44 +0000 (GMT)
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 74D9828794;
+	Tue, 17 Feb 2026 13:54:48 +0000 (GMT)
 From: Larysa Zaremba <larysa.zaremba@intel.com>
 To: bpf@vger.kernel.org
 Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
@@ -109,9 +109,9 @@ Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
 	linux-kselftest@vger.kernel.org,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
 	Dragos Tatulea <dtatulea@nvidia.com>
-Subject: [PATCH bpf v3 7/9] libeth, idpf: use truesize as XDP RxQ info frag_size
-Date: Tue, 17 Feb 2026 14:24:45 +0100
-Message-ID: <20260217132450.1936200-8-larysa.zaremba@intel.com>
+Subject: [PATCH bpf v3 8/9] net: enetc: use truesize as XDP RxQ info frag_size
+Date: Tue, 17 Feb 2026 14:24:46 +0100
+Message-ID: <20260217132450.1936200-9-larysa.zaremba@intel.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260217132450.1936200-1-larysa.zaremba@intel.com>
 References: <20260217132450.1936200-1-larysa.zaremba@intel.com>
@@ -129,116 +129,59 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[intel.com,nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,linux.dev,bootlin.com,tencent.com,suse.com,lists.linux.dev,vger.kernel.org,lists.osuosl.org,nvidia.com];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259046-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[44];
-	TAGGED_FROM(0.00)[bounces-259045-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	ASN_FAIL(0.00)[1.2.3.5.c.f.2.1.0.0.0.0.0.0.0.0.c.6.3.0.1.0.0.e.4.0.c.3.0.0.6.2.asn6.rspamd.com:query timed out];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RSPAMD_URIBL_FAIL(0.00)[nxp.com:query timed out];
+	DKIM_TRACE(0.00)[intel.com:+];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[larysa.zaremba@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_CC(0.00)[intel.com,nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,linux.dev,bootlin.com,tencent.com,suse.com,lists.linux.dev,vger.kernel.org,lists.osuosl.org,nvidia.com];
 	RCVD_COUNT_FIVE(0.00)[6];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim,intel.com:email]
-X-Rspamd-Queue-Id: 0AF4D14CE62
+	RSPAMD_EMAILBL_FAIL(0.00)[vladimir.oltean.nxp.com:server fail];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,intel.com:mid,intel.com:dkim,intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BFD5114CE9F
 X-Rspamd-Action: no action
 
 The only user of frag_size field in XDP RxQ info is
-bpf_xdp_frags_increase_tail(). It clearly expects whole buffer size instead
-of DMA write size. Different assumptions in idpf driver configuration lead
-to negative tailroom.
+bpf_xdp_frags_increase_tail(). It clearly expects truesize instead of DMA
+write size. Different assumptions in enetc driver configuration lead to
+negative tailroom.
 
-To make it worse, buffer sizes are not actually uniform in idpf when
-splitq is enabled, as there are several buffer queues, so rxq->rx_buf_size
-is meaningless in this case.
+Set frag_size to the same value as frame_sz.
 
-Use truesize of the first bufq in AF_XDP ZC, as there is only one. Disable
-growinf tail for regular splitq.
-
-Fixes: ac8a861f632e ("idpf: prepare structures to support XDP")
+Fixes: 2768b2e2f7d2 ("net: enetc: register XDP RX queues with frag_size")
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
 ---
- drivers/net/ethernet/intel/idpf/xdp.c   | 6 +++++-
- drivers/net/ethernet/intel/idpf/xsk.c   | 1 +
- drivers/net/ethernet/intel/libeth/xsk.c | 1 +
- include/net/libeth/xsk.h                | 3 +++
- 4 files changed, 10 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/freescale/enetc/enetc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/idpf/xdp.c b/drivers/net/ethernet/intel/idpf/xdp.c
-index 958d16f87424..7d91f21174de 100644
---- a/drivers/net/ethernet/intel/idpf/xdp.c
-+++ b/drivers/net/ethernet/intel/idpf/xdp.c
-@@ -46,11 +46,15 @@ static int __idpf_xdp_rxq_info_init(struct idpf_rx_queue *rxq, void *arg)
- {
- 	const struct idpf_vport *vport = rxq->q_vector->vport;
- 	bool split = idpf_is_queue_model_split(vport->rxq_model);
-+	u32 frag_size = 0;
- 	int err;
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
+index e380a4f39855..9fdd448e602f 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc.c
++++ b/drivers/net/ethernet/freescale/enetc/enetc.c
+@@ -3468,7 +3468,7 @@ static int enetc_int_vector_init(struct enetc_ndev_priv *priv, int i,
+ 	priv->rx_ring[i] = bdr;
  
-+	if (idpf_queue_has(XSK, rxq))
-+		frag_size = rxq->bufq_sets[0].bufq.truesize;
-+
- 	err = __xdp_rxq_info_reg(&rxq->xdp_rxq, vport->netdev, rxq->idx,
- 				 rxq->q_vector->napi.napi_id,
--				 rxq->rx_buf_size);
-+				 frag_size);
+ 	err = __xdp_rxq_info_reg(&bdr->xdp.rxq, priv->ndev, i, 0,
+-				 ENETC_RXB_DMA_SIZE_XDP);
++				 ENETC_RXB_TRUESIZE);
  	if (err)
- 		return err;
- 
-diff --git a/drivers/net/ethernet/intel/idpf/xsk.c b/drivers/net/ethernet/intel/idpf/xsk.c
-index fd2cc43ab43c..95a665cb2f33 100644
---- a/drivers/net/ethernet/intel/idpf/xsk.c
-+++ b/drivers/net/ethernet/intel/idpf/xsk.c
-@@ -401,6 +401,7 @@ int idpf_xskfq_init(struct idpf_buf_queue *bufq)
- 	bufq->pending = fq.pending;
- 	bufq->thresh = fq.thresh;
- 	bufq->rx_buf_size = fq.buf_len;
-+	bufq->truesize = fq.truesize;
- 
- 	if (!idpf_xskfq_refill(bufq))
- 		netdev_err(bufq->pool->netdev,
-diff --git a/drivers/net/ethernet/intel/libeth/xsk.c b/drivers/net/ethernet/intel/libeth/xsk.c
-index 846e902e31b6..4882951d5c9c 100644
---- a/drivers/net/ethernet/intel/libeth/xsk.c
-+++ b/drivers/net/ethernet/intel/libeth/xsk.c
-@@ -167,6 +167,7 @@ int libeth_xskfq_create(struct libeth_xskfq *fq)
- 	fq->pending = fq->count;
- 	fq->thresh = libeth_xdp_queue_threshold(fq->count);
- 	fq->buf_len = xsk_pool_get_rx_frame_size(fq->pool);
-+	fq->truesize = xsk_pool_get_rx_frag_step(fq->pool);
- 
- 	return 0;
- }
-diff --git a/include/net/libeth/xsk.h b/include/net/libeth/xsk.h
-index 481a7b28e6f2..82b5d21aae87 100644
---- a/include/net/libeth/xsk.h
-+++ b/include/net/libeth/xsk.h
-@@ -597,6 +597,7 @@ __libeth_xsk_run_pass(struct libeth_xdp_buff *xdp,
-  * @pending: current number of XSkFQEs to refill
-  * @thresh: threshold below which the queue is refilled
-  * @buf_len: HW-writeable length per each buffer
-+ * @truesize: step between consecutive buffers, 0 if none exists
-  * @nid: ID of the closest NUMA node with memory
-  */
- struct libeth_xskfq {
-@@ -614,6 +615,8 @@ struct libeth_xskfq {
- 	u32			thresh;
- 
- 	u32			buf_len;
-+	u32			truesize;
-+
- 	int			nid;
- };
+ 		goto free_vector;
  
 -- 
 2.52.0
