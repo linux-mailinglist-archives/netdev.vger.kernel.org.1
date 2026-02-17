@@ -1,240 +1,250 @@
-Return-Path: <netdev+bounces-258978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258979-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cMbTE5AklGnXAAIAu9opvQ
-	(envelope-from <netdev+bounces-258978-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 09:19:28 +0100
+	id sC5fIUwllGnXAAIAu9opvQ
+	(envelope-from <netdev+bounces-258979-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 09:22:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A8F5149D8C
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 09:19:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1896149E56
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 09:22:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id F18EE3002520
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 08:19:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8FF763008215
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 08:22:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27EF72367D5;
-	Tue, 17 Feb 2026 08:19:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 361F42DCF45;
+	Tue, 17 Feb 2026 08:22:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=luminex.be header.i=@luminex.be header.b="Wnr+ew/G"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lfe06shC";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="pZyRD2kQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11021135.outbound.protection.outlook.com [52.101.70.135])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D18927707;
-	Tue, 17 Feb 2026 08:19:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.135
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771316363; cv=fail; b=L2LqKwVQsx1pH8dDawTyBEN3FHdFSjRHyofosEun1DyXg0QehST6Za1MG8jYypmGNu4V2Rl+I7/PUnLZwfyqWwK3fGAd501DdSl6yH4XKtjUkJEpr/a1jZ74fnUfJwZFQg/NCwBXyqJ4E2PojHE7hC1b1+JUmLRnmx/QArnBliA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771316363; c=relaxed/simple;
-	bh=cDgf6mT058Cfm3rQQwf28ATgs+QyXoHakjwBaoLlQgk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=FtjpG494683UZP1wgpkDjHSAi6dYU4/9clDhOkKySBNg8HQ0cuANqqFwU5FWmyDQYWzTyEQDuZmd8AuL+Thvr1K7lWf21YGx/5Y+tUQB3foBK+vsubsWfi+0JUrWDo0+5697fXs90lUcO+EUBF1PELsILljcPESF2p6nUghHLLQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=luminex.be; spf=pass smtp.mailfrom=luminex.be; dkim=pass (1024-bit key) header.d=luminex.be header.i=@luminex.be header.b=Wnr+ew/G; arc=fail smtp.client-ip=52.101.70.135
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=luminex.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=luminex.be
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JKHAG12+C8OzhOLWIQJ9ShYts8Eqd+AQT0hvDR4e2Bojmrm4yvYNusdGhaKxkqKT7mKk+iMHUpzLim8eLx4UeGiMhCpdaT7AyF+fvLzZR8P1qrKdqk+Tt8f82q4EBhiGwZi6vqdJbwctYyQmDLQzexfOu+VneFcPd9GBkW54uTDt5eUCAC5nwVwf1Wikc10TI+aGaBymkLsONgYPifs9kkjlafAQW6sbWGpa635kK+wIwp0nb+WGCK/ZHtGb+FoTASZvSXIuZsIy01mrpaChoPNqtcdQ3/PR66ZayiIjgoKAzsVmGve/nXHZDVY3uieXjRxjNfHAGc4jEwSNwkRJyA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cDgf6mT058Cfm3rQQwf28ATgs+QyXoHakjwBaoLlQgk=;
- b=RsYcoiJyeXORuAmm81zVJsPJzIPCRT/yaJwCiadvk96H1g/5d5iUBhMVy1bNAkXMhcTdadtYTElvrLXr5ekiVnK5Q7nDpFqrZ/YW/bJqa+wZSN/1Y30HOBiiC8jEU+uyyM4cTc1RBwvvrcImC4cm/ai6YAoSTDnyATGAk+7MCwAgQ7I4HgboY7w+lVBpyIdlrA3wwgKRf2jBKvXG5fPHwyUWFQ9lcy9U7lFTFgFEc3/xhMepyRPM3/gxlmhkVRqDck+GPbb26B1wQ3gMCpUI2zwQZt51B+f8B/MrE9448yxqVFjhnvYL+kVNFx4EYMTd1CPDqmWg0QK0mODhg38YIg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=luminex.be; dmarc=pass action=none header.from=luminex.be;
- dkim=pass header.d=luminex.be; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=luminex.be;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cDgf6mT058Cfm3rQQwf28ATgs+QyXoHakjwBaoLlQgk=;
- b=Wnr+ew/GJB/MDBwy2Ztqir5HE6fXcskwaIrbHbhgQX9mFK6kCMJfiVLX9ZAeHSLecRjG4xSA/EqF7qMLKWbjNEZ0B5OFdS1wVMWgdekJfEq7HT08KbRD0Xv4LCJ72/QfalcqfQuHpyl11XzrS5j2nGLZ26+z/cv6UjvMvm0O21k=
-Received: from PR3P194MB1505.EURP194.PROD.OUTLOOK.COM (2603:10a6:102:14c::14)
- by AM9P194MB1219.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:3ad::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.13; Tue, 17 Feb
- 2026 08:19:15 +0000
-Received: from PR3P194MB1505.EURP194.PROD.OUTLOOK.COM
- ([fe80::b6ba:9288:de68:5c5]) by PR3P194MB1505.EURP194.PROD.OUTLOOK.COM
- ([fe80::b6ba:9288:de68:5c5%5]) with mapi id 15.20.9632.010; Tue, 17 Feb 2026
- 08:19:15 +0000
-From: Cedric Jehasse <cedric.jehasse@luminex.be>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Russell King
-	<linux@armlinux.org.uk>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: dsa: mv88e6xxx: Add partial support for
- TCAM entries
-Thread-Topic: [PATCH net-next] net: dsa: mv88e6xxx: Add partial support for
- TCAM entries
-Thread-Index: AQHcnOcKItkW6DRmz0WEcytv9y/A6rWEn70AgAC29wOAAAOQgIABLqGF
-Date: Tue, 17 Feb 2026 08:19:15 +0000
-Message-ID:
- <PR3P194MB1505A3EE2647C89838DAC173EA6DA@PR3P194MB1505.EURP194.PROD.OUTLOOK.COM>
-References: <20260213-net-next-mv88e6xxx-tcam-v1-1-051e552e2afc@luminex.be>
- <179960d4-7963-41b6-8c1d-a09376fb0d60@lunn.ch>
- <PR3P194MB15057C0D7A6A99A912B18783EA6CA@PR3P194MB1505.EURP194.PROD.OUTLOOK.COM>
- <9cd71e84-3e2a-41a1-a6d0-875fd354d578@lunn.ch>
-In-Reply-To: <9cd71e84-3e2a-41a1-a6d0-875fd354d578@lunn.ch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-x-codetwoprocessed: true
-x-codetwo-clientsignature-inserted: true
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=luminex.be;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PR3P194MB1505:EE_|AM9P194MB1219:EE_
-x-ms-office365-filtering-correlation-id: b22d5c14-2ca4-4e6a-ff9b-08de6dfd3d52
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|376014|1800799024|10070799003|38070700021;
-x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?vISqXJPXKCfoqbYn4B4qbdRYwnL0u/pRvaYXvqn72YrOTLltisa/dGsRF8?=
- =?iso-8859-1?Q?8xm33J5xncvGHNDiMux3FqBE63AeuMrH6f85bvYJpbs0rAsKGPyWAvhXJ9?=
- =?iso-8859-1?Q?tXVAEtTjXU+1q4+QHNxQcpv5qpSwoJP11uEznC0zAtKy+aRlhQ1ArJA45G?=
- =?iso-8859-1?Q?NI2yXz3VpHGE315hBMQpOAhe1T1VC3X85I/Wep8/wagdxUxnRbdrR901pL?=
- =?iso-8859-1?Q?HvwbfIZaSSFroBYuju63NZoqJRzWcUL8410/lgkEqSH4IIxGtIJu5nWEdi?=
- =?iso-8859-1?Q?UbTuoBYDTZtwvh6gctrIcUTbUaPQZ5hd/TIXeluc3HWPbiF7PkxO6/ni5i?=
- =?iso-8859-1?Q?NhUiJEQrjw9nYs8vxbUMAneXk4YNyLJBX+pDVIGMZA0OZzcDGl7fwKNPXr?=
- =?iso-8859-1?Q?0AfPn3Er488zBVSTs7J0RIMtB1oaIYSat0tpt7zNbeBExuR+qzT6CKjjaL?=
- =?iso-8859-1?Q?th3GVCwNE+Xu2Eu9zL47pvUPUNj3olQKRHB8NYhlcqaRQh5wBrf/mPd+ep?=
- =?iso-8859-1?Q?MJOzQ7qGGA8XTx7mm7QRnTg1R0JNQvQKkBxVtDoFw7sdsPCw3S1YedgQjA?=
- =?iso-8859-1?Q?BGsTVGTZaZPf4OnoYVCzTvr6bsAitCV8VH/ORuj/AZTA0CN1TTV3S3tT08?=
- =?iso-8859-1?Q?pn2SLXlQ72fsOpPT6/eTpDuILvVH9HWIWWSRopePq2RfSmG6FfHKKwRvw1?=
- =?iso-8859-1?Q?nnQURwyl+y1lZQyf5mXv8vYVuYz8QIj3fRbHPgzV547/mEyc6pXAaiQ9Qx?=
- =?iso-8859-1?Q?0NCGthWeSoKnSiwe2XQGt8k5lPquQIPKoZt4UPap/SIiFOCTNdCZ26yTE/?=
- =?iso-8859-1?Q?hUpKUjlw1f75ysF/Sv5iMpYwQ0E+q0lM+yyC9qCGUEqABhumnA09w1+Fa0?=
- =?iso-8859-1?Q?tu/l45athPeC7pZ01HHnfH1CbtB0pb1+NwenBvL2aC7rpa7TQiwki6wEIf?=
- =?iso-8859-1?Q?Dj/JzEhelzYKO2Lhc34LExQI94VZweQlc9NGaJ3HlPrjY7gRlAchVA8BGp?=
- =?iso-8859-1?Q?EG9FO4UK1nGvcpNSa0Pkh6Br6/gXnE7U7l98voFoMrgtWEE+DQP91LvPlI?=
- =?iso-8859-1?Q?2j8/BtQpgAIIrsRKfdwIew5Ln7Csn9iMgbeUrEmk3IEygyVjY/Am4VuyYv?=
- =?iso-8859-1?Q?5an/ts7SIazlEMgUiESuLe5VEnidRsP71RdZFjAy2U6gsZd8QnG4en+mEY?=
- =?iso-8859-1?Q?oKuabemB+eqFX4VxTs1sBYjXJT88lF0CwV5q2KJ3xaQrooEJOsUt/SfWMG?=
- =?iso-8859-1?Q?bVBFF7NC/XPICZTsLoiWKx3bAJKqIOoBlLSdyh6pgvNz0jnibO2MaQl06w?=
- =?iso-8859-1?Q?FdfPmc2v8M2+xkOqHuEEYBG2Fd2N4lckbZ9fupwQaIW4exltSXyqpXxKpV?=
- =?iso-8859-1?Q?xbUtj2Em0eF1/uaAwgCOwfzd/8BmwJgGERE3pmvErKIxobPuwgPnpKmLrJ?=
- =?iso-8859-1?Q?8KNvVEJMEDiTtGK3jLpeYmW3eaH/BLM9vNDkOe+0F2tAMqqDjclwGxq8kR?=
- =?iso-8859-1?Q?YjEIrMDa+yFM1+mBheHHdeiftGhwUiza94FgNpXMGbtiTDpdzElhqwqVMU?=
- =?iso-8859-1?Q?MQDCs9fQgGoH42NFzzCeHnrsbAlQakXcQln2Agls0iJPTnjVKF/5Kuuf46?=
- =?iso-8859-1?Q?QbE2Fwwf7iDLLn3hABQ6SW33ktZmb6RJqZvyIRvS7QSzch9ekeEoqG7o16?=
- =?iso-8859-1?Q?LcNk42ErWyzCJd7wyIA=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PR3P194MB1505.EURP194.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(10070799003)(38070700021);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 2
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?Wo7Q/jbKmStyzQ5t14U49mdkXwaKHGcZ+NVy0YPlyVWInqn5qi/iKPmxYM?=
- =?iso-8859-1?Q?DVZQoeV7iJKhjdFNIPopelbHXOdE0szOLvm1+bN5P2r+qknw5M3/onrClV?=
- =?iso-8859-1?Q?cwM7L4WRiKoqiIyo4NiF2NRgzv+OHnUXaCyspnhmUtZ6bxiua17ypk1Zh9?=
- =?iso-8859-1?Q?RgkGMu1CORDdBZJyugs8NPOQ51QYGGquOCRndM7l6oKOcAJNDOM2p/CUuN?=
- =?iso-8859-1?Q?XLLMkBPMtawlOLS2gpkDEFXM2fkhG6x8TMaIVGUgh4FJQTiETOB3C2INkZ?=
- =?iso-8859-1?Q?KSzdTHHhKGD4YucZvrutWuB4i0sHKZ12Rt4oF+VEyUZraRR33YyLlroAID?=
- =?iso-8859-1?Q?FFeWX19GDzxQATyU8qMUJRXkTc+thHl8aSq8+3WSKxwWXuohJmF57kptj7?=
- =?iso-8859-1?Q?hSTobuSZrUTazFqBPukHiLfiUzfau5HsSmIsG2vS0nev6En7+p/mWvFPkC?=
- =?iso-8859-1?Q?xNQouD/YaD1IXMmAYmoOdMOBJo2J4p0NjJWT5fjIYRGDnTKGug1ZU0VFLd?=
- =?iso-8859-1?Q?2FDofW/Hbq6tb6ryw0ks+aFIgCKsLZFoCBBD4SrhXUGvZ9Tv7crn68C4Zh?=
- =?iso-8859-1?Q?zbgAJ/YpCsZYTTe9GkFcLRwVSL08+I0IxCrX6p5PFipEzP3MpicITxkcXi?=
- =?iso-8859-1?Q?zmFoYFwiJrr/ZtgmKLeofq9FNNUXlGjyhIjL+ouI4Qx9QLw95TBrk8wfaw?=
- =?iso-8859-1?Q?bZIe6ZXHio1QfTdCFAfYNLpZp/rFWrMumdtZ46u9jWro3OOk6MlwSKkPS6?=
- =?iso-8859-1?Q?TOi5KbhR6q7Z6ordL10+iKXS8/31GM8L5eiARoUt62mwsqEOP52+rInLSq?=
- =?iso-8859-1?Q?wA+/L1SWsb4APL4HwAMyNWPabw6/q+BxuTOWf9o9WdgL1Vhjx4AglPhLG6?=
- =?iso-8859-1?Q?boBPtrgdSq7Dgv9F570bZiDFOOP8RfEi3Pn2LD9VreP6G1eLMfQEWWeUue?=
- =?iso-8859-1?Q?aDwzeHYyAeRif0f/TjpDBos1rshV07+jpMYHO+m4L1OVmx07GemHEK6PAl?=
- =?iso-8859-1?Q?1xNCucF4g1FLKD0CtOZ2RddHNVbKJfOr8bkyCKBoqrXvB8AXxQKSEC7Iej?=
- =?iso-8859-1?Q?RXMvtMeXbUsn3RkbgYO7Y6HdGWVBgt17/876iknx28QSLUjg7zk93m8S8h?=
- =?iso-8859-1?Q?cbeQqVNFCFp8ACY1Bc3FeZayW5KbI6nUwhufw/IQ5MRZugBScJs1DIHGgt?=
- =?iso-8859-1?Q?49XYDb6rRKkW93xbwpUprj3y3dBa+IyTNcCr6PrekJh39ZKS73ITaQ1aMw?=
- =?iso-8859-1?Q?HItZDp8k/Nlr20QiSwd4aVBkjTDU93Kz7Arr7mlolhSf4FVRmh7jeumJMW?=
- =?iso-8859-1?Q?sryx3EOq2a7ezauYB0kC2a6/xLdZ/bfrR2LcuHuL1idpbbKByva/zODPW9?=
- =?iso-8859-1?Q?dVr4mlN0EdvG15LcBdDjsX4vikshxUUepz+BxNXz1WGPDs/mnik8fDX8AK?=
- =?iso-8859-1?Q?BDwaEWKbWzLP2AxUD3g3LSREDre1japQcH1q0WekvCcVqnQDpTosUv1LFK?=
- =?iso-8859-1?Q?ar5FBASQ7PovgYh9+uajXwNDgd8JH9W7IRWY6PMEV/8HV5vfBBrMHRgbAs?=
- =?iso-8859-1?Q?T0I5NU9qkYS+Y96NJnJGCuYYJliK4h+sLrQ23CpjdfXBoYr1mwHm8k4I6J?=
- =?iso-8859-1?Q?RdcqopxC0441c3IDwo49LUkGTHdJ4jIt1P2C9XR7YZtWqyYvTt+KAybgam?=
- =?iso-8859-1?Q?9SA2Jbg/bDE0nesdzDhIaU/yXMBb7lPaamqQxwqpMUTs4OWK+D8im03Q8Z?=
- =?iso-8859-1?Q?Ogbtw87wxTQJgfwEj6P+snEjMARv18Os+vfqM4gPSm0JdX7ynzQTcIIoTk?=
- =?iso-8859-1?Q?RDosdaSYrTmVmtm3eRpbMcP7WPFardCfcCoQpTZ6dSOyOktw4JPguen3wb?=
- =?iso-8859-1?Q?0Z?=
-x-ms-exchange-antispam-messagedata-1: Tcr84DAZmoSV4w==
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D44EF33993
+	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 08:22:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771316554; cv=none; b=b09plZZqIz2xBaihxadBXLqj9N1zTP9rXo/w7f/Pzqcjk8jsiaL96KtzgbTXd3PCT3BEVVxUdUNJk9POoG2TmnDKeq5t9tjFO+J2FL7yZeMMmWEZjFG6SKrs+Yp5d5Diyq30WWQi6rA7lO3OU6hHvazieypT3shq+qhUb6i372k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771316554; c=relaxed/simple;
+	bh=mTBibbIrxTo705P0hKuLMeHpa+PbJX0gNSLzGp96SJ4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=b7JFg3YVGIzO8Pdw8C1hSXTscF9Awyeur+VzhWNggVjWlZ7gTHlVN5rPXuvJciG/7SZ4E6hlsaN8y1iL7XkVaiQuZhKUwDnvWhWr3A7Yl6//8M/lc26qEo1+IL7U5pz4Kwlb4dUSd34SL8hrcM8/a2dNsLwpJ/ekGN30WkkJIuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Lfe06shC; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=pZyRD2kQ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1771316551;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Bx/q5VhEMKYi6ocCTPiZ6xHKLvhxYLjeRnABX5dgCdQ=;
+	b=Lfe06shCztUDWiaz7VfgsB3jcLJQG0P5euhiX0GduLZxSXk6ijHbmF/ep3vgXlcKhA2GIs
+	hcTmuZcTOCmckzRZwzV3n96d6GrmGoHXinLFYeZypyT6XGnzYCVYqBNdjjZJc1CMiibwW3
+	QZi08FAoxbpwI119d6pA4cCmC169qGM=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-251-EIb534YWPSewvtXrXR0wjA-1; Tue, 17 Feb 2026 03:22:30 -0500
+X-MC-Unique: EIb534YWPSewvtXrXR0wjA-1
+X-Mimecast-MFC-AGG-ID: EIb534YWPSewvtXrXR0wjA_1771316549
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4837a71903aso16806005e9.1
+        for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 00:22:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1771316549; x=1771921349; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Bx/q5VhEMKYi6ocCTPiZ6xHKLvhxYLjeRnABX5dgCdQ=;
+        b=pZyRD2kQFFOGMrvXRcYTEPMiCVQtu4b1UsDJSCxPd5cjCWdTMca5r0/Fsm43oWtZlo
+         PgEHl6fR+JqSdNK5cUyEdaZfFNNLt91706/75Y3yPiAv9UHJjSbppkvWSV7fNIS0Da8b
+         Blx9B1v4GX4AViBaImjNeJsf98GJggs6qv0AxuGx5Ww3hYFUw1aQo2qWC9/rPMRLo9AQ
+         4W69X7pBaCw97xgbNcHRZmNhqyAgIq7ABTibVMrIIBFBNKXctMEc8XMhed3T0byZE9dX
+         UZXB35Fz6qicHddOkOhY4Yfdvw+UmEdHqPr8KZHco7rNZzPZT5hNXLs3YluSXGnHTxxA
+         WevA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771316549; x=1771921349;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Bx/q5VhEMKYi6ocCTPiZ6xHKLvhxYLjeRnABX5dgCdQ=;
+        b=J59BDrvvzTaqH8xPND8imM6khGgpaRN/GEVGsQByGEUY+naQAUSCG4NEttbMZLhTVb
+         epgz2EfCX7FLFugIHW6JxgrRK3E8gMwj9t8d/Qaot7Kots8Vxa9/29ACmCWLsHehXwum
+         LIxyb6HnRNw68K7nJA7IDNhtGrNTgOujocN8AsgD7F0ZqAaDA7LZwc3PbUCCKfFAF1vx
+         VS08SGasOMdIjJt66QW0KI/15diPQUPpCSmAFL3qwMJiZ/xswoJl/2DmBAGOyXDUFhCX
+         alS92uhxb1yaNoCT+dfVl0Q4sU9boYN7/1rEKXllXuavb35Y4klWNneH3Ndw2LOsYfao
+         9Vqw==
+X-Forwarded-Encrypted: i=1; AJvYcCUhJN5v0uqGaOkFtm9iv/qyAfdGhpUbJ4W5yrAnGL/2GSMvPNRX3+6lQSVz67pQzn1cR17xda4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5SDkLrZZLgUJD8g487F3MxHqQy/yw/IabjOi9gG7n+rE0fqYa
+	uUZ2a6xwdY8imE/mIBZKPl2R+3X+/N7ftxp8iIID6xoIX5hNGj8l2WxCX0QHMtvVVs7fHBJ2iiK
+	+4l0Bi08fJCCtMdczIX8gkEPtrbBtBdMb1WF071JTOWUxo4zK9fczzyolhg==
+X-Gm-Gg: AZuq6aJCl7D1UPU3ARjQgStch7zjRbG3CY7p+QoBB8NqokCjwinQ3YtTxSEMmOoTXFl
+	WVD5ht2KREUc2NHmFpI+GTmeXOp1cA79r8dloLBckxy4YtY7qJjSb+PAaqS4kYRMu1HKaKW647n
+	XfB00cets7yHpf42yMmINN5wrxBKqdpjdf8wQP4dFlyiXqY1Y6IrI4tKpzlGdyQsO+316IIWllu
+	/3N7CqtNOth22DXOZDAxYd4gR3mYGMDm+67oCR9Bfs521PSe1tQmK8raMUV20AOtFfQTs8FwQfs
+	xkcUDnYzz7nHnsMWzx0Zxwbcc9owY6vOPPcQYeQTW51zepDtMCRbzL2SJD+NLiztp73HZ/QxTk8
+	YAZjpfvMGhhvvil65PINZcBSYQQ==
+X-Received: by 2002:a05:600c:8b6d:b0:47e:e807:a05a with SMTP id 5b1f17b1804b1-48379c31ca1mr174280575e9.33.1771316549290;
+        Tue, 17 Feb 2026 00:22:29 -0800 (PST)
+X-Received: by 2002:a05:600c:8b6d:b0:47e:e807:a05a with SMTP id 5b1f17b1804b1-48379c31ca1mr174280285e9.33.1771316548782;
+        Tue, 17 Feb 2026 00:22:28 -0800 (PST)
+Received: from [192.168.88.32] ([169.155.232.137])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48371a409a5sm100104465e9.26.2026.02.17.00.22.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Feb 2026 00:22:28 -0800 (PST)
+Message-ID: <173190b1-aed6-4366-bb7d-c6ea64d26899@redhat.com>
+Date: Tue, 17 Feb 2026 09:22:25 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: luminex.be
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PR3P194MB1505.EURP194.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: b22d5c14-2ca4-4e6a-ff9b-08de6dfd3d52
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Feb 2026 08:19:15.5610
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 8ca3018c-58f1-4333-afa9-a8744cbe7fc2
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: +FYmN/8+NuW3nOFi2wEoMOuYDqovd8Ljw7J7UpK1SvQVEzPSL1rXZDfxdcyjALizPFgWXX0Y8lGQ+bquny+irSqU+CCLS+y8q8bYMisQxjM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9P194MB1219
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: phylink: guard link replay helpers against
+ NULL phylink instance
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org
+References: <20260205192344.21797-1-vladimir.oltean@nxp.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260205192344.21797-1-vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[luminex.be,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[luminex.be:s=selector2];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258978-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258979-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cedric.jehasse@luminex.be,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[luminex.be:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,luminex.be:dkim]
-X-Rspamd-Queue-Id: 6A8F5149D8C
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nxp.com:email]
+X-Rspamd-Queue-Id: E1896149E56
 X-Rspamd-Action: no action
 
->> The match registers (pages 0 and 1) are almost identical across all of t=
-hese=0A=
->> families.=0A=
->> The only difference is the register at page 0 offset 0x01 is used on the=
- 6393=0A=
->> and is reserved on all the others.=0A=
->=0A=
->So a helper to access that register would be=0A=
->mv88e6393_tcam_set_match() or similar.=0A=
-=0A=
-What i said earlier was wrong. The register at offset 0x01 is not a match=
-=0A=
-register, but a common register for all TCAM pages.=0A=
-On the other families the TCAM operation register at offset 0x00 is used to=
-=0A=
-select the page number and TCAM entry index.=0A=
-The 6393 has the TCAM extension register at offset 0x01 to also select bloc=
-k=0A=
-and port number. Eg. on the 6393 page2 block 0 is a different set of regist=
-ers=0A=
-than page 2 block 6.=0A=
-=0A=
-The current patch doesn't write the TCAM extension register because only=0A=
-block 0 is used. I'll add this as it shouldn't assume that register contain=
-s=0A=
-the correct block and port values.=
+On 2/5/26 8:23 PM, Vladimir Oltean wrote:
+> There is a crash when unbinding the sja1105 driver under special
+> circumstances:
+> 
+> Unable to handle kernel NULL pointer dereference at virtual address 0000000000000030
+> Call trace:
+> phylink_run_resolve_and_disable+0x10/0x90
+> sja1105_static_config_reload+0xc0/0x410
+> sja1105_vlan_filtering+0x100/0x140
+> dsa_port_vlan_filtering+0x13c/0x368
+> dsa_port_reset_vlan_filtering.isra.0+0xe8/0x198
+> dsa_port_bridge_leave+0x130/0x248
+> dsa_user_changeupper.part.0+0x74/0x158
+> dsa_user_netdevice_event+0x50c/0xa50
+> notifier_call_chain+0x78/0x148
+> raw_notifier_call_chain+0x20/0x38
+> call_netdevice_notifiers_info+0x58/0xa8
+> __netdev_upper_dev_unlink+0xac/0x220
+> netdev_upper_dev_unlink+0x38/0x70
+> del_nbp+0x1a4/0x320
+> br_del_if+0x3c/0xd8
+> br_device_event+0xf8/0x2d8
+> notifier_call_chain+0x78/0x148
+> raw_notifier_call_chain+0x20/0x38
+> call_netdevice_notifiers_info+0x58/0xa8
+> unregister_netdevice_many_notify+0x314/0x848
+> unregister_netdevice_queue+0xe8/0xf8
+> dsa_user_destroy+0x50/0xa8
+> dsa_port_teardown+0x80/0x98
+> dsa_switch_teardown_ports+0x4c/0xb8
+> dsa_switch_deinit+0x94/0xb8
+> dsa_switch_put_tree+0x2c/0xc0
+> dsa_unregister_switch+0x38/0x60
+> sja1105_remove+0x24/0x40
+> spi_remove+0x38/0x60
+> device_remove+0x54/0x90
+> device_release_driver_internal+0x1d4/0x230
+> device_driver_detach+0x20/0x38
+> unbind_store+0xbc/0xc8
+> ---[ end trace 0000000000000000 ]---
+> 
+> which requires an explanation.
+> 
+> When a port offloads a bridge, the switch must be reset to change
+> the VLAN awareness state (the SJA1105_VLAN_FILTERING reason for
+> sja1105_static_config_reload()). When the port leaves a VLAN-aware
+> bridge, it must also be reset for the same reason: it is returning
+> to operation as a VLAN-unaware standalone port.
+> 
+> sja1105_static_config_reload() triggers the phylink link replay helpers.
+> 
+> Because sja1105 is a switch, it has multiple user ports. During unbind,
+> ports are torn down one by one in dsa_switch_teardown_ports() ->
+> dsa_port_teardown() -> dsa_user_destroy().
+> 
+> The crash happens when the numerically first user port is not part of
+> the VLAN-aware bridge, but any other user port is.
+> 
+> Tearing down the first user port causes phylink_destroy() to be called
+> on dp->pl, and this pointer to be set to NULL. Then, when the second
+> user port is torn down, this was offloading a VLAN-aware bridge port, so
+> indirectly it will trigger sja1105_static_config_reload().
+> 
+> The latter function iterates using dsa_switch_for_each_available_port(),
+> and unconditionally dereferences dp->pl, including for the
+> aforementioned torn down previous port, and passes that to phylink.
+> This is where the NULL pointer is coming from.
+> 
+> There are multiple levels at which this could be avoided:
+> - add an "if (dp->pl)" in sja1105_static_config_reload()
+> - make the phylink replay helpers NULL-tolerant
+> - mark ports as DSA_PORT_TYPE_UNUSED after dsa_port_phylink_destroy()
+>   has run, such that subsequent dsa_switch_for_each_available_port()
+>   iterations skip them
+> - disconnect the entire switch at once from switchdev and
+>   NETDEV_CHANGEUPPER events while unbinding, not just port by port,
+>   likely using a "ds->unbinding = true" mechanism or similar
+> 
+> however options 3 and 4 are quite heavy and might have side effects,
+> option 1 is very unassuming and option 2 seems a more elegant variant
+> of 1, given the fact that sja1105 is the only user of these phylink
+> replay helpers. It allows to keep the driver simple and is the option
+> I went with.
+> 
+> Functionally speaking, transforming the replay helpers into no-ops for
+> ports without a phylink instance is fine, because that only happens
+> during driver removal (an operation which cannot be cancelled). The
+> ports are not required to work.
+> 
+> Fixes: 0b2edc531e0b ("net: dsa: sja1105: let phylink help with the replay of link callbacks")
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+
+I think this patch could land on current net, but it would be nice an
+ack from phylib SMEs.
+
+Thanks,
+
+Paolo
+
 
