@@ -1,90 +1,74 @@
-Return-Path: <netdev+bounces-259147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259156-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gFy3NHXZlGk6IQIAu9opvQ
-	(envelope-from <netdev+bounces-259147-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 22:11:17 +0100
+	id uMU4MMbklGmjIgIAu9opvQ
+	(envelope-from <netdev+bounces-259156-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 22:59:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30C4115096C
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 22:11:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6189F1513C1
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 22:59:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D42BE30226B9
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 21:11:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A12BE30071FB
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 21:59:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9138537A487;
-	Tue, 17 Feb 2026 21:11:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF86E307492;
+	Tue, 17 Feb 2026 21:59:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="g/FC2feW"
+	dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b="SjNchY2C"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010067.outbound.protection.outlook.com [52.101.201.67])
+Received: from mx0a-00206402.pphosted.com (mx0a-00206402.pphosted.com [148.163.148.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E21B379998
-	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 21:11:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771362663; cv=fail; b=lJV7cskCTqZq/4f0XxAnKbVIGoPXU3s1uQadSkz+slqF/SI6PpNCfnPoavext2qHqoilnhO35nZntJ7Bz158V0/Kz7/jMnwEpdFmhfuyukuhslPfHo0CclrAKoqQZPDy+U8/u4kg8fUL2lbOwkdktyujlDrrVmFA70K1/TeDFSM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771362663; c=relaxed/simple;
-	bh=sYkY1Qo1dh8QmSsLBUyqydCNKgP4s0QEJ/PwOVceD0s=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ETg9F1ECNX/yLomVoFpGwJHGwSHKFzOE44fmrGz8SNioLsQp+B4jL2fKECiIr2JDPURG/6TeFtNIN2rtqLVOUhHJ8dj3wFL5fEH1sOmr3pJj0UggXR2CLPMbwRg552ZUoOnq/G17CfWj0vC3IW/HzDESdS4K+GKxlK8IoV6YcAM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=g/FC2feW; arc=fail smtp.client-ip=52.101.201.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XR6z7PrVsO43zOQ7UCiS1t2XbtbN4Kbs73ZNMe+wGgUsgz/rjUiTFt15zlKsJxki5ZKoD2sGc1RPFNaFnBz3EWueAMot2jVxDs9yeq/7ozNAaulTEOhpF+JfiE5HLV+Dl/AMS/Wf629OJGoIQpKLpD4jzlkaTZNZnfuXRCmdNYVRC49XeJC1w9pkSznjxrIdrrgW4WmekIIqt1UM2QaXoV0N6LpuKmxM/3h5unjJ7z9bppoapMjCCFSNyzcg9uookud3RLQWALpPotS+wal0Q3HhZLf4xw40xynE7z44bYQJ3N8XMtqB7ZQaG2d9IOU1caxnuXyEHOLe2ZyHunr52Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=W8jyynSd+OGwU/oIx8ApKq/0K2oBFE7c9d3A8xWYhPM=;
- b=taZ+T/xucJksj+rtxLoD2tuIKuHld8tjOWOqT+orbZEfbM/jMQQIJsq2CirDI0Ae3qyN6RqCaoG3eZxZc9hPQwbCbBeSRo6FFY+XxK5G4w6/6BUgFAX5/nLpz2J4VvSJV1UdzUYSwiM0Q7GN8Fcn0Lvff083U5C/09Gk86yibdNtFUPIoP73zQgq1oWHP/FnVSWz1TgqFBfArC0kgTvY9LdxKbPEbb0JSsQSn/E/87FP46R0TcQu9215CmLK3PxDPKyPLklTMRHLdqx6Ec4v42hyOesC1Gs3GXZgGPKaoeB7pDk4kK5ivrw5CPlO3flu5vCWmjSFpVwdo3mo/LKt3A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=W8jyynSd+OGwU/oIx8ApKq/0K2oBFE7c9d3A8xWYhPM=;
- b=g/FC2feW2ZkUCBnI30jei/b0pNb2KU2Zev4totSy/r++brLK9+K3XbibhifBrXoPEopsjEzlQchyCNHfSM3+ffShbhhp8AsOGi2LAFXLeqmx4QDov16uUpAQ79Xbce8A/oiZJ96pBS9xJp0RNRxmsFnmtxGeu/Sdogmy4+mLyDQ=
-Received: from PH8PR22CA0022.namprd22.prod.outlook.com (2603:10b6:510:2d1::17)
- by SA1PR12MB8141.namprd12.prod.outlook.com (2603:10b6:806:339::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.13; Tue, 17 Feb
- 2026 21:10:58 +0000
-Received: from MW1PEPF0001615B.namprd21.prod.outlook.com
- (2603:10b6:510:2d1:cafe::d5) by PH8PR22CA0022.outlook.office365.com
- (2603:10b6:510:2d1::17) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.13 via Frontend Transport; Tue,
- 17 Feb 2026 21:10:57 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- MW1PEPF0001615B.mail.protection.outlook.com (10.167.249.86) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9654.0 via Frontend Transport; Tue, 17 Feb 2026 21:10:58 +0000
-Received: from ubuntu24.e2e.pensando.io (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Tue, 17 Feb
- 2026 15:10:56 -0600
-From: "Nikhil P. Rao" <nikhil.rao@amd.com>
-To: <netdev@vger.kernel.org>
-CC: <nikhil.rao@amd.com>, <magnus.karlsson@intel.com>,
-	<maciej.fijalkowski@intel.com>, <sdf@fomichev.me>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<horms@kernel.org>, <kerneljasonxing@gmail.com>
-Subject: [PATCH net v4 2/2] xsk: Fix zero-copy AF_XDP fragment drop
-Date: Tue, 17 Feb 2026 21:08:51 +0000
-Message-ID: <20260217211019.48280-3-nikhil.rao@amd.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260217211019.48280-1-nikhil.rao@amd.com>
-References: <20260217211019.48280-1-nikhil.rao@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9127528DF2D;
+	Tue, 17 Feb 2026 21:59:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.148.77
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771365568; cv=none; b=uVHDIG1NVAGh9YVNnyzgOzucPcv2Lc24ZpxyUgR3OQ01WaJR0KEeZACN5P4GdjIxw6G80VaqwWKG01IJwy+uOwNrU/iW/0q7xa1CDQLxqb7AW6jM/wuBVSuDjfGBFDyiI28cTSeElJlWDjRAsImrRNsJth0GkfGtnk7q3HhOm00=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771365568; c=relaxed/simple;
+	bh=oHQfNcmSigVL9TWDHkhIvPAWNge36mHKajCj47NCyOw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rOl/S/Dv9fk7tUYfVfZ1kfOUZi+Q9WwM2WgFQS04Mx43JpoCVbKNm6KnOExXfaIyFrtp4yXU/KVNzW5qMQj6lC/MK7IarJffjaQwcO9TKNmTfHSJwFg/GnyG8pXzrhFoLslUixtMVGjcL7JsWvHTqMhNtEru87vxdr4kGB8CWOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com; spf=pass smtp.mailfrom=crowdstrike.com; dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b=SjNchY2C; arc=none smtp.client-ip=148.163.148.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=crowdstrike.com
+Received: from pps.filterd (m0354650.ppops.net [127.0.0.1])
+	by mx0a-00206402.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61HKj3KU1425520;
+	Tue, 17 Feb 2026 21:45:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=crowdstrike.com;
+	 h=cc:content-transfer-encoding:content-type:date:from
+	:message-id:mime-version:subject:to; s=default; bh=KfwHpjImdoj0z
+	fEWGV80PU5OuIazRwyLrYpTlBXks+c=; b=SjNchY2CYOKMLgzMd2xVhP33JBjjg
+	TUWNfA9M9crkB74UT1BjMoDRR+RLcFNIg+inCJKLDYG2CkH6NdNVb2ImTVYI8yqk
+	e/ln2R//CNAUey84y5AZG0ae1guErYKn6bImMg+2+e8fjc/yWd68jjRJIy3wTQTU
+	lpC3UNOSt2v3JW9+8jnlUF1QuAKbmercMUO8lejAM/BIjLx1ZeY4JLa+NrxY3joi
+	nPUJJrotu+74TIBeNZtL5g8/oNHNsw4kl9QYC7pi/wBRrXezzigKUtCKmpbVcqnx
+	Ks1fJfQrxkcTpZ/c7ViZslszMh8dU4wDm+755pUcFm19+xWhM6DiNVpGw==
+Received: from mail.crowdstrike.com (dragosx.crowdstrike.com [208.42.231.60] (may be forged))
+	by mx0a-00206402.pphosted.com (PPS) with ESMTPS id 4ccyn38657-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 17 Feb 2026 21:45:48 +0000 (GMT)
+Received: from ML-CTVHTF21DX.crowdstrike.sys (10.100.11.122) by
+ 04WPEXCH006.crowdstrike.sys (10.100.11.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Tue, 17 Feb 2026 21:45:42 +0000
+From: Slava Imameev <slava.imameev@crowdstrike.com>
+To: <sast@kernel.org>, <daniel@iogearbox.net>, <andrii@kernel.org>
+CC: <sartin.lau@linux.dev>, <eddyz87@gmail.com>, <song@kernel.org>,
+        <yonghong.song@linux.dev>, <john.fastabend@gmail.com>,
+        <kpsingh@kernel.org>, <sdf@fomichev.me>, <haoluo@google.com>,
+        <jolsa@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+        <shuah@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>, <linux-open-source@crowdstrike.com>,
+        Slava Imameev
+	<slava.imameev@crowdstrike.com>
+Subject: [PATCH bpf-next 0/2] bpf: Add multi-level pointer parameter support for trampolines
+Date: Wed, 18 Feb 2026 08:45:31 +1100
+Message-ID: <20260217214533.17776-1-slava.imameev@crowdstrike.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,152 +77,185 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW1PEPF0001615B:EE_|SA1PR12MB8141:EE_
-X-MS-Office365-Filtering-Correlation-Id: 78170468-5266-4c4c-6436-08de6e690c00
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|7416014|36860700013|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?D5u8LIPBfOnz5meItmAP91WiesWq0txf9+ih5Ai9YqugLw7r6F6TO2myF4sp?=
- =?us-ascii?Q?0hegKh8Xgjc+dhU18qXimcqkHbo/kuvkKDeTKuYi1nSK+HcMNDJytMj6f7lX?=
- =?us-ascii?Q?uOfWBLuhkh1YWqzdoTMpBqUJHAR43LJqFa4lFNoO+Z+0PwnCsUTQXD+ftASE?=
- =?us-ascii?Q?tNEX5G905wHjDEpHwx6JXwJuKWhww/vf9bUbkCzCpH0mxu4JMpBsMdfz3Ish?=
- =?us-ascii?Q?U+K4nM9T/jO+fAyh1xXw10rSvejvjBv6C9N087uXWW+9Sf8Cx3KKQ94NHjgp?=
- =?us-ascii?Q?Citwinho80DzLz8wpySzYgcS9Zsz6O1f8cUFx7ff4N4Ha/mga+tHr1r6OXBg?=
- =?us-ascii?Q?k7t+QgTwp2T6vNosbClZH6WL6HG3KYBIie0uesNdgBsGJZSvT30avOEVSqWT?=
- =?us-ascii?Q?57CfKZrs4aoQkwiCIjeTur+wstP0fLcix2Qrr90UArau1yPLJd8np2G/2lnO?=
- =?us-ascii?Q?K89niP6bqlMOodxjxm10QFKF4BtpHM2Z3iICeufp4CmVUFEGO80YHk55CKSm?=
- =?us-ascii?Q?2Aik7BU6yALvhk1d9kJq5A4kXfpSU76kLUl9ssu2JnqmHv44oTbBxCYnLguX?=
- =?us-ascii?Q?+/tbGVuv4CV1snt9sRFuk1/JSCgR3Hwxnncief080RP7bZZL+gn6XXaeDsQU?=
- =?us-ascii?Q?LL6avzxprNmSiht5Ur0B6oT3zCFuJMf78KvJc3+pkbwQRdyV47m+HRlC5ur2?=
- =?us-ascii?Q?/2Fd4Q57Jwii4GoBTIvfCzecu5p8ImltD6WL2geDfDHHba0NJID2N9QGt2H1?=
- =?us-ascii?Q?M3d/EMYMw86aq4ielztQEJsDULZUsF4yX3CZr0AMyjt6BKnJLWuehjhHlO3z?=
- =?us-ascii?Q?bhcBafE++qYLbSEyZBkHd0uJSM0S3GT6fUKicwFNWcLWG3k0f2oPetm4YOSQ?=
- =?us-ascii?Q?kaZH33vgyC9dO/UsN1cyl9Oyy3YOIHvKT+ou91U6I7SJ2p8uK8QEKS9wapFx?=
- =?us-ascii?Q?CJ9+Yxg51CJ/PSuAokPOGCL2OpUoeCEeq6uzel5c9wV6STNVNpP1lxeUsOgS?=
- =?us-ascii?Q?6y/8vYbDXKnMX08pXYA4g7ba+HxbhUnZw/lX0LkxVc9JwFTkOVE/RrPvzjnH?=
- =?us-ascii?Q?Mq1bmNKdbeZJK0vaesdi1kDhT/xIwjvs6EmQof2FUUwpiLHMUgFl4DQ6KIuT?=
- =?us-ascii?Q?EC+tL6UCzxjFcVD7DOYZUvgOJOxvS1eb6QPSt9LtfdiatJRg2HVT2kcaTXSx?=
- =?us-ascii?Q?XTYvltY0B+qS5DcUCMDIbQWfczcX527rJh6i6P9psVm08Ztv8eIRdxwsuU2M?=
- =?us-ascii?Q?Q6N7VbtplQXO01jSBLZRR4R9QT5PCNbw5fyMCFhdPEqga+Wcetgp2EzkxmA1?=
- =?us-ascii?Q?W5gcitgfb/FUGSYs6meAof3NHR8PlVBd6kLo+tUu773ja8TG9rbEPd5JPMxk?=
- =?us-ascii?Q?ZvTfuSQ1pTMe/kJMUgPMSJ6UOvCFxJ+MkaBfev3OZQfwqCXX5I7KlJFrSibK?=
- =?us-ascii?Q?vtoHJNvCPkYmwqzj02bwcqK21mgvx9nL2YwJK9IQbVOrMzDMRMmUXGXAP7rv?=
- =?us-ascii?Q?+LQdQEFTnRnKhvhG53TyrO/bgZy4gLm1jX7Kz5WZGWdyf2Ytz/4uY1UW5kRA?=
- =?us-ascii?Q?3RlrOiKUZS5zEzSqpllU9XAc7Lg7Wp0pM/4z/0WhjLXiN/QccO4Ohbz2Z3Hg?=
- =?us-ascii?Q?Ux4FhLjYsZGDBwhPK4iv5eRnfoUHNW49lSeZYJiNaenA?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	z/zfrEUWmZdpLYbIgTs5VmPmpY3SLX0jVRNi9sZqa9P44F1hJV+/LtRXbX51q7eql4vc20WAr8HqtvN9QEHwdgKdkjvY4ZTQXAnK9nFdrOWERz21B13mpg90NSggMfHW5NRaOnTohN9bKcIH70dEwCI2ZmswUZkdw5w30zfQNnujlIonMoy9H3OJ4ZDMURD6lzn+Ykt6pKFbaox5wC1wez3h2ezoJNTjIXJfgpntXJrUfAW50WEelu/K24JKHf+lwscJn2Evg+1IeqjoOSR7gXYXBFYIUvgvYXWn+kGeEoDqfpele9CY2ykCfnjml70u98KaVoLquTHQkrjwaUGRUt+AJXu48qWz1YG10J+CmxtQ8rqTWwn9G1qtDIkKmt7wySRn5kAKBYydJYU1w3vLqro84K23w+fkHufB1TbY8M3QSsdCduWWwMPve5M7H2nX
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Feb 2026 21:10:58.3806
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 78170468-5266-4c4c-6436-08de6e690c00
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MW1PEPF0001615B.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8141
+X-ClientProxiedBy: 04WPEXCH016.crowdstrike.sys (10.100.11.68) To
+ 04WPEXCH006.crowdstrike.sys (10.100.11.70)
+X-Disclaimer: USA
+X-Proofpoint-ORIG-GUID: k3eqfDwWqaL0Vl_VLkwlriYtsRUYyLAH
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjE3MDE3OSBTYWx0ZWRfX6kzIylWzRPZf
+ xbRDzycFl7hXyrEKODwAgZ3aQN0ZY5oMlc30RBgxhIcKioJza1CnVdPYK3/axtEoUE/aRyl6rVk
+ EFLhFeyyYEebyiPBSTmrLXvhm4eYP9HYUXy2akEWTEIdS8nyQso7frygJJejBkt24T7s22Na8r9
+ JhrfS+DDWyuEk75I4kR2TaEquTQxXtXIGQ+5Dy2/B5zmo5E+SpxJnAscoL8UVtePTMkiU7naBEX
+ ps5hWwx7tgpYAHaBqUFZOkEuLQ69twks4/pzmzR24NuXOSsKGtG9gMN1ryPC5x3a3zw2IqpjemI
+ V8zdlQGKZGRHKzVDYEcFISHomUZY35abfxgp05/lSug6h6CKx86IbNobUGuQZRjlCd/jJlVjEJr
+ bvlHebjlTq3RCMwBt5NOd+cWYls4arQmZjUgAfBEj1B7H/oTlbU1/r8Uz1WG9jRMxPfnQzQuWQC
+ ooGS0dZ79a8RBrRk4YQ==
+X-Authority-Analysis: v=2.4 cv=bOMb4f+Z c=1 sm=1 tr=0 ts=6994e18c cx=c_pps
+ a=1d8vc5iZWYKGYgMGCdbIRA==:117 a=1d8vc5iZWYKGYgMGCdbIRA==:17
+ a=EjBHVkixTFsA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=Vjdy_2d24l28D3FOwqMA:9
+X-Proofpoint-GUID: k3eqfDwWqaL0Vl_VLkwlriYtsRUYyLAH
+X-Proofpoint-Virus-Version: vendor=nai engine=6800 definitions=11704
+ signatures=596818
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 priorityscore=1501 adultscore=0 clxscore=1011 malwarescore=0
+ spamscore=0 bulkscore=0 lowpriorityscore=0 phishscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602170179
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[crowdstrike.com,reject];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[crowdstrike.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[amd.com,intel.com,fomichev.me,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259147-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[amd.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_CC(0.00)[linux.dev,gmail.com,kernel.org,fomichev.me,google.com,davemloft.net,redhat.com,vger.kernel.org,crowdstrike.com];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	TAGGED_FROM(0.00)[bounces-259156-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[nikhil.rao@amd.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[slava.imameev@crowdstrike.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[crowdstrike.com:+];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 30C4115096C
+	RCVD_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[crowdstrike.com:mid,crowdstrike.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6189F1513C1
 X-Rspamd-Action: no action
 
-AF_XDP should ensure that only a complete packet is sent to application.
-In the zero-copy case, if the Rx queue gets full as fragments are being
-enqueued, the remaining fragments are dropped.
+This patch adds BPF verifier support for multi-level pointer parameters
+and return values in BPF trampolines. The implementation treats these
+parameters as PTR_TO_MEM with read-only semantics, applying either
+untrusted or trusted access patterns while honoring __nullable
+annotations. Runtime safety is ensured through existing exception
+handling mechanisms for untrusted memory reads, with the verifier
+enforcing bounds checking and null validation. The series includes
+selftests covering double and triple pointer arguments across
+fentry/fexit/lsm programs and verifier context validation.
 
-For the multi-buffer case, add a check to ensure that the Rx queue has
-enough space for all fragments of a packet before starting to enqueue
-them.
+Background:
 
-Fixes: 24ea50127ecf ("xsk: support mbuf on ZC RX")
-Acked-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Signed-off-by: Nikhil P. Rao <nikhil.rao@amd.com>
----
- net/xdp/xsk.c | 23 +++++++++++++++--------
- 1 file changed, 15 insertions(+), 8 deletions(-)
+Prior to these changes, accessing multi-level pointer parameters or
+return values through BPF trampoline context arrays resulted in
+verification failures in btf_ctx_access, producing errors such as:
 
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index f2ec4f78bbb6..f7f816a5cb80 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -167,25 +167,32 @@ static int xsk_rcv_zc(struct xdp_sock *xs, struct xdp_buff *xdp, u32 len)
- 	struct xdp_buff_xsk *pos, *tmp;
- 	struct list_head *xskb_list;
- 	u32 contd = 0;
-+	u32 num_desc;
- 	int err;
- 
--	if (frags)
-+	if (frags) {
-+		num_desc = xdp_get_shared_info_from_buff(xdp)->nr_frags + 1;
- 		contd = XDP_PKT_CONTD;
-+	} else {
-+		err = __xsk_rcv_zc(xs, xskb, len, contd);
-+		if (err)
-+			goto err;
-+		return 0;
-+	}
- 
--	err = __xsk_rcv_zc(xs, xskb, len, contd);
--	if (err)
-+	if (xskq_prod_nb_free(xs->rx, num_desc) < num_desc) {
-+		xs->rx_queue_full++;
-+		err = -ENOBUFS;
- 		goto err;
--	if (likely(!frags))
--		return 0;
-+	}
- 
-+	__xsk_rcv_zc(xs, xskb, len, contd);
- 	xskb_list = &xskb->pool->xskb_list;
- 	list_for_each_entry_safe(pos, tmp, xskb_list, list_node) {
- 		if (list_is_singular(xskb_list))
- 			contd = 0;
- 		len = pos->xdp.data_end - pos->xdp.data;
--		err = __xsk_rcv_zc(xs, pos, len, contd);
--		if (err)
--			goto err;
-+		__xsk_rcv_zc(xs, pos, len, contd);
- 		list_del_init(&pos->list_node);
- 	}
- 
+func '%s' arg%d type %s is not a struct
+
+For example, consider a BPF program that logs an input parameter of type
+struct posix_acl **:
+
+SEC("fentry/__posix_acl_chmod")
+int BPF_PROG(trace_posix_acl_chmod, struct posix_acl **ppacl, gfp_t gfp,
+             umode_t mode)
+{
+    bpf_printk("__posix_acl_chmod ppacl = %px\n", ppacl);
+    return 0;
+}
+
+This program failed BPF verification with the following error:
+
+libbpf: prog 'trace_posix_acl_chmod': -- BEGIN PROG LOAD LOG --
+0: R1=ctx() R10=fp0
+; int BPF_PROG(trace_posix_acl_chmod, struct posix_acl **ppacl,
+gfp_t gfp, umode_t mode) @ posix_acl_monitor.bpf.c:23
+0: (79) r6 = *(u64 *)(r1 +16)         ; R1=ctx() R6_w=scalar()
+1: (79) r1 = *(u64 *)(r1 +0)
+func '__posix_acl_chmod' arg0 type PTR is not a struct
+invalid bpf_context access off=0 size=8
+processed 2 insns (limit 1000000) max_states_per_insn 0 total_states 0
+peak_states 0 mark_read 0
+-- END PROG LOAD LOG --
+
+The common workaround involved using helper functions to fetch parameter
+values by passing the address of the context array entry:
+
+SEC("fentry/__posix_acl_chmod")
+int BPF_PROG(trace_posix_acl_chmod, struct posix_acl **ppacl, gfp_t gfp,
+             umode_t mode)
+{
+    struct posix_acl **p;
+    bpf_probe_read_kernel(&p, sizeof(ppacl), &ctx[0]);
+    bpf_printk("__posix_acl_chmod before %px\n", p);
+    return 0;
+}
+
+This approach introduced helper call overhead and created inconsistency
+with parameter access patterns.
+
+Improvements:
+
+With this patch, trampoline programs can directly read parameters and
+dereference memory using load instructions, eliminating helper call
+overhead and ensuring consistent parameter handling. For example, the
+following helper call sequence:
+
+{
+    struct posix_acl **pp;
+    struct posix_acl *p;
+    bpf_probe_read_kernel(&pp, sizeof(pp), &ctx[0]);
+    bpf_probe_read_kernel(&p, sizeof(p), pp);
+    ...
+}
+
+can be replaced by two load instructions implementing a single C
+statement:
+
+{
+    struct posix_acl *p = *ppacl;
+    ...
+}
+
+Design Rationale: PTR_TO_MEM vs SCALAR
+
+The verifier assigns SCALAR type to single-level pointers (void*, int*).
+For multi-level pointers, I selected PTR_TO_MEM to enable memory access
+through a single load instruction for the first level of dereference,
+with subsequent dereferences becoming SCALAR. This design eliminates
+helper call for parameter dereference, replacing it with a load
+instruction (e.g., void* ptr = *pptr).
+
+Access safety is maintained through existing verify-time checks,
+exception handling, and kernel virtual address range boundary checks:
+- User-mode memory address access is prevented by runtime virtual
+  address range checks for untrusted PTR_TO_MEM
+- Invalid kernel address space accesses are intercepted by the
+  exception handler for untrusted PTR_TO_MEM
+- Trusted PTR_TO_MEM access safety is maintained at verify time
+
+Slava Imameev (2):
+  bpf: Support multi-level pointer params via PTR_TO_MEM for trampolines
+  selftests/bpf: Add trampolines multi-level pointer params test
+    coverage
+
+ include/linux/bpf.h                           |   3 +-
+ kernel/bpf/btf.c                              |  54 ++-
+ kernel/bpf/verifier.c                         |   4 +-
+ net/bpf/test_run.c                            | 128 ++++++
+ .../prog_tests/fentry_fexit_multi_level_ptr.c | 204 +++++++++
+ .../selftests/bpf/prog_tests/verifier.c       |   2 +
+ .../progs/fentry_fexit_pptr_nullable_test.c   |  52 +++
+ .../bpf/progs/fentry_fexit_pptr_test.c        |  60 +++
+ .../bpf/progs/fentry_fexit_void_ppptr_test.c  |  31 ++
+ .../bpf/progs/fentry_fexit_void_pptr_test.c   |  64 +++
+ .../bpf/progs/verifier_ctx_multilevel_ptr.c   | 429 ++++++++++++++++++
+ 11 files changed, 1021 insertions(+), 10 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/fentry_fexit_multi_level_ptr.c
+ create mode 100644 tools/testing/selftests/bpf/progs/fentry_fexit_pptr_nullable_test.c
+ create mode 100644 tools/testing/selftests/bpf/progs/fentry_fexit_pptr_test.c
+ create mode 100644 tools/testing/selftests/bpf/progs/fentry_fexit_void_ppptr_test.c
+ create mode 100644 tools/testing/selftests/bpf/progs/fentry_fexit_void_pptr_test.c
+ create mode 100644 tools/testing/selftests/bpf/progs/verifier_ctx_multilevel_ptr.c
+
 -- 
-2.43.0
+2.50.1 (Apple Git-155)
 
 
