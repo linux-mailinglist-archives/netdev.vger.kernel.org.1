@@ -1,173 +1,209 @@
-Return-Path: <netdev+bounces-259022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259023-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uGosOC9glGnODAIAu9opvQ
-	(envelope-from <netdev+bounces-259022-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 13:33:51 +0100
+	id 6DDEJ6thlGlfDQIAu9opvQ
+	(envelope-from <netdev+bounces-259023-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 13:40:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1427314BFF7
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 13:33:51 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF6F114C08B
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 13:40:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id AA1443006033
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 12:33:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 57B9430214E5
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 12:39:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C56573385A2;
-	Tue, 17 Feb 2026 12:33:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5353C3542CF;
+	Tue, 17 Feb 2026 12:39:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AJyn9eFN";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="odrm1pQn"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PQqBwSlg"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A26245029
-	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 12:33:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBCAD28D8DB
+	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 12:39:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771331626; cv=none; b=eXg1ltf007hGk3deNzUVMoxInFTQZbz//1WxNphHKspoqTTNRtdPhl4Xvv9LD78k14NDM7ZocpVtuObsA/dpyBCiYB0Wt03iX7fQnUeVeFe7QvW7pPQqmLiS97XS3/s4uO0CGr2nwcHWf1fIhykO8aotr+Gz1KMRzjxSraHMfW4=
+	t=1771331986; cv=none; b=ZQ6lCduJmyhkQtoURTylp0sNMj1U1mgsfWjaLA6BHHG8CG7NMb+uFPCBp3E/4R/OFQSlqwSNm3fIkGQ8jlKiPjPtMuPGNMapyYDdu4Bb/gRlmWs2HQ9tGVNPA0x85OR13lwGujFH0wDIyXrQE0R+dUros0a2HQYQdqgBp/8b3Ek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771331626; c=relaxed/simple;
-	bh=3F/PtxbvnZWTruaWOX8pt9TFrvnOL7MN4m3IXy/gB00=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WYvMLvbBmVyCw8v8kqwxQePbxIWOgedcDpPkPXs8PuOveuOQRLJV0dlL5MAtpToZCqN18bK3mqrTnlOOwUvUeYpJ0j42VZTP18L7raGxsrxO/ph4fu4ux/J3ouLKNKyMBwm5A+KGYC9HdNxFR6lBrp3AWO30UqPwSABashX8Dnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AJyn9eFN; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=odrm1pQn; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1771331624;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WDRWvoSrz3e9BgTnryMnQECVYhAGIwjQq5XKzoi1yT4=;
-	b=AJyn9eFN6TO91G6/5Mb3kUFrcxmm3tQZe4+OTD5mtcSgNrmf513Vd2cc5QP2pf1laJji7I
-	vPs+7LUptJC1o1Hsy+V7P6j9IJi6+DkqUybfXJpzl1/KBCK6/MIBmEUqRv0/AZRP5hCD4g
-	0HR2a0DrnIv87xPn3nv1e9OoANEwrm4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-131-4LHr-B6aMaihp9Oghg_whQ-1; Tue, 17 Feb 2026 07:33:43 -0500
-X-MC-Unique: 4LHr-B6aMaihp9Oghg_whQ-1
-X-Mimecast-MFC-AGG-ID: 4LHr-B6aMaihp9Oghg_whQ_1771331622
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-437159d3ff2so4148580f8f.1
-        for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 04:33:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1771331622; x=1771936422; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WDRWvoSrz3e9BgTnryMnQECVYhAGIwjQq5XKzoi1yT4=;
-        b=odrm1pQnhSHcpzDdJCscpUySTdaXZLPiFpmr4InC9sWcK6tSvnCQgUWctil3SM3dae
-         ku5BFRTYWOVfzMIR+kVyvJZGIULlnpCmkJwh1u3zJYg4mDMRgYfo9/kXFNHJAJupPFCK
-         E+5p9qxtMDoVlMGp7di356y1+KAoCaTxY0lHjDJbAeC2xHcUw3X2kCNfG6JoG2nsBEjK
-         0spCDezuf0Yi5SVfXCv/+iJwbME1o7rKzJvtpliwM1rbPMQzHBxah9BKJB+pyo6dr1Zr
-         2aybALlwd3LNSLrKZZtxLp8AOEhXEmOIsYCIli2oo8+I713aY/HNy3v45L8AZiJMCPov
-         9YWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771331622; x=1771936422;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WDRWvoSrz3e9BgTnryMnQECVYhAGIwjQq5XKzoi1yT4=;
-        b=VhMUI7z0Ywi+VgOhI8jYj4YxIv24KGevqxrjl7q6EGuUEb9bbxa6bZBoXn+hgrhMgc
-         SEW4IdSisZVm7VY8b+FamKR9T02R2Y1rltzNTOLH/jyZlpeKtf3pUrIksKn+jCd4SXCw
-         dRuo98HMf94tdDybgafMCnGiKJL9LilSBrN3tBgvegWywPbamQdrS8/wZHgcRKTst7Mu
-         4R64DrkBh8WQ25H6V21o1BuzcLv8coMv5d4Fp75ZFcHFp8dssDQRINECTj/EOf+n2sPb
-         z+ivF9eu9Z49PfMEhfHQb6tjZj+zMqn7dexpdT9khI9NhcklJPYN4s6pX+aTWSk9aY0s
-         Z3ZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUGGgVqhGdNisn523nnlykkdXpetT2RRDWPIsSGBnAsGUtEsKw0OnDQ91MTKGUzV1akCRTxLM0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPITbpA5lUrivsl5LiU+a7nx4ypqYncudDgAJVgGQOpK4WhN9p
-	81n6SY+96lK2rRc2esBx5heT++zgmJ/pkX+FMN/OFajns0MT3L4YwB11LjBr5k/P2DnNflBUXLr
-	6ZExzMGkSmO96b/DLz8/TH/6SZjbeb62ERokv+uZYDZsjtpKD2Fl6RDDypg==
-X-Gm-Gg: AZuq6aKLq9G+VDTD7XOIcoitv/2EhIxBaKdt9nFiJgyj4/l2hTW8O994Gg0PB274rm1
-	5+ty2MYKoK2BYLMlAbkwjFmrAHdWW8mPCl1upfiBYZ5roMTPrgiqTtNhELs1VTAPFHcSTuwseKW
-	z1AyNI07EZAmFw5qw8bTb65uQKwGXZGxwD+iPOFq4lr19KEwFhG9uhEvP9K4IYgl+BpBKO7r4oq
-	DeoHi4UNglyxGgK8Cgv2QpOv/8az5lxVcc/L44IpVnyqwuyXdOpHSOP9Kr4RopBtXtipIHuHPTP
-	uU+2UI4zEBCqMbS8cmWeNEaIYsiEQ0nPbBVNE8RgDi0O62WWWzGDveAyZ5jBqNQ36kWPp7K8ojF
-	8HCXtaJrfCvP2G8EHZERkh8DjAw==
-X-Received: by 2002:a05:600c:8117:b0:475:da1a:53f9 with SMTP id 5b1f17b1804b1-483710588e9mr183712905e9.14.1771331621809;
-        Tue, 17 Feb 2026 04:33:41 -0800 (PST)
-X-Received: by 2002:a05:600c:8117:b0:475:da1a:53f9 with SMTP id 5b1f17b1804b1-483710588e9mr183712465e9.14.1771331621423;
-        Tue, 17 Feb 2026 04:33:41 -0800 (PST)
-Received: from [192.168.88.32] ([169.155.232.137])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48378b5196esm127469705e9.8.2026.02.17.04.33.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Feb 2026 04:33:40 -0800 (PST)
-Message-ID: <354ecaee-7b66-4c8f-8293-30e68f1a3a1c@redhat.com>
-Date: Tue, 17 Feb 2026 13:33:39 +0100
+	s=arc-20240116; t=1771331986; c=relaxed/simple;
+	bh=jkvscVY8jhU91bgbPbEIsETUtHOFLH8AOKAEllmL2rk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=euPffuT/5eWxcw3CF/wFRDrXryplaRJR93Vydmyk8GIGXPtURm4A/CEFChDx3+UhIH3t4nxlSKh6rrrAQ+c+3RluhIyqivJuikjjAhavv9GHP9XsQL7AzFxfBQqnT4/UWfYq468Licoz2abKrkfnlYDAOAOJDZHmCMLxodN2r0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PQqBwSlg; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1771331985; x=1802867985;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=jkvscVY8jhU91bgbPbEIsETUtHOFLH8AOKAEllmL2rk=;
+  b=PQqBwSlgdtTZDPzOTPhEbHt/35E4doQ/JS7SGnsnYXuXK1dI1kkYxSGW
+   NZ3ISeYMP2bG7eoQ22tmu6X0NpaR7/LGzuUiKmv/4Xp4DPyulfspIpZTm
+   GeFalHURDQoVJ4gnSAlNgPXugDAtDcuNGqM7U24Kise43kdjHzZDhyDE7
+   HOfap5qJdIdfqFxeFAFAAXgWDaMtalUiXIFM9zAkwIjBf4aC5GXR9BbDY
+   /su9FVFYSxKuPhzZOy4L+4RVQM0RjBxpU7DpL0wB3eU1fKtHu5befuKWe
+   pAvyLYQwticm2CAkOl3f5Z8zbjxN9v5upsubRWseRUmS0husLB1T1xND7
+   w==;
+X-CSE-ConnectionGUID: tK8qK1AkSUeu+LQIzUVlag==
+X-CSE-MsgGUID: UODwKethS8mj/6sy9FfIQQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11703"; a="89810018"
+X-IronPort-AV: E=Sophos;i="6.21,296,1763452800"; 
+   d="scan'208";a="89810018"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2026 04:39:45 -0800
+X-CSE-ConnectionGUID: 6kfB+UeyR7uRw1igXSIHzQ==
+X-CSE-MsgGUID: 2+/IDyIFRpyfXaTbOlIbZA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,296,1763452800"; 
+   d="scan'208";a="218003122"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 17 Feb 2026 04:39:41 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vsKMc-000000010xY-2ggC;
+	Tue, 17 Feb 2026 12:39:38 +0000
+Date: Tue, 17 Feb 2026 20:39:19 +0800
+From: kernel test robot <lkp@intel.com>
+To: "Nikhil P. Rao" <nikhil.rao@amd.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, nikhil.rao@amd.com,
+	magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
+	sdf@fomichev.me, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	kerneljasonxing@gmail.com
+Subject: Re: [PATCH net v3 2/2] xsk: Fix zero-copy AF_XDP fragment drop
+Message-ID: <202602172046.vf9DtpdF-lkp@intel.com>
+References: <20260217012346.22468-3-nikhil.rao@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 3/3] selftests: forwarding: fix pedit tests failure
- with br_netfilter enabled
-To: Ido Schimmel <idosch@nvidia.com>,
- Aleksei Oladko <aleksey.oladko@virtuozzo.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Petr Machata <petrm@nvidia.com>, Amit Cohen <amcohen@nvidia.com>,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260213131907.43351-1-aleksey.oladko@virtuozzo.com>
- <20260213131907.43351-4-aleksey.oladko@virtuozzo.com>
- <20260215094520.GC114305@shredder>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260215094520.GC114305@shredder>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260217012346.22468-3-nikhil.rao@amd.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259022-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259023-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lists.linux.dev,amd.com,intel.com,fomichev.me,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1427314BFF7
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,intel.com:email,01.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BF6F114C08B
 X-Rspamd-Action: no action
 
-On 2/15/26 10:45 AM, Ido Schimmel wrote:
-> On Fri, Feb 13, 2026 at 01:19:07PM +0000, Aleksei Oladko wrote:
->> The tests use the tc pedit action to modify the IPv4 source address
->> ("pedit ex munge ip src set"), but the IP header checksum is not
->> recalculated after the modification. As a result, the modified packet
->> fails sanity checks in br_netfilter after bridging and is dropped,
->> which causes the test to fail.
->>
->> Fix this by ensuring net.bridge.bridge-nf-call-iptables is set to 0
->> during the test execution. This prevents the bridge from passing
->> L2 traffic to netfilter, bypasing the checksum validation that
-> 
-> s/bypasing/bypassing/
+Hi Nikhil,
 
-No need to resubmit, I'll fix it while applying.
+kernel test robot noticed the following build warnings:
 
-/P
+[auto build test WARNING on net/main]
 
+url:    https://github.com/intel-lab-lkp/linux/commits/Nikhil-P-Rao/xsk-Fix-fragment-node-deletion-to-prevent-buffer-leak/20260217-092448
+base:   net/main
+patch link:    https://lore.kernel.org/r/20260217012346.22468-3-nikhil.rao%40amd.com
+patch subject: [PATCH net v3 2/2] xsk: Fix zero-copy AF_XDP fragment drop
+config: powerpc64-randconfig-002-20260217 (https://download.01.org/0day-ci/archive/20260217/202602172046.vf9DtpdF-lkp@intel.com/config)
+compiler: clang version 23.0.0git (https://github.com/llvm/llvm-project e86750b29fa0ff207cd43213d66dabe565417638)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260217/202602172046.vf9DtpdF-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202602172046.vf9DtpdF-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> net/xdp/xsk.c:183:6: warning: variable 'err' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
+     183 |         if (xskq_prod_nb_free(xs->rx, num_desc) < num_desc) {
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   net/xdp/xsk.c:201:9: note: uninitialized use occurs here
+     201 |         return err;
+         |                ^~~
+   net/xdp/xsk.c:183:2: note: remove the 'if' if its condition is always false
+     183 |         if (xskq_prod_nb_free(xs->rx, num_desc) < num_desc) {
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     184 |                 xs->rx_queue_full++;
+         |                 ~~~~~~~~~~~~~~~~~~~~
+     185 |                 goto err;
+         |                 ~~~~~~~~~
+     186 |         }
+         |         ~
+   net/xdp/xsk.c:171:9: note: initialize the variable 'err' to silence this warning
+     171 |         int err;
+         |                ^
+         |                 = 0
+   1 warning generated.
+
+
+vim +183 net/xdp/xsk.c
+
+   162	
+   163	static int xsk_rcv_zc(struct xdp_sock *xs, struct xdp_buff *xdp, u32 len)
+   164	{
+   165		struct xdp_buff_xsk *xskb = container_of(xdp, struct xdp_buff_xsk, xdp);
+   166		u32 frags = xdp_buff_has_frags(xdp);
+   167		struct xdp_buff_xsk *pos, *tmp;
+   168		struct list_head *xskb_list;
+   169		u32 contd = 0;
+   170		u32 num_desc;
+   171		int err;
+   172	
+   173		if (frags) {
+   174			num_desc = xdp_get_shared_info_from_buff(xdp)->nr_frags + 1;
+   175			contd = XDP_PKT_CONTD;
+   176		} else {
+   177			err = __xsk_rcv_zc(xs, xskb, len, contd);
+   178			if (err)
+   179				goto err;
+   180			return 0;
+   181		}
+   182	
+ > 183		if (xskq_prod_nb_free(xs->rx, num_desc) < num_desc) {
+   184			xs->rx_queue_full++;
+   185			goto err;
+   186		}
+   187	
+   188		__xsk_rcv_zc(xs, xskb, len, contd);
+   189		xskb_list = &xskb->pool->xskb_list;
+   190		list_for_each_entry_safe(pos, tmp, xskb_list, list_node) {
+   191			if (list_is_singular(xskb_list))
+   192				contd = 0;
+   193			len = pos->xdp.data_end - pos->xdp.data;
+   194			__xsk_rcv_zc(xs, pos, len, contd);
+   195			list_del_init(&pos->list_node);
+   196		}
+   197	
+   198		return 0;
+   199	err:
+   200		xsk_buff_free(xdp);
+   201		return err;
+   202	}
+   203	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
