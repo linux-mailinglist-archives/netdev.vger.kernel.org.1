@@ -1,186 +1,416 @@
-Return-Path: <netdev+bounces-259084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259085-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uCF/BiyTlGl3FgIAu9opvQ
-	(envelope-from <netdev+bounces-259084-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 17:11:24 +0100
+	id YJfOG2OTlGl3FgIAu9opvQ
+	(envelope-from <netdev+bounces-259085-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 17:12:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D43814DEBD
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 17:11:23 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2E3D14DEEB
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 17:12:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 42B84301588C
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 16:10:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C39653009B0E
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 16:12:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 407D836BCF4;
-	Tue, 17 Feb 2026 16:10:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7AD436E460;
+	Tue, 17 Feb 2026 16:12:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="t12cETo0";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="pNNg3Ojd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ED0eagEX"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F03EA36BCC5
-	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 16:10:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 460C836D4E0
+	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 16:12:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771344658; cv=none; b=AMmHoh06MMcVjyi9a/YH82dsx4wCFkZYVFV7K210NfzyNnCMNemtDv8wIgQIUlbd+VvXV0P8wLo1XtloEdkRKj6t6rR8psB9loCS2OrXTiApaVZFU3Cbqu9ZQJuxaVDAgP281v+pem9YADQATQimR8TE6ggoDMZBBFbGSArsLrA=
+	t=1771344734; cv=none; b=HnqfTrU7woDnD9yLBdZmXnBzmrQ8hxX9C1Leyg39G0pzikvLg+2lyQ3iXR3hdSUnNExwAyMnv27ZdKCo8PIuQiOJh1HHe4vjwGONry8B37XKKltYyR4XUfQHdsLGftchNDgKOau9Abimo9ba6AwVp2SzBpdSWYeT09upJ9qS8u8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771344658; c=relaxed/simple;
-	bh=p+uCUKhVP8DzvkBlCG/a5C0OAUe9Iw5kiDqsEYWg3LU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tk09s4cNyqo1zIqx660dwZknQjcfHE4aIVPAueN0sn+FMenjkfbODG8Byg1KyAtUFqLlSXr9CGO+niBkOeTQUP4ahizNjvjwIu5+0x9+JiJKV2fTUuSSMjsepifV88m+r6l54ReeFHlL3Tax9qR87DUUQ1OtA6AmPZf2s/W5eK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=t12cETo0; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=pNNg3Ojd; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Tue, 17 Feb 2026 17:10:53 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1771344655;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qp3z3cLWxmI2ZKIW4Hi+ySZosFYVscIFYciVpCgFXII=;
-	b=t12cETo0nFqqFSfP6psu6XPvSAvB7LDd4oMCZvCnE5PmZp1gZDqxGTs8KvC3qOzPaolF34
-	EJT6HDHl6+VJxOoomxiG7fm2kuiVfujz27vbHXQhVKX1LpBcTcgTaMx0ECX7juqj8ZRrPQ
-	K/CF8ZyUUolKQsXoAxGaLHQ37i/tpXbIhD7OV5ZeIUJT+t+cwv+zB5uidcmMMBWMs+SVZe
-	ai3tCv0TSpHdkjTCMwSL8kuNpy4mB78WigSvDZhndMY1EEDfIwmn05R+1Fjx/hnL+XsSvS
-	DLpBHDOqz9V69P6L+VblcVpr0WKMiU5c8uQwdWv75Y61MZTLCWPYZ9xJie5jSg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1771344655;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qp3z3cLWxmI2ZKIW4Hi+ySZosFYVscIFYciVpCgFXII=;
-	b=pNNg3OjdSAgQvJq6jLl6/ee7MIzZ/pUl7jE8AS9u6aQzOW/wvi9hM1hgSERHCfV9udg9Lh
-	S224Xrpe5yHz0XBg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Felix Maurer <fmaurer@redhat.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Subject: Re: [PATCH RFC net-next 0/2] hsr: Add additional info to send/
- receive skbs
-Message-ID: <20260217161053.XMFBwFXg@linutronix.de>
-References: <20260204-hsr_ptp-v1-0-b421c69a77da@linutronix.de>
- <aZNBfh81p1zBvbi2@thinkpad>
+	s=arc-20240116; t=1771344734; c=relaxed/simple;
+	bh=va5IQmUOeukDdY+Smw7NVB8ZT0GBNgJGhbtfiGxrM9Y=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Ypfhr2hVT5x16ryAGHfIzWP3SrzNLTCNiH/a8swcpzxNLS8IBqQyDdf2A224Pko5GpfwxD/0yyX/skI4elmy1FROGgae6qfiDslvjmsW8OEdL5rVz0kGqsu5KV+F9w3IGVBpbCis3YerI0mchA3z/N6C86ep/K41oKsnYYsq9Pw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ED0eagEX; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8c70ab7f67fso4324706085a.3
+        for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 08:12:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1771344732; x=1771949532; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=wmseZ8mhA4Y9pMCincHkiIN77VZDfky12cUI2X3jfK0=;
+        b=ED0eagEXaYUiSn5yvNHkRuUaCwK/o1KbLdeELAymjTErwJlCydSTgm6Q476E7bbbyp
+         PE2qnwxRz1Xpw6e+7slw+8X6FClDbxfYTUL9mNLfdPe3ASd5nbfoRyogbpsyRJJ1Vn1A
+         MJDrOGDqzRymtEvOZxlcgK5HeZPvHIO8WGc4uHRMiwIDv3CpG/jYqdMRHGmJ5zPNMGjQ
+         8ZUnZ63eUFWuRVw+tTGEZrksp+LNZ/A+jP5NyH5mg/zIjI/gweJMc1EUC7mkpKHuJpcU
+         H5djmw0cG8Rw6XHFp6PC1J6PrvsidIDJlpnO4Br/pRBRr4dGJPUL/5AqIJbiHyC3BKvg
+         l7sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771344732; x=1771949532;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wmseZ8mhA4Y9pMCincHkiIN77VZDfky12cUI2X3jfK0=;
+        b=iuyfMCeQEYZ6m95tj/FqTQpeGxuDGcgxjJfQRyyLzx/Onwtbb/lMi26Ua6vQ5fS+7a
+         6uZ9ZyqPaO/wvqXb2ntAJVyejQ9bRoM0uvsCldLYCxUOGcd84LbGz/9Vj3C0WHLGEuvq
+         WZtepbs6LxQ/1QNRGRv6IAiQyAReQwWxxjoKBOEc/YQqFaeGk9UoRBhnfEO0ACmlW3vu
+         UqCnQ66vKV4iIBcQr+RRyUK4p1do3yFzSWjZ+B0kXf8PACu03raR2/9jNJThAnNiV4fw
+         wu5p2+REJN8+dKxEYC1ys/3vqyzJP0bMtux1BOLXxMyExe0TVWyQYLXjSSEz9SKXmAyn
+         GTMw==
+X-Forwarded-Encrypted: i=1; AJvYcCVXNuFY9qHi/Wf7fUKt17qGh5IfPleRd1hbQRHIxkeej5L1DEg4yXGEmzjEaprebtUl6iCvudc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDsMETUhkDJBKSW0nnmFJT0WwSfQYx6TVE/QXrV2SMbN2jCwUG
+	2XxORRK6JLaZFnjmEaHEsqJeos8o0mSHUfmXw9UO8Fot86kDlYvEXKZFRslzvbVPaLfYVaQflpt
+	tJcR9oJyfpfrfJQ==
+X-Received: from qkntr13.prod.google.com ([2002:a05:620a:2d8d:b0:8cb:4c74:5ab9])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:4494:b0:8c5:3256:2f3c with SMTP id af79cd13be357-8cb4c0147d5mr1415282185a.55.1771344731555;
+ Tue, 17 Feb 2026 08:12:11 -0800 (PST)
+Date: Tue, 17 Feb 2026 16:12:05 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aZNBfh81p1zBvbi2@thinkpad>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.310.g728cabbaf7-goog
+Message-ID: <20260217161205.2079883-1-edumazet@google.com>
+Subject: [PATCH net] tcp: fix potential race in tcp_v6_syn_recv_sock()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
+	syzbot+937b5bbb6a815b3e5d0b@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-259085-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-259084-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com,syzkaller.appspotmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6D43814DEBD
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev,937b5bbb6a815b3e5d0b];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E2E3D14DEEB
 X-Rspamd-Action: no action
 
-On 2026-02-16 17:10:38 [+0100], Felix Maurer wrote:
-> Hi Sebastian,
-Hi,
+Code in tcp_v6_syn_recv_sock() after the call to tcp_v4_syn_recv_sock()
+is done too late.
 
-> I agree with Willem that the changes are pretty invasive in core parts
-> of the stack for a pretty narrow use case. It got me thinking what would
-> already be supported at the moment without any changes in the kernel or
-> pretty small changes. For that, I see three parts:
-> 
-> 1. Userspace needs to get the full HSR+PTP frames including the headers
->    and including the rx port information.
->      a) Userspace should have a way to _only_ receive HSR+PTP frames
->         instead of all traffic on one of the ports.
-> 2. We should not forward HSR+PTP frames in HSR interface to prevent
->    creating inaccurate timing information.
-> 3. Userspace needs a way to send packets a) over just port A or B of an
->    HSR interface, that b) already include an HSR header and should
->    therefore go mostly unmodified.
-> 
-> Is that about a correct summary?
+After tcp_v4_syn_recv_sock(), the child socket is already visible
+from TCP ehash table and other cpus might use it.
 
-Yes. Point 3b needs to be extended by
-  " + or does not contain a HSR/PRP header and requires one by the
-  system."
+Since newinet->pinet6 is still pointing to the listener ipv6_pinfo
+bad things can happen as syzbot found.
 
-> If I understand your patch 2 correctly, you will be maintaining two
-> sockets in userspace (one bound to each of the ports A and B through the
-> HSR interface using PACKET_HSR_BIND_PORT). Binding through the HSR
-> interface to port A/B has the very special meaning of making a socket
-> only receive a very small subset of the packets, that is PTP traffic at
-> the moment. This seems like a somewhat hidden property of the bound
-> sockets and should at least be very explicit.
+Move the problematic code in tcp_v6_mapped_child_init()
+and call this new helper from tcp_v4_syn_recv_sock() before
+the ehash insertion.
 
-Technically four sockets (two for A and two for B) but in general yes.
-What you mean by hidden property/ very explicit? Document
-PACKET_HSR_BIND_PORT in packet(7) or something else?
+This allows the removal of one tcp_sync_mss(), since
+tcp_v4_syn_recv_sock() will call it with the correct
+context.
 
-> Is there a reason not to create and bind one socket directly to each of
-> the underlying slave interfaces, with a socket filter attached to only
-> receive the HSR+PTP packets you want? The rx port information is
-> inherent to the socket this way. I'm not sure if sending over the
-> sockets works out of the box, but if something is needed for that, I'd
-> assume it's less invasive and more generally usable.
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: syzbot+937b5bbb6a815b3e5d0b@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/69949275.050a0220.2eeac1.0145.GAE@google.com/
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ include/net/inet_connection_sock.h |  4 +-
+ include/net/tcp.h                  |  4 +-
+ net/ipv4/syncookies.c              |  2 +-
+ net/ipv4/tcp_fastopen.c            |  2 +-
+ net/ipv4/tcp_ipv4.c                |  8 ++-
+ net/ipv4/tcp_minisocks.c           |  2 +-
+ net/ipv6/tcp_ipv6.c                | 98 +++++++++++++-----------------
+ net/mptcp/subflow.c                |  6 +-
+ net/smc/af_smc.c                   |  6 +-
+ 9 files changed, 66 insertions(+), 66 deletions(-)
 
-This was v1. The missing part is sending a new packet and not forwarding
-one. The specification mandates to use system's sequence number.
+diff --git a/include/net/inet_connection_sock.h b/include/net/inet_connection_sock.h
+index ecb362025c4e5183ec78aef4b45c249da87c19ea..5cb3056d6ddc7cb9489131f503b32f3dac211bec 100644
+--- a/include/net/inet_connection_sock.h
++++ b/include/net/inet_connection_sock.h
+@@ -42,7 +42,9 @@ struct inet_connection_sock_af_ops {
+ 				      struct request_sock *req,
+ 				      struct dst_entry *dst,
+ 				      struct request_sock *req_unhash,
+-				      bool *own_req);
++				      bool *own_req,
++				      void (*opt_child_init)(struct sock *newsk,
++							     const struct sock *sk));
+ 	u16	    net_header_len;
+ 	int	    (*setsockopt)(struct sock *sk, int level, int optname,
+ 				  sockptr_t optval, unsigned int optlen);
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index 40e72b9cb85f08714d3f458c0bd1402a5fb1eb4e..eb8bf63fdafc3243469f293fd06aef0ce086c5a4 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -544,7 +544,9 @@ struct sock *tcp_v4_syn_recv_sock(const struct sock *sk, struct sk_buff *skb,
+ 				  struct request_sock *req,
+ 				  struct dst_entry *dst,
+ 				  struct request_sock *req_unhash,
+-				  bool *own_req);
++				  bool *own_req,
++				  void (*opt_child_init)(struct sock *newsk,
++							 const struct sock *sk));
+ int tcp_v4_do_rcv(struct sock *sk, struct sk_buff *skb);
+ int tcp_v4_connect(struct sock *sk, struct sockaddr_unsized *uaddr, int addr_len);
+ int tcp_connect(struct sock *sk);
+diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
+index 569befcf021ba5598e57ee3256843c141aeb412b..061751aabc8e16c5d536a19f7b920d1bca2b0f4f 100644
+--- a/net/ipv4/syncookies.c
++++ b/net/ipv4/syncookies.c
+@@ -203,7 +203,7 @@ struct sock *tcp_get_cookie_sock(struct sock *sk, struct sk_buff *skb,
+ 	bool own_req;
+ 
+ 	child = icsk->icsk_af_ops->syn_recv_sock(sk, skb, req, dst,
+-						 NULL, &own_req);
++						 NULL, &own_req, NULL);
+ 	if (child) {
+ 		refcount_set(&req->rsk_refcnt, 1);
+ 		sock_rps_save_rxhash(child, skb);
+diff --git a/net/ipv4/tcp_fastopen.c b/net/ipv4/tcp_fastopen.c
+index b30090cff3cf7d925dc46694860abd3ca5516d70..df803f088f454cf157e0efbba8e2ff3f6d205530 100644
+--- a/net/ipv4/tcp_fastopen.c
++++ b/net/ipv4/tcp_fastopen.c
+@@ -333,7 +333,7 @@ static struct sock *tcp_fastopen_create_child(struct sock *sk,
+ 	bool own_req;
+ 
+ 	child = inet_csk(sk)->icsk_af_ops->syn_recv_sock(sk, skb, req, NULL,
+-							 NULL, &own_req);
++							 NULL, &own_req, NULL);
+ 	if (!child)
+ 		return NULL;
+ 
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index 6264fc0b2be53854598d7c37ce1c7928d2e0b507..2980c175d326b6c6ebd4acba0c4333f481617579 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -1705,7 +1705,9 @@ struct sock *tcp_v4_syn_recv_sock(const struct sock *sk, struct sk_buff *skb,
+ 				  struct request_sock *req,
+ 				  struct dst_entry *dst,
+ 				  struct request_sock *req_unhash,
+-				  bool *own_req)
++				  bool *own_req,
++				  void (*opt_child_init)(struct sock *newsk,
++							 const struct sock *sk))
+ {
+ 	struct inet_request_sock *ireq;
+ 	bool found_dup_sk = false;
+@@ -1757,6 +1759,10 @@ struct sock *tcp_v4_syn_recv_sock(const struct sock *sk, struct sk_buff *skb,
+ 	}
+ 	sk_setup_caps(newsk, dst);
+ 
++#if IS_ENABLED(CONFIG_IPV6)
++	if (opt_child_init)
++		opt_child_init(newsk, sk);
++#endif
+ 	tcp_ca_openreq_child(newsk, dst);
+ 
+ 	tcp_sync_mss(newsk, dst4_mtu(dst));
+diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+index ec128865f5c029c971eb00cb9ee058b742efafd1..d9c5a43bd2818c17d79d8433ac5dd2bdd199b812 100644
+--- a/net/ipv4/tcp_minisocks.c
++++ b/net/ipv4/tcp_minisocks.c
+@@ -925,7 +925,7 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+ 	 * socket is created, wait for troubles.
+ 	 */
+ 	child = inet_csk(sk)->icsk_af_ops->syn_recv_sock(sk, skb, req, NULL,
+-							 req, &own_req);
++							 req, &own_req, NULL);
+ 	if (!child)
+ 		goto listen_overflow;
+ 
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index d10487b4e5bff87d4ff2a7b912a826964101a163..e46a0efae01235ae7430ed268b92cb47309b8d28 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -1312,11 +1312,48 @@ static void tcp_v6_restore_cb(struct sk_buff *skb)
+ 		sizeof(struct inet6_skb_parm));
+ }
+ 
++/* Called from tcp_v4_syn_recv_sock() for v6_mapped children. */
++static void tcp_v6_mapped_child_init(struct sock *newsk, const struct sock *sk)
++{
++	struct inet_sock *newinet = inet_sk(newsk);
++	struct ipv6_pinfo *newnp;
++
++	newinet->pinet6 = newnp = tcp_inet6_sk(newsk);
++	newinet->ipv6_fl_list = NULL;
++
++	memcpy(newnp, tcp_inet6_sk(sk), sizeof(struct ipv6_pinfo));
++
++	newnp->saddr = newsk->sk_v6_rcv_saddr;
++
++	inet_csk(newsk)->icsk_af_ops = &ipv6_mapped;
++	if (sk_is_mptcp(newsk))
++		mptcpv6_handle_mapped(newsk, true);
++	newsk->sk_backlog_rcv = tcp_v4_do_rcv;
++#if defined(CONFIG_TCP_MD5SIG) || defined(CONFIG_TCP_AO)
++	tcp_sk(newsk)->af_specific = &tcp_sock_ipv6_mapped_specific;
++#endif
++
++	newnp->ipv6_mc_list = NULL;
++	newnp->ipv6_ac_list = NULL;
++	newnp->pktoptions  = NULL;
++	newnp->opt	   = NULL;
++
++	/* tcp_v4_syn_recv_sock() has initialized newinet->mc_{index,ttl} */
++	newnp->mcast_oif   = newinet->mc_index;
++	newnp->mcast_hops  = newinet->mc_ttl;
++
++	newnp->rcv_flowinfo = 0;
++	if (inet6_test_bit(REPFLOW, sk))
++		newnp->flow_label = 0;
++}
++
+ static struct sock *tcp_v6_syn_recv_sock(const struct sock *sk, struct sk_buff *skb,
+ 					 struct request_sock *req,
+ 					 struct dst_entry *dst,
+ 					 struct request_sock *req_unhash,
+-					 bool *own_req)
++					 bool *own_req,
++					 void (*opt_child_init)(struct sock *newsk,
++								const struct sock *sk))
+ {
+ 	const struct ipv6_pinfo *np = tcp_inet6_sk(sk);
+ 	struct inet_request_sock *ireq;
+@@ -1332,61 +1369,10 @@ static struct sock *tcp_v6_syn_recv_sock(const struct sock *sk, struct sk_buff *
+ #endif
+ 	struct flowi6 fl6;
+ 
+-	if (skb->protocol == htons(ETH_P_IP)) {
+-		/*
+-		 *	v6 mapped
+-		 */
+-
+-		newsk = tcp_v4_syn_recv_sock(sk, skb, req, dst,
+-					     req_unhash, own_req);
+-
+-		if (!newsk)
+-			return NULL;
+-
+-		newinet = inet_sk(newsk);
+-		newinet->pinet6 = tcp_inet6_sk(newsk);
+-		newinet->ipv6_fl_list = NULL;
+-
+-		newnp = tcp_inet6_sk(newsk);
+-		newtp = tcp_sk(newsk);
+-
+-		memcpy(newnp, np, sizeof(struct ipv6_pinfo));
+-
+-		newnp->saddr = newsk->sk_v6_rcv_saddr;
+-
+-		inet_csk(newsk)->icsk_af_ops = &ipv6_mapped;
+-		if (sk_is_mptcp(newsk))
+-			mptcpv6_handle_mapped(newsk, true);
+-		newsk->sk_backlog_rcv = tcp_v4_do_rcv;
+-#if defined(CONFIG_TCP_MD5SIG) || defined(CONFIG_TCP_AO)
+-		newtp->af_specific = &tcp_sock_ipv6_mapped_specific;
+-#endif
+-
+-		newnp->ipv6_mc_list = NULL;
+-		newnp->ipv6_ac_list = NULL;
+-		newnp->pktoptions  = NULL;
+-		newnp->opt	   = NULL;
+-		newnp->mcast_oif   = inet_iif(skb);
+-		newnp->mcast_hops  = ip_hdr(skb)->ttl;
+-		newnp->rcv_flowinfo = 0;
+-		if (inet6_test_bit(REPFLOW, sk))
+-			newnp->flow_label = 0;
+-
+-		/*
+-		 * No need to charge this sock to the relevant IPv6 refcnt debug socks count
+-		 * here, tcp_create_openreq_child now does this for us, see the comment in
+-		 * that function for the gory details. -acme
+-		 */
+-
+-		/* It is tricky place. Until this moment IPv4 tcp
+-		   worked with IPv6 icsk.icsk_af_ops.
+-		   Sync it now.
+-		 */
+-		tcp_sync_mss(newsk, inet_csk(newsk)->icsk_pmtu_cookie);
+-
+-		return newsk;
+-	}
+-
++	if (skb->protocol == htons(ETH_P_IP))
++		return tcp_v4_syn_recv_sock(sk, skb, req, dst,
++					    req_unhash, own_req,
++					    tcp_v6_mapped_child_init);
+ 	ireq = inet_rsk(req);
+ 
+ 	if (sk_acceptq_is_full(sk))
+diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
+index f66129f1e649248e00215d254c925f66c3fffa6a..8b25dd86ffeb668b98fd41026fb084dab7dc23b8 100644
+--- a/net/mptcp/subflow.c
++++ b/net/mptcp/subflow.c
+@@ -808,7 +808,9 @@ static struct sock *subflow_syn_recv_sock(const struct sock *sk,
+ 					  struct request_sock *req,
+ 					  struct dst_entry *dst,
+ 					  struct request_sock *req_unhash,
+-					  bool *own_req)
++					  bool *own_req,
++					  void (*opt_child_init)(struct sock *newsk,
++								 const struct sock *sk))
+ {
+ 	struct mptcp_subflow_context *listener = mptcp_subflow_ctx(sk);
+ 	struct mptcp_subflow_request_sock *subflow_req;
+@@ -855,7 +857,7 @@ static struct sock *subflow_syn_recv_sock(const struct sock *sk,
+ 
+ create_child:
+ 	child = listener->icsk_af_ops->syn_recv_sock(sk, skb, req, dst,
+-						     req_unhash, own_req);
++						     req_unhash, own_req, opt_child_init);
+ 
+ 	if (child && *own_req) {
+ 		struct mptcp_subflow_context *ctx = mptcp_subflow_ctx(child);
+diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+index d8201eb3ac5f3d87a15f385862c4ae82ae3a24ff..18c56b0d7ad531e575266ad7f38187973422151f 100644
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -124,7 +124,9 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
+ 					  struct request_sock *req,
+ 					  struct dst_entry *dst,
+ 					  struct request_sock *req_unhash,
+-					  bool *own_req)
++					  bool *own_req,
++					  void (*opt_child_init)(struct sock *newsk,
++								 const struct sock *sk))
+ {
+ 	struct smc_sock *smc;
+ 	struct sock *child;
+@@ -142,7 +144,7 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
+ 
+ 	/* passthrough to original syn recv sock fct */
+ 	child = smc->ori_af_ops->syn_recv_sock(sk, skb, req, dst, req_unhash,
+-					       own_req);
++					       own_req, opt_child_init);
+ 	/* child must not inherit smc or its ops */
+ 	if (child) {
+ 		rcu_assign_sk_user_data(child, NULL);
+-- 
+2.53.0.310.g728cabbaf7-goog
 
-> We'd still need to address 2. for this to work, but blocking forwarding
-> for PTP could be done in hsr_forward and friends with a much simpler
-> patch.
-
-Blocking forwarding is simple as it needs just to look at the ethernet
-protocol and drop it if it is PTP. Here I additionally add some
-hints to get the port right and the time stamp.
-
-> The other thing that came to my mind: this sounds like XDP with AF_XDP
-> could be a solution that could be used already today; not so much
-> because of their speed but because you can program what goes to the
-> stack and what ends up in userspace. It fulfills 1) + a) directly, 2)
-> implicitly by not letting these frames enter the stack, and 3) directly.
-> But I also see that handling AF_XDP sockets in userspace is quite some
-> work to do if all you really need is to separate out some traffic.
-
-Not forwarding PTP traffic needs to happen unconditionally and not to
-wait until the system is up and has the software running. However if we
-ignore this detail and can receive on interface A and send on interface
-B over XDP and get timestamps right then we have the same as the packet
-interface on the two eth devices. What is missing is sending with HSR/
-PRP header.
-
-> Thanks,
->    Felix
-
-Sebastian
 
