@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-259055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259056-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mAtKMEN8lGkfFAIAu9opvQ
-	(envelope-from <netdev+bounces-259055-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 15:33:39 +0100
+	id 4Jb4NUJ8lGkfFAIAu9opvQ
+	(envelope-from <netdev+bounces-259056-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 15:33:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 390AC14D322
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 15:33:39 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CCF814D314
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 15:33:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DEA3B303E770
-	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 14:33:05 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B61493012844
+	for <lists+netdev@lfdr.de>; Tue, 17 Feb 2026 14:33:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4787436BCC6;
-	Tue, 17 Feb 2026 14:33:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA21136C5B2;
+	Tue, 17 Feb 2026 14:33:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZavVQTUz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="blm4aGhE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16E04253B73
-	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 14:32:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E59936BCEB
+	for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 14:33:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771338781; cv=none; b=dXNWzCEXY3ECbTFH/AE7feh3iD5+XOxUnZUguqO73yLJmyqpazGkPW4huvSDC7jtUvm2fVr3VcwMb+kdplkIu+GAl5olsYf/pTcP9GiJ9qAIrfmPwCojjps+JmlDTn0JPYEiD21WdCpZw00iSkuizmAJ7BFYu6fn8deJvcskDa0=
+	t=1771338789; cv=none; b=jnI1ydoKDvKxstgk+MAxvHqJb7aC2mhoSxe32iTG5UW8TjszxWpqWtTzTN62U+oj/uSjvdbd/YGcDvW9PFULpXpH5++ipEIuEL27FXsVImntnzxh8JS0yPBi4Vk5KLbXy3cWbWuXTduh9LlCnNRwPpEuCNCFXHlTQFC9lREtd1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771338781; c=relaxed/simple;
-	bh=jdxK9qyg4GvQ0M9+yUqbCMfjEqTvkNj/Dh3EXuDWEUc=;
+	s=arc-20240116; t=1771338789; c=relaxed/simple;
+	bh=7wYcnvlwXxMtmytoFvwS0gIZLk/ErVQm+KTlcn7X1Kw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=oM0UGWO/tkEuFiSB1bzCOT0Go466pQPPSKmvfx7ywtz1je9OwEG2qHUmp3xxJNeH3lEGKgMaxjVakzIzqus5f8cSM7sQSmiEa99QEY/kM362/Mni5OX4YDaVLCLpg50MzVry683GH3OHMWEeADigNoUG5hISKN5ld7nONKQPih4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZavVQTUz; arc=none smtp.client-ip=209.85.210.174
+	 MIME-Version; b=PwJGbKU38CcmWqC6/YcP/0HaX00+81vHwgwdMQ4IBuvdX766Fnd8IvYyqi8/ru/XdMocaRI6NPorH+rn/2UW2LC1hY2MkpJWGVfN5rVELyLj4fSofDISoHnE75YQDGGEZt7CC/ccvALyraVjxr5J2c+fIH+JIOffbIyODfBCa2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=blm4aGhE; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-82418b0178cso2326404b3a.1
-        for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 06:32:59 -0800 (PST)
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-824a9348603so1584646b3a.2
+        for <netdev@vger.kernel.org>; Tue, 17 Feb 2026 06:33:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771338779; x=1771943579; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1771338787; x=1771943587; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Gebaghse5OySHou5H1mHGqUHtgCt8QeUT/JMZWe+7bg=;
-        b=ZavVQTUzNYv/Lq4WG7b/Y4vixEMZnPswVVRGpqBnoSJplQC0q4an1ZuOrLPLnh98wB
-         o69mxQWEZUjwPLBMql1qzw5MyyEjGcXySIIxQdiGh0HSmjIlJ9hIgtHKDHL5Hdvb792A
-         4Q+6fBjgrsMvuD1F13FgeuwP+3VmmwB1kFlXNChqtUIxCyJHc1jcGwwLXb0DrkXFA8fe
-         XYPXuEI7nT0qOAR2uXP5qhxPMVCQGd1yoHJL8LD4fvTYT4l0oO6wJoQzLBDL3LvLgD//
-         /rxwRXgA7U6g1xFpXs2dfoThBg0M9T4KhS5thq4f2mwVnsgOCe2g8CfWZxOa5dYQPCpc
-         JEfw==
+        bh=WmaglD0okUceIHjkPS7+EHjYvS/v7GixIVmf6reFCj8=;
+        b=blm4aGhE3QsvvH6GIsyY2akUDAUMd4aDeNTrh45Yp5wV2EizVvNxAr9pHj95279jN2
+         QsXppE/lXoav9mcW3/EOpY5tHxJLiidNqtgsp3FQOsb53pmcP3zsYm6Bzfz9GER91PC2
+         5PjEs6fGy5mjReOsVc5EdWz8EgOB+HbBWU565rD7Fn4kKPklZr+6BB1Mg3uOKGXGCmyy
+         ZmqGVcQvk6fkS+azd/AsNcGlwVHeOxBaCoJ6mieWeCP6KFtb1LftbrBLBsNt3SzjtMDk
+         OKkcPO6eLZVqkISz719BEpLOaYtIMlmK7Zi2i1mH2RuSeJJWEvLKxu8dcu2Rmudh0WnN
+         UVrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771338779; x=1771943579;
+        d=1e100.net; s=20230601; t=1771338787; x=1771943587;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Gebaghse5OySHou5H1mHGqUHtgCt8QeUT/JMZWe+7bg=;
-        b=AEsb2wlvz+UtF+CLoGrtED2kM5l9PaVMFmHOWzdYJLpp8zGnPePcUbZ0k0pWGXUQzI
-         6J4VFE+c4/WOWLZmtD4vd6NskyHIk/UcK6qfRQKEvyM65/Qx4305sQ7fNZSFrrKCKdnC
-         92Cx2icpOzWaWlAP3qIVXQL2Lpru2eR5LQj+VARoWYTIS7k/bhia2InMibYVOeJr4CnQ
-         ttBIUcv6hoJFZjOqlupsflFRg6Weqmhtw6AH7fkGFEok95DURUKoK+th0FcDCcgGtpra
-         pmf9BA0CH3SW2EBSDQiTxWXYo1zHtrxZeR+VuDquGMAGWqim4/scsqTrpMHKcfGmF3Es
-         O5yg==
-X-Forwarded-Encrypted: i=1; AJvYcCWWPN4uHfMwIjJhXSyl4C4JzUuXij6JISxPcjXMeNzLbSw1cKsKky9xx3L5jerQDLdjR9bb4Zw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyyaiJahLixwPC3JXAv2fc7JT3DmK/qnIZdJTN4uCC8duOK7Iy6
-	D514JNzCEB/ib/oXAUXjO0eBhJda6yAF75ZxXeZovOp6cza8ye7ORTt6
-X-Gm-Gg: AZuq6aKGghYrr0F5pgSDWzTNG9Z8UuP75kgDBsChxdB1ulgPXhBsQ3Vx7TnUW/K9jAC
-	59CNW9U2/5Z9m8M8+hDikICqxVcZcipMhyZU418s87Y7RH2OhcgoWTLqgtDdp6mmWwRru8nQixP
-	+JI9WDl7G+NPJU89uanfBTVLBF2NcE85YS51p1085VywdjTH5sho7ItyIOjRuiw4gzw+W/vgA60
-	J56Q388uBFxhpkQTQRnYJrGz5jnKpHzsbaLwezQ17H3jxVGBOCQwW2EE1hym+OY7XTUn4rdiDN6
-	MiWA9sG17QL8WfAJV5iU973L3fuBQDGS3XVzlfq6OfMepZ6zvb2NIiQIybqpOsDquL7563Mo4iE
-	ecluTLHypN5lViV2016ciFBhB5Y8ce9wwt3Qd0mec2gaV3OYNZ1q+qfykLk81A2VjApnNVz9kUB
-	1S+9T5IuwLb+hc5tvr41Pg14AKVo3vub0q4vs3LWfwYN+4dWQYUbBZj+dCnEBKaC37+AyF2UDdC
-	ELiaPRrcI/kKTLAbz/XkCjUYwwQuHI=
-X-Received: by 2002:a05:6a00:4f89:b0:824:9edb:46f with SMTP id d2e1a72fcca58-824c95c2a2fmr12746663b3a.45.1771338779401;
-        Tue, 17 Feb 2026 06:32:59 -0800 (PST)
+        bh=WmaglD0okUceIHjkPS7+EHjYvS/v7GixIVmf6reFCj8=;
+        b=laSQqr5qmINB2i1BM686VJMh4ch/QR48rTmQil/VdtfnjzaIzaXiRl7mI/eB7SfOl9
+         zk+LSYbf5LH1zImjAthl8FioNgtpOhgeMnVzj3rlf4mUKnsgv+v4y4hlwPsTHHD5DYLC
+         IXbogvMwkOMAIuzgetqNUBen+aTtyNMCYMpNHrXzbfbdaOXnTSJrP/PwNn0zZ49jfvg0
+         tod7oBpJF2y9KKRpJDGHi6rU22SUCOJ0Cbeo5ylqs0+5IjUJpKt9PkqyaJ5Deeit1ihY
+         mt9AA5iNIE06bpnO9ykA/aZJuE/r74uN64K3Fsw7hBnpH+c6o3l5Y+hTNtA5f8QaEDDD
+         ITeA==
+X-Forwarded-Encrypted: i=1; AJvYcCUejHEpUOmnoskijkDrinMAkLmBTQb9tnEJil8xiNq6wnbOF1Dkbid945JWFwUWEYxg14ofRhI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3BoGL5gXDnnJkNO9AbpG4ZP+vZZV5qkLJG1uz3we+evUbh45R
+	fRquZHsgjeoXCMe91VegrmZ1eYLlaQ+vynC1guTTSj331OVVIrz39VD+
+X-Gm-Gg: AZuq6aKML1FFMzoQNEQcODfrb0dXn1Pp9WETnAGmSFPvmdcH/fw2m+xFxc5jkU/Gk7N
+	Cgku6xrrxinGeGVvoyka2iXRpFe/LtCG0iKclxb3qOBao51i6xfNq/jPbldjb4ODMa/1JI+nHCU
+	hmtfJpwTK8ZEnwZotYkWqdioqSjo/8nejpN/w80jFddHJyjx2RVNsk8eZ4wjXeYBXbAgozBxYnx
+	iSQ0FHQFMbPxNNNzg2ysS0AvYKH2oBH/NIMIvLHiZimGnvLmq5xeWybN+x2P8VjziXrs9jZr9TE
+	jND4FzUgomQ4+PkuNjspy9weY3ZRY2v0sxY7j3a5e1CPVlhGFJxf6nF6K2VKsKkCFJYegtE5v2b
+	dCmoZo7BKI7XnKqdMA+FPtBuAcbl0iG30KYt4sx5XpbpP27rXAE+HIOZF0tEQzVi/0FnyffbOAK
+	pf2DsFEAObCpKE96No5Py+hunUjBTcfFn0p/d1BI5GtPhIOaD+3eVEbxp/O6nt//rJTFYJ/kVPA
+	XEPQHiBP83LCGLWoYmh
+X-Received: by 2002:a05:6a00:9289:b0:7e8:4398:b36c with SMTP id d2e1a72fcca58-824c963e848mr12234784b3a.63.1771338786467;
+        Tue, 17 Feb 2026 06:33:06 -0800 (PST)
 Received: from localhost.localdomain ([49.207.200.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-824c6b935c6sm14770821b3a.47.2026.02.17.06.32.52
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-824c6b935c6sm14770821b3a.47.2026.02.17.06.32.59
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 17 Feb 2026 06:32:59 -0800 (PST)
+        Tue, 17 Feb 2026 06:33:06 -0800 (PST)
 From: Anand Kumar Shaw <anandkrshawheritage@gmail.com>
 To: bpf@vger.kernel.org,
 	netdev@vger.kernel.org
@@ -100,9 +100,9 @@ Cc: ast@kernel.org,
 	jolsa@kernel.org,
 	linux-kernel@vger.kernel.org,
 	Anand Kumar Shaw <anandkrshawheritage@gmail.com>
-Subject: [PATCH 1/2] xdp: propagate queue_index through xdp_frame
-Date: Tue, 17 Feb 2026 20:02:41 +0530
-Message-Id: <f8b3cada5542fb63172711d8e0efc983680972cb.1771338602.git.anandkumarshaw@users.noreply.github.com>
+Subject: [PATCH 2/2] bpf: report queue_index to xdp_rxq_info in cpumap and devmap
+Date: Tue, 17 Feb 2026 20:02:42 +0530
+Message-Id: <a44f6bff92b7f2d0f86c10214c2e861164e52a03.1771338602.git.anandkumarshaw@users.noreply.github.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <cover.1771338602.git.anandkumarshaw@users.noreply.github.com>
 References: <cover.1771338602.git.anandkumarshaw@users.noreply.github.com>
@@ -119,12 +119,12 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259055-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-259056-lists,netdev=lfdr.de];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,gmail.com,davemloft.net,fomichev.me,google.com,redhat.com,linux.dev,vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[22];
@@ -140,74 +140,53 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[users.noreply.github.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 390AC14D322
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,users.noreply.github.com:mid,rxq.dev:url]
+X-Rspamd-Queue-Id: 7CCF814D314
 X-Rspamd-Action: no action
 
-When an XDP frame is redirected via cpumap or devmap, the original RX
-queue index from xdp_rxq_info is lost during the xdp_buff to xdp_frame
-conversion. This causes BPF programs running on the remote CPU to always
-see rx_queue_index as 0, and SKBs built from xdp_frame to lack proper
-RX queue metadata.
+When a second-stage XDP program runs on a cpumap or devmap redirected
+frame, ctx->rx_queue_index always returns 0 because the reconstructed
+xdp_rxq_info never had queue_index set.
 
-Add a queue_index field to struct xdp_frame and populate it from
-xdp->rxq->queue_index in both the normal conversion path
-(xdp_convert_buff_to_frame) and the zero-copy path
-(xdp_convert_zc_to_xdp_frame).
+Now that xdp_frame carries queue_index, set rxq.queue_index from
+xdpf->queue_index in both cpu_map_bpf_prog_run_xdp() and
+dev_map_bpf_prog_run(). This allows BPF programs to correctly identify
+the original hardware RX queue after a cpumap or devmap redirect.
 
-Additionally, call skb_record_rx_queue() in __xdp_build_skb_from_frame()
-to set the RX queue on SKBs built from xdp_frame, resolving a
-documented gap in the function.
+Resolves a TODO left since the cpumap implementation.
 
 Signed-off-by: Anand Kumar Shaw <anandkrshawheritage@gmail.com>
 ---
- include/net/xdp.h | 2 ++
- net/core/xdp.c    | 3 ++-
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ kernel/bpf/cpumap.c | 2 +-
+ kernel/bpf/devmap.c | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/xdp.h b/include/net/xdp.h
-index aa742f413c35..4912e132ff84 100644
---- a/include/net/xdp.h
-+++ b/include/net/xdp.h
-@@ -303,6 +303,7 @@ struct xdp_frame {
- 	struct net_device *dev_rx; /* used by cpumap */
- 	u32 frame_sz;
- 	u32 flags; /* supported values defined in xdp_buff_flags */
-+	u32 queue_index;
- };
+diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
+index 04171fbc39cb..f5b2ff17e328 100644
+--- a/kernel/bpf/cpumap.c
++++ b/kernel/bpf/cpumap.c
+@@ -195,7 +195,7 @@ static int cpu_map_bpf_prog_run_xdp(struct bpf_cpu_map_entry *rcpu,
  
- static __always_inline bool xdp_frame_has_frags(const struct xdp_frame *frame)
-@@ -441,6 +442,7 @@ struct xdp_frame *xdp_convert_buff_to_frame(struct xdp_buff *xdp)
+ 		rxq.dev = xdpf->dev_rx;
+ 		rxq.mem.type = xdpf->mem_type;
+-		/* TODO: report queue_index to xdp_rxq_info */
++		rxq.queue_index = xdpf->queue_index;
  
- 	/* rxq only valid until napi_schedule ends, convert to xdp_mem_type */
- 	xdp_frame->mem_type = xdp->rxq->mem.type;
-+	xdp_frame->queue_index = xdp->rxq->queue_index;
+ 		xdp_convert_frame_to_buff(xdpf, &xdp);
  
- 	return xdp_frame;
- }
-diff --git a/net/core/xdp.c b/net/core/xdp.c
-index fee6d080ee85..2d6a3f2c9584 100644
---- a/net/core/xdp.c
-+++ b/net/core/xdp.c
-@@ -606,6 +606,7 @@ struct xdp_frame *xdp_convert_zc_to_xdp_frame(struct xdp_buff *xdp)
- 	xdpf->metasize = metasize;
- 	xdpf->frame_sz = PAGE_SIZE;
- 	xdpf->mem_type = MEM_TYPE_PAGE_ORDER0;
-+	xdpf->queue_index = xdp->rxq->queue_index;
+diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
+index 2625601de76e..aa2e929792c8 100644
+--- a/kernel/bpf/devmap.c
++++ b/kernel/bpf/devmap.c
+@@ -346,6 +346,7 @@ static int dev_map_bpf_prog_run(struct bpf_prog *xdp_prog,
+ 		u32 act;
+ 		int err;
  
- 	xsk_buff_free(xdp);
- 	return xdpf;
-@@ -833,8 +834,8 @@ struct sk_buff *__xdp_build_skb_from_frame(struct xdp_frame *xdpf,
- 	/* Optional SKB info, currently missing:
- 	 * - HW checksum info		(skb->ip_summed)
- 	 * - HW RX hash			(skb_set_hash)
--	 * - RX ring dev queue index	(skb_record_rx_queue)
- 	 */
-+	skb_record_rx_queue(skb, xdpf->queue_index);
- 
- 	if (xdpf->mem_type == MEM_TYPE_PAGE_POOL)
- 		skb_mark_for_recycle(skb);
++		rxq.queue_index = xdpf->queue_index;
+ 		xdp_convert_frame_to_buff(xdpf, &xdp);
+ 		xdp.txq = &txq;
+ 		xdp.rxq = &rxq;
 -- 
 2.39.5 (Apple Git-154)
 
