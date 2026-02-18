@@ -1,511 +1,212 @@
-Return-Path: <netdev+bounces-259224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259225-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iJ7ALBN5lWl8RwIAu9opvQ
-	(envelope-from <netdev+bounces-259224-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 09:32:19 +0100
+	id WJTVKRV6lWl8RwIAu9opvQ
+	(envelope-from <netdev+bounces-259225-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 09:36:37 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 588CE15417A
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 09:32:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 127F515420B
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 09:36:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C19D8300AB37
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 08:32:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CDB4F3007AEE
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 08:36:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9035B30CDA1;
-	Wed, 18 Feb 2026 08:32:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA7ED31ED6C;
+	Wed, 18 Feb 2026 08:36:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hale.at header.i=@hale.at header.b="A2XKqFtX"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="dK147n1O"
 X-Original-To: netdev@vger.kernel.org
-Received: from gw.hale.at (gw.hale.at [89.26.116.210])
+Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013001.outbound.protection.outlook.com [52.101.72.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0A1019F13F;
-	Wed, 18 Feb 2026 08:32:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.26.116.210
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771403535; cv=none; b=Hf5l6lIL2ywrXT6qrHVa/HQYJP1FeqIkKqG7AKgn0aS4SBZ8/KdqM7T+yc5agVNZpZLCSTSdluiieMClReN+qMj8GUSXVLC63jYUKf85ie+9dde1lDtQuPep9i6fvoCbfzxnJ1P7+mnIj++pV0l6EqbExVx5yX2FxQFYkQXVxW8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771403535; c=relaxed/simple;
-	bh=49YUch5onaQ2WHbr8c49jX9uAnaB39U/YdIX/4d77Pw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B957Q1RF1L9qt4ogZi8jTSstbA4njRwBVfvQHq938MxY7zsTbb9ZLlDtyvJWDNcJWCnCqtzq1fG4CKZazlP+ZvUSCusowRjSHaIGSbsf++iUvMt0YazRs2A/R3yWTNPflLWbJ0m0bLpSrzeb7OWFV24k/bfCQvYcMW6LZUUYQtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hale.at; spf=pass smtp.mailfrom=hale.at; dkim=pass (2048-bit key) header.d=hale.at header.i=@hale.at header.b=A2XKqFtX; arc=none smtp.client-ip=89.26.116.210
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hale.at
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hale.at
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=hale.at; i=@hale.at; q=dns/txt; s=mail;
-  t=1771403532; x=1802939532;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=49YUch5onaQ2WHbr8c49jX9uAnaB39U/YdIX/4d77Pw=;
-  b=A2XKqFtXZqt1zbh5hGi9ug/KaMoEGI0YWN3TP6Zl8qYn0h0xY0mOjUVx
-   v5q57Ldcbnk1vIxglvE79YcG6vYVnb13lt/6qxB2yuZStOnw+5mr7y8Gy
-   hbqK+FZrky6i0fUXfhaFLGjNGqgbYM3Dfv6EIXxWB9GAGwHeSXwwsThTA
-   eFxiqlutl+i90Zm9T8/7pa5ItAZ742Io3lAWaOPyczR6zLdNaQ3zIhPjm
-   dCbIATX7wx1e13whvxuq3vZ/L2opb/g+kqvJ0AiPeOrfhL88a+Xcm4N3g
-   I27HNq5JBojWZgWK5K2I8W8bG3kq8sZ73zjYB6XRFD0cGJZmdmZq4JSO6
-   A==;
-X-CSE-ConnectionGUID: VIJgaDgUTzOPWEd7J70KBw==
-X-CSE-MsgGUID: Z/y1bBSrSSWL3T+LdVRSMg==
-IronPort-SDR: 699578ad_WBwOGxo9+nSL8ugg8EEur8lQwg6mv1i648pWmhW7QhhU/Q4
- ExWoaOEXQCgusw8qw6Ch8B95uVhKIhM+3dlZ6Ew==
-X-IronPort-AV: E=Sophos;i="6.21,297,1763420400"; 
-   d="scan'208";a="1699743"
-Received: from unknown (HELO mail4.hale.at) ([192.168.100.5])
-  by mgmt.hale.at with ESMTP; 18 Feb 2026 09:30:37 +0100
-Received: from mail4.hale.at (localhost.localdomain [127.0.0.1])
-	by mail4.hale.at (Postfix) with ESMTPS id 8F15513005BC;
-	Wed, 18 Feb 2026 09:30:17 +0100 (CET)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail4.hale.at (Postfix) with ESMTP id 774F81300712;
-	Wed, 18 Feb 2026 09:30:17 +0100 (CET)
-X-Virus-Scanned: amavis at mail4.hale.at
-Received: from mail4.hale.at ([127.0.0.1])
- by localhost (mail4.hale.at [127.0.0.1]) (amavis, port 10026) with ESMTP
- id 3tvIuPKNxwyW; Wed, 18 Feb 2026 09:30:17 +0100 (CET)
-Received: from entw47.HALE.at (entw47 [192.168.100.117])
-	by mail4.hale.at (Postfix) with ESMTPSA id 5E25713005BC;
-	Wed, 18 Feb 2026 09:30:17 +0100 (CET)
-From: Michael Thalmeier <michael.thalmeier@hale.at>
-To: Deepak Sharma <deepak.sharma.472935@gmail.com>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Simon Horman <horms@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	"Lukas K ." <kernel@0x83.eu>,
-	Michael Thalmeier <michael@thalmeier.at>,
-	Michael Thalmeier <michael.thalmeier@hale.at>,
-	stable@vger.kernel.org
-Subject: [PATCH net v6] net: nfc: nci: Fix parameter validation for packet data
-Date: Wed, 18 Feb 2026 09:30:00 +0100
-Message-ID: <20260218083000.301354-1-michael.thalmeier@hale.at>
-X-Mailer: git-send-email 2.53.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E322FE57B;
+	Wed, 18 Feb 2026 08:36:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.1
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771403789; cv=fail; b=bligTPc9evITTJuFdF2VLbAa7tXtCHJBdNC85mbavD8zb5eI58J3aRSl1EhcUPYwAFA5Cj++n2v7VvMlvepy71UxkllueiiFC8YsiLGJBeMYwbcnZdd1qT8oAWHzP8ccbKFXDKUlATFVnccPUeZXKIE50JrS+4XKKboY5rou5YM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771403789; c=relaxed/simple;
+	bh=Niin2tt8AmPMcysiYpKV4C221rh1gwD/v1MojucOg6A=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fB+22LPWWDP/cm+UMHnDQlMZ0weVmLGPU43WuEvi61vKdeeS5KwJYpagROeWOd4tTh9dICPhJXWgtQuZqxlZWyr+4dizRF4AdhVIUAt3aSTXKvHZZaj+dP8r20iczW1qjAzUOvkT6kZcJTeBo3/CeSPXOo9OFRoftqZCJuJbtiA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=dK147n1O; arc=fail smtp.client-ip=52.101.72.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=NPTrQuik0zVfTj3fWkhAnA2Ye/QippAZFxxErRVL6VWggjuAiPDzcNjrZfLWM/IdUVSDxyOFZhykTONyFUNBjSN9m+r/RSFH74c4ljAoz25Z4LiYvEqZaysUsYb/lYH6Bs8wj/BLWIsFogOFq9IMfbXdKKUhDinik2iRJB369yOS31ayn86JEwUChMe5QqBEAh6q/TLpAWnMSOa1nrymTIc+sud4GqeXZBGH7S+dENbccsRoMNpRjuWfjlJc/y4o/AGvKLG0gv5geTtoEmIjtW73D9Rim3kn3J9Ov/YT8itUjGoR6Z/aEc0iO4rnQFNskTa0r63DzW/+LHt8TJI2kA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aFml97od/WAOLQCUZ3m8RECZA6fG672YeSsD5ZCEDvQ=;
+ b=w2pGv88WKK9jmnyZ9MChR91DDPJRpTpA4Kk9bS1WBJrnT0ZmGBqeLfLs2jMZdle/4wcn/f/r0fjFf4LsP3atiWltryC3JBLgTuU5DV2Kgwf6VH53i0St9IqAGB0TRgbAV8fJNAPm/arqyDAR7hLHNRlGTmG45Ond5uAnCtqfgueVV2j1yHkE0t38B+wDTuTrvwFHBmYwcnrcTjZAOHLj4UimQD1X3hakRk3GKpeQIyc8Sm+YcnasxDGlqgX/wB0CKzlPW4z+W/koiiX11Yy0BAve3ce1MOxStLlVfzK6US5B+FcbS0OOlmTY16e+8CI7F94vtO7Kq7rMml8VgdSIlQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
+ 164.130.1.59) smtp.rcpttodomain=lunn.ch smtp.mailfrom=foss.st.com; dmarc=fail
+ (p=none sp=none pct=100) action=none header.from=foss.st.com; dkim=none
+ (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aFml97od/WAOLQCUZ3m8RECZA6fG672YeSsD5ZCEDvQ=;
+ b=dK147n1Oc7unpaM0pOzcNPoB1kKjIffTDWPIQhXFYV1U+6qgqfRu3atnYCEOy/Ai4ratYdMbMNna31r+xSmgL2oJaFf0UcwspjMZOzkwFIDXc6sR9ld6b0bv/tuKSAXGcUNlCX/5vjLd47Qvsn0GfDNqOKpzb/I1h6AhBC2SW4y6hZqCr2tucCEEb28+uRlNtRgXuWUR9O/7OlUOXk0EJvnGHoHtYzcNV7LDWqeAvrJnbtTGcUubfwVdNW5CJp3U1x9YWYWw1pK+o8OZ8Mk2r4zieDBdqVRrmU/WPWlwDyhS4BlEOgnnj5xuQ5QdP/b31oUfLQPJlDLKK5dujoJMXw==
+Received: from DUZPR01CA0242.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:4b5::14) by PAVPR10MB6913.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:102:30e::10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.14; Wed, 18 Feb
+ 2026 08:36:24 +0000
+Received: from DU2PEPF00028D0D.eurprd03.prod.outlook.com
+ (2603:10a6:10:4b5:cafe::1d) by DUZPR01CA0242.outlook.office365.com
+ (2603:10a6:10:4b5::14) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.13 via Frontend Transport; Wed,
+ 18 Feb 2026 08:36:24 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 164.130.1.59)
+ smtp.mailfrom=foss.st.com; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=none header.from=foss.st.com;
+Received-SPF: Fail (protection.outlook.com: domain of foss.st.com does not
+ designate 164.130.1.59 as permitted sender) receiver=protection.outlook.com;
+ client-ip=164.130.1.59; helo=smtpO365.st.com;
+Received: from smtpO365.st.com (164.130.1.59) by
+ DU2PEPF00028D0D.mail.protection.outlook.com (10.167.242.21) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9611.8 via Frontend Transport; Wed, 18 Feb 2026 08:36:22 +0000
+Received: from STKDAG1NODE2.st.com (10.75.128.133) by smtpo365.st.com
+ (10.250.44.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.29; Wed, 18 Feb
+ 2026 09:38:17 +0100
+Received: from localhost (10.252.6.190) by STKDAG1NODE2.st.com (10.75.128.133)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.29; Wed, 18 Feb
+ 2026 09:36:21 +0100
+From: Christophe Roullier <christophe.roullier@foss.st.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Russell King <rmk+kernel@armlinux.org.uk>, Maxime Chevallier
+	<maxime.chevallier@bootlin.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Christophe Roullier <christophe.roullier@foss.st.com>
+CC: <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH 0/3] Fixes for stmmac driver
+Date: Wed, 18 Feb 2026 09:36:15 +0100
+Message-ID: <20260218083618.67805-1-christophe.roullier@foss.st.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: ENXCAS1NODE2.st.com (10.75.128.138) To STKDAG1NODE2.st.com
+ (10.75.128.133)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DU2PEPF00028D0D:EE_|PAVPR10MB6913:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3a87ee6f-c99d-4d80-d07a-08de6ec8cbbc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|7416014|376014|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?yJEGFylffjb6nqk2VAk12CUsNHdvY91bd9jQ73g5KTSI7Oahl135ph1/4ilh?=
+ =?us-ascii?Q?pOB6fsM67BL3tTxZIzYWUynlfZOfWcY2QtLTlegxy4TiFA/FMMNoh98wNqDk?=
+ =?us-ascii?Q?4gMI0EJ6AO3MBL8G/1x5xE98MQBow9lniPLeFzKTpCzZfxW8q8IFeK26+dfg?=
+ =?us-ascii?Q?uNoVbdkN13HzONWEInVpOx2nQG/Ov/kcd3sios1b8PjOBqEJO/VAaVzOo44/?=
+ =?us-ascii?Q?GqK37uf1aFg2oomRLxTGhkzT37Ej3yo/oPbba6wwaF2juDlPayGdR+uFwOz5?=
+ =?us-ascii?Q?dZMqKELU06PTxRFAsVZ3YxCfDbBzRICWe0EAG0CivuF3GpsxBoUEeCVNbcO2?=
+ =?us-ascii?Q?KLQDgpzjMJFMp+9EzfDWrH4edQhlWuwVRhp+F5YuvOsBJT+8J6dIPVOM8dM8?=
+ =?us-ascii?Q?63FxEvuxZyAzJ3Z0zgAoy8VmIwpJ43xoGgA4aHXIWWJ3NKh0ELmHNfnxrN7g?=
+ =?us-ascii?Q?L6eKltAgmmTTthUFNBVOBdftS3JZ+hnHP8Z1zSbcQWW5lKv3LCEccrlqwlvJ?=
+ =?us-ascii?Q?q5SbcTgM/ICAaYPm5/kjaZV51h6pBTATL+0Trvsos4AFexZgBKYsliA8LY7J?=
+ =?us-ascii?Q?lsDbjoYU8XZ3DQTuJEWOwTRN+bsXKk/mkmF85anY9zJ//hb0sXR3eC2oULAs?=
+ =?us-ascii?Q?Tji2F3a/uLkEsIJWoP7pWgg2A3ZUUiCS/hlVQTig0YArLOcZw8mP8Ujmg9Qy?=
+ =?us-ascii?Q?swBNq5dsb43AzZfVAv7e/xuhQjGh3sZm/Iep7gthJ4LFSLr15EPuO1TO5JcX?=
+ =?us-ascii?Q?+vZCesE16uaUsb37a1ps0baCNr4dEYH+HJU/JgAb8/GRgSoVMo97d2HyfpNV?=
+ =?us-ascii?Q?0WYYImjU0qXCTOC0bFHxNAVRZLDHj2rF7unn62aL5go2dOwkJDKfiPV9gOAf?=
+ =?us-ascii?Q?DnkftasYU4gkSRBfP+ca5jNCAiIHRhmdGXS/pqUm3G0BbJg8ljsnOWpabBUQ?=
+ =?us-ascii?Q?/Fs+0LzXXH2u+hmCAg6AuHUBBMmS7nG3Y64d7pGYVWvyU98MUH6MgbCxL1Tf?=
+ =?us-ascii?Q?+vogW3MaijqEQpEQHCupgtJntFGN5zwVhhyjJqHZXk0BGOjMu5LGfReqWSmU?=
+ =?us-ascii?Q?toZDic1/u2REt7PvvoO3rt+9bvim8y24tmGTojmg7iLh/dVv6UokiyO7xXDV?=
+ =?us-ascii?Q?xc31oSfWtwTAZpmWT9iGi+2BcAe5m6+KZAqTpKWTKpBs+Ulxr67TbEvEL35o?=
+ =?us-ascii?Q?xpYDV4ghz5q/n7Cb9jv5x6X10RAaV7iV9Iu0X3sja37AM3KJ8dosMy3zuKmF?=
+ =?us-ascii?Q?p1AZ9oRsRUWhV9FV84MYkEYTx4CFdtZyNqIfHrrkjD0BqUyHRWlGjW0la5NS?=
+ =?us-ascii?Q?16RuE9V7TbIABJrBKce3Xh0AXdVfKr5Imkm2+4AuZDpCwtdkyUpoqDhvlUof?=
+ =?us-ascii?Q?zxY+z6OWU40vUGJhTb5W62yis99YcroOSc2xiLSVOZ6/N80cLjX6ix8ioqTa?=
+ =?us-ascii?Q?vLS268fEtTR2T3q5TcyMDIRi58aNCJSC+jXZUjpCj05ewVHfAtE4hrEoIu65?=
+ =?us-ascii?Q?JEJEBgAjn/AYZ+Np09ylB5+N/+0Ff9K4YdSzbfzciKzKq2WKB5Jd/KcB0+LB?=
+ =?us-ascii?Q?3fGh//++K/FO1i2LHLGpCAhEfkVOTKoQIa9t+WCDXH/oGUnD6o2Ehb6V4j9v?=
+ =?us-ascii?Q?jbVnmIUvsP2W/4rqxsvYrxXzAYlSMWaXc+bmDZdP0vkYI2auRqN4lYbPUWam?=
+ =?us-ascii?Q?Cu4Nyw=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:164.130.1.59;CTRY:IT;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:smtpO365.st.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(7416014)(376014)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	yuvMJcPDJpegkIkfssyEYL6lCTzZ4bukeA0gXRKH1M+a2j6N4Zjh//17RIiBjPmOMRWFWiWc6h3z6O6N9Nj2ul66V5BA5up3Drd2DbzmhCKwyd2hsJK0Q/cX+ShT6r8jDZry1gjmlL9vKsXSZPsvA0156Fha7wLgzrMZ5zdSWZnKMuUU11E7+hY+fUfUlPTDjJSSz47SLJ95HWVwXvT/NKTiLfPs9Wsdct14F0MFi0CUNKGpSD5ipFKi0C0F7CphJP+JZnv8rQBxVBRy52SbVNaoGN8ehbd1w14q9t9AdAGXeSxvjnYC43zgR2R2shASx3Di7hp/8pHrG96LfoK8EUv4W87DgJ2FKgy5ZlsJ+Lsd+x4Rikzl+ss/ZPeKQH1ufnw8BHbZq+m6eJJp4qHIenpXTrFM3TZCTjz0OE1JHeqzlLJNYncYPKxQwbjmCF2c
+X-OriginatorOrg: foss.st.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Feb 2026 08:36:22.2712
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3a87ee6f-c99d-4d80-d07a-08de6ec8cbbc
+X-MS-Exchange-CrossTenant-Id: 75e027c9-20d5-47d5-b82f-77d7cd041e8f
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=75e027c9-20d5-47d5-b82f-77d7cd041e8f;Ip=[164.130.1.59];Helo=[smtpO365.st.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DU2PEPF00028D0D.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAVPR10MB6913
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[hale.at,reject];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[hale.at:s=mail];
+	DMARC_POLICY_ALLOW(-0.50)[foss.st.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[foss.st.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,linux.dev,redhat.com];
-	TAGGED_FROM(0.00)[bounces-259224-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[hale.at:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michael.thalmeier@hale.at,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,nxp.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-259225-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	FROM_NEQ_ENVFROM(0.00)[christophe.roullier@foss.st.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[foss.st.com:+];
 	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 588CE15417A
+X-Rspamd-Queue-Id: 127F515420B
 X-Rspamd-Action: no action
 
-Since commit 9c328f54741b ("net: nfc: nci: Add parameter validation for
-packet data") communication with nci nfc chips is not working any more.
+First commit fix error when :
+1 - Deactivated eth0 (ip link set eth0 down)
+2 - Perform low power procedure
+3 - Reactivate eth0 (ip link set eth0 up)
+=> eth0: stmmac_hw_setup: DMA engine initialization failed
+         stm32-dwmac 5800a000.ethernet eth0: stmmac_open: Hw setup failed
 
-The mentioned commit tries to fix access of uninitialized data, but
-failed to understand that in some cases the data packet is of variable
-length and can therefore not be compared to the maximum packet length
-given by the sizeof(struct).
+Second commit fix error when ethernet driver is unbind,
+ethernet pinouts always set.
 
-Fixes: 9c328f54741b ("net: nfc: nci: Add parameter validation for packet =
-data")
-Cc: stable@vger.kernel.org
-Signed-off-by: Michael Thalmeier <michael.thalmeier@hale.at>
----
-v6:
-- use ssize_t for data_len parameter to guard against underflows
-- omit unneeded data_len decrements at the end of the functions
+Third commit fix bad cleaning when error during stmmac_mdio_register.
 
-v5:
-- also check helper functions in nci_extract_rf_params_nfcf_passive_liste=
-n
-  and nci_rf_discover_ntf_packet
+Christophe Roullier (3):
+  net: stmmac: fix pinctrl management during suspend/resume
+  net: stmmac: restore pinctrl when driver remove.
+  net: stmmac: manage error case during stmmac_dvr_probe
 
-v4:
-- formatting fixes
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-v3:
-- perform complete checks
-- replace magic numbers with offsetofend and sizeof
-
-v2:
-- Reference correct commit hash
-
----
- net/nfc/nci/ntf.c | 159 ++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 141 insertions(+), 18 deletions(-)
-
-diff --git a/net/nfc/nci/ntf.c b/net/nfc/nci/ntf.c
-index 418b84e2b260..c96512bb8653 100644
---- a/net/nfc/nci/ntf.c
-+++ b/net/nfc/nci/ntf.c
-@@ -58,7 +58,7 @@ static int nci_core_conn_credits_ntf_packet(struct nci_=
-dev *ndev,
- 	struct nci_conn_info *conn_info;
- 	int i;
-=20
--	if (skb->len < sizeof(struct nci_core_conn_credit_ntf))
-+	if (skb->len < offsetofend(struct nci_core_conn_credit_ntf, num_entries=
-))
- 		return -EINVAL;
-=20
- 	ntf =3D (struct nci_core_conn_credit_ntf *)skb->data;
-@@ -68,6 +68,10 @@ static int nci_core_conn_credits_ntf_packet(struct nci=
-_dev *ndev,
- 	if (ntf->num_entries > NCI_MAX_NUM_CONN)
- 		ntf->num_entries =3D NCI_MAX_NUM_CONN;
-=20
-+	if (skb->len < offsetofend(struct nci_core_conn_credit_ntf, num_entries=
-) +
-+			ntf->num_entries * sizeof(struct conn_credit_entry))
-+		return -EINVAL;
-+
- 	/* update the credits */
- 	for (i =3D 0; i < ntf->num_entries; i++) {
- 		ntf->conn_entries[i].conn_id =3D
-@@ -138,23 +142,48 @@ static int nci_core_conn_intf_error_ntf_packet(stru=
-ct nci_dev *ndev,
- static const __u8 *
- nci_extract_rf_params_nfca_passive_poll(struct nci_dev *ndev,
- 					struct rf_tech_specific_params_nfca_poll *nfca_poll,
--					const __u8 *data)
-+					const __u8 *data, ssize_t data_len)
- {
-+	/* Check if we have enough data for sens_res (2 bytes) */
-+	if (data_len < 2)
-+		return ERR_PTR(-EINVAL);
-+
- 	nfca_poll->sens_res =3D __le16_to_cpu(*((__le16 *)data));
- 	data +=3D 2;
-+	data_len -=3D 2;
-+
-+	/* Check if we have enough data for nfcid1_len (1 byte) */
-+	if (data_len < 1)
-+		return ERR_PTR(-EINVAL);
-=20
- 	nfca_poll->nfcid1_len =3D min_t(__u8, *data++, NFC_NFCID1_MAXSIZE);
-+	data_len--;
-=20
- 	pr_debug("sens_res 0x%x, nfcid1_len %d\n",
- 		 nfca_poll->sens_res, nfca_poll->nfcid1_len);
-=20
-+	/* Check if we have enough data for nfcid1 */
-+	if (data_len < nfca_poll->nfcid1_len)
-+		return ERR_PTR(-EINVAL);
-+
- 	memcpy(nfca_poll->nfcid1, data, nfca_poll->nfcid1_len);
- 	data +=3D nfca_poll->nfcid1_len;
-+	data_len -=3D nfca_poll->nfcid1_len;
-+
-+	/* Check if we have enough data for sel_res_len (1 byte) */
-+	if (data_len < 1)
-+		return ERR_PTR(-EINVAL);
-=20
- 	nfca_poll->sel_res_len =3D *data++;
-+	data_len--;
-+
-+	if (nfca_poll->sel_res_len !=3D 0) {
-+		/* Check if we have enough data for sel_res (1 byte) */
-+		if (data_len < 1)
-+			return ERR_PTR(-EINVAL);
-=20
--	if (nfca_poll->sel_res_len !=3D 0)
- 		nfca_poll->sel_res =3D *data++;
-+	}
-=20
- 	pr_debug("sel_res_len %d, sel_res 0x%x\n",
- 		 nfca_poll->sel_res_len,
-@@ -166,12 +195,21 @@ nci_extract_rf_params_nfca_passive_poll(struct nci_=
-dev *ndev,
- static const __u8 *
- nci_extract_rf_params_nfcb_passive_poll(struct nci_dev *ndev,
- 					struct rf_tech_specific_params_nfcb_poll *nfcb_poll,
--					const __u8 *data)
-+					const __u8 *data, ssize_t data_len)
- {
-+	/* Check if we have enough data for sensb_res_len (1 byte) */
-+	if (data_len < 1)
-+		return ERR_PTR(-EINVAL);
-+
- 	nfcb_poll->sensb_res_len =3D min_t(__u8, *data++, NFC_SENSB_RES_MAXSIZE=
-);
-+	data_len--;
-=20
- 	pr_debug("sensb_res_len %d\n", nfcb_poll->sensb_res_len);
-=20
-+	/* Check if we have enough data for sensb_res */
-+	if (data_len < nfcb_poll->sensb_res_len)
-+		return ERR_PTR(-EINVAL);
-+
- 	memcpy(nfcb_poll->sensb_res, data, nfcb_poll->sensb_res_len);
- 	data +=3D nfcb_poll->sensb_res_len;
-=20
-@@ -181,14 +219,29 @@ nci_extract_rf_params_nfcb_passive_poll(struct nci_=
-dev *ndev,
- static const __u8 *
- nci_extract_rf_params_nfcf_passive_poll(struct nci_dev *ndev,
- 					struct rf_tech_specific_params_nfcf_poll *nfcf_poll,
--					const __u8 *data)
-+					const __u8 *data, ssize_t data_len)
- {
-+	/* Check if we have enough data for bit_rate (1 byte) */
-+	if (data_len < 1)
-+		return ERR_PTR(-EINVAL);
-+
- 	nfcf_poll->bit_rate =3D *data++;
-+	data_len--;
-+
-+	/* Check if we have enough data for sensf_res_len (1 byte) */
-+	if (data_len < 1)
-+		return ERR_PTR(-EINVAL);
-+
- 	nfcf_poll->sensf_res_len =3D min_t(__u8, *data++, NFC_SENSF_RES_MAXSIZE=
-);
-+	data_len--;
-=20
- 	pr_debug("bit_rate %d, sensf_res_len %d\n",
- 		 nfcf_poll->bit_rate, nfcf_poll->sensf_res_len);
-=20
-+	/* Check if we have enough data for sensf_res */
-+	if (data_len < nfcf_poll->sensf_res_len)
-+		return ERR_PTR(-EINVAL);
-+
- 	memcpy(nfcf_poll->sensf_res, data, nfcf_poll->sensf_res_len);
- 	data +=3D nfcf_poll->sensf_res_len;
-=20
-@@ -198,22 +251,49 @@ nci_extract_rf_params_nfcf_passive_poll(struct nci_=
-dev *ndev,
- static const __u8 *
- nci_extract_rf_params_nfcv_passive_poll(struct nci_dev *ndev,
- 					struct rf_tech_specific_params_nfcv_poll *nfcv_poll,
--					const __u8 *data)
-+					const __u8 *data, ssize_t data_len)
- {
-+	/* Skip 1 byte (reserved) */
-+	if (data_len < 1)
-+		return ERR_PTR(-EINVAL);
-+
- 	++data;
-+	data_len--;
-+
-+	/* Check if we have enough data for dsfid (1 byte) */
-+	if (data_len < 1)
-+		return ERR_PTR(-EINVAL);
-+
- 	nfcv_poll->dsfid =3D *data++;
-+	data_len--;
-+
-+	/* Check if we have enough data for uid (8 bytes) */
-+	if (data_len < NFC_ISO15693_UID_MAXSIZE)
-+		return ERR_PTR(-EINVAL);
-+
- 	memcpy(nfcv_poll->uid, data, NFC_ISO15693_UID_MAXSIZE);
- 	data +=3D NFC_ISO15693_UID_MAXSIZE;
-+
- 	return data;
- }
-=20
- static const __u8 *
- nci_extract_rf_params_nfcf_passive_listen(struct nci_dev *ndev,
- 					  struct rf_tech_specific_params_nfcf_listen *nfcf_listen,
--					  const __u8 *data)
-+					  const __u8 *data, ssize_t data_len)
- {
-+	/* Check if we have enough data for local_nfcid2_len (1 byte) */
-+	if (data_len < 1)
-+		return ERR_PTR(-EINVAL);
-+
- 	nfcf_listen->local_nfcid2_len =3D min_t(__u8, *data++,
- 					      NFC_NFCID2_MAXSIZE);
-+	data_len--;
-+
-+	/* Check if we have enough data for local_nfcid2 */
-+	if (data_len < nfcf_listen->local_nfcid2_len)
-+		return ERR_PTR(-EINVAL);
-+
- 	memcpy(nfcf_listen->local_nfcid2, data, nfcf_listen->local_nfcid2_len);
- 	data +=3D nfcf_listen->local_nfcid2_len;
-=20
-@@ -364,7 +444,7 @@ static int nci_rf_discover_ntf_packet(struct nci_dev =
-*ndev,
- 	const __u8 *data;
- 	bool add_target =3D true;
-=20
--	if (skb->len < sizeof(struct nci_rf_discover_ntf))
-+	if (skb->len < offsetofend(struct nci_rf_discover_ntf, rf_tech_specific=
-_params_len))
- 		return -EINVAL;
-=20
- 	data =3D skb->data;
-@@ -380,26 +460,42 @@ static int nci_rf_discover_ntf_packet(struct nci_de=
-v *ndev,
- 	pr_debug("rf_tech_specific_params_len %d\n",
- 		 ntf.rf_tech_specific_params_len);
-=20
-+	if (skb->len < (data - skb->data) +
-+			ntf.rf_tech_specific_params_len + sizeof(ntf.ntf_type))
-+		return -EINVAL;
-+
- 	if (ntf.rf_tech_specific_params_len > 0) {
- 		switch (ntf.rf_tech_and_mode) {
- 		case NCI_NFC_A_PASSIVE_POLL_MODE:
- 			data =3D nci_extract_rf_params_nfca_passive_poll(ndev,
--				&(ntf.rf_tech_specific_params.nfca_poll), data);
-+				&(ntf.rf_tech_specific_params.nfca_poll), data,
-+				ntf.rf_tech_specific_params_len);
-+			if (IS_ERR(data))
-+				return PTR_ERR(data);
- 			break;
-=20
- 		case NCI_NFC_B_PASSIVE_POLL_MODE:
- 			data =3D nci_extract_rf_params_nfcb_passive_poll(ndev,
--				&(ntf.rf_tech_specific_params.nfcb_poll), data);
-+				&(ntf.rf_tech_specific_params.nfcb_poll), data,
-+				ntf.rf_tech_specific_params_len);
-+			if (IS_ERR(data))
-+				return PTR_ERR(data);
- 			break;
-=20
- 		case NCI_NFC_F_PASSIVE_POLL_MODE:
- 			data =3D nci_extract_rf_params_nfcf_passive_poll(ndev,
--				&(ntf.rf_tech_specific_params.nfcf_poll), data);
-+				&(ntf.rf_tech_specific_params.nfcf_poll), data,
-+				ntf.rf_tech_specific_params_len);
-+			if (IS_ERR(data))
-+				return PTR_ERR(data);
- 			break;
-=20
- 		case NCI_NFC_V_PASSIVE_POLL_MODE:
- 			data =3D nci_extract_rf_params_nfcv_passive_poll(ndev,
--				&(ntf.rf_tech_specific_params.nfcv_poll), data);
-+				&(ntf.rf_tech_specific_params.nfcv_poll), data,
-+				ntf.rf_tech_specific_params_len);
-+			if (IS_ERR(data))
-+				return PTR_ERR(data);
- 			break;
-=20
- 		default:
-@@ -596,7 +692,7 @@ static int nci_rf_intf_activated_ntf_packet(struct nc=
-i_dev *ndev,
- 	const __u8 *data;
- 	int err =3D NCI_STATUS_OK;
-=20
--	if (skb->len < sizeof(struct nci_rf_intf_activated_ntf))
-+	if (skb->len < offsetofend(struct nci_rf_intf_activated_ntf, rf_tech_sp=
-ecific_params_len))
- 		return -EINVAL;
-=20
- 	data =3D skb->data;
-@@ -628,26 +724,41 @@ static int nci_rf_intf_activated_ntf_packet(struct =
-nci_dev *ndev,
- 	if (ntf.rf_interface =3D=3D NCI_RF_INTERFACE_NFCEE_DIRECT)
- 		goto listen;
-=20
-+	if (skb->len < (data - skb->data) + ntf.rf_tech_specific_params_len)
-+		return -EINVAL;
-+
- 	if (ntf.rf_tech_specific_params_len > 0) {
- 		switch (ntf.activation_rf_tech_and_mode) {
- 		case NCI_NFC_A_PASSIVE_POLL_MODE:
- 			data =3D nci_extract_rf_params_nfca_passive_poll(ndev,
--				&(ntf.rf_tech_specific_params.nfca_poll), data);
-+				&(ntf.rf_tech_specific_params.nfca_poll), data,
-+				ntf.rf_tech_specific_params_len);
-+			if (IS_ERR(data))
-+				return -EINVAL;
- 			break;
-=20
- 		case NCI_NFC_B_PASSIVE_POLL_MODE:
- 			data =3D nci_extract_rf_params_nfcb_passive_poll(ndev,
--				&(ntf.rf_tech_specific_params.nfcb_poll), data);
-+				&(ntf.rf_tech_specific_params.nfcb_poll), data,
-+				ntf.rf_tech_specific_params_len);
-+			if (IS_ERR(data))
-+				return -EINVAL;
- 			break;
-=20
- 		case NCI_NFC_F_PASSIVE_POLL_MODE:
- 			data =3D nci_extract_rf_params_nfcf_passive_poll(ndev,
--				&(ntf.rf_tech_specific_params.nfcf_poll), data);
-+				&(ntf.rf_tech_specific_params.nfcf_poll), data,
-+				ntf.rf_tech_specific_params_len);
-+			if (IS_ERR(data))
-+				return -EINVAL;
- 			break;
-=20
- 		case NCI_NFC_V_PASSIVE_POLL_MODE:
- 			data =3D nci_extract_rf_params_nfcv_passive_poll(ndev,
--				&(ntf.rf_tech_specific_params.nfcv_poll), data);
-+				&(ntf.rf_tech_specific_params.nfcv_poll), data,
-+				ntf.rf_tech_specific_params_len);
-+			if (IS_ERR(data))
-+				return -EINVAL;
- 			break;
-=20
- 		case NCI_NFC_A_PASSIVE_LISTEN_MODE:
-@@ -657,7 +768,9 @@ static int nci_rf_intf_activated_ntf_packet(struct nc=
-i_dev *ndev,
- 		case NCI_NFC_F_PASSIVE_LISTEN_MODE:
- 			data =3D nci_extract_rf_params_nfcf_passive_listen(ndev,
- 				&(ntf.rf_tech_specific_params.nfcf_listen),
--				data);
-+				data, ntf.rf_tech_specific_params_len);
-+			if (IS_ERR(data))
-+				return -EINVAL;
- 			break;
-=20
- 		default:
-@@ -668,6 +781,13 @@ static int nci_rf_intf_activated_ntf_packet(struct n=
-ci_dev *ndev,
- 		}
- 	}
-=20
-+	if (skb->len < (data - skb->data) +
-+			sizeof(ntf.data_exch_rf_tech_and_mode) +
-+			sizeof(ntf.data_exch_tx_bit_rate) +
-+			sizeof(ntf.data_exch_rx_bit_rate) +
-+			sizeof(ntf.activation_params_len))
-+		return -EINVAL;
-+
- 	ntf.data_exch_rf_tech_and_mode =3D *data++;
- 	ntf.data_exch_tx_bit_rate =3D *data++;
- 	ntf.data_exch_rx_bit_rate =3D *data++;
-@@ -679,6 +799,9 @@ static int nci_rf_intf_activated_ntf_packet(struct nc=
-i_dev *ndev,
- 	pr_debug("data_exch_rx_bit_rate 0x%x\n", ntf.data_exch_rx_bit_rate);
- 	pr_debug("activation_params_len %d\n", ntf.activation_params_len);
-=20
-+	if (skb->len < (data - skb->data) + ntf.activation_params_len)
-+		return -EINVAL;
-+
- 	if (ntf.activation_params_len > 0) {
- 		switch (ntf.rf_interface) {
- 		case NCI_RF_INTERFACE_ISO_DEP:
---=20
-2.53.0
+-- 
+2.43.0
 
 
