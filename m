@@ -1,186 +1,148 @@
-Return-Path: <netdev+bounces-259301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259302-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gEzxD9uolWlVTAIAu9opvQ
-	(envelope-from <netdev+bounces-259301-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 12:56:11 +0100
+	id QJCQEqWslWlZTgIAu9opvQ
+	(envelope-from <netdev+bounces-259302-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 13:12:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94659156264
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 12:56:10 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89C081563C0
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 13:12:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 83A483019914
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 11:56:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 09D51300B129
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 12:12:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71F2130DEAA;
-	Wed, 18 Feb 2026 11:56:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EqdLIUNs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0B4F3074AB;
+	Wed, 18 Feb 2026 12:12:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D952303A1A;
-	Wed, 18 Feb 2026 11:56:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5533B3064BA;
+	Wed, 18 Feb 2026 12:12:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771415767; cv=none; b=BDZLv/BwRjyzoByTk1SkjFyT6Swn8i3+Y0fh5C16kIRnZdfr129P7EJndDh4UWUMb2f1dC8feHDt7zYwobHRpZGxVYHQhC63kv2wDpI3NQRTgvnqRcAmFK9CIqZvqHMhcUOsJJaiLGgMamRfqwezsCrDMOMIy9i0LlWsrY1MoOc=
+	t=1771416736; cv=none; b=j6aywtSGzR8wPgY6xHh56VN+kFvRMTS13hTQcU1sNaSDms3kEJnj8v9PuNauTNN8cePXZx080VJ/z2DrDutTnhXrrmrc8M8X+mHXxV5eNtpdWs69Dlz/Q3Facxk1L0DgHL6rhXZb1RUPKBJwAyEU30qG+MAa3VdrNqh2Ipej+/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771415767; c=relaxed/simple;
-	bh=q6BVILBmo4kht/Ek3frvBWGuLP2t4zYigvK3MqljjUI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nhHhOjMamq4zk2f8Y8Ie8CpPjH8v1qoQqDc34bkVC/18S43bOdufGBeSl5d0d31CGS0+aNMx19HFmGDvBmgqMv+GXlIwJsYL/uweq82nMfbUya0sarwQCH97Fc3DFIWLFcTDRDfpa9DQbx1Vayi/Iy7alIlYnoN1737S0jQQFO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EqdLIUNs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEBD7C19421;
-	Wed, 18 Feb 2026 11:56:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771415767;
-	bh=q6BVILBmo4kht/Ek3frvBWGuLP2t4zYigvK3MqljjUI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=EqdLIUNsgaDcy+rd4zrmtMy9KdQgwQFRQb4uZ4Rhu0ROOF1PfLbroQsBqtD4Xaoi2
-	 8YFzq0+6V49rN7tfoxRSg1kaMu9cI6im15kl9NBQfUTqDYb2rDq2gkC5YVbzY7p/n+
-	 MzI9QgtoG8vMfx2OjT0tnMl5SBa4wJGSIOrL/NuJAF2GW+VuHqLDFDPtlC8YfA6849
-	 igrM9ZkmVPF9BqweIedYBGPTvIh61hOs1r/1hXbGvSQ8H5AdIQ13kbfF2Es3JJfsqo
-	 FM+j1l/MoW/i/NEVGi0gO325ECMS2HyFwDAYfK2VDDqPW2M4c8chrfLslgXXNVhOmP
-	 iv/thosUBbNrw==
-Message-ID: <0bfcb292-4e49-4047-b631-dd3029b43f1c@kernel.org>
-Date: Wed, 18 Feb 2026 12:56:02 +0100
+	s=arc-20240116; t=1771416736; c=relaxed/simple;
+	bh=24ED2ZQcmExbCxrG8QfizHyY6qifA3PcqVzwnGZrHrw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hhmAMKQNMAfX2BlzfxIf+mHyPkBB3AXiOtgJ1WZV997XvSCO22PLi2fCLQ2CEGxq+RcJVYepmWNjEJjmmGIIRdQYL8ClW0OxrnzxELUIwgiuxPjBNVyII7WMrqBWUqLHYOdR7GzHGUeaYCCnL5wmp7CrdAT8xR8O8rgQdJJI30k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [223.64.68.227])
+	by gateway (Coremail) with SMTP id _____8BxmsKVrJVpzEwTAA--.60658S3;
+	Wed, 18 Feb 2026 20:12:05 +0800 (CST)
+Received: from kernelserver (unknown [223.64.68.227])
+	by front1 (Coremail) with SMTP id qMiowJBx58CIrJVpbRRIAA--.25617S2;
+	Wed, 18 Feb 2026 20:12:02 +0800 (CST)
+From: Huacai Chen <chenhuacai@loongson.cn>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Sasha Levin <sashal@kernel.org>,
+	Huacai Chen <chenhuacai@kernel.org>
+Cc: Xuerui Wang <kernel@xen0n.name>,
+	stable@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Yanteng Si <si.yanteng@linux.dev>,
+	linux-kernel@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	netdev@vger.kernel.org,
+	Huacai Chen <chenhuacai@loongson.cn>,
+	Hongliang Wang <wanghongliang@loongson.cn>
+Subject: [PATCH for 6.18] net: stmmac: dwmac-loongson: Set clk_csr_i to 100-150MHz
+Date: Wed, 18 Feb 2026 20:11:43 +0800
+Message-ID: <20260218121143.2545082-1-chenhuacai@loongson.cn>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 1/3] dt-bindings: sram: qcom,imem: Allow
- modem-tables subnode
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
- Konrad Dybcio <konradybcio@kernel.org>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alex Elder <elder@kernel.org>, Marijn Suijten
- <marijn.suijten@somainline.org>, linux-arm-msm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20260217-topic-ipa_imem-v3-0-d6d8ed1dfb67@oss.qualcomm.com>
- <20260217-topic-ipa_imem-v3-1-d6d8ed1dfb67@oss.qualcomm.com>
- <20260217-godlike-silent-owl-0a8487@quoll>
- <36f0a71c-a8b7-4aaa-81c3-1945b268c57f@oss.qualcomm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <36f0a71c-a8b7-4aaa-81c3-1945b268c57f@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJBx58CIrJVpbRRIAA--.25617S2
+X-CM-SenderInfo: hfkh0x5xdftxo6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj93XoW7CrWDtF13CrW7Jr4UCrW5twc_yoW8XrWDpr
+	WxZa47WrWayr12k3Z5Zw1UZFy5ua4YgFZrGFs7ta1fuFZ2yw1jqryjgFZ8ZFW7uFW8GF1a
+	vF4qkr45CF1DCwbCm3ZEXasCq-sJn29KB7ZKAUJUUUUD529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUtVWr
+	XwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
+	8JMxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4
+	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AK
+	xVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8TCJPUUUUU==
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	DMARC_NA(0.00)[loongson.cn];
+	RCVD_COUNT_FIVE(0.00)[5];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259301-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-259302-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,qualcomm.com:email]
-X-Rspamd-Queue-Id: 94659156264
+	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[chenhuacai@loongson.cn,netdev@vger.kernel.org];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 89C081563C0
 X-Rspamd-Action: no action
 
-On 18/02/2026 12:05, Konrad Dybcio wrote:
-> On 2/17/26 9:25 PM, Krzysztof Kozlowski wrote:
->> On Tue, Feb 17, 2026 at 02:30:31PM +0100, Konrad Dybcio wrote:
->>> From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
->>>
->>> The IP Accelerator hardware/firmware owns a sizeable region within the
->>> IMEM, named 'modem-tables', containing various packet processing
->>> configuration data.
->>>
->>> It's not actually accessed by the OS, although we have to IOMMU-map it
->>> with the IPA device, so that presumably the firmware can act upon it.
->>>
->>> Allow it as a subnode of IMEM.
->>
->> You do not have compatible, so rely on the node name as ABI, which is
->> fine in general but... I do not see usage of it in the driver. Why do
->> you need to define modem-tables child then?
-> 
-> I don't really *need* the node name to be an ABI. However, the current
-> binding for IMEM only allows a named "pil-reloc@.." subnode (which is
-> consumed via of_find_compatible_node() in the remoteproc subsystem) so I
-> figured the intention was to keep the list of allowed subnodes strictly
-> moderated
-> 
-> If you'd prefer a blanket pattern declaration with say '^[a-z]@[0-9a-z]+$'
-> with just a reg requirement inside, I'm fine with that too
+commit e1aa5ef892fb4fa9014a25e87b64b97347919d37 upstream.
 
-No, the problem is that you do not use the ABI here at all. Neither
-would you use the blanket pattern, so my question stays: why adding ABI
-which is not used?
+Current clk_csr_i setting of Loongson STMMAC (including LS7A1000/2000
+and LS2K1000/2000/3000) are copy & paste from other drivers. In fact,
+Loongson STMMAC use 125MHz clocks and need 62 freq division to within
+2.5MHz, meeting most PHY MDC requirement. So fix by setting clk_csr_i
+to 100-150MHz, otherwise some PHYs may link fail.
 
-The pil-reloc is being used, as you pointed out.
+Cc: stable@vger.kernel.org
+Fixes: 30bba69d7db40e7 ("stmmac: pci: Add dwmac support for Loongson")
+Signed-off-by: Hongliang Wang <wanghongliang@loongson.cn>
+Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Best regards,
-Krzysztof
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+index 592aa9d636e5..d3dc60c3714b 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+@@ -90,8 +90,8 @@ static void loongson_default_data(struct pci_dev *pdev,
+ 	/* Get bus_id, this can be overwritten later */
+ 	plat->bus_id = pci_dev_id(pdev);
+ 
+-	/* clk_csr_i = 20-35MHz & MDC = clk_csr_i/16 */
+-	plat->clk_csr = STMMAC_CSR_20_35M;
++	/* clk_csr_i = 100-150MHz & MDC = clk_csr_i/62 */
++	plat->clk_csr = STMMAC_CSR_100_150M;
+ 	plat->has_gmac = 1;
+ 	plat->force_sf_dma_mode = 1;
+ 
+-- 
+2.52.0
+
 
