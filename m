@@ -1,58 +1,61 @@
-Return-Path: <netdev+bounces-259238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259239-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mAr7FtSFlWm/SAIAu9opvQ
-	(envelope-from <netdev+bounces-259238-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 10:26:44 +0100
+	id MHmkKrqHlWnqSAIAu9opvQ
+	(envelope-from <netdev+bounces-259239-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 10:34:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B958D154B76
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 10:26:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C187154C08
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 10:34:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 21B5130078DC
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 09:26:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B91583009160
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 09:34:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB7C933A71F;
-	Wed, 18 Feb 2026 09:26:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EEB733C509;
+	Wed, 18 Feb 2026 09:34:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rd25Sy6B"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MSVMH0W0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 889AF2C11EE
-	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 09:26:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AF5633C1B0
+	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 09:34:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771406767; cv=none; b=enRso0H5W6cOuFl9HPs9XzxwRnIj2cnvzgM7qlZSQyG88c/+oSsrvWG06e2vsXLAsMacsF1Hs2uYyxrrCMyzK2UROoyn+ZAZrayQegoTo+/fUxRgq646D2VsM/leKCe2+pLJbeb6y1dgOYvIgj4MyiB6VfA7uWshTpQgTUc3p7E=
+	t=1771407272; cv=none; b=ecn4mS7gXbS9HYfiVwgMbMTCODAIfhnGQyYvaDJ03Bodo5JiDu9IKvjHw3rOk/xXKdL2zKGgKmKPXXRzs4X5DaTqaKHIwlHUVeKc7U/VAIspzCBunni/H9mKnaCbDgkqgR1VunMn1zmHWjmrYBMl1Myv/N17MKiUq2BEOQPOt8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771406767; c=relaxed/simple;
-	bh=TLfKk2qADOrbfEuoBvhVTAIQXEmEQg3OyhClYssyi+c=;
+	s=arc-20240116; t=1771407272; c=relaxed/simple;
+	bh=7GOMRDuVGC3oOvroDf0aGrTBQm4HerE/jUzEE8IJXLY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zh33xL88Yb+Kq1ohTedpkuZvUKYHpjiN5HWc/f/wUA+ucQ5rXENvNlmXxnGfqXUrboeebdpG71qdUjitN3uE99azZ+ptxu077Jkko/gDjy+J3uTKmvUXHIqcRmZzfz398xB5M/L3Q0LmapDQlZgKvmgQkf4LbAlZh2YOGKCypMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rd25Sy6B; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69F13C19421;
-	Wed, 18 Feb 2026 09:26:06 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=Amn8fmQk8I0nPrGvJnmgA7hZTSHUOlcq84rABFqlxYyBimLXJ2WIiuWWZQL36FpNqrhS0gCOp9+ZQwGUlKDcP7wbdNCzh2MMaDXRmX/LGtw+2A3wONlpuwFTomYMgqIKDgpelThOoSvi4otJCz5eQ+t56xr7Oi37h87t4ojQahU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MSVMH0W0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 420CBC19421;
+	Wed, 18 Feb 2026 09:34:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771406767;
-	bh=TLfKk2qADOrbfEuoBvhVTAIQXEmEQg3OyhClYssyi+c=;
+	s=k20201202; t=1771407271;
+	bh=7GOMRDuVGC3oOvroDf0aGrTBQm4HerE/jUzEE8IJXLY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rd25Sy6BoRHD4/ffww6s9HAOxt1aJRcGlZVuLkXC1340br/EyvtvtNKzn9cq6Y9YB
-	 rzGXypO7d1nPBiW4mAg2gp80FS5nXuVmTZlboU5bwELH8GJTdcvgjSUd5Pqyk5qLxS
-	 Xak01NvEqNjC48nRlLUCFonz22EHPoujXM6XrnLBfRyMi12T3or+sfLvpZqsc0pYeo
-	 p2PgXOt8uSFvV2RnebrsWw2HcD0DbWtc5sPlQ0bKmy+A3j6BDC46J46/9ZgNbCxxu3
-	 FIALwvy3I+YmiNcOIwVu4QQQl1C1PWG81fdfr87VnsfVT8xIg1yg3LY9kr8gnn2WuC
-	 KBNRph9BdlNug==
-Date: Wed, 18 Feb 2026 09:26:04 +0000
+	b=MSVMH0W0TP9Bkl7DkhFmZMcNJUAhZm92qXlGbHyG8QyBjKyEwu+n5PqozVvrB9gCA
+	 1h4O9i+KIBaUOs04NLvNpobX6bVLVq1QpB2QR5GSFzYDLmiGklut7C32SgLBKaN2H4
+	 JILTRl3YpWVsThU63GJFY6Uv5xZO4y3QKsG95OoroKj/C+6gfKeNv4jd79D4LZOzET
+	 Gufwza32wmMyupZ0nUm5II7WAErV+GWAYSKCTdnqU22kf6Gm07Ab9OWbZey9yC2zkS
+	 nrYlqUVl1mZTK5BqE4Bhh9fLOVzfuGW8PdcjYjD9n0gTXYsrtpKVp4kHksumL5yGvn
+	 gMfZ4oPtYpB7w==
+Date: Wed, 18 Feb 2026 09:34:28 +0000
 From: Simon Horman <horms@kernel.org>
-To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+To: Hyunwoo Kim <imv4bel@gmail.com>
+Cc: john.fastabend@gmail.com, kuba@kernel.org, sd@queasysnail.net,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: Re: [PATCH iwl-next v2] ice: implement symmetric RSS hash
- configuration
-Message-ID: <aZWFrEqPvAKxQB3z@horms.kernel.org>
-References: <20260217130039.1802805-1-aleksandr.loktionov@intel.com>
+Subject: Re: [PATCH] net: tls: Use disable_delayed_work_sync() instead of
+ cancel_delayed_work_sync() in tls_sw_cancel_work_tx()
+Message-ID: <aZWHpBwpMVTUNYTg@horms.kernel.org>
+References: <aZLotq3aZY0b-dI8@v4bel>
+ <aZSLHaFj7k8DPmLG@horms.kernel.org>
+ <aZSbSOVuRgkjeezg@v4bel>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,62 +64,163 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260217130039.1802805-1-aleksandr.loktionov@intel.com>
+In-Reply-To: <aZSbSOVuRgkjeezg@v4bel>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259238-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259239-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,queasysnail.net,davemloft.net,google.com,redhat.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[4];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email]
-X-Rspamd-Queue-Id: B958D154B76
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0C187154C08
 X-Rspamd-Action: no action
 
-On Tue, Feb 17, 2026 at 02:00:39PM +0100, Aleksandr Loktionov wrote:
-> The driver advertises symmetric RSS support via supported_input_xfrm
-> but ice_set_rxfh() ignored the input_xfrm parameter, making it
-> impossible to configure symmetric hashing.
+On Wed, Feb 18, 2026 at 01:46:00AM +0900, Hyunwoo Kim wrote:
+> On Tue, Feb 17, 2026 at 03:37:01PM +0000, Simon Horman wrote:
+> > On Mon, Feb 16, 2026 at 06:51:50PM +0900, Hyunwoo Kim wrote:
+> > > After cancel_delayed_work_sync() is called from tls_sk_proto_close(), 
+> > > tx_work_handler() can still be scheduled from paths such as the 
+> > > Delayed ACK handler or ksoftirqd.
+> > > As a result, the tx_work_handler() worker may dereference a freed 
+> > > TLS object.
+> > > 
+> > > To prevent this race condition, cancel_delayed_work_sync() is 
+> > > replaced with disable_delayed_work_sync().
+> > > 
+> > > Fixes: f87e62d45e51 ("net/tls: remove close callback sock unlock/lock around TX work flush")
+> > > Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+> > 
+> > Hi Hyunwoo,
+> > 
+> > Thanks for your patch(es).
+> > 
+> > Some feedback on process from my side.
+> > You can read more about that at
+> > https://docs.kernel.org/process/maintainer-netdev.html
+> > 
+> > * I think it would be good to mention how this problem was found.
 > 
-> Fix ice_set_rxfh() to check rxfh->input_xfrm and call
-> ice_set_rss_hfunc() with ICE_AQ_VSI_Q_OPT_RSS_HASH_SYM_TPLZ when
-> RXH_XFRM_SYM_XOR is requested.
+> Hi Simon,
 > 
-> Modify ice_set_rss_vsi_ctx() to use vsi->rss_hfunc instead of
-> hardcoding ICE_AQ_VSI_Q_OPT_RSS_HASH_TPLZ, and export it for
-> use by ice_set_rxfh().
+> Thank you for the feedback.
 > 
-> The kernel requires get_rxfh_fields() to report symmetric hash
-> configurations when symmetric transforms are supported. Update
-> ice_get_rxfh_fields() to return symmetric field configuration
-> (src+dst IP and ports) for all flow types.
+> This issue was found during a manual code audit. I will add this 
+> information to the commit message.
 > 
-> Tested with tools/testing/selftests/drivers/net/hw/rss_input_xfrm.py
 > 
-> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> ---
-> v1 -> v2 preserve valid symmetric RSS fields.
+> > 
+> > * As a bug fix for code present in the net tree, it should be targeted
+> >   at that tree like this.
+> > 
+> >   Subject: [PATCH net]: ...
+> > 
+> > * Looking over git history, it seems that an appropriate prefix
+> >   for patches for this code is 'tls: '
+> > 
+> >   Subject [PATCH net]: tls: ...
+> > 
+> > * Also, please try to make the subject a bit more succinct
+> > 
+> > > ---
+> > >  net/tls/tls_sw.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > 
+> > > diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+> > > index 9937d4c810f2..b1fa62de9dab 100644
+> > > --- a/net/tls/tls_sw.c
+> > > +++ b/net/tls/tls_sw.c
+> > > @@ -2533,7 +2533,7 @@ void tls_sw_cancel_work_tx(struct tls_context *tls_ctx)
+> > >  
+> > >  	set_bit(BIT_TX_CLOSING, &ctx->tx_bitmask);
+> > >  	set_bit(BIT_TX_SCHEDULED, &ctx->tx_bitmask);
+> > > -	cancel_delayed_work_sync(&ctx->tx_work.work);
+> > > +	disable_delayed_work_sync(&ctx->tx_work.work);
+> > >  }
+> > >  
+> > >  void tls_sw_release_resources_tx(struct sock *sk)
+> > > -- 
+> > > 2.43.0
+> > > ---
+> > > 
+> > > Dear,
+> > > 
+> > > The following is a simplified scenario illustrating how each race can occur. Since tls_sw_cancel_work_tx() does not hold lock_sock(), it can race with tls_write_space().
+> > > ```
+> > >           cpu0                                             cpu1
+> > > 
+> > > tls_sk_proto_close()
+> > >   tls_sw_cancel_work_tx()
+> > >                                                     tls_write_space()
+> > >                                                       tls_sw_write_space()
+> > >                                                       if (!test_and_set_bit(BIT_TX_SCHEDULED, &tx_ctx->tx_bitmask))
+> > >     set_bit(BIT_TX_SCHEDULED, &ctx->tx_bitmask);
+> > >     cancel_delayed_work_sync(&ctx->tx_work.work);
+> > >                                                       schedule_delayed_work(&tx_ctx->tx_work.work, 0);
+> > > ```
+> > 
+> > I think that the text above would be best included in the patch description.
+> > At least for me it is fundamental to understanding the problem.
+> 
+> Understood. I will add the race scenario description to the patch.
+> 
+> > 
+> > > 
+> > > Best regards,
+> > > Hyunwoo Kim
+> > > 
+> > 
+> > I see three similar patches on the mailing list.
+> > The comments above go for them too.
+> > And It would probably be useful to just handle one at a time,
+> > to allow for proper feedback. Or bundle them in a patchset.
+> 
+> Since the core of this bug pattern is espintcp, I will submit a revised 
+> espintcp v2 patch shortly. 
+> I would appreciate it if you could review the espintcp v2 patch. 
+> Once the espintcp review is done, I will apply the feedback to the 
+> remaining strparser and tls patches as well.
 
-Thanks for the update.
+Thanks.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+I have looked over the espintcp patch.
+
+It looks good to me. But I think it would be good to include
+some sort of race analysis in the commit message: something similar
+to the cpu0 / cpu1 text above, but perhaps with a different case explained.
+
+Also, I think the other comments above apply to that patch too.
+
+I will respond to that patch pointing to this message.
+
+> 
+> Best regards,
+> Hyunwoo Kim
+> 
+> > 
+> > -- 
+> > pw-bot: changes-requested
+> 
 
