@@ -1,1205 +1,180 @@
-Return-Path: <netdev+bounces-259300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259307-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GAePFfqmlWkQTAIAu9opvQ
-	(envelope-from <netdev+bounces-259300-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 12:48:10 +0100
+	id mFtbJACwlWkvTwIAu9opvQ
+	(envelope-from <netdev+bounces-259307-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 13:26:40 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A994415610B
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 12:48:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DA958156563
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 13:26:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2A4DB3008757
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 11:48:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6214A300CC1A
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 12:26:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9784F2FDC28;
-	Wed, 18 Feb 2026 11:48:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AzKR7X1b"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD8D9312820;
+	Wed, 18 Feb 2026 12:26:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com [209.85.161.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C9F62FC890
-	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 11:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46C16302163
+	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 12:26:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771415287; cv=none; b=YMnjjrKmK15Bs8wl7jvq8YvVGVNl2GwgrTh0eNC3jc/0DhmaCPnAuDEuId3GX/q+yMSriMLyc7UJXpdxd6p+w+MpQ+U+FJZ9dUDm25h78D+6vEln9f2ElA7xT5fM5PfdAJkRmEd0lMouL2hEB3lSiW2joZNsLPAdh5tBfs5MR+Y=
+	t=1771417592; cv=none; b=MARfVkRIRA6sqm3jsTMN5a4X5I0S41ONXmKzXSXfMFsYbY/lDMM7rAxnVUp7HWWH8RxEO77vHxSLPqWNPrPStBMzpQ1/Nv2fRJ0vKTelQ9BBx9rWY1x1tAkoHF8570Tf1S8adCYGlVUqaJ2ya1h+6bcmisIoxQ4VKx1Dmlc6okQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771415287; c=relaxed/simple;
-	bh=8KdZGajiKELKgsRbuLrjr2UIjBDmVhoe1WGe93gA8w4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p7GM3UaZsUof737xrEsEOO8Fy2fJw9P1cBIhCuAWZeaqZncoEpWzahuWiJlmV9XuCKwnwOTcwRzhny6eqLjJegHeL9v6kE80Fo3oCD7Af/PsjvCYQQr7sDh2SW1QKe59oAm1KElX6Dam/LvnFfvGWOQuKBDHXoGC13CO6NVpp6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AzKR7X1b; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1771415286; x=1802951286;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=8KdZGajiKELKgsRbuLrjr2UIjBDmVhoe1WGe93gA8w4=;
-  b=AzKR7X1baXjcA96T65/FqJw52OmU7nsMk6jBPVT0/4j5B8NMXSdhd708
-   8RsDW+A49Ed29x2xxEwPIfq6VkxBEKY3ocuI7w0JQyuys+cOc9TcXCS6q
-   BFsmpgAmc7sehetJF/nb9A93z5vv275G8ssDt9hJaTNR84wrHFCXZ6tpw
-   BcKIKwGSy0ZUFrYxAuDyu2YQsNs0C4p+kp3cVuaswvkL5+sqDjMUGZdBz
-   OVnTGYF/NwxNiTgsdtef+rek7J3bD6XUXNMvntqrnXCy+9k9COmS/Y28m
-   l7sr5eRbbgpMKgJac+lkhw8op34Sg2DfVL78DZn8PIzJfWhgKj37CtZyK
-   Q==;
-X-CSE-ConnectionGUID: 0in2xPhuTLWKjGGnk+XxCw==
-X-CSE-MsgGUID: TbX1etzhS+yygMvZ3ykm3w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11704"; a="72665186"
-X-IronPort-AV: E=Sophos;i="6.21,298,1763452800"; 
-   d="scan'208";a="72665186"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2026 03:48:05 -0800
-X-CSE-ConnectionGUID: +2z+sxSBR6iBtwVH1V/ZWg==
-X-CSE-MsgGUID: cfsW3RLuQoa2bBkV9QRINw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,298,1763452800"; 
-   d="scan'208";a="212537862"
-Received: from rtauro-desk.iind.intel.com ([10.190.238.50])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2026 03:47:58 -0800
-From: Riana Tauro <riana.tauro@intel.com>
-To: intel-xe@lists.freedesktop.org,
-	dri-devel@lists.freedesktop.org
-Cc: aravind.iddamsetty@linux.intel.com,
-	anshuman.gupta@intel.com,
-	rodrigo.vivi@intel.com,
-	joonas.lahtinen@linux.intel.com,
-	simona.vetter@ffwll.ch,
-	airlied@gmail.com,
-	pratik.bari@intel.com,
-	joshua.santosh.ranjan@intel.com,
-	ashwin.kumar.kulkarni@intel.com,
-	shubham.kumar@intel.com,
-	ravi.kishore.koppuravuri@intel.com,
-	raag.jadav@intel.com,
-	Zack McKevitt <zachary.mckevitt@oss.qualcomm.com>,
-	Lijo Lazar <lijo.lazar@amd.com>,
-	Hawking Zhang <Hawking.Zhang@amd.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org,
-	Riana Tauro <riana.tauro@intel.com>
-Subject: [PATCH v7 1/5] drm/ras: Introduce the DRM RAS infrastructure over generic netlink
-Date: Wed, 18 Feb 2026 17:49:03 +0530
-Message-ID: <20260218121904.157295-8-riana.tauro@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20260218121904.157295-7-riana.tauro@intel.com>
-References: <20260218121904.157295-7-riana.tauro@intel.com>
+	s=arc-20240116; t=1771417592; c=relaxed/simple;
+	bh=tR+orXm+QpSEbpPmDkmO5MhxYeOlH5Awe1VFFJj+aLk=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Ph+gzU9JtwK0hzXFVsfCNRqhYmWS+InqIDk6enuu4kdRrgGfpeFic1IaQ2O5yl+M9PzV0uNwDVaAZPq8sL/LgtTpgQhJdH/T8cxTlpaA+0Blieuppm1ZU0yNlWb7qC0EFN+To5miwbrNlEHpn8HrdI4qyeNnwgMRo4SSnVHR6TQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-67951b29107so31242771eaf.2
+        for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 04:26:31 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771417590; x=1772022390;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MpnbwtwHTnmSiRy508Y4HKeHxUD2rHJYwm+SdOQF/PM=;
+        b=aNFED62s+9HTS9RQEUQz0mnK6KN9f7Qfa14ZmpVQREjwZLQ3O5UdcGO6xxP5zDG2OL
+         XqW+oo6CuR23oBW19HuMykw8k4kd+fE/sWnxMGp43yCkZ/5fCiKCM5TH0/E26UTSN30b
+         ikYL2b3+QodixIgGf1MVN7e4iHHZk0QbZB4MAxd/XpvTFdn7zfiSN2XNaA5STfPU7+yQ
+         WzMZ2WdaQ8AsbVSI1NbngA2o8sZN3Ix89/eOqqj1rin8cONr0tVUN+/T79aN7Sg7eWIk
+         jAVhgKFTgNaKXipvrxrCbv+haEP576QAGS8RaQ/wN5C+xOFHofq842npiZH9We40UY0i
+         NT+A==
+X-Forwarded-Encrypted: i=1; AJvYcCXsbGQzdxPHemBWU85QbuENXFklxLIeSwW9+ANvbGir4IMgAdCT7NDcrXfoWyMZ+cFpOV5TLrk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIU0shi24avg25CowyjFk/RdJBOBJdwcmqMiFJA+xXkTvxB6eA
+	f9EIb58QSfgNjrCR0dhVDvj5HUcxU+4yBwOy6uLsRoYRJZWRgF5FXVJNr3ajm86T925kNomtl6V
+	K2+mzNiSE/JHnCGiKkFLqYmhYauL++NAE6m2VZO9Ec8lcQSsL91U8IZ6pkO4=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6820:4912:b0:677:5e0a:a92d with SMTP id
+ 006d021491bc7-679a7487a67mr691583eaf.73.1771417590173; Wed, 18 Feb 2026
+ 04:26:30 -0800 (PST)
+Date: Wed, 18 Feb 2026 04:26:30 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6995aff6.050a0220.2eeac1.014e.GAE@google.com>
+Subject: [syzbot] [net?] WARNING in ops_undo_list
+From: syzbot <syzbot+5a287bcdc08104bc3132@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=17f5c46dd78c01cf];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259300-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[linux.intel.com,intel.com,ffwll.ch,gmail.com,oss.qualcomm.com,amd.com,kernel.org,davemloft.net,redhat.com,google.com,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[riana.tauro@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-259307-lists,netdev=lfdr.de,5a287bcdc08104bc3132];
+	SUBJECT_HAS_QUESTION(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim,intel.com:email,amd.com:email]
-X-Rspamd-Queue-Id: A994415610B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[googlegroups.com:email,appspotmail.com:email,goo.gl:url,syzkaller.appspot.com:url]
+X-Rspamd-Queue-Id: DA958156563
 X-Rspamd-Action: no action
 
-From: Rodrigo Vivi <rodrigo.vivi@intel.com>
+Hello,
 
-Introduces the DRM RAS infrastructure over generic netlink.
+syzbot found the following issue on:
 
-The new interface allows drivers to expose RAS nodes and their
-associated error counters to userspace in a structured and extensible
-way. Each drm_ras node can register its own set of error counters, which
-are then discoverable and queryable through netlink operations. This
-lays the groundwork for reporting and managing hardware error states
-in a unified manner across different DRM drivers.
+HEAD commit:    77c5e3fdd279 Merge branch 'selftests-forwarding-fix-br_net..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=14b07652580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=17f5c46dd78c01cf
+dashboard link: https://syzkaller.appspot.com/bug?extid=5a287bcdc08104bc3132
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
 
-Currently is only supports error-counter nodes. But it can be
-extended later.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-The registration is also no tied to any drm node, so it can be
-used by accel devices as well.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/90a57d114c3a/disk-77c5e3fd.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/f0cb3d6cda5d/vmlinux-77c5e3fd.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/ad4ef00f313f/bzImage-77c5e3fd.xz
 
-It uses the new and mandatory YAML description format stored in
-Documentation/netlink/specs/. This forces a single generic netlink
-family namespace for the entire drm: "drm-ras".
-But multiple-endpoints are supported within the single family.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+5a287bcdc08104bc3132@syzkaller.appspotmail.com
 
-Any modification to this API needs to be applied to
-Documentation/netlink/specs/drm_ras.yaml before regenerating the
-code:
+ip6erspan0 (unregistering): left allmulticast mode
+bond7 (unregistering): (slave ip6gretap1): Releasing active interface
+bond12 (unregistering): (slave geneve2): Releasing active interface
+bond0 (unregistering): Released all slaves
+bond1 (unregistering): Error: No native XDP support for the current bonding mode
+------------[ cut here ]------------
+dev_xdp_install(dev, mode, bpf_op, NULL, 0, NULL)
+WARNING: net/core/dev.c:10361 at dev_xdp_uninstall net/core/dev.c:10361 [inline], CPU#0: kworker/u8:22/11031
+WARNING: net/core/dev.c:10361 at unregister_netdevice_many_notify+0x1efd/0x2370 net/core/dev.c:12393, CPU#0: kworker/u8:22/11031
+Modules linked in:
+CPU: 0 UID: 0 PID: 11031 Comm: kworker/u8:22 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2026
+Workqueue: netns cleanup_net
+RIP: 0010:dev_xdp_uninstall net/core/dev.c:10361 [inline]
+RIP: 0010:unregister_netdevice_many_notify+0x1efd/0x2370 net/core/dev.c:12393
+Code: 0f b9 3a e9 00 ff ff ff e8 50 51 52 f8 90 0f 0b 90 e9 1d ff ff ff e8 42 51 52 f8 90 0f 0b 90 e9 a0 f3 ff ff e8 34 51 52 f8 90 <0f> 0b 90 e9 f1 f4 ff ff e8 26 51 52 f8 90 0f 0b 90 e9 4e f6 ff ff
+RSP: 0018:ffffc90003b2f7c0 EFLAGS: 00010293
+RAX: ffffffff8971e99c RBX: ffff888052f84c40 RCX: ffff88807896bc80
+RDX: 0000000000000000 RSI: 00000000ffffffa1 RDI: 0000000000000000
+RBP: ffffc90003b2f930 R08: ffffc90003b2f207 R09: 1ffff92000765e40
+R10: dffffc0000000000 R11: fffff52000765e41 R12: 00000000ffffffa1
+R13: ffff888052f84c38 R14: 1ffff1100a5f0988 R15: ffffc9000df67000
+FS:  0000000000000000(0000) GS:ffff8881254ae000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f60871d5d58 CR3: 000000006c41c000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ ops_exit_rtnl_list net/core/net_namespace.c:187 [inline]
+ ops_undo_list+0x3d3/0x940 net/core/net_namespace.c:248
+ cleanup_net+0x56b/0x800 net/core/net_namespace.c:704
+ process_one_work kernel/workqueue.c:3275 [inline]
+ process_scheduled_works+0xaec/0x17a0 kernel/workqueue.c:3358
+ worker_thread+0xa50/0xfc0 kernel/workqueue.c:3439
+ kthread+0x388/0x470 kernel/kthread.c:467
+ ret_from_fork+0x51e/0xb90 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
 
-$ tools/net/ynl/pyynl/ynl_gen_c.py --spec \
- Documentation/netlink/specs/drm_ras.yaml --mode uapi --header \
- > include/uapi/drm/drm_ras.h
 
-$ tools/net/ynl/pyynl/ynl_gen_c.py --spec \
- Documentation/netlink/specs/drm_ras.yaml --mode kernel --header \
- > include/drm/drm_ras_nl.h
-
-$ tools/net/ynl/pyynl/ynl_gen_c.py --spec \
- Documentation/netlink/specs/drm_ras.yaml --mode kernel --source \
- > drivers/gpu/drm/drm_ras_nl.c
-
-Cc: Zack McKevitt <zachary.mckevitt@oss.qualcomm.com>
-Cc: Lijo Lazar <lijo.lazar@amd.com>
-Cc: Hawking Zhang <Hawking.Zhang@amd.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org
-Co-developed-by: Aravind Iddamsetty <aravind.iddamsetty@linux.intel.com>
-Signed-off-by: Aravind Iddamsetty <aravind.iddamsetty@linux.intel.com>
-Signed-off-by: Rodrigo Vivi <rodrigo.vivi@intel.com>
-Signed-off-by: Riana Tauro <riana.tauro@intel.com>
-Reviewed-by: Zack McKevitt <zachary.mckevitt@oss.qualcomm.com>
 ---
-v2: fix doc and memory leak
-    use xe_for_each_start
-    use standard genlmsg_iput (Jakub Kicinski)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-v3: add documentation to index
-    modify documentation to mention uAPI requirements (Rodrigo)
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-v4: fix typo (Zack)
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-v5: fix kernel-robot reported htmldocs error
-    fix kernel-robot reported build error on csky arch
----
- Documentation/gpu/drm-ras.rst            | 107 +++++++
- Documentation/gpu/index.rst              |   1 +
- Documentation/netlink/specs/drm_ras.yaml | 130 +++++++++
- drivers/gpu/drm/Kconfig                  |  10 +
- drivers/gpu/drm/Makefile                 |   1 +
- drivers/gpu/drm/drm_drv.c                |   6 +
- drivers/gpu/drm/drm_ras.c                | 354 +++++++++++++++++++++++
- drivers/gpu/drm/drm_ras_genl_family.c    |  42 +++
- drivers/gpu/drm/drm_ras_nl.c             |  54 ++++
- include/drm/drm_ras.h                    |  76 +++++
- include/drm/drm_ras_genl_family.h        |  17 ++
- include/drm/drm_ras_nl.h                 |  24 ++
- include/uapi/drm/drm_ras.h               |  49 ++++
- 13 files changed, 871 insertions(+)
- create mode 100644 Documentation/gpu/drm-ras.rst
- create mode 100644 Documentation/netlink/specs/drm_ras.yaml
- create mode 100644 drivers/gpu/drm/drm_ras.c
- create mode 100644 drivers/gpu/drm/drm_ras_genl_family.c
- create mode 100644 drivers/gpu/drm/drm_ras_nl.c
- create mode 100644 include/drm/drm_ras.h
- create mode 100644 include/drm/drm_ras_genl_family.h
- create mode 100644 include/drm/drm_ras_nl.h
- create mode 100644 include/uapi/drm/drm_ras.h
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-diff --git a/Documentation/gpu/drm-ras.rst b/Documentation/gpu/drm-ras.rst
-new file mode 100644
-index 000000000000..0b3e1550e378
---- /dev/null
-+++ b/Documentation/gpu/drm-ras.rst
-@@ -0,0 +1,107 @@
-+.. SPDX-License-Identifier: GPL-2.0+
-+
-+============================
-+DRM RAS over Generic Netlink
-+============================
-+
-+The DRM RAS (Reliability, Availability, Serviceability) interface provides a
-+standardized way for GPU/accelerator drivers to expose error counters and
-+other reliability nodes to user space via Generic Netlink. This allows
-+diagnostic tools, monitoring daemons, or test infrastructure to query hardware
-+health in a uniform way across different DRM drivers.
-+
-+Key Goals:
-+
-+* Provide a standardized RAS solution for GPU and accelerator drivers, enabling
-+  data center monitoring and reliability operations.
-+* Implement a single drm-ras Generic Netlink family to meet modern Netlink YAML
-+  specifications and centralize all RAS-related communication in one namespace.
-+* Support a basic error counter interface, addressing the immediate, essential
-+  monitoring needs.
-+* Offer a flexible, future-proof interface that can be extended to support
-+  additional types of RAS data in the future.
-+* Allow multiple nodes per driver, enabling drivers to register separate
-+  nodes for different IP blocks, sub-blocks, or other logical subdivisions
-+  as applicable.
-+
-+Nodes
-+=====
-+
-+Nodes are logical abstractions representing an error source or block within
-+the device. Currently, only error counter nodes is supported.
-+
-+Drivers are responsible for registering and unregistering nodes via the
-+`drm_ras_node_register()` and `drm_ras_node_unregister()` APIs.
-+
-+Node Management
-+-------------------
-+
-+.. kernel-doc:: drivers/gpu/drm/drm_ras.c
-+   :doc: DRM RAS Node Management
-+.. kernel-doc:: drivers/gpu/drm/drm_ras.c
-+   :internal:
-+
-+Generic Netlink Usage
-+=====================
-+
-+The interface is implemented as a Generic Netlink family named ``drm-ras``.
-+User space tools can:
-+
-+* List registered nodes with the ``get-nodes`` command.
-+* List all error counters in an node with the ``get-error-counters`` command.
-+* Query error counters using the ``query-error-counter`` command.
-+
-+YAML-based Interface
-+--------------------
-+
-+The interface is described in a YAML specification ``Documentation/netlink/specs/drm_ras.yaml``
-+
-+This YAML is used to auto-generate user space bindings via
-+``tools/net/ynl/pyynl/ynl_gen_c.py``, and drives the structure of netlink
-+attributes and operations.
-+
-+Usage Notes
-+-----------
-+
-+* User space must first enumerate nodes to obtain their IDs.
-+* Node IDs or Node names can be used for all further queries, such as error counters.
-+* Error counters can be queried by either the Error ID or Error name.
-+* Query Parameters should be defined as part of the uAPI to ensure user interface stability.
-+* The interface supports future extension by adding new node types and
-+  additional attributes.
-+
-+Example: List nodes using ynl
-+
-+.. code-block:: bash
-+
-+    sudo ynl --family drm_ras  --dump list-nodes
-+    [{'device-name': '0000:03:00.0',
-+    'node-id': 0,
-+    'node-name': 'correctable-errors',
-+    'node-type': 'error-counter'},
-+    {'device-name': '0000:03:00.0',
-+     'node-id': 1,
-+    'node-name': 'nonfatal-errors',
-+    'node-type': 'error-counter'},
-+    {'device-name': '0000:03:00.0',
-+    'node-id': 2,
-+    'node-name': 'fatal-errors',
-+    'node-type': 'error-counter'}]
-+
-+Example: List all error counters using ynl
-+
-+.. code-block:: bash
-+
-+
-+   sudo ynl --family drm_ras  --dump get-error-counters --json '{"node-id":1}'
-+   [{'error-id': 1, 'error-name': 'error_name_1', 'error-value': 0},
-+   {'error-id': 2, 'error-name': 'error_name_2', 'error-value': 0}]
-+
-+
-+Example: Query an error counter for a given node
-+
-+.. code-block:: bash
-+
-+   sudo ynl --family drm_ras --do query-error-counter  --json '{"node-id":2, "error-id":1}'
-+   {'error-id': 1, 'error-name': 'error_name_1', 'error-value': 0}
-+
-diff --git a/Documentation/gpu/index.rst b/Documentation/gpu/index.rst
-index 7dcb15850afd..60c73fdcfeed 100644
---- a/Documentation/gpu/index.rst
-+++ b/Documentation/gpu/index.rst
-@@ -9,6 +9,7 @@ GPU Driver Developer's Guide
-    drm-mm
-    drm-kms
-    drm-kms-helpers
-+   drm-ras
-    drm-uapi
-    drm-usage-stats
-    driver-uapi
-diff --git a/Documentation/netlink/specs/drm_ras.yaml b/Documentation/netlink/specs/drm_ras.yaml
-new file mode 100644
-index 000000000000..be0e379c5bc9
---- /dev/null
-+++ b/Documentation/netlink/specs/drm_ras.yaml
-@@ -0,0 +1,130 @@
-+# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-+---
-+name: drm-ras
-+protocol: genetlink
-+uapi-header: drm/drm_ras.h
-+
-+doc: >-
-+  DRM RAS (Reliability, Availability, Serviceability) over Generic Netlink.
-+  Provides a standardized mechanism for DRM drivers to register "nodes"
-+  representing hardware/software components capable of reporting error counters.
-+  Userspace tools can query the list of nodes or individual error counters
-+  via the Generic Netlink interface.
-+
-+definitions:
-+  -
-+    type: enum
-+    name: node-type
-+    value-start: 1
-+    entries: [error-counter]
-+    doc: >-
-+         Type of the node. Currently, only error-counter nodes are
-+         supported, which expose reliability counters for a hardware/software
-+         component.
-+
-+attribute-sets:
-+  -
-+    name: node-attrs
-+    attributes:
-+      -
-+        name: node-id
-+        type: u32
-+        doc: >-
-+             Unique identifier for the node.
-+             Assigned dynamically by the DRM RAS core upon registration.
-+      -
-+        name: device-name
-+        type: string
-+        doc: >-
-+             Device name chosen by the driver at registration.
-+             Can be a PCI BDF, UUID, or module name if unique.
-+      -
-+        name: node-name
-+        type: string
-+        doc: >-
-+             Node name chosen by the driver at registration.
-+             Can be an IP block name, or any name that identifies the
-+             RAS node inside the device.
-+      -
-+        name: node-type
-+        type: u32
-+        doc: Type of this node, identifying its function.
-+        enum: node-type
-+  -
-+    name: error-counter-attrs
-+    attributes:
-+      -
-+        name: node-id
-+        type: u32
-+        doc:  Node ID targeted by this error counter operation.
-+      -
-+        name: error-id
-+        type: u32
-+        doc: Unique identifier for a specific error counter within an node.
-+      -
-+        name: error-name
-+        type: string
-+        doc: Name of the error.
-+      -
-+        name: error-value
-+        type: u32
-+        doc: Current value of the requested error counter.
-+
-+operations:
-+  list:
-+    -
-+      name: list-nodes
-+      doc: >-
-+           Retrieve the full list of currently registered DRM RAS nodes.
-+           Each node includes its dynamically assigned ID, name, and type.
-+           **Important:** User space must call this operation first to obtain
-+           the node IDs. These IDs are required for all subsequent
-+           operations on nodes, such as querying error counters.
-+      attribute-set: node-attrs
-+      flags: [admin-perm]
-+      dump:
-+        reply:
-+          attributes:
-+            - node-id
-+            - device-name
-+            - node-name
-+            - node-type
-+    -
-+      name: get-error-counters
-+      doc: >-
-+           Retrieve the full list of error counters for a given node.
-+           The response include the id, the name, and even the current
-+           value of each counter.
-+      attribute-set: error-counter-attrs
-+      flags: [admin-perm]
-+      dump:
-+        request:
-+          attributes:
-+            - node-id
-+        reply:
-+          attributes:
-+            - error-id
-+            - error-name
-+            - error-value
-+    -
-+      name: query-error-counter
-+      doc: >-
-+           Query the information of a specific error counter for a given node.
-+           Users must provide the node ID and the error counter ID.
-+           The response contains the id, the name, and the current value
-+           of the counter.
-+      attribute-set: error-counter-attrs
-+      flags: [admin-perm]
-+      do:
-+        request:
-+          attributes:
-+            - node-id
-+            - error-id
-+        reply:
-+          attributes:
-+            - error-id
-+            - error-name
-+            - error-value
-+
-+kernel-family:
-+  headers: ["drm/drm_ras_nl.h"]
-diff --git a/drivers/gpu/drm/Kconfig b/drivers/gpu/drm/Kconfig
-index 0d0657dd1b41..5386248e75b6 100644
---- a/drivers/gpu/drm/Kconfig
-+++ b/drivers/gpu/drm/Kconfig
-@@ -130,6 +130,16 @@ config DRM_PANIC_SCREEN_QR_VERSION
- 	  Smaller QR code are easier to read, but will contain less debugging
- 	  data. Default is 40.
- 
-+config DRM_RAS
-+	bool "DRM RAS support"
-+	depends on DRM
-+	depends on NET
-+	help
-+	  Enables the DRM RAS (Reliability, Availability and Serviceability)
-+	  support for DRM drivers. This provides a Generic Netlink interface
-+	  for error reporting and queries.
-+	  If in doubt, say "N".
-+
- config DRM_DEBUG_DP_MST_TOPOLOGY_REFS
-         bool "Enable refcount backtrace history in the DP MST helpers"
- 	depends on STACKTRACE_SUPPORT
-diff --git a/drivers/gpu/drm/Makefile b/drivers/gpu/drm/Makefile
-index 062162d8e179..b2e031b8eaac 100644
---- a/drivers/gpu/drm/Makefile
-+++ b/drivers/gpu/drm/Makefile
-@@ -94,6 +94,7 @@ drm-$(CONFIG_DRM_ACCEL) += ../../accel/drm_accel.o
- drm-$(CONFIG_DRM_PANIC) += drm_panic.o
- drm-$(CONFIG_DRM_DRAW) += drm_draw.o
- drm-$(CONFIG_DRM_PANIC_SCREEN_QR_CODE) += drm_panic_qr.o
-+drm-$(CONFIG_DRM_RAS) += drm_ras.o drm_ras_nl.o drm_ras_genl_family.o
- obj-$(CONFIG_DRM)	+= drm.o
- 
- obj-$(CONFIG_DRM_PANEL_ORIENTATION_QUIRKS) += drm_panel_orientation_quirks.o
-diff --git a/drivers/gpu/drm/drm_drv.c b/drivers/gpu/drm/drm_drv.c
-index 2915118436ce..6b965c3d3307 100644
---- a/drivers/gpu/drm/drm_drv.c
-+++ b/drivers/gpu/drm/drm_drv.c
-@@ -53,6 +53,7 @@
- #include <drm/drm_panic.h>
- #include <drm/drm_print.h>
- #include <drm/drm_privacy_screen_machine.h>
-+#include <drm/drm_ras_genl_family.h>
- 
- #include "drm_crtc_internal.h"
- #include "drm_internal.h"
-@@ -1223,6 +1224,7 @@ static const struct file_operations drm_stub_fops = {
- 
- static void drm_core_exit(void)
- {
-+	drm_ras_genl_family_unregister();
- 	drm_privacy_screen_lookup_exit();
- 	drm_panic_exit();
- 	accel_core_exit();
-@@ -1261,6 +1263,10 @@ static int __init drm_core_init(void)
- 
- 	drm_privacy_screen_lookup_init();
- 
-+	ret = drm_ras_genl_family_register();
-+	if (ret < 0)
-+		goto error;
-+
- 	drm_core_init_complete = true;
- 
- 	DRM_DEBUG("Initialized\n");
-diff --git a/drivers/gpu/drm/drm_ras.c b/drivers/gpu/drm/drm_ras.c
-new file mode 100644
-index 000000000000..eb8a58d84002
---- /dev/null
-+++ b/drivers/gpu/drm/drm_ras.c
-@@ -0,0 +1,354 @@
-+// SPDX-License-Identifier: MIT
-+/*
-+ * Copyright © 2025 Intel Corporation
-+ */
-+
-+#include <linux/module.h>
-+#include <linux/kernel.h>
-+#include <linux/netdevice.h>
-+#include <linux/xarray.h>
-+#include <net/genetlink.h>
-+
-+#include <drm/drm_ras.h>
-+
-+/**
-+ * DOC: DRM RAS Node Management
-+ *
-+ * This module provides the infrastructure to manage RAS (Reliability,
-+ * Availability, and Serviceability) nodes for DRM drivers. Each
-+ * DRM driver may register one or more RAS nodes, which represent
-+ * logical components capable of reporting error counters and other
-+ * reliability metrics.
-+ *
-+ * The nodes are stored in a global xarray `drm_ras_xa` to allow
-+ * efficient lookup by ID. Nodes can be registered or unregistered
-+ * dynamically at runtime.
-+ *
-+ * A Generic Netlink family `drm_ras` exposes three main operations to
-+ * userspace:
-+ *
-+ * 1. LIST_NODES: Dump all currently registered RAS nodes.
-+ *    The user receives an array of node IDs, names, and types.
-+ *
-+ * 2. GET_ERROR_COUNTERS: Dump all error counters of a given node.
-+ *    The user receives an array of error IDs, names, and current value.
-+ *
-+ * 3. QUERY_ERROR_COUNTER: Query a specific error counter for a given node.
-+ *    Userspace must provide the node ID and the counter ID, and
-+ *    receives the ID, the error name, and its current value.
-+ *
-+ * Node registration:
-+ *
-+ * - drm_ras_node_register(): Registers a new node and assigns
-+ *   it a unique ID in the xarray.
-+ * - drm_ras_node_unregister(): Removes a previously registered
-+ *   node from the xarray.
-+ *
-+ * Node type:
-+ *
-+ * - ERROR_COUNTER:
-+ *     + Currently, only error counters are supported.
-+ *     + The driver must implement the query_error_counter() callback to provide
-+ *       the name and the value of the error counter.
-+ *     + The driver must provide a error_counter_range.last value informing the
-+ *       last valid error ID.
-+ *     + The driver can provide a error_counter_range.first value informing the
-+ *       frst valid error ID.
-+ *     + The error counters in the driver doesn't need to be contiguous, but the
-+ *       driver must return -ENOENT to the query_error_counter as an indication
-+ *       that the ID should be skipped and not listed in the netlink API.
-+ *
-+ * Netlink handlers:
-+ *
-+ * - drm_ras_nl_list_nodes_dumpit(): Implements the LIST_NODES
-+ *   operation, iterating over the xarray.
-+ * - drm_ras_nl_get_error_counters_dumpit(): Implements the GET_ERROR_COUNTERS
-+ *   operation, iterating over the know valid error_counter_range.
-+ * - drm_ras_nl_query_error_counter_doit(): Implements the QUERY_ERROR_COUNTER
-+ *   operation, fetching a counter value from a specific node.
-+ */
-+
-+static DEFINE_XARRAY_ALLOC(drm_ras_xa);
-+
-+/*
-+ * The netlink callback context carries dump state across multiple dumpit calls
-+ */
-+struct drm_ras_ctx {
-+	/* Which xarray id to restart the dump from */
-+	unsigned long restart;
-+};
-+
-+/**
-+ * drm_ras_nl_list_nodes_dumpit() - Dump all registered RAS nodes
-+ * @skb: Netlink message buffer
-+ * @cb: Callback context for multi-part dumps
-+ *
-+ * Iterates over all registered RAS nodes in the global xarray and appends
-+ * their attributes (ID, name, type) to the given netlink message buffer.
-+ * Uses @cb->ctx to track progress in case the message buffer fills up, allowing
-+ * multi-part dump support. On buffer overflow, updates the context to resume
-+ * from the last node on the next invocation.
-+ *
-+ * Return: 0 if all nodes fit in @skb, number of bytes added to @skb if
-+ *          the buffer filled up (requires multi-part continuation), or
-+ *          a negative error code on failure.
-+ */
-+int drm_ras_nl_list_nodes_dumpit(struct sk_buff *skb,
-+				 struct netlink_callback *cb)
-+{
-+	const struct genl_info *info = genl_info_dump(cb);
-+	struct drm_ras_ctx *ctx = (void *)cb->ctx;
-+	struct drm_ras_node *node;
-+	struct nlattr *hdr;
-+	unsigned long id;
-+	int ret;
-+
-+	xa_for_each_start(&drm_ras_xa, id, node, ctx->restart) {
-+		hdr = genlmsg_iput(skb, info);
-+		if (!hdr) {
-+			ret = -EMSGSIZE;
-+			break;
-+		}
-+
-+		ret = nla_put_u32(skb, DRM_RAS_A_NODE_ATTRS_NODE_ID, node->id);
-+		if (ret) {
-+			genlmsg_cancel(skb, hdr);
-+			break;
-+		}
-+
-+		ret = nla_put_string(skb, DRM_RAS_A_NODE_ATTRS_DEVICE_NAME,
-+				     node->device_name);
-+		if (ret) {
-+			genlmsg_cancel(skb, hdr);
-+			break;
-+		}
-+
-+		ret = nla_put_string(skb, DRM_RAS_A_NODE_ATTRS_NODE_NAME,
-+				     node->node_name);
-+		if (ret) {
-+			genlmsg_cancel(skb, hdr);
-+			break;
-+		}
-+
-+		ret = nla_put_u32(skb, DRM_RAS_A_NODE_ATTRS_NODE_TYPE,
-+				  node->type);
-+		if (ret) {
-+			genlmsg_cancel(skb, hdr);
-+			break;
-+		}
-+
-+		genlmsg_end(skb, hdr);
-+	}
-+
-+	if (ret == -EMSGSIZE)
-+		ctx->restart = id;
-+
-+	return ret;
-+}
-+
-+static int get_node_error_counter(u32 node_id, u32 error_id,
-+				  const char **name, u32 *value)
-+{
-+	struct drm_ras_node *node;
-+
-+	node = xa_load(&drm_ras_xa, node_id);
-+	if (!node || !node->query_error_counter)
-+		return -ENOENT;
-+
-+	if (error_id < node->error_counter_range.first ||
-+	    error_id > node->error_counter_range.last)
-+		return -EINVAL;
-+
-+	return node->query_error_counter(node, error_id, name, value);
-+}
-+
-+static int msg_reply_value(struct sk_buff *msg, u32 error_id,
-+			   const char *error_name, u32 value)
-+{
-+	int ret;
-+
-+	ret = nla_put_u32(msg, DRM_RAS_A_ERROR_COUNTER_ATTRS_ERROR_ID, error_id);
-+	if (ret)
-+		return ret;
-+
-+	ret = nla_put_string(msg, DRM_RAS_A_ERROR_COUNTER_ATTRS_ERROR_NAME,
-+			     error_name);
-+	if (ret)
-+		return ret;
-+
-+	return nla_put_u32(msg, DRM_RAS_A_ERROR_COUNTER_ATTRS_ERROR_VALUE,
-+			   value);
-+}
-+
-+static int doit_reply_value(struct genl_info *info, u32 node_id,
-+			    u32 error_id)
-+{
-+	struct sk_buff *msg;
-+	struct nlattr *hdr;
-+	const char *error_name;
-+	u32 value;
-+	int ret;
-+
-+	msg = genlmsg_new(NLMSG_GOODSIZE, GFP_KERNEL);
-+	if (!msg)
-+		return -ENOMEM;
-+
-+	hdr = genlmsg_iput(msg, info);
-+	if (!hdr) {
-+		nlmsg_free(msg);
-+		return -EMSGSIZE;
-+	}
-+
-+	ret = get_node_error_counter(node_id, error_id,
-+				     &error_name, &value);
-+	if (ret)
-+		return ret;
-+
-+	ret = msg_reply_value(msg, error_id, error_name, value);
-+	if (ret) {
-+		genlmsg_cancel(msg, hdr);
-+		nlmsg_free(msg);
-+		return ret;
-+	}
-+
-+	genlmsg_end(msg, hdr);
-+
-+	return genlmsg_reply(msg, info);
-+}
-+
-+/**
-+ * drm_ras_nl_get_error_counters_dumpit() - Dump all Error Counters
-+ * @skb: Netlink message buffer
-+ * @cb: Callback context for multi-part dumps
-+ *
-+ * Iterates over all error counters in a given Node and appends
-+ * their attributes (ID, name, value) to the given netlink message buffer.
-+ * Uses @cb->ctx to track progress in case the message buffer fills up, allowing
-+ * multi-part dump support. On buffer overflow, updates the context to resume
-+ * from the last node on the next invocation.
-+ *
-+ * Return: 0 if all errors fit in @skb, number of bytes added to @skb if
-+ *          the buffer filled up (requires multi-part continuation), or
-+ *          a negative error code on failure.
-+ */
-+int drm_ras_nl_get_error_counters_dumpit(struct sk_buff *skb,
-+					 struct netlink_callback *cb)
-+{
-+	const struct genl_info *info = genl_info_dump(cb);
-+	struct drm_ras_ctx *ctx = (void *)cb->ctx;
-+	struct drm_ras_node *node;
-+	struct nlattr *hdr;
-+	const char *error_name;
-+	u32 node_id, error_id, value;
-+	int ret;
-+
-+	if (!info->attrs || !info->attrs[DRM_RAS_A_ERROR_COUNTER_ATTRS_NODE_ID])
-+		return -EINVAL;
-+
-+	node_id = nla_get_u32(info->attrs[DRM_RAS_A_ERROR_COUNTER_ATTRS_NODE_ID]);
-+
-+	node = xa_load(&drm_ras_xa, node_id);
-+	if (!node)
-+		return -ENOENT;
-+
-+	for (error_id = max(node->error_counter_range.first, ctx->restart);
-+	     error_id <= node->error_counter_range.last;
-+	     error_id++) {
-+		ret = get_node_error_counter(node_id, error_id,
-+					     &error_name, &value);
-+		/*
-+		 * For non-contiguous range, driver return -ENOENT as indication
-+		 * to skip this ID when listing all errors.
-+		 */
-+		if (ret == -ENOENT)
-+			continue;
-+		if (ret)
-+			return ret;
-+
-+		hdr = genlmsg_iput(skb, info);
-+
-+		if (!hdr) {
-+			ret = -EMSGSIZE;
-+			break;
-+		}
-+
-+		ret = msg_reply_value(skb, error_id, error_name, value);
-+		if (ret) {
-+			genlmsg_cancel(skb, hdr);
-+			break;
-+		}
-+
-+		genlmsg_end(skb, hdr);
-+	}
-+
-+	if (ret == -EMSGSIZE)
-+		ctx->restart = error_id;
-+
-+	return ret;
-+}
-+
-+/**
-+ * drm_ras_nl_query_error_counter_doit() - Query an error counter of an node
-+ * @skb: Netlink message buffer
-+ * @info: Generic Netlink info containing attributes of the request
-+ *
-+ * Extracts the node ID and error ID from the netlink attributes and
-+ * retrieves the current value of the corresponding error counter. Sends the
-+ * result back to the requesting user via the standard Genl reply.
-+ *
-+ * Return: 0 on success, or negative errno on failure.
-+ */
-+int drm_ras_nl_query_error_counter_doit(struct sk_buff *skb,
-+					struct genl_info *info)
-+{
-+	u32 node_id, error_id;
-+
-+	if (!info->attrs ||
-+	    !info->attrs[DRM_RAS_A_ERROR_COUNTER_ATTRS_NODE_ID] ||
-+	    !info->attrs[DRM_RAS_A_ERROR_COUNTER_ATTRS_ERROR_ID])
-+		return -EINVAL;
-+
-+	node_id = nla_get_u32(info->attrs[DRM_RAS_A_ERROR_COUNTER_ATTRS_NODE_ID]);
-+	error_id = nla_get_u32(info->attrs[DRM_RAS_A_ERROR_COUNTER_ATTRS_ERROR_ID]);
-+
-+	return doit_reply_value(info, node_id, error_id);
-+}
-+
-+/**
-+ * drm_ras_node_register() - Register a new RAS node
-+ * @node: Node structure to register
-+ *
-+ * Adds the given RAS node to the global node xarray and assigns it
-+ * a unique ID. Both @node->name and @node->type must be valid.
-+ *
-+ * Return: 0 on success, or negative errno on failure:
-+ */
-+int drm_ras_node_register(struct drm_ras_node *node)
-+{
-+	if (!node->device_name || !node->node_name)
-+		return -EINVAL;
-+
-+	/* Currently, only Error Counter Endpoinnts are supported */
-+	if (node->type != DRM_RAS_NODE_TYPE_ERROR_COUNTER)
-+		return -EINVAL;
-+
-+	/* Mandatorty entries for Error Counter Node */
-+	if (node->type == DRM_RAS_NODE_TYPE_ERROR_COUNTER &&
-+	    (!node->error_counter_range.last || !node->query_error_counter))
-+		return -EINVAL;
-+
-+	return xa_alloc(&drm_ras_xa, &node->id, node, xa_limit_32b, GFP_KERNEL);
-+}
-+EXPORT_SYMBOL(drm_ras_node_register);
-+
-+/**
-+ * drm_ras_node_unregister() - Unregister a previously registered node
-+ * @node: Node structure to unregister
-+ *
-+ * Removes the given node from the global node xarray using its ID.
-+ */
-+void drm_ras_node_unregister(struct drm_ras_node *node)
-+{
-+	xa_erase(&drm_ras_xa, node->id);
-+}
-+EXPORT_SYMBOL(drm_ras_node_unregister);
-diff --git a/drivers/gpu/drm/drm_ras_genl_family.c b/drivers/gpu/drm/drm_ras_genl_family.c
-new file mode 100644
-index 000000000000..2d818b8c3808
---- /dev/null
-+++ b/drivers/gpu/drm/drm_ras_genl_family.c
-@@ -0,0 +1,42 @@
-+// SPDX-License-Identifier: MIT
-+/*
-+ * Copyright © 2025 Intel Corporation
-+ */
-+
-+#include <drm/drm_ras_genl_family.h>
-+#include <drm/drm_ras_nl.h>
-+
-+/* Track family registration so the drm_exit can be called at any time */
-+static bool registered;
-+
-+/**
-+ * drm_ras_genl_family_register() - Register drm-ras genl family
-+ *
-+ * Only to be called one at drm_drv_init()
-+ */
-+int drm_ras_genl_family_register(void)
-+{
-+	int ret;
-+
-+	registered = false;
-+
-+	ret = genl_register_family(&drm_ras_nl_family);
-+	if (ret)
-+		return ret;
-+
-+	registered = true;
-+	return 0;
-+}
-+
-+/**
-+ * drm_ras_genl_family_unregister() - Unregister drm-ras genl family
-+ *
-+ * To be called one at drm_drv_exit() at any moment, but only once.
-+ */
-+void drm_ras_genl_family_unregister(void)
-+{
-+	if (registered) {
-+		genl_unregister_family(&drm_ras_nl_family);
-+		registered = false;
-+	}
-+}
-diff --git a/drivers/gpu/drm/drm_ras_nl.c b/drivers/gpu/drm/drm_ras_nl.c
-new file mode 100644
-index 000000000000..fcd1392410e4
---- /dev/null
-+++ b/drivers/gpu/drm/drm_ras_nl.c
-@@ -0,0 +1,54 @@
-+// SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-+/* Do not edit directly, auto-generated from: */
-+/*	Documentation/netlink/specs/drm_ras.yaml */
-+/* YNL-GEN kernel source */
-+
-+#include <net/netlink.h>
-+#include <net/genetlink.h>
-+
-+#include <uapi/drm/drm_ras.h>
-+#include <drm/drm_ras_nl.h>
-+
-+/* DRM_RAS_CMD_GET_ERROR_COUNTERS - dump */
-+static const struct nla_policy drm_ras_get_error_counters_nl_policy[DRM_RAS_A_ERROR_COUNTER_ATTRS_NODE_ID + 1] = {
-+	[DRM_RAS_A_ERROR_COUNTER_ATTRS_NODE_ID] = { .type = NLA_U32, },
-+};
-+
-+/* DRM_RAS_CMD_QUERY_ERROR_COUNTER - do */
-+static const struct nla_policy drm_ras_query_error_counter_nl_policy[DRM_RAS_A_ERROR_COUNTER_ATTRS_ERROR_ID + 1] = {
-+	[DRM_RAS_A_ERROR_COUNTER_ATTRS_NODE_ID] = { .type = NLA_U32, },
-+	[DRM_RAS_A_ERROR_COUNTER_ATTRS_ERROR_ID] = { .type = NLA_U32, },
-+};
-+
-+/* Ops table for drm_ras */
-+static const struct genl_split_ops drm_ras_nl_ops[] = {
-+	{
-+		.cmd	= DRM_RAS_CMD_LIST_NODES,
-+		.dumpit	= drm_ras_nl_list_nodes_dumpit,
-+		.flags	= GENL_ADMIN_PERM | GENL_CMD_CAP_DUMP,
-+	},
-+	{
-+		.cmd		= DRM_RAS_CMD_GET_ERROR_COUNTERS,
-+		.dumpit		= drm_ras_nl_get_error_counters_dumpit,
-+		.policy		= drm_ras_get_error_counters_nl_policy,
-+		.maxattr	= DRM_RAS_A_ERROR_COUNTER_ATTRS_NODE_ID,
-+		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DUMP,
-+	},
-+	{
-+		.cmd		= DRM_RAS_CMD_QUERY_ERROR_COUNTER,
-+		.doit		= drm_ras_nl_query_error_counter_doit,
-+		.policy		= drm_ras_query_error_counter_nl_policy,
-+		.maxattr	= DRM_RAS_A_ERROR_COUNTER_ATTRS_ERROR_ID,
-+		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
-+	},
-+};
-+
-+struct genl_family drm_ras_nl_family __ro_after_init = {
-+	.name		= DRM_RAS_FAMILY_NAME,
-+	.version	= DRM_RAS_FAMILY_VERSION,
-+	.netnsok	= true,
-+	.parallel_ops	= true,
-+	.module		= THIS_MODULE,
-+	.split_ops	= drm_ras_nl_ops,
-+	.n_split_ops	= ARRAY_SIZE(drm_ras_nl_ops),
-+};
-diff --git a/include/drm/drm_ras.h b/include/drm/drm_ras.h
-new file mode 100644
-index 000000000000..bba47a282ef8
---- /dev/null
-+++ b/include/drm/drm_ras.h
-@@ -0,0 +1,76 @@
-+/* SPDX-License-Identifier: MIT */
-+/*
-+ * Copyright © 2025 Intel Corporation
-+ */
-+
-+#ifndef __DRM_RAS_H__
-+#define __DRM_RAS_H__
-+
-+#include "drm_ras_nl.h"
-+
-+/**
-+ * struct drm_ras_node - A DRM RAS Node
-+ */
-+struct drm_ras_node {
-+	/** @id: Unique identifier for the node. Dynamically assigned. */
-+	u32 id;
-+	/**
-+	 * @device_name: Human-readable name of the device. Given by the driver.
-+	 */
-+	const char *device_name;
-+	/** @node_name: Human-readable name of the node. Given by the driver. */
-+	const char *node_name;
-+	/** @type: Type of the node (enum drm_ras_node_type). */
-+	enum drm_ras_node_type type;
-+
-+	/* Error-Counter Related Callback and Variables */
-+
-+	/** @error_counter_range: Range of valid Error IDs for this node. */
-+	struct {
-+		/** @first: First valid Error ID. */
-+		u32 first;
-+		/** @last: Last valid Error ID. Mandatory entry. */
-+		u32 last;
-+	} error_counter_range;
-+
-+	/**
-+	 * @query_error_counter:
-+	 *
-+	 * This callback is used by drm-ras to query a specific error counter.
-+	 * counters supported by this node. Used for input check and to
-+	 * iterate in all counters.
-+	 *
-+	 * Driver should expect query_error_counters() to be called with
-+	 * error_id from `error_counter_range.first` to
-+	 * `error_counter_range.last`.
-+	 *
-+	 * The @query_error_counter is a mandatory callback for
-+	 * error_counter_node.
-+	 *
-+	 * Returns: 0 on success,
-+	 *          -ENOENT when error_id is not supported as an indication that
-+	 *                  drm_ras should silently skip this entry. Used for
-+	 *                  supporting non-contiguous error ranges.
-+	 *                  Driver is responsible for maintaining the list of
-+	 *                  supported error IDs in the range of first to last.
-+	 *          Other negative values on errors that should terminate the
-+	 *          netlink query.
-+	 */
-+	int (*query_error_counter)(struct drm_ras_node *ep, u32 error_id,
-+				   const char **name, u32 *val);
-+
-+	/** @priv: Driver private data */
-+	void *priv;
-+};
-+
-+struct drm_device;
-+
-+#if IS_ENABLED(CONFIG_DRM_RAS)
-+int drm_ras_node_register(struct drm_ras_node *ep);
-+void drm_ras_node_unregister(struct drm_ras_node *ep);
-+#else
-+static inline int drm_ras_node_register(struct drm_ras_node *ep) { return 0; }
-+static inline void drm_ras_node_unregister(struct drm_ras_node *ep) { }
-+#endif
-+
-+#endif
-diff --git a/include/drm/drm_ras_genl_family.h b/include/drm/drm_ras_genl_family.h
-new file mode 100644
-index 000000000000..5931b53429f1
---- /dev/null
-+++ b/include/drm/drm_ras_genl_family.h
-@@ -0,0 +1,17 @@
-+/* SPDX-License-Identifier: MIT */
-+/*
-+ * Copyright © 2025 Intel Corporation
-+ */
-+
-+#ifndef __DRM_RAS_GENL_FAMILY_H__
-+#define __DRM_RAS_GENL_FAMILY_H__
-+
-+#if IS_ENABLED(CONFIG_DRM_RAS)
-+int drm_ras_genl_family_register(void);
-+void drm_ras_genl_family_unregister(void);
-+#else
-+static inline int drm_ras_genl_family_register(void) { return 0; }
-+static inline void drm_ras_genl_family_unregister(void) { }
-+#endif
-+
-+#endif
-diff --git a/include/drm/drm_ras_nl.h b/include/drm/drm_ras_nl.h
-new file mode 100644
-index 000000000000..9613b7d9ffdb
---- /dev/null
-+++ b/include/drm/drm_ras_nl.h
-@@ -0,0 +1,24 @@
-+/* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause) */
-+/* Do not edit directly, auto-generated from: */
-+/*	Documentation/netlink/specs/drm_ras.yaml */
-+/* YNL-GEN kernel header */
-+
-+#ifndef _LINUX_DRM_RAS_GEN_H
-+#define _LINUX_DRM_RAS_GEN_H
-+
-+#include <net/netlink.h>
-+#include <net/genetlink.h>
-+
-+#include <uapi/drm/drm_ras.h>
-+#include <drm/drm_ras_nl.h>
-+
-+int drm_ras_nl_list_nodes_dumpit(struct sk_buff *skb,
-+				 struct netlink_callback *cb);
-+int drm_ras_nl_get_error_counters_dumpit(struct sk_buff *skb,
-+					 struct netlink_callback *cb);
-+int drm_ras_nl_query_error_counter_doit(struct sk_buff *skb,
-+					struct genl_info *info);
-+
-+extern struct genl_family drm_ras_nl_family;
-+
-+#endif /* _LINUX_DRM_RAS_GEN_H */
-diff --git a/include/uapi/drm/drm_ras.h b/include/uapi/drm/drm_ras.h
-new file mode 100644
-index 000000000000..3415ba345ac8
---- /dev/null
-+++ b/include/uapi/drm/drm_ras.h
-@@ -0,0 +1,49 @@
-+/* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause) */
-+/* Do not edit directly, auto-generated from: */
-+/*	Documentation/netlink/specs/drm_ras.yaml */
-+/* YNL-GEN uapi header */
-+
-+#ifndef _UAPI_LINUX_DRM_RAS_H
-+#define _UAPI_LINUX_DRM_RAS_H
-+
-+#define DRM_RAS_FAMILY_NAME	"drm-ras"
-+#define DRM_RAS_FAMILY_VERSION	1
-+
-+/*
-+ * Type of the node. Currently, only error-counter nodes are supported, which
-+ * expose reliability counters for a hardware/software component.
-+ */
-+enum drm_ras_node_type {
-+	DRM_RAS_NODE_TYPE_ERROR_COUNTER = 1,
-+};
-+
-+enum {
-+	DRM_RAS_A_NODE_ATTRS_NODE_ID = 1,
-+	DRM_RAS_A_NODE_ATTRS_DEVICE_NAME,
-+	DRM_RAS_A_NODE_ATTRS_NODE_NAME,
-+	DRM_RAS_A_NODE_ATTRS_NODE_TYPE,
-+
-+	__DRM_RAS_A_NODE_ATTRS_MAX,
-+	DRM_RAS_A_NODE_ATTRS_MAX = (__DRM_RAS_A_NODE_ATTRS_MAX - 1)
-+};
-+
-+enum {
-+	DRM_RAS_A_ERROR_COUNTER_ATTRS_NODE_ID = 1,
-+	DRM_RAS_A_ERROR_COUNTER_ATTRS_ERROR_ID,
-+	DRM_RAS_A_ERROR_COUNTER_ATTRS_ERROR_NAME,
-+	DRM_RAS_A_ERROR_COUNTER_ATTRS_ERROR_VALUE,
-+
-+	__DRM_RAS_A_ERROR_COUNTER_ATTRS_MAX,
-+	DRM_RAS_A_ERROR_COUNTER_ATTRS_MAX = (__DRM_RAS_A_ERROR_COUNTER_ATTRS_MAX - 1)
-+};
-+
-+enum {
-+	DRM_RAS_CMD_LIST_NODES = 1,
-+	DRM_RAS_CMD_GET_ERROR_COUNTERS,
-+	DRM_RAS_CMD_QUERY_ERROR_COUNTER,
-+
-+	__DRM_RAS_CMD_MAX,
-+	DRM_RAS_CMD_MAX = (__DRM_RAS_CMD_MAX - 1)
-+};
-+
-+#endif /* _UAPI_LINUX_DRM_RAS_H */
--- 
-2.47.1
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
+If you want to undo deduplication, reply with:
+#syz undup
 
