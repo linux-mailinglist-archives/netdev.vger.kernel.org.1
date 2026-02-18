@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-259266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259268-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CIzjHhaRlWn1SQIAu9opvQ
-	(envelope-from <netdev+bounces-259266-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 11:14:46 +0100
+	id iLseIGeSlWn1SQIAu9opvQ
+	(envelope-from <netdev+bounces-259268-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 11:20:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66857155386
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 11:14:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7BE61554D1
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 11:20:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6961730244C2
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 10:14:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 18ED031291C9
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 10:14:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9B09344DB4;
-	Wed, 18 Feb 2026 10:13:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9741C345CD9;
+	Wed, 18 Feb 2026 10:13:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GRoqqIpO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UZ7ngsvQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C07BA344D86;
-	Wed, 18 Feb 2026 10:13:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BCF9345758;
+	Wed, 18 Feb 2026 10:13:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771409602; cv=none; b=tFuOi0D5M+cuqzMS7wZCuEsWm98Enb7tV6/pDZCcTnoZL4sJiEnvRibErbakBX9/h8XBexTo1Iot7FazfrUX0HauGi5M+2ZnjrZjZzp53iDV0jXx5jXLdYgT+ywd/EM2SOAc2RoZxfMgNR/8ADjE+Yd8zyHZpabOXzq7XXgSJxo=
+	t=1771409603; cv=none; b=jdGtkcE/GQhpyCl8K7fLJzpPK/b95LCHW1gDY7JClOAutBYTWRpgTEunL2+bskS1CeJRhpkitpSjFaSlVfuvxjeuaE26tKQcr6AplZm0enRpNO5zTGHu0SSIE0laD0lxfdcfOV249gkLuAEEJakdqFcEdAPd1to29U8DGHOgwww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771409602; c=relaxed/simple;
-	bh=ANXFSo26ZIet9VFxR9KfWGVyYc/Hjaq5uByQoaJKpUs=;
+	s=arc-20240116; t=1771409603; c=relaxed/simple;
+	bh=Z36YMV6EMn5rFyaqYGer/gsooo6w2VF9hIyZNnrWbgI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=katqYRDwgRBY+IySj+/N8xDaB6e+fnFycwmNqrlYu5EszcSabCRq17KyuZeqsJKgSDtea3wd9evER7gPG6DuHm+u7DqCl8/XJ/ukEIQeHCka5Xh+g17BsFtvjVhOPVjNyhcyy94DbRKf1WOOs287afaiv2tYz6a84WHXfDn3AdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GRoqqIpO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1B42C19425;
-	Wed, 18 Feb 2026 10:13:22 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ohjxLU5QBJcoqmjTb9UeZ1mpYhwJotYSUep1fP3gwbkanGOdbjtUzy++Rtwy1z+hlUDvY153uV4vdAFxmNqkMFnzmwap5Jd3EaDlos+B5Dpm+jsHizeHsku+s7CBlizgULYYWNoMgt4txQPCTCxbJHhRVo9BdkNMnVXlgCGPi4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UZ7ngsvQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F518C19421;
+	Wed, 18 Feb 2026 10:13:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771409602;
-	bh=ANXFSo26ZIet9VFxR9KfWGVyYc/Hjaq5uByQoaJKpUs=;
+	s=k20201202; t=1771409603;
+	bh=Z36YMV6EMn5rFyaqYGer/gsooo6w2VF9hIyZNnrWbgI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GRoqqIpOh8KBAHdnmBPXjVRd1w+0ZswrOmO5iM3eQgbXb+mSGS7P4eoaqrstOeSJD
-	 kKyRiy8IA+Hr/ga9e79w+L7i7s33ndwthBktovkttS5y8DBBTlH3S8+VOJofTWU/c9
-	 YQjZW4rPCEnbFi/QQduZObO6hYl4j4aHEBYT0tBJaReBlDtHPPecLl4pHYnb8fpZLC
-	 NrGN89fEUyL28wWgQUY2TMm06HUoWZVgq0h8sMRsYCyNGTH6sDQRAsFEsPKuQlbzT+
-	 IECCDJohgVme3rhB49N/nz5j2gm5cDmwVlCEyL2yw+G3Ilt0SwLOZLdTvAagP3cy9G
-	 n6xAbFVPcZnnQ==
+	b=UZ7ngsvQWV+yF2K49kxsi+ciJK1WcKwWLhpRYok7EriWqUsYG1+ZzzpC98QV/LN3l
+	 x1hg94t3i7+rNvR3dLhbArDLu2YMg6Cgz4wHjYx5dP8V0WxTHPZP8ZxxOLS9t+WgD+
+	 IIL/0twb+1YWHTgo+zBwRvaDxbQ92NJA22djnbAntcGyyhFRJ5Sd61HvkRTxrrMNqw
+	 4rjOQAdWYdQilTEDOk3Lg8PZk+Oz0dEsSm8vVUfAY+OOhu5/krsuTYIqyCIsFEddnB
+	 Y99GPuDA43lOC6jikWdLaKoGWyHrIxSWs1EgSCCXQhcFxXbcTcE2mT7CdzZUy1Ieel
+	 /lQQzVLhf79MA==
 Received: from mchehab by mail.kernel.org with local (Exim 4.99.1)
 	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1vseYa-00000000LZf-3pcS;
-	Wed, 18 Feb 2026 11:13:20 +0100
+	id 1vseYb-00000000Lar-0nUE;
+	Wed, 18 Feb 2026 11:13:21 +0100
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To: Jonathan Corbet <corbet@lwn.net>,
 	Linux Doc Mailing List <linux-doc@vger.kernel.org>
@@ -58,9 +58,9 @@ Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	netdev@vger.kernel.org,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
 	Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH 13/38] docs: kdoc_parser: add support for LIST_HEAD
-Date: Wed, 18 Feb 2026 11:12:43 +0100
-Message-ID: <fb829a86209dd902a2b537044a440b28517d7817.1771408406.git.mchehab+huawei@kernel.org>
+Subject: [PATCH 14/38] docs: kdoc_parser: handle struct member macro VIRTIO_DECLARE_FEATURES(name)
+Date: Wed, 18 Feb 2026 11:12:44 +0100
+Message-ID: <7b7809ce8ee561e6023a82288e3c429e9a1889d2.1771408406.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <cover.1771408406.git.mchehab+huawei@kernel.org>
 References: <cover.1771408406.git.mchehab+huawei@kernel.org>
@@ -79,7 +79,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -87,45 +87,48 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259266-lists,netdev=lfdr.de,huawei];
+	TAGGED_FROM(0.00)[bounces-259268-lists,netdev=lfdr.de,huawei];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[mchehab@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,huawei];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,infradead.org:email,intel.com:email]
-X-Rspamd-Queue-Id: 66857155386
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,infradead.org:email]
+X-Rspamd-Queue-Id: C7BE61554D1
 X-Rspamd-Action: no action
 
-Convert LIST_HEAD into struct list_head when handling its
-prototype.
+From: Randy Dunlap <rdunlap@infradead.org>
 
+Parse the macro VIRTIO_DECLARE_FEATURES(name) and expand it to its
+definition. These prevents one build warning:
+
+WARNING: include/linux/virtio.h:188 struct member 'VIRTIO_DECLARE_FEATURES(features' not described in 'virtio_device'
+
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
-Tested-by: Randy Dunlap <rdunlap@infradead.org>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 ---
  tools/lib/python/kdoc/kdoc_parser.py | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/tools/lib/python/kdoc/kdoc_parser.py b/tools/lib/python/kdoc/kdoc_parser.py
-index 25d8a89f32b2..6fe2fa032900 100644
+index 6fe2fa032900..32a30851db08 100644
 --- a/tools/lib/python/kdoc/kdoc_parser.py
 +++ b/tools/lib/python/kdoc/kdoc_parser.py
-@@ -220,6 +220,7 @@ var_xforms = [
-     (KernRe(r"__ro_after_init"), ""),
-     (KernRe(r'\s*__guarded_by\s*\([^\)]*\)', re.S), ""),
-     (KernRe(r'\s*__pt_guarded_by\s*\([^\)]*\)', re.S), ""),
-+    (KernRe(r"LIST_HEAD\(([\w_]+)\)"), r"struct list_head \1"),
-     (KernRe(r"(?://.*)$"), ""),
-     (KernRe(r"(?:/\*.*\*/)"), ""),
-     (KernRe(r";$"), ""),
+@@ -152,6 +152,7 @@ struct_xforms = [
+             struct_args_pattern + r'\)', re.S), r'\1 \2[]'),
+     (KernRe(r'DEFINE_DMA_UNMAP_ADDR\s*\(' + struct_args_pattern + r'\)', re.S), r'dma_addr_t \1'),
+     (KernRe(r'DEFINE_DMA_UNMAP_LEN\s*\(' + struct_args_pattern + r'\)', re.S), r'__u32 \1'),
++    (KernRe(r'VIRTIO_DECLARE_FEATURES\(([\w_]+)\)'), r'union { u64 \1; u64 \1_array[VIRTIO_FEATURES_U64S]; }'),
+ ]
+ #
+ # Struct regexes here are guaranteed to have the end delimiter matching
 -- 
 2.52.0
 
