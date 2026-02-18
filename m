@@ -1,159 +1,184 @@
-Return-Path: <netdev+bounces-259360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259361-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mFjbLlYolmnxbQIAu9opvQ
-	(envelope-from <netdev+bounces-259360-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 22:00:06 +0100
+	id 8PRrCd4rlmlPbwIAu9opvQ
+	(envelope-from <netdev+bounces-259361-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 22:15:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DE6E159B41
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 22:00:06 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3099159CDC
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 22:15:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 15A58305CE21
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 20:57:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 00EF2300753B
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 21:15:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B76F349B16;
-	Wed, 18 Feb 2026 20:57:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A65533439A;
+	Wed, 18 Feb 2026 21:15:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HN1JXgg7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hRI9H51E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76654348898
-	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 20:57:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D046A30F943
+	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 21:15:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771448243; cv=none; b=mrg1CmIXKDpKKhKc4zZFkDfbDLkwZXgtaKdSjcMvPWbuH9xtsZU0euGD2PUj85dH6d1r0ceW3nCDXNrW5rb+r1NkpsJodQYIyCkzof5EWFT21wjdLvhG7YwDEa1mNj/arYNDavVXvAMYgLH/sxJmHItl6bLJPy3SM8RkE4Z2tDw=
+	t=1771449308; cv=none; b=OGAkC5iuqrPo1nuG9q3qeoe3vUaAEGR55DLWlhhBeortXJqMHgtathxD3vHLGB+o1YmtwROq1U7UNRdC4tQ7jq6EbLxIInZA9G2CplFA5nHSHPKAdLZnXe2XLUeUUZMDDtML25k52mLQ64VxZYkYoboSIgetZN7j6/3sq6p+/jg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771448243; c=relaxed/simple;
-	bh=NrImsyeBmcyB/xczM3IyezJ+XEgL14mHdJnKM9XhK+M=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=A2UIj07DdB3B/6DG94VbLzTKXBh9NNHHNJ1Y9qAJ1m86f8/juYJn5uX3OrGl6GM32kLIdjpkA67E40dIzHodmODFSzYyGGMR0aGwcBgYyQwUa/dxErDCXiZzFzCLfbKxI7umNUG+EuziRZMNU3a2bX6Cz8PQLaKY23IJHHIE6Qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HN1JXgg7; arc=none smtp.client-ip=74.125.82.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-12732165d1eso227311c88.1
-        for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 12:57:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771448241; x=1772053041; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jQmTwRzucgCJ+TONChC4KuMJonzwlGON5FYise/WlLY=;
-        b=HN1JXgg7cv1m40/+0AkpjZ6QBQqxcWoIby2fmmQ+KbJhRf+cFjqj3Yk08hqVgGd+C7
-         g6L8F8prXiRQlZQyrQVuMgd2/dqFL+LMWZ4GWdJujdd4Fk+K56MQIKRHtKYzB3sg5Ace
-         9AY918Y2izW7qgKB7gzzCiwwvQyefElUxkivjQxBUHqk0tf8oO239prMYIXr2wnK/qRT
-         n/nrHswM3AIUIatvAuwE9SaUJwP9/dpJ11Km+6Wwc951k6Qtm9NwwueYbMWS7QhWf7gm
-         m4Xj9cfkJjCDTovqbUuNG0TViF9OBp8HXef2XWVNh6VVPToV9+zovOTivVfBrybWiG2d
-         9zSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771448241; x=1772053041;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jQmTwRzucgCJ+TONChC4KuMJonzwlGON5FYise/WlLY=;
-        b=xSA7FOmULqUACB0H0yvP87WUziCwPG9LIInuo+LzH3P14ZDlwtr4dBNnEzYhZT1J2b
-         X2Z5LiwSguM6WSetiwssAvcJsx6BFGtdXugL/NeNu5jRer23OeiN89Zqvt/h2bSMcqMX
-         WZfRMqKgOXm92UdXuCjiYlP+/XT9/iT2gOabwPPMsOyR5S6gNtene0CT5T8CShGHDILH
-         Cpbi9Ry1tCiwjHRzaV847aTsFSFU2dY/TDRedo3Kijh1B1yoeVZvl18gHqR6CLo4PK7W
-         iGP8Qevytz9hcfuLz+VYhuYQ7WkbU0rN8fisw4VFWuMhQ4DeGLiehvlDfYxA4hvcSlao
-         o7Ug==
-X-Forwarded-Encrypted: i=1; AJvYcCU017YpbGEMeOgO/oIkzT59NEIGfNUVps/XTpSgWjmcun+yoiWTg5LSngpm2whzjParqP6YrPo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxA15axx6ck7DVNCndMMRWwTtig3WL3mb078gDssnqLsDS+nsTt
-	73eDAAb/mEvrfJdVV7IJDjlEkFyiv399hq9vbcRV+wEQjV5axad6Szfu
-X-Gm-Gg: AZuq6aIR5j/stDmJvRXqWcWc9d340Gs0/g6zktRTWiWPEjxG/kJvw5+1bHkVT5IId1Q
-	3l3v6K+kOKeGSryDw0Uh9bUgkd0HoQmSQesXS2CMZK1A9mmIm3oBE4K3Tp1SxWK8Lav2ov2CijJ
-	ORueQt1kk6mcFNh0FhOC3bA3X1PJ8bD6ez9c7vZYR9a/JsviYy59NFpToOKYC0UFy6pAayiNjhl
-	iyIdy8hSXizf+Qh1a7QAAL277l5MGQoDEJIEAiPt+nwACf/4L4KqxtkfwBFV9t0yw0oqUv9ThQN
-	v02O/gH9mWppEJybHJtcSMyHiQ5hIf5j7R+dW37Fyizz/BJJtIm4YkwBMS7Yr1YQFYxeBFFvF3J
-	VXydK0WgaXKPdZAFOIUauyJQMoWnsG+7cbNhHOIQ1bOKZ392Kr5yTZ/lSAh2gIzHMR4DHL2eKc3
-	l4IvqiOrmUSQ+JgtJ4oGpwPl0TPdPjCb6hDyVNqRCvzaXmq8BAj7J4+GIgJa9iEvG+
-X-Received: by 2002:a05:7022:6087:b0:119:e56b:9899 with SMTP id a92af1059eb24-127599a5719mr1369362c88.0.1771448240567;
-        Wed, 18 Feb 2026 12:57:20 -0800 (PST)
-Received: from google.com ([2a00:79e0:2ebe:8:265b:f5ad:9e03:677e])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12742cba118sm24748533c88.12.2026.02.18.12.57.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Feb 2026 12:57:20 -0800 (PST)
-Date: Wed, 18 Feb 2026 12:57:17 -0800
-From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Linus Walleij <linusw@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, netdev@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org
-Subject: [PATCH] net: phy: qcom: qca807x: normalize return value of gpio_get
-Message-ID: <aZYnWZqfzKwzzF4f@google.com>
+	s=arc-20240116; t=1771449308; c=relaxed/simple;
+	bh=SgZvd8Sskv0y3be4d0fIiN0IEvSgTvHHZpYtU5oVIAE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bGUc7yPdQeFO115n58kUwOrUsTPpwn8OSURcgDwZtj3zLRU0jRg1yqrpBTCbY3F5RkoCFWWp2fG+jHdu218Mi1hY+jb5NsSvlqBeo+KEkE2fO6C/JMJDZAYSD2PF/iMMWpZGXrfVsL3gPdTElSHaKcensT9hbWALdZDSgzvHdJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hRI9H51E; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1771449305;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=eZU4gWKyKnQkKunk/pkzGylRrazxnAm7GHvdG5YZ6SY=;
+	b=hRI9H51E4tlB2V1xwUEUNIf2/Ode5I7By/9mboHICZoKE8xp4V8mbzgBD7RKA9yqlLQ99j
+	CYTdzuHRvI503IQx8C80oV+MUXtj0CWnlCDAwZvJsHtv+WPgglceWHR93ug4E4YHBIwKd5
+	EZD8x8DcY3/W/MPH4Uf8nsyHpT+yYkE=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-665-vkcSGc0kMhSmxjFwUGM44w-1; Wed,
+ 18 Feb 2026 16:15:02 -0500
+X-MC-Unique: vkcSGc0kMhSmxjFwUGM44w-1
+X-Mimecast-MFC-AGG-ID: vkcSGc0kMhSmxjFwUGM44w_1771449300
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7C4081955BC4;
+	Wed, 18 Feb 2026 21:15:00 +0000 (UTC)
+Received: from ShadowPeak.redhat.com (unknown [10.44.32.59])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 770CB180066F;
+	Wed, 18 Feb 2026 21:14:56 +0000 (UTC)
+From: Petr Oros <poros@redhat.com>
+To: netdev@vger.kernel.org
+Cc: ivecera@redhat.com,
+	Petr Oros <poros@redhat.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH iwl-net] ice: fix missing dpll notification for SW pins
+Date: Wed, 18 Feb 2026 22:14:14 +0100
+Message-ID: <20260218211414.1411163-1-poros@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-259360-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259361-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dmitrytorokhov@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7DE6E159B41
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C3099159CDC
 X-Rspamd-Action: no action
 
-The GPIO get callback is expected to return 0 or 1 (or a negative error
-code). Ensure that the value returned by qca807x_gpio_get() is
-normalized to the [0, 1] range.
+ice_dpll_notify_changes() sends dpll_pin_change_ntf() only for the
+direct CGU input pin stored in d->active_input. Software-controlled
+pins (SMA/U.FL) are separate dpll_pin objects that wrap a backing CGU
+input, but they never receive a change notification. As a result,
+userspace consumers such as synce4l that monitor SMA pins via dpll
+netlink never learn when the pin state transitions (e.g. from
+SELECTABLE to CONNECTED), even though 'dpll pin show' reports the
+correct state on demand.
 
-Signed-off-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+When the active input changes, also send dpll_pin_change_ntf() for any
+registered SMA/U.FL input pin whose backing CGU input matches the old
+or new active input.
+
+Fixes: 2dd5d03c77e2 ("ice: redesign dpll sma/u.fl pins control")
+Signed-off-by: Petr Oros <poros@redhat.com>
 ---
+ drivers/net/ethernet/intel/ice/ice_dpll.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-[First copy went to Andrew privately by mistake]
-
- drivers/net/phy/qcom/qca807x.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/phy/qcom/qca807x.c b/drivers/net/phy/qcom/qca807x.c
-index d8f1ce5a7128..6004da5741af 100644
---- a/drivers/net/phy/qcom/qca807x.c
-+++ b/drivers/net/phy/qcom/qca807x.c
-@@ -375,7 +375,7 @@ static int qca807x_gpio_get(struct gpio_chip *gc, unsigned int offset)
- 	reg = QCA807X_MMD7_LED_FORCE_CTRL(offset);
- 	val = phy_read_mmd(priv->phy, MDIO_MMD_AN, reg);
+diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
+index c2ad39bfe177db..6f855fe4c78d62 100644
+--- a/drivers/net/ethernet/intel/ice/ice_dpll.c
++++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
+@@ -2470,13 +2470,17 @@ static u64 ice_generate_clock_id(struct ice_pf *pf)
+  */
+ static void ice_dpll_notify_changes(struct ice_dpll *d)
+ {
++	struct ice_dplls *dplls = &d->pf->dplls;
+ 	bool pin_notified = false;
++	int i;
  
--	return FIELD_GET(QCA807X_GPIO_FORCE_MODE_MASK, val);
-+	return !!FIELD_GET(QCA807X_GPIO_FORCE_MODE_MASK, val);
- }
- 
- static int qca807x_gpio_set(struct gpio_chip *gc, unsigned int offset, int value)
+ 	if (d->prev_dpll_state != d->dpll_state) {
+ 		d->prev_dpll_state = d->dpll_state;
+ 		dpll_device_change_ntf(d->dpll);
+ 	}
+ 	if (d->prev_input != d->active_input) {
++		struct dpll_pin *old = d->prev_input;
++
+ 		if (d->prev_input)
+ 			dpll_pin_change_ntf(d->prev_input);
+ 		d->prev_input = d->active_input;
+@@ -2484,6 +2488,20 @@ static void ice_dpll_notify_changes(struct ice_dpll *d)
+ 			dpll_pin_change_ntf(d->active_input);
+ 			pin_notified = true;
+ 		}
++		for (i = 0; i < ICE_DPLL_PIN_SW_NUM; i++) {
++			if (dplls->sma[i].pin &&
++			    dplls->sma[i].direction ==
++			    DPLL_PIN_DIRECTION_INPUT &&
++			    (dplls->sma[i].input->pin == d->active_input ||
++			     dplls->sma[i].input->pin == old))
++				dpll_pin_change_ntf(dplls->sma[i].pin);
++			if (dplls->ufl[i].pin &&
++			    dplls->ufl[i].direction ==
++			    DPLL_PIN_DIRECTION_INPUT &&
++			    (dplls->ufl[i].input->pin == d->active_input ||
++			     dplls->ufl[i].input->pin == old))
++				dpll_pin_change_ntf(dplls->ufl[i].pin);
++		}
+ 	}
+ 	if (d->prev_phase_offset != d->phase_offset) {
+ 		d->prev_phase_offset = d->phase_offset;
 -- 
-2.53.0.335.g19a08e0c02-goog
+2.52.0
 
-
--- 
-Dmitry
 
