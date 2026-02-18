@@ -1,46 +1,84 @@
-Return-Path: <netdev+bounces-259221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259222-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WHlUIN1xlWn8RQIAu9opvQ
-	(envelope-from <netdev+bounces-259221-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 09:01:33 +0100
+	id cPGsAAJylWn8RQIAu9opvQ
+	(envelope-from <netdev+bounces-259222-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 09:02:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4155153D33
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 09:01:32 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A7F3153D41
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 09:02:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 98EEF300915E
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 08:01:31 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E87B030054DE
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 08:02:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 475222857F0;
-	Wed, 18 Feb 2026 08:01:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D65C6309DCB;
+	Wed, 18 Feb 2026 08:02:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jc5vXaKF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0002F19DF4F
-	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 08:01:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61E1E2857F0
+	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 08:02:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771401690; cv=none; b=TU6g8lKFk/H7523CjTuSrav7rh3/kTx7mXk3qmHjlHNIQ98CLIbmVg8PoyvhiFqJiF12UEVGogWPh+ES1XRKfWEbwATGTYBwkKT92q0PuNZX4skjj2bsyb+xC/q/X63pqw+O5yiLZvi9qdACxHZChmwp1cFi/WyxkiemfmPuY08=
+	t=1771401727; cv=none; b=BH2QgXzASNFfSfMNZexmE9xbTKnhF5IDtP0lpt43tsodaF9D58VZRU7Bi2lvEjYgc6exSN3SRyYNNtSUrGX4jDJ7heuy4C2fuZzQCjIXYYzQT2rk048ZT4yxpjceVeG9aMk7xVJmpQb0Su0DhFqC3Xz7cH7zHDA+CKKuCCrLY7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771401690; c=relaxed/simple;
-	bh=uEEqcGAmbzr0e+JO2ZCt+O57tGqAqtgD3MpvDgtLlik=;
+	s=arc-20240116; t=1771401727; c=relaxed/simple;
+	bh=XI04HMMZxmtmKIt5krwj5AVJKXwc+CwEajC7Ya2hKUU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YMZxyhtxtXM0p9kQeWfTpMhBHKGwOTpLJFxycqxaezmUxbx0ZFjBmVFkQtX2Yr76+7pAdIfbUm/DuaD4vTI0U8/jicsPyIC9xdEN1O6KSZ+IPW/KCt1hAMk5W4rD+0qtMtL6HJiHw41LPdShN36hSKprdNbbqDiFidQSowFMZXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.221] (p5b13aefb.dip0.t-ipconnect.de [91.19.174.251])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id EC80C4C2C37D45;
-	Wed, 18 Feb 2026 09:00:33 +0100 (CET)
-Message-ID: <705e0576-db72-4ea1-b548-b69197bbaf87@molgen.mpg.de>
-Date: Wed, 18 Feb 2026 09:00:33 +0100
+	 In-Reply-To:Content-Type; b=I1esHILB5FiD1pGvRBxRw9eR14CM2V824vSW2miR3z7Td9exuha1Mmy0VEZbywtRM0qauQBEpg4QCRsuodvbXmJVhHJKRGxy2FnrAvmLFj44ZJ1BwiWEtF7gIBqzP58+6KqOq7BWTjMP1kvWYnsmW7FgkQ62GE5zmdkPWQmr9UY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jc5vXaKF; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-483770e0b25so44600965e9.0
+        for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 00:02:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771401725; x=1772006525; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=joXhlMp7nr1yG3GmLEpDKyVgijmZOHHHCsIq8VlzarI=;
+        b=jc5vXaKFXSWX6BK20tk8Dg53nh+psfN+OUbY0CgimlWQ9eVMRAP8JzOQdW16gggm6p
+         pM4qbabxT+WvKcRG5GFOn6N6A7w6ODP7PqP17MqGerm3kcl2EFlJdQbee0gYyT/OMz18
+         FHaIc+YcbD/G2Tqo1GR/ABHLeBHg20gavlf4IrqbRvnyu1v8t9Xn0HD55DInumSLgu9B
+         FM8Zr83qz1kPJuRIAgBM6KIxBoELjBVIa8hqsaVDD6gkqMwaTXIegh32MGEbi9F2HBnf
+         hgQojdQAAjcETkT3cf8BiEc1NbcylLF9zz1tv+zw63Tx5FD51R3sT07A0/uwMXIW0vGg
+         7j/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771401725; x=1772006525;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=joXhlMp7nr1yG3GmLEpDKyVgijmZOHHHCsIq8VlzarI=;
+        b=lMLooWqU5mQwMgrEg/0gnwv8BgCw86iFr9R9Ph4OD1i30Hjn9ckzbvHGCm7Em97cMm
+         wHWuC+gfSdQSkD89CTXmcs23GXNb4ldYyzH2AAnwWigBe/z1pN7r8eJVRLWGmNb7emO4
+         RAofxofGioIGVGn/5sz2OaWV3IQpO16v1oIipRE1jenH/rhzCs2NJ8Fy6h/q8lvsSJC0
+         nqiTeNLigBsXhFCdUbui7sOACmLFLFPwsRRENoxRTDrdFtz0rGHLE5frt5PbMjo894NL
+         qzVE+qimZvQXFMoF/veSaOc0igr26o27PTKwYcT5dyz384G0GkSAijkzyuRzXGjCdaYp
+         aNhw==
+X-Forwarded-Encrypted: i=1; AJvYcCWpc9Fu5G86/9qGfhutWWJTToBKnVmaHqkye6mac+PwXLbR4WaqHs7gPzEh+Qf8rRNFPhzYy3M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3IoGN9XSbFn0to8XZsk8xp3HT80oXgW0Y9ErIxrvgQCvSMqFi
+	8pmG/2sd6hCslm3KQnpmwhhXZIE5c3+WOkxiEMYtlrRkSSUMW3Yu7Hpk
+X-Gm-Gg: AZuq6aJvrwOcXf8SHkScvq2E5fOKq8DKXQ2UdajDNEefb4GYUsFQNSsEi13fyCaBxnK
+	TSq8Gyf+hxnQJEDJWSJLWgGIZ0l98DswjPBpY4NM64m0rLrSvbq412Tf1ERiFFUqm82FW4dGY8W
+	0sb8DfuBC2/3ic0oyZlDlKYI73BjHMtctEULzzbZ2TavwlktrLJAXroussMBCcMJPVsYj3ds1DD
+	a/YKyQiz5RbSziuvb+UESqldLQNvqHZ/It9dWIfjSwTmwvpsa0lzarFLyGp7WUS3MyoujrkyRxG
+	p+8p1g53WCr+5Og3K7Hv0aPJUiUQzaMoUl5RMolBl1lkGAmsVjOLEzdn7g3LrjyItJVwnkulTtA
+	HP2RTmA/Z6n4cClGhSMYm5Gz2yqTSaFG2VP4sWPSAY9QDThoM82vOAnjfpDuWfLqb+wN/QZ9k4h
+	TGNtcdIx1TpffkCj8iE/uwOPtcXH00MkNPdDUgW3cGsGaDLlM9Ko+GqQ==
+X-Received: by 2002:a05:600c:3143:b0:480:53ce:45d3 with SMTP id 5b1f17b1804b1-483710858d3mr294678345e9.18.1771401724343;
+        Wed, 18 Feb 2026 00:02:04 -0800 (PST)
+Received: from [10.158.36.109] ([72.25.96.17])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4835dd0deeasm527592655e9.12.2026.02.18.00.02.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Feb 2026 00:02:03 -0800 (PST)
+Message-ID: <d56f8f9a-7377-4892-8b29-d5be53eed08e@gmail.com>
+Date: Wed, 18 Feb 2026 10:02:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,206 +86,122 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH v1 iwl-net] iavf: fix out-of-bounds
- writes in iavf_get_ethtool_stats()
-To: Kohei Enju <kohei@enjuk.jp>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
- Mateusz Palczewski <mateusz.palczewski@intel.com>,
- Witold Fijalkowski <witoldx.fijalkowski@intel.com>,
- Przemyslaw Patynowski <przemyslawx.patynowski@intel.com>,
- kohei.enju@gmail.com
-References: <20260214191502.267670-1-kohei@enjuk.jp>
+Subject: Re: [PATCH net-next v2 1/2] selftests: drv-net: rss: validate min RSS
+ table size
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Yael Chemla <ychemla@nvidia.com>, davem@davemloft.net,
+ netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org,
+ Willem de Bruijn <willemb@google.com>, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>,
+ Gal Pressman <gal@nvidia.com>, noren@nvidia.com
+References: <20260131225454.1225151-1-kuba@kernel.org>
+ <9f535014-80eb-4f57-b047-3638579bde9a@nvidia.com>
+ <20260211134319.39710c1d@kernel.org>
+ <dbbe9690-996f-4a63-90a0-baec52c27236@gmail.com>
+ <20260212172215.0a3295a0@kernel.org>
+ <ba1885cc-57e7-488b-946b-d08c1644dcaa@gmail.com>
+ <20260217135727.292acc4e@kernel.org>
 Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260214191502.267670-1-kohei@enjuk.jp>
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20260217135727.292acc4e@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259221-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[lists.osuosl.org,vger.kernel.org,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
-	DMARC_NA(0.00)[mpg.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259222-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ttoukanlinux@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: D4155153D33
+X-Rspamd-Queue-Id: 9A7F3153D41
 X-Rspamd-Action: no action
 
-Dear Kohei,
 
 
-Thank you for your patch.
+On 17/02/2026 23:57, Jakub Kicinski wrote:
+> On Mon, 16 Feb 2026 10:28:52 +0200 Tariq Toukan wrote:
+>>>> This ignores multiple other considerations:
+>>>>
+>>>> 1. Existing behavior: In general, mlx5e today implies 2x factor, so it
+>>>> would fail this new test.
+>>>>
+>>>> 2. Device resources: In large scale (high num of channels, or high num
+>>>> of netdevs on the same chip, or both), it is not obvious that increasing
+>>>> the indirection table size is still desirable, or even possible. To pass
+>>>> the selftest, you'll have to limit the max number of channels.
+>>>>
+>>>> 3. ch_max should win: Related to point #2. Driver should not enforce
+>>>> limitations on supported ch_max just to fulfill the recommendation and
+>>>> pass the test. I prefer flexibility, give the admin the control. That
+>>>> means, driver would use 4x factor (or larger) whenever possible, but
+>>>> would not block configurations in which the 4x factor cannot be satisfied.
+>>>
+>>> Oh I see.. I wasn't aware the CX7 has a limitation of the indirection
+>>> table size.
+>>
+>> There is a limitation, we read it from FW.
+>> It's usually not small, much larger than 256.
+>>
+>> But currently it can vary according to FW decisions in scale (resource
+>> management).
+>>
+>>> I wrote the test because of a similar limitation in a
+>>> different NIC, but that one has been fixed.. I have limited access to
+>>> CX7 NICs, the one I tested on maxed out at 63 queues so the test has
+>>> passed.
+>>>
+>>> Is it not possible to create an indirection table larger than 256
+>>> entries?
+>>
+>> It is possible, depending on the exposed FW capability.
+>> As of today, there are high-scale configurations (many VFs for example)
+>> where the FW exposed cap is lowered.
+> 
+> Not entirely sure what you expect the outcome of this discussion to be.
+> 
+> The 2x indirection table has been proven inadequate for real production
+> use. I'm not talking about some theory or benchmarks, actual workloads
+> reported machines/NICs with such table as unusable (workload starts
+> choking way before reaching expected machine capacity).
+> 
+> That said I just checked out of curiosity and the OCP NIC spec also
+> states:
+> 
+>    The minimum supported indirection table size MUST be 128.
 
-Am 14.02.26 um 20:14 schrieb Kohei Enju:
-> iavf incorrectly uses real_num_tx_queues for ETH_SS_STATS. Since the
-> value could change in runtime, we should use num_tx_queues instead.
-> 
-> Moreover iavf_get_ethtool_stats() uses num_active_queues while
-> iavf_get_sset_count() and iavf_get_stat_strings() use
-> real_num_tx_queues, which triggers out-of-bounds writes when we do
-> "ethtool -L" and "ethtool -S" simultaneously [1].
-> 
-> For example when we change channels from 1 to 8, Thread 3 could be
-> scheduled before Thread 2, and out-of-bounds writes could be triggered
-> in Thread 3:
-> 
-> Thread 1 (ethtool -L)       Thread 2 (work)        Thread 3 (ethtool -S)
-> iavf_set_channels()
-> ...
-> iavf_alloc_queues()
-> -> num_active_queues = 8
-> iavf_schedule_finish_config()
->                                                     iavf_get_sset_count()
->                                                     real_num_tx_queues: 1
->                                                     -> buffer for 1 queue
->                                                     iavf_get_ethtool_stats()
->                                                     num_active_queues: 8
->                                                     -> out-of-bounds!
->                              iavf_finish_config()
->                              -> real_num_tx_queues = 8
-> 
-> Use immutable num_tx_queues in all related functions to avoid the issue.
-> 
-> [1]
->   BUG: KASAN: vmalloc-out-of-bounds in iavf_add_one_ethtool_stat+0x200/0x270
->   Write of size 8 at addr ffffc900031c9080 by task ethtool/5800
-> 
->   CPU: 1 UID: 0 PID: 5800 Comm: ethtool Not tainted 6.19.0-enjuk-08403-g8137e3db7f1c #241 PREEMPT(full)
->   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
->   Call Trace:
->    <TASK>
->    dump_stack_lvl+0x6f/0xb0
->    print_report+0x170/0x4f3
->    kasan_report+0xe1/0x180
->    iavf_add_one_ethtool_stat+0x200/0x270
->    iavf_get_ethtool_stats+0x14c/0x2e0
->    __dev_ethtool+0x3d0c/0x5830
->    dev_ethtool+0x12d/0x270
->    dev_ioctl+0x53c/0xe30
->    sock_do_ioctl+0x1a9/0x270
->    sock_ioctl+0x3d4/0x5e0
->    __x64_sys_ioctl+0x137/0x1c0
->    do_syscall_64+0xf3/0x690
->    entry_SYSCALL_64_after_hwframe+0x77/0x7f
->   RIP: 0033:0x7f7da0e6e36d
->   ...
->    </TASK>
-> 
->   The buggy address belongs to a 1-page vmalloc region starting at 0xffffc900031c9000 allocated at __dev_ethtool+0x3cc9/0x5830
->   The buggy address belongs to the physical page: page: refcount:1 mapcount:0 mapping:0000000000000000
->   index:0xffff88813a013de0 pfn:0x13a013
->   flags: 0x200000000000000(node=0|zone=2)
->   raw: 0200000000000000 0000000000000000 dead000000000122 0000000000000000
->   raw: ffff88813a013de0 0000000000000000 00000001ffffffff 0000000000000000
->   page dumped because: kasan: bad access detected
-> 
->   Memory state around the buggy address:
->    ffffc900031c8f80: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
->    ffffc900031c9000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   >ffffc900031c9080: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
->                      ^
->    ffffc900031c9100: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
->    ffffc900031c9180: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
-> 
-> Fixes: 64430f70ba6f ("iavf: Fix displaying queue statistics shown by ethtool")
-> Signed-off-by: Kohei Enju <kohei@enjuk.jp>
-> ---
->   .../net/ethernet/intel/iavf/iavf_ethtool.c    | 31 +++++++++----------
->   1 file changed, 15 insertions(+), 16 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-> index 6ff3842a1ff1..98bec3afc200 100644
-> --- a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-> +++ b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-> @@ -313,14 +313,13 @@ static int iavf_get_sset_count(struct net_device *netdev, int sset)
->   {
->   	/* Report the maximum number queues, even if not every queue is
->   	 * currently configured. Since allocation of queues is in pairs,
-> -	 * use netdev->real_num_tx_queues * 2. The real_num_tx_queues is set
-> -	 * at device creation and never changes.
-> +	 * use netdev->num_tx_queues * 2. The num_tx_queues is set at
-> +	 * device creation and never changes.
->   	 */
->   
->   	if (sset == ETH_SS_STATS)
->   		return IAVF_STATS_LEN +
-> -			(IAVF_QUEUE_STATS_LEN * 2 *
-> -			 netdev->real_num_tx_queues);
-> +		       (IAVF_QUEUE_STATS_LEN * 2 * netdev->num_tx_queues);
->   	else
->   		return -EINVAL;
->   }
-> @@ -345,19 +344,19 @@ static void iavf_get_ethtool_stats(struct net_device *netdev,
->   	iavf_add_ethtool_stats(&data, adapter, iavf_gstrings_stats);
->   
->   	rcu_read_lock();
-> -	/* As num_active_queues describe both tx and rx queues, we can use
-> -	 * it to iterate over rings' stats.
-> +	/* Use num_tx_queues to report stats for the maximum number of queues.
-> +	 * Queues beyond num_active_queues will report zero.
->   	 */
-> -	for (i = 0; i < adapter->num_active_queues; i++) {
-> -		struct iavf_ring *ring;
-> +	for (i = 0; i < netdev->num_tx_queues; i++) {
-> +		struct iavf_ring *tx_ring = NULL, *rx_ring = NULL;
->   
-> -		/* Tx rings stats */
-> -		ring = &adapter->tx_rings[i];
-> -		iavf_add_queue_stats(&data, ring);
-> +		if (i < adapter->num_active_queues) {
-> +			tx_ring = &adapter->tx_rings[i];
-> +			rx_ring = &adapter->rx_rings[i];
-> +		}
->   
-> -		/* Rx rings stats */
-> -		ring = &adapter->rx_rings[i];
-> -		iavf_add_queue_stats(&data, ring);
-> +		iavf_add_queue_stats(&data, tx_ring);
-> +		iavf_add_queue_stats(&data, rx_ring);
->   	}
->   	rcu_read_unlock();
->   }
-> @@ -376,9 +375,9 @@ static void iavf_get_stat_strings(struct net_device *netdev, u8 *data)
->   	iavf_add_stat_strings(&data, iavf_gstrings_stats);
->   
->   	/* Queues are always allocated in pairs, so we just use
-> -	 * real_num_tx_queues for both Tx and Rx queues.
-> +	 * num_tx_queues for both Tx and Rx queues.
->   	 */
-> -	for (i = 0; i < netdev->real_num_tx_queues; i++) {
-> +	for (i = 0; i < netdev->num_tx_queues; i++) {
->   		iavf_add_stat_strings(&data, iavf_gstrings_queue_stats,
->   				      "tx", i);
->   		iavf_add_stat_strings(&data, iavf_gstrings_queue_stats,
+That should be fine. Max table size cap is always >= 256.
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+> The minimum
+>    SHOULD be at least 4 times the number of supported receive queues.
+> 
+> so I guess the 4x isn't exactly a new recommendation.
+
+My position is as follows:
+Provide the appropriate factor *if possible* (currently it is 2x, and we 
+will likely increase it to 4x).
+However, do not limit the maximum nch if the factor cannot be satisfied 
+- even if that results in the selftest failing.
 
 
-Kind regards,
-
-Paul
 
