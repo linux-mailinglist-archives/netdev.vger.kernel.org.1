@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-259253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259255-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QLcUMMWQlWnoSQIAu9opvQ
-	(envelope-from <netdev+bounces-259253-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 11:13:25 +0100
+	id wMRPK9SQlWn1SQIAu9opvQ
+	(envelope-from <netdev+bounces-259255-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 11:13:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F70B15521C
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 11:13:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 102081552B2
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 11:13:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 310A930107C9
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 10:13:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8F1BD3020010
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 10:13:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8076F33D4F6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5FBD33DEF6;
 	Wed, 18 Feb 2026 10:13:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y+9PRPJS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V4mai1t9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C7B3243367;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E59433D6E1;
 	Wed, 18 Feb 2026 10:13:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771409598; cv=none; b=CwEkpIjOJTFjZiaqyQuUhbmiNwG22InREHFmYAz7YGt1kWEjm9KLrWte1EeW42oYT7dAsxf4lAfP8vw5nJWzjT0SyGizhusHSvjYO76Nw4o1hFeopJy0rCOyY9mroNtcsHFyKVccUllTN499UtLqzSuqym4r155JP1koaALn2WE=
+	t=1771409598; cv=none; b=TXFJwwsIi3/25TrDrS7Dpk3tZ0g1iRiyRRCq04C9DfyTfw2+pQ6ABVuWcNPED0zk+QK37h6vQMzFT49iQQ55gLaT+PX1MHQAQz9ZG1ToW2XksCl2t1V5XEev0CQ03BRKk6hpE8AcIWGueY+YOHCHkYxj8GEblqKt6jNEBUl973I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1771409598; c=relaxed/simple;
-	bh=Mq94eCCs+RKATmleknUccsvrIqNogkHHQ1NGR1scPL0=;
+	bh=ZQpmZi3xCboNCaTitC+DH8Zwcl8IPzrA6Uao2EOU9sw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=r1/qi2ys5MVbobKuZKGlDi8C1+XNCa2m9lvM45+TjRQTR79+TSAS/CkHh70vxkmsRdpZuRNsVhrxtCmk2G3WZIpKbbK7nnDvj3+5fN3VBOZFrkaZPiQzOpr6pfvV4g3xnhuinOVypl8m87YdfUltr7ddhUdPV6bBzXJqyAIyFY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y+9PRPJS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2914BC19425;
+	 MIME-Version:Content-Type; b=j/sU0j5T9/xhpGlyZ+mEpYSKtRiTz4kX/bQiZxp9i079B044IvQVgZqzvVk0D4RMInmzn+BTHuzRqiYu5UjQtCEJFNQpXXFzxUsuxVQx88oVYltKs/a4qGPg6t5cqM4W7R3GvGLQRmkx3IGOoLQkQKEdrPih0F2WOQ6oWplLcYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V4mai1t9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BE31C2BC86;
 	Wed, 18 Feb 2026 10:13:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1771409598;
-	bh=Mq94eCCs+RKATmleknUccsvrIqNogkHHQ1NGR1scPL0=;
+	bh=ZQpmZi3xCboNCaTitC+DH8Zwcl8IPzrA6Uao2EOU9sw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Y+9PRPJSkjz11xvjOQGqeiX1T1CMS1ZijJxTf/OBtdeedFvvTx/WzQJZCMtcnEGLN
-	 oS7/wIqluqzChdEfIhT2PaNOIn4rle3aieEQKaqwQ1bos38Uz9YEhbr4GfYSJW0dIu
-	 yTXZAaB5WnO9cismVDnyNRH7HN6DE7B4OID1PEOUgCxsrnG3SDecUr2ybtaiXWLEdU
-	 Bi8UZNa3fBnmLnDcv3UMGGAKt9nnWjrreTjGradPefIWDS9W1uvq9Ag/6zA1D8pYFQ
-	 bsTnUA9BN/6ZIUVuw3zq+Yb2xzyKGoNBt9jvPGGv8hCMq8neI7CvkQny/kLPbdSUOJ
-	 iLqnG953iI+0g==
+	b=V4mai1t9MrPfripNwkG+T4D2sdL2EKgkZEsiE7+/d1+6A635o536kp8D/PJk8JfN5
+	 jY7ne68OA3MfMpRFOglO9rou7faRljM2edDo7w5fWjhhGT4z34ctWyOgLP5wIYc1Ka
+	 OAzHwdsccUyFXZHS63EAhy68OeW+dJ//KdcIPegB+ChAlHM+7s7Y/Y7VD1ZXrjM53x
+	 pCD8Nr7cqwwSDDKw0iWZAuQgDwoA/CxtRKlhxK36ZO32/k+CbhkaysSWLLq0gdKG1U
+	 Wl+8fR0RKi6gB/0XQPF27N05gWr3DJw5EqGz+mTuBFqW/uxvOsDgnTfO9Oqr4W3Kn9
+	 CcKWiujG5to0g==
 Received: from mchehab by mail.kernel.org with local (Exim 4.99.1)
 	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1vseYW-00000000LKh-0WnY;
+	id 1vseYW-00000000LMC-2DMh;
 	Wed, 18 Feb 2026 11:13:16 +0100
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To: Jonathan Corbet <corbet@lwn.net>,
@@ -58,9 +58,9 @@ Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	netdev@vger.kernel.org,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
 	Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH 01/38] docs: kdoc_re: add support for groups()
-Date: Wed, 18 Feb 2026 11:12:31 +0100
-Message-ID: <49b2f5bd2284b0685d8a8ab363d60f89d4d53935.1771408406.git.mchehab+huawei@kernel.org>
+Subject: [PATCH 02/38] docs: kdoc_re: don't go past the end of a line
+Date: Wed, 18 Feb 2026 11:12:32 +0100
+Message-ID: <98da31eb6b5b2c84e960945e0ea283d3fcd2cce5.1771408406.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <cover.1771408406.git.mchehab+huawei@kernel.org>
 References: <cover.1771408406.git.mchehab+huawei@kernel.org>
@@ -79,7 +79,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -87,51 +87,48 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259253-lists,netdev=lfdr.de,huawei];
+	TAGGED_FROM(0.00)[bounces-259255-lists,netdev=lfdr.de,huawei];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[mchehab@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,huawei];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email]
-X-Rspamd-Queue-Id: 6F70B15521C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:email,intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 102081552B2
 X-Rspamd-Action: no action
 
-Add an equivalent to re groups() method.
-This is useful on debug messages.
+The logic which checks if the line ends with ";" is currently
+broken: it may try to read past the buffer.
+
+Fix it by checking before trying to access line[pos].
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 Acked-by: Randy Dunlap <rdunlap@infradead.org>
 Tested-by: Randy Dunlap <rdunlap@infradead.org>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 ---
- tools/lib/python/kdoc/kdoc_re.py | 7 +++++++
- 1 file changed, 7 insertions(+)
+ tools/lib/python/kdoc/kdoc_re.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tools/lib/python/kdoc/kdoc_re.py b/tools/lib/python/kdoc/kdoc_re.py
-index 0bf9e01cdc57..774dd747ecb0 100644
+index 774dd747ecb0..6c44fcce0415 100644
 --- a/tools/lib/python/kdoc/kdoc_re.py
 +++ b/tools/lib/python/kdoc/kdoc_re.py
-@@ -106,6 +106,13 @@ class KernRe:
+@@ -269,7 +269,7 @@ class NestedMatch:
+             out += new_sub
  
-         return self.last_match.group(num)
+             # Drop end ';' if any
+-            if line[pos] == ';':
++            if pos < len(line) and line[pos] == ';':
+                 pos += 1
  
-+    def groups(self):
-+        """
-+        Returns the group results of the last match
-+        """
-+
-+        return self.last_match.groups()
-+
- 
- class NestedMatch:
-     """
+             cur_pos = pos
 -- 
 2.52.0
 
