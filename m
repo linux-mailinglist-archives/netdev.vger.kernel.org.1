@@ -1,223 +1,238 @@
-Return-Path: <netdev+bounces-259241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259243-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2N8vLBKIlWnqSAIAu9opvQ
-	(envelope-from <netdev+bounces-259241-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 10:36:18 +0100
+	id QG5IGLOJlWnqSAIAu9opvQ
+	(envelope-from <netdev+bounces-259243-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 10:43:15 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15E30154C33
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 10:36:18 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5CF6154CF9
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 10:43:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ED1A63010245
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 09:36:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2262C301C975
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 09:43:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4555833A9DF;
-	Wed, 18 Feb 2026 09:36:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5070533CEB4;
+	Wed, 18 Feb 2026 09:43:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MnH8X0+s"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="2Encfo+X"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-8faa.mail.infomaniak.ch (smtp-8faa.mail.infomaniak.ch [83.166.143.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22CE1319864
-	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 09:36:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3A633C1B3
+	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 09:43:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771407374; cv=none; b=Q/UuOV5JUEwaPbX6OzP512BXxThBemMdAsOxu88hlmXxD52pyVW/Z6Yciok1qAbo5zjr6YZdftN1h5ispaX1VGCkG8mNz81V/azxmJXPJRL1l7qd7fAwiQ6stsngHLxVJIjPoDy/nn0UCfd625zYnLxPoxZcRrqDBxIwYtyBK2U=
+	t=1771407790; cv=none; b=B7s/ZYRkZt78oNTstj+Z/DEaU27wg/lrc6wNfKezFIPhZRjcCEHbaP3cAL46cUvyk/5xXdBuiPTfM+Tf/NvF+73ZNjg2e0P7oo6kM6mW18FbzXKp43nH/lw5yGmYW3ExmoSR6d+UexYqcANxye9otxcRGahX9odV7LIr1q3N5I0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771407374; c=relaxed/simple;
-	bh=gQ6MPdOMsERvQzft4Tv59+KHrFI9aFUHwFWACOmrb4w=;
+	s=arc-20240116; t=1771407790; c=relaxed/simple;
+	bh=J9Uxe4ZEAWj20zBZzQJyfXD6ju3mDOe3vYTEKgmZwTU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rh4s4foacw/3Z/mG8GGLbD/LwB29eM6+LKOJzZwPTPIWaao6vXlsjpvESlvsIDKCEBxBS2AHrdVWLLf0UEOGLkcacLwgXykxDDnOuS7gb71xVw3mzzUCYL4dYKkTZ7aKU8DLjjMpfHozsAKOsNg9oQ7mfPhjcwEfcKMgc5NJjxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MnH8X0+s; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10C59C19421;
-	Wed, 18 Feb 2026 09:36:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771407373;
-	bh=gQ6MPdOMsERvQzft4Tv59+KHrFI9aFUHwFWACOmrb4w=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=u8sLDRDP9UWfiXCDOpDHHY110EhpMNIonsES9psFwF7SfxnrljJ84FO3aLAG87Kbhw2rErEY+M8NfMSGCqweCYwZBIJUw1epV4eCs7S8kByZFaJ7xJMOj1zLkStHKLI8eCq5XPfSjbX3FSR3GD9b6HyYp5+ULR3zah9i3CZyulE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=2Encfo+X; arc=none smtp.client-ip=83.166.143.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4fGBH31RQnzqpc;
+	Wed, 18 Feb 2026 10:36:47 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1771407407;
+	bh=ffntIhV2m6xC97D+pEZgKwQ6ddwWIQFpxfoE0JG7tfw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MnH8X0+sOUAV/I0guIN1x+gT+m0cYPyCmdXutoy9CZOrjafGVGFLZ9NcI+KGp0K1s
-	 /4oMOhoVz0oZkIfXJiZvB2gozMm+smiX8V9cZLZg7/h8SyYnQpD5QH6gMV5JfW2ypz
-	 9DI9jVgYlaF56pI3BWwOayP4OKKKP76rxJeZJKnZGmk9iRyVHKI9xTKvK0hS4OM9IH
-	 2SKwwIx0HNsalVLY27hdMBiZjgy4wrsRabr+GEKXwUTzZ7ZBR1cPRe/Yhq5S80r/Tr
-	 xXYnn32LFihtoupGO3/ocgf0+sr6Q/UMgs5hziDFyOK51CsmUtEU3iR3Y7rzRXTgTj
-	 VEFy16s8C2EjQ==
-Date: Wed, 18 Feb 2026 09:36:09 +0000
-From: Simon Horman <horms@kernel.org>
-To: Hyunwoo Kim <imv4bel@gmail.com>
-Cc: john.fastabend@gmail.com, kuba@kernel.org, sd@queasysnail.net,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] net: tls: Use disable_delayed_work_sync() instead of
- cancel_delayed_work_sync() in tls_sw_cancel_work_tx()
-Message-ID: <aZWICa8b0JF4fWq3@horms.kernel.org>
-References: <aZLotq3aZY0b-dI8@v4bel>
- <aZSLHaFj7k8DPmLG@horms.kernel.org>
- <aZSbSOVuRgkjeezg@v4bel>
- <aZWHpBwpMVTUNYTg@horms.kernel.org>
+	b=2Encfo+X/baZ2m1VBAgiRsUSMTGNzMcMAaicEiW0RYddGxHGEbherxuDtrOGldquH
+	 bEYIF1ZKpQ0UAeLfNT0YF0P5a8dU2rubVY2u/xGObzeIPdqJFeU+2auMZAYA/pdp3j
+	 oL/HEqhd7nEV0zHDsX9J4ea0IeUp2CYomld4z02g=
+Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4fGBH06q50z5rJ;
+	Wed, 18 Feb 2026 10:36:44 +0100 (CET)
+Date: Wed, 18 Feb 2026 10:36:37 +0100
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack3000@gmail.com>
+Cc: John Johansen <john.johansen@canonical.com>, 
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
+	"Serge E . Hallyn" <serge@hallyn.com>, Tingmao Wang <m@maowtm.org>, 
+	Justin Suess <utilityemal77@gmail.com>, linux-security-module@vger.kernel.org, 
+	Samasth Norway Ananda <samasth.norway.ananda@oracle.com>, Matthieu Buffet <matthieu@buffet.re>, 
+	Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>, konstantin.meskhidze@huawei.com, 
+	Demi Marie Obenour <demiobenour@gmail.com>, Alyssa Ross <hi@alyssa.is>, Jann Horn <jannh@google.com>, 
+	Tahera Fahimi <fahimitahera@gmail.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>
+Subject: Re: [PATCH v5 1/9] lsm: Add LSM hook security_unix_find
+Message-ID: <20260217.Nei3Aeg8bo6h@digikod.net>
+References: <20260215105158.28132-1-gnoack3000@gmail.com>
+ <20260215105158.28132-2-gnoack3000@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <aZWHpBwpMVTUNYTg@horms.kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260215105158.28132-2-gnoack3000@gmail.com>
+X-Infomaniak-Routing: alpha
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.89 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_MIXED_CHARSET(0.77)[subject];
+	R_DKIM_ALLOW(-0.20)[digikod.net:s=20191114];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259241-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-259243-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,queasysnail.net,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	FREEMAIL_CC(0.00)[canonical.com,paul-moore.com,namei.org,hallyn.com,maowtm.org,gmail.com,vger.kernel.org,oracle.com,buffet.re,huawei-partners.com,huawei.com,alyssa.is,google.com,kernel.org,zeniv.linux.org.uk];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	DMARC_NA(0.00)[digikod.net];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[digikod.net:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[mic@digikod.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: 15E30154C33
+	DBL_BLOCKED_OPENRESOLVER(0.00)[maowtm.org:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,digikod.net:mid,digikod.net:dkim]
+X-Rspamd-Queue-Id: D5CF6154CF9
 X-Rspamd-Action: no action
 
-On Wed, Feb 18, 2026 at 09:34:32AM +0000, Simon Horman wrote:
-> On Wed, Feb 18, 2026 at 01:46:00AM +0900, Hyunwoo Kim wrote:
-> > On Tue, Feb 17, 2026 at 03:37:01PM +0000, Simon Horman wrote:
-> > > On Mon, Feb 16, 2026 at 06:51:50PM +0900, Hyunwoo Kim wrote:
-> > > > After cancel_delayed_work_sync() is called from tls_sk_proto_close(), 
-> > > > tx_work_handler() can still be scheduled from paths such as the 
-> > > > Delayed ACK handler or ksoftirqd.
-> > > > As a result, the tx_work_handler() worker may dereference a freed 
-> > > > TLS object.
-> > > > 
-> > > > To prevent this race condition, cancel_delayed_work_sync() is 
-> > > > replaced with disable_delayed_work_sync().
-> > > > 
-> > > > Fixes: f87e62d45e51 ("net/tls: remove close callback sock unlock/lock around TX work flush")
-> > > > Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
-> > > 
-> > > Hi Hyunwoo,
-> > > 
-> > > Thanks for your patch(es).
-> > > 
-> > > Some feedback on process from my side.
-> > > You can read more about that at
-> > > https://docs.kernel.org/process/maintainer-netdev.html
-> > > 
-> > > * I think it would be good to mention how this problem was found.
-> > 
-> > Hi Simon,
-> > 
-> > Thank you for the feedback.
-> > 
-> > This issue was found during a manual code audit. I will add this 
-> > information to the commit message.
-> > 
-> > 
-> > > 
-> > > * As a bug fix for code present in the net tree, it should be targeted
-> > >   at that tree like this.
-> > > 
-> > >   Subject: [PATCH net]: ...
-> > > 
-> > > * Looking over git history, it seems that an appropriate prefix
-> > >   for patches for this code is 'tls: '
-> > > 
-> > >   Subject [PATCH net]: tls: ...
-> > > 
-> > > * Also, please try to make the subject a bit more succinct
-> > > 
-> > > > ---
-> > > >  net/tls/tls_sw.c | 2 +-
-> > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > 
-> > > > diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-> > > > index 9937d4c810f2..b1fa62de9dab 100644
-> > > > --- a/net/tls/tls_sw.c
-> > > > +++ b/net/tls/tls_sw.c
-> > > > @@ -2533,7 +2533,7 @@ void tls_sw_cancel_work_tx(struct tls_context *tls_ctx)
-> > > >  
-> > > >  	set_bit(BIT_TX_CLOSING, &ctx->tx_bitmask);
-> > > >  	set_bit(BIT_TX_SCHEDULED, &ctx->tx_bitmask);
-> > > > -	cancel_delayed_work_sync(&ctx->tx_work.work);
-> > > > +	disable_delayed_work_sync(&ctx->tx_work.work);
-> > > >  }
-> > > >  
-> > > >  void tls_sw_release_resources_tx(struct sock *sk)
-> > > > -- 
-> > > > 2.43.0
-> > > > ---
-> > > > 
-> > > > Dear,
-> > > > 
-> > > > The following is a simplified scenario illustrating how each race can occur. Since tls_sw_cancel_work_tx() does not hold lock_sock(), it can race with tls_write_space().
-> > > > ```
-> > > >           cpu0                                             cpu1
-> > > > 
-> > > > tls_sk_proto_close()
-> > > >   tls_sw_cancel_work_tx()
-> > > >                                                     tls_write_space()
-> > > >                                                       tls_sw_write_space()
-> > > >                                                       if (!test_and_set_bit(BIT_TX_SCHEDULED, &tx_ctx->tx_bitmask))
-> > > >     set_bit(BIT_TX_SCHEDULED, &ctx->tx_bitmask);
-> > > >     cancel_delayed_work_sync(&ctx->tx_work.work);
-> > > >                                                       schedule_delayed_work(&tx_ctx->tx_work.work, 0);
-> > > > ```
-> > > 
-> > > I think that the text above would be best included in the patch description.
-> > > At least for me it is fundamental to understanding the problem.
-> > 
-> > Understood. I will add the race scenario description to the patch.
-> > 
-> > > 
-> > > > 
-> > > > Best regards,
-> > > > Hyunwoo Kim
-> > > > 
-> > > 
-> > > I see three similar patches on the mailing list.
-> > > The comments above go for them too.
-> > > And It would probably be useful to just handle one at a time,
-> > > to allow for proper feedback. Or bundle them in a patchset.
-> > 
-> > Since the core of this bug pattern is espintcp, I will submit a revised 
-> > espintcp v2 patch shortly. 
-> > I would appreciate it if you could review the espintcp v2 patch. 
-> > Once the espintcp review is done, I will apply the feedback to the 
-> > remaining strparser and tls patches as well.
+On Sun, Feb 15, 2026 at 11:51:49AM +0100, Günther Noack wrote:
+> From: Justin Suess <utilityemal77@gmail.com>
 > 
-> Thanks.
+> Add a LSM hook security_unix_find.
 > 
-> I have looked over the espintcp patch.
+> This hook is called to check the path of a named unix socket before a
+> connection is initiated. The peer socket may be inspected as well.
 > 
-> It looks good to me. But I think it would be good to include
-> some sort of race analysis in the commit message: something similar
-> to the cpu0 / cpu1 text above, but perhaps with a different case explained.
+> Why existing hooks are unsuitable:
 > 
-> Also, I think the other comments above apply to that patch too.
+> Existing socket hooks, security_unix_stream_connect(),
+> security_unix_may_send(), and security_socket_connect() don't provide
+> TOCTOU-free / namespace independent access to the paths of sockets.
 > 
-> I will respond to that patch pointing to this message.
+> (1) We cannot resolve the path from the struct sockaddr in existing hooks.
+> This requires another path lookup. A change in the path between the
+> two lookups will cause a TOCTOU bug.
+> 
+> (2) We cannot use the struct path from the listening socket, because it
+> may be bound to a path in a different namespace than the caller,
+> resulting in a path that cannot be referenced at policy creation time.
+> 
+> Cc: Günther Noack <gnoack3000@gmail.com>
+> Cc: Tingmao Wang <m@maowtm.org>
+> Signed-off-by: Justin Suess <utilityemal77@gmail.com>
+> ---
+>  include/linux/lsm_hook_defs.h |  5 +++++
+>  include/linux/security.h      | 11 +++++++++++
+>  net/unix/af_unix.c            |  8 ++++++++
+>  security/security.c           | 20 ++++++++++++++++++++
+>  4 files changed, 44 insertions(+)
+> 
+> diff --git a/include/linux/lsm_hook_defs.h b/include/linux/lsm_hook_defs.h
+> index 8c42b4bde09c..7a0fd3dbfa29 100644
+> --- a/include/linux/lsm_hook_defs.h
+> +++ b/include/linux/lsm_hook_defs.h
+> @@ -317,6 +317,11 @@ LSM_HOOK(int, 0, post_notification, const struct cred *w_cred,
+>  LSM_HOOK(int, 0, watch_key, struct key *key)
+>  #endif /* CONFIG_SECURITY && CONFIG_KEY_NOTIFICATIONS */
+>  
+> +#if defined(CONFIG_SECURITY_NETWORK) && defined(CONFIG_SECURITY_PATH)
+> +LSM_HOOK(int, 0, unix_find, const struct path *path, struct sock *other,
+> +	 int flags)
+> +#endif /* CONFIG_SECURITY_NETWORK && CONFIG_SECURITY_PATH */
+> +
+>  #ifdef CONFIG_SECURITY_NETWORK
+>  LSM_HOOK(int, 0, unix_stream_connect, struct sock *sock, struct sock *other,
+>  	 struct sock *newsk)
+> diff --git a/include/linux/security.h b/include/linux/security.h
+> index 83a646d72f6f..99a33d8eb28d 100644
+> --- a/include/linux/security.h
+> +++ b/include/linux/security.h
+> @@ -1931,6 +1931,17 @@ static inline int security_mptcp_add_subflow(struct sock *sk, struct sock *ssk)
+>  }
+>  #endif	/* CONFIG_SECURITY_NETWORK */
+>  
+> +#if defined(CONFIG_SECURITY_NETWORK) && defined(CONFIG_SECURITY_PATH)
+> +
+> +int security_unix_find(const struct path *path, struct sock *other, int flags);
+> +
+> +#else /* CONFIG_SECURITY_NETWORK && CONFIG_SECURITY_PATH */
+> +static inline int security_unix_find(const struct path *path, struct sock *other, int flags)
+> +{
+> +	return 0;
+> +}
+> +#endif /* CONFIG_SECURITY_NETWORK && CONFIG_SECURITY_PATH */
+> +
+>  #ifdef CONFIG_SECURITY_INFINIBAND
+>  int security_ib_pkey_access(void *sec, u64 subnet_prefix, u16 pkey);
+>  int security_ib_endport_manage_subnet(void *sec, const char *name, u8 port_num);
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index d0511225799b..369812b79dd8 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -1230,6 +1230,14 @@ static struct sock *unix_find_bsd(struct sockaddr_un *sunaddr, int addr_len,
+>  	if (!sk)
+>  		goto path_put;
+>  
+> +	/*
+> +	 * We call the hook because we know that the inode is a socket and we
+> +	 * hold a valid reference to it via the path.
+> +	 */
+> +	err = security_unix_find(&path, sk, flags);
+> +	if (err)
+> +		goto sock_put;
+> +
+>  	err = -EPROTOTYPE;
+>  	if (sk->sk_type == type)
 
-Sorry, I was a bit hasty there.
-The comments above are for v1.
-I'll look over v2 and respond there.
+I think this hook call should be moved here, just before the
+touch_atime() call for consistency with the socket type check, and to
+avoid doing useless check in the hook.
+
+>  		touch_atime(&path);
+> diff --git a/security/security.c b/security/security.c
+> index 67af9228c4e9..c73196b8db4b 100644
+> --- a/security/security.c
+> +++ b/security/security.c
+> @@ -4731,6 +4731,26 @@ int security_mptcp_add_subflow(struct sock *sk, struct sock *ssk)
+>  
+>  #endif	/* CONFIG_SECURITY_NETWORK */
+>  
+> +#if defined(CONFIG_SECURITY_NETWORK) && defined(CONFIG_SECURITY_PATH)
+> +/**
+> + * security_unix_find() - Check if a named AF_UNIX socket can connect
+> + * @path: path of the socket being connected to
+> + * @other: peer sock
+> + * @flags: flags associated with the socket
+> + *
+> + * This hook is called to check permissions before connecting to a named
+> + * AF_UNIX socket.
+> + *
+> + * Return: Returns 0 if permission is granted.
+> + */
+> +int security_unix_find(const struct path *path, struct sock *other, int flags)
+> +{
+> +	return call_int_hook(unix_find, path, other, flags);
+> +}
+> +EXPORT_SYMBOL(security_unix_find);
+> +
+> +#endif	/* CONFIG_SECURITY_NETWORK && CONFIG_SECURITY_PATH */
+> +
+>  #ifdef CONFIG_SECURITY_INFINIBAND
+>  /**
+>   * security_ib_pkey_access() - Check if access to an IB pkey is allowed
+> -- 
+> 2.52.0
+> 
+> 
 
