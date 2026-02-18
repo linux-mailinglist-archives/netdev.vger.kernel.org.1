@@ -1,152 +1,232 @@
-Return-Path: <netdev+bounces-259338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259339-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WFRMEYP6lWknXwIAu9opvQ
-	(envelope-from <netdev+bounces-259338-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 18:44:35 +0100
+	id wHzNGBL9lWm/XwIAu9opvQ
+	(envelope-from <netdev+bounces-259339-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 18:55:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6E1D158671
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 18:44:34 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6688158713
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 18:55:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4B09D30058CB
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 17:44:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 701A43018BEC
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 17:55:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35682343D74;
-	Wed, 18 Feb 2026 17:44:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9E423446AB;
+	Wed, 18 Feb 2026 17:55:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="r6NLG9hz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MdgQgaNi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7299B345731
-	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 17:44:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C170238C29
+	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 17:55:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771436673; cv=none; b=O2rzfAAVmpsZWgtzRXy7lVb5kwMsMfoMjX4BP6x+4lkgdQlqDBKKAhLnK/zIlqe5ilGb/XMoZuwjANFYV+Kj0xD0sYWk1q4c1XnTKHyTuFmKtoa41qJ+ewQ7nxOYO8hPDtli4gfKV5Bj/6ml835I1uKU1cZ31ehXJ0FFOPLC0cw=
+	t=1771437318; cv=none; b=QNNEfh737kWMxG/E65Wqr/Hnmov63F12JXakuYHqBXnTOcNxmefGWMQDfvVqlOo8d/gU+zOpa4KWFxGuNevSD8x0sjDOet9Wrz15uFaR9Hp1jLt87CFPmGZIRocxsanvZacW7h7C1a7yNS3rT6FSkDsKopB+yc5oB2jiMdNuQeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771436673; c=relaxed/simple;
-	bh=DAPjo5Vesdht9bmwlcZvfhdk4I6QmRF2Twzcn0AX36c=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=i57KicL4sKT9GD5ycn7UeKBaKJNw5m1jqDd2rsuJmgiPTTmEcyI2AFnOKbPxZ3bvqYslUULFNPgWL/0cmY5F2hfbk1RzmWPe2ahkA/GObmjCRlwKPq0tATA+xRoOWKa9f9y3LFuqzDiOVlQACE+mSBSIdalRYnj+GklSq24P1Jo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=r6NLG9hz; arc=none smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-8cb513e860cso5100885a.2
-        for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 09:44:31 -0800 (PST)
+	s=arc-20240116; t=1771437318; c=relaxed/simple;
+	bh=1qN6+A28/pt88lO3FJpQg+a31lpcoYR5RTGDzaMoak4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rhP6Xur0aBqL2wdvc38yXMpqeS17+ztQKkLbyjdHi4S7XUAVQIz9L4P1tB4mCU4eBPW4C9LVf6CZx9pclRYKMrdFupz23aSfvr6qIbSoRrfhOeJxdP+NoAQbNEz+WKe/x8MRxCT4xrUm3QFaz+EbZCcjvJFhuHaSjVH95GXo37I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MdgQgaNi; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-506c02ec1b3so1859821cf.0
+        for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 09:55:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1771436670; x=1772041470; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f52Wwd+rDLXDwPRRIQsN1Yx7eFsotz+Oj4co4oyfPt0=;
-        b=r6NLG9hzAvoVeSWlXgZGbw+lN8td1J+RDI8qk2USRLFr61sKh7xRAhF/Ooza+b2EYQ
-         R1OKBSt0jZVYvSviWOYKbNudYJG/yTngumbRrpN9w8xMPc+efonOWASOpyawZMDuPrjP
-         wFul2msURiZxQSD7p7KR6YfmF4QX/jFe9bZgYeblsEM/ur1J8TyvHpWlxoQ5Ps2blUBc
-         hYHYtWsuJnzJPeWcVsUUrH2kam3r/cwzjzq9xO1oh5BjGySVwZSFRCuwDw6Ukl7/mbAG
-         04P9S0hnss1Nd8W5fTT9cRE5DMA0zAgsGiwIEvEFkR1VjpuHSA1gK+3DYbzP354zXrKV
-         BagQ==
+        d=gmail.com; s=20230601; t=1771437316; x=1772042116; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xSK4YnOKTUFeSTgqI6iNtHiqzJw/Xmlr9/hUIirpfpE=;
+        b=MdgQgaNi0lYNRhyb7r++4Yl9c3UpaX5q5lV0iOZN7SAA7jMwq9fkR5GV8MSPTKjqJE
+         umzEI5LhdxwDnRM17TqCoxJUdnNKkruCfSg0d8addHXD1mYDQ24Nx66steqyuTugvG2l
+         O4hwsShCrz+J2p1jXZGrN8ExqcenYPCV45gZN7YeFPFWLe1FrvrCUd7oMuwEOG9ORE3a
+         YjMROg73OFJo4+F3davdDuTFSDnmbOge1caeuTGx/KJe6bMiIO+d0pOAAc5SoTcyqzBT
+         Hf911R02rF6F4D9MAmYE/CiFIvXVOhYdt6jvOswcZsD+EakoN0poW1LmraaosHEsf1Wi
+         ePsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771436670; x=1772041470;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=f52Wwd+rDLXDwPRRIQsN1Yx7eFsotz+Oj4co4oyfPt0=;
-        b=OT+KYckbovKaMzT2D4b1V0xWOX44IGQTXdVk97EFYjSwglQ9arX+feBWigy6Zjoqb3
-         sq56jBQcmMQpErNRY7i1LL+2zvdqQEGVbxeC4fooDr/lp6X2Qp7Dho9xAY3NHZVLTKL8
-         cFUXFebKdC/DNXDaI9FWKNTKpntOF6RhN5EjdKivUly4xE9QKr9HetKK9A7BVg7JyISJ
-         Lq0jIR5FZn5MDIqOZKZRuOwM5KoENAj8AEUefaOd2kPjnGca8EciVKHKCFphEvPwH9X6
-         KZ/bcXjOXW/AD4DCZ+V+qJJCAFHQpvYzUKNc3mvE6mRMWAv1tijkFdRUzzLsjZJjKHz+
-         IwYQ==
-X-Gm-Message-State: AOJu0YzufnSbChIau2ZMYWt+H9JU+1BqCEkSGX4eBUdHYgkAcyxekzjZ
-	owW1YPNoQ4Fb8gzyevbon+suzUYohRNyOSMbYbxKFFj8G9TdysC3/AOZ4zKfssdQ6gYZHp0amWf
-	WtNjth+M=
-X-Gm-Gg: AZuq6aJ++Nkdi9KX/91JWXDN//wHPD0/pEx8pjg5Amm0+yR8JlIB6arVH80Um/mvkLx
-	0xweO9hfpuJiOCv5YR2bVkC75Sd0fyOeBGSBE0L4dlayyFizbXP8ZemSExq7X8815HZCgUlE47j
-	RGHp7VIOgHWZyJcfIpvB6rq5Vp3LM8Lazcslqccy35rmzkyN4H0c/qet5kpHUHw8lQUJRFiOrDe
-	pvX+EseaPr7yFWb05d+swjFx6iXatHHu/CIDi9nKozCDXtg4yEft7T955swrIz+8bR2h0y8aG+E
-	VbpydSUyfQ2e9rv8H8FndEd0793NTm7acchs0XJPlWmIWTSMKVyvg+fPDvrpSw1vf7V4zEgSeFl
-	BSHZQje87fFgg6xmgNX2OenIV+b+KxCe+u+dlYhT25QjEsp9VtVnEcIClKRKGjWCB+LNPfEAuhO
-	s72EkfIdbepjb1bKuBMDlatUNuTYBtIN38JnG8EXZJKmft
-X-Received: by 2002:a05:620a:1712:b0:8b2:e666:70d with SMTP id af79cd13be357-8cb4242a53emr2221223485a.43.1771436670115;
-        Wed, 18 Feb 2026 09:44:30 -0800 (PST)
-Received: from [127.0.0.1] ([99.196.128.5])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cb2b0e12eesm1872969085a.15.2026.02.18.09.44.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Feb 2026 09:44:29 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: io-uring@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org, Kai Aizen <kai@snailsploit.com>
-In-Reply-To: <364c2e7d4f53b26bb3133cfc4271183fcd450be2.1771435883.git.asml.silence@gmail.com>
-References: <364c2e7d4f53b26bb3133cfc4271183fcd450be2.1771435883.git.asml.silence@gmail.com>
-Subject: Re: [PATCH 1/1] io_uring/zcrx: fix user_ref race between scrub and
- refill paths
-Message-Id: <177143666453.514340.3486576920762114601.b4-ty@kernel.dk>
-Date: Wed, 18 Feb 2026 10:44:24 -0700
+        d=1e100.net; s=20230601; t=1771437316; x=1772042116;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xSK4YnOKTUFeSTgqI6iNtHiqzJw/Xmlr9/hUIirpfpE=;
+        b=r3dAvMsUivL/an1iiTodBT1rKMhtcHe5afmOevikqYaHWWVjz16RzoCPM58pHVTylg
+         qbaWUqdstufq3+6PRBGO2SpAVU6aHIegAMLNvlGefYaxH+66Y2ifttFHvkyER0gYz4HA
+         UYPSyPSYCgap78q90NDGrKkxvfJOVa/aY3XOvbPlPk3xVDMX8qMye47xitPjFUX0E8Kx
+         jDbqi83nt85IoTlTqEY6dcaaGS3PVZ3FgGBmmyICb7nRPU1QGUZtMBctYrlre/X/adTR
+         Rp+XhdpxjWD4psRe4sMm7310kQdiOIR6880grV0ON99qXl5s3TluXSWlZYh9dg9Pe1uA
+         1XMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXaOSoXlk+M6qyY1gNc+9KSswJVE2dlW/5SmJLTUwRPEMyEQirZtMlRwaVBaorl54DH/IuDhuk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJX/y1q5CSIs/2Yq+sr4KyduMNWJc4WeYGXZQfGTp34QWC1tzc
+	rAdJjCW7fSubNV2MZGsCxDsw5GVjufuOZi+ZvUtHQxOHcpmmKOhhWnqx
+X-Gm-Gg: AZuq6aL6tIjVkcbqmwOtC/6hR44b/5n3SqOMQ6Bvk1gjYuKcLUheX8bxbiv3fGl3QP2
+	oC4XcFQ/GCSZs2XUpA1jPZL5YhqCZSN+i+SORgaH3QQTlRKdg8VXjA1N/M0rpQMALvnwueXz6jA
+	ImGEKnoGh0r8vEC0193r43elqCK0PyZCCLXCmcsYMY+uaxlLMiAvhLBrMKhRaWq35JR/lD9c0FN
+	wF4WHSUjP1UfCllztEBtnUcIi5dy2+Kx2+m4h9T/zo3rmI5cEU6uZJd19CFhFTdf4HIzxmvRqF/
+	XmAeZu5OH2MT3JmalZsKmVRM+qRjXoLVD4QfplQ4yJ2f5Y9VTvk9kxrrUmnQb/lkziFw96MUN4w
+	+nSYNjSiTtddxJayOswPX7g3+fhDsZp+qBLRGHrFR9vrsIVDJINYrOr2P9c6kYNH3bZAFrePDps
+	uMxISK3Qrn7Q83NiUUjxg9zZBxWOMz7JA7qxkXQj6n6HN1KssavHjpsg==
+X-Received: by 2002:a05:622a:5c7:b0:4ee:1dd0:5a50 with SMTP id d75a77b69052e-506e913132bmr32877541cf.17.1771437316193;
+        Wed, 18 Feb 2026 09:55:16 -0800 (PST)
+Received: from ?IPV6:2a03:83e0:1145:4:70a9:dacc:ec4e:a432? ([2620:10d:c091:500::2:eb8])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-506bc1c3bfasm107289721cf.14.2026.02.18.09.55.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Feb 2026 09:55:15 -0800 (PST)
+Message-ID: <24fb96ca-042c-46ce-93cd-a6c2ce710795@gmail.com>
+Date: Wed, 18 Feb 2026 12:55:09 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] psp: use sk->sk_hash in psp_write_headers()
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com, Raed Salem <raeds@nvidia.com>,
+ Rahul Rameshbabu <rrameshbabu@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>,
+ Willem de Bruijn <willemb@google.com>
+References: <20260218141337.999945-1-edumazet@google.com>
+Content-Language: en-US
+From: Daniel Zahka <daniel.zahka@gmail.com>
+In-Reply-To: <20260218141337.999945-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[kernel-dk.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259338-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com];
-	DMARC_NA(0.00)[kernel.dk];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,nvidia.com,google.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel-dk.20230601.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259339-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[axboe@kernel.dk,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[4];
-	NEURAL_HAM(-0.00)[-0.997];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[danielzahka@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,kernel-dk.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: D6E1D158671
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
+X-Rspamd-Queue-Id: B6688158713
 X-Rspamd-Action: no action
 
 
-On Wed, 18 Feb 2026 17:36:41 +0000, Pavel Begunkov wrote:
-> The io_zcrx_put_niov_uref() function uses a non-atomic
-> check-then-decrement pattern (atomic_read followed by separate
-> atomic_dec) to manipulate user_refs. This is serialized against other
-> callers by rq_lock, but io_zcrx_scrub() modifies the same counter with
-> atomic_xchg() WITHOUT holding rq_lock.
-> 
-> On SMP systems, the following race exists:
-> 
-> [...]
 
-Applied, thanks!
+On 2/18/26 9:13 AM, Eric Dumazet wrote:
+> udp_flow_src_port() is indirectly using sk->sk_txhash as a base,
+> because __tcp_transmit_skb() uses skb_set_hash_from_sk().
+>
+> This is problematic because this field can change over the
+> lifetime of a TCP flow, thanks to calls to sk_rethink_txhash().
+>
+> Problem is that some NIC might (ab)use the PSP UDP source port in their
+> RSS computation, and PSP packets for a given flow could jump
+> from one queue to another.
+>
+> In order to avoid surprises, it is safer to let Protective Load
+> Balancing (PLB) get its entropy from the IPv6 flowlabel,
+> and change psp_write_headers() to use sk->sk_hash which
+> does not change for the duration of the flow.
+>
+> We might add a sysctl to select the behavior, if there
+> is a need for it.
+>
+> Fixes: fc724515741a ("psp: provide encapsulation helper for drivers")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+> Cc: Raed Salem <raeds@nvidia.com>
+> Cc: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+> Cc: Cosmin Ratiu <cratiu@nvidia.com>
+> Cc: Daniel Zahka <daniel.zahka@gmail.com>
+> Cc: Willem de Bruijn <willemb@google.com>
+> ---
+>   net/psp/psp_main.c | 39 ++++++++++++++++++++++++++++++++++++++-
+>   1 file changed, 38 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/psp/psp_main.c b/net/psp/psp_main.c
+> index a8534124f62669cf8b3611d5352e3827982d871d..066222eb56c4af187791445f30a70443aef8a6d8 100644
+> --- a/net/psp/psp_main.c
+> +++ b/net/psp/psp_main.c
+> @@ -166,9 +166,46 @@ static void psp_write_headers(struct net *net, struct sk_buff *skb, __be32 spi,
+>   {
+>   	struct udphdr *uh = udp_hdr(skb);
+>   	struct psphdr *psph = (struct psphdr *)(uh + 1);
+> +	const struct sock *sk = skb->sk;
+>   
+>   	uh->dest = htons(PSP_DEFAULT_UDP_PORT);
+> -	uh->source = udp_flow_src_port(net, skb, 0, 0, false);
+> +
+> +	/* A bit of theory: Selection of the source port.
+> +	 *
+> +	 * We need some entropy, so that multiple flows use different
+> +	 * source ports for better RSS spreading at the receiver.
+> +	 *
+> +	 * We also need that all packets belonging to one TCP flow
+> +	 * use the same source port through their duration,
+> +	 * so that all these packets land in the same receive queue.
+> +	 *
+> +	 * udp_flow_src_port() is using sk_txhash, inherited from
+> +	 * skb_set_hash_from_sk() call in __tcp_transmit_skb().
+> +	 * This field is subject to reshuffling, thanks to
+> +	 * sk_rethink_txhash() calls in various TCP functions.
+> +	 *
+> +	 * Instead, use sk->sk_hash which is constant through
+> +	 * the whole flow duration.
+> +	 */
+> +	if (likely(sk)) {
+> +		u32 hash = sk->sk_hash;
+> +		int min, max;
+> +
+> +		/* These operations are cheap, no need to cache the result
+> +		 * in another socket field.
+> +		 */
+> +		inet_get_local_port_range(net, &min, &max);
+> +		/* Since this is being sent on the wire obfuscate hash a bit
+> +		 * to minimize possibility that any useful information to an
+> +		 * attacker is leaked. Only upper 16 bits are relevant in the
+> +		 * computation for 16 bit port value because we use a
+> +		 * reciprocal divide.
+> +		 */
+> +		hash ^= hash << 16;
+> +		uh->source = htons((((u64)hash * (max - min)) >> 32) + min);
+> +	} else {
+> +		uh->source = udp_flow_src_port(net, skb, 0, 0, false);
+> +	}
+>   	uh->check = 0;
+>   	uh->len = htons(udp_len);
+>   
 
-[1/1] io_uring/zcrx: fix user_ref race between scrub and refill paths
-      commit: 003049b1c4fb8aabb93febb7d1e49004f6ad653b
+Thanks. The PSP spec suggests in multiple places the that udp sport be a 
+hash derived from "inner header fields", so sk->sk_hash fits that 
+description better than sk->sk_txhash regardless of RSS use/abuse 
+categorization.
 
-Best regards,
--- 
-Jens Axboe
+It occurs to me now that fc724515741a ("psp: provide encapsulation 
+helper for drivers") also has a bug of unused udp sport parameter. I can 
+send a fix for that later, unless you want to remove that as well.
 
-
-
+Reviewed-By: Daniel Zahka <daniel.zahka@gmail.com>
 
