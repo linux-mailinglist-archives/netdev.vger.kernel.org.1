@@ -1,136 +1,130 @@
-Return-Path: <netdev+bounces-259372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259373-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GD0IKvhHlmmCdQIAu9opvQ
-	(envelope-from <netdev+bounces-259372-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 00:15:04 +0100
+	id uOwBBERJlmnedQIAu9opvQ
+	(envelope-from <netdev+bounces-259373-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 00:20:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC87A15ADA1
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 00:15:03 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7000D15AE23
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 00:20:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B2217303DD2F
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 23:12:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C2DEF3037EC0
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 23:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F237133A9DE;
-	Wed, 18 Feb 2026 23:12:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98B2C33AD90;
+	Wed, 18 Feb 2026 23:20:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sJiyRWvW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i6hwy7dx"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8E8338591;
-	Wed, 18 Feb 2026 23:12:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7462D338936;
+	Wed, 18 Feb 2026 23:20:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771456322; cv=none; b=fw7LE8MJ2q37keziU9UHFN+U8Gjsx+40NAeNaz++xOkyizoiDWvt2c2pkh4pS+FgTHvyUlAZJigKMEZaGFMXMBnRvYr3cawBObcn+5BwSFsPVfpsrLpB9H6qSpLyuiCrFs1bwH3Dm7ZzUlUb7tCV1QBlEvu8xLmgIH5yBFeiRoQ=
+	t=1771456818; cv=none; b=s1IFCXWn8czKtTn2PdpukdZsRYKQl4xneBaqXIncw9eSTn3xjsVeOzKgpjKhN7hPVaw+FJaOc+Nuz3ST+++qOmiGFdPGUEPAuaB0TAE0cj3S95HR3Rd6HDaCYOUcFpcJHLHI8eyfDaK2rY0MpkNUDZXq7lqYeWkEysID44SrR4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771456322; c=relaxed/simple;
-	bh=l2mmhtwx4AGKOlNOY2RMIeEbNsMULM2tIdh7Io2lzAQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fnaWOinkW/fBJk3sNJdE6toIq3hLiY4hsGJHfLtHHUnZaSZK5/ptOTIxBlKOB5vJdp0t4upWCtxyqN4kRHMwEXax1AOgbG3a7a30gD+/HOvLxypJbgP2tEUrE7sz+1nm/laT5ARNKvrPFLdl5TtTW0z0a4DOse3v070LnYoG9AE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=sJiyRWvW; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=h+hFf+woNMcuS5UpAbpJxrCSOyAlVkeAmCJ8RBioNh0=; b=sJiyRWvWWIpf9TuaKwBMz5RHqI
-	GMBUpTvgzaOoT+8VHHplAocVTQrAdNNX9cA2BoDDjtgQcfWSftxizve7zVDaROyecwAIm+gpM7APD
-	dGXqlurT3UGhLUM2VpSEKarJWz4CL8orrT7ciOooBGfX8753fPO1M3WIgsWIm1sNdkwE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vsqi0-007pqC-NA; Thu, 19 Feb 2026 00:11:52 +0100
-Date: Thu, 19 Feb 2026 00:11:52 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Linus Walleij <linusw@kernel.org>,
-	Bartosz Golaszewski <brgl@kernel.org>, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org
-Subject: Re: [PATCH] net: phy: qcom: qca807x: normalize return value of
- gpio_get
-Message-ID: <d4044009-1a17-4533-9449-68954ac55976@lunn.ch>
-References: <aZYnWZqfzKwzzF4f@google.com>
- <ba73d17a-1d7c-4e66-af6b-d8e5a37358f2@lunn.ch>
- <893C889D-3440-4DCC-904F-CA4228C48C50@gmail.com>
+	s=arc-20240116; t=1771456818; c=relaxed/simple;
+	bh=QTrVz5IaAuqZQ+xaNJzBYU3H1cLdiG2sbdLrfR2MBmY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=g0FQDxTA8Wuvwd4ZhIkxar6hhjJuIP9GMvIgZiRPrhdVbnylZYpTo94VjjqgcB049FW2FtCv9Px46P5QXVugGLAdqiXuvVMMvLWzRjmljab2pkfxUvcuxNQumlaUEdfvn3U29o65B4OhDDN+E5u/M7my23nkL7dxjIvMnbKWReY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i6hwy7dx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17693C116D0;
+	Wed, 18 Feb 2026 23:20:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771456818;
+	bh=QTrVz5IaAuqZQ+xaNJzBYU3H1cLdiG2sbdLrfR2MBmY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=i6hwy7dxFXaWt1zcO2KcSpawt5Cl7yr464niYuKQ6aYcNlojZ91Tp00kOscuYPFkN
+	 /h0o9Y3mJ+qlKgX+WrbHxPbP3G9RsCenFgD9xLRZXuB465AuAFENgYkE09w1mBwdo+
+	 B0Tsnsxwf4BUd8sBTXauPSQ5oHov1ZNSAYJ+q8pRepELQRsxzifhnyG8+H1e/eATE9
+	 oYpDycLBHaWlKxbT9YFOqJdlJQJ9guxZragvZLJz49v6cx2N04zN3CUnBSY4xFviKW
+	 b89osK7rlqyktBoROwCTVxPnzC56ooFyVoXGkwnu9voxVKsv/eKG9e2CQ2/YyVP/Pm
+	 IIgzMkBB+HN0w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 85209380CEE0;
+	Wed, 18 Feb 2026 23:20:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <893C889D-3440-4DCC-904F-CA4228C48C50@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf v1 0/2] libbpf: Remove extern declaration of
+ bpf_stream_vprintk()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177145680932.1592777.6289917082318107943.git-patchwork-notify@kernel.org>
+Date: Wed, 18 Feb 2026 23:20:09 +0000
+References: <20260218215651.2057673-1-ihor.solodrai@linux.dev>
+In-Reply-To: <20260218215651.2057673-1-ihor.solodrai@linux.dev>
+To: Ihor Solodrai <ihor.solodrai@linux.dev>
+Cc: ast@kernel.org, andrii@kernel.org, daniel@iogearbox.net,
+ eddyz87@gmail.com, jakub@cloudflare.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-team@meta.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259372-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-259373-lists,netdev=lfdr.de,netdevbpf];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mentor.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim,lunn.ch:email]
-X-Rspamd-Queue-Id: EC87A15ADA1
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,gmail.com,cloudflare.com,vger.kernel.org,meta.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 7000D15AE23
 X-Rspamd-Action: no action
 
-On Wed, Feb 18, 2026 at 03:01:22PM -0800, Dmitry Torokhov wrote:
-> On February 18, 2026 2:55:32 PM PST, Andrew Lunn <andrew@lunn.ch> wrote:
-> >On Wed, Feb 18, 2026 at 12:57:17PM -0800, Dmitry Torokhov wrote:
-> >> The GPIO get callback is expected to return 0 or 1 (or a negative error
-> >> code). Ensure that the value returned by qca807x_gpio_get() is
-> >> normalized to the [0, 1] range.
-> >> 
-> >> Signed-off-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-> >
-> >This appears to be a fix. Please add a Fixes: tag.
-> >
-> >Also, please put net into the Subject.
-> >
-> >https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+Hello:
+
+This series was applied to bpf/bpf.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
+
+On Wed, 18 Feb 2026 13:56:49 -0800 you wrote:
+> The first patch adjusts a selftest that has been using
+> bpf_stream_printk() macro. The second patch removes the declaration.
 > 
-> Will do, however I am not sure what should be tagged as "Fixes" - original driver commit or the change in gpiolib tightening the checks? 
+> Successful BPF CI run: https://github.com/kernel-patches/bpf/actions/runs/22156645808
+> 
+> Ihor Solodrai (2):
+>   selftests/bpf: Use vmlinux.h in test_xdp_meta
+>   libbpf: Remove extern declaration of bpf_stream_vprintk()
+> 
+> [...]
 
-commit 60befd2ea1c2061775838ea7bac5cc2b1353afd0
-Author: Vladimir Zapolskiy <vladimir_zapolskiy@mentor.com>
-Date:   Tue Dec 22 16:37:28 2015 +0200
+Here is the summary with links:
+  - [bpf,v1,1/2] selftests/bpf: Use vmlinux.h in test_xdp_meta
+    https://git.kernel.org/bpf/bpf/c/b3dfa128f7da
+  - [bpf,v1,2/2] libbpf: Remove extern declaration of bpf_stream_vprintk()
+    https://git.kernel.org/bpf/bpf/c/0cecd492f516
 
-suggests the check is to do with bugs when you have 32 GPIOs, and so
-the top bit for the 31st GPIO turns the value negative and results in
-an error code. However, this driver only has 2 GPIOs, so it is not an
-issue.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-So i would go for when the gpiolib tightened up the checks.
 
-   Andrew
 
