@@ -1,344 +1,374 @@
-Return-Path: <netdev+bounces-259326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259327-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8KvSJ6rllWneVwIAu9opvQ
-	(envelope-from <netdev+bounces-259326-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 17:15:38 +0100
+	id qEb6INPllWneVwIAu9opvQ
+	(envelope-from <netdev+bounces-259327-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 17:16:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 423CF157A5A
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 17:15:38 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B2BE157A85
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 17:16:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8039D3005589
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 16:15:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CFE57303B972
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 16:15:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 547FE23373D;
-	Wed, 18 Feb 2026 16:15:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6A6E2F1FED;
+	Wed, 18 Feb 2026 16:15:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jand+f8M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com [209.85.128.66])
+Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87D5CC2EA
-	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 16:15:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E4D0334682
+	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 16:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771431335; cv=none; b=Rm0kmKP9rD0wcN9D1Mkjfe3pL3hrQ7fqCNxP63lkB+hPV6emMI72HzyNx8BNO+Sn4qLGWEHyrsffqXYyNcUBuX2/TF1c3xhUb+/FSJAGYxjk1EzF2AkZ1syG4t6hXiBckUwKV510TC6K9KDngOLM2eHf84f1s1XJ41TmZI/lo9I=
+	t=1771431343; cv=none; b=lj3GSzMawKoq3XMwnu0xMB+/7oAeMUmT7oTLXxv+/K70fyntFcpyONoPGuPDF6OD32DlDElR04OBFjN9ybgM918t0Uu8wBgmbHgVnMlLhnduzbqhPfuBca5Br9QYnRmjfBFp9OQzokA0xG8TnEO+KF2gYY/GJJypTnhYaGC3CIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771431335; c=relaxed/simple;
-	bh=ftGedUjq5bQyBT2fiFnev7SPqerA7MdeEwOqlrSXnbQ=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=A2cYG4s51m5Rps3U17sN9ffhpBJelq0c1E2sqYsOIG+1KMUtOGNJFfpCdA2AQybKrusqNMnz0G2H9G2gWXaf92uevgTZ5dg+ckIrHwbpuO0+Ac0oVOMIIGrK1nRL5C7di9O9BCp4N8JjnxizZSHv7GdznxLf4VjOCYy8Vahjnbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+	s=arc-20240116; t=1771431343; c=relaxed/simple;
+	bh=M8x3Eta6dsHBZmEiqBxFrizv2ZeW28diPeGIt7lnfCA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Igglj24Oy9gVLIiX6kDLLSwJIcz9EGTUeye+1WdMDaKASsXW6pS1XnDYow9Xg4m99HxfHq50YXVYRwuV1d74DV4/L5omtnWbQBNXS3OWC6EsmK7lQ9H+AvhxidGsv+jNCC5D376i8HdffdhPo2+utW9kUgNR+5rdJktNLJFUxUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jand+f8M; arc=none smtp.client-ip=74.125.224.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f66.google.com with SMTP id 5b1f17b1804b1-480706554beso50125e9.1
-        for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 08:15:33 -0800 (PST)
+Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-64ad9fabd08so4795915d50.2
+        for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 08:15:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771431341; x=1772036141; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2QPsjXZQUdipsGNcNiU7XkuEdRr5aKeXHMLyIc5cKOk=;
+        b=jand+f8M3Jd5O3rcSzxwSXS3iXpIymlb5nzewPOdqK0MB2H8r2pVIQtTsfaE1fqGwQ
+         woFexX9sumlrZ3IpXGi62Jwwywe8Qb8NrzYQDffeoFkpj86kt17hwnW+T9RURb1futKv
+         wDcFcPtjocXiWm1cdi9QMZhl4VNsS8Ijl9/+8Km0Bc0GHk5UF67sfHMpjgrEO0dK7o9L
+         /632maIJJCSz2ucDEAYS01S/I3H7egf58AhrjY1fL2mx4K1HJCJ3c1Kn0VP+wPJNHjbX
+         vCuC22r9gOqSTB7tQYGr4eWB+cNbbv4N1+GCxbhzOE27BapNm0u50lcivnrwvpteOM0c
+         33zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771431332; x=1772036132;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:cc:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/F9MqBQhwqkCiz5DHJVrlZmkCOx7ANZz5Tu0pqSgGIU=;
-        b=Z/Wf6fpcDK5MDGoQySq7AxU7jcmCHQ3CSqJYMS9hz4yUAalhvXafTViPs8+zaQ9v1O
-         Av5yq8jzekI5MtIZRpH+FD/mvF8pi8qu7zTI2BSpVsNQK94yWKf4EftFiTMw7ekIG2d7
-         sMiSe8LLmfOCu7IX5X1XV2g9HxjskRBQIf/T2s4Nc289oBurNKNEOHZDQNNlK0QI9weN
-         TT9y6jBZ1NCfjVljDeEcOxZu6BL2yoOiiUpHSkVPh0n5U09v6uQ4MFumCaho0IjE0Hj1
-         5PblaMFzOr2LY29eAdlQWqeOdFQCEOPJw/E6+cR+C25CCaXQfBxwpzZbODxzfnvtMv2o
-         Gq1A==
-X-Forwarded-Encrypted: i=1; AJvYcCWz2hxaN6J4gkZnsWG5f3yRdiTCwcRps33uchNHS0GUZ8r2MJY4Hqsdt5Aiuq5Knm7C2pS1Dk8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwldYn0rmp2VklSpINVdyUzDX9XzeiT71rjj+3m53oUV0z/8+Rw
-	50Lwwzt9iWq6T41d2FEuXtWBwCAqjfq/3WVpIn46yZUxHJNgLRCY2MfW
-X-Gm-Gg: AZuq6aIt/mipdjzIkVlEoadnC43ii2lrsDgwA1lXsUgbMM5ygDRSjxBqdR8YDbnxG/i
-	k74lQIXO5yX848B/WQ4Z5gAwEpNBGIq1fYQHTMDnpGZiARAAus/h8Ajn4INpzG9YokDajapwqzx
-	CJjb30zmOPV64LYuQHkOWqIb1dXGJV1fPePP/QieQMiYyMqhQFIaOWsVcLhtfZ2lqiTbXmJzJjK
-	Rj4v+eS1IVCxKjoKftVnE+/r0h19ixId+dEhUEpoID3T54jaLzhGrngX00Fut0W+yFip8d4t02B
-	G/9B7Gy1Zkw1gkhLY39e74pr/YVTWVKjgR+07ULEs8n8jqJ+IvBT3L5UTDPBSpV6wXhaBDgztVl
-	t8Dr3maIMeAiO3EOe5Lm2VQbaGo3J1uHY3yu7d3pFM51cn57ecl5ENA7rMYgnTLpaKvPNvrZk1O
-	xdmTO24ULjlpiV9zNBzXNn6I5ZoFvtR5kiaTWqxYb4E/wVYeX/I2GFKO/NMVw=
-X-Received: by 2002:a05:600c:37cc:b0:477:58af:a91d with SMTP id 5b1f17b1804b1-48379b93370mr252101065e9.5.1771431331468;
-        Wed, 18 Feb 2026 08:15:31 -0800 (PST)
-Received: from [192.168.88.241] (89-24-32-126.nat.epc.tmcz.cz. [89.24.32.126])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4834d82a4afsm1056351605e9.11.2026.02.18.08.15.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Feb 2026 08:15:30 -0800 (PST)
-Message-ID: <90b25744-76e5-4d9a-865f-72832bbedfe5@ovn.org>
-Date: Wed, 18 Feb 2026 17:15:28 +0100
+        d=1e100.net; s=20230601; t=1771431341; x=1772036141;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2QPsjXZQUdipsGNcNiU7XkuEdRr5aKeXHMLyIc5cKOk=;
+        b=dyvB55p7rooMug5j5zLJ2kcGj+7trKlIFHDfoobJL2Texp3DInGciX+LZ7OCNmQoMz
+         IweA5yVhuBfUz934n4yN+WfOINvMCuGXa0N7FhlZFNYxO69ZvG0uK8A7infiMcgP1M0G
+         cKY7m1YOkM6iixgTSKDLhWpkYskHOzdfT2yHn2UP7hpf5+FqarO7+tpeNzIIFqvTK2kN
+         Lqqkya/dNBq/q322Fqrx2xYSUYryj1Ebq4xtnXHTeScnkPfI5hA2zWreNGjc0uU3sOcw
+         OrIN+zOTg5Ir9/pDNdfZHfucMGo9YT+TyT/HwsHeSlylA9zzp3BQMFAufjl5FXBMYMU4
+         Mrsw==
+X-Forwarded-Encrypted: i=1; AJvYcCXKrhIydl70OwmOESIGkz+QTL2JvlskersLW+vDXuCbrIzbK5p9cQ/Ui9NSrUCbXE95+iZZ1Mo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvKyBXkzXKuIwpzRSFP+YkhosAW0SEqnHut8Mj+J+/PDLT2GB/
+	hAr6beFDow03Z/jIseILOAHpq/XH6Gq4JafZQJYX9eTXl3s4Bezxkw1W
+X-Gm-Gg: AZuq6aKUC1REBgLAfyPlQxdmokUbJZjwdHiRqbouOeqM/HerCtMJiGktGuTbdvDIZ1W
+	AfJv82u2WTZ7VPxYoZf472fi9x32uaksg5mg7wljJF/iPCyAUiAjPJaSZTGEbUKGfXZ7RRW0V7C
+	mQcztKo0JD02ZXyu3lkITDS9OMlmFolZTJKYQ9HMw4k/GxQrc3ZNd0CmKwmIHugi8OharM6/1rN
+	MoP+byyCPUOzCfqF7QPqANMyIQLOn710Swsxe8FNWdD/rq7P63JYr83nFt4UTl9pVen4UjvoTsW
+	rH3ueGHJTP9P0Sljfugo1sveB4DwgufLQF2TbXwLG+QJjHM/Fla43q7oiuZ/y6M1t3T0qlH7xPD
+	fgtG9TBJYzeq12t15sgu1uiD/qembPCbRFodT2TAVaC2znqGJhC2C+LBIFFb5N/ZxzFoCttkgYY
+	BwPlPVlF5ZC7Q4h5LudtK7QEitUvaBHWm8hRtQ2ZsunCTsh8I=
+X-Received: by 2002:a53:de11:0:b0:649:3897:ba21 with SMTP id 956f58d0204a3-64c14d381f8mr13378167d50.52.1771431341018;
+        Wed, 18 Feb 2026 08:15:41 -0800 (PST)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:55::])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-64c22ea3ddfsm5898507d50.8.2026.02.18.08.15.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Feb 2026 08:15:40 -0800 (PST)
+Date: Wed, 18 Feb 2026 08:15:38 -0800
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Bobby Eshleman <bobbyeshleman@meta.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Daan De Meyer <daan.j.demeyer@gmail.com>
+Subject: Re: [PATCH net] vsock: lock down child_ns_mode as write-once
+Message-ID: <aZXlqv5ukWymz/NI@devvm11784.nha0.facebook.com>
+References: <20260217-vsock-ns-write-once-v1-1-a1fb30f289a9@meta.com>
+ <aZV6HRAIsf_rNRM2@sgarzare-redhat>
+ <aZWUmbiH11Eh3Y4v@sgarzare-redhat>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: i.maximets@ovn.org, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
- Henrik Steen <henrist@henrist.net>,
- Olivier Tilmans <olivier.tilmans@nokia.com>,
- Bob Briscoe <research@bobbriscoe.net>, Olga Albisser <olga@albisser.org>,
- GangMin Kim <km.kim1503@gmail.com>, Eelco Chaudron <echaudro@redhat.com>,
- Aaron Conole <aconole@redhat.com>, Florian Westphal <fw@strlen.de>
-Subject: Re: [PATCH net] net_sched: act_ct: drop all packets when not attached
- to ingress
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-References: <674b8cbfc385c6f37fb29a1de08d8fe5c2b0fbee.1771321118.git.pabeni@redhat.com>
- <cc6bfb4a-4a2b-42d8-b9ce-7ef6644fb22b@ovn.org>
- <ecfc49ae-99c9-414e-8b8d-211112fc5873@redhat.com>
- <b6b67235-bd7b-45d3-81e1-49a2a1f6b241@ovn.org>
- <CAM0EoM=g3ahJ704qDQmr4s-4sDJqbyRvWNDchb3YaRbD0zdyKA@mail.gmail.com>
-Content-Language: en-US
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- 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
-In-Reply-To: <CAM0EoM=g3ahJ704qDQmr4s-4sDJqbyRvWNDchb3YaRbD0zdyKA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aZWUmbiH11Eh3Y4v@sgarzare-redhat>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	TAGGED_FROM(0.00)[bounces-259326-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[ovn.org];
+	TAGGED_FROM(0.00)[bounces-259327-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[ovn.org,redhat.com,vger.kernel.org,resnulli.us,davemloft.net,google.com,kernel.org,henrist.net,nokia.com,bobbriscoe.net,albisser.org,gmail.com,strlen.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,meta.com,lists.linux.dev,vger.kernel.org,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,ovn.org:mid,ovn.org:email,msgid.link:url]
-X-Rspamd-Queue-Id: 423CF157A5A
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,meta.com:email]
+X-Rspamd-Queue-Id: 0B2BE157A85
 X-Rspamd-Action: no action
 
-On 2/18/26 3:28 PM, Jamal Hadi Salim wrote:
-> On Tue, Feb 17, 2026 at 2:37 PM Ilya Maximets <i.maximets@ovn.org> wrote:
->>
->> On 2/17/26 4:52 PM, Paolo Abeni wrote:
->>> Adding Florian, too
->>>
->>> On 2/17/26 3:49 PM, Ilya Maximets wrote:
->>>> On 2/17/26 10:38 AM, Paolo Abeni wrote:
->>>>> Since the blamed commit below, classify can return TC_ACT_CONSUMED while
->>>>> the current skb being held by the defragmentation engine. As reported by
->>>>> GangMin Kim, if such packet is that may cause a UaF when the defrag engine
->>>>> later on tries to tuch again such packet.
->>>>>
->>>>> act_ct was never meant to be used outside of the ingress path. Making
->>>>> defrag really works for act_ct outside such constraints range from very
->>>>> difficult to completely impossible.
->>>>>
->>>>> Address the issue making act_ct drop any packet when not attached to the
->>>>> ingress path and additionally emit a warning about the bad
->>>>> configuration.
->>>>>
->>>>> Reported-by: GangMin Kim <km.kim1503@gmail.com>
->>>>> Fixes: 8f9516daedd6 ("sched: Add enqueue/dequeue of dualpi2 qdisc")
->>>>> CC: stable@vger.kernel.org
->>>>> Link: https://patch.msgid.link/16f6b264373ad60ab18eb8525809e7267442afa7.1770394932.git.pabeni@redhat.com
->>>>> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
->>>>> ---
->>>>> Catching the bad configuration at runtime instead of init time to reduce
->>>>> complexity
->>>>> ---
->>>>>  net/sched/act_ct.c | 6 ++++++
->>>>>  1 file changed, 6 insertions(+)
->>>>>
->>>>> diff --git a/net/sched/act_ct.c b/net/sched/act_ct.c
->>>>> index 81d488655793..e8eb0d195f4a 100644
->>>>> --- a/net/sched/act_ct.c
->>>>> +++ b/net/sched/act_ct.c
->>>>> @@ -987,6 +987,11 @@ TC_INDIRECT_SCOPE int tcf_ct_act(struct sk_buff *skb, const struct tc_action *a,
->>>>>     tcf_lastuse_update(&c->tcf_tm);
->>>>>     tcf_action_update_bstats(&c->common, skb);
->>>>>
->>>>> +   if (!skb_at_tc_ingress(skb)) {
->>>>> +           pr_warn_once("act_CT should be attached at ingress!\n");
->>>>
->>>> Hi, Paolo.  I didn't test this yet, but I'm a little concerned about this
->>>> change.  For TC offload of OVS tunnels, we create egress qdisc for internal
->>>> ports, a.k.a. bridge ports.  This is necessary for tunnels to work.
->>>> A typical setup looks like this:
->>>>
->>>>     Bridge br-int (10.0.0.1)
->>>>         Port br-int
->>>>             Interface br-int
->>>>                 type: internal
->>>>         Port vm
->>>>             Interface vm
->>>>         Port vxlan0
->>>>             Interface vxlan0
->>>>                 type: vxlan
->>>>                 options: {remote_ip="172.31.1.1"}
->>>>
->>>>     Bridge br-phy (172.31.1.100)
->>>>         Port br-phy
->>>>             Interface br-phy
->>>>                 type: internal
->>>>         Port eth0
->>>>             Interface eth0
->>>>
->>>> When a VM sends a packet that supposed to go through the tunnel, it enters
->>>> from the vm port and OVS forwards it into vxlan0 LWT with an appropriate
->>>> tunnel metadata.  Then it gets encapsulated and put into kernel routing to
->>>> find the next hop, which is via br-phy bridge.  Packet enters br-phy and
->>>> OVS forwards the packet to eth0.  There can be stateful processing in the
->>>> br-phy bridge involving passing packets through conntrack.
->>>>
->>>> With the TC offload enabled, OVS creates following filters:
->>>>
->>>> 1. Ingress filter on vm interface that forwards packets to vxlan0.
->>>> 2. Egress filter on br-phy interface that forwards encapsulated packets
->>>>    to eth0 interface.
->>>>
->>>> If some stateful processing is involved, both of those could have act_ct
->>>> in them.
->>>>
->>>> AFAIU, we have to use Egress qdisc for the br-phy, because the packet is
->>>> egressing from the kernel routing via br-phy and the ingress qdisc is not
->>>> invoked.  Ingress will be at play when packets are flowing in the opposite
->>>> direction from eth0 to br-phy, as that's where they will ingress into
->>>> standard kernel routing.
->>>>
->>>> If act_tc will not be allowed on Egress, then stateful processing will
->>>> not be possible in this case in br-phy bridge.
->>>>
->>>> Thoughts?
->>>
->>> This looks very problematic. A slightly different patch tried to
->>> somewhat preserve functionality, but it simply can't work in presence of
->>> IP fragments.
->>>
->>> Why stateful processing on  br-int/port vm ingress is not enough?
->>
->> In general we don't know where the packet will go after encapsulation,
->> so we do not know beforehand if it will end up in another OVS bridge
->> or not.  Hence the processing has to be split in two parts, the ingress
->> on vm port and egress on the other bridge port.
->>
->> At the same time, thinking more about potential use cases, I don't see
->> a good one for running encapsulated traffic through conntrack.  Most
->> of the time it's a UDP unidirectional traffic with hashes for source
->> ports.  Not sure what functionality would require to do anything
->> stateful on such packets.  So, maybe it's fine to prohibit act_ct on
->> the egress after all.
->>
+On Wed, Feb 18, 2026 at 11:43:42AM +0100, Stefano Garzarella wrote:
+> On Wed, Feb 18, 2026 at 11:02:02AM +0100, Stefano Garzarella wrote:
+> > On Tue, Feb 17, 2026 at 05:45:10PM -0800, Bobby Eshleman wrote:
+> > > From: Bobby Eshleman <bobbyeshleman@meta.com>
+> > > 
+> > > To improve the security posture of vsock namespacing, this patch locks
+> > > down the vsock child_ns_mode sysctl setting with a write-once policy.
+> > > The user may write to child_ns_mode only once in each namespace, making
+> > > changes to either local or global mode be irreversible.
+> > > 
+> > > This avoids security breaches where a process in a local namespace may
+> > > attempt to jailbreak into the global vsock ns space by setting
+> > > child_ns_mode to "global", creating a new namespace, and accessing the
+> > > global space through the new namespace.
+> > 
+> > Commit 6a997f38bdf8 ("vsock: prevent child netns mode switch from local
+> > to global") should avoid exactly that, so I don't get this. Can you
+> > elaborate more how this can happen without this patch?
+> > 
+> > I think here we should talk more about what we described in
+> > https://lore.kernel.org/netdev/aZNNBc390y6V09qO@sgarzare-redhat/ which
+> > is that two administrator processes could compete in setting
+> > `child_ns_mode` and end up creating a namespace with an `ns_mode`
+> > different from the one set in `child_ns_mode`. But I would also explain
+> > that this can still be detected by the process by looking at `ns_mode`
+> > and trying again.  With this patch, we avoid this and allow the
+> > namespace manager to set it once and be sure that it cannot be changed
+> > again.
+
+Oh that's right, I lost track of the original intent when writing this.
+
+> > 
+> > > 
+> > > Additionally, fix the test functions that this change would otherwise
+> > > break by adding "global-parent" and "local-parent" namespaces and using
+> > > them as intermediaries to spawn namespaces in the given modes. This
+> > > avoids the need to change "child_ns_mode" in the init_ns. nsenter must
+> > > be used because ip netns unshares the mount namespace so nested "ip
+> > > netns add" breaks exec calls from the init ns.
+> > 
+> > I'm not sure what the policy is in netdev, but I would prefer to have
+> > selftest changes in another patch (I think earlier in the series so as
+> > not to break the bisection), in order to simplify backporting (e.g. in
+> > CentOS Stream, to keep the backport small, I didn't backport the dozens
+> > of patches for selftest that we did previously).
+
+Sounds good! I wasn't sure if breakage so tightly coupled should be in
+the same patch or not, I'm happy to split it up to ease backporting.
+
+> > 
+> > Obviously, if it's not possible and breaks the bisection, I can safely
+> > skip these changes during the backport.
+> > 
+> > > 
+> > > Test run:
+> > > 
+> > > 1..25
+> > > ok 1 vm_server_host_client
+> > > ok 2 vm_client_host_server
+> > > ok 3 vm_loopback
+> > > ok 4 ns_host_vsock_ns_mode_ok
+> > > ok 5 ns_host_vsock_child_ns_mode_ok
+> > > ok 6 ns_global_same_cid_fails
+> > > ok 7 ns_local_same_cid_ok
+> > > ok 8 ns_global_local_same_cid_ok
+> > > ok 9 ns_local_global_same_cid_ok
+> > > ok 10 ns_diff_global_host_connect_to_global_vm_ok
+> > > ok 11 ns_diff_global_host_connect_to_local_vm_fails
+> > > ok 12 ns_diff_global_vm_connect_to_global_host_ok
+> > > ok 13 ns_diff_global_vm_connect_to_local_host_fails
+> > > ok 14 ns_diff_local_host_connect_to_local_vm_fails
+> > > ok 15 ns_diff_local_vm_connect_to_local_host_fails
+> > > ok 16 ns_diff_global_to_local_loopback_local_fails
+> > > ok 17 ns_diff_local_to_global_loopback_fails
+> > > ok 18 ns_diff_local_to_local_loopback_fails
+> > > ok 19 ns_diff_global_to_global_loopback_ok
+> > > ok 20 ns_same_local_loopback_ok
+> > > ok 21 ns_same_local_host_connect_to_local_vm_ok
+> > > ok 22 ns_same_local_vm_connect_to_local_host_ok
+> > > ok 23 ns_delete_vm_ok
+> > > ok 24 ns_delete_host_ok
+> > > ok 25 ns_delete_both_ok
+> > > SUMMARY: PASS=25 SKIP=0 FAIL=0
+> > 
+> > IMO this can be removed from the commit message, doesn't add much value
+> > other than say that all test passes.
+
+sgtm!
+
+> > 
+> > > 
+> > > Fixes: eafb64f40ca4 ("vsock: add netns to vsock core")
+> > > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+> > > Suggested-by: Daan De Meyer <daan.j.demeyer@gmail.com>
+> > > Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
+> > > ---
+> > > include/net/af_vsock.h                  |  6 +++++-
+> > > include/net/netns/vsock.h               |  1 +
+> > > net/vmw_vsock/af_vsock.c                | 10 ++++++----
+> > > tools/testing/selftests/vsock/vmtest.sh | 35
+> > > +++++++++++++++------------------
+> > > 4 files changed, 28 insertions(+), 24 deletions(-)
+> > > 
+> > > diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+> > > index d3ff48a2fbe0..c7de33039907 100644
+> > > --- a/include/net/af_vsock.h
+> > > +++ b/include/net/af_vsock.h
+> > > @@ -276,10 +276,14 @@ static inline bool vsock_net_mode_global(struct vsock_sock *vsk)
+> > > 	return vsock_net_mode(sock_net(sk_vsock(vsk))) == VSOCK_NET_MODE_GLOBAL;
+> > > }
+> > > 
+> > > -static inline void vsock_net_set_child_mode(struct net *net,
+> > > +static inline bool vsock_net_set_child_mode(struct net *net,
+> > > 					    enum vsock_net_mode mode)
+> > > {
+> > > +	if (xchg(&net->vsock.child_ns_mode_locked, 1))
+> > > +		return false;
+> > > +
+> > > 	WRITE_ONCE(net->vsock.child_ns_mode, mode);
+> > > +	return true;
+> > > }
+> > > 
+> > > static inline enum vsock_net_mode vsock_net_child_mode(struct net *net)
+> > > diff --git a/include/net/netns/vsock.h b/include/net/netns/vsock.h
+> > > index b34d69a22fa8..8c855fff8039 100644
+> > > --- a/include/net/netns/vsock.h
+> > > +++ b/include/net/netns/vsock.h
+> > > @@ -17,5 +17,6 @@ struct netns_vsock {
+> > > 
+> > > 	enum vsock_net_mode mode;
+> > > 	enum vsock_net_mode child_ns_mode;
+> > > +	int child_ns_mode_locked;
+> > > };
+> > > #endif /* __NET_NET_NAMESPACE_VSOCK_H */
+> > > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> > > index 9880756d9eff..35e097f4fde8 100644
+> > > --- a/net/vmw_vsock/af_vsock.c
+> > > +++ b/net/vmw_vsock/af_vsock.c
+> > > @@ -90,14 +90,15 @@
+> > > *
+> > > *   - /proc/sys/net/vsock/ns_mode (read-only) reports the current namespace's
+> > > *     mode, which is set at namespace creation and immutable thereafter.
+> > > - *   - /proc/sys/net/vsock/child_ns_mode (writable) controls what mode future
+> > > + *   - /proc/sys/net/vsock/child_ns_mode (write-once) controls what mode future
+> > > *     child namespaces will inherit when created. The initial value matches
+> > > *     the namespace's own ns_mode.
+> > > *
+> > > *   Changing child_ns_mode only affects newly created namespaces, not the
+> > > *   current namespace or existing children. A "local" namespace cannot set
+> > > - *   child_ns_mode to "global". At namespace creation, ns_mode is inherited
+> > > - *   from the parent's child_ns_mode.
+> > > + *   child_ns_mode to "global". child_ns_mode is write-once, so that it may
+> > > + *   be configured and locked down by a namespace manager. At namespace
+> > > + *   creation, ns_mode is inherited from the parent's child_ns_mode.
+> > 
+> > We just merged commit a07c33c6f2fc ("vsock: document namespace mode
+> > sysctls") in the net tree, so we should update also
+> > Documentation/admin-guide/sysctl/net.rst
+
+Indeed.
+
+> > 
+> > > *
+> > > *   The init_net mode is "global" and cannot be modified.
+> > 
+> > Maybe we should also emphasise in the documentation and in the commit
+> > description that `child_ns_mode` in `init_net` also is write-once, so
+> > writing `local` to that one by the init process (e.g. systemd),
+> > essentially will make all the new namespaces in `local` mode. This could
+> > be useful for container/namespace managers.
+> > 
+
+Sounds good.
+
+> > > *
+> > > @@ -2853,7 +2854,8 @@ static int vsock_net_child_mode_string(const struct ctl_table *table, int write,
+> > > 		    new_mode == VSOCK_NET_MODE_GLOBAL)
+> > > 			return -EPERM;
+> > > 
+> > > -		vsock_net_set_child_mode(net, new_mode);
+> > > +		if (!vsock_net_set_child_mode(net, new_mode))
+> > > +			return -EPERM;
+> > 
+> > So, if `child_ns_mode` is set to `local` but locked, writing `local`
+> > again will return -EPERM, is this really what we want?
+> > 
+> > I'm not sure if we can relax it a bit, but then we may race between
+> > reader and writer, so maybe it's fine like it is in this patch, but we
+> > should document better that any writes (even same value) after the first
+> > one will return -EPERM.
 > 
-> Another alternative is to drop packets that have fragments? i.e
-> Paolo's original patch but instead of accepting to drop
-> Or perhaps if there are no consequences there is nothing wrong with
-> Paolo's original patch..
+> I think we can try in this way:
 > 
-> From a validation/testability/debugability POV, assuming its bad to
-> ignore frags processing:
-> The issue is for the user to distinguish between a bad setup (like
-> getting fragments in ct) and a good one where there were no frags. If
-> I were to write a tdc test to send two packets - one with fragments
-> and another without - a good way to check is to look at the tc
-> action/qdisc counters.. Paolo's original patch was accepting in both
-> cases the counter so the accept counter would read as 2 but if it was
-> dropped it would say 1 dropped and 1 accepted, so its easy to test (or
-> the user to debug)
+> static inline bool vsock_net_set_child_mode(struct net *net,
+> 					    enum vsock_net_mode mode)
+> {
+> 	int new_locked = mode + 1;
+> 	int old_locked = 0;
+> 
+> 	if (try_cmpxchg(&net->vsock.child_ns_mode_locked,
+> 			&old_locked, new_locked)) {
+> 		WRITE_ONCE(net->vsock.child_ns_mode, mode);
+> 		return true;
+> 	}
+> 
+> 	return old_locked == new_locked;
+> }
+> 
+> With a comment like this near child_ns_mode_locked in struct netns_vsock:
+> /* 0 = unlocked
+>  * 1 = locked to GLOBAL (VSOCK_NET_MODE_GLOBAL + 1)
+>  * 2 = locked to LOCAL  (VSOCK_NET_MODE_LOCAL + 1)
+>  */
+
+This looks good to me. Will change.
+
+> 
+> While writing that, I thought that we can even remove `child_ns_mode_locked`
+> and use a single variable where encode the value and the state, but maybe
+> it's an unnecessary extra complexity.
+> 
+> Stefano
+> 
+> > 
+> > About that, should we return something different, like -EBUSY ?
+> > Not a strong opinion, just to differentiate with the other check before.
+> > 
+> > Thanks,
+> > Stefano
 > 
 
-From a user's perspective I'd prefer if RTM_NEWTFILTER just fails when
-it contains TCA_ACT_KIND "ct" with TC_H_MIN_EGRESS.  This is clear
-for the application that makes a request and for the user if they make
-the request manually with 'tc filter ...'.
+Differentiating with -EBUSY sounds useful. Will add that and document.
 
-If the filter with act_ct is allowed to be created, but only works for
-non-fragmented traffic, that would be pretty hard to debug for someone
-who is not an expert in the area, but also would be a pretty inconsistent
-user API.
-
-Best regards, Ilya Maximets.
-
-> cheers,
-> jamal
-> 
->> For the implementation however, let's look at a different very simple
->> use case:
->>
->>    Application on the host -> br-phy -> NAT -> eth0.
->>
->> This is a very common thing to NAT traffic before it leaves the host.
->> It can be for load balancing reasons, e.g. if a destination is a service
->> IP with multiple backends and we want multiple applications to hit
->> different backends.
->>
->> There is no actual reason to try and offload such traffic to TC, as it
->> would not be possible to offload it to hardware (since the traffic
->> source is an application on the host).
->>
->> However, since OVS doesn't really know that it's not possible to offload
->> to hardware and TC by itself allows creation of such filter, it will
->> create the filter on the egress qdisc on the bridge port and that egress
->> filter will be performing act_ct with the NAT.
->>
->> With this patch applied, all this traffic will be just dropped.  If we're
->> going to prohibit act_ct on egress, that should be done at the moment of
->> creation of this action on the egress qdisc, so the user knows that it's
->> not supposed to be there.  E.g. if OVS will try to create such action and
->> fail, it will keep forwarding the traffic successfully through the normal
->> openvswitch datapath.  But if the TC filter creation succeeds, all traffic
->> will be just dropped by it.  That doesn't sound right.
->>
->> Best regards, Ilya Maximets.
-
+Best,
+Bobby
 
