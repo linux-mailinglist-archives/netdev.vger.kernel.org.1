@@ -1,127 +1,253 @@
-Return-Path: <netdev+bounces-259220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259221-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cNFYAZVrlWkzQwIAu9opvQ
-	(envelope-from <netdev+bounces-259220-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 08:34:45 +0100
+	id WHlUIN1xlWn8RQIAu9opvQ
+	(envelope-from <netdev+bounces-259221-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 09:01:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88FBE153B7B
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 08:34:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4155153D33
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 09:01:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 86EF93024107
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 07:30:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 98EEF300915E
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 08:01:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C82C730AAAF;
-	Wed, 18 Feb 2026 07:30:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="frHsimN5";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="s2N4jDFl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 475222857F0;
+	Wed, 18 Feb 2026 08:01:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A27B22877D8;
-	Wed, 18 Feb 2026 07:30:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0002F19DF4F
+	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 08:01:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771399840; cv=none; b=m5dn2imczrJhO2gL4I42j7Q1mmjX0MfflnPlGHaVTOwq3rzrc95UY4vb4O8mpdmdBUmQvXYYje5jDloxKf/2ZwH31sd+8FsJV7ZcMREnMMn29Fgg11jAsqySiUuDe+oS50XLlosuucDWOS5L1V4qaTgRvGiwwlnSSIroQGo/ah0=
+	t=1771401690; cv=none; b=TU6g8lKFk/H7523CjTuSrav7rh3/kTx7mXk3qmHjlHNIQ98CLIbmVg8PoyvhiFqJiF12UEVGogWPh+ES1XRKfWEbwATGTYBwkKT92q0PuNZX4skjj2bsyb+xC/q/X63pqw+O5yiLZvi9qdACxHZChmwp1cFi/WyxkiemfmPuY08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771399840; c=relaxed/simple;
-	bh=34u/rNF/6gMuqw/QVlKw+Hkw0ctFME7G9F/5KqB8LsQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g1GrXJsQ/zOXQd54gAeaP7qre1Aa5SS6nCIsQaQVasgOeEnI0w6aw/3W4LuLCZbRO7xnCzvUQbTG4ge0CUW4KUTLRDuRxiH3WdmWU7cBcfZK/LoHjS6Kyg/cNRw9Vk9tO9ZOk67Go/75JLfLSyvTtYaSUHzUyNqIkcrWPSn94tc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=frHsimN5; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=s2N4jDFl; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Wed, 18 Feb 2026 08:30:36 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1771399838;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rE1+nS47WTm1MywF1MSM8NtXNvVjaIpkgpgBHi8uZLw=;
-	b=frHsimN5f0WFkWdQz/69DQuAw9hk38yo+1V4Z4MJ/8gpB4qm+/hye4N71URiIQfEINN5Y6
-	E6COlf+uIVwSKmZD1GpLFDmb2Y+Kx05zaDhdTkQv+0Wr06dAZqyIcpwR6ow+tue62CBkAK
-	SsuRo77Ppkv5suj8XiJFSs2IOOFnbxwcaIfxXhoQZ5bLucWclIkF6PlpKWu0g3rlYomoKi
-	XOTISplYcOelNq6JLX9O7039ml3irE5LhptQ/55YzeBLKpW7UACrsc0FYZr1EHKashXBr7
-	9Z8f2yGKCpOPEJVwkP1POBX4JZ6FGdWqB7tWy7IB9WiWEZCBBub1WCC/mqAN5Q==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1771399838;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rE1+nS47WTm1MywF1MSM8NtXNvVjaIpkgpgBHi8uZLw=;
-	b=s2N4jDFl/I3362WXwp8T+mzBytfrQXnRjYmii6jBZk1HHGQB2uSMExzRTHMePdUXeCOVMY
-	cb8Tn3tHtRrIghCQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Bert Karwatzki <spasswolf@web.de>
-Cc: Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org,
-	linux-rt-devel@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
-Subject: Re: "Dead loop on virtual device" error without softirq-BKL on
- PREEMPT_RT
-Message-ID: <20260218073036.AlkNRoAP@linutronix.de>
-References: <6274de932f4a62c51b424b65fc875ef3cb5ffd60.camel@web.de>
- <20260216153745.CA3__zRc@linutronix.de>
- <37d6e27f96afb57c5716798530cb3560d25202e5.camel@web.de>
- <20260217071952.WCXLGs5-@linutronix.de>
- <80114792206dc00d0099f00999a209e717debb12.camel@web.de>
- <20260217095700.SjYjM8RO@linutronix.de>
- <4fba57892e5bd6a1afc4a36a80b40e3ecc28cac5.camel@web.de>
- <fd609cfe186ee48e0e9a08e35764175a2516dd14.camel@web.de>
- <2369ba83d204290dcfe157aed3f943206213b979.camel@web.de>
- <aa02f39ec4640c9d98963f42121b76e59b58371d.camel@web.de>
+	s=arc-20240116; t=1771401690; c=relaxed/simple;
+	bh=uEEqcGAmbzr0e+JO2ZCt+O57tGqAqtgD3MpvDgtLlik=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YMZxyhtxtXM0p9kQeWfTpMhBHKGwOTpLJFxycqxaezmUxbx0ZFjBmVFkQtX2Yr76+7pAdIfbUm/DuaD4vTI0U8/jicsPyIC9xdEN1O6KSZ+IPW/KCt1hAMk5W4rD+0qtMtL6HJiHw41LPdShN36hSKprdNbbqDiFidQSowFMZXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.2.221] (p5b13aefb.dip0.t-ipconnect.de [91.19.174.251])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id EC80C4C2C37D45;
+	Wed, 18 Feb 2026 09:00:33 +0100 (CET)
+Message-ID: <705e0576-db72-4ea1-b548-b69197bbaf87@molgen.mpg.de>
+Date: Wed, 18 Feb 2026 09:00:33 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aa02f39ec4640c9d98963f42121b76e59b58371d.camel@web.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH v1 iwl-net] iavf: fix out-of-bounds
+ writes in iavf_get_ethtool_stats()
+To: Kohei Enju <kohei@enjuk.jp>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+ Mateusz Palczewski <mateusz.palczewski@intel.com>,
+ Witold Fijalkowski <witoldx.fijalkowski@intel.com>,
+ Przemyslaw Patynowski <przemyslawx.patynowski@intel.com>,
+ kohei.enju@gmail.com
+References: <20260214191502.267670-1-kohei@enjuk.jp>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20260214191502.267670-1-kohei@enjuk.jp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-259221-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259220-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[web.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[lists.osuosl.org,vger.kernel.org,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
+	DMARC_NA(0.00)[mpg.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linutronix.de:mid,linutronix.de:dkim]
-X-Rspamd-Queue-Id: 88FBE153B7B
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: D4155153D33
 X-Rspamd-Action: no action
 
-On 2026-02-17 20:10:09 [+0100], Bert Karwatzki wrote:
+Dear Kohei,
+
+
+Thank you for your patch.
+
+Am 14.02.26 um 20:14 schrieb Kohei Enju:
+> iavf incorrectly uses real_num_tx_queues for ETH_SS_STATS. Since the
+> value could change in runtime, we should use num_tx_queues instead.
 > 
-> I tried to research the original commit which introduced the xmit_lock_owner check, but
-> it is present since linux 2.3.6 (released 19990610) (when __dev_queue_xmit() was still called dev_queue_xmit()),
-> so I can't tell the original idea behind that check (perhaps recuesion detection ...), so I'm
-> not completely sure if it can be omitted (and just let dev_xmit_recursion() do the recursion checking).
+> Moreover iavf_get_ethtool_stats() uses num_active_queues while
+> iavf_get_sset_count() and iavf_get_stat_strings() use
+> real_num_tx_queues, which triggers out-of-bounds writes when we do
+> "ethtool -L" and "ethtool -S" simultaneously [1].
+> 
+> For example when we change channels from 1 to 8, Thread 3 could be
+> scheduled before Thread 2, and out-of-bounds writes could be triggered
+> in Thread 3:
+> 
+> Thread 1 (ethtool -L)       Thread 2 (work)        Thread 3 (ethtool -S)
+> iavf_set_channels()
+> ...
+> iavf_alloc_queues()
+> -> num_active_queues = 8
+> iavf_schedule_finish_config()
+>                                                     iavf_get_sset_count()
+>                                                     real_num_tx_queues: 1
+>                                                     -> buffer for 1 queue
+>                                                     iavf_get_ethtool_stats()
+>                                                     num_active_queues: 8
+>                                                     -> out-of-bounds!
+>                              iavf_finish_config()
+>                              -> real_num_tx_queues = 8
+> 
+> Use immutable num_tx_queues in all related functions to avoid the issue.
+> 
+> [1]
+>   BUG: KASAN: vmalloc-out-of-bounds in iavf_add_one_ethtool_stat+0x200/0x270
+>   Write of size 8 at addr ffffc900031c9080 by task ethtool/5800
+> 
+>   CPU: 1 UID: 0 PID: 5800 Comm: ethtool Not tainted 6.19.0-enjuk-08403-g8137e3db7f1c #241 PREEMPT(full)
+>   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+>   Call Trace:
+>    <TASK>
+>    dump_stack_lvl+0x6f/0xb0
+>    print_report+0x170/0x4f3
+>    kasan_report+0xe1/0x180
+>    iavf_add_one_ethtool_stat+0x200/0x270
+>    iavf_get_ethtool_stats+0x14c/0x2e0
+>    __dev_ethtool+0x3d0c/0x5830
+>    dev_ethtool+0x12d/0x270
+>    dev_ioctl+0x53c/0xe30
+>    sock_do_ioctl+0x1a9/0x270
+>    sock_ioctl+0x3d4/0x5e0
+>    __x64_sys_ioctl+0x137/0x1c0
+>    do_syscall_64+0xf3/0x690
+>    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>   RIP: 0033:0x7f7da0e6e36d
+>   ...
+>    </TASK>
+> 
+>   The buggy address belongs to a 1-page vmalloc region starting at 0xffffc900031c9000 allocated at __dev_ethtool+0x3cc9/0x5830
+>   The buggy address belongs to the physical page: page: refcount:1 mapcount:0 mapping:0000000000000000
+>   index:0xffff88813a013de0 pfn:0x13a013
+>   flags: 0x200000000000000(node=0|zone=2)
+>   raw: 0200000000000000 0000000000000000 dead000000000122 0000000000000000
+>   raw: ffff88813a013de0 0000000000000000 00000001ffffffff 0000000000000000
+>   page dumped because: kasan: bad access detected
+> 
+>   Memory state around the buggy address:
+>    ffffc900031c8f80: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
+>    ffffc900031c9000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>   >ffffc900031c9080: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
+>                      ^
+>    ffffc900031c9100: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
+>    ffffc900031c9180: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
+> 
+> Fixes: 64430f70ba6f ("iavf: Fix displaying queue statistics shown by ethtool")
+> Signed-off-by: Kohei Enju <kohei@enjuk.jp>
+> ---
+>   .../net/ethernet/intel/iavf/iavf_ethtool.c    | 31 +++++++++----------
+>   1 file changed, 15 insertions(+), 16 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
+> index 6ff3842a1ff1..98bec3afc200 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
+> @@ -313,14 +313,13 @@ static int iavf_get_sset_count(struct net_device *netdev, int sset)
+>   {
+>   	/* Report the maximum number queues, even if not every queue is
+>   	 * currently configured. Since allocation of queues is in pairs,
+> -	 * use netdev->real_num_tx_queues * 2. The real_num_tx_queues is set
+> -	 * at device creation and never changes.
+> +	 * use netdev->num_tx_queues * 2. The num_tx_queues is set at
+> +	 * device creation and never changes.
+>   	 */
+>   
+>   	if (sset == ETH_SS_STATS)
+>   		return IAVF_STATS_LEN +
+> -			(IAVF_QUEUE_STATS_LEN * 2 *
+> -			 netdev->real_num_tx_queues);
+> +		       (IAVF_QUEUE_STATS_LEN * 2 * netdev->num_tx_queues);
+>   	else
+>   		return -EINVAL;
+>   }
+> @@ -345,19 +344,19 @@ static void iavf_get_ethtool_stats(struct net_device *netdev,
+>   	iavf_add_ethtool_stats(&data, adapter, iavf_gstrings_stats);
+>   
+>   	rcu_read_lock();
+> -	/* As num_active_queues describe both tx and rx queues, we can use
+> -	 * it to iterate over rings' stats.
+> +	/* Use num_tx_queues to report stats for the maximum number of queues.
+> +	 * Queues beyond num_active_queues will report zero.
+>   	 */
+> -	for (i = 0; i < adapter->num_active_queues; i++) {
+> -		struct iavf_ring *ring;
+> +	for (i = 0; i < netdev->num_tx_queues; i++) {
+> +		struct iavf_ring *tx_ring = NULL, *rx_ring = NULL;
+>   
+> -		/* Tx rings stats */
+> -		ring = &adapter->tx_rings[i];
+> -		iavf_add_queue_stats(&data, ring);
+> +		if (i < adapter->num_active_queues) {
+> +			tx_ring = &adapter->tx_rings[i];
+> +			rx_ring = &adapter->rx_rings[i];
+> +		}
+>   
+> -		/* Rx rings stats */
+> -		ring = &adapter->rx_rings[i];
+> -		iavf_add_queue_stats(&data, ring);
+> +		iavf_add_queue_stats(&data, tx_ring);
+> +		iavf_add_queue_stats(&data, rx_ring);
+>   	}
+>   	rcu_read_unlock();
+>   }
+> @@ -376,9 +375,9 @@ static void iavf_get_stat_strings(struct net_device *netdev, u8 *data)
+>   	iavf_add_stat_strings(&data, iavf_gstrings_stats);
+>   
+>   	/* Queues are always allocated in pairs, so we just use
+> -	 * real_num_tx_queues for both Tx and Rx queues.
+> +	 * num_tx_queues for both Tx and Rx queues.
+>   	 */
+> -	for (i = 0; i < netdev->real_num_tx_queues; i++) {
+> +	for (i = 0; i < netdev->num_tx_queues; i++) {
+>   		iavf_add_stat_strings(&data, iavf_gstrings_queue_stats,
+>   				      "tx", i);
+>   		iavf_add_stat_strings(&data, iavf_gstrings_queue_stats,
 
-Okay. Thank you. I add it to my list.
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
-> Bert Karwatzki
 
-Sebastian
+Kind regards,
+
+Paul
 
