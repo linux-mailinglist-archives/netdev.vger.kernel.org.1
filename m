@@ -1,160 +1,159 @@
-Return-Path: <netdev+bounces-259244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259245-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yMsMGfeJlWnqSAIAu9opvQ
-	(envelope-from <netdev+bounces-259244-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 10:44:23 +0100
+	id 2MmrEdKLlWlVSQIAu9opvQ
+	(envelope-from <netdev+bounces-259245-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 10:52:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B173154D11
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 10:44:22 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD741154E4A
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 10:52:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 59237300EA97
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 09:44:21 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1A2EC3012E6D
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 09:52:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F231A326922;
-	Wed, 18 Feb 2026 09:44:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9CED33D6EF;
+	Wed, 18 Feb 2026 09:52:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lpJw3aqc"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="VA1AwakW";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="VA1AwakW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF96731B814
-	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 09:44:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4147B33C50A
+	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 09:52:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771407860; cv=none; b=XaOfYeJ2z/ZygOP845yJap/Q7N5UjlUoCfo2KlST1XfFsysSKRpQaIK92FOFtpJVYKSIiDnOuJ++5chnijkS6oVsxV2C7fp2+U48CG4rO5Fw5vYKoXYdF5gcSYbUlMoGKPJU9zTbr3mn55A7hxe+bDwXTggqpdN6MKLH6qysb+w=
+	t=1771408331; cv=none; b=jvNwXCQTbFW4cfpPvhclupvOuFyiUQdk9cSys1CVwsKtT17hZn6HDvGt9++qYrVTj4SZC5/Kt4p3xopoYyB/1E/ROYVyUihLPHowyHcK6GddKB2Fm0T0AmNLLxUypaVmNWIQjAd6ZdAHdT7D9NSNkeUCRGdtlAQdXDWaQCLuvXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771407860; c=relaxed/simple;
-	bh=DvBwpAu06e6aj8xMNAmhq7qBsezlWGDqujytLeNzUcY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DHlowH+s9wgh4ZEtV708L24J1qzc5HIZd2LEWB3rHaegVbHTHcgmlaVfurLmpgl8louNFqIkQotNZcr+zsXy6UMrc8yFcpLkDZKz5AOB1MeU0jhUYkM/Msv8+yPjz0lvqA8PpJetNeLkV/0SB9md0Omdo3r0Fh9CFfpE5afwbuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lpJw3aqc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92A73C19421;
-	Wed, 18 Feb 2026 09:44:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771407860;
-	bh=DvBwpAu06e6aj8xMNAmhq7qBsezlWGDqujytLeNzUcY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lpJw3aqcxAkE/64jTro2O9TAHqKR0qTIB+mH8brhyHWqFsTW4C98TeGsil2Mb06zL
-	 lz89ACOlYciFPp4g7/rC1ANToDTUC7uvWHBdIO6QwX8qjnKjPd7akZKIHUzXW/wVax
-	 vjiQ4aYA4yI0K6Dk8E565D65Eq/vSLyuZTu/18Sqed/gVCZDNdCtkifv5SNEYABQzn
-	 CFC5PkNTjLDgQMoHWpVQYIDF2V0sl49ADo7BLMdnXaLfjzpfJ9xCUU85Nq9bhtikps
-	 CIyjDZouuUNu2tAlPgYIMGwmr0WJtmqIuxU/lJpmC8ckmtaJ2tzfchPFWAGSuc1GLg
-	 SUaJrqNDW+ncA==
-Date: Wed, 18 Feb 2026 09:44:16 +0000
-From: Simon Horman <horms@kernel.org>
-To: Hyunwoo Kim <imv4bel@gmail.com>
-Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	Sabrina Dubroca <sd@queasysnail.net>
-Subject: Re: [PATCH net v2] espintcp: Fix race condition in espintcp_close()
-Message-ID: <aZWJ8KeUttdEIi3v@horms.kernel.org>
-References: <aZSie7rEdh9Nu0eM@v4bel>
+	s=arc-20240116; t=1771408331; c=relaxed/simple;
+	bh=RJN7VwLgRbysX/GaZnO21V0s1Gnlb8jQMZYhR3neSFY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=B0YdyQuql93CDc8n9eXhQI5pJrCDJ7X1YcjQW3VdeBo158HBixjTCWBbeo7875aXUrE1amO3X6tCOAPu1RuLI+QWIOByMGlzMxwALth5/5FsKt9mRTk/4EuZZklh6k9TnCHZFAYpQgObHdzzhCc5xRvyFnFkm/DUbV1zji3kB2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=VA1AwakW; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=VA1AwakW; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 90C8F5BCC9;
+	Wed, 18 Feb 2026 09:52:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1771408327; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1qq8z/OXjLb7Vbssw0MTizM/EphKSCRXKSLOblBdcEE=;
+	b=VA1AwakW+XiAmozxbE8J7qZrQuEf0+n6ib1+6fbubOke3wbODuvMeCOcD64nyd4vCS+6j/
+	2cqA+2yIJ/JmEB55zUFcMfEL2AhvclSOmRZa1zIUUrbxNkD5jNvcTBFALY11162rdDspf9
+	3hse2FjaMAWXjosrHWAfF8m3bSEH1VI=
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1771408327; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1qq8z/OXjLb7Vbssw0MTizM/EphKSCRXKSLOblBdcEE=;
+	b=VA1AwakW+XiAmozxbE8J7qZrQuEf0+n6ib1+6fbubOke3wbODuvMeCOcD64nyd4vCS+6j/
+	2cqA+2yIJ/JmEB55zUFcMfEL2AhvclSOmRZa1zIUUrbxNkD5jNvcTBFALY11162rdDspf9
+	3hse2FjaMAWXjosrHWAfF8m3bSEH1VI=
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2C1E53EA65;
+	Wed, 18 Feb 2026 09:52:07 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id +Y2iCceLlWnjfQAAD6G6ig
+	(envelope-from <jgross@suse.com>); Wed, 18 Feb 2026 09:52:07 +0000
+From: Juergen Gross <jgross@suse.com>
+To: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Cc: Juergen Gross <jgross@suse.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	xen-devel@lists.xenproject.org
+Subject: [PATCH v2 0/2]  xen/xenbus: better handle backend crash
+Date: Wed, 18 Feb 2026 10:52:03 +0100
+Message-ID: <20260218095205.453657-1-jgross@suse.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aZSie7rEdh9Nu0eM@v4bel>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Score: -1.80
+X-Spam-Level: 
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259244-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-259245-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jgross@suse.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,get_maintainer.pl:url]
-X-Rspamd-Queue-Id: 9B173154D11
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,suse.com:mid,suse.com:dkim]
+X-Rspamd-Queue-Id: DD741154E4A
 X-Rspamd-Action: no action
 
-+ Sabrina
+This small series fixes PV-device frontend side handling in case the
+backend crashed and has come up again.
 
-On Wed, Feb 18, 2026 at 02:16:43AM +0900, Hyunwoo Kim wrote:
-> This issue was discovered during a code audit.
-> 
-> After cancel_work_sync() is called from espintcp_close(), 
-> espintcp_tx_work() can still be scheduled from paths such as 
-> the Delayed ACK handler or ksoftirqd.
-> As a result, the espintcp_tx_work() worker may dereference a 
-> freed espintcp ctx or sk.
-> 
-> The following is a simple race scenario:
-> 
->            cpu0                             cpu1
-> 
->   espintcp_close()
->     cancel_work_sync(&ctx->work);
->                                      espintcp_write_space()
->                                        schedule_work(&ctx->work);
-> 
-> To prevent this race condition, cancel_work_sync() is 
-> replaced with disable_work_sync().
-> 
-> Fixes: e27cca96cd68 ("xfrm: add espintcp (RFC 8229)")
-> Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
-> ---
-> Changes in v2:
-> - Shorten the patch subject
-> - Target the net tree
-> - Add the bug discovery background and the race scenario to the commit message
-> - v1: https://lore.kernel.org/all/aZLmvv51f5Iu9G7b@v4bel/
+The old device will be discarded and the replacement can be used
+instead.
 
-Thanks for taking my review into account [1].
-This version looks good to me.
+Changes in V2:
+- fixed one comment related build warning
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Juergen Gross (2):
+  xenbus: add xenbus_device parameter to xenbus_read_driver_state()
+  xen/xenbus: better handle backend crash
 
-It seems that get_maintainer.pl highlights that Sabrina is also a
-maintainer, so I have CCed here and left the full context of the
-patch in place for her convenience.
+ drivers/net/xen-netfront.c                 | 34 +++++++++---------
+ drivers/pci/xen-pcifront.c                 |  8 ++---
+ drivers/scsi/xen-scsifront.c               |  2 +-
+ drivers/xen/xen-pciback/xenbus.c           | 10 +++---
+ drivers/xen/xenbus/xenbus_client.c         | 17 +++++++--
+ drivers/xen/xenbus/xenbus_probe.c          | 42 ++++++++++++++++++++--
+ drivers/xen/xenbus/xenbus_probe_frontend.c |  2 +-
+ include/xen/xenbus.h                       |  4 ++-
+ 8 files changed, 84 insertions(+), 35 deletions(-)
 
-[1] https://lore.kernel.org/netdev/aZSbSOVuRgkjeezg@v4bel/
+-- 
+2.53.0
 
-> ---
->  net/xfrm/espintcp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/xfrm/espintcp.c b/net/xfrm/espintcp.c
-> index bf744ac9d5a7..8709df716e98 100644
-> --- a/net/xfrm/espintcp.c
-> +++ b/net/xfrm/espintcp.c
-> @@ -536,7 +536,7 @@ static void espintcp_close(struct sock *sk, long timeout)
->  	sk->sk_prot = &tcp_prot;
->  	barrier();
->  
-> -	cancel_work_sync(&ctx->work);
-> +	disable_work_sync(&ctx->work);
->  	strp_done(&ctx->strp);
->  
->  	skb_queue_purge(&ctx->out_queue);
-> -- 
-> 2.43.0
-> 
 
