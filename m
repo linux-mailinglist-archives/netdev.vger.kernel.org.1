@@ -1,172 +1,179 @@
-Return-Path: <netdev+bounces-259340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259353-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YOejGej+lWkDYAIAu9opvQ
-	(envelope-from <netdev+bounces-259340-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 19:03:20 +0100
+	id WKe5AHgZlmkSaAIAu9opvQ
+	(envelope-from <netdev+bounces-259353-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 20:56:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7A9F1587E1
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 19:03:19 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FB35159428
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 20:56:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 794CA300576E
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 18:03:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 77884300461F
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 19:56:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F4024346797;
-	Wed, 18 Feb 2026 18:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B27F0347BC6;
+	Wed, 18 Feb 2026 19:56:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kcYEeTwE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KS1UWHRN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568A0344DBC
-	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 18:03:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.178
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771437787; cv=pass; b=SMXEAtzNLreE9FB2yEUItfb7ICWPCgHBWLGUcGB7wNwm73GRni/jPgq9SOVC/J7lee2XvKzjaUiC/4AvV+DzEv1fTCTyrlDYvgNFF9ZFXjycI7GBbhxsvRJCU9I/pexVephgkh7+dlWtJcuv7GSmVRmePkX/Rgk+5UpCcd61dOI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771437787; c=relaxed/simple;
-	bh=mRGlLzcyBU2hMT/t/1/OrHyiZLvyFfBvs+g40nVkdfE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UIAD13QfKeH7eZ8/PH5tWx+YhFYe2aN2yixIDP+H/sDC/i7kGykCY7ffaKrJPd3XEuzBe+iRPtPFW3zjIOPx0sd9GQ/YITNdk4fsHTBRhxm6zYCsDMQQJwIuk4xU5MsZVshO+y+XAYLHUyRyXsI2WWimqIiue4yxPNZ3TGkNZ2g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kcYEeTwE; arc=pass smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-506a321cc53so114791cf.3
-        for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 10:03:06 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771437785; cv=none;
-        d=google.com; s=arc-20240605;
-        b=cEFrzJ4D46XWSf1rfvNnB3Mw477WbzU+o81gd/3FVnCvvfbF2CUhjxLNtSUNnDJp0s
-         ouw7YBAd25M80xNuxnSTYt4Th/Ne2H5/YCcUh+0Xb6fJeWjfIwSWeg7gPDqw3qVT1TNl
-         8mdKvGc55uERa3q460WS9/OdFpYUTcbGSZMwt2RmlHEobtaglrybJ+0l7kLjQWbNzOdX
-         Og5ylj1WtX0rNK2puAHBSJ/ozjpDnQO4ZczvLXqW7xkxkXEczptE2oCVhm0LoBjpTp50
-         4jomtCvdDDNPnEfjHs/gwV9TnpSFbZxygqqoExnzNdesxrA5ABhjD4O0td5adRBfucvW
-         lpNw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=mRGlLzcyBU2hMT/t/1/OrHyiZLvyFfBvs+g40nVkdfE=;
-        fh=uIkjex7smlvq0LxKXRdB12u4+7+4l9do7yDfnQUtdNM=;
-        b=T9PkP1Xchd+OZHb5/WNH5wB+apzu1li4BPIM6QW6yIX7wskutMH0yPtkPjAfw6XPiR
-         h9NwatXzqq7oMb++wjKkwVBv8qkE+MmaEbFLoBq3Kdd06RJt5ymNpGMaEBvkT8gdQBdr
-         gIIAnlLb7KbA/BrRhlAyaiSwUZXQRNgqWcYYU4yLDwdJWCGNEfwWuV7dKCsMkG3M/RR5
-         dRE0E+2KLTP6Z2h/lcWBawdrMy4SO5MYxj8QEScciPmksPnuLzfDDkS3bm+YghflNxJl
-         hy6WzoAGMCmW4v6fbQ3vrqXUWer/tG3Bc60pOYPCpbIJcb9r87lpzzM5JSqGHWyTZbd7
-         U/tQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5B6238C29
+	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 19:56:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771444593; cv=none; b=PWZALZfzxXb48aGIny+qM2jYUMGmsh/8eEcyVfZT/CRRnD71zE6cPp89O6qgtgD3H1NfZtO5jsAXQyjW8ctZaCgJE13kz2P3mJdNO8aAdA/aeWAoC3Z8EvJegPB0jUxnAzHc70mcXJ1eZhpm1lXtV2H/9FIWy5l5Cq44f05cwZk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771444593; c=relaxed/simple;
+	bh=vBUAyAbacjfaRDxMQvWcGcFT+qxiW9zxnAxYnB8luFk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=APmSHVcLnzbhiVkqd2ogmf9gupMYl3Fxy9iDeYNHg4klGImNhyN3jm+kA/HWgNo4Z60rXczAI2h0WHAWQktZpHsiT/kRLfS+/hk/q8lwY4QYo/mb+l3s6etKEop5fuARZQgBzl8Exs5DGIP0xjWv36u8+7x4vf+XgvPYuoFzBlo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KS1UWHRN; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-8c713a6a6f8so27506785a.0
+        for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 11:56:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771437785; x=1772042585; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mRGlLzcyBU2hMT/t/1/OrHyiZLvyFfBvs+g40nVkdfE=;
-        b=kcYEeTwEtklb+cSwo1j/UX5kIvJoJOO3Dhpsg660hGjm4ehw+bJWDHjVx7Bq0zMHbW
-         MnotCPuM15LPPZqRjhIy0c+AN20HMT7KI80x7gFGBegV1MWFjGdrNnmv4dZE3FOb1pUG
-         eEoha5+7UZr1rCDAOntt/I7t0AR6bWz3qR9tzskXInpdQWlCes/JwRP+bWR3oHVSJbTz
-         K0niB/w58Lmu1/uIzbajjCvXNtkryT0/O5CkfZD+eFBIgiMPbjfyccjLP6gwdW+ub9lR
-         RDjBXMFqpzK1aoJxaY21XKgT89Et2uy+y9DkVICi0IA6F+x3FMNYD2kh0G/meA8P76Kj
-         djNA==
+        d=gmail.com; s=20230601; t=1771444591; x=1772049391; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wD8Ttwe5Tegj8OFrv2Q7m/YBq2wmzpAVQJC0WJWjYy8=;
+        b=KS1UWHRNb9ZlAhRfC/s9nNN9vTufJ3/PEazrIgBD1cSnx6RlBR0EwANWc8b+ygj5ja
+         Bw/jPsabpbezWAaDwFrzqONTAK9KvEFz0oY6GAOHaN5m06Ef6Z1vVEbS+2TYb+/TJ49G
+         TWn3JP4GgQdlDD26/5rETLevAB03FL6qNAotcZyT3laarXKVMaXDhsLMjssHmpPM0+bb
+         qFjKghutzChmQy7PkwpIO8xC0gHPN/aONYNumtsProyvVGx/MYOjXqEnkTBT3f3ngY+i
+         v1zSnWXt8Ka81MvoDSGl1ot3HiC7pJMjCqv7LQj5LLyI6pwFjeQDve+tsvxErOfv6Pdz
+         TRbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771437785; x=1772042585;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=mRGlLzcyBU2hMT/t/1/OrHyiZLvyFfBvs+g40nVkdfE=;
-        b=Lj3KzeND3yrBDYJFBY3gjZQbXKLJ7DPOuw34PnXPSTi0PRMfFyaFdHw1RLmbRPrLnE
-         kEPb9xYUQkh4uL3vyL72aD0Xs6yP/scJriLJyl0x76ceOUtgA4qrF3hWMjVsWLtXS9N+
-         /JJhVHqe0RkpbHpJl3WS13ssjx8oVL7rplfD0fR3UMRzimejEjy+zP5yYM0ydD55gvdw
-         99UuyXproOhtTNuK90EFKetxFp1CEhx+sgs2KJZ/Zg5NduICWy/f2vmPelKcanrRTmmm
-         h2618zWilB7/BGvh/ZCECmK/fvLMcKmYiaiY2V4qrXdb1Qxa+f291qQGYOLmV63QR3ME
-         CZ/w==
-X-Forwarded-Encrypted: i=1; AJvYcCWmdi//258KDSm3xkLWaZJWcvxaPahhx0Ln6VrNDxoK2V8yrtIZYJhFJtLVEHnVGSsW2e2C7Qo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGDECQGJKNsWnb/P+EhFJrTiYXvAE25oBxdkIX0fw5ZPMMizpF
-	jOFl6N+G39UScGGqQ+4/X3m5OuOOlvL4vKaJ2j05hTm3iQ0exa5krJAlIu2K+j7PRCwewpFbQZU
-	Aw0PB1Au/shRzpzWB1aIJrSJgjOrgS6zdk35Nc2et
-X-Gm-Gg: AZuq6aI87uIWlnEkbyj8taGFpaxHzNmjf+d5qazUrerbzJScOZNLNhE6ipyCw6zyt5t
-	efdl0avCfEBy6D7b8FGw4mtSRQrfN0MTJOp2Xa8oY655lUlSAVQdHWhlyK8KwHaXw9j/WDtqdkA
-	1ZKqVr/ehaJugOU1Ab+mNAbLOHrDRlxc1zmBNQO5UGSUJp7O1ynfLXz98np1sHKNy2PGuIzhbea
-	4TCrLqpVrwonRZUxerUU+SINviSsfl4FEk4ubc4JsY3xqduibBVgRakIb8apxQNvOJzB6FnmtJC
-	8CX/gk/q
-X-Received: by 2002:ac8:7dc5:0:b0:4ee:1e95:af68 with SMTP id
- d75a77b69052e-506a6a5bb0dmr253127521cf.36.1771437784484; Wed, 18 Feb 2026
- 10:03:04 -0800 (PST)
+        d=1e100.net; s=20230601; t=1771444591; x=1772049391;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wD8Ttwe5Tegj8OFrv2Q7m/YBq2wmzpAVQJC0WJWjYy8=;
+        b=K9PzrjiMwHeyB229t20AADOn5LiQ1Xi7/5+TOTyiB9MG+G8x9CF3zQZsnPMNLVJ/Ql
+         3lsUWzGiOvB8LDOffJ6ZQUtAFB1wy5+38joMfQE9YqqM3iZ90K2wAADLNANJ1dn61UJl
+         VK643uGdIyPhtvK3AgNAKGx9vWrKLzX38IkwLVfBxKl01081TX75ks5WIcivqyDcTe8B
+         cqDhr1Ho+8g87SRFlxN7buChWf88T0xJUCrwyNtKiuDudM6bsI9hEjrSx8Y5n5IO1ZX7
+         mEHQFt4c3rXvBCUVDqOEF/yg6R3FdqVeBmKtpyskwo3m3QDib/2SMZAjPaX5EvHrWgv0
+         EhIg==
+X-Forwarded-Encrypted: i=1; AJvYcCUtt/TFLn2IPG87jF4kTW8Rwaccak+qw2Lk0NstiYWjLfhTjn3TxpfzcsWtsQDQkRIfXpkiYik=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIQln4sT+SvGo0bSSPZFqhIgakv2m85TDanS8BP888iGjQi1D9
+	WbpkArRUa0PAA12dnMPq7LPvUPq7J6Lv4nBecGzxt241wNKOusm6UNEHgC4WYQ==
+X-Gm-Gg: AZuq6aKCzGeIJscdh79DK7iX5oLFlxqkuuO5ufpCqhLBLu/6iFMr15Rkwz+7GbicCb9
+	SAwz5OtuJadbI2NIJI1Pdt69fdvfrCCcn2FklH8uz5z/3wJve8CD+7jeQ4b5wHlaCPiEKhTdHEb
+	j2UA52OKx6CpGcMc+FQhUyXT/blk5MWhTjMZrmRkeD0a//T7/eObxvXweyGfx8qUwiXVqcFYIJd
+	vwEf19Ms6hQqU/ExwpWZOpHtH8AdRzNfwXp3JX5580sMQaPQxdku0rI+3rulOfKykutLU2eW0xf
+	flqSQeYNmSa2ofK+LSc4zEyad6kN9PKYWS7wF637r01CtmPGP4WhgYK/ABqKQkvrtbcwnB48AbQ
+	AGOSuZ/sTU6JDi+wEnRUtb6yQr5+8n0loQFxzJm8EpS7afp8TBaA9OpKWkUCKB94xQkizN5Ab+r
+	5JPPywa0y/uaNUgHcREtzaxb/5LQ8QWMNd
+X-Received: by 2002:a53:b118:0:b0:63f:b605:b7f2 with SMTP id 956f58d0204a3-64c557eae43mr2160180d50.10.1771438271298;
+        Wed, 18 Feb 2026 10:11:11 -0800 (PST)
+Received: from localhost ([2a03:2880:25ff:49::])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-64c22fb1d22sm6051799d50.17.2026.02.18.10.11.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Feb 2026 10:11:11 -0800 (PST)
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+Subject: [PATCH net v2 0/3] vsock: add write-once semantics to
+ child_ns_mode
+Date: Wed, 18 Feb 2026 10:10:35 -0800
+Message-Id: <20260218-vsock-ns-write-once-v2-0-19e4c50d509a@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260218141337.999945-1-edumazet@google.com> <24fb96ca-042c-46ce-93cd-a6c2ce710795@gmail.com>
-In-Reply-To: <24fb96ca-042c-46ce-93cd-a6c2ce710795@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 18 Feb 2026 19:02:53 +0100
-X-Gm-Features: AaiRm50uUB20ht8FRsoBazB_7jBPYk_S8JpaqMK0SnyH5l5xnn965lhqfYSVdzs
-Message-ID: <CANn89iJ2Ox2-Wfxggv0_v9-1EC2hS6nH_fY8Sq2O1yS2Hun7yA@mail.gmail.com>
-Subject: Re: [PATCH net] psp: use sk->sk_hash in psp_write_headers()
-To: Daniel Zahka <daniel.zahka@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Raed Salem <raeds@nvidia.com>, 
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>, 
-	Willem de Bruijn <willemb@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJwAlmkC/33NQQqDMBBA0auEWTsliWKjq96juEjjWIdiIklIW
+ 8S7F3KArj+8f0CiyJRgFAdEKpw4eBiFbgS41fonIc8wCtBS91KrK5YU3At9wnfkTBi8IzSm7eb
+ edCSthkbAHmnhT1Xv4CnD1AhYOeUQv/VUVE1/0aJQoVXLo5WLNoMdbhtle3Fhg+k8zx//dlzIu
+ gAAAA==
+X-Change-ID: 20260217-vsock-ns-write-once-8834d684e0a2
+To: Stefano Garzarella <sgarzare@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>, Bobby Eshleman <bobbyeshleman@meta.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+ Shuah Khan <skhan@linuxfoundation.org>
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org, 
+ Daan De Meyer <daan.j.demeyer@gmail.com>
+X-Mailer: b4 0.14.3
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259340-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com,nvidia.com,google.com];
+	TAGGED_FROM(0.00)[bounces-259353-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: C7A9F1587E1
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:mid,meta.com:email]
+X-Rspamd-Queue-Id: 1FB35159428
 X-Rspamd-Action: no action
 
-On Wed, Feb 18, 2026 at 6:55=E2=80=AFPM Daniel Zahka <daniel.zahka@gmail.co=
-m> wrote:
->
->
+Two administrator processes may race when setting child_ns_mode: one
+sets it to "local" and creates a namespace, but another changes it to
+"global" in between. The first process ends up with a namespace in the
+wrong mode. Make child_ns_mode write-once so that a namespace manager
+can set it once, check the value, and be guaranteed it won't change
+before creating its namespaces. Writing a different value after the
+first write returns -EBUSY.
 
-> Thanks. The PSP spec suggests in multiple places the that udp sport be a
-> hash derived from "inner header fields", so sk->sk_hash fits that
-> description better than sk->sk_txhash regardless of RSS use/abuse
-> categorization.
->
-> It occurs to me now that fc724515741a ("psp: provide encapsulation
-> helper for drivers") also has a bug of unused udp sport parameter. I can
-> send a fix for that later, unless you want to remove that as well.
+One patch for the implementation, one for docs, and one for tests.
 
-I saw this sport parameter, and thought this was there for a future
-patch you had in mind.
+---
+Changes in v2:
+- break docs, tests, and implementation into separate patches
+- clarify commit message
+- only use child_ns_mode, do not add additional child_ns_mode_locked
+  variable
+- add documentation to Documentation/
+- Link to v1: https://lore.kernel.org/r/20260217-vsock-ns-write-once-v1-1-a1fb30f289a9@meta.com
 
-No big deal.
+---
+Bobby Eshleman (3):
+      selftests/vsock: change tests to respect write-once child ns mode
+      vsock: lock down child_ns_mode as write-once
+      vsock: document write-once behavior of the child_ns_mode sysctl
 
->
-> Reviewed-By: Daniel Zahka <daniel.zahka@gmail.com>
+ Documentation/admin-guide/sysctl/net.rst | 10 ++++++---
+ include/net/af_vsock.h                   | 20 +++++++++++++++---
+ include/net/netns/vsock.h                |  9 +++++++-
+ net/vmw_vsock/af_vsock.c                 | 15 +++++++++-----
+ tools/testing/selftests/vsock/vmtest.sh  | 35 +++++++++++++++-----------------
+ 5 files changed, 58 insertions(+), 31 deletions(-)
+---
+base-commit: ccd8e87748ad083047d6c8544c5809b7f96cc8df
+change-id: 20260217-vsock-ns-write-once-8834d684e0a2
 
-Thanks !
+Best regards,
+-- 
+Bobby Eshleman <bobbyeshleman@meta.com>
+
 
