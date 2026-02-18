@@ -1,221 +1,142 @@
-Return-Path: <netdev+bounces-259309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259310-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0N3nGcy1lWk/UQIAu9opvQ
-	(envelope-from <netdev+bounces-259309-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 13:51:24 +0100
+	id QAtCO9S8lWntUQIAu9opvQ
+	(envelope-from <netdev+bounces-259310-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 14:21:24 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D144B1566D2
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 13:51:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 53668156909
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 14:21:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AA55F300FEE8
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 12:50:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D9458301951B
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 13:21:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EBA431B823;
-	Wed, 18 Feb 2026 12:50:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=spasswolf@web.de header.b="jaajD485"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F5112BEC45;
+	Wed, 18 Feb 2026 13:21:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com [209.85.210.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDC231B810;
-	Wed, 18 Feb 2026 12:50:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE0029E114
+	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 13:21:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771419054; cv=none; b=RHsg1jG2Q8cLERrG35xB4MZgb4cfXt0j7l/Tc3a9NEQ2r/k86rJ5b7HBriid5mcNIGWQVxUHOM/ZNCvEc83RFzV1jGTQUwhUoduTZDln7YfXYkd53HFcmLReVQSVuLULMhSbv1pExsrnhQYWPByobhq2obV+YhnQvtW43J+Hi34=
+	t=1771420882; cv=none; b=NiZEfVZtO/lpMZ6BZ/EUyNyeTKMwJXcMx80RHAGHYYMGUxBYpILEscLsORYNHDHPFErRoxRuDdjzGLc3Bpo5MLfxO2YCdJlQLFGMRWLO0UVLuMMhg+yqMEM3/h7WdvgVBnb0pjX+AUMpXUmx72qb8hXPsrPkCEw+k0RObatSipQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771419054; c=relaxed/simple;
-	bh=oiz0qSzTRSjwO6uBzEFh+1ASJTZei4IaQNol1aJ2eqg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=bL3W2TVO8jI0NZEKgHYYrzzXXhRirv9gO7PYNwZK+/gfdRysYFgfTqYDT7s8cduVANIxI/EU1Rk19/mEuxJYIy6SblDubZ3FqHJdaYDeo5mFA+xRDWCTkBOi0ZcYP6s4b7OdVKKyKBZS7yY4fcp1IrjkehJQFbCXVXQVuc6fZV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=spasswolf@web.de header.b=jaajD485; arc=none smtp.client-ip=212.227.15.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1771419015; x=1772023815; i=spasswolf@web.de;
-	bh=oiz0qSzTRSjwO6uBzEFh+1ASJTZei4IaQNol1aJ2eqg=;
-	h=X-UI-Sender-Class:Message-ID:Subject:From:To:Cc:Date:In-Reply-To:
-	 References:Content-Type:MIME-Version:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=jaajD485e2WwPcsjaaiTPbH21QaiAiGCX8Y9GEy+RkDYpLow4QW2M+IaiPKpn7V0
-	 bFze/T8RSbErskBrTh63bnUH87IVTFyUZrgQom8L4SLHehTQRus5FBThzvaxYKKMc
-	 nBmh35Oyt0vcy/KWDZguAsHd8JJZJtRDAnEvnt7j1FqIwMDh1/6Nd663YOKN9V42B
-	 mgr+zasN0OZn5J5Myg0AvvXz8A5IiRgDZJTcwJGG+89rkWRUq9dE0STeypGWfnJsK
-	 mb0DwgixgQxGzVc2cce9LVjlzE06dP32TwU68ilfNehC8zch2nAvKmFCpht9aa7Ze
-	 3s3K6u0I3/A3taQi2g==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.0.101] ([95.223.134.88]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MODmf-1w7sNi1Dg1-00NprJ; Wed, 18
- Feb 2026 13:50:15 +0100
-Message-ID: <ae213d2b908e46d34856be9daec891d7210f46f7.camel@web.de>
-Subject: Re: "Dead loop on virtual device" error without softirq-BKL on
- PREEMPT_RT
-From: Bert Karwatzki <spasswolf@web.de>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org, 
-	linux-rt-devel@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>, Eric
- Dumazet	 <edumazet@google.com>, netdev@vger.kernel.org, spasswolf@web.de
-Date: Wed, 18 Feb 2026 13:50:14 +0100
-In-Reply-To: <20260218073036.AlkNRoAP@linutronix.de>
-References: <6274de932f4a62c51b424b65fc875ef3cb5ffd60.camel@web.de>
-	 <20260216153745.CA3__zRc@linutronix.de>
-	 <37d6e27f96afb57c5716798530cb3560d25202e5.camel@web.de>
-	 <20260217071952.WCXLGs5-@linutronix.de>
-	 <80114792206dc00d0099f00999a209e717debb12.camel@web.de>
-	 <20260217095700.SjYjM8RO@linutronix.de>
-	 <4fba57892e5bd6a1afc4a36a80b40e3ecc28cac5.camel@web.de>
-	 <fd609cfe186ee48e0e9a08e35764175a2516dd14.camel@web.de>
-	 <2369ba83d204290dcfe157aed3f943206213b979.camel@web.de>
-	 <aa02f39ec4640c9d98963f42121b76e59b58371d.camel@web.de>
-	 <20260218073036.AlkNRoAP@linutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.56.2-0+deb13u1 
+	s=arc-20240116; t=1771420882; c=relaxed/simple;
+	bh=4Dn0UKUm73Olelcz49EZhrlfjDGw9M/DcH8jEvOJiFw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=KNTGkcylntGYv6kWA94NmcWVbK8kE4vjPDuLhXN8Q3Dz0y9ZMLsKMQwVqsXjdY0kkt+gHRmPsTBvUPDJXBuudh1acAhSDXW2qOYvO9YNU+no0PaxQMKCp47J/bWnbjUZnjAeIepMnJT2qdb9Xr5vPW50Yd/IjpkTSah6BcyLD1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-7d194b631d6so58823896a34.0
+        for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 05:21:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771420880; x=1772025680;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5s1PrBwjWJkBDhrHp6GlKuEWF8QNwEUz0W27JeFQmLs=;
+        b=WZ+ZsDTFSTH0DrvxgGztYYKKTQu846BOyBV06X4JRx4mukQCNH800KUDfwfZaQrmbx
+         aEL9gRKgNQbmHruDJpESlFZhiLGv6DZciecnr80YzLrDXSemW/A0BX8lTnVDHNfqCqHo
+         r3Nq/nlKe/RM5c1N0Lat5DoRDns7spbk2qAbSo53I0ORY9U+vzjhaTAfIQcnFOOKhlrb
+         dsV3TUjzLclooH9nkK+CiMZlOMwg1KZD2uvl3t4cIvAZOylmnH9xCjVpm9nvrW9Uy3Q/
+         3HtM3gfzqFuLx9p+v8wdafNDqzqnYpAmwMhgzL3APY3mXuGbZO2oAtzalAD/PeuZs/Me
+         1Z0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVGA+1vI95QPMaTAhazobs5U1jpIOzSKI+I/5IfXafbhb5tpozCksAEjIROWPf1mhG0XA63Jo8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDY0c9xYWTgRCpI/Osg2on+0gbNukr4lJA9d6Kw34oBWHzmZpf
+	KcmiZ3d5QzCoy3f9zA5ul6rBbN7SjrerM/HeE2e3PEkYtF8QNvetlZlnNJiobSlU3ZYgdDrTq27
+	GjjPbgcFAxSV9CjntQDwB3a+/L1u5U/Yp9XpGnYNcGu3zqaGWW2RbpeKC6Ik=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:tZ3T1+z48acjku+wUM1FS1gvod/HiQcMZJv5r+Bf4hWYiFw97N3
- Q/ZCSYXJdZjuDlg44q6JWl39x+Rny7NsjcozxBL2WZhBfjfhq37LEE3QA/DONNVISYsw1uX
- iAtqE09xfvReRiEiSmgmfKdJ2mNrSp43IUPtbP4Hv+A/HnHmkLEHWCygTIJSDcHocB57fbk
- 7N3bMJ8ikjBhEH9jM+ZUw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:1JPBO3HMeBM=;crzQwpTHIg0aN8ALe1ZzgLdmfQ2
- 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
- rYTh6EYo9dc+NEIR6iAQp7nxogxSX4xlm6DjCt
+X-Received: by 2002:a05:6820:4411:b0:679:871c:b309 with SMTP id
+ 006d021491bc7-679a71b9ec0mr792547eaf.3.1771420879866; Wed, 18 Feb 2026
+ 05:21:19 -0800 (PST)
+Date: Wed, 18 Feb 2026 05:21:19 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6995bccf.050a0220.2eeac1.0153.GAE@google.com>
+Subject: [syzbot] Monthly net report (Feb 2026)
+From: syzbot <syzbot+list5f277c8c913b6bc12aa1@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[web.de,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[web.de:s=s29768273];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259309-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[linutronix.de,vger.kernel.org,lists.linux.dev,kernel.org,google.com,web.de];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[spasswolf@web.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[web.de:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[web.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D144B1566D2
+	FORGED_SENDER_MAILLIST(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	RCVD_COUNT_THREE(0.00)[4];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	R_DKIM_NA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,goo.gl:url,googlegroups.com:email,syzkaller.appspot.com:url];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259310-lists,netdev=lfdr.de,list5f277c8c913b6bc12aa1];
+	RCPT_COUNT_THREE(0.00)[3]
+X-Rspamd-Queue-Id: 53668156909
 X-Rspamd-Action: no action
 
-Am Mittwoch, dem 18.02.2026 um 08:30 +0100 schrieb Sebastian Andrzej Siewi=
-or:
-> On 2026-02-17 20:10:09 [+0100], Bert Karwatzki wrote:
-> >=20
-> > I tried to research the original commit which introduced the xmit_lock=
-_owner check, but
-> > it is present since linux 2.3.6 (released 19990610) (when __dev_queue_=
-xmit() was still called dev_queue_xmit()),
-> > so I can't tell the original idea behind that check (perhaps recuesion=
- detection ...), so I'm
-> > not completely sure if it can be omitted (and just let dev_xmit_recurs=
-ion() do the recursion checking).
->=20
-> Okay. Thank you. I add it to my list.
->=20
-I've thought about it again and I now think the xmit_lock_owner check IS n=
-ecessary to
-avoid deadlocks on recursion in the non-RT case.
+Hello net maintainers/developers,
 
-My idea to use get_current()->tgid as lock owner also does not work as int=
-errupts are still enabled
-and __dev_queue_xmit() can be called from interrupt context. So in a situa=
-tion where an interrupt occurs
-after the lock has been taken and the interrupt handler calls __dev_queue_=
-xmit() on the same CPU a deadlock
-would occur.
+This is a 31-day syzbot report for the net subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/net
 
-Bert Karwatzki
+During the period, 7 new issues were detected and 14 were fixed.
+In total, 89 issues are still open and 1693 have already been fixed.
+
+Some of the still happening issues:
+
+Ref  Crashes Repro Title
+<1>  8343    Yes   KMSAN: uninit-value in eth_type_trans (2)
+                   https://syzkaller.appspot.com/bug?extid=0901d0cc75c3d716a3a3
+<2>  3466    Yes   INFO: task hung in linkwatch_event (4)
+                   https://syzkaller.appspot.com/bug?extid=2ba2d70f288cf61174e4
+<3>  2905    Yes   WARNING in rcu_check_gp_start_stall
+                   https://syzkaller.appspot.com/bug?extid=111bc509cd9740d7e4aa
+<4>  2551    Yes   INFO: task hung in synchronize_rcu (4)
+                   https://syzkaller.appspot.com/bug?extid=222aa26d0a5dbc2e84fe
+<5>  2077    Yes   KMSAN: uninit-value in bpf_prog_run_generic_xdp
+                   https://syzkaller.appspot.com/bug?extid=0e6ddb1ef80986bdfe64
+<6>  1967    Yes   INFO: task hung in del_device_store
+                   https://syzkaller.appspot.com/bug?extid=6d10ecc8a97cc10639f9
+<7>  1639    Yes   INFO: task hung in addrconf_dad_work (5)
+                   https://syzkaller.appspot.com/bug?extid=82ccd564344eeaa5427d
+<8>  1055    Yes   possible deadlock in hsr_dev_xmit (2)
+                   https://syzkaller.appspot.com/bug?extid=fbf74291c3b7e753b481
+<9>  977     Yes   INFO: task hung in tls_sk_proto_close
+                   https://syzkaller.appspot.com/bug?extid=ca1345cca66556f3d79b
+<10> 872     Yes   WARNING in nsim_fib_event_nb
+                   https://syzkaller.appspot.com/bug?extid=a259a17220263c2d73fc
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
