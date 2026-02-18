@@ -1,148 +1,173 @@
-Return-Path: <netdev+bounces-259292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259293-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qDpKFCuUlWk1SgIAu9opvQ
-	(envelope-from <netdev+bounces-259292-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 11:27:55 +0100
+	id cEm1GLyXlWk1SgIAu9opvQ
+	(envelope-from <netdev+bounces-259293-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 11:43:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E32A1556DF
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 11:27:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B64F615594F
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 11:43:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8DDD2302A9F5
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 10:23:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C95873004F77
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 10:41:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8312B27F754;
-	Wed, 18 Feb 2026 10:23:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFD1A2FF652;
+	Wed, 18 Feb 2026 10:41:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="23ZszNET"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jl0ssTuM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 727202797B5
-	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 10:23:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB6E52F3C26;
+	Wed, 18 Feb 2026 10:41:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771410186; cv=none; b=gRwwI6GxTmonj9JSlnVERBc5eihSAnAtLbjHO2YiELEqG17vinR+IEaDhSKnXrS7lp4WnZQeWOTEAL05gXfIlTfBy73r3oM/KbWFMnXz4JMfqe7/uMSm53LG9dvs/OPvlig+7LCr8ZLP6Fmcpy7KrUb/MaEI4SwH0xfMpfaGVLQ=
+	t=1771411293; cv=none; b=dSbzF9SuO9Sw1HTPh7cIrKDFG2lVY2iIr6E50+XfbmtsM4cFnQkQeG5y8kUeiRZVFfdBR4FTs44SR3Xr3eCQpgi/5xgDddbc/6JbiE9dlLTUYqA+hviKX4gP6uOBxHnBBB7N9ON1M/5g+6Tg4u/G+zBv5dWopEoyxX0T7d9wZic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771410186; c=relaxed/simple;
-	bh=KXSxsS0KS5sBzF7hZf88JgsOaLg0aESnpZNXnxV4Cr0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HZW45pqBOmaLoJbzQMDXex6qh69Llg6po0Ror8rMvr+esCuBOAby3ayC2R3ZsriBi8eO9pfFzvOD6q7MzsqSvw9CDv6r+y3+QdzjpDuRcUcEYzzD7whvI7vnOh2zYNS8fEoqV34SXjdcdhlf3YrPb4LBtuPJi7CIjlpk5YIj1P8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=23ZszNET; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id AA93D1A108B;
-	Wed, 18 Feb 2026 10:23:02 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 7EB5060738;
-	Wed, 18 Feb 2026 10:23:02 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 33CCC10368710;
-	Wed, 18 Feb 2026 11:22:56 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1771410181; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=C09t4/Z5sG0k/xsZ9ftcPSXBPXf0UGwyK04jlPmA92I=;
-	b=23ZszNET6ENPp0U6ZyqUlUPV77VJjyEMEWpYziu6RiaVWnA+gtvIAdYRUAF+mx40Q9oiEy
-	piqHbMGUEUl5oBOHY0Vw4lZawH/3RkvMSagXn/jZxuuh5/edrN0PpUPihvMqGPh4nIvcsq
-	jPcodvFWIFIvzdGoYjsRU6XN7n7DI1x0hPWoVn/3zIe4o2+aan7KEFfuKGk/AotaUQcqTX
-	/p5yIDbAvDe0pSCazwavLVA3OaEu7MSG4D1Ovz4Or+vCjuo0rso1nEMVYz+c+yF/IUbRTT
-	i5LKS+dd3wdf0eCFjsk50DsA6May1S9dUS3Su+9mnzMwgcRf0YTJ5jd3CQuJ/w==
-Message-ID: <90af3964-e2d1-41a1-b731-91de05085730@bootlin.com>
-Date: Wed, 18 Feb 2026 11:22:56 +0100
+	s=arc-20240116; t=1771411293; c=relaxed/simple;
+	bh=2IipbrnC8gRJmyofTcNtL2KhCjB5y7fHAJB00hh96q8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Ed4TY1g50fDfZ4ZbK3MopdBLTfvPkhWaQhP3zurFCA/AohwJpLQk4IC3ZJ0nsB6ESMlcck3M+Dmo2wqixJB1+8SX37LUJDsZTPyuIAIzOeYPNTmp+xHS49S9VgnVzMiZSpdokiZrh7Z83Y8Ju0mOBHnVGU4YNfUJzE/Ssidk5Gg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jl0ssTuM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71CA6C19421;
+	Wed, 18 Feb 2026 10:41:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771411293;
+	bh=2IipbrnC8gRJmyofTcNtL2KhCjB5y7fHAJB00hh96q8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=jl0ssTuMc5uw/xUkfnpmzcshIOzt76e+5Mwm17ghvaE2r6jEg7Df8PV+7G4Vmfxi3
+	 VBAzHPb75uoqYBlrM+4IxhRaIrhvPCchkdqQmh3Xy9S/728JjUOlR7eQ+rlG/vd5+2
+	 5JUExHKR2LFhbYZuYOObTob91xuUbbpP1RBsWRIpzC/KjSIBdTxqwtA8n5entXjMD+
+	 2FvEo7XHaG/MVAv2rxf5N3HVy2V0VkjOLR/BIDpaKsZz77NhvFY4HWEmqtPh5dUVDO
+	 h3Q4dVHRYkHPt9Wq2M1DYZ/9jLa3nWWMsYn0CvjtgaMaUSR/ZsHQB9QCm5kNtvOla1
+	 uKbUYoPSsoGBg==
+From: Simon Horman <horms@kernel.org>
+To: konradybcio@kernel.org
+Cc: Simon Horman <horms@kernel.org>,
+	pabeni@redhat.com,
+	marijn.suijten@somainline.org,
+	edumazet@google.com,
+	elder@riscstar.com,
+	andrew+netdev@lunn.ch,
+	dmitry.baryshkov@oss.qualcomm.com,
+	konrad.dybcio@oss.qualcomm.com,
+	andersson@kernel.org,
+	elder@kernel.org,
+	devicetree@vger.kernel.org,
+	krzk@kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	conor+dt@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	robh@kernel.org,
+	krzk+dt@kernel.org
+Subject: Re: [net-next,v3,3/3] net: ipa: Grab IMEM slice base/size from DTS
+Date: Wed, 18 Feb 2026 10:39:19 +0000
+Message-ID: <20260218103917.132153-3-horms@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260217-topic-ipa_imem-v3-3-d6d8ed1dfb67@oss.qualcomm.com>
+References: <20260217-topic-ipa_imem-v3-3-d6d8ed1dfb67@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 6/8] net: dsa: microchip: Enable Ethernet PTP
- detection
-To: Tristram.Ha@microchip.com, kuba@kernel.org
-Cc: Woojung.Huh@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
- olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, richardcochran@gmail.com, horms@kernel.org,
- pascal.eberhard@se.com, miquel.raynal@bootlin.com,
- thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260127-ksz8463-ptp-v4-0-652e021aae86@bootlin.com>
- <20260127-ksz8463-ptp-v4-6-652e021aae86@bootlin.com>
- <20260129201720.0a63447b@kernel.org>
- <DM3PR11MB873640D9FA5A1CEC9EA36B2EEC9FA@DM3PR11MB8736.namprd11.prod.outlook.com>
-Content-Language: en-US
-From: Bastien Curutchet <bastien.curutchet@bootlin.com>
-In-Reply-To: <DM3PR11MB873640D9FA5A1CEC9EA36B2EEC9FA@DM3PR11MB8736.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,kernel.org,se.com,bootlin.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	TAGGED_FROM(0.00)[bounces-259293-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259292-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0E32A1556DF
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B64F615594F
 X-Rspamd-Action: no action
 
-Hi,
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-On 1/30/26 6:16 AM, Tristram.Ha@microchip.com wrote:
->> On Tue, 27 Jan 2026 10:06:48 +0100 Bastien Curutchet (Schneider
->> Electric) wrote:
->>> KSZ8463 needs to enable the Ethernet PTP detection to fire the
->>> interrupts when a timestamp is captured.
->>
->> Is it worth stating our expectation WRT other switches given this
->> is a shared function (not advocating to add a condition to be clear,
->> just document).
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+net: ipa: Grab IMEM slice base/size from DTS
 
-The PTP_ETH_ENABLE bit added here is already set by default on the 
-'second generation' switches Tristram mentioned but not on the KSZ8463. 
-I'll add details to the commit log.
+This commit reads the IMEM slice base address and size from a device
+tree "sram" phandle, falling back to the existing struct fields when
+the DT property is absent.
 
-> 
-> KSZ8464 uses the first generation of PTP engine while KSZ9477/KSZ9567 and
-> LAN937X use the second generation.  Most of their basic operations like
-> transmitting are the same.  KSZ8463 enables 1-step E2E TC operation by
-> default while the newer switches need to enable the function manually.
-> Because of that the PTP function in KSZ8463 is disabled after driver
-> starts until the Linux PTP stack wants to enable the feature.
-> 
+> diff --git a/drivers/net/ipa/ipa_mem.c b/drivers/net/ipa/ipa_mem.c
+> index 835a3c9c1fd4..583aea625709 100644
+> --- a/drivers/net/ipa/ipa_mem.c
+> +++ b/drivers/net/ipa/ipa_mem.c
 
-I think that here you refer to the PTP_ENABLE bit. It's indeed unset at 
-init in ksz8_config_cpu_port() but it's then set back by 
-ksz_ptp_enable_mode() when needed.
+[ ... ]
 
-PTP_ETH_ENABLE (bit 5) enables detection of L2 PTP frames
-PTP_ENABLE (bit 6) enables the full PTP feature.
+> @@ -656,7 +659,23 @@ int ipa_mem_init(struct ipa *ipa, struct platform_device *pdev,
+>  	ipa->mem_addr = res->start;
+>  	ipa->mem_size = resource_size(res);
+>
+> -	ret = ipa_imem_init(ipa, mem_data->imem_addr, mem_data->imem_size);
+> +	ipa_slice_np = of_parse_phandle(dev->of_node, "sram", 0);
+> +	if (ipa_slice_np) {
+> +		ret = of_address_to_resource(ipa_slice_np, 0, res);
 
+Here, res still points into the platform device's resource array from
+the earlier platform_get_resource_byname() call.  Won't
+of_address_to_resource() overwrite the platform device's "ipa-shared"
+resource entry with the SRAM resource data?
 
-Best regards,
-Bastien
+The needed values (mem_addr, mem_size) were already copied out, but
+this silently corrupts the platform device's resource table.  Would it
+be better to use a local struct resource for this call?
+
+Simon says: I think this is a false positive as I don't see how reusing res
+here results in resource table corruption.
+
+> +		of_node_put(ipa_slice_np);
+> +		if (ret)
+> +			return ret;
+                        ^^^^^^^^^^
+
+At this point ipa->mem_virt holds a valid memremap() pointer.  Does
+this direct return leak the mapping?  Every other error path after the
+memremap() in this function uses goto err_unmap, which calls
+memunmap(ipa->mem_virt).  Should this be goto err_unmap instead?
+
+Simon says: This seems to me to be an actual problem.
+
+> +
+> +		imem_base = res->start;
+> +		imem_size = resource_size(res);
+
+[ ... ]
+
+> +	ret = ipa_imem_init(ipa, imem_base, imem_size);
+>  	if (ret)
+>  		goto err_unmap;
 
