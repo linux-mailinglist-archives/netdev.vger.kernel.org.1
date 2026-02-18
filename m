@@ -1,271 +1,196 @@
-Return-Path: <netdev+bounces-259335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259336-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YL9DOG/zlWlTWwIAu9opvQ
-	(envelope-from <netdev+bounces-259335-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 18:14:23 +0100
+	id IG5ZE8b4lWlMXgIAu9opvQ
+	(envelope-from <netdev+bounces-259336-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 18:37:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A91815827A
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 18:14:23 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AB051585B5
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 18:37:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9C512300BDBE
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 17:14:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AF60630013BF
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 17:36:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDFF3344DA7;
-	Wed, 18 Feb 2026 17:14:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ABEF334370;
+	Wed, 18 Feb 2026 17:36:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vH0j1bU/";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="dROlG5Y0";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="KRN/vjqF";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="qeOBMTSf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fPfvwdiW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5E2340D93
-	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 17:14:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 012B533EB07
+	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 17:36:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771434855; cv=none; b=jgjg3uapdBI2zZPUpiNgLQWOMbOjsN70lulj2FUJ47O/MTaN55X7gsQsKrb8mOLH2fRbToua082xlQ/kSUrtUnigxon3n220iL5XtOLB+yTooD7WnkdCMQa3w+2W8jAW5TmCuy5inq4jrnBHMNvQTSI54B2VUnxXAjIMt3SM9W8=
+	t=1771436207; cv=none; b=boHcqzpPTi2WosuM3WK9aww2E+TIlg/SjaJM0HGTzL+4CeS0J4XgiBRwUEYjwEecTgP79NwbC3LGJvDjw+d4MYmiJUT1escFRM7IYOxKU/0XvszODG3AIrtPSDD8zIVeW1G/m+dS/jWlCsnpieIG9xx0wrrY5PmZ2ZzZq9hFJa4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771434855; c=relaxed/simple;
-	bh=V4ubtxTZe6qjg85/HutGSAp8jrshlZZcGnuQ7i3rRsY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FyQRbxS6BfOD3efZdqUTS59jrPrPe1cGXUTpew6ayFx7dgU6M95UK8vIQS7j0DYsb3XYRF/A/yM/JRGLLWIBg+iwZnrXCHSMzKdjmRfcnbiDmm0yW3uII2UNbuEz/jOj4myO1rFc3qfCKhLQERVyBAVLmDFLJY/3ffEo/OtP4jE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vH0j1bU/; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=dROlG5Y0; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=KRN/vjqF; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=qeOBMTSf; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id BAA885BCE5;
-	Wed, 18 Feb 2026 17:14:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1771434852; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+145KWOw3QDQIRqPhnmXA3oHucxMq9auILbBaUBYpl0=;
-	b=vH0j1bU/gRr05S3sHY60kx3an2rq/YBi07seig6P/nxO9Zef49VKHwgDmwMU+YBHGdzewR
-	PR/QBO0aQUhG3DOHueFy4qrfniCqFRH3MDO6RFNPMbblj7oraIftr41s8PdbWm+0jsMwNq
-	hLjpXtTJ9EdIHzvspgbypm8wodd6kog=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1771434852;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+145KWOw3QDQIRqPhnmXA3oHucxMq9auILbBaUBYpl0=;
-	b=dROlG5Y05UXillUiWdRnvk1k1Q9a+bVchpMeJpasQGyr7WdF1uGLzgCnbt6VnpTduuJLm6
-	W4xJWQ5HhYFp6xAw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="KRN/vjqF";
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=qeOBMTSf
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1771434850; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+145KWOw3QDQIRqPhnmXA3oHucxMq9auILbBaUBYpl0=;
-	b=KRN/vjqFRKPS5cVQL8RkgNpwbVPqx4b5jyCh1aLbiPHtBw+3JY8kfH7E9M16IncdeZVRZj
-	d+kVFt9bhslH6HtnMbIB5Q9lGI1LC4LiNgotRvjVn/4Vh3JIUzsW4OXAP1tYsMh5j71tGX
-	1YkngPibDlB/wMGRRUoypxUUVkjfK1o=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1771434850;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+145KWOw3QDQIRqPhnmXA3oHucxMq9auILbBaUBYpl0=;
-	b=qeOBMTSfU3QIUkXBwkk4CVHE1kCnudFcf4x0si44RwmRVy2XSdWixbJ8HFnlQ75nd+fEVy
-	oHYQ1bN90YL/XWDw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 02AD63EA65;
-	Wed, 18 Feb 2026 17:14:09 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id EPXYOGHzlWmUTwAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Wed, 18 Feb 2026 17:14:09 +0000
-Message-ID: <59c133d4-9e5c-4eee-95c2-4a8877b052be@suse.de>
-Date: Wed, 18 Feb 2026 18:13:56 +0100
+	s=arc-20240116; t=1771436207; c=relaxed/simple;
+	bh=ryk1XlFpYkbWCCRIEYCdmMdH4Bm5ivPc/TwrajVtluw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KpMHBveTOY/K0iaW5HUb9u8rqTcxg9mcu6LVkiok4tarrTfP7J7Qgf41dW9M7NoYtgUGMSuTvJQ2njVnTmOMnCyVqgTqyVE1iWrBl4dy+dCqiwwLKq5fETpvRITzQTxXkcNVe/+LK04Q1F0zm41exqrd89nJvYHQbWZ8hfBP3vU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fPfvwdiW; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-480706554beso948615e9.1
+        for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 09:36:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771436204; x=1772041004; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=opGeJXdqBNHSNGuTpufEOdqG+49HpE5DgTtWk7Ja0tg=;
+        b=fPfvwdiWDb4Z/WTrRpEyjGKWx0uF+c3WWRdZpfUgGpmGf/wkqSJQDTsZfLyUtPb8bR
+         3j/uHqLognwuuARMvQKskx8S54cNDCrd9ueIKDN9vt8wb9SZdGdXR7oSoAbxaLMTjn8M
+         wyTG6ibzHAQZNvaMN9zgUG1+h0oLkSFuF13NONi6yvCohPCC1NUIsTIDL6dpklApzzxh
+         99gjgu2i88SLjrIjNZCndX4iVqVBUcR8kMfPRBjin5emSni5dfRSi8JaVBvepj+BeksG
+         +Yb0AUnaTtWu4svK6bkYXSMZER1LQU1gy5XI2j01f2/eP09DSQo9/YJ0g0kRstVAw0m4
+         XGQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771436204; x=1772041004;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=opGeJXdqBNHSNGuTpufEOdqG+49HpE5DgTtWk7Ja0tg=;
+        b=pGQxVhUkPftJszsz8kQTFPsEKPOuB9rKvbj3oCuxSOo6xX7hfb5aPArUYUpjtbgcYY
+         hCxGtotcnC34UJ+V/IVNg44xIneEJQDxYyHKwRv8IZbIV+699uJhjuXRJ2fd0eYDoitq
+         NvLk/10blUQIwdku901zSLL8+fw3Vgvncn6K3cOzPL/T6BMKLtM5ryMv74vY0VSF5yV2
+         ++1csO+DPzCwDoN5Aj0nzsgrvs3NH7n0WjAMlCjSXbP85ug3Bbcy23elcDIpradn01zq
+         ph+rrxjkir6GEV+4Lx6Z6RoZy/3epw/jKeVjXRgnqXGBpaRABSKF1YjW25ydUq92kQ33
+         Kgig==
+X-Forwarded-Encrypted: i=1; AJvYcCXlE6lfkmkq0D8BCLtZ6npGoF+XY1vd2YPkAFJ6B9Coj1Y91NcSqvYhcy/DYQCvkRLqU5N/BUg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFiRIdrzyIF76V4LwqaGC7KKfNiVG5dIYLXZWIvQq1Rc0uhcj3
+	hobdvdxAnfhpNPIoumFNzGPD/vHrxjgvr9ZEvU+crLiv4pJpnu6Lqnd0
+X-Gm-Gg: AZuq6aL9K3xN+vq376vetbcitgHuKA25KmYyyLqLUPkEzNiV3+95sAb1a1fZOH9ZDV8
+	RXTiMwq8tsHA13KUZ0aqUxA5Aw0bJ9DhdWVu5kVij/G56Cz+iT0UW5mdbtd1pRY3BJMeK2nUkOU
+	KdILaye0rWN6YF+viNuvFe9dyx+NQ6JVGEkRDajOScS9+f/8sqIqUxyKX5ZKbva2dUEUrYDtHwa
+	sYy9GB2SSL5yyeqp0vMLe+CM2J5F2SB6u6mTS/DavZ0ypnrlAcfb4LyS4Mqu5nQ8OjCBoEP9Pp+
+	1+C1tJQpvJUFTbAKS3GEpI36e8PZTICoVEKClqNOhJQBizEDy3s12DJo4Do+9YqklZ/11rayfT4
+	O8/Sw9JVLo5Y+7qjkaKBX02YRamw0c4asyxUU1nuOqpWVh8Qzoqt2X8dl4rY2XKfoKfe93H2atk
+	S8kwZ6o7IX2eIweVPHlFHb4un+l1SPhREkOXU+/EeGvSfMy1ymLWfL2JXgn+zHmR6qU081Mru5p
+	xaHy08BonfONC3h+qnCjI2hKmNxOFFHk44D2Ja8
+X-Received: by 2002:a05:600c:5308:b0:47e:e946:3a72 with SMTP id 5b1f17b1804b1-48379bf78f1mr246397705e9.27.1771436204063;
+        Wed, 18 Feb 2026 09:36:44 -0800 (PST)
+Received: from 127.mynet ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4835d99e194sm464119405e9.8.2026.02.18.09.36.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Feb 2026 09:36:43 -0800 (PST)
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: io-uring@vger.kernel.org
+Cc: asml.silence@gmail.com,
+	axboe@kernel.dk,
+	netdev@vger.kernel.org,
+	Kai Aizen <kai@snailsploit.com>
+Subject: [PATCH 1/1] io_uring/zcrx: fix user_ref race between scrub and refill paths
+Date: Wed, 18 Feb 2026 17:36:41 +0000
+Message-ID: <364c2e7d4f53b26bb3133cfc4271183fcd450be2.1771435883.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net,v2] net/rds: fix recursive lock in
- rds_tcp_conn_slots_available
-To: Simon Horman <horms@kernel.org>
-Cc: pabeni@redhat.com, davem@davemloft.net, allison.henderson@oracle.com,
- syzbot+5efae91f60932839f0a5@syzkaller.appspotmail.com, kuba@kernel.org,
- rds-devel@oss.oracle.com, gerd.rausch@oracle.com, netdev@vger.kernel.org,
- edumazet@google.com, linux-rdma@vger.kernel.org
-References: <20260217223802.21659-1-fmancera@suse.de>
- <20260218100206.88254-1-horms@kernel.org>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20260218100206.88254-1-horms@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Flag: NO
-X-Spam-Score: -3.01
-X-Spam-Level: 
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259335-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.dk,vger.kernel.org,snailsploit.com];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259336-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,5efae91f60932839f0a5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,syzkaller.appspot.com:url]
-X-Rspamd-Queue-Id: 8A91815827A
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7AB051585B5
 X-Rspamd-Action: no action
 
-On 2/18/26 11:02 AM, Simon Horman wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email says "I'm passing this on, not becuase of the first coment
-> regarding fan-out, which I think seems reasonable in it's current
-> form. But because of the second comment, at the end, regarding the
-> receive path. I'm not sure about that one either way, but it seems
-> worth passing on to you."
-> 
-> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
-> ---
-> net/rds: fix recursive lock in rds_tcp_conn_slots_available
-> 
-> This commit addresses a recursive lock warning reported by syzbot in
-> rds_tcp_get_peer_sport() by replacing kernel_getpeername() calls with
-> direct socket struct access to read the peer port number.
-> 
-> Closes: https://syzkaller.appspot.com/bug?extid=5efae91f60932839f0a5
-> 
->> diff --git a/net/rds/connection.c b/net/rds/connection.c
->> index 185f73b01694..a542f94c0214 100644
->> --- a/net/rds/connection.c
->> +++ b/net/rds/connection.c
->> @@ -455,6 +455,9 @@ void rds_conn_shutdown(struct rds_conn_path *cp)
->>   		rcu_read_unlock();
->>   	}
->>
->> +	/* we do not hold the socket lock here but it is safe because
->> +	 * fan-out is disabled when calling conn_slots_available()
->> +	 */
-> 
-> Is this comment potentially misleading about the safety reasoning?
-> 
-> The comment says "we do not hold the socket lock here but it is safe
-> because fan-out is disabled." This is factually accurate - with fan_out
-> set to false, the code path that reads from the socket (via
-> rds_tcp_get_peer_sport) is never reached.
-> 
-> However, the phrasing could confuse readers about what happens if fan_out
-> were true but the lock weren't held. In that scenario, the new code
-> (reading inet_dport directly) would still be safe because inet_dport is an
-> atomic-width read of a stable field.
-> 
-> The comment conflates two independent safety properties: (1) the socket
-> isn't accessed at all when fan_out is false, and (2) if it were accessed,
-> the new implementation would still be safe without the lock.
-> 
-> Could the comment more precisely explain the safety reasoning?
-> 
->>   	if (conn->c_trans->conn_slots_available)
->>   		conn->c_trans->conn_slots_available(conn, false);
->>   }
-> 
-> [ ... ]
-> 
->> @@ -59,30 +59,12 @@ void rds_tcp_keepalive(struct socket *sock)
->>   static int
->>   rds_tcp_get_peer_sport(struct socket *sock)
->>   {
->> -	union {
->> -		struct sockaddr_storage storage;
->> -		struct sockaddr addr;
->> -		struct sockaddr_in sin;
->> -		struct sockaddr_in6 sin6;
->> -	} saddr;
->> -	int sport;
->> -
->> -	if (kernel_getpeername(sock, &saddr.addr) >= 0) {
->> -		switch (saddr.addr.sa_family) {
->> -		case AF_INET:
->> -			sport = ntohs(saddr.sin.sin_port);
->> -			break;
->> -		case AF_INET6:
->> -			sport = ntohs(saddr.sin6.sin6_port);
->> -			break;
->> -		default:
->> -			sport = -1;
->> -		}
->> -	} else {
->> -		sport = -1;
->> -	}
->> +	struct sock *sk = sock->sk;
->> +
->> +	if (!sk)
->> +		return -1;
->>
->> -	return sport;
->> +	return ntohs(inet_sk(sk)->inet_dport);
->>   }
-> 
-> The commit message states "For rds_tcp_conn_slots_available() the lock is
-> already held because we are in the receiving path." Is this claim accurate
-> across all receive paths?
-> 
-> Looking at the two receive sub-paths:
-> 
-> 1. In the backlog processing path (shown in the syzbot stack trace), the
-> socket IS owned because __release_sock() runs while the lock_sock
-> ownership bit is still set:
-> 
-> tcp_sock_set_cork() -> lock_sock() -> release_sock() -> __release_sock()
->    -> sk_backlog_rcv() -> tcp_v6_do_rcv() -> tcp_rcv_established()
->    -> tcp_data_ready() -> sk->sk_data_ready() -> rds_tcp_data_ready()
->    -> rds_tcp_read_sock()
-> 
-> 2. However, rds_tcp_data_ready() can also be called directly from the
-> normal softirq receive path via tcp_data_ready() -> sk->sk_data_ready(),
-> where the socket lock is NOT held. In this path, rds_tcp_read_sock()
-> calls tcp_read_sock() without lock_sock.
-> 
-> The fix is still correct in both cases because inet_dport is a stable
-> atomic-width field, but the claim "the lock is already held" is not
-> universally true for all receiving paths.
-> 
-> Should the commit message be more precise about when the lock is held?
-> 
+From: Kai Aizen <kai@snailsploit.com>
 
-While I think that is right, the relevant part is the atomicity. The 
-operation is safe but it requires a READ_ONCE() annotation probably.
+The io_zcrx_put_niov_uref() function uses a non-atomic
+check-then-decrement pattern (atomic_read followed by separate
+atomic_dec) to manipulate user_refs. This is serialized against other
+callers by rq_lock, but io_zcrx_scrub() modifies the same counter with
+atomic_xchg() WITHOUT holding rq_lock.
+
+On SMP systems, the following race exists:
+
+  CPU0 (refill, holds rq_lock)          CPU1 (scrub, no rq_lock)
+  put_niov_uref:
+    atomic_read(uref) - 1
+    // window opens
+                                        atomic_xchg(uref, 0) - 1
+                                        return_niov_freelist(niov) [PUSH #1]
+    // window closes
+    atomic_dec(uref) - wraps to -1
+    returns true
+    return_niov(niov)
+    return_niov_freelist(niov)           [PUSH #2: DOUBLE-FREE]
+
+The same niov is pushed to the freelist twice, causing free_count to
+exceed nr_iovs. Subsequent freelist pushes then perform an out-of-bounds
+write (a u32 value) past the kvmalloc'd freelist array into the adjacent
+slab object.
+
+Fix this by replacing the non-atomic read-then-dec in
+io_zcrx_put_niov_uref() with an atomic_try_cmpxchg loop that atomically
+tests and decrements user_refs. This makes the operation safe against
+concurrent atomic_xchg from scrub without requiring scrub to acquire
+rq_lock.
+
+Fixes: 34a3e60821ab ("io_uring/zcrx: implement zerocopy receive pp memory provider")
+Cc: stable@vger.kernel.org
+Signed-off-by: Kai Aizen <kai@snailsploit.com>
+[pavel: removed a warning and a comment]
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+---
+ io_uring/zcrx.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+index 3d377523ff7e..0c9bf540b12b 100644
+--- a/io_uring/zcrx.c
++++ b/io_uring/zcrx.c
+@@ -341,10 +341,14 @@ static inline atomic_t *io_get_user_counter(struct net_iov *niov)
+ static bool io_zcrx_put_niov_uref(struct net_iov *niov)
+ {
+ 	atomic_t *uref = io_get_user_counter(niov);
++	int old;
++
++	old = atomic_read(uref);
++	do {
++		if (unlikely(old == 0))
++			return false;
++	} while (!atomic_try_cmpxchg(uref, &old, old - 1));
+ 
+-	if (unlikely(!atomic_read(uref)))
+-		return false;
+-	atomic_dec(uref);
+ 	return true;
+ }
+ 
+-- 
+2.52.0
 
 
