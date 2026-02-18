@@ -1,273 +1,364 @@
-Return-Path: <netdev+bounces-259295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259294-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yLn3HAOYlWk1SgIAu9opvQ
-	(envelope-from <netdev+bounces-259295-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 11:44:19 +0100
+	id kFGqACiYlWk1SgIAu9opvQ
+	(envelope-from <netdev+bounces-259294-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 11:44:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 085BB1559B1
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 11:44:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 720BF1559DB
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 11:44:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5E325301628A
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 10:44:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1309A304DC9C
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 10:43:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33F1D2FF662;
-	Wed, 18 Feb 2026 10:44:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F227730100E;
+	Wed, 18 Feb 2026 10:43:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b="F/CcDDcT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hac+poap";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="sSanYZb0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00206402.pphosted.com (mx0b-00206402.pphosted.com [148.163.152.16])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB162299A84;
-	Wed, 18 Feb 2026 10:44:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.152.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6E7D2E8DEC
+	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 10:43:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771411455; cv=none; b=DgEISI/o63ModoIVTDOj7Iw864sZMF0Teiue3Vn6CH81RRznAMppu63KbJz2uAz/y3A6so4qJHtrNnsxokhk0M1zB5/Je+SO+uIY2Cxlt1UfieaNvhd3kxI00fAvHumYvPf0qRfQP07PivPW95ueMaLF+Um8w4+W5AnxTV/jYcs=
+	t=1771411434; cv=none; b=Ps21864ZavWiZRAqdHpxPsJqOlx2owwpvFb6zVzOYNZS6KNlNxFBfB0Dg+TqCKTDdzsHO/vNjo4VxmBl0GjHrDG87yrNsDmeFcnEdaqYsZjnnI0ToSjMoV0GSjb2OMWFe6BU0t0HMJhBioQ51rHkChbllLsHJ+S7DWXi996hs/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771411455; c=relaxed/simple;
-	bh=a8HICPT4itUNVb4ozmNp/B0igy5o9dgDPEwOlFdkd/w=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bN38VOSPwrRZKOMPifx+cZorKEhA2jOyHUgwNHmv7D/lb7tw21CQczFraKazMzKE2K6WwYjejOSoubK4T7CBx0irVzw7rPL6RKnl5LZkZyIoNI+MfFmXoVnzicwCzbDW0Ck0fOpqUDIb9afjwedmWdbApTvuQlequyw5dy4wkGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com; spf=pass smtp.mailfrom=crowdstrike.com; dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b=F/CcDDcT; arc=none smtp.client-ip=148.163.152.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=crowdstrike.com
-Received: from pps.filterd (m0354653.ppops.net [127.0.0.1])
-	by mx0b-00206402.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61I3X7R72985266;
-	Wed, 18 Feb 2026 10:43:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=crowdstrike.com;
-	 h=cc:content-transfer-encoding:content-type:date:from
-	:in-reply-to:message-id:mime-version:references:subject:to; s=
-	default; bh=klMVeU2EoRJtpwl0kImpp5z2CkGr7gsQ7+/yyuwpRuc=; b=F/Cc
-	DDcTcR7cBooauPuTB2VdOaKSD4ZS1NCa31B1YwYdH5lk7ug3xhKLBBMZ/G0+GeP4
-	WLFMrLeDTEW8LMxJzCP93e1zCFfJzxk//2IU8ALZPvbi4mnNbujcCXuEdmz25FZs
-	aRL39L7JmauC+KrqFMhpjR13PUPKf9G9pqEqW/g+ft4cOqCgef9z/CRT4qcgNnJ1
-	iHST+EUjMQoKT9/FKNhOvBH/PsjfCaGZAc9QVPSfe/JmAdDm0X+lUGFedzy3lA5h
-	y9hgbKPnSmphYXaY1HLb+FuDyYUkXWzSk4j7hh4/tp+JLW5AfZhGNG3LNAa6hSAB
-	IuKjLztjNU+5TvuYzA==
-Received: from mail.crowdstrike.com (dragosx.crowdstrike.com [208.42.231.60] (may be forged))
-	by mx0b-00206402.pphosted.com (PPS) with ESMTPS id 4cd06ca947-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 18 Feb 2026 10:43:43 +0000 (GMT)
-Received: from ML-CTVHTF21DX.crowdstrike.sys (10.100.11.122) by
- 04WPEXCH006.crowdstrike.sys (10.100.11.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35; Wed, 18 Feb 2026 10:43:36 +0000
-From: Slava Imameev <slava.imameev@crowdstrike.com>
-To: <eddyz87@gmail.com>
-CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
-        <daniel@iogearbox.net>, <davem@davemloft.net>, <edumazet@google.com>,
-        <haoluo@google.com>, <horms@kernel.org>, <john.fastabend@gmail.com>,
-        <jolsa@kernel.org>, <kpsingh@kernel.org>, <kuba@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-open-source@crowdstrike.com>, <martin.lau@linux.dev>,
-        <netdev@vger.kernel.org>, <pabeni@redhat.com>, <sdf@fomichev.me>,
-        <shuah@kernel.org>, <slava.imameev@crowdstrike.com>, <song@kernel.org>,
-        <yonghong.song@linux.dev>
-Subject: Re: Re: [PATCH bpf-next v2 0/2] bpf: Add multi-level pointer parameter
-Date: Wed, 18 Feb 2026 21:43:28 +1100
-Message-ID: <20260218104328.14341-1-slava.imameev@crowdstrike.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <bb4bf5fe648ac71c969c6228ac6e72ea85cbc64b.camel@gmail.com>
-References: <bb4bf5fe648ac71c969c6228ac6e72ea85cbc64b.camel@gmail.com>
+	s=arc-20240116; t=1771411434; c=relaxed/simple;
+	bh=vs01qvgYJsnWbZD7RPRe5+RrLzHQ11mT4rvtlCK+odQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=goGRVPJI/SA4TwvSKxMr69o+gBEgLxNvqQL6PG3+zqu1giLQWnztX1Ksg/bXYY3JUSTkD1C06hGhsOJ4bJ86cQ8+/UxhWUixsIQRf+DrA4erbykO1C4cNwtotwKezYDcHd+AINlxL4+k4JSRZVOOyTW0ukzr1X5P83jZFYxKTP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hac+poap; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=sSanYZb0; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1771411431;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Fe1gy+WdvmYe1mvohV7Dt8/rkDiaG76OuN5B9cWwu48=;
+	b=hac+poapF49eo0IImtqHHUQaq4skFHjsgobTTmxdxeYfqCor7hoMqhg1vU7BmzgGiCBDPm
+	eaXBwiiz7rmCCPShFthFghGtvVUxeTb18qg27qb0gUqGpEon1S8C3e2tW9S43YlfqWT0KZ
+	bXJAWK5VYEK6weNOFVfjyVydtkyX+Q8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-689-_y3RHrHgNzeCzfS1da7xig-1; Wed, 18 Feb 2026 05:43:49 -0500
+X-MC-Unique: _y3RHrHgNzeCzfS1da7xig-1
+X-Mimecast-MFC-AGG-ID: _y3RHrHgNzeCzfS1da7xig_1771411428
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4836bf1a920so59293435e9.3
+        for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 02:43:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1771411428; x=1772016228; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fe1gy+WdvmYe1mvohV7Dt8/rkDiaG76OuN5B9cWwu48=;
+        b=sSanYZb0SfrlWqK1KrAPv7ShKmrLg9iC+uRUj0ymn24HnjIna1Fy1BL7sNLh8sa6k2
+         +heZ3dAm7TSG4oKb1EokbLKYFyVUHA9mKpgFHCF2RbxfwhYpi9nGSLkrNqILfJlf0/6Y
+         RD+pr8UMMupHEAPDB7TdcNwNIVKKGlPBBZmrdAzY2s/H/YqjTrgF8ZbERyElswroqWaP
+         YXv+I5NmGYNCmsxtIbEwR6jbQ8JdkfT9yAdx1yKWbTgfa2GOY0sHZ2Rm8dlOo/3AO1iZ
+         bQDf6ZPpR/Z6Nxl7HIZ3gkRYQdcVdZTuCbJuoSfp9r0b2bQvQG9c9/cFvVNdIwxDlpL+
+         RMxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771411428; x=1772016228;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Fe1gy+WdvmYe1mvohV7Dt8/rkDiaG76OuN5B9cWwu48=;
+        b=cQ51ZMnWRHMTFbtyTLEGQhlaEIGgwgaw0FbyVX2Dhz7Ns3I9e1BM8n2h6fZiADD7fX
+         B8t/3q+xiHnTF9VIxTx6ULEdyQBYKOYq7RVo0YkIoKviRSTVv7yvNpLuUffbFjCmitsQ
+         jXC8r99hvQ6KMJhoIGB31ePCTOQIBzdW+xieJcaTmTpjIxLr/3NUf/TD1qpzs902z5gg
+         3UZYQ1RwotgubCZe+AxzW0Esle0xW+eap5gKQ9DNn9UQnxKnAi86vhPLPbVszQxCR+Mm
+         DbE+1FnRLpaAJBLHG2nafxUefKQa48O32dH2ubdOrBQgKHAeXGhIXjwRGpfBYoGsTsI2
+         embQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXvS/DzmcYsdxzCo+UmoBEWh+MLBB3NBZ5W8j1mdRlwkxc2P1DgLbs6+sPqokrme9Bse950g7k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHG8kKTELwTaD3VAltsNpWsTn5X6cx/RvWJiqeR3zQc4PsiBW3
+	Mln6XUSa7Yzh5Q3W96zuPOi+vTS3GupT6THL5jOhzAqAsCogdHuze3cCXMa0oxws0dQfZU7P3jY
+	hUZPvsGfWfWrMdeNCydVezpIG4GwZA5vFUqWqXNGfhP5e3fRPaA3Z16zNvg==
+X-Gm-Gg: AZuq6aIg4Nzv5xHVYcTySQyrPVE8s3e0+Rjq8RzQ33HEx2THaSkCHbGpKD2BuW4d3Yj
+	mGlm+ITLu5OF/ff9NAsa/LO5xBRtZqa9C3Sd6GvT2EiWySQ2Ug3CRQIgCJeZHWs6DV4LEqo3HWz
+	7rHV5InJdI2KtqLtQ5x5813We7L8jp/ecXh1s4k1ER+F72Dw0KBWPhV/0FXWGn4HaOBtopjpyEi
+	YGNKJ4eVs0lgAJXpzP2/ti+oll2ASq+X0ixHZ6CR6UxrDweMPnufHlaGM1uI3QgAIw6hsGdqvz/
+	d+Gvh7FcgDSAjFgMGrCGQnbXuUkpr7BDx1g/6GJQoTbdY6Trl6UqABjb8yNf5a5iJcp1iAF+6Ek
+	CVhCFh3JRBR8SADauxVVp04rQPEd5wy1EuYaDhbnPzz0n9gwemwzpKMkS3id2dd2SP6AQIEI=
+X-Received: by 2002:a05:600c:1d0b:b0:475:dde5:d91b with SMTP id 5b1f17b1804b1-48379be820fmr252895215e9.17.1771411428161;
+        Wed, 18 Feb 2026 02:43:48 -0800 (PST)
+X-Received: by 2002:a05:600c:1d0b:b0:475:dde5:d91b with SMTP id 5b1f17b1804b1-48379be820fmr252894855e9.17.1771411427663;
+        Wed, 18 Feb 2026 02:43:47 -0800 (PST)
+Received: from sgarzare-redhat (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43796a5d156sm44633988f8f.5.2026.02.18.02.43.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Feb 2026 02:43:46 -0800 (PST)
+Date: Wed, 18 Feb 2026 11:43:42 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Bobby Eshleman <bobbyeshleman@meta.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Daan De Meyer <daan.j.demeyer@gmail.com>
+Subject: Re: [PATCH net] vsock: lock down child_ns_mode as write-once
+Message-ID: <aZWUmbiH11Eh3Y4v@sgarzare-redhat>
+References: <20260217-vsock-ns-write-once-v1-1-a1fb30f289a9@meta.com>
+ <aZV6HRAIsf_rNRM2@sgarzare-redhat>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: 04WPEXCH011.crowdstrike.sys (10.100.11.81) To
- 04WPEXCH006.crowdstrike.sys (10.100.11.70)
-X-Disclaimer: USA
-X-Authority-Analysis: v=2.4 cv=UfxciaSN c=1 sm=1 tr=0 ts=699597df cx=c_pps
- a=1d8vc5iZWYKGYgMGCdbIRA==:117 a=1d8vc5iZWYKGYgMGCdbIRA==:17
- a=EjBHVkixTFsA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=H0qDomdnsbD56h0TScUA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjE4MDA5NSBTYWx0ZWRfX3Srx+ioQsDqV
- 0jC/0wPwKQ8mhy+rhGpLVUeYxahxlT1JGdmpydQX/Hc5SfZFb4k695nFbgDP5EAzamAivllSkX2
- LQRsaBEzYEBCqO5bHeGbiWJ1P2IOtvtrzBsXrpxUBGb/1N84urCNFUI9Kn9eC3/CvF4LZPZzUNC
- 0XlSoIRhk7nVavpxowcUiIUNXBx8T0CrP9/FSo+pQs7IbRxr3zuJ4jqjX2deRub1d8Bv4s7soY2
- kdcgOpS2sAiE+ndrGnjEtifUviLgTGqzQROV2ljGlrpYa4pF1VJcqwK5PDxjhJG2aDT+cKgMDCf
- 4O+paE3PpKHeNxOP/V9Cz9J12hAhChVJZE7iw9yrkrYCxc27giHxINfRHAWkImhB7HaLQw4eoSU
- +iZyc662CB1FxvHd518IDiWA768u074SvSgW/twaV31HL4Ajf3VosqhUHvoLf6C0ZbVpRB63tUX
- YQkgdbA+hY/y1EkBYLw==
-X-Proofpoint-GUID: RALuzazVZ2uQ8v73WefunJGodwe9y-dj
-X-Proofpoint-ORIG-GUID: RALuzazVZ2uQ8v73WefunJGodwe9y-dj
-X-Proofpoint-Virus-Version: vendor=nai engine=6800 definitions=11704
- signatures=596818
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 adultscore=0 clxscore=1015 suspectscore=0 impostorscore=0
- phishscore=0 bulkscore=0 spamscore=0 priorityscore=1501 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602180095
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <aZV6HRAIsf_rNRM2@sgarzare-redhat>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[crowdstrike.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[crowdstrike.com:s=default];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,iogearbox.net,davemloft.net,google.com,gmail.com,crowdstrike.com,linux.dev,redhat.com,fomichev.me];
-	TAGGED_FROM(0.00)[bounces-259295-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[slava.imameev@crowdstrike.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-259294-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[crowdstrike.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,meta.com,lists.linux.dev,vger.kernel.org,gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_NONE(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,crowdstrike.com:mid,crowdstrike.com:dkim]
-X-Rspamd-Queue-Id: 085BB1559B1
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,meta.com:email]
+X-Rspamd-Queue-Id: 720BF1559DB
 X-Rspamd-Action: no action
 
-> > The verifier assigns SCALAR type to single-level pointers (void*, int*).
-> 
-> So, the simplest change for pointers to pointers would be as below, right?
-> 
->   --- a/kernel/bpf/btf.c
->   +++ b/kernel/bpf/btf.c
->   @@ -6906,7 +6906,8 @@ bool btf_ctx_access(int off, int size, enum bpf_acc=
-ess_type type,
->            * If it's a pointer to void, it's the same as scalar from the ve=
-rifier
->            * safety POV. Either way, no futher pointer walking is allowed.
->            */
->   -       if (is_void_or_int_ptr(btf, t))
->   +       if (is_void_or_int_ptr(btf, t) || !is_ptr_to_struct(btf, t))
->                   return true;
-> 
->           /* this is a pointer to another type */
-> 
-> Except that loaded value would be marked as scalar() and one would
-> need to cast it using e.g. bpf_core_cast() to obtain an untrusted
-> pointer.
+On Wed, Feb 18, 2026 at 11:02:02AM +0100, Stefano Garzarella wrote:
+>On Tue, Feb 17, 2026 at 05:45:10PM -0800, Bobby Eshleman wrote:
+>>From: Bobby Eshleman <bobbyeshleman@meta.com>
+>>
+>>To improve the security posture of vsock namespacing, this patch locks
+>>down the vsock child_ns_mode sysctl setting with a write-once policy.
+>>The user may write to child_ns_mode only once in each namespace, making
+>>changes to either local or global mode be irreversible.
+>>
+>>This avoids security breaches where a process in a local namespace may
+>>attempt to jailbreak into the global vsock ns space by setting
+>>child_ns_mode to "global", creating a new namespace, and accessing the
+>>global space through the new namespace.
+>
+>Commit 6a997f38bdf8 ("vsock: prevent child netns mode switch from 
+>local to global") should avoid exactly that, so I don't get this. Can 
+>you elaborate more how this can happen without this patch?
+>
+>I think here we should talk more about what we described in 
+>https://lore.kernel.org/netdev/aZNNBc390y6V09qO@sgarzare-redhat/ which 
+>is that two administrator processes could compete in setting 
+>`child_ns_mode` and end up creating a namespace with an `ns_mode` 
+>different from the one set in `child_ns_mode`. But I would also 
+>explain that this can still be detected by the process by looking at 
+>`ns_mode` and trying again.  With this patch, we avoid this and allow 
+>the namespace manager to set it once and be sure that it cannot be 
+>changed again.
+>
+>>
+>>Additionally, fix the test functions that this change would otherwise
+>>break by adding "global-parent" and "local-parent" namespaces and using
+>>them as intermediaries to spawn namespaces in the given modes. This
+>>avoids the need to change "child_ns_mode" in the init_ns. nsenter must
+>>be used because ip netns unshares the mount namespace so nested "ip
+>>netns add" breaks exec calls from the init ns.
+>
+>I'm not sure what the policy is in netdev, but I would prefer to have 
+>selftest changes in another patch (I think earlier in the series so as 
+>not to break the bisection), in order to simplify backporting (e.g. in 
+>CentOS Stream, to keep the backport small, I didn't backport the 
+>dozens of patches for selftest that we did previously).
+>
+>Obviously, if it's not possible and breaks the bisection, I can safely 
+>skip these changes during the backport.
+>
+>>
+>>Test run:
+>>
+>>1..25
+>>ok 1 vm_server_host_client
+>>ok 2 vm_client_host_server
+>>ok 3 vm_loopback
+>>ok 4 ns_host_vsock_ns_mode_ok
+>>ok 5 ns_host_vsock_child_ns_mode_ok
+>>ok 6 ns_global_same_cid_fails
+>>ok 7 ns_local_same_cid_ok
+>>ok 8 ns_global_local_same_cid_ok
+>>ok 9 ns_local_global_same_cid_ok
+>>ok 10 ns_diff_global_host_connect_to_global_vm_ok
+>>ok 11 ns_diff_global_host_connect_to_local_vm_fails
+>>ok 12 ns_diff_global_vm_connect_to_global_host_ok
+>>ok 13 ns_diff_global_vm_connect_to_local_host_fails
+>>ok 14 ns_diff_local_host_connect_to_local_vm_fails
+>>ok 15 ns_diff_local_vm_connect_to_local_host_fails
+>>ok 16 ns_diff_global_to_local_loopback_local_fails
+>>ok 17 ns_diff_local_to_global_loopback_fails
+>>ok 18 ns_diff_local_to_local_loopback_fails
+>>ok 19 ns_diff_global_to_global_loopback_ok
+>>ok 20 ns_same_local_loopback_ok
+>>ok 21 ns_same_local_host_connect_to_local_vm_ok
+>>ok 22 ns_same_local_vm_connect_to_local_host_ok
+>>ok 23 ns_delete_vm_ok
+>>ok 24 ns_delete_host_ok
+>>ok 25 ns_delete_both_ok
+>>SUMMARY: PASS=25 SKIP=0 FAIL=0
+>
+>IMO this can be removed from the commit message, doesn't add much 
+>value other than say that all test passes.
+>
+>>
+>>Fixes: eafb64f40ca4 ("vsock: add netns to vsock core")
+>>Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+>>Suggested-by: Daan De Meyer <daan.j.demeyer@gmail.com>
+>>Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
+>>---
+>>include/net/af_vsock.h                  |  6 +++++-
+>>include/net/netns/vsock.h               |  1 +
+>>net/vmw_vsock/af_vsock.c                | 10 ++++++----
+>>tools/testing/selftests/vsock/vmtest.sh | 35 
+>>+++++++++++++++------------------
+>>4 files changed, 28 insertions(+), 24 deletions(-)
+>>
+>>diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+>>index d3ff48a2fbe0..c7de33039907 100644
+>>--- a/include/net/af_vsock.h
+>>+++ b/include/net/af_vsock.h
+>>@@ -276,10 +276,14 @@ static inline bool vsock_net_mode_global(struct vsock_sock *vsk)
+>>	return vsock_net_mode(sock_net(sk_vsock(vsk))) == VSOCK_NET_MODE_GLOBAL;
+>>}
+>>
+>>-static inline void vsock_net_set_child_mode(struct net *net,
+>>+static inline bool vsock_net_set_child_mode(struct net *net,
+>>					    enum vsock_net_mode mode)
+>>{
+>>+	if (xchg(&net->vsock.child_ns_mode_locked, 1))
+>>+		return false;
+>>+
+>>	WRITE_ONCE(net->vsock.child_ns_mode, mode);
+>>+	return true;
+>>}
+>>
+>>static inline enum vsock_net_mode vsock_net_child_mode(struct net *net)
+>>diff --git a/include/net/netns/vsock.h b/include/net/netns/vsock.h
+>>index b34d69a22fa8..8c855fff8039 100644
+>>--- a/include/net/netns/vsock.h
+>>+++ b/include/net/netns/vsock.h
+>>@@ -17,5 +17,6 @@ struct netns_vsock {
+>>
+>>	enum vsock_net_mode mode;
+>>	enum vsock_net_mode child_ns_mode;
+>>+	int child_ns_mode_locked;
+>>};
+>>#endif /* __NET_NET_NAMESPACE_VSOCK_H */
+>>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>>index 9880756d9eff..35e097f4fde8 100644
+>>--- a/net/vmw_vsock/af_vsock.c
+>>+++ b/net/vmw_vsock/af_vsock.c
+>>@@ -90,14 +90,15 @@
+>> *
+>> *   - /proc/sys/net/vsock/ns_mode (read-only) reports the current namespace's
+>> *     mode, which is set at namespace creation and immutable thereafter.
+>>- *   - /proc/sys/net/vsock/child_ns_mode (writable) controls what mode future
+>>+ *   - /proc/sys/net/vsock/child_ns_mode (write-once) controls what mode future
+>> *     child namespaces will inherit when created. The initial value matches
+>> *     the namespace's own ns_mode.
+>> *
+>> *   Changing child_ns_mode only affects newly created namespaces, not the
+>> *   current namespace or existing children. A "local" namespace cannot set
+>>- *   child_ns_mode to "global". At namespace creation, ns_mode is inherited
+>>- *   from the parent's child_ns_mode.
+>>+ *   child_ns_mode to "global". child_ns_mode is write-once, so that it may
+>>+ *   be configured and locked down by a namespace manager. At namespace
+>>+ *   creation, ns_mode is inherited from the parent's child_ns_mode.
+>
+>We just merged commit a07c33c6f2fc ("vsock: document namespace mode 
+>sysctls") in the net tree, so we should update also 
+>Documentation/admin-guide/sysctl/net.rst
+>
+>> *
+>> *   The init_net mode is "global" and cannot be modified.
+>
+>Maybe we should also emphasise in the documentation and in the commit 
+>description that `child_ns_mode` in `init_net` also is write-once, so
+>writing `local` to that one by the init process (e.g. systemd), 
+>essentially will make all the new namespaces in `local` mode. This 
+>could be useful for container/namespace managers.
+>
+>> *
+>>@@ -2853,7 +2854,8 @@ static int vsock_net_child_mode_string(const struct ctl_table *table, int write,
+>>		    new_mode == VSOCK_NET_MODE_GLOBAL)
+>>			return -EPERM;
+>>
+>>-		vsock_net_set_child_mode(net, new_mode);
+>>+		if (!vsock_net_set_child_mode(net, new_mode))
+>>+			return -EPERM;
+>
+>So, if `child_ns_mode` is set to `local` but locked, writing `local` 
+>again will return -EPERM, is this really what we want?
+>
+>I'm not sure if we can relax it a bit, but then we may race between 
+>reader and writer, so maybe it's fine like it is in this patch, but we 
+>should document better that any writes (even same value) after the 
+>first one will return -EPERM.
 
+I think we can try in this way:
 
-I considered using a scalar as a simpler solution, but there are some
-disadvantages with casting to scalar and using bpf_core_cast:
-
- - Casting to scalar removes nullable and trusted properties
- - bpf_core_cast cannot cast to multi-level pointers without
-  introducing a new typedef or a wrapper for a pointer
-
-Let's consider the following LSM program which has trusted parameters, and
-logs the value for (*mnt_opts):
-
-SEC("lsm/sb_eat_lsm_opts")
-int BPF_PROG(sb_eat_lsm_opts_1,char *options, void **mnt_opts)
-
-With this patch:
-
-- This program is valid:
-
-SEC("lsm/sb_eat_lsm_opts")
-int BPF_PROG(sb_eat_lsm_opts_1,char *options, void **mnt_opts)
+static inline bool vsock_net_set_child_mode(struct net *net,
+					    enum vsock_net_mode mode)
 {
-    bpf_printk("%p\n", *mnt_opts);
-    return 0;
+	int new_locked = mode + 1;
+	int old_locked = 0;
+
+	if (try_cmpxchg(&net->vsock.child_ns_mode_locked,
+			&old_locked, new_locked)) {
+		WRITE_ONCE(net->vsock.child_ns_mode, mode);
+		return true;
+	}
+
+	return old_locked == new_locked;
 }
 
-- This program is semantically invalid as mnt_opts is a trusted
-parameter, so there are no run-time checks and the verifier rejects
-out-of-bounds access:
+With a comment like this near child_ns_mode_locked in struct 
+netns_vsock:
+/* 0 = unlocked
+  * 1 = locked to GLOBAL (VSOCK_NET_MODE_GLOBAL + 1)
+  * 2 = locked to LOCAL  (VSOCK_NET_MODE_LOCAL + 1)
+  */
 
-SEC("lsm/sb_eat_lsm_opts")
-int BPF_PROG(sb_eat_lsm_opts_1,char *options, void **mnt_opts)
-{
-    bpf_printk("%p\n", *(mnt_opts+10));
-    return 0;
-}
+While writing that, I thought that we can even remove 
+`child_ns_mode_locked` and use a single variable where encode the value 
+and the state, but maybe it's an unnecessary extra complexity.
 
-With casting to a scalar and following bpf_core_cast:
+Stefano
 
-- This programs cannot be compiled as bpf_core_cast cannot cast to a
-multi-level pointer:
+>
+>About that, should we return something different, like -EBUSY ?
+>Not a strong opinion, just to differentiate with the other check before.
+>
+>Thanks,
+>Stefano
 
-SEC("lsm/sb_eat_lsm_opts")
-int BPF_PROG(sb_eat_lsm_opts_1,char *options, void **mnt_opts)
-{
-    void** ppt = bpf_core_cast(mnt_opts, void*);
-    bpf_printk("%p\t", *ppt);
-    return 0;
-}
-
-- There is a workaround, which requires introducing a wrapper for
-a pointer or typedef:
-
-struct pvoid {
-    void* v;
-};
-
-typedef void* pvoid;
-
-SEC("lsm/sb_eat_lsm_opts")
-int BPF_PROG(sb_eat_lsm_opts_1,char *options, void **mnt_opts)
-{
-    struct pvoid* ppt = bpf_core_cast(mnt_opts, struct pvoid);
-    bpf_printk("%p\t", ppt->v);
-    return 0;
-}
-
-SEC("lsm/sb_eat_lsm_opts")
-int BPF_PROG(sb_eat_lsm_opts_2,char *options, void **mnt_opts)
-{
-    pvoid* ppt = bpf_core_cast(mnt_opts, pvoid);
-    bpf_printk("%p\t", *ppt);
-    return 0;
-}
-
-- This program passes verifier, though it is semantically invalid
-as logs an invalid data using a trusted parameter:
-
-SEC("lsm/sb_eat_lsm_opts")
-int BPF_PROG(sb_eat_lsm_opts_1,char *options, void **mnt_opts)
-{
-    struct pvoid* ppt = bpf_core_cast(mnt_opts + 10, struct pvoid);
-    bpf_printk("%p\t", ppt->v);
-    return 0;
-}
-
-The similar examples can be done for nullable annotation, which
-is ignored for a scalar allowing semantically invalid BPF programs to
-pass verifier.
-
-> > For multi-level pointers, I selected PTR_TO_MEM to enable memory access
-> > through a single load instruction for the first level of dereference,
-> > with subsequent dereferences becoming SCALAR. This design eliminates
-> > helper call for parameter dereference, replacing it with a load
-> > instruction (e.g., void* ptr =3D *pptr).
-> 
-> If going this route instead, is there a technical reason to limit this
-> logic to multi-level pointers? Applying same rules to `int *` and
-> alike seem more consistent.
-
-I decided to address only multilevel pointers as this is what we
-encountered in practice and have to use BPF helper workarounds.
-I think there are no technical restrictions for treating single
-level pointers as PTR_TO_MEM.
-However, there is some cohesion between multilevel pointers being
-PTR_TO_MEM and single level being scalar, as verifier infers a scalar
-for PTR_TO_MEM dereference, so:
-
-foo(void *ptr1, void **pptr)
-{
-    void* ptr2 = *pptr; /* verifier infers a scalar for ptr2*/
-    /* both ptr1 and ptr2 are scalars */
-}
 
