@@ -1,142 +1,207 @@
-Return-Path: <netdev+bounces-259310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259311-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QAtCO9S8lWntUQIAu9opvQ
-	(envelope-from <netdev+bounces-259310-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 14:21:24 +0100
+	id +OyKMP28lWntUQIAu9opvQ
+	(envelope-from <netdev+bounces-259311-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 14:22:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53668156909
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 14:21:24 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04C9C15691F
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 14:22:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D9458301951B
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 13:21:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9889B300A389
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 13:22:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F5112BEC45;
-	Wed, 18 Feb 2026 13:21:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2193C2C1586;
+	Wed, 18 Feb 2026 13:22:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rcu6sarx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com [209.85.210.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE0029E114
-	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 13:21:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9392C0266;
+	Wed, 18 Feb 2026 13:22:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771420882; cv=none; b=NiZEfVZtO/lpMZ6BZ/EUyNyeTKMwJXcMx80RHAGHYYMGUxBYpILEscLsORYNHDHPFErRoxRuDdjzGLc3Bpo5MLfxO2YCdJlQLFGMRWLO0UVLuMMhg+yqMEM3/h7WdvgVBnb0pjX+AUMpXUmx72qb8hXPsrPkCEw+k0RObatSipQ=
+	t=1771420923; cv=none; b=oy71mesCm/rZzljVGat7lo/cJHTFNGGiRLYQmocKrclOF3KMDzKawurgtncq1yGQ2fFcvMg66U0lo4yayRYzTgYoAyzKKk43dtdLfqz1ISDqmIIbZZMvHaYi5faDQ6VJt3GjAP3dRDqMUXnou+dXTWlM7gwPG32yOh05f64nz94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771420882; c=relaxed/simple;
-	bh=4Dn0UKUm73Olelcz49EZhrlfjDGw9M/DcH8jEvOJiFw=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=KNTGkcylntGYv6kWA94NmcWVbK8kE4vjPDuLhXN8Q3Dz0y9ZMLsKMQwVqsXjdY0kkt+gHRmPsTBvUPDJXBuudh1acAhSDXW2qOYvO9YNU+no0PaxQMKCp47J/bWnbjUZnjAeIepMnJT2qdb9Xr5vPW50Yd/IjpkTSah6BcyLD1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-7d194b631d6so58823896a34.0
-        for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 05:21:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771420880; x=1772025680;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5s1PrBwjWJkBDhrHp6GlKuEWF8QNwEUz0W27JeFQmLs=;
-        b=WZ+ZsDTFSTH0DrvxgGztYYKKTQu846BOyBV06X4JRx4mukQCNH800KUDfwfZaQrmbx
-         aEL9gRKgNQbmHruDJpESlFZhiLGv6DZciecnr80YzLrDXSemW/A0BX8lTnVDHNfqCqHo
-         r3Nq/nlKe/RM5c1N0Lat5DoRDns7spbk2qAbSo53I0ORY9U+vzjhaTAfIQcnFOOKhlrb
-         dsV3TUjzLclooH9nkK+CiMZlOMwg1KZD2uvl3t4cIvAZOylmnH9xCjVpm9nvrW9Uy3Q/
-         3HtM3gfzqFuLx9p+v8wdafNDqzqnYpAmwMhgzL3APY3mXuGbZO2oAtzalAD/PeuZs/Me
-         1Z0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVGA+1vI95QPMaTAhazobs5U1jpIOzSKI+I/5IfXafbhb5tpozCksAEjIROWPf1mhG0XA63Jo8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDY0c9xYWTgRCpI/Osg2on+0gbNukr4lJA9d6Kw34oBWHzmZpf
-	KcmiZ3d5QzCoy3f9zA5ul6rBbN7SjrerM/HeE2e3PEkYtF8QNvetlZlnNJiobSlU3ZYgdDrTq27
-	GjjPbgcFAxSV9CjntQDwB3a+/L1u5U/Yp9XpGnYNcGu3zqaGWW2RbpeKC6Ik=
+	s=arc-20240116; t=1771420923; c=relaxed/simple;
+	bh=RtjePkww0hw8ZMwtNPB3pR4A7ItkOV7dbFLkqdtP194=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KSNEEMXksTvgqzoQx7reo8JW17uJto7SpIUNDK46ObfchVPjOEeYsXElDqUMXO7vxvZ+7cz3rRKC0TfFQyOj4djfTiJ3VmiqUrr2y04q+w+m3LTD9E20oDXWuyK29NpIGysyqzk+uQb+t/Vc2jxKwVbNAm4nTTtUiF+Ocbna2WM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rcu6sarx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6EAAC19421;
+	Wed, 18 Feb 2026 13:21:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771420922;
+	bh=RtjePkww0hw8ZMwtNPB3pR4A7ItkOV7dbFLkqdtP194=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Rcu6sarx6DzcS3b4UmBtDKUimvxJtmougnDqFbsIcCpRmQPxnA6ddZ+zJ/zyxWdpn
+	 85wcjx9xAOWqIwW1d2PjLkC97NI7xXye4QC7sgh+/qu+TIgYqsYyer/cPnlrkpUFoM
+	 IkmGYkOqrPWDHTgfb51a69l5OnAOPElOb3luuLRnbmc4IqIiKOrZWfx5D/2BhPAHCz
+	 UJz98rXhYyo5pUA+B/FEKjI8hRwhbE96/h6i8izoKK0P7LfrGJTHetWrTSAEdeD56B
+	 ukbXSw9QAszunJz32fPgKiBLjsB4GSIIP0Rp1BqY/+lD3IoRs11r474rtrCHl5EnUK
+	 i7rFt+XU9YcBw==
+Message-ID: <9bfb4ef0-49a1-4127-aad4-2ba1b9dd8e95@kernel.org>
+Date: Wed, 18 Feb 2026 14:21:57 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:4411:b0:679:871c:b309 with SMTP id
- 006d021491bc7-679a71b9ec0mr792547eaf.3.1771420879866; Wed, 18 Feb 2026
- 05:21:19 -0800 (PST)
-Date: Wed, 18 Feb 2026 05:21:19 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6995bccf.050a0220.2eeac1.0153.GAE@google.com>
-Subject: [syzbot] Monthly net report (Feb 2026)
-From: syzbot <syzbot+list5f277c8c913b6bc12aa1@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 1/3] dt-bindings: sram: qcom,imem: Allow
+ modem-tables subnode
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+ Konrad Dybcio <konradybcio@kernel.org>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alex Elder <elder@kernel.org>, Marijn Suijten
+ <marijn.suijten@somainline.org>, linux-arm-msm@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20260217-topic-ipa_imem-v3-0-d6d8ed1dfb67@oss.qualcomm.com>
+ <20260217-topic-ipa_imem-v3-1-d6d8ed1dfb67@oss.qualcomm.com>
+ <20260217-godlike-silent-owl-0a8487@quoll>
+ <36f0a71c-a8b7-4aaa-81c3-1945b268c57f@oss.qualcomm.com>
+ <0bfcb292-4e49-4047-b631-dd3029b43f1c@kernel.org>
+ <193d236b-864b-45bd-b0a9-6efbdccf6db9@oss.qualcomm.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <193d236b-864b-45bd-b0a9-6efbdccf6db9@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.36 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	R_DKIM_NA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,goo.gl:url,googlegroups.com:email,syzkaller.appspot.com:url];
+	TAGGED_FROM(0.00)[bounces-259311-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259310-lists,netdev=lfdr.de,list5f277c8c913b6bc12aa1];
-	RCPT_COUNT_THREE(0.00)[3]
-X-Rspamd-Queue-Id: 53668156909
+	DBL_PROHIBIT(0.00)[0.0.4.210:email];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,qualcomm.com:email,devicetree.org:url,146a5000:email]
+X-Rspamd-Queue-Id: 04C9C15691F
 X-Rspamd-Action: no action
 
-Hello net maintainers/developers,
+On 18/02/2026 13:26, Konrad Dybcio wrote:
+> 
+> 
+> On 18-Feb-26 12:56, Krzysztof Kozlowski wrote:
+>> On 18/02/2026 12:05, Konrad Dybcio wrote:
+>>> On 2/17/26 9:25 PM, Krzysztof Kozlowski wrote:
+>>>> On Tue, Feb 17, 2026 at 02:30:31PM +0100, Konrad Dybcio wrote:
+>>>>> From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+>>>>>
+>>>>> The IP Accelerator hardware/firmware owns a sizeable region within the
+>>>>> IMEM, named 'modem-tables', containing various packet processing
+>>>>> configuration data.
+>>>>>
+>>>>> It's not actually accessed by the OS, although we have to IOMMU-map it
+>>>>> with the IPA device, so that presumably the firmware can act upon it.
+>>>>>
+>>>>> Allow it as a subnode of IMEM.
+>>>>
+>>>> You do not have compatible, so rely on the node name as ABI, which is
+>>>> fine in general but... I do not see usage of it in the driver. Why do
+>>>> you need to define modem-tables child then?
+>>>
+>>> I don't really *need* the node name to be an ABI. However, the current
+>>> binding for IMEM only allows a named "pil-reloc@.." subnode (which is
+>>> consumed via of_find_compatible_node() in the remoteproc subsystem) so I
+>>> figured the intention was to keep the list of allowed subnodes strictly
+>>> moderated
+>>>
+>>> If you'd prefer a blanket pattern declaration with say '^[a-z]@[0-9a-z]+$'
+>>> with just a reg requirement inside, I'm fine with that too
+>>
+>> No, the problem is that you do not use the ABI here at all. Neither
+>> would you use the blanket pattern, so my question stays: why adding ABI
+>> which is not used?
+> 
+> The subnode I'm trying to introduce is going to be consumed (via a
+> phandle reference) from the IPA node, as done by the remaining 2
+> patches in this series.
 
-This is a 31-day syzbot report for the net subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/net
+And that's the problem - I do not see consuming child. I see
+of_parse_phandle to sram node, not the child.
 
-During the period, 7 new issues were detected and 14 were fixed.
-In total, 89 issues are still open and 1693 have already been fixed.
+> 
+> I would much prefer not to touch this binding file, but there's an
+> additionalProperties: false and just adding it as-is results in a:
+> 
+> arch/arm64/boot/dts/qcom/sc7280-idp.dtb: sram@146a5000: 'modem-tables@1234' does not match any of the regexes: '^pil-reloc@[0-9a-f]+$', 'pinctrl-[0-9]+'
+>         from schema $id: http://devicetree.org/schemas/sram/qcom,imem.yaml#
+> 
+> Konrad
 
-Some of the still happening issues:
-
-Ref  Crashes Repro Title
-<1>  8343    Yes   KMSAN: uninit-value in eth_type_trans (2)
-                   https://syzkaller.appspot.com/bug?extid=0901d0cc75c3d716a3a3
-<2>  3466    Yes   INFO: task hung in linkwatch_event (4)
-                   https://syzkaller.appspot.com/bug?extid=2ba2d70f288cf61174e4
-<3>  2905    Yes   WARNING in rcu_check_gp_start_stall
-                   https://syzkaller.appspot.com/bug?extid=111bc509cd9740d7e4aa
-<4>  2551    Yes   INFO: task hung in synchronize_rcu (4)
-                   https://syzkaller.appspot.com/bug?extid=222aa26d0a5dbc2e84fe
-<5>  2077    Yes   KMSAN: uninit-value in bpf_prog_run_generic_xdp
-                   https://syzkaller.appspot.com/bug?extid=0e6ddb1ef80986bdfe64
-<6>  1967    Yes   INFO: task hung in del_device_store
-                   https://syzkaller.appspot.com/bug?extid=6d10ecc8a97cc10639f9
-<7>  1639    Yes   INFO: task hung in addrconf_dad_work (5)
-                   https://syzkaller.appspot.com/bug?extid=82ccd564344eeaa5427d
-<8>  1055    Yes   possible deadlock in hsr_dev_xmit (2)
-                   https://syzkaller.appspot.com/bug?extid=fbf74291c3b7e753b481
-<9>  977     Yes   INFO: task hung in tls_sk_proto_close
-                   https://syzkaller.appspot.com/bug?extid=ca1345cca66556f3d79b
-<10> 872     Yes   WARNING in nsim_fib_event_nb
-                   https://syzkaller.appspot.com/bug?extid=a259a17220263c2d73fc
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+Best regards,
+Krzysztof
 
