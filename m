@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-259284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259289-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eED2KBWTlWn1SQIAu9opvQ
-	(envelope-from <netdev+bounces-259284-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 11:23:17 +0100
+	id CP7cHAGWlWk1SgIAu9opvQ
+	(envelope-from <netdev+bounces-259289-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 11:35:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F6D1155583
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 11:23:17 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E12AF155849
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 11:35:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5196A30B8F54
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 10:17:46 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CCD563052BC9
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 10:19:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0260A3502BC;
-	Wed, 18 Feb 2026 10:13:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E85D3590D3;
+	Wed, 18 Feb 2026 10:13:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TWlB+dWv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D6zqkt/3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF2ED350286;
-	Wed, 18 Feb 2026 10:13:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 019A33587A9;
+	Wed, 18 Feb 2026 10:13:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771409610; cv=none; b=WyvkmYPnkAe8/sYAbNrd8fS9TDq1k4c1DPJWB2/rYFWa+fmeqPyDCUZcSiqHuK0S9kJmrgZbXTKz4z45r+OSpZHw8cOIg2X8exCSb6b+kBQyRcTeB4TV6Hr8OC7du8q7pdVtXiDi2DbnyL2O8lpQragtaww/9qQQzV7p3cR9CX4=
+	t=1771409615; cv=none; b=DIKXpX0Gtcq5SNvPakPR6vyfcvhci2X2ASjFmYTOa5MIBTrZ2nzA++jTwcR21wimk6SE9KpSlSNy+aNiDEmSjxpVRUI1aX08JyskSfduL+clkkkIe1LVY5cZv39gTMuBsfBUH3FN1K5spWmtiMS14yrKbaJIGYPYIE3G/aFX4pI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771409610; c=relaxed/simple;
-	bh=vr6braZddKgoYGrWnqS65Mye11jx/ixo713d+HFrhJc=;
+	s=arc-20240116; t=1771409615; c=relaxed/simple;
+	bh=93FI6HCbFuKLoTGysvIesP/671jVJYX05qdlxtKR9Kk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ve0M5gRqu1e4X/QLdNZ+ij88kHLkYCbl0RdhuMB83w+ZB+kJgCLhfsIXhCgztt2oII+uYFnvI4ASiBOrm5UKdMCyS+NPerzChD2FiUmn+q/Gsbt4StGzRzCXXZnK9QKzc3cNfPvArM3EzeH8/cpoex6RPECmfniCzRxEXndQ3r8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TWlB+dWv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EE58C19423;
-	Wed, 18 Feb 2026 10:13:30 +0000 (UTC)
+	 MIME-Version:Content-Type; b=I6gkn67e6PwvL3n6c2Hfda+AnQOK8yqxVJTKbjlprcmjl1Y5edSIX2Cm6iCeiYhNNJPXo4ZK/Gjz2fzMZvgmKDDrtxU2PtpMx50Izm0ybIRlnV3oNDOV+fq9Zh3bCvFLlpIdFxtcUVuVqjm5plSsx1M5s8/raEmT794ZjyhzHmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D6zqkt/3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26B82C19421;
+	Wed, 18 Feb 2026 10:13:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771409610;
-	bh=vr6braZddKgoYGrWnqS65Mye11jx/ixo713d+HFrhJc=;
+	s=k20201202; t=1771409611;
+	bh=93FI6HCbFuKLoTGysvIesP/671jVJYX05qdlxtKR9Kk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TWlB+dWvLoWppC8mBA0qmB5c3nDT2/AmirhXcP6cEGn2a7M25H9Gv7RhoYoSCVB5f
-	 9rfe/g4ukmPFLVwz/QyYY/GZ8bChfo+tUv+oMVDLbOYDgP99PE70F8qLv1hDc1TDZ7
-	 UzJnBBUTlZKsT7YiTlypFluMvPTfRLnhoSQhWUpVu35+hhLeBmEgIrxU2Sxb/TcPSv
-	 oxoqwpEeQSK11Hg4ko+Nedd+HTPVu8NbsPMzVMinYu8c3vSYxCK7+qctBqB0vjOxRl
-	 314TDJCd6Rg9mvBwpfnMK5BBtOCdXMohntcGgJYwXhBp83SuKHjVkldBduyq6KIOYQ
-	 Nv++eFu1SYyJA==
+	b=D6zqkt/3NUB6EpxHEputgfvaw1vHtc0NsZ65QNN3AAKsJuHWSBcq82NKFzJu8llkR
+	 S+1bk/UPxulyqkqcMbYtUMX/IIRr09HFtRuwNOA1NPlhPHsSPUiXhECDzbmymTKCPU
+	 JmPJyAld8CPADXng3h49bxxTnDEx8O6tZ/7uUMOx2P8DlevrZHSEFbuD7SA01tAoZe
+	 Wy2GDlPrU1hQLkRN135ojO5oHWcW9ckY5i4kcvDUXG5i7xXrBHkp+i3T/cZga64Syq
+	 yIzxySQ3SnLG+PqvN40MnLlrYGZ278mb8gxtsx2bB1lNqpGUgxCJ6tFZMhIOwetkTl
+	 /MxbF5cjFyQRg==
 Received: from mchehab by mail.kernel.org with local (Exim 4.99.1)
 	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1vseYi-00000000Lw8-3n8u;
-	Wed, 18 Feb 2026 11:13:28 +0100
+	id 1vseYj-00000000Lxe-1kJB;
+	Wed, 18 Feb 2026 11:13:29 +0100
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To: Jonathan Corbet <corbet@lwn.net>,
 	Linux Doc Mailing List <linux-doc@vger.kernel.org>
@@ -56,12 +56,10 @@ Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	linux-hardening@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Akira Yokosawa <akiyks@gmail.com>
-Subject: [PATCH 31/38] docs: kdoc_re: Fix NestedMatch.sub() which causes PDF builds to break
-Date: Wed, 18 Feb 2026 11:13:01 +0100
-Message-ID: <f025e8ed3b01e193977b56df128694c1d2aaeb43.1771408406.git.mchehab+huawei@kernel.org>
+	Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH 32/38] docs: kdoc_files: document KernelFiles() ABI
+Date: Wed, 18 Feb 2026 11:13:02 +0100
+Message-ID: <ca064642fd70b1dd2fa2c72a119a3a579ef0a3c2.1771408406.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <cover.1771408406.git.mchehab+huawei@kernel.org>
 References: <cover.1771408406.git.mchehab+huawei@kernel.org>
@@ -80,104 +78,99 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,lists.osuosl.org,vger.kernel.org,intel.com,infradead.org,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-259284-lists,netdev=lfdr.de,huawei];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259289-lists,netdev=lfdr.de,huawei];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[mchehab@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,huawei];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0F6D1155583
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E12AF155849
 X-Rspamd-Action: no action
 
-Having a "\digit"  inside a docstring with normal strings causes
-PDF output to break, as it will add a weird character inside the
-string. It should be using a raw string instead.
+The KernelFiles is the main entry point to run kernel-doc,
+being used by both tools/docs/kernel-doc and
+Documentation/sphinx/kerneldoc.py.
 
-Yet, having r"\0" won't solve, as this would be converted in
-Sphinx as "0". So, this has to be inside a pre formatted text.
+It is also used on QEMU, which also uses the kernel-doc
+libraries from tools/lib/python/kdoc.
 
-That's said, the comment itself is probably not the best one.
+Properly describe its ABI contract.
 
-Rewrite the entire comment to properly document each parameter
-and add a "delim" parameter that will be passed to the
-ancillary function.
-
-Reported-by: Akira Yokosawa <akiyks@gmail.com>
-Closes: https://lore.kernel.org/linux-doc/63e99049-cc72-4156-83af-414fdde34312@gmail.com/
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- tools/lib/python/kdoc/kdoc_re.py | 30 ++++++++++++++++++------------
- 1 file changed, 18 insertions(+), 12 deletions(-)
+ tools/lib/python/kdoc/kdoc_files.py | 44 ++++++++++++++++++++++++++++-
+ 1 file changed, 43 insertions(+), 1 deletion(-)
 
-diff --git a/tools/lib/python/kdoc/kdoc_re.py b/tools/lib/python/kdoc/kdoc_re.py
-index 44af43aa1e93..f67ebe86c458 100644
---- a/tools/lib/python/kdoc/kdoc_re.py
-+++ b/tools/lib/python/kdoc/kdoc_re.py
-@@ -323,22 +323,28 @@ class NestedMatch:
+diff --git a/tools/lib/python/kdoc/kdoc_files.py b/tools/lib/python/kdoc/kdoc_files.py
+index c35e033cf123..8c2059623949 100644
+--- a/tools/lib/python/kdoc/kdoc_files.py
++++ b/tools/lib/python/kdoc/kdoc_files.py
+@@ -91,7 +91,49 @@ class KernelFiles():
+     """
+     Parse kernel-doc tags on multiple kernel source files.
  
-         return args
- 
--    def sub(self, sub, line, count=0):
--        """
--        This is similar to re.sub:
-+    def sub(self, sub, line, delim=",", count=0):
-+        r"""
-+        Perform a regex‑based replacement on ``line`` for all matches with
-+        the ``self.regex`` pattern. It uses the following parameters:
- 
--        It matches a regex that it is followed by a delimiter,
--        replacing occurrences only if all delimiters are paired.
-+        ``sub``
-+            Replacement string that may contain placeholders in the form
-+            ``\{digit}``, where  ``digit`` is an integer referring to the regex
-+            capture group number.
- 
--        if the sub argument contains::
-+            ``\{0}`` is a special case that expands to the entire matched text.
- 
--            r'\0'
-+        ``line``
-+            The string to operate on.
- 
--        it will work just like re: it places there the matched paired data
--        with the delimiter stripped.
-+        ``delim``
-+            The delimiter used by identify the placeholder groups
-+            (defaults to ",").
- 
--        If count is different than zero, it will replace at most count
--        items.
-+        ``count``
-+            Maximum number of replacements per match.  If 0 or omitted,
-+            all matches are replaced.
-         """
-         out = ""
- 
-@@ -358,7 +364,7 @@ class NestedMatch:
-             # replace arguments
-             new_sub = sub
-             if "\\" in sub:
--                args = self._split_args(value)
-+                args = self._split_args(value, delim=delim)
- 
-                 new_sub = re.sub(r'\\(\d+)',
-                                  lambda m: args[int(m.group(1))], new_sub)
+-    There are two type of parsers defined here:
++    This is the main entry point to run kernel-doc. This class is initialized
++    using a series of optional arguments:
++
++    ``verbose``
++        If True, enables kernel-doc verbosity. Default: False.
++
++    ``out_style``
++        Class to be used to format output. If None (default),
++        only report errors.
++
++    ``xforms``
++        Transforms to be applied to C prototypes and data structs.
++        If not specified, defaults to xforms = CFunction()
++
++    ``werror``
++        If True, treat warnings as errors, retuning an error code on warnings.
++
++        Default: False.
++
++    ``wreturn``
++        If True, warns about the lack of a return markup on functions.
++
++        Default: False.
++    ``wshort_desc``
++        If True, warns if initial short description is missing.
++
++        Default: False.
++
++    ``wcontents_before_sections``
++        If True, warn if there are contents before sections (deprecated).
++        This option is kept just for backward-compatibility, but it does
++        nothing, neither here nor at the original Perl script.
++
++        Default: False.
++
++    ``logger``
++        Optional logger class instance.
++
++        If not specified, defaults to use: ``logging.getLogger("kernel-doc")``
++
++    Note:
++        There are two type of parsers defined here:
++
+         - self.parse_file(): parses both kernel-doc markups and
+           ``EXPORT_SYMBOL*`` macros;
+         - self.process_export_file(): parses only ``EXPORT_SYMBOL*`` macros.
 -- 
 2.52.0
 
