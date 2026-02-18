@@ -1,184 +1,214 @@
-Return-Path: <netdev+bounces-259361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259362-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8PRrCd4rlmlPbwIAu9opvQ
-	(envelope-from <netdev+bounces-259361-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 22:15:10 +0100
+	id qF4nBGMvlmm5bwIAu9opvQ
+	(envelope-from <netdev+bounces-259362-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 22:30:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3099159CDC
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 22:15:09 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52CCF15A192
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 22:30:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 00EF2300753B
-	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 21:15:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1B1483001F99
+	for <lists+netdev@lfdr.de>; Wed, 18 Feb 2026 21:27:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A65533439A;
-	Wed, 18 Feb 2026 21:15:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hRI9H51E"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E4A433123A;
+	Wed, 18 Feb 2026 21:27:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from helium.schroedingers-bit.net (helium.schroedingers-bit.net [94.16.120.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D046A30F943
-	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 21:15:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F1133065A
+	for <netdev@vger.kernel.org>; Wed, 18 Feb 2026 21:27:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.16.120.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771449308; cv=none; b=OGAkC5iuqrPo1nuG9q3qeoe3vUaAEGR55DLWlhhBeortXJqMHgtathxD3vHLGB+o1YmtwROq1U7UNRdC4tQ7jq6EbLxIInZA9G2CplFA5nHSHPKAdLZnXe2XLUeUUZMDDtML25k52mLQ64VxZYkYoboSIgetZN7j6/3sq6p+/jg=
+	t=1771450074; cv=none; b=GPoKR2X0Y2dQVYdHwEGv2wNpdRvz6mqNoDDwDitPiOPmhndPbey5+tCqorBq7dONWyZ2Fuaka8gTg7NoANUMQHmjjHBasL13dWWnv+e7qcCwOdTzNzakbxIHXEniR9U+o498UNpBX/jGQkgTvpiyquVzpV46hue8RUSfxNhtJZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771449308; c=relaxed/simple;
-	bh=SgZvd8Sskv0y3be4d0fIiN0IEvSgTvHHZpYtU5oVIAE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bGUc7yPdQeFO115n58kUwOrUsTPpwn8OSURcgDwZtj3zLRU0jRg1yqrpBTCbY3F5RkoCFWWp2fG+jHdu218Mi1hY+jb5NsSvlqBeo+KEkE2fO6C/JMJDZAYSD2PF/iMMWpZGXrfVsL3gPdTElSHaKcensT9hbWALdZDSgzvHdJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hRI9H51E; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1771449305;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=eZU4gWKyKnQkKunk/pkzGylRrazxnAm7GHvdG5YZ6SY=;
-	b=hRI9H51E4tlB2V1xwUEUNIf2/Ode5I7By/9mboHICZoKE8xp4V8mbzgBD7RKA9yqlLQ99j
-	CYTdzuHRvI503IQx8C80oV+MUXtj0CWnlCDAwZvJsHtv+WPgglceWHR93ug4E4YHBIwKd5
-	EZD8x8DcY3/W/MPH4Uf8nsyHpT+yYkE=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-665-vkcSGc0kMhSmxjFwUGM44w-1; Wed,
- 18 Feb 2026 16:15:02 -0500
-X-MC-Unique: vkcSGc0kMhSmxjFwUGM44w-1
-X-Mimecast-MFC-AGG-ID: vkcSGc0kMhSmxjFwUGM44w_1771449300
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7C4081955BC4;
-	Wed, 18 Feb 2026 21:15:00 +0000 (UTC)
-Received: from ShadowPeak.redhat.com (unknown [10.44.32.59])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 770CB180066F;
-	Wed, 18 Feb 2026 21:14:56 +0000 (UTC)
-From: Petr Oros <poros@redhat.com>
-To: netdev@vger.kernel.org
-Cc: ivecera@redhat.com,
-	Petr Oros <poros@redhat.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	intel-wired-lan@lists.osuosl.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH iwl-net] ice: fix missing dpll notification for SW pins
-Date: Wed, 18 Feb 2026 22:14:14 +0100
-Message-ID: <20260218211414.1411163-1-poros@redhat.com>
+	s=arc-20240116; t=1771450074; c=relaxed/simple;
+	bh=4P5HkoC2BU5XWlTqhB9thnyU1IPqc35TCgxAd5Ip01o=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=Zoy6t10Ja3VIMjZbCeO55DW9IGbQlghI0PEoBJlOrBsUDYbxgpTubstV08SwCbgHknaatUfjmU/wTP4lRZOxFV66dD1WSOlQqrejPgqMxdemosi5ghFfN1CtlU+1hPVgU0dppd6pxz82k8kcJDR3GMuLdzvWp6AJUmb9FaFEzw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schroedingers-bit.net; spf=pass smtp.mailfrom=schroedingers-bit.net; arc=none smtp.client-ip=94.16.120.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schroedingers-bit.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=schroedingers-bit.net
+Received: from [IPV6:2a0a:a54a:ec35:0:ea9c:25ff:fe12:908b] (2a0a-a54a-ec35-0-ea9c-25ff-fe12-908b.ipv6dyn.netcologne.de [IPv6:2a0a:a54a:ec35:0:ea9c:25ff:fe12:908b])
+	by helium.schroedingers-bit.net (Postfix) with ESMTPSA id CE61484012;
+	Wed, 18 Feb 2026 21:19:55 +0000 (UTC)
+Message-ID: <b0414a07-f26e-4795-a697-37fb32d05595@schroedingers-bit.net>
+Date: Wed, 18 Feb 2026 22:19:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US-large, de-DE
+To: netdev@vger.kernel.org
+Cc: David Ahern <dsahern@kernel.org>
+From: Daniel Schulte <trilader@schroedingers-bit.net>
+Subject: [PATCH iproute2-next] ss: Remove trailing whitespace when output is
+ not a TTY
+X-Enigmail-Draft-Status: N11222
+Autocrypt: addr=trilader@schroedingers-bit.net; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[schroedingers-bit.net : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-259362-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWO(0.00)[2];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259361-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[trilader@schroedingers-bit.net,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.956];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C3099159CDC
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,schroedingers-bit.net:mid,schroedingers-bit.net:email]
+X-Rspamd-Queue-Id: 52CCF15A192
 X-Rspamd-Action: no action
 
-ice_dpll_notify_changes() sends dpll_pin_change_ntf() only for the
-direct CGU input pin stored in d->active_input. Software-controlled
-pins (SMA/U.FL) are separate dpll_pin objects that wrap a backing CGU
-input, but they never receive a change notification. As a result,
-userspace consumers such as synce4l that monitor SMA pins via dpll
-netlink never learn when the pin state transitions (e.g. from
-SELECTABLE to CONNECTED), even though 'dpll pin show' reports the
-correct state on demand.
+Sometimes a value in the last column might be very long.
+When grepping ss output the matched lines are also padded to the longest value.
+In some cases this can result in multiple lines of the terminal getting filled
+with spaces.
 
-When the active input changes, also send dpll_pin_change_ntf() for any
-registered SMA/U.FL input pin whose backing CGU input matches the old
-or new active input.
+Don't print right padding in last visible column when ss can't determine the
+screen width.
 
-Fixes: 2dd5d03c77e2 ("ice: redesign dpll sma/u.fl pins control")
-Signed-off-by: Petr Oros <poros@redhat.com>
+Signed-off-by: Daniel Schulte <trilader@schroedingers-bit.net>
 ---
- drivers/net/ethernet/intel/ice/ice_dpll.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+  misc/ss.c | 20 +++++++++++++++-----
+  1 file changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
-index c2ad39bfe177db..6f855fe4c78d62 100644
---- a/drivers/net/ethernet/intel/ice/ice_dpll.c
-+++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
-@@ -2470,13 +2470,17 @@ static u64 ice_generate_clock_id(struct ice_pf *pf)
-  */
- static void ice_dpll_notify_changes(struct ice_dpll *d)
- {
-+	struct ice_dplls *dplls = &d->pf->dplls;
- 	bool pin_notified = false;
-+	int i;
- 
- 	if (d->prev_dpll_state != d->dpll_state) {
- 		d->prev_dpll_state = d->dpll_state;
- 		dpll_device_change_ntf(d->dpll);
- 	}
- 	if (d->prev_input != d->active_input) {
-+		struct dpll_pin *old = d->prev_input;
+diff --git a/misc/ss.c b/misc/ss.c
+index b3566f6b..2cd6b470 100644
+--- a/misc/ss.c
++++ b/misc/ss.c
+@@ -1211,7 +1211,7 @@ static int render_screen_width(void)
+   * aligned across lines. Available screen space is equally spread between fields
+   * as additional spacing.
+   */
+-static void render_calc_width(void)
++static bool render_calc_width(void)
+  {
+      int screen_width, first, len = 0, linecols = 0;
+      struct column *c, *eol = columns - 1;
+@@ -1245,7 +1245,7 @@ static void render_calc_width(void)
+  
+      if (compact_output) {
+          /* Compact output, skip extending columns. */
+-        return;
++        return compact_output;
+      }
+  
+      /* Second pass: find out newlines and distribute available spacing */
+@@ -1304,6 +1304,7 @@ newline:
+          len = 0;
+          linecols = 0;
+      }
++    return compact_output;
+  }
+  
+  /* Render buffered output with spacing and delimiters, then free up buffers */
+@@ -1311,7 +1312,8 @@ static void render(void)
+  {
+      struct buf_token *token;
+      int printed, line_started = 0;
+-    struct column *f;
++    struct column *f, *last_visible_column = 0;
++    bool compact_output = false;
+  
+      if (!buffer.head)
+          return;
+@@ -1321,11 +1323,18 @@ static void render(void)
+      /* Ensure end alignment of last token, it wasn't necessarily flushed */
+      buffer.tail->end += buffer.cur->len % 2;
+  
+-    render_calc_width();
++    compact_output = render_calc_width();
+  
+      /* Rewind and replay */
+      buffer.tail = buffer.head;
+  
++    f = columns;
++    while (!field_is_last(f)) {
++        if (!f->disabled)
++            last_visible_column = f;
++        f++;
++    }
 +
- 		if (d->prev_input)
- 			dpll_pin_change_ntf(d->prev_input);
- 		d->prev_input = d->active_input;
-@@ -2484,6 +2488,20 @@ static void ice_dpll_notify_changes(struct ice_dpll *d)
- 			dpll_pin_change_ntf(d->active_input);
- 			pin_notified = true;
- 		}
-+		for (i = 0; i < ICE_DPLL_PIN_SW_NUM; i++) {
-+			if (dplls->sma[i].pin &&
-+			    dplls->sma[i].direction ==
-+			    DPLL_PIN_DIRECTION_INPUT &&
-+			    (dplls->sma[i].input->pin == d->active_input ||
-+			     dplls->sma[i].input->pin == old))
-+				dpll_pin_change_ntf(dplls->sma[i].pin);
-+			if (dplls->ufl[i].pin &&
-+			    dplls->ufl[i].direction ==
-+			    DPLL_PIN_DIRECTION_INPUT &&
-+			    (dplls->ufl[i].input->pin == d->active_input ||
-+			     dplls->ufl[i].input->pin == old))
-+				dpll_pin_change_ntf(dplls->ufl[i].pin);
-+		}
- 	}
- 	if (d->prev_phase_offset != d->phase_offset) {
- 		d->prev_phase_offset = d->phase_offset;
+      f = columns;
+      while (!f->width)
+          f++;
+@@ -1340,7 +1349,8 @@ static void render(void)
+          /* Print field content from token data with spacing */
+          printed += print_left_spacing(f, token->len, printed);
+          printed += fwrite(token->data, 1, token->len, stdout);
+-        print_right_spacing(f, printed);
++        if (!compact_output || f != last_visible_column)
++            print_right_spacing(f, printed);
+  
+          /* Go to next non-empty field, deal with end-of-line */
+          do {
 -- 
-2.52.0
+2.53.0
+
 
 
