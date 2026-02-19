@@ -1,209 +1,316 @@
-Return-Path: <netdev+bounces-259546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259547-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mDjKDzhSl2kzxAIAu9opvQ
-	(envelope-from <netdev+bounces-259546-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 19:11:04 +0100
+	id sBUfG/1Sl2kzxAIAu9opvQ
+	(envelope-from <netdev+bounces-259547-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 19:14:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 994E51617CA
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 19:11:03 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62A8516183E
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 19:14:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 37A96301BF61
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 18:11:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BE40A3007AC6
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 18:14:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E558C3502B6;
-	Thu, 19 Feb 2026 18:10:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB73A352FBD;
+	Thu, 19 Feb 2026 18:14:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IiEqsA2M"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="QVAkWKD2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010008.outbound.protection.outlook.com [40.93.198.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF480235071;
-	Thu, 19 Feb 2026 18:10:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771524659; cv=none; b=hEbmAnDiqqGiLHJooIKvRxrVj/iGdANygcXy5f6jNEPSKa5mknJ8/yRyLoz3sEWyVELVy0QVCjYfxN/OOij0+5BY0L56ua6aZIhgt7C5agp8MMTg39zZ3S14E1iFxpZW9cCJEbw/v7stVwcoSr+zIirEDLmuZ9837FJANWvHp38=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771524659; c=relaxed/simple;
-	bh=ZdR+XCWWCEE+0mQLk/14clIF1WSqOWjK0Y7yNhb9UUc=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=sQaPpV2S0zYlKJ86vnnB1xRqwrS7RTNTSDQA+bKHE0jp6mM/AHZ9htEcdANWI7mJWZ5n4z7OPShkM+1VFWm7wKwYHD7+QaEjAc9L4yHtoveuGvY43WmPrSb49HmgUaOXsaWJ8zWMOpJqgvJ5cvBcvJE1J/W3aph9ez7HHX6RxSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IiEqsA2M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 151DDC4CEF7;
-	Thu, 19 Feb 2026 18:10:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771524659;
-	bh=ZdR+XCWWCEE+0mQLk/14clIF1WSqOWjK0Y7yNhb9UUc=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=IiEqsA2M94+iRE5Y7F3CJrCsL8irEKRxD/xKNmbzfiFzyXpk/Q0epRqe8guFbY8BH
-	 hCZ1DcvT+Or8VtpxfmoDUSr8DyhQf/mRL8wYWsKev0wMafyfcS+k8Mnmf+JgQct1Au
-	 CsiazsyL+aYwo5G1R9VzoNw31VXuLEPn2yyHkb/DODINs860KUsPbgMpcaZn9Ka7/M
-	 Ji+ZtetZgg1+seI8AOZGKqP0MTPTKpclWA3wmdkxrzeZqZpwgmFSM+O7XFSSpzlxCu
-	 WfVSw8bK7f8nWtl/vRYT2cm/im3HscJdOfHCpjIbjewaXgkMQbmn3Bg+vJAjaP/cYJ
-	 wOwDtGgiy+DIQ==
-Content-Type: multipart/mixed; boundary="===============1189534981472302392=="
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E49D350D65;
+	Thu, 19 Feb 2026 18:14:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771524857; cv=fail; b=Jl9vtfdqpZBhCb5prOBCUOGFAy6KtyEIwacE/ghH0Cu2rOyFwevBL0CWa72eZ6NJfEysbE2xvwFuwv2MMouAYtEnUVveJu5aA+kkz7VgSrdGLh1jjMQl+gNhGizL6RP/R5q+fw283L5FDtcnaizcza8aBsHPQzdNPopVzFLmS4Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771524857; c=relaxed/simple;
+	bh=BGSSbMvGBA5flLrxqmgYOa3auXApyokFUJ8Y69vpAoA=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=VouBQYYhtiFF22hCno0fIvb/kvKpCU7fQa6N2SikDkwdQs3dHYhMGq8C4SXgdhF/xW721ggbSTaH3B+H/eW0sqzyaUoB2sSjZf0vME/eSepSknp6oi0HgAHvWmvbxbeBo5IQUxP1v/cnn/Zer6Bg3LvR/WsaObOih8/CLO/5hYs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=QVAkWKD2; arc=fail smtp.client-ip=40.93.198.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=sLhW2xKOdSv0R2FsliYyKRWdqMqnKjAKfdYHdXi4nNkJXxug2peploDyMiSDRkSCiubBOLS0wda2yDs3WbwTpmAuEOEBi26/wwPLlxHCw6Y4yqmZO++omjIUwqLC7dCK3HOYUbCgDhuCsIyUsitylVIvv1fkNGgpruBemqv9JR+3z0xjXmNvGecTNwTDa7pjkMLxZqGv/2/1zWfXU12CN79Ha4REoEx8IPOjv+vu1IsTbx2CFCpenFB0Ik/50S6hC52dSIpOg9T6nN3lIErxjsQ996ubmK7jK8KcD5AL6WMEVZgDPeH3rsvUVd92rcXpBhaVH5P0+sN7/RZ66K89Mg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4xbAOul5b8jY2HHKd0/CR/Nj4YU7dqrPThGNTl0SCqM=;
+ b=yHnI/hYC+Wld7tSEULkC9AbUPV2d7L5ik3G1euRedORbk0OIavYqkqROpgeylK/y79cODkh8aILiYsFJ7aroL7Hei9oZclMu7iQ+pdXoY7a6dMuvPcamO79VBPui4tQiHYAuh9SKYJVmfzZuhSouXJwpGWkxiCv/ipiZotr0MRLtGwHp5JIPGU37TaUgK6EW+DNKMuHXDHSdDY0/MpqgwrzgZFUVV/mKu6iZxjKhcyTK+2jEl5IdgV1oMU2wUeHOpkzFIl0XgUo1G0CQ9J8ZdZwUyOA8cTTE7OqXOU9ijKA7KA8CCuqDRqvAiPF2KDUDBYuxYmsbYul4cKYR3Ji7tg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4xbAOul5b8jY2HHKd0/CR/Nj4YU7dqrPThGNTl0SCqM=;
+ b=QVAkWKD2wW5d99kDS8SJUiOIf8sR9me6kIqMMvIeCQ1UM1bNvqmBKn3K4/S3xGxoOJ5b/yzxwG0LqSElNBby+lR5mGSuDoIGZ3oz8WSd2nIPfQzPSIkOmWm7roHsH20+iLPxjBs2JtpDoNP2njA9fpeokYHzlerpC4fivwrj/vujuSysfGSRKYRHJhgZ8NhT2WCDm/Y6WAQ9nDAZddc1HgDJJVkdnEkukg64rUltrjRbyEeI3VQbe3WKhpN/g5QyMwnWeCJ0wJF7noj8FSuaEHRDqDDDlgwsp05y92eLkAyRXeqt9GPOGco1DnG4fQ395mqRNm4iX+2OCOzhMTLMVw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from PH0PR12MB8800.namprd12.prod.outlook.com (2603:10b6:510:26f::12)
+ by IA0PR12MB7674.namprd12.prod.outlook.com (2603:10b6:208:434::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.16; Thu, 19 Feb
+ 2026 18:14:11 +0000
+Received: from PH0PR12MB8800.namprd12.prod.outlook.com
+ ([fe80::f79d:ddc5:2ad7:762d]) by PH0PR12MB8800.namprd12.prod.outlook.com
+ ([fe80::f79d:ddc5:2ad7:762d%4]) with mapi id 15.20.9632.010; Thu, 19 Feb 2026
+ 18:14:10 +0000
+From: Yury Norov <ynorov@nvidia.com>
+To: linux-kernel@vger.kernel.org,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Peter Zijlstra (Intel)" <peterz@infradead.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Antoine Tenart <atenart@kernel.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Ingo Molnar <mingo@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	James Clark <james.clark@linaro.org>,
+	Jerin Jacob <jerinj@marvell.com>,
+	Linu Cherian <lcherian@marvell.com>,
+	Lukasz Luba <lukasz.luba@arm.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Mike Leach <mike.leach@linaro.org>,
+	Moritz Fischer <mdf@kernel.org>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Tom Rix <trix@redhat.com>,
+	Xu Yilun <yilun.xu@intel.com>,
+	Yajun Deng <yajun.deng@linux.dev>,
+	Yury Norov <yury.norov@gmail.com>,
+	Zhang Rui <rui.zhang@intel.com>,
+	hariprasad <hkelam@marvell.com>,
+	coresight@lists.linaro.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-fpga@vger.kernel.org,
+	linux-pm@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	netdev@vger.kernel.org
+Cc: Yury Norov <ynorov@nvidia.com>
+Subject: [PATCH 00/12] cleanup bitmaps printing in sysfs
+Date: Thu, 19 Feb 2026 13:13:52 -0500
+Message-ID: <20260219181407.290201-1-ynorov@nvidia.com>
+X-Mailer: git-send-email 2.43.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BN0PR04CA0146.namprd04.prod.outlook.com
+ (2603:10b6:408:ed::31) To PH0PR12MB8800.namprd12.prod.outlook.com
+ (2603:10b6:510:26f::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <b8d59a7285647804e2c8484dc8cb118abf0ecd69657edab42393389088e349c5@mail.kernel.org>
-In-Reply-To: <20260219173756.315077-7-kuniyu@google.com>
-References: <20260219173756.315077-7-kuniyu@google.com>
-Subject: Re: [PATCH v3 bpf/net 6/6] sockmap: Fix broken memory accounting for UDP.
-From: bot+bpf-ci@kernel.org
-To: kuniyu@google.com,john.fastabend@gmail.com,jakub@cloudflare.com
-Cc: willemdebruijn.kernel@gmail.com,kuniyu@google.com,kuni1840@gmail.com,bpf@vger.kernel.org,netdev@vger.kernel.org,syzbot+5b3b7e51dda1be027b7a@syzkaller.appspotmail.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Thu, 19 Feb 2026 18:10:59 +0000 (UTC)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB8800:EE_|IA0PR12MB7674:EE_
+X-MS-Office365-Filtering-Correlation-Id: 95594654-ab1f-4b64-1d7c-08de6fe2adc2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|376014|7416014|10070799003|1800799024|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?ylwAa26eKvDTRWjoxYTQl53W2tWXlgE3Oc83pTdGzFEZ6j3wf3xx8CUtn17Q?=
+ =?us-ascii?Q?EgKgmb8//5+U4qoXpbtl9nmf3/kYAr94lXBNmWXRVzNMgDa38xSPObUC7Ff7?=
+ =?us-ascii?Q?uzLtmcsRn7m1CqMUJxiScRYp1VJbGHFQw/v4zuHd4hOHkhutjctqtg9vd/xN?=
+ =?us-ascii?Q?P29izKVtK1dAa2VgphWzmq6W6Syqmiwj6rh9ebRTVVU/7rzrakTceFAYw2GC?=
+ =?us-ascii?Q?wzJHvVj2wZtyzKExq5R+8hDREUXlJJhcE9RDygwpcUmMjXgo+gXD6OToIbCq?=
+ =?us-ascii?Q?SmozqtyN/SaCUhM5F13doxyX/pw3k3YJ9yY/hkyyQybqLk8ZNkKMcoA9m1Mk?=
+ =?us-ascii?Q?vtTGzuuLot+nzBMry19nTuZDMeQO0cKiwlnOB8mamBlESOj3uKIXHdBS3h+N?=
+ =?us-ascii?Q?6+Eh3C51N/Fc+xPSlV1gYuwB222LMl+wH6/5NUCfnaxqGhZ12dgylOUaPstm?=
+ =?us-ascii?Q?lewQiLuvbtcKn+TdtIJwv3OqP6qjiX1tix1jYNlboE1ej5220BRd+8YDo1me?=
+ =?us-ascii?Q?78GMnJZE08KuKUuWb2wrO470lvJ1R2KaeXHjeE9gyCi0QsSuazMC/lmrBRSx?=
+ =?us-ascii?Q?tRbIgxkU03pO8J8C9gEOlR8dXcOVTOX/URIkBQ9JWh0Pqlh8KRCAqTC/Rq0t?=
+ =?us-ascii?Q?xj2jO13Kl2Ds2y5hqrgZpv4TabdN8c+jq3Ncg6QuWJoGGhinGQVmmJIslhSX?=
+ =?us-ascii?Q?Ma+7P/A2OWeGmo5Hj76uP87rMhgEurh7VrDp3LJZCm/w0tbwjzTxXuw6X+B6?=
+ =?us-ascii?Q?y9LvX8d1N4OO+Z9/KT2clfnzIX4SQslQpzdjeKyzNzGecrWHYCazPx90T+K/?=
+ =?us-ascii?Q?5DBdOd7TtI0cbBVwdJjvw2Trwu6eWFQVl4SwqTZ5j2DbJlPfSrt46YYTz9rQ?=
+ =?us-ascii?Q?sqn4NlkZfxYAZCnAgXOWD4ginfNLHYxl4N8rkLsbfuYY2Gh43YAmg3WY5zJ0?=
+ =?us-ascii?Q?kZy5BdAXMiBlUGbvgomF8SN99Imb9OqqUcBIuP4tIa23d24v3zoa4nehy0sL?=
+ =?us-ascii?Q?Cpp7Vdn4hJIwRhupKOUqi197RJk5aCxeuNcCgAnPdT4qVfFL8PXGqC+ruBnb?=
+ =?us-ascii?Q?ge7PvX3u7fY1gpJsGeOPUfdH0jeefRbydtjfLuPjB2xvVR2Zgw6Vr059q78m?=
+ =?us-ascii?Q?f118O7AL/5QQn0kk4gxvY6uZWEc3aDoE/b6n1XX0wd8b4RqjQ+GTak3zqrFz?=
+ =?us-ascii?Q?kZgKRz769zGNZN9Kljoti0Cmyw7bweoYY2kcwiBBrM8VJ6cfnqo2eHa2hTDB?=
+ =?us-ascii?Q?lH5WIeVaMyBgaYk3On1+ZvU9Wtjr6JDKpGpaKqJHP+JwF3bur5HVsgoJOVnr?=
+ =?us-ascii?Q?TMlADmZk73V7odMQmOCjccUoStOxArmi6NfvnrdlOvnLxTDEdrmI13GpOvq8?=
+ =?us-ascii?Q?oP5NPs9yc11nZVkFFrRUYwZACvv7xfAfrzVnJIpoJFtqkHoidvmvURDo/ZHV?=
+ =?us-ascii?Q?okyu790rVoExEjxsGES+9goT/L3TqNGciHfNbYBDeF36SHW9jPG3fq101Uqe?=
+ =?us-ascii?Q?1OhZGVyogk8Plj0WDRmoy6d5OwIuA06rQF5IKCuZj8OSRs5U+HJXVgi57bzN?=
+ =?us-ascii?Q?b7vmA6yCNHHIcb3GrL30fxFbLH9ktnLqkEv/VU3J3qf5x6EYpsZAF4V+VSwJ?=
+ =?us-ascii?Q?wA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB8800.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(10070799003)(1800799024)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?GY+dhMEsv6f9haOebPfabM/pikAhTM3FIYck+ggOILMzp9mGAlKnbNt4nUbc?=
+ =?us-ascii?Q?Npfwl4whsC1IzWpQwJt7271H9ECFzKtS56xXtN650/r1+K2BYIRColJTtVER?=
+ =?us-ascii?Q?q0VSp8wFXw+cHqsPxrsuujrGovWU0pWL/qzaW3HRjQJilyNyc26dfnTTUJ+Z?=
+ =?us-ascii?Q?kHcBPRVSZIx6BN2Z/mkbDHX9Je+SN7yWski8ajL6YFmM/RSKEE9Bw8ZLTAp9?=
+ =?us-ascii?Q?R78flduFJ+7PCyKOnMPY8N1yIAdf7F3YliVNKu9gslupN1lH6vL5nAQGjVE4?=
+ =?us-ascii?Q?m45FC0ImEQ7E7zZpnisisILh9ajTVAhPCGwx1gy4ca/bVAqVQD2z9Yi8/HNS?=
+ =?us-ascii?Q?ZkqOhxxwOktsGQlHNNLA8R7iDVUY2CXJ+yyWWDFxZFweo3XjWm0bZ/BrVqM+?=
+ =?us-ascii?Q?ORtoG69EVjekRaKQn/Yhrw/p4rxgJRLthlyH+RpAZL1HrSH3VYqsGZxMO+yq?=
+ =?us-ascii?Q?941JhqQsBEaIM3wVUCYHIbhPcfeLjn8N4bIfHii8c6VpaPOlbA4w4LC3N+21?=
+ =?us-ascii?Q?8njGeI3t8m++MN3/0YKWJFOn8zsbT00sTCk25EagnS0Ma3DyNN8wKNeLOuXV?=
+ =?us-ascii?Q?yyA0NndOMny6YuxVZPFcfrj1rpsZy2DN3/oE1uFWFunypB//VOgzLVWnpGtM?=
+ =?us-ascii?Q?tmD47joCUHT1O+UQKJRX3iwv9sZFHJKvNyKwesc6SteNAA+/Qx3qLZeRBV2I?=
+ =?us-ascii?Q?Cmp7LGMq5md3mU6r+bG7a7vgu3STlCf2gmhTjUPRuX8LdB8Ajq8qkx4u29HZ?=
+ =?us-ascii?Q?1Dt/YEmWMGDtftVktOuRjBNBugtjy4YsBU0+gFv1btMVIAuzCcI2dR6MlMVF?=
+ =?us-ascii?Q?qNqac7kHr21688PsmcRXMOHBtpGSz7Tc24p//H3Rt7pDjEOarbFh1aQ2CZIH?=
+ =?us-ascii?Q?UhxwH7q0prPMc42Q+grHwZF6lB1Iy7jMFA8bBe6XUObj2ckMUKbXhbCTmSBS?=
+ =?us-ascii?Q?FRJub2Rhmm3oIOks+/IpSCCQ/2ueYH/X9KMqUOdCnJHGXzXZ3m+n0yfqqX49?=
+ =?us-ascii?Q?Ft6GToe8dVZ7PIEw51AIB9T2dyPQqQXQMDLpu4MX6AYd8bPO5QbUSXv4lriD?=
+ =?us-ascii?Q?DQ63T4D4LN/gx1v6V0hfGNECjFpsF9DyV1tu0no8O/z9ZkyxLKfxeE20PeI+?=
+ =?us-ascii?Q?XMm4LiW29a6kj2X5eB8aeilLtpf7jEFQvt3ruBYFv0V7PICSsDN0eUMjcCf3?=
+ =?us-ascii?Q?8TOtcAQxX8jJapuq9MdUn5N2iM+d5scdHviSQMuTJLA3H6VlPszZZIwidfer?=
+ =?us-ascii?Q?u8EQG0v3K7LPDV3ciKvRnJBlBJsfbksMFJa7I2GNdd6wrPrMKwPZLCsxYfR9?=
+ =?us-ascii?Q?8GE9Sn9gHTkeFMWkgf5nJh6G9CkXcZZl3AGJMtvLbQKw+3fnn9AWgAzxYSkG?=
+ =?us-ascii?Q?LSp50JtR3Mz+vJcv8D5b+cQIHSIoIps8bY0OGZpoU1MvXEwBjoyyRyJ/dbEW?=
+ =?us-ascii?Q?UMNvgA6vS7z6ummyFOK0SGutO6aBn4aVkbwksenAut8FtcsYKFPrub/hWZ+u?=
+ =?us-ascii?Q?UknDSi/EAfW3rFj6G25iwUSOZ4YAOEwGuhG6bB8F2aHvFCoLimvv/Ijg45Vc?=
+ =?us-ascii?Q?I/s5LvXNU/i/Sjkz9AUQA6TSdlCtzbCrAyiDrayNCSBrwUjvRL4XJ/CN0Ljy?=
+ =?us-ascii?Q?aZGg6v4dfn79im5BHoqCbR4t9hUz8d0goOG3viHGrkmjceo//oFAm2HjwdTV?=
+ =?us-ascii?Q?eM4rVlRBojw7IoyTbupPKOzW8iyhlKIvlrOsyI6eSmDr1UVLGrddfbm7dDER?=
+ =?us-ascii?Q?ryJEWGGom4wlZb11rpiJfxuN6s9ITB0x5a24nicyKtQ/nHl+Psvq?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 95594654-ab1f-4b64-1d7c-08de6fe2adc2
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB8800.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2026 18:14:10.6782
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: aKc3KNBJ6MrnqtD3WphYpe2e8lr7vxluyOmHHH+4fP1y/doKOxDRm/DKRQ6IMRHAO0GPGz4muo+WsCHrYCFGPg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7674
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	CTYPE_MIXED_BOGUS(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259546-lists,netdev=lfdr.de,bpf-ci];
-	FREEMAIL_CC(0.00)[gmail.com,google.com,vger.kernel.org,syzkaller.appspotmail.com,kernel.org,iogearbox.net,linux.dev,meta.com];
-	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+];
+	FREEMAIL_TO(0.00)[vger.kernel.org,kernel.org,davemloft.net,infradead.org,linux.intel.com,lunn.ch,linux-foundation.org,linaro.org,google.com,marvell.com,arm.com,linux.ibm.com,ellerman.id.au,gmail.com,redhat.com,rasmusvillemoes.dk,fomichev.me,intel.com,linux.dev,lists.linaro.org,lists.infradead.org,lists.ozlabs.org];
+	RCPT_COUNT_TWELVE(0.00)[44];
 	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[google.com,gmail.com,cloudflare.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	NEURAL_HAM(-0.00)[-0.999];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259547-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,5b3b7e51dda1be027b7a];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 994E51617CA
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ynorov@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:mid]
+X-Rspamd-Queue-Id: 62A8516183E
 X-Rspamd-Action: no action
 
---===============1189534981472302392==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Bitmap API has a bitmap_print_to_pagebuf() function that is intended to
+print bitmap into a human readable format, making sure that the output
+string will not get big enough to cross the current page limit.
 
-> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-> --- a/net/core/skmsg.c
-> +++ b/net/core/skmsg.c
+Some drivers use this function immediately before passing the result to
+seq_printf() with no modification. This is useless because seq_pritf()
+takes care of not overflowing the buffer by itself, and perfectly prints
+bitmaps with "%*pb[l]".
 
-[ ... ]
+The first 6 patches of the series convert such bitmap_print_to_pagebuf()
+users to just print the bitmap with seq_printf().
 
-> @@ -576,6 +577,7 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
->  				u32 off, u32 len, gfp_t gfp_flags, bool take_ref)
->  {
->  	struct sock *sk = psock->sk;
-> +	bool is_udp = sk_is_udp(sk);
->  	struct sk_msg *msg;
->  	int err = -EAGAIN;
->
-> @@ -583,12 +585,15 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
->  	if (!msg)
->  		goto out;
->
-> -	if (skb->sk != sk) {
-> +	if (is_udp)
-> +		spin_lock_bh(&sk->sk_receive_queue.lock);
-> +
-> +	if (skb->sk != sk || is_udp) {
->  		if (atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf)
-> -			goto free;
-> +			goto unlock;
->
->  		if (!sk_rmem_schedule(sk, skb, skb->truesize))
-> -			goto free;
-> +			goto unlock;
->  	}
+Patch #7 adds (actually moves from net/p9 driver) a handy macro
+rest_of_page() and applies it globally.
 
-[ ... ]
+The rest of the series switches all other users to scnprintf("%*pb[l]"),
+so that users wont abuse kmalloc() + bitmap_print_to_pagebuf().
 
->  	skb_set_owner_r(skb, sk);
-                        ^^^
+Patches 1-6 may be applied individually, or together with the rest of
+the series, at maintainers' discretion.
 
-If sk_psock_skb_ingress_enqueue() fails after this point (for
-example, skb_to_sgvec() fails and skb_linearize() also fails under
-GFP_ATOMIC memory pressure), the error path frees msg and returns
--EAGAIN, but the skb is kept with skb->destructor set to
-udp_sock_rfree.
+Yury Norov (12):
+  powerpc/xive: simplify xive_spapr_debug_show()
+  octeontx2-af: siplify rvu_debugfs
+  thermal: intel: switch cpumask_get() to using
+    cpumask_print_to_pagebuf()
+  lib/prime_numbers: drop temporary buffer in dump_primes()
+  bitmap: switch test to scnprintf("%*pbl")
+  bitmap: align test_bitmap output
+  mm: add rest_of_page() macro
+  coresight: don't use bitmap_print_to_pagebuf()
+  fpga: m10bmc-sec: switch show_canceled_csk() to using scnprintf()
+  net-sysfs: switch xps_queue_show() to using scnprintf()
+  cpumask: switch cpumap_print_to_pagebuf() to using scnprintf()
+  bitmap: drop bitmap_print_to_pagebuf()
 
-The caller sk_psock_verdict_apply() then queues this skb onto
-psock->ingress_skb for retry via sk_psock_backlog().
+ arch/arm64/kernel/patching.c                  |  4 +-
+ arch/powerpc/lib/code-patching.c              |  6 +--
+ arch/powerpc/sysdev/xive/spapr.c              | 12 +-----
+ arch/riscv/kernel/sbi.c                       |  4 +-
+ arch/s390/kvm/gaccess.c                       |  6 +--
+ arch/x86/kvm/emulate.c                        |  4 +-
+ drivers/block/null_blk/main.c                 |  6 +--
+ drivers/fpga/intel-m10-bmc-sec-update.c       |  3 +-
+ drivers/gpu/drm/i915/gt/shmem_utils.c         |  5 +--
+ .../hwtracing/coresight/coresight-cti-sysfs.c | 33 +++++++--------
+ drivers/md/dm-pcache/backing_dev.h            |  2 +-
+ .../marvell/octeontx2/af/rvu_debugfs.c        | 28 +++----------
+ drivers/net/ethernet/meta/fbnic/fbnic_tlv.c   |  6 +--
+ drivers/s390/net/qeth_core_main.c             |  6 +--
+ drivers/spi/spi-pl022.c                       |  3 +-
+ drivers/spi/spi.c                             |  4 +-
+ drivers/thermal/intel/intel_powerclamp.c      |  3 +-
+ fs/ext4/verity.c                              |  3 +-
+ fs/f2fs/verity.c                              |  6 +--
+ fs/fuse/dev.c                                 |  4 +-
+ fs/iomap/buffered-io.c                        |  2 +-
+ fs/nfs/pagelist.c                             |  2 +-
+ fs/remap_range.c                              |  3 +-
+ fs/xfs/scrub/xfile.c                          |  3 +-
+ include/crypto/scatterwalk.h                  |  2 +-
+ include/linux/bitmap-str.h                    |  1 -
+ include/linux/cpumask.h                       | 17 +-------
+ include/linux/highmem.h                       | 24 +++++------
+ include/linux/iomap.h                         |  2 +-
+ include/linux/iov_iter.h                      |  3 +-
+ include/linux/mm.h                            |  2 +
+ kernel/events/ring_buffer.c                   |  2 +-
+ lib/bitmap-str.c                              | 42 +++----------------
+ lib/cpumask.c                                 | 17 ++++++++
+ lib/iov_iter.c                                |  5 +--
+ lib/math/tests/prime_numbers_kunit.c          |  6 +--
+ lib/test_bitmap.c                             | 17 ++++----
+ net/9p/trans_virtio.c                         |  6 ---
+ net/core/net-sysfs.c                          |  2 +-
+ sound/virtio/virtio_pcm_msg.c                 |  4 +-
+ 40 files changed, 111 insertions(+), 199 deletions(-)
 
-On retry, sk_psock_handle_skb() calls sk_psock_skb_ingress()
-again. The function acquires sk->sk_receive_queue.lock, then calls
-skb_set_owner_r() which calls skb_orphan(). skb_orphan() invokes
-the current skb->destructor, which is now udp_sock_rfree():
+-- 
+2.43.0
 
-  sk_psock_skb_ingress()
-    spin_lock_bh(&sk->sk_receive_queue.lock)   <-- held
-    skb_set_owner_r(skb, sk)
-      skb_orphan(skb)
-        skb->destructor(skb)           [= udp_sock_rfree]
-          spin_lock_bh(&sk->sk_receive_queue.lock)  <-- deadlock
-
-Could this self-deadlock on the receive queue lock?
-
-> +	if (is_udp) {
-> +		skb->destructor = udp_sock_rfree;
-> +		spin_unlock_bh(&sk->sk_receive_queue.lock);
-> +	}
-> +
->  	err = sk_psock_skb_ingress_enqueue(skb, off, len, psock, sk, msg, take_ref);
->  	if (err < 0)
->  		goto free;
->  out:
->  	return err;
-> +
-> +unlock:
-> +	if (is_udp)
-> +		spin_unlock_bh(&sk->sk_receive_queue.lock);
->  free:
->  	kfree(msg);
->  	goto out;
-
-> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> --- a/net/ipv4/udp.c
-> +++ b/net/ipv4/udp.c
-
-[ ... ]
-
-> +void udp_sock_rfree(struct sk_buff *skb)
-> +{
-> +	struct sock *sk = skb->sk;
-> +
-> +	spin_lock_bh(&sk->sk_receive_queue.lock);
-> +	sock_rfree(skb);
-> +	spin_unlock_bh(&sk->sk_receive_queue.lock);
-> +}
-
-
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/22193327667
-
-AI-authorship-score: low
-AI-authorship-explanation: The commit demonstrates deep understanding of UDP memory accounting internals and references a specific syzbot report, consistent with an experienced kernel networking developer.
-issues-found: 1
-issue-severity-score: high
-issue-severity-explanation: Self-deadlock on sk->sk_receive_queue.lock when sk_psock_skb_ingress is retried after enqueue failure for UDP, causing a system hang.
-
---===============1189534981472302392==--
 
