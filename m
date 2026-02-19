@@ -1,91 +1,77 @@
-Return-Path: <netdev+bounces-259609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259610-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SH/3DqWfl2nc3AIAu9opvQ
-	(envelope-from <netdev+bounces-259609-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 00:41:25 +0100
+	id eNf4IGahl2nc3AIAu9opvQ
+	(envelope-from <netdev+bounces-259610-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 00:48:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EA97163940
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 00:41:24 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5711163AE2
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 00:48:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C3885302EEBE
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 23:41:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 749483061AFA
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 23:44:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 344B4314A90;
-	Thu, 19 Feb 2026 23:41:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D005324B1D;
+	Thu, 19 Feb 2026 23:44:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XR648izV"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fhQrXZgH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f50.google.com (mail-dl1-f50.google.com [74.125.82.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 090893033C5
-	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 23:41:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51AB5324700
+	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 23:44:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771544463; cv=none; b=rct9a2JaaR0bOFxrSa16RcUHT7wvABpCRwew17ZraavqGdpNnYr0HpCOyDywW0ZEuwztvvgW44asTAOg6YXd1fHrNp0yT8UBKzqPbZANg928ZrDyYkwd0ivEEOLLEbSrOwyIxrfKtD/RP3ul1Hsms3qH/W9BIPIBvQNkTIj1r5s=
+	t=1771544662; cv=none; b=PPJnQ239pMmQL1l5ujZnfy/Uoz71MzGeNQQVoA5DJWN+eKa3KeY+QuRluYjISqsNR1GOVdau7075AGnZu0McQrWVT7WK9YK0HCPqwlRnE5pHhWquyAt3MEOBX+na8ZwQf8UaQhT6UYIDplcDF/O2GIZU4ZQYvrDgyo1Y8DbcIRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771544463; c=relaxed/simple;
-	bh=PMAPfIQEj675IqbisUBERbNkWF6o3Hukzf5k9lachTI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=tLYg+f3mTu7/4yaKiSlH8+LNEqVt9SaoCFkSQe7rkOJXExZyemw3Nj9fNe3FAHBwWUO4dS8RwDSPr8X7thZMcz8C0R5a8th6BlPrNQQpfDd5/CV8UEdc10JScMcpVEUeFoj2vMqH8q4Fn8GxxbjO2TDSHWD1TI7SjGkAj1J3fB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XR648izV; arc=none smtp.client-ip=74.125.82.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f50.google.com with SMTP id a92af1059eb24-127423bea4bso882108c88.0
-        for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 15:41:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771544461; x=1772149261; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BofRrJoOgRuo4uPqIcmQDyXymqEuxMsCR5jwllsdETk=;
-        b=XR648izV8WEmMbhF0uwsDAJNxEfsxmXZZO9u2hBuJm30jg0odRdD8gBhMQRdVzNzx6
-         n1olf8uf8Ff6MKEHg4uJjqC/a0qwvWC5MQ9hoOVK4MGY+TVfthghMkNTg2AQUq0PRlVu
-         lblt/bkFQUv6DpwFkxN0u8mH9QjV3kU61oF6YZau+bafzHiIdIqR2PiAT2+g+un8+f0L
-         plVYhri05juiB9HG2BZgWRVoJ91OBXbMGayXhPLSGEigX9NLPXWL/U3FLbxMxQiquG17
-         o4kzLPbD9HD0gAtfhQ0NxBJxku7yp7deIH28+JXMbacW4lYn6LOz90iH9j1CvfXk9dvE
-         9klA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771544461; x=1772149261;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BofRrJoOgRuo4uPqIcmQDyXymqEuxMsCR5jwllsdETk=;
-        b=Bf4BqYgdd3oF+qolGcK9+UYPWrr6ouqO4dIRBpgu6rXbUXwDS9JpEaeHbxHTDU42pT
-         rVgfY3U6ORhWwIpW8FFPw1Dq5ejOR+Gskl9AMo3boVyM2wGVEyjMgbw+cpsRtbGvi6H5
-         trJXgF0iaOgpLvmCiGV6hwlyjD1cue/htSoER3G4HM7rxoQiggGK2GxJOZAuHgh/eibl
-         58HgN+pMOoviHM3+90AQ05cufPbmDHq9L/gqAmdLRH8cBWUQyeYI++745JuGHSbL3v5x
-         yQy/yHpehn8HDU7F3DoR33qJ/9/wgSqRIEPkD/4HfksjQyn7+lCMTs2Jvbbg6olHMb6X
-         ksNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWEFpBgtwkEkn/9klkfdfQEz3tQH+HBgxNgyO5tmv1HiIrCJoDt9uV407D7zyxgcUyyUoOEKCk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBEcba3gWnMeokkN3dyL165oMsHyTK0lS7+FUz4o9vzSYHPMmW
-	UQUkZ7USi7McSfNJsb9S4wKlOgFCW5b69RkhAsx4qtsUruuF0OpMM2PA
-X-Gm-Gg: AZuq6aKeclywZP3ofiGdw9iCbYXp5YuwM+2llVDONpBbw1nueT6J5btifhT9WmwM/1m
-	931nCmm30Gx603zdkr6r13hYQf7BmyEokol/A6URjzqGiyM5Q5nNUN3+oTK6kzrc6HKSfhLTx6b
-	05cYyJUq5c+LefNUkRl7nUa6JCbfU6DzKmg5oHqWnSl65wPRi6L8eNtNdDzDSgTkg9AGUAvVmXA
-	LLxHD80TRynB7pxq61sc7lNGp88B4KRo5DaF7KHYPmTqw9vFjcjlCzYAXB/hYluTqrH1GZ3NV8h
-	FR90pVFogxh2Dv+SgzOZg+QpRq6bwOym2Fuwv3gRyqnV2tzZtaRxdr+mLK5OAYuIo9ONNF6tx6Z
-	141fMtkxrXVkED8YX6F1Vh5yvsqH4Pkkog8oPYeYDnKvgtJG/O2KqiUUyML7z0Q5at5esgTUf+D
-	+KKS/DRQxe2BpgGwZdoOjGH2vF8cHSTR9shcpcT8vyS2sCLO0WBLpIESyiZLLo65QD
-X-Received: by 2002:a05:7022:128c:b0:127:874:af0a with SMTP id a92af1059eb24-1273adb37a3mr11907088c88.5.1771544460948;
-        Thu, 19 Feb 2026 15:41:00 -0800 (PST)
-Received: from google.com ([2a00:79e0:2ebe:8:9c24:8181:603e:7ad7])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12742c6dc70sm23105356c88.8.2026.02.19.15.41.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Feb 2026 15:41:00 -0800 (PST)
-Date: Thu, 19 Feb 2026 15:40:57 -0800
-From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>, Simon Horman <horms@kernel.org>, 
-	Zijun Hu <zijun.hu@oss.qualcomm.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net] net: wan: framer: fix potential UAF in
- framer_provider_simple_of_xlate()
-Message-ID: <aZefB5f3EAkQQM1m@google.com>
+	s=arc-20240116; t=1771544662; c=relaxed/simple;
+	bh=yJ+guJ1ZGDFw7M2SDl9coYqoXi18n3pdQNwEMc3vxWc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XXP+kiAnyambrew44rvdTNsoCZkBCsK09daSbRqOt4zPvea8LHIOjE2QS5/Go3JU5c9NimPeTfHpKvBf3E5Ae7iG/6NjBLWBrJOqh7TCq5S2O434wYfA+MHnEWbdQ4HMoR/Wwk+4HJkBqcWt5jvAQeKCW0C4CYKi+jBG8qmnmms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fhQrXZgH; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Thu, 19 Feb 2026 16:43:48 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1771544647;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CRO5rWml1QK70tgKl06x/aVYyKWj/aRzqe+fxQOhkKU=;
+	b=fhQrXZgHJkvalaKby2C9z8kNEAxoIH1m4n89qWYP4oV4FrEttt7O/TFwSqck5NetZ+5GDD
+	r85/jEND3KIXN+QZQViJ5D6/7XLpG0063G/hobulPpZrlBoCjyKRIHgQ8/tmHR3cbJhttp
+	PROJqJgnuOXtp4Pi0UJPkEoNJ3l8aaM=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Russ Weight <russ.weight@linux.dev>
+To: Yury Norov <ynorov@nvidia.com>
+Cc: linux-kernel@vger.kernel.org, 
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	"Peter Zijlstra (Intel)" <peterz@infradead.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Andrew Morton <akpm@linux-foundation.org>, Antoine Tenart <atenart@kernel.org>, 
+	Christian Brauner <brauner@kernel.org>, Daniel Lezcano <daniel.lezcano@linaro.org>, 
+	Eric Dumazet <edumazet@google.com>, Geetha sowjanya <gakula@marvell.com>, 
+	Ingo Molnar <mingo@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	James Clark <james.clark@linaro.org>, Jerin Jacob <jerinj@marvell.com>, 
+	Linu Cherian <lcherian@marvell.com>, Lukasz Luba <lukasz.luba@arm.com>, 
+	Madhavan Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Mike Leach <mike.leach@linaro.org>, Moritz Fischer <mdf@kernel.org>, 
+	Nicholas Piggin <npiggin@gmail.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>, Simon Horman <horms@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Subbaraya Sundeep <sbhatta@marvell.com>, 
+	Sunil Goutham <sgoutham@marvell.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Tom Rix <trix@redhat.com>, Xu Yilun <yilun.xu@intel.com>, Yajun Deng <yajun.deng@linux.dev>, 
+	Yury Norov <yury.norov@gmail.com>, Zhang Rui <rui.zhang@intel.com>, hariprasad <hkelam@marvell.com>, 
+	coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org, linux-fpga@vger.kernel.org, 
+	linux-pm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 09/12] fpga: m10bmc-sec: switch show_canceled_csk() to
+ using scnprintf()
+Message-ID: <nsymcnuakoxcuq55csc5dsyevuftlp4vahz7yljziwnbbe7vhr@6n3kddtcuwh7>
+References: <20260219181407.290201-1-ynorov@nvidia.com>
+ <20260219181407.290201-10-ynorov@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,75 +80,72 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20260219181407.290201-10-ynorov@nvidia.com>
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_FROM(0.00)[bounces-259610-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259609-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,davemloft.net,infradead.org,linux.intel.com,lunn.ch,linux-foundation.org,linaro.org,google.com,marvell.com,arm.com,linux.ibm.com,ellerman.id.au,gmail.com,redhat.com,rasmusvillemoes.dk,fomichev.me,intel.com,linux.dev,lists.linaro.org,lists.infradead.org,lists.ozlabs.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[44];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dmitrytorokhov@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[russ.weight@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com]
-X-Rspamd-Queue-Id: 9EA97163940
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: E5711163AE2
 X-Rspamd-Action: no action
 
-The implementation put_device()s located device and then uses
-container_of() on the pointer. The device may disappear by that time,
-resulting in UAF.
+On Thu, Feb 19, 2026 at 01:14:01PM -0500, Yury Norov wrote:
+> Switch show_canceled_csk() to use a more common scnprintf("%*pbl").
+> 
+> Signed-off-by: Yury Norov <ynorov@nvidia.com>
 
-Fix the problem by keeping the reference to the framer device, and
-avoid getting an extra reference to it in framer_get().
+Reviewed-by: Russ Weight <russ.weight@linux.dev>
 
-Fixes: dcacb364772e ("net: wan: framer: Simplify API framer_provider_simple_of_xlate() implementation")
-Signed-off-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
----
- drivers/net/wan/framer/framer-core.c | 3 ---
- 1 file changed, 3 deletions(-)
-
-diff --git a/drivers/net/wan/framer/framer-core.c b/drivers/net/wan/framer/framer-core.c
-index bf7ac7dd2804..397fabc3da4e 100644
---- a/drivers/net/wan/framer/framer-core.c
-+++ b/drivers/net/wan/framer/framer-core.c
-@@ -482,8 +482,6 @@ struct framer *framer_get(struct device *dev, const char *con_id)
- 	if (IS_ERR(framer))
- 		return framer;
- 
--	get_device(&framer->dev);
--
- 	if (!try_module_get(framer->ops->owner)) {
- 		ret = -EPROBE_DEFER;
- 		goto err_put_device;
-@@ -749,7 +747,6 @@ struct framer *framer_provider_simple_of_xlate(struct device *dev,
- 	if (!target_dev)
- 		return ERR_PTR(-ENODEV);
- 
--	put_device(target_dev);
- 	return dev_to_framer(target_dev);
- }
- EXPORT_SYMBOL_GPL(framer_provider_simple_of_xlate);
--- 
-2.53.0.345.g96ddfc5eaa-goog
-
-
--- 
-Dmitry
+> ---
+>  drivers/fpga/intel-m10-bmc-sec-update.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/fpga/intel-m10-bmc-sec-update.c b/drivers/fpga/intel-m10-bmc-sec-update.c
+> index 10f678b9ed36..5ae76b8ece18 100644
+> --- a/drivers/fpga/intel-m10-bmc-sec-update.c
+> +++ b/drivers/fpga/intel-m10-bmc-sec-update.c
+> @@ -10,6 +10,7 @@
+>  #include <linux/firmware.h>
+>  #include <linux/mfd/intel-m10-bmc.h>
+>  #include <linux/mod_devicetable.h>
+> +#include <linux/mm.h>
+>  #include <linux/module.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/slab.h>
+> @@ -183,7 +184,7 @@ show_canceled_csk(struct device *dev, u32 addr, char *buf)
+>  
+>  	bitmap_from_arr32(csk_map, csk32, CSK_BIT_LEN);
+>  	bitmap_complement(csk_map, csk_map, CSK_BIT_LEN);
+> -	return bitmap_print_to_pagebuf(1, buf, csk_map, CSK_BIT_LEN);
+> +	return scnprintf(buf, rest_of_page(buf), "%*pbl\n", CSK_BIT_LEN, csk_map);
+>  }
+>  
+>  #define DEVICE_ATTR_SEC_CSK_RO(_name)						\
+> -- 
+> 2.43.0
+> 
 
