@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-259530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259531-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cLunLBRJl2m2wQIAu9opvQ
-	(envelope-from <netdev+bounces-259530-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 18:32:04 +0100
+	id aPheDntKl2m2wQIAu9opvQ
+	(envelope-from <netdev+bounces-259531-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 18:38:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF20C161393
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 18:32:03 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97DE41614A9
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 18:38:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DCD8E300A589
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 17:31:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 51E0730166FF
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 17:38:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E728D34B1B6;
-	Thu, 19 Feb 2026 17:31:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7DF134FF5D;
+	Thu, 19 Feb 2026 17:38:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X8sype1B"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e4pRTxQd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9692133D6C0
-	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 17:31:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B562634F481
+	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 17:37:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771522312; cv=none; b=cyX1kXfNovZcZKpe/eImiXKZ9sehuOYrNMgU4bUVcNeX5OHoLokLvlLas41xhhtyja29JiW4X6rIrwe9WhSuHRuz2HLBx9+E7nG9oeagv3A/essTun/WHLX9xvTEA2IdoIpMhMwBoHnEZd4e2xUeKgMLWxPCZY+rF2X5qsdeVlU=
+	t=1771522680; cv=none; b=DymAU0tUTlYVbNvhgXc3dgzhMAjS2Jw3SJ9IiDiJhJzNoeMzC2Jh2mZQqqcpwyId5lXbOd6Ithb27AEFXJJJDpxKewIr+aZ3OfgHKVG+MFWKFnq2Guaa4HcWk2KPW1fRk+cp0f+kJ6ZPsrAOCvPrA3qg7TdWmjq0GyeKhKbPpi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771522312; c=relaxed/simple;
-	bh=cH3A+hNy82Z3Nr6KCoi3z9+vio0RgXsvawO4HmHjvNA=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Wf6LtYiJscUzqEP/0+TaRDbxum7C17xwkVXwyh+hW+m2g/ErRmUwznqhiJ2UZuB6LkcKAYkv5S/whYPzsZ3OFD9F8YREdUpLpKlJKOr2/yqGLGnPIte8ufynZQ6cyMqj4wNaa4BQ2G4QDYRYf9V7Gk6veHdJDwm3mETtCYzYU44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X8sype1B; arc=none smtp.client-ip=209.85.214.201
+	s=arc-20240116; t=1771522680; c=relaxed/simple;
+	bh=KV2rSveKLlsEUiPOhobYTSa074sCG5JYWi41NMS/Z8s=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=BrUqnn1luYBi8OxflU/5S7zHTyNDHMdY4GfzSfjhTgCKsYHTnQnDnFv7LwJ8xOHs7rdCANhOy2WxwYaw8YNq/cVOk86UGmG/BsgMozCGyaHcTyMblo+pULSsOepIPhzc3mnSnUeWpEE8afxnUDjHpUeG6ciGaB5LmP6LvaUZ2tM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e4pRTxQd; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a75ed2f89dso12058565ad.1
-        for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 09:31:51 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-354be486779so4657944a91.0
+        for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 09:37:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771522311; x=1772127111; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1771522679; x=1772127479; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=q+qxRZORX5q6GWWaQwZmJwHUXEeLDsk4PQC2ak6epgo=;
-        b=X8sype1B5rI9iYSZxOWHc4l2cJHg0cPoqIgS/P/5WEl9zKGXkxlap0++kabPRCK39j
-         VvUGe0SD1d7Gd9LmOmr2Es/+TQ9XdPmoYQN4sLfsJShXoEjFjbMTAPhjXEvfqDJRwGLs
-         fv1mWVv+6Mx2WyaRpLINBhBJFZiu3d6PXzmwYLK0CUlH+tKPXYwFbqEKeKY8v8CaUv3Q
-         xp7OJZ2oTtdbsYvwAOXLfzV1RQUTsIJ2AcIju87AYMyOQBxRvTAuc9rAtpxw9Sxe2BVh
-         1CN29byJK12tXd4MvemwNCcnwik5MFQwS4SbG2QsFC3B7X1YUzN6COTBR230pDUh1tZr
-         z7qg==
+        bh=U+Iw0b6KfBvQUyazI4ICr9dPs40QzN0uJ3fvkFSRfOo=;
+        b=e4pRTxQdjZwMcglSFWcD7oB2G+8XGVU7mcSFO6/pyMNSaBTES3pQRNrKgNa1rtbRBi
+         lNX9T8KC2DVojLZE03Y1aZZuf/Nj/tLlKMw+bzycGF0cJEiEFFfcm8HSaCYNdyeNoxN5
+         ev9z2PIk7uue8xHLnQV1DCv9rt5Qc+6HS8Khdwa7xoxGvYULmYgUNEy42g6nr5OSNvWH
+         396SYPfpSz65bVLA6azAFwRX6tp1LCtTZCbD7ID8/DoIeB8EzgZtNwmB4ulDZaHv5iuX
+         oM/pHKhpOYR7EHDrMhItbu35NgUbu4Dg962JSjTQpqE9GmFFIiUGOz17Nc7yV1eRHxnJ
+         mXdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771522311; x=1772127111;
+        d=1e100.net; s=20230601; t=1771522679; x=1772127479;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=q+qxRZORX5q6GWWaQwZmJwHUXEeLDsk4PQC2ak6epgo=;
-        b=rI0buoq9lSWtgKQhRBIDa2LPnvWIu42lyX8k7CZMS/zzKa+bvqGPIc4c/ikZw5j30S
-         svgY1R8B2oFjkZbXTxtX1+LbzqxpTOFI3VXYS/mtMEBmkPxJoLdCTPztuSKr02djnnle
-         cn3hnlRkT8DAawNB+9DENiBsuymeR+wlg3TuNHAFH3TSoshsrW6rDjWKR/evib3fwKxy
-         D2nt+J6iorojPu02aDUtDzEBpzgtLDjK58UcmN9M0tvsfet3EiPMIQ5ES/9tabCHwieW
-         dBWBe2lfU6Qj2qwY4mQBbHnaeNKmJj+CwYLzafymJ1kwlYr+Fw5VgtuHv9aUMOXTZHkX
-         +MHg==
-X-Forwarded-Encrypted: i=1; AJvYcCU2HV54pPOlqCnNRQKNMl8IP/LZ2QLTaI77XGnrYEMIfKdPluOck3aN5IFmFozEhlI4VCQ06Lg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywp0jCwPR7AR/Xkzid8JqfzXYG1Nx7Egb/kx25nJT7nsA9m2N5l
-	426kS83G5sHeTKI7nfEADTaspaA4YfEb7B5ilBon0/UEucLzFwp9M/6RNjKzprIe9rMHKmssWr3
-	GqbbNJw==
-X-Received: from plty7.prod.google.com ([2002:a17:902:8647:b0:2aa:d3db:a8d7])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:41cc:b0:2aa:e7fe:63b8
- with SMTP id d9443c01a7336-2ad174dd3b7mr183006395ad.33.1771522310614; Thu, 19
- Feb 2026 09:31:50 -0800 (PST)
-Date: Thu, 19 Feb 2026 17:31:31 +0000
+        bh=U+Iw0b6KfBvQUyazI4ICr9dPs40QzN0uJ3fvkFSRfOo=;
+        b=q0HTYNP8WfU5fnCDII1AwHvd7I4KInyCzZ0DRN/1lLYtEREh8caVNyvyQAEokA1d1w
+         huzPSHs6ZHb/+Iv3qHQXxGsiDAX/lT4W3eK0ZzZkQjLQTc7V2E4GZIH7+LTxfoOa2EAg
+         v5By3Xmk6pXqXsX6r9rujPvWO7eeaEhHqgbkoges3+gUGAXHJIrkYlvz+guqbxQlje7Y
+         T5Cv07Ils28G8SXlkP2z5OdcmgGb7zbrsodHSPSUPPTAYlCCzBNiZ2E8ktzAo39WykDd
+         6yBrLiEtOrmpvR/vgRuY4fyMXP1gOdON8yLoyAj7t9fHwu801O69G5/LbtCYC3Pi5lOk
+         Pnrw==
+X-Forwarded-Encrypted: i=1; AJvYcCU6pVnOHkWUDLT/Ox9LshbbalqiIC7Fbn5E0rGSsabWaRLRrHAV03nDExwGceVVJuJ1F1C6PAc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHBeJ0OH/AlmybpYD8jnwAQ6gcOXgs0A2h6TYYiRi4ToMiLVG7
+	pdzm8DmiBi0W8ZVFTd7uQkjbMsPkRi2qwjojYIUtHYnoqDl46oTYePPsgTsic8m4vHGI9Vu+nMU
+	LXotxPg==
+X-Received: from pjbnh24.prod.google.com ([2002:a17:90b:3658:b0:356:a274:747f])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d808:b0:34c:99d6:175d
+ with SMTP id 98e67ed59e1d1-358890a05b0mr3454675a91.2.1771522679020; Thu, 19
+ Feb 2026 09:37:59 -0800 (PST)
+Date: Thu, 19 Feb 2026 17:37:23 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,161 +73,87 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.53.0.345.g96ddfc5eaa-goog
-Message-ID: <20260219173142.310741-1-kuniyu@google.com>
-Subject: [PATCH v1 net] udplite: Fix null-ptr-deref in __udp_enqueue_schedule_skb().
+Message-ID: <20260219173756.315077-1-kuniyu@google.com>
+Subject: [PATCH v3 bpf/net 0/6] sockmap: Fix UAF and broken memory accounting
+ for UDP.
 From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	syzbot <syzkaller@googlegroups.com>
+To: John Fastabend <john.fastabend@gmail.com>, Jakub Sitnicki <jakub@cloudflare.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259530-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org,googlegroups.com];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259531-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,cloudflare.com];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FREEMAIL_CC(0.00)[gmail.com,google.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,googlegroups.com:email]
-X-Rspamd-Queue-Id: EF20C161393
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 97DE41614A9
 X-Rspamd-Action: no action
 
-syzbot reported null-ptr-deref of udp_sk(sk)->udp_prod_queue. [0]
+syzbot reported 3 issues in SOCKMAP for UDP.
 
-Since the cited commit, udp_lib_init_sock() can fail, as can
-udp_init_sock() and udpv6_init_sock().
+Patch 1 - 2 fix lockless accesses to sk->sk_data_ready()
+and sk->sk_write_space().
 
-Let's handle the error in udplite_sk_init() and udplitev6_sk_init().
+Patch 3 fixes UAF in sk_msg_recvmsg().
 
-[0]:
-BUG: KASAN: null-ptr-deref in instrument_atomic_read include/linux/instrumented.h:82 [inline]
-BUG: KASAN: null-ptr-deref in atomic_read include/linux/atomic/atomic-instrumented.h:32 [inline]
-BUG: KASAN: null-ptr-deref in __udp_enqueue_schedule_skb+0x151/0x1480 net/ipv4/udp.c:1719
-Read of size 4 at addr 0000000000000008 by task syz.2.18/2944
+Patch 4 - 5 consolidate sk_psock_skb_ingress_self() into
+sk_psock_skb_ingress() as prep.
 
-CPU: 1 UID: 0 PID: 2944 Comm: syz.2.18 Not tainted syzkaller #0 PREEMPTLAZY
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-Call Trace:
- <IRQ>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- kasan_report+0xa2/0xe0 mm/kasan/report.c:595
- check_region_inline mm/kasan/generic.c:-1 [inline]
- kasan_check_range+0x264/0x2c0 mm/kasan/generic.c:200
- instrument_atomic_read include/linux/instrumented.h:82 [inline]
- atomic_read include/linux/atomic/atomic-instrumented.h:32 [inline]
- __udp_enqueue_schedule_skb+0x151/0x1480 net/ipv4/udp.c:1719
- __udpv6_queue_rcv_skb net/ipv6/udp.c:795 [inline]
- udpv6_queue_rcv_one_skb+0xa2e/0x1ad0 net/ipv6/udp.c:906
- udp6_unicast_rcv_skb+0x227/0x380 net/ipv6/udp.c:1064
- ip6_protocol_deliver_rcu+0xe17/0x1540 net/ipv6/ip6_input.c:438
- ip6_input_finish+0x191/0x350 net/ipv6/ip6_input.c:489
- NF_HOOK+0x354/0x3f0 include/linux/netfilter.h:318
- ip6_input+0x16c/0x2b0 net/ipv6/ip6_input.c:500
- NF_HOOK+0x354/0x3f0 include/linux/netfilter.h:318
- __netif_receive_skb_one_core net/core/dev.c:6149 [inline]
- __netif_receive_skb+0xd3/0x370 net/core/dev.c:6262
- process_backlog+0x4d6/0x1160 net/core/dev.c:6614
- __napi_poll+0xae/0x320 net/core/dev.c:7678
- napi_poll net/core/dev.c:7741 [inline]
- net_rx_action+0x60d/0xdc0 net/core/dev.c:7893
- handle_softirqs+0x209/0x8d0 kernel/softirq.c:622
- do_softirq+0x52/0x90 kernel/softirq.c:523
- </IRQ>
- <TASK>
- __local_bh_enable_ip+0xe7/0x120 kernel/softirq.c:450
- local_bh_enable include/linux/bottom_half.h:33 [inline]
- rcu_read_unlock_bh include/linux/rcupdate.h:924 [inline]
- __dev_queue_xmit+0x109c/0x2dc0 net/core/dev.c:4856
- __ip6_finish_output net/ipv6/ip6_output.c:-1 [inline]
- ip6_finish_output+0x158/0x4e0 net/ipv6/ip6_output.c:219
- NF_HOOK_COND include/linux/netfilter.h:307 [inline]
- ip6_output+0x342/0x580 net/ipv6/ip6_output.c:246
- ip6_send_skb+0x1d7/0x3c0 net/ipv6/ip6_output.c:1984
- udp_v6_send_skb+0x9a5/0x1770 net/ipv6/udp.c:1442
- udp_v6_push_pending_frames+0xa2/0x140 net/ipv6/udp.c:1469
- udpv6_sendmsg+0xfe0/0x2830 net/ipv6/udp.c:1759
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg+0xe5/0x270 net/socket.c:742
- __sys_sendto+0x3eb/0x580 net/socket.c:2206
- __do_sys_sendto net/socket.c:2213 [inline]
- __se_sys_sendto net/socket.c:2209 [inline]
- __x64_sys_sendto+0xde/0x100 net/socket.c:2209
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xd2/0xf20 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
-RIP: 0033:0x7f67b4d9c629
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f67b5c98028 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
-RAX: ffffffffffffffda RBX: 00007f67b5015fa0 RCX: 00007f67b4d9c629
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000003
-RBP: 00007f67b4e32b39 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000040000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f67b5016038 R14: 00007f67b5015fa0 R15: 00007ffe3cb66dd8
- </TASK>
+Patch 6 fixes broken memory accounting.
 
-Fixes: b650bf0977d3 ("udp: remove busylock and add per NUMA queues")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
-I'll remove UDP-Lite entirely once net-next opens next week.
----
- net/ipv4/udplite.c | 3 +--
- net/ipv6/udplite.c | 3 +--
- 2 files changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/net/ipv4/udplite.c b/net/ipv4/udplite.c
-index d3e621a11a1a..826e9e79eb19 100644
---- a/net/ipv4/udplite.c
-+++ b/net/ipv4/udplite.c
-@@ -20,10 +20,9 @@ EXPORT_SYMBOL(udplite_table);
- /* Designate sk as UDP-Lite socket */
- static int udplite_sk_init(struct sock *sk)
- {
--	udp_init_sock(sk);
- 	pr_warn_once("UDP-Lite is deprecated and scheduled to be removed in 2025, "
- 		     "please contact the netdev mailing list\n");
--	return 0;
-+	return udp_init_sock(sk);
- }
- 
- static int udplite_rcv(struct sk_buff *skb)
-diff --git a/net/ipv6/udplite.c b/net/ipv6/udplite.c
-index 2cec542437f7..e867721cda4d 100644
---- a/net/ipv6/udplite.c
-+++ b/net/ipv6/udplite.c
-@@ -16,10 +16,9 @@
- 
- static int udplitev6_sk_init(struct sock *sk)
- {
--	udpv6_init_sock(sk);
- 	pr_warn_once("UDP-Lite is deprecated and scheduled to be removed in 2025, "
- 		     "please contact the netdev mailing list\n");
--	return 0;
-+	return udpv6_init_sock(sk);
- }
- 
- static int udplitev6_rcv(struct sk_buff *skb)
+Changes:
+  v3:
+    Patch 2: Use WRITE_ONCE() in udp_bpf_update_proto()
+
+  v2: https://lore.kernel.org/netdev/20260217000701.791189-1-kuniyu@google.com/
+    Patch 2: Cache sk->sk_write_space in sock_wfree()
+    Patch 5: Keep msg->sk assignment
+    Patch 6: Fix build failure when CONFIG_INET=n
+
+  v1: https://lore.kernel.org/netdev/20260215204353.3645744-1-kuniyu@google.com/
+
+
+Kuniyuki Iwashima (6):
+  sockmap: Annotate sk->sk_data_ready() for UDP.
+  sockmap: Annotate sk->sk_write_space() for UDP.
+  sockmap: Fix use-after-free in udp_bpf_recvmsg().
+  sockmap: Pass gfp_t flag to sk_psock_skb_ingress().
+  sockmap: Consolidate sk_psock_skb_ingress_self().
+  sockmap: Fix broken memory accounting for UDP.
+
+ include/net/udp.h  |  9 +++++
+ net/core/skmsg.c   | 97 ++++++++++++++++++++--------------------------
+ net/core/sock.c    |  8 +++-
+ net/ipv4/udp.c     | 11 +++++-
+ net/ipv4/udp_bpf.c | 11 +++++-
+ 5 files changed, 77 insertions(+), 59 deletions(-)
+
 -- 
 2.53.0.345.g96ddfc5eaa-goog
 
