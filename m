@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-259502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259503-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sJagNjwql2nivQIAu9opvQ
-	(envelope-from <netdev+bounces-259502-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 16:20:28 +0100
+	id SAxBM3Irl2nmvQIAu9opvQ
+	(envelope-from <netdev+bounces-259503-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 16:25:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E802F1600B1
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 16:20:27 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 041AF16019F
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 16:25:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7CE6F3004D35
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 15:20:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2131B300BC43
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 15:25:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBB32340A46;
-	Thu, 19 Feb 2026 15:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAF4E3451A6;
+	Thu, 19 Feb 2026 15:25:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u2y/ZZvG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eoF3SEnn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C50CA3033FD;
-	Thu, 19 Feb 2026 15:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7BDC3446C4;
+	Thu, 19 Feb 2026 15:25:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771514423; cv=none; b=qHoWKx3LLhSf59q2rHDRbVVLsWPfHFwIunO8erCjfZRIBTligpw7iEij90iz1iThJqQmtGZlQvazUpCART+R8mDmdU5tSPN1ITXLSOWJN5huBBoYG9ChElJED3h1eRj+0b2hIwqmcO/WgYtrPmWCmF8s7/uAEKPXCItCI56BYl0=
+	t=1771514717; cv=none; b=muwwxQ24Z3JbzCnqcJd8PZkYsh/PUumNlVnvPnxkL1WxGhdwe1Fbwrue9HuLnEvsva013lE+zyt3PMY3Ko0VZUgs2pMJHVzci0BgkLlkbMlme0ybapYUZOLDJPO7/3iwZWIQqXwMnB/igMbBxG7eUTbtubGDU+mdtDcu/3lm0gM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771514423; c=relaxed/simple;
+	s=arc-20240116; t=1771514717; c=relaxed/simple;
 	bh=c3Y9GTRH+k4/VYLEFnoafUvNK9Y+FEq4L75YnvIin04=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=qHjzZZS1L70csZsHzM4vFED+SZDe0OfvE8bX6QEZSJsRrZtYbymQs4FrVJyJHpYMS2ClBqJE/9eIo4lS2bq0ToXori0VlRZ09j7uR3dHGS1cQcDXsyMzKw245xGYPMfjjgt2YJxRZl6MIvObW/+RhxpW3k4c/vhvnDr6ovgG31o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u2y/ZZvG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5127C4CEF7;
-	Thu, 19 Feb 2026 15:20:22 +0000 (UTC)
+	 MIME-Version:Content-Type; b=N4w+J0dFN8DxK/p9Qapn+7nmSZXIVy8kSXbeoo/pirLKQdMZIPiOCIPscU/ucG78h/IfsqrUddRH/hELZkobL2fgXFLSQoQoJhD/TBw/wOK16r8HUGagewNH9MdahyZA8KlC6PzPybte9sRrEsUCvHkadJ58QKTZ5eJqoSXeh3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eoF3SEnn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2AD7C4CEF7;
+	Thu, 19 Feb 2026 15:25:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771514423;
+	s=k20201202; t=1771514717;
 	bh=c3Y9GTRH+k4/VYLEFnoafUvNK9Y+FEq4L75YnvIin04=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=u2y/ZZvGGyCA0ZMal4I6Yh2MPUePHSoIbhn7GRgZqpPuSEQN1+eJSk3v+91Nr6EtH
-	 piuBM6wQrpNhrHD7XWGBDmo3HHe2Jc+7pBA5ngEwD7MnECFOUVigIi4jIFC+hg0ns5
-	 i6p3lFvWVVmlfGe8cW9dmCv13GsW/3wQeS6uqWZ0bb67qYvkPcc25XTcc3WUc/DZ7k
-	 drP0I8MfcWjLUb0mPszi6xVpWDE6mNnJ7u3dS4gQqLoDFX8VkyDhEpcEKzfaYJks5R
-	 tZ+itm1KlS+3NU5tgYTMfOYB2x+bXQ0kK3DWfFUcJGDPksXqPjwvS9CgX5ZdA4XG9H
-	 GKpyLqDoSlZkA==
+	b=eoF3SEnnmnE4LvTHgf2XBEk4NJpMWL0G1zuRq+C1T7/esz8mTa1Mi5K4N3rnZGa1A
+	 zgcl4uxRUC4Ff7mUl+IvHrge303amM+Qk/hXTkrOS3WyUIY82LBhDcxoSaciQPnv0f
+	 xQwKxOZEq3cJ6T4AlqTV6CbDNY/5Ez1b+ifHUxUkClxKWAHSkMWLwzBDf2137j/Iea
+	 3xhJptlZi0dfC3N0he7Spv5njSBdvrBJUvXqNJAarA0nrWDio3FmONmbxx4LjSaQuG
+	 tNAfBNLEFtWwgdRpF3Qnhgho5eMYkHAhC18xhP8YCFQHQHeZnMPx4vlOgA4qeskqU6
+	 casIjI3PL1rEQ==
 From: Puranjay Mohan <puranjay@kernel.org>
 To: Leon Hwang <leon.hwang@linux.dev>, bpf@vger.kernel.org
 Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
@@ -67,8 +67,8 @@ Subject: Re: [PATCH bpf-next v2 3/6] bpf, arm64: Add 64-bit bitops kfuncs
 In-Reply-To: <20260219142933.13904-4-leon.hwang@linux.dev>
 References: <20260219142933.13904-1-leon.hwang@linux.dev>
  <20260219142933.13904-4-leon.hwang@linux.dev>
-Date: Thu, 19 Feb 2026 15:20:09 +0000
-Message-ID: <m24incoj4m.fsf@kernel.org>
+Date: Thu, 19 Feb 2026 15:25:10 +0000
+Message-ID: <m2342woiw9.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,7 +82,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -90,7 +90,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,huaweicloud.com,arm.com,redhat.com,alien8.de,linux.intel.com,zytor.com,fau.de,lists.infradead.org,vger.kernel.org,fb.com];
 	RCPT_COUNT_TWELVE(0.00)[33];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-259502-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-259503-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -104,10 +104,10 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E802F1600B1
+X-Rspamd-Queue-Id: 041AF16019F
 X-Rspamd-Action: no action
 
 Leon Hwang <leon.hwang@linux.dev> writes:
