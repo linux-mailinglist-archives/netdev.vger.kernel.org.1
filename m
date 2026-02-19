@@ -1,170 +1,163 @@
-Return-Path: <netdev+bounces-259466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259467-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SPbwORcTl2n7uAIAu9opvQ
-	(envelope-from <netdev+bounces-259466-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 14:41:43 +0100
+	id RD1zDyMVl2kUugIAu9opvQ
+	(envelope-from <netdev+bounces-259467-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 14:50:27 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 506EB15F2DE
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 14:41:43 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAAC415F398
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 14:50:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D65683052B91
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 13:39:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9EAB63019CB1
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 13:50:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B77833D6D9;
-	Thu, 19 Feb 2026 13:39:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B2F624DCE5;
+	Thu, 19 Feb 2026 13:50:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PHaHdW2u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tp8evlUM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3965A33A9FE
-	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 13:39:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73730207A38;
+	Thu, 19 Feb 2026 13:50:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771508391; cv=none; b=vCVg6Q5kFEoOudQWU69MbwyQpTe3UCfMfEx2f04YdzLfYspCNVB8o8W1qNuhCX5/oV9WQpaQ0OTi4DUlAF+GWiAIp424nB0TwEfox5q4Y2fjWTkvockq88eSGvg09Xyn9pXlfZH2EZaHfqFbaFzj9hti0QPv8kPtPLR5TGdw5ZM=
+	t=1771509021; cv=none; b=ovdHhR6L+eMm/yGJ6DKkhOdNmK87BNEn9TpPPFSZVSd7B6G6dWzV4kc90h3YCpjAuvlC3W9NBRNt1eDzoDkQCabFgrrWRR32GkWUwkTrdCxdM05W7OZqyvv7WiH3zXKIx50CEEox6OQx6Pu1Q8L0/m2NzxbPFonkNVyBcYk9RzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771508391; c=relaxed/simple;
-	bh=N9OBe8gFy/5lAWdIQtGeULCTj8GBSBFYRaakur4X1Og=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M1qVsJE1yypCWqtvMescBYPuU1+lJSl/zDUeTxJmV/V/kbnZc59U55xB/9b19zlh5xu74TW5uuKWBnSuC3PGph11wPNTaVlqCC7RST88Ue9eRMpOYC1b+IHJUO8M2xwNPqB4fb1Lzd7nFAU1aXQBTUH9Ru8nZ4/CJi9/Lnxsp5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PHaHdW2u; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-c626bd75628so318412a12.3
-        for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 05:39:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771508389; x=1772113189; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HG2fzVv7T3rTOzyp2iO5eb5j3k2FtcwtFNElfJxNd7I=;
-        b=PHaHdW2urufR1SGoyLGVXpdRJpOBQEIRo/1aoLLGqhJkRky12HF8N4bpv5rqKHzNMY
-         MvRoRZ7pc4a8ogQRuLah1WvhKBDeJds93zvLOOn6OVOrJSaI1lFvEriLBZUS2wBj5cxk
-         XydcGIm8EJodQ7yEhxImibGQnTUIuL6J5P5JKH3gkbwd7HIfPqnRB8yx8Ifa3uVPgLhs
-         gK0L2CeIjKlYfy4tTFmN7WzAk9DyGg9puiU68Dhx8nRHpY2uN5agWL6TA43qGvCecah3
-         mGoA4y2LalD+p1HVNFLlgFLbpkharacYrUlADRPxilRpc4BpQt9/tmhXJNhVjTvwQKmv
-         LRHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771508389; x=1772113189;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HG2fzVv7T3rTOzyp2iO5eb5j3k2FtcwtFNElfJxNd7I=;
-        b=poVvsovpDBGkMLwZXxkML+4OTWPHlEKVxTWa7c/HlQLK0HBqNTuqqr6bO2mx3D1oRK
-         bRM9o25VOD16FshAKs0Hjnnuw6M2SgcOacvEsorx31MGguZ9pJSk5hpGlzWmN4s8CJTa
-         mXBNMXS3XOdK/cAv78v/EDZLCr2Nd6Cu1/MH0vfK1O5mzwz3RfyVzjuyg1u4Mnr+LQv4
-         r3a0wDxDm6XI9c4ns8rW7tmQt0e1jGHW0AhrIrgi8JbuHs6VwUN7cs/Oj56cewHffEKF
-         aYmkUQk+b+q/y5X4YObdQpObi0dIEu67oKt0yM9uq8lSyCqaVzv6k+LyboifpSQi4YCo
-         JHMA==
-X-Gm-Message-State: AOJu0YzT4ofvxLr2eBNoSjkngQdHW7n8qOWWb5kQysmZSrjH9aXZH+Ci
-	FVGUK5nBiOPZTEPXEDvV/ToJpCDoMuECBpq6JKHdjKtMVU0p5wq0QdOM
-X-Gm-Gg: AZuq6aIxCwFqXMjTrTEoDpYvcqYzmthydx5Ffva2XjXtDQ/6ClcWjQej49U+KJo+M5y
-	hK36wn/du71L5QmBmHsjafrzqpEnF2g9NXeqj1O7TI6BE6UJH8LpbFHQ4E35+zEL+hTmrVO0CVA
-	/aUe1zPqagxu5jY/nfGTxuDlxsQIlJU9YakH6Mlr2e1CJoBbPB4daV2pGB0k8O8OCGXeHF6/g0c
-	jr3D0RilGx1E2q8ssGBGV80x8KM64+58uDLxyAy/85LsTlIN1byyyOUQQlbPEDoesDilr3utjrd
-	buKbg4UQaq7Q8Ps8HxN/LzxGpAjET+xL4rDsHYErusmJFO1RAU0kkABE7iJ0ARJkJwNGZqIV1IV
-	cjDDa+CBdcvVZvo/xPGhzLtiUGtqAepISBFgkmjhHNj9lNwu5stMIIGYs01iuqrU3ayo+Opl+Gs
-	fjfyda6yNXpGxPfqkFoSVLsyoFLeIOh4ZTBZ2Oxg==
-X-Received: by 2002:a17:90a:d410:b0:33b:bf8d:6172 with SMTP id 98e67ed59e1d1-358891e543dmr3895608a91.34.1771508389464;
-        Thu, 19 Feb 2026 05:39:49 -0800 (PST)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3589d8fdf1csm151982a91.17.2026.02.19.05.39.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Feb 2026 05:39:48 -0800 (PST)
-Date: Thu, 19 Feb 2026 13:39:42 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jiri Bohac <jbohac@suse.cz>, Liang Li <liali@redhat.com>,
-	Nikolay Aleksandrov <nikolay@nvidia.com>
-Subject: Re: [PATCHv2 net] bonding: alb: fix UAF in rlb_arp_recv during bond
- up/down
-Message-ID: <aZcSnpcDrIWogpb8@fedora>
-References: <20260214091541.89659-1-liuhangbin@gmail.com>
- <20260217164355.7139ab53@kernel.org>
- <aZVByEOAYdR3WF4q@fedora>
- <20260218161110.14f1551a@kernel.org>
- <aZcRS0cUsAOgktMf@fedora>
+	s=arc-20240116; t=1771509021; c=relaxed/simple;
+	bh=bDG5HJATJlSE2M/uMl1Kc0L6vOb6S35ga6tbRrUuGeI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=bi5G4kLja3r+ailKkcrJ+l18+4Q8/8BNC/oY+u36L7nj72KXpLAsvs5j/pJd+ckx9zkP3iDY7ouzGRHSA63rF/r/wFuruyXW2KCrLcjWfFCeonBYLl9sQc5/8G2qGFgzg4PrMsABQypcHwC6507I9mrXmq5hB7OgnLuVP3jAD60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tp8evlUM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CE0CC4CEF7;
+	Thu, 19 Feb 2026 13:50:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771509021;
+	bh=bDG5HJATJlSE2M/uMl1Kc0L6vOb6S35ga6tbRrUuGeI=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Tp8evlUMWQQSQh/RUchyMWCQbPQKsaMPkGnTyuSvUhOWO9H/fGjB+rYD1u8fUKaAz
+	 JnnPLm3sDMV4jf6xKDx3RAW1fror/OhfxmNWNs/9Bpnoe0E+a0GiemfUWEA+olxnxE
+	 mWsG1zB4LBj/XzRT2hf94I7yrO5iDCC/Se9J3kRUH7ohdEmT2AN79So2szW1Iv6zMY
+	 7EwqbNPzWmtiWvH8xs6EOrwkSd7uSSVMVhw2U9j8GwcU9FTK9U/iOxcAtBNXe08aFI
+	 D5VJ80oEq9jnrcDV38ShljJPcuYn5Y5xFMmOthVzi9diCbTTtK7XzHpRtLFSNhHrmI
+	 nuTrT019OyFxw==
+From: Konrad Dybcio <konradybcio@kernel.org>
+Subject: [net-next PATCH v4 0/3] Grab IPA IMEM slice through DT
+Date: Thu, 19 Feb 2026 14:49:47 +0100
+Message-Id: <20260219-topic-ipa_imem-v4-0-189d91dbee84@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aZcRS0cUsAOgktMf@fedora>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3XMQQrCMBCF4atI1kaa1KTRlfcQkTQztQPG1ESLI
+ r27sSAItZuBf+B9L5YwEia2XbxYxJ4ShUuO9XLBXGsvJ+QEuZkspCqULPktdOQ4dfZIHj0HbLR
+ 2zhqDiuVRF7GhxwjuD7lbSrcQn6Pfi893luoFL3itQJVaboSrml1IaXW927ML3q/yYR+xl79KN
+ VFkVjQIa2EjarMWM0r5VXQhxVQpswIaDIKAptbVH2UYhjd+v/pbPwEAAA==
+X-Change-ID: 20250523-topic-ipa_imem-def66cca88e5
+To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Alex Elder <elder@kernel.org>
+Cc: Marijn Suijten <marijn.suijten@somainline.org>, 
+ linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>, 
+ Alex Elder <elder@riscstar.com>, 
+ Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
+ Simon Horman <horms@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1771509014; l=1932;
+ i=konrad.dybcio@oss.qualcomm.com; s=20230215; h=from:subject:message-id;
+ bh=bDG5HJATJlSE2M/uMl1Kc0L6vOb6S35ga6tbRrUuGeI=;
+ b=UqMGpWifDKjhndgjCJBJ+mTlKrehsRK94O+e6wWG5s6WFzL8p4xZueeWlVorSy+soW8/s/wyE
+ LpWJTozvpBrBpEU4hH1lNZKlyFxu1zJ0XlkXGUBlFDx5yld/a9pLeKG
+X-Developer-Key: i=konrad.dybcio@oss.qualcomm.com; a=ed25519;
+ pk=iclgkYvtl2w05SSXO5EjjSYlhFKsJ+5OSZBjOkQuEms=
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259466-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259467-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[konradybcio@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 506EB15F2DE
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,oss.qualcomm.com:mid]
+X-Rspamd-Queue-Id: DAAC415F398
 X-Rspamd-Action: no action
 
-On Thu, Feb 19, 2026 at 01:34:10PM +0000, Hangbin Liu wrote:
-> On Wed, Feb 18, 2026 at 04:11:10PM -0800, Jakub Kicinski wrote:
-> > On Wed, 18 Feb 2026 04:36:24 +0000 Hangbin Liu wrote:
-> > > On Tue, Feb 17, 2026 at 04:43:55PM -0800, Jakub Kicinski wrote:
-> > > > On Sat, 14 Feb 2026 09:15:41 +0000 Hangbin Liu wrote:  
-> > > > > Fixes: e53665c6eaa6 ("bonding: delete migrated IP addresses from the rlb hash table")  
-> > > > 
-> > > > Ah, also AI says the issue existed already in 
-> > > > 3aba891dde38 ("bonding: move processing of recv handlers into
-> > > > handle_frame()")
-> > > > not the exact trapping instruction but the hash table was used from
-> > > > recv_probe so at least a UAF would happen.  
-> > > 
-> > > Not sure if I understand correctly. Do you mean we still able to access
-> > > rlb_arp_recv() after setting recv_probe to NULL?
-> > 
-> > Simply put -- wasn't there a case where rx_hashtbl was accessed after
-> > being freed in 3aba891dde38 already? That commit is a year and a half
-> > older than the commit you had under Fixes.
-> 
-> AFAIK, the UAF/null-ptr-deref issue for rx_hashtble is introduced by
-> 53665c6eaa6 ("bonding: delete migrated IP addresses from the rlb hash table"),
-> which added rlb_purge_src_ip() in rlb_arp_recv().
-> 
-> In 3aba891dde38 ("bonding: move processing of recv handlers into handle_frame()")
-> it only let other CPU still able to access rlb_arp_recv() after we set recv_probe
-> to NULL. But it doesn't trigger a null-ptr-deref.
+This adds the necessary driver change to migrate over from
+hardcoded-per-IPA-version-but-varying-per-implementation numbers, while
+unfortunately keeping them in there for backwards compatibility.
 
-Oh, I remember now. rlb_arp_recv() also calls rlb_update_entry_from_arp(),
-which could access rx_hashtbl. You are right, the fixes tag should be
-3aba891dde38 ("bonding: move processing of recv handlers into handle_frame()")
+The DT changes will be submitted in a separate series, this one is OK
+to merge independently.
 
-Thanks
-Hangbin
+Signed-off-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+---
+Changes in v4:
+- Fix a memmap() leak
+- Adjust comment style, take Alex's suggestion about very explicit
+  DEPRECATION notices
+- Pick up tags
+- Link to v3: https://lore.kernel.org/r/20260217-topic-ipa_imem-v3-0-d6d8ed1dfb67@oss.qualcomm.com
+
+Changes in v3:
+- Pick up tags, rebase (effectively a NOP)
+- Add actual binding constraints for modem-tables, drop Alex's r-b
+- Better describe the purpose of this region, as much as I can anyway
+- Link to v2: https://lore.kernel.org/r/20250527-topic-ipa_imem-v2-0-6d1aad91b841@oss.qualcomm.com
+
+Changes in v2:
+- Actually pass the retrieved data to the target function
+- Re-wrap comments to match net/ style
+- Mention next-next in the mail subjects
+- Pick up tags
+- Link to v1: https://lore.kernel.org/r/20250523-topic-ipa_imem-v1-0-b5d536291c7f@oss.qualcomm.com
+
+---
+Konrad Dybcio (3):
+      dt-bindings: sram: qcom,imem: Allow modem-tables subnode
+      dt-bindings: net: qcom,ipa: Add sram property for describing IMEM slice
+      net: ipa: Grab IMEM slice base/size from DTS
+
+ .../devicetree/bindings/net/qcom,ipa.yaml          |  7 +++++++
+ .../devicetree/bindings/sram/qcom,imem.yaml        | 14 ++++++++++++++
+ drivers/net/ipa/ipa_data.h                         |  9 +++++++--
+ drivers/net/ipa/ipa_mem.c                          | 22 +++++++++++++++++++++-
+ 4 files changed, 49 insertions(+), 3 deletions(-)
+---
+base-commit: 50f68cc7be0a2cbf54d8f6aaf17df32fb01acc3f
+change-id: 20250523-topic-ipa_imem-def66cca88e5
+
+Best regards,
+-- 
+Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+
 
