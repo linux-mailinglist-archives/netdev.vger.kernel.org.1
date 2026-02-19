@@ -1,160 +1,195 @@
-Return-Path: <netdev+bounces-259422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259423-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0CVSMFnclmlJpgIAu9opvQ
-	(envelope-from <netdev+bounces-259422-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 10:48:09 +0100
+	id CA32DZrdlmlJpgIAu9opvQ
+	(envelope-from <netdev+bounces-259423-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 10:53:30 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CEA215D82E
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 10:48:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C46015D8CF
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 10:53:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C7A3C300EFAD
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 09:47:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1BFC13016526
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 09:53:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08B1E2E9749;
-	Thu, 19 Feb 2026 09:47:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=osuchow.ski header.i=@osuchow.ski header.b="vdKUx8Tt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DDE3309DAB;
+	Thu, 19 Feb 2026 09:53:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com [209.85.161.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7FB7239E63
-	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 09:47:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 215DE1E8320
+	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 09:53:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771494438; cv=none; b=jc/pn3tTZqRPLG+rTPb6nnq9ktBFhKqbKvW54BLl0MYCEF0LIdribbgCBZkG3SYZqizbrfEpIlcwfPj+AduP96qX6Y7CmBRyoLbfjFB2AnpMB4CJ8yIpS6aJ2waZNbZuz2GFwXcJaEEE6PWv6hSp+kct+Ne6GcL5PpJXGQuh69E=
+	t=1771494807; cv=none; b=G4CIeDjxCu8XZ7LwtaLXGKhxzorQGWveJOGCyRuZ1V0JUVSQsMwzdOaZwz/ZOghdPfhW7qZICoX7HG9l+wufAaWm4n0QX6dwqpzlSBgFQTcyCGgLfb7bTVhI3f8guU7CTEyiRTv90W9WOivJ2Hf+OMhEV9seHIyPKzfcBq4FK6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771494438; c=relaxed/simple;
-	bh=/7C42wtfN4wi2QGjPOAqXRsBXliDVA++u/UZARfTp+o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YS2tJrj/l0m/s1y/NVZevLTpI4ZN7FNsudbIMtHDfXSELboNnNhs08DzoxtZ4jyZU3EDu94Yl3pdzv7XcI7Lp5FrP+kkYj5fSaJr+TUi9XheZEsVV20HZmoVvokIr0w+GIdV9zJH6iUvGEY+zo32n92H0IhPMY16nPKL+cUo3Go=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=osuchow.ski; spf=pass smtp.mailfrom=osuchow.ski; dkim=pass (2048-bit key) header.d=osuchow.ski header.i=@osuchow.ski header.b=vdKUx8Tt; arc=none smtp.client-ip=80.241.56.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=osuchow.ski
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=osuchow.ski
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4fGpSb2H1nz9tWy;
-	Thu, 19 Feb 2026 10:47:11 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=osuchow.ski; s=MBO0001;
-	t=1771494431;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/co7FbE1LDOOvieMRlaYdRnl3jah2chrYM/3KO5bB48=;
-	b=vdKUx8Tt0RQnWRMC8R83e70Xd9yk4jttoE3iT/XBcwIfDcE2QtB3ejbK/f0eUHt3ABpAS8
-	oh870teh4ho8n04VIkIhmYpEnjNAK5nvAAsdqDRLtFyhZ4IU2zypGlAndyWSacSi+cFG2T
-	ldS8I0orM1AbA1ACZL7Z9QfGbz89AAAsoHEP4SMGVw4OTQOTiP0j6aJijMbckxdX6j+PPA
-	H9qF1zbOfCqwYMI8NqyP9toJs+WYi90hU/gFXac8aK5GqnQsOvDTEz3x2VkJLm5ec9ixbW
-	cx4Ebc2hdVbs1piH2aACeGyo8gYM9ZWtgJb+qOMO+jvOF0rL4P7Una7/ZjpOZg==
-Authentication-Results: outgoing_mbo_mout;
-	dkim=none;
-	spf=pass (outgoing_mbo_mout: domain of linux@osuchow.ski designates 2001:67c:2050:b231:465::102 as permitted sender) smtp.mailfrom=linux@osuchow.ski
-Message-ID: <55190384-e06a-45ef-ba7c-55d341e93e83@osuchow.ski>
-Date: Thu, 19 Feb 2026 10:47:05 +0100
+	s=arc-20240116; t=1771494807; c=relaxed/simple;
+	bh=Dhduq9xuVvgA8DtpWSl04RjzTY7h43inAglIIusU1cI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=TSGcj3h0/FzJheWE/zkkbXwrIGMCnF53EqJmf+pbGdUb6hPj1A26HaiswPS++0Pidh9+msZWTLGp7hWwllNGrVNLAcrnQ5K9qXs1w/jSmt5hCPVEvVgymFHRxr70lA+eK0jj9SmwenO29mcDC218aUDW6suaN2MXoRXxeCkFhcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-678e130a87fso9407031eaf.3
+        for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 01:53:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771494805; x=1772099605;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zGZKkrB6oOUdLIAR0DUc8CPC0P4InXVzgpiay4MkPXc=;
+        b=RlWQTdOhDkCK1g9EKn9OxHjTE9LIUce+SmIag6mfWc/NqgtZpqffhgNOu7M8BkBTLv
+         eNGXxIPF71/TJw31I2aJ9e7z5OfeZIGEpcOJ6IjKSGVbtjjcQygGbd6SNPQdz04qmxEd
+         tAiWYhxskll80Z75jautyB8i5zgpgIKlMtUKFg3r7U+HHu48/ZmmqKOZxs5t4aFd3k0R
+         W1H33S9X5bAPYdncF5UVZk7cGG8e8OgdLqdkQ5ZL8HdGL8neZpgvCNyUKCBSNwf6pKHX
+         VHazYAwRyfKX41nECNiyH1+ybt1incZqjo27DtI1PioMFeqqpNWIDjN2sqRaLJ6ExnkJ
+         iYvw==
+X-Forwarded-Encrypted: i=1; AJvYcCX6I94xUzprEmt87JCYmQdAUF4ujqosmoylVNWd9LoMGKe6kLIHjNkyK0lNdlkfEmgTyBpveyM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+UNGwCN19cpsGiHAe5VA6bqcEBMTsh1hMPrE4Jwv1hANjnRai
+	v8sLSTQzfAQUrgK05PwJhw1BEu32xq9+AHL9JZnll72Y6OM8Fy75aLZekgD5JL4Ems4RHZXg6fR
+	0IW5xqz3UbqAdJgr+TIPS3SF7CkQjZmSflkQTFQ3zbzUZzU4Zt2TrXsqgY8w=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [ANN] netdev development stats for 7.0 (and some AI review
- thoughts)
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org
-References: <20260212124208.187e53ae@kernel.org>
- <d3e7fa70-4035-47e0-89cc-92d636497198@osuchow.ski>
- <20260217141500.00c3fa2d@kernel.org>
-Content-Language: en-US
-From: Dawid Osuchowski <linux@osuchow.ski>
-In-Reply-To: <20260217141500.00c3fa2d@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6820:4b01:b0:679:a4bc:9f8f with SMTP id
+ 006d021491bc7-679a4bca251mr3116067eaf.61.1771494805102; Thu, 19 Feb 2026
+ 01:53:25 -0800 (PST)
+Date: Thu, 19 Feb 2026 01:53:25 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6996dd95.050a0220.21cd75.010c.GAE@google.com>
+Subject: [syzbot] [netfilter?] WARNING in nft_map_deactivate
+From: syzbot <syzbot+4924a0edc148e8b4b342@syzkaller.appspotmail.com>
+To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
+	fw@strlen.de, horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com, 
+	pablo@netfilter.org, phil@nwl.cc, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[osuchow.ski,none];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=6d9e410399043c26];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[osuchow.ski:s=MBO0001];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-259423-lists,netdev=lfdr.de,4924a0edc148e8b4b342];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259422-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[osuchow.ski:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linux@osuchow.ski,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url,osuchow.ski:mid,osuchow.ski:dkim]
-X-Rspamd-Queue-Id: 1CEA215D82E
+	SUBJECT_HAS_QUESTION(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,goo.gl:url,storage.googleapis.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8C46015D8CF
 X-Rspamd-Action: no action
 
-On 17/02/2026 23:15, Jakub Kicinski wrote:
-> On Mon, 16 Feb 2026 00:31:08 +0100 Dawid Osuchowski wrote:
->>> One more note on testing, we have completed the migration of NIPA
->>> to netdev foundation machines. Due to DRAM shortage, however,
->>> the shipment of additional machines is delayed.
->>
->> Just something I noticed that might be connected to this is that the
->> links to "Raw output" in these announcements broke for each previous
->> message you posted.
->>
->> It is possible to use the new link convention/format:
->>
->> 	Raw output: https://netdev.bots.linux.dev/ml-stats/stats-7.0
->>
->> to go back as far as 6.18 stats e.g.:
->>
->> 	https://netdev.bots.linux.dev/ml-stats/stats-6.18
->>
->> but beyond that (6.17 and older) it doesn't work. The "old" nipa links:
->>
->> 	Raw output: https://netdev.bots.linux.dev/static/nipa/stats-6.19/stdout
->>
->> are completely broken.
-> 
-> Yup, this is due to the NIPA migration from Meta systems to netdev
-> foundation machines. I can regenerate the outputs if you need them
-> (modulo the JSON format changing since), LMK if and how far back.
+Hello,
 
-I don't need them, just noticed the gap and reported it, as I thought 
-you might've not been aware.
+syzbot found the following issue on:
 
-> I did copy the "time based" stats from old machines (3mo, 6mo etc) FWIW:
-> https://netdev.bots.linux.dev/ml-stats/
-> which I suspect to be more useful for actionable tracking of activity
-> than the release-by-release. Release stats are mostly an excuse to send
-> an email to the list and thank people :)
+HEAD commit:    4c51f90d45dc selftests/bpf: Add powerpc support for get_pr..
+git tree:       bpf-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=159e5aaa580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6d9e410399043c26
+dashboard link: https://syzkaller.appspot.com/bug?extid=4924a0edc148e8b4b342
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13437652580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1250a7b2580000
 
-Understood, in that case my response above still holds true. For myself 
-I don't need anything more, but other folks might want/need them for 
-some purpose. If they do I guess they will let you know one way or 
-another :)
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/173ab67d0a10/disk-4c51f90d.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/9c8787b7cc0e/vmlinux-4c51f90d.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/bf9799a7764a/bzImage-4c51f90d.xz
 
->> P.S. I am using a freshly setup email client on a new machine so
->> apologies if the formatting is wrong on my end. I did send this message
->> to myself for testing and I think it's okay, but I might be missing
->> something :)
-> 
-> Looks fine :)
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+4924a0edc148e8b4b342@syzkaller.appspotmail.com
 
-Thanks for confirming!
-Dawid
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+R13: 00007fb5ea615fac R14: 00007fb5ea615fa0 R15: 00007fb5ea615fa0
+ </TASK>
+------------[ cut here ]------------
+iter.err
+WARNING: net/netfilter/nf_tables_api.c:845 at nft_map_deactivate+0x34e/0x3c0 net/netfilter/nf_tables_api.c:845, CPU#0: syz.0.17/5992
+Modules linked in:
+CPU: 0 UID: 0 PID: 5992 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2026
+RIP: 0010:nft_map_deactivate+0x34e/0x3c0 net/netfilter/nf_tables_api.c:845
+Code: 8b 05 86 5a 4e 09 48 3b 84 24 a0 00 00 00 75 62 48 8d 65 d8 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc cc e8 63 6d fa f7 90 <0f> 0b 90 43 80 7c 35 00 00 0f 85 23 fe ff ff e9 26 fe ff ff 89 d9
+RSP: 0018:ffffc900045af780 EFLAGS: 00010293
+RAX: ffffffff89ca45bd RBX: 00000000fffffff4 RCX: ffff888028111e40
+RDX: 0000000000000000 RSI: 00000000fffffff4 RDI: 0000000000000000
+RBP: ffffc900045af870 R08: 0000000000400dc0 R09: 00000000ffffffff
+R10: dffffc0000000000 R11: fffffbfff1d141db R12: ffffc900045af7e0
+R13: 1ffff920008b5f24 R14: dffffc0000000000 R15: ffffc900045af920
+FS:  000055557a6a5500(0000) GS:ffff888125496000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fb5ea271fc0 CR3: 000000003269e000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ __nft_release_table+0xceb/0x11f0 net/netfilter/nf_tables_api.c:12115
+ nft_rcv_nl_event+0xc25/0xdb0 net/netfilter/nf_tables_api.c:12187
+ notifier_call_chain+0x19d/0x3a0 kernel/notifier.c:85
+ blocking_notifier_call_chain+0x6a/0x90 kernel/notifier.c:380
+ netlink_release+0x123b/0x1ad0 net/netlink/af_netlink.c:761
+ __sock_release net/socket.c:662 [inline]
+ sock_close+0xc3/0x240 net/socket.c:1455
+ __fput+0x44f/0xa70 fs/file_table.c:469
+ fput_close_sync+0x11f/0x240 fs/file_table.c:574
+ __do_sys_close fs/open.c:1509 [inline]
+ __se_sys_close fs/open.c:1494 [inline]
+ __x64_sys_close+0x7e/0x110 fs/open.c:1494
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fb5ea39c629
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fff72e03568 EFLAGS: 00000246 ORIG_RAX: 0000000000000003
+RAX: ffffffffffffffda RBX: 00007fb5ea615fa0 RCX: 00007fb5ea39c629
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000003
+RBP: 00007fff72e035d0 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+R13: 00007fb5ea615fac R14: 00007fb5ea615fa0 R15: 00007fb5ea615fa0
+ </TASK>
 
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
