@@ -1,166 +1,196 @@
-Return-Path: <netdev+bounces-259438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259439-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WG/qKhLzlmndrQIAu9opvQ
-	(envelope-from <netdev+bounces-259438-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 12:25:06 +0100
+	id uAdNFlP2lmndrQIAu9opvQ
+	(envelope-from <netdev+bounces-259439-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 12:38:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19A1915E413
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 12:25:06 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC3B815E576
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 12:38:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A841B300B443
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 11:25:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B3CC6301F795
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 11:38:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF20733DEE0;
-	Thu, 19 Feb 2026 11:25:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 312752FD1B3;
+	Thu, 19 Feb 2026 11:38:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.pl header.i=@yahoo.pl header.b="MbpBmKXr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="itQWdK1l"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic308-17.consmr.mail.ir2.yahoo.com (sonic308-17.consmr.mail.ir2.yahoo.com [77.238.178.145])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FB6633E35C
-	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 11:25:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.238.178.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF762F3C26
+	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 11:38:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771500302; cv=none; b=dcSu06/UuS8VYv+ILCZI4E2R2x3ivRKKzLqpmx9dVKl+pIpM3/nTquMEkjuiRMPLILr8c1qj/DVlLuPpBSrp9tkIMRhLEBf8/PyZSpjZnHR41pI0K8rq79Ys0r+Gd4OipwKMo7ufBte/xUnA7KUQDWTVvPiWCb8/ZD/jzcNekZc=
+	t=1771501135; cv=none; b=BE487bF8lAhu1eC7DyqQYLIluExnkqt8HO/8/VFaji0sObNcGow4zhC4lAX3IShudhW2vuV0ihdPAl+FS6o5n2KI0KYf0n0e1v7oxNSLFY8ZFgj4kKIPrYVOPg40IidP2MzYR40UwRZTfGmt9+TqReOALf11pT9AVJGFu+gkrhs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771500302; c=relaxed/simple;
-	bh=OhSdwfy1FtG4ztzOwXlEkdBpe0lhi5439WS5nFTsDsQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:References; b=XOgpcSZQV7ZiHgqWO3VSOKKA/EfSROERVGnEfyyOT4i/8Ar+BfwezY4dFOn+we5O414gSCwgIG6GyJY1yA75IBHxgVgHMg3PMRjixYz4AkYAtz7hMWBYjN6HG96zwth1LRWzdoegisp/mffZ88+QQQWYBmtbVs3sySRmphzFl7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.pl; spf=pass smtp.mailfrom=yahoo.pl; dkim=pass (2048-bit key) header.d=yahoo.pl header.i=@yahoo.pl header.b=MbpBmKXr; arc=none smtp.client-ip=77.238.178.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.pl
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.pl; s=s2048; t=1771500299; bh=VeJXZz8rO9UPaobGdDqzKgcsjS8fLwLcgWdV+vsQR9Y=; h=From:To:Cc:Subject:Date:References:From:Subject:Reply-To; b=MbpBmKXruv/zDdbryX2ktQIwER1JuidgNacAJ7JDrTopdBRQIUeEG/E0MMHVl1+4TvTjkFZ7rSk4c9LXbhuuBoyvELwkSuw3rP5cUvEBYEiDzcSfvowYXAMWuXIRY7Vng9UWAmHjuMOhVtmr0utPbfKKoICk4/rw9MREFP6yDwKzNvwT9dGn8x4uM8tv+RsVc3u1ac22OpjupD86e/6Y9aUplK1ZoTlKl3k8+01tG43BUVmD9PZfN01DFg8g/9IJgcfvvUClZIoiUNTkdlFVVkw2hbQsLgMoB8bKo/2abgYVKgnHE4cfcjm8m5qrSgQUH6T2PBMkzRm4wPGWOBCcyQ==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1771500299; bh=4Vpz+lDepeD7YwqoMqUIOOFLJCJ0aE5tzmr+CtuNhg9=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=foJjJYtB5P4+lGiblkW34U9AzuTjTMGtOgQSGbsyazrbllDpd6ZY4niDAaXzo5FpEpsyjw50DzuDRBH60htLHVGfpkWMsYq17fhe3XzOf+zIw+rUUElNfR3R7AVXQov/vfUUNX82b8BdO1Ur1EZcssEQ8nt+GIycEl2nYlsf5cCLJdZ03UDqYvKq8af02ZJOwSozJnA3tH8ZLjDhSMgefLjdXKzBb8ZY5SVGOTWNLuBFeiFvuAESuqL8ZSKuZnRlRQCqOYStU7NrSOuZn8Xf6DzIvJTlSiFXJuoTfy4Wt1EcQEOMsuFBK7QH1SSH44+jLjyzOUBQemhjSnWYRmFM4A==
-X-YMail-OSG: 2C0oKscVM1moaV20UbmspCSGyhtzNrq.Gfh3fwGjMXFy6Cd4nJ3QSP6EqNioHya
- YGwD20izixMKypIerQaloX0oEB50nGtsgYMpg8lesUNDKBiQjBCfFL_WXXDRLtjtaeZTUb63MtSn
- D9m81esyAUIjNBQsesLncuw52wEpJheixLe9g2wOnFMvSCgDjwYHC2_1wz74Zq1p8xPiAFftkG7O
- sgURUqSxO_YhTUQgyjiMaRaztT.cYaGtQ4S8P1P3LomOp8yFbhWA277YPPO_w2CBDX85CO.jgZj8
- IpVdqKZM7Zf7iE6VQ78rKsE7u4zy._jf8y9ywuLlzOcwewsmsPDGxrRho8yhCGJAFv71DOZ8B6zu
- MBSCSAz_qoE8.d7AWmvlQ4sfP.v8s0fshxbnfG5LcFlideLBIPnJG0pxGpRnOTHd0Oc0ND3w4k0q
- INGfzLCPiM_i7jGCkUHF4Uge_.AdzgQwOnLEAluVFOD8yY08OPsdI.WB2q5EGpJ48Z054CQajKRU
- XhkSdiEN.Kud3n6LkAx3JMev_uBB8.nIYu5O1YkUsJ2u1JQYHTbp7TnBHYVTovFOVn9r_4VzBf.x
- Gistzu_Ro4y.cSjX612fWB7rFyBccnLci5jhHT8kvy9u4gJJtRkGaNcXccG9ifdCoTQeFjvNCisR
- 2eeO8vfn0rfnmBV2NeIuhFQIQYyyEaWi6vkoEcPUSYAIJlZtQ9rQHmViLYc6qgKEiq6qmNHM9wzI
- eTY91XUc34d.eqtTEQwAcydW5hPfufPHPp5Ck7LiR7pO0d9zxYySSRbXrwarN37zZik0Vjhyuxbp
- ikvjY5S3aFYr0_7y6c4g02esgQ2mUXuPWWwIJn0FXSSr.lJvfEOqTGnrOBMuDZfchs7udcZsdqty
- NG.YgYzmLHazBu6i6vOLzBa16aEisHwF6vKDcKR3tbDKxWQahFcz5Ov1ogk8sdlnzUe55JwsLP3M
- DDbyJSS.5RjCRlsjmPNGlVyle_q6ISuiRNTW4i4Yimb299TxdFU6HbZKArEjspfLEDNGoJf4n6xa
- doHtT.pbMWT.KNWqB2BphsPzwAZevqyyszDCYJMOg5m.01DOWgzJsDImxtXr1BfFStQe1XSl8bTn
- FpO4JgiKCilX0cRi0b2nq1IsoQEY31SL.amz1ss2Tki5l.aoaXs212puvXRq7ZH7v4VSRHt2lU.4
- hGZr9iC1r7XlJAAlHorF1nEfJhAORAHvqLfnG60djxOot8xJRqdcO6KEhTYua8UHQADUcgHnUlls
- NvpC.4M_rOAcOas.1OJNarqbZNI2bwa8EfzUjDkxXkZrHd07LIa2UCtS0vrBje.EXDTsEKdx3rJ8
- TF9A0jqHmom0BJdUIZhwvXE_3ESmiYkbBEqrNRD0vy9D20d8k9Sqm3mRaHcHpXXiPkXHBMvtWbn3
- i0rtJyMwjq4EsyyUPVuA3PzpzeGHPjuQ33IJo.iesJAA7yhQpOvsXbNzif2QoP9k43Xxsq9NrmF5
- O8aXBnVhYNEzjh7B_OM60yyGGj5YlzS_RCpCeZwQKhN8R0YddfnCRmkJuXsU9Qfzwu2aA41Skf07
- XB50y6TUN2.sJb9cHa8Gioc9SW4DpTa1dq9fzUjHrl.pp6eqC0jrorar1DzzwoSuvzr8SjlkohLN
- 04p3lX.wwRw26ZmH4Q2jv0zxhCVo1qTzKFXsKCvpkkk60yMHvJGUZhrvKR0Lv_8qT4ZlmhT32U_5
- kvUydPF2scRCj.BWWejTTDJOdcVeDHYWUFFt1gU2_wGhjt4xUi8eMGm1tkJDaVRFSdCBElxOi_XO
- Z7a.2h7TNKKAU2baLQXtxBVn5uecYLS5t.qRo.CZJil_X_muJMZkgAMrZfAtQd6D_wiKXHJYXs1w
- goDguCcIgWqfdUw4XqXdSk702HLLwVEJF6.jwjd3AqHhdAhOHZ7Pov.whneua3ncWZmCkn7DbKWS
- rHFt3mWge2IJ3m_Ym0XuoeF2vOcSADNBHl_ABS9q52J_c3OycMXPof64gKUzr.upv2uSM.MBdF5o
- RuBfMIM9Hh8o0L2N5U0E4cYFFk__sV149XTeH4jou6VBVPJArP.EEQP.XBgSuzz8sQbPog2lQfKu
- 6gudJO1bnOgu3zQWZ1Rj8g4q2u.Bx6r1vLBA85cc9McUB5LO7vBbbAW49_Y6DETBUAN5GRD97vYw
- SYfeTLSb5OkxlWD1.89etNUnf.g0bkRlSooyv1V2b_x6kERNz15gvOhI4iS1uPkrA_asOHCsl0qf
- WxRhaRjdPQ3ANYcbPFsX7tkiSabFuU11TWCPEKaAX15D0uUhKDp1ueBJBFZ.uTurrDCi40JW5BCQ
- tBXI-
-X-Sonic-MF: <tomasz.unger@yahoo.pl>
-X-Sonic-ID: aa63cefa-ee54-44b0-b215-8774486a4a4f
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic308.consmr.mail.ir2.yahoo.com with HTTP; Thu, 19 Feb 2026 11:24:59 +0000
-Received: by hermes--production-ir2-bbcfb4457-f49j6 (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID baf2b470e72ab17ac553910279b9b1b1;
-          Thu, 19 Feb 2026 11:24:57 +0000 (UTC)
-From: tomasz.unger@yahoo.pl
-To: Mark Greer <mgreer@animalcreek.com>
-Cc: linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Tomasz Unger <tomasz.unger@yahoo.pl>
-Subject: [PATCH] nfc: trf7970a: Fix spelling mistakes in comments
-Date: Thu, 19 Feb 2026 12:24:54 +0100
-Message-ID: <20260219112454.46841-1-tomasz.unger@yahoo.pl>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1771501135; c=relaxed/simple;
+	bh=ZGnMRTs7nrcarZ8ZiRWgBuKMRk6C73qSEwcvnQgEQuE=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=eVMYzm8ccQMsDGTeS5pY/RoX+nNoJUZ6twcd9lfE53L6djctqKfrhl70/9a85kal+IFGi3NOeVa16BOCmBPD2ibq6YOXkdQWAXyZo2SjFnN3GJ42qfM6NPFs/zPBZGFZbKPIAVYNA66d2Zq2KkXM1LkFe18tVd3Cnb2gbhsWVKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=itQWdK1l; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF6FBC4CEF7;
+	Thu, 19 Feb 2026 11:38:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771501134;
+	bh=ZGnMRTs7nrcarZ8ZiRWgBuKMRk6C73qSEwcvnQgEQuE=;
+	h=From:Date:Subject:To:Cc:From;
+	b=itQWdK1lquBGM0p4L7LHMwxuXMoEvq29HqzUrIiOWyUJqfJQmgFgMoL/i0l2lRbOI
+	 PMsDHqEqrcnPJOhDhqsIXbRSjUgZSsZZJFLpQs2SGMWJnqG+fEVNg28BQl6pwcC8Ve
+	 4hQd9NAJAGWISvKHYzT7/FVk6zGkXk/jMP3WaYUnX1Jjdd1zENcxbVWyhLvSdiTFRw
+	 bfXGQYXcuo/SA8Rw6RT2wi7v3ITvNUcTTovvdU6bu2vtEoDMWXdjzi5dY+gdaI0uQF
+	 hYNiFwEN6lnN9bdD0wQ7Z62u7bMehSRKlWT9wYl9n+L88cwBYfBniaP+nUg+aHcGNS
+	 LmvKBqE6A360A==
+From: Linus Walleij <linusw@kernel.org>
+Date: Thu, 19 Feb 2026 12:38:50 +0100
+Subject: [PATCH net v3] net: ethernet: xscale: Check for PTP support
+ properly
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-References: <20260219112454.46841-1-tomasz.unger.ref@yahoo.pl>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260219-ixp4xx-fix-ethernet-v3-1-f235ccc3cd46@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/33NwQ6CMAwG4FchPTuzDtzAk+9hPMAosGgY2cgyQ
+ 3h35y7GxHj8+7dfN/DkDHk4Fxs4CsYbO6dQHgrQUzuPxEyfMgguJEeUzMSlipENJjJaJ3Izraw
+ a2lL2Dedaa0iXi6PUZ/UKaQFuaTgZv1r3zJ8C5uovGpAha9qu7CpErRRd7u/icbRuzGAQH0Qg/
+ kZEQrg6STXUtdS1/kL2fX8BnkQNZgEBAAA=
+X-Change-ID: 20260116-ixp4xx-fix-ethernet-4fa36d900ccc
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+ Vladimir Oltean <vladimir.oltean@nxp.com>, 
+ Jacob Keller <jacob.e.keller@intel.com>
+Cc: netdev@vger.kernel.org, Linus Walleij <linusw@kernel.org>
+X-Mailer: b4 0.14.3
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[yahoo.pl,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[yahoo.pl:s=s2048];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,yahoo.pl];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259438-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-259439-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linux.dev,nxp.com,intel.com];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[yahoo.pl];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tomasz.unger@yahoo.pl,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[yahoo.pl:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,yahoo.pl:mid,yahoo.pl:dkim,yahoo.pl:email]
-X-Rspamd-Queue-Id: 19A1915E413
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[openwrt:email]
+X-Rspamd-Queue-Id: BC3B815E576
 X-Rspamd-Action: no action
 
-From: Tomasz Unger <tomasz.unger@yahoo.pl>
+In ixp4xx_get_ts_info() ixp46x_ptp_find() is called
+unconditionally despite this feature only existing on
+ixp46x, leading to the following splat from tcpdump:
 
-Fix spelling mistakes in comment block (lines 64, 69, 72):
-- 'recieves' -> 'receives'
-- 'recieving' -> 'receiving'
-- 'recived' -> 'received'
+root@OpenWrt:~# tcpdump -vv -X -i eth0
+(...)
+Unable to handle kernel NULL pointer dereference at virtual address
+  00000238 when read
+(...)
+Call trace:
+ ptp_clock_index from ixp46x_ptp_find+0x1c/0x38
+ ixp46x_ptp_find from ixp4xx_get_ts_info+0x4c/0x64
+ ixp4xx_get_ts_info from __ethtool_get_ts_info+0x90/0x108
+ __ethtool_get_ts_info from __dev_ethtool+0xa00/0x2648
+ __dev_ethtool from dev_ethtool+0x160/0x234
+ dev_ethtool from dev_ioctl+0x2cc/0x460
+ dev_ioctl from sock_ioctl+0x1ec/0x524
+ sock_ioctl from sys_ioctl+0x51c/0xa94
+ sys_ioctl from ret_fast_syscall+0x0/0x44
+ (...)
+Segmentation fault
 
-Found by manual inspection.
+Check for ixp46x in ixp46x_ptp_find() before trying to set up
+PTP to avoid this.
 
-Signed-off-by: Tomasz Unger <tomasz.unger@yahoo.pl>
+To avoid altering the returned error code from ixp4xx_hwtstamp_set()
+which before this patch was -EOPNOTSUPP, we return -EOPNOTSUPP
+from ixp4xx_hwtstamp_set() if ixp46x_ptp_find() fails no matter
+the error code. The helper function ixp46x_ptp_find() helper
+returns -ENODEV.
+
+Fixes: 9055a2f59162 ("ixp4xx_eth: make ptp support a platform driver")
+Signed-off-by: Linus Walleij <linusw@kernel.org>
 ---
- drivers/nfc/trf7970a.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Changes in v3:
+- Detail the juggling of error codes in the committ message.
+- Link to v2: https://lore.kernel.org/r/20260211-ixp4xx-fix-ethernet-v2-1-07567f886c8c@kernel.org
 
-diff --git a/drivers/nfc/trf7970a.c b/drivers/nfc/trf7970a.c
-index d17c701c7888..c3bf48f49eca 100644
---- a/drivers/nfc/trf7970a.c
-+++ b/drivers/nfc/trf7970a.c
-@@ -61,15 +61,15 @@
-  * support that.  So, if an abort is received before trf7970a_send_cmd()
-  * has sent the command to the tag, it simply returns -ECANCELED.  If the
-  * command has already been sent to the tag, then the driver continues
-- * normally and recieves the response data (or error) but just before
-+ * normally and receives the response data (or error) but just before
-  * sending the data upstream, it frees the rx_skb and sends -ECANCELED
-  * upstream instead.  If the command failed, that error will be sent
-  * upstream.
-  *
-- * When recieving data from a tag and the interrupt status register has
-+ * When receiving data from a tag and the interrupt status register has
-  * only the SRX bit set, it means that all of the data has been received
-  * (once what's in the fifo has been read).  However, depending on timing
-- * an interrupt status with only the SRX bit set may not be recived.  In
-+ * an interrupt status with only the SRX bit set may not be received.  In
-  * those cases, the timeout mechanism is used to wait 20 ms in case more
-  * data arrives.  After 20 ms, it is assumed that all of the data has been
-  * received and the accumulated rx data is sent upstream.  The
+Changes in v2:
+- Use the correct Fixes-tag.
+- Move check to ixp46x_ptp_find() to simplify things.
+- Link to v1: https://lore.kernel.org/r/20260116-ixp4xx-fix-ethernet-v1-1-9ab3b411c77e@kernel.org
+---
+ drivers/net/ethernet/xscale/ixp4xx_eth.c | 5 +----
+ drivers/net/ethernet/xscale/ptp_ixp46x.c | 3 +++
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/xscale/ixp4xx_eth.c b/drivers/net/ethernet/xscale/ixp4xx_eth.c
+index e1e7f65553e7..b0faa0f1780d 100644
+--- a/drivers/net/ethernet/xscale/ixp4xx_eth.c
++++ b/drivers/net/ethernet/xscale/ixp4xx_eth.c
+@@ -403,15 +403,12 @@ static int ixp4xx_hwtstamp_set(struct net_device *netdev,
+ 	int ret;
+ 	int ch;
+ 
+-	if (!cpu_is_ixp46x())
+-		return -EOPNOTSUPP;
+-
+ 	if (!netif_running(netdev))
+ 		return -EINVAL;
+ 
+ 	ret = ixp46x_ptp_find(&port->timesync_regs, &port->phc_index);
+ 	if (ret)
+-		return ret;
++		return -EOPNOTSUPP;
+ 
+ 	ch = PORT2CHANNEL(port);
+ 	regs = port->timesync_regs;
+diff --git a/drivers/net/ethernet/xscale/ptp_ixp46x.c b/drivers/net/ethernet/xscale/ptp_ixp46x.c
+index 94203eb46e6b..93c64db22a69 100644
+--- a/drivers/net/ethernet/xscale/ptp_ixp46x.c
++++ b/drivers/net/ethernet/xscale/ptp_ixp46x.c
+@@ -232,6 +232,9 @@ static struct ixp_clock ixp_clock;
+ 
+ int ixp46x_ptp_find(struct ixp46x_ts_regs *__iomem *regs, int *phc_index)
+ {
++	if (!cpu_is_ixp46x())
++		return -ENODEV;
++
+ 	*regs = ixp_clock.regs;
+ 	*phc_index = ptp_clock_index(ixp_clock.ptp_clock);
+ 
+
+---
+base-commit: 05f7e89ab9731565d8a62e3b5d1ec206485eeb0b
+change-id: 20260116-ixp4xx-fix-ethernet-4fa36d900ccc
+
+Best regards,
 -- 
-2.53.0
+Linus Walleij <linusw@kernel.org>
 
 
