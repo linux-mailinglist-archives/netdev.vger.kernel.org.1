@@ -1,187 +1,171 @@
-Return-Path: <netdev+bounces-259578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259579-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OF2BJadjl2mnxgIAu9opvQ
-	(envelope-from <netdev+bounces-259578-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 20:25:27 +0100
+	id kPMSANVjl2n/xgIAu9opvQ
+	(envelope-from <netdev+bounces-259579-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 20:26:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1881161F62
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 20:25:26 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34BEB161F98
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 20:26:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9AFA9301FD42
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 19:25:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CDC4C301FD48
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 19:26:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46703009E4;
-	Thu, 19 Feb 2026 19:25:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61DEE3009E4;
+	Thu, 19 Feb 2026 19:26:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="o14AFEFW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yx9I7kXA"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D794FC8E6;
-	Thu, 19 Feb 2026 19:25:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DBF23009DA;
+	Thu, 19 Feb 2026 19:26:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771529122; cv=none; b=c6NSGjvmNlGnNQE31Ay3GBwMTd7ZsQw3cUQ320vvrL2GzCjpC7S6SsV/yYDXdO0GWodZfFbYicjC7IIhvvTAZdUhLAlOQGyZ5QQ3/CPEVYkkfGvNGz7Lr0lx1smKSSG6QZAM37VNt1Y0QzllRLkGzUJMz6087S4RL6CBbPXNFnE=
+	t=1771529169; cv=none; b=fafviTTRseIdoYY5FTQAh3qUo1p0i2Vo2VTAp0EVVlm4pEvYl715mV55897L3dJeLQU0Oputx6w3S8SlFVLL4qORSAWcKtm+Q+3xNRM32/HX/DRI0lGkuZvxrWKqx2TLE+sek6adeAxogwmFP1sZuQ4RKZAmYx2YoJOJ807yZcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771529122; c=relaxed/simple;
-	bh=5wXfDNgjYs99AmeEzQZ7yzbacQJewjjR6R0dgn3B7qg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cP+vs4yocGfKcNfsc0XPXW+sNQeeQ7kUi25QocSg3X/aLY59b09krHtN8yDt6P8um4+wOoosvc4Evdk9WVhUVuIMX2qm8aoastLYLK69BYV5ifabmG/ZR9OVz12NuD+z8qt16+Z2A8DsWNSQT4e3dcs+XHh7t3QaGbYl2l5j6aM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=o14AFEFW; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=dPP/cIarqO1P9h9eWlYa372Rs/GIxWfK5Giq5Q6Jtr8=; b=o14AFEFWgr4pXheJHwdZbvcLVX
-	H7IWEeMLSvtYiqinwiXG68B+CxFS5PshaScxPl5Kc/wg4ZXrMcK+OZsRvuW/O2pNbPNPZLTEZvTe5
-	YL2XTPxup0UUF0P34vmXe3UZkj/ZChdsE+KslfVEM7eS/hb1UNw//4S/P0dpenrlFIvPfR/DZDZBo
-	ceRP++HlA46ZXqXNlGFBfDAq4MMA/Mo5LV3WHNSBPe9n3DE0QRAUAxTTsTx5vFd4r8xAtKEiTHHqv
-	yI1ViidDr/qHM031HgJ4BqBvEUVNNd7LAtsMkce2iVxNSkQMoXFXjWMMtpq8vrEeC10MX+W9ikSKm
-	wisGstpA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46806)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vt9e9-000000001EC-0CuB;
-	Thu, 19 Feb 2026 19:25:09 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vt9e5-000000003ZS-1kp1;
-	Thu, 19 Feb 2026 19:25:05 +0000
-Date: Thu, 19 Feb 2026 19:25:05 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Linus Walleij <linusw@kernel.org>
-Cc: Christophe Roullier <christophe.roullier@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/3] net: stmmac: restore pinctrl when driver remove.
-Message-ID: <aZdjke4eOwF-wTZO@shell.armlinux.org.uk>
-References: <20260218083618.67805-1-christophe.roullier@foss.st.com>
- <20260218083618.67805-3-christophe.roullier@foss.st.com>
- <aZV-b6TdLMdI8dm4@shell.armlinux.org.uk>
- <CAD++jLnF=8MvW4CbXmPZR=w8tAUZiL9M3N73WB++DaYYwhToDQ@mail.gmail.com>
+	s=arc-20240116; t=1771529169; c=relaxed/simple;
+	bh=PTKkIMAlwKAGtkr6LyPwtmF/MhXnT370tTbyI0Iohk4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kU61+QGtjbQ0cwjD6a+DR1AiCwviuU7MBM7HelmsllhTfkq8acUP12t4kA31k9Sc5qD8J/An7KBc1mAWcsSHCSwvmxZxI5OJ9MowzZ69VD9wXJVteJIrvF2u1Jcn62JaS9V4hCpNzMvzRu+IN+SO71Feo1kRrpFBYq4rTE/1ZAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yx9I7kXA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA48EC4CEF7;
+	Thu, 19 Feb 2026 19:26:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771529169;
+	bh=PTKkIMAlwKAGtkr6LyPwtmF/MhXnT370tTbyI0Iohk4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Yx9I7kXAhmB2EQs5y1PwFYMCT5n30/pZ7JQ2JHuqbz7UJOiDZ4uSAT6718s7AxkBn
+	 tgDZvQ4RxNWbGDxXf53AfKmri2R5JJM4EdAHURw6+fVBduQ5C7dskzStg2fFNd+hTY
+	 A1Ya5gvo5Uy87htCS8kC+AdtVodfvG+YOFZ/SduYWA6jynipwaaO7P5dN0l0pIe1Da
+	 Y/amdAsUCrjXVP8Vu/WtH1+OfPAD4RslKQFAhRSf9hZpfUNgChE+MFPLgQDtcIb/2s
+	 t/5anxyfULxxfk2XJ2JinozhaXZEIb7r1Efjfw2T7KRKOz0UGQeNbMPe10aVgE2hvg
+	 AoaskTW7Efo0w==
+Message-ID: <0248ef7e-0274-46d6-94aa-b3725e29e52f@kernel.org>
+Date: Thu, 19 Feb 2026 20:26:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAD++jLnF=8MvW4CbXmPZR=w8tAUZiL9M3N73WB++DaYYwhToDQ@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH iproute2 1/2] mptcp: monitor: also show iface name
+Content-Language: en-GB, fr-BE
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+ mptcp@lists.linux.dev
+References: <20260211-mptcp-color-v1-0-01832777611d@kernel.org>
+ <20260211-mptcp-color-v1-1-01832777611d@kernel.org>
+ <20260218103155.486d20ee@phoenix.local>
+ <a44c1f27-e9f0-4f33-beda-e5f611197e35@kernel.org>
+ <20260219091101.551377a9@phoenix.local>
+ <1f81c7c3-59ee-43ee-93f9-771015a2752c@kernel.org>
+ <20260219112220.6576b50d@phoenix.local>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20260219112220.6576b50d@phoenix.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259578-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[foss.st.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,bootlin.com,nxp.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259579-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	HAS_ORG_HEADER(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.983];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_THREE(0.00)[4];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:url,armlinux.org.uk:email]
-X-Rspamd-Queue-Id: D1881161F62
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 34BEB161F98
 X-Rspamd-Action: no action
 
-On Thu, Feb 19, 2026 at 08:11:13PM +0100, Linus Walleij wrote:
-> On Wed, Feb 18, 2026 at 9:55 AM Russell King (Oracle)
-> <linux@armlinux.org.uk> wrote:
-> > On Wed, Feb 18, 2026 at 09:36:17AM +0100, Christophe Roullier wrote:
-> > > when system suspend or unbind, need to set pins
-> > > to low power state to save IO power consumption.
-> > >
-> > > Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
-> > > ---
-> > >  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 +++
-> > >  1 file changed, 3 insertions(+)
-> > >
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > index 067b17f03cd09..3d4f0e4cb53fb 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > @@ -8071,6 +8071,9 @@ void stmmac_dvr_remove(struct device *dev)
-> > >       mutex_destroy(&priv->lock);
-> > >       bitmap_free(priv->af_xdp_zc_qps);
-> > >
-> > > +     /* Select sleep pin state */
-> > > +     pinctrl_pm_select_sleep_state(dev);
-> > > +
-> >
-> > I'm not convinced this is correct, there's nothing to match it in the
-> > probe function, except what the driver model core does. However, the
-> > driver model core also doesn't clean up the state if probe fails.
+On 19/02/2026 20:22, Stephen Hemminger wrote:
+> On Thu, 19 Feb 2026 18:38:51 +0100
+> Matthieu Baerts <matttbe@kernel.org> wrote:
 > 
-> I think it looks right, if this state is indeed for the sleep state of the
-> device pins, and this is what you want to happen at remove().
+>>>>> Please fix the whole function.    
+>>>>
+>>>> Doing that would likely break scripts parsing 'ip mptcp monitor' output,
+>>>> are you sure we should still change this output format?  
+>>>
+>>> I doubt scripts are parsing this weird format. That is one more reason for JSON  
+>>
+>> Not as weird as 'ss -i' format where there are even more scripts parsing
+>> that :)
 > 
-> The non-cleanup of the pin states is a (maybe ugly) feature: there
-> is an "init" and a "default" state. If the "init" state does not exist the
-> "default" state is selected in the dd.c call.
-> 
-> These states are just some values in dev->pins, allocated with
-> devm_kzalloc(), and devm_pinctrl_get() for e.g. dev->pins->p,
-> so IIUC this will befree:ed on driver detach,
-> also if the probe() fails, at least that is what the original devres
-> design document says
-> Documentation/driver-api/driver-model/devres.rst
-> 
-> There is really no other cleanup that can happen: there is no
-> before-default-or-init state we can revert to (that would be the
-> power-on values), so there are just these states in some pointers
-> that could be accessed by e.g. pinctrl_pm_select_sleep_state()
-> that get free:ed up, and muxing and pin config that happened
-> in the pin control hardware just stays around.
+> Agreed ss is a RFM.
+> I did take a shot at doing JSON there (with some help from Claude), just haven't gotten back to it.
 
-What we seem to end up with is that on probe failure, we set the pins
-to init or default state. However, on remove, it's up to the driver to
-decide whether to put the pins into sleep state or not.
+That would be great to have! Thank you for having started!
 
-Shouldn't a driver be consistent, and place the pins into the same
-state in both these scenarios?
-
-Conversely, I'm slightly worried that putting pins into sleep state
-when we're not powering down may be bad if they're allowed to then
-float, which could cause the PHY to interfere on the network.
-
+Cheers,
+Matt
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Sponsored by the NGI0 Core fund.
+
 
