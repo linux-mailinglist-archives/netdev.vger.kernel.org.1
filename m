@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-259539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259540-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4DKYLA9Ll2m2wQIAu9opvQ
-	(envelope-from <netdev+bounces-259539-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 18:40:31 +0100
+	id COaIASxLl2m2wQIAu9opvQ
+	(envelope-from <netdev+bounces-259540-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 18:41:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3148016151B
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 18:40:31 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77070161548
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 18:40:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ED9D9300E3E2
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 17:40:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 08478303A3CB
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 17:40:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 816EA350283;
-	Thu, 19 Feb 2026 17:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C678352926;
+	Thu, 19 Feb 2026 17:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xe/rAFv0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uZr5Kzdd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D29E34DB7B;
-	Thu, 19 Feb 2026 17:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 692D9350D5F;
+	Thu, 19 Feb 2026 17:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771522826; cv=none; b=Ys6M5L6UKduEItTsCl/xHCOOeFjT+I1KgfPN79apVlbzef5+Fbq3DRxe5ZGGWpa6VLmojd1VzAi03yFlxCJRjcRyq2sHUAEmGS7yOpsGZXsAr5fUPsWaz5q43YCVHT2S5jf3wvjqmily2tEZg2ZRCei1Ejf8uom0uCsL776B/DM=
+	t=1771522827; cv=none; b=imgB645m7Lb8mybluNE6hEUenQZvYFgVVxEHelSenTTu2vzBjiq8FMsk4SIhW0M9oyGf0SqZULnRcwqTbOYNVTb2WPv2qonNIvIBDcU0gVp85Iey+RJ6kaOxoSeG7E8/87R5HhBUjW7i7Gdr8w41IB3s7HKluQWec1GrFH0nn6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771522826; c=relaxed/simple;
-	bh=K52d2zJMFf3z16p2U8f9apBmP5al2DYkLQOxG/9VQtk=;
+	s=arc-20240116; t=1771522827; c=relaxed/simple;
+	bh=lV/twQnYR6xhX7VxT/ix240QX+Hupfle+GMbus/3P5A=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=W3/q+lJYuh+pjuyR1a4KEANkqDzVro5B46WDGv5GOyUCezRVOTT32ynUDGho2d7OOn2qH0PTtuuPiL2WHJAQAZ3+eVdQ/LIDEvy+cc1gEC9VaLWhCI6ndeaKDPtRVNSWIJ306w2NQWZXc+nSWMl03VAUgBkB/+ublDirXOt2+r0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xe/rAFv0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFEFAC4CEF7;
-	Thu, 19 Feb 2026 17:40:25 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=szx6hs5oJPf6uOPcFtO6zWyoP9/VKm0lloSzLfLhDqdyrGjpfpCNyiFBIE+ZctnQ4P2YGiRnJaX3KCi3CQCRSzFHd2LQiK7tXVCkSHV1mkqZ11ftEv5qwzBmJu0CbCkqbD5stXgB2Y1tyS+HX8nHe+sGeO56qWMsGcwBLZV8Eb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uZr5Kzdd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20120C4CEF7;
+	Thu, 19 Feb 2026 17:40:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771522826;
-	bh=K52d2zJMFf3z16p2U8f9apBmP5al2DYkLQOxG/9VQtk=;
+	s=k20201202; t=1771522827;
+	bh=lV/twQnYR6xhX7VxT/ix240QX+Hupfle+GMbus/3P5A=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Xe/rAFv0SJoQMrAaJzDyUvhaCGLHJkrOibK2vzUsuBhk2S8phvhGV+Fnuyfyzc293
-	 vAnteCrDUGbVZxDHf8hSjaJBwVfIPo01NEpJjdueBTnJ1EdJ4crjr+kjhwSGh73EhD
-	 pkJxnVz8U7+rAIe0uL+9KDbUbbXxwQgLnPqgDtB0nbyxamiJlroBnlospyI0Q0GhvR
-	 C7o/RRdGDmxmL8u3bayHVRXJ5LQg6S3Pd+2TcrCjF8J0ln3i5udyYYvBfRcyh8xNvd
-	 bxdFup6yk0AzjGDtTFw0lJ0aUAPwHa7/x1cZz5efXhz57D95+PvBwNMczO96NoWoeY
-	 VDBjGFLdZeBRw==
+	b=uZr5KzddzoPSQS3PjuS5ihTzwFXE+2757Otd7o8s+4MdYs4ZllAGiIvSXrnYzSz3y
+	 5FRn06UJCWp2bMKdu0JJd3D32HRfzxkCokGMJXziSvsuEi+70x/SRKM8iFnRQ6xOuH
+	 HkxxtgW50JERQW6/JFrGLuXIqI8JyY0nlZtdoBbs4DydoqXs1Qvjs7cdAqg/OxYGli
+	 7XralgC/iERSWshsHqz9eaEzEkMajwlATsQPB+zV26vy6AWELmKfTXYlRdS0QzlfOp
+	 nP/f47SpuAPFH69oXXzSknaymH0i8q2RtSzaCDFHQqHIkda61B+VmcUv4wVFe3vYmt
+	 u8tR9EpuXO5Ag==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 0B2A5380CEF3;
-	Thu, 19 Feb 2026 17:40:18 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 48369380CEF3;
+	Thu, 19 Feb 2026 17:40:19 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,71 +55,80 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v6] net: nfc: nci: Fix parameter validation for packet
- data
+Subject: Re: [PATCH net V2 0/6] mlx5 misc fixes 2026-02-18
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177152281658.2317554.15811337395929240239.git-patchwork-notify@kernel.org>
-Date: Thu, 19 Feb 2026 17:40:16 +0000
-References: <20260218083000.301354-1-michael.thalmeier@hale.at>
-In-Reply-To: <20260218083000.301354-1-michael.thalmeier@hale.at>
-To: Michael Thalmeier <michael.thalmeier@hale.at>
-Cc: deepak.sharma.472935@gmail.com, krzk@kernel.org,
- vadim.fedorenko@linux.dev, horms@kernel.org, pabeni@redhat.com,
- kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- kernel@0x83.eu, michael@thalmeier.at, stable@vger.kernel.org
+ <177152281807.2317554.9342671396219500693.git-patchwork-notify@kernel.org>
+Date: Thu, 19 Feb 2026 17:40:18 +0000
+References: <20260218072904.1764634-1-tariqt@nvidia.com>
+In-Reply-To: <20260218072904.1764634-1-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
+ leon@kernel.org, mbloch@nvidia.com, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com,
+ moshe@nvidia.com, jacob.e.keller@intel.com
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259539-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,linux.dev,redhat.com,vger.kernel.org,0x83.eu,thalmeier.at];
+	TAGGED_FROM(0.00)[bounces-259540-lists,netdev=lfdr.de,netdevbpf];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_NO_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3148016151B
+X-Rspamd-Queue-Id: 77070161548
 X-Rspamd-Action: no action
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 18 Feb 2026 09:30:00 +0100 you wrote:
-> Since commit 9c328f54741b ("net: nfc: nci: Add parameter validation for
-> packet data") communication with nci nfc chips is not working any more.
+On Wed, 18 Feb 2026 09:28:58 +0200 you wrote:
+> Hi,
 > 
-> The mentioned commit tries to fix access of uninitialized data, but
-> failed to understand that in some cases the data packet is of variable
-> length and can therefore not be compared to the maximum packet length
-> given by the sizeof(struct).
+> This patchset provides misc bug fixes from the team to the mlx5
+> core and Eth drivers.
+> 
+> Thanks,
+> Tariq.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v6] net: nfc: nci: Fix parameter validation for packet data
-    https://git.kernel.org/netdev/net/c/571dcbeb8e63
+  - [net,V2,1/6] net/mlx5: Fix multiport device check over light SFs
+    https://git.kernel.org/netdev/net/c/47bf2e813817
+  - [net,V2,2/6] net/mlx5e: Fix misidentification of ASO CQE during poll loop
+    https://git.kernel.org/netdev/net/c/ae3cb71e6c4d
+  - [net,V2,3/6] net/mlx5: Fix misidentification of write combining CQE during poll loop
+    https://git.kernel.org/netdev/net/c/d451994ebc7d
+  - [net,V2,4/6] net/mlx5e: MACsec, add ASO poll loop in macsec_aso_set_arm_event
+    https://git.kernel.org/netdev/net/c/9854b243ce42
+  - [net,V2,5/6] net/mlx5e: Fix deadlocks between devlink and netdev instance locks
+    https://git.kernel.org/netdev/net/c/83ac0304a2d7
+  - [net,V2,6/6] net/mlx5e: Use unsigned for mlx5e_get_max_num_channels
+    https://git.kernel.org/netdev/net/c/57a94d4b22b0
 
 You are awesome, thank you!
 -- 
