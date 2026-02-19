@@ -1,168 +1,164 @@
-Return-Path: <netdev+bounces-259523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259524-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6D36L0lEl2kiwQIAu9opvQ
-	(envelope-from <netdev+bounces-259523-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 18:11:37 +0100
+	id 4CmSDudEl2lMwQIAu9opvQ
+	(envelope-from <netdev+bounces-259524-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 18:14:15 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E0B3160FA9
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 18:11:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FB58161034
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 18:14:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 51D37302E404
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 17:11:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AD5E2303298F
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 17:13:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0115834D393;
-	Thu, 19 Feb 2026 17:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BB4634DB5F;
+	Thu, 19 Feb 2026 17:13:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="bBUzQIfi"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jsOLrC1k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6872734CFD7
-	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 17:11:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93C43343D64;
+	Thu, 19 Feb 2026 17:13:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771521067; cv=none; b=GP2Qe2Ia4r0RwUZz2unJhB3L5i1mcfuSr5htzZkZFNRwv0Z2cGdF7VkD5LQWE7fhUIXLLGXTTxC/78JXhvauLsChnv5NFnq0PAPlfrECki1dkFp7U/rfuEqBBv+KQ/r38VQyA+iVL66JdTfL0h9jyPOXooXgQfFzG0chKNXSBy4=
+	t=1771521198; cv=none; b=SD7n7fDgIAazWE+f+HZqKUvzfOlxKKuSOwtIDL6w+NFcsNGnYEq4gmJmVUyxUtE3vzCbFneC0EMxLWblfY8Zr1QsBYYND/biRxI8JM0SFbx33VoG7mczu2cZIBpH00oEWGkP/bBmc9ik0mNw2l04scurZFRP3qT5FOyP8LEDlc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771521067; c=relaxed/simple;
-	bh=p+0yoUYOgqdCSsNYmHj7zM+lo5ChPaixfv+pRNVOGdU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Fh/c827xyiYWREsGTWFqtgOGJCuNqMRH+pBENZYcZT0MJWfQZjSeRvw1v1gSFZtT9sj8x5hQ8WKJ8RpUi4qeJogRpKQNrymw+0Q++k+PW0Cu54jfjnWQxR5ZVFC0qiQiWedE6mc5UunHAefqaIca/eHQOmU9vBVQGZ+YxidQIbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=bBUzQIfi; arc=none smtp.client-ip=209.85.160.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-413d8b8e98aso505615fac.3
-        for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 09:11:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1771521065; x=1772125865; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dyrjZBaOYWnsTcDoFAVLra9VVv9NrS1xfuVC945Eoh4=;
-        b=bBUzQIfiAbbIMume12l3+0XQL1Dc1qJNDs28T8gU/j1601zRk63JiPYRBrk14T2lpJ
-         XCr+o4VN0MpvsHKXco0qXacrrIcaMrf7wSUfJVPi6M+2+PNIeZO9qssDkcwpFyD7caNp
-         qnnrlg1h1FiLf3dJ7ccslCL20xgtFLSV1xTfpYWO6iJIJu+ajAlU//gesRoVwVI4McTQ
-         6kJhkuXDjE/aQYhM+xwpK65boHANaeFMgsyZBambHTWBirblqYPrwNKLZu3yjG45XtTo
-         gl2FSLeGkY72xlH8+h83Hu1WG57xrdLgKWovzJYiC7QosJMoI1JqZsyyMhX4e/UUakkf
-         SBgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771521065; x=1772125865;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=dyrjZBaOYWnsTcDoFAVLra9VVv9NrS1xfuVC945Eoh4=;
-        b=Zdf4Z6LcmMs9ykdyKSzNZpcFhACc6swIpmfTMOxMw1n95+7Dw0qd44B9NjHdP7JgZH
-         OpX+O7AmHgjEm7Xy3901SIHTKstYeRUi3829AByJXPGSAet/XhWtEY8kRw6qQCfeToTn
-         ZmE7yJ+3sL1EBgrH4YZcJTonikIPnLIWQQ4uZ1b8dnHup0Ql1IVjIR6r4TEILsAlRBVA
-         ekWEJsHPxhdgbR+5PaVXn9WEGZFPLZn2EebK5hsNMFiv/Yk0l3FLlX8530D+bc4MvVFp
-         1ywXnYEf+OPJahWDHwfLXjqMlxTPwLU3Z/kQuu5jqHn8UVw1CYJLGuTdl3X4EguhGD8y
-         YZCA==
-X-Forwarded-Encrypted: i=1; AJvYcCV5+lsSQVHrqDJ0sa4DcK4aFO0XbeMLV0WHTb4DYlceGHdDN2JrOAPS+21nu9FGQLzojG12lHo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxsmznc2eCxoXZ/M9HympXul3xMNEStp+jYN9OZ7GBtSH1boSlI
-	WVd33NLOyImBO/7/ZtYTUi8BIltSbHAT8UUC1Ze3BJ7dKGYTPWj4Bc47tHA4CHFIZneeOXgJz9R
-	8Jb3W
-X-Gm-Gg: AZuq6aJ5gcl2nzSRhNwFHUVHTKS3Ps7KsUhXOoEF3ls6QIeLp3WjzclPdm2XaZOI4Wr
-	WiE//TiLy4OohMVaRA65VX/Z4B09pDcI/LyONxRmvbhKkbxhuDpobqzn2nd6zPJ5d7/MvISZpmA
-	zhWCizlGnyINU/XBZ3m2Gq3SjIvaUySrFhE4OexnjjqA3kcfTa6+b6AP3LuSkn4ZWdeaLy8gso1
-	n8rNmpdGabrOWodnPkKrU/wGhddW4qxMOihR/E8fAn170oKgm4/bWIgxwfofvw1d77C/GTIZ9Up
-	Px0EhXvYQ2RooopPk5Skoy8FsdSINzSww1UgPXBhrpCW6U/Fbni9YDAYKs5NiXaVMajZ1HgNV+s
-	XrskL2HrHrhIrv3MylK8DMKkoa8zXpxifiAgrJMAGnqO9bB47evooWF5QkZpn329wfab5Uc34d6
-	WcYDj8vmMG4fE2wxG2y+GVPlyvBruLIdxCl4Rcn9p+XSnStamsUYM8SSdzylqI8vpZ
-X-Received: by 2002:a05:6871:7508:b0:3fa:df3:b198 with SMTP id 586e51a60fabf-40ef3b771famr12402059fac.3.1771521064925;
-        Thu, 19 Feb 2026 09:11:04 -0800 (PST)
-Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-40eaf178c1fsm24492608fac.17.2026.02.19.09.11.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Feb 2026 09:11:04 -0800 (PST)
-Date: Thu, 19 Feb 2026 09:11:01 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
- mptcp@lists.linux.dev
-Subject: Re: [PATCH iproute2 1/2] mptcp: monitor: also show iface name
-Message-ID: <20260219091101.551377a9@phoenix.local>
-In-Reply-To: <a44c1f27-e9f0-4f33-beda-e5f611197e35@kernel.org>
-References: <20260211-mptcp-color-v1-0-01832777611d@kernel.org>
- <20260211-mptcp-color-v1-1-01832777611d@kernel.org>
- <20260218103155.486d20ee@phoenix.local>
- <a44c1f27-e9f0-4f33-beda-e5f611197e35@kernel.org>
+	s=arc-20240116; t=1771521198; c=relaxed/simple;
+	bh=KQyrX/4nRonuD7ep0S1AQdj+eEhngN9HecBFazReEtI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sq7aM2zOQ5ipb18jBQkGvxFfHXm+BOubjF46H37ytXkP0dJF8vLXtAykSYzwj9MIXZnXiHnpn5QQg6vEBo2jbY+vfsanYk8ysKCWuQJIXVFanUnNibSZfdbBiY8iDXI6Bd3n0WQ6nim2SNMSPIwQQJ0FlQRIcNUZyX+rua64j/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jsOLrC1k; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Kwii5PhtQiDgJHBhdr912xjePXvLsCHh353/wV7cYNw=; b=jsOLrC1klsYiofgUAhVpkNCnez
+	VZPlheTJJPdgMK15EUbUT+LjW22MJLr1CvUwPVhgqaP5Rxy8vkuWaoJQrqbEk4yGIX7VDLNZc6GNb
+	OcTcqhOA8OVQxpFzfcnLCNtd9111J+q8tnsAiBnW3STXw/1rHOYYZm9reZ8CNi+anCnaUZOlX/ke1
+	PPmx5NYHvPiWntCTNS8Oxh10GwHnaBf8TiRQqclGVB70QCLldiReOPiezJwxH25VYvS4J8C8g1bDO
+	1OdviJBoWCDhBe7GDt3GiFaGgWK+UDkEHuyKeBgkjpbKsCjfyb3ysz+YwK9y647xiPZq/TPL+9wry
+	up+kkjzQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42212)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vt7aM-0000000017F-4C31;
+	Thu, 19 Feb 2026 17:13:07 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vt7aI-000000003Um-3jR3;
+	Thu, 19 Feb 2026 17:13:02 +0000
+Date: Thu, 19 Feb 2026 17:13:02 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Charles Perry <charles.perry@microchip.com>
+Cc: netdev@vger.kernel.org, Sean Anderson <sean.anderson@linux.dev>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/2] net: macb: fix SGMII with inband aneg
+ disabled
+Message-ID: <aZdEnm9Vlb41T_DT@shell.armlinux.org.uk>
+References: <20260219170113.1774090-1-charles.perry@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260219170113.1774090-1-charles.perry@microchip.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.56 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[networkplumber-org.20230601.gappssmtp.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[networkplumber-org.20230601.gappssmtp.com:+];
-	TAGGED_FROM(0.00)[bounces-259523-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259524-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.965];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,phoenix.local:mid]
-X-Rspamd-Queue-Id: 0E0B3160FA9
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[shell.armlinux.org.uk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8FB58161034
 X-Rspamd-Action: no action
 
-On Wed, 18 Feb 2026 20:03:20 +0100
-Matthieu Baerts <matttbe@kernel.org> wrote:
+On Thu, Feb 19, 2026 at 09:01:11AM -0800, Charles Perry wrote:
+> @@ -574,6 +574,25 @@ static int macb_pcs_config(struct phylink_pcs *pcs,
+>  			   const unsigned long *advertising,
+>  			   bool permit_pause_to_mac)
+>  {
+> +	struct macb *bp = container_of(pcs, struct macb, phylink_sgmii_pcs);
+> +	unsigned long flags;
+> +	u32 old, new;
+> +
+> +	spin_lock_irqsave(&bp->lock, flags);
+> +	old = gem_readl(bp, PCSANADV);
+> +	new = phylink_mii_c22_pcs_encode_advertisement(interface, advertising);
+> +	if (new != -EINVAL && old != new)
+> +		gem_writel(bp, PCSANADV, new);
+> +
+> +	old = gem_readl(bp, PCSCNTRL);
+> +	if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED)
+> +		new = old | BMCR_ANENABLE;
+> +	else
+> +		new = old & ~BMCR_ANENABLE;
+> +	if (old != new)
+> +		gem_writel(bp, PCSCNTRL, new);
+> +
+> +	spin_unlock_irqrestore(&bp->lock, flags);
 
-> Hi Stephen,
-> 
-> Thank you for the review!
-> 
-> On 18/02/2026 19:31, Stephen Hemminger wrote:
-> > On Wed, 11 Feb 2026 13:03:17 +0100
-> > "Matthieu Baerts (NGI0)" <matttbe@kernel.org> wrote:
-> >   
-> >> @@ -530,7 +541,7 @@ static int mptcp_monitor_msg(struct rtnl_ctrl_data *ctrl,
-> >>  	if (tb[MPTCP_ATTR_TIMEOUT])
-> >>  		printf(" timeout=%u", rta_getattr_u32(tb[MPTCP_ATTR_TIMEOUT]));
-> >>  	if (tb[MPTCP_ATTR_IF_IDX])
-> >> -		printf(" ifindex=%d", rta_getattr_s32(tb[MPTCP_ATTR_IF_IDX]));
-> >> +		print_iface(rta_getattr_s32(tb[MPTCP_ATTR_IF_IDX]));
-> >>  	if (tb[MPTCP_ATTR_RESET_REASON])
-> >>  		printf(" reset_reason=%u", rta_getattr_u32(tb[MPTCP_ATTR_RESET_REASON]));
-> >>  	if (tb[MPTCP_ATTR_RESET_FLAGS])  
-> > 
-> > 
-> > The whole monitor message output format here is divergent from what other
-> > iproute2 commands do. If you look at ip monitor there are no '=' signs
-> > in the output.  
-> 
-> Indeed, the output is different from 'ip monitor' (but similar to 'ip
-> ioam monitor').
+What purpose does the spinlock serve?
 
-IMHO ioam monitor is outlier as well. Should have seen that during review.
+phylink will call this under the phylink state_mutex lock, which will
+guarantee that two threads can't execute this code simultaneously.
 
-> 
-> > Please fix the whole function.  
-> 
-> Doing that would likely break scripts parsing 'ip mptcp monitor' output,
-> are you sure we should still change this output format?
+>  	return 0;
+>  }
+>  
+> @@ -628,22 +647,6 @@ static void macb_mac_config(struct phylink_config *config, unsigned int mode,
+>  	if (old_ncr ^ ncr)
+>  		macb_or_gem_writel(bp, NCR, ncr);
+>  
+> -	/* Disable AN for SGMII fixed link configuration, enable otherwise.
+> -	 * Must be written after PCSSEL is set in NCFGR,
+> -	 * otherwise writes will not take effect.
 
-I doubt scripts are parsing this weird format. That is one more reason for JSON
+This looks like a key piece of information that is being removed from
+the driver. Might be worth keeping it as a note that macb_pcs_config()
+will be called after PCSSEL has been set in NCFGR?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
