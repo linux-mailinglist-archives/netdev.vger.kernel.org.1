@@ -1,174 +1,115 @@
-Return-Path: <netdev+bounces-259393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259394-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id db+KD8BtlmnrfAIAu9opvQ
-	(envelope-from <netdev+bounces-259393-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 02:56:16 +0100
+	id aJnmNVR2lmkIfwIAu9opvQ
+	(envelope-from <netdev+bounces-259394-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 03:32:52 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BB6015B72E
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 02:56:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C03215BBEB
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 03:32:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7C80A3037EEA
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 01:56:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6B941303C628
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 02:32:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02897242D97;
-	Thu, 19 Feb 2026 01:56:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D8EE26F2B9;
+	Thu, 19 Feb 2026 02:32:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L9ZlxRlv"
+	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="oW89b9MV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-05.mail-europe.com (mail-05.mail-europe.com [85.9.206.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D38CC29A1
-	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 01:56:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA4C272816
+	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 02:32:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.9.206.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771466172; cv=none; b=RRlviCF5/O7BGzwZ5SadF0LQeq9tC2bKFSfqxml/9i+IgY1LfaBEY2RTiT8mx0JwVfMP8nbyMofD/pm4ZpbGRbUHW7i+VQXOlwFOThlsBJrMXZonPp62cxKZz/1Y20Q3zvz7fDtQNco5axQaBNU1rtALn+6kU/Rg4CIw8zMMEpY=
+	t=1771468345; cv=none; b=VnhvOqktUJS7pIce2B2hVqIGI9PrWl7c8zuTzaAWPYf2Ld9AtbbW/9XmZXztMW4A+1mX4PMis3Ns0FdQ+fs6bHcJEpKDr/QIKcuSCNd0+bYMip0+hGzq2KekaiiRKzkZ9DCy9qrho6o/kTJouz+jQOY9jyN8iEDjuXxBON5j4qY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771466172; c=relaxed/simple;
-	bh=1Zr6zn+t9zQ5uzbiKux522mMCUA2Rat4glkGMdEmA08=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LpuwBvswr3TdIbL1ebYcJrwLbcK/uVRd9iLRZGQFclNytBbqQ6s4xqr72Gk/5YlasgS4TNDavYmAgm2BwF+fqbRmoU5aaHuh92t3LNTrFmtvA+W/M+x4I9mmYy475QQlOhl3vV94Fzyt5uMIKnrnDV679JCyHpMvIcI1N4pCLb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L9ZlxRlv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1546FC116D0;
-	Thu, 19 Feb 2026 01:56:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771466172;
-	bh=1Zr6zn+t9zQ5uzbiKux522mMCUA2Rat4glkGMdEmA08=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=L9ZlxRlvz0gAOZGndoAcQUAbNGoc5Q9zhtBuFJkAIHxh1L1Jv/FBiFF76MfUQM3Aw
-	 89I3FUKMAr5o5rDoqEo0Yq42gqco77Ar949v8QnSr3QAXQ+sIf5BO3xYo7vi68m4Ob
-	 DIA1HnzeGlYbeoO1VzQT1DJi74bXc5IOiUVjK9n0K9Yu8JzpKRMA1uRpxbuHb8bWJw
-	 r4hT94HN4u7ObB2Q20El1jUv3Nhhh4mlwpEE3L41SEu/cbx3k37o5ifGShwMgkdiF9
-	 pBOrIO7mrMujacO8qaL+4x4dRz97BjHA1KiPiJ0dXLSnOoIInkMuz3pqurNraYt9Y8
-	 oX8g2cD/+st+g==
-Date: Wed, 18 Feb 2026 17:56:07 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Riana Tauro <riana.tauro@intel.com>
-Cc: intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
- aravind.iddamsetty@linux.intel.com, anshuman.gupta@intel.com,
- rodrigo.vivi@intel.com, joonas.lahtinen@linux.intel.com,
- simona.vetter@ffwll.ch, airlied@gmail.com, pratik.bari@intel.com,
- joshua.santosh.ranjan@intel.com, ashwin.kumar.kulkarni@intel.com,
- shubham.kumar@intel.com, ravi.kishore.koppuravuri@intel.com,
- raag.jadav@intel.com, Zack McKevitt <zachary.mckevitt@oss.qualcomm.com>,
- Lijo Lazar <lijo.lazar@amd.com>, Hawking Zhang <Hawking.Zhang@amd.com>,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH v7 1/5] drm/ras: Introduce the DRM RAS infrastructure
- over generic netlink
-Message-ID: <20260218175607.711ffd2c@kernel.org>
-In-Reply-To: <20260218121904.157295-8-riana.tauro@intel.com>
-References: <20260218121904.157295-7-riana.tauro@intel.com>
-	<20260218121904.157295-8-riana.tauro@intel.com>
+	s=arc-20240116; t=1771468345; c=relaxed/simple;
+	bh=c7Ok8iXOfSYz4v4jJ7U6j6p+rRUgu075WEHNkvllUf8=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=DXvUh1Pouk9X2F86gDcQYqyo6irUBVVjWFcsfusllU0ky1k7fTxESzTHQTn78mp4yvlflSq1W465Dn0qy7NQvl8nD1RLH8ksbhePcQU7Z0Y2Z7ywIgV1Fj/TbeRIMfMkzbMQojSoRdrEtjVRTVnc73VNmqxQNGApGmkTKTPPgIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=oW89b9MV; arc=none smtp.client-ip=85.9.206.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
+	s=protonmail2; t=1771468327; x=1771727527;
+	bh=1YjamJ6ylCdZhUudRHXFxvvo6UfDwTK/0lEPw8J6C+I=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=oW89b9MVIgvCV+UkzcJmU81WPKRNbuRda5aKQVOuw7DwMcOm2SwTBdNtZdKM0eH1t
+	 oo9U2GRjUaFk0rB3XWdOozUkusjTRgKgX867Xlp2qsHATWS89c88baObKKETrv8Rus
+	 83f5sweBktGuWRXvnNyDB2xk86pVjmC4Z/UzIDrhISijUdfuWDKxH1TH/0NVHbrzKm
+	 Azw2jcq95tGHn0Sy7I8TkJNv8QnTDKxA/plRHejxNVCgJPXzFUNyFowrv7WbyNPi/E
+	 hpdV1YkuO8Yr//11Pjk+jW6c6PVothpmWRkUuueNLDowEEljdL9IM9VhDk3XBTIUGa
+	 G0B61ftW9DI8A==
+Date: Thu, 19 Feb 2026 02:32:02 +0000
+To: Victor Nogueira <victor@mojatatu.com>, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>
+From: Paul Moses <p@1g4.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Paul Moses <p@1g4.org>
+Subject: [PATCH net v7 0/1] net/sched: act_gate: snapshot parameters with RCU on replace
+Message-ID: <20260219023151.171753-1-p@1g4.org>
+Feedback-ID: 8253658:user:proton
+X-Pm-Message-ID: 938bcd6b3be7383a87fc839d38cba17fe64b1b7f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[1g4.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259393-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[lists.freedesktop.org,linux.intel.com,intel.com,ffwll.ch,gmail.com,oss.qualcomm.com,amd.com,davemloft.net,redhat.com,google.com,vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-259394-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[mojatatu.com,gmail.com,resnulli.us];
+	RCVD_COUNT_THREE(0.00)[3];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[1g4.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 8BB6015B72E
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[1g4.org:mid,1g4.org:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3C03215BBEB
 X-Rspamd-Action: no action
 
-On Wed, 18 Feb 2026 17:49:03 +0530 Riana Tauro wrote:
-> +    -
-> +      name: get-error-counters
-> +      doc: >-
-> +           Retrieve the full list of error counters for a given node.
-> +           The response include the id, the name, and even the current
-> +           value of each counter.
-> +      attribute-set: error-counter-attrs
-> +      flags: [admin-perm]
-> +      dump:
-> +        request:
-> +          attributes:
-> +            - node-id
-> +        reply:
-> +          attributes:
-> +            - error-id
-> +            - error-name
-> +            - error-value
-> +    -
-> +      name: query-error-counter
-> +      doc: >-
-> +           Query the information of a specific error counter for a given node.
-> +           Users must provide the node ID and the error counter ID.
-> +           The response contains the id, the name, and the current value
-> +           of the counter.
-> +      attribute-set: error-counter-attrs
-> +      flags: [admin-perm]
-> +      do:
-> +        request:
-> +          attributes:
-> +            - node-id
-> +            - error-id
-> +        reply:
-> +          attributes:
-> +            - error-id
-> +            - error-name
-> +            - error-value
+This series fixes a schedule lifetime race in `act_gate` between the
+control-plane replace path and the running hrtimer callback
+(`gate_timer_func`).
 
-The get-error-counters vs query-error-counter is sort of asking to be a
-do and dump of the same op doesn't it? The return messages are the same,
-one returns a single counter, the other one (filtered to given node-id)
-dump of counters. Not a big deal, but from Netlink perspective having
-these as do / dump of the same op would be more natural.
+Changes since v6:
+- revert gate_start_timer()
+- added explicit chain_put: label before release_idr:
+- kzalloc failure path changed from goto release_idr to goto chain_put
+- formatting only: blankline cleanup for readability, no behavior change
 
-On top of that please definitely make sure that the code is generated
-with the latest tooling from Linus's tree! We tweaked the output a
-little, it shouldn't happen again but running regen with this commit
-gives me a dirty tree with a bunch of:
+Paul Moses (1):
+  net/sched: act_gate: snapshot parameters with RCU on replace
 
-diff --git a/include/uapi/drm/drm_ras.h b/include/uapi/drm/drm_ras.h
-index 3415ba345ac8..31f0180c1035 100644
---- a/include/uapi/drm/drm_ras.h
-+++ b/include/uapi/drm/drm_ras.h
-@@ -2,6 +2,7 @@
- /* Do not edit directly, auto-generated from: */
- /*     Documentation/netlink/specs/drm_ras.yaml */
- /* YNL-GEN uapi header */
-+/* To regenerate run: tools/net/ynl/ynl-regen.sh */
- 
- #ifndef _UAPI_LINUX_DRM_RAS_H
- #define _UAPI_LINUX_DRM_RAS_H
+ include/net/tc_act/tc_gate.h |  33 ++++-
+ net/sched/act_gate.c         | 265 +++++++++++++++++++++++++----------
+ 2 files changed, 215 insertions(+), 83 deletions(-)
 
-
-Last but not least:
-
-$ yamllint Documentation/netlink/specs/drm_ras.yaml
-Documentation/netlink/specs/drm_ras.yaml
-  59:14     error    too many spaces after colon  (colons)
+--=20
+2.53.0
 
 
