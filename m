@@ -1,288 +1,153 @@
-Return-Path: <netdev+bounces-259506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259505-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +EMPIw0vl2kcvgIAu9opvQ
-	(envelope-from <netdev+bounces-259506-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 16:41:01 +0100
+	id AEWkArMul2kcvgIAu9opvQ
+	(envelope-from <netdev+bounces-259505-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 16:39:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15038160441
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 16:41:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 584B1160415
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 16:39:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E5AF53077E77
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 15:37:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D9C3430071E4
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 15:37:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A86F347BB9;
-	Thu, 19 Feb 2026 15:37:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37044345758;
+	Thu, 19 Feb 2026 15:37:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dbRrhdJj"
+	dkim=pass (2048-bit key) header.d=thorsis.com header.i=@thorsis.com header.b="IeDBh943"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from mail.thorsis.com (mail.thorsis.com [217.92.40.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E50F33F394
-	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 15:37:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECE1F3451A7;
+	Thu, 19 Feb 2026 15:36:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.92.40.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771515447; cv=none; b=NXoZWThht2b7tNg7KbMgdsYtlQVYoQKJLFD6bbabuCGahB2rKg6QJYBkrD5uV+xx9tbPWHjFq7aiQRhyzph0UE4zuhQPtFFDOuPk+r4UUEABL649C1yimEqJ9yViGezwtDN/yJaJB626MoLkx5N9buGfYRHXwMBL7uCsXJ7fL3U=
+	t=1771515421; cv=none; b=Ob36+vZf7AmufgGLNEzQQ6UyGR6m/+CSUNO1zexy2WNbrxcMpAXyGdKBkt7SSZVcaVUWU0qB4uKJjM/0i1H0CrgsT88n2p1oSB4buNt0hK1uMLDxaUQ2SLpnu0BXAPd1fZNvoB5BLwTKTh3kHjt1t8h8vo4OB8Oz7KJ5Y5LpY9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771515447; c=relaxed/simple;
-	bh=ixhP+oBrva5ygcp2hjhyaCOAT/lLVs3Df/zIr2l4nqY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JsmFaJQwn/hynLxFPJ05fRdzn1iLsoTBidSooSVGVrXTmKZM/H5EXO6DNQ8lLjGTQSAqcnAAM0Rm3wDMuKdeTlfJuXi14Hx6N3v66u6pzmZKCMjQeAxpVkGrt8ItLKPWwH9AoDDDowF9YsrCkUHScck1sHE8azsqvhy9hGRdJ/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dbRrhdJj; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <10911cdf-d951-41a6-82c1-1c0ecd47c5f5@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1771515433;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dar0RQt4M278UggC4OmngN9+vjxlsvXau8VM1wIA7Uc=;
-	b=dbRrhdJj1yu9EW96WbowLTZvrGwoJeZ7bRWKOGHU/itw/cjdE7WOq4Ghc+D/CbDuq+msoC
-	c83WPqh3xLBfArsVfWotrWTNWoRHXy/uOQoj6nTQRkxVU2JEhLwB4JYXtwA4p7lW3W2PKx
-	HWJM5Y+mUQOy0MQlOl7geSIZqE/ws/U=
-Date: Thu, 19 Feb 2026 23:36:51 +0800
+	s=arc-20240116; t=1771515421; c=relaxed/simple;
+	bh=FtxsfZVG+UyeZeesGRnVoCjX4vtU9MuQ61F/Ejwoylk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ITRkXqHZg8s76NabJ3CQ/mm0w0GxENN2fMC6JZtfYJl4OMtYt9z/Qu/1Bd7kw2exDw9erwR08aQwIagzCeJV3drV5hk2v7XKXiQ+5Gymucdy9s/9pLKN3x9rDsJ+B5W5KeTECihxzFNCMkoh/DX/NQ98Kr24nChVlJ9lNf9rzvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorsis.com; spf=pass smtp.mailfrom=thorsis.com; dkim=pass (2048-bit key) header.d=thorsis.com header.i=@thorsis.com header.b=IeDBh943; arc=none smtp.client-ip=217.92.40.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorsis.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=thorsis.com
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 56F651483189;
+	Thu, 19 Feb 2026 16:36:54 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=thorsis.com; s=dkim;
+	t=1771515417; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=1AE1AmYfvATrMvyJE4ZzKXon+W6nliw611/s/YfGS68=;
+	b=IeDBh943I007i0SbNfYfqY1DhYKrBB6M0hoXqlo9oXlXPWIYy5aKQkJJhjki771Feu1KqK
+	9vaDD2gMIQNZWYWrol4O6TevD0HVs7uDSK6Ax0J0YDXFKYvgeGY6nlNFTmtmnCht12dxNA
+	tLB60zs7sQLKyLJheFI1aTkpPcvWAsMUlr49ZNqACcU6dvOdEz9w8iLPZSaATe+sv2Y+xG
+	BKyd99Xn6FcVfhvn6Rr3+4B5miODha/EN+a7nnPIOv6Nx/uvKLrDQ+7/7zGWxYEGcPAd6Z
+	KlAjylnD4ZeO2yEWgcgk5LiTJXpHPfwRJLYkS+I1NoUt7646dykHP/MDFXAwtg==
+Date: Thu, 19 Feb 2026 16:36:53 +0100
+From: Alexander Dahl <ada@thorsis.com>
+To: Kevin Hao <kexin.hao@windriver.com>
+Cc: Xiaolei Wang <xiaolei.wang@windriver.com>, pabeni@redhat.com,
+	nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, rmk+kernel@armlinux.org.uk, netdev@vger.kernel.org,
+	stable@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rt-users@vger.kernel.org
+Subject: Re: [PATCH net v3] net: macb: Relocate mog_init_rings() callback
+ from macb_mac_link_up() to macb_open()
+Message-ID: <20260219-zeppelin-scope-8cf10fdf1d43@thorsis.com>
+Mail-Followup-To: Kevin Hao <kexin.hao@windriver.com>,
+	Xiaolei Wang <xiaolei.wang@windriver.com>, pabeni@redhat.com,
+	nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, rmk+kernel@armlinux.org.uk, netdev@vger.kernel.org,
+	stable@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rt-users@vger.kernel.org
+References: <20251222015624.1994551-1-xiaolei.wang@windriver.com>
+ <20260219-knapsack-thirteen-7d9e83451a40@thorsis.com>
+ <aZcjqF1E57E-i5aS@pek-khao-d3>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v2 3/6] bpf, arm64: Add 64-bit bitops kfuncs
- support
-To: Puranjay Mohan <puranjay@kernel.org>, bpf@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Xu Kuohai <xukuohai@huaweicloud.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
- Shuah Khan <shuah@kernel.org>, Peilin Ye <yepeilin@google.com>,
- Luis Gerhorst <luis.gerhorst@fau.de>, Viktor Malik <vmalik@redhat.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- kernel-patches-bot@fb.com
-References: <20260219142933.13904-1-leon.hwang@linux.dev>
- <20260219142933.13904-4-leon.hwang@linux.dev> <m2342woiw9.fsf@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Leon Hwang <leon.hwang@linux.dev>
-In-Reply-To: <m2342woiw9.fsf@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aZcjqF1E57E-i5aS@pek-khao-d3>
+User-Agent: Mutt/2.2.13 (2024-03-09)
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[thorsis.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[thorsis.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259506-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-259505-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,huaweicloud.com,arm.com,redhat.com,alien8.de,linux.intel.com,zytor.com,fau.de,lists.infradead.org,vger.kernel.org,fb.com];
-	RCPT_COUNT_TWELVE(0.00)[32];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-0.998];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon.hwang@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	FROM_NEQ_ENVFROM(0.00)[ada@thorsis.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[thorsis.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,linux.dev:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 15038160441
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,thorsis.com:mid,thorsis.com:dkim]
+X-Rspamd-Queue-Id: 584B1160415
 X-Rspamd-Action: no action
 
+Hello Kevin,
 
+Am Thu, Feb 19, 2026 at 10:52:24PM +0800 schrieb Kevin Hao:
+> On Thu, Feb 19, 2026 at 03:34:54PM +0100, Alexander Dahl wrote:
+> > After upgrading from 6.12.57-rt14 to 6.12.66-rt15 on a custom at91
+> > sam9x60 based board with PREEMPT_RT patch, we noticed a complete
+> > system lockup, which I bisected to this changeset.
+> > 
+> > After unplugging and plugging the ethernet cable, while
+> > running PROFINET, system does not respond to anything anymore.
+> > Last message in kernel log is:
+> > 
+> >   [  +8.621919] macb f802c000.ethernet eth0: Link is Up - 100Mbps/Full - flow control off
+> > 
+> > Heartbeat LED does not blink anymore, no network communication,
+> > serial console does not respond anymore.
+> > 
+> > Reverting that change locally prevents the system lockup for me, but
+> > what is the proper course of action on kernel side now?  Send a revert
+> > to stable?  Send a revert to master?  Please advise.
+> > 
+> > (I'm aware there were least two more patches on netdev referencing
+> > this change, but if I'm not mistaken none of those made it to stable,
+> > right?)
+> 
+> A fix for this commit is available in the latest mainline kernel. Could you
+> please verify whether it resolves the issue you encountered?
+>   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=bf9cf80cab81e39701861a42877a28295ade266f
 
-On 2026/2/19 23:25, Puranjay Mohan wrote:
-> Leon Hwang <leon.hwang@linux.dev> writes:
-> 
->> Implement JIT inlining of the 64-bit bitops kfuncs on arm64.
->>
->> bpf_clz64(), bpf_ffs64(), bpf_fls64(), and bpf_bitrev64() are always
->> inlined using mandatory ARMv8 CLZ/RBIT instructions. bpf_ctz64() is
->> inlined via RBIT + CLZ, or via the native CTZ instruction when
->> FEAT_CSSC is available. bpf_rol64() and bpf_ror64() are always inlined
->> via RORV.
->>
->> bpf_popcnt64() is not inlined as the native population count instruction
->> requires NEON/SIMD registers, which should not be touched from BPF
->> programs. It therefore falls back to a regular function call.
->>
->> Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
->> ---
->>  arch/arm64/net/bpf_jit_comp.c | 123 ++++++++++++++++++++++++++++++++++
->>  1 file changed, 123 insertions(+)
->>
->> diff --git a/arch/arm64/net/bpf_jit_comp.c b/arch/arm64/net/bpf_jit_comp.c
->> index 7a530ea4f5ae..f03f732063d9 100644
->> --- a/arch/arm64/net/bpf_jit_comp.c
->> +++ b/arch/arm64/net/bpf_jit_comp.c
->> @@ -1192,6 +1192,127 @@ static int add_exception_handler(const struct bpf_insn *insn,
->>  	return 0;
->>  }
->>  
->> +static inline u32 a64_clz64(u8 rd, u8 rn)
->> +{
->> +	/*
->> +	 * Arm Architecture Reference Manual for A-profile architecture
->> +	 * (Document number: ARM DDI 0487)
->> +	 *
->> +	 *   A64 Base Instruction Descriptions
->> +	 *   C6.2 Alphabetical list of A64 base instructions
->> +	 *
->> +	 *   C6.2.91 CLZ
->> +	 *
->> +	 *     Count leading zeros
->> +	 *
->> +	 *     This instruction counts the number of consecutive binary zero bits,
->> +	 *     starting from the most significant bit in the source register,
->> +	 *     and places the count in the destination register.
->> +	 */
->> +	/* CLZ Xd, Xn */
->> +	return 0xdac01000 | (rn << 5) | rd;
->> +}
->> +
->> +static inline u32 a64_ctz64(u8 rd, u8 rn)
->> +{
->> +	/*
->> +	 * Arm Architecture Reference Manual for A-profile architecture
->> +	 * (Document number: ARM DDI 0487)
->> +	 *
->> +	 *   A64 Base Instruction Descriptions
->> +	 *   C6.2 Alphabetical list of A64 base instructions
->> +	 *
->> +	 *   C6.2.144 CTZ
->> +	 *
->> +	 *     Count trailing zeros
->> +	 *
->> +	 *     This instruction counts the number of consecutive binary zero bits,
->> +	 *     starting from the least significant bit in the source register,
->> +	 *     and places the count in the destination register.
->> +	 *
->> +	 *     This instruction requires FEAT_CSSC.
->> +	 */
->> +	/* CTZ Xd, Xn */
->> +	return 0xdac01800 | (rn << 5) | rd;
->> +}
->> +
->> +static inline u32 a64_rbit64(u8 rd, u8 rn)
->> +{
->> +	/*
->> +	 * Arm Architecture Reference Manual for A-profile architecture
->> +	 * (Document number: ARM DDI 0487)
->> +	 *
->> +	 *   A64 Base Instruction Descriptions
->> +	 *   C6.2 Alphabetical list of A64 base instructions
->> +	 *
->> +	 *   C6.2.320 RBIT
->> +	 *
->> +	 *     Reverse bits
->> +	 *
->> +	 *     This instruction reverses the bit order in a register.
->> +	 */
->> +	/* RBIT Xd, Xn */
->> +	return 0xdac00000 | (rn << 5) | rd;
->> +}
-> 
-> I don't think adding the above three functions is the best to JIT these
-> intructions, do it like the other data1 and data2 instructions and add
-> them to the generic framework like the following patch(untested) does:
-> > -- >8 --
-> 
-> diff --git a/arch/arm64/include/asm/insn.h b/arch/arm64/include/asm/insn.h
-> index 18c7811774d3..b2696af0b817 100644
-> --- a/arch/arm64/include/asm/insn.h
-> +++ b/arch/arm64/include/asm/insn.h
-> @@ -221,6 +221,9 @@ enum aarch64_insn_data1_type {
->  	AARCH64_INSN_DATA1_REVERSE_16,
->  	AARCH64_INSN_DATA1_REVERSE_32,
->  	AARCH64_INSN_DATA1_REVERSE_64,
-> +	AARCH64_INSN_DATA1_RBIT,
-> +	AARCH64_INSN_DATA1_CLZ,
-> +	AARCH64_INSN_DATA1_CTZ,
->  };
-> 
->  enum aarch64_insn_data2_type {
-> @@ -389,6 +392,9 @@ __AARCH64_INSN_FUNCS(rorv,	0x7FE0FC00, 0x1AC02C00)
->  __AARCH64_INSN_FUNCS(rev16,	0x7FFFFC00, 0x5AC00400)
->  __AARCH64_INSN_FUNCS(rev32,	0x7FFFFC00, 0x5AC00800)
->  __AARCH64_INSN_FUNCS(rev64,	0x7FFFFC00, 0x5AC00C00)
-> +__AARCH64_INSN_FUNCS(rbit,	0x7FFFFC00, 0x5AC00000)
-> +__AARCH64_INSN_FUNCS(clz,	0x7FFFFC00, 0x5AC01000)
-> +__AARCH64_INSN_FUNCS(ctz,	0x7FFFFC00, 0x5AC01800)
->  __AARCH64_INSN_FUNCS(and,	0x7F200000, 0x0A000000)
->  __AARCH64_INSN_FUNCS(bic,	0x7F200000, 0x0A200000)
->  __AARCH64_INSN_FUNCS(orr,	0x7F200000, 0x2A000000)
-> diff --git a/arch/arm64/lib/insn.c b/arch/arm64/lib/insn.c
-> index 4e298baddc2e..2229ab596cda 100644
-> --- a/arch/arm64/lib/insn.c
-> +++ b/arch/arm64/lib/insn.c
-> @@ -1008,6 +1008,15 @@ u32 aarch64_insn_gen_data1(enum aarch64_insn_register dst,
->  		}
->  		insn = aarch64_insn_get_rev64_value();
->  		break;
-> +	case AARCH64_INSN_DATA1_CLZ:
-> +		insn = aarch64_insn_get_clz_value();
-> +		break;
-> +	case AARCH64_INSN_DATA1_RBIT:
-> +		insn = aarch64_insn_get_rbit_value();
-> +		break;
-> +	case AARCH64_INSN_DATA1_CTZ:
-> +		insn = aarch64_insn_get_ctz_value();
-> +		break;
->  	default:
->  		pr_err("%s: unknown data1 encoding %d\n", __func__, type);
->  		return AARCH64_BREAK_FAULT;
-> diff --git a/arch/arm64/net/bpf_jit.h b/arch/arm64/net/bpf_jit.h
-> index bbea4f36f9f2..af806c39dadb 100644
-> --- a/arch/arm64/net/bpf_jit.h
-> +++ b/arch/arm64/net/bpf_jit.h
-> @@ -248,6 +248,12 @@
->  #define A64_REV16(sf, Rd, Rn) A64_DATA1(sf, Rd, Rn, REVERSE_16)
->  #define A64_REV32(sf, Rd, Rn) A64_DATA1(sf, Rd, Rn, REVERSE_32)
->  #define A64_REV64(Rd, Rn)     A64_DATA1(1, Rd, Rn, REVERSE_64)
-> +/* Rd = RBIT(Rn) */
-> +#define A64_RBIT(sf, Rd, Rn) A64_DATA1(sf, Rd, Rn, RBIT)
-> +/* Rd = CLZ(Rn) */
-> +#define A64_CLZ(sf, Rd, Rn) A64_DATA1(sf, Rd, Rn, CLZ)
-> +/* Rd = CTZ(Rn) */
-> +#define A64_CTZ(sf, Rd, Rn) A64_DATA1(sf, Rd, Rn, CTZ)
-> 
->  /* Data-processing (2 source) */
->  /* Rd = Rn OP Rm */
-> 
-> -- 8< --
+Verified by replacing the revert with your patch backported to my
+6.12.66-rt15 based tree.  Answered to your patch mail, so hopefully
+that change hits stable soon.  Thanks for your effort.
+
+Greets
+Alex
+
 > 
 > Thanks,
-> Puranjay
+> Kevin
 
-Ack.
-
-I'll do it in the next revision.
-
-Thanks,
-Leon
 
 
