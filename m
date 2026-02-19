@@ -1,164 +1,160 @@
-Return-Path: <netdev+bounces-259524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259525-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4CmSDudEl2lMwQIAu9opvQ
-	(envelope-from <netdev+bounces-259524-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 18:14:15 +0100
+	id uAhoDv1Fl2lMwQIAu9opvQ
+	(envelope-from <netdev+bounces-259525-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 18:18:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FB58161034
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 18:14:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88CA7161133
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 18:18:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AD5E2303298F
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 17:13:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DA75830E3DF5
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 17:13:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BB4634DB5F;
-	Thu, 19 Feb 2026 17:13:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90F8934E771;
+	Thu, 19 Feb 2026 17:13:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jsOLrC1k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YBECWMXb"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93C43343D64;
-	Thu, 19 Feb 2026 17:13:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B02D34E743;
+	Thu, 19 Feb 2026 17:13:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771521198; cv=none; b=SD7n7fDgIAazWE+f+HZqKUvzfOlxKKuSOwtIDL6w+NFcsNGnYEq4gmJmVUyxUtE3vzCbFneC0EMxLWblfY8Zr1QsBYYND/biRxI8JM0SFbx33VoG7mczu2cZIBpH00oEWGkP/bBmc9ik0mNw2l04scurZFRP3qT5FOyP8LEDlc8=
+	t=1771521227; cv=none; b=jRaOtiNQsNxc972QuN3hmHUzDVQR2Dnlizep1i3nFg88RxtUWVAwACAptnhVzbCfIo9LMfbjgpkBbLeO410mZxl8kpzQZm5waexf7YC9Q8H+L3e7M3VwU1S7KSOBck+Vr1swfmqQj0qVHfzNNOEam2WluwMXyXhWPVLriWhMFRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771521198; c=relaxed/simple;
-	bh=KQyrX/4nRonuD7ep0S1AQdj+eEhngN9HecBFazReEtI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sq7aM2zOQ5ipb18jBQkGvxFfHXm+BOubjF46H37ytXkP0dJF8vLXtAykSYzwj9MIXZnXiHnpn5QQg6vEBo2jbY+vfsanYk8ysKCWuQJIXVFanUnNibSZfdbBiY8iDXI6Bd3n0WQ6nim2SNMSPIwQQJ0FlQRIcNUZyX+rua64j/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jsOLrC1k; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Kwii5PhtQiDgJHBhdr912xjePXvLsCHh353/wV7cYNw=; b=jsOLrC1klsYiofgUAhVpkNCnez
-	VZPlheTJJPdgMK15EUbUT+LjW22MJLr1CvUwPVhgqaP5Rxy8vkuWaoJQrqbEk4yGIX7VDLNZc6GNb
-	OcTcqhOA8OVQxpFzfcnLCNtd9111J+q8tnsAiBnW3STXw/1rHOYYZm9reZ8CNi+anCnaUZOlX/ke1
-	PPmx5NYHvPiWntCTNS8Oxh10GwHnaBf8TiRQqclGVB70QCLldiReOPiezJwxH25VYvS4J8C8g1bDO
-	1OdviJBoWCDhBe7GDt3GiFaGgWK+UDkEHuyKeBgkjpbKsCjfyb3ysz+YwK9y647xiPZq/TPL+9wry
-	up+kkjzQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42212)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vt7aM-0000000017F-4C31;
-	Thu, 19 Feb 2026 17:13:07 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vt7aI-000000003Um-3jR3;
-	Thu, 19 Feb 2026 17:13:02 +0000
-Date: Thu, 19 Feb 2026 17:13:02 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Charles Perry <charles.perry@microchip.com>
-Cc: netdev@vger.kernel.org, Sean Anderson <sean.anderson@linux.dev>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/2] net: macb: fix SGMII with inband aneg
- disabled
-Message-ID: <aZdEnm9Vlb41T_DT@shell.armlinux.org.uk>
-References: <20260219170113.1774090-1-charles.perry@microchip.com>
+	s=arc-20240116; t=1771521227; c=relaxed/simple;
+	bh=uSNP3MgJa05tgGcM2PHS+3DfjpvUZxFcp68M0fm6gMw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cinAxiwJpYaxej6VR+0GzbixRtOTUlARkrPPWh3ktBqmeLYCbTnm2U9/qQQLjSm0B9EEgIuQEiluot+oQRUlgJ7uQ04jDlS2/n4hzKPvqnWE3e38JC0bm9dFvUFSnhWJftM716BYPQHVqUObB549h2Z62+iVlwKpYECsqom7r+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YBECWMXb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C99FFC4CEF7;
+	Thu, 19 Feb 2026 17:13:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771521227;
+	bh=uSNP3MgJa05tgGcM2PHS+3DfjpvUZxFcp68M0fm6gMw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YBECWMXb0l7YTspH/2A5O3YVGZH6sWYLy8DEUbYHZmd42ojMoLrQlGcLCCJMrL2hh
+	 x+wP36x5mPRNiQ4YlwXCwC/juipG7QbBpRGokXKhMip0rb+zqeOyz1T/oyqvIsqX39
+	 0uWM5uc3clsg6rObH0QWpBsHgl6EHjxydLfuQ8y75z5noUysamoKS2gFAR01od1G1Y
+	 PgTXezyWl0CqUO+nYC9xJ+/p3WCbTnYD1J04ekQmer9tzg7Sw1gmJB6VQvUPRZySKk
+	 heOGtRDTg2rnD4IQxpqSjHoTGMLaI1R6+dFrvzNnqVQa3aTn6B+/CDnUXAC+onTPQe
+	 wmiBxtyJ7m7Wg==
+Date: Thu, 19 Feb 2026 09:13:44 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Donald Hunter <donald.hunter@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Alexei Starovoitov
+ <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard
+ Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, Andrii Nakryiko <andrii@kernel.org>, Martin
+ KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP
+ Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>, Maciej Fijalkowski
+ <maciej.fijalkowski@intel.com>, Jakub Sitnicki <jakub@cloudflare.com>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH bpf-next v3 1/5] netlink: specs: Add XDP RX checksum
+ capability to XDP metadata specs
+Message-ID: <20260219091344.1d8517f3@kernel.org>
+In-Reply-To: <aZbuWBnmh_SQJyVf@lore-desk>
+References: <20260217-bpf-xdp-meta-rxcksum-v3-0-30024c50ba71@kernel.org>
+	<20260217-bpf-xdp-meta-rxcksum-v3-1-30024c50ba71@kernel.org>
+	<20260218174742.62a4074f@kernel.org>
+	<aZbuWBnmh_SQJyVf@lore-desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260219170113.1774090-1-charles.perry@microchip.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	TAGGED_FROM(0.00)[bounces-259525-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259524-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,kernel.org,iogearbox.net,fomichev.me,lunn.ch,intel.com,linux.dev,cloudflare.com,vger.kernel.org,lists.osuosl.org];
+	RCPT_COUNT_TWELVE(0.00)[30];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.965];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[shell.armlinux.org.uk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8FB58161034
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 88CA7161133
 X-Rspamd-Action: no action
 
-On Thu, Feb 19, 2026 at 09:01:11AM -0800, Charles Perry wrote:
-> @@ -574,6 +574,25 @@ static int macb_pcs_config(struct phylink_pcs *pcs,
->  			   const unsigned long *advertising,
->  			   bool permit_pause_to_mac)
->  {
-> +	struct macb *bp = container_of(pcs, struct macb, phylink_sgmii_pcs);
-> +	unsigned long flags;
-> +	u32 old, new;
-> +
-> +	spin_lock_irqsave(&bp->lock, flags);
-> +	old = gem_readl(bp, PCSANADV);
-> +	new = phylink_mii_c22_pcs_encode_advertisement(interface, advertising);
-> +	if (new != -EINVAL && old != new)
-> +		gem_writel(bp, PCSANADV, new);
-> +
-> +	old = gem_readl(bp, PCSCNTRL);
-> +	if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED)
-> +		new = old | BMCR_ANENABLE;
-> +	else
-> +		new = old & ~BMCR_ANENABLE;
-> +	if (old != new)
-> +		gem_writel(bp, PCSCNTRL, new);
-> +
-> +	spin_unlock_irqrestore(&bp->lock, flags);
+On Thu, 19 Feb 2026 12:04:56 +0100 Lorenzo Bianconi wrote:
+> > On Tue, 17 Feb 2026 09:33:56 +0100 Lorenzo Bianconi wrote:  
+> > > + * In case of success, ``ip_summed`` is set to the RX checksum result. Possible
+> > > + * values are:
+> > > + * ``XDP_CHECKSUM_NONE``
+> > > + * ``XDP_CHECKSUM_UNNECESSARY``
+> > > + * ``XDP_CHECKSUM_COMPLETE``
+> > > + *
+> > > + * In case of success, ``cksum_meta`` contains the hw computed checksum value
+> > > + * for ``XDP_CHECKSUM_COMPLETE`` or the ``csum_level`` for
+> > > + * ``XDP_CHECKSUM_UNNECESSARY``. It is set to 0 for ``XDP_CHECKSUM_NONE``  
+> > 
+> > It's fairly common for NICs to report both csum complete and
+> > unnecessary. Which one should the driver return in that case?  
+> 
+> Do you mean what is value for cksum_meta if we do not report csum_level for
+> XDP_CHECKSUM_UNNECESSARY/CHECKSUM_UNNECESSARY use-case? (as suggested by
+> Stanislav).
 
-What purpose does the spinlock serve?
+More fundamentally whether the API is right.
 
-phylink will call this under the phylink state_mutex lock, which will
-guarantee that two threads can't execute this code simultaneously.
+> My original idea is:
+> - if the hw reports CHECKSUM_COMPLETE:
+>   - ip_summed = XDP_CHECKSUM_COMPLETE
+>   - cksum_meta contains the checksum computed by the hw
+> - if the hw reports CHECKSUM_UNNECESSARY
+>   - ip_summed = XDP_CHECKSUM_UNNECESSARY
+>   - cksum_meta = csum_level <-- Stanislav suggests to drop this one
+> - if the hw reports CHECKSUM_NONE
+>   - ip_summed = XDP_CHECKSUM_NONE
+>   - cksum_meta = 0
 
->  	return 0;
->  }
->  
-> @@ -628,22 +647,6 @@ static void macb_mac_config(struct phylink_config *config, unsigned int mode,
->  	if (old_ncr ^ ncr)
->  		macb_or_gem_writel(bp, NCR, ncr);
->  
-> -	/* Disable AN for SGMII fixed link configuration, enable otherwise.
-> -	 * Must be written after PCSSEL is set in NCFGR,
-> -	 * otherwise writes will not take effect.
+Off the top of my head drivers prefer reporting UNNECESSARY when they
+have both, and reserve COMPLETE for cases where L4 could not be found
+or is incorrect. Why don't we report both? We're using 3 args, we still
+have 3 to go. We could turn ip_summed into a bitmap and have explicit
+output args for both level and csum complete value?
 
-This looks like a key piece of information that is being removed from
-the driver. Might be worth keeping it as a note that macb_pcs_config()
-will be called after PCSSEL has been set in NCFGR?
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+One more thing I'd like us to at least have a plan for at this stage
+is how to deal with COMPLETE + modified packet + XDP_PASS.
+Right now some drivers discard COMPLETE when XDP is attached since
+they can't be sure if XDP modifies the packet. Other drivers don't
+and we end up with bad csum splat. Do we have a recommendation on
+the correct behavior? If not - should we have a kfunc to adjust /
+discard csum complete explicitly?
 
