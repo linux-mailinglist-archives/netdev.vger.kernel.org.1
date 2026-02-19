@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-259485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259486-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SCtAGj4fl2m9uwIAu9opvQ
-	(envelope-from <netdev+bounces-259485-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 15:33:34 +0100
+	id gJHvA9Yel2m9uwIAu9opvQ
+	(envelope-from <netdev+bounces-259486-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 15:31:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2665C15F887
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 15:33:34 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF4CC15F806
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 15:31:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 615C2302A180
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 14:31:32 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 295353000B00
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 14:31:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C77E33F8BA;
-	Thu, 19 Feb 2026 14:31:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3977133F8C6;
+	Thu, 19 Feb 2026 14:31:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XDu1ztxs"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pmq3iPTU"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA2733EAE7
-	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 14:31:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84605253B58
+	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 14:31:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771511491; cv=none; b=QBNcYywh/w6SVuweYC6Y5iUE+wj2Q7g9vPdkHorMsGDdozX9VremznXkdnZ4xZwU4NUHW7sS4XBd1dP55Q/wMMk7HoSqYqshHjwHFW2I3EJGk9s7QM8HYATG5JKkc22kLOKywkJVhc3qKkvLbnUaN5wIjZZ1IM8ty3syvhCw3D8=
+	t=1771511506; cv=none; b=X8qp5Y/YJJlUqbSkUDRUoFfXM0goFpEgx8WF6/+fB6c4cwDW9pAk+3QWjjwlogbY9YnJMY+meNDx8CeZmuq/w8CpRCw8PxR6FDBtFnCQloYlWUR7TebSXlYtSkl4cFOWQTztrnJLpzV9s+XJHJvawSUXf6CEEkU80wNL9RGvXSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771511491; c=relaxed/simple;
-	bh=okXF8hqTMNtslj4tawfqT6rUWjNbqU+Szo2bMXHuVtY=;
+	s=arc-20240116; t=1771511506; c=relaxed/simple;
+	bh=ypZOtjUaRaMCXC1q6gBRjeCXf2W7vKM3BCik4l5EdmI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fyhtXKmFcr+tnI3m60pPh0Wpj2svkte2AmwdfYBPlCOosksOuusnqWXzmid7NmOVKSzZUBdYzHioR73brboCF10PPpcNTsfmMc7bnCNVjgLKxxlqLL1iznw5AIWS2cb7pRUAFgs8vtzDQp6juUfIFDxFehfwUD3A51hkpLwyQDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XDu1ztxs; arc=none smtp.client-ip=95.215.58.173
+	 MIME-Version; b=BnUajEfvPdvVkMeiZtMSyDCrtCDTHjNJ45OcsaEu8Wccm4/ph+af3o3Jwfo7GuZCM32h1wzv6yaT98HSGGUyuMdy5hxM14l1XAgNVZK9rsUKDX/RbBUoFIoV+0JRPDCC6UJGIP24cp0p+RzZ6jOE37ZLKXNpzFLgevHycKFJP7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pmq3iPTU; arc=none smtp.client-ip=95.215.58.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1771511487;
+	t=1771511502;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=W9I9TydWVo15yKzkAGFLtCWQjvdOPQocpTW8F8p/JRI=;
-	b=XDu1ztxsOwv2MmylQD0qb4UCW5fqcEoF4pFpbhXOIVlzj8Js4KnUzKViS3VL1nbB5t0aI6
-	C0VmxmzJKZmbudyuazDQ2XpWcujZ2AsRVwShzv0kR39Hbv8mwH8uz8qS4aJawcAPwkLhxh
-	vTPPAFLMR1eemfo9bIwXvWuSpLfUEVs=
+	bh=jNWdJdK58m69LHIGW7l7DEM1Iok2ekKHAFCQkjcDuSU=;
+	b=pmq3iPTU63sGP1ZRWI1plSYlIte7DRbyd44PXvjrbFkYECiRO2VgIlPGgGYL84uz3EB28a
+	l66sqiSOUYeMXIAIyJkZkrwGIRzeuQWlmkkdDPEuthjbgQ+eODaXueBFgt4EY9LOVQREtV
+	jYWNkODtdCcUubHfy1Q5R3NBRGfFRHA=
 From: Leon Hwang <leon.hwang@linux.dev>
 To: bpf@vger.kernel.org
 Cc: Alexei Starovoitov <ast@kernel.org>,
@@ -79,9 +79,9 @@ Cc: Alexei Starovoitov <ast@kernel.org>,
 	netdev@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	kernel-patches-bot@fb.com
-Subject: [PATCH bpf-next v2 3/6] bpf, arm64: Add 64-bit bitops kfuncs support
-Date: Thu, 19 Feb 2026 22:29:25 +0800
-Message-ID: <20260219142933.13904-4-leon.hwang@linux.dev>
+Subject: [PATCH bpf-next v2 4/6] selftests/bpf: Add tests for 64-bit bitops kfuncs
+Date: Thu, 19 Feb 2026 22:29:26 +0800
+Message-ID: <20260219142933.13904-5-leon.hwang@linux.dev>
 In-Reply-To: <20260219142933.13904-1-leon.hwang@linux.dev>
 References: <20260219142933.13904-1-leon.hwang@linux.dev>
 Precedence: bulk
@@ -100,14 +100,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,huaweicloud.com,arm.com,redhat.com,alien8.de,linux.intel.com,zytor.com,fau.de,lists.infradead.org,vger.kernel.org,fb.com];
 	RCVD_COUNT_THREE(0.00)[3];
 	RCPT_COUNT_TWELVE(0.00)[33];
-	TAGGED_FROM(0.00)[bounces-259485-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-259486-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -117,172 +117,311 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[leon.hwang@linux.dev,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,linux.dev:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2665C15F887
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim,linux.dev:email]
+X-Rspamd-Queue-Id: BF4CC15F806
 X-Rspamd-Action: no action
 
-Implement JIT inlining of the 64-bit bitops kfuncs on arm64.
+Add selftests for bpf_clz64(), bpf_ctz64(), bpf_ffs64(), bpf_fls64(),
+bpf_bitrev64(), bpf_popcnt64(), bpf_rol64(), and bpf_ror64().
 
-bpf_clz64(), bpf_ffs64(), bpf_fls64(), and bpf_bitrev64() are always
-inlined using mandatory ARMv8 CLZ/RBIT instructions. bpf_ctz64() is
-inlined via RBIT + CLZ, or via the native CTZ instruction when
-FEAT_CSSC is available. bpf_rol64() and bpf_ror64() are always inlined
-via RORV.
-
-bpf_popcnt64() is not inlined as the native population count instruction
-requires NEON/SIMD registers, which should not be touched from BPF
-programs. It therefore falls back to a regular function call.
+Each subtest compares kfunc results against a userspace reference
+implementation over a set of test vectors.
 
 Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
 ---
- arch/arm64/net/bpf_jit_comp.c | 123 ++++++++++++++++++++++++++++++++++
- 1 file changed, 123 insertions(+)
+ .../testing/selftests/bpf/bpf_experimental.h  |   9 +
+ .../testing/selftests/bpf/prog_tests/bitops.c | 182 ++++++++++++++++++
+ tools/testing/selftests/bpf/progs/bitops.c    |  68 +++++++
+ 3 files changed, 259 insertions(+)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/bitops.c
+ create mode 100644 tools/testing/selftests/bpf/progs/bitops.c
 
-diff --git a/arch/arm64/net/bpf_jit_comp.c b/arch/arm64/net/bpf_jit_comp.c
-index 7a530ea4f5ae..f03f732063d9 100644
---- a/arch/arm64/net/bpf_jit_comp.c
-+++ b/arch/arm64/net/bpf_jit_comp.c
-@@ -1192,6 +1192,127 @@ static int add_exception_handler(const struct bpf_insn *insn,
- 	return 0;
- }
+diff --git a/tools/testing/selftests/bpf/bpf_experimental.h b/tools/testing/selftests/bpf/bpf_experimental.h
+index 9df77e59d4f5..02a985ef71cc 100644
+--- a/tools/testing/selftests/bpf/bpf_experimental.h
++++ b/tools/testing/selftests/bpf/bpf_experimental.h
+@@ -594,6 +594,15 @@ extern void bpf_iter_dmabuf_destroy(struct bpf_iter_dmabuf *it) __weak __ksym;
+ extern int bpf_cgroup_read_xattr(struct cgroup *cgroup, const char *name__str,
+ 				 struct bpf_dynptr *value_p) __weak __ksym;
  
-+static inline u32 a64_clz64(u8 rd, u8 rn)
++extern __u64 bpf_clz64(__u64 x) __weak __ksym;
++extern __u64 bpf_ctz64(__u64 x) __weak __ksym;
++extern __u64 bpf_ffs64(__u64 x) __weak __ksym;
++extern __u64 bpf_fls64(__u64 x) __weak __ksym;
++extern __u64 bpf_bitrev64(__u64 x) __weak __ksym;
++extern __u64 bpf_popcnt64(__u64 x) __weak __ksym;
++extern __u64 bpf_rol64(__u64 x, __u64 s) __weak __ksym;
++extern __u64 bpf_ror64(__u64 x, __u64 s) __weak __ksym;
++
+ #define PREEMPT_BITS	8
+ #define SOFTIRQ_BITS	8
+ #define HARDIRQ_BITS	4
+diff --git a/tools/testing/selftests/bpf/prog_tests/bitops.c b/tools/testing/selftests/bpf/prog_tests/bitops.c
+new file mode 100644
+index 000000000000..9acc3cb1908c
+--- /dev/null
++++ b/tools/testing/selftests/bpf/prog_tests/bitops.c
+@@ -0,0 +1,182 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include <test_progs.h>
++#include "bitops.skel.h"
++
++struct bitops_case {
++	__u64 x;
++	__u64 s;
++	__u64 exp;
++};
++
++static struct bitops_case cases[] = {
++	{ 0x0ULL, 0, 0 },
++	{ 0x1ULL, 1, 0 },
++	{ 0x8000000000000000ULL, 63, 0 },
++	{ 0xffffffffffffffffULL, 64, 0 },
++	{ 0x0123456789abcdefULL, 65, 0 },
++	{ 0x0000000100000000ULL, 127, 0 },
++};
++
++static __u64 clz64(__u64 x, __u64 s)
 +{
-+	/*
-+	 * Arm Architecture Reference Manual for A-profile architecture
-+	 * (Document number: ARM DDI 0487)
-+	 *
-+	 *   A64 Base Instruction Descriptions
-+	 *   C6.2 Alphabetical list of A64 base instructions
-+	 *
-+	 *   C6.2.91 CLZ
-+	 *
-+	 *     Count leading zeros
-+	 *
-+	 *     This instruction counts the number of consecutive binary zero bits,
-+	 *     starting from the most significant bit in the source register,
-+	 *     and places the count in the destination register.
-+	 */
-+	/* CLZ Xd, Xn */
-+	return 0xdac01000 | (rn << 5) | rd;
++	(void)s;
++	return x ? __builtin_clzll(x) : 64;
 +}
 +
-+static inline u32 a64_ctz64(u8 rd, u8 rn)
++static __u64 ctz64(__u64 x, __u64 s)
 +{
-+	/*
-+	 * Arm Architecture Reference Manual for A-profile architecture
-+	 * (Document number: ARM DDI 0487)
-+	 *
-+	 *   A64 Base Instruction Descriptions
-+	 *   C6.2 Alphabetical list of A64 base instructions
-+	 *
-+	 *   C6.2.144 CTZ
-+	 *
-+	 *     Count trailing zeros
-+	 *
-+	 *     This instruction counts the number of consecutive binary zero bits,
-+	 *     starting from the least significant bit in the source register,
-+	 *     and places the count in the destination register.
-+	 *
-+	 *     This instruction requires FEAT_CSSC.
-+	 */
-+	/* CTZ Xd, Xn */
-+	return 0xdac01800 | (rn << 5) | rd;
++	(void)s;
++	return x ? __builtin_ctzll(x) : 64;
 +}
 +
-+static inline u32 a64_rbit64(u8 rd, u8 rn)
++static __u64 ffs64(__u64 x, __u64 s)
 +{
-+	/*
-+	 * Arm Architecture Reference Manual for A-profile architecture
-+	 * (Document number: ARM DDI 0487)
-+	 *
-+	 *   A64 Base Instruction Descriptions
-+	 *   C6.2 Alphabetical list of A64 base instructions
-+	 *
-+	 *   C6.2.320 RBIT
-+	 *
-+	 *     Reverse bits
-+	 *
-+	 *     This instruction reverses the bit order in a register.
-+	 */
-+	/* RBIT Xd, Xn */
-+	return 0xdac00000 | (rn << 5) | rd;
++	(void)s;
++	return x ? (__u64)__builtin_ctzll(x) + 1 : 0;
 +}
 +
-+static inline bool boot_cpu_supports_cssc(void)
++static __u64 fls64(__u64 x, __u64 s)
 +{
-+	/*
-+	 * Documentation/arch/arm64/cpu-feature-registers.rst
-+	 *
-+	 *   ID_AA64ISAR2_EL1 - Instruction set attribute register 2
-+	 *
-+	 *     CSSC
-+	 */
-+	return cpuid_feature_extract_unsigned_field(read_sanitised_ftr_reg(SYS_ID_AA64ISAR2_EL1),
-+						    ID_AA64ISAR2_EL1_CSSC_SHIFT);
++	(void)s;
++	return x ? 64 - __builtin_clzll(x) : 0;
 +}
 +
-+static bool bpf_inlines_func_call(struct jit_ctx *ctx, void *func_addr)
++static __u64 popcnt64(__u64 x, __u64 s)
 +{
-+	const u8 tmp = bpf2a64[TMP_REG_1];
-+	const u8 r0 = bpf2a64[BPF_REG_0];
-+	const u8 r1 = bpf2a64[BPF_REG_1];
-+	const u8 r2 = bpf2a64[BPF_REG_2];
-+	bool inlined = true;
++	(void)s;
++	return __builtin_popcountll(x);
++}
 +
-+	if (func_addr == bpf_clz64) {
-+		emit(a64_clz64(r0, r1), ctx);
-+	} else if (func_addr == bpf_ctz64 || func_addr == bpf_ffs64) {
-+		if (boot_cpu_supports_cssc()) {
-+			emit(a64_ctz64(r0, r1), ctx);
-+		} else {
-+			emit(a64_rbit64(tmp, r1), ctx);
-+			emit(a64_clz64(r0, tmp), ctx);
-+		}
-+	} else if (func_addr == bpf_fls64) {
-+		emit(a64_clz64(tmp, r1), ctx);
-+		emit(A64_NEG(1, tmp, tmp), ctx);
-+		emit(A64_ADD_I(1, r0, tmp, 64), ctx);
-+	} else if (func_addr == bpf_bitrev64) {
-+		emit(a64_rbit64(r0, r1), ctx);
-+	} else if (func_addr == bpf_rol64) {
-+		emit(A64_NEG(1, tmp, r2), ctx);
-+		emit(A64_DATA2(1, r0, r1, tmp, RORV), ctx);
-+	} else if (func_addr == bpf_ror64) {
-+		emit(A64_DATA2(1, r0, r1, r2, RORV), ctx);
-+	} else {
-+		inlined = false;
++static __u64 bitrev64(__u64 x, __u64 s)
++{
++	__u64 y = 0;
++	int i;
++
++	(void)s;
++
++	for (i = 0; i < 64; i++) {
++		y <<= 1;
++		y |= x & 1;
++		x >>= 1;
++	}
++	return y;
++}
++
++static __u64 rol64(__u64 x, __u64 s)
++{
++	s &= 63;
++	return (x << s) | (x >> ((-s) & 63));
++}
++
++static __u64 ror64(__u64 x, __u64 s)
++{
++	s &= 63;
++	return (x >> s) | (x << ((-s) & 63));
++}
++
++static void test_bitops_case(const char *prog_name)
++{
++	struct bpf_program *prog;
++	struct bitops *skel;
++	size_t i;
++	int err;
++	LIBBPF_OPTS(bpf_test_run_opts, topts);
++
++	skel = bitops__open();
++	if (!ASSERT_OK_PTR(skel, "bitops__open"))
++		return;
++
++	prog = bpf_object__find_program_by_name(skel->obj, prog_name);
++	if (!ASSERT_OK_PTR(prog, "bpf_object__find_program_by_name"))
++		goto cleanup;
++
++	bpf_program__set_autoload(prog, true);
++
++	err = bitops__load(skel);
++	if (!ASSERT_OK(err, "bitops__load"))
++		goto cleanup;
++
++	for (i = 0; i < ARRAY_SIZE(cases); i++) {
++		skel->bss->in_x = cases[i].x;
++		skel->bss->in_s = cases[i].s;
++		err = bpf_prog_test_run_opts(bpf_program__fd(prog), &topts);
++		if (!ASSERT_OK(err, "bpf_prog_test_run_opts"))
++			goto cleanup;
++
++		if (!ASSERT_OK(topts.retval, "retval"))
++			goto cleanup;
++
++		ASSERT_EQ(skel->bss->out, cases[i].exp, "out");
 +	}
 +
-+	return inlined;
++cleanup:
++	bitops__destroy(skel);
 +}
 +
-+bool bpf_jit_inlines_kfunc_call(void *func_addr)
++#define RUN_BITOPS_CASE(_bitops, _prog)					\
++	do {								\
++		for (size_t i = 0; i < ARRAY_SIZE(cases); i++)		\
++			cases[i].exp = _bitops(cases[i].x, cases[i].s);	\
++		test_bitops_case(_prog);				\
++	} while (0)
++
++static void test_clz64(void)
 +{
-+	if (func_addr == bpf_clz64 || func_addr == bpf_ctz64 ||
-+	    func_addr == bpf_ffs64 || func_addr == bpf_fls64 ||
-+	    func_addr == bpf_rol64 || func_addr == bpf_ror64 ||
-+	    func_addr == bpf_bitrev64)
-+		return true;
-+	return false;
++	RUN_BITOPS_CASE(clz64, "bitops_clz64");
 +}
 +
- /* JITs an eBPF instruction.
-  * Returns:
-  * 0  - successfully JITed an 8-byte eBPF instruction.
-@@ -1598,6 +1719,8 @@ static int build_insn(const struct bpf_insn *insn, struct jit_ctx *ctx,
- 					    &func_addr, &func_addr_fixed);
- 		if (ret < 0)
- 			return ret;
-+		if (bpf_inlines_func_call(ctx, (void *) func_addr))
-+			break;
- 		emit_call(func_addr, ctx);
- 		/*
- 		 * Call to arch_bpf_timed_may_goto() is emitted by the
++static void test_ctz64(void)
++{
++	RUN_BITOPS_CASE(ctz64, "bitops_ctz64");
++}
++
++static void test_ffs64(void)
++{
++	RUN_BITOPS_CASE(ffs64, "bitops_ffs64");
++}
++
++static void test_fls64(void)
++{
++	RUN_BITOPS_CASE(fls64, "bitops_fls64");
++}
++
++static void test_bitrev64(void)
++{
++	RUN_BITOPS_CASE(bitrev64, "bitops_bitrev");
++}
++
++static void test_popcnt64(void)
++{
++	RUN_BITOPS_CASE(popcnt64, "bitops_popcnt");
++}
++
++static void test_rol64(void)
++{
++	RUN_BITOPS_CASE(rol64, "bitops_rol64");
++}
++
++static void test_ror64(void)
++{
++	RUN_BITOPS_CASE(ror64, "bitops_ror64");
++}
++
++void test_bitops(void)
++{
++	if (test__start_subtest("clz64"))
++		test_clz64();
++	if (test__start_subtest("ctz64"))
++		test_ctz64();
++	if (test__start_subtest("ffs64"))
++		test_ffs64();
++	if (test__start_subtest("fls64"))
++		test_fls64();
++	if (test__start_subtest("bitrev64"))
++		test_bitrev64();
++	if (test__start_subtest("popcnt64"))
++		test_popcnt64();
++	if (test__start_subtest("rol64"))
++		test_rol64();
++	if (test__start_subtest("ror64"))
++		test_ror64();
++}
+diff --git a/tools/testing/selftests/bpf/progs/bitops.c b/tools/testing/selftests/bpf/progs/bitops.c
+new file mode 100644
+index 000000000000..deac09bc8683
+--- /dev/null
++++ b/tools/testing/selftests/bpf/progs/bitops.c
+@@ -0,0 +1,68 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include "vmlinux.h"
++#include <bpf/bpf_helpers.h>
++#include "bpf_experimental.h"
++
++__u64 in_x;
++__u64 in_s;
++
++__u64 out;
++
++SEC("?syscall")
++int bitops_clz64(void *ctx)
++{
++	out = bpf_clz64(in_x);
++	return 0;
++}
++
++SEC("?syscall")
++int bitops_ctz64(void *ctx)
++{
++	out = bpf_ctz64(in_x);
++	return 0;
++}
++
++SEC("?syscall")
++int bitops_ffs64(void *ctx)
++{
++	out = bpf_ffs64(in_x);
++	return 0;
++}
++
++SEC("?syscall")
++int bitops_fls64(void *ctx)
++{
++	out = bpf_fls64(in_x);
++	return 0;
++}
++
++SEC("?syscall")
++int bitops_bitrev(void *ctx)
++{
++	out = bpf_bitrev64(in_x);
++	return 0;
++}
++
++SEC("?syscall")
++int bitops_popcnt(void *ctx)
++{
++	out = bpf_popcnt64(in_x);
++	return 0;
++}
++
++SEC("?syscall")
++int bitops_rol64(void *ctx)
++{
++	out = bpf_rol64(in_x, in_s);
++	return 0;
++}
++
++SEC("?syscall")
++int bitops_ror64(void *ctx)
++{
++	out = bpf_ror64(in_x, in_s);
++	return 0;
++}
++
++char _license[] SEC("license") = "GPL";
 -- 
 2.52.0
 
