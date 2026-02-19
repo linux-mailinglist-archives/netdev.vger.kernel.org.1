@@ -1,172 +1,178 @@
-Return-Path: <netdev+bounces-259436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259437-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uIQqB/ntlmngrAIAu9opvQ
-	(envelope-from <netdev+bounces-259436-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 12:03:21 +0100
+	id GOxsEV7ulmngrAIAu9opvQ
+	(envelope-from <netdev+bounces-259437-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 12:05:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADFF915E219
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 12:03:20 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id E207215E25A
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 12:05:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 829383017C18
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 11:01:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2EE80300AB38
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 11:05:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2A1833D515;
-	Thu, 19 Feb 2026 11:01:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3AEF33D6E1;
+	Thu, 19 Feb 2026 11:04:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EzI4U+0L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gAtAjWUv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C67A33D50A;
-	Thu, 19 Feb 2026 11:01:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FF9833D6D4;
+	Thu, 19 Feb 2026 11:04:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771498892; cv=none; b=GGTsTPjvoRdMOHNdHuIh6oDFKNeCDFw363yyH0z/oR3Sldblj9jnGLmvVN6itZ3ujuFU9Njlx+WbpuS/kx98vZXeoCNIhYMRqI81Irhw4QjiL5UCQRODRt8681Q1TuRrp5bdsaX8yo4G2DhynM5fpg3ZOQmPNzZFHez5HpZjrGA=
+	t=1771499099; cv=none; b=I79NDM4bVplWeDtKH48uKVPj3jguR80bVbfU+Rk7AKhEYeX8lAZ9MY0DxCRLxKW7+FGSTg96ij4/g0hk7g90LI5oT6Agt0nNvQ5r7cVtnk0GK4/hih5IFowgXraGywRIG/wK0izNkGvhoGmtNzp9EcOomQYw4R1x73WgpSf1X3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771498892; c=relaxed/simple;
-	bh=NmrOcvMHCYeayk8JjT6h8S01R2z4UwfaPhPLFEB2bXg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FMeVZtSNX92h+nOt0S0tPwRASHISlQ8xawDKSlHZWZNCEEnxxRm9AMEOMoQK4+R9BDaqV3uC9x7vBnebP7znOog0OsztBrcQzC35NPBYW11ZcgpfiC4D2INfgGczkXIoODlWccm9lZRoNGYnyanMse5cOw8udIQD5ZuaXdlq/wE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EzI4U+0L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB945C116C6;
-	Thu, 19 Feb 2026 11:01:28 +0000 (UTC)
+	s=arc-20240116; t=1771499099; c=relaxed/simple;
+	bh=dypEWTVlE89/7xWq0IMW0YOdKTTzDMNo3Lyu5x3skpc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dqdy75vjS/wuHdF8z7SIOzC+3oqwvhUjrk2eOhxo8mwFkVRhIeq/BZuPc9qAlV0DXAiAB+FXMW8erUd6NdzUdoGOuK50BzHgvnU7dRLvrelcZY1euHPK6YiYm1Nu9P7AVpoTW3HFBZSEW+8WqdaKoMZDhM+9x/tfofhZ90PjZLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gAtAjWUv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA6CCC4CEF7;
+	Thu, 19 Feb 2026 11:04:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771498892;
-	bh=NmrOcvMHCYeayk8JjT6h8S01R2z4UwfaPhPLFEB2bXg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=EzI4U+0LrX0L/ZbsG2302dfi4XMIWgdyNcRs/pwH9EpxdRIIIQ/A5RsTHvRsZxSIZ
-	 +8JPVoM8BsGsCO/zmvbiRcMRKa3zoei4cQHUJ/l7fDrQYlv1Vxm5xHjJsMuUhA04jy
-	 kpJKJxSRgwOYtm1pQboCEODY/okYtGVgOBQsWYHe8cMQ7RrdYgMJYv1ljmNzTGJbG3
-	 1xYIeeIxglbALCUB3ieztdn2g7H2+8YCsicO1I2GSKwBQ0HudTrsYNFEGCYmhP0Rqj
-	 2KJVxtvsYJuLkzgnEAVYMVp4KwRv+skz3+JPdBdgel0n1q7pFFGYNkqs9kufCkhI72
-	 HQz6qwhPwzK3g==
-Message-ID: <9f452e62-c1b4-4010-9153-83d822c7a8dc@kernel.org>
-Date: Thu, 19 Feb 2026 12:01:26 +0100
+	s=k20201202; t=1771499099;
+	bh=dypEWTVlE89/7xWq0IMW0YOdKTTzDMNo3Lyu5x3skpc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gAtAjWUvVDmTRToDssVu6nnZikmwl3JN7acRo2iLd0lEvmhvgfXflHnTynALA9mrq
+	 nTHeuHwRaRZY615Y8GKhJcQeL4r4a64YN20cDYuJFOE46yhNoSyO9SQ4ld+5JYiR3M
+	 N8RLdY8Ha/7M69wnFNBNtL95Y34OFoZi03vsTgYT97t5cJvJ20Ys+HF67rNOuxooQR
+	 8jN+mOTIvtulLGPfmGWSn/cmg79C1iRwlPkT8P6G+XYIVviS8c6h4pa1rFzMlJIiIc
+	 070DFDc3uDPap4Rjh1pjsjApp/txIT6RjA3087C0vptI1egOPum1zhC/Sc8rsfhVI2
+	 HAnIbLUnh/1Sg==
+Date: Thu, 19 Feb 2026 12:04:56 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Donald Hunter <donald.hunter@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH bpf-next v3 1/5] netlink: specs: Add XDP RX checksum
+ capability to XDP metadata specs
+Message-ID: <aZbuWBnmh_SQJyVf@lore-desk>
+References: <20260217-bpf-xdp-meta-rxcksum-v3-0-30024c50ba71@kernel.org>
+ <20260217-bpf-xdp-meta-rxcksum-v3-1-30024c50ba71@kernel.org>
+ <20260218174742.62a4074f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 1/3] dt-bindings: sram: qcom,imem: Allow
- modem-tables subnode
-To: Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alex Elder <elder@kernel.org>
-Cc: Marijn Suijten <marijn.suijten@somainline.org>,
- linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-References: <20260217-topic-ipa_imem-v3-0-d6d8ed1dfb67@oss.qualcomm.com>
- <20260217-topic-ipa_imem-v3-1-d6d8ed1dfb67@oss.qualcomm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
- cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
- JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
- gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
- J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
- NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
- BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
- vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
- Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
- TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
- S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
- FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJoF1BKBQkWlnSaAAoJEBuTQ307
- QWKbHukP/3t4tRp/bvDnxJfmNdNVn0gv9ep3L39IntPalBFwRKytqeQkzAju0whYWg+R/rwp
- +r2I1Fzwt7+PTjsnMFlh1AZxGDmP5MFkzVsMnfX1lGiXhYSOMP97XL6R1QSXxaWOpGNCDaUl
- ajorB0lJDcC0q3xAdwzRConxYVhlgmTrRiD8oLlSCD5baEAt5Zw17UTNDnDGmZQKR0fqLpWy
- 786Lm5OScb7DjEgcA2PRm17st4UQ1kF0rQHokVaotxRM74PPDB8bCsunlghJl1DRK9s1aSuN
- hL1Pv9VD8b4dFNvCo7b4hfAANPU67W40AaaGZ3UAfmw+1MYyo4QuAZGKzaP2ukbdCD/DYnqi
- tJy88XqWtyb4UQWKNoQqGKzlYXdKsldYqrLHGoMvj1UN9XcRtXHST/IaLn72o7j7/h/Ac5EL
- 8lSUVIG4TYn59NyxxAXa07Wi6zjVL1U11fTnFmE29ALYQEXKBI3KUO1A3p4sQWzU7uRmbuxn
- naUmm8RbpMcOfa9JjlXCLmQ5IP7Rr5tYZUCkZz08LIfF8UMXwH7OOEX87Y++EkAB+pzKZNNd
- hwoXulTAgjSy+OiaLtuCys9VdXLZ3Zy314azaCU3BoWgaMV0eAW/+gprWMXQM1lrlzvwlD/k
- whyy9wGf0AEPpLssLVt9VVxNjo6BIkt6d1pMg6mHsUEVzsFNBFVDXDQBEADNkrQYSREUL4D3
- Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
- MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
- OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
- GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
- 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
- YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
- 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
- BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
- JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
- 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
- YpsFAmgXUF8FCRaWWyoACgkQG5NDfTtBYptO0w//dlXJs5/42hAXKsk+PDg3wyEFb4NpyA1v
- qmx7SfAzk9Hf6lWwU1O6AbqNMbh6PjEwadKUk1m04S7EjdQLsj/MBSgoQtCT3MDmWUUtHZd5
- RYIPnPq3WVB47GtuO6/u375tsxhtf7vt95QSYJwCB+ZUgo4T+FV4hquZ4AsRkbgavtIzQisg
- Dgv76tnEv3YHV8Jn9mi/Bu0FURF+5kpdMfgo1sq6RXNQ//TVf8yFgRtTUdXxW/qHjlYURrm2
- H4kutobVEIxiyu6m05q3e9eZB/TaMMNVORx+1kM3j7f0rwtEYUFzY1ygQfpcMDPl7pRYoJjB
- dSsm0ZuzDaCwaxg2t8hqQJBzJCezTOIkjHUsWAK+tEbU4Z4SnNpCyM3fBqsgYdJxjyC/tWVT
- AQ18NRLtPw7tK1rdcwCl0GFQHwSwk5pDpz1NH40e6lU+NcXSeiqkDDRkHlftKPV/dV+lQXiu
- jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
- zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
- XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20260217-topic-ipa_imem-v3-1-d6d8ed1dfb67@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="7EEdEqOMZc2AsItl"
+Content-Disposition: inline
+In-Reply-To: <20260218174742.62a4074f@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259436-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-259437-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[30];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,kernel.org,iogearbox.net,fomichev.me,lunn.ch,intel.com,linux.dev,cloudflare.com,vger.kernel.org,lists.osuosl.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,qualcomm.com:email]
-X-Rspamd-Queue-Id: ADFF915E219
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E207215E25A
 X-Rspamd-Action: no action
 
-On 17/02/2026 14:30, Konrad Dybcio wrote:
-> From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-> 
-> The IP Accelerator hardware/firmware owns a sizeable region within the
-> IMEM, named 'modem-tables', containing various packet processing
-> configuration data.
-> 
-> It's not actually accessed by the OS, although we have to IOMMU-map it
-> with the IPA device, so that presumably the firmware can act upon it.
-> 
-> Allow it as a subnode of IMEM.
-> 
-> Signed-off-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-> ---
->  Documentation/devicetree/bindings/sram/qcom,imem.yaml | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
-> 
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+--7EEdEqOMZc2AsItl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Best regards,
-Krzysztof
+> On Tue, 17 Feb 2026 09:33:56 +0100 Lorenzo Bianconi wrote:
+> > + * In case of success, ``ip_summed`` is set to the RX checksum result.=
+ Possible
+> > + * values are:
+> > + * ``XDP_CHECKSUM_NONE``
+> > + * ``XDP_CHECKSUM_UNNECESSARY``
+> > + * ``XDP_CHECKSUM_COMPLETE``
+> > + *
+> > + * In case of success, ``cksum_meta`` contains the hw computed checksu=
+m value
+> > + * for ``XDP_CHECKSUM_COMPLETE`` or the ``csum_level`` for
+> > + * ``XDP_CHECKSUM_UNNECESSARY``. It is set to 0 for ``XDP_CHECKSUM_NON=
+E``
+>=20
+> It's fairly common for NICs to report both csum complete and
+> unnecessary. Which one should the driver return in that case?
+
+Do you mean what is value for cksum_meta if we do not report csum_level for
+XDP_CHECKSUM_UNNECESSARY/CHECKSUM_UNNECESSARY use-case? (as suggested by
+Stanislav).
+
+My original idea is:
+- if the hw reports CHECKSUM_COMPLETE:
+  - ip_summed =3D XDP_CHECKSUM_COMPLETE
+  - cksum_meta contains the checksum computed by the hw
+- if the hw reports CHECKSUM_UNNECESSARY
+  - ip_summed =3D XDP_CHECKSUM_UNNECESSARY
+  - cksum_meta =3D csum_level <-- Stanislav suggests to drop this one
+- if the hw reports CHECKSUM_NONE
+  - ip_summed =3D XDP_CHECKSUM_NONE
+  - cksum_meta =3D 0
+
+Regards,
+Lorenzo
+
+> What if the user prefers the other one?..
+
+--7EEdEqOMZc2AsItl
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaZbuWAAKCRA6cBh0uS2t
+rK3sAP0Y8MEfTYmbOSyx5stUp9dR847DtJFisjm3SerE8v89VgEAxRUCoRfB45R8
+ogSiJLBtXUXr8+9VJlQ99d28Dja/LgY=
+=gmGu
+-----END PGP SIGNATURE-----
+
+--7EEdEqOMZc2AsItl--
 
