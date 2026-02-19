@@ -1,166 +1,155 @@
-Return-Path: <netdev+bounces-259589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259590-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eCknHlZ3l2nVywIAu9opvQ
-	(envelope-from <netdev+bounces-259589-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 21:49:26 +0100
+	id kAYSEWF3l2nVywIAu9opvQ
+	(envelope-from <netdev+bounces-259590-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 21:49:37 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20D1D1626CF
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 21:49:26 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4AAF1626E7
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 21:49:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6DD5D301E995
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 20:49:24 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1482A30151EB
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 20:49:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E601130DD1F;
-	Thu, 19 Feb 2026 20:49:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="OnxGDHIE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9423F318EE1;
+	Thu, 19 Feb 2026 20:49:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B20013957E
-	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 20:49:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F903307AF0
+	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 20:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771534161; cv=none; b=smjTYtYG0tRAcGJDGUY9qCE4vQgEMhn7dgVDdz+DjxJKMobpaCk65snhiTag5shzl51m1tGQJUkPUASsKl0RX9UjS95UbWx9aPKtcIjNwOs2qDLWynUz1GBt2c9E9MDLzKuAWK8X3XRez7FoIP3T0vMS+GOPF8qc2XOy3pzfMq0=
+	t=1771534171; cv=none; b=awZqzxduOR0vC5TVtLwf1WSKF7k31WrN4+vY4k5FTPdRegQ28Mv+3TyBDUUMcSi7v5b6hxdr3NLNM9VX/4kq/cRubABSUBXpv52J+LLjThQlVv6/HRJPGohmURttI7auurjl2g17ImW5nx1ikx32g+LqzgscGGhAgZ2g8hYd9Vo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771534161; c=relaxed/simple;
-	bh=w9oLg1R0wW4uMVOKbUTIgtKGy4OR4ye6n/7fMiajz5Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ALf8hvffCFBL6HkiZBnlRvugt7WpqjKl1ESG3MzHzgopVmclmd+ypHBmuKpKI7Q7QKhOKSZKXti/EBib1C1ADSALSjU0a+vSGwelr6wMpZwcNOmOryjveFTImEetjZYdd7lN1ck3iv1llAYVzTDdGxG/eW6YMZlTLZhYETJpEbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=OnxGDHIE; arc=none smtp.client-ip=209.85.167.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-46391e91e16so821356b6e.3
-        for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 12:49:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1771534158; x=1772138958; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UtgTLfGOcjGDe5PL0CHRRM4ZPGAPDgJhQWgABhxIwOI=;
-        b=OnxGDHIEpSgwydxSo+Ox0VIZVoezIpwv0gPA9dVBHDoIXE+cFEhYjiudytjBVTJLi0
-         haAJDy4WNEAh0KMiVylCLsKeVZGR/1j5Niy8TNxNd2jNxpWrCZbkSejWOQxzcE4epwua
-         9NVQdpdK6BjwN5k9nO+opyGACXpSaK+GxRNKCh0okr6pTCLiWn1Zixw5HIe6WTQF9ABt
-         aLdvpQjgYbeHSgSWCRIGsbNhXfj+ZoGdSP9PDQKFH5nGFpvOqAtCz08TpneJBdUPmqba
-         FQodCMNIHSTG63bQkGY9N8/2WdA2ZhECvS9MABFC9RyqQddQ81zeKOKpsaKKWefmh3l+
-         X1FA==
+	s=arc-20240116; t=1771534171; c=relaxed/simple;
+	bh=VPpsP0dsawszPlt3WR8YV332ybsqWRl9JKH0WSPkup8=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=adaF4zWfpA6kCPHhg8YuTm4Ki4o7ny8Wma9u4JaZ2g3/Mb7HpCiqLCjGoHAlHVCbwp+Aq/Vn4TaSHT/5cWUpn3z+bXWS9goDLNI7moT73mRfCiop97N9ILJzjxg259q/47hSzZT5Pw5Ys8rPQvDtMwr431KnYGYnadOq7RxVX+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-679a47a1febso17734699eaf.3
+        for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 12:49:30 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771534158; x=1772138958;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UtgTLfGOcjGDe5PL0CHRRM4ZPGAPDgJhQWgABhxIwOI=;
-        b=oNtOrR80u/HVaDcKz5wKjWdY4YHEVtUQbJlDwwHvMlNuRVue6jy/5D6K6fYiK+G+Fu
-         MAEhtBl2DRuDM5t15xm1KSEz/dae4G5BzzsD3AHiaWfn47RRjMPN5jGfoz9d1T9Yy0dh
-         CDWCsCfmAVT9IivIwjRnnnGFjCxBp3ujfSrxWj3+SfWbHUiVpbuDX5h07iNHoWxaambf
-         R/Xuw7HM7wJN/LqQicf+yhNYZslyFP0bMPi0cmYhFbb2ULlpY4BEwG/jCPDrMEyt910p
-         wdxf5KJCkNfPsMZfHiO9XONDpCiOXzAAIvrb1MjXx/74igsyHb3PUeXcCwmvaDl1H1Qz
-         CnSw==
-X-Forwarded-Encrypted: i=1; AJvYcCUFOth6boJnTlgBr7kZqSm5X9WhXGrtcuxgna/XlsKB6BCKLDQHW+RLm4pc0HtJfpuB9v1Qdi8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyW4DGqK9nnD+vhb4BU6WrJvHXdA2Anie1aHlJ+fGhB+l4QMv/d
-	XWSxSLejEREZiEJkQI0x7Ep1Z5QuCXBKfsyryp9O5Iv/A05j4y3dBOOSIENSqmFdDZc=
-X-Gm-Gg: AZuq6aLhLSY7348d6n1R8T/g8G5p48GCwPfjYwQfPl1ZVI5SK+GSecEegBpq5fG9Q8j
-	1qv6njoyel6EL5wJwKMAC/1lDPamy/cpkTrjmJGjcrecJDK1FfWZzJzmfvmOUwgdhRQNOORYO0j
-	Xm7Z97RE6c6xKWTVtsVkXKbnUpLSuP77TS7UOehLoqT53xkHIG7sop0gomiUEvlsV6XK5KwbkaC
-	LSPbh1xz14qLiH8IwbnU2vftLPmGQr6ImNKw0mgOHXmWopMwHsR6n6XQZdBye/hXr7tOCn/7TGw
-	ZMfloanJLRnXPBLL8SHu7gWtWRQsU3VOIynML28QqAwZpcaKD0lhOWm1OChy3Nhhyf1C780WSnQ
-	tWOyCPoVqV/xtiqr6NoxmRUBTU2AgNraqNoKFk6axKKkZI762/cSc0ZJ6SNRkM1p/F8NBuSSDc6
-	SDeSSn8DKPkY9n3GzBnNR2ElwgNJZKpyuajEnUgGwRZoIQR8qPNTucYL0q4ndB5h6Z86vNhKaRS
-	NW+DFyU
-X-Received: by 2002:a05:6808:1448:b0:459:b569:702f with SMTP id 5614622812f47-46410b94689mr3904867b6e.15.1771534158258;
-        Thu, 19 Feb 2026 12:49:18 -0800 (PST)
-Received: from ?IPV6:2600:8803:e7e4:500:d4c1:bce:26a1:c903? ([2600:8803:e7e4:500:d4c1:bce:26a1:c903])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-463a4ede045sm13618351b6e.9.2026.02.19.12.49.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Feb 2026 12:49:17 -0800 (PST)
-Message-ID: <4b22e998-b38e-4452-82ce-1389d7086a04@baylibre.com>
-Date: Thu, 19 Feb 2026 14:49:16 -0600
+        d=1e100.net; s=20230601; t=1771534169; x=1772138969;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RpT7RKYs8o+VrGFqhw7mVJWRGQZTD3hsQ/+Luc9lqMU=;
+        b=NS7C8WyooVHWBx8Ki0Tuyz4E6p7QFg7BDBvjUvYHVD67xVpnAl8t0IFxmzNVBqHL3e
+         2f2fgs1JaFsB/quIDp6IPjJYmA/CpptEDgE9xj7NTyKA3lNgu2JHeI6xKihH3yxuesdx
+         OqZGt4mZS23loZ9xmxgIPvTaB6e74w+7FRWu/ug7gvNBltkHRsInnyqkSSCQW+yWgpp7
+         nOqJi4bDE7n32T8QGAXs+5SVLMYYUQvAfH6uS2hQKQusQD+Qi4CIyybFbVKME2tc3a6y
+         LI11VwEXAjt3OojZL80o31tnoAj119K1eniOcxdyC0lcDMj/+/vYRVMFIZsAdu46XGfA
+         AbSw==
+X-Forwarded-Encrypted: i=1; AJvYcCW7sA59YTj12IpyUMoetFPiDWWEFaehn3MNhkiWytXIWjMhTqDO7wesIxy+SSt5WyNjiEEI/j8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEGIa98zyZ2dWzzWWKy83SZ6Xb9bqS0DTmvWan7Vcxd1w3wHE9
+	0c1LZt1iZSw8CEoc/W2Q/Z/zG+ObUAti1hHdxyppo1P3/BgZfIF9T2nDFIXLD4Ysrr28fdPOGA7
+	aSB0MxIOKkMrIjm7y0JFuJR1yXkjpCtGr1ZrGntUB+EIPgp4H4KfN6cn2aw4=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 05/18] clk: mediatek: Add MT8189 vlpckgen clock support
-To: "irving.ch.lin" <irving-ch.lin@mediatek.com>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Bartosz Golaszewski <brgl@kernel.org>, Chen-Yu Tsai <wenst@chromium.org>,
- Miles Chen <miles.chen@mediatek.com>
-Cc: linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
- Project_Global_Chrome_Upstream_Group@mediatek.com,
- Qiqi Wang <qiqi.wang@mediatek.com>, sirius.wang@mediatek.com,
- vince-wl.liu@mediatek.com, jh.hsu@mediatek.com
-References: <20260202062840.342707-1-irving-ch.lin@mediatek.com>
- <20260202062840.342707-6-irving-ch.lin@mediatek.com>
-Content-Language: en-US
-From: David Lechner <dlechner@baylibre.com>
-In-Reply-To: <20260202062840.342707-6-irving-ch.lin@mediatek.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6820:16a6:b0:677:8da:2867 with SMTP id
+ 006d021491bc7-679a742cc7emr3617174eaf.38.1771534169287; Thu, 19 Feb 2026
+ 12:49:29 -0800 (PST)
+Date: Thu, 19 Feb 2026 12:49:29 -0800
+In-Reply-To: <6920fe81.a70a0220.d98e3.004f.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69977759.050a0220.21cd75.0198.GAE@google.com>
+Subject: Re: [syzbot] [wireless?] WARNING in ieee80211_mgd_probe_ap_send (3)
+From: syzbot <syzbot+a59b5291776979816910@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[baylibre-com.20230601.gappssmtp.com:s=20230601];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=65722f41f7edc17e];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259589-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[mediatek.com,baylibre.com,kernel.org,gmail.com,collabora.com,chromium.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[baylibre.com];
-	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[baylibre-com.20230601.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dlechner@baylibre.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mediatek.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,baylibre.com:mid]
-X-Rspamd-Queue-Id: 20D1D1626CF
+	TAGGED_FROM(0.00)[bounces-259590-lists,netdev=lfdr.de,a59b5291776979816910];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	SUBJECT_HAS_QUESTION(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,storage.googleapis.com:url,syzkaller.appspot.com:url]
+X-Rspamd-Queue-Id: B4AAF1626E7
 X-Rspamd-Action: no action
 
-On 2/2/26 12:28 AM, irving.ch.lin wrote:
-> From: Irving-CH Lin <irving-ch.lin@mediatek.com>
-> 
-> Add support for the MT8189 vlpckgen clock controller, which provides
-> muxes and dividers for clock selection in vlp domain for other IP blocks.
-> 
-> Signed-off-by: Irving-CH Lin <irving-ch.lin@mediatek.com>
-> ---
+syzbot has found a reproducer for the following issue on:
 
-...
+HEAD commit:    2b7a25df823d Merge tag 'mm-nonmm-stable-2026-02-18-19-56' ..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11a0bb3a580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=65722f41f7edc17e
+dashboard link: https://syzkaller.appspot.com/bug?extid=a59b5291776979816910
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16445ffa580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14e8715a580000
 
-> +static const struct mtk_gate vlp_ck_clks[] = {
-> +	GATE_VLP_CK(CLK_VLP_CK_VADSYS_VLP_26M_EN, "vlp_vadsys_vlp_26m", "clk26m", 1),
-> +	GATE_VLP_CK_FLAGS(CLK_VLP_CK_FMIPI_CSI_UP26M_CK_EN, "VLP_fmipi_csi_up26m",
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-2b7a25df.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/f3a54d09b17c/vmlinux-2b7a25df.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/fb704901bce5/bzImage-2b7a25df.xz
 
-Should "VLP_fmipi_csi_up26m" be all lower-case to match the style of all of
-the other clock names? i.e. "vlp_fmipi_csi_up26m"
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+a59b5291776979816910@syzkaller.appspotmail.com
 
-> +			  "osc_d10", 11, CLK_IS_CRITICAL),
-> +};
-> +
+------------[ cut here ]------------
+!sta
+WARNING: net/mac80211/mlme.c:4504 at ieee80211_mgd_probe_ap_send+0x497/0x560 net/mac80211/mlme.c:4504, CPU#0: kworker/u4:1/13
+Modules linked in:
+CPU: 0 UID: 0 PID: 13 Comm: kworker/u4:1 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+Workqueue: events_unbound cfg80211_wiphy_work
+RIP: 0010:ieee80211_mgd_probe_ap_send+0x497/0x560 net/mac80211/mlme.c:4504
+Code: 4c 89 fe 48 83 c4 18 5b 41 5c 41 5d 41 5e 41 5f 5d e9 dd 2b 78 f6 e8 98 44 8c f6 90 0f 0b 90 e9 3a fc ff ff e8 8a 44 8c f6 90 <0f> 0b 90 e9 d3 fc ff ff e8 7c 44 8c f6 90 0f 0b 90 e9 3c ff ff ff
+RSP: 0018:ffffc9000026fa60 EFLAGS: 00010293
+RAX: ffffffff8b3957a6 RBX: ffff888012918dc0 RCX: ffff88801b7b0000
+RDX: 0000000000000000 RSI: ffffffff8e16564a RDI: ffff88801b7b0000
+RBP: 0000000000000001 R08: ffff88801b7b0000 R09: 000000000000000c
+R10: 000000000000000c R11: 0000000000000000 R12: ffff88801291aae2
+R13: dffffc0000000000 R14: 0000000000000002 R15: ffff888012919d40
+FS:  0000000000000000(0000) GS:ffff88808ca5b000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f947154da08 CR3: 000000001253c000 CR4: 0000000000352ef0
+Call Trace:
+ <TASK>
+ cfg80211_wiphy_work+0x2ab/0x4a0 net/wireless/core.c:440
+ process_one_work kernel/workqueue.c:3275 [inline]
+ process_scheduled_works+0xb02/0x1830 kernel/workqueue.c:3358
+ worker_thread+0xa50/0xfc0 kernel/workqueue.c:3439
+ kthread+0x388/0x470 kernel/kthread.c:467
+ ret_from_fork+0x51e/0xb90 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
