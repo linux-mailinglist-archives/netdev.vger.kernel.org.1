@@ -1,213 +1,141 @@
-Return-Path: <netdev+bounces-259517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259518-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sAoSGklAl2lXwAIAu9opvQ
-	(envelope-from <netdev+bounces-259517-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 17:54:33 +0100
+	id kFwyLLJBl2lXwAIAu9opvQ
+	(envelope-from <netdev+bounces-259518-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 18:00:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7F5B160D57
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 17:54:32 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72F56160DF4
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 18:00:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C82AA3035017
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 16:54:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3E8963010BB0
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 17:00:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9093934D4FE;
-	Thu, 19 Feb 2026 16:54:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C8E2C0294;
+	Thu, 19 Feb 2026 17:00:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="aUUac6CL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eJUbPMiB"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 181F134CFCB;
-	Thu, 19 Feb 2026 16:53:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D631F2C1586;
+	Thu, 19 Feb 2026 17:00:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771520040; cv=none; b=u1EcwDv4fSuc5Qk3q1APS7C9v6uNtb9Z+kC5PIFk8AtwEptHg+QXn1hqAkvtbMtcWLqP+AHOtgeAp5bPSzbyoXcRTVK7uU2tIUTvnG7jXU5D+GWnbeHJdVb+sLj4LWWsUmH4ZZXoQGkQsaI5F4BNoFrzCa26KCxuzY5qlf9GMe0=
+	t=1771520417; cv=none; b=H9IL6y/HEkAF4GH6oNADtS6uhIx5pRN4sPhSwW7gwcMUOziaiETKWRX+Brd7Js/KmOdhVaa/BpyrZpldm9KGwuGx0HyozKe4EEtsHkP/ykmBB1kEoWbNW/qKDaXWoZAzdk0sMvv71nNVVTvYhpTBxdSBW1nuXZe8DQa/3MzZVdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771520040; c=relaxed/simple;
-	bh=p+tUXB3Qji9LNhxxmlLdCEuFkWLVEAKpcxmSjcIqAUc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZgNr7nYavKzPonfwFSk6QZkoJIykiyEOT7tcYZla+UhRCCXd+u62X61BhflLhAYuucUewyw0vEGGNJBVJVTsFwCx2yhX3o4gFd265uxh9BYMPfoaNISwugJv9zb+pRkqAPvAtmeFD3ujQMW3imPSbhshecczr1ffVEBhbqswc5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=aUUac6CL; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=NqNSewweIKFfCmLrQgWQ7akHkJKLSCW09XG4EmRHUr0=; b=aUUac6CLUXaq7d2aPoJC01PxD+
-	YVDK70ivOhzz2+bcc2WE720b7dBz5Dsn1eOubCpXqN8MKeW9BpQBSwr1upT5ce+YMCSX03wJF/XKo
-	J7mKaZglQ+JQ+XhgLMllxR2fv7lqzcQf8nNSIBxk+siRabMz/VKpVFq8l7cByG8DMHL4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vt7Hi-007wWF-9A; Thu, 19 Feb 2026 17:53:50 +0100
-Date: Thu, 19 Feb 2026 17:53:50 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Srinivas Neeli <srinivas.neeli@amd.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, michal.simek@amd.com,
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	richardcochran@gmail.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, git@amd.com
-Subject: Re: [RFC PATCH 1/8] dt-bindings: net: Add TSN Endpoint Ethernet MAC
- support
-Message-ID: <76c811a7-d081-4238-bf6a-0226e867560a@lunn.ch>
-References: <20260219054911.2017362-1-srinivas.neeli@amd.com>
- <20260219054911.2017362-2-srinivas.neeli@amd.com>
+	s=arc-20240116; t=1771520417; c=relaxed/simple;
+	bh=XvPDoDY1pPUq2k4fN+DFMpOuKnftkoMNinTaw9sQDoI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=BKpCmVhb0hNSjrmY5ygI0L1/2KcR0HzknuW0RVgbzEBljbc29kKqLxH6gqSd/ZXp2PtrHE5mnPuxS18x7+qnE8n3E4uPyyuHnmn7tVzoe0PYIqelwPuxBbPdPLgIH8ViQ4eVdljd8xwqsr7qnVR9IOPIUAHB3mqlR/CYe43j0po=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eJUbPMiB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 739D3C4CEF7;
+	Thu, 19 Feb 2026 17:00:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771520417;
+	bh=XvPDoDY1pPUq2k4fN+DFMpOuKnftkoMNinTaw9sQDoI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=eJUbPMiB2E1T9Lhc+4dT+CcezwLr274I7dc4UGbegfiNEmILiv46YJAHjjtqMHufk
+	 RLEKmy+FSRhTdTCpgjO76/RRqjJDhWD/fHpyPq4irNa+j6ZBS0U6MbWX3cgT7eGj2c
+	 E1MpAeqMvxygCgTDyNRRk49QVVvMh13YfnKrc6mOt/ixWj6HTY0igOCPAp2NHBzLvf
+	 CxR9/oF8dzPWaTsiUVSURSBL6iSwsgLYwEACVxtQiNwchCl4eFHb2v4U3LpHPAJ01f
+	 HK+i9nt9v6puKDD5gjJkiUijyfocBRZJONcmqoEbLpKryUmjSN0n/WxK54RxMqBzog
+	 0Yt548Q6n521Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 8527C380CEF3;
+	Thu, 19 Feb 2026 17:00:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260219054911.2017362-2-srinivas.neeli@amd.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH iproute2-next v2 0/2] devlink: support default flag attr
+ for param-get and param-set commands
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177152040832.2301686.9442715552350209457.git-patchwork-notify@kernel.org>
+Date: Thu, 19 Feb 2026 17:00:08 +0000
+References: <20260206-param-defaults-v2-0-1ce78e2c5a31@gmail.com>
+In-Reply-To: <20260206-param-defaults-v2-0-1ce78e2c5a31@gmail.com>
+To: Daniel Zahka <daniel.zahka@gmail.com>
+Cc: jiri@resnulli.us, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, donald.hunter@gmail.com, dsahern@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259517-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[resnulli.us,davemloft.net,kernel.org,redhat.com,gmail.com,vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,amd.com,gmail.com,vger.kernel.org,lists.infradead.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259518-lists,netdev=lfdr.de,netdevbpf];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_PROHIBIT(0.00)[0.0.148.112:email,0.0.78.32:email,0.0.0.1:email,0.0.62.128:email];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	FROM_NO_DN(0.00)[];
+	RSPAMD_EMAILBL_FAIL(0.00)[dsahern.kernel.org:query timed out];
+	NEURAL_HAM(-0.00)[-0.999];
 	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[0.0.0.0:email,lunn.ch:mid,lunn.ch:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,4.197.80.64:email]
-X-Rspamd-Queue-Id: C7F5B160D57
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 72F56160DF4
 X-Rspamd-Action: no action
 
-> +examples:
-> +  - |
-> +    tsn_ip: tsn@80040000 {
-> +        compatible = "xlnx,tsn-endpoint-ethernet-mac-3.0";
-> +        reg = <0x80040000 0x40000>;
-> +        clocks = <&misc_clk_2>, <&misc_clk_2>, <&misc_clk_1>, <&misc_clk_1>, <&misc_clk_3>, <&misc_clk_0>;
-> +        clock-names = "gtx", "gtx90", "host_rxfifo", "host_txfifo", "ref", "s_axi";
-> +        dmas = <&axi_mcdma_0 0>, <&axi_mcdma_0 1>, <&axi_mcdma_0 2>, <&axi_mcdma_0 3>,
-> +               <&axi_mcdma_0 4>, <&axi_mcdma_0 5>, <&axi_mcdma_0 6>, <&axi_mcdma_0 7>,
-> +               <&axi_mcdma_0 16>, <&axi_mcdma_0 17>, <&axi_mcdma_0 18>, <&axi_mcdma_0 19>,
-> +               <&axi_mcdma_0 20>, <&axi_mcdma_0 21>, <&axi_mcdma_0 22>, <&axi_mcdma_0 23>;
-> +        dma-names = "tx_chan0","tx_chan1","tx_chan2","tx_chan3","tx_chan4","tx_chan5","tx_chan6",
-> +                    "tx_chan7","rx_chan0","rx_chan1","rx_chan2","rx_chan3","rx_chan4","rx_chan5",
-> +                    "rx_chan6","rx_chan7";
-> +        xlnx,num-priorities = <8>;
-> +        #address-cells = <1>;
-> +        #size-cells = <1>;
-> +        ranges = <0x0 0x80040000 0x40000>;
-> +        xlnx,tsn-tx-config = <&tsn_tx_config>;
-> +        tsn_tx_config: tx-queues-config {
-> +            queue0 {
-> +                xlnx,dma-channel-num = <0x5>;
-> +            };
-> +            queue1 {
-> +                 xlnx,dma-channel-num = <0x4>;
-> +            };
-> +            queue2 {
-> +                 xlnx,dma-channel-num = <0x3>;
-> +            };
-> +            queue3 {
-> +                 xlnx,dma-channel-num = <0x2>;
-> +            };
-> +            queue4 {
-> +                 xlnx,dma-channel-num = <0x1>;
-> +            };
-> +            queue5 {
-> +                 xlnx,dma-channel-num = <0x0>;
-> +            };
-> +        };
-> +        // MAC 1 Node
-> +        mac1: ethernet-mac@0 {
-> +            reg = <0x0 0x14000>;
-> +            phy-mode = "rgmii-id";
-> +            phy-handle = <&phy0>;
-> +            mdio {
-> +            #address-cells = <1>;
-> +            #size-cells = <0>;
-> +            phy0: ethernet-phy@0 {
-> +                device_type = "ethernet-phy";
-> +                reg = <0>;
-> +            };
-> +            };
+Hello:
 
-Two } at the same level means your indentation is broken.
+This series was applied to iproute2/iproute2-next.git (main)
+by David Ahern <dsahern@kernel.org>:
 
-So each MAC has an MDIO node?
+On Fri, 06 Feb 2026 13:11:28 -0800 you wrote:
+> Add cli support for default param values introduced in the
+> accompanying kernel series [1]. Here is some sample usage:
+> 
+> [1]: https://lore.kernel.org/netdev/20251119025038.651131-1-daniel.zahka@gmail.com/
+> 
+>  # dump params with defaults
+> ./devlink dev param show pci/0000:01:00.0
+> pci/0000:01:00.0:
+>   name max_macs type generic
+>     values:
+>       cmode driverinit value 128 default 128
+> ...
+>   name swp_l4_csum_mode type driver-specific
+>     values:
+>       cmode permanent value default default default
+> 
+> [...]
 
-> +        };
-> +
-> +        // MAC 2 Node
-> +        mac2: ethernet-mac@20000 {
-> +            reg = <0x20000 0x14000>;
-> +            phy-mode = "rgmii-id";
-> +            phy-handle = <&phy1>;
-> +            mdio {
-> +            #address-cells = <1>;
-> +            #size-cells = <0>;
-> +            phy1: ethernet-phy@1 {
-> +                device_type = "ethernet-phy";
-> +                reg = <1>;
-> +            };
-> +            };
-> +        };
-> +
-> +        // Endpoint Node
-> +        ep_mac: ep-mac@16000 {
-> +            reg = <0x16000 0xa000>;
-> +        };
+Here is the summary with links:
+  - [iproute2-next,v2,1/2] devlink: Pull the value printing logic out of pr_out_param_value()
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=bbe2c8b3229d
+  - [iproute2-next,v2,2/2] devlink: support displaying and resetting to default params
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=446dd2c18952
 
-Except the Endpoint MAC does not have MDIO?  Or does it have an MDIO
-bus, and you have simply not listed it?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> +
-> +        // Switch Node
-> +        tsn_switch: switch@38000 {
-> +            reg = <0x38000 0x8000>;
-> +
-> +            ethernet-ports {
-> +                #address-cells = <1>;
-> +                #size-cells = <0>;
-> +
-> +                port@0 {
-> +                    reg = <0>;
-> +                    ethernet = <&ep_mac>;
-> +                };
 
-So this looks like a DSA switch.
-
-> +
-> +                port@1 {
-> +                    reg = <1>;
-> +                    ethernet = <&mac1>;
-
-If you look at Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
-you see this node is derives from ethernet-switch-port.yaml, and that
-derives from ethernet-controller.yaml. All the MAC properties you have
-above actually belong here.
-
-	Andrew
 
