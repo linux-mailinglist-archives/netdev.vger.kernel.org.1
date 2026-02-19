@@ -1,226 +1,157 @@
-Return-Path: <netdev+bounces-259388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259389-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UBmMHpxnlmleewIAu9opvQ
-	(envelope-from <netdev+bounces-259388-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 02:30:04 +0100
+	id +OKwIzBqlmnlewIAu9opvQ
+	(envelope-from <netdev+bounces-259389-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 02:41:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEEE515B5EE
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 02:30:03 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6A9815B64F
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 02:41:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A8CB03019111
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 01:30:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1BFC4302E790
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 01:40:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4C2325C6EE;
-	Thu, 19 Feb 2026 01:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85BD21DF755;
+	Thu, 19 Feb 2026 01:40:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OkgJwX+R"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="buZARvjV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDB282264D3;
-	Thu, 19 Feb 2026 01:30:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3836713B58A
+	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 01:40:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771464601; cv=none; b=ff7asTfDNYaqM3XHZnABqyAQcoBaAG0uepV/BXN5VYAxJfqAa3ZXO3dFRji4qA5PJvmO/fK1OQvfb+56BWukD31R1bhu+kg1EGH17CNA3d/hCXVSj2QcDRWjs0QQbxBtYf9hRHAQSuAQQskeO4lMuH2xC+O/yjA1mBw36ZN4CEk=
+	t=1771465222; cv=none; b=vBfdvG0TSea5bR475RmAOsT51C4BHjKL4ZQZ3OUJa+/xhWjg5lyI2YHHzFyTDlvWwEdxq2YVlqhiHUHNSaxVPcQk+OLMgjsu/SgQGCek8xtFGr1OgTPMumg47l+JTaaRBlOnhcKacHc9nt6oKa5woPWLNbZQvK6fonRLelDmiXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771464601; c=relaxed/simple;
-	bh=T8Ma8VZaNHsXdV3GsG9USlali9VvMOZ+l/Y7uA1elPY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dJ2wQ9ll8Labovyj9PpTQ8yXAvJPOHoj2vG0a9XlCgVhmeLvDae42x8Us1bR6e4jEexbPULzSeztf/YFx36DmcPPwXZ2bbFNWe/qWXI4ybAkzsbTxGrisEzayr+MUflJ+IFp2Arz1oRCf1Ax9BNcuTm6klTrBl8tGybg1MUNq5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OkgJwX+R; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E974CC116D0;
-	Thu, 19 Feb 2026 01:30:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771464601;
-	bh=T8Ma8VZaNHsXdV3GsG9USlali9VvMOZ+l/Y7uA1elPY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OkgJwX+Rpz97LiFNEnUJFmma0Wi0St8j+K2fdxDbG0N1l35LGvqIzVSSfw8FvSQ5q
-	 Q6/gSfRyxq+0OmLaucO+Mjwduld5zAkTSxvQ1+6PmURNByzTn/JzAQJkdVheFxebdK
-	 QXKjxd99Njs8LB/8HrdG6AFFtUGcjBTazeiU+jo3LzBZk14lhAUupC6MRYG2JVH+aC
-	 +Dne/41oE0a830V3HUu+SYpISfaE86TJ8IBtJbrvtbPjTAtolqgn0t3ymecqKAMVY6
-	 /sSCRfOj774KqzX4FSedIeRPRK9TGPAxgRnWgjoOKvSVtqMMigdfowQnQ6uNFOgIi5
-	 fz8tAV6AUxatw==
-Date: Wed, 18 Feb 2026 17:30:00 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tiernan Hubble <thubble@thubble.ca>
-Cc: Igor Russkikh <irusskikh@marvell.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Lorenz Brun
- <lorenz@brun.one>, Andrew Lunn <andrew@lunn.ch>, Simon Horman
- <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] net: atlantic: fix reading SFP module info on
- some AQC100 cards
-Message-ID: <20260218173000.01a44c80@kernel.org>
-In-Reply-To: <20260216224913.419470-1-thubble@thubble.ca>
-References: <20260216224913.419470-1-thubble@thubble.ca>
+	s=arc-20240116; t=1771465222; c=relaxed/simple;
+	bh=edZH8GVjhcpoHyWTrz+AskdA2I//P81O54WF+KiRGYM=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=JdzyBFJq5uc/TE06Y2Yl/2e71TTTIGbyQpExDKNcsHDEJs3Vw75aj6EGtmmhPOJWTwuoLgp9LBTGW8mkosFX8gJouKdZXzHYlDz0wRBLyEh7TI/ZvwyavRAXDH4fmXRqkW3lNDXGl+tPhK7zLip+1phCmC22vtZ4aYNS0d3k+rE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=buZARvjV; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1771465207;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1rhlDgjQRcnJlZlAdvy1WgT+vLTyCB0qwPb81xHOXUU=;
+	b=buZARvjVi8yPahboMH82huFElwmuB8/gjOKCy3Gz5qYGcjS8f+ua2DRvleV7YBXUCMhEDX
+	CRj32TrG/+o7UulYGH6XQxmScyEpq2cxKuU/J8e36SF18Tik06UVkXkcBntQj+roWim9hP
+	HPdTx1Q/cDbpZkt1Co9mxxDRP9aa8ss=
+Date: Thu, 19 Feb 2026 01:40:04 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
+Message-ID: <1be04622bbdace30827f3588b2b721b478bc2c28@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH net v1] kcm: fix zero-frag skb in frag_list on partial
+ sendmsg error
+To: "Paolo Abeni" <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: "Jiayuan Chen" <jiayuan.chen@shopee.com>,
+ syzbot+52624bdfbf2746d37d70@syzkaller.appspotmail.com, "David S. Miller"
+ <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, "Simon Horman" <horms@kernel.org>, "Michal
+ Luczaj" <mhal@rbox.co>, "Sven Stegemann" <sven@stegemann.de>, "Christian
+ Brauner" <brauner@kernel.org>, "Tom Herbert" <tom@herbertland.com>,
+ linux-kernel@vger.kernel.org
+In-Reply-To: <404e29e1-a5b8-4d43-bde6-7409a8b00b57@redhat.com>
+References: <20260213061232.338244-1-jiayuan.chen@linux.dev>
+ <404e29e1-a5b8-4d43-bde6-7409a8b00b57@redhat.com>
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259388-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259389-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,thubble.ca:email]
-X-Rspamd-Queue-Id: DEEE515B5EE
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,52624bdfbf2746d37d70];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,shopee.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E6A9815B64F
 X-Rspamd-Action: no action
 
-On Mon, 16 Feb 2026 16:49:12 -0600 Tiernan Hubble wrote:
-> Commit 853a2944aaf3 ("net: atlantic: support reading SFP module info")
-> added support for reading SFP module info on AQC100-based cards. However,
-> it only supports reading directly from the controller's hardware
-> registers, and this does not seem to be supported on certain cards,
-> including my TRENDnet TEG-10GECSFP V3. "ethtool -m" times out when reading
-> certain registers, even when I increase the read poll timeout values.
-> 
-> The DPDK "atlantic" driver reads module info via firmware calls instead of
-> directly reading the hardware registers, provided that the NIC's firmware
-> version supports it.
-> 
-> This change adapts the DPDK firmware call code to the kernel driver. It
-> preserves the old hardware-based module read code as a fallback when the
-> firmware does not support it, to avoid breaking cards that are currently
-> working.
-> 
-> Tested on 2 different TRENDnet TEG-10GECSFP V3 cards, both with firmware
-> version 3.1.121 (current at the time of this patch). Both cards correctly
-> reported module info for a passive DAC cable and 2 different 10G optical
-> transceivers.
-> 
-> Fixes: 853a2944aaf3 ("net: atlantic: support reading SFP module info")
-> Signed-off-by: Tiernan Hubble <thubble@thubble.ca>
+2026/2/17 19:52, "Paolo Abeni" <pabeni@redhat.com mailto:pabeni@redhat.co=
+m?to=3D%22Paolo%20Abeni%22%20%3Cpabeni%40redhat.com%3E > wrote:
 
-Overall looks quite nice, but I don't think it qualifies as a fix.
-Fix means something regressed from previous release, crashes, etc
-For the adapters in question IIUC ethtool -m has never worked before.
-Please drop the Fixes tag and repost next week for net-next.
 
-Some drive by comments below..
+>=20
+>=20On 2/13/26 7:12 AM, Jiayuan Chen wrote:
+>=20
+>=20>=20
+>=20> From: Jiayuan Chen <jiayuan.chen@shopee.com>
+> >=20=20
+>=20>  Syzkaller reported a warning in kcm_write_msgs() when processing a
+> >  message with a zero-fragment skb in the frag_list.
+> >=20=20
+>=20>  When kcm_sendmsg() fills MAX_SKB_FRAGS fragments in the current sk=
+b,
+> >  it allocates a new skb (tskb) and links it into the frag_list before
+> >  copying data. If the copy subsequently fails (e.g. -EFAULT from
+> >  user memory), tskb remains in the frag_list with zero fragments:
+> >=20=20
+>=20>  head skb (msg being assembled, NOT yet in sk_write_queue)
+> >  +-----------+
+> >  | frags[17] | (MAX_SKB_FRAGS, all filled with data)
+> >  | frag_list-+--> tskb
+> >  +-----------+ +----------+
+> >  | frags[0] | (empty! copy failed before filling)
+> >  +----------+
+> >=20=20
+>=20>  For SOCK_SEQPACKET with partial data already copied, the error pat=
+h
+> >  saves this message via partial_message for later completion. A
+> >  subsequent zero-length write(fd, NULL, 0) implies MSG_EOR, which
+> >  queues the message to sk_write_queue.
+> >=20
+>=20AI review noted that the above statement is dubious. Specifically,
+> looking it looks like that write(fd, NULL, 0) implies EOR for SOCK_DGRA=
+M
+> packets:
+>=20
+>=20 int eor =3D (sock->type =3D=3D SOCK_DGRAM) ?
+>  !(msg->msg_flags & MSG_MORE) : !!(msg->msg_flags & MSG_EOR);
+>=20
+>=20I guess the changelog needs some clarification.
+>=20
+>=20Thanks,
+>=20
+>=20Paolo
+>
 
-> diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c b/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
-> index a6e1826dd5d7..5be9e9ee7e9f 100644
-> --- a/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
-> +++ b/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
-> @@ -983,6 +983,36 @@ static int aq_ethtool_set_phy_tunable(struct net_device *ndev,
->  	return err;
->  }
->  
-> +static bool aq_ethtool_can_read_module_eeprom(struct aq_nic_s *aq_nic)
-> +{
-> +	return aq_nic->aq_fw_ops->read_module_eeprom ||
-> +		aq_nic->aq_hw_ops->hw_read_module_eeprom;
-> +}
-> +
-> +static int aq_ethtool_read_module_eeprom(struct aq_nic_s *aq_nic, u8 dev_addr,
-> +					 u8 reg_start_addr, int len, u8 *data)
-> +{
-> +	int err = -EOPNOTSUPP;
-
-maybe add a temp variable:
-
-	const struct aq_fw_ops *ops = aq_nic->aq_fw_ops;
-
-> +	if (aq_nic->aq_fw_ops->read_module_eeprom) {
-> +		err = aq_nic->aq_fw_ops->read_module_eeprom(aq_nic->aq_hw,
-
-to avoid the long lines and awkward wrapping ?
-
-> +			dev_addr, reg_start_addr, len, data);
-> +
-> +		/* If the only error is that the firmware version doesn't
-> +		 * support reading EEPROM, we can still attempt to read it
-> +		 * directly from the hardware if supported.
-> +		 */
-> +		if (err != -EOPNOTSUPP)
-> +			return err;
-> +	}
-> +
-> +	if (aq_nic->aq_hw_ops->hw_read_module_eeprom)
-> +		err = aq_nic->aq_hw_ops->hw_read_module_eeprom(aq_nic->aq_hw,
-
-and here
-
-> +			dev_addr, reg_start_addr, len, data);
-> +
-> +	return err;
-> +}
-
-> +static int aq_fw2x_read_module_eeprom(struct aq_hw_s *self, u8 dev_addr,
-> +				      u8 reg_start_addr, int len, u8 *data)
-> +{
-> +	u32 low_status, orig_low_status, low_req = 0;
-> +	u32 res_bytes_remain_cnt = len % sizeof(u32);
-> +	u32 res_dword_cnt = len / sizeof(u32);
-> +	struct smbus_request request = { 0 };
-> +	u32 req_dword_cnt;
-> +	u32 result = 0;
-> +	u32 caps_lo;
-> +	u32 offset;
-> +	int err;
-> +
-> +	caps_lo = aq_fw2x_get_link_capabilities(self);
-> +	if (!(caps_lo & BIT(CAPS_LO_SMBUS_READ)))
-> +		return -EOPNOTSUPP;
-> +
-> +	request.msg_id = 0;
-> +	request.device_id = dev_addr;
-> +	request.address = reg_start_addr;
-> +	request.length = len;
-> +
-> +	/* Write SMBUS request to cfg memory */
-> +	req_dword_cnt = (sizeof(request) + sizeof(u32) - 1) / sizeof(u32);
-
-DIV_ROUND_UP()
-
-> +	err = hw_atl_write_fwcfg_dwords(self, (void *)&request, req_dword_cnt);
-> +	if (err < 0)
-> +		return err;
-> +
-> +	/* Toggle 0x368.CAPS_LO_SMBUS_READ bit */
-> +	low_req = aq_hw_read_reg(self, HW_ATL_FW2X_MPI_CONTROL_ADDR);
-> +	orig_low_status = low_req & BIT(CAPS_LO_SMBUS_READ);
-
-the mixing of BIT(CAPS_LO_SMBUS_READ)..
-
-> +	low_req ^= HW_ATL_FW2X_CAP_SMBUS_READ;
-
-.. and HW_ATL_FW2X_CAP_SMBUS_READ which is defined to
-
-+#define HW_ATL_FW2X_CAP_SMBUS_READ       BIT(CAPS_LO_SMBUS_READ)
-
-seems unnecessary and confusing?
--- 
-pw-bot: cr
+Thanks for pointing this out. I'll update the changelog to clarify that
+for SOCK_SEQPACKET, sock_write_iter() automatically sets MSG_EOR
+(net/socket.c:1189), which is what makes the subsequent write()
+complete the message.
 
