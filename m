@@ -1,149 +1,153 @@
-Return-Path: <netdev+bounces-259573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259574-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4MN5AJNgl2kAxgIAu9opvQ
-	(envelope-from <netdev+bounces-259573-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 20:12:19 +0100
+	id +IdiNlBhl2kAxgIAu9opvQ
+	(envelope-from <netdev+bounces-259574-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 20:15:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92884161DE7
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 20:12:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B50C161E27
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 20:15:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D13BA3012D06
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 19:12:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8372730226B5
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 19:15:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A76B2F0C7E;
-	Thu, 19 Feb 2026 19:12:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2E032FFF8E;
+	Thu, 19 Feb 2026 19:15:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.pl header.i=@yahoo.pl header.b="D8w/74TZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WL+zcT/h"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic311-31.consmr.mail.ir2.yahoo.com (sonic311-31.consmr.mail.ir2.yahoo.com [77.238.176.163])
+Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7009E2DFF3F
-	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 19:12:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.238.176.163
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D9542F39C2
+	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 19:15:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771528336; cv=none; b=f+lTA1+Jr3zrm1RK4EOaAaWp8UczMVfj7LY4vLea6TZQ/s1xnBTwMdZRzVaDh8ueZYDIecfV6zX2oiggAmzdpbnZZ1fAuulehj2VTgE6r60ej7vkFNtRa5tsczpc/lLO+ZkfPMiPMp0X85TXujO8uT7LrHADvVZcu1+q8FhiXak=
+	t=1771528519; cv=none; b=akvpPJCOyzO0eeALEY49evL8ypPdeJycRxbSRfiDLjbnH0Al+eZjUodan9VVG30Enxd19eVhKFra0bMfnJl/SzKU+bFow8nxu71QXjWOLUNFPCL0QLCUtfkhwz5wPRJguEcVi1LyV2J/XuhQqBtvdXX6/jiOqXYQOfA6FJe85Hs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771528336; c=relaxed/simple;
-	bh=3ikTeXHqkkKjka3YreCgbGPZvLBVSQVy7oDraPv6vT8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:References; b=CPWkDRCyDkjLXx0cPfRg3pQ6oET40r/e9avDT+XONQs7PDzMPtpneT4pImalAqlUSSHltOZGVZ9rZO/jPwqX/z8LuAmk68EhANfUATBQlxgD7OTkCF5MslFSHUXBv4MAEA2NYQXAWKTw7t/Np4HVW6ebfI5Zgx8Rk5jYXuRE2pw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.pl; spf=pass smtp.mailfrom=yahoo.pl; dkim=pass (2048-bit key) header.d=yahoo.pl header.i=@yahoo.pl header.b=D8w/74TZ; arc=none smtp.client-ip=77.238.176.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.pl
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.pl; s=s2048; t=1771528325; bh=iaCwCXJITWk+Di0OQ3tScf/e/NJTS15h2zbUKrBRvDk=; h=From:To:Cc:Subject:Date:References:From:Subject:Reply-To; b=D8w/74TZFeb/nxtVENBfs9nTrdckc9lJXMiF9sYygE3eq6uRA4IunrjrdPhwCCU/dTRRlheTiXKO3jbAqSaDx6xsYLcOxFuXl7J9ZwBXsfVVzTa8nPdB6fOZzKijRTst8C8wPknzPwLBdeDeKc+s9DTfvimHEIA5J2+txoQGvKG8IvURqyIVkB+eQ1Q8OIEpDVyQwjF2teA/hkEZjfe3AU+kWAJUHSr6jgi140oWpkApCRta3TZeQGWVMExQkIL64sUx8ojYqXuVGvgR+FjLwFSg5KFF/8wNzciEtp3GgrQzDrK1o6ThmoLLdPsMjP4Bu58DrNS9TehIG0OFtvynGQ==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1771528325; bh=iAH4w9xhX8/ED/ivZQozZb3rpgExpkkwdOHtQRU+HYi=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=HgBwkZVD+iE7BOSlEObrgMuxvCSQwmBQpY/nApkdyGGrXu0R1zFqasAY1AjHDo4VQ0vCB+rQpN0JF+ZoWHKzStLJkimHr319m5ZkwrGdCP0EffjpTgTQ+pAsU8P5C+kRiKtSMz/tji3YhBE/0msebJFBz+Ec22yC8CoOVxCTlAOZKv7r5Ki2K0JxXiMQqWZR8+ApTpiQrdHshrBXpmgQEWDEoOO6W435Zb8yIGNxaBjcABJE5RPUUILQkWBnMRflD2qo27HUutjTVJUvrVjD0MMsTH3UKIPtvBdkjEQsIMjcWFQp9/vkzgapVb2cpUuWukpDmdCcH5nCZBkC3hoiJA==
-X-YMail-OSG: Te4q5EkVM1kGVDot1c9H4NhhSf5ajsxQh.y9DvS4oBn0.xzMnwtiNGPUqBdnZaL
- KVWDpVcpRF1FRzHgUAE7ZwJTKy9NzfYPPcWuPFSKfCdWNNIsXB9Jnuls.3BGU32AteIAONuW1P2l
- nRZLvR8mMdu9s5JejgpHowThk7ZlwHzaxcnwHOxsDX1FruPjCfOIr8lV2cHhDXh1UenJAPqxbNI0
- sFmx23YuPhayaI7IDIYHAqKRl9lAhz35tRNOggWb6TaLA6pLhcEWb8BlwRKh_b_C4.BCG0vb7_gL
- LAIfdj2rZcmV5u0NJCEy_BbIWfFp9GIdm4vJBtrbL2EXw0DeDFNn0JPOmq1.4qchuW9FItBDbEdM
- BU2QJAPWYHmPscGCFETB2E8lWfNWRRlAkOBYOwP6FL28zljPf6.hQBf8aKl1MOhps7GPKX9mszWk
- Hvrx8Hg1xBGOmT3USue4pkpmCbbgTtkXvSX_8c8bxUcMwgRtaqGrL3eVz818Rq8ArEFUSGZ5Td_e
- wSfWGpyHWzuQCANz_EETSzIyIvx7Cv21qU9Wv3epTOUD4YR8gi.PfxEqQsqpB8WF2tvzbPrr8wac
- 7fyiIPqLKcI9HlZMC3RyL.mWysxOsXPdAOw8_1kqsM1LeIVOSWIx6bjTP0lUYzpNIbBBnjeUc.kt
- .94bIzs09JuRVOJdaYO6l0AWjJRhKZH.6oDBZXN3J4ETnUdvdrLgn.NIdBDVyU_yOjEpHInQO1CR
- ir8VXbk7wpBTCZVkGClVTrrsowrkdmUHluAE9HyU3ZOspKVn9ClCOx_QuLe0fEVC8_F6ok5aJesy
- 0ECF1Q7MjB9PrQPnzNaNS99Y.CYbEC81LwJ6deU3GK3aXzH2FcqFAfH1CCCvnt6mOW_jq0bBLLgI
- VWMCZAcNH7w1rctEGyUjBOzkIyS_UCXP3CysAp_XzNUXCc52KvZbrQdqeBUdMOGY9YdBzelJB8g4
- 307IM6BhvACZl5SteSSbfZsMsM89a3KK6qbARt.CRgHUwRBNGV5m0JKTxQbGI2_gArYkNgfDHbY0
- _ZZJ94neIrn6r6zYp719hUhNz2._RN3_PCx6R93uChRCSuZr4Eo.qRcepASetVRE72Bp5HDHgJeH
- j16_e6SCkQkg_aH8btVaIJwI3mBC6KTTIqA_pSwXn_d.gezgNjEif0ZLXEnB3SAXqP8tsSWKfAjw
- pt3zrWEQuFNQpXs.a5GBev7IrlN9hMsSkIRONpQAwayoMqSONwOmuP7irff6w5f1cQ.SeeGRK_3R
- FwGRI7YitPFI28PphG8gW9_KipqvOXm0jEj9kpMxJrP.nBZqJGs0AGpJwwGgvZPXHrdoONRram_h
- hpc9NVGowFz.79COM0NJl7ZHVG5MfcC.RHQiq4xsWxBKm17YCD6khxo2dwOLIGq4VGTIiWlNsBxF
- smITZRcwbKzm8Pto89AdDhmMcXMr1j9HEa4K5ce04P1ApdANrTe2lJKXs0ItDlmAvOKbv96AYbLX
- gjW_zVpcdCvus.ZNpSqhoQI7_ky4lQ7Da8foP4sTHqIGdZVGtlRe9EuiGE7k3S26MkCczgjOEQO_
- FFH7UHqwx2iuiq2P_0.k2PUBSNavRT62DllS9cdSiwKtmqezRbE_dNJffPD7GdCXQtUwgUv4F8ZA
- 5F0kJTo7UgusioAu.vyHSAVgI.4mvwbYuu5uCmZRjbbFkCNzHuKLq2VBR8d8s5lha8SMR1RFy7zZ
- VhT4j3fv.s0ZY9NUyig2AIBhqnZj04P7Jb3xhoQkBcF.9KDXnAX9AAbINp5mMRzI0FIsar3kDy6b
- BIShHrsg7Lv4kzaTaMrl2w..J7gsvIkjyyIT4uxIg3UogMaKqepP7auYcmhnuG3PTWwpoOjZ5Qm7
- jrk1a82D8At6pJB7W9Gl.U3bLUEKYORda4KYsQngRBeS99xjODZL9FLaF57DaqfwSnIur5yZvGL2
- _bqK9GokTAafrPBCxRr2G9Dfsr8cfhkFo3kyoIWa7TZYHqcybNTLObwydNJNfdhDXkNAcncWnFGQ
- aBkhWij4XEZROb0VE57hs0vGSHJQ71Rg3y2aJpbr_Rw9OZPMQDTyVIsLBFscyW7troKKnMoX4sVB
- GeRKi8RCqeeTVYwObnl6mXPgPCGwlWXt22kLozRb3bxLgDtJArTXnBEOD3IRPcnZHkrsNGkYcV.h
- 0wG0U_NOjTjo7f_GD0tuOGvq2sZONYBbbOKWI2S6KqKPqf41aOvY9JCuKc6_vX3DaZQuw7Mo1Ea5
- GZyKXmhl.O9udFuNnTXxguE_vm1foxAmoq0xFccV8O6Hr9E4atZyqjcO4msBum8pi8M1CW014dBd
- 9qxNuey8-
-X-Sonic-MF: <tomasz.unger@yahoo.pl>
-X-Sonic-ID: 429394d8-8e5c-41ec-8418-8cc9ead76d2b
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic311.consmr.mail.ir2.yahoo.com with HTTP; Thu, 19 Feb 2026 19:12:05 +0000
-Received: by hermes--production-ir2-bbcfb4457-9k578 (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID b4276a2a9be5d302a996c69ff3595aa6;
-          Thu, 19 Feb 2026 19:12:01 +0000 (UTC)
-From: tomasz.unger@yahoo.pl
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Tomasz Unger <tomasz.unger@yahoo.pl>
-Subject: [PATCH] nfc: pn544: i2c: Fix spelling mistake in comment
-Date: Thu, 19 Feb 2026 20:11:53 +0100
-Message-ID: <20260219191153.96434-1-tomasz.unger@yahoo.pl>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1771528519; c=relaxed/simple;
+	bh=0gkmir7Dg84DIj2NqS7pC8gGD0qGSz0cFFvUXtQdQMQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f5CR4n6ytdcVPsTDgaGW8sS94hYRTO03zVrOoYNwBtHTxyfjAVyTY7uQzNLNvc932Q03OQRnvcvMLhKL2Wgm/2gv7CMeflnLUoyeZd2Hs/c2gw02yJByIDfoyDNqD/fK7/29xZyenvbfa5zXRevlVFoIWE/doq2WrEnTKM1SG9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WL+zcT/h; arc=none smtp.client-ip=74.125.82.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-2baab3137bcso1171694eec.0
+        for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 11:15:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771528516; x=1772133316; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SKXPKRIMQX0M/LU7nK6tMFNe40zI+JHq9z0mH/36x9E=;
+        b=WL+zcT/hlNDs7HDTTsYFfGTB8g/0kik6EvUdgHmLCaYcbUnr3QBYqUo3dGf4GDYE11
+         m74cl//wYTy0mujBgrv8iN/t7eXz12N2ZM+Yvf/xnsZ+gaIgrQsK+M1EZpCeSQpTiAfG
+         S8S8Qw9IaRPMM0zymw5y/VWxmuKF+LSYMl3jFVLMYPbZ+Ox9fVkLsTX+fAV4fdIJ/OuP
+         HduJIk/6eDlr5XkmQYDlfwLNPF5P9BPHJhhcG93ndtOXi6+UXRnZVVS5u6Lm6TadiI4/
+         21qBeQ4XR2pKjHnLiS2+4S6dcOCFg7oPCdcurZX6qJTMt9HQPKyrKnDlZozj7gPEwMSa
+         VKxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771528516; x=1772133316;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SKXPKRIMQX0M/LU7nK6tMFNe40zI+JHq9z0mH/36x9E=;
+        b=HBT6c9NYs8bwRZZ/Dtv9whShJNHI6tBtJkjTs95F4jn90n6Q8SylESbByHqOLAzaNt
+         zySvvl7vHvRB85ziBKUtZ5bA4ChD9j++1qL7oS2Zfxkc0Z3w9nOTCoS2Ep76nihTGwrc
+         ZlaP2zRKEIjZICz8CsU/qk483oTGTdvee2wz9gTjeO35/8Lzwvkpoq0SR3TZbg30kYHo
+         cMqdlNz8t0H3gXhjrcKD1CyV/0Q4FLiaSU7w7asrzYFQdsdP1CXbpAxbcwB85A2RnGdR
+         z8lMKdzosPSd4CpaRTXpAtD4xBmi1/CoNoRN2A2YyFklvdC5/kQIpqDTH4Msq60e0lvx
+         +Ysg==
+X-Forwarded-Encrypted: i=1; AJvYcCWUL+H0Rtmac9IDtAhu9hkabtx3AC4jeb6ARFzC6hOVHniDN5aSNOX9P/AmYu2SrEm3Ems5WUA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6c9EkzQxiF/+mqoGSWTHlDINty1b/BcpAfsxEyoh2y6TUo3fn
+	YJKwzg1u4DC4OFH1kppX8zTgaZK1dDYZhp+glDJ5GUSL2zeyBGxQpuM=
+X-Gm-Gg: AZuq6aIMrgZVlrfUhAC2sF1BmZYpwEcE0N0puOKyvWCMPDR+U2+QoYrjtIpNlPKXU+W
+	mU84hvK9mHLFmObI4My+mni6jbqJAwNL5ieaLEDJaLV/ZvkK4nHSszA1hHI49cYWsa56EoOgpNV
+	mn5Os/Sg/hkXd7aH/I1vG/J3yWcoTWQH0GT9NCS+LanMWt3/mN3TiE+ePTkoG+azsfBm/QAO1k8
+	nKP8+66A8vHs7JB4LEAl0rXgg9wRpTF2WJb+/Anu2ietlMvzGW8cXOFWPISrDwZMY0v4gxseMNG
+	ddUCQv3i1g2Wfx3tosMgVLdbpslOnPwjwlrdndJsPwPKUHyTvJqRio3XeklKskmi4cdGyy1ZjqO
+	EF88igdlCuEN0nrzURC7KHah2g/837HH6S5iFIXgeFm+KNDBUN+LA0TehrZ3HtWB/dwv2pficxs
+	FY4d2KUFTWp6tN4vDJ5fwWO6HLELjfIz1LkuI67CvI9AFkFKN6Ym0rLhzyhxExQk1HzcVr8MaaD
+	2n2fHfbvzX+0UqoYQ==
+X-Received: by 2002:a05:7301:d1a:b0:2ba:8f0d:cfe with SMTP id 5a478bee46e88-2bac933a6femr9943515eec.9.1771528515983;
+        Thu, 19 Feb 2026 11:15:15 -0800 (PST)
+Received: from localhost (c-76-102-12-149.hsd1.ca.comcast.net. [76.102.12.149])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2bacb658fc4sm25299392eec.22.2026.02.19.11.15.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Feb 2026 11:15:15 -0800 (PST)
+Date: Thu, 19 Feb 2026 11:15:14 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+	andrii@kernel.org, netdev@vger.kernel.org,
+	magnus.karlsson@intel.com
+Subject: Re: [PATCH bpf-next] xsk: avoid double checking against rx queue
+ being full
+Message-ID: <aZdhQv_VEc5VgsSU@mini-arch>
+References: <20260218150000.301176-1-maciej.fijalkowski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-References: <20260219191153.96434-1-tomasz.unger.ref@yahoo.pl>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260218150000.301176-1-maciej.fijalkowski@intel.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[yahoo.pl,reject];
-	R_DKIM_ALLOW(-0.20)[yahoo.pl:s=s2048];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,yahoo.pl];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259574-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259573-lists,netdev=lfdr.de];
-	FROM_NO_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tomasz.unger@yahoo.pl,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[yahoo.pl:+];
+	FROM_NEQ_ENVFROM(0.00)[stfomichev@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[yahoo.pl];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 92884161DE7
+	RCPT_COUNT_SEVEN(0.00)[7];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email]
+X-Rspamd-Queue-Id: 3B50C161E27
 X-Rspamd-Action: no action
 
-From: Tomasz Unger <tomasz.unger@yahoo.pl>
+On 02/18, Maciej Fijalkowski wrote:
+> Currently non-zc xsk rx path for multi-buffer case checks twice if xsk
+> rx queue has enough space for producing descriptors:
+> 1.
+> 	if (xskq_prod_nb_free(xs->rx, num_desc) < num_desc) {
+> 		xs->rx_queue_full++;
+> 		return -ENOBUFS;
+> 	}
+> 2.
+> 	__xsk_rcv_zc(xs, xskb, copied - meta_len, rem ? XDP_PKT_CONTD : 0);
+> 	-> err = xskq_prod_reserve_desc(xs->rx, addr, len, flags);
+> 	  -> if (xskq_prod_is_full(q))
+> 
+> Second part is redundant as in 1. we already peeked onto rx queue and
+> checked that there is enough space to produce given amount of
+> descriptors.
+> 
+> Provide helper functions that will skip it and therefore optimize code.
+> 
+> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 
-'occured' -> 'occurred'
-
-Signed-off-by: Tomasz Unger <tomasz.unger@yahoo.pl>
----
- drivers/nfc/pn544/i2c.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/nfc/pn544/i2c.c b/drivers/nfc/pn544/i2c.c
-index a0dfb3f98d5a..1ecef0acaa50 100644
---- a/drivers/nfc/pn544/i2c.c
-+++ b/drivers/nfc/pn544/i2c.c
-@@ -171,7 +171,7 @@ struct pn544_i2c_phy {
- 	int run_mode;
- 
- 	int hard_fault;		/*
--				 * < 0 if hardware error occured (e.g. i2c err)
-+				 * < 0 if hardware error occurred (e.g. i2c err)
- 				 * and prevents normal operation.
- 				 */
- };
--- 
-2.53.0
-
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
