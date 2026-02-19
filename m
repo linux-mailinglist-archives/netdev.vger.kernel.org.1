@@ -1,173 +1,208 @@
-Return-Path: <netdev+bounces-259611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259616-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KJWwHhmjl2mf3wIAu9opvQ
-	(envelope-from <netdev+bounces-259611-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 00:56:09 +0100
+	id MIgLDxykl2mf3wIAu9opvQ
+	(envelope-from <netdev+bounces-259616-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 01:00:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 651BA163B38
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 00:56:09 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB4B6163C16
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 01:00:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A32C5300A301
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 23:56:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 60DFB3009F1F
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 23:59:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 009DB30C62D;
-	Thu, 19 Feb 2026 23:56:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B51832ABC3;
+	Thu, 19 Feb 2026 23:59:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZqZ9+qsJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oU3BrviT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA6B15539A;
-	Thu, 19 Feb 2026 23:56:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 272892F4A15;
+	Thu, 19 Feb 2026 23:59:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771545364; cv=none; b=gA6Iv1XRfkVE576gJlbQnwzK+ZpnOaToS+0IREDXKBZL4PNldHH5T8g/tw96sfKfC709ghJnJVusBog0pqNLUQqFudeoOrWMaSF4+axJx6Oossq3nNq0fHmPuqqWZfZc55ZE1VNcAEN0Aud+ZDGZ6Mm8xy+tg4Orey1V3xYCbsU=
+	t=1771545591; cv=none; b=bP2YXFVTb3v67wT1dQWd3BC5kRmHSEihoAsF6JQiQvdA4Jp46qh1g2wQ8excGaMNHOHdMPmOL4GRYQhvF0NtqVMCUJdRobwtDdLUIS1lH8MtAS8mTxv0n4c0T3iqn3EvupG6QlHJBJpk32cYhso8XTVxjht74e390cH/sR0irZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771545364; c=relaxed/simple;
-	bh=W4+lTtQg9XK2AMyVTLl5/C3YX/X14q1QnU9K2rdiGfM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=rOTcum6COGlwSyy7ktpcWBYzgHv7t/orYLdVrWxtX4fjJXRen6YCJFD9cy2DBrc8UqESJSwTPBG1r6r/vg8gzdf4DDuPIRmJu9TW2O5nrgj07hSf5wsv/l72HDc8NsNnFuwOqm7u76u4mSPCU/bqzzOK5N3AXSXLrUbBt3Q7Qko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZqZ9+qsJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A151DC2BC87;
-	Thu, 19 Feb 2026 23:56:04 +0000 (UTC)
+	s=arc-20240116; t=1771545591; c=relaxed/simple;
+	bh=ZMzYxL94z8q0TJyvNhpiuIgpQ1hKazr0tfXAbomaJd8=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=PGgbC9p3CfsS1sX5SyEx0K6C3iooqDZbhDSUCmtmWv/c0sH3unF2sg6RGGf/IhCzhU2WuFl6f1LiHydjQO1G7gFuV0eJaF6/o8/PdEW8nF3mAdVwqwA+bd7JY1fEpTj0fF5ixA6lz6Eq4LJ6VjN/gk5umMxANjFZVoCVnM2DLa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oU3BrviT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F3BBC4CEF7;
+	Thu, 19 Feb 2026 23:59:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771545364;
-	bh=W4+lTtQg9XK2AMyVTLl5/C3YX/X14q1QnU9K2rdiGfM=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=ZqZ9+qsJ7zOUH1OAdo3wIjwSIygpVGra27qCSgAIacM/KVMYYDVxzHQDiAgFrN2E9
-	 XZF2p8e4yUp6VBnTbX2w6RzDVBwBtVS7QDvzoyu2WH5Leajt0/vbW1l415x/2tknQr
-	 iXviLEV4ON/sG5OL1J71wgnDXN94ihihmMO6QYy8ItDsEPooQZ50u/4PWDikVia5m+
-	 r+wsPlSAR1ehtgaSmQMy8ErIVB2K6bsp/xt1mdCimXWOWwFZVA0SfqIbpiAk7GHQT5
-	 XAL+h86iw1fiLdZTuCPp6Q1+Eg/5YMp5zKzFB1+Rvl7jNLX9XQFKOwOt7UbvrPBS8C
-	 XA2LoSXj+EioA==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96478C531F3;
-	Thu, 19 Feb 2026 23:56:04 +0000 (UTC)
-From: Simon Baatz via B4 Relay <devnull+gmbnomis.gmail.com@kernel.org>
-Date: Fri, 20 Feb 2026 00:55:17 +0100
-Subject: [PATCH RFC net-next 4/4] selftests/net: packetdrill: add
- tcp_rcv_toobig_back_to_back.pkt
+	s=k20201202; t=1771545590;
+	bh=ZMzYxL94z8q0TJyvNhpiuIgpQ1hKazr0tfXAbomaJd8=;
+	h=Date:Subject:Cc:To:From:References:In-Reply-To:From;
+	b=oU3BrviTxQgpucmePP3fA6Qy04sAxAocBTXaGBNbp12HervoLWm+VmBJ5hNq4fzdp
+	 dFTDstOoHfXpG9EcQsOBajZN5jYCs56hg535NMq1Z+l95v9+9v5DzsxKn+13hSpW8R
+	 7H8I/BKIMsOYmm/8TskUgBgsAxKAvetR9Y0rFWli9JXE9tdVsEJuQ56zNauG3qbA/1
+	 TvThSUrlro3U/abDVryk99nkNQZFBvaM918dHud/DPKT/jgcwiDOAJB1NaPpRWVNp4
+	 u9Eri/MFKhkKHYx724FyDD5F3d/KvYwlgPU2E8oQSABPQ/iCkI5q1ZN0vOdIJAjgGb
+	 wrB7Ulm2y9aBg==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260220-tcp_rfc7323_retract_wnd_rfc-v1-4-904942561479@gmail.com>
-References: <20260220-tcp_rfc7323_retract_wnd_rfc-v1-0-904942561479@gmail.com>
-In-Reply-To: <20260220-tcp_rfc7323_retract_wnd_rfc-v1-0-904942561479@gmail.com>
-To: Eric Dumazet <edumazet@google.com>, 
- Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, 
- David Ahern <dsahern@kernel.org>, Stefano Brivio <sbrivio@redhat.com>, 
- Jon Maloy <jmaloy@redhat.com>, Jason Xing <kerneljasonxing@gmail.com>, 
- mfreemon@cloudflare.com, Shuah Khan <shuah@kernel.org>
-Cc: Christian Ebner <c.ebner@proxmox.com>, netdev@vger.kernel.org, 
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, Simon Baatz <gmbnomis@gmail.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1771545363; l=1646;
- i=gmbnomis@gmail.com; s=20260220; h=from:subject:message-id;
- bh=c1eQDsHINo/iLpDzO11WhQUeLWxzIkGGeSmjjLGkjpQ=;
- b=tGiZqmdvVs1iMDN93UHdsZnv90evQhVamdSvCoez+vPECABVnnhvp0nW717BsblYUJtRlcHaH
- oPH4k/Yj/LuCnEItmj3gZHey/IHNif1Hx88V/lBkZm2UFDkSKgvE2qo
-X-Developer-Key: i=gmbnomis@gmail.com; a=ed25519;
- pk=T/JIz/6F5bf1uQJr69lmyi7czVG+F9TVZ/8x5z9Wtqw=
-X-Endpoint-Received: by B4 Relay for gmbnomis@gmail.com/20260220 with
- auth_id=641
-X-Original-From: Simon Baatz <gmbnomis@gmail.com>
-Reply-To: gmbnomis@gmail.com
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 20 Feb 2026 00:59:45 +0100
+Message-Id: <DGJCHYS3SKIQ.1TIHQCMEOCRC@kernel.org>
+Subject: Re: [PATCH V2] driver core: auxiliary bus: Fix sysfs creation on
+ bind
+Cc: "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, "Saeed Mahameed" <saeedm@nvidia.com>, "Leon
+ Romanovsky" <leon@kernel.org>, "Mark Bloch" <mbloch@nvidia.com>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, <driver-core@lists.linux.dev>,
+ <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <linux-rdma@vger.kernel.org>, "Gal Pressman" <gal@nvidia.com>, "Moshe
+ Shemesh" <moshe@nvidia.com>, "Amir Tzin" <amirtz@nvidia.com>, "Leon
+ Romanovsky" <leonro@nvidia.com>
+To: "Tariq Toukan" <tariqt@nvidia.com>
+From: "Danilo Krummrich" <dakr@kernel.org>
+References: <20260219210435.1769394-1-tariqt@nvidia.com>
+In-Reply-To: <20260219210435.1769394-1-tariqt@nvidia.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
-	FREEMAIL_REPLYTO_NEQ_FROM(2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MV_CASE(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[google.com,davemloft.net,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,cloudflare.com];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_REPLYTO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-259611-lists,netdev=lfdr.de,gmbnomis.gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259616-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[proxmox.com,vger.kernel.org,gmail.com];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[dakr@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	HAS_REPLYTO(0.00)[gmbnomis@gmail.com];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 651BA163B38
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AB4B6163C16
 X-Rspamd-Action: no action
 
-From: Simon Baatz <gmbnomis@gmail.com>
+On Thu Feb 19, 2026 at 10:04 PM CET, Tariq Toukan wrote:
+> +/**
+> + * auxiliary_device_sysfs_irq_dir_init - initialize the IRQ sysfs direct=
+ory
+> + * @auxdev: auxiliary bus device to initialize the sysfs directory.
+> + *
+> + * This function should be called by drivers to initialize the IRQ direc=
+tory
+> + * before adding any IRQ sysfs entries. The driver is responsible for en=
+suring
+> + * this function is called only once and for handling any concurrency co=
+ntrol
+> + * if needed.
+> + *
+> + * Drivers must call auxiliary_device_sysfs_irq_dir_destroy() to clean u=
+p when
+> + * done.
+> + *
+> + * Return: zero on success or an error code on failure.
+> + */
+> +int auxiliary_device_sysfs_irq_dir_init(struct auxiliary_device *auxdev)
+>  {
+> -	int ret =3D 0;
+> -
+> -	guard(mutex)(&auxdev->sysfs.lock);
+> -	if (auxdev->sysfs.irq_dir_exists)
+> -		return 0;
+> +	int ret;
+> =20
+> -	ret =3D devm_device_add_group(&auxdev->dev, &auxiliary_irqs_group);
+> +	ret =3D sysfs_create_group(&auxdev->dev.kobj, &auxiliary_irqs_group);
+>  	if (ret)
+>  		return ret;
+> =20
+> -	auxdev->sysfs.irq_dir_exists =3D true;
+>  	xa_init(&auxdev->sysfs.irqs);
+>  	return 0;
+>  }
+> +EXPORT_SYMBOL_GPL(auxiliary_device_sysfs_irq_dir_init);
+> +
+> +/**
+> + * auxiliary_device_sysfs_irq_dir_destroy - destroy the IRQ sysfs direct=
+ory
+> + * @auxdev: auxiliary bus device to destroy the sysfs directory.
+> + *
+> + * This function should be called by drivers to clean up the IRQ directo=
+ry
+> + * after all IRQ sysfs entries have been removed. The driver is responsi=
+ble
+> + * for ensuring all IRQs are removed before calling this function.
+> + */
+> +void auxiliary_device_sysfs_irq_dir_destroy(struct auxiliary_device *aux=
+dev)
+> +{
+> +	xa_destroy(&auxdev->sysfs.irqs);
+> +	sysfs_remove_group(&auxdev->dev.kobj, &auxiliary_irqs_group);
+> +}
+> +EXPORT_SYMBOL_GPL(auxiliary_device_sysfs_irq_dir_destroy);
+> =20
+>  /**
+>   * auxiliary_device_sysfs_irq_add - add a sysfs entry for the given IRQ
+> @@ -45,7 +70,8 @@ static int auxiliary_irq_dir_prepare(struct auxiliary_d=
+evice *auxdev)
+>   * @irq: The associated interrupt number.
+>   *
+>   * This function should be called after auxiliary device have successful=
+ly
+> - * received the irq.
+> + * received the irq. The driver must call auxiliary_device_sysfs_irq_dir=
+_init()
+> + * before calling this function for the first time.
 
-This test verifies the sequence number checks using the maximum
-advertised window sequence number when we accept a packet going beyond
-any window that was ever advertised (i.e. rcv_nxt advances beyond
-rcv_mwnd_seq).
+I'm not convinced by this approach. This adds two new sources of bugs for
+drivers.
 
-Signed-off-by: Simon Baatz <gmbnomis@gmail.com>
----
- .../packetdrill/tcp_rcv_toobig_back_to_back.pkt    | 27 ++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+  1. Drivers can now forget to call auxiliary_device_sysfs_irq_dir_init()
+     *before* auxiliary_device_sysfs_irq_add().
 
-diff --git a/tools/testing/selftests/net/packetdrill/tcp_rcv_toobig_back_to_back.pkt b/tools/testing/selftests/net/packetdrill/tcp_rcv_toobig_back_to_back.pkt
-new file mode 100644
-index 0000000000000000000000000000000000000000..4d4c33d248948d3dfaf9b0c5b243ed27321e9b10
---- /dev/null
-+++ b/tools/testing/selftests/net/packetdrill/tcp_rcv_toobig_back_to_back.pkt
-@@ -0,0 +1,27 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+--mss=1000
-+
-+`./defaults.sh`
-+
-+// Establish a connection.
-+   +0 socket(..., SOCK_STREAM, IPPROTO_TCP) = 3
-+   +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
-+   +0 setsockopt(3, SOL_SOCKET, SO_RCVBUF, [20000], 4) = 0
-+   +0 bind(3, ..., ...) = 0
-+   +0 listen(3, 1) = 0
-+
-+   +0 < S 0:0(0) win 32792 <mss 1000,nop,wscale 7>
-+   +0 > S. 0:0(0) ack 1 win 18980 <mss 1460,nop,wscale 0>
-+  +.1 < . 1:1(0) ack 1 win 257
-+
-+   +0 accept(3, ..., ...) = 4
-+
-+// A too big packet is accepted if the receive queue is empty
-+   +0 < P. 1:20001(20000) ack 1 win 257
-+// Send a RST immediately so that there is no rcv_wup/rcv_mwnd_seq update yet
-+   +0 < R. 20001:20001(0) ack 1 win 257
-+//    * > .  1:1(0) ack 20001 win 18000
-+
-+  +.1 %{ assert tcpi_state == TCP_CLOSE, tcpi_state }%
-+
+  2. Drivers can forget to call auxiliary_device_sysfs_irq_dir_destroy().
 
--- 
-2.52.0
+Instead, I suggest to keep the current approach and just replace
+devm_device_add_group() with devm_auxiliary_device_add_group(), which in it=
+s
+devres callback additionally clears auxdev->sysfs.irq_dir_exists.
 
+In terms of the auxdev->sysfs.lock, I think this can still be removed, as i=
+t
+wasn't needed in the first place.
 
+auxiliary_device_sysfs_irq_add() must only be called from a scope where the
+auxiliary device is guaranteed to be bound, so there can't be a concurrent
+unbind.
+
+There may only be multiple concurrent calls to auxiliary_device_sysfs_irq_a=
+dd()
+itself, and in this case irq_dir_exists can just be an atomic.
+
+Yes, we're still stuck with an atomic for irq_dir_exists, but the driver AP=
+I
+remains much simpler and less error prone.
+
+- Danilo
 
