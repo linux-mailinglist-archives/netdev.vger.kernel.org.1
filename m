@@ -1,322 +1,312 @@
-Return-Path: <netdev+bounces-259488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259490-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qNWSHAEgl2nvuwIAu9opvQ
-	(envelope-from <netdev+bounces-259488-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 15:36:49 +0100
+	id +BESFkMil2lAvAIAu9opvQ
+	(envelope-from <netdev+bounces-259490-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 15:46:27 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D630015F99B
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 15:36:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B8F5515FB83
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 15:46:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 624133069E45
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 14:32:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8FEFD3042D47
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 14:44:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71EE8340293;
-	Thu, 19 Feb 2026 14:32:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FD7933F8C4;
+	Thu, 19 Feb 2026 14:43:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sr5M0+63"
+	dkim=pass (2048-bit key) header.d=thorsis.com header.i=@thorsis.com header.b="p83vKIuU"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from mail.thorsis.com (mail.thorsis.com [217.92.40.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2D8033FE11
-	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 14:32:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB1F833E363;
+	Thu, 19 Feb 2026 14:43:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.92.40.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771511551; cv=none; b=t/i45FFjsRp1nA/WF0YkO+i5K7z1DSGC/lR8e5gH2Ya3Yctk8HQ6n2CWInnJBp467ZVeHGBWbOMsc4C0kT/BjRzKAO3DfSC34EdxitqregIZjwFIDBkDI2MDR52vIG9/1g5iZwcbl8FfLoIdaGiTKhsIdLqcUZfS7/DzFoIty1g=
+	t=1771512237; cv=none; b=ixysvwESHXiVo6DcIs9VCvu22WdpO20QCoQDrMglZERTvpCmYF9BHXAp8GLlwN7rXJMtSMjjM6M9HWX1Z2+2Qi06fdGvvUDH1Rnx0tGXU9sodrR3UIdGOGhms4jba1xV7YJf/zeH46Ta5UCR6ffiRKGi6mbhugsR9o2cXUuRgUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771511551; c=relaxed/simple;
-	bh=Rwu0/Q5O6sDify4vtHE7EgDx/HdSGFfyoKuhTksF7Ao=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pqhQGvMAqMbYasecfzcxTy7Aql+XG8CgCxoGO0RWZZEWXb9W7m64AfHvlDwk3I6Dll4XHPRcKPJH+USrUV0eRYvEdp6xA+sPmN0Qx0EhZVsGdCHI5wBCrkxwrZxOeVSuLzhXUSO1im22NIRYqcO3xCrZnJSGLZuMFAYfxZaj8Lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sr5M0+63; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1771511547;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q2bRCV7yDeBf8GuOUBEvMnX2Y0xlNieUH03bOqMBKOs=;
-	b=sr5M0+63Wsz/ZZW1ycof/LgoMgshho1gsH8aRzB8qzGyjBs7rbmGy5s3WQDYQs8NGiSTHH
-	mq0TRXvTdlSZkV6BWgnSjsF3wTVpux4bX3ZZf61jgHFh7IQrelrkdZ8gq8t86l0TpmxOZm
-	hR78dUiXmERnYMyYvwn87pHpaqddEYo=
-From: Leon Hwang <leon.hwang@linux.dev>
-To: bpf@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Puranjay Mohan <puranjay@kernel.org>,
-	Xu Kuohai <xukuohai@huaweicloud.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H . Peter Anvin" <hpa@zytor.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Leon Hwang <leon.hwang@linux.dev>,
-	Peilin Ye <yepeilin@google.com>,
-	Luis Gerhorst <luis.gerhorst@fau.de>,
-	Viktor Malik <vmalik@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	kernel-patches-bot@fb.com
-Subject: [PATCH bpf-next v2 6/6] selftests/bpf: Add JIT disassembly tests for 64-bit bitops kfuncs
-Date: Thu, 19 Feb 2026 22:29:28 +0800
-Message-ID: <20260219142933.13904-7-leon.hwang@linux.dev>
-In-Reply-To: <20260219142933.13904-1-leon.hwang@linux.dev>
-References: <20260219142933.13904-1-leon.hwang@linux.dev>
+	s=arc-20240116; t=1771512237; c=relaxed/simple;
+	bh=wrDcT68tjzWDw0KnopV0KPmRwe4z7FMUImVXdNBcgNY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kxMhS0NpuBJ9KoBX4c+vffkGfGqj7Sdkqf+WkqC51+KbHwsblvYK0OmUQRngHkYr3wnhFcmvLj2YFJ6Lm1i2GI66FlTM6o6/v3I6qTwxA8nLyGa6zZzW7FcezonOOMQ0KNQKjNoBJSkZmkzvhLvVJU0cGL+FRHkmQ48++Ino2FE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorsis.com; spf=pass smtp.mailfrom=thorsis.com; dkim=pass (2048-bit key) header.d=thorsis.com header.i=@thorsis.com header.b=p83vKIuU; arc=none smtp.client-ip=217.92.40.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorsis.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=thorsis.com
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E1A981483047;
+	Thu, 19 Feb 2026 15:34:59 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=thorsis.com; s=dkim;
+	t=1771511704; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=fnoCxlXNAvqGXeIlhnynw34rDuzT2dMUswG6JRemf6A=;
+	b=p83vKIuUydHuNVBbOdfuYz7q5Og4LiPxeitxVnJzMWMRHnn+C422MJCXZbQu7jAbJMrjf6
+	FifXkY1eqc6XEfP8Aa9fr13xMJ7DBWOBKRuqEn6SakF3tQuaa1UuKE8k7W1bWudkxE+z3u
+	TwMjZhEV0Y+tDlZlCih/LAveHGGUqPKw1i2UiDPErsl8HN0QxiyXYqqoiXP0KShLgpQIh1
+	5gifeQjrIHGqcqdfOz4gt0Z+3M46Gj8uuSIinfZGzjRRnuAJxfKvGTe1Fs9+uw3CzgXJ+I
+	5YvADNGj8WEhob0gsgk50elGYJl+Ynobs0MU5D26mQZwKgeKec3NuaqjAUuE7Q==
+Date: Thu, 19 Feb 2026 15:34:54 +0100
+From: Alexander Dahl <ada@thorsis.com>
+To: Xiaolei Wang <xiaolei.wang@windriver.com>
+Cc: pabeni@redhat.com, nicolas.ferre@microchip.com,
+	claudiu.beznea@tuxon.dev, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	rmk+kernel@armlinux.org.uk, Kexin.Hao@windriver.com,
+	netdev@vger.kernel.org, stable@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rt-users@vger.kernel.org
+Subject: Re: [PATCH net v3] net: macb: Relocate mog_init_rings() callback
+ from macb_mac_link_up() to macb_open()
+Message-ID: <20260219-knapsack-thirteen-7d9e83451a40@thorsis.com>
+Mail-Followup-To: Xiaolei Wang <xiaolei.wang@windriver.com>,
+	pabeni@redhat.com, nicolas.ferre@microchip.com,
+	claudiu.beznea@tuxon.dev, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	rmk+kernel@armlinux.org.uk, Kexin.Hao@windriver.com,
+	netdev@vger.kernel.org, stable@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rt-users@vger.kernel.org
+References: <20251222015624.1994551-1-xiaolei.wang@windriver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251222015624.1994551-1-xiaolei.wang@windriver.com>
+User-Agent: Mutt/2.2.13 (2024-03-09)
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[thorsis.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[thorsis.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,huaweicloud.com,arm.com,redhat.com,alien8.de,linux.intel.com,zytor.com,fau.de,lists.infradead.org,vger.kernel.org,fb.com];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[33];
-	TAGGED_FROM(0.00)[bounces-259488-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259490-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon.hwang@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
 	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ada@thorsis.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[thorsis.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,kernel];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim,linux.dev:email]
-X-Rspamd-Queue-Id: D630015F99B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,windriver.com:email]
+X-Rspamd-Queue-Id: B8F5515FB83
 X-Rspamd-Action: no action
 
-Add bitops_jit selftests that verify JITed instruction sequences for
-supported 64-bit bitops kfuncs on x86_64 and arm64, including
-CPU-feature-gated coverage on x86 where required.
+Hello,
 
-Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
----
- .../testing/selftests/bpf/prog_tests/bitops.c |   6 +
- .../testing/selftests/bpf/progs/bitops_jit.c  | 153 ++++++++++++++++++
- 2 files changed, 159 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/progs/bitops_jit.c
+this change leads to a system lockup, see below.
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/bitops.c b/tools/testing/selftests/bpf/prog_tests/bitops.c
-index 9acc3cb1908c..2c203904880d 100644
---- a/tools/testing/selftests/bpf/prog_tests/bitops.c
-+++ b/tools/testing/selftests/bpf/prog_tests/bitops.c
-@@ -2,6 +2,7 @@
- 
- #include <test_progs.h>
- #include "bitops.skel.h"
-+#include "bitops_jit.skel.h"
- 
- struct bitops_case {
- 	__u64 x;
-@@ -180,3 +181,8 @@ void test_bitops(void)
- 	if (test__start_subtest("ror64"))
- 		test_ror64();
- }
-+
-+void test_bitops_jit(void)
-+{
-+	RUN_TESTS(bitops_jit);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/bitops_jit.c b/tools/testing/selftests/bpf/progs/bitops_jit.c
-new file mode 100644
-index 000000000000..9f414e56b1e8
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/bitops_jit.c
-@@ -0,0 +1,153 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <vmlinux.h>
-+#include <bpf/bpf_helpers.h>
-+#include "bpf_experimental.h"
-+#include "bpf_misc.h"
-+
-+SEC("syscall")
-+__description("bitops jit: clz64 uses lzcnt on x86 with abm")
-+__success __retval(63)
-+__arch_x86_64
-+__cpu_feature("abm")
-+__jited("	lzcnt{{.*}}")
-+int bitops_jit_clz64_x86(void *ctx)
-+{
-+	return bpf_clz64(1);
-+}
-+
-+SEC("syscall")
-+__description("bitops jit: ctz64 uses tzcnt on x86 with bmi1")
-+__success __retval(4)
-+__arch_x86_64
-+__cpu_feature("bmi1")
-+__jited("	tzcnt{{.*}}")
-+int bitops_jit_ctz64_x86(void *ctx)
-+{
-+	return bpf_ctz64(0x10);
-+}
-+
-+SEC("syscall")
-+__description("bitops jit: ffs64 uses tzcnt on x86 with bmi1")
-+__success __retval(5)
-+__arch_x86_64
-+__cpu_feature("bmi1")
-+__jited("	tzcnt{{.*}}")
-+int bitops_jit_ffs64_x86(void *ctx)
-+{
-+	return bpf_ffs64(0x10);
-+}
-+
-+SEC("syscall")
-+__description("bitops jit: fls64 uses lzcnt on x86 with abm")
-+__success __retval(5)
-+__arch_x86_64
-+__cpu_feature("abm")
-+__jited("	lzcnt{{.*}}")
-+int bitops_jit_fls64_x86(void *ctx)
-+{
-+	return bpf_fls64(0x10);
-+}
-+
-+SEC("syscall")
-+__description("bitops jit: popcnt64 uses popcnt on x86")
-+__success __retval(3)
-+__arch_x86_64
-+__cpu_feature("popcnt")
-+__jited("	popcnt{{.*}}")
-+int bitops_jit_popcnt64_x86(void *ctx)
-+{
-+	return bpf_popcnt64(0x1011);
-+}
-+
-+SEC("syscall")
-+__description("bitops jit: rol64 uses rol on x86")
-+__success __retval(6)
-+__arch_x86_64
-+__jited("	rol{{.*}}")
-+int bitops_jit_rol64_x86(void *ctx)
-+{
-+	return bpf_rol64(3, 1);
-+}
-+
-+SEC("syscall")
-+__description("bitops jit: ror64 uses ror on x86")
-+__success __retval(3)
-+__arch_x86_64
-+__jited("	ror{{.*}}")
-+int bitops_jit_ror64_x86(void *ctx)
-+{
-+	return bpf_ror64(6, 1);
-+}
-+
-+SEC("syscall")
-+__description("bitops jit: clz64 uses clz on arm64")
-+__success __retval(63)
-+__arch_arm64
-+__jited("	clz	{{.*}}")
-+int bitops_jit_clz64_arm64(void *ctx)
-+{
-+	return bpf_clz64(1);
-+}
-+
-+SEC("syscall")
-+__description("bitops jit: ctz64 uses ctz or rbit+clz on arm64")
-+__success __retval(4)
-+__arch_arm64
-+__jited("	{{(ctz|rbit)}}	{{.*}}")
-+int bitops_jit_ctz64_arm64(void *ctx)
-+{
-+	return bpf_ctz64(0x10);
-+}
-+
-+SEC("syscall")
-+__description("bitops jit: ffs64 uses ctz or rbit+clz on arm64")
-+__success __retval(5)
-+__arch_arm64
-+__jited("	{{(ctz|rbit)}}	{{.*}}")
-+int bitops_jit_ffs64_arm64(void *ctx)
-+{
-+	return bpf_ffs64(0x10);
-+}
-+
-+SEC("syscall")
-+__description("bitops jit: fls64 uses clz on arm64")
-+__success __retval(5)
-+__arch_arm64
-+__jited("	clz	{{.*}}")
-+int bitops_jit_fls64_arm64(void *ctx)
-+{
-+	return bpf_fls64(0x10);
-+}
-+
-+SEC("syscall")
-+__description("bitops jit: bitrev64 uses rbit on arm64")
-+__success __retval(1)
-+__arch_arm64
-+__jited("	rbit	{{.*}}")
-+int bitops_jit_bitrev64_arm64(void *ctx)
-+{
-+	return bpf_bitrev64(0x8000000000000000ULL);
-+}
-+
-+SEC("syscall")
-+__description("bitops jit: rol64 uses rorv on arm64")
-+__success __retval(6)
-+__arch_arm64
-+__jited("	ror	{{.*}}")
-+int bitops_jit_rol64_arm64(void *ctx)
-+{
-+	return bpf_rol64(3, 1);
-+}
-+
-+SEC("syscall")
-+__description("bitops jit: ror64 uses rorv on arm64")
-+__success __retval(3)
-+__arch_arm64
-+__jited("	ror	{{.*}}")
-+int bitops_jit_ror64_arm64(void *ctx)
-+{
-+	return bpf_ror64(6, 1);
-+}
-+
-+char _license[] SEC("license") = "GPL";
--- 
-2.52.0
+Am Mon, Dec 22, 2025 at 09:56:24AM +0800 schrieb Xiaolei Wang:
+> In the non-RT kernel, local_bh_disable() merely disables preemption,
+> whereas it maps to an actual spin lock in the RT kernel. Consequently,
+> when attempting to refill RX buffers via netdev_alloc_skb() in
+> macb_mac_link_up(), a deadlock scenario arises as follows:
+> 
+>    WARNING: possible circular locking dependency detected
+>    6.18.0-08691-g2061f18ad76e #39 Not tainted
+>    ------------------------------------------------------
+>    kworker/0:0/8 is trying to acquire lock:
+>    ffff00080369bbe0 (&bp->lock){+.+.}-{3:3}, at: macb_start_xmit+0x808/0xb7c
+> 
+>    but task is already holding lock:
+>    ffff000803698e58 (&queue->tx_ptr_lock){+...}-{3:3}, at: macb_start_xmit
+>    +0x148/0xb7c
+> 
+>    which lock already depends on the new lock.
+> 
+>    the existing dependency chain (in reverse order) is:
+> 
+>    -> #3 (&queue->tx_ptr_lock){+...}-{3:3}:
+>           rt_spin_lock+0x50/0x1f0
+>           macb_start_xmit+0x148/0xb7c
+>           dev_hard_start_xmit+0x94/0x284
+>           sch_direct_xmit+0x8c/0x37c
+>           __dev_queue_xmit+0x708/0x1120
+>           neigh_resolve_output+0x148/0x28c
+>           ip6_finish_output2+0x2c0/0xb2c
+>           __ip6_finish_output+0x114/0x308
+>           ip6_output+0xc4/0x4a4
+>           mld_sendpack+0x220/0x68c
+>           mld_ifc_work+0x2a8/0x4f4
+>           process_one_work+0x20c/0x5f8
+>           worker_thread+0x1b0/0x35c
+>           kthread+0x144/0x200
+>           ret_from_fork+0x10/0x20
+> 
+>    -> #2 (_xmit_ETHER#2){+...}-{3:3}:
+>           rt_spin_lock+0x50/0x1f0
+>           sch_direct_xmit+0x11c/0x37c
+>           __dev_queue_xmit+0x708/0x1120
+>           neigh_resolve_output+0x148/0x28c
+>           ip6_finish_output2+0x2c0/0xb2c
+>           __ip6_finish_output+0x114/0x308
+>           ip6_output+0xc4/0x4a4
+>           mld_sendpack+0x220/0x68c
+>           mld_ifc_work+0x2a8/0x4f4
+>           process_one_work+0x20c/0x5f8
+>           worker_thread+0x1b0/0x35c
+>           kthread+0x144/0x200
+>           ret_from_fork+0x10/0x20
+> 
+>    -> #1 ((softirq_ctrl.lock)){+.+.}-{3:3}:
+>           lock_release+0x250/0x348
+>           __local_bh_enable_ip+0x7c/0x240
+>           __netdev_alloc_skb+0x1b4/0x1d8
+>           gem_rx_refill+0xdc/0x240
+>           gem_init_rings+0xb4/0x108
+>           macb_mac_link_up+0x9c/0x2b4
+>           phylink_resolve+0x170/0x614
+>           process_one_work+0x20c/0x5f8
+>           worker_thread+0x1b0/0x35c
+>           kthread+0x144/0x200
+>           ret_from_fork+0x10/0x20
+> 
+>    -> #0 (&bp->lock){+.+.}-{3:3}:
+>           __lock_acquire+0x15a8/0x2084
+>           lock_acquire+0x1cc/0x350
+>           rt_spin_lock+0x50/0x1f0
+>           macb_start_xmit+0x808/0xb7c
+>           dev_hard_start_xmit+0x94/0x284
+>           sch_direct_xmit+0x8c/0x37c
+>           __dev_queue_xmit+0x708/0x1120
+>           neigh_resolve_output+0x148/0x28c
+>           ip6_finish_output2+0x2c0/0xb2c
+>           __ip6_finish_output+0x114/0x308
+>           ip6_output+0xc4/0x4a4
+>           mld_sendpack+0x220/0x68c
+>           mld_ifc_work+0x2a8/0x4f4
+>           process_one_work+0x20c/0x5f8
+>           worker_thread+0x1b0/0x35c
+>           kthread+0x144/0x200
+>           ret_from_fork+0x10/0x20
+> 
+>    other info that might help us debug this:
+> 
+>    Chain exists of:
+>      &bp->lock --> _xmit_ETHER#2 --> &queue->tx_ptr_lock
+> 
+>     Possible unsafe locking scenario:
+> 
+>           CPU0                    CPU1
+>           ----                    ----
+>      lock(&queue->tx_ptr_lock);
+>                                   lock(_xmit_ETHER#2);
+>                                   lock(&queue->tx_ptr_lock);
+>      lock(&bp->lock);
+> 
+>     *** DEADLOCK ***
+> 
+>    Call trace:
+>     show_stack+0x18/0x24 (C)
+>     dump_stack_lvl+0xa0/0xf0
+>     dump_stack+0x18/0x24
+>     print_circular_bug+0x28c/0x370
+>     check_noncircular+0x198/0x1ac
+>     __lock_acquire+0x15a8/0x2084
+>     lock_acquire+0x1cc/0x350
+>     rt_spin_lock+0x50/0x1f0
+>     macb_start_xmit+0x808/0xb7c
+>     dev_hard_start_xmit+0x94/0x284
+>     sch_direct_xmit+0x8c/0x37c
+>     __dev_queue_xmit+0x708/0x1120
+>     neigh_resolve_output+0x148/0x28c
+>     ip6_finish_output2+0x2c0/0xb2c
+>     __ip6_finish_output+0x114/0x308
+>     ip6_output+0xc4/0x4a4
+>     mld_sendpack+0x220/0x68c
+>     mld_ifc_work+0x2a8/0x4f4
+>     process_one_work+0x20c/0x5f8
+>     worker_thread+0x1b0/0x35c
+>     kthread+0x144/0x200
+>     ret_from_fork+0x10/0x20
+> 
+> Notably, invoking the mog_init_rings() callback upon link establishment
+> is unnecessary. Instead, we can exclusively call mog_init_rings() within
+> the ndo_open() callback. This adjustment resolves the deadlock issue.
+> Furthermore, since MACB_CAPS_MACB_IS_EMAC cases do not use mog_init_rings()
+> when opening the network interface via at91ether_open(), moving
+> mog_init_rings() to macb_open() also eliminates the MACB_CAPS_MACB_IS_EMAC
+> check.
+> 
+> Fixes: 633e98a711ac ("net: macb: use resolved link config in mac_link_up()")
+> Cc: stable@vger.kernel.org
+> Suggested-by: Kevin Hao <kexin.hao@windriver.com>
+> Signed-off-by: Xiaolei Wang <xiaolei.wang@windriver.com>
+> ---
+> 
+> V1: https://patchwork.kernel.org/project/netdevbpf/patch/20251128103647.351259-1-xiaolei.wang@windriver.com/
+> V2: Update the correct lock dependency chain and add the Fix tag.
+> V3: update commit log, Add full deadlock log added explanations: because MACB_CAPS_MACB_IS_EMAC cases do not
+>     use mog_init_rings(), we don't need the MACB_CAPS_MACB_IS_EMAC check when moving mog_init_rings() to macb_open().
 
+After upgrading from 6.12.57-rt14 to 6.12.66-rt15 on a custom at91
+sam9x60 based board with PREEMPT_RT patch, we noticed a complete
+system lockup, which I bisected to this changeset.
+
+After unplugging and plugging the ethernet cable, while
+running PROFINET, system does not respond to anything anymore.
+Last message in kernel log is:
+
+  [  +8.621919] macb f802c000.ethernet eth0: Link is Up - 100Mbps/Full - flow control off
+
+Heartbeat LED does not blink anymore, no network communication,
+serial console does not respond anymore.
+
+Reverting that change locally prevents the system lockup for me, but
+what is the proper course of action on kernel side now?  Send a revert
+to stable?  Send a revert to master?  Please advise.
+
+(I'm aware there were least two more patches on netdev referencing
+this change, but if I'm not mistaken none of those made it to stable,
+right?)
+
+Greets
+Alex
+
+P.S.: adding linux-rt-users to Cc
+
+> 
+>  drivers/net/ethernet/cadence/macb_main.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+> index ca2386b83473..064fccdcf699 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -744,7 +744,6 @@ static void macb_mac_link_up(struct phylink_config *config,
+>  		/* Initialize rings & buffers as clearing MACB_BIT(TE) in link down
+>  		 * cleared the pipeline and control registers.
+>  		 */
+> -		bp->macbgem_ops.mog_init_rings(bp);
+>  		macb_init_buffers(bp);
+>  
+>  		for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue)
+> @@ -2991,6 +2990,8 @@ static int macb_open(struct net_device *dev)
+>  		goto pm_exit;
+>  	}
+>  
+> +	bp->macbgem_ops.mog_init_rings(bp);
+> +
+>  	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
+>  		napi_enable(&queue->napi_rx);
+>  		napi_enable(&queue->napi_tx);
+> -- 
+> 2.43.0
+> 
+> 
 
