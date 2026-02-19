@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-259607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259608-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OEkfKBqal2mK2QIAu9opvQ
-	(envelope-from <netdev+bounces-259607-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 00:17:46 +0100
+	id AHfWG16dl2nU2wIAu9opvQ
+	(envelope-from <netdev+bounces-259608-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 00:31:42 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01137163818
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 00:17:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 91BB416389D
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 00:31:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 78FEC3034E11
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 23:16:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1F2BA3026177
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 23:31:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C77BE1E1C11;
-	Thu, 19 Feb 2026 23:16:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1B5F2D0C94;
+	Thu, 19 Feb 2026 23:31:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WqmiFcvJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m8xaEcLT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FB171B7F4;
-	Thu, 19 Feb 2026 23:16:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810832E6CAB;
+	Thu, 19 Feb 2026 23:31:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771543016; cv=none; b=qMkXdgJGJn7y5Ac4UxdtpLTdIZBLDq1hIGQ/BwjD58LjFE9LktxWD2E9a1+x9DA1fNzIY7+OCrGXCHpaCdtm2zagrW6FvN4Cl5w3vRaDAqN2ejDG9UKgcm6xTZ8y0790oXT2cdFVmSV9+vcUouHY0HtlMxzqvJUr9HMJfIa67+s=
+	t=1771543894; cv=none; b=D9p6t7lLxG5iYAZlapT6800rWFkp9Ays8WUKO4MnmA6guYI9GSJh0JlU7t1l30iAVUaKyXqp91C1uWYDE+mzhwUAEdPFXA+zAODQWc7NhBTCAqNtU7fGWysYrv/CPyW1h82jD005PeXuH9RTXGnfqU35caHlFSTa9d3tIbCOtKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771543016; c=relaxed/simple;
-	bh=q8poZrR+8Kv8WAPYxU+foxrSBtcaL/I2YQNkj2HuLJ0=;
+	s=arc-20240116; t=1771543894; c=relaxed/simple;
+	bh=APB1wgNHiZm2zeetuzEUNgdc+71Sm5mfd0RgRrB0mbA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jPwWXCzWnH9i3Y4PDTQksb53pRtRw0AxHtoMTRHo8OI9NDgb0IyeBc8x9tak316OXoYvIUPBkT63c4azZIJtpGevUnag/VJgJmUMvgDEQbpTm9XcoRSGHiAqxmdx5pD9Sha/3Ni7pPvXc4AOm2mLwVyFRl5eYeILOXwERSogHkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WqmiFcvJ; arc=none smtp.client-ip=192.198.163.11
+	 In-Reply-To:Content-Type; b=V7QrVO3wWRLk7s4ki28coNf1qD5x97PjleGyTIHMGEV2b+BjK5uVtfKuVEJNadLmMDr6/+kycyeCB7HQquQDDljKVsenY8Qm7ovUQ9cnScGP2ZkijzUWW9tTxEEUTEZofXmA56FTWRQvYa5lgZG5pFP+ihhHqsvCHG8e5ItGE1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=m8xaEcLT; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1771543015; x=1803079015;
+  t=1771543893; x=1803079893;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=q8poZrR+8Kv8WAPYxU+foxrSBtcaL/I2YQNkj2HuLJ0=;
-  b=WqmiFcvJNuo7K+Ntk7H0HPXCX1kS6VG/VXhRK442g8WDZDmszqmOvjOd
-   9JJOjnR7BmY1Wlm8aGSzUEz75QSn41zPryxwLtbolp/kIBvkuQh6IYlqm
-   t76VbRwIOg/UkZ9w1vXK1xBm6CvcaOXaBXz4zl4QlN8dZ5aMsE/fo8V0n
-   PO20BOKz1V4Y9lurmYAF0mDCdZYn/iY+rBHTawuj5J1StjIB0puwS4rnT
-   rTnxpM3p5u7ATs4Wu+CPLWph8HXRdQkkmsxa62trlwY6SkE2BMIfsn40O
-   trcrazro6M95fD+ezdiJ8DZyHvvOZySMJgmtFie8cvp/3jyUo9XnXvqlp
-   Q==;
-X-CSE-ConnectionGUID: mEiexDptRc6aVBJZ/hR74w==
-X-CSE-MsgGUID: YPUINg1NRP27wxYMhTzCdA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11706"; a="83266167"
+  bh=APB1wgNHiZm2zeetuzEUNgdc+71Sm5mfd0RgRrB0mbA=;
+  b=m8xaEcLTAKGLXxG7roqfVFlBfw23Gz5e0YsfMjXFX8pqFQz1CRn+g4d7
+   vxCujjAOMFcJDaQlIhXFls8lkuKyHXCM30QSXkuXW/s92ZNRs7D5HDEev
+   AvKdGkWo5A+4ftwBoxp8IfsqEuum73Wc7xJfS+rQxJDJIrhWisQCR5DM4
+   J2yhV99X51GsRuXJvi5VEPrYvY3BKPcMfZFQpkyAvd17Y/HcSt44A26bq
+   KdglhimmimSpRQWb4eHSTcEDmRBsw0QD/6WNCThDovAQzVGhndMU08KiV
+   n6tDp0daHaOTV6O7gblPghJnhEfEoDu9e8d2cj2u2P19QolvQkUNvlGbo
+   w==;
+X-CSE-ConnectionGUID: VLJDNJQ4TiKrCgcWgKSrdg==
+X-CSE-MsgGUID: 0+VSVjZ8Rb22v4UNHCfvqw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11706"; a="76507283"
 X-IronPort-AV: E=Sophos;i="6.21,300,1763452800"; 
-   d="scan'208";a="83266167"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2026 15:16:54 -0800
-X-CSE-ConnectionGUID: O6WHmfTTQyO7KJKChWqp1g==
-X-CSE-MsgGUID: fYNO9aqvQvutLvet0VRouA==
+   d="scan'208";a="76507283"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2026 15:31:32 -0800
+X-CSE-ConnectionGUID: Gs0nNgoqSUarlIT/3nJMcw==
+X-CSE-MsgGUID: eQHNuTrzRjSjS5Q24OzwlQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,300,1763452800"; 
-   d="scan'208";a="237668398"
+   d="scan'208";a="218836281"
 Received: from dnelso2-mobl.amr.corp.intel.com (HELO [10.125.110.20]) ([10.125.110.20])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2026 15:16:53 -0800
-Message-ID: <5ab04f4b-8758-4a02-ac58-4b4ca35cf033@intel.com>
-Date: Thu, 19 Feb 2026 16:16:52 -0700
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2026 15:31:32 -0800
+Message-ID: <817fca78-2416-44d9-9e1a-301e2a42e88c@intel.com>
+Date: Thu, 19 Feb 2026 16:31:30 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,17 +70,17 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v23 10/22] cxl: Export function for unwinding cxl by
- accelerators
+Subject: Re: [PATCH v23 11/22] sfc: obtain decoder and region if committed by
+ firmware
 To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
  netdev@vger.kernel.org, dan.j.williams@intel.com, edward.cree@amd.com,
  davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
 Cc: Alejandro Lucero <alucerop@amd.com>
 References: <20260201155438.2664640-1-alejandro.lucero-palau@amd.com>
- <20260201155438.2664640-11-alejandro.lucero-palau@amd.com>
+ <20260201155438.2664640-12-alejandro.lucero-palau@amd.com>
 Content-Language: en-US
 From: Dave Jiang <dave.jiang@intel.com>
-In-Reply-To: <20260201155438.2664640-11-alejandro.lucero-palau@amd.com>
+In-Reply-To: <20260201155438.2664640-12-alejandro.lucero-palau@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
@@ -96,7 +96,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259607-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-259608-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FROM_HAS_DN(0.00)[];
@@ -108,8 +108,8 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim,intel.com:email]
-X-Rspamd-Queue-Id: 01137163818
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amd.com:email]
+X-Rspamd-Queue-Id: 91BB416389D
 X-Rspamd-Action: no action
 
 
@@ -117,84 +117,76 @@ X-Rspamd-Action: no action
 On 2/1/26 8:54 AM, alejandro.lucero-palau@amd.com wrote:
 > From: Alejandro Lucero <alucerop@amd.com>
 > 
-> Add cxl_unregister_region() to the accelerator driver API
-> for a clean exit.
+> Check if device HDM is already committed during firmware/BIOS
+> initialization.
+> 
+> A CXL region should exist if so after memdev allocation/initialization.
+> Get HPA from region and map it.
 > 
 > Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-
-Reviewed-by: Dave Jiang <dave.jiang@intel.com>
-
 > ---
->  drivers/cxl/core/region.c | 17 ++++++++++++-----
->  include/cxl/cxl.h         |  1 +
->  2 files changed, 13 insertions(+), 5 deletions(-)
+>  drivers/net/ethernet/sfc/efx_cxl.c | 28 +++++++++++++++++++++++++++-
+>  1 file changed, 27 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
-> index acf29ba3b205..954b8fcdbac6 100644
-> --- a/drivers/cxl/core/region.c
-> +++ b/drivers/cxl/core/region.c
-> @@ -2438,9 +2438,8 @@ static struct cxl_region *to_cxl_region(struct device *dev)
->  	return container_of(dev, struct cxl_region, dev);
->  }
+> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
+> index a77ef4783fcb..3536eccf1b2a 100644
+> --- a/drivers/net/ethernet/sfc/efx_cxl.c
+> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
+> @@ -19,6 +19,7 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
+>  	struct efx_nic *efx = &probe_data->efx;
+>  	struct pci_dev *pci_dev = efx->pci_dev;
+>  	struct efx_cxl *cxl;
+> +	struct range range;
+>  	u16 dvsec;
+>  	int rc;
 >  
-> -static void unregister_region(void *_cxlr)
-> +void cxl_unregister_region(struct cxl_region *cxlr)
->  {
-> -	struct cxl_region *cxlr = _cxlr;
->  	struct cxl_region_params *p = &cxlr->params;
->  	int i;
->  
-> @@ -2457,6 +2456,14 @@ static void unregister_region(void *_cxlr)
->  	cxl_region_iomem_release(cxlr);
->  	put_device(&cxlr->dev);
->  }
-> +EXPORT_SYMBOL_NS_GPL(cxl_unregister_region, "CXL");
-> +
-> +static void __unregister_region(void *_cxlr)
-> +{
-> +	struct cxl_region *cxlr = _cxlr;
-> +
-> +	return cxl_unregister_region(cxlr);
-> +}
->  
->  static struct lock_class_key cxl_region_key;
->  
-> @@ -2608,7 +2615,7 @@ static struct cxl_region *devm_cxl_add_region(struct cxl_root_decoder *cxlrd,
->  	if (rc)
->  		goto err;
->  
-> -	rc = devm_add_action_or_reset(port->uport_dev, unregister_region, cxlr);
-> +	rc = devm_add_action_or_reset(port->uport_dev, __unregister_region, cxlr);
->  	if (rc)
->  		return ERR_PTR(rc);
->  
-> @@ -2762,7 +2769,7 @@ static ssize_t delete_region_store(struct device *dev,
->  	if (IS_ERR(cxlr))
->  		return PTR_ERR(cxlr);
->  
-> -	devm_release_action(port->uport_dev, unregister_region, cxlr);
-> +	devm_release_action(port->uport_dev, __unregister_region, cxlr);
->  	put_device(&cxlr->dev);
->  
->  	return len;
-> @@ -3878,7 +3885,7 @@ static struct cxl_region *construct_region(struct cxl_root_decoder *cxlrd,
->  
->  	rc = __construct_region(cxlr, cxlrd, cxled);
->  	if (rc) {
-> -		devm_release_action(port->uport_dev, unregister_region, cxlr);
-> +		devm_release_action(port->uport_dev, __unregister_region, cxlr);
->  		return ERR_PTR(rc);
+> @@ -90,13 +91,38 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
+>  		return PTR_ERR(cxl->cxlmd);
 >  	}
 >  
-> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
-> index 906065e0d2a6..92880c26b2d5 100644
-> --- a/include/cxl/cxl.h
-> +++ b/include/cxl/cxl.h
-> @@ -254,4 +254,5 @@ struct cxl_endpoint_decoder *cxl_get_committed_decoder(struct cxl_memdev *cxlmd,
->  						       struct cxl_region **cxlr);
->  struct range;
->  int cxl_get_region_range(struct cxl_region *region, struct range *range);
-> +void cxl_unregister_region(struct cxl_region *cxlr);
->  #endif /* __CXL_CXL_H__ */
+> -	probe_data->cxl = cxl;
+> +	cxl->cxled = cxl_get_committed_decoder(cxl->cxlmd, &cxl->efx_region);
+> +	if (cxl->cxled) {
+
+if (!cxl->cxled)
+	return 0;
+
+Should save you a level of indent.
+
+DJ
+
+> +		if (!cxl->efx_region) {
+> +			pci_err(pci_dev, "CXL found committed decoder without a region");
+> +			return -ENODEV;
+> +		}
+> +		rc = cxl_get_region_range(cxl->efx_region, &range);
+> +		if (rc) {
+> +			pci_err(pci_dev,
+> +				"CXL getting regions params from a committed decoder failed");
+> +			return rc;
+> +		}
+> +
+> +		cxl->ctpio_cxl = ioremap(range.start, range.end - range.start + 1);
+> +		if (!cxl->ctpio_cxl) {
+> +			pci_err(pci_dev, "CXL ioremap region (%pra) failed", &range);
+> +			return -ENOMEM;
+> +		}
+> +
+> +		probe_data->cxl = cxl;
+> +	}
+>  
+>  	return 0;
+>  }
+>  
+>  void efx_cxl_exit(struct efx_probe_data *probe_data)
+>  {
+> +	if (!probe_data->cxl)
+> +		return;
+> +
+> +	iounmap(probe_data->cxl->ctpio_cxl);
+> +	cxl_unregister_region(probe_data->cxl->efx_region);
+>  }
+>  
+>  MODULE_IMPORT_NS("CXL");
 
 
