@@ -1,282 +1,198 @@
-Return-Path: <netdev+bounces-259481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259482-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uJPJNYMdl2ktuwIAu9opvQ
-	(envelope-from <netdev+bounces-259481-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 15:26:11 +0100
+	id OFaLJ34el2mXuwIAu9opvQ
+	(envelope-from <netdev+bounces-259482-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 15:30:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5916815F770
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 15:26:11 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 009B415F7AF
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 15:30:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5C0F53069ACC
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 14:24:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DCBDC301589D
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 14:30:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38BFA33EAF9;
-	Thu, 19 Feb 2026 14:24:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6001133D6EA;
+	Thu, 19 Feb 2026 14:30:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ag9H2Yx+"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lR2culyr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15BAD33E368
-	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 14:24:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7640333A9C4
+	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 14:30:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771511074; cv=none; b=fDD0sWJRaZBQ8u8hAuwiE9dsX6K3lNqpkKoYoPy4N/a3O3/Xla96LVcWzekr2sJO7dsjcGhohl44TQRczsUrXC9d3J92d/MSBVJpPIEpI1rc12nQnAbnMFyNknShVmFh+pAPuehb6rWfXF1U8yLYLJWbquO8Dq8CZn8YafZkGhg=
+	t=1771511420; cv=none; b=KTchwOBn5cfVCWvqUC4XP52kP1k9TsweD6Xn+O6uMo1qDrYr3wgTRyn+zHBwVSNZfedi1rvMaNiVEMZhKu0hBfJcod72cW+uso72zxFTTShMe++xZsuCii15HyTN/Jm0Rl/bQKy2VPr/CgAxf4HE/TV9RqlCkm+frsGQUZGxN40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771511074; c=relaxed/simple;
-	bh=mFTTChIZMPbImSnGQe9CAyrsfNbtDDi1TMX8en9zWZ4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dYHDmO9/lIhR4zsPdPK4aPep6C8ci7MbGVqI/KH5oV6b/QklFyXCqhL9Jz6J9F7FRHi4Q7l0nPWIGzg3dACYTjtRAERfJrfZ4M6X9GCCYXE28eF1cpYpRxAQ2Bm8TgUTcnj3XhgZFyusp8fy/I8dv31yntICiEa2a2n3ewQ+Xk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ag9H2Yx+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEEA4C116D0;
-	Thu, 19 Feb 2026 14:24:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771511073;
-	bh=mFTTChIZMPbImSnGQe9CAyrsfNbtDDi1TMX8en9zWZ4=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Ag9H2Yx+K1KqomDSlx/D525yT5xzDPuKCrQYysWw4LOGXk94MpECkFG/AqG7Ui97w
-	 8PRyAuAq0GxulVLzYAlf2PLKy0TGmNDLE4nj+eaX2jp0ObBEllBLKuwcCrlyG6p4mv
-	 PUxvhqNDkF8R4O9sQw4zC2sEJ9NtwM7EpfJ4P0w62/bR4Lcewoa19dXvjyMu6TFbhW
-	 NToSdP9e98mPV69ZdSsy9jgWXeUuqylUWpEehHefeGq0dwe9Ogc8VI5xVJMp5dkE9x
-	 V6CSa61pG5lTvrFH/S+wnXhDX4iqP/UnW4oESeI2Pom5XFPSnV+HJEhGzW3gW3qVxW
-	 oHDqg5Ua/0jyw==
-From: Linus Walleij <linusw@kernel.org>
-Date: Thu, 19 Feb 2026 15:24:21 +0100
-Subject: [PATCH net v3 5/5] net: dsa: ks8995: Implement port isolation
+	s=arc-20240116; t=1771511420; c=relaxed/simple;
+	bh=CG2uCtipwOOt8HU/0TWfy6Fc9mWxrM+FVH2EaxMB+0k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HxcT9GfenTKA2LsVRYFVMaGmr9UbUZOfTfmrFVLj5T/ohMohUJOMPDeDhcjZVp3b2dpCsTzjrUvDtOrY222Fwox4hfzT7bLFEH6Kpnj/EglKnbXShfpWEI0skNDAuWjDvTIjU/ksrr0KcH/4cza0jqS0c6Ph2oAJgtMsdJTqoIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lR2culyr; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1771511415;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=LRtR7BaGNupDWJtUJ58LFj4w6zAqDSzxcIixhPEboME=;
+	b=lR2culyrTuf+k/z/wvJ7a4TUVJtUKioslDuE04IeFiNfDyawkkQoEMJkVNpSWGmNExEPFF
+	Zzz9Cu/xfdoAwYIVGaS/KJNhqdaV5GF/Ud+dTmgeV5uAC/UIabDJL1FUIHTlOxvi0sV8O9
+	J8IYCsIie3aBLLg+bK95zRLvhIVzVaM=
+From: Leon Hwang <leon.hwang@linux.dev>
+To: bpf@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Puranjay Mohan <puranjay@kernel.org>,
+	Xu Kuohai <xukuohai@huaweicloud.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Leon Hwang <leon.hwang@linux.dev>,
+	Peilin Ye <yepeilin@google.com>,
+	Luis Gerhorst <luis.gerhorst@fau.de>,
+	Viktor Malik <vmalik@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	kernel-patches-bot@fb.com
+Subject: [PATCH bpf-next v2 0/6] bpf: Introduce 64-bit bitops kfuncs
+Date: Thu, 19 Feb 2026 22:29:22 +0800
+Message-ID: <20260219142933.13904-1-leon.hwang@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260219-ks8995-fixups-v3-5-a7fc63fe1916@kernel.org>
-References: <20260219-ks8995-fixups-v3-0-a7fc63fe1916@kernel.org>
-In-Reply-To: <20260219-ks8995-fixups-v3-0-a7fc63fe1916@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Woojung Huh <woojung.huh@microchip.com>
-Cc: UNGLinuxDriver@microchip.com, netdev@vger.kernel.org, 
- Linus Walleij <linusw@kernel.org>
-X-Mailer: b4 0.14.3
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259481-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,microchip.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWELVE(0.00)[33];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259482-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,huaweicloud.com,arm.com,redhat.com,alien8.de,linux.intel.com,zytor.com,fau.de,lists.infradead.org,vger.kernel.org,fb.com];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leon.hwang@linux.dev,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5916815F770
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 009B415F7AF
 X-Rspamd-Action: no action
 
-It is unsound to not have proper port isolation on a
-switch which supports it.
+This series adds generic 64-bit bitops kfuncs and JIT inlining support
+on x86_64 and arm64.
 
-Set each port as isolated by default in the setup callback
-and de-isolate and isolate the ports in the bridge join/leave
-callbacks.
+The new kfuncs are:
 
-Fixes: a7fe8b266f65 ("net: dsa: ks8995: Add basic switch set-up")
-Reported-by: Vladimir Oltean <olteanv@gmail.com>
-Signed-off-by: Linus Walleij <linusw@kernel.org>
----
- drivers/net/dsa/ks8995.c | 131 ++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 129 insertions(+), 2 deletions(-)
+* bpf_clz64(): Count leading zeros.
+* bpf_ctz64(): Count trailing zeros.
+* bpf_ffs64(): Find first set bit, 1-based index, returns 0 when input is 0.
+* bpf_fls64(): Find last set bit, 1-based index.
+* bpf_bitrev64(): Reverse bits.
+* bpf_popcnt64(): Population count.
+* bpf_rol64(): Rotate left.
+* bpf_ror64(): Rotate right.
 
-diff --git a/drivers/net/dsa/ks8995.c b/drivers/net/dsa/ks8995.c
-index 1ed81a8f7d21..dbae218fb015 100644
---- a/drivers/net/dsa/ks8995.c
-+++ b/drivers/net/dsa/ks8995.c
-@@ -80,6 +80,11 @@
- #define KS8995_PC0_TAG_REM	BIT(1)	/* Enable tag removal on port */
- #define KS8995_PC0_PRIO_EN	BIT(0)	/* Enable priority handling */
- 
-+#define KS8995_PC1_SNIFF_PORT	BIT(7)	/* This port is a sniffer port */
-+#define KS8995_PC1_RCV_SNIFF	BIT(6)	/* Packets received goes to sniffer port(s) */
-+#define KS8995_PC1_XMIT_SNIFF	BIT(5)	/* Packets transmitted goes to sniffer port(s) */
-+#define KS8995_PC1_PORT_VLAN	GENMASK(4, 0)	/* Port isolation mask */
-+
- #define KS8995_PC2_TXEN		BIT(2)	/* Enable TX on port */
- #define KS8995_PC2_RXEN		BIT(1)	/* Enable RX on port */
- #define KS8995_PC2_LEARN_DIS	BIT(0)	/* Disable learning on port */
-@@ -441,6 +446,44 @@ dsa_tag_protocol ks8995_get_tag_protocol(struct dsa_switch *ds,
- 
- static int ks8995_setup(struct dsa_switch *ds)
- {
-+	struct ks8995_switch *ks = ds->priv;
-+	int ret;
-+	u8 val;
-+	int i;
-+
-+	/* Isolate all user ports so they can only send packets to itself and the CPU port */
-+	for (i = 0; i < KS8995_CPU_PORT; i++) {
-+		ret = ks8995_read_reg(ks, KS8995_REG_PC(i, KS8995_REG_PC1), &val);
-+		if (ret) {
-+			dev_err(ks->dev, "failed to read KS8995_REG_PC1 on port %d\n", i);
-+			return ret;
-+		}
-+
-+		val &= ~KS8995_PC1_PORT_VLAN;
-+		val |= (BIT(i) | BIT(KS8995_CPU_PORT));
-+
-+		ret = ks8995_write_reg(ks, KS8995_REG_PC(i, KS8995_REG_PC1), val);
-+		if (ret) {
-+			dev_err(ks->dev, "failed to write KS8995_REG_PC1 on port %d\n", i);
-+			return ret;
-+		}
-+	}
-+
-+	/* The CPU port should be able to talk to all ports */
-+	ret = ks8995_read_reg(ks, KS8995_REG_PC(KS8995_CPU_PORT, KS8995_REG_PC1), &val);
-+	if (ret) {
-+		dev_err(ks->dev, "failed to read KS8995_REG_PC1 on CPU port\n");
-+		return ret;
-+	}
-+
-+	val |= KS8995_PC1_PORT_VLAN;
-+
-+	ret = ks8995_write_reg(ks, KS8995_REG_PC(KS8995_CPU_PORT, KS8995_REG_PC1), val);
-+	if (ret) {
-+		dev_err(ks->dev, "failed to write KS8995_REG_PC1 on CPU port\n");
-+		return ret;
-+	}
-+
- 	return 0;
- }
- 
-@@ -466,8 +509,44 @@ static int ks8995_port_bridge_join(struct dsa_switch *ds, int port,
- 				   bool *tx_fwd_offload,
- 				   struct netlink_ext_ack *extack)
- {
-+	struct ks8995_switch *ks = ds->priv;
-+	u8 port_bitmap = 0;
-+	int ret;
-+	u8 val;
-+	int i;
-+
-+	/* De-isolate this port from any other port on the bridge */
-+	port_bitmap |= BIT(port);
-+	for (i = 0; i < KS8995_CPU_PORT; i++) {
-+		if (i == port)
-+			continue;
-+		if (!dsa_port_offloads_bridge(dsa_to_port(ds, i), &bridge))
-+			continue;
-+		port_bitmap |= BIT(i);
-+	}
-+
-+	/* Update all affected ports with the new bitmask */
-+	for (i = 0; i < KS8995_CPU_PORT; i++) {
-+		if (!dsa_port_offloads_bridge(dsa_to_port(ds, i), &bridge))
-+			continue;
-+
-+		ret = ks8995_read_reg(ks, KS8995_REG_PC(i, KS8995_REG_PC1), &val);
-+		if (ret) {
-+			dev_err(ks->dev, "failed to read KS8995_REG_PC1 on port %d\n", i);
-+			return ret;
-+		}
-+
-+		val |= port_bitmap;
-+
-+		ret = ks8995_write_reg(ks, KS8995_REG_PC(i, KS8995_REG_PC1), val);
-+		if (ret) {
-+			dev_err(ks->dev, "failed to write KS8995_REG_PC1 on port %d\n", i);
-+			return ret;
-+		}
-+	}
-+
- 	/* port_stp_state_set() will be called after to put the port in
--	 * appropriate state so there is no need to do anything.
-+	 * appropriate state.
- 	 */
- 
- 	return 0;
-@@ -476,8 +555,56 @@ static int ks8995_port_bridge_join(struct dsa_switch *ds, int port,
- static void ks8995_port_bridge_leave(struct dsa_switch *ds, int port,
- 				     struct dsa_bridge bridge)
- {
-+	struct ks8995_switch *ks = ds->priv;
-+	u8 port_bitmap = 0;
-+	int ret;
-+	u8 val;
-+	int i;
-+
-+	/* Isolate this port from any other port on the bridge */
-+	for (i = 0; i < KS8995_CPU_PORT; i++) {
-+		/* Current port handled last */
-+		if (i == port)
-+			continue;
-+		/* Not on this bridge */
-+		if (!dsa_port_offloads_bridge(dsa_to_port(ds, i), &bridge))
-+			continue;
-+
-+		ret = ks8995_read_reg(ks, KS8995_REG_PC(i, KS8995_REG_PC1), &val);
-+		if (ret) {
-+			dev_err(ks->dev, "failed to read KS8995_REG_PC1 on port %d\n", i);
-+			return;
-+		}
-+
-+		val &= ~BIT(port);
-+
-+		ret = ks8995_write_reg(ks, KS8995_REG_PC(i, KS8995_REG_PC1), val);
-+		if (ret) {
-+			dev_err(ks->dev, "failed to write KS8995_REG_PC1 on port %d\n", i);
-+			return;
-+		}
-+
-+		/* Accumulate this port for access by current */
-+		port_bitmap |= BIT(i);
-+	}
-+
-+	/* Isolate this port from all other ports formerly on the bridge */
-+	ret = ks8995_read_reg(ks, KS8995_REG_PC(port, KS8995_REG_PC1), &val);
-+	if (ret) {
-+		dev_err(ks->dev, "failed to read KS8995_REG_PC1 on port %d\n", port);
-+		return;
-+	}
-+
-+	val &= ~port_bitmap;
-+
-+	ret = ks8995_write_reg(ks, KS8995_REG_PC(port, KS8995_REG_PC1), val);
-+	if (ret) {
-+		dev_err(ks->dev, "failed to write KS8995_REG_PC1 on port %d\n", port);
-+		return;
-+	}
-+
- 	/* port_stp_state_set() will be called after to put the port in
--	 * forwarding state so there is no need to do anything.
-+	 * forwarding state.
- 	 */
- }
- 
+Defined zero-input behavior:
+
+* bpf_clz64(0) = 64
+* bpf_ctz64(0) = 64
+* bpf_ffs64(0) = 0
+* bpf_fls64(0) = 0
+
+bpf_ffs64() was previously discussed in
+"bpf: Add generic kfunc bpf_ffs64()" [1].
+
+The main concern in that discussion was ABI overhead: a regular kfunc call
+follows the BPF calling convention and can introduce extra spill/fill compared
+to dedicated instructions.
+
+This series keeps the user-facing API as kfuncs while avoiding that overhead
+on hot paths. When the JIT/backend and CPU support it, calls are inlined into
+native instructions; otherwise they fall back to regular function calls.
+
+Links:
+[1] https://lore.kernel.org/bpf/20240131155607.51157-1-hffilwlqm@gmail.com/
+
+Changes:
+v1 -> v2:
+* Drop RFC.
+* Add __cpu_feature annotation for CPU-feature-gated tests.
+* Add JIT disassembly tests for 64-bit bitops kfuncs
+* Address comments from Alexei:
+  * Drop KF_MUST_INLINE.
+  * Drop internal BPF_ALU64 opcode BPF_BITOPS.
+  * Mark all of the kfuncs as fastcall and do push/pop in JIT when necessary.
+* v1: https://lore.kernel.org/bpf/20260209155919.19015-1-leon.hwang@linux.dev/
+
+Leon Hwang (6):
+  bpf: Introduce 64-bit bitops kfuncs
+  bpf, x86: Add 64-bit bitops kfuncs support for x86_64
+  bpf, arm64: Add 64-bit bitops kfuncs support
+  selftests/bpf: Add tests for 64-bit bitops kfuncs
+  selftests/bpf: Add __cpu_feature annotation for CPU-feature-gated
+    tests
+  selftests/bpf: Add JIT disassembly tests for 64-bit bitops kfuncs
+
+ arch/arm64/net/bpf_jit_comp.c                 | 123 ++++++++++++
+ arch/x86/net/bpf_jit_comp.c                   | 141 +++++++++++++
+ include/linux/filter.h                        |  10 +
+ kernel/bpf/core.c                             |   6 +
+ kernel/bpf/helpers.c                          |  50 +++++
+ kernel/bpf/verifier.c                         |  53 ++++-
+ .../testing/selftests/bpf/bpf_experimental.h  |   9 +
+ .../testing/selftests/bpf/prog_tests/bitops.c | 188 ++++++++++++++++++
+ tools/testing/selftests/bpf/progs/bitops.c    |  68 +++++++
+ .../testing/selftests/bpf/progs/bitops_jit.c  | 153 ++++++++++++++
+ tools/testing/selftests/bpf/progs/bpf_misc.h  |   7 +
+ tools/testing/selftests/bpf/test_loader.c     | 150 ++++++++++++++
+ 12 files changed, 957 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/bitops.c
+ create mode 100644 tools/testing/selftests/bpf/progs/bitops.c
+ create mode 100644 tools/testing/selftests/bpf/progs/bitops_jit.c
 
 -- 
-2.53.0
+2.52.0
 
 
