@@ -1,347 +1,436 @@
-Return-Path: <netdev+bounces-259559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259560-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GIb6EQ1Ul2lexAIAu9opvQ
-	(envelope-from <netdev+bounces-259559-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 19:18:53 +0100
+	id ULdUHF5Vl2lPxAIAu9opvQ
+	(envelope-from <netdev+bounces-259560-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 19:24:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9360E1619AD
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 19:18:52 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB361161A41
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 19:24:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F2DF530B0D7C
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 18:15:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1A62B301D6BC
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 18:23:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FD7A359FA4;
-	Thu, 19 Feb 2026 18:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 906BB2BD031;
+	Thu, 19 Feb 2026 18:23:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="bV61MuHw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fH0BVhWh"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010047.outbound.protection.outlook.com [52.101.201.47])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D906355058;
-	Thu, 19 Feb 2026 18:14:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771524895; cv=fail; b=ed3TbQ6+T3cuEWq5DldNfESvltZY3FPBR8YC6MsfgT49glVe3tnWyn73WBXSSmTahqpJ1aQhupp3QMT6WK8veZ0ki1Ea5jGOZcLlRO5EHecNhxCCnYMLuk+cDQix889UoDUhU5e70ai2t9g3ChJL4I6KJkDaRU1plAQohqr5/ww=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771524895; c=relaxed/simple;
-	bh=fP1uKA9Sh5K3aA+Fo90AH9gWE2ceyuVt1upyEXci7oM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=U8N3RS13OelF2SByiVFZBMyQXXC2OuHbysayefoeskLpKA6sy7zyUwh9gXA0WxYN7jsYub00DK87QSsu8Vr8D2HFiiaHvpqjajpRt979lQsjk2UCRN3ms8BbQ+zdI3ZYE60QzoI4749vAu7m30APrjehNfuJOpVAuf3kWhVYxOI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=bV61MuHw; arc=fail smtp.client-ip=52.101.201.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=PIsBlLTE2etv3qWbFxAnQ8KbnkJfArG+Cv8TuwtBVnXr6B6hT4RzQkyHXPav/dssGfCWr60cdqXP3XNK8BWpbRP4+Wy0DIUwDiltmUJrGXz/Lr0LopXFWOHn/a/mIs573of/apXYdNh3OqEEdkyTXN273CFpE1oger7mgAC0r1OiawN8tuzgkI5v7NnLF8PUbbqulxJa2DiMi53BzHBjy52pX3DZEfqZJnseE2tQdX57wTZwkFRXpMdtkBO1wW8d8JL0N10zY3LBzhdlL0w/f4sY5d6DJS4wymjm6QlL9ytCoEmAmFpVVy541OdZ3Lkgr51GUsV98Puo4KVORhVdVg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ULdBrUgJJf3AqL7P5yzGnoRBrsfbngQm05zIK5QlUds=;
- b=GTEZraW6xVSMJMmlSaaglPqdkFZzsATeX1cZWVm4EP6CEgqWk6ZrI7Rr5WCMkxTDq+OQgQUhW/D95ehaoDG0lMY+XAO4tIcmN5yWzXl1sisjp9uybzCkwBJ2jjd5hRNrnV6JQEaCUlx2nW+x1D8DRPasaxangTZdqW18pB6W3HCZkoHz/OTJKc0ogoJapXVDwvhwA1HEzH4YnIkBTiUH/29yP/C8Axm8GNnrx6DOsRPQ1lNDzkRMZHK8WM90SCcUKgb89RdqDsYePyZyHn39K+ZXkcsL85IHl1kFRaxlkfGuQOBHYYMvZEKyaIZfskLS4bA5rg8+jSN9EPfuZ+7cEQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ULdBrUgJJf3AqL7P5yzGnoRBrsfbngQm05zIK5QlUds=;
- b=bV61MuHwBph0L5YvLwmD5052v6EA5Krq4sR28ITciCK1VCIE+RtM8KQPHXGiyAeSl14+wLNni5LvHicn+TkG+e+7FldFKtsJYYyfp/SW3zDZ4U/hPiPfff+3auPxvdCbjhvzByUsDkTZbmuCsdhmrAv+DBD32Y8zrQKlLJF8ZtZSj/67r2K5KgNh3zKzVYyzgneCj4bNmVoegv5c/ESqKyPa1Ar6CRf8J4VJjR6QE/D9qBroZ6JEmuw/sqV/HwnRhsfoAx8n1ATUo5/PwQVMkfmulR2VtsOIkOeV4G8ywPzD3soxOgZNbCsq2niiZI1uxoyKOMouq6MKwghN7CESWQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from PH0PR12MB8800.namprd12.prod.outlook.com (2603:10b6:510:26f::12)
- by CH3PR12MB8877.namprd12.prod.outlook.com (2603:10b6:610:170::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.16; Thu, 19 Feb
- 2026 18:14:39 +0000
-Received: from PH0PR12MB8800.namprd12.prod.outlook.com
- ([fe80::f79d:ddc5:2ad7:762d]) by PH0PR12MB8800.namprd12.prod.outlook.com
- ([fe80::f79d:ddc5:2ad7:762d%4]) with mapi id 15.20.9632.010; Thu, 19 Feb 2026
- 18:14:39 +0000
-From: Yury Norov <ynorov@nvidia.com>
-To: linux-kernel@vger.kernel.org,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Peter Zijlstra (Intel)" <peterz@infradead.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Antoine Tenart <atenart@kernel.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Ingo Molnar <mingo@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	James Clark <james.clark@linaro.org>,
-	Jerin Jacob <jerinj@marvell.com>,
-	Linu Cherian <lcherian@marvell.com>,
-	Lukasz Luba <lukasz.luba@arm.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Mike Leach <mike.leach@linaro.org>,
-	Moritz Fischer <mdf@kernel.org>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Simon Horman <horms@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	Sunil Goutham <sgoutham@marvell.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Tom Rix <trix@redhat.com>,
-	Xu Yilun <yilun.xu@intel.com>,
-	Yajun Deng <yajun.deng@linux.dev>,
-	Yury Norov <yury.norov@gmail.com>,
-	Zhang Rui <rui.zhang@intel.com>,
-	hariprasad <hkelam@marvell.com>,
-	coresight@lists.linaro.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-fpga@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	netdev@vger.kernel.org
-Cc: Yury Norov <ynorov@nvidia.com>
-Subject: [PATCH 12/12] bitmap: drop bitmap_print_to_pagebuf()
-Date: Thu, 19 Feb 2026 13:14:04 -0500
-Message-ID: <20260219181407.290201-13-ynorov@nvidia.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260219181407.290201-1-ynorov@nvidia.com>
-References: <20260219181407.290201-1-ynorov@nvidia.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BN0PR04CA0115.namprd04.prod.outlook.com
- (2603:10b6:408:ec::30) To PH0PR12MB8800.namprd12.prod.outlook.com
- (2603:10b6:510:26f::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C59110E3;
+	Thu, 19 Feb 2026 18:23:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771525383; cv=none; b=XGcE5smQZa9Uyo/zqqa+1kVjjRA5ewJYs0x8YcKAWtkAHXDieUmCuDgziPGDS2lLZifzr+1y0d64IwVsJRJqdIfUHBIGKzk37sGN/aNS8o/tC3paiC7qc5SCzBwf8nmKj86QjSrMYxhJBBHKoWy8sdvsmmBOvpjKZUlAvwSlwHk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771525383; c=relaxed/simple;
+	bh=X9JOI5zH7Dn3UvkeUkUE87DuY5w9gvjTh2UEBEMNaGQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oChx5d64HCORbZMFND9xyEzJE5hjmVGwhY+stKhgbEBM1N5hZDFrgfkHjoonJOngvd98Yzpo7fhsJVPLbqXaoDjfEDUuBht0IWZV3y0qm0RBfkLENTWuq2mO6ozkr1sZmMJiG5NaPBn4XrPQr+OzNovGY0yxggJb4N34N31GP5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fH0BVhWh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6C69C4CEF7;
+	Thu, 19 Feb 2026 18:23:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771525383;
+	bh=X9JOI5zH7Dn3UvkeUkUE87DuY5w9gvjTh2UEBEMNaGQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=fH0BVhWhyQN8tKz09MRmYgv9qWykHp0iiONPN8kdNVUK9zxCu4XAdHiCpvvs956f6
+	 numyOKEvxlLDmqYPSOqgH8LBSmAxoe0t0orTi8Clw2HOv/Z8bmvFHEG1V2qEriHqvM
+	 cy8Y/xzMGhDrDFipSbHcxvpNAZtdFLfl/oupW/R4eAW1FgfMB0KdCpZlmGbm3oqM+T
+	 hBAKq/M3oRSeYDg3lNE1hMfzzNdud0w9c7ZkIwCf4rFySCZXfsbJmNVbS9EDI2xjmL
+	 /q6ZrxNu4yHrqjb3BGSKUO3e9+odttDqq3CmrL4hQtmSb9RH2dTqf/4hbs4s/l6Y3k
+	 VWa5O6gj37cow==
+From: Jakub Kicinski <kuba@kernel.org>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pabeni@redhat.com
+Subject: [GIT PULL] Networking for v7.0-rc1
+Date: Thu, 19 Feb 2026 10:23:01 -0800
+Message-ID: <20260219182301.660280-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR12MB8800:EE_|CH3PR12MB8877:EE_
-X-MS-Office365-Filtering-Correlation-Id: 807c0036-96bc-4c52-fc04-08de6fe2bedf
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|376014|7416014|10070799003|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?SbWiriWEbcf51nIJ35nrCbq0VoQZCNtKmr/rMfuuwiqcA1iOMFssd73PdpkD?=
- =?us-ascii?Q?bmw80kaqnbyGns176EKMDqTNZwEZUO6TTvlGZHH1NZjmWOEfX4+d7tC6YA04?=
- =?us-ascii?Q?mfFBH+gR6l79N0jkFh7TyVi8KBD4NTym0cwKLn8Qo8e7EeLgqj4GmU1J273p?=
- =?us-ascii?Q?vRRqpsYePfU5uL+TLDmccnDZwR9ra/RrR5Y4ywBs4XBS5u42sIR4wtYG8TpK?=
- =?us-ascii?Q?YOvNG1RIQzAChPdb3udwPjbbb2SlIp6PfZ8umOoCIEfSGHPTfnjPr7Pr8NQG?=
- =?us-ascii?Q?kNxlfMXP0A8iTihInYb/lQL4DNz7Kh/oW3S7lcVRADWerAmRHO5hMjbvPf68?=
- =?us-ascii?Q?AaAOxB/GkcF+PTW59ptPSAyVgrjby+hCMmx1vAZ48EvQvuGgGF/J33LyDyKz?=
- =?us-ascii?Q?EanMoOebjV/7BNSo4bgvR3sB+y9m6nHS1yPzON6heFOMTHfCiJjZrtSiCZoY?=
- =?us-ascii?Q?ZBqPkjMQHhEvLMukgi6FZoy4lxxup9WfwaHsRG9InArk7P7k8eDFSLCRxpSV?=
- =?us-ascii?Q?P3AhgEoBZveB1U2sYgvXpY5EujP1yUuMclBfBibOqMyKJDL4rUNA3Hl1YLF4?=
- =?us-ascii?Q?hBik9kYakpABDEOdMAJTU/6CmQdbOx0HN8dXhJx/qwU0otjbh9zV+MytscLi?=
- =?us-ascii?Q?MRmSDQn3u2t+WVfdfaKooz/TeTVIYGHn4UNEXv3YQ0N/2jRf+NXfQL25PKfc?=
- =?us-ascii?Q?/723+8u1B+4JTqGspgyQ/+jMInBPihW8TSiDnaDqT4Usu1lojeDqZM+F3MG0?=
- =?us-ascii?Q?4MhBLwmkmBES1bqkcUxW8+g1pkXU9S/d6bRTC+lflzYJg0KbjbfuWZQYBT8J?=
- =?us-ascii?Q?8ipONOVQB7ORzmR0TcIUI66oqlqhZJYuQTEV4UobQYGRCGeJHY+w/ji43SWa?=
- =?us-ascii?Q?E1IzIMtaLrGlbdnNGp8MANkpiMSxhm7OHibJmsxHK53DG+Ibgg7lwjeFHcu2?=
- =?us-ascii?Q?Qll4EG3c03TloYomzUz3qmTvi5R1dqrnXQ8og11uffn2JW7cePi521dvTYTv?=
- =?us-ascii?Q?W7zHXlxDaFi/V/WkE5yz5UnfF275zDPcKG9oc/EhpYjY5YPTrZPpPjykoue9?=
- =?us-ascii?Q?6c9YN0/Zv4vrP6zvOvMTRKuRLMZxEeW9b7B9mD9rWwk5M+7syh8FBAW2pe0o?=
- =?us-ascii?Q?tHivp2g2eNwqXZ64BKZlRKU7wtF/f9DcSGxrRgjUF4EeoBDUyv3ahF5lf41M?=
- =?us-ascii?Q?QE29toa+NZhgLsf44c/q5DHAh7xhBM49Zwwq5mKcfUcq/mTAJmpuAuAo6K4k?=
- =?us-ascii?Q?QzxchpGOuAe1uCMGz4Tg7OXPfxA5nw6lnhov0acUahqmxpXan4NJAj3xJ+wO?=
- =?us-ascii?Q?KNyfdlm246mlJ4+BlKvESzTjg0ig0vIOH5MmeE7E/AVqQpvyHa0BZWFnaE6x?=
- =?us-ascii?Q?wSRMUz+3c1likYb7/M1G2gmHpExIVxdqQtCYGI4YLrjgQ77FspjYZ4MrtZ1A?=
- =?us-ascii?Q?Tos9BLwnyMZMg0yEQw54JmlOCtwetMwPsI5ThWGtF9aUlWugrLAYg7TJGKzQ?=
- =?us-ascii?Q?YnEZpR77uPRywv6SojV6W1DLUq7/5rqBonpoV/IRA2Znk/guEAgzWg5EDsks?=
- =?us-ascii?Q?IPgsg64VtGdWAK4FSavNUPpkHFEGMMeFVko05xY7ayppfD+8BH73hOYk0Pv4?=
- =?us-ascii?Q?PA=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB8800.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(10070799003)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?xwnbcz0jEsAJwo2uYPcn8BvdIcszVwkGtt1iznF/U/GJax48C3h56yyCciJx?=
- =?us-ascii?Q?n4yW9d28C6COwy2D9++nm0ikZf3wgJFBbgKxk/XWV3Vn/VGmMNAOL5jitR6O?=
- =?us-ascii?Q?Xz0F0hEj5vjPfYKbP9BV7NW7hvMorO77NiL0m8e5hPBNISntimMS394YuSBj?=
- =?us-ascii?Q?qbld95i2v5Lk3ncXSuPONJI6g229Y8UMxXBctfBNhLG9R9ieq+vB78CnZB6X?=
- =?us-ascii?Q?CKQ6nv+bQqiIyJ2FXJEbRJZ/6Djmse9f3Qt+/lY3ft3Tlz0J09Gg4WZUWe5h?=
- =?us-ascii?Q?81NxP8ThxTwHjBYGE1KowGzQ8nCujs++9uFYMJvxSnfeGsbcUJEBfcKFNvlq?=
- =?us-ascii?Q?j/PC8F6feY3KxuZZ2txrJsJ4yJnCkLYG4JN/bFJmUgUY/gvUCfrpeqhzD6i/?=
- =?us-ascii?Q?zXNupSKFVgKj/9NZvNwMhVT9iZJf+BwpKVze/X+1C95ZLH1KomvejrIucK+O?=
- =?us-ascii?Q?i7zq6pGZIR9VCiSmvsDnMK+3XJzfibyxnQl53tenpzju4mtgfanG2BxrR498?=
- =?us-ascii?Q?mFSIjXp4llubeoqtQZStP5R4OOFRJmOmE3072sL6OoU8fzl4cEewXrs2KMvf?=
- =?us-ascii?Q?KG/+9wMZLhcvdD3p/SkWRPa170MhOO+1aiv8yKJXzGuGQL9+bt+t8QIeJcnx?=
- =?us-ascii?Q?0t8S0O1n0eJSfEMqE3yJ1USLOZXX4eeEibfsrtH+2S16UoUH9hDRVcW06d/a?=
- =?us-ascii?Q?YqoYc0lVSizIazNA82cSh+CVwdPitVIGqW7kSF/xdOc9Lz1dO4OztRbH4p5f?=
- =?us-ascii?Q?zJSZzTGqdLPt55T3hU6Ak7jU0RfzzXv2GV1BQWPLy4AzU5uxTHMU8efR2FvW?=
- =?us-ascii?Q?Exi75x6ffv5S2z9TSFdSFV8aJ97ApBuYSsZobUJz2YG5AJX7t/t3Hxnu5LQS?=
- =?us-ascii?Q?QSYxYZOZGaSTvn5ktpm/TuZ14ldv+Eaf72jQZ6pd6HSWqGR133a3tNoT1y/B?=
- =?us-ascii?Q?R/8xGOB0Oz955fZ7hWrDSRWgQszhftK4Egw4cKKzAWrh82XubRsu7vBbIvdG?=
- =?us-ascii?Q?+dzKdFV05fAeYEBeNv28t2goiR7nXvrCKET218ejgeFpC9JZWx0xrtQdnTlo?=
- =?us-ascii?Q?s/cUv5FIUbniCDDUrInlXtvQzs64400i48J20zw9SSjnMI562Gj8dYf9BDAQ?=
- =?us-ascii?Q?4Kt+VcjM4QoJB+kpE7fEH+BXik6s+rAEjn9lCrRnimsB6fMuXGbW+wZnuL1K?=
- =?us-ascii?Q?Zx/YpVszYPr9dkcqqatdrkDUy+jnDCnm0Y+NeepO4uLAJ/y3KAJYOyH0NPWw?=
- =?us-ascii?Q?CzhxgoIyl8vbCwj0pHNgTx3cJnyxf0EdFzWyvfEpwKyobw3+NpwZrz+HvuOX?=
- =?us-ascii?Q?zRPbqXo0o3bMB+4CoYZqbSaiKqJHWjm48OGUcn/bebR9kFGpboF6rTa5+MBw?=
- =?us-ascii?Q?QvE5K9313S+NQ1jwn38sBumqwzD96184PoYs5LzrVQ/CbCr1NtdawOZ+1ocf?=
- =?us-ascii?Q?9PnJ3PUovsabWwDLCAqPU/IbuB44iD7HbbtymvBc3DCPhYuBuNWpheYNs5IP?=
- =?us-ascii?Q?qx7jMwQvHFg342xTmRZgfCk8+rf8MKPxQGr5GaNUfB/rTD4pGFjAq0XWgHZI?=
- =?us-ascii?Q?g5cu4x3Zk+820JIu3GeMdzLLzwZQ+wdKmq4vWQwdWI0tTJpeX12DZPmteuuj?=
- =?us-ascii?Q?upAEuhXqkJVS/TnV7cTtsbo4HpBjK1kbsdrh9TbFC5b+u4ySj3wl2EmesYpv?=
- =?us-ascii?Q?BOboCaWLzJR+Lwp2AwVyztoosjpt1vqLWC7Gek1qdcJ+jPsBELBXWJ3oHWhS?=
- =?us-ascii?Q?5zrYqEe7RdNB70j6WgYZMqxQbU8LT59Sk3f1yyT0K/akX0LGBjGl?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 807c0036-96bc-4c52-fc04-08de6fe2bedf
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB8800.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2026 18:14:39.0329
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3bioaco1tNd3mW+rjo4wtJOR0itiVHJzaVDXbBo/aduMRpT4rdc1gV+OjjE/MH2iknGzN8Nhyc1tcFRZ9ejywA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8877
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[vger.kernel.org,kernel.org,davemloft.net,infradead.org,linux.intel.com,lunn.ch,linux-foundation.org,linaro.org,google.com,marvell.com,arm.com,linux.ibm.com,ellerman.id.au,gmail.com,redhat.com,rasmusvillemoes.dk,fomichev.me,intel.com,linux.dev,lists.linaro.org,lists.infradead.org,lists.ozlabs.org];
-	RCPT_COUNT_TWELVE(0.00)[44];
+	TAGGED_FROM(0.00)[bounces-259560-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259559-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ynorov@nvidia.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:mid,nvidia.com:email,Nvidia.com:dkim]
-X-Rspamd-Queue-Id: 9360E1619AD
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: CB361161A41
 X-Rspamd-Action: no action
 
-Now that all users of the function are switched to the alternatives,
-drop the function.
+Hi Linus!
 
-Signed-off-by: Yury Norov <ynorov@nvidia.com>
----
- include/linux/bitmap-str.h |  1 -
- lib/bitmap-str.c           | 42 +++++---------------------------------
- 2 files changed, 5 insertions(+), 38 deletions(-)
+The following changes since commit 37a93dd5c49b5fda807fd204edf2547c3493319c:
 
-diff --git a/include/linux/bitmap-str.h b/include/linux/bitmap-str.h
-index 53d3e1b32d3d..abe7a69a846f 100644
---- a/include/linux/bitmap-str.h
-+++ b/include/linux/bitmap-str.h
-@@ -5,7 +5,6 @@
- #include <linux/types.h>
- 
- int bitmap_parse_user(const char __user *ubuf, unsigned int ulen, unsigned long *dst, int nbits);
--int bitmap_print_to_pagebuf(bool list, char *buf, const unsigned long *maskp, int nmaskbits);
- int bitmap_print_bitmask_to_buf(char *buf, const unsigned long *maskp, int nmaskbits,
- 				loff_t off, size_t count);
- int bitmap_print_list_to_buf(char *buf, const unsigned long *maskp, int nmaskbits,
-diff --git a/lib/bitmap-str.c b/lib/bitmap-str.c
-index a357342d5d6c..49f4118c5cd3 100644
---- a/lib/bitmap-str.c
-+++ b/lib/bitmap-str.c
-@@ -39,32 +39,6 @@ int bitmap_parse_user(const char __user *ubuf,
- }
- EXPORT_SYMBOL(bitmap_parse_user);
- 
--/**
-- * bitmap_print_to_pagebuf - convert bitmap to list or hex format ASCII string
-- * @list: indicates whether the bitmap must be list
-- * @buf: page aligned buffer into which string is placed
-- * @maskp: pointer to bitmap to convert
-- * @nmaskbits: size of bitmap, in bits
-- *
-- * Output format is a comma-separated list of decimal numbers and
-- * ranges if list is specified or hex digits grouped into comma-separated
-- * sets of 8 digits/set. Returns the number of characters written to buf.
-- *
-- * It is assumed that @buf is a pointer into a PAGE_SIZE, page-aligned
-- * area and that sufficient storage remains at @buf to accommodate the
-- * bitmap_print_to_pagebuf() output. Returns the number of characters
-- * actually printed to @buf, excluding terminating '\0'.
-- */
--int bitmap_print_to_pagebuf(bool list, char *buf, const unsigned long *maskp,
--			    int nmaskbits)
--{
--	ptrdiff_t len = rest_of_page(buf);
--
--	return list ? scnprintf(buf, len, "%*pbl\n", nmaskbits, maskp) :
--		      scnprintf(buf, len, "%*pb\n", nmaskbits, maskp);
--}
--EXPORT_SYMBOL(bitmap_print_to_pagebuf);
--
- /**
-  * bitmap_print_to_buf  - convert bitmap to list or hex format ASCII string
-  * @list: indicates whether the bitmap must be list
-@@ -101,7 +75,7 @@ static int bitmap_print_to_buf(bool list, char *buf, const unsigned long *maskp,
-  * @off: in the string from which we are copying, We copy to @buf
-  * @count: the maximum number of bytes to print
-  *
-- * The bitmap_print_to_pagebuf() is used indirectly via its cpumap wrapper
-+ * The sprintf("%*pbl") is used indirectly via its cpumap wrapper
-  * cpumap_print_to_pagebuf() or directly by drivers to export hexadecimal
-  * bitmask and decimal list to userspace by sysfs ABI.
-  * Drivers might be using a normal attribute for this kind of ABIs. A
-@@ -111,18 +85,11 @@ static int bitmap_print_to_buf(bool list, char *buf, const unsigned long *maskp,
-  *		struct device_attribute *attr, char *buf)
-  *   {
-  *	...
-- *	return bitmap_print_to_pagebuf(true, buf, &mask, nr_trig_max);
-+ *	return scnprintf(buf, rest_of_page(buf), nr_trig_max, &mask);
-  *   }
-  *
-  * show entry of attribute has no offset and count parameters and this
-  * means the file is limited to one page only.
-- * bitmap_print_to_pagebuf() API works terribly well for this kind of
-- * normal attribute with buf parameter and without offset, count::
-- *
-- *   bitmap_print_to_pagebuf(bool list, char *buf, const unsigned long *maskp,
-- *			   int nmaskbits)
-- *   {
-- *   }
-  *
-  * The problem is once we have a large bitmap, we have a chance to get a
-  * bitmask or list more than one page. Especially for list, it could be
-@@ -149,7 +116,7 @@ static int bitmap_print_to_buf(bool list, char *buf, const unsigned long *maskp,
-  *
-  * The role of cpumap_print_bitmask_to_buf() and cpumap_print_list_to_buf()
-  * is similar with cpumap_print_to_pagebuf(),  the difference is that
-- * bitmap_print_to_pagebuf() mainly serves sysfs attribute with the assumption
-+ * scnprintf("%*pb[l]") mainly serves sysfs attribute with the assumption
-  * the destination buffer is exactly one page and won't be more than one page.
-  * cpumap_print_bitmask_to_buf() and cpumap_print_list_to_buf(), on the other
-  * hand, mainly serves bin_attribute which doesn't work with exact one page,
-@@ -158,7 +125,8 @@ static int bitmap_print_to_buf(bool list, char *buf, const unsigned long *maskp,
-  *
-  * WARNING!
-  *
-- * This function is not a replacement for sprintf() or bitmap_print_to_pagebuf().
-+ * This function is not a replacement for sprintf().
-+ *
-  * It is intended to workaround sysfs limitations discussed above and should be
-  * used carefully in general case for the following reasons:
-  *
--- 
-2.43.0
+  Merge tag 'net-next-7.0' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next (2026-02-11 19:31:52 -0800)
 
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-7.0-rc1
+
+for you to fetch changes up to 571dcbeb8e635182bb825ae758399831805693c2:
+
+  net: nfc: nci: Fix parameter validation for packet data (2026-02-19 09:32:51 -0800)
+
+----------------------------------------------------------------
+Including fixes from Netfilter.
+
+Current release - new code bugs:
+
+ - net: fix backlog_unlock_irq_restore() vs CONFIG_PREEMPT_RT
+
+ - eth: mlx5e: XSK, Fix unintended ICOSQ change
+
+ - phy_port: correctly recompute the port's linkmodes
+
+ - vsock: prevent child netns mode switch from local to global
+
+ - couple of kconfig fixes for new symbols
+
+Previous releases - regressions:
+
+ - nfc: nci: fix false-positive parameter validation for packet data
+
+ - net: do not delay zero-copy skbs in skb_attempt_defer_free()
+
+Previous releases - always broken:
+
+ - mctp: ensure our nlmsg responses to user space are zero-initialised
+
+ - ipv6: ioam: fix heap buffer overflow in __ioam6_fill_trace_data()
+
+ - fixes for ICMP rate limiting
+
+Misc:
+
+ - intel: fix PCI device ID conflict between i40e and ipw2200
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+----------------------------------------------------------------
+Aleksei Oladko (3):
+      selftests: forwarding: vxlan_bridge_1d: fix test failure with br_netfilter enabled
+      selftests: forwarding: vxlan_bridge_1d_ipv6: fix test failure with br_netfilter enabled
+      selftests: forwarding: fix pedit tests failure with br_netfilter enabled
+
+Allison Henderson (2):
+      net/rds: rds_sendmsg should not discard payload_len
+      net/rds: Fix NULL pointer dereference in rds_tcp_accept_one
+
+Antonio Quartulli (1):
+      ovpn: tcp - don't deref NULL sk_socket member after tcp_close()
+
+Arnd Bergmann (3):
+      printk: add CONFIG_PRINTK dependency for netconsole
+      net: psp: select CONFIG_SKB_EXTENSIONS
+      net: dsa: MxL862xx: don't force-enable MAXLINEAR_GPHY
+
+Bobby Eshleman (4):
+      eth: fbnic: set FBNIC_QUEUE_RDE_CTL0_EN_HDR_SPLIT on RDE_CTL0
+      eth: fbnic: increase FBNIC_HDR_BYTES_MIN from 128 to 256 bytes
+      eth: fbnic: set DMA_HINT_L4 for all flows
+      selftests: drv-net: add HDS payload sweep test for devmem TCP
+
+Brian Witte (3):
+      netfilter: nft_counter: serialize reset with spinlock
+      netfilter: nft_quota: use atomic64_xchg for reset
+      netfilter: nf_tables: revert commit_mutex usage in reset path
+
+Chen Ni (2):
+      myri10ge: replace comma with semicolons
+      bng_en: Remove duplicate include
+
+Chengfeng Ye (1):
+      fbnic: close fw_log race between users and teardown
+
+Cosmin Ratiu (2):
+      net/mlx5e: Fix deadlocks between devlink and netdev instance locks
+      net/mlx5e: Use unsigned for mlx5e_get_max_num_channels
+
+Daniel Machon (2):
+      net: sparx5/lan969x: fix DWRR cost max to match hardware register width
+      net: sparx5/lan969x: fix PTP clock max_adj value
+
+Dimitri Daskalakis (2):
+      eth: fbnic: Add validation for MTU changes
+      eth: fbnic: Advertise supported XDP features.
+
+Duoming Zhou (1):
+      atm: fore200e: fix use-after-free in tasklets during device removal
+
+Eric Dumazet (11):
+      net: fix backlog_unlock_irq_restore() vs CONFIG_PREEMPT_RT
+      ipv6: fix a race in ip6_sock_set_v6only()
+      net: do not delay zero-copy skbs in skb_attempt_defer_free()
+      ping: annotate data-races in ping_lookup()
+      macvlan: observe an RCU grace period in macvlan_common_newlink() error path
+      selftests/net: packetdrill: add ipv4-mapped-ipv6 tests
+      icmp: prevent possible overflow in icmp_global_allow()
+      inet: move icmp_global_{credit,stamp} to a separate cache line
+      ipv6: icmp: remove obsolete code in icmpv6_xrlim_allow()
+      ipv4: icmp: icmpv4_xrlim_allow() optimization if net.ipv4.icmp_ratelimit is zero
+      ipv6: icmp: icmpv6_xrlim_allow() optimization if net.ipv6.icmp.ratelimit is zero
+
+Ethan Nelson-Moore (2):
+      net: intel: fix PCI device ID conflict between i40e and ipw2200
+      net: arcnet: com20020-pci: fix support for 2.5Mbit cards
+
+Fernando Fernandez Mancera (1):
+      ipv6: addrconf: reduce default temp_valid_lft to 2 days
+
+Florian Westphal (1):
+      netfilter: nf_conntrack_h323: don't pass uninitialised l3num value
+
+Gal Pressman (4):
+      selftests: drv-net: limit RPS test CPUs to supported range
+      net/mlx5e: Fix misidentification of ASO CQE during poll loop
+      net/mlx5: Fix misidentification of write combining CQE during poll loop
+      net/mlx5e: MACsec, add ASO poll loop in macsec_aso_set_arm_event
+
+Hangbin Liu (1):
+      bonding: alb: fix UAF in rlb_arp_recv during bond up/down
+
+Hariprasad Kelam (1):
+      octeontx2-af: Fix default entries mcam entry action
+
+Ido Schimmel (1):
+      selftests: mlxsw: tc_restrictions: Fix test failure with new iproute2
+
+Inseo An (1):
+      netfilter: nf_tables: fix use-after-free in nf_tables_addchain()
+
+Ivan Vecera (1):
+      dpll: zl3073x: Fix ref frequency setting
+
+Jakub Kicinski (7):
+      Merge branch 'net-phy_port-sfp-modules-representation-and-phy_port-listing'
+      Merge branch 'net-mscc-ocelot-fix-missing-lock-in-ocelot_port_xmit'
+      Merge branch 'vsock-fix-child-netns-mode-initialization-and-restriction'
+      selftests: tc_actions: don't dump 2MB of \0 to stdout
+      Merge branch 'icmp-better-deal-with-ddos'
+      Merge tag 'nf-26-02-17' of https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
+      Merge branch 'mlx5-misc-fixes-2026-02-18'
+
+Jeremy Kerr (1):
+      net: mctp: ensure our nlmsg responses are initialised
+
+Jie Zhang (1):
+      net: stmmac: fix oops when split header is enabled
+
+Julian Anastasov (2):
+      ipvs: skip ipv6 extension headers for csum checks
+      ipvs: do not keep dest_dst if dev is going down
+
+Kuniyuki Iwashima (1):
+      ipv6: Fix out-of-bound access in fib6_add_rt2node().
+
+Maxime Chevallier (3):
+      net: phy: initialize the port support based on the PHY's for OF ports
+      net: phy: phy_port: Cleanup the of-parsing logic for phy_port
+      net: phy: phy_port: Correctly recompute the port's linkmodes
+
+Michael Thalmeier (1):
+      net: nfc: nci: Fix parameter validation for packet data
+
+Nikolay Aleksandrov (2):
+      net: bridge: mcast: always update mdb_n_entries for vlan contexts
+      selftests: forwarding: bridge_mdb_max: add tests for mdb_n_entries warning
+
+Pablo Neira Ayuso (1):
+      net: remove WARN_ON_ONCE when accessing forward path array
+
+Paolo Abeni (4):
+      Merge branch 'eth-fbnic-fix-and-improve-header-data-split-configuration'
+      Merge tag 'ovpn-net-20260212' of https://github.com/OpenVPN/ovpn-net-next
+      Merge branch 'net-bridge-mcast-fix-mdb_n_entries-counting-warning'
+      Merge branch 'selftests-forwarding-fix-br_netfilter-related-test-failures'
+
+Phil Sutter (1):
+      include: uapi: netfilter_bridge.h: Cover for musl libc
+
+Pin-yen Lin (1):
+      selftests: netconsole: Increase port listening timeout
+
+Qanux (1):
+      ipv6: ioam: fix heap buffer overflow in __ioam6_fill_trace_data()
+
+Ralf Lici (3):
+      ovpn: set sk_user_data before overriding callbacks
+      ovpn: fix possible use-after-free in ovpn_net_xmit
+      ovpn: fix VPN TX bytes counting
+
+Ruitong Liu (1):
+      net/sched: act_skbedit: fix divide-by-zero in tcf_skbedit_hash()
+
+Shay Drory (1):
+      net/mlx5: Fix multiport device check over light SFs
+
+Stefano Garzarella (3):
+      vsock: fix child netns mode initialization
+      vsock: prevent child netns mode switch from local to global
+      vsock: document namespace mode sysctls
+
+Sun Jian (1):
+      netfilter: annotate NAT helper hook pointers with __rcu
+
+Tabrez Ahmed (1):
+      rds: tcp: fix uninit-value in __inet_bind
+
+Tariq Toukan (1):
+      net/mlx5e: XSK, Fix unintended ICOSQ change
+
+Thomas Fourier (1):
+      net: ethernet: ec_bhf: Fix dma_free_coherent() dma handle
+
+Vikas Gupta (1):
+      bnge: fix reserving resources from FW
+
+Yue Haibing (1):
+      selftests: net: lib: Fix jq parsing error
+
+Ziyi Guo (5):
+      net: mscc: ocelot: extract ocelot_xmit_timestamp() helper
+      net: mscc: ocelot: split xmit into FDMA and register injection paths
+      net: mscc: ocelot: add missing lock protection in ocelot_port_xmit_inj()
+      net: usb: catc: enable basic endpoint checking
+      xen-netback: reject zero-queue configuration from guest
+
+ Documentation/admin-guide/sysctl/net.rst           |  52 ++++-
+ Documentation/networking/ip-sysctl.rst             |   7 +-
+ drivers/atm/fore200e.c                             |   4 +
+ drivers/dpll/zl3073x/ref.h                         |   2 +
+ drivers/net/Kconfig                                |   1 +
+ drivers/net/arcnet/com20020-pci.c                  |  16 +-
+ drivers/net/bonding/bond_main.c                    |   6 +-
+ drivers/net/dsa/mxl862xx/Kconfig                   |   1 -
+ drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c |   2 +-
+ drivers/net/ethernet/broadcom/bnge/bnge_netdev.c   |   1 -
+ drivers/net/ethernet/ec_bhf.c                      |   2 +-
+ drivers/net/ethernet/intel/i40e/i40e_main.c        |   8 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu_npc.c    |  41 ++--
+ drivers/net/ethernet/mellanox/mlx5/core/en.h       |   4 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c   |  14 --
+ .../ethernet/mellanox/mlx5/core/en/reporter_rx.c   |  13 ++
+ .../ethernet/mellanox/mlx5/core/en/reporter_tx.c   |  52 ++++-
+ .../net/ethernet/mellanox/mlx5/core/en/tc/meter.c  |  10 +-
+ .../net/ethernet/mellanox/mlx5/core/en/xsk/pool.c  |   4 +-
+ .../net/ethernet/mellanox/mlx5/core/en/xsk/tx.c    |   2 +-
+ .../ethernet/mellanox/mlx5/core/en_accel/macsec.c  |  13 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c  |  64 ++----
+ drivers/net/ethernet/mellanox/mlx5/core/wc.c       |  14 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c    |   3 +
+ drivers/net/ethernet/meta/fbnic/fbnic_fw_log.c     |   3 -
+ drivers/net/ethernet/meta/fbnic/fbnic_netdev.c     |  20 ++
+ drivers/net/ethernet/meta/fbnic/fbnic_pci.c        |  19 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_rpc.c        |   5 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.c       |  25 ++-
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.h       |   2 +-
+ drivers/net/ethernet/microchip/sparx5/sparx5_ptp.c |   2 +-
+ drivers/net/ethernet/microchip/sparx5/sparx5_qos.h |   2 +-
+ drivers/net/ethernet/mscc/ocelot_net.c             |  89 +++++---
+ drivers/net/ethernet/myricom/myri10ge/myri10ge.c   |  12 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |  20 +-
+ drivers/net/macvlan.c                              |   5 +
+ drivers/net/ovpn/io.c                              |  57 +++--
+ drivers/net/ovpn/socket.c                          |  41 ++--
+ drivers/net/ovpn/tcp.c                             |  23 +-
+ drivers/net/ovpn/udp.c                             |   1 +
+ drivers/net/phy/phy_device.c                       |   3 +
+ drivers/net/phy/phy_port.c                         |  33 +--
+ drivers/net/usb/catc.c                             |  37 ++-
+ drivers/net/wireless/intel/ipw2x00/ipw2200.c       |   8 +-
+ drivers/net/xen-netback/xenbus.c                   |   5 +-
+ include/linux/mlx5/driver.h                        |   4 +-
+ include/linux/netfilter/nf_conntrack_amanda.h      |   2 +-
+ include/linux/netfilter/nf_conntrack_ftp.h         |   2 +-
+ include/linux/netfilter/nf_conntrack_irc.h         |   2 +-
+ include/linux/netfilter/nf_conntrack_snmp.h        |   2 +-
+ include/linux/netfilter/nf_conntrack_tftp.h        |   2 +-
+ include/net/addrconf.h                             |   3 +-
+ include/net/ioam6.h                                |   2 +
+ include/net/ipv6.h                                 |  11 +-
+ include/net/netns/ipv4.h                           |   9 +-
+ include/uapi/linux/netfilter_bridge.h              |   4 +
+ net/bridge/br_multicast.c                          |  45 ++--
+ net/core/dev.c                                     |  19 +-
+ net/core/skbuff.c                                  |   7 +-
+ net/ipv4/icmp.c                                    |  17 +-
+ net/ipv4/ping.c                                    |  33 +--
+ net/ipv6/af_inet6.c                                |   2 +-
+ net/ipv6/exthdrs.c                                 |   5 +
+ net/ipv6/icmp.c                                    |  15 +-
+ net/ipv6/ioam6.c                                   |  14 ++
+ net/ipv6/ioam6_iptunnel.c                          |  10 +-
+ net/ipv6/ip6_fib.c                                 |   2 +-
+ net/mctp/device.c                                  |   1 +
+ net/mctp/neigh.c                                   |   1 +
+ net/mctp/route.c                                   |   1 +
+ net/netfilter/ipvs/ip_vs_proto_sctp.c              |  18 +-
+ net/netfilter/ipvs/ip_vs_proto_tcp.c               |  21 +-
+ net/netfilter/ipvs/ip_vs_proto_udp.c               |  20 +-
+ net/netfilter/ipvs/ip_vs_xmit.c                    |  46 +++-
+ net/netfilter/nf_conntrack_amanda.c                |  14 +-
+ net/netfilter/nf_conntrack_ftp.c                   |  14 +-
+ net/netfilter/nf_conntrack_h323_main.c             |  10 +-
+ net/netfilter/nf_conntrack_irc.c                   |  13 +-
+ net/netfilter/nf_conntrack_snmp.c                  |   8 +-
+ net/netfilter/nf_conntrack_tftp.c                  |   7 +-
+ net/netfilter/nf_tables_api.c                      | 249 ++++-----------------
+ net/netfilter/nft_counter.c                        |  20 +-
+ net/netfilter/nft_quota.c                          |  13 +-
+ net/nfc/nci/ntf.c                                  | 159 +++++++++++--
+ net/psp/Kconfig                                    |   1 +
+ net/rds/send.c                                     |   6 +-
+ net/rds/tcp.c                                      |   2 +-
+ net/rds/tcp_listen.c                               |  20 +-
+ net/sched/act_skbedit.c                            |   6 +-
+ net/vmw_vsock/af_vsock.c                           |  20 +-
+ tools/testing/selftests/drivers/net/hw/devmem.py   |  19 +-
+ tools/testing/selftests/drivers/net/hw/ncdevmem.c  |  11 +-
+ tools/testing/selftests/drivers/net/hw/toeplitz.py |  17 +-
+ .../selftests/drivers/net/lib/sh/lib_netcons.sh    |   4 +-
+ .../selftests/drivers/net/mlxsw/tc_restrictions.sh |   4 +-
+ .../selftests/net/forwarding/bridge_mdb_max.sh     |  90 +++++++-
+ .../selftests/net/forwarding/pedit_dsfield.sh      |   8 +
+ tools/testing/selftests/net/forwarding/pedit_ip.sh |   8 +
+ .../testing/selftests/net/forwarding/tc_actions.sh |   2 +-
+ .../selftests/net/forwarding/vxlan_bridge_1d.sh    |  26 ++-
+ .../net/forwarding/vxlan_bridge_1d_ipv6.sh         |   2 +-
+ tools/testing/selftests/net/lib.sh                 |   2 +-
+ .../selftests/net/packetdrill/ksft_runner.sh       |  11 +-
+ 103 files changed, 1140 insertions(+), 694 deletions(-)
 
