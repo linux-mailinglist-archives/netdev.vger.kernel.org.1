@@ -1,509 +1,232 @@
-Return-Path: <netdev+bounces-259443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259444-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aKjVLVUAl2mItQIAu9opvQ
-	(envelope-from <netdev+bounces-259443-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 13:21:41 +0100
+	id oHeVB4oBl2k8tgIAu9opvQ
+	(envelope-from <netdev+bounces-259444-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 13:26:50 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16D8F15E8FD
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 13:21:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D71015E94D
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 13:26:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 57CB3300E259
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 12:21:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4008230143C3
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 12:26:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B295223DD6;
-	Thu, 19 Feb 2026 12:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB1B6286430;
+	Thu, 19 Feb 2026 12:26:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="oKM1cLKo";
-	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="lvLw/wKU"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="pgqNhpO+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p02-ob.smtp.rzone.de (mo4-p02-ob.smtp.rzone.de [85.215.255.84])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9190A1EB9E1;
-	Thu, 19 Feb 2026 12:21:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.84
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771503696; cv=pass; b=KMikOX69sbub7B6h1C0DcTiR+uWJf8XivbzhzySNY1ctZsgbk0WCZDtBQ6eMsUNJ/POyOBplN5skf22BXfWhL7TyUO5MAuIxzNz5zFBV1oVTHcjXlQ+PbIZQXaWRp3S6shRoozmttvAjLIDShzPrxFxFJB7cvYM4+6magEH0GPg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771503696; c=relaxed/simple;
-	bh=h63ZdEaaEPnZsRx6yiC2v1fC2mPZzy2aCrwUBkQ4jUk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r70s1Q15MREBXbB5jMYpt+9DmrBlnsbctWFW9oJgxVigIJWrHgKivaAE9ENbtfRkCCjxkCK+8rXKiDnr7swnSNMGBrMUfDMUzsUbqhl1fRuS5Ii186yaOjRTJdNBi9JyYiwaeicZi+jiiR1OXQ44Zubxe4AtBkBHYsaYckiaJHE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=fail smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=oKM1cLKo; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=lvLw/wKU; arc=pass smtp.client-ip=85.215.255.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=hartkopp.net
-ARC-Seal: i=1; a=rsa-sha256; t=1771503501; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=FuEqPBV6oVYJEQ1tD/JwSXTRCbAuK6lO0BtMvK+k7HZINKUYyUovzinOVcL587Qiek
-    i0Ouf8nGFwA2Ijb4na7VCIS+uA3u3yqDcwGU5rkcIx9dVA8HXqz5F8WgxJceg8XyLWOA
-    pCwqphzo+GZS0fOpPBiTxLl7dP9l5u4P8d3YSUZmIV86Pz4lB2IS0Bgnil9TrA6Gf7Kl
-    MbBIERE4xaSTn9K+jHt/GVDxdaKQXmJjuNLg+zR985jDgFaM+5azPc3BLGzTs2COr2Kw
-    WZKcRA57UJDvPgiSF4YOYw8GD03zO7klrlnrztQXhvDq4N9VMLh7lI06NQB2xkYUBxoc
-    FbAA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1771503501;
-    s=strato-dkim-0002; d=strato.com;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=LCyaAbyVtKip3XCHObo7iedMbzRRklZBba0c3rwtqjI=;
-    b=PoecEVCFkZCPso5psypG/Io8BP3gqSACmoHmTI45heDJjCXCdnssS3knjhHozc0MLj
-    wEjHJBSUOC6hoHXYfkjinlgM0K/9fLIuI070J+KQD4MCJe+EBr8HDB0iyNjBrKgj1H7Z
-    bYdi83wFm0opIf5H6w6joH3XeYtG6XhaffVfrtQB0Z0buZ/cFLb39st2+fD4/q2dOnmW
-    ZL8slWvAHS/f72VVr+OtQQbEQfDbuSBzOHQbZDoXWT7R5aoUE/K5BpPclfPhT99lFblE
-    UpzFLsNlQDPLRaQ1g2ii3L62/GVsJQ9HADs3tZP8vEODg7JG2eRHwr48xUd72s0g4p2g
-    BFsw==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo02
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1771503501;
-    s=strato-dkim-0002; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=LCyaAbyVtKip3XCHObo7iedMbzRRklZBba0c3rwtqjI=;
-    b=oKM1cLKoA8HlN4JFrHXQDmlSXiBRsvJAT7pBV6LTxhxmL2NB+PEDnUus8pR0sDM1Sl
-    niETk59rUepMYwHyiDF0h20ruT4s7PMH/YZaj5AG3SuW3h3VHzJ0hmgiSJByjVqgib/2
-    k7h2dQFgqw6HTtyYXqffw2H60M6D1sg2FD96wAtx0nbH0P0tup/LLaM5Qh8/iWutcQaY
-    4pX0kK4skeQaFFEIDEN08Ardx3+blTpaBlVQCoPTGPmOp49nZyl3E0WtjjXpd+3XzOKH
-    cWOI8CDQCnNQTN58OCzbtXJlJyupzq71EtJXCsDSrmoHi3GH2wkwyGNc4NGoxSPM1go0
-    g3LA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1771503501;
-    s=strato-dkim-0003; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=LCyaAbyVtKip3XCHObo7iedMbzRRklZBba0c3rwtqjI=;
-    b=lvLw/wKUJhlBDrJaLdzUVK0hmnhu6BVuEa+pZjpNu2vKno7j0/46NUROAWGaph8DIs
-    ritDlgFfU1z7tpqsjqCg==
-X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeFQ7s0ZDT0tksFSR+Aix0esQJVIAlZEg=="
-Received: from [IPV6:2a00:6020:4a38:6800:217d:dfe3:b063:ecb0]
-    by smtp.strato.de (RZmta 55.0.1 AUTH)
-    with ESMTPSA id Ka861021JCIKTBS
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Thu, 19 Feb 2026 13:18:20 +0100 (CET)
-Message-ID: <3601c855-ae24-4a61-ac67-891100411648@hartkopp.net>
-Date: Thu, 19 Feb 2026 13:18:14 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3ACE1946DA;
+	Thu, 19 Feb 2026 12:26:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771504006; cv=none; b=QYPbGX1hBNCqKAXNkw/8diuxSVp5AgyxFhD7xnmhYIwoghBFm09tg8Y1u2C0ffH+zfMJvF9VvG6CuKyBSnTO7Xex5BVN5JiUoDJVPQcuZRgmWgbstw6wbP+kuFDCAj29YQK65ptc4LV4g8Yx03dK9LuW+ddtZB5SIpylSHctkoE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771504006; c=relaxed/simple;
+	bh=WWNDYmDurhKhiMRGxM0OxWlHH8s1Go8hhj6ttk7N7Bk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TU0bdukbh1LNcSv3MfMACxzmBCCI060QdhTcmFdDQ7eDkZC1qDC8m//HIKUhW8mmCz2q8Nyz3uqNQTEqItuG9H4Y2tRdycLs5+yJ53hDiwYKvw4ab7bXiFOR3MGJ8TYuQw6vp+ScllIFrYFLxiLwbWBy+5cIPJkgQsNsazdAFFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=pgqNhpO+; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 32FCD60253;
+	Thu, 19 Feb 2026 13:26:35 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1771503995;
+	bh=5tucPx83ij3BIVmjNx5q6OBL7ANHZFuec6ke4EP8SvA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pgqNhpO+5u9H2OopCZiXlb+HURVSvvYJKVm1YeKCGFj2Qj08lsjxSFEOsbhoRavQQ
+	 YU+Lljim9+dqvw/gA4X51mLbz5Lkr2rHGipCq2QYCSY+pH9e6/3F8/mG2atmnMT2mP
+	 pDfDY0kow9fufkFF8GevttK2qhoR/QgjG94IZ//Mlq2Jz/6ZCVmSh20SAR2hE0bPUR
+	 cFa5DtIAKoE6+0uSRpP58Py+/159GtFPxnCEfF7j6mCExK8EvVhdfMSZVLnZHHoY8q
+	 vu76Ugee5hLp5Vr0uqBB53Dh2nEJYVNsc0ZH2IMGhF/4pAG5TQK4As8F2lVxe5y4OH
+	 GZzIfZf7DVIpw==
+Date: Thu, 19 Feb 2026 13:26:32 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: syzbot <syzbot+4924a0edc148e8b4b342@syzkaller.appspotmail.com>
+Cc: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com,
+	fw@strlen.de, horms@kernel.org, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com, phil@nwl.cc,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [netfilter?] WARNING in nft_map_deactivate
+Message-ID: <aZcBeD8NCE5k7zeC@chamomile>
+References: <6996dd95.050a0220.21cd75.010c.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 1/1] bpf: Add tunnel decapsulation and GSO state
- updates per new flags
-To: "Hudson, Nick" <nhudson@akamai.com>
-Cc: "Glasgall, Anna" <aglasgal@akamai.com>,
- "Tottenham, Max" <mtottenh@akamai.com>, "Hunt, Joshua" <johunt@akamai.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jason Xing <kerneljasonxing@gmail.com>, Willem de Bruijn
- <willemb@google.com>, Paul Chaignon <paul.chaignon@gmail.com>,
- Mykyta Yatsenko <yatsenko@meta.com>, Tao Chen <chen.dylane@linux.dev>,
- Kumar Kartikeya Dwivedi <memxor@gmail.com>,
- Anton Protopopov <a.s.protopopov@gmail.com>,
- Tobias Klauser <tklauser@distanz.ch>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <20260219104710.1490304-1-nhudson@akamai.com>
- <20260219104710.1490304-2-nhudson@akamai.com>
- <789D0313-ED17-4DAA-B66F-754654B8EE16@akamai.com>
-Content-Language: en-US
-From: Oliver Hartkopp <socketcan@hartkopp.net>
-In-Reply-To: <789D0313-ED17-4DAA-B66F-754654B8EE16@akamai.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <6996dd95.050a0220.21cd75.010c.GAE@google.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[hartkopp.net,reject];
-	R_DKIM_ALLOW(-0.20)[hartkopp.net:s=strato-dkim-0002,hartkopp.net:s=strato-dkim-0003];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=6d9e410399043c26];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259443-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259444-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[akamai.com,kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,davemloft.net,redhat.com,meta.com,distanz.ch,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[32];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DMARC_NA(0.00)[netfilter.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,googlegroups.com:email,storage.googleapis.com:url,goo.gl:url];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[socketcan@hartkopp.net,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[hartkopp.net:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,hartkopp.net:mid,hartkopp.net:dkim]
-X-Rspamd-Queue-Id: 16D8F15E8FD
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	TAGGED_RCPT(0.00)[netdev,4924a0edc148e8b4b342];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	SUBJECT_HAS_QUESTION(0.00)[]
+X-Rspamd-Queue-Id: 7D71015E94D
 X-Rspamd-Action: no action
 
-
-
-On 19.02.26 12:50, Hudson, Nick wrote:
-> [still learning git send-email]
-
-Definitely :-D
-
-No idea, why I am in the recipient list ;-)
-
-Best regards,
-Oliver
-
+On Thu, Feb 19, 2026 at 01:53:25AM -0800, syzbot wrote:
+> Hello,
 > 
-> This was supposed to be sent with this:
+> syzbot found the following issue on:
 > 
+> HEAD commit:    4c51f90d45dc selftests/bpf: Add powerpc support for get_pr..
+> git tree:       bpf-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=159e5aaa580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=6d9e410399043c26
+> dashboard link: https://syzkaller.appspot.com/bug?extid=4924a0edc148e8b4b342
+> compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13437652580000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1250a7b2580000
 > 
-> Our use case involves a BPF program that removes VXLAN headers from
-> packets that are subsequently forwarded via a tap interface. The new
-> flags allow the BPF program to strip the tunnel header and selectively
-> clear the tunnel-specific GSO state. This allows larget packets to be
-> forwarded without segmentation through the (non-robust) tap interface
-> for the decapsulated packets.
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/173ab67d0a10/disk-4c51f90d.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/9c8787b7cc0e/vmlinux-4c51f90d.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/bf9799a7764a/bzImage-4c51f90d.xz
 > 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+4924a0edc148e8b4b342@syzkaller.appspotmail.com
 > 
-> 
->> On 19 Feb 2026, at 10:47, Nick Hudson <nhudson@akamai.com> wrote:
->>
->> Enable BPF programs to properly handle GSO state when decapsulating
->> tunneled packets by adding selective GSO flag clearing and a trusted
->> mode for GSO handling.
->>
->> New decapsulation flags:
->>
->> - BPF_F_ADJ_ROOM_DECAP_L4_UDP: Clear UDP tunnel GSO flags
->>   (SKB_GSO_UDP_TUNNEL, SKB_GSO_UDP_TUNNEL_CSUM)
->> - BPF_F_ADJ_ROOM_DECAP_L4_GRE: Clear GRE tunnel GSO flags
->>   (SKB_GSO_GRE, SKB_GSO_GRE_CSUM)
->> - BPF_F_ADJ_ROOM_DECAP_IPXIP4: Clear SKB_GSO_IPXIP4 flag for
->>   IPv4-in-IPv4 (IPIP) and IPv6-in-IPv4 (SIT) tunnels
->> - BPF_F_ADJ_ROOM_DECAP_IPXIP6: Clear SKB_GSO_IPXIP6 flag for
->>   IPv6-in-IPv6 and IPv4-in-IPv6 tunnels
->> - BPF_F_ADJ_ROOM_NO_DODGY: Preserve gso_segs and don't set
->>   SKB_GSO_DODGY when the BPF program is trusted and modifications
->>   are known to be valid
->>
->> The existing anonymous enum for BPF_FUNC_skb_adjust_room flags is
->> renamed to enum bpf_adj_room_flags to enable CO-RE (Compile Once -
->> Run Everywhere) lookups in BPF programs.
->>
->> By default, bpf_skb_adjust_room sets SKB_GSO_DODGY and resets
->> gso_segs to 0, forcing revalidation. The NO_DODGY flag bypasses this
->> for trusted programs that guarantee GSO correctness.
->>
->> Usage example (decapsulating UDP tunnel with IPv4 inner packet):
->>   bpf_skb_adjust_room(skb, -hdr_len, BPF_ADJ_ROOM_NET,
->>                       BPF_F_ADJ_ROOM_DECAP_L3_IPV4 |
->>                       BPF_F_ADJ_ROOM_DECAP_L4_UDP);
->>
->> Co-developed-by: Anna Glasgall <aglasgal@akamai.com>
->> Signed-off-by: Anna Glasgall <aglasgal@akamai.com>
->> Co-developed-by: Max Tottenham <mtottenh@akamai.com>
->> Signed-off-by: Max Tottenham <mtottenh@akamai.com>
->> Signed-off-by: Josh Hunt <johunt@akamai.com>
->> Signed-off-by: Nick Hudson <nhudson@akamai.com>
->> ---
->> include/uapi/linux/bpf.h       | 45 +++++++++++++++++++--
->> net/core/filter.c              | 73 ++++++++++++++++++++++++++++------
->> tools/include/uapi/linux/bpf.h | 45 +++++++++++++++++++--
->> 3 files changed, 145 insertions(+), 18 deletions(-)
->>
->> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
->> index c8d400b7680a..0cb24ab70af7 100644
->> --- a/include/uapi/linux/bpf.h
->> +++ b/include/uapi/linux/bpf.h
->> @@ -3010,8 +3010,42 @@ union bpf_attr {
->>   *
->>   * * **BPF_F_ADJ_ROOM_DECAP_L3_IPV4**,
->>   *  **BPF_F_ADJ_ROOM_DECAP_L3_IPV6**:
->> - *  Indicate the new IP header version after decapsulating the outer
->> - *  IP header. Used when the inner and outer IP versions are different.
->> + *  Indicate the new IP header version after decapsulating the
->> + *  outer IP header. Used when the inner and outer IP versions
->> + *  are different. These flags only trigger a protocol change
->> + *  without clearing any tunnel-specific GSO flags.
->> + *
->> + * * **BPF_F_ADJ_ROOM_DECAP_L4_GRE**:
->> + *  Clear GRE tunnel GSO flags (SKB_GSO_GRE and SKB_GSO_GRE_CSUM)
->> + *  when decapsulating a GRE tunnel.
->> + *
->> + * * **BPF_F_ADJ_ROOM_DECAP_L4_UDP**:
->> + *  Clear UDP tunnel GSO flags (SKB_GSO_UDP_TUNNEL and
->> + *  SKB_GSO_UDP_TUNNEL_CSUM) when decapsulating a UDP tunnel.
->> + *
->> + * * **BPF_F_ADJ_ROOM_DECAP_IPXIP4**:
->> + *  Clear IPIP/SIT tunnel GSO flag (SKB_GSO_IPXIP4) when decapsulating
->> + *  a tunnel with an outer IPv4 header (IPv4-in-IPv4 or IPv6-in-IPv4).
->> + *
->> + * * **BPF_F_ADJ_ROOM_DECAP_IPXIP6**:
->> + *  Clear IPv6 encapsulation tunnel GSO flag (SKB_GSO_IPXIP6) when
->> + *  decapsulating a tunnel with an outer IPv6 header (IPv6-in-IPv6
->> + *  or IPv4-in-IPv6).
->> + *
->> + * When using the decapsulation flags above, the skb->encapsulation
->> + * flag is automatically cleared if all tunnel-specific GSO flags
->> + * (SKB_GSO_UDP_TUNNEL, SKB_GSO_UDP_TUNNEL_CSUM, SKB_GSO_GRE,
->> + * SKB_GSO_GRE_CSUM, SKB_GSO_IPXIP4, SKB_GSO_IPXIP6) have been
->> + * removed from the packet. This handles cases where all tunnel
->> + * layers have been decapsulated.
->> + *
->> + * * **BPF_F_ADJ_ROOM_NO_DODGY**:
->> + *  Do not mark the packet as dodgy (untrusted) and preserve
->> + *  the existing gso_segs count. By default, packet modifications
->> + *  set SKB_GSO_DODGY and reset gso_segs to 0, forcing
->> + *  revalidation. This flag is useful when decapsulating the
->> + *  tunnel, the BPF program is trusted, and the modifications
->> + *  are known to be valid.
->>   *
->>   * A call to this helper is susceptible to change the underlying
->>   * packet buffer. Therefore, at load time, all checks on pointers
->> @@ -6209,7 +6243,7 @@ enum {
->> };
->>
->> /* BPF_FUNC_skb_adjust_room flags. */
->> -enum {
->> +enum bpf_adj_room_flags {
->> BPF_F_ADJ_ROOM_FIXED_GSO = (1ULL << 0),
->> BPF_F_ADJ_ROOM_ENCAP_L3_IPV4 = (1ULL << 1),
->> BPF_F_ADJ_ROOM_ENCAP_L3_IPV6 = (1ULL << 2),
->> @@ -6219,6 +6253,11 @@ enum {
->> BPF_F_ADJ_ROOM_ENCAP_L2_ETH = (1ULL << 6),
->> BPF_F_ADJ_ROOM_DECAP_L3_IPV4 = (1ULL << 7),
->> BPF_F_ADJ_ROOM_DECAP_L3_IPV6 = (1ULL << 8),
->> + BPF_F_ADJ_ROOM_DECAP_L4_GRE = (1ULL << 9),
->> + BPF_F_ADJ_ROOM_DECAP_L4_UDP = (1ULL << 10),
->> + BPF_F_ADJ_ROOM_DECAP_IPXIP4 = (1ULL << 11),
->> + BPF_F_ADJ_ROOM_DECAP_IPXIP6 = (1ULL << 12),
->> + BPF_F_ADJ_ROOM_NO_DODGY = (1ULL << 13),
->> };
->>
->> enum {
->> diff --git a/net/core/filter.c b/net/core/filter.c
->> index ba019ded773d..681dd53ab841 100644
->> --- a/net/core/filter.c
->> +++ b/net/core/filter.c
->> @@ -3484,14 +3484,28 @@ static u32 bpf_skb_net_base_len(const struct sk_buff *skb)
->> #define BPF_F_ADJ_ROOM_DECAP_L3_MASK (BPF_F_ADJ_ROOM_DECAP_L3_IPV4 | \
->> BPF_F_ADJ_ROOM_DECAP_L3_IPV6)
->>
->> -#define BPF_F_ADJ_ROOM_MASK (BPF_F_ADJ_ROOM_FIXED_GSO | \
->> - BPF_F_ADJ_ROOM_ENCAP_L3_MASK | \
->> +#define BPF_F_ADJ_ROOM_DECAP_L4_MASK (BPF_F_ADJ_ROOM_DECAP_L4_UDP | \
->> + BPF_F_ADJ_ROOM_DECAP_L4_GRE)
->> +
->> +#define BPF_F_ADJ_ROOM_DECAP_IPXIP_MASK (BPF_F_ADJ_ROOM_DECAP_IPXIP4 | \
->> + BPF_F_ADJ_ROOM_DECAP_IPXIP6)
->> +
->> +#define BPF_F_ADJ_ROOM_ENCAP_MASK (BPF_F_ADJ_ROOM_ENCAP_L3_MASK | \
->> BPF_F_ADJ_ROOM_ENCAP_L4_GRE | \
->> BPF_F_ADJ_ROOM_ENCAP_L4_UDP | \
->> BPF_F_ADJ_ROOM_ENCAP_L2_ETH | \
->> BPF_F_ADJ_ROOM_ENCAP_L2( \
->> -  BPF_ADJ_ROOM_ENCAP_L2_MASK) | \
->> - BPF_F_ADJ_ROOM_DECAP_L3_MASK)
->> +  BPF_ADJ_ROOM_ENCAP_L2_MASK))
->> +
->> +#define BPF_F_ADJ_ROOM_DECAP_MASK (BPF_F_ADJ_ROOM_DECAP_L3_MASK | \
->> + BPF_F_ADJ_ROOM_DECAP_L4_MASK | \
->> + BPF_F_ADJ_ROOM_DECAP_IPXIP_MASK)
->> +
->> +#define BPF_F_ADJ_ROOM_MASK (BPF_F_ADJ_ROOM_FIXED_GSO | \
->> + BPF_F_ADJ_ROOM_ENCAP_MASK | \
->> + BPF_F_ADJ_ROOM_DECAP_MASK | \
->> + BPF_F_ADJ_ROOM_NO_CSUM_RESET | \
->> + BPF_F_ADJ_ROOM_NO_DODGY)
->>
->> static int bpf_skb_net_grow(struct sk_buff *skb, u32 off, u32 len_diff,
->>     u64 flags)
->> @@ -3503,6 +3517,10 @@ static int bpf_skb_net_grow(struct sk_buff *skb, u32 off, u32 len_diff,
->> unsigned int gso_type = SKB_GSO_DODGY;
->> int ret;
->>
->> + if (unlikely(flags & (BPF_F_ADJ_ROOM_DECAP_MASK |
->> +      BPF_F_ADJ_ROOM_NO_DODGY)))
->> + return -EINVAL;
->> +
->> if (skb_is_gso(skb) && !skb_is_gso_tcp(skb)) {
->> /* udp gso_size delineates datagrams, only allow if fixed */
->> if (!(skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4) ||
->> @@ -3588,8 +3606,10 @@ static int bpf_skb_net_grow(struct sk_buff *skb, u32 off, u32 len_diff,
->> if (skb_is_gso(skb)) {
->> struct skb_shared_info *shinfo = skb_shinfo(skb);
->>
->> - /* Header must be checked, and gso_segs recomputed. */
->> + /* Add tunnel GSO type flags as appropriate. */
->> shinfo->gso_type |= gso_type;
->> +
->> + /* Header must be checked, and gso_segs recomputed. */
->> shinfo->gso_segs = 0;
->>
->> /* Due to header growth, MSS needs to be downgraded.
->> @@ -3610,11 +3630,14 @@ static int bpf_skb_net_grow(struct sk_buff *skb, u32 off, u32 len_diff,
->> static int bpf_skb_net_shrink(struct sk_buff *skb, u32 off, u32 len_diff,
->>       u64 flags)
->> {
->> + bool no_dodgy = flags & BPF_F_ADJ_ROOM_NO_DODGY;
->> int ret;
->>
->> if (unlikely(flags & ~(BPF_F_ADJ_ROOM_FIXED_GSO |
->>        BPF_F_ADJ_ROOM_DECAP_L3_MASK |
->> -       BPF_F_ADJ_ROOM_NO_CSUM_RESET)))
->> +       BPF_F_ADJ_ROOM_DECAP_MASK |
->> +       BPF_F_ADJ_ROOM_NO_CSUM_RESET |
->> +       BPF_F_ADJ_ROOM_NO_DODGY)))
->> return -EINVAL;
->>
->> if (skb_is_gso(skb) && !skb_is_gso_tcp(skb)) {
->> @@ -3647,9 +3670,36 @@ static int bpf_skb_net_shrink(struct sk_buff *skb, u32 off, u32 len_diff,
->> if (!(flags & BPF_F_ADJ_ROOM_FIXED_GSO))
->> skb_increase_gso_size(shinfo, len_diff);
->>
->> - /* Header must be checked, and gso_segs recomputed. */
->> - shinfo->gso_type |= SKB_GSO_DODGY;
->> - shinfo->gso_segs = 0;
->> + /* Selective GSO flag clearing based on decap type.
->> + * Only clear the flags for the tunnel layer being removed.
->> + */
->> + if (flags & BPF_F_ADJ_ROOM_DECAP_L4_UDP)
->> + shinfo->gso_type &= ~(SKB_GSO_UDP_TUNNEL |
->> +      SKB_GSO_UDP_TUNNEL_CSUM);
->> + if (flags & BPF_F_ADJ_ROOM_DECAP_L4_GRE)
->> + shinfo->gso_type &= ~(SKB_GSO_GRE |
->> +      SKB_GSO_GRE_CSUM);
->> + if (flags & BPF_F_ADJ_ROOM_DECAP_IPXIP4)
->> + shinfo->gso_type &= ~SKB_GSO_IPXIP4;
->> + if (flags & BPF_F_ADJ_ROOM_DECAP_IPXIP6)
->> + shinfo->gso_type &= ~SKB_GSO_IPXIP6;
->> +
->> + /* Clear encapsulation flag only when no tunnel GSO flags remain */
->> + if (flags & BPF_F_ADJ_ROOM_DECAP_MASK) {
->> + if (!(shinfo->gso_type & (SKB_GSO_UDP_TUNNEL |
->> +  SKB_GSO_UDP_TUNNEL_CSUM |
->> +  SKB_GSO_GRE |
->> +  SKB_GSO_GRE_CSUM |
->> +  SKB_GSO_IPXIP4 |
->> +  SKB_GSO_IPXIP6)))
->> + skb->encapsulation = 0;
->> + }
->> +
->> + /* NO_DODGY: preserve gso_segs, don't mark as dodgy. */
->> + if (!no_dodgy) {
->> + shinfo->gso_type |= SKB_GSO_DODGY;
->> + shinfo->gso_segs = 0;
->> + }
->> }
->>
->> return 0;
->> @@ -3709,8 +3759,7 @@ BPF_CALL_4(bpf_skb_adjust_room, struct sk_buff *, skb, s32, len_diff,
->> u32 off;
->> int ret;
->>
->> - if (unlikely(flags & ~(BPF_F_ADJ_ROOM_MASK |
->> -       BPF_F_ADJ_ROOM_NO_CSUM_RESET)))
->> + if (unlikely(flags & ~BPF_F_ADJ_ROOM_MASK))
->> return -EINVAL;
->> if (unlikely(len_diff_abs > 0xfffU))
->> return -EFAULT;
->> @@ -3729,7 +3778,7 @@ BPF_CALL_4(bpf_skb_adjust_room, struct sk_buff *, skb, s32, len_diff,
->> return -ENOTSUPP;
->> }
->>
->> - if (flags & BPF_F_ADJ_ROOM_DECAP_L3_MASK) {
->> + if (flags & BPF_F_ADJ_ROOM_DECAP_MASK) {
->> if (!shrink)
->> return -EINVAL;
->>
->> diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
->> index 5e38b4887de6..664bc8438186 100644
->> --- a/tools/include/uapi/linux/bpf.h
->> +++ b/tools/include/uapi/linux/bpf.h
->> @@ -3010,8 +3010,42 @@ union bpf_attr {
->>   *
->>   * * **BPF_F_ADJ_ROOM_DECAP_L3_IPV4**,
->>   *  **BPF_F_ADJ_ROOM_DECAP_L3_IPV6**:
->> - *  Indicate the new IP header version after decapsulating the outer
->> - *  IP header. Used when the inner and outer IP versions are different.
->> + *  Indicate the new IP header version after decapsulating the
->> + *  outer IP header. Used when the inner and outer IP versions
->> + *  are different. These flags only trigger a protocol change
->> + *  without clearing any tunnel-specific GSO flags.
->> + *
->> + * * **BPF_F_ADJ_ROOM_DECAP_L4_GRE**:
->> + *  Clear GRE tunnel GSO flags (SKB_GSO_GRE and SKB_GSO_GRE_CSUM)
->> + *  when decapsulating a GRE tunnel.
->> + *
->> + * * **BPF_F_ADJ_ROOM_DECAP_L4_UDP**:
->> + *  Clear UDP tunnel GSO flags (SKB_GSO_UDP_TUNNEL and
->> + *  SKB_GSO_UDP_TUNNEL_CSUM) when decapsulating a UDP tunnel.
->> + *
->> + * * **BPF_F_ADJ_ROOM_DECAP_IPXIP4**:
->> + *  Clear IPIP/SIT tunnel GSO flag (SKB_GSO_IPXIP4) when decapsulating
->> + *  a tunnel with an outer IPv4 header (IPv4-in-IPv4 or IPv6-in-IPv4).
->> + *
->> + * * **BPF_F_ADJ_ROOM_DECAP_IPXIP6**:
->> + *  Clear IPv6 encapsulation tunnel GSO flag (SKB_GSO_IPXIP6) when
->> + *  decapsulating a tunnel with an outer IPv6 header (IPv6-in-IPv6
->> + *  or IPv4-in-IPv6).
->> + *
->> + * When using the decapsulation flags above, the skb->encapsulation
->> + * flag is automatically cleared if all tunnel-specific GSO flags
->> + * (SKB_GSO_UDP_TUNNEL, SKB_GSO_UDP_TUNNEL_CSUM, SKB_GSO_GRE,
->> + * SKB_GSO_GRE_CSUM, SKB_GSO_IPXIP4, SKB_GSO_IPXIP6) have been
->> + * removed from the packet. This handles cases where all tunnel
->> + * layers have been decapsulated.
->> + *
->> + * * **BPF_F_ADJ_ROOM_NO_DODGY**:
->> + *  Do not mark the packet as dodgy (untrusted) and preserve
->> + *  the existing gso_segs count. By default, packet modifications
->> + *  set SKB_GSO_DODGY and reset gso_segs to 0, forcing
->> + *  revalidation. This flag is useful when decapsulating the
->> + *  tunnel, the BPF program is trusted, and the modifications
->> + *  are known to be valid.
->>   *
->>   * A call to this helper is susceptible to change the underlying
->>   * packet buffer. Therefore, at load time, all checks on pointers
->> @@ -6209,7 +6243,7 @@ enum {
->> };
->>
->> /* BPF_FUNC_skb_adjust_room flags. */
->> -enum {
->> +enum bpf_adj_room_flags {
->> BPF_F_ADJ_ROOM_FIXED_GSO = (1ULL << 0),
->> BPF_F_ADJ_ROOM_ENCAP_L3_IPV4 = (1ULL << 1),
->> BPF_F_ADJ_ROOM_ENCAP_L3_IPV6 = (1ULL << 2),
->> @@ -6219,6 +6253,11 @@ enum {
->> BPF_F_ADJ_ROOM_ENCAP_L2_ETH = (1ULL << 6),
->> BPF_F_ADJ_ROOM_DECAP_L3_IPV4 = (1ULL << 7),
->> BPF_F_ADJ_ROOM_DECAP_L3_IPV6 = (1ULL << 8),
->> + BPF_F_ADJ_ROOM_DECAP_L4_GRE = (1ULL << 9),
->> + BPF_F_ADJ_ROOM_DECAP_L4_UDP = (1ULL << 10),
->> + BPF_F_ADJ_ROOM_DECAP_IPXIP4 = (1ULL << 11),
->> + BPF_F_ADJ_ROOM_DECAP_IPXIP6 = (1ULL << 12),
->> + BPF_F_ADJ_ROOM_NO_DODGY = (1ULL << 13),
->> };
->>
->> enum {
->> -- 
->> 2.34.1
->>
-> 
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+> R13: 00007fb5ea615fac R14: 00007fb5ea615fa0 R15: 00007fb5ea615fa0
+>  </TASK>
+> ------------[ cut here ]------------
+> iter.err
+> WARNING: net/netfilter/nf_tables_api.c:845 at nft_map_deactivate+0x34e/0x3c0 net/netfilter/nf_tables_api.c:845, CPU#0: syz.0.17/5992
 
+This is triggered with fault injection.
+
+This is an interval set allocating a new array that is allocated with
+GFP_KERNEL (rbtree/pipapo follow a similar approach), I suspect fault
+injection is making this memory allocation fail.
+
+Then, this WARN_ON_ONCE below triggers:
+
+static void nft_map_deactivate(const struct nft_ctx *ctx, struct nft_set *set)
+{               
+        struct nft_set_iter iter = {
+                .genmask        = nft_genmask_next(ctx->net),
+                .type           = NFT_ITER_UPDATE,
+                .fn             = nft_mapelem_deactivate,
+        };
+        
+        set->ops->walk(ctx, set, &iter);
+        WARN_ON_ONCE(iter.err);
+
+For the traceback below, it should be possible to add NFT_ITER_RELEASE
+to skip the allocation.
+
+But there are other paths where this can happen too, I am looking into
+making these nft_map_activate/nft_map_deactivate function never fail
+in the second stage, this is the idea:
+
+- For anonymous sets, the allocation (clone) can be skipped since they
+  are immutable.
+- For non-anonymous sets, add a .clone interface to nft_set_ops so
+  the clone is not done from the 
+
+Those two should be relatively small, I am preparing a patch.
+
+> Modules linked in:
+> CPU: 0 UID: 0 PID: 5992 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2026
+> RIP: 0010:nft_map_deactivate+0x34e/0x3c0 net/netfilter/nf_tables_api.c:845
+> Code: 8b 05 86 5a 4e 09 48 3b 84 24 a0 00 00 00 75 62 48 8d 65 d8 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc cc e8 63 6d fa f7 90 <0f> 0b 90 43 80 7c 35 00 00 0f 85 23 fe ff ff e9 26 fe ff ff 89 d9
+> RSP: 0018:ffffc900045af780 EFLAGS: 00010293
+> RAX: ffffffff89ca45bd RBX: 00000000fffffff4 RCX: ffff888028111e40
+> RDX: 0000000000000000 RSI: 00000000fffffff4 RDI: 0000000000000000
+> RBP: ffffc900045af870 R08: 0000000000400dc0 R09: 00000000ffffffff
+> R10: dffffc0000000000 R11: fffffbfff1d141db R12: ffffc900045af7e0
+> R13: 1ffff920008b5f24 R14: dffffc0000000000 R15: ffffc900045af920
+> FS:  000055557a6a5500(0000) GS:ffff888125496000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007fb5ea271fc0 CR3: 000000003269e000 CR4: 00000000003526f0
+> Call Trace:
+>  <TASK>
+>  __nft_release_table+0xceb/0x11f0 net/netfilter/nf_tables_api.c:12115
+>  nft_rcv_nl_event+0xc25/0xdb0 net/netfilter/nf_tables_api.c:12187
+>  notifier_call_chain+0x19d/0x3a0 kernel/notifier.c:85
+>  blocking_notifier_call_chain+0x6a/0x90 kernel/notifier.c:380
+>  netlink_release+0x123b/0x1ad0 net/netlink/af_netlink.c:761
+>  __sock_release net/socket.c:662 [inline]
+>  sock_close+0xc3/0x240 net/socket.c:1455
+>  __fput+0x44f/0xa70 fs/file_table.c:469
+>  fput_close_sync+0x11f/0x240 fs/file_table.c:574
+>  __do_sys_close fs/open.c:1509 [inline]
+>  __se_sys_close fs/open.c:1494 [inline]
+>  __x64_sys_close+0x7e/0x110 fs/open.c:1494
+>  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>  do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7fb5ea39c629
+> Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007fff72e03568 EFLAGS: 00000246 ORIG_RAX: 0000000000000003
+> RAX: ffffffffffffffda RBX: 00007fb5ea615fa0 RCX: 00007fb5ea39c629
+> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000003
+> RBP: 00007fff72e035d0 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+> R13: 00007fb5ea615fac R14: 00007fb5ea615fa0 R15: 00007fb5ea615fa0
+>  </TASK>
+> 
+> 
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> 
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+> 
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
+> 
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+> 
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+> 
+> If you want to undo deduplication, reply with:
+> #syz undup
 
