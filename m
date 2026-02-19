@@ -1,229 +1,272 @@
-Return-Path: <netdev+bounces-259585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259586-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0F3xDQVvl2lSygIAu9opvQ
-	(envelope-from <netdev+bounces-259585-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 21:13:57 +0100
+	id +DvhHOxxl2nUygIAu9opvQ
+	(envelope-from <netdev+bounces-259586-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 21:26:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D043162439
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 21:13:56 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D35A91624D1
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 21:26:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3A7253019925
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 20:13:55 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C671F301681D
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 20:26:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F0572E0B71;
-	Thu, 19 Feb 2026 20:13:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C3B1316915;
+	Thu, 19 Feb 2026 20:26:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="nTMFYHsM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cu4TYd1I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A194B2FFF8E
-	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 20:13:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.179
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771532034; cv=pass; b=DL8gY2B9aD7XM4xbzk5/qU+tKZJG1nSx9lnoxW53vWIx7JtOCia+m77rnSXaJxWCB6SCvQY8K/xXkfAdKlM+UXrdEVFqpdAVLTV9wziPEPvWEAKghTL92Gcp0xILgGnVRJ1/pIwCEspKb9qTAiGmE2drN82HPc283hzmRlB8tao=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771532034; c=relaxed/simple;
-	bh=vhYbwXc19Kg+BTAuoWrhd56336ifTiAy67MDKNrWt04=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uc9kEAByyBQp5PeQpN+6z8RB8xPCiTfdDkanVeXGaf33HBorfHVqGEPwGB6Lu9udS9xU8QQ+3hX35FGK830TpbK3u6vD2IP0GoetSMEFqR6F8TCOWvowuxqI6WMA5O2Uu3uKmgX+LXF45yp16cQKUpw6wI5cnTCQ/gMSBDBJmJs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=nTMFYHsM; arc=pass smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2ad20007c73so6382305ad.2
-        for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 12:13:52 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771532032; cv=none;
-        d=google.com; s=arc-20240605;
-        b=abur1D+t0E6oBO0j8OQB1P8GqqWYjelm9NFNAX/dwrCz7pE0RwX9PomB5fe6RyspCB
-         MQC0JYMVorEkRIKy51a8i6Qsp7ZLXnUBNEiZg5fLk03Sm7aLqJ4U88YVCeCYsTGMlurP
-         o+o6sCsCJLqRXMm5ezvZWzhzL+WqE63SBYWjCpAZ85f7UZNwBwKT8Dx19xSdf0u5w605
-         S99U5P3MFE6I1MHacFgP9YdwCMhINqbgrLMCbAgfSL8mvujv6tphSQfRpFwzwZA3+xha
-         1G6cE8ZIWiBP9XF3aj0HBAopyZrK0Kk5hoPWaugTgHh5D7Du7CT6NOepTL85pSBTMgHC
-         shlg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=/HwvyFv/slxn9yE9YxErLiklwYugDGhdGXpzBest8f4=;
-        fh=iSslJSJ/M4vfovzfX7pysnhiDl4YQ1S9ZFpwgvXhHA8=;
-        b=Uh7m8ULM2Cz3oGoHkTwyaloZf63n12vfvH/eMLNRkv5nmxlsM960hXbAaNl1AXdsqL
-         ilTFxtgVgJUdnbIrqANPMKZIcyQDMYCWliz0O0uy/qpE1Y058DHPTLCku4S+ungiaHfk
-         kSDerPTmcxRz9p8kAOKb4ZmJ5tzJ5cC5HhepTmjI8KNOcaUOVWiHYDekyTTXZoXau2CD
-         2W+PJMdcS5JJYkZJePr6nSzFcm2gEZga/a3xL/qfWLTa0AX3PD/Q3KVnpmT7rBHuUbTT
-         FNMubLjDhI0sRDbIXRoxysG/oiuyI5AKMSxaM/932QtX2EmxskFLiD71NcttqpjV19Xu
-         GTNA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F5D311C2D
+	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 20:26:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771532776; cv=none; b=kyFi3+jwfCAsK5+ZE38ZDEAQiPqu12zA37GknoT4nkYhh2DLShlLzi3t8cm7A26P92GxcfnZDqcycpGBeNPLydPQNSQK7A/TgHXYGizFMoHkH9acoKMMJBUrQaEWK3SD2vO94sgtISxc1yzoFCY8PyGv094V0B+nlnwczcshl7E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771532776; c=relaxed/simple;
+	bh=lU3vpxRoA7Lrd5Mcj7am2OVGUSxLkLjaNQK6YWgO4kM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gDarzpOBxUGXvisN9bHLsnS4TOTURl4NAzOMavtNGuG4B6t7KAhMCFCgPTiFGLnR034Rg1TKurSHgaf2mSGY5rRaS02Y7EnTqtFP/RrnO59IFEQ1yY1D2Hf1Qhu8TA05Dzt8envDKaKmfRsvm+tUXZ25UglI0KWeWlt71+86tIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cu4TYd1I; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-48371119eacso12595795e9.2
+        for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 12:26:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1771532032; x=1772136832; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/HwvyFv/slxn9yE9YxErLiklwYugDGhdGXpzBest8f4=;
-        b=nTMFYHsMng9J/5gS1a08yqllZDQLS5cs88/Em2jQn7PB1G9IUYDB+qSmKhdvQSXKWv
-         AYHbIT+WWQ/YOr0/S6jhGkm44WY4Xz6sgXrAzSplEq94NcaaeOYrFD5hUmruNfmcskdK
-         tYcl2ST2Uy9qV7Pcf3Ysyo9r5gDBhGeQidXAQEj06UMCmceTbmAPaWAo/OvFNWN76N1O
-         UYRp1R1y/D/zrVVVWkJR6zyNqTaGTWu+PXHYrDqHJzr4optzf6GOJ+mrTyYTPI4OBjVM
-         4isfYNcy/ohPd64uaGqXsW9yS+RCwx1rZ9FaeqGisEaafofkX4DXkCfr33Wb5+OLQ6Oq
-         Lfsg==
+        d=gmail.com; s=20230601; t=1771532773; x=1772137573; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=jRM8tuheMzh9OOGizoOHRGNoarMk96qRAJKHeKpf0es=;
+        b=Cu4TYd1IM/hSHKmJBC1rOhOQMjCrbR6EVA3vUPUqgdiKWCZKfnie0VjJqmxC2WCSh2
+         IgCbglIU8P/ezmJVrugSsgXaByBchHNku8tEalAMMBcoUds6xFllChhYFWhILQnshPNC
+         gJ69skCi3LBGEsDeO5/kMyGmSjH60ZtGRCGNWJcoRvsdBe8zlV9bYWXZUK3oZmuUcG7I
+         WBZIiLXdFGfSuhgxlM8luSK8desgQG7MUCy4pMYo3LBm85fvWKkME8KWjuwCJZqZTzLO
+         vp1VFzXII8PsymJIuT4j2IjY1dXUleZsx8ZMPk0FePAXpKG6G2gFNlNLRiwHJyNpmcA8
+         oxVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771532032; x=1772136832;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=/HwvyFv/slxn9yE9YxErLiklwYugDGhdGXpzBest8f4=;
-        b=CM+qttsP6whw13RTNXAnuRceOBjVXsPfYrCrsJ09DkAWdd+hiYA/NpCVSMsbYI1YLZ
-         qQbtRtmI+giycz8I5/sUMUJcMIZmptpSuYMftztpadsuGCWvrhWoblHZDcpNYSw0Uw2j
-         N6kT3JY/MFjmqhtHf459nCaD2HyDD6IvP3VycYGlE2zNzk6b+MtaQvT9XY2ilUnxjHZq
-         ddkheOcofRMxiE0JaQ5NNw+qHeZJLJPsk8nnBRWGH7utaVyxPBvICtj+ikewRp7uuNuM
-         hWlwlTPsZ7Db2eSBwnk5u3okK9ECkWnylzp/+5fXYRlNyqYyPgEx08I4y+7vYJubF/Nx
-         jOeg==
-X-Forwarded-Encrypted: i=1; AJvYcCUuipaMem5czf0In4xBWTVlYQ3d4W4HuiKyleEvXT+lOmMIPU87lcqiu5JFc20iGmkKlM8GggQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy50VI+OCxKth8+PI9e6ltiXOPiwepLa8xCyHsJ6V8DopyVlEr+
-	pFJyvZOWTv7zt4kRWh6x0IR1tbxpx1xn/qdfXKmrvLJLp1L1ZaGGEFsn8oY38mPPj0y9WnrVecr
-	GU2kpk24MQW7zbNBMHXSv7WW1SQ2d9ehy1N04aYPO
-X-Gm-Gg: AZuq6aJZg6ptMlszEi/Bxb/gI5tTQ1LkqoKbd6EWgv2MZFuCpwTvQIYc1/KyG+9xKNe
-	Y9Eu2z86GYChR9sjFvZoyhqRNTtTFQ9OboLjcJoDm16eETm2XSPU4V8FTrasRhuMzYnjYqR8eP7
-	pcFCuyWEq687k7ipROaOgMwKB9IWYGjHbcSEcK8ibg/GAoF+ikbnkUr9pPBVi32LD6BfePcb1+q
-	QLk8WokxQDJL8qQqllNi4bnRNUQlVvo9j0XMM3ZnHoe+0L9UF5uC0Aig716e1kEJKm2ornT8c9y
-	dH2ZkF5+fLf6JK4=
-X-Received: by 2002:a17:902:e788:b0:2a0:8ca7:69de with SMTP id
- d9443c01a7336-2ad17545608mr164593825ad.41.1771532031846; Thu, 19 Feb 2026
- 12:13:51 -0800 (PST)
+        d=1e100.net; s=20230601; t=1771532773; x=1772137573;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jRM8tuheMzh9OOGizoOHRGNoarMk96qRAJKHeKpf0es=;
+        b=fPNM0cVUSv1P8roDWtONOHKmPYdgOZOUx+ctOoVaz9H0SSDkmk7gPK/UesJeB0pZp+
+         IoUCzp7gVJF14DRTE4uOn0QT7FpISOK3ZGbOZt6Y85b/rcHEiIbatbE8laQ5Dy+nkOZ3
+         lBcX9wkU8EaPW5yEnFfnHdK+AWIddDyzuzR6rY0MEP33fPybpwtyRFriaYBOOm1yddAZ
+         fztQcMn6X1QNNBm2BEbgWe4kOZpPcDWeYAHnlFeMhHXK1ZdT8AwHo1QhMQCo8hRQEW6Q
+         SneEkCWbYXcNfuXPGQ1KnW80oHI7HOnDWRfV0VMIGLNheoek/8lE4OGIHAUXX3zqBsqH
+         NyUg==
+X-Forwarded-Encrypted: i=1; AJvYcCV8RG1W/GBkfrj9XrWpxdxJuoUR+WlwPWjjHGtpVo6mxoMQV1g8ZtHNEMPFCwHSYv76boCmx2I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZ1XxL0bqCYRCeAR932gLxRPPg4OAqDVK8y1iEPV4YYkUyiaLx
+	thV6DXDdMqTdzlYeHKRZWfb58iwMfuKTErYhVONf+S5Z/ydHfDIGb0qT
+X-Gm-Gg: AZuq6aKLi19lvFi31COVRF90jwYsg0Rz3u9CoSvFrwH8n5zxmHhDsiu9e9MWtIO0WL4
+	qhi8C82yM4WCsVNX4x1LNlinCyFS0k7Q7G7mvn2kuD5SUMfFv6E1NKvy/vqqMAgCYdG6XOHwvfv
+	820kij8fSPr3Xqqm64kMCO4u5XYDDszvREiAsif1/aLK5OB3aIa7Gsaw7ubpX6wTXIN1IjM8TPD
+	nnwk/GFotVF9M0aQU03hrmudy8MM9hRD9Y9doITEfZ3IfA2c92oeq2NEoXHGb8CCbex56sG7T89
+	JcqLbSOolryRVWE7XvPQgk9i5QjJ4aD7Z/2urB2roT+xV8o64LsegQRBjtpWfiaTnSQYkjW00Yo
+	aTuqXZ2ewCH6EnzbpLFsAG+8z16/rSdpeSe+th2AVncgWyyXGdDAfK/zcQRibvAzXyFtbMHosqS
+	3i4jahEXhkQdfnFxT3d80UTYkQKISUCj4rIdSXyOVavPvm/03y
+X-Received: by 2002:a05:600c:3e0c:b0:477:76c2:49c9 with SMTP id 5b1f17b1804b1-48398a65ecdmr99591345e9.2.1771532772772;
+        Thu, 19 Feb 2026 12:26:12 -0800 (PST)
+Received: from localhost (ip87-106-108-193.pbiaas.com. [87.106.108.193])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483a31b0e63sm47342245e9.2.2026.02.19.12.26.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Feb 2026 12:26:12 -0800 (PST)
+Date: Thu, 19 Feb 2026 21:26:10 +0100
+From: =?iso-8859-1?Q?G=FCnther?= Noack <gnoack3000@gmail.com>
+To: Justin Suess <utilityemal77@gmail.com>
+Cc: brauner@kernel.org, demiobenour@gmail.com, fahimitahera@gmail.com,
+	hi@alyssa.is, horms@kernel.org, ivanov.mikhail1@huawei-partners.com,
+	jannh@google.com, jmorris@namei.org, john.johansen@canonical.com,
+	konstantin.meskhidze@huawei.com,
+	linux-security-module@vger.kernel.org, m@maowtm.org,
+	matthieu@buffet.re, mic@digikod.net, netdev@vger.kernel.org,
+	paul@paul-moore.com, samasth.norway.ananda@oracle.com,
+	serge@hallyn.com, viro@zeniv.linux.org.uk
+Subject: Re: [PATCH v6] lsm: Add LSM hook security_unix_find
+Message-ID: <20260219.de5dc35ec231@gnoack.org>
+References: <aZcPd3OKqxwCZV-5@suesslenovo>
+ <20260219200459.1474232-1-utilityemal77@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <674b8cbfc385c6f37fb29a1de08d8fe5c2b0fbee.1771321118.git.pabeni@redhat.com>
- <cc6bfb4a-4a2b-42d8-b9ce-7ef6644fb22b@ovn.org> <ecfc49ae-99c9-414e-8b8d-211112fc5873@redhat.com>
- <b6b67235-bd7b-45d3-81e1-49a2a1f6b241@ovn.org> <CAM0EoM=g3ahJ704qDQmr4s-4sDJqbyRvWNDchb3YaRbD0zdyKA@mail.gmail.com>
- <90b25744-76e5-4d9a-865f-72832bbedfe5@ovn.org> <CAM0EoMmgigcc9aYmoj_vEM4TpopHDFjyjbdFeVyEN8QzVLb4vw@mail.gmail.com>
- <CAM0EoMm3zkJpkHkwHX0YQDSJD_gEMphihZ3CC+b1dMx49bdjWg@mail.gmail.com>
- <d07fdeb8-2b26-43f0-8fab-28907e88bd06@redhat.com> <CAM0EoMmq-aN98=TTh7YkODFr2DmZjD=Lzp6roGiCBog1tT9Lyw@mail.gmail.com>
-In-Reply-To: <CAM0EoMmq-aN98=TTh7YkODFr2DmZjD=Lzp6roGiCBog1tT9Lyw@mail.gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 19 Feb 2026 15:13:40 -0500
-X-Gm-Features: AaiRm50g2kSVezvC1-oOXIx6TLnIiaRhnDgB9DGVJyxA3xlks2e-pjEwDl4bfu0
-Message-ID: <CAM0EoMn_eXtLi36Nb3Y=oHCN3dNRjhB0UMwGVhZkr4zbAkxzuA@mail.gmail.com>
-Subject: Re: [PATCH net] net_sched: act_ct: drop all packets when not attached
- to ingress
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Ilya Maximets <i.maximets@ovn.org>, netdev@vger.kernel.org, 
-	Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Henrik Steen <henrist@henrist.net>, Olivier Tilmans <olivier.tilmans@nokia.com>, 
-	Bob Briscoe <research@bobbriscoe.net>, Olga Albisser <olga@albisser.org>, 
-	GangMin Kim <km.kim1503@gmail.com>, Eelco Chaudron <echaudro@redhat.com>, 
-	Aaron Conole <aconole@redhat.com>, Florian Westphal <fw@strlen.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260219200459.1474232-1-utilityemal77@gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-259586-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259585-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,alyssa.is,huawei-partners.com,google.com,namei.org,canonical.com,huawei.com,vger.kernel.org,maowtm.org,buffet.re,digikod.net,paul-moore.com,oracle.com,hallyn.com,zeniv.linux.org.uk];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[ovn.org,vger.kernel.org,resnulli.us,davemloft.net,google.com,kernel.org,henrist.net,nokia.com,bobbriscoe.net,albisser.org,gmail.com,redhat.com,strlen.de];
+	FROM_NEQ_ENVFROM(0.00)[gnoack3000@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mojatatu-com.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 7D043162439
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,maowtm.org:email]
+X-Rspamd-Queue-Id: D35A91624D1
 X-Rspamd-Action: no action
 
-On Thu, Feb 19, 2026 at 9:16=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com>=
- wrote:
->
-> On Wed, Feb 18, 2026 at 3:43=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> w=
-rote:
-> >
-> > On 2/18/26 7:44 PM, Jamal Hadi Salim wrote:
-> > > On Wed, Feb 18, 2026 at 1:31=E2=80=AFPM Jamal Hadi Salim <jhs@mojatat=
-u.com> wrote:
-> > >> On Wed, Feb 18, 2026 at 11:15=E2=80=AFAM Ilya Maximets <i.maximets@o=
-vn.org> wrote:
-> > >>> From a user's perspective I'd prefer if RTM_NEWTFILTER just fails w=
-hen
-> > >>> it contains TCA_ACT_KIND "ct" with TC_H_MIN_EGRESS.  This is clear
-> > >>> for the application that makes a request and for the user if they m=
-ake
-> > >>> the request manually with 'tc filter ...'.
-> > >
-> > >> The challenge is actions could be created as a standalone i.e "tc
-> > >> actions add action ct..." then later bound via tc filter. Don't forg=
-et
-> > >> actions can also be shared by multiple filters (which could be a mix
-> > >> of egress/ingress)...
-> > >
-> > > Actually, looking closely at the code - this is doable. Let's see if =
-a
-> > > patch can be cooked.
-> >
-> > I discussed a bit the topic with Davide, it looks like the thing you
-> > mentioned above could be handled. The problematic part is AFAICS the
-> > additional indirection level added by (possibly shared) blocks. AFAICS
-> > whatever check we do at ct_init() time, shared block could later
-> > circumvent it - unless act_ct is always forbidden for shared blocks.
-> >
-> > TL;DR: I think admission check at init time can be implemented only in =
-a
-> > quite (too much?) restrictive way.
-> >
->
-> True - the blocks will require more surgery but seems doable. We may
-> end up again in ->quirks() land here. I.e when an action is bound to a
-> filter (not necessarily when created) it should check its fit in the
-> graph and see if it is legit. But since this is only the second quirk
-> we know of, we can simplify. Note: We already have one such check,
-> albeit ugly-looking, with skbedit (see flag TCA_ACT_FLAGS_AT_INGRESS).
-> I will talk to Victor and see if he can cook at minimal a preliminary
-> patch without considering blocks, and at best one that does consider
-> blocks.
+On Thu, Feb 19, 2026 at 03:04:59PM -0500, Justin Suess wrote:
+> Add a LSM hook security_unix_find.
+> 
+> This hook is called to check the path of a named unix socket before a
+> connection is initiated. The peer socket may be inspected as well.
+> 
+> Why existing hooks are unsuitable:
+> 
+> Existing socket hooks, security_unix_stream_connect(),
+> security_unix_may_send(), and security_socket_connect() don't provide
+> TOCTOU-free / namespace independent access to the paths of sockets.
+> 
+> (1) We cannot resolve the path from the struct sockaddr in existing hooks.
+> This requires another path lookup. A change in the path between the
+> two lookups will cause a TOCTOU bug.
+> 
+> (2) We cannot use the struct path from the listening socket, because it
+> may be bound to a path in a different namespace than the caller,
+> resulting in a path that cannot be referenced at policy creation time.
+> 
+> Cc: Günther Noack <gnoack3000@gmail.com>
+> Cc: Tingmao Wang <m@maowtm.org>
+> Signed-off-by: Justin Suess <utilityemal77@gmail.com>
+> ---
+>  include/linux/lsm_hook_defs.h |  5 +++++
+>  include/linux/security.h      | 11 +++++++++++
+>  net/unix/af_unix.c            | 13 ++++++++++---
+>  security/security.c           | 20 ++++++++++++++++++++
+>  4 files changed, 46 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/linux/lsm_hook_defs.h b/include/linux/lsm_hook_defs.h
+> index 8c42b4bde09c..7a0fd3dbfa29 100644
+> --- a/include/linux/lsm_hook_defs.h
+> +++ b/include/linux/lsm_hook_defs.h
+> @@ -317,6 +317,11 @@ LSM_HOOK(int, 0, post_notification, const struct cred *w_cred,
+>  LSM_HOOK(int, 0, watch_key, struct key *key)
+>  #endif /* CONFIG_SECURITY && CONFIG_KEY_NOTIFICATIONS */
+>  
+> +#if defined(CONFIG_SECURITY_NETWORK) && defined(CONFIG_SECURITY_PATH)
+> +LSM_HOOK(int, 0, unix_find, const struct path *path, struct sock *other,
+> +	 int flags)
+> +#endif /* CONFIG_SECURITY_NETWORK && CONFIG_SECURITY_PATH */
+> +
+>  #ifdef CONFIG_SECURITY_NETWORK
+>  LSM_HOOK(int, 0, unix_stream_connect, struct sock *sock, struct sock *other,
+>  	 struct sock *newsk)
+> diff --git a/include/linux/security.h b/include/linux/security.h
+> index 83a646d72f6f..99a33d8eb28d 100644
+> --- a/include/linux/security.h
+> +++ b/include/linux/security.h
+> @@ -1931,6 +1931,17 @@ static inline int security_mptcp_add_subflow(struct sock *sk, struct sock *ssk)
+>  }
+>  #endif	/* CONFIG_SECURITY_NETWORK */
+>  
+> +#if defined(CONFIG_SECURITY_NETWORK) && defined(CONFIG_SECURITY_PATH)
+> +
+> +int security_unix_find(const struct path *path, struct sock *other, int flags);
+> +
+> +#else /* CONFIG_SECURITY_NETWORK && CONFIG_SECURITY_PATH */
+> +static inline int security_unix_find(const struct path *path, struct sock *other, int flags)
+> +{
+> +	return 0;
+> +}
+> +#endif /* CONFIG_SECURITY_NETWORK && CONFIG_SECURITY_PATH */
+> +
+>  #ifdef CONFIG_SECURITY_INFINIBAND
+>  int security_ib_pkey_access(void *sec, u64 subnet_prefix, u16 pkey);
+>  int security_ib_endport_manage_subnet(void *sec, const char *name, u8 port_num);
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index f6d56e70c7a2..41698460194b 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -1231,10 +1231,17 @@ static struct sock *unix_find_bsd(struct sockaddr_un *sunaddr, int addr_len,
+>  		goto path_put;
+>  
+>  	err = -EPROTOTYPE;
+> -	if (sk->sk_type == type)
+> -		touch_atime(&path);
+> -	else
+> +	if (sk->sk_type != type)
+> +		goto sock_put;
+> +
+> +	/*
+> +	 * We call the hook because we know that the inode is a socket and we
+> +	 * hold a valid reference to it via the path.
+> +	 */
+> +	err = security_unix_find(&path, sk, flags);
+> +	if (err)
+>  		goto sock_put;
+> +	touch_atime(&path);
+>  
+>  	path_put(&path);
+>  
+> diff --git a/security/security.c b/security/security.c
+> index 67af9228c4e9..c73196b8db4b 100644
+> --- a/security/security.c
+> +++ b/security/security.c
+> @@ -4731,6 +4731,26 @@ int security_mptcp_add_subflow(struct sock *sk, struct sock *ssk)
+>  
+>  #endif	/* CONFIG_SECURITY_NETWORK */
+>  
+> +#if defined(CONFIG_SECURITY_NETWORK) && defined(CONFIG_SECURITY_PATH)
+> +/**
+> + * security_unix_find() - Check if a named AF_UNIX socket can connect
+> + * @path: path of the socket being connected to
+> + * @other: peer sock
+> + * @flags: flags associated with the socket
+> + *
+> + * This hook is called to check permissions before connecting to a named
+> + * AF_UNIX socket.
+> + *
+> + * Return: Returns 0 if permission is granted.
+> + */
+> +int security_unix_find(const struct path *path, struct sock *other, int flags)
+> +{
+> +	return call_int_hook(unix_find, path, other, flags);
+> +}
+> +EXPORT_SYMBOL(security_unix_find);
+> +
+> +#endif	/* CONFIG_SECURITY_NETWORK && CONFIG_SECURITY_PATH */
+> +
+>  #ifdef CONFIG_SECURITY_INFINIBAND
+>  /**
+>   * security_ib_pkey_access() - Check if access to an IB pkey is allowed
+> -- 
+> 2.52.0
+> 
 
-After discussions with Victor we concluded that blocks have no effect
-on this specific issue.
-Blocks are only useful in clsact(both ingress/egress) and ingress.
-Both of these handle ACT_CONSUMED fine.
-Code sample looks as follows:
+Reviewed-by: Günther Noack <gnoack3000@gmail.com>
 
-        case TC_ACT_STOLEN:
-        case TC_ACT_QUEUED:
-        case TC_ACT_TRAP:
-                consume_skb(skb);
-                fallthrough;
-        case TC_ACT_CONSUMED:
-                *ret =3D NET_RX_SUCCESS;
-                bpf_net_ctx_clear(bpf_net_ctx);
-                return NULL;
+Thank you, this looks good. I'll include it in the next version of the
+Unix connect patch set again.
 
-The reason this works is because they don't have to deal with
-queues(unlike the other qdiscs).
-So, ignoring the block should work just fine. Ilya, for your case, if
-you must egress, use clsact egress - the only problem is it will not
-support the more feature-rich qdiscs...
-
-cheers,
-jamal
+–Günther
 
