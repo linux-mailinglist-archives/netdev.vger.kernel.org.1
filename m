@@ -1,151 +1,187 @@
-Return-Path: <netdev+bounces-259576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259578-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CCTXFXxjl2mnxgIAu9opvQ
-	(envelope-from <netdev+bounces-259576-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 20:24:44 +0100
+	id OF2BJadjl2mnxgIAu9opvQ
+	(envelope-from <netdev+bounces-259578-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 20:25:27 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD93C161F22
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 20:24:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D1881161F62
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 20:25:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2870C3030E97
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 19:24:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9AFA9301FD42
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 19:25:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0482303A01;
-	Thu, 19 Feb 2026 19:24:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46703009E4;
+	Thu, 19 Feb 2026 19:25:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.pl header.i=@yahoo.pl header.b="E7loc9fb"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="o14AFEFW"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic307-54.consmr.mail.ir2.yahoo.com (sonic307-54.consmr.mail.ir2.yahoo.com [87.248.110.31])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2321A27F017
-	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 19:24:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=87.248.110.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D794FC8E6;
+	Thu, 19 Feb 2026 19:25:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771529071; cv=none; b=Tf3ZeAc3/7+jVh5xBUHnAx60fWS6NnRvIEzaj7t3MeBDzgqnY/bpA6eaq9sF1T7egpi+MMq4siz191kjLV45i18c6hBontNkHNcjHiyRgkdF+PPHuIJy1H0An2xUkvVAzXrpNqMSoKuSXXptPXjZVIIJdY6LLBwjZRrNYhDBo2w=
+	t=1771529122; cv=none; b=c6NSGjvmNlGnNQE31Ay3GBwMTd7ZsQw3cUQ320vvrL2GzCjpC7S6SsV/yYDXdO0GWodZfFbYicjC7IIhvvTAZdUhLAlOQGyZ5QQ3/CPEVYkkfGvNGz7Lr0lx1smKSSG6QZAM37VNt1Y0QzllRLkGzUJMz6087S4RL6CBbPXNFnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771529071; c=relaxed/simple;
-	bh=g9aw1h2lbRrKNRmFNy+58raEIbGXeql1NWBasM5x9lQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:References; b=ljIQZgLopaVTPKk4wDH2MkbirdLHVThvUBGytlbizNDZIydm3J+7zGd789DwnLU8l/MIb4yjhXAq0/x5Wb1uDxfSHwAxPUU5lOPUNoaowOsRCPUS4qPacRMaNAoU5sK/WFV9vxZg+Wds/hnfEsPa/9uL2cgl0JpQq0ARAdMKlXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.pl; spf=pass smtp.mailfrom=yahoo.pl; dkim=pass (2048-bit key) header.d=yahoo.pl header.i=@yahoo.pl header.b=E7loc9fb; arc=none smtp.client-ip=87.248.110.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.pl
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.pl; s=s2048; t=1771529061; bh=3JkcDV5cuTOaDZPGYbCuh82fN1WQ+pJzyXz/Ohmpx4c=; h=From:To:Cc:Subject:Date:References:From:Subject:Reply-To; b=E7loc9fbNPBi6l3nKK/8mwx1Woar0ZulD8+rK9X7Mj44lltnGKePtg3thoITJS5gzSpLoRT8cAVphDHV8o5ujaeaBlHKDt7vALYWPSbVaR60k5g9sh5iGiO03sAVA8zj06TQtKV3MUCJWTGSQtI1nWV2eT2iKC6+S993/VdmPoyXSo3ip2UOOQ+eK35fJLqcvesX7h6egj/UWEcUbs2DcS1CECgQGS0YptgEX6X/Jk8lajzl+Lr29ijLDKMmWNRGjHc+ZhUaS7gFc+SjFiKLjFUH21pT/pVaV9kYxU5GB6Qo+PWaNg5OmoBI5lwgnwBbXUeRCL1zH6O+M/ha791vQQ==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1771529061; bh=C6HOYMYxlkLxLJmT8KnPmHXcBGUy7t0R8803S7o3p5k=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=NGNobtKFhttd9oiPVU5SCHL2edLYuyYSu2MH3j8NrfXzfgCU9NfgNjMpH9x480RYMtQg6Yz8N7BDBInUBYxz3QuOQq/fgDKmXg6k2hSKFPyCRMmZ7Y72KT4kUIDLFGRxICHMpWeEGrHJUwpTog/mbJ5sTxc4rfELO6oSQb9F1q6Btp8tl6iJ+Txs6xecgofa4BRm6es3+tXdN8RlgVxV/gVYLnkGsSsnkyO7BObhDj41TGgbbHzTd3x1w2tukPSP6xlGEHYTCYGsSa7cf3rcm9rA21xwiL4eCib+CgnaDenCf8vRr1n1ELRNb5kUm6r35Ig6zwvOhGmdy6Owfcr9UA==
-X-YMail-OSG: 5wabyDAVM1mV0UjXrhKbQE_97SDzUDBMfzXDLTHLqgoo78oXaP4.QFEP85j6fLD
- jV3B5yDBmGsxmskWWSiggZl3qFB7GYTlYm1WUgYL4TRtN_o19zlLc2IRJrXgWn.CoBj54wC9jJrD
- qzQSrMeB1YEVbNPuuKfookONGuLpln26oW1SPvEs2hgEpoLeoTlWLiiRokIix0nFiqar24LlwKbF
- _AfxA65.97gayBAldLqryT7M4Kg6FCrdyedHbL.zhHi9eDlz.h.PX1NdVoMgq9kD_hcmIMEJcK63
- RsFF82kJuhi2CRYi5nbpcFD.12vWO3s_f3mAmID4itaFTVsuKdrxQ3fAxgu7F8Au7QtB4_D7Mi6G
- cCzF3F3GyKBNMyd71LrhQp3UN9PnwB2.MPmE6b22Su9pHrY_fC0PgPh9oRbKANWByF1s8ZUDJbkp
- 7Ao7U7qcnRV8DsR6IQzDW4wViQtcvkqqHzd.5HLwSRtBREAZPrdFx.kJLLmYhzuKDVfZY5RV4C9R
- jRaBu83ug5iqN7WEATLhCBq43BJnpzoMlSCSJS5zRtimJ6_PjdAM0Va5woqdjAUa9A6J1zhM.M4i
- YDjrIQR0sWo7o1MNOBr9JaixLBvYl3gYDFwXELhZ_xmMC4N1dNBlr9dOI54pUtQFeD_daBoVLLO5
- w5K64g_xMEys74R4_mPxO4jiHRcXy8O6k_LP1qwq7VhX4us5Sox2qMGj9d8imSamPOc0n7WUwxJm
- vm_GRULv_nFFwhe34rbbu1J8hZypfetyG.O2aMnRt8.Fr6SDeCVcfjEt0UIOBnZO87yTeN9gsCST
- _ZIpPdHpPLDQD22yHkWOVo0Z8Z8dyBniPEF3s9yhjXwUoy2LQsQC_1PVSyTZI2nU077Gc.hRRmWU
- .VItPP5ILqJnEsH9fl2157rRdjJIvOAzL3i0YRkpsk.9YXWN6mrcINqXDKxyLYo6H_cGxnLu648X
- y9ufR.bRJOaeeD0QpbaAX1Nh8xIp3hg2gOvxOSz4HKtoV4C7F76b8bNzJL1S8d7yoOeYzUUqqcRK
- RPiuAimbXAsaPrdcPEfLHYVFsLrb_0A0Un2a5BYoBvA49TsZ_LjWYvMivNOi6bu5I7ITNb1HSxl4
- 8DgUTGU1b5ssty7ewPFMx34gGGIR57V6fplSD9ejoM4T_W.WowHer.TjoC0vyd9jZtO.ZYXBRzTQ
- PSD_gMg44QOVRlx35eOgOnab.V0L9c8psKBEOruIy6PomWNBBAZBmWyf72SpP3Gf04shHkSbeKui
- d0H91SvtXldivxSPf2Urx4dTDtZP3MTV_p76f6HD32HpJIJUocEsetg4jL0SK8rdIISJ6x5wgxTv
- 4XNUJMusUKQ2JTeZxfCmnRv9krloL7LxAVxPjq52yiSEMSzqqpFuWAG6pvRD05aWsXqNMqQ5z4pS
- QDtcFqE5Mh5fgvG19RMZp.Om3kwXhTC2L58e1cfVxw6vJoLQR7DRHbxzPy_l6q3wVveFg1SlKfKT
- AXv5xpDX8Yoi.S81HhvVr7_RxDkyp36lK4nzL7Yfex_fodBLJ5HCLfTX8d8PH45X4hKz9aHflprC
- dGU2IcCN8uyJWFwSQs2dBO5xCFBbYfYlCumvbJzeIBOPMkJQfZeLl_Bgk.OL.aNup.JjN5PdSwWW
- 6wQbIDAeb..Zfz3XcxYuH843p6kn2GvxOWtXFgi2YF_IFr4lNwlJL4EZJNJSuLTPxYzs0TgqcG6Q
- Y2HD4hOEWKpJG.pwdS2_Kg.IBwy2qfJhxmTXUCw9zmFlhdQaBHpQnF_N5MVivFhh3joogx5Ub0SF
- 0a6Kk5IPTkcabl4vE6Lrr4lzjDurnjL00iFbfQyyM8OQlQ6NWQqzTTGQi8.G1AZjIA1sLoowZU5U
- _d3U1uNDY071PiPZyRIwIwohFpnLFCwRijh0wiEu.mMChYlYNpeD9L8NroyFLVk0dAgIgKP5vDDq
- tsBHQ6dWRxmEkC.LirROQ3oWarblL2YtAmmycvoscwKg8zDxAvtTVGh5OZC2ikMZSyzU2VQ3ET0x
- B2N7RZNVGlQmRxtj64YzIwRA2hLadj635qkuWBm4Mj0tJTYnRJH.O7NinK33yehzVOVNN_ouflM.
- kdGu1B8zW1w6ZQh4jWcvoihhQf7fVdOPCg25Mkf3PJvuya2H9gketAWLQ6gbN00Pf7d.tzK8LUMn
- 7XXik.NxMW4a6ZYfbDWjelwj7bx36JchF8gK6dfCiGXK9igpbAu9IEScc_XFqerg5hI6q9YRcrwY
- K7WkFbQOuxtqrK0wAS_eR9_6KX4_psHtp1sZLeBm0oAMn5VTwMmBFADn7RJQdiSjSCNQac1wT76e
- uvg--
-X-Sonic-MF: <tomasz.unger@yahoo.pl>
-X-Sonic-ID: c6bf989f-f13b-489f-bd11-c16b5327d594
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic307.consmr.mail.ir2.yahoo.com with HTTP; Thu, 19 Feb 2026 19:24:21 +0000
-Received: by hermes--production-ir2-bbcfb4457-64r94 (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 7930e584e2bde0d09a9482761953a5e1;
-          Thu, 19 Feb 2026 19:24:19 +0000 (UTC)
-From: tomasz.unger@yahoo.pl
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Tomasz Unger <tomasz.unger@yahoo.pl>
-Subject: [PATCH] nfc: pn544: i2c: Replace strcpy() with strscpy()
-Date: Thu, 19 Feb 2026 20:24:16 +0100
-Message-ID: <20260219192416.97654-1-tomasz.unger@yahoo.pl>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1771529122; c=relaxed/simple;
+	bh=5wXfDNgjYs99AmeEzQZ7yzbacQJewjjR6R0dgn3B7qg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cP+vs4yocGfKcNfsc0XPXW+sNQeeQ7kUi25QocSg3X/aLY59b09krHtN8yDt6P8um4+wOoosvc4Evdk9WVhUVuIMX2qm8aoastLYLK69BYV5ifabmG/ZR9OVz12NuD+z8qt16+Z2A8DsWNSQT4e3dcs+XHh7t3QaGbYl2l5j6aM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=o14AFEFW; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=dPP/cIarqO1P9h9eWlYa372Rs/GIxWfK5Giq5Q6Jtr8=; b=o14AFEFWgr4pXheJHwdZbvcLVX
+	H7IWEeMLSvtYiqinwiXG68B+CxFS5PshaScxPl5Kc/wg4ZXrMcK+OZsRvuW/O2pNbPNPZLTEZvTe5
+	YL2XTPxup0UUF0P34vmXe3UZkj/ZChdsE+KslfVEM7eS/hb1UNw//4S/P0dpenrlFIvPfR/DZDZBo
+	ceRP++HlA46ZXqXNlGFBfDAq4MMA/Mo5LV3WHNSBPe9n3DE0QRAUAxTTsTx5vFd4r8xAtKEiTHHqv
+	yI1ViidDr/qHM031HgJ4BqBvEUVNNd7LAtsMkce2iVxNSkQMoXFXjWMMtpq8vrEeC10MX+W9ikSKm
+	wisGstpA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46806)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vt9e9-000000001EC-0CuB;
+	Thu, 19 Feb 2026 19:25:09 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vt9e5-000000003ZS-1kp1;
+	Thu, 19 Feb 2026 19:25:05 +0000
+Date: Thu, 19 Feb 2026 19:25:05 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Linus Walleij <linusw@kernel.org>
+Cc: Christophe Roullier <christophe.roullier@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] net: stmmac: restore pinctrl when driver remove.
+Message-ID: <aZdjke4eOwF-wTZO@shell.armlinux.org.uk>
+References: <20260218083618.67805-1-christophe.roullier@foss.st.com>
+ <20260218083618.67805-3-christophe.roullier@foss.st.com>
+ <aZV-b6TdLMdI8dm4@shell.armlinux.org.uk>
+ <CAD++jLnF=8MvW4CbXmPZR=w8tAUZiL9M3N73WB++DaYYwhToDQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-References: <20260219192416.97654-1-tomasz.unger.ref@yahoo.pl>
+In-Reply-To: <CAD++jLnF=8MvW4CbXmPZR=w8tAUZiL9M3N73WB++DaYYwhToDQ@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[yahoo.pl,reject];
-	R_DKIM_ALLOW(-0.20)[yahoo.pl:s=s2048];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,yahoo.pl];
+	TAGGED_FROM(0.00)[bounces-259578-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[foss.st.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,bootlin.com,nxp.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259576-lists,netdev=lfdr.de];
-	FROM_NO_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tomasz.unger@yahoo.pl,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[yahoo.pl:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[yahoo.pl];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,yahoo.pl:mid,yahoo.pl:dkim,yahoo.pl:email]
-X-Rspamd-Queue-Id: AD93C161F22
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.983];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:url,armlinux.org.uk:email]
+X-Rspamd-Queue-Id: D1881161F62
 X-Rspamd-Action: no action
 
-From: Tomasz Unger <tomasz.unger@yahoo.pl>
+On Thu, Feb 19, 2026 at 08:11:13PM +0100, Linus Walleij wrote:
+> On Wed, Feb 18, 2026 at 9:55 AM Russell King (Oracle)
+> <linux@armlinux.org.uk> wrote:
+> > On Wed, Feb 18, 2026 at 09:36:17AM +0100, Christophe Roullier wrote:
+> > > when system suspend or unbind, need to set pins
+> > > to low power state to save IO power consumption.
+> > >
+> > > Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
+> > > ---
+> > >  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 +++
+> > >  1 file changed, 3 insertions(+)
+> > >
+> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > > index 067b17f03cd09..3d4f0e4cb53fb 100644
+> > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > > @@ -8071,6 +8071,9 @@ void stmmac_dvr_remove(struct device *dev)
+> > >       mutex_destroy(&priv->lock);
+> > >       bitmap_free(priv->af_xdp_zc_qps);
+> > >
+> > > +     /* Select sleep pin state */
+> > > +     pinctrl_pm_select_sleep_state(dev);
+> > > +
+> >
+> > I'm not convinced this is correct, there's nothing to match it in the
+> > probe function, except what the driver model core does. However, the
+> > driver model core also doesn't clean up the state if probe fails.
+> 
+> I think it looks right, if this state is indeed for the sleep state of the
+> device pins, and this is what you want to happen at remove().
+> 
+> The non-cleanup of the pin states is a (maybe ugly) feature: there
+> is an "init" and a "default" state. If the "init" state does not exist the
+> "default" state is selected in the dd.c call.
+> 
+> These states are just some values in dev->pins, allocated with
+> devm_kzalloc(), and devm_pinctrl_get() for e.g. dev->pins->p,
+> so IIUC this will befree:ed on driver detach,
+> also if the probe() fails, at least that is what the original devres
+> design document says
+> Documentation/driver-api/driver-model/devres.rst
+> 
+> There is really no other cleanup that can happen: there is no
+> before-default-or-init state we can revert to (that would be the
+> power-on values), so there are just these states in some pointers
+> that could be accessed by e.g. pinctrl_pm_select_sleep_state()
+> that get free:ed up, and muxing and pin config that happened
+> in the pin control hardware just stays around.
 
-strcpy() does not limit the number of bytes copied which can lead to
-buffer overflow. Replace with strscpy() which is safer as it limits
-the copy to the size of the destination buffer.
+What we seem to end up with is that on probe failure, we set the pins
+to init or default state. However, on remove, it's up to the driver to
+decide whether to put the pins into sleep state or not.
 
-Signed-off-by: Tomasz Unger <tomasz.unger@yahoo.pl>
----
- drivers/nfc/pn544/i2c.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Shouldn't a driver be consistent, and place the pins into the same
+state in both these scenarios?
 
-diff --git a/drivers/nfc/pn544/i2c.c b/drivers/nfc/pn544/i2c.c
-index 1ecef0acaa50..b897357732fa 100644
---- a/drivers/nfc/pn544/i2c.c
-+++ b/drivers/nfc/pn544/i2c.c
-@@ -526,7 +526,7 @@ static int pn544_hci_i2c_fw_download(void *phy_id, const char *firmware_name,
- 
- 	pr_info("Starting Firmware Download (%s)\n", firmware_name);
- 
--	strcpy(phy->firmware_name, firmware_name);
-+	strscpy(phy->firmware_name, firmware_name, sizeof(phy->firmware_name));
- 
- 	phy->hw_variant = hw_variant;
- 	phy->fw_work_state = FW_WORK_STATE_START;
+Conversely, I'm slightly worried that putting pins into sleep state
+when we're not powering down may be bad if they're allowed to then
+float, which could cause the PHY to interfere on the network.
+
 -- 
-2.53.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
