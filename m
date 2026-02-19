@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-259386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259387-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id b5u5BV1llmnxegIAu9opvQ
-	(envelope-from <netdev+bounces-259386-lists+netdev=lfdr.de@vger.kernel.org>)
+	id 4OeIO11llmnxegIAu9opvQ
+	(envelope-from <netdev+bounces-259387-lists+netdev=lfdr.de@vger.kernel.org>)
 	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 02:20:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F4BD15B5A1
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 02:20:28 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id C14B115B5AE
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 02:20:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6F00E3026C05
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 01:20:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B2B79300AC93
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 01:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E89C122A4FC;
-	Thu, 19 Feb 2026 01:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02A7B25B31D;
+	Thu, 19 Feb 2026 01:20:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MkZclhtl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ksxT/CpB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C55C41F37D3;
-	Thu, 19 Feb 2026 01:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D46B425A2A2;
+	Thu, 19 Feb 2026 01:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771464025; cv=none; b=FE6vO7vCYpl5xRrB+GE3TbVDMT7Pp67KzdNFA/zE9tWYJcJUIl+PlDmfk8pb1OuPMbliYKEow4C2YFo06LVDSPlrvrbIVUjOuZRtgTNviTO4JSn2nzZvZHeXGxKPgk55G3GAhK6okGpKPe8rmskoXASxFRs3k15KVd3FaMiczEM=
+	t=1771464026; cv=none; b=EFLaiSvD6GFfwpu3OeszR9BIhknSH16qiNp+UNjyb8QyskR4H1wCEb57d2eukrSeCcv3/Hs6++Rh0WII9GlmTkT5goLWcNrlf3KlvE1fN6MnyRz6TXnMIKDyvEFaJ1zUBPPGZhyubMZUHB8ISfYLiy3upaWJdapAmOgDuzijmS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771464025; c=relaxed/simple;
-	bh=opx5HQqNWXsOMj+26IePzG4gQnO0sFQCgThHDAvQObU=;
+	s=arc-20240116; t=1771464026; c=relaxed/simple;
+	bh=VmtAjIZOutr3x3Q6CAFvx3ilseHXFaCKzuUZ5iSr1dU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gcEhjP4yL9QNL8Ha2xJLjSEdw/NAGWW6pZBUtSWUV/UxN/WkUjWa2chXapxXk53A9vykU6RSjvBEAJj/2Ozd56HMhLpZMwaqDZ+zgFiUbRvws6wbJc50Nk19q8BmyJ6mnqX1hiUh3WzGIwlO472Qze8M1ZLen/1/VLZ/WS0LESY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MkZclhtl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 600AEC116D0;
-	Thu, 19 Feb 2026 01:20:25 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Z7WNSYQhhZs0ujvWAbNbRRMaWuJNpc69kOF7ojcRv/GCxI2Zlhng5sIXE5flgWx7WTaQqhdPwycoaRFW+wDqrYcE7qvoYxuWuv3FqMU5CQ2FCjGPd9NKvXGbjfZg2MGwgetailfxYaz5Q5+JFeZWddSFFojkNFkbeyEX+LJSZgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ksxT/CpB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94359C116D0;
+	Thu, 19 Feb 2026 01:20:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771464025;
-	bh=opx5HQqNWXsOMj+26IePzG4gQnO0sFQCgThHDAvQObU=;
+	s=k20201202; t=1771464026;
+	bh=VmtAjIZOutr3x3Q6CAFvx3ilseHXFaCKzuUZ5iSr1dU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MkZclhtl7Gi+zzxJHYXdO7AtqKZzIqJbSieMALUX2WtX+u3Xx5egkCu833r4iYTvd
-	 rq5u6CEhzklAgb2Ehy3TjOiFuPxYqjOU/l2NH2QOWz5ucdLLcG96VMBLjH9aqmObhq
-	 4FUVDICqdoyHBnXYzf05YqyTOZk1Mqbw4kPFRrkUdTmDIBZU92N8yWP3ghW9OvH4q/
-	 RdUUynMZMowLKtBLDYXWAhjOi1qZZRvEV2BtMNICwd7SP8NaaEVPQNS9aHjttnojP+
-	 +9JoFk848Jg1P2NiZYirspjPJsUmNAyage1ZusihrmdYS7g9Wn23Rsy4pT7+Sr2h+f
-	 PgJH3+M0DKxKg==
+	b=ksxT/CpB58sf/tzl6XR3iw7wwuXozZ3y/Cm0kBvm9QbPrj5fdEVGjhPKBqHwbpE4V
+	 U3mHs2EVgcWqdWSiAo9bW2ej6GBXZ2uq9UIyeCFlverQmaUeBY7KCVBNH96S3yXED2
+	 Xh6PERhlCOgNufppCP4Hxz2yqyVM7qOu+vpz7jUCLOZuB91yRct20cvTC0Z7yCUAQE
+	 eLyDXvXRACwG+9TufDH9+QphIqZOGIJL7K7XvbMH8LIYuzbBDbes5JzW2x1vFyMICt
+	 LLjWb0yvk8KnTAr+sx/MRbSChD6ogSbieEwihOPryfNVW/2BssJzLj1ApihOdc3UGx
+	 TmaYvg4VG+7bQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id C2291380CEE0;
-	Thu, 19 Feb 2026 01:20:17 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 0AFC8380CEE0;
+	Thu, 19 Feb 2026 01:20:19 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,87 +55,68 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 01/10] netfilter: annotate NAT helper hook pointers
- with
- __rcu
+Subject: Re: [net Patch] octeontx2-af: Fix default entries mcam entry action
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177146401658.1625981.7919315366165441134.git-patchwork-notify@kernel.org>
-Date: Thu, 19 Feb 2026 01:20:16 +0000
-References: <20260217163233.31455-2-fw@strlen.de>
-In-Reply-To: <20260217163233.31455-2-fw@strlen.de>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
- pablo@netfilter.org
+ <177146401782.1625981.7221483538428502621.git-patchwork-notify@kernel.org>
+Date: Thu, 19 Feb 2026 01:20:17 +0000
+References: <20260216090338.1318976-1-hkelam@marvell.com>
+In-Reply-To: <20260216090338.1318976-1-hkelam@marvell.com>
+To: Hariprasad Kelam <hkelam@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
+ jerinj@marvell.com, sbhatta@marvell.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259387-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259386-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_NO_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5F4BD15B5A1
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,marvell.com:email]
+X-Rspamd-Queue-Id: C14B115B5AE
 X-Rspamd-Action: no action
 
 Hello:
 
-This series was applied to netdev/net.git (main)
-by Florian Westphal <fw@strlen.de>:
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 17 Feb 2026 17:32:24 +0100 you wrote:
-> From: Sun Jian <sun.jian.kdev@gmail.com>
+On Mon, 16 Feb 2026 14:33:38 +0530 you wrote:
+> As per design, AF should update the default MCAM action only when
+> mcam_index is -1. A bug in the previous patch caused default entries
+> to be changed even when the request was not for them.
 > 
-> The NAT helper hook pointers are updated and dereferenced under RCU rules,
-> but lack the proper __rcu annotation.
-> 
-> This makes sparse report address space mismatches when the hooks are used
-> with rcu_dereference().
+> Fixes: 570ba37898ec ("octeontx2-af: Update RSS algorithm index")
+> Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,01/10] netfilter: annotate NAT helper hook pointers with __rcu
-    https://git.kernel.org/netdev/net/c/07919126ecfc
-  - [net,02/10] netfilter: nft_counter: serialize reset with spinlock
-    https://git.kernel.org/netdev/net/c/779c60a5190c
-  - [net,03/10] netfilter: nft_quota: use atomic64_xchg for reset
-    https://git.kernel.org/netdev/net/c/30c4d7fb59ac
-  - [net,04/10] netfilter: nf_tables: revert commit_mutex usage in reset path
-    https://git.kernel.org/netdev/net/c/7f261bb906bf
-  - [net,05/10] netfilter: nf_conntrack_h323: don't pass uninitialised l3num value
-    https://git.kernel.org/netdev/net/c/a6d28eb8efe9
-  - [net,06/10] include: uapi: netfilter_bridge.h: Cover for musl libc
-    https://git.kernel.org/netdev/net/c/4edd4ba71ce0
-  - [net,07/10] ipvs: skip ipv6 extension headers for csum checks
-    https://git.kernel.org/netdev/net/c/05cfe9863ef0
-  - [net,08/10] ipvs: do not keep dest_dst if dev is going down
-    https://git.kernel.org/netdev/net/c/8fde939b0206
-  - [net,09/10] net: remove WARN_ON_ONCE when accessing forward path array
-    https://git.kernel.org/netdev/net/c/008e7a7c293b
-  - [net,10/10] netfilter: nf_tables: fix use-after-free in nf_tables_addchain()
-    https://git.kernel.org/netdev/net/c/71e99ee20fc3
+  - [net] octeontx2-af: Fix default entries mcam entry action
+    https://git.kernel.org/netdev/net/c/45be47bf5d7d
 
 You are awesome, thank you!
 -- 
