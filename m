@@ -1,153 +1,273 @@
-Return-Path: <netdev+bounces-259582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259583-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UK33D4Npl2muyAIAu9opvQ
-	(envelope-from <netdev+bounces-259582-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 20:50:27 +0100
+	id AKMzLhhtl2nxyQIAu9opvQ
+	(envelope-from <netdev+bounces-259583-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 21:05:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10DF81622CA
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 20:50:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EF1B16234C
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 21:05:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6D99D300D758
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 19:50:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 63F753012273
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 20:05:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7193D2FD7DA;
-	Thu, 19 Feb 2026 19:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 625A2305E21;
+	Thu, 19 Feb 2026 20:05:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ce5UiX/r"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CuS+4c3G"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0BB2FC01B
-	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 19:50:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEDCD2C0F6D
+	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 20:05:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771530623; cv=none; b=Hd/TbedegDHt1WxRULCODWvcZvuTHHBkZOA2maFV4Fe3w/FBdceRHOGTIJvR8KSiNBxhKw3XjQ1HV3+NKCE40ak2LfpzgUkJD7sS5x4VwipcswkAw9UPZN243QrJQCdQ0V6SFKBGfN5guB3oX5OjW5n5cjBudZBvaDbz0nuVSl8=
+	t=1771531541; cv=none; b=BGioHAlQXIuDpCSppU+zNa4C+vxu3VI+V4T1EFH+ZY1KDHYGa6aDugiKgQwfjp9OeXlMvLCtNPzUSBi/HNvHXQSBCF/KO4+YRu6lmwadg/eroQ0yAsjVdvShapwM0QtpL3sbirVqJ3bFZV1mBf7Wfx2HmyBP7qldk4LOKhPoAp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771530623; c=relaxed/simple;
-	bh=5Gw5nAbTft2x9TcdWgtrRybtFUONCCJiImuuk4GOmvM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hU/rmj8GHXULvifxOIVDwRQubJM1+EDy28PueYHH2KyoRn0OsqDfW6RyOzz/r0nVZWdezV/JFTLWAXtkbuuGBBhCx6r4r66sziEOX8K2strMvA+LT7ky+vDRe7NJD9N7e3kyjqOkTvcvBDNf5hU4OopdVgu3VkkjvuuofNU9Tk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ce5UiX/r; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BF4FC4CEF7;
-	Thu, 19 Feb 2026 19:50:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771530622;
-	bh=5Gw5nAbTft2x9TcdWgtrRybtFUONCCJiImuuk4GOmvM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ce5UiX/rJoWfjYn+nuo9RUgxoc+ccu/ZuxP093c0zo3tfpCBJzqCaDbtiHrgyBoOX
-	 oQ1fSKgVfZRfKGvZs9MWzE2yDGaOB2UA1T2xiXGEIfcOvsXRTwM14g3AXDAUqAfEUP
-	 pjXXNDKDFFeOLrQBkh0GFiQafUssNI1YrBMgpPRq/xbedYIvGu2qDf+yXJaEK0hoeu
-	 wrb3vBTXVZP1CWG9nWB9QYd5zSVxHWg0E8DWJF6hmUfrW8ctHlyCtFrv5MEs0TWJHv
-	 EOcBBUf79fk4QB2jClgTltawdauZWTlB6GFtFOxcLokmeNWvY29YpoJxCBfkMPX5VC
-	 7h5TuAzAFtV5g==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
+	s=arc-20240116; t=1771531541; c=relaxed/simple;
+	bh=WQyPCMu2/LVxP1HRKmCCZGdKwmRzWEn+99ptBGf9kFY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=b1dJ/gv2J8mwWKHWB4vS7tH736bEqnv2zLr4kZ8YqrubNBISEMQD0qv2QxTDMOdlu/J90d6p78bSnEhmaAY+x47B1or1/rbv4pnlZ7x61QpsZAtj5gF6CO3ue15/Fiwf1iJNB//Ze9KxXZTMzQ0UdeU7e7/oeccTggDTN7BQd5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CuS+4c3G; arc=none smtp.client-ip=74.125.224.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-64937edbc9eso1317201d50.2
+        for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 12:05:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771531539; x=1772136339; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9i/0wTnFIm7HfE0FOOWnlBqJyTOzDQHrvyvLNh6JIe4=;
+        b=CuS+4c3GjbnXeolZKsGMH36GQxpWc/g+jwVRHrSyvmGTbbZqp/tKlLrHsNogwvn2zX
+         iX9vbck7mxdF2d5DQ2q1d8kLqSxnA6oHpoEYrmOfjz2S/4ayv1gkSF0BPupNpegdyibz
+         VN4CA2/VApttCIsvXeslfnAcpHDjncDjaXWOBdgk3N4C25Dx2J2tSSziqYDdGVN8yHYR
+         qpSqpdQi+6OUi2HrpE0FqYq8Zg6SgPRtTfrHMluqJI1bLfBQVIJHrAriV94tRlK5QuZg
+         bEGtDQutvVKkxwJNt6loklSjlMSoXYyrQS2hXiL/2j3neADa43uouYXVwWB6Cak1BKvR
+         SAGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771531539; x=1772136339;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=9i/0wTnFIm7HfE0FOOWnlBqJyTOzDQHrvyvLNh6JIe4=;
+        b=L/qQxrqq9Bj3EHVD5q8TUPBIbgZKgvw1C0Y0J0hOuHxFaFZ68rdOuxcpnOPlkN9+My
+         cnJpN6BRxxxsv3KiroM7r85oljK7M7UsnQ5sz1woTezsz2I08WZMN/+7anjvskyn4F5m
+         1xCzAoFyMcCS9rhxCGLfBkQP2QqFEBvZlhD6rqZL9i2/EAs+cag1mpXTNrZ7HY0aukMb
+         ZHu532xbkeB1mRybBXWAqiO/pokJCANObP/4yK5zRDrEwI4zXrMdk4yqKCSYsMCMcUIv
+         le2QGKzfIiiXuOEzd2guu0PL7vHOcSzDHC9yoUU4LGnIGYhQ2ssRKm1dNekd/JTCa3Gl
+         JUaA==
+X-Forwarded-Encrypted: i=1; AJvYcCXYnhwphUJr1t9lTJdGLkl8oHar+BQRZVElH5g1PPLOd1g+IpOlvGoVPlzs9afEPWyXZS6/hVo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4co//jZkbxZ0yS4fjK94PNwjnpfPmJyGfZltA32R1Ph0ihNo8
+	MKjzHclIw23QTUqhML+D2q2akAnVWjl8TOH9c8l305RI6rP9+q2yQ2dM
+X-Gm-Gg: AZuq6aK6FS5MvCK23bkUQu3me+533AhV3csF3cbR44/xSh4HFaOQNrbd3bKe2ll/mSW
+	A0JxDqfNF+kQhGGAycj5y/JP6WRJPSPwDxu29T+l40P7/Tk6yZ2mMonDJ7tT9YOhgwn4A5lVXwu
+	xwkzmVfdSgg33wXO8rTdup/izn03jpOj/RBvFM53EcEPeSFwmVG9oNBPvR9DdUyPqLUCLggyXRq
+	Q796u8XlCTy+VaVUj0LE8Kh46yi3q70+hhgiRBvbWoViRinl6TQRicHDstZp4GVQrrZM4QsHTI8
+	rkIDlZTnppOUhPtPORUfM1XHsYcphAirBP6KjKQqdPOL4I8luxqkjTu7ixmFScXZ95Ir27DTmHI
+	gjEMozcw2akeO4hWZtTmenNEblfmiqx7W5IlJjb7PMMdh8dv6DSXwcloqwqWVW1PKJY4qSLyqdu
+	yOzHJGJAEZuPIu6ZhtDMWvxhRCpnbQ
+X-Received: by 2002:a05:690e:16a0:b0:64a:f3fa:af58 with SMTP id 956f58d0204a3-64c21a43cf9mr15905823d50.17.1771531538628;
+        Thu, 19 Feb 2026 12:05:38 -0800 (PST)
+Received: from suesslenovo ([129.222.84.220])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-64c22e73125sm7292264d50.4.2026.02.19.12.05.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Feb 2026 12:05:38 -0800 (PST)
+From: Justin Suess <utilityemal77@gmail.com>
+To: utilityemal77@gmail.com
+Cc: brauner@kernel.org,
+	demiobenour@gmail.com,
+	fahimitahera@gmail.com,
+	gnoack3000@gmail.com,
+	hi@alyssa.is,
 	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	leitao@debian.org
-Subject: [PATCH net] netconsole: avoid OOB reads, msg is not nul-terminated
-Date: Thu, 19 Feb 2026 11:50:21 -0800
-Message-ID: <20260219195021.2099699-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.53.0
+	ivanov.mikhail1@huawei-partners.com,
+	jannh@google.com,
+	jmorris@namei.org,
+	john.johansen@canonical.com,
+	konstantin.meskhidze@huawei.com,
+	linux-security-module@vger.kernel.org,
+	m@maowtm.org,
+	matthieu@buffet.re,
+	mic@digikod.net,
+	netdev@vger.kernel.org,
+	paul@paul-moore.com,
+	samasth.norway.ananda@oracle.com,
+	serge@hallyn.com,
+	viro@zeniv.linux.org.uk
+Subject: [PATCH v6] lsm: Add LSM hook security_unix_find
+Date: Thu, 19 Feb 2026 15:04:59 -0500
+Message-ID: <20260219200459.1474232-1-utilityemal77@gmail.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <aZcPd3OKqxwCZV-5@suesslenovo>
+References: <aZcPd3OKqxwCZV-5@suesslenovo>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,alyssa.is,huawei-partners.com,google.com,namei.org,canonical.com,huawei.com,vger.kernel.org,maowtm.org,buffet.re,digikod.net,paul-moore.com,oracle.com,hallyn.com,zeniv.linux.org.uk];
+	TAGGED_FROM(0.00)[bounces-259583-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259582-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[utilityemal77@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 10DF81622CA
+	FREEMAIL_FROM(0.00)[gmail.com]
+X-Rspamd-Queue-Id: 0EF1B16234C
 X-Rspamd-Action: no action
 
-msg passed to netconsole from the console subsystem is not guaranteed
-to be nul-terminated. Before recent
-commit 7eab73b18630 ("netconsole: convert to NBCON console infrastructure")
-the message would be placed in printk_shared_pbufs, a static global
-buffer, so KASAN had harder time catching OOB accesses. Now we see:
+Add a LSM hook security_unix_find.
 
-    printk: console [netcon_ext0] enabled
-    BUG: KASAN: slab-out-of-bounds in string+0x1f7/0x240
-    Read of size 1 at addr ffff88813b6d4c00 by task pr/netcon_ext0/594
+This hook is called to check the path of a named unix socket before a
+connection is initiated. The peer socket may be inspected as well.
 
-    CPU: 65 UID: 0 PID: 594 Comm: pr/netcon_ext0 Not tainted 6.19.0-11754-g4246fd6547c9
-    Call Trace:
-     kasan_report+0xe4/0x120
-     string+0x1f7/0x240
-     vsnprintf+0x655/0xba0
-     scnprintf+0xba/0x120
-     netconsole_write+0x3fe/0xa10
-     nbcon_emit_next_record+0x46e/0x860
-     nbcon_kthread_func+0x623/0x750
+Why existing hooks are unsuitable:
 
-    Allocated by task 1:
-     nbcon_alloc+0x1ea/0x450
-     register_console+0x26b/0xe10
-     init_netconsole+0xbb0/0xda0
+Existing socket hooks, security_unix_stream_connect(),
+security_unix_may_send(), and security_socket_connect() don't provide
+TOCTOU-free / namespace independent access to the paths of sockets.
 
-    The buggy address belongs to the object at ffff88813b6d4000
-                which belongs to the cache kmalloc-4k of size 4096
-    The buggy address is located 0 bytes to the right of
-                allocated 3072-byte region [ffff88813b6d4000, ffff88813b6d4c00)
+(1) We cannot resolve the path from the struct sockaddr in existing hooks.
+This requires another path lookup. A change in the path between the
+two lookups will cause a TOCTOU bug.
 
-Fixes: c62c0a17f9b7 ("netconsole: Append kernel version to message")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+(2) We cannot use the struct path from the listening socket, because it
+may be bound to a path in a different namespace than the caller,
+resulting in a path that cannot be referenced at policy creation time.
+
+Cc: Günther Noack <gnoack3000@gmail.com>
+Cc: Tingmao Wang <m@maowtm.org>
+Signed-off-by: Justin Suess <utilityemal77@gmail.com>
 ---
-CC: leitao@debian.org
----
- drivers/net/netconsole.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ include/linux/lsm_hook_defs.h |  5 +++++
+ include/linux/security.h      | 11 +++++++++++
+ net/unix/af_unix.c            | 13 ++++++++++---
+ security/security.c           | 20 ++++++++++++++++++++
+ 4 files changed, 46 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index d144787b2947..1b6a4135ec08 100644
---- a/drivers/net/netconsole.c
-+++ b/drivers/net/netconsole.c
-@@ -1679,7 +1679,8 @@ static void send_msg_no_fragmentation(struct netconsole_target *nt,
- 	if (release_len) {
- 		release = init_utsname()->release;
+diff --git a/include/linux/lsm_hook_defs.h b/include/linux/lsm_hook_defs.h
+index 8c42b4bde09c..7a0fd3dbfa29 100644
+--- a/include/linux/lsm_hook_defs.h
++++ b/include/linux/lsm_hook_defs.h
+@@ -317,6 +317,11 @@ LSM_HOOK(int, 0, post_notification, const struct cred *w_cred,
+ LSM_HOOK(int, 0, watch_key, struct key *key)
+ #endif /* CONFIG_SECURITY && CONFIG_KEY_NOTIFICATIONS */
  
--		scnprintf(nt->buf, MAX_PRINT_CHUNK, "%s,%s", release, msg);
-+		scnprintf(nt->buf, MAX_PRINT_CHUNK, "%s,%.*s", release,
-+			  msg_len, msg);
- 		msg_len += release_len;
- 	} else {
- 		memcpy(nt->buf, msg, msg_len);
++#if defined(CONFIG_SECURITY_NETWORK) && defined(CONFIG_SECURITY_PATH)
++LSM_HOOK(int, 0, unix_find, const struct path *path, struct sock *other,
++	 int flags)
++#endif /* CONFIG_SECURITY_NETWORK && CONFIG_SECURITY_PATH */
++
+ #ifdef CONFIG_SECURITY_NETWORK
+ LSM_HOOK(int, 0, unix_stream_connect, struct sock *sock, struct sock *other,
+ 	 struct sock *newsk)
+diff --git a/include/linux/security.h b/include/linux/security.h
+index 83a646d72f6f..99a33d8eb28d 100644
+--- a/include/linux/security.h
++++ b/include/linux/security.h
+@@ -1931,6 +1931,17 @@ static inline int security_mptcp_add_subflow(struct sock *sk, struct sock *ssk)
+ }
+ #endif	/* CONFIG_SECURITY_NETWORK */
+ 
++#if defined(CONFIG_SECURITY_NETWORK) && defined(CONFIG_SECURITY_PATH)
++
++int security_unix_find(const struct path *path, struct sock *other, int flags);
++
++#else /* CONFIG_SECURITY_NETWORK && CONFIG_SECURITY_PATH */
++static inline int security_unix_find(const struct path *path, struct sock *other, int flags)
++{
++	return 0;
++}
++#endif /* CONFIG_SECURITY_NETWORK && CONFIG_SECURITY_PATH */
++
+ #ifdef CONFIG_SECURITY_INFINIBAND
+ int security_ib_pkey_access(void *sec, u64 subnet_prefix, u16 pkey);
+ int security_ib_endport_manage_subnet(void *sec, const char *name, u8 port_num);
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index f6d56e70c7a2..41698460194b 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -1231,10 +1231,17 @@ static struct sock *unix_find_bsd(struct sockaddr_un *sunaddr, int addr_len,
+ 		goto path_put;
+ 
+ 	err = -EPROTOTYPE;
+-	if (sk->sk_type == type)
+-		touch_atime(&path);
+-	else
++	if (sk->sk_type != type)
++		goto sock_put;
++
++	/*
++	 * We call the hook because we know that the inode is a socket and we
++	 * hold a valid reference to it via the path.
++	 */
++	err = security_unix_find(&path, sk, flags);
++	if (err)
+ 		goto sock_put;
++	touch_atime(&path);
+ 
+ 	path_put(&path);
+ 
+diff --git a/security/security.c b/security/security.c
+index 67af9228c4e9..c73196b8db4b 100644
+--- a/security/security.c
++++ b/security/security.c
+@@ -4731,6 +4731,26 @@ int security_mptcp_add_subflow(struct sock *sk, struct sock *ssk)
+ 
+ #endif	/* CONFIG_SECURITY_NETWORK */
+ 
++#if defined(CONFIG_SECURITY_NETWORK) && defined(CONFIG_SECURITY_PATH)
++/**
++ * security_unix_find() - Check if a named AF_UNIX socket can connect
++ * @path: path of the socket being connected to
++ * @other: peer sock
++ * @flags: flags associated with the socket
++ *
++ * This hook is called to check permissions before connecting to a named
++ * AF_UNIX socket.
++ *
++ * Return: Returns 0 if permission is granted.
++ */
++int security_unix_find(const struct path *path, struct sock *other, int flags)
++{
++	return call_int_hook(unix_find, path, other, flags);
++}
++EXPORT_SYMBOL(security_unix_find);
++
++#endif	/* CONFIG_SECURITY_NETWORK && CONFIG_SECURITY_PATH */
++
+ #ifdef CONFIG_SECURITY_INFINIBAND
+ /**
+  * security_ib_pkey_access() - Check if access to an IB pkey is allowed
 -- 
-2.53.0
+2.52.0
 
 
