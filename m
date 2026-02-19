@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-259404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259406-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AIp3Eg6llmlsiQIAu9opvQ
-	(envelope-from <netdev+bounces-259404-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 06:52:14 +0100
+	id wH1xD0GllmlsiQIAu9opvQ
+	(envelope-from <netdev+bounces-259406-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 06:53:05 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E087815C355
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 06:52:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CA4FF15C365
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 06:53:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6E34E3031CF5
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 05:49:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2224C3080DDF
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 05:50:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE7CC2C3261;
-	Thu, 19 Feb 2026 05:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD9B2D3EC7;
+	Thu, 19 Feb 2026 05:50:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="WwXsBvrX"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="3kV/h7+O"
 X-Original-To: netdev@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010014.outbound.protection.outlook.com [52.101.85.14])
+Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012006.outbound.protection.outlook.com [40.107.200.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C7242D1913;
-	Thu, 19 Feb 2026 05:49:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2412E2D0607;
+	Thu, 19 Feb 2026 05:49:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.6
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771480196; cv=fail; b=GNVqFKJzZoOPSGALffG+pz1XTH2J4muqIKirpQMO2Ozs/AVP1NL1hdwMS8WJOKpLmdToTs4tHWrev37yO8L6VJqBrBIyHtUUAT2L0lGeyMiuA/ILRUs/zDN7jcyTHYhSZRYyi6kUVlKsmDTQn2X2j1cDw9oYomYIW/DvoFPGId0=
+	t=1771480202; cv=fail; b=RYVRq9ylsEMnwC1o4t2rpkiYWI5P3E0sSCwxe0ykp3y9efTr6Hlja1joLhUiiMm3Ra2vSuhEqPoDJmHLvpQ5oqbQIXWkKzx3AAGFXIGDEvcLkNwl+gva7x7rgPkv6W9iAOtzPvsGko1lszRW146tLw7XTCthZ8GHvpZsGaaCxdY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771480196; c=relaxed/simple;
-	bh=2EWNRGptBH5F+Okk1/erKfQsUDaT2wj+L+K/KmMAix8=;
+	s=arc-20240116; t=1771480202; c=relaxed/simple;
+	bh=JhLBQGPczV1pG8s9IgW2Gfc6aeRNcJecDNFkc1tZzWo=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=t7AI/r7xHVKeSPVLaYWUk8qBOmzMrzPkBoX7oSq9IugdC+82yr5QbEJpiTzCRpawV6INXSxrDPkCurXpE2BUHrYmCVWeiH9R//U/vZCSrR2Rtf9tLYviSWpNXZVUL5JlekH6abmLfXbB6JKrF7ci/B3ZRZIe9bCAY6FIt+qwam0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=WwXsBvrX; arc=fail smtp.client-ip=52.101.85.14
+	 MIME-Version:Content-Type; b=NOQK5d4NqKmOgrmkkTKsGmCSuIgG1NgHU1KNpRGNTFH/CsE+Qles6N9gMcKlxJPE94+R1NZhXfxxJKNHV/oApi2DPKa/HJWgN+TJhcKlLcO/4HuqNhd0UOWw8HV7oDDETkeqv4N3au8HoAfC6zHy5kzrtYeUa2FgAVqiS53zIGA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=3kV/h7+O; arc=fail smtp.client-ip=40.107.200.6
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dPmJOdgfBQRzpyAZ0HUcvxgCV3hTWahyy7oeUp+dUceIZZ9e4b4sa9Mj3/ks7j9RGW/sqBl8afJKoQl7RKSGdtpkd3845o/TU2nI2VhQPqe6DmmElIeBXcMtPomOd4Tbajm3VSXkDAyISiO0EV/xb0M3WoxEh0jc0kSSsqrfA4D6/8XUr48pVlizgyAio6sDvRDHX3/APadJCOH4OQBCfjSH7yty7pL9jPo9Ql5AE2saV5Ssbd5IyMsRwXOgpMOqu1t5jt5skJZcBorSlIHrl5fdXvjf8jzGB3ijezN6hFQQpVfVRe/msFDMKAcx+hRN+uF9vqVEZ0iEW2hjtNVEiQ==
+ b=RW7emJRdxVeBpTAJrStdBtWPDce2eCTW+Ch5l1BddTkLrfciCNJ4J1SnXJsWOGbnzBFN4FsH8iS6is5GKOfNLwxUz/B96/H44HdH/ycxH8nKxUF0nKpT5YVBb1D8QhMB5GR6H94+taCE+ycqlmLAuNX/SFlZB4LAPBgrlrjNRRb46YTje+3iJTbwK1kNkDY3wv5z0jGkqOcSe20DEmdvE4cn2c1DLk+KLitODL6GbUZ7Q4yXI/wn1yn4sWei47mt6plo71Qw4IdL6ozx8868Td7WhDN63b0ODL2ebZzTpeCMyVmAxB8s80edmnYh2d/T03G4d7QKiu+NtEtANeAGPA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pe5WxTxlkNiWrnIHsNf9P8eeOEr0ZC+5Wg1arpx7gco=;
- b=Fb+tzm7hCfXjvGxeuw8ute2WW2MRnKGNVltF9yDf7bL+plH3r8WV4wvQ+iY3VpCsKuGfjTopjsdGF1qIf5B4KAhfFmAmEotTbTamIzAnADPzwof+qWVGQBoRhwfR/BpEDUd9Pm8G/i7vThU/JgOt5r0C0HVowTirLEGxJOXJY2sf8N+9X/yRrkWW3VwphEh3B9ZmTGpn2IMBEJ75b3zFIwsSPlposm/EgzU6gs7CEZ4q9VUIFovuSsJm2dM8eJoD13S0dcGdmYhd7wkbfaesm+TjNlT8GtfcwNTyqXr7jnWhV/J3SjJsGOQG1Mlp+xwbtrYRizeqJ2RvAFe8sHuCFg==
+ bh=px6XeTeIKgMpbqCdjDEg4gksVwvMEi6wtH5XzuKgRoc=;
+ b=JVibVpBn3hrfd7TDXTghxc7u86qirLlq3nV15pw0sBik7a0JakYgBBRHHa+XT8tehlcfbzxQsCYRm03+AbKxDnCngjmwlWYtKE2cq7zoQUrgJvfLzMuzB8C8PYQwbS1a5wSDw5kFPSah1v0mQTgYVYg0pMFZYxaMuWM4TTJI3qmkNDzloh8k6rcfSOV+OJorSfBmCB0oH4EY168gOzpAp+phyOuDDGqwZzZQpCvsoZx7ecnWq8MVCsEBK6BZT61uPFxogAhpxyuHdqxAGZYg+o5qEdhDRRDKUGTGeu2klldIp4YAepmYW5maJACgL8+IfdV9vScC9HVSxPg55Uk8Zw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=lunn.ch smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pe5WxTxlkNiWrnIHsNf9P8eeOEr0ZC+5Wg1arpx7gco=;
- b=WwXsBvrXnPxL+JWzZ2JfcDa/ahTsfEnkqM47NF367/RJtT0fFtbCnF6QX3LkQoNp6Fi4+rzSji3wkKk4StXEA8OizCYTsJPgv3Ts22wRYRSzJRtC23IXx0cYpmz8yhOdQfxWV+ErwNqc8IaBixQRDLLQmR1XJNQ0LSbsdXvltkc=
-Received: from SJ0PR03CA0293.namprd03.prod.outlook.com (2603:10b6:a03:39e::28)
- by DM4PR12MB8452.namprd12.prod.outlook.com (2603:10b6:8:184::18) with
+ bh=px6XeTeIKgMpbqCdjDEg4gksVwvMEi6wtH5XzuKgRoc=;
+ b=3kV/h7+O1bwmlnNBxn/wL8rsrv6dnYFITsrEFsrbbdNJlgFLnh5zaZkAi8aaoQ8vhzuDZIf4VQhClZ9rU1/YClQl4NkZeYH5f4wrqNflzCkyijG8LXfCyx1fUFl8IwoJHoRmyWxoY6DmUIt58LeRnE7ejOGyHa9KYEHx8ufMOMM=
+Received: from SJ0PR13CA0110.namprd13.prod.outlook.com (2603:10b6:a03:2c5::25)
+ by LV2PR12MB5944.namprd12.prod.outlook.com (2603:10b6:408:14f::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9611.16; Thu, 19 Feb
- 2026 05:49:47 +0000
-Received: from SJ5PEPF000001CC.namprd05.prod.outlook.com
- (2603:10b6:a03:39e:cafe::cc) by SJ0PR03CA0293.outlook.office365.com
- (2603:10b6:a03:39e::28) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.14 via Frontend Transport; Thu,
- 19 Feb 2026 05:49:47 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.14; Thu, 19 Feb
+ 2026 05:49:52 +0000
+Received: from SJ5PEPF000001C8.namprd05.prod.outlook.com
+ (2603:10b6:a03:2c5:cafe::3c) by SJ0PR13CA0110.outlook.office365.com
+ (2603:10b6:a03:2c5::25) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.15 via Frontend Transport; Thu,
+ 19 Feb 2026 05:49:29 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -66,16 +66,20 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- SJ5PEPF000001CC.mail.protection.outlook.com (10.167.242.41) with Microsoft
+ SJ5PEPF000001C8.mail.protection.outlook.com (10.167.242.36) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9632.12 via Frontend Transport; Thu, 19 Feb 2026 05:49:45 +0000
-Received: from satlexmb07.amd.com (10.181.42.216) by satlexmb07.amd.com
+ 15.20.9632.12 via Frontend Transport; Thu, 19 Feb 2026 05:49:50 +0000
+Received: from Satlexmb09.amd.com (10.181.42.218) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 18 Feb
- 2026 23:49:43 -0600
+ 2026 23:49:49 -0600
+Received: from satlexmb07.amd.com (10.181.42.216) by satlexmb09.amd.com
+ (10.181.42.218) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 18 Feb
+ 2026 21:49:48 -0800
 Received: from xhdsneeli40.xilinx.com (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Wed, 18 Feb 2026 23:49:39 -0600
+ Transport; Wed, 18 Feb 2026 23:49:44 -0600
 From: Srinivas Neeli <srinivas.neeli@amd.com>
 To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
 	<kuba@kernel.org>, <pabeni@redhat.com>, <michal.simek@amd.com>,
@@ -84,9 +88,9 @@ To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
 	<git@amd.com>, <srinivas.neeli@amd.com>
-Subject: [RFC PATCH 4/8] xilinx: tsn: Add Ethernet MAC (EMAC) and MDIO support to the TSN driver
-Date: Thu, 19 Feb 2026 11:19:07 +0530
-Message-ID: <20260219054911.2017362-5-srinivas.neeli@amd.com>
+Subject: [RFC PATCH 5/8] net: xilinx: tsn: Add TSN switch support with port state and frame filter control
+Date: Thu, 19 Feb 2026 11:19:08 +0530
+Message-ID: <20260219054911.2017362-6-srinivas.neeli@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260219054911.2017362-1-srinivas.neeli@amd.com>
 References: <20260219054911.2017362-1-srinivas.neeli@amd.com>
@@ -100,58 +104,58 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001CC:EE_|DM4PR12MB8452:EE_
-X-MS-Office365-Filtering-Correlation-Id: 24404c16-e599-40dd-89c4-08de6f7aaf76
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001C8:EE_|LV2PR12MB5944:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6921346b-bede-498b-94b5-08de6f7ab2d3
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|1800799024|82310400026|36860700013|921020;
+	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|7416014|376014|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?SfoXHlZcjADEbkQtEfUTvfgo7lZgKy0VkWul9uqk8W6e/CWsms9fzLTcso7P?=
- =?us-ascii?Q?BQ9vkxkTZwyNdpnxFevBNECOLhREuOyH2vVGjjoY/q0bHwqKJFKMfvoIfz4M?=
- =?us-ascii?Q?3C/aIBQyNPA6jnDF/YlcIrBPndifA0dsmMMGZvhDs34ARnNSmyydQP5GXqv6?=
- =?us-ascii?Q?1F+MzW278uUMytu3cmLB7AH2LVXwj+jv2Y0qRkHkmZH43TwmN5icWAXTlBa6?=
- =?us-ascii?Q?oZG0if6DbXIy0f+/fG12tR9A2iyjFj7jXD8eOE374t5HpQT+WAKIJ/kHOYbz?=
- =?us-ascii?Q?uZF86JcUnl9PGnIkt8eENP5uxvjshTrZXjCLGByc2RYZD9ozhwayxRZWCok1?=
- =?us-ascii?Q?gxQm281ijtZHr4BdtmzNHGxUsIQNoXTd4dpHsuCmSOVMi2cwStf+yj8Yj+K7?=
- =?us-ascii?Q?omuPe1mOHfiJfr1Zi2vO8XA0/MMinVVtjzUneZcS0uEX45NZB+qPc0Ee8Y51?=
- =?us-ascii?Q?3DBMCUMAPz7ZAWMJiv7dkBX0rqrseTNVSRvNKsWWuF/koDgOvQkGX1OEklLq?=
- =?us-ascii?Q?hXCtTyvUIkUzHYn56VH9d5dVGHneEx9Hj9DDdm+MIZ8T6KKjNDVaR9LVq+GP?=
- =?us-ascii?Q?wRb7r01INOk+8ZhpOpN53obngtMiU5e1NXGerZmS77mdnaBJhJWsFr9n8Yvr?=
- =?us-ascii?Q?pwsWG2ryrvFTtqoBpbjK+TdCiYGRIr6UgB9lSEX7gE9oO23a8hRbARWRgGbJ?=
- =?us-ascii?Q?IYSL37ceiJ7hG+JfQFDy/A0TNO35BmOUrW223BfVmol0HelgXJS4Jr+1vbNl?=
- =?us-ascii?Q?n3JpQYqA1KmqrhMOx9VLkq5VdKG7TZGGZL6Le4XCDoct6wogMpLRmz4dTeQz?=
- =?us-ascii?Q?gOw5w62pPH68ReHm64V5RTo8vL3xCurXV3egZpYFj824xfQSfpQ4v7fGYI/2?=
- =?us-ascii?Q?cMBi70NNlMe5t1jMFcpslYopw/B3wYeOcgOKotgF7iugdtHf3TRJipU/tSzL?=
- =?us-ascii?Q?GekZQeAwm+crHNAeM+frhkWtY3JoSOKRDja5Xu9vdntrev5UNlkCNH3uiunl?=
- =?us-ascii?Q?1w59wOoMwk923iUDgRHbv/Brgpja0hD2kTQaUXT5wsvBGKKmncKx20igcaxD?=
- =?us-ascii?Q?lWE41illb5lg2EaNhhge9sdjTXcdGt6fLpRs1VabCcMn9g2cd/1vZv76Lo/M?=
- =?us-ascii?Q?OnC5v4ofVWSZj/82z4W/prqQbhExvqiKKp/1r1JqNcpUtiyzdgcl/ehMG96H?=
- =?us-ascii?Q?DdNTrPC9f/ATBy/d1VbDAQaG33/aHRgENlt3K2DVO773kWy/HgEoc+VHE5H6?=
- =?us-ascii?Q?0jB34wdSqknGWhYj3/4afaVii3v78ffO8gsAcjqHxUZ+E2PJcGcRG1VzZOgp?=
- =?us-ascii?Q?v/jp9n5vnpTCqKQcP994itVkmf4/J/Jcy2FPJirhVsADBvqyeYFacbDcoQ5z?=
- =?us-ascii?Q?iDtew4reQird9pouixHLskdulJCzFierYx9hSHlWGbCyep3UY7D2+3vsr0Wp?=
- =?us-ascii?Q?bz4lbCvRXwWQefitVrQSUznisyGHauK0i0YPq/yOjikclN5h9UlFZsRWGqPs?=
- =?us-ascii?Q?Kss8gvU7Mkm6buoxBZHB4LIbvW4KwKQBpsw2y2WRplDMmUebRFGqVn6xHnQ6?=
- =?us-ascii?Q?6p20sR6Jz0VzJtVJSKWLMB2cxpSob2PKy0nR2IDUsjLo9v8jiFzByjXhv3IV?=
- =?us-ascii?Q?R7LVUlwFcoobruUC15bYooGNXKzAmftbqep8wH4oNF6lWfJMIU2lt/CHviv7?=
- =?us-ascii?Q?0/bfzWOtYG53/chsYohGwWr9+Ow=3D?=
+	=?us-ascii?Q?8yRwTHU1lixQPDIqDblgJgJee+Rjt9MPcXbOktnwFtBQ+CD5f8THdvokIViG?=
+ =?us-ascii?Q?bbjtGO0v/COHrMvpk3LS6gY/tWvqkFk/3sn9+VTR/amVjdZahGtMa2f6nHjS?=
+ =?us-ascii?Q?EOKCt8ItLMRfou7FD5/bLiuqVHNfhtRw1coTSfetn+de4TI7gbAB7TzGfrhs?=
+ =?us-ascii?Q?fA1Kcz/WLtTNkqUZwy+EAfy5ipH1FBuiqVKR/jKeudKUJsuGMch8xsTs3K1y?=
+ =?us-ascii?Q?A4C/NKccX+OizuzVB9ugKyXffChK3Fr8sBpS3bOhRdun2zgXn/96sEwORg0u?=
+ =?us-ascii?Q?2olZFDXbzrvB9SonyaXPMolHhDxDB4Grj1MQSxAUGQ2FXeTmA8ZUnFWLhHPF?=
+ =?us-ascii?Q?xAKUtga2Nkp7d5cUPHzaGWlxxiHrIYwwk+INYm57sSXhZJyxp/lbc6ksZeUB?=
+ =?us-ascii?Q?DVWbNElIO1myYl3u1QPgkvlhswc1XueLtpl1aWZLjUe1TSR1cQgrZGZniNvj?=
+ =?us-ascii?Q?uy8dQ3cIprRnB1F7WXe+AkbhVtc/NM5xW7mnjxcZc3zt6pm6DRAFwBNNaOzu?=
+ =?us-ascii?Q?b6OU6vdzH/wBYtnM8dmfoHiP4A76pgGskPVIAx6Di72JGMc0tA1JuR/vSJoT?=
+ =?us-ascii?Q?TUaxlejPvoVUIVZTwO/qA9i/PipmtisXd28/jPJifKEEF0Xvu7Ztop5YhqPR?=
+ =?us-ascii?Q?mLesvVCqHeWztoKylQMhZ/3gi61JtLE3n4CX9vSRdaJjVlhD5t0UXSeD2QeO?=
+ =?us-ascii?Q?IGAllGgSUx8MUv+0avy1MYckuwRFsDxhy+8VAQgjRT5w/hqzZzxM/uA+b49g?=
+ =?us-ascii?Q?Z+0PEXdSmSh1AFpXhJ9kY3e6ZIT4/bcKie75JUpnb9MxZWW3JK6s3k4iLF8h?=
+ =?us-ascii?Q?5h2E/gnx9YWjy6JjCkgW/NPYa6f0c3pCy2RQdmof9uUlRoG5ACcHhUk+angI?=
+ =?us-ascii?Q?7vfnp/PQ5/86n4V08yTfJbaDeltUrsbIFnbtObyATP5MVywsJAhWW4N3mJeB?=
+ =?us-ascii?Q?Eibv5b+kkI8f6HThUAhX5Y8/cLiqzg6b1VIojO+F2vRsSrqGWrorj32AN1cJ?=
+ =?us-ascii?Q?SmqPmBV9huxTs0L4BuI36iskoz12DfFBGfpiqnoKt3XB80oSbGIPvNErJ4Nd?=
+ =?us-ascii?Q?UIDpghfqDozcvl9aXBxiqjs7qKrF0UMVWoH6Su0fbIm/Lixl0Y8y00VHOlLa?=
+ =?us-ascii?Q?Cl9W9UQQvfC8WNxcgaSGyDvaRKzgSjdcCBwbMhCEMIvJtQupiW6h06ZS3vkI?=
+ =?us-ascii?Q?brX++haOSqYcnMaRTjFv7yUh2f9Agpl598HFsJchJehX9Xyx3cT26fYBWrs3?=
+ =?us-ascii?Q?iyOc62s3vEX+jhXCboIoKl3nF3M/CL36y+1uXGL+mhyzmjBzvLFWnBtgc5Z2?=
+ =?us-ascii?Q?PX61LS+CGiNtaJ23+GD+MUtBf08llmSL3k/dX6kxgQXd3H8dN/jbST09HtUq?=
+ =?us-ascii?Q?MFoe6HjJYZyc1r0g3NTlL4aXWhtNuFIWfrFiK8YKYBJ0t9uNXiRzBuJuEe4l?=
+ =?us-ascii?Q?JdjzXnxQfM32gI+POEVuq5bOrKLUup7+xGWBfcf7uhYzD+5/mZJHmqDBGDFt?=
+ =?us-ascii?Q?ZgHj99TRYmdJHDj52CIp12a20E3GuIOU4TvG2hZFcK1YxCqYIVrJgnhZBNPq?=
+ =?us-ascii?Q?yR9L1XxFL7ZjsApdMbsD8ht4T0qDKPiiE4HjCE9aaIunmxqCme0KsbiAmY4q?=
+ =?us-ascii?Q?J9xh2sjm72cKGI4SwC1Sy2Op/gCiVT0QQs+P6a94SOnqwSXtxxR4Fa2/5TmR?=
+ =?us-ascii?Q?tzPljMTMdhj/1HeXnv25WKCONyU=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(82310400026)(36860700013)(921020);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(7416014)(376014)(921020);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	3v5TnSjpRpYYFfYaPagmqFmNbBIBe/1buYgfzoNYgrImYSX/6zDFhG0t92TKgVpgBr/rz/fLzNZzUWTPOT9+4lAUDijmuB8nO9I//Ndm8JuL9RybPatFGNgYe4wGjds7ZDQWy9qfygpDnBo16lo/fyoz2kU6tiu1nZawwWiOCdHVWCHbrsCX424i/C1dII7M9tg49qQlIc6Y7sjY/N/mb7tYrj1yZ2aL56UaaKiHX595zVNDprvNJ3ELmKX7KMyMYAL001nXOez4eH8iUTxOkls0uLxLeh+6L/jQPQO08ys+YiXP1kbdRbGI+aU64p8OKRMb9/E29yE3Cc/QMtfes/RT5zs7TUtCsMdXjkwphX65rhGcpSMrPFRaE5hDV8Y+s3DbVp4VP/oVmnQeD1Dz0tuYjVSYiuDGbZQu9SIRL20smmH+4xI7p/M2NCwxxycq
+	xB/x+0XZECM3LsnrXLK5BZMz+gBsB1ScD0kejEdytefG3XCdPoHksgf8D7MWLsWKHGS51p4LK/nz+pVbWC5MpGYiYS+JvNd/VW0mV1DMFD58RhZjvvBKiWj9gleRvn5f+e4muy0EWwrwuwXM6/rVjUTrSbSpUhkHLrau2SKNkpY7sVrEMxs/n7QKL/ZBFet7qL+JnQIUFOFDxVQfDyuh3xHSDar6/MlA92xgmras3lOEfq9PNVTq7YRTWG8faCi+9K9aRMHeQueesFd5OxVRK8jhKqa24/hh2WGtLbx8lwW8v+Sn7u7GZ9WS+r2EHaNecAIG03NnCJm82doe6ahlVr8bqIHNlnA4ZZFht6SFuxtXqfzVAdcQgIJEiq9HD7Ook47p7rG3XGbfGLhUki36ce7TK9GfgYpCM8J9Doi3NSAS5zgcMLXNmCBquGxneWSP
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2026 05:49:45.2946
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2026 05:49:50.8821
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 24404c16-e599-40dd-89c4-08de6f7aaf76
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6921346b-bede-498b-94b5-08de6f7ab2d3
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001CC.namprd05.prod.outlook.com
+	SJ5PEPF000001C8.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB8452
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5944
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -168,7 +172,7 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,amd.com,gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259404-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-259406-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	PRECEDENCE_BULK(0.00)[];
@@ -177,929 +181,664 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	DKIM_TRACE(0.00)[amd.com:+];
 	TO_DN_NONE(0.00)[];
 	NEURAL_HAM(-0.00)[-0.997];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:mid,amd.com:dkim,amd.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:mid,amd.com:dkim,amd.com:email];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: E087815C355
+	RCVD_COUNT_SEVEN(0.00)[9]
+X-Rspamd-Queue-Id: CA4FF15C365
 X-Rspamd-Action: no action
 
-Introduce support for the Ethernet MAC (EMAC) and MDIO controller used by
-the TSN driver.
+Add support for the TSN hardware switch block, introducing port state
+management and frame filter configuration.
 
-This patch adds:
-- EMAC initialization, reset handling, and register access helpers
-- MAC address configuration support
-- MDIO read/write functions for PHY register access
-- Basic PHY detection and link status handling
-- Error handling and resource cleanup during initialization failures
-- Build system updates to compile the new EMAC/MDIO support
+It provides initialization and cleanup routines, register access
+helpers, and APIs for port state and frame filter configuration.
+
+Enables basic activation and controlled management of TSN switch ports,
+allowing traffic forwarding between endpoint and MAC interfaces through
+the switch.
 
 Signed-off-by: Srinivas Neeli <srinivas.neeli@amd.com>
 ---
  drivers/net/ethernet/xilinx/tsn/Makefile      |   2 +-
- drivers/net/ethernet/xilinx/tsn/xilinx_tsn.h  | 124 +++++++
- .../net/ethernet/xilinx/tsn/xilinx_tsn_emac.c | 326 ++++++++++++++++++
- .../net/ethernet/xilinx/tsn/xilinx_tsn_main.c |  19 +-
- .../net/ethernet/xilinx/tsn/xilinx_tsn_mdio.c | 308 +++++++++++++++++
- 5 files changed, 774 insertions(+), 5 deletions(-)
- create mode 100644 drivers/net/ethernet/xilinx/tsn/xilinx_tsn_emac.c
- create mode 100644 drivers/net/ethernet/xilinx/tsn/xilinx_tsn_mdio.c
+ drivers/net/ethernet/xilinx/tsn/xilinx_tsn.h  |  16 +
+ .../net/ethernet/xilinx/tsn/xilinx_tsn_main.c |   7 +
+ .../ethernet/xilinx/tsn/xilinx_tsn_switch.c   | 546 ++++++++++++++++++
+ 4 files changed, 570 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/ethernet/xilinx/tsn/xilinx_tsn_switch.c
 
 diff --git a/drivers/net/ethernet/xilinx/tsn/Makefile b/drivers/net/ethernet/xilinx/tsn/Makefile
-index 099526877948..5eb6dde67061 100644
+index 5eb6dde67061..fc1c0cda0843 100644
 --- a/drivers/net/ethernet/xilinx/tsn/Makefile
 +++ b/drivers/net/ethernet/xilinx/tsn/Makefile
 @@ -1,2 +1,2 @@
  obj-$(CONFIG_XILINX_TSN) :=xilinx_tsn.o
--xilinx_tsn-objs := xilinx_tsn_main.o xilinx_tsn_ep.o
-+xilinx_tsn-objs := xilinx_tsn_main.o xilinx_tsn_ep.o xilinx_tsn_emac.o xilinx_tsn_mdio.o
+-xilinx_tsn-objs := xilinx_tsn_main.o xilinx_tsn_ep.o xilinx_tsn_emac.o xilinx_tsn_mdio.o
++xilinx_tsn-objs := xilinx_tsn_main.o xilinx_tsn_ep.o xilinx_tsn_emac.o xilinx_tsn_mdio.o xilinx_tsn_switch.o
 diff --git a/drivers/net/ethernet/xilinx/tsn/xilinx_tsn.h b/drivers/net/ethernet/xilinx/tsn/xilinx_tsn.h
-index 054f74b97a38..c8435c09ed2c 100644
+index c8435c09ed2c..91d01313aada 100644
 --- a/drivers/net/ethernet/xilinx/tsn/xilinx_tsn.h
 +++ b/drivers/net/ethernet/xilinx/tsn/xilinx_tsn.h
-@@ -25,6 +25,7 @@
- #include <linux/of.h>
- #include <linux/of_address.h>
- #include <linux/of_dma.h>
-+#include <linux/of_mdio.h>
- #include <linux/of_net.h>
- #include <linux/of_platform.h>
- #include <linux/platform_device.h>
-@@ -52,6 +53,91 @@
- #define TSN_TUSER_PORT_MAC1		0x1  /* MAC-1 Port */
- #define TSN_TUSER_PORT_MAC2		0x2  /* MAC-2 Port */
+@@ -138,6 +138,18 @@ struct tsn_emac {
+ 	int irq;
+ };
  
-+/* TSN MAC Registers */
-+#define TSN_RAF_OFFSET		0x00000000 /* Reset and Address filter */
-+#define TSN_STATS_OFFSET	0x00000200 /* Statistics counters */
-+#define TSN_RCW0_OFFSET		0x00000400 /* Rx Configuration Word 0 */
-+#define TSN_RCW1_OFFSET		0x00000404 /* Rx Configuration Word 1 */
-+#define TSN_TC_OFFSET		0x00000408 /* Tx Configuration */
-+#define TSN_FCC_OFFSET		0x0000040C /* Flow Control Configuration */
-+#define TSN_EMMC_OFFSET		0x00000410 /* MAC speed configuration */
-+#define TSN_PHYC_OFFSET		0x00000414 /* RX Max Frame Configuration */
-+#define TSN_ID_OFFSET		0x000004F8 /* Identification register */
-+#define TSN_ABILITY_OFFSET	0x000004FC /* Ability Register offset */
-+#define TSN_MDIO_MC_OFFSET	0x00000500 /* MDIO Setup */
-+#define TSN_MDIO_MCR_OFFSET	0x00000504 /* MDIO Control */
-+#define TSN_MDIO_MWD_OFFSET	0x00000508 /* MDIO Write Data */
-+#define TSN_MDIO_MRD_OFFSET	0x0000050C /* MDIO Read Data */
-+
-+/* Bit masks for TSN Ethernet MDIO interface MC register */
-+#define TSN_MDIO_MC_MDIOEN		BIT(6)	   /* MII management enable */
-+#define TSN_MDIO_MC_CLOCK_DIVIDE_MAX	0x3F	   /* Maximum MDIO divisor */
-+
-+/* Bit masks for TSN Ethernet MDIO interface MCR register */
-+#define TSN_MDIO_MCR_PHYAD_SHIFT	24         /* Phy Address Shift */
-+#define TSN_MDIO_MCR_PHYAD_MASK		GENMASK(28, 24) /* Phy Address Mask */
-+#define TSN_MDIO_MCR_REGAD_SHIFT	16         /* Reg Address Shift */
-+#define TSN_MDIO_MCR_REGAD_MASK		GENMASK(20, 16) /* Reg Address Mask */
-+#define TSN_MDIO_MCR_OP_SHIFT		14         /* Operation Code Shift */
-+#define TSN_MDIO_MCR_OP_MASK		GENMASK(15, 14) /* Operation Code Mask */
-+#define TSN_MDIO_MCR_OP_READ		BIT(15)    /* Op Code Read */
-+#define TSN_MDIO_MCR_OP_WRITE		BIT(14)    /* Op Code Write */
-+#define TSN_MDIO_MCR_INITIATE		BIT(11)    /* Initiate MDIO transaction */
-+#define TSN_MDIO_MCR_READY		BIT(7)     /* MDIO Ready */
-+
-+/* Bit masks for TSN Ethernet MDIO Write Data Register */
-+#define TSN_MDIO_MWD_SHIFT		0          /* Write Data Shift */
-+#define TSN_MDIO_MWD_MASK		GENMASK(15, 0) /* Write Data Mask */
-+
-+/* Bit masks for TSN Ethernet MDIO Read Data Register */
-+#define TSN_MDIO_MRD_SHIFT		0          /* Read Data Shift */
-+#define TSN_MDIO_MRD_MASK		GENMASK(15, 0) /* Read Data Mask */
-+
-+/* Bit masks for Ethernet UAW1 register */
-+/* Station address bits [47:32]; Station address
-+ * bits [31:0] are stored in register UAW0
-+ */
-+#define TSN_UAW1_UNICASTADDR_MASK	GENMASK(15, 0)
-+
-+/* Bit masks for TSN Ethernet EMMC register */
-+#define TSN_EMMC_LINKSPEED_SHIFT	30	   /* Link speed shift */
-+#define TSN_EMMC_LINKSPEED_MASK		GENMASK(31, 30) /* Link speed mask */
-+#define TSN_EMMC_LINKSPEED_10		0x0	   /* 10 Mbit */
-+#define TSN_EMMC_LINKSPEED_100		BIT(30)    /* 100 Mbit */
-+#define TSN_EMMC_LINKSPEED_1000		BIT(31)    /* 1000 Mbit */
-+
-+#define TSN_MAX_EMAC_NO			2
-+
 +/*
-+ * struct tsn_emac - TSN Ethernet MAC configuration structure
-+ * @ndev: Network device associated with this EMAC instance
-+ * @common: Pointer to the main TSN private data structure
-+ * @phy_node: Device tree node for the connected PHY device
-+ * @phy_mode: PHY interface mode (RGMII, SGMII, etc.)
-+ * @phy_flags: PHY-specific configuration flags
-+ * @regs: Virtual address mapping of EMAC register space
-+ * @regs_start: Physical start address of EMAC register space
-+ * @mii_bus: MDIO bus controller for PHY management
-+ * @last_link: Previous link state for change detection
-+ * @mii_clk_div: MDIO clock divider value
-+ * @emac_num: EMAC instance number (1 or 2)
-+ * @irq: Interrupt number for this EMAC
++ * struct tsn_switch - TSN switch configuration structure
++ * @dev: Device pointer for this switch instance
++ * @regs: Virtual address mapping of switch register space
++ * @irq: Interrupt number for switch events
 + */
-+struct tsn_emac {
-+	struct net_device *ndev;
-+	struct tsn_priv *common;
-+	struct device_node *phy_node;
-+	phy_interface_t phy_mode;
-+	u32 phy_flags;
++struct tsn_switch {
++	struct device *dev;
 +	void __iomem *regs;
-+	resource_size_t regs_start;
-+	struct mii_bus *mii_bus;
-+	u32 last_link;
-+	u8 mii_clk_div;
-+	int emac_num;
 +	int irq;
 +};
 +
  /*
   * struct skbuf_dma_descriptor - skb for each dma descriptor
   * @sgl: Pointer for sglist.
-@@ -106,6 +192,7 @@ struct tsn_endpoint {
-  * @regs_start: Start address (physical) of mapped region
+@@ -193,6 +205,7 @@ struct tsn_endpoint {
   * @regs: ioremap()'d base pointer
   * @ep: Pointer to TSN endpoint structure
-+ * @emacs: Array of EMAC instances (up to 2)
+  * @emacs: Array of EMAC instances (up to 2)
++ * @sw: Pointer to TSN switch structure
   * @clks: Bulk clock data for all required clocks
   * @tx_lock: Spinlock protecting TX rings and related TX state
   * @rx_lock: Spinlock protecting RX rings and related RX state
-@@ -117,6 +204,7 @@ struct tsn_endpoint {
-  * @max_frm_size: Maximum frame size supported
-  * @tx_chans: Array of TX DMA channels
-  * @rx_chans: Array of RX DMA channels
-+ * @num_emacs: Number of EMAC instances
-  */
- struct tsn_priv {
- 	struct platform_device *pdev;
-@@ -125,6 +213,7 @@ struct tsn_priv {
- 	resource_size_t regs_start;
+@@ -214,6 +227,7 @@ struct tsn_priv {
  	void __iomem *regs;
  	struct tsn_endpoint *ep;
-+	struct tsn_emac *emacs[TSN_MAX_EMAC_NO];
+ 	struct tsn_emac *emacs[TSN_MAX_EMAC_NO];
++	struct tsn_switch *sw;
  	struct clk_bulk_data clks[TSN_NUM_CLOCKS];
  	spinlock_t tx_lock;	/* Protects TX ring buffers */
  	spinlock_t rx_lock;	/* Protects RX ring buffers */
-@@ -136,6 +225,7 @@ struct tsn_priv {
- 	u32 max_frm_size;
- 	struct tsn_dma_chan **tx_chans;
- 	struct tsn_dma_chan **rx_chans;
-+	u32 num_emacs;
- };
- 
- /**
-@@ -168,6 +258,40 @@ static inline int tsn_ndo_set_mac_address(struct net_device *ndev, void *p)
- netdev_tx_t tsn_start_xmit_dmaengine(struct tsn_priv *common,
- 				     struct sk_buff *skb,
- 				     struct net_device *ndev);
-+
-+/**
-+ * emac_iow - Memory mapped TSN EMAC register write
-+ * @emac: Pointer to TSN EMAC structure
-+ * @off: Address offset from the base address of EMAC registers
-+ * @val: Value to be written into the EMAC register
-+ *
-+ * This function writes the desired value into the corresponding TSN
-+ * EMAC register.
-+ */
-+static inline void emac_iow(struct tsn_emac *emac, off_t off, u32 val)
-+{
-+	iowrite32(val, emac->regs + off);
-+}
-+
-+/**
-+ * emac_ior - Memory mapped TSN EMAC register read
-+ * @emac: Pointer to TSN EMAC structure
-+ * @off: Address offset from the base address of EMAC registers
-+ *
-+ * This function reads a value from the corresponding TSN EMAC
-+ * register.
-+ *
-+ * Return: Value read from the EMAC register
-+ */
-+static inline u32 emac_ior(struct tsn_emac *emac, u32 off)
-+{
-+	return ioread32(emac->regs + off);
-+}
-+
- int tsn_ep_init(struct platform_device *pdev);
- void tsn_ep_exit(struct platform_device *pdev);
-+int tsn_emac_init(struct platform_device *pdev);
-+void tsn_emac_exit(struct platform_device *pdev);
-+int tsn_mdio_setup(struct tsn_emac *emac, struct device_node *mac_np);
-+void tsn_mdio_teardown(struct tsn_emac *emac);
+@@ -294,4 +308,6 @@ int tsn_emac_init(struct platform_device *pdev);
+ void tsn_emac_exit(struct platform_device *pdev);
+ int tsn_mdio_setup(struct tsn_emac *emac, struct device_node *mac_np);
+ void tsn_mdio_teardown(struct tsn_emac *emac);
++int tsn_switch_init(struct platform_device *pdev);
++void tsn_switch_exit(struct platform_device *pdev);
  #endif /* XILINX_TSN_H */
-diff --git a/drivers/net/ethernet/xilinx/tsn/xilinx_tsn_emac.c b/drivers/net/ethernet/xilinx/tsn/xilinx_tsn_emac.c
-new file mode 100644
-index 000000000000..26a533e313a2
---- /dev/null
-+++ b/drivers/net/ethernet/xilinx/tsn/xilinx_tsn_emac.c
-@@ -0,0 +1,326 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include "xilinx_tsn.h"
-+
-+#define DRIVER_NAME             "xilinx_tsn_emac"
-+#define DRIVER_DESCRIPTION      "Xilinx TSN driver"
-+#define DRIVER_VERSION          "1.0"
-+
-+/**
-+ * tsn_adjust_link_tsn - Adjust link parameters
-+ * @ndev: Pointer to the net_device structure
-+ *
-+ * This function is called when the PHY link state changes. It configures
-+ * the EMAC link speed register based on the current PHY settings and
-+ * updates link status information.
-+ */
-+static void tsn_adjust_link_tsn(struct net_device *ndev)
-+{
-+	struct tsn_emac *emac = netdev_priv(ndev);
-+	struct phy_device *phy = ndev->phydev;
-+	u32 emmc_reg;
-+
-+	if (!phy || emac->last_link == phy->link)
-+		return;
-+
-+	if (phy->link) {
-+		emmc_reg = emac_ior(emac, TSN_EMMC_OFFSET);
-+		emmc_reg &= ~TSN_EMMC_LINKSPEED_MASK;
-+
-+		switch (phy->speed) {
-+		case SPEED_1000:
-+			emmc_reg |= TSN_EMMC_LINKSPEED_1000;
-+			break;
-+		case SPEED_100:
-+			emmc_reg |= TSN_EMMC_LINKSPEED_100;
-+			break;
-+		default:
-+			dev_warn(&ndev->dev, "Unsupported speed: %d\n", phy->speed);
-+			break;
-+		}
-+
-+		emac_iow(emac, TSN_EMMC_OFFSET, emmc_reg);
-+		dev_info(&ndev->dev, "Link up: %d Mbps, %s duplex\n",
-+			 phy->speed, phy->duplex ? "full" : "half");
-+	} else {
-+		dev_info(&ndev->dev, "Link down\n");
-+	}
-+
-+	emac->last_link = phy->link;
-+}
-+
-+/**
-+ * emac_open - Open the network interface
-+ * @ndev: Pointer to the net_device structure
-+ *
-+ * This function is called when the network interface is brought up.
-+ * It connects to the PHY device and starts the PHY if available.
-+ *
-+ * Return: 0 on success, negative error code on failure
-+ */
-+static int emac_open(struct net_device *ndev)
-+{
-+	struct tsn_emac *emac = netdev_priv(ndev);
-+	struct phy_device *phydev = NULL;
-+
-+	if (emac->phy_node) {
-+		phydev = of_phy_connect(emac->ndev, emac->phy_node,
-+					tsn_adjust_link_tsn,
-+					emac->phy_flags,
-+					emac->phy_mode);
-+		if (!phydev)
-+			dev_err(emac->common->dev, "of_phy_connect() failed\n");
-+		else
-+			phy_start(phydev);
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * emac_stop - Stop the network interface
-+ * @ndev: Pointer to the net_device structure
-+ *
-+ * This function is called when the network interface is brought down.
-+ * It disconnects the PHY device to stop link monitoring.
-+ *
-+ * Return: 0 on success
-+ */
-+static int emac_stop(struct net_device *ndev)
-+{
-+	if (ndev->phydev)
-+		phy_disconnect(ndev->phydev);
-+
-+	return 0;
-+}
-+
-+/**
-+ * emac_validate_addr - Validate the MAC address
-+ * @ndev: Pointer to the net_device structure
-+ *
-+ * This function validates the current MAC address of the device.
-+ *
-+ * Return: 0 if address is valid, negative error code otherwise
-+ */
-+static int emac_validate_addr(struct net_device *ndev)
-+{
-+	return eth_validate_addr(ndev);
-+}
-+
-+/**
-+ * emac_start_xmit - Transmit packet handler
-+ * @skb: Socket buffer containing the packet
-+ * @ndev: Pointer to the net_device structure
-+ *
-+ * This function handles packet transmission for EMAC interfaces.
-+ * Currently drops packets and updates statistics as EMAC is not
-+ * configured for actual transmission.
-+ *
-+ * Return: NETDEV_TX_OK always
-+ */
-+static netdev_tx_t emac_start_xmit(struct sk_buff *skb, struct net_device *ndev)
-+{
-+	struct tsn_emac *emac = netdev_priv(ndev);
-+
-+	return tsn_start_xmit_dmaengine(emac->common, skb, ndev);
-+}
-+
-+static const struct net_device_ops emac_netdev_ops = {
-+	.ndo_open		= emac_open,
-+	.ndo_stop		= emac_stop,
-+	.ndo_start_xmit		= emac_start_xmit,
-+	.ndo_set_mac_address	= tsn_ndo_set_mac_address,
-+	.ndo_validate_addr	= emac_validate_addr,
-+};
-+
-+/**
-+ * emac_get_drvinfo - Get various TSN Ethernet driver information.
-+ * @ndev:       Pointer to net_device structure
-+ * @ed:         Pointer to ethtool_drvinfo structure
-+ *
-+ * This implements ethtool command for getting the driver information.
-+ * Issue "ethtool -i ethX" under linux prompt to execute this function.
-+ */
-+static void emac_get_drvinfo(struct net_device *ndev,
-+			     struct ethtool_drvinfo *ed)
-+{
-+	strscpy(ed->driver, DRIVER_NAME, sizeof(ed->driver));
-+	strscpy(ed->version, DRIVER_VERSION, sizeof(ed->version));
-+}
-+
-+static const struct ethtool_ops emac_ethtool_ops = {
-+	.get_drvinfo	= emac_get_drvinfo,
-+	.get_link	= ethtool_op_get_link,
-+	.get_link_ksettings	= phy_ethtool_get_link_ksettings,
-+	.set_link_ksettings	= phy_ethtool_set_link_ksettings,
-+};
-+
-+/**
-+ * tsn_emac_init - Initialize TSN EMAC interfaces
-+ * @pdev: Platform device pointer
-+ *
-+ * This function initializes all EMAC interfaces found in the device tree.
-+ * For each EMAC, it allocates a network device, maps register regions,
-+ * sets up PHY connections, configures MDIO bus, and registers the
-+ * network interface with the kernel.
-+ *
-+ * Return: 0 on success, negative error code on failure
-+ */
-+int tsn_emac_init(struct platform_device *pdev)
-+{
-+	struct tsn_priv *common = platform_get_drvdata(pdev);
-+	struct device *dev = &pdev->dev;
-+	struct device_node *emac_np;
-+	int ret, array_idx = 0;
-+
-+	for_each_child_of_node(dev->of_node, emac_np) {
-+		struct net_device *ndev;
-+		struct tsn_emac *emac;
-+		u8 mac_addr[ETH_ALEN];
-+		struct resource res;
-+		u32 mac_id = 0;
-+
-+		if (!of_node_name_eq(emac_np, "ethernet-mac"))
-+			continue;
-+
-+		ret = of_property_read_u32(emac_np, "xlnx,mac-id", &mac_id);
-+		if (ret) {
-+			dev_err(dev, "Missing mandatory property 'xlnx,mac-id' for EMAC %d\n",
-+				array_idx + 1);
-+			of_node_put(emac_np);
-+			goto err_cleanup_all;
-+		}
-+
-+		ndev = alloc_etherdev(sizeof(*emac));
-+		if (!ndev) {
-+			ret = -ENOMEM;
-+			of_node_put(emac_np);
-+			goto err_cleanup_all;
-+		}
-+
-+		ret = of_address_to_resource(emac_np, 0, &res);
-+		if (ret) {
-+			dev_err_probe(dev, ret, "failed to get emac resource\n");
-+			goto err_free_ndev_put_node;
-+		}
-+
-+		emac = netdev_priv(ndev);
-+		memset(emac, 0, sizeof(*emac));
-+		emac->ndev = ndev;
-+		emac->common = common;
-+		emac->regs_start = common->regs_start + res.start;
-+		emac->regs = common->regs + res.start;
-+		emac->emac_num = mac_id;
-+		/* basic netdev config */
-+		ndev->netdev_ops = &emac_netdev_ops;
-+		ndev->ethtool_ops = &emac_ethtool_ops;
-+		ndev->min_mtu = ETH_ZLEN - ETH_HLEN;
-+		ndev->max_mtu = ETH_DATA_LEN;
-+		SET_NETDEV_DEV(ndev, dev);
-+
-+		/* Retrieve the MAC address */
-+		ret = of_get_mac_address(emac_np, mac_addr);
-+		if (ret == 0 && is_valid_ether_addr(mac_addr))
-+			eth_hw_addr_set(ndev, mac_addr);
-+
-+		emac->phy_node = of_parse_phandle(emac_np, "phy-handle", 0);
-+		if (!emac->phy_node) {
-+			dev_err(&pdev->dev, "Failed to get 'phy-handle' from device tree\n");
-+
-+		} else {
-+			ret = tsn_mdio_setup(emac, emac_np);
-+			if (ret) {
-+				dev_warn(&pdev->dev, "error registering MDIO bus for EMAC %d: %d\n",
-+					 mac_id, ret);
-+				goto err_put_phy_node;
-+			}
-+		}
-+
-+		ret = register_netdev(ndev);
-+		if (ret) {
-+			dev_err(dev, "Failed to register net device for MAC %d\n", mac_id);
-+			goto err_teardown_mdio;
-+		}
-+
-+		common->emacs[array_idx] = emac;
-+		array_idx++;
-+		common->num_emacs = array_idx;
-+		continue;
-+
-+err_teardown_mdio:
-+		if (emac->phy_node)
-+			tsn_mdio_teardown(emac);
-+err_put_phy_node:
-+		if (emac->phy_node)
-+			of_node_put(emac->phy_node);
-+err_free_ndev_put_node:
-+		free_netdev(ndev);
-+		of_node_put(emac_np);
-+		dev_warn(dev, "EMAC %d initialization failed, rolling back\n", mac_id);
-+		goto err_cleanup_all;
-+	}
-+
-+	if (array_idx == 0)
-+		return -ENODEV;
-+
-+	return 0;
-+
-+err_cleanup_all:
-+	/* Cleanup all initialized EMACs in reverse order */
-+	while (array_idx > 0) {
-+		struct tsn_emac *old = common->emacs[--array_idx];
-+
-+		if (!old)
-+			continue;
-+
-+		dev_info(dev, "Cleaning up MAC %u (array[%d])\n", old->emac_num, array_idx);
-+
-+		unregister_netdev(old->ndev);
-+
-+		if (old->phy_node) {
-+			tsn_mdio_teardown(old);
-+			of_node_put(old->phy_node);
-+		}
-+
-+		free_netdev(old->ndev);
-+		common->emacs[array_idx] = NULL;
-+	}
-+
-+	common->num_emacs = 0;
-+
-+	return ret;
-+}
-+
-+/**
-+ * tsn_emac_exit - Cleanup TSN EMAC interfaces
-+ * @pdev: Platform device pointer
-+ *
-+ * This function performs cleanup for all initialized EMAC interfaces.
-+ * It unregisters network devices, tears down MDIO buses, releases
-+ * PHY connections, and frees allocated memory for each EMAC instance.
-+ */
-+void tsn_emac_exit(struct platform_device *pdev)
-+{
-+	struct tsn_priv *common = platform_get_drvdata(pdev);
-+	struct device *dev = &pdev->dev;
-+	int i;
-+
-+	/* Cleanup only the EMACs that were actually initialized */
-+	for (i = 0; i < common->num_emacs; i++) {
-+		struct tsn_emac *emac = common->emacs[i];
-+
-+		if (!emac)
-+			continue;
-+
-+		dev_info(dev, "Cleaning up MAC %u (array[%d])\n", emac->emac_num, i);
-+
-+		unregister_netdev(emac->ndev);
-+		if (emac->phy_node) {
-+			tsn_mdio_teardown(emac);
-+			of_node_put(emac->phy_node);
-+		}
-+		free_netdev(emac->ndev);
-+		common->emacs[i] = NULL;
-+	}
-+
-+	common->num_emacs = 0;
-+}
 diff --git a/drivers/net/ethernet/xilinx/tsn/xilinx_tsn_main.c b/drivers/net/ethernet/xilinx/tsn/xilinx_tsn_main.c
-index 9e674f99d83f..7cb07e330f57 100644
+index 7cb07e330f57..82c73fbcd83c 100644
 --- a/drivers/net/ethernet/xilinx/tsn/xilinx_tsn_main.c
 +++ b/drivers/net/ethernet/xilinx/tsn/xilinx_tsn_main.c
-@@ -92,13 +92,14 @@ static void tsn_rx_submit_desc(struct tsn_dma_chan *xchan)
-  * @tuser: TUSER metadata word from DMA descriptor
-  *
-  * Extract Input Port ID from TUSER bits[5:4] and return corresponding netdev.
-- * Currently only EP is supported; MAC ports will return NULL until implemented.
-+ * Supports EP (endpoint) and MAC1/MAC2 (EMAC) ports.
-  *
-  * Return: net_device pointer on success, NULL if port not available
-  */
- static inline struct net_device *tsn_classify_rx_packet(struct tsn_priv *common, u32 tuser)
- {
- 	u32 port_id;
-+	int i;
- 
- 	/* Extract Input Port ID from TUSER bits[5:4] */
- 	port_id = FIELD_GET(TSN_TUSER_PORT_ID_MASK, tuser);
-@@ -112,9 +113,13 @@ static inline struct net_device *tsn_classify_rx_packet(struct tsn_priv *common,
- 
- 	case TSN_TUSER_PORT_MAC1:
- 	case TSN_TUSER_PORT_MAC2:
--		/* MAC ports not yet implemented */
-+		for (i = 0; i < common->num_emacs; i++) {
-+			if (common->emacs[i] &&
-+			    common->emacs[i]->emac_num == port_id)
-+				return common->emacs[i]->ndev;
-+		}
- 		if (net_ratelimit())
--			dev_warn(common->dev, "RX from MAC port %u not yet supported\n", port_id);
-+			dev_warn(common->dev, "RX from MAC port %u not found\n", port_id);
- 		return NULL;
- 
- 	default:
-@@ -726,13 +731,18 @@ static int tsn_ip_probe(struct platform_device *pdev)
- 		goto free_clk;
- 	}
- 
--	/* Initialize EP - now safe to register because DMA is ready */
- 	ret = tsn_ep_init(pdev);
+@@ -739,8 +739,14 @@ static int tsn_ip_probe(struct platform_device *pdev)
  	if (ret)
- 		goto exit_dma;
+ 		goto exit_ep;
  
-+	ret = tsn_emac_init(pdev);
++	ret = tsn_switch_init(pdev);
 +	if (ret)
-+		goto exit_ep;
++		goto exit_emac;
 +
  	return 0;
  
-+exit_ep:
-+	tsn_ep_exit(pdev);
++exit_emac:
++	tsn_emac_exit(pdev);
+ exit_ep:
+ 	tsn_ep_exit(pdev);
  exit_dma:
- 	tsn_exit_dmaengine(pdev);
- free_clk:
-@@ -748,6 +758,7 @@ static void tsn_ip_remove(struct platform_device *pdev)
+@@ -758,6 +764,7 @@ static void tsn_ip_remove(struct platform_device *pdev)
  {
  	struct tsn_priv *common = platform_get_drvdata(pdev);
  
-+	tsn_emac_exit(pdev);
++	tsn_switch_exit(pdev);
+ 	tsn_emac_exit(pdev);
  	/* Tear down DMA channels and endpoint */
  	if (common->ep)
- 		tsn_ep_exit(pdev);
-diff --git a/drivers/net/ethernet/xilinx/tsn/xilinx_tsn_mdio.c b/drivers/net/ethernet/xilinx/tsn/xilinx_tsn_mdio.c
+diff --git a/drivers/net/ethernet/xilinx/tsn/xilinx_tsn_switch.c b/drivers/net/ethernet/xilinx/tsn/xilinx_tsn_switch.c
 new file mode 100644
-index 000000000000..a057378c9d22
+index 000000000000..89fbc5bcc16f
 --- /dev/null
-+++ b/drivers/net/ethernet/xilinx/tsn/xilinx_tsn_mdio.c
-@@ -0,0 +1,308 @@
++++ b/drivers/net/ethernet/xilinx/tsn/xilinx_tsn_switch.c
+@@ -0,0 +1,546 @@
 +// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * TSN MDIO bus driver
-+ */
 +
 +#include "xilinx_tsn.h"
 +
-+#define MAX_MDIO_FREQ		2500000 /* 2.5 MHz */
-+#define DEFAULT_AXI_CLK_FREQ	150000000 /* 150 MHz */
++#define TSN_SW_MAX_PORTS		3
++#define TSN_PORT_STATE_CTRL_OFFSET	0x0004c
++#define TSN_SW_MAC_LSB_OFFSET		0x0000c
++#define TSN_SW_MAC_MSB_OFFSET		0x00010
++
++#define TSN_SW_MAC_MSB_FF_MASK_SHIFT	16
++
++/* EP Port (Port 0) control bits */
++#define EP_PORT_STATUS_CHG_BIT		BIT(0)
++#define EP_PORT_STATUS_SHIFT		1
++#define EP_PORT_STATUS_MASK		GENMASK(3, 1)
++
++/* MAC1 Port (Port 1) control bits */
++#define MAC1_PORT_STATUS_CHG_BIT	BIT(8)
++#define MAC1_PORT_STATUS_SHIFT		9
++#define MAC1_PORT_STATUS_MASK		GENMASK(11, 9)
++
++/* MAC2 Port (Port 2) control bits */
++#define MAC2_PORT_STATUS_CHG_BIT	BIT(16)
++#define MAC2_PORT_STATUS_SHIFT		17
++#define MAC2_PORT_STATUS_MASK		GENMASK(19, 17)
++
++#define DELAY_OF_ONE_MILLISEC		1000
++#define DELAY_OF_FIVE_MILLISEC		(5 * DELAY_OF_ONE_MILLISEC)
 +
 +/**
-+ * emac_ior_read_mcr - Read MDIO Control Register
-+ * @emac: Pointer to TSN EMAC structure
-+ *
-+ * This function reads the MDIO Control Register (MCR) and is used
-+ * as a callback for polling operations.
-+ *
-+ * Return: Value of MCR register
++ * enum tsn_port_state - TSN switch port STP states
++ * @TSN_PORT_STATE_DISABLED: Port disabled, no traffic forwarding
++ * @TSN_PORT_STATE_BLOCKING: Port blocking frames
++ * @TSN_PORT_STATE_LISTENING: Port listening for BPDU frames
++ * @TSN_PORT_STATE_LEARNING: Port learning MAC addresses
++ * @TSN_PORT_STATE_FORWARDING: Port forwarding frames normally
 + */
-+static inline u32 emac_ior_read_mcr(struct tsn_emac *emac)
++enum tsn_port_state {
++	TSN_PORT_STATE_DISABLED = 0,
++	TSN_PORT_STATE_BLOCKING,
++	TSN_PORT_STATE_LISTENING,
++	TSN_PORT_STATE_LEARNING,
++	TSN_PORT_STATE_FORWARDING,
++};
++
++/**
++ * sw_iow - Memory mapped TSN switch register write
++ * @sw: Pointer to TSN switch structure
++ * @off: Address offset from the base address of switch registers
++ * @val: Value to be written into the switch register
++ *
++ * This function writes the desired value into the corresponding TSN
++ * switch register.
++ */
++static inline void sw_iow(struct tsn_switch *sw, off_t off, u32 val)
 +{
-+	return emac_ior(emac, TSN_MDIO_MCR_OFFSET);
++	iowrite32(val, sw->regs + off);
 +}
 +
 +/**
-+ * tsn_mdio_wait_until_ready - Wait for MDIO interface to be ready
-+ * @emac: Pointer to TSN EMAC structure
++ * sw_ior - Memory mapped TSN switch register read
++ * @sw: Pointer to TSN switch structure
++ * @off: Address offset from the base address of switch registers
 + *
-+ * This function polls the MDIO Control Register until the READY bit
-+ * is set, indicating the interface is ready for a new transaction.
++ * This function reads a value from the corresponding TSN switch
++ * register.
 + *
-+ * Return: 0 on success, -ETIMEDOUT on timeout
++ * Return: Value read from the switch register
 + */
-+static int tsn_mdio_wait_until_ready(struct tsn_emac *emac)
++static inline u32 sw_ior(struct tsn_switch *sw, u32 off)
 +{
-+	u32 val;
-+
-+	return readx_poll_timeout(emac_ior_read_mcr, emac,
-+				  val, val & TSN_MDIO_MCR_READY,
-+				  1, 20000);
++	return ioread32(sw->regs + off);
 +}
 +
 +/**
-+ * tsn_mdio_mdc_enable - Enable MDIO MDC clock
-+ * @emac: Pointer to TSN EMAC structure
-+ *
-+ * This function enables the MDIO Management Data Clock (MDC) by setting
-+ * the appropriate bits in the MDIO Control register. Called prior to
-+ * read/write operations.
++ * enum switch_port - TSN switch port identifiers
++ * @PORT_EP: Endpoint port (port 1)
++ * @PORT_MAC1: MAC1 port (port 2)
++ * @PORT_MAC2: MAC2 port (port 3)
 + */
-+static void tsn_mdio_mdc_enable(struct tsn_emac *emac)
++enum switch_port {
++	PORT_EP = 1,
++	PORT_MAC1 = 2,
++	PORT_MAC2 = 3,
++};
++
++/**
++ * struct port_status - Port configuration structure
++ * @port_num: Port number identifier
++ * @port_status: STP state for the port
++ */
++struct port_status {
++	u8 port_num;
++	u8 port_status;
++};
++
++/**
++ * tsn_sw_set_port_mac - Set MAC address for a specific TSN port
++ * @common: TSN common private structure
++ * @ndev: Network device to update
++ * @base_mac: Base MAC address (first 44 bits)
++ * @port_id: Port identifier (0x01 for EP, 0x02 for EMAC0, 0x03 for EMAC1)
++ * @port_name: Human-readable port name for logging
++ *
++ * Helper function to assign a MAC address to a port with the specified
++ * port ID in the lower 4 bits while preserving the upper 44 bits from
++ * the base MAC address.
++ */
++static void tsn_sw_set_port_mac(struct tsn_priv *common,
++				struct net_device *ndev,
++				const u8 *base_mac, u8 port_id,
++				const char *port_name)
 +{
-+	emac_iow(emac, TSN_MDIO_MC_OFFSET,
-+		 ((u32)emac->mii_clk_div | TSN_MDIO_MC_MDIOEN));
++	u8 new_mac[ETH_ALEN];
++
++	memcpy(new_mac, base_mac, ETH_ALEN);
++	new_mac[5] = (base_mac[5] & 0xF0) | (port_id & 0x0F);
++
++	eth_hw_addr_set(ndev, new_mac);
++	dev_info(common->dev, "%s MAC: %pM\n", port_name, ndev->dev_addr);
 +}
 +
 +/**
-+ * tsn_mdio_mdc_disable - Disable MDIO MDC clock
-+ * @emac: Pointer to TSN EMAC structure
++ * tsn_sw_generate_consistent_macs - Generate consistent MAC addresses for all ports
++ * @common: TSN common private structure
++ * @base_mac: Base MAC address to use (first 44 bits preserved)
 + *
-+ * This function disables the MDIO Management Data Clock (MDC) by clearing
-+ * the enable bit in the MDIO Control register. Called after read/write
-+ * operations to save power.
++ * Generates MAC addresses for EP, EMAC0, EMAC1 based on a common prefix.
++ * The last 4 bits are set to 0x1, 0x2, 0x3 respectively to distinguish ports.
++ *
++ * Example output:
++ *   Base:  32:77:6a:ed:7a:35
++ *   EP:    32:77:6a:ed:7a:31
++ *   EMAC0: 32:77:6a:ed:7a:32
++ *   EMAC1: 32:77:6a:ed:7a:33
 + */
-+static void tsn_mdio_mdc_disable(struct tsn_emac *emac)
++static void tsn_sw_generate_consistent_macs(struct tsn_priv *common,
++					    const u8 *base_mac)
 +{
-+	u32 mc_reg;
++	struct net_device *emac0_ndev = (common->num_emacs >= 1 && common->emacs[0]) ?
++					 common->emacs[0]->ndev : NULL;
++	struct net_device *emac1_ndev = (common->num_emacs >= 2 && common->emacs[1]) ?
++					 common->emacs[1]->ndev : NULL;
++	struct net_device *ep_ndev = common->ep ? common->ep->ndev : NULL;
 +
-+	mc_reg = emac_ior(emac, TSN_MDIO_MC_OFFSET);
-+	emac_iow(emac, TSN_MDIO_MC_OFFSET,
-+		 (mc_reg & ~TSN_MDIO_MC_MDIOEN));
++	if (ep_ndev)
++		tsn_sw_set_port_mac(common, ep_ndev, base_mac, 0x01, "EP");
++
++	if (emac0_ndev)
++		tsn_sw_set_port_mac(common, emac0_ndev, base_mac, 0x02, "EMAC0");
++
++	if (emac1_ndev)
++		tsn_sw_set_port_mac(common, emac1_ndev, base_mac, 0x03, "EMAC1");
 +}
 +
 +/**
-+ * tsn_mdio_read - MDIO interface read function
-+ * @bus:	Pointer to mii bus structure
-+ * @phy_id:	Address of the PHY device
-+ * @reg:	PHY register to read
++ * tsn_sw_is_mac_invalid - Check if MAC address is invalid or zero
++ * @addr: MAC address to validate
 + *
-+ * Return:	The register contents on success, -ETIMEDOUT on a timeout
-+ *
-+ * Reads the contents of the requested register from the requested PHY
-+ * address by first writing the details into MCR register. After a while
-+ * the register MRD is read to obtain the PHY register content.
++ * Return: true if MAC is invalid/zero, false if valid
 + */
-+static int tsn_mdio_read(struct mii_bus *bus, int phy_id, int reg)
++static inline bool tsn_sw_is_mac_invalid(const u8 *addr)
 +{
-+	u32 rc;
-+	int ret;
-+	struct tsn_emac *emac = bus->priv;
-+	struct tsn_priv *common = emac->common;
++	return !is_valid_ether_addr(addr) || is_zero_ether_addr(addr);
++}
 +
-+	scoped_guard(mutex, &common->mdio_lock) {
-+		tsn_mdio_mdc_enable(emac);
++/**
++ * tsn_sw_check_mac_consistency - Validate MAC prefix consistency
++ * @common: TSN common private structure
++ * @ep_ndev: EP network device
++ * @emac0_ndev: EMAC0 network device
++ * @emac1_ndev: EMAC1 network device
++ * @mac_mask: Mask for comparing first 44 bits
++ *
++ * Checks if all active ports have matching 44-bit MAC prefixes.
++ *
++ * Return: true if mismatch found, false if all consistent
++ */
++static bool tsn_sw_check_mac_consistency(struct tsn_priv *common,
++					 struct net_device *ep_ndev,
++					 struct net_device *emac0_ndev,
++					 struct net_device *emac1_ndev,
++					 const u8 *mac_mask)
++{
++	bool mismatch = false;
 +
-+		ret = tsn_mdio_wait_until_ready(emac);
-+		if (ret < 0) {
-+			tsn_mdio_mdc_disable(emac);
-+			return ret;
-+		}
-+
-+		emac_iow(emac, TSN_MDIO_MCR_OFFSET,
-+			 FIELD_PREP(TSN_MDIO_MCR_PHYAD_MASK, phy_id) |
-+			 FIELD_PREP(TSN_MDIO_MCR_REGAD_MASK, reg) |
-+			 TSN_MDIO_MCR_INITIATE |
-+			 TSN_MDIO_MCR_OP_READ);
-+
-+		ret = tsn_mdio_wait_until_ready(emac);
-+		if (ret < 0) {
-+			tsn_mdio_mdc_disable(emac);
-+			return ret;
-+		}
-+
-+		rc = FIELD_GET(TSN_MDIO_MRD_MASK,
-+			       emac_ior(emac, TSN_MDIO_MRD_OFFSET));
-+		tsn_mdio_mdc_disable(emac);
++	/* Check EP vs EMAC0 */
++	if (ep_ndev && emac0_ndev &&
++	    !ether_addr_equal_masked(ep_ndev->dev_addr,
++				     emac0_ndev->dev_addr, mac_mask)) {
++		dev_warn(common->dev,
++			 "MAC prefix mismatch: EP (%pM) vs EMAC0 (%pM)\n",
++			 ep_ndev->dev_addr, emac0_ndev->dev_addr);
++		mismatch = true;
 +	}
-+	dev_dbg(common->dev, "%s (phy_id=%i, reg=%x) == %x\n",
-+		__func__, phy_id, reg, rc);
 +
-+	return rc;
++	/* Check EP vs EMAC1 */
++	if (ep_ndev && emac1_ndev &&
++	    !ether_addr_equal_masked(ep_ndev->dev_addr,
++				     emac1_ndev->dev_addr, mac_mask)) {
++		dev_warn(common->dev,
++			 "MAC prefix mismatch: EP (%pM) vs EMAC1 (%pM)\n",
++			 ep_ndev->dev_addr, emac1_ndev->dev_addr);
++		mismatch = true;
++	}
++
++	/* Check EMAC0 vs EMAC1 */
++	if (emac0_ndev && emac1_ndev &&
++	    !ether_addr_equal_masked(emac0_ndev->dev_addr,
++				     emac1_ndev->dev_addr, mac_mask)) {
++		dev_warn(common->dev,
++			 "MAC prefix mismatch: EMAC0 (%pM) vs EMAC1 (%pM)\n",
++			 emac0_ndev->dev_addr, emac1_ndev->dev_addr);
++		mismatch = true;
++	}
++
++	return mismatch;
 +}
 +
 +/**
-+ * tsn_mdio_write - MDIO interface write function
-+ * @bus:	Pointer to mii bus structure
-+ * @phy_id:	Address of the PHY device
-+ * @reg:	PHY register to write to
-+ * @val:	Value to be written into the register
++ * tsn_sw_select_base_mac - Select best available MAC as base
++ * @common: TSN common private structure
++ * @ep_ndev: EP network device
++ * @emac0_ndev: EMAC0 network device
++ * @emac1_ndev: EMAC1 network device
++ * @base_mac: Output buffer for selected base MAC
 + *
-+ * Return:	0 on success, -ETIMEDOUT on a timeout
-+ *
-+ * Writes the value to the requested register by first writing the value
-+ * into MWD register. The MCR register is then appropriately setup
-+ * to finish the write operation.
++ * Selects the best available MAC address to use as base for generating
++ * consistent MACs. Priority: EP > EMAC0 > EMAC1 > Random.
 + */
-+static int tsn_mdio_write(struct mii_bus *bus, int phy_id, int reg,
-+			  u16 val)
++static void tsn_sw_select_base_mac(struct tsn_priv *common,
++				   struct net_device *ep_ndev,
++				   struct net_device *emac0_ndev,
++				   struct net_device *emac1_ndev,
++				   u8 *base_mac)
 +{
-+	struct tsn_emac *emac = bus->priv;
-+	struct tsn_priv *common = emac->common;
-+	int ret;
-+
-+	dev_dbg(common->dev, "%s (phy_id=%i, reg=%x, val=%x)\n",
-+		__func__, phy_id, reg, val);
-+	scoped_guard(mutex, &common->mdio_lock) {
-+		tsn_mdio_mdc_enable(emac);
-+
-+		ret = tsn_mdio_wait_until_ready(emac);
-+		if (ret < 0) {
-+			tsn_mdio_mdc_disable(emac);
-+			return ret;
-+		}
-+
-+		emac_iow(emac, TSN_MDIO_MWD_OFFSET, (u32)val);
-+		emac_iow(emac, TSN_MDIO_MCR_OFFSET,
-+			 FIELD_PREP(TSN_MDIO_MCR_PHYAD_MASK, phy_id) |
-+			 FIELD_PREP(TSN_MDIO_MCR_REGAD_MASK, reg) |
-+			 TSN_MDIO_MCR_INITIATE |
-+			 TSN_MDIO_MCR_OP_WRITE);
-+
-+		ret = tsn_mdio_wait_until_ready(emac);
-+		if (ret < 0) {
-+			tsn_mdio_mdc_disable(emac);
-+			return ret;
-+		}
-+		tsn_mdio_mdc_disable(emac);
++	/* Try EP first */
++	if (ep_ndev && !tsn_sw_is_mac_invalid(ep_ndev->dev_addr)) {
++		ether_addr_copy(base_mac, ep_ndev->dev_addr);
++		dev_info(common->dev, "Using EP MAC as base: %pM\n", base_mac);
++		return;
 +	}
++
++	/* Try EMAC0 */
++	if (emac0_ndev && !tsn_sw_is_mac_invalid(emac0_ndev->dev_addr)) {
++		ether_addr_copy(base_mac, emac0_ndev->dev_addr);
++		dev_info(common->dev, "Using EMAC0 MAC as base: %pM\n", base_mac);
++		return;
++	}
++
++	/* Try EMAC1 */
++	if (emac1_ndev && !tsn_sw_is_mac_invalid(emac1_ndev->dev_addr)) {
++		ether_addr_copy(base_mac, emac1_ndev->dev_addr);
++		dev_info(common->dev, "Using EMAC1 MAC as base: %pM\n", base_mac);
++		return;
++	}
++
++	/* Generate random locally administered MAC */
++	eth_random_addr(base_mac);
++	base_mac[0] = (base_mac[0] & 0xFE) | 0x02;  /* Set local bit, clear multicast */
++	dev_info(common->dev, "Generated random MAC base: %pM\n", base_mac);
++}
++
++/**
++ * tsn_sw_frame_filter_config - Configure frame filtering and validate MAC addresses
++ * @common: TSN common private structure
++ *
++ * This function validates that all TSN ports (EP, EMAC0, EMAC1) share the same
++ * 44-bit MAC address prefix. If any mismatch is detected, it generates a new
++ * consistent set of MAC addresses with:
++ *   - Same 44-bit prefix (OUI + 12 bits)
++ *   - Last 4 bits set to 0x1, 0x2, 0x3 for EP, EMAC0, EMAC1 respectively
++ *
++ * This ensures proper frame forwarding in the TSN switch where all ports must
++ * appear to belong to the same logical bridge.
++ *
++ * The function uses ether_addr_equal_masked() with mask FF:FF:FF:FF:FF:F0
++ * to compare only the first 44 bits of MAC addresses.
++ */
++static void tsn_sw_frame_filter_config(struct tsn_priv *common)
++{
++	struct net_device *emac0_ndev = (common->num_emacs >= 1 && common->emacs[0]) ?
++					 common->emacs[0]->ndev : NULL;
++	struct net_device *emac1_ndev = (common->num_emacs >= 2 && common->emacs[1]) ?
++					 common->emacs[1]->ndev : NULL;
++	static const u8 mac_mask[ETH_ALEN] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xF0};
++	struct net_device *ep_ndev = common->ep ? common->ep->ndev : NULL;
++	struct tsn_switch *sw = common->sw;
++	bool need_new_macs = false;
++	bool mac_mismatch = false;
++	u8 base_mac[ETH_ALEN];
++	u32 mac_lsb, mac_msb;
++	int active_ports;
++
++	dev_info(common->dev, "Validating TSN switch MAC address consistency\n");
++
++	/* Count active ports */
++	active_ports = !!ep_ndev + !!emac0_ndev + !!emac1_ndev;
++	if (active_ports < 2) {
++		dev_info(common->dev, "Less than 2 ports active, skipping MAC validation\n");
++		return;
++	}
++
++	/* Check for invalid/zero MAC addresses */
++	if (ep_ndev && tsn_sw_is_mac_invalid(ep_ndev->dev_addr)) {
++		dev_info(common->dev, "EP has invalid/zero MAC: %pM\n",
++			 ep_ndev->dev_addr);
++		need_new_macs = true;
++	}
++
++	if (emac0_ndev && tsn_sw_is_mac_invalid(emac0_ndev->dev_addr)) {
++		dev_info(common->dev, "EMAC0 has invalid/zero MAC: %pM\n",
++			 emac0_ndev->dev_addr);
++		need_new_macs = true;
++	}
++
++	if (emac1_ndev && tsn_sw_is_mac_invalid(emac1_ndev->dev_addr)) {
++		dev_info(common->dev, "EMAC1 has invalid/zero MAC: %pM\n",
++			 emac1_ndev->dev_addr);
++		need_new_macs = true;
++	}
++
++	/* If all MACs are valid, check consistency */
++	if (!need_new_macs)
++		mac_mismatch = tsn_sw_check_mac_consistency(common, ep_ndev,
++							    emac0_ndev, emac1_ndev,
++							    mac_mask);
++
++	/* Generate consistent MACs if needed */
++	if (need_new_macs || mac_mismatch) {
++		dev_info(common->dev, "Generating consistent MAC addresses\n");
++
++		tsn_sw_select_base_mac(common, ep_ndev, emac0_ndev,
++				       emac1_ndev, base_mac);
++
++		tsn_sw_generate_consistent_macs(common, base_mac);
++
++		dev_info(common->dev, "MAC address synchronization completed\n");
++	} else {
++		dev_info(common->dev, "All MAC addresses have consistent 44-bit prefix\n");
++	}
++
++	/* Program switch frame filter registers.
++	 * Use EMAC0 MAC address as the base for the switch filter.
++	 * Network port MAC addresses must differ in last LSB nibble only.
++	 * This is a hardware pre-requisite - we program the MAC per port basis.
++	 */
++
++	ether_addr_copy(base_mac, emac0_ndev->dev_addr);
++
++	/* Program lower 32 bits (bytes 2-5) into TSN_MAC_LSB register */
++	mac_lsb = ((u32)base_mac[2] << 24) | ((u32)base_mac[3] << 16) |
++		  ((u32)base_mac[4] << 8)  | ((u32)base_mac[5]);
++	sw_iow(sw, TSN_SW_MAC_LSB_OFFSET, mac_lsb);
++
++	/* Program upper 16 bits (bytes 0-1) and 4-bit filter mask (0xF)
++	 * into TSN_MAC_MSB register
++	 */
++	mac_msb = (0xF << TSN_SW_MAC_MSB_FF_MASK_SHIFT) |
++		  ((u32)base_mac[0] << 8) | ((u32)base_mac[1]);
++	sw_iow(sw, TSN_SW_MAC_MSB_OFFSET, mac_msb);
++
++	dev_info(common->dev, "Switch frame filter programmed with MAC: %pM (LSB=0x%08x, MSB=0x%08x)\n",
++		 base_mac, mac_lsb, mac_msb);
++}
++
++/**
++ * tsn_switch_set_state - Set hardware port state for a TSN switch
++ * @sw: Pointer to TSN switch structure
++ * @port: Pointer to port status structure containing port number and desired state
++ *
++ * This function programs the desired state of a TSN switch port by writing
++ * to the port state control register. It supports all switch ports
++ * (endpoint, MAC1, MAC2) and updates the corresponding port state bits.
++ * After writing, it waits for the hardware to acknowledge the state change.
++ *
++ * Return: 0 on success, -ETIMEDOUT if the hardware does not acknowledge
++ *         the change within the timeout period.
++ */
++static int tsn_switch_set_state(struct tsn_switch *sw,
++				struct port_status *port)
++{
++	u32 en_port_sts_chg_bit = 1;
++	u32 u_value, reg, err;
++
++	u_value = sw_ior(sw, TSN_PORT_STATE_CTRL_OFFSET);
++	switch (port->port_num) {
++	case PORT_EP:
++		if (!(u_value & EP_PORT_STATUS_CHG_BIT)) {
++			u_value &= ~EP_PORT_STATUS_MASK;
++			u_value |= FIELD_PREP(EP_PORT_STATUS_MASK, port->port_status);
++			en_port_sts_chg_bit = EP_PORT_STATUS_CHG_BIT;
++		}
++		break;
++	case PORT_MAC1:
++		if (!(u_value & MAC1_PORT_STATUS_CHG_BIT)) {
++			u_value &= ~MAC1_PORT_STATUS_MASK;
++			u_value |= FIELD_PREP(MAC1_PORT_STATUS_MASK, port->port_status);
++			en_port_sts_chg_bit = MAC1_PORT_STATUS_CHG_BIT;
++		}
++		break;
++	case PORT_MAC2:
++		if (!(u_value & MAC2_PORT_STATUS_CHG_BIT)) {
++			u_value &= ~MAC2_PORT_STATUS_MASK;
++			u_value |= FIELD_PREP(MAC2_PORT_STATUS_MASK, port->port_status);
++			en_port_sts_chg_bit = MAC2_PORT_STATUS_CHG_BIT;
++		}
++		break;
++	}
++
++	u_value |= en_port_sts_chg_bit;
++	sw_iow(sw, TSN_PORT_STATE_CTRL_OFFSET, u_value);
++
++	/* wait for write to complete */
++	err = readl_poll_timeout(sw->regs + TSN_PORT_STATE_CTRL_OFFSET, reg,
++				 (!(reg & en_port_sts_chg_bit)), 10,
++				 DELAY_OF_FIVE_MILLISEC);
++	if (err) {
++		pr_err("CAM write timed out\n");
++		return -ETIMEDOUT;
++	}
++
 +	return 0;
 +}
 +
 +/**
-+ * tsn_mdio_enable - Configure and enable MDIO controller
-+ * @emac: Pointer to TSN EMAC structure
++ * tsn_sw_configure_forwarding - Initialize switch forwarding behavior
++ * @sw: TSN switch instance pointer
 + *
-+ * This function calculates the appropriate clock divisor for MDIO timing
-+ * based on the host clock frequency, programs the divisor, and enables
-+ * the MDIO controller. It ensures MDIO frequency does not exceed 2.5 MHz.
-+ *
-+ * Return: 0 on success, negative error code on failure
++ * Establishes basic packet forwarding configuration across all switch
++ * ports by setting each port to the forwarding state. This enables
++ * traffic flow between endpoint and MAC interfaces through the switch
++ * fabric.
 + */
-+static int tsn_mdio_enable(struct tsn_emac *emac)
++static void tsn_sw_configure_forwarding(struct tsn_switch *sw)
 +{
-+	struct tsn_priv *common = emac->common;
-+	u32 axi_clk_freq;
-+	u32 clk_div;
-+	int i;
++	struct port_status port;
++	int ret;
 +
-+	emac->mii_clk_div = 0;
++	pr_info("Configuring TSN switch for basic forwarding\n");
 +
-+	/* Pick the right clock for MDIO timing */
-+	axi_clk_freq = 0;
-+	for (i = 0; i < TSN_NUM_CLOCKS; i++) {
-+		const char *id = common->clks[i].id;
++	/* Configure PORT_EP to forwarding state */
++	port.port_num = PORT_EP;
++	port.port_status = TSN_PORT_STATE_FORWARDING;
++	ret = tsn_switch_set_state(sw, &port);
++	if (ret)
++		pr_err("Failed to set PORT_EP state: %d\n", ret);
++	else
++		pr_info("PORT_EP configured for forwarding\n");
 +
-+		if (id && !strcmp(id, "s_axi_aclk") && common->clks[i].clk) {
-+			axi_clk_freq = clk_get_rate(common->clks[i].clk);
-+			break;
-+		}
-+	}
++	/* Configure PORT_MAC1 to forwarding state */
++	port.port_num = PORT_MAC1;
++	port.port_status = TSN_PORT_STATE_FORWARDING;
++	ret = tsn_switch_set_state(sw, &port);
++	if (ret)
++		pr_err("Failed to set PORT_MAC1 state: %d\n", ret);
++	else
++		pr_info("PORT_MAC1 configured for forwarding\n");
 +
-+	if (!axi_clk_freq) {
-+		dev_warn(common->dev,
-+			 "Could not get s_axi_aclk, assuming %d Hz\n",
-+			 DEFAULT_AXI_CLK_FREQ);
-+		axi_clk_freq = DEFAULT_AXI_CLK_FREQ;
-+	}
++	/* Configure PORT_MAC2 to forwarding state */
++	port.port_num = PORT_MAC2;
++	port.port_status = TSN_PORT_STATE_FORWARDING;
++	ret = tsn_switch_set_state(sw, &port);
++	if (ret)
++		pr_err("Failed to set PORT_MAC2 state: %d\n", ret);
++	else
++		pr_info("PORT_MAC2 configured for forwarding\n");
 +
-+	/* Equation: fMDIO = fHOST / ((1 + clk_div) * 2)
-+	 * Must ensure fMDIO <= 2.5 MHz
-+	 */
-+	clk_div = (axi_clk_freq / (MAX_MDIO_FREQ * 2)) - 1;
-+	if (axi_clk_freq % (MAX_MDIO_FREQ * 2))
-+		clk_div++;
-+
-+	emac->mii_clk_div = clk_div;
-+
-+	dev_dbg(common->dev,
-+		"MDIO: host_clk=%u Hz, clk_div=%u\n",
-+		axi_clk_freq, clk_div);
-+
-+	/* Program divisor and enable MDIO controller */
-+	dev_info(common->dev,
-+		 "MDIO: writing to offset=0x%x, value=0x%lx\n",
-+		 TSN_MDIO_MC_OFFSET,
-+		 (unsigned long)(emac->mii_clk_div | TSN_MDIO_MC_MDIOEN));
-+
-+	/* Program divisor and enable MDIO controller */
-+	emac_iow(emac, TSN_MDIO_MC_OFFSET,
-+		 emac->mii_clk_div | TSN_MDIO_MC_MDIOEN);
-+	return tsn_mdio_wait_until_ready(emac);
++	pr_info("TSN switch forwarding configuration completed\n");
 +}
 +
 +/**
-+ * tsn_mdio_setup - Setup MDIO bus for TSN EMAC
-+ * @emac: Pointer to TSN EMAC structure
-+ * @mac_np: Device tree node for MAC
++ * tsn_switch_init - Initialize TSN switching subsystem
++ * @pdev: Platform device for the TSN controller
 + *
-+ * This function initializes the MDIO bus for the TSN EMAC interface.
-+ * It allocates an MII bus structure, configures MDIO timing, finds
-+ * the MDIO device tree node, and registers the MDIO bus with the kernel.
++ * Sets up the TSN switch component by parsing device tree configuration,
++ * mapping register regions, allocating switch data structures, and
++ * configuring initial forwarding behavior for all ports.
 + *
-+ * Return: 0 on success, negative error code on failure
++ * Return: 0 on successful initialization, negative error code otherwise
 + */
-+int tsn_mdio_setup(struct tsn_emac *emac, struct device_node *mac_np)
++int tsn_switch_init(struct platform_device *pdev)
 +{
-+	struct tsn_priv *common = emac->common;
-+	struct device_node *mdio_node;
-+	struct mii_bus *bus;
-+	int ret;
++	struct tsn_priv *common = platform_get_drvdata(pdev);
++	struct device_node *switch_node;
++	struct device *dev = &pdev->dev;
++	struct tsn_switch *sw;
++	struct resource res;
++	u32 ret;
 +
-+	bus = mdiobus_alloc();
-+	if (!bus)
++	switch_node = of_get_child_by_name(dev->of_node, "switch");
++	if (!switch_node)
++		return dev_err_probe(dev, -ENODEV, "missing switch node\n");
++
++	ret = of_address_to_resource(switch_node, 0, &res);
++	if (ret) {
++		of_node_put(switch_node);
++		return dev_err_probe(dev, ret, "failed to get switch resource\n");
++	}
++
++	sw = devm_kzalloc(&pdev->dev, sizeof(*sw), GFP_KERNEL);
++	if (!sw)
 +		return -ENOMEM;
 +
-+	snprintf(bus->id, MII_BUS_ID_SIZE, "tsn-mac-%.8llx",
-+		 (unsigned long long)emac->regs_start);
++	sw->dev = &pdev->dev;
++	sw->regs = common->regs + res.start;
++	common->sw = sw;
 +
-+	bus->priv = emac;
-+	bus->name = "Xilinx TSN Ethernet MDIO";
-+	bus->read = tsn_mdio_read;
-+	bus->write = tsn_mdio_write;
-+	bus->parent = common->dev;
-+	emac->mii_bus = bus;
++	/* Configure default forwarding */
++	tsn_sw_configure_forwarding(sw);
 +
-+	mdio_node = of_get_child_by_name(mac_np, "mdio");
-+	if (!mdio_node) {
-+		dev_err(common->dev, "MAC%d: missing 'mdio' child node\n",
-+			emac->emac_num);
-+		ret = -ENODEV;
-+		goto unregister;
-+	}
-+	ret = tsn_mdio_enable(emac);
-+	if (ret < 0)
-+		goto unregister;
-+	ret = of_mdiobus_register(bus, mdio_node);
-+	if (ret) {
-+		dev_err(common->dev, "Failed to register MDIO bus for MAC%d\n",
-+			emac->emac_num);
-+		goto unregister_mdio_enabled;
-+	}
-+	of_node_put(mdio_node);
-+	tsn_mdio_mdc_disable(emac);
++	tsn_sw_frame_filter_config(common);
++
 +	return 0;
-+
-+unregister_mdio_enabled:
-+	tsn_mdio_mdc_disable(emac);
-+unregister:
-+	of_node_put(mdio_node);
-+	mdiobus_free(bus);
-+	emac->mii_bus = NULL;
-+	return ret;
 +}
 +
 +/**
-+ * tsn_mdio_teardown - Cleanup MDIO bus for TSN EMAC
-+ * @emac: Pointer to TSN EMAC structure
++ * tsn_switch_exit - Cleanup TSN switching subsystem
++ * @pdev: Platform device for the TSN controller
 + *
-+ * This function performs cleanup operations for the MDIO bus.
-+ * It unregisters the MDIO bus from the kernel and frees any
-+ * associated memory for the MII bus structure.
++ * Performs shutdown sequence for the TSN switch by disabling all port
++ * forwarding states and cleaning up allocated resources. This ensures
++ * proper isolation of switch ports during driver removal.
 + */
-+void tsn_mdio_teardown(struct tsn_emac *emac)
++void tsn_switch_exit(struct platform_device *pdev)
 +{
-+	mdiobus_unregister(emac->mii_bus);
-+	mdiobus_free(emac->mii_bus);
-+	emac->mii_bus = NULL;
++	struct tsn_priv *common = platform_get_drvdata(pdev);
++	struct tsn_switch *sw = common->sw;
++	struct port_status port;
++
++	if (!sw)
++		return;
++
++	port.port_status = TSN_PORT_STATE_DISABLED;
++
++	port.port_num = PORT_EP;
++	tsn_switch_set_state(sw, &port);
++
++	port.port_num = PORT_MAC1;
++	tsn_switch_set_state(sw, &port);
++
++	port.port_num = PORT_MAC2;
++	tsn_switch_set_state(sw, &port);
++
++	pr_info("TSN switch exited and all ports set to disabled\n");
 +}
 -- 
 2.25.1
