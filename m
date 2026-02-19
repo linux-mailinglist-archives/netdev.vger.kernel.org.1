@@ -1,64 +1,63 @@
-Return-Path: <netdev+bounces-259401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259402-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iO6iE3uklmlsiQIAu9opvQ
-	(envelope-from <netdev+bounces-259401-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 06:49:47 +0100
+	id 4FE9IpKklml5iQIAu9opvQ
+	(envelope-from <netdev+bounces-259402-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 06:50:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3E4D15C2E2
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 06:49:46 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0727715C2F7
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 06:50:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2043430241B5
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 05:49:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 472AA303B5C8
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 05:49:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC3A72C234E;
-	Thu, 19 Feb 2026 05:49:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B1F92D0C95;
+	Thu, 19 Feb 2026 05:49:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="exttTClC"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Fa65tzp1"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010064.outbound.protection.outlook.com [52.101.201.64])
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012032.outbound.protection.outlook.com [52.101.48.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4154A2D0C79;
-	Thu, 19 Feb 2026 05:49:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEFD026A1AC;
+	Thu, 19 Feb 2026 05:49:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771480179; cv=fail; b=tvwkcn+wxH9/clr6wlR9kMBW2UI7JltCYYbchqmRgnpQlZkPcuEEN2xSMlMbdjuZYAdm5sMBN0nV3JWz/gwHrNaWG/g2q02/IKhoMQva8V5gyylMEh6kP0uLTTcJX2RLQRJTCheYLJhRjSCgB/gw8FT/7XOJLBZcMu5Wuh1MZ1k=
+	t=1771480185; cv=fail; b=OA+8DbSl6H2qRmwNJ79DtEdUodQH4llWpBEcA440b51oXhxDgARClXnffuIVLzw2MkeQp4Z5t0sAvrdvoyPjHSCMUM2KwhKTcaL4fOnx9/MyUxXCdL53fIpck/uCWE9ZGpDqn/dOpBOXNxaTxxwUTpCbA8bJtEnVHoJ3o6UC42s=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771480179; c=relaxed/simple;
-	bh=sFyUrViBJZu4PD5sE4LK1ZeXwOdA1kLZyWD1m6eI/kM=;
+	s=arc-20240116; t=1771480185; c=relaxed/simple;
+	bh=yoZV6gY7ECH+f3ulF3dfRG3zd6qzTvYp/fmuZDhk90I=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pFSN5JhE0s6cfsTkYOnRJ5vNFgJN4P2RicoF4FfgJ8IKjdrXAuaE3SANTgCH/ghliGrVC2vUfZHMDl3LvVeM9Pb4TypoScvePcApcfa0L5Nc0/ZBsqGqVEOqDt0C5t4uhmm+26l0GQfdJSgrQ83L0uHqcFcyCvwgVsiYbdnlpAw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=exttTClC; arc=fail smtp.client-ip=52.101.201.64
+	 MIME-Version:Content-Type; b=ENEsXoyz1b0URrsguNP5NVxyut7+cvwD/G1sxTuWEGGoOSXd/rXy6Qmj1IhzrmQfdvvwgchLIaUlm97bjSuV6LYnvoLGn9xeH/IFn3CXrCjH44yE5/JaoZMO04fwOips59ZtdpfzQ4/CrGWFGuQHGaafWADKQtEE3YaONw81Tew=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Fa65tzp1; arc=fail smtp.client-ip=52.101.48.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=EWwLJGIiOaZOQeFVCJ79UBmOI73WNnQhAV8zPx9yfCoA+tKBAOInNSPeWonVh+Lry53iMdRHUj1kalE0SSXyn09qmLY50xYdQjuP1Qvyx5pOeV19c61uJOR1tpsOhaiMxWk36709wfNJEKBnKB8oL32Q5wfDI72e02bM/JQydMPAUlrccWZHQ/2htGHRm+VeRNHG1Z3ksUStiR8Z3jGKK0ORtaaX2UAB9y8B/lQqVCZXRucBOfGnKk2kC0eagnCtt4j/ojQVBBOSyuLuQAtkG03DZlswIJ5rbW0T7iRitwg+PscHNP0YWbOSkCYu2uLMAezKT4XKZvP39MT8vx2R/Q==
+ b=OWBugbNWdeO//mz+I+hNmz6SPc/adCKT6AHsFb+aTtekBs8oRWK+7IjqKoOHTpna9pVTJItQtIUYjRZAl7szRhxvafym2uZMj4iPdRkPWQAxiVVXFlj2MnxqFA8iXGNeAmlQn1TxulUEFOXASweUgFXqEAytreqyhdUxUWzqc1tsBmWqJ9bIV/UTB5weq/Jnsav7rBBa3CD/pHJ0PEr5gQvDt0EI8AHmyMXYgRN462T21lth+WtilksQm10PUhTcOgktcbhiPdNhwSHdxya1Oi2MZLHVZ+S9wLg8tnZg1zhvxJNMMpfuVqS7yQPgVB7fis4erFaHEItIHthgEJ0zwQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/1JhVxiINl4/OgvY1Prv82mvqv91E1g15ShpcUrgXwI=;
- b=ObM6OaxEcqny9og5vVM8Z0MpEoIJFPp2to18dlNbXRXrqE6wtupXCga2bU7CmYPtSLS2OtqY7tXsi8lDTIdn5jJ3FcS5Mh5jjGMbV0IaWmjzXCi0nbNfzOpBcf4BylBd/fx9txdMSSH7LM42zoeCxZmm3w6zGy/MVwGPyF5Ka5As6FT46AXnSkROSm4K0FZ9fmcWL3qpBnnZn6mBle1RfdilkVtJh5tGESNV60zgXrlx9RBiRx/pY8Njx1+Q6UYIdUw+lzItvu3NiY/UJY4B3bccNzC8MKNY9kUQTnvQ3Evx5UbmQBHiX4eGkKlT+WEddyFtSCmS1JaDmmbyKIGaiA==
+ bh=/Fpk7eQA+BFWFn1n0xCVD2Q83ec575h5/jvXc0XZsO0=;
+ b=JEtuHEsKApTkYpiMVxr6i4bj/DNkcIIS3CCGGNxq9DNUf7yEfAptG5Ht37d8pbTGNuAx5BLttEBABvhKT8YXQVn6US8RGYORlrK/HlPIM7JL9nqplZ88eHjD89UhF/wcxlNtLT3AddCGzX9Fwfgdd6v/Ot2YGE3GIunZJhspUGFQD+ANvBCwxrOmbBb0Z3obh7ELP7XDbKd/8kNq+5AVfFVgOpVzJnLL3ag3WLe/Da1a6lQVoLjCSCvyhiiBJTvhnz7QYEUqSNP2TwX6CeOQ4S5k4o+tzb6+0a1uOYMF85FPorMvl8wL0GH6/D0Rr2+8hR4mZedGnu2LGRzeudAEhA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=lunn.ch smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/1JhVxiINl4/OgvY1Prv82mvqv91E1g15ShpcUrgXwI=;
- b=exttTClC+MXHY+ie0ybmkXlWd6Dgp4PceBBjuFNpbInL4BYaqrli2kcWdLhkvaDhTs2AzxdvJzOsb59ry1HsYKkBBinbAf7naHNlgVtFLB4TjjfB5bd9x/BHt0lNAa0xeo010/6Vw/O+3APlVdBR3NaDGZpLfjB1sQ2IzNKjwmg=
-Received: from CH5PR03CA0004.namprd03.prod.outlook.com (2603:10b6:610:1f1::6)
- by LV2PR12MB5893.namprd12.prod.outlook.com (2603:10b6:408:175::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.15; Thu, 19 Feb
- 2026 05:49:32 +0000
-Received: from DS3PEPF000099DD.namprd04.prod.outlook.com
- (2603:10b6:610:1f1:cafe::ae) by CH5PR03CA0004.outlook.office365.com
- (2603:10b6:610:1f1::6) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.15 via Frontend Transport; Thu,
- 19 Feb 2026 05:49:31 +0000
+ bh=/Fpk7eQA+BFWFn1n0xCVD2Q83ec575h5/jvXc0XZsO0=;
+ b=Fa65tzp1L3+IL+7cPgptFHrBloNB1hOWmxQ8V7pYH8Jyz3XkVuNDzbk6U7xOvH2SYlDPmRAclWDuMoDthez/htzZlDkg2ZotutM/qBIA64hoeA2wp0R8TJaunoxHztokWBjyrtEjjeRzZftwgH8StkUlPH+k2c4FOso3eWTVMV8=
+Received: from DS7PR05CA0002.namprd05.prod.outlook.com (2603:10b6:5:3b9::7) by
+ DS0PR12MB7804.namprd12.prod.outlook.com (2603:10b6:8:142::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9632.14; Thu, 19 Feb 2026 05:49:36 +0000
+Received: from DS3PEPF000099E2.namprd04.prod.outlook.com
+ (2603:10b6:5:3b9:cafe::bf) by DS7PR05CA0002.outlook.office365.com
+ (2603:10b6:5:3b9::7) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.13 via Frontend Transport; Thu,
+ 19 Feb 2026 05:49:07 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -66,20 +65,20 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb08.amd.com; pr=C
 Received: from satlexmb08.amd.com (165.204.84.17) by
- DS3PEPF000099DD.mail.protection.outlook.com (10.167.17.199) with Microsoft
+ DS3PEPF000099E2.mail.protection.outlook.com (10.167.17.201) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9632.12 via Frontend Transport; Thu, 19 Feb 2026 05:49:31 +0000
+ 15.20.9632.12 via Frontend Transport; Thu, 19 Feb 2026 05:49:35 +0000
 Received: from satlexmb10.amd.com (10.181.42.219) by satlexmb08.amd.com
  (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 18 Feb
- 2026 23:49:30 -0600
+ 2026 23:49:35 -0600
 Received: from satlexmb07.amd.com (10.181.42.216) by satlexmb10.amd.com
  (10.181.42.219) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 18 Feb
- 2026 23:49:29 -0600
+ 2026 23:49:34 -0600
 Received: from xhdsneeli40.xilinx.com (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Wed, 18 Feb 2026 23:49:25 -0600
+ Transport; Wed, 18 Feb 2026 23:49:30 -0600
 From: Srinivas Neeli <srinivas.neeli@amd.com>
 To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
 	<kuba@kernel.org>, <pabeni@redhat.com>, <michal.simek@amd.com>,
@@ -88,9 +87,9 @@ To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
 	<git@amd.com>, <srinivas.neeli@amd.com>
-Subject: [RFC PATCH 1/8] dt-bindings: net: Add TSN Endpoint Ethernet MAC support
-Date: Thu, 19 Feb 2026 11:19:04 +0530
-Message-ID: <20260219054911.2017362-2-srinivas.neeli@amd.com>
+Subject: [RFC PATCH 2/8] net: xilinx: tsn: Introduce TSN core driver skeleton
+Date: Thu, 19 Feb 2026 11:19:05 +0530
+Message-ID: <20260219054911.2017362-3-srinivas.neeli@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260219054911.2017362-1-srinivas.neeli@amd.com>
 References: <20260219054911.2017362-1-srinivas.neeli@amd.com>
@@ -104,58 +103,58 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF000099DD:EE_|LV2PR12MB5893:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0df2a0ff-6ce1-4fe9-61eb-08de6f7aa72e
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099E2:EE_|DS0PR12MB7804:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5d2f2ace-8c2a-4899-92b0-08de6f7aa9cf
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|376014|82310400026|7416014|1800799024|921020|13003099007;
+	BCL:0;ARA:13230040|36860700013|376014|7416014|82310400026|1800799024|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?XaO6xdPra7err53QLpwlcW+ZvixD8jjSw0ro7UnrJ7Pabm7qN/LMPnPzN3h8?=
- =?us-ascii?Q?kFKbBGEvBZ4U6S2DfOsQvmUdyeN+j3kPuTM4dZlQmVjvDLTNTdSPNWusnuUD?=
- =?us-ascii?Q?qeC8uA+XxRs2C41ybEB5payWgu7DyjWFup6zSYqVI4Ifo//TQpypQ9aZk2bm?=
- =?us-ascii?Q?iI0ZiNTW1S/Xhb1djxABlz1jLHwwGBpv85vF2jtp+2iyqPRzJnFgDNOdEceH?=
- =?us-ascii?Q?WdhyH8oPRKojCLmm5XXjkBppkTL3UE8x6A+MiKkfP9bMald6rGxvmALikMy/?=
- =?us-ascii?Q?+DXC/4ye0/mUhj3iE4MqCXTxbDw3mNEYcn0V/7tV0qK4zcI1+wzH5hEX0POI?=
- =?us-ascii?Q?dRgEU8t/R8Gbu2IfZXYGmAu02kgNHSziL35te2RXQHyuu6xGdn47TgjZa5nF?=
- =?us-ascii?Q?z5qa7y5mZWw9USInhCz70Ax3KKI++usTB7E21XtUhoaTlxIVs4bkTo+uL+cD?=
- =?us-ascii?Q?JoBMn1/XtExrOfBx0GEmil5J2YfIBv52RgWC0LMUNG/nojfokYXeR3qiwOxD?=
- =?us-ascii?Q?e2ALvfE7wkvCnpUORlaXeQky7iwWK7DQTqSScMqrgFnASO6SxO+6CPs13ETw?=
- =?us-ascii?Q?QPcjLyqjLM9OraJ6mhM/K6UkzPexV2sDNRcneuSy+U8NJH1y3ARP6fAix1s0?=
- =?us-ascii?Q?06MwBUeWvAMgQ8aR5FtcP+aDq4D46JsZ/NAe4tldvBeNgkaCtDUHxuWecprJ?=
- =?us-ascii?Q?iVBrlefeUlYV/9Yd0CCF0YPhwbrmmM13K9GkdKOa04j5fWwjqcLetWyleou1?=
- =?us-ascii?Q?/F8dGJ161WH2J75FQBwM2j0C9zZmoZrI2tf1qdz3AfJJtO7hFIQZuC1wRU6Y?=
- =?us-ascii?Q?CNkNzVS5OXKvraq7Wc4OAMYyXN9vh2+RiMAMBMR6/45khauG1nmc9FT3a+NJ?=
- =?us-ascii?Q?r+uaioiL4IHU3qp6euXrWfGZWg0BlIzCuiqfbd694io2ib9AkDkb8nCQJhsM?=
- =?us-ascii?Q?accj0MN8geLII+xPgnrjcZvo/YmjCq5qCn34Ktyr1UecMv36qOtVX2zdWdCD?=
- =?us-ascii?Q?jTQ84PaiDWivx++agDdpbezvw66r4/BKcOpZVJGjP1XpvrhNFUYAYW3VO4gm?=
- =?us-ascii?Q?TR5HtLvMEMhfcP1z+aC0VgZEB28ttc+S55R4n2+whecwJf+6yAf8CLPDTI/m?=
- =?us-ascii?Q?Tk/FLmq2527vGFSO4/KOcRFjyPcxYbGXE7DulTFxg+DcElNd2vRxW1h66WA3?=
- =?us-ascii?Q?GfxVRmDv0aN4/rIskMYhCGTOShoGLBwym7xlEEYwKhzPYVvLpfmTMp1itTET?=
- =?us-ascii?Q?tymI3bAsHkBvEzHczYLInh0zKuHrGpcC+00JbXRnTBNDHkatGauwXppxx7+i?=
- =?us-ascii?Q?+rIdPI5H5E7s+L52AfYiu9yhEcjf0ayc/KNHYUXlF4D9n2+aflrP27pHSK4r?=
- =?us-ascii?Q?4UHkKDKD3oPpXXDP6L8ArMDPWxZ0uW7CCEiISp6GjmnyDIKo88S63tijTOHe?=
- =?us-ascii?Q?CxeFDSFaqUvQpfXItMMRNTRBgNLJmgJjzP3mQjaASOnix/FR8rDMthfgbFEE?=
- =?us-ascii?Q?+GmSDQLotb1GA6pBAXzNNQ1jeqpZ0rUhuB5fHWuAXpfDAH0KPoDQ8SGgrBgs?=
- =?us-ascii?Q?pLg/ZQ5uYxPc8r+yLGxSSSO+D8rcASgWuIvkNwM3eXHxJ4GD3R4rwzvMjGKh?=
- =?us-ascii?Q?aEkWIFz+0bkzoQXPMw6APdPwuYrIFv37R+dpqT1RR8jdCmD/wdGleKzvU94S?=
- =?us-ascii?Q?XYbiWDzLzddQWIiRTifbXD63cVY=3D?=
+	=?us-ascii?Q?lWvzrnUFJr/jlioeo0lq8wMwhj786H+zseFejjhqbg8GUNH16rgv9KtsFr0H?=
+ =?us-ascii?Q?p1hNho5wNmUNL+YZy3ZtABZKkzp6lWsb5LuawBd3CH09dnN8S/wlLZjgkXpF?=
+ =?us-ascii?Q?uY1F45wBmm7GopoJZAPgwb5jO5NEqk6IiKggaOx1nTcD1fpfPZfj97og3J+A?=
+ =?us-ascii?Q?GVr35adyO8KiNbLHDb9VRpbMniFiBvOnv5Xp49W+GcMfHy69bduTDZXGf6HI?=
+ =?us-ascii?Q?cLTxgIp6sAueCBmQNwhEhrfH2avFmJuFjaJqCtFH+oTn1DwyB+xt3gJ+dt9u?=
+ =?us-ascii?Q?aM/GdB6M1ARWFr7lsPMgYiOPjfihkrOypeCtCMWtqlwKzbPW+WIK+Z1k96UZ?=
+ =?us-ascii?Q?UcyWEYW/HzedH8IrJOO+YPXjQC/h7jwBEGXwWmAOTsrOvJYNJqddxQiIFMhp?=
+ =?us-ascii?Q?I1ZSAF/7mkfk5GclWmeePG4MjGxCam4y8bX4Lj15/TWYaraCy4nXR6R9Novb?=
+ =?us-ascii?Q?ciNRD7pUiqj0PFK/aYgmi7JHwwjw3gux7WoQ2nnQExCsAVzhIG7ID9cPukGi?=
+ =?us-ascii?Q?t/KOE4hKp9pNGF+XHNo4e2sf3tGF1XIFllZZppPWO2lkIyMPWKLXyLuN0UIe?=
+ =?us-ascii?Q?1XZxabEpe2gajEzO4d6F050h/RJvj4jM6TFpiLL8YJZOJ4HkLxaqc8yEdNdf?=
+ =?us-ascii?Q?2Obkx2qA7KolH8wzvrQeWqzKZ63hC7/mIkwg2siZs2ZmKthSlOqRG6CbONkc?=
+ =?us-ascii?Q?52BPT4DrH85mi0j1R3M4e5mIHkCDbd73fx3BrnMY6pHExxeyiM9NodOU0ya8?=
+ =?us-ascii?Q?xFEM8WxNHePDH4Oo29LZrqMcmvvgPJtUdOHqVJVXUc/SPDfcqqgFk9ErIEpP?=
+ =?us-ascii?Q?4prrS0oi7oqcUSOyO8FLFHwCGC6c/ZUM4ycRcGZIerZUYv/DUpXvZkssiPqx?=
+ =?us-ascii?Q?Ed+UWE1NYUamaxDvzNcSAP8X7l37PJCqFli4AQ61rwihqO7Gs0CXRQS2nudc?=
+ =?us-ascii?Q?A1vhI+USi+1ca/qDdIwpYLmir84XE5WjThpkNlCfoheQfy8a6FNKNNps6Uf6?=
+ =?us-ascii?Q?9a3LshmjTAhAvf0sNWofysMdq7+5ONu2SCra/GIwDEEH7vjaokAtjPa6rVxU?=
+ =?us-ascii?Q?s2hUKE3dkhPudAr+RK3MyKvA0ML4g95G83qAKByCsNJE1Yt8e7KEqfz+D6Sg?=
+ =?us-ascii?Q?701vo2DRAp9NBixS0pd1HRWx8mu0wCqjUX6oXuN1J6aNerBySnLzqHMR44X3?=
+ =?us-ascii?Q?U7aAYCRn53sbG7zC7ETITuR3b6xNzMdy5GU1qYLoRbRCG9aFCfYs81pL9iT2?=
+ =?us-ascii?Q?kfNfmeJucIzzwaOpkW8uxcPK3KTxxLq8VKqA4Z1s7mNUzfUzoJsb5HTwUepz?=
+ =?us-ascii?Q?Nz8KAOgp8L45OKwYLaLjiU/vd5kc5EdzgjHJzPIm2oPa9r8spjk5jAsbTnhV?=
+ =?us-ascii?Q?bNhX8na6ITHm5frbsF/2X8DZUlwUWyr3SdWg4X6vWcLLrTinICPSmX28N12V?=
+ =?us-ascii?Q?t2vRg5FMsBfeGJaJJg+oCdkLknGXmD5wpPyl42wH1dPwT5ctahiSS7yXwUmP?=
+ =?us-ascii?Q?wXnxR3Xqxh4CHDikUdO/nSTqAf2iL58wepevYBHV1lIpgz8HF2eEXwMkLLgb?=
+ =?us-ascii?Q?8JkqsxQuw45bwtVGKYBFLskMbxRmpekurJksrl7oZ3LkKPusL+nH8VQ98lUo?=
+ =?us-ascii?Q?79s5b6KZ6vpRvDnPuiQe0dbKtgC+qQS6jFO4sC/fM/H6Tt2xTUrlNiC95C7e?=
+ =?us-ascii?Q?o61GYHbC9p8q2InzrksHqWTYNzc=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(82310400026)(7416014)(1800799024)(921020)(13003099007);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(7416014)(82310400026)(1800799024)(921020);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	BHjiPN+vOJxuegQdGGRL3VkajaJKLQXWkoP0pI1BIWKCV+5PDpv5VC1X0ngvQyr8NcVjeGm0Tj2vVaJXV6TghpIN/w4yBZOe0XuoKIwFIXDVoEYtmWVmdAgcxERG1qSR+ezVojYd1E2wka3R1J5zFgZrDwJOZl8iaydw+7RR9G+VC0KJLrEdYVoZs1FcumfjK/Smq2gr6lEGL1ZYmq2sNr9S3KQ23JoYHUGsr203hA3ZDrFTKlIR65XziQ0tZ2xntuQqnSgREvl+7kfEcoS3Hk5zRmo9QcfjR15UqntKpqXj5U9NFsx0qbux7w4EIdBLQHopiyVp6/xqvB3dK0cbnY9cCCtfdxhikWXCSe5sK/0jztmzOEcBvV/8VDRW44YMEnj7sVjtkMXsmoBochj85XXkjln28tQUY1Sg2ZF0sRZjF52lQgR2l0+lveUI5vCY
+	TSoTYGMgXtmGkiVf934FIViO6e7EAQ09jlp0h6o3D5TZmAbOxVaLjMk9iAxas7/OO3OxTxzE/zKlpGdfKUf7IkXxs26Y5BC89xFqvHfh8Ft9GQcsFNDnpNzxsuMMN+Azog2dqZy0xyNunXPiNesGFzO3SnOL5oyD2gwOhIrQm5rZUnQR1wXnDC+YsNZeT59HvbADlqKY93XdXNTdv6DvrkAgkmVgeoilJJKalFjNwwt0BIONINQsnZp0OkEUY4rH1uQ2b/15jDllV57+ceTm2fR7m0IfmxJRnVd/sFC26Cth8wQaMjxo3HBiFRhKjbolew7f2KV3hEUmBq1ndUCp6ruEXIVO7h+fgOB4YD96Hw2R7qxRqae2H4Wb5pkWXVAnrIgsl6OA5jwhS+dmOsUijGGXGiYrRlG+4AdLZ3CkGonwRjtwyppgJfM5G4/09eu3
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2026 05:49:31.3921
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2026 05:49:35.8100
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0df2a0ff-6ce1-4fe9-61eb-08de6f7aa72e
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5d2f2ace-8c2a-4899-92b0-08de6f7aa9cf
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb08.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF000099DD.namprd04.prod.outlook.com
+	DS3PEPF000099E2.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5893
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7804
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -163,7 +162,7 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -172,7 +171,7 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,amd.com,gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259401-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-259402-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	PRECEDENCE_BULK(0.00)[];
@@ -180,332 +179,371 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[amd.com:+];
 	TO_DN_NONE(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.997];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:mid,amd.com:dkim,amd.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	RCVD_COUNT_SEVEN(0.00)[9]
-X-Rspamd-Queue-Id: B3E4D15C2E2
+X-Rspamd-Queue-Id: 0727715C2F7
 X-Rspamd-Action: no action
 
-TSN Endpoint Ethernet MAC implements IEEE 802.1 Time-Sensitive Networking
-(TSN) standards, providing deterministic, low-latency Ethernet
-communication. It can operate in two configurations, either as
-Endpoint-only or Bridged Endpoint mode. The Bridged Endpoint configuration
-integrates a three-port switch, with two ports connected to the external
-network and one port connected to an internal endpoint.
-
-The IP supports GMII and RGMII interfaces for connection to external PHY
-devices, enabling full-duplex operation at 100 Mb/s and 1 Gb/s.
-
-Add devicetree binding documentation for the TSN Endpoint Ethernet MAC IP,
-including support for multiple Ethernet MACs, a TSN switch, and an
-endpoint block.
+Introduce the initial skeleton for the AMD/Xilinx Time Sensitive
+Networking (TSN) Ethernet IP driver. Adds the Kconfig entry
+(CONFIG_XILINX_TSN), updates the Xilinx Ethernet Makefile,
+and provides the base source file focused on device tree
+parsing and clock acquisition.
 
 Signed-off-by: Srinivas Neeli <srinivas.neeli@amd.com>
 ---
-NOTE:
-The xlnx,tsn-endpoint-ethernet-mac-3.0 corresponds to the TSN Endpoint Ethernet MAC IP version. 
-The IP Product Guide is currently under review and will be published on
-the AMD/Xilinx documentation portal (similar to other IP TRMs).
----
- .../net/xlnx,tsn-endpoint-ethernet-mac.yaml   | 287 ++++++++++++++++++
- 1 file changed, 287 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/xlnx,tsn-endpoint-ethernet-mac.yaml
+ drivers/net/ethernet/xilinx/Kconfig           |   1 +
+ drivers/net/ethernet/xilinx/Makefile          |   1 +
+ drivers/net/ethernet/xilinx/tsn/Kconfig       |  14 ++
+ drivers/net/ethernet/xilinx/tsn/Makefile      |   2 +
+ drivers/net/ethernet/xilinx/tsn/xilinx_tsn.h  |  60 +++++
+ .../net/ethernet/xilinx/tsn/xilinx_tsn_main.c | 218 ++++++++++++++++++
+ 6 files changed, 296 insertions(+)
+ create mode 100644 drivers/net/ethernet/xilinx/tsn/Kconfig
+ create mode 100644 drivers/net/ethernet/xilinx/tsn/Makefile
+ create mode 100644 drivers/net/ethernet/xilinx/tsn/xilinx_tsn.h
+ create mode 100644 drivers/net/ethernet/xilinx/tsn/xilinx_tsn_main.c
 
-diff --git a/Documentation/devicetree/bindings/net/xlnx,tsn-endpoint-ethernet-mac.yaml b/Documentation/devicetree/bindings/net/xlnx,tsn-endpoint-ethernet-mac.yaml
+diff --git a/drivers/net/ethernet/xilinx/Kconfig b/drivers/net/ethernet/xilinx/Kconfig
+index 7502214cc7d5..c6d704c8d3d4 100644
+--- a/drivers/net/ethernet/xilinx/Kconfig
++++ b/drivers/net/ethernet/xilinx/Kconfig
+@@ -41,4 +41,5 @@ config XILINX_LL_TEMAC
+ 	  This driver supports the Xilinx 10/100/1000 LocalLink TEMAC
+ 	  core used in Xilinx Spartan and Virtex FPGAs
+ 
++source "drivers/net/ethernet/xilinx/tsn/Kconfig"
+ endif # NET_VENDOR_XILINX
+diff --git a/drivers/net/ethernet/xilinx/Makefile b/drivers/net/ethernet/xilinx/Makefile
+index 7d7dc1771423..66dab012650b 100644
+--- a/drivers/net/ethernet/xilinx/Makefile
++++ b/drivers/net/ethernet/xilinx/Makefile
+@@ -8,3 +8,4 @@ obj-$(CONFIG_XILINX_LL_TEMAC) += ll_temac.o
+ obj-$(CONFIG_XILINX_EMACLITE) += xilinx_emaclite.o
+ xilinx_emac-objs := xilinx_axienet_main.o xilinx_axienet_mdio.o
+ obj-$(CONFIG_XILINX_AXI_EMAC) += xilinx_emac.o
++obj-$(CONFIG_XILINX_TSN) += tsn/
+diff --git a/drivers/net/ethernet/xilinx/tsn/Kconfig b/drivers/net/ethernet/xilinx/tsn/Kconfig
 new file mode 100644
-index 000000000000..0d61a911e1d1
+index 000000000000..53734842700b
 --- /dev/null
-+++ b/Documentation/devicetree/bindings/net/xlnx,tsn-endpoint-ethernet-mac.yaml
-@@ -0,0 +1,287 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/xlnx,tsn-endpoint-ethernet-mac.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
++++ b/drivers/net/ethernet/xilinx/tsn/Kconfig
+@@ -0,0 +1,14 @@
++config XILINX_TSN
++	tristate "Xilinx TSN Ethernet driver"
++	depends on OF && HAS_IOMEM
++	select PHYLIB
++	select NET_DEVLINK
++	select NET_DEV_STATS
++	help
++	  This driver supports the Xilinx Time-Sensitive Networking (TSN)
++	  Ethernet IP, which includes multiple Ethernet MACs, a TSN switch,
++	  and an endpoint block. It provides support for scheduling,
++	  traffic shaping, and time synchronization to meet real-time
++	  requirements of industrial Ethernet applications.
 +
-+title: Xilinx TSN Endpoint Ethernet MAC
++	  If unsure, say N.
+diff --git a/drivers/net/ethernet/xilinx/tsn/Makefile b/drivers/net/ethernet/xilinx/tsn/Makefile
+new file mode 100644
+index 000000000000..420497f2d402
+--- /dev/null
++++ b/drivers/net/ethernet/xilinx/tsn/Makefile
+@@ -0,0 +1,2 @@
++obj-$(CONFIG_XILINX_TSN) :=xilinx_tsn.o
++xilinx_tsn-objs := xilinx_tsn_main.o
+diff --git a/drivers/net/ethernet/xilinx/tsn/xilinx_tsn.h b/drivers/net/ethernet/xilinx/tsn/xilinx_tsn.h
+new file mode 100644
+index 000000000000..fe613f73044f
+--- /dev/null
++++ b/drivers/net/ethernet/xilinx/tsn/xilinx_tsn.h
+@@ -0,0 +1,60 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Time Sensitive Networking (TSN) Ethernet MAC driver
++ *
++ * Copyright (C) 2025 Advanced Micro Devices, Inc.
++ */
 +
-+description:
-+  TSN Endpoint Ethernet MAC IP implements IEEE 802.1 Time-Sensitive Networking (TSN)
-+  standards and provides low-latency network connectivity in either Endpoint-only or
-+  Bridged Endpoint configurations. In the Bridged Endpoint mode, the IP integrates a
-+  three-port switch, with two ports connected to the external network and one port
-+  connected to an internal endpoint.It also supports GMII/RGMII interfaces for
-+  connection to an external PHY, enabling full-duplex operation at 100 Mb/s and
-+  1 Gb/s speeds.
++#ifndef XILINX_TSN_H
++#define XILINX_TSN_H
 +
-+maintainers:
-+  - Neeli Srinivas <srinivas.neeli@amd.com>
++#include <linux/clk.h>
++#include <linux/init.h>
++#include <linux/io.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/mutex.h>
++#include <linux/of.h>
++#include <linux/platform_device.h>
++#include <linux/spinlock.h>
 +
-+properties:
-+  compatible:
-+    enum:
-+      - xlnx,tsn-endpoint-ethernet-mac-3.0
-+  reg:
-+    maxItems: 1
++#define TSN_NUM_CLOCKS		6
 +
-+  clocks:
-+    minItems: 6
++#define TSN_DMA_CH_INVALID	GENMASK(7, 0)
++#define TSN_DMA_MAX_TX_CH	GENMASK(3, 0)
++#define TSN_MAX_TX_QUEUE	8
++#define TSN_MIN_PRIORITIES	2
++#define TSN_MAX_PRIORITIES	8
++/**
++ * struct tsn_priv - Main TSN private data structure
++ * @pdev: Platform device handle
++ * @dev: Device pointer for this TSN instance
++ * @res: Platform resource information
++ * @regs_start: Start address (physical) of mapped region
++ * @regs: ioremap()'d base pointer
++ * @clks: Bulk clock data for all required clocks
++ * @tx_lock: Spinlock protecting TX rings and related TX state
++ * @rx_lock: Spinlock protecting RX rings and related RX state
++ * @mdio_lock: Mutex placeholder for future MDIO serialization
++ * @num_priorities: Number of priority queues configured
++ * @num_tx_queues: Number of TX DMA queues
++ * @num_rx_queues: Number of RX DMA queues
++ * @tx_dma_chan_map: Logical TX queue index to DMA channel number mapping.
++ */
++struct tsn_priv {
++	struct platform_device *pdev;
++	struct device *dev;
++	struct resource *res;
++	resource_size_t regs_start;
++	void __iomem *regs;
++	struct clk_bulk_data clks[TSN_NUM_CLOCKS];
++	spinlock_t tx_lock;	/* Protects TX ring buffers */
++	spinlock_t rx_lock;	/* Protects RX ring buffers */
++	struct mutex mdio_lock; /* Serializes MDIO access across all EMACs */
++	u32 num_priorities;
++	u32 num_tx_queues;
++	u32 num_rx_queues;
++	u32 tx_dma_chan_map[TSN_MAX_TX_QUEUE];
++};
 +
-+  clock-names:
-+    items:
-+      - const: gtx
-+      - const: gtx90
-+      - const: host_rxfifo
-+      - const: host_txfifo
-+      - const: ref
-+      - const: s_axi
++#endif /* XILINX_TSN_H */
+diff --git a/drivers/net/ethernet/xilinx/tsn/xilinx_tsn_main.c b/drivers/net/ethernet/xilinx/tsn/xilinx_tsn_main.c
+new file mode 100644
+index 000000000000..2a7f5fbc5510
+--- /dev/null
++++ b/drivers/net/ethernet/xilinx/tsn/xilinx_tsn_main.c
+@@ -0,0 +1,218 @@
++// SPDX-License-Identifier: GPL-2.0
 +
-+  dmas:
-+    minItems: 2
-+    maxItems: 32
++/*
++ * Time Sensitive Networking (TSN) Ethernet MAC driver
++ *
++ * Copyright (C) 2025 Advanced Micro Devices, Inc.
++ */
 +
-+  dma-names:
-+    items:
-+      pattern: "^[tr]x_chan([0-9]|1[0-5])$"
-+    description:
-+      Should be "tx_chan0", "tx_chan1" ... "tx_chan15" for DMA Tx channel
-+      Should be "rx_chan0", "rx_chan1" ... "rx_chan15" for DMA Rx channel
-+    minItems: 2
-+    maxItems: 32
++#include "xilinx_tsn.h"
 +
-+  ranges: true
++static const char * const tsn_clk_names[TSN_NUM_CLOCKS] = {
++	"gtx",
++	"gtx90",
++	"host_rxfifo",
++	"host_txfifo",
++	"ref",
++	"s_axi",
++};
 +
-+  xlnx,num-priorities:
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    minimum: 2
-+    maximum: 8
-+    description:
-+      Number of traffic classes (priorities) configured in the IP.
-+      This is an IP configuration parameter that determines the number of
-+      priority queues available for QoS scheduling. Traffic classes map to
-+      IEEE 802.1Q priority levels (0-7).
++/*
++ * Helper to parse TX queue config subnode referenced by
++ * xlnx,tsn-tx-config. This version enumerates child nodes in order and
++ * assigns DMA channels sequentially (queue0 == first child, etc.)
++ */
++static int tsn_parse_tx_queue_config(struct device *dev, struct tsn_priv *common,
++				     struct device_node *txcfg_np)
++{
++	struct device_node *qnode;
++	unsigned int queue = 0;
++	int ret = 0;
 +
-+  xlnx,tsn-tx-config:
-+    $ref: /schemas/types.yaml#/definitions/phandle
-+    description:
-+      Multiple TX Queue parameters. Phandle to a node that implements
-+      the tx-queues-config.
++	for_each_available_child_of_node(txcfg_np, qnode) {
++		u32 chan;
 +
-+  tx-queues-config:
-+    type: object
-+    description:
-+      TX queue configuration node that maps IP priority queues to
-+      DMA TX channels. The TSN IP supports multiple priority queues for QoS
-+      scheduling, and each queue can be connected to a specific DMA channel.
-+      This mapping defines which DMA TX channel is used to transmit packets
-+      for each priority queue. For example, queue0 with xlnx,dma-channel-num
-+      set to 5 means priority queue 0 uses tx_chan5 for data transfer.
++		if (queue >= common->num_tx_queues) {
++			dev_err(dev, "tx-config: extra child nodes beyond %u ignored\n",
++				common->num_tx_queues);
++			of_node_put(qnode);
++			return -EINVAL;
++		}
 +
-+    patternProperties:
-+      "^queue[0-7]$":
-+        description:
-+          Each subnode represents a priority queue. The xlnx,dma-channel-num
-+          property specifies which DMA TX channel (tx_chan0 to tx_chan15)
-+          is connected to this queue for transmitting packets.
-+        type: object
-+        properties:
-+          xlnx,dma-channel-num:
-+            $ref: /schemas/types.yaml#/definitions/uint32
-+            description:
-+              DMA TX channel number connected to this priority queue.
-+            minimum: 0
-+            maximum: 15
++		ret = of_property_read_u32(qnode, "xlnx,dma-channel-num", &chan);
++		if (ret) {
++			dev_err(dev, "tx-config: Q%u missing xlnx,dma-channel-num\n", queue);
++			of_node_put(qnode);
++			return ret;
++		}
 +
-+        additionalProperties: false
-+    additionalProperties: false
++		if (chan > TSN_DMA_MAX_TX_CH) {
++			dev_err(dev, "tx-config: Q%u channel %u exceeds max %lu\n",
++				queue, chan, TSN_DMA_MAX_TX_CH);
++			of_node_put(qnode);
++			return -EINVAL;
++		}
++		common->tx_dma_chan_map[queue++] = chan;
++	}
 +
-+  '#address-cells':
-+    const: 1
++	if (queue != common->num_tx_queues) {
++		dev_err(dev, "tx-config: described %u queues but expected %u\n",
++			queue, common->num_tx_queues);
++		return -EINVAL;
++	}
 +
-+  '#size-cells':
-+    const: 1
++	return 0;
++}
 +
-+patternProperties:
-+  "^ethernet-mac@":
-+    type: object
-+    $ref: /schemas/net/ethernet-controller.yaml#
-+    required:
-+      - reg
-+      - phy-mode
-+    properties:
-+      reg:
-+        maxItems: 1
++/**
++ * tsn_parse_device_tree - Parse device tree configuration for TSN device
++ * @pdev: Platform device pointer
++ *
++ * Return: 0 on success, negative error code on failure
++ */
++static int tsn_parse_device_tree(struct platform_device *pdev)
++{
++	struct tsn_priv *common = platform_get_drvdata(pdev);
++	struct device_node *txcfg_np = NULL;
++	struct device *dev = &pdev->dev;
++	int i, ret;
 +
-+      phy-mode:
-+        enum:
-+          - gmii
-+          - rgmii
-+          - rgmii-id
++	/* Read number of priorities */
++	ret = of_property_read_u32(dev->of_node, "xlnx,num-priorities", &common->num_priorities);
++	if (ret)
++		return dev_err_probe(dev, ret, "Failed to get xlnx,num-priorities\n");
 +
-+      phy-handle:
-+        $ref: /schemas/types.yaml#/definitions/phandle
++	if (common->num_priorities < TSN_MIN_PRIORITIES ||
++	    common->num_priorities > TSN_MAX_PRIORITIES)
++		return dev_err_probe(dev, -EINVAL, "Invalid xlnx,num-priorities (%u)\n",
++				     common->num_priorities);
 +
-+      mdio:
-+        type: object
-+    additionalProperties: false
++	/* Count TX and RX queues from dma-names property */
++	ret = of_property_count_strings(dev->of_node, "dma-names");
++	if (ret < 0)
++		return dev_err_probe(dev, ret, "Failed to get dma-names\n");
 +
-+  "^ep-mac@":
-+    type: object
-+    $ref: /schemas/net/ethernet-controller.yaml#
-+    properties:
-+      reg:
-+        maxItems: 1
++	common->num_tx_queues = 0;
++	common->num_rx_queues = 0;
 +
-+    additionalProperties: false
++	for (i = 0; i < ret; i++) {
++		const char *dma_name;
 +
-+  "^switch@":
-+    type: object
-+    $ref: /schemas/net/ethernet-switch.yaml#
-+    unevaluatedProperties: false
++		if (of_property_read_string_index(dev->of_node, "dma-names", i, &dma_name))
++			continue;
 +
-+    properties:
-+      reg:
-+        maxItems: 1
++		if (strncmp(dma_name, "tx_chan", 7) == 0)
++			common->num_tx_queues++;
++		else if (strncmp(dma_name, "rx_chan", 7) == 0)
++			common->num_rx_queues++;
++	}
 +
-+      ethernet-ports:
-+        type: object
-+        unevaluatedProperties: false
++	if (!common->num_tx_queues || common->num_tx_queues > TSN_MAX_TX_QUEUE)
++		return dev_err_probe(dev, -EINVAL,
++				     "Invalid TX queue count (%u, max %u)\n",
++				     common->num_tx_queues, TSN_MAX_TX_QUEUE);
 +
-+        properties:
-+          '#address-cells':
-+            const: 1
-+          '#size-cells':
-+            const: 0
++	if (!common->num_rx_queues)
++		return dev_err_probe(dev, -EINVAL, "No RX DMA channels found\n");
 +
-+        patternProperties:
-+          "^port@[0-2]$":
-+            type: object
-+            $ref: ethernet-switch-port.yaml#
-+            unevaluatedProperties: false
++	/* Setup clock IDs */
++	for (i = 0; i < TSN_NUM_CLOCKS; i++)
++		common->clks[i].id = tsn_clk_names[i];
 +
-+            properties:
-+              reg:
-+                maximum: 2
-+              ethernet:
-+                description: Phandle to associated MAC or endpoint node
-+                $ref: /schemas/types.yaml#/definitions/phandle
-+            required:
-+              - reg
-+              - ethernet
-+        required:
-+          - "#address-cells"
-+          - "#size-cells"
-+    required:
-+      - reg
-+additionalProperties: false
++	/* Get all clocks */
++	ret = devm_clk_bulk_get(dev, TSN_NUM_CLOCKS, common->clks);
++	if (ret)
++		return dev_err_probe(dev, ret, "Failed to get clocks\n");
 +
-+required:
-+  - compatible
-+  - reg
-+  - clocks
-+  - clock-names
-+  - dmas
-+  - dma-names
-+  - xlnx,num-priorities
-+  - ranges
++	/* Enable clocks */
++	ret = clk_bulk_prepare_enable(TSN_NUM_CLOCKS, common->clks);
++	if (ret)
++		return dev_err_probe(dev, ret, "Failed to enable clocks\n");
 +
-+examples:
-+  - |
-+    tsn_ip: tsn@80040000 {
-+        compatible = "xlnx,tsn-endpoint-ethernet-mac-3.0";
-+        reg = <0x80040000 0x40000>;
-+        clocks = <&misc_clk_2>, <&misc_clk_2>, <&misc_clk_1>, <&misc_clk_1>, <&misc_clk_3>, <&misc_clk_0>;
-+        clock-names = "gtx", "gtx90", "host_rxfifo", "host_txfifo", "ref", "s_axi";
-+        dmas = <&axi_mcdma_0 0>, <&axi_mcdma_0 1>, <&axi_mcdma_0 2>, <&axi_mcdma_0 3>,
-+               <&axi_mcdma_0 4>, <&axi_mcdma_0 5>, <&axi_mcdma_0 6>, <&axi_mcdma_0 7>,
-+               <&axi_mcdma_0 16>, <&axi_mcdma_0 17>, <&axi_mcdma_0 18>, <&axi_mcdma_0 19>,
-+               <&axi_mcdma_0 20>, <&axi_mcdma_0 21>, <&axi_mcdma_0 22>, <&axi_mcdma_0 23>;
-+        dma-names = "tx_chan0","tx_chan1","tx_chan2","tx_chan3","tx_chan4","tx_chan5","tx_chan6",
-+                    "tx_chan7","rx_chan0","rx_chan1","rx_chan2","rx_chan3","rx_chan4","rx_chan5",
-+                    "rx_chan6","rx_chan7";
-+        xlnx,num-priorities = <8>;
-+        #address-cells = <1>;
-+        #size-cells = <1>;
-+        ranges = <0x0 0x80040000 0x40000>;
-+        xlnx,tsn-tx-config = <&tsn_tx_config>;
-+        tsn_tx_config: tx-queues-config {
-+            queue0 {
-+                xlnx,dma-channel-num = <0x5>;
-+            };
-+            queue1 {
-+                 xlnx,dma-channel-num = <0x4>;
-+            };
-+            queue2 {
-+                 xlnx,dma-channel-num = <0x3>;
-+            };
-+            queue3 {
-+                 xlnx,dma-channel-num = <0x2>;
-+            };
-+            queue4 {
-+                 xlnx,dma-channel-num = <0x1>;
-+            };
-+            queue5 {
-+                 xlnx,dma-channel-num = <0x0>;
-+            };
-+        };
-+        // MAC 1 Node
-+        mac1: ethernet-mac@0 {
-+            reg = <0x0 0x14000>;
-+            phy-mode = "rgmii-id";
-+            phy-handle = <&phy0>;
-+            mdio {
-+            #address-cells = <1>;
-+            #size-cells = <0>;
-+            phy0: ethernet-phy@0 {
-+                device_type = "ethernet-phy";
-+                reg = <0>;
-+            };
-+            };
-+        };
++	for (i = 0; i < TSN_MAX_TX_QUEUE; i++)
++		common->tx_dma_chan_map[i] = TSN_DMA_CH_INVALID;
 +
-+        // MAC 2 Node
-+        mac2: ethernet-mac@20000 {
-+            reg = <0x20000 0x14000>;
-+            phy-mode = "rgmii-id";
-+            phy-handle = <&phy1>;
-+            mdio {
-+            #address-cells = <1>;
-+            #size-cells = <0>;
-+            phy1: ethernet-phy@1 {
-+                device_type = "ethernet-phy";
-+                reg = <1>;
-+            };
-+            };
-+        };
++	txcfg_np = of_parse_phandle(dev->of_node, "xlnx,tsn-tx-config", 0);
++	if (txcfg_np) {
++		ret = tsn_parse_tx_queue_config(dev, common, txcfg_np);
++		of_node_put(txcfg_np);
++		if (ret)
++			goto err_disable_clks;
++	}
 +
-+        // Endpoint Node
-+        ep_mac: ep-mac@16000 {
-+            reg = <0x16000 0xa000>;
-+        };
++	return 0;
 +
-+        // Switch Node
-+        tsn_switch: switch@38000 {
-+            reg = <0x38000 0x8000>;
++err_disable_clks:
++	clk_bulk_disable_unprepare(TSN_NUM_CLOCKS, common->clks);
++	return ret;
++}
 +
-+            ethernet-ports {
-+                #address-cells = <1>;
-+                #size-cells = <0>;
++/**
++ * tsn_ip_probe - Probe TSN IP core device
++ * @pdev: Platform device pointer
++ *
++ * Return: 0 on success, negative error code on failure
++ */
++static int tsn_ip_probe(struct platform_device *pdev)
++{
++	struct tsn_priv *common;
++	int ret;
 +
-+                port@0 {
-+                    reg = <0>;
-+                    ethernet = <&ep_mac>;
-+                };
++	common = devm_kzalloc(&pdev->dev, sizeof(*common), GFP_KERNEL);
++	if (!common)
++		return -ENOMEM;
 +
-+                port@1 {
-+                    reg = <1>;
-+                    ethernet = <&mac1>;
-+                };
++	platform_set_drvdata(pdev, common);
++	common->pdev = pdev;
++	common->dev = &pdev->dev;
 +
-+                port@2 {
-+                    reg = <2>;
-+                    ethernet = <&mac2>;
-+                };
-+            };
-+        };
-+    };
++	/* Initialize synchronization primitives */
++	spin_lock_init(&common->tx_lock);
++	spin_lock_init(&common->rx_lock);
++	mutex_init(&common->mdio_lock);
++
++	common->res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++	if (!common->res)
++		return -ENODEV;
++	common->regs_start = common->res->start;
++	common->regs = devm_ioremap_resource(&pdev->dev, common->res);
++	if (IS_ERR(common->regs))
++		return PTR_ERR(common->regs);
++
++	ret = tsn_parse_device_tree(pdev);
++	if (ret)
++		return ret;
++
++	return 0;
++}
++
++/**
++ * tsn_ip_remove - Remove TSN IP core device
++ * @pdev: Platform device pointer
++ */
++static void tsn_ip_remove(struct platform_device *pdev)
++{
++	struct tsn_priv *common = platform_get_drvdata(pdev);
++
++	clk_bulk_disable_unprepare(TSN_NUM_CLOCKS, common->clks);
++}
++
++static const struct of_device_id tsn_of_match[] = {
++	{ .compatible = "xlnx,tsn-endpoint-ethernet-mac-3.0", },
++	{ }
++};
++MODULE_DEVICE_TABLE(of, tsn_of_match);
++
++static struct platform_driver tsn_driver = {
++	.probe = tsn_ip_probe,
++	.remove = tsn_ip_remove,
++	.driver = {
++		.name = "xilinx-tsn",
++		.of_match_table = tsn_of_match,
++	},
++};
++module_platform_driver(tsn_driver);
++
++MODULE_AUTHOR("Neeli Srinivas <srinivas.neeli@amd.com>");
++MODULE_DESCRIPTION("Time Sensitive Networking (TSN) Ethernet MAC driver");
++MODULE_LICENSE("GPL");
 -- 
 2.25.1
 
