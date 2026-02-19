@@ -1,198 +1,191 @@
-Return-Path: <netdev+bounces-259455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259456-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yDZdIZ4Hl2lmtwIAu9opvQ
-	(envelope-from <netdev+bounces-259455-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 13:52:46 +0100
+	id 4KVYMNMHl2lmtwIAu9opvQ
+	(envelope-from <netdev+bounces-259456-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 13:53:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0DFB15EC19
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 13:52:45 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67AD315EC48
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 13:53:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AB5313047E68
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 12:51:22 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CE02330098B4
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 12:53:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33F9B3382D3;
-	Thu, 19 Feb 2026 12:51:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4759E33A6FB;
+	Thu, 19 Feb 2026 12:53:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="gJTuk5OC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PySoHfpM"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2877334373;
-	Thu, 19 Feb 2026 12:51:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C576261B9C
+	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 12:53:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771505482; cv=none; b=ZuCLCIoalJg0v+XssuzkjD8aY4Hika1oejMBCjNyyXRJIwZIw6bz2UQCoGu8uI1u83Kd4Z8Ee+PPbjbSmHqfehA6UmlxGYSRW1strqOna7oK/Y3aK/6T5vtEFCwP9vcSEc2ii2iAYljWrcwnZ5TKrvskrCD8NwR9GCaFsNR0KNk=
+	t=1771505616; cv=none; b=EZUtRogNt8wZDZyZJHLkhvkNNJHGNmwEBerzhK5JDhGxlsE2PDI5Ktc8eTxoG6M1iVTp09go7dCmavjpVBzsWbYofHeEfbZEI9pWSDL2R6sQGgj2wU3b0a+10BKZjKXmlkgOJwobp6JHleCOeDNwv+jinuEbNMWpAcsSCY/Nd2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771505482; c=relaxed/simple;
-	bh=dJs4LN5IDxfdlRoPDGT6USPyxzT1SgXwTDOL8f4EIBA=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=MvyGJWFzRp5QFWpf0g+Jv+xn68GkHTvw9vKqFjDaheyd5NSJr7v/B0O8ReWLB71NkUkWlsoWdxUAcHPVR9RVpoYf32+NZlv0bZgCidN+3gikcCSIO8q0pZ+bH80vwCLiGi3/vD9oLMR10X5iEKrD6bc4MR+sKW+iWtj7uULeUeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=gJTuk5OC; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=UW9TZnyZ2Y3LKNh+2F0ZhT91QThw6bRR+2OtOzOSz7Q=; b=gJTuk5OCkGKe0b/nvgnA1+x3VO
-	V/ipmXPTKs4LAzJ1cGwncsENwC43Yui2ugL3KwPufR0ejtfx3OKgfAH9YYneUMcDA5XPvW7zgAzNk
-	v/Ue2qGugmLuJ22XLR1jyvY8tESLmAKSMUa0kJld5kvN5Ma6dSnbpbM3qGamT2pwAcLRgBkSCpKYR
-	mrsgZFt/MIBg7e0Ai01knbybfcyjAFYqlSEP9vMX4A+DAURpfUATFeqVH+kOBucEshUlbDzIwhgzs
-	GfUrbZ3ps4xnrK6TysSc0KYeCWT9IyzBazLWgLys54DIQV+tQLkt/LjAc1n/fo2SM5ZTDMVM17vjt
-	eV5fRIxA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:58024 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vt3Ut-000000000tg-2pht;
-	Thu, 19 Feb 2026 12:51:12 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vt3Us-0000000A5ei-04Bg;
-	Thu, 19 Feb 2026 12:51:10 +0000
-In-Reply-To: <aZcGxDBwfMXHbo_O@shell.armlinux.org.uk>
-References: <aZcGxDBwfMXHbo_O@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-phy@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>
-Subject: [PATCH RFC net-next+ 9/9] net: stmmac: qcom-ethqos: remove
- phy_set_mode_ext() after phy_power_on()
+	s=arc-20240116; t=1771505616; c=relaxed/simple;
+	bh=KvKfnnXRIGiSC2qzkC6wSjgCJkoB/qA7zqQFhWOs+0c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WvRP/uqr4XVx89fn4jB1/ti2N4A9Lqn0vuWbnzfPSgPauNDsG2MtAukG6UcKfAIeflWTmk/QYJ7s3fgyN9HRjSABRW0LAhGlm1KOv4OyWz3kUgBUhcbr1v+PO84qJWBnGZP11QtbZOhVwBt+Z5415/GGtOA1rUiAtXGJRdn5Tg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PySoHfpM; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1771505614; x=1803041614;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=KvKfnnXRIGiSC2qzkC6wSjgCJkoB/qA7zqQFhWOs+0c=;
+  b=PySoHfpMR88w75cr/TMfFShZN46iWxVehw6+3rgXdBcLOtpW5yESYp2a
+   fsFqFQKHBZ2j/s8rAzBaBE+ttR8dEYr++o5YXK1MhgqZhK7P+8K3JO808
+   7hgo+utuhQKNVrwgXOq7Tc43fkdN9Wc5hI8hv2gRPDxl/vkt5co/sgGPv
+   x1I9T+QIYdf4mRVC2PfJYEx36gsE7jnP6pkxIuK39g7pQyp54Y89tGLLs
+   LGBR/s5fCC0EiT79lG3XlqIXICLc0vFC/lCmp9aMZKQ0U4bKKxD58aMCz
+   7SAcELgElgvDIFidgOpRdgKIa8OwkI4wYjnkKKWiJ/nsvPt8EN2iyYieD
+   g==;
+X-CSE-ConnectionGUID: zdxCTzj+RTmfHcRwKYo2tg==
+X-CSE-MsgGUID: 5OWkY768R6iz0PgCU2UKxg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11705"; a="72765876"
+X-IronPort-AV: E=Sophos;i="6.21,300,1763452800"; 
+   d="scan'208";a="72765876"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2026 04:53:33 -0800
+X-CSE-ConnectionGUID: khK1/qZGTE2Cj3f2xIopWA==
+X-CSE-MsgGUID: 7iOclODnQzqetEIeZgKamA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,299,1763452800"; 
+   d="scan'208";a="219511560"
+Received: from unknown (HELO [10.217.181.1]) ([10.217.181.1])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2026 04:53:33 -0800
+Message-ID: <650853a0-6fdb-42cb-9feb-c9166439bcaa@linux.intel.com>
+Date: Thu, 19 Feb 2026 13:53:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vt3Us-0000000A5ei-04Bg@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 19 Feb 2026 12:51:10 +0000
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] ice: implement symmetric
+ RSS hash configuration
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+ intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com
+Cc: netdev@vger.kernel.org
+References: <20260217130039.1802805-1-aleksandr.loktionov@intel.com>
+Content-Language: en-US
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+In-Reply-To: <20260217130039.1802805-1-aleksandr.loktionov@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259455-lists,netdev=lfdr.de,kernel];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259456-lists,netdev=lfdr.de];
+	RCPT_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.962];
+	FROM_NEQ_ENVFROM(0.00)[marcin.szycik@linux.intel.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:email,rmk-PC.armlinux.org.uk:mid]
-X-Rspamd-Queue-Id: F0DFB15EC19
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 67AD315EC48
 X-Rspamd-Action: no action
 
-The call to phy_set_mode_ext() after phy_power_on() was a work-around
-for the qcom-sgmii-eth SerDes driver that only re-enabled its clocks on
-phy_power_on() but did not configure the PHY. Now that the SerDes driver
-fully configures the SerDes at phy_power_on(), there is no need to call
-phy_set_mode_ext() immediately afterwards.
 
-This also means we no longer need to record the previous operating mode
-of the driver - this is up to the SerDes driver. In any case, the only
-thing that we care about is the SerDes provides the necessary clocks to
-the stmmac core to allow it to reset at this point. The actual mode is
-irrelevant at this point as the correct mode will be configured in
-ethqos_mac_finish_serdes() just before the network device is brought
-online.
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- .../stmicro/stmmac/dwmac-qcom-ethqos.c         | 18 ++----------------
- 1 file changed, 2 insertions(+), 16 deletions(-)
+On 17.02.2026 14:00, Aleksandr Loktionov wrote:
+> The driver advertises symmetric RSS support via supported_input_xfrm
+> but ice_set_rxfh() ignored the input_xfrm parameter, making it
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index 65316c603cae..20d0d113965d 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -105,7 +105,6 @@ struct qcom_ethqos {
- 
- 	struct clk *link_clk;
- 	struct phy *serdes_phy;
--	phy_interface_t serdes_mode;
- 	phy_interface_t phy_mode;
- 
- 	const struct ethqos_emac_por *rgmii_por;
-@@ -648,17 +647,8 @@ static int qcom_ethqos_serdes_powerup(struct net_device *ndev, void *priv)
- 		return ret;
- 
- 	ret = phy_power_on(ethqos->serdes_phy);
--	if (ret) {
--		phy_exit(ethqos->serdes_phy);
--		return ret;
--	}
--
--	ret = phy_set_mode(ethqos->serdes_phy, PHY_MODE_ETHERNET,
--			   ethqos->serdes_mode);
--	if (ret) {
--		phy_power_off(ethqos->serdes_phy);
-+	if (ret)
- 		phy_exit(ethqos->serdes_phy);
--	}
- 
- 	return ret;
- }
-@@ -681,12 +671,9 @@ static int ethqos_mac_finish_serdes(struct net_device *ndev, void *priv,
- 	qcom_ethqos_set_sgmii_loopback(ethqos, false);
- 
- 	if (interface == PHY_INTERFACE_MODE_SGMII ||
--	    interface == PHY_INTERFACE_MODE_2500BASEX) {
-+	    interface == PHY_INTERFACE_MODE_2500BASEX)
- 		ret = phy_set_mode(ethqos->serdes_phy, PHY_MODE_ETHERNET,
- 				   interface);
--		if (ret == 0)
--			ethqos->serdes_mode = interface;
--	}
- 
- 	return ret;
- }
-@@ -839,7 +826,6 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
- 		plat_dat->host_dma_width = data->dma_addr_width;
- 
- 	if (ethqos->serdes_phy) {
--		ethqos->serdes_mode = PHY_INTERFACE_MODE_SGMII;
- 		plat_dat->serdes_powerup = qcom_ethqos_serdes_powerup;
- 		plat_dat->serdes_powerdown  = qcom_ethqos_serdes_powerdown;
- 	}
--- 
-2.47.3
+s/ignored/ignores/
 
+> impossible to configure symmetric hashing.
+> 
+> Fix ice_set_rxfh() to check rxfh->input_xfrm and call
+> ice_set_rss_hfunc() with ICE_AQ_VSI_Q_OPT_RSS_HASH_SYM_TPLZ when
+> RXH_XFRM_SYM_XOR is requested.
+> 
+> Modify ice_set_rss_vsi_ctx() to use vsi->rss_hfunc instead of
+> hardcoding ICE_AQ_VSI_Q_OPT_RSS_HASH_TPLZ, and export it for
+> use by ice_set_rxfh().
+> 
+> The kernel requires get_rxfh_fields() to report symmetric hash
+> configurations when symmetric transforms are supported. Update
+> ice_get_rxfh_fields() to return symmetric field configuration
+> (src+dst IP and ports) for all flow types.
+> 
+> Tested with tools/testing/selftests/drivers/net/hw/rss_input_xfrm.py
+> 
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> ---
+> v1 -> v2 preserve valid symmetric RSS fields.
+> ---
+>  drivers/net/ethernet/intel/ice/ice_ethtool.c | 45 ++++++++++++++++----
+>  drivers/net/ethernet/intel/ice/ice_lib.c     |  7 +--
+>  drivers/net/ethernet/intel/ice/ice_lib.h     |  1 +
+>  3 files changed, 41 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+> index c6bc29c..27c97ca 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+> @@ -3008,14 +3008,18 @@ ice_set_rxfh_fields(struct net_device *netdev,
+>  	return 0;
+>  }
+>  
+> +#define ICE_RSS_ALLOWED_FIELDS	(RXH_IP_SRC | RXH_IP_DST | RXH_L4_B_0_1 | RXH_L4_B_2_3)
+> +#define ICE_RSS_L3_PAIR		(RXH_IP_SRC | RXH_IP_DST)
+> +#define ICE_RSS_L4_PAIR		(RXH_L4_B_0_1 | RXH_L4_B_2_3)
+> +
+>  static int
+>  ice_get_rxfh_fields(struct net_device *netdev, struct ethtool_rxfh_fields *nfc)
+>  {
+>  	struct ice_netdev_priv *np = netdev_priv(netdev);
+>  	struct ice_vsi *vsi = np->vsi;
+>  	struct ice_pf *pf = vsi->back;
+> +	u64 l3, l4, hash_flds;
+>  	struct device *dev;
+> -	u64 hash_flds;
+>  	bool symm;
+>  	u32 hdrs;
+>  
+> @@ -3037,8 +3041,10 @@ ice_get_rxfh_fields(struct net_device *netdev, struct ethtool_rxfh_fields *nfc)
+>  
+>  	hash_flds = ice_get_rss_cfg(&pf->hw, vsi->idx, hdrs, &symm);
+>  	if (hash_flds == ICE_HASH_INVALID) {
+> -		dev_dbg(dev, "No hash fields found for the given header type, vsi num = %d\n",
+> +		/* Provide default symmetric hash fields when no config exists */
+> +		dev_dbg(dev, "No RSS config for this flow, using symmetric defaults, vsi num = %d\n",
+>  			vsi->vsi_num);
+> +		nfc->data = RXH_IP_SRC | RXH_IP_DST | RXH_L4_B_0_1 | RXH_L4_B_2_3;
+
+This is the same as ICE_RSS_ALLOWED_FIELDS, use it or:
+#define ICE_RSS_DEFAULT_FIELDS ICE_RSS_ALLOWED_FIELDS
+
+>  		return 0;
+>  	}
+
+Thanks,
+Marcin
+
+---8<---
 
