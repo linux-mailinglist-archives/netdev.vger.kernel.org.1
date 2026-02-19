@@ -1,256 +1,170 @@
-Return-Path: <netdev+bounces-259411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259412-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wA+JFZDClmnjmAIAu9opvQ
-	(envelope-from <netdev+bounces-259411-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 08:58:08 +0100
+	id kA1VF3LNlmn4nwIAu9opvQ
+	(envelope-from <netdev+bounces-259412-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 09:44:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10CAD15CE04
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 08:58:08 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B614E15D188
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 09:44:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A1F683022579
-	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 07:58:05 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id ED65C3008C16
+	for <lists+netdev@lfdr.de>; Thu, 19 Feb 2026 08:44:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C91D033468F;
-	Thu, 19 Feb 2026 07:58:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="lkQr5cRZ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BmyviFyt";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="lkQr5cRZ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BmyviFyt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F0B633507D;
+	Thu, 19 Feb 2026 08:44:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B0843093DE
-	for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 07:58:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1851233342E;
+	Thu, 19 Feb 2026 08:44:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771487882; cv=none; b=tmSl/RugL2wn6Zsb3CgujcPYmgAu/BQbXBazlg6a9SjLraXATvz6E3/qITprkcMStGvh+fVXdjjLFlzyr3//m28amN8cZg7RSgLDAMe5r/BAP8RXuPL1omzWe1uhD9Qp2DD6AQWagc4NLH29FFFeMf1PLFFBP0k40bs8/qhr9as=
+	t=1771490670; cv=none; b=h+4aJ9wMrR5hm2xChJ8xdqH3ZgPB+rGhqWC6Mc9NGciQTmVMWT0qUFSWSFRtf2GAbixI3Gx5w108wMSVZBn4/JqbTl4l5aIo6ifYWA5fpB3b8rto88pAZpbm8fSZlx8TTfVPmtqapZJDQ5ZaPWdn4qYwaIwwKhlNu1EW+EToVxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771487882; c=relaxed/simple;
-	bh=e5bN8nw75LATuV/fHy7w/iNFPX9Ka0rmFDPS+JrWCS0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GY5uXZ4DPG8WZl2L6ZOz+p7EJxPKdC5dgJBnzPyskvy6xvtgjEDjzuxfPfrpbaqilB7C/hdoZgXvmKqbsEwTjcC2m8XIdkhkpX6kPV4K8dh60I2cUyLOmbDNDVR/e8lcwCGt6/VVQW+wvn1yaFTt244405pYajHtbS3BYWGldi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=lkQr5cRZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BmyviFyt; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=lkQr5cRZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BmyviFyt; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	s=arc-20240116; t=1771490670; c=relaxed/simple;
+	bh=q86tA4VbUkx+OqyW+v68k1AhOLR3wLhIMOukRa1X0/w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RNJ7kp7EwCrDrRRSE7G8vUk90azP0Uvp+DLcXTIGVD2oD4H07jx/j0Kxh1PpOjAc8CfLtraFOPM4fV5E7SrVEmjZeJfxB0evmeAaQ8DqHi3Sqq7NerJFI4e8hJKtvtlzZqDhEJbQC4cEs4LfbkwnGohsTsHGU3DpccxlkNXmfcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.192] (ip5f5af0dc.dynamic.kabel-deutschland.de [95.90.240.220])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 46A055BCC3;
-	Thu, 19 Feb 2026 07:57:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1771487878; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=Ygjc/uH2gjSmPoe9nD4e21U+qRN3Vh3aXZUJ/DBOSps=;
-	b=lkQr5cRZVVXKMbgZ/bnWrsQSgGaFIDWyHzQijMCF83tGILJJ+kdny9k9jYLEdUAFEiVn0i
-	7EzZaYmIGaMmo+FRLJXxuse85ZO5YYxm8zGyi5uYJUa9H3qdn04WF89CkLY2KCcXSqRKFZ
-	QzAFGGVUNwnWwOD5p3CZE2jazqalAaI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1771487878;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=Ygjc/uH2gjSmPoe9nD4e21U+qRN3Vh3aXZUJ/DBOSps=;
-	b=BmyviFytapaDMrbcJOaJBxwRnljsqL/83j5ornbQcQ85udWwRUXNYVwQUoSaNdXEUyIWXo
-	D/YeceNI6M4hf4AQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1771487878; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=Ygjc/uH2gjSmPoe9nD4e21U+qRN3Vh3aXZUJ/DBOSps=;
-	b=lkQr5cRZVVXKMbgZ/bnWrsQSgGaFIDWyHzQijMCF83tGILJJ+kdny9k9jYLEdUAFEiVn0i
-	7EzZaYmIGaMmo+FRLJXxuse85ZO5YYxm8zGyi5uYJUa9H3qdn04WF89CkLY2KCcXSqRKFZ
-	QzAFGGVUNwnWwOD5p3CZE2jazqalAaI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1771487878;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=Ygjc/uH2gjSmPoe9nD4e21U+qRN3Vh3aXZUJ/DBOSps=;
-	b=BmyviFytapaDMrbcJOaJBxwRnljsqL/83j5ornbQcQ85udWwRUXNYVwQUoSaNdXEUyIWXo
-	D/YeceNI6M4hf4AQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 684EE3EA65;
-	Thu, 19 Feb 2026 07:57:57 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id UYgaFoXClml2SwAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Thu, 19 Feb 2026 07:57:57 +0000
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-To: netdev@vger.kernel.org
-Cc: rds-devel@oss.oracle.com,
-	linux-rdma@vger.kernel.org,
-	gerd.rausch@oracle.com,
-	horms@kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	allison.henderson@oracle.com,
-	Fernando Fernandez Mancera <fmancera@suse.de>,
-	syzbot+5efae91f60932839f0a5@syzkaller.appspotmail.com
-Subject: [PATCH net v3] net/rds: fix recursive lock in rds_tcp_conn_slots_available
-Date: Thu, 19 Feb 2026 08:57:38 +0100
-Message-ID: <20260219075738.4403-1-fmancera@suse.de>
-X-Mailer: git-send-email 2.51.0
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id F1F814C2C37D57;
+	Thu, 19 Feb 2026 09:43:50 +0100 (CET)
+Message-ID: <6cf745e5-55fb-4163-8c37-8ed1ef477fff@molgen.mpg.de>
+Date: Thu, 19 Feb 2026 09:43:50 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: bnxt_en: BCM57414: 0000:c4:00.0 (unnamed net_device)
+ (uninitialized): Device requests max timeout of 100 seconds, may trigger hung
+ task watchdog
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: Pavan Chebbi <pavan.chebbi@broadcom.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+References: <ff733f84-9688-48af-bb11-12362d6b9758@molgen.mpg.de>
+ <CACKFLin5vLXDBhheP7Tm7br0-Zew1zpdfyZw3Lu1EiHx9Fw8uQ@mail.gmail.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <CACKFLin5vLXDBhheP7Tm7br0-Zew1zpdfyZw3Lu1EiHx9Fw8uQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -1.30
-X-Spam-Level: 
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259411-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[suse.de:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev,5efae91f60932839f0a5];
-	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_FROM(0.00)[bounces-259412-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[mpg.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,suse.de:mid,suse.de:dkim,suse.de:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,appspotmail.com:email]
-X-Rspamd-Queue-Id: 10CAD15CE04
+	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.962];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	R_DKIM_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mpg.de:email,molgen.mpg.de:mid]
+X-Rspamd-Queue-Id: B614E15D188
 X-Rspamd-Action: no action
 
-syzbot reported a recursive lock warning in rds_tcp_get_peer_sport() as
-it calls inet6_getname() which acquires the socket lock that was already
-held by __release_sock().
+Dear Michael,
 
- kworker/u8:6/2985 is trying to acquire lock:
- ffff88807a07aa20 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1709 [inline]
- ffff88807a07aa20 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: inet6_getname+0x15d/0x650 net/ipv6/af_inet6.c:533
 
- but task is already holding lock:
- ffff88807a07aa20 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1709 [inline]
- ffff88807a07aa20 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: tcp_sock_set_cork+0x2c/0x2e0 net/ipv4/tcp.c:3694
-   lock_sock_nested+0x48/0x100 net/core/sock.c:3780
-   lock_sock include/net/sock.h:1709 [inline]
-   inet6_getname+0x15d/0x650 net/ipv6/af_inet6.c:533
-   rds_tcp_get_peer_sport net/rds/tcp_listen.c:70 [inline]
-   rds_tcp_conn_slots_available+0x288/0x470 net/rds/tcp_listen.c:149
-   rds_recv_hs_exthdrs+0x60f/0x7c0 net/rds/recv.c:265
-   rds_recv_incoming+0x9f6/0x12d0 net/rds/recv.c:389
-   rds_tcp_data_recv+0x7f1/0xa40 net/rds/tcp_recv.c:243
-   __tcp_read_sock+0x196/0x970 net/ipv4/tcp.c:1702
-   rds_tcp_read_sock net/rds/tcp_recv.c:277 [inline]
-   rds_tcp_data_ready+0x369/0x950 net/rds/tcp_recv.c:331
-   tcp_rcv_established+0x19e9/0x2670 net/ipv4/tcp_input.c:6675
-   tcp_v6_do_rcv+0x8eb/0x1ba0 net/ipv6/tcp_ipv6.c:1609
-   sk_backlog_rcv include/net/sock.h:1185 [inline]
-   __release_sock+0x1b8/0x3a0 net/core/sock.c:3213
+Thank you for your reply.
 
-Reading from the socket struct directly is safe from possible paths. For
-rds_tcp_accept_one(), the socket has just been accepted and is not yet
-exposed to concurrent access. For rds_tcp_conn_slots_available(), direct
-access avoids the recursive deadlock seen during backlog processing
-where the socket lock is already held from the __release_sock().
+Am 12.02.26 um 20:10 schrieb Michael Chan:
+> On Thu, Feb 12, 2026 at 10:30 AM Paul Menzel <pmenzel@molgen.mpg.de> wrote:
+> 
+>> There seem to be two problems:
+>>
+>> 1.  It’s logged before the name is known.
+> 
+> Yes, this information is received from the first FW response when
+> probing the device.  So the netdev name is not known yet and the PCI
+> device number is used instead.
 
-However, rds_tcp_conn_slots_available() is also called from the normal
-softirq path via tcp_data_ready() where the lock is not held. This is
-also safe because inet_dport is a stable 16 bits field. A READ_ONCE()
-annotation as the value might be accessed lockless in a concurrent
-access context.
+Hmm, it’s still ugly. ;-) Why not log it later, or don’t use that 
+logging macro and use something else, that does not expect the netdev name?
 
-Note that it is also safe to call rds_tcp_conn_slots_available() from
-rds_conn_shutdown() because the fan-out is disabled.
+>> 2.  The timeout of 100 s seems higher than the one you expect, which is
+>> 60 s [1].
+> 
+> I believe the latest FW should use 60 seconds, but there are older FW
+> in the field that use 100 seconds.
 
-Fixes: 9d27a0fb122f ("net/rds: Trigger rds_send_ping() more than once")
-Reported-by: syzbot+5efae91f60932839f0a5@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=5efae91f60932839f0a5
-Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
----
-v2: clarified commit message and add a comment around
-rds_conn_shutdown() path 
-v3: used READ_ONCE() for lockless read and adjusted commit message
----
- net/rds/connection.c |  3 +++
- net/rds/tcp_listen.c | 28 +++++-----------------------
- 2 files changed, 8 insertions(+), 23 deletions(-)
+We just bought the Dell server, and the Broadcom BCM57414 has the 
+firmware version below:
 
-diff --git a/net/rds/connection.c b/net/rds/connection.c
-index 185f73b01694..a542f94c0214 100644
---- a/net/rds/connection.c
-+++ b/net/rds/connection.c
-@@ -455,6 +455,9 @@ void rds_conn_shutdown(struct rds_conn_path *cp)
- 		rcu_read_unlock();
- 	}
- 
-+	/* we do not hold the socket lock here but it is safe because
-+	 * fan-out is disabled when calling conn_slots_available()
-+	 */
- 	if (conn->c_trans->conn_slots_available)
- 		conn->c_trans->conn_slots_available(conn, false);
- }
-diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
-index 6fb5c928b8fd..dce7ac9d3197 100644
---- a/net/rds/tcp_listen.c
-+++ b/net/rds/tcp_listen.c
-@@ -59,30 +59,12 @@ void rds_tcp_keepalive(struct socket *sock)
- static int
- rds_tcp_get_peer_sport(struct socket *sock)
- {
--	union {
--		struct sockaddr_storage storage;
--		struct sockaddr addr;
--		struct sockaddr_in sin;
--		struct sockaddr_in6 sin6;
--	} saddr;
--	int sport;
--
--	if (kernel_getpeername(sock, &saddr.addr) >= 0) {
--		switch (saddr.addr.sa_family) {
--		case AF_INET:
--			sport = ntohs(saddr.sin.sin_port);
--			break;
--		case AF_INET6:
--			sport = ntohs(saddr.sin6.sin6_port);
--			break;
--		default:
--			sport = -1;
--		}
--	} else {
--		sport = -1;
--	}
-+	struct sock *sk = sock->sk;
-+
-+	if (!sk)
-+		return -1;
- 
--	return sport;
-+	return ntohs(READ_ONCE(inet_sk(sk)->inet_dport));
- }
- 
- /* rds_tcp_accept_one_path(): if accepting on cp_index > 0, make sure the
--- 
-2.53.0
+     $ ethtool -i net02
+     […]
+     firmware-version: 233.0.195.0/pkg 23.31.18.10
+     […]
 
+It’d be great, if you told me the current firmware version from 
+Broadcom, so that I can point Dell to it and ask to release an update?
+
+(By the way, why not log this version too, so it shows up in `dmesg`?)
+
+>>       > But 60 seconds is the timeout on most production FW and cannot be
+>>       > reduced further.
+>>
+>> It looks like you addressed some of this in commit 0fcad44a86bd
+>> (bnxt_en: Change FW message timeout warning) and commit 8ff617513996
+>> (bnxt_en: hide CONFIG_DETECT_HUNG_TASK specific code), merged in Linux
+>> v6.16-rc1. Both were not backported to the 6.12 LTS series. Also, it
+>> looks like they do not address the first issue.
+>>
+>> As we do have `CONFIG_DETECT_HUNG_TASK` unset, we would not see the
+>> warning with the patches.
+>>
+>>       $ grep HUNG_TASK /boot/config-6.12.49.mx64.487
+>>       # CONFIG_DETECT_HUNG_TASK is not set
+>>
+>> I’d recommend to have both commits backported. Will you do this, or
+>> should I contact the stable folks?
+> 
+> If AUTOSEL has not selected these patches for stable, I can request to
+> have these backported.  I agree that the warning is annoying.  I will
+> do it later today.
+
+Thank you for sending in the request. I found it in the archives, and 
+it’s queued for 6.12.74 [2].
+
+
+Kind regards,
+
+Paul
+
+
+[1]: 
+https://lore.kernel.org/all/CACKFLik3qQ46i3_wRpm0OnaNnMcMc-hVNrFt_0U9yzzjNrm4VA@mail.gmail.com/t/#u
+[2]: 
+https://lore.kernel.org/all/20260217200005.998240758@linuxfoundation.org/
 
