@@ -1,148 +1,113 @@
-Return-Path: <netdev+bounces-259712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259713-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EKz9IkhfmGnzHAMAu9opvQ
-	(envelope-from <netdev+bounces-259712-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 14:19:04 +0100
+	id MAMvJaRfmGnzHAMAu9opvQ
+	(envelope-from <netdev+bounces-259713-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 14:20:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08322167C01
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 14:19:03 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id F416F167C3D
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 14:20:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BA4C7304F49A
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 13:17:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6DD5930790AB
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 13:19:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6742D343D9E;
-	Fri, 20 Feb 2026 13:17:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C73DA3451B2;
+	Fri, 20 Feb 2026 13:19:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b="A/selhji"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DUALUD8b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 690151CD1E4
-	for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 13:17:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D400343D9E;
+	Fri, 20 Feb 2026 13:19:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771593426; cv=none; b=H87GJuHkcnBB1ldk8AxK8rukiLf+WeYkZN0/18FiwEYH/ugSi0MsGktXNxkXogApQXRzSF0a3UXcQYW8AS2qUPyOgyU5E6hupcSq4JWe7xl5q9aPlPGEHPV11OGmsBNzH8a0LaGk943IyhCopIL+Ux2IqIAhedSOjJJr6o63XZ4=
+	t=1771593577; cv=none; b=Ft6mkAURuVWhgWFXAIU7RPFmltrzkTN5pC+9yd2bYSPhc31IcDrRU9PYehRnVp2hTjGYtymV+jj/ZYyaK4NyNmZ0B8lxTs9uya2TsqYzDxOVStfsQwOEnNY1G81S80+mVoM2czYfYQPURMU0AfmlcURP4uSv1klKPsntXoNr3PU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771593426; c=relaxed/simple;
-	bh=q9gM4WcCB+3YQq34MqtXMaVgKKPtqg0dElkkwl6GeiE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=XrCEqhAmKI6z/s2YFPIKvE9CkLrifkl/e95NFsjkthPqB8meEeLcKyC40O2VG5A5dS7DC7r3LhJGg6hdePBKu7TwVUOzDyvwgJkWvQpV52vwWP5b6dOlmK97cp2jJnYxVHaV5OVq3GI+5HsD0dZoOnaxJ6zn3yfe058HBhLZvhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b=A/selhji; arc=none smtp.client-ip=185.67.36.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout01.posteo.de (Postfix) with ESMTPS id 15949240028
-	for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 14:16:56 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=posteo.net; s=2017;
-	t=1771593417; bh=lKGbTAK+8Ycx+lfEIrFGLvCjSvLBMGu3yMZUrY+M6Xw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type:
-	 From;
-	b=A/selhji/JpxAz0OneLMCzvLoQ6zDi2bnVm7IHwAVtrmog/dgxyjx/Ah5w3Y4tdrc
-	 2e920XCyMmhF9pDDMijWDMEetYg7wMcL25DFubNYBN9ewebJ/JN0PhoU2HGK32xwYY
-	 lW68aNg/XPbI39moeCAXnrf4zJhUjpfaTce49BhnFMyaVc0VWX8oneJBAKR8LYHez+
-	 OzunoYof3Fok0cars8b7KeqyIbim+baBFcuW7DH2hqq6fLib1ITvNVZLVnHefjGFlO
-	 fdc+YAxd340bsky9YVWC3EwBik6fgE1eTH9Wkop8xCfpD/MtDjkd35Zb1Tw6UaBkBU
-	 QR6PuEtx4YKeQ==
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4fHW480krLz6txm;
-	Fri, 20 Feb 2026 14:16:56 +0100 (CET)
-From: Charalampos Mitrodimas <charmitro@posteo.net>
+	s=arc-20240116; t=1771593577; c=relaxed/simple;
+	bh=Z9baX1Oc+0kIjmmdNJGyqpVBLR+OE/bICX4S4c8DmYs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Smfzp92E7XHqWokLsJY6ZrKKkQfC9jtxmTKUaMKdMzfxsfu9VrdF4NvtOvYvr3leSLmERBLAy6sfnmW29Q34li4RS5/Mh2oZzkHaFbHGZEjf8g+1Ko/8b/Pz4DkTrR3Cux48mCm1akFJo8DYSrnzARAfa14ewXNZ/6RmLR/C6SE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=DUALUD8b; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=BDq9fah7f/OdHSSrS3O1cbxrV2lTIxsoY2PgpJA2L3o=; b=DUALUD8bPdRkoch97BuRH8q7+h
+	xAAm34QnuoubNAAKhIINeh9RbQ/RMeN7yrPUEYMuXJL4GJ9Iv09vj2ubhKKxTtlaIvEZsv5SVIrK8
+	MO3VsDRqDYTTsGFSWXj4EQc9HCDH+76mURXtj3EkflZB+TQMntqhl7pG+c0DULsH2uP0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vtQPu-0084QU-OD; Fri, 20 Feb 2026 14:19:34 +0100
+Date: Fri, 20 Feb 2026 14:19:34 +0100
+From: Andrew Lunn <andrew@lunn.ch>
 To: Ian Ray <ian.ray@gehealthcare.com>
-Cc: netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH] nfc: nxp-nci: allow GPIOs to sleep
-In-Reply-To: <20260220115906.102470-1-ian.ray@gehealthcare.com>
+Message-ID: <d991e47a-0275-4f8d-afef-0e26fbd2bfdc@lunn.ch>
 References: <20260220115906.102470-1-ian.ray@gehealthcare.com>
-Date: Fri, 20 Feb 2026 13:16:56 +0000
-Message-ID: <875x7rblmg.fsf@posteo.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260220115906.102470-1-ian.ray@gehealthcare.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[posteo.net,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[posteo.net:s=2017];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259712-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	TAGGED_FROM(0.00)[bounces-259713-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[posteo.net:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_THREE(0.00)[3];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[charmitro@posteo.net,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[gehealthcare.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,posteo.net:mid,posteo.net:dkim]
-X-Rspamd-Queue-Id: 08322167C01
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
+X-Rspamd-Queue-Id: F416F167C3D
 X-Rspamd-Action: no action
 
-Ian Ray <ian.ray@gehealthcare.com> writes:
-
+On Fri, Feb 20, 2026 at 01:59:05PM +0200, Ian Ray wrote:
 > Allow the firmware and enable GPIOs to sleep.
->
+> 
 > This fixes a `WARN_ON' and allows the driver to operate GPIOs which are
 > connected to I2C GPIO expanders.
->
+> 
 > -- >8 --
 > kernel: WARNING: CPU: 3 PID: 2636 at drivers/gpio/gpiolib.c:3880 gpiod_set_value+0x88/0x98
 > -- >8 --
->
-> Signed-off-by: Ian Ray <ian.ray@gehealthcare.com>
-> ---
->  drivers/nfc/nxp-nci/i2c.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/nfc/nxp-nci/i2c.c b/drivers/nfc/nxp-nci/i2c.c
-> index 6a5ce8ff91f0..b3d34433bd14 100644
-> --- a/drivers/nfc/nxp-nci/i2c.c
-> +++ b/drivers/nfc/nxp-nci/i2c.c
-> @@ -47,8 +47,8 @@ static int nxp_nci_i2c_set_mode(void *phy_id,
->  {
->  	struct nxp_nci_i2c_phy *phy = (struct nxp_nci_i2c_phy *) phy_id;
->  
-> -	gpiod_set_value(phy->gpiod_fw, (mode == NXP_NCI_MODE_FW) ? 1 : 0);
-> -	gpiod_set_value(phy->gpiod_en, (mode != NXP_NCI_MODE_COLD) ? 1 : 0);
-> +	gpiod_set_value_cansleep(phy->gpiod_fw, (mode == NXP_NCI_MODE_FW) ? 1 : 0);
-> +	gpiod_set_value_cansleep(phy->gpiod_en, (mode != NXP_NCI_MODE_COLD) ? 1 : 0);
 
-Do we need a Fixes tag here?
+Are there in tree boards which have this problem? Should this be part
+of stable?
 
-AFAICT this was introduced in
+https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
 
-  6be88670fc59 ("NFC: nxp-nci_i2c: Add I2C support to NXP NCI driver")
+Did you use ./scripts/get_maintainer.pl to get the To: and Cc: list?
+It is very unusual to see an empty To:.
 
-which used gpio_set_value() instead of gpio_set_value_cansleep() from
-the beginning (that is before transitioning to gpiod_* calls in
-43201767b44c ("NFC: nxp-nci: Convert to use GPIO descriptor").
-
-This piece of code is present on active stable trees. So you also need
-to Cc stable?
-  
-Cheers,
-C. Mitrodimas
-
->  	usleep_range(10000, 15000);
->  
->  	if (mode == NXP_NCI_MODE_COLD)
+	Andrew
 
