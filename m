@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-259623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259624-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4JWXH5etl2nO5QIAu9opvQ
-	(envelope-from <netdev+bounces-259623-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 01:40:55 +0100
+	id EDifJxqul2nO5QIAu9opvQ
+	(envelope-from <netdev+bounces-259624-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 01:43:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F619163E71
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 01:40:55 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA067163EBB
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 01:43:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9C017302E7D6
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 00:40:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 511E83061E2C
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 00:40:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD2FA21B905;
-	Fri, 20 Feb 2026 00:40:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75F0321D00A;
+	Fri, 20 Feb 2026 00:40:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nt7s8mnb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kBU865Kb"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C9F1F1932
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909241F4180
 	for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 00:40:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771548037; cv=none; b=rH3RPKAzcIk+EtiEcPUAhf9a+9k1QHuSNsyJiZ/D93tkOpu4n8RfHnnKvXryGELhmMbRrSaKne3+UZYR7NfL9ByHuY+siq4JsjZbjmLX32l4mGIq476NemDaV+dbRntt2LOonTD9ctycXpAyI3n4SRRUl3HQstH9XuxmOivEnnI=
+	t=1771548038; cv=none; b=A7ggS+PvNoLuDcy8n528pdYPbRkiTDzNAePUoZZC4eRbTvwKVGi1L6tZYzYXzGyQj7sjhie4n0VPnZy02gnJNe6sfpB7AgamZ0gJhMeEyqMw60duaEtfpcaIqZ5It7IgR+7qxwXPJ7hghQr25Kx0fGWklZnXl8jh1mTm/bm6O/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771548037; c=relaxed/simple;
-	bh=UcxmttI3/fPWN5YeNse0zzAKsxiVJgZ3rQajvidjvyg=;
+	s=arc-20240116; t=1771548038; c=relaxed/simple;
+	bh=9ewvARFceZTpgZUWF2m1IHTqUp46kfBAAKHsEv2QiH8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=m4ie+bYaOSakbUSw3fwDC3XwU5i+lLiezbTJYuMfSevu/CFDBaMmLkNqo1KSgZf1KIp5CznLXm6PRdsSWjLm+YlP8Ojl3G0BPXrGdxJ/LDMorMThjlJ++yimAfQKYrY9fQWRwmEWF8SKL+s/sGmZ5tpWjQ4Sx5eerOXikqeC9BU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nt7s8mnb; arc=none smtp.client-ip=198.175.65.14
+	 MIME-Version; b=niXxkVivsmb0Z/N4o1LFLIgh0kXzkYYXymgSP2VWb60V610uJOi4NOvFCbk60YTNmAOCcXpJHGqTfOZ7/dCt/rhwLvrN3vS4GS94sOXhrx7SvjTrRMNpTPqUq6/65xXhKSBYy5azU35MN207ZHVJ1P3WGwH7jIuwbgERRbFu9aE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kBU865Kb; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -39,26 +39,26 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1771548037; x=1803084037;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=UcxmttI3/fPWN5YeNse0zzAKsxiVJgZ3rQajvidjvyg=;
-  b=nt7s8mnb+XIL+TGdiwvDWo4ks3rcFgVhlm+SvLl19CLiy25HdCpwVB2O
-   obi6w3Rnk+Lsdrf5UJnI/vzmoZy88o31UJqwQJiCMsDz6X0t6F26fWEru
-   Kl3kjtOwzLTMMzw0jDh7FQZxAHHogDzleSu1tdoF6BpMKlzLv+PaYBXy5
-   4/5W7boCO+HyS1ialg+CMG9HjL4M4+r0hVEQAsZmJi2JtQlz8i24NJ9f3
-   P5StWphR1XbttkcHoXNzpnH5kDcBEiQ6H/CSl5rGOmWawMBt/gQIo5Dz4
-   VNf+jGupX2a+TB3fFMYts7jaTeW0LNWBfg10nobwUA9Tbjy1x8iiu3+cr
-   Q==;
-X-CSE-ConnectionGUID: 57oWLa7rSiSrPz0YHqqcIA==
-X-CSE-MsgGUID: h/n8zBOBRvOmf+povOO19w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11706"; a="76484189"
+  bh=9ewvARFceZTpgZUWF2m1IHTqUp46kfBAAKHsEv2QiH8=;
+  b=kBU865KbTTTE/BB/PokXMiAsqIT9b1wR6ffvJQ8K8ZljiQLhYhyRWSpq
+   GVEJ7aPaqZn84uo6zHLwB3voSvqCzT6jS83YViwcO8gjsbRfrMt1NALwZ
+   yMHH/Er8Ic8NjQzSP5qRATpk2wOExKuM+/fo148bjZ9cKBW6aGhZ7yaJQ
+   fFNn+h1m4ELGy8MbETjgjmym5Bz+Oeioll/M60cJU1QJ7hZuRF1wRg1Wt
+   EjjrUXM5J1mYrw6AA3NvJHp0IpkpjwsKTbLjSNmbHOOcX1Ar7pYbJWgok
+   YG0Ec0ceR/1QCCDrcAbrtA/THRmjRVu3+6r0bEOQW+zznUyUFuyr1YnUl
+   g==;
+X-CSE-ConnectionGUID: Z1Ht59L0Ta6dROrh9SUjnQ==
+X-CSE-MsgGUID: TpCZSoOrTcGIyk8vJtgwVQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11706"; a="76484195"
 X-IronPort-AV: E=Sophos;i="6.21,300,1763452800"; 
-   d="scan'208";a="76484189"
+   d="scan'208";a="76484195"
 Received: from orviesa003.jf.intel.com ([10.64.159.143])
   by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2026 16:40:34 -0800
-X-CSE-ConnectionGUID: W12SF91HSjaJkokTEoJQ9w==
-X-CSE-MsgGUID: 3+O3l29LQ2mbztqzAuk+Rg==
+X-CSE-ConnectionGUID: Z5Kk6U7YT2+NWVZffY2ZNw==
+X-CSE-MsgGUID: tA4LVhXOQPWTaIlxhtxbnA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,300,1763452800"; 
-   d="scan'208";a="218850471"
+   d="scan'208";a="218850474"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa003.jf.intel.com with ESMTP; 19 Feb 2026 16:40:33 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -68,18 +68,19 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Li Li <boolli@google.com>,
+Cc: Brian Vazquez <brianvv@google.com>,
 	anthony.l.nguyen@intel.com,
 	emil.s.tantilov@intel.com,
 	sridhar.samudrala@intel.com,
-	brianvv@google.com,
 	decot@google.com,
 	willemb@google.com,
+	Brett Creeley <brett.creeley@amd.com>,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>,
 	Samuel Salin <Samuel.salin@intel.com>
-Subject: [PATCH net 04/13] idpf: nullify pointers after they are freed
-Date: Thu, 19 Feb 2026 16:40:16 -0800
-Message-ID: <20260220004027.729384-5-anthony.l.nguyen@intel.com>
+Subject: [PATCH net 05/13] idpf: change IRQ naming to match netdev and ethtool queue numbering
+Date: Thu, 19 Feb 2026 16:40:17 -0800
+Message-ID: <20260220004027.729384-6-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20260220004027.729384-1-anthony.l.nguyen@intel.com>
 References: <20260220004027.729384-1-anthony.l.nguyen@intel.com>
@@ -98,16 +99,16 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-259623-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-259624-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
@@ -117,39 +118,90 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-0.999];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim,intel.com:email]
-X-Rspamd-Queue-Id: 3F619163E71
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mpg.de:email,intel.com:mid,intel.com:dkim,intel.com:email,amd.com:email]
+X-Rspamd-Queue-Id: EA067163EBB
 X-Rspamd-Action: no action
 
-From: Li Li <boolli@google.com>
+From: Brian Vazquez <brianvv@google.com>
 
-rss_data->rss_key needs to be nullified after it is freed.
-Checks like "if (!rss_data->rss_key)" in the code could fail
-if it is not nullified.
+The code uses the vidx for the IRQ name but that doesn't match ethtool
+reporting nor netdev naming, this makes it hard to tune the device and
+associate queues with IRQs. Sequentially requesting irqs starting from
+'0' makes the output consistent.
 
-Tested: built and booted the kernel.
+This commit changes the interrupt numbering but preserves the name
+format, maintaining ABI compatibility. Existing tools relying on the old
+numbering are already non-functional, as they lack a useful correlation
+to the interrupts.
 
-Fixes: 83f38f210b85 ("idpf: Fix RSS LUT NULL pointer crash on early ethtool operations")
-Signed-off-by: Li Li <boolli@google.com>
+Before:
+
+ethtool -L eth1 tx 1 combined 3
+
+grep . /proc/irq/*/*idpf*/../smp_affinity_list
+/proc/irq/67/idpf-Mailbox-0/../smp_affinity_list:0-55,112-167
+/proc/irq/68/idpf-eth1-TxRx-1/../smp_affinity_list:0
+/proc/irq/70/idpf-eth1-TxRx-3/../smp_affinity_list:1
+/proc/irq/71/idpf-eth1-TxRx-4/../smp_affinity_list:2
+/proc/irq/72/idpf-eth1-Tx-5/../smp_affinity_list:3
+
+ethtool -S eth1 | grep -v ': 0'
+NIC statistics:
+     tx_q-0_pkts: 1002
+     tx_q-1_pkts: 2679
+     tx_q-2_pkts: 1113
+     tx_q-3_pkts: 1192 <----- tx_q-3 vs idpf-eth1-Tx-5
+     rx_q-0_pkts: 1143
+     rx_q-1_pkts: 3172
+     rx_q-2_pkts: 1074
+
+After:
+
+ethtool -L eth1 tx 1 combined 3
+
+grep . /proc/irq/*/*idpf*/../smp_affinity_list
+
+/proc/irq/67/idpf-Mailbox-0/../smp_affinity_list:0-55,112-167
+/proc/irq/68/idpf-eth1-TxRx-0/../smp_affinity_list:0
+/proc/irq/70/idpf-eth1-TxRx-1/../smp_affinity_list:1
+/proc/irq/71/idpf-eth1-TxRx-2/../smp_affinity_list:2
+/proc/irq/72/idpf-eth1-Tx-3/../smp_affinity_list:3
+
+ethtool -S eth1 | grep -v ': 0'
+NIC statistics:
+     tx_q-0_pkts: 118
+     tx_q-1_pkts: 134
+     tx_q-2_pkts: 228
+     tx_q-3_pkts: 138 <--- tx_q-3 matches idpf-eth1-Tx-3
+     rx_q-0_pkts: 111
+     rx_q-1_pkts: 366
+     rx_q-2_pkts: 120
+
+Fixes: d4d558718266 ("idpf: initialize interrupts and enable vport")
+Signed-off-by: Brian Vazquez <brianvv@google.com>
+Reviewed-by: Brett Creeley <brett.creeley@amd.com>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 Tested-by: Samuel Salin <Samuel.salin@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf_lib.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index 94da5fbd56f1..7ce6a0e4acb6 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -1320,6 +1320,7 @@ static struct idpf_vport *idpf_vport_alloc(struct idpf_adapter *adapter,
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index 7613f020b622..b7e922fffc96 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -4077,7 +4077,7 @@ static int idpf_vport_intr_req_irq(struct idpf_vport *vport,
+ 			continue;
  
- free_rss_key:
- 	kfree(rss_data->rss_key);
-+	rss_data->rss_key = NULL;
- free_qreg_chunks:
- 	idpf_vport_deinit_queue_reg_chunks(adapter->vport_config[idx]);
- free_vector_idxs:
+ 		name = kasprintf(GFP_KERNEL, "%s-%s-%s-%d", drv_name, if_name,
+-				 vec_name, vidx);
++				 vec_name, vector);
+ 
+ 		err = request_irq(irq_num, idpf_vport_intr_clean_queues, 0,
+ 				  name, q_vector);
 -- 
 2.47.1
 
