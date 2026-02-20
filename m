@@ -1,208 +1,176 @@
-Return-Path: <netdev+bounces-259766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259813-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qIiVL+7HmGngMAMAu9opvQ
-	(envelope-from <netdev+bounces-259766-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 21:45:34 +0100
+	id CKvKCWAVmWl5QQMAu9opvQ
+	(envelope-from <netdev+bounces-259813-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 03:16:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9B3A16AB9F
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 21:45:33 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77AC716BE71
+	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 03:15:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 732643034E25
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 20:45:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B1663303BB04
+	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 02:15:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345182EA480;
-	Fri, 20 Feb 2026 20:45:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EDCA21ABB1;
+	Sat, 21 Feb 2026 02:15:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="Y8Bku9BM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NfQV4gkQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C4C2D7DEF
-	for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 20:45:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771620331; cv=none; b=ZLuHIDD8jHSNLoLsl0xSwQmWSqaALQs/hsk3V40C14/IwH3pngimn6q2FfDFjugHLu/ObOwKIQv1cpGStMWVyzEzAr0A2kcz1fg1IH2fFUG2oo7XtvBJ1QEatfJyxwCx/pe7Fqv/nFFuVYn9o21CfPrTzroOXQBEQtAuoUJJXiw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771620331; c=relaxed/simple;
-	bh=+MpAdX04z71/DriT7F3atRs8SgTe+Kc43ytE6V82v5Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QIZXCI3ok0gSuaASeA+UwwzCDvG/DsMSn+97855bj5IetsiO7cZZkHmByUkGmBLY5U4TZNJfRQX/QhcCesjl9hNkvh5ULSUEL1VmCuDLROYtN2l4E9q4CuYdueMlXsOLpTnAnm8JF/HZjqE32B26yDSF5zWyII+IUGx0+4HBPyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=Y8Bku9BM; arc=none smtp.client-ip=49.212.198.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
-Received: from ms-a2 (54.52.30.125.dy.iij4u.or.jp [125.30.52.54])
-	(authenticated bits=0)
-	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 61KKjR4u048125
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Sat, 21 Feb 2026 05:45:27 +0900 (JST)
-	(envelope-from kohei@enjuk.jp)
-DKIM-Signature: a=rsa-sha256; bh=g4QW/rxYMrWC1qtUxlhgMr6Uho9KgR9xRA8MZbs0IJ8=;
-        c=relaxed/relaxed; d=enjuk.jp;
-        h=From:To:Subject:Date:Message-ID;
-        s=rs20251215; t=1771620327; v=1;
-        b=Y8Bku9BMzVuXdD6cj9XlchnAU0Q0reYEjpYi2tb054JZVWQzUbA54mqUDtSonRox
-         8irIg6zH2TpqEBu2JFG4QZn68dh5GFYK/Ck4Qbbvvtu7QmPuJVkJ7cGaE3s5Iuun
-         g5bYiGUw+pcJsxkuQMEj6Q7cnBtoivB4FCDoZGiKvBDj7p+4JloN/nNN8zEQGkus
-         qaN0RoZ1+3j0q8ZyaE5QSxNUSAcoLgAYoc5zS2bRMH/XGZemmmJxLarQ+XANNKg9
-         eggkjT1PHcHotuLu9ZDIufnYF+zSKPBZZYfmgZU85d4WWgitJW1Zeiscgon6hUGa
-         HoMRorv0srS0LpUjEqoCjQ==
-From: Kohei Enju <kohei@enjuk.jp>
-To: aleksandr.loktionov@intel.com
-Cc: alice.michael@intel.com, andrew+netdev@lunn.ch, anthony.l.nguyen@intel.com,
-        davem@davemloft.net, edumazet@google.com,
-        intel-wired-lan@lists.osuosl.org, kohei.enju@gmail.com, kohei@enjuk.jp,
-        kuba@kernel.org, maciej.fijalkowski@intel.com, netdev@vger.kernel.org,
-        pabeni@redhat.com, paul.greenwalt@intel.com,
-        przemyslaw.kitszel@intel.com
-Subject: Re: [Intel-wired-lan] [PATCH v1 iwl-net] ice: fix potential NULL pointer deref in error path of ice_set_ringparam()
-Date: Fri, 20 Feb 2026 20:44:14 +0000
-Message-ID: <20260220204526.7514-1-kohei@enjuk.jp>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <IA3PR11MB89864DB144A3D8990E6512D5E568A@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <IA3PR11MB89864DB144A3D8990E6512D5E568A@IA3PR11MB8986.namprd11.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B91BE2D5957
+	for <netdev@vger.kernel.org>; Sat, 21 Feb 2026 02:15:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771640156; cv=pass; b=aP+CFhUmxrT+1jA599BZlxyEc0hi4s1qqulmuepf6Cf0rUR/KEFEm7TffGxOhYFaRIGpf/vVvXjwqaCzRJ4RUXz3QpjieFdHfos4sB9Mt8Ayyg90oNZFACt9dkon0qOLA1Ky+mZ7hUS80UrkgM7oqV+e51TSa3oP+4VsK3+nwwA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771640156; c=relaxed/simple;
+	bh=cwVJpYds9WRhqGxgtRAz+YHH/axeAs5tYhVkRL3n+NY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nplC3WrGkcidYIfyjPHMMpeLR8DK5u/ARhhY7doGPI1do9bzPoGfsnxJFscmcGJsOnJj2vWwASYLI6hnhJb/3p15JRJQ+g42Qu2s5BGUJ3+tNM6Q2CXHPMZ22nG7G9iPbfM2UJRH7P5h80wf2RpT48YYabjkuu5fRkU5EqCOuew=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NfQV4gkQ; arc=pass smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-b8850aa5b56so485001566b.2
+        for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 18:15:54 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771640153; cv=none;
+        d=google.com; s=arc-20240605;
+        b=EEY5fX1S9zWgxObFCJ0uQMeO0m4PC0NLdmLctTy9yk35T1+J2Stbdgbzk/qpzNjW+R
+         FXwHwlW0ejfxzSvqDdVn7djE0m8KpiY+UbVCbiYTzI/72tGwqkV6ucalLNgHA6G1U9V+
+         81loDr1rys0yo4r23BirKNuD3XbiS0k5pl2e5PJXySZCG7rUGbuEMTnnMf6IrNnSvxda
+         mCaWQlOTo+FIR9ERQ5iBkmvFRg8ngLfzK84wyfpN2037y2oXbaTNC9+ed31QYrau67JY
+         GCfxr3KgGsUESOhlrY6Id4BNMwkzHV8DBhMtj8lyLesYb1U3Xpxy4T0q5tbazYM915Ou
+         zB9w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=cwVJpYds9WRhqGxgtRAz+YHH/axeAs5tYhVkRL3n+NY=;
+        fh=+iyTqnHstk/Gdj3f5FCvurJzonhteX7gnW8NJlfVBDU=;
+        b=EoGRZza03yQKD5l4ndZJqkPm4xlr12OZvqILorinjBycVEmORK5qkN0sBswhCsQtfi
+         Qx5hKB9sbvJkmMCbeuAvrxmzxJL2pBQWMEjL1TnI8WO+ieiAvx7Oly6HZz0dAmon56VV
+         SrMSE07iRlO9vVSkCIvLKuiQqw4ATGfd2RSp77RR65ojB/HLTnoQ8RgkygnXm6QnU5ut
+         Da1sm1hQ6Iu43pbX7FD7IB8b1GXpHLVSVjXw+CFP25Wnfp6vFCGOHZ/QBeVFSrPkehwk
+         U1G1rh6BogKpnGs1GKCxKKnYCYN3gm1ROEhSv+i9LsfLUdDGadbEr1w7mnRzcEYxVmsh
+         67vg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771640153; x=1772244953; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=cwVJpYds9WRhqGxgtRAz+YHH/axeAs5tYhVkRL3n+NY=;
+        b=NfQV4gkQ+/Lyk7eVnL/DiyVroz58r5jwR19LKO1YVxm9JzPsNR/8RX4LIdeg+9FlSB
+         /1iIu/4tSSV9ceA9QzLKDyH0o0cK8pOcDg4nUt7zUTNHtQE8grAsFwH3WChp5Bm3Hfhj
+         Jnqvc2VigJPGxYaekcVCAMyeNy+WhTKn59bW5eqn660muAFIXvNd+rsmxvSjTl1nPnaz
+         CRzXkzyKC2Lz4mdjBHp+hkgNJAyb9a+YSf2cmfP8nRwfUUoTjuJIBgO29a1JrjcuFn1Q
+         mxPcpZtq0dXD2OURsniMUfNfnFvl9wTHXHof4YlWavuJISW6tgd7GHP0+wUtnjAsEiQm
+         pCrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771640153; x=1772244953;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cwVJpYds9WRhqGxgtRAz+YHH/axeAs5tYhVkRL3n+NY=;
+        b=IHVMn0lzEIhNa27kux19JgoBt+MD5gTIpIr71j7EloqmxTlUb1R7oALgsfA+kZ/JSe
+         QImRXIv5p2fVs8Efxi93WfDcPtTJ8UNs97iuS3zLytBCcSjK2+h0Z+npswAkPOGqb95w
+         uZ+gJ2UjK0nzEjn20GAMuJZiFOuWpy5VN4kY9JkEai1O+cktvwDjYczm71hfQmmEKudt
+         fBqcsTvZtI0T56wvmY7J8M+qacrrzj1Bbx6DV5KzTJEwHfd1yjlTf0NCQpy6KMrASKEr
+         QR5h4JcynTg5dvUzmDZ9DKCus5uOu6lXKctMMXx3l3gPFuruHmzQ/Lo072ewTD009pVf
+         fzBg==
+X-Forwarded-Encrypted: i=1; AJvYcCX1yclpslerfaNEPuNHPeIFgIyRf5r56xxY3+vhBtSOr2tNWvRlBsRmbGxXZGHTwUPODjNMRT0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjFTrxHo3rdJo6n1NfwrDWcas6+aWahbt+XapWfi50V0zH59QL
+	Slfq97L9Ncftaw5mmaqV1RiiLseDNtbSA6Jl6tffhht/j0lHmMCKYtgTBAnolwMYDKL0+Tozo4c
+	6VzZw7VE9bC7UU5T1c3E2T8jIMh85cUo=
+X-Gm-Gg: AZuq6aIJftb+O281sEzIX1r6BfyvzeiPqy7JkHaRGzwoghbxnFGR19ixfFF78dYkuA9
+	OT2LWM4WKXgbnRbh4H24ApHBbrSZ7b16lKAiDKYQsvgvRXE8HCZJmHhlaj3dZJaOPEzzXQH60nH
+	lNqhxee7RFUWV3AB3SGHvbK7fecDuCq6N3R1u2Rv9GxGCJYvVa1iia7P0qyNcYzzjDEWc0RVhow
+	gQX0PvFA12dw6zOQhJEnnCXQWuVSqX1AIXYb3OZqbyWJaSKg+bJak/98G6TRNmA4tdCExKCOjpo
+	rD0MqZ1G1/FuumX2N4trYKoDQwlzHyxhnXyiM5mARbUzJzgCPL+RW20M3AKjejulMXvsiO1+Kg=
+	=
+X-Received: by 2002:a17:906:4f8f:b0:b8f:70c0:c619 with SMTP id
+ a640c23a62f3a-b9081bcf826mr57406966b.52.1771640152852; Fri, 20 Feb 2026
+ 18:15:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260214033859.43857-1-jiayuan.chen@linux.dev>
+ <aZURjBHTHRvjP7Ee@mini-arch> <20260218174025.2fe593d3@kernel.org>
+ <aZdddVNRy6sYiUEt@mini-arch> <20260219121213.5b5ab0e7@kernel.org>
+ <CAPrAcgNP0av_d+Ai175QoEu5shjHXEEtObtqkhcnKufpHwHWDA@mail.gmail.com> <aZkHFB1yH2ooiukD@mini-arch>
+In-Reply-To: <aZkHFB1yH2ooiukD@mini-arch>
+From: I Viswanath <viswanathiyyappan@gmail.com>
+Date: Sat, 21 Feb 2026 02:15:38 +0530
+X-Gm-Features: AaiRm52UQSJUE8vaQr6WV5HgUrfDWWlGtsDuWtCL3urjMblSAGcISCnDA8aO7iY
+Message-ID: <CAPrAcgOzEnc-XPNG55UtzQMRamG4pTzZA8PB71WuzjGRSNmFjw@mail.gmail.com>
+Subject: Re: [PATCH net v1] net: defer __dev_set_promiscuity() to avoid
+ sleeping in atomic context
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Jiayuan Chen <jiayuan.chen@linux.dev>, netdev@vger.kernel.org, 
+	Jiayuan Chen <jiayuan.chen@shopee.com>, 
+	syzbot+2b3391f44313b3983e91@syzkaller.appspotmail.com, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Sabrina Dubroca <sd@queasysnail.net>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Samiullah Khawaja <skhawaja@google.com>, 
+	Ahmed Zaki <ahmed.zaki@intel.com>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
+	Willem de Bruijn <willemb@google.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,lists.osuosl.org,gmail.com,enjuk.jp,kernel.org,vger.kernel.org,redhat.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259766-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-259813-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[enjuk.jp:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D9B3A16AB9F
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[viswanathiyyappan@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,2b3391f44313b3983e91];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 77AC716BE71
 X-Rspamd-Action: no action
 
-On Fri, 20 Feb 2026 20:04:52 +0000, "Loktionov, Aleksandr" wrote:
+On Sat, 21 Feb 2026 at 06:45, Stanislav Fomichev <stfomichev@gmail.com> wrote:
+> > Do you mean rtnl_lock when you say instance lock?
+>
+> Search for the instance locks in Documentation/networking/netdevices.rst. We
+> essentially need to add netdev_ops_assert_locked to __dev_set_rx_mode
+> and make it work.
 
-> > -----Original Message-----
-> > From: Kohei Enju <kohei@enjuk.jp>
-> > Sent: Friday, February 20, 2026 7:40 PM
-> > To: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org
-> > Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel,
-> > Przemyslaw <przemyslaw.kitszel@intel.com>; Andrew Lunn
-> > <andrew+netdev@lunn.ch>; David S. Miller <davem@davemloft.net>; Eric
-> > Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
-> > Abeni <pabeni@redhat.com>; Loktionov, Aleksandr
-> > <aleksandr.loktionov@intel.com>; Alice Michael
-> > <alice.michael@intel.com>; Greenwalt, Paul <paul.greenwalt@intel.com>;
-> > Fijalkowski, Maciej <maciej.fijalkowski@intel.com>;
-> > kohei.enju@gmail.com; Kohei Enju <kohei@enjuk.jp>
-> > Subject: [PATCH v1 iwl-net] ice: fix potential NULL pointer deref in
-> > error path of ice_set_ringparam()
-> >=20
-> > ice_set_ringparam nullifies tstamp_ring of temporary tx_rings, without
-> > clearing ICE_TX_RING_FLAGS_TXTIME bit.
-> > When ICE_TX_RING_FLAGS_TXTIME is set and the subsequent
-> > ice_setup_tx_ring() call fails, a NULL pointer dereference could
-> > happen in the unwinding sequence:
-> >=20
-> > ice_clean_tx_ring()
-> > -> ice_is_txtime_cfg() =3D=3D true (ICE_TX_RING_FLAGS_TXTIME is set)
-> > -> ice_free_tx_tstamp_ring()
-> >   -> ice_free_tstamp_ring()
-> >     -> tstamp_ring->desc (NULL deref)
-> >=20
-> > Clear ICE_TX_RING_FLAGS_TXTIME bit to avoid the potential issue.
-> >=20
-> > Note that this potential issue is found by manual code review.
-> > Compile test only since unfortunately I don't have E830 devices.
-> >=20
-> > Fixes: ccde82e90946 ("ice: add E830 Earliest TxTime First Offload
-> > support")
-> If it's a fix, shouldn't it go to net?
+So, the handler should look something like this?
 
-This fix relies on a commit 8a4e78094945 ("ice: fix race condition in TX
-timestamp ring cleanup"), which changed type of flags from u8 to
-BITMAP, as you advised in [1].
-Since the commit only exists in Tony's tree, I chose iwl-net, not net.
+static void netif_write_rx_mode(struct work_struct *param) {
+ rtnl_lock()
+ netdev_lock()
+ /* Processing */
+netdev_unlock();
+ rtnl_unlock();
+}
 
-[1] https://lore.kernel.org/intel-wired-lan/IA3PR11MB8986EB459D2FD1697644CF98E598A@IA3PR11MB8986.namprd11.prod.outlook.com/
-
-> 
-> > Signed-off-by: Kohei Enju <kohei@enjuk.jp>
-> > ---
-> >  drivers/net/ethernet/intel/ice/ice_ethtool.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> >=20
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> > b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> > index 7f769a90dde1..5ed86648d0d6 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> > +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> > @@ -3290,6 +3290,7 @@ ice_set_ringparam(struct net_device *netdev,
-> > struct ethtool_ringparam *ring,
-> >  		tx_rings[i].desc =3D NULL;
-> >  		tx_rings[i].tx_buf =3D NULL;
-> >  		tx_rings[i].tstamp_ring =3D NULL;
-> > +		clear_bit(ICE_TX_RING_FLAGS_TXTIME, tx_rings[i].flags);
-> >  		tx_rings[i].tx_tstamps =3D &pf->ptp.port.tx;
-> >  		err =3D ice_setup_tx_ring(&tx_rings[i]);
-> If ice_setup_tx_ring() internally reads ICE_TX_RING_FLAGS_TXTIME to decide =
-> whether to allocate the tstamp_ring, then clearing the bit first means ice_=
-> setup_tx_ring() skips TxTime setup even on success - leaving TxTime silentl=
-> y broken after ice_set_ringparam() completes normally. The crash is fixed o=
-> n the error path, but I'm afraid a functional regression is introduced on t=
-> he success path.
-> Please correct me if I'm wrong.
-
-I believe, in the successful path, tx_tstamps and the flag
-ICE_TX_RING_FLAGS_TXTIME are restored in ice_up().
-
-ice_up()
- ice_vsi_cfg_lan()
-  ice_vsi_cfg_lan_txqs()
-   ice_vsi_cfg_txqs()
-    ice_vsi_cfg_txq()
-     ice_is_txtime_ena() ( == test_bit(ring->q_index,  pf->txtime_txqs))
-     ice_alloc_setup_tstamp_ring()
-      ice_alloc_tstamp_ring()
-       - allocate tx_tstamps
-       - set_bit(ICE_TX_RING_FLAGS_TXTIME, tx_ring->flags);
-
-Enablement of TxTime feature is managed by pf->txtime_txqs, and
-ring->flags represents only a 'result' of the enablement.
-
-Therefore I think it's not a problem, but please let me know if my
-understanding is wrong.
-Thank you for reviewing, Alex!
-
-> 
-> Thank you
-> Alex
-> 
-> >  		if (err) {
-> > --
-> > 2.51.0
+v9 should be out by next week and fixes all the issues I could think
+of so please wait for that
 
