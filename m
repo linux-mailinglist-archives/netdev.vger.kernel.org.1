@@ -1,168 +1,215 @@
-Return-Path: <netdev+bounces-259750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259751-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GP6XM0qqmGn5KgMAu9opvQ
-	(envelope-from <netdev+bounces-259750-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 19:39:06 +0100
+	id eEBPL2mqmGn5KgMAu9opvQ
+	(envelope-from <netdev+bounces-259751-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 19:39:37 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35D5C16A20A
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 19:39:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 19A7E16A21A
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 19:39:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3CE463035D55
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 18:39:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 46F7A306B4D6
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 18:39:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CF4135B64F;
-	Fri, 20 Feb 2026 18:39:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B3C436681B;
+	Fri, 20 Feb 2026 18:39:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziswiler.com header.i=marcel@ziswiler.com header.b="DAnaaMy6"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="dfOuCk8N";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="rsC15xh5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.perfora.net (mout.perfora.net [74.208.4.194])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C9C3D76;
-	Fri, 20 Feb 2026 18:38:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.208.4.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7D52EDD7D
+	for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 18:39:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771612741; cv=none; b=ZzKI2STjqOt2rU/DdKZAy6Thkp+HKfZ6u9QZ6OuRz/zDn556rYNCw3+qESM2UqoobD3G5VJWiXbfycC4U+sQ+UNLYN57HVysc0fAI2bFRmufv3dnQmKvbyNySDcyJoAOR2nPETfJmMxhivUPDk1wtZ/B/ZB2tMJKpjxMZzaLpJU=
+	t=1771612742; cv=none; b=T0VJqchpDBzr9AhslpZYyVPC3DFx8UMGa+8mcz+mRZ/n7bcLWnmeDA657U4fwgHAemtPoNKsrA+Ma4jpNKKH36BcOuE3Rts5C9gZoh2neV56R+N93Qqc8+ZEN+FEY4fsVmMbfgyvM82iHrpa6brMroORqaKANoxvKD/kJbjxyMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771612741; c=relaxed/simple;
-	bh=44XHMM4HiGXVuuiMEAL+Zgb1brCATCabA15+Bi10vBM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=HqjPvCoT2lbvveuNuMqriBRzMqgSdcZIS3r4c5Bu0tGgV6b/sftm54iaG6BVSfRMN2WUPyBOVrOKKkfx6ffIPd82RDVlhipOU3BSJUt3kvEhK0Sry/FTmnpllsj8+edDXeS70B0tBYc0w3qSXVp/EHiTxVtt7T2kD8sSlO3RX9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ziswiler.com; spf=pass smtp.mailfrom=ziswiler.com; dkim=pass (2048-bit key) header.d=ziswiler.com header.i=marcel@ziswiler.com header.b=DAnaaMy6; arc=none smtp.client-ip=74.208.4.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ziswiler.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziswiler.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ziswiler.com;
-	s=s1-ionos; t=1771612693; x=1772217493; i=marcel@ziswiler.com;
-	bh=44XHMM4HiGXVuuiMEAL+Zgb1brCATCabA15+Bi10vBM=;
-	h=X-UI-Sender-Class:Message-ID:Subject:From:To:Cc:Date:In-Reply-To:
-	 References:Content-Type:Content-Transfer-Encoding:MIME-Version:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=DAnaaMy6FMfhZ2PwdSqRhG6MDuqyQSedE3vAoFZG2GKJyuf7AQZdNa+TVtKceOxx
-	 GLmKB7Tv5VuGCHD28ItratLbK71EFbbQm+dmXH9N620NvrwUDe5RAjTEtLUUiCXwz
-	 O7dIHZi+slXQOabDs5OuDN3gYk0al+6SEf5PnAqBnU6oa9NcHfjk/TI/TNS9K0uiH
-	 M6ACFR42VCrBf8H33PT/Fer/XdQIuBWF639rVTsW3LVEzzMhfowmPvK9byB+AQQdu
-	 I+8q0G2BRF/oHFxumh/eJvAPAN+HrO0qHE9bxJS+2uaDeEG7mTqVpWHZwYPyHe8RV
-	 Dq4iINyHX16t7NT5hg==
-X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
-Received: from [10.118.255.253] ([213.55.199.191]) by mrelay.perfora.net
- (mreueus002 [74.208.5.2]) with ESMTPSA (Nemesis) id 0Lz5KI-1vgDll0QdM-00szjr;
- Fri, 20 Feb 2026 19:38:13 +0100
-Message-ID: <5f99968ec561631852bfa72aea95a100dcad5324.camel@ziswiler.com>
-Subject: Re: [PATCH v2 0/2] net: stmmac: eic7700: fix EIC7700 eth1 RX
- sampling timing
-From: Marcel Ziswiler <marcel@ziswiler.com>
-To: lizhi2@eswincomputing.com, devicetree@vger.kernel.org, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, 	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- netdev@vger.kernel.org, 	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
- alexandre.torgue@foss.st.com, 	rmk+kernel@armlinux.org.uk,
- linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Cc: ningyu@eswincomputing.com, linmin@eswincomputing.com, 
-	pinkesh.vaghela@einfochips.com, weishangjuan@eswincomputing.com, 
-	dongxuyang@eswincomputing.com
-Date: Fri, 20 Feb 2026 19:37:57 +0100
-In-Reply-To: <20260209094628.886-1-lizhi2@eswincomputing.com>
-References: <20260209094628.886-1-lizhi2@eswincomputing.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (by Flathub.org) 
+	s=arc-20240116; t=1771612742; c=relaxed/simple;
+	bh=WlKNvIqaKbweM9fECdaUANs8Aj8XdHnRDOZXjozAff8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=FilkPDrYRSmbU02N9PvXLB0gy5v62Uy63W0DjhBT19L0NnZxRvQSOVLUpVWzUWho278ep5ejG3wT+x2ula9dKITXn1hTeDEjapLiRrByANdHKAwvrjLGZrkf7BsmdfZw1zjUST+Z4gN0qtb4O2+pzpTZ6NU20oyu8jxNxZQZn3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=dfOuCk8N; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=rsC15xh5; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Fri, 20 Feb 2026 19:38:58 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1771612739;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=wP8xzvqN3A40VPZSmAm4RelqqJjST2AaJuC+daRjRao=;
+	b=dfOuCk8NOJM4HDnSUJcfouxO47AFeVAwP8oTVXE4xupLcWKu1qswTiJvZA+AubXITwEcH+
+	KuXt4oN1cxNSwmzWK1J6UM4h7NLfJDjc3N5tUlCnbZitMT4w+1R1PiDQeA578r1KbkBZpG
+	9b/MuSC4RGvBcWzcnuL2Dl1UXDAQt6AQPHsYUZiO0Do5Ucz6bYyIpcR2LmBVEXQANEC96I
+	Z1zCukhtXYZQFMDzXlu+OPa4PIfLN+oiJCQ1OG+oac59/gV8i3Rt3oT0eWFt4hqcB7D7bq
+	/zsD+XUK42tVhvwDdbE7eKFCgIf7Q5m2tVYnUjC4MXpYZfoy+oazMpaE19mqaw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1771612739;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=wP8xzvqN3A40VPZSmAm4RelqqJjST2AaJuC+daRjRao=;
+	b=rsC15xh5xpSEw/fkz2tkTlqcYh3ktwQrdgzRBmNtm2jhVz4AQ7ElFt77Ld9T1USnFRBxGe
+	jciaC8NMrviImoBw==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: netdev@vger.kernel.org
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Kurt Kanzenbach <kurt@linutronix.de>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net v2] net: Drop the lock in skb_may_tx_timestamp()
+Message-ID: <20260220183858.N4ERjFW6@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Provags-ID: V03:K1:u/DHXNq2KmbH+PEHVvmwb1sDGASiAHHbzFo0qypFQSmu/f9iPyH
- wIM60ITAsgVE8zKq8x4W1mwI7OIQOsFfVkvxZRDQ/IfplOt1qrRxMT6waj53uIDR6B0mFaH
- Z4w1OMjNf7s8ziypBjWDeR6Yd9ZHavHCf74toT1z82gG9kf+RbwYNYWNhEkfY8pDrtHDG2H
- m4hi7rLnCghPmV2u0uXDA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:N6VQHXQ2V8M=;i1WrHzikZoZ7F0hufQ6NBs+Gb5n
- oH6rserJeM//8krLCVRcJ/pddwD2cVa9puBHNwbNwuk4xlNPEHditbXxpT5GM0acxINOndcsR
- Rf+3DD8vdBcbn9DKYRYHzC06qZz+Wjwd30xVa2pn/yiBDNguVvhc5BJsURC4Vv/JRiZ0d+dt6
- wca8DNjfhUVWJf5/NbgsV115cWGBw4BmtLLvnzUXRXPz7ie2FDOHlfoh0yl3NPRGlNF7TzW9L
- ijaNRUkrSyAfIWFJxnCSYZ1BR6/iYnnSruZ0qG5BK/tSji6vL5RRQaXsNnkt3KWK84hjINfSX
- lCrTQr/ozD82tIXG1zYO4/zmF6AeMn2YP+2Mg6WlLemR57XQrTUVrO9Xtg+gyG0V0XhKH6TqW
- 1rJuye+jU5eT8DIxCBiTircrRrk3csG6f74zK+ZOBLxHqYcS2+lMncGgfnRtHPN5TVp+1keV6
- HzFiNxvUHpQfDCZRgm3T2bo8UxctBeDFFA6+ZIempWQMBaejqqfYaUYNa3P5KjtOhDwQdCzRa
- 9migtwklYqWSxK859ArT8bW/RtRTU0m0ZV7GJznJlNxg/WQGr33O9mvoIJiMVRhtatocGzQc9
- yEVkV+1P+8IVSAhH4PMdGAAr371DT3jXAljNPvhl2wf4/VNFqPAg4BLyr3oEI242e5jM8rHCh
- 0KupWh5l8/npu8bMRqdhe/vnaIB54/JQwvnwPF8BLUcZxu+90AZSGFSrMHlkntMfc+voFDDZY
- c0RubH/Fk9RlxiV1wwlLmZxz58H4Q1+YjvMSNlRQ/aMcHBUOIRzB3i3kxps+zd+hS8zbQPeex
- 1XfXfjwuP4aaP6RCPgc0dAdAjfsLDF5X54IPWF70HP+vCv3bMjoRvddeiIG5EGLTa7OcSUU/I
- SND3jUpSUL/qRCNJkL2Qnnx9KEln4eSNtFAYg03UsNL7pmY8vN0RRfSja2U2IZCE3MZc+Fgop
- tAhUHhrquw6UyognU34C2bh0nfBCL9K9lFWpML0qZOAcsJzLIqeElM90W5y/uZaWkzfc1hRK+
- A8J/5zRkSwgErPv1zsvVyQst119Jyrh1UYfdmiVqXFn3CPbonQGd8wfyUVN8qqYJ1o4OCShq9
- MRvHzk0e2e5cldL2F+gjdqJzQ8DCaP68Y6sAiCdPmEu6xMXlC9CSeylpEUgw2MqKRBFuzWtp6
- HAFDgZhQnRbCB6PJaV0GIQZbxDR2kgVQETIBQPqiah77F/ZeSvzMWRDMbxPJ1CT4sJBc4ONff
- OL2vcgxS+Uq13qZNfBWu4fIQOx8XwhlOEsaLWMcSc4Snhzl3LvA7Xs47hyeCbUg9KIBWB7kvq
- 3KGl12WYWhtjeLlotTFhxdhydAQfnqha7FayK+F4OG8CvpLm0CLwnrtafdtS/2OxNUeKEcTNw
- REvgRxdSNiFS2Vyzf/uz/18a0ovUr5eTEzgJ3pzy9PB8ignGLzbTDrzqHPGUhp8F81mDOtAfk
- I7DcUOxhuvKwC0hKn1XkY1Howm0Jd8KvNkaO08A6wpvLU0cHPBvHxWq1LdZLudKUo63B5SMDy
- WEDsyQf7ic6/Vg4OjRPYBN6TmqlQ5eOuSW5p8KHwyQQe8JUGMTY6iTRzMSn47IQ4HA8Nxo/zr
- eUGSrww3xksxxB7QJJphJiw6xyIG72llXqAvBTpYSbcyE9CrRRfTkKfH3l2mAh0dRzU5UD98p
- Ddde3hkuSAOajGNH3CwM4Rt9C5JglSNQrbO3j+8lqbLFaHVY7GL2nIV5gCDqPIeZNNOFw8iL5
- scHG/VjxQrgDlK+cDfyUWij3BzqEah5g6UCgjhg0RWWN5LZ2cCVgtlHRodSc1QEUuohAtwE9v
- Q+mH
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ziswiler.com,none];
-	R_DKIM_ALLOW(-0.20)[ziswiler.com:s=s1-ionos];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259750-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,linutronix.de,redhat.com];
+	TAGGED_FROM(0.00)[bounces-259751-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[eswincomputing.com,vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,st-md-mailman.stormreply.com,lists.infradead.org];
+	RCVD_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[ziswiler.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marcel@ziswiler.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 35D5C16A20A
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linutronix.de:mid,linutronix.de:dkim,linutronix.de:email]
+X-Rspamd-Queue-Id: 19A7E16A21A
 X-Rspamd-Action: no action
 
-Hi Zhi Li
+skb_may_tx_timestamp() may acquire sock::sk_callback_lock. The lock must
+not be taken in IRQ context, only softirq is okay. A few drivers receive
+the timestamp via a dedicated interrupt and complete the TX timestamp
+=66rom that handler. This will lead to a deadlock if the lock is already
+write-locked on the same CPU.
 
-Sorry, to steal this thread, but I do have a quick question concerning Ethe=
-rnet on the EIC7700. Every time I
-enable gmac0 in the device tree my EBC7700 stops booting (e.g. SD card is n=
-o longer detected) while Ethernet
-does seem to at least get detected. This has been seen using next-20260219,=
- stable v6.19.2 [1] as well as
-6.18.0-rc6 [2]. Any idea what could be going wrong?
+Taking the lock can be avoided. The socket (pointed by the skb) will
+remain valid until the skb is released. The ->sk_socket and ->file
+member will be set to NULL once the user closes the socket which may
+happen before the timestamp arrives.
+If we happen to observe the pointer while the socket is closing but
+before the pointer is set to NULL then we may use it because both
+pointer (and the file's cred member) are RCU freed.
 
-I admit so far I only do have one single EBC7700 at hand while waiting for =
-further hardware to arrive.
+Drop the lock. Use READ_ONCE() to obtain the individual pointer. Add a
+matching WRITE_ONCE() where the pointer are cleared.
 
-Thanks!
+Link: https://lore.kernel.org/all/20260205145104.iWinkXHv@linutronix.de
+Fixes: b245be1f4db1a ("net-timestamp: no-payload only sysctl")
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
 
-[1] https://github.com/riscv/meta-riscv/pull/601
-[2] https://github.com/eswincomputing/linux-next/tree/dev/test-upstream-v6.=
-18-rc6
+v1=E2=80=A62: https://lore.kernel.org/all/20260214232456.A37oV4KQ@linutroni=
+x.de/
+  - Added matching WRITE_ONCE() as per Eric.
+  - Added a RCU read section. There are users from preemptible
+    context.
+  - Added a Link: to the original thread as per Willem de Bruijn
 
-Cheers
+ include/net/sock.h |  2 +-
+ net/core/skbuff.c  | 23 ++++++++++++++++++-----
+ net/socket.c       |  2 +-
+ 3 files changed, 20 insertions(+), 7 deletions(-)
 
-Marcel
+diff --git a/include/net/sock.h b/include/net/sock.h
+index aafe8bdb2c0f9..ff65c3a67efa2 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -2089,7 +2089,7 @@ static inline int sk_rx_queue_get(const struct sock *=
+sk)
+=20
+ static inline void sk_set_socket(struct sock *sk, struct socket *sock)
+ {
+-	sk->sk_socket =3D sock;
++	WRITE_ONCE(sk->sk_socket, sock);
+ 	if (sock) {
+ 		WRITE_ONCE(sk->sk_uid, SOCK_INODE(sock)->i_uid);
+ 		WRITE_ONCE(sk->sk_ino, SOCK_INODE(sock)->i_ino);
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 61746c2b95f63..a01fb7c053bfa 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -5555,15 +5555,28 @@ static void __skb_complete_tx_timestamp(struct sk_b=
+uff *skb,
+=20
+ static bool skb_may_tx_timestamp(struct sock *sk, bool tsonly)
+ {
+-	bool ret;
++	struct socket *sock;
++	struct file *file;
++	bool ret =3D false;
+=20
+ 	if (likely(tsonly || READ_ONCE(sock_net(sk)->core.sysctl_tstamp_allow_dat=
+a)))
+ 		return true;
+=20
+-	read_lock_bh(&sk->sk_callback_lock);
+-	ret =3D sk->sk_socket && sk->sk_socket->file &&
+-	      file_ns_capable(sk->sk_socket->file, &init_user_ns, CAP_NET_RAW);
+-	read_unlock_bh(&sk->sk_callback_lock);
++	/* The sk pointer remains valid as long as the skb is. The sk_socket and
++	 * file pointer may become NULL if the socket is closed. Both structures
++	 * (including file->cred) are RCU freed which means they can be accessed
++	 * within a RCU read section.
++	 */
++	rcu_read_lock();
++	sock =3D READ_ONCE(sk->sk_socket);
++	if (!sock)
++		goto out;
++	file =3D READ_ONCE(sock->file);
++	if (!file)
++		goto out;
++	ret =3D file_ns_capable(file, &init_user_ns, CAP_NET_RAW);
++out:
++	rcu_read_unlock();
+ 	return ret;
+ }
+=20
+diff --git a/net/socket.c b/net/socket.c
+index 136b98c54fb37..05952188127f5 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -674,7 +674,7 @@ static void __sock_release(struct socket *sock, struct =
+inode *inode)
+ 		iput(SOCK_INODE(sock));
+ 		return;
+ 	}
+-	sock->file =3D NULL;
++	WRITE_ONCE(sock->file, NULL);
+ }
+=20
+ /**
+--=20
+2.51.0
 
-[snip]
 
