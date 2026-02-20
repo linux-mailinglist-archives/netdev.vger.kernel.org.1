@@ -1,68 +1,67 @@
-Return-Path: <netdev+bounces-259735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259736-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YElZB/+AmGlMJQMAu9opvQ
-	(envelope-from <netdev+bounces-259735-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 16:42:55 +0100
+	id wH73CmOBmGlMJQMAu9opvQ
+	(envelope-from <netdev+bounces-259736-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 16:44:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B287A168FC2
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 16:42:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB8F6168FFC
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 16:44:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1B2D23004DD9
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 15:42:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1983A30A808F
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 15:43:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75CDF3451BA;
-	Fri, 20 Feb 2026 15:42:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4E8734DCF9;
+	Fri, 20 Feb 2026 15:43:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BBDFY5Xs"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PXqKwvDX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 122E03164D4;
-	Fri, 20 Feb 2026 15:42:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F7F034C806
+	for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 15:43:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771602171; cv=none; b=tn25LsY4AfIqHXiG+JFgMRhN3dyTChKLoVxkKzDIim36dUfGLUaG+vpAJtz7+3jdqYDxyaH3NdAIS0WifW4iuGLkT0ukSYl6mscCesIQMTrRE3oibwUTt0LRI5t3+g2fG4V5vBBLP8+PPrmShNN+G1yP68rGkq3u/5T7L9mdutA=
+	t=1771602218; cv=none; b=qkT691ybpf7f7GxD1jUV6/FOZUyKPLxpCGqOlbDSfEYEU1sKsd6JirLTqUdt4Efjf1gItAgZRANabNiMdOSfhAPObhGXnoVwu0feyIqIGSAi9wQD0CbYWMxoSCQ1ma+eak5pwbHYi4uuKf4Mdn3hLSXFW3DytQ7BZHlH4rYLDWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771602171; c=relaxed/simple;
-	bh=c/0F3Zcs/ajAPs7LR68zL4Fd8Ke5e+LE0K35AHav2hE=;
+	s=arc-20240116; t=1771602218; c=relaxed/simple;
+	bh=XancFSkqs9/j3HeLlQ6DxYHYeIvDSLV8aOi9rO0aggo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lm8m5deRFD30Dup9jsEWJpokI99M6r+4CeSWNrenZfu1aosr6J7i+n+4xY95CD2wysAp9z6pf1TsyryXyXfFCa9ToPi8I32pwAGn56roHzAyWXkg23oOYLFKIpAgSFkRzj9jRprXSlNyxlYuVJDh0dVU1iS6TyEOMKVzVAj5GVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BBDFY5Xs; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1771602169; x=1803138169;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=c/0F3Zcs/ajAPs7LR68zL4Fd8Ke5e+LE0K35AHav2hE=;
-  b=BBDFY5XsSl1s8i1DruwmHByDLRy0+6uVADryc8SUXgX2iKQfVawFNH5A
-   8c77nwWcwwvCv9uMh3fYbUTTAfezD/QgsfFs1dPsciQj4pgeS+ALDWImj
-   Fjv1HSF9ZvJJiIzBQefdamLpXTij2KEXhdSh5WwVBGIR8si6IQm3UUGZz
-   3PNTrbdZSqsoKswuAmCyckugWQi5h0+0R/ZgJPKqp/FH1/5CwR693M13D
-   r+69GEs3Bzteh04UO+JxXzoTH1Ezya2SmOMIdz5NVcL4jKLvj2xPB0AUJ
-   aes/ygDX4eCeAG0zjFnALaQfW1dUf5LYqjM09X19NN4Qdz1iGY5g4j9QE
-   w==;
-X-CSE-ConnectionGUID: cPWtHafgSzip8tkccjMtCw==
-X-CSE-MsgGUID: ldYXF0NQQpGF9NJcRwdSDA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11707"; a="71721754"
-X-IronPort-AV: E=Sophos;i="6.21,302,1763452800"; 
-   d="scan'208";a="71721754"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2026 07:42:48 -0800
-X-CSE-ConnectionGUID: 9z4j3WoPRByXRBneFiGB+A==
-X-CSE-MsgGUID: YwKunrxmT8KsXe79qObBjg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,302,1763452800"; 
-   d="scan'208";a="212637935"
-Received: from gabaabhi-mobl2.amr.corp.intel.com (HELO [10.125.110.83]) ([10.125.110.83])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2026 07:42:47 -0800
-Message-ID: <341c6e75-e027-4fa0-bb5e-f8091efd3130@intel.com>
-Date: Fri, 20 Feb 2026 08:42:46 -0700
+	 In-Reply-To:Content-Type; b=VHd/mrph9Jr/A2Vzz+B5gLY2/RnVsll2+gAVpEFOdXOvqvcxd36m5tijY/cwpd0iGRBhZlsavVZKf2e1GI2VbOKbpTahF9LBpPDyNicMC1WHOj9WVpy8Dw46A2fMZnL4xw6U4Llyd4Oafeojl+cHQMw1/F9XAZ1dRRW4RPM4sno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PXqKwvDX; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1771602216;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Z+Uv0d3wrPnSJ3SxLCH2RWTR/GFjVuhCCarj46UG2RM=;
+	b=PXqKwvDX608w+/TNX1ixwHfUMyVlpU7zgb1WYcw8YQRJxdCpMIgkmR0nm5JaYJ/qtYmOa9
+	MkQDE4B95JZTrMXHzyC2LFpbYhOXPcHksdKUlpK7xOEyG9sA5B01jV9T/KC2BjN5mw851C
+	kke3+TzQ4rI/8JXg4koxR5fstd8Err8=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-325-TU7hGJMAMh2LNowuTJn72A-1; Fri,
+ 20 Feb 2026 10:43:33 -0500
+X-MC-Unique: TU7hGJMAMh2LNowuTJn72A-1
+X-Mimecast-MFC-AGG-ID: TU7hGJMAMh2LNowuTJn72A_1771602211
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 272A21956052;
+	Fri, 20 Feb 2026 15:43:31 +0000 (UTC)
+Received: from [10.44.32.156] (unknown [10.44.32.156])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F00081800361;
+	Fri, 20 Feb 2026 15:43:25 +0000 (UTC)
+Message-ID: <00243d05-7dda-4106-b56c-f772d3fa96be@redhat.com>
+Date: Fri, 20 Feb 2026 16:43:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,296 +69,147 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v23 12/22] cxl: Define a driver interface for HPA free
- space enumeration
-To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
- netdev@vger.kernel.org, dan.j.williams@intel.com, edward.cree@amd.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
-Cc: Alejandro Lucero <alucerop@amd.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>
-References: <20260201155438.2664640-1-alejandro.lucero-palau@amd.com>
- <20260201155438.2664640-13-alejandro.lucero-palau@amd.com>
+Subject: Re: [PATCH iwl-net v3] ice: fix missing dpll notification for SW pins
+To: Petr Oros <poros@redhat.com>, netdev@vger.kernel.org
+Cc: kernel test robot <lkp@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org,
+ piotr.kwapulinski@intel.com
+References: <20260220140700.2910174-1-poros@redhat.com>
 Content-Language: en-US
-From: Dave Jiang <dave.jiang@intel.com>
-In-Reply-To: <20260201155438.2664640-13-alejandro.lucero-palau@amd.com>
-Content-Type: text/plain; charset=UTF-8
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <20260220140700.2910174-1-poros@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259735-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-259736-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dave.jiang@intel.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim,huawei.com:email,amd.com:email]
-X-Rspamd-Queue-Id: B287A168FC2
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email]
+X-Rspamd-Queue-Id: AB8F6168FFC
 X-Rspamd-Action: no action
 
-
-
-On 2/1/26 8:54 AM, alejandro.lucero-palau@amd.com wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
+On 2/20/26 3:07 PM, Petr Oros wrote:
+> ice_dpll_notify_changes() sends dpll_pin_change_ntf() only for the
+> direct CGU input pin stored in d->active_input. Software-controlled
+> pins (SMA/U.FL) are separate dpll_pin objects that wrap a backing CGU
+> input, but they never receive a change notification. As a result,
+> userspace consumers such as synce4l that monitor SMA pins via dpll
+> netlink never learn when the pin state transitions (e.g. from
+> SELECTABLE to CONNECTED), even though 'dpll pin show' reports the
+> correct state on demand.
 > 
-> CXL region creation involves allocating capacity from Device Physical
-> Address (DPA) and assigning it to decode a given Host Physical Address
-> (HPA). Before determining how much DPA to allocate the amount of available
-> HPA must be determined. Also, not all HPA is created equal, some HPA
-> targets RAM, some targets PMEM, some is prepared for device-memory flows
-> like HDM-D and HDM-DB, and some is HDM-H (host-only).
+> When the active input changes, also send dpll_pin_change_ntf() for any
+> registered SMA/U.FL input pin whose backing CGU input matches the old
+> or new active input.
 > 
-> In order to support Type2 CXL devices, wrap all of those concerns into
-> an API that retrieves a root decoder (platform CXL window) that fits the
-> specified constraints and the capacity available for a new region.
-> 
-> Add a complementary function for releasing the reference to such root
-> decoder.
-> 
-> Based on https://lore.kernel.org/linux-cxl/168592159290.1948938.13522227102445462976.stgit@dwillia2-xfh.jf.intel.com/
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> Fixes: 2dd5d03c77e2 ("ice: redesign dpll sma/u.fl pins control")
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202602200046.SGwK2tWh-lkp@intel.com/
+> Signed-off-by: Petr Oros <poros@redhat.com>
 > ---
->  drivers/cxl/core/region.c | 164 ++++++++++++++++++++++++++++++++++++++
->  drivers/cxl/cxl.h         |   3 +
->  include/cxl/cxl.h         |   6 ++
->  3 files changed, 173 insertions(+)
+> v3:
+> - Add kdoc for the helper.
+> v2:
+> - Extract ice_dpll_sw_pin_needs_notify() helper for readability,
+> - Move loop variable into for() scope.
 > 
-> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
-> index 954b8fcdbac6..bdefd088f5f1 100644
-> --- a/drivers/cxl/core/region.c
-> +++ b/drivers/cxl/core/region.c
-> @@ -705,6 +705,170 @@ static int free_hpa(struct cxl_region *cxlr)
->  	return 0;
->  }
->  
-> +struct cxlrd_max_context {
-> +	struct device * const *host_bridges;
-> +	int interleave_ways;
-> +	unsigned long flags;
-> +	resource_size_t max_hpa;
-> +	struct cxl_root_decoder *cxlrd;
-> +};
-> +
-> +static int find_max_hpa(struct device *dev, void *data)
-> +{
-> +	struct cxlrd_max_context *ctx = data;
-> +	struct cxl_switch_decoder *cxlsd;
-> +	struct cxl_root_decoder *cxlrd;
-> +	struct resource *res, *prev;
-> +	struct cxl_decoder *cxld;
-> +	resource_size_t free = 0;
-> +	resource_size_t max;
-> +	int found = 0;
-> +
-> +	if (!is_root_decoder(dev))
-> +		return 0;
-> +
-> +	cxlrd = to_cxl_root_decoder(dev);
-> +	cxlsd = &cxlrd->cxlsd;
-> +	cxld = &cxlsd->cxld;
-> +
-> +	if ((cxld->flags & ctx->flags) != ctx->flags) {
-> +		dev_dbg(dev, "flags not matching: %08lx vs %08lx\n",
-> +			cxld->flags, ctx->flags);
-> +		return 0;
-> +	}
-> +
-> +	for (int i = 0; i < ctx->interleave_ways; i++) {
-> +		for (int j = 0; j < ctx->interleave_ways; j++) {
-> +			if (ctx->host_bridges[i] == cxlsd->target[j]->dport_dev) {
-> +				found++;
-> +				break;
-> +			}
-> +		}
-> +	}
-> +
-> +	if (found != ctx->interleave_ways) {
-> +		dev_dbg(dev,
-> +			"Not enough host bridges. Found %d for %d interleave ways requested\n",
-> +			found, ctx->interleave_ways);
-> +		return 0;
-> +	}
-> +
-> +	/*
-> +	 * Walk the root decoder resource range relying on cxl_rwsem.region to
-> +	 * preclude sibling arrival/departure and find the largest free space
-> +	 * gap.
-> +	 */
-> +	lockdep_assert_held_read(&cxl_rwsem.region);
-> +	res = cxlrd->res->child;
-> +
-> +	/* With no resource child the whole parent resource is available */
-> +	if (!res)
-> +		max = resource_size(cxlrd->res);
-> +	else
-> +		max = 0;
-> +
-> +	for (prev = NULL; res; prev = res, res = res->sibling) {
-> +		if (!prev && res->start == cxlrd->res->start &&
-> +		    res->end == cxlrd->res->end) {
-> +			max = resource_size(cxlrd->res);
-> +			break;
-> +		}
-
-Can this block be pulled out of the for loop so it only needs to run once?
-
-> +		/*
-> +		 * Sanity check for preventing arithmetic problems below as a
-> +		 * resource with size 0 could imply using the end field below
-> +		 * when set to unsigned zero - 1 or all f in hex.
-> +		 */
-> +		if (prev && !resource_size(prev))
-> +			continue;
-> +
-> +		if (!prev && res->start > cxlrd->res->start) {
-> +			free = res->start - cxlrd->res->start;
-> +			max = max(free, max);
-> +		}
-> +		if (prev && res->start > prev->end + 1) {
-> +			free = res->start - prev->end + 1;
-> +			max = max(free, max);
-> +		}
-> +	}
-> +
-> +	if (prev && prev->end + 1 < cxlrd->res->end + 1) {
-> +		free = cxlrd->res->end + 1 - prev->end + 1;
-> +		max = max(free, max);
-> +	}
-> +
-> +	dev_dbg(cxlrd_dev(cxlrd), "found %pa bytes of free space\n", &max);
-> +	if (max > ctx->max_hpa) {
-> +		if (ctx->cxlrd)
-> +			put_device(cxlrd_dev(ctx->cxlrd));
-> +		get_device(cxlrd_dev(cxlrd));
-> +		ctx->cxlrd = cxlrd;
-> +		ctx->max_hpa = max;
-
-Is there any chance that ctx->cxlrd == cxlrd? Maybe you can do:
-
-if (ctx->cxlrd && ctx->cxlrd != cxlrd) {
-	put_device(cxlrd_dev(ctx->cxlrd));
-	get_device(cxlrd_dev(cxlrd));
-	ctx->cxlrd = cxlrd;
-}
-ctx->max_hpa = max;
-
-DJ
-
-> +	}
-> +	return 0;
-> +}
-> +
+> drivers/net/ethernet/intel/ice/ice_dpll.c | 29 +++++++++++++++++++++++
+>   1 file changed, 29 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
+> index c2ad39bfe177db..a9db85a1026388 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_dpll.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
+> @@ -2462,6 +2462,24 @@ static u64 ice_generate_clock_id(struct ice_pf *pf)
+>   	return pci_get_dsn(pf->pdev);
+>   }
+>   
 > +/**
-> + * cxl_get_hpa_freespace - find a root decoder with free capacity per constraints
-> + * @cxlmd: the mem device requiring the HPA
-> + * @interleave_ways: number of entries in @host_bridges
-> + * @flags: CXL_DECODER_F flags for selecting RAM vs PMEM, and Type2 device
-> + * @max_avail_contig: output parameter of max contiguous bytes available in the
-> + *		      returned decoder
+> + * ice_dpll_sw_pin_needs_notify - check if SW pin needs change notification
+> + * @p: pointer to SW pin (SMA or U.FL)
+> + * @active: currently active input pin (or NULL)
+> + * @old: previously active input pin (or NULL)
 > + *
-> + * Returns a pointer to a struct cxl_root_decoder
-> + *
-> + * The return tuple of a 'struct cxl_root_decoder' and 'bytes available given
-> + * in (@max_avail_contig))' is a point in time snapshot. If by the time the
-> + * caller goes to use this decoder and its capacity is reduced then caller needs
-> + * to loop and retry.
-> + *
-> + * The returned root decoder has an elevated reference count that needs to be
-> + * put with cxl_put_root_decoder(cxlrd).
+> + * Return: true if the SW pin is an input whose backing CGU pin matches either
+> + * the old or new active input, meaning its state has changed.
 > + */
-> +struct cxl_root_decoder *cxl_get_hpa_freespace(struct cxl_memdev *cxlmd,
-> +					       int interleave_ways,
-> +					       unsigned long flags,
-> +					       resource_size_t *max_avail_contig)
+> +static bool
+> +ice_dpll_sw_pin_needs_notify(struct ice_dpll_pin *p,
+> +			     struct dpll_pin *active, struct dpll_pin *old)
 > +{
-> +	struct cxlrd_max_context ctx = {
-> +		.flags = flags,
-> +		.interleave_ways = interleave_ways,
-> +	};
-> +	struct cxl_port *root_port;
-> +	struct cxl_port *endpoint;
-> +
-> +	endpoint = cxlmd->endpoint;
-> +	if (!endpoint) {
-> +		dev_dbg(&cxlmd->dev, "endpoint not linked to memdev\n");
-> +		return ERR_PTR(-ENXIO);
-> +	}
-> +
-> +	ctx.host_bridges = &endpoint->host_bridge;
-> +
-> +	struct cxl_root *root __free(put_cxl_root) = find_cxl_root(endpoint);
-> +	if (!root) {
-> +		dev_dbg(&endpoint->dev, "endpoint is not related to a root port\n");
-> +		return ERR_PTR(-ENXIO);
-> +	}
-> +
-> +	root_port = &root->port;
-> +	scoped_guard(rwsem_read, &cxl_rwsem.region)
-> +		device_for_each_child(&root_port->dev, &ctx, find_max_hpa);
-> +
-> +	if (!ctx.cxlrd)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	*max_avail_contig = ctx.max_hpa;
-> +	return ctx.cxlrd;
+> +	return p->pin &&
+> +	       p->direction == DPLL_PIN_DIRECTION_INPUT &&
+> +	       (p->input->pin == active || p->input->pin == old);
 > +}
-> +EXPORT_SYMBOL_NS_GPL(cxl_get_hpa_freespace, "CXL");
 > +
-> +void cxl_put_root_decoder(struct cxl_root_decoder *cxlrd)
-> +{
-> +	put_device(cxlrd_dev(cxlrd));
-> +}
-> +EXPORT_SYMBOL_NS_GPL(cxl_put_root_decoder, "CXL");
+>   /**
+>    * ice_dpll_notify_changes - notify dpll subsystem about changes
+>    * @d: pointer do dpll
+> @@ -2470,6 +2488,7 @@ static u64 ice_generate_clock_id(struct ice_pf *pf)
+>    */
+>   static void ice_dpll_notify_changes(struct ice_dpll *d)
+>   {
+> +	struct ice_dplls *dplls = &d->pf->dplls;
+>   	bool pin_notified = false;
+>   
+>   	if (d->prev_dpll_state != d->dpll_state) {
+> @@ -2477,6 +2496,8 @@ static void ice_dpll_notify_changes(struct ice_dpll *d)
+>   		dpll_device_change_ntf(d->dpll);
+>   	}
+>   	if (d->prev_input != d->active_input) {
+> +		struct dpll_pin *old = d->prev_input;
 > +
->  static ssize_t size_store(struct device *dev, struct device_attribute *attr,
->  			  const char *buf, size_t len)
->  {
-> diff --git a/drivers/cxl/cxl.h b/drivers/cxl/cxl.h
-> index 944c5d1ccceb..c7d9b2c2908f 100644
-> --- a/drivers/cxl/cxl.h
-> +++ b/drivers/cxl/cxl.h
-> @@ -706,6 +706,9 @@ struct cxl_root_decoder *to_cxl_root_decoder(struct device *dev);
->  struct cxl_switch_decoder *to_cxl_switch_decoder(struct device *dev);
->  struct cxl_endpoint_decoder *to_cxl_endpoint_decoder(struct device *dev);
->  bool is_root_decoder(struct device *dev);
-> +
-> +#define cxlrd_dev(cxlrd) (&(cxlrd)->cxlsd.cxld.dev)
-> +
->  bool is_switch_decoder(struct device *dev);
->  bool is_endpoint_decoder(struct device *dev);
->  struct cxl_root_decoder *cxl_root_decoder_alloc(struct cxl_port *port,
-> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
-> index 92880c26b2d5..834dc7e78934 100644
-> --- a/include/cxl/cxl.h
-> +++ b/include/cxl/cxl.h
-> @@ -255,4 +255,10 @@ struct cxl_endpoint_decoder *cxl_get_committed_decoder(struct cxl_memdev *cxlmd,
->  struct range;
->  int cxl_get_region_range(struct cxl_region *region, struct range *range);
->  void cxl_unregister_region(struct cxl_region *cxlr);
-> +struct cxl_port;
-> +struct cxl_root_decoder *cxl_get_hpa_freespace(struct cxl_memdev *cxlmd,
-> +					       int interleave_ways,
-> +					       unsigned long flags,
-> +					       resource_size_t *max);
-> +void cxl_put_root_decoder(struct cxl_root_decoder *cxlrd);
->  #endif /* __CXL_CXL_H__ */
+>   		if (d->prev_input)
+>   			dpll_pin_change_ntf(d->prev_input);
+>   		d->prev_input = d->active_input;
+> @@ -2484,6 +2505,14 @@ static void ice_dpll_notify_changes(struct ice_dpll *d)
+>   			dpll_pin_change_ntf(d->active_input);
+>   			pin_notified = true;
+>   		}
+> +		for (int i = 0; i < ICE_DPLL_PIN_SW_NUM; i++) {
+> +			if (ice_dpll_sw_pin_needs_notify(&dplls->sma[i],
+> +							 d->active_input, old))
+> +				dpll_pin_change_ntf(dplls->sma[i].pin);
+> +			if (ice_dpll_sw_pin_needs_notify(&dplls->ufl[i],
+> +							 d->active_input, old))
+> +				dpll_pin_change_ntf(dplls->ufl[i].pin);
+> +		}
+>   	}
+>   	if (d->prev_phase_offset != d->phase_offset) {
+>   		d->prev_phase_offset = d->phase_offset;
+
+LGMT...
+
+Reviewed-by: Ivan Vecera <ivecera@redhat.com>
 
 
