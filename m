@@ -1,191 +1,168 @@
-Return-Path: <netdev+bounces-259749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259750-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0I+9N52pmGmvKgMAu9opvQ
-	(envelope-from <netdev+bounces-259749-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 19:36:13 +0100
+	id GP6XM0qqmGn5KgMAu9opvQ
+	(envelope-from <netdev+bounces-259750-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 19:39:06 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 765F116A1CA
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 19:36:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 35D5C16A20A
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 19:39:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6499F3018BF3
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 18:35:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3CE463035D55
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 18:39:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FE8F366803;
-	Fri, 20 Feb 2026 18:35:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CF4135B64F;
+	Fri, 20 Feb 2026 18:39:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="YqpoFQJN"
+	dkim=pass (2048-bit key) header.d=ziswiler.com header.i=marcel@ziswiler.com header.b="DAnaaMy6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.perfora.net (mout.perfora.net [74.208.4.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06ED1366545
-	for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 18:35:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771612518; cv=pass; b=CqV7R4E3haZ4iCsqPS9qg1nk4HYfp1BdzNDuwzTub3J7YDJVhymZKTmGh6aPyPkCV5tkBlB+cHsHkwz6r7vsbxSafBBgQvj+15g2TCYn9U3DyCiO8mKR9RaPj3QaYNdhVZIqXH/3dyKAcBmTC2CCRaL3XuY190C5VWGpqG5AiOA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771612518; c=relaxed/simple;
-	bh=MxQa3nrfu1YS+AokB96QoOSx1G+mkz1ci5wmgAEFyag=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oJ3gEoLDiII3KSbrhxcB8tZsqEy9Sp5VYYpX4xchUJg59qdbFcwSuoYNHBlxUwwWAe5H6FGG9m34YD/TvlOrRnk0UWqg0oaxR54zXg4xGwREeTBBS7XFmbvIYjyTpMIphtrGqMfjotlKbyXGUi3sVY2aE3YCb5VJJZmbVANxH6s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=YqpoFQJN; arc=pass smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-65a2fea1a1eso5506201a12.0
-        for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 10:35:16 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771612515; cv=none;
-        d=google.com; s=arc-20240605;
-        b=cidIR6feSkBFhnGRJe0N9MICQebOtNksd3txr5J7K0J3jZKCg3VkMwb48qWW6kDTAq
-         b5D2Hs4feS/lQYkIcDAtBgImAZlA/mM66a/NBNL6X0ktjb1KhUDC4TA/1YTwAptx+qWT
-         PhfoQpCnvdLS5gNCaR9onKyUA6X/+FUeBcgrs+gzQL2vzRr9P3P9O6LNt8Pj2Ice4gHN
-         gV7AluEGAj+YtEzYRdpEM59pUBy0laPOU++kj/j8fBeUlQHIEH5Cypu2lbDnKRLQ8xc7
-         /gr72Slz/cDLnm07UKFVuyXy+ILZaY0EmTZy0O6k9cn86yoHCG9Twt3ApEWVyDMNWDNV
-         6qZA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=1Xu9HuQBL5cHkzfmroWqrxWWuNKUX0XVOJbElhWvSbc=;
-        fh=4wsaFr7yCnCGJv4OdjcIdNEcBDsPPpfcfa+Q4BcAGTI=;
-        b=QodAv4dYlmRfsZC4tKIv3mN/FdTCFyzXFoiZXZo2tVACn1rm3I0DBD30M1k9dF0SQ3
-         mHAMVWHk4QWwS3FcaxEjnErsbw1Tq9cbJS4EWLMriBo3wIdCijWMVyLlVFM3oxVUBtHB
-         +of3hro7rPMtfOx/UIPp2asofBPHHhKYRjvEtU9WmG5CXRDfkoVOsM0/mc+KuUJF6peQ
-         qtpYgL7eLO+NO0Y3OMpucuBV5CwbL6er5YuWgwtv2c6rRJQy/4Z6lgx9VGxF8j+GKqh5
-         SqO4lkK4Pns4EGstiIvdHdLZUBtN/+u6kxDISbmI59j1CxmgEiHBXHdf1tM4lvW6OA6X
-         249Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1771612515; x=1772217315; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1Xu9HuQBL5cHkzfmroWqrxWWuNKUX0XVOJbElhWvSbc=;
-        b=YqpoFQJNZ7VmDgwYZImK521CGV7x2h+X3liTv6D6Q6BoDi6sRtJUi8pdKoHvtAPYis
-         SXCmLw5YWWZOayoTatRpLHJBpt4vOWQ27fHjpXpPcWekHiBfRaRV/9PFlugAQgAsV3EX
-         iDzo9YiVCCC3koGRvgSb0YSaEN4FUWFFjYcsBeQBEGMSCCiT/unt+3Sr+Gju42BtGeEz
-         rpW//XkxJseLJIiOhL7DJ/vrj7sXrG7W1sjEeYa7+G6JssrxMH+45wDUewTPNLEoNgtE
-         8enzrbaZ3Z7wS6OURaL3vupbVgxJLejr5gX9wSHult60ZvbpN7PqtNweroIVOwIdAJ+t
-         +IBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771612515; x=1772217315;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=1Xu9HuQBL5cHkzfmroWqrxWWuNKUX0XVOJbElhWvSbc=;
-        b=hYmXoXrgEeqZ3AJHUPnIORSEhlpoFe8FR50bsFVdkPcPgnWA9eAyeGZFg3zqoxxZ2h
-         e6CIuBisUAmsiZPA5iflREMp4Iib8iFkHUucBDM6MLHhDPxoGktX7kf/m0/pXA+eChH6
-         qxQ1U1KNSVD38WfKmm9XxvhdqcAIWjxyCgKuxDVIBY79v+6fJZ2PxfJUwZVo0AN5fLbg
-         XFa7GzWn45aOiJOpLN6GF4vtBU4kBC2M5O8gdR05LsM/nrBOt1afsKT1EVf9BzVksC7z
-         V2l08b6hQeLcBr91eFR7kIDwpozwSfgPo2G6ioGA2Ox83hKQzH4O8IGHqNgG+ZNjNjrk
-         BlKA==
-X-Forwarded-Encrypted: i=1; AJvYcCUBIJYJR/gI8OqjsQ8dR8Hh4X+ehk4fZpC/vOkUbb8tfKaSgLr1Uw4HJSMAq7jNZZQPwJk7A/M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6afmwDTDFHdUItaCw1qa/1kkd7caprf8acWjZ02viJPQddFYT
-	4esRcyPGfxQlXSP1rwlf3buHlr5wOJLheYgzPDFZpE11SjYgPAtKzEK8tQ9sVl/Vuzou+S2vfRN
-	QfjgtGe9tTlt9Lwsswg8gD0fH+Qb/z6RLJDvYkVDCug==
-X-Gm-Gg: AZuq6aIsOm22nQHYfltOCzxnU/BUtA7ypuyaIr2VqSpoZFTDSnLl4rNYzjXnWPwkoPE
-	UZatvvUUaUkoBXsn9Mc7W42/HeOP80a1GKz99ow18LHTYCYfVZmGyzqBnp/12kgzaCWumw3zWNq
-	ZmyWJES2VBSnA2GBxE+QXDsav3x/haA3L56fl3wv7juoq5CXTB2mylBEHrmz0qmVjIVrHNs7DRW
-	GsLXkCOZ+fRI3dBI8xZzWnwRsUXWiK8WR5Kt6weUQJd7YuBuWq8BS9u378lyemBzV7F44A7wY6Q
-	LpItqrHB4g==
-X-Received: by 2002:a17:907:3ea7:b0:b90:77bb:5aa3 with SMTP id
- a640c23a62f3a-b90810895b3mr33703266b.16.1771612515417; Fri, 20 Feb 2026
- 10:35:15 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C9C3D76;
+	Fri, 20 Feb 2026 18:38:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.208.4.194
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771612741; cv=none; b=ZzKI2STjqOt2rU/DdKZAy6Thkp+HKfZ6u9QZ6OuRz/zDn556rYNCw3+qESM2UqoobD3G5VJWiXbfycC4U+sQ+UNLYN57HVysc0fAI2bFRmufv3dnQmKvbyNySDcyJoAOR2nPETfJmMxhivUPDk1wtZ/B/ZB2tMJKpjxMZzaLpJU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771612741; c=relaxed/simple;
+	bh=44XHMM4HiGXVuuiMEAL+Zgb1brCATCabA15+Bi10vBM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=HqjPvCoT2lbvveuNuMqriBRzMqgSdcZIS3r4c5Bu0tGgV6b/sftm54iaG6BVSfRMN2WUPyBOVrOKKkfx6ffIPd82RDVlhipOU3BSJUt3kvEhK0Sry/FTmnpllsj8+edDXeS70B0tBYc0w3qSXVp/EHiTxVtt7T2kD8sSlO3RX9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ziswiler.com; spf=pass smtp.mailfrom=ziswiler.com; dkim=pass (2048-bit key) header.d=ziswiler.com header.i=marcel@ziswiler.com header.b=DAnaaMy6; arc=none smtp.client-ip=74.208.4.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ziswiler.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziswiler.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ziswiler.com;
+	s=s1-ionos; t=1771612693; x=1772217493; i=marcel@ziswiler.com;
+	bh=44XHMM4HiGXVuuiMEAL+Zgb1brCATCabA15+Bi10vBM=;
+	h=X-UI-Sender-Class:Message-ID:Subject:From:To:Cc:Date:In-Reply-To:
+	 References:Content-Type:Content-Transfer-Encoding:MIME-Version:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=DAnaaMy6FMfhZ2PwdSqRhG6MDuqyQSedE3vAoFZG2GKJyuf7AQZdNa+TVtKceOxx
+	 GLmKB7Tv5VuGCHD28ItratLbK71EFbbQm+dmXH9N620NvrwUDe5RAjTEtLUUiCXwz
+	 O7dIHZi+slXQOabDs5OuDN3gYk0al+6SEf5PnAqBnU6oa9NcHfjk/TI/TNS9K0uiH
+	 M6ACFR42VCrBf8H33PT/Fer/XdQIuBWF639rVTsW3LVEzzMhfowmPvK9byB+AQQdu
+	 I+8q0G2BRF/oHFxumh/eJvAPAN+HrO0qHE9bxJS+2uaDeEG7mTqVpWHZwYPyHe8RV
+	 Dq4iINyHX16t7NT5hg==
+X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
+Received: from [10.118.255.253] ([213.55.199.191]) by mrelay.perfora.net
+ (mreueus002 [74.208.5.2]) with ESMTPSA (Nemesis) id 0Lz5KI-1vgDll0QdM-00szjr;
+ Fri, 20 Feb 2026 19:38:13 +0100
+Message-ID: <5f99968ec561631852bfa72aea95a100dcad5324.camel@ziswiler.com>
+Subject: Re: [PATCH v2 0/2] net: stmmac: eic7700: fix EIC7700 eth1 RX
+ sampling timing
+From: Marcel Ziswiler <marcel@ziswiler.com>
+To: lizhi2@eswincomputing.com, devicetree@vger.kernel.org, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, 	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ netdev@vger.kernel.org, 	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+ alexandre.torgue@foss.st.com, 	rmk+kernel@armlinux.org.uk,
+ linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Cc: ningyu@eswincomputing.com, linmin@eswincomputing.com, 
+	pinkesh.vaghela@einfochips.com, weishangjuan@eswincomputing.com, 
+	dongxuyang@eswincomputing.com
+Date: Fri, 20 Feb 2026 19:37:57 +0100
+In-Reply-To: <20260209094628.886-1-lizhi2@eswincomputing.com>
+References: <20260209094628.886-1-lizhi2@eswincomputing.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (by Flathub.org) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260220-fu740-v1-0-c8af54130c58@sifive.com> <20260220-fu740-v1-3-c8af54130c58@sifive.com>
- <45821cd4-214c-43c0-ab2d-bbf34d9ec911@lunn.ch>
-In-Reply-To: <45821cd4-214c-43c0-ab2d-bbf34d9ec911@lunn.ch>
-From: Max Hsu <max.hsu@sifive.com>
-Date: Sat, 21 Feb 2026 02:35:03 +0800
-X-Gm-Features: AaiRm52zdgGy_ZwaGZNcNjw3wNbwheS9Jou-9dGIz_POzEmmVoyRUwnv2BD7-yg
-Message-ID: <CAHibDyzQAWgGP9sktLtnpND-Qr6FRrTA=HEiweyDD6rWm=8=5g@mail.gmail.com>
-Subject: Re: [PATCH 3/5] net: macb: Add support for SiFive FU740-C000
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Paul Walmsley <pjw@kernel.org>, Samuel Holland <samuel.holland@sifive.com>, 
-	Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
-	Thomas Gleixner <tglx@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Conor Dooley <conor@kernel.org>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, Paul Walmsley <paul.walmsley@sifive.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:u/DHXNq2KmbH+PEHVvmwb1sDGASiAHHbzFo0qypFQSmu/f9iPyH
+ wIM60ITAsgVE8zKq8x4W1mwI7OIQOsFfVkvxZRDQ/IfplOt1qrRxMT6waj53uIDR6B0mFaH
+ Z4w1OMjNf7s8ziypBjWDeR6Yd9ZHavHCf74toT1z82gG9kf+RbwYNYWNhEkfY8pDrtHDG2H
+ m4hi7rLnCghPmV2u0uXDA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:N6VQHXQ2V8M=;i1WrHzikZoZ7F0hufQ6NBs+Gb5n
+ oH6rserJeM//8krLCVRcJ/pddwD2cVa9puBHNwbNwuk4xlNPEHditbXxpT5GM0acxINOndcsR
+ Rf+3DD8vdBcbn9DKYRYHzC06qZz+Wjwd30xVa2pn/yiBDNguVvhc5BJsURC4Vv/JRiZ0d+dt6
+ wca8DNjfhUVWJf5/NbgsV115cWGBw4BmtLLvnzUXRXPz7ie2FDOHlfoh0yl3NPRGlNF7TzW9L
+ ijaNRUkrSyAfIWFJxnCSYZ1BR6/iYnnSruZ0qG5BK/tSji6vL5RRQaXsNnkt3KWK84hjINfSX
+ lCrTQr/ozD82tIXG1zYO4/zmF6AeMn2YP+2Mg6WlLemR57XQrTUVrO9Xtg+gyG0V0XhKH6TqW
+ 1rJuye+jU5eT8DIxCBiTircrRrk3csG6f74zK+ZOBLxHqYcS2+lMncGgfnRtHPN5TVp+1keV6
+ HzFiNxvUHpQfDCZRgm3T2bo8UxctBeDFFA6+ZIempWQMBaejqqfYaUYNa3P5KjtOhDwQdCzRa
+ 9migtwklYqWSxK859ArT8bW/RtRTU0m0ZV7GJznJlNxg/WQGr33O9mvoIJiMVRhtatocGzQc9
+ yEVkV+1P+8IVSAhH4PMdGAAr371DT3jXAljNPvhl2wf4/VNFqPAg4BLyr3oEI242e5jM8rHCh
+ 0KupWh5l8/npu8bMRqdhe/vnaIB54/JQwvnwPF8BLUcZxu+90AZSGFSrMHlkntMfc+voFDDZY
+ c0RubH/Fk9RlxiV1wwlLmZxz58H4Q1+YjvMSNlRQ/aMcHBUOIRzB3i3kxps+zd+hS8zbQPeex
+ 1XfXfjwuP4aaP6RCPgc0dAdAjfsLDF5X54IPWF70HP+vCv3bMjoRvddeiIG5EGLTa7OcSUU/I
+ SND3jUpSUL/qRCNJkL2Qnnx9KEln4eSNtFAYg03UsNL7pmY8vN0RRfSja2U2IZCE3MZc+Fgop
+ tAhUHhrquw6UyognU34C2bh0nfBCL9K9lFWpML0qZOAcsJzLIqeElM90W5y/uZaWkzfc1hRK+
+ A8J/5zRkSwgErPv1zsvVyQst119Jyrh1UYfdmiVqXFn3CPbonQGd8wfyUVN8qqYJ1o4OCShq9
+ MRvHzk0e2e5cldL2F+gjdqJzQ8DCaP68Y6sAiCdPmEu6xMXlC9CSeylpEUgw2MqKRBFuzWtp6
+ HAFDgZhQnRbCB6PJaV0GIQZbxDR2kgVQETIBQPqiah77F/ZeSvzMWRDMbxPJ1CT4sJBc4ONff
+ OL2vcgxS+Uq13qZNfBWu4fIQOx8XwhlOEsaLWMcSc4Snhzl3LvA7Xs47hyeCbUg9KIBWB7kvq
+ 3KGl12WYWhtjeLlotTFhxdhydAQfnqha7FayK+F4OG8CvpLm0CLwnrtafdtS/2OxNUeKEcTNw
+ REvgRxdSNiFS2Vyzf/uz/18a0ovUr5eTEzgJ3pzy9PB8ignGLzbTDrzqHPGUhp8F81mDOtAfk
+ I7DcUOxhuvKwC0hKn1XkY1Howm0Jd8KvNkaO08A6wpvLU0cHPBvHxWq1LdZLudKUo63B5SMDy
+ WEDsyQf7ic6/Vg4OjRPYBN6TmqlQ5eOuSW5p8KHwyQQe8JUGMTY6iTRzMSn47IQ4HA8Nxo/zr
+ eUGSrww3xksxxB7QJJphJiw6xyIG72llXqAvBTpYSbcyE9CrRRfTkKfH3l2mAh0dRzU5UD98p
+ Ddde3hkuSAOajGNH3CwM4Rt9C5JglSNQrbO3j+8lqbLFaHVY7GL2nIV5gCDqPIeZNNOFw8iL5
+ scHG/VjxQrgDlK+cDfyUWij3BzqEah5g6UCgjhg0RWWN5LZ2cCVgtlHRodSc1QEUuohAtwE9v
+ Q+mH
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[sifive.com,reject];
-	R_DKIM_ALLOW(-0.20)[sifive.com:s=google];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[ziswiler.com,none];
+	R_DKIM_ALLOW(-0.20)[ziswiler.com:s=s1-ionos];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259749-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-259750-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[eswincomputing.com,vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,st-md-mailman.stormreply.com,lists.infradead.org];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[max.hsu@sifive.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[sifive.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	DKIM_TRACE(0.00)[ziswiler.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sifive.com:dkim,lunn.ch:email,infradead.org:url,infradead.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 765F116A1CA
+	RCPT_COUNT_TWELVE(0.00)[22];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[marcel@ziswiler.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 35D5C16A20A
 X-Rspamd-Action: no action
 
-Thanks for the review, Andrew!
+Hi Zhi Li
 
-Based on Conor's feedback on patch 1, I'll be dropping this patch entirely
-in v2. Instead, I'll use a fallback compatible string pattern
-("sifive,fu740-c000-gem", "sifive,fu540-c000-gem") in the device tree,
-which makes this driver change redundant.
+Sorry, to steal this thread, but I do have a quick question concerning Ethe=
+rnet on the EIC7700. Every time I
+enable gmac0 in the device tree my EBC7700 stops booting (e.g. SD card is n=
+o longer detected) while Ethernet
+does seem to at least get detected. This has been seen using next-20260219,=
+ stable v6.19.2 [1] as well as
+6.18.0-rc6 [2]. Any idea what could be going wrong?
 
-Since there will be no net subsystem changes in v2, the series will go
-through the devicetree and RISC-V trees instead.
+I admit so far I only do have one single EBC7700 at hand while waiting for =
+further hardware to arrive.
 
-Thanks,
-Max
+Thanks!
 
+[1] https://github.com/riscv/meta-riscv/pull/601
+[2] https://github.com/eswincomputing/linux-next/tree/dev/test-upstream-v6.=
+18-rc6
 
-On Fri, Feb 20, 2026 at 9:15=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> On Fri, Feb 20, 2026 at 04:27:07PM +0800, Max Hsu wrote:
-> > Add a distinct configuration for the SiFive FU740-C000 ethernet
-> > controller to comply with the SiFive IP versioning guidelines.
->
-> We are in the merge window at the moment, so net-next is closed.
->
-> As requested, please reword the commit messages to replace the SiFive
-> guidelines with the generic DT guidelines. And repost when net-next
-> reopens.
->
-> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
->
-> The Subject line also needs to indicate which tree this is for.
->
->     Andrew
->
-> ---
-> pw-bot: cr
->
-> _______________________________________________
-> linux-riscv mailing list
-> linux-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-riscv
+Cheers
+
+Marcel
+
+[snip]
 
