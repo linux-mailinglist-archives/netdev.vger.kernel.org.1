@@ -1,161 +1,275 @@
-Return-Path: <netdev+bounces-259703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259704-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +DlfD7xQmGkBGAMAu9opvQ
-	(envelope-from <netdev+bounces-259703-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 13:17:00 +0100
+	id eLVvHKpSmGk1GQMAu9opvQ
+	(envelope-from <netdev+bounces-259704-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 13:25:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D74B16775A
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 13:16:59 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCF9216779A
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 13:25:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2F0E630642EA
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 12:16:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5949C3052BAE
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 12:25:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AE6C27C866;
-	Fri, 20 Feb 2026 12:16:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E014E342C9E;
+	Fri, 20 Feb 2026 12:25:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hZhsIFG6";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="DHTSWF8i"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="nd1iv9h8"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 477383176E0
-	for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 12:16:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF76E34320A
+	for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 12:25:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771589801; cv=none; b=enD52inTqOAJf83I68BLxzgo9xwxBstd7noz3i5iO/vLEPri+hCPASO+VFzwPot+jN8Snlup9Wa8js47XbGCaBQF7xBSFyxRH3Bietcc0u0L+tM03CW2VBXcA1+vRHnMvWjtyxcC9LesxbLyG/we+VTqyn0uksFVXOwqkqhqikw=
+	t=1771590309; cv=none; b=uEp/j8ygfZtasB1+BsOADW2AgwrKRAdFMdAe5kKT6A0bs9h65nNICZC89j21EoS1XI2pvt/a0ZRZQdNTdnEkcU8uau50ukEzrsUPTYVw8GHFLa+J50McsxfzWTV/TgDuYanzdmz6cv71B3smpWk+RLSfF+5f8YRwk2/DChMnZRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771589801; c=relaxed/simple;
-	bh=wm76su/KSHXbP9XpFDxWLEEOisiuyvETB5+Pc5yMr6M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KQ/c6V8v+Nifp+cpGzGvMzuKmOAPu7QdUJsN3Goq0QJsVxllDgvg0ULYcW7V3YxTnF/Xi/8YQWikC/990LqaMnvTNLWFqZqg2iVESdaU1KyHSGs3EIYDimC41HQsp2swadoIZ/D1PHEzZgvRUZ6YpxuZvn3DAloq/R8D1k9CBaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hZhsIFG6; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=DHTSWF8i; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1771589798;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cLoJ+jp00IG6fGnTItrasTfbATFvyrsRR0CaBc2zB4c=;
-	b=hZhsIFG6DSSJMPV0SF4EhyEwn0gZlZgGEIA6LuXaV+8djXM0fKCf0PmneFX4ykvySQ3ktJ
-	gW86kn/dS8eQjVxjQlcvlTFcVAYN23Y+KDs9qkg0f9nsn+f4RQpIuMi2Bd1x9RVAi4MCzB
-	dzstCmcAA0hHTpyCgglVH891IhExKZE=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-498-NrJchBEaOC672NJELRDpYA-1; Fri, 20 Feb 2026 07:16:37 -0500
-X-MC-Unique: NrJchBEaOC672NJELRDpYA-1
-X-Mimecast-MFC-AGG-ID: NrJchBEaOC672NJELRDpYA_1771589796
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-894a861fd7cso211291786d6.3
-        for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 04:16:37 -0800 (PST)
+	s=arc-20240116; t=1771590309; c=relaxed/simple;
+	bh=TaLjfvOzj/HIcOTUm6OJh917piL4hDV/FfEgkrsrmK8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Pkr4/J1A8ItB43iMckjIgvNuqMLOErwq2Lv8RHtt50Lt0mtIeTpMTN60X9/+34XDegDwehM86pkHUwhW9FHTIHFTGCvtk7QsXwynDm++MeDbRNmXjtskWpfUwRkaGCP4YUd09vAw6kfTpWu+EHKXQxOqJ3UVnJZcAiXQKcXkLJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=nd1iv9h8; arc=none smtp.client-ip=209.85.222.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-948a378b9deso569879241.2
+        for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 04:25:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1771589796; x=1772194596; darn=vger.kernel.org;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cLoJ+jp00IG6fGnTItrasTfbATFvyrsRR0CaBc2zB4c=;
-        b=DHTSWF8iCAOkwxTFEaj08Z9jvgLErR6HZ/Mau6OA6DhMjAKNmQg269fy2yXAtFzQoR
-         Qpct3ZdR5s+iH0yvFKsOVg7FdIMDjaqVUZQjkklKnzgavAa7YXbSRvEhMFMXMjmYzSuV
-         QZbTYDak3pIMWRYrcbgJq5JBC7ijV+aEDlWBIdNdbrxko2Yt0x6YqjJ914HgaX4fes5S
-         KV/weHji/tkKtz5QtCv/FtuSLmCSb/5V5uvL7mZkFS81OlymiIi/IBkHXiytTNnkaJbY
-         eEAezAuOARK7Y801WS4etcCG/rdhZdgAqtHgiwXkUlDZQbcQ/ShUQIMDXp/FlOxZ1ZHI
-         KYHQ==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1771590306; x=1772195106; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eUjuCPulvrU/V53TQvaDZPT3PxcDMvlKYGaXtuHsTLY=;
+        b=nd1iv9h8JSTZNP2pSPL4tsVPDjAtXO+n6c/vaiuMBBUdM0Cg5k1+uQClAcgkld80zk
+         q0pbIcxVtbB9KY7lM5Jf21yZAtJ7Qgce3fhPz0rGeEf1dBIpjzClmNVAWXImivZpZpmz
+         Y3wuQgnOmD1/YgwHk6sQuitPwXcNpyC5N1dqK6VwQeecoQner5LfM1JkKnhDdJdRv2gp
+         zo4uq3uBGnJgqz9CdPcwkz8JGbfQKi1bamKwn0W/B0i7AUtwaxqqCXxONpdXTZF/vGKP
+         3AjRJ5bou3JbVN62KO5l9ZCAzYAkGUu4Gio65ACdM28jCWLOLOEBlH+xS321jiy9PvFu
+         Vz2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771589796; x=1772194596;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=cLoJ+jp00IG6fGnTItrasTfbATFvyrsRR0CaBc2zB4c=;
-        b=B8f3+BFy7yeV+cyDTSMx1txiyXbndrFuszB3KRp+btGajC4yKdfA0uywoGr4v0VbHS
-         tN+HQNN02FsCbMr/jRhdrR3HwWAL4DtCQO//FZYO/7bQSanilMOx3PoBw9ejYhK0tVMn
-         sIpw6bPyNihzSkAHQrNIngov0Yv9LMcFUFLzoCPbqOC74T7f8hF23NgLCeDzAyIXui03
-         8LomPiy+3q2kEuw9/AVGyAn/WAnf++39VNV5Px78lEmchN6bHwnGnsTMdjVa448OZuuU
-         CDQEJquNcxgVl9GkF0T5pLJsyhEUkyqB7UEI2jphKgeGVnHjO6g3O88dbxEpT7H9I/+l
-         tiIA==
-X-Forwarded-Encrypted: i=1; AJvYcCUVxAm/uOxp2P430dNBShkM60CUJmnBaTC/k4rFcwzjzNZTV9w6JVkgUu3TpuQohRsOXYA1jrc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwS7v1iZ+T3mIgQuxaNzTJ66PJ16oM94cVwT1Sjopi77rLwVo6c
-	oBp+UcuZi6nwIS2bDR8TkVSTxlC6YLlB6otUNfwbWAivAlb4+sv+r70r0DUAD4wOU7l1w9I9VqD
-	G/RIkoSKIl+4ynBJnpgL1dW5Oyhw49XmiCyQNKCEQaaq9PxibwGQm15yNnA==
-X-Gm-Gg: AZuq6aLmBj+9GE1WTNlebr4Q2/XHMHjUJI6BhTVlIi6EpRdrCsnZ9dCGIZYTKXZ1pbp
-	SqdqbjgVelgGVvdhHwHn0NBiXeKdr9iaNK5cAA9vmT/SGWsLJiiUA3eyiZvUZ8+IJicKifNw3p2
-	wxi1lEDkk61JWmQK9FWkvZE46+1VNQTgi64Dqe0oXnvHAw6qs+IU3HjnH8U+jsDgeQtdVO2U0kv
-	otT8ilZkfKOGEW9xxmc5x1ZerMiw+dE9SbEpUIdyXyOMswSLVtH9ebxPw1mfhQ/ot0S3OOUAk0Z
-	POatpjhPR2IlT3saedbg8+MoDKbhczWLSQAKczFnwCeobDZybNY0GXcLYY471pMXKNPM1iWdzbL
-	8eZR1WyGrOvqYff92iJT09ArwSpkfBhhZ0/JhcZRQmkAg1+am2VIq4EII
-X-Received: by 2002:ad4:5e85:0:b0:894:470f:677c with SMTP id 6a1803df08f44-897404af8f4mr315254386d6.51.1771589796247;
-        Fri, 20 Feb 2026 04:16:36 -0800 (PST)
-X-Received: by 2002:ad4:5e85:0:b0:894:470f:677c with SMTP id 6a1803df08f44-897404af8f4mr315253886d6.51.1771589795818;
-        Fri, 20 Feb 2026 04:16:35 -0800 (PST)
-Received: from redhat.com (c-73-183-52-120.hsd1.pa.comcast.net. [73.183.52.120])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8971cdad6c1sm235678206d6.39.2026.02.20.04.16.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Feb 2026 04:16:34 -0800 (PST)
-Date: Fri, 20 Feb 2026 07:16:33 -0500
-From: Brian Masney <bmasney@redhat.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Ryan Chen <ryan_chen@aspeedtech.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-kernel@vger.kernel.org,
-	linux-clk@vger.kernel.org, netdev@vger.kernel.org,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>
-Subject: Re: [PATCH v1 1/1] clk: baikal-t1: Remove not-going-to-be-supported
- code for Baikal SoC
-Message-ID: <aZhQoY55bwGj8LJc@redhat.com>
-References: <20260220082210.2320303-1-andriy.shevchenko@linux.intel.com>
+        d=1e100.net; s=20230601; t=1771590306; x=1772195106;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eUjuCPulvrU/V53TQvaDZPT3PxcDMvlKYGaXtuHsTLY=;
+        b=a3icu6miQl6yy+uSykS/iZYeAx0Bj2F2WSjL6uDen7cWGatvk9A5ilFFL7pwI4SEXr
+         ya+zB9EVuGhFZ3i0fRKVIibIHPy7T6EesRIgedtQaGcSCbh0dDn5VCxzXqiBTEGbLzSO
+         k3j3PFAfbx9loFBILHsv8OO5PPmwf7w9C6JUBq6xbypk67mcqZE+Iuu3Hx6GmvyAopxr
+         BQYwBmUsjV2my00rBA8Ll3XNf3wXWFrnUS3YWJ+WXjn1/7CKC40qQc3wQ4cOjJUsKfLN
+         2/a1OjG9KiPWy328IOW8homnAWb/tBpo5hAux1DNMl5wDx/yTAUtABE2Ud4WZyxt49tl
+         4Hig==
+X-Forwarded-Encrypted: i=1; AJvYcCWwM+E7ddUc3XSRLat43ijDbwCWGtJ5LrAMIPvQhRpIOq6MXDZJJ9qGgILLsmSAO+sAc2c8nHY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2VvELFOmHVb8UTUZhSqtEXXEbdG8FHwEN6t1iwCNFIfvQq11S
+	+gV0ilJqXMp1qjpsWC7tHsR5s82JfRKbeJnNe5Zwo6eOW+FKMrwPTmwH+AzCpa5ErA==
+X-Gm-Gg: AZuq6aIp1Mq9M/552ioZaeZdH6hMpORULo9XoPDW163aoq4YzSEnbIPTrITugcyZ9zo
+	OsJ7PWhl8s6JeuHO0QvTgYGT/+1g01LJUV7t1HGmV8NkYKya6O5l6enb+uB+fgHiIFj1iMLL2xN
+	JorZq96LUDW/Ba3B9v8lDysIjp0kRfLZLvrVS0fwZ+QyLcy6zOSCg80a8w/GUIMjwm82ToOFvGu
+	DBrkUns8gm4Siqljb3dd0BDs1cCQILgQRdndEkKHTjVrMt/+Q9Mvfz118g60JODss/UI4Xp+xLK
+	dIWOEW5W7qlJ8mu+5ELscJJOT8BRNseIIzssMlPfTIC7sqG9+QtICdaJjHR6ftNoP0OM8a2QSfu
+	PapVyxJH3NLcavctSR2Ifj4xwc5SWErfMoCWTXpP2rF2tb4mwylnhHWJNn+2YTFkRWs+Js2AXqB
+	OI6nRKbM2kDPNr3cCyg4GgsYQDLWYy+i8C3cglDI4b9fJ7
+X-Received: by 2002:a05:6102:e06:b0:5f9:39e6:cb04 with SMTP id ada2fe7eead31-5fe2acee59amr6908988137.9.1771590306169;
+        Fri, 20 Feb 2026 04:25:06 -0800 (PST)
+Received: from ?IPV6:2804:14d:5c54:4efb::2000? ([2804:14d:5c54:4efb::2000])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-94afd14e0b7sm16093007241.3.2026.02.20.04.25.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Feb 2026 04:25:05 -0800 (PST)
+Message-ID: <b4b43d1d-00bc-4168-8204-88bd9b0ba9a1@mojatatu.com>
+Date: Fri, 20 Feb 2026 09:24:59 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260220082210.2320303-1-andriy.shevchenko@linux.intel.com>
-User-Agent: Mutt/2.2.14 (2025-02-20)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net_sched: act_ct: drop all packets when not attached
+ to ingress
+To: Jamal Hadi Salim <jhs@mojatatu.com>, Paolo Abeni <pabeni@redhat.com>
+Cc: Ilya Maximets <i.maximets@ovn.org>, netdev@vger.kernel.org,
+ Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Henrik Steen <henrist@henrist.net>,
+ Olivier Tilmans <olivier.tilmans@nokia.com>,
+ Bob Briscoe <research@bobbriscoe.net>, Olga Albisser <olga@albisser.org>,
+ GangMin Kim <km.kim1503@gmail.com>, Eelco Chaudron <echaudro@redhat.com>,
+ Aaron Conole <aconole@redhat.com>, Florian Westphal <fw@strlen.de>
+References: <674b8cbfc385c6f37fb29a1de08d8fe5c2b0fbee.1771321118.git.pabeni@redhat.com>
+ <cc6bfb4a-4a2b-42d8-b9ce-7ef6644fb22b@ovn.org>
+ <ecfc49ae-99c9-414e-8b8d-211112fc5873@redhat.com>
+ <b6b67235-bd7b-45d3-81e1-49a2a1f6b241@ovn.org>
+ <CAM0EoM=g3ahJ704qDQmr4s-4sDJqbyRvWNDchb3YaRbD0zdyKA@mail.gmail.com>
+ <90b25744-76e5-4d9a-865f-72832bbedfe5@ovn.org>
+ <CAM0EoMmgigcc9aYmoj_vEM4TpopHDFjyjbdFeVyEN8QzVLb4vw@mail.gmail.com>
+ <CAM0EoMm3zkJpkHkwHX0YQDSJD_gEMphihZ3CC+b1dMx49bdjWg@mail.gmail.com>
+ <d07fdeb8-2b26-43f0-8fab-28907e88bd06@redhat.com>
+ <CAM0EoMmq-aN98=TTh7YkODFr2DmZjD=Lzp6roGiCBog1tT9Lyw@mail.gmail.com>
+ <CAM0EoMn_eXtLi36Nb3Y=oHCN3dNRjhB0UMwGVhZkr4zbAkxzuA@mail.gmail.com>
+Content-Language: en-US
+From: Victor Nogueira <victor@mojatatu.com>
+In-Reply-To: <CAM0EoMn_eXtLi36Nb3Y=oHCN3dNRjhB0UMwGVhZkr4zbAkxzuA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FREEMAIL_CC(0.00)[aspeedtech.com,google.com,vger.kernel.org,baylibre.com,kernel.org,gmail.com,pengutronix.de];
+	TAGGED_FROM(0.00)[bounces-259704-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[mojatatu.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259703-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[ovn.org,vger.kernel.org,resnulli.us,davemloft.net,google.com,kernel.org,henrist.net,nokia.com,bobbriscoe.net,albisser.org,gmail.com,redhat.com,strlen.de];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bmasney@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9D74B16775A
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mojatatu.com:mid,mojatatu.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: CCF9216779A
 X-Rspamd-Action: no action
 
-On Fri, Feb 20, 2026 at 09:22:10AM +0100, Andy Shevchenko wrote:
-> As noticed in the discussion [1] the Baikal SoC and platforms
-> are not going to be finalized, hence remove stale code.
+On 19/02/2026 17:13, Jamal Hadi Salim wrote:
+> On Thu, Feb 19, 2026 at 9:16 AM Jamal Hadi Salim <jhs@mojatatu.com> wrote:
+>>
+>> On Wed, Feb 18, 2026 at 3:43 PM Paolo Abeni <pabeni@redhat.com> wrote:
+>>>
+>>> On 2/18/26 7:44 PM, Jamal Hadi Salim wrote:
+>>>> On Wed, Feb 18, 2026 at 1:31 PM Jamal Hadi Salim <jhs@mojatatu.com> wrote:
+>>>>> On Wed, Feb 18, 2026 at 11:15 AM Ilya Maximets <i.maximets@ovn.org> wrote:
+>>>>>>  From a user's perspective I'd prefer if RTM_NEWTFILTER just fails when
+>>>>>> it contains TCA_ACT_KIND "ct" with TC_H_MIN_EGRESS.  This is clear
+>>>>>> for the application that makes a request and for the user if they make
+>>>>>> the request manually with 'tc filter ...'.
+>>>>
+>>>>> The challenge is actions could be created as a standalone i.e "tc
+>>>>> actions add action ct..." then later bound via tc filter. Don't forget
+>>>>> actions can also be shared by multiple filters (which could be a mix
+>>>>> of egress/ingress)...
+>>>>
+>>>> Actually, looking closely at the code - this is doable. Let's see if a
+>>>> patch can be cooked.
+>>>
+>>> I discussed a bit the topic with Davide, it looks like the thing you
+>>> mentioned above could be handled. The problematic part is AFAICS the
+>>> additional indirection level added by (possibly shared) blocks. AFAICS
+>>> whatever check we do at ct_init() time, shared block could later
+>>> circumvent it - unless act_ct is always forbidden for shared blocks.
+>>>
+>>> TL;DR: I think admission check at init time can be implemented only in a
+>>> quite (too much?) restrictive way.
+>>>
+>>
+>> True - the blocks will require more surgery but seems doable. We may
+>> end up again in ->quirks() land here. I.e when an action is bound to a
+>> filter (not necessarily when created) it should check its fit in the
+>> graph and see if it is legit. But since this is only the second quirk
+>> we know of, we can simplify. Note: We already have one such check,
+>> albeit ugly-looking, with skbedit (see flag TCA_ACT_FLAGS_AT_INGRESS).
+>> I will talk to Victor and see if he can cook at minimal a preliminary
+>> patch without considering blocks, and at best one that does consider
+>> blocks.
 > 
-> Link: https://lore.kernel.org/lkml/22b92ddf-6321-41b5-8073-f9c7064d3432@infradead.org/ [1]
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> After discussions with Victor we concluded that blocks have no effect
+> on this specific issue.
+> Blocks are only useful in clsact(both ingress/egress) and ingress.
+> Both of these handle ACT_CONSUMED fine.
+> Code sample looks as follows:
+> 
+>          case TC_ACT_STOLEN:
+>          case TC_ACT_QUEUED:
+>          case TC_ACT_TRAP:
+>                  consume_skb(skb);
+>                  fallthrough;
+>          case TC_ACT_CONSUMED:
+>                  *ret = NET_RX_SUCCESS;
+>                  bpf_net_ctx_clear(bpf_net_ctx);
+>                  return NULL;
+> 
+> The reason this works is because they don't have to deal with
+> queues(unlike the other qdiscs).
+> So, ignoring the block should work just fine. Ilya, for your case, if
+> you must egress, use clsact egress - the only problem is it will not
+> support the more feature-rich qdiscs...
 
-Reviewed-by: Brian Masney <bmasney@redhat.com>
+If there is no objection, we are thinking of sending something along
+these lines:
+
+diff --git a/include/net/act_api.h b/include/net/act_api.h
+index 91a24b5e0b93..2ba40eb45aad 100644
+--- a/include/net/act_api.h
++++ b/include/net/act_api.h
+@@ -70,6 +70,7 @@ struct tc_action {
+  #define TCA_ACT_FLAGS_REPLACE  (1U << (TCA_ACT_FLAGS_USER_BITS + 2))
+  #define TCA_ACT_FLAGS_NO_RTNL  (1U << (TCA_ACT_FLAGS_USER_BITS + 3))
+  #define TCA_ACT_FLAGS_AT_INGRESS       (1U << (TCA_ACT_FLAGS_USER_BITS 
++ 4))
++#define TCA_ACT_FLAGS_AT_INGRESS_OR_CLSACT     (1U << 
+(TCA_ACT_FLAGS_USER_BITS + 5))
+
+  /* Update lastuse only if needed, to avoid dirtying a cache line.
+   * We use a temp variable to avoid fetching jiffies twice.
+diff --git a/net/sched/act_ct.c b/net/sched/act_ct.c
+index 81d488655793..a79479faf0f8 100644
+--- a/net/sched/act_ct.c
++++ b/net/sched/act_ct.c
+@@ -1360,6 +1360,12 @@ static int tcf_ct_init(struct net *net, struct 
+nlattr *nla,
+                 return -EINVAL;
+         }
+
++       if (bind && !(flags & TCA_ACT_FLAGS_AT_INGRESS_OR_CLSACT)) {
++               NL_SET_ERR_MSG_MOD(extack,
++                               "May only attach ct to ingress or clsact");
++               return -EPERM;
++       }
++
+         err = nla_parse_nested(tb, TCA_CT_MAX, nla, ct_policy, extack);
+         if (err < 0)
+                 return err;
+diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+index ebca4b926dcf..8c72faf3314d 100644
+--- a/net/sched/cls_api.c
++++ b/net/sched/cls_api.c
+@@ -2228,6 +2228,11 @@ static bool is_qdisc_ingress(__u32 classid)
+         return (TC_H_MIN(classid) == TC_H_MIN(TC_H_MIN_INGRESS));
+  }
+
++static bool is_ingress_or_clsact(struct tcf_block *block, struct Qdisc *q)
++{
++       return tcf_block_shared(block) || (q && !!(q->flags & 
+TCQ_F_INGRESS));
++}
++
+  static int tc_new_tfilter(struct sk_buff *skb, struct nlmsghdr *n,
+                           struct netlink_ext_ack *extack)
+  {
+@@ -2420,6 +2425,8 @@ static int tc_new_tfilter(struct sk_buff *skb, 
+struct nlmsghdr *n,
+                 flags |= TCA_ACT_FLAGS_NO_RTNL;
+         if (is_qdisc_ingress(parent))
+                 flags |= TCA_ACT_FLAGS_AT_INGRESS;
++       if (is_ingress_or_clsact(block, q))
++               flags |= TCA_ACT_FLAGS_AT_INGRESS_OR_CLSACT;
+         err = tp->ops->change(net, skb, tp, cl, t->tcm_handle, tca, &fh,
+                               flags, extack);
+         if (err == 0) {
+
 
 
