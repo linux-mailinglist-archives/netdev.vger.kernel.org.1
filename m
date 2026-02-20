@@ -1,221 +1,200 @@
-Return-Path: <netdev+bounces-259618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259619-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id h+owODurl2kL5QIAu9opvQ
-	(envelope-from <netdev+bounces-259618-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 01:30:51 +0100
+	id WEfNKdutl2nO5QIAu9opvQ
+	(envelope-from <netdev+bounces-259619-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 01:42:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EDBE163DB6
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 01:30:51 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21FFA163E96
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 01:42:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B5368300FB5C
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 00:30:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 38C8E3026C2A
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 00:40:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88D912AD3D;
-	Fri, 20 Feb 2026 00:30:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE71A1F09A5;
+	Fri, 20 Feb 2026 00:40:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WLUqycTF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Mckt35cH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f46.google.com (mail-dl1-f46.google.com [74.125.82.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438A5C8F0
-	for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 00:30:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79A701B0F19
+	for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 00:40:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771547446; cv=none; b=Ucx+P9HrttnvErxd4b0UxyN7JdVIn4sTFv9DIrIZ67dY9PZLmit86IFFGhKcN8DK+H1bRGWxLRYv2+L9uD0Mo+RakVs2Uu4L7Um5z+Tngx5K3cDRHNeCN1RkaA8kwp43J12T+VLK3uBgiuDXVvUeAA5daVJjbUajdQ+mYyBZuoQ=
+	t=1771548034; cv=none; b=q32/Ql13gb7rStlJT/WpQVa0PSD9B8JLlOabfTfKLYRzEw4B46wl0MHTnppk43fUFUIGJcIYvQ5Kx5DsT/f6rmgYWKP1OGiC58cLa2O0NCWF7ynuqf1mq4yZe1vioz07kouCJU/1K+E09l+wy2nULLw0Ild2JSzULVHetebDMe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771547446; c=relaxed/simple;
-	bh=JHQUE5GOzFNyvc1ZCVCk74Z1cDW9iwN2hrJNEY5Vb58=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jGZ0G9SjjpURu90a9sxmO24f44hG5D+Lz45UQnrlp5ahH44GqPFKthoPMcD/RPokf6dtcCCIbtkGf2TyJfFMG4aFmmaGTzAR21Idv7fCxQPJmEzhZL9BEZAzBRRIz530gE2fGevjd5pbEobU57M/hiz/gd46XYDyTZk2c+XFb2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WLUqycTF; arc=none smtp.client-ip=74.125.82.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f46.google.com with SMTP id a92af1059eb24-127380532eeso1598326c88.1
-        for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 16:30:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771547444; x=1772152244; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=T2PIPxpQNA63NGLvP9npisU2Bb/eGAYAhx+E8CbqwmE=;
-        b=WLUqycTF2HMidqTQ7nBvl7mTxp8UCExHtH6g7ygM5ga5KWtu0XmZgrzO84RcFrsJTZ
-         cyfXaLLC6Mufb8SpQIycGgug1oQZUAOztsfXhMPp7ntQdnz8wVTV29MXGiq3dq+vTKUJ
-         Mcn5VocdZQyrtTDtggbuD9OjZmX0LfiM5Yi4U5/Ghok5pl44SPYh21qRHW0LSOXc8F81
-         1lW+XXEb+ozPYBGHdymT9DTs5E9KSl2ej/nm4oGM7q4BIXjHQn3g13z+5naGocjyDNWi
-         xt9xWiLgJwf2HsPYijoxoygIj+3jkTWhNfIOq1pGiBcj7EyhekV+/CeI3TY1KD1OliTG
-         UD1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771547444; x=1772152244;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=T2PIPxpQNA63NGLvP9npisU2Bb/eGAYAhx+E8CbqwmE=;
-        b=PMBaISF5LWECZb0vQIcMDP2sFfT8efywoRXjzBf0XTNOsAJ3f5Biv/EGD8iUXGayVt
-         yWh+poSqfULRRbOHq3kmbK6hfpnPiNmsByEnVL5t4FO5TBcPgzax2PvPR/F41wtl9UG9
-         ynXW7QwZ6KSTxaPihJnyqRDBhG1Biwd4J1bXZu/VDSggIQFf84jd+Yb0VwjC3WKpwGp4
-         /26mw6ogWlUgqytlWdFG9UXDuOMFvfmXmimbUHlVQJvYvMQadcJkCDYskYf1I1NTv5in
-         HNqNa0gzPBJUuHaN73NAL+aiK1BsWGekRQlYZ/CiKNu+o1sG6V0Rl0cr1cTRJie9W/aq
-         AjBw==
-X-Forwarded-Encrypted: i=1; AJvYcCUj1VTQJy/iiUoSRM1Xf73qcp1/nND+ue0pyCQsWEI7BD+WCIH5+9/ggg5FXKkIKWq33Jgf7Sc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcNUog67N19WBol76GXdIn1ca62rLvvq4y7OCsbPAbj4EBoVxc
-	24jK5Tz7Dk5uzAZ1s/3xp2n8RO60xsL+nhk7VHwNEGWX/kdHd7xHeKI=
-X-Gm-Gg: AZuq6aI0pJ9L9wpTFnqrzF+Z4QcjpAVSnuVaIEcZXyZErEwxgiPtAHl9OwvR4RpABnK
-	qraEq5BLTwMWvwG0AAiBAx3ZHzEuRXfM7p81jKSnS2dWeKkGYeQ/HGf6byJZhP4iFtqivV3xG7K
-	Yttr0MSQ6Y9K+3emtbn46uj5EYvcayNdWPqwCu7xnPboe+EdnPLgeEtpjmLjM2Kc9iuqZw24fH3
-	87FkGGoJ7gUNBFa+/IA7ozYAbTDq+yOqzb01sVomCR4VoFnPSjPb2nVPG+wCmI8qb6qZyPjrOBM
-	bcnhlluJcVjQTYvuaXVxtglt3MpNWp3psnE3djAmOEgmEojpJmde+9S5iFs26/nIMxRR58X67rZ
-	KsZOJglBRGaFggsGB8v93Nyxlc70dJZ0+qfNqScouGHMmw0buvYisoBHpojHFJ5lDGUwBAyvDPw
-	2fIMaj6b4fyM+0xljMKYHLXKwIjdXu1GfqAOPEcol615yRNpa5uOxLYUMwrXn/8rtM4XQwZMFKc
-	bgUAv+ar2X8zT/Tip/pOTlCGP/O
-X-Received: by 2002:a05:7022:6626:b0:11b:a3a7:65cd with SMTP id a92af1059eb24-12759a1ee7emr3982672c88.12.1771547443952;
-        Thu, 19 Feb 2026 16:30:43 -0800 (PST)
-Received: from localhost (c-76-102-12-149.hsd1.ca.comcast.net. [76.102.12.149])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12742c6dc70sm23197294c88.8.2026.02.19.16.30.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Feb 2026 16:30:43 -0800 (PST)
-Date: Thu, 19 Feb 2026 16:30:42 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>, netdev@vger.kernel.org,
-	Jiayuan Chen <jiayuan.chen@shopee.com>,
-	syzbot+2b3391f44313b3983e91@syzkaller.appspotmail.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Samiullah Khawaja <skhawaja@google.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Willem de Bruijn <willemb@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v1] net: defer __dev_set_promiscuity() to avoid
- sleeping in atomic context
-Message-ID: <aZerMs_c5W81t9BV@mini-arch>
-References: <20260214033859.43857-1-jiayuan.chen@linux.dev>
- <aZURjBHTHRvjP7Ee@mini-arch>
- <20260218174025.2fe593d3@kernel.org>
- <aZdddVNRy6sYiUEt@mini-arch>
- <20260219121213.5b5ab0e7@kernel.org>
+	s=arc-20240116; t=1771548034; c=relaxed/simple;
+	bh=hELtRf1+RelxDa7Tc7WYN9mHXWU60XRPUlkhSHSaFqI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vd0T2sbWX9tHypLEk03j9ICBJnzL1kT2LGu9HA8DNEEskTejapqWFCtGZu1cWQa836CV3W9WIjlBbUl0n2gKSxDixD4ByIVWA8tnIjqzm0+HpYeP2DJ2oXjcxAOJyCu5+8UCaYiDB65sTB81yO5f/JQ86n7T3GQeShjnZ1IVCDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Mckt35cH; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1771548034; x=1803084034;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=hELtRf1+RelxDa7Tc7WYN9mHXWU60XRPUlkhSHSaFqI=;
+  b=Mckt35cHnINh/OOJgsT5NewXjyTm+9qaUZ9Bx4gmXhoAZP7E0yKnVB6+
+   ZNBbpYClZpCDt7vdgQPCCS1fw3NLHV7GNPumsPQ97STsYuMWxNsVagtBp
+   bk+9y1btIvA9UvHN5v5x8b7w1l0/NWFoWbs3sYV7Yc2tzcMDudPp68ip/
+   2E4ARckRkR/1tsV7o4iQB7sk+7AsIWg+pPkFP0itccbJS50ElViK0rY2x
+   SxSnoP9zYRBVHKGwgTu65+tdPXTtOUaVIZ1BvAG1EHEKEKT69og3T7eYS
+   UOclpYQMYWTfZlAk+M5UEJvNZoSspqfSghSBwXCfwXsMoFQHlztlaZ7LH
+   Q==;
+X-CSE-ConnectionGUID: NdnvtH1MQ4aAgx5fX5iCYA==
+X-CSE-MsgGUID: Ookm2kKpSpyiM7yXs+wMsw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11706"; a="76484163"
+X-IronPort-AV: E=Sophos;i="6.21,300,1763452800"; 
+   d="scan'208";a="76484163"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2026 16:40:33 -0800
+X-CSE-ConnectionGUID: DvteM3giTHODAMk9wn765A==
+X-CSE-MsgGUID: YHsyo0iaRYeiwCIhZC46Zg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,300,1763452800"; 
+   d="scan'208";a="218850457"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa003.jf.intel.com with ESMTP; 19 Feb 2026 16:40:32 -0800
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net 00/13][pull request] Intel Wired LAN Driver Updates 2026-02-19 (idpf, ice, i40e, ixgbevf, e1000e)
+Date: Thu, 19 Feb 2026 16:40:12 -0800
+Message-ID: <20260220004027.729384-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260219121213.5b5ab0e7@kernel.org>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259618-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259619-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stfomichev@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,2b3391f44313b3983e91];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3EDBE163DB6
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 21FFA163E96
 X-Rspamd-Action: no action
 
-On 02/19, Jakub Kicinski wrote:
-> On Thu, 19 Feb 2026 10:59:01 -0800 Stanislav Fomichev wrote:
-> > On 02/18, Jakub Kicinski wrote:
-> > > On Tue, 17 Feb 2026 17:10:36 -0800 Stanislav Fomichev wrote:  
-> > > > > Reproducer:
-> > > > > 
-> > > > >   ip link add dummy0 type dummy
-> > > > >   ip link add team0 type team
-> > > > >   ip link set dummy0 master team0
-> > > > >   ip link set team0 up
-> > > > >   ip link add bridge0 type bridge vlan_filtering 1
-> > > > >   ip link set bridge0 up
-> > > > >   ip link set team0 master bridge0
-> > > > >   ip link add macsec0 link bridge0 type macsec
-> > > > >   ip link set macsec0 up   # triggers the bug    
-> > > > 
-> > > > Can you add it as a selftest under selftests/drivers/net/team/?  
-> > > 
-> > > Stan, this "fix" may work for the promisc flag but won't we have 
-> > > the same problem with sync'ing the address list? Looks like team
-> > > will do:
-> > >  - team_set_rx_mode()
-> > >    - dev_uc_sync_multiple()
-> > >      - __dev_set_rx_mode(port->dev)
-> > > so AFAICT we're calling ndo_set_rx_mode without holding the instance
-> > > lock?  
-> > 
-> > Not sure I understand your trace without more details about the hierarchy.
-> 
-> Team on top of a ops-locked netdev 
-> 
->  - team_set_rx_mode() # set_rx_mode on team
->    - dev_uc_sync_multiple()
->      - __dev_set_rx_mode(port->dev) # calls ndo_set_rx_mode on ops-locked
->                                     # netdev without holding the inst. lock
-> 
-> IOW this will fire:
-> 
-> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
-> index 6285fbefe38a..77991f62bffc 100644
-> --- a/drivers/net/netdevsim/netdev.c
-> +++ b/drivers/net/netdevsim/netdev.c
-> @@ -184,6 +184,7 @@ static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
->  
->  static void nsim_set_rx_mode(struct net_device *dev)
->  {
-> +       netdev_assert_locked(dev);
->  }
->  
->  static int nsim_change_mtu(struct net_device *dev, int new_mtu)
+For idpf:
+Li Li moves the check for software marker to occur after incrementing
+next to clean to avoid re-encountering the same packet. He also adds a
+couple of checks to prevent NULL pointer dereferences and NULLs rss_key,
+after free, in error path so that later checks are properly evaluated.
 
-Ah, you're saying in general.. Yeah, agreed, for the instance locked
-devices not grabbing an instance lock for these paths looks problematic.
- 
-> > But you have a point, per netdevices.rst ndo_set_rx_mode is synchronized via
-> > netif_addr_lock and we are breaking that with this patch.. :-(
-> > (so I don't think we need an instance lock if we keep netif_addr_lock?)
-> > 
-> > For this particular issue, maybe we can do something similar to net_todo_list?
-> > Instead of changing the promisc for !FLT under right here right now, move it
-> > to the rtnl_unlock? Not sure how important the ordering is..
-> 
-> Not sure. Another alternative is to implement the long standing idea of
-> having an async / sleeping version of ndo_set_rx_mode() orchestrated
-> by the core. Because a lot of drivers need to sleep, anyway, so they
-> just schedule a work from that callback.
-> 
-> Then we can say old ndo_set_rx_mode is under netif_addr_lock.
-> ndo_set_rx_mode_async is under instance lock.
+Brian Vazquez adjusts IRQ naming to have correlation with netdev naming.
 
-That sounds like a better plan going forward, but gonna need a bunch of
-work to redo the addr lock it seems? We can start with moving promisc into
-rtnl_unlock to unblock that "bridge vlan_filtering 1" and I
-can look into adding an instance lock for set_rx_mode.. LMK if you prefer
-me to focus on the latter and don't waste time on the former. 
+Sreedevi removes validation of action type as part of ntuple rule
+deletion.
+
+For ice:
+Aaron Ma breaks RDMA initialization into two steps and adjusts calls so
+that VSIs are entirely configured before plugging.
+
+Michal Schmidt fixes initialization of loopback VSI to have proper
+resources allocated to allow for loopback testing to occur.
+
+For i40e:
+Thomas Gleixner fixes a leak of preempt count by replacing get_cpu()
+with smp_processor_id().
+
+For ixgbevf:
+Jedrzej adds a check for mailbox version before attempting to call an
+associated link state call that is supported in that mailbox version.
+
+For e1000e:
+Vitaly clears power gating feature for Panther Lake systems to avoid
+packet issues. He also adds detection, and correction, of XTAL clock on
+Tiger Lake and Alder Lake systems.
+
+The following are changes since commit 8bf22c33e7a172fbc72464f4cc484d23a6b412ba:
+  Merge tag 'net-7.0-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 200GbE
+
+Aaron Ma (1):
+  ice: recap the VSI and QoS info after rebuild
+
+Brian Vazquez (1):
+  idpf: change IRQ naming to match netdev and ethtool queue numbering
+
+Jedrzej Jagielski (1):
+  ixgbevf: fix link setup issue
+
+Li Li (4):
+  idpf: increment completion queue next_to_clean in sw marker wait
+    routine
+  idpf: skip deallocating bufq_sets from rx_qgrp if it is NULL
+  idpf: skip deallocating txq group's txqs if it is NULL
+  idpf: nullify pointers after they are freed
+
+Michal Schmidt (1):
+  ice: fix crash in ethtool offline loopback test
+
+Sreedevi Joshi (1):
+  idpf: Fix flow rule delete failure due to invalid validation
+
+Thomas Gleixner (1):
+  i40e: Fix preempt count leak in napi poll tracepoint
+
+Vitaly Lifshits (3):
+  e1000e: introduce new board type for Panther Lake PCH
+  e1000e: clear DPG_EN after reset to avoid autonomous power-gating
+  e1000e: correct TIMINCA on ADP/TGP systems with wrong XTAL frequency
+
+ drivers/net/ethernet/intel/e1000e/defines.h   |  1 +
+ drivers/net/ethernet/intel/e1000e/e1000.h     |  4 +-
+ drivers/net/ethernet/intel/e1000e/hw.h        |  2 -
+ drivers/net/ethernet/intel/e1000e/ich8lan.c   | 31 ++++++-
+ drivers/net/ethernet/intel/e1000e/netdev.c    | 92 +++++++++++++++++--
+ drivers/net/ethernet/intel/i40e/i40e_trace.h  |  2 +-
+ drivers/net/ethernet/intel/ice/ice.h          |  1 +
+ drivers/net/ethernet/intel/ice/ice_base.c     |  5 +-
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  |  4 +
+ drivers/net/ethernet/intel/ice/ice_idc.c      | 44 +++++++--
+ drivers/net/ethernet/intel/ice/ice_lib.c      | 15 ++-
+ drivers/net/ethernet/intel/ice/ice_main.c     |  7 +-
+ .../net/ethernet/intel/idpf/idpf_ethtool.c    |  3 -
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    |  1 +
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 14 ++-
+ drivers/net/ethernet/intel/ixgbevf/vf.c       |  3 +-
+ 16 files changed, 191 insertions(+), 38 deletions(-)
+
+-- 
+2.47.1
+
 
