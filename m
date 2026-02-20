@@ -1,122 +1,118 @@
-Return-Path: <netdev+bounces-259774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259775-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2NvQNKfQmGmcMwMAu9opvQ
-	(envelope-from <netdev+bounces-259774-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 22:22:47 +0100
+	id ALE9JUTSmGlrNAMAu9opvQ
+	(envelope-from <netdev+bounces-259775-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 22:29:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3742E16AFB9
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 22:22:47 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D555B16AFF4
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 22:29:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 22417303DD25
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 21:22:45 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5049D3002D3E
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 21:29:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21A327603F;
-	Fri, 20 Feb 2026 21:22:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 806DC30EF8F;
+	Fri, 20 Feb 2026 21:29:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mNks5MJd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d7iAZNFV"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6C827470;
-	Fri, 20 Feb 2026 21:22:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D4F425FA30
+	for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 21:29:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771622563; cv=none; b=bxCyYCMa5dM1rLXm8WV8kgbxqTMynJkorPqYagho1wUo0HCbQknDhyFh7AakKDuQSQf0l15H4JiKxJXUPtWbQi+JTNH/huacgaSMwSxs7X1ZjkACI51AyzsoXbPC36gPEetnC+JBzeRN9mUpbqEZBYl3QU5QkaA1F2KMPvpSEV8=
+	t=1771622974; cv=none; b=AEmgExO+MGxLyz8ybD/PZQhi3+pdZJJGTopq7bhxitUzSufvbF84mj7SQxJoPvmJAIOs5gvAuV+mL3MsTBuIlLBxPiYbk0zhNKLNVybepc+aWfrHcNr5C4Q2Ryd4SZ/wfRIgGNqqOPmmlufCGpqjtxACFsnY8ELHxkcdhQgrmtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771622563; c=relaxed/simple;
-	bh=Wzv+/bm/zFNOVqDjDm3OEt8nLk05ptmHRPDJWug36XM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nTkXV9/0y/2qB9RjSCKo5I1SH1WlnbQrXdB7dAJd9xgm/AqHdmHZcXB3/CdS3tx52i2fP5XWK/Vpy6tUgzzmyZq1LY7lZy0ufu4R1P7oN6DqYYaCW/9BtTWLeIsvOBuRx7vScVxu09hSoMAc/3ll5PzQDy3Te6os/9Jh2811n6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mNks5MJd; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=jQTrRm9DdwQQcg788bUh/6qqNxoDulMA3aJEtSR6meo=; b=mNks5MJdED28eHrPyL0LV2pMSm
-	jJwLBeV6bPSq/2fNp1qed7u6MqEipNDDh2CDz18Il+lhCLK+QQlfHoU1Zh2qek7arIAtL+RjDAwy5
-	gv2SYZqc0o3WMHTJ/0ZWtTUNjetfyNEk5zebJIOyoH2nt5BDYXFBBMdenYpHpSKAaZeY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vtXxG-00871K-3s; Fri, 20 Feb 2026 22:22:30 +0100
-Date: Fri, 20 Feb 2026 22:22:30 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Jens Emil Schulz Ostergaard <jensemil.schulzostergaard@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	o.rempel@pengutronix.de,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] net: phy: micrel: Add support for lan9645x
- internal phy
-Message-ID: <bf7ced3d-44b8-4788-8f39-702486474d67@lunn.ch>
-References: <20260130-phy_micrel_add_support_for_lan9645x_internal_phy-v2-1-202ac31cf9c4@microchip.com>
- <92ba22ee64b2670448295b44d663d8ae7e8fe9c4.camel@microchip.com>
- <641d92a2-93fb-4ffe-89d8-77bf10edecf8@gmail.com>
- <1b14f42944d21fff1cb45132fe6dc9e5c18289a1.camel@microchip.com>
- <00f03a3f-fc12-4875-b4b5-7470e7f0452d@gmail.com>
- <aZjN48iisYaJ4xeg@shell.armlinux.org.uk>
+	s=arc-20240116; t=1771622974; c=relaxed/simple;
+	bh=QbxYjpvYK5cmxzAfdadtzt8NEStFyTWxngJgeUmvcsU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=f5LpJM1jWSD0koRnwiQphvIuDxrhtv7YzDo6e6mPB7g1fZYKUiR5k376h7iYAYi73BuCqFi/58MYAbJBAx3JDVVIK8QcAvW6hLYGIPlLO/Qqq7VzG5XLHVY2GOfmNEzP7aykohwwCKZaFAa5jA2chSw0Hp2hWcRZJfsXCiZu0iQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d7iAZNFV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87088C116C6;
+	Fri, 20 Feb 2026 21:29:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771622974;
+	bh=QbxYjpvYK5cmxzAfdadtzt8NEStFyTWxngJgeUmvcsU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=d7iAZNFVwMuttwV85k1ZQbjPfzvjhYgCGx/qV7jqeXLJqYHYHjMc/sUHux1WJj8Fo
+	 Uf1T/R8pLb5mUKGRsqEfbbR6J6o0/paihGCPoc61tO3Pmu/qKUtofpNOljBg6AFNR4
+	 0+8XV419g9KkHHT+xf7VNi6OMTVN9E2MsxJT+AraEvP48n3AzPmSFRvRPNAa9nm11P
+	 /3YIsXOqM0yghEqVuxoBoygfyhwEMSHiI7X41zNvijeA0bDMu94mQk11neA4Zh+baT
+	 0ZmlfD339inDjKzYBSRarmusrAjw4tMor+jh4FB2qJqY33LCDVjOgoJorZ920B4KOz
+	 Bw+RXyB1tcUHw==
+Date: Fri, 20 Feb 2026 13:29:32 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: netdev@vger.kernel.org, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Kurt Kanzenbach <kurt@linutronix.de>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Willem de
+ Bruijn <willemb@google.com>
+Subject: Re: [PATCH net v2] net: Drop the lock in skb_may_tx_timestamp()
+Message-ID: <20260220132932.1ed45656@kernel.org>
+In-Reply-To: <20260220183858.N4ERjFW6@linutronix.de>
+References: <20260220183858.N4ERjFW6@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aZjN48iisYaJ4xeg@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259774-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,microchip.com,davemloft.net,google.com,kernel.org,redhat.com,pengutronix.de,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,google.com,linutronix.de,redhat.com,kernel.org];
+	TAGGED_FROM(0.00)[bounces-259775-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3742E16AFB9
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D555B16AFF4
 X-Rspamd-Action: no action
 
-> So, we should not assume that setting 0.15 will retain configuration in
-> the PHY - at least phylib should not assume that a call to
-> genphy_soft_reset will not clear the configuration registers. If we
-> have code in phylib that makes that assumption, phylib is buggy to
-> 802.3.
+On Fri, 20 Feb 2026 19:38:58 +0100 Sebastian Andrzej Siewior wrote:
+> skb_may_tx_timestamp() may acquire sock::sk_callback_lock. The lock must
+> not be taken in IRQ context, only softirq is okay. A few drivers receive
+> the timestamp via a dedicated interrupt and complete the TX timestamp
+> from that handler. This will lead to a deadlock if the lock is already
+> write-locked on the same CPU.
 
-phylib will call the .soft_reset function provided by the driver, if
-there is one. It does not fall back to genphy_soft_reset() if it is
-missing. If a driver wants to use genphy_soft_reset() it needs to
-assign it to .soft_reset.
+Fine by me, the fix is fairly simple. But FWIW I can't stop myself from
+restating that networking core is not supposed to be called by drivers
+in hard IRQ context in general. Especially when it comes to anything
+that may involve user sockets. So my intuition is that fixing the driver
+to use a tasklet^w work_bh would make the expectations clearer.
 
-       Andrew
+Willem, you don't find that argument convincing?
+
+BTW IIUC the driver in question was igc, and it did not exist for
+another 3 years after the commit under Fixes, which is another bad
+smell here.
 
