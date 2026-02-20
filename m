@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-259641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259642-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6GdaCtzel2nW9gIAu9opvQ
-	(envelope-from <netdev+bounces-259641-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 05:11:08 +0100
+	id kIEqFG/gl2ne9gIAu9opvQ
+	(envelope-from <netdev+bounces-259642-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 05:17:51 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92F59164830
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 05:11:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C1F44164A80
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 05:17:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AD29E303A86A
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 04:10:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9C57130C77A7
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 04:12:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B2A02FC881;
-	Fri, 20 Feb 2026 04:10:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 096682FF66C;
+	Fri, 20 Feb 2026 04:11:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bAm4gV2c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s0PWe5C5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 064572F83AC;
-	Fri, 20 Feb 2026 04:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA6A7307AF0;
+	Fri, 20 Feb 2026 04:11:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771560633; cv=none; b=QcZlK6PBOSer24S8XbHqCZxfownSzRmNixAyAU6NdJ0uIzbTYZjAvmN+7wudakYBMoz2110dqM8UmQ4IzqKzfDBs/xvR46MS/IXKJwPa/tnOg4jLaYjnCuX+GVBUh4xzhgF2Dm5ZcaezZM4A6Z8cqzR+urjtO8z8QRC2j/hjvAM=
+	t=1771560660; cv=none; b=F4L3vOoRwN88jvtFrCSs27H1l3vmDh3irGn7E8G+OK9ZrZ3s36bb9+YsdcFHBbVNUpcReVZ36rVx593S7zOg1+wS8bnCEXmUGp/XFNEKEApYZy5tuskFKklGQt/HZ3BvTgajh8Mw52PIXkhkm6oOftkGNFE/9hkvoPxrxe1E+6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771560633; c=relaxed/simple;
-	bh=72mBwftCl+P66JkWk2D3tPM6F5W5fqiLlxhFDPCaeZk=;
+	s=arc-20240116; t=1771560660; c=relaxed/simple;
+	bh=efjNDJhM9/0diWvBdyGOzP+K21cHz4kM08BrUOfEDRQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NNeWTOBXwd7qsFGH7SJzqHnjwAiFoqrm6aMNxoRWYOeWSEGyH/H/G06mB3c1pI+OwhEGtn3guQdheEjBwMCBlZ8c6+0N95ZAeq4EGkZncuR31YqVPprk5rjoBB2dD0Y+8+nijOAWSS2w8yf6HwJjAUiXvS7luMgLf54CZISMKb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bAm4gV2c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A05E8C2BC9E;
-	Fri, 20 Feb 2026 04:10:32 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=IWO6dQF+zx6LeNT0z9NE/vTxWFxLNOhuBzhICPJqISUjNgGDaTquO9+GJO2GQ1k7J3bSZzLIPOgxWwkf+1Hbxnsx65lFBWKs0ec+UeIEsLWxPC/Nfl5Z8uxM7+yAfk1ayT362r+/oygCJUQdUPBVYIgFmpppfunqY6qv3DUneQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s0PWe5C5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98269C116D0;
+	Fri, 20 Feb 2026 04:11:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771560632;
-	bh=72mBwftCl+P66JkWk2D3tPM6F5W5fqiLlxhFDPCaeZk=;
+	s=k20201202; t=1771560660;
+	bh=efjNDJhM9/0diWvBdyGOzP+K21cHz4kM08BrUOfEDRQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bAm4gV2cKvjN5GuYeDqOqnWaOQJnwWiubm5cPxzG0b1Sls51+3jb0M5jPJ1+SGZTp
-	 BNMGuKF+rHUZyZkSemcZ7VP/pg7JHj2ZcfuVFKpEER40qLLDnHc+EVOwAimnPx17DQ
-	 /jDJhzaTZP/JOxp36YKfDTewflsvr8lV3YbUHfUAOw4uyWsvqfoKgWsWEaQXJWPeS0
-	 7yQWORIx1F33RSW37fCo4RiS84fyL5mrOB1bDmofqalUb0Xx4bXIumnN+Z2lzvlWAZ
-	 8a+Io+IXkFA3DZOs/NEEJxN4KV44owP83FsMWAyt+2OmNLolEZfWlAR2gjA0OmJimN
-	 kkoQWYIwgr7TQ==
+	b=s0PWe5C5DfEFXvhOpNI7PD7CfmjfKkPnl3Er379KNRdps2JQFPoznWKtIkmcobcVj
+	 nQGi5AvNQIMtqm29dzcR5JBEXVOZSjC7/ZSGvbUqAjqj6fjih/3Cdnzx4k5/VQHovv
+	 ECXpPMVdp67gRv7WTlabd5cKSHZtj0ctTJFvMgi61cM01rTpuh1Is+QEtCJGhUE663
+	 9hoUXMixh3D7BmD//K3rb0GT9JknVLzSS86miuq3vnneDb0PWVddPNyTDKBWT/Z6D+
+	 gOTX9B5N+2k/Cw40A/fepclZYN9UHV/XHkBeirJhkb+CduzAOhngVE89qjJeVFNg1n
+	 beYdy47j4zHmg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FD913809A88;
-	Fri, 20 Feb 2026 04:10:42 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FE9B3809A88;
+	Fri, 20 Feb 2026 04:11:10 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,28 +55,20 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v4 0/4] PCI/MSI: Generalize no_64bit_msi into
- msi_addr_mask
+Subject: Re: [PATCH net v3] net: spacemit: k1-emac: fix jumbo frame support
 From: patchwork-bot+linux-riscv@kernel.org
 Message-Id: 
- <177156064078.189817.10457864568127488431.git-patchwork-notify@kernel.org>
-Date: Fri, 20 Feb 2026 04:10:40 +0000
-References: <20260129-pci-msi-addr-mask-v4-0-70da998f2750@iscas.ac.cn>
-In-Reply-To: <20260129-pci-msi-addr-mask-v4-0-70da998f2750@iscas.ac.cn>
-To: Vivian Wang <wangruikang@iscas.ac.cn>
-Cc: linux-riscv@lists.infradead.org, maddy@linux.ibm.com, mpe@ellerman.id.au,
- npiggin@gmail.com, chleroy@kernel.org, alexander.deucher@amd.com,
- christian.koenig@amd.com, airlied@gmail.com, simona@ffwll.ch,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, bhelgaas@google.com, perex@perex.cz,
- tiwai@suse.com, brett.creeley@amd.com, gaohan@iscas.ac.cn, tglx@kernel.org,
- linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
- amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
- netdev@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-sound@vger.kernel.org, sophgo@lists.linux.dev, tiwai@suse.de
+ <177156066878.189817.17095459510292198861.git-patchwork-notify@kernel.org>
+Date: Fri, 20 Feb 2026 04:11:08 +0000
+References: <20260130102301.477514-1-tmshlvck@gmail.com>
+In-Reply-To: <20260130102301.477514-1-tmshlvck@gmail.com>
+To: Tomas Hlavacek <tmshlvck@gmail.com>
+Cc: linux-riscv@lists.infradead.org, netdev@vger.kernel.org,
+ spacemit@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, dlan@kernel.org, wangruikang@iscas.ac.cn,
+ stable@vger.kernel.org
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
@@ -84,53 +76,50 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259641-lists,netdev=lfdr.de,linux-riscv];
-	FREEMAIL_CC(0.00)[lists.infradead.org,linux.ibm.com,ellerman.id.au,gmail.com,kernel.org,amd.com,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,perex.cz,suse.com,iscas.ac.cn,lists.ozlabs.org,vger.kernel.org,lists.freedesktop.org,lists.linux.dev,suse.de];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[30];
-	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259642-lists,netdev=lfdr.de,linux-riscv];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 92F59164830
+X-Rspamd-Queue-Id: C1F44164A80
 X-Rspamd-Action: no action
 
 Hello:
 
-This series was applied to riscv/linux.git (fixes)
-by Thomas Gleixner <tglx@kernel.org>:
+This patch was applied to riscv/linux.git (fixes)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 29 Jan 2026 09:56:05 +0800 you wrote:
-> The Sophgo SG2042 is a cursed machine in more ways than one.
+On Fri, 30 Jan 2026 11:23:01 +0100 you wrote:
+> The driver never programs the MAC frame size and jabber registers,
+> causing the hardware to reject frames larger than the default 1518
+> bytes even when larger DMA buffers are allocated.
 > 
-> The one way relevant to this patch series is that its PCIe controller
-> has neither INTx nor a low-address MSI doorbell wired up. Instead, the
-> only usable MSI doorbell is a SoC one at 0x7030010300, which is above
-> the 32-bit limit.
+> Program MAC_MAXIMUM_FRAME_SIZE, MAC_TRANSMIT_JABBER_SIZE, and
+> MAC_RECEIVE_JABBER_SIZE based on the configured MTU. Also fix the
+> maximum buffer size from 4096 to 4095, since the descriptor buffer
+> size field is only 12 bits. Account for double VLAN tags in frame
+> size calculations.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v4,1/4] PCI/MSI: Conservatively generalize no_64bit_msi into msi_addr_mask
-    https://git.kernel.org/riscv/c/386ced19e9a3
-  - [v4,2/4] PCI/MSI: Check msi_addr_mask in msi_verify_entries()
-    https://git.kernel.org/riscv/c/52f0d862f595
-  - [v4,3/4] drm/radeon: Raise msi_addr_mask to dma_bits
-    https://git.kernel.org/riscv/c/617562bbe12d
-  - [v4,4/4] ALSA: hda/intel: Raise msi_addr_mask to dma_bits
-    https://git.kernel.org/riscv/c/cb9b6f9d2be6
+  - [net,v3] net: spacemit: k1-emac: fix jumbo frame support
+    https://git.kernel.org/riscv/c/3125fc170169
 
 You are awesome, thank you!
 -- 
