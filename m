@@ -1,249 +1,153 @@
-Return-Path: <netdev+bounces-259781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259783-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id X2yjNeLXmGnJNQMAu9opvQ
-	(envelope-from <netdev+bounces-259781-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 22:53:38 +0100
+	id 8GeiI5XZmGkSNgMAu9opvQ
+	(envelope-from <netdev+bounces-259783-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 23:00:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0E9E16B122
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 22:53:37 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E81E716B172
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 23:00:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5B2B8302BEAA
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 21:53:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 77A5A302FAAD
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 22:00:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0C4730C626;
-	Fri, 20 Feb 2026 21:53:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 769972F3C30;
+	Fri, 20 Feb 2026 22:00:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W2piBnNs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="svX6zwOa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 793DA308F39
-	for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 21:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E80B24DCE5;
+	Fri, 20 Feb 2026 22:00:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771624415; cv=none; b=rXO0fJnwpBdPfAQ5dtdcu4oWf43iLSYsERLk67PuVGd6xT5DP9LVmun+PCAzl7t7JhPOkkE0soOmA4NSC756Fo7u4BGuQ845vlqKoqFATQW76WVIUiY2qfUZBuiNwgf4VWMOdekQHVw34+tDLnjBl9yu2MNefmF6kvdhTKX/7NI=
+	t=1771624849; cv=none; b=F2a/YzdWTMqldfKSKID6AbVsb8Tjjl6WAIxfImgdlvNwgs+1KA5aLmUgkzK9Q3kteJw0K2jwNv95+9CqktmWdGeN1UK4EwDJA2uoLn1tsiI2/zWbIEQRFZTQUpR8tF6CF4WYtCxV2UtOS8rDWXt4FbVC7mmVLA0vyLVe3Sibii4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771624415; c=relaxed/simple;
-	bh=2W8xM0Ob3ienbz8oe2WhVPLywE7WqUXP/3asHzkIZ0E=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=liuoHd4lfY9/q7hMfBdmUjQqtaKA3KUGurQxnwIOTVEVIuTUvPayNqVEUuRw3zmMS+N3e7qc3cwVTEDxybWoQt01N+Jhd2V3s+G5rIxDCeVSCbM+Y1ASN7RfCb4zf+TqNVxHyrwkiNpubd3GyNZGjEa8TwwCXIucL/JkJj9O3u0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=W2piBnNs; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a7a98ba326so39123995ad.1
-        for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 13:53:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771624414; x=1772229214; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=zNnXU2rQFrrZwDNDExXkVvTwmDaf1Rl3je1sHwkbBVo=;
-        b=W2piBnNs4xXjKoJ7PPq7PtHE8SRKTGVZaimudBR7dtj0drfTG3jxsykvbGBd+/jF6e
-         kYHnU83VozqSHRw9lF87DvTQTGstucIqsyxRIvlDOb3I1MZCdavRS1grdrQp+E9ZJZnB
-         3DsDXRTb8SOu1EPL3PR/hF8gYBq8fEZttps2YcYLrCEPd7ZM5xkV+acYIW4NTBMclWXg
-         o9UEckqB1ASLxD45m1pX7j3T2wb0iWqqe1NvTSM0IQdmzdFgRCysTnMrTIRZ6ssAErZG
-         1J5pHm6dOqIjNCNTDPjo8XG885CDN9KSX8GR73NAOi+m7xUpptcpEDBm/h1L968mKosA
-         RETg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771624414; x=1772229214;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zNnXU2rQFrrZwDNDExXkVvTwmDaf1Rl3je1sHwkbBVo=;
-        b=i89bMGPcUx89c4lmL3h3hVss2OZoFkvktYXE62fQSa8tvAPVwvfIHbkq+Z0/Z9tLBP
-         7yxAEPtEZM51PRq3bJrRnKwtTS5izmWKVxOg1CCU0gdunR/swNbMd4OYU3K6clX172xs
-         GNzx2ab6bgQKhSXv8iG79MNsFUhlvgKJwhUspA3Svv5ySAlTHCHBixk433ZWh8g6OaXm
-         B+oQuDzRU/8+AVoLl332xWzUj9itwVfgc3ZeScEGS/kZaxcktrnhHzhQNVBd4FGLVgjU
-         a64xcyAw6fVpZABSr3TzeBNPEO3bTfIyR5jTDURHrkCdljTKeCt7Q67OETx06ZJIUb23
-         QAdA==
-X-Gm-Message-State: AOJu0YyPASHkBo3b/P3YGDiaCliXmDX7uepc3TR+0EisO+Sywu38IL2I
-	TY96pWqpuKSTiTv75jThZhpwcsVeP0GfSVV5udRYvxvAEZLUzc/mI6uI5WiwonSgmnuU77d92UQ
-	SFKc7+cf6UR4fjM4wAuxTJDazReYx9M0UzkZSZAa7T/n6WtkONT2kfsiSQXiY91WWLX4AZ86GF8
-	ErdWTNfPjMuUCd08PQp5Wik+0up+eclGQZ2cdRqwxJOkiJuIs=
-X-Received: from pglc4.prod.google.com ([2002:a63:d04:0:b0:c6e:1f6a:ef71])
- (user=joshwash job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:b45:b0:2a0:9934:a3f3 with SMTP id d9443c01a7336-2ad5f7a4e05mr59737705ad.24.1771624413654;
- Fri, 20 Feb 2026 13:53:33 -0800 (PST)
-Date: Fri, 20 Feb 2026 13:53:24 -0800
+	s=arc-20240116; t=1771624849; c=relaxed/simple;
+	bh=j8ewDZamzs1TUqrD98btJHbb2prX1tgCIDCSHXyKP0I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BSEvoAK0deYT9/2IFcnUAErFV55ewvXxNNeqwgN/0aVOw6CJYdfn6TDxf/CgS/b+rmMMiVLcm+EJvnwv4dCG1nGzA7iq+OKO1nwYqjzV1AgfdFlCRoIhkxSsgEiCxOntyk+ZSbcc1PMwG3oAP//9XguWYRGgRxQCVDjOvqUFMOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=svX6zwOa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05829C116C6;
+	Fri, 20 Feb 2026 22:00:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771624849;
+	bh=j8ewDZamzs1TUqrD98btJHbb2prX1tgCIDCSHXyKP0I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=svX6zwOaYzJn1xmxcW4F3TCS53OmLgF9S4IfY5MLZ9Awz2faOYHVqXgrtO5KzI/aN
+	 tMO1jyfo9oo2ArMO0nOZ9IWZsUBZrpEaeE/lx+nFVBrMlM0Dtdmca2wE9iT4Bs27Qr
+	 FWM0tICDnXU7z8Tta2YyudsmnXCi1bg7HipnwVpRRqp7bUBkdbqXPCBmCH1y01RDLa
+	 nFSUhGIfqgph98KbTIDHblrfmwAZFkMKoe/IPCGv+AoKTzW6NSZN9u0R0YhwqxUtNQ
+	 pjcq0RPyQJuuv+jQj/AvZ9H6kg0gRM1fnS3Q7q2x/OMr142BnQH/suq6Mb5e2oxSyl
+	 ZdRne+uuPFfqw==
+Date: Fri, 20 Feb 2026 22:00:42 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Max Hsu <max.hsu@sifive.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Paul Walmsley <pjw@kernel.org>,
+	Samuel Holland <samuel.holland@sifive.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+	Paul Walmsley <paul.walmsley@sifive.com>
+Subject: Re: [PATCH 3/5] net: macb: Add support for SiFive FU740-C000
+Message-ID: <20260220-backtrack-saturday-b85344cd5eb6@spud>
+References: <20260220-fu740-v1-0-c8af54130c58@sifive.com>
+ <20260220-fu740-v1-3-c8af54130c58@sifive.com>
+ <45821cd4-214c-43c0-ab2d-bbf34d9ec911@lunn.ch>
+ <CAHibDyzQAWgGP9sktLtnpND-Qr6FRrTA=HEiweyDD6rWm=8=5g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.345.g96ddfc5eaa-goog
-Message-ID: <20260220215324.1631350-1-joshwash@google.com>
-Subject: [PATCH net v2] gve: fix incorrect buffer cleanup in
- gve_tx_clean_pending_packets for QPL
-From: Joshua Washington <joshwash@google.com>
-To: netdev@vger.kernel.org
-Cc: Joshua Washington <joshwash@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
-	Rushil Gupta <rushilg@google.com>, Bailey Forrest <bcf@google.com>, linux-kernel@vger.kernel.org, 
-	Ankit Garg <nktgrg@google.com>, stable@vger.kernel.org, 
-	Jordan Rhee <jordanrhee@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="owSUAfZltS+zhmwj"
+Content-Disposition: inline
+In-Reply-To: <CAHibDyzQAWgGP9sktLtnpND-Qr6FRrTA=HEiweyDD6rWm=8=5g@mail.gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259781-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259783-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joshwash@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: F0E9E16B122
+X-Rspamd-Queue-Id: E81E716B172
 X-Rspamd-Action: no action
 
-From: Ankit Garg <nktgrg@google.com>
 
-In DQ-QPL mode, gve_tx_clean_pending_packets() incorrectly uses the RDA
-buffer cleanup path. It iterates num_bufs times and attempts to unmap
-entries in the dma array.
+--owSUAfZltS+zhmwj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This leads to two issues:
-1. The dma array shares storage with tx_qpl_buf_ids (union).
- Interpreting buffer IDs as DMA addresses results in attempting to
- unmap incorrect memory locations.
-2. num_bufs in QPL mode (counting 2K chunks) can significantly exceed
- the size of the dma array, causing out-of-bounds access warnings
-(trace below is how we noticed this issue).
+On Sat, Feb 21, 2026 at 02:35:03AM +0800, Max Hsu wrote:
+> Thanks for the review, Andrew!
+>=20
+> Based on Conor's feedback on patch 1, I'll be dropping this patch entirely
+> in v2. Instead, I'll use a fallback compatible string pattern
+> ("sifive,fu740-c000-gem", "sifive,fu540-c000-gem") in the device tree,
+> which makes this driver change redundant.
+>=20
+> Since there will be no net subsystem changes in v2, the series will go
+> through the devicetree and RISC-V trees instead.
 
-UBSAN: array-index-out-of-bounds in
-drivers/net/ethernet/drivers/net/ethernet/google/gve/gve_tx_dqo.c:178:5 index 18 is out of
-range for type 'dma_addr_t[18]' (aka 'unsigned long long[18]')
-Workqueue: gve gve_service_task [gve]
-Call Trace:
-<TASK>
-dump_stack_lvl+0x33/0xa0
-__ubsan_handle_out_of_bounds+0xdc/0x110
-gve_tx_stop_ring_dqo+0x182/0x200 [gve]
-gve_close+0x1be/0x450 [gve]
-gve_reset+0x99/0x120 [gve]
-gve_service_task+0x61/0x100 [gve]
-process_scheduled_works+0x1e9/0x380
+Nope, you still have one patch for net - the dt-binding for the macb
+goes via net. Nothing in this series goes via devicetree or RISC-V trees
+either.
+Generally, bindings go through driver trees and dts patches go through
+the soc tree.
 
-Fix this by properly checking for QPL mode and delegating to
-gve_free_tx_qpl_bufs() to reclaim the buffers.
+Cheers,
+Conor.
 
-Cc: stable@vger.kernel.org
-Fixes: a6fb8d5a8b69 ("gve: Tx path for DQO-QPL")
-Signed-off-by: Ankit Garg <nktgrg@google.com>
-Reviewed-by: Jordan Rhee <jordanrhee@google.com>
-Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
-Signed-off-by: Joshua Washington <joshwash@google.com>
----
-Changes in v2:
-* Moved gve_unmap_packet up instead of forward declaration
-  (Jakub Kicinski)
----
- drivers/net/ethernet/google/gve/gve_tx_dqo.c | 56 ++++++++++++++++++-----------------------
- 1 file changed, 25 insertions(+), 31 deletions(-)
+--owSUAfZltS+zhmwj
+Content-Type: application/pgp-signature; name="signature.asc"
 
-diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-index 40b89b3e..e5e33966 100644
---- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-+++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-@@ -167,6 +167,25 @@ gve_free_pending_packet(struct gve_tx_ring *tx,
- 	}
- }
- 
-+static void gve_unmap_packet(struct device *dev,
-+			     struct gve_tx_pending_packet_dqo *pkt)
-+{
-+	int i;
-+
-+	if (!pkt->num_bufs)
-+		return;
-+
-+	/* SKB linear portion is guaranteed to be mapped */
-+	dma_unmap_single(dev, dma_unmap_addr(pkt, dma[0]),
-+			 dma_unmap_len(pkt, len[0]), DMA_TO_DEVICE);
-+	for (i = 1; i < pkt->num_bufs; i++) {
-+		netmem_dma_unmap_page_attrs(dev, dma_unmap_addr(pkt, dma[i]),
-+					    dma_unmap_len(pkt, len[i]),
-+					    DMA_TO_DEVICE, 0);
-+	}
-+	pkt->num_bufs = 0;
-+}
-+
- /* gve_tx_free_desc - Cleans up all pending tx requests and buffers.
-  */
- static void gve_tx_clean_pending_packets(struct gve_tx_ring *tx)
-@@ -176,21 +195,12 @@ static void gve_tx_clean_pending_packets(struct gve_tx_ring *tx)
- 	for (i = 0; i < tx->dqo.num_pending_packets; i++) {
- 		struct gve_tx_pending_packet_dqo *cur_state =
- 			&tx->dqo.pending_packets[i];
--		int j;
--
--		for (j = 0; j < cur_state->num_bufs; j++) {
--			if (j == 0) {
--				dma_unmap_single(tx->dev,
--					dma_unmap_addr(cur_state, dma[j]),
--					dma_unmap_len(cur_state, len[j]),
--					DMA_TO_DEVICE);
--			} else {
--				dma_unmap_page(tx->dev,
--					dma_unmap_addr(cur_state, dma[j]),
--					dma_unmap_len(cur_state, len[j]),
--					DMA_TO_DEVICE);
--			}
--		}
-+
-+		if (tx->dqo.qpl)
-+			gve_free_tx_qpl_bufs(tx, cur_state);
-+		else
-+			gve_unmap_packet(tx->dev, cur_state);
-+
- 		if (cur_state->skb) {
- 			dev_consume_skb_any(cur_state->skb);
- 			cur_state->skb = NULL;
-@@ -1160,22 +1170,6 @@ static void remove_from_list(struct gve_tx_ring *tx,
- 	}
- }
- 
--static void gve_unmap_packet(struct device *dev,
--			     struct gve_tx_pending_packet_dqo *pkt)
--{
--	int i;
--
--	/* SKB linear portion is guaranteed to be mapped */
--	dma_unmap_single(dev, dma_unmap_addr(pkt, dma[0]),
--			 dma_unmap_len(pkt, len[0]), DMA_TO_DEVICE);
--	for (i = 1; i < pkt->num_bufs; i++) {
--		netmem_dma_unmap_page_attrs(dev, dma_unmap_addr(pkt, dma[i]),
--					    dma_unmap_len(pkt, len[i]),
--					    DMA_TO_DEVICE, 0);
--	}
--	pkt->num_bufs = 0;
--}
--
- /* Completion types and expected behavior:
-  * No Miss compl + Packet compl = Packet completed normally.
-  * Miss compl + Re-inject compl = Packet completed normally.
--- 
-2.53.0.335.g19a08e0c02-goog
+-----BEGIN PGP SIGNATURE-----
 
+iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaZjZigAKCRB4tDGHoIJi
+0ppkAQDELcLSGsd9+CZKBIRTpROITc+zabzoqZ2zjM8e+CEGYAEAuTFkDeKn4vsG
+nyHlHlHuc1eRatDuaFWmAN81FiAvBAg=
+=gWwp
+-----END PGP SIGNATURE-----
+
+--owSUAfZltS+zhmwj--
 
