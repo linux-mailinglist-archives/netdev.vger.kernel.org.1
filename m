@@ -1,209 +1,133 @@
-Return-Path: <netdev+bounces-259755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259756-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8EaHHsCsmGlSKwMAu9opvQ
-	(envelope-from <netdev+bounces-259755-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 19:49:36 +0100
+	id IDMlBd2tmGl4KwMAu9opvQ
+	(envelope-from <netdev+bounces-259756-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 19:54:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3FFD16A2D4
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 19:49:35 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C34F16A323
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 19:54:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8D782301E6CF
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 18:49:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6A98E3018C03
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 18:54:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20714366545;
-	Fri, 20 Feb 2026 18:49:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A2636683C;
+	Fri, 20 Feb 2026 18:54:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="E80IzUOf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RTvfJTk1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C235A3128A2
-	for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 18:49:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771613374; cv=pass; b=GE67oR0xkSrzHRfCkPWqoyqaoKqoiVC1zIhBNzRyIcpLg5rfI0PDqWHdPdTstO9tJnAJtSkWN/h2GfUQBtm9mdtDs8qO6MTcWXy1qU3Ty2etpdv6ZUduYvEI0Tg4cp+dfbPMKS2hsRnv19aa0aZvxLdHg2ydqy/tRJnWE5hJMJo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771613374; c=relaxed/simple;
-	bh=TOr5HOHrQ2xjuVTHunziB5WVpm1ag/FbTe/dq53usUs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QThZXd1+cAn7k7uSAkUts38FaWubL4mq9nZTbutEI8YoaLoknd9R1GufZUSCTsIFiXIaFbgUixa+geah2vqX2qgBwXlIpibsApiyCcXaS5rl4h1y6b4BFPYC4kuhV3KfuN9AfXu7UFTGCduuG3Q0rdkinNb765hKH+nNi5/Woh8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=E80IzUOf; arc=pass smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b885e8c6727so433882666b.1
-        for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 10:49:32 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771613371; cv=none;
-        d=google.com; s=arc-20240605;
-        b=J4ZmNamPlZ3/v1VueC0Cng1M63x9zDugl/coekYnavmMZdifirv2f095EP/WrXun3r
-         lLXq+2UhvDoRCjrFRcKVvoucAvxCoD1z3rI0d7hw5dpufCYSzIMxdCpwLWEBOe2ZCc32
-         wkT3Q6XpBx4ffnfV0Vg1vbsCNSZCAIhXiOEAF72XxIzpOP2xEkVDdrKtJ7pJdDSo3AaD
-         0aYNIfVc6JB5ryv7a9nv4HVMmI/ZEeRjiWcdlACyDdo0HxBSEjN3LUD3CXbYlfRd05E2
-         YrYo6Y/eppKRUaKKahdDi9X81ogldsxODQATCLpRu9COEyD8tcqekTObnAHdAeE4fvjp
-         yDhA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=wx+eX0mBS59Zy6hvZp9IaEVvMB66mMGe+OdOIYRjb5w=;
-        fh=AQ/rjUHojR1l4iAP3oPmfzpQpf20Y/uaAuX/QmYQ7wQ=;
-        b=DWNS/myWjF/cFY5u3Se9SeK8fzQCV9PtAePn3WT3IO0Fv3EnDkpeR1Qt3OqgRc7rJB
-         YAUg7jYB4aFA2BDDnBWh9g2IDyA0z5RHKrT1yuW/SW/LOh7xtiD5Dx7HVaoBTe5xqBCr
-         /Jrkow0L/Gv/YDNT+G+EcA7lxHLk2S7t+Gx3/uWO2vr8US9o6q4OeI+ZRaJEQ/q5O5V3
-         Y82Z2SuGdqcxWPmToBHHX7COakZjOhHbUdtLBDtrPlr/mZxi9bUpOKdlnTFdY97kvu65
-         zOUfZ3jq+W7x8Fn31xyIKl4hr5jlBpo3yr38msftzn+DBK/6lDc7a9j8mTwh7Ppxe3La
-         2KZw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1771613371; x=1772218171; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wx+eX0mBS59Zy6hvZp9IaEVvMB66mMGe+OdOIYRjb5w=;
-        b=E80IzUOfgMfPpS+VtjXgjqT+6ZLZ/zkoLDchI/2ZFnJ8LPL4o2dmasugc7NdoMh3Oe
-         wnQ52LtUQfhbFp3GwwcNk86jmcq012cO2qdqwncPJqVfNDEsWBydlIjhc7i7pgnYK19b
-         vo2GnC5rVPMuDo7WtsRQGkkBTlpZM1S1qbix+NgZC27WIE2uWdxVa6fBSw7o24+dTBZ8
-         fq+0HouLZHPmlkSP+mjO0rL47BL7Lx0VuwG4mcWf1f1UGC5qmYEb10Xf5UUnJ1T5X+Ik
-         LWzTbwLGDuVNayxFygjbkRcsFJObpjFmNfEaal1kwGwljwhg94mYk1LAVzdtpMXQbZKA
-         M/Mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771613371; x=1772218171;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=wx+eX0mBS59Zy6hvZp9IaEVvMB66mMGe+OdOIYRjb5w=;
-        b=ORJ6NxA7Vwo5YBU1u3/DtzFLQU9V6RtxDY0oIfSckAAI5nFy9avwp9KX30vrBacGwh
-         XG6rb7lmDq1X/OIGE3Za3WnVJBXnIlISv1UZAS6zA/SERcl35Zxx9etgVsnbbTgqVX8x
-         A/Y5/653reWr8/V4BpYwUSCiih9LoX647W+QvoBEMHBqNwucWxQ0GoeReDEBXLTKfDVw
-         ih0RWbcDTOgdhR5g3Txj0Hf+Zanx9h2HC0Vdpin5/aRc1vOJT6tugD8uZWdgLoWLnrfQ
-         dvegF3+z6PLKjAIlC0p+ubyWhW6L75Oic75s3dARcYyBSVOyX4qgELYQnwOtHZo1JK7w
-         cTXA==
-X-Forwarded-Encrypted: i=1; AJvYcCWhg20qVgcr1CYO78qWUdBmiKLLz679Y44CsTrGIveo/JvpaHx56ZRqXLgfVO/9HE4G4Z/36OE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOrazk/QHZ3nBmS2tYNBi0SYMvnWlnH97fVaWMSaVTqR8CHOE+
-	6BXOAoF0jQPVd01lK1Co57BDwKg65UCz3L6uvJRuQrr1WgRSpxjtROuHdSer7a+A3BKvi6TNcbm
-	b8BVyn3oebM8mXWvw3z+0Zt9WvK8FuGRAJt2ZRdOGoA==
-X-Gm-Gg: AZuq6aKze24xHkve9vaVu7k8a3Dqz8c1wOFaE+OAlF0ROyCr14Cm7c/Rb5Ge+KoluZe
-	Y/sf7GYiu0/b7den9XBvHWtdgnMBKvle+ISLBCihGSisqQZbW9L+tuzPeEPpklbaFEpC/HZwKln
-	HXv//kOIjZu/z5FlB/RfUjloCRkmWXjcGhfFHhDRS+UVDTe8m4+TtTiefkJJPdZox1ifPHNlRhp
-	LIxvcwq5LfNH34WyAAJcNU0UdHA4fIgGglK9PMmSxR1rjX192EbKBNsqwxw/aaHbwAK40J924lT
-	RgLmfxkgsg==
-X-Received: by 2002:a17:906:99c1:b0:b8f:dec3:6606 with SMTP id
- a640c23a62f3a-b90810d9416mr39173466b.23.1771613371158; Fri, 20 Feb 2026
- 10:49:31 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B40D2E7BB4;
+	Fri, 20 Feb 2026 18:54:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771613656; cv=none; b=G6ISSaDb7u/zwqdbvKB5Mgu04YWR70BwaNFpw7edGziYCBFJ5cXK89TXxkDzXU5IVYtZedcmDulhUtI0jZbWsvk2UOUMCZhBIvKJYnAm4P4q8UN/PFPMGnA5/7d0cVZumsO2MVXxfCkXPlrITKvURo3tyuGxS4tHeFjdDSpTHyo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771613656; c=relaxed/simple;
+	bh=hFetM3+clZO7c6XVenc/oELmwqh4574Kor3LRRxJ5P8=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Q2MwzhbBEKxZt4Edm54Bq69/bhFk7zIBRaUaJTn3sanKvlwTpmVkTEbt9Br0wEYrTVkIK8LnDQ3jARpgI+xhirp4u0zZJL/uiNq0nJx/gBgS5jpZchNL6P4853+m3e50EMV68g7s3bP2CY3/S6Nni1iAGynIKs9zTtK/XDfZ4O0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RTvfJTk1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF015C116C6;
+	Fri, 20 Feb 2026 18:54:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771613655;
+	bh=hFetM3+clZO7c6XVenc/oELmwqh4574Kor3LRRxJ5P8=;
+	h=From:Subject:Date:To:Cc:From;
+	b=RTvfJTk1rQYRuEpVer6/q4yxaHfNYY0VPgJOFzjP4R3WvhN4JPipUtLnD0im5TZeW
+	 77oOcZpzbgqa4Eh9RRjUqAJ0V5EbdTlYKm8876xLhxbk61NNiKvtZ2irWSF3nRr87Y
+	 RjKuOeUUQCJCuSDTzOoxC82GU7LssWDoIi4wAqkIdaWrCMUjJ4kXs7igijfXKYXK4Y
+	 0O8by0WXxRCQF/9IPXRCo2MmFbwX29GC6Btqoaj18YE4cV3NTp9sS43PW6oJWk0QZn
+	 h3Jq+J6+mcDp9uaOt6q2LTa6s52f7BvKQfEa2Oy1WqIyZM5ZU5Ju725FP5oE5vBcru
+	 x1sVR7pojOLYQ==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH iproute2-next 0/3] ip mptcp monitor: add JSON support
+Date: Fri, 20 Feb 2026 19:54:00 +0100
+Message-Id: <20260220-ipr-monitor-json-v1-0-eb4b0d5f7820@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260220-fu740-v1-0-c8af54130c58@sifive.com> <20260220-fu740-v1-2-c8af54130c58@sifive.com>
- <20260220-contest-ambiguity-1a4099520bdf@spud>
-In-Reply-To: <20260220-contest-ambiguity-1a4099520bdf@spud>
-From: Max Hsu <max.hsu@sifive.com>
-Date: Sat, 21 Feb 2026 02:49:19 +0800
-X-Gm-Features: AaiRm50P1Nlh0T0vDWni0aUkbrbTe6xYAsBq75SA6rKDY3TAVmB4kTeN4YB9xj8
-Message-ID: <CAHibDyy1mA2s9_UjKGPemRaKNSvyq07Ok5+4yruQ1uXX+R-Pkg@mail.gmail.com>
-Subject: Re: [PATCH 2/5] dt-bindings: interrupt-controller: Add SiFive
- FU740-C000 PLIC
-To: Conor Dooley <conor@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Paul Walmsley <pjw@kernel.org>, Samuel Holland <samuel.holland@sifive.com>, 
-	Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
-	Thomas Gleixner <tglx@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexandre Ghiti <alex@ghiti.fr>, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	Paul Walmsley <paul.walmsley@sifive.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAMitmGkC/x2MywqDQAwAf0VyNrAbX9BfKR7ExjZCE8muIoj/3
+ qXHgZm5ILELJ3hUFzgfksS0QKwrmD+TvhnlVRgoUB+IAsrm+DWVbI5rMsXYDU0zxI7aOULJNud
+ Fzv/yCcW2PTOh8plhvO8fAACp73EAAAA=
+X-Change-ID: 20260220-ipr-monitor-json-1573371524c1
+To: Stephen Hemminger <stephen@networkplumber.org>, 
+ David Ahern <dsahern@kernel.org>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=858; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=hFetM3+clZO7c6XVenc/oELmwqh4574Kor3LRRxJ5P8=;
+ b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDJnrL080Zqju0ll008RTsajE5YnRla4rDKfuj37V/y6d
+ zeW/dl1oKOUhUGMi0FWTJFFui0yf+bzKt4SLz8LmDmsTCBDGLg4BWAiu34x/PdcxLDBcMq5X/WH
+ jE+t2FozyyZrtkWOz61X/mXtbGXn7GMZ/hmvsDhneEOC3YbfTjbY9GT+hJuJu+SzJ3qkrJvZnvT
+ wFC8A
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[sifive.com,reject];
-	R_DKIM_ALLOW(-0.20)[sifive.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259755-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-259756-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[max.hsu@sifive.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[sifive.com:+];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,sifive.com:email,sifive.com:dkim,microchip.com:email]
-X-Rspamd-Queue-Id: D3FFD16A2D4
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7C34F16A323
 X-Rspamd-Action: no action
 
-On Fri, Feb 20, 2026 at 09:23:18 +0000, Conor Dooley wrote:
-> So do the general rules for devicetree bindings, that's not something
-> SiFive specific FWIW.
-> Acked-by: Conor Dooley <conor.dooley@microchip.com>
+With this series, the command 'ip [-t[s]] mptcp monitor' produces an
+output with the JSON format.
 
-Thanks for the review and the ack, Conor.
+- Patch 1: a small refactoring to uniform the code.
 
-I'll update the commit message in v2 to reference the general device
-tree conventions.
+- Patch 2: add JSON support in print_timestamp() helper.
 
-Thanks,
-Max Hsu
+- Patch 3: add JSON support to 'ip mptcp monitor' as requested by
+  Stephen.
 
-On Fri, Feb 20, 2026 at 5:23=E2=80=AFPM Conor Dooley <conor@kernel.org> wro=
-te:
->
-> On Fri, Feb 20, 2026 at 04:27:06PM +0800, Max Hsu wrote:
-> > Add the SiFive FU740-C000 PLIC compatible string to the binding
-> > documentation.
-> >
-> > This follows the SiFive IP versioning scheme which requires SoC-specifi=
-c
-> > compatible strings for proper hardware identification, even when the IP
-> > blocks are functionally identical.
->
-> So do the general rules for devicetree bindings, that's not something
-> SiFive specific FWIW.
-> Acked-by: Conor Dooley <conor.dooley@microchip.com>
->
-> >
-> > Signed-off-by: Max Hsu <max.hsu@sifive.com>
-> > ---
-> >  .../devicetree/bindings/interrupt-controller/sifive,plic-1.0.0.yaml   =
-   | 1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/Documentation/devicetree/bindings/interrupt-controller/sif=
-ive,plic-1.0.0.yaml b/Documentation/devicetree/bindings/interrupt-controlle=
-r/sifive,plic-1.0.0.yaml
-> > index e0267223887e..351d26ab1956 100644
-> > --- a/Documentation/devicetree/bindings/interrupt-controller/sifive,pli=
-c-1.0.0.yaml
-> > +++ b/Documentation/devicetree/bindings/interrupt-controller/sifive,pli=
-c-1.0.0.yaml
-> > @@ -63,6 +63,7 @@ properties:
-> >                - eswin,eic7700-plic
-> >                - microchip,pic64gx-plic
-> >                - sifive,fu540-c000-plic
-> > +              - sifive,fu740-c000-plic
-> >                - spacemit,k1-plic
-> >                - starfive,jh7100-plic
-> >                - starfive,jh7110-plic
-> >
-> > --
-> > 2.43.0
-> >
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Matthieu Baerts (NGI0) (3):
+      mptcp: uniform stream closure
+      utils: timestamp: add JSON support
+      mptcp: monitor: add JSON support
+
+ ip/ipmptcp.c | 96 +++++++++++++++++++++++++++++++++++++++++-------------------
+ lib/utils.c  | 19 ++++++++----
+ 2 files changed, 80 insertions(+), 35 deletions(-)
+---
+base-commit: f120cdb35da76ca99932d0428a0917bd01a843da
+change-id: 20260220-ipr-monitor-json-1573371524c1
+
+Best regards,
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
 
