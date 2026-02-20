@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-259664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259665-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UP+UOYIbmGnp/wIAu9opvQ
-	(envelope-from <netdev+bounces-259664-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 09:29:54 +0100
+	id mMpRLcAbmGnp/wIAu9opvQ
+	(envelope-from <netdev+bounces-259665-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 09:30:56 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45DAE165AAF
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 09:29:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E4F3165ACD
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 09:30:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 70C52300617F
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 08:27:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DC3A7304DC9D
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 08:27:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE3923321A2;
-	Fri, 20 Feb 2026 08:27:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0365335575;
+	Fri, 20 Feb 2026 08:27:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="MFyqskF/"
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="NUbOJd0b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02FDA314A67
-	for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 08:27:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D75A314A67
+	for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 08:27:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771576070; cv=none; b=gHyucuwTYTyYjVJAliTxWc76H2zNEg/Td9OGkKRoaxiY5049AgIauMdvH5+2FIjKhpTlKJiltUKgILu9bBXtcoFwMxtjxwptHjYA+jfKrm2NfH2rfqd3t5CwwoIJU57sP7puRGk+RKE7xljDFjUL7yxrnrxvHlK8fihbH+khkok=
+	t=1771576076; cv=none; b=IrCdWbhKduwi/kT8t2H4EI0vX28fmYP8g3cn7qazkL6+OX4S2ERTXZaFQaDgTxFuaU4d4HUbr/47XmeYivyUxAy7eOr4nnr1Y1o72yoPvEATVsCrjT4N456731lzAvl9XsLLQwH5wLShJVZGF6B6h9v3o2ZI82TItF8oPjzbVyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771576070; c=relaxed/simple;
-	bh=NgLK9DnHXHbh/0SyIUqpYV9kGEgoxTNyXaMzbPHKhzU=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=QLjx6qgbVwZFpeyRz2pkMV0/E2U0yuYy1+CCO7rc2PXWHO1CcMIMvls/RLw0g+ioXYJis9PAjhiicLi1GKp5miGDQcq3uCtuX5gTy3dq9946Mkztq6M5TdwnjQBfVcusurCxPkPjWRY0dekOiktvXc4GJ5VIGpA+czZ8Osudmno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=MFyqskF/; arc=none smtp.client-ip=209.85.221.42
+	s=arc-20240116; t=1771576076; c=relaxed/simple;
+	bh=YJgGJZFBEeFnKwCZBKtMF/4z3f6ENQ0IR89Zow+dMes=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=MQb/TjyBWeQBXvQ8lS7TZ7u4+9l3iEM651iTVmlxfv71wPej8jZhAxkqPfirZFoaapz4GjY+tKWucHO5iO85H9c1WVvvUwDd/LgF9aLImKl7qUmrHCN/WaGvbfKlN0MfY/P5pWuviMXW5HH8My6JincVxaBZHPveBlaFqbN3kd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=NUbOJd0b; arc=none smtp.client-ip=209.85.221.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-43590777e22so1069271f8f.3
-        for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 00:27:48 -0800 (PST)
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-43638a33157so1675191f8f.1
+        for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 00:27:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1771576067; x=1772180867; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=f6MEUb/BPhbswvjItrmNDB/sN3JkbLXHr2GG5X1/PKQ=;
-        b=MFyqskF/SzC8gjbr6VprSQ3Loy6ku4T+DHCUkSGyiuXgLMZwJbn+l6NyPtVERK512T
-         IX+ysAo0eqmfYEdAUtpmPGtVcoNw44DF8euRJIL87qmJcFsL4Myy20RxCZiqAZb3VrvH
-         s7Qt1VnDhXHNdZ4ESFh9qbo++2Y0so434CHf/grzCsJfeO1hp86yyXLUoIp9V/gg0LKn
-         nh45wXn3zFabun3I038eXgHJBpxiWu66UW5yALpkMDw7MSWbe50VpRXUuxpMuW4pQizO
-         lDNJwdW+2h8ggMJqi+yUM0y/oT2QT5YktJf/szUBrd8eQ9porMlSilhIcZD0fPXzzgjq
-         5hUA==
+        d=sifive.com; s=google; t=1771576074; x=1772180874; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=i/igY8Az/VsZJlm1xDZMRduuC4c0JTGDigxQuwADxBg=;
+        b=NUbOJd0bZmG0zBsPKdchttp0PlH94khuvEr6kwhcDd/eaWDFZ3Xp9CEL44kBl3vsHi
+         Y//Yrnry51078svhQ4tfM89YdkTSOvV++9lAIgkyFJy/g0mXiuIC5uAJjNfnu3TjaBma
+         c+H2g1QF6wqVyeQc1fIeKggSxLJ1AZx5QRNcP86q5TP2RtdWd+3n5u1Kcha3emR1q4hw
+         JajhN7BermOl5guKuZJhh6IT2h+oCQDoGlqwhuoYjxOuq7imbzOo+gsY+0rr2YkeNugw
+         o0/Ymx7yhLfZjzao0vvdHQ717E+lBaABVrYbwRPyr5z/fX3laD4mWxERsrQgqO9IWStZ
+         lJbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771576067; x=1772180867;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f6MEUb/BPhbswvjItrmNDB/sN3JkbLXHr2GG5X1/PKQ=;
-        b=slH8w9vK3FYcous/FEWxFT7RdO/ufxTnXtWX2004AV/cpptVijbhu7Z2Kz29yQW+H+
-         8RsCH8DbLknXyzE6b3G02dDnS7UGevH6OeSIo94P9I9E9pVOq+1ATsNVNCWJhXbdfhrF
-         PcQyp5ywwkz+lOK0pbhRyTOi3ibNy+WNTBwAhvYj5aLx6ksVTEjmSW4/jz8RuYX3dXdb
-         9yzlRdmGberRRtEQamb5VskFjE6cVerVdyhW6gYiWBFJ35xNNhJXQLs1CzHJvYhNJiTh
-         lu9McGu2qhh3Fh83rSLBudfOje3mmH2omdkyna0odch/Y9Ip4eRRC/P19NKJNtvW6UNJ
-         XxOg==
-X-Gm-Message-State: AOJu0YwUOGUM7D+rgMYkhZT/7CcXIG+0l8Fvbw+Zyx9AYjdX3EInCCYp
-	1CJcAdMKesjncYtsgrMqPcsD6pRrT5ny+f472ZQVeUQ5/mYwfWuLaCjBqXzFmkBblx0=
-X-Gm-Gg: AZuq6aII0s2aSxAnPE4pXwGODR9ppoJgznDDaof0ngeDa5yrE3X5zPAY/U4dP4i0xKC
-	pCYAjUvrxTasxaDVhpDaz+ltoVQJEh+ZLlFqPsKx/jQ7UbsyUSh99kEF0nUg8qPLq+eGGgojkTY
-	Sx4vtboBu4qVE3+OeZIX2iRceCGKsxo7XfMXop5r/UHR67dyfOVQKEkCHCMwn03zvHHeAmzjS5W
-	sKmVCBY21f/KB29oaXJKWPqTvS0j24SdalQ59Lwgcsb18HRc8bYVLhwndJAOLHz3DNMB+05z7ey
-	WUgSQ/L/St9AcypPMN4XJq+Zm70XLL3WVMIBoArTmgoSz3h+aNJuzVVLHdvxJDprqRJYnuIhjYY
-	UFWZnXy7GOeAqI14JqwklG4G82nP3hd3cNXbjeToeFvfh5rreHF1J4R3TUtHgwTl1sYOMEAW9Al
-	Z1nYTrBkr7HgFf20Y7zJvQ
-X-Received: by 2002:a05:6000:2f82:b0:431:a0:7dea with SMTP id ffacd0b85a97d-4379db8cfe8mr36270633f8f.40.1771576067168;
-        Fri, 20 Feb 2026 00:27:47 -0800 (PST)
+        d=1e100.net; s=20230601; t=1771576074; x=1772180874;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=i/igY8Az/VsZJlm1xDZMRduuC4c0JTGDigxQuwADxBg=;
+        b=AceAYAdNhIJzaknpPrMfeJCdKDqsPVdpw6KRXVzhsJBHJv2RHxRSUe8Ev6GRGmFZqH
+         FtrUz96MlADXlJ2mZ4TbXAXwSbM6g9e/uKvCC+2kDRFqnfaWk6MPLY+5GRTFF71uy6gn
+         3Xuum4fC+k1+ckDYLRuCoKrE5nYKqk8kOoaJ+JV2o/etQltNoyu8JYRhoBw4RJ/W9HTs
+         dp0scU21kqXhb1dhupG6I5UkI8PNnl6aFWBLfV8U5iBn/JYnJcIHBVoXq1i7EuxzIy0G
+         qzy8E6kc+6fGXT3C3ifopiWATwCkx8ALf7Fe1de69X4kX0bMHHDxmAGDOpvDD+41zk93
+         aEfQ==
+X-Gm-Message-State: AOJu0YwGFhwY4qX33DnJ9G2wpOm0n04FKBg9JQcknpYZpMkhXkFDpWEo
+	W5yCcTlCQERMFhO94G5rBe3yQHA4r5p9LLKL8LO1cdwL+iVrYnjoEqhGapzeGpEmKFc=
+X-Gm-Gg: AZuq6aJDlWHKkOLuXaT7hvQ0p6eLyByo+ru8gc1MfGVIU9JdF062BpmwRiQ3mHsfAXQ
+	TXGHUol5hbdnHfm7L0Seewd6Npmi+Pjg9vMDZEy9qtfF94uSlnQ3F4XVahoU8PC0f2Nej8Ox9cZ
+	IVArao8TVq3AY6/KO8qD0mWBqysf3//Oj3e7Mm7MOkn5h7kbPgSACZO15d57o3mBm/vRBxGG/Hc
+	rDDcsRjzKEEQJAoslEg7XSzxSTLBiW0N/YbFvVxfh4Pjzina93SyeJVIeU/PcBAoLuwVFTTtOeh
+	+44ceHyjJn56pnRjHXpCijpjA7gv4FuIdnnyLHnxvck8IhxP1nxpG7O78PDhJBGekJr72VaB6Jk
+	AffwKBu0/+aIqYrezHOWsTP5Uohn9+Gwndgv4BI5Uk2Qw6hir83dBi6GbL7FqtFgM4SVrBn5pTb
+	y13RZwKOfneMexTDWA/2VA
+X-Received: by 2002:a05:6000:3103:b0:430:f68f:ee96 with SMTP id ffacd0b85a97d-43958e4a763mr14559959f8f.36.1771576073712;
+        Fri, 20 Feb 2026 00:27:53 -0800 (PST)
 Received: from [127.0.1.1] ([210.176.154.34])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43796a6c1bfsm54717688f8f.13.2026.02.20.00.27.40
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43796a6c1bfsm54717688f8f.13.2026.02.20.00.27.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Feb 2026 00:27:46 -0800 (PST)
+        Fri, 20 Feb 2026 00:27:53 -0800 (PST)
 From: Max Hsu <max.hsu@sifive.com>
-Subject: [PATCH 0/5] riscv: dts: sifive: fu740: Fix compatible strings per
- IP versioning
-Date: Fri, 20 Feb 2026 16:27:04 +0800
-Message-Id: <20260220-fu740-v1-0-c8af54130c58@sifive.com>
+Date: Fri, 20 Feb 2026 16:27:05 +0800
+Subject: [PATCH 1/5] dt-bindings: net: macb: Add SiFive FU740-C000 support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,10 +86,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIANkamGkC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDIzMDQ0ND3bRScxMDXSNz89TUVOOU1MRUIyWg2oKi1LTMCrA50bG1tQDZz7v
- ZVwAAAA==
-X-Change-ID: 20260111-fu740-277eee3deae2
+Message-Id: <20260220-fu740-v1-1-c8af54130c58@sifive.com>
+References: <20260220-fu740-v1-0-c8af54130c58@sifive.com>
+In-Reply-To: <20260220-fu740-v1-0-c8af54130c58@sifive.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -105,17 +104,17 @@ Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
  Paul Walmsley <paul.walmsley@sifive.com>, Max Hsu <max.hsu@sifive.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2249; i=max.hsu@sifive.com;
- h=from:subject:message-id; bh=NgLK9DnHXHbh/0SyIUqpYV9kGEgoxTNyXaMzbPHKhzU=;
- b=owEB7QES/pANAwAKAdID/Z0HeUC9AcsmYgBpmBr8G5xsYpp9bS179Zrgmq7WnSzmUVdzC2ysv
- pcbgcn4kNGJAbMEAAEKAB0WIQTqXmcbOhS2KZE9X2jSA/2dB3lAvQUCaZga/AAKCRDSA/2dB3lA
- vaydC/4poywKhTIZqAMbae4JLkqR9S4oc9GHiXiZaRJ4LgVvekuyuJEmS6yJ0m/9F45/zTZCMRL
- jNPykIc6Bfnjicq+MtCIPIe6KyYE8BmfZvUuwHN90Ly8hXBmI/38cfD5/nQuKSV0OK8e7pbPxLD
- DMeoDmNI4tPN7Ho4e2s3RDuPC3GayFrF1lsAeguT8ksplL+bZqffbVIRKuh0Ah3/OpObQyxeZyP
- e2jfTEe1keULm09THOGG373hT2aE3Uuacix908naKGoxe1dPFeml4L/Ih9qhV4OkT9it+aaE1AH
- JzA7nBVHR/9GePMch/mGDbpNcvaR2zZge/o/BXimRRRpgE8N4oLN8Pjasuunx9k3oQ0FPnUdMGQ
- kMhAZTvsbTSZhodIWrD45whFv9vVr5QX9KmL35z4z6nx/Ez8tO9PIK7ndI4qXZLKSU4vyaN73n2
- XzH0mt+Qp1cTHUAxg/Lz2vemcsd7iLGYqYuxTv+BRUAJFprp1xDVX3ClEHlfwUsG2U+Ik=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1795; i=max.hsu@sifive.com;
+ h=from:subject:message-id; bh=YJgGJZFBEeFnKwCZBKtMF/4z3f6ENQ0IR89Zow+dMes=;
+ b=owEB7QES/pANAwAKAdID/Z0HeUC9AcsmYgBpmBr8Oji0/4OVhQOIUlKAIgJBQ5IPR4YxPGYhh
+ goHXM5+HRiJAbMEAAEKAB0WIQTqXmcbOhS2KZE9X2jSA/2dB3lAvQUCaZga/AAKCRDSA/2dB3lA
+ vdGEDACBZOQzifNbSjKgt1DwPNhFpnL3Bj+UAEIr0weXbZ7rZsZ2J71Bn7D2TjtbPF6gSUQh9TB
+ u23Gvon4ro7QrbdH9K+Sg9Dhe50X7LjXj978B2jLf48Jb2xVvo32OBNuvHZidvgOv5ZGsuMvfak
+ xlX0HB2czT1jn/Orh1i/zz1UW4/pMcGGgOhZ4/BMg6LutjuEic9quiKJo+oXqeBwySJmq4RTVbK
+ zC87a0yqs40PXIHgUC76c9JjqspvRjEFVXRqY9vYgi5DQhRPOZIrjO196ZK6WDj5vrVT67yCkEc
+ gRZeiums12ErPNalqrAOMceY3J1vHscNh2BzhAUmh50Hztck0BMHRc7TO/S/ExWT4yXFbwA2pfy
+ 41fHmAxMxpliC7zdowFN4ftLDrnxI05dS31ML9SgUoz82WPlypMS47DOw3bPrIMeI95HF3zRgDM
+ 7QdyG5280seME+oT3I9NUn6bVru2yTmihfXUlKeQs+7F+34waoB8I+wODhRbKVuwkaRpY=
 X-Developer-Key: i=max.hsu@sifive.com; a=openpgp;
  fpr=EA5E671B3A14B629913D5F68D203FD9D077940BD
 X-Rspamd-Server: lfdr
@@ -131,7 +130,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[23];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259664-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-259665-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[sifive.com:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -146,58 +145,56 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sifive.com:mid,sifive.com:dkim,sifive.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 45DAE165AAF
+X-Rspamd-Queue-Id: 0E4F3165ACD
 X-Rspamd-Action: no action
 
-This series corrects the device tree compatible strings for the SiFive
-FU740-C000 SoC to comply with the SiFive IP versioning scheme documented
-in Documentation/devicetree/bindings/sifive/sifive-blocks-ip-versioning.txt.
+Add the SiFive FU740-C000 ethernet controller compatible string to the
+Cadence MACB binding documentation.
 
-According to the versioning guidelines, each SoC should use SoC-specific
-compatible strings even when IP blocks are functionally identical across
-different SoCs. This ensures proper hardware identification and allows
-for future flexibility.
-
-The series updates both the ethernet (MACB) and PLIC compatible strings
-for the FU740, adds the corresponding device tree binding documentation,
-and adds driver support for the FU740 ethernet controller.
-
-Changes in this series:
-- Patch 1: Add FU740 ethernet compatible string to the Cadence MACB
-  binding documentation
-- Patch 2: Add FU740 PLIC compatible string to the PLIC binding
-  documentation
-- Patch 3: Add FU740-specific configuration to the Cadence MACB driver;
-  the FU740 ethernet controller is functionally identical to FU540, so
-  it reuses the existing implementation
-- Patch 4: Update the FU740 DTS to use the correct ethernet compatible
-  string "sifive,fu740-c000-gem"
-- Patch 5: Update the FU740 DTS to use the correct PLIC compatible
-  string "sifive,fu740-c000-plic"
-
-Tested on HiFive Unmatched (FU740-C000) hardware with network
-functionality verified.
+The FU740 ethernet controller uses the same GEMGXL management block as
+the FU540, which is tightly coupled with the Cadence MACB IP. This
+follows the SiFive IP versioning scheme which requires SoC-specific
+compatible strings for proper hardware identification.
 
 Signed-off-by: Max Hsu <max.hsu@sifive.com>
 ---
-Max Hsu (5):
-      dt-bindings: net: macb: Add SiFive FU740-C000 support
-      dt-bindings: interrupt-controller: Add SiFive FU740-C000 PLIC
-      net: macb: Add support for SiFive FU740-C000
-      riscv: dts: sifive: fu740: Use correct ethernet compatible string
-      riscv: dts: sifive: fu740: Use correct PLIC compatible string
+ Documentation/devicetree/bindings/net/cdns,macb.yaml | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
- .../interrupt-controller/sifive,plic-1.0.0.yaml         |  1 +
- Documentation/devicetree/bindings/net/cdns,macb.yaml    |  7 +++++--
- arch/riscv/boot/dts/sifive/fu740-c000.dtsi              |  4 ++--
- drivers/net/ethernet/cadence/macb_main.c                | 17 ++++++++++++++---
- 4 files changed, 22 insertions(+), 7 deletions(-)
----
-base-commit: 9702969978695d9a699a1f34771580cdbb153b33
-change-id: 20260111-fu740-277eee3deae2
+diff --git a/Documentation/devicetree/bindings/net/cdns,macb.yaml b/Documentation/devicetree/bindings/net/cdns,macb.yaml
+index cb14c35ba996..b46dde1da170 100644
+--- a/Documentation/devicetree/bindings/net/cdns,macb.yaml
++++ b/Documentation/devicetree/bindings/net/cdns,macb.yaml
+@@ -63,6 +63,7 @@ properties:
+           - mobileye,eyeq5-gem        # Mobileye EyeQ5 SoCs
+           - raspberrypi,rp1-gem       # Raspberry Pi RP1 gigabit ethernet interface
+           - sifive,fu540-c000-gem     # SiFive FU540-C000 SoC
++          - sifive,fu740-c000-gem     # SiFive FU740-C000 SoC
+ 
+       - items:
+           - enum:
+@@ -74,7 +75,7 @@ properties:
+     minItems: 1
+     items:
+       - description: Basic register set
+-      - description: GEMGXL Management block registers on SiFive FU540-C000 SoC
++      - description: GEMGXL Management block registers on SiFive FU540/FU740 SoCs
+ 
+   interrupts:
+     minItems: 1
+@@ -181,7 +182,9 @@ allOf:
+         properties:
+           compatible:
+             contains:
+-              const: sifive,fu540-c000-gem
++              enum:
++                - sifive,fu540-c000-gem
++                - sifive,fu740-c000-gem
+     then:
+       properties:
+         reg:
 
-Best regards,
 -- 
-Max Hsu <max.hsu@sifive.com>
+2.43.0
 
 
