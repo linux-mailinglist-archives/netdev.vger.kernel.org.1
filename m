@@ -1,215 +1,267 @@
-Return-Path: <netdev+bounces-259633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259634-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oIkyF4qul2nO5QIAu9opvQ
-	(envelope-from <netdev+bounces-259633-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 01:44:58 +0100
+	id YEPzLNCzl2lq6gIAu9opvQ
+	(envelope-from <netdev+bounces-259634-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 02:07:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8EBD163F30
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 01:44:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 572D0164133
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 02:07:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 295B730078A6
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 00:44:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 17203300BDB5
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 01:07:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0842C212FAD;
-	Fri, 20 Feb 2026 00:44:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9FBB18E02A;
+	Fri, 20 Feb 2026 01:07:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iNgrOn2F"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X7Y1Ryfc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D84F91F5825;
-	Fri, 20 Feb 2026 00:44:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771548295; cv=none; b=Gtfg3LLZfVfUnU2ND3gBJZMuFV/2axE5B0LAjR12ttIFMPfJMx/vssw0D+cIvbQjHogZeYxFvhq5ypaQ1g8amuWkzJfxI5qd/3OyOMi7oSMMfPE9By+lTO1daYFtdNUZ0n23tPPkHyqAZjMn8lbe3FmL7+vvrYuLCUtXlILfTE4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771548295; c=relaxed/simple;
-	bh=kagJ+UlIdLhqkqspgrp0oS3pZa0ipNhQ034OQlfEeFs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BEWdGua1S3LW9FjZMFF/VlyRj06+zbvncYDMYg/GG3ZhWmY5GvtK+bNqY3pRljdhZ7fF2lpjpTwQlswN+Yv+ictA8PF+vtF14BIByDb+PqTgLDHwPPIXjvw6OyquJBUtNYi99U5a2+1qB7i7r89vb+7wZSga6v2L34+prv7V2no=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iNgrOn2F; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 847DCC4CEF7;
-	Fri, 20 Feb 2026 00:44:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771548295;
-	bh=kagJ+UlIdLhqkqspgrp0oS3pZa0ipNhQ034OQlfEeFs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iNgrOn2FjR7+xFM/Tus8NkYomQ/mZXHDMoEg2Ks1LLulQRPBoVawVhUJLwQjt36Po
-	 YyrJsb863cKScPUVC9qF3gpeYWh+eTIs0jNcVwrl0A/zcWKRrKQXwS0vbmbTLjdqW1
-	 wlZAw/+Sj7fVU+aC73t335JuSCkVltl/wUxzo4oq2oiig4DsYbQ7IhD8tncmYsH+XS
-	 OqklRFg5TRKLiMOK3S1IyBB7AMBMDhc7kgSiKRBGFKZMbZxhdmaY/tNAmw1uB0Vu8f
-	 AQqsqtBQ+VS8i6HkYSrzjPX0RKcxkA9Nt/eFkvZZKrtV6PfcuJayphZ7c2SVGLXTRn
-	 RMUZQXkbI5mHA==
-Date: Thu, 19 Feb 2026 16:44:54 -0800
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, Jeff Layton <jlayton@kernel.org>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-	linux-kernel@vger.kernel.org, Hugh Dickins <hughd@google.com>,
-	linux-mm@kvack.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Tejun Heo <tj@kernel.org>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jann Horn <jannh@google.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 00/14] xattr: rework simple xattrs and support user.*
- xattrs on sockets
-Message-ID: <20260220004454.GR6467@frogsfrogsfrogs>
-References: <20260216-work-xattr-socket-v1-0-c2efa4f74cb7@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F01992AD3D
+	for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 01:07:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771549638; cv=pass; b=uXjuB70er/H0VCUwRe1OmUi8z1H1rXN7jqUed2Ll/uzor99icJ41Tyi1LppTjIXIucKXGQnfg9RdvDu5SyRtHZiD1+998iC0DRYGjjzuGKgXuy4HBbRcxs/mNQAIpa6UF/D053zrIBmABfPdEupKsTfRYtl7AKMnBEcJWU+ZITQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771549638; c=relaxed/simple;
+	bh=4Du0OQoVDfLifz3GYSC+YkUNdNJ2Et5vb/FwjYsvS+8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nqY3p//krQ837FW02zqGBJ2fTKuFKVOSrXm7bpo+2u7OLalzD5qTm8Bhs8AE01VkX3Y9AFrhbQbDdjApwr10gTGr+HOwzCcPuZ61RJZIuWmNr3HwU+abbKDt8XEemv4X4XOMIEaOn1FkFtA0Yaj7sCrC+QxHXFisVmEZ5y3sbac=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X7Y1Ryfc; arc=pass smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-59de0b7c28aso1879056e87.1
+        for <netdev@vger.kernel.org>; Thu, 19 Feb 2026 17:07:15 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771549634; cv=none;
+        d=google.com; s=arc-20240605;
+        b=e3KfGO1diF/T7AiTrKj+1Xbci+Knc5PRigCRwa1fduSSNk87PdC/MeGtVUc86mITac
+         HC+goQm/3GyBGe1o8r/1i/vmLBGOabGiVFGCC87cCgCkbsVDDFyNVa6DHg+E7dPvaf69
+         1I2j62IMr+74CIb5F6tjXJjlRNnOj97h0A6PlisL46Va/DN+eZBEwSYYSA0OkHm8SvgU
+         gaKXKlkPC4e8CINDytB7KcyJbEQzDePdlz5frzEeMI6rg1KIaOrEA1mcqVZO4OMmzynk
+         41d2fSMVU6kD8HDrpGBqbQtbSN+a1cR/1E9EOzSxcrtx8oOR0xE4sXC3FguonIKR2SoS
+         XC9Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ZmIxyr54D/I58TGB2aA1a9CohmKJ72f48z84M3gqW7U=;
+        fh=KNmxO7YaiNkefmsJt/F3GPDtxlqat5ve1E4cG6pLvJE=;
+        b=M3s+fhQGFov4MiCywtr3v7c18pwpk/oiVtYT5gO2oZ1+rfYQWAq4I9oWbmRtkcxy2e
+         FQlGoddPwHIr5+iwGBf2ZmMRKcdMjejIzees4jRCx2VIY+6hV1mcNlGpcFAb57p4GDQG
+         HNJI6ksSHzyYhTrSQX/5aJkkQ5xBSo6mT08lb3yObwr7ZNjo80+JKRxGLnyAccc+Kvmb
+         K/NIsSpt1XvfkeaNZVWt+IqV4fenhFaCDsBZds+jijkWFzPzk/l5xaX7PYXxYlrxerGJ
+         KX1/NmOUAQEceeDPJw7a4GGfjhKW7EoHibx7LKElrfBMB1DofjzXC95/mA/VRJ+96Y/X
+         hPug==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771549634; x=1772154434; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZmIxyr54D/I58TGB2aA1a9CohmKJ72f48z84M3gqW7U=;
+        b=X7Y1RyfcJ62vtQeELeBpgIsqIwySUL3qfTkhS6exJ8wW/Tx5Bw6aWPvFRVq0FnHJeQ
+         oy5zlKhBqqIU/VFinM6b00Z1+3r4bYLRjM2UcyK5wwhY8BsJi+0q2T/m+9rchldlgd3u
+         jjyOZHrursfa+h7/GoeiBuFmGY3KSqQTael0bByPDHARXiRKEmEZqLZHSiZT5ylPGxS2
+         YAxYsPSlPli03X1L1dbLmjNM87EfSdS5oBhErJRGRtkYvE7dCfsj6jXYX04xIIMAb09d
+         /Icrhq2+lOYdO7kKHlcCeCeYj4Y3Rcu5VwhR8Jt4VdmHrk8UsOFzbn3zMTnmmOO/nzS2
+         qlZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771549634; x=1772154434;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ZmIxyr54D/I58TGB2aA1a9CohmKJ72f48z84M3gqW7U=;
+        b=H+gTgq7OcxMKbikzgdpqsUrWBbqxLbiVsZY+xj4Nv9l9KEXAmkcv/IYf4uDVDm8hNK
+         DsWIvr1fI9O3TEkbnWcZzdc+7N9rKsQ1amFvZaBEXDVeySb+fdmVszNfoIch+dt61TAL
+         7geS9Z3ldOiqKQdIqa0Z0X6HBk9Lbe3OdT0IpFSq/JB6rNR0miLwUQNlpd8UVQvRL6Vq
+         MYgn4zsA6CgjTcnLfG3rit10oSlp+uQ3F9BHaKHaF1oqkjLa/qGR+sSgOzkk+PLyCZGv
+         ooguZu1LfpClmuWtziRWtrRb1PPJb+KFyvB39p00Pu5ngTCgOpSx4nm/Y2SdiitNMrkT
+         VFcg==
+X-Forwarded-Encrypted: i=1; AJvYcCVLqGHTAIA9+14TzAwQmpxEb+yS03xrGy1/wQ5azgAHvBj2vvNw0Y0QhUF+TylfCHuKgMGx8Ds=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGTiPWPdtJJjAH+HbKeqZW1D4MEUpIfHQeLka28TOQozWj+99u
+	sII/EqZ5CD8meUSdUmgrq1xzLJhoGgh3hPyyuO8u2IAOnaLmJRNJJYksNE9IsjWthnAw/uh2BbZ
+	mIupPa+OQ4cMBHWfIvvDQCxgX9lArYB0=
+X-Gm-Gg: AZuq6aKd+l8sQp34cwWCATJhMIALEywFQCwKryrF1iCsOr8td548WJl7Cs+c1yEB39R
+	4cmvheIB/QA6Tl2MGKWLUr6neeSbOAE1iaMuBHDcRRFrGrumHU9HRAx31zx2Gb3jQcT8s7CGvun
+	rST/CZljdgGCDXPrFCAWGUBKaYTJS6l+fsto94DC5Kz6Bhah9kqj0jOllszu5eFuK1pG1wJZrrm
+	qRPWaKcukhEDAi9Ckj7KKLxj6+mvAp726vlzKjxq65p9FJYLuXx5JUU3dW9ksdAm7li7UEdgBzd
+	u3tPan8=
+X-Received: by 2002:a05:6512:3087:b0:59d:e9df:6dcd with SMTP id
+ 2adb3069b0e04-59f83b9da63mr2099271e87.15.1771549633590; Thu, 19 Feb 2026
+ 17:07:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260216-work-xattr-socket-v1-0-c2efa4f74cb7@kernel.org>
+References: <20260218150000.301176-1-maciej.fijalkowski@intel.com>
+In-Reply-To: <20260218150000.301176-1-maciej.fijalkowski@intel.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 20 Feb 2026 09:06:36 +0800
+X-Gm-Features: AaiRm52_xb6kFQorOBbTSas6w9BZ_ZFswXRYRYP9SzorGa659iuDtN-NAWW3y58
+Message-ID: <CAL+tcoCYMzNtAqgrdOHVNPBO4H5mCtvwhYj5kGdhJ5CCRgRd5A@mail.gmail.com>
+Subject: Re: [PATCH bpf-next] xsk: avoid double checking against rx queue
+ being full
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com, 
+	stfomichev@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259634-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,intel.com,gmail.com];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259633-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[djwong@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D8EBD163F30
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 572D0164133
 X-Rspamd-Action: no action
 
-On Mon, Feb 16, 2026 at 02:31:56PM +0100, Christian Brauner wrote:
-> Hey,
-> 
-> This reworks the simple_xattr infrastructure and adds support for
-> user.* extended attributes on sockets.
-> 
-> The simple_xattr subsystem currently uses an rbtree protected by a
-> reader-writer spinlock. This series replaces the rbtree with an
-> rhashtable giving O(1) average-case lookup with RCU-based lockless
-> reads. This sped up concurrent access patterns on tmpfs quite a bit and
-> it's an overall easy enough conversion to do and gets rid or rwlock_t.
-> 
-> The conversion is done incrementally: a new rhashtable path is added
-> alongside the existing rbtree, consumers are migrated one at a time
-> (shmem, kernfs, pidfs), and then the rbtree code is removed. All three
-> consumers switch from embedded structs to pointer-based lazy allocation
-> so the rhashtable overhead is only paid for inodes that actually use
-> xattrs.
+Hi Maciej,
 
-Patches 1-6 look ok to me, at least in the sense that nothing stood out
-to me as obviously wrong, so
-Acked-by: "Darrick J. Wong" <djwong@kernel.org>
+On Wed, Feb 18, 2026 at 11:03=E2=80=AFPM Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
+>
+> Currently non-zc xsk rx path for multi-buffer case checks twice if xsk
+> rx queue has enough space for producing descriptors:
+> 1.
+>         if (xskq_prod_nb_free(xs->rx, num_desc) < num_desc) {
+>                 xs->rx_queue_full++;
+>                 return -ENOBUFS;
+>         }
+> 2.
+>         __xsk_rcv_zc(xs, xskb, copied - meta_len, rem ? XDP_PKT_CONTD : 0=
+);
+>         -> err =3D xskq_prod_reserve_desc(xs->rx, addr, len, flags);
+>           -> if (xskq_prod_is_full(q))
+>
+> Second part is redundant as in 1. we already peeked onto rx queue and
+> checked that there is enough space to produce given amount of
+> descriptors.
+>
+> Provide helper functions that will skip it and therefore optimize code.
+>
+> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 
-> With this infrastructure in place the series adds support for user.*
-> xattrs on sockets. Path-based AF_UNIX sockets inherit xattr support
-> from the underlying filesystem (e.g. tmpfs) but sockets in sockfs -
-> that is everything created via socket() including abstract namespace
-> AF_UNIX sockets - had no xattr support at all.
-> 
-> The xattr_permission() checks are reworked to allow user.* xattrs on
-> S_IFSOCK inodes. Sockfs sockets get per-inode limits of 128 xattrs and
-> 128KB total value size matching the limits already in use for kernfs.
-> 
-> The practical motivation comes from several directions. systemd and
-> GNOME are expanding their use of Varlink as an IPC mechanism. For D-Bus
-> there are tools like dbus-monitor that can observe IPC traffic across
-> the system but this only works because D-Bus has a central broker. For
-> Varlink there is no broker and there is currently no way to identify
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
 
-Hum.  I suppose there's never going to be a central varlink broker, is
-there?  That doesn't sound great for discoverability, unless the plan is
-to try to concentrate them in (say) /run/varlink?  But even then, could
-you have N services that share the same otherwise private tmpfs in order
-to talk to each other via a varlink socket?  I suppose in that case, the
-N services probably don't care/want others to discover their socket.
-
-> which sockets speak Varlink. With user.* xattrs on sockets a service
-> can label its socket with the IPC protocol it speaks (e.g.,
-> user.varlink=1) and an eBPF program can then selectively capture
-
-Who gets to set xattrs?  Can a malicious varlink socket user who has
-connect() abilities also delete user.varlink to mess with everyone who
-comes afterwards?
-
---D
-
-> traffic on those sockets. Enumerating bound sockets via netlink combined
-> with these xattr labels gives a way to discover all Varlink IPC
-> entrypoints for debugging and introspection.
-> 
-> Similarly, systemd-journald wants to use xattrs on the /dev/log socket
-> for protocol negotiation to indicate whether RFC 5424 structured syslog
-> is supported or whether only the legacy RFC 3164 format should be used.
-> 
-> In containers these labels are particularly useful as high-privilege or
-> more complicated solutions for socket identification aren't available.
-> 
-> The series comes with comprehensive selftests covering path-based
-> AF_UNIX sockets, sockfs socket operations, per-inode limit enforcement,
-> and xattr operations across multiple address families (AF_INET,
-> AF_INET6, AF_NETLINK, AF_PACKET).
-> 
-> Christian
-> 
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
 > ---
-> Christian Brauner (14):
->       xattr: add rcu_head and rhash_head to struct simple_xattr
->       xattr: add rhashtable-based simple_xattr infrastructure
->       shmem: adapt to rhashtable-based simple_xattrs with lazy allocation
->       kernfs: adapt to rhashtable-based simple_xattrs with lazy allocation
->       pidfs: adapt to rhashtable-based simple_xattrs
->       xattr: remove rbtree-based simple_xattr infrastructure
->       xattr: add xattr_permission_error()
->       xattr: switch xattr_permission() to switch statement
->       xattr: move user limits for xattrs to generic infra
->       xattr,net: support limited amount of extended attributes on sockfs sockets
->       xattr: support extended attributes on sockets
->       selftests/xattr: path-based AF_UNIX socket xattr tests
->       selftests/xattr: sockfs socket xattr tests
->       selftests/xattr: test xattrs on various socket families
-> 
->  fs/kernfs/dir.c                                    |  15 +-
->  fs/kernfs/inode.c                                  |  99 +----
->  fs/kernfs/kernfs-internal.h                        |   5 +-
->  fs/pidfs.c                                         |  65 +--
->  fs/xattr.c                                         | 423 +++++++++++++------
->  include/linux/kernfs.h                             |   2 -
->  include/linux/shmem_fs.h                           |   2 +-
->  include/linux/xattr.h                              |  47 ++-
->  mm/shmem.c                                         |  46 +-
->  net/socket.c                                       | 119 ++++--
->  .../testing/selftests/filesystems/xattr/.gitignore |   3 +
->  tools/testing/selftests/filesystems/xattr/Makefile |   6 +
->  .../filesystems/xattr/xattr_socket_test.c          | 470 +++++++++++++++++++++
->  .../filesystems/xattr/xattr_socket_types_test.c    | 177 ++++++++
->  .../filesystems/xattr/xattr_sockfs_test.c          | 363 ++++++++++++++++
->  15 files changed, 1547 insertions(+), 295 deletions(-)
-> ---
-> base-commit: 72c395024dac5e215136cbff793455f065603b06
-> change-id: 20260211-work-xattr-socket-c85f4d3b8847
-> 
-> 
+>  net/xdp/xsk.c       | 14 +++++++++++++-
+>  net/xdp/xsk_queue.h | 16 +++++++++++-----
+>  2 files changed, 24 insertions(+), 6 deletions(-)
+>
+> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> index f093c3453f64..aaadc13649e1 100644
+> --- a/net/xdp/xsk.c
+> +++ b/net/xdp/xsk.c
+> @@ -160,6 +160,17 @@ static int __xsk_rcv_zc(struct xdp_sock *xs, struct =
+xdp_buff_xsk *xskb, u32 len,
+>         return 0;
+>  }
+>
+> +static void __xsk_rcv_zc_safe(struct xdp_sock *xs, struct xdp_buff_xsk *=
+xskb,
+> +                             u32 len, u32 flags)
+
+This helper is used only here, so I wonder what the need of it is?
+
+Thanks,
+Jason
+
+
+> +{
+> +       u64 addr;
+> +
+> +       addr =3D xp_get_handle(xskb, xskb->pool);
+> +       __xskq_prod_reserve_desc(xs->rx, addr, len, flags);
+> +
+> +       xp_release(xskb);
+> +}
+> +
+>  static int xsk_rcv_zc(struct xdp_sock *xs, struct xdp_buff *xdp, u32 len=
+)
+>  {
+>         struct xdp_buff_xsk *xskb =3D container_of(xdp, struct xdp_buff_x=
+sk, xdp);
+> @@ -292,7 +303,8 @@ static int __xsk_rcv(struct xdp_sock *xs, struct xdp_=
+buff *xdp, u32 len)
+>                 rem -=3D copied;
+>
+>                 xskb =3D container_of(xsk_xdp, struct xdp_buff_xsk, xdp);
+> -               __xsk_rcv_zc(xs, xskb, copied - meta_len, rem ? XDP_PKT_C=
+ONTD : 0);
+> +               __xsk_rcv_zc_safe(xs, xskb, copied - meta_len,
+> +                                 rem ? XDP_PKT_CONTD : 0);
+>                 meta_len =3D 0;
+>         } while (rem);
+>
+> diff --git a/net/xdp/xsk_queue.h b/net/xdp/xsk_queue.h
+> index 1eb8d9f8b104..4f764b5748d2 100644
+> --- a/net/xdp/xsk_queue.h
+> +++ b/net/xdp/xsk_queue.h
+> @@ -440,20 +440,26 @@ static inline void xskq_prod_write_addr_batch(struc=
+t xsk_queue *q, struct xdp_de
+>         q->cached_prod =3D cached_prod;
+>  }
+>
+> -static inline int xskq_prod_reserve_desc(struct xsk_queue *q,
+> -                                        u64 addr, u32 len, u32 flags)
+> +static inline void __xskq_prod_reserve_desc(struct xsk_queue *q,
+> +                                           u64 addr, u32 len, u32 flags)
+>  {
+>         struct xdp_rxtx_ring *ring =3D (struct xdp_rxtx_ring *)q->ring;
+>         u32 idx;
+>
+> -       if (xskq_prod_is_full(q))
+> -               return -ENOBUFS;
+> -
+>         /* A, matches D */
+>         idx =3D q->cached_prod++ & q->ring_mask;
+>         ring->desc[idx].addr =3D addr;
+>         ring->desc[idx].len =3D len;
+>         ring->desc[idx].options =3D flags;
+> +}
+> +
+> +static inline int xskq_prod_reserve_desc(struct xsk_queue *q,
+> +                                        u64 addr, u32 len, u32 flags)
+> +{
+> +       if (xskq_prod_is_full(q))
+> +               return -ENOBUFS;
+> +
+> +       __xskq_prod_reserve_desc(q, addr, len, flags);
+>
+>         return 0;
+>  }
+> --
+> 2.43.0
+>
+>
 
