@@ -1,87 +1,65 @@
-Return-Path: <netdev+bounces-259650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259651-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IMcwBqT8l2kf/AIAu9opvQ
-	(envelope-from <netdev+bounces-259650-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 07:18:12 +0100
+	id IM9WN2IAmGmV/AIAu9opvQ
+	(envelope-from <netdev+bounces-259651-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 07:34:10 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BEA4164EB6
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 07:18:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 368DC164F9C
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 07:34:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E101A301E22A
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 06:18:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D0356301F9C0
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 06:34:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F5AE30BB8A;
-	Fri, 20 Feb 2026 06:18:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CDF629BDB1;
+	Fri, 20 Feb 2026 06:34:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PZN52lPt"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="EBZTLNua"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4CD141A8F;
-	Fri, 20 Feb 2026 06:18:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D60961D555;
+	Fri, 20 Feb 2026 06:34:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771568287; cv=none; b=hdT++UZDabOiZ23cOCvnrdUUe/PRp9LlAQVZEmP5mcCXTaUi+52GqtnuBfHSHD8ggHr3X8RQUH1esFQNZaUeicmmi6Tzh5IKW8MEKqwUo5gGfNVAJTVgYpijWAsGOu6RHLJJx5jx73Dit1d8kn8JnOcSV6/e7M3hxCpiDp4EnvE=
+	t=1771569245; cv=none; b=WahIVQI47Q55CSFc1udc8paWKMHCtZSwy9tHbFKwSc/JpZ0HDeBm2MF3iJVsD5Hc1K/Z/j523qEQ6JjsuoIlAznMgvHF72NMmViVq0G/hD4NkSfptcxlX81vjh20e5+53TH/nopO/+XihlD4+3xAFDFwl49aO3xAJudMwJFCS3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771568287; c=relaxed/simple;
-	bh=mZnZx8EnhGB8nR1tC/rsTKQ187O7k8yDgpkPcZK8kHM=;
+	s=arc-20240116; t=1771569245; c=relaxed/simple;
+	bh=Ial17sfZgdVRiZ5JFwlMSLgTFo1LPcexMHaX94onETg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CCtnTBIRHhWMaW0+Lq5w2YL+jCNKjcDkPIz5urQ2rnshI8mQB0lG/e0RxytMhrSALPyxlEQ07IcVjGPM0mUj9ThPoKwvtI7mmK439FXA4eeYJPHHD/SsNM821upoOwe5uiD7fiqTIUz+PVI69KaTYrDhwx/7ydQjXdzitkq/YJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PZN52lPt; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1771568285; x=1803104285;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=mZnZx8EnhGB8nR1tC/rsTKQ187O7k8yDgpkPcZK8kHM=;
-  b=PZN52lPty72ABe6Gzivcva6yYivIjJ2UT4vCd04GhCxFe6B2uEId3/L/
-   MJaMe329GBn95q/FzZ6JABjqpvaeg6mKgPA6VI2/ImEgRP0xbwp+bLNIb
-   /bexiHWFu4KF6hhr/wB5c6nSbGp6ethkzDKFNHiNgnSjPTrtIBhsTNZtD
-   pq4bSTTRLeGbR2qKlN/Fqt39qIhj4ZEClpqd5723OWLS1yR1rFWOCPT7Y
-   kp6UdSuAMxyH4qrKaYSAkHWMgRIZk+s//H9ZFuM3xMx5gOZK+I7dIUJwh
-   Q6YpAIvom/7aZBxVrsEWd2s/dcwXb9E15bhpuGPcaQPpo6syPANaxGkJM
-   g==;
-X-CSE-ConnectionGUID: /PWBn/59TRynabt/9OmFxA==
-X-CSE-MsgGUID: x6pyGRF4R0eiuTc1O8/t3w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11706"; a="60236582"
-X-IronPort-AV: E=Sophos;i="6.21,301,1763452800"; 
-   d="scan'208";a="60236582"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2026 22:18:05 -0800
-X-CSE-ConnectionGUID: zpQLEjETQB+EvLNDYDduEQ==
-X-CSE-MsgGUID: eg4a2n0bQS641+Y7zSycFQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,301,1763452800"; 
-   d="scan'208";a="212918155"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by fmviesa006.fm.intel.com with ESMTP; 19 Feb 2026 22:18:01 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vtJpv-000000013s4-1vP8;
-	Fri, 20 Feb 2026 06:17:59 +0000
-Date: Fri, 20 Feb 2026 14:17:54 +0800
-From: kernel test robot <lkp@intel.com>
-To: Petr Oros <poros@redhat.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, ivecera@redhat.com,
-	Petr Oros <poros@redhat.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=EaKhh8VE288m0eWH7LRIaKcgC6cBcPCt3so3uponeLN33D/7uD4Tuy8eGpS/BtkJ5aFn8mCf5aq1q/tNkuLpneztQKDwVoBAYCMJn0IW1vi5ErFVLl847hjQKyTXXB3XgX7aMRW74hwbZqZjkZvPAoo8bmPoiIXdTDsjcOqlbPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=EBZTLNua; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A349DC116D0;
+	Fri, 20 Feb 2026 06:34:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1771569245;
+	bh=Ial17sfZgdVRiZ5JFwlMSLgTFo1LPcexMHaX94onETg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EBZTLNuay2yyKESIcWpEoKJGo4zBffSI2G6ymTPRJKLu8EuK6qk9cn+K+b8PyMmKp
+	 plAp5fIjthS+U/Ei/t32XPcpzz6MbCPJuTVZjCOgCCqS9kwQrGvma9WOTpLDVFhZUf
+	 Xr1/SToJ9JyGZCP1mOfOjglWaUbH/cM5KfDRuGhs=
+Date: Fri, 20 Feb 2026 07:34:02 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Danilo Krummrich <dakr@kernel.org>
+Cc: Tariq Toukan <tariqt@nvidia.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org,
-	piotr.kwapulinski@intel.com
-Subject: Re: [PATCH iwl-net v2] ice: fix missing dpll notification for SW pins
-Message-ID: <202602201417.eTuOe57F-lkp@intel.com>
-References: <20260219131500.2271897-1-poros@redhat.com>
+	driver-core@lists.linux.dev, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
+	Amir Tzin <amirtz@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>
+Subject: Re: [PATCH V2] driver core: auxiliary bus: Fix sysfs creation on bind
+Message-ID: <2026022040-casualty-dexterity-543c@gregkh>
+References: <20260219210435.1769394-1-tariqt@nvidia.com>
+ <DGJCHYS3SKIQ.1TIHQCMEOCRC@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,65 +68,130 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260219131500.2271897-1-poros@redhat.com>
+In-Reply-To: <DGJCHYS3SKIQ.1TIHQCMEOCRC@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [3.84 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
+	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259650-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259651-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-0.998];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linuxfoundation.org:+];
 	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,intel.com:email,01.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5BEA4164EB6
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxfoundation.org:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 368DC164F9C
 X-Rspamd-Action: no action
 
-Hi Petr,
+On Fri, Feb 20, 2026 at 12:59:45AM +0100, Danilo Krummrich wrote:
+> On Thu Feb 19, 2026 at 10:04 PM CET, Tariq Toukan wrote:
+> > +/**
+> > + * auxiliary_device_sysfs_irq_dir_init - initialize the IRQ sysfs directory
+> > + * @auxdev: auxiliary bus device to initialize the sysfs directory.
+> > + *
+> > + * This function should be called by drivers to initialize the IRQ directory
+> > + * before adding any IRQ sysfs entries. The driver is responsible for ensuring
+> > + * this function is called only once and for handling any concurrency control
+> > + * if needed.
+> > + *
+> > + * Drivers must call auxiliary_device_sysfs_irq_dir_destroy() to clean up when
+> > + * done.
+> > + *
+> > + * Return: zero on success or an error code on failure.
+> > + */
+> > +int auxiliary_device_sysfs_irq_dir_init(struct auxiliary_device *auxdev)
+> >  {
+> > -	int ret = 0;
+> > -
+> > -	guard(mutex)(&auxdev->sysfs.lock);
+> > -	if (auxdev->sysfs.irq_dir_exists)
+> > -		return 0;
+> > +	int ret;
+> >  
+> > -	ret = devm_device_add_group(&auxdev->dev, &auxiliary_irqs_group);
+> > +	ret = sysfs_create_group(&auxdev->dev.kobj, &auxiliary_irqs_group);
+> >  	if (ret)
+> >  		return ret;
+> >  
+> > -	auxdev->sysfs.irq_dir_exists = true;
+> >  	xa_init(&auxdev->sysfs.irqs);
+> >  	return 0;
+> >  }
+> > +EXPORT_SYMBOL_GPL(auxiliary_device_sysfs_irq_dir_init);
+> > +
+> > +/**
+> > + * auxiliary_device_sysfs_irq_dir_destroy - destroy the IRQ sysfs directory
+> > + * @auxdev: auxiliary bus device to destroy the sysfs directory.
+> > + *
+> > + * This function should be called by drivers to clean up the IRQ directory
+> > + * after all IRQ sysfs entries have been removed. The driver is responsible
+> > + * for ensuring all IRQs are removed before calling this function.
+> > + */
+> > +void auxiliary_device_sysfs_irq_dir_destroy(struct auxiliary_device *auxdev)
+> > +{
+> > +	xa_destroy(&auxdev->sysfs.irqs);
+> > +	sysfs_remove_group(&auxdev->dev.kobj, &auxiliary_irqs_group);
+> > +}
+> > +EXPORT_SYMBOL_GPL(auxiliary_device_sysfs_irq_dir_destroy);
+> >  
+> >  /**
+> >   * auxiliary_device_sysfs_irq_add - add a sysfs entry for the given IRQ
+> > @@ -45,7 +70,8 @@ static int auxiliary_irq_dir_prepare(struct auxiliary_device *auxdev)
+> >   * @irq: The associated interrupt number.
+> >   *
+> >   * This function should be called after auxiliary device have successfully
+> > - * received the irq.
+> > + * received the irq. The driver must call auxiliary_device_sysfs_irq_dir_init()
+> > + * before calling this function for the first time.
+> 
+> I'm not convinced by this approach. This adds two new sources of bugs for
+> drivers.
+> 
+>   1. Drivers can now forget to call auxiliary_device_sysfs_irq_dir_init()
+>      *before* auxiliary_device_sysfs_irq_add().
+> 
+>   2. Drivers can forget to call auxiliary_device_sysfs_irq_dir_destroy().
+> 
+> Instead, I suggest to keep the current approach and just replace
+> devm_device_add_group() with devm_auxiliary_device_add_group(), which in its
+> devres callback additionally clears auxdev->sysfs.irq_dir_exists.
+> 
+> In terms of the auxdev->sysfs.lock, I think this can still be removed, as it
+> wasn't needed in the first place.
+> 
+> auxiliary_device_sysfs_irq_add() must only be called from a scope where the
+> auxiliary device is guaranteed to be bound, so there can't be a concurrent
+> unbind.
+> 
+> There may only be multiple concurrent calls to auxiliary_device_sysfs_irq_add()
+> itself, and in this case irq_dir_exists can just be an atomic.
+> 
+> Yes, we're still stuck with an atomic for irq_dir_exists, but the driver API
+> remains much simpler and less error prone.
 
-kernel test robot noticed the following build warnings:
+I agree, your recommendations make sense.  And I still hate this irq
+addition to auxdevices :(
 
-[auto build test WARNING on tnguy-net-queue/dev-queue]
+thanks,
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Petr-Oros/ice-fix-missing-dpll-notification-for-SW-pins/20260219-211758
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue.git dev-queue
-patch link:    https://lore.kernel.org/r/20260219131500.2271897-1-poros%40redhat.com
-patch subject: [PATCH iwl-net v2] ice: fix missing dpll notification for SW pins
-config: um-allyesconfig (https://download.01.org/0day-ci/archive/20260220/202602201417.eTuOe57F-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260220/202602201417.eTuOe57F-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202602201417.eTuOe57F-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> Warning: drivers/net/ethernet/intel/ice/ice_dpll.c:2625 function parameter 'p' not described in 'ice_dpll_sw_pin_needs_notify'
->> Warning: drivers/net/ethernet/intel/ice/ice_dpll.c:2625 function parameter 'active' not described in 'ice_dpll_sw_pin_needs_notify'
->> Warning: drivers/net/ethernet/intel/ice/ice_dpll.c:2625 function parameter 'old' not described in 'ice_dpll_sw_pin_needs_notify'
->> Warning: drivers/net/ethernet/intel/ice/ice_dpll.c:2625 expecting prototype for ice_dpll_notify_changes(). Prototype was for ice_dpll_sw_pin_needs_notify() instead
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+greg k-h
 
