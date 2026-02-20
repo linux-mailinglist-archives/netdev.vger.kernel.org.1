@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-259668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259669-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kO+tCV8cmGnp/wIAu9opvQ
-	(envelope-from <netdev+bounces-259668-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 09:33:35 +0100
+	id SKOwBGIbmGnp/wIAu9opvQ
+	(envelope-from <netdev+bounces-259669-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 09:29:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 700B8165B12
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 09:33:34 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3250B165AA6
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 09:29:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6A04A308C2D4
-	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 08:28:18 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D48C2301072B
+	for <lists+netdev@lfdr.de>; Fri, 20 Feb 2026 08:28:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A68AD335BBB;
-	Fri, 20 Feb 2026 08:28:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BC30336ED1;
+	Fri, 20 Feb 2026 08:28:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="U4eTyjwO"
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="GslRCv4C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B34D3358BE
-	for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 08:28:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7C9233556E
+	for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 08:28:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771576096; cv=none; b=WFDy38TIdK6cTiRb2a/dHPOuWVHmJ9/fUN30EEN7ZSjdoo8T1crTEjUEW2yYaXVBUIJl+mMfMapPjZrWMK/ncI4jp5UVhaaUcJgGp5Gs8QGdHUbQ+Ut/xxd6mWdWhjM8ohpnx2smOO4P/b+hvo0pB6MDpd3+jGtbiXF5sXvmKL8=
+	t=1771576103; cv=none; b=gZ4gIoSIeZDLmnmTHmaZrIJcUTyBPpN3mBpTsZgXpz96WwaY89R0mJO1Lpbyk7lskuLbbVUdNYJ1cAhPX38zleyT5fWpAnicacj2jLTClsag18h9rhwb0YWj7iWTQhKEIzlQrj8KMVbqJL+SYE4Y8sFQMuNkDKjSnKFU5r6M9dM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771576096; c=relaxed/simple;
-	bh=A1K63zp8qaSu12/rz2C04BAncHqq+vlSUPdPl98mUA8=;
+	s=arc-20240116; t=1771576103; c=relaxed/simple;
+	bh=4GANKwuw4Gmvjt4yzo6mJduIJtLD4oH0IHu2XPGqRsA=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=c7uTLxAeXVRHMIKznXzyfwt5zZmu33Lnn5nQUcwpOcJ2D3MIkiDVKrmb8tE4TpD9tQ7YeVaOsSWNIUrSxpBa0xIMzwP6o34OxoSbd1f8wewRb7rfJu/PjOWMCcYl9B37oOuP2ULnvk74btcA4tqcjFDPs7EcgcEO9DSf34tNHWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=U4eTyjwO; arc=none smtp.client-ip=209.85.221.47
+	 In-Reply-To:To:Cc; b=fzlXXy/wqPujWKD+mGd6FJuLMW7JD0A5ArPqB/NfucTElFZW/6U30tfSW0YAfthQyYWFPxP9ELG7dI50UjlcYsaqta3dx2SepagVQ5BUbPURZ+LO+JAq8wl8C1E/RJ2Mv1W3+mEmEM95pi6CbK44UFHJWB1o5Q+/oF/8uG+ewEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=GslRCv4C; arc=none smtp.client-ip=209.85.221.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-436e87589e8so1800724f8f.3
-        for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 00:28:14 -0800 (PST)
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-435f177a8f7so1702807f8f.1
+        for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 00:28:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1771576093; x=1772180893; darn=vger.kernel.org;
+        d=sifive.com; s=google; t=1771576100; x=1772180900; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ZV5sUmW06PeMcEouxXRCwFu2jwo5fAowFeT/xqFkYvY=;
-        b=U4eTyjwO50qL56+enRA3hMn4fSFzqXwxYWFhepB1Y+P8HPDDpU1e6LTeOetzg5cnhd
-         I2uzIEp3xwiHi775xU2fwWQ10xNNLRfFA8PweR9utGPQURRPV/AO6ubBHIBRzZbx9Ma5
-         9KzfX1aFwjfLOz+HyEdHUIUQRCVzltzFSuG/ULjaA2PLhnB4UizED9r7rE29cqVFWx+9
-         E25wPN3sjpV6XTwDCB+nb0VVlyy66LRrvBRxPwcMcBqxVRsXUKgSEjeYNtp7KNdHEqVC
-         eBCY6UVSikfjmoPiLvNVHBc6VTLnYEWF9dd7ACG6KQoX7o4SgEkJxcyRzKSNVLuLuYX8
-         viQQ==
+        bh=Mcr+ylFRvbVQSvo6VBml7OoEWOKRfpbvT57xdCCmX1Q=;
+        b=GslRCv4CZ8IGt5sclvgYvqLmarB80+s//Jk0Y3cnG7PWV0d2JkFKuLm//TV4J0KXrW
+         t0ycaUAh14Uq7i6k8PZBHglsDHaoKyBFdqjhA3VWjOSuSIxcLjHXrYYnmrn+PHmjiZ5U
+         EyfcQh5qfTt4ls3duswSPDmoKsEQy7i61LhUCvsGMX2/6Wa/xrTxirVQlY2vVlNCA4NR
+         XW+F4MwLA7QAtc484pJs5/zFTArKtBYO75wL8iSYIWaRTADIdvBi/H48fNNHLl80o+ra
+         9IBElF8+Rtoe9EYO0NVGvfvHMnqL6shJfBmcbKbBfD9S2INU/wyIewQF9QyPWltkaVPO
+         Eq/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771576093; x=1772180893;
+        d=1e100.net; s=20230601; t=1771576100; x=1772180900;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=ZV5sUmW06PeMcEouxXRCwFu2jwo5fAowFeT/xqFkYvY=;
-        b=FxQQovp2a9mOK0NITxV2/J4JG5zGXSTmLlzFqQVerNdtO/IAsyk77J0RQn+pc0pLwA
-         U2HLQpIjPsNPYeB3DG9KrVx7lmFY1dDig1NHUnZNF68DgCpZDsLxWGIpIDIqFUUu7UYO
-         Pzk11TusVz/2mLC/K1pL0FMNI7TnI3QpH4K/RfZJzXIW8WZCgjzC5thljzdO5esYGv62
-         pe45EeXlLHlohGhRvc4MzN+gmUUdbfPLvVGPY0SY+6yOms4zd6T/lt0cpcnVF1C8A1Yx
-         JONnw3tM8oD56wARO+LCpOzWAX6P52iwWjRPMfWUMJsOGwEvHx/v+mJYV3DGE+e62Rfr
-         wlMQ==
-X-Gm-Message-State: AOJu0Yx3T3Kj1aRi+u102Enow/8SJ7Gr9WvF6wQq5nA+JkR+p3KXxB26
-	/fRu963cCQduO3mSjm3kPTeIPIwRlBrjznOVqwENkufqkmhITTvvgeo+MIBAzTxU4Ek=
-X-Gm-Gg: AZuq6aLLkmbNTOIPyiRzSQJZIWOCmxytmaKHAAiNTgOqPvds0mu300BKtwsic65kAyF
-	5BiAbI8qTkSoYcS4pUjXRnNihfLt4ElR1EH9cxnx9mvazwV9c0ZerV/w8gUpCKKNFUI6lsXq5SK
-	fDw0nd6L8nLxcJNeFFW5Yr6wJ9E86+rTIZFVmCj8rWnkLNXjdPZBlgR5IKVMGQithY7n3beLuBW
-	jyx36/BFBuF4ubPiY6JlF610sKbbirSGa5D8zgGw80YnKr6iCQ90PRSBEKxidc1ZLLWiYP5DUwd
-	vVYbxUeMXbYekRsdKHa3HCjBv4ApxiUq2YlitwmtJvXDLT32TMwb6f0mvyr4maTN16PeLIciktB
-	J8x3pqpxUzlhb7BPgHZ0VjZ/QouEKQiKxq1DSdscopEt33uPFkl3uujQNSlzbgqwG5woelGrZ8w
-	Osjd/VX0syB6BoGscka+zx
-X-Received: by 2002:a5d:5846:0:b0:436:684:b94a with SMTP id ffacd0b85a97d-4396b02fef8mr1388893f8f.4.1771576093346;
-        Fri, 20 Feb 2026 00:28:13 -0800 (PST)
+        bh=Mcr+ylFRvbVQSvo6VBml7OoEWOKRfpbvT57xdCCmX1Q=;
+        b=jl0Hn42YiEZYocBtiIvqqIyhVzmYQMa28GZdzvh+LOeFu94idDPFmIqttco+FsXB3p
+         Z/08iFvxT+9XhVs6mW6iisO7sJh8oY2ui7OUw/LvortwXyDNCFMrcREKbXa0nYbcpcTO
+         dAt+d+NYtHAiq9rddiWjvj86dj0eboNLbGKF5x8ptNtsPJoxW+fWUP5+sL5ETHz0GIne
+         xwBSRDn7mF7LTmsCvkBHS06WLSkyTFNvFoCvXj0MkGveq/4KNamkeZUVOScy8XbsYeFC
+         K7BWZkYCOIzo2hsmRK/LvKl9lCKfQcWZqjKEQ7WAk6k9Os+m8bLcyIvkgGfOFWWrpBBP
+         1Ktg==
+X-Gm-Message-State: AOJu0Yx8PXXI596fblM9L3gpelc5nPfd2WzD9ZOpOB8ReG9VQJtxJl59
+	ASyuP0xi8fhcpT4tEpuvYzHNFDwwgaXDtglkandjzQM4TClNaDIiXMB6EL1SsdiiVXA=
+X-Gm-Gg: AZuq6aJQE75kI2ia03I3zpmV9giuSL7n3LKKeTciAGMFgxWTA/7URkk6ubjjBANcTWQ
+	pn0yKE/pCwv7MzX7PVnP0HTApsWbcuRDMNWQG7SXXuxPnJscWtmb6GVZlXmrcKkzfj4zxr/el0V
+	Fzewc1oV3/1O5Hq+gM8UBLMbZwRwuKtjw5wOtTZ/e6DskO3Mnj5Q5WCNJy7hpQCyRRfyoD98PjT
+	OUsFLL/+80dlpmdVt6V9u7kxMLZyaZttMA+YSVsk0NCdbGesRmNEtZ0IL9v2KRCvkOJXSrydxwG
+	P3eYagB8jYxMwTtZ3b2jh+9yW+2CWbl6vEGwFIhamBfLaBY66nnHVAeeNXaRv2brJf19iC+hesm
+	iLR4HA0wDKkZG0IKycu5/G+0BcXDR2mViM9y07RKWBFT+9NnRGR+6j6SxTo8BfevjfYw8T/3DUU
+	9Fc346hElLIbJESTkaJWtL
+X-Received: by 2002:a05:6000:2001:b0:435:96ec:679e with SMTP id ffacd0b85a97d-4379db61cccmr37806593f8f.23.1771576099874;
+        Fri, 20 Feb 2026 00:28:19 -0800 (PST)
 Received: from [127.0.1.1] ([210.176.154.34])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43796a6c1bfsm54717688f8f.13.2026.02.20.00.28.07
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43796a6c1bfsm54717688f8f.13.2026.02.20.00.28.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Feb 2026 00:28:12 -0800 (PST)
+        Fri, 20 Feb 2026 00:28:19 -0800 (PST)
 From: Max Hsu <max.hsu@sifive.com>
-Date: Fri, 20 Feb 2026 16:27:08 +0800
-Subject: [PATCH 4/5] riscv: dts: sifive: fu740: Use correct ethernet
- compatible string
+Date: Fri, 20 Feb 2026 16:27:09 +0800
+Subject: [PATCH 5/5] riscv: dts: sifive: fu740: Use correct PLIC compatible
+ string
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,7 +87,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260220-fu740-v1-4-c8af54130c58@sifive.com>
+Message-Id: <20260220-fu740-v1-5-c8af54130c58@sifive.com>
 References: <20260220-fu740-v1-0-c8af54130c58@sifive.com>
 In-Reply-To: <20260220-fu740-v1-0-c8af54130c58@sifive.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -105,17 +105,17 @@ Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
  Paul Walmsley <paul.walmsley@sifive.com>, Max Hsu <max.hsu@sifive.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1012; i=max.hsu@sifive.com;
- h=from:subject:message-id; bh=A1K63zp8qaSu12/rz2C04BAncHqq+vlSUPdPl98mUA8=;
- b=owEB7QES/pANAwAKAdID/Z0HeUC9AcsmYgBpmBr8b2XrUrBxDXHt5A67Hwwa7ka+Ty9EZgdkQ
- 7WSQEVEN1eJAbMEAAEKAB0WIQTqXmcbOhS2KZE9X2jSA/2dB3lAvQUCaZga/AAKCRDSA/2dB3lA
- ve0TDACsrXUlZYiA3LTQB96Ic/SvGiR39+u7jjo1RB8zDPY1fFcdIlM9ICXPe+VMcFkE0MJlwSz
- eSI4zgllduH5jMJBLGiVlFzhCkKG7r8LyrHyB+j+U+MY12Jioy7EGWP7uEdzokTTZBEABG6ft48
- OP7yapHigO+rIauXOp0snpDXnPRS4cA23v5t1/bGBeYWjJtrcpxDEfCIXHn0gcraFlWLAL11Pzh
- TMos7QkH9T1+whYSbQn6Ne8Pa2XfYaDbXynLLQCOptWUYRugy2DyTkYaaoKxFCRqFZUlHh38PJr
- DeXHrbyE3PpDPnS4PY0X+O3HCDFkiCfUyWe7rinj7YwZtte+BzrP1JAAzO5/n/pIsYS4CgPfw81
- 3fxEBh0OY6uFUXTwj+FE8Uq1ZYko4KmaI9WBuSIQ00+nn/bijbxhRF3Aj2FIVv1bY/aCr2vDhfG
- UuoKrPQGX6nNz2NXw/tTQP4LXv/sV2yA0xGGYmNbapDjDybxtl9CFyahUAByOTbNPO5x8=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1052; i=max.hsu@sifive.com;
+ h=from:subject:message-id; bh=4GANKwuw4Gmvjt4yzo6mJduIJtLD4oH0IHu2XPGqRsA=;
+ b=owEB7QES/pANAwAKAdID/Z0HeUC9AcsmYgBpmBr8A5x0AN6WLq/BdWL/ZvvVR001n1rPKS373
+ hQAgd5vgOmJAbMEAAEKAB0WIQTqXmcbOhS2KZE9X2jSA/2dB3lAvQUCaZga/AAKCRDSA/2dB3lA
+ vUkOC/0emc5DX/XLv6NvlYCRNIsC14BaTvJqWzTvJMubMPLS86hHgd3FKQ7Uyb58051WiOLwAsz
+ cZ5AXNu8PWhFfZ+5aMcENxul9NU7y/aIYoD/m7oTozg+qnQ/Auiuw+sA68uBPKrR+nloV55s2/4
+ y4L0wfIX9asSx+Wx1H9rVEWCSt0F7vyAJw2ZPxe63ySqy5Xo94rukEpaYDcUb2eCyNT7bpjyiv4
+ BWMESgWKFLD4SERy6CSScQ8HgNkc9cuYdPLH/28EmfXvLqeiZtlAfcCmFbdRQdUQcXCnTiw8IyU
+ bHvBM5KnFqNqVI4WlO2dSppzOYM+1fUoyYNHls4yC0x3v7XZpkZUvvniJ+wfD2ySZ9SmdhwOSx9
+ nlEe39EPyWVPTjorh6pmsmrTHzcdAhma1I3FuhiD4+WjzpcJYmH5mhmY4jIifqvSgffVzDRpohV
+ 99j6p2JFWXqHmVfIA9TtlV+Uai6/eMHYdklOUmBQQKzTSc1q0dMYAPOUoVbPxQ7Nurf7A=
 X-Developer-Key: i=max.hsu@sifive.com; a=openpgp;
  fpr=EA5E671B3A14B629913D5F68D203FD9D077940BD
 X-Rspamd-Server: lfdr
@@ -123,7 +123,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[sifive.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[sifive.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -131,31 +131,30 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[23];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259668-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-259669-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[sifive.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[max.hsu@sifive.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_PROHIBIT(0.00)[0.153.246.16:email];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sifive.com:mid,sifive.com:dkim,sifive.com:email,0.153.89.208:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 700B8165B12
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,sifive.com:mid,sifive.com:dkim,sifive.com:email,c000000:email]
+X-Rspamd-Queue-Id: 3250B165AA6
 X-Rspamd-Action: no action
 
-Update the ethernet node compatible string from "sifive,fu540-c000-gem"
-to "sifive,fu740-c000-gem" to comply with the SiFive IP versioning
+Update the PLIC compatible string from "sifive,fu540-c000-plic" to
+"sifive,fu740-c000-plic" to comply with the SiFive IP versioning
 scheme documented in sifive-blocks-ip-versioning.txt.
 
-The versioning scheme requires SoC-specific compatible strings even when
-IP blocks are functionally identical.
+The versioning scheme requires SoC-specific compatible strings for
+proper hardware identification.
 
 Signed-off-by: Max Hsu <max.hsu@sifive.com>
 ---
@@ -163,18 +162,18 @@ Signed-off-by: Max Hsu <max.hsu@sifive.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/riscv/boot/dts/sifive/fu740-c000.dtsi b/arch/riscv/boot/dts/sifive/fu740-c000.dtsi
-index 6150f3397bff..15e11a03582a 100644
+index 15e11a03582a..a44ccbf4822b 100644
 --- a/arch/riscv/boot/dts/sifive/fu740-c000.dtsi
 +++ b/arch/riscv/boot/dts/sifive/fu740-c000.dtsi
-@@ -273,7 +273,7 @@ spi0: spi@10050000 {
- 			status = "disabled";
- 		};
- 		eth0: ethernet@10090000 {
--			compatible = "sifive,fu540-c000-gem";
-+			compatible = "sifive,fu740-c000-gem";
- 			interrupt-parent = <&plic0>;
- 			interrupts = <55>;
- 			reg = <0x0 0x10090000 0x0 0x2000>,
+@@ -182,7 +182,7 @@ soc {
+ 		plic0: interrupt-controller@c000000 {
+ 			#interrupt-cells = <1>;
+ 			#address-cells = <0>;
+-			compatible = "sifive,fu540-c000-plic", "sifive,plic-1.0.0";
++			compatible = "sifive,fu740-c000-plic", "sifive,plic-1.0.0";
+ 			reg = <0x0 0xc000000 0x0 0x4000000>;
+ 			riscv,ndev = <69>;
+ 			interrupt-controller;
 
 -- 
 2.43.0
