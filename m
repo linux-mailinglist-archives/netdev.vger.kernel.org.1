@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-259843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259842-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gIzrKvtAmmlXaAMAu9opvQ
-	(envelope-from <netdev+bounces-259843-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 00:34:19 +0100
+	id KLCuKPVAmmlXaAMAu9opvQ
+	(envelope-from <netdev+bounces-259842-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 00:34:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D2AC16E40F
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 00:34:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24B4B16E408
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 00:34:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6FA0B3028378
-	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 23:32:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E7DC23028EE1
+	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 23:32:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67EC2318BA6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4521A30DEB8;
 	Sat, 21 Feb 2026 23:32:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NdyrYand"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="De1A5G+L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37C6F3093C3
-	for <netdev@vger.kernel.org>; Sat, 21 Feb 2026 23:32:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A3D5478D
+	for <netdev@vger.kernel.org>; Sat, 21 Feb 2026 23:32:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771716769; cv=none; b=J89snzG4WFxstL3doP/jR6SsXVXG+bvHCtmyQIJxuBHxJLiJxYTRYw4MHRyWeQmsZH7bYAM8stScSh4oAMWsxD5Kv17pVS6jpWmYln/n++qe+dwZMoZaBZJA9yK0QFH6I63b35AnDtWe/xdGF8yUv4BJ6XhCWYnY9ZTM/L7H2W0=
+	t=1771716769; cv=none; b=UM9uRemV9YwSzeJd5fxdTaBk/tXQLwnQaxulEUM9DeABqivau+TRWFl/qERhLzCebEqHIXZXhVXu88hWZ1KXR7kETceHmZLbRZI2rr8gVioc5mRqxmyngj3mMMkaArDOxU+n12PfS2nTpIMI83IzBagi3ciUV5L8gtpB7uqVTAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1771716769; c=relaxed/simple;
-	bh=5qIeLn0udmUQ0lAH7ymvh4bwzedo3+XdQggsGBEBQeQ=;
+	bh=ec6BohS1gLM/Q1ZqnRvT3Aomp2QwhFfnioc2Qzv+QZE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WqRu8km+oX43hoYlyhtH/1G0aHB8Qf7IRVnHTeGGR/QG/+T836LUxnTFdiM7BfagRHCvxp5doNfU9uyFwJPNzepwJ2P3tJyiebw27PfEIXabnvZl+6zf+4b2lK5G/ntid1Ak2BHJ84g4rC2D79Tzpn3bleEj/mb1e14n4CfVQso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NdyrYand; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=hqhOiB45iMQ9Ud+16v6HKeqWtX+bO8x0590vqQ5lmEXQzmKNDxH+7rJenihGklcz/B7BkJH5YuvASq1EfvfrGZ1cST3aUKQnL1h7Gs5tDqFmECLTzi84QjMZTIUUZ/Uu97Hh05tEZU+PHLE9doXXfvpoojwLLtJOevigbxXVtH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=De1A5G+L; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-35621cea097so2017418a91.1
-        for <netdev@vger.kernel.org>; Sat, 21 Feb 2026 15:32:48 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a944e6336eso218260255ad.0
+        for <netdev@vger.kernel.org>; Sat, 21 Feb 2026 15:32:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771716766; x=1772321566; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1771716767; x=1772321567; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SRZJLtlywpr8r14Jsy3Lpf4GPuEEfot66fEIP/mfghw=;
-        b=NdyrYandaoDBcBdreAM+tl+s+0egVZ+FNp7LW3OF6u0Y2cQBsLBgdjyaPIU+4YLBOw
-         SW5t+11osgGcopFPuB8YsPZe0e8JCVO08Fen8AMTPtciLtw4YWwqC/qcFyhJQyzBUDFq
-         Gz5/6aQtdSwwEutPF/HUpWwggJCyVWq/V5UT6yuEgkG679BvLahUFPQ9H7vxzthTMCZG
-         fBOe7W8oT43RFjTXBzfyadxPtD+2QWh9fld2+OmMkTrgkFc1yoiCBetqJI+YL214IIEr
-         hlGjum+yHQKJG91mti6Kg1cF3M11ESliI8Tlx8hHgZnkzR+ZR+yqjSMM7qV+diBE1u2v
-         cB0Q==
+        bh=DHxyL9MR5WHIlG3mnYGDsZ6mMi8UdtePTLqzlQr7uPM=;
+        b=De1A5G+L889xjXqS+MxsgxWcg4RQh8Q0q0qXCYyMnZULhABEeSe85/ARBybNmQu+9q
+         yy+5+fsb+DczTr74o1qHbsqHi6nAcGLfX2YV3G0/Gkh49YfdOMuQlQiROgXml9snI+H/
+         Yl18hg8cdw+cuJnYfUhrvLDKSmXxhNiteI955Yr9qsfFcgbJL1LfNEYJPD2G0UAMPeqZ
+         PrThF2WcGCTCGWZ8v6+lR/jXxHqkCAb9dW89LbuQFKpBCXZPjDfk1JUxRLfwGuQMXeon
+         3AxJ54EFw5IYfNueSLgr1sSzufoWl8/Z8vc+j9drZhdM0iyRs301gTPVTTReSe9Qx4kX
+         dfkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771716766; x=1772321566;
+        d=1e100.net; s=20230601; t=1771716767; x=1772321567;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SRZJLtlywpr8r14Jsy3Lpf4GPuEEfot66fEIP/mfghw=;
-        b=Fz7avI7J8m4tAJ7QzabCSsNXmbdoPUsiPDH/8hDKO8DNLk01PCwgSzH5OzceAVNSxy
-         94Gt2Qj5Qa53oOtoGvCX3fH6KExE5ZDe9ZzJlnIB44OCpYHmYnUHfkAKanB+5c/0DEof
-         QECMmkBSlgJpb17q0U5dyv2X6NP6Ln4bu+Pv6P9vBt3HaK4W4rVpeNhoU1WE1MoMdJTJ
-         HiIEjsHrgmlZ5AgIYSVxsKRBZGwDMeOeZvGo62CZUEmfWhbgUuI0NFbmanipkBjs7o9v
-         cKKleJEgNi/X2OaQ3VrYvKW0X5bZ+4gH02NS4jlfydREKB9J7fzMImaxSk2BFlp8qxUU
-         1/xQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVs4ASldsbtDuWF5pAqHZ1VfF5rL8SC/nF+klx7TRkYjUdPlODIig1xt0FnzC5taoY/ohlMtuo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVoeN4jHDIJtAoEo5DC6rU0ANTZb6O3oSuEfU/CBaJmo+n7eEU
-	x29IADBkbmGh1FaIv9RkgNv8qAf2rchc5fZ6XHK3MyN7g3tkBOebskRci6NGqsJ99YQm74+yx5Y
-	fYXDZhg==
-X-Received: from pjm13.prod.google.com ([2002:a17:90b:2fcd:b0:354:bde2:b529])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5112:b0:356:2eac:b649
- with SMTP id 98e67ed59e1d1-358ae7bc5efmr3691684a91.7.1771716765435; Sat, 21
- Feb 2026 15:32:45 -0800 (PST)
-Date: Sat, 21 Feb 2026 23:30:52 +0000
+        bh=DHxyL9MR5WHIlG3mnYGDsZ6mMi8UdtePTLqzlQr7uPM=;
+        b=TWZpr/smiytJHi6P3dtWithg72+jVTTtDIudTS8YRBaXZCPhqGG2Hm45Q7HL+0XnSd
+         uwtTWrns6Pmaw+OqTM12+zfO9d7ZrJL2lhsC7HFV8nIsPJKJknGZNIUqzVwLrBMFoAfN
+         80NGeGlbNyhX4IvakwU7qQpoPIk4Es7kE/RztffsUV8Lfio8aHI62snWaARL6CHpD61q
+         8u+lmJCPl7Ol5sZyp/J5PSSVnrqB/kgGGIcjyFih38Saquf6ZENoRqF7EU5QR9017g2C
+         C6amQrG1l5IVjbYhmPblml+zvq/Z2BDD+5gkIIzww+HkgtNIfhFylzoi7m4I0XxrNeZY
+         I2ig==
+X-Forwarded-Encrypted: i=1; AJvYcCULfEbSQmYk5ujhNiOdUDT5SQXYFF+G/4fzPbjcv1SuTMDZVLRBJCGJSvhW4xdQPeDJUaT4F08=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0XptCsueQW/dDHmqyDgTZEK+usypSyQvTT8lBtWviosx+5eDn
+	pgNF3B4TOmlueRcB2jcv6XT8a5C1u2AatdWjS7Sqd8vm9e3CbYKJCfW/djc6pO7lRWKmjmeGJ2i
+	a1iB9XA==
+X-Received: from pjph2.prod.google.com ([2002:a17:90a:9c02:b0:351:c17:c7b9])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f707:b0:295:565b:c691
+ with SMTP id d9443c01a7336-2ad74444dc3mr38808295ad.17.1771716767243; Sat, 21
+ Feb 2026 15:32:47 -0800 (PST)
+Date: Sat, 21 Feb 2026 23:30:53 +0000
 In-Reply-To: <20260221233234.3814768-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,12 +76,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260221233234.3814768-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.53.0.371.g1d285c8824-goog
-Message-ID: <20260221233234.3814768-6-kuniyu@google.com>
-Subject: [PATCH v4 bpf/net 5/6] sockmap: Consolidate sk_psock_skb_ingress_self().
+Message-ID: <20260221233234.3814768-7-kuniyu@google.com>
+Subject: [PATCH v4 bpf/net 6/6] sockmap: Fix broken memory accounting for UDP.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: John Fastabend <john.fastabend@gmail.com>, Jakub Sitnicki <jakub@cloudflare.com>
 Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
+	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	syzbot+5b3b7e51dda1be027b7a@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
@@ -91,160 +92,216 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259843-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-259842-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com,cloudflare.com];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,google.com,vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,google.com,vger.kernel.org,syzkaller.appspotmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4D2AC16E40F
+	TAGGED_RCPT(0.00)[netdev,5b3b7e51dda1be027b7a];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,appspotmail.com:email]
+X-Rspamd-Queue-Id: 24B4B16E408
 X-Rspamd-Action: no action
 
-SOCKMAP memory accounting for UDP is broken, and
-sk_psock_skb_ingress_self() should not be used for UDP.
+syzbot reported imbalanced sk->sk_forward_alloc [0] and
+demonstrated that UDP memory accounting by SOCKMAP is broken.
 
-Let's consolidate sk_psock_skb_ingress_self() to
-sk_psock_skb_ingress() so we can centralise the fix.
+The repro put a UDP sk into SOCKMAP and redirected skb to itself,
+where skb->truesize was 4240.
 
-Note that now sk_psock_skb_ingress() always use GFP_KERNEL
-if called from sk_psock_backlog().
+First, udp_rmem_schedule() set sk->sk_forward_alloc to 8192
+(2 * PAGE_SIZE), and skb->truesize was charged:
 
+  sk->sk_forward_alloc = 0 + 8192 - 4240;  // => 3952
+
+Then, udp_read_skb() dequeued the skb by skb_recv_udp(), which finally
+calls udp_rmem_release() and _partially_ reclaims sk->sk_forward_alloc
+because skb->truesize was larger than PAGE_SIZE:
+
+  sk->sk_forward_alloc += 4240;  // => 8192 (PAGE_SIZE is reclaimable)
+  sk->sk_forward_alloc -= 4096;  // => 4096
+
+Later, sk_psock_skb_ingress_self() called skb_set_owner_r() to
+charge the skb again, triggering an sk->sk_forward_alloc underflow:
+
+  sk->sk_forward_alloc -= 4240   // => -144
+
+Another problem is that UDP memory accounting is not performed
+under spin_lock_bh(&sk->sk_receive_queue.lock).
+
+skb_set_owner_r() and sock_rfree() are called locklessly and
+corrupt sk->sk_forward_alloc, leading to the splat.
+
+Let's not skip memory accounting for UDP and ensure the proper
+lock is held.
+
+Note that UDP does not need msg->sk assignment, which is for TCP.
+
+[0]:
+WARNING: net/ipv4/af_inet.c:157 at inet_sock_destruct+0x62d/0x740 net/ipv4/af_inet.c:157, CPU#0: ksoftirqd/0/15
+Modules linked in:
+CPU: 0 UID: 0 PID: 15 Comm: ksoftirqd/0 Not tainted syzkaller #0 PREEMPT(full)
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/13/2026
+RIP: 0010:inet_sock_destruct+0x62d/0x740 net/ipv4/af_inet.c:157
+Code: 0f 0b 90 e9 58 fe ff ff e8 40 55 b3 f7 90 0f 0b 90 e9 8b fe ff ff e8 32 55 b3 f7 90 0f 0b 90 e9 b1 fe ff ff e8 24 55 b3 f7 90 <0f> 0b 90 e9 d7 fe ff ff 89 f9 80 e1 07 80 c1 03 38 c1 0f 8c 95 fc
+RSP: 0018:ffffc90000147a48 EFLAGS: 00010246
+RAX: ffffffff8a1121dc RBX: dffffc0000000000 RCX: ffff88801d2c3d00
+RDX: 0000000000000100 RSI: 0000000000000f70 RDI: 0000000000000000
+RBP: 0000000000000f70 R08: ffff888030ce1327 R09: 1ffff1100619c264
+R10: dffffc0000000000 R11: ffffed100619c265 R12: ffff888030ce1080
+R13: dffffc0000000000 R14: ffff888030ce130c R15: ffffffff8fa87e00
+FS:  0000000000000000(0000) GS:ffff8881256f8000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000200000000700 CR3: 000000007200c000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ __sk_destruct+0x85/0x880 net/core/sock.c:2350
+ rcu_do_batch kernel/rcu/tree.c:2605 [inline]
+ rcu_core+0xc9e/0x1750 kernel/rcu/tree.c:2857
+ handle_softirqs+0x22a/0x7c0 kernel/softirq.c:622
+ run_ksoftirqd+0x36/0x60 kernel/softirq.c:1063
+ smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
+ kthread+0x726/0x8b0 kernel/kthread.c:463
+ ret_from_fork+0x51b/0xa40 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
+ </TASK>
+
+Fixes: d7f571188ecf ("udp: Implement ->read_sock() for sockmap")
+Reported-by: syzbot+5b3b7e51dda1be027b7a@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/698f84c6.a70a0220.2c38d7.00cb.GAE@google.com/
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
-v4: Fix memory accounting condition from (skb->sk != sk) to
-    (skb->sk != sk && take_ref), the cause of selftest failure
-v2: Keep msg->sk assignment
+v4: Fix deadlock when requeued
+v2: Fix build failure when CONFIG_INET=n
 ---
- net/core/skmsg.c | 62 +++++++++++++-----------------------------------
- 1 file changed, 17 insertions(+), 45 deletions(-)
+ include/net/udp.h |  9 +++++++++
+ net/core/skmsg.c  | 29 +++++++++++++++++++++++++----
+ net/ipv4/udp.c    |  9 +++++++++
+ 3 files changed, 43 insertions(+), 4 deletions(-)
 
+diff --git a/include/net/udp.h b/include/net/udp.h
+index 700dbedcb15f..ae38a4da9388 100644
+--- a/include/net/udp.h
++++ b/include/net/udp.h
+@@ -455,6 +455,15 @@ struct sock *__udp6_lib_lookup(const struct net *net,
+ 			       struct sk_buff *skb);
+ struct sock *udp6_lib_lookup_skb(const struct sk_buff *skb,
+ 				 __be16 sport, __be16 dport);
++
++#ifdef CONFIG_INET
++void udp_sock_rfree(struct sk_buff *skb);
++#else
++static inline void udp_sock_rfree(struct sk_buff *skb)
++{
++}
++#endif
++
+ int udp_read_skb(struct sock *sk, skb_read_actor_t recv_actor);
+ 
+ /* UDP uses skb->dev_scratch to cache as much information as possible and avoid
 diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-index 6b1fef6ef85b..96f43e0dbb17 100644
+index 96f43e0dbb17..dd9134a45663 100644
 --- a/net/core/skmsg.c
 +++ b/net/core/skmsg.c
-@@ -572,32 +572,30 @@ static int sk_psock_skb_ingress_enqueue(struct sk_buff *skb,
- 	return copied;
- }
+@@ -7,6 +7,7 @@
  
--static int sk_psock_skb_ingress_self(struct sk_psock *psock, struct sk_buff *skb,
--				     u32 off, u32 len, bool take_ref);
--
- static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
--				u32 off, u32 len)
-+				u32 off, u32 len, bool take_ref)
+ #include <net/sock.h>
+ #include <net/tcp.h>
++#include <net/udp.h>
+ #include <net/tls.h>
+ #include <trace/events/sock.h>
+ 
+@@ -576,6 +577,7 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
+ 				u32 off, u32 len, bool take_ref)
  {
  	struct sock *sk = psock->sk;
++	bool is_udp = sk_is_udp(sk);
  	struct sk_msg *msg;
  	int err = -EAGAIN;
  
--	/* If we are receiving on the same sock skb->sk is already assigned,
--	 * skip memory accounting and owner transition seeing it already set
--	 * correctly.
--	 */
--	if (unlikely(skb->sk == sk))
--		return sk_psock_skb_ingress_self(psock, skb, off, len, true);
--
--	msg = alloc_sk_msg(GFP_KERNEL);
-+	msg = alloc_sk_msg(take_ref ? GFP_KERNEL : GFP_ATOMIC);
+@@ -583,13 +585,20 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
  	if (!msg)
  		goto out;
  
--	if (atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf)
--		goto free;
-+	if (skb->sk != sk && take_ref) {
-+		if (atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf)
-+			goto free;
- 
--	if (!sk_rmem_schedule(sk, skb, skb->truesize))
--		goto free;
-+		if (!sk_rmem_schedule(sk, skb, skb->truesize))
-+			goto free;
-+	} else {
-+		/* This is used in tcp_bpf_recvmsg_parser() to determine whether the
-+		 * data originates from the socket's own protocol stack. No need to
-+		 * refcount sk because msg's lifetime is bound to sk via the ingress_msg.
-+		 */
-+		msg->sk = sk;
+-	if (skb->sk != sk && take_ref) {
++	if (is_udp) {
++		if (unlikely(skb->destructor == udp_sock_rfree))
++			goto enqueue;
++
++		spin_lock_bh(&sk->sk_receive_queue.lock);
 +	}
++
++	if (is_udp || (skb->sk != sk && take_ref)) {
+ 		if (atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf)
+-			goto free;
++			goto unlock;
  
- 	/* This will transition ownership of the data from the socket where
- 	 * the BPF program was run initiating the redirect to the socket
-@@ -606,7 +604,7 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
+ 		if (!sk_rmem_schedule(sk, skb, skb->truesize))
+-			goto free;
+-	} else {
++			goto unlock;
++	} else if (skb->sk == sk || !take_ref) {
+ 		/* This is used in tcp_bpf_recvmsg_parser() to determine whether the
+ 		 * data originates from the socket's own protocol stack. No need to
+ 		 * refcount sk because msg's lifetime is bound to sk via the ingress_msg.
+@@ -604,11 +613,23 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
  	 * into user buffers.
  	 */
  	skb_set_owner_r(skb, sk);
--	err = sk_psock_skb_ingress_enqueue(skb, off, len, psock, sk, msg, true);
-+	err = sk_psock_skb_ingress_enqueue(skb, off, len, psock, sk, msg, take_ref);
++
++	if (is_udp) {
++		spin_unlock_bh(&sk->sk_receive_queue.lock);
++
++		skb->destructor = udp_sock_rfree;
++	}
++
++enqueue:
+ 	err = sk_psock_skb_ingress_enqueue(skb, off, len, psock, sk, msg, take_ref);
  	if (err < 0)
  		goto free;
  out:
-@@ -616,32 +614,6 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
+ 	return err;
++
++unlock:
++	if (is_udp)
++		spin_unlock_bh(&sk->sk_receive_queue.lock);
+ free:
+ 	kfree(msg);
  	goto out;
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 422c96fea249..831d26748a90 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -2039,6 +2039,15 @@ struct sk_buff *__skb_recv_udp(struct sock *sk, unsigned int flags,
  }
+ EXPORT_SYMBOL(__skb_recv_udp);
  
--/* Puts an skb on the ingress queue of the socket already assigned to the
-- * skb. In this case we do not need to check memory limits or skb_set_owner_r
-- * because the skb is already accounted for here.
-- */
--static int sk_psock_skb_ingress_self(struct sk_psock *psock, struct sk_buff *skb,
--				     u32 off, u32 len, bool take_ref)
--{
--	struct sk_msg *msg = alloc_sk_msg(GFP_ATOMIC);
--	struct sock *sk = psock->sk;
--	int err;
--
--	if (unlikely(!msg))
--		return -EAGAIN;
--	skb_set_owner_r(skb, sk);
--
--	/* This is used in tcp_bpf_recvmsg_parser() to determine whether the
--	 * data originates from the socket's own protocol stack. No need to
--	 * refcount sk because msg's lifetime is bound to sk via the ingress_msg.
--	 */
--	msg->sk = sk;
--	err = sk_psock_skb_ingress_enqueue(skb, off, len, psock, sk, msg, take_ref);
--	if (err < 0)
--		kfree(msg);
--	return err;
--}
--
- static int sk_psock_handle_skb(struct sk_psock *psock, struct sk_buff *skb,
- 			       u32 off, u32 len, bool ingress)
++void udp_sock_rfree(struct sk_buff *skb)
++{
++	struct sock *sk = skb->sk;
++
++	spin_lock_bh(&sk->sk_receive_queue.lock);
++	sock_rfree(skb);
++	spin_unlock_bh(&sk->sk_receive_queue.lock);
++}
++
+ int udp_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
  {
-@@ -651,7 +623,7 @@ static int sk_psock_handle_skb(struct sk_psock *psock, struct sk_buff *skb,
- 		return skb_send_sock(psock->sk, skb, off, len);
- 	}
- 
--	return sk_psock_skb_ingress(psock, skb, off, len);
-+	return sk_psock_skb_ingress(psock, skb, off, len, true);
- }
- 
- static void sk_psock_skb_state(struct sk_psock *psock,
-@@ -1058,7 +1030,7 @@ static int sk_psock_verdict_apply(struct sk_psock *psock, struct sk_buff *skb,
- 				off = stm->offset;
- 				len = stm->full_len;
- 			}
--			err = sk_psock_skb_ingress_self(psock, skb, off, len, false);
-+			err = sk_psock_skb_ingress(psock, skb, off, len, false);
- 		}
- 		if (err < 0) {
- 			spin_lock_bh(&psock->ingress_lock);
+ 	struct sk_buff *skb;
 -- 
 2.53.0.371.g1d285c8824-goog
 
