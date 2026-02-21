@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-259833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259834-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id O3iKEJ4KmmlmYAMAu9opvQ
-	(envelope-from <netdev+bounces-259833-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 20:42:22 +0100
+	id 8B3fDToMmml+YAMAu9opvQ
+	(envelope-from <netdev+bounces-259834-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 20:49:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BD9C16DB2A
-	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 20:42:21 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5640716DBAD
+	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 20:49:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D14283031821
-	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 19:40:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C6647300D75B
+	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 19:49:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21A352F7AB0;
-	Sat, 21 Feb 2026 19:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 932321DFE12;
+	Sat, 21 Feb 2026 19:49:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pym+SHUk"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uWzlCfbw"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BDAE1F8AC5;
-	Sat, 21 Feb 2026 19:40:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3446510785;
+	Sat, 21 Feb 2026 19:49:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771702803; cv=none; b=RShddJKXRF+P7lsHKtx2oGuZVUFK7x9jqvMVC7DOOgc/SAZb6pHguarTvar3DBFkqP7N4pH7eLwek8IlYj1gddGzkNcsGakFnH1Oz0zsUqfi8iPg/+i1IVQHPI5xEAob/2oy90Bo4ezei4fHbwCcyQjKJ0T1iL2yODctflpc/GY=
+	t=1771703349; cv=none; b=OjktmzebNZdDSDgSZ1Ex6BqI6YgpN9PZrtB4DPNJ33z1R5+TSmhOKI9dNNpFIXNQsdLL53WpXlqsgYeS8vYCturqddqewLbe8a/eJQEH1GWGDsIXequw3gkjicUBzTH0qgrmoIe+WqqnbNvb+xYInf9aNCpQUez4tQGeiKAGBNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771702803; c=relaxed/simple;
-	bh=6877EAml+cwDVu5bMwWkpPQnqhATORdE0XORtYeXh7k=;
+	s=arc-20240116; t=1771703349; c=relaxed/simple;
+	bh=fSRGrvc9Ng/9/dIjO6ddKOyQEt6stAFONh4lvET2pjI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IPl9K02RuzBVVVoGSYXHVGOzliukS5WWTfGwTOsq8q6o7vQxQ9HahD9FUduMLme3YUUg/H9I3314IHj0TzSKfl7nKL8zGU02Lky7chmBNgQxVwoaoWI1gzlo3RKussBCA8YR43lFmpwcJIUvWqeSg+zzZXI30gHuo+x89qupqVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pym+SHUk; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=KYGs9ZIVnIAZQVEyCQrzx7amvBsUf7iPJPgauRf708gY+sw7OPAO6xWz5ui8+9ea2XbcedfdP/8WuISWJRMz3zUAo/IV2e05JJ3MNIwhqLkQv+KwGvZiEgVxXJEmqaMDIlTEaCGfGZj/3Akadw3ogdt+TT9VM3suLngpeLDkM4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=uWzlCfbw; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -39,25 +39,20 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=6MPC/BjfmZ12DMeW9WRa7gVUTSve3+iuCGJFtp88j8w=; b=pym+SHUkcKaKS9RcUKno3A2+uk
-	bwfJcYTNyPFxeYhBM8C0unUIXCGX2m1mrKpnFxsI7mjxLbu+uzlPzm8xOv5GaaNAM2ScX5HI62zvO
-	YXFRgFqE2R2wqD8vMm6TVPk8e0dMJWNvutivXq0F8r+qfRF0jmDThJ7eOb5LYvixNkFk=;
+	bh=5iRlmFXc2r6CZchmrxzQhQ4qV/4q4TC+MOdXBZVQljc=; b=uWzlCfbwnN4+jfGVnro++028Lc
+	7bkvigXRQdILPfCC6G4kZ8OKrcGboBJy4ytsZo67NIyOJ8AiCS+h/TI1V/oOKWhruAmCWo/MMPpnT
+	nTI2tngWsMCu9/0R2n4Q4+JChWi0J6vFfbGkXYcG3+dDRBgsHh3WmhfWl8YqxRauU0sA=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vtspZ-008CPG-KV; Sat, 21 Feb 2026 20:39:57 +0100
-Date: Sat, 21 Feb 2026 20:39:57 +0100
+	id 1vtsyP-008CQs-TI; Sat, 21 Feb 2026 20:49:05 +0100
+Date: Sat, 21 Feb 2026 20:49:05 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Shiji Yang <yangshiji66@outlook.com>
-Cc: linux-leds@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Lee Jones <lee@kernel.org>,
-	Pavel Machek <pavel@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [BUG] AB-BA deadlock between net and led-trigger module
-Message-ID: <13fd89d2-012b-4882-8a72-aa5f66460201@lunn.ch>
-References: <OS7PR01MB13602B128BA1AD3FA38B6D1FFBC69A@OS7PR01MB13602.jpnprd01.prod.outlook.com>
+To: satishkh@cisco.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] net:ethernet:enic: map ethtool link modes by VIC type
+Message-ID: <ba9de65f-2a58-4a02-ab01-b5a78a22d2f4@lunn.ch>
+References: <20260221-enic-cscwi36355-v1-0-5a01a6046d5e@cisco.com>
+ <20260221-enic-cscwi36355-v1-2-5a01a6046d5e@cisco.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,79 +61,72 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <OS7PR01MB13602B128BA1AD3FA38B6D1FFBC69A@OS7PR01MB13602.jpnprd01.prod.outlook.com>
+In-Reply-To: <20260221-enic-cscwi36355-v1-2-5a01a6046d5e@cisco.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259833-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[outlook.com];
-	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[lunn.ch:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-259834-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_NONE(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
-X-Rspamd-Queue-Id: 8BD9C16DB2A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5640716DBAD
 X-Rspamd-Action: no action
 
-On Sat, Feb 21, 2026 at 06:01:46PM +0800, Shiji Yang wrote:
-> The OpenWrt community reports that sometimes devices fail to start[1]
-> on 5.15 kernel. After further tracking, this is caused by a AB-BA
-> deadlock which can be reproduced in at least 5.15, 6.6, 6.12 and latest
-> 6.18 LTS kenrel.
+> +	switch (sub_dev_id) {
+> +	case PCI_SUBDEV_ID_CISCO_VIC_1225:
+> +	case PCI_SUBDEV_ID_CISCO_VIC_1227:
+> +		ethtool_link_ksettings_add_link_mode(ecmd, supported,
+> +						     10000baseSR_Full);
+> +		ethtool_link_ksettings_add_link_mode(ecmd, advertising,
+> +						     10000baseSR_Full);
 
-Thanks for the bug report. I will take a look at this.
+Do these ports support autoneg? Is it really advertising a single link
+mode to the link partner for the negotiation process?
 
-I was initially assuming this was the netdev trigger causing the
-deadlock. However:
- 
-> Stack tracing on 6.12 kernel:
-> ```
-> Task1 "netifd" is used to start/restart the network:
-> 
-> [ 1361.967916] task:netifd          state:D stack:0     pid:4743  tgid:4743  ppid:1      flags:0x08100000
-> [ 1361.977269] Stack : 00000001 00000001 00000006 800bf464 817a0cb0 800b67ac 00000001 83261b20
-> [ 1361.985668]         83261a54 00000000 83261aac 000007ef 00000000 80c04d74 00000000 00000002
-> [ 1361.994138]         83aba760 80ce0000 83261af8 00000002 83261af8 80cd0000 00000002 80d8058c
-> [ 1362.002582]         80cc0000 809bae70 00000002 80d80000 80cd0000 80d80568 00000001 00000000
-> [ 1362.011033]         809baecc 83261af8 00000002 80d80560 80d80568 809bb11c 809c09c8 806614d0
-> [ 1362.019484]         ...
-> [ 1362.021942] Call Trace:
-> [ 1362.024380] [<809ba6fc>] __schedule+0x504/0xc28
-> [ 1362.028974] [<809bae70>] schedule+0x50/0x190
-> [ 1362.033251] [<809bb11c>] schedule_preempt_disabled+0x1c/0x34
-> [ 1362.038958] [<809c0b94>] rwsem_down_write_slowpath+0x240/0x7f8
-> [ 1362.044789] [<809c11c0>] down_write+0x74/0x90
-> [ 1362.049207] [<8054e4b8>] led_trigger_register+0x5c/0x1fc		<-- Trying to get lock "triggers_list_lock" via down_write(&triggers_list_lock);
-> [ 1362.054536] [<80662830>] phy_led_triggers_register+0xd0/0x234
+>  static int enic_get_ksettings(struct net_device *netdev,
+>  			      struct ethtool_link_ksettings *ecmd)
+>  {
+>  	struct enic *enic = netdev_priv(netdev);
+>  	struct ethtool_link_settings *base = &ecmd->base;
+>  
+> -	ethtool_link_ksettings_add_link_mode(ecmd, supported,
+> -					     10000baseT_Full);
+> -	ethtool_link_ksettings_add_link_mode(ecmd, supported, FIBRE);
+> -	ethtool_link_ksettings_add_link_mode(ecmd, advertising,
+> -					     10000baseT_Full);
+> -	ethtool_link_ksettings_add_link_mode(ecmd, advertising, FIBRE);
+> -	base->port = PORT_FIBRE;
+> +	enic_get_supp_adv_media_type(netdev, ecmd);
+>  
+>  	if (netif_carrier_ok(netdev)) {
+>  		base->speed = vnic_dev_port_speed(enic->vdev);
 
-This is the code in drivers/net/phy/phy_led_triggers.c.
+Ah, if you look at the rest of enic_get_ksettings() you see:
 
-> Task2 "led" is used to set the led-trigger "netdev" for a GPIO LED:
+	base->autoneg = AUTONEG_DISABLE;
 
-If you are using the led-trigger netdev, do you even need
-phy_led_triggers.c? As a workaround, could you disable
-CONFIG_LED_TRIGGER_PHY?
+So this hardware does not support autoneg. So all these advertising
+values are pointless.
 
-I'm not sure familiar with phy_led_triggers.c, so i don't have a quick
-real fix.
-
-     Andrew
+       Andrew
 
