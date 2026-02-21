@@ -1,132 +1,171 @@
-Return-Path: <netdev+bounces-259834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259835-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8B3fDToMmml+YAMAu9opvQ
-	(envelope-from <netdev+bounces-259834-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 20:49:14 +0100
+	id uAxKBbUTmmmeYQMAu9opvQ
+	(envelope-from <netdev+bounces-259835-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 21:21:09 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5640716DBAD
-	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 20:49:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60CCC16DCD5
+	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 21:21:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C6647300D75B
-	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 19:49:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 54D213038513
+	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 20:21:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 932321DFE12;
-	Sat, 21 Feb 2026 19:49:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CC42368294;
+	Sat, 21 Feb 2026 20:21:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uWzlCfbw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eIOaVn21"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3446510785;
-	Sat, 21 Feb 2026 19:49:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C9836829E
+	for <netdev@vger.kernel.org>; Sat, 21 Feb 2026 20:21:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771703349; cv=none; b=OjktmzebNZdDSDgSZ1Ex6BqI6YgpN9PZrtB4DPNJ33z1R5+TSmhOKI9dNNpFIXNQsdLL53WpXlqsgYeS8vYCturqddqewLbe8a/eJQEH1GWGDsIXequw3gkjicUBzTH0qgrmoIe+WqqnbNvb+xYInf9aNCpQUez4tQGeiKAGBNw=
+	t=1771705262; cv=none; b=KWoHodCPpie7uR3mDOVko0WENs1JlqW/nFWFcSelCMvhE/IUxzasnFq756GFT1A6kWGJt0Lzj5dfJ+10AY7zw6FVqcnLhYnEwvGItvcCQwyrvLgxGtmWSuHHseX839Ck+PEoU5X9L0tkxRTsfZy4uMPTacKDjMUjVjeObjP2DDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771703349; c=relaxed/simple;
-	bh=fSRGrvc9Ng/9/dIjO6ddKOyQEt6stAFONh4lvET2pjI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KYGs9ZIVnIAZQVEyCQrzx7amvBsUf7iPJPgauRf708gY+sw7OPAO6xWz5ui8+9ea2XbcedfdP/8WuISWJRMz3zUAo/IV2e05JJ3MNIwhqLkQv+KwGvZiEgVxXJEmqaMDIlTEaCGfGZj/3Akadw3ogdt+TT9VM3suLngpeLDkM4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=uWzlCfbw; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=5iRlmFXc2r6CZchmrxzQhQ4qV/4q4TC+MOdXBZVQljc=; b=uWzlCfbwnN4+jfGVnro++028Lc
-	7bkvigXRQdILPfCC6G4kZ8OKrcGboBJy4ytsZo67NIyOJ8AiCS+h/TI1V/oOKWhruAmCWo/MMPpnT
-	nTI2tngWsMCu9/0R2n4Q4+JChWi0J6vFfbGkXYcG3+dDRBgsHh3WmhfWl8YqxRauU0sA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vtsyP-008CQs-TI; Sat, 21 Feb 2026 20:49:05 +0100
-Date: Sat, 21 Feb 2026 20:49:05 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: satishkh@cisco.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] net:ethernet:enic: map ethtool link modes by VIC type
-Message-ID: <ba9de65f-2a58-4a02-ab01-b5a78a22d2f4@lunn.ch>
-References: <20260221-enic-cscwi36355-v1-0-5a01a6046d5e@cisco.com>
- <20260221-enic-cscwi36355-v1-2-5a01a6046d5e@cisco.com>
+	s=arc-20240116; t=1771705262; c=relaxed/simple;
+	bh=MdfV7MR6/fNLmSxrCi1s/IDBRC28RM6oES4DTBkklKY=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=SmP5SfR4eTLT4coeTQNxz3N3kjQ/Jv2utQdCHCTOIFKRPMfy+Jj/nCJjtFamTO1UlWcdp/pm2xQvuKXBvoERSQZyTPdXb735fIfRVMqhmPGGSrVm4vjPaq15+8ewl+OLZon1l4F49PZJKdRsEmmEnE08YV9wysWZ9z7YOau/dhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eIOaVn21; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-48069a48629so31331515e9.0
+        for <netdev@vger.kernel.org>; Sat, 21 Feb 2026 12:21:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771705259; x=1772310059; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MdfV7MR6/fNLmSxrCi1s/IDBRC28RM6oES4DTBkklKY=;
+        b=eIOaVn21dxmpGJRJ5AkRuf5VTL3tJulHpCokOrqiI8iCoB4pZ7tMsTzlDJ0GLGA34Q
+         n3JXOOSVdrA56L1uDX0fKkBPSR0GcLm8apmgrGBM+MerfDBGcytTQq1OqTqRqweBx3ks
+         HAJj5wOS5Ed5nWX6dEmDEesqptyXktUbVlUk14wG/noVbqzsfGydzSDYSVBlRBUwYLto
+         rE98i5CvMuV15vFLN8YaIUKikic7fmEH2Z4Zf0PnCiBbjMdV7lDy+8CrpUQywHOBJqfJ
+         v+z89zcG9cgneXMzbO9fDKxWg2e2wsoAQIyPD+qkg4AkSHdopNnSPykA0sUshdlhB8yA
+         +B3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771705259; x=1772310059;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MdfV7MR6/fNLmSxrCi1s/IDBRC28RM6oES4DTBkklKY=;
+        b=pkO4PEj+LcVk1r3Qz8HSDKurZScVaG9emlyGerGImBFEwIqGBgTJ5K4uBJ7qmE9/Op
+         1tpYqxJFBRGMGgcYatM3WkP/e82k/ger3PRhZbKRZCXVOxNO02HVFzxLWq+vwI9Z7fpg
+         RVzJhbQssSKkDORzcWDPvJbl6lnTbXDLU/DLrXFUWRWhvRTfcF/v88MtCy2rD1Ge7z6U
+         EcGz89nR3+0oV0DaVMoMrYQSnw50ZA8d7daUkWTpjYDWo7PGi2FJLAyWjVin8voYhW1x
+         n8OLxD+LUqMw3Zh5pjjgjrT5VfUey092DL41t1SUrI65U+WVQS9f6buZJkcbi/UyUXtM
+         Gvow==
+X-Forwarded-Encrypted: i=1; AJvYcCXPq1UrBIUlTlUip6Y4iOYJhmjT6iZQErymz6BlZUgEkwXsvTfg1EkSC5iF2ty5tTAYvlnjfcM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTNm8ylQLAfibC0TQau1fjOPeSnFTN/0vjnukASJWANIrb7lrX
+	EQWtPFlm3Iz2CsjxTEK6bvT7Tem+DyaN3Ovuu1NiuFB8WJ0eX+FbvY+Y
+X-Gm-Gg: AZuq6aKmZDqlwHO0wS01a+ojsPnl8sH9yIBPkgYez5lKYv/wxefHIOKX9AHQteY0kjv
+	sfr9dokN35MLLdfOHPhAT1bUxyKLdgdHSD2oiwzjd56yb6HP48yk2gtOERCpItGm0VjDK/mayCm
+	zPKrI6XCrlCV1dCvz4S8SSHNljTQT/2irAKQZQVRdUSeAFmO2JFRbtAUvNZMV7KHEATqe+d/erl
+	QPQw4KVT+OAGj+muKVz2G3WQ1SHrhS5Egw0+VReuMwzKwHJW1XridrSTPCCGTD3lvSuV7Z+9j0u
+	Z55WI8vhIW4Ay6GyIT2+CbZx3dARWVx/qr6n3NgUL9iH04SJovm7pgrSY+Bldd46+Cmbpbrkvc9
+	U+JYuiwgN2co80QDvRxVKwaD8+o5wHf5QQTaYhoUKOpmA9jn5Z2C5SY0VWpQSuw4SBaLNDgAwlV
+	Bm/MfF3x3Ti3h3kINQG6lYHycB6nOJin1b1XRoyp/C0nsJtIAT/zav2ZU=
+X-Received: by 2002:a05:600c:1e1d:b0:480:6999:27ec with SMTP id 5b1f17b1804b1-483a95bebcdmr70776425e9.13.1771705258786;
+        Sat, 21 Feb 2026 12:20:58 -0800 (PST)
+Received: from smtpclient.apple ([2001:912:1ac0:1e00:8846:5cfe:bf37:b202])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483a316eb08sm175040345e9.0.2026.02.21.12.20.57
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 21 Feb 2026 12:20:58 -0800 (PST)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260221-enic-cscwi36355-v1-2-5a01a6046d5e@cisco.com>
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.300.41.1.7\))
+Subject: Re: [PATCH v6 4/4] net: phy: realtek: add RTL8224 polarity support
+From: Damien Dejean <dam.dejean@gmail.com>
+In-Reply-To: <def77227-7b69-4f23-8f68-949173eda6a4@redhat.com>
+Date: Sat, 21 Feb 2026 21:20:46 +0100
+Cc: andrew@lunn.ch,
+ krzk+dt@kernel.org,
+ robh@kernel.org,
+ kuba@kernel.org,
+ maxime.chevallier@bootlin.com,
+ netdev@vger.kernel.org,
+ devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ edumazet@google.com,
+ davem@davemloft.net,
+ hkallweit1@gmail.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <CB0A00EB-82D1-44AC-BBC8-8C676C89AD2E@gmail.com>
+References: <20260207092539.647768-1-dam.dejean@gmail.com>
+ <20260207092539.647768-4-dam.dejean@gmail.com>
+ <def77227-7b69-4f23-8f68-949173eda6a4@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+X-Mailer: Apple Mail (2.3864.300.41.1.7)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
+	TAGGED_FROM(0.00)[bounces-259835-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	TAGGED_FROM(0.00)[bounces-259834-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,kernel.org,bootlin.com,vger.kernel.org,google.com,davemloft.net,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[damdejean@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5640716DBAD
+	TAGGED_RCPT(0.00)[netdev,dt];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 60CCC16DCD5
 X-Rspamd-Action: no action
 
-> +	switch (sub_dev_id) {
-> +	case PCI_SUBDEV_ID_CISCO_VIC_1225:
-> +	case PCI_SUBDEV_ID_CISCO_VIC_1227:
-> +		ethtool_link_ksettings_add_link_mode(ecmd, supported,
-> +						     10000baseSR_Full);
-> +		ethtool_link_ksettings_add_link_mode(ecmd, advertising,
-> +						     10000baseSR_Full);
+Hi Paolo,
 
-Do these ports support autoneg? Is it really advertising a single link
-mode to the link partner for the negotiation process?
+> Le 11 f=C3=A9vr. 2026 =C3=A0 12:36, Paolo Abeni <pabeni@redhat.com> a =
+=C3=A9crit :
+>=20
+> This very close to what you implemented into patch 2/4. Likely you can
+> deduplicate the code a bit factoring out some common helper.
 
->  static int enic_get_ksettings(struct net_device *netdev,
->  			      struct ethtool_link_ksettings *ecmd)
->  {
->  	struct enic *enic = netdev_priv(netdev);
->  	struct ethtool_link_settings *base = &ecmd->base;
->  
-> -	ethtool_link_ksettings_add_link_mode(ecmd, supported,
-> -					     10000baseT_Full);
-> -	ethtool_link_ksettings_add_link_mode(ecmd, supported, FIBRE);
-> -	ethtool_link_ksettings_add_link_mode(ecmd, advertising,
-> -					     10000baseT_Full);
-> -	ethtool_link_ksettings_add_link_mode(ecmd, advertising, FIBRE);
-> -	base->port = PORT_FIBRE;
-> +	enic_get_supp_adv_media_type(netdev, ecmd);
->  
->  	if (netif_carrier_ok(netdev)) {
->  		base->speed = vnic_dev_port_speed(enic->vdev);
+Thanks for the feedback, let me rework this and repost once it is =
+possible
 
-Ah, if you look at the rest of enic_get_ksettings() you see:
+Damien
 
-	base->autoneg = AUTONEG_DISABLE;
+>=20
+> Side notes: you should include the target tree in the subj prefix -
+> 'net-next' in this case, a per patch changelog for the introduced
+> changes WRT the previous revision and a cover letter.
+>=20
+> Also note that net-next is now closed for the merge window; you will
+> have to wait unit ~23 Feb before reposting.
+>=20
+> /P
+>=20
+>> }
+>>=20
+>> static int rtl8224_probe(struct phy_device *phydev)
+>=20
 
-So this hardware does not support autoneg. So all these advertising
-values are pointless.
-
-       Andrew
 
