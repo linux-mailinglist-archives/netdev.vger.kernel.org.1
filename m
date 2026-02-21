@@ -1,63 +1,93 @@
-Return-Path: <netdev+bounces-259812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259814-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0p7HNQMTmWnhQAMAu9opvQ
-	(envelope-from <netdev+bounces-259812-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 03:05:55 +0100
+	id iL56GxE5mWk/RwMAu9opvQ
+	(envelope-from <netdev+bounces-259814-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 05:48:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CBF216BCA4
-	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 03:05:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B03D716C202
+	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 05:48:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A11E8300D9CB
-	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 02:05:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 623C5300BD89
+	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 04:48:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6330631AA9C;
-	Sat, 21 Feb 2026 02:05:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCD90330642;
+	Sat, 21 Feb 2026 04:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b="T9iZDjeX"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4E6B8F7D;
-	Sat, 21 Feb 2026 02:05:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6747132FA14
+	for <netdev@vger.kernel.org>; Sat, 21 Feb 2026 04:48:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771639550; cv=none; b=pl12vMjzf3IgWDRgSuifkrSjB16QT4cStJBO2FHA/0f1JyGlAUEzsLZhyMdUh2PW13LFDIRCLHNfEF6x5DtkUmvKdbWecZhXJziAQwdAS+zJ/8xiDZNdOPbyqqMLy7eZEt5FPRQStTDHWUlqWKGIdwRY4F2/L3TVBCRFCkdyaWM=
+	t=1771649294; cv=none; b=ggWEN9+nAED9n8MP2741GjYeAX/eiRFVCBWX0rZAz+IvVBosjmUwrhd3HMmw+8SENq6Od6JF/20RTiaEHN0K+uHkgITcHxFHPI7kJf4R6XiECrTMugNBpNhO6UMvteeeV9siVBnQG6NUtqroNJu3hIbzhw2rR741AktoIj18mPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771639550; c=relaxed/simple;
-	bh=/1L0eOLHIcuq+KMQYlBxMwouNHovymbAHhI7qfeT0uI=;
+	s=arc-20240116; t=1771649294; c=relaxed/simple;
+	bh=mEsr6mMZj3A98YW1eNq3yyz90k9RElIecO1zjl+Pj1Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Behb595uC5nAhJPPSCTbJSlZnG9sgbPUdTkzN9WdiKx7DuSe+102LPU1u4tVMKq3HbRXXsmWULEh0HcYFNvcFd/KWS1KuQb+EUrhqqlroa29umunKCUmu4sO4WVAiDdGK7l1CSWJSST7R1OwP+3b4lLiw/WfH1ArvCZqKm/nlWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vtcN8-000000002I0-3Udj;
-	Sat, 21 Feb 2026 02:05:30 +0000
-Date: Sat, 21 Feb 2026 02:05:27 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: Arnd Bergmann <arnd@arndb.de>, Arnd Bergmann <arnd@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
-	linux-hwmon@vger.kernel.org
-Subject: Re: [PATCH] net: dsa: MxL862xx: don't force-enable MAXLINEAR_GPHY
-Message-ID: <aZkS585QOq6g7Ax-@makrotopia.org>
-References: <20260216105522.2382373-1-arnd@kernel.org>
- <aZMKXavVQPelSXcG@makrotopia.org>
- <306e79fb-f3ee-434e-a90e-547e97d2a5aa@roeck-us.net>
- <c881a13a-0687-4e4d-b70b-900f91acd212@app.fastmail.com>
- <70a195ab-3b61-47fb-a361-17b53cf7bdda@roeck-us.net>
- <aZNEKS-fefEgqhTs@makrotopia.org>
- <316a6ee6-9e5e-4518-8dc4-2f39805934a9@app.fastmail.com>
- <9d7aee5a-ac46-47d9-ac26-0f3a63b6a8ab@roeck-us.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=lJISx/1A0qkkrdhFpIFKaAMyBE3V8a+u94KerCzZT8NBLEyZ8aq/Q2NC1ATbvljMJzVMwy2XSJyk48+YDD/phSZQRDiVGRU4c/TeWlayXRQOjSn5TXUV9FtMJWCCpPEo/pVzt4oGY08WQvwCcnJQRMfU9naIy4jiJrIM7KDf37U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net; spf=pass smtp.mailfrom=gourry.net; dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b=T9iZDjeX; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gourry.net
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-8c70b5594f4so305781885a.1
+        for <netdev@vger.kernel.org>; Fri, 20 Feb 2026 20:48:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gourry.net; s=google; t=1771649292; x=1772254092; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eq3866hUg0iccmQvSfWEyoLr7h9wTLRxQOBYnSXIh+c=;
+        b=T9iZDjeXJodH18Pg6Tlptd03tg7yvB6qXtRgYz6yI5fts3rgYz6AoTZIwtpZc5r73b
+         nyhql7BjoxqPiCU+yzn+VQ7eW/KlSh6xNO3BWpGEcShMvFIu+R/u+68vm9MkVkLt+B+f
+         NpLLJy/a30t1qo0YiyLOQdyTA+geMcAT3a8H8k+1w9FXPW5MKNjybmpZayvimzAT6sOf
+         XHwg8QpRIqJY9etOCNNiT5bc/782nqG2RTniU7HwvysJtvUIOIAHGZlV+Ugr5KZmp4XA
+         bv+fCmFcy8NTO4szx5uo9tLLgmBtJxTXz7dUMwSwgkEo/M+WOwN4T7oxbmRy70oYWQSA
+         VVtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771649292; x=1772254092;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eq3866hUg0iccmQvSfWEyoLr7h9wTLRxQOBYnSXIh+c=;
+        b=wCcgWdrhh+o1YLgVX7Hw8stSf2aeLE3I6JGy7KgciUJNmrWqia6zPTmjNHiWXNfygH
+         FqzH1ln587eTRmJXusimP/HaTFb1nquGRP1/Y0GvcKRe7tTLgTRqhc6X4CIl78HSOiOs
+         RcqXIorauBAH4mfgTcBR7gOnan92yrMFUxb0wTt8FJe/HdeXl4KbbNMsKz3IzmYTSHID
+         ybX0w2dEjH95/DEKbYQ70pMS16rR9Q4QThoIHnfIYq3Sqn9G+bkRSAjvPcvIh3PIA40t
+         yt8FRgl5dgBwU1l8UvFUlhDixY31J379lAiaQlSTGk4XHMwsZcG3wbs7/R9IgEcg2+uq
+         Z5Dg==
+X-Forwarded-Encrypted: i=1; AJvYcCV9I6Eu4j2xaCw0q0bMox2gnYAjYccV2cGTkoDAZjjF17wQhzM8tx34W9li6MntldrCzJPUe1o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYSAnZrL08pu04aUPCiUZdlaIVKZyaDExj1ou91wPmFiSnlbco
+	stsSInNG3e/CCNC/zaObcE0lNMh+sDY4CHcypLm3X+JVg/L6KeLSsiCewoy4oSD5e9I=
+X-Gm-Gg: AZuq6aLjwucQ0RlFaiXHfGI+Zb7/7/pQril0nuqvbfItLtFWJhkuv1TW9CNrJCmqOSu
+	PWm4cm69PgZwH3hFUJIu0LLsU1eACxmjdf5fYIF2gtmuTPPm0tNTe+Qfzm9aQfgae08s48br0xs
+	81wLP5OI3CiPzs2Uy/SfUOoaPKoR0pYvqIX17Tft2kK2zK+fv84k3a7CeuaOYQvA9oFljOyjJji
+	CQJHrfS0MvtUe/0gOHSQRhpa/OpmvyvcNjKOVQcx9yqf7hOm1lVQOW4iqpag0U5g1mDufT+15rz
+	AHGOuMNae9zaI5w8AXiDJBC+DBDkqa3nPFUauwlWkiJv9mRJCbNRdVutRLbL/ZCBMWVl104s6bF
+	w5tY5LIucHe2+NRst08QKlZbRAc+44z1InSEqlq1mhMLF7/B1TJoM0RpMPyfAJO3Tng9NgeOBXH
+	T2IZD7SudeTdOP01HI/o5bc/9rq+TXA5rHeEcPoKLfAXPTDmWlSaPXudH3ReXNynE/Y6OkqV73b
+	UF8r/bZ4A==
+X-Received: by 2002:a05:620a:8d1:b0:8c9:eee0:dbb7 with SMTP id af79cd13be357-8cb7bfc8d44mr724210585a.23.1771649292241;
+        Fri, 20 Feb 2026 20:48:12 -0800 (PST)
+Received: from gourry-fedora-PF4VCD3F (pool-96-255-20-138.washdc.ftas.verizon.net. [96.255.20.138])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cb8d1202e2sm116505085a.44.2026.02.20.20.48.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Feb 2026 20:48:11 -0800 (PST)
+Date: Fri, 20 Feb 2026 23:48:09 -0500
+From: Gregory Price <gourry@gourry.net>
+To: alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+	dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	dave.jiang@intel.com, Alejandro Lucero <alucerop@amd.com>
+Subject: Re: [PATCH v23 10/22] cxl: Export function for unwinding cxl by
+ accelerators
+Message-ID: <aZk5CVRELS2qo92c@gourry-fedora-PF4VCD3F>
+References: <20260201155438.2664640-1-alejandro.lucero-palau@amd.com>
+ <20260201155438.2664640-11-alejandro.lucero-palau@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,93 +96,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9d7aee5a-ac46-47d9-ac26-0f3a63b6a8ab@roeck-us.net>
+In-Reply-To: <20260201155438.2664640-11-alejandro.lucero-palau@amd.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gourry.net:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[arndb.de,kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-259812-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[makrotopia.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[gourry.net:+];
+	TAGGED_FROM(0.00)[bounces-259814-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[gourry.net];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.987];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gourry@gourry.net,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3CBF216BCA4
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,gourry.net:dkim]
+X-Rspamd-Queue-Id: B03D716C202
 X-Rspamd-Action: no action
 
-On Fri, Feb 20, 2026 at 05:25:06PM -0800, Guenter Roeck wrote:
-> On 2/16/26 08:27, Arnd Bergmann wrote:
-> > On Mon, Feb 16, 2026, at 17:22, Daniel Golle wrote:
-> > > On Mon, Feb 16, 2026 at 08:20:41AM -0800, Guenter Roeck wrote:
-> > > > On 2/16/26 07:34, Arnd Bergmann wrote:
-> > > > > On Mon, Feb 16, 2026, at 16:17, Guenter Roeck wrote:
-> > > > > > On 2/16/26 04:15, Daniel Golle wrote:
-> > > > > > 
-> > > > > > Technically, with "select MAXLINEAR_GPHY", NET_DSA_MXL862 should depend
-> > > > > > on "depends on HWMON || HWMON=n". That would prevent NET_DSA_MXL862=y
-> > > > > > and with it MAXLINEAR_GPHY=y.
-> > > > > > 
-> > > > > > Maybe it is time to implement dummy functions for hwmon API calls
-> > > > > > to avoid all this.
-> > 
-> > I think I misread this bit earlier, sorry
-> > 
-> > > > > I had considered this when I found the build failure, but
-> > > > > I think removing the 'select' here is much better: this
-> > > > > simplifies the dependencies, and allows a valid configuration
-> > > > > with hwmon and gphy support in a loadable module that would
-> > > > > otherwise be impossible.
-> > > > > 
-> > > > 
-> > > > Makes sense. I think I'll move forward with the dummy functions anyway
-> > > > because with that the #ifdefs in drivers are no longer necessary
-> > > > and the "depends on HWMON || HWMON=n" becomes optional.
-> > > 
-> > > Yes, that would be great and eliminate that whole class of obstacles
-> > > with some inline no-op stubs in the header.
-> > 
-> > What I meant above is that I had considered and rejected the extra
-> > dependencies in the ethernet driver. I don't think there is a good
-> > way to add inline helpers. Technically, one could use IS_REACHABLE()
-> > here, to stub out the functions when the caller is built-in, but
-> > I find that even worse because it replaces a trivial build-time
-> > failure with very subtle runtime bug.
-> > 
-> 
-> Lots of kernel APIs have dummy implementations. hwmon isn't really that
-> different to those. Also, arguably, that would not be a subtle runtime
-> bug but a feature.
-> 
-> In this context:
-> 
-> If NET_DSA_MXL862 is enabled but MAXLINEAR_GPHY isn't, does the system
-> still work ?
+On Sun, Feb 01, 2026 at 03:54:26PM +0000, alejandro.lucero-palau@amd.com wrote:
+> -static void unregister_region(void *_cxlr)
+> +void cxl_unregister_region(struct cxl_region *cxlr)
+>  {
+> -	struct cxl_region *cxlr = _cxlr;
+>  	struct cxl_region_params *p = &cxlr->params;
+>  	int i;
+>  
+> @@ -2457,6 +2456,14 @@ static void unregister_region(void *_cxlr)
+>  	cxl_region_iomem_release(cxlr);
+>  	put_device(&cxlr->dev);
+>  }
+> +EXPORT_SYMBOL_NS_GPL(cxl_unregister_region, "CXL");
+> +
 
-The switches supported by NET_DSA_MXL862 come with 5 or 8 twistedpair
-ports provided by built-in PHYs. For the ports to (fully) work the
-MAXLINEAR_GPHY driver is required, as without it they would be detected
-as "Generic PHY".
+kreview suggested you probably want this:
 
-This is similar to the situation on other DSA switches, and there is
-apparently no clear rule whether this (runtime) dependency should be
-treated as depedency in Kconfig which is typically used only to express
-linking dependencies.
+void cxl_destroy_region(struct cxl_region *cxlr)
+{
+	struct cxl_port *port = cxlrd_to_port(cxlr->cxlrd);
+
+	devm_release_action(port->uport_dev, __unregister_region, cxlr);
+}
+EXPORT_SYMBOL_NS_GPL(cxl_destroy_region, "CXL");
+
+
+During testing I experienced some double-releases when doing aggressive
+loads and unloads of some drivers.  This was one of the fixes.
+
+~Gregory
 
