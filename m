@@ -1,127 +1,246 @@
-Return-Path: <netdev+bounces-259793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259794-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id APGLMjz4mGlyOgMAu9opvQ
-	(envelope-from <netdev+bounces-259793-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 01:11:40 +0100
+	id g+kDHQr5mGmoOgMAu9opvQ
+	(envelope-from <netdev+bounces-259794-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 01:15:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D26816B840
-	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 01:11:39 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1DED16B874
+	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 01:15:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DE2E33010BB5
-	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 00:11:38 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 03DAE3002F41
+	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 00:15:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E67831FC8;
-	Sat, 21 Feb 2026 00:11:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C7143EBF20;
+	Sat, 21 Feb 2026 00:14:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uVU5Nk3j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gm1Xi3dv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD9EB800;
-	Sat, 21 Feb 2026 00:11:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77E4DA55;
+	Sat, 21 Feb 2026 00:14:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771632696; cv=none; b=b90J414KMNEabY5otxBXMvsbakOpnts9h29s01iWONViO80dMMdi83e27nys/q2Zwo0WrtixrB3IdEcNA5lfpoAAi7tq8G3czcAin+DDYvO4ky+6xijX26vlnr8JFxPfQxeElO/4+PLJfqdF1oPRWFPO/hXPZP3SzO9hpCMEwp8=
+	t=1771632898; cv=none; b=Ox4wp08nfaGV8Iyx6BKHgvSqU8ECHSd6tJp1SU3mRa2aYHpNuUbRS/DaOsaVKCoL4gkfkr2AM+ReDaZz559c8eXoTrrN/NK5PmyK0PguoPBkbzfEZGQ6Mj3n2YsgWo1IG2OXYmkk7oGYWYdHl+Cpci1qx1Hiz3gckMPs05p4LVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771632696; c=relaxed/simple;
-	bh=iAa1txVJOw2LWNdxxG5IZ6O8+JDliDDMmQc1XBb4dKQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mNd+5i0KTWuCO1uPg9xPccbReF2PAmz9yOzqbdPyUr5pRa4Wxx3DVFz9Lu6Rhs408oJ25Yat+lGZvy2OvENI0LgmjaW85wWCxP1ttxbv4vNFmCshjJr2yvgN+1gvf1u+o+a8LivQlsX5m1THpkD/R1nf0htYK0aGge6DB5JDWY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uVU5Nk3j; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B666FC116C6;
-	Sat, 21 Feb 2026 00:11:35 +0000 (UTC)
+	s=arc-20240116; t=1771632898; c=relaxed/simple;
+	bh=cPOXXeoMDDb6cE4js7btDJ4jN4yUD0fdZu49+gMi3ig=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VIkXIRGhpwHa+OAcm12vUWxS5CC1pxZzpbmwMDUpnOLPPh3tLBEslZmk+1WJMVokExOmk9fZKpPX1JlOS8vbi5adHL9THeE77sHZ714600uXlIX4xI8RHmjpJV26gPItFQjETjGg9MYxmZvQYsPHDEKfp80jg0Iq6O+LG0qW0jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gm1Xi3dv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FBCAC116C6;
+	Sat, 21 Feb 2026 00:14:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771632696;
-	bh=iAa1txVJOw2LWNdxxG5IZ6O8+JDliDDMmQc1XBb4dKQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uVU5Nk3jjuCZ6daTPh+YnA/9YPZ2OY1BNmhJFTRty5+iV6Ytalmgdex0oMksqqB9W
-	 SlqYDz9FQyXEAkaVZVGY/lBMXgDhpcHbs61M04tkKMvmp46ZeHf5aSLFo3l6g3PdKk
-	 suOT3zwM1V3b+UAdMY+tf57j/maw3Im3/a2pfKohum1v+r0Goe1o2P0ViOJ6rGVlbM
-	 8QvBdSQXE65disWP/WSOCe4vtg5ns8IyDjkZy5aum26TiFE+KRjxrKhNUL2s/OzvWa
-	 rQXKO0Qh9/oNYHV3oQjeHH4gvZfcse+PH4z+WV/xE0JhtgRR/EaF070PbzNI3V0j3J
-	 NDZhM0+Xuk9Pw==
-Date: Fri, 20 Feb 2026 16:11:34 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Konrad Dybcio <konradybcio@kernel.org>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Alex Elder <elder@kernel.org>, Marijn Suijten
- <marijn.suijten@somainline.org>, linux-arm-msm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
- Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>, Alex Elder
- <elder@riscstar.com>, Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
- Simon Horman <horms@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: [net-next PATCH v4 0/3] Grab IPA IMEM slice through DT
-Message-ID: <20260220161134.5663a273@kernel.org>
-In-Reply-To: <20260219-topic-ipa_imem-v4-0-189d91dbee84@oss.qualcomm.com>
-References: <20260219-topic-ipa_imem-v4-0-189d91dbee84@oss.qualcomm.com>
+	s=k20201202; t=1771632898;
+	bh=cPOXXeoMDDb6cE4js7btDJ4jN4yUD0fdZu49+gMi3ig=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gm1Xi3dvnq5YtpVfl8JZPdsvzTXmuk1XT3ncjNDt44oMBe4yZg+FDZPRwBfmp9Sjv
+	 cv1Yr+UqCemI4ia6PBzyOHRi0++Z1Kq4oDpMuPS9YQH1gis6iaSJw6gIAP68HStvoe
+	 OcBAsgmA7nb3AqMD+2rFEUT9VjI6rE0WRr3GtrGut91Amhcr5WcVXwwxr2FstBRtGI
+	 dNOQ2tvoS9DHSk6RZJwsPyqSQpYK4hfzDHUBqIG1AfSb4eizZbIca91x7CH1UWFdFG
+	 0P2o+/8TnoL7W6ofnLu1E6SawJYbif5Jo5k0/Jn0ZHY2k5k3FZwbWx+0MQsuTu4Y/q
+	 7OGxSkv+jbZyA==
+Date: Fri, 20 Feb 2026 16:14:57 -0800
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Christian Brauner <brauner@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, Jeff Layton <jlayton@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+	linux-kernel@vger.kernel.org, Hugh Dickins <hughd@google.com>,
+	linux-mm@kvack.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Tejun Heo <tj@kernel.org>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jann Horn <jannh@google.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 00/14] xattr: rework simple xattrs and support user.*
+ xattrs on sockets
+Message-ID: <20260221001457.GC11076@frogsfrogsfrogs>
+References: <20260216-work-xattr-socket-v1-0-c2efa4f74cb7@kernel.org>
+ <20260220004454.GR6467@frogsfrogsfrogs>
+ <20260220-biobauer-beilhieb-2e792f9453cf@brauner>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260220-biobauer-beilhieb-2e792f9453cf@brauner>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259793-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-259794-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[djwong@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0D26816B840
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[localhost:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: F1DED16B874
 X-Rspamd-Action: no action
 
-On Thu, 19 Feb 2026 14:49:47 +0100 Konrad Dybcio wrote:
-> This adds the necessary driver change to migrate over from
-> hardcoded-per-IPA-version-but-varying-per-implementation numbers, while
-> unfortunately keeping them in there for backwards compatibility.
+On Fri, Feb 20, 2026 at 10:23:55AM +0100, Christian Brauner wrote:
+> On Thu, Feb 19, 2026 at 04:44:54PM -0800, Darrick J. Wong wrote:
+> > On Mon, Feb 16, 2026 at 02:31:56PM +0100, Christian Brauner wrote:
+> > > Hey,
+> > > 
+> > > This reworks the simple_xattr infrastructure and adds support for
+> > > user.* extended attributes on sockets.
+> > > 
+> > > The simple_xattr subsystem currently uses an rbtree protected by a
+> > > reader-writer spinlock. This series replaces the rbtree with an
+> > > rhashtable giving O(1) average-case lookup with RCU-based lockless
+> > > reads. This sped up concurrent access patterns on tmpfs quite a bit and
+> > > it's an overall easy enough conversion to do and gets rid or rwlock_t.
+> > > 
+> > > The conversion is done incrementally: a new rhashtable path is added
+> > > alongside the existing rbtree, consumers are migrated one at a time
+> > > (shmem, kernfs, pidfs), and then the rbtree code is removed. All three
+> > > consumers switch from embedded structs to pointer-based lazy allocation
+> > > so the rhashtable overhead is only paid for inodes that actually use
+> > > xattrs.
+> > 
+> > Patches 1-6 look ok to me, at least in the sense that nothing stood out
+> > to me as obviously wrong, so
+> > Acked-by: "Darrick J. Wong" <djwong@kernel.org>
+> > 
+> > > With this infrastructure in place the series adds support for user.*
+> > > xattrs on sockets. Path-based AF_UNIX sockets inherit xattr support
+> > > from the underlying filesystem (e.g. tmpfs) but sockets in sockfs -
+> > > that is everything created via socket() including abstract namespace
+> > > AF_UNIX sockets - had no xattr support at all.
+> > > 
+> > > The xattr_permission() checks are reworked to allow user.* xattrs on
+> > > S_IFSOCK inodes. Sockfs sockets get per-inode limits of 128 xattrs and
+> > > 128KB total value size matching the limits already in use for kernfs.
+> > > 
+> > > The practical motivation comes from several directions. systemd and
+> > > GNOME are expanding their use of Varlink as an IPC mechanism. For D-Bus
+> > > there are tools like dbus-monitor that can observe IPC traffic across
+> > > the system but this only works because D-Bus has a central broker. For
+> > > Varlink there is no broker and there is currently no way to identify
+> > 
+> > Hum.  I suppose there's never going to be a central varlink broker, is
+> > there?  That doesn't sound great for discoverability, unless the plan is
 > 
-> The DT changes will be submitted in a separate series, this one is OK
-> to merge independently.
+> Varlink was explicitly designed to avoid having to have a broker.
+> Practically it would have been one option to have a a central registry
+> maintained as a bpf socket map. My naive take had always been something
+> like: systemd can have a global socket map. sockets are picked up
+> whenver the appropriate xattr is set and deleted from the map once the
+> socket goes away (or the xattr is unset). Right now this is something
+> that would require capabilities. Once signed bpf is more common it is
+> easy to load that on per-container basis. But...
+> 
+> > to try to concentrate them in (say) /run/varlink?  But even then, could
+> 
+> ... the future is already here :)
+> 
+>   https://github.com/systemd/systemd/pull/40590
+> 
+> All public varlink services that are supposed to be announced are now
+> symlinked into:
+> 
+>   /run/varlink/registry
+> 
+> There are of-course non-public interfaces such as the interface
+> between PID 1 and oomd. Such interfaces are not exposed.
+> 
+> It's also possible to have per user registries at e.g.:
+> 
+>   /run/user/1000/varlink/registry/
+> 
+> Such varlink services can now also be listed via:
+> 
+>   valinkctl list-services
+> 
+> This then ties very neatly into the varlink bridge we're currently
+> building:
+> 
+>   https://github.com/mvo5/varlink-http-bridge
+> 
+> It takes a directory with varlink sockets (or symlinks to varlink
+> sockets) like /run/varlink/registry as the argument and will serve
+> whatever it finds in there. Sockets can be added or removed dynamically
+> in the dir as needed:
+> 
+>   curl -s http://localhost:8080/sockets | jq
+>   {
+>     "sockets": [
+>       "io.systemd.Login",
+>       "io.systemd.Hostname",
+>       "io.systemd.sysext",
+>       "io.systemd.BootControl",
+>       "io.systemd.Import",
+>       "io.systemd.Repart",
+>       "io.systemd.MuteConsole",
+>       "io.systemd.FactoryReset",
+>       "io.systemd.Credentials",
+>       "io.systemd.AskPassword",
+>       "io.systemd.Manager",
+>       "io.systemd.ManagedOOM"
+>     ]
+>   }
+> 
+> The xattrs allow to have a completely global view of such services and
+> the per-user sessions all have their own sub-view.
+> 
+> > you have N services that share the same otherwise private tmpfs in order
+> > to talk to each other via a varlink socket?  I suppose in that case, the
+> 
+> Yeah sure that's one way.
+> 
+> > N services probably don't care/want others to discover their socket.
+> > 
+> > > which sockets speak Varlink. With user.* xattrs on sockets a service
+> > > can label its socket with the IPC protocol it speaks (e.g.,
+> > > user.varlink=1) and an eBPF program can then selectively capture
+> > 
+> > Who gets to set xattrs?  Can a malicious varlink socket user who has
+> > connect() abilities also delete user.varlink to mess with everyone who
+> > comes afterwards?
+> 
+> The main focus is AF_UNIX sockets of course so a varlink service does:
+> 
+>   fd = socket(AF_UNIX)
+>   umask(0117);
+>   bind(fd, "/run/foobar");
+>   umask(original_umask);
+>   chown("/run/foobar", -1, MYACCESSGID);
+>   setxattr("/run/foobar", "user.varlink", "1");
+> 
+> For non-path based sockets the inodes for client and server are
+> inherently distinct so they cannot interfer with each other. But even
+> then a chmod() + chown(-1, MYACCESSGID) on the sockfs socket fd will
+> protect this.
+> 
+> Thanks for the review. Please keep going. :)
 
-## Form letter - net-next-closed
+The rest look fine too, modulo my comments about the fixed limits.
 
-We have already submitted our pull request with net-next material for v7.0,
-and therefore net-next is closed for new drivers, features, code refactoring
-and optimizations. We are currently accepting bug fixes only.
+Acked-by: "Darrick J. Wong" <djwong@kernel.org>
 
-Please repost when net-next reopens after Feb 23rd.
-
-RFC patches sent for review only are obviously welcome at any time.
-
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
--- 
-pw-bot: defer
-pv-bot: closed
+--D
 
