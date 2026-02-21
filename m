@@ -1,308 +1,259 @@
-Return-Path: <netdev+bounces-259842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259844-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KLCuKPVAmmlXaAMAu9opvQ
-	(envelope-from <netdev+bounces-259842-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 00:34:13 +0100
+	id iKoTCgFEmmm6aAMAu9opvQ
+	(envelope-from <netdev+bounces-259844-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 00:47:13 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24B4B16E408
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 00:34:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F3C616E47E
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 00:47:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E7DC23028EE1
-	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 23:32:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1DB17301BF4E
+	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 23:47:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4521A30DEB8;
-	Sat, 21 Feb 2026 23:32:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76B08311C11;
+	Sat, 21 Feb 2026 23:46:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="De1A5G+L"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T4dZAZLA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A3D5478D
-	for <netdev@vger.kernel.org>; Sat, 21 Feb 2026 23:32:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC9CE246BC5
+	for <netdev@vger.kernel.org>; Sat, 21 Feb 2026 23:46:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771716769; cv=none; b=UM9uRemV9YwSzeJd5fxdTaBk/tXQLwnQaxulEUM9DeABqivau+TRWFl/qERhLzCebEqHIXZXhVXu88hWZ1KXR7kETceHmZLbRZI2rr8gVioc5mRqxmyngj3mMMkaArDOxU+n12PfS2nTpIMI83IzBagi3ciUV5L8gtpB7uqVTAM=
+	t=1771717619; cv=none; b=RQsJ+cIhrY0DJH6iicZmY0zfqtlxUSi9KNUmlQ03uyxFYxkDHJ7PXWT+hAmChjQaA+N68aq+6UsAOpIm3fE3ljby7JN38J8Qmq7mAcKz6oP+DRh0RuYgDzcUsZpGYCcB15rkSVKb3vsDioM8AqDmkchS53Q0S2u13wTCJ9IjVVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771716769; c=relaxed/simple;
-	bh=ec6BohS1gLM/Q1ZqnRvT3Aomp2QwhFfnioc2Qzv+QZE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hqhOiB45iMQ9Ud+16v6HKeqWtX+bO8x0590vqQ5lmEXQzmKNDxH+7rJenihGklcz/B7BkJH5YuvASq1EfvfrGZ1cST3aUKQnL1h7Gs5tDqFmECLTzi84QjMZTIUUZ/Uu97Hh05tEZU+PHLE9doXXfvpoojwLLtJOevigbxXVtH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=De1A5G+L; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a944e6336eso218260255ad.0
-        for <netdev@vger.kernel.org>; Sat, 21 Feb 2026 15:32:47 -0800 (PST)
+	s=arc-20240116; t=1771717619; c=relaxed/simple;
+	bh=CI6Ld/360tcKW0f2CDu5G0ZhUB63qMbtjaTz06jRPkU=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=BB4Ivof41uA2dIpjduXNhAKXFP1IXZZlxVM6trzYSit0a529Zx4VflX4YBILoz1gVppP7hcnxSBRqmOs52ElLKIAiNrdio6scTetsPiod3RwUK92pUTZXbenrMWxSsCV8o+raSJrk4HJ7/puuo8MxnsV7KFTyoSv1rFUO/4XxsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T4dZAZLA; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4838c15e3cbso27053385e9.3
+        for <netdev@vger.kernel.org>; Sat, 21 Feb 2026 15:46:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771716767; x=1772321567; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DHxyL9MR5WHIlG3mnYGDsZ6mMi8UdtePTLqzlQr7uPM=;
-        b=De1A5G+L889xjXqS+MxsgxWcg4RQh8Q0q0qXCYyMnZULhABEeSe85/ARBybNmQu+9q
-         yy+5+fsb+DczTr74o1qHbsqHi6nAcGLfX2YV3G0/Gkh49YfdOMuQlQiROgXml9snI+H/
-         Yl18hg8cdw+cuJnYfUhrvLDKSmXxhNiteI955Yr9qsfFcgbJL1LfNEYJPD2G0UAMPeqZ
-         PrThF2WcGCTCGWZ8v6+lR/jXxHqkCAb9dW89LbuQFKpBCXZPjDfk1JUxRLfwGuQMXeon
-         3AxJ54EFw5IYfNueSLgr1sSzufoWl8/Z8vc+j9drZhdM0iyRs301gTPVTTReSe9Qx4kX
-         dfkQ==
+        d=gmail.com; s=20230601; t=1771717616; x=1772322416; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VsFpBim+U9AJYeIWZrEcXBta4FenG5ZBWPSwsN8cexA=;
+        b=T4dZAZLAnRoKX0EKSzvemPRhGLHwhIYVpdtMbJCr6a/+jtY0hDNIlsXIFK9wnDP4Lw
+         WJk0GH+o6zwoZMV0LHIhm+IaQ2aczYqn5vfa7r1RR+gF3ABtSx4pfzistVOBuyfQIUGA
+         vDo3b+hApkmc71FFJdCnxrY4PCRllxQzMCqYzA6pzcKGH0nXDMa02gPRUugQqJlwkAZn
+         ro7k5xHRF3DAFI4LUNfUAiwvWY1gqhyn4k25owCdEu62sb0xtPPkk4pGLapmxYnaB524
+         SMmgcAwP0QPAae3B4mGmQkRupTDHkwT9B9ZvieCyyyR+ypusQe+3OskKRf6f7bLHfiyE
+         3DFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771716767; x=1772321567;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DHxyL9MR5WHIlG3mnYGDsZ6mMi8UdtePTLqzlQr7uPM=;
-        b=TWZpr/smiytJHi6P3dtWithg72+jVTTtDIudTS8YRBaXZCPhqGG2Hm45Q7HL+0XnSd
-         uwtTWrns6Pmaw+OqTM12+zfO9d7ZrJL2lhsC7HFV8nIsPJKJknGZNIUqzVwLrBMFoAfN
-         80NGeGlbNyhX4IvakwU7qQpoPIk4Es7kE/RztffsUV8Lfio8aHI62snWaARL6CHpD61q
-         8u+lmJCPl7Ol5sZyp/J5PSSVnrqB/kgGGIcjyFih38Saquf6ZENoRqF7EU5QR9017g2C
-         C6amQrG1l5IVjbYhmPblml+zvq/Z2BDD+5gkIIzww+HkgtNIfhFylzoi7m4I0XxrNeZY
-         I2ig==
-X-Forwarded-Encrypted: i=1; AJvYcCULfEbSQmYk5ujhNiOdUDT5SQXYFF+G/4fzPbjcv1SuTMDZVLRBJCGJSvhW4xdQPeDJUaT4F08=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0XptCsueQW/dDHmqyDgTZEK+usypSyQvTT8lBtWviosx+5eDn
-	pgNF3B4TOmlueRcB2jcv6XT8a5C1u2AatdWjS7Sqd8vm9e3CbYKJCfW/djc6pO7lRWKmjmeGJ2i
-	a1iB9XA==
-X-Received: from pjph2.prod.google.com ([2002:a17:90a:9c02:b0:351:c17:c7b9])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f707:b0:295:565b:c691
- with SMTP id d9443c01a7336-2ad74444dc3mr38808295ad.17.1771716767243; Sat, 21
- Feb 2026 15:32:47 -0800 (PST)
-Date: Sat, 21 Feb 2026 23:30:53 +0000
-In-Reply-To: <20260221233234.3814768-1-kuniyu@google.com>
+        d=1e100.net; s=20230601; t=1771717616; x=1772322416;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VsFpBim+U9AJYeIWZrEcXBta4FenG5ZBWPSwsN8cexA=;
+        b=S4SW6QB5OwlkLOuUXcn077xzEBjIyYpTVucUV2Rm4l52+5Sst24ZaIsVGrAjvVmmf7
+         x5Q1bpufQWNInf8sZMNm8qneAfm96PXRQM697c9xDXS8XC5QoDQ4Oh402A/nxlE9a87A
+         T+A34dhx+DHPoJgh+S2LaVkppKjyNMyyodJWyUM+fXVpglllQkzW+VtI666UbyXJDEv+
+         lKs4l+Jb2+8XIMNXBuZlQhFFq77eOjBdYd5p3ghzOuAgqltK8Agt3wdFJXXEppxYnjZj
+         xm/a0aVawMo17l9WMLv6MqiiYjlefEiVGPN8LqbII/jIgnj9pym9k/5Go/POMjaPzMyj
+         KV1A==
+X-Forwarded-Encrypted: i=1; AJvYcCXaO1sorMCpK2jO0bcKfehz06nxXbPNJ/VoZ0wJNRU3oq2QPDmw5vcb8YNhiXHF4mTrfvxDkAI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYUyPmlAtYere/CehXbpYBjr8ZWgwVQSNFTYfTXPq3lHCyorwu
+	2HQKIJyB9JVdJ6FlyUsFPtHT/U6ozcg3KDjNuDaGgz3qFbKcr1klkk8t
+X-Gm-Gg: AZuq6aJNkmv6u8u2Z4hFYUXQxvDXY3y2nZ1TilGAQUDHVcKS8ZxqVq+Pae6793IEd3L
+	OYJLKmLXDxo3YsaEyONYAhDni8/ZxU+9km2R8w46TSsZYrC6T+Paxt4M0U57E6s6OxOaR4n9PE0
+	6w8jLFkmZtTOdw9XOTZnaMd4aq9pgiio2iv/PWdxC6R8t18yrNro2nxOZ8Ibl5ljAV/KSevG/kx
+	iTAYIbio02xDCNWlmRjCNr1qnMGNz5n16Fs2RBo7G9vmvf/w0LI4sFkLzJfIg4SpU4RPQ7zjsMJ
+	tt4FQGUgqTImNPhG1yFzZc3GjRHvhRNMzSRCv6IL9NDYmfRpXmWizgn4ojrEHDGhvJzsM9+UvTs
+	HNPFuaBVaFFsC7n2IgDij78TwGuS+284GGNGrL2ysxz3P8QhQvzjJIAGPwNXB8jPH6idaL8u/Ys
+	kirH5qPt74WD9lZ5L7LwGQeOMwc+5Ef7jNstNrAPLwH0PaWdAGDlUYqJZ1+yFdHEz/8y0Nbg6ii
+	TVI
+X-Received: by 2002:a05:600c:4e12:b0:480:39ad:3b7c with SMTP id 5b1f17b1804b1-483a962e465mr80910425e9.16.1771717616137;
+        Sat, 21 Feb 2026 15:46:56 -0800 (PST)
+Received: from [10.0.0.98] (snat-2.cgn.sat-an.net. [176.222.226.2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43970bf9feasm8271637f8f.6.2026.02.21.15.46.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 21 Feb 2026 15:46:54 -0800 (PST)
+Message-ID: <d3bb9c36-5a0e-4339-901d-2dd21bdba395@gmail.com>
+Date: Sun, 22 Feb 2026 00:46:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260221233234.3814768-1-kuniyu@google.com>
-X-Mailer: git-send-email 2.53.0.371.g1d285c8824-goog
-Message-ID: <20260221233234.3814768-7-kuniyu@google.com>
-Subject: [PATCH v4 bpf/net 6/6] sockmap: Fix broken memory accounting for UDP.
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: John Fastabend <john.fastabend@gmail.com>, Jakub Sitnicki <jakub@cloudflare.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	syzbot+5b3b7e51dda1be027b7a@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Frank <Frank.Sae@motor-comm.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Sai Krishna <saikrishnag@marvell.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linuxtardis@gmail.com
+From: =?UTF-8?Q?Jakub_Van=C4=9Bk?= <linuxtardis@gmail.com>
+Subject: [PATCH net v1] net: phy: motorcomm: yt8821: disable MDIO broadcast
+ address 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,marvell.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-259844-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259842-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,cloudflare.com];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,google.com,vger.kernel.org,syzkaller.appspotmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,5b3b7e51dda1be027b7a];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,appspotmail.com:email]
-X-Rspamd-Queue-Id: 24B4B16E408
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linuxtardis@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7F3C616E47E
 X-Rspamd-Action: no action
 
-syzbot reported imbalanced sk->sk_forward_alloc [0] and
-demonstrated that UDP memory accounting by SOCKMAP is broken.
+The YT8821 PHY responds on two MDIO addresses by default: the address
+selected by its strapping pins and the broadcast address 0.
 
-The repro put a UDP sk into SOCKMAP and redirected skb to itself,
-where skb->truesize was 4240.
+On platforms where another PHY is hardwired to respond only on address 0
+(e.g. the internal Gigabit PHY in the MediaTek MT7981B SoC), this can lead
+to MDIO bus conflicts. The YT8821 may incorrectly respond to transactions
+intended for the other PHY, leaving it in an inconsistent state. The
+following issues were observed on a Cudy M3000 router:
 
-First, udp_rmem_schedule() set sk->sk_forward_alloc to 8192
-(2 * PAGE_SIZE), and skb->truesize was charged:
+- Achieving just 100 Mbps speeds on gigabit links. Dmesg would show
+  messages like
 
-  sk->sk_forward_alloc = 0 + 8192 - 4240;  // => 3952
+    [ 133.997177] YT8821 2.5Gbps PHY mdio-bus:01: Downshift occurred from negotiated speed 1Gbps to actual speed 100Mbps, check cabling!
+    [ 134.009400] mtk_soc_eth 15100000.ethernet eth0: Link is Up - 100Mbps/Full - flow control off
 
-Then, udp_read_skb() dequeued the skb by skb_recv_udp(), which finally
-calls udp_rmem_release() and _partially_ reclaims sk->sk_forward_alloc
-because skb->truesize was larger than PAGE_SIZE:
+- Having the PHY report that the link is up, yet no data would flow.
+- The YT8821 would be affected by an "ip link set dev eth1 down"
+  command aimed at the other PHY.
 
-  sk->sk_forward_alloc += 4240;  // => 8192 (PAGE_SIZE is reclaimable)
-  sk->sk_forward_alloc -= 4096;  // => 4096
+Avoid this conflict by disabling the broadcast address 0 early in
+the PHY configuration process. The .probe callback is called early
+enough to stop the issues from occurring. The .config_init callback
+re-establishes the workaround after the PHY undergoes a hardware
+reset.
 
-Later, sk_psock_skb_ingress_self() called skb_set_owner_r() to
-charge the skb again, triggering an sk->sk_forward_alloc underflow:
+This change makes the YT8821 work reliably on the Cudy M3000 router
+when running the current OpenWrt main branch with a small device tree
+patch.
 
-  sk->sk_forward_alloc -= 4240   // => -144
-
-Another problem is that UDP memory accounting is not performed
-under spin_lock_bh(&sk->sk_receive_queue.lock).
-
-skb_set_owner_r() and sock_rfree() are called locklessly and
-corrupt sk->sk_forward_alloc, leading to the splat.
-
-Let's not skip memory accounting for UDP and ensure the proper
-lock is held.
-
-Note that UDP does not need msg->sk assignment, which is for TCP.
-
-[0]:
-WARNING: net/ipv4/af_inet.c:157 at inet_sock_destruct+0x62d/0x740 net/ipv4/af_inet.c:157, CPU#0: ksoftirqd/0/15
-Modules linked in:
-CPU: 0 UID: 0 PID: 15 Comm: ksoftirqd/0 Not tainted syzkaller #0 PREEMPT(full)
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/13/2026
-RIP: 0010:inet_sock_destruct+0x62d/0x740 net/ipv4/af_inet.c:157
-Code: 0f 0b 90 e9 58 fe ff ff e8 40 55 b3 f7 90 0f 0b 90 e9 8b fe ff ff e8 32 55 b3 f7 90 0f 0b 90 e9 b1 fe ff ff e8 24 55 b3 f7 90 <0f> 0b 90 e9 d7 fe ff ff 89 f9 80 e1 07 80 c1 03 38 c1 0f 8c 95 fc
-RSP: 0018:ffffc90000147a48 EFLAGS: 00010246
-RAX: ffffffff8a1121dc RBX: dffffc0000000000 RCX: ffff88801d2c3d00
-RDX: 0000000000000100 RSI: 0000000000000f70 RDI: 0000000000000000
-RBP: 0000000000000f70 R08: ffff888030ce1327 R09: 1ffff1100619c264
-R10: dffffc0000000000 R11: ffffed100619c265 R12: ffff888030ce1080
-R13: dffffc0000000000 R14: ffff888030ce130c R15: ffffffff8fa87e00
-FS:  0000000000000000(0000) GS:ffff8881256f8000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000200000000700 CR3: 000000007200c000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- __sk_destruct+0x85/0x880 net/core/sock.c:2350
- rcu_do_batch kernel/rcu/tree.c:2605 [inline]
- rcu_core+0xc9e/0x1750 kernel/rcu/tree.c:2857
- handle_softirqs+0x22a/0x7c0 kernel/softirq.c:622
- run_ksoftirqd+0x36/0x60 kernel/softirq.c:1063
- smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
- kthread+0x726/0x8b0 kernel/kthread.c:463
- ret_from_fork+0x51b/0xa40 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
- </TASK>
-
-Fixes: d7f571188ecf ("udp: Implement ->read_sock() for sockmap")
-Reported-by: syzbot+5b3b7e51dda1be027b7a@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/698f84c6.a70a0220.2c38d7.00cb.GAE@google.com/
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+Link: https://github.com/openwrt/openwrt/pull/21584
+Fixes: b671105b88c3 ("net: phy: Add driver for Motorcomm yt8821 2.5G ethernet phy")
+Signed-off-by: Jakub Vaněk <linuxtardis@gmail.com>
 ---
-v4: Fix deadlock when requeued
-v2: Fix build failure when CONFIG_INET=n
----
- include/net/udp.h |  9 +++++++++
- net/core/skmsg.c  | 29 +++++++++++++++++++++++++----
- net/ipv4/udp.c    |  9 +++++++++
- 3 files changed, 43 insertions(+), 4 deletions(-)
+ drivers/net/phy/motorcomm.c | 48 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
-diff --git a/include/net/udp.h b/include/net/udp.h
-index 700dbedcb15f..ae38a4da9388 100644
---- a/include/net/udp.h
-+++ b/include/net/udp.h
-@@ -455,6 +455,15 @@ struct sock *__udp6_lib_lookup(const struct net *net,
- 			       struct sk_buff *skb);
- struct sock *udp6_lib_lookup_skb(const struct sk_buff *skb,
- 				 __be16 sport, __be16 dport);
-+
-+#ifdef CONFIG_INET
-+void udp_sock_rfree(struct sk_buff *skb);
-+#else
-+static inline void udp_sock_rfree(struct sk_buff *skb)
-+{
-+}
-+#endif
-+
- int udp_read_skb(struct sock *sk, skb_read_actor_t recv_actor);
+diff --git a/drivers/net/phy/motorcomm.c b/drivers/net/phy/motorcomm.c
+index 42d46b5758fc..bcb60d0bcab5 100644
+--- a/drivers/net/phy/motorcomm.c
++++ b/drivers/net/phy/motorcomm.c
+@@ -227,6 +227,9 @@
+ #define YT8521_LED_100_ON_EN			BIT(5)
+ #define YT8521_LED_10_ON_EN			BIT(4)
  
- /* UDP uses skb->dev_scratch to cache as much information as possible and avoid
-diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-index 96f43e0dbb17..dd9134a45663 100644
---- a/net/core/skmsg.c
-+++ b/net/core/skmsg.c
-@@ -7,6 +7,7 @@
- 
- #include <net/sock.h>
- #include <net/tcp.h>
-+#include <net/udp.h>
- #include <net/tls.h>
- #include <trace/events/sock.h>
- 
-@@ -576,6 +577,7 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
- 				u32 off, u32 len, bool take_ref)
- {
- 	struct sock *sk = psock->sk;
-+	bool is_udp = sk_is_udp(sk);
- 	struct sk_msg *msg;
- 	int err = -EAGAIN;
- 
-@@ -583,13 +585,20 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
- 	if (!msg)
- 		goto out;
- 
--	if (skb->sk != sk && take_ref) {
-+	if (is_udp) {
-+		if (unlikely(skb->destructor == udp_sock_rfree))
-+			goto enqueue;
++#define YTPHY_MDIO_ADDRESS_CONTROL_REG		0xA005
++#define YTPHY_MACR_EN_PHY_ADDR_0		BIT(6)
 +
-+		spin_lock_bh(&sk->sk_receive_queue.lock);
-+	}
-+
-+	if (is_udp || (skb->sk != sk && take_ref)) {
- 		if (atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf)
--			goto free;
-+			goto unlock;
- 
- 		if (!sk_rmem_schedule(sk, skb, skb->truesize))
--			goto free;
--	} else {
-+			goto unlock;
-+	} else if (skb->sk == sk || !take_ref) {
- 		/* This is used in tcp_bpf_recvmsg_parser() to determine whether the
- 		 * data originates from the socket's own protocol stack. No need to
- 		 * refcount sk because msg's lifetime is bound to sk via the ingress_msg.
-@@ -604,11 +613,23 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
- 	 * into user buffers.
- 	 */
- 	skb_set_owner_r(skb, sk);
-+
-+	if (is_udp) {
-+		spin_unlock_bh(&sk->sk_receive_queue.lock);
-+
-+		skb->destructor = udp_sock_rfree;
-+	}
-+
-+enqueue:
- 	err = sk_psock_skb_ingress_enqueue(skb, off, len, psock, sk, msg, take_ref);
- 	if (err < 0)
- 		goto free;
- out:
- 	return err;
-+
-+unlock:
-+	if (is_udp)
-+		spin_unlock_bh(&sk->sk_receive_queue.lock);
- free:
- 	kfree(msg);
- 	goto out;
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 422c96fea249..831d26748a90 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -2039,6 +2039,15 @@ struct sk_buff *__skb_recv_udp(struct sock *sk, unsigned int flags,
+ #define YTPHY_MISC_CONFIG_REG			0xA006
+ #define YTPHY_MCR_FIBER_SPEED_MASK		BIT(0)
+ #define YTPHY_MCR_FIBER_1000BX			(0x1 << 0)
+@@ -2760,6 +2763,30 @@ static int yt8821_soft_reset(struct phy_device *phydev)
+ 					  YT8521_CCR_SW_RST, 0);
  }
- EXPORT_SYMBOL(__skb_recv_udp);
  
-+void udp_sock_rfree(struct sk_buff *skb)
++/**
++ * yt8821_disable_mdio_address_zero() - disable MDIO broadcast address 0
++ * @phydev: a pointer to a &struct phy_device
++ *
++ * The YT8821 responds on two MDIO addresses by default:
++ *  - the address selected by its strapping pins
++ *  - the broadcast address 0
++ *
++ * Some other PHYs (e.g. the MT7981B internal Gigabit PHY) are hardwired to
++ * respond only on MDIO address 0. If the YT8821 also listens on address 0,
++ * it may incorrectly react to transactions intended for those PHYs.
++ *
++ * Disabling address 0 on the YT8821 early avoids such MDIO bus conflicts.
++ *
++ * Returns: 0 or negative errno code
++ */
++static int yt8821_disable_mdio_address_zero(struct phy_device *phydev)
 +{
-+	struct sock *sk = skb->sk;
-+
-+	spin_lock_bh(&sk->sk_receive_queue.lock);
-+	sock_rfree(skb);
-+	spin_unlock_bh(&sk->sk_receive_queue.lock);
++	return ytphy_modify_ext(phydev,
++				YTPHY_MDIO_ADDRESS_CONTROL_REG,
++				YTPHY_MACR_EN_PHY_ADDR_0,
++				0);
 +}
 +
- int udp_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
- {
- 	struct sk_buff *skb;
+ /**
+  * yt8821_config_init() - phy initializatioin
+  * @phydev: a pointer to a &struct phy_device
+@@ -2795,6 +2822,10 @@ static int yt8821_config_init(struct phy_device *phydev)
+ 		phydev->rate_matching = RATE_MATCH_PAUSE;
+ 	}
+ 
++	ret = yt8821_disable_mdio_address_zero(phydev);
++	if (ret < 0)
++		return ret;
++
+ 	ret = yt8821_serdes_init(phydev);
+ 	if (ret < 0)
+ 		return ret;
+@@ -2812,6 +2843,22 @@ static int yt8821_config_init(struct phy_device *phydev)
+ 	return yt8821_soft_reset(phydev);
+ }
+ 
++/**
++ * yt8821_probe() - early PHY initialization
++ * @phydev: a pointer to a &struct phy_device
++ *
++ * Returns: 0 or negative errno code
++ */
++static int yt8821_probe(struct phy_device *phydev)
++{
++	/*
++	 * Disable the MDIO broadcast address (0) as early as possible.
++	 * This prevents the YT8821 from responding to transactions
++	 * intended for a different PHY that is fixed at address 0.
++	 */
++	return yt8821_disable_mdio_address_zero(phydev);
++}
++
+ /**
+  * yt8821_adjust_status() - update speed and duplex to phydev
+  * @phydev: a pointer to a &struct phy_device
+@@ -3073,6 +3120,7 @@ static struct phy_driver motorcomm_phy_drvs[] = {
+ 		PHY_ID_MATCH_EXACT(PHY_ID_YT8821),
+ 		.name			= "YT8821 2.5Gbps PHY",
+ 		.get_features		= yt8821_get_features,
++		.probe			= yt8821_probe,
+ 		.read_page		= yt8521_read_page,
+ 		.write_page		= yt8521_write_page,
+ 		.get_wol		= ytphy_get_wol,
 -- 
-2.53.0.371.g1d285c8824-goog
+2.43.0
 
 
