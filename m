@@ -1,224 +1,325 @@
-Return-Path: <netdev+bounces-259828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259829-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2C14CevYmWkeXAMAu9opvQ
-	(envelope-from <netdev+bounces-259828-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 17:10:19 +0100
+	id oLOnLKXimWn5XAMAu9opvQ
+	(envelope-from <netdev+bounces-259829-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 17:51:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54A4316D3C9
-	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 17:10:18 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2594916D52D
+	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 17:51:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B8E6C30214DE
-	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 16:10:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A9257304B83E
+	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 16:51:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92E902DCBF7;
-	Sat, 21 Feb 2026 16:10:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D00C0352C42;
+	Sat, 21 Feb 2026 16:51:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="0yd43Een"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LNvXGSvp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEBD32DB79F
-	for <netdev@vger.kernel.org>; Sat, 21 Feb 2026 16:10:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771690215; cv=none; b=PyDvWAMD1crpeQb0czLrdD+qrarbn8YrH4xj2g+AzEu2bOJvBd2KCZWEVysRu+E3CV+07GA4LZ3lTkGyQo+9bv4ADH8lrbQhQYoxmTE+MScmfdP2i6azoABLNiLsyZmMgBikwRFI0eCsthekCnI+Plcwlvo+jwiDzFlHukIgHJc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771690215; c=relaxed/simple;
-	bh=ZbkqrLdc62pLjotZtZoP+RnNAEPOTnqSGQpsrx5OEoo=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=If41AcIhcemgsC1qPJNLosIR3itf7/Lu8AihHIKC30NRCHqp5n5GupXLydeD5PDVewtoIurVVULTrrRgIFLeui9Uvjm5KXj3pcPiA0p686NJz2HBYSmNBbc+RvAWjbs/pzZ7jyDOEsdc7a0r+jc2NYxY18qKt5nVYgmCpjAqrJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=0yd43Een; arc=none smtp.client-ip=209.85.167.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-463d81452abso1955443b6e.0
-        for <netdev@vger.kernel.org>; Sat, 21 Feb 2026 08:10:13 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C24352C27
+	for <netdev@vger.kernel.org>; Sat, 21 Feb 2026 16:51:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771692706; cv=pass; b=XWfOGW4DICt9+crb/Q1dQwXpsyV4Lj4pUMBV6LOWRGXCFnjVOzcaBrw8sXHTpogNYAYMTtnEAkXerRyAcR2OP4sG1dzGDB4jp3HslCatfM/oFdE7Ft6NEupq/TUHW+TBZiNYPYPxEGAnZs0AG0t5+tJHS+N9ymHARTXIOchZg0o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771692706; c=relaxed/simple;
+	bh=ISMeaFGkM1t/rcoHTy00tzcyFwk6QjXPrYp0XSfWpw0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bUKjmUkKfce5wza1FzxYUzuAte9tXBSjke8YQluLEyBC78TWaGRFtlMEQO4sMrX8GhoN+2VaRyYrSgOuQ5bqEhECxtQJdsAm5g8VuW5BU0lkdUWDRbfpKO87JMPnesH/hr1kVUXvE74C5P5WPK8fUaGXOLf1F89ed4jGyG6yO8Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LNvXGSvp; arc=pass smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-4376c0bffc1so2284311f8f.0
+        for <netdev@vger.kernel.org>; Sat, 21 Feb 2026 08:51:44 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771692703; cv=none;
+        d=google.com; s=arc-20240605;
+        b=V2dUjdS4kymzHehE3F0yhlei/0OW6FMz+LVGvF3l+UWuVkiPr6ylD14Vqrbc749/qM
+         G91Ro+UZLMAliCrL0+VC7IlttHzQTi8ht+Xjthc9yInlph7LW3axqL/fEaWUGugmybDx
+         ZSCILhTOEnbtkxj4Bmmjwjm4OrwrjaVXz1X5H19vnR1LqDt+4VBAfYcQWGEPr6qVMb/V
+         MC4R9AqURnkYJ9DJIJ5WHR+MEhjOB4oG+220WksVvljDofQOJAozgm6/tlpoGElt3Qc2
+         G0I4JddI7+HCndL6LqQWGqRtaKQvwFggRtvSc5WY/25JsXWXnDtHCQhWLntXLYMhQTIO
+         OvPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=6IS/94CiUdqXhdBEGqJ8zPaf2eO5R4ltg/JKS5ZLlyY=;
+        fh=oz8ZgvnfPQd5SGAonhSPKhBARqiOmGie7ANfOETTijc=;
+        b=cw378L7vTHX4003Lj4813DieJdcI5jr1xrxmXl8kmlHXmGkcA3+Wj4M1z3Bzm4ZJl9
+         VElIrFWqhBiXF2ceemLIQL+eE3k28pMvSarCkmvV0v0S02gNiwGGFrC8hqgDO8/jGltB
+         aW03FkvFAFb7HUNPUV2Xa3KKHuvJCP6AxtFnXVi06IUBfgudSAQXPatBkG0zu3Mq7ftU
+         E132uwFc8ZXElvIZLxUmxAJYcrhAveauVq6ZkfWjePWLgP7EDrUX9zxZ9iNXiqxB0pzt
+         Ydtk5PjV9uqCBsVZmHEpNj53pVNJ97vAM41r9ybzm3zNf5pIEJzuLxbPGsHba8LIV7GW
+         NGdA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1771690213; x=1772295013; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:subject:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z4UNznzYHS91akkUO/PnX70Z9N2x6qXPiwF3ms8pLos=;
-        b=0yd43EenNMRd68lcr22haul6wZd6yAXs46Z4dMy9W5X32vDDPSGHdtvPPSVw3NJ3z8
-         2gjFUjQ3jQpZP0uCFo6oQyKxlLTQm/MKQEVlyoigcn47V+zEMUSzOjPCaWwoPbE6XPWD
-         9wJ5mOkfOSCmyWvKvIppWlbfSM1tHoDNb6bJP+Q2/+h3DCeHdMAXmV8mpwFCTnjY/t7O
-         ctSJm6ltRkqoyVdi1P2QwVwmqXgD64S3ivaqbUKjlVbRFuKO32+VuVYjYoayyiOTeexi
-         YMGeAUCEyKWclv9GZeqYYWUqlZJ25uvOHKNnhbJt4iKi0KHA7X2IMEWS7AbQSBiGrTLu
-         kuog==
+        d=gmail.com; s=20230601; t=1771692703; x=1772297503; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6IS/94CiUdqXhdBEGqJ8zPaf2eO5R4ltg/JKS5ZLlyY=;
+        b=LNvXGSvp4GOwg6mfUO74scnJBC/+3xWm+aXloNBxUpptrpV4cGiiQOzLDtZ1y4GTZx
+         9QBWZxZTKnjZpYgjCLZ3gL0/DgpFPwjfHaGv9MNsGItGue262zIWumgw1y8+ffnrqD3s
+         dH5PFsFl35H4voTKs5XIzCBaeL02EZTy3lDbskMTXGZ2ISj+pd45dPE6ep2XJ75qtprq
+         lHjcmp80MlFj7Lc3rmUUrDtO0Trgaw8vhXTiHuXJw4ipVYC3aKeH/Gwvts+yM7Mg7ImL
+         7kOAbJXcGMrfNLuzTRcb795Ol4YT+MuKe+m/uFDykUyifgjL5zrIsevxBwZb8Ej8ewhj
+         eEaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771690213; x=1772295013;
-        h=content-transfer-encoding:mime-version:message-id:subject:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Z4UNznzYHS91akkUO/PnX70Z9N2x6qXPiwF3ms8pLos=;
-        b=OMUqEthsolk4ShONr8lYzp38FnEd58fVy50/XnK5i9Fnbt3wCj8F4yWlJZpDAzS5hA
-         omsiJEPU2Cx1NZ49nFOfz5GckAuuj+1tHmIya/Lm3cZ7c+Lm9RUnTd5LEYFl3oBfU/wC
-         5SCehzubtIDGqnCH5iQL9hsmr+4yDRglyQtRimmgIQ/P20mNzEzKL+lh72cLSd4OTUk3
-         U/6m3JDZffPWenTA7e6+I3P+F6s3joi4xtHuJuQrgVOPlzABpySTcIN1sdNb8WPzZAWm
-         QpJcMwxHeP8OLMkTgpamJ69jQY2IeWQZtwknIY0snCpYRSwdScBxeGkHWePL2CpNkkx5
-         aUNw==
-X-Gm-Message-State: AOJu0YxmYplyQjLa10ZkCGksqCZt2b13qoU3DM0x245N/VW23ybVeM0Z
-	7b8WXOkL96QNSLx6EONJptLA1hVWl0tfEzDFAZe0oPRKbKSiCnCtFJpe1EMaPnBwyVbu+VWC+GJ
-	Cv1le
-X-Gm-Gg: AZuq6aJB1rEB322hkFN22HIFzsKW9JodqrIptgghpfw5ugBSHt2aXTQPgfBzgcPsJQg
-	9o/RldsGWXb6o8wr7bTF/k1XLNVLZWevrp+EvmT+251QiWWc67ZDpGMB+Asa0GVxSJ8E9H+w6mw
-	Wv3cwg55szhsAel2GOcPgwLoilWNzYcJJR2aC6Gk6VdLCRflExMKraaXMzq7wTa5B7hplbsp14i
-	VY1SJfzYbHIWk3fCS4lesc0BIQd/G+2vHpXpgmAxA4zv8HCd8zF5PB8QFFcx6EYO9km761dKfMq
-	+kIL8S7X8kiNIVnQ45oBGLexC/8snZOhL4O6XAQJ+OBIK+d5lHgrlj+ZR6FThMh7c1laEtw+YA4
-	do+zeg8aXUPN9KofvrWsWHmDppuIFVzscBXvG0Co/yejAyxwIQgtaCYkej3E4ax3dT8Nsx1ox9Y
-	Le5JVw2L9AdHeo70S+5EkptkiHLYltH6nS73IdczzlnPCFkathQOw4TF399BE+87cP
-X-Received: by 2002:a05:6808:ed0:b0:463:93a5:a5c7 with SMTP id 5614622812f47-4644616ec49mr2000980b6e.2.1771690212576;
-        Sat, 21 Feb 2026 08:10:12 -0800 (PST)
-Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d52d072598sm2664044a34.27.2026.02.21.08.10.11
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 Feb 2026 08:10:12 -0800 (PST)
-Date: Sat, 21 Feb 2026 08:10:09 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Subject: [ANNOUNCE] iproute2 6.19.0 release
-Message-ID: <20260221081009.45f00ca8@phoenix.local>
+        d=1e100.net; s=20230601; t=1771692703; x=1772297503;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=6IS/94CiUdqXhdBEGqJ8zPaf2eO5R4ltg/JKS5ZLlyY=;
+        b=nISRCJl+vqupA7O0WOIpyZN8ApzroNFE8QauT/nvkQNMdDG6ojT0RiDssdpbKMySBl
+         4gCa6iY9zQM42wySyjzeGOiiY4mcd9Co3BtF9Ea8uZPijVb8TzPYpDqu+LR3C6heYDeh
+         iEyzU9w8FvkeMr+u+vuN9BcUbSJWMofnInVleBeelG9rWLxKEVVTRFB/RXCUsQPaiZTY
+         DwfIKwl6XOLZYDl4vJVyUkPpoOOMDvOvzAQPyiiXoK3qkCkdG2aPKEhe8/vxSaMuurVi
+         qm2XFPCOuajmie/FZz8bPwTcw3kz+n/ucDGdI+HMrLp041iM9hgTgx+qHnpDn/hxKcsK
+         2RSg==
+X-Forwarded-Encrypted: i=1; AJvYcCW/KLofFxP+tMcN9vVfQt0RT5xaQhaTiorAdiu7seQplvA7/h2t8D9crLtJCQaZCHR6FX5ziPc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzP1DHGWPH8uMx8CbQoz9/e0tyXicFciL4JfJSlEiq9CNcnLmcV
+	/GHaGeLx2PlOeLqdAyyCs2Ev7ZvRMdxXzKgAeoAjT0z6MxDz78JIiljjLer5xOfrhGSv9Fi176S
+	qDb8bng5Mlt9fNtXGzuIXLhKKO7piz68=
+X-Gm-Gg: AZuq6aLLySqn99HkCKZCmC9JlYXuloWxyL+xEDmHfPJdX6VpOLNo+x0crJoWMm8M6Pi
+	SsOVAfa/fXmqMQt7Lrm1jwAabGJeJYhr6pWPJmas4WO4Py8kSeloGxWHlSzLNaaA1/XHaf4QAFC
+	g6eFvhOjrCHtIavht3ICSsnjXf2XwA8JpRjBjPoQfn1u99acbko3u7xg5G7ErrfZv/ca64xtWVc
+	e9IWvOkt0P91bSnVm7xk7UY38nxj7oi4AVwkKmJPq82hifsnZKDpk0b6xoZD6xzvzby5CN3KKzS
+	1DHyGerS9bkdOYfaqr9XhFMoZb9bSTfiXPGkYTPuoqvrS6A44M1jGsAqVpnFP/t4gdI61mTkeGJ
+	hg5p1pCqaEFaxvHCbJ0vlUIrnng==
+X-Received: by 2002:a05:6000:290c:b0:437:7168:af50 with SMTP id
+ ffacd0b85a97d-4396f182e99mr5976364f8f.37.1771692703222; Sat, 21 Feb 2026
+ 08:51:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20260219142933.13904-1-leon.hwang@linux.dev> <20260219142933.13904-3-leon.hwang@linux.dev>
+ <CAADnVQLNmQGKf5S5ZNwHYzScYBhnWFmnzLg=5Xxy4SgYKE3EfQ@mail.gmail.com>
+ <c6c2ffcf-acdf-4bda-ad82-dc4cc1a9260e@linux.dev> <CAADnVQ+iQkvb9-wOchuPrUOneqzx9Rrqto88=R7GUOqih6PhZQ@mail.gmail.com>
+ <4c40705a-4e6a-47ea-b420-223318d1ad09@linux.dev>
+In-Reply-To: <4c40705a-4e6a-47ea-b420-223318d1ad09@linux.dev>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Sat, 21 Feb 2026 08:51:32 -0800
+X-Gm-Features: AaiRm52nj1X-_nBJIgAQ9NCx4CHzjnra7QF_C1bGfU9ssH2LC_icyswN6XymldQ
+Message-ID: <CAADnVQLsJV8OaLCxznwbnxdLVOQ+t=MmAr2O8Y89iPErCvphFQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2 2/6] bpf, x86: Add 64-bit bitops kfuncs
+ support for x86_64
+To: Leon Hwang <leon.hwang@linux.dev>
+Cc: Ilya Leoshkevich <iii@linux.ibm.com>, bpf <bpf@vger.kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Puranjay Mohan <puranjay@kernel.org>, 
+	Xu Kuohai <xukuohai@huaweicloud.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
+	"H . Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, Peilin Ye <yepeilin@google.com>, 
+	Luis Gerhorst <luis.gerhorst@fau.de>, Viktor Malik <vmalik@redhat.com>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, kernel-patches-bot@fb.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.56 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[networkplumber-org.20230601.gappssmtp.com:s=20230601];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[networkplumber-org.20230601.gappssmtp.com:+];
-	TAGGED_FROM(0.00)[bounces-259828-lists,netdev=lfdr.de];
-	RCPT_COUNT_ONE(0.00)[1];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259829-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	FREEMAIL_CC(0.00)[linux.ibm.com,vger.kernel.org,kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,huaweicloud.com,arm.com,redhat.com,alien8.de,linux.intel.com,zytor.com,fau.de,lists.infradead.org,fb.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_NONE(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alexeistarovoitov@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 54A4316D3C9
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,linux.dev:email,wikipedia.org:url]
+X-Rspamd-Queue-Id: 2594916D52D
 X-Rspamd-Action: no action
 
-This is the regular release of iproute2 corresponding to the 6.19 kernel.
+On Sat, Feb 21, 2026 at 4:45=E2=80=AFAM Leon Hwang <leon.hwang@linux.dev> w=
+rote:
+>
+>
+>
+> On 2026/2/21 01:50, Alexei Starovoitov wrote:
+> > On Fri, Feb 20, 2026 at 7:54=E2=80=AFAM Leon Hwang <leon.hwang@linux.de=
+v> wrote:
+> >>
+> >>
+> >>
+> >> On 2026/2/20 01:47, Alexei Starovoitov wrote:
+> >>> On Thu, Feb 19, 2026 at 6:30=E2=80=AFAM Leon Hwang <leon.hwang@linux.=
+dev> wrote:
+> >>>>
+> >>>> Implement JIT inlining of the 64-bit bitops kfuncs on x86_64.
+> >>>>
+> >>>> bpf_rol64() and bpf_ror64() are always supported via ROL/ROR.
+> >>>>
+> >>>> bpf_ctz64() and bpf_ffs64() are supported when the CPU has
+> >>>> X86_FEATURE_BMI1 (TZCNT).
+> >>>>
+> >>>> bpf_clz64() and bpf_fls64() are supported when the CPU has
+> >>>> X86_FEATURE_ABM (LZCNT).
+> >>>>
+> >>>> bpf_popcnt64() is supported when the CPU has X86_FEATURE_POPCNT.
+> >>>>
+> >>>> bpf_bitrev64() is not inlined as x86_64 has no native bit-reverse
+> >>>> instruction, so it falls back to a regular function call.
+> >>>>
+> >>>> Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
+> >>>> ---
+> >>>>  arch/x86/net/bpf_jit_comp.c | 141 +++++++++++++++++++++++++++++++++=
++++
+> >>>>  1 file changed, 141 insertions(+)
+> >>>>
+> >>>> diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp=
+.c
+> >>>> index 070ba80e39d7..193e1e2d7aa8 100644
+> >>>> --- a/arch/x86/net/bpf_jit_comp.c
+> >>>> +++ b/arch/x86/net/bpf_jit_comp.c
+> >>>> @@ -19,6 +19,7 @@
+> >>>>  #include <asm/text-patching.h>
+> >>>>  #include <asm/unwind.h>
+> >>>>  #include <asm/cfi.h>
+> >>>> +#include <asm/cpufeatures.h>
+> >>>>
+> >>>>  static bool all_callee_regs_used[4] =3D {true, true, true, true};
+> >>>>
+> >>>> @@ -1604,6 +1605,127 @@ static void emit_priv_frame_ptr(u8 **pprog, =
+void __percpu *priv_frame_ptr)
+> >>>>         *pprog =3D prog;
+> >>>>  }
+> >>>>
+> >>>> +static bool bpf_inlines_func_call(u8 **pprog, void *func)
+> >>>> +{
+> >>>> +       bool has_popcnt =3D boot_cpu_has(X86_FEATURE_POPCNT);
+> >>>> +       bool has_bmi1 =3D boot_cpu_has(X86_FEATURE_BMI1);
+> >>>> +       bool has_abm =3D boot_cpu_has(X86_FEATURE_ABM);
+> >>>> +       bool inlined =3D true;
+> >>>> +       u8 *prog =3D *pprog;
+> >>>> +
+> >>>> +       /*
+> >>>> +        * x86 Bit manipulation instruction set
+> >>>> +        * https://en.wikipedia.org/wiki/X86_Bit_manipulation_instru=
+ction_set
+> >>>> +        */
+> >>>> +
+> >>>> +       if (func =3D=3D bpf_clz64 && has_abm) {
+> >>>> +               /*
+> >>>> +                * Intel=C2=AE 64 and IA-32 Architectures Software D=
+eveloper's Manual (June 2023)
+> >>>> +                *
+> >>>> +                *   LZCNT - Count the Number of Leading Zero Bits
+> >>>> +                *
+> >>>> +                *     Opcode/Instruction
+> >>>> +                *     F3 REX.W 0F BD /r
+> >>>> +                *     LZCNT r64, r/m64
+> >>>> +                *
+> >>>> +                *     Op/En
+> >>>> +                *     RVM
+> >>>> +                *
+> >>>> +                *     64/32-bit Mode
+> >>>> +                *     V/N.E.
+> >>>> +                *
+> >>>> +                *     CPUID Feature Flag
+> >>>> +                *     LZCNT
+> >>>> +                *
+> >>>> +                *     Description
+> >>>> +                *     Count the number of leading zero bits in r/m6=
+4, return
+> >>>> +                *     result in r64.
+> >>>> +                */
+> >>>> +               /* emit: x ? 64 - fls64(x) : 64 */
+> >>>> +               /* lzcnt rax, rdi */
+> >>>> +               EMIT5(0xF3, 0x48, 0x0F, 0xBD, 0xC7);
+> >>>
+> >>> Instead of emitting binary in x86 and arm JITs,
+> >>> let's use in kernel disasm to check that all these kfuncs
+> >>> conform to kf_fastcall (don't use unnecessary registers,
+> >>> don't have calls to other functions) and then copy the binary
+> >>> from code and skip the last 'ret' insn.
+> >>> This way we can inline all kinds of kfuncs.
+> >>>
+> >>
+> >> Good idea.
+> >>
+> >> Quick question on =E2=80=9Cin-kernel disasm=E2=80=9D: do you mean addi=
+ng a kernel
+> >> instruction decoder/disassembler to validate a whitelist of kfuncs at
+> >> load time?
+> >>
+> >> I=E2=80=99m trying to understand the intended scope:
+> >>
+> >> * Is the expectation that we add an in-kernel disassembler/validator f=
+or
+> >>   a small set of supported instructions and patterns (no calls/jumps,
+> >>   only arg/ret regs touched, etc.)?
+> >> * Or is there already infrastructure you had in mind that we can reuse=
+?
+> >>
+> >> Once I understand that piece, I can rework the series to inline by
+> >> copying validated machine code (minus the final ret), rather than
+> >> emitting raw opcodes in the JITs.
+> >>
+> >> I also noticed you mentioned a similar direction in "bpf/s390: Impleme=
+nt
+> >> get_preempt_count()" [1], so I=E2=80=99ve added Ilya to the thread to =
+discuss
+> >> this approach further.
+> >
+> > You really sound like LLM. Do your homework as a human.
+>
+> Got it.
+>
+> I polished my draft using ChatGPT, which would leave LLM smell in my repl=
+y.
 
-The biggest addition is a new `dpll` command for managing Digital
-Phase-Locked Loop devices via netlink, which also prompted refactoring
-the `mnlg` library into a shared location. CAN XL support saw major
-expansion with seven patches from Vincent Mailhol adding transceiver
-mode setting, PWM configuration, and a RESTRICTED operation
-mode. MPTCP gained a new `laminar` endpoint type and several monitor
-improvements from Matthieu Baerts, who also added a MAINTAINERS entry
-for the subsystem.
+... and for anyone reading it the smell is ohh too strong.
 
-On the devlink side, there's now support for 64-bit parameters, a new
-`SWITCHDEV_INACTIVE` eswitch mode, and burst period configuration for
-health reporters. The `genl` utility picked up JSON output
-support. Andrea Claudi modernized `ifstat`, `nstat`, and `lnstat` by
-converting them to the high-level `json_print` API for consistent JSON
-output.
+> Here's my original draft:
+>
+> Good idea. But I concern about the "in kernel disasm". Do you mean we
+> will build a disassembler for whitelist kfuncs at starting?
+>
+> I noticed you've mentioned the same direction in "bpf/s390: Implement
+> get_preempt_count()" [1]. So, I added Ilya here to discuss this direction=
+.
 
-Rounding things out are smaller fixes: per-CPU support for XFRM, HSR
-protocol version display, an off-by-one fix in iplink, a musl libc
-build fix, and assorted man page corrections.
+Much better. Keep it human.
 
-Download:
-    https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-6.18.0.tar.gz
+"in kernel disasm" already exists for some architectures
+(at least x86 and arm64) since it's being used by kprobes.
+The ask here is to figure out whether they're usable for such
+insn analysis. x86 disasm is likely capable.
 
-Repository for current release
-    https://github.com/shemminger/iproute2.git
-    git://git.kernel.org/pub/scm/network/iproute2/iproute2.git
-
-And future release (net-next):
-    git://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git
-
-Contributions:
-
-Akhilesh Nema (1):
-      fix 'UINT_MAX' undeclared with build with musl libc
-
-Andrea Claudi (3):
-      ifstat: convert to high-level json_print API
-      nstat: convert to high-level json_print API
-      lnstat: convert to high-level json_print API
-
-David Ahern (4):
-      Update kernel headers
-      Update kernel headers
-      uapi: import dpll.h from last sync point
-      man: Fix spelling in tipc-link man page
-
-Ido Schimmel (1):
-      devlink: Fix resource show output
-
-Ivan Vecera (1):
-      devlink: Add support for 64bit parameters
-
-Jan Vaclav (2):
-      iplink: hsr: add protocol version to print_opt output
-      ip/iplink: fix off-by-one KIND length in modify()
-
-Matthieu Baerts (NGI0) (6):
-      MAINTAINERS: add entry for mptcp
-      man: mptcp: fix minor typos
-      mptcp: add 'laminar' endpoint support
-      mptcp: monitor: add 'server side' info
-      mptcp: monitor: add 'deny join id0' info
-      mptcp: monitor: support 'server side' as a flag
-
-Petr Oros (3):
-      lib: Move mnlg to lib for shared use
-      lib: Add str_to_bool helper function
-      dpll: Add dpll command
-
-Sabrina Dubroca (1):
-      ip-xfrm: add pcpu-num support
-
-Saeed Mahameed (1):
-      devlink: Support DEVLINK_ESWITCH_MODE_SWITCHDEV_INACTIVE
-
-Shahar Shitrit (1):
-      devlink: Introduce burst period for health reporter
-
-Stephen Hemminger (6):
-      genl: add json support
-      genl: move print_policy into genl
-      uapi: update from 6.19 merge window
-      uapi: update mptcp and rdma headers
-      man/tc-actions: fix typo
-      v6.19.0
-
-Vincent Mailhol (7):
-      iplink_can: print_usage: fix the text indentation
-      iplink_can: print_usage: change unit for minimum time quanta to mtq
-      iplink_can: print_usage: describe the CAN bittiming units
-      iplink_can: add RESTRICTED operation mode support
-      iplink_can: add initial CAN XL support
-      iplink_can: add CAN XL transceiver mode setting (TMS) support
-      iplink_can: add CAN XL TMS PWM configuration support
-
-Yureka (1):
-      lib: bridge: avoid redefinition of in6_addr
-
-Stephen Hemminger (1):
-      v6.19.0
-
+re:"whitelist kfunc"
+I suspect an additional list is not necessary.
+kf_fastcall is a good enough signal that such kfunc should
+be inlinable.
 
