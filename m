@@ -1,152 +1,224 @@
-Return-Path: <netdev+bounces-259827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259828-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id TlexKc/JmWkAWwMAu9opvQ
-	(envelope-from <netdev+bounces-259827-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 16:05:51 +0100
+	id 2C14CevYmWkeXAMAu9opvQ
+	(envelope-from <netdev+bounces-259828-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 17:10:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4071616D1D6
-	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 16:05:51 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54A4316D3C9
+	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 17:10:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 96D673004DE5
-	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 15:05:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B8E6C30214DE
+	for <lists+netdev@lfdr.de>; Sat, 21 Feb 2026 16:10:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F9CB7E792;
-	Sat, 21 Feb 2026 15:05:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92E902DCBF7;
+	Sat, 21 Feb 2026 16:10:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="1Un026cT"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="0yd43Een"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BD173EBF31
-	for <netdev@vger.kernel.org>; Sat, 21 Feb 2026 15:05:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEBD32DB79F
+	for <netdev@vger.kernel.org>; Sat, 21 Feb 2026 16:10:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771686349; cv=none; b=k/+wHGah1XHv/fg3inS6SLnUwi8gXnI9eKnB9HcRqnwWSXVy/o/GdXGmtxbkaeqBI/hI1lPJ3TCPEZoBpv8LiVU3hdZhEqEW98jvLcjCNPrrU8Y6tXKTQ+S4GFmX8Gbh23hJ2KU33HSPQDySZudS58PKCoi5AbErF69Jhdf1lfo=
+	t=1771690215; cv=none; b=PyDvWAMD1crpeQb0czLrdD+qrarbn8YrH4xj2g+AzEu2bOJvBd2KCZWEVysRu+E3CV+07GA4LZ3lTkGyQo+9bv4ADH8lrbQhQYoxmTE+MScmfdP2i6azoABLNiLsyZmMgBikwRFI0eCsthekCnI+Plcwlvo+jwiDzFlHukIgHJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771686349; c=relaxed/simple;
-	bh=1SoG0KFED/ZRemdzvZfEt59idgMoFs+ppiHQOWwuSWM=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=LgLTx951OPcVyX+UuXpVo2TBDro5AsKrFvO1Sh99sEAEwH+R/O7rbk/8f2Dt2nXcXjR9zk1L/HRwvxutdZXdKIyAIA34Wjr+A9SASxpRbsOP2RW32BEcYZTB94Tn8RKndmEIhOh0nUzezY2OMH1MhsRz4mXTX83HMOpXayteU+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=1Un026cT; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
-	Message-ID:Subject:To:From:Date:Reply-To:Cc:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=4Zxa70BsPBpyeKBArzZz+QYGD7sAD7nz2aOkeOx+vHw=; b=1Un026cTp3Z3wmcnuxdMV6H9iY
-	U+uZJ7CSk/DbOWHuZ5DI6Xvf8Uy1i6OcR/THZWtjx80Ty4HCW2NDXz74fp6K1DrP9ST+dN+63E8Nh
-	/oNmaXZ7dsgVKNqxMTFjUttqVhX8Ui7s0CYu8c5B8o/a/kaOmYp4F0OJspzBtzsgxLkdlccC351OY
-	zBd58xJ4DdxVjfgkYDi2fzgLlMS24JdpYS15hCb88AeFSzFUYNnY/837H3chhGQba3VTEg/M/I+7N
-	TKF1MogmgkcZbLXdQdRfaQdSKjbN0Ll5N+DV+g52ZovoUwwjPAQul7BRZSxFLD1AvAPH8VJWDcNnM
-	wlhlTi4w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38186)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vtoYD-000000002bV-0iuu
-	for netdev@vger.kernel.org;
-	Sat, 21 Feb 2026 15:05:45 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vtoYC-000000005Ps-0BTq
-	for netdev@vger.kernel.org;
-	Sat, 21 Feb 2026 15:05:44 +0000
-Date: Sat, 21 Feb 2026 15:05:43 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+	s=arc-20240116; t=1771690215; c=relaxed/simple;
+	bh=ZbkqrLdc62pLjotZtZoP+RnNAEPOTnqSGQpsrx5OEoo=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=If41AcIhcemgsC1qPJNLosIR3itf7/Lu8AihHIKC30NRCHqp5n5GupXLydeD5PDVewtoIurVVULTrrRgIFLeui9Uvjm5KXj3pcPiA0p686NJz2HBYSmNBbc+RvAWjbs/pzZ7jyDOEsdc7a0r+jc2NYxY18qKt5nVYgmCpjAqrJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=0yd43Een; arc=none smtp.client-ip=209.85.167.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-463d81452abso1955443b6e.0
+        for <netdev@vger.kernel.org>; Sat, 21 Feb 2026 08:10:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1771690213; x=1772295013; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z4UNznzYHS91akkUO/PnX70Z9N2x6qXPiwF3ms8pLos=;
+        b=0yd43EenNMRd68lcr22haul6wZd6yAXs46Z4dMy9W5X32vDDPSGHdtvPPSVw3NJ3z8
+         2gjFUjQ3jQpZP0uCFo6oQyKxlLTQm/MKQEVlyoigcn47V+zEMUSzOjPCaWwoPbE6XPWD
+         9wJ5mOkfOSCmyWvKvIppWlbfSM1tHoDNb6bJP+Q2/+h3DCeHdMAXmV8mpwFCTnjY/t7O
+         ctSJm6ltRkqoyVdi1P2QwVwmqXgD64S3ivaqbUKjlVbRFuKO32+VuVYjYoayyiOTeexi
+         YMGeAUCEyKWclv9GZeqYYWUqlZJ25uvOHKNnhbJt4iKi0KHA7X2IMEWS7AbQSBiGrTLu
+         kuog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771690213; x=1772295013;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Z4UNznzYHS91akkUO/PnX70Z9N2x6qXPiwF3ms8pLos=;
+        b=OMUqEthsolk4ShONr8lYzp38FnEd58fVy50/XnK5i9Fnbt3wCj8F4yWlJZpDAzS5hA
+         omsiJEPU2Cx1NZ49nFOfz5GckAuuj+1tHmIya/Lm3cZ7c+Lm9RUnTd5LEYFl3oBfU/wC
+         5SCehzubtIDGqnCH5iQL9hsmr+4yDRglyQtRimmgIQ/P20mNzEzKL+lh72cLSd4OTUk3
+         U/6m3JDZffPWenTA7e6+I3P+F6s3joi4xtHuJuQrgVOPlzABpySTcIN1sdNb8WPzZAWm
+         QpJcMwxHeP8OLMkTgpamJ69jQY2IeWQZtwknIY0snCpYRSwdScBxeGkHWePL2CpNkkx5
+         aUNw==
+X-Gm-Message-State: AOJu0YxmYplyQjLa10ZkCGksqCZt2b13qoU3DM0x245N/VW23ybVeM0Z
+	7b8WXOkL96QNSLx6EONJptLA1hVWl0tfEzDFAZe0oPRKbKSiCnCtFJpe1EMaPnBwyVbu+VWC+GJ
+	Cv1le
+X-Gm-Gg: AZuq6aJB1rEB322hkFN22HIFzsKW9JodqrIptgghpfw5ugBSHt2aXTQPgfBzgcPsJQg
+	9o/RldsGWXb6o8wr7bTF/k1XLNVLZWevrp+EvmT+251QiWWc67ZDpGMB+Asa0GVxSJ8E9H+w6mw
+	Wv3cwg55szhsAel2GOcPgwLoilWNzYcJJR2aC6Gk6VdLCRflExMKraaXMzq7wTa5B7hplbsp14i
+	VY1SJfzYbHIWk3fCS4lesc0BIQd/G+2vHpXpgmAxA4zv8HCd8zF5PB8QFFcx6EYO9km761dKfMq
+	+kIL8S7X8kiNIVnQ45oBGLexC/8snZOhL4O6XAQJ+OBIK+d5lHgrlj+ZR6FThMh7c1laEtw+YA4
+	do+zeg8aXUPN9KofvrWsWHmDppuIFVzscBXvG0Co/yejAyxwIQgtaCYkej3E4ax3dT8Nsx1ox9Y
+	Le5JVw2L9AdHeo70S+5EkptkiHLYltH6nS73IdczzlnPCFkathQOw4TF399BE+87cP
+X-Received: by 2002:a05:6808:ed0:b0:463:93a5:a5c7 with SMTP id 5614622812f47-4644616ec49mr2000980b6e.2.1771690212576;
+        Sat, 21 Feb 2026 08:10:12 -0800 (PST)
+Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d52d072598sm2664044a34.27.2026.02.21.08.10.11
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 21 Feb 2026 08:10:12 -0800 (PST)
+Date: Sat, 21 Feb 2026 08:10:09 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
 To: netdev@vger.kernel.org
-Subject: Question: stmmac xmit: GSO vs TAPRIO max-sdu
-Message-ID: <aZnJx4Mea7Ns-tsU@shell.armlinux.org.uk>
+Subject: [ANNOUNCE] iproute2 6.19.0 release
+Message-ID: <20260221081009.45f00ca8@phoenix.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+X-Spamd-Result: default: False [-1.56 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[networkplumber-org.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
+	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259827-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[networkplumber-org.20230601.gappssmtp.com:+];
+	TAGGED_FROM(0.00)[bounces-259828-lists,netdev=lfdr.de];
 	RCPT_COUNT_ONE(0.00)[1];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	NEURAL_HAM(-0.00)[-0.945];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4071616D1D6
+	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 54A4316D3C9
 X-Rspamd-Action: no action
 
-Hi,
+This is the regular release of iproute2 corresponding to the 6.19 kernel.
 
-I've recently been looking at stmmac's descriptor code (and finding a
-few bugs along the way...) I think I've found another bug.
+The biggest addition is a new `dpll` command for managing Digital
+Phase-Locked Loop devices via netlink, which also prompted refactoring
+the `mnlg` library into a shared location. CAN XL support saw major
+expansion with seven patches from Vincent Mailhol adding transceiver
+mode setting, PWM configuration, and a RESTRICTED operation
+mode. MPTCP gained a new `laminar` endpoint type and several monitor
+improvements from Matthieu Baerts, who also added a MAINTAINERS entry
+for the subsystem.
 
-stmmac implements various TC offloading, including some TAPRIO support.
-This supports max_sdu, but it seems it is only implemented for the
-non-GSO path:
+On the devlink side, there's now support for 64-bit parameters, a new
+`SWITCHDEV_INACTIVE` eswitch mode, and burst period configuration for
+health reporters. The `genl` utility picked up JSON output
+support. Andrea Claudi modernized `ifstat`, `nstat`, and `lnstat` by
+converting them to the high-level `json_print` API for consistent JSON
+output.
 
-        if (skb_is_gso(skb) &&
-            skb_shinfo(skb)->gso_type & priv->gso_enabled_types)
-                return stmmac_tso_xmit(skb, dev);
+Rounding things out are smaller fixes: per-CPU support for XFRM, HSR
+protocol version display, an off-by-one fix in iplink, a musl libc
+build fix, and assorted man page corrections.
 
-        if (priv->est && priv->est->enable &&
-            priv->est->max_sdu[queue]) {
-                sdu_len = skb->len;
-                /* Add VLAN tag length if VLAN tag insertion offload is requeste+d */
-                if (priv->dma_cap.vlins && skb_vlan_tag_present(skb))
-                        sdu_len += VLAN_HLEN;
-                if (sdu_len > priv->est->max_sdu[queue]) {
-                        priv->xstats.max_sdu_txq_drop[queue]++;
-                        goto max_sdu_err;
-                }
-        }
+Download:
+    https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-6.18.0.tar.gz
 
-stmmac_tso_xmit() doesn't do any max_sdu checks. Is this correct, or
-should the order of the above two if() statements be reversed so the
-max_sdu check is also done for TSO?
+Repository for current release
+    https://github.com/shemminger/iproute2.git
+    git://git.kernel.org/pub/scm/network/iproute2/iproute2.git
 
-(The TSO check in the above code will look different form what's
-currently in net-next, as I already have a large pile of cleanups in
-this area. However, it is functionally identical.)
+And future release (net-next):
+    git://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git
 
-Another question arises: gso_enabled_types is modified in
-stmmac_set_features(). Is it possible that there are GSO packets
-in the higher level networking queues while the netdev features are
-changed, which could result in GSO packets being passed into the
-netdev after e.g. GSO has been disabled, or are we guaranteed that
-after .ndo_set_features() has been called, we won't be passed any
-GSO packets?
+Contributions:
 
-Thanks.
+Akhilesh Nema (1):
+      fix 'UINT_MAX' undeclared with build with musl libc
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Andrea Claudi (3):
+      ifstat: convert to high-level json_print API
+      nstat: convert to high-level json_print API
+      lnstat: convert to high-level json_print API
+
+David Ahern (4):
+      Update kernel headers
+      Update kernel headers
+      uapi: import dpll.h from last sync point
+      man: Fix spelling in tipc-link man page
+
+Ido Schimmel (1):
+      devlink: Fix resource show output
+
+Ivan Vecera (1):
+      devlink: Add support for 64bit parameters
+
+Jan Vaclav (2):
+      iplink: hsr: add protocol version to print_opt output
+      ip/iplink: fix off-by-one KIND length in modify()
+
+Matthieu Baerts (NGI0) (6):
+      MAINTAINERS: add entry for mptcp
+      man: mptcp: fix minor typos
+      mptcp: add 'laminar' endpoint support
+      mptcp: monitor: add 'server side' info
+      mptcp: monitor: add 'deny join id0' info
+      mptcp: monitor: support 'server side' as a flag
+
+Petr Oros (3):
+      lib: Move mnlg to lib for shared use
+      lib: Add str_to_bool helper function
+      dpll: Add dpll command
+
+Sabrina Dubroca (1):
+      ip-xfrm: add pcpu-num support
+
+Saeed Mahameed (1):
+      devlink: Support DEVLINK_ESWITCH_MODE_SWITCHDEV_INACTIVE
+
+Shahar Shitrit (1):
+      devlink: Introduce burst period for health reporter
+
+Stephen Hemminger (6):
+      genl: add json support
+      genl: move print_policy into genl
+      uapi: update from 6.19 merge window
+      uapi: update mptcp and rdma headers
+      man/tc-actions: fix typo
+      v6.19.0
+
+Vincent Mailhol (7):
+      iplink_can: print_usage: fix the text indentation
+      iplink_can: print_usage: change unit for minimum time quanta to mtq
+      iplink_can: print_usage: describe the CAN bittiming units
+      iplink_can: add RESTRICTED operation mode support
+      iplink_can: add initial CAN XL support
+      iplink_can: add CAN XL transceiver mode setting (TMS) support
+      iplink_can: add CAN XL TMS PWM configuration support
+
+Yureka (1):
+      lib: bridge: avoid redefinition of in6_addr
+
+Stephen Hemminger (1):
+      v6.19.0
+
 
