@@ -1,147 +1,232 @@
-Return-Path: <netdev+bounces-259901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259902-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kPleCApem2nyygMAu9opvQ
-	(envelope-from <netdev+bounces-259901-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 20:50:34 +0100
+	id wM1LIQlgm2kmywMAu9opvQ
+	(envelope-from <netdev+bounces-259902-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 20:59:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A75AC170382
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 20:50:33 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D17BB1703D4
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 20:59:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 558993009897
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 19:50:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 27924300A749
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 19:58:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA46B35C185;
-	Sun, 22 Feb 2026 19:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F39035C183;
+	Sun, 22 Feb 2026 19:58:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0F5+1h9j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sP7CsShI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A2EA35C182
-	for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 19:50:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA8735BDCE
+	for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 19:58:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771789824; cv=none; b=PGfltjyJRgh66WAZ99C+AJ5iogegTAQb46a4qEB9CnCC00vXnoTxbwUYJQVhlpCRCOVsaS3TOwd6WnR61cuMxkpdaW4XKyp98uy5I8qqmwzOaejeebywM6QOjlRlHm2V02OJQSDGD3Ud2zVyyJDF2gaKa2vy60NqGzwOFXMckBU=
+	t=1771790322; cv=none; b=kmYYmtSKn46hw4Q4V6dE0NMX1RObb2i36DenIA2fii1xdzOhUwirMiudlsBXQSkeSH1Mj8TCIw73Iy8hWU9E2NwblvRJnTqmIQzVT193EaDn9zX0zBUXVTGEDiOL/h7EcYgwj6LscdtCw4JRT752rO07wQJKeyS4KfA/bE5F+lE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771789824; c=relaxed/simple;
-	bh=bw7cHK5nN5bBdOVPzNIhQTQlFDdU4LLOBvhwHvy+Sek=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=l0yNrE7sZEm5v4DM1oMQ0ePTsoHDHC7K3k7F5jxOgf5DVLWAAn/hlbWwxJxC4BrWUpDoe5BH22HZcEL2EUMARZdiY++CAOhlq35xWQgAHypedSCcol7X/MhsygCh/9ofKVilhbP41WUauq2IgWMqnztOn4CrESSoBxcCTVY1pnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0F5+1h9j; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c6e1dab2235so2234698a12.3
-        for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 11:50:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771789823; x=1772394623; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=na4axJXt/cUr1mORRW5n0O7My4YPvC1XtbGZHus3pls=;
-        b=0F5+1h9jqaupf4/Ej+8lqyw0Xh8xci6ZN2oePo38Y+pSsQbVYMOhlUo/l7YX80WsRA
-         3FT/jTux45Jvx8J6JCvyNTGdfag89MgXNe3I3pgIp8NigwBXGtRCmcek9tcbSlNGwF5e
-         OwIwER9v3iqpF+k1cwlYwl70BtcnxUSETtNMhBNW6tNFU5YBSl5yWVjIxI/W5cx4NMZx
-         vrmJ+ssr0Gxtki14Wm491N835gZIG8FfPuPmNauRMaobC+FD0rZHwXA2lrIpqYYjiVug
-         VMj80yO5CTQCghz2akQZ0AL4yI6lrZW39Ln+T2Jko/Pyxaud/KjbBQxiq/cmK1RFmZ7E
-         phvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771789823; x=1772394623;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=na4axJXt/cUr1mORRW5n0O7My4YPvC1XtbGZHus3pls=;
-        b=n5oI731DlJlnTYcMVzOPHxqCv+VI+Pdh0GN6APtD1psQrOxRevM+gdTyMcsD3Di909
-         HD/VMBnrtpM/TiN8OURopD3J9Y1jp5gJoIOPKOqTtVNgF1bkW5oIxm5bpnGdXhI3Wx/g
-         AYOZhJGymW3rsRkc+IYDBSa40URVJR7lrLJiFGdswQFsViidVlrhbLb3OCHhSCRi+m2P
-         Cahscq/uYS1XNfl2s/HR0pzQqN748X8Qg+OJ7Z8Ldl/YkSchijAAnTtpqC0p4DcRWDkD
-         s55yWcnRMUhqaGsP0Z2HrmSnGeFDIxu1Z1D+v/kGfNvPLA93vEnhiZo40kgnc85495Bo
-         +JJg==
-X-Forwarded-Encrypted: i=1; AJvYcCWF4ii34QKLXqOmI/fFzL2BvWHee02YFyLndG1PT+/A1oHxsT3msEnXpYK6wrgk8LiQW3lVFNo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyq5EejZOBvnQNuwJ95sYDLFRrB2MLPvvqgC0FfkNLXiJg+xBNV
-	CFx2NEKrY4U7ua5Vspa6zLKh0GNEwsfsGC1S6kJhAhmNybKqNJlfx1rWMZbX4H9VRc5AHeuZvpT
-	/eurYDw==
-X-Received: from pgbfp12.prod.google.com ([2002:a05:6a02:2cec:b0:c52:a841:c79d])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:748b:b0:38b:e55a:97c9
- with SMTP id adf61e73a8af0-39545ebb1b9mr5333025637.28.1771789822447; Sun, 22
- Feb 2026 11:50:22 -0800 (PST)
-Date: Sun, 22 Feb 2026 19:50:04 +0000
-In-Reply-To: <20260222195016.705157-1-kuniyu@google.com>
+	s=arc-20240116; t=1771790322; c=relaxed/simple;
+	bh=XbOYmoiKmvZc0TpiZ+4qaUVvKWKkSTRjdYI8od7dCLM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lK0VMH59ije0XFSEpWvh4nBX7M+FIwyzZ4yQyrOsZZPkKI2eyhijCxcpGorPOAgDzqB70nYCgrsEkaGZ5jszw3isEqdplr1idzBga6GUKvsbjMpGWn6SIzcFFUbxecaRp4WwR7cH+460Hfvg7RlxBL9nfJmBX5TCtCbgZTDPhno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sP7CsShI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35E1CC2BCB2
+	for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 19:58:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771790322;
+	bh=XbOYmoiKmvZc0TpiZ+4qaUVvKWKkSTRjdYI8od7dCLM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=sP7CsShIa+9tBAVOpZoUIyhDovnLK/iulAF3RRMZoVAv/3wx5MN5ZaXKYHtNMN/6X
+	 h9nkrDHQUcI9orrG41egzrvDkiODBKN44kR9DF1ZcZxNXMfzD/FsUR1EzZqx1/G2e6
+	 Hps8rYr6+wDQY2kZw5Qcil6Ed7fCij3fXVLDUuQmDsZAE2HmlZEv5oDVRFcmfLxMQj
+	 GWEf2Eh24FuxP/RRwOAiNV0Ub7QXW1LLwXcHHsuZwqBfgBSzb3lZLUW9qnfa+9/CpI
+	 TKb70YzBkJCzTWqJ0O+WJ924S/wnKzc7VvJqV3dXlJ8TVP/1NMeFvxhvGazugmNAvl
+	 kuU0TLvGdmU1Q==
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-8951c720496so20773376d6.2
+        for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 11:58:42 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWWvg1oRSiFk1NcYwEdAv4AIedEgT0OgNJhC/Mxxw3n4ewqK6lQhbrXWWsFFjm3lrLjvOhjP8M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxvu5KcFyR2Knwspx+OE01cYguzty4RCQCrIj94/0YHjKGTUQPM
+	zj8wb8yYxtbwHSQMmaMZ/xp9Oacn+iFI73+1ftoPSEYCEfV4BR0/j1oFEv2XgnvU5E+2fHCykiR
+	r6orIeDuA1jdSj+TkLCyDjBpq0ZM6CLc=
+X-Received: by 2002:a05:6214:20ea:b0:888:fc37:f9b7 with SMTP id
+ 6a1803df08f44-89979c78478mr88266616d6.25.1771790321119; Sun, 22 Feb 2026
+ 11:58:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260222195016.705157-1-kuniyu@google.com>
-X-Mailer: git-send-email 2.53.0.371.g1d285c8824-goog
-Message-ID: <20260222195016.705157-3-kuniyu@google.com>
-Subject: [PATCH v1 net 2/2] ip6mr: Fix mr_mfc.unres.unresolved corruption in  ip6mr_cache_resolve().
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+MIME-Version: 1.0
+References: <20260219130050.2390226-1-bjorn@kernel.org> <415c4922-cc8d-4e35-bbac-3a532f44d238@lunn.ch>
+ <20260219160519.323041bf@kernel.org> <3b0949fa-0b05-4bce-86c0-2a7a058865a5@lunn.ch>
+ <20260220131254.03874c4c@kernel.org>
+In-Reply-To: <20260220131254.03874c4c@kernel.org>
+From: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+Date: Sun, 22 Feb 2026 20:58:30 +0100
+X-Gmail-Original-Message-ID: <CAJ+HfNgXqpqDYsmAa-mpHnO82aDgC7XbyVw3TmXk-ySFmGA-JQ@mail.gmail.com>
+X-Gm-Features: AaiRm50dFFABjs7xMRr7bPvGJoJmWkgrR5jZgwSuGpuHDNGj6z0XXgMM_PtlaCQ
+Message-ID: <CAJ+HfNgXqpqDYsmAa-mpHnO82aDgC7XbyVw3TmXk-ySFmGA-JQ@mail.gmail.com>
+Subject: Re: [RFC net-next 0/4] ethtool: CMIS module diagnostic loopback support
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org, 
+	Donald Hunter <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+	Michael Chan <michael.chan@broadcom.com>, Hariprasad Kelam <hkelam@marvell.com>, 
+	Ido Schimmel <idosch@nvidia.com>, Danielle Ratson <danieller@nvidia.com>, linux-kernel@vger.kernel.org, 
+	linux-rdma@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.01 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_MIXED_CHARSET(0.67)[subject];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-259901-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[lunn.ch,vger.kernel.org,gmail.com,davemloft.net,google.com,redhat.com,kernel.org,nvidia.com,bootlin.com,broadcom.com,marvell.com];
+	TAGGED_FROM(0.00)[bounces-259902-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: A75AC170382
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[bjorn@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D17BB1703D4
 X-Rspamd-Action: no action
 
-mr_mfc.unres.unresolved is filled by skb_queue_tail() under
-spin_lock_bh(&mfc_unres_lock) in ip6mr_cache_unresolved().
+Andrew/Kuba!
 
-ip6mr_cache_resolve() is called from ip6mr_mfc_add() after
-releasing the spinlock, so nothing protects the queue.
+Thanks for having a look!
 
-Let's use skb_dequeue() instead.
+On Fri, 20 Feb 2026 at 22:12, Jakub Kicinski <kuba@kernel.org> wrote:
 
-Fixes: 7bc570c8b4f7 ("[IPV6] MROUTE: Support multicast forwarding.")
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- net/ipv6/ip6mr.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+>> > Something like:
+>> >
+>> >   struct {
+>> >      enum type;   // MAC, PHY, SFP
+>> >      int type_id; // if type=3DPHY - phy id
+>> >      int depth;   // counting from CPU, first loopback opportunity is =
+1
+>> >                   // second is 2, etc.
+>> >      bool direction; // towards CPU/host vs towards network
+>> >      char name[16];  // "pcs", "far", "near", "post-fec", whatever
+>> >   }
+>>
+>> Lets see what comes from the drawing board, but i was more thinking
+>> about expanding the bitmap this proposal already has, extending it to
+>> other layers.
+>
+>IIUC the bitmap this proposal has is basically a product of
+>direction x depth: [host, network] x [nearest, furthest]
+>plus its scoped to SFP.
 
-diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
-index e047a4680ab0..97c406e58b39 100644
---- a/net/ipv6/ip6mr.c
-+++ b/net/ipv6/ip6mr.c
-@@ -1031,7 +1031,7 @@ static void ip6mr_cache_resolve(struct net *net, struct mr_table *mrt,
- 	 *	Play the pending entries through our router
- 	 */
- 
--	while ((skb = __skb_dequeue(&uc->_c.mfc_un.unres.unresolved))) {
-+	while ((skb = skb_dequeue(&uc->_c.mfc_un.unres.unresolved))) {
- 		if (ipv6_hdr(skb)->version == 0) {
- 			struct nlmsghdr *nlh = skb_pull(skb,
- 							sizeof(struct ipv6hdr));
--- 
-2.53.0.371.g1d285c8824-goog
+(Digging into different ways to loopback, rather than drawing board,
+but here goes! ;-))
 
+I'd agree with Jakub here, unless I'm not getting the details of what
+you mean, Andrew. Sounds like we'd end up with a huge bitmap? I
+suggest tweaking Jakub's idea to something like:
+
+/* loopback.c: A new ETHTOOL_MSG_LOOPBACK_{GET,SET} */
+
+/* Loopback layers/scope
+enum ethtool_loopback_layer {
+    ETHTOOL_LB_LAYER_SW =3D 0,    /* Software/Kernel stack loopback */
+    ETHTOOL_LB_LAYER_MAC,        /* MAC/Controller internal */
+    ETHTOOL_LB_LAYER_PCS,        /* Physical Coding Sublayer (Digital) */
+    ETHTOOL_LB_LAYER_PMA,        /* SerDes / Analog-Digital boundary */
+    ETHTOOL_LB_LAYER_PMD,        /* Transceiver / Module internal */
+    ETHTOOL_LB_LAYER_EXT,        /* External physical plug/cable */
+};
+
+/* Loopback Direction (XXX is local/remote easier to understand?) */
+enum ethtool_loopback_dir {
+    ETHTOOL_LB_DIR_NEAR_END =3D 0,    /* Host -> Loop -> Host  */
+    ETHTOOL_LB_DIR_FAR_END,        /* Line -> Loop -> Line  */
+};
+
+struct ethtool_loopback_layer_cfg {
+    enum ethtool_loopback_layer layer;    /* ETHTOOL_LB_L_MAC, etc. */
+    enum ethtool_loopback_dir direction;  /* NEAR or FAR */
+    u32 lane_mask;                        /* Specific lanes */
+    u32  flags;                           /* patterns? reserved... */
+    bool enabled;
+    char name[16];
+};
+
+struct ethtool_loopback_cfg {
+    struct ethtool_loopback_layer_cfg *entries;
+    u32 num_layers;
+};
+
+struct ethtool_ops {
+    /* ... */
+
+    /* Query which layers/lane-combos are physically possible */
+    int (*get_loopback_caps)(struct net_device *dev,
+                             struct ethtool_loopback_cfg *caps);
+
+    /* Get current active status for all layers */
+    int (*get_loopback_state)(struct net_device *dev,
+                              struct ethtool_loopback_cfg *state);
+
+    /* Set one or more layer/lane configurations atomically */
+    int (*set_loopback)(struct net_device *dev,
+                        const struct ethtool_loopback_cfg *cfg,
+                        struct netlink_ext_ack *extack);
+};
+
+As for layers; EXT vs PMD? EXT could be a loopback plug, whereas PMD
+would be CMIS, or whatever the driver detects.
+
+Userland would be something like:
+
+# ethtool --show-loopback eth0
+Loopback Status for eth0:
+  Layer: SW  | State: OFF
+  Layer: MAC   | State: OFF
+  Layer: PMA   | State: ON  | Lanes: 0x1 (Lane 0) | Direction: Near-End (Lo=
+cal)
+  Layer: PMD   | State: ON  | Lanes: 0xF (All)    | Direction: Far-End (Rem=
+ote)
+  Layer: EXT   | State: ON  | Detected: External Loopback Plug
+
+# ethtool --set-loopback <dev> [layer[:lanes][:direction]] ... [off]
+
+# # Simple MAC loopback:
+# ethtool --set-loopback eth0 mac (Defaults: lanes=3Dall, dir=3Dnear)
+# # Specific SerDes (PMA) lane:
+# ethtool --set-loopback eth0 pma:lane0
+# # Complex multi-layer (PMA Near + PMD Far):
+# ethtool --set-loopback eth0 pma:0x1:near pmd:all:far
+# # Disable all loopbacks:
+ethtool --set-loopback eth0 off
+
+Thoughts? Is this somewhat close to what you had in mind, Andrew?
+
+I'm far from an expert on the details here, so the folks with more
+knowledge, please chime in!
+
+
+Cheers,
+Bj=C3=B6rn
 
