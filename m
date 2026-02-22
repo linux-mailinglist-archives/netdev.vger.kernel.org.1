@@ -1,96 +1,86 @@
-Return-Path: <netdev+bounces-259908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259909-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6Ey6Gu5gm2kmywMAu9opvQ
-	(envelope-from <netdev+bounces-259908-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 21:02:54 +0100
+	id QEImEf5km2k2zAMAu9opvQ
+	(envelope-from <netdev+bounces-259909-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 21:20:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C0BA170437
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 21:02:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 920C61704A3
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 21:20:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E67A630074AA
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 20:02:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8DC03300C59C
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 20:20:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E6D31B4156;
-	Sun, 22 Feb 2026 20:02:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A8D335BDCB;
+	Sun, 22 Feb 2026 20:20:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=animalcreek.com header.i=@animalcreek.com header.b="sp2ikvR/";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="NSQKd/sJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Im5+F6P9"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 098EB2B9BA;
-	Sun, 22 Feb 2026 20:02:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D726E1DE4EF
+	for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 20:20:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771790571; cv=none; b=AOPJP1XcmBr/9aohliikQi3aoka+h0Fta+c4MwU8RjDJp18iipd4rl5NVlc8uJWD7IDQbS/aflMhYLoZHrWpZ9lgyc5QXXdHMvDTIoAQAahYAa+tjAunYEHsA7vpwWxmwMyGl81drDQR7kMiHX8kwDbPhesAiGPvYfoimWLYxzE=
+	t=1771791610; cv=none; b=Ad0TKuLfl2AFyU/AsbDcJ1D1EUl96imVKByS71NBa38F6vJIz7QsPdtLJEldGw/qdQFmBr9fxyzy5XiUNZqlQHRGnCsiW9AqR1VvxqALjWAt0mOlpHfDksOB6+vVaImQRI7NLyJAFGPrszsv4zr8U67m3+WQRGkm7bUj0WGE3kI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771790571; c=relaxed/simple;
-	bh=OP4O3q0tEgUsuEr5yc6i3Pk3OGco6JhTwWYBuWw8ZeY=;
+	s=arc-20240116; t=1771791610; c=relaxed/simple;
+	bh=AvPUejLylMe6jxtFjp+4uu3x6b6UYh1yyZKXO4RB18g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=thUL5MMBSV5Ezh7ND5sI4OBz3DuaYerHCtnGR9DzQaP0fGqMzNvVwXJeDahMEFu2BIx33OwmtUm/0oNf3l8Pxn3dtkanbv1SDPOXaNeNd717CQmzgce7+/WwpYIkoyMQPynmoe205jW65ZZjpBoSJJwVzOjhc0cgeAS87WmL/+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=animalcreek.com; spf=pass smtp.mailfrom=animalcreek.com; dkim=pass (2048-bit key) header.d=animalcreek.com header.i=@animalcreek.com header.b=sp2ikvR/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=NSQKd/sJ; arc=none smtp.client-ip=202.12.124.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=animalcreek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=animalcreek.com
-Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 0FC377A004D;
-	Sun, 22 Feb 2026 15:02:47 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-12.internal (MEProxy); Sun, 22 Feb 2026 15:02:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=animalcreek.com;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
-	 t=1771790567; x=1771876967; bh=iLfA9tYX3ZgFzd0/ew0lCDb5XE0nxrvr
-	a7ORe8E4F0I=; b=sp2ikvR/wrlvxMw2Rg04UQBeovX12toH+bjpRyb0pTJIwrbU
-	IOhGT/3fid+xVbtSzfpg8uVUB2mv+U6IH01qR8cifPea99MhsR1M8R6cLWHoeNHj
-	UReMa4X3COK71OOekdw/0O0eYSCR2tqFVLhG7W3vhdDe7FAqqaBNjWSycMal8F38
-	UCFIZ2i1nWRUNv59su2EUq+NLjF67ZFUH7YG/O3emOTa4DosPRRsCsbvbqdpaiBI
-	vSNnkgbIE2+I3xUq6KISLtngNhY+KI8popxF3wowhNlSHPXfYXaTCHyQ5DszDtza
-	DYgvYl2hQz3pq99+CUyXrU52yFPb51E8jkKkwA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1771790567; x=
-	1771876967; bh=iLfA9tYX3ZgFzd0/ew0lCDb5XE0nxrvra7ORe8E4F0I=; b=N
-	SQKd/sJdznCJrAvSWsG6YbBEHuROoMH6RFUGFaiZ20+Vz3vl4aAkYqwIOEvSap7W
-	+A6/JPwAVwR0Z/hEzlPoAbdLpRtMJX6DPOcutYWYix2jTPosxndqamobFuTMX/IQ
-	skEU0Z7c3X+BAMCQ3UbRVrA/0MgtKEUobE2GO5yx85g3XUf/9PsNh5Ph/OiqzTee
-	Cfr1hI3mM6dGfb2V69qJOJGRPc/bX/pBrFWyAX4gN6GPgfWZsLzCPx8XdkJ0JLZw
-	OygsKqXg8+2ScdQQMhHaERSsP8ZLVecqly5LE8JhX3+JrCVzF7eK8jVo8FaeBQXH
-	aF1TfdUssixzRUNJgZWGQ==
-X-ME-Sender: <xms:52CbaSXmiUO-WUZxbWcJBuBaZ0m56xHY9RABhhvFSBeEC9eI-uQbvw>
-    <xme:52CbaXiVlOoz34fgPNZzEV4V_mY-HZYV8hXiFupcGnePoS1ulaRKuUwYc_Mw3z4ul
-    gBMqi4IMA097PITJmeOpDHxFJGCMN1B1rrTvMl-od_l5upkarISSA>
-X-ME-Received: <xmr:52CbaR-8ZpCD6cZ8eNioLyZKpJdBbvnc82rl67A-f6DrqGXT6z-xThQ8NYysZntPg7q2C-zA3YEZ6qPYBVBWgaOAyXop>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvfeehvddvucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucenucfjughrpefkffggfgfuvfevfhfhohgjtgfgsehtje
-    ertddtvdejnecuhfhrohhmpeforghrkhcuifhrvggvrhcuoehmghhrvggvrhesrghnihhm
-    rghltghrvggvkhdrtghomheqnecuggftrfgrthhtvghrnhephfduteehueffkeelfeefke
-    efjeeuffdtuedvffeftdettdfhleduvddutdefheeinecuvehluhhsthgvrhfuihiivgep
-    tdenucfrrghrrghmpehmrghilhhfrhhomhepmhhgrhgvvghrsegrnhhimhgrlhgtrhgvvg
-    hkrdgtohhmpdhnsggprhgtphhtthhopeehpdhmohguvgepshhmthhpohhuthdprhgtphht
-    thhopehtohhmrghsiidruhhnghgvrheshigrhhhoohdrphhlpdhrtghpthhtoheplhhinh
-    hugidqfihirhgvlhgvshhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohep
-    nhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugi
-    dqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepmhhgrhgv
-    vghrsegrnhhimhgrlhgtrhgvvghkrdgtohhm
-X-ME-Proxy: <xmx:52CbaZY0xw7DMS0Cw5MKQlM6_XB7PUvgwLfwgV2NeaKd15hiwW3jqQ>
-    <xmx:52CbaY2CGxszxHsyF2Se7t3zMFvQp_lnwBJG-PjV9aSJNaTYbrsJxg>
-    <xmx:52Cbacaz6sXeE2ANtP093_-dKeL-LjEgNaITbxOIhQreQ5OzS__QAQ>
-    <xmx:52CbaYI-cPfDeHKCBJSV269JPkVme0DwOmVpYIfKQ3BWNhbD3QTpdw>
-    <xmx:52CbaQuvwCW4nc-UV3VtD1M9kfExyx8yDjkqOv2HjRrpspzNWWBa9YyX>
-Feedback-ID: i9cc843c7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 22 Feb 2026 15:02:46 -0500 (EST)
-Message-ID: <386f2ceb-30ae-4acf-9a62-287412fc5c79@animalcreek.com>
-Date: Sun, 22 Feb 2026 13:02:45 -0700
+	 In-Reply-To:Content-Type; b=tMYLhwnfn7FO1oUC0zh30OvUtjAxA0S8He2xeLLvhIbJuxMBheXEgEdiXIIVBrHaPL7qtTmQpdgB2CvEdnsJj53ktwjf7XX2epUP1AC4yqgt9+vrU8YBOMgqGuUsrSFKy7WIOE8NB9NMHe5jM20D+hI0NQkThz8QK63dKrhnDtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Im5+F6P9; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-b8fd976e90cso495037066b.0
+        for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 12:20:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771791606; x=1772396406; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ziqVjObozmBP/YMpMD3gIg2L0bYhVbhRy21Cs0R6NM4=;
+        b=Im5+F6P9mQnTRX6lgEV7pYRTS5FxSC6LH2GxXTbY553unxaWlpMZBCn2C9nS44M79U
+         wFouC2OvIKcB+qoSmWZjCHB4lVDpZBV5rmOKrQiOY9a+CvfnWIVuGg8QFisW7/j1nNQz
+         NFWHJARiDrDLEEwQC/yhoDp+Ge1o1mskdSA+HcEf6/Ru3pwMxXcr2I+5pVQcrKb6OAet
+         /sWAm7oaslecI06aHwmptjaf5IXnKGbFiw6Nt6PH5C2p0uYZGJTpKNG6JLlYqK3SU+wb
+         XghlSwLBaN3FVELPBxv6l6HBUWqR/kgeEtSJ/R7pNhC0SxgeCTulRAIlJoAwxw8qnv66
+         Qn5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771791606; x=1772396406;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ziqVjObozmBP/YMpMD3gIg2L0bYhVbhRy21Cs0R6NM4=;
+        b=wRLtPDey/vK4ot8p+aX6VPczkY3AoDlrUHlT8oLZx2Z+qwAgw7cHzfABy0E8+PmaOa
+         dQHuoybrK1VXbxOYkhUdsWouogrbHVT/jxGXKiwZYP8cgdEh2H8CJeEPWkoDTMhBADZ2
+         v8PbDdNm/94RYS2wPfH6s9PvTb5N4sXVZRl2UlNh406eRUG1h/rO3quAlXjKEicO0Bhi
+         4VpGQMHrUw5NNxirUvuHHwGdFzvljCulfzwSEY6jjz+8Ut5kQOzi2uKdK55CAqicNA/G
+         wFqlIdWHfisEUJkGFksQAOvu8xI69JS+FMIm3MuSUcXzXVu39kEJssMnr6YP3mWZEYu1
+         8UCw==
+X-Forwarded-Encrypted: i=1; AJvYcCViq/tBbUXri+HiiRnxKiCBqx2FJwtvvXo4DlPCKyLXdaxVLNE7CYSQQD0HQ6LR9Qjy8B59+00=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIL16hDgkiEIHIltcZicWCOiv7fqmoo6iPjhkRG2NiLI6eYnqM
+	BFmhheU5XFjzUHwTuiPMafsO+gqSrm2UoVsVptc3XwjI8BLGnth/tQM/
+X-Gm-Gg: AZuq6aJznzcys/xJWmd7T5Q2boSzQr1VDppHTl6+GgxG7Ct/KHzgt0Ai1Yhe6Dbkuft
+	t3HjF4OuHP7dBUVFNQJRRBqRXMiqDkhPUPuC35yYq8J/F2TXazaA8/o8rPqdf44SAUsboEAj+Mo
+	JvK+Xbb0qnTcd33iiY1IDW0LnIRJi2DFTwje+6BHlqN5IV18rHwCSBtwWz1XT5e0a596ucrr0L/
+	TLkKhT8X0o1fGlhHg19ibOBDznpu+8y+apU17u0AdkhHhy/4gOElbJDp1wQ0azUUAf3SF2iRGij
+	PyHmV8vA0U715+jKuW9y+a5Ga6T2ZteWKDsd55Y4MxB5/+bh3sjrtZH7suve0+N/vG1A38GAt6N
+	JO+8r/qd/scOjrY+esgdNlwHuCJy/6TurA8Vw2HxsiDeA/r8sVvx3GYzaNZYdO/DNYot5quTBSz
+	eLy6VAmRLvKMugxHOxyiEpMgozHwYLWk87tXDhwWu01rXrkO6QNN19Q9grJO9QDPzGwAgZSmdJm
+	A211D+ykpMmsvFAB6vXvCpT/1iUUrKVE0NzLQox1Z5AVOX2gWS112ooxlorobGpTARiXQrKLv1E
+	g3hNTOve4k0CGMbFwRT8NT/R7ueuUr7Clg==
+X-Received: by 2002:a17:907:3d4b:b0:b8f:e43d:d5fe with SMTP id a640c23a62f3a-b9081a0cbc8mr417794866b.20.1771791605886;
+        Sun, 22 Feb 2026 12:20:05 -0800 (PST)
+Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-65eab9ac4acsm1892737a12.14.2026.02.22.12.20.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 22 Feb 2026 12:20:04 -0800 (PST)
+Message-ID: <a4af5ff8-7aff-454d-8990-2922f1b9bbf3@gmail.com>
+Date: Sun, 22 Feb 2026 21:20:03 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,93 +88,114 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] nfc: trf7970a: Fix spelling mistakes in comments
-To: tomasz.unger@yahoo.pl
-Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260219112454.46841-1-tomasz.unger.ref@yahoo.pl>
- <20260219112454.46841-1-tomasz.unger@yahoo.pl>
+Subject: Re: [PATCH RFC v1 nf-next] netfilter: nf_flow_table_ip: Introduce
+ nf_flow_vlan_push()
+To: Florian Westphal <fw@strlen.de>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20260222155251.76886-1-ericwouds@gmail.com>
+ <aZs8atSEZTjkzzQ3@strlen.de>
+From: Eric Woudstra <ericwouds@gmail.com>
 Content-Language: en-US
-From: Mark Greer <mgreer@animalcreek.com>
-Organization: Animal Creek Technologies, Inc.
-In-Reply-To: <20260219112454.46841-1-tomasz.unger@yahoo.pl>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <aZs8atSEZTjkzzQ3@strlen.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
-	R_DKIM_ALLOW(-0.20)[animalcreek.com:s=fm1,messagingengine.com:s=fm3];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[animalcreek.com];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-259908-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	FREEMAIL_TO(0.00)[yahoo.pl];
-	DKIM_TRACE(0.00)[animalcreek.com:+,messagingengine.com:+];
-	RCPT_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_FROM(0.00)[bounces-259909-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mgreer@animalcreek.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ericwouds@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[animalcreek.com:mid,animalcreek.com:dkim,animalcreek.com:email]
-X-Rspamd-Queue-Id: 8C0BA170437
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 920C61704A3
 X-Rspamd-Action: no action
 
-On 2/19/26 4:24 AM, tomasz.unger@yahoo.pl wrote:
-> From: Tomasz Unger <tomasz.unger@yahoo.pl>
->
-> Fix spelling mistakes in comment block (lines 64, 69, 72):
-> - 'recieves' -> 'receives'
-> - 'recieving' -> 'receiving'
-> - 'recived' -> 'received'
->
-> Found by manual inspection.
->
-> Signed-off-by: Tomasz Unger <tomasz.unger@yahoo.pl>
-> ---
->   drivers/nfc/trf7970a.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/nfc/trf7970a.c b/drivers/nfc/trf7970a.c
-> index d17c701c7888..c3bf48f49eca 100644
-> --- a/drivers/nfc/trf7970a.c
-> +++ b/drivers/nfc/trf7970a.c
-> @@ -61,15 +61,15 @@
->    * support that.  So, if an abort is received before trf7970a_send_cmd()
->    * has sent the command to the tag, it simply returns -ECANCELED.  If the
->    * command has already been sent to the tag, then the driver continues
-> - * normally and recieves the response data (or error) but just before
-> + * normally and receives the response data (or error) but just before
->    * sending the data upstream, it frees the rx_skb and sends -ECANCELED
->    * upstream instead.  If the command failed, that error will be sent
->    * upstream.
->    *
-> - * When recieving data from a tag and the interrupt status register has
-> + * When receiving data from a tag and the interrupt status register has
->    * only the SRX bit set, it means that all of the data has been received
->    * (once what's in the fifo has been read).  However, depending on timing
-> - * an interrupt status with only the SRX bit set may not be recived.  In
-> + * an interrupt status with only the SRX bit set may not be received.  In
->    * those cases, the timeout mechanism is used to wait 20 ms in case more
->    * data arrives.  After 20 ms, it is assumed that all of the data has been
->    * received and the accumulated rx data is sent upstream.  The
 
 
-Wow... and I actually know how to spell receive. if you can believe that.
+On 2/22/26 6:27 PM, Florian Westphal wrote:
+> Eric Woudstra <ericwouds@gmail.com> wrote:
+>> With double vlan tagged packets in the fastpath, getting the error:
+>>
+>> skb_vlan_push got skb with skb->data not at mac header (offset 18)
+>>
+>> Introduce nf_flow_vlan_push, that can push the inner vlan in the
+>> fastpath.
+>>
+>> Fixes: c653d5a78f34 ("netfilter: flowtable: inline vlan encapsulation in xmit path")
+> 
+> This change is in net/nf tree, so why are you targetting nf-next?
+> Are you proposing a revert for nf?  If so, please first send a revert
+> for nf.
+> 
+> Is there a test case for this that demonstrages the breakage?
+> 
+> And why is this tagged as RFC, what is the problem with this patch?
+> 
 
+I have run into this, when testing my branch for implementing the
+bridge-fastpath, not in the forward-fastpath. But anyway, no matter how
+packets are handled in the original path (forwarding or bridged), once
+going through the fastpath it would not matter, so it is broken in any
+fastpath.
 
-Acked-by: Mark Greer <mgreer@animalcreek.com>
+I have the complete testcase for bridge-fastpath here:
+
+https://github.com/ericwoud/linux/commits/bpir-nftflow-nf-next
+
+I do not have a ready to use testcase in the forward-fastpath, but is is
+clearly broken. So this is why I started with an RFC first.
+
+>> +	if (skb_vlan_tag_present(skb)) {
+>> +		struct vlan_hdr *vhdr;
+>> +
+>> +		if (skb_cow_head(skb, VLAN_HLEN))
+>> +			return -1;
+>> +
+>> +		__skb_push(skb, VLAN_HLEN);
+>> +		skb_reset_network_header(skb);
+>> +
+>> +		vhdr = (struct vlan_hdr *)(skb->data);
+>> +		vhdr->h_vlan_TCI = htons(id);
+>> +		vhdr->h_vlan_encapsulated_proto = skb->protocol;
+>> +		skb->protocol = proto;
+> 
+> Ok, I see, this opencodes a variant of skb_vlan_push().
+> Would it be possible to correct skb->data so it points to the mac header
+> temporarily?  skb->data always points to network header so this cannot
+> have worked, ever.
+
+The code here for the inner header is an almost exact copy of
+nf_flow_pppoe_push(), which was also implemented at the same time.
+So handling pppoe and inner-vlan header is implemented in the same
+manner, which keeps it simple and uniform. If one functions
+(in)correctly, then so would the other.
+
+I've been implementing handling the inner vlan header like this for a
+half year now. My version of nf_flow_encap_push() was a bit different,
+but after this patch it is quite similar.
 
 
