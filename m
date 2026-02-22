@@ -1,133 +1,264 @@
-Return-Path: <netdev+bounces-259885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259886-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YJHhGC0rm2nfuQMAu9opvQ
-	(envelope-from <netdev+bounces-259885-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 17:13:33 +0100
+	id MBxFMg0vm2lluwMAu9opvQ
+	(envelope-from <netdev+bounces-259886-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 17:30:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B27D016F995
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 17:13:32 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 426EE16FA16
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 17:30:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6E412300C007
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 16:13:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3C3AD3005655
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 16:30:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0E603502B5;
-	Sun, 22 Feb 2026 16:13:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C6CA357A20;
+	Sun, 22 Feb 2026 16:30:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Swzw9aeL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D64R3jrn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE1FD34FF41
-	for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 16:13:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05B53357716;
+	Sun, 22 Feb 2026 16:30:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771776810; cv=none; b=qptzKPLxW36h2Dr4qfvrzZ2H4lzVK5+mxbOzPfKhKZoBbdq7XKrTVnqk7P9Bc9vZidCbklFRHpAtISm57CBeY44Fx4azTHEGMTVIyPGAl4KgebtgFaRJhu6C50kM5eB3O+k+8Hznd+juJLTQSzBYfk0dZlveNmTN75B3n5J+HU4=
+	t=1771777803; cv=none; b=sD0famZsPgDm5Q5oeV0b0ZF4UDxvO2NsKC32bV8TNtKSbeqdwzNkQ2jeMMgwanismC+Q24spw/ov4InQCYEb1foYF7erBnfmwuagIB6cQwSraKtrygKBR6LyOAOsEcJ3NK7H3YVpUms6mL4ua+GbqxazTX91wjbMoVS4BSza0xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771776810; c=relaxed/simple;
-	bh=v/6hFuSO8PJHKsZtPakfmI7341eYHwTYsiJnuIJ7aEM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D5THQYNnfI95NEC+wPVq1acflDJTZvU44H+foj16mZD6AjOFMw6K46qcoDJNO3cs5dp4Y297rbWF3oxtqZW/FjHNi0c1htxoXEGEure8Q8Dn18m+1P415+xYFu51jsm3cv7IU0Z4MX+vEf1fBqB0dDD3fb9r4IrRS+xpWqSaE5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Swzw9aeL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C78DBC116D0;
-	Sun, 22 Feb 2026 16:13:22 +0000 (UTC)
+	s=arc-20240116; t=1771777803; c=relaxed/simple;
+	bh=r8blr4lUK/hyGtCcj6d0ju2YO+6PPYpgeQ+iODPCV2k=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=u8TpIYyoUzlOgMkI2wNo9qgfuqdqPq040XJ/lKWgmLJ5TVLm5ws+xhqXFaCDBOlcxG0mGdR2m8oipRciZziZAraXoIhTpFtxm1+oHx/vp39/Ruhluuq+paBPYG6vAV95TLnd+cMayWX1bx+C/4ZUS7IRkUPr3pF3GaQVLZ7iuTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D64R3jrn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 108C9C116D0;
+	Sun, 22 Feb 2026 16:29:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771776810;
-	bh=v/6hFuSO8PJHKsZtPakfmI7341eYHwTYsiJnuIJ7aEM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Swzw9aeL/fPjVDloXgfcmXciuhkPrtRCexdsaTuogDoS5wxaPU7uz6WITTo1OwFdR
-	 VVxzjT4xKHGVhcVQ9DmXrNkI3keyvx9QyscXuXhygL45XQoYZeGipx5Wrdwn03JEKT
-	 XY415XS3jpwK1CknjC3nKFXTzbKVVTYulBQE/QD2zSMNbtI736IVM8c1K0pLqwKCVD
-	 +UxmJycvbqRJd1BJr8xoEydhOPFOndXMrBFLp7fZCjIvV/JxWepdCzZgDaY5l2v7Db
-	 0WzEaYbvl3Ttb9c3C9dNJe9QgV9nbDpOLjIrIsuP7x1X5uy1fJezOfxZPtqVg4qR/k
-	 26/HL5EDoY7Fw==
-Date: Sun, 22 Feb 2026 16:13:19 +0000
+	s=k20201202; t=1771777802;
+	bh=r8blr4lUK/hyGtCcj6d0ju2YO+6PPYpgeQ+iODPCV2k=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=D64R3jrn2VIvuTjEvCQJYfO0SMH8ZC/bkcq3qDt1pNiXD33gHEhHIZtCRpMUsPicw
+	 d2yk83fh2WRM/g0u6LvlOc8ACkTGd6vjrp9D/BeivT87IAV5syryMaBD726L3IzM08
+	 stESZxL+ruOqFuGlbKC7U4L52EqUDvOYJTJiStcHg0RqKKis25WEI1PEwntVG7eX/U
+	 Gogbgcuc5WDFTIhTOaLlQ5VhfIwkJjWsQgwvcZefkcn1JAe3GEu3SAtib9DWUuWMhn
+	 rdr+KpLnk+2rXGxeXifjS1VJ57tW9Vp7R8K2rGkdzcst8od9oRzUC07Ic8rNzJXtSu
+	 ztuIiDzwmKITw==
 From: Simon Horman <horms@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, leitao@debian.org
-Subject: Re: [PATCH net] netconsole: avoid OOB reads, msg is not
- nul-terminated
-Message-ID: <aZsrH23rOB0Z4_fz@horms.kernel.org>
-References: <20260219195021.2099699-1-kuba@kernel.org>
+To: anthony.l.nguyen@intel.com
+Cc: Simon Horman <horms@kernel.org>,
+	joshua.a.hay@intel.com,
+	aaron.ma@canonical.com,
+	przemyslaw.kitszel@intel.com,
+	Samuel.salin@intel.com,
+	jacob.e.keller@intel.com,
+	pmenzel@molgen.mpg.de,
+	sridhar.samudrala@intel.com,
+	brett.creeley@amd.com,
+	decot@google.com,
+	david.m.ertman@intel.com,
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	sreedevi.joshi@intel.com,
+	rafal.romanowski@intel.com,
+	en-wei.wu@canonical.com,
+	dima.ruinskiy@intel.com,
+	michal.kubiak@intel.com,
+	tglx@kernel.org,
+	pabeni@redhat.com,
+	willemb@google.com,
+	avigailx.dahan@intel.com,
+	davem@davemloft.net,
+	aleksandr.loktionov@intel.com,
+	edumazet@google.com,
+	piotr.kwapulinski@intel.com,
+	sx.rinitha@intel.com,
+	emil.s.tantilov@intel.com,
+	brianvv@google.com,
+	vitaly.lifshits@intel.com,
+	jedrzej.jagielski@intel.com,
+	stable@vger.kernel.org,
+	kuba@kernel.org,
+	richardcochran@gmail.com,
+	joe@dama.to,
+	mschmidt@redhat.com,
+	boolli@google.com
+Subject: Re: [net,13/13] e1000e: correct TIMINCA on ADP/TGP systems with wrong XTAL frequency
+Date: Sun, 22 Feb 2026 16:28:35 +0000
+Message-ID: <20260222162835.23954-1-horms@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260220004027.729384-14-anthony.l.nguyen@intel.com>
+References: <20260220004027.729384-14-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260219195021.2099699-1-kuba@kernel.org>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259885-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,intel.com,canonical.com,molgen.mpg.de,amd.com,google.com,lunn.ch,vger.kernel.org,lists.osuosl.org,redhat.com,davemloft.net,gmail.com,dama.to];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[39];
+	TAGGED_FROM(0.00)[bounces-259886-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B27D016F995
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 426EE16FA16
 X-Rspamd-Action: no action
 
-On Thu, Feb 19, 2026 at 11:50:21AM -0800, Jakub Kicinski wrote:
-> msg passed to netconsole from the console subsystem is not guaranteed
-> to be nul-terminated. Before recent
-> commit 7eab73b18630 ("netconsole: convert to NBCON console infrastructure")
-> the message would be placed in printk_shared_pbufs, a static global
-> buffer, so KASAN had harder time catching OOB accesses. Now we see:
-> 
->     printk: console [netcon_ext0] enabled
->     BUG: KASAN: slab-out-of-bounds in string+0x1f7/0x240
->     Read of size 1 at addr ffff88813b6d4c00 by task pr/netcon_ext0/594
-> 
->     CPU: 65 UID: 0 PID: 594 Comm: pr/netcon_ext0 Not tainted 6.19.0-11754-g4246fd6547c9
->     Call Trace:
->      kasan_report+0xe4/0x120
->      string+0x1f7/0x240
->      vsnprintf+0x655/0xba0
->      scnprintf+0xba/0x120
->      netconsole_write+0x3fe/0xa10
->      nbcon_emit_next_record+0x46e/0x860
->      nbcon_kthread_func+0x623/0x750
-> 
->     Allocated by task 1:
->      nbcon_alloc+0x1ea/0x450
->      register_console+0x26b/0xe10
->      init_netconsole+0xbb0/0xda0
-> 
->     The buggy address belongs to the object at ffff88813b6d4000
->                 which belongs to the cache kmalloc-4k of size 4096
->     The buggy address is located 0 bytes to the right of
->                 allocated 3072-byte region [ffff88813b6d4000, ffff88813b6d4c00)
-> 
-> Fixes: c62c0a17f9b7 ("netconsole: Append kernel version to message")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+e1000e: correct TIMINCA on ADP/TGP systems with wrong XTAL frequency
 
+On some Tiger Lake (TGP) and Alder Lake (ADP) platforms, the hardware
+XTAL clock is incorrectly interpreted as 24 MHz instead of the actual
+38.4 MHz. The commit measures PHC vs system time over 1 ms and if the
+delta exceeds 100 microseconds, reprograms TIMINCA for the 38.4 MHz
+profile and reinitializes the timecounter.
+
+> diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
+> index 814698807f3d..ae35ac479026 100644
+> --- a/drivers/net/ethernet/intel/e1000e/netdev.c
+> +++ b/drivers/net/ethernet/intel/e1000e/netdev.c
+
+[ ... ]
+
+> @@ -3905,6 +3905,80 @@ static void e1000_flush_desc_rings(struct e1000_adapter *adapter)
+>  		e1000_flush_rx_ring(adapter);
+>  }
+>
+> +/**
+> + * e1000e_xtal_tgp_workaround - Adjust XTAL clock based on PHC and system
+> + * clock delta.
+> + * @adapter: Pointer to the private adapter structure
+> + *
+> + * Measures the time difference between the PHC (Precision Hardware Clock)
+> + * and the system clock over a 1 millisecond interval. If the delta
+> + * exceeds 100 microseconds, reconfigure the XTAL clock to 38.4 MHz.
+> + */
+> +static void e1000e_xtal_tgp_workaround(struct e1000_adapter *adapter)
+> +{
+> +	s64 phc_delta, sys_delta, sys_start_ns, sys_end_ns, delta_ns;
+> +	struct ptp_system_timestamp sys_start = {}, sys_end = {};
+> +	struct ptp_clock_info *info = &adapter->ptp_clock_info;
+> +	struct timespec64 phc_start, phc_end;
+> +	struct e1000_hw *hw = &adapter->hw;
+> +	struct netlink_ext_ack extack = {};
+> +	unsigned long flags;
+> +	u32 timinca;
+> +	s32 ret_val;
+> +
+> +	/* Capture start */
+> +	if (info->gettimex64(info, &phc_start, &sys_start)) {
+> +		e_dbg("PHC gettimex(start) failed\n");
+> +		return;
+> +	}
+> +
+> +	/* Small interval to measure increment */
+> +	usleep_range(1000, 1100);
+> +
+> +	/* Capture end */
+> +	if (info->gettimex64(info, &phc_end, &sys_end)) {
+> +		e_dbg("PHC gettimex(end) failed\n");
+> +		return;
+> +	}
+> +
+> +	/* Compute deltas */
+> +	phc_delta = timespec64_to_ns(&phc_end) -
+> +		    timespec64_to_ns(&phc_start);
+> +
+> +	sys_start_ns = (timespec64_to_ns(&sys_start.pre_ts) +
+> +			timespec64_to_ns(&sys_start.post_ts)) >> 1;
+> +
+> +	sys_end_ns = (timespec64_to_ns(&sys_end.pre_ts) +
+> +		      timespec64_to_ns(&sys_end.post_ts)) >> 1;
+> +
+> +	sys_delta = sys_end_ns - sys_start_ns;
+> +
+> +	delta_ns = phc_delta - sys_delta;
+> +	if (delta_ns > 100000) {
+> +		e_dbg("Corrected PHC frequency: TIMINCA set for 38.4 MHz\n");
+> +		/* Program TIMINCA for 38.4 MHz */
+> +		timinca = (INCPERIOD_38400KHZ <<
+> +			   E1000_TIMINCA_INCPERIOD_SHIFT) |
+> +			  (((INCVALUE_38400KHZ <<
+> +			     adapter->cc.shift) &
+> +			   E1000_TIMINCA_INCVALUE_MASK));
+
+Is adapter->cc.shift correct here? When e1000e_xtal_tgp_workaround runs,
+the earlier call to e1000e_get_base_timinca (via e1000e_phc_adjfine in
+e1000e_systim_reset) has already set adapter->cc.shift based on the
+incorrectly reported 24 MHz XTAL frequency.
+
+On affected hardware where SYSCFI reports 24 MHz:
+
+e1000e_systim_reset()
+ -> e1000e_phc_adjfine(0)
+    -> e1000e_get_base_timinca() sets:
+       adapter->cc.shift = INCVALUE_SHIFT_24MHZ (14)
+ -> e1000e_xtal_tgp_workaround()
+
+So when computing TIMINCA for 38.4 MHz, the code uses shift=14:
+
+  INCVALUE_38400KHZ << 14 = 26 << 14 = 425984
+
+But the 38.4 MHz profile needs shift=19:
+
+  INCVALUE_38400KHZ << 19 = 26 << 19 = 13631488
+
+This produces timinca = 17203200 instead of the correct 30408704.
+
+Additionally, the subsequent timecounter_init call uses adapter->cc which
+still has shift=14. This computes tc->mask = (1ULL << 14) - 1 = 16383
+instead of the correct (1ULL << 19) - 1 = 524287.
+
+Should the function update adapter->cc.shift = INCVALUE_SHIFT_38400KHZ
+before computing timinca and calling timecounter_init, matching the
+pattern in e1000e_get_base_timinca for the 38.4 MHz profile?
+
+> +		ew32(TIMINCA, timinca);
+> +
+> +		/* reset the systim ns time counter */
+> +		spin_lock_irqsave(&adapter->systim_lock, flags);
+> +		timecounter_init(&adapter->tc, &adapter->cc,
+> +				 ktime_to_ns(ktime_get_real()));
+> +		spin_unlock_irqrestore(&adapter->systim_lock, flags);
+> +
+> +		/* restore the previous hwtstamp configuration settings */
+> +		ret_val = e1000e_config_hwtstamp(adapter,
+> +						 &adapter->hwtstamp_config,
+> +						 &extack);
+> +		if (ret_val && extack._msg)
+> +			e_err("%s\n", extack._msg);
+> +	}
+> +}
+
+[ ... ]
 
