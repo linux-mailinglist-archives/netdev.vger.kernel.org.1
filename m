@@ -1,232 +1,227 @@
-Return-Path: <netdev+bounces-259902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259903-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wM1LIQlgm2kmywMAu9opvQ
-	(envelope-from <netdev+bounces-259902-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 20:59:05 +0100
+	id UC7qLQxgm2kmywMAu9opvQ
+	(envelope-from <netdev+bounces-259903-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 20:59:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D17BB1703D4
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 20:59:04 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CB971703E2
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 20:59:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 27924300A749
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 19:58:43 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C56773009380
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 19:59:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F39035C183;
-	Sun, 22 Feb 2026 19:58:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A441135C185;
+	Sun, 22 Feb 2026 19:59:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sP7CsShI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mHwWiTl2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA8735BDCE
-	for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 19:58:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3250C35BDB8
+	for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 19:59:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771790322; cv=none; b=kmYYmtSKn46hw4Q4V6dE0NMX1RObb2i36DenIA2fii1xdzOhUwirMiudlsBXQSkeSH1Mj8TCIw73Iy8hWU9E2NwblvRJnTqmIQzVT193EaDn9zX0zBUXVTGEDiOL/h7EcYgwj6LscdtCw4JRT752rO07wQJKeyS4KfA/bE5F+lE=
+	t=1771790344; cv=none; b=BIo62VVl8piSWMhYA0NS9f/JWkXRCWA0Or20J+zoI1dM4fnyrqcfMPWt440ugSOkZb9OWH1uDRB0hp8jdNjIoeVsFX2A42Uk0xZA94s5AmGZKYkICyBHNgabyixzWibbI3LzvNBIMOKZp6Vd5nfbXEpMR6sZ+8ajVGYG9R76978=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771790322; c=relaxed/simple;
-	bh=XbOYmoiKmvZc0TpiZ+4qaUVvKWKkSTRjdYI8od7dCLM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lK0VMH59ije0XFSEpWvh4nBX7M+FIwyzZ4yQyrOsZZPkKI2eyhijCxcpGorPOAgDzqB70nYCgrsEkaGZ5jszw3isEqdplr1idzBga6GUKvsbjMpGWn6SIzcFFUbxecaRp4WwR7cH+460Hfvg7RlxBL9nfJmBX5TCtCbgZTDPhno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sP7CsShI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35E1CC2BCB2
-	for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 19:58:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771790322;
-	bh=XbOYmoiKmvZc0TpiZ+4qaUVvKWKkSTRjdYI8od7dCLM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=sP7CsShIa+9tBAVOpZoUIyhDovnLK/iulAF3RRMZoVAv/3wx5MN5ZaXKYHtNMN/6X
-	 h9nkrDHQUcI9orrG41egzrvDkiODBKN44kR9DF1ZcZxNXMfzD/FsUR1EzZqx1/G2e6
-	 Hps8rYr6+wDQY2kZw5Qcil6Ed7fCij3fXVLDUuQmDsZAE2HmlZEv5oDVRFcmfLxMQj
-	 GWEf2Eh24FuxP/RRwOAiNV0Ub7QXW1LLwXcHHsuZwqBfgBSzb3lZLUW9qnfa+9/CpI
-	 TKb70YzBkJCzTWqJ0O+WJ924S/wnKzc7VvJqV3dXlJ8TVP/1NMeFvxhvGazugmNAvl
-	 kuU0TLvGdmU1Q==
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-8951c720496so20773376d6.2
-        for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 11:58:42 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWWvg1oRSiFk1NcYwEdAv4AIedEgT0OgNJhC/Mxxw3n4ewqK6lQhbrXWWsFFjm3lrLjvOhjP8M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxvu5KcFyR2Knwspx+OE01cYguzty4RCQCrIj94/0YHjKGTUQPM
-	zj8wb8yYxtbwHSQMmaMZ/xp9Oacn+iFI73+1ftoPSEYCEfV4BR0/j1oFEv2XgnvU5E+2fHCykiR
-	r6orIeDuA1jdSj+TkLCyDjBpq0ZM6CLc=
-X-Received: by 2002:a05:6214:20ea:b0:888:fc37:f9b7 with SMTP id
- 6a1803df08f44-89979c78478mr88266616d6.25.1771790321119; Sun, 22 Feb 2026
- 11:58:41 -0800 (PST)
+	s=arc-20240116; t=1771790344; c=relaxed/simple;
+	bh=2r0CUzvJW0jUKiBlQ8CAUks8FkA5M+bm5AgY23WtjyM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZE/gNs56MKct0RSDDAVRD6mEg+2gLkCZii5qNKk+m790UHECgEGuPVBhEirVGcqFLzGGj3tPz9G6y5TPujv0mRzzcR8vXMLZ1E5ykaeIqsa6vS/1GSt31KuQDtPoUmhcYmeo0A6ItCZnFNWWI7olFnVHGWP2swd1LNAH+tREVBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mHwWiTl2; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b885e8c6727so655486266b.1
+        for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 11:59:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771790341; x=1772395141; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0QUz8L/CWko35QAQoLR3+2iYYOTyA5StSVzZHwFaV9s=;
+        b=mHwWiTl2s8gycdG3ji++VEgMcnuFx8cQddjV6Q5mELECSxfwdY0h6SBftlcGXNlCto
+         YKQEwA7dgNqar50inT9NyQtFZGtHEmUWTan1LExLfMY9LAJG84ldXONnEoeSEXVRL9ce
+         n+LfyXtW5J/AEJOU6fYd5cu1UNDHdeAFc6QCRnT4ypeld8sRBxSVxuZdJWvCL/mso3Ml
+         4Gr82oW7Qv6q2EPCUEXPaBGXqjI2kLDEuJmdlIfk1kdXId++UmRfjHB7GNvjVjErROia
+         j8q8NNDC46EEkXEirTEBV4lVSQkoiOZCnvke/NS54Tqvr6d5OGtAHMnU+CX0Ix40Zvnv
+         EMlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771790341; x=1772395141;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0QUz8L/CWko35QAQoLR3+2iYYOTyA5StSVzZHwFaV9s=;
+        b=LS5xTy8hAuZd8sHaJ0Vrzspewfco03pmWJ+rNMjAjtUQO4y62Vzm1+ttZ1pEGuLkzm
+         xVqlIgMNuvkw8TN49H/D1t7yuVQxweaJ9xj9tKLpHZQZBhKWXBUZdtLSG/N2lmv6yywD
+         ItU+ztMBv+bgzwyPHXfj19F6sYFztxiYFkmZ/92lD6Enb9uCgxzTIPFkb2BrkFswWMOT
+         BoT/TWucr07oaX58IHJbd5IDXC/Nn53Fe6MK6hPqElR6mtF5bI796JrfbLftloTw0sAb
+         4MwR4JVw8ueVSYqxA270zVLO1Hw1wy0nBcRkAt060pWmpDBm23qXd5hQpuU7iTJFR/Wk
+         SeZw==
+X-Forwarded-Encrypted: i=1; AJvYcCXhyt/nsULPtTHlf9WS7ViesLK+JtQd3ZRWuB+/Z8VdzfZGVz0qpXmrdead8sX9WziEELHyK5E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxl4+NjLl5WIVQGiVmEPLpCvYPSsY+9+3U4rs9dsFx8TCSZ5NnQ
+	4sSeSFy7FSNETDa/Roq9Lle9KOPXmrrTjfS+QyoR0afUVioCwDGLmqK4
+X-Gm-Gg: AZuq6aKrLkNvJUy5+AMdle1tBHM+dqqmCN95lI76misnNRG9wPKrab4l9jvOwNSfUj1
+	i0sDSnaWDRYxPG8Y6jjxFS1eRq90ltngqbQAqbQ3bq/luT7bjUb0blYrelMmlgSg0ruaoDOVG+O
+	AMXMkFTEBiXAarrp6GOZYp3Klleu8r1FdEWMKwJuCxNWUyqU8cURUW6Ur2N8cG6gRJ7f66FdzBM
+	J6/nn1TQ18avhaU1+TsED83EYn92W4ceFj1zGpEfCAtDRnVnojVm0UxLTvrNQXA+LdI3TjlObDn
+	3x2BYGms3Osqp+0XSVrsQneJJJ8DZ0tG5yQf1ZBg/yvbC0EhYEXX2hmrMl1jhJvjcLhiN1SUP7C
+	DhpiFP90DQiy3FHhfBZMyGjnjYPdMmPwc+DUN3gya+iJRbhcyFiRjjeV8qyyEsvztviOHnTjD+l
+	pRDu5XYJmkKPwmaPBEUHjrH2gyL6IckuMb768V7VERpFJ19gBjdYB1cVO7ZvvyasmYVJsSwi8iU
+	0Kjr9wJ+qD7NtpduKhQI4BeK5NmyUjSgNMjbjAvJatfPwhX3KEtlCeBBjPMWoEo8w==
+X-Received: by 2002:a17:907:ea8:b0:b88:3877:d922 with SMTP id a640c23a62f3a-b9080f34a6bmr415866766b.10.1771790341184;
+        Sun, 22 Feb 2026 11:59:01 -0800 (PST)
+Received: from eric (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9084c5c514sm246125466b.5.2026.02.22.11.58.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 22 Feb 2026 11:59:00 -0800 (PST)
+From: Eric Woudstra <ericwouds@gmail.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>
+Cc: netfilter-devel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	bridge@lists.linux.dev,
+	Eric Woudstra <ericwouds@gmail.com>
+Subject: [PATCH v18 nf-next 0/4] conntrack: bridge: add double vlan, pppoe and pppoe-in-q
+Date: Sun, 22 Feb 2026 20:58:39 +0100
+Message-ID: <20260222195845.77880-1-ericwouds@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260219130050.2390226-1-bjorn@kernel.org> <415c4922-cc8d-4e35-bbac-3a532f44d238@lunn.ch>
- <20260219160519.323041bf@kernel.org> <3b0949fa-0b05-4bce-86c0-2a7a058865a5@lunn.ch>
- <20260220131254.03874c4c@kernel.org>
-In-Reply-To: <20260220131254.03874c4c@kernel.org>
-From: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-Date: Sun, 22 Feb 2026 20:58:30 +0100
-X-Gmail-Original-Message-ID: <CAJ+HfNgXqpqDYsmAa-mpHnO82aDgC7XbyVw3TmXk-ySFmGA-JQ@mail.gmail.com>
-X-Gm-Features: AaiRm50dFFABjs7xMRr7bPvGJoJmWkgrR5jZgwSuGpuHDNGj6z0XXgMM_PtlaCQ
-Message-ID: <CAJ+HfNgXqpqDYsmAa-mpHnO82aDgC7XbyVw3TmXk-ySFmGA-JQ@mail.gmail.com>
-Subject: Re: [RFC net-next 0/4] ethtool: CMIS module diagnostic loopback support
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org, 
-	Donald Hunter <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Maxime Chevallier <maxime.chevallier@bootlin.com>, 
-	Michael Chan <michael.chan@broadcom.com>, Hariprasad Kelam <hkelam@marvell.com>, 
-	Ido Schimmel <idosch@nvidia.com>, Danielle Ratson <danieller@nvidia.com>, linux-kernel@vger.kernel.org, 
-	linux-rdma@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.01 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.67)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,vger.kernel.org,gmail.com,davemloft.net,google.com,redhat.com,kernel.org,nvidia.com,bootlin.com,broadcom.com,marvell.com];
-	TAGGED_FROM(0.00)[bounces-259902-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259903-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[bjorn@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ericwouds@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D17BB1703D4
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1CB971703E2
 X-Rspamd-Action: no action
 
-Andrew/Kuba!
+Conntrack bridge only tracks untagged and 802.1q.
 
-Thanks for having a look!
+To make the bridge-fastpath experience more similar to the
+forward-fastpath experience, introduce patches for double vlan,
+pppoe and pppoe-in-q tagged packets to bridge conntrack and to
+bridge filter chain.
 
-On Fri, 20 Feb 2026 at 22:12, Jakub Kicinski <kuba@kernel.org> wrote:
+Changes in v18:
 
->> > Something like:
->> >
->> >   struct {
->> >      enum type;   // MAC, PHY, SFP
->> >      int type_id; // if type=3DPHY - phy id
->> >      int depth;   // counting from CPU, first loopback opportunity is =
-1
->> >                   // second is 2, etc.
->> >      bool direction; // towards CPU/host vs towards network
->> >      char name[16];  // "pcs", "far", "near", "post-fec", whatever
->> >   }
->>
->> Lets see what comes from the drawing board, but i was more thinking
->> about expanding the bitmap this proposal already has, extending it to
->> other layers.
->
->IIUC the bitmap this proposal has is basically a product of
->direction x depth: [host, network] x [nearest, furthest]
->plus its scoped to SFP.
+- Rebased
+- ‎nf_conntrack_bridge: added #include <linux/ppp_defs.h>
+- nf_checksum(_partial)(): changed WARN_ON to WARN_ON_ONCE.
+- nft_set_bridge_pktinfo(): changed call to pskb_may_pull() to
+   skb_header_pointer().
 
-(Digging into different ways to loopback, rather than drawing board,
-but here goes! ;-))
+Changes in v17:
 
-I'd agree with Jakub here, unless I'm not getting the details of what
-you mean, Andrew. Sounds like we'd end up with a huge bitmap? I
-suggest tweaking Jakub's idea to something like:
+- Add patch for nft_set_pktinfo_ipv4/6_validate() adding nhoff argument.
+- Stopped using skb_set_network_header() in nft_set_bridge_pktinfo,
+   using the new offset for nft_set_pktinfo_ipv4/6_validate instead.
+- When pskb_may_pull() fails in nft_set_bridge_pktinfo() set proto to 0,
+   resulting in pktinfo unspecified.
 
-/* loopback.c: A new ETHTOOL_MSG_LOOPBACK_{GET,SET} */
+Changes in v16:
 
-/* Loopback layers/scope
-enum ethtool_loopback_layer {
-    ETHTOOL_LB_LAYER_SW =3D 0,    /* Software/Kernel stack loopback */
-    ETHTOOL_LB_LAYER_MAC,        /* MAC/Controller internal */
-    ETHTOOL_LB_LAYER_PCS,        /* Physical Coding Sublayer (Digital) */
-    ETHTOOL_LB_LAYER_PMA,        /* SerDes / Analog-Digital boundary */
-    ETHTOOL_LB_LAYER_PMD,        /* Transceiver / Module internal */
-    ETHTOOL_LB_LAYER_EXT,        /* External physical plug/cable */
-};
+- Changed nft_chain_filter patch: Only help populating pktinfo offsets,
+   call nft_do_chain() with original network_offset.
+- Changed commit messages.
+- Removed kernel-doc comments.
 
-/* Loopback Direction (XXX is local/remote easier to understand?) */
-enum ethtool_loopback_dir {
-    ETHTOOL_LB_DIR_NEAR_END =3D 0,    /* Host -> Loop -> Host  */
-    ETHTOOL_LB_DIR_FAR_END,        /* Line -> Loop -> Line  */
-};
+Changes in v15:
 
-struct ethtool_loopback_layer_cfg {
-    enum ethtool_loopback_layer layer;    /* ETHTOOL_LB_L_MAC, etc. */
-    enum ethtool_loopback_dir direction;  /* NEAR or FAR */
-    u32 lane_mask;                        /* Specific lanes */
-    u32  flags;                           /* patterns? reserved... */
-    bool enabled;
-    char name[16];
-};
+- Do not munge skb->protocol.
+- Introduce nft_set_bridge_pktinfo() helper.
+- Introduce nf_ct_bridge_pre_inner() helper.
+- nf_ct_bridge_pre(): Don't trim on ph->hdr.length, only compare to what
+   ip header claims and return NF_ACCEPT if it does not match.
+- nf_ct_bridge_pre(): Renamed u32 data_len to pppoe_len.
+- nf_ct_bridge_pre(): Reset network_header only when ret == NF_ACCEPT.
+- nf_checksum(_partial)(): Use of skb_network_offset().
+- nf_checksum(_partial)(): Use 'if (WARN_ON()) return 0' instead.
+- nf_checksum(_partial)(): Added comments
 
-struct ethtool_loopback_cfg {
-    struct ethtool_loopback_layer_cfg *entries;
-    u32 num_layers;
-};
+Changes in v14:
 
-struct ethtool_ops {
-    /* ... */
+- nf_checksum(_patial): Use DEBUG_NET_WARN_ON_ONCE(
+   !skb_pointer_if_linear()) instead of pskb_may_pull().
+- nft_do_chain_bridge: Added default case ph->proto is neither
+   ipv4 nor ipv6.
+- nft_do_chain_bridge: only reset network header when ret == NF_ACCEPT.
 
-    /* Query which layers/lane-combos are physically possible */
-    int (*get_loopback_caps)(struct net_device *dev,
-                             struct ethtool_loopback_cfg *caps);
+Changes in v13:
 
-    /* Get current active status for all layers */
-    int (*get_loopback_state)(struct net_device *dev,
-                              struct ethtool_loopback_cfg *state);
+- Do not use pull/push before/after calling nf_conntrack_in() or
+   nft_do_chain().
+- Add patch to correct calculating checksum when skb->data !=
+   skb_network_header(skb).
 
-    /* Set one or more layer/lane configurations atomically */
-    int (*set_loopback)(struct net_device *dev,
-                        const struct ethtool_loopback_cfg *cfg,
-                        struct netlink_ext_ack *extack);
-};
+Changes in v12:
 
-As for layers; EXT vs PMD? EXT could be a loopback plug, whereas PMD
-would be CMIS, or whatever the driver detects.
+- Only allow tracking this traffic when a conntrack zone is set.
+- nf_ct_bridge_pre(): skb pull/push without touching the checksum,
+   because the pull is always restored with push.
+- nft_do_chain_bridge(): handle the extra header similar to
+   nf_ct_bridge_pre(), using pull/push.
 
-Userland would be something like:
+Changes in v11:
 
-# ethtool --show-loopback eth0
-Loopback Status for eth0:
-  Layer: SW  | State: OFF
-  Layer: MAC   | State: OFF
-  Layer: PMA   | State: ON  | Lanes: 0x1 (Lane 0) | Direction: Near-End (Lo=
-cal)
-  Layer: PMD   | State: ON  | Lanes: 0xF (All)    | Direction: Far-End (Rem=
-ote)
-  Layer: EXT   | State: ON  | Detected: External Loopback Plug
+- nft_do_chain_bridge(): Proper readout of encapsulated proto.
+- nft_do_chain_bridge(): Use skb_set_network_header() instead of thoff.
+- removed test script, it is now in separate patch.
 
-# ethtool --set-loopback <dev> [layer[:lanes][:direction]] ... [off]
+v10 split from patch-set: bridge-fastpath and related improvements v9
 
-# # Simple MAC loopback:
-# ethtool --set-loopback eth0 mac (Defaults: lanes=3Dall, dir=3Dnear)
-# # Specific SerDes (PMA) lane:
-# ethtool --set-loopback eth0 pma:lane0
-# # Complex multi-layer (PMA Near + PMD Far):
-# ethtool --set-loopback eth0 pma:0x1:near pmd:all:far
-# # Disable all loopbacks:
-ethtool --set-loopback eth0 off
+Eric Woudstra (4):
+  netfilter: utils: nf_checksum(_partial) correct data!=networkheader
+  netfilter: bridge: Add conntrack double vlan and pppoe
+  netfilter: nft_set_pktinfo_ipv4/6_validate: Add nhoff argument
+  netfilter: nft_chain_filter: Add bridge double vlan and pppoe
 
-Thoughts? Is this somewhat close to what you had in mind, Andrew?
+ include/net/netfilter/nf_tables_ipv4.h     | 21 +++--
+ include/net/netfilter/nf_tables_ipv6.h     | 21 +++--
+ net/bridge/netfilter/nf_conntrack_bridge.c | 93 ++++++++++++++++++----
+ net/netfilter/nft_chain_filter.c           | 59 ++++++++++++--
+ net/netfilter/utils.c                      | 28 +++++--
+ 5 files changed, 177 insertions(+), 45 deletions(-)
 
-I'm far from an expert on the details here, so the folks with more
-knowledge, please chime in!
+-- 
+2.53.0
 
-
-Cheers,
-Bj=C3=B6rn
 
