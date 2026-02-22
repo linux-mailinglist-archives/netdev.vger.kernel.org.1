@@ -1,181 +1,159 @@
-Return-Path: <netdev+bounces-259897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259898-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ABovLz5Vm2kVyQMAu9opvQ
-	(envelope-from <netdev+bounces-259897-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 20:13:02 +0100
+	id IL1nCwRXm2lHyQMAu9opvQ
+	(envelope-from <netdev+bounces-259898-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 20:20:36 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20F73170270
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 20:13:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D9921702AD
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 20:20:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 898BC300FED3
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 19:12:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E2F67300E391
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 19:20:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17638350A3D;
-	Sun, 22 Feb 2026 19:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A6BC35A925;
+	Sun, 22 Feb 2026 19:20:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eX9geXYS"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZZg0ucmK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com [34.218.115.239])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3BC534F498
-	for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 19:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 038E8350A0F
+	for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 19:20:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.218.115.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771787549; cv=none; b=XcUTAc8ohRoxCmANOF2hBJ1K4/77b3JbSLCJswXYUXj0fGplzPvdQysJUXpSo6yLzwsAQMto2I5Z6oI7MFyKdUey71EsJ4BYG7IZrW5pf7Cmp3ROUF/ttHoVKQlNSYII+6MZ0hf+INFv2eu+dclQ3RzSTI+DzeH2duQf0EJfpn0=
+	t=1771788033; cv=none; b=JQPtuy7N3euoBaVrL54zY0gVk/c9N4KT3tJPXrAN2+QytuDwItHE8zT8em0lEeP/DySiV9eVsWFAor+KHr0jKKmYfg7Odqul3r1orTAP6uvwrlR1NK4IENFDyFWecbCG3dz4F4UBLcsOUZEjHuKv552cDjbbKJFarjmbeCgr41I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771787549; c=relaxed/simple;
-	bh=WDYU4B2COo5wPNQEOkJnNyqNgaVyCN9liZiMYFO7p8o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nAaHWGyKEMcxnVgB8vvb6iOXqGoPzimioRsgKLYqDU5h9wyEaFcBGCbnxWin5mQQzN95DvUFZgxoLAzQaU9Cl9OLwf5ihpK2b1wzRbhWl7mDQ3UI9/sm4ZyjmEX7idZSh0qaR24Cs1YNbNxrzZnbBt/loYaSvJDkjUnEQREuLA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eX9geXYS; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-480706554beso43778105e9.1
-        for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 11:12:27 -0800 (PST)
+	s=arc-20240116; t=1771788033; c=relaxed/simple;
+	bh=6veznJnw41SdRLT/r5xh9HQI0Ih7fKTSv/0BiN/OYn4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ulthfOUnGR1/l8QYX2LS//2/pK0IOIfqVsATD3Wqg0YMsgndgBzeaBhl/iwoI5IyUYgyurzy+/+PXkETGMdNd70wZIduhcNrarly8EUnU5SnMAe3CJMRiR3P9Ssy2a+3TKk4NqzDi/eHya2nqCcj05NI6s82ADPMpS0A3yNWyoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=ZZg0ucmK; arc=none smtp.client-ip=34.218.115.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771787546; x=1772392346; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4HC92kY3YmOXxXaiIb4PsPv2+pjORHFu23rMYG4ouvY=;
-        b=eX9geXYSIFrmlxTKSXZoDgz5DC/pqpl4yO5oxgeLqPd0jmgnDthQn7T9qen6JOoySM
-         sjf6qqc18Fg0No3cJ0jqF11t5dGVYhBgA1DBtZUox+5iPkmsqz7q5hoISFvySbKQwuFt
-         sMqDAyqcluy2Dx0o/1NKfxHTl8dXlFzCxVKefb3PJezXWUoKdbtsnP/12K3ml1QN1728
-         QtlCwCsswzrmCisbTb6Y9B6BQ2M3l0AA07ex4dJOwc6mGIOKIOrD4bvvOlw6YXpPRMBv
-         DQqSi40036viDoGB6a8CV/R+jOxzE/THcObyTzETSW+2y7NDZr4vSTsN4SWLqk/agCyp
-         2ypw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771787546; x=1772392346;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4HC92kY3YmOXxXaiIb4PsPv2+pjORHFu23rMYG4ouvY=;
-        b=a0VpLw03dqqMGrCuBTDlQdsclX31ueTj/ulfpfn/LuW/EAZeqwXl0Zny9p7ojoNTwg
-         FaPU2oPv2jvisQQQP7w4UzJEmdNDzagcNTP1EooGAqGqukfw9x9ovFyvC1EJOGcKWJOf
-         B+C38JDRmo0Mhm7xF7QkeAb+Av1SkqgmQzY00CllJ/NwHG9fjEFCvbDyCEkUBk1Y0ZYW
-         KWuBMO9driv+Bgl7eWvHHDLHrtRCxD3WWn/E2qowXQk0i8PkSE/rEo6fnC/D29QWB06d
-         X0RJJIuWOW9OG7lY5bwWtLdSmzAmnGRmbszUOE1S1xTUf3KOtWZsidQYfhp9bAOrOQ8W
-         h+DQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXGM404ccoQCyX5qHdgNxfc4cmtQnjp3QvlQinb9mHmkrIu3eg3Fj2eKVaJFU4mhuAHpFaYJ/k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGF6wqIBgLpuMxJ4q9r9UUlmIqrHt1nSxwLU9bW72KTc83RzKn
-	puPKN3I/T1kxG00x2t9RoqA9ByyiPNuXQ4LWbgZXG5S+/6r4dnxFjIug
-X-Gm-Gg: AZuq6aKEVwqpk4N7GBFsa+xjTppr2REYnp0+0aUbIqM+zNFiWmIs077QvgERzeW9RH7
-	tgZ0koPFmocbbvcoulAtn2Mk5IZBpkuwYMyciRQCMYXY8FQWi65c5jxMGUiNaGzH7qHrGTf11F3
-	a++t9GKaa1wC8vUe7FuEVRL64K2wsxgT3VcMSDY26xNwgKwHa2F7FXdKiiVONRuF7JIBOr/M1b/
-	0oW+BH4/IfJjb9x8Y60jbsGPrhl3i+b2l3KWNE/AkZX8HwgTzt8lZ8LJj7tnYrNCRw8mUd3Ud80
-	C7ey275Pu2hxhB/ngh9R3bwDZ6vSd/CgtvA/lwag9eFfwizYYWEahuzglM7LSq4odghjutWFfu5
-	qdQXKsw0mEQZl9WLW/J7n0yzR8AfSLgciap2aJJKUDLK7KUY4cl+8/aDmCMvcG/ywJp1mWx2VmN
-	RRK56Z8Q7DFZ33iA7TKNX66mkJ8yBj/ospyX2wouqQH4vAw/0u7K8/ZarIXDHL8fDmKl71mN8+8
-	efV
-X-Received: by 2002:a05:600c:828c:b0:47e:e48b:506d with SMTP id 5b1f17b1804b1-483a962e003mr122153875e9.16.1771787546078;
-        Sun, 22 Feb 2026 11:12:26 -0800 (PST)
-Received: from [10.0.0.98] (snat-2.cgn.sat-an.net. [176.222.226.2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43970c00768sm14086405f8f.10.2026.02.22.11.12.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 22 Feb 2026 11:12:25 -0800 (PST)
-Message-ID: <79e33665-ff41-412d-ab17-154f6687233d@gmail.com>
-Date: Sun, 22 Feb 2026 20:12:24 +0100
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1771788032; x=1803324032;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=7AXFH+vuOnnn9PkWkiJdfT8gFe6PP/Z9KQnHfrVnI7M=;
+  b=ZZg0ucmKT2toaqeYe8fWhVBGA4AJuvtwPCY0T/GgMXBctonwpdJYXdmo
+   f/gppIQNKFy4lPM0sHPUNgRpdm5odXUfH3+zq9xl3qzn6tr1SRvWuDW8y
+   9uv/npl3/Vdje+zdPDJlr3ma+UDt/vKEDuYJ1mQiTOSsMO0M/ACrQ/cOS
+   I8J6RL9HTwE5zE4ONJI+P7PEzFajdVE7F9d6Ga0GoD/mb+RoyaLx6TEq2
+   JxdOLYQQkq/u1tE7g5J6Od4Pum+UgPP9hhClkpBLLpcB+pNptmA3ExQTc
+   98QxGi1MEeo+MogU60UeOyxslCBNNPOhfVv5N8bHx1G+Zs7AoYtCU6+DY
+   A==;
+X-CSE-ConnectionGUID: VxIbJwiBS5Sm4s1MW9hdmg==
+X-CSE-MsgGUID: be32y7KeSjadlkwIrYuphQ==
+X-IronPort-AV: E=Sophos;i="6.21,305,1763424000"; 
+   d="scan'208";a="13362928"
+Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
+  by internal-pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2026 19:20:29 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [205.251.233.111:27511]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.38.188:2525] with esmtp (Farcaster)
+ id a94a9f8d-db01-4698-8020-45b8dd150707; Sun, 22 Feb 2026 19:20:29 +0000 (UTC)
+X-Farcaster-Flow-ID: a94a9f8d-db01-4698-8020-45b8dd150707
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Sun, 22 Feb 2026 19:20:29 +0000
+Received: from b0be8375a521.amazon.com (10.37.245.8) by
+ EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Sun, 22 Feb 2026 19:20:25 +0000
+From: Kohei Enju <enjuk@amazon.com>
+To: <dsahern@kernel.org>
+CC: <aleksandr.loktionov@intel.com>, <andrew+netdev@lunn.ch>,
+	<anthony.l.nguyen@intel.com>, <daniel.zahka@gmail.com>,
+	<davem@davemloft.net>, <david.m.ertman@intel.com>, <edumazet@google.com>,
+	<intel-wired-lan@lists.osuosl.org>, <kuba@kernel.org>,
+	<michal.swiatkowski@linux.intel.com>, <mustafa.ismail@intel.com>,
+	<netdev@vger.kernel.org>, <nikolay@nvidia.com>, <pabeni@redhat.com>,
+	<paul.greenwalt@intel.com>, <przemyslaw.kitszel@intel.com>,
+	<shiraz.saleem@intel.com>, <tatyana.e.nikolova@intel.com>
+Subject: Re: [PATCH net] drivers: net: ice: fix devlink parameters get without irdma
+Date: Mon, 23 Feb 2026 04:20:11 +0900
+Message-ID: <20260222192011.1147-1-enjuk@amazon.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <56e04cb1-e205-4076-8236-1f172a75793d@kernel.org>
+References: <56e04cb1-e205-4076-8236-1f172a75793d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v1] net: phy: motorcomm: yt8821: disable MDIO
- broadcast address 0
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Daniel Golle <daniel@makrotopia.org>, Qingfang Deng <dqfext@gmail.com>,
- SkyLake Huang <SkyLake.Huang@mediatek.com>, Frank
- <Frank.Sae@motor-comm.com>, Heiner Kallweit <hkallweit1@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Sai Krishna <saikrishnag@marvell.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <d3bb9c36-5a0e-4339-901d-2dd21bdba395@gmail.com>
- <0308e736-c3e7-45d2-86f7-e729af9cb487@gmail.com>
- <3e64d8d1-87c1-45e0-9556-0ca844a90f73@lunn.ch>
- <740e8351-d8a5-4f4c-91e4-c278e4b7d248@gmail.com>
- <aZq-SbHC0eU9OenG@shell.armlinux.org.uk>
- <6d248bec-cb87-4238-9ccc-e901926e3226@gmail.com>
- <557033a0-e5c8-4384-8f40-21f37c2e7dc1@lunn.ch>
-Content-Language: en-US
-From: =?UTF-8?Q?Jakub_Van=C4=9Bk?= <linuxtardis@gmail.com>
-In-Reply-To: <557033a0-e5c8-4384-8f40-21f37c2e7dc1@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D043UWC004.ant.amazon.com (10.13.139.206) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-6.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[armlinux.org.uk,makrotopia.org,gmail.com,mediatek.com,motor-comm.com,davemloft.net,google.com,kernel.org,redhat.com,marvell.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-259897-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-259898-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linuxtardis@gmail.com,netdev@vger.kernel.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[intel.com,lunn.ch,gmail.com,davemloft.net,google.com,lists.osuosl.org,kernel.org,linux.intel.com,vger.kernel.org,nvidia.com,redhat.com];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[enjuk@amazon.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[amazon.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 20F73170270
+	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	TO_DN_NONE(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 7D9921702AD
 X-Rspamd-Action: no action
 
-On 2/22/26 16:15, Andrew Lunn wrote:
-> On Sun, Feb 22, 2026 at 10:52:28AM +0100, Jakub Vaněk wrote:
->> On 2/22/26 09:28, Russell King (Oracle) wrote:
->>> On Sun, Feb 22, 2026 at 05:22:55AM +0100, Jakub Vaněk wrote:
->>>> I had hoped this would not happen on the Cudy router. The MediaTek
->>>> Ethernet subsystem driver uses of_mdiobus_register(), so PHY address 0
->>>> should not be probed unless it is explicitly described in the device
->>>> tree. That said, I agree that with mdiobus_register() this would still
->>>> be an issue.
->>>>
->>>> I was also hoping that moving the internal PHY would provide more
->>>> flexibility in the device tree description of the YT8821. If the
->>>> workaround were implemented in U-Boot by writing YT8821 MDIO registers
->>>> at boot time, Linux would not be able to assert the YT8821 reset pin
->>>> without losing that workaround.
->>>
->>> Why would you want to assert the reset pin?
->>>
->>
->> I don't currently have a solid reason to assert the reset pin.
->> The two reasons I had in mind were mostly precautionary:
+On Sun, 22 Feb 2026 11:27:30 -0700, David Ahern wrote:
+
+> On 2/13/26 1:48 AM, Nikolay Aleksandrov wrote:
+> > If CONFIG_IRDMA isn't enabled but there are ice NICs in the system, the
+> > driver will prevent full devlink dev param show dump because its rdma get
+> > callbacks return ENODEV and stop the dump. For example:
+> >  $ devlink dev param show
+> >  pci/0000:82:00.0:
+> >    name msix_vec_per_pf_max type generic
+> >      values:
+> >        cmode driverinit value 2
+> >    name msix_vec_per_pf_min type generic
+> >      values:
+> >        cmode driverinit value 2
+> >  kernel answers: No such device
+> > 
+> > Returning EOPNOTSUPP allows the dump to continue so we can see all devices'
+> > devlink parameters.
+> > 
+> > Fixes: c24a65b6a27c ("iidc/ice/irdma: Update IDC to support multiple consumers")
+> > Signed-off-by: Nikolay Aleksandrov <nikolay@nvidia.com>
+> > ---
+> >  drivers/net/ethernet/intel/ice/devlink/devlink.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > 
 > 
-> Being able to drive a PHY reset pin in Linux is relatively new. It was
-> added in 2016. Before that, we lived without this feature. If
-> anything, being able to reset the PHY causes more issues than it
-> solves.
-> 
-> So unless the PHY is actually broken and needs a reset to make it
-> work, it is probably better not to list the reset.
+> This patch was marked as awaiting upstream; I wanted to confirm it is in
+> Intel's queue or was the expectation for netdev maintainer's to pick it up?
 
-Thank you, that is encouraging. Handling the YT8821 PHY reset
-and configuration in U-Boot should then indeed be sufficient.
+I see it's in Intel's queue.
 
-Best regards,
-Jakub
-
+https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue.git/log/?h=dev-queue
 
