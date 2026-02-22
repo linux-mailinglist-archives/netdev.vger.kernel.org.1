@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-259872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259873-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cF2aFQ/4mmmqogMAu9opvQ
-	(envelope-from <netdev+bounces-259872-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 13:35:27 +0100
+	id iO4fFBL4mmmqogMAu9opvQ
+	(envelope-from <netdev+bounces-259873-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 13:35:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C13B716F0B5
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 13:35:26 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A1C216F0CA
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 13:35:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D254D300D904
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 12:35:23 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C5E22300BE1B
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 12:35:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10016213E9C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14D312236E3;
 	Sun, 22 Feb 2026 12:35:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t9SlU2zK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PZGvRZKT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB45918AE3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB4A01E49F;
 	Sun, 22 Feb 2026 12:35:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771763719; cv=none; b=HgEFs+f4UMGODnEKlceYCUgUQPEONai5nt3UhT1sD7UHhky0DvX/jluxxUTaGrTEOliHW2wGSPnlEviQTnb4dwksHmbgooRrZ8xVI1W1y4UFOugMeIQaIY0XXT/WBmVJjQ2XNZG9u8viK1FpD0pstzlfPYliyqMVQH5U6q4apwI=
+	t=1771763719; cv=none; b=tluEIyS2ynnLO+1b4D85R2cXBxf+AIX42DtaZ+6RaqdJghyaCS65w/w6ZOCY2NpDFHplQbHNglSWFUzyA78MiZ+3Bb7up1/cSB8TdFR508vzCOy3BrxYnki2T2dyNKToqreGT/Xaz4B0yypzhcp3wkvEoCce++LfcRZtS3/M9r4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1771763719; c=relaxed/simple;
-	bh=fOTXusaZK56AmcS2R8m8YPN9h42bESspa46XGl1Ik3k=;
+	bh=Yho54yKeF0+pYUwHDqezl+RQxQv9QgV7ZpFQWc0NSEQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=H9C3T/HB40nO9gVQmuhzAGkTf+sdwFJ7Qf4qP5+leCwuyCQSE6ZIo+D4vqrHikQbkkIUii35BSe1xbyb1lcQio6NDjaf8qUXcL/ACnqsKR4mQFdrSluM1/6ewe7eFUaVrq47E9LeYyrhl7AWF3AEbRXg1VGPcP9HNEBYu+WH/bE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t9SlU2zK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8C563C19425;
+	 In-Reply-To:To:Cc; b=f9DZgSHrCwodv/SDPy2ZVtx0Z2SvKcKIjQYjZJmHgQPbBTyILTF9rGHai0B4ujjlhzig1VATbN3MwDe4DZwbeCENyFagoyFmLmLlsdcES30yLPfMfZurBuBb2ArKf9nGBOU5hbVsfldO5w7miqnG2IF4Rt1qx1lMSH4H+i+ZCW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PZGvRZKT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 96A37C19423;
 	Sun, 22 Feb 2026 12:35:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1771763719;
-	bh=fOTXusaZK56AmcS2R8m8YPN9h42bESspa46XGl1Ik3k=;
+	bh=Yho54yKeF0+pYUwHDqezl+RQxQv9QgV7ZpFQWc0NSEQ=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=t9SlU2zKGHFQAV9YRY1KwEiq4WSp8eLek3In79jkbQIVp++prEj9+L4aNNzbuitU6
-	 vrv927J9O3+zOZ5HBzv6u8qxKDJApWTRWLW43B8aMLFjyIVi1eOLMO6aLmQnhmtgG1
-	 ZxfOAozuRP/5ZDWJnzvvza+bKP1r9dq8TjJqEJA4PmCJyFNB+RE/PpV3vC9tvGMEdv
-	 CK3tTTnyKtXXx+Y/NyRkVptSA/CXBDkjAsjlNcgfl+17rOcprLtzuS5Ekncyi8se4s
-	 ZcK3WDFvuB6ndNKV8eAvEhCgx9ZZjLHyH7VkfimrQSGDkIkbsTuTrsX7BI+3PKw9fg
-	 5BKPfy0wPyM4g==
+	b=PZGvRZKTE6KD8a/4OCAMuQKrBk5GsbG/ogGjDjQob5wtEtnfnJJUHS2zFTtyW19jh
+	 Ns0xhjzXpBJzLLjXLfM8tyH5mc0Yq4e4bvbb6HpCrUQzRKXTdj4J4fEvyXtcu4AWHB
+	 W2gc1mHG85RKJJo0cqUnKAU5x3cXbxwAsWInoUDIawgkicpWxJnEVJ+7yszZWxwrrE
+	 M2Ux3LZfYifzlSKRFA+doAdO1XO3gfGlFKXRciYDxi+HfCXyxSY6GU4DFvb0DRm3qI
+	 CF67KavNyuGCrGfpqbjBaThCHJVUbFvdf338B3Sda+SeQD1flrahsinp0VAfq0ZGpP
+	 tB4N9TrQSef3g==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CFA1C624D8;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B9D8C63680;
 	Sun, 22 Feb 2026 12:35:19 +0000 (UTC)
 From: Simon Baatz via B4 Relay <devnull+gmbnomis.gmail.com@kernel.org>
-Date: Sun, 22 Feb 2026 13:35:08 +0100
-Subject: [PATCH net 1/2] tcp: re-enable acceptance of FIN packets when RWIN
- is 0
+Date: Sun, 22 Feb 2026 13:35:09 +0100
+Subject: [PATCH net 2/2] selftests/net: packetdrill: Verify acceptance of
+ FIN packets when RWIN is 0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,7 +59,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260222-fix_zero_wnd_fin-v1-1-5f4034952f3c@gmail.com>
+Message-Id: <20260222-fix_zero_wnd_fin-v1-2-5f4034952f3c@gmail.com>
 References: <20260222-fix_zero_wnd_fin-v1-0-5f4034952f3c@gmail.com>
 In-Reply-To: <20260222-fix_zero_wnd_fin-v1-0-5f4034952f3c@gmail.com>
 To: Eric Dumazet <edumazet@google.com>, 
@@ -70,11 +70,11 @@ To: Eric Dumazet <edumazet@google.com>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
  linux-kselftest@vger.kernel.org, Simon Baatz <gmbnomis@gmail.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1771763718; l=1892;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1771763718; l=1458;
  i=gmbnomis@gmail.com; s=20260220; h=from:subject:message-id;
- bh=2+1eVacnxOmDaohxIY6qSWPXriJ79AYLQ+Cp0PfC4TQ=;
- b=FMKB20bLolhb6Ew2dUc7wN+ml4Zx0IowwF58ximgA7YMljwawroVdSvf7uKR48Oaj7Ils8STb
- AWJH4jK6KHCApogu6LqmYbpU3AlqPD5t8qn/Krg3HBpdGG1qgaNVayk
+ bh=H8ZjJQB2JKY6JAi2lxsgvvCVKMl7+c9eEHI+rYT/o+E=;
+ b=lgI7EvC8oiFXPUNSBKhoDtUMYncLczmqT5NPsgdRFxjceE8Su9xDKcOYaGqlP/1PVTWaYMgKC
+ zLgpMtlesyVBEFIzswkeB2EhtcM6lmZCbVEHjXdNl1/LSrjwhpxKij/
 X-Developer-Key: i=gmbnomis@gmail.com; a=ed25519;
  pk=T/JIz/6F5bf1uQJr69lmyi7czVG+F9TVZ/8x5z9Wtqw=
 X-Endpoint-Received: by B4 Relay for gmbnomis@gmail.com/20260220 with
@@ -86,13 +86,13 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FREEMAIL_REPLYTO_NEQ_FROM(2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259872-lists,netdev=lfdr.de,gmbnomis.gmail.com];
+	TAGGED_FROM(0.00)[bounces-259873-lists,netdev=lfdr.de,gmbnomis.gmail.com];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -107,57 +107,57 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
 	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C13B716F0B5
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7A1C216F0CA
 X-Rspamd-Action: no action
 
 From: Simon Baatz <gmbnomis@gmail.com>
 
-Commit 2bd99aef1b19 ("tcp: accept bare FIN packets under memory
-pressure") allowed accepting FIN packets in tcp_data_queue() even when
-the receive window was closed, to prevent ACK/FIN loops with broken
-clients.
+Add a packetdrill test that verifies we accept bare FIN packets when
+the advertised receive window is zero.
 
-Such a FIN packet is in sequence, but because the FIN consumes a
-sequence number, it extends beyond the window. Before commit
-9ca48d616ed7 ("tcp: do not accept packets beyond window"),
-tcp_sequence() only required the seq to be within the window. After
-that change, the entire packet (including the FIN) must fit within the
-window. As a result, such FIN packets are now dropped and the handling
-path is no longer reached.
-
-Be more lenient by not counting the sequence number consumed by the
-FIN when calling tcp_sequence(), restoring the previous behavior for
-cases where only the FIN extends beyond the window.
-
-Fixes: 9ca48d616ed7 ("tcp: do not accept packets beyond window")
 Signed-off-by: Simon Baatz <gmbnomis@gmail.com>
 ---
- net/ipv4/tcp_input.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ .../net/packetdrill/tcp_rcv_zero_wnd_fin.pkt       | 27 ++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index e7b41abb82aad33d8cab4fcfa989cc4771149b41..fde612f12d3625000081958d13cec8779684a642 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -6379,7 +6379,12 @@ static bool tcp_validate_incoming(struct sock *sk, struct sk_buff *skb,
- 
- step1:
- 	/* Step 1: check sequence number */
--	reason = tcp_sequence(sk, TCP_SKB_CB(skb)->seq, TCP_SKB_CB(skb)->end_seq);
+diff --git a/tools/testing/selftests/net/packetdrill/tcp_rcv_zero_wnd_fin.pkt b/tools/testing/selftests/net/packetdrill/tcp_rcv_zero_wnd_fin.pkt
+new file mode 100644
+index 0000000000000000000000000000000000000000..e245359a1a91d4b6d7ef64496681cea57792cb71
+--- /dev/null
++++ b/tools/testing/selftests/net/packetdrill/tcp_rcv_zero_wnd_fin.pkt
+@@ -0,0 +1,27 @@
++// SPDX-License-Identifier: GPL-2.0
 +
-+	/* Some stacks are known to handle FIN incorrectly; allow the FIN
-+	 * to extend beyond the window and check it in detail later.
-+	 */
-+	reason = tcp_sequence(sk, TCP_SKB_CB(skb)->seq,
-+			      TCP_SKB_CB(skb)->end_seq - th->fin);
- 	if (reason) {
- 		/* RFC793, page 37: "In all states except SYN-SENT, all reset
- 		 * (RST) segments are validated by checking their SEQ-fields."
++// Some TCP stacks send FINs even though the window is closed. We break
++// a possible FIN/ACK loop by accepting the FIN.
++
++--mss=1000
++
++`./defaults.sh`
++
++// Establish a connection.
++   +0 socket(..., SOCK_STREAM, IPPROTO_TCP) = 3
++   +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
++   +0 setsockopt(3, SOL_SOCKET, SO_RCVBUF, [20000], 4) = 0
++   +0 bind(3, ..., ...) = 0
++   +0 listen(3, 1) = 0
++
++   +0 < S 0:0(0) win 32792 <mss 1000,nop,wscale 7>
++   +0 > S. 0:0(0) ack 1 <mss 1460,nop,wscale 0>
++   +0 < . 1:1(0) ack 1 win 257
++
++   +0 accept(3, ..., ...) = 4
++
++   +0 < P. 1:60001(60000) ack 1 win 257
++    * > .  1:1(0) ack 60001 win 0
++
++   +0 < F. 60001:60001(0) ack 1 win 257
++   +0 > . 1:1(0) ack 60002 win 0
 
 -- 
 2.53.0
