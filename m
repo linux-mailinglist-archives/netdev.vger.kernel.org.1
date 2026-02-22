@@ -1,193 +1,133 @@
-Return-Path: <netdev+bounces-259884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259885-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id InZrK1wmm2nGtwMAu9opvQ
-	(envelope-from <netdev+bounces-259884-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 16:53:00 +0100
+	id YJHhGC0rm2nfuQMAu9opvQ
+	(envelope-from <netdev+bounces-259885-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 17:13:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 339FD16F91E
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 16:53:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B27D016F995
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 17:13:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 879843008C2D
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 15:52:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6E412300C007
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 16:13:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A504261B96;
-	Sun, 22 Feb 2026 15:52:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0E603502B5;
+	Sun, 22 Feb 2026 16:13:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q9klw3P+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Swzw9aeL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C3413D51C
-	for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 15:52:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE1FD34FF41
+	for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 16:13:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771775578; cv=none; b=t22x4/swfXtMDP9oFBmGLI3qiKK9/BE5FNAZ5/liQ5f158h62jLjSys2M9emiIhqnEXJQy55NE3NYOwQf3zlB7zx7P0SeGTWRSTji+ayA7dAfOTPMr0jlsJaXy7JW73vuPDp075SV6FnlgO/NeNIGpinhujaVT/+MWs2/+zOlkY=
+	t=1771776810; cv=none; b=qptzKPLxW36h2Dr4qfvrzZ2H4lzVK5+mxbOzPfKhKZoBbdq7XKrTVnqk7P9Bc9vZidCbklFRHpAtISm57CBeY44Fx4azTHEGMTVIyPGAl4KgebtgFaRJhu6C50kM5eB3O+k+8Hznd+juJLTQSzBYfk0dZlveNmTN75B3n5J+HU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771775578; c=relaxed/simple;
-	bh=A3FVTaY3gTdk4/I4tDNDGEa2Hhq6PqSLRqaRlb/FPlg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ojyXQToXLXwyHmJZk08hKJRVTRI87lwGJOjQg6UA4uB0C4Ev/xxbB3xK9D5yc9yppJ1m2lTAeSrQ75aIN1wEQ27khjSsylIeP7dCtMBzAfTqUO6vMmxxFuJlPI0hR84YjLQcZBiGhvdT7w5qPLIQ28BgTt7+fkpZ9+pwepWwnsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q9klw3P+; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b885a18f620so630956266b.3
-        for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 07:52:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771775575; x=1772380375; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1NVM2G3MvWYR9rREQPgIPKKWATWW6NZZLQEjl5ilZu8=;
-        b=Q9klw3P+qB6Wp5NKJatrfhBOT+pCQLkrV8HCbvghP/xTICLWpJoxmduqSTX5yDFXTp
-         8EvvVf0w4MFYhInE8L0C8t0INb1i1gkS19ITOKyrCpKVywLIjsmk7i/k1GIMrfMfjts/
-         evSx8hUMwlwjRLrLHD2ouD3NhOi5YT8BJd9MN4GKmrRD/rGDEeqN7hvlQRP/1jsqmk5s
-         h7O8O1uqKGWedjNVDJBLRy+YVP0a8AEIZ7IaPPVw2uYz1B3baR5YIgvF5bkcgW2liRtw
-         fkwsMyHi9RvnjQRGQOLfzv7Pb8T6FFOyiX0NnADGzW5dWi6LCFWnPxsw/ebyqNVYTvET
-         kZGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771775575; x=1772380375;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1NVM2G3MvWYR9rREQPgIPKKWATWW6NZZLQEjl5ilZu8=;
-        b=mLqK7dHVBLC8pot07njtX2WBODTwRPlZwjO+7QMyzMiFyDT54g43BlgP5jIe9seht2
-         CiIoAUutGFjJNYVR4FmkhNZHox5iddEfSYqbhswLwMl/GykFURpJJ32+F6A4jU6n6lmk
-         r9iUNM80PFROLTUA6xpdFUa2hZ4fTUii+sfW+zIv71/4/aUsEPIgFjM+Ju5xaL+ZgscM
-         LwrlNrES4U7dpd/kKFA/QBiLdxm/7CVPgDfNAXs2ImNqN6e/Xo+Bm+HKcFOR6egDxIE3
-         9VnndYKx++6ZA/485Iwc3q07XI8Jja8ZJzCUoGZ+2E5sxiyGqfBSFHZzBU0g90PvFAB6
-         2rBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUuW+Um7jMJSIEtQ/ZXUpCv8Hyf/2wMrA0JQMhxmDzMSA+byZVjd2pnUVbv8gBGpoTttaSrwUI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwR1xI3dr+ZGeVsK78ZQAxp5p7rKCstEtTWfOSdFvVW+llJcZc8
-	x1UwDzMlTADjE5pS0NJ4xUhDM9tlsIGfO+Ad4VqTcsFmlAVzoUbHuMdg
-X-Gm-Gg: AZuq6aIoSLwTwAfOxokMYbm/2vbFmSt4DnirxTClN9utq1pPk45WNa9Dq3G61rBglyt
-	rgTdpqr0y7jTjimnS4VKuHzSxh0EF0E3MAv/V9fhMDKIt8GhwVAC7xDQK4f+xSZpLCdxdAcZK+x
-	BQhQU3jdR/Oy4oZe0TU4dOKkNUKkJ/1aKcpm2ykS4INd0xp/Myb+I5vyl5Cp8crM1fyZhKGKgak
-	Lsbeef85blFY6g17bQmzZg/uCWTPwilatE6Fcho0/JdXGmymPihEF7VFSGSPlPUNSJfQkjy2UZ4
-	Bmsx6ml6vNTRvOquyK1MgH2TCMOFYOqCs56d2twmbl414CLiiLUD04GNtCPoycFWQbdCN3QsYSm
-	ROlkY5pa8th2wReONHonZl65hQFLnn6JY50fg2fvgFBvixykYZg9PCnq2GyxtqH4zPu12UF+FFO
-	UFulcoLrt4d6uWD0WgAYTRoaO9fjvf7j5IPQIKo4i8T+6GHiZn1u/nWHi4ygtnc37O55BL5Zbkh
-	NToPaPss8uzxzx7L2zEk4C6UlYNi847J0ZTt34nNAPUTKwOSKSGTFE=
-X-Received: by 2002:a17:906:c10f:b0:b86:fa17:4cf5 with SMTP id a640c23a62f3a-b9081994619mr406955466b.13.1771775575119;
-        Sun, 22 Feb 2026 07:52:55 -0800 (PST)
-Received: from eric (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9084f028a3sm235371666b.64.2026.02.22.07.52.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Feb 2026 07:52:54 -0800 (PST)
-From: Eric Woudstra <ericwouds@gmail.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: netfilter-devel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Eric Woudstra <ericwouds@gmail.com>
-Subject: [PATCH RFC v1 nf-next] netfilter: nf_flow_table_ip: Introduce nf_flow_vlan_push()
-Date: Sun, 22 Feb 2026 16:52:51 +0100
-Message-ID: <20260222155251.76886-1-ericwouds@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1771776810; c=relaxed/simple;
+	bh=v/6hFuSO8PJHKsZtPakfmI7341eYHwTYsiJnuIJ7aEM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D5THQYNnfI95NEC+wPVq1acflDJTZvU44H+foj16mZD6AjOFMw6K46qcoDJNO3cs5dp4Y297rbWF3oxtqZW/FjHNi0c1htxoXEGEure8Q8Dn18m+1P415+xYFu51jsm3cv7IU0Z4MX+vEf1fBqB0dDD3fb9r4IrRS+xpWqSaE5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Swzw9aeL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C78DBC116D0;
+	Sun, 22 Feb 2026 16:13:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771776810;
+	bh=v/6hFuSO8PJHKsZtPakfmI7341eYHwTYsiJnuIJ7aEM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Swzw9aeL/fPjVDloXgfcmXciuhkPrtRCexdsaTuogDoS5wxaPU7uz6WITTo1OwFdR
+	 VVxzjT4xKHGVhcVQ9DmXrNkI3keyvx9QyscXuXhygL45XQoYZeGipx5Wrdwn03JEKT
+	 XY415XS3jpwK1CknjC3nKFXTzbKVVTYulBQE/QD2zSMNbtI736IVM8c1K0pLqwKCVD
+	 +UxmJycvbqRJd1BJr8xoEydhOPFOndXMrBFLp7fZCjIvV/JxWepdCzZgDaY5l2v7Db
+	 0WzEaYbvl3Ttb9c3C9dNJe9QgV9nbDpOLjIrIsuP7x1X5uy1fJezOfxZPtqVg4qR/k
+	 26/HL5EDoY7Fw==
+Date: Sun, 22 Feb 2026 16:13:19 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, leitao@debian.org
+Subject: Re: [PATCH net] netconsole: avoid OOB reads, msg is not
+ nul-terminated
+Message-ID: <aZsrH23rOB0Z4_fz@horms.kernel.org>
+References: <20260219195021.2099699-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260219195021.2099699-1-kuba@kernel.org>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-259884-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-259885-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ericwouds@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 339FD16F91E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B27D016F995
 X-Rspamd-Action: no action
 
-With double vlan tagged packets in the fastpath, getting the error:
+On Thu, Feb 19, 2026 at 11:50:21AM -0800, Jakub Kicinski wrote:
+> msg passed to netconsole from the console subsystem is not guaranteed
+> to be nul-terminated. Before recent
+> commit 7eab73b18630 ("netconsole: convert to NBCON console infrastructure")
+> the message would be placed in printk_shared_pbufs, a static global
+> buffer, so KASAN had harder time catching OOB accesses. Now we see:
+> 
+>     printk: console [netcon_ext0] enabled
+>     BUG: KASAN: slab-out-of-bounds in string+0x1f7/0x240
+>     Read of size 1 at addr ffff88813b6d4c00 by task pr/netcon_ext0/594
+> 
+>     CPU: 65 UID: 0 PID: 594 Comm: pr/netcon_ext0 Not tainted 6.19.0-11754-g4246fd6547c9
+>     Call Trace:
+>      kasan_report+0xe4/0x120
+>      string+0x1f7/0x240
+>      vsnprintf+0x655/0xba0
+>      scnprintf+0xba/0x120
+>      netconsole_write+0x3fe/0xa10
+>      nbcon_emit_next_record+0x46e/0x860
+>      nbcon_kthread_func+0x623/0x750
+> 
+>     Allocated by task 1:
+>      nbcon_alloc+0x1ea/0x450
+>      register_console+0x26b/0xe10
+>      init_netconsole+0xbb0/0xda0
+> 
+>     The buggy address belongs to the object at ffff88813b6d4000
+>                 which belongs to the cache kmalloc-4k of size 4096
+>     The buggy address is located 0 bytes to the right of
+>                 allocated 3072-byte region [ffff88813b6d4000, ffff88813b6d4c00)
+> 
+> Fixes: c62c0a17f9b7 ("netconsole: Append kernel version to message")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-skb_vlan_push got skb with skb->data not at mac header (offset 18)
-
-Introduce nf_flow_vlan_push, that can push the inner vlan in the
-fastpath.
-
-Fixes: c653d5a78f34 ("netfilter: flowtable: inline vlan encapsulation in xmit path")
-Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
----
- net/netfilter/nf_flow_table_ip.c | 25 +++++++++++++++++++++++--
- 1 file changed, 23 insertions(+), 2 deletions(-)
-
-diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
-index 3fdb10d9bf7f..e65c8148688e 100644
---- a/net/netfilter/nf_flow_table_ip.c
-+++ b/net/netfilter/nf_flow_table_ip.c
-@@ -544,6 +544,27 @@ static int nf_flow_offload_forward(struct nf_flowtable_ctx *ctx,
- 	return 1;
- }
- 
-+static int nf_flow_vlan_push(struct sk_buff *skb, __be16 proto, u16 id)
-+{
-+	if (skb_vlan_tag_present(skb)) {
-+		struct vlan_hdr *vhdr;
-+
-+		if (skb_cow_head(skb, VLAN_HLEN))
-+			return -1;
-+
-+		__skb_push(skb, VLAN_HLEN);
-+		skb_reset_network_header(skb);
-+
-+		vhdr = (struct vlan_hdr *)(skb->data);
-+		vhdr->h_vlan_TCI = htons(id);
-+		vhdr->h_vlan_encapsulated_proto = skb->protocol;
-+		skb->protocol = proto;
-+	} else {
-+		__vlan_hwaccel_put_tag(skb, proto, id);
-+	}
-+	return 0;
-+}
-+
- static int nf_flow_pppoe_push(struct sk_buff *skb, u16 id)
- {
- 	int data_len = skb->len + sizeof(__be16);
-@@ -738,8 +759,8 @@ static int nf_flow_encap_push(struct sk_buff *skb,
- 		switch (tuple->encap[i].proto) {
- 		case htons(ETH_P_8021Q):
- 		case htons(ETH_P_8021AD):
--			if (skb_vlan_push(skb, tuple->encap[i].proto,
--					  tuple->encap[i].id) < 0)
-+			if (nf_flow_vlan_push(skb, tuple->encap[i].proto,
-+					      tuple->encap[i].id) < 0)
- 				return -1;
- 			break;
- 		case htons(ETH_P_PPP_SES):
--- 
-2.53.0
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
