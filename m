@@ -1,182 +1,158 @@
-Return-Path: <netdev+bounces-259867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259868-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cCnhCefRmmnTkAMAu9opvQ
-	(envelope-from <netdev+bounces-259867-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 10:52:39 +0100
+	id +K7cK+DSmmlQkQMAu9opvQ
+	(envelope-from <netdev+bounces-259868-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 10:56:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FCBA16ECC2
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 10:52:38 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C377E16ECD5
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 10:56:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 73ABA300CCBA
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 09:52:36 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E638E300B44E
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 09:56:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBD49201278;
-	Sun, 22 Feb 2026 09:52:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADACC221D89;
+	Sun, 22 Feb 2026 09:56:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jbkMeWqL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TRTI++s3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E0581A5B84
-	for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 09:52:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F18D29CEB
+	for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 09:56:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771753953; cv=none; b=UOwWz0lU0hQuI1K3jTwq65MAvOaazPuknOsn2H7goAGIjTvhmK6lgwOCe5rPAuO2EevLPdmFb0aTisbE4SN9AAvSDQ8FJwBmgCrl8QwVsiwtGY5q5jlYjVrS7yIRs2aPUB85nMl0UQeUHhM2xYyGBBzhmk6hIuLqGCrI6cqexcg=
+	t=1771754203; cv=none; b=uLdagnbi4BqPnRi2RyPJJwEA+Na87K/D7MCsG0ep+HjjRiMG0QEa150Eo9iIND169a/6Nw3WSQbD67GjffSw8VFdyoZ0UtcuFyUi8xfTSJ0jyHyrgLkyXrUd0vMHRVqweu4yTVrnzzzxwczzpJpRmjCrIF5ktE6AigSG+jaNTmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771753953; c=relaxed/simple;
-	bh=ju8rgkEZ7gc4XGBM4l4hAOgRRcp9M4mxJZIPFycKSDA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YFfSH1kkFDvzqCO0wQytfIw8+r7ybTjpmaaxxGsyXJAJqciePYjFFQFFQCidYbMDC3os6Z2p8c6KmsPtiZTTzFFEe5cVi2imowDep5ncKeMD8gRkkoEMW3jZI5/bpto8EBy0VMysnZt44SvsYW4FQWJ+spWCAkUxhq8VR+MZaTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jbkMeWqL; arc=none smtp.client-ip=209.85.221.46
+	s=arc-20240116; t=1771754203; c=relaxed/simple;
+	bh=mE4O0BtV173/rmaxbBM547I7Ypc4pHP28K3lvpHQstg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XfVOgTxrVpnuYzQwA8caDS+dibDOvgXYFzs9qlJAJjxAWKvO1uo1JSuhc7Ew+xejrpIkb6yKkRBOZwHN4jeVHR/W1Oq19MclHppJJVVzfcORK+4PLrMEdhtYNVOI/cISPxbOTBMPgw4AvaxpQKmoWrtyYmALtmvAp5bbVYvAQnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TRTI++s3; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-436356740e6so3666393f8f.2
-        for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 01:52:32 -0800 (PST)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2a871c8b171so21299145ad.3
+        for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 01:56:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771753951; x=1772358751; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0maBnJmKEymwKdDc0DBPC6NLeLVs1LHgfi7QbouBhO8=;
-        b=jbkMeWqLN+rQF3DdBBdqDC36GTVQ0SMRHu/+kH2t3fvfEmH2Rqd2hObFjJyGQT8OpF
-         1WF36ZSO6wUCv+6pl/hGTTCh+DHyrFn5dt8R140XcTD0e53kMru7Dp9zdSycL0bTfGMy
-         B1MErzcJ+YVQRXcel4IwXC2eyODjcZxWDak+FvEbwHwWf01+hYfqS6eZE/vZVZzFw5pB
-         sZZainLb62Rgu29fKpKtb8kegpTWYo0138UyzmDX1g/oO6m7JTwmbDiXSpLsFnXbkAwa
-         UhBsCe5OtCribVsUkmQ0QgVWrqOcBh739IW6nN3x5MjeiIlPed8ouTxY0IWZ0l/8v3/V
-         JokA==
+        d=gmail.com; s=20230601; t=1771754201; x=1772359001; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=maJ0fqFSfWgbQUTbt8pkn0t5Je6F2vvbc8i45PZOpsQ=;
+        b=TRTI++s3CYiq5yWozRp0iOJ6q6mXRpJmd/GT+XJgquYkrQhPIZFgowlu+1vPfjzuO+
+         L07qOranodNaLwQzjgiqvZgH0gUM/vgsyr6HOaZof51MzSNwVP1EpzPaa7Op6Ujg2cla
+         hih7sFwPm6cWGDefhzrF5G365aaXphBEpbJVpRcA722xrlfqnr4QxScnJe9Ll6/bP9eJ
+         lRLB19BabL2JVIyGZXZoc/AVmh9QTuQKS82Hd0C9xzXWjHXvbuBUt5eXqh/V0PXCdn8k
+         CgRAEjsRpccm1W7QkB6F/Vu8jtREChQx164M51K2mug/mQSe9dsWMPKg3htRfmHkmX7H
+         O+xQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771753951; x=1772358751;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0maBnJmKEymwKdDc0DBPC6NLeLVs1LHgfi7QbouBhO8=;
-        b=q+UC9qPVQl+D1oNpZMtwYi5rqASxECFS9zubCeUlZAVxv9hlTgEnziqA6ODgHvFPVw
-         3R2ZewygAJiSJXFOqtQCjrPXMxMOmF5L8Tm+4gbzvlI2uSV05tDot3oCk6sCTRMCXVJq
-         O8DeSFX/8opHvdo2umFHmRMGcTFU9xjkkYx511+wAtsRPYmlrjO4XUKjVf1HBSmGHvP5
-         225jFNV3cFAPTa2UFGajoKaMU575lCUhUnvMMfijZqzjDxaCMzgtIVCFiO5pJxtHX+TR
-         zqtZ+X71TvmEQkPI+b9n5Yj7f2bLizZo7AYMNveaWG/Z8UGM4qjxwQO/LyqisQ44Fgu0
-         oP2w==
-X-Forwarded-Encrypted: i=1; AJvYcCVPpW9WBz/cZl/gsMGhk2B8ZkirQ+REWhctvybCJgSGk1dMIxdVGA+WOjFVS2P/KcFvipnlXA4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYR4KOIz241k96GFFUIjTG83XYEo7q1rPuILXuA2Em2PFSTfZv
-	ilgOTqw1sH3Q5HFxCE7Teuy13c4q/Qoq82fWu3BJX2KYVzeoxzkidhxH
-X-Gm-Gg: AZuq6aJcmEy8DIErNnL7U0TxEZHUeVsYR4mnizZk7GBbVQ8tkSXNiKQynHG61aCAtTo
-	MihxylIbPrQ4Ybp8IKrxpjSLMmOqpALVl2o+yvxRLCyzViXh5s4A0jOfvYOJIIJWC/lGcTTEkjP
-	0OeY9RR3pyVVdg0cwVSul1q4fBwy/JFVyop9WVtmofHCJsa5tBrYrPiN8EJZziJn5tt75lLIoT4
-	Z3UV25J9HJjMQZlTeDJcQiRInpHv50Tp1FmuMfpP3xHWyH/ow78767x5CdWRseR8pBmXStUwA+X
-	Z7k4j7/BtljtpE143DSvlhtFwicvmc34iKeGt768NzeHH435SdUZgdVtrkDuaH3uQAPAuS1lzjm
-	jrlMzn+G3FQfKALyPAylTWOI7Y5G5Fv5uieQ4pauUdy3Tgk21CiSYydpNnQyvhtnvT7m74XQQd2
-	SPoJqTKcNLSnpk0xB2sxuGJbABfLLN0yDEfPboedTNwIVAoSvbCB2MABqoOzQQnf+Ra8/KEW02r
-	zds51fS//MFXnA=
-X-Received: by 2002:a05:6000:184d:b0:436:3563:49a2 with SMTP id ffacd0b85a97d-4396f17a6b8mr9232277f8f.37.1771753950660;
-        Sun, 22 Feb 2026 01:52:30 -0800 (PST)
-Received: from [10.0.0.98] (snat-2.cgn.sat-an.net. [176.222.226.2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43970d4c96csm12160766f8f.30.2026.02.22.01.52.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 22 Feb 2026 01:52:30 -0800 (PST)
-Message-ID: <6d248bec-cb87-4238-9ccc-e901926e3226@gmail.com>
-Date: Sun, 22 Feb 2026 10:52:28 +0100
+        d=1e100.net; s=20230601; t=1771754201; x=1772359001;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=maJ0fqFSfWgbQUTbt8pkn0t5Je6F2vvbc8i45PZOpsQ=;
+        b=izZsGhsUH/4OjsefeUGvYymKuHFVjVajlpH7/AVYz5K5D9Qe2Fhg/tyH8F9RC3zKK8
+         5uv7ycYWHBowwU1rwrPVmNqZ3xBT+Fct4W2vJDXapyIGMCWFbTbQfigWj5aPhQTxuRN9
+         OCMimD4dO+h30yN9gIkuvGGFH1XyvcwvB9qmW+4r4/Cil4jqCGRY7Uo0+ic7W+7tFeka
+         LRX+ggEMvMunshq6+vHGFsiNyvXQsccxmjIid+JSTjcGPO6NwXJSgF4UXF3gsKq1OkUV
+         h0jfVek94e9PeYJwehc9dM/v6QNmrIe28nvr9HEFrwDpJ1fGk23+HyE91il3vjjSXKb8
+         798g==
+X-Gm-Message-State: AOJu0Yxbt/aB7Fi6VPQhZLSFaH90xlAxJO8KiuBOexxLYZq5BFyl8XhH
+	CSbXxQgcnl4j6lJoh/1Z+XsklS20msvRD82m00oMI9NJY4+KeE8SkYff
+X-Gm-Gg: AZuq6aJOAvu13vbcpTQlxikKKtD+kc1QmDmjjcgoEHl9FS8TN6Bn8ZCko4Dz0gWCXa6
+	MZKt5J6kUNdiZHo85t8k3kiPAnST6X6YOnfE+oM9OX726aC+HI7v8eTcJOCmOhmnoG68FckwU5h
+	mW5le5qe7xH11SAGqCRgpim3GWtGUXqs1S8/cNPGTkHbc7i2RZroD5Cjblw5LvSgkJjbZ4mNz0m
+	B09oPnKctYsqr9f9bZ5KYUAE0dDOZDlHOykuiPdPr568/rv6DHrH7IvY3F0qT0CEW73ny4MHZEG
+	5Ixe2N+yd5NNj4zy0eFzqPiMDF3fcWzn+rjuoO/hxhSIp2qtwxZeXJmXnTQVH4CYUaACBWbdrCV
+	yUsGwOScIyGvIyrBq7cjfNGITTVtvQ40lc/omAhKAu/wvTwrQpAy64v/sOpFaWb/uZ42iT5V/wP
+	d9YS6iQ0h8D12MTaveR1cMFKJ+OKrGRqpma77KbzwIRwDIylPBJQaSGj81ww==
+X-Received: by 2002:a17:902:e787:b0:2aa:cfee:a47c with SMTP id d9443c01a7336-2ad7456550emr45059005ad.52.1771754200580;
+        Sun, 22 Feb 2026 01:56:40 -0800 (PST)
+Received: from strange.. ([2405:201:e066:f03e:63d0:17e6:9d20:6b06])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ad75054aa3sm43939045ad.89.2026.02.22.01.56.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 22 Feb 2026 01:56:40 -0800 (PST)
+From: mr.navi8680@gmail.com
+To: jhs@mojatatu.com,
+	jiri@resnulli.us,
+	shuah@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Naveen Anandhan <mr.navi8680@gmail.com>
+Subject: [PATCH] selftests: tc-testing: preserve list order when removing duplicates
+Date: Sun, 22 Feb 2026 15:25:36 +0530
+Message-ID: <20260222095536.17371-1-mr.navi8680@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v1] net: phy: motorcomm: yt8821: disable MDIO
- broadcast address 0
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Daniel Golle <daniel@makrotopia.org>,
- Qingfang Deng <dqfext@gmail.com>, SkyLake Huang
- <SkyLake.Huang@mediatek.com>, Frank <Frank.Sae@motor-comm.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Sai Krishna <saikrishnag@marvell.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <d3bb9c36-5a0e-4339-901d-2dd21bdba395@gmail.com>
- <0308e736-c3e7-45d2-86f7-e729af9cb487@gmail.com>
- <3e64d8d1-87c1-45e0-9556-0ca844a90f73@lunn.ch>
- <740e8351-d8a5-4f4c-91e4-c278e4b7d248@gmail.com>
- <aZq-SbHC0eU9OenG@shell.armlinux.org.uk>
-Content-Language: en-US
-From: =?UTF-8?Q?Jakub_Van=C4=9Bk?= <linuxtardis@gmail.com>
-In-Reply-To: <aZq-SbHC0eU9OenG@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_CC(0.00)[lunn.ch,makrotopia.org,gmail.com,mediatek.com,motor-comm.com,davemloft.net,google.com,kernel.org,redhat.com,marvell.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-259867-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259868-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linuxtardis@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[mrnavi8680@gmail.com,netdev@vger.kernel.org];
+	FROM_NO_DN(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 8FCBA16ECC2
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C377E16ECD5
 X-Rspamd-Action: no action
 
-On 2/22/26 09:28, Russell King (Oracle) wrote:
-> On Sun, Feb 22, 2026 at 05:22:55AM +0100, Jakub Vaněk wrote:
->> I had hoped this would not happen on the Cudy router. The MediaTek
->> Ethernet subsystem driver uses of_mdiobus_register(), so PHY address 0
->> should not be probed unless it is explicitly described in the device
->> tree. That said, I agree that with mdiobus_register() this would still
->> be an issue.
->>
->> I was also hoping that moving the internal PHY would provide more
->> flexibility in the device tree description of the YT8821. If the
->> workaround were implemented in U-Boot by writing YT8821 MDIO registers
->> at boot time, Linux would not be able to assert the YT8821 reset pin
->> without losing that workaround.
-> 
-> Why would you want to assert the reset pin?
-> 
+From: Naveen Anandhan <mr.navi8680@gmail.com>
 
-I don't currently have a solid reason to assert the reset pin.
-The two reasons I had in mind were mostly precautionary:
+Using set() removes duplicates but breaks ordering.
+Test output should be deterministic, so replace with dict.fromkeys().
 
-- I saw that the Qualcomm Atheros AR803x PHY driver relies on the
-  hardware reset pin to work around a hardware errata. While the
-  YT8821 appears to work just fine without asserting the reset,
-  I wanted to keep the option open in case a similar need arises
-  in the future.
+Signed-off-by: Naveen Anandhan <mr.navi8680@gmail.com>
+---
+ tools/testing/selftests/tc-testing/tdc_helper.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-- In the OpenWrt device trees for Cudy routers, PHY reset GPIOs
-  are/were* often described on the PHY node itself. I observed that
-  when the reset GPIO is associated with the PHY, the PHY core asserts
-  the reset pin in response to "ip link set dev eth0 down". Moving the
-  reset pin definition elsewhere changed that behavior. So far it
-  appeared to be fine, but I wasn't yet entirely sure that I didn't
-  subtly break something.
-
-Jakub
-
-* I recently moved some of the reset GPIO definitions from the PHY
-  level to the MDIO bus level to make the automatic PHY type detection
-  work. Doing this in U-Boot would work equally well.
+diff --git a/tools/testing/selftests/tc-testing/tdc_helper.py b/tools/testing/selftests/tc-testing/tdc_helper.py
+index 0440d252c4c5..e06f03c0fb5d 100644
+--- a/tools/testing/selftests/tc-testing/tdc_helper.py
++++ b/tools/testing/selftests/tc-testing/tdc_helper.py
+@@ -16,9 +16,9 @@ def get_categorized_testlist(alltests, ucat):
+ 
+ 
+ def get_unique_item(lst):
+-    """ For a list, return a list of the unique items in the list. """
++    """Return unique items while preserving original order."""
+     if len(lst) > 1:
+-        return list(set(lst))
++        return list(dict.fromkeys(lst))
+     else:
+         return lst
+ 
+-- 
+2.43.0
 
 
