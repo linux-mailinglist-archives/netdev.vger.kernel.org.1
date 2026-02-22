@@ -1,243 +1,190 @@
-Return-Path: <netdev+bounces-259907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259908-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gDT0JJtgm2kmywMAu9opvQ
-	(envelope-from <netdev+bounces-259907-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 21:01:31 +0100
+	id 6Ey6Gu5gm2kmywMAu9opvQ
+	(envelope-from <netdev+bounces-259908-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 21:02:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 401F2170427
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 21:01:31 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C0BA170437
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 21:02:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0DCDD3012E94
-	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 19:59:11 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E67A630074AA
+	for <lists+netdev@lfdr.de>; Sun, 22 Feb 2026 20:02:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64C9735C195;
-	Sun, 22 Feb 2026 19:59:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E6D31B4156;
+	Sun, 22 Feb 2026 20:02:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U4p4TMDV"
+	dkim=pass (2048-bit key) header.d=animalcreek.com header.i=@animalcreek.com header.b="sp2ikvR/";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="NSQKd/sJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD20135BDBC
-	for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 19:59:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 098EB2B9BA;
+	Sun, 22 Feb 2026 20:02:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771790349; cv=none; b=tZ+n6VZpOuYa5oWa2Euw4gaNdRHy+f+4ai1/Vh2sj/uXkV08erBk8KPxxulZ89RhVjPnhbmZR7hxaHvy6q8uNOUVWGXHtPmobj8wEQG2GuZn7W1BZubdfxxPF8GlJWMNaiDWPurT8XzHOqGvWmZQjwBYz9IWCNlShc4bzzpQcdM=
+	t=1771790571; cv=none; b=AOPJP1XcmBr/9aohliikQi3aoka+h0Fta+c4MwU8RjDJp18iipd4rl5NVlc8uJWD7IDQbS/aflMhYLoZHrWpZ9lgyc5QXXdHMvDTIoAQAahYAa+tjAunYEHsA7vpwWxmwMyGl81drDQR7kMiHX8kwDbPhesAiGPvYfoimWLYxzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771790349; c=relaxed/simple;
-	bh=otw/sidfsrVAXpxIAPSAHcc1JnUEwkQzo3iMewEEbLs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lNDt9d04pUP+nHiHBuWBaz3NpRH4voYuYSJytcyFt0qkp3djRWtaIwkn4ySq+4bq7SalvzhbTD3vFgdahFA1qlDWWlyud8k17ylS6YVwSaeE3KlD4s99tU/PhOqZm2UycLKepB+3URQLUlCQixz0WzgDLIoCp2qJX5gzkOIkyPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U4p4TMDV; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-b8fbb24a9a9so676146266b.0
-        for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 11:59:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771790346; x=1772395146; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=coP60IDvUwENZ4G8REzPur6qzEmmqfojoUutShryN4c=;
-        b=U4p4TMDVXOX8tlyznO4pGpYlq2u/vqSP3x7/wVv1pTs+c47Rv5CCc5/3PWgvh/G6Fg
-         cjRR//410wSU0It4WkOcEjzmNtR7v9YEmmCfzW8ajR1eUdXDJZwqDw+YuVeiX1dGylAv
-         vJRAW6il44jDmqYbcNDT+gxLMEHiG0LpwoASzgavKYtVNzkevof//eLyITh92sF0sM/g
-         l6AesyU4/JtviweOwGQf6KCopBm7ZQCSXXha8hL14FE3Dy1edAfqOIO/LZ6uyEy/YX4w
-         go8b38NAMjPEtbTKg4shTOA9TrwPCNU/BKr0OkyQjuzgN0FdrXWW6AQqB2ojJPg01SQr
-         tGFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771790346; x=1772395146;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=coP60IDvUwENZ4G8REzPur6qzEmmqfojoUutShryN4c=;
-        b=Wd+etLkyY8Ll4P0Q3siu/ZVx5lfPOfrtLiYa3BEJNbxWJhAzVDFZw1ZDkjGD+t1Is/
-         iKvotp7fMa00V/of8bSFK4hGTMuHco31oS47zPB95dBX474snXIrrwh60NRJ+18kazlT
-         2tNuKEhVQwMcsoxUWa3c+78L5d7oqg+Dg/zuPdxg8PaP6PeTbSZhlhRUuLo+GzlTvZR4
-         Kxrp4G0yfC7m21sRXsqadfT8Jk2kCBjeAIt6i3/gADVNgXMx7tVhEF7vVTOJ5YTxyx9l
-         c6H07HgIB9rfYjVaUZCdu66/RcZD3x29mb6sHnWiFNJ+8eSHWI4eos4ARbmDAbst3p/m
-         EPDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUJRzmP9/veKiw7L8rKh+UU38msQK3YR+abisImKwSP3PbXeZmq00pDieAHv1jycuhb305FUDg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+aFp+7xR6SciHfiaRYOAZp6q3oADHXI+MvhxUO8g/vn/P1SWJ
-	uNCef43L7yPWrFTMnSXm76n7nadedqple/BpIA/GsJesGTYuM6R9lBTt
-X-Gm-Gg: AZuq6aI8QuECCMd2xSs6r+U/8cvAGEbJC2QYtomFfto9fEHgaQtUlSDIkbB/VJQq8xk
-	lG5DnLnLGrPAlOiZR6/qA16vHTL0RH1LT2stD4tiJQj2BC9KA1TLFDacMRgrLYiMcLJhfuxy81c
-	PE/Eh6Tvvi4l7ZLd/x3+tBrf8nE14noP2G8Vi0G8Lny8iYLZW431K9tJE9bw0AHjv152U+hTnm9
-	iTJteZ0y1FB7tf67uGpHHDWugTHopxXqf7F7HNTaL7V8nDG+73ZfZ3ga74208Kgw48432rpg2bD
-	CXcgIuCnmOkS5CdHtm3LhuxbV3xACWYuaAEzPENH/6RRTQJEnZf/McjfDjT5A08DDVvDa0N6kJz
-	ai2KZYqalPhT0r06ff0XlGY7hIuRhwMPW8MDMoc0yw/UPKFeRUZEJev0RFH1eiTRjXj9b1lyOAi
-	rVnyiZBapSxo29Jme/vDn5T5h5oXP2jJFGH1RzAqi+cVh7FmFLXOKlrk7WK/OmonxBiODMt0TUV
-	UlKQ1LlxmrGChgZ4/k3typGK+yr+cSJzC5uWhs1//3a1W4RUxyfhevvAnCPYp2AUg==
-X-Received: by 2002:a17:907:988:b0:b88:1e2:ed49 with SMTP id a640c23a62f3a-b9080f13a76mr405909266b.8.1771790346139;
-        Sun, 22 Feb 2026 11:59:06 -0800 (PST)
-Received: from eric (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9084c5c514sm246125466b.5.2026.02.22.11.59.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Feb 2026 11:59:05 -0800 (PST)
-From: Eric Woudstra <ericwouds@gmail.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>
-Cc: netfilter-devel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	bridge@lists.linux.dev,
-	Eric Woudstra <ericwouds@gmail.com>
-Subject: [PATCH v18 nf-next 4/4] netfilter: nft_chain_filter: Add bridge double vlan and pppoe
-Date: Sun, 22 Feb 2026 20:58:43 +0100
-Message-ID: <20260222195845.77880-5-ericwouds@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260222195845.77880-1-ericwouds@gmail.com>
-References: <20260222195845.77880-1-ericwouds@gmail.com>
+	s=arc-20240116; t=1771790571; c=relaxed/simple;
+	bh=OP4O3q0tEgUsuEr5yc6i3Pk3OGco6JhTwWYBuWw8ZeY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=thUL5MMBSV5Ezh7ND5sI4OBz3DuaYerHCtnGR9DzQaP0fGqMzNvVwXJeDahMEFu2BIx33OwmtUm/0oNf3l8Pxn3dtkanbv1SDPOXaNeNd717CQmzgce7+/WwpYIkoyMQPynmoe205jW65ZZjpBoSJJwVzOjhc0cgeAS87WmL/+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=animalcreek.com; spf=pass smtp.mailfrom=animalcreek.com; dkim=pass (2048-bit key) header.d=animalcreek.com header.i=@animalcreek.com header.b=sp2ikvR/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=NSQKd/sJ; arc=none smtp.client-ip=202.12.124.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=animalcreek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=animalcreek.com
+Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 0FC377A004D;
+	Sun, 22 Feb 2026 15:02:47 -0500 (EST)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-12.internal (MEProxy); Sun, 22 Feb 2026 15:02:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=animalcreek.com;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
+	 t=1771790567; x=1771876967; bh=iLfA9tYX3ZgFzd0/ew0lCDb5XE0nxrvr
+	a7ORe8E4F0I=; b=sp2ikvR/wrlvxMw2Rg04UQBeovX12toH+bjpRyb0pTJIwrbU
+	IOhGT/3fid+xVbtSzfpg8uVUB2mv+U6IH01qR8cifPea99MhsR1M8R6cLWHoeNHj
+	UReMa4X3COK71OOekdw/0O0eYSCR2tqFVLhG7W3vhdDe7FAqqaBNjWSycMal8F38
+	UCFIZ2i1nWRUNv59su2EUq+NLjF67ZFUH7YG/O3emOTa4DosPRRsCsbvbqdpaiBI
+	vSNnkgbIE2+I3xUq6KISLtngNhY+KI8popxF3wowhNlSHPXfYXaTCHyQ5DszDtza
+	DYgvYl2hQz3pq99+CUyXrU52yFPb51E8jkKkwA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1771790567; x=
+	1771876967; bh=iLfA9tYX3ZgFzd0/ew0lCDb5XE0nxrvra7ORe8E4F0I=; b=N
+	SQKd/sJdznCJrAvSWsG6YbBEHuROoMH6RFUGFaiZ20+Vz3vl4aAkYqwIOEvSap7W
+	+A6/JPwAVwR0Z/hEzlPoAbdLpRtMJX6DPOcutYWYix2jTPosxndqamobFuTMX/IQ
+	skEU0Z7c3X+BAMCQ3UbRVrA/0MgtKEUobE2GO5yx85g3XUf/9PsNh5Ph/OiqzTee
+	Cfr1hI3mM6dGfb2V69qJOJGRPc/bX/pBrFWyAX4gN6GPgfWZsLzCPx8XdkJ0JLZw
+	OygsKqXg8+2ScdQQMhHaERSsP8ZLVecqly5LE8JhX3+JrCVzF7eK8jVo8FaeBQXH
+	aF1TfdUssixzRUNJgZWGQ==
+X-ME-Sender: <xms:52CbaSXmiUO-WUZxbWcJBuBaZ0m56xHY9RABhhvFSBeEC9eI-uQbvw>
+    <xme:52CbaXiVlOoz34fgPNZzEV4V_mY-HZYV8hXiFupcGnePoS1ulaRKuUwYc_Mw3z4ul
+    gBMqi4IMA097PITJmeOpDHxFJGCMN1B1rrTvMl-od_l5upkarISSA>
+X-ME-Received: <xmr:52CbaR-8ZpCD6cZ8eNioLyZKpJdBbvnc82rl67A-f6DrqGXT6z-xThQ8NYysZntPg7q2C-zA3YEZ6qPYBVBWgaOAyXop>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvfeehvddvucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucenucfjughrpefkffggfgfuvfevfhfhohgjtgfgsehtje
+    ertddtvdejnecuhfhrohhmpeforghrkhcuifhrvggvrhcuoehmghhrvggvrhesrghnihhm
+    rghltghrvggvkhdrtghomheqnecuggftrfgrthhtvghrnhephfduteehueffkeelfeefke
+    efjeeuffdtuedvffeftdettdfhleduvddutdefheeinecuvehluhhsthgvrhfuihiivgep
+    tdenucfrrghrrghmpehmrghilhhfrhhomhepmhhgrhgvvghrsegrnhhimhgrlhgtrhgvvg
+    hkrdgtohhmpdhnsggprhgtphhtthhopeehpdhmohguvgepshhmthhpohhuthdprhgtphht
+    thhopehtohhmrghsiidruhhnghgvrheshigrhhhoohdrphhlpdhrtghpthhtoheplhhinh
+    hugidqfihirhgvlhgvshhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohep
+    nhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugi
+    dqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepmhhgrhgv
+    vghrsegrnhhimhgrlhgtrhgvvghkrdgtohhm
+X-ME-Proxy: <xmx:52CbaZY0xw7DMS0Cw5MKQlM6_XB7PUvgwLfwgV2NeaKd15hiwW3jqQ>
+    <xmx:52CbaY2CGxszxHsyF2Se7t3zMFvQp_lnwBJG-PjV9aSJNaTYbrsJxg>
+    <xmx:52Cbacaz6sXeE2ANtP093_-dKeL-LjEgNaITbxOIhQreQ5OzS__QAQ>
+    <xmx:52CbaYI-cPfDeHKCBJSV269JPkVme0DwOmVpYIfKQ3BWNhbD3QTpdw>
+    <xmx:52CbaQuvwCW4nc-UV3VtD1M9kfExyx8yDjkqOv2HjRrpspzNWWBa9YyX>
+Feedback-ID: i9cc843c7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 22 Feb 2026 15:02:46 -0500 (EST)
+Message-ID: <386f2ceb-30ae-4acf-9a62-287412fc5c79@animalcreek.com>
+Date: Sun, 22 Feb 2026 13:02:45 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] nfc: trf7970a: Fix spelling mistakes in comments
+To: tomasz.unger@yahoo.pl
+Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260219112454.46841-1-tomasz.unger.ref@yahoo.pl>
+ <20260219112454.46841-1-tomasz.unger@yahoo.pl>
+Content-Language: en-US
+From: Mark Greer <mgreer@animalcreek.com>
+Organization: Animal Creek Technologies, Inc.
+In-Reply-To: <20260219112454.46841-1-tomasz.unger@yahoo.pl>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	R_DKIM_ALLOW(-0.20)[animalcreek.com:s=fm1,messagingengine.com:s=fm3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,gmail.com];
-	TAGGED_FROM(0.00)[bounces-259907-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ericwouds@gmail.com,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[animalcreek.com];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-259908-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
+	FREEMAIL_TO(0.00)[yahoo.pl];
+	DKIM_TRACE(0.00)[animalcreek.com:+,messagingengine.com:+];
+	RCPT_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mgreer@animalcreek.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 401F2170427
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[animalcreek.com:mid,animalcreek.com:dkim,animalcreek.com:email]
+X-Rspamd-Queue-Id: 8C0BA170437
 X-Rspamd-Action: no action
 
-In nft_do_chain_bridge() pktinfo is only fully populated for plain packets
-and packets encapsulated in single 802.1q or 802.1ad.
+On 2/19/26 4:24 AM, tomasz.unger@yahoo.pl wrote:
+> From: Tomasz Unger <tomasz.unger@yahoo.pl>
+>
+> Fix spelling mistakes in comment block (lines 64, 69, 72):
+> - 'recieves' -> 'receives'
+> - 'recieving' -> 'receiving'
+> - 'recived' -> 'received'
+>
+> Found by manual inspection.
+>
+> Signed-off-by: Tomasz Unger <tomasz.unger@yahoo.pl>
+> ---
+>   drivers/nfc/trf7970a.c | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/nfc/trf7970a.c b/drivers/nfc/trf7970a.c
+> index d17c701c7888..c3bf48f49eca 100644
+> --- a/drivers/nfc/trf7970a.c
+> +++ b/drivers/nfc/trf7970a.c
+> @@ -61,15 +61,15 @@
+>    * support that.  So, if an abort is received before trf7970a_send_cmd()
+>    * has sent the command to the tag, it simply returns -ECANCELED.  If the
+>    * command has already been sent to the tag, then the driver continues
+> - * normally and recieves the response data (or error) but just before
+> + * normally and receives the response data (or error) but just before
+>    * sending the data upstream, it frees the rx_skb and sends -ECANCELED
+>    * upstream instead.  If the command failed, that error will be sent
+>    * upstream.
+>    *
+> - * When recieving data from a tag and the interrupt status register has
+> + * When receiving data from a tag and the interrupt status register has
+>    * only the SRX bit set, it means that all of the data has been received
+>    * (once what's in the fifo has been read).  However, depending on timing
+> - * an interrupt status with only the SRX bit set may not be recived.  In
+> + * an interrupt status with only the SRX bit set may not be received.  In
+>    * those cases, the timeout mechanism is used to wait 20 ms in case more
+>    * data arrives.  After 20 ms, it is assumed that all of the data has been
+>    * received and the accumulated rx data is sent upstream.  The
 
-When implementing the software bridge-fastpath and testing all possible
-encapulations, there can be more encapsulations:
 
-The packet could (also) be encapsulated in PPPoE, or the packet could be
-encapsulated in an inner 802.1q, combined with an outer 802.1ad or 802.1q
-encapsulation.
+Wow... and I actually know how to spell receive. if you can believe that.
 
-nft_flow_offload_eval() also examines the L4 header, with the L4 protocol
-known from the conntrack-tuplehash. To access the header it uses
-nft_thoff(), but for these packets it returns zero.
 
-Introduce nft_set_bridge_pktinfo() to help populate pktinfo with the
-offsets.
-
-Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
----
- net/netfilter/nft_chain_filter.c | 55 +++++++++++++++++++++++++++++---
- 1 file changed, 51 insertions(+), 4 deletions(-)
-
-diff --git a/net/netfilter/nft_chain_filter.c b/net/netfilter/nft_chain_filter.c
-index d4d5eadaba9c..66ef30c60e56 100644
---- a/net/netfilter/nft_chain_filter.c
-+++ b/net/netfilter/nft_chain_filter.c
-@@ -227,21 +227,68 @@ static inline void nft_chain_filter_inet_fini(void) {}
- #endif /* CONFIG_NF_TABLES_IPV6 */
- 
- #if IS_ENABLED(CONFIG_NF_TABLES_BRIDGE)
-+static int nft_set_bridge_pktinfo(struct nft_pktinfo *pkt, struct sk_buff *skb,
-+				  const struct nf_hook_state *state,
-+				  __be16 *proto)
-+{
-+	nft_set_pktinfo(pkt, skb, state);
-+
-+	switch (*proto) {
-+	case htons(ETH_P_PPP_SES): {
-+		struct ppp_hdr {
-+			struct pppoe_hdr hdr;
-+			__be16 proto;
-+		} *ph, _ph;
-+
-+		ph = skb_header_pointer(skb, 0, sizeof(_ph), &_ph);
-+		if (!ph) {
-+			*proto = 0;
-+			return -1;
-+		}
-+		switch (ph->proto) {
-+		case htons(PPP_IP):
-+			*proto = htons(ETH_P_IP);
-+			return PPPOE_SES_HLEN;
-+		case htons(PPP_IPV6):
-+			*proto = htons(ETH_P_IPV6);
-+			return PPPOE_SES_HLEN;
-+		}
-+		break;
-+	}
-+	case htons(ETH_P_8021Q): {
-+		struct vlan_hdr *vhdr, _vhdr;
-+
-+		vhdr = skb_header_pointer(skb, 0, sizeof(_vhdr), &_vhdr);
-+		if (!vhdr) {
-+			*proto = 0;
-+			return -1;
-+		}
-+		*proto = vhdr->h_vlan_encapsulated_proto;
-+		return VLAN_HLEN;
-+	}
-+	}
-+	return 0;
-+}
-+
- static unsigned int
- nft_do_chain_bridge(void *priv,
- 		    struct sk_buff *skb,
- 		    const struct nf_hook_state *state)
- {
- 	struct nft_pktinfo pkt;
-+	__be16 proto;
-+	int offset;
- 
--	nft_set_pktinfo(&pkt, skb, state);
-+	proto = eth_hdr(skb)->h_proto;
-+
-+	offset = nft_set_bridge_pktinfo(&pkt, skb, state, &proto);
- 
--	switch (eth_hdr(skb)->h_proto) {
-+	switch (proto) {
- 	case htons(ETH_P_IP):
--		nft_set_pktinfo_ipv4_validate(&pkt, 0);
-+		nft_set_pktinfo_ipv4_validate(&pkt, offset);
- 		break;
- 	case htons(ETH_P_IPV6):
--		nft_set_pktinfo_ipv6_validate(&pkt, 0);
-+		nft_set_pktinfo_ipv6_validate(&pkt, offset);
- 		break;
- 	default:
- 		nft_set_pktinfo_unspec(&pkt);
--- 
-2.53.0
+Acked-by: Mark Greer <mgreer@animalcreek.com>
 
 
