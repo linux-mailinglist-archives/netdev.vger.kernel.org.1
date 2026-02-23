@@ -1,72 +1,74 @@
-Return-Path: <netdev+bounces-260212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260213-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cCR2J+PLnGlHKQQAu9opvQ
-	(envelope-from <netdev+bounces-260212-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:51:31 +0100
+	id mK0RNfnLnGlHKQQAu9opvQ
+	(envelope-from <netdev+bounces-260213-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:51:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0604C17DC21
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:51:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DEFB17DC46
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:51:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8AAFE30D6E3D
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 21:50:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E7E6230F6F52
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 21:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 319273793B8;
-	Mon, 23 Feb 2026 21:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9879D36B07F;
+	Mon, 23 Feb 2026 21:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="FNDp/mkA"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="TciR3zCO"
 X-Original-To: netdev@vger.kernel.org
 Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 143E633A6E9
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 21:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF7A378D82
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 21:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771883428; cv=none; b=Bfyl0MDzEfx5WiLNjKZt03tnriz9KElBdgREUBrwa23KFuLeezqLKbuD0XISh9WUep4kG6ShWB30+ErQNiFsdyAwOJwx94s9A4O5NS3isR/0Qtsgu6YLME6VLSspvEpfS8IGhf3d1H9hpmvMkMR7d3tdWHPXTgL0Y2dXy0zJyi0=
+	t=1771883430; cv=none; b=nptHMcED7UceHNC9kYnd720Yu902nv5k3GXERu6Q6ncb9enx70ftgERkS3s5glLq22Jpt4VQISsyBNLcBpJydP8XXs3xQrw5ygFdjBHgpeQbmt80Za6F44lbJbEs/LJvsQyO5Ahbnw39888ALrYmOnc59wwVYSF4sPgxXps3+1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771883428; c=relaxed/simple;
-	bh=qtP38MaTf/OO1c4XDeW+gZQilw49VkT2LCkLWQnTNog=;
+	s=arc-20240116; t=1771883430; c=relaxed/simple;
+	bh=urs7LFEFzoIA8YPfdWzwjXPvYvVkNZEMfiFNbQSTi58=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OagtBINxB6gAp9pZ+YbjfUMv8Rj3yTRvqrk2oDZ8ru0LQbwQqoxW3+5R4QPzkddIfUFgOim6U3hPY7mp8cMZzTDB948tjxp4BgsJglqzV6iJefk+D3pt0mWNcExlEODvFCyfbHj9nAjq5xqoDoUgL9ehU+tDpHDod/ppU+jNHgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=FNDp/mkA; arc=none smtp.client-ip=199.89.1.16
+	 MIME-Version; b=D5pqq1Cbgivd8LjEH1vIlUJP9hGx8YYSP3mlObMgyAPm+p/lL4Jjuqz1ZalZiU31MCiK3WOhlhkYyDYh5aHLesv7I3qnHw8ax2UfUD+Gz4XEBcQL0AQCTR0Ij9oEcHXsknM6BOLX/tQtLLqWLsEIFeafiY9IUWNMqpFgYoZnGlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=TciR3zCO; arc=none smtp.client-ip=199.89.1.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4fKZKG623Pzlh1Wk;
-	Mon, 23 Feb 2026 21:50:26 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4fKZKK1k6Rzlh1Wr;
+	Mon, 23 Feb 2026 21:50:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1771883426; x=1774475427; bh=JMpWL
-	lk4dcnYEp1thSbtksjwVomaU0aDgfmv5lEycPc=; b=FNDp/mkAhgK4vG8iE8zWM
-	k+PfftIvKwmNzrnJi1hr0O641bexFcbr4DL8b/rQoyh87aNHmFsFDGlS+AOD2/Jx
-	NWmdtth7kwqpbDV13JbAKZ3y+merbWxXR4Lr9LfSbz34acCbMuVkL8Y5zhHn3/SM
-	KPaAvqz9tBbU/D5plUG0R5vsEBRVuK5bCz3d6vmlxkIgQ1b0zkCxvAWB8PfKdrPP
-	aftLQ4cMJ3WVtXf2n4vK65+KVYH3As9P1i6spqgPvOdPfBIOQY8/hybsI3Ur9fP5
-	cWm3KpBZf2iwxPY6i1D24GbM4ai0e5UK+A/NcRHOeO37Oq8ZtrdSfziUF10KByUc
-	g==
+	:received:received; s=mr01; t=1771883427; x=1774475428; bh=nnFa9
+	8OY9ljH31aKjq4xyU/FDPBwt+RV3CAa4GqfTp4=; b=TciR3zCOOrCRvtqqenN9x
+	aGqDunUrT0V2bvQnIuCIV8Ko94Ahn6YQTu+oP65tINdKPUQ8iWXxjsVwy6nNkuoq
+	2mEjqfh0LCKAs6BImMQ7OK1hAhJgIo1tLAxMZU24msvHzuVQRXys9ScDgrlX0AxB
+	ABJ/MUY+Q6uJ76++2IgMoq+jFRswFulHj12da6uy/veEepV/l8JIqqEhP9rWhpTA
+	c/DrV8pDi6vLG02mciyejPvRDDIQmGc0XfFkLkOVSzqW6hALROquqN7MzA2tWDTd
+	Yo9RqjV1x0xQ42VlFHikGrYkoQbXIFhgGGqk2eeVR//P3SFgjJoAacRMBdxINrCp
+	Q==
 X-Virus-Scanned: by MailRoute
 Received: from 013.lax.mailroute.net ([127.0.0.1])
  by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id s9Rg_GU3Howl; Mon, 23 Feb 2026 21:50:26 +0000 (UTC)
+ id zKMjZq9ZOlrP; Mon, 23 Feb 2026 21:50:27 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4fKZKF10M0zlfgPY;
-	Mon, 23 Feb 2026 21:50:24 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4fKZKG3Y55zlfddf;
+	Mon, 23 Feb 2026 21:50:26 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Peter Zijlstra <peterz@infradead.org>
 Cc: Bart Van Assche <bvanassche@acm.org>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Shantiprasad Shettar <shantiprasad.shettar@broadcom.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
 	netdev@vger.kernel.org
-Subject: [PATCH 17/62] bnxt_en: Make bnxt_resume() easier to analyze
-Date: Mon, 23 Feb 2026 13:49:05 -0800
-Message-ID: <20260223214950.2153735-18-bvanassche@acm.org>
+Subject: [PATCH 18/62] bnxt_en: Fix bnxt_dl_reload_up()
+Date: Mon, 23 Feb 2026 13:49:06 -0800
+Message-ID: <20260223214950.2153735-19-bvanassche@acm.org>
 X-Mailer: git-send-email 2.53.0.371.g1d285c8824-goog
 In-Reply-To: <20260223214950.2153735-1-bvanassche@acm.org>
 References: <20260223214950.2153735-1-bvanassche@acm.org>
@@ -84,54 +86,59 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[acm.org,reject];
 	R_DKIM_ALLOW(-0.20)[acm.org:s=mr01];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260212-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[acm.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260213-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DKIM_TRACE(0.00)[acm.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[bvanassche@acm.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,acm.org:mid,acm.org:dkim,acm.org:email,broadcom.com:email]
-X-Rspamd-Queue-Id: 0604C17DC21
+	DBL_BLOCKED_OPENRESOLVER(0.00)[broadcom.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,acm.org:mid,acm.org:dkim,acm.org:email]
+X-Rspamd-Queue-Id: 0DEFB17DC46
 X-Rspamd-Action: no action
 
-Pass the same argument to netdev_lock() and netdev_unlock(). This patch
-prepares for enabling the Clang thread-safety analysis functionality. No
-functional change intended.
+bnxt_dl_reload_down() calls rtnl_lock() and netdev_lock() if it returns
+0. Hence, bnxt_dl_reload_up() should invoke the corresponding unlock
+calls. This issue has been detected by the clang thread-sanitizer.
+Compile-tested only.
 
+Cc: Jakub Kicinski <kuba@kernel.org>
 Cc: Shantiprasad Shettar <shantiprasad.shettar@broadcom.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>
 Cc: netdev@vger.kernel.org
+Fixes: 004b5008016a ("eth: bnxt: remove most dependencies on RTNL")
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethe=
-rnet/broadcom/bnxt/bnxt.c
-index e062d5d400da..950708575268 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -17121,7 +17121,7 @@ static int bnxt_resume(struct device *device)
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c b/drivers/=
+net/ethernet/broadcom/bnxt/bnxt_devlink.c
+index 15de802bbac4..1e9a3454bb29 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
+@@ -562,6 +562,8 @@ static int bnxt_dl_reload_up(struct devlink *dl, enum=
+ devlink_reload_action acti
+ 		break;
+ 	}
+ 	default:
++		netdev_unlock(bp->dev);
++		rtnl_unlock();
+ 		return -EOPNOTSUPP;
  	}
 =20
- resume_exit:
--	netdev_unlock(bp->dev);
-+	netdev_unlock(dev);
- 	bnxt_ulp_start(bp, rc);
- 	if (!rc)
- 		bnxt_reenable_sriov(bp);
 
