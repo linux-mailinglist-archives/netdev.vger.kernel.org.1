@@ -1,221 +1,179 @@
-Return-Path: <netdev+bounces-260031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260032-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sDKxL6ZTnGktDwQAu9opvQ
-	(envelope-from <netdev+bounces-260031-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 14:18:30 +0100
+	id yHhwHEFUnGmSEAQAu9opvQ
+	(envelope-from <netdev+bounces-260032-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 14:21:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 681E4176A9A
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 14:18:30 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 988A3176B3F
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 14:21:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8F16B30D57CA
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 13:15:03 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8AC8030095E4
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 13:20:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B12E11E5201;
-	Mon, 23 Feb 2026 13:15:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0178318787A;
+	Mon, 23 Feb 2026 13:20:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VhVTfmRZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TUjLNisP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F23936680B;
-	Mon, 23 Feb 2026 13:14:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0A25156661;
+	Mon, 23 Feb 2026 13:20:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771852502; cv=none; b=alew28rwiDs6+Y6XlsBdNyXjJuOHPvgt6CKRXSt/pQBGaiv9I/DF3m60hUiM/LvMCGNFWYltwCq6DFph7EXzsBnHN/M+5rJvq7NYrAqR0vZPPNe/rOtEmDRnYBwLlhaaR6rQJ5kUw7gI+OhnC3x1Lcjrn2+nE/yt0jmEPXelKI8=
+	t=1771852836; cv=none; b=GnoIerkeQE6KYK/0rm7wXs3imtj9qiUxFUpF5Gt5uAhOODYmaf8MqVfcwXNXdVu3/nMu5ZG4U1+0LSY2jNmWow1YayKMzGEQ2HKh0SeUMlMl31h+m5wLhWcQZKNXMMoO5KTJlq+RZ6Zf87vQtjWPjNGWkzxRQC/jHUEAVINmD8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771852502; c=relaxed/simple;
-	bh=9vMVLC6u6HwsJjrlQb/VRLODhHk+XdbvNFxqmNw0T/Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
-	 In-Reply-To:Content-Type; b=lDDTgwdueHykv/93U+wWl6A6B6iEaHeRC8UOWBsw0vulb2go10VZcptbjUc2f9vPS1rDlmAo1vasF+hj5G5QjCeiWtxAh09SQQU+DqY0P6zja2bXgyheGJnuQVXBau18qw8AQin60N396M9By95peRzB7Bzb6cZTq5uasWn9UIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=VhVTfmRZ; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61N1F85K2962734;
-	Mon, 23 Feb 2026 13:14:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=zYhRLo
-	iK0VLHYOzUwBccbAM03Ht3O7rDyk48fwSLsM4=; b=VhVTfmRZlcgUlS2H4zoNjO
-	cIoftXjrnJVO+eqs4xb2LmUjPaQvMLgx3ARvMEmIwP/wzgaXegXa4SMfxebr4Jl6
-	rOrZqqcQQVdXVymS4xyFEhlh7kHdBUqOgX+u0fj6nYjsUiXPIPVeFEI78dC0r0og
-	gBu6wELB17+OmxixdGAA+Np2BXE4pyxsunqdDVWs/UBpEt1i+S5lWwcNwrRFbWA3
-	Sqbwh3UB5HI+rcOfsm98h8jwSnrrCYtuKxzjE31EPy9hMQOYJy4FynC5EQqFa4b4
-	VE1MZ+O/BlCHbXVsqMxxfDDFtylqNuDNvU+Hu5Hq2CvooDNEb1G1Jb9Q1nVL1oPA
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4cf24g703j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 23 Feb 2026 13:14:03 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 61NBfIQK003836;
-	Mon, 23 Feb 2026 13:14:02 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4cfs8jmn9q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 23 Feb 2026 13:14:02 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 61NDE1Qp49545712
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 23 Feb 2026 13:14:01 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F358B20040;
-	Mon, 23 Feb 2026 13:14:00 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6D9172004B;
-	Mon, 23 Feb 2026 13:13:44 +0000 (GMT)
-Received: from [9.124.223.211] (unknown [9.124.223.211])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 23 Feb 2026 13:13:44 +0000 (GMT)
-Message-ID: <68149255-7398-466b-9d97-7f0124fda25b@linux.ibm.com>
-Date: Mon, 23 Feb 2026 18:43:42 +0530
+	s=arc-20240116; t=1771852836; c=relaxed/simple;
+	bh=UM5uAas2+oPaEQtliTzSO+741krCLvx89znH8iLeZv8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=N2hW33LPU373KrvkB30C27Di04ICc33Yd6Gep9EQj2Bkn9y03P4VM0KL3TEzeuIk21mMYe1+s90sUd+0evW66oB1j+oxfuojb1yJMCa9f92FSE5v/3k5AJUHOR9/CQKzCvzyr1UmKPg+C6Mh0qB483KqFSmEuwBKS2sdo+EYeP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TUjLNisP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB2A9C19424;
+	Mon, 23 Feb 2026 13:20:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771852836;
+	bh=UM5uAas2+oPaEQtliTzSO+741krCLvx89znH8iLeZv8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=TUjLNisP07ZWrnDtJj/fbjkJFkdGXibs0StqzQi6ersq7RgfLOWCsh4x8yxRJROsF
+	 7viKo9PK0jrSdmBs9CE3c4XJLb9Y3UW5oSpyus8yMb6ktrs32HqxQFDmwyLBYFUYwV
+	 pZwe6+EPoxHNGSe+I178ztEgEwN9lJTYeEj/CqLnQnr79kGN+QX3L7vfVECPPi/EqT
+	 Y03x37Da9KEt0CQ2ZtTeX/NlQzJsEWkzX68V6kb9fxT7Vh+9q3O8k6VQf+KkHhxlC4
+	 nv7o8PT+kbsiQLCiQlTALLp7DpoH8te+dYe+DRPchY111ai9GAyVHMyfp5T4zG3H9n
+	 Vd9hoxIDS62WQ==
+Message-ID: <1bdb2c3d-a1b8-432c-8933-d7df3fc10ce5@kernel.org>
+Date: Mon, 23 Feb 2026 14:20:33 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/12] powerpc/xive: simplify xive_spapr_debug_show()
-To: Yury Norov <ynorov@nvidia.com>, linuxppc-dev@lists.ozlabs.org
-References: <20260219181407.290201-1-ynorov@nvidia.com>
- <20260219181407.290201-2-ynorov@nvidia.com>
-From: Shrikanth Hegde <sshegde@linux.ibm.com>
-Content-Language: en-US
-Cc: linux-kernel@vger.kernel.org,
-        "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Antoine Tenart <atenart@kernel.org>,
-        Christian Brauner <brauner@kernel.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Geetha sowjanya <gakula@marvell.com>, Ingo Molnar <mingo@kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>, James Clark <james.clark@linaro.org>,
-        Jerin Jacob <jerinj@marvell.com>, Linu Cherian <lcherian@marvell.com>,
-        Lukasz Luba <lukasz.luba@arm.com>,
-        Madhavan Srinivasan <maddy@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Mike Leach <mike.leach@linaro.org>, Moritz Fischer <mdf@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
-        Rasmus Villemoes
- <linux@rasmusvillemoes.dk>,
-        Simon Horman <horms@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-        Subbaraya Sundeep
- <sbhatta@marvell.com>,
-        Sunil Goutham <sgoutham@marvell.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>, Tom Rix <trix@redhat.com>,
-        Xu Yilun <yilun.xu@intel.com>, Yajun Deng <yajun.deng@linux.dev>,
-        Yury Norov <yury.norov@gmail.com>, Zhang Rui <rui.zhang@intel.com>,
-        hariprasad <hkelam@marvell.com>, coresight@lists.linaro.org,
-        linux-arm-kernel@lists.infradead.org, linux-fpga@vger.kernel.org,
-        linux-pm@vger.kernel.org, netdev@vger.kernel.org
-In-Reply-To: <20260219181407.290201-2-ynorov@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH iproute2-next 2/3] utils: timestamp: add JSON support
+Content-Language: en-GB, fr-BE
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+ mptcp@lists.linux.dev
+References: <20260220-ipr-monitor-json-v1-0-eb4b0d5f7820@kernel.org>
+ <20260220-ipr-monitor-json-v1-2-eb4b0d5f7820@kernel.org>
+ <20260220213900.76198834@phoenix.local>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20260220213900.76198834@phoenix.local>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=TNRIilla c=1 sm=1 tr=0 ts=699c529c cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=Ikd4Dj_1AAAA:8
- a=VnNF1IyMAAAA:8 a=RRjIJgXTCtlgTdhHy9AA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: zk86Bjz-ydPJYTzK12ycUFUxtnx4SsWL
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjIzMDExMyBTYWx0ZWRfXzUksRw9myqEz
- UixBWMUBZhLNgjnHiRif4qEj6UTL9WGyZkn27yUtF6CWFb9SYDOGa8ybNIYcoScAvxJAjZvhNeN
- crWv2GETS4bYnOXhGA0j9jBzFducGZUXccIKv+/lCjc59Y7xepUBptqzpDWEqkQeTWTMZOLtDAe
- JKMVrv5POWEa1ALIBmUFCCdNJAw5xb1J1rgrHt8KhPKHVdM2T59DOL7PmtHzE85KWEwjN5v4NGp
- KwqvUOH7ymRE+6kwdl+0y/KIhzwB4XbaesJX00qvqjBCniVexgjmFtm0aMlvo60ZeN66AO42SpO
- fZ+eus7mxmnk4gnXvoIwI7BShUWgz1g/JfCJNmaSyECFzmtlwps2RusoWi6ud1HQYaHQSf5ROEo
- rm2QmGaze6ialIdxLy6AR7amIsOcyElw9lE3OHW750fh185sPBRKByN+/ioJoQpV2aiqznoRRJa
- UDMaxIW562x9oJGezoA==
-X-Proofpoint-ORIG-GUID: Hf_7wRhC8iujCJ7VvfJzpi5rfR7wKIcE
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-23_02,2026-02-23_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 suspectscore=0 adultscore=0 priorityscore=1501 impostorscore=0
- spamscore=0 clxscore=1011 bulkscore=0 lowpriorityscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602230113
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[44];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260031-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,davemloft.net,infradead.org,linux.intel.com,lunn.ch,linux-foundation.org,linaro.org,google.com,marvell.com,arm.com,linux.ibm.com,ellerman.id.au,gmail.com,redhat.com,rasmusvillemoes.dk,fomichev.me,intel.com,linux.dev,lists.linaro.org,lists.infradead.org];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.ibm.com:mid,nvidia.com:email];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-260032-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	HAS_ORG_HEADER(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sshegde@linux.ibm.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[11]
-X-Rspamd-Queue-Id: 681E4176A9A
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCPT_COUNT_THREE(0.00)[4];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 988A3176B3F
 X-Rspamd-Action: no action
 
+Hi Stephen,
 
-
-On 2/19/26 11:43 PM, Yury Norov wrote:
-> The function creates temporary buffer to convert xibm->bitmap to a
-> human-readable list before passing it to seq_printf. Drop it and print
-> the list in seq_printf() directly with the "%*pbl" specifier.
+On 21/02/2026 06:39, Stephen Hemminger wrote:
+> On Fri, 20 Feb 2026 19:54:02 +0100
+> "Matthieu Baerts (NGI0)" <matttbe@kernel.org> wrote:
 > 
-> Signed-off-by: Yury Norov <ynorov@nvidia.com>
-> ---
->   arch/powerpc/sysdev/xive/spapr.c | 12 ++----------
->   1 file changed, 2 insertions(+), 10 deletions(-)
+>> Only if the output stream is 'stdout', because all JSON helpers like
+>> print_string() only write on 'stdout'.
+>>
+>> Supporting JSON is easy with the helpers. The biggest modification is to
+>> extract the end value.
+>>
+>> No behavioural changes intended for the moment, this is a preparation for a
+>> future usage of print_timestamp() within a JSON context.
+>>
+>> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 > 
-> diff --git a/arch/powerpc/sysdev/xive/spapr.c b/arch/powerpc/sysdev/xive/spapr.c
-> index 5aedbe3e8e6a..f818299579b1 100644
-> --- a/arch/powerpc/sysdev/xive/spapr.c
-> +++ b/arch/powerpc/sysdev/xive/spapr.c
-> @@ -667,17 +667,9 @@ static void xive_spapr_sync_source(u32 hw_irq)
->   static int xive_spapr_debug_show(struct seq_file *m, void *private)
->   {
->   	struct xive_irq_bitmap *xibm;
-> -	char *buf = kmalloc(PAGE_SIZE, GFP_KERNEL);
->   
-> -	if (!buf)
-> -		return -ENOMEM;
-> -
-> -	list_for_each_entry(xibm, &xive_irq_bitmaps, list) {
-> -		memset(buf, 0, PAGE_SIZE);
-> -		bitmap_print_to_pagebuf(true, buf, xibm->bitmap, xibm->count);
-> -		seq_printf(m, "bitmap #%d: %s", xibm->count, buf);
-> -	}
-> -	kfree(buf);
-> +	list_for_each_entry(xibm, &xive_irq_bitmaps, list)
-> +		seq_printf(m, "bitmap #%d: %*pbl\n", xibm->count, xibm->count, xibm->bitmap);
->   
->   	return 0;
->   }
+> I would go farther, fp is always stdout. Drop the argument to the function.
 
-Looks good to me.
+Good idea!
 
-Reviewed-by: Shrikanth Hegde <sshegde@linux.ibm.com>
+To be coherent with the rest, I started to look at removing the same
+argument from the caller functions, and similar ones. I did a very quick
+draft with a few sed, etc. but I'm not sure whether I should take this
+direction:
+
+  https://github.com/matttbe/iproute2/commit/585b0109
+
+WDYT? Or should I only drop fp from print_timestamp()? Or simply not use
+it like it is done in many other helpers supporting JSON?
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
 
