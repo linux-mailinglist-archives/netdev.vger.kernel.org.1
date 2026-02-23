@@ -1,177 +1,187 @@
-Return-Path: <netdev+bounces-260033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260035-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0GXoMexUnGnJEAQAu9opvQ
-	(envelope-from <netdev+bounces-260033-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 14:23:56 +0100
+	id 4JeeAktXnGkAEQQAu9opvQ
+	(envelope-from <netdev+bounces-260035-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 14:34:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 692D4176C10
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 14:23:56 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14413176FA4
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 14:34:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C503D307DB30
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 13:21:05 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 23A6A3007224
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 13:33:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0031C1DFE22;
-	Mon, 23 Feb 2026 13:21:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF14223323;
+	Mon, 23 Feb 2026 13:33:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nl+hNm+p"
+	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="meD5mbcz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B435A86337
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 13:21:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25B0B3A1D2
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 13:33:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771852863; cv=none; b=hThCOih62nwKQJP85yTh/CXRAOn+eTOkEF2tbJ9c7qiKrCCGlTifUF1A6yvdEPzwY0GBIVlP72g/qsKo/Wf08DqDZq8jKdxBsm9koMwH5dh+i8OFuJHm8flo8dQmCrwZRfo+YccR2wVUQKuXLrtGBL6T1vh/h0ywT1leS8Id/c8=
+	t=1771853634; cv=none; b=Eju2UZMc+XytqZ1qvjL62xXzs9QGVYt9lC5ciMhFrTLCWf8OWqwR9KEMkUMVNtFFBhYO478IT5aLHDsJYTWbMJmZYMelMFdRGrxEytlE1kSoBR8JH9P9pemtsoS/ZAdV7RhQsTjoZIM/IIPJdF7IbTm4F6OS4mRjUxsZqRbJMQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771852863; c=relaxed/simple;
-	bh=Kj+/ajwRePtGlW3OIHCvCgyrtRYz91XA0ng0hQ25swQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=eNCBfXtqZSeH9xn2sFYXgda1GNn6cSgTGxdK9YjdMCq4c42284mfAvmO19XiMlJT3vCIos3CqNNBaITYv+GZxxoRvcBIzIIBnN6xnpQyWsUErRvPhqhHb1MQNDmtZpqgNjwVO95qqSLuM/QTfRvJ86Z89wabNYquwQOUd2bbYPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nl+hNm+p; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-35305538592so3236218a91.0
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 05:21:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771852862; x=1772457662; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=KC50Ytogn6MLWiOk7iY5VOP4pMvpHMsRtorrT09M7jE=;
-        b=nl+hNm+p9GUH+KOFABaQgB9t/BcS36CxFCKwyCYtOSTssj6txy3LtzKfZV7W3oN3U2
-         oFWSCCNW4ybhNTwHCmsVKcpQqvrVQXKLrXPLRIA57SzPVmzlVuDxGwBtax8dmO+7hyvs
-         /IftdPNPu4dUV8dPPtC7tYbH0ObScj00LjBF4LwgQmolUz2utI9l1ROuKb2HquhyYk6u
-         nqJZwXcIAt3ma98AH/Cb3WLsgt2b1of/ZS3mrbnexml+SCUgzFrMiNyEG5frJwnBkquq
-         QsapOQ6pozalY0Y1YjVq/2qlfeyeqBtT81p3ahJnmtjwhtX2YysGtNCUHVlK+8xA6pfE
-         LBQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771852862; x=1772457662;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KC50Ytogn6MLWiOk7iY5VOP4pMvpHMsRtorrT09M7jE=;
-        b=PiMbj/FilQrXZ2DQOtieSr3ri7lWc+W+yapi+McmPWX8iIpIYAmK600pzGQFTVF53p
-         iHNn1VNjzhW4CWezFnZfUW3fx0tN6B+dyopSFlecpq7YlTQLe+ln6vGmD8vqEsM8Wftv
-         7jBc4WKwymH3a7+3DKOa6myriKjdcH/v6xR4zhieA6klMXP0bMjKljXl/6GANWvUrhe/
-         Y8fN4i50gDFjNOwdfjZ7SUFKPSAW28Y/DbH4vuDnJUNWNHgnL2JwVK/fc9muRbWVqVUP
-         9zdKJGOkXY/swi6EGauiZByayAzxIOTLB/3sn8hqbewjGFvz+DfFBfXDwiBTk5fTe+lo
-         9dAw==
-X-Gm-Message-State: AOJu0YyMMPPNwL1esqy3wrlcqNlV9wwT+ymzpZGrRc5L623hoIF9oCIS
-	1VAR1CUp7mQz5l5F7+k9zJdDpVdPdVCpmLe4797b7hqqTcMOY/69C5aB
-X-Gm-Gg: ATEYQzytNU0DaGfMUS16Hsn6WFbgwXQndU9jvH7Vne0GS9lQE+Ddb8AvDxQgVRUKBgH
-	LqUDda2r9/B7jaDlCw7CKC7J57LOp3q5MLreRf0dndJd6uwy7G6nHQGZR8aU3gV5RodE3yt4bvS
-	zFgkD11mUgjQBxojseaQaZJHYgstMDUxeSelOwRt5Xq+GOSrHt27RzjCMJ1FErgXAFezbdUYu3p
-	dQFKrhjH3ygKCW6yUU1gorm6a424LJQlDufGP2TiecAPA4iPsd9wHHz/ImD5F5loLecmLziBBGU
-	+i1p/GQ26I9t81nd3oajA9k7dfsx0DEZ4FEZN9lI/XoHzaJ/GrUL13ns/9Oe/0T57Zw4vxbpZfN
-	+qBB852NMzEn7BpxheRu86RlAiryQEuYFFcu9WzDwT7OHqPfqA52fZJz3OkyRH5i4YiN56C9/g3
-	tHwtp0T6J1t7qllnv5zoIJInoom8dZNVzWGKnFLA==
-X-Received: by 2002:a17:90b:5410:b0:340:ca7d:936a with SMTP id 98e67ed59e1d1-358ae8a87e3mr8330402a91.18.1771852862153;
-        Mon, 23 Feb 2026 05:21:02 -0800 (PST)
-Received: from junjungu-PC.localdomain ([2408:820c:9008:ba52:1cfe:ae34:fdd6:6b97])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-358af93b9ddsm6613074a91.14.2026.02.23.05.20.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Feb 2026 05:21:01 -0800 (PST)
-From: Felix Gu <ustc.gu@gmail.com>
-Date: Mon, 23 Feb 2026 21:20:56 +0800
-Subject: [PATCH] dpll: zl3073x: Remove redundant cleanup in
- devm_dpll_init()
+	s=arc-20240116; t=1771853634; c=relaxed/simple;
+	bh=vwDHGZkNKcZgrDUmXykErc1y/rSOex9+J/bjnc8RUYs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ekXgnlCmuKXmNEbn2eUd6v+9pK940U/gOrVdwcJgEl/JwYE8lXoR9O6a7of99lXi8oDwMMAuD0EzDFPRx1Me/p491vNu7G5W1WpBVdFKlxxTkximXtYbg75tVTp4SCfiQ4oeWcbHnkR4Z9gd2ZP2pfSHl/X4hp4v+Xg9oJt7jeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=meD5mbcz; arc=none smtp.client-ip=49.212.198.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
+Received: from x1 (99.223.13.160.dy.iij4u.or.jp [160.13.223.99])
+	(authenticated bits=0)
+	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 61NDWcbh055624
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Mon, 23 Feb 2026 22:32:40 +0900 (JST)
+	(envelope-from kohei@enjuk.jp)
+DKIM-Signature: a=rsa-sha256; bh=MU4uqkPCUo1YSM7ORV3XeMLzQiNwxn5T39Jw0803mss=;
+        c=relaxed/relaxed; d=enjuk.jp;
+        h=Date:From:To:Subject:Message-ID;
+        s=rs20251215; t=1771853562; v=1;
+        b=meD5mbczMUBA9iqvN7VIexPFQB9dAqCNgFbF9AbUC6KD43CJqE8IzSY/162US5k6
+         d+qoClRbskcdvG6MrTes0dk0VDvIzlVxtbWG8lTdX3+gUU76GWmW28IVReC2e+v8
+         T+PPrD1WWE3EMslcCi/mRoQcYqB+CIgvGDCnaDZqn7c1EHz5nT3Rg6RKlzJZpOUq
+         /EFMNM97NxBzVdqwraFhm+BxLR35C0FWi4Z5jfLnMmyFBqGaxuCfyDogGKWp+H7K
+         NY5u+/xbmLSGwidcXAhjL0VVJ6hRqydACi5ryCbSxMOe/GiEMGuJ5PV9IHvVt2cB
+         pNpR4f+q2PsKoxLnSTz+yA==
+Date: Mon, 23 Feb 2026 22:32:38 +0900
+From: Kohei Enju <kohei@enjuk.jp>
+To: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Stanislav Fomichev <sdf@fomichev.me>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Martin KaFai Lau <martin.lau@linux.dev>,
+        Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+        Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
+        Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+        Jussi Maki <joamaki@gmail.com>, kohei.enju@gmail.com,
+        syzbot+10cc7f13760b31bd2e61@syzkaller.appspotmail.com
+Subject: Re: [PATCH v2 bpf] bpf: devmap: fix stack-out-of-bounds write in
+ get_upper_ifindexes()
+Message-ID: <aZxVELsXHvrpkicA@x1>
+References: <20260220193039.7129-1-kohei@enjuk.jp>
+ <87ikbnofug.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260223-dpll-v1-1-d99f18c12bae@gmail.com>
-X-B4-Tracking: v=1; b=H4sIADdUnGkC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDIzMDIyNj3ZSCnBxdE4Nk42SLJKPEJGMLJaDSgqLUtMwKsDHRsbW1AOCcYut
- WAAAA
-X-Change-ID: 20260223-dpll-40c3c8b2ab38
-To: Ivan Vecera <ivecera@redhat.com>, 
- Prathosh Satish <Prathosh.Satish@microchip.com>, 
- Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, 
- Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kuba@kernel.org>, 
- Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Felix Gu <ustc.gu@gmail.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1771852858; l=1086;
- i=ustc.gu@gmail.com; h=from:subject:message-id;
- bh=Kj+/ajwRePtGlW3OIHCvCgyrtRYz91XA0ng0hQ25swQ=;
- b=fGqiFWh2ai5tigH3W7Ns/6o76xTqxXMhKkzJi0gG/Gt5tD3dtXyhUsqorYn6KKLB6rY93zEL8
- wl+czRsMIj7B9sbANUsbsdLOs7BmbU7E4gnw8bdJ3B2oTfjNl2pCY8K
-X-Developer-Key: i=ustc.gu@gmail.com; a=ed25519;
- pk=fjUXwmjchVN7Ja6KGP55IXOzFeCl9edaHoQIEUA+/hw=
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87ikbnofug.fsf@toke.dk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
+	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260035-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260033-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ustcgu@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,linux.dev,google.com,syzkaller.appspotmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[enjuk.jp:+];
+	TAGGED_RCPT(0.00)[netdev,10cc7f13760b31bd2e61];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 692D4176C10
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,appspotmail.com:email]
+X-Rspamd-Queue-Id: 14413176FA4
 X-Rspamd-Action: no action
 
-The devm_add_action_or_reset() function already executes the cleanup
-action on failure before returning an error, so the explicit goto error
-and subsequent zl3073x_dev_dpll_fini() call causes double cleanup.
+On 02/23 12:32, Toke Høiland-Jørgensen wrote:
+> Kohei Enju <kohei@enjuk.jp> writes:
+> 
+> > get_upper_ifindexes() iterates over all upper devices and writes their
+> > indices into an array without checking bounds.
+> >
+> > Also the callers assume that the max number of upper devices is
+> > MAX_NEST_DEV and allocate excluded_devices[1+MAX_NEST_DEV] on the stack,
+> > but that assumption is not correct and the number of upper devices could
+> > be larger than MAX_NEST_DEV (e.g., many macvlans), causing a
+> > stack-out-of-bounds write.
+> >
+> > Add a max parameter to get_upper_ifindexes() to avoid the issue.
+> >
+> > To reproduce, create more than MAX_NEST_DEV(8) macvlans on a device with
+> > an XDP program attached using BPF_F_BROADCAST | BPF_F_EXCLUDE_INGRESS.
+> > Then send a packet to the device to trigger the XDP redirect path.
+> >
+> > Reported-by: syzbot+10cc7f13760b31bd2e61@syzkaller.appspotmail.com
+> > Closes: https://lore.kernel.org/all/698c4ce3.050a0220.340abe.000b.GAE@google.com/T/
+> > Fixes: aeea1b86f936 ("bpf, devmap: Exclude XDP broadcast to master device")
+> > Signed-off-by: Kohei Enju <kohei@enjuk.jp>
+> > ---
+> > Changes:
+> >   v2:
+> >     - fix formatting, accounting that max-line-length is 100
+> >   v1: https://lore.kernel.org/bpf/20260216201428.65641-1-kohei@enjuk.jp/
+> > ---
+> >  kernel/bpf/devmap.c | 12 ++++++++----
+> >  1 file changed, 8 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
+> > index 2625601de76e..c8c49d86a403 100644
+> > --- a/kernel/bpf/devmap.c
+> > +++ b/kernel/bpf/devmap.c
+> > @@ -588,16 +588,18 @@ static inline bool is_ifindex_excluded(int *excluded, int num_excluded, int ifin
+> >  }
+> >  
+> >  /* Get ifindex of each upper device. 'indexes' must be able to hold at
+> > - * least MAX_NEST_DEV elements.
+> > + * least 'max' elements.
+> >   * Returns the number of ifindexes added.
+> >   */
+> > -static int get_upper_ifindexes(struct net_device *dev, int *indexes)
 
-Fixes: ebb1031c5137 ("dpll: zl3073x: Refactor DPLL initialization")
-Signed-off-by: Felix Gu <ustc.gu@gmail.com>
----
- drivers/dpll/zl3073x/core.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+> > +static int get_upper_ifindexes(struct net_device *dev, int *indexes, int max)
+> >  {
+> >  	struct net_device *upper;
+> >  	struct list_head *iter;
+> >  	int n = 0;
+> >  
+> >  	netdev_for_each_upper_dev_rcu(dev, upper, iter) {
+> > +		if (n >= max)
+> > +			break;
+> 
+> Hmm, how about returning an error here, and aborting the redirect
+> entirely? This silent truncation to an arbitrary number seems a bit
+> surprising, and very hard to debug. With an error, there will at least
+> be an error tracepoint to catch the failure.
+> 
+> -Toke
 
-diff --git a/drivers/dpll/zl3073x/core.c b/drivers/dpll/zl3073x/core.c
-index 63bd97181b9e..4ad21caec0e8 100644
---- a/drivers/dpll/zl3073x/core.c
-+++ b/drivers/dpll/zl3073x/core.c
-@@ -982,10 +982,8 @@ zl3073x_devm_dpll_init(struct zl3073x_dev *zldev, u8 num_dplls)
- 
- 	/* Add devres action to release DPLL related resources */
- 	rc = devm_add_action_or_reset(zldev->dev, zl3073x_dev_dpll_fini, zldev);
--	if (rc)
--		goto error;
- 
--	return 0;
-+	return rc;
- 
- error:
- 	zl3073x_dev_dpll_fini(zldev);
+Hi, Toke. 
 
----
-base-commit: d4906ae14a5f136ceb671bb14cedbf13fa560da6
-change-id: 20260223-dpll-40c3c8b2ab38
-
-Best regards,
--- 
-Felix Gu <ustc.gu@gmail.com>
-
+Thanks for the review.
+Indeed I agree that silent truncation is surprising and hard to debug.
+I'll send a v3 that returns -EOVERFLOW and aborts the redirect when
+there are too many upper devices.
 
