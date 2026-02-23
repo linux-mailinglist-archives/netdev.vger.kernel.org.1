@@ -1,71 +1,74 @@
-Return-Path: <netdev+bounces-260027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260034-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YP7pJQFNnGnYDQQAu9opvQ
-	(envelope-from <netdev+bounces-260027-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 13:50:09 +0100
+	id WJCJGpZWnGkAEQQAu9opvQ
+	(envelope-from <netdev+bounces-260034-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 14:31:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BFE817673B
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 13:50:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 741C0176F24
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 14:31:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A4CC53124161
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 12:42:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7A6AE30B101D
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 13:25:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDE07366045;
-	Mon, 23 Feb 2026 12:41:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C61353A1D2;
+	Mon, 23 Feb 2026 13:25:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kA80m0ek"
 X-Original-To: netdev@vger.kernel.org
-Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1B9C366044;
-	Mon, 23 Feb 2026 12:41:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.172
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC16A2EB0F
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 13:25:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771850502; cv=none; b=eC6AspBmMsMB/lWsyoAvY3E71LYNHY62dRvVrUEbqNP4Y+KfHXY56fh8T+PD4U9RDu19fxTE5bkIRmBNqTSNYUUZ5fu7tHokMij9oFi4OdkLsDZDGduiwi0ofv/hsBHzmoaarrVznD5zGcK+0VWymeTyY+3DznvlEOTFPLEEaaA=
+	t=1771853138; cv=none; b=ncrW5FoFX6CvO1Cgi/mxQ5SifWEoF7r3DN3Hh+7M5cDnkIwYxLVYh72ObvZ9KJmshZEd8006nxN8TPl58GchlAWfq7c0QNYA6Rfsb863Hx2ka1lsvnjHmBlZ1lL3JtDgmy7jsGj6YR9Fx2R0WXV35jCHz6G6GJszPOyaakGNEww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771850502; c=relaxed/simple;
-	bh=my3ie864iTaDCoQbedVs3qsRAL84M9L7UnzCUL3bZ9s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hPvE0w8zNOtLAqvVptXaQrr5hXS74ys0LSZEeYqBGpeWM4viCdqPjFfYhnAeULGwr/N+U6XRnTYWBMQ0MHqC1JLgHbEejwcuJmqjFATBn4iXszGYsXOmkpeypDpmPHxLUsDoq5LfFQTNNhapw24adhVW9VdQDQYDNopFSLOaaDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; arc=none smtp.client-ip=210.160.252.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
-X-CSE-ConnectionGUID: RATekyJ1R5yKNNf7lStgUQ==
-X-CSE-MsgGUID: y0YMchb9Q8eDUObnCEjfig==
-Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
-  by relmlie6.idc.renesas.com with ESMTP; 23 Feb 2026 21:41:40 +0900
-Received: from vm01.adwin.renesas.com (unknown [10.226.92.12])
-	by relmlir6.idc.renesas.com (Postfix) with ESMTP id DEB7641AB637;
-	Mon, 23 Feb 2026 21:41:33 +0900 (JST)
-From: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com,
-	linux@armlinux.org.uk,
-	rmk+kernel@armlinux.org.uk,
-	maxime.chevallier@bootlin.com,
-	boon.khai.ng@altera.com,
-	rohan.g.thomas@altera.com,
-	vladimir.oltean@nxp.com,
-	hayashi.kunihiko@socionext.com,
-	matthew.gerlach@altera.com,
-	vee.khee.wong@intel.com,
-	boon.leong.ong@intel.com,
-	kim.tatt.chuah@intel.com
+	s=arc-20240116; t=1771853138; c=relaxed/simple;
+	bh=8GljxCdIML4JwqSHoSvnhyZ8D7LTSTtgjk4jLabrviM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n9P+zOpRYszVAwMwMlAkKI26c2uAaKKkcPLjTw+UJX5vvmPOSS3Dia8jPEAa3cMa7q00t4Z+4KGdgomzsyusMbEHntVSMQtK5k4t2TJeOzinDeVGB7GdMIuHMUkqHPCHODRFySBNXFq6hfTZnk2UyGKWTvWrLunHZYeiJap82EA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kA80m0ek; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1771853136; x=1803389136;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=8GljxCdIML4JwqSHoSvnhyZ8D7LTSTtgjk4jLabrviM=;
+  b=kA80m0ekNjp5c9hODYl7qvqS3JITzIzxJ13GwJmHTFQIy5y+2CKndDUk
+   SUIeTyhTSB1gfqy2Re0+9YUlSQoasHfPyodV8JX1q/JbmwIYVNPui7Ko7
+   E5HDeUkH6hUtardu/j6p+YndxnOco1FT5q14e24sA5vGm2+Ar7IlvSK1P
+   PHn4kIeyzcQQEERB9xTQX8w1VJn7tpSL6oIL5xyZinM9M6gYV8cCY0idi
+   HOQMhB7a428DXIQcfV+mYgR3/UGgVdFVClvSySqwAs2xL60nsef1OpvOt
+   SbdWldB0+hN4NBFY9JL8e4XBITRt2RuB6eWs2lxbkC7SyGdrGyQKERd50
+   w==;
+X-CSE-ConnectionGUID: KPM3A3POSYioSKMZzS5G4A==
+X-CSE-MsgGUID: VjHyW37PRCm54c+d2Y8K+A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11709"; a="60421080"
+X-IronPort-AV: E=Sophos;i="6.21,306,1763452800"; 
+   d="scan'208";a="60421080"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2026 05:25:35 -0800
+X-CSE-ConnectionGUID: qhMCWJpHSnazyPqUZFC/mQ==
+X-CSE-MsgGUID: iBZk0vBrQy2MbjUHGKSngg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,306,1763452800"; 
+   d="scan'208";a="253283464"
+Received: from os-delivery.igk.intel.com ([10.102.21.165])
+  by orviesa001.jf.intel.com with ESMTP; 23 Feb 2026 05:25:31 -0800
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 4/4] net: stmmac: Defer VLAN HW configuration when interface is down
-Date: Mon, 23 Feb 2026 12:41:02 +0000
-Message-ID: <20260223124102.120432-5-ovidiu.panait.rb@renesas.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260223124102.120432-1-ovidiu.panait.rb@renesas.com>
-References: <20260223124102.120432-1-ovidiu.panait.rb@renesas.com>
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH iwl-net v1] ice: set max queues in alloc_etherdev_mqs()
+Date: Mon, 23 Feb 2026 13:51:57 +0100
+Message-ID: <20260223125157.819135-1-michal.swiatkowski@linux.intel.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,200 +77,147 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.64 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[renesas.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260027-lists,netdev=lfdr.de];
-	TO_DN_NONE(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,altera.com,nxp.com,socionext.com,intel.com];
+	DKIM_TRACE(0.00)[intel.com:+];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[ovidiu.panait.rb@renesas.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260034-lists,netdev=lfdr.de];
+	RCPT_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[michal.swiatkowski@linux.intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.860];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,kernel];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,renesas.com:mid,renesas.com:email]
-X-Rspamd-Queue-Id: 1BFE817673B
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim]
+X-Rspamd-Queue-Id: 741C0176F24
 X-Rspamd-Action: no action
 
-VLAN register accesses on the MAC side require the PHY RX clock to be
-active. When the network interface is down, the PHY is suspended and
-the RX clock is unavailable, causing VLAN operations to fail with
-timeouts.
+When allocating netdevice using alloc_etherdev_mqs() the maximum
+supported queues number should be passed. The vsi->alloc_txq/rxq is
+storing current number of queues, not the maximum ones.
 
-The VLAN core automatically removes VID 0 after the interface goes down
-and re-adds it when it comes back up, so these timeouts happen during
-normal interface down/up:
+Use the same function for getting max Tx and Rx queues which is used
+during ethtool -l call to set maximum number of queues during netdev
+allocation.
 
-    # ip link set end1 down
-    renesas-gbeth 15c40000.ethernet end1: Timeout accessing MAC_VLAN_Tag_Filter
-    renesas-gbeth 15c40000.ethernet end1: failed to kill vid 0081/0
+Reproduction steps:
+$ethtool -l $pf # says current 16, max 64
+$ethtool -S $pf # fine
+$ethtool -L $pf combined 40 # crash
 
-Adding VLANs while the interface is down also fails:
+[491187.472594] Call Trace:
+[491187.472829]  <TASK>
+[491187.473067]  netif_set_xps_queue+0x26/0x40
+[491187.473305]  ice_vsi_cfg_txq+0x265/0x3d0 [ice]
+[491187.473619]  ice_vsi_cfg_lan_txqs+0x68/0xa0 [ice]
+[491187.473918]  ice_vsi_cfg_lan+0x2b/0xa0 [ice]
+[491187.474202]  ice_vsi_open+0x71/0x170 [ice]
+[491187.474484]  ice_vsi_recfg_qs+0x17f/0x230 [ice]
+[491187.474759]  ? dev_get_min_mp_channel_count+0xab/0xd0
+[491187.474987]  ice_set_channels+0x185/0x3d0 [ice]
+[491187.475278]  ethnl_set_channels+0x26f/0x340
 
-    # ip link add link end1 name end1.10 type vlan id 10
-    renesas-gbeth 15c40000.ethernet end1: Timeout accessing MAC_VLAN_Tag_Filter
-    RTNETLINK answers: Device or resource busy
-
-Use the write_hw parameter introduced in the previous commit to skip
-hardware register writes when the interface is down. The software state
-is always kept up to date regardless of interface state.
-
-When the interface is brought up, stmmac_vlan_configure() is called
-to write the VLAN state to hardware.
-
-Signed-off-by: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
+Fixes: ee13aa1a2c5a ("ice: use netif_get_num_default_rss_queues()")
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 ---
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 33 +++++++++++++++----
- .../net/ethernet/stmicro/stmmac/stmmac_vlan.c |  9 ++---
- 2 files changed, 29 insertions(+), 13 deletions(-)
+ drivers/net/ethernet/intel/ice/ice.h         | 22 ++++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_ethtool.c | 18 ----------------
+ drivers/net/ethernet/intel/ice/ice_main.c    |  4 ++--
+ 3 files changed, 24 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 536668a0d6dd..d0aede23ae0d 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -156,6 +156,7 @@ static void stmmac_tx_timer_arm(struct stmmac_priv *priv, u32 queue);
- static void stmmac_flush_tx_descriptors(struct stmmac_priv *priv, int queue);
- static void stmmac_set_dma_operation_mode(struct stmmac_priv *priv, u32 txmode,
- 					  u32 rxmode, u32 chan);
-+static int stmmac_vlan_configure(struct stmmac_priv *priv);
- 
- #ifdef CONFIG_DEBUG_FS
- static const struct net_device_ops stmmac_netdev_ops;
-@@ -4111,6 +4112,14 @@ static int __stmmac_open(struct net_device *dev,
- 
- 	phylink_start(priv->phylink);
- 
-+	if (dev->features & NETIF_F_VLAN_FEATURES) {
-+		phylink_rx_clk_stop_block(priv->phylink);
-+		ret = stmmac_vlan_configure(priv);
-+		phylink_rx_clk_stop_unblock(priv->phylink);
-+		if (ret)
-+			netdev_err(dev, "Failed to configure VLANs\n");
-+	}
-+
- 	ret = stmmac_request_irq(dev);
- 	if (ret)
- 		goto irq_error;
-@@ -6784,6 +6793,7 @@ static int stmmac_vlan_update(struct stmmac_priv *priv, bool is_double,
- static int stmmac_vlan_rx_add_vid(struct net_device *ndev, __be16 proto, u16 vid)
- {
- 	struct stmmac_priv *priv = netdev_priv(ndev);
-+	bool write_hw = netif_running(ndev);
- 	unsigned int num_double_vlans;
- 	bool is_double = false;
- 	int ret;
-@@ -6797,7 +6807,7 @@ static int stmmac_vlan_rx_add_vid(struct net_device *ndev, __be16 proto, u16 vid
- 
- 	set_bit(vid, priv->active_vlans);
- 	num_double_vlans = priv->num_double_vlans + is_double;
--	ret = stmmac_vlan_update(priv, num_double_vlans, true);
-+	ret = stmmac_vlan_update(priv, num_double_vlans, write_hw);
- 	if (ret) {
- 		clear_bit(vid, priv->active_vlans);
- 		goto err_pm_put;
-@@ -6805,10 +6815,11 @@ static int stmmac_vlan_rx_add_vid(struct net_device *ndev, __be16 proto, u16 vid
- 
- 	if (priv->hw->num_vlan) {
- 		ret = stmmac_add_hw_vlan_rx_fltr(priv, ndev, priv->hw, proto,
--						 vid, true);
-+						 vid, write_hw);
- 		if (ret) {
- 			clear_bit(vid, priv->active_vlans);
--			stmmac_vlan_update(priv, priv->num_double_vlans, true);
-+			stmmac_vlan_update(priv, priv->num_double_vlans,
-+					   write_hw);
- 			goto err_pm_put;
- 		}
- 	}
-@@ -6827,6 +6838,7 @@ static int stmmac_vlan_rx_add_vid(struct net_device *ndev, __be16 proto, u16 vid
- static int stmmac_vlan_rx_kill_vid(struct net_device *ndev, __be16 proto, u16 vid)
- {
- 	struct stmmac_priv *priv = netdev_priv(ndev);
-+	bool write_hw = netif_running(ndev);
- 	unsigned int num_double_vlans;
- 	bool is_double = false;
- 	int ret;
-@@ -6840,7 +6852,7 @@ static int stmmac_vlan_rx_kill_vid(struct net_device *ndev, __be16 proto, u16 vi
- 
- 	clear_bit(vid, priv->active_vlans);
- 	num_double_vlans = priv->num_double_vlans - is_double;
--	ret = stmmac_vlan_update(priv, num_double_vlans, true);
-+	ret = stmmac_vlan_update(priv, num_double_vlans, write_hw);
- 	if (ret) {
- 		set_bit(vid, priv->active_vlans);
- 		goto del_vlan_error;
-@@ -6848,10 +6860,11 @@ static int stmmac_vlan_rx_kill_vid(struct net_device *ndev, __be16 proto, u16 vi
- 
- 	if (priv->hw->num_vlan) {
- 		ret = stmmac_del_hw_vlan_rx_fltr(priv, ndev, priv->hw, proto,
--						 vid, true);
-+						 vid, write_hw);
- 		if (ret) {
- 			set_bit(vid, priv->active_vlans);
--			stmmac_vlan_update(priv, priv->num_double_vlans, true);
-+			stmmac_vlan_update(priv, priv->num_double_vlans,
-+					   write_hw);
- 			goto del_vlan_error;
- 		}
- 	}
-@@ -6864,6 +6877,14 @@ static int stmmac_vlan_rx_kill_vid(struct net_device *ndev, __be16 proto, u16 vi
- 	return ret;
+diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+index f6a56a864459..725b130dd3a2 100644
+--- a/drivers/net/ethernet/intel/ice/ice.h
++++ b/drivers/net/ethernet/intel/ice/ice.h
+@@ -839,6 +839,28 @@ static inline void ice_tx_xsk_pool(struct ice_vsi *vsi, u16 qid)
+ 	WRITE_ONCE(ring->xsk_pool, ice_get_xp_from_qid(vsi, qid));
  }
  
-+static int stmmac_vlan_configure(struct stmmac_priv *priv)
++/**
++ * ice_get_max_txq - return the maximum number of Tx queues for in a PF
++ * @pf: PF structure
++ *
++ * Return: maximum number of Tx queues
++ */
++static inline int ice_get_max_txq(struct ice_pf *pf)
 +{
-+	if (priv->hw->num_vlan)
-+		stmmac_restore_hw_vlan_rx_fltr(priv, priv->dev, priv->hw);
-+
-+	return stmmac_vlan_update(priv, priv->num_double_vlans, true);
++	return min(num_online_cpus(), pf->hw.func_caps.common_cap.num_txq);
 +}
 +
- static int stmmac_bpf(struct net_device *dev, struct netdev_bpf *bpf)
- {
- 	struct stmmac_priv *priv = netdev_priv(dev);
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.c
-index b74c173da1b5..070c11870c02 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.c
-@@ -150,7 +150,6 @@ static void vlan_restore_hw_rx_fltr(struct net_device *dev,
- 	void __iomem *ioaddr = hw->pcsr;
- 	u32 value;
- 	u32 hash;
--	u32 val;
- 	int i;
++/**
++ * ice_get_max_rxq - return the maximum number of Rx queues for in a PF
++ * @pf: PF structure
++ *
++ * Return: maximum number of Rx queues
++ */
++static inline int ice_get_max_rxq(struct ice_pf *pf)
++{
++	return min(num_online_cpus(), pf->hw.func_caps.common_cap.num_rxq);
++}
++
+ /**
+  * ice_get_main_vsi - Get the PF VSI
+  * @pf: PF instance
+diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+index a897a6b22495..a0b0416f5aea 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
++++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+@@ -3780,24 +3780,6 @@ ice_get_ts_info(struct net_device *dev, struct kernel_ethtool_ts_info *info)
+ 	return 0;
+ }
  
- 	/* Single Rx VLAN Filter */
-@@ -160,12 +159,8 @@ static void vlan_restore_hw_rx_fltr(struct net_device *dev,
- 	}
+-/**
+- * ice_get_max_txq - return the maximum number of Tx queues for in a PF
+- * @pf: PF structure
+- */
+-static int ice_get_max_txq(struct ice_pf *pf)
+-{
+-	return min(num_online_cpus(), pf->hw.func_caps.common_cap.num_txq);
+-}
+-
+-/**
+- * ice_get_max_rxq - return the maximum number of Rx queues for in a PF
+- * @pf: PF structure
+- */
+-static int ice_get_max_rxq(struct ice_pf *pf)
+-{
+-	return min(num_online_cpus(), pf->hw.func_caps.common_cap.num_rxq);
+-}
+-
+ /**
+  * ice_get_combined_cnt - return the current number of combined channels
+  * @vsi: PF VSI pointer
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index fa4095037be5..863ac81eebce 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -4699,8 +4699,8 @@ static int ice_cfg_netdev(struct ice_vsi *vsi)
+ 	struct net_device *netdev;
+ 	u8 mac_addr[ETH_ALEN];
  
- 	/* Extended Rx VLAN Filter Enable */
--	for (i = 0; i < hw->num_vlan; i++) {
--		if (hw->vlan_filter[i] & VLAN_TAG_DATA_VEN) {
--			val = hw->vlan_filter[i];
--			vlan_write_filter(dev, hw, i, val);
--		}
--	}
-+	for (i = 0; i < hw->num_vlan; i++)
-+		vlan_write_filter(dev, hw, i, hw->vlan_filter[i]);
+-	netdev = alloc_etherdev_mqs(sizeof(*np), vsi->alloc_txq,
+-				    vsi->alloc_rxq);
++	netdev = alloc_etherdev_mqs(sizeof(*np), ice_get_max_txq(vsi->back),
++				    ice_get_max_rxq(vsi->back));
+ 	if (!netdev)
+ 		return -ENOMEM;
  
- 	hash = readl(ioaddr + VLAN_HASH_TABLE);
- 	if (hash & VLAN_VLHT) {
 -- 
-2.34.1
+2.49.0
 
 
