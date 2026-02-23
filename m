@@ -1,266 +1,162 @@
-Return-Path: <netdev+bounces-260002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260003-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SNkkBYs5nGlCBgQAu9opvQ
-	(envelope-from <netdev+bounces-260002-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 12:27:07 +0100
+	id 6HBhE0I5nGlCBgQAu9opvQ
+	(envelope-from <netdev+bounces-260003-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 12:25:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6681F1757D2
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 12:27:06 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA9061757AE
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 12:25:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C8573305DA53
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 11:23:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1B3833002E7C
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 11:25:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13FD935DD1C;
-	Mon, 23 Feb 2026 11:23:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FD29356A0B;
+	Mon, 23 Feb 2026 11:25:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Q2lb2ihs"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ldmf4dqb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f227.google.com (mail-pg1-f227.google.com [209.85.215.227])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C413335CB8B
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 11:23:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A226D1E9B1A
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 11:24:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771845839; cv=none; b=pygUx8cZZbJPGN1vIN21m5WN/XzP8jn9enu3ptE5SKPZp4g+uHteoW26bU3AChvc273EmmtQ9nucETLvD1JK0P5DRYjS1YqJnvgSIU6dNGqR/E1fGlWP6Un0C5wId59P+W+F0eqyzOzYwnQiEn64S7ZClqUNA0LUuJR0Su8HTuk=
+	t=1771845901; cv=none; b=CojLQXq+4vnNm2pxzu6xLgHapG/tsTsXnUrl7kUfkGqsDX/a0QKS3cQawECUh8u2mSaBQyWF9sCAs0jh5cffa0zzBi/EoTQdBSOEGJmJWnOtuOG0E71+t3WRIF6jMp1K29hSljcvkML7x7QXYTFJMcPPZsFDACsvueOfn3V0EdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771845839; c=relaxed/simple;
-	bh=JPgultTIWgbNYxA4vXArnqWlMkM/RR4GlNiyDYUXKLU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TNCY8fsrBRQBSMDKjeYVLtyQ8L608SJrdPKh2m0oqJ1o8VZxSHF7qbmAyQBNuV41YuFgLPKuCrN7Fu13zMRJRKWgZ4c6Jhwn2C9RS+AGVl3Y0EPD4tzqFH/YSETAYpHXUCXuaZCr0MAPa+dtZUGc1dWMRZ8Ul2n57Rg8ye7KaCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Q2lb2ihs; arc=none smtp.client-ip=209.85.215.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f227.google.com with SMTP id 41be03b00d2f7-c6de5ea6879so493261a12.0
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 03:23:57 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771845837; x=1772450637;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=C9EWl9Y2Ycs1HrHu15KRF0sV4Ewn7s/wLLI95hZv0i4=;
-        b=mMPc964vNQt/Ww/BtVl78OpYdoVgB742N9RScZvBQwYVOIj0ekXOoKrUd4Qm7feTKG
-         lhO0DS92iikVE3ys3ya20xevw2zHpCDo78RE7SAR4pLG6+63/ik6ae+XpDos63HngXGX
-         WmTlLqXKqXWsLklYn5g8/HkIbRonzAOSEIP4tCKJOB9J6zPyyFjnoff491JSBmMqzhEq
-         au/ly3peb4vMH6lad6S5deOgr5gIoDsgpg05M8nAKM1UsMhLTG3tvLX0qO2XxnkAtJdD
-         hdXHMpDaZH1OmkiHf+kVYNZ3EvMB06JO0ccqGKCMEyRS2S7K5BzHA+RUcB957ajZ8D42
-         MbLA==
-X-Forwarded-Encrypted: i=1; AJvYcCV8ODUwIpDFLjz5sGqmUpKX0ZTIw1NWMzeGUGOARolZV+7F9oPPd8rGL5wpTItbAsDt1JRYTCM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3D3yj+XUXr4y4JR8+jChrXQ3oLoy7349dvMtJtICaFUvaoCQQ
-	1iTvwawpQOVGgCwReyrbOxm2t7BiRTq+QFWyndB4MPsID/WXvHmvi+rTxU3wZ6o/3zdDhxrQbUC
-	j6+5sPHDALYJnDMRrLgeUg8QSp4DR8rhCJQA1QY6UBppadjkyW1rNip1c1Z24gs7prfc1MdsLI9
-	WEaIbYT37tzHVZJ91Acr4DIoEZ54xrCnkaK8lYu9WT/nL3JqRaZutPDScecgfgFV/V05ZXWLlX5
-	c4B374frURcvo3/HOQkFGh3SY1p9zU=
-X-Gm-Gg: ATEYQzwaaHJENNPc1Fe2JvTZKpo++HZxp3Zi5uLs5mizReBn+4xhjs4PS6RTWa7sY2u
-	efhjnmzxicO0pQndDbLojVtnqpAnjCQSN2Hmsvkc3XhnoOS1lZtc5qUAP/jX69NR9kvwmDsW0Dt
-	HCRikoRNUP/ca8cmQSdLp8Dv8m4FLK+61ZmBODlhEhRDttf9OGbYxozuErgbUa7WNAvUDPSilIw
-	+50Tu1ksCChoF4q4tVXFCzFbtrI39NI740gGmUwhEpLe96O/M6xD2Md3b7/hqbvwuFRTDSIeyW4
-	Xqe3dw/TArihl9Ovzkc2Z9y/evSOEVl3nfsV2KOxd/wFrx96AjeDWE55/U9Ww1BtScOR941ex9R
-	o/ZAZ9znhubnoLiQCmMcp9cZqsf5nHgz3ZweN1AIPdOiM/V2SxeqQq6kPcERW9apT1sTl8dtkb0
-	1ZJadcu1paYbJyC0azcWNn4Xg0+emUy6O08DcQMp/Oyq1qq2GJwcaOljx3ydahGjMfaK3HQ9D2c
-	g==
-X-Received: by 2002:a17:90a:d645:b0:349:2cdd:434a with SMTP id 98e67ed59e1d1-358ae8c3000mr5206444a91.5.1771845836991;
-        Mon, 23 Feb 2026 03:23:56 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-25.dlp.protect.broadcom.com. [144.49.247.25])
-        by smtp-relay.gmail.com with ESMTPS id 41be03b00d2f7-c70b717d4f4sm988182a12.2.2026.02.23.03.23.56
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 23 Feb 2026 03:23:56 -0800 (PST)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-8954937be97so60849316d6.1
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 03:23:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1771845835; x=1772450635; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=C9EWl9Y2Ycs1HrHu15KRF0sV4Ewn7s/wLLI95hZv0i4=;
-        b=Q2lb2ihssqbq6RlsYb0F/fBARy8lHelBo04AIS1+osNQR0AJBBfbGcRfdnu+eJUcEY
-         Zy37Wa8DL+zO6fyDJanKNJMUuaSie0kAk/voTgMDNI4pyWlbnVZOPzYzP3UoilYN+zOH
-         XsaYlfP+zN4F1wSD7RS+VCfo8DC65ZsR5mxIM=
-X-Forwarded-Encrypted: i=1; AJvYcCV/ij/UY53BGr3+aEb6k0lZhV5wzDijg0E4PLMOcrbfdsf1J8r1fLQubx3jQe5yM73fmpzYQrw=@vger.kernel.org
-X-Received: by 2002:a05:6214:4f1a:b0:897:1d50:2336 with SMTP id 6a1803df08f44-89979d74070mr82436566d6.6.1771845835403;
-        Mon, 23 Feb 2026 03:23:55 -0800 (PST)
-X-Received: by 2002:a05:6214:4f1a:b0:897:1d50:2336 with SMTP id 6a1803df08f44-89979d74070mr82436216d6.6.1771845834866;
-        Mon, 23 Feb 2026 03:23:54 -0800 (PST)
-Received: from keerthanak-ph5-dev.. ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cb8d1224f6sm682922385a.46.2026.02.23.03.23.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Feb 2026 03:23:54 -0800 (PST)
-From: Keerthana K <keerthana.kalyanasundaram@broadcom.com>
-To: stable@vger.kernel.org,
-	gregkh@linuxfoundation.org
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	kafai@fb.com,
-	weiwan@google.com,
+	s=arc-20240116; t=1771845901; c=relaxed/simple;
+	bh=guScEY3dPd7AmDH3BtW0PqB1E7MBGZSoHvJU7aNptLA=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=QfmzhqKKdxXXVjyA1KW7gg/Iw/4+L/21W+RAt/AhS6kkQDukk9o2uuer5PDb40zK7aUXieaOeObf7j+hIiIU57jFnMCGw10cuo0ETOt+KnH69Ss93tu2iuWXy3xogqVdbxKKrJ5KIeNsfgxtNbmxLQmzXe/PYE0cpq5nkZCu0+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ldmf4dqb; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=4TUBah16GDdhtaKN61j6qNC6e187hWuNZSPnIGunkaw=; b=ldmf4dqbIJ3Gox+YeX2Xt8Y5LB
+	+wDBfhh0dm00zjJym+zp2X9/5D/n5ylJWylwro9vWWWZ6RXZxj6blJK3CYbwlrGuuthCl2o60NiSE
+	eAz+7iKEGEbIs7oCXiv79ZahT0/4YmTXh9MBpGkt6WOHaPfKMKnIk1vy0CU2lBWpI4zyK9L7Ea7CF
+	RkRfL+gzsVAcN8iXeB9lp6sXZehZQKZtI1NZOWSJDjRJwSmy3oEJw3mxjsEvjkbFEp1b2j/9Mjxe6
+	j3clX/cpymOnCuJKSGKg2gvGm6En3y3JKtOd9WaaG0uQYJfj1emqukt3vRP181jgrl7jwSU82UkwQ
+	6tjaeHEg==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:45166 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1vuU3Y-000000003xp-04Ul;
+	Mon, 23 Feb 2026 11:24:52 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1vuU3X-0000000Ae9G-1Er8;
+	Mon, 23 Feb 2026 11:24:51 +0000
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ajay.kaher@broadcom.com,
-	alexey.makhalov@broadcom.com,
-	vamsi-krishna.brahmajosyula@broadcom.com,
-	yin.ding@broadcom.com,
-	tapas.kundu@broadcom.com,
-	Sasha Levin <sashal@kernel.org>,
-	Keerthana K <keerthana.kalyanasundaram@broadcom.com>
-Subject: [PATCH v2 v6.12] ipv6: use RCU in ip6_xmit()
-Date: Mon, 23 Feb 2026 11:18:50 +0000
-Message-ID: <20260223111850.4165186-1-keerthana.kalyanasundaram@broadcom.com>
-X-Mailer: git-send-email 2.43.7
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next] net: stmmac: fix .ndo_fix_features()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1vuU3X-0000000Ae9G-1Er8@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Mon, 23 Feb 2026 11:24:51 +0000
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260002-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,broadcom.com:mid,broadcom.com:dkim,broadcom.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FROM_NEQ_ENVFROM(0.00)[keerthana.kalyanasundaram@broadcom.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-260003-lists,netdev=lfdr.de,kernel];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 6681F1757D2
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-0.959];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[rmk-PC.armlinux.org.uk:mid,armlinux.org.uk:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BA9061757AE
 X-Rspamd-Action: no action
 
-From: Eric Dumazet <edumazet@google.com>
+netdev features documentation requires that .ndo_fix_features() is
+stateless: it shouldn't modify driver state. Yet, stmmac_fix_features()
+does exactly that, changing whether GSO frames are processed by the
+driver.
 
-[ Upstream commit 9085e56501d93af9f2d7bd16f7fcfacdde47b99c ]
+Move this code to stmmac_set_features() instead, which is the correct
+place for it. We don't need to check whether TSO is supported; this
+is already handled via the setup of netdev->hw_features, and we are
+guaranteed that if netdev->hw_features indicates that a feature is
+not supported, .ndo_set_features() won't be called with it set.
 
-Use RCU in ip6_xmit() in order to use dst_dev_rcu() to prevent
-possible UAF.
-
-Fixes: 4a6ce2b6f2ec ("net: introduce a new function dst_dev_put()")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: David Ahern <dsahern@kernel.org>
-Link: https://patch.msgid.link/20250828195823.3958522-4-edumazet@google.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-Signed-off-by: Keerthana K <keerthana.kalyanasundaram@broadcom.com>
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
-Changes in v2:
-- Modified to apply on latest v6.12.y
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
- net/ipv6/ip6_output.c | 35 +++++++++++++++++++++--------------
- 1 file changed, 21 insertions(+), 14 deletions(-)
-
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index 24b68e996..0aedb2007 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -267,35 +267,36 @@ bool ip6_autoflowlabel(struct net *net, const struct sock *sk)
- int ip6_xmit(const struct sock *sk, struct sk_buff *skb, struct flowi6 *fl6,
- 	     __u32 mark, struct ipv6_txoptions *opt, int tclass, u32 priority)
- {
--	struct net *net = sock_net(sk);
- 	const struct ipv6_pinfo *np = inet6_sk(sk);
- 	struct in6_addr *first_hop = &fl6->daddr;
- 	struct dst_entry *dst = skb_dst(skb);
--	struct net_device *dev = dst_dev(dst);
- 	struct inet6_dev *idev = ip6_dst_idev(dst);
- 	struct hop_jumbo_hdr *hop_jumbo;
- 	int hoplen = sizeof(*hop_jumbo);
-+	struct net *net = sock_net(sk);
- 	unsigned int head_room;
-+	struct net_device *dev;
- 	struct ipv6hdr *hdr;
- 	u8  proto = fl6->flowi6_proto;
- 	int seg_len = skb->len;
--	int hlimit = -1;
-+	int ret, hlimit = -1;
- 	u32 mtu;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 82375d34ad57..a2a0985e8c37 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -6105,14 +6105,6 @@ static netdev_features_t stmmac_fix_features(struct net_device *dev,
+ 	if (priv->plat->bugged_jumbo && (dev->mtu > ETH_DATA_LEN))
+ 		features &= ~NETIF_F_CSUM_MASK;
  
-+	rcu_read_lock();
-+
-+	dev = dst_dev_rcu(dst);
- 	head_room = sizeof(struct ipv6hdr) + hoplen + LL_RESERVED_SPACE(dev);
- 	if (opt)
- 		head_room += opt->opt_nflen + opt->opt_flen;
- 
- 	if (unlikely(head_room > skb_headroom(skb))) {
--		/* Make sure idev stays alive */
--		rcu_read_lock();
-+		/* idev stays alive while we hold rcu_read_lock(). */
- 		skb = skb_expand_head(skb, head_room);
- 		if (!skb) {
- 			IP6_INC_STATS(net, idev, IPSTATS_MIB_OUTDISCARDS);
--			rcu_read_unlock();
--			return -ENOBUFS;
-+			ret = -ENOBUFS;
-+			goto unlock;
- 		}
--		rcu_read_unlock();
- 	}
- 
- 	if (opt) {
-@@ -357,17 +358,21 @@ int ip6_xmit(const struct sock *sk, struct sk_buff *skb, struct flowi6 *fl6,
- 		 * skb to its handler for processing
- 		 */
- 		skb = l3mdev_ip6_out((struct sock *)sk, skb);
--		if (unlikely(!skb))
--			return 0;
-+		if (unlikely(!skb)) {
-+			ret = 0;
-+			goto unlock;
-+		}
- 
- 		/* hooks should never assume socket lock is held.
- 		 * we promote our socket to non const
- 		 */
--		return NF_HOOK(NFPROTO_IPV6, NF_INET_LOCAL_OUT,
--			       net, (struct sock *)sk, skb, NULL, dev,
--			       dst_output);
-+		ret = NF_HOOK(NFPROTO_IPV6, NF_INET_LOCAL_OUT,
-+			      net, (struct sock *)sk, skb, NULL, dev,
-+			      dst_output);
-+		goto unlock;
- 	}
- 
-+	ret = -EMSGSIZE;
- 	skb->dev = dev;
- 	/* ipv6_local_error() does not require socket lock,
- 	 * we promote our socket to non const
-@@ -376,7 +381,9 @@ int ip6_xmit(const struct sock *sk, struct sk_buff *skb, struct flowi6 *fl6,
- 
- 	IP6_INC_STATS(net, idev, IPSTATS_MIB_FRAGFAILS);
- 	kfree_skb(skb);
--	return -EMSGSIZE;
-+unlock:
-+	rcu_read_unlock();
-+	return ret;
+-	/* Disable tso if asked by ethtool */
+-	if ((priv->plat->flags & STMMAC_FLAG_TSO_EN) && (priv->dma_cap.tsoen)) {
+-		if (features & NETIF_F_TSO)
+-			priv->tso = true;
+-		else
+-			priv->tso = false;
+-	}
+-
+ 	return features;
  }
- EXPORT_SYMBOL(ip6_xmit);
  
+@@ -6144,6 +6136,8 @@ static int stmmac_set_features(struct net_device *netdev,
+ 	else
+ 		priv->hw->hw_vlan_en = false;
+ 
++	priv->tso = !!(features & NETIF_F_TSO);
++
+ 	phylink_rx_clk_stop_block(priv->phylink);
+ 	stmmac_set_hw_vlan_mode(priv, priv->hw);
+ 	phylink_rx_clk_stop_unblock(priv->phylink);
 -- 
-2.43.7
+2.47.3
 
 
