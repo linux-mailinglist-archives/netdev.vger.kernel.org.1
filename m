@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-259997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259995-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SPXABrYtnGkKAgQAu9opvQ
-	(envelope-from <netdev+bounces-259997-lists+netdev=lfdr.de@vger.kernel.org>)
+	id oNH3CbYtnGkKAgQAu9opvQ
+	(envelope-from <netdev+bounces-259995-lists+netdev=lfdr.de@vger.kernel.org>)
 	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 11:36:38 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F020174FA2
+	by mail.lfdr.de (Postfix) with ESMTPS id A77EF174FA3
 	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 11:36:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AC88B309527F
+	by sea.lore.kernel.org (Postfix) with ESMTP id EC12F3099152
 	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 10:28:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0B8035C1BF;
-	Mon, 23 Feb 2026 10:28:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A34E35CB61;
+	Mon, 23 Feb 2026 10:28:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eAJCWw0C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C6OeqFXW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A894A35C18D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC34635C1A6
 	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 10:28:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771842485; cv=none; b=EUybKTgy90sXAxlJjEaArobcuWKhzmeQko7mzddtz7XMYbDQv1CVlr/N6kwMLnmbhZVp+1+zqqJhG9Ob0NdMux3wUFfhZYRoRHhBM4nF3WHfLdP80F2aXatoz7dtGT/8aYXAakDQmbRXIYW1eRzFeMSliY6JTq+5Gmc2rURQHBs=
+	t=1771842485; cv=none; b=D81uYIEzLyv/WmrSJhW/vIObr0Ce5/uGfBHU6Bh/bVeGDlRtoeqDloB9ppOpvFQYbpAhBDR9tfvBxVZlwHOfvp2gHakZqcxXNUUSh6K7X+Ce66PaLieipPVFNXhv33HJco1EhJ5X3R36/P6GVHSbkijXetERdfIj8xFI61opBk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1771842485; c=relaxed/simple;
-	bh=N2bM5Up2XL0atqGOG2enGUu9vC/fkdKMG9llDdkFOoo=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=nDwXtAQ6T3RUjH2wyWMNV8GEHJrv1GpMVJxctsQEcnd653svdWEPXnzHOb+ea61xhAT2YO3PsYthlAW4rBokJdNUPrz8Y/YC2A0WtjeTBpCsO0InyTZvBrtv4E4AW/L60eG3BWZvOHSwHGT3p2T9jedzQ+upi1DjSRkqIqEY3mI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eAJCWw0C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3C9ECC116C6;
+	bh=BhJ48uuWboluACMnIhJ5XbzlO5XIOLObwV7qKhTfYmQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=P54m2gqHjtap2lYfzRgqWCEQiHgsWQj18MenJ9oqSxJlykbzESANwQtsESoMWUddrQEuWgfyp39KP4NndoGWKW/Kaw/49lkj7ZOrMuBcUL8xrTclALKrzSAUggLSzAZkXTAmZlKArpyDFv3pBQQynUgv4ER+jfQzYNq3EEhdR8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C6OeqFXW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 49C3EC19424;
 	Mon, 23 Feb 2026 10:28:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1771842485;
-	bh=N2bM5Up2XL0atqGOG2enGUu9vC/fkdKMG9llDdkFOoo=;
-	h=From:Subject:Date:To:Cc:Reply-To:From;
-	b=eAJCWw0CRgq9z7X06mCXtcvpYReS0J1EuKKocuZuG+Y9+l+AmqRSAWH5vT2KyKD19
-	 unuPV8Jh2DVeBbjMDoM3AetOy6g2Knb9Tn7At1bS5vVGiSQQ8PcCPFPw1nhGLH9bjZ
-	 dESDhIloqlgJ+W1j/EaqnZow9h24GuHAF7XCNFKduR9vFaInhTzv1x5Xq068LsVVoy
-	 x6cKWjilHodmwqPNGhMw6bLwo4V2lGeKhzMme+4SgbT6ynS5DenGCqu47CLDQ3so39
-	 eXHcXFGGswN3iClMcT6R6guew+oLS7x3E9w4ofEGLIQCiBh7Oh672vTXnRgTVlO17R
-	 HPs2sG9cZ9U1Q==
+	bh=BhJ48uuWboluACMnIhJ5XbzlO5XIOLObwV7qKhTfYmQ=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=C6OeqFXWHEcvRUBGHGBk5+6N+I5eon9ptcWUELamVJ/KMqJhdR8yH+s9Nmrmm2WSr
+	 QUp4LHGK6aU7U2mPI16FP9k8nCyv1OE+J3gcoMfJ6lMQ/ZPXpXoVovrhz/eZ07q4fH
+	 RSaiCab1qxejpUGtrC4UCl9+mVLqPZCEoVtRPooy0bcx1q8K1UI/Ap5gf+jjTh0D5S
+	 1okv3j2cNjRKN9dEpH+BEfLGnxViZDDLmYqbLmvYbYqc+0H0Bmf8SyBG3v7QjUnkym
+	 BhdlBtVN+1c6Kkq2k7Pnr757bXU7kBrbvQs0R+xm3fxU3ZQ/nhl9zuZzgdLxQycDeX
+	 VJoOptfSJcg/g==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B844E98E12;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3996DE98E1C;
 	Mon, 23 Feb 2026 10:28:05 +0000 (UTC)
 From: Satish Kharat via B4 Relay <devnull+satishkh.cisco.com@kernel.org>
-Subject: [PATCH v2 0/2] net:ethernet:enic: add VIC ids and link modes
-Date: Mon, 23 Feb 2026 02:27:19 -0800
-Message-Id: <20260223-enic-cscwi36355-v2-0-63488194a974@cisco.com>
+Date: Mon, 23 Feb 2026 02:27:20 -0800
+Subject: [PATCH v2 1/2] net:ethernet:enic: add VIC subsystem ids
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,17 +58,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAIcrnGkC/2WNQQ7CIBBFr9LMWsxABaMr72G6qMNgZyEYMFXTc
- HexiSuX7yX//QUKZ+ECx26BzLMUSbGB2XRA0xivrMQ3BoPGoTGoOAopKvSU3vXWqn3wiBd7CKw
- R2uqeOchrLZ6HxpOUR8rv9WDWX/tr6b/WrBUqO6IeHe6ct3wiKZS2lG4w1Fo/nOGj164AAAA=
+Message-Id: <20260223-enic-cscwi36355-v2-1-63488194a974@cisco.com>
+References: <20260223-enic-cscwi36355-v2-0-63488194a974@cisco.com>
+In-Reply-To: <20260223-enic-cscwi36355-v2-0-63488194a974@cisco.com>
 To: netdev@vger.kernel.org
 Cc: Satish Kharat <satishkh@cisco.com>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1771842484; l=917;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1771842484; l=2264;
  i=satishkh@cisco.com; h=from:subject:message-id;
- bh=N2bM5Up2XL0atqGOG2enGUu9vC/fkdKMG9llDdkFOoo=;
- b=ePtJYNXa95b+fVzS5ILEB9gq+wC/V8iZ3E6DkIITTTW8Y+O5+8iFmUb5ABMrKO4bk6/M/NKvI
- eonYPGwVkUfCQ+giMuvYaKAwxku8hyVWLwabh5BYZcPeRdgjlKuEVaA
+ bh=dmiiJ3fxTUP7u8ZrF0g2EZDSbfEDLnZtm8vLm5JCiQk=;
+ b=pyfckAyhVR58o2HdR9UbUSXu2Poucs1lIYmPJxUdS2/KDEN1mey9nSbTSRF+1uPrALcUolE6/
+ H//Km4jNUqvC+8I6HqBKpXElqmsFXsv+ZrXcg7xpr7sTuPTejWwx6nZ
 X-Developer-Key: i=satishkh@cisco.com; a=ed25519;
  pk=4BxbLoCGvHeIMH/PbpiNVx8/2IcTjFvqcr0AD8K6WLY=
 X-Endpoint-Received: by B4 Relay for satishkh@cisco.com/default with
@@ -84,7 +84,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259997-lists,netdev=lfdr.de,satishkh.cisco.com];
+	TAGGED_FROM(0.00)[bounces-259995-lists,netdev=lfdr.de,satishkh.cisco.com];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	RCPT_COUNT_TWO(0.00)[2];
@@ -102,35 +102,72 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	HAS_REPLYTO(0.00)[satishkh@cisco.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,cisco.com:mid,cisco.com:email,cisco.com:replyto]
-X-Rspamd-Queue-Id: 6F020174FA2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[cisco.com:mid,cisco.com:email,cisco.com:replyto,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A77EF174FA3
 X-Rspamd-Action: no action
 
-Add VIC subsystem ids and their supported/advertised media types so ethtool
-reflects the hardware capabilities for the VIC variants.
+From: Satish Kharat <satishkh@cisco.com>
+
+Add VIC subsystem id for 12xx, 13xx, 14xx and 15xxx series
 
 Signed-off-by: Satish Kharat <satishkh@cisco.com>
 ---
-Changes in v2:
-Addressed comments from Andrew Lunn
-- Removed the advertising of the link speed as we don't support autoneg.
-- Link to v1: https://lore.kernel.org/r/20260221-enic-cscwi36355-v1-0-5a01a6046d5e@cisco.com
+ drivers/net/ethernet/cisco/enic/enic.h | 39 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
----
-Satish Kharat (2):
-      net:ethernet:enic: add VIC subsystem ids
-      net:ethernet:enic: map ethtool link modes by VIC type
+diff --git a/drivers/net/ethernet/cisco/enic/enic.h b/drivers/net/ethernet/cisco/enic/enic.h
+index 301b3f311..6959e85ab 100644
+--- a/drivers/net/ethernet/cisco/enic/enic.h
++++ b/drivers/net/ethernet/cisco/enic/enic.h
+@@ -22,6 +22,45 @@
+ #define DRV_NAME		"enic"
+ #define DRV_DESCRIPTION		"Cisco VIC Ethernet NIC Driver"
+ 
++#define PCI_SUBDEV_ID_CISCO_VIC_1225	0x085
++#define PCI_SUBDEV_ID_CISCO_VIC_1225T	0x0CE
++#define PCI_SUBDEV_ID_CISCO_VIC_1227	0x12E
++#define PCI_SUBDEV_ID_CISCO_VIC_1227T	0x139
++#define PCI_SUBDEV_ID_CISCO_VIC_1240	0x084
++#define PCI_SUBDEV_ID_CISCO_VIC_1280	0x04F
++#define PCI_SUBDEV_ID_CISCO_VIC_1285	0x0CD
++
++#define PCI_SUBDEV_ID_CISCO_VIC_1340	0x12C
++#define PCI_SUBDEV_ID_CISCO_VIC_1380	0x137
++#define PCI_SUBDEV_ID_CISCO_VIC_1385	0x14D
++#define PCI_SUBDEV_ID_CISCO_VIC_1387	0x15D
++
++#define PCI_SUBDEV_ID_CISCO_VIC_1440	0x0215
++#define PCI_SUBDEV_ID_CISCO_VIC_1455	0x0217
++#define PCI_SUBDEV_ID_CISCO_VIC_1457	0x0218
++#define PCI_SUBDEV_ID_CISCO_VIC_1467	0x02AF
++#define PCI_SUBDEV_ID_CISCO_VIC_1477	0x2B0
++#define PCI_SUBDEV_ID_CISCO_VIC_1480	0x0216
++#define PCI_SUBDEV_ID_CISCO_VIC_1485	0x0219
++#define PCI_SUBDEV_ID_CISCO_VIC_1487	0x021A
++#define PCI_SUBDEV_ID_CISCO_VIC_1495	0x024A
++#define PCI_SUBDEV_ID_CISCO_VIC_1497	0x024B
++#define PCI_SUBDEV_ID_CISCO_VIC_14425	0x02CF
++#define PCI_SUBDEV_ID_CISCO_VIC_14825	0x02D0
++
++#define PCI_SUBDEV_ID_CISCO_VIC_15230	0x02DF
++#define PCI_SUBDEV_ID_CISCO_VIC_15231	0x02DB
++#define PCI_SUBDEV_ID_CISCO_VIC_15235	0x02E4
++#define PCI_SUBDEV_ID_CISCO_VIC_15237	0x02F3
++#define PCI_SUBDEV_ID_CISCO_VIC_15238	0x02E8
++#define PCI_SUBDEV_ID_CISCO_VIC_15411	0x02DC
++#define PCI_SUBDEV_ID_CISCO_VIC_15412	0x02E2
++#define PCI_SUBDEV_ID_CISCO_VIC_15420	0x02DE
++#define PCI_SUBDEV_ID_CISCO_VIC_15422	0x02E1
++#define PCI_SUBDEV_ID_CISCO_VIC_15425	0x02F2
++#define PCI_SUBDEV_ID_CISCO_VIC_15427	0x02E0
++#define PCI_SUBDEV_ID_CISCO_VIC_15428	0x02DD
++
+ #define ENIC_BARS_MAX		6
+ 
+ #define ENIC_WQ_MAX		256
 
- drivers/net/ethernet/cisco/enic/enic.h         |  39 +++++++
- drivers/net/ethernet/cisco/enic/enic_ethtool.c | 155 +++++++++++++++++++++++--
- 2 files changed, 187 insertions(+), 7 deletions(-)
----
-base-commit: 8bf22c33e7a172fbc72464f4cc484d23a6b412ba
-change-id: 20260220-enic-cscwi36355-7fd00b59fe10
-
-Best regards,
 -- 
-Satish Kharat <satishkh@cisco.com>
+2.43.0
 
 
 
