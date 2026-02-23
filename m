@@ -1,145 +1,238 @@
-Return-Path: <netdev+bounces-260061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260065-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UDG3K39qnGmcGAQAu9opvQ
-	(envelope-from <netdev+bounces-260061-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 15:55:59 +0100
+	id IDQKBm9rnGmcGAQAu9opvQ
+	(envelope-from <netdev+bounces-260065-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 15:59:59 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 184911784E3
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 15:55:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 76CBD178597
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 15:59:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AE52D30F36D7
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 14:54:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6694230F667B
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 14:56:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8B3258EDE;
-	Mon, 23 Feb 2026 14:54:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5599B26E6E1;
+	Mon, 23 Feb 2026 14:56:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="254YfcH4"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="mjWc3on2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com [209.85.128.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6443A23E229
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 14:54:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65EF55C613
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 14:55:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771858481; cv=none; b=CwDDwvUc8ZPyLTSnJeyZsmYQ5Y7YvxAwZzA3YNK5bfQD4HKbgDSxlKU7dJQGU2eGZhKZ9gW3Ai8YvtS5q9LN0qXvswr9w7PTYWDfA4q/LUY03AeKiNLHsF7yV9I+TQW8l24VoBkjOPHGqAE56Vf13kFFkETg8Uch0OJlLsMsuds=
+	t=1771858565; cv=none; b=FUc5ej9OoJ2CyAPHnxEHJU+gpk8oSoBxEq0+WlGamYSCEd/y+S/hfHbjnq57AxRX9iItgHHgbNGmpcRceAh1rtW6pkTV5a6TFmcJG68H2YadSXsAAvdOAx7rf3MPoH16ArzlTuO+wOcvCt6ulPY/3kV4sWQH2gJlGqDjKUnAZ7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771858481; c=relaxed/simple;
-	bh=hanRw6neqo1V+xkrPiN7EJ0NS7fHSnweQt1XIxZc9no=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=A4wMpGDzlzPmDLTdBWdLsLhIGhdbbmQNupevtyCY/Uz1Pc0t45FjbeqEoCY3xml5RxEnR10Q10utFPD/Mo7pMf5bgewgOqKAridrXX82TkkfYslzZTc8ysWkA3Z1rvmGuh4/hhwDzOXVkx1M/e1AgAjqlkQ2caDz+7smm8mfENg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=254YfcH4; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D9304A0387;
-	Mon, 23 Feb 2026 15:54:31 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1771858475; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=R/OB9yjVomqfrNS8o4uEl0JRvNoCayKvxpqSMhtr2tU=;
-	b=254YfcH4fPrCGlNpJqA1Qc2gfoMXOWnywYPSI5GcVsr13PHZSlH34+KYIwAhs5qbCM2929
-	gOmleCoW7Tn2nOGjge5g6GbI8xBw4XL3OKDVAT/dzrhp314LqfsuOOEkInNfLnBGLnPJdG
-	LMKCRBqkKUZipc8WOhQXcEOeUtDp0lo5wmlkX2GeOXP//E3ouSa227hj+Yv3oqKnmzKyw1
-	/OpwU4mc9diRgU8TC2vO9VgXhknf9I3BnJy8Itvi2quUTvMRLxcKzMQ4l1FGuSTnK/XUMS
-	FAo/Wbx3zfXXpABNHJgZFBPXTByiNZwvXpJ4IJQIXIbdyDuCEdYVF14q4d4CWw==
+	s=arc-20240116; t=1771858565; c=relaxed/simple;
+	bh=u7xsWoPAN17Y/BR2jdrdpoVYb5DBfFYA0RaC2z7xS3I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YiYA/4BXjBcM2XjqhHWXIoVSWIwxy3ek5/acK1fPzFiCfgdGNzqcCuqqMevFUAhNFZSGhjsQ/AYhX8ipy791uXqkGlX6+x68dzp+cpNWyNGdq3hiPXw1AcOErWsaiQPumP/Uq4HL88VMDrrnom5rcFml8VXGbGMmb11IMRXx0Po=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=mjWc3on2; arc=none smtp.client-ip=209.85.128.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f65.google.com with SMTP id 5b1f17b1804b1-4837584120eso31533075e9.1
+        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 06:55:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1771858558; x=1772463358; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kWPtdc3AKgH7Qa6aP8A9K9zkG5fmObFHBGS+pXL1FG0=;
+        b=mjWc3on2sPxG389ldeVG62T1xs0BeGFtYDElQjzR7MmEnI5eMo4D57b6L84QdDf2Fx
+         zbtZYFzIOghSrHp8NgXwYMrHIqpnNh/SzJ4/20MGSd67nUhA0eucYH/XJDiiI6/muG0e
+         vju8nBDFUn4skcw/Fg+NA4H/egAHIIqUoufbsVjPzL3HiBx7evul5m8cjU421oHSJDFq
+         OREZbE17DYXXUOJ/IyxZZ+LXpi0KxFIVCLbXWWYkuN2o6FQ6NVtXJTTqQJb9AGuTnyoZ
+         LNTBFExsVkeHl2N6GH/XNxuMFheL3z8WJVWiO8aPqcBA/uznzAwx2cbtHbVkoDd1VXsS
+         BqAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771858558; x=1772463358;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kWPtdc3AKgH7Qa6aP8A9K9zkG5fmObFHBGS+pXL1FG0=;
+        b=e4OQ10F/GsAyQj710iYv0OMxsabPGexRpga/6gOuBnQoagkEd4sn1f5omT/wCYq+Q+
+         76pt/Hc1yPCLQ2Q/mZ3X3cPpST45WVZoq6JXY15EqAHrwHN+L/Ptcj7oSHQhkvzSRdhg
+         z+aLASnrW0tLS4Wa2Fn1f+yLuLywKRueIQdQmRaZX2Pk9F5HwNuxKhiPQfbs5tdZJcC0
+         hCFVeS8leXtjlPvN0RrJL6z91cmQ+0lNvkj7O1+LYk4JURPdWPwkoQRi9yZDdIywKsKH
+         hJrU/AxWXngK9yIdhPM6honV74gMk3LGrsf2NPTk8nvLAz4EE9ycObeHNGpnZhMgXGM8
+         vJHQ==
+X-Gm-Message-State: AOJu0YwLbN5QTgtSsg7JDpxOJOZMhzAgtzNxkZqYpEJkVZRfklCJ3Uls
+	dZoSi+lb5Eco/VulgevDlgyOlCjm7iW1FO6uWUeDWWG/A3Xm7wLWeelsqwiZhw7Rb+PmYVuJd0/
+	ZR+Yp
+X-Gm-Gg: AZuq6aLwyz4KuYlEts0G/E34J4Yg9ktLmyAdQHsTzAzOXB8xH3n1KlhROfPzZGfw2NB
+	2h/wuqlU1IpM13KXwy7sYBI91nOSBJIfKhQOO73QgV2zNYZv2EL/2/V0ggJzgbru+3As0xkOqqh
+	y6XRFU+Je0EBhA4rhT7tIGZIzcmCKVIzZWR/1c/nMSm7RqBI2sbfhZyFCSrtQsUF/7xdBoCpxNL
+	Ch5vEVulfMt62NOxw/Ci+i++H7z6/Uc181SODV7SwkP0A5Ct8Hs/IRihXOwIHDn+8ogt0QTXkn9
+	+v9XBIHTPLZAFe7+x8MLlp2f13sQ5sc4PW7EY4QD49qRIxfBqgvCV9rUtl6R5SEwW29I4yUNGum
+	ef2Hq5ie4hN7EPDAIrJwmPSO+d+w3qhzGbpQvhdLIwE8Am9uyDl+xT8OVyZhyzQ1/4mbJjkoPEe
+	aN5IxmXbuuuCBUew==
+X-Received: by 2002:a05:600c:3e8d:b0:47e:e779:36d with SMTP id 5b1f17b1804b1-483a95f8bdfmr144910985e9.23.1771858558344;
+        Mon, 23 Feb 2026 06:55:58 -0800 (PST)
+Received: from localhost ([85.163.81.98])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483a9cb3f31sm190787405e9.13.2026.02.23.06.55.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Feb 2026 06:55:57 -0800 (PST)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	donald.hunter@gmail.com,
+	corbet@lwn.net,
+	skhan@linuxfoundation.org,
+	saeedm@nvidia.com,
+	leon@kernel.org,
+	tariqt@nvidia.com,
+	mbloch@nvidia.com,
+	przemyslaw.kitszel@intel.com,
+	mschmidt@redhat.com,
+	andrew+netdev@lunn.ch,
+	rostedt@goodmis.org,
+	mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com,
+	chuck.lever@oracle.com,
+	matttbe@kernel.org,
+	cjubran@nvidia.com,
+	daniel.zahka@gmail.com
+Subject: [PATCH net-next 00/10] devlink: introduce shared devlink instance for PFs on same chip
+Date: Mon, 23 Feb 2026 15:55:47 +0100
+Message-ID: <20260223145557.248679-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 23 Feb 2026 15:54:31 +0100
-From: nb@tipi-net.de
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, claudiu.beznea@tuxon.dev,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- nicolas.ferre@microchip.com, pabeni@redhat.com
-Subject: Re: [PATCH net-next 3/5] net: cadence: macb: implement EEE TX LPI
- support
-In-Reply-To: <aZwm9u_xCbuXCkDX@shell.armlinux.org.uk>
-References: <20260223090412.44070-1-nb@tipi-net.de>
- <20260223090412.44070-4-nb@tipi-net.de>
- <aZwm9u_xCbuXCkDX@shell.armlinux.org.uk>
-Message-ID: <cdf89583f91ce548f1108c8105632102@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260061-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	DMARC_NA(0.00)[tipi-net.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	FROM_NO_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lwn.net,linuxfoundation.org,nvidia.com,intel.com,lunn.ch,goodmis.org,efficios.com,oracle.com];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[resnulli.us];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260065-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DKIM_TRACE(0.00)[resnulli-us.20230601.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_NONE(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 184911784E3
+	DBL_BLOCKED_OPENRESOLVER(0.00)[resnulli.us:mid,nvidia.com:email,resnulli-us.20230601.gappssmtp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 76CBD178597
 X-Rspamd-Action: no action
 
-On 23.2.2026 11:07, Russell King (Oracle) wrote:
-> On Mon, Feb 23, 2026 at 10:04:10AM +0100, Nicolai Buchwitz wrote:
->> Implement software-managed TX Low Power Idle (LPI) for the Cadence GEM
->> MAC as part of IEEE 802.3az Energy Efficient Ethernet support.
->> 
->> The GEM MAC has no built-in idle timer - the TXLPIEN bit (NCR bit 19)
->> immediately asserts LPI and blocks all TX while set. The MAC does not
->> auto-wake for transmit. Per Microchip GMAC documentation (section
->> 40.6.19): "It is best to use firmware to control LPI."
->> 
->> This patch implements a software idle timer using delayed_work:
->> - On TX completion with an empty ring, schedule LPI entry after a
->>   configurable idle timeout (default 250ms). The work function
->>   verifies all TX queues are truly idle before entering LPI to
->>   prevent entering LPI while traffic is still active.
->> - On TX start, wake from LPI by clearing TXLPIEN, cancelling any
->>   pending re-entry, and waiting 50us for the PHY to exit LPI
->>   (conservative vs IEEE 802.3az Tw_sys of ~17us/~30us)
->> - On link up, check EEE negotiation via phy_init_eee() and defer
->>   first LPI entry by 1 second per IEEE 802.3az requirements
->> - On link down, immediately cancel pending work and clear TXLPIEN
->> 
->> The timer value is configurable at runtime via ethtool --set-eee
->> tx-timer.
->> 
->> The implementation is gated on MACB_CAPS_EEE so platforms must
->> explicitly opt in via their macb_config.
-> 
-> In addition to my comments, please check the nipabot status for this
-> patch which can be found at:
-> 
-> https://patchwork.kernel.org/project/netdevbpf/patch/20260223090412.44070-4-nb@tipi-net.de/
-> 
+From: Jiri Pirko <jiri@nvidia.com>
 
-Thanks. I will have a look at the mentioned patches + feedback from the 
-pipeline and prepare a v2 of this series.
+Multiple PFs on a network adapter often reside on the same physical
+chip, running a single firmware. Some resources and configurations
+are inherently shared among these PFs - PTP clocks, VF group rates,
+firmware parameters, and others. Today there is no good object in
+the devlink model to attach these chip-wide configuration knobs to.
+Drivers resort to workarounds like pinning shared state to PF0 or
+maintaining ad-hoc internal structures (e.g., ice_adapter) that are
+invisible to userspace.
 
-> Thanks.
+This problem was discussed extensively starting with Przemek Kitszel's
+"whole device devlink instance" RFC for the ice driver [1]. Several
+approaches for representing the parent instance were considered:
+using a partial PCI BDF as the dev_name (breaks when PFs have different
+BDFs in VMs), creating a per-driver bus, using auxiliary devices, or
+using faux devices. All of these required a backing struct device for
+the parent devlink instance, which does not naturally exist - there is
+no PCI device that represents the chip as a whole.
 
-Nicolai
+This patchset takes a different approach: allow devlink instances to
+exist without any backing struct device. The instance is identified
+purely by its internal index, exposed over devlin netlink. This avoids
+fabricating fake devices and keeps the devlink handle semantics clean.
+
+The first seven patches prepare the devlink core for device-less
+instances by decoupling the handle from the parent device. The last
+three introduce the shared devlink infrastructure and its first user
+in the mlx5 driver.
+
+Example output showing the shared instance and nesting:
+
+  pci/0000:08:00.0: index 0
+    nested_devlink:
+      auxiliary/mlx5_core.eth.0
+  devlink_index/1: index 1
+    nested_devlink:
+      pci/0000:08:00.0
+      pci/0000:08:00.1
+  auxiliary/mlx5_core.eth.0: index 2
+  pci/0000:08:00.1: index 3
+    nested_devlink:
+      auxiliary/mlx5_core.eth.1
+  auxiliary/mlx5_core.eth.1: index 4
+
+[1] https://lore.kernel.org/netdev/20250219164410.35665-1-przemyslaw.kitszel@intel.com/
+
+---
+Decoupled from "devlink and mlx5: Support cross-function rate scheduling"
+patchset to maintain 15-patches limit.
+
+Jiri Pirko (10):
+  devlink: expose devlink instance index over netlink
+  devlink: store bus_name and dev_name pointers in struct devlink
+  devlink: avoid extra iterations when found devlink is not registered
+  devlink: allow to use devlink index as a command handle
+  devlink: support index-based lookup via bus_name/dev_name handle
+  devlink: add devlink_dev_driver_name() helper and use it in trace
+    events
+  devlink: allow devlink instance allocation without a backing device
+  devlink: introduce shared devlink instance for PFs on same chip
+  documentation: networking: add shared devlink documentation
+  net/mlx5: Add a shared devlink instance for PFs on same chip
+
+ Documentation/netlink/specs/devlink.yaml      |  56 +++
+ .../networking/devlink/devlink-shared.rst     |  89 +++++
+ Documentation/networking/devlink/index.rst    |   1 +
+ .../net/ethernet/mellanox/mlx5/core/Makefile  |   5 +-
+ .../net/ethernet/mellanox/mlx5/core/main.c    |  17 +
+ .../ethernet/mellanox/mlx5/core/sh_devlink.c  |  62 ++++
+ .../ethernet/mellanox/mlx5/core/sh_devlink.h  |  12 +
+ include/linux/mlx5/driver.h                   |   1 +
+ include/net/devlink.h                         |   9 +
+ include/trace/events/devlink.h                |  36 +-
+ include/uapi/linux/devlink.h                  |   4 +
+ net/devlink/Makefile                          |   2 +-
+ net/devlink/core.c                            |  59 ++-
+ net/devlink/dev.c                             |  11 +-
+ net/devlink/devl_internal.h                   |  17 +-
+ net/devlink/netlink.c                         |  38 +-
+ net/devlink/netlink_gen.c                     | 350 +++++++++++-------
+ net/devlink/port.c                            |  19 +-
+ net/devlink/sh_dev.c                          | 149 ++++++++
+ 19 files changed, 746 insertions(+), 191 deletions(-)
+ create mode 100644 Documentation/networking/devlink/devlink-shared.rst
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.h
+ create mode 100644 net/devlink/sh_dev.c
+
+-- 
+2.51.1
+
 
