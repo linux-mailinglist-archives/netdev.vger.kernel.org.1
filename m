@@ -1,168 +1,124 @@
-Return-Path: <netdev+bounces-260176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260177-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2Jt8KC+snGlnJwQAu9opvQ
-	(envelope-from <netdev+bounces-260176-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 20:36:15 +0100
+	id iOmOE0CunGmSJwQAu9opvQ
+	(envelope-from <netdev+bounces-260177-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 20:45:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1974E17C70A
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 20:36:15 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72CD217C7D6
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 20:45:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B06B3302A6BF
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 19:34:39 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 08EA5300C7EE
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 19:45:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4790936EAAE;
-	Mon, 23 Feb 2026 19:34:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAC6C372B37;
+	Mon, 23 Feb 2026 19:44:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="bcYdof09";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="sAbOg2o3";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ug7xIB1h";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rM0b80c4"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3FH5OOOC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0735636AB63
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 19:34:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70050372B25;
+	Mon, 23 Feb 2026 19:44:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771875279; cv=none; b=F1NJicjTI+4FY9OAp5FljxnWQRtfCgL4sp2l7xqVwxd0izQ1gwOTuoJhNPspvXhUhPxLshlU4m6XYWjksij4WWRp7LUhEU9i8WVn6TCMtuthXFE77h1qCaAvX6a/bck0QXwFQnTi9ZuUx8NCdH6zSCcRNdDlXwnM0wvkYIjyy7o=
+	t=1771875899; cv=none; b=E61iyV5Tn3U8FZwMvpKFDiG/WymeuxJL/BUl5dUkka9h2sjqovU4SVQWynKCSaZXe0iYX5+m1SQokLOcwXh4/H1Z9b1w0YNAV3nkFqlYLbRC0oFHdZwYqW7XO18RfYUPSakh1tcDwG0LdUA8AO0PaDGPZncfpKR/O4zN7lnLTvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771875279; c=relaxed/simple;
-	bh=zPzIE63q+SKIDVvzynuyd4TDpCR9AcVQsqgQm/sM/LA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IW9sxPw18Qajh2haMoyQz0V9lcY4JDDVs8u+BVJGiNNjzDYLsfgdGl1axXt02uNfV16uiS6haQiiwAmrTDI5KOVcX69BeRozKy3vXlqYD6uD816FcywjT80PhsRDqW42Qg2WLhdhs7cUHiinTbH7XVP7urL2JU4Tj+ir5Y2FV6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=bcYdof09; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=sAbOg2o3; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ug7xIB1h; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=rM0b80c4; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id E99CA3ED9E;
-	Mon, 23 Feb 2026 19:34:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1771875276; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aPKhoA1IudoX9gVRAm7a8eC45/4QquXeX3VQupX9rHo=;
-	b=bcYdof09AinURCf+eM4OpOKjUN1jXRBGnfToJe/OcV+wf92RUfWq6nyXZ5wk3SMy/E2hcU
-	Qkk1gBlnm7yw8wJzFum+V4NgRx+IHsgFjvC9Dsaw/rrWkRPcQJ0Nj/kEHXZ1CGAQ3/Cl7L
-	4vwXVQEvd3v6fxE/k2lJLwQ2TNWTayQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1771875276;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aPKhoA1IudoX9gVRAm7a8eC45/4QquXeX3VQupX9rHo=;
-	b=sAbOg2o3QjX82PJW0oEc4tKQMVS70O7oGC3oWi5xBTE5CYZldJsxf7TyfRzpHFpFEkloCz
-	Y+ap2ZLBwDyGmeAw==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=ug7xIB1h;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=rM0b80c4
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1771875275; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aPKhoA1IudoX9gVRAm7a8eC45/4QquXeX3VQupX9rHo=;
-	b=ug7xIB1hUMgqFgNCH9X/7LWoqUKrUaE58ISIL0bByJIObvmNVG/bZ8ZnS4kjArzo55pDdU
-	ieBjjGY0TiUBw3URbZdvUKX0qz8fahEEn9fPsBhbL253rC01KGdYjgrQ+NpYbIWs6jLhYp
-	4vmyJpJVLKznGBtaln72NJVkND1nKV0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1771875275;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aPKhoA1IudoX9gVRAm7a8eC45/4QquXeX3VQupX9rHo=;
-	b=rM0b80c4y5q9Dg7aWpPSstQXvcJpwTZrWiqm+2eCd+A0cKnh5/1MubYm5Q02jdGfmjNuA2
-	ymRmvpC0mDj4suAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6B4C43EA68;
-	Mon, 23 Feb 2026 19:34:35 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id /aZFF8urnGl/NQAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Mon, 23 Feb 2026 19:34:35 +0000
-Message-ID: <31aab9d3-b4d9-42fe-a248-1da22d5293ce@suse.de>
-Date: Mon, 23 Feb 2026 20:34:28 +0100
+	s=arc-20240116; t=1771875899; c=relaxed/simple;
+	bh=QOrJEEXlaQLObhJSUyE5ecFFySbo4RimNxhr3hLlYXE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PZ9RBVsgGnWfWnPrKvvGzt/6pdtznrK9ti5HVGY15QthmR0TytXPBopmoFUvFErSsgbVudGiE5ca6/utXWejRW9uf6mydMiEyyYCv8rWql4U5I0fQrHm/ZP/ts0tTrWnAcowDRpO//VS7qcPk1dHUvQgvx/5K4rHFbwV1EmJ16Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3FH5OOOC; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=v9wjxYCvvOyI5XN0/kxrJ4ahrWI41bXN3B63JHu9q6o=; b=3FH5OOOC0jx/HV5x4u0GCAIDxZ
+	RmeGpHkLVuBvf7lh04CwsiEm495ybu/XuFA9cTJ0U+L6y2wRIAH8Ann/dyNutC48PM1xgrNh/hywo
+	4SDqKD85SsGdVmPAsFMooHzVB0oPs/bywdbDNWnCrzBMANpdoAkNpe7d1gmWyZqRN5Xc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vubrN-008VRc-EX; Mon, 23 Feb 2026 20:44:49 +0100
+Date: Mon, 23 Feb 2026 20:44:49 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
+	vsrama-krishna.nemani@broadcom.com, vikas.gupta@broadcom.com,
+	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>,
+	Ajit Kumar Khaparde <ajit.khaparde@broadcom.com>
+Subject: Re: [PATCH net-next 3/7] bng_en: add ethtool link settings,
+ get_link, and nway_reset
+Message-ID: <f2bbeb1f-962d-4e7e-9b0b-5d4a4ef762d4@lunn.ch>
+References: <20260223163641.755200-1-bhargava.marreddy@broadcom.com>
+ <20260223163641.755200-4-bhargava.marreddy@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] selftests: net: add ipv6 RA route to ECMP merge
- test
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org, shuah@kernel.org
-References: <20260223150950.31904-1-fmancera@suse.de>
- <20260223103902.4c06e85d@kernel.org>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20260223103902.4c06e85d@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Spam-Level: 
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260223163641.755200-4-bhargava.marreddy@broadcom.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260176-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-260177-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,suse.de:mid,suse.de:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1974E17C70A
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 72CD217C7D6
 X-Rspamd-Action: no action
 
-On 2/23/26 7:39 PM, Jakub Kicinski wrote:
-> On Mon, 23 Feb 2026 16:09:50 +0100 Fernando Fernandez Mancera wrote:
->> +	# Prepare for RA route with gateway
->> +	$NS_EXEC sysctl -wq net.ipv6.conf.veth1.accept_ra_rt_info_max_plen=64
-> 
-> This fails for us:
-> 
-> # 95.85 [+2.11]     TEST: ipv6 promote RA route to static                               [ OK ]
-> # 95.85 [+0.01] sysctl: cannot stat /proc/sys/net/ipv6/conf/veth1/accept_ra_rt_info_max_plen: No such file or directory
-> not ok 1 selftests: net: fib_tests.sh # exit=1
-> 
-> https://netdev-ctrl.bots.linux.dev/logs/vmksft/net/results/531161/10-fib-tests-sh/stdout
+> +	if (link_info->auto_pause_setting & BNGE_LINK_PAUSE_RX)
+> +		linkmode_set_bit(ETHTOOL_LINK_MODE_Pause_BIT,
+> +				 lk_ksettings->link_modes.advertising);
+> +	if (hweight8(link_info->auto_pause_setting & BNGE_LINK_PAUSE_BOTH) == 1)
+> +		linkmode_set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT,
+> +				 lk_ksettings->link_modes.advertising);
 
-Hm, I see. CONFIG_IPV6_ROUTE_INFO seems to be missing. I am adjusting it.
+It is not clear to me how you are configuring pause, and in particular
+if pause it being autoneg or forced.
 
-Thanks,
-Fernando.
+Ethtool has:
 
+       ethtool -A|--pause devname [autoneg on|off] [rx on|off] [tx on|off]
+
+The autoneg here is separate to global autoneg. You can have global
+autoneg on, but pause autoneg off, meaning the pause configuration is
+forced.
+
+The PHY should only be advertising pause if pause autoneg is on.
+
+    Andrew
 
