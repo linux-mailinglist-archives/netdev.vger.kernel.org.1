@@ -1,288 +1,142 @@
-Return-Path: <netdev+bounces-259942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259943-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eOP7NBQUnGkq/gMAu9opvQ
-	(envelope-from <netdev+bounces-259942-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:47:16 +0100
+	id UPxdIwUWnGkq/gMAu9opvQ
+	(envelope-from <netdev+bounces-259943-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:55:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B87F173455
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:47:16 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1636173561
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:55:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DA018301BDF4
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 08:47:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E2189301FAAD
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 08:55:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C93D34CFAB;
-	Mon, 23 Feb 2026 08:47:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 752B834D903;
+	Mon, 23 Feb 2026 08:55:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="lkbTWSB0"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="Wl/algA3"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E34E134CFCC;
-	Mon, 23 Feb 2026 08:47:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B71D34DB59;
+	Mon, 23 Feb 2026 08:55:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771836432; cv=none; b=pd05RkOeWQ3XcrcHLyqRu6W086o4YjXVIu7Y7Btk1LUPTnurs8F5HKtRZjzPocFP/bkfCOdGIU/zaQkureMjPIHX8z1uKZTv825wHzkTulcRt5hjyEt9gY2CILidgYBPvivNA0MIVeluvi+PrBiUwOGmWGrUSpMh9+vbBA/8C64=
+	t=1771836928; cv=none; b=X76zZgMnLcdmzuXdmQ8FveUZFp2Z7q0x+SLHVvSoPp3eQcnlPuZoPuxKXAbpq4hw88aDiJxq8vPBXUR2d8R6oCcFGbtrIPtbOKkHbiAIuqj6tJCj2Sfqt7u+ZLnVWlV/qBOoZX/Owf1Gctugi4cRTMvZELlZa+2O+s2ObFJXl9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771836432; c=relaxed/simple;
-	bh=+dHU1bptRcVz99RN7Jt1KnpbOiRfG8JJsVx1iaC+d18=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ClaTKvFGDbypL4Z4d1jPSwzaw1Qrictkm+zHwZskWlb7NFOaikHLxG4c04fakiebzoK6gWLEIMNyazwgXvAhsbez4/WOszBO1nQ5z9MvpOE4koirVG3VByJS0VbfY8rbmUpQC5KlXyC0rfkTPIzeuAHqG5dXxMIGzZ/GPrKRAQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=lkbTWSB0; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1204)
-	id AA74D20B6F00; Mon, 23 Feb 2026 00:47:10 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com AA74D20B6F00
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1771836430;
-	bh=+sMFljrbCbR3Gmuqz/2XuavaMj59idE6ZsCDEzg5qg4=;
-	h=Date:From:To:Subject:From;
-	b=lkbTWSB0Cxb1mjyEJoV6QWJGe8HeIzgv+uAMW1zP+Qd++KEEmCadG6PzQsIHGSkqE
-	 Kl/vnJc1DSzB5ABO+EbdKG8l6stKCua3Tw34PW4z8xlGreD16exO9hEmFPOYSW9hB4
-	 TnTgmkyWIe75NP0Z1revBXSzNXEMwbjI/P8wopZM=
-Date: Mon, 23 Feb 2026 00:47:10 -0800
-From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-To: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
-	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
-	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	dipayanroy@microsoft.com
-Subject: [PATCH, net-next] net: mana: Trigger VF reset/recovery on health
- check failure due to HWC timeout
-Message-ID: <aZwUDlTkb5xunIkH@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	s=arc-20240116; t=1771836928; c=relaxed/simple;
+	bh=ZzEDcJRcTp7f+irbi5h36BguC6lX6oTQyXuhoXgjY+w=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gU6nBbI80T7o2Km2RhkPPpclg2R8wfqKmiIwW3krv9nt1GkcSjxfC+2G+OM2ZKlzj/BwRjE82aDviHI2Tc66UlPBAJJ0k3KAZmG2c897v+jCtBd5P4hM9f6vVFNjGgh54E2T2dSx/3L/P2uh/JKv2R3TdZzvFQsEkm5cpqE70p8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=Wl/algA3; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BB49FA02E5;
+	Mon, 23 Feb 2026 09:55:12 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1771836916; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=pCJoFEal8tJ3i46WcikENP1f/excTslKdDBJyw5ZBpo=;
+	b=Wl/algA3DmZsyYgxW9Fk/S1gZda8/tDarXqxtrwIlJNKNWR8eYCswubEgYSuUL4j48RCpC
+	bMihuOjQvrFFMPK//qOiFyOb/P9mvR0Va5w1Vx1iuPpFjjnXeQ/tYqV8yp45vnJmNKDEMv
+	/4ylYlKBexeeEJEhgC2JlWXwcue5idj5O7vc9B7Vwn/UQT5I37Rvie6ugUzxExmrWfZfwO
+	WuOcL7aXRUjbLj6idsR1nEShHge5ogiMXHp6DztDTZghymrHDoxC3Bltv9MH8GJZaYGdo/
+	W2Ouu5IDg8zm5aETQCK0HhTB6QUWokjNiUJS1zrmuzrDfYl3hdNNkMvwumO79A==
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: netdev@vger.kernel.org
+Cc: Nicolai Buchwitz <nb@tipi-net.de>,
+	Russel King <rmk+kernel@armlinux.org.uk>,
+	Bryan Whitehead <bryan.whitehead@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: microchip: lan743x: add ethtool nway_reset support
+Date: Mon, 23 Feb 2026 09:54:42 +0100
+Message-Id: <20260223085442.42852-1-nb@tipi-net.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259942-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[tipi-net.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259943-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
 	NEURAL_HAM(-0.00)[-0.998];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.microsoft.com:dkim,linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid]
-X-Rspamd-Queue-Id: 7B87F173455
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,tipi-net.de:mid,tipi-net.de:dkim,tipi-net.de:email,armlinux.org.uk:email]
+X-Rspamd-Queue-Id: A1636173561
 X-Rspamd-Action: no action
 
-The GF stats periodic query is used as mechanism to monitor HWC health
-check. If this HWC command times out, it is a strong indication that
-the device/SoC is in a faulty state and requires recovery.
+Wire phylink_ethtool_nway_reset() as the .nway_reset ethtool operation,
+allowing userspace to restart PHY autonegotiation via 'ethtool -r'.
 
-Today, when a timeout is detected, the driver marks
-hwc_timeout_occurred, clears cached stats, and stops rescheduling the
-periodic work. However, the device itself is left in the same failing
-state.
-
-Extend the timeout handling path to trigger the existing MANA VF
-recovery service by queueing a GDMA_EQE_HWC_RESET_REQUEST work item.
-This is expected to initiate the appropriate recovery flow by suspende
-resume first and if it fails then trigger a bus rescan.
-
-This change is intentionally limited to HWC command timeouts and does
-not trigger recovery for errors reported by the SoC as a normal command
-response.
-
-Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
+Reviewed-by: Russel King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- .../net/ethernet/microsoft/mana/gdma_main.c   | 14 +++-------
- drivers/net/ethernet/microsoft/mana/mana_en.c | 28 ++++++++++++++++++-
- include/net/mana/gdma.h                       | 16 +++++++++--
- 3 files changed, 45 insertions(+), 13 deletions(-)
+ drivers/net/ethernet/microchip/lan743x_ethtool.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index 0055c231acf6..16c438d2aaa3 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -490,15 +490,9 @@ static void mana_serv_reset(struct pci_dev *pdev)
- 		dev_info(&pdev->dev, "MANA reset cycle completed\n");
- 
- out:
--	gc->in_service = false;
-+	clear_bit(GC_IN_SERVICE, &gc->flags);
+diff --git a/drivers/net/ethernet/microchip/lan743x_ethtool.c b/drivers/net/ethernet/microchip/lan743x_ethtool.c
+index 8a3c1ecc7866..9195419ecee0 100644
+--- a/drivers/net/ethernet/microchip/lan743x_ethtool.c
++++ b/drivers/net/ethernet/microchip/lan743x_ethtool.c
+@@ -1079,6 +1079,13 @@ static int lan743x_ethtool_set_eee(struct net_device *netdev,
+ 	return phylink_ethtool_set_eee(adapter->phylink, eee);
  }
  
--struct mana_serv_work {
--	struct work_struct serv_work;
--	struct pci_dev *pdev;
--	enum gdma_eqe_type type;
--};
--
- static void mana_do_service(enum gdma_eqe_type type, struct pci_dev *pdev)
- {
- 	switch (type) {
-@@ -542,7 +536,7 @@ static void mana_recovery_delayed_func(struct work_struct *w)
- 	spin_unlock_irqrestore(&work->lock, flags);
- }
- 
--static void mana_serv_func(struct work_struct *w)
-+void mana_serv_func(struct work_struct *w)
- {
- 	struct mana_serv_work *mns_wk;
- 	struct pci_dev *pdev;
-@@ -624,7 +618,7 @@ static void mana_gd_process_eqe(struct gdma_queue *eq)
- 			break;
- 		}
- 
--		if (gc->in_service) {
-+		if (test_bit(GC_IN_SERVICE, &gc->flags)) {
- 			dev_info(gc->dev, "Already in service\n");
- 			break;
- 		}
-@@ -641,7 +635,7 @@ static void mana_gd_process_eqe(struct gdma_queue *eq)
- 		}
- 
- 		dev_info(gc->dev, "Start MANA service type:%d\n", type);
--		gc->in_service = true;
-+		set_bit(GC_IN_SERVICE, &gc->flags);
- 		mns_wk->pdev = to_pci_dev(gc->dev);
- 		mns_wk->type = type;
- 		pci_dev_get(mns_wk->pdev);
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 91c418097284..8da574cf06f2 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -879,7 +879,7 @@ static void mana_tx_timeout(struct net_device *netdev, unsigned int txqueue)
- 	struct gdma_context *gc = ac->gdma_dev->gdma_context;
- 
- 	/* Already in service, hence tx queue reset is not required.*/
--	if (gc->in_service)
-+	if (test_bit(GC_IN_SERVICE, &gc->flags))
- 		return;
- 
- 	/* Note: If there are pending queue reset work for this port(apc),
-@@ -3533,6 +3533,8 @@ static void mana_gf_stats_work_handler(struct work_struct *work)
- {
- 	struct mana_context *ac =
- 		container_of(to_delayed_work(work), struct mana_context, gf_stats_work);
-+	struct gdma_context *gc = ac->gdma_dev->gdma_context;
-+	struct mana_serv_work *mns_wk;
- 	int err;
- 
- 	err = mana_query_gf_stats(ac);
-@@ -3540,6 +3542,30 @@ static void mana_gf_stats_work_handler(struct work_struct *work)
- 		/* HWC timeout detected - reset stats and stop rescheduling */
- 		ac->hwc_timeout_occurred = true;
- 		memset(&ac->hc_stats, 0, sizeof(ac->hc_stats));
-+		dev_warn(gc->dev,
-+			 "Gf stats wk handler: gf stats query timed out.\n");
++static int lan743x_ethtool_nway_reset(struct net_device *netdev)
++{
++	struct lan743x_adapter *adapter = netdev_priv(netdev);
 +
-+		/* As HWC timed out, indicating a faulty HW state and needs a
-+		 * reset.
-+		 */
-+		if (!test_and_set_bit(GC_IN_SERVICE, &gc->flags)) {
-+			if (!try_module_get(THIS_MODULE)) {
-+				dev_info(gc->dev, "Module is unloading\n");
-+				return;
-+			}
++	return phylink_ethtool_nway_reset(adapter->phylink);
++}
 +
-+			mns_wk = kzalloc(sizeof(*mns_wk), GFP_ATOMIC);
-+			if (!mns_wk) {
-+				module_put(THIS_MODULE);
-+				return;
-+			}
-+
-+			mns_wk->pdev = to_pci_dev(gc->dev);
-+			mns_wk->type = GDMA_EQE_HWC_RESET_REQUEST;
-+			pci_dev_get(mns_wk->pdev);
-+			INIT_WORK(&mns_wk->serv_work, mana_serv_func);
-+			schedule_work(&mns_wk->serv_work);
-+		}
- 		return;
- 	}
- 	schedule_delayed_work(&ac->gf_stats_work, MANA_GF_STATS_PERIOD);
-diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-index a59bd4035a99..fb946389d593 100644
---- a/include/net/mana/gdma.h
-+++ b/include/net/mana/gdma.h
-@@ -213,6 +213,12 @@ enum gdma_page_type {
- 
- #define GDMA_INVALID_DMA_REGION 0
- 
-+struct mana_serv_work {
-+	struct work_struct serv_work;
-+	struct pci_dev *pdev;
-+	enum gdma_eqe_type type;
-+};
-+
- struct gdma_mem_info {
- 	struct device *dev;
- 
-@@ -384,6 +390,7 @@ struct gdma_irq_context {
- 
- enum gdma_context_flags {
- 	GC_PROBE_SUCCEEDED	= 0,
-+	GC_IN_SERVICE		= 1,
- };
- 
- struct gdma_context {
-@@ -409,7 +416,6 @@ struct gdma_context {
- 	u32			test_event_eq_id;
- 
- 	bool			is_pf;
--	bool			in_service;
- 
- 	phys_addr_t		bar0_pa;
- 	void __iomem		*bar0_va;
-@@ -471,6 +477,8 @@ int mana_gd_poll_cq(struct gdma_queue *cq, struct gdma_comp *comp, int num_cqe);
- 
- void mana_gd_ring_cq(struct gdma_queue *cq, u8 arm_bit);
- 
-+void mana_serv_func(struct work_struct *w);
-+
- struct gdma_wqe {
- 	u32 reserved	:24;
- 	u32 last_vbytes	:8;
-@@ -613,6 +621,9 @@ enum {
- /* Driver can handle hardware recovery events during probe */
- #define GDMA_DRV_CAP_FLAG_1_PROBE_RECOVERY BIT(22)
- 
-+/* Driver supports self recovery on Hardware Channel timeouts */
-+#define GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECOVERY BIT(25)
-+
- #define GDMA_DRV_CAP_FLAGS1 \
- 	(GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
- 	 GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX | \
-@@ -626,7 +637,8 @@ enum {
- 	 GDMA_DRV_CAP_FLAG_1_PERIODIC_STATS_QUERY | \
- 	 GDMA_DRV_CAP_FLAG_1_SKB_LINEARIZE | \
- 	 GDMA_DRV_CAP_FLAG_1_PROBE_RECOVERY | \
--	 GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY)
-+	 GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY | \
-+	 GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECOVERY)
- 
- #define GDMA_DRV_CAP_FLAGS2 0
- 
+ static int
+ lan743x_ethtool_set_link_ksettings(struct net_device *netdev,
+ 				   const struct ethtool_link_ksettings *cmd)
+@@ -1369,6 +1376,7 @@ const struct ethtool_ops lan743x_ethtool_ops = {
+ 	.set_rxfh = lan743x_ethtool_set_rxfh,
+ 	.get_rxfh_fields = lan743x_ethtool_get_rxfh_fields,
+ 	.get_ts_info = lan743x_ethtool_get_ts_info,
++	.nway_reset = lan743x_ethtool_nway_reset,
+ 	.get_eee = lan743x_ethtool_get_eee,
+ 	.set_eee = lan743x_ethtool_set_eee,
+ 	.get_link_ksettings = lan743x_ethtool_get_link_ksettings,
 -- 
-2.43.0
+2.39.5
 
 
