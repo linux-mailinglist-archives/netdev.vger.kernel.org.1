@@ -1,125 +1,128 @@
-Return-Path: <netdev+bounces-260122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260123-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aOw1KgiFnGm7IwQAu9opvQ
-	(envelope-from <netdev+bounces-260122-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 17:49:12 +0100
+	id UHvEC0WHnGm7IwQAu9opvQ
+	(envelope-from <netdev+bounces-260123-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 17:58:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D4E317A213
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 17:49:12 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4774517A3C3
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 17:58:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 698AE3142FDF
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 16:40:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5D0133005179
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 16:58:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A36331A072;
-	Mon, 23 Feb 2026 16:39:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C47B73191B5;
+	Mon, 23 Feb 2026 16:58:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vfg0mLJ1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ReOT2Foh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB782315793
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 16:39:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EB59314A84
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 16:58:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.50
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771864745; cv=pass; b=q3To6k+am/Xj+/glIfw26R2I56FnzuoEMmZ92OT0nZxWElx9YbP7yh/jpsSat+9FDU65lTwULIulnjgovfpOzlAfLosuPheyphirKfXTm24R3PpUKuTcGXUlS9JcjTPZ8l4dQrCiMcrAAKCdLj6iD1BoLHBP8XfVDgwDFRvg2i0=
+	t=1771865909; cv=pass; b=p0VvtjSL6xGxD2vk3shD1O7zo3BAVfb27AlrPMxo4QnsJZlLsO4qM8vstp4q1/k5ymJn8uk4KXRUxsIibyBRgo1XYypL4oYN9LdPrBAIepZc5kqlXN2znjflyaQJeaQ9MPN2VEk3xDWyqgLV33/VFEdqTa3NpOuhuDujEa/TV1w=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771864745; c=relaxed/simple;
-	bh=6BMG4Aw9cTxQ9+0M97149ECEu9MA2fic37H9nokz5/g=;
+	s=arc-20240116; t=1771865909; c=relaxed/simple;
+	bh=8O35ywf3frONs/mR3sh+Q3y4PGU/DxQ4aRR+Ww+VwB8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Q6FPa4F4WvYG9p2blpktdI1W0wxsLG8SKy+vyx+47FE/a3GiUMJ02uGvPXfroYo9WGvDJk/RFbUYMc/4l0YhxLgtZGUnUf0XghVsdCq7/4hsAKJmYNjcI14zn+XCAGnZKrWATX9paZnvicdJBU2oxmskafi2UT/jmsh2yaoMlK4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vfg0mLJ1; arc=pass smtp.client-ip=209.85.221.48
+	 To:Cc:Content-Type; b=R8NcL3VTVC/NYgOgfBvXnevon5D+O4P6bvRmLMGnwvvZm7RNGn1hgpw6juaBS3TsNiDOxfchL4SjsxgHn+oD2HgGkw5eHInD+VK0KhNqKTiJWYJjbX1nA1v2ZWQfiQDNok4428M6L4waXhGTwRm3wu9zeUwJ9Dc3RgQqNXlcB9U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ReOT2Foh; arc=pass smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-4362197d174so2902466f8f.3
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 08:39:03 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771864742; cv=none;
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-48373a4bca3so27397355e9.0
+        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 08:58:28 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771865907; cv=none;
         d=google.com; s=arc-20240605;
-        b=K7GHyj1oWgUxO21SRya3GkTmCElSHtmKRfsvmJDgU1rlKUCUJm/N312LXYVLRV+DzA
-         mekMJVtfNjcSrqIpMcBafK4cFZtY0xSv+R587mHAdw+6h0hmXfM6Xvw0bKZsv/I/SiKN
-         iyEnk4SnOz/tbBGETuh74r5/zYex0CWvS+RsvR6URbGs9SA38SfMZ/vosk2VqPQu3kbf
-         3dVOOtxfmrpJxw8798hlcWsVwzUmK3UvL0i3SIiLDWommS2BrnStuIqpgZlB4a2jzzIj
-         1mO8yoRN+Hg6ru2HDd5H/vYx7GioRCbWgzQ5MI0m8jGRoq0nB4ksUpfcfSCOIrj8XkS1
-         +a9Q==
+        b=RtRMqkhsB9zKDByBUAsWJoUtz42BHsAifoXwDMJlvxqhbAimpCw3bIibYOno3K13fx
+         I+3tKgKdg64WhgUlf3GCOjuGc8ktYjXhmXL1cegPv5TYUyfnbcndGWiE9kWvuqW3O1wq
+         qCCFhQmkT9BYt4gCSEdpOKkqJGAveL3trKJwIpqL1YEtDGa7Dskz7kQYf4bYbzt+KDln
+         qEPnowd4g+/pCY7DUcGal163yEF6RQ81ZCc4WQFEN4z+NQV0r+AV9vsFLJxnXyFRdABL
+         WzMkcL6nyRXLwWQpVUyr8zebhV9ptvYInCMfpzv5jtIeHFpFS2IP04W5+MuaUJRDuvg9
+         HZ6w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=/Btlg+v2s4Bj2eA79FYWO+v9doj0qL1zCyyDyKw2C9g=;
-        fh=MlOs5H8/b8tZqFe7IcXdm07VOBBU44ZseVHdRgI+o50=;
-        b=elF+aLeTihj6g97u//rXg0KCFt/Hc21Djvs7gb25voFbFSLcALXWiiaLIj1045RtwA
-         6znqA2BUhuB360MB1vztSvaqBF3sZf+ogdBLKK8+sTXhzyACjUPBvb+JWj7nCrIAhm5f
-         SXwkgBosUz0c0dc5sm1noII+iNLLkw6qqH4owrZOc2APNZoX7kDeCLz9U/J6WGftXBTC
-         XQcJlP3K52EX+TEcf2KfJ/2Cdc3hyQgLIEHr2WTUv4WzFFOfQ5ae6Y4CrZh2JIAKVPfk
-         wm7miW9u3q2YuMZtN+GTlncGuUsKsEguhs+TrioIUDdmnlOO9DQ6Eoes6UBrLPM6gfpK
-         d3gA==;
+        bh=2/TWRW3byuvHDEl1Ok9W0sAe5kheK+6oFHQAV5r5ghw=;
+        fh=MOhK3SvBamVXFCRmgjZBOaqpgHfSwwQNkLLSdcwqixI=;
+        b=V9k9joRrfBBHuRPe2QDY6IUdqkebjXclah4KyfGPJBk3f8UtzATAxadkOjPgyPNuKc
+         4nh16BPCrJ1jKsKo4vGZ82w4SSXL6jDk571z/q+6bDnJnNbQZd92HFE0NQTBEik/VUxy
+         yYcCzqRrKKxX6vGsPjg/s16dD09KOb9mryfHEv3DY53rwweF8/qbWVH+1KRrQYnEq2mm
+         Oxzbnsk1rlwMX6HIZgscBQUvT7Kay0YU3cJyfpBQFzcg0buijQl3QSOx4OLJP3X6j8Si
+         SLV7eHKIWjBHkk3t8f2zlA4WGXEnmvs8PRF4v2rTSr+PHlO0R1MqVy5vvNdEKTZJtR0P
+         rmzg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771864742; x=1772469542; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1771865907; x=1772470707; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/Btlg+v2s4Bj2eA79FYWO+v9doj0qL1zCyyDyKw2C9g=;
-        b=Vfg0mLJ1k/XPortGSlRwBsGhmmDAiuwD3PfBM/gyQK4jkvK7qAhkbn0aFg5g/JydBU
-         fEnl9USlhTpgCtkEOIkWLq/i8pEr3+08T3bm/joRgz8nOFux+JjDEEk0dVqiw9PhFpsT
-         gk4P1pX4xd52gvTjnBxOcSVqL3kxi0VRSLGTDhUotprfHaI39n8NG30j+SRcvp5MbEWS
-         mZK5Y+3h6lfxoz8hLmavGmCoH7AHkUal10iR9a64YpPuK+iR/rQqM9I1kSLcNXzWQN+9
-         FlPT8cQ2mzzU7c+3vjLOS3TFrsGyCPBlpbusvsGxeP9Xq/tHf+b60dtMUMJ7Iy3OWOyK
-         WRKg==
+        bh=2/TWRW3byuvHDEl1Ok9W0sAe5kheK+6oFHQAV5r5ghw=;
+        b=ReOT2Fohn+NNBBbUJpNuYk384nuMXyiNFHVPkouNela1ImQm4WI0vsXiu/VNIdP6kD
+         J7zbFeV4UpXHLousND1iqZaEXqe2OhDCBiKP2hwdHCwglau583RVveXojmoNacSCTSgg
+         ZO94CAlMcp5+NTKBV46d1C7X0HXfTisdBfXxhXbmsz2f6J56rMF41e0IBOw3uio2OqDs
+         Y7lh77oFr7d9wjKEiiren2rJNRHlWDpzGIxplX76MbVhCIwSxuXXXVI62qJg103EPqDG
+         aEboVMp0zMDHAPCj4Zefd6zEJ6AWFRPjMVdc8LREdbMEmcphSQEHPfJvAkQk1LmVgffc
+         LrUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771864742; x=1772469542;
+        d=1e100.net; s=20230601; t=1771865907; x=1772470707;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=/Btlg+v2s4Bj2eA79FYWO+v9doj0qL1zCyyDyKw2C9g=;
-        b=bYl93BihfrFlLHCnZNtBikY+JVEdpsFLvIrFvXTZDe5PFTtlbXKb7Zd/V38MzDA279
-         ldfCyCbGhwUnHiafv5ifxv8J9oqe5SutsDrVqxXxqX5KG/de1SoAhsJA6I5SLxwfGLWs
-         ZohM964P1QHwf8ECWmk7mnKvqzicCwJ8vqbBLek8U5YR3Nt9F3zcaZu2EcU1Si1Yrk6c
-         x6h7Za56mSjVpTRGY+nghb0umstawb56bR0sG6/5eGpQyxjUp/zghnXE5bl3M0/RjGDl
-         0YJIJPQ27N+aD2Lr73/Orl5FlQk8FnLNjX+Y2cSt12erzXfWbIxGwlMd1qjKL49i488b
-         ZqgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWatcVFCF9i+fDSoE8wpFI+16NLFgkDroeUMetCBJI0usOmyWEwYpAY6mAEuxafX11nign/LeM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQcoeAY/OgNiQOXao1z3OAcRe8w7PexSwROZh4lad+oZbFzJ3L
-	SHSJDmfOWGQg8OWr0+PgkRnrT7Twnl3NEe9sHkcdBOBr6A9e4c28pnokE+TJ1xooMX5US+ZBzm0
-	qctStwW3G/FmYQa8sRg4G9xw0n7qNlYI=
-X-Gm-Gg: ATEYQzyZBO28Z1P0S5TqbTrEXmoqH8ePhqQP7MaQeJhscsUxRKRN4UwD59jPjb0anqo
-	Jsx9+X91pjHBwh3UINyVcBDGEYuXMtN0yG2TuETxPvRM0LZnsr0VI3BUSFfGAcFuKh1ja36Wqls
-	oY3BkgY4S/t22fklt8cfxqx0H+hl9iFGc82THuRTLG4U/yAPtIM/pJR8Vxch/lLM2eXVu80hkaQ
-	/LWJvVchpcLNJPcSvveu4CtxFntCVie0C9iPnhvGXQZ6R6kaC1JtnqqqZn3qoUXNMoMeBg4I6Fx
-	oXCGw+oagS1YusJMyIH/uLCuClu/qQ3C5iJuzKtENCyKxx7xABoXsAsyM5p4iRLDTdRIZseqIwY
-	faGNj2n2a
-X-Received: by 2002:a05:6000:40ca:b0:437:73a2:2d4c with SMTP id
- ffacd0b85a97d-4396f15a735mr16101979f8f.13.1771864742055; Mon, 23 Feb 2026
- 08:39:02 -0800 (PST)
+        bh=2/TWRW3byuvHDEl1Ok9W0sAe5kheK+6oFHQAV5r5ghw=;
+        b=QdKOFJPKWkGW4j3EhAIBcZAY/KO/m2D/g+qnqMhggnhUGUTPSNhCdthJPnRFy5yK04
+         +kXc0N3T2XXvwqjKPnpV9f5fSq9SALgyl9UiMNCIUlzKatdiYwuoa4AIO3yuFj6U2Z33
+         0YO/6jP9Jhcs6TIS7imaRkD/iC4ND21V92A/J0lQrHy7Oa9rpqGh7v2bSr4vXB5f9kqZ
+         PLYaqkYpX9wvwVjxlDZrrvc30iSEYg7karr078z/yxXsmWFjUFvcJ9xTR59o1Uocxh3a
+         wqTVhcK7cYg/rcnud7Z86HyD30vlB5Kz8R9p35CUpg2WhXKt7sAClA+Y1BLZXWiZEuqc
+         jbWw==
+X-Forwarded-Encrypted: i=1; AJvYcCX/FzpspIls/a4928+FSTZ2BfeK3L6D6apy68Ttazyn3/W1hRlLtyjXohKWpeCeZODxQSymU9s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEpGbFU0ksdKtYfG8EfZd+HF/MByG3VE9YsvcTt/WP0EQARbX0
+	TQWf7SN3twNCtpsuhUr02Vvi8/RjKkhdTpfiKXP4/1i93bAM9V7Bi8mll4FQX9U1r4GZ4Fxq8W1
+	H+xgmO8WCnjRrF7srmYTKfhY+l2rVfLg=
+X-Gm-Gg: AZuq6aIRwf/dnXRzt+bY7e+Dmw0jj8INeKp2XrkjO+QMmWdH1V7unxILKBpzO9NgzFn
+	wg9/ByPfrk/s2sSzJutj/wZtVSZGtsooXBuFVcG39WzwgMPSVACKmU3QPlWf/sur6mOdIeEMXe+
+	cPm6hbQJ1G7fHDVOI/T72ADa1ADaM7M0KXnl39v8SfJog7ydcYwc6Dokd/wJbS134UR3uO7744t
+	r1kBb29ggHJj3aoEi3b3FV5MSqQTMkoaV0N6U7CZZahu+o5rofk4hxGPRsrujSf+UX9UxmMbEbU
+	0XUjD1yHp8rOwIlOPKOeGvksoft3OKnEFx0PjliIi+8GGtLxFIo6UxLSuYJcpYrbW2XJ2+HOFf/
+	eUjion8ttUCD35SWpEhs=
+X-Received: by 2002:a05:600c:3484:b0:483:7f4e:fef6 with SMTP id
+ 5b1f17b1804b1-483a95fa4e7mr119430205e9.26.1771865906614; Mon, 23 Feb 2026
+ 08:58:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260223083120.23776-1-slava.imameev@crowdstrike.com> <20260223083120.23776-3-slava.imameev@crowdstrike.com>
-In-Reply-To: <20260223083120.23776-3-slava.imameev@crowdstrike.com>
+References: <692c1f3c4b95e9b8a2bbaf333f4618f1ca1c3cc36fc8b0246b094cd67ed62dbd@mail.kernel.org>
+ <20260223104743.37713-1-slava.imameev@crowdstrike.com>
+In-Reply-To: <20260223104743.37713-1-slava.imameev@crowdstrike.com>
 From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Mon, 23 Feb 2026 08:38:51 -0800
-X-Gm-Features: AaiRm51gzgi525_wFRB9fptLy63BCDSKPCaqKcQyhmb9W89_jXdbtCdsK1J7NFE
-Message-ID: <CAADnVQ+50cMbAiTPEuPT_LZgPu3SuMDhemX9EpMLoqdCHvAXbA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v3 2/2] selftests/bpf: Add trampolines
- multi-level pointer params test coverage
+Date: Mon, 23 Feb 2026 08:58:14 -0800
+X-Gm-Features: AaiRm53gF6QRXkPAEJJjxdjdGlfFi_H0IJde1Ne6TGCB64Ct4fuwj2XfM2Yoyyg
+Message-ID: <CAADnVQ+okfKHvKzCy9vLQkpevhvHMFXhincqmFOQX9zN_vtQyA@mail.gmail.com>
+Subject: Re: Re: [PATCH bpf-next v3 1/2] bpf: Support multi-level pointer
+ params via SCALAR_VALUE for trampolines
 To: Slava Imameev <slava.imameev@crowdstrike.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard <eddyz87@gmail.com>, 
-	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
+Cc: bot+bpf-ci@kernel.org, Andrii Nakryiko <andrii@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, bpf <bpf@vger.kernel.org>, Chris Mason <clm@meta.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, Eduard <eddyz87@gmail.com>, 
+	Eric Dumazet <edumazet@google.com>, Hao Luo <haoluo@google.com>, Simon Horman <horms@kernel.org>, 
+	Ihor Solodrai <ihor.solodrai@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	Jiri Olsa <jolsa@kernel.org>, KP Singh <kpsingh@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>, 
 	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
-	DL Linux Open Source Team <linux-open-source@crowdstrike.com>
+	DL Linux Open Source Team <linux-open-source@crowdstrike.com>, 
+	Martin KaFai Lau <martin.lau@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Network Development <netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Shuah Khan <shuah@kernel.org>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
@@ -127,175 +130,73 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260122-lists,netdev=lfdr.de];
-	TO_DN_ALL(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260123-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,davemloft.net,redhat.com,vger.kernel.org,crowdstrike.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,meta.com,iogearbox.net,davemloft.net,gmail.com,google.com,linux.dev,crowdstrike.com,redhat.com,fomichev.me];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[alexeistarovoitov@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,bpf-ci];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 0D4E317A213
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,crowdstrike.com:email]
+X-Rspamd-Queue-Id: 4774517A3C3
 X-Rspamd-Action: no action
 
-On Mon, Feb 23, 2026 at 12:32=E2=80=AFAM Slava Imameev
+On Mon, Feb 23, 2026 at 2:48=E2=80=AFAM Slava Imameev
 <slava.imameev@crowdstrike.com> wrote:
 >
-> Multi-level pointer params and return value test coverage for BPF
-> trampolines:
-> - fentry/fexit programs covering struct and void double/triple
->   pointer parameters and returned values
-> - verifier context tests covering multi-level pointers as parameters
-> - verifier context tests covering multi-level pointers as returned
->   values
-> - verifier context tests for lsm to check trusted parameters handling
-> - verifier context tests covering out-of-bound access after cast
-> - verifier BPF helper tests to validate no change in verifier
->   behaviour
+> I think support for broader types can be provided in a compatible way
+> with future annotated support, as I explained in my reply to the v2
+> review:
 >
-> Signed-off-by: Slava Imameev <slava.imameev@crowdstrike.com>
-> ---
->  net/bpf/test_run.c                            | 130 ++++++
->  .../prog_tests/fentry_fexit_multi_level_ptr.c | 206 +++++++++
->  .../selftests/bpf/prog_tests/verifier.c       |   2 +
->  .../progs/fentry_fexit_pptr_nullable_test.c   |  56 +++
->  .../bpf/progs/fentry_fexit_pptr_test.c        |  67 +++
->  .../bpf/progs/fentry_fexit_void_ppptr_test.c  |  38 ++
->  .../bpf/progs/fentry_fexit_void_pptr_test.c   |  71 +++
->  .../bpf/progs/verifier_ctx_multilevel_ptr.c   | 435 ++++++++++++++++++
->  8 files changed, 1005 insertions(+)
->  create mode 100644 tools/testing/selftests/bpf/prog_tests/fentry_fexit_m=
-ulti_level_ptr.c
->  create mode 100644 tools/testing/selftests/bpf/progs/fentry_fexit_pptr_n=
-ullable_test.c
->  create mode 100644 tools/testing/selftests/bpf/progs/fentry_fexit_pptr_t=
-est.c
->  create mode 100644 tools/testing/selftests/bpf/progs/fentry_fexit_void_p=
-pptr_test.c
->  create mode 100644 tools/testing/selftests/bpf/progs/fentry_fexit_void_p=
-ptr_test.c
->  create mode 100644 tools/testing/selftests/bpf/progs/verifier_ctx_multil=
-evel_ptr.c
->
-> diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-> index 178c4738e63b..9f6ee2eb01cd 100644
-> --- a/net/bpf/test_run.c
-> +++ b/net/bpf/test_run.c
-> @@ -24,6 +24,9 @@
->  #include <net/netdev_rx_queue.h>
->  #include <net/xdp.h>
->  #include <net/netfilter/nf_bpf_link.h>
-> +#include <linux/set_memory.h>
-> +#include <linux/string.h>
-> +#include <asm/tlbflush.h>
->
->  #define CREATE_TRACE_POINTS
->  #include <trace/events/bpf_test_run.h>
-> @@ -563,6 +566,42 @@ noinline int bpf_fentry_test10(const void *a)
->         return (long)a;
->  }
->
-> +struct bpf_fentry_test_pptr_t {
-> +       u32 value1;
-> +       u32 value2;
-> +};
-> +
-> +noinline int bpf_fentry_test11_pptr_nullable(struct bpf_fentry_test_pptr=
-_t **pptr__nullable)
-> +{
-> +       if (!pptr__nullable)
-> +               return -1;
-> +
-> +       return (*pptr__nullable)->value1;
-> +}
-> +
-> +noinline u32 **bpf_fentry_test12_pptr(u32 id, u32 **pptr)
-> +{
-> +       /* prevent DCE */
-> +       asm volatile("" : "+r"(id));
-> +       asm volatile("" : "+r"(pptr));
-> +       return pptr;
-> +}
-> +
-> +noinline u8 bpf_fentry_test13_pptr(void **pptr)
-> +{
-> +       void *ptr;
-> +
-> +       return copy_from_kernel_nofault(&ptr, pptr, sizeof(pptr)) =3D=3D =
-0;
-> +}
-> +
-> +/* Test the verifier can handle multi-level pointer types with qualifier=
-s. */
-> +noinline void ***bpf_fentry_test14_ppptr(void **volatile *const ppptr)
-> +{
-> +       /* prevent DCE */
-> +       asm volatile("" :: "r"(ppptr) : "memory");
-> +       return (void ***)ppptr;
-> +}
-> +
->  noinline void bpf_fentry_test_sinfo(struct skb_shared_info *sinfo)
->  {
->  }
-> @@ -670,20 +709,110 @@ static void *bpf_test_init(const union bpf_attr *k=
-attr, u32 user_size,
->         return data;
->  }
->
-> +static void *create_bad_kaddr(void)
-> +{
-> +       /*
-> +        * Try to get an address that passes kernel range checks but caus=
-es
-> +        * a page fault handler invocation if accessed from a BPF program=
+> "
+>   > so I suggest treating 'void **' as a scalar as Eduard suggested.
+>   > This particular sb_eat_lsm_opts() hook
+>   > doesn't have a useful type behind it anyway.
+>   > I'm less certain about 'char **'. If we make it scalar too
+>   > it will be harder to make it a pointer to nul terminated string later=
 .
-> +        */
-> +#if defined(CONFIG_ARCH_HAS_SET_MEMORY) && defined(CONFIG_X86)
-> +       void *addr =3D vmalloc(PAGE_SIZE);
-> +
-> +       if (!addr)
-> +               return NULL;
-> +       /* Make it non-present - any access will fault */
-> +       if (set_memory_np((unsigned long)addr, 1)) {
-> +               vfree(addr);
-> +               return NULL;
-> +       }
-> +       return addr;
-> +#elif defined(CONFIG_ARCH_HAS_SET_DIRECT_MAP)
-> +       struct page *page =3D alloc_page(GFP_KERNEL);
-> +
-> +       if (!page)
-> +               return NULL;
-> +       /* Remove from direct map - any access will fault */
-> +       if (set_direct_map_invalid_noflush(page)) {
-> +               __free_page(page);
-> +               return NULL;
-> +       }
-> +       flush_tlb_kernel_range((unsigned long)page_address(page),
-> +                              (unsigned long)page_address(page) + PAGE_S=
-IZE);
-> +       return page_address(page);
-> +#endif
+>
+>   > So I would do 'void **' -> scalar for now only.
+>
+>   I changed to scalar in v3, keeping broader scope for pointer types.
+>
+>   We encountered double pointers of various types that required
+>   workarounds, such as:
+>
+>   int __posix_acl_chmod(struct posix_acl **acl, gfp_t gfp, umode_t mode)
+>
+>   Adding support for void** alone doesn't address the broader issue
+>   with other double pointer types.
+>
+>   When annotated array support (including char**) is added in the
+>   future, it should remain compatible with the scalar approach for
+>   legacy (unannotated) parameters. Unannotated parameters will
+>   continue using scalar handling.
+> "
 
-This is serious overkill for a test.
-See how bpf_testmod_return_ptr() does it.
+but then there is no need to relax it for double pointers only.
 
-pw-bot: cr
+-       if (is_void_or_int_ptr(btf, t))
++       if (is_void_or_int_ptr(btf, t) || !btf_type_is_struct_ptr(btf, t))
+
+would make 'scalar' a fallback for anything unrecognized,
+and we can argue that making it smarter in the future
+maybe hopefully won't break progs.
 
