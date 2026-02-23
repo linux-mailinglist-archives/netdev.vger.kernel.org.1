@@ -1,157 +1,167 @@
-Return-Path: <netdev+bounces-259975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259968-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0OQYIy8lnGkeAAQAu9opvQ
-	(envelope-from <netdev+bounces-259975-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 11:00:15 +0100
+	id wODbBeshnGkZ/wMAu9opvQ
+	(envelope-from <netdev+bounces-259968-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 10:46:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19C381746AE
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 11:00:15 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 406671741FF
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 10:46:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7F6743003334
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:58:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CEDD630074E3
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:46:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 071FA352926;
-	Mon, 23 Feb 2026 09:58:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 935A134DCCC;
+	Mon, 23 Feb 2026 09:46:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=uter.be header.i=@uter.be header.b="gqxjkDRM"
+	dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b="HmII/pEq"
 X-Original-To: netdev@vger.kernel.org
-Received: from lounge.grep.be (lounge.grep.be [144.76.219.42])
+Received: from mx0a-00206402.pphosted.com (mx0a-00206402.pphosted.com [148.163.148.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED5B34A785;
-	Mon, 23 Feb 2026 09:58:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3FC145348;
+	Mon, 23 Feb 2026 09:46:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.148.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771840704; cv=none; b=phG1QddaaHWpTBpckMc9qL2K5VhXsRvdEh/NMVCqTE/2kEs4xUIYqT4UXInBDSptEX6+OOCDWG2okzddwwZnOraBdbnwHJ67R9DEY+119rqWog0mo8K9F6lCiGKBUEPgPYrmUE+UcUwPq4V2Ocw2aSjGvijtALF7yh2Ps/FlIRA=
+	t=1771839972; cv=none; b=Ch7Sh7cBWlutgXTsWBZDYVea5oFWNjVsRLKa2dMQIgTHrTeJrIIQ6dXIwHK79Sp1JQbTVuuJln4x18DI8RauvbaDFDl9AN55ayuQgJ/9yED+Wj66GNdpTOE61YVB3OmM+bteNc0xWbdzjJ46/GKv5F3uoYuOo/qFeTBbHydinac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771840704; c=relaxed/simple;
-	bh=Iw0Gt16U9GaQulC5u4A0rgAlC9ecuwz937bM6cVUjmI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oGTlkKEqC5JVEnDwmr71AaTbB8RkHH5oFRwYHm7fldq5u7fcMqQK+mfpvxpTk6uXjZBjtV/9G4G+Aj0c4scZOPLg8TpRayKB4hkm35JuxbwhWXx+NBYllfx2Ul/C4phy5031g4LGAZk5O0uaJf6gSFRWTthqGb+7mQOCGiLT8nQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uter.be; spf=pass smtp.mailfrom=uter.be; dkim=pass (2048-bit key) header.d=uter.be header.i=@uter.be header.b=gqxjkDRM; arc=none smtp.client-ip=144.76.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uter.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uter.be
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=uter.be;
-	s=2021.lounge; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=l7ur/xMoIwQ2QmfUHV3rfzePMQaZM3DKESy7NxWDgx8=; b=gqxjkDRMi7UMD8moDQ7aD/9Mxa
-	rsXMoJy5UeyWwvNNBxUgyP4vQXsGZpxY/B0qa/2FR7ThWKP7mrhZHFoLstJljE9hWt3UC05uCJGkW
-	kJqb0IIMN83A25VYXzzIbfDFEXBh09pNqJSHlZzbPCTo9gvWcQvp1+pE3VhWa7XWnJYYIDf3MXL2r
-	q9Vww+gEZs/lMrOHEH/4+TYXHcyUh/N/X3qsmSMOlcqMN8YkoXuk2TJcFHwi5PZ9j3H/udfXw1NH2
-	sB+qvScv+YCHGgX96t1wM4KM2gvgWn44NXzeEqDpu8gHz7QK3iw4Q6uKthh/2cz9Vx8dalwiVbBRP
-	t4rdB6QQ==;
-Received: from [102.39.233.88] (helo=pc220518)
-	by lounge.grep.be with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <w@uter.be>)
-	id 1vuSQg-0000000F0gb-2Jmf;
-	Mon, 23 Feb 2026 10:40:38 +0100
-Received: from wouter by pc220518 with local (Exim 4.99.1)
-	(envelope-from <w@uter.be>)
-	id 1vuSQU-00000000uTV-3zJQ;
-	Mon, 23 Feb 2026 11:40:26 +0200
-Date: Mon, 23 Feb 2026 11:40:26 +0200
-From: Wouter Verhelst <w@uter.be>
-To: Hristo Venev <hristo@venev.name>
-Cc: Donald Hunter <donald.hunter@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, nbd@other.debian.org
-Subject: Re: [PATCH] netlink: specs: add specification for NBD
-Message-ID: <aZwgiv0vPWPybUF-@pc220518.home.grep.be>
-References: <20260215180309.2255721-3-hristo@venev.name>
- <m2o6lnlg2y.fsf@gmail.com>
- <6a1339999b091edaaa15e34aceb7961dfc61581b.camel@venev.name>
+	s=arc-20240116; t=1771839972; c=relaxed/simple;
+	bh=yPRkaRS6xCl+Ba/XYQOMFWH+i0o393KmfiXvx+ReNoY=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tUNYhV05h97TA1L2Xb7cozaiGXv9/w+7/0Wv5h2GujE+NznGVT7wiRMrN6rzas9LHVtTOGCasoE+nT06ZxxTHq2ZOG9OGumdYg5tyDloBJT67qxCn+NTh15u0qm5wuOjskksUYTL9Vfs2gej6b9wIiiOL57oiAffObyrf0x+zLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com; spf=pass smtp.mailfrom=crowdstrike.com; dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b=HmII/pEq; arc=none smtp.client-ip=148.163.148.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=crowdstrike.com
+Received: from pps.filterd (m0354652.ppops.net [127.0.0.1])
+	by mx0a-00206402.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61N9FaWo912091;
+	Mon, 23 Feb 2026 09:45:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=crowdstrike.com;
+	 h=cc:content-transfer-encoding:content-type:date:from
+	:in-reply-to:message-id:mime-version:references:subject:to; s=
+	default; bh=yPRkaRS6xCl+Ba/XYQOMFWH+i0o393KmfiXvx+ReNoY=; b=HmII
+	/pEqFkzPRukv7r2n3dB2AAqdw40A39IhgYy92ZW7jG8NStQjza9P2QKuatZmWIpc
+	5U0NxvBz5XL3eBkki+CebhjdSZuTSBtyaK4RMjDOzS0v0aKC1gZdAAFgpGZQot1e
+	byYuiWJkNrzT9RNXy9x11ME00kqJ524D4jSjUIvIcJC0pQEgNc7isFv9S6iQC7Vf
+	Q9Kyk2+7uxzJwEmzq2ywwWT/l6M7Z6BAKo96mKR8N2Jya4+qOAhfll4w6JC8Zdjm
+	RLlxgKRe3IWXhBmeqjtpbE43sMlPYEgcA8j6BUa064xGq7BM3kswJLmhR8+PYsYG
+	O7zZlTwXWhnWkiyWDg==
+Received: from mail.crowdstrike.com (dragosx.crowdstrike.com [208.42.231.60] (may be forged))
+	by mx0a-00206402.pphosted.com (PPS) with ESMTPS id 4cftgxbrp2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 23 Feb 2026 09:45:33 +0000 (GMT)
+Received: from ML-CTVHTF21DX.crowdstrike.sys (10.100.11.122) by
+ 04WPEXCH006.crowdstrike.sys (10.100.11.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Mon, 23 Feb 2026 09:45:11 +0000
+From: Slava Imameev <slava.imameev@crowdstrike.com>
+To: <alexei.starovoitov@gmail.com>
+CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
+        <daniel@iogearbox.net>, <davem@davemloft.net>, <eddyz87@gmail.com>,
+        <edumazet@google.com>, <haoluo@google.com>, <horms@kernel.org>,
+        <john.fastabend@gmail.com>, <jolsa@kernel.org>, <kpsingh@kernel.org>,
+        <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>, <linux-open-source@crowdstrike.com>,
+        <martin.lau@linux.dev>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+        <sdf@fomichev.me>, <shuah@kernel.org>, <slava.imameev@crowdstrike.com>,
+        <song@kernel.org>, <yonghong.song@linux.dev>
+Subject: Re: Re: Re: [PATCH bpf-next v2 0/2] bpf: Add multi-level pointer parameter
+Date: Mon, 23 Feb 2026 20:44:23 +1100
+Message-ID: <20260223094423.26551-1-slava.imameev@crowdstrike.com>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <CAADnVQ+xwC+J1hZcHPEUjBoKcUKmnucG4AFQ-kkDmqx+C-GcoA@mail.gmail.com>
+References: <CAADnVQ+xwC+J1hZcHPEUjBoKcUKmnucG4AFQ-kkDmqx+C-GcoA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <6a1339999b091edaaa15e34aceb7961dfc61581b.camel@venev.name>
-X-Speed: Gates' Law: Every 18 months, the speed of software halves.
-Organization: none
+Content-Type: text/plain
+X-ClientProxiedBy: 04WPEXCH008.crowdstrike.sys (10.100.11.75) To
+ 04WPEXCH006.crowdstrike.sys (10.100.11.70)
+X-Disclaimer: USA
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjIzMDA4NCBTYWx0ZWRfXxKMhC26uW/sS
+ VQhBnpPk/dLzBnOC0sWN4wR8pIttZ4R/qnnBuviPXEEbaEN0SCHqLdMw7rRunGIlNT29/HAJeDn
+ 0NfrNWJR43xo/hWkfnD9szVANc3WFIP69v8FZkp0SkYcb2Yv7GL69nGBQrXv2xxGSWEA/BBxPVP
+ rc0tWUSc6S8kXZ9ni+/W8oN2nAd4rkv6ZZDAHwqNtrJGmB4BBb5hBVcaQBe57SK5HdYoajxLP5A
+ 40KC/BdDkgBhDv2u1ccopWfqXNi29+GPZsmufnWlU7Gmfs4rumASl9y9ghycEFlbum4h0gvaBrR
+ /yGlmUHfJuXVYUDKJatq8nqzqz1YYipnYqcr2kvvxOrfYRghMcNJZe6Itj1oYw2Y6qyEyD3KkW/
+ AyzAV+Pl6btm3X8ShR9JhCdG4FbeIYa11ENmvYcgsM0DiPIV01GBSZGGb4QW++89tC5Nf1CG2o2
+ nN6M0iZBh/D5z2VZ/XQ==
+X-Proofpoint-ORIG-GUID: -TQ0QlKj59_ApXtzOc_qSSDtCQL_w70e
+X-Authority-Analysis: v=2.4 cv=S+XUAYsP c=1 sm=1 tr=0 ts=699c21bd cx=c_pps
+ a=1d8vc5iZWYKGYgMGCdbIRA==:117 a=1d8vc5iZWYKGYgMGCdbIRA==:17
+ a=EjBHVkixTFsA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=T2KQ53IYiC3MXPrxx8bB:22 a=2KvRFfd_T_-xjmS8C1aD:22 a=pGLkceISAAAA:8
+ a=fhEmHalCemDr9p1Y7F8A:9
+X-Proofpoint-GUID: -TQ0QlKj59_ApXtzOc_qSSDtCQL_w70e
+X-Proofpoint-Virus-Version: vendor=nai engine=6800 definitions=11709
+ signatures=596818
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 phishscore=0 impostorscore=0 priorityscore=1501
+ lowpriorityscore=0 malwarescore=0 bulkscore=0 suspectscore=0 clxscore=1011
+ adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2602130000
+ definitions=main-2602230084
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[uter.be:s=2021.lounge];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[crowdstrike.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[crowdstrike.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[uter.be : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259975-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org,toxicpanda.com,kernel.dk,other.debian.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,iogearbox.net,davemloft.net,gmail.com,google.com,crowdstrike.com,linux.dev,redhat.com,fomichev.me];
 	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[uter.be:-];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[w@uter.be,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-259968-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[slava.imameev@crowdstrike.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[crowdstrike.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[25];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.996];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,pc220518.home.grep.be:mid]
-X-Rspamd-Queue-Id: 19C381746AE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[crowdstrike.com:mid,crowdstrike.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 406671741FF
 X-Rspamd-Action: no action
 
-On Tue, Feb 17, 2026 at 07:40:33PM +0200, Hristo Venev wrote:
-> On Tue, 2026-02-17 at 12:17 +0000, Donald Hunter wrote:
-> > There are yamllint errors:
-> > 
-> > make -C tools/net/ynl lint
-> > make: Entering directory '/home/donaldh/net-next/tools/net/ynl'
-> > yamllint ../../../Documentation/netlink/specs
-> > ../../../Documentation/netlink/specs/nbd.yaml
-> >   159:81    error    line too long (104 > 80 characters)  (line-
-> > length)
-> >   169:6     error    syntax error: expected <block end>, but found
-> > '<block mapping start>' (syntax)
-> >   170:7     error    wrong indentation: expected 5 but found 6 
-> > (indentation)
-> 
-> Thanks, I will fix the lint errors in v2.
-> 
-> > > +doc: See :file:`drivers/block/nbd.c`
-> > 
-> > Prefer to see a meaningful doc string here.
-> 
-> I will add more proper documentation in v2. I couldn't find any
-> existing documentation of this netlink interface, so I guess I will
-> write it myself.
+On Wed, 18 Feb 2026 19:15:47 Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote
 
-As luck would have it, before I saw this message, I had been wanting to
-work on some of the messages that nbd-client still needed, and so I
-asked an LLM to analyze the code and generate some docs for me.
+> so I suggest treating 'void **' as a scalar as Eduard suggested.
+> This particular sb_eat_lsm_opts() hook
+> doesn't have a useful type behind it anyway.
+> I'm less certain about 'char **'. If we make it scalar too
+> it will be harder to make it a pointer to nul terminated string later.
 
-Heed the "LLM" part. It's probably not perfect. But it could be a good
-starting point. Or not. At any rate, you can find it here:
+> So I would do 'void **' -> scalar for now only.
 
-https://github.com/NetworkBlockDevice/nbd/blob/master/doc/netlink-proto.md
+I changed to scalar in v3, keeping broader scope for pointer types.
 
--- 
-"I never had a C in history!"
-"Yeah, but there was so much less of it when you were my age!"
- -- Joe Brockmeier recounting a conversation with his father, cfgmgmtcamp 2026, Ghent
+We encountered double pointers of various types that required
+workarounds, such as:
+
+int __posix_acl_chmod(struct posix_acl **acl, gfp_t gfp, umode_t mode)
+
+Adding support for void** alone doesn't address the broader issue
+with other double pointer types.
+
+When annotated array support (including char**) is added in the
+future, it should remain compatible with the scalar approach for
+legacy (unannotated) parameters. Unannotated parameters will
+continue using scalar handling.
 
