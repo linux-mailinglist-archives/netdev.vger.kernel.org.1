@@ -1,111 +1,111 @@
-Return-Path: <netdev+bounces-260036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260037-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uN3LApVYnGkAEQQAu9opvQ
-	(envelope-from <netdev+bounces-260036-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 14:39:33 +0100
+	id sFmLFR5anGmzEgQAu9opvQ
+	(envelope-from <netdev+bounces-260037-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 14:46:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 829151770F3
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 14:39:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB199177323
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 14:46:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DC028302A7B5
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 13:38:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C8CA63045C03
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 13:41:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11DBF218E91;
-	Mon, 23 Feb 2026 13:38:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90089221540;
+	Mon, 23 Feb 2026 13:41:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="MWqNoOT0"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="zXlappCN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4951E834B
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 13:38:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22DA9221726
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 13:41:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.169
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771853928; cv=pass; b=ZvujB6BM3mhwkL1cao3FNwBnIztUpNIhE9YvN7upy26p6lZqYDcle96WQLG7LSqDX89axqmhNV2/t1wmyhE+m+AKID5/5IrhVnmXFQjAZfo6by6+uByIqkub1JzQOsO7GJC7mBn9V9atwAk7guJUkKzezwmN8PQ14kv5q3lti1A=
+	t=1771854065; cv=pass; b=PdBEd3TwmhuWfGWSV6u2iIFxJJqg+Q8ZLH2HSD6w4TNMvElPLUrzGFJSNtJ9tVtUWt/CjCzSoe+SxQo/kPezuSlIcApksjBwCvtqbiALWfPAtgqMVhvwWJ+rsE5djktbmH9Xq663VhVrfvad7a5iaMt+2XM6zKUxvadJcHmDXzw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771853928; c=relaxed/simple;
-	bh=S4lFjQaSGlg1lS+TEpbgnOltoHuapaMvNQyfxUz713w=;
+	s=arc-20240116; t=1771854065; c=relaxed/simple;
+	bh=/rDFSkyk9XDD6QnhOlAh/4Ojapy2eEuDhDWuh193Y38=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=u3pXTVOyzAlsIaB9yXBTF5Wwff5giUMryJw/n1oCfeXg58oX507vzX6LTm5aXl7zACSd042ylpA0QKltIMRi3u8E2N9yTo+eZz9fwPxyRsNXKbqMk0oRzrpze+He6fhvmlhpzoQG2R411hbiE1G/nWo/BgStz6gXwKp80Idstqg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=MWqNoOT0; arc=pass smtp.client-ip=209.85.210.179
+	 To:Cc:Content-Type; b=RRzjTOdeAoq/bI8dMAPd2h87loso6zySO6eDvcarxH5yByHN5Ot0jUrCEzh7KA6RLO0lyjZyXWUnUvRViVt1XT9YQ28MPcdRhPWgSqhORvoqcwzEZ3jY2yabB9ZHWNgdpxLWOCt0LeeAxESI7+NWm5dNzdqGonuHYlHoIz7agLM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=zXlappCN; arc=pass smtp.client-ip=209.85.210.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-82318702afbso3991372b3a.1
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 05:38:46 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771853926; cv=none;
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-8249cb73792so3823675b3a.3
+        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 05:41:03 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771854063; cv=none;
         d=google.com; s=arc-20240605;
-        b=fye3OWDqQvGpo5aibBCx7ziifJw0r0CSwVTxpghSzKnOm60YTaTZWHcvYNZZm5G/ol
-         5Hq5ZUGMNp6bKEBSg1MlIeVTtjbeJqouE4MC4deAMrZJSgleyxR7cuKdFKCawuwvyHAk
-         fWS5vYYPLZwM+UiMpgKVz5zzsd9MUUKgqV7vQuvvxe9sJcPoeC4kO1pZYLtSfxoCEoRW
-         S79PuW6d4un1+5Usxhy7L2JEgnVHc7MMUFq/wy3XFK8tsLCaeqCPWGI+aNbYvvl+O0+W
-         pun/N6lCgYS7SkFnJvHI98VV+jI9LEhpFDXsSdoABedsAfoiHj3uP7J6YLdZM7iSU+2o
-         zGLQ==
+        b=fElRVdC4wIgCX2/g9TgrltgDgOtmCWvkzNPTheOwmxkAVRcBHELTfmcIWGGobMfISI
+         kGsCtxpK6D2IeJp6B5S+W17b9FDEuiMM8Ln9lo4pWDaDTaXS/jUbeEN8B/6nJ7NB3WeN
+         BDCO1vjF1lzVluwt4rRDEksI28+yiODZZxZE49XMHui0Zer2VT6DAcP0h8I2YL4qowH+
+         O1o65T8TV6uBAn/j4gYGc5jHAWelrcTP8JwlciF5kTQc1QtDy03oQa+KuGNcz8QsQXA7
+         8RRNU9gWEUjat/4gKSuw+6OKw76ZXF+F85FXFgcLTHXpF2UgYzbTM9Oi5Xs74bPdUJgA
+         otZg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=XKOZN3uWc3BNbuYEOvKeegPOFJeQZgqrunx5GZ7JRc4=;
-        fh=WboAxardEv8hjAjkt4R1zZ8nCz1odhj71MoMPXjtR8k=;
-        b=lP3gfo33OFqSGc8VpstGXbbHPs6e7aXa9ttJdW4N9nbfFqktDac/bg0SeUh2bBYXxx
-         l9kj7I6EWHB6KgpVqkgtZuiA88/PQg0yFfMveP0lcoHcutB/zFCafJbjU4NupKhlw1hM
-         1lK1rQjyAZe4gRCFaoUvJBD6LPRuchnPX7OF/eZu4s64u+tS7FEAyGaN7FYxvzoAJOWG
-         8XxQK5ITd+KsFaIw2I9OmwzvFea/DVc4vIfPZV5o+ojMY66vu4C5BOGJHblI5StKIw83
-         OFR9OBA3itk5Qthp8qHreGyVlv4j3BDwV1cScn474Wp7/kWdNiBvuATEdj0DAOvTatUk
-         /fEQ==;
+        bh=MMsH9QLvKj5vXxSOfwujFHVAamnbIlrD7SVHZSgn1eY=;
+        fh=tvqvJkdnUQVi9NGN6B1VadfIZaGGJMi9h7m+wE3SvCs=;
+        b=eiFfLcmlA64ZEoTo5AQRNx1cPqL4OaCT01D7vEmXOiVrfwUKLoRjqglV2dWKIogSvx
+         E0nmwmfmhbgz7eK6tjiEVx0n1RfVZIuiJIU6gHnFP1iupdc2qS7BPKyFaJRvN3nj8G+z
+         YCPcxDUSHfzvxSSOm3mAzSjdiXGYBicqAV0cqSRe6Wpz9Gr7+OwsCZDwky0zGXgTjjI0
+         JAoSg/ewimL5/I5TzPKrq71rqG6LgNtNQgOjQIjDQEwuFSy2cw6hMGIWcHsvUPKQe+6e
+         BT9qcbAj0peFOwQM3wDdZyqlHUl8O0yqe8Gn7ikjAPxkAWGc33mc47pcdbpdQPdVypfA
+         iYZw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1771853926; x=1772458726; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1771854063; x=1772458863; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XKOZN3uWc3BNbuYEOvKeegPOFJeQZgqrunx5GZ7JRc4=;
-        b=MWqNoOT0WHFFz+w6ejkQ6DU8px4GKJo50274CHkYHj1fnjdVmyCR/QwXekCykLW+38
-         E77aS4uwJhzPgELrNbvt5e2pgio3Z3YWaE3ebTnHwf7PdydwedgD+nV4dRWo6esCsDxP
-         FQfOgv0arxwJSY/dcb1S8/o9kQy9ojyemHgTlUqcpIA+dSBhymARs6xpy4r2MDOehKHC
-         vigT+5KFjbEg5s1kjMpk1Q6OkMMF6RRJQ4TjzS4xxYQA2nYsgFDndJP3PQeh2zQrz7e3
-         FKjg9S7VmJ8vNjpxVn+AxQ7V6Z5uwxK9GVWHestAaPvQTKf/W+3+T+BTI2PmF2N2IbUl
-         MYYA==
+        bh=MMsH9QLvKj5vXxSOfwujFHVAamnbIlrD7SVHZSgn1eY=;
+        b=zXlappCNL0nR6JvJgc0Fj2qU/4lPPhn9GUw3StYe1Q47qX2WMR+u1lZHpdCLf5tWTJ
+         VKT0VJ2XXdW6r+H1cJVSpkvKmXt2IW4dJFUAxGH/nTLA5NyJSmNTOl5xmj1RgN0DCdfx
+         KyU+tonYNY3hB5B2IJjdsNHEWDYIEN7+Wb8ghKfFkUmtOsyLrIblDtDitu5EcBtSv4I0
+         ox4kvMpKaDz9h+6mztclCmS2pQIhVk5PREOfxdFThF9VQBC3rGlW1fop+F0BVzCHgj+X
+         kA8Sju4bzYk62jGw+JBA4LPSM/CXavy/KUxGKxb8HoexovSt7VKjqJSTGPOqyl5CW/jT
+         mhAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771853926; x=1772458726;
+        d=1e100.net; s=20230601; t=1771854063; x=1772458863;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=XKOZN3uWc3BNbuYEOvKeegPOFJeQZgqrunx5GZ7JRc4=;
-        b=SVg8YC+gmpvfP9K1vMFQ1dP4+lBfCE9lk/uikUccTFkgB+jXHyeTrOqbjAfAzeLlXu
-         b53QMKaNMGxED8CIck+fA2KCNfeBDoxibm6OsZ5DxjeRfypbRbdWzApDX1r4uEqzREzE
-         0nQ7wgZKw6fucqxnewL57o4rlU11KRRFJx2/7owomEEL1b27l3YCbHOT8S3cxlFAl6Oj
-         VJCVa7IlNaDBshlAJKtAbpJX61C+rTNjTNAscrRz4ogX51GwShEvVcAhQJgvibjrPwTk
-         v4j86PPFefsOPiv8KVAxhuceGiZRFv0qzlhWQi4io6p4/g2vbzPiC2oJdTXgU8U5fOjC
-         D6Vw==
-X-Forwarded-Encrypted: i=1; AJvYcCVaijVCCVsjMgFTvwjvyL79g08EGUrkaXeECwhlxY3YKCfEPxZ3X9Yme9BkvkW0AJzn7W6I0hU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYOdAKwIHX3pirWP9A420n9dTf92t91egzlpCHLV9YacyyUB5g
-	rQSbdaDyHvb6EDYqsxr8MVXLfx9sNmxlRKXUwqPqyCIvWBntQ5A2lLowjhZQYJYK+ROE7mYV1je
-	+FaETBlCCjqs9vG3naKWRMXSw6e1hiWuT8KdYYV+G
-X-Gm-Gg: AZuq6aJHDwYjCi6STrEHKjlhPt7RbiZXv83ZDQcGSHn3j2NOMWjByq8X4xSxuLn09Jl
-	KXE3h8sK/svCiGe97ac3AC9qdcEh4+NlxIUsLR4Mtb3YXtoLYwK/PYtGoOxilHndrMyda/0LXVo
-	zOrY2JpSXrLsXg7gHMAtD1wEu93dUXwg2kJbKrV5vfxm48c5nOBDljcyTILle94rz2prPxF+R5N
-	kFnKEE2FP9B6EM8DqoDROLZvhNzXHhwVNgn2b291YzrXKyMuIG+HaYiMUThd9Ri+wmVpeK7lSs+
-	xeeB4ZeUTTGD48j04MMLk0sisQ==
-X-Received: by 2002:a05:6a00:1583:b0:824:4a22:ec16 with SMTP id
- d2e1a72fcca58-826daa042eamr6893598b3a.34.1771853925606; Mon, 23 Feb 2026
- 05:38:45 -0800 (PST)
+        bh=MMsH9QLvKj5vXxSOfwujFHVAamnbIlrD7SVHZSgn1eY=;
+        b=QP4LiMZaGTBOrSPokpA2Tvv4uAw+KN+gbsVH5R58rJj/Pi+QR6jgtsmEKALzaJJcoN
+         hePkd9sC3Dae5nWhLAktjTEIRzMnlJbHiiG5Wuhgt4JDD5wUXpsIf18QNetu4ek549U2
+         jRnK3pDfiha/Qvy0MnO9M8Jqq7LZTBYuM8IEwKbcIwcJ0GNfs35l9dWMcY9Tb1DjmmvY
+         UezbSpAFtFv2m0p2rAxAYvtkhXSxnLlNRonofq6js1Kx8tCb3z5Y+xczpBUHmhnkyj8g
+         euVE/mFibJFYoxDpJ42WMObpfHM7ypjWNiAnWWNft7TL/aEtUGr5xnvDEAHpEZh4mYUN
+         ZVKg==
+X-Forwarded-Encrypted: i=1; AJvYcCWKK/2shOh6g7NCPUcR434OB1Vi9/ZW8xGxHqi4fZmPnTzK1ehx6sgxkOyCdvygXTxpxSYQYzA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6PlZIwZCr1Vh7blpEJG1/303/UMHdE4rVZniHVsTO4MNrNIqM
+	EMXmCFuk8z/QtIB5wRn4nbUoORSImiMBVD2IFnY/Doh23K8S/9z+PYc2ZZFWHws/rMVi7LZdsGD
+	Oib6sIMTv7oDkez2WbBL4WeCW3pfHanObNv0mSDNW
+X-Gm-Gg: ATEYQzzTLAN8IJ28yDs0n8DPJxuZ30IpDUwLAPSC7qB1Y+g/JxJcWnIMCFoo76x4MUR
+	lnBeLR2E0hUnF0F5UqS9CDEuQ69m4/oEBK8vzgCW6BQz8Opo5dKZZhLdhj3NmHnsBGodmjZuIyb
+	HiGPUsPDBBr84i4rWI0nCFin6UlN9xJ0V9BTNQ66BpaQy2lMm3gAMa787l5G9s9sTx5hx4olafc
+	XzkP5dvYUSyZKBenAg93cuDfehbqNZALV1rv9cqBDY68DCGfDFdqvko1rBr582Cc/ZaIq0DESV8
+	wSQc1hP7srCJhm5UYetiE9u4cg==
+X-Received: by 2002:a05:6a00:928a:b0:81e:d7c3:2f3a with SMTP id
+ d2e1a72fcca58-826daa64655mr8520754b3a.46.1771854063410; Mon, 23 Feb 2026
+ 05:41:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAGfirffHzSjmjNGx1ZU+JNLmrUYWEukrPAP5nTbJdemn6MZGyQ@mail.gmail.com>
-In-Reply-To: <CAGfirffHzSjmjNGx1ZU+JNLmrUYWEukrPAP5nTbJdemn6MZGyQ@mail.gmail.com>
+References: <CAGfirfcsAFODycGarmqY8v6HSiHVaBgyKSUucV0DvPDjVX0U8Q@mail.gmail.com>
+In-Reply-To: <CAGfirfcsAFODycGarmqY8v6HSiHVaBgyKSUucV0DvPDjVX0U8Q@mail.gmail.com>
 From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 23 Feb 2026 08:38:34 -0500
-X-Gm-Features: AaiRm53gQfQHUt4ZsvXGs_tUP6nz0iJ1CDQfGs3HmbGVgylsl2sA2-uxujKXoFw
-Message-ID: <CAM0EoMkpOd0ZJwsSUa-diuMtDOoOuGcNDyYtdhmjYcCe+jw9Qw@mail.gmail.com>
-Subject: Re: [BUG] general protection fault in qfq_qlen_notify
+Date: Mon, 23 Feb 2026 08:40:51 -0500
+X-Gm-Features: AaiRm53u989LLHY4g2APNKOf2_8vz5njbIEGhG0KlJv4EeKJ8L0SktMlmBAn8Ys
+Message-ID: <CAM0EoMk-QngJqsk+ehp7eynqMhHwwjju80pgKvTfRVqYoN9x=A@mail.gmail.com>
+Subject: Re: [BUG] general protection fault in qdisc_tree_reduce_backlog
 To: GangMin Kim <km.kim1503@gmail.com>
 Cc: davem@davemloft.net, Eric Dumazet <edumazet@google.com>, Jiri Pirko <jiri@resnulli.us>, 
 	kuba@kernel.org, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
@@ -118,12 +118,12 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260036-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-260037-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	DMARC_NA(0.00)[mojatatu.com];
 	FREEMAIL_TO(0.00)[gmail.com];
@@ -138,16 +138,14 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mojatatu-com.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 829151770F3
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mojatatu-com.20230601.gappssmtp.com:dkim,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: EB199177323
 X-Rspamd-Action: no action
 
-Hi,
-
-On Sun, Feb 22, 2026 at 8:27=E2=80=AFPM GangMin Kim <km.kim1503@gmail.com> =
+On Sun, Feb 22, 2026 at 8:33=E2=80=AFPM GangMin Kim <km.kim1503@gmail.com> =
 wrote:
 >
 > Dear Linux kernel developers and maintainers,
@@ -157,18 +155,11 @@ wrote:
 >
 > Summary
 >
-> A NULL Pointer Dereference occurs because there is no proper check for
-> whether cl is NULL when a class is found via cops->find() and then
-> used in cops->qlen_notify().
-> This description provides an explanation and KASAN report for
-> qfq_qlen_notify, but the vulnerability can occur in various other
-> places such as drr_qlen_notify, hfsc_qlen_notify, htb_qlen_notify,
-> etc.
+> A missing NULL check for cl_ops during qdisc replacement causes a NULL
+> Pointer Dereference in qdisc_tree_reduce_backlog().
 >
 
-This is a duplicate of the issue reported by Manas Ghandat
-<ghandatmanas@gmail.com> on the 17th.
-We are still looking at best way to resolve this issue.
+This also seems to have the same root cause as your earlier email.
 
 cheers,
 jamal
@@ -183,6 +174,67 @@ jamal
 > - 6de23f81a5e08be8fbf5e8d7e9febc72a5b5f27f
 >
 > Description(Root Cause)
+>
+> Most qdiscs set .cl_ops in their struct Qdisc_ops.
+>
+> ```c
+> // net/sched/sch_tbf.c
+> static struct Qdisc_ops tbf_qdisc_ops __read_mostly =3D {
+>     .cl_ops     =3D &tbf_class_ops,
+>     .id         =3D "tbf",
+>     ...
+> };
+>
+> // net/sched/sch_qfq.c
+> static struct Qdisc_ops qfq_qdisc_ops __read_mostly =3D {
+>     .cl_ops     =3D &qfq_class_ops,
+>     .id         =3D "qfq",
+>     ...
+> };
+> ```
+>
+> However, teql is a classless qdisc and does not set cl_ops.
+>
+> ```c
+> static __init void teql_master_setup(struct net_device *dev)
+> {
+>     struct teql_master *master =3D netdev_priv(dev);
+>     struct Qdisc_ops *ops =3D &master->qops;
+>
+>     master->dev =3D dev;
+>     ops->priv_size  =3D sizeof(struct teql_sched_data);
+>
+>     ops->enqueue    =3D   teql_enqueue;
+>     ops->dequeue    =3D   teql_dequeue;
+>     ops->peek   =3D   teql_peek;
+>     ops->init   =3D   teql_qdisc_init;
+>     ops->reset  =3D   teql_reset;
+>     ops->destroy    =3D   teql_destroy;
+>     ops->owner  =3D   THIS_MODULE;
+>
+>     dev->netdev_ops =3D       &teql_netdev_ops;
+>     dev->type       =3D ARPHRD_VOID;
+>     dev->mtu        =3D 1500;
+>     dev->min_mtu        =3D 68;
+>     dev->max_mtu        =3D 65535;
+>     dev->tx_queue_len   =3D 100;
+>     dev->flags      =3D IFF_NOARP;
+>     dev->hard_header_len    =3D LL_MAX_HEADER;
+>     netif_keep_dst(dev);
+> }
+> ```
+>
+> When a qdisc is replaced, the existing qdisc tree is deleted, and
+> qdisc_tree_reduce_backlog() is called to update the backlog counters.
+>
+> ```c
+> tc_modify_qdisc
+>   __tc_modify_qdisc
+>     qdisc_graft
+>       qdisc_replace
+>         qdisc_purge_queue
+>           qdisc_tree_reduce_backlog
+> ```
 >
 > ```c
 > void qdisc_tree_reduce_backlog(struct Qdisc *sch, int n, int len)
@@ -209,14 +261,14 @@ jamal
 >             WARN_ON_ONCE(parentid !=3D TC_H_ROOT);
 >             break;
 >         }
->         cops =3D sch->ops->cl_ops;
->         if (notify && cops->qlen_notify) { // [1]
+>         cops =3D sch->ops->cl_ops; // [1]
+>         if (notify && cops->qlen_notify) { // [2]
 >             /* Note that qlen_notify must be idempotent as it may get cal=
 led
 >              * multiple times.
 >              */
->             cl =3D cops->find(sch, parentid); // [2]
->             cops->qlen_notify(sch, cl); // [3]
+>             cl =3D cops->find(sch, parentid);
+>             cops->qlen_notify(sch, cl);
 >         }
 >         sch->q.qlen -=3D n;
 >         sch->qstats.backlog -=3D len;
@@ -226,75 +278,38 @@ led
 > }
 > ```
 >
-> When condition [1] is satisfied, cl is retrieved at [2] and then
-> passed to [3]. Here, [2] can return NULL, and using this value at [3]
-> can cause a NULL Pointer Dereference.
->
-> ```c
-> static unsigned long qfq_search_class(struct Qdisc *sch, u32 classid)
-> {
->     return (unsigned long)qfq_find_class(sch, classid);
-> }
->
-> static struct qfq_class *qfq_find_class(struct Qdisc *sch, u32 classid)
-> {
->     struct qfq_sched *q =3D qdisc_priv(sch);
->     struct Qdisc_class_common *clc;
->
->     clc =3D qdisc_class_find(&q->clhash, classid);
->     if (clc =3D=3D NULL)
->         return NULL; // [4]
->     return container_of(clc, struct qfq_class, common);
-> }
-> ```
->
-> When QFQ is configured, the above function is executed at [2], and
-> NULL can be returned at [4].
->
-> ```c
-> static void qfq_qlen_notify(struct Qdisc *sch, unsigned long arg)
-> {
->     struct qfq_sched *q =3D qdisc_priv(sch);
->     struct qfq_class *cl =3D (struct qfq_class *)arg; // [5]
->
->     if (list_empty(&cl->alist)) // [6]
->         return;
->     qfq_deactivate_class(q, cl);
-> }
-> ```
->
-> If NULL is returned at [2], that value is passed directly to [3],
-> which becomes cl through [5]. Subsequently, a NULL Pointer Dereference
-> occurs at [6].
+> If the parent qdisc is replaced with teql, sch becomes teql0, and
+> since teql is a classless qdisc, cl_ops is NULL. At [1], cops is
+> assigned NULL, and at [2], accessing qlen_notify through the NULL
+> pointer causes a NULL Pointer Dereference.
 >
 > Kasan Report
 > Oops: general protection fault, probably for non-canonical address
-> 0xdffffc000000000b: 0000 [#1] SMP KASAN NOPTI
-> KASAN: null-ptr-deref in range [0x0000000000000058-0x000000000000005f]
-> CPU: 0 UID: 0 PID: 377 Comm: test Not tainted 7.0.0-rc1 #54 PREEMPT(full)
+> 0xdffffc0000000004: 0000 [#1] SMP KASAN NOPTI
+> KASAN: null-ptr-deref in range [0x0000000000000020-0x0000000000000027]
+> CPU: 0 UID: 0 PID: 2275 Comm: test Tainted: G        W
+> 7.0.0-rc1 #54 PREEMPT(full)
+> Tainted: [W]=3DWARN
 > Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_caps fix,
 > 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-> RIP: 0010:qfq_qlen_notify+0x2e/0x180 net/sched/sch_qfq.c:1434
-> Code: 41 57 41 56 41 55 41 54 55 48 89 fd 53 48 89 f3 4c 8d 7b 58 e8
-> e3 b3 8a fd 4c 89 fa 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <80> 3c
-> 02 00 0f 85 f8 00 00 00 48 8b 43 58 49 39 c7 0f 84 b9 00 00
-> RSP: 0018:ffff88811a447258 EFLAGS: 00010212
-> RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff83e2af6d
-> RDX: 000000000000000b RSI: 0000000000000000 RDI: ffff88811b524000
-> RBP: ffff88811b524000 R08: 0000000000000000 R09: fffffbfff0d3595c
-> R10: ffffffff869acae7 R11: 00000000ac3123a9 R12: ffffffff859b0b60
-> R13: ffffffff859b0b40 R14: 0000000000000000 R15: 0000000000000058
-> FS:  00007ff24e5da700(0000) GS:ffff88834ad0d000(0000) knlGS:0000000000000=
+> RIP: 0010:qdisc_tree_reduce_backlog+0xcf/0x400 net/sched/sch_api.c:810
+> Code: 4d 8b 67 18 49 8d 7c 24 08 48 89 f8 48 c1 e8 03 80 3c 18 00 0f
+> 85 fb 02 00 00 4d 8b 6c 24 08 4d 8d 65 20 4c 89 e0 48 c1 e8 03 <80> 3c
+> 18 00 0f 85 d4 02 00 00 49 83 7d 20 00 74 48 e8 7b ac 98 fd
+> RSP: 0018:ffff8881213ef2d8 EFLAGS: 00010212
+> RAX: 0000000000000004 RBX: dffffc0000000000 RCX: ffffffff83d4b680
+> RDX: ffff8881213e4680 RSI: 0000000000010000 RDI: ffff888103812a08
+> RBP: 0000000000010001 R08: 0000000000000000 R09: fffffbfff0d3595c
+> R10: ffffffff869acae7 R11: 00000000ac3123a9 R12: 0000000000000020
+> R13: 0000000000000000 R14: 0000000000000000 R15: ffff888121071c00
+> FS:  00007f10c4c3f700(0000) GS:ffff88834ad0d000(0000) knlGS:0000000000000=
 000
 > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007ff24e6e95f0 CR3: 000000011a5ff000 CR4: 0000000000750ef0
+> CR2: 00007f10c4bfcfb8 CR3: 0000000121398000 CR4: 0000000000750ef0
 > PKRU: 55555554
 > Call Trace:
 >  <TASK>
->  __qdisc_qstats_drop include/net/sch_generic.h:958 [inline]
->  qdisc_tree_reduce_backlog+0x128/0x400 net/sched/sch_api.c:812
->  tbf_offload_graft net/sched/sch_tbf.c:191 [inline]
->  tbf_graft+0x1cc/0x590 net/sched/sch_tbf.c:573
+>  htb_graft+0x257/0x810 net/sched/sch_htb.c:1468
 >  qdisc_refcount_dec_if_one include/net/sch_generic.h:152 [inline]
 >  qdisc_graft+0x2ef/0x1460 net/sched/sch_api.c:1117
 >  __tc_modify_qdisc net/sched/sch_api.c:1631 [inline]
@@ -323,63 +338,57 @@ ne]
 >  syscall_exit_to_user_mode include/linux/entry-common.h:327 [inline]
 >  do_syscall_64+0xf1/0x530 arch/x86/entry/syscall_64.c:100
 >  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7ff24e7c4e4d
+> RIP: 0033:0x7f10c4e29e4d
 > Code: 28 89 54 24 1c 48 89 74 24 10 89 7c 24 08 e8 ca ee ff ff 8b 54
 > 24 1c 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 2e 00 00 00 0f 05 <48> 3d
 > 00 f0 ff ff 77 33 44 89 c7 48 89 44 24 08 e8 fe ee ff ff 48
-> RSP: 002b:00007ff24e5d9d90 EFLAGS: 00000293 ORIG_RAX: 000000000000002e
-> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007ff24e7c4e4d
-> RDX: 0000000000000000 RSI: 00007ff24e5d9dd0 RDI: 0000000000000003
-> RBP: 00007ff24e5d9e30 R08: 0000000000000000 R09: 0000000000050000
-> R10: 0000000000000000 R11: 0000000000000293 R12: 00007ffcdc50ddde
-> R13: 00007ffcdc50dddf R14: 00007ff24e5d9fc0 R15: 0000000000022000
+> RSP: 002b:00007f10c4c3ed90 EFLAGS: 00000293 ORIG_RAX: 000000000000002e
+> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f10c4e29e4d
+> RDX: 0000000000000000 RSI: 00007f10c4c3edd0 RDI: 0000000000000003
+> RBP: 00007f10c4c3ee30 R08: 0000000000000000 R09: 0000000000050000
+> R10: 0000000000000000 R11: 0000000000000293 R12: 00007fff03a356fe
+> R13: 00007fff03a356ff R14: 00007f10c4c3efc0 R15: 0000000000022000
 >  </TASK>
 > Modules linked in:
 > ---[ end trace 0000000000000000 ]---
-> RIP: 0010:qfq_qlen_notify+0x2e/0x180 net/sched/sch_qfq.c:1434
-> Code: 41 57 41 56 41 55 41 54 55 48 89 fd 53 48 89 f3 4c 8d 7b 58 e8
-> e3 b3 8a fd 4c 89 fa 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <80> 3c
-> 02 00 0f 85 f8 00 00 00 48 8b 43 58 49 39 c7 0f 84 b9 00 00
-> RSP: 0018:ffff88811a447258 EFLAGS: 00010212
-> RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff83e2af6d
-> RDX: 000000000000000b RSI: 0000000000000000 RDI: ffff88811b524000
-> RBP: ffff88811b524000 R08: 0000000000000000 R09: fffffbfff0d3595c
-> R10: ffffffff869acae7 R11: 00000000ac3123a9 R12: ffffffff859b0b60
-> R13: ffffffff859b0b40 R14: 0000000000000000 R15: 0000000000000058
-> FS:  00007ff24e5da700(0000) GS:ffff88834ad0d000(0000) knlGS:0000000000000=
+> RIP: 0010:qdisc_tree_reduce_backlog+0xcf/0x400 net/sched/sch_api.c:810
+> Code: 4d 8b 67 18 49 8d 7c 24 08 48 89 f8 48 c1 e8 03 80 3c 18 00 0f
+> 85 fb 02 00 00 4d 8b 6c 24 08 4d 8d 65 20 4c 89 e0 48 c1 e8 03 <80> 3c
+> 18 00 0f 85 d4 02 00 00 49 83 7d 20 00 74 48 e8 7b ac 98 fd
+> RSP: 0018:ffff8881213ef2d8 EFLAGS: 00010212
+> RAX: 0000000000000004 RBX: dffffc0000000000 RCX: ffffffff83d4b680
+> RDX: ffff8881213e4680 RSI: 0000000000010000 RDI: ffff888103812a08
+> RBP: 0000000000010001 R08: 0000000000000000 R09: fffffbfff0d3595c
+> R10: ffffffff869acae7 R11: 00000000ac3123a9 R12: 0000000000000020
+> R13: 0000000000000000 R14: 0000000000000000 R15: ffff888121071c00
+> FS:  00007f10c4c3f700(0000) GS:ffff88834ad0d000(0000) knlGS:0000000000000=
 000
 > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007ff24e6e95f0 CR3: 000000011a5ff000 CR4: 0000000000750ef0
+> CR2: 00007f10c4bfcfb8 CR3: 0000000121398000 CR4: 0000000000750ef0
 > PKRU: 55555554
 > ----------------
 > Code disassembly (best guess):
->    0:   41 57                   push   %r15
->    2:   41 56                   push   %r14
->    4:   41 55                   push   %r13
->    6:   41 54                   push   %r12
->    8:   55                      push   %rbp
->    9:   48 89 fd                mov    %rdi,%rbp
->    c:   53                      push   %rbx
->    d:   48 89 f3                mov    %rsi,%rbx
->   10:   4c 8d 7b 58             lea    0x58(%rbx),%r15
->   14:   e8 e3 b3 8a fd          call   0xfd8ab3fc
->   19:   4c 89 fa                mov    %r15,%rdx
->   1c:   48 b8 00 00 00 00 00    movabs $0xdffffc0000000000,%rax
->   23:   fc ff df
->   26:   48 c1 ea 03             shr    $0x3,%rdx
-> * 2a:   80 3c 02 00             cmpb   $0x0,(%rdx,%rax,1) <-- trapping
-> instruction
->   2e:   0f 85 f8 00 00 00       jne    0x12c
->   34:   48 8b 43 58             mov    0x58(%rbx),%rax
->   38:   49 39 c7                cmp    %rax,%r15
->   3b:   0f                      .byte 0xf
->   3c:   84                      .byte 0x84
->   3d:   b9                      .byte 0xb9
-> R13: ffffffff859b0b40 R14: 0000000000000000 R15: 0000000000000058
-> FS:  00007ff24e5da700(0000) GS:ffff88834ad0d000(0000) knlGS:0000000000000=
+>    0: 4d 8b 67 18           mov    0x18(%r15),%r12
+>    4: 49 8d 7c 24 08        lea    0x8(%r12),%rdi
+>    9: 48 89 f8              mov    %rdi,%rax
+>    c: 48 c1 e8 03           shr    $0x3,%rax
+>   10: 80 3c 18 00           cmpb   $0x0,(%rax,%rbx,1)
+>   14: 0f 85 fb 02 00 00     jne    0x315
+>   1a: 4d 8b 6c 24 08        mov    0x8(%r12),%r13
+>   1f: 4d 8d 65 20           lea    0x20(%r13),%r12
+>   23: 4c 89 e0              mov    %r12,%rax
+>   26: 48 c1 e8 03           shr    $0x3,%rax
+> * 2a: 80 3c 18 00           cmpb   $0x0,(%rax,%rbx,1) <-- trapping instru=
+ction
+>   2e: 0f 85 d4 02 00 00     jne    0x308
+>   34: 49 83 7d 20 00        cmpq   $0x0,0x20(%r13)
+>   39: 74 48                 je     0x83
+>   3b: e8 7b ac 98 fd        call   0xfd98acbb
+> R13: 0000000000000000 R14: 0000000000000000 R15: ffff888121071c00
+> FS:  00007f10c4c3f700(0000) GS:ffff88834ad0d000(0000) knlGS:0000000000000=
 000
 > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007ff24e6e95f0 CR3: 000000011a5ff000 CR4: 0000000000750ef0
+> CR2: 00007f10c4bfcfb8 CR3: 0000000121398000 CR4: 0000000000750ef0
 > PKRU: 55555554
 > Kernel panic - not syncing: Fatal exception in interrupt
 > Kernel Offset: disabled
