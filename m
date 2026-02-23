@@ -1,169 +1,162 @@
-Return-Path: <netdev+bounces-259999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259998-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OGNXF44wnGkKAgQAu9opvQ
-	(envelope-from <netdev+bounces-259999-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 11:48:46 +0100
+	id ODivDWownGkKAgQAu9opvQ
+	(envelope-from <netdev+bounces-259998-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 11:48:10 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F5C91751DD
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 11:48:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C314B1751B0
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 11:48:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 866AA30266DF
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 10:48:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D2A6B3016EE0
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 10:48:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5D4E3612E2;
-	Mon, 23 Feb 2026 10:48:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72A6C35C1AC;
+	Mon, 23 Feb 2026 10:48:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b="r7i4Wj3i"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="uEYmNzuJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00206402.pphosted.com (mx0a-00206402.pphosted.com [148.163.148.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8444A35CB60;
-	Mon, 23 Feb 2026 10:48:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.148.77
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771843711; cv=none; b=YQGZPuum7Dfvr2KxmPHFqCIdkPgTuzBNIwA5UZJP3PuAFGEYPlqrL3EqF4Tmlktl1ywezwQoxpW47OfzJNiHiVE3n3qHYP6hxhw8hqbhuRvglJN1dsytSMPhC9Mlxl885clad0HoH9+sczGZRQoUGzg68mf9/7ksc4fgMTqRBDU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771843711; c=relaxed/simple;
-	bh=B4k9gRkg71PnsXufZ2xYa5mMfTFkRd2QdwpI5OBgPQk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rpD7bPA3C8ednsvs2GvG9PmuUDc9IFH93wwHKh77qXyhK5TtkKBTMKYWhRjtFPeNFwIJtRjaYMpWe/r2zg1Hwl++2JEIhaJQ5ky+Kxf4Tm+O47QEyQFSJ86FZ3ngVepNZgCUoYISAsPx1qRbFZbnVcK1hRFFOIJNpmXumkJK3EI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com; spf=pass smtp.mailfrom=crowdstrike.com; dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b=r7i4Wj3i; arc=none smtp.client-ip=148.163.148.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=crowdstrike.com
-Received: from pps.filterd (m0354651.ppops.net [127.0.0.1])
-	by mx0a-00206402.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61N9Ogk0853227;
-	Mon, 23 Feb 2026 10:47:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=crowdstrike.com;
-	 h=cc:content-transfer-encoding:content-type:date:from
-	:in-reply-to:message-id:mime-version:references:subject:to; s=
-	default; bh=UVyLOI3z8vWqmLKu0cEzyVJ9p5zsfe+0kMQ3yPY7dlo=; b=r7i4
-	Wj3iJztaMll+kb1E3oDWnRm6MlurDnIZeuQ9qX84fMc598gS6ZEU1w7dMGZoZqVJ
-	sOsG3kNY4m2O6Lh5n88gURdRUr3qiEV5wnTZuDU/JQVln8DpB1IXRRoYlrdjTwQC
-	FCnkV4XNtzA/KBdx4C6IRhLKA9eoKC+aNc0yT5dUDOcaBrEEFK150AgfTjARttgk
-	GiLRWH0lbZQ/4ceeS5EoXp3FmPfLIA/bOowbxevpRI8/RK2Sxd4S5xMzr/0RIo/I
-	DvaSxCmKv4YL+PdN8uI2awQDpROYhWnYpiPJ3fG/tip/6bFoXvxFQSEp+GVbvssL
-	kV2AvfBM9LD1bTVayg==
-Received: from mail.crowdstrike.com (dragosx.crowdstrike.com [208.42.231.60] (may be forged))
-	by mx0a-00206402.pphosted.com (PPS) with ESMTPS id 4cfqxwcake-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 23 Feb 2026 10:47:52 +0000 (GMT)
-Received: from ML-CTVHTF21DX.crowdstrike.sys (10.100.11.122) by
- 04WPEXCH006.crowdstrike.sys (10.100.11.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35; Mon, 23 Feb 2026 10:47:45 +0000
-From: Slava Imameev <slava.imameev@crowdstrike.com>
-To: <bot+bpf-ci@kernel.org>
-CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
-        <clm@meta.com>, <daniel@iogearbox.net>, <davem@davemloft.net>,
-        <eddyz87@gmail.com>, <edumazet@google.com>, <haoluo@google.com>,
-        <horms@kernel.org>, <ihor.solodrai@linux.dev>,
-        <john.fastabend@gmail.com>, <jolsa@kernel.org>, <kpsingh@kernel.org>,
-        <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <linux-open-source@crowdstrike.com>,
-        <martin.lau@kernel.org>, <martin.lau@linux.dev>,
-        <netdev@vger.kernel.org>, <pabeni@redhat.com>, <sdf@fomichev.me>,
-        <shuah@kernel.org>, <slava.imameev@crowdstrike.com>, <song@kernel.org>,
-        <yonghong.song@linux.dev>
-Subject: Re: Re: [PATCH bpf-next v3 1/2] bpf: Support multi-level pointer params via SCALAR_VALUE for trampolines
-Date: Mon, 23 Feb 2026 21:47:43 +1100
-Message-ID: <20260223104743.37713-1-slava.imameev@crowdstrike.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <692c1f3c4b95e9b8a2bbaf333f4618f1ca1c3cc36fc8b0246b094cd67ed62dbd@mail.kernel.org>
-References: <692c1f3c4b95e9b8a2bbaf333f4618f1ca1c3cc36fc8b0246b094cd67ed62dbd@mail.kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2553A2BEC43
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 10:48:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771843686; cv=pass; b=cFRWjaweETChmlb6QOIwF0WT7m9XPiK0gEns+jxMxdx/un2yiebCgqnIund8OOkYY+/CWeK4zc7WwmITe7POpYHlukfX/jdmfdbkhzdAAEklYoP3RBwimgRnT0NwrGbDog8vY2Yp2mtQUsey5h4ABCfOBqKJrWvqFPfa8InzmHk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771843686; c=relaxed/simple;
+	bh=QeOEsVeZ9klcyMYyvytk/qdh3OHqWAZ7aYcxi8/K3XE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bOCilfWLO6qKF05Z5WnvyoS3kaxhkKK5mWoenGNzhcgcTj/rBPPo2qf0hwjkgC+YwleXMUrMiderJbGZxC9xXP2auFEyjNhqZBwKulqyUvP0P3YRp1GxZ8FfC2Z26UElBuftVxIccXxwr7SbwAuC5nRgsT+OdPFSk8Xty7dbcIA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=uEYmNzuJ; arc=pass smtp.client-ip=74.125.224.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-649b1ca87ddso3589463d50.3
+        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 02:48:04 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771843684; cv=none;
+        d=google.com; s=arc-20240605;
+        b=N3OiPYY1nfDBnTzqJyqdw24fhLiLdaQM+NFXdFnjU7Ov1mGjR9bcigrwEUi7cuVqfM
+         E8G6ulh/IjDNVvN+UrvJSvdwwEM9oX3y/tPg2dIPE+vvxs6Swtb1iBYYCD959X+ysesY
+         7v7L14bkt6sOqnV+E04jgrXYCjd/c50cg7T6FfAWhpFGhn7LNaYWpXx8NSrEiJf0Q8v8
+         Rfw99fCOalkfWcIlEr4+2e/z4rKlI9HzMg19vAT0bfKXjjCGupRVDDe0VsCyTUnzG0gD
+         Z21de+K/n6DOgJTCdxOG6T9LLWRg9lIKautE9oLj4Zk5hYGjIB4FcjCxfHe7QSPQuPni
+         RhIg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=QeOEsVeZ9klcyMYyvytk/qdh3OHqWAZ7aYcxi8/K3XE=;
+        fh=CkhlC/wlTyrD0HT9xJALK+obuDNxJPpf1mC5ZudDDnE=;
+        b=CU//NiEoquzvCDZC/LBn+QnBVAIEJ0KJSZgy0MmQAiyqQPfb86whzl5iCfKpH9M8iE
+         QETicgxR7uYgT83hU/k2qCV5wLvFPI1+Henti7s8FM9PPsO8X+ysMjQIiXVjgJJU+9p1
+         jifNQ00dCrX4X2gwJPddsYKy0X2TfqurvRk8EqsUk1cjztui+LPI0I1j8MfEVIE+XfNF
+         hUjzXyEOv7S6ri0LmWWpFRIIG7mVOOcbgKroCFya0kVgk6diES3JlrHMzzX2cFdR3Rxt
+         2A/CjjRUkgxlsOJ40FPeWzcjJbDdRtBxDWnMcdKa2jBvyvCKqWzUhmXkMpoF76xU9R5l
+         JIpw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1771843684; x=1772448484; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QeOEsVeZ9klcyMYyvytk/qdh3OHqWAZ7aYcxi8/K3XE=;
+        b=uEYmNzuJY4E+XG0xNDwub7CZrdrz5mdQdGFj34mvZciM20yomwImwvSEvREaXl/dvF
+         MV539F98fR12mVfG9nAUq0i3SdziKJ3sXYX/pNCuXgruLrP7lDMInwpDcXSLtdb/KkNj
+         o1l90GPlEoc+ixPNF9BYHiR/ZvFCXqIVcG72MjAwqHLKPpHOAsl6Umsn1hlBMBwGp2PW
+         GcgkmS0DgycEUZARJ3WZCczfDvWNMcMIgL56Lkln5avhdmJ0ALJg6Xa5jcVOBPZ2X3tY
+         7sKFpJMc1XhOqn30q3mUE0YL3TAMzpw6aNmRWypNR1KXo7Ds4guYJJm98Ar/hmB5TmVx
+         57yQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771843684; x=1772448484;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=QeOEsVeZ9klcyMYyvytk/qdh3OHqWAZ7aYcxi8/K3XE=;
+        b=mxeddz3sDsBMPrl8lz9qgEMqG77bGFhZQ+v/rCOhtY0+oK6QJF1nF9+JRlUEN+c9i1
+         84U1wXKPVQ8/k2kSwClXlkNeTOaCPL+ddo2XZ4ZwN0YREcsWkt66m4ziSnqmbbzRhqqB
+         uBNPZmMcNnjWR05B9EXpvgt+38QdopnLqrFIG0yPahtM9hh6lC6lnvuAwWl5K/FRSPFP
+         pZUtji08NycnE80xsytK61eG1NtnzgBSHctVux9CniQYm4Yt9+sKHNICoIhFIP1HaW1f
+         QZ1j1Ic4c5tQ4usDejAILR6mwrp7fL1W2dHdhEhUppz7dTanGrDLedUOXdXXQf1AKFD4
+         00pg==
+X-Forwarded-Encrypted: i=1; AJvYcCXt/hNgLvivX5xB/rnjxUynxFmG3hp3F+3rjIC3vBrub8WBCR7dP0iViRb7Rrk1O+eBfVmTBKo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVq0tbzXOnBsTDdzxSSolufGyiuyxDfMKBYhv5GLn5F6scWk/4
+	bjP1wqQrVyY2c89wsnK4VLVdzTiEqkkALtzvckp0dC3jN3Gac6xCFSohWpqDsMztGxF5LlISOUg
+	NB7js7l0NtGvX439x5h4+2POYeWOqmr5e1uJg6pHN
+X-Gm-Gg: ATEYQzyOZTk5V0YEW/keKap/279DYSvu7gYHotpSWvDIW7xvkkenCP/Q7hs1NTRR36W
+	hIANRQfhIaQ4LQqFIQyXMXWzymXRfy+c4WFFaI1pTO7Ye1W7ES4qpLYl9xrXtAvnV4zrHTnhTE5
+	YLZJdkKaINcazCZfG9JmyzGNhMfTtk9hS80RwWzPyTWYMgKpqkmkDD92hWEpLMQHGCEbFvVfVw6
+	ffVW4O0+o83nVloLSyRv01+YHx/ubYYbY4QCHoKa1AMBrs9+aVqKMAd+fFeKi8lCsulCHffRj7s
+	Iu3ShQELdN3sodVJaIkh0Q==
+X-Received: by 2002:a05:690e:1384:b0:64a:e89b:d7de with SMTP id
+ 956f58d0204a3-64c78e58eaemr6997011d50.81.1771843684150; Mon, 23 Feb 2026
+ 02:48:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: 04WPEXCH008.crowdstrike.sys (10.100.11.75) To
- 04WPEXCH006.crowdstrike.sys (10.100.11.70)
-X-Disclaimer: USA
-X-Proofpoint-ORIG-GUID: u83RgyQRo6YQuztzaIMjK3jEhrRMTO4m
-X-Authority-Analysis: v=2.4 cv=TJhIilla c=1 sm=1 tr=0 ts=699c3058 cx=c_pps
- a=1d8vc5iZWYKGYgMGCdbIRA==:117 a=1d8vc5iZWYKGYgMGCdbIRA==:17
- a=EjBHVkixTFsA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=T2KQ53IYiC3MXPrxx8bB:22 a=b3B37AjAgz0HnGB3MuNd:22 a=6Gbh3OEyIFFArXis12EA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjIzMDA5MyBTYWx0ZWRfXwY+XXO95NKDb
- 5upXSOhNQb8bSY8jYzonOWR8axJ09OYOOGLPBYJJWbP4Wf9PdosW0k2nUnKi2sRY7ihnjVASwdI
- PgGjkbQ9yMXdfyZi8VXugsB3AfoMG4pgt015ly7ZTFF8ccmlSa4NJeu1PrU9qng03H6zNGlnyZm
- sTGVbTVig2NpzmDxH4DwSDit0Ty7Jk/whDFshWZIjpfR4U71if0C3i9mXZAlzF1UMRpGx1NJnyf
- 2PXzSR0CeYq3SVDKO7+K14boa5QLzAHvcRIYuAwvPZT+Uwvn9gg3eL3brHk1ZZI0MZGS1wfq/O+
- CRsnLVnSbCgBIbNe5YRQ0E87k2f2pqEaWKbiRfZpkkgVzDw5VSfUT3fwkNyKVU4y7s6QK97gU95
- UOl3FQZiQ6SuahY/shSOHoPFK/vvkeHM33Qxb5ArcsmhpYTfgpHCv8Zp+lfxyD8D/LB+LCGzSat
- GXMAuYCQzQ9OYvOIfhA==
-X-Proofpoint-GUID: u83RgyQRo6YQuztzaIMjK3jEhrRMTO4m
-X-Proofpoint-Virus-Version: vendor=nai engine=6800 definitions=11709
- signatures=596818
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 malwarescore=0 suspectscore=0 impostorscore=0 lowpriorityscore=0
- priorityscore=1501 spamscore=0 adultscore=0 clxscore=1011 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2602230093
+References: <20260219023151.171753-1-p@1g4.org> <20260219023151.171753-2-p@1g4.org>
+ <CA+NMeC-WmxL48X5dSqGx5+2T_dR8B_g5C2BL2Hre_HG1-UkXDg@mail.gmail.com> <TtHh0X2fAHdo4Gs6voxOjI5iFT3kt9qJkutxcHLc3nSpal0RiOTy6cXeZ4FSJMRcD2qVJy__ER-pvJhgBhbj9qucVu5yNecJfCeD44HmtBE=@1g4.org>
+In-Reply-To: <TtHh0X2fAHdo4Gs6voxOjI5iFT3kt9qJkutxcHLc3nSpal0RiOTy6cXeZ4FSJMRcD2qVJy__ER-pvJhgBhbj9qucVu5yNecJfCeD44HmtBE=@1g4.org>
+From: Victor Nogueira <victor@mojatatu.com>
+Date: Mon, 23 Feb 2026 07:47:53 -0300
+X-Gm-Features: AaiRm51lJFg7e79JKgjG7OsGqAzPtwaoRLqJDtGC59XuuJVeJI19kMnYrJ4iZt8
+Message-ID: <CA+NMeC9mYweb=uPTugHhmjK26zSgA8qmKM0OJ22jsJZHak8SwA@mail.gmail.com>
+Subject: Re: [PATCH net v7 1/1] net/sched: act_gate: snapshot parameters with
+ RCU on replace
+To: Paul Moses <p@1g4.org>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[crowdstrike.com,reject];
-	R_DKIM_ALLOW(-0.20)[crowdstrike.com:s=default];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-259999-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,meta.com,iogearbox.net,davemloft.net,gmail.com,google.com,linux.dev,crowdstrike.com,redhat.com,fomichev.me];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[crowdstrike.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[slava.imameev@crowdstrike.com,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[mojatatu.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259998-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,bpf-ci];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,crowdstrike.com:mid,crowdstrike.com:dkim]
-X-Rspamd-Queue-Id: 3F5C91751DD
+	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[mojatatu.com,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid,1g4.org:email,mojatatu-com.20230601.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: C314B1751B0
 X-Rspamd-Action: no action
 
-I think support for broader types can be provided in a compatible way
-with future annotated support, as I explained in my reply to the v2
-review:
+On Sun, Feb 22, 2026 at 11:13=E2=80=AFAM Paul Moses <p@1g4.org> wrote:
+>
+> Yes, I only see it as unreachable code cleanup.
+>
+> While looking at cycletime, should I move that block before
+> spin_lock_bh()?
 
-"
-  > so I suggest treating 'void **' as a scalar as Eduard suggested.
-  > This particular sb_eat_lsm_opts() hook
-  > doesn't have a useful type behind it anyway.
-  > I'm less certain about 'char **'. If we make it scalar too
-  > it will be harder to make it a pointer to nul terminated string later.
+I think it would be best to leave it as is and just do the
+unreachable code cleanup.
 
-  > So I would do 'void **' -> scalar for now only.
-
-  I changed to scalar in v3, keeping broader scope for pointer types.
-
-  We encountered double pointers of various types that required
-  workarounds, such as:
-
-  int __posix_acl_chmod(struct posix_acl **acl, gfp_t gfp, umode_t mode)
-
-  Adding support for void** alone doesn't address the broader issue
-  with other double pointer types.
-
-  When annotated array support (including char**) is added in the
-  future, it should remain compatible with the scalar approach for
-  legacy (unannotated) parameters. Unannotated parameters will
-  continue using scalar handling.
-"
+cheers,
+Victor
 
