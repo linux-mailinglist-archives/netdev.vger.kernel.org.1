@@ -1,322 +1,198 @@
-Return-Path: <netdev+bounces-260040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260042-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uG5KJR9bnGmzEgQAu9opvQ
-	(envelope-from <netdev+bounces-260040-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 14:50:23 +0100
+	id WF6wB55anGmzEgQAu9opvQ
+	(envelope-from <netdev+bounces-260042-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 14:48:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14E7C17751C
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 14:50:23 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FA421773D7
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 14:48:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 59BBD30EBB17
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 13:46:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 961A6304D159
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 13:47:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A266246781;
-	Mon, 23 Feb 2026 13:46:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D7B24E4AF;
+	Mon, 23 Feb 2026 13:47:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PhezQN2L"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="YKXr/1uL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com [209.85.221.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A73202C5C
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 13:46:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED646246BC0;
+	Mon, 23 Feb 2026 13:47:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771854378; cv=none; b=tjEJuI1FYlPx6J1Q0fAMPiSg1rdSnkF7UBaAvc2zsA+ATRu3TmzMdjEnrtASpRolmmg+D7rxStgqZ0Iynq4/thS/ysKLXu1MKDyzt8N2klIfJICzkxhwszf4NI4PtqxJQNmLcjdalwjOg0+fnSSvAPB4y2roZDGG9/gQHWeUCFE=
+	t=1771854441; cv=none; b=YU22D8zW1+jJN4UwPoDwMiluSdLv7lTh0Vv3wwoZZEFI68Pi6WUZ4lp0P+fgxFyo6nQrubHTDMPIN+aArHkc4dnSw418BLSrabXxPvjqynjZvFIMA94ycS+g7TgLV8zZ5qNunLodRGnqEtN97qVzi5u4L8ln90QvqyWiaNQRDrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771854378; c=relaxed/simple;
-	bh=moj3QcCqGLm4CLDFDzhqpwOR0+qc8ZVyonKyqdrXhMs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sDnyrxuVim9XmfioBK2+zCpe2C6c/1JyuWNPoeK/67/+KHu1OWFRZtwjJ0CU7P4S4aP7ZO2dBX4lawLp59j1Fw9IMHGGBfa/8al4Bnv32zpV0KAhcGoqJd8aJ8u6677vhz511/ur1oTdUsIw0UcrL6MY/XHqBRq4hD3G+BwoUXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PhezQN2L; arc=none smtp.client-ip=209.85.221.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f65.google.com with SMTP id ffacd0b85a97d-4362507f0bcso3086463f8f.0
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 05:46:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771854375; x=1772459175; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nQQ7lnppDq+V0zgDgWba+T0g0+pMzVEGyZ983+O+pHg=;
-        b=PhezQN2LypfTN99J0BsO/WMhkHLSXCBM9MIncUdh37qhlM1/hN7eLdd9/4BEevLliJ
-         f+k3NBQBxSYlIii0PxfJk6NTYXJNxGcs2aZMS5EGVuTeV2hef3LW84CioV2iYGxrOLlw
-         nLVHeM/dkzQdtqMMbgSz+TOHnJJidbgr/9UMRHS5lEMSCO2/12I9g+TYCZcKvRI6jSw1
-         Q0/zQUxjNjtP8MBl8UQigKuowZBibCxsGCPIfnXexTtCPlAtLet7yvhgH1NYwjusj1Bb
-         vOv1ln8UtEbK6w7EJp/Gq1TWGjSPvAqq+I4NF7Hpv7q9mS2BQPMxx39DxDLTUCXlVCKd
-         UE+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771854375; x=1772459175;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nQQ7lnppDq+V0zgDgWba+T0g0+pMzVEGyZ983+O+pHg=;
-        b=f/UcW7bCRLilIQdQHaXXgbrSUweQx2W6irya4PWZnxMU9i7sllWbuulJ0XoKoG/AkA
-         IAD3cKwAeceRrptZFY86j4bvZY3YjAkVjvaxKce+J2wodQCWNURu4/+UeKKoMaPbIItz
-         W64OXQyfqn4SwIH0IghWDrwK7NC6SuMoB8/RGDJpGUFAFghhJURJ3yu5W37+2o80LUyO
-         EiP1O2O9aD/l8jSsNDXFj7i8mJQvbTUI3425LfDNTrCeaDuXsNaS0GXrZx1DzedBzFoj
-         mfXugdhNpUWA2X894S/Co+FUSLk9ddRzs67HF2IK3DnxlK+5cVW1wLGfmTIKi3uPkyRN
-         0AyA==
-X-Forwarded-Encrypted: i=1; AJvYcCXsu6tOQ8mk+2cnuj9yMsaEsQm4mabZvydNcCXY/9L8pZxby6IgY1E5dVvIbE3ZTWO/GqzcTYQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyix5vfPbSWdpjmPD8vd1LSEvcXBs/JEpqEDzBfsrUWuf6iYqS3
-	hf0JTudz2sHqbSlhPkNM/oq5iiORSxp9LwFSmzXp0BobYevZv4IDs1NpjcWsYk7S
-X-Gm-Gg: ATEYQzx5U3vvHNkuRt4aynDJ5ZXX9LgAZvk5wGUQ/U32wu0SjPScHLyJFCPMS+3ryFC
-	MBXqxjssoKklagi1CuG7GIZgh63IShR3Q/U6mXAeLVs1WG5MyU4wQqgP1lCp+t8dr5mPmxrB+DU
-	C/IFgEbeRM12iWMqfgar5jtBr5LMtUlr5T8rIJqlz2SDjsgmz7SM+ibNigQ+pK0/JAeKpbwkeAn
-	r2FI7h+HIpgXrUa26I+OgWZCAticXSupYIybvrnxrO0KQ0XxvPLJLEL8MYpONrnDeZrSSoeyJLz
-	uew4vGyH2p0YAe9Mm2gZP8FcCQozJgiQP1q8VygmQ6YR5IjZqBq/Qp70YcqswwZPntpAr+Vq8NK
-	Y68RsS8BQ+93lfMzX9gSwx7zesIU13qddaCiASEimKsUvzYtWkcL67DmgdkbH1tPh/tLnbalcbt
-	rrfLhJH7GIWLhqBDxJ5ZRJvPpiJxtx9H2dh4PScFklmsw=
-X-Received: by 2002:a05:6000:2282:b0:435:932e:f924 with SMTP id ffacd0b85a97d-4396fd9b8f6mr15083047f8f.2.1771854374934;
-        Mon, 23 Feb 2026 05:46:14 -0800 (PST)
-Received: from [10.158.36.109] ([72.25.96.17])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43970d3fc12sm17069302f8f.24.2026.02.23.05.46.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Feb 2026 05:46:14 -0800 (PST)
-Message-ID: <e24b4a4f-b7e7-4e9e-ade0-cdda06f5765a@gmail.com>
-Date: Mon, 23 Feb 2026 15:46:14 +0200
+	s=arc-20240116; t=1771854441; c=relaxed/simple;
+	bh=7oBM+VgLvhixHqlmsvTeeBj2Zzny06GOUYBa8qLzvPg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dby0xX66mr1lMO623ZtUVcCG/k4juruw4ddsEZrRdM1uKQ1Maq8vH6IIiILnO91GT6QjPltuPOpF64XwZNgcALoBmuI8kP7ttKeCNBT1/0fzPuiswaMEetPIZ2+mgBj5qhvZyvU2OaL80uTSeSy1nmLXMmuuWf9aRSf6sIN2Gtk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=YKXr/1uL; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=tGF/G9VZgwv5uDw1cDEKac6MbcUJTCMmbChRNc3rhyU=; b=YKXr/1uLiFlLjtTWx/94BTDEY4
+	PWsXqFPZ7hzVbsvDV7OwZxL5gRAoeagWEG42AaxNXU+5yidUIQn9+u+/bgcF6yQq1kYNDR/Cx7Ak5
+	HYmm2mo41VFEAdLt4bROjOQiy5gBryfzrOjk4Zl37LTPBCIc1QdUq3GF5fdFCbFVFL49d/vDJ2D/4
+	Tfh+JXbDsNAEstdP2O1B1W6Q1Zxz8Mrevd3ESMmND+XeZbUD0ktAOSdGYpvZXiij7w+UzmxmtxlTS
+	Buk39hdi/nTKDPZiRXqlj279EVslGoFr2NqsJdatWYOe1FtjvB0Hl+FfT+uiRyYaDbML6lisqL/TR
+	vAvBIC4g==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50878)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vuWH2-0000000049Y-3Ilb;
+	Mon, 23 Feb 2026 13:46:56 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vuWGw-000000007QI-0wgd;
+	Mon, 23 Feb 2026 13:46:50 +0000
+Date: Mon, 23 Feb 2026 13:46:50 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com, maxime.chevallier@bootlin.com,
+	boon.khai.ng@altera.com, rohan.g.thomas@altera.com,
+	vladimir.oltean@nxp.com, hayashi.kunihiko@socionext.com,
+	matthew.gerlach@altera.com, vee.khee.wong@intel.com,
+	boon.leong.ong@intel.com, kim.tatt.chuah@intel.com,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 0/4] net: stmmac: Fix VLAN handling when
+ interface is down
+Message-ID: <aZxaSq1mrfInWClI@shell.armlinux.org.uk>
+References: <20260223124102.120432-1-ovidiu.panait.rb@renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/mlx5e: Precompute xdpsq assignments for
- mlx5e_xdp_xmit()
-To: Finn Dayton <Finnius.Dayton@spacex.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Cc: "Alexei Starovoitov ," <ast@kernel.org>,
- "Daniel Borkmann ," <daniel@iogearbox.net>,
- "David S. Miller ," <davem@davemloft.net>, "Jakub Kicinski ,"
- <kuba@kernel.org>, "Jesper Dangaard Brouer ," <hawk@kernel.org>,
- "John Fastabend ," <john.fastabend@gmail.com>,
- "Stanislav Fomichev ," <sdf@fomichev.me>,
- "Saeed Mahameed ," <saeedm@nvidia.com>, "Leon Romanovsky ,"
- <leon@kernel.org>, "Tariq Toukan ," <tariqt@nvidia.com>,
- "Mark Bloch ," <mbloch@nvidia.com>, "Andrew Lunn ," <andrew+netdev@lunn.ch>,
- "Eric Dumazet ," <edumazet@google.com>, "Paolo Abeni ," <pabeni@redhat.com>,
- "stable@vger.kernel.org" <stable@vger.kernel.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <610D8F9E-0038-46D9-AD8A-1D596236B1EF@spacex.com>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <610D8F9E-0038-46D9-AD8A-1D596236B1EF@spacex.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260223124102.120432-1-ovidiu.panait.rb@renesas.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,nvidia.com,lunn.ch,google.com,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-260040-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ttoukanlinux@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-260042-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,bootlin.com,altera.com,nxp.com,socionext.com,intel.com,vger.kernel.org,lists.infradead.org,st-md-mailman.stormreply.com];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.986];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,spacex.com:email]
-X-Rspamd-Queue-Id: 14E7C17751C
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,armlinux.org.uk:url,shell.armlinux.org.uk:mid]
+X-Rspamd-Queue-Id: 9FA421773D7
 X-Rspamd-Action: no action
 
-
-
-On 23/02/2026 2:05, Finn Dayton wrote:
-> mlx5e_xdp_xmit() selects an XDP SQ (Send Queue) using smp_processor_id()
-> (CPU ID). When doing XDP_REDIRECT from a CPU whose ID is
->> = priv->channels.num, mlx5e_xdp_xmit() returns -ENXIO and the
-> redirect fails.
+On Mon, Feb 23, 2026 at 12:40:58PM +0000, Ovidiu Panait wrote:
+> VLAN register accesses on the MAC side require the PHY RX clock to be
+> active. When the network interface is down, the PHY is suspended and
+> the RX clock is unavailable, causing VLAN operations to fail with
+> timeouts.
 > 
-> Previous discussion proposed using modulo in mlx5e_xdp_xmit() to map
-> CPU IDs into the channel range, but modulo/division is too costly in
-> the hot path.
+> The VLAN core automatically removes VID 0 after the interface goes down
+> and re-adds it when it comes back up, so these timeouts happen during
+> normal interface down/up:
 > 
-
-That discussion reached to an agreement of using a while loop with 
-subtraction. It's expected to be fast, and optimizes the common case.
-
-> Instead, this solution precomputes per-cpu priv->xdpsq assignments when
-> channels are (re)configured and does a single lookup in  mlx5e_xdp_xmit().
+>     # ip link set end1 down
+>     renesas-gbeth 15c40000.ethernet end1: Timeout accessing MAC_VLAN_Tag_Filter
+>     renesas-gbeth 15c40000.ethernet end1: failed to kill vid 0081/0
 > 
-> Because multiple CPUs map to the same xdpsq when CPU count exceeds
-> channel count, serialize xdp_xmit on the ring with xdp_tx_lock.
+> Adding VLANs while the interface is down also fails:
 > 
-
-What's the advantage of this solution over the one we already agreed to?
-
-> Fixes: 58b99ee3e3eb ("net/mlx5e: Add support for XDP_REDIRECT in device-out side")
-> Link: https://lore.kernel.org/netdev/20251031231038.1092673-1-zijianzhang@bytedance.com/
-> Link: https://lore.kernel.org/netdev/44f69955-b566-4fb1-904d-f551046ff2d4@gmail.com
-> Cc: stable@vger.kernel.org # 6.12+
-> Signed-off-by: Finn Dayton <finnius.dayton@spacex.com>
-> ---
-> Testing:
->   - XDP forwarding / XDP_REDIRECT verified with both low CPU ids and
->     CPU ids > than number of send queues.
->   - No -ENXIO observed, successful forwarding.
+>     # ip link add link end1 name end1.10 type vlan id 10
+>     renesas-gbeth 15c40000.ethernet end1: Timeout accessing MAC_VLAN_Tag_Filter
+>     RTNETLINK answers: Device or resource busy
 > 
->   drivers/net/ethernet/mellanox/mlx5/core/en.h  |  4 +++
->   .../net/ethernet/mellanox/mlx5/core/en/xdp.c  | 16 +++++++----
->   .../net/ethernet/mellanox/mlx5/core/en_main.c | 28 +++++++++++++++++++
->   3 files changed, 43 insertions(+), 5 deletions(-)
+> Patches 3-4 address this by deferring hardware writes when the
+> interface is down and reconfiguring the VLAN state on interface up.
 > 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-> index ea2cd1f5d1d0..387954201640 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-> @@ -519,6 +519,8 @@ struct mlx5e_xdpsq {
->   	/* control path */
->   	struct mlx5_wq_ctrl        wq_ctrl;
->   	struct mlx5e_channel      *channel;
-> +	/* serialize writes by multiple CPUs to this send queue */
-> +	spinlock_t xdp_tx_lock;
->   } ____cacheline_aligned_in_smp;
->   
->   struct mlx5e_xdp_buff {
-> @@ -909,6 +911,8 @@ struct mlx5e_priv {
->   	struct mlx5e_rq            drop_rq;
->   
->   	struct mlx5e_channels      channels;
-> +	/* selects the xdpsq during mlx5e_xdp_xmit() */
-> +	int __percpu              *send_queue_idx_ptr;
->   	struct mlx5e_rx_res       *rx_res;
->   	u32                       *tx_rates;
->   
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-> index 80f9fc10877a..2dd44ad873a1 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-> @@ -845,7 +845,7 @@ int mlx5e_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
->   	struct mlx5e_priv *priv = netdev_priv(dev);
->   	struct mlx5e_xdpsq *sq;
->   	int nxmit = 0;
-> -	int sq_num;
-> +	int send_queue_idx = 0;
->   	int i;
->   
->   	/* this flag is sufficient, no need to test internal sq state */
-> @@ -855,13 +855,19 @@ int mlx5e_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
->   	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
->   		return -EINVAL;
->   
-> -	sq_num = smp_processor_id();
->   
-> -	if (unlikely(sq_num >= priv->channels.num))
-> +	if (unlikely(!priv->send_queue_idx_ptr))
->   		return -ENXIO;
->   
-> -	sq = priv->channels.c[sq_num]->xdpsq;
-> +	send_queue_idx = *this_cpu_ptr(priv->send_queue_idx_ptr);
-> +	if (unlikely(send_queue_idx >= priv->channels.num || send_queue_idx < 0))
-> +		return -ENXIO;
->   
-> +	sq = priv->channels.c[send_queue_idx]->xdpsq;
-> +	/* The number of queues configured on a netdev may be smaller than the
-> +	 * CPU pool, so two CPUs might map to this queue. We must serialize writes.
-> +	 */
-> +	spin_lock(&sq->xdp_tx_lock);
->   	for (i = 0; i < n; i++) {
->   		struct mlx5e_xmit_data_frags xdptxdf = {};
->   		struct xdp_frame *xdpf = frames[i];
-> @@ -941,7 +947,7 @@ int mlx5e_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
->   
->   	if (flags & XDP_XMIT_FLUSH)
->   		mlx5e_xmit_xdp_doorbell(sq);
-> -
-> +	spin_unlock(&sq->xdp_tx_lock);
->   	return nxmit;
->   }
->   
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> index 7eb691c2a1bd..adef35d06b89 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> @@ -1492,6 +1492,7 @@ static int mlx5e_alloc_xdpsq(struct mlx5e_channel *c,
->   	sq->pdev      = c->pdev;
->   	sq->mkey_be   = c->mkey_be;
->   	sq->channel   = c;
-> +	spin_lock_init(&sq->xdp_tx_lock);
->   	sq->uar_map   = c->bfreg->map;
->   	sq->min_inline_mode = params->tx_min_inline_mode;
->   	sq->hw_mtu    = MLX5E_SW2HW_MTU(params, params->sw_mtu) - ETH_FCS_LEN;
-> @@ -3283,10 +3284,30 @@ static void mlx5e_build_txq_maps(struct mlx5e_priv *priv)
->   	smp_wmb();
->   }
->   
-> +static void build_priv_to_xdpsq_associations(struct mlx5e_priv *priv)
-> +{
-> +	/*
-> +	 * Build the mapping from CPU to XDP send queue index for priv.
-> +	 * This is used by mlx5e_xdp_xmit() to determine which xdpsq (send queue)
-> +	 * should handle the xdptx data, based on the CPU running mlx5e_xdp_xmit()
-> +	 * and the target priv (netdev).
-> +	 */
-> +	int send_queue_idx, cpu;
-> +
-> +	if (unlikely(priv->channels.num == 0))
-> +		return;
-> +
-> +	for_each_possible_cpu(cpu) {
-> +		send_queue_idx = cpu % priv->channels.num;
-> +		*per_cpu_ptr(priv->send_queue_idx_ptr, cpu) = send_queue_idx;
-> +	}
-> +}
-> +
->   void mlx5e_activate_priv_channels(struct mlx5e_priv *priv)
->   {
->   	mlx5e_build_txq_maps(priv);
->   	mlx5e_activate_channels(priv, &priv->channels);
-> +	build_priv_to_xdpsq_associations(priv);
->   	mlx5e_xdp_tx_enable(priv);
->   
->   	/* dev_watchdog() wants all TX queues to be started when the carrier is
-> @@ -6263,8 +6284,14 @@ int mlx5e_priv_init(struct mlx5e_priv *priv,
->   	if (!priv->fec_ranges)
->   		goto err_free_channel_stats;
->   
-> +	priv->send_queue_idx_ptr = alloc_percpu(int);
-> +	if (!priv->send_queue_idx_ptr)
-> +		goto err_free_fec_ranges;
-> +
->   	return 0;
->   
-> +err_free_fec_ranges:
-> +	kfree(priv->fec_ranges);
->   err_free_channel_stats:
->   	kfree(priv->channel_stats);
->   err_free_tx_rates:
-> @@ -6295,6 +6322,7 @@ void mlx5e_priv_cleanup(struct mlx5e_priv *priv)
->   	for (i = 0; i < priv->stats_nch; i++)
->   		kvfree(priv->channel_stats[i]);
->   	kfree(priv->channel_stats);
-> +	free_percpu(priv->send_queue_idx_ptr);
->   	kfree(priv->tx_rates);
->   	kfree(priv->txq2sq_stats);
->   	kfree(priv->txq2sq);
+> Patches 1-2 fix some issues in the existing VLAN implementation.
 
+First point to make is that when the netdev supports
+NETIF_F_VLAN_FEATURES, receive clock stop is disabled. In stmmac:
+
+        /* Disable EEE RX clock stop to ensure VLAN register access works
+         * correctly.
+         */
+        if (!(priv->plat->flags & STMMAC_FLAG_RX_CLK_RUNS_IN_LPI) &&
+            !(priv->dev->features & NETIF_F_VLAN_FEATURES))
+                config->eee_rx_clk_stop_enable = true;
+
+in phylink:
+
+        if (pl->mac_supports_eee_ops) {
+                /* Explicitly configure whether the PHY is allowed to stop it's
+                 * receive clock.
+                 */
+                ret = phy_eee_rx_clock_stop(phy,
+                                            pl->config->eee_rx_clk_stop_enable);
+
+and also in phylink's phylink_rx_clk_stop_block():
+
+        /* Disable PHY receive clock stop if this is the first time this
+         * function has been called and clock-stop was previously enabled.
+         */
+        if (pl->mac_rx_clk_stop_blocked++ == 0 &&
+            pl->mac_supports_eee_ops && pl->phydev &&
+            pl->config->eee_rx_clk_stop_enable)
+                phy_eee_rx_clock_stop(pl->phydev, false);
+
+So, given that when stmmac supports VLAN, eee_rx_clk_stop_enable will be
+false, so phylink_rx_clk_stop_block() does nothing useful and receive
+clock stop at the PHY will be disabled.
+
+
+So a few questions:
+
+1) when the network interface is opened or resumed, a DMA reset is
+performed which resets all hardware state, including VLAN state. On
+resume, we call stmmac_restore_hw_vlan_rx_fltr(), but to me it looks
+like that is incomplete, and bits of the VLAN configuration don't get
+restored on resume. Please can you look at this and confirm whether
+this is indeed the problem.
+
+2) If we can fully restore the VLAN configuration on resume, I suspect
+the driver will be doing the same work at resume as at open time, so
+this code should be shared.
+
+Please can you look at both of these points.
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
