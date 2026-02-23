@@ -1,265 +1,178 @@
-Return-Path: <netdev+bounces-260103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260104-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aAYtDwB9nGm6IQQAu9opvQ
-	(envelope-from <netdev+bounces-260103-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 17:14:56 +0100
+	id gDTzObt8nGm6IQQAu9opvQ
+	(envelope-from <netdev+bounces-260104-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 17:13:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC924179855
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 17:14:55 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74CC01797C0
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 17:13:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BBE3F3053BFC
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 16:07:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 144EB30D49C5
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 16:09:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 658E1308F0A;
-	Mon, 23 Feb 2026 16:07:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44D4F2F6565;
+	Mon, 23 Feb 2026 16:09:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="Pz9reodk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l9pVaPN/"
 X-Original-To: netdev@vger.kernel.org
-Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11021116.outbound.protection.outlook.com [52.101.62.116])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FF752EC09B;
-	Mon, 23 Feb 2026 16:07:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.116
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771862859; cv=fail; b=H+1BDKMa+sVKime8py9EsGanD4W8HXhm1Zgo04U8KRBtxKRaRHYCSpXOYMu9vcZGThNdMhU/Pv42m7dagJ2IqluJg8qQhztHknWtDeNMCvLbToFFNPr+0Gf3lXzDID/Mz+ca7c3NXLbBSG9sgTU9uvMLE/Zbj1lUAkGclvEIZ50=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771862859; c=relaxed/simple;
-	bh=3toHGPWuNC88ERAWtoze1RuBoBVBufb8az0mBB/0sJI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ftk3jS0SpLLBSdOB4Awg3HgcAotQrYFWcPcv56obBWlGgE8JyQdgfe2nKB1ZJS0GXzFhssqdfJBbVgYwY4aZyf5D5ARp1UB9UCPbNVuLGo+97XtQ9aNKejNlH9mM0h2Xf+LHM2ubHDplU3KPpPtIsq6cdVYlqFk0MRokPiiUmJw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=Pz9reodk; arc=fail smtp.client-ip=52.101.62.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=N1vV0tE0FsjGinsQJzowvw9MJNeqyEB0K2JS26VEshURE3rwaCkK2LjhyQzz5odlrgvKkV7wi08okxQQyLBNgBnCO7lqVgLwLtRW07EvTrHGpAagn/uRw0WtmHDiAJcQ4htjE+qZuBOxLgZFbad8+QBT9meNrUeXQz27nQVoxhb2YRMUPl09YhwW7ino6PqHX+Sa1pnZTDlEczdCjZK90kUTKBL8zgHbUoUqHhBpuiFvHyBurkGI7RSFTTpofmzLmX831BXfOhdvzjUTPGioHBJnjBeWNZYxFBx6u+GXcoT/ypDrJhE3btQHt4aH12cDKvp+ax51poV1TDujWpCMtg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3toHGPWuNC88ERAWtoze1RuBoBVBufb8az0mBB/0sJI=;
- b=ew6mmpRK+Y4tAEJWuxztAwqNm3uXs7oOGCA7mJEqruT0zeAtLw2J8Tnfz98/C2nF95M9+5EpLY28yYgkvTUx66O2acGiep+vqWwYVTvfHKLrMKUiu4hztZlL32tt2bJnan8LhWmlh3Fo1QiygqnPU9imOcPOJdtWEce0xxCz1nafaW0IxZBjHaBQpkPtrNyMBN5/HDFeKm1p5cqJHXc8oeHAhqVJzIFwSI3qSNEQo4r11/Nvt+5CDjFsWdeUMSrufw2QaMZb00Sw49gG3v+ywLReeZ0Y70BlC3RL7mVSuYEeh8TvoIGFdRCAqiE8bvgZJ96rOn9h34VkrKdTt9A85Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3toHGPWuNC88ERAWtoze1RuBoBVBufb8az0mBB/0sJI=;
- b=Pz9reodk6QxxY0/ldPbadJrDl4NKcHgqn68Gy2F9L91AwmZf/R2wnnvKGrYqTEttrxr5eX0gJ8E6zzDUGX826SLmYPwj4Ds09K9qDqas17/z6023PU0RSLqyoR+P/kK13mQu5BMhLLuOV1oReIUAUCGXLVI3qEK74XKksgPcuKw=
-Received: from SA3PR21MB3867.namprd21.prod.outlook.com (2603:10b6:806:2fc::15)
- by SA3PR21MB5794.namprd21.prod.outlook.com (2603:10b6:806:499::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.6; Mon, 23 Feb
- 2026 16:07:34 +0000
-Received: from SA3PR21MB3867.namprd21.prod.outlook.com
- ([fe80::70ff:4d3:2cb6:92a3]) by SA3PR21MB3867.namprd21.prod.outlook.com
- ([fe80::70ff:4d3:2cb6:92a3%6]) with mapi id 15.20.9678.006; Mon, 23 Feb 2026
- 16:07:34 +0000
-From: Haiyang Zhang <haiyangz@microsoft.com>
-To: Kory Maincent <kory.maincent@bootlin.com>, Haiyang Zhang
-	<haiyangz@linux.microsoft.com>
-CC: "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Andrew Lunn
-	<andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Donald Hunter
-	<donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan
-	<skhan@linuxfoundation.org>, Gal Pressman <gal@nvidia.com>, Oleksij Rempel
-	<o.rempel@pengutronix.de>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, Paul Rosswurm
-	<paulros@microsoft.com>
-Subject: RE: [EXTERNAL] Re: [PATCH net-next] net: ethtool: add
- COALESCE_RX_CQE_FRAMES/NSECS parameters
-Thread-Topic: [EXTERNAL] Re: [PATCH net-next] net: ethtool: add
- COALESCE_RX_CQE_FRAMES/NSECS parameters
-Thread-Index: AQHcpEGiDcItgSgzW0KbKcdvetQIAbWQBDYAgABvgUA=
-Date: Mon, 23 Feb 2026 16:07:34 +0000
-Message-ID:
- <SA3PR21MB38671D269251FB3C4C4CD85CCA77A@SA3PR21MB3867.namprd21.prod.outlook.com>
-References: <20260222212328.736628-1-haiyangz@linux.microsoft.com>
- <20260223102534.0a87ed4c@kmaincent-XPS-13-7390>
-In-Reply-To: <20260223102534.0a87ed4c@kmaincent-XPS-13-7390>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=18f2f4c8-5d1b-42e0-b20a-edbeee1c0999;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2026-02-23T16:04:39Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
- 3, 0, 1;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA3PR21MB3867:EE_|SA3PR21MB5794:EE_
-x-ms-office365-filtering-correlation-id: 0f69edb6-3494-44aa-ba19-08de72f5a80e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|366016|376014|7416014|38070700021|7053199007;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?yAMwhYMLNP/VLRLXzcXniVqQWLzVac9WKp0WhsOVDX82IpOUdkJJrlpfEQyt?=
- =?us-ascii?Q?SIOxdq52lU0e7u3ZTWdMzBiGLp7919GNkhdpl3WM04iYexyeZYET3t8CLF1u?=
- =?us-ascii?Q?kgkI4BQlztSBEZZ5J5Y+ubaU6ZWGrq2EpCHH9/5Vk3oa+6cAQzpW7++/gWIt?=
- =?us-ascii?Q?XkPeCIDvBRQ9USnt6hntmdadmZv1jHyplMahbsW8dWEzQG4i/78Mbqu+wcUy?=
- =?us-ascii?Q?KeXvUUntNXK9YEGAxPzSOsLDK/3H7E5q1imFhYHO6DTlHpg2W/0tJGnOFd5t?=
- =?us-ascii?Q?5cIz0AN+c7CgcAeILaQOec+T1DiuzeFjTQ+wFY+VOnmm3n0lc/TZw4YOLLJS?=
- =?us-ascii?Q?EYHzy8/qqZJOBm+fgYQITa8gO0Q08WaDp6LX5KnnksHZqZGQp9Yy1M7Xt0D2?=
- =?us-ascii?Q?6mp4yTYKdkHekRxSEWA01uWo+WSq+GF1WskxDazGFOKA14XvLvTo9/SABYGm?=
- =?us-ascii?Q?MuxIVm3GUsZKn7QhASEiiHo4r6zflsGowO3F9nUuXGREgrXRK8RjBXKQ+Gzz?=
- =?us-ascii?Q?Z7kFEz/8X/uKwJ3/Eyamv9IPM8V+xoX5Wki/2AkAP18oqaRpZVqIFVxUkzgh?=
- =?us-ascii?Q?pkWb5k9qNK0cOITkFDBS/h7AXetqdQ5AMXyd245O6DbNC/Yqwdmt2VkGibZS?=
- =?us-ascii?Q?4GBT2Q8h1Mho14J6T7w8c0DFJ3hGpq8EmrxRpPd6rkUT011JvGSeXndtXc0v?=
- =?us-ascii?Q?jEaGW7u55+iRqZa2liKeLs/7xFw8R+kK0C245AbhzPNz8fwpBfjVZJUEArrT?=
- =?us-ascii?Q?ZNk5ykbrwLIcVVq5nCGdqkKJ6dREqZIhyIG+1RZp2OivhlK6wInSH3CYmPx9?=
- =?us-ascii?Q?AnF0B3CvEe8ay32WekfN0w5vjTMjRHMpJE1Wx+KS6k5/Yv9Lu1JxYtN49wUY?=
- =?us-ascii?Q?VJf3le5BAm9ac6jXE4GkDUmaJM1MItSKJDmNczcT7X6KFw9ja4DgvqaNrTJP?=
- =?us-ascii?Q?Wwt6NHnOyv3ZV/eEIf5ZCbSnRQudi+m1sw7F7aItVVR8kHFBdm7W45T6pJxr?=
- =?us-ascii?Q?dE+JWHst6SMiEyeUxzM0LutHG+Yg9rFe1KgLhsronkfTwPKEaqyccXLDCkzp?=
- =?us-ascii?Q?mBARWrjXsQi18vjkZbZB/i24/9+QZTzPxaDtUUWtXTP0NmMFea+Rf+CaSlIm?=
- =?us-ascii?Q?twFJfIdwoY6rnYaoTDqltOAokdQ5rGiV40pvl7zjWoKavGzuT3ZPJX5U62iM?=
- =?us-ascii?Q?xT8wMBRUYU58iosez32FjK9n5OvXF1wKFwHUgXQZISFkMn4sX7bFA7Rt4LYd?=
- =?us-ascii?Q?tfzt/b9poi4bH4ZkHoQFbh6am6KYYLGgqgGxGp55ROqe4CPSkp4v7qy3fi5E?=
- =?us-ascii?Q?aZrzWBAqiU2eZDI+cRx/0MOJuR7Ss5O7LN88lFVhjv7i84/xWvYWCDGQB0Vr?=
- =?us-ascii?Q?B2X4mvLEkmvs7nl75hCfZzNSPTpo1fpuUY7G6Gsk+P/v8B5Y8my/s1duqUpX?=
- =?us-ascii?Q?A8AlD8RBVjNutnEiep1rOEw3yyfoaSp1L/+ynng6aZPOknPu4aPnTH8fWrEa?=
- =?us-ascii?Q?3YNJNwGUTDmKnBNxHZadzB2RWdUj1cqtkurp10I79LMEwMvu9bF6e+p57HeM?=
- =?us-ascii?Q?oImxiQb88/N86a6Q1P6tIKviFySecvqD+S4sdnY7BtaCFTzYX0zRBqgGyMxl?=
- =?us-ascii?Q?qEpAwfYB5KXh8dk+FlSoSFc=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR21MB3867.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(38070700021)(7053199007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?14EYhhVTScGzoRNqxlKs7CBoGdWfIj5nYLhcbdvEZL6C7njzrYy1lk7GZryt?=
- =?us-ascii?Q?OpMeosO4o88410ZWPggS/fBlgRqQhjzPMgIUloVJjhoVyY04sDGHe6hp7zZU?=
- =?us-ascii?Q?uK5Tk5cwAOWQhdUamM7ITrPbXhCfZZSztuS8BbQ7DriKOmRQ/MVDh3Mt4OTY?=
- =?us-ascii?Q?2iUgDGGy0DdICocNqQNzwqSMDSxS4oRwJPY5R1VnGuAyLaTdmgdgmRP/ctda?=
- =?us-ascii?Q?0OWnBXy40NnzBEnDG0/jVB7vJbv+x434hlampFkxU5nXZmq9wBRI4bCykX+q?=
- =?us-ascii?Q?w9WxCMD5VOl1vNrN6rnsgZ/9WpekyGBWX68OrqMc/ARv8GBfwC5qeFfmZAos?=
- =?us-ascii?Q?AnJiOQoP39VqjX1sfQu0V+kNfJ6KfDNE/DNTZaqqe6TS/TkJ9EH+tE70sdtb?=
- =?us-ascii?Q?FEikL1jsEv2ypx8wqWX/rO5HL0FTEbFl5+3eAeOVO3xgbVA8vpfQfc0dn63k?=
- =?us-ascii?Q?jHL7imH5+Eb1WPfI8sAcSGf49ACOID7QZwJOAd6vzezLvYX6qtEm2c3V0M/C?=
- =?us-ascii?Q?Afj9uGJPOqr/lgXwak1ap4boSvUVlZZ4pLyMG12LHzFqYSMSqD7w2OeLElV9?=
- =?us-ascii?Q?oct6j30eKQHMpBQpmLkO7gboWyT8BknjCCvuzvFdvNT7rpZycdC089Rl0uTg?=
- =?us-ascii?Q?ZJmfANBZFRBl571yYpDR9LQptnhGgRmDL0xZ+MSCyg0Ae3YOgc7hAzT+nP4a?=
- =?us-ascii?Q?w5GfMjkX/oF7p9VRq3jAb7EIt0orHNhZj3DD9ukl/wxtwIYm3Le7NQVoP0of?=
- =?us-ascii?Q?5fX8M57nSb349EtFYk8j0cEtC4ED8cmC9CJdQHUmwyw5sSViXlDEABqUshFi?=
- =?us-ascii?Q?+oZnHr4tqoLuKt5dZJXlqn68MkC2xmocxHuHSIMIHIZNsItgQB5imBmGIahr?=
- =?us-ascii?Q?9YgrhWfg9laZ6Ss3KkT94ytzePfuB4QsBENAjx/0Tkok4+0rR8XJtWx7U2jn?=
- =?us-ascii?Q?pSLXbW+g9luPuzqNMpfYGHLpIH1vfUX4FjUeed/sN8OdgRvZEi8RV2FL29jl?=
- =?us-ascii?Q?5cHAZIJjzcRmdDDfjkxu92YPARQQBWQYCy2HEvWOz4hfaj9krhG+vLbpNKpN?=
- =?us-ascii?Q?Cy9+xgDqOdgj72f79UQbAnylAoEqiSu+wqxiG3atMQfBqvs8SsF8fyD67Ssq?=
- =?us-ascii?Q?W/9iqZ0S2Sjr/1wkXSTpdc11eeJjECg/4BIgeUTzeUk2CvESNJ7+MJ94RcWd?=
- =?us-ascii?Q?BVHSaHxoBE96ME7xLqWfswSTT2I0GopBj7aVgc0qibTdgoR4lIGc6fDpp8Ox?=
- =?us-ascii?Q?fyGaKnQObYnQrNoiACMqpIoan2BYgyltq0ZLfcjWNeaeRRSt3fmMOBClIh2j?=
- =?us-ascii?Q?I+WVDKl0ZnKey8d1+vdsOCarUYVPdCyyucKdpLYRnZ8kj5FpPmc3wG00oHOa?=
- =?us-ascii?Q?LFIhRDT9/TBmm/DkfQl7dReYcx5YYzktLVrSJpnqMiYdC4EOhmgAASZUpbjX?=
- =?us-ascii?Q?1TgLSADbwQA8n06Ssg1JOUUC9RI8sTqCz2mLneV/d98KK4yoaOCPwT8AMlHD?=
- =?us-ascii?Q?tUTj8Q4L3MlXTd3sFoO9943uvmemNLuZJK9IvpXR+K3zq6qqQP78Pp09UStP?=
- =?us-ascii?Q?CMsk+WLFaM1onS40uTzHI+D3rMteTclNF3veq7f7URdzK89TMGRgFeIgdwZs?=
- =?us-ascii?Q?PcAgqIfMQTykjFZoHULpRKO5pOZVUi8+mIBIBbk/sXdRsyW9bCOS+cbRmrQE?=
- =?us-ascii?Q?1T4sOew1VULkHzRg90tmWTanzAUVpCILd5aIhjCYk1JwmFhlK01khKi0LRzG?=
- =?us-ascii?Q?w2r/xbvoAw=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2119D28C869;
+	Mon, 23 Feb 2026 16:09:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771862945; cv=none; b=tu8UD6wMo/hVdP+EMVeCNepHq2i0Qt4owF/WVtRELei9CpM4Trjqoy5BRRnX4TqeVXqYasWfoMI+TS9I4SqVPr3xhnk7KDackJi7KxEGfHioBDGvmq97nm0Z3ksFxZVvSx+Q/lNGDjiAJU4Zj0H4g0mIA57smazg3CJPuHWJQc8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771862945; c=relaxed/simple;
+	bh=U1f4VUWvlVoHVRzjSsvSj6+GTfFekKDeqZn6GrwXI0o=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=h/BOkjva8uPoNlA87lW1vnTJV0L42mPpMMwkGRvuYmqENEHrzwDUeeEEUve3dhXf4L0WulaToDpFbsNE1ihtn/MzJkZAQFdKXAJfE6nc+8JiTT94YWQFfs/0clxtyH0yZ+a81h5JoUfJDhq3pcZAnpJqZwNRaEku1tz8+NjRDxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l9pVaPN/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91C5AC116C6;
+	Mon, 23 Feb 2026 16:09:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771862944;
+	bh=U1f4VUWvlVoHVRzjSsvSj6+GTfFekKDeqZn6GrwXI0o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=l9pVaPN/cxEh/suCVhuWE9zKuRvobiCEGJ0txgkBo9PpXkl47x3YeBE24NtYlHPBp
+	 Z9MvnO0WtjK2zPWfQ/IfIVLCZffKJlqemIihS/QeSLhwIJq8IdOPIU+1f9688A4XMp
+	 gwlAn+/8UAVE4a0QW6Jp5dz96715FKWMWVIWgA0sngCXHv+7g87EwavNZvdprMhmg7
+	 MahbRAl/A4ygOiEtD77hedrDSCJEvgQIk8RNwhzzo9fFOFuUA/+QEBobC2lco7cD/+
+	 etfl/NJ7Xp0yiJtecEPjRZB5hFueUHK0rlemZus13jXbfPV+sMsHDxL+4n4NsgZMVR
+	 B+47pl7GCN5cg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vuYUX-0000000D3Lu-3QOf;
+	Mon, 23 Feb 2026 16:09:01 +0000
+Date: Mon, 23 Feb 2026 16:09:01 +0000
+Message-ID: <86jyw3a1cy.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: David Lechner <dlechner@baylibre.com>
+Cc: Frederic Weisbecker <frederic@kernel.org>,	LKML
+ <linux-kernel@vger.kernel.org>,	Michal =?UTF-8?B?S291dG7DvQ==?=
+ <mkoutny@suse.com>,	Andrew Morton <akpm@linux-foundation.org>,	Bjorn
+ Helgaas <bhelgaas@google.com>,	Catalin Marinas <catalin.marinas@arm.com>,
+	Chen Ridong <chenridong@huawei.com>,	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,	Eric Dumazet
+ <edumazet@google.com>,	Gabriele Monaco <gmonaco@redhat.com>,	Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>,	Ingo Molnar <mingo@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,	Jens Axboe <axboe@kernel.dk>,	Johannes
+ Weiner <hannes@cmpxchg.org>,	Lai Jiangshan <jiangshanlai@gmail.com>,	Marco
+ Crivellari <marco.crivellari@suse.com>,	Michal Hocko <mhocko@suse.com>,
+	Muchun Song <muchun.song@linux.dev>,	Paolo Abeni <pabeni@redhat.com>,	Peter
+ Zijlstra <peterz@infradead.org>,	Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,	Roman Gushchin
+ <roman.gushchin@linux.dev>,	Shakeel Butt <shakeel.butt@linux.dev>,	Simon
+ Horman <horms@kernel.org>,	Tejun Heo <tj@kernel.org>,	Thomas Gleixner
+ <tglx@linutronix.de>,	Vlastimil Babka <vbabka@suse.cz>,	Waiman Long
+ <longman@redhat.com>,	Will Deacon <will@kernel.org>,
+	cgroups@vger.kernel.org,	linux-arm-kernel@lists.infradead.org,
+	linux-block@vger.kernel.org,	linux-mm@kvack.org,	linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 04/33] mm: vmstat: Prepare to protect against concurrent isolated cpuset change
+In-Reply-To: <47be2ff3-c25a-4aab-89fc-53921af8b0a9@baylibre.com>
+References: <20260101221359.22298-1-frederic@kernel.org>
+	<20260101221359.22298-5-frederic@kernel.org>
+	<47be2ff3-c25a-4aab-89fc-53921af8b0a9@baylibre.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR21MB3867.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0f69edb6-3494-44aa-ba19-08de72f5a80e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Feb 2026 16:07:34.5055
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pA0dmGMddQMR1Lp+Q5r+SX2lTiT4+g45PfXYIxRSSDRyyG/AbFNZh6WLbsXE9oFDYw1iNECbRR9tjuBss5brLA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR21MB5794
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: dlechner@baylibre.com, frederic@kernel.org, linux-kernel@vger.kernel.org, mkoutny@suse.com, akpm@linux-foundation.org, bhelgaas@google.com, catalin.marinas@arm.com, chenridong@huawei.com, dakr@kernel.org, davem@davemloft.net, edumazet@google.com, gmonaco@redhat.com, gregkh@linuxfoundation.org, mingo@redhat.com, kuba@kernel.org, axboe@kernel.dk, hannes@cmpxchg.org, jiangshanlai@gmail.com, marco.crivellari@suse.com, mhocko@suse.com, muchun.song@linux.dev, pabeni@redhat.com, peterz@infradead.org, pauld@redhat.com, rafael@kernel.org, roman.gushchin@linux.dev, shakeel.butt@linux.dev, horms@kernel.org, tj@kernel.org, tglx@linutronix.de, vbabka@suse.cz, longman@redhat.com, will@kernel.org, cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, netdev@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[microsoft.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[microsoft.com:s=selector2];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,kernel.org,gmail.com,davemloft.net,google.com,redhat.com,lwn.net,linuxfoundation.org,nvidia.com,pengutronix.de,linux.dev,microsoft.com];
-	TAGGED_FROM(0.00)[bounces-260103-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	RCPT_COUNT_TWELVE(0.00)[39];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,suse.com,linux-foundation.org,google.com,arm.com,huawei.com,davemloft.net,redhat.com,linuxfoundation.org,kernel.dk,cmpxchg.org,gmail.com,linux.dev,infradead.org,linutronix.de,suse.cz,lists.infradead.org,kvack.org];
+	TAGGED_FROM(0.00)[bounces-260104-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[microsoft.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[haiyangz@microsoft.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	REDIRECTOR_URL(0.00)[aka.ms];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AC924179855
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 74CC01797C0
 X-Rspamd-Action: no action
 
+On Mon, 23 Feb 2026 16:01:03 +0000,
+David Lechner <dlechner@baylibre.com> wrote:
+> 
+> On 1/1/26 4:13 PM, Frederic Weisbecker wrote:
+> > The HK_TYPE_DOMAIN housekeeping cpumask will soon be made modifiable at
+> > runtime. In order to synchronize against vmstat workqueue to make sure
+> > that no asynchronous vmstat work is pending or executing on a newly made
+> > isolated CPU, target and queue a vmstat work under the same RCU read
+> > side critical section.
+> > 
+> > Whenever housekeeping will update the HK_TYPE_DOMAIN cpumask, a vmstat
+> > workqueue flush will also be issued in a further change to make sure
+> > that no work remains pending after a CPU has been made isolated.
+> > 
+> > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> > ---
+> >  mm/vmstat.c | 10 ++++++----
+> >  1 file changed, 6 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/mm/vmstat.c b/mm/vmstat.c
+> > index 65de88cdf40e..ed19c0d42de6 100644
+> > --- a/mm/vmstat.c
+> > +++ b/mm/vmstat.c
+> > @@ -2144,11 +2144,13 @@ static void vmstat_shepherd(struct work_struct *w)
+> >  		 * infrastructure ever noticing. Skip regular flushing from vmstat_shepherd
+> >  		 * for all isolated CPUs to avoid interference with the isolated workload.
+> >  		 */
+> > -		if (cpu_is_isolated(cpu))
+> > -			continue;
+> > +		scoped_guard(rcu) {
+> > +			if (cpu_is_isolated(cpu))
+> > +				continue;
+> 
+> I think this might have introduced a bug - or at least an
+> unintentional change in the program flow.
+> 
+> scoped_guard() is implemented using a for loop. Now this continue
+> statement will only exit the scoped_guard() scope rather than
+> continuing the outer for loop. This means that cond_resched() will
+> be called when it previously was not.
 
+Yup, I've been bitten by that once before. It lead to very subtle
+breakage that took me a while to figure out. I've now mentally
+banished the use of scoped_guard() inside any form of loop, but that's
+a pretty brittle strategy...
 
-> -----Original Message-----
-> From: Kory Maincent <kory.maincent@bootlin.com>
-> Sent: Monday, February 23, 2026 4:26 AM
-> To: Haiyang Zhang <haiyangz@linux.microsoft.com>
-> Cc: linux-hyperv@vger.kernel.org; netdev@vger.kernel.org; Andrew Lunn
-> <andrew@lunn.ch>; Jakub Kicinski <kuba@kernel.org>; Donald Hunter
-> <donald.hunter@gmail.com>; David S. Miller <davem@davemloft.net>; Eric
-> Dumazet <edumazet@google.com>; Paolo Abeni <pabeni@redhat.com>; Simon
-> Horman <horms@kernel.org>; Jonathan Corbet <corbet@lwn.net>; Shuah Khan
-> <skhan@linuxfoundation.org>; Gal Pressman <gal@nvidia.com>; Oleksij Rempe=
-l
-> <o.rempel@pengutronix.de>; Vadim Fedorenko <vadim.fedorenko@linux.dev>;
-> linux-kernel@vger.kernel.org; linux-doc@vger.kernel.org; Haiyang Zhang
-> <haiyangz@microsoft.com>; Paul Rosswurm <paulros@microsoft.com>
-> Subject: [EXTERNAL] Re: [PATCH net-next] net: ethtool: add
-> COALESCE_RX_CQE_FRAMES/NSECS parameters
->=20
-> [You don't often get email from kory.maincent@bootlin.com. Learn why this
-> is important at https://aka.ms/LearnAboutSenderIdentification ]
->=20
-> On Sun, 22 Feb 2026 13:23:17 -0800
-> Haiyang Zhang <haiyangz@linux.microsoft.com> wrote:
->=20
-> > From: Haiyang Zhang <haiyangz@microsoft.com>
-> >
-> > Add two parameters for drivers supporting Rx CQE Coalescing.
-> >
-> > ETHTOOL_A_COALESCE_RX_CQE_FRAMES:
-> > Maximum number of frames that can be coalesced into a CQE.
-> >
-> > ETHTOOL_A_COALESCE_RX_CQE_NSECS:
-> > Time out value in nanoseconds after the first packet arrival in a
-> > coalesced CQE to be sent.
-> >
-> > Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
->=20
-> You send this patch one day before the official reopening of net-next.
-> Not sure if this will be taken into account by patchwork.
-> Else:
-> Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
+	M.
 
-Thanks for the review! I sent it a day earlier because of the winter
-storm :)
-
-- Haiyang
-
+-- 
+Without deviation from the norm, progress is not possible.
 
