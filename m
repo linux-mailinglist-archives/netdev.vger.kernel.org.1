@@ -1,175 +1,141 @@
-Return-Path: <netdev+bounces-260081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260083-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WPIsCwZwnGmcGAQAu9opvQ
-	(envelope-from <netdev+bounces-260081-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 16:19:34 +0100
+	id EBs7NTVznGmcGAQAu9opvQ
+	(envelope-from <netdev+bounces-260083-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 16:33:09 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFE62178A2B
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 16:19:33 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70DF2178C35
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 16:33:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0292430244F7
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 15:19:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3EBA63073871
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 15:31:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98B03285CAA;
-	Mon, 23 Feb 2026 15:19:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C368028C869;
+	Mon, 23 Feb 2026 15:31:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="L0HByolD";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="3eUmRSDd";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="L0HByolD";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="3eUmRSDd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Locr35s6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 499F128505E
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 15:19:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A08A7191;
+	Mon, 23 Feb 2026 15:31:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771859971; cv=none; b=E5BYYtZEKhCriRnjBctcHFBFv9klINcvmzbZ3VVTBvABjlbQ2pDjiwat2AyEpmkCeE95e7sgKknVTM4+6HsPUOCZXevQbJguz6NMGpQHqnJoKQgbyGgn2RU9LXyQapY5EiqXTc0koxzntr08fi3bZ4nACa9BRVOgwg5n2T40UHg=
+	t=1771860681; cv=none; b=tDpoLzBzarAdA5/0+0ZBVCRtVToTVb+0lzc+GebTwSTm2HEJrPt5BiCaC8c3fCo0wNnHgqp5muq2KSKpj96507hQ1P+/lSYQ19KnfZ6cIrimccjlWS34xVoyZkSuMBqD9SkmJPtTHu7t9TnHRPmAltmIGXKX3vwkzkpjvhimKLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771859971; c=relaxed/simple;
-	bh=0O3RvJy5wMszVpqd7072pywBFbMARv2HhD0Qr8fHSJ8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lr7HTUn2WqI6QSl+pzmYERrWhc/Wsf9Fe6+TlefjFvwW5n7396qdM1cbU2X/XouaFbh9CGCpLm0D5B+HmgDiaY8dHI49/iJ3XNJdi22gvt45CajlAhn81Cq8rqj2NG3NKfzRxVOnFPhksZRM/tQNZ5KMVZqYSi70hMLl0ZEPWfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=L0HByolD; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=3eUmRSDd; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=L0HByolD; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=3eUmRSDd; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 409323ED75;
-	Mon, 23 Feb 2026 15:19:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1771859968; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=i3eJX+/Hm/8RuHBx6XH/gu7RzCdwaePCRMFOhHNaKD8=;
-	b=L0HByolDVRfyM01drZUEECGagzGV5s6SWkJjohtEthBkg7sJRUufWFphhvvroOyQ3c5xVd
-	zL2wcxTWdXcnkuF71DQQjanTOW3QAvKbP9lprFbCNY6txADtM4CU6LKYiup3Hb/o4npRNz
-	QM+02eL730I8vv6S7fkBSgvL3mUnaww=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1771859968;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=i3eJX+/Hm/8RuHBx6XH/gu7RzCdwaePCRMFOhHNaKD8=;
-	b=3eUmRSDdrxphum6bcXgQsXjZG1mi3jxmMQEwcNlI3fgXnGhloea2dS+FDVXybg9nMWk93f
-	sVb9C2pOzefDzEAg==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=L0HByolD;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=3eUmRSDd
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1771859968; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=i3eJX+/Hm/8RuHBx6XH/gu7RzCdwaePCRMFOhHNaKD8=;
-	b=L0HByolDVRfyM01drZUEECGagzGV5s6SWkJjohtEthBkg7sJRUufWFphhvvroOyQ3c5xVd
-	zL2wcxTWdXcnkuF71DQQjanTOW3QAvKbP9lprFbCNY6txADtM4CU6LKYiup3Hb/o4npRNz
-	QM+02eL730I8vv6S7fkBSgvL3mUnaww=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1771859968;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=i3eJX+/Hm/8RuHBx6XH/gu7RzCdwaePCRMFOhHNaKD8=;
-	b=3eUmRSDdrxphum6bcXgQsXjZG1mi3jxmMQEwcNlI3fgXnGhloea2dS+FDVXybg9nMWk93f
-	sVb9C2pOzefDzEAg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9E06C3EA68;
-	Mon, 23 Feb 2026 15:19:27 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 4qFSI/9vnGlRKQAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Mon, 23 Feb 2026 15:19:27 +0000
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-To: netdev@vger.kernel.org
-Cc: horms@kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	dsahern@kernel.org,
-	davem@davemloft.net,
-	Fernando Fernandez Mancera <fmancera@suse.de>
-Subject: [PATCH net-next] ipv6: discard fragment queue if middle fragment is not 8 bytes aligned
-Date: Mon, 23 Feb 2026 16:19:18 +0100
-Message-ID: <20260223151918.31965-1-fmancera@suse.de>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1771860681; c=relaxed/simple;
+	bh=ctP1UU27tLiOW211tKcjYzIW7T9UCOnyQ+3z045jeUs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=hhqZfk3D9hHsd3iHzW8drrDRgn8m7BTBQ3QYmp5CrgeN1OgNa1ZFORUwRym/x6IAgnQ0/roB3VTWrzW/1RXKdibVXHmXZpuR+xdMxW2hYcRHYZHRgfxmJRW7l2Mg4GLjyNyfs4FxS54o1QUw7//CeQ+nTgkGuBlr5xnCxnTFLvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Locr35s6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63A6DC116C6;
+	Mon, 23 Feb 2026 15:31:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771860681;
+	bh=ctP1UU27tLiOW211tKcjYzIW7T9UCOnyQ+3z045jeUs=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Locr35s63cRteDBT9nn+5mbBlHIoMU30aMUM9UiLDZiVKM2L1WQaqlea440Q9D/1s
+	 PIPFsU3GCN+LkOMgz3oiotDAUTpdBxSHjHPMlh3/O3EmPjk2VRybKxogElIxdnGdPW
+	 lsWO/Fy78o0rt2l4kGc3aSoKSDV+bUAGzjHqGzkXsaV7Hih9DDV/YpfIruMT4tMwjO
+	 WXxuz9RlS+4EJgjx4cLk6uFhZXHb/14s1FRrbMCER+RPLLhp4cgI5AsqDGdJdF2NXZ
+	 xfh4XVXxJ73K8gJ+RBszVv8oxYEmWw7H+M3v5ebwX0oH3nTnejeLKIieidQARd1kVx
+	 RkjspPRYU/Bww==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH iproute2-next v2 0/3] ip mptcp monitor: add JSON support
+Date: Mon, 23 Feb 2026 16:28:37 +0100
+Message-Id: <20260223-ipr-monitor-json-v2-0-f91fccccf917@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -3.01
-X-Spam-Level: 
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIACVynGkC/3WNzQ6CMBCEX4Xs2TXtAmI8+R6Gg8AC609Ltkgwp
+ O9uw93jl5n5ZoPAKhzgkm2gvEgQ7xLQIYN2vLuBUbrEQIZOhsigTIpv72T2io/gHdqyyvPKllS
+ 0FtJsUu5l3ZU3SG3/mZnQ8TpDneJRQpp+98PF7qX/7sWiQW6KxnRlX53JXJ+sjl9HrwPUMcYfN
+ sjHA8AAAAA=
+X-Change-ID: 20260220-ipr-monitor-json-1573371524c1
+To: Stephen Hemminger <stephen@networkplumber.org>, 
+ David Ahern <dsahern@kernel.org>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1090; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=ctP1UU27tLiOW211tKcjYzIW7T9UCOnyQ+3z045jeUs=;
+ b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDLnFB2zYDex9jS9tTnyjnTcVYbKKeUTGh8e8A64Ll+47
+ 4fnI97CjlIWBjEuBlkxRRbptsj8mc+reEu8/Cxg5rAygQxh4OIUgIncF2VkuN67c8YVs95583pv
+ 5JR2B2+d67xsz8sEsW1afExfWkMe+TP84fvOJjpFM7nw/5tLfSZTU7wvWZurfgqt4bq7KdP1b3w
+ aIwA=
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[suse.de:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260081-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-260083-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,suse.de:mid,suse.de:dkim,suse.de:email]
-X-Rspamd-Queue-Id: BFE62178A2B
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 70DF2178C35
 X-Rspamd-Action: no action
 
-Currently the kernel IPv6 implementation is not dicarding the fragment
-queue upon receiving a IPv6 fragment that is not 8 bytes aligned. It
-relies on queue expiration to free the queue.
+With this series, the command 'ip [-t[s]] mptcp monitor' produces an
+output with the JSON format.
 
-While RFC 8200 section 4.5 does not explicitly mention that the rest of
-fragments must be discarded, it does not make sense to keep them. The
-parameter problem message is sent regardless that. In addition, if the
-sender is able to re-compose the datagram so it is 8 bytes aligned it
-would qualify as a new whole datagram not fitting into the same fragment
-queue.
+- Patch 1: a small refactoring to uniform the code.
 
-The sooner we can free resources during reassembly, the better.
+- Patch 2: add JSON support in print_timestamp() helper.
 
-Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+- Patch 3: add JSON support to 'ip mptcp monitor' as requested by
+  Stephen.
+
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- net/ipv6/reassembly.c | 3 +++
- 1 file changed, 3 insertions(+)
+Changes in v2:
+- Patch 1: clearly mention the "fix".
+- Patch 2: ignore argument.
+- Patch 3: print token with 0xhex, use atexit().
+- Link to v1: https://patch.msgid.link/20260220-ipr-monitor-json-v1-0-eb4b0d5f7820@kernel.org
 
-diff --git a/net/ipv6/reassembly.c b/net/ipv6/reassembly.c
-index 25ec8001898d..8b0bc0ba56f4 100644
---- a/net/ipv6/reassembly.c
-+++ b/net/ipv6/reassembly.c
-@@ -163,6 +163,9 @@ static int ip6_frag_queue(struct net *net,
- 			 * this case. -DaveM
- 			 */
- 			*prob_offset = offsetof(struct ipv6hdr, payload_len);
-+			inet_frag_kill(&fq->q, refs);
-+			__IP6_INC_STATS(net, ip6_dst_idev(skb_dst(skb)),
-+					IPSTATS_MIB_REASMFAILS);
- 			return -1;
- 		}
- 		if (end > fq->q.len) {
+---
+Matthieu Baerts (NGI0) (3):
+      mptcp: uniform stream closure
+      utils: timestamp: add JSON support
+      mptcp: monitor: add JSON support
+
+ ip/ipmptcp.c | 94 +++++++++++++++++++++++++++++++++++++++++-------------------
+ lib/utils.c  | 12 ++++----
+ 2 files changed, 71 insertions(+), 35 deletions(-)
+---
+base-commit: f120cdb35da76ca99932d0428a0917bd01a843da
+change-id: 20260220-ipr-monitor-json-1573371524c1
+
+Best regards,
 -- 
-2.53.0
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
