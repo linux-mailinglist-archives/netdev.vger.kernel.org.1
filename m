@@ -1,117 +1,101 @@
-Return-Path: <netdev+bounces-260153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260154-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SIrDBTqcnGmyJgQAu9opvQ
-	(envelope-from <netdev+bounces-260153-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 19:28:10 +0100
+	id 4N/eH8qdnGmyJgQAu9opvQ
+	(envelope-from <netdev+bounces-260154-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 19:34:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F35117B7B6
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 19:28:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF8FD17B951
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 19:34:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 54E5D301DA41
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 18:27:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 96F5030B8265
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 18:31:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF99F340285;
-	Mon, 23 Feb 2026 18:27:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0628F368262;
+	Mon, 23 Feb 2026 18:31:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K06vK2S+";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="HdkOn6lX"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="VL36tq+Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F85433987F
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 18:27:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43A5A3612D6
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 18:31:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771871252; cv=none; b=I/iP5Y4+435BeG3rEG2QmKuIZMH/EP3miXlpwQijOXsZT+PIFpfcMPWopB3aIAZg/ABOcSAM21RpIIm0rc1nBNd5zGt9RRp8bJpJNWU+Ig8cx/cCZpBTBMdzSVPHv5R02TLYCJofvTpC1HHixqkOuEqrPXD2E0pe7rmgfxIRUL8=
+	t=1771871465; cv=none; b=QvAaHklIB1JeLDrGbK/IBMppWjmztJNPmtL2r6ggTFghSgaus+oWYp8EIH3JOqgqxaX1bghqJCyX1cAPDeTeUMEbSWitbjnzwYAXWdGrC/hPHT7VNMDHRRG7JhXI16eUf+nc+CCI/2AxyFajwXGa4WuUIgJLSF/kOKGUaK80qrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771871252; c=relaxed/simple;
-	bh=Gt/ybORBXuFYqnra/JVdC2WvTktBDNp4NAuqe5HpQTE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VdlbgIXKktCcosZR5gFP3zNns158ufueOFXuKg19aqlkHhRBHS3fS4z3wAN3RzYbF8PlmHsuJj15lO/0GyQVzpUgQs6o7duz8xm9lL+A7beDECH71foadbXVOAqcDJ4TgF3Lq+0I8Jxy/V92obj50hsfIe8S0/IKZo0o9WEAqL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K06vK2S+; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=HdkOn6lX; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1771871250;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eLbpRX1SSJd3x5MRSo5gnO5pcAxAYlU6G0gCQ7m11Ro=;
-	b=K06vK2S+Smde8os7jhGPiDoH0Nk6tuQM1RhMDn1B0xgru9AeAtxxwVaLT5TcZivURNM7l5
-	0+dbGbCcI9HcEtUgxVPdFigeBKTNSvnfCUMhjDHPBfzjGb1d07SZBK3O/ZdeizbI+ItTeH
-	R8gyWlwQ/JQ3T9iCni4K1sPXDepOzxQ=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-41-QMhFXW2cPuOeZyHRrLeP2w-1; Mon, 23 Feb 2026 13:27:28 -0500
-X-MC-Unique: QMhFXW2cPuOeZyHRrLeP2w-1
-X-Mimecast-MFC-AGG-ID: QMhFXW2cPuOeZyHRrLeP2w_1771871248
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-48079ae1001so15873355e9.0
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 10:27:28 -0800 (PST)
+	s=arc-20240116; t=1771871465; c=relaxed/simple;
+	bh=Kdu1cMXgA2XqjBYc7dvRjH7dxfg9Vy4WuG4CB6nfJ0c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G5+4WCdJhcOuARlxfTw1Gpt3WfFnW6GzAVFzcwlFkQAk+n7h1EEWhlK4f6A2MfgrWFByYUO07ly5pFqEBVVA0IKjqlMeEBVe8D7DQEAxDdiK71S02/WmS/T5ZA+LUU7H8tM/qz2I4thsvNiM9DAgPVcl9ukOiKS5cRrzCXh+cM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=VL36tq+Y; arc=none smtp.client-ip=74.125.82.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-2bd9a485bd6so2157729eec.1
+        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 10:31:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1771871247; x=1772476047; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eLbpRX1SSJd3x5MRSo5gnO5pcAxAYlU6G0gCQ7m11Ro=;
-        b=HdkOn6lXcmi+L7IPq5B9OXUsxki1WplO3H7gqzt2es6y+0pF9op2tK9QHv1cettCMN
-         6XwP2Rf6X5lTEL8i4iV80sNQ5LboY+cFH7BaX4giOka5EETSNNpvBe3jxB5bRPgYMLjj
-         6+RRxr9/uRyxUe5cvIj/G4pUdo6yGC8NMU+JGrn3xcZFHzxXTQfdlC9vZ+Tz7rUjpMp5
-         DczWdg9x64nFjuaDYg4XRDA/HtWeGB8ReogE+1ziSDAdsqZsjo7Z57W6VGZuTsMMI95g
-         Y9VKnBIn6ePRgO/T/unflCf/KScee+oAzwpgLr+jolVMqg0nz8PfxfoO4lXeJ+DthIY1
-         8O7A==
+        d=purestorage.com; s=google2022; t=1771871462; x=1772476262; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hNnIbQepM7OsxG8YtXelmWTZHGkDq1OrrS+VLi1UfmQ=;
+        b=VL36tq+YYHcnLb2Pj+T4XlYEo3uzETDIKhaWyb6z5S6lIveu+xKuGB467pJcnNuBFf
+         LIYeFMlH5/GsbZ/A8e03iPAPqwLNtVPiPEQDHqRhrCEJ0+OG61j7YNWT5hZhlXHgjg3P
+         v1Dm5EY0EVpxiS80akpdro7fktC4ufNKnCT7A+Qfdtos/WP4sU8b3wHJN00pIjD/XsS/
+         KhsaJJJ4uBytQaagJD/abcGH1U1lj0MbJCCf2Nc/tFByl1JiCypHWvAJLR2FGvV6qgZy
+         /9LaFbbKzu0LE5V1u7q27fbJuyR5LJkyXGkWiy98X4AQkEn1JxmfV3/LCr9kU1pX7To2
+         nIuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771871247; x=1772476047;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=eLbpRX1SSJd3x5MRSo5gnO5pcAxAYlU6G0gCQ7m11Ro=;
-        b=tDbIeUUqE3ICyvjwYSMHei1dVWjuNEEoUQAB8TTJp7ITiI7TiarRC43yfUfzQoBm3+
-         FQpwByEnKqXxohrpVlL9mnMWJJLKRZ882GKr/lOrjmVLkli8lhY1MpqQksEnh9Skckot
-         Vp3ZHhHGkdVf7UDnhf2GQoVH6P7vn/GpT6UCq+0sZYJIGDFpPnUxQuoa7+9fw7cu7GBY
-         GNwc1wPqQGsC8ZdMdH+/hhzjABcabC+DGS1mIfqs3x6Keb5JRRjJSPWnbq9YTMdZ4N6A
-         Pgwv4xXKPnYvyoEqwlDsUnAMLMU5pqz/cymX5S/3gcIOiZUBQpRcNErMVHfAeP9PMSnG
-         3IyQ==
-X-Gm-Message-State: AOJu0Yy1EOptgLiNDI6XSZKf4tbqJXMNqBHDolptOMSt7xL1vXybwqOw
-	cKYAqCRLEPjHzx5zMJsu/004bcvk+64NeqMC9ISHQrUcGEPDbQMOTTPVDanaaQUwj0JzRTg8mDF
-	5vB6d9sRDW6VVBoah3GlC6eHK1EGyEbDD4ozqICCMNIJbAlSwnII8R6FqUQzmHki6kD/UXqEkIc
-	gc6sodSYODolLkZ+c21C4YsjQdahovZD6meW4PMsi8pg==
-X-Gm-Gg: AZuq6aJyWe1iOvYuDtFP4kC6UKv8HZl5i1oOUOAzC3sTYvy5YFO7pZbAk/2ZWJuoM8u
-	9rJUcgkVULUb0+tcIls+UhDd7Yr11neqHy94K+CZsYVd++qeORimXFKgJOEMjO1ignr94kfP0VA
-	NMvlZ7ndxJoxa8t3MQLb2OBkZeaE1+6YA4kmrc1evOhfJPTi4c7b8HhcJ9Tg0aEYSqPIkw/n1q3
-	bpujYEBjsqlEE8SNZq1cYivoWc6TcDFtgVHqFZtiBeUEp2QpI8VBpwWd5ibT52O8prkWa2GTr+F
-	hxp252V3vUxP5i+qBbrGipXi4C3Osk5wmhguFyC7IVXdJxaTv2+GC7MRSKtoT7GMmEnWa26rBbn
-	wTgFihdHdK8uS59sf6HYA6PT/IjWClOgwoUilQkbhvoqCXnkF659A1dH/gmw=
-X-Received: by 2002:a05:600c:8211:b0:483:885:f0b0 with SMTP id 5b1f17b1804b1-483a963c196mr198902105e9.35.1771871246614;
-        Mon, 23 Feb 2026 10:27:26 -0800 (PST)
-X-Received: by 2002:a05:600c:8211:b0:483:885:f0b0 with SMTP id 5b1f17b1804b1-483a963c196mr198901465e9.35.1771871246069;
-        Mon, 23 Feb 2026 10:27:26 -0800 (PST)
-Received: from localhost (net-93-146-155-42.cust.vodafonedsl.it. [93.146.155.42])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483a31bc0e3sm257839895e9.5.2026.02.23.10.27.25
+        d=1e100.net; s=20230601; t=1771871462; x=1772476262;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hNnIbQepM7OsxG8YtXelmWTZHGkDq1OrrS+VLi1UfmQ=;
+        b=b5vSpfSs4+o4RGVdov44cvqaQCd33EqZ79OuM2Tf8FGemRAPyZG0fKZvHxy03J0CfV
+         MM83CrnOD4MCVxWMiFKlsCsbNssHZ5GycNccqnfIQ2bjhMK3U/KbKXhH25MCdE28rGCk
+         msM7y9Ng2iqvaAy+9fOoMWkCUk3HFpWye34Ly3TgCvvYLiyNkV6vXCT1laLW5xXv4t4y
+         GxcW6tTUybjSoZdE8sh8ylWfRUC0IeL39QDimQCkXCDkHFcm3Wy6Ep8NkP8VOX8fk9lP
+         8L7lpKNbZieH/5yDlMLVu+fXX5Qh8yIkjsbQ1WyRLgz9xBdgyRPT81R6/dCYjoiV5unE
+         FS8A==
+X-Forwarded-Encrypted: i=1; AJvYcCV6EonOOJvwHJnL2Feh4lWaluRE68VhoyMQYwF232h7eUX1OsOKupvLS41LBtx1o6g+KnF5S8Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqPJjKC4FcM8sKJjhcI645lp3KQFDaUOh8KfmYkYj3ZJCpy1AX
+	3HC2lGjgrriYXLvSg1UFErPw5pJV3SX0OxKOfHKPejAdUWB+f0Yvt6YOr6/E5h65Ou4=
+X-Gm-Gg: ATEYQzzbS1a0sA7yxgWEjVmJuhQdSAdd42QzaYJAZpXSOZx++GC0n4m8Zr9lTv/1BwH
+	NPZ4a1+mQf+l68emi2BXaqHo/x/5xsThfMPDLPIQeYbhbZoIP90UbE5Gi+CUhn/JXBauLo/ivQk
+	vg3lde5gPDC++5rCrLTYWV7VapPUBFeM2QUpBxzgvi5gFUGzFQUQzgX9RwgIRTh2Tdiv1aosOJa
+	YMaHpbR0MSrVM9z0ojQWF/CAi9uE6me6GpbK1+vaKqvukhRNJCr0Ulv/Oz+kkpCuTVjp6WmhfKK
+	qoMh6i39eruz91vIx5bv4Rg3E3QjcQRzP7+stF4fqb7weqXyDJKLXxPpCldAmq+AbDgxcvE9JPV
+	waj2mBeU2GzFFCQMOd3ue1+2ZIkLqapGuaHn4Avkp2hnBGMqzZXpj8j6hxovlef9+fL4HCWU9fg
+	2dGkzw1eFEa+NzBq4XPQJYusFFMYdnJmy+ntMJ7HE26d6cDbpPcQ==
+X-Received: by 2002:a05:7301:9f18:b0:2ba:a098:ae64 with SMTP id 5a478bee46e88-2bd7bd58cf5mr3962238eec.34.1771871462146;
+        Mon, 23 Feb 2026 10:31:02 -0800 (PST)
+Received: from goldfish.dev.purestorage.com ([208.88.152.253])
+        by smtp.googlemail.com with ESMTPSA id 5a478bee46e88-2bd7dc169e2sm5814354eec.29.2026.02.23.10.31.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Feb 2026 10:27:25 -0800 (PST)
-From: Paolo Valerio <pvalerio@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+        Mon, 23 Feb 2026 10:31:01 -0800 (PST)
+From: Eric Badger <ebadger@purestorage.com>
+To: ebadger@purestorage.com
+Cc: Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	NeilBrown <neil@brown.name>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	=?UTF-8?q?Th=C3=A9o=20Lebrun?= <theo.lebrun@bootlin.com>
-Subject: [PATCH net-next v2 8/8] net: macb: introduce xmit support
-Date: Mon, 23 Feb 2026 19:26:32 +0100
-Message-ID: <20260223182632.1681809-9-pvalerio@redhat.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260223182632.1681809-1-pvalerio@redhat.com>
-References: <20260223182632.1681809-1-pvalerio@redhat.com>
+	Simon Horman <horms@kernel.org>,
+	linux-nfs@vger.kernel.org (open list:NFS, SUNRPC, AND LOCKD CLIENTS),
+	netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH] xprtrdma: Decrement re_receiving on the early exit paths
+Date: Mon, 23 Feb 2026 10:28:55 -0800
+Message-ID: <20260223182858.1158739-1-ebadger@purestorage.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -120,320 +104,112 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[purestorage.com,reject];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[purestorage.com:s=google2022];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260153-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pvalerio@redhat.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-260154-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FROM_NEQ_ENVFROM(0.00)[ebadger@purestorage.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[purestorage.com:+];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3F35117B7B6
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,purestorage.com:mid,purestorage.com:dkim,purestorage.com:email]
+X-Rspamd-Queue-Id: CF8FD17B951
 X-Rspamd-Action: no action
 
-Add XDP_TX verdict support, also introduce ndo_xdp_xmit function for
-redirection, and update macb_tx_unmap() to handle both skbs and xdp
-frames advertising NETDEV_XDP_ACT_NDO_XMIT capability and the ability
-to process XDP_TX verdicts.
+In the event that rpcrdma_post_recvs() fails to create a work request
+(due to memory allocation failure, say) or otherwise exits early, we
+should decrement ep->re_receiving before returning. Otherwise we will
+hang in rpcrdma_xprt_drain() as re_receiving will never reach zero and
+the completion will never be triggered.
 
-Signed-off-by: Paolo Valerio <pvalerio@redhat.com>
+On a system with high memory pressure, this can appear as the following
+hung task:
+
+    INFO: task kworker/u385:17:8393 blocked for more than 122 seconds.
+          Tainted: G S          E       6.19.0 #3
+    "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+    task:kworker/u385:17 state:D stack:0     pid:8393  tgid:8393  ppid:2      task_flags:0x4248060 flags:0x00080000
+    Workqueue: xprtiod xprt_autoclose [sunrpc]
+    Call Trace:
+     <TASK>
+     __schedule+0x48b/0x18b0
+     ? ib_post_send_mad+0x247/0xae0 [ib_core]
+     schedule+0x27/0xf0
+     schedule_timeout+0x104/0x110
+     __wait_for_common+0x98/0x180
+     ? __pfx_schedule_timeout+0x10/0x10
+     wait_for_completion+0x24/0x40
+     rpcrdma_xprt_disconnect+0x444/0x460 [rpcrdma]
+     xprt_rdma_close+0x12/0x40 [rpcrdma]
+     xprt_autoclose+0x5f/0x120 [sunrpc]
+     process_one_work+0x191/0x3e0
+     worker_thread+0x2e3/0x420
+     ? __pfx_worker_thread+0x10/0x10
+     kthread+0x10d/0x230
+     ? __pfx_kthread+0x10/0x10
+     ret_from_fork+0x273/0x2b0
+     ? __pfx_kthread+0x10/0x10
+     ret_from_fork_asm+0x1a/0x30
+
+Fixes: 15788d1d1077 ("xprtrdma: Do not refresh Receive Queue while it is draining")
+Signed-off-by: Eric Badger <ebadger@purestorage.com>
 ---
- drivers/net/ethernet/cadence/macb_main.c | 171 +++++++++++++++++++++--
- 1 file changed, 162 insertions(+), 9 deletions(-)
+ net/sunrpc/xprtrdma/verbs.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 50646ee90672..69392ec0065f 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -967,6 +967,17 @@ static int macb_halt_tx(struct macb *bp)
- 					bp, TSR);
- }
+diff --git a/net/sunrpc/xprtrdma/verbs.c b/net/sunrpc/xprtrdma/verbs.c
+index 63262ef0c2e3..8abbd9c4045a 100644
+--- a/net/sunrpc/xprtrdma/verbs.c
++++ b/net/sunrpc/xprtrdma/verbs.c
+@@ -1362,7 +1362,7 @@ void rpcrdma_post_recvs(struct rpcrdma_xprt *r_xprt, int needed)
+ 	needed += RPCRDMA_MAX_RECV_BATCH;
  
-+static void macb_tx_release_buff(void *buff, enum macb_tx_buff_type type, int budget)
-+{
-+	if (type == MACB_TYPE_SKB) {
-+		napi_consume_skb(buff, budget);
-+	} else if (type == MACB_TYPE_XDP_TX) {
-+		xdp_return_frame_rx_napi(buff);
-+	} else {
-+		xdp_return_frame(buff);
-+	}
-+}
-+
- static void macb_tx_unmap(struct macb *bp, struct macb_tx_buff *tx_buff,
- 			  int budget)
- {
-@@ -981,7 +992,7 @@ static void macb_tx_unmap(struct macb *bp, struct macb_tx_buff *tx_buff,
+ 	if (atomic_inc_return(&ep->re_receiving) > 1)
+-		goto out;
++		goto out_dec;
+ 
+ 	/* fast path: all needed reps can be found on the free list */
+ 	wr = NULL;
+@@ -1385,7 +1385,7 @@ void rpcrdma_post_recvs(struct rpcrdma_xprt *r_xprt, int needed)
+ 		++count;
  	}
+ 	if (!wr)
+-		goto out;
++		goto out_dec;
  
- 	if (tx_buff->ptr) {
--		napi_consume_skb(tx_buff->ptr, budget);
-+		macb_tx_release_buff(tx_buff->ptr, tx_buff->type, budget);
- 		tx_buff->ptr = NULL;
- 	}
- }
-@@ -1069,6 +1080,10 @@ static void macb_tx_error_task(struct work_struct *work)
- 		desc = macb_tx_desc(queue, tail);
- 		ctrl = desc->ctrl;
- 		tx_buff = macb_tx_buff(queue, tail);
-+
-+		if (tx_buff->type != MACB_TYPE_SKB)
-+			goto unmap;
-+
- 		skb = tx_buff->ptr;
- 
- 		if (ctrl & MACB_BIT(TX_USED)) {
-@@ -1106,6 +1121,7 @@ static void macb_tx_error_task(struct work_struct *work)
- 			desc->ctrl = ctrl | MACB_BIT(TX_USED);
- 		}
- 
-+unmap:
- 		macb_tx_unmap(bp, tx_buff, 0);
- 	}
- 
-@@ -1184,6 +1200,7 @@ static int macb_tx_complete(struct macb_queue *queue, int budget)
- 	spin_lock_irqsave(&queue->tx_ptr_lock, flags);
- 	head = queue->tx_head;
- 	for (tail = queue->tx_tail; tail != head && packets < budget; tail++) {
-+		void			*data = NULL;
- 		struct macb_tx_buff	*tx_buff;
- 		struct sk_buff		*skb;
- 		struct macb_dma_desc	*desc;
-@@ -1206,11 +1223,16 @@ static int macb_tx_complete(struct macb_queue *queue, int budget)
- 		for (;; tail++) {
- 			tx_buff = macb_tx_buff(queue, tail);
- 
--			if (tx_buff->type == MACB_TYPE_SKB)
--				skb = tx_buff->ptr;
-+			if (tx_buff->type != MACB_TYPE_SKB) {
-+				data = tx_buff->ptr;
-+				goto unmap;
-+			}
- 
- 			/* First, update TX stats if needed */
--			if (skb) {
-+			if (tx_buff->type == MACB_TYPE_SKB && tx_buff->ptr) {
-+				data = tx_buff->ptr;
-+				skb = tx_buff->ptr;
-+
- 				if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP) &&
- 				    !ptp_one_step_sync(skb))
- 					gem_ptp_do_txstamp(bp, skb, desc);
-@@ -1226,6 +1248,7 @@ static int macb_tx_complete(struct macb_queue *queue, int budget)
- 				bytes += skb->len;
- 			}
- 
-+unmap:
- 			/* Now we can safely release resources */
- 			macb_tx_unmap(bp, tx_buff, budget);
- 
-@@ -1233,7 +1256,7 @@ static int macb_tx_complete(struct macb_queue *queue, int budget)
- 			 * WARNING: at this point skb has been freed by
- 			 * macb_tx_unmap().
- 			 */
--			if (skb)
-+			if (data)
- 				break;
+ 	rc = ib_post_recv(ep->re_id->qp, wr,
+ 			  (const struct ib_recv_wr **)&bad_wr);
+@@ -1400,9 +1400,10 @@ void rpcrdma_post_recvs(struct rpcrdma_xprt *r_xprt, int needed)
+ 			--count;
  		}
  	}
-@@ -1363,10 +1386,127 @@ static void discard_partial_frame(struct macb_queue *queue, unsigned int begin,
- 	 */
- }
- 
-+static int macb_xdp_submit_frame(struct macb *bp, struct xdp_frame *xdpf,
-+				 struct net_device *dev, bool dma_map,
-+				 dma_addr_t addr)
-+{
-+	enum macb_tx_buff_type buff_type;
-+	struct macb_tx_buff *tx_buff;
-+	int cpu = smp_processor_id();
-+	struct macb_dma_desc *desc;
-+	struct macb_queue *queue;
-+	unsigned int next_head;
-+	unsigned long flags;
-+	dma_addr_t mapping;
-+	u16 queue_index;
-+	int err = 0;
-+	u32 ctrl;
 +
-+	queue_index = cpu % bp->num_queues;
-+	queue = &bp->queues[queue_index];
-+	buff_type = dma_map ? MACB_TYPE_XDP_NDO : MACB_TYPE_XDP_TX;
-+
-+	spin_lock_irqsave(&queue->tx_ptr_lock, flags);
-+
-+	/* This is a hard error, log it. */
-+	if (CIRC_SPACE(queue->tx_head, queue->tx_tail, bp->tx_ring_size) < 1) {
-+		netif_stop_subqueue(dev, queue_index);
-+		netdev_dbg(bp->dev, "tx_head = %u, tx_tail = %u\n",
-+			   queue->tx_head, queue->tx_tail);
-+		err = -ENOMEM;
-+		goto unlock;
-+	}
-+
-+	if (dma_map) {
-+		mapping = dma_map_single(&bp->pdev->dev,
-+					 xdpf->data,
-+					 xdpf->len, DMA_TO_DEVICE);
-+		if (unlikely(dma_mapping_error(&bp->pdev->dev, mapping))) {
-+			err = -ENOMEM;
-+			goto unlock;
-+		}
-+	} else {
-+		mapping = addr;
-+		dma_sync_single_for_device(&bp->pdev->dev, mapping,
-+					   xdpf->len, DMA_BIDIRECTIONAL);
-+	}
-+
-+	next_head = queue->tx_head + 1;
-+
-+	ctrl = MACB_BIT(TX_USED);
-+	desc = macb_tx_desc(queue, next_head);
-+	desc->ctrl = ctrl;
-+
-+	desc = macb_tx_desc(queue, queue->tx_head);
-+	tx_buff = macb_tx_buff(queue, queue->tx_head);
-+	tx_buff->ptr = xdpf;
-+	tx_buff->type = buff_type;
-+	tx_buff->mapping = dma_map ? mapping : 0;
-+	tx_buff->size = xdpf->len;
-+	tx_buff->mapped_as_page = false;
-+
-+	ctrl = (u32)tx_buff->size;
-+	ctrl |= MACB_BIT(TX_LAST);
-+
-+	if (unlikely(macb_tx_ring_wrap(bp, queue->tx_head) == (bp->tx_ring_size - 1)))
-+		ctrl |= MACB_BIT(TX_WRAP);
-+
-+	/* Set TX buffer descriptor */
-+	macb_set_addr(bp, desc, mapping);
-+	/* desc->addr must be visible to hardware before clearing
-+	 * 'TX_USED' bit in desc->ctrl.
-+	 */
-+	wmb();
-+	desc->ctrl = ctrl;
-+	queue->tx_head = next_head;
-+
-+	/* Make newly initialized descriptor visible to hardware */
-+	wmb();
-+
-+	spin_lock(&bp->lock);
-+	macb_writel(bp, NCR, macb_readl(bp, NCR) | MACB_BIT(TSTART));
-+	spin_unlock(&bp->lock);
-+
-+	if (CIRC_SPACE(queue->tx_head, queue->tx_tail, bp->tx_ring_size) < 1)
-+		netif_stop_subqueue(dev, queue_index);
-+
-+unlock:
-+	spin_unlock_irqrestore(&queue->tx_ptr_lock, flags);
-+
-+	if (err)
-+		macb_tx_release_buff(xdpf, buff_type, 0);
-+
-+	return err;
-+}
-+
-+static int gem_xdp_xmit(struct net_device *dev, int num_frame,
-+			struct xdp_frame **frames, u32 flags)
-+{
-+	struct macb *bp = netdev_priv(dev);
-+	u32 xmitted = 0;
-+	int i;
-+
-+	if (!macb_is_gem(bp))
-+		return -EOPNOTSUPP;
-+
-+	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
-+		return -EINVAL;
-+
-+	for (i = 0; i < num_frame; i++) {
-+		if (macb_xdp_submit_frame(bp, frames[i], dev, true, 0))
-+			break;
-+
-+		xmitted++;
-+	}
-+
-+	return xmitted;
-+}
-+
- static u32 gem_xdp_run(struct macb_queue *queue, void *buff_head,
--		       unsigned int len)
-+		       unsigned int len, dma_addr_t addr)
- {
- 	struct net_device *dev;
-+	struct xdp_frame *xdpf;
- 	struct bpf_prog *prog;
- 	struct xdp_buff xdp;
- 
-@@ -1393,6 +1533,18 @@ static u32 gem_xdp_run(struct macb_queue *queue, void *buff_head,
- 			break;
- 		}
- 		goto out;
-+	case XDP_TX:
-+		xdpf = xdp_convert_buff_to_frame(&xdp);
-+
-+		if (unlikely(!xdpf)) {
-+			act = XDP_DROP;
-+			break;
-+		}
-+
-+		if (macb_xdp_submit_frame(queue->bp, xdpf, dev, false,
-+					  addr))
-+			act = XDP_DROP;
-+		goto out;
- 	default:
- 		bpf_warn_invalid_xdp_action(dev, prog, act);
- 		fallthrough;
-@@ -1480,7 +1632,7 @@ static int gem_rx(struct macb_queue *queue, struct napi_struct *napi,
- 
- 		if (first_frame) {
- 			if (last_frame) {
--				ret = gem_xdp_run(queue, buff_head, data_len);
-+				ret = gem_xdp_run(queue, buff_head, data_len, addr);
- 				if (ret == XDP_REDIRECT)
- 					xdp_flush = true;
- 
-@@ -4620,6 +4772,7 @@ static const struct net_device_ops macb_netdev_ops = {
- 	.ndo_hwtstamp_get	= macb_hwtstamp_get,
- 	.ndo_setup_tc		= macb_setup_tc,
- 	.ndo_bpf		= gem_xdp,
-+	.ndo_xdp_xmit		= gem_xdp_xmit,
- };
- 
- /* Configure peripheral capabilities according to device tree
-@@ -5920,8 +6073,8 @@ static int macb_probe(struct platform_device *pdev)
- 
- 	if (macb_is_gem(bp))
- 		dev->xdp_features = NETDEV_XDP_ACT_BASIC |
--				    NETDEV_XDP_ACT_REDIRECT;
++out_dec:
+ 	if (atomic_dec_return(&ep->re_receiving) > 0)
+ 		complete(&ep->re_done);
 -
-+				    NETDEV_XDP_ACT_REDIRECT |
-+				    NETDEV_XDP_ACT_NDO_XMIT;
- 	netif_carrier_off(dev);
- 
- 	err = register_netdev(dev);
+ out:
+ 	trace_xprtrdma_post_recvs(r_xprt, count);
+ 	ep->re_receive_count += count;
 -- 
-2.52.0
+2.43.0
 
 
