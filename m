@@ -1,203 +1,157 @@
-Return-Path: <netdev+bounces-259970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259975-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iGXNIeIinGkZ/wMAu9opvQ
-	(envelope-from <netdev+bounces-259970-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 10:50:26 +0100
+	id 0OQYIy8lnGkeAAQAu9opvQ
+	(envelope-from <netdev+bounces-259975-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 11:00:15 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01A0E174366
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 10:50:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19C381746AE
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 11:00:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E8B383009561
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:50:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7F6743003334
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:58:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4FB734D38B;
-	Mon, 23 Feb 2026 09:50:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 071FA352926;
+	Mon, 23 Feb 2026 09:58:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ddee/CP6"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=uter.be header.i=@uter.be header.b="gqxjkDRM"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from lounge.grep.be (lounge.grep.be [144.76.219.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 745D434EF15;
-	Mon, 23 Feb 2026 09:50:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED5B34A785;
+	Mon, 23 Feb 2026 09:58:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771840205; cv=none; b=SKzlDVVlmnAzGjSgSNRDxdTHjzdQEkEI8byE6P/qe10dWNucQZt3k7t0gzM0OiKde88OlLqdZ/OvZeogNKJmq7t3uLtlXMS7hAE5TS9ALHl4RAXKdVUVj0HOmixUV3apDAAg38JW/P3KkwPnev7Lu9EW3+/XNxjOwBCel50fXZk=
+	t=1771840704; cv=none; b=phG1QddaaHWpTBpckMc9qL2K5VhXsRvdEh/NMVCqTE/2kEs4xUIYqT4UXInBDSptEX6+OOCDWG2okzddwwZnOraBdbnwHJ67R9DEY+119rqWog0mo8K9F6lCiGKBUEPgPYrmUE+UcUwPq4V2Ocw2aSjGvijtALF7yh2Ps/FlIRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771840205; c=relaxed/simple;
-	bh=CQaerqaO94SUvC0RBkpmPblTp23xUve9HixX4t4j2L4=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=gKHsCG5D54o/581wDd0f+2zj7qkOHyLkYg/1qISBG4kOzLvYjVCnlnrpvDdRtzPuSUBMiiIkLgwshRj5IaStScjgaqtbTWjTuaQUejU2RuED9vgrTI+ut4SwATDWloBRn3JQJ4wHXBDZLAmZc6pnnYUPd0aKWbDYUWzsmrQeLNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ddee/CP6; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=h1qemJ9T19BWX8RspLLamHrXeBfB/46GJPlusAb73Gw=; b=ddee/CP6H2pArVn5J7X3sQ1ibc
-	av2S6hElHtr7a03FoNfuDzly0TTL8FhQCTdg4i9d4ONJ4hd/FcbRA1+IAyFXWnLTd3pp1u9ra0SNi
-	LfaZpMD7JE5aqbnf3MWBFfJOXAd59eUlNly8mDt9JiY7seqXeRyBu4p6kLfKg7YCV+w8gEQinWyAM
-	J5p+k+1BVe0u6Wk5X8fYSuRvcQEZeKIsa3ZzI7sQcEhNcWGiOAsavHm0jrHsrCXy1v3RE7Ne068gq
-	fe4TKnioGvAYyBKjzCwyeLq/PPSXhaItA/RJSFniE2wREn5WUNbT9LLwXJJUDS7L3RGVB7UH05TAI
-	uKeLFmUA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:47460 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	s=arc-20240116; t=1771840704; c=relaxed/simple;
+	bh=Iw0Gt16U9GaQulC5u4A0rgAlC9ecuwz937bM6cVUjmI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oGTlkKEqC5JVEnDwmr71AaTbB8RkHH5oFRwYHm7fldq5u7fcMqQK+mfpvxpTk6uXjZBjtV/9G4G+Aj0c4scZOPLg8TpRayKB4hkm35JuxbwhWXx+NBYllfx2Ul/C4phy5031g4LGAZk5O0uaJf6gSFRWTthqGb+7mQOCGiLT8nQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uter.be; spf=pass smtp.mailfrom=uter.be; dkim=pass (2048-bit key) header.d=uter.be header.i=@uter.be header.b=gqxjkDRM; arc=none smtp.client-ip=144.76.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uter.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uter.be
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=uter.be;
+	s=2021.lounge; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=l7ur/xMoIwQ2QmfUHV3rfzePMQaZM3DKESy7NxWDgx8=; b=gqxjkDRMi7UMD8moDQ7aD/9Mxa
+	rsXMoJy5UeyWwvNNBxUgyP4vQXsGZpxY/B0qa/2FR7ThWKP7mrhZHFoLstJljE9hWt3UC05uCJGkW
+	kJqb0IIMN83A25VYXzzIbfDFEXBh09pNqJSHlZzbPCTo9gvWcQvp1+pE3VhWa7XWnJYYIDf3MXL2r
+	q9Vww+gEZs/lMrOHEH/4+TYXHcyUh/N/X3qsmSMOlcqMN8YkoXuk2TJcFHwi5PZ9j3H/udfXw1NH2
+	sB+qvScv+YCHGgX96t1wM4KM2gvgWn44NXzeEqDpu8gHz7QK3iw4Q6uKthh/2cz9Vx8dalwiVbBRP
+	t4rdB6QQ==;
+Received: from [102.39.233.88] (helo=pc220518)
+	by lounge.grep.be with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vuSLM-000000003oU-2mCW;
-	Mon, 23 Feb 2026 09:35:08 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vuSLF-0000000ASci-42kh;
-	Mon, 23 Feb 2026 09:35:01 +0000
-In-Reply-To: <aZwfAFJQcp9f0niI@shell.armlinux.org.uk>
-References: <aZwfAFJQcp9f0niI@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Frank Li <Frank.Li@nxp.com>,
-	imx@lists.linux.dev,
+	(envelope-from <w@uter.be>)
+	id 1vuSQg-0000000F0gb-2Jmf;
+	Mon, 23 Feb 2026 10:40:38 +0100
+Received: from wouter by pc220518 with local (Exim 4.99.1)
+	(envelope-from <w@uter.be>)
+	id 1vuSQU-00000000uTV-3zJQ;
+	Mon, 23 Feb 2026 11:40:26 +0200
+Date: Mon, 23 Feb 2026 11:40:26 +0200
+From: Wouter Verhelst <w@uter.be>
+To: Hristo Venev <hristo@venev.name>
+Cc: Donald Hunter <donald.hunter@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Vinod Koul <vkoul@kernel.org>
-Subject: [PATCH net-next 10/10] net: stmmac: qcom-ethqos: convert to
- set_clk_tx_rate() method
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, nbd@other.debian.org
+Subject: Re: [PATCH] netlink: specs: add specification for NBD
+Message-ID: <aZwgiv0vPWPybUF-@pc220518.home.grep.be>
+References: <20260215180309.2255721-3-hristo@venev.name>
+ <m2o6lnlg2y.fsf@gmail.com>
+ <6a1339999b091edaaa15e34aceb7961dfc61581b.camel@venev.name>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vuSLF-0000000ASci-42kh@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Mon, 23 Feb 2026 09:35:01 +0000
+In-Reply-To: <6a1339999b091edaaa15e34aceb7961dfc61581b.camel@venev.name>
+X-Speed: Gates' Law: Every 18 months, the speed of software halves.
+Organization: none
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[uter.be:s=2021.lounge];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
+	DMARC_POLICY_SOFTFAIL(0.10)[uter.be : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259970-lists,netdev=lfdr.de,kernel];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-259975-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org,toxicpanda.com,kernel.dk,other.debian.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
+	DKIM_TRACE(0.00)[uter.be:-];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.961];
+	FROM_NEQ_ENVFROM(0.00)[w@uter.be,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	NEURAL_HAM(-0.00)[-0.996];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,rmk-PC.armlinux.org.uk:mid,qualcomm.com:email,armlinux.org.uk:email]
-X-Rspamd-Queue-Id: 01A0E174366
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,pc220518.home.grep.be:mid]
+X-Rspamd-Queue-Id: 19C381746AE
 X-Rspamd-Action: no action
 
-Set the RGMII link clock using the set_clk_tx_rate() method rather than
-coding it into the .fix_mac_speed() method. This simplifies ethqos's
-ethqos_fix_mac_speed().
+On Tue, Feb 17, 2026 at 07:40:33PM +0200, Hristo Venev wrote:
+> On Tue, 2026-02-17 at 12:17 +0000, Donald Hunter wrote:
+> > There are yamllint errors:
+> > 
+> > make -C tools/net/ynl lint
+> > make: Entering directory '/home/donaldh/net-next/tools/net/ynl'
+> > yamllint ../../../Documentation/netlink/specs
+> > ../../../Documentation/netlink/specs/nbd.yaml
+> >   159:81    error    line too long (104 > 80 characters)  (line-
+> > length)
+> >   169:6     error    syntax error: expected <block end>, but found
+> > '<block mapping start>' (syntax)
+> >   170:7     error    wrong indentation: expected 5 but found 6 
+> > (indentation)
+> 
+> Thanks, I will fix the lint errors in v2.
+> 
+> > > +doc: See :file:`drivers/block/nbd.c`
+> > 
+> > Prefer to see a meaningful doc string here.
+> 
+> I will add more proper documentation in v2. I couldn't find any
+> existing documentation of this netlink interface, so I guess I will
+> write it myself.
 
-Tested-by: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 21 ++++++++++---------
- 1 file changed, 11 insertions(+), 10 deletions(-)
+As luck would have it, before I saw this message, I had been wanting to
+work on some of the messages that nbd-client still needed, and so I
+asked an LLM to analyze the code and generate some docs for me.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index 153f6abc77cd..ad5b5d950fff 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -103,7 +103,6 @@ struct qcom_ethqos {
- 	void (*configure_func)(struct qcom_ethqos *ethqos,
- 			       phy_interface_t interface, int speed);
- 
--	unsigned int link_clk_rate;
- 	struct clk *link_clk;
- 	struct phy *serdes_phy;
- 	int serdes_speed;
-@@ -175,19 +174,20 @@ static void rgmii_dump(void *priv)
- 		rgmii_readl(ethqos, EMAC_SYSTEM_LOW_POWER_DEBUG));
- }
- 
--static void
--ethqos_update_link_clk(struct qcom_ethqos *ethqos, int speed)
-+static int ethqos_set_clk_tx_rate(void *bsp_priv, struct clk *clk_tx_i,
-+				  phy_interface_t interface, int speed)
- {
-+	struct qcom_ethqos *ethqos = bsp_priv;
- 	long rate;
- 
--	if (!phy_interface_mode_is_rgmii(ethqos->phy_mode))
--		return;
-+	if (!phy_interface_mode_is_rgmii(interface))
-+		return 0;
- 
- 	rate = rgmii_clock(speed);
--	if (rate > 0)
--		ethqos->link_clk_rate = rate * 2;
-+	if (rate < 0)
-+		return rate;
- 
--	clk_set_rate(ethqos->link_clk, ethqos->link_clk_rate);
-+	return clk_set_rate(ethqos->link_clk, rate * 2);
- }
- 
- static void
-@@ -643,7 +643,6 @@ static void ethqos_fix_mac_speed(void *priv, phy_interface_t interface,
- {
- 	struct qcom_ethqos *ethqos = priv;
- 
--	ethqos_update_link_clk(ethqos, speed);
- 	ethqos_configure(ethqos, interface, speed);
- }
- 
-@@ -821,12 +820,14 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
- 				     "Failed to get serdes phy\n");
- 
- 	ethqos->serdes_speed = SPEED_1000;
--	ethqos_update_link_clk(ethqos, SPEED_1000);
-+	ethqos_set_clk_tx_rate(ethqos, NULL, plat_dat->phy_interface,
-+			       SPEED_1000);
- 
- 	qcom_ethqos_set_sgmii_loopback(ethqos, true);
- 	ethqos_set_func_clk_en(ethqos);
- 
- 	plat_dat->bsp_priv = ethqos;
-+	plat_dat->set_clk_tx_rate = ethqos_set_clk_tx_rate;
- 	plat_dat->fix_mac_speed = ethqos_fix_mac_speed;
- 	plat_dat->dump_debug_regs = rgmii_dump;
- 	plat_dat->ptp_clk_freq_config = ethqos_ptp_clk_freq_config;
+Heed the "LLM" part. It's probably not perfect. But it could be a good
+starting point. Or not. At any rate, you can find it here:
+
+https://github.com/NetworkBlockDevice/nbd/blob/master/doc/netlink-proto.md
+
 -- 
-2.47.3
-
+"I never had a C in history!"
+"Yeah, but there was so much less of it when you were my age!"
+ -- Joe Brockmeier recounting a conversation with his father, cfgmgmtcamp 2026, Ghent
 
