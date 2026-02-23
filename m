@@ -1,248 +1,260 @@
-Return-Path: <netdev+bounces-259936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259937-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UIGBFssNnGly/QMAu9opvQ
-	(envelope-from <netdev+bounces-259936-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:20:27 +0100
+	id IICoL5QQnGna/QMAu9opvQ
+	(envelope-from <netdev+bounces-259937-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:32:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6F47172FC9
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:20:26 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BEAA17310A
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:32:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 712F23007E20
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 08:20:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A0B0530214CB
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 08:32:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F433348440;
-	Mon, 23 Feb 2026 08:20:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51496346ADC;
+	Mon, 23 Feb 2026 08:32:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="uByV67d6"
+	dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b="OifF7AcG"
 X-Original-To: netdev@vger.kernel.org
-Received: from MEUPR01CU001.outbound.protection.outlook.com (mail-australiasoutheastazolkn19010000.outbound.protection.outlook.com [52.103.73.0])
+Received: from mx0b-00206402.pphosted.com (mx0b-00206402.pphosted.com [148.163.152.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99CC92BE03B;
-	Mon, 23 Feb 2026 08:20:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.73.0
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771834807; cv=fail; b=G/4hFpTnGHkph52EX4ubH4IzcgkJ82ZubGOMgRh34zQigX94y+k8hdbKbP4DVAEuquwuxO+Tn8CtLiKbauaU8n3HkWho1l8oCPhh6w36Wxot4YcqI+iojF5TI5dirpPsc12jEZGvpKuUF95QGlYQYbVoIn+h4f254b6tsWkbeJA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771834807; c=relaxed/simple;
-	bh=F5E/fRlt5uKVynWIcLMrUhPRDFvJaUnf35v8XPoQTIQ=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=SlUXgqO93vk9ICwabOQhlJY8ZkL9RKxkES/LAPOsVqCezggnXW9URQbzdOizKpEI0W4AjuECam6mDVL1XpGkzdTRMGXhzs8keBjJ5fKmJDdvu5ESeNw98IF+xAzb4DdMcFxKDjv5jFsDbBBXP8cqDIyV+bhREul+6AnBJhQEc5U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=uByV67d6; arc=fail smtp.client-ip=52.103.73.0
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hENWdQJc3xZZVI42UzfqB/sJz2Na+g+cYU+Rxsp6jitp7tmkB30Z+du55kYdvQX5kalL1NFhaBzwLMP75u8l7n0xs3DmYo8jcLb2tsZLAQ/OmeCUHZAtzGEnx3EYfNGMa9YiVx5bP6pnnXvdO8c5H9zJL6aTScimsVKKfGoeSW1mtxedOAfmU7zbMZS50qMdN1Kcy3RlVTYW0viW2fOZG5KWKJycIwpjXy6kdUu6c2PLUvA0PMlGhD78NQ51/c+KlMz1du1EjXXDa5Sfed611VpWHiD5CCfZUthCiSZkMtZCZJX+aByWPbzgNY6pzCJt36+xmU/L2gqt2aMSPTcmNw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GFBdknx/i46GhR7pNJc4IdwPfOmRJRbNMSFK6setJ/Y=;
- b=TjH+ecou0F95Tkt7CfzFEkzOcw+JkJ4L/MrBw4QR2HKzxM1NB6j8jysR0vVagc6cWgtdFh7N8uVAJs1WVDAhOfxzbyToU4aKQ8OEzOVHi4hG2G1MGLaGlH1ct7Xlk2uJEOrm+BVpNozI8YE6kpMF2kHIkglDtekfXdUAwXEeXNeCDWsIwyCvnf/IxQhfnVP6WoVAiR+J4cu8ICg1mo17Ov6TOMWVsn1AieIxtYwNrUe8dXlagHJHpoYphAE5XZn7lUGd/uPaJdPHWD054XhxFJXI5Kl6qmlSfJA3Q0B6iYWultskcjaFDSmTigbjAyhoQe1aBkjOkVBsr9S9Udlkxw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GFBdknx/i46GhR7pNJc4IdwPfOmRJRbNMSFK6setJ/Y=;
- b=uByV67d6fsE4lnA+fc3wXLa5I/8UAEt8jFqrOmtckP1CHHaioA7sFwxlHlKq3/Hn+W6FjrHRHj4NSldTNulEFltNKpGc0/YukI49CTcWz+1+Y9ojxUtBnGGCRnbLJ7rRutP8lkisxPqg2uIW6knZDeXSosyQ6zjuFQPgJgbxNyJo/y6/cidGHumYuxZGzhr8gQGx0sSkz5GL1wWr7d2sc77KFvQ8cW6N9UZfT3+gs5Dva2bjKFPwEWz6zzlM0RTG7VemzNCh7EiVYR5Yo0fE7PbFCIRVvSIQ026jnOTbgfNkT/XGSi7VMuU9jubIEy+3KeNlT+dydkFmmnVSdAxehQ==
-Received: from SYBPR01MB7881.ausprd01.prod.outlook.com (2603:10c6:10:1b0::5)
- by SYBPR01MB7836.ausprd01.prod.outlook.com (2603:10c6:10:1b3::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.21; Mon, 23 Feb
- 2026 08:20:01 +0000
-Received: from SYBPR01MB7881.ausprd01.prod.outlook.com
- ([fe80::7cd2:d6e8:3fa0:5f0c]) by SYBPR01MB7881.ausprd01.prod.outlook.com
- ([fe80::7cd2:d6e8:3fa0:5f0c%5]) with mapi id 15.20.9632.017; Mon, 23 Feb 2026
- 08:20:01 +0000
-From: Junrui Luo <moonafterrain@outlook.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Junrui Luo <moonafterrain@outlook.com>, Ioana Ciornei
-	<ioana.ciornei@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>, Yuhao Jiang <danisjiang@gmail.com>
-Subject: Re: [PATCH net] dpaa2-switch: validate num_ifs to prevent
- out-of-bounds write
-Thread-Topic: [PATCH net] dpaa2-switch: validate num_ifs to prevent
- out-of-bounds write
-Thread-Index: AQHcpJkqjUpnrKDqJ0SMPk6OlAycGQ==
-Date: Mon, 23 Feb 2026 08:20:01 +0000
-Message-ID:
- <SYBPR01MB7881DE7EB6C664763CAFE851AF77A@SYBPR01MB7881.ausprd01.prod.outlook.com>
-Accept-Language: en-US, zh-CN
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SYBPR01MB7881:EE_|SYBPR01MB7836:EE_
-x-ms-office365-filtering-correlation-id: 6d401eaf-686a-4306-04d1-08de72b456fd
-x-ms-exchange-slblob-mailprops:
- znQPCv1HvwXZ5XHxNrJCjRnjimRBgM6S31bMiv4b12i5wt+OnSTG2oJZIDl6ZSXFbchJx5nQe3hVfDDg1weW9xTdoKW5s0cV6Vk+MGjVqCtjsNVeHrt2NYwTvXTeYEi9DkfV613rzIqrPOO9GAp/N8hWq0WUIADbj+SfrACU8lZtlTJMYWtpUPjBgfG4x3gmK7HiWM+2Khf4qmniNW2bmGIsjrTPwVGdDOkndpfHUlHP2ULco5FVqS1z5J01GTQsW/lRKDc1gvFvZ+bByM7Jx4VlgGRdfqDVKxviL7tWzyXgbbHxllQeD7uHyApJC8hh3p8BmCSMCYqSgO5D9O2yia9CAsBFtsThLvlXs0dEQPxwtS7iIpqwWv2ApwPkzYeu+hxoq0CCzGeD/HWhEeuTsOb3p7Jo72iV8ZqAeWr19EJUzP009/xhU4vDqY6JGpessuFIfg0u7KO2VLLiKp+990pcTQI29ukrxLwRdg5AnRPxNbihTKrJXZkybSa/3IazRznvBu1WfIwjO68wbVGUNKB3gYF6bsafdGDiVYcUV6DCxURDnaz0BL4KoUCHQ6SfPr7pitZ8fAqFrzp28b0IgLORk7dDKHX8Ol+X2+FIMsu5PPVLvVm6U0UimU+F2opznuLZu7dZ/spt8YylDo2FY97tARQ+IcLeMEPKTCo5G5IoDw/QEmNqqWIjB7X3wxOOA18qhLWl/u3xPGhVcmbVn2mwsAhYNDoV8tNenhnp3x9A5rJlEzKUBKzcUXNw894Bgrzf+a2riqw=
-x-microsoft-antispam:
- BCL:0;ARA:14566002|461199028|31061999003|51005399006|8062599012|8060799015|15030799006|15080799012|19110799012|4295299021|40105399003|440099028|3412199025|10035399007|102099032|1710799026;
-x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?ugJYF/muZFeXZlxA4YQKUXBP5HYR2aiA6im9FkS1RuVfBRU9MXbQe6XYcw?=
- =?iso-8859-1?Q?SQFpPo981r1pdkJaJoWTAlK7ijYAMbuj6SiIUBMugrrFLdsbvsmnvWCw/o?=
- =?iso-8859-1?Q?+rp79cqIbVCzDcbArGjJlFGlSdNptscs0tHd52YNzZ5Zp23c9+W+elIEgK?=
- =?iso-8859-1?Q?feE4xL6fZOmWuhKI82gnKasC4o2hBp555NX1RnWYE8bgsyLejZXcMrcMFd?=
- =?iso-8859-1?Q?YU3b3RmHXBtSxGn0D7sidP01r7eXfsjw2YbQgHkjZkvZbZayCR44wynOzB?=
- =?iso-8859-1?Q?Ybpo8nOQrxed59exMP/N5kIqSQKvHYXtUrh4lOJoXsTDbsZTcXu0XnyJe7?=
- =?iso-8859-1?Q?Cceqx6pk0ck15ZufW9Wz664aUmlQgL2Whxb0j1zw9HDoUVTyIsz+5I3gDw?=
- =?iso-8859-1?Q?7rBz+Eqq7hDmKLyF0SQ3PNmkubax5Y9ZM//0MuHVE+6mFPBVLvAgCO0+ll?=
- =?iso-8859-1?Q?4ZLw5vQqJw5Y0MmHRUarI1pVHiWYVNbSCD3KyE1W+dvP+YNkD4684uYzGa?=
- =?iso-8859-1?Q?+t7pkASB/Uc9gioXwe3F2croNmj0pUm8KuE8zTuflGPrc8+0V/QMga1a9j?=
- =?iso-8859-1?Q?nof7h/OYetOBQn5+1mouvBrej4KqcB2l/Ql96OOdy6cWArGZoqIjsNAXPx?=
- =?iso-8859-1?Q?D6EoiHyELD1a9bJNbPu1jHPMgVyELJXFQQKdf4aiJK+UTcdYvcM550V6hK?=
- =?iso-8859-1?Q?K1y7KzsEToFfQb6Vekpk4Q+Ypa3cKOtQ8s4Imodv/sWfwPP1H/ZJ5Uy03u?=
- =?iso-8859-1?Q?xx2bDFsYT1phFqq967Z3Q1b5XJ/3E9BB5dF7CrDj5Xshoq+zcAq/+gVCE9?=
- =?iso-8859-1?Q?/MhqR1MfKL7af+RLnBqUyuJaMVFT0Nq/ZoO/WeRS6PuJmXVbR6CaX8Fprh?=
- =?iso-8859-1?Q?POEugwcfGUg24lAqWvRSaucIwq10z1gZ0wmSOn1Hn9BQItMjphuRwIlf85?=
- =?iso-8859-1?Q?26eFNj7BrNBk1wZxlwS8m4wCOghcUfmzMz2AP0+kQF1vnaXrY0IgxFwJqB?=
- =?iso-8859-1?Q?8ibg861JjvpIhLoAkPFsruRXEoiYa0v78260krXjBQTHDMJO+5iD9SchEm?=
- =?iso-8859-1?Q?66JzZ0U9jMrZEILDto758oarc61WzOtQVXoAczFoYaqzClh+O97esBMcub?=
- =?iso-8859-1?Q?NQVpvrZKE0wZZHrZKSqJrUsrVs5xaUo9HDvM5Ex3KsWPnLgqaqtZudpa5Z?=
- =?iso-8859-1?Q?3QFqm0PK0lWXV3aKXtji7AhO4+cF4b9QQhqxMTb5UEu+dmN95O+Sn+NCKD?=
- =?iso-8859-1?Q?y9KPm2flCL7W3p2J8SY8b/ILjnepoTYituo0jrQqmSDIhKB8lu9U2pVmDm?=
- =?iso-8859-1?Q?HL1vceUk9K0SrvlCPahwb3ZtvLHQULXu0pOt7V7vKiEjAlG57iqox/eFDX?=
- =?iso-8859-1?Q?uW+iFoyYU9?=
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?YCU7qKefVIoBbqBOV1OBCuwPu58jUjbgtlCvYlr0jBhx4nC4M2c+3PueQd?=
- =?iso-8859-1?Q?nmT3H9uNbT1RT/EsPd2K9UTMm1Nr922O78oqYOgIizFZ1ni0t4ySxIFYLc?=
- =?iso-8859-1?Q?SyFmDXWFMfvuYpbb6mtzSUkMTYLPcJGjLDTAFRY+Wg1osXepaRBH2KQeOK?=
- =?iso-8859-1?Q?SDCILlH29MU/parXh+XFhsJSZOBX+axFa5WzJQyIIjoLEA0rWR+8Mx/Xru?=
- =?iso-8859-1?Q?OVnYcZLcd4z/sIMl0nH6HD47kvZQo1ON4dekcdN5kj9a8ODdT/NycuSjHg?=
- =?iso-8859-1?Q?aQmQ2Lt06DjerS1BNUaUtzGGuhwWRJT4+c+O6AqWO5x5LA2lxK42xM/rul?=
- =?iso-8859-1?Q?RKnOnzOaZgveYEyVd4LPtd4Gch/mxKM3ns/sq5tjAT1S1ZKNqufCQ1n7ap?=
- =?iso-8859-1?Q?rtic/Erfu1HQ3AUdOp3uKboERsHZkjjZ36dsUKCrNFTmERNNSwyO7LahPF?=
- =?iso-8859-1?Q?ygQ/4cRyONg/2IrbdWIn2Hd/JJxy1+0fKy15JJIzDKt2jlNOKR+Dyb7iVD?=
- =?iso-8859-1?Q?Gewv/2lIBJlwc7cWkrNpjnKsK2Yh1bMdQJSCgyRjJcoi90E7GSG+LK6BEg?=
- =?iso-8859-1?Q?S504GJ4J/DvHJhWCbrLieK+FbGTfEH/Ndkpjz4g9V/w33FQYGCCiWUFGia?=
- =?iso-8859-1?Q?XmQKehfR/bWDa+YqxDpbDQmtq/d+gWNhEdFKOsdVNcY4VMBAGXcSOBzGAN?=
- =?iso-8859-1?Q?YM2uc3V1TyfHeN9lS3cOLrzqcQ6Is2iedmS0K2JMOX6YE6jC68zHmc1UqR?=
- =?iso-8859-1?Q?K3CQSOrH0Xzo69xAqoHJwtJfuYZzxcVELaxMaU2crHjBWSXFoIHqLDVg4R?=
- =?iso-8859-1?Q?PSk3akD5mp3U+x5MOyxc+s92EWxjbp2azgL7K/2YqAiF/BqgSdB6dU64Ng?=
- =?iso-8859-1?Q?swxF3OHIYpquulM1b0mFz5w9aB3u8coLKKMPOHeyfplN2UsPs5i4YzA/5p?=
- =?iso-8859-1?Q?q2LmQK+2jp8EyJVavLedDmhA+2cdw8ND3GXFOg/Ow6lFuqNqP0Mrsdtlmf?=
- =?iso-8859-1?Q?hLrSJKphvG36zq8SxOGw/cb1nsIL4EtWEyYIgdP4cwk3BxvHcmZFjwk8ki?=
- =?iso-8859-1?Q?Aa4ZrO/Pwt2GMD3J3OHo4wvYN0LUORB9FeRVOO73c3/wm8pGHibXesAnAO?=
- =?iso-8859-1?Q?cvuPBKV58E2T5xquRolpXRehI3hC7WOhTwCOklNmORmcwHIb0fODCHJyzQ?=
- =?iso-8859-1?Q?NewTDwNjoE4I7iOYBCqkMMK+TOXQkwe5b1dFuc8wYa/+AfDe6LNq9oIs4T?=
- =?iso-8859-1?Q?j8Qm7oZBtO/t/nvpy1JoShF3lHUbvgxVpBA2EW43jK4VgXoZw2ljc5ohSI?=
- =?iso-8859-1?Q?iIj5kF5DCcGKZAmMo17azox/vnjtshet20kyLnKZ3UwIrPNvoZp+6mtJKR?=
- =?iso-8859-1?Q?SEToVeHHYTf5FE0tunRA24BYwHkHp1yHIkrChrOYG9rdL1tZ9b3h9iF/a4?=
- =?iso-8859-1?Q?Q8WJIztcAvliUuvn?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C235C78F26;
+	Mon, 23 Feb 2026 08:32:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.152.16
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771835536; cv=none; b=QOJzetMesSr3SM6J5mevI8MRV61aP7UHUvi7VqzQTZZoCAmwEtKf/BQom7aBifn2wGa8ISVZG6o00R1/1+YBVNGGETwVfjNuaxewQ2rZCpAY1IDvHTDO4ZpHRH6TX3z1674qe9h3x8uLlqHhIvM0vy2S5Hm5+X0yEv3W4KT8M1Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771835536; c=relaxed/simple;
+	bh=h8x7tfbxgKI3WKCo9c1YmJnbeHPbTwj37yYi3UrYOyQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=psB+fZr3qDxazNQCCDX/J91z1h6gJa0lVDf3WtL2sd1Y+UTJVtEYz2nNkAkly6AajQpXF+L5S8Ggb2g8IgUmzb4gtsjRqc0Xx0tH70kk90GqZ28tOZZAuNAGO9+uT2Xrr0SBrYwiiqfRl8gUEwPAfzcgbuKqow58PRf2zVcbavw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com; spf=pass smtp.mailfrom=crowdstrike.com; dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b=OifF7AcG; arc=none smtp.client-ip=148.163.152.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=crowdstrike.com
+Received: from pps.filterd (m0354653.ppops.net [127.0.0.1])
+	by mx0b-00206402.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61N4TK2I2920332;
+	Mon, 23 Feb 2026 08:31:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=crowdstrike.com;
+	 h=cc:content-transfer-encoding:content-type:date:from
+	:message-id:mime-version:subject:to; s=default; bh=IS+R75/r6zVVs
+	//GfwEhQiq+hDGhL8rSZLwFni8gym8=; b=OifF7AcGxFYCTYfpvjsC+3ucf8/0i
+	VjOddNMOcnu7909uBCm6WfpKqOnLGFaeASUiK2wc4F3wITLUbcUVjwH46KBnGug2
+	9DOFVac+Qq5ngNUjH/iv3xuw+D+jkHyle9o8r/wlXVXQnYuLi3fv/RhKQIQJloRw
+	2PPGGpbLIBtVardFw22ZkwaMTH0Sejh+kEqrDwtTygjpjk+Q18+1wl+EOL9Zc3/c
+	94UxeL0toy6M4pjciAREYJ+fnnM5AdK4HCJ/Y44mJyHZwkEGExbtifUufeSJ+Can
+	XR6ePj/jcqGdU4Ft+i/V/kkzcXbF7xf++qjll3s4tCsrw/n6ayEJ6xGRQ==
+Received: from mail.crowdstrike.com (dragosx.crowdstrike.com [208.42.231.60] (may be forged))
+	by mx0b-00206402.pphosted.com (PPS) with ESMTPS id 4cfqnjbwhu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 23 Feb 2026 08:31:36 +0000 (GMT)
+Received: from ML-CTVHTF21DX.crowdstrike.sys (10.100.11.122) by
+ 04WPEXCH006.crowdstrike.sys (10.100.11.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Mon, 23 Feb 2026 08:31:30 +0000
+From: Slava Imameev <slava.imameev@crowdstrike.com>
+To: <ast@kernel.org>, <daniel@iogearbox.net>, <andrii@kernel.org>
+CC: <martin.lau@linux.dev>, <eddyz87@gmail.com>, <song@kernel.org>,
+        <yonghong.song@linux.dev>, <john.fastabend@gmail.com>,
+        <kpsingh@kernel.org>, <sdf@fomichev.me>, <haoluo@google.com>,
+        <jolsa@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+        <shuah@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>, <linux-open-source@crowdstrike.com>,
+        Slava Imameev
+	<slava.imameev@crowdstrike.com>
+Subject: [PATCH bpf-next v3 0/2] bpf: Add multi-level pointer parameter support for trampolines
+Date: Mon, 23 Feb 2026 19:31:18 +1100
+Message-ID: <20260223083120.23776-1-slava.imameev@crowdstrike.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SYBPR01MB7881.ausprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6d401eaf-686a-4306-04d1-08de72b456fd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Feb 2026 08:20:01.1871
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SYBPR01MB7836
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: 04WPEXCH005.crowdstrike.sys (10.100.11.69) To
+ 04WPEXCH006.crowdstrike.sys (10.100.11.70)
+X-Disclaimer: USA
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjIzMDA3NSBTYWx0ZWRfX3Jw7IsgGuYka
+ 0aUQOncboiDOTglH+7el1f1QSZ0xITZryLzuv0zfeR5eQec+xY0r9XbQHGa8GB9JvWo6IFw91L5
+ XboFwPQwrjgR6x76w5U61h0PCSEWZc/tSrGJollbm0EP20L/Ak7/E6G7rjAoCyKVWcLJMlLul+I
+ Qjc/eJLDVrdONxBCemsiXdTynqroGDLpCTycc88kSJ28NMVLKx5RzuHcU4pMX32eo3NU2Xm/Vcd
+ qHV3F51F9iI9Spt90FrAwpoZ41cKxX9VWqRfk95S7cqXCons9ZRYFoto9283mzilvgEyP4EK2+y
+ me746vvG+HL/lvEJdjo9P6djhdfHpRymk6s+YrlEbrOqAQSk61IQrD1R3648T0gViLrAkYwcbSL
+ HsfB+U+EwPDKkXaLfr8qerrrNda4rRFtCVva4y30clFOCAPVQpXaYGvrRcdXb6Nw1z7moIhUKeb
+ eSZZ8HeSwVgtSy1JvGA==
+X-Proofpoint-ORIG-GUID: HOfpB4wLN6QKWG72Qf0YFbVc83U4v_mt
+X-Authority-Analysis: v=2.4 cv=UoJu9uwB c=1 sm=1 tr=0 ts=699c1068 cx=c_pps
+ a=1d8vc5iZWYKGYgMGCdbIRA==:117 a=1d8vc5iZWYKGYgMGCdbIRA==:17
+ a=EjBHVkixTFsA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=T2KQ53IYiC3MXPrxx8bB:22 a=GCXdLZfFv8EKBZhKOxZ5:22 a=VwQbUJbxAAAA:8
+ a=QyXUC8HyAAAA:8 a=JRLApV_pkuiehV_KFgYA:9
+X-Proofpoint-GUID: HOfpB4wLN6QKWG72Qf0YFbVc83U4v_mt
+X-Proofpoint-Virus-Version: vendor=nai engine=6800 definitions=11709
+ signatures=596818
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 bulkscore=0 suspectscore=0 malwarescore=0 clxscore=1015
+ adultscore=0 lowpriorityscore=0 impostorscore=0 priorityscore=1501
+ phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2602130000
+ definitions=main-2602230075
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	FAKE_REPLY(1.00)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[outlook.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[outlook.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[crowdstrike.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[crowdstrike.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259936-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_FROM(0.00)[outlook.com];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[outlook.com,nxp.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org,gmail.com];
+	FREEMAIL_CC(0.00)[linux.dev,gmail.com,kernel.org,fomichev.me,google.com,davemloft.net,redhat.com,vger.kernel.org,crowdstrike.com];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259937-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[moonafterrain@outlook.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[outlook.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[slava.imameev@crowdstrike.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[crowdstrike.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,outlook.com:email,outlook.com:dkim]
-X-Rspamd-Queue-Id: A6F47172FC9
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,crowdstrike.com:mid,crowdstrike.com:dkim]
+X-Rspamd-Queue-Id: 6BEAA17310A
 X-Rspamd-Action: no action
 
-On Thu, Feb 19, 2026 at 02:14:07PM -0800, Jakub Kicinski wrote:=0A=
-> > Reported-by: Yuhao Jiang <danisjiang@gmail.com>=0A=
-> > Reported-by: Junrui Luo <moonafterrain@outlook.com>=0A=
-> =0A=
-> Please remove the self-referential reported-by tags. FWIW:=0A=
-> https://github.com/google/security-research/pull/334=0A=
-=0A=
-Will drop in v2.=0A=
-=0A=
-> =0A=
-> > Fixes: f054e3e217e4 ("dpaa2-switch: refactor the egress flooding domain=
- setup")=0A=
-> =0A=
-> This commit looks like refactoring.=0A=
-> Please dig a bit deeper to find the real commit in which the bug was=0A=
-> added.=0A=
-=0A=
-I found the actual vulnerable pattern was introduced in:=0A=
-=0A=
-539dda3c5d19 ("staging: dpaa2-switch: properly setup switching domains")=0A=
-=0A=
-Will fix in v2.=0A=
-=0A=
-> > +	if (ethsw->sw_attr.num_ifs >=3D DPSW_MAX_IF) {=0A=
-> =0A=
-> Unclear to me from a quick look at the code and the commit message why=0A=
-> we reject num_ifs =3D=3D DPSW_MAX_IF. I see there are some references to =
-a=0A=
-> control interface in egress flooding, is that why?=0A=
-> =0A=
-> Please explain clearly.=0A=
-=0A=
-dpaa2_switch_fdb_get_flood_cfg() appends the control=0A=
-interface entry after all matched ports:=0A=
-=0A=
-      for (j =3D 0; j < ethsw->sw_attr.num_ifs; j++)=0A=
-          if (port matches)=0A=
-              cfg->if_id[i++] =3D ethsw->ports[j]->idx;=0A=
-=0A=
-      cfg->if_id[i++] =3D ethsw->sw_attr.num_ifs;=0A=
-=0A=
-When num_ifs =3D=3D 64 and all ports match the flood filter, the loop=0A=
-fills all 64 slots (indices 0-63), then the control interface write=0A=
-goes to cfg->if_id[64].=0A=
-=0A=
-Beyond the array overflow, num_ifs =3D=3D 64 is also functionally broken:=
-=0A=
-build_if_id_bitmap() silently drops any ID >=3D 64:=0A=
-=0A=
-      if (id[i] < DPSW_MAX_IF)=0A=
-          bmap[id[i] / 64] |=3D ...=0A=
-=0A=
-Will clarify this in the v2 commit message.=0A=
-=0A=
-Thanks,=0A=
-Junrui Luo=0A=
+This patch adds BPF verifier support for multi-level pointer parameters
+and return values in BPF trampolines. The implementation treats these
+parameters as SCALAR_VALUE.
+
+Background:
+
+Prior to these changes, accessing multi-level pointer parameters or
+return values through BPF trampoline context arrays resulted in
+verification failures in btf_ctx_access, producing errors such as:
+
+func '%s' arg%d type %s is not a struct
+
+For example, consider a BPF program that logs an input parameter of type
+struct posix_acl **:
+
+SEC("fentry/__posix_acl_chmod")
+int BPF_PROG(trace_posix_acl_chmod, struct posix_acl **ppacl, gfp_t gfp,
+             umode_t mode)
+{
+    bpf_printk("__posix_acl_chmod ppacl = %px\n", ppacl);
+    return 0;
+}
+
+This program failed BPF verification with the following error:
+
+libbpf: prog 'trace_posix_acl_chmod': -- BEGIN PROG LOAD LOG --
+0: R1=ctx() R10=fp0
+; int BPF_PROG(trace_posix_acl_chmod, struct posix_acl **ppacl,
+gfp_t gfp, umode_t mode) @ posix_acl_monitor.bpf.c:23
+0: (79) r6 = *(u64 *)(r1 +16)         ; R1=ctx() R6_w=scalar()
+1: (79) r1 = *(u64 *)(r1 +0)
+func '__posix_acl_chmod' arg0 type PTR is not a struct
+invalid bpf_context access off=0 size=8
+processed 2 insns (limit 1000000) max_states_per_insn 0 total_states 0
+peak_states 0 mark_read 0
+-- END PROG LOAD LOG --
+
+The common workaround involved using helper functions to fetch parameter
+values by passing the address of the context array entry:
+
+SEC("fentry/__posix_acl_chmod")
+int BPF_PROG(trace_posix_acl_chmod, struct posix_acl **ppacl, gfp_t gfp,
+             umode_t mode)
+{
+    struct posix_acl **pp;
+    bpf_probe_read_kernel(&pp, sizeof(ppacl), &ctx[0]);
+    bpf_printk("__posix_acl_chmod %px\n", pp);
+    return 0;
+}
+
+This approach introduced helper call overhead and created inconsistency
+with parameter access patterns.
+
+Improvements:
+
+With this patch, trampoline programs can directly access multi-level
+pointer parameters, eliminating helper call overhead and explicit ctx
+access while ensuring consistent parameter handling. For example, the
+following ctx access with a helper call:
+
+SEC("fentry/__posix_acl_chmod")
+int BPF_PROG(trace_posix_acl_chmod, struct posix_acl **ppacl, gfp_t gfp,
+             umode_t mode)
+{
+    struct posix_acl **pp;
+    bpf_probe_read_kernel(&pp, sizeof(pp), &ctx[0]);
+    bpf_printk("__posix_acl_chmod %px\n", pp);
+    ...
+}
+
+is replaced by a load instruction:
+
+SEC("fentry/__posix_acl_chmod")
+int BPF_PROG(trace_posix_acl_chmod, struct posix_acl **ppacl, gfp_t gfp,
+             umode_t mode)
+{
+    bpf_printk("__posix_acl_chmod %px\n", ppacl);
+    ...
+}
+
+The bpf_core_cast macro can be used for deeper level dereferences,
+as illustrated in the tests added by this patch.
+
+v1 -> v2:
+* corrected maintainer's email
+v2 -> v3:
+* Addressed reviewers feedback:
+	* Changed the register type from PTR_TO_MEM to SCALAR_VALUE.
+	* Modified tests to accommodate SCALAR_VALUE handling.
+* Fixed a compilation error for loongarch
+	* https://lore.kernel.org/oe-kbuild-all/202602181710.tEK6nOl6-lkp@intel.com/
+* Addressed AI bot review
+	* Added a commentary to address a NULL pointer case
+	* Removed WARN_ON
+	* Fixed a commentary
+
+Slava Imameev (2):
+  bpf: Support multi-level pointer params via SCALAR_VALUE for
+    trampolines
+  selftests/bpf: Add trampolines multi-level pointer params test
+    coverage
+
+ kernel/bpf/btf.c                              |  20 +-
+ net/bpf/test_run.c                            | 130 ++++++
+ .../prog_tests/fentry_fexit_multi_level_ptr.c | 206 +++++++++
+ .../selftests/bpf/prog_tests/verifier.c       |   2 +
+ .../progs/fentry_fexit_pptr_nullable_test.c   |  56 +++
+ .../bpf/progs/fentry_fexit_pptr_test.c        |  67 +++
+ .../bpf/progs/fentry_fexit_void_ppptr_test.c  |  38 ++
+ .../bpf/progs/fentry_fexit_void_pptr_test.c   |  71 +++
+ .../bpf/progs/verifier_ctx_multilevel_ptr.c   | 435 ++++++++++++++++++
+ 9 files changed, 1024 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/fentry_fexit_multi_level_ptr.c
+ create mode 100644 tools/testing/selftests/bpf/progs/fentry_fexit_pptr_nullable_test.c
+ create mode 100644 tools/testing/selftests/bpf/progs/fentry_fexit_pptr_test.c
+ create mode 100644 tools/testing/selftests/bpf/progs/fentry_fexit_void_ppptr_test.c
+ create mode 100644 tools/testing/selftests/bpf/progs/fentry_fexit_void_pptr_test.c
+ create mode 100644 tools/testing/selftests/bpf/progs/verifier_ctx_multilevel_ptr.c
+
+-- 
+2.34.1
+
 
