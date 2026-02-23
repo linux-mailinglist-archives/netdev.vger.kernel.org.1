@@ -1,376 +1,223 @@
-Return-Path: <netdev+bounces-259925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259926-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mIzPKCq0m2kJ5AMAu9opvQ
-	(envelope-from <netdev+bounces-259925-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 02:58:02 +0100
+	id +EQfCD3Tm2ma7wMAu9opvQ
+	(envelope-from <netdev+bounces-259926-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 05:10:37 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA53E1715D7
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 02:58:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BAB0F171BBE
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 05:10:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D5DF73009535
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 01:57:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D52083013691
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 04:10:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D05D1CAA68;
-	Mon, 23 Feb 2026 01:57:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8D8825A2C9;
+	Mon, 23 Feb 2026 04:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dRkxqmkz"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Xk6/6nYh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 039758632B
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 01:57:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D811459FA;
+	Mon, 23 Feb 2026 04:10:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771811879; cv=none; b=YGgCQShl6c3+upZGy8K2YXWR8wGPU0WD3ZIeLu9IxlYCzvOEM/mL8BX6a4JSd/yJNrEAeQKFtNYKbO2ftbndrLobFytZJ8r6kDkiNGOsgl7lZkMcSBZ2DmNAchGjsWRdEMcoO+og7+NVoeB1mWfUYRC6oVod6TnNh+f/icisagI=
+	t=1771819832; cv=none; b=W9FKfMKGcTp/6uuqW+tPFqNNgkFbyZz4c5l7Jpbut4zofKL8q0IMpj40CqeQ2CXl1e4kBE02kLnP7Heg2PaGlcOUz8IQ1TH7xmeEHF2cS3mCaqSmtgKQxHvsa1OzG6YLWHKHK6GwPqI2ESgtD1/Up7sPqjp6DcSRFg2T+NMThho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771811879; c=relaxed/simple;
-	bh=/4gziutufUrH0OFdOQhNBLXzMCh+IGZVYu9/0hxCRrg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fVdpnchHq717gpCs4V/y7r8dEPVGuK/5Gh+afiZbz0msnNR0dBZCQjJDrCkvvN0uyEklpLmWbFk+SIMiR3F2tJkjFkBBLCrjqb+/cVWlR6j9oPyp6c2/zLf89OWsFOkHvcGNkWERWC6FN+R8P4YpjirfiGF4xMoG7Axnuwrrnac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dRkxqmkz; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2ad22a5e245so25083295ad.2
-        for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 17:57:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771811876; x=1772416676; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=llR/CDN0qA6HlMSpdCclQMih6ERIQrWO2TnuYjQc/wc=;
-        b=dRkxqmkz4+9D9nN+FHjZ0UWxSnz83ew3lB7ZbJ+lW5/yGaAzTewmsZpLKEDH40MGP2
-         8tpu0O1c0ju5UVwPop0ydHVoPZmDGgURzkpfr1x4LpTIlm5RGhq73xveEvUFMhwbzhow
-         mXeeXG8QbYJm4QyKrzVzrtl/BtFZbVV/5JJMvi7vFX9PfO9o7ur64GrewoQdw/HzY9mo
-         MeaSJq8cirXAdcDOIJTWgV44j/lgX8HEZwU1Pa/fdOoip3CKB6JWbpe98li8eOQnoSL2
-         Vl86ArgKgMDx9IjlsL50he5EMKNZpPrulhDGVHsByzMEa9Md+UlJHG/nAdTMSkUPTag9
-         9/9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771811876; x=1772416676;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=llR/CDN0qA6HlMSpdCclQMih6ERIQrWO2TnuYjQc/wc=;
-        b=lDviIa95WaBkgdjR03p6Ks3tq12+5VftJju5gM21KU0UMFwipw6CarznagXNei54Hx
-         A7jTrg4GiRdhuWqd78234w/mi5sE4umRbSosGZkh3KoMTE3ueKGyRqi8C5RFF91/epbw
-         Mi7HVDChTD8sRAB3yklMYXJkXV7ikZ5k9pdsAGoN2BC1WM+JSxGmnOyvXG17BuAI/m7a
-         F3ONay1PLHtLKLG2jLDl1vUxpw28fL3JzAbKA9b9AyqjOAvxZtY9zSlOC5LB1QnAgzwW
-         /Pl6lr6IVwnMPS49j2eOe/QlZexIKkOcoEZOialkk5/jB6AseRA2ggBtXjt6gxuS1uNI
-         OW5w==
-X-Gm-Message-State: AOJu0YxEFcByef7L4EBFL9Bd1jFp3kFYAz9MUUOmFtqPg6RaiQUVHrfv
-	hMHx1H9Jrtyfsq7AN/i716rfdb4CS9J4m0AxrDdffciMU/igFf99PtOy
-X-Gm-Gg: AZuq6aLYkfPItC1MNtHETSzIg1QM7CaPwEU+Bm/kQIKEGC0/yajIXPxq2wj0+qMAjsR
-	uEsVD/IID17K8hWSj8YSpI5gZwuyNX6/4WpjxVIvbTfwytaycLuAuov5UPDMYW7tFY1uki6VhCB
-	FlFXmssnD9JOvWyd0wN7hCwbf6tGFqfwpa3nEv+YorD+qG5vEwJ2V4gFIKHWii1Jp1ATZZO/0GD
-	f1bNZhuAPCVbbI75qfSYyOps9B5oxzTmCor/yHHXSoHzj3xBBPNo40Gk7WDJAwsKrxRdBgje73Z
-	AUWb5dDwVtOSLeRkwGJ6oQAlaak0AYorgBykE23s4QkCnPXQGVacrcFG9zsiA2DcPrPaKZ948eW
-	wQJly+k8vioBcEjoaI+j0otgfGsOEgdfUE9F3T1itTr7T7jT8mt5qnZor3aBckgbvL8K3rX+W5b
-	HJa38I/yRd682Cn4yDjZqTzv+u3Fo=
-X-Received: by 2002:a17:902:f682:b0:2a8:ac0f:9ae9 with SMTP id d9443c01a7336-2ad7452627amr58120695ad.41.1771811876211;
-        Sun, 22 Feb 2026 17:57:56 -0800 (PST)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ad74f72497sm53662645ad.38.2026.02.22.17.57.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Feb 2026 17:57:55 -0800 (PST)
-Date: Mon, 23 Feb 2026 01:57:50 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Shuah Khan <shuah@kernel.org>, Brendan Jackman <jackmanb@google.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH selftests] selftests: Use ktap helpers for runner.sh
-Message-ID: <aZu0Hka4QRbrsh4z@fedora>
-References: <20260206081704.53215-1-liuhangbin@gmail.com>
+	s=arc-20240116; t=1771819832; c=relaxed/simple;
+	bh=byKsVt5kfARyWMQ+Wys+3V1BZ1fFa9lghRODrpk5D0U=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=WTZ4u5TN2kzcWyprH+FKiTSnuwtREuPfDXd0hmfZEJ+mtB0X591mfB4YUQLZGCl01c77bT8jSvOmQIxxzMesfvKEo3l1TiTLvfjSrEMo1yU9hEBzPrFUlB6HWLYP57RQsOVNf4QnB1/ckedfTverhECAfCvLH/+M0cQuNlb+c70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Xk6/6nYh; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1173)
+	id 5985D20B6F00; Sun, 22 Feb 2026 20:10:31 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5985D20B6F00
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1771819831;
+	bh=eZZalm4VeHuSBsuld5iU0lfQTOovz3kt5YTDAVGflx4=;
+	h=From:To:Subject:Date:From;
+	b=Xk6/6nYhfATPbo5RajVT9cF4RUGAKWOlvNOVOA2rXbbsBhAyMqAcxLAjPGZaIW3og
+	 mWuIRkEh73VnHuQJofBugwNgwzySvlV46uMW+1uEmqO/M2BDTh8wW6cd6LaAlTBLRZ
+	 rgYebxLGe1hC58VVL6H1wULwOhrewT/U1ZyhxCms=
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+To: Erni Sri Satya Vennela <ernis@microsoft.com>,
+	kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	longli@microsoft.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dipayanroy@linux.microsoft.com,
+	ssengar@linux.microsoft.com,
+	shradhagupta@linux.microsoft.com,
+	ernis@linux.microsoft.com,
+	shirazsaleem@microsoft.com,
+	gargaditya@linux.microsoft.com,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v3] net: mana: Add MAC address to vPort logs and clarify error messages
+Date: Sun, 22 Feb 2026 20:08:16 -0800
+Message-ID: <20260223040826.750864-1-ernis@linux.microsoft.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260206081704.53215-1-liuhangbin@gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-259925-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	TAGGED_FROM(0.00)[bounces-259926-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[4];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.999];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,run_kselftest.sh:url,runner.sh:url]
-X-Rspamd-Queue-Id: DA53E1715D7
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BAB0F171BBE
 X-Rspamd-Action: no action
 
-Hi Shuah, Brendan,
+Add MAC address to vPort configuration success message and update error
+message to be more specific about HWC message errors in
+mana_send_request and mana_hwc_send_request.
 
-Any feedback for this patch?
+Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+---
+Changes in v3:
+* Remove the changes from v2 and Update commit message.
+* Use "Enabled vPort ..." instead of "Configured vPort" in
+  mana_cfg_vport.
+* Update error logs in mana_hwc_send_request.
+Changes in v2:
+* Update commit message.
+* Use "Enabled vPort ..." instead of "Configured vPort" in
+  mana_cfg_vport.
+* Add info log in mana_uncfg_vport, mana_gd_verify_vf_version,
+  mana_gd_query_max_resources, mana_query_device_cfg and
+  mana_query_vport_cfg.
+---
+ .../net/ethernet/microsoft/mana/hw_channel.c  | 19 +++++++++++--------
+ drivers/net/ethernet/microsoft/mana/mana_en.c |  8 ++++----
+ 2 files changed, 15 insertions(+), 12 deletions(-)
 
-Thanks
-Hangbin
-On Fri, Feb 06, 2026 at 08:17:04AM +0000, Hangbin Liu wrote:
-> This has been on my todo list for a long time. We should use ktap
-> helpers in runner.sh. I saw Brendan did some work in d9e6269e3303
-> ("selftests/run_kselftest.sh: exit with error if tests fail") to make
-> run_kselftest.sh exit with the correct return value. But we still use a
-> custom solution in runner.sh. Let's convert all the print messages to use
-> formal ktap helpers. Here’s what I changed:
-> 
->   1. Move TAP header from runner.sh to run_kselftest.sh, since run_kselftest.sh
->      is the only caller of run_many().
->   2. In run_kselftest.sh, call run_many() in main process to count the
->      pass/fail numbers.
->   3. In run_kselftest.sh, do not generate kselftest_failures_file; just
->      use ktap_print_totals to report the result.
->   4. In runner.sh run_one(), get the return value and use ktap helpers for
->      all pass/fail reporting. This allows counting pass/fail numbers in the
->      main process.
->   5. In runner.sh run_in_netns(), also return the correct rc, so we can
->      count results during wait.
-> 
-> After the change, the printed result looks like:
-> 
->   not ok 4 4 selftests: clone3: clone3_cap_checkpoint_restore # exit=1
->   # Totals: pass:3 fail:1 xfail:0 xpass:0 skip:0 error:0
-> 
->   ]# echo $?
->   1
-> 
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
->  tools/testing/selftests/kselftest/runner.sh | 83 ++++++++++++---------
->  tools/testing/selftests/run_kselftest.sh    | 21 ++++--
->  2 files changed, 62 insertions(+), 42 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kselftest/runner.sh b/tools/testing/selftests/kselftest/runner.sh
-> index 3a62039fa621..f3307f2d1f48 100644
-> --- a/tools/testing/selftests/kselftest/runner.sh
-> +++ b/tools/testing/selftests/kselftest/runner.sh
-> @@ -1,8 +1,8 @@
-> -#!/bin/sh
-> +#!/bin/bash
->  # SPDX-License-Identifier: GPL-2.0
->  #
->  # Runs a set of tests in a given subdirectory.
-> -export skip_rc=4
-> +. $(dirname "$(readlink -e "${BASH_SOURCE[0]}")")/ktap_helpers.sh
->  export timeout_rc=124
->  export logfile=/dev/stdout
->  export per_test_logging=
-> @@ -44,17 +44,11 @@ tap_timeout()
->  	fi
->  }
->  
-> -report_failure()
-> -{
-> -	echo "not ok $*"
-> -	echo "$*" >> "$kselftest_failures_file"
-> -}
-> -
->  run_one()
->  {
->  	DIR="$1"
->  	TEST="$2"
-> -	local test_num="$3"
-> +	local rc test_num="$3"
->  
->  	BASENAME_TEST=$(basename $TEST)
->  
-> @@ -102,16 +96,17 @@ run_one()
->  	# Command line timeout overrides the settings file
->  	if [ -n "$kselftest_override_timeout" ]; then
->  		kselftest_timeout="$kselftest_override_timeout"
-> -		echo "# overriding timeout to $kselftest_timeout" >> "$logfile"
-> +		ktap_print_msg "overriding timeout to $kselftest_timeout" >> "$logfile"
->  	else
-> -		echo "# timeout set to $kselftest_timeout" >> "$logfile"
-> +		ktap_print_msg "timeout set to $kselftest_timeout" >> "$logfile"
->  	fi
->  
->  	TEST_HDR_MSG="selftests: $DIR: $BASENAME_TEST"
->  	echo "# $TEST_HDR_MSG"
->  	if [ ! -e "$TEST" ]; then
-> -		echo "# Warning: file $TEST is missing!"
-> -		report_failure "$test_num $TEST_HDR_MSG"
-> +		ktap_print_msg "Warning: file $TEST is missing!"
-> +		ktap_test_fail "$test_num $TEST_HDR_MSG"
-> +		rc=$KSFT_FAIL
->  	else
->  		if [ -x /usr/bin/stdbuf ]; then
->  			stdbuf="/usr/bin/stdbuf --output=L "
-> @@ -122,33 +117,37 @@ run_one()
->  		elif [ -x "./ksft_runner.sh" ]; then
->  			cmd="$stdbuf ./ksft_runner.sh ./$BASENAME_TEST"
->  		else
-> -			echo "# Warning: file $TEST is not executable"
-> +			ktap_print_msg "Warning: file $TEST is not executable"
->  
->  			if [ $(head -n 1 "$TEST" | cut -c -2) = "#!" ]
->  			then
->  				interpreter=$(head -n 1 "$TEST" | cut -c 3-)
->  				cmd="$stdbuf $interpreter ./$BASENAME_TEST"
->  			else
-> -				report_failure "$test_num $TEST_HDR_MSG"
-> -				return
-> +				ktap_test_fail "$test_num $TEST_HDR_MSG"
-> +				return $KSFT_FAIL
->  			fi
->  		fi
->  		cd `dirname $TEST` > /dev/null
-> -		((((( tap_timeout "$cmd" 2>&1; echo $? >&3) |
-> +		(((( tap_timeout "$cmd" 2>&1; echo $? >&3) |
->  			tap_prefix >&4) 3>&1) |
-> -			(read xs; exit $xs)) 4>>"$logfile" &&
-> -		echo "ok $test_num $TEST_HDR_MSG") ||
-> -		(rc=$?;	\
-> -		if [ $rc -eq $skip_rc ]; then	\
-> -			echo "ok $test_num $TEST_HDR_MSG # SKIP"
-> -		elif [ $rc -eq $timeout_rc ]; then \
-> -			echo "#"
-> -			report_failure "$test_num $TEST_HDR_MSG # TIMEOUT $kselftest_timeout seconds"
-> +			(read xs; exit $xs)) 4>>"$logfile"
-> +		rc=$?
-> +		if [ "$rc" -eq "$KSFT_PASS" ]; then
-> +			ktap_test_pass "$test_num $TEST_HDR_MSG"
-> +		elif [ "$rc" -eq "$KSFT_SKIP" ]; then
-> +			ktap_test_skip "$test_num $TEST_HDR_MSG"
-> +		elif [ "$rc" -eq "$KSFT_XFAIL" ]; then
-> +			ktap_test_xfail "$test_num $TEST_HDR_MSG"
-> +		elif [ "$rc" -eq "$timeout_rc" ]; then
-> +			ktap_test_fail "$test_num $TEST_HDR_MSG # TIMEOUT $kselftest_timeout seconds"
->  		else
-> -			report_failure "$test_num $TEST_HDR_MSG # exit=$rc"
-> -		fi)
-> +			ktap_test_fail "$test_num $TEST_HDR_MSG # exit=$rc"
-> +		fi
->  		cd - >/dev/null
->  	fi
-> +
-> +	return $rc
->  }
->  
->  in_netns()
-> @@ -164,27 +163,34 @@ in_netns()
->  
->  run_in_netns()
->  {
-> -	local netns=$(mktemp -u ${BASENAME_TEST}-XXXXXX)
->  	local tmplog="/tmp/$(mktemp -u ${BASENAME_TEST}-XXXXXX)"
-> +	local netns=$(mktemp -u ${BASENAME_TEST}-XXXXXX)
-> +	local rc
-> +
->  	ip netns add $netns
->  	if [ $? -ne 0 ]; then
-> -		echo "# Warning: Create namespace failed for $BASENAME_TEST"
-> -		echo "not ok $test_num selftests: $DIR: $BASENAME_TEST # Create NS failed"
-> +		ktap_print_msg "Warning: Create namespace failed for $BASENAME_TEST"
-> +		ktap_test_fail "$test_num selftests: $DIR: $BASENAME_TEST # Create NS failed"
->  	fi
->  	ip -n $netns link set lo up
-> +
->  	in_netns $netns &> $tmplog
-> +	rc=$?
-> +
->  	ip netns del $netns &> /dev/null
-> +	# Cat the log at once to avoid parallel netns logs.
->  	cat $tmplog
->  	rm -f $tmplog
-> +	return $rc
->  }
->  
->  run_many()
->  {
-> -	echo "TAP version 13"
->  	DIR="${PWD#${BASE_DIR}/}"
->  	test_num=0
-> -	total=$(echo "$@" | wc -w)
-> -	echo "1..$total"
-> +	local rc
-> +	pids=()
-> +
->  	for TEST in "$@"; do
->  		BASENAME_TEST=$(basename $TEST)
->  		test_num=$(( test_num + 1 ))
-> @@ -194,10 +200,19 @@ run_many()
->  		fi
->  		if [ -n "$RUN_IN_NETNS" ]; then
->  			run_in_netns &
-> +			pids+=($!)
->  		else
->  			run_one "$DIR" "$TEST" "$test_num"
->  		fi
->  	done
->  
-> -	wait
-> +	# Handle the return values when running in netns.
-> +	for pid in "${pids[@]}"; do
-> +		wait "$pid"
-> +		rc=$?
-> +		[ "$rc" -eq "$KSFT_PASS" ] && KTAP_CNT_PASS=$((KTAP_CNT_PASS+1))
-> +		[ "$rc" -eq "$KSFT_FAIL" ] && KTAP_CNT_FAIL=$((KTAP_CNT_FAIL+1))
-> +		[ "$rc" -eq "$KSFT_SKIP" ] && KTAP_CNT_SKIP=$((KTAP_CNT_SKIP+1))
-> +		[ "$rc" -eq "$KSFT_XFAIL" ] && KTAP_CNT_XFAIL=$((KTAP_CNT_XFAIL+1))
-> +	done
->  }
-> diff --git a/tools/testing/selftests/run_kselftest.sh b/tools/testing/selftests/run_kselftest.sh
-> index d4be97498b32..10930d09f2a5 100755
-> --- a/tools/testing/selftests/run_kselftest.sh
-> +++ b/tools/testing/selftests/run_kselftest.sh
-> @@ -110,18 +110,23 @@ if [ -n "$TESTS" ]; then
->  	available="$(echo "$valid" | sed -e 's/ /\n/g')"
->  fi
->  
-> -kselftest_failures_file="$(mktemp --tmpdir kselftest-failures-XXXXXX)"
-> -export kselftest_failures_file
-> -
-> +curdir=$(pwd)
-> +total=$(echo "$available" | wc -w)
->  collections=$(echo "$available" | cut -d: -f1 | sort | uniq)
-> +
-> +ktap_print_header
-> +ktap_set_plan "$total"
-> +
->  for collection in $collections ; do
->  	[ -w /dev/kmsg ] && echo "kselftest: Running tests in $collection" >> /dev/kmsg
->  	tests=$(echo "$available" | grep "^$collection:" | cut -d: -f2)
-> -	($dryrun cd "$collection" && $dryrun run_many $tests)
-> +	$dryrun cd "$collection" && $dryrun run_many $tests
-> +	$dryrun cd "$curdir"
->  done
->  
-> -failures="$(cat "$kselftest_failures_file")"
-> -rm "$kselftest_failures_file"
-> -if "$ERROR_ON_FAIL" && [ "$failures" ]; then
-> -	exit 1
-> +ktap_print_totals
-> +if "$ERROR_ON_FAIL" && [ "$KTAP_CNT_FAIL" -ne 0 ]; then
-> +	exit "$KSFT_FAIL"
-> +else
-> +	exit "$KSFT_PASS"
->  fi
-> -- 
-> 2.50.1
-> 
+diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+index aa4e2731e2ba..d4fd513dc1d6 100644
+--- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
++++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+@@ -853,6 +853,7 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
+ 	struct hwc_caller_ctx *ctx;
+ 	u32 dest_vrcq = 0;
+ 	u32 dest_vrq = 0;
++	u32 command;
+ 	u16 msg_id;
+ 	int err;
+ 
+@@ -861,8 +862,8 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
+ 	tx_wr = &txq->msg_buf->reqs[msg_id];
+ 
+ 	if (req_len > tx_wr->buf_len) {
+-		dev_err(hwc->dev, "HWC: req msg size: %d > %d\n", req_len,
+-			tx_wr->buf_len);
++		dev_err(hwc->dev, "%s:%d: req msg size: %d > %d\n",
++			__func__, __LINE__, req_len, tx_wr->buf_len);
+ 		err = -EINVAL;
+ 		goto out;
+ 	}
+@@ -878,6 +879,7 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
+ 	req_msg->req.hwc_msg_id = msg_id;
+ 
+ 	tx_wr->msg_size = req_len;
++	command = req_msg->req.msg_type;
+ 
+ 	if (gc->is_pf) {
+ 		dest_vrq = hwc->pf_dest_vrq_id;
+@@ -886,15 +888,16 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
+ 
+ 	err = mana_hwc_post_tx_wqe(txq, tx_wr, dest_vrq, dest_vrcq, false);
+ 	if (err) {
+-		dev_err(hwc->dev, "HWC: Failed to post send WQE: %d\n", err);
++		dev_err(hwc->dev, "%s:%d: Failed to post send WQE: %d\n",
++			__func__, __LINE__, err);
+ 		goto out;
+ 	}
+ 
+ 	if (!wait_for_completion_timeout(&ctx->comp_event,
+ 					 (msecs_to_jiffies(hwc->hwc_timeout)))) {
+ 		if (hwc->hwc_timeout != 0)
+-			dev_err(hwc->dev, "HWC: Request timed out: %u ms\n",
+-				hwc->hwc_timeout);
++			dev_err(hwc->dev, "%s:%d: Command 0x%x timed out: %u ms\n",
++				__func__, __LINE__, command, hwc->hwc_timeout);
+ 
+ 		/* Reduce further waiting if HWC no response */
+ 		if (hwc->hwc_timeout > 1)
+@@ -914,9 +917,9 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
+ 			err = -EOPNOTSUPP;
+ 			goto out;
+ 		}
+-		if (req_msg->req.msg_type != MANA_QUERY_PHY_STAT)
+-			dev_err(hwc->dev, "HWC: Failed hw_channel req: 0x%x\n",
+-				ctx->status_code);
++		if (command != MANA_QUERY_PHY_STAT)
++			dev_err(hwc->dev, "%s:%d: Command 0x%x failed with status: 0x%x\n",
++				__func__, __LINE__, command, ctx->status_code);
+ 		err = -EPROTO;
+ 		goto out;
+ 	}
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index 9b5a72ada5c4..53f24244de75 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -1023,8 +1023,8 @@ static int mana_send_request(struct mana_context *ac, void *in_buf,
+ 
+ 		if (req->req.msg_type != MANA_QUERY_PHY_STAT &&
+ 		    mana_need_log(gc, err))
+-			dev_err(dev, "Failed to send mana message: %d, 0x%x\n",
+-				err, resp->status);
++			dev_err(dev, "Command 0x%x failed with status: 0x%x, err: %d\n",
++				req->req.msg_type, resp->status, err);
+ 		return err ? err : -EPROTO;
+ 	}
+ 
+@@ -1337,8 +1337,8 @@ int mana_cfg_vport(struct mana_port_context *apc, u32 protection_dom_id,
+ 	apc->tx_shortform_allowed = resp.short_form_allowed;
+ 	apc->tx_vp_offset = resp.tx_vport_offset;
+ 
+-	netdev_info(apc->ndev, "Configured vPort %llu PD %u DB %u\n",
+-		    apc->port_handle, protection_dom_id, doorbell_pg_id);
++	netdev_info(apc->ndev, "Enabled vPort %llu PD %u DB %u MAC %pM\n",
++		    apc->port_handle, protection_dom_id, doorbell_pg_id, apc->mac_addr);
+ out:
+ 	if (err)
+ 		mana_uncfg_vport(apc);
+-- 
+2.34.1
+
 
