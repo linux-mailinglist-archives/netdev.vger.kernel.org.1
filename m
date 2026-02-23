@@ -1,149 +1,125 @@
-Return-Path: <netdev+bounces-260075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260078-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uCPXGhNtnGmcGAQAu9opvQ
-	(envelope-from <netdev+bounces-260075-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 16:06:59 +0100
+	id WAQQOSxunGmcGAQAu9opvQ
+	(envelope-from <netdev+bounces-260078-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 16:11:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7CE817877D
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 16:06:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3551D178880
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 16:11:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 98216305DD04
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 15:02:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6E5683029AD2
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 15:07:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EAE535BDAF;
-	Mon, 23 Feb 2026 15:02:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03D2B366060;
+	Mon, 23 Feb 2026 15:07:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b="Bi8miG0S"
+	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="pmyRjEdO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D0E3451D9
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 15:02:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41719361DB2;
+	Mon, 23 Feb 2026 15:07:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771858931; cv=none; b=OhddxRCXcgsgO3cReyz2cmIzikH2fdl136u6YKbRpuQelx0y0C8dUGs4MJ3oyY3m9tLPteBvoXZh9IESH+NVieGmW9rRoFBiJhZMIfbNnxlaPzai38qascl3RElUK1YpEU+uunsYc6mu+HR9BojuMDn7ij+jMBRm/4nzgj1hX+c=
+	t=1771859256; cv=none; b=JnbHaTV9YmljZeU/VTJnHdXHZOdA7/61qMyl7O3LzEoMDq455U8axtyvXLaqphEArUx2qVkcc8v5DwTBj7jjioG1oe99Uho2uRsRmmas/f/h2CaZufBX1o2AAH0p7tersxQjS0b3n2d5c/PJmZk4haYH3UpePDcbMxgeRqYX+tg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771858931; c=relaxed/simple;
-	bh=DJpNDmDyIrKn7kt89iPA47eOQyY++TU0zFaH3aJGWKE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hed4neShZfuj6t/OcZE0wrulWXBZ/uVzlwuSY8NjdcchzBs9JkbsjAMTtqDU0Jm7KTakbzbeluOBXdr8uRHi2yVjamC8yb58UT7hz7PfXYZ0ERBZKMK1zetWg8IObwcrzPmFLP4rPcu7ScrtCcIEw1QOtmgpyV6veL7jI68jGpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu; spf=fail smtp.mailfrom=g.harvard.edu; dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b=Bi8miG0S; arc=none smtp.client-ip=209.85.210.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=g.harvard.edu
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-7d4c68f0e47so2532731a34.1
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 07:02:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rowland.harvard.edu; s=google; t=1771858928; x=1772463728; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qTN8ZuMw3IBNaYoAHK7lC0KSJE/o8k5UplAc8Jft30I=;
-        b=Bi8miG0Sz573Ii1SK02XqPqZszZtXFDC0s6JN389hMiZtRDnkSysCkW8y7t2ppBoW/
-         Da3FKVsegMw7XQXA//pcJ6js2xHUKiPdItV/vaeI7DAYPON02291qWV6KNiaHUnFe4Qp
-         ib3hjtmYjr+JWidZSanRGb1othbLDyCT1OkY0890ZEgSLyd8fQcJl3UfaIcKgdM+Flfc
-         MKGdzVa72C4PyJtfqenpPmShoxQajId86sk3Swij0YoSpdM/Zhi//xCxEkbrqZI0CyA9
-         vZw1mxOGIaiiJz+PY9AVBH6uu7GXpT4TqKqktHDQeGvDqXwyIMLRj+9xmOyIzWBDS5pl
-         TVhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771858928; x=1772463728;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qTN8ZuMw3IBNaYoAHK7lC0KSJE/o8k5UplAc8Jft30I=;
-        b=l8U1JLpqKucfdad85Q9YQjpLKciMfDYsFjlKMEG97ggVkMqjmDOvWcudwObaxicTtA
-         TMiDWUhycTizKg6VbgRaUufCSEIFOS+AnztFcPTXPBTOw52JEGjdnSGA4+DzP+YP1aw8
-         0dm7w8qR3Xek/hOg21z/eyABPYfPiflr7yjkdetyZjFlZ/FgKKxhkY7+kkGuQA0Bffk3
-         2q51Q6qfqAjF2vuOnIEsnune1IApxl4xtqYo2PkF+bztczn+BqFg9YtY6NZTDwKHQE+x
-         uDNeKqGUXMN1hZkC7PIFtFngQgptvLlo+Ix1yKxdWQdJnnHeo0FclPV4rqsaSpcdcyKz
-         eDtQ==
-X-Gm-Message-State: AOJu0YyeJuRIsVgIDfWsNR+qBucj1Sl4S1OnNS05J7/N7b/RR8+sH0ff
-	DxfWtD8MNEZ0+yDVnJq2gn0kzDJw9dOGakH0j3uV2hrorUvhW1cq6yCynwJgkmGjDA==
-X-Gm-Gg: AZuq6aI4TIfUasBcK6lcAAyuJUO/BiW8ZFAqZdfd9ABTeHu7R5M4t2ncGINOIO6Zf+u
-	SsSlAu2MH4Y2uPKmPyU33TA3Om7GQH+DLjIVpELnaHR2lLFegpypvc/GzsgOjRmLP+zP9JT8xzC
-	efCDWL735+vdDUQG1vVyJ/FR86tedbsPt03CLZCINedrPuly5xBUghLkQZKcqCOJPpU5uOmImr+
-	/9BG8uM6tkpWPfpJLP45/xK6cc3ukt1P87jl964SjUJJU+7MIwyU3KEBKzsxp550uiGXwCLQZnB
-	T5q8NbQtBTwlF4RPpu+K6c6zNjd9/LPVYO3CQCN4wi3kTvs9JONaVnAqACE6CS+rhPBMnxh3X6I
-	G9/uWZVtFdG3HJzWL10nDeZsqKBNLujtyQHwZ7NpZOIZUvToN7V0fC511BobXPRZsVX09mmHFcr
-	Vr0HVFIEpfQEPMdk004P1nmqZM
-X-Received: by 2002:a05:6808:13d6:b0:450:4628:e3f0 with SMTP id 5614622812f47-464463428a2mr4950723b6e.36.1771858928282;
-        Mon, 23 Feb 2026 07:02:08 -0800 (PST)
-Received: from rowland.harvard.edu ([2601:19b:d01:d210::687c])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8997c8adf68sm65878116d6.20.2026.02.23.07.02.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Feb 2026 07:02:06 -0800 (PST)
-Date: Mon, 23 Feb 2026 10:02:01 -0500
-From: Alan Stern <stern@rowland.harvard.edu>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Petko Manolov <petkan@nucleusys.com>,
-	stable <stable@kernel.org>
-Subject: Re: [PATCH net] net: usb: pegasus: validate USB endpoints
-Message-ID: <ed6ad3d0-e46e-413e-9db7-1c788c8a2dbe@rowland.harvard.edu>
-References: <2026022347-legibly-attest-cc5c@gregkh>
- <acc166b4-9ce7-4e95-8f2f-4300ee6dd27e@rowland.harvard.edu>
- <2026022352-dried-sputter-eba9@gregkh>
+	s=arc-20240116; t=1771859256; c=relaxed/simple;
+	bh=6ZP8MgbtGH5MobBoC2FmXVMgOF3DCo3R40gaWjqdmuE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=JD6WBu/PHULf0vbZKHSGIFoAzRugZaH3vM8tz+VDlNXgXvAyiAsxsOC5Ite4Jg+JW/buf8QsQdQT+x1m+e0i0vLYk/RxS1oOTnqHn8mDnr04h+7pqlAi0DsQhMuOIQ2HhM3YBl2GTd5ypWCi0uxJpeizT0UwyEbluspZdVA5HyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=pmyRjEdO; arc=none smtp.client-ip=45.79.88.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 36B9640C6F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+	t=1771858932; bh=uNGo1sx9Ki+w096sWaEIkC6IKo4fwwadEMyWfut8oEA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=pmyRjEdODIjeAipqFcXYuUUMrCqulImfJMdvpChSX4o/WEBWx/D9iIlWRpC28MpMR
+	 qVDCmq+hq0AkV08Ab8WKXCSn3jVSTe44fDZpyszr6qmMY8FVvxyKZSG4VIFau2YsLd
+	 6HmQreBiYMLctEplPjUNpkQHDtzx90LkD1LwYV6ym6ZGVr2QfWgD8ASD79pfZpssJm
+	 6jsdZ7c9cQC8TcmBk0h3GmT35iZy0vd2tpZL0AmNvmaqMWI1Q7BnfoIBzCZR5JfsDI
+	 1+Hnuvb8/6/Nn5MLCnkYX2noN97MOig+H33SStCdhDKoh1Zib9BjIAcfdAoKMAPONc
+	 fVwEGo2bWGoog==
+Received: from localhost (c-71-229-227-126.hsd1.co.comcast.net [71.229.227.126])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by ms.lwn.net (Postfix) with ESMTPSA id 36B9640C6F;
+	Mon, 23 Feb 2026 15:02:12 +0000 (UTC)
+From: Jonathan Corbet <corbet@lwn.net>
+To: Jani Nikula <jani.nikula@linux.intel.com>, Mauro Carvalho Chehab
+ <mchehab+huawei@kernel.org>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, Kees
+ Cook <kees@kernel.org>, Mauro Carvalho Chehab <mchehab@kernel.org>
+Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+ intel-wired-lan@lists.osuosl.org, linux-doc@vger.kernel.org,
+ linux-hardening@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>, Randy Dunlap
+ <rdunlap@infradead.org>, Shuah Khan <skhan@linuxfoundation.org>
+Subject: Re: [PATCH 00/38] docs: several improvements to kernel-doc
+In-Reply-To: <33d214091909b9a060637f56f81fb8f525cf433b@intel.com>
+References: <cover.1771408406.git.mchehab+huawei@kernel.org>
+ <33d214091909b9a060637f56f81fb8f525cf433b@intel.com>
+Date: Mon, 23 Feb 2026 08:02:11 -0700
+Message-ID: <878qcj8pvw.fsf@trenco.lwn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2026022352-dried-sputter-eba9@gregkh>
+Content-Type: text/plain
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[rowland.harvard.edu,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[rowland.harvard.edu:s=google];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[lwn.net,none];
+	R_DKIM_ALLOW(-0.20)[lwn.net:s=20201203];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[rowland.harvard.edu:+];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-260075-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260078-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[lwn.net:+];
 	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stern@rowland.harvard.edu,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[corbet@lwn.net,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	TAGGED_RCPT(0.00)[netdev,huawei];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[rowland.harvard.edu:mid,rowland.harvard.edu:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D7CE817877D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,trenco.lwn.net:mid,lwn.net:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3551D178880
 X-Rspamd-Action: no action
 
-On Mon, Feb 23, 2026 at 03:54:30PM +0100, Greg Kroah-Hartman wrote:
-> On Mon, Feb 23, 2026 at 09:39:52AM -0500, Alan Stern wrote:
-> > BTW, what is gkh_clanker_2000?
-> 
-> A hacked up system of tools/scripts I'm running here to find stuff like
-> "take this previously applied commit that fixed a problem, does the same
-> pattern need to be also done anywhere else in the tree"?  It finds a lot
-> of stuff and then I sift through it and see if anything is actually real
-> or not and if so, make up a patch for it.  It was my "merge window is
-> giving me a respite from reviewing patches" hobby project this past
-> week.
-> 
-> Now if I was really good, I could turn the output into a coccinelle
-> script, as this is just simple patterns.
+Jani Nikula <jani.nikula@linux.intel.com> writes:
 
-It's a little surprising that nobody has asked an AI to do this sort of 
-thing yet (as far as I know).  It's hard to say whether the results 
-would be better than you get with your hacked-up system of 
-tools/scripts, but it might be.
+> There's always the question, if you're putting a lot of effort into
+> making kernel-doc closer to an actual C parser, why not put all that
+> effort into using and adapting to, you know, an actual C parser?
 
-Alan Stern
+Not speaking to the current effort but ... in the past, when I have
+contemplated this (using, say, tree-sitter), the real problem is that
+those parsers simply strip out the comments.  Kerneldoc without comments
+... doesn't work very well.  If there were a parser without those
+problems, and which could be made to do the right thing with all of our
+weird macro usage, it would certainly be worth considering.
+
+jon
 
