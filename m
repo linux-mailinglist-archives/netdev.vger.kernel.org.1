@@ -1,169 +1,219 @@
-Return-Path: <netdev+bounces-260258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260259-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YLpHNFvgnGnCLwQAu9opvQ
-	(envelope-from <netdev+bounces-260258-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:18:51 +0100
+	id gOitFpfhnGnCLwQAu9opvQ
+	(envelope-from <netdev+bounces-260259-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:24:07 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B45C17F253
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:18:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EB4B617F48D
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:24:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AE73F3007493
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:18:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5A8B2302797E
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:24:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 968E137F733;
-	Mon, 23 Feb 2026 23:18:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6341937F748;
+	Mon, 23 Feb 2026 23:24:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TlZbVIG0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D2J5KUQr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7323934D4D8;
-	Mon, 23 Feb 2026 23:18:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EDF337F74C
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 23:23:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771888728; cv=none; b=I6QTFIwSzbgE0C8hoSSY+/oW2+1Cx077EQOC9lQLMTDztjnGJNqh3VAzJ8Q7qPnLBFET3+xtLI/tHcnKYKR+Gb39moaQc5vCEsChJlmxyA62sU2Sr7tkgrsHx2ytn6GHiK1CVS9csd4gTCmLQSFQMWVvOMnGvjwezQjYwBQy0Bk=
+	t=1771889043; cv=none; b=cosOnGW4oNVBMTghwXzl8dD/yIpy5uD/dJX75XmHAFYufK2IGc5waYfDclHUiDRi1v3sUP3QC0ugbk+wW1I0d5whf9HBhQb3+hPEKmKPoilKYGM04vbRtX1LLo2n6OENZFAebj0tjWwGGMHL2jkuJYL7kkTbgXtneQCo4i4/V9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771888728; c=relaxed/simple;
-	bh=CYLrkQbplhVLWpLwYQI2kVgix50aUPHsmv7SwhslwTg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZxrXQRdZZ/Dkz2PYtlz0/7z/SAJHXIC7TdbA9ijhYsxfjKQzWFmOwlSC2Q/DiQ3zkfoFIQO11RlzTXyPzOO1R4g9xkCrADxTk/D+B+axkvef1skBjk3OQ3zKx1VrEhSNfVBwYNfo4lkBCr7r31g4JDAqWiYEHhEIA/qlcPQuLw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TlZbVIG0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EC4EC116C6;
-	Mon, 23 Feb 2026 23:18:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771888727;
-	bh=CYLrkQbplhVLWpLwYQI2kVgix50aUPHsmv7SwhslwTg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TlZbVIG0zfxSp01GgD2+JrWlDWhpRYIi9iTBhCrYsyrhBEvafKGrz2Sy10Zr/MQkO
-	 X1SL7F61crQZeQWRjiwxV8hbfegSYseFSQVFEm3T0eSv7L1gLYAWcFx88Chz+qnBzR
-	 qxzUVv9nXlsD5qoFeVw2MpDIz2ZJBws9y/8zBWThrTv1CUFXmms+yQKrqAfBJe58Rj
-	 wzoFidKhPfAGKJtuWuzd3CSqX6uLhqXhwQPvDkLXHlNpf/7Xie1DnA9YPLi/1rPJUG
-	 2Uvl9A1L5WmKRP7FY64FUyfKI4LTjN9DyLsOPBIVeTR5NmcYTzMkfxsK50Z4nHKidf
-	 m7ZoZ1PlpHIWg==
-Date: Mon, 23 Feb 2026 15:18:45 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Donald Hunter <donald.hunter@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Alexei Starovoitov
- <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard
- Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Alexander Lobakin
- <aleksander.lobakin@intel.com>, Andrii Nakryiko <andrii@kernel.org>, Martin
- KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP
- Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>, Jakub Sitnicki <jakub@cloudflare.com>,
- netdev@vger.kernel.org, bpf@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH bpf-next v3 1/5] netlink: specs: Add XDP RX checksum
- capability to XDP metadata specs
-Message-ID: <20260223151845.06db43b0@kernel.org>
-In-Reply-To: <aZyKWoxnywXKWth9@lore-desk>
-References: <20260217-bpf-xdp-meta-rxcksum-v3-0-30024c50ba71@kernel.org>
-	<20260217-bpf-xdp-meta-rxcksum-v3-1-30024c50ba71@kernel.org>
-	<20260218174742.62a4074f@kernel.org>
-	<aZbuWBnmh_SQJyVf@lore-desk>
-	<20260219091344.1d8517f3@kernel.org>
-	<aZyKWoxnywXKWth9@lore-desk>
+	s=arc-20240116; t=1771889043; c=relaxed/simple;
+	bh=pCQRwUB18cL9IhLHvvAID1cleX6dfDa/YbPB3043ZP8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Eq5wnIPNgw1gjQ82P272XYe/S1lpGm/y0oEsigScEydgSGlvmh+9tgdNX+QykcTYeOjrOww/GAtUxX6BiamiByFTGDmKYDBg9q87DaiLBzpXMdaUtjP0a6MuWMdG+DqaeU1urVutsuCwbuHWtOXBrgXCestf0978hUZr9wdGcEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=D2J5KUQr; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1771889039; x=1803425039;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=pCQRwUB18cL9IhLHvvAID1cleX6dfDa/YbPB3043ZP8=;
+  b=D2J5KUQrMxekXWGxER2oRhEXe846RbAgWHTXXM7rC2P4ZYvvBuP+WY6I
+   ytsi4h+WbSSQEDO8JufJUeIL39ReaORIJ4JlVGSphWYVY/whTeGLyA0l2
+   +KeVUjxPOxDW+1Upv9CtZiOXvLIGj+Ln8SzlmiMg0UnW5ar57GsAlMmbM
+   zRAIJJqyxs3ExBxIQ2+V8YIO/yDBwpS+lvyOH64CEtjsSOKhJwPhQety4
+   I5MOJQsiQcXfTFTrAFtHgc6FD/NIfQA3Yn8PkX3/FlpEZGs9pkVc7fzGm
+   3Vk/iuyd4UxDeQvg9nJ2SQS1G6IwpUw9vWJWIKkuEwsvl3qqetHdoasAN
+   A==;
+X-CSE-ConnectionGUID: q3t5o0bRR+Syrmydc0icHA==
+X-CSE-MsgGUID: tAUktr5TRZGL5KPXxhPe8Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11710"; a="75503594"
+X-IronPort-AV: E=Sophos;i="6.21,307,1763452800"; 
+   d="scan'208";a="75503594"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2026 15:23:58 -0800
+X-CSE-ConnectionGUID: GThoQFBSSM6m5KEZfuANxQ==
+X-CSE-MsgGUID: h7D62WMSTyeuV1f2GpL48w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,307,1763452800"; 
+   d="scan'208";a="220720210"
+Received: from lkp-server02.sh.intel.com (HELO a3936d6a266d) ([10.239.97.151])
+  by orviesa005.jf.intel.com with ESMTP; 23 Feb 2026 15:23:54 -0800
+Received: from kbuild by a3936d6a266d with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vufHM-000000000vt-0piV;
+	Mon, 23 Feb 2026 23:23:52 +0000
+Date: Tue, 24 Feb 2026 07:23:12 +0800
+From: kernel test robot <lkp@intel.com>
+To: Paolo Valerio <pvalerio@redhat.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	=?iso-8859-1?Q?Th=E9o?= Lebrun <theo.lebrun@bootlin.com>
+Subject: Re: [PATCH net-next v2 5/8] net: macb: add XDP support for gem
+Message-ID: <202602240713.bQWzr8aD-lkp@intel.com>
+References: <20260223182632.1681809-6-pvalerio@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260223182632.1681809-6-pvalerio@redhat.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260258-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,kernel.org,iogearbox.net,fomichev.me,lunn.ch,intel.com,linux.dev,cloudflare.com,vger.kernel.org,lists.osuosl.org];
-	RCPT_COUNT_TWELVE(0.00)[30];
+	TAGGED_FROM(0.00)[bounces-260259-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7B45C17F253
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,intel.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,01.org:url]
+X-Rspamd-Queue-Id: EB4B617F48D
 X-Rspamd-Action: no action
 
-On Mon, 23 Feb 2026 18:11:54 +0100 Lorenzo Bianconi wrote:
-> > Off the top of my head drivers prefer reporting UNNECESSARY when they
-> > have both, and reserve COMPLETE for cases where L4 could not be found
-> > or is incorrect. Why don't we report both? We're using 3 args, we still
-> > have 3 to go. We could turn ip_summed into a bitmap and have explicit
-> > output args for both level and csum complete value?  
-> 
-> Ack, thx for the explanation. Just for sake of understanding, is there
-> any NIC capable of reporting both csum_value and csum for the same packet
-> in the DMA descriptor? Or is this change needed to be future-proof?
+Hi Paolo,
 
-Both nfp and fbnic definitely can. Off the top of my head - mlx5 also
-can, but I haven't double checked.
+kernel test robot noticed the following build warnings:
 
-> > One more thing I'd like us to at least have a plan for at this stage
-> > is how to deal with COMPLETE + modified packet + XDP_PASS.
-> > Right now some drivers discard COMPLETE when XDP is attached since
-> > they can't be sure if XDP modifies the packet. Other drivers don't
-> > and we end up with bad csum splat. Do we have a recommendation on
-> > the correct behavior? If not - should we have a kfunc to adjust /
-> > discard csum complete explicitly?  
-> 
-> At the moment there is no way to store the csum value we got running
-> bpf_xdp_metadata_rx_checksum() in order to be consumed during
-> xdp_buff/xdp_frame to skb conversion (this info can just be consumed in the
-> ebpf program bound to the NIC) but
+[auto build test WARNING on net-next/main]
 
-I think the scope here is much narrower than the xdp_buf to xdp_frame
-to skb conversion. We are just pass information between the program and
-driver which owns xdp_buff. Very similar to your new xmo.
+url:    https://github.com/intel-lab-lkp/linux/commits/Paolo-Valerio/net-macb-move-Rx-buffers-alloc-from-link-up-to-open/20260224-023220
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260223182632.1681809-6-pvalerio%40redhat.com
+patch subject: [PATCH net-next v2 5/8] net: macb: add XDP support for gem
+config: s390-allmodconfig (https://download.01.org/0day-ci/archive/20260224/202602240713.bQWzr8aD-lkp@intel.com/config)
+compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260224/202602240713.bQWzr8aD-lkp@intel.com/reproduce)
 
-We could either tell the driver to discard the csum complete or even
-add a helper to "adjust" the the csum value. Similar to the helper
-we have to adjust the csum in TC / skb context.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202602240713.bQWzr8aD-lkp@intel.com/
 
-> I guess the issue you pointed out can be solved in the verifier
-> during program load time. What do you think?
+All warnings (new ones prefixed by >>):
 
-It could, but at the verifier level we'd probably have to be fairly
-coarse-grained. Any write to the packet data would mean csum complete
-cannot be trusted, that's not too hard. But also any tail call / fentry?
-I'm not really up to date on the latest in program chaining in BPF but
-I think a lot of real-life deployments would use either chaining or
-fentry. So in practice it may be a lot of complexity for having csum
-complete always disabled w/ XDP, in practice.
+>> drivers/net/ethernet/cadence/macb_main.c:2749:10: warning: variable 'err' is uninitialized when used here [-Wuninitialized]
+    2749 |                 return err;
+         |                        ^~~
+   drivers/net/ethernet/cadence/macb_main.c:2743:9: note: initialize the variable 'err' to silence this warning
+    2743 |         int err;
+         |                ^
+         |                 = 0
+   1 warning generated.
 
-Up to you. I'm totally okay to just say** that drivers should never
-report csum complete with XDP (until appropriate API is built).
-Perhaps this will force those who care about XDP+csum_complete to
-tell us what their requirements are?
 
-[**] "just say" == document and add driver kselftest that validates it
+vim +/err +2749 drivers/net/ethernet/cadence/macb_main.c
+
+89e5785fc8a6b9 drivers/net/macb.c                       Haavard Skinnemoen 2006-11-09  2726  
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2727  static int gem_create_page_pool(struct macb_queue *queue, int qid)
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2728  {
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2729  	struct page_pool_params pp_params = {
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2730  		.order = 0,
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2731  		.flags = PP_FLAG_DMA_MAP,
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2732  		.pool_size = queue->bp->rx_ring_size,
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2733  		.nid = NUMA_NO_NODE,
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2734  		.dma_dir = rcu_access_pointer(queue->bp->prog)
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2735  				? DMA_BIDIRECTIONAL
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2736  				: DMA_FROM_DEVICE,
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2737  		.dev = &queue->bp->pdev->dev,
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2738  		.netdev = queue->bp->dev,
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2739  		.napi = &queue->napi_rx,
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2740  		.max_len = PAGE_SIZE,
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2741  	};
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2742  	struct page_pool *pool;
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2743  	int err;
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2744  
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2745  	/* This can happen in the case of HRESP error.
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2746  	 * Do nothing as page pool is already existing.
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2747  	 */
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2748  	if (queue->page_pool)
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23 @2749  		return err;
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2750  
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2751  	pool = page_pool_create(&pp_params);
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2752  	if (IS_ERR(pool)) {
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2753  		netdev_err(queue->bp->dev, "cannot create rx page pool\n");
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2754  		err = PTR_ERR(pool);
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2755  		goto clear_pool;
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2756  	}
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2757  
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2758  	queue->page_pool = pool;
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2759  
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2760  	err = xdp_rxq_info_reg(&queue->xdp_rxq, queue->bp->dev, qid,
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2761  			       queue->napi_rx.napi_id);
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2762  	if (err < 0) {
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2763  		netdev_err(queue->bp->dev, "xdp: failed to register rxq info\n");
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2764  		goto destroy_pool;
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2765  	}
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2766  
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2767  	err = xdp_rxq_info_reg_mem_model(&queue->xdp_rxq, MEM_TYPE_PAGE_POOL,
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2768  					 queue->page_pool);
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2769  	if (err) {
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2770  		netdev_err(queue->bp->dev, "xdp: failed to register rxq memory model\n");
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2771  		goto unreg_info;
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2772  	}
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2773  
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2774  	return 0;
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2775  
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2776  unreg_info:
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2777  	xdp_rxq_info_unreg(&queue->xdp_rxq);
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2778  destroy_pool:
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2779  	page_pool_destroy(pool);
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2780  clear_pool:
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2781  	queue->page_pool = NULL;
+fa62bb4def147c drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2782  
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2783  	return err;
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2784  }
+65104588f8cde9 drivers/net/ethernet/cadence/macb_main.c Paolo Valerio      2026-02-23  2785  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
