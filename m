@@ -1,61 +1,66 @@
-Return-Path: <netdev+bounces-260143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260144-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SCWnCYuUnGnRJQQAu9opvQ
-	(envelope-from <netdev+bounces-260143-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 18:55:23 +0100
+	id KDwDJfKWnGluJgQAu9opvQ
+	(envelope-from <netdev+bounces-260144-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 19:05:38 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8556917B287
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 18:55:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D795817B3C0
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 19:05:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2F38D301A712
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 17:50:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C5715303DAE6
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 18:04:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66F0C338910;
-	Mon, 23 Feb 2026 17:50:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E89E33ADA2;
+	Mon, 23 Feb 2026 18:04:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="huuADg37"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B/TA1P3L"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43E983385B1;
-	Mon, 23 Feb 2026 17:50:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AE5233AD8D;
+	Mon, 23 Feb 2026 18:04:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771869045; cv=none; b=PwLSaiRf+b9vdlLLD2ItydhKSDeR5yvocOQ1+xH2CnyOuogsang9/6LFFP472KJSw+Gc1BVHLrDrkra/+b6IE8DLCQBWPxU7X4JaRbiG+OD1NouH4P6DzdKS+DQy5yl0Dl61HwoMtNr5N5698kdFntuXnBIWTX+rtcfdtQRwCiY=
+	t=1771869889; cv=none; b=HVtG7ka91pkPUHS1lORu007FBJ9hFjKWa88qtpk2S021yJ11kFE+v1xTjZ7/yefmxoVX1hSCG1+rO5Zesnks1TpzxzzeZX+oPdHo+K0i5pkaEz/hw4JLp8vcdHhyMqbW6bh+7gxsQRAZYTXgHU2KlYLWleHHgYz3jHXEgA9Qruk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771869045; c=relaxed/simple;
-	bh=qltNpxVS1O/Ej3OenO1iVrOJiK15RWvrrThFE6tLcuc=;
+	s=arc-20240116; t=1771869889; c=relaxed/simple;
+	bh=jTNz6bghS2vX7fzfSwPt5FmZzzVndnGCUpqd+sS3tW8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hMksTmfDup+L6C1y5LlCtXIscB2i5KmQ7CMFDuBlOlNnQlQz7k8/DclngvOgL8rOcdNcqmFAcy7yERiL/6Y8wUb3Bl2QaS+M91PxOMCrFVFDywGi8v3ZrAoXtldXC2yRUAl2BnYjBcWAJE0G0RxNjxAytDaGmeWDseXmv6FyKDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=huuADg37; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42A82C116C6;
-	Mon, 23 Feb 2026 17:50:43 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=s6mZCdzQHcFm/jymjfwcK5IBZjGFeCkZJEEBdcG5pb7DpQZqTL3enFjFL6Je/UW7AfBeWu7lBFj8aceY1ykE4NOHFFY0FUmQWKg1hhyFGj116yWezL9OBug0SEfsmr+/aYhNRSllZ6JBtEJy/xNJW2MQlnLp4uyWt4n7I/tEU/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B/TA1P3L; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 532C3C116C6;
+	Mon, 23 Feb 2026 18:04:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771869044;
-	bh=qltNpxVS1O/Ej3OenO1iVrOJiK15RWvrrThFE6tLcuc=;
+	s=k20201202; t=1771869888;
+	bh=jTNz6bghS2vX7fzfSwPt5FmZzzVndnGCUpqd+sS3tW8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=huuADg37tL1SSfJ6E5JHY7F+eKGmWwAls/fUsnj/NXSp4aqFc0tIfMy2WD4h595ZM
-	 YZpv1OngXUgtft8weAj12caAtFF2vQE11IYR8Twy9hntIFArBY/oHdvxDpYjXiPBeN
-	 PMkDT8sJrGWmj1+rtx13sR0jtutaep1iHYyKZdHhTb+icML+mAzjODD7byqya/WK10
-	 l5QhE/W6VHFwlWI7YsF99z2MTD9a+abVocQ5f3H1wIKu0B4u2/iwoSvu2OeapnwAvg
-	 jR/SjMBOI0u8eCwwVoPs5EhSFGa/xJjNGXK6ckIP+gwIIVivVA5wH2s+Y7BqdDjc33
-	 CJNvv10Fh/L+w==
-Date: Mon, 23 Feb 2026 17:50:41 +0000
+	b=B/TA1P3LHN3w3k8g53QCbFLrYAMNC5VG74BbSs1JeyUdkVdzipYrmt6+5zxwUq6G6
+	 WqMjBmpvG/3GenGZYRNr9lJ66oXruQfrsDKgQakdqzLcU78Fl/TOG+QWefGHvL4PjG
+	 mgXMTepUttf7ZrsvIfNJrV/JcpiTrl8NDT3Fm0+e1B0B22tPCUHe/nzvlqTyCM4ZIP
+	 pbM/K1E91d02iVvmVJ22CmcS9t5gvmhgDSuPObyUtwcKIaCTKH66hAqAoH6nwSCdNi
+	 Q1rYmcGSoY3yD6grut6WiYnhwK9in/0RiR8NPlAqCmlRBpuR20L7bd0Yqdr42z3g8U
+	 JvnLsqvpPLs+w==
+Date: Mon, 23 Feb 2026 18:04:43 +0000
 From: Simon Horman <horms@kernel.org>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>, Paolo Abeni <pabeni@redhat.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net] dpll: zl3073x: fix REF_PHASE_OFFSET_COMP register
- width for some chip IDs
-Message-ID: <aZyTcWMAIzVOSz09@horms.kernel.org>
-References: <20260220155755.448185-1-ivecera@redhat.com>
+To: Joshua Washington <joshwash@google.com>
+Cc: netdev@vger.kernel.org, Harshitha Ramamurthy <hramamurthy@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Rushil Gupta <rushilg@google.com>, Bailey Forrest <bcf@google.com>,
+	linux-kernel@vger.kernel.org, Ankit Garg <nktgrg@google.com>,
+	stable@vger.kernel.org, Jordan Rhee <jordanrhee@google.com>
+Subject: Re: [PATCH net v2] gve: fix incorrect buffer cleanup in
+ gve_tx_clean_pending_packets for QPL
+Message-ID: <aZyWu1T4dgF2XKcE@horms.kernel.org>
+References: <20260220215324.1631350-1-joshwash@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,53 +69,81 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260220155755.448185-1-ivecera@redhat.com>
+In-Reply-To: <20260220215324.1631350-1-joshwash@google.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-260143-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260144-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8556917B287
+X-Rspamd-Queue-Id: D795817B3C0
 X-Rspamd-Action: no action
 
-On Fri, Feb 20, 2026 at 04:57:54PM +0100, Ivan Vecera wrote:
-> The REF_PHASE_OFFSET_COMP register is 48-bit wide on most zl3073x chip
-> variants, but only 32-bit wide on chip IDs 0x0E30, 0x0E93..0x0E97 and
-> 0x1F60. The driver unconditionally uses 48-bit read/write operations,
-> which on 32-bit variants causes reading 2 bytes past the register
-> boundary (corrupting the value) and writing 2 bytes into the adjacent
-> register.
+On Fri, Feb 20, 2026 at 01:53:24PM -0800, Joshua Washington wrote:
+> From: Ankit Garg <nktgrg@google.com>
 > 
-> Fix this by storing the chip ID in the device structure during probe
-> and adding a helper to detect the affected variants. Use the correct
-> register width for read/write operations and the matching sign extension
-> bit (31 vs 47) when interpreting the phase compensation value.
+> In DQ-QPL mode, gve_tx_clean_pending_packets() incorrectly uses the RDA
+> buffer cleanup path. It iterates num_bufs times and attempts to unmap
+> entries in the dma array.
 > 
-> Fixes: 6287262f761e ("dpll: zl3073x: Add support to adjust phase")
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> This leads to two issues:
+> 1. The dma array shares storage with tx_qpl_buf_ids (union).
+>  Interpreting buffer IDs as DMA addresses results in attempting to
+>  unmap incorrect memory locations.
+> 2. num_bufs in QPL mode (counting 2K chunks) can significantly exceed
+>  the size of the dma array, causing out-of-bounds access warnings
+> (trace below is how we noticed this issue).
+> 
+> UBSAN: array-index-out-of-bounds in
+> drivers/net/ethernet/drivers/net/ethernet/google/gve/gve_tx_dqo.c:178:5 index 18 is out of
+> range for type 'dma_addr_t[18]' (aka 'unsigned long long[18]')
+> Workqueue: gve gve_service_task [gve]
+> Call Trace:
+> <TASK>
+> dump_stack_lvl+0x33/0xa0
+> __ubsan_handle_out_of_bounds+0xdc/0x110
+> gve_tx_stop_ring_dqo+0x182/0x200 [gve]
+> gve_close+0x1be/0x450 [gve]
+> gve_reset+0x99/0x120 [gve]
+> gve_service_task+0x61/0x100 [gve]
+> process_scheduled_works+0x1e9/0x380
+> 
+> Fix this by properly checking for QPL mode and delegating to
+> gve_free_tx_qpl_bufs() to reclaim the buffers.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: a6fb8d5a8b69 ("gve: Tx path for DQO-QPL")
+> Signed-off-by: Ankit Garg <nktgrg@google.com>
+> Reviewed-by: Jordan Rhee <jordanrhee@google.com>
+> Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
+> Signed-off-by: Joshua Washington <joshwash@google.com>
+> ---
+> Changes in v2:
+> * Moved gve_unmap_packet up instead of forward declaration
+>   (Jakub Kicinski)
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
