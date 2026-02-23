@@ -1,67 +1,66 @@
-Return-Path: <netdev+bounces-260318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260101-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oMfsGVIXnWlTMwQAu9opvQ
-	(envelope-from <netdev+bounces-260318-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 04:13:22 +0100
+	id +PZxJk18nGm6IQQAu9opvQ
+	(envelope-from <netdev+bounces-260101-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 17:11:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFAED18151A
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 04:13:21 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD181179727
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 17:11:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7238A304527C
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 03:13:20 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D54A3305CC72
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 16:02:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 817B228850E;
-	Tue, 24 Feb 2026 03:13:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A45D30C372;
+	Mon, 23 Feb 2026 16:02:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b="IV0ghmG4"
+	dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b="eUEk7obF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m19731102.qiye.163.com (mail-m19731102.qiye.163.com [220.197.31.102])
+Received: from mail-m49231.qiye.163.com (mail-m49231.qiye.163.com [45.254.49.231])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD821287257;
-	Tue, 24 Feb 2026 03:13:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.102
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7436F303A26;
+	Mon, 23 Feb 2026 16:02:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.231
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771902797; cv=none; b=ey3Zgc/PdUS0Uwy/ZUT7adqxeEPUoj5RhiH8GNzB0VeoMDhG5TJU9P81NxPQeaRKyg1lfIxIh0aXoy39Hy4/7tgxEgFkPbtCd2COUthjCwm59Tpw/aS2uyU1BRCHnxRD8fkYQEGVBjhktQK9QMmAIoeNRu9DtOKrunDbb8OPa+g=
+	t=1771862531; cv=none; b=GKzsC9Bmo5vbYyq8q/XrT80DVL9Mz0IYKKFEVG3P+Gd0/FsGemLlkduhWRPeX64boM035HTE59rQOzzgHHeW3k0Lng+LrrrMV6gepUkAS3oxsbiklEWmXZuCy6byCMGzFD9cJ9x8z1Bz9K+QDJ1ssTCEvA/YATTrNXy9HuT7dIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771902797; c=relaxed/simple;
-	bh=M4UJ9qoqEgnDJwKAFDyiKjKl2Ar99+wjN7D6njiVANM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=sVmWD0dIEHZm6qYs+RhDQpRQ+bTh3esbjNNlWldzUVSEWmGyrjXoxBMcKv7MIjBMBeqNpn1MI55vrIl86iJ5ly1qRhiSc+q5dRgFcivfL90fwHbEbUP1wACRDBnEgTwR5AlUdgLLQfTSIb3FfnHbtnRVSNnwN+ultaf9oYDmuts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com; spf=pass smtp.mailfrom=rock-chips.com; dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b=IV0ghmG4; arc=none smtp.client-ip=220.197.31.102
+	s=arc-20240116; t=1771862531; c=relaxed/simple;
+	bh=ghcauBkoo/jQ0qHNXUYp82lwJ47JwCuqh/RwAg7/o9U=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=qNQAIJ9Udd0j3r2PqPCoeZANH1kBESJszn1GXF+8/+SxPIyvpLrJilAUhpJnuMBc1r6qfm7wKaqmwMfS44il9tTWb/8ZB86dPYLeu6yLQq+IW7FfPng+6vTTxSbAvJQKvrnaePmOKHi02HrKMeuc/xpCQQTkEfhEQ8DWfKUISf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com; spf=pass smtp.mailfrom=rock-chips.com; dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b=eUEk7obF; arc=none smtp.client-ip=45.254.49.231
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rock-chips.com
 Received: from localhost.localdomain (unknown [58.22.7.114])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 34b404601;
-	Mon, 23 Feb 2026 23:56:23 +0800 (GMT+08:00)
+	by smtp.qiye.163.com (Hmail) with ESMTP id 34b404611;
+	Mon, 23 Feb 2026 23:56:55 +0800 (GMT+08:00)
 From: Shawn Lin <shawn.lin@rock-chips.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: nic_swsd@realtek.com,
+	netdev@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
 	Bjorn Helgaas <bhelgaas@google.com>,
 	Philipp Stanner <phasta@kernel.org>,
 	linux-pci@vger.kernel.org,
 	Shawn Lin <shawn.lin@rock-chips.com>
-Subject: [PATCH 26/37] net: stmmac: Replace pci_alloc_irq_vectors() with pcim_alloc_irq_vectors()
-Date: Mon, 23 Feb 2026 23:56:18 +0800
-Message-Id: <1771862178-89833-1-git-send-email-shawn.lin@rock-chips.com>
+Subject: [PATCH 27/37] r8169: Replace pci_alloc_irq_vectors() with pcim_alloc_irq_vectors()
+Date: Mon, 23 Feb 2026 23:56:52 +0800
+Message-Id: <1771862212-89945-1-git-send-email-shawn.lin@rock-chips.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1771860581-82092-1-git-send-email-shawn.lin@rock-chips.com>
 References: <1771860581-82092-1-git-send-email-shawn.lin@rock-chips.com>
-X-HM-Tid: 0a9c8b374b1309cckunmb3d17b81987efd
+X-HM-Tid: 0a9c8b37cb1809cckunmb80f2457987f88
 X-HM-MType: 1
 X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFDSUNOT01LS0k3V1ktWUFJV1kPCRoVCBIfWUFZGU9KGFZCGUNLGBhDSU1LTExWFRQJFh
+	tZV1koWUFDSUNOT01LS0k3V1ktWUFJV1kPCRoVCBIfWUFZGR1DHVZKS0wZGE9KT0hIQ05WFRQJFh
 	oXVRMBExYaEhckFA4PWVdZGBILWUFZTkNVSUlVTFVKSk9ZV1kWGg8SFR0UWUFZT0tIVUpLSU9PT0
 	hVSktLVUpCS0tZBg++
 DKIM-Signature: a=rsa-sha256;
-	b=IV0ghmG4sGtSy4po62kvJscgyoHY0vUatk9nnrbg2GsGW8ZZOpAhbpgANzi/Q0+3XnavqqlejSiMfPirpEG1pA2RxBIr08516remo9ORZ2pd6NZojcMa4XewN9s5mih13H+u3UKB1nc3K4LFDXw5D+MUxkkyyA47HTePkC+Mn50=; s=default; c=relaxed/relaxed; d=rock-chips.com; v=1;
-	bh=Vs3w1gqIcLFWsADUFrf0uniaLeLE8Vx6Fum5/MP1TYc=;
+	b=eUEk7obF35KX3vz8VQlKv7vucQqWkLIn3vs+Somj/Gor67P4F2kKVjZX5S1k014qpr5Ze26ECoTJQeAv4pjJdVM+m/aHCKvtF/ogzRaFwvDcfN//SDHozU4fNVq6gqKRZdH36by5PGA9MUttKfykIqnIXF61lr8iLTjju6ZiOe4=; s=default; c=relaxed/relaxed; d=rock-chips.com; v=1;
+	bh=Jty+Oys8Xh4YOyfLyh3sXEOFZn/MSFkx47AtlS+dRik=;
 	h=date:mime-version:subject:message-id:from;
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,75 +72,63 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[rock-chips.com,none];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[rock-chips.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260101-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-260318-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[shawn.lin@rock-chips.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[rock-chips.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,rock-chips.com:mid,rock-chips.com:dkim,rock-chips.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CFAED18151A
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: BD181179727
 X-Rspamd-Action: no action
 
 pcim_enable_device() no longer automatically manages IRQ vectors via devres.
 Drivers must now manually call pci_free_irq_vectors() for cleanup. Alternatively,
 pcim_alloc_irq_vectors() should be used.
 
-To: Andrew Lunn <andrew+netdev@lunn.ch>
-To: davem@davemloft.net
-To: Eric Dumazet <edumazet@google.com>
-To: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: nic_swsd@realtek.com
 Cc: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: davem@davemloft.net
 Cc: Bjorn Helgaas <bhelgaas@google.com>
 Cc: Philipp Stanner <phasta@kernel.org>
 Cc: linux-pci@vger.kernel.org
 Signed-off-by: Shawn Lin <shawn.lin@rock-chips.com>
 ---
 
- drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/realtek/r8169_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-index 92d77b0..e35c138a 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-@@ -1122,7 +1122,7 @@ static int stmmac_config_single_msi(struct pci_dev *pdev,
- {
- 	int ret;
- 
--	ret = pci_alloc_irq_vectors(pdev, 1, 1, PCI_IRQ_ALL_TYPES);
-+	ret = pcim_alloc_irq_vectors(pdev, 1, 1, PCI_IRQ_ALL_TYPES);
- 	if (ret < 0) {
- 		dev_info(&pdev->dev, "%s: Single IRQ enablement failed\n",
- 			 __func__);
-@@ -1152,8 +1152,8 @@ static int stmmac_config_multi_msi(struct pci_dev *pdev,
- 		return -1;
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 2f7d980..e8dd1ef 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -5337,7 +5337,7 @@ static int rtl_alloc_irq(struct rtl8169_private *tp)
+ 		break;
  	}
  
--	ret = pci_alloc_irq_vectors(pdev, 2, STMMAC_MSI_VEC_MAX,
--				    PCI_IRQ_MSI | PCI_IRQ_MSIX);
-+	ret = pcim_alloc_irq_vectors(pdev, 2, STMMAC_MSI_VEC_MAX,
-+				     PCI_IRQ_MSI | PCI_IRQ_MSIX);
- 	if (ret < 0) {
- 		dev_info(&pdev->dev, "%s: multi MSI enablement failed\n",
- 			 __func__);
+-	return pci_alloc_irq_vectors(tp->pci_dev, 1, 1, flags);
++	return pcim_alloc_irq_vectors(tp->pci_dev, 1, 1, flags);
+ }
+ 
+ static void rtl_read_mac_address(struct rtl8169_private *tp,
 -- 
 2.7.4
 
