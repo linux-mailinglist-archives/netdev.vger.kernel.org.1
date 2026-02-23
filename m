@@ -1,84 +1,85 @@
-Return-Path: <netdev+bounces-260246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260247-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mFEFArbXnGn+LgQAu9opvQ
-	(envelope-from <netdev+bounces-260246-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:41:58 +0100
+	id EK0qGDHXnGkJLAQAu9opvQ
+	(envelope-from <netdev+bounces-260247-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:39:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6056517E7EC
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:41:57 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9BF117E768
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:39:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 05377317B4F2
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:39:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 351003077774
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:39:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D440F37C109;
-	Mon, 23 Feb 2026 22:38:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DB8C37C11E;
+	Mon, 23 Feb 2026 22:38:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jE8odhRp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WXwcJ5nH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+Received: from mail-yw1-f193.google.com (mail-yw1-f193.google.com [209.85.128.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE6537BE75
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 22:38:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A1837BE97
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 22:38:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771886337; cv=none; b=Gmf15CJSe/SDiXA4AL40HwLxOyD/A2fY7oR8Rx549xnthwseUkgcHhw0psQuKvcBiXCAbLRq0df15fnARWeFv/8zg2h779aRWyTHJHeb8utvM1hJdgvAU4KLJn5jUCvsCg4oytJyfgQAjtHVmB5uGNJ+MF916VLihxNb93dHXyY=
+	t=1771886338; cv=none; b=QLugztoUtSdtOfrCJlNK8uVfZdaxz2p8e45ev0FBNlNgQBX/Ifaicwdb1Yhfo6khCd6DGiK9R3SZ60Q50oak+uVnWW5VmZYogZw4oyNks0Wqa9763tF6V9yOuiP9jWR4klMQRFjDhhrZoAIazgFjxQU2gWVpYKXDXIMvtzqKGK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771886337; c=relaxed/simple;
-	bh=WgeYmElNUd8JWXtDscMvKbTYKQRR4nvqCMrxNQNtld4=;
+	s=arc-20240116; t=1771886338; c=relaxed/simple;
+	bh=ZIS40BN/lVEtVVMEAyUeO8Q0LmXvqKfPsebwIKGBEeo=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=W0tLqgJBOH63LiEGGBZ/CCfUcka4JSS+ZqaooKuiWcMguo+1LbcHCa1a4wFXXvrbxube52MNm1cwT3m1ELLcKJajpBRMKZcblTRMW7fTqNY1nLXIG4EwMTp6KsOPLYigs64Yoo3A3MHbijDjABYbqnYXOuGxcfnc53mdRfcFFsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jE8odhRp; arc=none smtp.client-ip=209.85.128.171
+	 In-Reply-To:To:Cc; b=nNVBkGosvsZTrX/oLyAhToA369CgH5HBwH0XNXkEMJNJBx7n06AtJbW3qv3iKuLm4FzaDbcGxRgU/5NngLeAIy7rSLAzAFYu7j6/5R/4FzCNcj8qJ+2g/wVSsZBVdMNqQ7/EyfK0xfua6V9NGkZtG+Y7ZGxI/TnapWWVL7iMm1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WXwcJ5nH; arc=none smtp.client-ip=209.85.128.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-79827d28feaso26961387b3.3
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 14:38:55 -0800 (PST)
+Received: by mail-yw1-f193.google.com with SMTP id 00721157ae682-797a52d8c34so45657277b3.2
+        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 14:38:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771886335; x=1772491135; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1771886336; x=1772491136; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=g/yCmM+X3z1/BoTwo6svOrTqbVDwyb97Jpk/MjzyWmU=;
-        b=jE8odhRpi+A5fYcaIkttPI6rdvQvXlTeFUD7oqhwWKK6ZsCv/rkRijElk2BkBcw7ID
-         kXl7UaVfk4gq5d3fmJ4x035+0JYeBZZTI48hPI0DhyTAoqhCFWm58tFnUxbd/SPqOy9P
-         3TH52LdyySAvIMZjRgh8NU6vvZIN3i+dBqOTm75rK26J1qtUnGDFYJwDV3yMGLRlHK31
-         5tTKoW/TAaloqxP7wX29sXv8grKlph030P7cgpHQyEIH5g1C00Eqs1Z0W70jhq0NRAL6
-         JFj3JCRrc9piWD6in6TC4q1bok4Y+LqAUWQAKy1e07hS1o/YAN1c+hp0EVLb799Qu4uh
-         BDbA==
+        bh=0cemh6Unm8avZ318Zd18G/NSlRGlTIfX9gcE2w2y6Xk=;
+        b=WXwcJ5nHT2Wm/PBC1YtI6EPOCYBowHp3Lk1cw+rFZMNUHtzbT9DCmAW/xRAREIgHIB
+         CnIiKyBKNvtAZMG5pxeq1heJClkrSVPTvrFX6EzwNyNnnZ+2b1peTvJ3YNl+K/i3b9It
+         3SG10I3GoZgiQeLqR+RkMFANZ1ahMjQJRrQhhLT7Q2slVUOgqdPcJ2IgQppjMTVsgohD
+         qx4TerJTJdvZgXiiO3oK6UUFl6VWQsjKft6zZa2ffx8XMU1NmU62gK5aBFvPG5mpS5bW
+         U/ek6YQgDPh+GqfXaffTgfXOdkrHi8+rzPfeSNMt4Ueqs4X+XVLJ6RmLkGSxbqs+Xeal
+         wdBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771886335; x=1772491135;
+        d=1e100.net; s=20230601; t=1771886336; x=1772491136;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=g/yCmM+X3z1/BoTwo6svOrTqbVDwyb97Jpk/MjzyWmU=;
-        b=dPmB9kuOAek3KUYhTBEQdJrWmgVhgd5mB2Z7bhDzR18kZ+Lgy19fM/vOdjNRJKdnMo
-         45QAD+twUJ1dBCXbuB6UdoLn7XccfGeTswonJRNEH8AOGQBUNoPq6B67p0/RP9ik4Mxd
-         RUKMUekKHNpXrLXycaKgHYlvt1ZqntIbcbJyTUhLu/9RzMeMJ7QA0QQlNanXNhXUb45s
-         IdWtSbQpLxu/alnx5mvHJkcPng/LI7RapWutzenQxBvSqYaFEvP8Wb4grOiR6Z8XH5fx
-         Fin3orgMMG8QkfiN8m5P3vcjVdbktGmVtOKRBsxI/V9+DDC2Kj0lXkShWhm8OtuRsyKn
-         UNKw==
-X-Forwarded-Encrypted: i=1; AJvYcCUefx8hwa6h1weT46qKlUh18rjsqKA345dKOFo/KuObwpAP54374s9jmP2aXMnJaL0/d0sAkTQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwjW4spitGY3/eJsgXSaURpZ5wLj5ep9WsQEfacSx4PsEF7+QL
-	XT29a7WnTvYje61XAH8qvyfhBpXqg1ZiA3t0+GjDtLecz2v8VOfkAKRZ
-X-Gm-Gg: ATEYQzws+EGbJ2ad7WOe+Ws+Mr8JKAhl0JEkNThvchtSaDY4dQoLHvZ72KNQ6GMoQ3r
-	qHBAZDqyY8nCrUZL7zZS1ujMBQjqjl0Fl+zd9tQr50BJnr49Yl2UmUCeJKRix7QpS9DcuzJHOkN
-	E8tv0eCnMiGDFra+jtk6X/kQo01whSegt76i4S2CI2LQ9c9d4q44Eu+QcUTeFoXYw6lOqN+RiC8
-	iTuTQdQitXNMJP1CY7zCCri0AqJK0HzGz+FSHM2snTmeWxDMt3ma+E4cV2/L+hIHaFzJeewLPSS
-	93kloXspB+JNFOQLBHfhghVqdUBQ+CgKDAr4juC/Q++RJZpSVTZEpMoyuJrP+Jhbz/hXjBqqbbb
-	tgqurrpTmqaMNaICnl7Tn0LuWyL42Icz1xrIMQAUd3fXuj3zh3fSEID4K90jbTtOHaq8XYWOanz
-	G6wa7i0qme+Osh7rHfi3CUF7R210K/E9Ax
-X-Received: by 2002:a05:690c:a:b0:794:c01a:18e6 with SMTP id 00721157ae682-7982903c9aamr91568337b3.47.1771886334599;
-        Mon, 23 Feb 2026 14:38:54 -0800 (PST)
-Received: from localhost ([2a03:2880:25ff:54::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7982dbdf23dsm37723417b3.21.2026.02.23.14.38.54
+        bh=0cemh6Unm8avZ318Zd18G/NSlRGlTIfX9gcE2w2y6Xk=;
+        b=gA8Dp/tJcKquIx+q4FWDJyLxIw+WoL1NieRf5J7aHOVx1UT4v+dSi7o9vPUp6bPDE0
+         54OuU5SZJuJKjIDzgk7agKBkEmOmvHBSrxaah3pNNdwDEymJFtg7w57JSQUQHmGoiJDa
+         C2lRh6mUh+OmbfKT/B8fQSrILLi4uPJKI7dh6M8r6ozMrfh0popkYsC4LOZY6oVq3jX6
+         l6/GIH3csqKClGVYeo2DeuXIUkATrsc+NGj4bhGRtHK+sw85S6VhKDd0RcD4oQH+eZgJ
+         qM6Ba74rcBXnTmyMDLnn0H0wAHdK3mIk5gUxkaLC7F73XIEdTgvEG1oFLEYhrgVPdyrR
+         rHKA==
+X-Forwarded-Encrypted: i=1; AJvYcCWLntU6ZeqIIt27eM/MH5UD/jP+7B8H07sMUzphIs96KUyYdS0AzGeOzs/LheE7fg4I4MZ7gc4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywlt+lxhAwViuOxQ4U6T2wxLBV7y5l1ijDJzx75AI/KFQe4NXGj
+	ZibOMFO9m4s4/MblUvpmuPzbsHwoPk2PI71vmcFYXSYQXrcPSHhc0H6R
+X-Gm-Gg: ATEYQzwcItaw43rzCWZgqYRsDnFWogSC2kT17hes38hyIvGiXbJJ1+Gs/R/H9rzhD2F
+	KpimV69NddPo9g0DH2NZKxrLpXQFmSKSzu00YH3fE0CWK6oRaTayAMMXxsoulU6HGOp6DKZhDzz
+	AxEmchCkWhMdLEtas1zEqEeFJ6xTOXuQfJLQt80pnwt4aau4FmJswS7ojEtcem5tM2H1UBE+SFe
+	Dl0JBv07X9p4BzXQ0l22IHO7nIa9R4gZxT6CmM2RkR6rt1XlMWn4tne7YkerTqJf7bjJCrIWGtq
+	+AWxPeLJByLeau35iA8kFleRTinyDQnfkCV/qtJ5GAHeY/g1i0dIXnnRfFuBPg+ICg5cSk+naG+
+	8Wvxgoi043aVSzyeMlT6Rkrslgur3dEj9MiIYQZVQvhEknURz5JS6nf6i78PEFK4Ozzm7LYI2d6
+	TCWXVQREJIpXNGZSPbNUY3XA==
+X-Received: by 2002:a05:690c:d89:b0:796:34f7:8ea2 with SMTP id 00721157ae682-79828fd308cmr92461117b3.31.1771886335647;
+        Mon, 23 Feb 2026 14:38:55 -0800 (PST)
+Received: from localhost ([2a03:2880:25ff:58::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7982dd87fa2sm37132007b3.28.2026.02.23.14.38.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Feb 2026 14:38:54 -0800 (PST)
+        Mon, 23 Feb 2026 14:38:55 -0800 (PST)
 From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Date: Mon, 23 Feb 2026 14:38:33 -0800
-Subject: [PATCH net v3 2/3] vsock: lock down child_ns_mode as write-once
+Date: Mon, 23 Feb 2026 14:38:34 -0800
+Subject: [PATCH net v3 3/3] vsock: document write-once behavior of the
+ child_ns_mode sysctl
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,7 +88,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260223-vsock-ns-write-once-v3-2-c0cde6959923@meta.com>
+Message-Id: <20260223-vsock-ns-write-once-v3-3-c0cde6959923@meta.com>
 References: <20260223-vsock-ns-write-once-v3-0-c0cde6959923@meta.com>
 In-Reply-To: <20260223-vsock-ns-write-once-v3-0-c0cde6959923@meta.com>
 To: Stefano Garzarella <sgarzare@redhat.com>, 
@@ -100,30 +101,27 @@ To: Stefano Garzarella <sgarzare@redhat.com>,
 Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
  linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
  linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org, 
- kuniyu@google.com, ncardwell@google.com, 
- Daan De Meyer <daan.j.demeyer@gmail.com>
+ kuniyu@google.com, ncardwell@google.com
 X-Mailer: b4 0.14.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260246-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-260247-lists,netdev=lfdr.de];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,google.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
@@ -131,116 +129,40 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,meta.com:mid,meta.com:email]
-X-Rspamd-Queue-Id: 6056517E7EC
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:mid,meta.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C9BF117E768
 X-Rspamd-Action: no action
 
 From: Bobby Eshleman <bobbyeshleman@meta.com>
 
-Two administrator processes may race when setting child_ns_mode as one
-process sets child_ns_mode to "local" and then creates a namespace, but
-another process changes child_ns_mode to "global" between the write and
-the namespace creation. The first process ends up with a namespace in
-"global" mode instead of "local". While this can be detected after the
-fact by reading ns_mode and retrying, it is fragile and error-prone.
+Update the vsock child_ns_mode documentation to include the new
+write-once semantics of setting child_ns_mode. The semantics are
+implemented in a preceding patch in this series.
 
-Make child_ns_mode write-once so that a namespace manager can set it
-once and be sure it won't change. Writing a different value after the
-first write returns -EBUSY. This applies to all namespaces, including
-init_net, where an init process can write "local" to lock all future
-namespaces into local mode.
-
-Fixes: eafb64f40ca4 ("vsock: add netns to vsock core")
-Suggested-by: Daan De Meyer <daan.j.demeyer@gmail.com>
-Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
-Co-developed-by: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
 ---
- include/net/af_vsock.h    | 13 +++++++++++--
- include/net/netns/vsock.h |  3 +++
- net/vmw_vsock/af_vsock.c  | 15 ++++++++++-----
- 3 files changed, 24 insertions(+), 7 deletions(-)
+Changes in v3:
+- update language to clarify language that first value is locked, but subsequent
+  writes succeed.
+---
+ Documentation/admin-guide/sysctl/net.rst | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
-index d3ff48a2fbe0..533d8e75f7bb 100644
---- a/include/net/af_vsock.h
-+++ b/include/net/af_vsock.h
-@@ -276,10 +276,19 @@ static inline bool vsock_net_mode_global(struct vsock_sock *vsk)
- 	return vsock_net_mode(sock_net(sk_vsock(vsk))) == VSOCK_NET_MODE_GLOBAL;
- }
+diff --git a/Documentation/admin-guide/sysctl/net.rst b/Documentation/admin-guide/sysctl/net.rst
+index c10530624f1e..3b2ad61995d4 100644
+--- a/Documentation/admin-guide/sysctl/net.rst
++++ b/Documentation/admin-guide/sysctl/net.rst
+@@ -594,6 +594,9 @@ Values:
+ 	  their sockets will only be able to connect within their own
+ 	  namespace.
  
--static inline void vsock_net_set_child_mode(struct net *net,
-+static inline bool vsock_net_set_child_mode(struct net *net,
- 					    enum vsock_net_mode mode)
- {
--	WRITE_ONCE(net->vsock.child_ns_mode, mode);
-+	int new_locked = mode + 1;
-+	int old_locked = 0; /* unlocked */
++The first write to ``child_ns_mode`` locks its value. Subsequent writes of the
++same value succeed, but writing a different value returns ``-EBUSY``.
 +
-+	if (try_cmpxchg(&net->vsock.child_ns_mode_locked,
-+			&old_locked, new_locked)) {
-+		WRITE_ONCE(net->vsock.child_ns_mode, mode);
-+		return true;
-+	}
-+
-+	return old_locked == new_locked;
- }
+ Changing ``child_ns_mode`` only affects namespaces created after the change;
+ it does not modify the current namespace or any existing children.
  
- static inline enum vsock_net_mode vsock_net_child_mode(struct net *net)
-diff --git a/include/net/netns/vsock.h b/include/net/netns/vsock.h
-index b34d69a22fa8..dc8cbe45f406 100644
---- a/include/net/netns/vsock.h
-+++ b/include/net/netns/vsock.h
-@@ -17,5 +17,8 @@ struct netns_vsock {
- 
- 	enum vsock_net_mode mode;
- 	enum vsock_net_mode child_ns_mode;
-+
-+	/* 0 = unlocked, 1 = locked to global, 2 = locked to local */
-+	int child_ns_mode_locked;
- };
- #endif /* __NET_NET_NAMESPACE_VSOCK_H */
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index 9880756d9eff..50044a838c89 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -90,16 +90,20 @@
-  *
-  *   - /proc/sys/net/vsock/ns_mode (read-only) reports the current namespace's
-  *     mode, which is set at namespace creation and immutable thereafter.
-- *   - /proc/sys/net/vsock/child_ns_mode (writable) controls what mode future
-+ *   - /proc/sys/net/vsock/child_ns_mode (write-once) controls what mode future
-  *     child namespaces will inherit when created. The initial value matches
-  *     the namespace's own ns_mode.
-  *
-  *   Changing child_ns_mode only affects newly created namespaces, not the
-  *   current namespace or existing children. A "local" namespace cannot set
-- *   child_ns_mode to "global". At namespace creation, ns_mode is inherited
-- *   from the parent's child_ns_mode.
-+ *   child_ns_mode to "global". child_ns_mode is write-once, so that it may be
-+ *   configured and locked down by a namespace manager. Writing a different
-+ *   value after the first write returns -EBUSY. At namespace creation, ns_mode
-+ *   is inherited from the parent's child_ns_mode.
-  *
-- *   The init_net mode is "global" and cannot be modified.
-+ *   The init_net mode is "global" and cannot be modified. The init_net
-+ *   child_ns_mode is also write-once, so an init process (e.g. systemd) can
-+ *   set it to "local" to ensure all new namespaces inherit local mode.
-  *
-  *   The modes affect the allocation and accessibility of CIDs as follows:
-  *
-@@ -2853,7 +2857,8 @@ static int vsock_net_child_mode_string(const struct ctl_table *table, int write,
- 		    new_mode == VSOCK_NET_MODE_GLOBAL)
- 			return -EPERM;
- 
--		vsock_net_set_child_mode(net, new_mode);
-+		if (!vsock_net_set_child_mode(net, new_mode))
-+			return -EBUSY;
- 	}
- 
- 	return 0;
 
 -- 
 2.47.3
