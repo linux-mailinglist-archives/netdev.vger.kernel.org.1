@@ -1,124 +1,162 @@
-Return-Path: <netdev+bounces-260006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260007-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id APjgNQ87nGlCBgQAu9opvQ
-	(envelope-from <netdev+bounces-260006-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 12:33:35 +0100
+	id yBSCAM47nGlCBgQAu9opvQ
+	(envelope-from <netdev+bounces-260007-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 12:36:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49E7A175909
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 12:33:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 598E5175993
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 12:36:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5C1133008E3C
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 11:33:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8583B300CE47
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 11:35:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28906361DC1;
-	Mon, 23 Feb 2026 11:33:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FA3136404B;
+	Mon, 23 Feb 2026 11:35:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ljOcsLMh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VETXs1yH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E03FE361DBF;
-	Mon, 23 Feb 2026 11:33:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22BE83624CE
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 11:35:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771846412; cv=none; b=FBkPSWrt3iKNi6SODziibvz5P0VKcfLJnNIXiD9RmFTp5Ws1Rp5WYpcctTZux8YoHwEgs7v3hgEbwXFkzfXQHXyzPPCkRcZd6MILxBozUGYt2OZM0mJW8IJwvrzNlQg4C8mJ09sdzxU5Jg9rMorc3SOyuePVNwCC3HLLj4oy9VQ=
+	t=1771846507; cv=none; b=gHiLtyX5NffOyvwcBWtHepBN+Bcjx7OrNf6N+fLnUD1jDCeFG0Tly0wJWq/mVAx223lNE+PXFjfLReQM5+TZt96077SsoiWlZavoWh2UkcAETJDLIm6ogSnA+VCEu/ls74k0fqKatdTSVUh4TO5S9uBLOugqn1jpFfZYyhDOnMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771846412; c=relaxed/simple;
-	bh=U+UlFoMSZ7je+gYxQXUTxIPqvWZ92YEu86tieN3JurQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S+f/CjwZeOoO08f0OEsra6fNbe7wrl0o9ZZH6KVsdFTUUf2+qDtYEtXPViE3EmfrqUEF3NP+PdjB2uJkhp57wJaSXJxehWey5uLY38ZTt8ARAXRtlkP17be6uQ+332UttuzlQwYtfU9c3a9uXrdyfrhINerUogBmK0EB46LyTMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ljOcsLMh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B3C0C116C6;
-	Mon, 23 Feb 2026 11:33:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1771846411;
-	bh=U+UlFoMSZ7je+gYxQXUTxIPqvWZ92YEu86tieN3JurQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ljOcsLMhZU5OymfzZqAl2DddPF0El+LMOGrrguLAMtOvPOuhd1Nvgm70kR4lqa0Ex
-	 7NsChBAJXzRI7wTK4APCn3x8zpHenC4jZNPV2BLt2y709dcdfQZL48zfDIFx7zqr4v
-	 78LPjVtFIwbmeGnDg6YNfETKSeNk9UaWkB6/yjnM=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jeremy Kerr <jk@codeconstruct.com.au>,
-	Matt Johnston <matt@codeconstruct.com.au>,
-	stable <stable@kernel.org>
-Subject: [PATCH net] net: mctp: usb: properly drop the usb interface on probe error
-Date: Mon, 23 Feb 2026 12:33:19 +0100
-Message-ID: <2026022319-turbofan-darkened-206d@gregkh>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1771846507; c=relaxed/simple;
+	bh=ChIG+CSqgG68WD7WDeEhDn/9P/dPdxnOOZW/4GW9ln4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=rtGe6SLdPCmhuHjZB+daYoIKgyPxra9SfC961PBcGrmgm9rxpiFqTQJxVRGDYPXM6pk1DBqphsEQBZUHW0V17cjZt9QeVafyMhWC8ETc5RrLo4smznzItcNTQFpxP8HH+RU+POAVIh9arW5JATfo7/5pP3zFxfc/jzlXSYbP3xU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VETXs1yH; arc=none smtp.client-ip=209.85.222.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8cb4d191ef1so606375685a.0
+        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 03:35:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1771846504; x=1772451304; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=tmhz9JjBq7tnFMyTTi29d1kC4osIt5a6RvwDJlvCZgg=;
+        b=VETXs1yHF8SNPUKKq2IV940TkeyogJ5UObfWMPz17mPegQ3IdiaqGKyqA6MRetvu2o
+         ir8TzEBass+F+JZ+hWak8EejagNvse/klugJCQRsRDKiGLqQeUIm0Ntbrlrmk7h5+3ZI
+         6OBMhjOMqf+kyymK4tsO9Ah1+c0xtZ4QjewvY40Zv1Hxh9y1pRVidR7wAuieXpEP9zcg
+         kM1d8URitrcRK0dxEHRGVt4Zm/LlzYTFC9oyEyTBgZHgDisTXWK4Z29aSv42wyEed8bI
+         FOczlLjj9pBKGAr2QzLUg+uAqY41Z/onu+dliVvJrUZs+QD0hlAAi+4WogcE+gbIYamH
+         ai5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771846504; x=1772451304;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tmhz9JjBq7tnFMyTTi29d1kC4osIt5a6RvwDJlvCZgg=;
+        b=SV9Rwj1N1/A2g0mLGHjV8xra8SGwf3yJpMjFbP4FJLOZXTF3rSLoiK+yVLqUcMUiav
+         7ciH++26IfCoM8kK2lcacwpwOYm3gtr1WnNmMfGPl1e++bK9ubUoxpbWSV9cfVCJXUtm
+         oWxOXI9I37xmlE34F66r4k4EDDIibZ5O158L8w0RbOozP+S5+1/R5EyynZhhGcqaLdjs
+         mZMZNtQcVPqGI5J9w6/RI9Bv3/Gd8HZNGmWfZu5e/4MGvj01SaY7DxFHuBBICeds5r5+
+         ZTAiFZxlWS7v14XbdAaNFyf67wy7caKPbe14PZwNpXbweAYf6bEkc2i6n2FSliAyGTFg
+         iisQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXbMcj66+KVCdApnrKpcRSQwGgAxExFw+rzF2tK5FEzVDC6KJBaLdzIWJDN9g5/byEdXJZGrUU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoV6Z4vM2Plx7kFHsceLD4O9xOdQPll+eAKJpj3rRhWDfXW2La
+	YtSQkX9/7+tGvMHVvAKf1ls0YHPo2kx0FmDatC8N3wNYARmeuaTWyLfniYfypxbDFBHy9vc3ZUe
+	ONRy7CoSd2/iDyg==
+X-Received: from qknqv11.prod.google.com ([2002:a05:620a:8acb:b0:8c7:ed7:f44f])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:45ac:b0:8c9:fc46:235c with SMTP id af79cd13be357-8cb8ca923fbmr886321685a.71.1771846503730;
+ Mon, 23 Feb 2026 03:35:03 -0800 (PST)
+Date: Mon, 23 Feb 2026 11:35:01 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Lines: 27
-X-Developer-Signature: v=1; a=openpgp-sha256; l=872; i=gregkh@linuxfoundation.org; h=from:subject:message-id; bh=U+UlFoMSZ7je+gYxQXUTxIPqvWZ92YEu86tieN3JurQ=; b=owGbwMvMwCRo6H6F97bub03G02pJDJlzrP67PPQUE03nPbH98E+VFf1zUp9wzDe+9Dtj5pt5X 099Ez1T0RHLwiDIxCArpsjyZRvP0f0VhxS9DG1Pw8xhZQIZwsDFKQATkTZlmKd86En2jdaryn12 pmtkbbTT3t6On8Ww4Kq4420T1pu7jdcmsv86bhP96mGXEgA=
-X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.345.g96ddfc5eaa-goog
+Message-ID: <20260223113501.4070245-1-edumazet@google.com>
+Subject: [PATCH net-next] tcp: reduce calls to tcp_schedule_loss_probe()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260006-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260007-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linuxfoundation.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxfoundation.org:email,linuxfoundation.org:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,codeconstruct.com.au:email]
-X-Rspamd-Queue-Id: 49E7A175909
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 598E5175993
 X-Rspamd-Action: no action
 
-When an error happens in mctp_usb_probe() the reference count on the usb
-interface structure needs to be properly dropped as it was incremented
-earlier in the function.
+For RPC workloads, we alternate tcp_schedule_loss_probe() calls from
+output path and from input path, with tp->packets_out value
+oscillating between !zero and zero, leading to poor branch prediction.
 
-Cc: Jeremy Kerr <jk@codeconstruct.com.au>
-Cc: Matt Johnston <matt@codeconstruct.com.au>
-Cc: stable <stable@kernel.org>
-Assisted-by: gkh_clanker_2000
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Move tp->packets_out check from tcp_schedule_loss_probe() to
+tcp_set_xmit_timer().
+
+We avoid one call to tcp_schedule_loss_probe() from tcp_ack()
+path for typical RPC workloads, while improving branch prediction.
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- drivers/net/mctp/mctp-usb.c | 1 +
- 1 file changed, 1 insertion(+)
+ net/ipv4/tcp_input.c  | 2 +-
+ net/ipv4/tcp_output.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/mctp/mctp-usb.c b/drivers/net/mctp/mctp-usb.c
-index ef860cfc629f..eef17ae89298 100644
---- a/drivers/net/mctp/mctp-usb.c
-+++ b/drivers/net/mctp/mctp-usb.c
-@@ -355,6 +355,7 @@ static int mctp_usb_probe(struct usb_interface *intf,
- 	usb_free_urb(dev->tx_urb);
- 	usb_free_urb(dev->rx_urb);
- 	free_netdev(netdev);
-+	usb_put_dev(dev->usbdev);
- 	return rc;
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index e7b41abb82aad33d8cab4fcfa989cc4771149b41..6c3f1d0314446966d0ec4e8efb0b3d83463990d9 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -3552,7 +3552,7 @@ void tcp_rearm_rto(struct sock *sk)
+ /* Try to schedule a loss probe; if that doesn't work, then schedule an RTO. */
+ static void tcp_set_xmit_timer(struct sock *sk)
+ {
+-	if (!tcp_schedule_loss_probe(sk, true))
++	if (!tcp_sk(sk)->packets_out || !tcp_schedule_loss_probe(sk, true))
+ 		tcp_rearm_rto(sk);
  }
  
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index 326b58ff1118d02fc396753d56f210f9d3007c7f..ada38dd9cef477e16ff77544bbdd057d695fa978 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -3116,7 +3116,7 @@ bool tcp_schedule_loss_probe(struct sock *sk, bool advancing_rto)
+ 	 * not in loss recovery, that are either limited by cwnd or application.
+ 	 */
+ 	if ((early_retrans != 3 && early_retrans != 4) ||
+-	    !tp->packets_out || !tcp_is_sack(tp) ||
++	    !tcp_is_sack(tp) ||
+ 	    (icsk->icsk_ca_state != TCP_CA_Open &&
+ 	     icsk->icsk_ca_state != TCP_CA_CWR))
+ 		return false;
 -- 
-2.53.0
+2.53.0.345.g96ddfc5eaa-goog
 
 
