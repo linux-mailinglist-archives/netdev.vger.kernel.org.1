@@ -1,99 +1,85 @@
-Return-Path: <netdev+bounces-260098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260099-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YPKGITZ6nGlfIAQAu9opvQ
-	(envelope-from <netdev+bounces-260098-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 17:03:02 +0100
+	id TNeSKYt7nGm6IQQAu9opvQ
+	(envelope-from <netdev+bounces-260099-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 17:08:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68A2217948E
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 17:02:57 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CE1E17961E
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 17:08:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DD30030354BE
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 16:00:54 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6307E316AAC2
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 16:01:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 517453090C1;
-	Mon, 23 Feb 2026 15:59:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C83F330ACFB;
+	Mon, 23 Feb 2026 16:01:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="AOFkm0wS";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ggPZbZK2";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="AOFkm0wS";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ggPZbZK2"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="PqHtQ0ke"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD7F30AAB8
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 15:59:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E1F2BDC1B
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 16:01:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771862379; cv=none; b=H+YqEtMH6FbzflmM+55mm6naA9aRvA+3lK30BX+EpzyCGZ7Zpmq0b87Wnor2fnjNQ/uLXm95Z1F0PcXWbMpaxwxcQQyCoTtUBJGo1Y/9eLF4RxeHOD4BBbEyC2CZC2+skoACTBt1XoWv8wlYJq2DM9978AaV1SeBLWxTD7rig5E=
+	t=1771862469; cv=none; b=ULik6Ut89W25SRq1usPRJ6ZX/ZCqp0s/QV5RPrj+XOoy88EltTche/LWQoElQz1NxyVvnK06YWN8LJ4JuIZCxetckBU9clTfoduvU+/+2sgphvynZoLWjZs89R2RjxdukAZEDKFWmBTmzSE59jQISilvIRmrBMAgjNDoe+0QGlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771862379; c=relaxed/simple;
-	bh=3DzJWG18UQD8BMkyzoVmPDuCb32UIi0DBzc1YMYn2/o=;
+	s=arc-20240116; t=1771862469; c=relaxed/simple;
+	bh=RBDa0jIO4VbsfMCQSIREc9cffsT7gvfxFla9G/UD7gs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YPbX6jUKFkdaUIdGLC5I6reZXm93O69R9PWAqE6wSWHWSMNL3Q0H/bFHqGi0UFhwxaBwMDeIVmJqAVPRwNhDETyZjthXATESSEsuWoFY46HhwmvpfpDLC+sv1cHPuMXVoht8V+RFhgEo8G3u6ujpL5+Ri8FwIsFvy9r9t38EWgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=AOFkm0wS; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ggPZbZK2; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=AOFkm0wS; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ggPZbZK2; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 45AFF5BE60;
-	Mon, 23 Feb 2026 15:59:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1771862376; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IfTADi7wOu0XPza4yRcEvmLbrPGNKl0T8wrL7OeuMro=;
-	b=AOFkm0wSCOEnha8+QR/Vpfh0ZeEAXghtyysSx7F4sEE4AM7krYtxuMRLIgec6ZxA8vumCr
-	fSi3LVe0G2d+kKoSEvHUZMgWCZUlT/JeW9JsVJ1dZzi90l4aIDtHPNcqmOuls528thWu/l
-	nvz3pnScOiBlNBdhbe7xXaNwaGw/9yU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1771862376;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IfTADi7wOu0XPza4yRcEvmLbrPGNKl0T8wrL7OeuMro=;
-	b=ggPZbZK27hqUwyWGKAxsJe93Jen5IKY+p4y1OfQ2nvzcBhAbCs/dZ7Syqo94aZdcZu3EN0
-	KVsep1LivtLeswDw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=AOFkm0wS;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=ggPZbZK2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1771862376; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IfTADi7wOu0XPza4yRcEvmLbrPGNKl0T8wrL7OeuMro=;
-	b=AOFkm0wSCOEnha8+QR/Vpfh0ZeEAXghtyysSx7F4sEE4AM7krYtxuMRLIgec6ZxA8vumCr
-	fSi3LVe0G2d+kKoSEvHUZMgWCZUlT/JeW9JsVJ1dZzi90l4aIDtHPNcqmOuls528thWu/l
-	nvz3pnScOiBlNBdhbe7xXaNwaGw/9yU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1771862376;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IfTADi7wOu0XPza4yRcEvmLbrPGNKl0T8wrL7OeuMro=;
-	b=ggPZbZK27hqUwyWGKAxsJe93Jen5IKY+p4y1OfQ2nvzcBhAbCs/dZ7Syqo94aZdcZu3EN0
-	KVsep1LivtLeswDw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9C1C63EA68;
-	Mon, 23 Feb 2026 15:59:35 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id XF2zImd5nGlEVAAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Mon, 23 Feb 2026 15:59:35 +0000
-Message-ID: <7e8d2947-8e0a-4f56-8906-49a84cbe46a0@suse.de>
-Date: Mon, 23 Feb 2026 16:59:34 +0100
+	 In-Reply-To:Content-Type; b=TJB259nsy79sCeC4Kpe1Q8yT8PdtBjQ2SRFe0A9xfOZtW8K4+99p75YMxonJQLbSEplR4B91cBYXvMnQUfQfs8BzkUZ9Doudf6jhJPm6NLfgefyfISysOZaoKJtbVE8YjXbSSG29PbnXoDkfhPcvepxyt6bMahiOIVcf5S/R+g0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=PqHtQ0ke; arc=none smtp.client-ip=209.85.210.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-7d195166b2cso3128916a34.3
+        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 08:01:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1771862466; x=1772467266; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HX29uEwlmShEjfFqkdwl8Eb5l/ZDj+DL2kVuvz05S4k=;
+        b=PqHtQ0kegO9Jus8W4cxNJI34/48vONyAjPHsLA84w3xhcTH+ehRGLWMutcJXZ2RAc/
+         sIIW38BVXjib20Hzzie5/NskGtknX8AWizrrYqFC+cHd9PikB2egS7JaNbi54oMe6P/4
+         ddf9EB7qZxkwqk3fcPIUygOni6aWtkYOvu4jDSCBwwynMsMsONTgNsrQ6SoIaPGchix5
+         apan0c7Jll92fM9SkRm6Fx8tqeLhj2uls5bV+0bT0tWyuhs39yMoF4q2AatkXEkfO9jQ
+         WZmQcIv6TmU8UxJu44cTa6JGtGGdPs47Tmw+CdciuwJYkd046huqr3OenbIXyacOEqFB
+         SY4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771862466; x=1772467266;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HX29uEwlmShEjfFqkdwl8Eb5l/ZDj+DL2kVuvz05S4k=;
+        b=v2fmJVMwzVOeEfUuRFUYzrE1GsCnGVMtC40BscMn68y/dHrLfNZjdmwxsnVaLCt2t0
+         aFgL73sHB4fj8qHIpSka8IqvNCCBQs+L09wOI8MPNDTHzD/5SVV0lmcWxibucJCNWo9w
+         WUTuMB5vYrOYRrus6pZMR/MHF6FlxMpzdFKsDuKxJWh3BooThk1RTZNhQo+arUuY15jm
+         Rt26z55kUArN+8C3CN8vYKE+NFehZNix2WnBgquAIt6K8ENBcGPPdMMuRVordngyOfoA
+         tISW8SulDL0AXRusdr180vdZLROIfPKl/oN0o5vgvDxsWMC0vOrwi5kOYGO4BZhnh/3p
+         Jeaw==
+X-Forwarded-Encrypted: i=1; AJvYcCWxHe3HuIgoK3pRsEhfyKOYiMGqRxFSv5JS7Gm3WJOvKlFUjlpjsX8rmToX/xdnjohbQnmCvIk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbLgnfidAk+7CsW8ooJPiK1d450+0lfMqWUSyKuk0xnaviDQut
+	7/3zZTZCKnKY65jWGOgPNAJWfnKCVlE3q+Jhhzk3phae8zFEuDklujlHVZsZQtgB8M4=
+X-Gm-Gg: AZuq6aI+/hBIxeYfz6qOAH3MghsQvCe+5ZGYwTgtFUxHnqptmqntFIP4OQGfCD2Swh0
+	YsSaYsJPHpnXbaymUJihhJ1fqA8WcvMC2r8pvsNfjoZZ3PIhB3eoGzg2q1TXVBeuK/3NyJwbUx9
+	a4MaIDwwllyyW4tfqegCy1qlMXtdaiv79TGLZ4jI1CfF2xhYvARqNFUyzDg0FliDVahanixwqDW
+	OTogs5jSjcc7tKjuObxiuKOm4RTt8M1VHIhkeHz3pV0sDZ7LeAkfkZ+5rcePilbXtpmYfSVlppo
+	vQbt08ZVFT6kMENY4cHLMPkcDcoTb3qfwFIwRApmheOc+F08chN/GWMqmZVSlgMZhmWJouT2FPU
+	78dTQgOdyQgZbRHlDQDyFmxkzUmxIWmZbJITyvZ6J8xtLxnpBx6zgJW57k2c4/sYD7hjGdD1Qx0
+	/7xpStggNw8skSpDySi5SYNQdMlgu4Sau6l4DeSBgNCTK+zIc+HJjnwu/kyISK1P0Fx6l+eFl30
+	mGri5V1Gg==
+X-Received: by 2002:a05:6830:3153:b0:7d1:853c:83e3 with SMTP id 46e09a7af769-7d52bdf416bmr6177467a34.2.1771862465520;
+        Mon, 23 Feb 2026 08:01:05 -0800 (PST)
+Received: from ?IPV6:2600:8803:e7e4:500:e37:2309:3937:4469? ([2600:8803:e7e4:500:e37:2309:3937:4469])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d55b9a8498sm1062950a34.28.2026.02.23.08.01.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Feb 2026 08:01:05 -0800 (PST)
+Message-ID: <47be2ff3-c25a-4aab-89fc-53921af8b0a9@baylibre.com>
+Date: Mon, 23 Feb 2026 10:01:03 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,72 +87,114 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] ipv6: move ip6_dst_hoplimit() to
- net/ipv6/ip6_output.c
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
- David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com
-References: <20260223153342.892477-1-edumazet@google.com>
+Subject: Re: [PATCH 04/33] mm: vmstat: Prepare to protect against concurrent
+ isolated cpuset change
+To: Frederic Weisbecker <frederic@kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>
+Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Chen Ridong <chenridong@huawei.com>, Danilo Krummrich <dakr@kernel.org>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+ Lai Jiangshan <jiangshanlai@gmail.com>,
+ Marco Crivellari <marco.crivellari@suse.com>, Michal Hocko
+ <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+ Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
+ Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
+ Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+ linux-mm@kvack.org, linux-pci@vger.kernel.org, netdev@vger.kernel.org
+References: <20260101221359.22298-1-frederic@kernel.org>
+ <20260101221359.22298-5-frederic@kernel.org>
 Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20260223153342.892477-1-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: David Lechner <dlechner@baylibre.com>
+In-Reply-To: <20260101221359.22298-5-frederic@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Flag: NO
-X-Spam-Score: -3.01
-X-Spam-Level: 
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[baylibre-com.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-260098-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[suse.com,linux-foundation.org,google.com,arm.com,huawei.com,kernel.org,davemloft.net,redhat.com,linuxfoundation.org,kernel.dk,cmpxchg.org,gmail.com,linux.dev,infradead.org,linutronix.de,suse.cz,vger.kernel.org,lists.infradead.org,kvack.org];
+	TAGGED_FROM(0.00)[bounces-260099-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RSPAMD_URIBL_FAIL(0.00)[suse.de:query timed out,vmlinux.new:query timed out];
+	DMARC_NA(0.00)[baylibre.com];
+	DKIM_TRACE(0.00)[baylibre-com.20230601.gappssmtp.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[38];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	RSPAMD_EMAILBL_FAIL(0.00)[edumazet.google.com:query timed out];
+	FROM_NEQ_ENVFROM(0.00)[dlechner@baylibre.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,suse.de:mid,suse.de:dkim,suse.de:email]
-X-Rspamd-Queue-Id: 68A2217948E
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 5CE1E17961E
 X-Rspamd-Action: no action
 
-On 2/23/26 4:33 PM, Eric Dumazet wrote:
-> Move ip6_dst_hoplimit() to net/ipv6/ip6_output.c so that compiler
-> can (auto)inline it from ip6_xmit().
+On 1/1/26 4:13 PM, Frederic Weisbecker wrote:
+> The HK_TYPE_DOMAIN housekeeping cpumask will soon be made modifiable at
+> runtime. In order to synchronize against vmstat workqueue to make sure
+> that no asynchronous vmstat work is pending or executing on a newly made
+> isolated CPU, target and queue a vmstat work under the same RCU read
+> side critical section.
 > 
-> $ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
-> add/remove: 0/0 grow/shrink: 1/0 up/down: 47/0 (47)
-> Function                                     old     new   delta
-> ip6_xmit                                    1481    1528     +47
-> Total: Before=25076476, After=25076523, chg +0.00%
+> Whenever housekeeping will update the HK_TYPE_DOMAIN cpumask, a vmstat
+> workqueue flush will also be issued in a further change to make sure
+> that no work remains pending after a CPU has been made isolated.
 > 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
 > ---
->   net/ipv6/ip6_output.c  | 21 +++++++++++++++++++++
->   net/ipv6/output_core.c | 23 -----------------------
->   2 files changed, 21 insertions(+), 23 deletions(-)
+>  mm/vmstat.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/mm/vmstat.c b/mm/vmstat.c
+> index 65de88cdf40e..ed19c0d42de6 100644
+> --- a/mm/vmstat.c
+> +++ b/mm/vmstat.c
+> @@ -2144,11 +2144,13 @@ static void vmstat_shepherd(struct work_struct *w)
+>  		 * infrastructure ever noticing. Skip regular flushing from vmstat_shepherd
+>  		 * for all isolated CPUs to avoid interference with the isolated workload.
+>  		 */
+> -		if (cpu_is_isolated(cpu))
+> -			continue;
+> +		scoped_guard(rcu) {
+> +			if (cpu_is_isolated(cpu))
+> +				continue;
 
-Reviewed-by: Fernando Fernandez Mancera <fmancera@suse.de>
+I think this might have introduced a bug - or at least an unintentional change
+in the program flow.
+
+scoped_guard() is implemented using a for loop. Now this continue statement will
+only exit the scoped_guard() scope rather than continuing the outer for loop. This
+means that cond_resched() will be called when it previously was not.
+
+>  
+> -		if (!delayed_work_pending(dw) && need_update(cpu))
+> -			queue_delayed_work_on(cpu, mm_percpu_wq, dw, 0);
+> +			if (!delayed_work_pending(dw) && need_update(cpu))
+> +				queue_delayed_work_on(cpu, mm_percpu_wq, dw, 0);
+> +		}
+>  
+>  		cond_resched();
+>  	}
+
 
