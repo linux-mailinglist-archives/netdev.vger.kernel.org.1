@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-260253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260254-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qBGuAWPdnGl/LwQAu9opvQ
-	(envelope-from <netdev+bounces-260253-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:06:11 +0100
+	id wFV8MYPdnGl/LwQAu9opvQ
+	(envelope-from <netdev+bounces-260254-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:06:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A30217ECBB
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:06:10 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38CC217ECE8
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:06:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id F2E643028040
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:05:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A0C15309520E
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:05:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D1E737E2E4;
-	Mon, 23 Feb 2026 23:05:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0789137E2E0;
+	Mon, 23 Feb 2026 23:05:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="SLWIKO2G";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="VR5nN1Fc"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="H4D88yRL";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="BPZfSInV"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
+Received: from fout-b8-smtp.messagingengine.com (fout-b8-smtp.messagingengine.com [202.12.124.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DC4337D131
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 23:05:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72C7A37E2E6
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 23:05:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771887930; cv=none; b=dNSJ/OQHjVvFDQiMH1YZ+y8qLKoOLkHA6qXgwIzY8vMLX478xS2p3uM4KIEnl4r264m2l7nYZmXePVmGlytunxVF0y37czr83iKBd0FdWJF4kPit7Mt85U6D1X4HxOoGDVuyc5NQJlCIrrsW31pNJYps5q6z7trhgjPhU+wUo7Q=
+	t=1771887931; cv=none; b=Sc8Q7IvkbOGRvs8XGJwcBLcsLrWrqU/owM7tw5tdPZyHCn9KXqgRc+cBbWrerG86NqVevU4kxcdGebW8GH46LwYFaRD/cr+WtLWWLsEZEHloKij5EEnGJY224pXUkj407uRUCh80h5fPyHlADTUNpUrFW9vmVLcN8AqhZFcz45A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771887930; c=relaxed/simple;
-	bh=SqejiicPd7AIHhFb5cjk7ILDTFURgwz3KgrK0dGiA0o=;
+	s=arc-20240116; t=1771887931; c=relaxed/simple;
+	bh=AYaE1No9ATufp037qakBQvfQcjAVvH9bJ3AD7OwvmbM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=e3zE2l9W1siCUcfVn4Qp2wncA/y5K903F5pF5VmnAt+vAYQ9Zl9JQgP327nfoobE+OAAlF9zff7hAdnDbcM+ck4LIFKQFLOi6chtFQcGPoL0knXYL9GvhHefJBN4IhSYvaFHXB3LFEufFL504+I1oIsSQetzQX4P25SawbsHckM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=SLWIKO2G; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=VR5nN1Fc; arc=none smtp.client-ip=202.12.124.156
+	 MIME-Version; b=PjDIEGlqf84tZMjzLoLQu9QRjG24uEu4INAW7iymZye0IsL8J/0Iun+tOpOpz152oLubQ8udxw4y1YCTTzpfmjsHFDr6OCMLug1HqkqDvF3aK4Kjj8ibSI/41arYzWkaNx1wagn0K3OdeFgsEqE/z8KSoKEwl1sO0KoBo8q8RBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=H4D88yRL; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=BPZfSInV; arc=none smtp.client-ip=202.12.124.151
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 8E5DE7A0061;
-	Mon, 23 Feb 2026 18:05:27 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-01.internal (MEProxy); Mon, 23 Feb 2026 18:05:27 -0500
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfout.stl.internal (Postfix) with ESMTP id B85491D001A9;
+	Mon, 23 Feb 2026 18:05:29 -0500 (EST)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-04.internal (MEProxy); Mon, 23 Feb 2026 18:05:29 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
 	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
 	:from:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1771887927; x=
-	1771974327; bh=Y4LQhFMzlRdN6Kiy7RCWFM3STqimrQtTeO6gLow7n+g=; b=S
-	LWIKO2G15cLfPTnTYiXYBCznY6O15mPqklVPd+qIjGkVS7TPm83GemHNrvspflHB
-	wTCgC4tdjlhvLMHnupV6XKbtAntoFm8g5WWuuW6S2JvZakwrvQBI2/tEz6avjyHI
-	6MkyndX4hmHCoJPAbkxjdER8H52qyuF0+adXasJeoKzCVHIMuhj83t2PWfuAiIUb
-	zXxSoD3PjodCbvn3CvP7Xurke1ZyvdkOnz+Vr8i/BZEKYO1t+YMxAoyoWWLmuGnA
-	y0cGrBJuRUQO8Rky5Aj8G4vPPsOpR6EkFVv2d9+5Nkn7bZUgN9eV8/0mmY9wtm8g
-	ZeQKv7JtP7qfATnEyi1nw==
+	:reply-to:subject:subject:to:to; s=fm1; t=1771887929; x=
+	1771974329; bh=9BleqaMhJ7j6AiFf97Zy4rBXKGhsMglfLM1A/DsNIQU=; b=H
+	4D88yRLupQ4DDoHbsFVugI9gjOoraT7WCZ0Z5k1yl6kpfvvZKuGZ4jcuu2ivZLYc
+	7RryUZYWDwxHrPdbAXB2RWLZaBbzqyLbbV6o5Ukkc+ipiHGe7V2EIR5XQzwP5w1L
+	DQD2NohanvvkyIYn8I4X0wLrtWGGdf2nW0HNwPWF9HEqzo7529DboqDGBvLFpMA/
+	7soo6FalsY3rGPAADwqweEDgaa/pAWdGFVjUpEzOWuIZ9H0lw8KgCdIO03P57soW
+	3K4s5X2aqCmwzATzRQKAgZ/d5GabUO+JafYVzKdhuAuqLa4+IvrGP0jfeSPLCFiy
+	+tjr/W1jm4JdCu4Wo9VPg==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
 	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm3; t=1771887927; x=1771974327; bh=Y
-	4LQhFMzlRdN6Kiy7RCWFM3STqimrQtTeO6gLow7n+g=; b=VR5nN1FcjDcoeKQa/
-	OE42XyF9/jm9HQwkuNjcpsQlL9Nny+UJFhszNSb/pEmEQ+u2/omjwtxc9EtB4/vf
-	qwlsaJy4YdPDMqH5fkiMf7R50JVQ/BYpVnm2V+rfGe2MUE8pr4JDYhmavvN3aDnZ
-	U4J5ON7mvTjmxnjjP0E27/gWYODwEGvw+Kb2GQIpqSyQSFWfZaYozy9zrdtC8hS3
-	ph2eI7T3LNCL8hdiWc0F901wEA799/BlAeXyii2NxHC6pb9waEf3l6t8WvByCY+B
-	141ZZ9wB8mBzaXoqrKqU2MIoh21y4Zo+lXE09TIsyPjq7pE43BuNSn4apF3ZL76d
-	vDtZA==
-X-ME-Sender: <xms:N92caYwbcsxUaRePql-SWIw2ACFnDBOCksMrU6ecZilDcefgAVEtdQ>
-    <xme:N92caXvQ-6yNAUd1W3K2NPR03BhggGhvMSo6iQkaSFNtztsjaDteMzm9dMXXseqS8
-    tADGx0uGoI2yFCJjMYMIJK7KqLprKNbgtadVBLoBY174oUmpZ3xy-M>
-X-ME-Received: <xmr:N92cad1Z1Uewv8_vSZgrelNmpT3XutEowpcW7HZAb41AhCxFdt7tdOJgVIhJ>
+	:x-me-sender:x-sasl-enc; s=fm3; t=1771887929; x=1771974329; bh=9
+	BleqaMhJ7j6AiFf97Zy4rBXKGhsMglfLM1A/DsNIQU=; b=BPZfSInV24rF8AnBe
+	b91gjG7bGTs6ZmO81PXZ9RpRht+qSMEeZskTnhUqIYWC1XKkaW82EEEOBQpZwy3f
+	Mf1YFlV/j9G/uSCPoKeghyU5etpc1WE8ecqatFssyj1RtP9lZSfN81QJ1KV6rQAT
+	hRY2iU/2cwft3mFu15aZxWsXDxUEVN8qG0Cui6U2ISvTnjHws4xBLsSG905mSYit
+	xbgiG6XkUiMq22CeEzPYDKqkDDacjt50U5En+hj5QUmcFtfAkYlLHdEm1rJkbPSd
+	5TCi6H/jhsoqG3GVtYxc+txRfw6WEcmONsw+ojdqEU+X2aWX6RKPpP+QzNioAy4F
+	TrhYw==
+X-ME-Sender: <xms:Od2cabHHi8CWC6dGt9nOv2G0em5Ne7RIE6-68wDC16puq9m8XHPqfA>
+    <xme:Od2caTxar3ReuQyIeCf4gWf76eN0SdOjigxju5Lq93ZPh_tEeZo1zZwtmAtx94dUi
+    rkZ328w6P3y9tI1dsMA7Zp7LcUHqK27NSr13t0Cz-vDEND2GaEIOo8>
+X-ME-Received: <xmr:Od2caQpn9vgCQq23QBXFmLnla9cx3zEuRrGTgUtJRNCAIQjbU74WRVuoYr1Y>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvfeekhedvucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
@@ -80,22 +80,22 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvfeekhedvucetufdote
     drohhrghdprhgtphhtthhopehsthgvfhhfvghnrdhklhgrshhsvghrthesshgvtghunhgv
     thdrtghomhdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdroh
     hrghdrrghupdhrtghpthhtohepshgusehquhgvrghshihsnhgrihhlrdhnvght
-X-ME-Proxy: <xmx:N92caa-3fN3rhU8rkUdpYUYb4lSSIY0DuO86VyzFSBHFr10C71LaHQ>
-    <xmx:N92caWMCiBVGn8PXtzauDmlAEtWsiWJVIepSb8FoMViy0qavxNySpw>
-    <xmx:N92caWcg8-_F9T-2ljSB1ZxA1tAIvfcWQ2ZNQLoyqlk8s0e2PwMJag>
-    <xmx:N92cadUSq_8Nh_kDHp1t_Yk4jl2FrcPpzVoXjNw7K5Ry6hARPRrvNw>
-    <xmx:N92caXHbmoCMzFOAlylAqWCqMHWXawbydn7mGfV0LJi0RoXlXouTQEYw>
+X-ME-Proxy: <xmx:Od2cadjB4SXO02KPAJZY8jJXjs7Xx2wXaVvR7TbBj9In8I25jpXorQ>
+    <xmx:Od2cadgrepuvELk9yDg2lwJwbyIWyvZeuRHi9y_ZT8nyXwkB89uWzA>
+    <xmx:Od2caTjlKTfhtaWMadJPN6YgIxxjIYLY0mt-U0Rq0AbdkYWFn2f7Eg>
+    <xmx:Od2cadKlfDWsIJD-YtTvMi2gR47wAznn7vIJofperevtianh7ez29g>
+    <xmx:Od2caf4YRi-CI44oaqBp6qzNqzzj96EaRG7dwxZlmZVXAw54Vc01Lc0w>
 Feedback-ID: i934648bf:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 23 Feb 2026 18:05:26 -0500 (EST)
+ 23 Feb 2026 18:05:29 -0500 (EST)
 From: Sabrina Dubroca <sd@queasysnail.net>
 To: netdev@vger.kernel.org
 Cc: Steffen Klassert <steffen.klassert@secunet.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Sabrina Dubroca <sd@queasysnail.net>
-Subject: [PATCH ipsec 2/4] xfrm: fix the condition on x->pcpu_num in xfrm_sa_len
-Date: Tue, 24 Feb 2026 00:05:12 +0100
-Message-ID: <475856d2b60e1e14660756a381a0a0abd7bf372f.1771876412.git.sd@queasysnail.net>
+Subject: [PATCH ipsec 3/4] xfrm: call xdo_dev_state_delete during state update
+Date: Tue, 24 Feb 2026 00:05:13 +0100
+Message-ID: <370887596f832347c9d7912f3c7b1c48605adc92.1771876412.git.sd@queasysnail.net>
 X-Mailer: git-send-email 2.51.2
 In-Reply-To: <cover.1771876412.git.sd@queasysnail.net>
 References: <cover.1771876412.git.sd@queasysnail.net>
@@ -111,12 +111,12 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260253-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-260254-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	DMARC_NA(0.00)[queasysnail.net];
@@ -132,34 +132,39 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,messagingengine.com:dkim,queasysnail.net:mid,queasysnail.net:dkim,queasysnail.net:email]
-X-Rspamd-Queue-Id: 2A30217ECBB
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[queasysnail.net:mid,queasysnail.net:dkim,queasysnail.net:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,messagingengine.com:dkim]
+X-Rspamd-Queue-Id: 38CC217ECE8
 X-Rspamd-Action: no action
 
-pcpu_num = 0 is a valid value. The marker for "unset pcpu_num" which
-makes copy_to_user_state_extra not add the XFRMA_SA_PCPU attribute is
-UINT_MAX.
+When we update an SA, we construct a new state and call
+xdo_dev_state_add, but never insert it. The existing state is updated,
+then we immediately destroy the new state. Since we haven't added it,
+we don't go through the standard state delete code, and we're skipping
+removing it from the device (but xdo_dev_state_free will get called
+when we destroy the temporary state).
 
-Fixes: 1ddf9916ac09 ("xfrm: Add support for per cpu xfrm state handling.")
+This is similar to commit c5d4d7d83165 ("xfrm: Fix deletion of
+offloaded SAs on failure.").
+
+Fixes: d77e38e612a0 ("xfrm: Add an IPsec hardware offloading API")
 Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
 ---
- net/xfrm/xfrm_user.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/xfrm/xfrm_state.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index 3e6477c6082e..4dd8341225bc 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -3676,7 +3676,7 @@ static inline unsigned int xfrm_sa_len(struct xfrm_state *x)
- 	}
- 	if (x->if_id)
- 		l += nla_total_size(sizeof(x->if_id));
--	if (x->pcpu_num)
-+	if (x->pcpu_num != UINT_MAX)
- 		l += nla_total_size(sizeof(x->pcpu_num));
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index 98b362d51836..a00c4fe1ab0c 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -2264,6 +2264,7 @@ int xfrm_state_update(struct xfrm_state *x)
  
- 	/* Must count x->lastused as it may become non-zero behind our back. */
+ 		err = 0;
+ 		x->km.state = XFRM_STATE_DEAD;
++		xfrm_dev_state_delete(x);
+ 		__xfrm_state_put(x);
+ 	}
+ 
 -- 
 2.51.2
 
