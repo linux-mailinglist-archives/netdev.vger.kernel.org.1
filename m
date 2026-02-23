@@ -1,197 +1,151 @@
-Return-Path: <netdev+bounces-260208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260209-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +IerFYnFnGnJKAQAu9opvQ
-	(envelope-from <netdev+bounces-260208-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:24:25 +0100
+	id wCZZC87HnGkwKQQAu9opvQ
+	(envelope-from <netdev+bounces-260209-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:34:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7225A17D8D7
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:24:24 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53FDD17D9C4
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:34:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E43E83008696
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 21:24:21 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9D07630086B8
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 21:34:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E98DC378829;
-	Mon, 23 Feb 2026 21:24:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF5AB378808;
+	Mon, 23 Feb 2026 21:34:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b="qsPQtzzh"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="gjFD5Old"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00206402.pphosted.com (mx0b-00206402.pphosted.com [148.163.152.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DBE43783D5;
-	Mon, 23 Feb 2026 21:24:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.152.16
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771881859; cv=none; b=EoCpUgjziJOMAmQ+qr9j7f05GDwJoLKSwUP6SX8VFwavK2ra5easCI+vuJzB/8+pNMVhJoMAB5a3Uh9OrkJeSlO5+jWC8bErsPC5pkDKZR7XU4d5bN53BObI67MfEOqp6qTwiRg0XsCHbbJyUBXGZeJCH4RyrCbq4ig66e2i0rY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771881859; c=relaxed/simple;
-	bh=WFrj/lZtqs44cNRXO4qgohbFideJk5QTDWmHS37c4M4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fBy6Gz7huGqGU0W0IqODo4e8/RiYlHnowKks3WnU8ruHzPqLfI6cO5Xq2ERKwiscrkRT5E9A+W+atj5KGTt1Ee+7MJu2hQM8ta4/qZavypcrcHj+B1v0wou4j4inka3m/g98Xz0RGGFQI2HT3CksXYGEAhmzfDIcWNuRk7uoMSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com; spf=pass smtp.mailfrom=crowdstrike.com; dkim=pass (2048-bit key) header.d=crowdstrike.com header.i=@crowdstrike.com header.b=qsPQtzzh; arc=none smtp.client-ip=148.163.152.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=crowdstrike.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=crowdstrike.com
-Received: from pps.filterd (m0354655.ppops.net [127.0.0.1])
-	by mx0b-00206402.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61NK1R0Y2383293;
-	Mon, 23 Feb 2026 21:23:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=crowdstrike.com;
-	 h=cc:content-transfer-encoding:content-type:date:from
-	:in-reply-to:message-id:mime-version:references:subject:to; s=
-	default; bh=0RS5kT8l4nIEQijTO7RqJlylIQ0xrDRUlNZg5uAdP50=; b=qsPQ
-	tzzheHgzelGIOpxGx39JE25DulziVfrSNTU5lo+Y6nCRCZaxqKz29DjllGUmQ90l
-	eU7guzfqn4AysKwSu+juRsPwbMLTIwqVbyXhQg3LfuovXRNfPaVYzDhdnMq7y7hi
-	g+/z0Uv3HZbuup1k89l+Llyt93EHdRXddfl9WqaWLOCsfb5PiytpuP5/AS4S69/S
-	cT9PQ+niLmdLahfQxnjLzaqviJkJIvvAM7RmI2i1LZLLwexEp7Ljlh7ESETtT3zi
-	11OeeKWk77kUTCLsMTyYLKFUkejakZOUYHd8mvI0kZinipNS3USyvSL8tp6nz4Jg
-	vfCqwzUbAD3WKvsPbg==
-Received: from mail.crowdstrike.com (dragosx.crowdstrike.com [208.42.231.60] (may be forged))
-	by mx0b-00206402.pphosted.com (PPS) with ESMTPS id 4cfry9psp6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 23 Feb 2026 21:23:43 +0000 (GMT)
-Received: from ML-CTVHTF21DX.crowdstrike.sys (10.100.11.122) by
- 04WPEXCH006.crowdstrike.sys (10.100.11.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35; Mon, 23 Feb 2026 21:23:36 +0000
-From: Slava Imameev <slava.imameev@crowdstrike.com>
-To: <alexei.starovoitov@gmail.com>
-CC: <andrii@kernel.org>, <ast@kernel.org>, <bot+bpf-ci@kernel.org>,
-        <bpf@vger.kernel.org>, <clm@meta.com>, <daniel@iogearbox.net>,
-        <davem@davemloft.net>, <eddyz87@gmail.com>, <edumazet@google.com>,
-        <haoluo@google.com>, <horms@kernel.org>, <ihor.solodrai@linux.dev>,
-        <john.fastabend@gmail.com>, <jolsa@kernel.org>, <kpsingh@kernel.org>,
-        <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <linux-open-source@crowdstrike.com>,
-        <martin.lau@kernel.org>, <martin.lau@linux.dev>,
-        <netdev@vger.kernel.org>, <pabeni@redhat.com>, <sdf@fomichev.me>,
-        <shuah@kernel.org>, <slava.imameev@crowdstrike.com>, <song@kernel.org>,
-        <yonghong.song@linux.dev>
-Subject: Re: Re: [PATCH bpf-next v3 1/2] bpf: Support multi-level pointer params via SCALAR_VALUE for trampolines
-Date: Tue, 24 Feb 2026 08:23:33 +1100
-Message-ID: <20260223212333.11438-1-slava.imameev@crowdstrike.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <CAADnVQ+okfKHvKzCy9vLQkpevhvHMFXhincqmFOQX9zN_vtQyA@mail.gmail.com>
-References: <CAADnVQ+okfKHvKzCy9vLQkpevhvHMFXhincqmFOQX9zN_vtQyA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E8721CA13
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 21:33:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.179
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771882440; cv=pass; b=gzWgMsvQ3jzD5Dw/ATnwVMy0+3NyvcJ7qOfipaW52sPEi2ZLNiH8lwheAotXpj+hrl0oHU0pR6ouXlr3kv+FpkAdeP52FmVeVxw2PjY4QKV51cmmGBMfAs+AVO8PTlC/W1Rfc+V1bI1anBD24azsaXSKNDHqIl5XthARGhW+RcU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771882440; c=relaxed/simple;
+	bh=021jXtMyhDZMJO8ezaqBggjzpQ8P1QfsLyb0to/BQ24=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=urWcp76RoCjpKAleQ2UC2zPZelSHfEf4KGKaaL4PwLLHYeQTaAFVOm/PFWIVqme7JkOeNAX3zghNbHDg1nqPctYGd0RBVJSXyP4AElQe73xkEF4nSjCJr++C1ZkBcFoMMn5vUaE4sUIyOyP24vLuMdqrwoQ6CaDi/AnAhVfJaKQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=gjFD5Old; arc=pass smtp.client-ip=209.85.221.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-566fe6a4ceeso2338855e0c.3
+        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 13:33:59 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771882438; cv=none;
+        d=google.com; s=arc-20240605;
+        b=FHy3FgzHzT9TFvS8y3DKsW/T8AxIEqNCH8a/AKw8u3vwVxpkUflpfLIOxWcL1k6Nen
+         syTzjtGW6ZVPTMpw4LDa7wFyDKTe6AwgFuEwU+aKLMHS2WyeXOGOAnoHUPCEl0GvRNYD
+         0AzWezGg63nwx8uiNPJ72g4H5ue2Z/7Irv+02qrmrZd2jaElYCDUREo4bCYkYPXVUFZX
+         R1wqZ4xT9zKPizEhPUpN4CXr+fMFqCxImI2X8WAKAeqmoffhh/E/H0Rd/SA02iBTsTfo
+         FXNREOq3HiwNz6diN70h2Hzb6nM+RFnWDR2vIgGg9q2sr/jd/fKv8U+ez/OQ3cpu5QHH
+         ANnA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=0zit8S7iwHJ5QSy6Eg/d7T533BFQll8AvWNa/glAiUQ=;
+        fh=AncD0AS9UsLKDFSJyg9EIrmTarBUaKA1UHVIu3FeFWo=;
+        b=Ji860sBbVpBJCh8CrWLDlh6lLDkOTP32m7S8f0Y07MdY0iQrU/DBvv/WRUsiLRGIDU
+         BOc2PSVWQ7iFlgbjj2CAKlDXBYNf8fBnIaPuN7ANUxCxXmrWAAqwh0EBnR7vcwmO8Gw0
+         XslWEGuUWkMe/g2eVCQBr2or/BKZxfcnNVkl8kfIYOcNxjs4nRmj1X/mA9W85MNGgiNL
+         SEIdMg1KgZmZ6PGqjMKYEaBGU28WHSagijpYR4gVi2H2dICircvr2E0MzP2jqnPVm2FE
+         AHqpGCIv9ZF61vTxoBjlnWLUAxfbkA/eatLcRoIoXnHIvOnZM/+yc+lDyZopZeKKSdq1
+         Xjug==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1771882438; x=1772487238; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=0zit8S7iwHJ5QSy6Eg/d7T533BFQll8AvWNa/glAiUQ=;
+        b=gjFD5OldWi7iMD4LJL9AjP5kse852W3IQ+4E95LBSLl8+Gk4k4zCUFQh09VG5RwEnb
+         xmbwAFTlpDTtc9CPE4qMRYQAust7VCoI8G+G2O9RQb3/WaX0FIJB9k1QRodfD1l2Z7mn
+         Ua6ICLMMzL8+syTGmC23RZq6z76OyOhqlKaWM5G8TgblO7qyb8kOq1YhahsE6rZ1aKxM
+         n2S8yumuz05SeMn3UL+bG3rImndzYJQx7oS1jE9I46ce6XpsD/iq2zvaqR4D/ueG60Jf
+         upbF6R2zguY54oZL6mu2YBG50SqoSmiRnRb6fNTIamyKUhu+wxjX3UTye57+facrd9rj
+         oh6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771882438; x=1772487238;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0zit8S7iwHJ5QSy6Eg/d7T533BFQll8AvWNa/glAiUQ=;
+        b=UcG7FiIHt1ryICrysbUAnDPV5dJPdfHshvxm82TjL8wygO2SXB222tX4D2vFgVQPhn
+         +5LGIPZYLrc1wjQw3ejcaoDpeJfZOvXHkJ204yMetC+oKx0/DGJ+1WImuTBW9Pmvr8vr
+         TtvTuhptEj5pjO8unnXRVwC8rZ4/lQN+Q9BcS2EE2p++OfXGM8zXMSHyJCzBojmPhWKp
+         jBg7Rh00HnwKalLClEpkgo4h5+432IkIfOkRr6sKqdUHG6QK5xwJE/r0/Q2o/7ABqHcD
+         7GuoOx841EMSvVfMopxOqkrYhvFuFg/7WtHOfSArHwxzsi255pcckqs0mwfm4wxGuzCq
+         0grw==
+X-Gm-Message-State: AOJu0YwAFOo7ezY56OtehJirzFJ1eiXLnXlnsnzIP0npZwvBUKipBFRV
+	yPUL3XTgF7uqFbcU20N5zq3fa78amG9T6eYR+yOohAV03dAuIfDsRBNKS46HbSRL7Iaz3t3onM3
+	n7Xa59NeaR0di2R5JRF7WhxlPbGNMtocmVF4vUQ/bpQ==
+X-Gm-Gg: ATEYQzxSvbsfGtmXSplAtXfD1pvg9oiEeMisSFYbm3IWjPl4IghPQe/5JH1W3A9fBfn
+	bJvf5iB7yfDb7LKj+3FoR4cf/DmUdSdnKkxCLOu87gyBBBzJ3rPe3Bh5X5KxOo+RNgaBQe9yHfX
+	M/++lI309Y8pOjV6pxJoFu9ExJ72GAfQjMz7dOB+MkLuWRb4KA20XFHx6152O5Sw5pfJzMGv3WR
+	9TsEL6XapPI0o/fsnRas4kW396oMOa89KEg7tsr42+t4iGIpQ5gW+eF7Sh3jzClzfQfHB8Ux9Hb
+	uLNRPg0g
+X-Received: by 2002:a05:6102:6cd:b0:5f1:70fe:3027 with SMTP id
+ ada2fe7eead31-5feb30293bcmr3146247137.24.1771882438099; Mon, 23 Feb 2026
+ 13:33:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: 04WPEXCH005.crowdstrike.sys (10.100.11.69) To
- 04WPEXCH006.crowdstrike.sys (10.100.11.70)
-X-Disclaimer: USA
-X-Proofpoint-GUID: CHbpyHajqq48QOwRSKalp0lbR_lxV-ko
-X-Proofpoint-ORIG-GUID: CHbpyHajqq48QOwRSKalp0lbR_lxV-ko
-X-Authority-Analysis: v=2.4 cv=b7u/I9Gx c=1 sm=1 tr=0 ts=699cc55f cx=c_pps
- a=1d8vc5iZWYKGYgMGCdbIRA==:117 a=1d8vc5iZWYKGYgMGCdbIRA==:17
- a=EjBHVkixTFsA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=T2KQ53IYiC3MXPrxx8bB:22 a=vDKVRhTs-M86Ea50iKLw:22 a=VwQbUJbxAAAA:8
- a=pl6vuDidAAAA:8 a=FujS-YLXLLbCOATfuAEA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjIzMDE4NSBTYWx0ZWRfX+5ixqzCHahBd
- YeWsrRYx9+ILBYLGHaTsEq0AfogXXHmkIiTiwGvmnlBn1ENVH5QrP+EdL0q/OpRSr6DAWkNhztT
- ZWwjZr9YyJd91xCXPL75S5FgJmY/Utnup+ht7MDXsh4aWKBLDBnmxcZ05dUlVjXD88JS9TdwHjY
- uMuzJPjcS0+mgm5S+xq2a7B1Kfz2Mc0adrm3jXJrNphUdE/0UaK5WWLExjfRmERMy5Z3RK6FC8R
- Qx+md0EBTPljlMIKdXTdHSgSjZO6ETwxr7YiTwnuj2llN6+TOBVcw5u5hjLt8LQV0OBUXkWwFrt
- P3d93K1sdLZZPcUsQf/hmP/Nf9QxUYGg0L7rvYFbfvraZXHqgTdxfmdoZuMXjd+xqExfdohFepy
- H6f9aMKs5K/rODcjn/K/Bdgbb7pOtEWqNK7urVF9bu+YSFmiL52T2nhaXHciCmHjFFx+KNsc5mD
- GMzZuKorcOy5xjThgHA==
-X-Proofpoint-Virus-Version: vendor=nai engine=6800 definitions=11710
- signatures=596818
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 lowpriorityscore=0 bulkscore=0 clxscore=1015 malwarescore=0
- impostorscore=0 spamscore=0 adultscore=0 priorityscore=1501 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2602230185
+References: <20260205231558.139818-1-rjethwani@purestorage.com>
+ <20260205231558.139818-2-rjethwani@purestorage.com> <aZxlWCVi4RZhRWB4@krikkit>
+In-Reply-To: <aZxlWCVi4RZhRWB4@krikkit>
+From: Rishikesh Jethwani <rjethwani@purestorage.com>
+Date: Mon, 23 Feb 2026 13:33:46 -0800
+X-Gm-Features: AaiRm50DG7fysrEN3Ci7bb2fXhMD-eUDkwoYkF23RbVwv6qUfiaU2HdkufnKrYQ
+Message-ID: <CAKaoeS0a7AMdY1TvYsc0TvF0xv=WjNin+6bQ5NqJAnGnR+yWtw@mail.gmail.com>
+Subject: Re: [RFC PATCH v7 1/4] tls: add TLS 1.3 hardware offload support
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, saeedm@nvidia.com, tariqt@nvidia.com, 
+	mbloch@nvidia.com, borisp@nvidia.com, john.fastabend@gmail.com, 
+	kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
+	leon@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[crowdstrike.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[crowdstrike.com:s=default];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[purestorage.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[purestorage.com:s=google2022];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,meta.com,iogearbox.net,davemloft.net,gmail.com,google.com,linux.dev,crowdstrike.com,redhat.com,fomichev.me];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260209-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-260208-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,gmail.com,kernel.org,davemloft.net,redhat.com,google.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[slava.imameev@crowdstrike.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[crowdstrike.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[rjethwani@purestorage.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[purestorage.com:+];
 	NEURAL_HAM(-0.00)[-0.999];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	TAGGED_RCPT(0.00)[netdev,bpf-ci];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7225A17D8D7
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 53FDD17D9C4
 X-Rspamd-Action: no action
 
-Alexei Starovoitov <ast@kernel.org> wrote:
-> On Mon, Feb 23, 2026 at 2:48=E2=80=AFAM Slava Imameev
-> <slava.imameev@crowdstrike.com> wrote:
-> >
-> > I think support for broader types can be provided in a compatible way
-> > with future annotated support, as I explained in my reply to the v2
-> > review:
-> >
-> > "
-> >   > so I suggest treating 'void **' as a scalar as Eduard suggested.
-> >   > This particular sb_eat_lsm_opts() hook
-> >   > doesn't have a useful type behind it anyway.
-> >   > I'm less certain about 'char **'. If we make it scalar too
-> >   > it will be harder to make it a pointer to nul terminated string later=
-> .
-> >
-> >   > So I would do 'void **' -> scalar for now only.
-> >
-> >   I changed to scalar in v3, keeping broader scope for pointer types.
-> >
-> >   We encountered double pointers of various types that required
-> >   workarounds, such as:
-> >
-> >   int __posix_acl_chmod(struct posix_acl **acl, gfp_t gfp, umode_t mode)
-> >
-> >   Adding support for void** alone doesn't address the broader issue
-> >   with other double pointer types.
-> >
-> >   When annotated array support (including char**) is added in the
-> >   future, it should remain compatible with the scalar approach for
-> >   legacy (unannotated) parameters. Unannotated parameters will
-> >   continue using scalar handling.
-> > "
-> 
-> but then there is no need to relax it for double pointers only.
-> 
-> -       if (is_void_or_int_ptr(btf, t))
-> +       if (is_void_or_int_ptr(btf, t) || !btf_type_is_struct_ptr(btf, t))
-> 
-> would make 'scalar' a fallback for anything unrecognized,
-> and we can argue that making it smarter in the future
-> maybe hopefully won't break progs.
+> Maybe a silly question but if we have this fallback to the dummy_page,
+> why even bother trying to allocate?
 
-I can increase coverage to anything that's not a pointer to structure.
-
-I added support only for multi-level pointers of any type because
-we needed workarounds for them in our development. This was the real
-case we encountered in practice.
-
-Multi-level pointers support appears to be a safe extension since any
-future support for arrays and output values would require annotation
-(similar to Microsoft SAL), which differentiates between current
-unannotated scalar cases and new annotated cases.
-
+Existing append tag code comment explains this:
+         * use socket memory to improve coalescing (re-using a single buffer
+         * increases frag count)
 
