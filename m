@@ -1,83 +1,82 @@
-Return-Path: <netdev+bounces-260228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260229-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oOyiDJrQnGmPKgQAu9opvQ
-	(envelope-from <netdev+bounces-260228-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:11:38 +0100
+	id WEstDAjRnGllKQQAu9opvQ
+	(envelope-from <netdev+bounces-260229-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:13:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B78B317E0B2
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:11:37 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C148817E141
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:13:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8B4C630474D2
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:06:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 49DA4306DFCA
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:06:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58C6F37BE78;
-	Mon, 23 Feb 2026 22:05:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78B5F37C118;
+	Mon, 23 Feb 2026 22:05:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e5pNyYux"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fFs7CI6c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05CAC37BE62
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 22:05:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870E237BE65
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 22:05:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771884308; cv=none; b=ko8OtZtr1xTVbHcYAorp3SkRyxJhzOQdB7EOC/sybByTZtY2IX0LTdexa0cVziCK9UawZ810NSk5t/FQ4poyURqvoKSRM54m5EJ5sndgE3ZSomIRZCmqMlU/hBjno6GDPOdKEuPeho8dzncyYoZH9w8FNKNTZVuUKjCI5LuXd0I=
+	t=1771884309; cv=none; b=elec/YacmjrZ+mcYBFVj9fkecLIIk16GbVEar1gR35/LMsaHReFD1+bj0RdFLjN+gzziCbayHAUa/fivmdRnyQwBad/EgEDhYBO2pth3DU7NKftnJ6MAqmvi4SdGNx4HeoiMR5ttAKAzpX0//h8Us8O/IvBxY23Hl379aRk07X0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771884308; c=relaxed/simple;
-	bh=hRGB9oVjZrDC5m4XZKHO2WMi1uqtMLbDhKE3faTS22k=;
+	s=arc-20240116; t=1771884309; c=relaxed/simple;
+	bh=6rrKwA7t2xdnfxQdEHWUilDFPRm0gP2abwyKcFsi1z4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EgbGpOrWp/q4+54OBBJFW/vFITLqV3zgjiEH1aTy7a0UZy4T33j26d4w32XJE0xnWqNCQgioOuyRrS4gM6zIgQLaragoehrcRiDTOLlIpsyA0BaCoIyHPB6ZFi2ClS29eMazpAuyixFQwbAvuF/vOrQxUY7ivGI+azqGp3GZQIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e5pNyYux; arc=none smtp.client-ip=209.85.218.54
+	 MIME-Version; b=Qq+BZ4RHV/dvXyaP3wnc9mOO7jZ8RsI23d7f7Nq6lBy1MBijnk9mS9aHe5M0bgx+IOl6HxodY2Jbd1T/kqVaC+GXfh9yAqIIrTwAfPaRXvESoDuo1QjxNwuIjh27epFbtKG/OCWeovUVLmTZMB3edpAPBPxR+J/JX4ga2EZ0Gjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fFs7CI6c; arc=none smtp.client-ip=209.85.218.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b8f96f6956aso666587666b.3
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 14:05:06 -0800 (PST)
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b883c8dfb00so832595766b.1
+        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 14:05:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771884305; x=1772489105; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1771884306; x=1772489106; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NJnwuXlwPqYBkjbw57cs4hmL2PjDi3OofAmEvUVEuyo=;
-        b=e5pNyYuxf0xHsF+XHzH0+Bhgh7yFJy58SnPuA5PH4pmpJl3fXe/OEFdVO86cMFyozs
-         FnxMJxgDOKBEgCvNmMMEL8cerEMk91LmtZG3IvxHSOOCJuGTfr6wwePKf54KJ7TWxXc1
-         3NXARy8GwkUi4TRFnU8VFwXbyHIVRmn+C/jwzBdRCDIOy0B++hxrolCH0gWRf/Wv2ghC
-         SaA7yTUad6y4D8UCoaz8mdR6ITUX2wUZhPvZYEY8V/xTeFhe0pGuXdWMwKseQ8SEJjwA
-         Mj28g7lFdgW9xPAx/67m+IzQxuCFgB5dEb8ytGWfw7+DG2N9QRcM9mVXyMrhzZAVPYCS
-         /tXw==
+        bh=Em4vcQtlpeRbVR/RxCYxW/F57zyFMmk1V0YQNclS9kA=;
+        b=fFs7CI6c4y6EvfLMVIy2PVMDG4ceE5hvJ2vAUJwosNx6Fj0XNY3F9ScvF3QiXFIj+q
+         STUYwq0ALicMOeocRtdt48KFZjO+bWIXx7WGqW3reTu5Zl35Vpj4KkBpGIKVpVtm0LhQ
+         GBRioi8mT2DMEkzJlW6qeBe7bZ4fhT/xk/xb3iRoK1AzVhDXnAf5Nzyt13QABjjfpYFv
+         bwkYZZ6B5OBpXftnWVdy6C6UIVje5iX2daEskUDZg+yMAQ2QBq7hthibmf5C/Kk8DMu7
+         o+rYg4K5nuR7y+9yCuXANgOntMCfHSqGiRXQxoxwhVNT02gZsqcNEOb+mHCo19HOiO9D
+         u28A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771884305; x=1772489105;
+        d=1e100.net; s=20230601; t=1771884306; x=1772489106;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=NJnwuXlwPqYBkjbw57cs4hmL2PjDi3OofAmEvUVEuyo=;
-        b=W4KIs0Jt8+FpqdjKLq6A0KovmgODBnUjf/qXlAQdL34r7DaUpEPSZE2/YKI2eRNr6j
-         7EaTtZDZiYpVV33AOGsBEyz4CkQJxxnaJj2Vy9XjYqYSP2VGal46IU0E7N04UH5OQBaC
-         ovH1X4/rO85KdY8i0qne6ovaENO6RuScaOWKrEWV/m+DO+lpkD43KWy9bPtQHa1ePbEc
-         U1zFtGRgGaxUYAQNwLrevazxo2kK2X/lYOhFTNbA+J8oDCncH1aJB12aeeAXrMmSmGsz
-         /jGLaG9QwALUWK8M9EC6tq9ay/uJ7bTRqCS9uj7FDi7bx0geLKDPr1X7ia5SC9IKHvzC
-         UPKw==
-X-Forwarded-Encrypted: i=1; AJvYcCXkp7eboqv75hGonrP+J6eNHbLzDi30j9jzp92v8GrxRAwoqS24zUpiiJUBLt+ryaPa7LePAiU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgaryBjZg+D3Pb3yozLDI0/8DeC1g3N8iJYn7I1pHgKCcb2ixC
-	iyR5Os7mw+UuTLdG5EAMyQYJ7N0tVSG4DzbURcJkWSn6mkr6H6RAC6Jl
-X-Gm-Gg: AZuq6aJniUR+J2AspEt9Oy+aqNOybQMS/pYOeDm+JJxXI2+sqjrCy90+MIje7YjFDS+
-	Cc1shxPi9AozOvUEZ5canWh6er9MK8t3JTG2BUkcUV0VycBdqtQGIBba5ivwKTNYwxJ8Lr+Ba1C
-	p+5nkwqPM93lgq6yeDT43UNTsdkKs5PQyEXrQuc7A5acMio8A7glGnvUKsV14tn7gI/2j3nrkqd
-	Ut1iMI6tgKISTl+ftvwQA23jqwE5LIcrkG6tbnZOfkeI0g9JD8xMEpkZUbl7riwHiZgr+J0kQHj
-	z4wukIad5qiSaxBdi2elPp5TMmwD2VigJdFPo5l6hQLhh3ZzOesRqzZcxh8zYkboVjdntJ2G1m6
-	ZomaOUZlOm6OXb+gSeTy4L0nQ7tmF4P2BoIXbGxG/ns3NSA56RchvDrzpe+q28IAjQIrGWmg038
-	Y3Ic8AWBNUHimTKYh49560l1X6E0l+40gijZglEkNINmq3jZGxE3Xd7QoZWmSiT+81+IVEjpjDV
-	1H4GhD5n6K8RVLxBA6PX3w+vDM3j+WKCRDh5NMWC1khcoNxJJiZgyI0JCpsUv1qtOubVCc4nsVC
-	w83wlg==
-X-Received: by 2002:a17:907:9288:b0:b76:f57f:a2c3 with SMTP id a640c23a62f3a-b90819214c4mr711516866b.12.1771884305230;
+        bh=Em4vcQtlpeRbVR/RxCYxW/F57zyFMmk1V0YQNclS9kA=;
+        b=t6sWWK3f7i8kj2M42jzd5WEjZu6Nx/CM/FiSC0huSGVI6gHYvb5FtnB7pFvWSiXCg3
+         jFtp4Ir4hUpeUQTjEazUYSLuCbqERRMIqJtJ5qRd2I1N8IHXaWXITbiyvzZS/uQV3Yt9
+         fHM7pC12Q93lxplZLTDaBqxWIHxMeKP/PZCtMZxVGyQrS8vyLYiIIP9VRzZrYDp8TLJJ
+         ClLY3uE95QxRSH3S5euEiSqNJDi1vNsjqBv92gY5BOqPvktBZKrNOJnKd0WeXZnTMcgX
+         DdbF+lDUBzr9bjuowaGzSRFwOp3Xjr2tN/4hJGmp9zKBjm6jKdia0adRjJ0BLwfOxHli
+         vsdA==
+X-Forwarded-Encrypted: i=1; AJvYcCX+WGRJvc/Lbl8ttWpJh6FVwwaXJ4kwISF/sB5vtLy/RaWB9/xpTXzV2iOlOLk3+c7uif1ziJg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxB20x/QyvDCKzLOtBWVDj0upTy28OnYx7i9nllPnH1QfcATTUC
+	s2mBgqiUvetvB9agqgXeWwmpJ+ZwXqTKMbZo/1hDYKoLj/Lj6Uuhqfm1
+X-Gm-Gg: AZuq6aJlTgcwyQJ/+teN63FkY2oerduA99yXzihA9rixCBnKIpDedv/OQe2bkVxjtl9
+	Ldr3kz5SMROlMsuzvVyB/aYdf3YvWbhjbpM1PaytJi67Pn/jnaXOlNIpuLAhTcNxE4qCGDa9udF
+	9r5gMJo0iqR5o+ZziIahkjYGtmvQmFTqw0rGMXR6Q8HUJG4TLhO+bzpfOhKJ8B+ttvKLCKavY1q
+	8gekVbUixFDpb89eheDD6tzQ5iKtEaJ1Yh8wsRkTpjzApWagR3E0Fk1my2Nh+YpjRp1lBMZw7zf
+	8ZMAkeIIa8qpawEA2thRQWWSN7fLKg++QG1XX7Xr3ekVSTQIveRmoN8m+wLjcBrFKldHcRwaPQu
+	1oz6vrMTqdbX7y4HpVkF+QTivuk/IHEsbQdpdhpchruCfgRnVIIqrzM4YEUQNFSy3fRop+Hl4y6
+	0ZTnjERKyYw5isYTZCIrECBkPYdyFbjV8IFCSt8pxvGu1J2zLGuDxAKsr46tp6XUj2xQa1Rn+NC
+	RNcjGt1mgxJym1A2lktZGw9aiVefhFweomhfQD2bOTwo5vT4lhuOagA4PjmES/96+j6Hng=
+X-Received: by 2002:a17:906:9f85:b0:b8e:36ec:88db with SMTP id a640c23a62f3a-b9081a40e99mr609037966b.22.1771884305881;
         Mon, 23 Feb 2026 14:05:05 -0800 (PST)
 Received: from cs-874966990260-default.europe-west4-a.c.i2f7e30109524dc12-tp.internal (230.86.12.34.bc.googleusercontent.com. [34.12.86.230])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9084f191b9sm359394666b.67.2026.02.23.14.05.04
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9084f191b9sm359394666b.67.2026.02.23.14.05.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Feb 2026 14:05:04 -0800 (PST)
+        Mon, 23 Feb 2026 14:05:05 -0800 (PST)
 From: Artem Lytkin <iprintercanon@gmail.com>
 To: FUJITA Tomonori <fujita.tomonori@gmail.com>,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -93,9 +92,9 @@ Cc: Trevor Gross <tmgross@umich.edu>,
 	rust-for-linux@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Artem Lytkin <iprintercanon@gmail.com>
-Subject: [PATCH net-next 1/2] rust: net: phy: expose genphy_config_aneg()
-Date: Mon, 23 Feb 2026 22:05:00 +0000
-Message-ID: <20260223220504.2102-2-iprintercanon@gmail.com>
+Subject: [PATCH v2 1/3] staging: most: dim2: replace IS_ERR_OR_NULL with IS_ERR for devm_clk_get
+Date: Mon, 23 Feb 2026 22:05:01 +0000
+Message-ID: <20260223220504.2102-3-iprintercanon@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260223220504.2102-1-iprintercanon@gmail.com>
 References: <20260223220504.2102-1-iprintercanon@gmail.com>
@@ -114,13 +113,13 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[umich.edu,armlinux.org.uk,kernel.org,davemloft.net,redhat.com,google.com,vger.kernel.org,gmail.com];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-260228-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-260229-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[14];
@@ -135,46 +134,43 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B78B317E0B2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C148817E141
 X-Rspamd-Action: no action
 
-Add genphy_config_aneg() method to phy::Device, wrapping the C
-function __genphy_config_aneg(). This is needed by PHY drivers that
-perform custom BMCR configuration before calling the generic
-auto-negotiation setup.
-
-The wrapper calls __genphy_config_aneg(phydev, false) directly since
-genphy_config_aneg() is a static inline function not visible to
-bindgen.
+devm_clk_get() never returns NULL, so IS_ERR_OR_NULL() checks are
+unnecessary. Replace them with IS_ERR() for both the "mlb" and
+"pll8_mlb" clock lookups in fsl_mx6_enable().
 
 Signed-off-by: Artem Lytkin <iprintercanon@gmail.com>
 ---
- rust/kernel/net/phy.rs | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ drivers/staging/most/dim2/dim2.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
-index 3ca99db5cccf..5ccadc5e2579 100644
---- a/rust/kernel/net/phy.rs
-+++ b/rust/kernel/net/phy.rs
-@@ -276,6 +276,15 @@ pub fn genphy_read_abilities(&mut self) -> Result {
-         // So it's just an FFI call.
-         to_result(unsafe { bindings::genphy_read_abilities(phydev) })
-     }
-+
-+    /// Configures the advertisement and resets auto-negotiation
-+    /// if auto-negotiation is enabled.
-+    pub fn genphy_config_aneg(&mut self) -> Result {
-+        let phydev = self.0.get();
-+        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
-+        // So it's just an FFI call.
-+        to_result(unsafe { bindings::__genphy_config_aneg(phydev, false) })
-+    }
- }
+diff --git a/drivers/staging/most/dim2/dim2.c b/drivers/staging/most/dim2/dim2.c
+index 92c7a7d8fe7e..cea1ba99caf7 100644
+--- a/drivers/staging/most/dim2/dim2.c
++++ b/drivers/staging/most/dim2/dim2.c
+@@ -921,7 +921,7 @@ static int fsl_mx6_enable(struct platform_device *pdev)
+ 	int ret;
  
- impl AsRef<kernel::device::Device> for Device {
+ 	dev->clk = devm_clk_get(&pdev->dev, "mlb");
+-	if (IS_ERR_OR_NULL(dev->clk)) {
++	if (IS_ERR(dev->clk)) {
+ 		dev_err(&pdev->dev, "unable to get mlb clock\n");
+ 		return -EFAULT;
+ 	}
+@@ -935,7 +935,7 @@ static int fsl_mx6_enable(struct platform_device *pdev)
+ 	if (dev->clk_speed >= CLK_2048FS) {
+ 		/* enable pll */
+ 		dev->clk_pll = devm_clk_get(&pdev->dev, "pll8_mlb");
+-		if (IS_ERR_OR_NULL(dev->clk_pll)) {
++		if (IS_ERR(dev->clk_pll)) {
+ 			dev_err(&pdev->dev, "unable to get mlb pll clock\n");
+ 			clk_disable_unprepare(dev->clk);
+ 			return -EFAULT;
 -- 
 2.43.0
 
