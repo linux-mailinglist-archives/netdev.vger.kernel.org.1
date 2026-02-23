@@ -1,91 +1,103 @@
-Return-Path: <netdev+bounces-260210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260211-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UHPWJDbJnGkwKQQAu9opvQ
-	(envelope-from <netdev+bounces-260210-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:40:06 +0100
+	id uG4PGlvKnGlHKQQAu9opvQ
+	(envelope-from <netdev+bounces-260211-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:44:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B1E417DA5B
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:40:05 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C214517DB2F
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:44:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 184DA301E9B8
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 21:40:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5FC143058DDC
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 21:43:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78D70378D99;
-	Mon, 23 Feb 2026 21:40:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D91378D9D;
+	Mon, 23 Feb 2026 21:43:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WZB+TXCP"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="McoNbNT9"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB37B374161;
-	Mon, 23 Feb 2026 21:39:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C49E2641C6
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 21:43:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771882801; cv=none; b=VmSx2Mv8z/lDSc7p550xBY7CkZ5NNStFUZ1BsvbZFjMO2V0sQRR4fh1hH6qYMrnDzW+L/jX8yAoFmRrURbio6m67j6UrhY+Sux1IAiUGCc+AigSuxOfDfneuTst/N450veGPec3MLTdaMgzuk7E+rdUY5s2fLB9zU/9KSBg9HLI=
+	t=1771882997; cv=none; b=KGmt0bimKstV6ERUB4os+TkohUkBEfLt6C4OxsOejs2DWhuMo3Rq9jt4/Ha2GTGRZRjww6+qT/0uoDHgehfpq1h+yaVvQx0ZVAnRGnwRmoXzvOSrEk42M7wx2ROXPWRDr4cwebnZJTJ8olsmU9duY0ZOKSztl5Jpt9BLd9I7Yio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771882801; c=relaxed/simple;
-	bh=BpSpamoVJZ3kwN5u6v1a6nz7c507hZNR2SXpJ+gOp+w=;
+	s=arc-20240116; t=1771882997; c=relaxed/simple;
+	bh=8x3+GaARO3sIasJgNw+lz23WiKvjHUHZs7cHUaZ6qwA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ApGkClrmK+hqMZxp4NHfo4fzsIIq+YWTtT5yuyZgdlGv4aHTmCrvsEtra6qTE3q1mZZ9jx9al4tVAJ/ic4w0qhuDcR2z8cUM1u9TI9/5uYlMbEjSXafCcqs1lFPCi4OGJG9R5FU0HrKlMPIzKe4M5aXilKSHIqE8x4/fr3ouK9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WZB+TXCP; arc=none smtp.client-ip=91.218.175.177
+	 In-Reply-To:Content-Type; b=Wer7tTfXW3qBXjgnPno0wUgHli7ezZJrzj5rtBxi5jox7leAXzIgjUHenZJB/HMeXjcEX+cH8vG3CNsYGtIr7mK1PZ6HM7/E+YCjs3yBDdb8Aih0gPwm813BviQvWlnLXpG4vX/Z1DlgDha27WPlD06zAdd1L+hvi9c6wPy9l/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=McoNbNT9; arc=none smtp.client-ip=91.218.175.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <49568dac-6c95-45e4-b869-d0f07563205a@linux.dev>
+Message-ID: <d122ed8b-ebfb-4d59-96ce-10c361e76676@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1771882796;
+	t=1771882994;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CAT57ah5rRdQMdj3uuN8asWPdjCT7A8sZ2h7Ftot1Hg=;
-	b=WZB+TXCPVzg5MVZDuVT4B5DBPN90HJGb2eNXCj4XAtpg2e3eZb6O7UoEBz+I3kLbPyM/D4
-	dZDVwnZmEdNMpn8liSFROdLZ2Y5uPninyBXdR8Wp878nDlDLuwlERT9cQEwLWLWluvJ7lv
-	VoNuXAPZBQqTkoaDb15DoBOQk1H4wtY=
-Date: Mon, 23 Feb 2026 13:39:51 -0800
+	bh=6ZYcupND28PGAqaDkbT7jqLJ1TI0n/gP/2am0PmSi9g=;
+	b=McoNbNT9vjwf2I2pNyeCv3x53PejvJMiSF7SiH5fi27UYl4kcLGt//K/xRN1I5Atzs1uJo
+	zPoyam07zdN+LgsrrFJad6W947WyoNLVSd1zIpC5z6+ZL/zeA3eYLSNNYfbfC170YMLnUq
+	B/GYtwlpPVkZQ9Beg6i1e5s9pVApOIg=
+Date: Mon, 23 Feb 2026 13:43:06 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v6 bpf-next 1/2] bpf: Fix the null pointer dereference
- issue in bpf_lwt_xmit_push_encap
-To: Feng Yang <yangfeng59949@163.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, posk@google.com, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com
-References: <20260213024429.39972-1-yangfeng59949@163.com>
- <20260213024429.39972-2-yangfeng59949@163.com>
+Subject: Re: [PATCH bpf v2 3/4] bpf, sockmap: Adapt for the af_unix-specific
+ lock
+To: Michal Luczaj <mhal@rbox.co>, Kuniyuki Iwashima <kuniyu@google.com>
+Cc: John Fastabend <john.fastabend@gmail.com>,
+ Jakub Sitnicki <jakub@cloudflare.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Willem de Bruijn <willemb@google.com>, Cong Wang <cong.wang@bytedance.com>,
+ Alexei Starovoitov <ast@kernel.org>, Yonghong Song <yhs@fb.com>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20260207-unix-proto-update-null-ptr-deref-v2-0-9f091330e7cd@rbox.co>
+ <20260207-unix-proto-update-null-ptr-deref-v2-3-9f091330e7cd@rbox.co>
+ <CAAVpQUA+8GL_j63CaKb8hbxoL21izD58yr1NvhOhU=j+35+3og@mail.gmail.com>
+ <c4eaead1-ad69-42f0-9699-5f2d555a7693@rbox.co>
+ <a2f2c260-38e8-4ba3-8655-cffbee046259@linux.dev>
+ <b75bbc3f-85fd-4209-9ce1-3bf685ba62ff@rbox.co>
 Content-Language: en-US
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20260213024429.39972-2-yangfeng59949@163.com>
+In-Reply-To: <b75bbc3f-85fd-4209-9ce1-3bf685ba62ff@rbox.co>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260210-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[163.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-260211-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[3];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,cloudflare.com,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,bytedance.com,fb.com,linux.dev,fomichev.me,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -94,108 +106,21 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[linux.dev:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,appspotmail.com:email]
-X-Rspamd-Queue-Id: 2B1E417DA5B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim]
+X-Rspamd-Queue-Id: C214517DB2F
 X-Rspamd-Action: no action
 
 
+On 2/11/26 2:02 AM, Michal Luczaj wrote:
+>> It should also be helpful to be consistent with tcp/udp iter and use
+>> lock_sock() instead of lock_sock_fast() in bpf_iter_unix_seq_show().
+> OK, I'll tweak that in v3.
 
-On 2/12/26 6:44 PM, Feng Yang wrote:
-> From: Feng Yang <yangfeng@kylinos.cn>
-> 
-> The bpf_lwt_xmit_push_encap helper needs to access skb_dst(skb)->dev to
-> calculate the needed headroom:
-> 
-> 	err = skb_cow_head(skb,
-> 			   len + LL_RESERVED_SPACE(skb_dst(skb)->dev));
-> 
-> But skb->_skb_refdst may not be initialized when the skb is set up by
-> bpf_prog_test_run_skb function. Executing bpf_lwt_push_ip_encap function
-> in this scenario will trigger null pointer dereference, causing a kernel
-> crash as Yinhao reported:
-> 
-> [  105.186365] BUG: kernel NULL pointer dereference, address: 0000000000000000
-> [  105.186382] #PF: supervisor read access in kernel mode
-> [  105.186388] #PF: error_code(0x0000) - not-present page
-> [  105.186393] PGD 121d3d067 P4D 121d3d067 PUD 106c83067 PMD 0
-> [  105.186404] Oops: 0000 [#1] PREEMPT SMP NOPTI
-> [  105.186412] CPU: 3 PID: 3250 Comm: poc Kdump: loaded Not tainted 6.19.0-rc5 #1
-> [  105.186423] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-> [  105.186427] RIP: 0010:bpf_lwt_push_ip_encap+0x1eb/0x520
-> [  105.186443] Code: 0f 84 de 01 00 00 0f b7 4a 04 66 85 c9 0f 85 47 01 00 00 31 c0 5b 5d 41 5c 41 5d 41 5e c3 cc cc cc cc 48 8b 73 58 48 83 e6 fe <48> 8b 36 0f b7 be ec 00 00 00 0f b7 b6 e6 00 00 00 01 fe 83 e6 f0
-> [  105.186449] RSP: 0018:ffffbb0e0387bc50 EFLAGS: 00010246
-> [  105.186455] RAX: 000000000000004e RBX: ffff94c74e036500 RCX: ffff94c74874da00
-> [  105.186460] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff94c74e036500
-> [  105.186463] RBP: 0000000000000001 R08: 0000000000000002 R09: 0000000000000000
-> [  105.186467] R10: ffffbb0e0387bd50 R11: 0000000000000000 R12: ffffbb0e0387bc98
-> [  105.186471] R13: 0000000000000014 R14: 0000000000000000 R15: 0000000000000002
-> [  105.186484] FS:  00007f166aa4d680(0000) GS:ffff94c8b7780000(0000) knlGS:0000000000000000
-> [  105.186490] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [  105.186494] CR2: 0000000000000000 CR3: 000000015eade001 CR4: 0000000000770ee0
-> [  105.186499] PKRU: 55555554
-> [  105.186502] Call Trace:
-> [  105.186507]  <TASK>
-> [  105.186513]  bpf_lwt_xmit_push_encap+0x2b/0x40
-> [  105.186522]  bpf_prog_a75eaad51e517912+0x41/0x49
-> [  105.186536]  ? kvm_clock_get_cycles+0x18/0x30
-> [  105.186547]  ? ktime_get+0x3c/0xa0
-> [  105.186554]  bpf_test_run+0x195/0x320
-> [  105.186563]  ? bpf_test_run+0x10f/0x320
-> [  105.186579]  bpf_prog_test_run_skb+0x2f5/0x4f0
-> [  105.186590]  __sys_bpf+0x69c/0xa40
-> [  105.186603]  __x64_sys_bpf+0x1e/0x30
-> [  105.186611]  do_syscall_64+0x59/0x110
-> [  105.186620]  entry_SYSCALL_64_after_hwframe+0x76/0xe0
-> [  105.186649] RIP: 0033:0x7f166a97455d
-> 
-> Check the skb->_skb_refdst in bpf_lwt_push_ip_encap function, and return
-> -EINVAL if _skb_refdst is NULL.
-> 
-> Fixes: 52f278774e79 ("bpf: implement BPF_LWT_ENCAP_IP mode in bpf_lwt_push_encap")
-> Reported-by: Yinhao Hu <dddddd@hust.edu.cn>
-> Reported-by: Kaiyan Mei <M202472210@hust.edu.cn>
-> Closes: https://groups.google.com/g/hust-os-kernel-patches/c/8-a0kPpBW2s
-> Signed-off-by: Yun Lu <luyun@kylinos.cn>
-> Signed-off-by: Feng Yang <yangfeng@kylinos.cn>
-> Tested-by: syzbot@syzkaller.appspotmail.com
-> ---
->   net/core/lwt_bpf.c | 7 +++++--
->   1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/core/lwt_bpf.c b/net/core/lwt_bpf.c
-> index 9f40be0c3e71..374054e1a2c6 100644
-> --- a/net/core/lwt_bpf.c
-> +++ b/net/core/lwt_bpf.c
-> @@ -616,11 +616,14 @@ int bpf_lwt_push_ip_encap(struct sk_buff *skb, void *hdr, u32 len, bool ingress)
->   		return -EINVAL;
->   	}
->   
-> -	if (ingress)
-> +	if (ingress) {
->   		err = skb_cow_head(skb, len + skb->mac_len);
-> -	else
-> +	} else {
-> +		if (unlikely(!skb_dst(skb)))
-
-Please check if the v5 discussion make sense (fix in test_run.c). It 
-should be something simpler than v5, e.g. always assign a dst to skb for 
-is_lwt case. I think always using net->ipv6.ip6_null_entry should work 
-but it needs to check ipv6 mod is loaded/enabled before using. Checking 
-'ipv6_bpf_stub' should do. I don't think we need to complicate things 
-for v4 only kernel in test_run. I don't think testing skb->protocol 
-matters also from looking at bpf_lwt_push_ip_encap but please check.
-
-pw-bot: cr
-
-> +			return -EINVAL;
->   		err = skb_cow_head(skb,
->   				   len + LL_RESERVED_SPACE(skb_dst(skb)->dev));
-> +	}
->   	if (unlikely(err))
->   		return err;
->   
+Hi, Michal. Are you planning to send v3 soon? I don't think the 
+sock_owned_by_user for the non-tracing prog needs to be addressed in the 
+same set.
 
 
