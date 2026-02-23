@@ -1,266 +1,172 @@
-Return-Path: <netdev+bounces-259940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259941-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KBrxIcURnGna/QMAu9opvQ
-	(envelope-from <netdev+bounces-259940-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:37:25 +0100
+	id GKanFxYTnGk4/gMAu9opvQ
+	(envelope-from <netdev+bounces-259941-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:43:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFBBE1731D9
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:37:24 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6CCD173385
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:43:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 601783003328
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 08:36:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 371633010B9E
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 08:43:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFA7D34D4CA;
-	Mon, 23 Feb 2026 08:36:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55B0334D4DC;
+	Mon, 23 Feb 2026 08:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bUWw064S"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RNMTDRYA"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA5434D3AD
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 08:36:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 097E134B40C
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 08:42:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.178
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771835811; cv=pass; b=ENeCA8xYp1YJaarvOxmPxsAEm6kCGHntKl4h0pqvisC0wby9FNpksL/15vSW6UiL9bjQpCi130NbS+8Uw4h9xKfN3kt7gjeRQFqeIq9LFer3Mm7AS/0ymFwe0gKzGomUdjPxBUpJjiro9A1ub7bGPa8umfXavaFk8InWIUZp5Cc=
+	t=1771836179; cv=pass; b=WP+SCk1pMDavv9flpmVQzrsD4Q5GUVDTN5s114Qm6q5waQZlstlB47wbYCPoG8kgOlFeG4RMoFHbYgbRqsYjwsTH24QLVJdaeCz2yMzbDRbVCmNKOrTCCiztifhaqVoLMW+rTALeKT4mEp8IzmzdpQGYGwjxR/Go2ACSF86diHQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771835811; c=relaxed/simple;
-	bh=hrmgggKQvVe10yK6nfrEeI2XixGYRKAk61xhi7TNXM4=;
+	s=arc-20240116; t=1771836179; c=relaxed/simple;
+	bh=DTu+tH08W5HUEEPKpct02840YPC0Y/czDYA0T4vjVek=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YBnlGJORjdhV6etvaibdwabjz/+IoaYwNAkeFucBZl2b9VcW+NbVa1bwvkkHoF2m6DmGDW/9mRW3aNsf/jMgFU1yapmkrqQGDJ/2MSWFeKHOhzEdIMiXy362GVKV6b0A904/VPfY0KIENkSM+RhpTh60fHfJkw9ZHvGLPpbzrrg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bUWw064S; arc=pass smtp.client-ip=209.85.160.178
+	 To:Cc:Content-Type; b=AttboDagNLNVTPcejEaIWaGCXTErz4XgFPJL9IvfqD814uufvt7DYe15twz/AvzdMrzuQJ1AqAJSH3qyd3NxCdK2W2Lm2Kmw/pnEUWoA7ki+nXjxu+FpYWpue65ovtU/LndlovBkY56/xzp5daxl/Quv3oDQiibtpkw/ysSqM3g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RNMTDRYA; arc=pass smtp.client-ip=209.85.160.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-5069b3e0c66so66769781cf.1
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 00:36:50 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771835809; cv=none;
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-502a789834fso36192411cf.2
+        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 00:42:57 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771836177; cv=none;
         d=google.com; s=arc-20240605;
-        b=Vo1PT6q+GLcZBEkTe+s1XrMGKs5oYtVDlGVYmZdE/l15jcCz+Ib9h+T9P7B9Yqn4Ng
-         T21o638VGpptz05NZ+ulNYAKsc/g7ffECd4m9FI39VBpTaadYgNs1G2fTLbqt1UXBkWq
-         FQ1tZh0BHkHNqevGTtcGLkUz0eqQeM52JL+igabCZTIJhZLkOWQqKpdtOmK7o8rJaHj6
-         Mzh+ZrH30YmXEdKVakAPuPSM2pjpOJIjoanjBFMke+iJ5swV/p5votKKKya4EfM8zDzv
-         JNJi91oP97ZlXIsQ1WKwGHAArFr4oHZyH/4PnZ5zooXoly6YntZPapdwzI4sNOlL/NJG
-         GHCw==
+        b=epjezyjzFNJUTMccka29yvnXIgn076TS4vn1HrXGPZFqiC1TKQMfW3W4lW5r3k1Qqm
+         YhdQjR+bAdHavBiuvGaTNljG9oGkblfueVAltDqpWYNhNW6Nk8rieegqnpwA03+lYbbN
+         tQr77e3hf2FUhSgkqU0FcwDjWNwIQb/1I61U1V3itbW3AYB7l8d3TJLlBOd5AEykaV+d
+         LIQNeCm2H24YyIxP3Px9g7vpjWmO4VN3BhEBclWtvxlMUT01F7VJraduRgzzgBwGDpc3
+         WrZRG4A1cZY4IJadMRMU8MHKGp7HnBJwg1PZUpOxZdQ+8mG4prBIOiITUeeGc3h4Jwgp
+         dbiQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=Vbp+UDntQVNzIlEDtZVze6X5jmwY5uUsgN9+rGm4rXU=;
-        fh=89Se4WlPbPJCggUyLAtAeroLquvRKTVXG0e6WIkA8Dc=;
-        b=W9Re5zZBOvyVWSf8xKI5nij8B+itos6tgAUpWNgmOrKqYncItZiszQpQY2OOTv8uNn
-         NGO70/zyaRwQgbPSOeeJhDQKS1y1bqtbfswMjPidPO3J1qW42zv0uwsQKV6WxEOdD+Oj
-         /gozsiFhkxoHzCLQvYMRelL+1/LbQsn54Pdxdj96z0YjuE+fOp9INR3nhMKP5CwO7S7H
-         oQhM5sb4rgDvdPX5Rg2elQLEw2qPBFx7SkTi6tkCAFMVQ+PRN+lnmYdvlKds7neKT24K
-         aqaiqsB6IzqfKFg7rYIlSmhnfAiYVFinWWdiilGWGLyUWDrLJDIu/1HJNlmoCOdvOtDo
-         WwAQ==;
+        bh=DTu+tH08W5HUEEPKpct02840YPC0Y/czDYA0T4vjVek=;
+        fh=3VlMT2KXuy/snbwWEaoxdWlgsVDl9691aT20R7YawmM=;
+        b=OPgWm4AYPSwT9nycUwy9M3JYdaCFvonM3DFY8O5hFVU/8kgtqIiN2E+g+caFkF0tlo
+         Ny5oiBHauIEHZcmlfYY/Gs7syX89jLBqJG++EdF3I3QQZxfN1ASGZdlABY5VBU8JBxxg
+         siOPHLLYY16PKkqhSBemZf+jmqUbv4k6r2j1d3grosJ+WaD1F0M0PQpVc++Dzjh6XCIo
+         EJxsRQzmdUKhC03qNLxZCNNMAF/Bwn/9U1l1gZWZwMd6E4QH1aUhvwotAH29X+15WLJH
+         HeKR0vmm+5zavzDfOHzmZtzfvAZlTdZhEyAZyDxP1yyXvFdNWy8zZx1BUccJl1l+CRbD
+         Ch6A==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771835809; x=1772440609; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1771836177; x=1772440977; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Vbp+UDntQVNzIlEDtZVze6X5jmwY5uUsgN9+rGm4rXU=;
-        b=bUWw064SHrG7nbChQShN+R6EomHLPmZyF3tQ+fV/EC1Tqs90cwoPCI5ZNSKL76mPz6
-         qndetkho5GQCm0poMmXTHIvjyTjpm6Af7cysbqbcxDOOARdnwapEMP5ywrZh9BKLNuWc
-         KZraTRVZ07JvyEMkLHm/pVFEwRqiRpcXkYwToZWIUN67bRuwLFo+OxYplVV6H1hYnH+k
-         iHdAxm9Jp5j0GrKXVqXzkzQHLLJAo3vC9Nlq7xMGUwsvCwT+oxqBi+mzmL6TXLa4o3/g
-         zbgkyeA1vhAjCtiWYrcg1pnVjOHOyTQWQFUtTKGrysdWD6M/K5SMK/YPHGUtAX+gwdeL
-         55Eg==
+        bh=DTu+tH08W5HUEEPKpct02840YPC0Y/czDYA0T4vjVek=;
+        b=RNMTDRYAmbvPyYugKt/qA1cQF6JD7s0ZvPqxRWPYhYnIp2NozYgu7MgYJ9OxOHr33j
+         bv4PR67ck4AN9U7uiHKKyraHGfLy/7O6UlTGjyqfprScfG/FP8MzKZmoePabmEsnIAKz
+         qQeEbOMSCfIOMct+dnSx7/cD1dTuGSNpiI8ST7+PlJJZHf0If7kIF9HqIiiVOSMEV90c
+         6R9d9UqeuYkIVqmSrifkm0lNt44hdw3iK49ilkqGHeEdRiuJDD9Z8h87fjl1YtiAv7Jp
+         jpToYldfFpvwNB6JQhtGkF2UHTZwlvBFKc6k1+W7BFPYuw8+xvbTx2uzRusGNqncWry8
+         zu3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771835809; x=1772440609;
+        d=1e100.net; s=20230601; t=1771836177; x=1772440977;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Vbp+UDntQVNzIlEDtZVze6X5jmwY5uUsgN9+rGm4rXU=;
-        b=qpzHNuhfoeshcAlqWkC60IX3Ps3ewhqpG3C7bNZ5h1bFHSbprQPt7f7/IdTntiiWbs
-         KHURfaT4YNfHK8Ikp+FoBV17p8tAWv5TbNGrWPWQYcpw2aaHyJdpHgmNaWL4WwwV1bxk
-         UohEcWcUcGdLVAo9h17ksrH1+OuM2J6keUgk4jmAyEgtC+JQY5rJV1gYqVKZFzFO/R9V
-         m6gRdHwcov1hJGchVVF8JJVDL/Qsj8njt03V+aG0mc2fKITmUAMGB2+UR8qhFcJDSKOv
-         Kuhk1GKTnsVBKp0OuH3bUSdfOek3xPOH18CpIsaMQ9ldzpLE1f0jhZlusv203k1UbxIM
-         wkvA==
-X-Forwarded-Encrypted: i=1; AJvYcCXU0Jzhz7Uy/BLKVN1SvR2EAwaAfZN5RBlXJs+NqoBSGnyr5IMNJiTeevX8skMDR852pdlOo0w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhSaCffHkPlOesTEDNkM7JXPG6gyGbVSLzUK+311HROEqdNrS+
-	NoaV7qbsr21/3xe6BU584rzdO1TU6Zs6VfmHcrMrE5YAHs+E26gEtmUdOQRiRrkBjFbph0psXQ4
-	HdqNvMw0SSyXDZBOa1u/qHWe4TIR9VfCCtFqNdLdW
-X-Gm-Gg: AZuq6aLYv0K/oN9OTwMjRsDjUwTXtk6JEEe1b/z6C/7a64M7jDi5S4nuWboKSp2aZN9
-	OiKIY64Iw4UlCJVhfH8BAFg4n8DgtgeHAvk4+XOZ7kqeCO+FCRQ0pjr0aJ4WH+10c3/LVxJOcy+
-	32hiCan/CGKZMAr3gXkWKnbXf9ZC/fM1fYq8qVhRjRU0tnZCYd9A2+J9rvdfec/b8d0NU9Unw3j
-	f/9PIDZGDgmoURg4TdgfgH5N9554UcHe4GhA9wtc8xdc/GCcNLsYqWjms92XTvFRV7Ps4l7wR42
-	fOKFez8=
-X-Received: by 2002:ac8:7dd0:0:b0:4ee:13dc:1040 with SMTP id
- d75a77b69052e-5070bf3b959mr102637101cf.3.1771835809065; Mon, 23 Feb 2026
- 00:36:49 -0800 (PST)
+        bh=DTu+tH08W5HUEEPKpct02840YPC0Y/czDYA0T4vjVek=;
+        b=Ua0WOiHpKABwvjVkVGIKg4xKIrjsJqEhgq0/FCTM39oVpC51ybU5MdQop68MGNxtbF
+         EMUtI8D0m5cQzLunl93ofc9/CDtGHU2nqKXgICr9XhTwiEDmppxaHxBxZBf8PqeoaAL1
+         wpvKXOpcCp8NeevvYEEzr7skVUwgYGMiUQNBi/PGVgE1aVdQs0xFYD/pBJax/1oI9Izx
+         6xdagDm9yiQnjvFGO/0wC5mkKe5whK+ektqLDrivm9Zs9cV9Yhm5h+QJPhU/XRU/LoRB
+         uAS9r+p+6lZVPANHuRSR2nAUO5sozL3icH5zR0wX6/7TISoHsns+h/bwqjDg1DIA9H/S
+         UXXw==
+X-Gm-Message-State: AOJu0YyihkasPh7P3INVosTb9itpaYGDYwATr5z0PIg/EMruX80Xqmox
+	peRZQapFMgiHAWAMqNBCHngppeR6CmCd5uluHCWSUiy+Z8JLPlScDdWaTsQzfdF0W7yRtERiOdd
+	lFrnPKbE5Uc894iiX7nD1AXpOJgiYDg2pa1pRAdYt
+X-Gm-Gg: AZuq6aLxtJTpHJqg64ow+EuwAyUBYi42dBWib5YD5t8d2Vg6PAgqhP7kxbSSctdAXbb
+	9m4AC2AZosz6bIPiFtVfowg0DvZypYwJlBRFsJVO3YBncA9ia5QphwmkMdSWS9PzNz3d5Evbce5
+	7sOok8OSIdXSo23zVrUc9zKQcVQVzpUqFdqBc/wzGWSmC6OiQmP3OX9x1QvHw6PJiJEgIxGUlfY
+	Yu63UzWOotCYzHGnmI/+skTHBsgpLfByfu1TSQNQieJyJxZ98yKXwpvjw7YYck0k8DYBJjGg+7c
+	9IC/suQ=
+X-Received: by 2002:a05:622a:8b:b0:4f3:5816:bd8d with SMTP id
+ d75a77b69052e-5070bcf26c9mr117996101cf.62.1771836176630; Mon, 23 Feb 2026
+ 00:42:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260222-fix_zero_wnd_fin-v1-0-5f4034952f3c@gmail.com>
- <20260222-fix_zero_wnd_fin-v1-1-5f4034952f3c@gmail.com> <CANn89iK5Kk2D-zMiw_2syb9OdmkKdgAA7aGfi8QNZ9XR4=CfvA@mail.gmail.com>
-In-Reply-To: <CANn89iK5Kk2D-zMiw_2syb9OdmkKdgAA7aGfi8QNZ9XR4=CfvA@mail.gmail.com>
+References: <20260220183858.N4ERjFW6@linutronix.de>
+In-Reply-To: <20260220183858.N4ERjFW6@linutronix.de>
 From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 23 Feb 2026 09:36:38 +0100
-X-Gm-Features: AaiRm52Hy4mj7KY80-wpFNvA2-ANxwYSkjGXPviKg5SUI27iW8AraDDM3-yinIY
-Message-ID: <CANn89iKBjfaoWaUh6Ar2Lj-MJODywLpHzbQif=aa8q387qutZA@mail.gmail.com>
-Subject: Re: [PATCH net 1/2] tcp: re-enable acceptance of FIN packets when
- RWIN is 0
-To: gmbnomis@gmail.com
-Cc: Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
+Date: Mon, 23 Feb 2026 09:42:45 +0100
+X-Gm-Features: AaiRm50IaHPe5inWp2qilcbSuZ_mp7Pb___hm_S4gtahGU5djQbzDJIiK0oqOlk
+Message-ID: <CANn89iKSTXxber390V+O6dnZ4PGoZnRgW8SuU2eRHwWb7xnLyw@mail.gmail.com>
+Subject: Re: [PATCH net v2] net: Drop the lock in skb_may_tx_timestamp()
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: netdev@vger.kernel.org, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Kurt Kanzenbach <kurt@linutronix.de>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Willem de Bruijn <willemb@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259940-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,kernel.org,linutronix.de,redhat.com,google.com];
+	TAGGED_FROM(0.00)[bounces-259941-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DFBBE1731D9
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,linutronix.de:email]
+X-Rspamd-Queue-Id: A6CCD173385
 X-Rspamd-Action: no action
 
-On Mon, Feb 23, 2026 at 9:01=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
+On Fri, Feb 20, 2026 at 7:39=E2=80=AFPM Sebastian Andrzej Siewior
+<bigeasy@linutronix.de> wrote:
 >
-> On Sun, Feb 22, 2026 at 1:35=E2=80=AFPM Simon Baatz via B4 Relay
-> <devnull+gmbnomis.gmail.com@kernel.org> wrote:
-> >
-> > From: Simon Baatz <gmbnomis@gmail.com>
-> >
-> > Commit 2bd99aef1b19 ("tcp: accept bare FIN packets under memory
-> > pressure") allowed accepting FIN packets in tcp_data_queue() even when
-> > the receive window was closed, to prevent ACK/FIN loops with broken
-> > clients.
-> >
-> > Such a FIN packet is in sequence, but because the FIN consumes a
-> > sequence number, it extends beyond the window. Before commit
-> > 9ca48d616ed7 ("tcp: do not accept packets beyond window"),
-> > tcp_sequence() only required the seq to be within the window. After
-> > that change, the entire packet (including the FIN) must fit within the
-> > window. As a result, such FIN packets are now dropped and the handling
-> > path is no longer reached.
-> >
-> > Be more lenient by not counting the sequence number consumed by the
-> > FIN when calling tcp_sequence(), restoring the previous behavior for
-> > cases where only the FIN extends beyond the window.
-> >
-> > Fixes: 9ca48d616ed7 ("tcp: do not accept packets beyond window")
+> skb_may_tx_timestamp() may acquire sock::sk_callback_lock. The lock must
+> not be taken in IRQ context, only softirq is okay. A few drivers receive
+> the timestamp via a dedicated interrupt and complete the TX timestamp
+> from that handler. This will lead to a deadlock if the lock is already
+> write-locked on the same CPU.
 >
-> OK, but this commit is fine ? It seems the issue is coming from buggy pee=
-rs ?
+> Taking the lock can be avoided. The socket (pointed by the skb) will
+> remain valid until the skb is released. The ->sk_socket and ->file
+> member will be set to NULL once the user closes the socket which may
+> happen before the timestamp arrives.
+> If we happen to observe the pointer while the socket is closing but
+> before the pointer is set to NULL then we may use it because both
+> pointer (and the file's cred member) are RCU freed.
 >
-> Eventually the receive queue would be drained by the application, the
-> peer would retransmit
-> this FIN, and it would be accepted.
+> Drop the lock. Use READ_ONCE() to obtain the individual pointer. Add a
+> matching WRITE_ONCE() where the pointer are cleared.
 >
-> > Signed-off-by: Simon Baatz <gmbnomis@gmail.com>
-> > ---
-> >  net/ipv4/tcp_input.c | 7 ++++++-
-> >  1 file changed, 6 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> > index e7b41abb82aad33d8cab4fcfa989cc4771149b41..fde612f12d3625000081958=
-d13cec8779684a642 100644
-> > --- a/net/ipv4/tcp_input.c
-> > +++ b/net/ipv4/tcp_input.c
-> > @@ -6379,7 +6379,12 @@ static bool tcp_validate_incoming(struct sock *s=
-k, struct sk_buff *skb,
-> >
-> >  step1:
-> >         /* Step 1: check sequence number */
-> > -       reason =3D tcp_sequence(sk, TCP_SKB_CB(skb)->seq, TCP_SKB_CB(sk=
-b)->end_seq);
-> > +
-> > +       /* Some stacks are known to handle FIN incorrectly; allow the F=
-IN
-> > +        * to extend beyond the window and check it in detail later.
-> > +        */
-> > +       reason =3D tcp_sequence(sk, TCP_SKB_CB(skb)->seq,
-> > +                             TCP_SKB_CB(skb)->end_seq - th->fin);
->
-> I don't think this is the right fix. Basically it says that FIN do not
-> count, but TCP RFC says otherwise.
->
-> It also adds code in TCP fast path.
+> Link: https://lore.kernel.org/all/20260205145104.iWinkXHv@linutronix.de
+> Fixes: b245be1f4db1a ("net-timestamp: no-payload only sysctl")
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> ---
 
-We can keep fast path unchanged with this variant.
-
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index e7b41abb82aad33d8cab4fcfa989cc4771149b41..156c92450f3ed00357aff2ef3e5=
-86b83f3cecb5e
-100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -4858,15 +4858,24 @@ static enum skb_drop_reason
-tcp_disordered_ack_check(const struct sock *sk,
-  */
-
- static enum skb_drop_reason tcp_sequence(const struct sock *sk,
--                                        u32 seq, u32 end_seq)
-+                                        u32 seq, u32 end_seq,
-+                                        const struct tcphdr *th)
- {
-        const struct tcp_sock *tp =3D tcp_sk(sk);
-+       u32 seq_limit;
-
-        if (before(end_seq, tp->rcv_wup))
-                return SKB_DROP_REASON_TCP_OLD_SEQUENCE;
-
--       if (after(end_seq, tp->rcv_nxt + tcp_receive_window(tp))) {
--               if (after(seq, tp->rcv_nxt + tcp_receive_window(tp)))
-+       seq_limit =3D tp->rcv_nxt + tcp_receive_window(tp);
-+       if (unlikely(after(end_seq, seq_limit))) {
-+               /* Some stacks are known to handle FIN incorrectly;
-allow the FIN
-+                * to extend beyond the window and check it in detail later=
-.
-+                */
-+               if (!after(end_seq - th->fin, seq_limit))
-+                       return SKB_NOT_DROPPED_YET;
-+
-+               if (after(seq, seq_limit))
-                        return SKB_DROP_REASON_TCP_INVALID_SEQUENCE;
-
-                /* Only accept this packet if receive queue is empty. */
-@@ -6379,7 +6388,8 @@ static bool tcp_validate_incoming(struct sock
-*sk, struct sk_buff *skb,
-
- step1:
-        /* Step 1: check sequence number */
--       reason =3D tcp_sequence(sk, TCP_SKB_CB(skb)->seq,
-TCP_SKB_CB(skb)->end_seq);
-+       reason =3D tcp_sequence(sk, TCP_SKB_CB(skb)->seq,
-+                             TCP_SKB_CB(skb)->end_seq, th);
-        if (reason) {
-                /* RFC793, page 37: "In all states except SYN-SENT, all res=
-et
-                 * (RST) segments are validated by checking their SEQ-field=
-s."
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
