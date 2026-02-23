@@ -1,180 +1,190 @@
-Return-Path: <netdev+bounces-260243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260245-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aIiHLaHWnGkJLAQAu9opvQ
-	(envelope-from <netdev+bounces-260243-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:37:21 +0100
+	id WAZNE4nXnGn+LgQAu9opvQ
+	(envelope-from <netdev+bounces-260245-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:41:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B98D17E700
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:37:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EE7117E7C3
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:41:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D12AC302A190
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:37:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BA108315EBD6
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:38:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0986836C0B3;
-	Mon, 23 Feb 2026 22:37:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8736D37BE8D;
+	Mon, 23 Feb 2026 22:38:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KjYvKm70"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gERp3q7x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f227.google.com (mail-pl1-f227.google.com [209.85.214.227])
+Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD62B350A3B
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 22:37:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.227
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771886237; cv=pass; b=a8Vo+VQqO3E7xCsTZjXlo3fG/VRVoa0fQiFahMnXpAnqaWtQ/DoPD8w0h6rymwLt7q9k7YO3X1BHo0n5SmDagLOFAY54VVlykpzczLNovYqGUdxrxxSCi+1sQYAi1ZsYqsI/1zrbiu9iPid2EORVqadxQCDWTTQT9h6nTHdPT/E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771886237; c=relaxed/simple;
-	bh=SPByhFK0VX6exNFjh1ZMPLtx4CENBsbZgIBlRw4KzqY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=svw5YicCnAJMxxVvzzckvRnfLQ5iHsPVYllzKhvGvMXtvjqBeI40fxUN8XdsLn1nGDxB8DBIL/PPFpeB1+tKhjoF93/PXAMyGDgZ+V3PexGu0sUQJPOzPSiZF+wPqAk6ekXOL/75q5/lg/u6WJbbPrPuqkCPQ0xQ8IT2++rgntc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=KjYvKm70; arc=pass smtp.client-ip=209.85.214.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f227.google.com with SMTP id d9443c01a7336-2a7bced39cfso50111795ad.1
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 14:37:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771886236; x=1772491036;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1vRpWWshjjL9VA+u7vs4zoE3GlWlOc3283ytQw0ic0Y=;
-        b=oM4eDpswQuI8LIPMMyIlf0J1591wd3mu9yQLUI+LU0ieS2h0UEkMfKrIYx6Sa/Ucjj
-         7bRKdJSXo546astqlr0LifkflpLL/RbyKTRz0VQHpL7/bRjDo7W/D86sDs5vfNuwLRrb
-         6aE1EfU/7IUeVII2OL7TMSIt6uknk0IHOlY26WXbDzF5tA8e1H7Eq7cyejYGJVhEqw7p
-         PtSmbkH43hXWgKHEWgGQoy32vYvEf2RlHdpYji7LnUb82nQQbDi+bRVb0AE59HFlSGZ8
-         zMAlwkqdjhsSAnhZUOSm0rR/+bQ6OLi9HMhV6zKW9g6PVT6Vk6OaSbWS9vfmcRRo54Qp
-         XObg==
-X-Forwarded-Encrypted: i=2; AJvYcCU4Mf4dUSiIOhW9naU9fueV/SieZ1T7WhhCRjITrfH+N6VGsi4xwi82u3I3MDb99Kf8bEezf6g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YweckJTojie8KK7e9Dx9SQ1wNo+nPkTqXpPJNmz1rMJAwhf7bQa
-	meRdVkxwFQVysJ12TPkuqOUVFutLnfivwwkoBs0FHBQ70FO6mWKY0ddwjJ+6KxclK9PaEwt5nhg
-	B5oq36y1XtQmKtc9Q3R0e/lcxh/N5LfEQqAEReJBeLkHhv3+2YLI2PDkUYXr/W7bzU/H1JBgSfQ
-	YTF5AKM4PDLplLr4xR400sZh/sWUAehlNZ/7BtjYjjv6Rg5/W6pUuA2+1dq0rRUGXg4Jabg/5KV
-	spp2eAx0Sg=
-X-Gm-Gg: ATEYQzz2N7aNQIBu08eFMV/1L087M0z2rpYPmIWvpclc7sCGzdB+mV8Hb1GuV+1TBT3
-	RdzIzovmVZ4BFuuWieLUFxoWQVYS/cVjWPJo2zVChqhfWFafzNN938jZxwWMVZBnjz6n7y8BZ3w
-	PF6XDNzghlfBfVydx92ilLEesacVfiK90JFIJlFW3PBUtPlYE51k3BJE1RNE8U1+yZAZRACr0GT
-	SwybOiBx1pOWJU8Jq8bwmbA0FEcf5Mo4eFiYvCn0kJbyJYfnvTcKLgNlcV57XXezrAG9ZyRroZH
-	/NQGswCYgi7rAYNvEpeajqf1VzMDJMTdfvwCXI2yC4GCCZSojACWRcGRrVwF89Q9FSieRRIZkO2
-	BdKw/dzn7m9srBJO6TMKTnWvP8JSHNls2nKBRHMp8n5lns/U1H9cjhGZqpl1pLhGEy/67vrMSj7
-	FC/X+9v7LB299CeCaKPJ6H1xDJcnt4hnWd4FARc7QreLL+EjQ8VuS/SB71atE=
-X-Received: by 2002:a17:903:320b:b0:2a0:c1ed:d0d9 with SMTP id d9443c01a7336-2ad74539d06mr95814925ad.46.1771886236177;
-        Mon, 23 Feb 2026 14:37:16 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-103.dlp.protect.broadcom.com. [144.49.247.103])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2ad74fd726asm9954725ad.27.2026.02.23.14.37.15
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 23 Feb 2026 14:37:16 -0800 (PST)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-65a408f232eso6074563a12.0
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 14:37:15 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771886234; cv=none;
-        d=google.com; s=arc-20240605;
-        b=lFSJ39A2J7CD2nWDOMDjBJMVH1pUaaKJ0yKDPy44BiSCRc0laP5NpIhl5STQPndmIW
-         frG5bgWkjI7e/lhdQB1tc2SRPQ2+d9tlvbfvZmQjOFwaZDHJ66aaQTkcKivY/orB2m58
-         4JxbHaKEq68E1kgvkZ3QkVxN/Mh3o/j2zR5BMBmScnZon/OpXL8wNWjNzLIffF9h3c6G
-         vk6JLaT32Fku0Vw7VMw/7nlhDuU4JYmaQj1c+P2gvgC1DmXRKgy+ntCMlioWqRrWA1DS
-         QKvBc7nFvHtnpIED4nKlRriovqA3X0pNAEJ5frm/b4buE5uai1aqMEUZQl4lXwSBnTVf
-         ndoQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=1vRpWWshjjL9VA+u7vs4zoE3GlWlOc3283ytQw0ic0Y=;
-        fh=h7rKFC2TZ5S7O+B+YBU6VHgfEnIhHkmeEkKv0bUGt/I=;
-        b=TZG/7aSIZcCXEqt9+0kxCFlvbwdDYmmAmhVCU1aHLTSXxDa94wDC7Apox/+J+Pfk67
-         RLy5+AX3szREtdnSbO1k0yOv9Gv/yKEYDgN8+LRRALvxvQfQ7Os3raPzneF3I9PXfo4g
-         JOoWHY3o+U/Hb4ADiwy1k/eRo9BgDVMOrW5m7yMsdai5mI3CvmOnX4svQyLOC6QkwA0t
-         7shBdJULPNuBlziCnSHWM/G4nSURyhwAi/RTd08dCtA7fh6iqToDWNWr8eSadgYeE2hY
-         Mcb0VuMrGQnKVpbMBf2F/xM1xn+Osb84hk60xFt8dvIhJgloyOYUcaeynn+6MzewtU+1
-         tpXQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 994D337B40E
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 22:38:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771886336; cv=none; b=LEgeuNImI6RFqaXcPI+ZqOhLk2njWoUxm3jpwbGeIMWw8CyUfyB1nNgraINdYEE+Rp9pePfuujW3w0K1poB2zL7O0UKQVtv2+VfpdP1jb0t/tn5ma9BHmdyCAsUf0sp5QExfmbRbxwMfJ+rTCck0rUQ0v6oSuOxLZYMRVgq8rJw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771886336; c=relaxed/simple;
+	bh=/bIC/WtvmzO2UMatiyKUHoqyh6+HwZ1czcMSAuZhOrg=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Mqy6jYersEt7Docyyl2c+706s6/YV0kmB5xDA1BoblbsU/gENqJN/olPQSYgUEa8pYiBApFMmHcryrgAvwFRu37CyM6tEduktTYmimFWgu8wb1cGaUkhjjwY5BP7LWkJjFpKkrQL6fRn5u/PYLFKptRxI2UatabqKry5Y3Ro9ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gERp3q7x; arc=none smtp.client-ip=74.125.224.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-64ad2a2851cso4038531d50.0
+        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 14:38:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1771886234; x=1772491034; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1771886334; x=1772491134; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=t9UtgbHB88uVfe270ruZfCUS90+GzEIoaTA2r5lSx94=;
+        b=gERp3q7xOYJbbS9V0A7MtyaZ19GS8AOYoDFRpfMu6yIdJlI9OwlsxpmRTmItkxifF7
+         sXKQ+nGlpkgZwNGVQ6oC8kQcWQ8jWJYaQq0fk8bOLBVYtYuyEYxdA7KemEcNsLWjk8B6
+         gJHo1Ef/zKoHnd6Z35YIpFV9SMrwaK3rVxETxp1g6y6dTlU0vbg3yWX56snqgZ6r7lA4
+         DX73BbDlw3BIVlCuRZrMr+drKKYMYRE7gTBxo5+JcZWvY9MPaEjmsRoekRVnO3t3a0Up
+         DM1XPmnHRnVwqIN/VtZ77/qVXm/ZhNy0bgHmFhWwV09UXVekxfc0No5Hm8I4pVMdGLAY
+         hdPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771886334; x=1772491134;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1vRpWWshjjL9VA+u7vs4zoE3GlWlOc3283ytQw0ic0Y=;
-        b=KjYvKm70B4T8cEfjusvKbO8iNWxqnSv1FlQ3Tx+6OmQucxwRK0QEdVqT21j99Wa9On
-         bIjKwjUlRHQDb9cXy0LAtR5vllwVwUQiZM4UovfDp56/q1bb5sNF826SQY/ZlWIX6RTc
-         aqvUUU3XXWcbj+BxcSzw5Q0RLEhxVtCujJdRw=
-X-Forwarded-Encrypted: i=1; AJvYcCU9OYSxOzcuLqJfowz8pvcKpcM3idG4dXTcFEK0raGSy/Qz1jaPs4FRrYLCjlV/GPA7HoGm+7I=@vger.kernel.org
-X-Received: by 2002:a17:907:7fa3:b0:b86:edb9:c01b with SMTP id a640c23a62f3a-b90819713bamr511007166b.8.1771886233971;
-        Mon, 23 Feb 2026 14:37:13 -0800 (PST)
-X-Received: by 2002:a17:907:7fa3:b0:b86:edb9:c01b with SMTP id
- a640c23a62f3a-b90819713bamr511005966b.8.1771886233526; Mon, 23 Feb 2026
- 14:37:13 -0800 (PST)
+        bh=t9UtgbHB88uVfe270ruZfCUS90+GzEIoaTA2r5lSx94=;
+        b=RkRERI0Hic4Y9NbsmwXc68qRPNLk+XL55DfFEQUPXQixg9YCai7tQ/PvXrkcmUC/Nj
+         NJGFudB2NF74ntzVKCKuFeh1LAUklMmee4FyUrKbjjo3afS7Xym8ejwjWO/pXcqAfaBQ
+         qv0kbMQfjhOjbVfyA3LhWtVJq7jhaa2meZW5rkV/36zpAFaJ9LeeGHiiBHlPaJHeg1h2
+         QWwBzlDqySwm3rR28EevoGsPRv49Dn/v4QAzmCSMn89J0DRsWomiB7+MAU/oXzoO3nKZ
+         rdHThIVmaHjuzYQnZ/lDrY9ssmoByqUojBZJNjVajQW3E5bDW/HDXJGhsNR4/zTgNnkB
+         O8OQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVWNofH4LsKSpSWONUu/WXZCk4uqXGhB/61hk8wnTsfTU1ZK2QsypUDgct6DPIskYZt8L9fKZ8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTuucVPUqXG4vWkTWHUxbX5WfSb63eTRjc75NpTDNd55zbt1Ej
+	5h4d2EfptWtbZdg67+mvPXvkaU1Rwj7+rVslVlZhlNZ8NmqU0mIfRpsz
+X-Gm-Gg: ATEYQzzCBgBIxU9hB3D/TyTkUE+EGS15pQzfNxTeDKxj5DSdTXEazuBlW4KQS+Tfx/M
+	8cUYeT/xSNs5vGpIO2r0kM4ADWV+6v/EhaXrmF9t99+LfC1ELm5Ik/SoFEI4gmNctQyFN75u3bk
+	MVyZ+X93PgA215IoYJOAdRlkL7ZB1hzH9gKjrqEOIPz0vRGtAB4iB2HdcF00G4E7JGbJAaDamTP
+	OSnrxeMz0u07otiK9L2yqXsDccH6UzG//TMZAd/0b+98ZnB/LF7jw2DhP/S2aSZx6JFPYbJJt7v
+	WamJeuejGuKHR5JcDYhpe6M94HRSJH01RGfm7vBpzznogmjujPUzS8Kjy9PAnxhz9+L1aN/tgxQ
+	AfG+R0F2MRSYhmPGm124/2OcNfKZq4mVr44A1RaKnc8p9MSqnm8Zzr5+FRK+o4uGpSrpF48EidS
+	I5Kr7bWz5SzcYcMYZpS9KKFg==
+X-Received: by 2002:a05:690e:408:b0:64a:db34:8509 with SMTP id 956f58d0204a3-64c78f6f039mr6063230d50.66.1771886332926;
+        Mon, 23 Feb 2026 14:38:52 -0800 (PST)
+Received: from localhost ([2a03:2880:25ff:44::])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-64c7a39bdecsm3726462d50.22.2026.02.23.14.38.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Feb 2026 14:38:52 -0800 (PST)
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+Subject: [PATCH net v3 0/3] vsock: add write-once semantics to
+ child_ns_mode
+Date: Mon, 23 Feb 2026 14:38:31 -0800
+Message-Id: <20260223-vsock-ns-write-once-v3-0-c0cde6959923@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260223214950.2153735-1-bvanassche@acm.org> <20260223214950.2153735-19-bvanassche@acm.org>
- <CACKFLimX0PPJGeJMG-nycNMufbFsJ4YUTnGbLHC_20xF2n9OQQ@mail.gmail.com> <41c375cd-5c23-407b-9e35-8779f899ad09@gmail.com>
-In-Reply-To: <41c375cd-5c23-407b-9e35-8779f899ad09@gmail.com>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Mon, 23 Feb 2026 14:37:01 -0800
-X-Gm-Features: AaiRm51FH978UEnMOPWMhbWlWYa1vvoKynsBBwwvikhLCmXLFDNutJOtQBJsiVY
-Message-ID: <CACKFLinqWm7wbdgES_gpYNhQiZJ0cv=w0zpra8rXF=3jMQ+BdA@mail.gmail.com>
-Subject: Re: [PATCH 18/62] bnxt_en: Fix bnxt_dl_reload_up()
-To: Bart Van Assche <bart.vanassche@gmail.com>
-Cc: Peter Zijlstra <peterz@infradead.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Shantiprasad Shettar <shantiprasad.shettar@broadcom.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAOjWnGkC/33NTQ7CIBBA4auQWXcM0B+hK+9hXCCdWmIEAwQ1T
+ e9uwqoL4/ol31shUXSUYGQrRCouueBhZG3DwC7G3wjdBCMDyeXApThiScHe0Sd8RZcJg7eESrX
+ dNKiOuJHQMHhGmt27qmfwlOHSMFhcyiF+6qmImv6iRaBAI+Zry2eptNGnB2VzsOFRuSL3hPpNS
+ OQoNHW251PPtdkR27Z9AQT30fz9AAAA
+X-Change-ID: 20260217-vsock-ns-write-once-8834d684e0a2
+To: Stefano Garzarella <sgarzare@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>, Bobby Eshleman <bobbyeshleman@meta.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+ Shuah Khan <skhan@linuxfoundation.org>
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org, 
+ kuniyu@google.com, ncardwell@google.com, 
+ Daan De Meyer <daan.j.demeyer@gmail.com>
+X-Mailer: b4 0.14.3
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260243-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-260245-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,google.com,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	NEURAL_HAM(-0.00)[-0.997];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 4B98D17E700
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vmtest.sh:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,meta.com:mid,meta.com:email]
+X-Rspamd-Queue-Id: 9EE7117E7C3
 X-Rspamd-Action: no action
 
-On Mon, Feb 23, 2026 at 2:27=E2=80=AFPM Bart Van Assche
-<bart.vanassche@gmail.com> wrote:
+Two administrator processes may race when setting child_ns_mode: one
+sets it to "local" and creates a namespace, but another changes it to
+"global" in between. The first process ends up with a namespace in the
+wrong mode. Make child_ns_mode write-once so that a namespace manager
+can set it once, check the value, and be guaranteed it won't change
+before creating its namespaces. Writing a different value after the
+first write returns -EBUSY.
 
-> My understanding is that bnxt_dl_reload_up() is only called if
-> bnxt_dl_reload_down() returns 0 (see also devlink_reload()).
-> bnxt_dl_reload_up() returns an error code (-EOPNOTSUPP) for other
-> actions than DEVLINK_RELOAD_ACTION_DRIVER_REINIT or
-> DEVLINK_RELOAD_ACTION_FW_ACTIVATE. Hence, bnxt_dl_reload_up() is only
-> called if "action" is either DEVLINK_RELOAD_ACTION_DRIVER_REINIT or
-> DEVLINK_RELOAD_ACTION_FW_ACTIVATE. In other words, the code in the
-> "default" clause will never be reached. So I think the above change is
-> correct but also that the patch description should be modified to
-> reflect that this is not a bug fix. Did I perhaps misunderstand
-> something?
->
-Yes, your description is correct.  So perhaps a better cleanup would
-be to remove the default case in bnxt_dl_reload_up()?  Thanks.
+One patch for the implementation, one for docs, and one for tests.
+
+---
+Changes in v3:
+- Simplify code be reverting approach of using only a single variable to
+  represent both lock state and child_ns_mode state. Instead, use
+  child_ns_mode and child_ns_mode_locked.
+- Update documentation to clarify the value-dependent behavior of
+  child_ns_mode writes (that is, same value is ok, different value gets
+  -EBUSY).
+- fixed some line length > 80 checkpatch issues in vmtest.sh
+- Link to v2: https://lore.kernel.org/r/20260218-vsock-ns-write-once-v2-0-19e4c50d509a@meta.com
+
+Changes in v2:
+- break docs, tests, and implementation into separate patches
+- clarify commit message
+- only use child_ns_mode, do not add additional child_ns_mode_locked
+  variable
+- add documentation to Documentation/
+- Link to v1: https://lore.kernel.org/r/20260217-vsock-ns-write-once-v1-1-a1fb30f289a9@meta.com
+
+---
+Bobby Eshleman (3):
+      selftests/vsock: change tests to respect write-once child ns mode
+      vsock: lock down child_ns_mode as write-once
+      vsock: document write-once behavior of the child_ns_mode sysctl
+
+ Documentation/admin-guide/sysctl/net.rst |  3 +++
+ include/net/af_vsock.h                   | 13 ++++++++--
+ include/net/netns/vsock.h                |  3 +++
+ net/vmw_vsock/af_vsock.c                 | 15 ++++++++----
+ tools/testing/selftests/vsock/vmtest.sh  | 41 ++++++++++++++++----------------
+ 5 files changed, 48 insertions(+), 27 deletions(-)
+---
+base-commit: ccd8e87748ad083047d6c8544c5809b7f96cc8df
+change-id: 20260217-vsock-ns-write-once-8834d684e0a2
+
+Best regards,
+-- 
+Bobby Eshleman <bobbyeshleman@meta.com>
+
 
