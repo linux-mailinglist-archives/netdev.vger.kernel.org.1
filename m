@@ -1,112 +1,112 @@
-Return-Path: <netdev+bounces-259921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259922-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 23FJGzSvm2mi4gMAu9opvQ
-	(envelope-from <netdev+bounces-259921-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 02:36:52 +0100
+	id kMw4Go2vm2mi4gMAu9opvQ
+	(envelope-from <netdev+bounces-259922-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 02:38:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF4C9171560
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 02:36:51 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 137F3171588
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 02:38:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 671FF301A509
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 01:36:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 885A93007AF3
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 01:38:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71F172C11E8;
-	Mon, 23 Feb 2026 01:36:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEEE02D541B;
+	Mon, 23 Feb 2026 01:38:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HLAqY7ZG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nSScHZl6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
+Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827CA2BE7DC
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 01:36:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B56B42C026C
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 01:38:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771810608; cv=pass; b=aTJj9YswtGAnQH5mG0FqyrLrSu0YcCGcseXWAfVANlzW2G6MOb1+RQjp5PXdOXqShIiweDWNwXPcKCkTw8ssfPvhQf7phAkX9KpORO2Se1KnPPfks6dNcUaxCCVu/V7j0QF/UH1eK4Q2VV6FIs6FekmTChvA1z1pY1jpq65a8Cs=
+	t=1771810693; cv=pass; b=shSrYI/JD510HFj3l7e3ZoI42TNWIKybCnW+F4ab2+i/3cFc7Tb2tcDuL664UdFlW9s4pR/dIlWUVgE29GEHGCFfN98SUXgHHWYnDjfuHjcZa+7D0Yd82oVAxj1yf4JzhI2sWYQrlx3O7nclutlS8dNtIccRqWlx8g4iK5N5/Ek=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771810608; c=relaxed/simple;
-	bh=56807nNBqcnG8caOg4si5mazv6USZKC5wC1JXqZVBco=;
+	s=arc-20240116; t=1771810693; c=relaxed/simple;
+	bh=bp7H9nKwxhAflkm+9LXvmfRYR3ZpB8pH/DfQLJel0Pw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WwR0a+J36t2w70INlt6OGeaQ6+B6hhA4FgvfnOY9Ujsdtcm9Okub8npa4aNhKKPIW6wPMnbRl2FPvkvn1jt6KmSD8TGkj7N0aW6C9rWk3RqjV4uMxohPG2r6vtU2LYptnteD2gxveVpS9E1IiFHa1CG9NQJWRM4h71iZrhS0R74=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HLAqY7ZG; arc=pass smtp.client-ip=74.125.82.41
+	 To:Cc:Content-Type; b=sNDxj/76RFBzpu3baKl/W57ue7i9ZAfXpYRq3Nw6beK8aCrH9eyHz9jSCeD8QYLo8YzAbFIaq9nLAtcej8i8EdGc0ZrII6lJ4+WQ+phzNy2UmS8w/1W7Bnl4QYg650hvm2M+DK6yL171Bq2Zcpu0kQnOMRHYWdTBFhAbJ7zZuzI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nSScHZl6; arc=pass smtp.client-ip=74.125.82.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-1275910b930so2775432c88.0
-        for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 17:36:46 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771810605; cv=none;
+Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-12732e6a123so829063c88.1
+        for <netdev@vger.kernel.org>; Sun, 22 Feb 2026 17:38:10 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771810690; cv=none;
         d=google.com; s=arc-20240605;
-        b=gjSg3ZUySzPxpdamt6ZKma5BgTjywD3JBaCEg1wNM917PrkbFtytcFO64EDTOjN4Ou
-         sZ3YevnMbvzZrLKMAFZiYWOO3BgZPAyCAEBUE21XpIb5Wuwmqddq7lCJ36yfMCbqR5U3
-         NkYqPlcLMFVgJA6fulvSSylcNUrw28QfrlcKPgJ6lvi0OFPuqu7sZ9Vn6yBiX0N0TCFT
-         eoY5M2uTot4aMbxU/kE+QQfIi/YrZ1JIQ24vzAHXwzmTk8fKttexG5r+76N1VHbcCl51
-         aVmkk/5eR8rdL0MpzUuTds6BQG0Eku2P1pxIobiKs5cQEcuiRuves/OZLAjgFej1+xjW
-         sGFQ==
+        b=iw1bGozAsHX3dTrk8SnbIQbhId/WyRQVH3tyJaR7/TeGySt3605zIH64bTy4SFdkJU
+         SAsCOs0N9/ZYgcw9TpU3ifvIYriaZb+iIxf6mB5qxT/y2ZReHSBNPgQhPC7p1JSv6W61
+         Qids3+PI/0s17Z/KXBV63KiE5ltotMV/uXPFPgUtiBe2lQS88G63jLfIYQyKQQJONgNv
+         2f5hh+Od1b2+M7HNGBbLWWZHkY4Izpz1/Uqx8G1wHQ59clsclIfIZ2CA0YhBAobSzTZv
+         VVuRvDCwdfNlMYk+x8S9MV/RpAKiovKGHTM1rcQKSTaD6uIJNruvhSX1d8icNk4x55JB
+         6K5g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=56807nNBqcnG8caOg4si5mazv6USZKC5wC1JXqZVBco=;
-        fh=EYS8hWnwAjWCLwETllJO2XlcNWQOfFj9BEJJchskNQw=;
-        b=Kt6sRRFmmAe8Ett8i/77G6A57QETdCezRtsnvsM+7gfHg8fvXmxN2/Az/C+5YFbVOw
-         vhu2i1s+XNKI22STc4AExwzw000kgcDcuRHAAduLnLi0yNrhPkIt9gV4vNKd7btiROJN
-         CvzTMJvA0LLQgDDU0LTQwSB4hYV9gjbO6kry2cxcQhIT3QJ1PwreJOcRsyIzZMFMDzip
-         BTdYUFmKehFUBwKh3a6QKCbVlVOLI0mg5YQqI/rNwhHQR/nqUvskRhHv3dC83d83ctKG
-         9oks45bx/nTMFvKORqYu5HdT889ND+HJIe2kkOHapx+1sil+3TM8TZJ+qk6gSt8S9Gck
-         AO2Q==;
+        bh=5UnSQ5YtPl3nmLSpWU/CZ43YZ80mhY04Vyv8Ao8Lu/M=;
+        fh=fyeCfd6sMmlfl/Sohu+hx5JpkK6IQfmyC7uFlCSLh4E=;
+        b=Re15DBgz/ZNAhkh6x+bjRrMHMkk2I/LREUx1wyhCLD1n1wHaSaeLc7K0/Od7pZiuLq
+         axKAWmg1Tm5q5HemYP+rscc8yTe1C8O4sTSJP9FpB1dTHgNA8CKY2gUW2S9wqIHdqat7
+         vBAIrBgqN1NdRgo0Fe4YEN3mBOeslnpvCorz1oP2tnTl+8BSNljrwdum9XNYt2XmBXtQ
+         mAFjRqxeay594c8gIn9RwgqeWKtIXF8difP2l7qgU5vdVj09g0y0krixqlwkZM+BxllW
+         Vak+ETo4shRiqVuhCdKCZ7toWFKpnlE1Tb4E/H8atcBdFOI3s3ALmmu4TkKq/miAxG4v
+         JL9Q==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771810605; x=1772415405; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1771810690; x=1772415490; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=56807nNBqcnG8caOg4si5mazv6USZKC5wC1JXqZVBco=;
-        b=HLAqY7ZGrI2jJ3KOj0NUwkgeRXd365y/HZodkpDEMXkE9nUvJr954YvUP6DUt9CLmY
-         xUEmkYAlJS+7gOwhHQttcO3ajIef9xtagrUh9bhKFvIE53Ieev2eMzuK61Gj4dEQrCVD
-         4B0bc/HX8GVnpzZEjCsjvl0zfbJJ6y5iZGx/qCVx3BoqC4bPULTwrrbjDMm6QaGKg9dc
-         JhTrJCHeD09hMUIzeH8G2XA4K3j0V1RgHJy20/esTV1bSjVbdtYQje3UR2GqDrTmalQM
-         y91mIP5bkztgjVBv236Pe5QBQ3QLtgjrLDAw0fPlu9cY+0T3K0EGs9riG4Qd8+qYmEFV
-         K5NQ==
+        bh=5UnSQ5YtPl3nmLSpWU/CZ43YZ80mhY04Vyv8Ao8Lu/M=;
+        b=nSScHZl689o0ViIqpW80LXHPJgGYMv0nNPWG2Absgx+MAOI5w8zfYsrt7Q7HtyUhXv
+         +krwvwfb19IFnNfE5/OYcnWAWKdV7I381ns2WG05dhGzIT5ZsAD6JoeUgPzemoLFHgJX
+         QZPlxzp8PMnO1G/Ht3Ztl9RwubvFMfEQiXGhFFZdfqg54lWvExH8BRIUPZ/9Ovi+689w
+         86n/aDu4qcR+yr5givDOZ/w1WwWg4EczgfPu0J7FxAKd71dLaSQg0X7HSf7eqOW9II9Z
+         6r9Dry2ncqQOyY5en1cLX6NTrsbDK6Xtu9y+eN28DM/E3N1cv73iJ2nweq4zLHUihNeW
+         WbGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771810605; x=1772415405;
+        d=1e100.net; s=20230601; t=1771810690; x=1772415490;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=56807nNBqcnG8caOg4si5mazv6USZKC5wC1JXqZVBco=;
-        b=gqeSePq0XVXSl4kgYoOPNKtkcQkrEeNQ0qSz2O6m2dJ3CdChvIlLgs2PKnV0aIyUN8
-         yNv1k+YwddAk/n/h8yte8HQEOIOZIXaKqdPmdrhySQDx8tJ0FIX8/9OpGwHFkZBEb3DY
-         QTmX+mQN5o02+FU7Q0uyEcw5pBmtpLLmtLAMpi/Yv2Nbm0Aw6Gs6pWlUXM7AAAYi3TPn
-         4S3S957qHQRdnf+VzNsh7i/tXCP79pbSol/U8tdQo2cGcwOymHolMuqMoo2x/WAyaDUS
-         GXHXAQRVlebqhzYLLLE+tE5XY0qeQn/qziY82qyGl9OXD5Bw10WjjHWD28lW9yZgDdoR
-         E1+g==
-X-Forwarded-Encrypted: i=1; AJvYcCXX54cvuIpqiabAsno8pMqm6pG5hRkbdRbUV/asskasW/VRp86fXIU06YV8hMywRbVolqp0DLY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgmLYg5wkS9N4VkWpC6qSfbZ2/Oe70iMK2S0FcbeJkk03BZJlQ
-	rMCz8ZJFVXIGsNJvLHAvRs0lISx/9EV8iCyyMReSY6+mJQp+jPutytY9CSnIHFAPLkBCtXsagDi
-	yFkGlUdV6sSyqgPqAoDwGkxWcd0tm3yz6hFMsBvuc
-X-Gm-Gg: AZuq6aKKJrSwNcuFt/DSG9bvJzUy4E7eycwPUWMMZ5iFEAORJvf6kCdxUQTn9SNpam+
-	ra0LOIW1utiGo5lsCJM+HKZNuVua7KQrdOh7eca3fB1IDAyIgqMGfM826A7vW7RTjsVNVhtx9r6
-	oP4a0XTqvYIeUY2PC+rlWffg+G1fhei6Cv6v2NJ0nkL3u32Jyq/kIMch5ITGQtM61ysyHjb3V19
-	MrrccFb8xNLId8VeeoJYmH1dcAc3UPxS9jd6zdRsVfedGdvRZme1HUxbGsXyPx1gxlVmXbAAXRL
-	wd5iYBAKZztaFrFITVfaGaK1fv0W1jJPs8m79zWYgWqkoEfCgYF2sqOhkbcmPb9CsBMlsl8n
-X-Received: by 2002:a05:7022:210:b0:11e:3e9:3e92 with SMTP id
- a92af1059eb24-1275fab7499mr4383996c88.23.1771810605061; Sun, 22 Feb 2026
- 17:36:45 -0800 (PST)
+        bh=5UnSQ5YtPl3nmLSpWU/CZ43YZ80mhY04Vyv8Ao8Lu/M=;
+        b=ootsGjIeV99gziNsDQ4KgvroeHaOTGw4ya22YeaNfGvNniMG4c+DHP09xHq5FwmqQ+
+         wjd1sqyXRg4NAUgXBecbnpTzsGLZZLPMIxYGejz4ILOPWKTw7oQLbvlb+lRbjHUpt3sU
+         wYpUyKl+stWJPyoq4vCqVQeW3Pl6No/oLSuaCzaZzUDLi3BRjuHkk9pc1GpP+uOcDKLx
+         PR/E7NXNJj8y9fGyrfEgPiFJcUNa9GBs4f3nHI9LT0T0lTm1VTmCc02tqbcZbjagSbMt
+         JVHR1ewSuXQRznLygM9mS7lanoPl56h4pgbMgytGHsNII7NWH+yt6VO3FxTZdkUj2tFe
+         WkTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVSjpsnOdbYxFRyCAA4gwxXFIEN6r+K6MEWJ+q276u3jD4LXwIimp9E0kv3Ho9/SACg9x7+WLY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgOSCf4DnnSgDQNCakHBITTnXFQXFM+iaIO4oc9sg3BK1JeA70
+	eszgj4ou3Vd/TdEA1ekrpbBFjUn7ZbyyY45SlxgJvHyqh9v+jE8q4y9rW05gy8vUzmJ5ICQjdM3
+	qcChv0COgM7Df3yiJXHkWgDK35Xkj/2JZRe/Fbx+p
+X-Gm-Gg: AZuq6aLWZn8iVpnbgLD3q5uze6C0CVeKh9+pkfuXkOTdXsvJvvnA9MBlDKbPX0zfdaq
+	6Sa+f0lKJVqMCekYbCsqpKxSFMfy/craL8R/i9ZIgcUbK34pAIqWtS95Mb7tVDr/LJPjxbe3Z0m
+	NDInDGa4dAM69eDTQ0NR3LZLjj8jvP3kBYFP60JcbUyGJpG5RPD/cGBkPN5OOPkegR85XrB+7F2
+	ONYTgnoE1LGNyYLckIOOYrfOeWlixC4pUI559b3CmFDo7pwWK197cQBM+LFQYtuUteOImCNOi6g
+	ooUbDFx2wFwmxCC9raNZfiYqkmzyDKosYlr6mcKn+i8gXoep5sgWGhu8UHt7NpG3wEPPP1jd
+X-Received: by 2002:a05:7022:1e05:b0:11b:c4ee:66b with SMTP id
+ a92af1059eb24-1276ad7ef12mr3151433c88.37.1771810689462; Sun, 22 Feb 2026
+ 17:38:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260222-fix_zero_wnd_fin-v1-0-5f4034952f3c@gmail.com> <20260222-fix_zero_wnd_fin-v1-1-5f4034952f3c@gmail.com>
-In-Reply-To: <20260222-fix_zero_wnd_fin-v1-1-5f4034952f3c@gmail.com>
+References: <20260222-fix_zero_wnd_fin-v1-0-5f4034952f3c@gmail.com> <20260222-fix_zero_wnd_fin-v1-2-5f4034952f3c@gmail.com>
+In-Reply-To: <20260222-fix_zero_wnd_fin-v1-2-5f4034952f3c@gmail.com>
 From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Sun, 22 Feb 2026 17:36:33 -0800
-X-Gm-Features: AaiRm50qMcdmSp1awvPNwQmaqwcUe7gupisvQyzMI5Tf_UWIEyQFIUbhjca6eWM
-Message-ID: <CAAVpQUCYk+eNb2oFVEzob9bh8Th39wqdxD5b-L7AzO9cueCOxg@mail.gmail.com>
-Subject: Re: [PATCH net 1/2] tcp: re-enable acceptance of FIN packets when
- RWIN is 0
+Date: Sun, 22 Feb 2026 17:37:58 -0800
+X-Gm-Features: AaiRm50HO_GSDIAUH_Vpew7xa4MHSNlo62w8RJQJhlg389x64xz_C5iL-OU7G_M
+Message-ID: <CAAVpQUBObJz75=_ozmVOnSZ-qsxpXzFKcea4Ntw2GqcdaU_yRA@mail.gmail.com>
+Subject: Re: [PATCH net 2/2] selftests/net: packetdrill: Verify acceptance of
+ FIN packets when RWIN is 0
 To: gmbnomis@gmail.com
 Cc: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, 
 	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
@@ -120,7 +120,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -128,7 +128,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259921-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-259922-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
@@ -137,12 +137,12 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-0.998];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: CF4C9171560
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 137F3171588
 X-Rspamd-Action: no action
 
 On Sun, Feb 22, 2026 at 4:35=E2=80=AFAM Simon Baatz via B4 Relay
@@ -150,27 +150,57 @@ On Sun, Feb 22, 2026 at 4:35=E2=80=AFAM Simon Baatz via B4 Relay
 >
 > From: Simon Baatz <gmbnomis@gmail.com>
 >
-> Commit 2bd99aef1b19 ("tcp: accept bare FIN packets under memory
-> pressure") allowed accepting FIN packets in tcp_data_queue() even when
-> the receive window was closed, to prevent ACK/FIN loops with broken
-> clients.
+> Add a packetdrill test that verifies we accept bare FIN packets when
+> the advertised receive window is zero.
 >
-> Such a FIN packet is in sequence, but because the FIN consumes a
-> sequence number, it extends beyond the window. Before commit
-> 9ca48d616ed7 ("tcp: do not accept packets beyond window"),
-> tcp_sequence() only required the seq to be within the window. After
-> that change, the entire packet (including the FIN) must fit within the
-> window. As a result, such FIN packets are now dropped and the handling
-> path is no longer reached.
->
-> Be more lenient by not counting the sequence number consumed by the
-> FIN when calling tcp_sequence(), restoring the previous behavior for
-> cases where only the FIN extends beyond the window.
->
-> Fixes: 9ca48d616ed7 ("tcp: do not accept packets beyond window")
 > Signed-off-by: Simon Baatz <gmbnomis@gmail.com>
 
-Good catch, thanks !
-
 Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+
+
+> ---
+>  .../net/packetdrill/tcp_rcv_zero_wnd_fin.pkt       | 27 ++++++++++++++++=
+++++++
+>  1 file changed, 27 insertions(+)
+>
+> diff --git a/tools/testing/selftests/net/packetdrill/tcp_rcv_zero_wnd_fin=
+.pkt b/tools/testing/selftests/net/packetdrill/tcp_rcv_zero_wnd_fin.pkt
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..e245359a1a91d4b6d7ef64496=
+681cea57792cb71
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/packetdrill/tcp_rcv_zero_wnd_fin.pkt
+> @@ -0,0 +1,27 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +// Some TCP stacks send FINs even though the window is closed. We break
+> +// a possible FIN/ACK loop by accepting the FIN.
+> +
+> +--mss=3D1000
+> +
+> +`./defaults.sh`
+> +
+> +// Establish a connection.
+> +   +0 socket(..., SOCK_STREAM, IPPROTO_TCP) =3D 3
+> +   +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) =3D 0
+> +   +0 setsockopt(3, SOL_SOCKET, SO_RCVBUF, [20000], 4) =3D 0
+> +   +0 bind(3, ..., ...) =3D 0
+> +   +0 listen(3, 1) =3D 0
+> +
+> +   +0 < S 0:0(0) win 32792 <mss 1000,nop,wscale 7>
+> +   +0 > S. 0:0(0) ack 1 <mss 1460,nop,wscale 0>
+> +   +0 < . 1:1(0) ack 1 win 257
+> +
+> +   +0 accept(3, ..., ...) =3D 4
+> +
+> +   +0 < P. 1:60001(60000) ack 1 win 257
+> +    * > .  1:1(0) ack 60001 win 0
+> +
+> +   +0 < F. 60001:60001(0) ack 1 win 257
+> +   +0 > . 1:1(0) ack 60002 win 0
+>
+> --
+> 2.53.0
+>
+>
 
