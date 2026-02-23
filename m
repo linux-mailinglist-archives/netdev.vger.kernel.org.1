@@ -1,200 +1,176 @@
-Return-Path: <netdev+bounces-260099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260100-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id TNeSKYt7nGm6IQQAu9opvQ
-	(envelope-from <netdev+bounces-260099-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 17:08:43 +0100
+	id aIECMuR6nGlfIAQAu9opvQ
+	(envelope-from <netdev+bounces-260100-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 17:05:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CE1E17961E
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 17:08:43 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D1AB17953E
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 17:05:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6307E316AAC2
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 16:01:58 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 84E35303CB31
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 16:02:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C83F330ACFB;
-	Mon, 23 Feb 2026 16:01:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="PqHtQ0ke"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E414F3043DB;
+	Mon, 23 Feb 2026 16:01:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E1F2BDC1B
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 16:01:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B86630C606;
+	Mon, 23 Feb 2026 16:01:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771862469; cv=none; b=ULik6Ut89W25SRq1usPRJ6ZX/ZCqp0s/QV5RPrj+XOoy88EltTche/LWQoElQz1NxyVvnK06YWN8LJ4JuIZCxetckBU9clTfoduvU+/+2sgphvynZoLWjZs89R2RjxdukAZEDKFWmBTmzSE59jQISilvIRmrBMAgjNDoe+0QGlU=
+	t=1771862483; cv=none; b=So9Zn2qJIiqv3OogA3VOIdUkbTUYd5YmDRJpA4BsV9Z/TECRIWC8zoK5U9r8/3bWjOviCccju+uW5qIntLMcZ1Z/JopizaL9W1myBYmixKyCjpPKSUncw3msQk3A0zKHSOivIxx4Tpkj3G9nQ7iuMsX1J5XZ1xvd42Zb2az+iUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771862469; c=relaxed/simple;
-	bh=RBDa0jIO4VbsfMCQSIREc9cffsT7gvfxFla9G/UD7gs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TJB259nsy79sCeC4Kpe1Q8yT8PdtBjQ2SRFe0A9xfOZtW8K4+99p75YMxonJQLbSEplR4B91cBYXvMnQUfQfs8BzkUZ9Doudf6jhJPm6NLfgefyfISysOZaoKJtbVE8YjXbSSG29PbnXoDkfhPcvepxyt6bMahiOIVcf5S/R+g0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=PqHtQ0ke; arc=none smtp.client-ip=209.85.210.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-7d195166b2cso3128916a34.3
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 08:01:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1771862466; x=1772467266; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HX29uEwlmShEjfFqkdwl8Eb5l/ZDj+DL2kVuvz05S4k=;
-        b=PqHtQ0kegO9Jus8W4cxNJI34/48vONyAjPHsLA84w3xhcTH+ehRGLWMutcJXZ2RAc/
-         sIIW38BVXjib20Hzzie5/NskGtknX8AWizrrYqFC+cHd9PikB2egS7JaNbi54oMe6P/4
-         ddf9EB7qZxkwqk3fcPIUygOni6aWtkYOvu4jDSCBwwynMsMsONTgNsrQ6SoIaPGchix5
-         apan0c7Jll92fM9SkRm6Fx8tqeLhj2uls5bV+0bT0tWyuhs39yMoF4q2AatkXEkfO9jQ
-         WZmQcIv6TmU8UxJu44cTa6JGtGGdPs47Tmw+CdciuwJYkd046huqr3OenbIXyacOEqFB
-         SY4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771862466; x=1772467266;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HX29uEwlmShEjfFqkdwl8Eb5l/ZDj+DL2kVuvz05S4k=;
-        b=v2fmJVMwzVOeEfUuRFUYzrE1GsCnGVMtC40BscMn68y/dHrLfNZjdmwxsnVaLCt2t0
-         aFgL73sHB4fj8qHIpSka8IqvNCCBQs+L09wOI8MPNDTHzD/5SVV0lmcWxibucJCNWo9w
-         WUTuMB5vYrOYRrus6pZMR/MHF6FlxMpzdFKsDuKxJWh3BooThk1RTZNhQo+arUuY15jm
-         Rt26z55kUArN+8C3CN8vYKE+NFehZNix2WnBgquAIt6K8ENBcGPPdMMuRVordngyOfoA
-         tISW8SulDL0AXRusdr180vdZLROIfPKl/oN0o5vgvDxsWMC0vOrwi5kOYGO4BZhnh/3p
-         Jeaw==
-X-Forwarded-Encrypted: i=1; AJvYcCWxHe3HuIgoK3pRsEhfyKOYiMGqRxFSv5JS7Gm3WJOvKlFUjlpjsX8rmToX/xdnjohbQnmCvIk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbLgnfidAk+7CsW8ooJPiK1d450+0lfMqWUSyKuk0xnaviDQut
-	7/3zZTZCKnKY65jWGOgPNAJWfnKCVlE3q+Jhhzk3phae8zFEuDklujlHVZsZQtgB8M4=
-X-Gm-Gg: AZuq6aI+/hBIxeYfz6qOAH3MghsQvCe+5ZGYwTgtFUxHnqptmqntFIP4OQGfCD2Swh0
-	YsSaYsJPHpnXbaymUJihhJ1fqA8WcvMC2r8pvsNfjoZZ3PIhB3eoGzg2q1TXVBeuK/3NyJwbUx9
-	a4MaIDwwllyyW4tfqegCy1qlMXtdaiv79TGLZ4jI1CfF2xhYvARqNFUyzDg0FliDVahanixwqDW
-	OTogs5jSjcc7tKjuObxiuKOm4RTt8M1VHIhkeHz3pV0sDZ7LeAkfkZ+5rcePilbXtpmYfSVlppo
-	vQbt08ZVFT6kMENY4cHLMPkcDcoTb3qfwFIwRApmheOc+F08chN/GWMqmZVSlgMZhmWJouT2FPU
-	78dTQgOdyQgZbRHlDQDyFmxkzUmxIWmZbJITyvZ6J8xtLxnpBx6zgJW57k2c4/sYD7hjGdD1Qx0
-	/7xpStggNw8skSpDySi5SYNQdMlgu4Sau6l4DeSBgNCTK+zIc+HJjnwu/kyISK1P0Fx6l+eFl30
-	mGri5V1Gg==
-X-Received: by 2002:a05:6830:3153:b0:7d1:853c:83e3 with SMTP id 46e09a7af769-7d52bdf416bmr6177467a34.2.1771862465520;
-        Mon, 23 Feb 2026 08:01:05 -0800 (PST)
-Received: from ?IPV6:2600:8803:e7e4:500:e37:2309:3937:4469? ([2600:8803:e7e4:500:e37:2309:3937:4469])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d55b9a8498sm1062950a34.28.2026.02.23.08.01.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Feb 2026 08:01:05 -0800 (PST)
-Message-ID: <47be2ff3-c25a-4aab-89fc-53921af8b0a9@baylibre.com>
-Date: Mon, 23 Feb 2026 10:01:03 -0600
+	s=arc-20240116; t=1771862483; c=relaxed/simple;
+	bh=wu2jEMSeASBK/6J7P4JboN7dhpfcXah/GbCIlIXFqt8=;
+	h=Date:From:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HhXQDVoQehtjf21EaQD7KyoSa+xXzXtNYXEB92cjQ6oqQMY+hHedYvTxCDS2mdr3T0mKVUNBMHp4KCXxX0g7mGgUai4d4uppF9y5G899ioAfqF/WXnbD8cPQXWoTFEQaBKeG+hFTVnGY3BNoLTdmydLBPNuD52Ty239Er1hhdTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 507286033B; Mon, 23 Feb 2026 17:01:15 +0100 (CET)
+Date: Mon, 23 Feb 2026 17:01:15 +0100
+From: Florian Westphal <fw@strlen.de>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>, netfilter-devel@vger.kernel.org,
+	netdev@vger.kernel.org, bridge@lists.linux.dev
+Subject: Re: [PATCH v18 nf-next 4/4] netfilter: nft_chain_filter: Add bridge
+ double vlan and pppoe
+Message-ID: <aZx5y6c6gIzELiHq@strlen.de>
+References: <20260222195845.77880-1-ericwouds@gmail.com>
+ <20260222195845.77880-5-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 04/33] mm: vmstat: Prepare to protect against concurrent
- isolated cpuset change
-To: Frederic Weisbecker <frederic@kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Bjorn Helgaas <bhelgaas@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Chen Ridong <chenridong@huawei.com>, Danilo Krummrich <dakr@kernel.org>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
- Lai Jiangshan <jiangshanlai@gmail.com>,
- Marco Crivellari <marco.crivellari@suse.com>, Michal Hocko
- <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
- Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
- Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
- Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
- linux-mm@kvack.org, linux-pci@vger.kernel.org, netdev@vger.kernel.org
-References: <20260101221359.22298-1-frederic@kernel.org>
- <20260101221359.22298-5-frederic@kernel.org>
-Content-Language: en-US
-From: David Lechner <dlechner@baylibre.com>
-In-Reply-To: <20260101221359.22298-5-frederic@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260222195845.77880-5-ericwouds@gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.54 / 15.00];
+	MISSING_TO(2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[baylibre-com.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[suse.com,linux-foundation.org,google.com,arm.com,huawei.com,kernel.org,davemloft.net,redhat.com,linuxfoundation.org,kernel.dk,cmpxchg.org,gmail.com,linux.dev,infradead.org,linutronix.de,suse.cz,vger.kernel.org,lists.infradead.org,kvack.org];
-	TAGGED_FROM(0.00)[bounces-260099-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-260100-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[baylibre.com];
-	DKIM_TRACE(0.00)[baylibre-com.20230601.gappssmtp.com:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[strlen.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[38];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dlechner@baylibre.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.949];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 5CE1E17961E
+X-Rspamd-Queue-Id: 6D1AB17953E
 X-Rspamd-Action: no action
 
-On 1/1/26 4:13 PM, Frederic Weisbecker wrote:
-> The HK_TYPE_DOMAIN housekeeping cpumask will soon be made modifiable at
-> runtime. In order to synchronize against vmstat workqueue to make sure
-> that no asynchronous vmstat work is pending or executing on a newly made
-> isolated CPU, target and queue a vmstat work under the same RCU read
-> side critical section.
-> 
-> Whenever housekeeping will update the HK_TYPE_DOMAIN cpumask, a vmstat
-> workqueue flush will also be issued in a further change to make sure
-> that no work remains pending after a CPU has been made isolated.
-> 
-> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> ---
->  mm/vmstat.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
-> 
-> diff --git a/mm/vmstat.c b/mm/vmstat.c
-> index 65de88cdf40e..ed19c0d42de6 100644
-> --- a/mm/vmstat.c
-> +++ b/mm/vmstat.c
-> @@ -2144,11 +2144,13 @@ static void vmstat_shepherd(struct work_struct *w)
->  		 * infrastructure ever noticing. Skip regular flushing from vmstat_shepherd
->  		 * for all isolated CPUs to avoid interference with the isolated workload.
->  		 */
-> -		if (cpu_is_isolated(cpu))
-> -			continue;
-> +		scoped_guard(rcu) {
-> +			if (cpu_is_isolated(cpu))
-> +				continue;
+Eric Woudstra <ericwouds@gmail.com> wrote:
 
-I think this might have introduced a bug - or at least an unintentional change
-in the program flow.
+This an AI-generated review, with no edits.
+I added my own 2 cents at the end.
 
-scoped_guard() is implemented using a for loop. Now this continue statement will
-only exit the scoped_guard() scope rather than continuing the outer for loop. This
-means that cond_resched() will be called when it previously was not.
+> diff --git a/net/netfilter/nft_chain_filter.c b/net/netfilter/nft_chain_filter.c
+> index d4d5eadaba9c..66ef30c60e56 100644
+> --- a/net/netfilter/nft_chain_filter.c
+> +++ b/net/netfilter/nft_chain_filter.c
+> @@ -227,21 +227,68 @@ static inline void nft_chain_filter_inet_fini(void) {}
+>  #endif /* CONFIG_NF_TABLES_IPV6 */
+>
+>  #if IS_ENABLED(CONFIG_NF_TABLES_BRIDGE)
+> +static int nft_set_bridge_pktinfo(struct nft_pktinfo *pkt, struct sk_buff *skb,
+> +				  const struct nf_hook_state *state,
+> +				  __be16 *proto)
+> +{
+> +	nft_set_pktinfo(pkt, skb, state);
+> +
+> +	switch (*proto) {
+> +	case htons(ETH_P_PPP_SES): {
 
->  
-> -		if (!delayed_work_pending(dw) && need_update(cpu))
-> -			queue_delayed_work_on(cpu, mm_percpu_wq, dw, 0);
-> +			if (!delayed_work_pending(dw) && need_update(cpu))
-> +				queue_delayed_work_on(cpu, mm_percpu_wq, dw, 0);
+[ ... ]
+
+> +	}
+> +	case htons(ETH_P_8021Q): {
+> +		struct vlan_hdr *vhdr, _vhdr;
+> +
+> +		vhdr = skb_header_pointer(skb, 0, sizeof(_vhdr), &_vhdr);
+> +		if (!vhdr) {
+> +			*proto = 0;
+> +			return -1;
 > +		}
->  
->  		cond_resched();
->  	}
+> +		*proto = vhdr->h_vlan_encapsulated_proto;
+> +		return VLAN_HLEN;
+> +	}
+> +	}
+> +	return 0;
+> +}
 
+The commit message states support for "inner 802.1q, combined with an
+outer 802.1ad or 802.1q encapsulation", but the code only handles
+ETH_P_8021Q (0x8100). Should there be a case for ETH_P_8021AD (0x88A8)?
+
+When a packet has an 802.1ad outer VLAN tag, proto will be ETH_P_8021AD
+but won't match any case in the switch statement. The function returns 0
+with proto unchanged, then nft_do_chain_bridge() calls
+nft_set_pktinfo_unspec(), setting thoff to 0.
+
+Other netfilter code handles both protocols, for example:
+
+net/netfilter/nf_flow_table_ip.c:
+    switch (tuple->encap[i].proto) {
+    case htons(ETH_P_8021Q):
+    case htons(ETH_P_8021AD):
+        if (skb_vlan_push(...))
+
+For double VLAN scenarios like outer 802.1q + inner 802.1q, the function
+strips the outer tag and sets proto to ETH_P_8021Q (from the inner VLAN).
+When nft_do_chain_bridge() switches on this proto value, it doesn't match
+ETH_P_IP or ETH_P_IPV6, so it falls through to the default case and calls
+nft_set_pktinfo_unspec().
+
+This means for a packet with two 802.1q tags followed by IPv4, the offset
+returned is 4 (one VLAN header), but nft_set_pktinfo_unspec() is called
+and thoff becomes 0 instead of 8.
+
+Should nft_set_bridge_pktinfo() handle nested encapsulations recursively,
+or should nft_do_chain_bridge() check if the updated proto is still a
+VLAN type and call nft_set_bridge_pktinfo() again?
+
+[ fw: I oppose auto-following nested headers an would prefer to add
+  any vlan-vlan-vlan-vlan-vlan-pppoe or whatever incrementally after
+  someone explains why thats sane.
+
+Wrt. the rest, I suspect the LLM gets confused due to vlan offloading,
+the code is fine if vlan offloading is on, we have outer vlan tag in
+the skb and eth_hdr(skb)->h_proto will be ETH_P_8021Q.
+
+Neverthelss: should this support configurations where vlan tag offload
+is off?  If it should, then ETH_P_8021AD / ETH_P_8021Q combo has to be
+handled.  That could be done in a followup change, of course.
+
+So, *I* don't see a need to send another iteration of the patch.
+
+Eric, whats your take?  Supersede?  Ignore LLM?  Follwup patch?
 
