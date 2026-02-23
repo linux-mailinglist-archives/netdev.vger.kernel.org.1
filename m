@@ -1,172 +1,288 @@
-Return-Path: <netdev+bounces-259941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259942-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GKanFxYTnGk4/gMAu9opvQ
-	(envelope-from <netdev+bounces-259941-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:43:02 +0100
+	id eOP7NBQUnGkq/gMAu9opvQ
+	(envelope-from <netdev+bounces-259942-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:47:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6CCD173385
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:43:01 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B87F173455
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:47:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 371633010B9E
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 08:43:00 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DA018301BDF4
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 08:47:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55B0334D4DC;
-	Mon, 23 Feb 2026 08:42:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C93D34CFAB;
+	Mon, 23 Feb 2026 08:47:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RNMTDRYA"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="lkbTWSB0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 097E134B40C
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 08:42:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.178
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771836179; cv=pass; b=WP+SCk1pMDavv9flpmVQzrsD4Q5GUVDTN5s114Qm6q5waQZlstlB47wbYCPoG8kgOlFeG4RMoFHbYgbRqsYjwsTH24QLVJdaeCz2yMzbDRbVCmNKOrTCCiztifhaqVoLMW+rTALeKT4mEp8IzmzdpQGYGwjxR/Go2ACSF86diHQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771836179; c=relaxed/simple;
-	bh=DTu+tH08W5HUEEPKpct02840YPC0Y/czDYA0T4vjVek=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AttboDagNLNVTPcejEaIWaGCXTErz4XgFPJL9IvfqD814uufvt7DYe15twz/AvzdMrzuQJ1AqAJSH3qyd3NxCdK2W2Lm2Kmw/pnEUWoA7ki+nXjxu+FpYWpue65ovtU/LndlovBkY56/xzp5daxl/Quv3oDQiibtpkw/ysSqM3g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RNMTDRYA; arc=pass smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-502a789834fso36192411cf.2
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 00:42:57 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771836177; cv=none;
-        d=google.com; s=arc-20240605;
-        b=epjezyjzFNJUTMccka29yvnXIgn076TS4vn1HrXGPZFqiC1TKQMfW3W4lW5r3k1Qqm
-         YhdQjR+bAdHavBiuvGaTNljG9oGkblfueVAltDqpWYNhNW6Nk8rieegqnpwA03+lYbbN
-         tQr77e3hf2FUhSgkqU0FcwDjWNwIQb/1I61U1V3itbW3AYB7l8d3TJLlBOd5AEykaV+d
-         LIQNeCm2H24YyIxP3Px9g7vpjWmO4VN3BhEBclWtvxlMUT01F7VJraduRgzzgBwGDpc3
-         WrZRG4A1cZY4IJadMRMU8MHKGp7HnBJwg1PZUpOxZdQ+8mG4prBIOiITUeeGc3h4Jwgp
-         dbiQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=DTu+tH08W5HUEEPKpct02840YPC0Y/czDYA0T4vjVek=;
-        fh=3VlMT2KXuy/snbwWEaoxdWlgsVDl9691aT20R7YawmM=;
-        b=OPgWm4AYPSwT9nycUwy9M3JYdaCFvonM3DFY8O5hFVU/8kgtqIiN2E+g+caFkF0tlo
-         Ny5oiBHauIEHZcmlfYY/Gs7syX89jLBqJG++EdF3I3QQZxfN1ASGZdlABY5VBU8JBxxg
-         siOPHLLYY16PKkqhSBemZf+jmqUbv4k6r2j1d3grosJ+WaD1F0M0PQpVc++Dzjh6XCIo
-         EJxsRQzmdUKhC03qNLxZCNNMAF/Bwn/9U1l1gZWZwMd6E4QH1aUhvwotAH29X+15WLJH
-         HeKR0vmm+5zavzDfOHzmZtzfvAZlTdZhEyAZyDxP1yyXvFdNWy8zZx1BUccJl1l+CRbD
-         Ch6A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771836177; x=1772440977; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DTu+tH08W5HUEEPKpct02840YPC0Y/czDYA0T4vjVek=;
-        b=RNMTDRYAmbvPyYugKt/qA1cQF6JD7s0ZvPqxRWPYhYnIp2NozYgu7MgYJ9OxOHr33j
-         bv4PR67ck4AN9U7uiHKKyraHGfLy/7O6UlTGjyqfprScfG/FP8MzKZmoePabmEsnIAKz
-         qQeEbOMSCfIOMct+dnSx7/cD1dTuGSNpiI8ST7+PlJJZHf0If7kIF9HqIiiVOSMEV90c
-         6R9d9UqeuYkIVqmSrifkm0lNt44hdw3iK49ilkqGHeEdRiuJDD9Z8h87fjl1YtiAv7Jp
-         jpToYldfFpvwNB6JQhtGkF2UHTZwlvBFKc6k1+W7BFPYuw8+xvbTx2uzRusGNqncWry8
-         zu3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771836177; x=1772440977;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=DTu+tH08W5HUEEPKpct02840YPC0Y/czDYA0T4vjVek=;
-        b=Ua0WOiHpKABwvjVkVGIKg4xKIrjsJqEhgq0/FCTM39oVpC51ybU5MdQop68MGNxtbF
-         EMUtI8D0m5cQzLunl93ofc9/CDtGHU2nqKXgICr9XhTwiEDmppxaHxBxZBf8PqeoaAL1
-         wpvKXOpcCp8NeevvYEEzr7skVUwgYGMiUQNBi/PGVgE1aVdQs0xFYD/pBJax/1oI9Izx
-         6xdagDm9yiQnjvFGO/0wC5mkKe5whK+ektqLDrivm9Zs9cV9Yhm5h+QJPhU/XRU/LoRB
-         uAS9r+p+6lZVPANHuRSR2nAUO5sozL3icH5zR0wX6/7TISoHsns+h/bwqjDg1DIA9H/S
-         UXXw==
-X-Gm-Message-State: AOJu0YyihkasPh7P3INVosTb9itpaYGDYwATr5z0PIg/EMruX80Xqmox
-	peRZQapFMgiHAWAMqNBCHngppeR6CmCd5uluHCWSUiy+Z8JLPlScDdWaTsQzfdF0W7yRtERiOdd
-	lFrnPKbE5Uc894iiX7nD1AXpOJgiYDg2pa1pRAdYt
-X-Gm-Gg: AZuq6aLxtJTpHJqg64ow+EuwAyUBYi42dBWib5YD5t8d2Vg6PAgqhP7kxbSSctdAXbb
-	9m4AC2AZosz6bIPiFtVfowg0DvZypYwJlBRFsJVO3YBncA9ia5QphwmkMdSWS9PzNz3d5Evbce5
-	7sOok8OSIdXSo23zVrUc9zKQcVQVzpUqFdqBc/wzGWSmC6OiQmP3OX9x1QvHw6PJiJEgIxGUlfY
-	Yu63UzWOotCYzHGnmI/+skTHBsgpLfByfu1TSQNQieJyJxZ98yKXwpvjw7YYck0k8DYBJjGg+7c
-	9IC/suQ=
-X-Received: by 2002:a05:622a:8b:b0:4f3:5816:bd8d with SMTP id
- d75a77b69052e-5070bcf26c9mr117996101cf.62.1771836176630; Mon, 23 Feb 2026
- 00:42:56 -0800 (PST)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E34E134CFCC;
+	Mon, 23 Feb 2026 08:47:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771836432; cv=none; b=pd05RkOeWQ3XcrcHLyqRu6W086o4YjXVIu7Y7Btk1LUPTnurs8F5HKtRZjzPocFP/bkfCOdGIU/zaQkureMjPIHX8z1uKZTv825wHzkTulcRt5hjyEt9gY2CILidgYBPvivNA0MIVeluvi+PrBiUwOGmWGrUSpMh9+vbBA/8C64=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771836432; c=relaxed/simple;
+	bh=+dHU1bptRcVz99RN7Jt1KnpbOiRfG8JJsVx1iaC+d18=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ClaTKvFGDbypL4Z4d1jPSwzaw1Qrictkm+zHwZskWlb7NFOaikHLxG4c04fakiebzoK6gWLEIMNyazwgXvAhsbez4/WOszBO1nQ5z9MvpOE4koirVG3VByJS0VbfY8rbmUpQC5KlXyC0rfkTPIzeuAHqG5dXxMIGzZ/GPrKRAQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=lkbTWSB0; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id AA74D20B6F00; Mon, 23 Feb 2026 00:47:10 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com AA74D20B6F00
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1771836430;
+	bh=+sMFljrbCbR3Gmuqz/2XuavaMj59idE6ZsCDEzg5qg4=;
+	h=Date:From:To:Subject:From;
+	b=lkbTWSB0Cxb1mjyEJoV6QWJGe8HeIzgv+uAMW1zP+Qd++KEEmCadG6PzQsIHGSkqE
+	 Kl/vnJc1DSzB5ABO+EbdKG8l6stKCua3Tw34PW4z8xlGreD16exO9hEmFPOYSW9hB4
+	 TnTgmkyWIe75NP0Z1revBXSzNXEMwbjI/P8wopZM=
+Date: Mon, 23 Feb 2026 00:47:10 -0800
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	dipayanroy@microsoft.com
+Subject: [PATCH, net-next] net: mana: Trigger VF reset/recovery on health
+ check failure due to HWC timeout
+Message-ID: <aZwUDlTkb5xunIkH@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260220183858.N4ERjFW6@linutronix.de>
-In-Reply-To: <20260220183858.N4ERjFW6@linutronix.de>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 23 Feb 2026 09:42:45 +0100
-X-Gm-Features: AaiRm50IaHPe5inWp2qilcbSuZ_mp7Pb___hm_S4gtahGU5djQbzDJIiK0oqOlk
-Message-ID: <CANn89iKSTXxber390V+O6dnZ4PGoZnRgW8SuU2eRHwWb7xnLyw@mail.gmail.com>
-Subject: Re: [PATCH net v2] net: Drop the lock in skb_may_tx_timestamp()
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Kurt Kanzenbach <kurt@linutronix.de>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Willem de Bruijn <willemb@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-259942-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,kernel.org,linutronix.de,redhat.com,google.com];
-	TAGGED_FROM(0.00)[bounces-259941-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,linutronix.de:email]
-X-Rspamd-Queue-Id: A6CCD173385
+	NEURAL_HAM(-0.00)[-0.998];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.microsoft.com:dkim,linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid]
+X-Rspamd-Queue-Id: 7B87F173455
 X-Rspamd-Action: no action
 
-On Fri, Feb 20, 2026 at 7:39=E2=80=AFPM Sebastian Andrzej Siewior
-<bigeasy@linutronix.de> wrote:
->
-> skb_may_tx_timestamp() may acquire sock::sk_callback_lock. The lock must
-> not be taken in IRQ context, only softirq is okay. A few drivers receive
-> the timestamp via a dedicated interrupt and complete the TX timestamp
-> from that handler. This will lead to a deadlock if the lock is already
-> write-locked on the same CPU.
->
-> Taking the lock can be avoided. The socket (pointed by the skb) will
-> remain valid until the skb is released. The ->sk_socket and ->file
-> member will be set to NULL once the user closes the socket which may
-> happen before the timestamp arrives.
-> If we happen to observe the pointer while the socket is closing but
-> before the pointer is set to NULL then we may use it because both
-> pointer (and the file's cred member) are RCU freed.
->
-> Drop the lock. Use READ_ONCE() to obtain the individual pointer. Add a
-> matching WRITE_ONCE() where the pointer are cleared.
->
-> Link: https://lore.kernel.org/all/20260205145104.iWinkXHv@linutronix.de
-> Fixes: b245be1f4db1a ("net-timestamp: no-payload only sysctl")
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> ---
+The GF stats periodic query is used as mechanism to monitor HWC health
+check. If this HWC command times out, it is a strong indication that
+the device/SoC is in a faulty state and requires recovery.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Today, when a timeout is detected, the driver marks
+hwc_timeout_occurred, clears cached stats, and stops rescheduling the
+periodic work. However, the device itself is left in the same failing
+state.
+
+Extend the timeout handling path to trigger the existing MANA VF
+recovery service by queueing a GDMA_EQE_HWC_RESET_REQUEST work item.
+This is expected to initiate the appropriate recovery flow by suspende
+resume first and if it fails then trigger a bus rescan.
+
+This change is intentionally limited to HWC command timeouts and does
+not trigger recovery for errors reported by the SoC as a normal command
+response.
+
+Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+---
+ .../net/ethernet/microsoft/mana/gdma_main.c   | 14 +++-------
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 28 ++++++++++++++++++-
+ include/net/mana/gdma.h                       | 16 +++++++++--
+ 3 files changed, 45 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+index 0055c231acf6..16c438d2aaa3 100644
+--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
++++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+@@ -490,15 +490,9 @@ static void mana_serv_reset(struct pci_dev *pdev)
+ 		dev_info(&pdev->dev, "MANA reset cycle completed\n");
+ 
+ out:
+-	gc->in_service = false;
++	clear_bit(GC_IN_SERVICE, &gc->flags);
+ }
+ 
+-struct mana_serv_work {
+-	struct work_struct serv_work;
+-	struct pci_dev *pdev;
+-	enum gdma_eqe_type type;
+-};
+-
+ static void mana_do_service(enum gdma_eqe_type type, struct pci_dev *pdev)
+ {
+ 	switch (type) {
+@@ -542,7 +536,7 @@ static void mana_recovery_delayed_func(struct work_struct *w)
+ 	spin_unlock_irqrestore(&work->lock, flags);
+ }
+ 
+-static void mana_serv_func(struct work_struct *w)
++void mana_serv_func(struct work_struct *w)
+ {
+ 	struct mana_serv_work *mns_wk;
+ 	struct pci_dev *pdev;
+@@ -624,7 +618,7 @@ static void mana_gd_process_eqe(struct gdma_queue *eq)
+ 			break;
+ 		}
+ 
+-		if (gc->in_service) {
++		if (test_bit(GC_IN_SERVICE, &gc->flags)) {
+ 			dev_info(gc->dev, "Already in service\n");
+ 			break;
+ 		}
+@@ -641,7 +635,7 @@ static void mana_gd_process_eqe(struct gdma_queue *eq)
+ 		}
+ 
+ 		dev_info(gc->dev, "Start MANA service type:%d\n", type);
+-		gc->in_service = true;
++		set_bit(GC_IN_SERVICE, &gc->flags);
+ 		mns_wk->pdev = to_pci_dev(gc->dev);
+ 		mns_wk->type = type;
+ 		pci_dev_get(mns_wk->pdev);
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index 91c418097284..8da574cf06f2 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -879,7 +879,7 @@ static void mana_tx_timeout(struct net_device *netdev, unsigned int txqueue)
+ 	struct gdma_context *gc = ac->gdma_dev->gdma_context;
+ 
+ 	/* Already in service, hence tx queue reset is not required.*/
+-	if (gc->in_service)
++	if (test_bit(GC_IN_SERVICE, &gc->flags))
+ 		return;
+ 
+ 	/* Note: If there are pending queue reset work for this port(apc),
+@@ -3533,6 +3533,8 @@ static void mana_gf_stats_work_handler(struct work_struct *work)
+ {
+ 	struct mana_context *ac =
+ 		container_of(to_delayed_work(work), struct mana_context, gf_stats_work);
++	struct gdma_context *gc = ac->gdma_dev->gdma_context;
++	struct mana_serv_work *mns_wk;
+ 	int err;
+ 
+ 	err = mana_query_gf_stats(ac);
+@@ -3540,6 +3542,30 @@ static void mana_gf_stats_work_handler(struct work_struct *work)
+ 		/* HWC timeout detected - reset stats and stop rescheduling */
+ 		ac->hwc_timeout_occurred = true;
+ 		memset(&ac->hc_stats, 0, sizeof(ac->hc_stats));
++		dev_warn(gc->dev,
++			 "Gf stats wk handler: gf stats query timed out.\n");
++
++		/* As HWC timed out, indicating a faulty HW state and needs a
++		 * reset.
++		 */
++		if (!test_and_set_bit(GC_IN_SERVICE, &gc->flags)) {
++			if (!try_module_get(THIS_MODULE)) {
++				dev_info(gc->dev, "Module is unloading\n");
++				return;
++			}
++
++			mns_wk = kzalloc(sizeof(*mns_wk), GFP_ATOMIC);
++			if (!mns_wk) {
++				module_put(THIS_MODULE);
++				return;
++			}
++
++			mns_wk->pdev = to_pci_dev(gc->dev);
++			mns_wk->type = GDMA_EQE_HWC_RESET_REQUEST;
++			pci_dev_get(mns_wk->pdev);
++			INIT_WORK(&mns_wk->serv_work, mana_serv_func);
++			schedule_work(&mns_wk->serv_work);
++		}
+ 		return;
+ 	}
+ 	schedule_delayed_work(&ac->gf_stats_work, MANA_GF_STATS_PERIOD);
+diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
+index a59bd4035a99..fb946389d593 100644
+--- a/include/net/mana/gdma.h
++++ b/include/net/mana/gdma.h
+@@ -213,6 +213,12 @@ enum gdma_page_type {
+ 
+ #define GDMA_INVALID_DMA_REGION 0
+ 
++struct mana_serv_work {
++	struct work_struct serv_work;
++	struct pci_dev *pdev;
++	enum gdma_eqe_type type;
++};
++
+ struct gdma_mem_info {
+ 	struct device *dev;
+ 
+@@ -384,6 +390,7 @@ struct gdma_irq_context {
+ 
+ enum gdma_context_flags {
+ 	GC_PROBE_SUCCEEDED	= 0,
++	GC_IN_SERVICE		= 1,
+ };
+ 
+ struct gdma_context {
+@@ -409,7 +416,6 @@ struct gdma_context {
+ 	u32			test_event_eq_id;
+ 
+ 	bool			is_pf;
+-	bool			in_service;
+ 
+ 	phys_addr_t		bar0_pa;
+ 	void __iomem		*bar0_va;
+@@ -471,6 +477,8 @@ int mana_gd_poll_cq(struct gdma_queue *cq, struct gdma_comp *comp, int num_cqe);
+ 
+ void mana_gd_ring_cq(struct gdma_queue *cq, u8 arm_bit);
+ 
++void mana_serv_func(struct work_struct *w);
++
+ struct gdma_wqe {
+ 	u32 reserved	:24;
+ 	u32 last_vbytes	:8;
+@@ -613,6 +621,9 @@ enum {
+ /* Driver can handle hardware recovery events during probe */
+ #define GDMA_DRV_CAP_FLAG_1_PROBE_RECOVERY BIT(22)
+ 
++/* Driver supports self recovery on Hardware Channel timeouts */
++#define GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECOVERY BIT(25)
++
+ #define GDMA_DRV_CAP_FLAGS1 \
+ 	(GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
+ 	 GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX | \
+@@ -626,7 +637,8 @@ enum {
+ 	 GDMA_DRV_CAP_FLAG_1_PERIODIC_STATS_QUERY | \
+ 	 GDMA_DRV_CAP_FLAG_1_SKB_LINEARIZE | \
+ 	 GDMA_DRV_CAP_FLAG_1_PROBE_RECOVERY | \
+-	 GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY)
++	 GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY | \
++	 GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECOVERY)
+ 
+ #define GDMA_DRV_CAP_FLAGS2 0
+ 
+-- 
+2.43.0
+
 
