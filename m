@@ -1,138 +1,231 @@
-Return-Path: <netdev+bounces-259934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259935-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uF2RK94EnGlG/AMAu9opvQ
-	(envelope-from <netdev+bounces-259934-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 08:42:22 +0100
+	id GMXsHFwJnGn8/AMAu9opvQ
+	(envelope-from <netdev+bounces-259935-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:01:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28FD0172CA3
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 08:42:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D19F4172DEA
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:01:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 90F5C300A7E8
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 07:42:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 47DC5300A8D4
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 08:01:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 531F0346FA9;
-	Mon, 23 Feb 2026 07:42:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0639734C808;
+	Mon, 23 Feb 2026 08:01:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Nr3bro9V"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QdK9FwaV"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1358346FA5
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 07:42:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771832539; cv=none; b=exvSFPG7EFEENaZa9V0pjf2OOrw7Z7MLSBZ8bq9mTSTM4tB6htWCh3DKZp/+rs2WXvCnT8Ab9hRAOcClKm80FVFJXxuIYQpiMEZ+xK7zDCbpzpXIw39HskwCkdoGgS2ClR8boCLhqmc9sHCAC63omhvYV3Q5KiYvr+WUXKMwt1Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771832539; c=relaxed/simple;
-	bh=MnUpCavpfI8BAF4yPsWkE96nO8uaSSIGdRS5zLGhAKo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B1FU6c9vgiZxlLtG8v8lRSGhubSL5w4VEeROJfOdBGJV4nlKEUPpG1FDd03MM2bfB5EYdor2c3johlxpZT13BervHqq60VvU5HKyalo1ow5K2oqrR260lBn+Mj5ERMlRcWBEPuC8wMhdENVi1tdWZDYQhcqZclvCYsRbLR/TDpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Nr3bro9V; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1771832535;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=PIKNM+rAOHSJeO0ca6Imav7F4Thd8LQwy9dytbmdIf4=;
-	b=Nr3bro9VEC7Acaq2fFWVptzkmySYBxmoN1Y2v77IqhiHl0uebWAIu3Cz70LymOEci5UMQA
-	XLnDkeZwQnA8Es8CCpvr+w3k3X4zgxIaDjW5w3soTkYuK1YBuXk5asltAyHfXmCgROYfl1
-	/5gD1bNF9iNMgBgFp1jakuZYGGTwvo0=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net: l2tp_eth: Replace deprecated strcpy with strscpy in l2tp_eth_create
-Date: Mon, 23 Feb 2026 08:41:34 +0100
-Message-ID: <20260223074137.321862-1-thorsten.blum@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42E65345729
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 08:01:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771833688; cv=pass; b=GXrMDluhT5tzeWJHvxWMK4nn8YFb6SE7WlKVe+bOw7mP4GlPWLxnxV8m8xcMoyxDukzBTbu+9GQ6YviEWW5Uwv/zwln+ZxyshHRZ2WM2Z2PAJc4DWOAcg4x08U6pRngrNivFrWyDK+pElfY8H379XCBBoSnjazq48QGTUh10IlU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771833688; c=relaxed/simple;
+	bh=K/6q6RkAywcpwdXEYmgKespAU22TbYrWPBmXAoPVm+A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rgearr3mGr+DpH0EBD0iu41jbohxHK7+8mSqOYap2Ce6urCMhKr5S6oPGL37d2Up2/cCTgtnSSoV/AGWkMjRDzG1LW+JD0G+qVSFBqv7QGx93ss2QSM0P7SbG5WzJU0B7iOyOajBl9v8dD1oHFG44hpz+Rt80G2YnrwVTAZdvik=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QdK9FwaV; arc=pass smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-506c02ec1b3so43628341cf.0
+        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 00:01:27 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771833686; cv=none;
+        d=google.com; s=arc-20240605;
+        b=J9B0Li6Tgg1xOCDEiCP33w27KarV/4BuUzRArUaToKkRR3fgzNcqmyzhTatgmIof3A
+         UTzSHTRVLnKlHNg78eEQpovvcEKpCAOS+evL5kA6bBG4UMR4zWlei3nJCwwuUGRnBTYR
+         ISw47jtz4eYPFZT1uh/lgbxWk+Ywup4fYS8WeMKPhOZvUu2qsIk/4mHuyVIxa3XgaHp4
+         MWCWaUXiup3maRjyY3+gyZedjQldIb5VS5v1sFeXcayl9G8bhcNrfE5UGlCv0o98nlof
+         PAaiqDVzstMHh7eOItK8fTCJKZ3zkO0QN1L/+/QIghCtXFP5LvflWGAi9Hdc6xjPfAsI
+         PJ0w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ZHeMGjNoyVss0xbi9Q87Th7AGf/k8UCazyBAOVdMvks=;
+        fh=Bmn2FrwyB+TMK4Vg022x5SyqEPgag6+f7BTZdoR6aio=;
+        b=ivKUqxE2C67O278YR0uJgcZvO1tbUdpSg2j3nLeeQqfld+TfZVLHtjWr96Tar/wJz5
+         CkuXWN3uhNzeZomEUsH5JCArdukZkS9TxWPUDbVGK5sxtAe5q8y7on+9W9TaP97m8+Xf
+         oM+p+0cxT8DOst8LVA3qt13rWxpT/JgEqIIEk5MLWwWygMGr8a9hoe2Nfg3FFJkDODNS
+         2BmKK8lMRka/SRd/2/5HzR9tp62I5VUaJNA80eToOC1flxSjZLd8WS/Q8jxp5TRLPU1P
+         l66WFzKY1quH+n4c+jQDoTSNIkELO3/v4RHSbckSaY9nCSeGt8SnS3MVGiGwkXqn2HiF
+         28CA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1771833686; x=1772438486; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZHeMGjNoyVss0xbi9Q87Th7AGf/k8UCazyBAOVdMvks=;
+        b=QdK9FwaVhnzFMU6phiq69IYWiUe6H2Cv/lLVizsub4gFEpSQGK3k/KNKj8JnzX+Nh5
+         9UvPxhVtjpdAsDitwJcHr7PIa+Y/iTTQQAd+w+AYruVsZ2J1cmKRTCmN1yhXnxE18MrS
+         o2qzRTV00zQBFt5w8uJzDahEDaLD59DpjN/P2cFo7+Cdg3BRs2NmeiMcHm0T1NfF7DK5
+         icWWCsis52EynRC3yZ45ZJqmlR4V5FEbuhp4VOHZScNJ+PrIcCkfpXqIJ+li/jKQXdU4
+         cgzkKQpHSnI2BJJx1KRSl15frFB5OXrNj4l2RmrrHvfTLQz4hIaFwfXc6VJouZueEh9E
+         QPTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771833686; x=1772438486;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ZHeMGjNoyVss0xbi9Q87Th7AGf/k8UCazyBAOVdMvks=;
+        b=XCKKSkl/gA+JN2U16IzcWurBXGM8uz5QuPZSdvZZMwS+a71ndmAKKY9WFTncmNW7DA
+         i389Q4tgpTvhDNDKuEpnBnWOzmfc7KHhKtLAzJ9GBtMAzsM5WtCU3Q6R6muChOpfIoNw
+         fZhVHwgg4bHzGaagdsChaK6nRlEC5ZRs2465YUwOIIsqb1CE+kr/aGAO8fqx0KmdmPsl
+         x7oxvxU2aRX3tMijqpHYHO4/LIg+FkAHWNvzlZLYc0YnYNBCyuO52GEfJy2UMs3k3Exf
+         JvZuMdxLnHeSYJLfL+lNwPRfg69ZVHlI5Ic0nnq3HKp4o20yDlxLwHgIpiEmyXOtkXv8
+         reGg==
+X-Forwarded-Encrypted: i=1; AJvYcCUtaknWDWUfGmq/XfiUUxSqFtJueyUYwpwdKj7AhyIs6qUJVCdTyEouQbnfR8LZtqsv6omwlLk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzG3vGz6M+cX7OVDxVtxJE0ypsfINw+D2Q3DwwceEcRGrTzJez2
+	LnMmCzVjPOcR1fEUCokERPorrR0a2B7lOIfWF9iNtSFytlVybrXiEdizscBT+ZwluX+E6qtMxsh
+	q2TTp2wWT7uRWbM6qIfqHaYiftSR7GxmEKeMOovfm
+X-Gm-Gg: AZuq6aJMU1eM1JKc2l0yXznp7e2GRtYcxxo6g7Ews/D8Gu+JSh9xsODdff8ucO9UchL
+	9MK2F9S9B1ndsF5dQcFfc6dhhFu0DQRtYIxdLNKYFAJISMD4VAa8z2VqxDh1vOAGjg5FmUdkX3M
+	oTlksOwWNRQC8cWxEWAkK8dkaRaFzg0azOxqgEeS2M34XPStMf4eBwDaiPL+eMGxsdRQykplUOU
+	4RrJEuzmKQTWGFLa9l1UGyLYjyFLy5quQnsdei/38OgHj8vtG7jTcu+9cUaG4Xb5DadAwxz16W4
+	O4QuLaQ=
+X-Received: by 2002:ac8:7f8f:0:b0:4ee:1f69:fdeb with SMTP id
+ d75a77b69052e-506f30ad7fdmr174135491cf.11.1771833685719; Mon, 23 Feb 2026
+ 00:01:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20260222-fix_zero_wnd_fin-v1-0-5f4034952f3c@gmail.com> <20260222-fix_zero_wnd_fin-v1-1-5f4034952f3c@gmail.com>
+In-Reply-To: <20260222-fix_zero_wnd_fin-v1-1-5f4034952f3c@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 23 Feb 2026 09:01:13 +0100
+X-Gm-Features: AaiRm51s6F5nJUNwqq5YLxG7UGRRbTM5Nc5rtJlp4nPZ5LnqHN7N58OnUco-aUs
+Message-ID: <CANn89iK5Kk2D-zMiw_2syb9OdmkKdgAA7aGfi8QNZ9XR4=CfvA@mail.gmail.com>
+Subject: Re: [PATCH net 1/2] tcp: re-enable acceptance of FIN packets when
+ RWIN is 0
+To: gmbnomis@gmail.com
+Cc: Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-259934-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[thorsten.blum@linux.dev,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-259935-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,linux.dev:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 28FD0172CA3
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-0.998];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D19F4172DEA
 X-Rspamd-Action: no action
 
-strcpy() has been deprecated [1] because it performs no bounds checking
-on the destination buffer, which can lead to buffer overflows. Replace
-it with the safer strscpy().  Use the two-argument version of strscpy()
-to copy 'cfg->ifname'.
+On Sun, Feb 22, 2026 at 1:35=E2=80=AFPM Simon Baatz via B4 Relay
+<devnull+gmbnomis.gmail.com@kernel.org> wrote:
+>
+> From: Simon Baatz <gmbnomis@gmail.com>
+>
+> Commit 2bd99aef1b19 ("tcp: accept bare FIN packets under memory
+> pressure") allowed accepting FIN packets in tcp_data_queue() even when
+> the receive window was closed, to prevent ACK/FIN loops with broken
+> clients.
+>
+> Such a FIN packet is in sequence, but because the FIN consumes a
+> sequence number, it extends beyond the window. Before commit
+> 9ca48d616ed7 ("tcp: do not accept packets beyond window"),
+> tcp_sequence() only required the seq to be within the window. After
+> that change, the entire packet (including the FIN) must fit within the
+> window. As a result, such FIN packets are now dropped and the handling
+> path is no longer reached.
+>
+> Be more lenient by not counting the sequence number consumed by the
+> FIN when calling tcp_sequence(), restoring the previous behavior for
+> cases where only the FIN extends beyond the window.
+>
+> Fixes: 9ca48d616ed7 ("tcp: do not accept packets beyond window")
 
-Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strcpy [1]
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- net/l2tp/l2tp_eth.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+OK, but this commit is fine ? It seems the issue is coming from buggy peers=
+ ?
 
-diff --git a/net/l2tp/l2tp_eth.c b/net/l2tp/l2tp_eth.c
-index cf0b66f4fb29..a4956ef9574c 100644
---- a/net/l2tp/l2tp_eth.c
-+++ b/net/l2tp/l2tp_eth.c
-@@ -14,6 +14,7 @@
- #include <linux/in.h>
- #include <linux/etherdevice.h>
- #include <linux/spinlock.h>
-+#include <linux/string.h>
- #include <net/sock.h>
- #include <net/ip.h>
- #include <net/icmp.h>
-@@ -235,10 +236,10 @@ static int l2tp_eth_create(struct net *net, struct l2tp_tunnel *tunnel,
- 	int rc;
- 
- 	if (cfg->ifname) {
--		strscpy(name, cfg->ifname, IFNAMSIZ);
-+		strscpy(name, cfg->ifname);
- 		name_assign_type = NET_NAME_USER;
- 	} else {
--		strcpy(name, L2TP_ETH_DEV_NAME);
-+		strscpy(name, L2TP_ETH_DEV_NAME);
- 		name_assign_type = NET_NAME_ENUM;
- 	}
- 
--- 
-Thorsten Blum <thorsten.blum@linux.dev>
-GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
+Eventually the receive queue would be drained by the application, the
+peer would retransmit
+this FIN, and it would be accepted.
 
+> Signed-off-by: Simon Baatz <gmbnomis@gmail.com>
+> ---
+>  net/ipv4/tcp_input.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index e7b41abb82aad33d8cab4fcfa989cc4771149b41..fde612f12d3625000081958d1=
+3cec8779684a642 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -6379,7 +6379,12 @@ static bool tcp_validate_incoming(struct sock *sk,=
+ struct sk_buff *skb,
+>
+>  step1:
+>         /* Step 1: check sequence number */
+> -       reason =3D tcp_sequence(sk, TCP_SKB_CB(skb)->seq, TCP_SKB_CB(skb)=
+->end_seq);
+> +
+> +       /* Some stacks are known to handle FIN incorrectly; allow the FIN
+> +        * to extend beyond the window and check it in detail later.
+> +        */
+> +       reason =3D tcp_sequence(sk, TCP_SKB_CB(skb)->seq,
+> +                             TCP_SKB_CB(skb)->end_seq - th->fin);
+
+I don't think this is the right fix. Basically it says that FIN do not
+count, but TCP RFC says otherwise.
+
+It also adds code in TCP fast path.
+
+See for reference
+
+commit 22555032c513e62fe744d4cdd553539897e8e922
+Author: Eric Dumazet <edumazet@google.com>
+Date:   Thu Apr 18 21:45:58 2024 +0000
+
+    tcp: remove dubious FIN exception from tcp_cwnd_test()
+
+    tcp_cwnd_test() has a special handing for the last packet in
+    the write queue if it is smaller than one MSS and has the FIN flag.
+
+    This is in violation of TCP RFC, and seems quite dubious.
+
+    This packet can be sent only if the current CWND is bigger
+    than the number of packets in flight.
+
+    Making tcp_cwnd_test() result independent of the first skb
+    in the write queue is needed for the last patch of the series.
+
+    Signed-off-by: Eric Dumazet <edumazet@google.com>
+    Link: https://lore.kernel.org/r/20240418214600.1291486-2-edumazet@googl=
+e.com
+    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
