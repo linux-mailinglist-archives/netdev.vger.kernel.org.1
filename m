@@ -1,126 +1,137 @@
-Return-Path: <netdev+bounces-260211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260212-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uG4PGlvKnGlHKQQAu9opvQ
-	(envelope-from <netdev+bounces-260211-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:44:59 +0100
+	id cCR2J+PLnGlHKQQAu9opvQ
+	(envelope-from <netdev+bounces-260212-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:51:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C214517DB2F
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:44:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0604C17DC21
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:51:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5FC143058DDC
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 21:43:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8AAFE30D6E3D
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 21:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D91378D9D;
-	Mon, 23 Feb 2026 21:43:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 319273793B8;
+	Mon, 23 Feb 2026 21:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="McoNbNT9"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="FNDp/mkA"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C49E2641C6
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 21:43:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 143E633A6E9
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 21:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771882997; cv=none; b=KGmt0bimKstV6ERUB4os+TkohUkBEfLt6C4OxsOejs2DWhuMo3Rq9jt4/Ha2GTGRZRjww6+qT/0uoDHgehfpq1h+yaVvQx0ZVAnRGnwRmoXzvOSrEk42M7wx2ROXPWRDr4cwebnZJTJ8olsmU9duY0ZOKSztl5Jpt9BLd9I7Yio=
+	t=1771883428; cv=none; b=Bfyl0MDzEfx5WiLNjKZt03tnriz9KElBdgREUBrwa23KFuLeezqLKbuD0XISh9WUep4kG6ShWB30+ErQNiFsdyAwOJwx94s9A4O5NS3isR/0Qtsgu6YLME6VLSspvEpfS8IGhf3d1H9hpmvMkMR7d3tdWHPXTgL0Y2dXy0zJyi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771882997; c=relaxed/simple;
-	bh=8x3+GaARO3sIasJgNw+lz23WiKvjHUHZs7cHUaZ6qwA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Wer7tTfXW3qBXjgnPno0wUgHli7ezZJrzj5rtBxi5jox7leAXzIgjUHenZJB/HMeXjcEX+cH8vG3CNsYGtIr7mK1PZ6HM7/E+YCjs3yBDdb8Aih0gPwm813BviQvWlnLXpG4vX/Z1DlgDha27WPlD06zAdd1L+hvi9c6wPy9l/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=McoNbNT9; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <d122ed8b-ebfb-4d59-96ce-10c361e76676@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1771882994;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6ZYcupND28PGAqaDkbT7jqLJ1TI0n/gP/2am0PmSi9g=;
-	b=McoNbNT9vjwf2I2pNyeCv3x53PejvJMiSF7SiH5fi27UYl4kcLGt//K/xRN1I5Atzs1uJo
-	zPoyam07zdN+LgsrrFJad6W947WyoNLVSd1zIpC5z6+ZL/zeA3eYLSNNYfbfC170YMLnUq
-	B/GYtwlpPVkZQ9Beg6i1e5s9pVApOIg=
-Date: Mon, 23 Feb 2026 13:43:06 -0800
+	s=arc-20240116; t=1771883428; c=relaxed/simple;
+	bh=qtP38MaTf/OO1c4XDeW+gZQilw49VkT2LCkLWQnTNog=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=OagtBINxB6gAp9pZ+YbjfUMv8Rj3yTRvqrk2oDZ8ru0LQbwQqoxW3+5R4QPzkddIfUFgOim6U3hPY7mp8cMZzTDB948tjxp4BgsJglqzV6iJefk+D3pt0mWNcExlEODvFCyfbHj9nAjq5xqoDoUgL9ehU+tDpHDod/ppU+jNHgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=FNDp/mkA; arc=none smtp.client-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Received: from localhost (localhost [127.0.0.1])
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4fKZKG623Pzlh1Wk;
+	Mon, 23 Feb 2026 21:50:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:mime-version:references:in-reply-to
+	:x-mailer:message-id:date:date:subject:subject:from:from
+	:received:received; s=mr01; t=1771883426; x=1774475427; bh=JMpWL
+	lk4dcnYEp1thSbtksjwVomaU0aDgfmv5lEycPc=; b=FNDp/mkAhgK4vG8iE8zWM
+	k+PfftIvKwmNzrnJi1hr0O641bexFcbr4DL8b/rQoyh87aNHmFsFDGlS+AOD2/Jx
+	NWmdtth7kwqpbDV13JbAKZ3y+merbWxXR4Lr9LfSbz34acCbMuVkL8Y5zhHn3/SM
+	KPaAvqz9tBbU/D5plUG0R5vsEBRVuK5bCz3d6vmlxkIgQ1b0zkCxvAWB8PfKdrPP
+	aftLQ4cMJ3WVtXf2n4vK65+KVYH3As9P1i6spqgPvOdPfBIOQY8/hybsI3Ur9fP5
+	cWm3KpBZf2iwxPY6i1D24GbM4ai0e5UK+A/NcRHOeO37Oq8ZtrdSfziUF10KByUc
+	g==
+X-Virus-Scanned: by MailRoute
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id s9Rg_GU3Howl; Mon, 23 Feb 2026 21:50:26 +0000 (UTC)
+Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4fKZKF10M0zlfgPY;
+	Mon, 23 Feb 2026 21:50:24 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Bart Van Assche <bvanassche@acm.org>,
+	Shantiprasad Shettar <shantiprasad.shettar@broadcom.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH 17/62] bnxt_en: Make bnxt_resume() easier to analyze
+Date: Mon, 23 Feb 2026 13:49:05 -0800
+Message-ID: <20260223214950.2153735-18-bvanassche@acm.org>
+X-Mailer: git-send-email 2.53.0.371.g1d285c8824-goog
+In-Reply-To: <20260223214950.2153735-1-bvanassche@acm.org>
+References: <20260223214950.2153735-1-bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf v2 3/4] bpf, sockmap: Adapt for the af_unix-specific
- lock
-To: Michal Luczaj <mhal@rbox.co>, Kuniyuki Iwashima <kuniyu@google.com>
-Cc: John Fastabend <john.fastabend@gmail.com>,
- Jakub Sitnicki <jakub@cloudflare.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Willem de Bruijn <willemb@google.com>, Cong Wang <cong.wang@bytedance.com>,
- Alexei Starovoitov <ast@kernel.org>, Yonghong Song <yhs@fb.com>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20260207-unix-proto-update-null-ptr-deref-v2-0-9f091330e7cd@rbox.co>
- <20260207-unix-proto-update-null-ptr-deref-v2-3-9f091330e7cd@rbox.co>
- <CAAVpQUA+8GL_j63CaKb8hbxoL21izD58yr1NvhOhU=j+35+3og@mail.gmail.com>
- <c4eaead1-ad69-42f0-9699-5f2d555a7693@rbox.co>
- <a2f2c260-38e8-4ba3-8655-cffbee046259@linux.dev>
- <b75bbc3f-85fd-4209-9ce1-3bf685ba62ff@rbox.co>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <b75bbc3f-85fd-4209-9ce1-3bf685ba62ff@rbox.co>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[acm.org,reject];
+	R_DKIM_ALLOW(-0.20)[acm.org:s=mr01];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260211-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,cloudflare.com,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,bytedance.com,fb.com,linux.dev,fomichev.me,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[27];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260212-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[acm.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[bvanassche@acm.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim]
-X-Rspamd-Queue-Id: C214517DB2F
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,acm.org:mid,acm.org:dkim,acm.org:email,broadcom.com:email]
+X-Rspamd-Queue-Id: 0604C17DC21
 X-Rspamd-Action: no action
 
+Pass the same argument to netdev_lock() and netdev_unlock(). This patch
+prepares for enabling the Clang thread-safety analysis functionality. No
+functional change intended.
 
-On 2/11/26 2:02 AM, Michal Luczaj wrote:
->> It should also be helpful to be consistent with tcp/udp iter and use
->> lock_sock() instead of lock_sock_fast() in bpf_iter_unix_seq_show().
-> OK, I'll tweak that in v3.
+Cc: Shantiprasad Shettar <shantiprasad.shettar@broadcom.com>
+Cc: netdev@vger.kernel.org
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Hi, Michal. Are you planning to send v3 soon? I don't think the 
-sock_owned_by_user for the non-tracing prog needs to be addressed in the 
-same set.
-
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethe=
+rnet/broadcom/bnxt/bnxt.c
+index e062d5d400da..950708575268 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -17121,7 +17121,7 @@ static int bnxt_resume(struct device *device)
+ 	}
+=20
+ resume_exit:
+-	netdev_unlock(bp->dev);
++	netdev_unlock(dev);
+ 	bnxt_ulp_start(bp, rc);
+ 	if (!rc)
+ 		bnxt_reenable_sriov(bp);
 
