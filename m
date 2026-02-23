@@ -1,154 +1,175 @@
-Return-Path: <netdev+bounces-260080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260081-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mG2mF6xvnGmcGAQAu9opvQ
-	(envelope-from <netdev+bounces-260080-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 16:18:04 +0100
+	id WPIsCwZwnGmcGAQAu9opvQ
+	(envelope-from <netdev+bounces-260081-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 16:19:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 002E9178A06
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 16:18:03 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFE62178A2B
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 16:19:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9EC12309B43A
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 15:14:04 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0292430244F7
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 15:19:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA5CF366546;
-	Mon, 23 Feb 2026 15:14:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98B03285CAA;
+	Mon, 23 Feb 2026 15:19:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lCAuJECM"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="L0HByolD";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="3eUmRSDd";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="L0HByolD";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="3eUmRSDd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EFF7364E89
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 15:14:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 499F128505E
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 15:19:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771859643; cv=none; b=T+mcL3ZqYTtsigzT0PST2dLqx04IZrS0icsSJbEe4h5dAKMcsijWBeFHnMc1WeRUDbLPHWomA47ePonguHyfahp7hrRF1vLALl2D95L9FRk70e1uySkTimEGukJ2gqgUwtjjV2LZajiXVWnUTR1TmP5BNIIbcqdmIPJUkiGMdDY=
+	t=1771859971; cv=none; b=E5BYYtZEKhCriRnjBctcHFBFv9klINcvmzbZ3VVTBvABjlbQ2pDjiwat2AyEpmkCeE95e7sgKknVTM4+6HsPUOCZXevQbJguz6NMGpQHqnJoKQgbyGgn2RU9LXyQapY5EiqXTc0koxzntr08fi3bZ4nACa9BRVOgwg5n2T40UHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771859643; c=relaxed/simple;
-	bh=VVXHRQLJVIkhPd2IDyY6/3ocuYzZkGuoft6mcPOs7Hs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=khX/cepFtHkxHUHT85n3GILscEveheHimg8BtYYmyC6xacltXRM0M3W8BA36azZwv7u7QQ456OGQgVYUxBZ3CeJXZHTv3i970yhc3IZxsiL2E5Re5XRSyL0DmWgFBhJZYfwBsNdWwW+UjplNYzqcQZgkHWCjwQ81+MehjcknLMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lCAuJECM; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4836d4c26d3so39007695e9.2
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 07:14:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771859640; x=1772464440; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xnMSq+iMDiikJ8uyTdLbOxczxYu6EkENQJgj76vUHKo=;
-        b=lCAuJECMyvDgF3hi/2NR54EbkNlb+iiZplrNjpUvH0s2801EEeXeodEbB8tcj1rTa5
-         2uWs7aTBsTtvMUF083+WXWxmoXwch/dQms44zuW7hJN6bsUwE7JvmW3aViIdktIRuW6U
-         OWgNJP0EOG1q892gGnkKVBCsohg/AykxJQF/vnneDiS5qG2aA+O26q/wzDXSP9KT3V31
-         KPyCFPm9NZ3+mEotv0vt3SzL+rY8p3HU93Da9QzOnVHRGjir0VXwiRkwo6BE0YsWUOdv
-         XS7WbRNJBoic+yA0u88lMGZ6uERRdz8r7zU8LfnpKwGXUErO5WIeoJ7vr4uSBysoV5Pt
-         myuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771859640; x=1772464440;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=xnMSq+iMDiikJ8uyTdLbOxczxYu6EkENQJgj76vUHKo=;
-        b=XohxZMJl3FkgB+x2zGGHzYcLybowTrgpa5lzCOUq+OuA+Oh7Ts8aTVwxnyqixUjFGB
-         shZKjaTciWhWlKsVqcnSNN+kdvyj7dqMbsj/s4n6zMmVtLo1IceGum1+LaEgWXUi5Ai+
-         3XzHCzeiZ1LbXHjW9l/q6A4vOSjbmkEc7dsJ8bDlSuLWPdYj+OamUt/7FkosBLb389fE
-         GRDiPqzG6/fjkkmd9bebmLXiUnwRmIkqJhdRMjATkxw9BG7FrpCwiHlGcag5Ig7ds5CI
-         ucRXrFMFN+p1NAwwRBpLSV+v9Opu5G8B5X7MpP034VphV3+1Wc7q/zpQXYyNClyCwQL8
-         E8iQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXjpeejf8IBoWjk2XmJoBEU/GKW//igkUXPhC40hDIvJAI7fdVIVzVHy1upnZRNfecOaLKAUao=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIAr49ztuLXcB0xm5SfCcRuNDXdBMVtFcanhR/6S0HOu6ixw84
-	JaOU4OGrDgDBxBVH5ODay/q+UXOd6dWTqTHj5T9IiFwf1ty+9xLaSrve
-X-Gm-Gg: AZuq6aItJCK0lfKD55tp1fKAJPNivDdHUERqKIYd4xhDOlSgshHlWMNHPKmlm2Biloq
-	Uk9nbJqWkCGuA0yvI3ivEIzFgq7mtjjBjkvBJS7t4o4IMFXwFqEbNuRd7xyg1OeV00nTSIbpnCz
-	tpPGKp/bgRM+px+OPKfZgkYxtE5QuttAk3Okkf+zZkZBInWdz76QnV+7AY22MexZJ7Hvq0W5KMc
-	Ag7prvU2EFC6DdrJw51WmY+HueqCVG/D7dfhzvhViVQFo6s759BckAPvb69jKlLbrvjMwGskjde
-	AS1O6LfCLmQoUM6SpaRE6As4ygHpxHpSOv4JdEsovy0TFlTGGvTlL9Tsh9k90OIyRdTIOVJNI31
-	N9Wcmrlr/cq7yxz+5lMV/iGXOJXUZBYmSm9sg+xL7ugqhmudIburuc/NBV4MIayYl7pj2rF9Msx
-	k4n1iGSbqbCs17IRjpxmrLLUL2KW+MzMVQLuUrCHj95LYH7BQ7jycFJwECKEbFbcqg
-X-Received: by 2002:a05:600c:3484:b0:480:4b59:932e with SMTP id 5b1f17b1804b1-483a95b58b7mr147817495e9.11.1771859640137;
-        Mon, 23 Feb 2026 07:14:00 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483a9caadedsm166131135e9.10.2026.02.23.07.13.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Feb 2026 07:13:59 -0800 (PST)
-Date: Mon, 23 Feb 2026 15:13:58 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: Koen Vandeputte <koen.vandeputte@citymesh.com>, oneukum@suse.com,
- andrew+netdev@lunn.ch, Eric Dumazet <edumazet@google.com>, kuba@kernel.org,
- pabeni@redhat.com, netdev <netdev@vger.kernel.org>,
- linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: commit 662dc80a5e86 breaks rmnet over usb
-Message-ID: <20260223151358.0efc263d@pumpkin>
-In-Reply-To: <95ccf5a6-975b-4543-80a3-595f1ee20543@redhat.com>
-References: <CAPh3n803k8JcBPV5qEzUB-oKzWkAs-D5CU7z=Vd_nLRCr5ZqQg@mail.gmail.com>
-	<95ccf5a6-975b-4543-80a3-595f1ee20543@redhat.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1771859971; c=relaxed/simple;
+	bh=0O3RvJy5wMszVpqd7072pywBFbMARv2HhD0Qr8fHSJ8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lr7HTUn2WqI6QSl+pzmYERrWhc/Wsf9Fe6+TlefjFvwW5n7396qdM1cbU2X/XouaFbh9CGCpLm0D5B+HmgDiaY8dHI49/iJ3XNJdi22gvt45CajlAhn81Cq8rqj2NG3NKfzRxVOnFPhksZRM/tQNZ5KMVZqYSi70hMLl0ZEPWfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=L0HByolD; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=3eUmRSDd; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=L0HByolD; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=3eUmRSDd; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 409323ED75;
+	Mon, 23 Feb 2026 15:19:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1771859968; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=i3eJX+/Hm/8RuHBx6XH/gu7RzCdwaePCRMFOhHNaKD8=;
+	b=L0HByolDVRfyM01drZUEECGagzGV5s6SWkJjohtEthBkg7sJRUufWFphhvvroOyQ3c5xVd
+	zL2wcxTWdXcnkuF71DQQjanTOW3QAvKbP9lprFbCNY6txADtM4CU6LKYiup3Hb/o4npRNz
+	QM+02eL730I8vv6S7fkBSgvL3mUnaww=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1771859968;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=i3eJX+/Hm/8RuHBx6XH/gu7RzCdwaePCRMFOhHNaKD8=;
+	b=3eUmRSDdrxphum6bcXgQsXjZG1mi3jxmMQEwcNlI3fgXnGhloea2dS+FDVXybg9nMWk93f
+	sVb9C2pOzefDzEAg==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=L0HByolD;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=3eUmRSDd
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1771859968; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=i3eJX+/Hm/8RuHBx6XH/gu7RzCdwaePCRMFOhHNaKD8=;
+	b=L0HByolDVRfyM01drZUEECGagzGV5s6SWkJjohtEthBkg7sJRUufWFphhvvroOyQ3c5xVd
+	zL2wcxTWdXcnkuF71DQQjanTOW3QAvKbP9lprFbCNY6txADtM4CU6LKYiup3Hb/o4npRNz
+	QM+02eL730I8vv6S7fkBSgvL3mUnaww=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1771859968;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=i3eJX+/Hm/8RuHBx6XH/gu7RzCdwaePCRMFOhHNaKD8=;
+	b=3eUmRSDdrxphum6bcXgQsXjZG1mi3jxmMQEwcNlI3fgXnGhloea2dS+FDVXybg9nMWk93f
+	sVb9C2pOzefDzEAg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9E06C3EA68;
+	Mon, 23 Feb 2026 15:19:27 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 4qFSI/9vnGlRKQAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Mon, 23 Feb 2026 15:19:27 +0000
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+To: netdev@vger.kernel.org
+Cc: horms@kernel.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	dsahern@kernel.org,
+	davem@davemloft.net,
+	Fernando Fernandez Mancera <fmancera@suse.de>
+Subject: [PATCH net-next] ipv6: discard fragment queue if middle fragment is not 8 bytes aligned
+Date: Mon, 23 Feb 2026 16:19:18 +0100
+Message-ID: <20260223151918.31965-1-fmancera@suse.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Score: -3.01
+X-Spam-Level: 
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260080-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.de:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260081-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 002E9178A06
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,suse.de:mid,suse.de:dkim,suse.de:email]
+X-Rspamd-Queue-Id: BFE62178A2B
 X-Rspamd-Action: no action
 
-On Mon, 23 Feb 2026 15:08:41 +0100
-Laurent Vivier <lvivier@redhat.com> wrote:
+Currently the kernel IPv6 implementation is not dicarding the fragment
+queue upon receiving a IPv6 fragment that is not 8 bytes aligned. It
+relies on queue expiration to free the queue.
 
-...
-> It's weird to be able to set an MTU that is not supported by the hardware.
-> 
-> To restore performance I think the rx_usb_size should be decoupled from MTU max in qmi_wwan.
+While RFC 8200 section 4.5 does not explicitly mention that the rest of
+fragments must be discarded, it does not make sense to keep them. The
+parameter problem message is sent regardless that. In addition, if the
+sender is able to re-compose the datagram so it is 8 bytes aligned it
+would qualify as a new whole datagram not fitting into the same fragment
+queue.
 
-A lot of 'usbnet' drivers support usb packets that contain multiple ethernet frames.
-IIRC (I looked at this code quite a few years ago) some (all?) lie very badly
-about the skb 'true_size' of receive packets - putting in the frame size
-even though it is sat in 16kb+ of kernel memory.
+The sooner we can free resources during reassembly, the better.
 
-In reality the driver want to receive the 'stream' of usb packets and
-debatch it directly into ethernet frames without going though the 'urb'
-buffers at all.
-ISTR that would be possible with the xhci/usb3 hardware, but would be a
-massive re-write of parts of the stack.
-I was only trying (and I mean failing) to get 100M working reliably.
-Project got canned for other reasons.
+Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+---
+ net/ipv6/reassembly.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-	David
+diff --git a/net/ipv6/reassembly.c b/net/ipv6/reassembly.c
+index 25ec8001898d..8b0bc0ba56f4 100644
+--- a/net/ipv6/reassembly.c
++++ b/net/ipv6/reassembly.c
+@@ -163,6 +163,9 @@ static int ip6_frag_queue(struct net *net,
+ 			 * this case. -DaveM
+ 			 */
+ 			*prob_offset = offsetof(struct ipv6hdr, payload_len);
++			inet_frag_kill(&fq->q, refs);
++			__IP6_INC_STATS(net, ip6_dst_idev(skb_dst(skb)),
++					IPSTATS_MIB_REASMFAILS);
+ 			return -1;
+ 		}
+ 		if (end > fq->q.len) {
+-- 
+2.53.0
+
 
