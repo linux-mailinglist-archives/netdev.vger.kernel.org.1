@@ -1,213 +1,130 @@
-Return-Path: <netdev+bounces-260256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260257-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6LgNHxjenGl/LwQAu9opvQ
-	(envelope-from <netdev+bounces-260256-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:09:12 +0100
+	id 4EBWBr7fnGnCLwQAu9opvQ
+	(envelope-from <netdev+bounces-260257-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:16:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4C3417EE2E
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:09:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7F6F17F141
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:16:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0E27E300BC69
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:07:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 58C7A317722B
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:12:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D66737D11D;
-	Mon, 23 Feb 2026 23:07:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wrGVV2wx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70F5C37E2F3;
+	Mon, 23 Feb 2026 23:12:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 412842222A9
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 23:07:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E76343502BA;
+	Mon, 23 Feb 2026 23:12:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771888073; cv=none; b=cjkHV1YFoVEWttT9mSIogwveRL7+aBQfrb+6nqopb4RE2nAcIgA4bSaQILdPuIOeOvRfN19BmwxkzpgrvOpgycJ7lMfrJQDVIcMZ08503ytLk4+0AjVqj1UI9ZMMwUexT9TtQZO6LzAlUOAGGfG3XbAOANdpw8qwzFFbw5OCOSc=
+	t=1771888348; cv=none; b=Ea6sebHm545j54w2si6NdY4vHX9yUZR8IGCzpVaaurLr+yNsgWoEaerHYCa/UTZh40/l3WpGZcb3E+vFdydku3KJulJ62vb24+uwpCrmU/8G+H8s2bVAKG9XF9zzc6VkQ2nNodqeoydPi6T0hWY4jXo+jZjZzr/bdqYFeLFAdTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771888073; c=relaxed/simple;
-	bh=xkJLVqf3jksD/kEmlPTWa7iJ1pG5J1cOinlyPkDEokU=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=nVLyY1Uu84+MpEwuG0+aq7De/AtMixJV4UnJAhhe6rgzphpJtZoW4ef4OM+xD7L/a17GSrtuR6i3xf0TmW53UCPqLWUSHry9bYs2FAWrb1Au+Loljh82GKePSyGRyXfYjFV5a1cd5miqsv1YxKMAszRgFNqw8I1oMAdMMfeF1s0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wrGVV2wx; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2ab0b2e804cso57215825ad.3
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 15:07:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771888071; x=1772492871; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UYzxjy17nM4pxM+pr7WqqPu2oje/LqwK9DS+bOv8WyU=;
-        b=wrGVV2wxI6/uLAFba0qGuc1IORZ2dBE1jgWFLLdr5/TSx0huSjNcS+o0sCMaQVRANn
-         2moZ7r/l15E28OE7sLHEwwOdLAkQCSvMp9IvefziQuaDVjlfwzEfbLL65dQFXyS7a/Qm
-         RP0iSVoPD+dS/gfjrS7wJ2W60ygXd34LkeTkmV8LcMAMi892UBNxfAzf+hmZgFmc+UTr
-         Ek2poIx9QFEIXBMJjM9Zc36VCbx6EspaVIJkowAPOO/0tldHPRjLbHtgw0pwX/YxifS/
-         GdvcbbRk1B/LRExYXnqLX2MdaYb5wColoK3Y1W4UPq8bbODtMKgk5eIKEhhza9bjJnyd
-         KLTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771888071; x=1772492871;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UYzxjy17nM4pxM+pr7WqqPu2oje/LqwK9DS+bOv8WyU=;
-        b=LdBE+z9F2OaNaD+H+2qPFc7Dy2dBBo74y4ZWCZWW8CBgqScSr8q6nQIgfpOwb+zpyy
-         438p6o3yqH58KPrNE7OaouBqJomvikSi6JnNTvEAm5Q/u6Y3dKBQ6B3yREZkqOVQgrIr
-         bXQr6L+TaUGS1d6GWe+rDH0mrnD7Q0JyGNvn7ptQ/JXbUcEUN83HEToj8SvXYd2+izYv
-         hT9duy0Quhvktrn4JLjObt64ojpZmVV9mSe6ew6NqZo4iOWcLARCDPaOGa31W9tHsD9L
-         AljmkYS7bO3eJeWLEwL9L8S05Wr+4oviGda14iJJe09OFOswqN8MB4mpIXjVIP9LD9X7
-         TNxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVpRWsYGZh2C9+nwkpPoymR/VinaNpuS/abQgdTwF7L0Povdwj7llptZvrvF7AL7DxdrvFQTPY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyiGXw8c6ZM+5NT0eK3oe9a3kdwxnrNB00KuY3aO2c3EH0R0AuG
-	tcthVQgz+Sv8+1839oIVJJziCD223aJUa5BQAUuFApYnHlzsXufWBSgmMh8xJtHCaRWEostHGEp
-	a/tBFzQ==
-X-Received: from plld16.prod.google.com ([2002:a17:902:7290:b0:2a1:10fa:4a4a])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d4d0:b0:2ad:99d8:8612
- with SMTP id d9443c01a7336-2ad99d8881bmr4611865ad.20.1771888071371; Mon, 23
- Feb 2026 15:07:51 -0800 (PST)
-Date: Mon, 23 Feb 2026 23:07:18 +0000
+	s=arc-20240116; t=1771888348; c=relaxed/simple;
+	bh=pnvJv1+/1g6KH6AlmPTZRGIvK0vkhCQ0O1avFyhYKUw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GTmO/075GEoo1BOiXbWBZI5OaqJeK7KCghIIF2YNgas3klGqL2RA1Vn97E+NGm3Jq8pb1GSU2jcuXr1ggt0E8WjTwLg2XyrpvF7VBkVbTHjPHLrPbElm+GiUBH7NihX4N1AFlWjQl5QwiLK+hEgZPPcMVejjhP6F6LRjZX/Drk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vuf61-000000000yO-0Opd;
+	Mon, 23 Feb 2026 23:12:09 +0000
+Date: Mon, 23 Feb 2026 23:12:04 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Bart Van Assche <bart.vanassche@linux.dev>
+Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+	Will Deacon <will@kernel.org>, Boqun Feng <boqun@kernel.org>,
+	Waiman Long <longman@redhat.com>, linux-kernel@vger.kernel.org,
+	Marco Elver <elver@google.com>, Christoph Hellwig <hch@lst.de>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Nathan Chancellor <nathan@kernel.org>, Kees Cook <kees@kernel.org>,
+	Jann Horn <jannh@google.com>, Bart Van Assche <bvanassche@acm.org>,
+	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	Xu Liang <lxu@maxlinear.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH 23/62] net: phy: mxl-86110: Fix locking in an error path
+Message-ID: <aZzexPsIeNh5yVdG@makrotopia.org>
+References: <20260223220102.2158611-1-bart.vanassche@linux.dev>
+ <20260223220102.2158611-24-bart.vanassche@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.414.gf7e9f6c205-goog
-Message-ID: <20260223230749.2376145-1-kuniyu@google.com>
-Subject: [PATCH v1 net-next] bonding: Optimise is_netpoll_tx_blocked().
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260223220102.2158611-24-bart.vanassche@linux.dev>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260257-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260256-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[makrotopia.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.976];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E4C3417EE2E
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:email,maxlinear.com:email,makrotopia.org:mid,makrotopia.org:email,acm.org:email]
+X-Rspamd-Queue-Id: A7F6F17F141
 X-Rspamd-Action: no action
 
-bond_start_xmit() spends some cycles in is_netpoll_tx_blocked():
+On Mon, Feb 23, 2026 at 02:00:23PM -0800, Bart Van Assche wrote:
+> From: Bart Van Assche <bvanassche@acm.org>
+> 
+> Only call phy_unlock_mdio_bus() if phy_lock_mdio_bus() has been called
+> first. This has been detected by the Clang thread-safety analyzer.
+> 
+> Cc: Daniel Golle <daniel@makrotopia.org>
+> Cc: Andrew Lunn <andrew@lunn.ch>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Xu Liang <lxu@maxlinear.com>
+> Cc: netdev@vger.kernel.org
+> Fixes: 3d1b3f4ffc0a ("net: phy: mxl-86110: add basic support for MxL86111 PHY")
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 
-  if (unlikely(is_netpoll_tx_blocked(dev)))
-      return NETDEV_TX_BUSY;
+Reviewed-by: Daniel Golle <daniel@makrotopia.org>
 
-because of the "pushf;pop reg" sequence (aka irqs_disabled()).
-
-Let's swap the conditions in is_netpoll_tx_blocked() and
-convert netpoll_block_tx to a static key.
-
-Before:
-
-   1.23 =E2=94=82       mov    %gs:0x28,%rax
-   1.24 =E2=94=82       mov    %rax,0x18(%rsp)
-  29.45 =E2=94=82       pushfq
-   0.50 =E2=94=82       pop    %rax
-   0.47 =E2=94=82       test   $0x200,%eax
-        =E2=94=82     =E2=86=93 je     1b4
-   0.49 =E2=94=82 32:   lea    0x980(%rsi),%rbx
-
-After:
-
-   0.72 =E2=94=82       mov    %gs:0x28,%rax
-   0.81 =E2=94=82       mov    %rax,0x18(%rsp)
-   0.82 =E2=94=82       nop
-   2.77 =E2=94=82 2a:   lea    0x980(%rsi),%rbx
-
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- drivers/net/bonding/bond_main.c |  4 ++--
- include/net/bonding.h           | 10 +++++-----
- 2 files changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_mai=
-n.c
-index 55a960da42b5..2f2dddcf9d30 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -206,7 +206,7 @@ MODULE_PARM_DESC(lp_interval, "The number of seconds be=
-tween instances where "
- /*----------------------------- Global variables -------------------------=
----*/
-=20
- #ifdef CONFIG_NET_POLL_CONTROLLER
--atomic_t netpoll_block_tx =3D ATOMIC_INIT(0);
-+DEFINE_STATIC_KEY_FALSE(netpoll_block_tx);
- #endif
-=20
- unsigned int bond_net_id __read_mostly;
-@@ -6589,7 +6589,7 @@ static void __exit bonding_exit(void)
-=20
- #ifdef CONFIG_NET_POLL_CONTROLLER
- 	/* Make sure we don't have an imbalance on our netpoll blocking */
--	WARN_ON(atomic_read(&netpoll_block_tx));
-+	WARN_ON(static_branch_unlikely(&netpoll_block_tx));
- #endif
- }
-=20
-diff --git a/include/net/bonding.h b/include/net/bonding.h
-index 4ad5521e7731..7f8fda2fdfcb 100644
---- a/include/net/bonding.h
-+++ b/include/net/bonding.h
-@@ -91,22 +91,22 @@
- 			    NETIF_F_GSO_ESP)
-=20
- #ifdef CONFIG_NET_POLL_CONTROLLER
--extern atomic_t netpoll_block_tx;
-+DECLARE_STATIC_KEY_FALSE(netpoll_block_tx);
-=20
- static inline void block_netpoll_tx(void)
- {
--	atomic_inc(&netpoll_block_tx);
-+	static_branch_inc(&netpoll_block_tx);
- }
-=20
- static inline void unblock_netpoll_tx(void)
- {
--	atomic_dec(&netpoll_block_tx);
-+	static_branch_dec(&netpoll_block_tx);
- }
-=20
- static inline int is_netpoll_tx_blocked(struct net_device *dev)
- {
--	if (unlikely(netpoll_tx_running(dev)))
--		return atomic_read(&netpoll_block_tx);
-+	if (static_branch_unlikely(&netpoll_block_tx))
-+		return netpoll_tx_running(dev);
- 	return 0;
- }
- #else
---=20
-2.53.0.414.gf7e9f6c205-goog
-
+> ---
+>  drivers/net/phy/mxl-86110.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/phy/mxl-86110.c b/drivers/net/phy/mxl-86110.c
+> index 42a5fe3f115f..d010b023f7b9 100644
+> --- a/drivers/net/phy/mxl-86110.c
+> +++ b/drivers/net/phy/mxl-86110.c
+> @@ -891,7 +891,7 @@ static int mxl86111_config_inband(struct phy_device *phydev, unsigned int modes)
+>  			       MII_BMCR, BMCR_ANENABLE,
+>  			       (modes == LINK_INBAND_DISABLE) ? 0 : BMCR_ANENABLE);
+>  	if (ret < 0)
+> -		goto out;
+> +		return ret;
+>  
+>  	phy_lock_mdio_bus(phydev);
+>  
 
