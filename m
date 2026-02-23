@@ -1,197 +1,195 @@
-Return-Path: <netdev+bounces-260232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260233-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KMy2GGnTnGkJLAQAu9opvQ
-	(envelope-from <netdev+bounces-260232-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:23:37 +0100
+	id CNO2J27SnGlLKwQAu9opvQ
+	(envelope-from <netdev+bounces-260233-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:19:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7211517E43F
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:23:36 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61CCC17E2C9
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:19:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 134F3305F561
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:17:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C47CB306ABF4
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 22:19:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D215C378D74;
-	Mon, 23 Feb 2026 22:17:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E369379992;
+	Mon, 23 Feb 2026 22:19:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="MWFzFegj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XDPMIFM5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f100.google.com (mail-qv1-f100.google.com [209.85.219.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DCB431CA6A
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 22:17:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.100
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771885058; cv=pass; b=m2+vByap7yi2Er2Var9tTwQzuIM4kX/X2hzrIVXOaBnVjMqot1mSj441KlqdSteLTnJ2iOXqnYidCPwmcLo9I55MqZ/TC2eMm3A+epIOxyh2hAw2HM+A8Il4MUSTeIxkMHJsA3Kss+u1XZk1cXPBcBG6/hBWTjgHlkF/6SAPJF0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771885058; c=relaxed/simple;
-	bh=ljMrIGCQUupDMXCGdoHZPzYWeyhoz0b0/enDyGkxeok=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ftGdKnODEbmxm4Av8FH4dP1/TKMVVcVlCFJ0g5R3wztnl9EE5ErxZgiMFJbrj68mWOKiDhPRvzkcL6oyGvquyBVDQJQpGlljBd8h+6XOWmlzMMPFcmLnSmOfputtaLafiUnVA5Ppm0EU4xkKBfFW2E0NaFaNqdpgHU/hTmRas9w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=MWFzFegj; arc=pass smtp.client-ip=209.85.219.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qv1-f100.google.com with SMTP id 6a1803df08f44-896f44dc48dso44462216d6.2
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 14:17:37 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771885056; x=1772489856;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jX6gKyOs9Y6nnTjehf4llMrXB0eEzMcOeiMlAuJfUnk=;
-        b=pz2Up9lMPSp3K4JaOhtPXgYcUzxO5TUB61FdGWtRO9z2LKys7Ya6JBEyHq8iKSB2SX
-         d8Ho/T5rY5rwgFw32ls4juP3S2t6YC7Whont/pW6FZdXovkG63y+njhhV4S1kYi/FOLj
-         J+tCvmjdJwlji+xMEWm9dZ4DOkEt8geIU4YSRDT2PxC7V8wE1amqz2Cp2jeqSSlvjojb
-         MnHUYNyekcst+eEhFfbswfF/r3c0cXmHINDFXU2G9Y7gET3/mcSBOZRMNZ1OghjgihPL
-         eeevo5zcoZS73BeoAkyxWZbKBIfqsKdbhRXVrffYRKK7N2gNFrN4akNmzLm0wSr6nh7x
-         zmbg==
-X-Forwarded-Encrypted: i=2; AJvYcCUBOnsnlUhL76NRkYsGX7OqcpKIFdITaGU27MoFxeHCpZNXCM6FmR5kAWTbY7s6jZ99k1ZDSpk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLXqzUrFxgqw8p88G4a330ChwI/c81X/EQgN36+LiXI5UMabya
-	yYy/uj5G9FnkOnYpDHG6h2ZNNT3j/ar+vkUu5pnQK38UV8y/oaGGvBs+Fc/vbJrKJqhhoC+vhPZ
-	yeECJlh6iBnCREcZJzuxVQoH9qCddWcR43NJ2c/qYEsVHKx2DDE/4PaW+Ra26yn+zw45zrWQyXG
-	j8kDpLDoiyRZyeYWNwb4AcyjAH0c9RtLqV8iv9culR208dunwm7HGm4SBU2h4qF7734FYrmrlYK
-	NULfHmYERc=
-X-Gm-Gg: ATEYQzzJhmvBCZhxLLIY9S+Tw/gMVwv1bHBGAT5dcVLI0X6B+7RSbLY8CxmjPwLyTjK
-	PIZgTRnc1W0XgHeQGRGMQbHBbYWa3efwN4wyCkSJs2pekzJQ3AOD28RHnUjM7NrycHDLRYaVRGn
-	8k1zoTFPb6FDAndbMDnYGeSnxL/oYq+ZUFrnUkbQydeTkISOeXREp6TsIALR/l7Fmt23Mu5l7XM
-	jpdd/pgIDCJxy49+znXBVXJwXoaiU71jxSgmuVptS77bgFOEg5SxQwiinWXRciEJfEbPUQFrCzz
-	BDRCwIEO0HYnhMoaZCDepcXRTibNkla2ov3MhWyuNto0+EndlLrpoOAerRrT3XCkVbwQIL8Z6Hh
-	beb3LVCfKBUo0t0I09OuyqubofwPgyCBDevSuSsqGt/WlBvBmTf6X6OJN2pRTk2ICalCufMSvbt
-	YgObDQkBvD+eYzHnEXoOQkq/n0j+ouJuj3PXwuZkuLCJn/kI6o8iPNowNXGoc=
-X-Received: by 2002:a0c:fe81:0:b0:899:a584:a6fc with SMTP id 6a1803df08f44-899a584a952mr2108016d6.15.1771885056049;
-        Mon, 23 Feb 2026 14:17:36 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-118.dlp.protect.broadcom.com. [144.49.247.118])
-        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-8997e752e62sm10236556d6.30.2026.02.23.14.17.35
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 23 Feb 2026 14:17:36 -0800 (PST)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-b8fbaa0787cso488069966b.1
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 14:17:35 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771885054; cv=none;
-        d=google.com; s=arc-20240605;
-        b=EIYvCbCUNnBLWRKac6aLfBhgCcIusNx2Bqau1eUL3sYPqNT5kjsyKXgO7334r/JcFL
-         OOxhiHU8iB+R6dPUY/GD2rhlLoptZuyeQkAS07SIJn5f32oe7P3vd7srZr0pRWp8b/0+
-         YLxdXuwD4CzOhFJWW7cJyEDbEyI0gPOle5HOwRlg2nF+O178cTYNCoZu/TN5JWcEk2WI
-         ziV8fZvDX945aoLu38NEm9b1eyvJTziMKNydEFl2FM6uLKa3otSeJx0Cdenoys1HQYZ/
-         neSc+0HGOYuBlkKPPhplb4IRqnTHe6l23nOLGfD2uv2CltR9er+Lpu6FiqMdZ1FyBcLV
-         zSAQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=jX6gKyOs9Y6nnTjehf4llMrXB0eEzMcOeiMlAuJfUnk=;
-        fh=/bO0x65+XST+C6OVWjP7cVzlGVC7PJUidTwXA44Qi18=;
-        b=i1DJp+s59REpcwsNGRrboDChCrDlSed9SY2KZYyNDISTCgPWRZo7AgYqvXrgG8QsX1
-         a9pD+j9TU8tUu6YoSyssQk9H1Oqs4TH02ks6XjcOC4+A/lIsRM9T6Xkd3Uijede4qovr
-         pG5Lb38ULZVNg7WWEhYbiSX8HpCuffqi3i6/xd3TCTo3pb+g1yvM8WFwKFR98yapjLo1
-         RgW61vkyqtFuP1GLRLyyM755rF1NGPi2HuBGnpxF5kizyPaWOYpufhpmbWioujT/kGhW
-         WTfaHIacjT2zl1as/83UqDoBKyFuEkSBWwMunwghhe5wv9YOR5n8F2IYPNIs5flWdMHA
-         HpCg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1771885054; x=1772489854; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jX6gKyOs9Y6nnTjehf4llMrXB0eEzMcOeiMlAuJfUnk=;
-        b=MWFzFegjP5tJ3feAdDgKNmgp+xszNQYmIdLbW4RKW3u//0KrA14wtOGqerV3tJy+jB
-         qGieAAd86crRUqYNAC5+JGfpz5/A3Matta8t+2dum6nwZXD8fJ/V40LkfMdpFZfKvGE7
-         yl93DLTeL60SVx2mhB3JLyM+mzgUrL+J3UwGk=
-X-Forwarded-Encrypted: i=1; AJvYcCUTEEYizOT+w3uMAEUDSC2/WEwURbrKqfDbQvsrveq8NbZWYo7VQqMzp2pjd1iM1D6aaECAVi4=@vger.kernel.org
-X-Received: by 2002:a17:907:e105:b0:b8f:c51c:6ae3 with SMTP id a640c23a62f3a-b9081c1713bmr323722866b.60.1771885054319;
-        Mon, 23 Feb 2026 14:17:34 -0800 (PST)
-X-Received: by 2002:a17:907:e105:b0:b8f:c51c:6ae3 with SMTP id
- a640c23a62f3a-b9081c1713bmr323721666b.60.1771885053858; Mon, 23 Feb 2026
- 14:17:33 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A0A637882A;
+	Mon, 23 Feb 2026 22:19:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771885160; cv=none; b=pxR+2aioGIY6WY4z49q247y65XVssQIDGxm0s5NvCI8R+e5PSrBql+cp/Hzb7F6g+fRzidAkwMYXxv1u00H952tgarm0bGEd3RPkCKe9SaEa05NcdOy9BEU3hGvSElNu8xkCVaxt9+zp9kCBEEKD9ABwMo+sx9FmdS/X71GhjBs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771885160; c=relaxed/simple;
+	bh=xt9ORoAyftTCHdxhLPTUzb9JYk/R6VOwutyTZYLKbzk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XTXzTeodA36Gik8qE3PLZUrj2o6azs0PIZv4rATtrhxs6DwUXxpA34WVKfXytzMcOszr2HmmQSlXNt00jiJdHo/PBRaOAAEg+P4DP4foTj0+0eS3bA9TwgCaFMn9ZSfDG0uRgvO4vkCozJh6vE3oZdmPa3v9Qise25Cb51RpAZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XDPMIFM5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E670C116C6;
+	Mon, 23 Feb 2026 22:19:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771885159;
+	bh=xt9ORoAyftTCHdxhLPTUzb9JYk/R6VOwutyTZYLKbzk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=XDPMIFM55jDwvTta3yUpeZYyUuQuGUDqFbKpYjAHySk3wghDCyMu6s+urYua54PqV
+	 3D5al7e/gvSRAt8zBgRlkYAERqaaBGRr71QhzNO2aLNPyf0e/9E8uG7dt0VMa2CxmR
+	 oHpwfgslf5zB8JyYweUItp/jeWAuva0CHr1Xl/VFg8IIcUhJG5wtkg/CkmkAEbYzjd
+	 neolIoIawqz2O0TkJLz1up4D7BGTmZJ7sdGHhk0Hk5NhEE6+wYrtFjfnrN2XmxV8xB
+	 d5RQoNo41ADyqdhYEfU5BRefKCcADTPDTGk8Ribm8y3HrqhJmC7Lz5lgVL5t5bFTeU
+	 uI+qr+P153+cQ==
+From: Allison Henderson <achender@kernel.org>
+To: netdev@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	rds-devel@oss.oracle.com,
+	kuba@kernel.org,
+	horms@kernel.org,
+	linux-rdma@vger.kernel.org,
+	allison.henderson@oracle.com
+Subject: [PATCH net-next v5 0/2] net/rds: RDS-TCP reconnect and fanout improvements
+Date: Mon, 23 Feb 2026 15:19:16 -0700
+Message-ID: <20260223221918.2750209-1-achender@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260223214950.2153735-1-bvanassche@acm.org> <20260223214950.2153735-19-bvanassche@acm.org>
-In-Reply-To: <20260223214950.2153735-19-bvanassche@acm.org>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Mon, 23 Feb 2026 14:17:19 -0800
-X-Gm-Features: AaiRm51hpSrjZIUpkojmKX_yfwIcRCxC1rv2cDNhxmCPQVjrbKz_hYHNbXb6T1Q
-Message-ID: <CACKFLimX0PPJGeJMG-nycNMufbFsJ4YUTnGbLHC_20xF2n9OQQ@mail.gmail.com>
-Subject: Re: [PATCH 18/62] bnxt_en: Fix bnxt_dl_reload_up()
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Peter Zijlstra <peterz@infradead.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Shantiprasad Shettar <shantiprasad.shettar@broadcom.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260232-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-260233-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,broadcom.com:email,broadcom.com:dkim,acm.org:email,fomichev.me:email,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 7211517E43F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,syzkaller.appspot.com:url]
+X-Rspamd-Queue-Id: 61CCC17E2C9
 X-Rspamd-Action: no action
 
-.
-On Mon, Feb 23, 2026 at 1:52=E2=80=AFPM Bart Van Assche <bvanassche@acm.org=
-> wrote:
->
-> bnxt_dl_reload_down() calls rtnl_lock() and netdev_lock() if it returns
-> 0. Hence, bnxt_dl_reload_up() should invoke the corresponding unlock
-> calls. This issue has been detected by the clang thread-sanitizer.
-> Compile-tested only.
->
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Shantiprasad Shettar <shantiprasad.shettar@broadcom.com>
-> Cc: Stanislav Fomichev <sdf@fomichev.me>
-> Cc: netdev@vger.kernel.org
-> Fixes: 004b5008016a ("eth: bnxt: remove most dependencies on RTNL")
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c b/drivers/=
-net/ethernet/broadcom/bnxt/bnxt_devlink.c
-> index 15de802bbac4..1e9a3454bb29 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
-> @@ -562,6 +562,8 @@ static int bnxt_dl_reload_up(struct devlink *dl, enum=
- devlink_reload_action acti
->                 break;
->         }
->         default:
-> +               netdev_unlock(bp->dev);
-> +               rtnl_unlock();
+Hi all,
 
-This doesn't look correct.  The 2 locks are taken in
-bnxt_dl_reload_down() only for the 2 actions
-DEVLINK_RELOAD_ACTION_DRIVER_REINIT and
-DEVLINK_RELOAD_ACTION_FW_ACTIVATE.  For the default action, no locks
-are taken so I don't think we should unlock here.
+This is subset 4 of the larger RDS-TCP patch series I posted last
+Oct.  The greater series aims to correct multiple rds-tcp issues that
+can cause dropped or out of sequence messages.  I've broken it down into
+smaller sets to make reviews more manageable.
+
+In this set, we address some reconnect issues occurring during connection
+teardowns, and also move connection fanout operations to a background
+worker.
+
+The entire set can be viewed in the rfc here:
+https://lore.kernel.org/netdev/20251022191715.157755-1-achender@kernel.org/
+
+Questions, comments, flames appreciated!
+
+Thanks,
+Allison
+
+Change Log
+v2:
+   [PATCH net-next v2 1/4] net/rds: Refactor __rds_conn_create for
+   blocking transport cleanup
+      - NEW
+
+   [PATCH net-next v2 2/4] net/rds: Delegate fan-out to a background
+    worker
+      - Added syzbot report link
+v3:
+  [PATCH net-next v3 1/4] net/rds: Fix NULL pointer dereference in
+  rds_tcp_accept_one
+    - NEW
+    - Fixes syzbot bug
+      https://syzkaller.appspot.com/bug?extid=96046021045ffe6d7709
+
+  [PATCH net-next v3 2/4] net/rds: Refactor __rds_conn_create for
+  blocking transport cleanup
+    - Moved syzbot report link from "Delegate fan-out to a background
+      worker" to this patch
+    - this patch fixes syzbot bug flaged in next patch
+      https://ci.syzbot.org/series/1a5ef180-c02c-401d-9df7-670b18570a55
+
+   [PATCH net-next v3 3/4] net/rds: Delegate fan-out to a background
+    worker
+     - Moved syzbot report link to previous patch
+
+   [PATCH net-next v3 4/4] net/rds: Use proper peer port number even
+   when not connected
+     - Fixed ai comment complaint
+
+   [PATCH net-next v2 4/4] net/rds: rds_sendmsg should not discard
+   payload_len
+     - Removed
+     - Deferred to net instead of net-next
+
+v4:
+  [PATCH net-next v4 2/4] net/rds: Refactor __rds_conn_create for
+  blocking transport cleanup
+    - Removed Reported-by: tag
+
+  [PATCH net-next v4 3/4] net/rds: Delegate fan-out to a background
+  worker
+    - Expanded commit header to clarify ordered queue mechanics and
+      cancel_work_sync() usage
+
+v5:
+  [PATCH net-next v4 1/4] net/rds: Fix NULL pointer dereference in
+  rds_tcp_accept_one
+   - Removed
+   - Deferred to net instead of net-next
+
+  [PATCH net v5 1/2] net/rds: Refactor __rds_conn_create for blocking
+  transport cleanup
+   - Clarified commit header and commets per ai review
+
+  [PATCH net-next v4 4/4] net/rds: Use proper peer port number even
+  when not connected
+   - Removed
+   - Superceeded by
+        "net/rds: fix recursive lock in rds_tcp_conn_slots_available"
+
+Allison Henderson (1):
+  net/rds: Refactor __rds_conn_create for blocking transport cleanup
+
+Gerd Rausch (1):
+  net/rds: Delegate fan-out to a background worker
+
+ net/rds/connection.c  | 32 ++++++++++++++-----------
+ net/rds/tcp.c         |  3 +++
+ net/rds/tcp.h         |  7 ++----
+ net/rds/tcp_connect.c |  2 ++
+ net/rds/tcp_listen.c  | 54 +++++++++++++++++++++++++++++++------------
+ 5 files changed, 64 insertions(+), 34 deletions(-)
+
+-- 
+2.43.0
+
 
