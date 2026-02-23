@@ -1,301 +1,349 @@
-Return-Path: <netdev+bounces-260086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260325-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mH8NMAZznGmcGAQAu9opvQ
-	(envelope-from <netdev+bounces-260086-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 16:32:22 +0100
+	id cKhVFGshnWnuMwQAu9opvQ
+	(envelope-from <netdev+bounces-260325-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 04:56:27 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E14DB178C26
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 16:32:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF265181821
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 04:56:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DA00230372D9
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 15:31:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D43B13081BF2
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 03:56:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3916D2F5321;
-	Mon, 23 Feb 2026 15:31:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F27B26ED40;
+	Tue, 24 Feb 2026 03:56:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FvcUDEp9"
+	dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b="jy81/F5N"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-m1973176.qiye.163.com (mail-m1973176.qiye.163.com [220.197.31.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 162082F3621;
-	Mon, 23 Feb 2026 15:31:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BADB619E97F;
+	Tue, 24 Feb 2026 03:55:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771860685; cv=none; b=m4OXXsYPNsCLeI+Db5ScceB2pyK4IdsygHdsavG/LOdDO6PyAQyGLkPvSYV9EOT6lY4+tJMPrnHiUGsiyqFGu+ZoFMqvPhVvEgc7vcHMOo98LH5gqxHb1vWRbapM86noOBXMyYHkXP6q+agjanjJD6Hyz09SLvbpHULQUJvQLSE=
+	t=1771905364; cv=none; b=OCKVPLunGXdApGoqxMBCsyiWW85UfYrQmmRUpFhgAbNMYCKFjEGZqqBF4i8eDMs6s2Ym2kpCCHu/MXIRG88I+pKAmbMmK6akpf1TQRlfpFHWG4sGPXFCVrRWzRS94pDgKewgGJXoGLQ9AmwGlcVVOYPHYw0dOdJxnEAqXEt1lU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771860685; c=relaxed/simple;
-	bh=Ht0t75qRYANDA/1+A7psyigJet3N9S4aK9ekPlRMMsI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=uLSck1bS+DVxBzF+1TGtKwq9TT6/A+6JuB6lKq8+71ECYCaVy5bvsghdAh5GU3n+hesiskG8nw83Qb23+2hxtM6Ids8gj2Lx7J5GK8IGpe/A8Z6PbopRimqk6zmz1cHIzeyCjpZlkNJXiNy2O1Ov9E8sZdD3d97IKxrq+bv0xAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FvcUDEp9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D0C3C116C6;
-	Mon, 23 Feb 2026 15:31:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771860684;
-	bh=Ht0t75qRYANDA/1+A7psyigJet3N9S4aK9ekPlRMMsI=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=FvcUDEp9nplL594VW7tBZtGhrrgE6quoEUBLVsndKdahNVVWjxUhx7JbkCE6GOQ+U
-	 D85XztQC+6LvEZU6CA8XAZmOd1nQp0M1Oii4N5bIXd3STyLI5ujnkPd/qmeOUZhb5s
-	 DCEgdwxx71NgOPAJXe1y0i9uE5JXE+o3Sw0rBrjOkzaVf33ISt0w4FrkxGg1KJzicL
-	 YUpTaMQm9PVLTAfc9hg1NIqSWdaA7vpmFXEpjusX+KTNuKVnsMs8zEivNnUxskWn/8
-	 UjwrahOe182dvwCqaEPIkH2Ji0ntHRzE2QZCCeqnow/ApmRdGAucT2qKMzJiehav+M
-	 H760X4hRlRV3w==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Mon, 23 Feb 2026 16:28:40 +0100
-Subject: [PATCH iproute2-next v2 3/3] mptcp: monitor: add JSON support
+	s=arc-20240116; t=1771905364; c=relaxed/simple;
+	bh=KoW38T6cNEmKidxotZXPZubVy4KOQgupYxDAJ1370F0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Y5XubMPPbLGeHX8Fh2KZBVr3SxsA4/y5kqFIPvxtjD4X15XdyT4B0OWriZv2zm+E9bCaqByqmDMQY3u6N9M3p3w9TgwvdEOZgdlgPAqu8ka8a9cr3Dx7TDNNkLZvlaJL+THNv3ge+6Fih+5pvABqlZMaTf8aX7L0eqRQgZefC14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com; spf=pass smtp.mailfrom=rock-chips.com; dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b=jy81/F5N; arc=none smtp.client-ip=220.197.31.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rock-chips.com
+Received: from localhost.localdomain (unknown [58.22.7.114])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 34b37f769;
+	Mon, 23 Feb 2026 23:31:09 +0800 (GMT+08:00)
+From: Shawn Lin <shawn.lin@rock-chips.com>
+To: Bjorn Helgaas <bhelgaas@google.com>,
+	"Vaibhaav Ram T . L" <vaibhaavram.tl@microchip.com>,
+	Kumaravel Thiagarajan <kumaravel.thiagarajan@microchip.com>,
+	Even Xu <even.xu@intel.com>,
+	Xinpeng Sun <xinpeng.sun@intel.com>,
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+	Jiri Kosina <jikos@kernel.org>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Zhou Wang <wangzhou1@hisilicon.com>,
+	Longfang Liu <liulongfang@huawei.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Lee Jones <lee@kernel.org>,
+	Jijie Shao <shaojijie@huawei.com>,
+	Jian Shen <shenjian15@huawei.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jeff Hugo <jeff.hugo@oss.qualcomm.com>,
+	Oded Gabbay <ogabbay@kernel.org>,
+	Maciej Falkowski <maciej.falkowski@linux.intel.com>,
+	Karol Wachowski <karol.wachowski@linux.intel.com>,
+	Min Ma <mamin506@gmail.com>,
+	Lizhi Hou <lizhi.hou@amd.com>,
+	Andreas Noever <andreas.noever@gmail.com>,
+	Mika Westerberg <westeri@kernel.org>,
+	Tomasz Jeznach <tjeznach@rivosinc.com>,
+	Will Deacon <will@kernel.org>,
+	Xinliang Liu <xinliang.liu@linaro.org>,
+	Tian Tao <tiantao6@hisilicon.com>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	Jonathan Cameron <jonathan.cameron@huawei.com>,
+	Srujana Challa <schalla@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Antoine Tenart <atenart@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Raag Jadav <raag.jadav@intel.com>,
+	Hans de Goede <hansg@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Andy Shevchenko <andy@kernel.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Mika Westerberg <mika.westerberg@linux.intel.com>,
+	Andi Shyti <andi.shyti@kernel.org>,
+	Robert Richter <rric@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
+	Nirmal Patel <nirmal.patel@linux.intel.com>,
+	Kurt Schwemmer <kurt.schwemmer@microsemi.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Linus Walleij <linusw@kernel.org>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	Bingbu Cao <bingbu.cao@intel.com>,
+	Ulf Hansson <ulf.hansson@linaro.org>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Benjamin Tissoires <bentiss@kernel.org>,
+	linux-input@vger.kernel.org,
+	linux-i3c@lists.infradead.org,
+	dmaengine@vger.kernel.org,
+	Philipp Stanner <phasta@kernel.org>,
+	netdev@vger.kernel.org,
+	nic_swsd@realtek.com,
+	linux-arm-msm@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	linux-usb@vger.kernel.org,
+	iommu@lists.linux.dev,
+	linux-riscv@lists.infradead.org,
+	David Airlie <airlied@gmail.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	linux-cxl@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	platform-driver-x86@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	mhi@lists.linux.dev,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Jan Dabros <jsd@semihalf.com>,
+	linux-i2c@vger.kernel.org,
+	Daniel Mack <daniel@zonque.org>,
+	Haojian Zhuang <haojian.zhuang@gmail.com>,
+	linux-spi@vger.kernel.org,
+	Jonathan Derrick <jonathan.derrick@linux.dev>,
+	linux-pci@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	linux-media@vger.kernel.org,
+	linux-mmc@vger.kernel.org,
+	Shawn Lin <shawn.lin@rock-chips.com>
+Subject: [PATCH 0/37] PCI/MSI: Enforce explicit IRQ vector management by removing devres auto-free
+Date: Mon, 23 Feb 2026 23:29:39 +0800
+Message-Id: <1771860581-82092-1-git-send-email-shawn.lin@rock-chips.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260223-ipr-monitor-json-v2-3-f91fccccf917@kernel.org>
-References: <20260223-ipr-monitor-json-v2-0-f91fccccf917@kernel.org>
-In-Reply-To: <20260223-ipr-monitor-json-v2-0-f91fccccf917@kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>, 
- David Ahern <dsahern@kernel.org>
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6581; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=Ht0t75qRYANDA/1+A7psyigJet3N9S4aK9ekPlRMMsI=;
- b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDLnFB3PWfFJMu/Omvzfq6KurnlnydEgcWLjb+3idctYD
- kr7OWTyd5SyMIhxMciKKbJIt0Xmz3xexVvi5WcBM4eVCWQIAxenAEwk7AQjwxsPO6+XZTw5flOi
- eBP1A/wOBDs0zbwbeqiNz6Wv3POJNSPDnqBN6RPfdtkb+6b5LphzLiuvxvT4X7nDMv3Twh0DO26
- yAAA=
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-HM-Tid: 0a9c8b20307709cckunm6946b3c79862a6
+X-HM-MType: 1
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFDSUNOT01LS0k3V1ktWUFJV1kPCRoVCBIfWUFZQ0oaHlZPHx5OTE0YQkJPHxlWFRQJFh
+	oXVRMBExYaEhckFA4PWVdZGBILWUFZTkNVSUlVTFVKSk9ZV1kWGg8SFR0UWUFZT0tIVUpLSUJDQ0
+	xVSktLVUtZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=jy81/F5Ni9q9/bSyZWlJabD1XxAXELPL9UhibFZyMz9WyzEiB5iEDVH0Ye8gCgDrz+TXTgJ8mWQ6QgQDO5+xpeOsxh+rOYDNTZc0JKdQU/fj9M+S4Jnb31IUAfPQnG6b/8K1G5LiNjlbXGROoXvc1DCKurZLBq/IoT1lOI+FLR8=; s=default; c=relaxed/relaxed; d=rock-chips.com; v=1;
+	bh=BcUR/HoijHqinvoMXUQVA7vidPdOPQAH0voVT1QIHOY=;
+	h=date:mime-version:subject:message-id:from;
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[rock-chips.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[rock-chips.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260086-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-260325-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[google.com,microchip.com,intel.com,linux.intel.com,kernel.org,bootlin.com,hisilicon.com,huawei.com,marvell.com,lunn.ch,gmail.com,davemloft.net,oss.qualcomm.com,amd.com,rivosinc.com,linaro.org,stgolabs.net,gondor.apana.org.au,linuxfoundation.org,microsemi.com,deltatee.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[arndb.de,kernel.org,vger.kernel.org,lists.infradead.org,realtek.com,lists.freedesktop.org,lists.linux.dev,gmail.com,ffwll.ch,linux.intel.com,semihalf.com,zonque.org,linux.dev,rock-chips.com];
+	DKIM_TRACE(0.00)[rock-chips.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shawn.lin@rock-chips.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[87];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E14DB178C26
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EF265181821
 X-Rspamd-Action: no action
 
-The command 'ip [-t[s]] mptcp monitor' now produces an output with the JSON
-format.
+This patch series addresses a long-standing design issue in the PCI/MSI
+subsystem where the implicit, automatic management of IRQ vectors by
+the devres framework conflicts with explicit driver cleanup, creating
+ambiguity and potential resource management bugs.
 
-The previous text output has been preserved.
+==== The Problem: Implicit vs. Explicit Management ====
+Historically, `pcim_enable_device()` not only manages standard PCI resources
+(BARs) via devres but also implicitly triggers automatic IRQ vector management
+by setting a flag that registers `pcim_msi_release()` as a cleanup action.
 
-The JSON support has been added thanks to the print_*() helpers. Note that
-it is also needed to add a signal handler to exit without errors in case of
-SIGINT or SIGTERM, and close the JSON. This last step will print the final
-']' when stopping 'ip -j mptcp monitor'.
+This creates an ambiguous ownership model. Many drivers follow a pattern of:
+1. Calling `pci_alloc_irq_vectors()` to allocate interrupts.
+2. Also calling `pci_free_irq_vectors()` in their error paths or remove routines.
 
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
-v2:
- - print token with print_0xhex(), and add missing space after ',' (AI)
- - use atexit() to close the JSON (Stephen)
- - always call delete_json_obj(): nothing is done when JSON is not used.
----
- ip/ipmptcp.c | 86 +++++++++++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 59 insertions(+), 27 deletions(-)
+When such a driver also uses `pcim_enable_device()`, the devres framework may
+attempt to free the IRQ vectors a second time upon device release, leading to
+a double-free. Analysis of the tree shows this hazardous pattern exists widely,
+while 35 other drivers correctly rely solely on the implicit cleanup.
 
-diff --git a/ip/ipmptcp.c b/ip/ipmptcp.c
-index 18ec05a8..3df89db5 100644
---- a/ip/ipmptcp.c
-+++ b/ip/ipmptcp.c
-@@ -2,6 +2,7 @@
- 
- #include <arpa/inet.h>
- #include <netinet/in.h>
-+#include <signal.h>
- #include <stdbool.h>
- #include <stdio.h>
- #include <stdlib.h>
-@@ -476,8 +477,9 @@ static void print_addr(const char *key, int af, struct rtattr *value)
- 	char str[INET6_ADDRSTRLEN];
- 
- 	if (inet_ntop(af, data, str, sizeof(str))) {
--		printf(" %s=", key);
--		color_fprintf(stdout, ifa_family_color(af), "%s", str);
-+		print_string(PRINT_FP, NULL, " %s=", key);
-+		print_color_string(PRINT_ANY, ifa_family_color(af), key, "%s",
-+				   str);
- 	}
- }
- 
-@@ -485,12 +487,13 @@ static void print_iface(int index)
- {
- 	const char *ifname;
- 
--	printf(" ifindex=%d", index);
-+	print_int(PRINT_ANY, "ifindex", " ifindex=%d", index);
- 
- 	ifname = index ? ll_index_to_name(index) : NULL;
- 	if (ifname) {
--		printf(" dev=");
--		color_fprintf(stdout, COLOR_IFNAME, "%s", ifname);
-+		print_string(PRINT_FP, NULL, " dev=", NULL);
-+		print_color_string(PRINT_ANY, COLOR_IFNAME, "dev", "%s",
-+				   ifname);
- 	}
- }
- 
-@@ -509,30 +512,34 @@ static int mptcp_monitor_msg(struct rtnl_ctrl_data *ctrl,
- 	if (n->nlmsg_type != genl_family)
- 		return 0;
- 
-+	open_json_object(NULL);
-+
- 	if (timestamp)
- 		print_timestamp(stdout);
- 
--	if (ghdr->cmd >= ARRAY_SIZE(event_to_str)) {
--		printf("[UNKNOWN %u]\n", ghdr->cmd);
-+	if (ghdr->cmd >= ARRAY_SIZE(event_to_str) ||
-+	    event_to_str[ghdr->cmd] == NULL) {
-+		char event[40];
-+
-+		snprintf(event, sizeof(event), "UNKNOWN %u", ghdr->cmd);
-+		print_string(PRINT_ANY, "event", "[%s]", event);
- 		goto out;
- 	}
- 
--	if (event_to_str[ghdr->cmd] == NULL) {
--		printf("[UNKNOWN %u]\n", ghdr->cmd);
--		goto out;
--	}
--
--	printf("[%16s]", event_to_str[ghdr->cmd]);
-+	print_string(PRINT_ANY, "event", "[%16s]", event_to_str[ghdr->cmd]);
- 
- 	parse_rtattr(tb, MPTCP_ATTR_MAX, (void *) ghdr + GENL_HDRLEN, len);
- 
- 	if (tb[MPTCP_ATTR_TOKEN])
--		printf(" token=%08x", rta_getattr_u32(tb[MPTCP_ATTR_TOKEN]));
-+		print_0xhex(PRINT_ANY, "token", " token=%08x",
-+			    rta_getattr_u32(tb[MPTCP_ATTR_TOKEN]));
- 
- 	if (tb[MPTCP_ATTR_REM_ID])
--		printf(" remid=%u", rta_getattr_u8(tb[MPTCP_ATTR_REM_ID]));
-+		print_uint(PRINT_ANY, "remid", " remid=%u",
-+			   rta_getattr_u8(tb[MPTCP_ATTR_REM_ID]));
- 	if (tb[MPTCP_ATTR_LOC_ID])
--		printf(" locid=%u", rta_getattr_u8(tb[MPTCP_ATTR_LOC_ID]));
-+		print_uint(PRINT_ANY, "locid", " locid=%u",
-+			   rta_getattr_u8(tb[MPTCP_ATTR_LOC_ID]));
- 
- 	if (tb[MPTCP_ATTR_SADDR4])
- 		print_addr("saddr4", AF_INET, tb[MPTCP_ATTR_SADDR4]);
-@@ -543,49 +550,74 @@ static int mptcp_monitor_msg(struct rtnl_ctrl_data *ctrl,
- 	if (tb[MPTCP_ATTR_DADDR6])
- 		print_addr("daddr6", AF_INET6, tb[MPTCP_ATTR_DADDR6]);
- 	if (tb[MPTCP_ATTR_SPORT])
--		printf(" sport=%u", rta_getattr_be16(tb[MPTCP_ATTR_SPORT]));
-+		print_uint(PRINT_ANY, "sport", " sport=%u",
-+			   rta_getattr_be16(tb[MPTCP_ATTR_SPORT]));
- 	if (tb[MPTCP_ATTR_DPORT])
--		printf(" dport=%u", rta_getattr_be16(tb[MPTCP_ATTR_DPORT]));
-+		print_uint(PRINT_ANY, "dport", " dport=%u",
-+			   rta_getattr_be16(tb[MPTCP_ATTR_DPORT]));
- 	if (tb[MPTCP_ATTR_BACKUP])
--		printf(" backup=%u", rta_getattr_u8(tb[MPTCP_ATTR_BACKUP]));
-+		print_uint(PRINT_ANY, "backup", " backup=%u",
-+			   rta_getattr_u8(tb[MPTCP_ATTR_BACKUP]));
- 	if (tb[MPTCP_ATTR_ERROR])
--		printf(" error=%u", rta_getattr_u8(tb[MPTCP_ATTR_ERROR]));
-+		print_uint(PRINT_ANY, "error", " error=%u",
-+			   rta_getattr_u8(tb[MPTCP_ATTR_ERROR]));
- 	if (tb[MPTCP_ATTR_TIMEOUT])
--		printf(" timeout=%u", rta_getattr_u32(tb[MPTCP_ATTR_TIMEOUT]));
-+		print_uint(PRINT_ANY, "timeout", " timeout=%u",
-+			   rta_getattr_u32(tb[MPTCP_ATTR_TIMEOUT]));
- 	if (tb[MPTCP_ATTR_IF_IDX])
- 		print_iface(rta_getattr_s32(tb[MPTCP_ATTR_IF_IDX]));
- 	if (tb[MPTCP_ATTR_RESET_REASON])
--		printf(" reset_reason=%u", rta_getattr_u32(tb[MPTCP_ATTR_RESET_REASON]));
-+		print_uint(PRINT_ANY, "reset_reason", " reset_reason=%u",
-+			   rta_getattr_u32(tb[MPTCP_ATTR_RESET_REASON]));
- 	if (tb[MPTCP_ATTR_RESET_FLAGS])
--		printf(" reset_flags=0x%x", rta_getattr_u32(tb[MPTCP_ATTR_RESET_FLAGS]));
-+		print_0xhex(PRINT_ANY, "reset_flags", " reset_flags=%#x",
-+			    rta_getattr_u32(tb[MPTCP_ATTR_RESET_FLAGS]));
- 
- 	if (tb[MPTCP_ATTR_FLAGS])
- 		flags = rta_getattr_u16(tb[MPTCP_ATTR_FLAGS]);
- 	if ((flags & MPTCP_PM_EV_FLAG_SERVER_SIDE) ||
- 	    (tb[MPTCP_ATTR_SERVER_SIDE] && rta_getattr_u8(tb[MPTCP_ATTR_SERVER_SIDE]))) {
- 		flags &= ~MPTCP_PM_EV_FLAG_SERVER_SIDE;
--		printf(" server_side");
-+		print_string(PRINT_FP, NULL, " server_side", NULL);
-+		print_bool(PRINT_JSON, "server_side", NULL, true);
- 	}
- 	if (flags & MPTCP_PM_EV_FLAG_DENY_JOIN_ID0) {
- 		flags &= ~MPTCP_PM_EV_FLAG_DENY_JOIN_ID0;
--		printf(" deny_join_id0");
-+		print_string(PRINT_FP, NULL, " deny_join_id0", NULL);
-+		print_bool(PRINT_JSON, "deny_join_id0", NULL, true);
- 	}
- 	if (flags) /* remaining bits */
--		printf(" flags=0x%x", flags);
-+		print_0xhex(PRINT_ANY, "flags", " flags=%#x", flags);
- 
--	puts("");
- out:
-+	print_nl();
-+	close_json_object();
- 	fflush(stdout);
-+
- 	return 0;
- }
- 
-+static void sig_exit(int signo)
-+{
-+	exit(0);
-+}
-+
- static int mptcp_monitor(void)
- {
-+	struct sigaction sa = { .sa_handler = sig_exit,
-+				.sa_flags = SA_RESTART };
-+
- 	if (genl_add_mcast_grp(&genl_rth, genl_family, MPTCP_PM_EV_GRP_NAME) < 0) {
- 		perror("can't subscribe to mptcp events");
- 		return 1;
- 	}
- 
-+	new_json_obj(json);
-+	atexit(delete_json_obj);
-+
-+	sigaction(SIGINT, &sa, NULL);
-+	sigaction(SIGTERM, &sa, NULL);
-+
- 	if (rtnl_listen(&genl_rth, mptcp_monitor_msg, stdout) < 0)
- 		return 2;
- 
+==== The Solution: Making Management Explicit ====
+This series enforces a clear, predictable model:
+1.  New Managed API (Patch 1/37): Introduces pcim_alloc_irq_vectors() and
+    pcim_alloc_irq_vectors_affinity(). Drivers that desire devres-managed IRQ
+    vectors should use these functions, which set the is_msi_managed flag and
+    ensure automatic cleanup.
+2.  Patches 2 through 36 convert each driver that uses pcim_enable_device() alongside
+    pci_alloc_irq_vectors() and relies on devres for IRQ vector cleanup to instead
+    make an explicit call to pcim_alloc_irq_vectors().
+3.  Core Change (Patch 37/37): With the former cleanup, now modifies pcim_setup_msi_release()
+    to check only the is_msi_managed flag. This decouples automatic IRQ cleanup from
+    pcim_enable_device(). IRQ vectors allocated via pci_alloc_irq_vectors*()
+    are now solely the driver's responsibility to free with pci_free_irq_vectors().
+
+With these changes, we clear ownership model: Explicit resource management eliminates
+ambiguity and follows the "principle of least surprise." New drivers choose one model and
+be consistent.
+- Use `pci_alloc_irq_vectors()` + `pci_free_irq_vectors()` for explicit control.
+- Use `pcim_alloc_irq_vectors()` for devres-managed, automatic cleanup.
+
+==== Testing And Review ====
+1. This series is only compiled test with allmodconfig.
+2. Given the substantial size of this patch series, I have structured the mailing
+   to facilitate efficient review. The cover letter, the first patch and the last one will be sent
+   to all relevant mailing lists and key maintainers to ensure broad visibility and
+   initial feedback on the overall approach. The remaining subsystem-specific patches
+   will be sent only to the respective subsystem maintainers and their associated
+   mailing lists, reducing noise.
+
+Please help review it, much thanks!
+
+
+
+Shawn Lin (37):
+  PCI/MSI: Add Devres managed IRQ vectors allocation
+  mmc: cavium: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  media: ipu6: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  gpio: merrifield: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  PCI: switchtec: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  PCI: vmd: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  spi: spi-pci1xxxx: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  spi: pxa2xx: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  i2c: amd-mp2: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  i2c: mchp-pci1xxxx: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  i2c: thunderx: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  i2c: designware: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  bus: mhi: host: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  serial: 8250_mid: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  serial: 8250_exar: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  platform/x86/intel: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  crypto: safexcel: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  crypto: octeontx2: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  cxl/pci: Replace pci_alloc_irq_vectors() with pcim_alloc_irq_vectors()
+  drm/hisilicon/hibmc: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  iommu/riscv: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  thunderbolt: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  accel/amdxdna: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  accel/ivpu: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  accel/qaic: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  net: stmmac: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  r8169: Replace pci_alloc_irq_vectors() with pcim_alloc_irq_vectors()
+  net: thunder_bgx: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  net: hibmcge: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  mfd: intel-lpss: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  dmaengine: hsu: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  dmaengine: hisilicon: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  i3c: mipi-i3c-hci-pci: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  HID: intel-ish-ipc: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  HID: Intel-thc-hid: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  misc: microchip: pci1xxxx: Replace pci_alloc_irq_vectors() with
+    pcim_alloc_irq_vectors()
+  PCI/MSI: Only check is_msi_managed in pcim_setup_msi_release()
+
+ drivers/accel/amdxdna/aie2_pci.c                   |  2 +-
+ drivers/accel/ivpu/ivpu_drv.c                      |  2 +-
+ drivers/accel/qaic/qaic_drv.c                      |  4 ++--
+ drivers/bus/mhi/host/pci_generic.c                 |  3 ++-
+ drivers/crypto/inside-secure/safexcel.c            |  8 +++----
+ drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c |  2 +-
+ drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c |  4 ++--
+ drivers/cxl/pci.c                                  |  8 ++-----
+ drivers/dma/hisi_dma.c                             |  3 +--
+ drivers/dma/hsu/pci.c                              |  2 +-
+ drivers/gpio/gpio-merrifield.c                     |  2 +-
+ drivers/gpu/drm/hisilicon/hibmc/hibmc_drm_drv.c    |  4 ++--
+ drivers/hid/intel-ish-hid/ipc/pci-ish.c            |  2 +-
+ .../intel-thc-hid/intel-quicki2c/pci-quicki2c.c    |  2 +-
+ drivers/i2c/busses/i2c-amd-mp2-pci.c               |  2 +-
+ drivers/i2c/busses/i2c-designware-pcidrv.c         |  2 +-
+ drivers/i2c/busses/i2c-mchp-pci1xxxx.c             |  2 +-
+ drivers/i2c/busses/i2c-thunderx-pcidrv.c           |  2 +-
+ drivers/i3c/master/mipi-i3c-hci/mipi-i3c-hci-pci.c |  2 +-
+ drivers/iommu/riscv/iommu-pci.c                    |  4 ++--
+ drivers/media/pci/intel/ipu6/ipu6.c                |  2 +-
+ drivers/mfd/intel-lpss-pci.c                       |  2 +-
+ drivers/misc/mchp_pci1xxxx/mchp_pci1xxxx_gp.c      |  2 +-
+ drivers/mmc/host/cavium-thunderx.c                 |  2 +-
+ drivers/net/ethernet/cavium/thunder/thunder_bgx.c  |  4 ++--
+ drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c   |  4 ++--
+ drivers/net/ethernet/realtek/r8169_main.c          |  2 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c  |  6 ++---
+ drivers/pci/controller/vmd.c                       |  4 ++--
+ drivers/pci/msi/api.c                              | 26 ++++++++++++++++++++++
+ drivers/pci/msi/msi.c                              |  4 +---
+ drivers/pci/switch/switchtec.c                     |  6 ++---
+ drivers/platform/x86/intel/ehl_pse_io.c            |  2 +-
+ drivers/spi/spi-pci1xxxx.c                         |  4 ++--
+ drivers/spi/spi-pxa2xx-pci.c                       |  2 +-
+ drivers/thunderbolt/nhi.c                          |  6 ++---
+ drivers/tty/serial/8250/8250_exar.c                |  2 +-
+ drivers/tty/serial/8250/8250_mid.c                 |  2 +-
+ include/linux/pci.h                                | 22 ++++++++++++++++++
+ 39 files changed, 104 insertions(+), 62 deletions(-)
 
 -- 
-2.51.0
+2.7.4
 
 
