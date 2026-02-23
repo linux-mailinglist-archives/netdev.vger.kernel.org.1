@@ -1,286 +1,265 @@
-Return-Path: <netdev+bounces-260136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260137-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GKp7OqiQnGnRJQQAu9opvQ
-	(envelope-from <netdev+bounces-260136-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 18:38:48 +0100
+	id uE0oNl6RnGnRJQQAu9opvQ
+	(envelope-from <netdev+bounces-260137-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 18:41:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93F9317AED3
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 18:38:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 841C817AF74
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 18:41:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C7F053006686
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 17:38:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7C48530D2437
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 17:38:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C4AA33291B;
-	Mon, 23 Feb 2026 17:38:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EF42334374;
+	Mon, 23 Feb 2026 17:38:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gnvvzwdN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NvMPcrsr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC993321D8
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 17:38:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771868327; cv=pass; b=UqGQmUf32+7x/RJoP8l8K5ittajl2mlq5oNqxxAukCESf9SrJgCHfJa4J8AjCzzHUlCo1fyQL3jvRB+rrsUPzvlBhMnOvaNaasUME5h0QEa5cAHl7dSi1g8U6/Rzq3wZIzy909cs8u8DQXyh51DdhcS5z0ZH1A/QkoQk/ZYDI4g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771868327; c=relaxed/simple;
-	bh=FXB8L6N1RShhllJFsmyh8MvpwbOyuUzjP20hAMAjN/E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=i0P5rmpgY33Dm3GY0c+2bRnqij7lPEFfl9YJA2ZGZB0wQTdyjocQ1x3h3CzW0qBfvSsd81d56zU6Mt/wm6aplWVvFfkdZDW45McumrejMJTfxeD7gHQkJ6sYp3PmOWzoxAzIirdtt3hsjr0DKH8lchYZGQel0IdVCpQGhDskPZQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gnvvzwdN; arc=pass smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-50335b926c2so42354091cf.2
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 09:38:44 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771868323; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Jl3Xuy175f+d/gOiF2MBUDbO1Vq9TAx7ez/Dp6m8XeFe2ZNPBOOXHTqzX/9/esqoHd
-         QYRXOnAyv6EiVUKyCEdRQJSxBrihNDs6PKV3opyXJOq9l8TtvFZn6eLRnUjIBtmH+fTA
-         SsL7AsVvA1YBKxb+Jq0otfrQairMgw5pM3YelALSM+s9EkrwvXfcVxccNghLlX73EnKD
-         4G+b45x1pR+5orrq/b5WkIa1gmN7gKS4WkCl44ip+L0j7fT6aJqYdq9LU5E7UlHw+tPJ
-         fQByc8i0uagidWQW+wzygMYqqmlF89IElih9w5caE1343ZHvdauzJPHsX2+MIVzwl/Am
-         9njA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=lxV8mPIjjwPE+1KEA8wKGyGIPdfmeyRv/k8v0nQQx+U=;
-        fh=AZJBgsHX2CtbIH3AKfPmSaqXwYNKYGe2Y37bzoVq7rk=;
-        b=eQtjkuYhi0KzlFk94zadKPLUKr8OXBAwE5VtOUbCCsKeiCqiQDiVxVu/u0NCY0i2rE
-         f7Ty4FgblU01Je6s1ytiWW4pn3dIgk6+iwO2UGGrkOmnNW8mXW3lAgvn+CWaZeAVqdb9
-         KGAWSRyDM5eu9SMKZkoWMOvJkHaJpCqNHyCesA1Ntjo2gHvpj4dIcdFZGavihYK/MAP3
-         N2JqYWiMqvE4TWUrBA30Y5axCWg+0VcMU11h0b/QaWrLnzDW238yN1xOlEu5QPbW3Jdq
-         vWf9O6e63FVm83bFesQQ/LMqb56Awcik8QrHL7aK8EV6RtiwZIxBCgNxev4zfmA/8iMg
-         bfSw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771868323; x=1772473123; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lxV8mPIjjwPE+1KEA8wKGyGIPdfmeyRv/k8v0nQQx+U=;
-        b=gnvvzwdNkmSa6r7WiSAhCB9VwNjeztRKEITPu7QClwmCbjGm0YEsIMLVOikE5xHU5p
-         X7fZA3TsI2BCtzKYoZtGD9CxdbpXsd/PN6rLhkYDYae0FWz0fKc72O+7syaIF/LWejcK
-         4cgY8Kn2kRAfwSf2gevOnH//DdIj+2z3t1pSv2h/uwTP0tJGTbGw0FI+0bIEapYV5VX4
-         TP/F69pcEQHADHXua2grLRQXj3191+kov99rejObWDfb9V3e7uriTn/mHfv9XpHRYGRx
-         +92niAWfii03coDneSw4iEs0zFZRnKPdTk3Ed+2mLRHgCxWPttYS1anB8hQJoswRDH3L
-         Frvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771868323; x=1772473123;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=lxV8mPIjjwPE+1KEA8wKGyGIPdfmeyRv/k8v0nQQx+U=;
-        b=lEFKQC1srXy+5LSSdtCEP9QSVugXwLte4Yk8U8bwg/ZuvQBLR3E/40Sq4/6qKm+JQw
-         3piOqLtYxpO4d73sePrc1gaY/HFnT5OEEUK8z1+0KpEdwgtn/i2y7hh4vAufafRtKa8L
-         x8FjWGRmAO26F+4QKWnI/JfJdnfoQpzVuSk2onPeI0H8dRgnI1ibRGx3iKKCM8KBalDO
-         RtVwB+F9LDzmM4iXPlex6/D+sIGkaQOMILy5MXxEyopIMQ5qgJKwn6XpKu9wjWslu0rx
-         rXa1Ljc6WPPWukxhcNKVCsoUqIP3AJkTY/OvOgbGFmmYtHkfr1qGQCHTlx0FitkWTu1z
-         sWkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVGGSdcMVWG8jxe26r/Inng3Z2l+OK5mjJSMhb5Xb9lXOsO+SsKl9A9aEWms6h2IcPj9i3BkC8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5j9iCxh679S1q0HTnzI5wFyUag9PERIhLG1uJ5kSTlCRYcqEi
-	RP3IWYTxAU8DPCHPzEFyh9RlEMBnv2vm81+KayKyfvtPF1Vp22Zwd92BHuuHKiNKLoIBndfQjCC
-	U8v2qcvClDwtzjA1v4pk0qDxZfDB/xr6QXIgT9JTU
-X-Gm-Gg: AZuq6aKItWxItm/N1sdKbjawEYQGGHbaDQ9GemLdgwys3CZqfA1FMOrNhXTOf6SJm3R
-	n7mennqN/XWlhP0Z/ktfV6GHHjdA0OZHBoTp+gZRn2so+xrn4wER9griZ9pG2aSzE+vvMhXiuqL
-	OOb+50HM/rfzvNV5NmqZ3WUgOcpdkYLpgEtHWQXEw9olU6N+Q0lzpMf5lbsA2HdOjxKiwls1FCf
-	WXLXdflDcnvjy+Dtso1/XiqW9eGtL7EHLvAU//QB2u55eXI/350doqJeDw31BKiptGHr0B3+or6
-	45HetS0=
-X-Received: by 2002:ac8:7d8e:0:b0:506:a320:e45b with SMTP id
- d75a77b69052e-5070bc6c30fmr130357461cf.39.1771868322989; Mon, 23 Feb 2026
- 09:38:42 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F4553328ED;
+	Mon, 23 Feb 2026 17:38:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771868336; cv=none; b=S0TDDsvzZx6kNRvbVQgbRkKM8whhRbD1pOF1b8Qh5ncKju18ZJ1Hbz9RP1NOs8xq/4FSDTMxBza9tuPy2PsrFsjUP0OGDCBVC8QmRHJamUDbiq4ImrTmyQTQgGChdBN6PvUreolfdM3m83/vBxR7LVSjmBMoheYxCv95brtT2aM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771868336; c=relaxed/simple;
+	bh=OFs+F2i4fpeRmsTH7tUJ5hO0npgCDxBo25FPhTX/hFs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FE0pNcsIdieHenKdz4s0nolqaxsrB3RIVp71Iabx+AgxS75Z5+p/sIj9saDfKA97vI9w7LRFRfYShrGoDlpMBS2btFk5miAzjNNuM0oxvFeZjOXtPCxARM2sACeTlCqWH0jJIlKbNeP5II3760TLhyAk6qLk8VEY7qaBCBoSV4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NvMPcrsr; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1771868335; x=1803404335;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=OFs+F2i4fpeRmsTH7tUJ5hO0npgCDxBo25FPhTX/hFs=;
+  b=NvMPcrsrscxq4yCJYNHBwma5dXpYiaLlpl5YaiHU4AbKmW1dss4zVpgH
+   eKc6wHV4HSpKqyOZ8UlLVlghXkur2gCHm4j/0tVPiKMiMs8WIyTYBU/2a
+   6yowW4cOU55qzj4P1UFjG06x85lKFyOgcBuajicG0+hQ7xUZWW5IVie0T
+   CzejcQppfEPzmSpHn0vPl0BWBUbMvv0s0ke5e+Qjssqu807Hmk7eyaE7j
+   rAcT4p6XKH7FNn0xujYAvGZ00DAcOtrZCn+DLE46UjHdqz7MQNGpBv4ef
+   eZ4zNkJ8cO1QoE+PCo+ORxkR4NcdogZJ2/EBVMiLNS/FtyyTrgvpBtjZv
+   g==;
+X-CSE-ConnectionGUID: jsfaBeNbRdOcjkAScBt/AA==
+X-CSE-MsgGUID: qC3ahawxSriUb3w5OK63yQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11710"; a="73050398"
+X-IronPort-AV: E=Sophos;i="6.21,307,1763452800"; 
+   d="scan'208";a="73050398"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2026 09:38:54 -0800
+X-CSE-ConnectionGUID: i7eZdD4uRr+gNr/ct2htpA==
+X-CSE-MsgGUID: B0cv0ytAS2ClRPRHaDlf4w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,307,1763452800"; 
+   d="scan'208";a="214708424"
+Received: from abityuts-desk.ger.corp.intel.com (HELO localhost) ([10.245.245.222])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2026 09:38:36 -0800
+Date: Mon, 23 Feb 2026 19:38:33 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Shawn Lin <shawn.lin@rock-chips.com>
+Cc: Andy Shevchenko <andy.shevchenko@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	"Vaibhaav Ram T . L" <vaibhaavram.tl@microchip.com>,
+	Kumaravel Thiagarajan <kumaravel.thiagarajan@microchip.com>,
+	Even Xu <even.xu@intel.com>, Xinpeng Sun <xinpeng.sun@intel.com>,
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+	Jiri Kosina <jikos@kernel.org>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Zhou Wang <wangzhou1@hisilicon.com>,
+	Longfang Liu <liulongfang@huawei.com>,
+	Vinod Koul <vkoul@kernel.org>, Lee Jones <lee@kernel.org>,
+	Jijie Shao <shaojijie@huawei.com>,
+	Jian Shen <shenjian15@huawei.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jeff Hugo <jeff.hugo@oss.qualcomm.com>,
+	Oded Gabbay <ogabbay@kernel.org>,
+	Maciej Falkowski <maciej.falkowski@linux.intel.com>,
+	Karol Wachowski <karol.wachowski@linux.intel.com>,
+	Min Ma <mamin506@gmail.com>, Lizhi Hou <lizhi.hou@amd.com>,
+	Andreas Noever <andreas.noever@gmail.com>,
+	Mika Westerberg <westeri@kernel.org>,
+	Tomasz Jeznach <tjeznach@rivosinc.com>,
+	Will Deacon <will@kernel.org>,
+	Xinliang Liu <xinliang.liu@linaro.org>,
+	Tian Tao <tiantao6@hisilicon.com>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	Jonathan Cameron <jonathan.cameron@huawei.com>,
+	Srujana Challa <schalla@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Antoine Tenart <atenart@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Raag Jadav <raag.jadav@intel.com>, Hans de Goede <hansg@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Andy Shevchenko <andy@kernel.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Mika Westerberg <mika.westerberg@linux.intel.com>,
+	Andi Shyti <andi.shyti@kernel.org>,
+	Robert Richter <rric@kernel.org>, Mark Brown <broonie@kernel.org>,
+	Nirmal Patel <nirmal.patel@linux.intel.com>,
+	Kurt Schwemmer <kurt.schwemmer@microsemi.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Linus Walleij <linusw@kernel.org>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	Bingbu Cao <bingbu.cao@intel.com>,
+	Ulf Hansson <ulf.hansson@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
+	Benjamin Tissoires <bentiss@kernel.org>,
+	linux-input@vger.kernel.org, linux-i3c@lists.infradead.org,
+	dmaengine@vger.kernel.org, Philipp Stanner <phasta@kernel.org>,
+	netdev@vger.kernel.org, nic_swsd@realtek.com,
+	linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linux-usb@vger.kernel.org, iommu@lists.linux.dev,
+	linux-riscv@lists.infradead.org, David Airlie <airlied@gmail.com>,
+	Simona Vetter <simona@ffwll.ch>, linux-cxl@vger.kernel.org,
+	linux-crypto@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+	linux-serial@vger.kernel.org, mhi@lists.linux.dev,
+	Jan Dabros <jsd@semihalf.com>, linux-i2c@vger.kernel.org,
+	Daniel Mack <daniel@zonque.org>,
+	Haojian Zhuang <haojian.zhuang@gmail.com>,
+	linux-spi@vger.kernel.org,
+	Jonathan Derrick <jonathan.derrick@linux.dev>,
+	linux-pci@vger.kernel.org, linux-gpio@vger.kernel.org,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	linux-media@vger.kernel.org, linux-mmc@vger.kernel.org
+Subject: Re: [PATCH 0/37] PCI/MSI: Enforce explicit IRQ vector management by
+ removing devres auto-free
+Message-ID: <aZyQmc7nOt87jitX@smile.fi.intel.com>
+References: <1771860581-82092-1-git-send-email-shawn.lin@rock-chips.com>
+ <CAHp75VeWD5A0r7-Uayyte1ZXXxdhLixd+z_y0xNeki0N+Ro=jQ@mail.gmail.com>
+ <cb878741-7b61-b72c-5a72-6ed6d5091b1f@rock-chips.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260222-fix_zero_wnd_fin-v1-0-5f4034952f3c@gmail.com>
- <20260222-fix_zero_wnd_fin-v1-1-5f4034952f3c@gmail.com> <CANn89iK5Kk2D-zMiw_2syb9OdmkKdgAA7aGfi8QNZ9XR4=CfvA@mail.gmail.com>
- <CANn89iKBjfaoWaUh6Ar2Lj-MJODywLpHzbQif=aa8q387qutZA@mail.gmail.com> <aZyLdQCaib1d4qDU@gandalf.schnuecks.de>
-In-Reply-To: <aZyLdQCaib1d4qDU@gandalf.schnuecks.de>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 23 Feb 2026 18:38:31 +0100
-X-Gm-Features: AaiRm52lmkQo_VYru9RAU9egFIOLOWNaqq_JEsXTUaSy5ElTYgirkWmuRPCRpgc
-Message-ID: <CANn89i+Em+e8Fb_QHwoRdOc6bYGNOsJqVby3jG+bO+672hDfxg@mail.gmail.com>
-Subject: Re: [PATCH net 1/2] tcp: re-enable acceptance of FIN packets when
- RWIN is 0
-To: Simon Baatz <gmbnomis@gmail.com>
-Cc: Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <cb878741-7b61-b72c-5a72-6ed6d5091b1f@rock-chips.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260136-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,google.com,microchip.com,intel.com,linux.intel.com,kernel.org,bootlin.com,hisilicon.com,huawei.com,marvell.com,lunn.ch,davemloft.net,oss.qualcomm.com,amd.com,rivosinc.com,linaro.org,stgolabs.net,gondor.apana.org.au,linuxfoundation.org,microsemi.com,deltatee.com,arndb.de,vger.kernel.org,lists.infradead.org,realtek.com,lists.freedesktop.org,lists.linux.dev,ffwll.ch,semihalf.com,zonque.org,linux.dev];
+	TAGGED_FROM(0.00)[bounces-260137-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 93F9317AED3
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[87];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,smile.fi.intel.com:mid,rock-chips.com:email]
+X-Rspamd-Queue-Id: 841C817AF74
 X-Rspamd-Action: no action
 
-On Mon, Feb 23, 2026 at 6:16=E2=80=AFPM Simon Baatz <gmbnomis@gmail.com> wr=
-ote:
->
-> Hi Eric,
->
-> On Mon, Feb 23, 2026 at 09:36:38AM +0100, Eric Dumazet wrote:
-> > On Mon, Feb 23, 2026 at 9:01???AM Eric Dumazet <edumazet@google.com> wr=
-ote:
-> > ...
-> > > >
-> > > > Fixes: 9ca48d616ed7 ("tcp: do not accept packets beyond window")
-> > >
-> > > OK, but this commit is fine ? It seems the issue is coming from buggy=
- peers ?
->
-> That "Fixes" tag is a technicality, I did not want to imply that the
-> commit is broken: 9ca48d616ed7 (which is RFC compliant) turns the
-> workaround (which isn't RFC compliant) 2bd99aef1b19 ("tcp:
-> accept bare FIN packets under memory pressure") into dead code.
->
-> If we still need that workaround, technically, this is a regression
-> caused by 9ca48d616ed7.  If not, I am perfectly happy to propose a
-> commit that removes the dead code.
->
-> > > Eventually the receive queue would be drained by the application, the
-> > > peer would retransmit
-> > > this FIN, and it would be accepted.
->
-> If I understand the problem correctly, the workaround was introduced
-> to break a FIN/ACK loop because the broken peer (macOS) did not use
-> exponential backoff in that scenario.  So yes, it would be accepted,
-> but until then we and the peer would ping-pong FIN/ACKs.
->
-> But as said, if we don't need the workaround I can submit a patch to
-> remove it.
->
-> > ...
-> > > > +       reason =3D tcp_sequence(sk, TCP_SKB_CB(skb)->seq,
-> > > > +                             TCP_SKB_CB(skb)->end_seq - th->fin);
-> > >
-> > > I don't think this is the right fix. Basically it says that FIN do no=
-t
-> > > count, but TCP RFC says otherwise.
->
-> We can be more specific and only allow that if we have a zero window.
-> (I thought I would not hurt much to accept that FIN which does not
-> take up real space)
->
-> > > It also adds code in TCP fast path.
->
-> Hmm, the call site for tcp_validate_incoming() in
-> tcp_rcv_established() is:
->
->         /*
->          *      Standard slow path.
->          */
-> validate:
->         if (!tcp_validate_incoming(sk, skb, th, 1))
->                 return;
->
->
-> Am I missing something?
+On Tue, Feb 24, 2026 at 12:09:37AM +0800, Shawn Lin wrote:
+> 在 2026/02/23 星期一 23:50, Andy Shevchenko 写道:
+> > On Mon, Feb 23, 2026 at 5:32 PM Shawn Lin <shawn.lin@rock-chips.com> wrote:
+> > > 
+> > > This patch series addresses a long-standing design issue in the PCI/MSI
+> > > subsystem where the implicit, automatic management of IRQ vectors by
+> > > the devres framework conflicts with explicit driver cleanup, creating
+> > > ambiguity and potential resource management bugs.
+> > > 
+> > > ==== The Problem: Implicit vs. Explicit Management ====
+> > > Historically, `pcim_enable_device()` not only manages standard PCI resources
+> > > (BARs) via devres but also implicitly triggers automatic IRQ vector management
+> > > by setting a flag that registers `pcim_msi_release()` as a cleanup action.
+> > > 
+> > > This creates an ambiguous ownership model. Many drivers follow a pattern of:
+> > > 1. Calling `pci_alloc_irq_vectors()` to allocate interrupts.
+> > > 2. Also calling `pci_free_irq_vectors()` in their error paths or remove routines.
+> > > 
+> > > When such a driver also uses `pcim_enable_device()`, the devres framework may
+> > > attempt to free the IRQ vectors a second time upon device release, leading to
+> > > a double-free. Analysis of the tree shows this hazardous pattern exists widely,
+> > > while 35 other drivers correctly rely solely on the implicit cleanup.
+> > 
+> > Is this confirmed? What I read from the cover letter, this series was
+> > only compile-tested, so how can you prove the problem exists in the
+> > first place?
+> 
+> Yes, it's confirmed. My debug of a double free issue of a out-of-tree
+> PCIe wifi driver which uses
+> pcim_enable_device + pci_alloc_irq_vectors + pci_free_irq_vectors expose
+> it. And we did have a TODO to cleanup this hybrid usage, targeted in
+> this cycle[1] suggested by Philipp:
 
-The 'slow path' comment does not mean everything from this can be really sl=
-ow.
-'slow path' is quite often used, header prediction is less and less a thing=
-.
+Okay, fair enough. I think this bit was missing in the cover letter.
 
->
->
-> > We can keep fast path unchanged with this variant.
-> >
-> > diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> > index e7b41abb82aad33d8cab4fcfa989cc4771149b41..156c92450f3ed00357aff2e=
-f3e586b83f3cecb5e
-> > 100644
-> > --- a/net/ipv4/tcp_input.c
-> > +++ b/net/ipv4/tcp_input.c
-> > @@ -4858,15 +4858,24 @@ static enum skb_drop_reason
-> > tcp_disordered_ack_check(const struct sock *sk,
-> >   */
-> >
-> >  static enum skb_drop_reason tcp_sequence(const struct sock *sk,
-> > -                                        u32 seq, u32 end_seq)
-> > +                                        u32 seq, u32 end_seq,
-> > +                                        const struct tcphdr *th)
-> >  {
-> >         const struct tcp_sock *tp =3D tcp_sk(sk);
-> > +       u32 seq_limit;
-> >
-> >         if (before(end_seq, tp->rcv_wup))
-> >                 return SKB_DROP_REASON_TCP_OLD_SEQUENCE;
-> >
-> > -       if (after(end_seq, tp->rcv_nxt + tcp_receive_window(tp))) {
-> > -               if (after(seq, tp->rcv_nxt + tcp_receive_window(tp)))
-> > +       seq_limit =3D tp->rcv_nxt + tcp_receive_window(tp);
-> > +       if (unlikely(after(end_seq, seq_limit))) {
-> > +               /* Some stacks are known to handle FIN incorrectly;
-> > allow the FIN
-> > +                * to extend beyond the window and check it in detail l=
-ater.
-> > +                */
-> > +               if (!after(end_seq - th->fin, seq_limit))
-> > +                       return SKB_NOT_DROPPED_YET;
-> > +
-> > +               if (after(seq, seq_limit))
-> >                         return SKB_DROP_REASON_TCP_INVALID_SEQUENCE;
-> >
-> >                 /* Only accept this packet if receive queue is empty. *=
-/
-> > @@ -6379,7 +6388,8 @@ static bool tcp_validate_incoming(struct sock
-> > *sk, struct sk_buff *skb,
-> >
-> >  step1:
-> >         /* Step 1: check sequence number */
-> > -       reason =3D tcp_sequence(sk, TCP_SKB_CB(skb)->seq,
-> > TCP_SKB_CB(skb)->end_seq);
-> > +       reason =3D tcp_sequence(sk, TCP_SKB_CB(skb)->seq,
-> > +                             TCP_SKB_CB(skb)->end_seq, th);
-> >         if (reason) {
-> >                 /* RFC793, page 37: "In all states except SYN-SENT, all=
- reset
-> >                  * (RST) segments are validated by checking their SEQ-f=
-ields."
->
-> Sure, I can do that.  Do you want me to add the
-> tcp_receive_window(tp) =3D=3D 0 check to narrow it down further?
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/pci/pci.git/log/?h=msi
 
-Not sure what you mean.
+> > > ==== The Solution: Making Management Explicit ====
+> > > This series enforces a clear, predictable model:
+> > > 1.  New Managed API (Patch 1/37): Introduces pcim_alloc_irq_vectors() and
+> > >      pcim_alloc_irq_vectors_affinity(). Drivers that desire devres-managed IRQ
+> > >      vectors should use these functions, which set the is_msi_managed flag and
+> > >      ensure automatic cleanup.
+> > > 2.  Patches 2 through 36 convert each driver that uses pcim_enable_device() alongside
+> > >      pci_alloc_irq_vectors() and relies on devres for IRQ vector cleanup to instead
+> > >      make an explicit call to pcim_alloc_irq_vectors().
+> > > 3.  Core Change (Patch 37/37): With the former cleanup, now modifies pcim_setup_msi_release()
+> > >      to check only the is_msi_managed flag. This decouples automatic IRQ cleanup from
+> > >      pcim_enable_device(). IRQ vectors allocated via pci_alloc_irq_vectors*()
+> > >      are now solely the driver's responsibility to free with pci_free_irq_vectors().
+> > > 
+> > > With these changes, we clear ownership model: Explicit resource management eliminates
+> > > ambiguity and follows the "principle of least surprise." New drivers choose one model and
+> > > be consistent.
+> > > - Use `pci_alloc_irq_vectors()` + `pci_free_irq_vectors()` for explicit control.
+> > > - Use `pcim_alloc_irq_vectors()` for devres-managed, automatic cleanup.
+> > 
+> > Have you checked previous attempts? Why is your series better than those?
+> 
+> There seems not previous attempts.
 
->
-> (And a dumb question: As you are the author of that code, how do I
-> attribute that commit when submitting a v2?)
+Maybe we are looking to the different projects...
 
-No worries, this is part of the review process, I give you permission to
-be the author, even if this happens to be something I wrote.
+https://lore.kernel.org/all/?q=pcim_alloc_irq_vectors
+
+> > > ==== Testing And Review ====
+> > > 1. This series is only compiled test with allmodconfig.
+> > > 2. Given the substantial size of this patch series, I have structured the mailing
+> > >     to facilitate efficient review. The cover letter, the first patch and the last one will be sent
+> > >     to all relevant mailing lists and key maintainers to ensure broad visibility and
+> > >     initial feedback on the overall approach. The remaining subsystem-specific patches
+> > >     will be sent only to the respective subsystem maintainers and their associated
+> > >     mailing lists, reducing noise.
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
 
