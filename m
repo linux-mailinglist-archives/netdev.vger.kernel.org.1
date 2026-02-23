@@ -1,41 +1,42 @@
-Return-Path: <netdev+bounces-260023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260024-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SOkOJM9MnGnYDQQAu9opvQ
-	(envelope-from <netdev+bounces-260023-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 13:49:19 +0100
+	id 8Lz1Od5MnGnYDQQAu9opvQ
+	(envelope-from <netdev+bounces-260024-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 13:49:34 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F133E17670F
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 13:49:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6281117671E
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 13:49:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9C44A30DC0D7
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 12:41:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6A1013104DC3
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 12:41:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A5C03659E0;
-	Mon, 23 Feb 2026 12:41:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8C9D3659EF;
+	Mon, 23 Feb 2026 12:41:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A65D5352C29;
-	Mon, 23 Feb 2026 12:41:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.171
+Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B5E2362137;
+	Mon, 23 Feb 2026 12:41:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771850481; cv=none; b=XL+TYu+oaZ63zAWSlP9SO33RgwXTZOrC0ThG4AiSipkurUbSmlNu3dL3hLFqj79OmqnlqTOMaG0EXTTLKea5u70zwWpt6nkAHnvvHKh9o3c60fwEcK88cr8rKUaD/apCVonudvV43/xZPPfRd8rm2ChdDIrNzqjJ/B7o8qEqDKg=
+	t=1771850487; cv=none; b=Tmf0S6Z2Hs4Rt94CVkznu+GweRsgKjysSWnmPGRFtnrGZ6EeIaN7vmgNPaJSQfOJr2dHBJuaUIQKWBaSKWrui4XdAHaXYovsmW7RRd6pBDyu7CWE7uJRn/qVqGfQ2IlcKiTThCBKJc/2quP99WGxW/AxxeuKL/7th9BaDVtV05M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771850481; c=relaxed/simple;
-	bh=16uCU6SU/bjvJzXtjLjxIPDd5tGtDanI9LQUJEW7ng8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KPF5H2dAkmaVr4CzFQoNTxpVlsEJfaSAElj4zj3eYh3tiNEJ++hlhz5SYfYI0xWqEqI7uk3dm8Riq5OBjSg5YuYWjCpLx7Nn4YJfkg8fTRBkKA5CjjuCaDJca5fwsCpuI17Sj+sTRvJ8Fyn/kHup2JLRecdjETSmefQ2smjGLfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; arc=none smtp.client-ip=210.160.252.171
+	s=arc-20240116; t=1771850487; c=relaxed/simple;
+	bh=ssm1ej6wHLtmi4HUkE/Q7GizkzFxTHV98lFTX/xFLyk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=nQmkWay/rmT7UTWe8nI5NGkeUUUhYnUYP4Y8NXITSi345U/X/Z4blPBHLUprqKdroLed6K3IWYvTbT6o/IBym4q0Vit5R1JEQutyquq1AG+vv79NwEEF6Am5fIEUFiQfEJoXORC9WeKbCV3pXBQKspDsT7F3W3WveCESC9XNkNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; arc=none smtp.client-ip=210.160.252.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
-X-CSE-ConnectionGUID: QlRjXNpSRbe8nAs7y3YahQ==
-X-CSE-MsgGUID: SQtk8V6rSKWQyLhCQ8cViw==
+X-CSE-ConnectionGUID: bMcOu8vCSmmFV+qHGkpgjg==
+X-CSE-MsgGUID: 6OlLtoNfQCiGn3FFGYi9xw==
 Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
-  by relmlie5.idc.renesas.com with ESMTP; 23 Feb 2026 21:41:11 +0900
+  by relmlie6.idc.renesas.com with ESMTP; 23 Feb 2026 21:41:18 +0900
 Received: from vm01.adwin.renesas.com (unknown [10.226.92.12])
-	by relmlir6.idc.renesas.com (Postfix) with ESMTP id 3C08E41AB637;
-	Mon, 23 Feb 2026 21:41:03 +0900 (JST)
+	by relmlir6.idc.renesas.com (Postfix) with ESMTP id A777C41AAEBA;
+	Mon, 23 Feb 2026 21:41:11 +0900 (JST)
 From: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
 To: andrew+netdev@lunn.ch,
 	davem@davemloft.net,
@@ -59,10 +60,12 @@ Cc: netdev@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 0/4] net: stmmac: Fix VLAN handling when interface is down
-Date: Mon, 23 Feb 2026 12:40:58 +0000
-Message-ID: <20260223124102.120432-1-ovidiu.panait.rb@renesas.com>
+Subject: [PATCH net-next 1/4] net: stmmac: Fix error handling in VLAN add and delete paths
+Date: Mon, 23 Feb 2026 12:40:59 +0000
+Message-ID: <20260223124102.120432-2-ovidiu.panait.rb@renesas.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260223124102.120432-1-ovidiu.panait.rb@renesas.com>
+References: <20260223124102.120432-1-ovidiu.panait.rb@renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,7 +85,7 @@ X-Spamd-Result: default: False [1.64 / 15.00];
 	DMARC_POLICY_SOFTFAIL(0.10)[renesas.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260023-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-260024-lists,netdev=lfdr.de];
 	TO_DN_NONE(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
@@ -92,51 +95,78 @@ X-Spamd-Result: default: False [1.64 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.879];
+	NEURAL_HAM(-0.00)[-0.855];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev,kernel];
 	PRECEDENCE_BULK(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[22];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,renesas.com:mid]
-X-Rspamd-Queue-Id: F133E17670F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,renesas.com:mid,renesas.com:email]
+X-Rspamd-Queue-Id: 6281117671E
 X-Rspamd-Action: no action
 
-VLAN register accesses on the MAC side require the PHY RX clock to be
-active. When the network interface is down, the PHY is suspended and
-the RX clock is unavailable, causing VLAN operations to fail with
-timeouts.
+stmmac_vlan_rx_add_vid() updates active_vlans and the VLAN hash
+register before writing the HW filter entry. If the filter write
+fails, it leaves a stale VID in active_vlans and the hash register.
 
-The VLAN core automatically removes VID 0 after the interface goes down
-and re-adds it when it comes back up, so these timeouts happen during
-normal interface down/up:
+stmmac_vlan_rx_kill_vid() has the reverse problem: it clears
+active_vlans before removing the HW filter. On failure, the VID is
+gone from active_vlans but still present in the HW filter table.
 
-    # ip link set end1 down
-    renesas-gbeth 15c40000.ethernet end1: Timeout accessing MAC_VLAN_Tag_Filter
-    renesas-gbeth 15c40000.ethernet end1: failed to kill vid 0081/0
+To fix this, reorder the operations to update the hash table first,
+then attempt the HW filter operation. If the HW filter fails, roll
+back both the active_vlans bitmap and the hash table by calling
+stmmac_vlan_update() again.
 
-Adding VLANs while the interface is down also fails:
+Fixes: ed64639bc1e0 ("net: stmmac: Add support for VLAN Rx filtering")
+Signed-off-by: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
+---
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c  | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
-    # ip link add link end1 name end1.10 type vlan id 10
-    renesas-gbeth 15c40000.ethernet end1: Timeout accessing MAC_VLAN_Tag_Filter
-    RTNETLINK answers: Device or resource busy
-
-Patches 3-4 address this by deferring hardware writes when the
-interface is down and reconfiguring the VLAN state on interface up.
-
-Patches 1-2 fix some issues in the existing VLAN implementation.
-
-Ovidiu Panait (4):
-  net: stmmac: Fix error handling in VLAN add and delete paths
-  net: stmmac: Improve double VLAN handling
-  net: stmmac: Add write_hw parameter to VLAN filter operations
-  net: stmmac: Defer VLAN HW configuration when interface is down
-
- drivers/net/ethernet/stmicro/stmmac/hwif.h    |  6 +-
- drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  1 +
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 62 ++++++++++++++++---
- .../net/ethernet/stmicro/stmmac/stmmac_vlan.c | 51 +++++++++------
- 4 files changed, 90 insertions(+), 30 deletions(-)
-
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 82375d34ad57..f2f120ddba46 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -6798,9 +6798,13 @@ static int stmmac_vlan_rx_add_vid(struct net_device *ndev, __be16 proto, u16 vid
+ 
+ 	if (priv->hw->num_vlan) {
+ 		ret = stmmac_add_hw_vlan_rx_fltr(priv, ndev, priv->hw, proto, vid);
+-		if (ret)
++		if (ret) {
++			clear_bit(vid, priv->active_vlans);
++			stmmac_vlan_update(priv, is_double);
+ 			goto err_pm_put;
++		}
+ 	}
++
+ err_pm_put:
+ 	pm_runtime_put(priv->device);
+ 
+@@ -6824,15 +6828,21 @@ static int stmmac_vlan_rx_kill_vid(struct net_device *ndev, __be16 proto, u16 vi
+ 		is_double = true;
+ 
+ 	clear_bit(vid, priv->active_vlans);
++	ret = stmmac_vlan_update(priv, is_double);
++	if (ret) {
++		set_bit(vid, priv->active_vlans);
++		goto del_vlan_error;
++	}
+ 
+ 	if (priv->hw->num_vlan) {
+ 		ret = stmmac_del_hw_vlan_rx_fltr(priv, ndev, priv->hw, proto, vid);
+-		if (ret)
++		if (ret) {
++			set_bit(vid, priv->active_vlans);
++			stmmac_vlan_update(priv, is_double);
+ 			goto del_vlan_error;
++		}
+ 	}
+ 
+-	ret = stmmac_vlan_update(priv, is_double);
+-
+ del_vlan_error:
+ 	pm_runtime_put(priv->device);
+ 
 -- 
 2.34.1
 
