@@ -1,192 +1,259 @@
-Return-Path: <netdev+bounces-260261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260262-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0JNAKUDmnGlNMAQAu9opvQ
-	(envelope-from <netdev+bounces-260261-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:44:00 +0100
+	id YAkCOoronGmNMAQAu9opvQ
+	(envelope-from <netdev+bounces-260262-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:53:46 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0220A17FDA2
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:43:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 500E0180134
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:53:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EDD9F30F75BA
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:43:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F15E7301ECF2
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:51:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4B6537FF47;
-	Mon, 23 Feb 2026 23:43:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EDA4314B6A;
+	Mon, 23 Feb 2026 23:51:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="crOfaB9K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BGNNVLsO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f225.google.com (mail-pg1-f225.google.com [209.85.215.225])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14F2237FF66
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 23:43:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.215.225
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771890189; cv=pass; b=ZoU0uwNq7rA7x1iDK+zf/uAeeyAQ9q3wqlHiKvsxYlbibMfIvrQF4ZparbLHI64+sc8MV7ov7cEByTVMGmc1Yhd1yppsmYHMAWyA0LGHMk2GQdCOjsCdzls7Ns/rcWKP0jrBiww9Y5iNO1gUXrBqsCQu/Pu+ncZV4X/dxEXRwAs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771890189; c=relaxed/simple;
-	bh=+jBBVPTRzLXPo9cNckFowfGFw09g+mEPMeSwlB5LDhs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gYkfxPqqoS2eIiio8dcs2Mkw1ftll4LCnQXWQF/livizt+OuPbwS93HDYHHHQjhMTV8GS8XrJ9Kba1qTVBtdHyCgKHnEaubCyN4SjQpzNHIKpbqldrt4rOemAjs5Tr7jZJptf98gFoz0oXS+Lmd9o9OB1/CzqMQ9s6CRZS/I4pM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=crOfaB9K; arc=pass smtp.client-ip=209.85.215.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f225.google.com with SMTP id 41be03b00d2f7-c6e248aa446so1965905a12.1
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 15:43:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771890187; x=1772494987;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=u8DqRTy5SdR97nmWrGUSUS5UJzBt9XQOKnn+GQnX3yI=;
-        b=DRWjQ73TqnC4+Guu0jijwctA0HuyKMAhP2A/hAqm4xZlfL/x1FDlm1IM4PNGZ8yrQF
-         NIqXEwP7PSJpzGZ0j8MeuEzA3nP/vC8eY0B9cVRwMuQwm1DRwShm3bf0+Q6tUeRTTXDf
-         VkNU54iC8W95AmortRuoW21L5Gt972y4DPtj3ALkwXowvDHVYwpSlDFrYTVL+29KgBoQ
-         QvW01Mi8xB9dg/Bg5K8dwgnSDrjr90rAjUxMRzdP2H/77T4zEUjzmtbIiFh18nsWfy+X
-         ZkjT3+ca96FpjzhCyhfTMLsOn+ZId+MVvsqmOQKHEY/tGmlx7ha3kv576ZRPZXFmGg1j
-         KY/A==
-X-Forwarded-Encrypted: i=2; AJvYcCUbFGBN0Ae+4u4QEcDrvoKFbFqI78Jbwr4fcb62VXkoZi+JINdP5nQcoIXpM/uAw0sVqXtbEu0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCKYWJYIk8a6vgsJ6Wlknm9+8JFwqeWhWMqo1nIgJNh1p+i0uc
-	FZgnblsIDCLDEgNbyEhX/J41yFbvpK79LcaRWXdBxRdBsNhH8a7BEVEdEOw/C0SSER67a72Llp+
-	PprvKXSW4Lle4BGebaiy3oCToOatkB1qGUT4C6AGC2uICACa+Nhr3yZwLkhcC/H08wZEXBonOz4
-	rQfet+Pudso3c0EqWrWuSw2+d7ZsvVMUiF0MP/bq2IxYjUxzQtfdFrnJ7WB6imTs/4tlW2MeHcq
-	k043UKjiog=
-X-Gm-Gg: ATEYQzxG1YqD4LZBczspWwQe0w1+4RURxYYmUoiyKthxWZBdbS/L7cvUaf74viSEpC2
-	T7KDeuM1XqOi01Inr0ZVidolt46TiZplhKxQug84HBwKxbNOJ8N1TWmyFEKv7qFnMJgjeRcTIHj
-	fjW+hC5ak5eSsKPXdPN5wfh5kEefRRm1DpiHMxBWHTv5zAksjONH5t7GN7Q7KnPeQIHaCnb9BPn
-	lh9eGyI+zr4Vl0HIUd4reO0oiLbmfiVGzHcEIheQWnZco559kkeVaZE8/25+0JRRoAIJtFYwk7T
-	d06oFrU04pHi2w2HZDpGEzak4/lcQlpWH/4QzSqI7KvOVPgR8ZRipgC/JIxKkyf5OLk5qJavP1L
-	Ozh/vXaI2fSbg2/bN/erfob2Xbs4EMzolvuORC0uKrgYm45XmuQG1nawdZXJ07/Pst3wV5tBLWC
-	1AxN5fVB9cyCOaj6B38vTRabMzUTQquCtWJdWxel3WHE6QPmnWgW05e+eELi0=
-X-Received: by 2002:a17:903:3d0b:b0:2a7:afca:fd1b with SMTP id d9443c01a7336-2ad74455a49mr72763975ad.13.1771890186856;
-        Mon, 23 Feb 2026 15:43:06 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-118.dlp.protect.broadcom.com. [144.49.247.118])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2ad74e0402esm9575695ad.6.2026.02.23.15.43.06
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 23 Feb 2026 15:43:06 -0800 (PST)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-65ab315bfffso354700a12.3
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 15:43:05 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771890185; cv=none;
-        d=google.com; s=arc-20240605;
-        b=BfOplvFmkjhcwjZjg0o24d9cKo/GIVttnrR1plXvafzHlxu+GH+HvywtHEQshaY930
-         zCauF08HXz4yF/cvXir7jKSqfz6XIaE7hqShFJ7P2Hncf5jH+ect+TXxT3G0TGinXIWH
-         ilYzZAsYb9MfrN1frbGgElQndC2jMR++IOKGReGtYAuwFJKzbx/mQRkDxgYe/OgZ07wN
-         BkOe42Q6eVdsQBgwdzIcS4uIHDiQweU5iP2eAVpX5//4AlHoq6ov5JSThSL1Yv2x5Kr6
-         Wr/epW52Fe0+p+/zZrVY3kLG0kHDREDegXHHIWFA0reHLOwz0OW1Urdm7lwjWLkrQt59
-         BsOA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=u8DqRTy5SdR97nmWrGUSUS5UJzBt9XQOKnn+GQnX3yI=;
-        fh=kTebTbxNXrzPbda7J8eo7sQRso92/QcCnh7SjUf5MOA=;
-        b=d9Yd6QkHqVEf89LwwxcAZWzV0LCCK6TGTi+B4IDdSFfCr7D5BlZeH0qCYNLFEuzDhL
-         oduT1SPbSriHKYp6YV98gD1GSYegLFiEyJW//MAGIO+Buc9MyJakH/N6gzYzLWw7Ss6o
-         AjPUIhI1wMSxw3YPj3D/sio/9agD1QQTPakmX5NwWe87t2SJTIr0qjthZeOnn4u0jxA2
-         PqFpuVIg3nwzxyrMauICWTb0xtjZAPiHr9L9nxHaO3yYzqeR+1hk9h1b82lHsfIbyN+O
-         azznkmIj/FKO0j1iaKSBq3bYd4GEnLCzPmgXw1hohMO7G/H6vIcy62j3uDGmr6e4mtya
-         mp6w==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1771890185; x=1772494985; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u8DqRTy5SdR97nmWrGUSUS5UJzBt9XQOKnn+GQnX3yI=;
-        b=crOfaB9K76dzfUlRlfh/Gn5N+29eH5FScfl9Z62x2FA2JA5GEuIL8u2hKzXU/MY5I5
-         rf25LV1vtZbkqLhvMBVreQX0e4Nuwz7jl2F0cPfNuxl4fEFPuW+XlzUWh9Jw/gxzoAur
-         lUZFe2CTelCU7JA4w5vmHjdID2AFOzNIoP/uA=
-X-Forwarded-Encrypted: i=1; AJvYcCXYz98tby1RUvDckod20sYNhQ3Hm9Y0fsUWUxxsE/N4mpiEnAe4wAAkgkyMyqmYPs8WP7g4PKc=@vger.kernel.org
-X-Received: by 2002:a17:907:7201:b0:b7d:1cbb:5deb with SMTP id a640c23a62f3a-b90819e4474mr733261966b.27.1771890184720;
-        Mon, 23 Feb 2026 15:43:04 -0800 (PST)
-X-Received: by 2002:a17:907:7201:b0:b7d:1cbb:5deb with SMTP id
- a640c23a62f3a-b90819e4474mr733260166b.27.1771890184220; Mon, 23 Feb 2026
- 15:43:04 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C610DF76
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 23:51:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771890665; cv=none; b=QpDWeL49H9wIsXyrO7cYdVIITrhPL88e24+PEx3ssqi8L0sUiLPloUljJj6/lEmBUgRQzIujurTaDO5nHUTiHWFiB+MqsQ6R4BEGsUyhMC+0WitAaAZcW9tomKC65RHShi7mSzNPNmHVO1ua77RDybzsIV/r/HM7oPbw8UckMVc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771890665; c=relaxed/simple;
+	bh=+7Y+dprCJ6A1laCGg0DDvPmSteFbaWyR/ZjDlzPWFkk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mKncnSY33G2+MkUlJsECu03edn2685LUqw9A/KtsfaFVhsBltL/2OhSuIZ2bfWcCZ7l32QVkeEiGxVTEM8IWUEuh8zZZvL4qCbDhCgiMjhog+3laZr+ri677KVoixuO7lUgNhaVLTs2cW6FFZkc8uK6Db7rs0OjuBj62BegTBM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BGNNVLsO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DA34C116C6;
+	Mon, 23 Feb 2026 23:51:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771890664;
+	bh=+7Y+dprCJ6A1laCGg0DDvPmSteFbaWyR/ZjDlzPWFkk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=BGNNVLsOOthRMboWl7vZ9Ssex0ZD0hjc9rUAVftSMqIBw+ZHlAgGfYJylPvlOtSZm
+	 XACne8i09C1O4T+tJVGtAakcsG79dFJtZbBX9R7Ls+1cyO/a6fXq55skXuxu4Qx5Mk
+	 F2kvccxQ54/3pItAA22yanWtvMTgclJam0me0ceHq4tNKvPD+RnNRf/vXVw+imuqnm
+	 jmpScApiAPCeNoc11rubyoCFg+/Z8wYPV8os2r8vb3CcKf/GJBk1lDrjwLEqvxujx1
+	 W/1H4aXfMnJq6V02MGPOVAlUAsgHn5cq+DHEgFoXop7Zj+sLrTArdjfGcqc6yef9x1
+	 /WzF4Vb7Hdc2w==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	sdf@fomichev.me,
+	hawk@kernel.org,
+	alexander.h.duyck@intel.com
+Subject: [PATCH net v2] net: consume xmit errors of GSO frames
+Date: Mon, 23 Feb 2026 15:51:00 -0800
+Message-ID: <20260223235100.108939-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260223214950.2153735-1-bvanassche@acm.org> <20260223214950.2153735-19-bvanassche@acm.org>
- <CACKFLimX0PPJGeJMG-nycNMufbFsJ4YUTnGbLHC_20xF2n9OQQ@mail.gmail.com>
- <41c375cd-5c23-407b-9e35-8779f899ad09@gmail.com> <CACKFLinqWm7wbdgES_gpYNhQiZJ0cv=w0zpra8rXF=3jMQ+BdA@mail.gmail.com>
- <637edf98-64b2-4a04-8fa9-4a4b791d7d53@gmail.com>
-In-Reply-To: <637edf98-64b2-4a04-8fa9-4a4b791d7d53@gmail.com>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Mon, 23 Feb 2026 15:42:52 -0800
-X-Gm-Features: AaiRm50NAa1I6s86LZWSsP2T7Q1mfHSuz3HF_H6knmM4bpPzD32jOaq_RnupZ30
-Message-ID: <CACKFLikK4aPasvxPBkr=KWj5e6zhxC-aXPCb7q=Yv2_dJLwZdg@mail.gmail.com>
-Subject: Re: [PATCH 18/62] bnxt_en: Fix bnxt_dl_reload_up()
-To: Bart Van Assche <bart.vanassche@gmail.com>
-Cc: Peter Zijlstra <peterz@infradead.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Shantiprasad Shettar <shantiprasad.shettar@broadcom.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260261-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260262-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 0220A17FDA2
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email]
+X-Rspamd-Queue-Id: 500E0180134
 X-Rspamd-Action: no action
 
-On Mon, Feb 23, 2026 at 2:56=E2=80=AFPM Bart Van Assche
-<bart.vanassche@gmail.com> wrote:
+udpgro_frglist.sh and udpgro_bench.sh are the flakiest tests
+currently in NIPA. They fail in the same exact way, TCP GRO
+test stalls occasionally and the test gets killed after 10min.
 
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
-> b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
-> index 15de802bbac4..aa7ebd1426ed 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
-> @@ -562,6 +562,13 @@ static int bnxt_dl_reload_up(struct devlink *dl,
-> enum devlink_reload_action acti
->                 break;
->         }
->         default:
-> +               /*
-> +                * Other actions have already been rejected by
-> +                * bnxt_dl_reload_down().
-> +                */
-> +               WARN_ON_ONCE(true);
-> +               netdev_unlock(bp->dev);
-> +               rtnl_unlock();
+These tests use veth to simulate GRO. They attach a trivial
+("return XDP_PASS;") XDP program to the veth to force TSO off
+and NAPI on.
 
-This is better.  It makes it clear that it should never get here.
+Digging into the failure mode we can see that the connection
+is completely stuck after a burst of drops. The sender's snd_nxt
+is at sequence number N [1], but the receiver claims to have
+received (rcv_nxt) up to N + 3 * MSS [2]. Last piece of the puzzle
+is that senders rtx queue is not empty (let's say the block in
+the rtx queue is at sequence number N - 4 * MSS [3]).
 
->                 return -EOPNOTSUPP;
->         }
->
->
+In this state, sender sends a retransmission from the rtx queue
+with a single segment, and sequence numbers N-4*MSS:N-3*MSS [3].
+Receiver sees it and responds with an ACK all the way up to
+N + 3 * MSS [2]. But sender will reject this ack as TCP_ACK_UNSENT_DATA
+because it has no recollection of ever sending data that far out [1].
+And we are stuck.
+
+The root cause is the mess of the xmit return codes. veth returns
+an error when it can't xmit a frame. We end up with a loss event
+like this:
+
+  -------------------------------------------------
+  |   GSO super frame 1   |   GSO super frame 2   |
+  |-----------------------------------------------|
+  | seg | seg | seg | seg | seg | seg | seg | seg |
+  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |
+  -------------------------------------------------
+     x    ok    ok    <ok>|  ok    ok    ok   <x>
+                          \\
+			   snd_nxt
+
+"x" means packet lost by veth, and "ok" means it went thru.
+Since veth has TSO disabled in this test it sees individual segments.
+Segment 1 is on the retransmit queue and will be resent.
+
+So why did the sender not advance snd_nxt even tho it clearly did
+send up to seg 8? tcp_write_xmit() interprets the return code
+from the core to mean that data has not been sent at all. Since
+TCP deals with GSO super frames, not individual segment the crux
+of the problem is that loss of a single segment can be interpreted
+as loss of all. TCP only sees the last return code for the last
+segment of the GSO frame (in <> brackets in the diagram above).
+
+Of course for the problem to occur we need a setup or a device
+without a Qdisc. Otherwise Qdisc layer disconnects the protocol
+layer from the device errors completely.
+
+We have multiple ways to fix this.
+
+ 1) make veth not return an error when it lost a packet.
+    While this is what I think we did in the past, the issue keeps
+    reappearing and it's annoying to debug. The game of whack
+    a mole is not great.
+
+ 2) fix the damn return codes
+    We only talk about NETDEV_TX_OK and NETDEV_TX_BUSY in the
+    documentation, so maybe we should make the return code from
+    ndo_start_xmit() a boolean. I like that the most, but perhaps
+    some ancient, not-really-networking protocol would suffer.
+
+ 3) make TCP ignore the errors
+    It is not entirely clear to me what benefit TCP gets from
+    interpreting the result of ip_queue_xmit()? Specifically once
+    the connection is established and we're pushing data - packet
+    loss is just packet loss?
+
+ 4) this fix
+    Ignore the rc in the Qdisc-less+GSO case, since it's unreliable.
+    We already always return OK in the TCQ_F_CAN_BYPASS case.
+    In the Qdisc-less case let's be a bit more conservative and only
+    mask the GSO errors. This path is taken by non-IP-"networks"
+    like CAN, MCTP etc, so we could regress some ancient thing.
+    This is the simplest, but also maybe the hackiest fix?
+
+Similar fix has been proposed by Eric in the past but never committed
+because original reporter was working with an OOT driver and wasn't
+providing feedback (see Link).
+
+Link: https://lore.kernel.org/CANn89iJcLepEin7EtBETrZ36bjoD9LrR=k4cfwWh046GB+4f9A@mail.gmail.com
+Fixes: 1f59533f9ca5 ("qdisc: validate frames going through the direct_xmit path")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+v2:
+ - rewrite to also cover the BUSY case
+v1: https://lore.kernel.org/20260220170032.2964535-1-kuba@kernel.org
+
+CC: sdf@fomichev.me
+CC: hawk@kernel.org
+CC: alexander.h.duyck@intel.com
+---
+ net/core/dev.c | 23 ++++++++++++++++++-----
+ 1 file changed, 18 insertions(+), 5 deletions(-)
+
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 096b3ff13f6b..52e5dd6c2e20 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -4822,6 +4822,8 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
+ 		 * to -1 or to their cpu id, but not to our id.
+ 		 */
+ 		if (READ_ONCE(txq->xmit_lock_owner) != cpu) {
++			bool is_list = false;
++
+ 			if (dev_xmit_recursion())
+ 				goto recursion_alert;
+ 
+@@ -4832,17 +4834,28 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
+ 			HARD_TX_LOCK(dev, txq, cpu);
+ 
+ 			if (!netif_xmit_stopped(txq)) {
++				is_list = !!skb->next;
++
+ 				dev_xmit_recursion_inc();
+ 				skb = dev_hard_start_xmit(skb, dev, txq, &rc);
+ 				dev_xmit_recursion_dec();
+-				if (dev_xmit_complete(rc)) {
+-					HARD_TX_UNLOCK(dev, txq);
+-					goto out;
+-				}
++
++				/* GSO segments a single SKB into
++				 * a list of frames. TCP expects error
++				 * to mean none of the data was sent.
++				 */
++				if (is_list)
++					rc = NETDEV_TX_OK;
+ 			}
+ 			HARD_TX_UNLOCK(dev, txq);
++			if (!skb) /* xmit completed */
++				goto out;
++
+ 			net_crit_ratelimited("Virtual device %s asks to queue packet!\n",
+ 					     dev->name);
++			/* NETDEV_TX_BUSY or queue was stopped */
++			if (!is_list)
++				rc = -ENETDOWN;
+ 		} else {
+ 			/* Recursion is detected! It is possible,
+ 			 * unfortunately
+@@ -4850,10 +4863,10 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
+ recursion_alert:
+ 			net_crit_ratelimited("Dead loop on virtual device %s, fix it urgently!\n",
+ 					     dev->name);
++			rc = -ENETDOWN;
+ 		}
+ 	}
+ 
+-	rc = -ENETDOWN;
+ 	rcu_read_unlock_bh();
+ 
+ 	dev_core_stats_tx_dropped_inc(dev);
+-- 
+2.53.0
+
 
