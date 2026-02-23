@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-259945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-259946-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0FqhENoYnGmq/gMAu9opvQ
-	(envelope-from <netdev+bounces-259945-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 10:07:38 +0100
+	id qG8hCF0YnGmq/gMAu9opvQ
+	(envelope-from <netdev+bounces-259946-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 10:05:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E134D17385A
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 10:07:37 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33F0F1737D1
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 10:05:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 54508300695F
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:05:26 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 31B5D3016B36
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 09:05:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05FA134DB61;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3755834E743;
 	Mon, 23 Feb 2026 09:05:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="KFUSXazX"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="LtK/2SZ/"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DEAE13D891
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC920344DA2
 	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 09:05:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771837524; cv=none; b=JBvObYZQj44haEez8v9UlsfOVkgaQiYNe8BZiX/YjnlLwzE5xXVdXjujUdCyQYNSLuhTR0DHagDZKJLXIlP/Ta3jfm28qmmJ941Foh/GNp9GusariWkEuFnF1lk59IBw3HxdJJxxuY6PhOaIBrck7KGTQRrj/+OX/zdIn4XsC5U=
+	t=1771837525; cv=none; b=rxzy21eHe6qXM2Pd0Z9e2Iwba0lhaa95XgXr4SfRA1Uv6K2qcblEqGpERiDKFtN2KbGlzG3Au43v60rvUVtwBSSMJmJR4CkcYPjB15o7sRD70hAD+PpWWRBfAGjpLhHDBsSk+Xe8kQbYuxbXLc0q5cwXZGUUfBTguyPyusvJPeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771837524; c=relaxed/simple;
-	bh=CwORaJk4t7M/X37NmV5ecmhJNln7SvJ4q3TcqMgPzYw=;
+	s=arc-20240116; t=1771837525; c=relaxed/simple;
+	bh=1LW1E3LuSHZZLirWNhCOrjialXghfkH+3l8NGLMu1X0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Zk+ooIHGzYrkcHEFUqLMjYkYRJQa0J/Hy6f54xNOkhAM8ExDDCrg9WBKqwKfaNQ9V4bsyxR9a50QDBhUkITVyfuK0tpjKLL34nOvyshvYYfSeMWXDCx9lLoPW+wXwyWO1wd/FBVc15tifvDMYkTvA/7il8XxK2c/BE+PekciAYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=KFUSXazX; arc=none smtp.client-ip=194.13.80.246
+	 MIME-Version; b=ag/8nsQ0ev/9dQpS6QwxfSQFiphZpgTh5bTTQjpBPTGy5Q5x4mLa2KJkctK0V6o5x78DXETVQV2cWAS+DXr4nxIMIQOCz8nhgdCFdKyxYJCncqLlj9qh89di2ypHGwRbeYx7lgmMRpnKSpoNC1ie4dm2WlAttowIHWcat+WrgzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=LtK/2SZ/; arc=none smtp.client-ip=194.13.80.246
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3BB91A3E6A;
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id CE9E8A3ED1;
 	Mon, 23 Feb 2026 10:05:21 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1771837521; h=from:subject:date:message-id:to:cc:mime-version:
+	t=1771837522; h=from:subject:date:message-id:to:cc:mime-version:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=msO9wIRe0eMZdl6b4a6WRDWlk64LVv74d2OouL9kFA0=;
-	b=KFUSXazXtqO2F8fp+sfdYRL4uxfWzQujLiWE0Rd2z50ycnk8YREpOOpX0qQ7Lz0gRRdeGr
-	toXuL11exrmLtZXvo/DtgF+94wuYadDozd5Dsa0oOp8xTIDvIMQDeeyS3+Ky/pnDGu147n
-	H+CVT1pLBCAaBr8/kia2fUnhpn2VDWaLw50ubmxz69KxUxdFYRKTnWZwN3xdP2vdpqYDHb
-	0UFqYpnB9aoW+VAz28PGIiKcFkSEMfHfAE9gj4G5lYJnXOAgYs1SaxtThLaAzn6ZxCz9KX
-	qbcCz1ruz4yJSn5qCYuJ+G5kMlmXYIsl8Zo15OeP9oruE2vAQjD3XuBNEpAKVw==
+	bh=hJs2yHp/wBGdoLlkdTjcS3vHsvQYBcvszxjelptE81s=;
+	b=LtK/2SZ/9lw2mN3WnsoWPvj9KA7ThUZ2EFo1yvAvg6KuoYhzzAOAPQQyq5i9jGV/yKUJo1
+	/XoXMj34jYFiQdOIcnGxA+UWaNTKGucTRkYCGLRN1TvDTSOPpUK4/kOB0lQXsdMfX7pKkr
+	rjFF9+YH7fWws/19FhXKvTmPFHm2Gw6pmUlPYcVVmKlX0UYJpnGASCu8x/8+YXKFR4rGvE
+	Y10ANU3j9YHLyBCv3JDhZf47RXTsFp55Zv1Ml+P5BAcb6xjbUrnmk4kBophaWxsH+xEVxF
+	q7vXwCbi0PmM+0czFptL8jAe3qegHfsLyCFJmaXFashfKShsPLEsHMwH5SRxJA==
 From: Nicolai Buchwitz <nb@tipi-net.de>
 To: netdev@vger.kernel.org
 Cc: andrew+netdev@lunn.ch,
@@ -56,9 +56,9 @@ Cc: andrew+netdev@lunn.ch,
 	pabeni@redhat.com,
 	linux@armlinux.org.uk,
 	Nicolai Buchwitz <nb@tipi-net.de>
-Subject: [PATCH net-next 1/5] net: cadence: macb: add EEE register definitions and capability flag
-Date: Mon, 23 Feb 2026 10:04:08 +0100
-Message-Id: <20260223090412.44070-2-nb@tipi-net.de>
+Subject: [PATCH net-next 2/5] net: cadence: macb: add EEE LPI statistics counters
+Date: Mon, 23 Feb 2026 10:04:09 +0100
+Message-Id: <20260223090412.44070-3-nb@tipi-net.de>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20260223090412.44070-1-nb@tipi-net.de>
 References: <20260223090412.44070-1-nb@tipi-net.de>
@@ -77,18 +77,18 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	DMARC_NA(0.00)[tipi-net.de];
-	TAGGED_FROM(0.00)[bounces-259945-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-259946-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
@@ -99,63 +99,52 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tipi-net.de:mid,tipi-net.de:dkim,tipi-net.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E134D17385A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,tipi-net.de:mid,tipi-net.de:dkim,tipi-net.de:email]
+X-Rspamd-Queue-Id: 33F0F1737D1
 X-Rspamd-Action: no action
 
-Add register and bitfield definitions for the Cadence GEM MAC's
-IEEE 802.3az Energy Efficient Ethernet (EEE) support:
+Expose the GEM MAC's EEE Low Power Idle hardware counters through
+ethtool -S:
 
-- LPI statistics counter registers (GEM_RXLPI, GEM_RXLPITIME,
-  GEM_TXLPI, GEM_TXLPITIME) at offsets 0x270-0x27c
-- TX LPI enable bitfield (GEM_TXLPIEN) in the NCR register (bit 19),
-  which directly asserts/deasserts LPI on the transmit path
-- MACB_CAPS_EEE capability flag to gate EEE support per platform
+- rx_lpi_transitions: number of RX LPI entry events
+- rx_lpi_time: cumulative time spent in RX LPI
+- tx_lpi_transitions: number of TX LPI entry events (TXLPIEN 0->1)
+- tx_lpi_time: cumulative time in TX LPI
 
-These registers are present in all Cadence GEM revisions that support
-EEE (verified on SAMA5D2, SAME70, PIC32CZ, and RP1 variants).
-
-No functional change.
+These are clear-on-read hardware registers at offsets 0x270-0x27c,
+automatically collected by the existing gem_statistics read loop.
 
 Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
 ---
- drivers/net/ethernet/cadence/macb.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ drivers/net/ethernet/cadence/macb.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
-index 87414a2ddf6e..f8fdb83bb5f3 100644
+index f8fdb83bb5f3..95317965080c 100644
 --- a/drivers/net/ethernet/cadence/macb.h
 +++ b/drivers/net/ethernet/cadence/macb.h
-@@ -170,6 +170,10 @@
- #define GEM_PCSANNPTX		0x021c /* PCS AN Next Page TX */
- #define GEM_PCSANNPLP		0x0220 /* PCS AN Next Page LP */
- #define GEM_PCSANEXTSTS		0x023c /* PCS AN Extended Status */
-+#define GEM_RXLPI		0x0270 /* EEE RX LPI Transitions */
-+#define GEM_RXLPITIME		0x0274 /* EEE RX LPI Time */
-+#define GEM_TXLPI		0x0278 /* EEE TX LPI Transitions */
-+#define GEM_TXLPITIME		0x027c /* EEE TX LPI Time */
- #define GEM_DCFG1		0x0280 /* Design Config 1 */
- #define GEM_DCFG2		0x0284 /* Design Config 2 */
- #define GEM_DCFG3		0x0288 /* Design Config 3 */
-@@ -264,6 +268,10 @@
- #define MACB_MIIONRGMII_OFFSET	28 /* MII Usage on RGMII Interface */
- #define MACB_MIIONRGMII_SIZE	1
+@@ -1052,6 +1052,10 @@ struct gem_stats {
+ 	u64	rx_ip_header_checksum_errors;
+ 	u64	rx_tcp_checksum_errors;
+ 	u64	rx_udp_checksum_errors;
++	u64	rx_lpi_transitions;
++	u64	rx_lpi_time;
++	u64	tx_lpi_transitions;
++	u64	tx_lpi_time;
+ };
  
-+/* GEM specific NCR bitfields. */
-+#define GEM_TXLPIEN_OFFSET	19 /* TX LPI Enable */
-+#define GEM_TXLPIEN_SIZE	1
-+
- /* Bitfields in NCFGR */
- #define MACB_SPD_OFFSET		0 /* Speed */
- #define MACB_SPD_SIZE		1
-@@ -779,6 +787,7 @@
- #define MACB_CAPS_DMA_PTP			BIT(22)
- #define MACB_CAPS_RSC				BIT(23)
- #define MACB_CAPS_NO_LSO			BIT(24)
-+#define MACB_CAPS_EEE				BIT(25)
+ /* Describes the name and offset of an individual statistic register, as
+@@ -1151,6 +1155,10 @@ static const struct gem_statistic gem_statistics[] = {
+ 			    GEM_BIT(NDS_RXERR)),
+ 	GEM_STAT_TITLE_BITS(RXUDPCCNT, "rx_udp_checksum_errors",
+ 			    GEM_BIT(NDS_RXERR)),
++	GEM_STAT_TITLE(RXLPI, "rx_lpi_transitions"),
++	GEM_STAT_TITLE(RXLPITIME, "rx_lpi_time"),
++	GEM_STAT_TITLE(TXLPI, "tx_lpi_transitions"),
++	GEM_STAT_TITLE(TXLPITIME, "tx_lpi_time"),
+ };
  
- /* LSO settings */
- #define MACB_LSO_UFO_ENABLE			0x01
+ #define GEM_STATS_LEN ARRAY_SIZE(gem_statistics)
 -- 
 2.39.5
 
