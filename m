@@ -1,91 +1,93 @@
-Return-Path: <netdev+bounces-260169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260170-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +LZTEYuonGklJwQAu9opvQ
-	(envelope-from <netdev+bounces-260169-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 20:20:43 +0100
+	id IC7VDqionGklJwQAu9opvQ
+	(envelope-from <netdev+bounces-260170-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 20:21:12 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C26B517C49C
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 20:20:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ACC1F17C4AD
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 20:21:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C465432F4AD0
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 19:14:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 59DC1310EEA5
+	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 19:14:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADE2336C0C2;
-	Mon, 23 Feb 2026 19:12:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F14336E494;
+	Mon, 23 Feb 2026 19:12:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hKOb5AqE"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="acfXjAFp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f98.google.com (mail-dl1-f98.google.com [74.125.82.98])
+Received: from mail-oo1-f99.google.com (mail-oo1-f99.google.com [209.85.161.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 609F136AB6F
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 19:12:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C70CA36BCF0
+	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 19:12:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771873928; cv=none; b=Q5Ik5/nEJFdyC5VqAsXZE+DnQWFH5ZPF9jV05nse4SQ0qSgpomuDVPcj7tzR32plzZmS1tm3qFopPVl0gaiKJ4LWEFv/jhL1Pa/tG4J7bZj6OmLndVd0+qQ1YR57+JVzclOgLV7G9IX5X6JTfQZkAsauqSBx4V7ZzJeNw1431zE=
+	t=1771873933; cv=none; b=FPQXgLO5k31b8Beh+yfG8+OxUJsoT3GJr5XG1kFK5CrIsxLEw7HZNxdNqdguEK+7jbhLycIXd4q5WF2h7IK6grnVCYcqHb8c8E/TuVCTnzpBDTBBQvWfLfzzg9Mba9veZGR9V/xVelabjW25s7fE4VnEXdY7vYq6peeykpDBR0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771873928; c=relaxed/simple;
-	bh=SCwe+t27d8QCPSJCzm+rQ6IUjffYevW8vs75ZU1hQVA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fna8APCbuFM5uJkv7rQEsBgM63f8our5/oPE//MLPU1U8HUdBegu4DHCiD9V7OBlzaIxQP2cBgKDtnTLa/wW9l7GPS+5VDzGgRxWYsNqJlELCaZnUPHBAteXmCniomn0hu5Oqg/jWVqSKT0mjkPiJJ0xm1EOFwCaH0bu7GXYrIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hKOb5AqE; arc=none smtp.client-ip=74.125.82.98
+	s=arc-20240116; t=1771873933; c=relaxed/simple;
+	bh=WutPYL4cG/EXST+jBmz13oiyimF6V23PC8A+85qvxYI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=EOd+nSMr80UwyqkGyQLc4kG6iv+a8PVqmDOamReNAjyKntLxFURYcYK8XjYuV0bIiqL4sGtbJSJ0S2fLJGWyyoAw33n4DLtyGpcOcJEigqAaWBZalCnrmPgZfMz3klMWa7NyK1FLuyrbUm4VxbPremOlW+xRY4qMrUTJ9l8uyuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=acfXjAFp; arc=none smtp.client-ip=209.85.161.99
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-dl1-f98.google.com with SMTP id a92af1059eb24-127423bea4bso768401c88.0
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 11:12:07 -0800 (PST)
+Received: by mail-oo1-f99.google.com with SMTP id 006d021491bc7-673f0b73dd3so2549325eaf.2
+        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 11:12:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771873926; x=1772478726;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rChNBXZrNe1CETweUbZuoEv1QuM46Wz/N53lv4Y4SLE=;
-        b=p+Tq9BBueUMlETxJf89W1ln3pszqwDcknVz3DeYXQMjBybhuzNFkPM5g1UL/0Jm3tv
-         EU31YZUKHwRDMUAYSsvhDX1x+xyEzzzAnN2Q3xVvBFZFsGWwCQ9Wl5Xl6qC++xWt7G2A
-         PUPqjteh0HFiKWnK5Rum0ElxZcmRuvIKJGTA5+K/GFkqy5QlLtdoaVsLAEWFqoaTPt2K
-         rS/yjhF0W8PWLZU0lUqmKFnhNLbeGzyBr3KKPeGnRKvaaBw+TLsgdGewKmpAVue39SD/
-         pKDPfqjnbXQaQHYwW62SpYgzqCbAlFZUgyCz8lweImHco3ZeDrNdbcV5dJhnzo/vIlU9
-         W1jQ==
-X-Gm-Message-State: AOJu0Yw+ftbINXOqM7X5YmsQMYGbKF9oGDC/RlSb6Z+6beQElq6u5DlB
-	Yv4IRz+R9Bep57NXUpzh68op9ocKbqk3PFdPl7ZXDoxpkOUlZGIe5yUUmonN+zW51/hbWWcv69l
-	NiRi/yqi9sb2kCfQZiIs1ZzDkdCmXOQbbJdjAUl/2Ld5+e7dmUNiX0Y3G4tulqGBGjM/1LA0v1k
-	I4B8hnO7XZmyVii6/eDpeLsmsn4TMivbE1XCqhXkWDXVIoOqdx/chvhY0wtgo6TdwXs4PwTrAXQ
-	0GEvXL7XOZH
-X-Gm-Gg: AZuq6aJ4615O/TyLMNLcarwMwSR0/z0IVGPfkIAGbhttG6lX8YEwYfL62Z2HSfuVDq5
-	oNlpz5rgdrgNReBPpnbeStz/bDzHndjRZeFUZcU5lhs9Kfap7Xz9nm6dDMb3DktfJJU1viihaqt
-	llpAJAROQQJXeOyjgDE0jqIjpVfzX4DpOPqwxJT17JktEckm12EOhhNOPY7ugq8ksFY9wkcMYY8
-	3uukacNRs4GY2WO9S8f8Uwau8HdD2tqoT/eGKOiGO+/Tus41VCaH8BLsMrrD0JNtaXGwk6QZaq8
-	PGJOUgSi9DCeFFMGAYelmgHSCEvMtSHJOJpnXkqDdfX3ZdtKbnOgHfdP6UkR4D6vTApkf+72T10
-	EEVX/RX+fN6KjctS2ooa13AZXz288BveU/nQRtmaX8rbDeBY4qbZRpYbO0K9B4myQFHp+nYf27Y
-	EBFg4jyP8PgMZNADngNle2xEdh3TV3Gd3zh4zkqtMVL6Vc1UTpKwGMTAnaWQ==
-X-Received: by 2002:a05:7022:112:b0:123:2dd0:10bc with SMTP id a92af1059eb24-1276acb8720mr4595149c88.10.1771873926339;
-        Mon, 23 Feb 2026 11:12:06 -0800 (PST)
+        d=1e100.net; s=20230601; t=1771873931; x=1772478731;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=v49c/0FsrhD7zmHG67B+ZI0NaJwp1KpfxbdYTpU5cag=;
+        b=av18gbN8DTPYWxuG9h4/L9k9jDao95ehR6HDtVipW8WtTlIZy7Rj8IFPK2FH9sB4vp
+         aKcQw2oHYdMBtDCjK3kHkvTGJUqCJx42dpQNc5FL9dgTYm2nwKbVDFijiN+6LDKh5vVL
+         IDcqYgpKodCWnjejwJ2JxAhv+uRwmapJ7Pv2xWKidD3duU6Aw6lK4b9tkZHBTS0jDjKe
+         +K73ZS+iNe+RynrtQdtx1UVPhzKBAx292XKI1VgQ3d6NZzsieWwZWj9TKQMlBF2O9VFo
+         aVHl2jmh6oyMt/i0pvgItoyQiYmE08JOCMCBSy/2nrKgsHmuj0GqoWC5aBBUsCin3T/G
+         YtKw==
+X-Gm-Message-State: AOJu0YzMvswchU7ZZG5fqDsa8i3EYZ9Tyacz2wFXsdtrfh3paHAcbtrM
+	WqEudS/l0gRt5vCJ7oxbayDq0VzxNlGJvf6jHJyHBpH7+c1Kfa9luiHVCb1CTy3s3+bGexr/3Vk
+	6ar+FG0khSynodRva6t7jtzzG8OAXX1LeE0CrA2efN/4AqVmX8PzGPkGwqSd7+5I6okqhWtBCoo
+	sYYCygyzhF5wU2Qd96tbNpvWlx38/0hVqkJ5WqNKdF9zF+yQG/KMdm5pLVQlhjBVFtllJnvX31c
+	3ev+i0ZGgOZ
+X-Gm-Gg: AZuq6aIGEt1yx2dav1rPN3nIiualLJzjODJR+zJ/BinBOrDwc/0gN4GfaVGeH+F6OdZ
+	fX6IWVyU5uXibpEQ0mzo4pqIaDb3SnA3bsES5X2EBUWooNhTecMWBbZbATs7RJk9B89UVMhq5Tt
+	45SwwC1j1lTvhXmUArz83aeODCqz0B5FKQnPQIq1FGn1ClYIl2QWlFEKmyuiUAkVmw91AfPnjbU
+	L1fWnDQ/ZOhC9i9FE6CW14yZb2Y3FLcauRACAYlQX7QTtZyhyq+87zcyYCOR/M8EV1961Sk8BDI
+	clKq+2rwngeE6SYhn0krlmb33C++XqtGk5o2w4qWJd2qe8TiJJp8G/lKszpL13L7+OYjPeaDk/N
+	QUUOLVSLjO+33Sv1h5Fcb4Emh8fdhL5KBh4JCGSiZUkR9sSpfOzacHrXduTX8gZFgVlZrTnsdpX
+	5EOnCNL+a5Iu9gZFffPecDQWL2H4C9TqPjHZ+eRxOlm4y95kBU65qrETmk8A==
+X-Received: by 2002:a05:6820:468a:b0:679:a560:cac5 with SMTP id 006d021491bc7-679c45082ccmr4129009eaf.46.1771873930641;
+        Mon, 23 Feb 2026 11:12:10 -0800 (PST)
 Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-118.dlp.protect.broadcom.com. [144.49.247.118])
-        by smtp-relay.gmail.com with ESMTPS id a92af1059eb24-1276af7557dsm1025780c88.8.2026.02.23.11.12.05
+        by smtp-relay.gmail.com with ESMTPS id 006d021491bc7-679c56431cbsm894619eaf.2.2026.02.23.11.12.10
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 23 Feb 2026 11:12:06 -0800 (PST)
+        Mon, 23 Feb 2026 11:12:10 -0800 (PST)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-dl1-f70.google.com with SMTP id a92af1059eb24-127337c8e52so18313933c88.1
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 11:12:05 -0800 (PST)
+Received: by mail-dy1-f197.google.com with SMTP id 5a478bee46e88-2baad797d0cso22226162eec.0
+        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 11:12:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1771873925; x=1772478725; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rChNBXZrNe1CETweUbZuoEv1QuM46Wz/N53lv4Y4SLE=;
-        b=hKOb5AqE2qw8z5QAnZsErx+Wg4m9x8G2hPT/wRoyjn5HeMKlifXvplMSdDhQX3u4ym
-         Y3jIYnRHb0nseVeU6sPMBDEa35UDVyD+gHL4IPBI2iB+GaYrdNyAiV099nQrf0YnSc7B
-         Sv+rhVeaBW56Qwh/A1itR3HjdOPazILpf5MLk=
-X-Received: by 2002:a05:7022:527:b0:11b:b064:f606 with SMTP id a92af1059eb24-1276ad1184cmr4436511c88.26.1771873924580;
-        Mon, 23 Feb 2026 11:12:04 -0800 (PST)
-X-Received: by 2002:a05:7022:527:b0:11b:b064:f606 with SMTP id a92af1059eb24-1276ad1184cmr4436493c88.26.1771873923975;
-        Mon, 23 Feb 2026 11:12:03 -0800 (PST)
+        d=broadcom.com; s=google; t=1771873929; x=1772478729; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v49c/0FsrhD7zmHG67B+ZI0NaJwp1KpfxbdYTpU5cag=;
+        b=acfXjAFpsNi9FJIrVO3kZ6P80IFlS8Q1QNlkavqBSK1w05O0yW7c+2hrIf9P7PF0T/
+         YG2udLj3Z7JcD/UV6KoFTOjoEdYWD68hsS24tAwxLvv8ZJelwFVopm4VGF43Ga1SkJsZ
+         ySJXDUItGladoUmBKU4r6HZ0oBOGtrfDgA0Ek=
+X-Received: by 2002:a05:7300:d505:b0:2b7:32a6:82d1 with SMTP id 5a478bee46e88-2bd7bae915dmr4336138eec.13.1771873928885;
+        Mon, 23 Feb 2026 11:12:08 -0800 (PST)
+X-Received: by 2002:a05:7300:d505:b0:2b7:32a6:82d1 with SMTP id 5a478bee46e88-2bd7bae915dmr4336120eec.13.1771873928176;
+        Mon, 23 Feb 2026 11:12:08 -0800 (PST)
 Received: from lvnvda4076.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2bd7da3eec5sm5332734eec.4.2026.02.23.11.12.03
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2bd7da3eec5sm5332734eec.4.2026.02.23.11.12.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Feb 2026 11:12:03 -0800 (PST)
+        Mon, 23 Feb 2026 11:12:07 -0800 (PST)
 From: Kiran Kella <kiran.kella@broadcom.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -101,10 +103,12 @@ Cc: netdev@vger.kernel.org,
 	ajit.khaparde@broadcom.com,
 	akhilesh.samineni@broadcom.com,
 	Kiran Kella <kiran.kella@broadcom.com>
-Subject: [net-next, v2 0/2] psp: Support PSP Tx on logical devices like VLAN
-Date: Mon, 23 Feb 2026 11:11:52 -0800
-Message-ID: <20260223191154.2800616-1-kiran.kella@broadcom.com>
+Subject: [net-next, v2 1/2] psp: Support for transmit on logical device when the underlying transport device supports PSP.
+Date: Mon, 23 Feb 2026 11:11:53 -0800
+Message-ID: <20260223191154.2800616-2-kiran.kella@broadcom.com>
 X-Mailer: git-send-email 2.45.4
+In-Reply-To: <20260223191154.2800616-1-kiran.kella@broadcom.com>
+References: <20260223191154.2800616-1-kiran.kella@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -130,86 +134,189 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260169-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-260170-lists,netdev=lfdr.de];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kiran.kella@broadcom.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[broadcom.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:mid,broadcom.com:dkim];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:mid,broadcom.com:dkim,broadcom.com:email];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-0.998];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: C26B517C49C
+X-Rspamd-Queue-Id: ACC1F17C4AD
 X-Rspamd-Action: no action
 
-This patch adds support to allow transmit if the bottom most underlying
-transport device matches the PSP device associated with the
-transmitting application socket.
+This is achieved by propagating the psp_dev from the lower device
+to the upper devices in the device stack via a netdevice notifier.
+The lowest device owns the psp_dev pointer while the upper devices
+just borrow the pointer. When the lower device is unlinked, the
+borrowed pointer is cleared in the upper device.
+Assumption being that psp_dev is set on the lowest device before
+any upper devices are stacked on that lowest device.
 
-  python ./psp.py
-  TAP version 13
-  1..29
-  ok 1 psp.data_basic_send_v0_ip4
-  ok 2 psp.data_basic_send_v0_ip6
-  ok 3 psp.data_basic_send_v1_ip4
-  ok 4 psp.data_basic_send_v1_ip6
-  ok 5 psp.data_basic_send_v2_ip4
-  ok 6 psp.data_basic_send_v2_ip6
-  ok 7 psp.data_basic_send_v3_ip4
-  ok 8 psp.data_basic_send_v3_ip6
-  ok 9 psp.data_mss_adjust_ip4
-  ok 10 psp.data_mss_adjust_ip6
-  ok 11 psp.dev_list_devices
-  ok 12 psp.dev_get_device
-  ok 13 psp.dev_get_device_bad
-  ok 14 psp.dev_rotate
-  ok 15 psp.dev_rotate_spi
-  ok 16 psp.assoc_basic
-  ok 17 psp.assoc_bad_dev
-  ok 18 psp.assoc_sk_only_conn
-  ok 19 psp.assoc_sk_only_mismatch
-  ok 20 psp.assoc_sk_only_mismatch_tx
-  ok 21 psp.assoc_sk_only_unconn
-  ok 22 psp.assoc_version_mismatch
-  ok 23 psp.assoc_twice
-  ok 24 psp.data_send_bad_key
-  ok 25 psp.data_send_disconnect
-  ok 26 psp.data_stale_key
-  ok 27 psp.removal_device_rx
-  ok 28 psp.removal_device_bi
-  ok 29 psp.vlan_basic_send
-  # Totals: pass:29 fail:0 xfail:0 xpass:0 skip:0 error:0
-  #
-  # Responder logs (0):
-  # STDERR:
-  # #  Set PSP enable on device 3 to 0xf
-  # #  Set PSP enable on device 3 to 0x0
+Signed-off-by: Kiran Kella <kiran.kella@broadcom.com>
+Reviewed-by: Ajit Kumar Khaparde <ajit.khaparde@broadcom.com>
+Reviewed-by: Akhilesh Samineni <akhilesh.samineni@broadcom.com>
+---
+ net/psp/psp_main.c | 109 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 108 insertions(+), 1 deletion(-)
 
-CHANGES:
-v2: 
-  - Simplified the psp_netdevice_event() to return if the upper device is
-    bond device.
-  - Handle the scenario where the psp_dev_unregister() is invoked by a
-    driver before the unregister_netdev() that can result in stale
-    psp_dev pointer in the upper devices. 
-  - Fix the vlan_basic_send test to run on any lower device and not
-    require nsim.
-
-v1: https://lore.kernel.org/all/20260121073517.3323332-1-kiran.kella@broadcom.com/
-
-Kiran Kella (2):
-  psp: Support for transmit on logical device when the underlying
-    transport device supports PSP.
-  selftests: drv-net: psp: add test for VLAN sub-interface
-
- net/psp/psp_main.c                         | 109 ++++++++++++++++++++-
- tools/testing/selftests/drivers/net/psp.py |  86 +++++++++++++++-
- 2 files changed, 193 insertions(+), 2 deletions(-)
-
+diff --git a/net/psp/psp_main.c b/net/psp/psp_main.c
+index a8534124f626..fac785dcfa0f 100644
+--- a/net/psp/psp_main.c
++++ b/net/psp/psp_main.c
+@@ -3,6 +3,7 @@
+ #include <linux/bitfield.h>
+ #include <linux/list.h>
+ #include <linux/netdevice.h>
++#include <linux/rtnetlink.h>
+ #include <linux/xarray.h>
+ #include <net/net_namespace.h>
+ #include <net/psp.h>
+@@ -110,13 +111,45 @@ void psp_dev_free(struct psp_dev *psd)
+ 	kfree_rcu(psd, rcu);
+ }
+ 
++/**
++ * psp_clear_upper_dev_psp_dev() - Clear borrowed psp_dev pointer on upper
++ *				   device
++ * @upper_dev:	Upper device that may have borrowed psp_dev pointer
++ * @priv:	netdev_nested_priv containing the psp_dev being unregistered
++ *
++ * Callback for netdev_walk_all_upper_dev_rcu() to clear borrowed psp_dev
++ * pointers on upper devices when the underlying psp_dev is being unregistered.
++ *
++ * Return: 0 to continue walking, non-zero to stop.
++ */
++static int psp_clear_upper_dev_psp_dev(struct net_device *upper_dev,
++				       struct netdev_nested_priv *priv)
++{
++	struct psp_dev *psd = priv->data;
++	struct psp_dev *upper_psd;
++
++	upper_psd = rcu_dereference(upper_dev->psp_dev);
++	if (upper_psd == psd)
++		rcu_assign_pointer(upper_dev->psp_dev, NULL);
++
++	return 0;
++}
++
+ /**
+  * psp_dev_unregister() - unregister PSP device
+  * @psd:	PSP device structure
++ *
++ * Unregisters a PSP device and clears all borrowed psp_dev pointers on
++ * upper devices (e.g., VLAN subinterfaces) that reference this device.
++ * This prevents use-after-free if upper devices still have borrowed
++ * pointers when the psp_dev structure is freed.
+  */
+ void psp_dev_unregister(struct psp_dev *psd)
+ {
+ 	struct psp_assoc *pas, *next;
++	struct netdev_nested_priv priv = {
++		.data = psd,
++	};
+ 
+ 	mutex_lock(&psp_devs_lock);
+ 	mutex_lock(&psd->lock);
+@@ -137,6 +170,12 @@ void psp_dev_unregister(struct psp_dev *psd)
+ 
+ 	rcu_assign_pointer(psd->main_netdev->psp_dev, NULL);
+ 
++	/* Clear borrowed psp_dev pointers on all upper devices */
++	rcu_read_lock();
++	netdev_walk_all_upper_dev_rcu(psd->main_netdev,
++				      psp_clear_upper_dev_psp_dev, &priv);
++	rcu_read_unlock();
++
+ 	psd->ops = NULL;
+ 	psd->drv_priv = NULL;
+ 
+@@ -313,11 +352,79 @@ int psp_dev_rcv(struct sk_buff *skb, u16 dev_id, u8 generation, bool strip_icv)
+ }
+ EXPORT_SYMBOL(psp_dev_rcv);
+ 
++/**
++ * psp_netdevice_event() - Handle netdevice events for PSP device propagation
++ * @nb:		notifier block
++ * @event:	netdevice event
++ * @ptr:	netdevice notifier info
++ *
++ * Propagates psp_dev pointer from lower devices to upper devices when
++ * upper devices are created (e.g., VLAN subinterfaces).
++ * Excluding from this logic, the upper devices that have multiple lower
++ * devices eg., bond devices.
++ *
++ * Return: NOTIFY_DONE
++ */
++static int psp_netdevice_event(struct notifier_block *nb,
++			       unsigned long event, void *ptr)
++{
++	struct netdev_notifier_changeupper_info *info;
++	struct net_device *dev, *upper_dev;
++	struct psp_dev *psd;
++
++	if (event != NETDEV_CHANGEUPPER)
++		return NOTIFY_DONE;
++
++	info = ptr;
++	dev = netdev_notifier_info_to_dev(ptr);
++	upper_dev = info->upper_dev;
++
++	if (netif_is_lag_master(upper_dev))
++		return NOTIFY_DONE;
++
++	if (info->linking) {
++		/* Lower device is being linked to an upper device.
++		 * Propagate psp_dev from the immediate lower device to the
++		 * upper device. The immediate lower device would have already
++		 * got the psp_dev pointer set in a previous notification (or
++		 * owns it if it's the lowest device).
++		 * Upper devices just borrow the pointer.
++		 */
++		psd = rtnl_dereference(dev->psp_dev);
++		if (psd)
++			rcu_assign_pointer(upper_dev->psp_dev, psd);
++	} else {
++		/* Lower device is being unlinked from an upper device.
++		 * Clear the borrowed psp_dev pointer.
++		 */
++		psd = rtnl_dereference(upper_dev->psp_dev);
++		if (psd)
++			rcu_assign_pointer(upper_dev->psp_dev, NULL);
++	}
++
++	return NOTIFY_DONE;
++}
++
++static struct notifier_block psp_netdevice_notifier = {
++	.notifier_call = psp_netdevice_event,
++};
++
+ static int __init psp_init(void)
+ {
++	int err;
++
+ 	mutex_init(&psp_devs_lock);
+ 
+-	return genl_register_family(&psp_nl_family);
++	err = register_netdevice_notifier(&psp_netdevice_notifier);
++	if (err)
++		return err;
++
++	err = genl_register_family(&psp_nl_family);
++	if (err) {
++		unregister_netdevice_notifier(&psp_netdevice_notifier);
++		return err;
++	}
++	return 0;
+ }
+ 
+ subsys_initcall(psp_init);
 -- 
 2.45.4
 
