@@ -1,255 +1,154 @@
-Return-Path: <netdev+bounces-260583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260584-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8INXDPjOnWn4SAQAu9opvQ
-	(envelope-from <netdev+bounces-260583-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 17:16:56 +0100
+	id GNeXANnPnWn4SAQAu9opvQ
+	(envelope-from <netdev+bounces-260584-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 17:20:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40827189AAA
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 17:16:55 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EA74189B71
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 17:20:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E3FDB301A6A6
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 16:16:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F07B530B15AB
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 16:20:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4F443A7855;
-	Tue, 24 Feb 2026 16:16:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mc1wlA8h"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A1D13A7F4C;
+	Tue, 24 Feb 2026 16:20:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0AD24DCF9;
-	Tue, 24 Feb 2026 16:16:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 289643806B8;
+	Tue, 24 Feb 2026 16:20:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771949782; cv=none; b=u+v+QAJwZAihoAdiiY9oEpHsKELzcwmPNfJVh5iq7jL5GeT3oWeJ+xlGNsmwi7lII2aVSu99gHMw2LcXSAgbW0z0DE9yPdoe1p/r6MUw1vksQBs5KRpTu7SHI6vw8pUucfsXDzAd0jalrE6fvl+btEwjrTs01udBr3LnqHaRHbo=
+	t=1771950009; cv=none; b=a/3p31JN+Ln/iVhYClMUdHR3BEsDFxCHW96XzI3tyXtY5LCkp2vrLjg86/BEWyjuipZvFv2s1Y0cqe8joQM+E2YLtk7p5dsjrQ890aFqnxiJG1LiGX7PXqsqORj6ZDEm+02lyVU/bnFW4xDNumuejjzP9warqWLYpTsupDig0IA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771949782; c=relaxed/simple;
-	bh=Jpzg3XcQH9T6/RZ4fN6CUybReuS0zIKiZ1EQ8AI4wBo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fXQguiYv2+utYM4WYrBn/fIG4EsQZWDo7bnGY9pf1uJ0k/89/x50hkTv0CMe0ASnkVP47QSgM2bRuy6dS64d8ot6dJQjureWjYyfPodnpXPvVIbJdeFtAbI2QrVdT6CZt/5njxakEcqPIm3Bm8MsWAVlOH6do7z+xdMNT2ZeuL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mc1wlA8h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46236C116D0;
-	Tue, 24 Feb 2026 16:16:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771949782;
-	bh=Jpzg3XcQH9T6/RZ4fN6CUybReuS0zIKiZ1EQ8AI4wBo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Mc1wlA8hy64hMUNU9Jqm8OcTRs+u83cX+Lkgu74ig9i1lNFMtTdiZmZxGPNo0MVvt
-	 vJ9foNO3ZA45GT9+8jOQECWUBo3+p1sxztzVYDTi+PBss6QWIrE0Pb7Ftpy/0kxX3A
-	 qJmxHR0mNb7M66B+oJ3bxKr+RcyVHIR6us0RQqV8CwA0nX/o86OKyrmUPhLufXkMYO
-	 MKUHoE6MyH2FVJRJNxdXjQFs84SwFgJlxVgvjQxuQdjFbyfQMmciOosAsX1w3Hn6Cw
-	 AsjdkHO73p1QlHq3UXTvq31/vOV6+HE4NUpHrC5JL/reDp+fJ8Qc/2Yoa2jpKXKcx0
-	 v8r5t44DBHiuA==
-From: Simon Horman <horms@kernel.org>
-To: achender@kernel.org
-Cc: Simon Horman <horms@kernel.org>,
-	linux-kselftest@vger.kernel.org,
-	kuba@kernel.org,
-	linux-rdma@vger.kernel.org,
-	allison.henderson@oracle.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org,
-	rds-devel@oss.oracle.com,
-	pabeni@redhat.com
-Subject: Re: [net-next,v5,1/2] net/rds: Refactor __rds_conn_create for blocking transport cleanup
-Date: Tue, 24 Feb 2026 16:16:07 +0000
-Message-ID: <20260224161607.143920-1-horms@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260223221918.2750209-2-achender@kernel.org>
-References: <20260223221918.2750209-2-achender@kernel.org>
+	s=arc-20240116; t=1771950009; c=relaxed/simple;
+	bh=6G91BbTqFSYq68w6yhfkl+JDGrXisXHtlEgCseE/wwo=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=USqOVO1G8thfgen45iXNVM6Ww1j0fmbiTNzRg5c7dxMz8bF4y4wQ0aLX+j9GyfK2JA3wIrVqkYLQdlrzBkNRCizxSSmBL4mlSz2rAAu5ju1vSO5mAI3PlnyzZd0LFo3AZFrEeaA2khoswtV2yxqdIflZTG4g0REjoy8UHhwRGjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.224.107])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4fL2xC01QGzJ46C2;
+	Wed, 25 Feb 2026 00:19:43 +0800 (CST)
+Received: from dubpeml500005.china.huawei.com (unknown [7.214.145.207])
+	by mail.maildlp.com (Postfix) with ESMTPS id C0C2D40570;
+	Wed, 25 Feb 2026 00:20:04 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml500005.china.huawei.com
+ (7.214.145.207) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 24 Feb
+ 2026 16:20:01 +0000
+Date: Tue, 24 Feb 2026 16:20:00 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Shawn Lin <shawn.lin@rock-chips.com>
+CC: Bjorn Helgaas <bhelgaas@google.com>, "Vaibhaav Ram T . L"
+	<vaibhaavram.tl@microchip.com>, Kumaravel Thiagarajan
+	<kumaravel.thiagarajan@microchip.com>, Even Xu <even.xu@intel.com>, Xinpeng
+ Sun <xinpeng.sun@intel.com>, Srinivas Pandruvada
+	<srinivas.pandruvada@linux.intel.com>, Jiri Kosina <jikos@kernel.org>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Zhou Wang
+	<wangzhou1@hisilicon.com>, Longfang Liu <liulongfang@huawei.com>, "Vinod
+ Koul" <vkoul@kernel.org>, Lee Jones <lee@kernel.org>, Jijie Shao
+	<shaojijie@huawei.com>, Jian Shen <shenjian15@huawei.com>, Sunil Goutham
+	<sgoutham@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "Heiner
+ Kallweit" <hkallweit1@gmail.com>, "David S . Miller" <davem@davemloft.net>,
+	Jeff Hugo <jeff.hugo@oss.qualcomm.com>, Oded Gabbay <ogabbay@kernel.org>,
+	Maciej Falkowski <maciej.falkowski@linux.intel.com>, Karol Wachowski
+	<karol.wachowski@linux.intel.com>, Min Ma <mamin506@gmail.com>, Lizhi Hou
+	<lizhi.hou@amd.com>, Andreas Noever <andreas.noever@gmail.com>, "Mika
+ Westerberg" <westeri@kernel.org>, Tomasz Jeznach <tjeznach@rivosinc.com>,
+	Will Deacon <will@kernel.org>, Xinliang Liu <xinliang.liu@linaro.org>, Tian
+ Tao <tiantao6@hisilicon.com>, Davidlohr Bueso <dave@stgolabs.net>, Srujana
+ Challa <schalla@marvell.com>, Bharat Bhushan <bbhushan2@marvell.com>, Antoine
+ Tenart <atenart@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, Raag
+ Jadav <raag.jadav@intel.com>, "Hans de Goede" <hansg@kernel.org>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby
+	<jirislaby@kernel.org>, Andy Shevchenko <andy@kernel.org>, Manivannan
+ Sadhasivam <mani@kernel.org>, Mika Westerberg
+	<mika.westerberg@linux.intel.com>, Andi Shyti <andi.shyti@kernel.org>, Robert
+ Richter <rric@kernel.org>, Mark Brown <broonie@kernel.org>, "Nirmal Patel"
+	<nirmal.patel@linux.intel.com>, Kurt Schwemmer
+	<kurt.schwemmer@microsemi.com>, Logan Gunthorpe <logang@deltatee.com>, Linus
+ Walleij <linusw@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, Sakari
+ Ailus <sakari.ailus@linux.intel.com>, Bingbu Cao <bingbu.cao@intel.com>, Ulf
+ Hansson <ulf.hansson@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Benjamin
+ Tissoires <bentiss@kernel.org>, <linux-input@vger.kernel.org>,
+	<linux-i3c@lists.infradead.org>, <dmaengine@vger.kernel.org>, Philipp Stanner
+	<phasta@kernel.org>, <netdev@vger.kernel.org>, <nic_swsd@realtek.com>,
+	<linux-arm-msm@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+	<linux-usb@vger.kernel.org>, <iommu@lists.linux.dev>,
+	<linux-riscv@lists.infradead.org>, David Airlie <airlied@gmail.com>, Simona
+ Vetter <simona@ffwll.ch>, <linux-cxl@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <platform-driver-x86@vger.kernel.org>,
+	<linux-serial@vger.kernel.org>, <mhi@lists.linux.dev>, Andy Shevchenko
+	<andriy.shevchenko@linux.intel.com>, Jan Dabros <jsd@semihalf.com>,
+	<linux-i2c@vger.kernel.org>, Daniel Mack <daniel@zonque.org>, "Haojian
+ Zhuang" <haojian.zhuang@gmail.com>, <linux-spi@vger.kernel.org>, "Jonathan
+ Derrick" <jonathan.derrick@linux.dev>, <linux-pci@vger.kernel.org>,
+	<linux-gpio@vger.kernel.org>, Mauro Carvalho Chehab <mchehab@kernel.org>,
+	<linux-media@vger.kernel.org>, <linux-mmc@vger.kernel.org>
+Subject: Re: [PATCH 01/37] PCI/MSI: Add Devres managed IRQ vectors
+ allocation
+Message-ID: <20260224162000.000001a5@huawei.com>
+In-Reply-To: <1771860581-82092-2-git-send-email-shawn.lin@rock-chips.com>
+References: <1771860581-82092-1-git-send-email-shawn.lin@rock-chips.com>
+	<1771860581-82092-2-git-send-email-shawn.lin@rock-chips.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500009.china.huawei.com (7.191.174.84) To
+ dubpeml500005.china.huawei.com (7.214.145.207)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	DMARC_POLICY_QUARANTINE(1.50)[huawei.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260583-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[google.com,microchip.com,intel.com,linux.intel.com,kernel.org,bootlin.com,hisilicon.com,huawei.com,marvell.com,lunn.ch,gmail.com,davemloft.net,oss.qualcomm.com,amd.com,rivosinc.com,linaro.org,stgolabs.net,gondor.apana.org.au,linuxfoundation.org,microsemi.com,deltatee.com,arndb.de,vger.kernel.org,lists.infradead.org,realtek.com,lists.freedesktop.org,lists.linux.dev,ffwll.ch,semihalf.com,zonque.org,linux.dev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260584-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_HAS_DN(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jonathan.cameron@huawei.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 40827189AAA
+	RCPT_COUNT_GT_50(0.00)[86];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.953];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,huawei.com:mid,rock-chips.com:email]
+X-Rspamd-Queue-Id: 7EA74189B71
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+On Mon, 23 Feb 2026 23:29:40 +0800
+Shawn Lin <shawn.lin@rock-chips.com> wrote:
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-net/rds: Refactor __rds_conn_create for blocking transport cleanup
+> pcim_alloc_irq_vectors() and pcim_alloc_irq_vectors_affinity() are created for
+> pci device drivers which rely on the devres machinery to help cleanup the IRQ
+> vectors.
 
-The next patch will delegate fanout operations to a background worker,
-which adds cancel_work_sync() to rds_tcp_conn_free(). This is called
-during a connection cleanup and requires an operations to be blocking.
-However, the error path of __rds_conn_create() currently calls
-trans->conn_free() while holding rds_conn_lock (spinlock) and
-rcu_read_lock, which creates an atomic context where cancel_work_sync()
-cannot sleep.
+It might be worth adding some details on why we need the is_msi_managed
+flag in the first place vs just doing conventional devm_add_action_or_reset()
+with pci_free_irq_vectors().
 
-Link: https://ci.syzbot.org/series/1a5ef180-c02c-401d-9df7-670b18570a55
 
-> diff --git a/net/rds/connection.c b/net/rds/connection.c
-> --- a/net/rds/connection.c
-> +++ b/net/rds/connection.c
-> @@ -170,6 +170,7 @@ static struct rds_connection *__rds_conn_create(struct net *net,
->  	struct hlist_head *head = rds_conn_bucket(laddr, faddr);
->  	struct rds_transport *loop_trans;
->  	struct rds_conn_path *free_cp = NULL;
-> +	struct rds_transport *free_trans = NULL;
->  	unsigned long flags;
->  	int ret, i;
->  	int npaths = (trans->t_mp_capable ? RDS_MPATH_WORKERS : 1);
-> @@ -305,7 +306,7 @@
->  	if (parent) {
->  		/* Creating passive conn */
->  		if (parent->c_passive) {
-> -			trans->conn_free(conn->c_path[0].cp_transport_data);
-> +			free_trans = trans;
->  			free_cp = conn->c_path;
->  			kmem_cache_free(rds_conn_slab, conn);
->  			conn = parent->c_passive;
-
-[ ... ]
-
-> @@ -321,18 +322,7 @@
->  		found = rds_conn_lookup(net, head, laddr, faddr, trans,
->  					tos, dev_if);
->  		if (found) {
-> -			struct rds_conn_path *cp;
-> -			int i;
-> -
-> -			for (i = 0; i < npaths; i++) {
-> -				cp = &conn->c_path[i];
-> -				/* The ->conn_alloc invocation may have
-> -				 * allocated resource for all paths, so all
-> -				 * of them may have to be freed here.
-> -				 */
-> -				if (cp->cp_transport_data)
-> -					trans->conn_free(cp->cp_transport_data);
-> -			}
-> +			free_trans = trans;
->  			free_cp = conn->c_path;
->  			kmem_cache_free(rds_conn_slab, conn);
->  			conn = found;
-
-Does this create a use-after-free in other threads that iterate the
-transport list?
-
-Looking at the race-loss path when rds_conn_lookup() finds an existing
-connection, the old code called trans->conn_free() before
-kmem_cache_free(conn). Now the patch defers conn_free() to after
-locks are released at the out: label, but kmem_cache_free(conn) still
-executes inside the critical section (line 327 after this change).
-
-This creates a window where rds_tcp_connection objects remain on
-rds_tcp_conn_list with tc->t_cpath->cp_conn pointing to the
-already-freed conn object.
-
-The timeline would be:
-
-CPU 0 (__rds_conn_create race-loss)
-  spin_lock_irqsave(&rds_conn_lock)
-  found = rds_conn_lookup()  // finds existing conn
-  free_trans = trans
-  free_cp = conn->c_path
-  kmem_cache_free(rds_conn_slab, conn)  // conn freed
-  conn = found
-  spin_unlock_irqrestore(&rds_conn_lock)
-  rcu_read_unlock()
-  // ... later at out: label
-  free_trans->conn_free(...)  // removes tc from list, but too late
-
-CPU 1 (rds_tcp_kill_sock)
-  spin_lock_irq(&rds_tcp_conn_lock)
-  list_for_each_entry_safe(tc, _tc, &rds_tcp_conn_list, t_tcp_node)
-    c_net = read_pnet(&tc->t_cpath->cp_conn->c_net)  // UAF here!
-
-The commit message states "connections that 'lose' the race are safe to
-clean up outside the critical section since they were never added to
-the hashtable, and therefore are inaccessible to other threads."
-
-However, while the rds_connection was never added to the RDS hashtable,
-the transport data (tc) WAS added to rds_tcp_conn_list during
-rds_tcp_conn_alloc(). Looking at that function in net/rds/tcp.c:
-
-rds_tcp_conn_alloc() {
-    // ... allocate tc structures ...
-    spin_lock_irq(&rds_tcp_conn_lock);
-    for (i = 0; i < RDS_MPATH_WORKERS; i++) {
-        tc = conn->c_path[i].cp_transport_data;
-        tc->t_tcp_node_detached = false;
-        list_add_tail(&tc->t_tcp_node, &rds_tcp_conn_list);
-    }
-    spin_unlock_irq(&rds_tcp_conn_lock);
-}
-
-So the tc objects are accessible to other threads via the transport
-list, even though the conn itself never made it into the RDS hashtable.
-
-Functions that iterate rds_tcp_conn_list include:
-- rds_tcp_kill_sock() at net/rds/tcp.c:610
-- rds_tcp_destroy_conns()
-- rds_tcp_sysctl_reset()
-
-All of these dereference tc->t_cpath->cp_conn during iteration.
-
-In the old code, conn_free() ran BEFORE kmem_cache_free(conn), so the tc
-was removed from the list before conn was freed. No UAF window existed.
-
-Could the kmem_cache_free(rds_conn_slab, conn) be moved to after
-conn_free() at the out: label, or should conn_free() be called before
-kmem_cache_free() inside the critical section for the race-loss paths?
-
-> @@ -349,9 +339,23 @@
->
->  out:
->  	if (free_cp) {
-> -		for (i = 0; i < npaths; i++)
-> +		for (i = 0; i < npaths; i++) {
-> +			/*
-> +			 * The trans->conn_alloc call may have allocated
-> +			 * resources for the cp paths, which will need to
-> +			 * be freed before freeing cp itself.  We do this here
-> +			 * after the out: label so it runs outside the
-> +			 * rds_conn_lock spinlock and rcu_read_lock section,
-> +			 * since both destroy_workqueue() and conn_free can
-> +			 * block. The local free_trans pointer is only set in
-> +			 * the race-loss paths where conn_alloc() succeeded.
-> +			 */
-> +			if (free_trans && free_cp[i].cp_transport_data)
-> +				free_trans->conn_free
-> +					(free_cp[i].cp_transport_data);
->  			if (free_cp[i].cp_wq != rds_wq)
->  				destroy_workqueue(free_cp[i].cp_wq);
-> +		}
->  		kfree(free_cp);
->  	}
 
