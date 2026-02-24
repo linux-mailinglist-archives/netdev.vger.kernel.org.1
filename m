@@ -1,182 +1,169 @@
-Return-Path: <netdev+bounces-260269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260270-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qAliAOXsnGnqMAQAu9opvQ
-	(envelope-from <netdev+bounces-260269-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 01:12:21 +0100
+	id 4Ak4EDbtnGnqMAQAu9opvQ
+	(envelope-from <netdev+bounces-260270-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 01:13:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A2D9180268
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 01:12:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 975F0180292
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 01:13:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B7C6030500E1
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:12:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 52652305184F
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:13:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3867170810;
-	Tue, 24 Feb 2026 00:12:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B1994317D;
+	Tue, 24 Feb 2026 00:13:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pcyKdemW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="luKelh3Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15F673EBF08;
-	Tue, 24 Feb 2026 00:12:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02D7F23741
+	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 00:13:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771891938; cv=none; b=gtefHaGEsHi0EGVoQS5JGgOQMlMHwFx4+sAIg9Wf1m/HM8+7RX2nFyydd/Px7Pc5kwe81WqM4YYziy0GDF7qcws1i4j0zSpmWnMvw2UZDSIBkqYyE6dpdX8+kdgR3rh7x8DS85e2ubRR07wvCWKroiapGYIgRdl0/NDxq+VD16U=
+	t=1771892019; cv=none; b=WFPCtCXVTsdm369glcauJeBkamf0E7D1DAbDV//7eF+OWW9ezK82PyML6E7+yJaEYDSuyb6kleLa1YvYz6nxEwVG0AnGern2QWoFsB8TzXZ1eO+vWI7zgzpXA/KOcPI6IYZpy3qkXs1DHSaoadzNDgQmaXwRFzlqshVNHE+YLsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771891938; c=relaxed/simple;
-	bh=9eNhWko4VxFgwbEsqMEAiJBYdT2SfwPPRQqT2fqq1QM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hvlPLqbBcdUMk4syOZ0P9rAXFHACF0d9S0CKBYN+sRcHKj4LfNiLzTMulWnFXDX6pGvDavG65e7xBGSYQk2DK4vk4bAaMZ2HlRJuzQjvfU7P5woT+1/+SNqFs5SR2yN7Juz2TB5Tnoy6YG99p81PzsE4RE/MWWQlt336Ijyp6kU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pcyKdemW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3480C116C6;
-	Tue, 24 Feb 2026 00:12:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771891937;
-	bh=9eNhWko4VxFgwbEsqMEAiJBYdT2SfwPPRQqT2fqq1QM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pcyKdemWEZ3YxPH8/Lv+CtJO9OMxkDDidx5m9D1WiwQALKjC6SKWwWqTQCvvcOOGp
-	 UGjZ7hyca1ZT0Gzs+TolDhzwAXzJLIQYKMZhbYxbV8IP2533aFdc9wbORfbJe4uP85
-	 cj216MUoVZBAwCR4xOrzw86yY/tbm5NcFOHMIpCxtTSusNEivcNtZZ+z9rw0UnHYhj
-	 c2Y6Y5OJsn3r0yQr4sny90jV6Gf1kJLC1RsqYCOmO5wD+9RB83raOc6GgZ2VySaM7a
-	 IPPeUgbBKFcrMFuY9H+ug5hbymvCACeUNsXMm8Re2uPdt03QUCOjpn/QF1YeBmO5bx
-	 6n1BGIIWSYRTQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: bhargava.marreddy@broadcom.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org,
-	michael.chan@broadcom.com,
-	vsrama-krishna.nemani@broadcom.com,
-	ajit.khaparde@broadcom.com,
-	rahul-rg.gupta@broadcom.com,
-	edumazet@google.com,
-	vikas.gupta@broadcom.com,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	rajashekar.hudumula@broadcom.com,
-	horms@kernel.org,
-	linux-kernel@vger.kernel.org,
-	pavan.chebbi@broadcom.com
-Subject: Re: [net-next,3/7] bng_en: add ethtool link settings, get_link, and nway_reset
-Date: Mon, 23 Feb 2026 16:12:02 -0800
-Message-ID: <20260224001201.146384-2-kuba@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260223163641.755200-4-bhargava.marreddy@broadcom.com>
-References: <20260223163641.755200-4-bhargava.marreddy@broadcom.com>
+	s=arc-20240116; t=1771892019; c=relaxed/simple;
+	bh=vQ2hfAh3pnvUs9p2rFL4aZs1O16IU1iCGeQsnn/e5lk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=prUkYJd8ir2j14N0/WGFdG877ZQ3T2JEkG6vaSmku0GctrNyB5+OM4sRhiQSkIO9G7U10BjgmdIF54RL/aqp16yLKTf84+QXfl8gnL98FY28r2QYGrwMFINPeqX7ncx1Z/Yfy2qjkfTxa25KGelhDu5hZR70KYkjHXxJbFpTp0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=luKelh3Q; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1771892017; x=1803428017;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:to:cc;
+  bh=vQ2hfAh3pnvUs9p2rFL4aZs1O16IU1iCGeQsnn/e5lk=;
+  b=luKelh3QjFDBiRkBJXYAC70WuYTHyypBwq7K3VDwUy+EFi31zQAKkcP6
+   vKHEfGEqECfZW5cRBeLjc6rYZBgHT6V7uXFK9PZc9HRAfevCpdAOp7mvd
+   AHezFSXXIsHImRdGbBYGtDXoVGsES3t9hDEAWh5YDmpMnsUO0CfLgoX//
+   606T05u/BB3NmmDxC6lccr1ENHriNWmEf0WC0OqAzksNmUJfkxHTVh+uR
+   eBOYRqficGKAE0Y9iE5l3m5YhqCOCdZzSMjbBfDmXpg05IFpz4AsWS3pi
+   F1G1+Lq026tBnCz1CbyJxMdKHvI5vU64JrFT9qKg3yRDbB0nlcxiFrai2
+   Q==;
+X-CSE-ConnectionGUID: 2TFFVuUNSKCxzGwYvgdiMQ==
+X-CSE-MsgGUID: W1f3Z5+ZRoWsv4UDqKagEw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11710"; a="60476661"
+X-IronPort-AV: E=Sophos;i="6.21,307,1763452800"; 
+   d="scan'208";a="60476661"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2026 16:13:37 -0800
+X-CSE-ConnectionGUID: apw5kpZxRpitfj+5ajSKqA==
+X-CSE-MsgGUID: g0JgzZe0TgiUMVV6aj+sAw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,307,1763452800"; 
+   d="scan'208";a="220284297"
+Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.109]) ([10.166.28.109])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2026 16:13:36 -0800
+From: Jacob Keller <jacob.e.keller@intel.com>
+Date: Mon, 23 Feb 2026 16:12:17 -0800
+Subject: [PATCH] ice: mention fw_activate action along with devlink reload
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260223-jk-improve-fw-update-activate-message-v1-1-ce2b4abcf79f@intel.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2NwQrCMBBEf6Xs2YVuCiL+ingIyVRXaRuyNQql/
+ +7qbR7Mm9nIUBVG526jiqamy+wgh47SPc43sGZnCn049kEGfjxZp1KXBh7f/Co5ruCYVm2/MME
+ suiTDyfuCFLKQb5WKUT//n8t137/Zg3tfdwAAAA==
+X-Change-ID: 20260213-jk-improve-fw-update-activate-message-1382601ec2d1
+To: netdev@vger.kernel.org, 
+ Intel Wired LAN <intel-wired-lan@lists.osuosl.org>, 
+ Anthony Nguyen <anthony.l.nguyen@intel.com>
+Cc: Jacob Keller <jacob.e.keller@intel.com>, 
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>
+X-Mailer: b4 0.15-dev-cf6a8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1920;
+ i=jacob.e.keller@intel.com; h=from:subject:message-id;
+ bh=vQ2hfAh3pnvUs9p2rFL4aZs1O16IU1iCGeQsnn/e5lk=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhsw5b3U2lehp67YvmvOm9aHFFW/vmTc3xeYvOhJad/3sl
+ Z2/j0e3d5SyMIhxMciKKbIoOISsvG48IUzrjbMczBxWJpAhDFycAjARNg+GvxLv51TPKGM6FsLH
+ bKevf1yuP1SznUHyYt6W2d8bXHsy4hgZvrxwVM5hE4hef+rdv6xLJ8S19zhEv6h/w7dA6tOahG4
+ bDgA=
+X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
+ fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-260269-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-260270-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: 4A2D9180268
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim,intel.com:email]
+X-Rspamd-Queue-Id: 975F0180292
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+The ice driver reports a helpful status message when updating firmware
+indicating what action is necessary to enable the new firmware. This is
+done because some updates require power cycling or rebooting the machine
+but some can be activated via devlink.
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+The ice driver only supports activating firmware with the specific action
+of "fw_activate" a bare "devlink dev reload" will *not* update the
+firmware, and will only perform driver reinitialization.
+
+Update the status message to explicitly reflect that the reload must use
+the fw_activate action.
+
+I considered modifying the text to spell out the full command, but felt
+that was both overkill and something that would belong better as part of
+the user space program and not hard coded into the kernel driver output.
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 ---
-bng_en: add ethtool link settings, get_link, and nway_reset
+ drivers/net/ethernet/intel/ice/ice_fw_update.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This commit adds get/set_link_ksettings, get_link, and nway_reset
-support. It also adds reporting for supported, advertised, and
-link-partner speeds across NRZ, PAM4, and PAM4-112 signaling modes,
-and enables lane count reporting.
+diff --git a/drivers/net/ethernet/intel/ice/ice_fw_update.c b/drivers/net/ethernet/intel/ice/ice_fw_update.c
+index 973a13d3d92a..1f35bb9314cc 100644
+--- a/drivers/net/ethernet/intel/ice/ice_fw_update.c
++++ b/drivers/net/ethernet/intel/ice/ice_fw_update.c
+@@ -726,7 +726,7 @@ static int ice_finalize_update(struct pldmfw *context)
+ 	switch (priv->reset_level) {
+ 	case ICE_AQC_NVM_EMPR_FLAG:
+ 		devlink_flash_update_status_notify(devlink,
+-						   "Activate new firmware by devlink reload",
++						   "Activate new firmware by devlink reload action fw_activate",
+ 						   NULL, 0, 0);
+ 		break;
+ 	case ICE_AQC_NVM_PERST_FLAG:
 
-> diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_link.c b/drivers/net/ethernet/broadcom/bnge/bnge_link.c
-> index bff04dfadaca..f037229db7b4 100644
-> --- a/drivers/net/ethernet/broadcom/bnge/bnge_link.c
-> +++ b/drivers/net/ethernet/broadcom/bnge/bnge_link.c
+---
+base-commit: 37a93dd5c49b5fda807fd204edf2547c3493319c
+change-id: 20260213-jk-improve-fw-update-activate-message-1382601ec2d1
 
-[ ... ]
+Best regards,
+--  
+Jacob Keller <jacob.e.keller@intel.com>
 
-> +enum bnge_link_speed_indices {
-> +	BNGE_LINK_SPEED_UNKNOWN = 0,
-> +	BNGE_LINK_SPEED_50GB_IDX,
-> +	BNGE_LINK_SPEED_100GB_IDX,
-> +	BNGE_LINK_SPEED_200GB_IDX,
-> +	BNGE_LINK_SPEED_400GB_IDX,
-> +	BNGE_LINK_SPEED_800GB_IDX,
-> +	__BNGE_LINK_SPEED_END
-> +};
-
-[ ... ]
-
-> +static const u16 bnge_nrz_speed_masks[] = {
-> +	[BNGE_LINK_SPEED_100GB_IDX] = BNGE_LINK_SPEED_MSK_100GB,
-> +	[__BNGE_LINK_SPEED_END - 1] = 0 /* make any legal speed a valid index */
-> +};
-> +
-> +static const u16 bnge_pam4_speed_masks[] = {
-> +	[BNGE_LINK_SPEED_50GB_IDX] = BNGE_LINK_PAM4_SPEED_MSK_50GB,
-> +	[BNGE_LINK_SPEED_100GB_IDX] = BNGE_LINK_PAM4_SPEED_MSK_100GB,
-> +	[BNGE_LINK_SPEED_200GB_IDX] = BNGE_LINK_PAM4_SPEED_MSK_200GB,
-> +	[__BNGE_LINK_SPEED_END - 1] = 0 /* make any legal speed a valid index */
-> +};
-> +
-> +static const u16 bnge_nrz_speeds2_masks[] = {
-> +	[BNGE_LINK_SPEED_100GB_IDX] = BNGE_LINK_SPEEDS2_MSK_100GB,
-> +	[__BNGE_LINK_SPEED_END - 1] = 0 /* make any legal speed a valid index */
-> +};
-> +
-> +static const u16 bnge_pam4_speeds2_masks[] = {
-> +	[BNGE_LINK_SPEED_50GB_IDX] = BNGE_LINK_SPEEDS2_MSK_50GB_PAM4,
-> +	[BNGE_LINK_SPEED_100GB_IDX] = BNGE_LINK_SPEEDS2_MSK_100GB_PAM4,
-> +	[BNGE_LINK_SPEED_200GB_IDX] = BNGE_LINK_SPEEDS2_MSK_200GB_PAM4,
-> +	[BNGE_LINK_SPEED_400GB_IDX] = BNGE_LINK_SPEEDS2_MSK_400GB_PAM4,
-> +};
-
-Is the missing sentinel entry here intentional? The bnge_pam4_speeds2_masks
-array has its highest initializer at BNGE_LINK_SPEED_400GB_IDX (4), making
-it 5 elements long (indices 0-4). However, bnge_set_ethtool_speeds loops
-'for (i = 1; i < __BNGE_LINK_SPEED_END; i++)' which reaches i = 5
-(BNGE_LINK_SPEED_800GB_IDX). When BNGE_PHY_FL_SPEEDS2 is set, sp_pam4_msks
-points to bnge_pam4_speeds2_masks, causing sp_pam4_msks[5] to read past
-the array end. All other speed mask arrays include
-'[__BNGE_LINK_SPEED_END - 1] = 0' to prevent this.
-
-> +
-> +static const u16 bnge_pam4_112_speeds2_masks[] = {
-> +	[BNGE_LINK_SPEED_100GB_IDX] = BNGE_LINK_SPEEDS2_MSK_100GB_PAM4_112,
-> +	[BNGE_LINK_SPEED_200GB_IDX] = BNGE_LINK_SPEEDS2_MSK_200GB_PAM4_112,
-> +	[BNGE_LINK_SPEED_400GB_IDX] = BNGE_LINK_SPEEDS2_MSK_400GB_PAM4_112,
-> +	[BNGE_LINK_SPEED_800GB_IDX] = BNGE_LINK_SPEEDS2_MSK_800GB_PAM4_112,
-> +};
--- 
-pw-bot: cr
 
