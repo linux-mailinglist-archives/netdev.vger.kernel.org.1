@@ -1,156 +1,293 @@
-Return-Path: <netdev+bounces-260349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260350-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oJscLxpEnWkMOAQAu9opvQ
-	(envelope-from <netdev+bounces-260349-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 07:24:26 +0100
+	id YPrlCmNEnWkMOAQAu9opvQ
+	(envelope-from <netdev+bounces-260350-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 07:25:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C05418263F
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 07:24:26 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 954E4182672
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 07:25:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E6AAA304E330
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 06:24:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C101F30A009F
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 06:24:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 359642DB783;
-	Tue, 24 Feb 2026 06:24:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4972F2EC086;
+	Tue, 24 Feb 2026 06:24:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="JOaL5E3R"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MYv+6rOx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 134653EBF1A;
-	Tue, 24 Feb 2026 06:24:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771914255; cv=none; b=ll4WtdSne9Iwsa6F//KocZu9LY95W7LIdGMFUPkoo1gztwtmqWZ6RctN4ObDgU58miNbcl1feFUlkTTHJ04LjZNQ26YwEFV2VawT3rUoQ/72tpw3EL5KEkDib9GrYvPEq0OTUCUQ7+G7LIZ5BYgm/07yaPzWboq6ckTQQmosCqc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771914255; c=relaxed/simple;
-	bh=nKLnHTavugGbir7CER2T7zO2lMEVl9bwHIddpa2F5ng=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FQ4cYyRX6BcFgAtC10tg+WhVppZI01iRDxtqc5iJnOrXO3iDv6OO22Id4c+c2C4J5PK9jEw3ctapwRWiZnQd9A99w9CkDoUQDQ/AmRKlm55On+pqVeuixhjWZPaXWui1eiwcgevhG2PfmhguJXK9yPLDe6MNn7TNKVuDcTLz8NU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=JOaL5E3R; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61NH0C2B4068859;
-	Mon, 23 Feb 2026 22:24:06 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=yQ87mrpjiyT3jYubyaOk+T3Ay
-	nnl5M7ryJPNqTqcMPM=; b=JOaL5E3RNRnLli8slTDmW58KHujrxPsuxHlWGu7X7
-	p9RUrbnoFIy3SCDgK9BP+xgw8qKQ6I/J1qoxf7MG2wuJZ2pmBAhGfqhm/tBWPpsQ
-	yt61+D2n5KnqGbFNVIyq6Ape1hqlPeKsWOiqB6txGy68zgONyNMukJpNsoUuX+P4
-	eptYZOI1iYuMDXpP5glqTGSKZyXRdGOn0EPY1R3v7RHw75otShHWB2gD2bp0L6O/
-	ER3Xt0x2Ni+WFeHKHnN3n9VvmyTyUtxv1mNtMRu6EE1lhnB0CzSY9cdcA668v1sS
-	tllX3Ca1WXN/qU+xR37D1xCzTOWY5tHrQCN6UZqWKXs6Q==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4cg1ubbys3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 23 Feb 2026 22:24:05 -0800 (PST)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 23 Feb 2026 22:24:04 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Mon, 23 Feb 2026 22:24:04 -0800
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id 9C9553F7099;
-	Mon, 23 Feb 2026 22:24:01 -0800 (PST)
-Date: Tue, 24 Feb 2026 11:54:00 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <edumazet@google.com>, <sgoutham@marvell.com>, <andrew+netdev@lunn.ch>,
-        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <sumang@marvell.com>,
-        <sbhatta@marvell.com>, <davem@davemloft.net>
-Subject: Re: [net-next,v8,10/13] octeontx2-af: npc: cn20k: Allocate MCAM
- entry for flow installation
-Message-ID: <aZ1EAJN7tDu-xPl9@rkannoth-OptiPlex-7090>
-References: <20260202074607.2535569-11-rkannoth@marvell.com>
- <20260205022527.2271205-1-kuba@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF2B1E3DF2
+	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 06:24:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771914285; cv=pass; b=qlndMAmavqd+9MMgxgclBXPOIuV3cdOaRNSLXme9IepnRJx7FnDPFGv+hF+vPMxWGNXqhhd2uMukTsMp4ECOhVXGlFxZIMoQbtfN6OKk77DBrNbkN14gbJJMt3Rck5FTBgFiV4070iTUr6HTQfO6uBAkdCSb3QWhbTrub+EaQ8U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771914285; c=relaxed/simple;
+	bh=IaAhbhRoCvkWl0UyC5c8VQLdocDUvPdXplhtBtmtAzs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=S6vcT50SqCoKf+uTZUytG7kLM5nM24RywpkjT2RN+C7J6QHGJachIeHjwVaWNWvO367zIS7oWFTZf2kEi9gzdclypJuVwOnOZa+sFYvHFRxTSyVFMCrerRgX+ONZnvD9ddJbgt5CV9KJIBtcqTW/D/NmjgII3oFaM7M4U0tfKyc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MYv+6rOx; arc=pass smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-59e60b3ccdfso6722096e87.0
+        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 22:24:43 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771914282; cv=none;
+        d=google.com; s=arc-20240605;
+        b=BL+/XqUx4ivJpEm3EcTVEq1yIhvVKKnKIi2kiEWjK7JBepZkibmCBhgum1Uz+FkVzN
+         xjDrSz2QeD4cK4UWIUvXI0qSmu7Gd/5WdA+QlpnKszUapmqXZdy7IU7f6f0t1J/Rxz6P
+         pKGZDfQaTuiYxQ/VNMpCUGEaDulXqBjeQo+3lKNQtTqejG+Ts+b1U2Pp3BZWvCIOx7+q
+         XW7uIXmfixV17c4Z5J11c1rXr+HWa/sJv1fMF8sxqKkN1jYbQ1aFSSaNsHxafD7zCtqA
+         6mnvWnSMvQgaxHQ6XVYgdU4E2pi/VaA0BesGGLSDBBMWsQsh+4r8ZDFKju7jrApIl8O4
+         9UTA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=7oJ5GOxJ9TP46UdtyKVnxV3J3bF2609kJGJegH4bMEk=;
+        fh=iimxS/toxw1tqakfW7lgDLfbqHnkLGiu5BceWk1v/ZM=;
+        b=DXrnRcBB7/feqHh2BPe39IDvBy4PnNDb7HU+KZFGgaHmB014t66eJFzWkPnRdlB1uE
+         jdD/020FQ9k+iEONAZ7QXMqm3XCXPW/uNbZglwtJtWii/zIYHPyFV4sPdVRyJzuiIsV3
+         Mu4njLdL6Qp2ss5nWezREVdlsG2FN62coEa2dLoWS2vWK62RCswYNgRGx1ZwXHrIzAhX
+         fyXLIpgeG9VViGmiLnXBO+/kqkGqQDXRXdxdD2KhrlPEvJN3JAFmXMiK8l7qSdvdkBZV
+         4lj44mvcn+xSHoUw6ohtgGvHf/lCxowmzjyE+2NssHRL1n58yIsgfwL+oJ5qdLIedt/p
+         Jqmw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771914282; x=1772519082; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7oJ5GOxJ9TP46UdtyKVnxV3J3bF2609kJGJegH4bMEk=;
+        b=MYv+6rOx3I5Y/oiGomWKOU8dLC0a1q787xFq9Bo2A4IP4Sgcdlpwi/OAMLDxiJu/XL
+         J+PyLC2miaybkrmYvnaUcAWaIu04ZMhVQvUWT+wb+8ry6JBECXVi5L5La6LuLcyskOVi
+         1tZdVcuFGDVPF8u05e+Q0pHAhaWDKSdBCcSm38l8rUSXiqR1v+0ojw1aTIiqIxtm3J5E
+         YrtIvFVWX7qUff3rFHgppL0vJFToQC0zML43UFskWVvM34GAaUAQzpMQ5awe6Lin2kwk
+         fvlguAOHxS3hVPaFlR7rn+TfC8TlabEBi7ngFnJrnumHEGCpdbrCBB0yMsgT7fHh+veR
+         de3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771914282; x=1772519082;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=7oJ5GOxJ9TP46UdtyKVnxV3J3bF2609kJGJegH4bMEk=;
+        b=ftVXlCONpqNyLVG8WL9sc7ljOh45/gSw5pbZJjWZgcuZbx7keYnWutZaCVWdHJ5jLK
+         Dwzm/vvw35KirzDUXd9U1Q3Ay5m+7TS39izJRLxAAWNlIX9tv+BawnYeXZbl4OuEM1Ec
+         8iviPChxPstKQ3Y02/t2PMOtVt4aW4bfmUZd3bvq0WU7DBHD3CsBm515wefyZHfdlHp8
+         19bSQPEc/JmEPpcaYf8SzH3Fmi125EaRshRn6/72frXRGNrjZjLx8ejVh9245NLXIa/i
+         H7jtxOnbYqPbwS4fhKuAOK85pC0afuSLjdZZ6JYpdeavoicIfQE6tKmxg2pZ4eTkh29n
+         osag==
+X-Gm-Message-State: AOJu0YyTYcKHA2tSdT153k6F/b6qUgsHLWpLfrdMl0ldIY1umtommb9v
+	ldyAQiwG1jU0JNzQ9J2VQ7cwEF2BrKqiIGF32m2/9C4Wl5WIvUZwtePbuQ7KTgQmBNVPg7m1fG8
+	4R6z8lTQJSUz6RL13X4U5gSNkwZ2513rAOBJJFqI=
+X-Gm-Gg: ATEYQzyH6gKoiiQCkxdD7YMwTBFGdKW/F+vpsUm3kX5t0nwwbrZOlXPsCe5e86p/vth
+	NjdkW+hvk0bfrSLk4k4LfDceWxp3Pv0qc4aRu4S8ufZbm64HA3z6xIoqQaRJSOkHYXqbGnq61ow
+	6NAIWMxAKVkRKHQPFgS6owEW04dpXBcFu/wk/NDqT/hA4TuVGIDf7EaPVfdnJdD+60AX9f1JPxR
+	A01CYX6MV2AGNFgmB5CQ1x1BeKrZja1kyXgd668ToadjI2TwzW7NV1V2YyKArWVNV/4D8e8hN5M
+	jasGnrX3
+X-Received: by 2002:a05:6512:1306:b0:59f:6c48:8d9b with SMTP id
+ 2adb3069b0e04-5a0ed9a1abamr3876884e87.34.1771914281170; Mon, 23 Feb 2026
+ 22:24:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260205022527.2271205-1-kuba@kernel.org>
-X-Authority-Analysis: v=2.4 cv=P7Y3RyAu c=1 sm=1 tr=0 ts=699d4406 cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=kj9zAlcOel0A:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=TtqV-g6YmW1Jfm2GSLaY:22 a=VwQbUJbxAAAA:8
- a=BwxlUtVFPHS1Afr9MAEA:9 a=CjuIK1q_8ugA:10 a=lhd_8Stf4_Oa5sg58ivl:22
-X-Proofpoint-ORIG-GUID: z_J5ehGgnZkkTwWFEIs8Obxz2u6LKu0f
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI0MDA1MyBTYWx0ZWRfXwu9t7G+kIWHa
- XMUee1+rJGLIHWSjGuRR4DZsXQaHWMvviwMa5n1OyjRIXvi45utWODzMhN31YLlvQk2O+GVec+Y
- yFB5xmXW3WyvKvw5xFGhMYs62/ujlXvOwS8bOB502Uoi4ZSe6LYr5xsi3HTMaEQelJ4pC2Kfq9u
- RduAwkKGnTBuTMxZlqAosgjKnVHqNHkcueMozAZpoHgAYP6tXyE9R0MI5zeg4hT0YuuZ7DT7bTw
- L4JfSvjV42pxybTMjOu65+qpKDihdK5nXNao32M/s2ASKD/0Ihk6XpefGmLevCM0K7SCAXb8MCQ
- rlYGhHlplUdDZ6LYOpicqTQ9Jwo9E9QaM/ynQ+k9M8UgH/dWh2z7sLu+96RoKRyBP4qd7u6LvI/
- kg4x8FXOrD5j9CzGyQJZyWeE+HOpUtBoSiVw8mUtWc3hwU7EZTFBl7URZ0mG+jr1LlMmXcwP8pb
- KnZxVenHfs+lT1SjVKw==
-X-Proofpoint-GUID: z_J5ehGgnZkkTwWFEIs8Obxz2u6LKu0f
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-23_06,2026-02-23_03,2025-10-01_01
+References: <e8355c0d7fd48981ba505e455387971f91210fa8.1771734206.git.tonghao@bamaicloud.com>
+ <CAL+tcoDR2-WTmhBakWcvEuLCwAU7RGRA8syfor-+RJJq7_ZOKw@mail.gmail.com>
+ <65307E32-7AFF-44EF-B2BB-89AA15F3D0D1@bamaicloud.com> <CAL+tcoB0uV0E9cDCfw58kAuzNcanstx_OT3h=dkQVOW1b-nN+A@mail.gmail.com>
+ <C914CAC5-AEF2-4814-84FC-30EA4B70F832@bamaicloud.com> <CAL+tcoDzik63K1aqpDTn7K6Jkta5ZtjedTQ58TB455+pwkq8Pw@mail.gmail.com>
+ <3AB6E925-3A2E-439D-8432-B00F4DEFE7F1@bamaicloud.com>
+In-Reply-To: <3AB6E925-3A2E-439D-8432-B00F4DEFE7F1@bamaicloud.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 24 Feb 2026 14:24:03 +0800
+X-Gm-Features: AaiRm53UuLFCmbRGEGOa_dBHEdx0vwsyZo3XAPoq2nQTssw-b4uMSjOTaphDY2A
+Message-ID: <CAL+tcoD+TL6xbTodAKp=w0NVeLOubxoJpk=-b_8Z0bPvFrzXCQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: core: introduce the netdev_fetch_core_stats()
+To: Tonghao Zhang <tonghao@bamaicloud.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Samiullah Khawaja <skhawaja@google.com>, 
+	Alexander Lobakin <aleksander.lobakin@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260349-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,marvell.com:dkim];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_FROM(0.00)[bounces-260350-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 3C05418263F
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,fomichev.me:email,mail.gmail.com:mid,bamaicloud.com:email]
+X-Rspamd-Queue-Id: 954E4182672
 X-Rspamd-Action: no action
 
-On 2026-02-05 at 07:55:27, Jakub Kicinski (kuba@kernel.org) wrote:
-> >  	cn20k_wreq.hw_prio = req->hw_prio;
-> > +	cn20k_wreq.req_kw_type = req->req_kw_type;
+On Tue, Feb 24, 2026 at 2:08=E2=80=AFPM Tonghao Zhang <tonghao@bamaicloud.c=
+om> wrote:
+>
+>
+>
+> > On Feb 24, 2026, at 13:28, Jason Xing <kerneljasonxing@gmail.com> wrote=
+:
 > >
-> >  update_rule:
+> > On Tue, Feb 24, 2026 at 12:07=E2=80=AFPM Tonghao Zhang <tonghao@bamaicl=
+oud.com> wrote:
+> >>
+> >>
+> >>
+> >>> On Feb 24, 2026, at 11:52, Jason Xing <kerneljasonxing@gmail.com> wro=
+te:
+> >>>
+> >>> On Tue, Feb 24, 2026 at 11:22=E2=80=AFAM Tonghao Zhang <tonghao@bamai=
+cloud.com> wrote:
+> >>>>
+> >>>>
+> >>>>
+> >>>>> On Feb 23, 2026, at 08:20, Jason Xing <kerneljasonxing@gmail.com> w=
+rote:
+> >>>>>
+> >>>>> On Sun, Feb 22, 2026 at 12:38=E2=80=AFPM Tonghao Zhang <tonghao@bam=
+aicloud.com> wrote:
+> >>>>>>
+> >>>>>> Network device statistics retrieved via procfs, sysfs, and netlink
+> >>>>>> represent the combined total of core_stats + driver, hardware stat=
+istics.
+> >>>>>>
+> >>>>>> However, in some scenarios, when monitoring netdev metrics, it is =
+valuable
+> >>>>>> to clearly distinguish whether the values originate from the netwo=
+rking
+> >>>>>> stack's core statistics or from the driver, hardware layer. This h=
+elps
+> >>>>>> improve debugging and addressing issues.
+> >>>>>>
+> >>>>>> Approaches were considered:
+> >>>>>> - commit 5247dbf16cee ("net/core: Introduce netdev_core_stats_inc(=
+)").
+> >>>>>> This allows tracking increments to core_stats and helps identify s=
+pecific
+> >>>>>> causes of changes, but not provide the total counters.
+> >>>>>> - extending rtnl_link_stats64 with new core_xxx fields.
+> >>>>>> This would likely confuse or break existing userspace applications=
+ relying
+> >>>>>> on this struct.
+> >>>>>> - adding a tracepoint inside dev_get_stats().
+> >>>>>> This implementation is not simple or straightforward enough.
+> >>>>>>
+> >>>>>> The solution in this patch is therefore to introduce a new dedicat=
+ed function
+> >>>>>> for collecting core statistics and mark it noinline. This approach=
+ is simple,
+> >>>>>> clean, and maintainable to obtain driver, hardware statistics sepa=
+rately when needed.
+> >>>>>>
+> >>>>>> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
+> >>>>>> Cc: "David S. Miller" <davem@davemloft.net>
+> >>>>>> Cc: Eric Dumazet <edumazet@google.com>
+> >>>>>> Cc: Jakub Kicinski <kuba@kernel.org>
+> >>>>>> Cc: Paolo Abeni <pabeni@redhat.com>
+> >>>>>> Cc: Simon Horman <horms@kernel.org>
+> >>>>>> Cc: Stanislav Fomichev <sdf@fomichev.me>
+> >>>>>> Cc: Kuniyuki Iwashima <kuniyu@google.com>
+> >>>>>> Cc: Samiullah Khawaja <skhawaja@google.com>
+> >>>>>> Cc: Ahmed Zaki <ahmed.zaki@intel.com>
+> >>>>>> Cc: Alexander Lobakin <aleksander.lobakin@intel.com>
+> >>>>>
+> >>>>> It's a simple refactor patch that only moves that logic to a new
+> >>>>> helper. I don't see any new possible callers right now so could you
+> >>>>> provide more straightward/clear use cases and intentions behind thi=
+s
+> >>>>> patch? For example, give us what kind of dumping stats you want to
+> >>>>> tweak and your next movements.
+> >>>> Thanks, Jason
+> >>>> This patch tries to add one helper function which marked as noinline=
+ for bpf tracing (this commit 5247dbf16cee also use the noinline for tracin=
+g). This helper is not used other place in kernel.
+> >>>>
+> >>>> For example,
+> >>>> sudo bpftrace -e '
+> >>>> kprobe:netdev_core_stats_fetch {printf("%d\n", ((struct rtnl_link_st=
+ats64 *)arg1)->rx_dropped);}
+> >>>> kretprobe:netdev_core_stats_fetch {printf("%d\n", ((struct rtnl_link=
+_stats64 *)retval)->rx_dropped);}
+> >>>> '
+> >>>
+> >>> Can't we use the global symbol dev_get_stats() instead? It should be =
+the same.
+> >>
+> >> - if kprobe the dev_get_stats(), the rtnl_link_stats64 *storage is not=
+ used by drivers (ndo_get_stats64, ndo_get_stats..,), the rx_dropped, for e=
+xample, is 0.
+> >
+> > How about computing the delta of @storage->xxx between two consecutive
+> > kretprobes hitting this function? And you can also identify the source
+
+two consecutive __kretprobes__...
+
+> > of @storage as you hope.
+> >
+> >> But kprobe the new helper netdev_core_stats_fetch(), the data is from =
+drivers.
+> >> - if kretkprobe the dev_get_stats(), the rtnl_link_stats64 * retval is=
+ sum of counter from driver and core_stats. This data is same as kretprobe =
+the netdev_core_stats_fetch().
+> >
+> > Sorry, I see no difference before/after your patch. The @storage is
+> > always initialized within dev_get_stats(), so how would it be
+> > different with your patch applied?
+> If tracing the dev_get_stats() with kprobe and kretprobe,
+> sudo bpftrace -e '
+>   kprobe:dev_get_stats {printf("%d\n", ((struct rtnl_link_stats64 *)arg1)=
+->rx_dropped);} // the @arg1 is not initialized by dev_get_stats() now
+>   kretprobe:dev_get_stats {printf("%d\n", ((struct rtnl_link_stats64 *)re=
+tval)->rx_dropped);} // the @retval is rtnl_link_stats64 *, which rx_droppe=
+d =3D rx_dropped of drivers + rx_dropped of core_stats
+> =E2=80=98
+> The delta makes no sense.
+
+Please look at the last reply, especially the highlighted part. I
+meant every time the function gets called, you can always use
+kretprobe to read any information and then do the math you want.
+
+Thanks,
+Jason
+
 >
-> Looking at npc_install_flow(), req->req_kw_type is copied to
-> cn20k_wreq.req_kw_type, but is req->req_kw_type ever initialized with the
-> computed kw_type value?
->
-> In rvu_mbox_handler_npc_install_flow(), the function
-> rvu_npc_alloc_entry_for_flow_install() computes the correct kw_type based
-> on the flow requirements and stores it in the local variable 'kw_type' at
-> line 1746. However, this computed value is never assigned to
-> req->req_kw_type before calling npc_install_flow() at line 1887.
->
-> As a result, npc_install_flow() uses either a zero-initialized value or
-> whatever the PF driver sent, instead of the AF-computed value. This seems
-> inconsistent with the commit message stating "the AF driver determine the
-> required NPC MCAM entry type." The incorrect req_kw_type is then passed to
-> npc_cn20k_config_mcam_entry() which uses it for hardware configuration
-> mismatch handling in npc_cn20k_config_kw_x2() at lines 956-960.
-req->req_kw_type is used for different purpose. I believe, this comment is invalid.
+> With this patch
+> sudo bpftrace -e '
+>   kprobe:netdev_core_stats_fetch {printf("%d\n", ((struct rtnl_link_stats=
+64 *)arg1)->rx_dropped);} // @arg1 is initialized by drivers, e.g. ndo_get_=
+stats64, ndo_get_stats.
+>   kretprobe:netdev_core_stats_fetch {printf("%d\n", ((struct rtnl_link_st=
+ats64 *)retval)->rx_dropped);} // the @retval is rtnl_link_stats64 *, which=
+ rx_dropped =3D rx_dropped of drivers + rx_dropped of core_stats
+> =E2=80=98
+> So when kprobe:netdev_core_stats_fetch, the @storage is from driver, e.g.=
+ ndo_get_stats64, ndo_get_stats.  The delta (core_stats) is @retval - @arg1
 
