@@ -1,187 +1,155 @@
-Return-Path: <netdev+bounces-260305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260306-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sAwdJjcHnWk7MgQAu9opvQ
-	(envelope-from <netdev+bounces-260305-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 03:04:39 +0100
+	id gCUMFx4InWk7MgQAu9opvQ
+	(envelope-from <netdev+bounces-260306-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 03:08:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B40E180CF6
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 03:04:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFC14180D56
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 03:08:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C93D7309B4DC
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 02:03:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E6DA630D819C
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 02:07:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 584C8223DE7;
-	Tue, 24 Feb 2026 02:03:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39C3E23ABA7;
+	Tue, 24 Feb 2026 02:07:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jvKXRBEN"
+	dkim=pass (1024-bit key) header.d=smail.nju.edu.cn header.i=@smail.nju.edu.cn header.b="MK44GgvB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE08E1DB356
-	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 02:03:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8819F207A20;
+	Tue, 24 Feb 2026 02:07:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771898626; cv=none; b=IgkPe5WIuC1K10XcnGSCNAvfoQq7/UHKER2OhZkCjAkzXGZG3PDAOa5SdG0s8px9GceHak260MRDan3Y3uQzq7J/YN/hRL6iUHCmifJxWZwm5mCxrryeJw0uwtdfx44R/hm26+xpisfr3xOTnL6U+/eRXaW2mzAy6Zdm2RuMN9E=
+	t=1771898870; cv=none; b=nb3beG434/LPAVtMTbTES3INqs1zlnuFCW76HTae/SRyMXSIWzuuAGNosZVWBFvGy14hHtJ4MGq4aAcal0IGEUSiWF+4bZ2S3zXfdD0erWyfJQsT0O/1iniXssiyYeGG5t7bFxTKkudD4tkUpKx/v4Pc43jXqlJJxiZ+KU/N3uM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771898626; c=relaxed/simple;
-	bh=TKAynUsDa0pnQZal2qOyqmI9x6RBTolrQrFDfPI9WLA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=MngyCp4ncg4eLEpgDIvCWFwogJcOu4vRNXQXFjPOpXrEBtxV/p0gg7g50pXRJiVhQebDuqXvyBWsWw7usSu7FCjsX6c3AWpHcsMwHUKwDnhHFQhJHFUtQIW958iwSdLdDTAuv2V1Fnne9Gl5jjSMHZzXr9EVb5H6bHB1Z3vRmBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jvKXRBEN; arc=none smtp.client-ip=209.85.128.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-7927261a3acso44508327b3.0
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 18:03:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771898623; x=1772503423; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=TrYAc39sTLZZ9Y3u2dhcPCilxry9QSJbAenHU8ouVoA=;
-        b=jvKXRBENuyNIfC1BtgOyyfPT8ep6XJH30KQzl8YQPMln+oiV/KCdVkj7e3mLKcXPDQ
-         wr1yVTbQhg4JfWeuH5dfT2M67cFQQjxYL2NgircXFnx3Z6ciYcNcBVqtjMpmPtW74JPA
-         eJzf6iNsTvCXvLiAEI/Rnk2MzPTiT+FVMhvfYkThJX83coSJx+XtbkaIc8KqnXeel9Vr
-         8hHq9C0rcRnb6N4MUgexxAh3Lk6HZ7Kw2V/pFDnwGlrZGHbf3BD/UlU34rdnkQCn9S0+
-         Gj9X8vcwuksyHxZ/3vjHYCZV3iVAsF7Jolvvz/+2XkJnOLvwc9ZdJVD7gxS16RwbmcqO
-         Rt0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771898623; x=1772503423;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TrYAc39sTLZZ9Y3u2dhcPCilxry9QSJbAenHU8ouVoA=;
-        b=ha4+EIKA5r3aUIs9nOqOeC1FlnahlNla3HTT0H49Te2W89kvPETIl8s/fPu7rPTSjO
-         zKLiTQHOnipxFIE0rm7Vqh5rGeLwUoYdPoMEE5cH4d9zloG+hCQsUeQ4Y3mwzbl3pUfU
-         CVvna7UqfDE3RHG1D7kWfSKh20cTfyr+/bTkQtuBJI2wlAib4nWvZ5JAR/agejEivhsB
-         kWgvDDQqoHgA+jsWNuXYqnGp9xf8hdXSHPsxN9hrAYPoSNeQwxEcnZLfklXqgwZ88yYR
-         PSwMtBYhohg1+aGpQRQtGhbup4UksSjMfGonzZKJiJiSqFwLXT999INl3UZtd8QKU/dd
-         Kzvw==
-X-Gm-Message-State: AOJu0YyoiEGoArD4R5Pf9EvuTP3BkjsnQRtLsGffhdCw7mygOqYRmL9C
-	Ljg1TZkoiolhaiUPoyjpqoLgqkUMONqtUtdqI05HhwP8h83HiaOe0GY0
-X-Gm-Gg: ATEYQzxtrZefWZhk4aE6hVtCcosaHIuLjI9oSEV4T6rrU1D4rsYqB9SfNOAyr7hAv8H
-	649ldbULXf3m5kEU2qaHWQA97pGNOGSygKjX6A1/SB8br7ADnAT6ZpE4wMLPxDRWUpnrGPGxDIw
-	/GXShtYZmTneWYHLwpuMrWpQORoNBAAlI5R0jxdfhUWDuZU8cJBe9uQ5zUR9BjMKyFtXIVmaW8/
-	Nf3Qh44UF6Asuo2zaMFq2P+xM32yDLCmru8vF8ZI58lAoVQbF2zWca/ucQRAHQzQ2mE3glOKBK3
-	13kil4upkaUn7H1XRcZWouIaSPKziC0VvUukC7pIWgMGTCmgRltCiURIrNE+nKUCEUtfOgM+OfB
-	m5+I7unQK5OD2v0YC1osHZJvPSJcTyr25uC6YhHgWFphq7Ir63S1C3jYs0vgXjFwktHM9EShVBW
-	8hBOhTybnA7zOrKEgm0kYO
-X-Received: by 2002:a05:690c:4d84:b0:795:1d73:4d7d with SMTP id 00721157ae682-79828cf8430mr99001887b3.12.1771898622979;
-        Mon, 23 Feb 2026 18:03:42 -0800 (PST)
-Received: from localhost ([2a03:2880:25ff:4::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7982dbd8207sm39043487b3.19.2026.02.23.18.03.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Feb 2026 18:03:42 -0800 (PST)
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Date: Mon, 23 Feb 2026 18:03:36 -0800
-Subject: [PATCH net] net: devmem: use READ_ONCE/WRITE_ONCE on binding->dev
+	s=arc-20240116; t=1771898870; c=relaxed/simple;
+	bh=FtO3wZJ5gAFHP8d/P/PrXYh9573Wu71WSSIUXMIaLLU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VPdH75kLfrAH7B80tU1Udeuy1Kq8OmJuw7sEW8DOOKof8MpTPyHUjB0vp01/TipCShYZjTp+Tmvk0BiucCtTRDhp8Sa0q3Y9kA2gmdKOA+W5qDAtKnq77+sU1TXsMbZqlDN2/vyYmjfQ0izJGJB+05WLCoPEZyJJDiclTjv5lMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=smail.nju.edu.cn; spf=pass smtp.mailfrom=smail.nju.edu.cn; dkim=pass (1024-bit key) header.d=smail.nju.edu.cn header.i=@smail.nju.edu.cn header.b=MK44GgvB; arc=none smtp.client-ip=15.184.224.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=smail.nju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=smail.nju.edu.cn
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=smail.nju.edu.cn;
+	s=iohv2404; t=1771898847;
+	bh=Afjeq0ABeVA/DVRS8ujIoUHECLl6nZzPpxDRLT+NXAA=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version;
+	b=MK44GgvB5salxVt6QnPqNWCnaqpvPG7j/WCWYpx+sq5Fl2dDmo3qEIvr6kfk2ItES
+	 dq9YtU4iy3SzzZW9o+V5vBSLNWHPoOsAJWVR4ewaOvUHBYibFQOsoADzlgvkGvDiJz
+	 XQT4ZJAmDB2ysPDj+LS3BjiOIC/M5oMMQvFgwdR8=
+X-QQ-mid: esmtpgz12t1771898846t75042e3c
+X-QQ-Originating-IP: AbaLvVooqE/aIP9HU58kycqEnEw8vz43/Z8waCUGLQM=
+Received: from localhost.localdomain ( [116.172.93.199])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 24 Feb 2026 10:07:23 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 5859754316398555003
+EX-QQ-RecipientCnt: 15
+From: kexinsun <kexinsun@smail.nju.edu.cn>
+To: allison.henderson@oracle.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	rds-devel@oss.oracle.com,
+	linux-kernel@vger.kernel.org,
+	julia.lawall@inria.fr,
+	xutong.ma@inria.fr,
+	yunbolyu@smu.edu.sg,
+	ratnadiraw@smu.edu.sg,
+	kexinsun@smail.nju.edu.cn
+Subject: [PATCH] rds: update outdated comment
+Date: Tue, 24 Feb 2026 10:07:20 +0800
+Message-Id: <20260224020720.1174-1-kexinsun@smail.nju.edu.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260223-devmem-membar-fix-v1-1-37dcae1e49f8@meta.com>
-X-B4-Tracking: v=1; b=H4sIAPgGnWkC/x3MQQqDMBAF0KsMf+2ARio2VyldpOZHZ5G0JEUE8
- e6FvgO8E43V2ODlROVuzd4FXoZOsGyhrFSL8ALXu6l3btTIPTNrZn6FqskOHcNtifdpmNMc0Ak
- +lcmO//lA4RfP6/oBrMYTtGgAAAA=
-X-Change-ID: 20260223-devmem-membar-fix-3a5cd9618f8a
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Mina Almasry <almasrymina@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>, 
- Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Bobby Eshleman <bobbyeshleman@meta.com>
-X-Mailer: b4 0.14.3
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpgz:smail.nju.edu.cn:qybglogicsvrgz:qybglogicsvrgz5b-0
+X-QQ-XMAILINFO: NDx3ZVsnQVLdeRcqJlgsdUu35W6y2ycEkAr6WvjXd4nMrqOqUfn4q3t2
+	qWliTXnccFWMNkZAuiAq+Fh79+kfZFTtk6Rl+7yb5CEs4dIyBTD2UFocbTX45NQIhkXkwJ6
+	zxYBK10llxFw7bw/nqB8vwWb+u9ovrQRgo/u/AWgLfV1Bv0rxraZOPZs0QcNjbJllymvX1y
+	RuOU/ZpkPxbxuYPMZf0tCgNHuRx2IRTnzVKA+cxdAeWLXlTigzbfnA/Py0elWGdVHgQ7vP0
+	6cRpFb+enoWjTrvu3E2KjQwABQiTOyIxA8GpQdsWrxyvQZMUHisb7V/m9WBbpXRtey6Fr8Y
+	XRAUkPbkQFGFVkdulwL9P9uFkHnRlLQXJRkvH7l1n9O/68He3zjhqwUdOyfMBukN0KpnRiC
+	5JH66gcZVFbmVSamHiRd/2bvK9zqNdIXIAK+bPs0WCXacKgtypMkoaYs0vTe8Rb1Ts4ldnP
+	xPll+rDVsYAMjvCAjTwbQ0a/HWJTpyWp2WOeqtvyVIApD9ZksjqI4c52K/hGH7AiZLVO8ik
+	LTo98mbHtypD2PZ0AoO6onf4TAf3G780lHlSXxktYI/4VG+ZdffB91ocidJlZSHTB6FDek3
+	Uw49t7bd5mVU495/8yYkzureOusiZyIPW709LAZlCs5CiJRiYgpWCTTm+zHvBzUZe+T449D
+	WftKswWbHzqVEfYReO/Ck3sXecd+YRNY/Rm4//wLWeMEvA2jVQCSq95Rwm8pBDRqyatjJ+X
+	kgP82ODxIS/XOvXn4KQPH2uUFxGZNfcnslnbeZ4p8wA99GX5Ly/wnrmO0IobmxHqG5q9TKl
+	/I/629b9jN8r/OLTRW4pGi0o00xdOj/uMh7kKnN49/QQMYXnTs3w5gH+/C5SO9oQ9Hda+f3
+	wP5A4C99CN3g2fFfr+4LM10glB/0Q1ch82Vc/HxZgkCx5j/EMUH9vlJcRUicPdJ1UaIdQ2d
+	PlUJHC0Hq6irfAg6jQqEH/tSo6vJPcO1npXr51ZuizyeLzHA0t+iatGuCetQWSCIT73O1m4
+	G+XisIrucB6QAO8AHzcIpk+aKCajmE90TbL1cYCyqWbz3ckTthXw29K6O+yCqNoEWuAGQzZ
+	egvCy3AKkKvNFLPCyC9z4MPr/uuwwd8Tgko5bq2SyAKwk++lrX6PO1xfzDeYxbj6A==
+X-QQ-XMRINFO: NS+P29fieYNwqS3WCnRCOn9D1NpZuCnCRA==
+X-QQ-RECHKSPAM: 0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[smail.nju.edu.cn,reject];
+	R_DKIM_ALLOW(-0.20)[smail.nju.edu.cn:s=iohv2404];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260305-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260306-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[smail.nju.edu.cn:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FROM_NEQ_ENVFROM(0.00)[kexinsun@smail.nju.edu.cn,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1B40E180CF6
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nju.edu.cn:email]
+X-Rspamd-Queue-Id: BFC14180D56
 X-Rspamd-Action: no action
 
-From: Bobby Eshleman <bobbyeshleman@meta.com>
+The function rds_send_reset() was subsumed by rds_send_path_reset()
+by commit d769ef81d5b5 ("RDS: Update rds_conn_shutdown to work with
+rds_conn_path").  Update the comment accordingly.
 
-binding->dev is protected on the write-side in
-mp_dmabuf_devmem_uninstall() against concurrent writes, but due to the
-concurrent bare read in net_devmem_get_binding() it should be wrapped in
-a READ_ONCE/WRITE_ONCE pair to make sure no compiler optimizations play
-with the underlying register in unforeseen ways.
-
-Fixes: bd61848900bf ("net: devmem: Implement TX path")
-Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+Signed-off-by: kexinsun <kexinsun@smail.nju.edu.cn>
 ---
-Note1: This didn't crop up in a discrete error, but just something that
-didn't seem to quite follow my understanding of memory-barriers.txt, as
-frail and feeble as that understanding may be.
+ net/rds/send.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Note2: the "Fixes" commit I referenced is the first one to introduce
-binding->dev bare accesses, but the later patch '6a2108c78069 ("net:
-devmem: refresh devmem TX dst in case of route invalidation")' carried
-that forward. I wasn't sure which was the ideal one to select for the
-"Fixes" label.
----
- net/core/devmem.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/net/core/devmem.c b/net/core/devmem.c
-index 63f093f7d2b2..cb989949d43c 100644
---- a/net/core/devmem.c
-+++ b/net/core/devmem.c
-@@ -398,7 +398,8 @@ struct net_devmem_dmabuf_binding *net_devmem_get_binding(struct sock *sk,
- 	 * net_device.
- 	 */
- 	dst_dev = dst_dev_rcu(dst);
--	if (unlikely(!dst_dev) || unlikely(dst_dev != binding->dev)) {
-+	if (unlikely(!dst_dev) ||
-+	    unlikely(dst_dev != READ_ONCE(binding->dev))) {
- 		err = -ENODEV;
- 		goto out_unlock;
- 	}
-@@ -515,7 +516,7 @@ static void mp_dmabuf_devmem_uninstall(void *mp_priv,
- 			xa_erase(&binding->bound_rxqs, xa_idx);
- 			if (xa_empty(&binding->bound_rxqs)) {
- 				mutex_lock(&binding->lock);
--				binding->dev = NULL;
-+				WRITE_ONCE(binding->dev, NULL);
- 				mutex_unlock(&binding->lock);
- 			}
- 			break;
-
----
-base-commit: d4f687fbbce45b5e88438e89b5e26c0c15847992
-change-id: 20260223-devmem-membar-fix-3a5cd9618f8a
-
-Best regards,
+diff --git a/net/rds/send.c b/net/rds/send.c
+index a1039e422a38..d8b14ff9d366 100644
+--- a/net/rds/send.c
++++ b/net/rds/send.c
+@@ -284,7 +284,7 @@ int rds_send_xmit(struct rds_conn_path *cp)
+ 		 *
+ 		 * cp_xmit_rm holds a ref while we're sending this message down
+ 		 * the connection.  We can use this ref while holding the
+-		 * send_sem.. rds_send_reset() is serialized with it.
++		 * send_sem.. rds_send_path_reset() is serialized with it.
+ 		 */
+ 		if (!rm) {
+ 			unsigned int len;
 -- 
-Bobby Eshleman <bobbyeshleman@meta.com>
+2.25.1
 
 
