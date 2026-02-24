@@ -1,137 +1,167 @@
-Return-Path: <netdev+bounces-260347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260348-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +CMtEblCnWkMOAQAu9opvQ
-	(envelope-from <netdev+bounces-260347-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 07:18:33 +0100
+	id INcTO01DnWkMOAQAu9opvQ
+	(envelope-from <netdev+bounces-260348-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 07:21:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D91F41825D2
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 07:18:32 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E5BD182609
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 07:21:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0E1B5301A2F2
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 06:18:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 35AC43047BDB
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 06:21:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD3F42DAFDE;
-	Tue, 24 Feb 2026 06:18:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B03E82DCF74;
+	Tue, 24 Feb 2026 06:20:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="fhzKRuEC"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Ixb/drv7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BD8F2D29C8;
-	Tue, 24 Feb 2026 06:18:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B4929AB05;
+	Tue, 24 Feb 2026 06:20:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771913908; cv=none; b=bWm1OB8jTaQGnBkbeuWWPbp3pDZVXQHGAK7VXVlBh/iXpd1PMmvIc/NglF0LUYEJ42wtK1ee9NQxCKo63d8o2VG4MJ9w0VpqAvvP9QF98tBUrlM79RkFLLHUJTjwZDAZAhPrIFM9F+c4bwIayIAnOSQLx2gkhMFMj5EBD3cTOMw=
+	t=1771914057; cv=none; b=rDI7UrrfjAwmqIhi4f51QRG6OqoqdFS2VImJ+VNSzfSccT9J2rxKa2rMzc6OI0vOqdJINK04FXjxYO+XCTHk6Zu90L+74q2AWA26HIM4b11ik2VPNDgVWYpi3qb/VjybfyJL4prbIa4elfrFifviU7qhDfoQytlfp2a17sPaDo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771913908; c=relaxed/simple;
-	bh=5so+i5TN5Ymsq487c5z6Ijr+l+6Z2GTD9oU+kbQIeEA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T+mOlhAC3ZQSNuz/qxYzBt4yf/8F0cBz5uFtoZQXohTUVKgG04WZ/Objb1MHwtWQsrMF5snsjS/gZ5MmT7671TMlMPWjCvut0Gkm0vd8DnWLi/CjBOlwwVtSiEw9ddTm7CKZr5Il4w9DKAFHGs/9BzjmKVloYbSHJDl5tJoCHto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=fhzKRuEC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF153C116D0;
-	Tue, 24 Feb 2026 06:18:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1771913908;
-	bh=5so+i5TN5Ymsq487c5z6Ijr+l+6Z2GTD9oU+kbQIeEA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fhzKRuECtoQuaS+tRitj2dpRYazlKfn58FqkpuO9wHfa7Td6kIBUNVg5+7Cq+I1jF
-	 NDIZF1JOAU56HcsFFl8rJX/EULTS4FLZtCFxRYP23xw3Qt6J0I0a5nV2mN7cEVlU20
-	 Ad2tJ5SgJDSdA+3zmpdcDs8m0j6A1JxHQxS7K7WE=
-Date: Mon, 23 Feb 2026 22:18:25 -0800
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Jeremy Kerr <jk@codeconstruct.com.au>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Matt Johnston <matt@codeconstruct.com.au>,
-	stable <stable@kernel.org>
-Subject: Re: [PATCH net] net: mctp: usb: properly drop the usb interface on
- probe error
-Message-ID: <2026022314-retiring-accustom-ca7b@gregkh>
-References: <2026022319-turbofan-darkened-206d@gregkh>
- <0fc4daf8261ea1b163c81c5618aba74f248bc3a9.camel@codeconstruct.com.au>
+	s=arc-20240116; t=1771914057; c=relaxed/simple;
+	bh=A50jC4LfoMxSa9lpx4VQPVxgpchl+m7KZrlwyFd5rhs=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=neA+JbhneXQI0mRyRzX2cSi6sSw+jU0grphV3pqPueon+oN+/LY7veeIHjzRi1MD81qm1Ln6wFEiYucNFKGvFDLlM3/h2UyQVbWGjcS+6uu2Wtyn8JdLSyik1icRlAA+RZOQTbl+2fJfr18HKwBIg6c98iqEEcC3D2u/jLjjtt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Ixb/drv7; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61NHSmGa3895504;
+	Mon, 23 Feb 2026 22:20:46 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=lsIWV0lAbt0Fe4quo+bjdEVqY
+	HmKpu+swmVQaofqSEw=; b=Ixb/drv70BmwE1YPbUgBEGHmohNBMTe56Ly17kQTY
+	umWTKEJyw64yq9+kvpkRxs52YAbWW2ytAseRXmwPBH4kspQFzEDE3NWp5Z0pvjAh
+	E9lRIOlU1OWv221BzfrBhXLjq6eiNgJUcyusLHptZPusa1Q/kY9bCw4+WM9QAT8P
+	LIQCBx9qt/vln5i1PlPHao+DI01JCaSCJ3DupUJo24BYrJVlyLVTNQI7C8/5q/2E
+	Hd/ekgkPHjRYhqAib8bhRiNG9D/GZIx2y0iXdYBblrAzEiCIkfeAX4NX860rCBxn
+	Y61uRxSZTEEzLoAhp/qR6zQqDrL9zkXut1bdmKqrl7m+A==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4cfaxp5avh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 23 Feb 2026 22:20:46 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 23 Feb 2026 22:20:45 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Mon, 23 Feb 2026 22:20:44 -0800
+Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id 8C8363F709A;
+	Mon, 23 Feb 2026 22:20:42 -0800 (PST)
+Date: Tue, 24 Feb 2026 11:50:41 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <edumazet@google.com>, <sgoutham@marvell.com>, <andrew+netdev@lunn.ch>,
+        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <sumang@marvell.com>,
+        <sbhatta@marvell.com>, <davem@davemloft.net>
+Subject: Re: [net-next,v8,09/13] octeontx2-af: npc: cn20k: virtual index
+ support
+Message-ID: <aZ1DOQOswkO6bgmP@rkannoth-OptiPlex-7090>
+References: <20260202074607.2535569-10-rkannoth@marvell.com>
+ <20260205022525.2271130-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0fc4daf8261ea1b163c81c5618aba74f248bc3a9.camel@codeconstruct.com.au>
+In-Reply-To: <20260205022525.2271130-1-kuba@kernel.org>
+X-Proofpoint-GUID: YFGQ8Z_2kim3fY0qVJX87yKDQnkSBWMu
+X-Authority-Analysis: v=2.4 cv=IsQTsb/g c=1 sm=1 tr=0 ts=699d433e cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+ a=kj9zAlcOel0A:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=EAYMVhzMl8SCOHhVQcBL:22 a=VwQbUJbxAAAA:8
+ a=5OoKT6bNshcxhbm2wnAA:9 a=CjuIK1q_8ugA:10 a=lhd_8Stf4_Oa5sg58ivl:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI0MDA1MyBTYWx0ZWRfX772Oq4RkySv6
+ uiY6h51T5Ds1QyhLt3UmbT6u0ctbjEVDbHipfmBBu8jV+YQAir5oeUcKg+1gsAgOXYwbhssrWT2
+ qbaqC78CuAQ918xY6SbODjc8sqfXWL1Bak5u0n/Hk2fHdqrLOpG6hOrjxFvSSf+ddbshqkPdWQj
+ kkxLT66Y9aUrQapXlUTcQT95kbp6WlKQIyzqp1cbJYDhJMPxp/99xQGJRiifV0EjoDc9gzKfrrM
+ ALHWAyqGtNJ6hYOXzfa/SAGF++a2vDNbbwYqLDY3a8dncIgawKz2RthpeP0hAjxROkG7KXoR09W
+ h/V3pFOv9FM6JQWEsuBCdFPoWicipt2zv3J8h/Ulbq00XFp3DsnO9JsMv68TtgLkV1tilztNWf0
+ 6rNMHiyhMwXvaa4JFfvgCo/1GoQ0t6wWu3scurVlShBB6QDv6U1KQMqzi7geW1hDZGO/ZrqTPxh
+ 3/l6Bc+eVQGaZkFRcSQ==
+X-Proofpoint-ORIG-GUID: YFGQ8Z_2kim3fY0qVJX87yKDQnkSBWMu
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-23_06,2026-02-23_03,2025-10-01_01
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.34 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260348-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,marvell.com:dkim];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260347-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linuxfoundation.org:+];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linuxfoundation.org:dkim]
-X-Rspamd-Queue-Id: D91F41825D2
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 6E5BD182609
 X-Rspamd-Action: no action
 
-On Tue, Feb 24, 2026 at 09:50:09AM +0800, Jeremy Kerr wrote:
-> Hi Greg,
-> 
-> On a second look:
-> 
-> > diff --git a/drivers/net/mctp/mctp-usb.c b/drivers/net/mctp/mctp-usb.c
-> > index ef860cfc629f..eef17ae89298 100644
-> > --- a/drivers/net/mctp/mctp-usb.c
-> > +++ b/drivers/net/mctp/mctp-usb.c
-> > @@ -355,6 +355,7 @@ static int mctp_usb_probe(struct usb_interface *intf,
-> >         usb_free_urb(dev->tx_urb);
-> >         usb_free_urb(dev->rx_urb);
-> >         free_netdev(netdev);
-> > +       usb_put_dev(dev->usbdev);
-> >         return rc;
-> >  }
-> 
-> Should we not do the usb_put_dev() before the free_netdev()?
-
-Why?  The usb_put_dev() doesn't really do anything, except for the fact
-that you have to do it because you did a usb_get_dev() earlier.  In
-reality, no USB driver needs to call get/put on a usb device at all,
-that is a bad pattern I made years ago for no good reason, sorry about
-that.
-
-I really should just sweep the tree to fix that up one of these days,
-odds are a coccinelle script can do that...
-
-> Given we're in NETREG_UNINITIALIZED state, we're likely to be
-> immediately freeing netdev there, which includes the netdev_priv data,
-> ie., dev.
-
-That's great, but again, the usb device will still be around as the usb
-core ensures that for the lifetime of probe/remove, the device will be
-there with a reference.  So there's no real reason to put it anywhere in
-this list, other than last as that mirrors when this was grabbed, right?
-
-thanks,
-
-greg k-h
+On 2026-02-05 at 07:55:25, Jakub Kicinski (kuba@kernel.org) wrote:
+> > +		dev_err(rvu->dev,
+> > +			"%s: Failed to roll back vidx2idx vidx=%u\n",
+> > +			__func__, vidx);
+>
+> At fail2, xa_erase() returns the erased entry on success (non-NULL) and NULL
+> on failure. The error message is printed when xa_erase() succeeds, which
+> appears inverted from the intended behavior.
+>
+> Should the condition check for NULL to detect failure instead?
+>
+> > +
+> > +fail1:
+> > +	if (xa_insert(&npc_priv.xa_vidx2idx_map, vidx,
+> > +		      xa_mk_value(old_midx), GFP_KERNEL))
+> > +		dev_err(rvu->dev,
+> > +			"%s: Faled to roll back vidx2idx to old_midx=%u, vidx=%u\n",
+> > +			__func__, old_midx, vidx);
+>
+> This isn't a bug, but there's a typo: "Faled" should be "Failed".
+>
+> Also, at fail1, the rollback attempts to insert into xa_vidx2idx_map to
+> restore old_midx. However, looking at the control flow, fail1 is reached when
+> xa_insert() to xa_vidx2idx_map fails. At that point, xa_vidx2idx_map has
+> already been erased, so the rollback target is correct.
+>
+> But fail2 rolls back using xa_erase() on xa_vidx2idx_map, which was just
+> inserted successfully. The rollback at fail1 should restore xa_idx2vidx_map
+> instead, since that's the only map modified when fail1 is reached via direct
+> return.
+>
+> Could the error path rollback logic be reviewed?
+This is getting flagged every time. i dont see any issue in the logic. Am i missing
+any thing here.
 
