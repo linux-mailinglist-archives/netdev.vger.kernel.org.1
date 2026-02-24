@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-260411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260412-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kAAXOhJqnWnYPwQAu9opvQ
-	(envelope-from <netdev+bounces-260411-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 10:06:26 +0100
+	id UMaVMB9qnWnhPwQAu9opvQ
+	(envelope-from <netdev+bounces-260412-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 10:06:39 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 497E91843CA
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 10:06:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 30AFE1843D3
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 10:06:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7CC4C30BB505
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 09:01:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 60FDA3084BF5
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 09:02:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15CD734D915;
-	Tue, 24 Feb 2026 09:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 979D6369979;
+	Tue, 24 Feb 2026 09:02:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="1aCWlMMJ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="mw2ib0Hu"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07F1022A4EE
-	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 09:01:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3811369988
+	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 09:02:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771923719; cv=none; b=H2SEOzpTHQkGt69B7BueeG3r+TgKBV+QX056Cv6ugFeQimznzozCcahJfKGh54EiEon67Kuzg+fskHHV1oxYSy0vh++oaUqkHZfyQg3Dlcf5aFxy0NWt3qdEQCj+2Tx5aloFxLczBuEim+zaTyb4KeUk/0FenJ4rXW38GVJjY8o=
+	t=1771923724; cv=none; b=l51ZVzu6uFd/jpQ3qJF5SffpJx6DfH5SYf9N5thVydw29vEtM73FLB2Dvyg4uxwVYb/WnFpgDUpz1rgXNF6TQ/QklUsMppzcpX05M4InQylJXlGvE0LwKJs06CqYWmjFRYEGyG7NzuSpeypCZTB7SdMpUUd3J92M2YCiEbZ0lHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771923719; c=relaxed/simple;
-	bh=Vd/GKnxZhyS6Wde3FQneQx/VqBmXBcDuRHcntPE2u2E=;
+	s=arc-20240116; t=1771923724; c=relaxed/simple;
+	bh=ci6K+P9Z1zNijD/nyDK4mq3ABwcFD/1pLpd/sO7WEA4=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=TIxm9/oSPXYOElKaNtD0O/ugVNmrpsA7iieWL4Ql65+BAKu4tZbkN18oWBGAfSueUkNgW4xNP45MB0/C83RC1vlcimuwvJebiNKsENktvAxcz+q4BO5zU4155w7Cnxl4/C5Z4rl0a5p+iOjjoXaCnweOLMpZTyf5gbPXRax/E0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=1aCWlMMJ; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=g063G6ImzN/REnL036dv+sxQ9o8OQde2QMOoKlHMd1jnd3DZDjTxsQdDAETIJfY+qjWi2QU3rqci+mgec//JvbCtlnLSBN6RrpYf2VJgZtqMe/GHWntkLv8jOlsxS3IlH4BP8XJvUK5f6w+imR09niJjCsSiI5ni0y6++T6CQY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=mw2ib0Hu; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -40,22 +40,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=w0Xla7YvpmY0GVAfkZRw6ajF/x6+DgW95hZFJKTbQfA=; b=1aCWlMMJBacFbSbFPTBQdkRKLN
-	A0dtOVoLdZA2uO+DfN02/Rl0qYJMP0hjWjHhU0cEItXKbXoWKUC7DgM3ax1RJMJEyW+Rn3BfZlASL
-	Xdy/d9R7PuBNn74bWevkBnFX9FoV5uNMZaYh+2if5FM/pzTpZwx+zSf1zHr9mwtla3jNP55F2j5fA
-	75FTZwiEmVey/R7+pjgGy6b3jsgMnUH4i/9Zc3GXM2JzAzgJ+ACKuh3dTpncSIqbLoJvUPBw31qv7
-	MWmo/YR2si/Nb0wXQQrTyRufAV6WgBE+l+LCbYwcb3f2+KDAJc88ocDHpF6dy3PoI+k0wS7a1zTKa
-	z6EYTX1g==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:41976 helo=rmk-PC.armlinux.org.uk)
+	bh=wrYNaMOH0TzghKNkY2gl5+fHgiHnouoR8L4MzPIrLQs=; b=mw2ib0HuC9E0Zqjnf7ey4YyaQ0
+	PbfUPNlapr6uP9hLfkxAQ/qPrEd4gLN+1dWbLlDINtrha5GqZTMrC2lGIuDzkWyt6KUpCHeqloYuj
+	4zWcsBsUhnsDovNGy1CNfpGRpK/+2FcNjcgGruVjnHYr06idMjGpATU9vyzUX4q9E1QqBm/3ihHO3
+	OPcYErNmn6kNVALpk4Yn22tf8bFSmXTD/QjWIJlDtKZV4Uh+wDMxN9Oo2i230Z8tQHNEnzaDfWNkg
+	/x2f4c33cDvdOYAXziQwelaCp6p4Tpx3wjHaf8eE0Y9UrkWMylONrKxXzvebRF99o0SQ5UZzXyPJv
+	8tmWV0CA==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:41980 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vuoIg-000000004yF-3QIo;
-	Tue, 24 Feb 2026 09:01:50 +0000
+	id 1vuoIl-000000004yS-3zCH;
+	Tue, 24 Feb 2026 09:01:56 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vuoIg-0000000Aout-0LyS;
-	Tue, 24 Feb 2026 09:01:50 +0000
+	id 1vuoIl-0000000Aouz-0ttb;
+	Tue, 24 Feb 2026 09:01:55 +0000
 In-Reply-To: <aZ1o2dmfpeiubCik@shell.armlinux.org.uk>
 References: <aZ1o2dmfpeiubCik@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -69,8 +69,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	linux-stm32@st-md-mailman.stormreply.com,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v2 1/2] net: stmmac: use circ_buf helpers for
- descriptors
+Subject: [PATCH net-next v2 2/2] net: stmmac: fix transmit interrupt
+ coalescing
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,9 +80,9 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vuoIg-0000000Aout-0LyS@rmk-PC.armlinux.org.uk>
+Message-Id: <E1vuoIl-0000000Aouz-0ttb@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 24 Feb 2026 09:01:50 +0000
+Date: Tue, 24 Feb 2026 09:01:55 +0000
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -96,7 +96,7 @@ X-Spamd-Result: default: False [1.14 / 15.00];
 	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260411-lists,netdev=lfdr.de,kernel];
+	TAGGED_FROM(0.00)[bounces-260412-lists,netdev=lfdr.de,kernel];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
@@ -111,101 +111,52 @@ X-Spamd-Result: default: False [1.14 / 15.00];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[stlinux.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:email,rmk-PC.armlinux.org.uk:mid]
-X-Rspamd-Queue-Id: 497E91843CA
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,rmk-PC.armlinux.org.uk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 30AFE1843D3
 X-Rspamd-Action: no action
 
-The stmmac descriptor queues are circular buffers, operated as far as
-the hardware is concerned as either a ring, or a chain that loops back
-on itself. From the software perspective, it forms a circular buffer.
+The accounting for transmit frames does not count the descriptors
+correctly. It uses:
 
-We have a few places which calculate the number of in-use and free
-entries in these circular buffers, for which we have macros for.
-Use CIRC_CNT() and CIRC_SPACE() as appropriate to calculate these
-values.
+	tx_packets = (tx_q->cur_tx + 1) - first_tx;
 
-Validating, for stmmac_tx_avail(), which uses CIRC_SPACE():
+however, these are indexes into a circular buffer, so cur_tx can be
+less than first_tx, and when that happens, tx_packets becomes a very
+large unsigned integer. When this is added to tx_q->tx_count_frames,
+it has the effect of reducing the count of frames, possibly causing
+it to also wrap to a very large unsigned integer.
 
-  dirty_tx = 1, cur_tx = 0 -> 0
-  dirty_tx = 0, cur_tx = 0 -> dma_tx_size - 1
-  dirty_tx = 0, cur_tx = 1 -> dma_tx_size - 2
-
-dirty_tx passed as end, reduced by one. cur_tx passed as start.
-Output on sane computers is identical.
-
-For stmmac_rx_dirty(), which uses CIRC_CNT():
-
-  dirty_rx = 1, cur_rx = 0 -> dma_rx_size - 1
-  dirty_rx = 0, cur_rx = 0 -> 0
-  dirty_rx = 0, cur_rx = 1 -> 1
-
-dirty_rx passed as start, cur_rx passed as end. Output is identical.
-
-Same validation performed on the is_last_segment calculation, which
-also gets converted to CIRC_CNT().
+Fix this by using CIRC_CNT() to calculate the number of descriptors
+used.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 23 ++++++-------------
- 1 file changed, 7 insertions(+), 16 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index a2a0985e8c37..2d74fe98ad61 100644
+index 2d74fe98ad61..baf2ff577f45 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -14,6 +14,7 @@
- 	https://bugzilla.stlinux.com/
- *******************************************************************************/
+@@ -4503,7 +4503,8 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	tx_q->tx_skbuff_dma[tx_q->cur_tx].buf_type = STMMAC_TXBUF_T_SKB;
  
-+#include <linux/circ_buf.h>
- #include <linux/clk.h>
- #include <linux/kernel.h>
- #include <linux/interrupt.h>
-@@ -355,14 +356,9 @@ static void print_pkt(unsigned char *buf, int len)
- static inline u32 stmmac_tx_avail(struct stmmac_priv *priv, u32 queue)
- {
- 	struct stmmac_tx_queue *tx_q = &priv->dma_conf.tx_queue[queue];
--	u32 avail;
+ 	/* Manage tx mitigation */
+-	tx_packets = (tx_q->cur_tx + 1) - first_tx;
++	tx_packets = CIRC_CNT(tx_q->cur_tx + 1, first_tx,
++			      priv->dma_conf.dma_tx_size);
+ 	tx_q->tx_count_frames += tx_packets;
  
--	if (tx_q->dirty_tx > tx_q->cur_tx)
--		avail = tx_q->dirty_tx - tx_q->cur_tx - 1;
--	else
--		avail = priv->dma_conf.dma_tx_size - tx_q->cur_tx + tx_q->dirty_tx - 1;
--
--	return avail;
-+	return CIRC_SPACE(tx_q->cur_tx, tx_q->dirty_tx,
-+			  priv->dma_conf.dma_tx_size);
- }
- 
- /**
-@@ -373,14 +369,9 @@ static inline u32 stmmac_tx_avail(struct stmmac_priv *priv, u32 queue)
- static inline u32 stmmac_rx_dirty(struct stmmac_priv *priv, u32 queue)
- {
- 	struct stmmac_rx_queue *rx_q = &priv->dma_conf.rx_queue[queue];
--	u32 dirty;
--
--	if (rx_q->dirty_rx <= rx_q->cur_rx)
--		dirty = rx_q->cur_rx - rx_q->dirty_rx;
--	else
--		dirty = priv->dma_conf.dma_rx_size - rx_q->dirty_rx + rx_q->cur_rx;
- 
--	return dirty;
-+	return CIRC_CNT(rx_q->cur_rx, rx_q->dirty_rx,
-+			priv->dma_conf.dma_rx_size);
- }
- 
- static bool stmmac_eee_tx_busy(struct stmmac_priv *priv)
-@@ -4571,8 +4562,8 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
- 	/* If we only have one entry used, then the first entry is the last
- 	 * segment.
+ 	if ((skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP) && priv->hwts_tx_en)
+@@ -4781,7 +4782,7 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	 * This approach takes care about the fragments: desc is the first
+ 	 * element in case of no SG.
  	 */
--	is_last_segment = ((tx_q->cur_tx - first_entry) &
--			   (priv->dma_conf.dma_tx_size - 1)) == 1;
-+	is_last_segment = CIRC_CNT(tx_q->cur_tx, first_entry,
-+				   priv->dma_conf.dma_tx_size) == 1;
+-	tx_packets = (entry + 1) - first_tx;
++	tx_packets = CIRC_CNT(entry + 1, first_tx, priv->dma_conf.dma_tx_size);
+ 	tx_q->tx_count_frames += tx_packets;
  
- 	/* Complete the first descriptor before granting the DMA */
- 	stmmac_prepare_tso_tx_desc(priv, first, 1, proto_hdr_len, 0, 1,
+ 	if ((skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP) && priv->hwts_tx_en)
 -- 
 2.47.3
 
