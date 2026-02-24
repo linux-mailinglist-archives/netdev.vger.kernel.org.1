@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-260348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260349-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id INcTO01DnWkMOAQAu9opvQ
-	(envelope-from <netdev+bounces-260348-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 07:21:01 +0100
+	id oJscLxpEnWkMOAQAu9opvQ
+	(envelope-from <netdev+bounces-260349-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 07:24:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E5BD182609
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 07:21:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C05418263F
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 07:24:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 35AC43047BDB
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 06:21:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E6AAA304E330
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 06:24:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B03E82DCF74;
-	Tue, 24 Feb 2026 06:20:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 359642DB783;
+	Tue, 24 Feb 2026 06:24:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Ixb/drv7"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="JOaL5E3R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B4929AB05;
-	Tue, 24 Feb 2026 06:20:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 134653EBF1A;
+	Tue, 24 Feb 2026 06:24:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771914057; cv=none; b=rDI7UrrfjAwmqIhi4f51QRG6OqoqdFS2VImJ+VNSzfSccT9J2rxKa2rMzc6OI0vOqdJINK04FXjxYO+XCTHk6Zu90L+74q2AWA26HIM4b11ik2VPNDgVWYpi3qb/VjybfyJL4prbIa4elfrFifviU7qhDfoQytlfp2a17sPaDo0=
+	t=1771914255; cv=none; b=ll4WtdSne9Iwsa6F//KocZu9LY95W7LIdGMFUPkoo1gztwtmqWZ6RctN4ObDgU58miNbcl1feFUlkTTHJ04LjZNQ26YwEFV2VawT3rUoQ/72tpw3EL5KEkDib9GrYvPEq0OTUCUQ7+G7LIZ5BYgm/07yaPzWboq6ckTQQmosCqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771914057; c=relaxed/simple;
-	bh=A50jC4LfoMxSa9lpx4VQPVxgpchl+m7KZrlwyFd5rhs=;
+	s=arc-20240116; t=1771914255; c=relaxed/simple;
+	bh=nKLnHTavugGbir7CER2T7zO2lMEVl9bwHIddpa2F5ng=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=neA+JbhneXQI0mRyRzX2cSi6sSw+jU0grphV3pqPueon+oN+/LY7veeIHjzRi1MD81qm1Ln6wFEiYucNFKGvFDLlM3/h2UyQVbWGjcS+6uu2Wtyn8JdLSyik1icRlAA+RZOQTbl+2fJfr18HKwBIg6c98iqEEcC3D2u/jLjjtt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Ixb/drv7; arc=none smtp.client-ip=67.231.148.174
+	 Content-Type:Content-Disposition:In-Reply-To; b=FQ4cYyRX6BcFgAtC10tg+WhVppZI01iRDxtqc5iJnOrXO3iDv6OO22Id4c+c2C4J5PK9jEw3ctapwRWiZnQd9A99w9CkDoUQDQ/AmRKlm55On+pqVeuixhjWZPaXWui1eiwcgevhG2PfmhguJXK9yPLDe6MNn7TNKVuDcTLz8NU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=JOaL5E3R; arc=none smtp.client-ip=67.231.148.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61NHSmGa3895504;
-	Mon, 23 Feb 2026 22:20:46 -0800
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61NH0C2B4068859;
+	Mon, 23 Feb 2026 22:24:06 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=lsIWV0lAbt0Fe4quo+bjdEVqY
-	HmKpu+swmVQaofqSEw=; b=Ixb/drv70BmwE1YPbUgBEGHmohNBMTe56Ly17kQTY
-	umWTKEJyw64yq9+kvpkRxs52YAbWW2ytAseRXmwPBH4kspQFzEDE3NWp5Z0pvjAh
-	E9lRIOlU1OWv221BzfrBhXLjq6eiNgJUcyusLHptZPusa1Q/kY9bCw4+WM9QAT8P
-	LIQCBx9qt/vln5i1PlPHao+DI01JCaSCJ3DupUJo24BYrJVlyLVTNQI7C8/5q/2E
-	Hd/ekgkPHjRYhqAib8bhRiNG9D/GZIx2y0iXdYBblrAzEiCIkfeAX4NX860rCBxn
-	Y61uRxSZTEEzLoAhp/qR6zQqDrL9zkXut1bdmKqrl7m+A==
+	:references:subject:to; s=pfpt0220; bh=yQ87mrpjiyT3jYubyaOk+T3Ay
+	nnl5M7ryJPNqTqcMPM=; b=JOaL5E3RNRnLli8slTDmW58KHujrxPsuxHlWGu7X7
+	p9RUrbnoFIy3SCDgK9BP+xgw8qKQ6I/J1qoxf7MG2wuJZ2pmBAhGfqhm/tBWPpsQ
+	yt61+D2n5KnqGbFNVIyq6Ape1hqlPeKsWOiqB6txGy68zgONyNMukJpNsoUuX+P4
+	eptYZOI1iYuMDXpP5glqTGSKZyXRdGOn0EPY1R3v7RHw75otShHWB2gD2bp0L6O/
+	ER3Xt0x2Ni+WFeHKHnN3n9VvmyTyUtxv1mNtMRu6EE1lhnB0CzSY9cdcA668v1sS
+	tllX3Ca1WXN/qU+xR37D1xCzTOWY5tHrQCN6UZqWKXs6Q==
 Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4cfaxp5avh-1
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4cg1ubbys3-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 23 Feb 2026 22:20:46 -0800 (PST)
+	Mon, 23 Feb 2026 22:24:05 -0800 (PST)
 Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
  DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 23 Feb 2026 22:20:45 -0800
+ 15.2.1544.25; Mon, 23 Feb 2026 22:24:04 -0800
 Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
  (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Mon, 23 Feb 2026 22:20:44 -0800
+ Transport; Mon, 23 Feb 2026 22:24:04 -0800
 Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id 8C8363F709A;
-	Mon, 23 Feb 2026 22:20:42 -0800 (PST)
-Date: Tue, 24 Feb 2026 11:50:41 +0530
+	by maili.marvell.com (Postfix) with SMTP id 9C9553F7099;
+	Mon, 23 Feb 2026 22:24:01 -0800 (PST)
+Date: Tue, 24 Feb 2026 11:54:00 +0530
 From: Ratheesh Kannoth <rkannoth@marvell.com>
 To: Jakub Kicinski <kuba@kernel.org>
 CC: <edumazet@google.com>, <sgoutham@marvell.com>, <andrew+netdev@lunn.ch>,
         <pabeni@redhat.com>, <netdev@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <sumang@marvell.com>,
         <sbhatta@marvell.com>, <davem@davemloft.net>
-Subject: Re: [net-next,v8,09/13] octeontx2-af: npc: cn20k: virtual index
- support
-Message-ID: <aZ1DOQOswkO6bgmP@rkannoth-OptiPlex-7090>
-References: <20260202074607.2535569-10-rkannoth@marvell.com>
- <20260205022525.2271130-1-kuba@kernel.org>
+Subject: Re: [net-next,v8,10/13] octeontx2-af: npc: cn20k: Allocate MCAM
+ entry for flow installation
+Message-ID: <aZ1EAJN7tDu-xPl9@rkannoth-OptiPlex-7090>
+References: <20260202074607.2535569-11-rkannoth@marvell.com>
+ <20260205022527.2271205-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,22 +80,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20260205022525.2271130-1-kuba@kernel.org>
-X-Proofpoint-GUID: YFGQ8Z_2kim3fY0qVJX87yKDQnkSBWMu
-X-Authority-Analysis: v=2.4 cv=IsQTsb/g c=1 sm=1 tr=0 ts=699d433e cx=c_pps
+In-Reply-To: <20260205022527.2271205-1-kuba@kernel.org>
+X-Authority-Analysis: v=2.4 cv=P7Y3RyAu c=1 sm=1 tr=0 ts=699d4406 cx=c_pps
  a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
  a=kj9zAlcOel0A:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=EAYMVhzMl8SCOHhVQcBL:22 a=VwQbUJbxAAAA:8
- a=5OoKT6bNshcxhbm2wnAA:9 a=CjuIK1q_8ugA:10 a=lhd_8Stf4_Oa5sg58ivl:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI0MDA1MyBTYWx0ZWRfX772Oq4RkySv6
- uiY6h51T5Ds1QyhLt3UmbT6u0ctbjEVDbHipfmBBu8jV+YQAir5oeUcKg+1gsAgOXYwbhssrWT2
- qbaqC78CuAQ918xY6SbODjc8sqfXWL1Bak5u0n/Hk2fHdqrLOpG6hOrjxFvSSf+ddbshqkPdWQj
- kkxLT66Y9aUrQapXlUTcQT95kbp6WlKQIyzqp1cbJYDhJMPxp/99xQGJRiifV0EjoDc9gzKfrrM
- ALHWAyqGtNJ6hYOXzfa/SAGF++a2vDNbbwYqLDY3a8dncIgawKz2RthpeP0hAjxROkG7KXoR09W
- h/V3pFOv9FM6JQWEsuBCdFPoWicipt2zv3J8h/Ulbq00XFp3DsnO9JsMv68TtgLkV1tilztNWf0
- 6rNMHiyhMwXvaa4JFfvgCo/1GoQ0t6wWu3scurVlShBB6QDv6U1KQMqzi7geW1hDZGO/ZrqTPxh
- 3/l6Bc+eVQGaZkFRcSQ==
-X-Proofpoint-ORIG-GUID: YFGQ8Z_2kim3fY0qVJX87yKDQnkSBWMu
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=TtqV-g6YmW1Jfm2GSLaY:22 a=VwQbUJbxAAAA:8
+ a=BwxlUtVFPHS1Afr9MAEA:9 a=CjuIK1q_8ugA:10 a=lhd_8Stf4_Oa5sg58ivl:22
+X-Proofpoint-ORIG-GUID: z_J5ehGgnZkkTwWFEIs8Obxz2u6LKu0f
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI0MDA1MyBTYWx0ZWRfXwu9t7G+kIWHa
+ XMUee1+rJGLIHWSjGuRR4DZsXQaHWMvviwMa5n1OyjRIXvi45utWODzMhN31YLlvQk2O+GVec+Y
+ yFB5xmXW3WyvKvw5xFGhMYs62/ujlXvOwS8bOB502Uoi4ZSe6LYr5xsi3HTMaEQelJ4pC2Kfq9u
+ RduAwkKGnTBuTMxZlqAosgjKnVHqNHkcueMozAZpoHgAYP6tXyE9R0MI5zeg4hT0YuuZ7DT7bTw
+ L4JfSvjV42pxybTMjOu65+qpKDihdK5nXNao32M/s2ASKD/0Ihk6XpefGmLevCM0K7SCAXb8MCQ
+ rlYGhHlplUdDZ6LYOpicqTQ9Jwo9E9QaM/ynQ+k9M8UgH/dWh2z7sLu+96RoKRyBP4qd7u6LvI/
+ kg4x8FXOrD5j9CzGyQJZyWeE+HOpUtBoSiVw8mUtWc3hwU7EZTFBl7URZ0mG+jr1LlMmXcwP8pb
+ KnZxVenHfs+lT1SjVKw==
+X-Proofpoint-GUID: z_J5ehGgnZkkTwWFEIs8Obxz2u6LKu0f
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-02-23_06,2026-02-23_03,2025-10-01_01
@@ -105,18 +105,18 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260348-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,marvell.com:dkim];
+	TAGGED_FROM(0.00)[bounces-260349-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,marvell.com:dkim];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[marvell.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
@@ -127,41 +127,30 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 6E5BD182609
+X-Rspamd-Queue-Id: 3C05418263F
 X-Rspamd-Action: no action
 
-On 2026-02-05 at 07:55:25, Jakub Kicinski (kuba@kernel.org) wrote:
-> > +		dev_err(rvu->dev,
-> > +			"%s: Failed to roll back vidx2idx vidx=%u\n",
-> > +			__func__, vidx);
+On 2026-02-05 at 07:55:27, Jakub Kicinski (kuba@kernel.org) wrote:
+> >  	cn20k_wreq.hw_prio = req->hw_prio;
+> > +	cn20k_wreq.req_kw_type = req->req_kw_type;
+> >
+> >  update_rule:
 >
-> At fail2, xa_erase() returns the erased entry on success (non-NULL) and NULL
-> on failure. The error message is printed when xa_erase() succeeds, which
-> appears inverted from the intended behavior.
+> Looking at npc_install_flow(), req->req_kw_type is copied to
+> cn20k_wreq.req_kw_type, but is req->req_kw_type ever initialized with the
+> computed kw_type value?
 >
-> Should the condition check for NULL to detect failure instead?
+> In rvu_mbox_handler_npc_install_flow(), the function
+> rvu_npc_alloc_entry_for_flow_install() computes the correct kw_type based
+> on the flow requirements and stores it in the local variable 'kw_type' at
+> line 1746. However, this computed value is never assigned to
+> req->req_kw_type before calling npc_install_flow() at line 1887.
 >
-> > +
-> > +fail1:
-> > +	if (xa_insert(&npc_priv.xa_vidx2idx_map, vidx,
-> > +		      xa_mk_value(old_midx), GFP_KERNEL))
-> > +		dev_err(rvu->dev,
-> > +			"%s: Faled to roll back vidx2idx to old_midx=%u, vidx=%u\n",
-> > +			__func__, old_midx, vidx);
->
-> This isn't a bug, but there's a typo: "Faled" should be "Failed".
->
-> Also, at fail1, the rollback attempts to insert into xa_vidx2idx_map to
-> restore old_midx. However, looking at the control flow, fail1 is reached when
-> xa_insert() to xa_vidx2idx_map fails. At that point, xa_vidx2idx_map has
-> already been erased, so the rollback target is correct.
->
-> But fail2 rolls back using xa_erase() on xa_vidx2idx_map, which was just
-> inserted successfully. The rollback at fail1 should restore xa_idx2vidx_map
-> instead, since that's the only map modified when fail1 is reached via direct
-> return.
->
-> Could the error path rollback logic be reviewed?
-This is getting flagged every time. i dont see any issue in the logic. Am i missing
-any thing here.
+> As a result, npc_install_flow() uses either a zero-initialized value or
+> whatever the PF driver sent, instead of the AF-computed value. This seems
+> inconsistent with the commit message stating "the AF driver determine the
+> required NPC MCAM entry type." The incorrect req_kw_type is then passed to
+> npc_cn20k_config_mcam_entry() which uses it for hardware configuration
+> mismatch handling in npc_cn20k_config_kw_x2() at lines 956-960.
+req->req_kw_type is used for different purpose. I believe, this comment is invalid.
 
