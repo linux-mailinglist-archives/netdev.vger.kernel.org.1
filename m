@@ -1,218 +1,250 @@
-Return-Path: <netdev+bounces-260404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260405-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0N+SNWJinWk8PQQAu9opvQ
-	(envelope-from <netdev+bounces-260404-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 09:33:38 +0100
+	id +Go8ENtinWksPQQAu9opvQ
+	(envelope-from <netdev+bounces-260405-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 09:35:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90C0F183C63
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 09:33:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 990CF183D4B
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 09:35:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C07F13074BE9
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 08:33:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9C6013019BB9
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 08:35:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68094366DB8;
-	Tue, 24 Feb 2026 08:33:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35561366814;
+	Tue, 24 Feb 2026 08:35:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="ed6RPlZl"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="RW5z6UsP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
+Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 504021DFDB8;
-	Tue, 24 Feb 2026 08:33:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A199366DA1;
+	Tue, 24 Feb 2026 08:35:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.222
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771922004; cv=none; b=nbQ2/uCUgp9QZBVSrJptxHleqA8dFTbM7/FYKEvb6PPxZUnN0D1BhwRzOY2U4ZFuQH9T3i0sDDDWPEjXT+IqGBuEeCZ8xrATCcmSLBM79mLOoJ//pyfI8vdfDJr6U0g3XjJSj5sXeOoYyc6oYTA1Qas0nlgz40bj7DfP2pVfdxw=
+	t=1771922111; cv=none; b=B8v40htL4j1DGhA+buZFbBAMSMgpu7Qv/wIWtiPifnBEjxPpy3V7jxRhgRkYVfzRNBl6t+wG/lqUZIjn5peFdN8d5IZRInC/5zFhbI6EHzGoPrxkspDbHKXKQTxcVnLid6dRUohBo5nGnbrSEyMxx1JDMbjIHXis7HyoG/j/K5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771922004; c=relaxed/simple;
-	bh=jbJfsDf/AFVBkWOy7rSA4AaZdHLzv8lJvtIZjuKCFtE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=EVf9aGxuXIcgilZMvncrDKL8sy8rQMUpPk83/EANmYRE+zOBqUqjNk38gUY1tx6dnuiF5c0LRCjZprClLlgD9Wl36Tnhy+ZBQagmEtPjrrYfC2NjaivYsrUhc9FT61FJ1OpQ6eD2Ezl4gWHK3InAKL9ZbHKFdyRfTiYE0KlqhzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=ed6RPlZl; arc=none smtp.client-ip=80.241.56.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4fKrZw3WpFz9vHN;
-	Tue, 24 Feb 2026 09:33:12 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1771921992; h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BYg4q6UpxC9QuXXiNNDVGkJ25zHrTtqhRQuiGoCwbvc=;
-	b=ed6RPlZlOUibWHwOocSfYTbtNmFVbXwAr31lgxNkh51bR+5xZFRh30ChM/VGa7gukLud7Z
-	gjTbJ0LWe52KAN52GeHh8bJ/s/WoNKVXWlvSRa1yRizbR3EpzoiYW3Wbfme/2w9YFsXFEw
-	1Sfja1+XOBY3ofP3UjIRgt036+qwuwuFFrM+HEUlokbyx8ydCENU7J4uyTEkj1BUrJue4J
-	99L7hKKIyf8MBC9C72PvXh5nuwMG3ygnRsPehMi1rXkCt72nSQ/Sw/iY4BR8htDmahaWW7
-	ev+dgehPQrgSupmjoTGs4VKws0G0Lm/uzKdxtzYsBciIbPjnvhapWs+EIlsL6g==
-Message-ID: <3014988f8a26dbac18a32ec22e0da3f5a383fd97.camel@mailbox.org>
-Subject: Re: [PATCH 01/37] PCI/MSI: Add Devres managed IRQ vectors allocation
-From: Philipp Stanner <phasta@mailbox.org>
-Reply-To: phasta@kernel.org
-To: Shawn Lin <shawn.lin@rock-chips.com>, phasta@kernel.org
-Cc: Bjorn Helgaas <bhelgaas@google.com>, "Vaibhaav Ram T . L"
- <vaibhaavram.tl@microchip.com>, Kumaravel Thiagarajan
- <kumaravel.thiagarajan@microchip.com>, Even Xu <even.xu@intel.com>, Xinpeng
- Sun <xinpeng.sun@intel.com>, Srinivas Pandruvada
- <srinivas.pandruvada@linux.intel.com>, Jiri Kosina <jikos@kernel.org>, 
- Alexandre Belloni <alexandre.belloni@bootlin.com>, Zhou Wang
- <wangzhou1@hisilicon.com>, Longfang Liu <liulongfang@huawei.com>, Vinod
- Koul <vkoul@kernel.org>, Lee Jones <lee@kernel.org>, Jijie Shao
- <shaojijie@huawei.com>, Jian Shen <shenjian15@huawei.com>, Sunil Goutham
- <sgoutham@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Heiner
- Kallweit <hkallweit1@gmail.com>, "David S . Miller" <davem@davemloft.net>,
- Jeff Hugo <jeff.hugo@oss.qualcomm.com>, Oded Gabbay <ogabbay@kernel.org>,
- Maciej Falkowski <maciej.falkowski@linux.intel.com>,  Karol Wachowski
- <karol.wachowski@linux.intel.com>, Min Ma <mamin506@gmail.com>, Lizhi Hou
- <lizhi.hou@amd.com>,  Andreas Noever <andreas.noever@gmail.com>, Mika
- Westerberg <westeri@kernel.org>, Tomasz Jeznach <tjeznach@rivosinc.com>,
- Will Deacon <will@kernel.org>, Xinliang Liu <xinliang.liu@linaro.org>, Tian
- Tao <tiantao6@hisilicon.com>, Davidlohr Bueso <dave@stgolabs.net>, Jonathan
- Cameron <jonathan.cameron@huawei.com>, Srujana Challa
- <schalla@marvell.com>, Bharat Bhushan <bbhushan2@marvell.com>, Antoine
- Tenart <atenart@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, Raag
- Jadav <raag.jadav@intel.com>, Hans de Goede <hansg@kernel.org>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby
- <jirislaby@kernel.org>, Andy Shevchenko <andy@kernel.org>, Manivannan
- Sadhasivam <mani@kernel.org>, Mika Westerberg
- <mika.westerberg@linux.intel.com>, Andi Shyti <andi.shyti@kernel.org>, 
- Robert Richter <rric@kernel.org>, Mark Brown <broonie@kernel.org>, Nirmal
- Patel <nirmal.patel@linux.intel.com>, Kurt Schwemmer
- <kurt.schwemmer@microsemi.com>,  Logan Gunthorpe <logang@deltatee.com>,
- Linus Walleij <linusw@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
- Sakari Ailus <sakari.ailus@linux.intel.com>, Bingbu Cao
- <bingbu.cao@intel.com>, Ulf Hansson <ulf.hansson@linaro.org>, Arnd Bergmann
- <arnd@arndb.de>, Benjamin Tissoires <bentiss@kernel.org>,
- linux-input@vger.kernel.org,  linux-i3c@lists.infradead.org,
- dmaengine@vger.kernel.org, netdev@vger.kernel.org,  nic_swsd@realtek.com,
- linux-arm-msm@vger.kernel.org,  dri-devel@lists.freedesktop.org,
- linux-usb@vger.kernel.org,  iommu@lists.linux.dev,
- linux-riscv@lists.infradead.org, David Airlie <airlied@gmail.com>, Simona
- Vetter <simona@ffwll.ch>, linux-cxl@vger.kernel.org, 
- linux-crypto@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
- linux-serial@vger.kernel.org, mhi@lists.linux.dev, Andy Shevchenko
- <andriy.shevchenko@linux.intel.com>, Jan Dabros <jsd@semihalf.com>, 
- linux-i2c@vger.kernel.org, Daniel Mack <daniel@zonque.org>, Haojian Zhuang
- <haojian.zhuang@gmail.com>, linux-spi@vger.kernel.org, Jonathan Derrick
- <jonathan.derrick@linux.dev>, linux-pci@vger.kernel.org, 
- linux-gpio@vger.kernel.org, Mauro Carvalho Chehab <mchehab@kernel.org>, 
- linux-media@vger.kernel.org, linux-mmc@vger.kernel.org, Jakub Kicinski
- <kuba@kernel.org>
-Date: Tue, 24 Feb 2026 09:32:39 +0100
-In-Reply-To: <d601ec05-ef38-5e8e-c643-c05010717ebe@rock-chips.com>
-References: <1771860581-82092-1-git-send-email-shawn.lin@rock-chips.com>
-	 <1771860581-82092-2-git-send-email-shawn.lin@rock-chips.com>
-	 <20260223160402.3ad8f079@kernel.org>
-	 <ec226aa1-5cc8-855f-8f90-1d7f89efe766@rock-chips.com>
-	 <07fc896007d86b731cbfb3cf6bbdf4e5315d7a77.camel@mailbox.org>
-	 <d601ec05-ef38-5e8e-c643-c05010717ebe@rock-chips.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1771922111; c=relaxed/simple;
+	bh=43m26sbpVD4yg8OL79u3M2NiOM3BzPRPCgbYPX+O1+k=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=EBw0ZsPRdGsAHofTGkTNcK3ih7OUYM0FK8ZnrrcPXXN3wG6qHAKkplMKjycnogwsJ346scJ3Pub/QFEVOfFJaaMoRsT6h3HVQmAInrPeVaX/0a6U1kHX57OKAS+f2LgZz+/J210MGfkvLEVB0HqokYkZOiAEonO616cYi+zgRQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=RW5z6UsP; arc=none smtp.client-ip=113.46.200.222
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=DVsICJgyDOq5n55e+N9YMtGRTcnXzdB9j4fTbzYgE7M=;
+	b=RW5z6UsPyv0yDN2hfUkcM0Be2o+cmUXCeU4zyB6PT+ZPk2qcRPWPcN7WS4qeMdNZ0sBbBw4wp
+	ec3yYhAY7sMhhhsYiUX+aR4cJXmnEyKginoJT98OmTUPm0lkPa8ug8St1N9ADvpN4/tDeHlog+/
+	C55ZK36q7Nc7NsT3AFWyOH4=
+Received: from mail.maildlp.com (unknown [172.19.163.200])
+	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4fKrWR1bPczLlSJ;
+	Tue, 24 Feb 2026 16:30:11 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4981B4055B;
+	Tue, 24 Feb 2026 16:34:57 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Tue, 24 Feb 2026 16:34:56 +0800
+Message-ID: <a5914383-06fc-45e8-9a6c-9760617383be@huawei.com>
+Date: Tue, 24 Feb 2026 16:34:56 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MBO-RS-META: 9xmyhhcgdmozckmn6yfrqrcxte8ryx4p
-X-MBO-RS-ID: 6c93f1b6d9c4844e3a5
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <linux-kernel@vger.kernel.org>,
+	<kevin.curtis@farsite.co.uk>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net] net: wan: farsync: Fix use-after-free bugs caused by
+ unfinished tasklets
+To: Duoming Zhou <duoming@zju.edu.cn>, <netdev@vger.kernel.org>
+References: <20260219124637.72578-1-duoming@zju.edu.cn>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20260219124637.72578-1-duoming@zju.edu.cn>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260404-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[google.com,microchip.com,intel.com,linux.intel.com,kernel.org,bootlin.com,hisilicon.com,huawei.com,marvell.com,lunn.ch,gmail.com,davemloft.net,oss.qualcomm.com,amd.com,rivosinc.com,linaro.org,stgolabs.net,gondor.apana.org.au,linuxfoundation.org,microsemi.com,deltatee.com,arndb.de,vger.kernel.org,lists.infradead.org,realtek.com,lists.freedesktop.org,lists.linux.dev,ffwll.ch,semihalf.com,zonque.org,linux.dev];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260405-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[mailbox.org:+];
-	RCPT_COUNT_GT_50(0.00)[88];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[phasta@mailbox.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	HAS_REPLYTO(0.00)[phasta@kernel.org];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mailbox.org:mid,mailbox.org:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 90C0F183C63
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,huawei.com:mid,huawei.com:dkim,huawei.com:email]
+X-Rspamd-Queue-Id: 990CF183D4B
 X-Rspamd-Action: no action
 
-On Tue, 2026-02-24 at 16:21 +0800, Shawn Lin wrote:
-> =E5=9C=A8 2026/02/24 =E6=98=9F=E6=9C=9F=E4=BA=8C 15:47, Philipp Stanner =
-=E5=86=99=E9=81=93:
-> > On Tue, 2026-02-24 at 10:08 +0800, Shawn Lin wrote:
-> > > =E5=9C=A8 2026/02/24 =E6=98=9F=E6=9C=9F=E4=BA=8C 8:04, Jakub Kicinski=
- =E5=86=99=E9=81=93:
-> > > > On Mon, 23 Feb 2026 23:29:40 +0800 Shawn Lin wrote:
-> > > > > pcim_alloc_irq_vectors() and pcim_alloc_irq_vectors_affinity() ar=
-e created for
-> > > > > pci device drivers which rely on the devres machinery to help cle=
-anup the IRQ
-> > > > > vectors.
-> > > >=20
-> > > > If you can please add this API with just a few users, and then conv=
-ert
-> > > > remaining users via the subsystem trees in the next cycle.
-> > > > There's no need to risk wasting maintainer time on conflicts with
-> > > > conversions like this.
-> > >=20
-> > > Thanks for the suggestion, Jakub. I have little experience with
-> > > cross-subsystem cleanups like this, so your suggestion is very helpfu=
-l.
-> >=20
-> >=20
-> > When I removed the hybrid nature of pci_request_region() et al., I
-> > concluded that there were so few users that doing them all in one run
-> > was sufficient.
-> >=20
-> > For larger reworks, like removing pcim_iomap_table(), a slower step-by-
-> > step strategy is necessary for the reasons that Jakub details.
-> >=20
-> > It is then smart to omit an easy to port subsystem / driver for the
-> > ultimate patch series where one then removes the hybrid behavior from
-> > PCI itself, after porting the last driver.
-> >=20
-> > In general,=C2=A0 as Jakub details, those step-by-step cleanups are a b=
-it
-> > safer, since you can proof valid behavior early on and in case of an
-> > explosion they are very easy to revert.
-> >=20
->=20
-> Thank you, Philipp. I wish I had attended your talk at FOSDEM 2025 on
-> removing pcim_iomap_table earlier. This first version was perhaps a bit=
-=20
-> too aggressive.
 
-No worries at all, it's very cool that you pick this work up!
+on 2026/2/19 20:46, Duoming Zhou wrote:
+> When the FarSync T-series card is being detached, the fst_card_info is
+> deallocated in fst_remove_one(). However, the fst_tx_task or fst_int_task
+> may still be running or pending, leading to use-after-free bugs when the
+> already freed fst_card_info is accessed in fst_process_tx_work_q() or
+> fst_process_int_work_q().
+>
+> A typical race condition is depicted below:
+>
+> CPU 0 (cleanup)           | CPU 1 (tasklet)
+>                            | fst_start_xmit()
+> fst_remove_one()          |   tasklet_schedule()
+>    unregister_hdlc_device()|
+>                            | fst_process_tx_work_q() //handler
+>    kfree(card) //free      |   do_bottom_half_tx()
+>                            |     card-> //use
+>
+> The following KASAN trace was captured:
+>
+> ==================================================================
+>   BUG: KASAN: slab-use-after-free in do_bottom_half_tx+0xb88/0xd00
+>   Read of size 4 at addr ffff88800aad101c by task ksoftirqd/3/32
+>   ...
+>   Call Trace:
+>    <IRQ>
+>    dump_stack_lvl+0x55/0x70
+>    print_report+0xcb/0x5d0
+>    ? do_bottom_half_tx+0xb88/0xd00
+>    kasan_report+0xb8/0xf0
+>    ? do_bottom_half_tx+0xb88/0xd00
+>    do_bottom_half_tx+0xb88/0xd00
+>    ? _raw_spin_lock_irqsave+0x85/0xe0
+>    ? __pfx__raw_spin_lock_irqsave+0x10/0x10
+>    ? __pfx___hrtimer_run_queues+0x10/0x10
+>    fst_process_tx_work_q+0x67/0x90
+>    tasklet_action_common+0x1fa/0x720
+>    ? hrtimer_interrupt+0x31f/0x780
+>    handle_softirqs+0x176/0x530
+>    __irq_exit_rcu+0xab/0xe0
+>    sysvec_apic_timer_interrupt+0x70/0x80
+>   ...
+>
+>   Allocated by task 41 on cpu 3 at 72.330843s:
+>    kasan_save_stack+0x24/0x50
+>    kasan_save_track+0x17/0x60
+>    __kasan_kmalloc+0x7f/0x90
+>    fst_add_one+0x1a5/0x1cd0
+>    local_pci_probe+0xdd/0x190
+>    pci_device_probe+0x341/0x480
+>    really_probe+0x1c6/0x6a0
+>    __driver_probe_device+0x248/0x310
+>    driver_probe_device+0x48/0x210
+>    __device_attach_driver+0x160/0x320
+>    bus_for_each_drv+0x101/0x190
+>    __device_attach+0x198/0x3a0
+>    device_initial_probe+0x78/0xa0
+>    pci_bus_add_device+0x81/0xc0
+>    pci_bus_add_devices+0x7e/0x190
+>    enable_slot+0x9b9/0x1130
+>    acpiphp_check_bridge.part.0+0x2e1/0x460
+>    acpiphp_hotplug_notify+0x36c/0x3c0
+>    acpi_device_hotplug+0x203/0xb10
+>    acpi_hotplug_work_fn+0x59/0x80
+>   ...
+>
+>   Freed by task 41 on cpu 1 at 75.138639s:
+>    kasan_save_stack+0x24/0x50
+>    kasan_save_track+0x17/0x60
+>    kasan_save_free_info+0x3b/0x60
+>    __kasan_slab_free+0x43/0x70
+>    kfree+0x135/0x410
+>    fst_remove_one+0x2ca/0x540
+>    pci_device_remove+0xa6/0x1d0
+>    device_release_driver_internal+0x364/0x530
+>    pci_stop_bus_device+0x105/0x150
+>    pci_stop_and_remove_bus_device+0xd/0x20
+>    disable_slot+0x116/0x260
+>    acpiphp_disable_and_eject_slot+0x4b/0x190
+>    acpiphp_hotplug_notify+0x230/0x3c0
+>    acpi_device_hotplug+0x203/0xb10
+>    acpi_hotplug_work_fn+0x59/0x80
+>   ...
+>
+>   The buggy address belongs to the object at ffff88800aad1000
+>    which belongs to the cache kmalloc-1k of size 1024
+>   The buggy address is located 28 bytes inside of
+>    freed 1024-byte region
+>   The buggy address belongs to the physical page:
+>   page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0xaad0
+>   head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+>   flags: 0x100000000000040(head|node=0|zone=1)
+>   page_type: f5(slab)
+>   raw: 0100000000000040 ffff888007042dc0 dead000000000122 0000000000000000
+>   raw: 0000000000000000 0000000080100010 00000000f5000000 0000000000000000
+>   head: 0100000000000040 ffff888007042dc0 dead000000000122 0000000000000000
+>   head: 0000000000000000 0000000080100010 00000000f5000000 0000000000000000
+>   head: 0100000000000003 ffffea00002ab401 00000000ffffffff 00000000ffffffff
+>   head: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
+>   page dumped because: kasan: bad access detected
+>
+>   Memory state around the buggy address:
+>    ffff88800aad0f00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>    ffff88800aad0f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>   >ffff88800aad1000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>                               ^
+>    ffff88800aad1080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>    ffff88800aad1100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>   ==================================================================
+>
+> Fix this by ensuring that both fst_tx_task and fst_int_task are properly
+> canceled before the fst_card_info is released. Add tasklet_kill() in
+> fst_remove_one() to synchronize with any pending or running tasklets.
+> Since unregister_hdlc_device() stops data transmission and reception,
+> and fst_disable_intr() prevents further interrupts, it is appropriate
+> to place tasklet_kill() after these calls.
+>
+> The bugs were identified through static analysis. To reproduce the issue
+> and validate the fix, a FarSync T-series card was simulated in QEMU and
+> delays(e.g., mdelay()) were introduced within the tasklet handler to
+> increase the likelihood of triggering the race condition.
+>
+> Fixes: 2f623aaf9f31 ("net: farsync: Fix kmemleak when rmmods farsync")
+> Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
 
->  For v2, I think the plan should start with addressing
-> the switchtec and vmd drivers, since both of those, along with the new=
-=20
-> API additions, can be handled entirely within the PCI subsystem scope.
+Reviewed-by: Jijie Shao <shaojijie@huawei.com>
 
-Sounds reasonable to me.
-
-Regards
-Philipp
+> ---
+>   drivers/net/wan/farsync.c | 2 ++
+>   1 file changed, 2 insertions(+)
+>
+> diff --git a/drivers/net/wan/farsync.c b/drivers/net/wan/farsync.c
+> index 5b01642ca44..6b2d1e63855 100644
+> --- a/drivers/net/wan/farsync.c
+> +++ b/drivers/net/wan/farsync.c
+> @@ -2550,6 +2550,8 @@ fst_remove_one(struct pci_dev *pdev)
+>   
+>   	fst_disable_intr(card);
+>   	free_irq(card->irq, card);
+> +	tasklet_kill(&fst_tx_task);
+> +	tasklet_kill(&fst_int_task);
+>   
+>   	iounmap(card->ctlmem);
+>   	iounmap(card->mem);
 
