@@ -1,177 +1,168 @@
-Return-Path: <netdev+bounces-260588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260589-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EC/3I4XQnWkaSQQAu9opvQ
-	(envelope-from <netdev+bounces-260588-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 17:23:33 +0100
+	id QNqnGjnUnWk0SQQAu9opvQ
+	(envelope-from <netdev+bounces-260589-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 17:39:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F6BF189C31
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 17:23:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E431B189E29
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 17:39:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 63BBB302BF61
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 16:23:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4913931B5916
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 16:35:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67CBE3A63E7;
-	Tue, 24 Feb 2026 16:23:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD6F93A8FEE;
+	Tue, 24 Feb 2026 16:35:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NfHhBxwa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i4rLs0cs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C3E73A1E96
-	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 16:23:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771950210; cv=pass; b=JYhBP+vF9gMbiA+b+Wfa8L1etyPiA8OdrOz7T0RKDdXFjunSICJVtxdXADmJeFFskW9+3eEyXbsaPj4HY1sqwXzV5qNTujQYbJDtvpqyou205OT0UzS6/CslsO/3IWKj+f3/KKHvuoTox6MzlNckPs+OEG6WAGVP929shMGToIo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771950210; c=relaxed/simple;
-	bh=ZqJufl22SDOPAyHAbjNV+mtVnTAnC3F95iDjVkPYjsc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kQo/bf5kfp+4rdenPeqlms51w1ZZleJHFr3A5rwCB9MnQBOjsOf/KpfpP0t+CAG1D3RFe670zz6xFJtPNv/QQRO1IFGl0mlYQw/+1rPNDb9rL+Ko+J1pZ5IJP9GlFsHk4XC6DuaMl4RHOgnqW4hX5NT/8WQrLOUOMTmkwlTHd+Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NfHhBxwa; arc=pass smtp.client-ip=74.125.82.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-2bda3b4318dso271866eec.1
-        for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 08:23:29 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771950208; cv=none;
-        d=google.com; s=arc-20240605;
-        b=T9N8ZMALa3ed99dBU8W+x753fm0+v0wcee27WA+zlE6M3Ee0RUVz40Ck1c78It0L4G
-         9u4P2cJt7N+umnNI8iJe3MaCcwiTZbLq4ladYs+N7wLqjzsJQ2C/C8iK06N67JlzRESh
-         mY2gWj4aWF1Wpm0rxIks9PQ9ZatFU6ycmCCgexcJfC29jcsWTOit8esx5WTOUv+V5tlp
-         fhopVVCgMzdHKttXtuK+te9QhLLtfWS+l7WOhEEs0QuIBza7HrrUjRF1bBkKbchSVD/k
-         05eYVdsLZQG2pcZlymPnQDdQRlyAMSvXtxBkwHWCUptZ52wGXuRpXeqQrQQljVvjqtrF
-         fQyg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ZqJufl22SDOPAyHAbjNV+mtVnTAnC3F95iDjVkPYjsc=;
-        fh=1JI0VPul/uzv7Lii9zU89ToLHi5S93U/kTULOcCO2Fg=;
-        b=jw0BgyitN9tsTZ8eJKlvmWriFutNTTwM/Lhqr9Kioxos8iUuHwlwYTg1pTmwlDsNCs
-         cAMRnjXVvRixPS2vIUh9mewQjD6kYoGqd/X1ruzpeqril+lyZUSkpYcjvykpLRambIOp
-         1G4Bj8Bb7W4HUmBe7xcKLQVjBDjWFZmpdOS9lQ2ONDpEUgJHbiFECAJFdS+Q/b4UAa/m
-         lpRFlo2BcfC3M4PI+fJWD7t5V0xXgfART4h+56kU/Fsnkj3Dmc6Ru6PYwZ/5SkcuPhRS
-         TDpwysjpd/8ur7femRn2eqe5Bt8QMXC3/GZ0mTEWepFSy0ufzZoKbyAfdMoXUqTrnoHv
-         gyBw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771950208; x=1772555008; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZqJufl22SDOPAyHAbjNV+mtVnTAnC3F95iDjVkPYjsc=;
-        b=NfHhBxwaHqxl4hP4LhBuPbhxDtmpiUFDuF5vJRhyFz5nkOHWcUGkUm5MX9wTLP0seS
-         GJ8KrR/HdE1e8GbmYgRb02OmbqlXHHSdRM4WcXsysG7svjxujS5yIR2K9DqfRXtKORVb
-         IU4/zVkixcIXv9DqCAYhKaQ7d3zdGMJAfNwCDvkvotzDm9yS3LlLkeY3BsxT5Bp2nOsf
-         bmKZiBAO/cyIW6Y+sBWEDKvpaXzaixEvOyVU5AbZrbif99YUrZau0afZWmQiXKFuXZrr
-         VrC8SELGZwndi17J9h79PV/iXdD39izMmg4yTxXleGzGtm5DtnpHZFzEvZ0EZje3h7YW
-         Yk0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771950208; x=1772555008;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ZqJufl22SDOPAyHAbjNV+mtVnTAnC3F95iDjVkPYjsc=;
-        b=X/ScEJrLlpHz/qJGPEzWI0dkW4h3KyVQZrrqJZsSZZBArP+Ub26vt5rX00gq+9QpZ/
-         wCoVusx5x2fT4iZ9mwp1wuUbdyt3jds7kCfYfKHVskWI+YxVQkcTWt4bizYbKD4b6XwC
-         WqLRolfwGIDO6oOOOIHg+0Xnz6nBWe8Ow06f4mdEZ79zVuxhS3DH5a8uhVSF+dpJkfKM
-         KeuVWCp+OXINxWCbqzJxHqSTZZLTiqBpcDL/Lwi4PppQWaiRQSNymWMR3V9KbS2Tbr4Y
-         4t0sRR26YZ9ILd1x//DXU3+Lb2uByTPnEMFSO+wNviIpQ+/BH3IP36oUNXjf0VjSa5le
-         /t/w==
-X-Forwarded-Encrypted: i=1; AJvYcCULE9jgLrukMM7a7K2IoF6oU8o9C+76kqlw//G0voqmbrPib/mGfz6izMv6LxBdvvZg1hbBkyo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyj/CCd0GDtylxXzMiZ0wXMnjGduVWgTMgTY8AmRq8e4huNaBRE
-	6OMpC1sN2p3faKB5pxEwcGgV1t7JiuAQ8ERfPKftWvFDHLUiVWY1bnaGjPHwadl2pfHg59122fZ
-	KHQ9T1VwhIUANxJ6bWf49/78s/ATlVtk=
-X-Gm-Gg: ATEYQzxlG4w6HEzVHTbipB/EsCVPGLjXnoC9jhn6KhlTLEp6iiWunW3MSBQb1DPD6sP
-	bcMPkkchEvb3VhGmcQuKrz2L0CXWZ93KDbM5U/4liAFFAPqcl50Xjp59TK6ST6GKOH6g8LEY9Pa
-	pPDgbj00I9CmvY8GKLP3FvdaBdJWPr+Sma6bdhjWV/mAOAcTTc6LLoioEATCox7qobUldAAMrJh
-	QvHl1JQQ8Bu++BSfTQ8F1XjFXWbxf3JfK0u8gNRbqrDNW3ZXdSbvpKxmltkUwU/WwhT/PKmPMPH
-	VE4YTJMnZJaqtCb6jSqXRM+R5SzWZfPYm6uJGswpjt7Qev0n/4P7D2pmmhLFeirjFKmiR8ZjLLW
-	fedTQHRCNuwVXlE0+OMdV/xS+aJRl
-X-Received: by 2002:a05:7300:dc8e:b0:2ba:7013:2b94 with SMTP id
- 5a478bee46e88-2bd7bd5a668mr2692037eec.4.1771950207813; Tue, 24 Feb 2026
- 08:23:27 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93793A8FE1;
+	Tue, 24 Feb 2026 16:35:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771950957; cv=none; b=P5ZKS4yqzf6jUYSM6IuGZZr5YmJHEJVvGIuobE1A4ojTld6l8D8Ljx73niyqx9e/4AmCJ0XmglXf8dh5V5QkPBr9wm809PKsZnYHPH07GlyfjZM5ALZBQpKvkaAlMBZGwDHfc+QpsbtwDu102VIn4CM9u6mWUM6wZZldrZZGdJs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771950957; c=relaxed/simple;
+	bh=kSBTLlMV6zLNU1mablt3JM4TXckztaxwmFihI53ir5c=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=LqIMNtMryN+6Z65gMIWhBI7O6ZQEhMyC+iqxLewJ9+tXAdaXZIOyuYvCFl+NizJR5i8UYfROC8FaRiVsNZ3m1r6Ldt2I6gBWqsOQhnQUNAoesgPzxDMLhivfC+Tmt4vBP3AZLPNbW9TYCpX9alIY+LLylnKwJdHmQ/ZsZwSJCjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i4rLs0cs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78998C116D0;
+	Tue, 24 Feb 2026 16:35:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771950957;
+	bh=kSBTLlMV6zLNU1mablt3JM4TXckztaxwmFihI53ir5c=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=i4rLs0csiXnuR3pQFC5fXouZ1CReKzLw6IUjP808CNpyIwZrwZXI5OqP88MimOpEd
+	 Q9a2zmzCsapZ81C9RdbcHl7iyDs+brduReKHn8O66+VoRTH124+ssuxz9x2bKFPHjg
+	 c+HcMbS9wnRS3FvW0QdPCwi6M7vXJw9BPjDc25RukpZmZZdBsdON2JeEP8IcGmSBl0
+	 MKyYGoP3m+EdHpEppMi8aB/3aWdhZnahQjYGTOjkRvyGnE62HpjZEg39QijS3K/Jm+
+	 V0sSHKSeCt9z+ovrJaB7MibHy0CIHOrAOeKmaS0Wq3K45QtHkFTr12tlQ+jmYMXj0f
+	 aqDeNjEVH7ZsQ==
+Content-Type: multipart/mixed; boundary="===============1231585818442456678=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260223220504.2102-1-iprintercanon@gmail.com> <20260224043211.1747-1-iprintercanon@gmail.com>
-In-Reply-To: <20260224043211.1747-1-iprintercanon@gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Tue, 24 Feb 2026 17:23:15 +0100
-X-Gm-Features: AaiRm53w0bVWON5EvGEnE-QSWW26Y5D2UjioC8X6mMuMoDlaoNudcBlKEg6cgtQ
-Message-ID: <CANiq72n9=xwb+HVkSDc9+6HGQA0-vw46OUHJ5PouhGgiFbcYBA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 0/3] net: phy: add Rust reference driver for ET1011C
-To: Artem Lytkin <iprintercanon@gmail.com>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Trevor Gross <tmgross@umich.edu>, 
-	Russell King <linux@armlinux.org.uk>, Miguel Ojeda <ojeda@kernel.org>, 
-	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Message-Id: <eee0df40aa8e7d4bba027682244ea59e86105b677510525f2ddd8b87b88f194e@mail.kernel.org>
+In-Reply-To: <20260224154024.12504-4-leon.hwang@linux.dev>
+References: <20260224154024.12504-4-leon.hwang@linux.dev>
+Subject: Re: [PATCH bpf-next 3/8] bpf: Disallow !call_get_func_ip progs tail-calling call_get_func_ip progs
+From: bot+bpf-ci@kernel.org
+To: leon.hwang@linux.dev,bpf@vger.kernel.org
+Cc: ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,martin.lau@linux.dev,eddyz87@gmail.com,song@kernel.org,yonghong.song@linux.dev,john.fastabend@gmail.com,kpsingh@kernel.org,sdf@fomichev.me,haoluo@google.com,jolsa@kernel.org,shuah@kernel.org,yangfeng@kylinos.cn,leon.hwang@linux.dev,menglong8.dong@gmail.com,puranjay@kernel.org,bjorn@kernel.org,pulehui@huawei.com,linux-kernel@vger.kernel.org,linux-kselftest@vger.kernel.org,netdev@vger.kernel.org,kernel-patches-bot@fb.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Tue, 24 Feb 2026 16:35:55 +0000 (UTC)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	CTYPE_MIXED_BOGUS(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260588-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-260589-lists,netdev=lfdr.de,bpf-ci];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,kylinos.cn,huawei.com,vger.kernel.org,fb.com,meta.com];
+	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	SUBJECT_HAS_EXCLAIM(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	NEURAL_HAM(-0.00)[-0.998];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[miguelojedasandonis@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,umich.edu,armlinux.org.uk,kernel.org,davemloft.net,redhat.com,google.com,vger.kernel.org];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2F6BF189C31
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E431B189E29
 X-Rspamd-Action: no action
 
-On Tue, Feb 24, 2026 at 5:32=E2=80=AFAM Artem Lytkin <iprintercanon@gmail.c=
-om> wrote:
->
-> This series adds a Rust reference driver for the LSI ET1011C PHY,
-> following the pattern established by the existing Rust Asix PHY driver
-> (ax88796b_rust.rs).
+--===============1231585818442456678==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-It is great to see more Rust code, and I am glad the "Rust reference
-driver" model is useful here. But reference drivers, in principle, are
-meant to bootstrap the abstractions and so on. The cover letter says
-"following the pattern established", but the idea is not to duplicate
-every C driver.
+> diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+> --- a/kernel/bpf/core.c
+> +++ b/kernel/bpf/core.c
 
-Since there is already a PHY one, is this meant to bootstrap the two
-new APIs? Or something else?
+[ ... ]
 
-Of course, it is up to the maintainers, i.e. if they want/need to have
-more reference drivers, that is great. But I think it would be good to
-clarify.
+> @@ -2418,6 +2419,9 @@ static bool __bpf_prog_map_compatible(struct bpf_map *map,
+>  		      map->owner->sleepable == fp->sleepable;
+>  		if (ret && (!map->owner->kprobe_write_ctx && aux->kprobe_write_ctx))
+>  			ret = false;
+> +		if (ret && (!map->owner->call_get_func_ip && fp->call_get_func_ip &&
+> +			    prog_type == BPF_PROG_TYPE_TRACING))
+> +			ret = false;
 
-Thanks!
+This check catches the case where owner->call_get_func_ip is 0 and
+the new program has call_get_func_ip set. However, does the reverse
+ordering also need to be handled?
 
-Cheers,
-Miguel
+Consider:
+
+  1. Program H (call_get_func_ip=1) is added to the prog_array first
+     and becomes the owner with owner->call_get_func_ip=1.
+
+  2. Program M (call_get_func_ip=0) is loaded and references this
+     prog_array for tail calls. bpf_check_tail_call() calls
+     __bpf_prog_map_compatible(PA, M), and the check evaluates:
+
+       (!owner->call_get_func_ip && fp->call_get_func_ip)
+       (!1 && 0) = false
+
+     so M passes the compatibility check.
+
+  3. M is attached to a trampoline where no program needs func_ip,
+     so ip_arg is false and func_ip is not pushed on the stack.
+
+  4. M tail-calls H. H calls bpf_get_func_ip(), which reads from
+     the expected stack offset, but that slot was never written by
+     the trampoline, so it returns stale stack data.
+
+Would it be safer to reject any mismatch on call_get_func_ip for
+tracing programs, regardless of which program was added first?
+Something like:
+
+  if (ret && (map->owner->call_get_func_ip != fp->call_get_func_ip) &&
+      prog_type == BPF_PROG_TYPE_TRACING)
+          ret = false;
+
+>  		if (ret &&
+>  		    map->map_type == BPF_MAP_TYPE_PROG_ARRAY &&
+>  		    map->owner->expected_attach_type != fp->expected_attach_type)
+>  			ret = false;
+
+
+---
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/22358832658
+
+AI-authorship-score: medium
+AI-authorship-explanation: Selftests in the series carry Assisted-by Codex tags, and the kernel code change is formulaic pattern replication across all commits, consistent with AI-assisted development.
+issues-found: 1
+issue-severity-score: medium
+issue-severity-explanation: One-directional compatibility check allows a non-call_get_func_ip tail-caller to bypass the check when the call_get_func_ip program is added to the prog_array first, potentially causing bpf_get_func_ip to return stale stack data.
+
+--===============1231585818442456678==--
 
