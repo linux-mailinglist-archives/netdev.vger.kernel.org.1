@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-260330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260331-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2Ex8BLoqnWmfNAQAu9opvQ
-	(envelope-from <netdev+bounces-260330-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 05:36:10 +0100
+	id 9IvVCycqnWmmNAQAu9opvQ
+	(envelope-from <netdev+bounces-260331-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 05:33:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6675C181AE5
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 05:36:09 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BBE1181AAF
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 05:33:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A979A318707D
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 04:32:27 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7ADA03044DD2
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 04:32:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18271280CE0;
-	Tue, 24 Feb 2026 04:32:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 207522BF006;
+	Tue, 24 Feb 2026 04:32:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LZXfwg/4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TdGPyQGd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49479292936
-	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 04:32:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5E1284B36
+	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 04:32:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771907537; cv=none; b=QUR0QgVXiqa4Om/n0u439ILR/bjmrY9prj89AUBh98ChSiv8ucECcT1Nc2r6g4RTgSxW80rN9/kWkYKW6JgPsyUYjD4RmfJqyFwD3ZpHYa/ktpBFySC/N9FeCIy1tWVwo/vQNe/J9bbE7/lkczhdvFHYD5CXgv8qPwU7b7dOwEg=
+	t=1771907539; cv=none; b=aG7g14LZTYjAIE1BqBuse9LZ5lzgIx/+JB5H0NL6bKVZWuSEDyndEdh/Ns+cKfjzsIFafjJZ6Aa+GuhBDjvsiQUVSOuAL+9X5erQ0mkQUatGRFTGkpjnIZg7wj6vng/AHtHLld/LBF7NrvJoLscsbYyaXYnV+Av27F3ouBWHlNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771907537; c=relaxed/simple;
-	bh=UEnQcp4MGlJixya53SMjZLpT9RLhpMLIX7hTK536NMQ=;
+	s=arc-20240116; t=1771907539; c=relaxed/simple;
+	bh=b1xLgounYgAgwix7HTIz89qnAwlJn9qu3/e7SYKIiwU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hUXMnCDjePRtrwcVvO3H8YKDJ4vSzO5IMLXiVP9QUueGkdViyOJtXgpUXfcnnF1/k7D4msY8p/s4Man5gpr5xfw0dShpi0sdHipPZaeMFf+DpqWMK0SyUZZtBncChHCnuUZuUh0gAfFAuwgHl/j8feDH1qeSPlLpC6JgF9vWm5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LZXfwg/4; arc=none smtp.client-ip=209.85.218.45
+	 MIME-Version; b=oXjzNsy/UYp8OsxTu5Li5VcpZtQYdu1x1gabpvXoAhdmNQK1bU0ITcQ7C07vLttct6bJ5GiZKVxaGWXenhv/C+J1P479po3RyCmOxdTeO8/odkhzlEGdwYCVdXwqbVD4xyUBtABCzKK5G9IlCmI6RzY3GNk0WrjKnRd83GLwfBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TdGPyQGd; arc=none smtp.client-ip=209.85.208.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b90bb0e8376so179511166b.0
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-65baa72399fso6734798a12.0
         for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 20:32:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20230601; t=1771907534; x=1772512334; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=q2TVn9WTr30egH9VBmZciSNVmo3+g7N5E2PAqbC/nLw=;
-        b=LZXfwg/4tZ6HhrT9jl4EPeGkI3uDTT+znbzZuqrGm3vqHETOCp7DPPE4I3BJrlY4Ss
-         gIM0R+yR0HQZ0LzBT26e1/i7HupkrLuAq+TathWp8I10RzEs8qkmUtzdkXGkQ5+avt/H
-         G6Dyz1UOpDSv+woBt1K9ajTq7ncVzzwaXL8a7jty3Ww3nzipSa+BNaql3n9Dgx9JNZ6m
-         aTMaK6pRB0Kpwnmwb6Tkc9K11m4ai/BG3huTEC/C0FYS03x1NonMLYM5d33e8darWG8M
-         Wi39KgQVgU4MeZlc2Thf+hwyBZtPwjxRmc4RRhTj/JKoQBLccVXVliowTnGN3CHccqQ9
-         lTfw==
+        bh=siyGLrMfYzfWpKFoliNweeMXGBRAFWTpZWYm7LAc1oE=;
+        b=TdGPyQGdK3oSwAxxSiYzeVbtxiTigeB7wXXSHcKB/tzEtFkT33s8Hz3Cvupio/4+fr
+         klYvKDU21KGDIAdLOCNqIxt4rHBw/yYG9r7OiXJObMaVQlUf2QKynR0yaHlGaAoXGrkV
+         yW0Kz3GbEWjdrkhM2kE3gBnJEYsmR1GBNi8I1P1DCasNmF+lG7qWkJEMu5r4wdwfxY6l
+         g+hsLmT3nyiEtJ9U/agFw/e/6Bv1NTOArq3MEKjZ2n5JFC6v0QrCgBRHNYnpnmZubgS7
+         p8+xgrVFMyUxMcQ9jF99lnJM8BN90nQeBTbBCtpBtiAJpV9iOGt6gcAcrZgisRW0gH4u
+         pKpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1771907534; x=1772512334;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=q2TVn9WTr30egH9VBmZciSNVmo3+g7N5E2PAqbC/nLw=;
-        b=LkZV41P18TOiY+T5coy7IrEe4iIjhxtvEpMUEktRx5JqhMP2bOuN5e3PTAwrZPLPQT
-         UU+cbLWHpibmZBy8mvlSHXayhQr0FrWedZhxSWj47dQjQa56wAPiAKEr9rvWArGqbQoG
-         Ngdb5KOgTBGmQXMrT5MeDfMMG83W/OiRF/rSW5N4iv4PnH5bSEviWbhKl+DMNzhQ+Iuu
-         PqSthWlJh2q6tNUbhwTxKKrJ+aZ/QVk6Sr6BcA6J4+MMMWiIEh7FQ0S85K3YAX39BlHa
-         rvb1FC1Z0roJaIPQ+cb+z/QjhhPmv7VJ0xj1V1Rat6oIVdeSzcmtD7c1YDJOF+fNIZIQ
-         atfw==
-X-Forwarded-Encrypted: i=1; AJvYcCU+8T5X4wF8psNLS9K4/W1JllpGaJC/bieN73GQosaMfWWM9IaCqgtb+ugy0aqlwlNZUuCUw4I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNANYqYq2jV/lJoGaG9GhojGRja64ynI0SrhRD1eAUzASI66I0
-	7nIR0KvK2lIyA879Zt0EfOKg0ui3CYVQ/1xg9kK5C6QuPP8J94sj+ZmM
-X-Gm-Gg: AZuq6aIDBUjph1/AKvJ70HzgIbMhXYQdBRjUHPljEAf6zUBWaJtVCNB3kgLbKOu+dKl
-	G3HsLXYbeGUGRgeIeHNsbWVAJ6cyzX9GY5ZAVszhl40xp7GoWzg2KoghchWq9V8orLcxGMYNAVg
-	nzer++wPOdk8gy9d3uHUVIci0Ucmx32WI2vgndtCeSfsGcHJgzvn4mn+Wmd8nAN+BW8DaUp7fs1
-	ggE26oRF+5MvsVYpIjQGvufV7JdFS3PtiWeo3eWmwuX9BOfdl+faXtNilBCLYy2GL6tAFLezur/
-	CBXsw2NaXq+ZqIyvJfINWNGm/9dO0CC104Zce8tN8N0viS9WguAPJd+mDmT4w53Lw2uWpwdTuiB
-	cRhJALAHWn11unVT0E3AcT3RnfvL0KoR5a2df8ULuvwiMJ3QG7D2lb/s4diDYP2SdWGbWIkvBaF
-	5X7tI7A1ynOyj9K9dlTvgGajpp0GgFqaIngOvK7+Y/1u2fkZwdSLwUxjAVbGkm5EHhJ2CWAtjzX
-	xglunpUqtAWR5h2FQX89bM67K/29l2zZ0FA1APS2EwNo0mRx3CoryUQdcUQX7KFEd3zRS33aQ==
-X-Received: by 2002:a17:907:6e8c:b0:b87:19ae:eb36 with SMTP id a640c23a62f3a-b90541616bdmr926260366b.7.1771907533547;
-        Mon, 23 Feb 2026 20:32:13 -0800 (PST)
+        bh=siyGLrMfYzfWpKFoliNweeMXGBRAFWTpZWYm7LAc1oE=;
+        b=OkWRmJTxIQ6vxWUltRCBvziIOSJRUTSo1XVM0rk6T0T0xYTApy0GrMvWDSBIFryeZv
+         X8yAiqw+PF/MJstAjmdxJ4naE+Kj9aEy9v3bshdTzl289iuznhY6MRWhHk0P721WyItr
+         +VjmuztR7Z5ooxLfsovQpE4MExe6RDdNiq4vCR9snOFdyEtIqjs74bVwFcOZDZ0R6yIM
+         3OcU3AzRL3heTEPi7cAyQkKCnn96wpJBCd7migF9aatcFxK8+IYmLEqBlSbpB/iwd74J
+         spCMbdmDW++5efvvRve8CFy69jzWzip297Ai8CrB27Ooji2Vg96ToydMGlwhfjfbZgs4
+         g8VA==
+X-Forwarded-Encrypted: i=1; AJvYcCU1Y4iXx6jXV8AwXy4R5S7GXPUwP21cADoMdTKZQorissRhnG+1x/kHGXcP272xpvNan0B8t8A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw85u+QL4XMo1skufut8qTY47JrgmMiEC86iypqW8DGp95PyULl
+	7cYDreueg0M5ysskrau/4H4EIihYNqfBcJDNsNU0WTqreGvLxls1JwWb
+X-Gm-Gg: AZuq6aJu5WqzhzfBHRErNdOhiQyIuEAWTDkCWrNOZSk3m1fiLiQSX5pLlMpul0UlPE7
+	ZSpXgwcSis1HUCUR9Oi9z3yFVk53vET6V0hWb3TbZTiLB29/nZlbLYBeZwbIrXY0iJ2BhQN5b3S
+	SjyiZr5YK/C0rveGRSiteRy9CI6Db5om8kmPL2hYH0Xn9bFCOfbqdWTz8vBrmBUyuaOlZU3f4sg
+	mGjp6/F50b9K59HE5UVBghLRE/NsKWnRrXWWLMVv7JGJ48PDnaDKRBpWQe2gXLI6akiS6waUZN5
+	t/+SUQwgKMyjHob/zDXmIltYoim07V4dp3Y/KbYBXAQhV1gMM4+XgtqP3BRvjHa9i74InlUWLYZ
+	XjFLTHDeEO1Yg51/wSc0EfFqFftjDAzIgNbBM3UFipbWIxG1VyekgJdRR6CcJxgj7yMlD3U34OU
+	vuKWHzR3Zo8ZLoKdOb7GJQU6Oh6Kr+SLRe8yMlgrI7rkuWWrk1q8NOafQUq6h/ZZ5ImQqAvrvr6
+	hLYQKU27jKqHV0HGDECPPGGKrksAm7GsPBAbqEufkZB+XNItsZzxmKhAWjsVjrp9Zo4zqX6Kg==
+X-Received: by 2002:a17:906:9f85:b0:b8e:d4ed:5eeb with SMTP id a640c23a62f3a-b9081a45252mr723264366b.26.1771907534454;
+        Mon, 23 Feb 2026 20:32:14 -0800 (PST)
 Received: from cs-874966990260-default.europe-west4-b.c.i2f7e30109524dc12-tp.internal (206.242.32.34.bc.googleusercontent.com. [34.32.242.206])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9088c8fc30sm371284466b.63.2026.02.23.20.32.12
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9088c8fc30sm371284466b.63.2026.02.23.20.32.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Mon, 23 Feb 2026 20:32:13 -0800 (PST)
 From: Artem Lytkin <iprintercanon@gmail.com>
@@ -92,9 +92,9 @@ Cc: Trevor Gross <tmgross@umich.edu>,
 	rust-for-linux@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Artem Lytkin <iprintercanon@gmail.com>
-Subject: [PATCH net-next v2 1/3] rust: net: phy: add speed() getter to Device
-Date: Tue, 24 Feb 2026 04:32:09 +0000
-Message-ID: <20260224043211.1747-2-iprintercanon@gmail.com>
+Subject: [PATCH net-next v2 2/3] rust: net: phy: expose genphy_config_aneg()
+Date: Tue, 24 Feb 2026 04:32:10 +0000
+Message-ID: <20260224043211.1747-3-iprintercanon@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260224043211.1747-1-iprintercanon@gmail.com>
 References: <20260223220504.2102-1-iprintercanon@gmail.com>
@@ -114,13 +114,13 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[umich.edu,armlinux.org.uk,kernel.org,davemloft.net,redhat.com,google.com,vger.kernel.org,gmail.com];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-260330-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-260331-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[14];
@@ -135,41 +135,46 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6675C181AE5
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4BBE1181AAF
 X-Rspamd-Action: no action
 
-Add a speed() method to phy::Device as a getter counterpart to the
-existing set_speed(). This is needed by PHY drivers that need to
-detect speed changes, such as drivers that must reconfigure hardware
-registers when the link speed changes.
+Add genphy_config_aneg() method to phy::Device, wrapping the C
+function __genphy_config_aneg(). This is needed by PHY drivers that
+perform custom BMCR configuration before calling the generic
+auto-negotiation setup.
+
+The wrapper calls __genphy_config_aneg(phydev, false) directly since
+genphy_config_aneg() is a static inline function not visible to
+bindgen.
 
 Signed-off-by: Artem Lytkin <iprintercanon@gmail.com>
 ---
- rust/kernel/net/phy.rs | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ rust/kernel/net/phy.rs | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
-index 3ca99db5cccf..b86939b163e3 100644
+index b86939b163e3..01597f2616fd 100644
 --- a/rust/kernel/net/phy.rs
 +++ b/rust/kernel/net/phy.rs
-@@ -158,6 +158,14 @@ pub fn is_autoneg_completed(&self) -> bool {
-         bit_field.get(15, 1) == AUTONEG_COMPLETED
+@@ -284,6 +284,15 @@ pub fn genphy_read_abilities(&mut self) -> Result {
+         // So it's just an FFI call.
+         to_result(unsafe { bindings::genphy_read_abilities(phydev) })
      }
- 
-+    /// Gets the negotiated speed of the PHY.
-+    pub fn speed(&self) -> i32 {
-+        let phydev = self.0.get();
-+        // SAFETY: The struct invariant ensures that we may access
-+        // this field without additional synchronization.
-+        unsafe { (*phydev).speed }
-+    }
 +
-     /// Sets the speed of the PHY.
-     pub fn set_speed(&mut self, speed: u32) {
-         let phydev = self.0.get();
++    /// Configures the advertisement and resets auto-negotiation
++    /// if auto-negotiation is enabled.
++    pub fn genphy_config_aneg(&mut self) -> Result {
++        let phydev = self.0.get();
++        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
++        // So it's just an FFI call.
++        to_result(unsafe { bindings::__genphy_config_aneg(phydev, false) })
++    }
+ }
+ 
+ impl AsRef<kernel::device::Device> for Device {
 -- 
 2.43.0
 
