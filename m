@@ -1,198 +1,270 @@
-Return-Path: <netdev+bounces-260400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260401-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iJQiFjpgnWkDPAQAu9opvQ
-	(envelope-from <netdev+bounces-260400-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 09:24:26 +0100
+	id cGgwFXVhnWksPQQAu9opvQ
+	(envelope-from <netdev+bounces-260401-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 09:29:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF8FF183996
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 09:24:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A907D183AE6
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 09:29:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 725CD304854E
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 08:21:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BAC16311F850
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 08:27:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50791366821;
-	Tue, 24 Feb 2026 08:21:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1E6C366806;
+	Tue, 24 Feb 2026 08:27:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b="OtokF0pM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SQwH/GL+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m21471.qiye.163.com (mail-m21471.qiye.163.com [117.135.214.71])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AF21366806;
-	Tue, 24 Feb 2026 08:21:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.214.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D306366552;
+	Tue, 24 Feb 2026 08:27:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771921292; cv=none; b=c7wSE4hYou+7htxkKBpX3x3ocowippH+kD0AHV630QVegc3x/ERtAn8OA3Oel0DJtvfMIC0vYCKEJEMDvzzd9AKvH2xPCpXeFUhSCQlCD6CgXjPeyqlEYsHFpG9Z1r+MtvZBmXzHdQWfvm8J416A8wJavRiTV4od5pcnmpD4CIA=
+	t=1771921625; cv=none; b=qalVr+vKfpTPKx2qfRTpe/nA7O0GneXKUgVI119kS7tf+UTdik2/id4UdapQFaYcl1tWMKrNvmwvf01vIeLs1E0YJdNKJ5twTVvY+x1YxO13WFwtg094YhX1nlSzquY6yBlIIcc1pMAJIICcDyvo9rvVW61zLrdrurcpfVOihPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771921292; c=relaxed/simple;
-	bh=jGNKoKMtgp1RUDE0JUj9nl9DZtqZbHM10+ockHI/Lug=;
-	h=Cc:Subject:To:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=P/KLlkIQh9Dl90OQ+njg4dzOQ/zbf6CwFmP9It6h0RhyWjK/3EXYe9AekiMM0lxaRmdjynzjbFU5jYbWCcidYa2PE4pu52hu0aHvhB6SjVYfsmaV+Xr6aKQ54mGMD/gmQNFz+kHJf6eoRokSfL5o6sVlnBBq/TV3sXJUrkplKUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com; spf=pass smtp.mailfrom=rock-chips.com; dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b=OtokF0pM; arc=none smtp.client-ip=117.135.214.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rock-chips.com
-Received: from [172.16.12.14] (unknown [58.22.7.114])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 34c7e7f42;
-	Tue, 24 Feb 2026 16:21:13 +0800 (GMT+08:00)
-Cc: shawn.lin@rock-chips.com, Bjorn Helgaas <bhelgaas@google.com>,
- "Vaibhaav Ram T . L" <vaibhaavram.tl@microchip.com>,
- Kumaravel Thiagarajan <kumaravel.thiagarajan@microchip.com>,
- Even Xu <even.xu@intel.com>, Xinpeng Sun <xinpeng.sun@intel.com>,
- Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
- Jiri Kosina <jikos@kernel.org>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Zhou Wang <wangzhou1@hisilicon.com>, Longfang Liu <liulongfang@huawei.com>,
- Vinod Koul <vkoul@kernel.org>, Lee Jones <lee@kernel.org>,
- Jijie Shao <shaojijie@huawei.com>, Jian Shen <shenjian15@huawei.com>,
- Sunil Goutham <sgoutham@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- "David S . Miller" <davem@davemloft.net>,
- Jeff Hugo <jeff.hugo@oss.qualcomm.com>, Oded Gabbay <ogabbay@kernel.org>,
- Maciej Falkowski <maciej.falkowski@linux.intel.com>,
- Karol Wachowski <karol.wachowski@linux.intel.com>,
- Min Ma <mamin506@gmail.com>, Lizhi Hou <lizhi.hou@amd.com>,
- Andreas Noever <andreas.noever@gmail.com>,
- Mika Westerberg <westeri@kernel.org>, Tomasz Jeznach
- <tjeznach@rivosinc.com>, Will Deacon <will@kernel.org>,
- Xinliang Liu <xinliang.liu@linaro.org>, Tian Tao <tiantao6@hisilicon.com>,
- Davidlohr Bueso <dave@stgolabs.net>,
- Jonathan Cameron <jonathan.cameron@huawei.com>,
- Srujana Challa <schalla@marvell.com>, Bharat Bhushan
- <bbhushan2@marvell.com>, Antoine Tenart <atenart@kernel.org>,
- Herbert Xu <herbert@gondor.apana.org.au>, Raag Jadav <raag.jadav@intel.com>,
- Hans de Goede <hansg@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Jiri Slaby <jirislaby@kernel.org>, Andy Shevchenko <andy@kernel.org>,
- Manivannan Sadhasivam <mani@kernel.org>,
- Mika Westerberg <mika.westerberg@linux.intel.com>,
- Andi Shyti <andi.shyti@kernel.org>, Robert Richter <rric@kernel.org>,
- Mark Brown <broonie@kernel.org>, Nirmal Patel
- <nirmal.patel@linux.intel.com>, Kurt Schwemmer
- <kurt.schwemmer@microsemi.com>, Logan Gunthorpe <logang@deltatee.com>,
- Linus Walleij <linusw@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>,
- Sakari Ailus <sakari.ailus@linux.intel.com>,
- Bingbu Cao <bingbu.cao@intel.com>, Ulf Hansson <ulf.hansson@linaro.org>,
- Arnd Bergmann <arnd@arndb.de>, Benjamin Tissoires <bentiss@kernel.org>,
- linux-input@vger.kernel.org, linux-i3c@lists.infradead.org,
- dmaengine@vger.kernel.org, netdev@vger.kernel.org, nic_swsd@realtek.com,
- linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-usb@vger.kernel.org, iommu@lists.linux.dev,
- linux-riscv@lists.infradead.org, David Airlie <airlied@gmail.com>,
- Simona Vetter <simona@ffwll.ch>, linux-cxl@vger.kernel.org,
- linux-crypto@vger.kernel.org, platform-driver-x86@vger.kernel.org,
- linux-serial@vger.kernel.org, mhi@lists.linux.dev,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Jan Dabros <jsd@semihalf.com>, linux-i2c@vger.kernel.org,
- Daniel Mack <daniel@zonque.org>, Haojian Zhuang <haojian.zhuang@gmail.com>,
- linux-spi@vger.kernel.org, Jonathan Derrick <jonathan.derrick@linux.dev>,
- linux-pci@vger.kernel.org, linux-gpio@vger.kernel.org,
- Mauro Carvalho Chehab <mchehab@kernel.org>, linux-media@vger.kernel.org,
- linux-mmc@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
-Subject: Re: [PATCH 01/37] PCI/MSI: Add Devres managed IRQ vectors allocation
-To: phasta@kernel.org
-References: <1771860581-82092-1-git-send-email-shawn.lin@rock-chips.com>
- <1771860581-82092-2-git-send-email-shawn.lin@rock-chips.com>
- <20260223160402.3ad8f079@kernel.org>
- <ec226aa1-5cc8-855f-8f90-1d7f89efe766@rock-chips.com>
- <07fc896007d86b731cbfb3cf6bbdf4e5315d7a77.camel@mailbox.org>
-From: Shawn Lin <shawn.lin@rock-chips.com>
-Message-ID: <d601ec05-ef38-5e8e-c643-c05010717ebe@rock-chips.com>
-Date: Tue, 24 Feb 2026 16:21:11 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+	s=arc-20240116; t=1771921625; c=relaxed/simple;
+	bh=5BIsjw2n9+mZDFSucxJ7xTsOVD5l8tfQvmSHZ4IJIrI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Q4kE8XJKNWKydbaIkSYxYWMLwZZXYA0HJZWUIsimDX1Btc6fln7t7q3fnrleXb8LLEwVBcKj2Nfm5DO4ypG+yaxZNzTpj32qXog5GSSB60HYg5z0VDubh5s9UAvb3XnyTg1dS0pmp7b+KfNhrREnXW6auoHFcRSvyROhiRW4OHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SQwH/GL+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43D52C19423;
+	Tue, 24 Feb 2026 08:27:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771921625;
+	bh=5BIsjw2n9+mZDFSucxJ7xTsOVD5l8tfQvmSHZ4IJIrI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=SQwH/GL+OG1XXnKIflNZBESOQ40d+rNrLwLg9GmFTrVaA6zUaaiKqglNVYubO01C2
+	 f3/8kFrHjxwCykMW7sgSsXCcfMLfJhzZsNPvwv10EFv/2/kb48oGSxKoBabN59gNXA
+	 ptKn5zYcHYDsd9erpoqg9qtIDoJt1MiyzX3HhuxArEU42W0LBurEIfRWMA7j9P6I/9
+	 sKz6HtySf5UdHtDWcCXA7FdKM5e3K7gi46aAQUx0bCmh5+H3uhiSrT7hh/uZo+YHw8
+	 NEW+VV9ulpTbWW6jeUUobAip/JIEUO91a3m1/y4gUWnwYQ4cL0eRXowgRnmTFgjvQX
+	 YWYExbxu1jXDw==
+From: Simon Horman <horms@kernel.org>
+To: dipayanroy@linux.microsoft.com
+Cc: Simon Horman <horms@kernel.org>,
+	kuba@kernel.org,
+	decui@microsoft.com,
+	pabeni@redhat.com,
+	dipayanroy@microsoft.com,
+	kotaranov@microsoft.com,
+	linux-kernel@vger.kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	linux-rdma@vger.kernel.org,
+	shradhagupta@linux.microsoft.com,
+	kys@microsoft.com,
+	ssengar@linux.microsoft.com,
+	haiyangz@microsoft.com,
+	linux-hyperv@vger.kernel.org,
+	wei.liu@kernel.org,
+	netdev@vger.kernel.org,
+	longli@microsoft.com,
+	ernis@linux.microsoft.com,
+	shirazsaleem@microsoft.com,
+	andrew+netdev@lunn.ch
+Subject: Re: [net-next] net: mana: Trigger VF reset/recovery on health check failure due to HWC timeout
+Date: Tue, 24 Feb 2026 08:26:41 +0000
+Message-ID: <20260224082641.130868-1-horms@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <aZwUDlTkb5xunIkH@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <aZwUDlTkb5xunIkH@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <07fc896007d86b731cbfb3cf6bbdf4e5315d7a77.camel@mailbox.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9c8ebcf01809cckunma66e3c5da3898b
-X-HM-MType: 1
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFDSUNOT01LS0k3V1ktWUFJV1kPCRoVCBIfWUFZGkwYT1ZIQ05NT00aQhpOTEpWFRQJFh
-	oXVRMBExYaEhckFA4PWVdZGBILWUFZTkNVSUlVTFVKSk9ZV1kWGg8SFR0UWUFZT0tIVUpLSEtKTE
-	tVSktLVUtZBg++
-DKIM-Signature: a=rsa-sha256;
-	b=OtokF0pM0Rdmb7CoOmlCq/zfLcm40+tPTFk2ZLwxQS10TLzJue4pNlrDVsSPzZGK7GjnZ03zAIHAn5VDRN2uAWAEjdInG9Pdls9n5NtKIAxCt/aoY8MRgy7icqkMUtp0jEjJ+naa5XLLsJTKYxzikINqVGIROqqbjer5tDm2ofg=; s=default; c=relaxed/relaxed; d=rock-chips.com; v=1;
-	bh=NX1TqWCCjq6xu1hXTAQXpYiiKKus6llHeXoiHdmvBy4=;
-	h=date:mime-version:subject:message-id:from;
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[rock-chips.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[rock-chips.com:s=default];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	TAGGED_FROM(0.00)[bounces-260401-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-260400-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[rock-chips.com,google.com,microchip.com,intel.com,linux.intel.com,kernel.org,bootlin.com,hisilicon.com,huawei.com,marvell.com,lunn.ch,gmail.com,davemloft.net,oss.qualcomm.com,amd.com,rivosinc.com,linaro.org,stgolabs.net,gondor.apana.org.au,linuxfoundation.org,microsemi.com,deltatee.com,arndb.de,vger.kernel.org,lists.infradead.org,realtek.com,lists.freedesktop.org,lists.linux.dev,ffwll.ch,semihalf.com,zonque.org,linux.dev];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[88];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shawn.lin@rock-chips.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[rock-chips.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[rock-chips.com:mid,rock-chips.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AF8FF183996
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: A907D183AE6
 X-Rspamd-Action: no action
 
-在 2026/02/24 星期二 15:47, Philipp Stanner 写道:
-> On Tue, 2026-02-24 at 10:08 +0800, Shawn Lin wrote:
->> 在 2026/02/24 星期二 8:04, Jakub Kicinski 写道:
->>> On Mon, 23 Feb 2026 23:29:40 +0800 Shawn Lin wrote:
->>>> pcim_alloc_irq_vectors() and pcim_alloc_irq_vectors_affinity() are created for
->>>> pci device drivers which rely on the devres machinery to help cleanup the IRQ
->>>> vectors.
->>>
->>> If you can please add this API with just a few users, and then convert
->>> remaining users via the subsystem trees in the next cycle.
->>> There's no need to risk wasting maintainer time on conflicts with
->>> conversions like this.
->>
->> Thanks for the suggestion, Jakub. I have little experience with
->> cross-subsystem cleanups like this, so your suggestion is very helpful.
-> 
-> 
-> When I removed the hybrid nature of pci_request_region() et al., I
-> concluded that there were so few users that doing them all in one run
-> was sufficient.
-> 
-> For larger reworks, like removing pcim_iomap_table(), a slower step-by-
-> step strategy is necessary for the reasons that Jakub details.
-> 
-> It is then smart to omit an easy to port subsystem / driver for the
-> ultimate patch series where one then removes the hybrid behavior from
-> PCI itself, after porting the last driver.
-> 
-> In general,  as Jakub details, those step-by-step cleanups are a bit
-> safer, since you can proof valid behavior early on and in case of an
-> explosion they are very easy to revert.
-> 
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-Thank you, Philipp. I wish I had attended your talk at FOSDEM 2025 on
-removing pcim_iomap_table earlier. This first version was perhaps a bit 
-too aggressive. For v2, I think the plan should start with addressing 
-the switchtec and vmd drivers, since both of those, along with the new 
-API additions, can be handled entirely within the PCI subsystem scope.
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+net: mana: Trigger VF reset/recovery on health check failure due to HWC timeout
 
-> 
-> P.
-> 
+The GF stats periodic query is used as mechanism to monitor HWC health
+check. If this HWC command times out, it is a strong indication that
+the device/SoC is in a faulty state and requires recovery.
+
+Today, when a timeout is detected, the driver marks
+hwc_timeout_occurred, clears cached stats, and stops rescheduling the
+periodic work. However, the device itself is left in the same failing
+state.
+
+Extend the timeout handling path to trigger the existing MANA VF
+recovery service by queueing a GDMA_EQE_HWC_RESET_REQUEST work item.
+This is expected to initiate the appropriate recovery flow by suspende
+resume first and if it fails then trigger a bus rescan.
+
+This change is intentionally limited to HWC command timeouts and does
+not trigger recovery for errors reported by the SoC as a normal command
+response.
+
+> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> index 0055c231acf6..16c438d2aaa3 100644
+> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+
+[ ... ]
+
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> index 9b5a72ada5c4..e6a4034b40f9 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+
+[ ... ]
+
+> @@ -3530,6 +3530,8 @@ static void mana_gf_stats_work_handler(struct work_struct *work)
+>  {
+>  	struct mana_context *ac =
+>  		container_of(to_delayed_work(work), struct mana_context, gf_stats_work);
+> +	struct gdma_context *gc = ac->gdma_dev->gdma_context;
+> +	struct mana_serv_work *mns_wk;
+>  	int err;
+>
+>  	err = mana_query_gf_stats(ac);
+> @@ -3537,6 +3539,30 @@ static void mana_gf_stats_work_handler(struct work_struct *work)
+>  		/* HWC timeout detected - reset stats and stop rescheduling */
+>  		ac->hwc_timeout_occurred = true;
+>  		memset(&ac->hc_stats, 0, sizeof(ac->hc_stats));
+> +		dev_warn(gc->dev,
+> +			 "Gf stats wk handler: gf stats query timed out.\n");
+> +
+> +		/* As HWC timed out, indicating a faulty HW state and needs a
+> +		 * reset.
+> +		 */
+> +		if (!test_and_set_bit(GC_IN_SERVICE, &gc->flags)) {
+> +			if (!try_module_get(THIS_MODULE)) {
+> +				dev_info(gc->dev, "Module is unloading\n");
+> +				return;
+> +			}
+> +
+> +			mns_wk = kzalloc(sizeof(*mns_wk), GFP_ATOMIC);
+> +			if (!mns_wk) {
+> +				module_put(THIS_MODULE);
+> +				return;
+> +			}
+
+Does this leave the GC_IN_SERVICE flag permanently set? When
+test_and_set_bit() atomically sets the bit and then try_module_get()
+fails or kzalloc() fails, the function returns without clearing
+GC_IN_SERVICE.
+
+This would permanently block all future recovery attempts. Looking at
+mana_gd_process_eqe() in gdma_main.c:
+
+	if (test_bit(GC_IN_SERVICE, &gc->flags)) {
+		dev_info(gc->dev, "Already in service\n");
+		break;
+	}
+
+It would detect the set bit and skip the reset. Similarly, mana_tx_timeout()
+in mana_en.c would also short-circuit:
+
+	if (test_bit(GC_IN_SERVICE, &gc->flags))
+		return;
+
+The device cannot recover without manual intervention since the flag is only
+cleared by mana_serv_reset() at the end of the service work:
+
+drivers/net/ethernet/microsoft/mana/gdma_main.c:mana_serv_reset()
+{
+	...
+out:
+	clear_bit(GC_IN_SERVICE, &gc->flags);
+}
+
+But since the work is never scheduled in these error paths, clear_bit() is
+never called.
+
+Note that the existing mana_gd_process_eqe() path avoids this problem by
+calling set_bit(GC_IN_SERVICE) only AFTER all allocations succeed:
+
+drivers/net/ethernet/microsoft/mana/gdma_main.c:mana_gd_process_eqe()
+{
+	...
+	if (test_bit(GC_IN_SERVICE, &gc->flags)) {
+		dev_info(gc->dev, "Already in service\n");
+		break;
+	}
+
+	if (!try_module_get(THIS_MODULE)) {
+		...
+		break;
+	}
+
+	mns_wk = kzalloc(sizeof(*mns_wk), GFP_KERNEL);
+	if (!mns_wk) {
+		module_put(THIS_MODULE);
+		break;
+	}
+
+	dev_info(gc->dev, "Start MANA service type:%d\n", type);
+	set_bit(GC_IN_SERVICE, &gc->flags);  // Set only after success
+	...
+}
+
+Should clear_bit(GC_IN_SERVICE, &gc->flags) be added before each error
+return?
+
+> +
+> +			mns_wk->pdev = to_pci_dev(gc->dev);
+> +			mns_wk->type = GDMA_EQE_HWC_RESET_REQUEST;
+> +			pci_dev_get(mns_wk->pdev);
+> +			INIT_WORK(&mns_wk->serv_work, mana_serv_func);
+> +			schedule_work(&mns_wk->serv_work);
+> +		}
+
+This isn't a bug, but the recovery initiation sequence here is a
+near-duplicate of the pattern in mana_gd_process_eqe() (gdma_main.c).
+Both perform the identical 7-step sequence: try_module_get, kzalloc
+mana_serv_work, set pdev, set type, pci_dev_get, INIT_WORK, schedule_work.
+
+The duplication already contributed to the GC_IN_SERVICE error path issue
+above, where this new copy diverged from the original in its error handling.
+
+Consider extracting a common helper to avoid divergence.
+
+>  		return;
+>  	}
+>  	schedule_delayed_work(&ac->gf_stats_work, MANA_GF_STATS_PERIOD);
+
+[ ... ]
 
