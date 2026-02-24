@@ -1,212 +1,251 @@
-Return-Path: <netdev+bounces-260321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260322-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IAVUNpgZnWlsMwQAu9opvQ
-	(envelope-from <netdev+bounces-260321-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 04:23:04 +0100
+	id 4dByG9kanWmJMwQAu9opvQ
+	(envelope-from <netdev+bounces-260322-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 04:28:25 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 076461815EF
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 04:23:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BBE8618160B
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 04:28:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 424E7307B7D7
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 03:22:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 69ECC303A6DC
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 03:28:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B74E1299A90;
-	Tue, 24 Feb 2026 03:22:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79BB729B789;
+	Tue, 24 Feb 2026 03:28:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jdcK0YwM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AECD23EA8D
-	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 03:22:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771903361; cv=none; b=upBG00NsHmQwQMGY+4O+aw4BWrt2QIeYWYFPTXzEGD091Vly3AQCqf1aIsh/rF8g/CVTRRTqLSRP7a/054mo0pgLdcexBF73b9ROkUi5RUgwfMjyXraXrOeocdKJZ89zN9EZnskArQ0S8chF8bL2Jq9yrXrWSxSsw3OQ4eSBDyI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771903361; c=relaxed/simple;
-	bh=VJ6oFAd0OCXycErHfZaQRIDwPe8bvGtv8S7E/IuaV5Y=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=X0hPOz8HeQl5UvUFs2IdM5ituDO23qyW7XAUdWjvdwXikysC35ItckF1AwlBdeFyovQ+kAtcONzRf008jaiPfbrB06Q6t2yDQzki+dK0R++aGxBEyjnSrs8cZzMTnrLM0TAsmtknGlWivaiVN7wiB1h32Sa1RXdPMYC7mF1eDnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=54.206.16.166
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
-X-QQ-mid: zesmtpsz2t1771903343t3d98926f
-X-QQ-Originating-IP: ZQx4IBOe+4kUPBHKmpjzKLPUbcFQzQbV43M3OCbSu3M=
-Received: from smtpclient.apple ( [120.244.235.1])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 24 Feb 2026 11:22:19 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 2625102856121023082
-Content-Type: text/plain;
-	charset=utf-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D70229B20D
+	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 03:28:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771903700; cv=pass; b=IC3BFs82bain1Pd7NYOfdmNbtXcJAC3NMYGRNHhYUOVKScUlW8N4NPJkK8rVnsoYFJn3ECaKmKD1huH0Jedy6xTTo8LCt4pFlsTPSMiagrGIdiNEVwrAbB+8x0Irkam3c9RGxxfsIPWfaoY0nikf3Lw/YcCM4jEksiCEOxwjXZY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771903700; c=relaxed/simple;
+	bh=FkI8/e2KYG4uetxy8S+ZQ4GydStUxKTKCiGH/WZQPpg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FDyanMPvvKJs6Est4S+4iBl1Bh7DIPxaWIm5XbDy9BQCxBiNpXBgnDXBc9e6THTK/e1RiE6JPQNOgrPKKNF53iHtinjrUXgSmQxNidv1Cd2bTP08yBECZCJijQMjasVI+4r+ncXHVEbLQs77dNgtwxvD9F51c6uC/Gm3X/PY+BQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jdcK0YwM; arc=pass smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-5069a785ed2so161051cf.1
+        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 19:28:18 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771903698; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ZiGfxEgOSwBN0p5+WrkgUfahHOvY/AJO1uWPyEZiLBQ3eNnDFUbajyyXb+WSfoqGv3
+         Vkbcn3dFwh5YMQaWNBFfM5z8KBETpNPR6nEr1V/gZvTwBABzu5p4syIsKSUjsyC6+IxH
+         H/7dwPUinPC4ejFHgzfQJGc2o580UTl+btFn1+rJp2fsy6x/hlou/dXJgznMfli6ljY0
+         mb4rpG3wr3LpW2vM7JbHjHSaunbrh3RLMoY1WNraE7AoRgTR8n/VY/d9ufrjV/y3Cigq
+         OuUZs8r08bBtBwERkIv4sQF32mHpg7exp+3/gseXElUzEfrKKRLhtCXfzGd1R4uSIbVw
+         loMQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=AwcM+iEPBhUnD4F73r7Q9uM2FATET2leNmHYF8iHSCo=;
+        fh=nUamM5D/JTQ0na4W6Ll/VKgoQwFWif5yls34UkB1HWE=;
+        b=FFx2Vl364uBTFHX2jBtWdVleTq2VERe/S+UdnsJqYdnGhnEMc8TCdaZQX2abCUb1tG
+         xL6W8C0CFo+VOi92E15YMujFNzioqIREASXqytZ925WQEmkan66TT1k3Yu3ufdhTLHmE
+         WwQYVcaWDwOvfSbVBc90w5YVM4uvZnOM5f7IRwGvWxYWVJLddWtfCaLi/fZVHqG+SIFq
+         9Z+8SThzi8JYmNJi8uG+aZ/EC9GEo+Kh13qq5cUm959Ox+aVUHwVYwQksNitT8Mpa5W+
+         KCAk6f+wmmh3SAmCTZiY08X8G0N7t68fEPeCuUN2Ufq41SXir4pVNktAMHgDqzPYn7n7
+         bYTA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1771903698; x=1772508498; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AwcM+iEPBhUnD4F73r7Q9uM2FATET2leNmHYF8iHSCo=;
+        b=jdcK0YwMJGHr23GU9QXG7MjweWrgAyXiAcx0+1u8WyrrX/c5enZIq8VEc95wEo7AW6
+         h3f6grKnV3PvEYysYu13aFzzUTv0oQvOZy0Ag7osqH2S3luyymmi2hBRhm78Ntrq/Osv
+         ucccEFrZPh5UfNb8r5GPz1Gk13WTy2qkcZ2ObQsJtuVUI4cmZOWwoBHO1O0QC5lSPxhR
+         z0xKrpR3XT3KIDU8T1QHDovQaceC+qZYe3NB8HgxJgOu5ltN7iw5kyIg2jTsGQLoVONB
+         VzxHJijjq0pyir1/VJLJ7BCdCBaTUpM8au2XpbAiXmx0p3OhvIFtYqlHNiTZwZ8kbW0Q
+         V68w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771903698; x=1772508498;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=AwcM+iEPBhUnD4F73r7Q9uM2FATET2leNmHYF8iHSCo=;
+        b=bgtCisSJkgyC/f5P6RCEeB87IIg/Ym5i/bHfD+qmUoWJNXkjhwMLWXUtzRXEe5xG24
+         C467/K90qTgNHCve+Mq5sSdNCtRlwNdBTFvc5AjqKLaXtVIouLDkUmxI/EyY1PoPh0lX
+         R7vjv1We5Qg985X3gHUSTnQwoif+QwowfYv/VWnoBfM0gtR1JAamYCF8ypXxqeRP0Y0s
+         Dcae42XOyXoDBPhfwf11BK9uIx9vUn73nGU4iIQb+kwCFtLq8obG+c9PycxfF8xhRd/d
+         R9z+Bvbw7O9AMHOafSyjpJtvTwHo7hGaMFFb8tuxFBp4Ts4gCtTjRuThPYKX3OtMf79A
+         Lv0w==
+X-Forwarded-Encrypted: i=1; AJvYcCUZKkxryJE0/R9Rokf9Hvdq7PshwnV0PUjh9+WloEV/Qh/AQnIQU/BQDb51sP4TkyBXWXCnUIM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaIkyFY6USb0pfaZN9NnHL7LrE5s4/ADJfJGmq4psXdhaEuxlB
+	0Du4uiTRvPfDcB7anpvdXVLXlv9cMKVp60c1q6B8dlpP/UETfsVXTeC9T0gg7BFIG8sTgbo6Iu8
+	2PxyTtRTjxzCsZ+AHpuC5sR1jHZGu9JEm/q9pZREF
+X-Gm-Gg: AZuq6aKRRAqCoRBM7tI7+3JQ5T1UVt3jW2s9TuMZicQ46Cn31MID+BKFNoJo4RKVW11
+	yMqb+o5tJnjG4fCVK1Z+Irdjqk7AwrNVo9YTHsFHgEid+J5UVJDpCnKPMyuZdcdGdODqbdb9DGS
+	ElZzJSFOJCaBIkmk0kN553yHlN26qpEhDl4SGBuA93q4BP3KdlLGy7gt3FpiGZRnDNoefxCARn9
+	Lo/jSpFBS6i94oV1SayQ9cDEzWC6D6uQG2X7ERrPXed1Ka/ka5yt2mzPKL/4ZtazUg9y06BVhpi
+	HVQP3RBNbGKkkJ6jh88VCPHqpFzeun1rrs+s
+X-Received: by 2002:a05:622a:60b:b0:506:2116:4b93 with SMTP id
+ d75a77b69052e-5072c9ed3efmr6181221cf.10.1771903697601; Mon, 23 Feb 2026
+ 19:28:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81.1.4\))
-Subject: Re: [PATCH net-next] net: core: introduce the
- netdev_fetch_core_stats()
-From: Tonghao Zhang <tonghao@bamaicloud.com>
-In-Reply-To: <CAL+tcoDR2-WTmhBakWcvEuLCwAU7RGRA8syfor-+RJJq7_ZOKw@mail.gmail.com>
-Date: Tue, 24 Feb 2026 11:22:09 +0800
-Cc: netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>,
- Kuniyuki Iwashima <kuniyu@google.com>,
- Samiullah Khawaja <skhawaja@google.com>,
- Ahmed Zaki <ahmed.zaki@intel.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>
+MIME-Version: 1.0
+References: <cover.1769509130.git.antony.antony@secunet.com>
+ <7c30e7f8543048a384f693684ccba5f71fe8543b.1769509131.git.antony.antony@secunet.com>
+ <aXyV028imsUPWSyq@krikkit> <aYCfVAeKGqF7MIRq@moon.secunet.de>
+ <CADhJOfbkUFaPfxTBrmOnrEh2JvxPKpkxaRrSdJHZGxeoQsQTcw@mail.gmail.com> <aYD9O5qiA1R2KIJ_@Antony2201.local>
+In-Reply-To: <aYD9O5qiA1R2KIJ_@Antony2201.local>
+From: Yan Yan <evitayan@google.com>
+Date: Mon, 23 Feb 2026 19:28:06 -0800
+X-Gm-Features: AaiRm537pqqKRtp-41V--fGiJBJPW7CjJ2gm6nMlaXkIE3lDTedzV9ZVKyivjeU
+Message-ID: <CADHa2dB+-nCHQK5nu0wKXKw+ut4wieUtoB9Gd-csr7sn8ZKjtg@mail.gmail.com>
+Subject: Re: [devel-ipsec] Re: [PATCH ipsec-next v5 3/8] xfrm: allow migration
+ from UDP encapsulated to non-encapsulated ESP
+To: Antony Antony <antony@phenome.org>
+Cc: Nathan Harold <nharold@google.com>, antony.antony@secunet.com, 
+	Sabrina Dubroca <sd@queasysnail.net>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Chiachang Wang <chiachangwang@google.com>, devel@linux-ipsec.org, 
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <65307E32-7AFF-44EF-B2BB-89AA15F3D0D1@bamaicloud.com>
-References: <e8355c0d7fd48981ba505e455387971f91210fa8.1771734206.git.tonghao@bamaicloud.com>
- <CAL+tcoDR2-WTmhBakWcvEuLCwAU7RGRA8syfor-+RJJq7_ZOKw@mail.gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-X-Mailer: Apple Mail (2.3826.700.81.1.4)
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpsz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz3b-0
-X-QQ-XMAILINFO: MIAHdi1iQo+zMN8wWtWW/+40/WbVYgnb1gjbaGko1dCs3J8Fwdtl313E
-	EH5DEFwS75QZZ83OiggdnAUhJfbf6/IaBbiBpxeK037P4lnHApDJv+Qgh6grqFEGhSzEOeU
-	XBRrxWitWjVfhz2J49h3SithWcEiQaIcdnj5GFq5kUpzgdJWuRVCGETUfQ1QNOWri9iupok
-	BWIKt8FALOnjTSFU3CtronwQbegZDpMj2UI7AarpDQS/Ig3J5A/zPuIobyzSJjX2Loo6ar1
-	k65py/em137MTNBbDu5aC9A9XeoENAgU9WbcGhz8uJ7tw3VvlmLKRjgpphN7NPOE/AKugO8
-	duhdi+gT5wy6lnaSjgDGrUaaGqR7Uf7wAx89rWPbITn1Ay4j6Ip3jwqMk42C3jO3dTaeyp+
-	zEYdGC5kFauyywYKuL6bAWyirt/0PWwSZxkvZwcevvPTJHwXd6ufgnVxQE0UqxoCZqJ09V8
-	r+9608UJrrXn8ZoLXrFd7umrvX37XMd1xFxsc0kFmDlX6eFG9YiYdOGN8UVw7qGvXheA2aE
-	kKI2tNVj5GL3LOBfQG0dGVwCDtR3MG7PdMcC5jJfpGtLnebalYIE/M5i7NSTJpnirCUotKx
-	x2otkmjkbZfescJQCXFofaWYAYh98uvRgFYAvkv33L71TD0eECQqU7yvgFyRwvZtQEiVQ8w
-	wkuscvbE/YnkwqN4hNd1r8QE0kLPoc2gFXPcVu0T7j2Zqra8Ev6hj3w3HgPQznrVCGa69Z1
-	CC5NeMynCwp0NmbVCc6v8+4PLBrl87UYRCGfQGfCsR6fbVXvqSACHkmTVmTYssw5f85wfBD
-	UAzIjal50EhL5+JNe5nUuaxr5PxR871utn6gWmFb3ojArt7Xqhz3GplwUkj0u5X+tIBTWhh
-	0c5EUSNWvwWs3KkV0N29wET1DgkIOxr8rgTHJ2ljolgUN8SxdV7nDqCyKLH4L8FFt1QAOEk
-	tb7hMpMMb/wH+guwSlM4h0ZJP03aj629ERskelh0pwhcEsB9VOszbEOA/l5sg+0O7M6Kk0J
-	MecRFQYcG0O8EEaDu1Mm8I90W51QUdvkvrPXob8Q==
-X-QQ-XMRINFO: MPJ6Tf5t3I/ylTmHUqvI8+Wpn+Gzalws3A==
-X-QQ-RECHKSPAM: 0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.96 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[bamaicloud.com];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260321-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-260322-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tonghao@bamaicloud.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[evitayan@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.994];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,fomichev.me:email,bamaicloud.com:mid,bamaicloud.com:email]
-X-Rspamd-Queue-Id: 076461815EF
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,phenome.org:email]
+X-Rspamd-Queue-Id: BBE8618160B
 X-Rspamd-Action: no action
 
+Hi Antony,
 
+Sorry for the late reply. We=E2=80=99ve prototyped this and confirmed that
+Android can be changed to explicitly provide the encap_tmpl in the
+MIGRATE requests. Also we are excited to have kernel support for
+encap-to-non-encap migration.
 
-> On Feb 23, 2026, at 08:20, Jason Xing <kerneljasonxing@gmail.com> =
+Thanks,
+Yan and Nathan
+
+On Mon, Feb 2, 2026 at 11:38=E2=80=AFAM Antony Antony <antony@phenome.org> =
 wrote:
->=20
-> On Sun, Feb 22, 2026 at 12:38=E2=80=AFPM Tonghao Zhang =
-<tonghao@bamaicloud.com> wrote:
->>=20
->> Network device statistics retrieved via procfs, sysfs, and netlink
->> represent the combined total of core_stats + driver, hardware =
-statistics.
->>=20
->> However, in some scenarios, when monitoring netdev metrics, it is =
-valuable
->> to clearly distinguish whether the values originate from the =
-networking
->> stack's core statistics or from the driver, hardware layer. This =
-helps
->> improve debugging and addressing issues.
->>=20
->> Approaches were considered:
->> - commit 5247dbf16cee ("net/core: Introduce =
-netdev_core_stats_inc()").
->>  This allows tracking increments to core_stats and helps identify =
-specific
->>  causes of changes, but not provide the total counters.
->> - extending rtnl_link_stats64 with new core_xxx fields.
->>  This would likely confuse or break existing userspace applications =
-relying
->>  on this struct.
->> - adding a tracepoint inside dev_get_stats().
->>  This implementation is not simple or straightforward enough.
->>=20
->> The solution in this patch is therefore to introduce a new dedicated =
-function
->> for collecting core statistics and mark it noinline. This approach is =
-simple,
->> clean, and maintainable to obtain driver, hardware statistics =
-separately when needed.
->>=20
->> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
->> Cc: "David S. Miller" <davem@davemloft.net>
->> Cc: Eric Dumazet <edumazet@google.com>
->> Cc: Jakub Kicinski <kuba@kernel.org>
->> Cc: Paolo Abeni <pabeni@redhat.com>
->> Cc: Simon Horman <horms@kernel.org>
->> Cc: Stanislav Fomichev <sdf@fomichev.me>
->> Cc: Kuniyuki Iwashima <kuniyu@google.com>
->> Cc: Samiullah Khawaja <skhawaja@google.com>
->> Cc: Ahmed Zaki <ahmed.zaki@intel.com>
->> Cc: Alexander Lobakin <aleksander.lobakin@intel.com>
->=20
-> It's a simple refactor patch that only moves that logic to a new
-> helper. I don't see any new possible callers right now so could you
-> provide more straightward/clear use cases and intentions behind this
-> patch? For example, give us what kind of dumping stats you want to
-> tweak and your next movements.
-Thanks, Jason
-This patch tries to add one helper function which marked as noinline for =
-bpf tracing (this commit 5247dbf16cee also use the noinline for =
-tracing). This helper is not used other place in kernel.
-
-For example,
-sudo bpftrace -e '
-  kprobe:netdev_core_stats_fetch {printf("%d\n", ((struct =
-rtnl_link_stats64 *)arg1)->rx_dropped);}
-  kretprobe:netdev_core_stats_fetch {printf("%d\n", ((struct =
-rtnl_link_stats64 *)retval)->rx_dropped);}
-'
-We can use bpftrace tool to trace the rx_dropped counter from driver, =
-hardware, and from netdev core_stats. Why ?
-
-Locating where the kernel is dropping packets
-- If packets are being dropped in the network stack, use the dropwatch =
-tool to obtain detailed skb.
-- If packets are being dropped at the driver layer, determine whether =
-the issue is with the driver itself (no skb free) or with the hardware =
-(use the struct rtnl_link_stats64* from driver)=20
-
-Note: Not all network drivers use the rx_missed_errors.
-
->=20
-> Usually, a refactor patch comes with a bunch of patches that are going
-> to use this helper.
->=20
-> Thanks,
-> Jason
+>
+> On Mon, Feb 02, 2026 at 10:15:24AM -0800, Nathan Harold via Devel wrote:
+> > Unfortunately, I believe Android relies on this behavior (at least for
+> > now). We never re-send the encap parameters.
+> >
+> > https://cs.android.com/android/platform/superproject/main/+/main:system=
+/netd/server/XfrmController.cpp;l=3D1183;drc=3D61197364367c9e404c7da6900658=
+f1b16c42d0da
+>
+> Thanks Nathan. It is good to know.
+>
+> The next question is how do you feel about changing the behavior in
+> Android? Would you be willing re-send ports every time the SA has it?
+>
+> This will allow more flexible migration. Migrating from NAT to no NAT an
+> IPv6 without NAT would be possible.
+>
+> If that is a bad idea, I would limit this change to the new method only.
+>
+> regards,
+> -antony
+>
+> >
+> > -Nathan
+> >
+> >
+> > On Mon, Feb 2, 2026 at 4:58=E2=80=AFAM Antony Antony via Devel <
+> > devel@lists.linux-ipsec.org> wrote:
+> >
+> > > On Fri, Jan 30, 2026 at 12:28:19 +0100, Sabrina Dubroca wrote:
+> > > > 2026-01-27, 11:42:40 +0100, Antony Antony wrote:
+> > > > > The current code prevents migrating an SA from UDP encapsulation =
+to
+> > > > > plain ESP. This is needed when moving from a NATed path to a non-=
+NATed
+> > > > > one, for example when switching from IPv4+NAT to IPv6.
+> > > > >
+> > > > > Only copy the existing encapsulation during migration if the enca=
+p
+> > > > > attribute is explicitly provided.
+> > > >
+> > > > Are we sure nobody out there relies on this behavior (silently copy=
+ing
+> > > > the existing UDP encap without having to explicitly request it in t=
+he
+> > > > MIGRATE request)? If there are, this patch would break their setup =
+by
+> > > > clearing the encap that they expect to still be present.
+> > >
+> > > Libreswan and Android are the main users of migrate method. Libreswan=
+ sets
+> > > the
+> > > value in every call. I am guessing Android does that too.
+> > >
+> > > Yan, would this patch cause regression in Android?
+> > >
+> > > Without this fix migrating from v4 nat to v6 and no v4 nat won't  wor=
+k.
+> > >
+> > > Also the ENCAP migrate with UDP port was broken before, 2017,
+> > > the commit 4ab47d47af20 ("xfrm: extend MIGRATE with UDP encapsulation
+> > > port") ?
+> > > So likely it was never used by older code and PF_KEY.
+> > >
+> > > For the new methed strongSwan wants to support migrating from UDP enc=
+ap
+> > > to no UDP encap.
+> > >
+> > > regards
+> > > -antony
+> > >
+> > > PS : Steffen advised not to Fixes tag.
+> > > --
+> > > Devel mailing list -- devel@lists.linux-ipsec.org
+> > > To unsubscribe send an email to devel-leave@lists.linux-ipsec.org
+> > >
+>
+> > --
+> > Devel mailing list -- devel@lists.linux-ipsec.org
+> > To unsubscribe send an email to devel-leave@lists.linux-ipsec.org
+>
 
 
+--=20
+--
+Best,
+Yan
 
