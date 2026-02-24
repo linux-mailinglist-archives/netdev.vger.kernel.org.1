@@ -1,74 +1,62 @@
-Return-Path: <netdev+bounces-260622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260623-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4NqtD7nmnWlDSgQAu9opvQ
-	(envelope-from <netdev+bounces-260622-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 18:58:17 +0100
+	id KE5sEyPnnWlDSgQAu9opvQ
+	(envelope-from <netdev+bounces-260623-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 19:00:03 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7166018AD7A
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 18:58:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FFFD18ADEA
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 19:00:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 22B7531669ED
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 17:55:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E8B6830BE2DE
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 17:55:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 635943A9DA4;
-	Tue, 24 Feb 2026 17:55:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A213D3A9634;
+	Tue, 24 Feb 2026 17:55:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cJObRucU"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="TsOFVTHF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FFC33A9D8D;
-	Tue, 24 Feb 2026 17:55:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 631EC3A7F5F;
+	Tue, 24 Feb 2026 17:55:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771955700; cv=none; b=cACrawviZAMH/Yavd4MSLfli67tp4L0AG8H/1wqKlhGl5eZkq0xJPkiA+CAAk+GVIAYL3HxL6ceuvQTl1rgTT7mFvPfhpayaxq2u0fLlYKx2Q9xXW4nQrlEtlOIfosED12c6NvjJsG+8KTR+P+O7+Ecw5gMenfO6STyga8Vc5N0=
+	t=1771955756; cv=none; b=fV63CPmLEgxLU6QJxdtaTymaiy2zJp7V/8VmrqiKspmtL4jvAboosRyI9EY9RTGP5u4B94p1mf+eJ5xPl1XMtVjVDwZ6Vvn6sgfXKb/smz6RdjhUGSBpw75nIPoIJbqtx6snRFuKVHRWkOHHDuowtNkqsj5O96M3+DGH3wkhUSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771955700; c=relaxed/simple;
-	bh=8VrcD46dycy0DmTlHRXutqJ3iyRT/XCLxmuZYonmw+8=;
+	s=arc-20240116; t=1771955756; c=relaxed/simple;
+	bh=98IuLBbUZjwROztS4gFmszZmMvMreP3SfmF0X5PeUb8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KEnminw0JutM3AKXmmuHwL/xhspKXjYbqhA+VmAy+dmfhZvprVG26Wu5e43wn2FTjUreWGpm4M9aGR17FQtQ591h9jEkJ3efYO+Om8/TIs2b7YQLXbShRBkmkLsskQr4xBPyG1zJ7isYSHhD3qjcPWGvvfagVvg2kKd3egCfXRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cJObRucU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53B90C116D0;
-	Tue, 24 Feb 2026 17:54:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771955700;
-	bh=8VrcD46dycy0DmTlHRXutqJ3iyRT/XCLxmuZYonmw+8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cJObRucUqbih7KkJPWJZwIp6ChpzPJMBFVAfVkOFpiFv7k73CVjDP5LQImwP1kQze
-	 ZJvYCfiaUywKjhFQGmIjBKstSyBKa6IzWOtX8D3miyxSrQjBOqiZpGuSUk7LcBJxwg
-	 QDfKE5mtlAc1XNk56axpFGOdKWwaVT6+wTI9YXFeqyBHBMpHL8OXzYxEGINmUFC4S0
-	 gFBx31dknflFgj/OxegwmafHV6iZMOwROmWt/YkAr+Z2Lcrt3YG7zPaln+naa/+5XI
-	 25UcZGIzHSz2Cu6BAfrHLNm+ZSw5wLZ1yiLgZaNKMWYFB7a5y8UZTgBVaIGVjM7Bv8
-	 mrf/VP6SCXvOQ==
-Date: Tue, 24 Feb 2026 17:54:54 +0000
-From: Simon Horman <horms@kernel.org>
-To: Larysa Zaremba <larysa.zaremba@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	intel-wired-lan@lists.osuosl.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Natalia Wochtman <natalia.wochtman@intel.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH iwl-next 06/10] ixgbevf: XDP_TX in multi-buffer through
- libeth
-Message-ID: <aZ3l7sqKmz6fvmRp@horms.kernel.org>
-References: <20260223095222.3205363-1-larysa.zaremba@intel.com>
- <20260223095222.3205363-7-larysa.zaremba@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=DqW0faxukprhJ67712h+7xqyNYJ/OrlWrwpTX2HOKLhEllgURv1p75e+YikF9ZCh7TgomcO+Fl8Sp+EFakZvlhIjks/mTHGC6bEF97atmeHKnI7PZSPfe36+7YoJyV/hDVUvSGqnf8SgPhRAyeFQs/A5/C1j1P9jViBAgLQB+bU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=TsOFVTHF; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=sd3o1yQOPLA4LCRvfJKT0MuX1lJbSN5LQG5t+uQCyLQ=; b=TsOFVTHFa3hMinSo01EQicgq6L
+	1HeI5/nzl5bgK7QHoiQSxwPzSJ9a/BV0XIDwqYOFrvNHbKz4WKRswi7BECg+rpHmvXeCcuju1NpMP
+	cfenXb3JL+IrIrO9si7PIeVES9DOjLv4Pi1IXXPWjCdmwhrloApsRQ6xc0fSt975V3gE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vuwdR-008dc0-BI; Tue, 24 Feb 2026 18:55:49 +0100
+Date: Tue, 24 Feb 2026 18:55:49 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Sean Chang <seanwascoding@gmail.com>
+Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
+	trond.myklebust@hammerspace.com, anna@kernel.org,
+	netdev@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 2/2] net: macb: use ethtool_sprintf to fill ethtool
+ stats strings
+Message-ID: <4cbcc1ba-7850-4dee-b563-22e8ac2ca0d0@lunn.ch>
+References: <20260224165435.17648-1-seanwascoding@gmail.com>
+ <20260224165435.17648-3-seanwascoding@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,81 +65,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260223095222.3205363-7-larysa.zaremba@intel.com>
+In-Reply-To: <20260224165435.17648-3-seanwascoding@gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260622-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260623-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[intel.com,lists.osuosl.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7166018AD7A
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,lunn.ch:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2FFFD18ADEA
 X-Rspamd-Action: no action
 
-On Mon, Feb 23, 2026 at 10:52:13AM +0100, Larysa Zaremba wrote:
+On Wed, Feb 25, 2026 at 12:54:35AM +0800, Sean Chang wrote:
+> The RISC-V toolchain triggers a stringop-truncation warning when using
+> snprintf() with a fixed ETH_GSTRING_LEN (32 bytes) buffer.
+> 
+> Convert the driver to use the modern ethtool_sprintf() API from
+> linux/ethtool.h. This removes the need for manual snprintf() and
+> memcpy() calls, handles the 32-byte padding automatically, and
+> simplifies the logic by removing manual pointer arithmetic.
+> 
+> Signed-off-by: Sean Chang <seanwascoding@gmail.com>
 
-...
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-> diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h b/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
-> index eada53c57fcf..67d10e6e9910 100644
-> --- a/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
-> +++ b/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
-> @@ -82,20 +82,22 @@ struct ixgbevf_ring {
->  	struct net_device *netdev;
->  	struct bpf_prog *xdp_prog;
-
-...
-
-> diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-
-...
-
-> @@ -784,11 +865,19 @@ static int ixgbevf_clean_rx_irq(struct ixgbevf_q_vector *q_vector,
->  	unsigned int total_rx_bytes = 0, total_rx_packets = 0;
->  	struct ixgbevf_adapter *adapter = q_vector->adapter;
->  	u16 cleaned_count = ixgbevf_desc_unused(rx_ring);
-> +	LIBETH_XDP_ONSTACK_BULK(xdp_tx_bulk);
->  	LIBETH_XDP_ONSTACK_BUFF(xdp);
-> +	u32 cached_ntu;
->  	bool xdp_xmit = false;
->  	int xdp_res = 0;
->  
->  	libeth_xdp_init_buff(xdp, &rx_ring->xdp_stash, &rx_ring->xdp_rxq);
-> +	libeth_xdp_tx_init_bulk(&xdp_tx_bulk, rx_ring->xdp_prog,
-> +				adapter->netdev, adapter->xdp_ring,
-> +				adapter->num_xdp_queues);
-
-Hi Larysa,
-
-Sparse flags that libeth_xdp_tx_init_bulk() expects xdp_prog to be managed
-using __rcu, but that is not the case for rx_ring->xdp_prog.
-
-  .../ixgbevf_main.c:875:9: error: incompatible types in comparison expression (different address spaces):
-  .../ixgbevf_main.c:875:9:    struct bpf_prog [noderef] __rcu *
-  .../ixgbevf_main.c:875:9:    struct bpf_prog *
-
-...
+    Andrew
 
