@@ -1,217 +1,221 @@
-Return-Path: <netdev+bounces-260440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260441-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IF1fD5d1nWmAQAQAu9opvQ
-	(envelope-from <netdev+bounces-260440-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 10:55:35 +0100
+	id WA6YKTh3nWmAQAQAu9opvQ
+	(envelope-from <netdev+bounces-260441-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 11:02:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0FF1184FE0
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 10:55:34 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0797A185130
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 11:02:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4E1EE3013B72
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 09:55:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 406D8302D082
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 10:02:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE135372B20;
-	Tue, 24 Feb 2026 09:55:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B010C36B07C;
+	Tue, 24 Feb 2026 10:02:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h9SUf12m";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="iNCN77qA"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="fBhIoRXh"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6225C36B07D
-	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 09:55:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74FAE1428F4
+	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 10:02:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771926909; cv=none; b=eycg00XPBN5a1/NOJnxzs6Ez1Z6oIVLpdQcnxVJwb0AY8OPiwHUrVAZncabOTYpb3brKpoJhZwxPtijJRv+wAEFSsQm7axkNgT2reZfqlR87nssjYZ80PLzWG+as7yIBhuUg4bHX0oNCdJ8JjRLx3s8TERAIPgePVkqL1zkPAMk=
+	t=1771927347; cv=none; b=bJ4aUNf48eYGoBeHrcg5btv76f3A3h5QEvFcHIzezNPWN3I0PoD3O+slcr/Bzb3Vusgu8YJcjO/W/9DhZQsawE9rhjTHQe5MVC2xVq8SxXkrsMCxt4yzfxlM+dUwGMjqQlCp1EMH3dLR8aiZxOh/eXwHRZi2Mi7ErombTPO4leE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771926909; c=relaxed/simple;
-	bh=ELCHW2MDcGHyAOjCI5TzQdz1gK18QvxlUMKh2Jmx5xU=;
+	s=arc-20240116; t=1771927347; c=relaxed/simple;
+	bh=Y3cMqOEa8ZSogS4rvUnWvBmarJIjegLy4qPw4G+C9IA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mPzx2I95ZFVpb1YghZu+UdGLP7zvM3NdcLR5ATAtt9rk/OqjhjV3/5bCr6gGAuruTn+vSqy/on9WLcxgLUjrsPBLCbJkXxqws5lUfcIWJTA6fQ6vkqvqpYy99+WZGYSIKDYmxYBGbybm6CYZdHNv/dY1aVOEIQiHsAmM8ijcnkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h9SUf12m; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=iNCN77qA; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1771926907;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=drtPn3RRebLcYs+RKWbzRzgsO6cnVFeivrQ9r6WAvBs=;
-	b=h9SUf12mKp8L6g8zx0SBkMi+GkEPQyEidXukdRDlJeJPC7tGoodQ9BZJvmuh9oCsxqk22D
-	FaxIlgHL2mQTx3wjDldPLK6q7CFWS5TzDNR9SpQIzfjS8Au55gBL9ZVU2XsBKdqnuXniyt
-	91OqDowN1LGNHB6lhOFtfRwh1ywV3fo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-373-qVt2eaUtPPOsKcX9FO6dqg-1; Tue, 24 Feb 2026 04:55:04 -0500
-X-MC-Unique: qVt2eaUtPPOsKcX9FO6dqg-1
-X-Mimecast-MFC-AGG-ID: qVt2eaUtPPOsKcX9FO6dqg_1771926903
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-43635708e98so3182032f8f.2
-        for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 01:55:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1771926903; x=1772531703; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=drtPn3RRebLcYs+RKWbzRzgsO6cnVFeivrQ9r6WAvBs=;
-        b=iNCN77qAuxKgOl13Y6JbhmY7+rojnTQ7Pl8uN0y90x0GoQRHbeKi4rOnF9oNpMvA6S
-         qi6qO/4cw5/Gkh4CTxGaarb0ObhFnI9Q48GyfsXmOyuR6r4VTQn3CvMa4qcvADBzDz/6
-         c1FEJnRNfG2zehtrRkY1T/iZ4zwnoPrdXJUQalJfuECTWhmAj7aGqM0odArHIsaLXM+b
-         cYnLkyBPxazyMFVDBAxU0y3Qs9czc1BbcaDv9EiSDI1gitBRbyS7TFe7AFk3oH1eD7F2
-         hLm3FX+Pu5mp25jTPk2i6L6qIzomvWhZt0+4VqRHawRf9kdfNa08hn1GEZbBVV4nT9E+
-         oJvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771926903; x=1772531703;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=drtPn3RRebLcYs+RKWbzRzgsO6cnVFeivrQ9r6WAvBs=;
-        b=GIGr/e86Mic+MO4VoEUVytynxSM//AV4hpG2TjvmekA99gkR+3/OJxjyVdzqYgt3Kx
-         L54E4B8EMfl6jhd7hfK7/Fo+TswKlhocpMQfu9CCF3lEPBjXPMuAPOzxu1NvgYKdgNpI
-         B4oyNU9BevjSDh6iY0btZUmxxpVrts3jqk8PUbevxfM1d8MAjyKdVqgHCOWbejfQ0r02
-         BneKieP4QTmP0GWC/w4hAbvYmxdKkHcvljYo1MtBXH/V31jNinAke98QCCMbS978YJbM
-         ddps6fB2yBzKbSGTfXuaBRkILp10WgnWiM+q471jlzfuPn/BG0hVcw1yHE0bko5TTih/
-         u/WQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXq1vOXsSHRzKYn9apTKQIq9LfGBSopQed+t3ZwJ0xT7AJ8TJLMT7rIiJ/YvPKMRaWBwCP0P8I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrvCu6TXi95O3TnAIlCsg2IyEDsQ7lKfpDK7Xhy6bk286Luwtn
-	+cijmu/3GhyZXP7tvlL/N5ONsWrNWAr9QaTz3UkI59zqZnThjBw+70zpvGVvHMzIfA1kNtpffXY
-	G182m2bgbdz0iHJjLC8lO3gAiPM4Pcu2DVUxkMnlOamrewuDu/R+EnUK2lg==
-X-Gm-Gg: ATEYQzyFIOBuRcTWopzYpQVXAp8Y3oiXVsF/ta7D3LA0dt3iViYszeqm5JJWLf0pTNd
-	Z3iDkDJ+orQlk8omqMhdx5A6u02r47/4mPo22KNgUKAferNSRH5pIcdXcFdGhUcxyHM34l/tZjd
-	OrT5GGcfhKu6d5qH1kXiLMtMzSEUZTs0pDw9DyAqRw+QfNISm5lKYyobtllWPS48Rb46h+wCoSm
-	GXAIN+dZHTSNs29RlU3MNClqPhxayp0wBfox+9yRqXnWlL42+6CTMA+K2iCi1mZGp+pHbMwKOmZ
-	P9gSHldKqQD5V9EzwWJklMy5FwuB+3ZPQ7sikUHZPJ7XgRC1lGNNeNhDyedyFYEnE8V+4nbtVw+
-	VUKQ/ntX0JxTeYqIdbmX98Ji0G8PmpM5mHouC1tae/5D0jPLxDhKL4ET2EEpF7JQTTbffD1g=
-X-Received: by 2002:a05:6000:2011:b0:437:6dac:458a with SMTP id ffacd0b85a97d-4396f18f82bmr19853121f8f.57.1771926903204;
-        Tue, 24 Feb 2026 01:55:03 -0800 (PST)
-X-Received: by 2002:a05:6000:2011:b0:437:6dac:458a with SMTP id ffacd0b85a97d-4396f18f82bmr19853090f8f.57.1771926902713;
-        Tue, 24 Feb 2026 01:55:02 -0800 (PST)
-Received: from sgarzare-redhat (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43970c09897sm26032093f8f.17.2026.02.24.01.55.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Feb 2026 01:55:02 -0800 (PST)
-Date: Tue, 24 Feb 2026 10:54:58 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable <stable@kernel.org>
-Subject: Re: [PATCH net] vsock: Use container_of() to get net namespace in
- sysctl handlers
-Message-ID: <aZ1oTufA5JkTBl35@sgarzare-redhat>
-References: <2026022318-rearview-gallery-ae13@gregkh>
+	 Content-Type:Content-Disposition:In-Reply-To; b=edQ4wPGFo8Q9xJp4XctpFSvc5mHiMrdFYPRsSgqWLwG7D75hUJ425TK7pwn/Bdyq3ejBHgpFEajhNIKdrs2GbTsXyPymMALCaC6pWkha5ppCEYwBJ7DWtRMptyhmf2bj0op+L1e4guPg4Es1gnsdxZOoxL52Uy73FNly6uHmsBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=fBhIoRXh; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=WdEZMFpQwHHmjmHMSwjs7JUUFErg72GIrhiSikPqoEI=; b=fBhIoRXhvjPAk7lxdXgmVZ4eF0
+	CYw+FGwMDwqu2PAtevCfLNsu9NyKOKz0/xKV95U85oWU2Hy7s1Z2x1Hd1QNY9P+VwUrIYUTZdG0qh
+	cQBKxf+uZGDhSPthm26p01JeytMS4I8YLZPsbacg8uu6MyvCAroM/DFupj3tpMwR+ENOH0YYqKV1+
+	mFqJa8z5kdEMmUmdqb9WfBSDRCFp5eMhi6UAnq7olMESK+Nijbo16rClkZ+LxfvDvimBAY70bJ6T2
+	5egdIJrpto1hSoHd0P6Fg0yoQ+1m6PPyoLHeDbyMBxKHVm5c8x9KgMbQBj6ta8YkUtI8x8GCODxqw
+	+N2jBGmA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48140)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vupF0-0000000053j-2ZSh;
+	Tue, 24 Feb 2026 10:02:06 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vupEw-000000008Gi-48I1;
+	Tue, 24 Feb 2026 10:02:03 +0000
+Date: Tue, 24 Feb 2026 10:02:02 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Simon Horman <horms@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next] net: stmmac: ptp: limit n_per_out
+Message-ID: <aZ13Gjav_5PYNGEN@shell.armlinux.org.uk>
+References: <E1vuUvf-0000000AfhS-0lJR@rmk-PC.armlinux.org.uk>
+ <aZ1uxX_fddwO7UYD@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2026022318-rearview-gallery-ae13@gregkh>
+In-Reply-To: <aZ1uxX_fddwO7UYD@horms.kernel.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260440-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-260441-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.920];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linuxfoundation.org:email]
-X-Rspamd-Queue-Id: B0FF1184FE0
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,armlinux.org.uk:email,shell.armlinux.org.uk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0797A185130
 X-Rspamd-Action: no action
 
-On Mon, Feb 23, 2026 at 06:32:18PM +0100, Greg Kroah-Hartman wrote:
->current->nsproxy is should not be accessed directly as syzbot has found
-                   ^
-nit: "is" can be removed
+On Tue, Feb 24, 2026 at 09:26:29AM +0000, Simon Horman wrote:
+> On Mon, Feb 23, 2026 at 12:20:47PM +0000, Russell King (Oracle) wrote:
+> > ptp_clock_ops.n_per_out sets the number of PPS outputs, which the PTP
+> > subsystem uses to validate userspace input, such as the index number
+> > used in a PTP_CLK_REQ_PEROUT request.
+> > 
+> > stmmac_enable() uses this to index the priv->pps array, which is an
+> > array of size STMMAC_PPS_MAX. ptp_clock_ops.n_per_out is initialised
+> > using priv->dma_cap.pps_out_num, which is a three bit field read from
+> > hardware.
+> > 
+> > Documentation that I've checked suggests that values >= 5 are reserved,
+> > but that doesn't mean such values won't appear, and if they do, we
+> > can overrun the priv->pps array in stmmac_enable().
+> > 
+> > stmmac_ptp_register() has protection against this in its loop, but it
+> > doesn't act to limit ptp_clock_ops.n_per_out.
+> > 
+> > Fix this by introducing a local variable, pps_out_num which is limited
+> > to STMMAC_PPS_MAX, and use that when initialising the array and setting
+> > priv->ptp_clock_ops.n_per_out.
+> > 
+> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > ---
+> > 
+> > This could be a user exploitable bug (although one has to be root
+> > so the gun is already pointing at one's foot.) This is the commit
+> > which introduced the problem:
+> 
+> Hi Russell,
+> 
+> From the description I assumed that for this problem to manifest
+> out-of-range values would need to be turned by hardware.
+> But maybe I misunderstand things.
+> 
+> Could you elaborate on the vector you have in mind?
 
->that it could be NULL at times, causing crashes.  Fix up the af_vsock
->sysctl handlers to use container_of() to deal with the current net
->namespace instead of attempting to rely on current.
->
->This is the same type of change done in commit 7f5611cbc487 ("rds:
->sysctl: rds_tcp_{rcv,snd}buf: avoid using current->nsproxy")
->
->Cc: Stefano Garzarella <sgarzare@redhat.com>
->Cc: stable <stable@kernel.org>
+priv->dma_cap.pps_out_num is initialised from hardware:
 
-I'm not sure this is stable material since these changes landed in the 
-latest merge window (v7.0-rc1), but yeah, you know better than me, so 
-there could be a reason.
+dwmac4.h:#define GMAC_HW_FEAT_PPSOUTNUM         GENMASK(26, 24)
+dwmac4_dma.c:   dma_cap->pps_out_num = (hw_cap & GMAC_HW_FEAT_PPSOUTNUM) >> 24;
+dwxgmac2.h:#define XGMAC_HWFEAT_PPSOUTNUM               GENMASK(26, 24)
+dwxgmac2_dma.c: dma_cap->pps_out_num = (hw_cap & XGMAC_HWFEAT_PPSOUTNUM) >> 24;
 
-If needed, maybe we can also add:
+As can be seen, these are three bit fields, and as noted in my commit
+description, values in this field above 4 appear to be reserved, but
+"reserved" doesn't mean they will never be seen.
 
-Fixes: eafb64f40ca4 ("vsock: add netns to vsock core")
+Meanwhile, priv->pps[] is defined as:
 
->Assisted-by: gkh_clanker_2000
->Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
->---
->
->Note, this is compile-tested only.  Some of my scripts found this when
->looking for places that are missing fixes that were applied to other
->parts of the kernel.  I think the af_vsock code uses namespaces, but as
->I don't know the network stack at all I figured I would let you all
->review it to tell me how wrong I got this change and all is fine with
->the original code.
+#define STMMAC_PPS_MAX          4
+        struct stmmac_pps_cfg pps[STMMAC_PPS_MAX];
 
-Thanks! LGTM and tests are fine!
+The code in stmmac_ptp_register() takes account of that, and is careful
+not to overrun the priv->pps[] array:
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+	for (i = 0; i < priv->dma_cap.pps_out_num; i++) {
+		if (i >= STMMAC_PPS_MAX)
+			break;
+		priv->pps[i].available = true;
+	}
 
->
->thanks,
->
->greg k-h
->
-> net/vmw_vsock/af_vsock.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 9880756d9eff..f4062c6a1944 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -2825,7 +2825,7 @@ static int vsock_net_mode_string(const struct ctl_table *table, int write,
-> 	if (write)
-> 		return -EPERM;
->
->-	net = current->nsproxy->net_ns;
->+	net = container_of(table->data, struct net, vsock.mode);
->
-> 	return __vsock_net_mode_string(table, write, buffer, lenp, ppos,
-> 				       vsock_net_mode(net), NULL);
->@@ -2838,7 +2838,7 @@ static int vsock_net_child_mode_string(const struct ctl_table *table, int write,
-> 	struct net *net;
-> 	int ret;
->
->-	net = current->nsproxy->net_ns;
->+	net = container_of(table->data, struct net, vsock.child_ns_mode);
->
-> 	ret = __vsock_net_mode_string(table, write, buffer, lenp, ppos,
-> 				      vsock_net_child_mode(net), &new_mode);
->-- 
->2.53.0
->
+but the code there goes on to assign it to the number of per_out:
 
+	if (priv->dma_cap.pps_out_num)
+		priv->ptp_clock_ops.n_per_out = priv->dma_cap.pps_out_num;
+
+Core PTP code uses this to validate user input. This limits the value
+that can appear in rq->perout.index for a PTP clock ->enable() call
+for PTP_CLK_REQ_PEROUT.
+
+stmmac_enable() implements this method, and with no bounds checks,
+does this:
+
+                cfg = &priv->pps[rq->perout.index];
+
+                cfg->start.tv_sec = rq->perout.start.sec;
+                cfg->start.tv_nsec = rq->perout.start.nsec;
+
+Thus, if priv->dma_cap.pps_out_num were to indicate e.g. 7, then
+there is nothing to prevent rq->perout.index being e.g. 6, and thus
+overflowing the priv->pps[] array. This will likely write to other
+struct stmmac_priv members if it were to occur.
+
+So... there's two views one can take here:
+
+- hardware will never indicate values > 4. If that's the case, then
+  what's the point of the limiting check in stmmac_ptp_register() ?
+
+- hardware might one day support more than 4 outputs, resulting in
+  priv->dma_cap.pps_out_num being greater than 4. This will be a
+  silent overrun until someone attempts to configure an output > 4,
+  at which point non-PPS data of struct stmmac_priv will be
+  overwritten.
+
+Either code should care about values > 4, or it shouldn't. The current
+code cares about it in one place but then ignores it in all other
+places where the index is under userspace control, allowing the
+potential for array overrun.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
