@@ -1,126 +1,146 @@
-Return-Path: <netdev+bounces-260541-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260542-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oLqeFVmonWmgQwQAu9opvQ
-	(envelope-from <netdev+bounces-260541-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 14:32:09 +0100
+	id +EzuCG6onWmgQwQAu9opvQ
+	(envelope-from <netdev+bounces-260542-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 14:32:30 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7B69187B9A
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 14:32:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 92D37187BC0
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 14:32:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A2D2031A80FC
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 13:25:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B6F9B31FE475
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 13:25:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB54C39E164;
-	Tue, 24 Feb 2026 13:25:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CA1939C648;
+	Tue, 24 Feb 2026 13:25:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="plDhhVVb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MaoJ9568"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0A6F396B8E;
-	Tue, 24 Feb 2026 13:25:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46DC8396B8E;
+	Tue, 24 Feb 2026 13:25:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771939529; cv=none; b=eMytBCCAvpheNr/IL3y4Brlct1GeYklVOJBzEMmDd9U1hcXvlrLqCxAzOL1g7mHsAJFJvso3ulb6AuZagfm9YEjB6k+QzUznDxMU8FkrhBexXJupOnPcgpyHwaGhR2OoP/OUWIBXS5OwsxrtrHsJkEHTaTUpaeLabV4m6e0Uh0Y=
+	t=1771939550; cv=none; b=OuTQgF19Wm9Ii6AxcOy8XDciDrHTp6LE6gentbV24PFRJgmy0Aj6wutAKaYWQT0tPnKR6kdINZTNRkeMQDmKbFLqtfsT4ZjIEcyJcDHqLiPo/SYwfvo34+eUEQsSEhInfb+9PgsvHly6gC0qYkTe8+qL4ApVUpH04oCYXB8GASU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771939529; c=relaxed/simple;
-	bh=Fd9buA8hd1MpbK8NwClydRsXgWzmjUVRoIb9Jt0q+c4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PdvpUB46q8koh5FOdKo7oo80kXJ1l2dzMmAngaMXkyMQj3RXFnIB//RJWXGdCivgyWGNdviFMoek0044bK6sp3zKfwOVoYYF9QURfLIM2pMoOVd52og66EGOyizcUXrAhkH+FumfaSs1EBw+VVYCVKsqTO/e5dXzRX1lP8CHzgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=plDhhVVb; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=L1jpiQ8THLDqRtoaEXu/fuXezfN+f17gE1m89GkKEOs=; b=plDhhVVbc6DSxhd4zZqeTFOTgU
-	ZL1e6WrSDNHojmnxL+aDUlAw03T0J7QWeBQFQ1AkMN/fROWFIi6X5XS9AMqaQTcwW8dKPIFndispB
-	pJPeNZ9+U2ypOffCdWe91ROpx1UM+cHj39DkL9a0whhUSenQAM85pAD9WlZf8+fGvsYtHNTre3aPg
-	1HWEkBjZTPMHBWA0yuodfNkkI29SKwWBruTzWaU23+ZKucsGt/e43yfte56su7Zog3hMJP7STqXi9
-	dNwUcAmmEc7bauLHiAtfsdIG6FBG9IuXt+4FTrnPrIJm49+zk+bRiQJK/6gaqDffDkh66f6phAu0S
-	6WJs9fZQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46252)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vusPj-000000005IC-0uSE;
-	Tue, 24 Feb 2026 13:25:23 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vusPh-000000008Oz-2SF5;
-	Tue, 24 Feb 2026 13:25:21 +0000
-Date: Tue, 24 Feb 2026 13:25:21 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH net-next] MAINTAINERS: Update maintainer entry for
- QUALCOMM ETHQOS ETHERNET DRIVER
-Message-ID: <aZ2mwRvjgHIc6Wbu@shell.armlinux.org.uk>
-References: <20260224-qcom_ethqos_maintainer-v1-1-24e02701ea52@oss.qualcomm.com>
+	s=arc-20240116; t=1771939550; c=relaxed/simple;
+	bh=OH226xpf6OFBkdLB/rlmhdXNbboVu+PgHRuJNn31ygA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KF94zdaMt5RI0wBR9NNXTZx6yfg+Fq0bxmsF3pUl7aMP2DDX96oymxnHfii62Zqa+t9gz9rcZlgnFzYky/bBZxSCWEpYsAmiXDB9V24SWo483H6pA7dAgqT/oxWgqFRwVW2fvKD3TdLSEhunIKTmvLc6Bl/1MAIa/lanSsM6+YE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MaoJ9568; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2C34C19422;
+	Tue, 24 Feb 2026 13:25:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771939550;
+	bh=OH226xpf6OFBkdLB/rlmhdXNbboVu+PgHRuJNn31ygA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MaoJ9568OOoCR1H3e1IZa3TXWhhHUxPVWefiXSWJ2H04Ml2WRp0YZFrfYixr85VSq
+	 xgLhEU4O++7qwHs4z7H6w+2Z83T8ixWcwtEoznNyTXw3SQRBIbxl7vnfiIFdMeDwb6
+	 D58Fq4EwRtzjQUa2SQ6x0QZyq15d4tjJXkhZMfYnAzbYXstciiMANFs7Mqr2MlvcxE
+	 nGme0QMlaUWVcc0XIS9/p+yJC0bk35W57YSjtBmnMj05sAvqYGbrv783MqSmT2s88s
+	 lQso4Cd6fZP60LmlsXOD22HuXICgwgDsLtgOtpb2uhpjH3wq6r9GHsBW9AnSZIduyL
+	 UMPdivEE1xDbg==
+Received: from localhost ([::1])
+	by mail.kernel.org with esmtp (Exim 4.99.1)
+	(envelope-from <mchehab+huawei@kernel.org>)
+	id 1vusQ7-0000000Gpru-39rz;
+	Tue, 24 Feb 2026 14:25:47 +0100
+Date: Tue, 24 Feb 2026 14:25:46 +0100
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Jonathan Corbet <corbet@lwn.net>
+Cc: Jani Nikula <jani.nikula@linux.intel.com>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, Kees Cook <kees@kernel.org>, Mauro Carvalho
+ Chehab <mchehab@kernel.org>, intel-wired-lan@lists.osuosl.org,
+ linux-doc@vger.kernel.org, linux-hardening@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, "Gustavo A. R. Silva"
+ <gustavoars@kernel.org>, Aleksandr Loktionov
+ <aleksandr.loktionov@intel.com>, Randy Dunlap <rdunlap@infradead.org>,
+ Shuah Khan <skhan@linuxfoundation.org>
+Subject: Re: [Intel-wired-lan] [PATCH 00/38] docs: several improvements to
+ kernel-doc
+Message-ID: <20260224142546.3eb7c38b@localhost>
+In-Reply-To: <878qcj8pvw.fsf@trenco.lwn.net>
+References: <cover.1771408406.git.mchehab+huawei@kernel.org>
+	<33d214091909b9a060637f56f81fb8f525cf433b@intel.com>
+	<878qcj8pvw.fsf@trenco.lwn.net>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260224-qcom_ethqos_maintainer-v1-1-24e02701ea52@oss.qualcomm.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260541-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260542-lists,netdev=lfdr.de,huawei];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.997];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mchehab@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:url,armlinux.org.uk:email,shell.armlinux.org.uk:mid,qualcomm.com:email]
-X-Rspamd-Queue-Id: E7B69187B9A
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,lwn.net:email]
+X-Rspamd-Queue-Id: 92D37187BC0
 X-Rspamd-Action: no action
 
-On Tue, Feb 24, 2026 at 05:58:47PM +0530, Mohd Ayaan Anwar wrote:
-> Replace Vinod Koul with Mohd Ayaan Anwar as the maintainer of the
-> QUALCOMM ETHQOS ETHERNET DRIVER. Vinod confirmed he is no longer
-> active in this area and agreed to be removed.
+On Mon, 23 Feb 2026 08:02:11 -0700
+Jonathan Corbet <corbet@lwn.net> wrote:
+
+> Jani Nikula <jani.nikula@linux.intel.com> writes:
 > 
-> Acked-by: Vinod Koul <vkoul@kernel.org>
-> Suggested-by: Russell King (Oracle) <linux@armlinux.org.uk>
-> Signed-off-by: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+> > There's always the question, if you're putting a lot of effort into
+> > making kernel-doc closer to an actual C parser, why not put all that
+> > effort into using and adapting to, you know, an actual C parser?  
+> 
+> Not speaking to the current effort but ... in the past, when I have
+> contemplated this (using, say, tree-sitter), the real problem is that
+> those parsers simply strip out the comments.  Kerneldoc without comments
+> ... doesn't work very well.  If there were a parser without those
+> problems, and which could be made to do the right thing with all of our
+> weird macro usage, it would certainly be worth considering.
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Parser is only needed for statement prototypes. There, stripping
+comments (after we parse public/private) should be OK. Yet, we
+want a python library to do the parsing, using it only for the
+things we want to be parsed.
 
-Thanks!
+Assuming we have something like that, we'll still need to teach
+the parser about the macro transforms, as those are very Linux
+specific.
+
+Maybe something like: https://github.com/eliben/pycparser would
+help (didn't test nor tried to check if it does what we want).
+
+There is an additional problem that this will add an extra
+dependency for the Kernel build itself, because kernel-doc can
+run at Kernel build time.
+
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks,
+Mauro
 
