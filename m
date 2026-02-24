@@ -1,174 +1,148 @@
-Return-Path: <netdev+bounces-260507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260508-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MK9gH/ubnWnwQgQAu9opvQ
-	(envelope-from <netdev+bounces-260507-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 13:39:23 +0100
+	id SEvhITycnWnwQgQAu9opvQ
+	(envelope-from <netdev+bounces-260508-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 13:40:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2B47187125
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 13:39:22 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBA9A187161
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 13:40:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3C62E3078A08
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 12:38:46 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CDA18302B46C
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 12:39:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99AFF39A7E8;
-	Tue, 24 Feb 2026 12:38:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66E8D3815C2;
+	Tue, 24 Feb 2026 12:39:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="e1xgz6l8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UmeYc8Xm"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BFC239A7EE;
-	Tue, 24 Feb 2026 12:38:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43D2425A2C9;
+	Tue, 24 Feb 2026 12:39:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771936723; cv=none; b=qPgbnSFLcf60zJ2r2lTFcBc1/jJTS4KTmgtsiNTBIcr5tQgPEpXY91wbiQZVqu/yVrgJcKeJFScWgd1xOpdwTc1qZ7OST9DEg0GtM48C92je+WbMOdiboF4MhQIuySO9pR3XOfbXqKs5nt83vEZFALPU9hyPx59ZOh+l34Upltw=
+	t=1771936778; cv=none; b=jpTSemmc1KUbpYHB6BSVnw3kvwtzAL8/KeZdHoMKtGOKiCHRq0GLO2Ep7jj049EOKLZo/rC73jjuo6VMcpENJ/OuqspLZs3k1pg//u6FiJkHZcfF8Mxj6tpbWsJL2rvoXGyAua+LacZSAzxx2w29q3MwGZ9OqtkbXzT+6PXd3mc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771936723; c=relaxed/simple;
-	bh=+8dfnuPCvheAZoj489Lw7VaqrKEQ66nLtTo4AaRsAxw=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=PJYuKqBuVwXWcAKVxO3OKFSLNEBKwkCXFp7aTydv136zndE+H90i0tbd0VVAAdvAp/dBvAPbiYDns97cR8Dx5oH/J9+V50wPV5DDnLVpgIJ205LEsjVfQUEFnL4mYIJtyZe5uTu4oC8XJ5cHmdAyzMs+TJZPtqpwaLpw2HogT4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=e1xgz6l8; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1204)
-	id 63B3E20B6F02; Tue, 24 Feb 2026 04:38:36 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 63B3E20B6F02
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1771936716;
-	bh=fWYrBpZ0QKK9eLfeDvRYeB6kFeBxTaLv8KWU5s0DQvc=;
-	h=Date:From:To:Subject:From;
-	b=e1xgz6l8MW+phkYu38JX0G3e4yO51wiYtpZAZUt9bv0qraZ8WRh0iPY5WOsU/b5Cg
-	 0uklXhOxgBKiCgFT+7ZT5gHJsZ4Vn9jo1l4bvAKogf72UWfhmGteZ8+eJRavQFVKMN
-	 5kbWXRfbKncroWU+DLxLkKDzt5WcZoU4qPOkAxzM=
-Date: Tue, 24 Feb 2026 04:38:36 -0800
-From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-To: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
-	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
-	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	dipayanroy@microsoft.com
-Subject: [PATCH net] net: mana: Fix double destroy_workqueue on service
- rescan PCI path
-Message-ID: <aZ2bzL64NagfyHpg@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	s=arc-20240116; t=1771936778; c=relaxed/simple;
+	bh=YKI1upsRFHpQ70GhUF+nMVLZfbcZ0yrmnGFgevv0qF4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=mRaSnPbnXVZgQjDq1i4M7EtrUpu7mX5dA9EHwZd2Hz5JtGcTJj2QH2eE4x3WmS+DVBSPv0VPVWRleVTNfLJrnoVt8WP2MaBnCnBRjDJKLqQlkMCA9JipC32sPQnKzBxvg8Solasf+Tk6CIAg/rtgFVYFkd5Yv7Oe5s45A+8bO2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UmeYc8Xm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A0A8C116D0;
+	Tue, 24 Feb 2026 12:39:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771936777;
+	bh=YKI1upsRFHpQ70GhUF+nMVLZfbcZ0yrmnGFgevv0qF4=;
+	h=Date:From:To:Cc:Subject:From;
+	b=UmeYc8Xmc8q6Ktw+pmpjpo4rcg2rpxPqLSrwhmop88ELBL6oqGNEFUfyO8nY4jYQV
+	 njgml2tRuM0x+L5NVrghIbPf5VhJmV8K/sj9s1GcfqaPxOpyksU7kKSkq6wxd/sQZu
+	 HGvo4R002MKuxjywktj/HwrpgJJ0CUqQSFQUQnxVB2v6XJF3iePXxJJ/vifAPer+sw
+	 5cHFlAEzvJLq48o7hyaaQFesLtuWs9H6N91DjY9w4oa6QfLpvlhqELvaIS/+gsbdn6
+	 v6heGMiR7IF8V8vbEkGWopsSbzFnDLNpaCWw/4OA90O6NjwQACnp8PhU9B2n05Bsqb
+	 2iANhGgZ4e5nQ==
+Date: Tue, 24 Feb 2026 12:39:33 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Daniel Borkmann <daniel@iogearbox.net>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>,
+	Networking <netdev@vger.kernel.org>
+Cc: Eduard Zingerman <eddyz87@gmail.com>,
+	Ihor Solodrai <ihor.solodrai@linux.dev>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the bpf-next tree with the bpf tree
+Message-ID: <aZ2cBWyiG_fKSjIq@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="MRWQfcW/ZMqR3ZoK"
 Content-Disposition: inline
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-4.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260507-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-260508-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,linux.dev,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TO_DN_ALL(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[broonie@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.microsoft.com:dkim,linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid]
-X-Rspamd-Queue-Id: F2B47187125
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,sirena.org.uk:mid]
+X-Rspamd-Queue-Id: CBA9A187161
 X-Rspamd-Action: no action
 
-While testing corner cases in the driver, a use-after-free crash
-was found on the service rescan PCI path.
 
-When mana_serv_reset() calls mana_gd_suspend(), mana_gd_cleanup()
-destroys gc->service_wq. If the subsequent mana_gd_resume() fails
-with -ETIMEDOUT or -EPROTO, the code falls through to
-mana_serv_rescan() which triggers pci_stop_and_remove_bus_device().
-This invokes the PCI .remove callback (mana_gd_remove), which calls
-mana_gd_cleanup() a second time, attempting to destroy the already-
-freed workqueue. Fix this by NULL-checking gc->service_wq in
-mana_gd_cleanup() and setting it to NULL after destruction.
+--MRWQfcW/ZMqR3ZoK
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Call stack of issue for reference:
-[Sat Feb 21 18:53:48 2026] Call Trace:
-[Sat Feb 21 18:53:48 2026]  <TASK>
-[Sat Feb 21 18:53:48 2026]  mana_gd_cleanup+0x33/0x70 [mana]
-[Sat Feb 21 18:53:48 2026]  mana_gd_remove+0x3a/0xc0 [mana]
-[Sat Feb 21 18:53:48 2026]  pci_device_remove+0x41/0xb0
-[Sat Feb 21 18:53:48 2026]  device_remove+0x46/0x70
-[Sat Feb 21 18:53:48 2026]  device_release_driver_internal+0x1e3/0x250
-[Sat Feb 21 18:53:48 2026]  device_release_driver+0x12/0x20
-[Sat Feb 21 18:53:48 2026]  pci_stop_bus_device+0x6a/0x90
-[Sat Feb 21 18:53:48 2026]  pci_stop_and_remove_bus_device+0x13/0x30
-[Sat Feb 21 18:53:48 2026]  mana_do_service+0x180/0x290 [mana]
-[Sat Feb 21 18:53:48 2026]  mana_serv_func+0x24/0x50 [mana]
-[Sat Feb 21 18:53:48 2026]  process_one_work+0x190/0x3d0
-[Sat Feb 21 18:53:48 2026]  worker_thread+0x16e/0x2e0
-[Sat Feb 21 18:53:48 2026]  kthread+0xf7/0x130
-[Sat Feb 21 18:53:48 2026]  ? __pfx_worker_thread+0x10/0x10
-[Sat Feb 21 18:53:48 2026]  ? __pfx_kthread+0x10/0x10
-[Sat Feb 21 18:53:48 2026]  ret_from_fork+0x269/0x350
-[Sat Feb 21 18:53:48 2026]  ? __pfx_kthread+0x10/0x10
-[Sat Feb 21 18:53:48 2026]  ret_from_fork_asm+0x1a/0x30
-[Sat Feb 21 18:53:48 2026]  </TASK>
+Hi all,
 
-Fixes: 505cc26bcae0 ("net: mana: Add support for auxiliary device servicing events")
-Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
----
- drivers/net/ethernet/microsoft/mana/gdma_main.c | 5 ++++-
- drivers/net/ethernet/microsoft/mana/mana_en.c   | 4 +++-
- 2 files changed, 7 insertions(+), 2 deletions(-)
+Today's linux-next merge of the bpf-next tree got a conflict in:
 
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index 0055c231acf6..3926d18f1840 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -1946,7 +1946,10 @@ static void mana_gd_cleanup(struct pci_dev *pdev)
- 
- 	mana_gd_remove_irqs(pdev);
- 
--	destroy_workqueue(gc->service_wq);
-+	if (gc->service_wq) {
-+		destroy_workqueue(gc->service_wq);
-+		gc->service_wq = NULL;
-+	}
- 	dev_dbg(&pdev->dev, "mana gdma cleanup successful\n");
- }
- 
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 9b5a72ada5c4..f69e42651359 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -3762,7 +3762,9 @@ void mana_rdma_remove(struct gdma_dev *gd)
- 	}
- 
- 	WRITE_ONCE(gd->rdma_teardown, true);
--	flush_workqueue(gc->service_wq);
-+
-+	if (gc->service_wq)
-+		flush_workqueue(gc->service_wq);
- 
- 	if (gd->adev)
- 		remove_adev(gd);
--- 
-2.43.0
+  tools/testing/selftests/bpf/prog_tests/align.c
 
+between commit:
+
+  05849ec34f3d7 ("selftests/bpf: Replace strncpy() with strscpy()")
+
+=66rom the bpf tree and commit:
+
+  f632de6e19553 ("selftests/bpf: Migrate align.c tests to test_loader frame=
+work")
+
+=66rom the bpf-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+(deleted the file)
+
+--MRWQfcW/ZMqR3ZoK
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmmdnAQACgkQJNaLcl1U
+h9CPLwf/WVi/v65yvxIWLU0e2i7lyr7/Gx18hXCvU8X+jNYcVqEmOjTGksRrkwEH
+FhZBM8r6iOWq7LXevWqXgtlNfs8u+M7zwWw/GgH6aubqBGo84PMiNei66qhlLLWl
+WTtkhpcazy5qizI/h3SXNJw0ywMUX8OefTRfpyJ0ywhEe/gi65QMeFMdwzv9rF4V
+/V981ojtcQ46skIMA/YfDoEGTRnoOJOzEIoRg94HBKYMLOsjvqz87CF5hq1mcpKJ
+Ol8MYGIhVF8GSOWM8/u613hTCrL9SZ+H+RJDBcjPo/GKlOb4BIh9hA+QZ64DiGgD
++tPDXy5IebLIo8HQX1qPApehFenxEA==
+=fAsj
+-----END PGP SIGNATURE-----
+
+--MRWQfcW/ZMqR3ZoK--
 
