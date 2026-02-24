@@ -1,287 +1,366 @@
-Return-Path: <netdev+bounces-260373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260374-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qKBKJo5SnWk2OgQAu9opvQ
-	(envelope-from <netdev+bounces-260373-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 08:26:06 +0100
+	id MKk9JQpUnWk2OgQAu9opvQ
+	(envelope-from <netdev+bounces-260374-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 08:32:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6952183024
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 08:26:05 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16C511830E3
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 08:32:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0D4B230A414C
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 07:24:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 08DA1302447F
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 07:32:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B7636404B;
-	Tue, 24 Feb 2026 07:24:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7850C34A790;
+	Tue, 24 Feb 2026 07:32:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BoaXEMy2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U4hTPw3p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com [209.85.128.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8A393644BA
-	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 07:24:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771917849; cv=pass; b=p5JnmFCRtFmHcI+QgZ0zi+sPTA+uaJ8aYbY7o7Rxy4rkI9ws3khWEZgltx0VQzLoxe5RsDKRrkSRto4SO6+/ABbYurXoYqeOy93f2m4GwzA0x2U3O+WPrq8XltDq1ul7tddhk72MXx9R+DhwO+SIQH9BaxRvFJwNAYjYfA3+3JM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771917849; c=relaxed/simple;
-	bh=ULd+oRTA8UiwXl4Lb5nizVLXiKCKx7ppXxndo2HO3Aw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oLALH53hr9zgzOVUKTVtt664XTg77CMnUP2FH4qP+PELGMf/aFA6DUON4f61CL+5VKPmVi5z+h8/F40VAN3Vwan6j3BMN4mgXmg+brK0XIUGo8Jl4GOyaxY7lVHcKyVfukn2uRikcsy7pcfMJEXTMYuyvbefbtXULtImvCGwgiU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BoaXEMy2; arc=pass smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A4133A9DC
+	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 07:32:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.67
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771918342; cv=none; b=SwYVRjTZR+duVQuoGEKZ2PXSjbxKP2hfpisx+D1yJhCUnGWwgXEjOLx4+xI1kQ/rDMGFGZP6dmSULTjRGF04yRjoX9Kv/gfTa2eZoEpxbgdCl87RnSa8SCQiiMRe3ZY+A8pY0Lg/yT28POmq2qoJ5hbrZik/LSjMsnB84DnsdXc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771918342; c=relaxed/simple;
+	bh=d0Q2rSgRuUEkQvpLjuXStow5++oAw5YGa+WZhF3+6II=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gGBtGVbUYG26W2ti2+hxzIDf+KNg7bcOSMVjSijaPI6Z7AtpKHgCRvw+4MIZKAo3M1cu+yPiOg7tnH3oyiwH7vkGH8/4xeUpeyREyIrWLi2+E1JTL5N1kWarfku8uJPNj2h1seYy5eKGtGG+Kb45AIUZJkWr1gQ+ZRZ0gHrQq/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U4hTPw3p; arc=none smtp.client-ip=209.85.128.67
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-59e5f52b13eso6255835e87.2
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 23:24:07 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771917846; cv=none;
-        d=google.com; s=arc-20240605;
-        b=SEapLtgLqr0FfbDV/YHc5Ds4cr/NCx2QCAyrM4qn44QJtICcjD38CsBTZc5zLAFplh
-         YjiGl9r3E4DG2nYR/aGIqHzkUnYW8Gi19FR2Fe0j2ptpAguKDvCN7uA4z4WtT9dZ0by2
-         KlU2+zMkp9RLBdi0P7Bx1MHVKGvu7egqmQMtWaVRwSfY6sznjoYBEob4lcVUjd6Z60gl
-         kFOPlOPtweCb4roerGWN+Uw2f62aqZpOARDS3z9P7UXeatohnIVYICbSVoOP1a8Cfm4m
-         jo6S6EAgKIo62wI/HfOHAVWZ3fVvlnmMdG7vvr6Wu0pRy7tuSDxDg5CJiDQimjmoY2pi
-         gzqA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ULd+oRTA8UiwXl4Lb5nizVLXiKCKx7ppXxndo2HO3Aw=;
-        fh=iimxS/toxw1tqakfW7lgDLfbqHnkLGiu5BceWk1v/ZM=;
-        b=dNnXqj7oHvF69gcL0gEWovqItsrKKhod+jtU1VZfXFeqZ+JxejjwI1jvwhBYlY7/U3
-         Idu6yZF6j765TcIBVN3xP/KU0VwtlpeW8N1yBPak3NV1WaQPgBZZA5/kmvBS7Kaa2V88
-         uBbFBaQb4sk1dTv4OsnFKczCMPsNY1SbUyNmA/GAV6i9VUwrrp4bynwj1xbb1H9Wkbsz
-         SXfPnOdtgOkcFi9ZBiBN4IvIyq+gjHTnXqVSD73TfQpaXgbyHncIbgirovkSUrc1HfUA
-         zG/80QYhzPGLrcpTppvPiAoqT163Z79hfd3VONJGaXnvUbo/5xVEvQUiWCP+y0BmEma5
-         axXQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Received: by mail-wm1-f67.google.com with SMTP id 5b1f17b1804b1-48371bb515eso64360745e9.1
+        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 23:32:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771917846; x=1772522646; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ULd+oRTA8UiwXl4Lb5nizVLXiKCKx7ppXxndo2HO3Aw=;
-        b=BoaXEMy2F7OAjJamk9KWf04b+60eygj6RgaNQuCjZy2fXgsavxwv3loBIEUSMfsysB
-         RAu+BDeBuDGiLJQXFsBvSzMUxWZU3X1idXl9ZJX9AiJOpTnE3XZ3TFezZACwhh4LXgk+
-         zILc2R8Tp7Hq6Lzc1RJkEfaOdAUhuPqjlm2rTXcX49azdnu+j+JYzzSw2kbOWrhybdBB
-         IhTbfWTkmS4VjnE/rdSWyHORVeDlTEmmZZt0ytx88fGf1Rlsuak1nfNGn1DVYvXX8SHf
-         Blrpbq9vl/t5wCY6kjhEp3Kq6sEgiaezd/61j/EsCc+hhmYK/i2GQugpG8M5UvyMXCJS
-         bArQ==
+        d=gmail.com; s=20230601; t=1771918339; x=1772523139; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=C2b+TtUL0OeelBHcO+Aq8hOabke3OUGf+iwRcVyhE8I=;
+        b=U4hTPw3phpiZ9GZQt2bQsCi7zVuq7JqO0QFtDdjqv3dJXLTPDZyHz92A734kRGVnH3
+         w7gEeIzBV32iVzefjZnbIVDfPsAHYG61vFujy63fpyBmEjGXJ3lIN92BBTGU0pUBOX/B
+         nHyv1jXe9bH0cwN++MRKDUwnEY/+dW2Mcv7gtVStTIm/K1kgFeK1E2Pt1M1K6v1IKVWI
+         y99opWWl8z1qo9yEvD+U4sqqziDDHmSgAokQoJJaKBBPqYhiwWJM2PpIYaV4rZ4jKfbC
+         /Ofdzd+BRKa6E8rvDnXJGI+VUEpmLUYdui68DIEQwhTGsKlIGkuFyF2vfd3cWyFEba6n
+         9wdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771917846; x=1772522646;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ULd+oRTA8UiwXl4Lb5nizVLXiKCKx7ppXxndo2HO3Aw=;
-        b=lHJT5RJrOyW7GaSc/x3Ci9lohg0/NaRIxbUipiWHeoCRoaAymQu8Q9I8NzuVoNdRYL
-         BohXwkv5MQuTyMGCFUGwbKYoAWYiTFv8KI1Lvbd5AVzeBkQHboTMZWEOympr12y+noBg
-         YgY/YEc/bbjvSUH+npHerVfAVLhHMDd4rd8neQkWREm/TkBo+2Z7dF0JLlB4WTQ6hOWN
-         aeYYgA0eqLcvgXt+hHbuWmE+21ZVtzebQy8MRDMzrlTXAXx7/dmVdmkGIUzMbtX7AaWZ
-         WQMbVv81uB1El3KDDvpAMJPedbQS7U8u2YQXVUE14qrWOa5OY2+3QzIEywxKs3Tri1ZG
-         WKxw==
-X-Gm-Message-State: AOJu0YwMbFogwsv14agCXaEsqUYlNdfUxlvU6DBug08+KU0F96F+e9Vg
-	kHmkIiVGHPIrzBEXAwgXzU7CCSjAPGW5Llni9al7oSHvyJLCs/fsQgkj2a0Pre9IGFLvHzSFS1F
-	vkapgUShuBZ6sJ3QfBxQs9sSlxwvKo10=
-X-Gm-Gg: ATEYQzzAz57CALGGrKaLHlS/r10TSHcOu/1PGEAYMZ158bWtPQIcz6FLHQsQVEX+5SF
-	xFhFY62WKEe/v3aGDEyyB/gUs1Bg8/H3Ly9oIie7Wq5U6mbuljMbe4tBYkyETq18l+74VDREQc6
-	49loct131qyXZ86vAK1f2w/cE3OQGuKvfalnSPJRACHGdMQBHL1uG7ohSJySOU7a6IESu24B8o7
-	nfZs4YKfu0sIVrawY8hwE7cYTkz/+KmcKXDSLhvWuHK0xEu/thc8uuTzl5NHwr2Y+C2t4BgnRXa
-	rKEDTSCs
-X-Received: by 2002:a05:6512:250f:b0:59f:6db3:152c with SMTP id
- 2adb3069b0e04-5a0ed87a67amr4003240e87.7.1771917845447; Mon, 23 Feb 2026
- 23:24:05 -0800 (PST)
+        d=1e100.net; s=20230601; t=1771918339; x=1772523139;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=C2b+TtUL0OeelBHcO+Aq8hOabke3OUGf+iwRcVyhE8I=;
+        b=v3fdNiagvaHwTRjOmOEUyBS7M07ihbT8gznt0aU+jFfbYXQ8nXhsjANpmMf/2yuBAx
+         oazpI2pErGkOaAz9U3rAm1+H5ZvYyTEv0wTJefLV9C3z+BiPA+EQrmYC0Whhxfwbx/ey
+         xcJwdgry2QSwLYqMo/ipijK7b0vziAzH3P6BaU4dgyqsY1nGXq84wcWQUnXHSliGh1Tq
+         FBx3cotN7jNvEWa1vjzEiS5tLMTGWIiAxwavYZPDEkoD3jKt2WZRkQ6DpaeZ2EZMcNMg
+         ihRcxe3louHYllwvYlCSiLeWq1IqP3h+JDZlF9HQDyh+D/cNTYLKAsbAF/ugMNQLbt0a
+         18rA==
+X-Forwarded-Encrypted: i=1; AJvYcCU7EcXMLpX7K371hRs2HLrPwGO/8c9AeUe0bftyIHKqrjYQuOINZc6nURYhMxIgg2wyCVLoF7s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywgegg+Q1GW7pVMZauQcTKTUgVm8lDN7oHY4uqe6Xm6knf+CEFL
+	b5oK12s14XEEqREn3ktpjQDq9lFg7LH3h6SnQ/TdDJBadk3Y4ji/Khj3
+X-Gm-Gg: ATEYQzyAImjxKHQWyD4AifPZ4bw63MvZRFd0jmJCHUdT2t5d4EAINNBOLFfUx51jzFZ
+	awjHJvQqRPL+lugxKf+x44TyVCr8vq3v/48Ur5w4ug9R5Yr3DOlkW6viIC9O43goqXcmNdshBlG
+	oknp07DI3pUEIbCZ47nbYYWkf1/b1O/XKKe18giLGanTKJg7RkyKPV8V8bEiQQEsvArVvsBV+5I
+	IKJ4d3XgH1bMhJuJwNp4dYefGgkXYWmBd1XhYEIOydEDBDQhJahVzaNg/xCaKJu4jdsSK80JsB7
+	YMLjediNl2SGQ+YvyG7dSfC7sfC1jVrAvqwwdW6HJOy0rDe5kidSO8N25gSQjZI49cP5Emds0a9
+	HAWFdV+5B9Cx6PmatPlzbxxX38mO/74G7kN8QdWAh+NSRQdF/AiCJujMIOcVgtDWFtVgLM/0aHF
+	RtCqLKzLKkYhf1OcpYJkPKv3yewS7rjhiPsFMvfc8JHUW8oZQ=
+X-Received: by 2002:a05:6000:2408:b0:437:6b73:ffa9 with SMTP id ffacd0b85a97d-4396f14c9b4mr20895527f8f.5.1771918339056;
+        Mon, 23 Feb 2026 23:32:19 -0800 (PST)
+Received: from [10.221.199.249] ([165.85.126.46])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43970d54c5csm24737157f8f.38.2026.02.23.23.32.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Feb 2026 23:32:18 -0800 (PST)
+Message-ID: <5359a23e-972a-4f88-b697-6b76334231a8@gmail.com>
+Date: Tue, 24 Feb 2026 09:32:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <e8355c0d7fd48981ba505e455387971f91210fa8.1771734206.git.tonghao@bamaicloud.com>
- <CAL+tcoDR2-WTmhBakWcvEuLCwAU7RGRA8syfor-+RJJq7_ZOKw@mail.gmail.com>
- <65307E32-7AFF-44EF-B2BB-89AA15F3D0D1@bamaicloud.com> <CAL+tcoB0uV0E9cDCfw58kAuzNcanstx_OT3h=dkQVOW1b-nN+A@mail.gmail.com>
- <C914CAC5-AEF2-4814-84FC-30EA4B70F832@bamaicloud.com> <CAL+tcoDzik63K1aqpDTn7K6Jkta5ZtjedTQ58TB455+pwkq8Pw@mail.gmail.com>
- <3AB6E925-3A2E-439D-8432-B00F4DEFE7F1@bamaicloud.com> <CAL+tcoD+TL6xbTodAKp=w0NVeLOubxoJpk=-b_8Z0bPvFrzXCQ@mail.gmail.com>
- <4E09E708-FA5A-4523-8E75-359C3D8B43E6@bamaicloud.com>
-In-Reply-To: <4E09E708-FA5A-4523-8E75-359C3D8B43E6@bamaicloud.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 24 Feb 2026 15:23:27 +0800
-X-Gm-Features: AaiRm53SWjolA5DC8EeO5QdP3fbiUdoyMmv93KkJ64Nta57w4RY5mb1Beu3QGEA
-Message-ID: <CAL+tcoAo++zNTneOD+YM5gbAqSOyZtGT=FgRUpSZuzrE7WffHw@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: core: introduce the netdev_fetch_core_stats()
-To: Tonghao Zhang <tonghao@bamaicloud.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Samiullah Khawaja <skhawaja@google.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/mlx5e: Precompute xdpsq assignments for
+ mlx5e_xdp_xmit()
+To: Finn Dayton <Finnius.Dayton@spacex.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Cc: "Alexei Starovoitov ," <ast@kernel.org>,
+ "Daniel Borkmann ," <daniel@iogearbox.net>,
+ "David S. Miller ," <davem@davemloft.net>, "Jakub Kicinski ,"
+ <kuba@kernel.org>, "Jesper Dangaard Brouer ," <hawk@kernel.org>,
+ "John Fastabend ," <john.fastabend@gmail.com>,
+ "Stanislav Fomichev ," <sdf@fomichev.me>,
+ "Saeed Mahameed ," <saeedm@nvidia.com>, "Leon Romanovsky ,"
+ <leon@kernel.org>, "Tariq Toukan ," <tariqt@nvidia.com>,
+ "Mark Bloch ," <mbloch@nvidia.com>, "Andrew Lunn ," <andrew+netdev@lunn.ch>,
+ "Eric Dumazet ," <edumazet@google.com>, "Paolo Abeni ," <pabeni@redhat.com>,
+ "stable@vger.kernel.org" <stable@vger.kernel.org>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <610D8F9E-0038-46D9-AD8A-1D596236B1EF@spacex.com>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <610D8F9E-0038-46D9-AD8A-1D596236B1EF@spacex.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260373-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,nvidia.com,lunn.ch,google.com,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-260374-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bamaicloud.com:email,mail.gmail.com:mid,davemloft.net:email,fomichev.me:email]
-X-Rspamd-Queue-Id: D6952183024
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ttoukanlinux@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 16C511830E3
 X-Rspamd-Action: no action
 
-On Tue, Feb 24, 2026 at 2:54=E2=80=AFPM Tonghao Zhang <tonghao@bamaicloud.c=
-om> wrote:
->
->
->
-> > On Feb 24, 2026, at 14:24, Jason Xing <kerneljasonxing@gmail.com> wrote=
-:
-> >
-> > On Tue, Feb 24, 2026 at 2:08=E2=80=AFPM Tonghao Zhang <tonghao@bamaiclo=
-ud.com> wrote:
-> >>
-> >>
-> >>
-> >>> On Feb 24, 2026, at 13:28, Jason Xing <kerneljasonxing@gmail.com> wro=
-te:
-> >>>
-> >>> On Tue, Feb 24, 2026 at 12:07=E2=80=AFPM Tonghao Zhang <tonghao@bamai=
-cloud.com> wrote:
-> >>>>
-> >>>>
-> >>>>
-> >>>>> On Feb 24, 2026, at 11:52, Jason Xing <kerneljasonxing@gmail.com> w=
-rote:
-> >>>>>
-> >>>>> On Tue, Feb 24, 2026 at 11:22=E2=80=AFAM Tonghao Zhang <tonghao@bam=
-aicloud.com> wrote:
-> >>>>>>
-> >>>>>>
-> >>>>>>
-> >>>>>>> On Feb 23, 2026, at 08:20, Jason Xing <kerneljasonxing@gmail.com>=
- wrote:
-> >>>>>>>
-> >>>>>>> On Sun, Feb 22, 2026 at 12:38=E2=80=AFPM Tonghao Zhang <tonghao@b=
-amaicloud.com> wrote:
-> >>>>>>>>
-> >>>>>>>> Network device statistics retrieved via procfs, sysfs, and netli=
-nk
-> >>>>>>>> represent the combined total of core_stats + driver, hardware st=
-atistics.
-> >>>>>>>>
-> >>>>>>>> However, in some scenarios, when monitoring netdev metrics, it i=
-s valuable
-> >>>>>>>> to clearly distinguish whether the values originate from the net=
-working
-> >>>>>>>> stack's core statistics or from the driver, hardware layer. This=
- helps
-> >>>>>>>> improve debugging and addressing issues.
-> >>>>>>>>
-> >>>>>>>> Approaches were considered:
-> >>>>>>>> - commit 5247dbf16cee ("net/core: Introduce netdev_core_stats_in=
-c()").
-> >>>>>>>> This allows tracking increments to core_stats and helps identify=
- specific
-> >>>>>>>> causes of changes, but not provide the total counters.
-> >>>>>>>> - extending rtnl_link_stats64 with new core_xxx fields.
-> >>>>>>>> This would likely confuse or break existing userspace applicatio=
-ns relying
-> >>>>>>>> on this struct.
-> >>>>>>>> - adding a tracepoint inside dev_get_stats().
-> >>>>>>>> This implementation is not simple or straightforward enough.
-> >>>>>>>>
-> >>>>>>>> The solution in this patch is therefore to introduce a new dedic=
-ated function
-> >>>>>>>> for collecting core statistics and mark it noinline. This approa=
-ch is simple,
-> >>>>>>>> clean, and maintainable to obtain driver, hardware statistics se=
-parately when needed.
-> >>>>>>>>
-> >>>>>>>> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
-> >>>>>>>> Cc: "David S. Miller" <davem@davemloft.net>
-> >>>>>>>> Cc: Eric Dumazet <edumazet@google.com>
-> >>>>>>>> Cc: Jakub Kicinski <kuba@kernel.org>
-> >>>>>>>> Cc: Paolo Abeni <pabeni@redhat.com>
-> >>>>>>>> Cc: Simon Horman <horms@kernel.org>
-> >>>>>>>> Cc: Stanislav Fomichev <sdf@fomichev.me>
-> >>>>>>>> Cc: Kuniyuki Iwashima <kuniyu@google.com>
-> >>>>>>>> Cc: Samiullah Khawaja <skhawaja@google.com>
-> >>>>>>>> Cc: Ahmed Zaki <ahmed.zaki@intel.com>
-> >>>>>>>> Cc: Alexander Lobakin <aleksander.lobakin@intel.com>
-> >>>>>>>
-> >>>>>>> It's a simple refactor patch that only moves that logic to a new
-> >>>>>>> helper. I don't see any new possible callers right now so could y=
-ou
-> >>>>>>> provide more straightward/clear use cases and intentions behind t=
-his
-> >>>>>>> patch? For example, give us what kind of dumping stats you want t=
-o
-> >>>>>>> tweak and your next movements.
-> >>>>>> Thanks, Jason
-> >>>>>> This patch tries to add one helper function which marked as noinli=
-ne for bpf tracing (this commit 5247dbf16cee also use the noinline for trac=
-ing). This helper is not used other place in kernel.
-> >>>>>>
-> >>>>>> For example,
-> >>>>>> sudo bpftrace -e '
-> >>>>>> kprobe:netdev_core_stats_fetch {printf("%d\n", ((struct rtnl_link_=
-stats64 *)arg1)->rx_dropped);}
-> >>>>>> kretprobe:netdev_core_stats_fetch {printf("%d\n", ((struct rtnl_li=
-nk_stats64 *)retval)->rx_dropped);}
-> >>>>>> '
-> >>>>>
-> >>>>> Can't we use the global symbol dev_get_stats() instead? It should b=
-e the same.
-> >>>>
-> >>>> - if kprobe the dev_get_stats(), the rtnl_link_stats64 *storage is n=
-ot used by drivers (ndo_get_stats64, ndo_get_stats..,), the rx_dropped, for=
- example, is 0.
-> >>>
-> >>> How about computing the delta of @storage->xxx between two consecutiv=
-e
-> >>> kretprobes hitting this function? And you can also identify the sourc=
-e
-> >
-> > two consecutive __kretprobes__=E2=80=A6
-> I got it. In fact, it is not solving the problem. For example, @storage->=
-rx_dropped is increasing, but it's impossible to determine whether the incr=
-ease comes from core_stats.rx_dropped, from the driver=E2=80=99s rx_dropped=
-, or from both.
 
-To be more specific, in dev_get_stats() @storage is only one memory
-area that records the information from @core_stats. So it is
-@core_stats that takes effect and is widely used/scattered over the
-place (please see how one example like dev_core_stats_rx_dropped_inc()
-gets called, it can be used by drivers like ipvlan or stack). We
-cannot tell which one causes the increment by looking at @core_stats.
 
-Besides, another trivial thing is that, even with your patch applied,
-it doesn't change anything since core_stats->rx_dropped can get
-increased in between kprobe and kretprobe of the new helper you added.
+On 23/02/2026 2:05, Finn Dayton wrote:
+> mlx5e_xdp_xmit() selects an XDP SQ (Send Queue) using smp_processor_id()
+> (CPU ID). When doing XDP_REDIRECT from a CPU whose ID is
+>> = priv->channels.num, mlx5e_xdp_xmit() returns -ENXIO and the
+> redirect fails.
+> 
+> Previous discussion proposed using modulo in mlx5e_xdp_xmit() to map
+> CPU IDs into the channel range, but modulo/division is too costly in
+> the hot path.
+> 
+> Instead, this solution precomputes per-cpu priv->xdpsq assignments when
+> channels are (re)configured and does a single lookup in  mlx5e_xdp_xmit().
+> 
+> Because multiple CPUs map to the same xdpsq when CPU count exceeds
+> channel count, serialize xdp_xmit on the ring with xdp_tx_lock.
+> 
+> Fixes: 58b99ee3e3eb ("net/mlx5e: Add support for XDP_REDIRECT in device-out side")
+> Link: https://lore.kernel.org/netdev/20251031231038.1092673-1-zijianzhang@bytedance.com/
+> Link: https://lore.kernel.org/netdev/44f69955-b566-4fb1-904d-f551046ff2d4@gmail.com
+> Cc: stable@vger.kernel.org # 6.12+
 
-With that said, how can you accurately know where the increment comes
-from? Is it from the stack or driver? I dunno :S
+Do not introduce it as a fix. No bug here.
 
-Thanks,
-Jason
+> Signed-off-by: Finn Dayton <finnius.dayton@spacex.com>
+> ---
+> Testing:
+>   - XDP forwarding / XDP_REDIRECT verified with both low CPU ids and
+>     CPU ids > than number of send queues.
+>   - No -ENXIO observed, successful forwarding.
+> 
+>   drivers/net/ethernet/mellanox/mlx5/core/en.h  |  4 +++
+>   .../net/ethernet/mellanox/mlx5/core/en/xdp.c  | 16 +++++++----
+>   .../net/ethernet/mellanox/mlx5/core/en_main.c | 28 +++++++++++++++++++
+>   3 files changed, 43 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+> index ea2cd1f5d1d0..387954201640 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+> @@ -519,6 +519,8 @@ struct mlx5e_xdpsq {
+>   	/* control path */
+>   	struct mlx5_wq_ctrl        wq_ctrl;
+>   	struct mlx5e_channel      *channel;
+> +	/* serialize writes by multiple CPUs to this send queue */
+> +	spinlock_t xdp_tx_lock;
+
+You're already inside xdpsq, no need to repeat xdp_tx in field name.
+Move field to the section with /* dirtied @xmit */.
+Try to find a proper placement with minimal cacheline impact.
+
+>   } ____cacheline_aligned_in_smp;
+>   
+>   struct mlx5e_xdp_buff {
+> @@ -909,6 +911,8 @@ struct mlx5e_priv {
+>   	struct mlx5e_rq            drop_rq;
+>   
+>   	struct mlx5e_channels      channels;
+> +	/* selects the xdpsq during mlx5e_xdp_xmit() */
+> +	int __percpu              *send_queue_idx_ptr;
+
+Move to section with /* priv data path fields - start */.
+Similarly to txq2sq, I'd switch the mapping to give xdpsq pointer, 
+rather than index.
+
+>   	struct mlx5e_rx_res       *rx_res;
+>   	u32                       *tx_rates;
+>   
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+> index 80f9fc10877a..2dd44ad873a1 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+> @@ -845,7 +845,7 @@ int mlx5e_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
+>   	struct mlx5e_priv *priv = netdev_priv(dev);
+>   	struct mlx5e_xdpsq *sq;
+>   	int nxmit = 0;
+> -	int sq_num;
+> +	int send_queue_idx = 0;
+
+Do not break RCT.
+
+>   	int i;
+>   
+>   	/* this flag is sufficient, no need to test internal sq state */
+> @@ -855,13 +855,19 @@ int mlx5e_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
+>   	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
+>   		return -EINVAL;
+>   
+> -	sq_num = smp_processor_id();
+>   
+> -	if (unlikely(sq_num >= priv->channels.num))
+> +	if (unlikely(!priv->send_queue_idx_ptr))
+
+Should be guaranteed by the safety mechanisms.
+Not needed.
+
+>   		return -ENXIO;
+>   
+> -	sq = priv->channels.c[sq_num]->xdpsq;
+> +	send_queue_idx = *this_cpu_ptr(priv->send_queue_idx_ptr);
+> +	if (unlikely(send_queue_idx >= priv->channels.num || send_queue_idx < 0))
+> +		return -ENXIO;
+
+Should be guaranteed by the safety mechanisms.
+Not needed.
+
+>   
+> +	sq = priv->channels.c[send_queue_idx]->xdpsq;
+> +	/* The number of queues configured on a netdev may be smaller than the
+> +	 * CPU pool, so two CPUs might map to this queue. We must serialize writes.
+> +	 */
+> +	spin_lock(&sq->xdp_tx_lock);
+>   	for (i = 0; i < n; i++) {
+>   		struct mlx5e_xmit_data_frags xdptxdf = {};
+>   		struct xdp_frame *xdpf = frames[i];
+> @@ -941,7 +947,7 @@ int mlx5e_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
+>   
+>   	if (flags & XDP_XMIT_FLUSH)
+>   		mlx5e_xmit_xdp_doorbell(sq);
+> -
+> +	spin_unlock(&sq->xdp_tx_lock);
+>   	return nxmit;
+>   }
+>   
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> index 7eb691c2a1bd..adef35d06b89 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> @@ -1492,6 +1492,7 @@ static int mlx5e_alloc_xdpsq(struct mlx5e_channel *c,
+>   	sq->pdev      = c->pdev;
+>   	sq->mkey_be   = c->mkey_be;
+>   	sq->channel   = c;
+> +	spin_lock_init(&sq->xdp_tx_lock);
+
+placement looks arbitrary.
+move it so it doesn't interfere the fields assignments/inits.
+
+>   	sq->uar_map   = c->bfreg->map;
+>   	sq->min_inline_mode = params->tx_min_inline_mode;
+>   	sq->hw_mtu    = MLX5E_SW2HW_MTU(params, params->sw_mtu) - ETH_FCS_LEN;
+> @@ -3283,10 +3284,30 @@ static void mlx5e_build_txq_maps(struct mlx5e_priv *priv)
+>   	smp_wmb();
+>   }
+>   
+> +static void build_priv_to_xdpsq_associations(struct mlx5e_priv *priv)
+
+Rename. How about mlx5e_build_xdpsq_maps? Similar to mlx5e_build_txq_maps.
+
+> +{
+> +	/*
+
+Start comment here, don't keep an empty comment line.
+
+> +	 * Build the mapping from CPU to XDP send queue index for priv.
+> +	 * This is used by mlx5e_xdp_xmit() to determine which xdpsq (send queue)
+> +	 * should handle the xdptx data, based on the CPU running mlx5e_xdp_xmit()
+> +	 * and the target priv (netdev).
+> +	 */
+
+Comment is too long. Can be short and to the point.
+
+> +	int send_queue_idx, cpu;
+> +
+> +	if (unlikely(priv->channels.num == 0))
+> +		return;
+> +
+
+Shouldn't be possible.
+This will just hide bugs. Remove it.
+
+> +	for_each_possible_cpu(cpu) {
+> +		send_queue_idx = cpu % priv->channels.num;
+
+Not sure this deserves a local var..
+
+> +		*per_cpu_ptr(priv->send_queue_idx_ptr, cpu) = send_queue_idx;
+> +	}
+
+We probably need smp_wmb(); here.
+Need to think about it...
+
+> +}
+> +
+>   void mlx5e_activate_priv_channels(struct mlx5e_priv *priv)
+>   {
+>   	mlx5e_build_txq_maps(priv);
+>   	mlx5e_activate_channels(priv, &priv->channels);
+> +	build_priv_to_xdpsq_associations(priv);
+>   	mlx5e_xdp_tx_enable(priv);
+>   
+>   	/* dev_watchdog() wants all TX queues to be started when the carrier is
+> @@ -6263,8 +6284,14 @@ int mlx5e_priv_init(struct mlx5e_priv *priv,
+>   	if (!priv->fec_ranges)
+>   		goto err_free_channel_stats;
+>   
+> +	priv->send_queue_idx_ptr = alloc_percpu(int);
+> +	if (!priv->send_queue_idx_ptr)
+> +		goto err_free_fec_ranges;
+> +
+>   	return 0;
+>   
+> +err_free_fec_ranges:
+> +	kfree(priv->fec_ranges);
+>   err_free_channel_stats:
+>   	kfree(priv->channel_stats);
+>   err_free_tx_rates:
+> @@ -6295,6 +6322,7 @@ void mlx5e_priv_cleanup(struct mlx5e_priv *priv)
+>   	for (i = 0; i < priv->stats_nch; i++)
+>   		kvfree(priv->channel_stats[i]);
+>   	kfree(priv->channel_stats);
+> +	free_percpu(priv->send_queue_idx_ptr);
+
+Keep order symmetric to the priv_init calls.
+
+>   	kfree(priv->tx_rates);
+>   	kfree(priv->txq2sq_stats);
+>   	kfree(priv->txq2sq);
+
 
