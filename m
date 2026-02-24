@@ -1,367 +1,194 @@
-Return-Path: <netdev+bounces-260375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260376-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eFuzKH5UnWk2OgQAu9opvQ
-	(envelope-from <netdev+bounces-260375-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 08:34:22 +0100
+	id gKyTHPRVnWk2OgQAu9opvQ
+	(envelope-from <netdev+bounces-260376-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 08:40:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22E87183135
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 08:34:21 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EB9A183268
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 08:40:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8BE5E3042630
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 07:34:02 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 004D7300AD94
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 07:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B27B364E83;
-	Tue, 24 Feb 2026 07:34:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76AA4364EB7;
+	Tue, 24 Feb 2026 07:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j7ER1Y2k"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="FKEAxwg8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com [209.85.221.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-103.mailbox.org (mout-p-103.mailbox.org [80.241.56.161])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C19633A9DC
-	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 07:33:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2B7526ADC;
+	Tue, 24 Feb 2026 07:40:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.161
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771918441; cv=none; b=qwHgXEKhvQm4FKYKz3GsNvZ1OGNx2YqxGoZtGKgL4DlfuwS1JgBIhDUVmlIVBBReA1t5d5isflANfqvIq+VryJWl7MkEL0k0et4SGER1cy5Uqv6yNQXsMH9iMCoAmtra3MwA8WwfQglLcIheaYVMw6A86dbChfhkov+7b9abJZo=
+	t=1771918830; cv=none; b=ZAf6DoS0p87tadAqumqKwQy8C9lHnlXjTgfcbuICRsOIXOZaoWtCfjMhtlKmoQ5ENGdWs+QAFbTzIJqvEzSGvPiXcVUaUzGY3XKHk2MKK59l0SN5PrWMgZrSn2gYiybcjg80Kon1jdStZAdRvX2AmvCG6b1+9J104oHodYF0C4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771918441; c=relaxed/simple;
-	bh=pSbPEmIMY+2pRtvOV6TAkJb2+K52O5PHlhbKRZdqGVs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=N2f+QpbpM82flwBYdyV98aMBi0HoY32Uler8TKOewIEYDXoWh2+CpSzvLeTWm6SAljYOYzvN4N9YLVH37uATZg46qBmCMuGX7xvDL9wYQ4CnA+dOz2XsBLBwKt6N0sr1LXBNzb1HwjzBqymTEi8sM/MgJcoUYGFdWKwXy0d8lYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j7ER1Y2k; arc=none smtp.client-ip=209.85.221.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f66.google.com with SMTP id ffacd0b85a97d-4359a316d89so4695668f8f.0
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 23:33:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771918437; x=1772523237; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zSGD0+cknqp5fLNAqiZuYxrSk7G1iqyXqllEHurRYm8=;
-        b=j7ER1Y2kUxTGtTXhXcROCOROmnP2VNAqqITwAqnV5ToyltUwOI+HJSmQ/eE/NBbrO/
-         GKJkFwSntSbQsAuuadbabgSrHaSjuMfZhKcDJ+mjW6gjAf29Qk4BIzF9zG636QHocPUz
-         S4BM+cU61KwDosN+EPY5z0cMZJTvUVmfpsszsOA+qa62bif8aH1BENFuOG1MfM1SLvtz
-         Xq4pQNw0TKdSpZijp8sFxEf7AjvH2c3PzsMUkC2+52gpph1n5UwcOiDuQ9Mu4BNp/aPM
-         HcJwxfUC+pr28W4Q56soudHqfA/i7pbvqGoKfipNYcAisuG1Ak2JPHlnXaaLpSemtuyg
-         POrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771918437; x=1772523237;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zSGD0+cknqp5fLNAqiZuYxrSk7G1iqyXqllEHurRYm8=;
-        b=GgIhmVBu58L/sSncpTtbcMH0t97f0sU8oechDFQ34kDyAwHcO2XZcX9sDtXwfEDtP/
-         ymuDyc1jsUaPd8usDwrgLA3exGK7tOCl+eZFC67KMepFNpxGMz1n/CfGEFcVd6XxHnKE
-         7QQGJAxNNw10aqzH9DAFJFYiFNzSfRPudaZ09jM/BBLtPVd5Ad6kfqpohp/3jg1N0aGi
-         /do7+mVPaFooK07VV6jdFeSDjlH7hxXeKVE39yk/ZEEn3PkcDijbQh9sogiCelBpliMr
-         bvWQfutrrW8SF2/fJPvLm5V/ruE6HZqtUJFCO0nlxsjx4aTsm3NZcpbiNCYcozXUC0ia
-         ihPg==
-X-Forwarded-Encrypted: i=1; AJvYcCUkW2BpF29/i8hmL4q2f3+h00lxCdSyI9JXjAwgV8+0IgOlXXTCNFzpQfvu7oPf0UycG1w5VHg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywa0Pvitdcet7gHi/tO71i2cbHWFjWO8Py/ibN9VPqUZIzWY1ch
-	oni+k6sdfHjzqqN0Mn0RYPC2QqJoNNhezXHQPRHjpjBXMmHr5DLsYojY
-X-Gm-Gg: ATEYQzwzwXJHQ3KPjgC1HAxeZFgwVjtgdV/o8l7ZcR6Ns4rtOsXNHRbXqxl2j5t11yO
-	k8oihOxPVp56nYveu97vPR/dBDNcdW34rpF/NKCEoP10Lu65OZmcrPDZFWvUAJSxnDVfww1GrX/
-	yttk3h2rR24SvePahLsAQXisjkW7KwKWkmxHZHqO43HUhdj81mRAU75nG+lKQS+0Cv0INid/9V+
-	DCcWs8iiZJacFI5vjkmri3wZOg8Wy53p4NBuZOyNHGhuF+nl9rLjF+b2IpLIA17SuR7v5vwQVEN
-	7KBXepYMJEGb05pdIplGM3dRfUHRV8U7WQz5JiOoR9yXKa3V6w7QKrhgCXNy06tz/iPcp4VgFj/
-	GQnL9GzMBQTDovQQmG1Q2PM9ZnvckNAkLY0ndeFJQbuV6wic6ZZrqxCq5vFLsy9IUNqi7Tyhsyz
-	hSNzoU15+E/pLXcNuLzziIYYbTvyT0YJ5f/uCJ3lBPAtaYYkI=
-X-Received: by 2002:a05:6000:2012:b0:429:c851:69ab with SMTP id ffacd0b85a97d-4396f181b46mr21671771f8f.55.1771918436863;
-        Mon, 23 Feb 2026 23:33:56 -0800 (PST)
-Received: from [10.221.199.249] ([165.85.126.46])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43970d54754sm24943473f8f.36.2026.02.23.23.33.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Feb 2026 23:33:56 -0800 (PST)
-Message-ID: <08e815f1-5c50-4bf9-8289-71c0202ee674@gmail.com>
-Date: Tue, 24 Feb 2026 09:33:57 +0200
+	s=arc-20240116; t=1771918830; c=relaxed/simple;
+	bh=nO29udC/TvyKqbOOxAxOz7i5aFfdank76tWIHV3k8yo=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Id41uLY/PCsfYRV6s33Rs/wEFPM0sOR34I08YnMJrihV6b/vgcBB5JwXgZwlgEshsOJ+uRRk52SuAIP8Be98J3N8UI6NbrCQqywnanM4FjNOUuNWAKHJ3Kvazf7voGf8vSdIU/XcuVKuHay+JMfB55hxfjdrHqJ4EHcLXd1Jayc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=FKEAxwg8; arc=none smtp.client-ip=80.241.56.161
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-103.mailbox.org (Postfix) with ESMTPS id 4fKqQ11RwVz9v7N;
+	Tue, 24 Feb 2026 08:40:25 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1771918825; h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nO29udC/TvyKqbOOxAxOz7i5aFfdank76tWIHV3k8yo=;
+	b=FKEAxwg8/2TVXMyYr/OiVCz5K1q4W+C/xn+JVXi//EMazudZywyjLwZrwzHNLYzROrIGjJ
+	WiOn32rHS7oEwHLLm6QL2yCRYinpfVLqqwTh7sT6RAQNG0u4EURZ5HxR4OK58Z3/n7gZZV
+	8caQG4lw5WqV9qVnTFk84Cn+SoVQbSZKgx07St5+8pxpkc99ybs0qQSpkSnjhqX/fK2fVh
+	R1e9tX2O0SBa7kFE1+a+xKqHOjB9jmAde03Ko6m7uo3zhkzAiDlzUONdZOidXL54Qs7PfF
+	bCIWc/77Lvrh1BnmhbO6+/6V4uapf65BSL0fwPQx8DWsFH0Szy8rGeRiOsWY+A==
+Message-ID: <7ca512d133f7a3bcfe00e9b0b2af5fe5f147ad77.camel@mailbox.org>
+Subject: Re: [PATCH 0/37] PCI/MSI: Enforce explicit IRQ vector management by
+ removing devres auto-free
+From: Philipp Stanner <phasta@mailbox.org>
+Reply-To: phasta@kernel.org
+To: Simon Richter <Simon.Richter@hogyros.de>, Shawn Lin
+ <shawn.lin@rock-chips.com>, Bjorn Helgaas <bhelgaas@google.com>, "Vaibhaav
+ Ram T . L" <vaibhaavram.tl@microchip.com>, Kumaravel Thiagarajan
+ <kumaravel.thiagarajan@microchip.com>,  Even Xu <even.xu@intel.com>,
+ Xinpeng Sun <xinpeng.sun@intel.com>, Srinivas Pandruvada
+ <srinivas.pandruvada@linux.intel.com>, Jiri Kosina <jikos@kernel.org>, 
+ Alexandre Belloni <alexandre.belloni@bootlin.com>, Zhou Wang
+ <wangzhou1@hisilicon.com>, Longfang Liu <liulongfang@huawei.com>, Vinod
+ Koul <vkoul@kernel.org>, Lee Jones <lee@kernel.org>, Jijie Shao
+ <shaojijie@huawei.com>, Jian Shen <shenjian15@huawei.com>, Sunil Goutham
+ <sgoutham@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Heiner
+ Kallweit <hkallweit1@gmail.com>, "David S . Miller" <davem@davemloft.net>,
+ Jeff Hugo <jeff.hugo@oss.qualcomm.com>, Oded Gabbay <ogabbay@kernel.org>,
+ Maciej Falkowski <maciej.falkowski@linux.intel.com>,  Karol Wachowski
+ <karol.wachowski@linux.intel.com>, Min Ma <mamin506@gmail.com>, Lizhi Hou
+ <lizhi.hou@amd.com>,  Andreas Noever <andreas.noever@gmail.com>, Mika
+ Westerberg <westeri@kernel.org>, Tomasz Jeznach <tjeznach@rivosinc.com>,
+ Will Deacon <will@kernel.org>, Xinliang Liu <xinliang.liu@linaro.org>, Tian
+ Tao <tiantao6@hisilicon.com>, Davidlohr Bueso <dave@stgolabs.net>, Jonathan
+ Cameron <jonathan.cameron@huawei.com>, Srujana Challa
+ <schalla@marvell.com>, Bharat Bhushan <bbhushan2@marvell.com>, Antoine
+ Tenart <atenart@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, Raag
+ Jadav <raag.jadav@intel.com>, Hans de Goede <hansg@kernel.org>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby
+ <jirislaby@kernel.org>, Andy Shevchenko <andy@kernel.org>, Manivannan
+ Sadhasivam <mani@kernel.org>, Mika Westerberg
+ <mika.westerberg@linux.intel.com>, Andi Shyti <andi.shyti@kernel.org>, 
+ Robert Richter <rric@kernel.org>, Mark Brown <broonie@kernel.org>, Nirmal
+ Patel <nirmal.patel@linux.intel.com>, Kurt Schwemmer
+ <kurt.schwemmer@microsemi.com>,  Logan Gunthorpe <logang@deltatee.com>,
+ Linus Walleij <linusw@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
+ Sakari Ailus <sakari.ailus@linux.intel.com>, Bingbu Cao
+ <bingbu.cao@intel.com>, Ulf Hansson <ulf.hansson@linaro.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Benjamin Tissoires <bentiss@kernel.org>, 
+ linux-input@vger.kernel.org, linux-i3c@lists.infradead.org, 
+ dmaengine@vger.kernel.org, Philipp Stanner <phasta@kernel.org>, 
+ netdev@vger.kernel.org, nic_swsd@realtek.com,
+ linux-arm-msm@vger.kernel.org,  dri-devel@lists.freedesktop.org,
+ linux-usb@vger.kernel.org,  iommu@lists.linux.dev,
+ linux-riscv@lists.infradead.org, David Airlie <airlied@gmail.com>, Simona
+ Vetter <simona@ffwll.ch>, linux-cxl@vger.kernel.org, 
+ linux-crypto@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
+ linux-serial@vger.kernel.org, mhi@lists.linux.dev, Andy Shevchenko
+ <andriy.shevchenko@linux.intel.com>, Jan Dabros <jsd@semihalf.com>, 
+ linux-i2c@vger.kernel.org, Daniel Mack <daniel@zonque.org>, Haojian Zhuang
+ <haojian.zhuang@gmail.com>, linux-spi@vger.kernel.org, Jonathan Derrick
+ <jonathan.derrick@linux.dev>, linux-pci@vger.kernel.org, 
+ linux-gpio@vger.kernel.org, Mauro Carvalho Chehab <mchehab@kernel.org>, 
+ linux-media@vger.kernel.org, linux-mmc@vger.kernel.org
+Date: Tue, 24 Feb 2026 08:39:43 +0100
+In-Reply-To: <6223f3cb-693f-42e7-9147-30f659f08563@hogyros.de>
+References: <1771860581-82092-1-git-send-email-shawn.lin@rock-chips.com>
+	 <6223f3cb-693f-42e7-9147-30f659f08563@hogyros.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/mlx5e: Precompute xdpsq assignments for
- mlx5e_xdp_xmit()
-To: Finn Dayton <Finnius.Dayton@spacex.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Cc: "Alexei Starovoitov ," <ast@kernel.org>,
- "Daniel Borkmann ," <daniel@iogearbox.net>,
- "David S. Miller ," <davem@davemloft.net>, "Jakub Kicinski ,"
- <kuba@kernel.org>, "Jesper Dangaard Brouer ," <hawk@kernel.org>,
- "John Fastabend ," <john.fastabend@gmail.com>,
- "Stanislav Fomichev ," <sdf@fomichev.me>,
- "Saeed Mahameed ," <saeedm@nvidia.com>, "Leon Romanovsky ,"
- <leon@kernel.org>, "Tariq Toukan ," <tariqt@nvidia.com>,
- "Mark Bloch ," <mbloch@nvidia.com>, "Andrew Lunn ," <andrew+netdev@lunn.ch>,
- "Eric Dumazet ," <edumazet@google.com>, "Paolo Abeni ," <pabeni@redhat.com>,
- "stable@vger.kernel.org" <stable@vger.kernel.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <610D8F9E-0038-46D9-AD8A-1D596236B1EF@spacex.com>
- <e24b4a4f-b7e7-4e9e-ade0-cdda06f5765a@gmail.com>
- <5D5DF105-22C6-42C5-A9B9-14C0DF9685EA@spacex.com>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <5D5DF105-22C6-42C5-A9B9-14C0DF9685EA@spacex.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MBO-RS-META: nd43b1cq9px89dfwjyyj71p3i7rr7fs9
+X-MBO-RS-ID: 9e24931f76f65785344
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,nvidia.com,lunn.ch,google.com,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-260375-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-260376-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ttoukanlinux@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[hogyros.de,rock-chips.com,google.com,microchip.com,intel.com,linux.intel.com,kernel.org,bootlin.com,hisilicon.com,huawei.com,marvell.com,lunn.ch,gmail.com,davemloft.net,oss.qualcomm.com,amd.com,rivosinc.com,linaro.org,stgolabs.net,gondor.apana.org.au,linuxfoundation.org,microsemi.com,deltatee.com];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[arndb.de,kernel.org,vger.kernel.org,lists.infradead.org,realtek.com,lists.freedesktop.org,lists.linux.dev,gmail.com,ffwll.ch,linux.intel.com,semihalf.com,zonque.org,linux.dev];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	DKIM_TRACE(0.00)[mailbox.org:+];
+	HAS_REPLYTO(0.00)[phasta@kernel.org];
+	RCPT_COUNT_GT_50(0.00)[88];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[phasta@mailbox.org,netdev@vger.kernel.org];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[spacex.com:email,urldefense.us:url,bytedance.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 22E87183135
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mailbox.org:mid,mailbox.org:dkim]
+X-Rspamd-Queue-Id: 9EB9A183268
 X-Rspamd-Action: no action
 
+On Tue, 2026-02-24 at 13:14 +0900, Simon Richter wrote:
+> Hi,
+>=20
+> On 2/24/26 12:29 AM, Shawn Lin wrote:
+>=20
+> > When such a driver also uses `pcim_enable_device()`, the devres framewo=
+rk may
+> > attempt to free the IRQ vectors a second time upon device release, lead=
+ing to
+> > a double-free. Analysis of the tree shows this hazardous pattern exists=
+ widely,
+> > while 35 other drivers correctly rely solely on the implicit cleanup.
+>=20
+> Would it make sense to have a function pcim_free_irq_vectors(), to allow=
+=20
+> explicit freeing even if the device is otherwise managed, analogous to=
+=20
+> pcim_iounmap()?
+
+We used to add those. In part because it is easier to port old users.
+
+Nowadays I tend to think that those APIs were more on the too-complex
+than too-simple side for a long time. As an expert or as the API
+designer you wouldn't expect it, but there are actually far too many
+users who came to believe they always have to use pcim_iounmap() and
+counter parts.
+
+If I could design it from scratch I would probably try to tell users to
+use the unmanaged versions instead of revoking the devres consequence.
+
+Devres is actually about your consequence always happening whenever the
+driver unloads, for whatever reason.
 
 
-On 24/02/2026 6:32, Finn Dayton wrote:
-> 
-> 
-> ﻿On 2/23/26, 5:46 AM, "Tariq Toukan" <ttoukan.linux@gmail.com <mailto:ttoukan.linux@gmail.com>> wrote:
-> 
-> 
-> 
-> 
-> 
-> 
-> On 23/02/2026 2:05, Finn Dayton wrote:
->> mlx5e_xdp_xmit() selects an XDP SQ (Send Queue) using smp_processor_id()
->> (CPU ID). When doing XDP_REDIRECT from a CPU whose ID is
->>> = priv->channels.num, mlx5e_xdp_xmit() returns -ENXIO and the
->> redirect fails.
->>
->> Previous discussion proposed using modulo in mlx5e_xdp_xmit() to map
->> CPU IDs into the channel range, but modulo/division is too costly in
->> the hot path.
->>
-> 
-> 
-> That discussion reached to an agreement of using a while loop with
-> subtraction. It's expected to be fast, and optimizes the common case.
-> 
-> 
->> Instead, this solution precomputes per-cpu priv->xdpsq assignments when
->> channels are (re)configured and does a single lookup in mlx5e_xdp_xmit().
->>
->> Because multiple CPUs map to the same xdpsq when CPU count exceeds
->> channel count, serialize xdp_xmit on the ring with xdp_tx_lock.
->>
-> 
-> 
-> What's the advantage of this solution over the one we already agreed to?
-> 
-> Subtraction in a while loop is great for the common case (cpu_id < channels.num).
-> But in worst case, i.e. CPUs >> XDP SQs, the while-subtraction approach
-> Is O(cpu_id / channels.num) iterations. With 256 CPUs and 8 channels, cpu_id=255 does
-> 31 subtractions; with 2 channels it can be 127 iterations in the mlx5e_xdp_xmit() hot path.
-> Precomputing moves the expensive operation out of the hot path into (re)configuration
-> time and makes runtime lookups constant. The tradeoff is added per-cpu state that needs
-> to be rebuilt whenever channels are reconfigured.
-> 
-> Given modern systems where CPU count can greatly exceed the number of XDP SQs, constant-
-> time lookups avoid a large/variable loop in the hot path.
-> 
-
-Valid point.
-The while loop solution is significantly simpler.
-We can go with this one, but must make sure we take care of all needed 
-syncs, for safety.
-
-See comments on original mail.
-
-Also, is the performance impact measurable?
-Do you see the regression in your tests?
-
-> Thank you,
-> Finn
-> 
->> Fixes: 58b99ee3e3eb ("net/mlx5e: Add support for XDP_REDIRECT in device-out side")
->> Link: https://urldefense.us/v3/__https://lore.kernel.org/netdev/20251031231038.1092673-1-zijianzhang@bytedance.com <mailto:20251031231038.1092673-1-zijianzhang@bytedance.com>/__;!!Fqb0NABsjhF0Kh8I!Y83cZX7QBDtN-kWQrfMsOLg2GhV5biqKsT4Dkj0Zk677rm_78pu6_4ij7TtkVuh859B_YQf8n0yDiBMAtI0Caie0lpk$
->> Link: https://urldefense.us/v3/__https://lore.kernel.org/netdev/44f69955-b566-4fb1-904d-f551046ff2d4@gmail.com <mailto:44f69955-b566-4fb1-904d-f551046ff2d4@gmail.com>__;!!Fqb0NABsjhF0Kh8I!Y83cZX7QBDtN-kWQrfMsOLg2GhV5biqKsT4Dkj0Zk677rm_78pu6_4ij7TtkVuh859B_YQf8n0yDiBMAtI0CNvBcoVA$
->> Cc: stable@vger.kernel.org <mailto:stable@vger.kernel.org> # 6.12+
->> Signed-off-by: Finn Dayton <finnius.dayton@spacex.com <mailto:finnius.dayton@spacex.com>>
->> ---
->> Testing:
->> - XDP forwarding / XDP_REDIRECT verified with both low CPU ids and
->> CPU ids > than number of send queues.
->> - No -ENXIO observed, successful forwarding.
->>
->> drivers/net/ethernet/mellanox/mlx5/core/en.h | 4 +++
->> .../net/ethernet/mellanox/mlx5/core/en/xdp.c | 16 +++++++----
->> .../net/ethernet/mellanox/mlx5/core/en_main.c | 28 +++++++++++++++++++
->> 3 files changed, 43 insertions(+), 5 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
->> index ea2cd1f5d1d0..387954201640 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
->> @@ -519,6 +519,8 @@ struct mlx5e_xdpsq {
->> /* control path */
->> struct mlx5_wq_ctrl wq_ctrl;
->> struct mlx5e_channel *channel;
->> + /* serialize writes by multiple CPUs to this send queue */
->> + spinlock_t xdp_tx_lock;
->> } ____cacheline_aligned_in_smp;
->>
->> struct mlx5e_xdp_buff {
->> @@ -909,6 +911,8 @@ struct mlx5e_priv {
->> struct mlx5e_rq drop_rq;
->>
->> struct mlx5e_channels channels;
->> + /* selects the xdpsq during mlx5e_xdp_xmit() */
->> + int __percpu *send_queue_idx_ptr;
->> struct mlx5e_rx_res *rx_res;
->> u32 *tx_rates;
->>
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
->> index 80f9fc10877a..2dd44ad873a1 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
->> @@ -845,7 +845,7 @@ int mlx5e_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
->> struct mlx5e_priv *priv = netdev_priv(dev);
->> struct mlx5e_xdpsq *sq;
->> int nxmit = 0;
->> - int sq_num;
->> + int send_queue_idx = 0;
->> int i;
->>
->> /* this flag is sufficient, no need to test internal sq state */
->> @@ -855,13 +855,19 @@ int mlx5e_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
->> if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
->> return -EINVAL;
->>
->> - sq_num = smp_processor_id();
->>
->> - if (unlikely(sq_num >= priv->channels.num))
->> + if (unlikely(!priv->send_queue_idx_ptr))
->> return -ENXIO;
->>
->> - sq = priv->channels.c[sq_num]->xdpsq;
->> + send_queue_idx = *this_cpu_ptr(priv->send_queue_idx_ptr);
->> + if (unlikely(send_queue_idx >= priv->channels.num || send_queue_idx < 0))
->> + return -ENXIO;
->>
->> + sq = priv->channels.c[send_queue_idx]->xdpsq;
->> + /* The number of queues configured on a netdev may be smaller than the
->> + * CPU pool, so two CPUs might map to this queue. We must serialize writes.
->> + */
->> + spin_lock(&sq->xdp_tx_lock);
->> for (i = 0; i < n; i++) {
->> struct mlx5e_xmit_data_frags xdptxdf = {};
->> struct xdp_frame *xdpf = frames[i];
->> @@ -941,7 +947,7 @@ int mlx5e_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
->>
->> if (flags & XDP_XMIT_FLUSH)
->> mlx5e_xmit_xdp_doorbell(sq);
->> -
->> + spin_unlock(&sq->xdp_tx_lock);
->> return nxmit;
->> }
->>
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
->> index 7eb691c2a1bd..adef35d06b89 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
->> @@ -1492,6 +1492,7 @@ static int mlx5e_alloc_xdpsq(struct mlx5e_channel *c,
->> sq->pdev = c->pdev;
->> sq->mkey_be = c->mkey_be;
->> sq->channel = c;
->> + spin_lock_init(&sq->xdp_tx_lock);
->> sq->uar_map = c->bfreg->map;
->> sq->min_inline_mode = params->tx_min_inline_mode;
->> sq->hw_mtu = MLX5E_SW2HW_MTU(params, params->sw_mtu) - ETH_FCS_LEN;
->> @@ -3283,10 +3284,30 @@ static void mlx5e_build_txq_maps(struct mlx5e_priv *priv)
->> smp_wmb();
->> }
->>
->> +static void build_priv_to_xdpsq_associations(struct mlx5e_priv *priv)
->> +{
->> + /*
->> + * Build the mapping from CPU to XDP send queue index for priv.
->> + * This is used by mlx5e_xdp_xmit() to determine which xdpsq (send queue)
->> + * should handle the xdptx data, based on the CPU running mlx5e_xdp_xmit()
->> + * and the target priv (netdev).
->> + */
->> + int send_queue_idx, cpu;
->> +
->> + if (unlikely(priv->channels.num == 0))
->> + return;
->> +
->> + for_each_possible_cpu(cpu) {
->> + send_queue_idx = cpu % priv->channels.num;
->> + *per_cpu_ptr(priv->send_queue_idx_ptr, cpu) = send_queue_idx;
->> + }
->> +}
->> +
->> void mlx5e_activate_priv_channels(struct mlx5e_priv *priv)
->> {
->> mlx5e_build_txq_maps(priv);
->> mlx5e_activate_channels(priv, &priv->channels);
->> + build_priv_to_xdpsq_associations(priv);
->> mlx5e_xdp_tx_enable(priv);
->>
->> /* dev_watchdog() wants all TX queues to be started when the carrier is
->> @@ -6263,8 +6284,14 @@ int mlx5e_priv_init(struct mlx5e_priv *priv,
->> if (!priv->fec_ranges)
->> goto err_free_channel_stats;
->>
->> + priv->send_queue_idx_ptr = alloc_percpu(int);
->> + if (!priv->send_queue_idx_ptr)
->> + goto err_free_fec_ranges;
->> +
->> return 0;
->>
->> +err_free_fec_ranges:
->> + kfree(priv->fec_ranges);
->> err_free_channel_stats:
->> kfree(priv->channel_stats);
->> err_free_tx_rates:
->> @@ -6295,6 +6322,7 @@ void mlx5e_priv_cleanup(struct mlx5e_priv *priv)
->> for (i = 0; i < priv->stats_nch; i++)
->> kvfree(priv->channel_stats[i]);
->> kfree(priv->channel_stats);
->> + free_percpu(priv->send_queue_idx_ptr);
->> kfree(priv->tx_rates);
->> kfree(priv->txq2sq_stats);
->> kfree(priv->txq2sq);
-> 
-> 
-> 
-> 
-> 
-
+P.
 
