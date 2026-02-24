@@ -1,259 +1,154 @@
-Return-Path: <netdev+bounces-260262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260263-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YAkCOoronGmNMAQAu9opvQ
-	(envelope-from <netdev+bounces-260262-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:53:46 +0100
+	id sN4fCwjrnGnqMAQAu9opvQ
+	(envelope-from <netdev+bounces-260263-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 01:04:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 500E0180134
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:53:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C79981801CA
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 01:04:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F15E7301ECF2
-	for <lists+netdev@lfdr.de>; Mon, 23 Feb 2026 23:51:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B007A3081808
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:04:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EDA4314B6A;
-	Mon, 23 Feb 2026 23:51:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFC8212D21B;
+	Tue, 24 Feb 2026 00:04:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BGNNVLsO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BiCxi3L9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C610DF76
-	for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 23:51:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB3473EBF3A;
+	Tue, 24 Feb 2026 00:04:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771890665; cv=none; b=QpDWeL49H9wIsXyrO7cYdVIITrhPL88e24+PEx3ssqi8L0sUiLPloUljJj6/lEmBUgRQzIujurTaDO5nHUTiHWFiB+MqsQ6R4BEGsUyhMC+0WitAaAZcW9tomKC65RHShi7mSzNPNmHVO1ua77RDybzsIV/r/HM7oPbw8UckMVc=
+	t=1771891447; cv=none; b=IZhNJnfHSwRwgEeBoyhtx/43E80eSQkLqvXAExdXib7UlrgcV1cESIdEnVFg4flNCsdQXWRhKOSGuvxzegrj+smCRAT7RD9GW7pBbjEdPiMykd9ma7YxoPrKiTaH6TFWv2WJnsGQt61gpm27n2EZN92qwa4zJPNN9Kn4yFNPAew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771890665; c=relaxed/simple;
-	bh=+7Y+dprCJ6A1laCGg0DDvPmSteFbaWyR/ZjDlzPWFkk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mKncnSY33G2+MkUlJsECu03edn2685LUqw9A/KtsfaFVhsBltL/2OhSuIZ2bfWcCZ7l32QVkeEiGxVTEM8IWUEuh8zZZvL4qCbDhCgiMjhog+3laZr+ri677KVoixuO7lUgNhaVLTs2cW6FFZkc8uK6Db7rs0OjuBj62BegTBM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BGNNVLsO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DA34C116C6;
-	Mon, 23 Feb 2026 23:51:04 +0000 (UTC)
+	s=arc-20240116; t=1771891447; c=relaxed/simple;
+	bh=eSEVzSG1u7kDX0qIB57v1bGEdvuxp7q/644aS2mjq3Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EUWhWVfdRsZ9Quo3bUn6Vo+FlBriw+gEfnVK9MtfSoow7SkR/FBrUN2FPNGDok1FeyKeJcbQwZYYOhvDb46X9nSr7xyUHXM0Oiugx0fhQw8f/wUbPBGzDnJZ8SOLvEOe5eqEUT/E+tC1RCHRl0T0JpDL80/J2Yam9Uoffkwb3YY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BiCxi3L9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E022C116C6;
+	Tue, 24 Feb 2026 00:04:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771890664;
-	bh=+7Y+dprCJ6A1laCGg0DDvPmSteFbaWyR/ZjDlzPWFkk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=BGNNVLsOOthRMboWl7vZ9Ssex0ZD0hjc9rUAVftSMqIBw+ZHlAgGfYJylPvlOtSZm
-	 XACne8i09C1O4T+tJVGtAakcsG79dFJtZbBX9R7Ls+1cyO/a6fXq55skXuxu4Qx5Mk
-	 F2kvccxQ54/3pItAA22yanWtvMTgclJam0me0ceHq4tNKvPD+RnNRf/vXVw+imuqnm
-	 jmpScApiAPCeNoc11rubyoCFg+/Z8wYPV8os2r8vb3CcKf/GJBk1lDrjwLEqvxujx1
-	 W/1H4aXfMnJq6V02MGPOVAlUAsgHn5cq+DHEgFoXop7Zj+sLrTArdjfGcqc6yef9x1
-	 /WzF4Vb7Hdc2w==
+	s=k20201202; t=1771891447;
+	bh=eSEVzSG1u7kDX0qIB57v1bGEdvuxp7q/644aS2mjq3Y=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BiCxi3L9JoXgkrh8SC5MAkJMhbY/Gt/ee8dkTYQlEReSuB4BTdHAinqlJ2OFDp6yS
+	 K2IocFIKpN9ibOJpRL9+VOLTSUbH7qQsPiBKrovipxTbo9eajt0gUvhxCDhwVDhO+8
+	 5Rlxa1CWbGyQ9Q36KM5NC+FfklyKper67d1Qv2aJIuTZ7s4KnLHKQM7iB0zRPc84mq
+	 jsXCWBPoX2cNDpVLYgAQmic4uvU8sr2uc48rEwfkKkj6Mxf3f1OBn5Wx+AaROlWqSn
+	 ntIjCz+6RR634lgigRfzRx83aoqzpm4WdYAuAXJwSFy0UCaudKb02bX6tegaaBV0nb
+	 MfkMoAbVPBZkQ==
+Date: Mon, 23 Feb 2026 16:04:02 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	sdf@fomichev.me,
-	hawk@kernel.org,
-	alexander.h.duyck@intel.com
-Subject: [PATCH net v2] net: consume xmit errors of GSO frames
-Date: Mon, 23 Feb 2026 15:51:00 -0800
-Message-ID: <20260223235100.108939-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.53.0
+To: Shawn Lin <shawn.lin@rock-chips.com>
+Cc: Bjorn Helgaas <bhelgaas@google.com>, "Vaibhaav Ram T . L"
+ <vaibhaavram.tl@microchip.com>, Kumaravel Thiagarajan
+ <kumaravel.thiagarajan@microchip.com>, Even Xu <even.xu@intel.com>, Xinpeng
+ Sun <xinpeng.sun@intel.com>, Srinivas Pandruvada
+ <srinivas.pandruvada@linux.intel.com>, Jiri Kosina <jikos@kernel.org>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>, Zhou Wang
+ <wangzhou1@hisilicon.com>, Longfang Liu <liulongfang@huawei.com>, Vinod
+ Koul <vkoul@kernel.org>, Lee Jones <lee@kernel.org>, Jijie Shao
+ <shaojijie@huawei.com>, Jian Shen <shenjian15@huawei.com>, Sunil Goutham
+ <sgoutham@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Heiner
+ Kallweit <hkallweit1@gmail.com>, "David S . Miller" <davem@davemloft.net>,
+ Jeff Hugo <jeff.hugo@oss.qualcomm.com>, Oded Gabbay <ogabbay@kernel.org>,
+ Maciej Falkowski <maciej.falkowski@linux.intel.com>, Karol Wachowski
+ <karol.wachowski@linux.intel.com>, Min Ma <mamin506@gmail.com>, Lizhi Hou
+ <lizhi.hou@amd.com>, Andreas Noever <andreas.noever@gmail.com>, Mika
+ Westerberg <westeri@kernel.org>, Tomasz Jeznach <tjeznach@rivosinc.com>,
+ Will Deacon <will@kernel.org>, Xinliang Liu <xinliang.liu@linaro.org>, Tian
+ Tao <tiantao6@hisilicon.com>, Davidlohr Bueso <dave@stgolabs.net>, Jonathan
+ Cameron <jonathan.cameron@huawei.com>, Srujana Challa
+ <schalla@marvell.com>, Bharat Bhushan <bbhushan2@marvell.com>, Antoine
+ Tenart <atenart@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, Raag
+ Jadav <raag.jadav@intel.com>, Hans de Goede <hansg@kernel.org>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby
+ <jirislaby@kernel.org>, Andy Shevchenko <andy@kernel.org>, Manivannan
+ Sadhasivam <mani@kernel.org>, Mika Westerberg
+ <mika.westerberg@linux.intel.com>, Andi Shyti <andi.shyti@kernel.org>,
+ Robert Richter <rric@kernel.org>, Mark Brown <broonie@kernel.org>, Nirmal
+ Patel <nirmal.patel@linux.intel.com>, Kurt Schwemmer
+ <kurt.schwemmer@microsemi.com>, Logan Gunthorpe <logang@deltatee.com>,
+ Linus Walleij <linusw@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>,
+ Sakari Ailus <sakari.ailus@linux.intel.com>, Bingbu Cao
+ <bingbu.cao@intel.com>, Ulf Hansson <ulf.hansson@linaro.org>, Arnd Bergmann
+ <arnd@arndb.de>, Benjamin Tissoires <bentiss@kernel.org>,
+ linux-input@vger.kernel.org, linux-i3c@lists.infradead.org,
+ dmaengine@vger.kernel.org, Philipp Stanner <phasta@kernel.org>,
+ netdev@vger.kernel.org, nic_swsd@realtek.com,
+ linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-usb@vger.kernel.org, iommu@lists.linux.dev,
+ linux-riscv@lists.infradead.org, David Airlie <airlied@gmail.com>, Simona
+ Vetter <simona@ffwll.ch>, linux-cxl@vger.kernel.org,
+ linux-crypto@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+ linux-serial@vger.kernel.org, mhi@lists.linux.dev, Andy Shevchenko
+ <andriy.shevchenko@linux.intel.com>, Jan Dabros <jsd@semihalf.com>,
+ linux-i2c@vger.kernel.org, Daniel Mack <daniel@zonque.org>, Haojian Zhuang
+ <haojian.zhuang@gmail.com>, linux-spi@vger.kernel.org, Jonathan Derrick
+ <jonathan.derrick@linux.dev>, linux-pci@vger.kernel.org,
+ linux-gpio@vger.kernel.org, Mauro Carvalho Chehab <mchehab@kernel.org>,
+ linux-media@vger.kernel.org, linux-mmc@vger.kernel.org
+Subject: Re: [PATCH 01/37] PCI/MSI: Add Devres managed IRQ vectors
+ allocation
+Message-ID: <20260223160402.3ad8f079@kernel.org>
+In-Reply-To: <1771860581-82092-2-git-send-email-shawn.lin@rock-chips.com>
+References: <1771860581-82092-1-git-send-email-shawn.lin@rock-chips.com>
+	<1771860581-82092-2-git-send-email-shawn.lin@rock-chips.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[google.com,microchip.com,intel.com,linux.intel.com,kernel.org,bootlin.com,hisilicon.com,huawei.com,marvell.com,lunn.ch,gmail.com,davemloft.net,oss.qualcomm.com,amd.com,rivosinc.com,linaro.org,stgolabs.net,gondor.apana.org.au,linuxfoundation.org,microsemi.com,deltatee.com,arndb.de,vger.kernel.org,lists.infradead.org,realtek.com,lists.freedesktop.org,lists.linux.dev,ffwll.ch,semihalf.com,zonque.org,linux.dev];
+	TAGGED_FROM(0.00)[bounces-260263-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260262-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[87];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email]
-X-Rspamd-Queue-Id: 500E0180134
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C79981801CA
 X-Rspamd-Action: no action
 
-udpgro_frglist.sh and udpgro_bench.sh are the flakiest tests
-currently in NIPA. They fail in the same exact way, TCP GRO
-test stalls occasionally and the test gets killed after 10min.
+On Mon, 23 Feb 2026 23:29:40 +0800 Shawn Lin wrote:
+> pcim_alloc_irq_vectors() and pcim_alloc_irq_vectors_affinity() are created for
+> pci device drivers which rely on the devres machinery to help cleanup the IRQ
+> vectors.
 
-These tests use veth to simulate GRO. They attach a trivial
-("return XDP_PASS;") XDP program to the veth to force TSO off
-and NAPI on.
-
-Digging into the failure mode we can see that the connection
-is completely stuck after a burst of drops. The sender's snd_nxt
-is at sequence number N [1], but the receiver claims to have
-received (rcv_nxt) up to N + 3 * MSS [2]. Last piece of the puzzle
-is that senders rtx queue is not empty (let's say the block in
-the rtx queue is at sequence number N - 4 * MSS [3]).
-
-In this state, sender sends a retransmission from the rtx queue
-with a single segment, and sequence numbers N-4*MSS:N-3*MSS [3].
-Receiver sees it and responds with an ACK all the way up to
-N + 3 * MSS [2]. But sender will reject this ack as TCP_ACK_UNSENT_DATA
-because it has no recollection of ever sending data that far out [1].
-And we are stuck.
-
-The root cause is the mess of the xmit return codes. veth returns
-an error when it can't xmit a frame. We end up with a loss event
-like this:
-
-  -------------------------------------------------
-  |   GSO super frame 1   |   GSO super frame 2   |
-  |-----------------------------------------------|
-  | seg | seg | seg | seg | seg | seg | seg | seg |
-  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |
-  -------------------------------------------------
-     x    ok    ok    <ok>|  ok    ok    ok   <x>
-                          \\
-			   snd_nxt
-
-"x" means packet lost by veth, and "ok" means it went thru.
-Since veth has TSO disabled in this test it sees individual segments.
-Segment 1 is on the retransmit queue and will be resent.
-
-So why did the sender not advance snd_nxt even tho it clearly did
-send up to seg 8? tcp_write_xmit() interprets the return code
-from the core to mean that data has not been sent at all. Since
-TCP deals with GSO super frames, not individual segment the crux
-of the problem is that loss of a single segment can be interpreted
-as loss of all. TCP only sees the last return code for the last
-segment of the GSO frame (in <> brackets in the diagram above).
-
-Of course for the problem to occur we need a setup or a device
-without a Qdisc. Otherwise Qdisc layer disconnects the protocol
-layer from the device errors completely.
-
-We have multiple ways to fix this.
-
- 1) make veth not return an error when it lost a packet.
-    While this is what I think we did in the past, the issue keeps
-    reappearing and it's annoying to debug. The game of whack
-    a mole is not great.
-
- 2) fix the damn return codes
-    We only talk about NETDEV_TX_OK and NETDEV_TX_BUSY in the
-    documentation, so maybe we should make the return code from
-    ndo_start_xmit() a boolean. I like that the most, but perhaps
-    some ancient, not-really-networking protocol would suffer.
-
- 3) make TCP ignore the errors
-    It is not entirely clear to me what benefit TCP gets from
-    interpreting the result of ip_queue_xmit()? Specifically once
-    the connection is established and we're pushing data - packet
-    loss is just packet loss?
-
- 4) this fix
-    Ignore the rc in the Qdisc-less+GSO case, since it's unreliable.
-    We already always return OK in the TCQ_F_CAN_BYPASS case.
-    In the Qdisc-less case let's be a bit more conservative and only
-    mask the GSO errors. This path is taken by non-IP-"networks"
-    like CAN, MCTP etc, so we could regress some ancient thing.
-    This is the simplest, but also maybe the hackiest fix?
-
-Similar fix has been proposed by Eric in the past but never committed
-because original reporter was working with an OOT driver and wasn't
-providing feedback (see Link).
-
-Link: https://lore.kernel.org/CANn89iJcLepEin7EtBETrZ36bjoD9LrR=k4cfwWh046GB+4f9A@mail.gmail.com
-Fixes: 1f59533f9ca5 ("qdisc: validate frames going through the direct_xmit path")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-v2:
- - rewrite to also cover the BUSY case
-v1: https://lore.kernel.org/20260220170032.2964535-1-kuba@kernel.org
-
-CC: sdf@fomichev.me
-CC: hawk@kernel.org
-CC: alexander.h.duyck@intel.com
----
- net/core/dev.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
-
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 096b3ff13f6b..52e5dd6c2e20 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -4822,6 +4822,8 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
- 		 * to -1 or to their cpu id, but not to our id.
- 		 */
- 		if (READ_ONCE(txq->xmit_lock_owner) != cpu) {
-+			bool is_list = false;
-+
- 			if (dev_xmit_recursion())
- 				goto recursion_alert;
- 
-@@ -4832,17 +4834,28 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
- 			HARD_TX_LOCK(dev, txq, cpu);
- 
- 			if (!netif_xmit_stopped(txq)) {
-+				is_list = !!skb->next;
-+
- 				dev_xmit_recursion_inc();
- 				skb = dev_hard_start_xmit(skb, dev, txq, &rc);
- 				dev_xmit_recursion_dec();
--				if (dev_xmit_complete(rc)) {
--					HARD_TX_UNLOCK(dev, txq);
--					goto out;
--				}
-+
-+				/* GSO segments a single SKB into
-+				 * a list of frames. TCP expects error
-+				 * to mean none of the data was sent.
-+				 */
-+				if (is_list)
-+					rc = NETDEV_TX_OK;
- 			}
- 			HARD_TX_UNLOCK(dev, txq);
-+			if (!skb) /* xmit completed */
-+				goto out;
-+
- 			net_crit_ratelimited("Virtual device %s asks to queue packet!\n",
- 					     dev->name);
-+			/* NETDEV_TX_BUSY or queue was stopped */
-+			if (!is_list)
-+				rc = -ENETDOWN;
- 		} else {
- 			/* Recursion is detected! It is possible,
- 			 * unfortunately
-@@ -4850,10 +4863,10 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
- recursion_alert:
- 			net_crit_ratelimited("Dead loop on virtual device %s, fix it urgently!\n",
- 					     dev->name);
-+			rc = -ENETDOWN;
- 		}
- 	}
- 
--	rc = -ENETDOWN;
- 	rcu_read_unlock_bh();
- 
- 	dev_core_stats_tx_dropped_inc(dev);
--- 
-2.53.0
-
+If you can please add this API with just a few users, and then convert
+remaining users via the subsystem trees in the next cycle.
+There's no need to risk wasting maintainer time on conflicts with
+conversions like this.
 
