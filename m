@@ -1,187 +1,138 @@
-Return-Path: <netdev+bounces-260658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260659-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OMVvM/YUnml+TQQAu9opvQ
-	(envelope-from <netdev+bounces-260658-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 22:15:34 +0100
+	id QH3YCkgXnmmcTQQAu9opvQ
+	(envelope-from <netdev+bounces-260659-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 22:25:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3685618CA51
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 22:15:33 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A931118CB4F
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 22:25:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6C904302E925
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 21:15:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 16978302EC94
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 21:25:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98E703321C1;
-	Tue, 24 Feb 2026 21:15:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12CB933D4F8;
+	Tue, 24 Feb 2026 21:25:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vh4DuBjB";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="w9cc62wn";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="GQQVNZ4I";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="APPPmjcB"
+	dkim=pass (2048-bit key) header.d=siemens.com header.i=florian.bezdeka@siemens.com header.b="KcW5ewYG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mta-64-225.siemens.flowmailer.net (mta-64-225.siemens.flowmailer.net [185.136.64.225])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4877D331A66
-	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 21:15:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6AB133B95D
+	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 21:25:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771967725; cv=none; b=g3cMfjhsyHWZjy+Njcx8EZij1W0BzMNXuYE9MU7JM95CeexCktIExZ4GQwZCXgOjLnyCSRjAQkN1YnBPtjpGn1XFd+IB5FYk2w/p0UccvGNM5IRebJDTePzmDOHkY9jYK7WI9045aSPmhoCjjux5k6XwDLnqheKKtwoPPxrBYVM=
+	t=1771968324; cv=none; b=qP/xnMzaxQu2BbIl5Wn3swQcXPmNFlyVoUfJD1hZ7u9WVP1D5bIipxdftPlygn6CBDHcTXBjovCPlpbT3uVDhGP7GWYBA2GIxFg0X25xeT6kxinBXKcoQb3p2QauUsDNZ3SoeEWDU7h+Wk7ziFVidINBakRnctRJKSbp9Fif5zc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771967725; c=relaxed/simple;
-	bh=P+AWeJJqjcCZXnUjSjwh+yFUZduo4FNKGJ28vpDkEVE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ufXEB9Pv9W38IF7/d+xctlLhiihye6FybGxI1emSAoDRNZJ7M1gqDIGP7YqOHuVVEm2qomA7EPxr0SoDxgBfnhZlHynHSCQhO+2j2+qnCr7yukowwPDytAXj2krlOf5CMIlGojXYkWHNL46zUjm+hKxqxISPuU4LpJ4NRmhMG3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vh4DuBjB; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=w9cc62wn; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=GQQVNZ4I; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=APPPmjcB; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id D31E13F431;
-	Tue, 24 Feb 2026 21:15:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1771967721; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QTVwABmLp7YcazNjUmUhynsY4icV5iGPSsBjSxT6sf8=;
-	b=vh4DuBjBWEc4CeW2i5iSRIJe0BR5arl/Rq8T21HMB4eUtzLb4rxO7ZgVwqNdjP2fKqvcSI
-	zfcBekBpM/s5Nphp9moY0zl4EgzdJKUw3iwRRiiXV8NSkTJlh68/QlvCdBSGGxfcKklTC1
-	32pZhhg3N2sdP0fXyZeASnsn43NSq/I=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1771967721;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QTVwABmLp7YcazNjUmUhynsY4icV5iGPSsBjSxT6sf8=;
-	b=w9cc62wnUJmCVQ9GlbWiqVDtF7sAUpCNJxZ5/q7gyOeF0YijYwyMI7JPavpaxkCQVbQHyW
-	qrikZKhnWlBeheCA==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=GQQVNZ4I;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=APPPmjcB
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1771967720; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QTVwABmLp7YcazNjUmUhynsY4icV5iGPSsBjSxT6sf8=;
-	b=GQQVNZ4Iryk2GO541Rtp3Bl92fByBBgJpjRM3Rs4tHUYb4GFEzIFcyzdVgbVcd8xXwCYcN
-	ZP/NYrwhcNwihtd6jmMd9xKgZHLpkAMpRGIBrotTdBmKji4UvfQ559zeSAh0psTS4tiJNg
-	SZ0PoXuYxvHX8Ob6oSHtBNXi2iyjnqg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1771967720;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QTVwABmLp7YcazNjUmUhynsY4icV5iGPSsBjSxT6sf8=;
-	b=APPPmjcBWrdDEeJuXOkXQ9+5JI9Hk0tSMml8UmItkON3TGx/PvznpOwhtTnPYqQKjlDuDy
-	n14l3po3qUHNFKCw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4C6E23EA68;
-	Tue, 24 Feb 2026 21:15:20 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id sMp2D+gUnmlScwAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Tue, 24 Feb 2026 21:15:20 +0000
-Message-ID: <35ec7753-febc-49ac-ad00-f423122ccc44@suse.de>
-Date: Tue, 24 Feb 2026 22:15:12 +0100
+	s=arc-20240116; t=1771968324; c=relaxed/simple;
+	bh=p9N0tg9ro3UyBcP2Fzp3R/vRzcui4PdL161SdN6uY2E=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=UXVHzH6gHuBV0yLS2p/nguFgCCmNcclkSdkT8i0W5rUdH9oNkiBRsbSgO5xF7OG1Fmoj9wy6eWM/hBO4PYkljRuqOuPQq3WAlK11XVHPpk5dq+Hfg1XpNpvtesisQXVmvxvEF6MQuCi0xrEoFzPF0Bid+eJDiuOvkAkdyxkfsqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=florian.bezdeka@siemens.com header.b=KcW5ewYG; arc=none smtp.client-ip=185.136.64.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
+Received: by mta-64-225.siemens.flowmailer.net with ESMTPSA id 20260224212514ac38db24a7000207d0
+        for <netdev@vger.kernel.org>;
+        Tue, 24 Feb 2026 22:25:14 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm2;
+ d=siemens.com; i=florian.bezdeka@siemens.com;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
+ bh=vbehI5k0rB54bjh1f0a2umagLZ4OYrZF4eNdQQugxLw=;
+ b=KcW5ewYGX3l5vf4Wblfb+Vgb1Jpva+THV2gf/O4U5sXYcTiaDI7LLIzlAwZMx9XA8avU3B
+ MQLeoJMHcWwQCTYV+Lbgn3qf3lawLd9EMojyc47icVDouNXsJJbkRi9MuydVi1Y2oRAEgY9U
+ W96vDkI/s4GJtRjD1v8EERcDzrnoFuR4N2bBcqEagUxqt4QDYPEVaFLMXWkTTmUInyqXA/67
+ dSjuG5ywwV4GpDznI04Ak2CUpfcKMKF76RVh6CM5zU0SWApiNooKLivJ5BkfGYoQBNqrOYq9
+ GSfAnJqKWOzldv8IzuXYnOj/5a/eqfGWLWyn4qc+ed3rWdHWodlyNeww==;
+Message-ID: <f269adc1e366685a15622fb51740eca7168c9339.camel@siemens.com>
+Subject: Re: [PATCH] igc: fix page fault in XDP TX timestamps handling
+From: Florian Bezdeka <florian.bezdeka@siemens.com>
+To: Zdenek Bouska <zdenek.bouska@siemens.com>, Tony Nguyen	
+ <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>,  Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet	
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni	
+ <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann	
+ <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
+ Richard Cochran	 <richardcochran@gmail.com>, Song Yoong Siang
+ <yoong.siang.song@intel.com>,  Lai Peter Jun Ann <jun.ann.lai@intel.com>
+Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>, 
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Date: Tue, 24 Feb 2026 22:25:10 +0100
+In-Reply-To: <20260224-igc-fix-xdp-tx-tstamp-pagefault-v1-1-7c729ef61ee5@siemens.com>
+References: 
+	<20260224-igc-fix-xdp-tx-tstamp-pagefault-v1-1-7c729ef61ee5@siemens.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2 net-next] ipv4: bump rt_genid when a relevant devconf
- value changes through netlink
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, tgraf@infradead.org
-References: <20260223153045.32044-1-fmancera@suse.de>
- <20260223153045.32044-2-fmancera@suse.de> <aZ3dhDV6Fai9zbgV@horms.kernel.org>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <aZ3dhDV6Fai9zbgV@horms.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Spam-Level: 
+X-Flowmailer-Platform: Siemens
+Feedback-ID: 519:519-68982:519-21489:flowmailer
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[siemens.com,reject];
+	R_DKIM_ALLOW(-0.20)[siemens.com:s=fm2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260659-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[siemens.com,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260658-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[florian.bezdeka@siemens.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[siemens.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:mid,suse.de:dkim,suse.de:email]
-X-Rspamd-Queue-Id: 3685618CA51
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[siemens.com:mid,siemens.com:dkim,siemens.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A931118CB4F
 X-Rspamd-Action: no action
 
-On 2/24/26 6:19 PM, Simon Horman wrote:
-> On Mon, Feb 23, 2026 at 04:30:45PM +0100, Fernando Fernandez Mancera wrote:
->> When modifying IPv4 devconf values using netlink for some relevant
->> fields the rt_cache_flush() call was missing. In addition, if forwarding
->> is enabled on the interface then disable LRO.
->>
->> This is needed to avoid possible connectivity issues and ease the
->> responsabilities of user space tools.
->>
->> Fixes: 9f0f7272ac95 ("ipv4: AF_INET link address family")
->> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
->> ---
->>   net/ipv4/devinet.c | 23 ++++++++++++++++++++++-
->>   1 file changed, 22 insertions(+), 1 deletion(-)
->>
->> diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
->> index 590c68e979f5..9f55c13a9c1f 100644
->> --- a/net/ipv4/devinet.c
->> +++ b/net/ipv4/devinet.c
->> @@ -2159,6 +2159,8 @@ static int inet_set_link_af(struct net_device *dev, const struct nlattr *nla,
->>   {
->>   	struct in_device *in_dev = __in_dev_get_rtnl(dev);
->>   	struct nlattr *a, *tb[IFLA_INET_MAX+1];
->> +	struct net *net = dev_net(in_dev->dev);
->> +	bool flush_cache = false;
->>   	int rem;
->>   
->>   	if (!in_dev)
-> 
-> Hi Fernando,
-> 
-> Here it is assumed that in_dev may be NULL.
-> But a few lines above it is now dereferenced unconditionally.
-> 
-> Flagged by Smatch.
-> 
+On Tue, 2026-02-24 at 13:38 +0100, Zdenek Bouska wrote:
+> If an XDP application that requested TX timestamping is shutting down
+> while the link of the interface in use is still up the following kernel
+> splat is reported:
+>=20
+> [  883.803618] [   T1554] BUG: unable to handle page fault for address: f=
+fffcfb6200fd008
+> ...
+> [  883.803650] [   T1554] Call Trace:
+> [  883.803652] [   T1554]  <TASK>
+> [  883.803654] [   T1554]  igc_ptp_tx_tstamp_event+0xdf/0x160 [igc]
+> [  883.803660] [   T1554]  igc_tsync_interrupt+0x2d5/0x300 [igc]
+> ...
+>=20
+> During shutdown of the TX ring the xsk_meta pointers are left behind, so
+> that the IRQ handler is trying to touch them.
+>=20
+> This issue is now being fixed by cleaning up the stale xsk meta data on
+> TX shutdown. TX timestamps on other queues remain unaffected.
+>=20
+> Fixes: 15fd021bc427 ("igc: Add Tx hardware timestamp request for AF_XDP z=
+ero-copy packet")
+> Signed-off-by: Zdenek Bouska <zdenek.bouska@siemens.com>
 
-Whoops. My bad. Thank you Simon.
+Reviewed-by: Florian Bezdeka <florian.bezdeka@siemens.com>
+
 
