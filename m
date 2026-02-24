@@ -1,217 +1,223 @@
-Return-Path: <netdev+bounces-260451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260452-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sGb3FGWAnWk/QQQAu9opvQ
-	(envelope-from <netdev+bounces-260451-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 11:41:41 +0100
+	id 8Mt0Gj2BnWk/QQQAu9opvQ
+	(envelope-from <netdev+bounces-260452-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 11:45:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0707185893
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 11:41:40 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3603B185978
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 11:45:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 438BD305D296
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 10:40:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2780C31553B7
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 10:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D014B379981;
-	Tue, 24 Feb 2026 10:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E22553793BB;
+	Tue, 24 Feb 2026 10:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XopqSYRt"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="gw958neF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54C3C36B042;
-	Tue, 24 Feb 2026 10:40:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 508EA379998
+	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 10:40:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771929602; cv=none; b=lCGV+B7GrV2vkwhIcFEa3djAP3J1KXbLTHGVF+vJ2DkbF3UKSh1oemtRWoVk2oKxtblnr7eTwBrzHV0R5Su4uYmF7z9iMw/dNO3sDybZVMLeYQtiubyYeexmbwUyNbpeq6kvXsBwev16sxbJURU2Br3aUqEKOelJ0bmzvCZBMDU=
+	t=1771929619; cv=none; b=oOk8Rrh4SX6KP3cRU1deM3RrJl8hyT1RSLZRyWrXFQW0nrlN0VNgValTxHQM9V7lgRRYZ2exhY+8ywNBRFJX1eW+WDPXjnJkzXzXzVPHJg2LUSDnV12KKc08krULhL6JeUsKNg33SNpieZwRooD08Q3qWRIbv+n2wahWkxBXrr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771929602; c=relaxed/simple;
-	bh=NKaZi+5e3r7u58UMALFBdqyb3F151mM8t+8ODkTnkmk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QuVBIeOeUqGXMbbJHrkZcYWxFhvxHGZcPdxuev153x914ZOjrvDielbNx8FBfnZ8RLzQtl6ieF8M7xLFPUbe2cMXUmarizYJ4EtyXQaWNOZR+O0HF/WK21g9jeZ4wxiJKXRghRNZhGPlE2MbMcuQggl2avj4uvy4dHy2IUbXVqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XopqSYRt; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1771929602; x=1803465602;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=NKaZi+5e3r7u58UMALFBdqyb3F151mM8t+8ODkTnkmk=;
-  b=XopqSYRtkRY1kCpFjPfo9JlkKyvfOTeNjUvTQzcCvZ0Wco/duPPH9yTs
-   2BYYe1ehVILAzceGH3kR9Ibdhf9OdaX0nn1X+vLN3lM1WFq9/902MOfSq
-   KT0akGC9Z4l09cVdSTLbXXcMpaWiKqBLrrciFeZCshMMukhcqiV22WdDG
-   /b5p/RX0xr+bMaYohToKBvv7n25aF+7rfchza6LMWuxfkVjUPNhRyRaZg
-   6+zN1SqET5WB4RSFWsS4RccWLmqdGwrGo3zuyT4VJ9ien/7/RJBTVlnn9
-   zk21cIhc+ThlCIJv5ipNdkJCwoh73AczH8JmwDZjLoXyC+iRkkxjPc7ot
-   A==;
-X-CSE-ConnectionGUID: 8SFCJy6SQ3uU5+xUyiH0AA==
-X-CSE-MsgGUID: Aog20IZDRxCZFn5F5ixt8Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11710"; a="95556109"
-X-IronPort-AV: E=Sophos;i="6.21,308,1763452800"; 
-   d="scan'208";a="95556109"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2026 02:40:01 -0800
-X-CSE-ConnectionGUID: 2vh5u/4QSUOjYuKUxqshOA==
-X-CSE-MsgGUID: IM2dRI81S8i45s0yX8WRUw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,308,1763452800"; 
-   d="scan'208";a="214955497"
-Received: from egrumbac-mobl6.ger.corp.intel.com (HELO localhost) ([10.245.244.146])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2026 02:39:43 -0800
-Date: Tue, 24 Feb 2026 12:39:40 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: phasta@kernel.org
-Cc: Simon Richter <Simon.Richter@hogyros.de>,
-	Shawn Lin <shawn.lin@rock-chips.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	"Vaibhaav Ram T . L" <vaibhaavram.tl@microchip.com>,
-	Kumaravel Thiagarajan <kumaravel.thiagarajan@microchip.com>,
-	Even Xu <even.xu@intel.com>, Xinpeng Sun <xinpeng.sun@intel.com>,
-	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-	Jiri Kosina <jikos@kernel.org>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Zhou Wang <wangzhou1@hisilicon.com>,
-	Longfang Liu <liulongfang@huawei.com>,
-	Vinod Koul <vkoul@kernel.org>, Lee Jones <lee@kernel.org>,
-	Jijie Shao <shaojijie@huawei.com>,
-	Jian Shen <shenjian15@huawei.com>,
-	Sunil Goutham <sgoutham@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jeff Hugo <jeff.hugo@oss.qualcomm.com>,
-	Oded Gabbay <ogabbay@kernel.org>,
-	Maciej Falkowski <maciej.falkowski@linux.intel.com>,
-	Karol Wachowski <karol.wachowski@linux.intel.com>,
-	Min Ma <mamin506@gmail.com>, Lizhi Hou <lizhi.hou@amd.com>,
-	Andreas Noever <andreas.noever@gmail.com>,
-	Mika Westerberg <westeri@kernel.org>,
-	Tomasz Jeznach <tjeznach@rivosinc.com>,
-	Will Deacon <will@kernel.org>,
-	Xinliang Liu <xinliang.liu@linaro.org>,
-	Tian Tao <tiantao6@hisilicon.com>,
-	Davidlohr Bueso <dave@stgolabs.net>,
-	Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Srujana Challa <schalla@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	Antoine Tenart <atenart@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Raag Jadav <raag.jadav@intel.com>, Hans de Goede <hansg@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jirislaby@kernel.org>,
-	Andy Shevchenko <andy@kernel.org>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Mika Westerberg <mika.westerberg@linux.intel.com>,
-	Andi Shyti <andi.shyti@kernel.org>,
-	Robert Richter <rric@kernel.org>, Mark Brown <broonie@kernel.org>,
-	Nirmal Patel <nirmal.patel@linux.intel.com>,
-	Kurt Schwemmer <kurt.schwemmer@microsemi.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Linus Walleij <linusw@kernel.org>,
-	Bartosz Golaszewski <brgl@kernel.org>,
-	Sakari Ailus <sakari.ailus@linux.intel.com>,
-	Bingbu Cao <bingbu.cao@intel.com>,
-	Ulf Hansson <ulf.hansson@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	linux-input@vger.kernel.org, linux-i3c@lists.infradead.org,
-	dmaengine@vger.kernel.org, netdev@vger.kernel.org,
-	nic_swsd@realtek.com, linux-arm-msm@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linux-usb@vger.kernel.org,
-	iommu@lists.linux.dev, linux-riscv@lists.infradead.org,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	linux-cxl@vger.kernel.org, linux-crypto@vger.kernel.org,
-	platform-driver-x86@vger.kernel.org, linux-serial@vger.kernel.org,
-	mhi@lists.linux.dev, Jan Dabros <jsd@semihalf.com>,
-	linux-i2c@vger.kernel.org, Daniel Mack <daniel@zonque.org>,
-	Haojian Zhuang <haojian.zhuang@gmail.com>,
-	linux-spi@vger.kernel.org,
-	Jonathan Derrick <jonathan.derrick@linux.dev>,
-	linux-pci@vger.kernel.org, linux-gpio@vger.kernel.org,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	linux-media@vger.kernel.org, linux-mmc@vger.kernel.org
-Subject: Re: [PATCH 0/37] PCI/MSI: Enforce explicit IRQ vector management by
- removing devres auto-free
-Message-ID: <aZ1_7IwDYfiLbfQE@smile.fi.intel.com>
-References: <1771860581-82092-1-git-send-email-shawn.lin@rock-chips.com>
- <6223f3cb-693f-42e7-9147-30f659f08563@hogyros.de>
- <7ca512d133f7a3bcfe00e9b0b2af5fe5f147ad77.camel@mailbox.org>
- <aZ1rb8zoqmQmakDP@smile.fi.intel.com>
- <48297cc524736e7452def05448ece84260a4fd83.camel@mailbox.org>
+	s=arc-20240116; t=1771929619; c=relaxed/simple;
+	bh=WBVOuPGA6GO1dyBeiZ6GvK3hAIw5tmGhxjpOH3BnGPU=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=O2yIag1M8BxvepkYa0JEZSz3rQUr8p96ShrPgUsAcmrtDFLuxj5VbBgFhaRP4tflcbTZiAA3lK4BQqqdNFlr5XEZMcqKh30AYbyiJLlFGAYFwrWxes0dusLX37rZGw/hImJkL3r4dZpaIxtCYZxUditWcHMNCyfwjoCnpqxBl98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=gw958neF; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 88103A02E5;
+	Tue, 24 Feb 2026 11:40:10 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1771929612; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=tC5e+DB/41PrYQLmy6DP3vXc5ukhmrwGOTEii3Bivyo=;
+	b=gw958neFtsHyv5GxAviLyO6EwJw3vLmdBNdJVDUV5rsyMNmaConhnlRkZsyIXhR6paYZ7r
+	Tk3Fe9lOWlt3Aw9b7WefjoN2RXNgk9bIGBBXbhyJbrzhyleCEhLPPzIvOCfzsHA2y0WzKA
+	HSGixkHZweuoXlu27imvBNmhKqH66gv2jBtZwkVwatTUvIkcpT5vy4pdR144vlatLc+9bm
+	lSQku4CD0dtCj22F92y9xbcatI2mcD4JfByGycmugX+8q49TM7BKYBB/yGHtPzp9EClCIx
+	gX0UfFBg0WNIhLBwaZugpYCJwqU0ePkq2icZOxbMQn8TjuxbX+j/fnIbnINNOg==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <48297cc524736e7452def05448ece84260a4fd83.camel@mailbox.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+Date: Tue, 24 Feb 2026 11:40:10 +0100
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, claudiu.beznea@tuxon.dev,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ nicolas.ferre@microchip.com, pabeni@redhat.com, phil@raspberrypi.com
+Subject: Re: [PATCH net-next v2 3/5] net: cadence: macb: implement EEE TX LPI
+ support
+In-Reply-To: <aZ16qgIsRxkUuoW1@shell.armlinux.org.uk>
+References: <20260224091821.47671-1-nb@tipi-net.de>
+ <20260224091821.47671-4-nb@tipi-net.de>
+ <aZ16qgIsRxkUuoW1@shell.armlinux.org.uk>
+Message-ID: <d8463e10e0c07ddf404a2515e2a8640c@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[hogyros.de,rock-chips.com,google.com,microchip.com,intel.com,linux.intel.com,kernel.org,bootlin.com,hisilicon.com,huawei.com,marvell.com,lunn.ch,gmail.com,davemloft.net,oss.qualcomm.com,amd.com,rivosinc.com,linaro.org,stgolabs.net,gondor.apana.org.au,linuxfoundation.org,microsemi.com,deltatee.com,arndb.de,vger.kernel.org,lists.infradead.org,realtek.com,lists.freedesktop.org,lists.linux.dev,ffwll.ch,semihalf.com,zonque.org,linux.dev];
-	TAGGED_FROM(0.00)[bounces-260451-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260452-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[tipi-net.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[87];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,smile.fi.intel.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B0707185893
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3603B185978
 X-Rspamd-Action: no action
 
-On Tue, Feb 24, 2026 at 11:30:28AM +0100, Philipp Stanner wrote:
-> On Tue, 2026-02-24 at 11:12 +0200, Andy Shevchenko wrote:
-> > On Tue, Feb 24, 2026 at 08:39:43AM +0100, Philipp Stanner wrote:
-> > > On Tue, 2026-02-24 at 13:14 +0900, Simon Richter wrote:
-
-...
-
-> > > If I could design it from scratch I would probably try to tell users to
-> > > use the unmanaged versions instead of revoking the devres consequence.
-> > 
-> > +many.
-
-> hm?
-
-I'm supporting you with many hands up (more than I possess)!
-
-> > > Devres is actually about your consequence always happening whenever the
-> > > driver unloads, for whatever reason.
-> > 
-> > I believe you meant "unbinds". The device<-->driver link can be broken
-> > without unloading the driver.
+On 24.2.2026 11:17, Russell King (Oracle) wrote:
+> On Tue, Feb 24, 2026 at 10:18:19AM +0100, Nicolai Buchwitz wrote:
+>> Implement Energy Efficient Ethernet TX Low Power Idle using phylink's
+>> managed EEE framework. The Cadence GEM MAC has no built-in idle timer
+>> - TXLPIEN (NCR bit 19) immediately blocks all TX when set and the MAC
+>> does NOT auto-wake - so the driver uses a software delayed_work timer
+>> for idle detection.
+>> 
+>> The TX LPI lifecycle:
+>>   - phylink calls mac_enable_tx_lpi() after link-up with the 
+>> negotiated
+>>     timer value. The driver defers the first LPI entry by 1 second per
+>>     IEEE 802.3az section 22.7a.
+>>   - macb_tx_complete() reschedules the idle timer after each TX drain.
+>>   - macb_start_xmit() wakes from LPI by clearing TXLPIEN, cancelling
+>>     the pending work, and waiting 50us (conservative Tw_sys) before
+>>     initiating the transmit.
+>>   - phylink calls mac_disable_tx_lpi() before link-down, which cancels
+>>     the work and clears TXLPIEN.
+>> 
+>> The phylink_config is populated with LPI capabilities (MII, GMII, 
+>> RGMII
+>> modes; 100FD and 1000FD speeds) and a 250ms default idle timer, gated
+>> on MACB_CAPS_EEE.
 > 
-> Yes, thx for pointing that out. Greg KH AFAIK always calls it "driver
-> detach".
+> Much better, thanks. One suggestion:
 
--- 
-With Best Regards,
-Andy Shevchenko
+Thanks for the quick feedback! I will address this in a v3 of this 
+series.
 
+> 
+>> +static void macb_tx_lpi_set(struct macb *bp, bool enable)
+> 
+> bool return type.
+> 
+>> +{
+>> +	unsigned long flags;
+>> +	u32 ncr;
+> 
+> 	u32 old, ncr;
+> 
+>> +
+>> +	spin_lock_irqsave(&bp->lock, flags);
+>> +	ncr = macb_readl(bp, NCR);
+> 
+> 	old = ncr;
+> 
+>> +	if (enable)
+>> +		ncr |= GEM_BIT(TXLPIEN);
+>> +	else
+>> +		ncr &= ~GEM_BIT(TXLPIEN);
+> 
+> 	if (old != ncr)
+>> +	macb_writel(bp, NCR, ncr);
+>> +	bp->tx_lpi_enabled = enable;
+> 
+> No need for tx_lpi_enabled
+> 
+>> +	spin_unlock_irqrestore(&bp->lock, flags);
+> 
+> 	return old != ncr;
+> 
+>> +}
+> 
+> ...
+> 
+>> +/* Wake from LPI before transmitting. The MAC must deassert TXLPIEN
+>> + * and wait for the PHY to exit LPI before any frame can be sent.
+>> + * IEEE 802.3az Tw_sys is ~17us for 1000BASE-T, ~30us for 100BASE-TX;
+>> + * we use a conservative 50us.
+>> + */
+>> +static void macb_tx_lpi_wake(struct macb *bp)
+>> +{
+>> +	if (!bp->tx_lpi_enabled)
+>> +		return;
+> 
+> No need for this if().
+> 
+>> +
+>> +	macb_tx_lpi_set(bp, false);
+> 
+> instead:
+> 	if (!macb_tx_lpi_set(bp, false))
+> 		return;
+> 
+> The presence of the spinlock in macb_tx_lpi_set() suggests that there
+> could be races, so keeping the state completely inside the spinlock
+> region would be sensible.
+> 
+>> +	cancel_delayed_work(&bp->tx_lpi_work);
+> 
+> I wonder whether this is reliable on its own. cancel_delayed_work()
+> documentation says:
+> 
+>  * Note:
+>  * The work callback function may still be running on return, unless
+>  * it returns %true and the work doesn't re-arm itself.  Explicitly 
+> flush or
+>  * use cancel_delayed_work_sync() to wait on it.
+> 
+> That means macb_tx_lpi_work_fn() could have just been entered at the
+> point that cancel_delayed_work() has been called. Would that cause a
+> problem, e.g. setting LPI mode again, or would we be guaranteed that
+> macb_tx_all_queues_idle() returns false preventing LPI mode being set
+> again?
 
+AFAIK, the race shouldn't be an issue here because macb_tx_lpi_wake()
+is called from macb_start_xmit() after the TX descriptors have been
+written and tx_head has been advanced (there's a wmb() before the
+call to ensure visibility). So if macb_tx_lpi_work_fn() happens to
+be running concurrently, macb_tx_all_queues_idle() will see
+tx_head != tx_tail and return false, preventing LPI from being
+re-enabled.
+
+> 
+> Thanks.
+
+Nicolai
 
