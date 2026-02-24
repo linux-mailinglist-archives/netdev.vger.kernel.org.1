@@ -1,94 +1,76 @@
-Return-Path: <netdev+bounces-260568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260571-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ODbpNIPFnWnsRwQAu9opvQ
-	(envelope-from <netdev+bounces-260568-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 16:36:35 +0100
+	id QOU+BUPInWk8SAQAu9opvQ
+	(envelope-from <netdev+bounces-260571-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 16:48:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CAAE189185
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 16:36:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68CBD18947F
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 16:48:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8130730242B8
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 15:36:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BB2773063A1E
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 15:41:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8195286D5E;
-	Tue, 24 Feb 2026 15:36:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EC773A4F3E;
+	Tue, 24 Feb 2026 15:41:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WH2FFnyz"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YZPphYPs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3E2B27E1DC
-	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 15:36:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7305039B4AD
+	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 15:41:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771947372; cv=none; b=Rb7DMt6qUqP1glXSyfdPnMo0k65V5we1RywrC5HfLkOFa3o3GSQWtoeeHGOhfjoTR7+LunGr9YAElWXNI3rrdQTLJRBefqmmvqg/km6ugvHXc+aahuNATK6S0mQRxa1YgmiOkNdt1h032tzIPUSD5R885jSARNwxT9c7wbN8I4g=
+	t=1771947711; cv=none; b=D4VrRzdPWgmUMLbHOgDlDNPpEsZH05MrRxqiLbNsUIkGc1sx/rdWK3/b2K8q9BkyBQn11cVnpN2j1bOqeW8gjgEo8PsQVResuzYG5iMPG6lYgej6pZ0RBw2m7U75NG/i/NoytNC175ctH3OdbTUPIE+f7mPR2S1phlZND4Jaj/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771947372; c=relaxed/simple;
-	bh=NmxLWvbIlebeZn6AKtgHcEK1/JKHs8ZQvP1lC80mkiw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iKgdB34xM48ZEyORK5Rhg3Vgyq086iij2gfgaelIOUJnb49HjGtrUBKijH0/a9Yj+xHzKazpZklLwW/QW6HOMWUs8eDCri/BkGCJkU59gv1jANappSIMdPUoKP5cQFe+BU/yZkcL8MJq8kQcDyFV+XUZgeFQ+vlVhQjuFS0lwzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WH2FFnyz; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-824b32875e7so2718708b3a.3
-        for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 07:36:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771947371; x=1772552171; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=J0m5QrjYNnqHXl9e832+w13ILtwNiaT2S5RFUJztWJo=;
-        b=WH2FFnyzc7ZgiOb3xmnDcm6qi7tpiinFHSnq2i1q/wvAhARVsTAt5TpSj6ZV2Le8UD
-         JOwz2TjsMWE51//RoebWb/5u3VYNDmy72oXk7oAP5YMy+12xQD+R2cWbnD68zW51PCAQ
-         fuWnOqiIAKdj70iY5SZ0SdTlK4X+hE7ZpKbJD55HjgD8vx/BJdH5YyyYpJpHMFfEokJB
-         vzyDsW8oe6WI3UUBrhIfTbc0VtY1hPn0UXv7l+MOEoZfyDdVm0YOlXDxTQtbypuK6xTN
-         KmmWwCEqjXD155oDuOMtveMGpDREv/SXg6oy2jD0iGHf/dY8qfKvpJyDnx1jKtO3JI+m
-         wl/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771947371; x=1772552171;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J0m5QrjYNnqHXl9e832+w13ILtwNiaT2S5RFUJztWJo=;
-        b=a82b5a1f92GUIVqF6Uoyx2+Eg57cWIj5xF8/1lT2TSXQgUpr4U/L830rQ6Q91clqAC
-         26bqxyp//jo9A5SgFiVixYvjVo6rvGyADyDcnWYUWdMGqYFkTQZDrTlpm6AvL5UZ4cP8
-         OJ8oORQTIIy1auQL66JY9dxh+NcQpnbIn8hEihk45BEJoh3mKN398sJuvVmTXiuIvnrw
-         Ey6vxTquwBpSlo/ro8z0JoFkZxOMdn8Y1OdYLl10KvqO/LwV5qxWQdjtpPXPPf8c5STf
-         3NpJXXskfFAT+/TZHuv5so93wXLNEUCjkk8HFB4MWQANogWIjrM2W66Z1Xfpj2NcTc0Y
-         adGg==
-X-Forwarded-Encrypted: i=1; AJvYcCUoXH1OBLpkWTwa+MvuTU9Db+KX7sOI6Ns1zDj5fe2yTTWpC1ENgYn4VuzU6VzSh3NcyE9nB3Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHJ0oeySkUNeyM6/fPASHRK7bHJJCrGfDpbtpJBZ5lJyWlFaaj
-	T30+BgU4BvdkQ9w4OsBEhIC4MtZPn8WsqABNjlRg2PhdhU8PHsIRLOMg
-X-Gm-Gg: AZuq6aLg1XplozhD+FfUk6Jh0mwhn0ZcDwayidYaiUMF7ws7GJ+Mw5OGmbnb8Kot06w
-	zl6myx0YaDfEU+zZYdu7lTP5aIuk9BbK/9GDOEUVxYIpvE1EbWo+Wv2RBQbPNpEGxo7Bl9e2Bq0
-	P8B35nZMaxKOweL/1b55qrZdwOxH1ll9vpmQzDosrLezKSxF0mGI+6Ja6P+M8lnxKf0vWFV3UYE
-	upZjWT54qSOA4CDswVmynLUR4rskXvAQwkxUWTeSeYf7sXUaWbtrr/FdgKyssHPD9bNmS3jHD6G
-	cA2EQaKTQZar02xzsaA6uFQheObKVgc7lPgHZjhkNPttLX6/nfabIBbcmAU6bpL+LIhe+Oa3s8j
-	evoutgWY/w5fT7KiEHw80y3CF7+zSZGsgJQFOr/G8wn0KlpdeGEnjnvd+88h9yTTl7L1aNENeYz
-	uaMC5ujHj/S9T5fl6L1AF8tbHQY+Hdm2g8Lu9Mh8YmA5zWKVz+enirbnwaptRDpCCZkkM=
-X-Received: by 2002:a05:6a21:38e:b0:38d:f745:4d5f with SMTP id adf61e73a8af0-39545ecc333mr11285126637.24.1771947371007;
-        Tue, 24 Feb 2026 07:36:11 -0800 (PST)
-Received: from Ubuntu-Kernel-2204.local.tld ([49.207.50.26])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-826dd64111csm10698181b3a.6.2026.02.24.07.36.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Feb 2026 07:36:10 -0800 (PST)
-From: Abhilekh Deka <abhindeka@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	nnac123@linux.ibm.com
-Cc: maddy@linux.ibm.com,
-	mpe@ellerman.id.au,
-	linuxppc-dev@lists.ozlabs.org,
-	netdev@vger.kernel.org,
+	s=arc-20240116; t=1771947711; c=relaxed/simple;
+	bh=Qky58vhSg7ngpuiMAI0wXwi0OB8jKBtIVpl989hW15k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JnpOzSiarmdROdbo1kzzXjQWokI508FR4XsntfDupA/2fPqQlzESdjKNDw6WQZHblrnrsbvgWzp055PVBPfciqvfXhs4aCk1nwEpZgYUgrNH1br9FLKdgBkwTVYV98CzZVQXAbKlmho8eDCaB6Y8ayuJ+SuMkZn8abXHQxd8Fck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YZPphYPs; arc=none smtp.client-ip=95.215.58.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1771947697;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=vsRHNcJt7Fs8ijA/eSOjtaTvGBC9pS0O7xztTp+2ST4=;
+	b=YZPphYPsH39NChvKkNn89BC4zucxFJ/ynOhlt1DDuCL5ye5eRYswqwiXFxTOEVIdPKXsQR
+	jSQmoLyGkQTyCDHzO1ncUoqcfjn51p088GVhtLnuZr5QWVxldt33zd9iay+02fdd1qfh4r
+	snGXhJzPJWJQlfxv/ckYZ855x7WvZUU=
+From: Leon Hwang <leon.hwang@linux.dev>
+To: bpf@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Feng Yang <yangfeng@kylinos.cn>,
+	Leon Hwang <leon.hwang@linux.dev>,
+	Menglong Dong <menglong8.dong@gmail.com>,
+	Puranjay Mohan <puranjay@kernel.org>,
+	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
+	Pu Lehui <pulehui@huawei.com>,
 	linux-kernel@vger.kernel.org,
-	Abhilekh Deka <abhindeka@gmail.com>
-Subject: [PATCH v3] net/ibmveth: fix comment typos in ibmveth.c
-Date: Tue, 24 Feb 2026 21:06:01 +0530
-Message-Id: <20260224153601.17534-1-abhindeka@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org,
+	kernel-patches-bot@fb.com
+Subject: [PATCH bpf-next 0/8] bpf: Enhance __bpf_prog_map_compatible()
+Date: Tue, 24 Feb 2026 23:40:16 +0800
+Message-ID: <20260224154024.12504-1-leon.hwang@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,71 +78,93 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,kylinos.cn,huawei.com,vger.kernel.org,fb.com];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	TAGGED_FROM(0.00)[bounces-260571-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[linux.ibm.com,ellerman.id.au,lists.ozlabs.org,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-260568-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[abhindeka@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[leon.hwang@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	NEURAL_HAM(-0.00)[-0.969];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5CAAE189185
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 68CBD18947F
 X-Rspamd-Action: no action
 
-Correct spelling mistakes in comments:
-- Fix misspelling of gro_receive
-- Fix misspelling of Partition
+Following discussion in the "bpf: tail calls in sleepable programs" [1],
+this series extends __bpf_prog_map_compatible() with additional per-program
+compatibility checks.
 
-Signed-off-by: Abhilekh Deka <abhindeka@gmail.com>
----
- drivers/net/ethernet/ibm/ibmveth.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+The series validates these attributes:
 
-diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
-index 3108bf50576f..b2a578e6ff31 100644
---- a/drivers/net/ethernet/ibm/ibmveth.c
-+++ b/drivers/net/ethernet/ibm/ibmveth.c
-@@ -355,7 +355,7 @@ static void ibmveth_replenish_buffer_pool(struct ibmveth_adapter *adapter,
- 
- 		/*
- 		 * If multi rx buffers hcall is no longer supported by FW
--		 * e.g. in the case of Live Parttion Migration
-+		 * e.g. in the case of Live Partition Migration
- 		 */
- 		if (batch > 1 && lpar_rc == H_FUNCTION) {
- 			/*
-@@ -480,7 +480,7 @@ static int ibmveth_remove_buffer_from_pool(struct ibmveth_adapter *adapter,
- 	 */
- 	if (!reuse) {
- 		/* remove the skb pointer to mark free. actual freeing is done
--		 * by upper level networking after gro_recieve
-+		 * by upper level networking after gro_receive
- 		 */
- 		adapter->rx_buff_pool[pool].skbuff[index] = NULL;
- 
+* kprobe_write_ctx: for uprobe programs that can update pt_regs.
+* call_get_func_ip: for tracing programs using bpf_get_func_ip().
+* call_session_cookie: for fsession programs using bpf_session_cookie().
+* call_session_is_return: for fsession programs using bpf_session_is_return().
+
+For each attribute, prog_array compatibility is one-way:
+programs without the requirement are rejected when tail-calling into
+programs that require it.
+
+This keeps tail-call runtime assumptions consistent. For example,
+call_get_func_ip programs rely on func_ip metadata prepared on trampoline
+stack; tail-calling from a !call_get_func_ip program into such a callee can
+produce invalid func_ip values. The same class of issue applies to
+call_session_cookie and call_session_is_return.
+
+Links:
+[1] https://lore.kernel.org/bpf/20260130081208.1130204-1-jolsa@kernel.org/
+
+Leon Hwang (8):
+  bpf: Add fsession to verbose log in check_get_func_ip()
+  bpf: Disallow !kprobe_write_ctx progs tail-calling kprobe_write_ctx
+    progs
+  bpf: Disallow !call_get_func_ip progs tail-calling call_get_func_ip
+    progs
+  bpf: Disallow !call_session_cookie progs tail-calling
+    call_session_cookie progs
+  bpf: Disallow !call_session_is_return progs tail-calling
+    call_session_is_return progs
+  selftests/bpf: Add a test to verify kprobe_write_ctx compatibility
+    enforcement
+  selftests/bpf: Add a test to verify call_get_func_ip compatibility
+    enforcement
+  selftests/bpf: Add a test to verify session-kfunc compatibility
+    enforcement
+
+ include/linux/bpf.h                           | 11 +++--
+ kernel/bpf/core.c                             | 15 ++++++
+ kernel/bpf/verifier.c                         |  4 +-
+ .../selftests/bpf/prog_tests/attach_probe.c   | 44 +++++++++++++++++
+ .../selftests/bpf/prog_tests/fsession_test.c  | 47 +++++++++++++++++++
+ .../bpf/prog_tests/get_func_ip_test.c         | 46 ++++++++++++++++++
+ .../selftests/bpf/progs/fsession_test.c       |  6 +++
+ .../selftests/bpf/progs/get_func_ip_test.c    |  6 +++
+ .../selftests/bpf/progs/kprobe_write_ctx.c    |  6 +++
+ 9 files changed, 181 insertions(+), 4 deletions(-)
+
 -- 
-2.34.1
+2.52.0
 
 
