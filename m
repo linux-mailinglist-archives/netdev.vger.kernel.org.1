@@ -1,78 +1,80 @@
-Return-Path: <netdev+bounces-260303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260304-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wOCNEsUGnWk7MgQAu9opvQ
-	(envelope-from <netdev+bounces-260303-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 03:02:45 +0100
+	id IBSADxcHnWk7MgQAu9opvQ
+	(envelope-from <netdev+bounces-260304-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 03:04:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69EB9180CB9
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 03:02:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90166180CE0
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 03:04:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DE0D230152CC
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 02:02:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9DBBD30FD77C
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 02:02:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D1251A9FBC;
-	Tue, 24 Feb 2026 02:02:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5F271A9FBC;
+	Tue, 24 Feb 2026 02:02:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HrqB7QD5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cxqvkppu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 505CE12B143
-	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 02:02:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 741BA1EB9F2
+	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 02:02:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771898560; cv=none; b=inx1hU/8uomu0ahSsyUpQNkV7I453PYmnhvtWqlTsa9xbTYZmtCjDnoLqtYjvBen38dUsfw9EWxMpkCG2ETMznXcShaArt/AD5WxLJoZS3mjhO1Igpp6uOOGf6JtyOxC7LceMGT6lp+JuwzaX5pcOM42pNQTubGoMOQFs3LZws0=
+	t=1771898564; cv=none; b=e1SKnjbA6srj4T5+P8xTj0GrbCrow3Wk3FBcuq5MeqNX+ayOH3Y0ZMDy35esuUiwbrQgh+9GQZauLPr+mhL4Usx7ha/1eHvkd8/tMD13cHeOGNrsvu0AsfbmHsLEKv3eUPuur4zTuX/JYBogsHB/kf7sJAqmmdGPMLmnVktrJAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771898560; c=relaxed/simple;
-	bh=OhTarnoYllk3gzRnVEJor5qQt15MI10wefzMzv+PZNM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Fx3npq3exw8D2A/hTLJGX85q35eqPrNWLILVcLmmCxSfKNQCtsqt5bZxgkBfVMoCfqKnJY/KLAr2P2lwgHPXKD6LscJZkAkl8dj4+YCToaQksbmc2vzQJVma7DWNwFCSwyqO9Uc7Iil4mYq5WRi07+Lo0bj1UmSOVldqHLavsmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HrqB7QD5; arc=none smtp.client-ip=209.85.210.178
+	s=arc-20240116; t=1771898564; c=relaxed/simple;
+	bh=jKl+rLgdOYg8KJEmtscbBU/VJIkevqTIWnLMTVACJwU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=WhdbRDRVOtXCKR89u8inrfZ5MuS/Tmyfll4l0irEBkZnx2iUqv0EeEIuXgn+uO+hCpGV/G1J6lXzNBVBmSahIr8ZRliYyHqE3yfHux3eS5ClRnJka5GXEgXZyJhSPpMOjR92zZyK//QxRdn9gQxNP6HNZKH/cB5GphmR+XSfHFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cxqvkppu; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-8249fc726e9so2573506b3a.2
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 18:02:39 -0800 (PST)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2aad1dc8856so36070265ad.1
+        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 18:02:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771898558; x=1772503358; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5dWRu8L6R1n4ykVyzbX3oEtnM0B63C+dsb7N5dNHQMs=;
-        b=HrqB7QD5IJBs/u9WuJmNYwdFFOPfKDqR43Jj2YmvuhyYDbE43OBeRuoOtOuOxLiMd8
-         uPxS8mH58VSoOQ7/7MmCPWI3+qYHg/mDdxxAU0kLo6j70Ybr5mTjT4T95dCu1NYA6imS
-         Mvq1A/gC7KT9fx9mQ+WoBPRb1+tAcyBO4OYejgNUtpO6MB3aUaHLCOUMUgvWJZBeQoO2
-         DGXYo+126RAxi5T5sS3cSGkTKcsq6rBSBzFia4oNfoHC6KsHFWMX2X2ZGWXXa6Bvf6i6
-         ZfxJaowBMqbHEqKPBdMNRsyMaOEZxqMUpYmpCQMGQyWWkZ5FJt1AeKzZ+Gai1vHbFp5J
-         C8dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771898558; x=1772503358;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1771898563; x=1772503363; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5dWRu8L6R1n4ykVyzbX3oEtnM0B63C+dsb7N5dNHQMs=;
-        b=dJymRRAgf/58ZPGtsuZ5lWnUY2gar94uJi3exBb6Mwg16D7VNoVhIw97bEhqTPbaKR
-         mZiYh74KPfOYV6DM1nEgkTFoah9OXpeo7j9OYphmxKHwZcGzmFJ1x71c4Ckfc89A2ZIL
-         rD09BrEVMDq1JvJ105HiYbtyazz4dk/12TfJNB1Qn8bAhixodEKFcv33W83xHSCgF+MQ
-         aLZkuXtUisFfZvSc2YnYDNX4Ttf09vEziaDL3Rr2ENiCJL0PJ6JG4+kOHPuTYLCDg87a
-         i/8B+ShHYgDRJa0rTffdqmiOJmugzT9QAeWQ05uPvPQw5Zx6YZa6c8EdOzsfCDbtaiDu
-         Qphg==
-X-Gm-Message-State: AOJu0YxoMFHSt8STZLkrxsJLuOrfL55MNR1RW4n5JHJKqB1zBIBUvFy6
-	An3qhYQH8BEzCtxqA/wshDKJZl67JhF8joWtnmNXbvop0ShkVcoZe19eoO6ZhYOQ
-X-Gm-Gg: ATEYQzz8KCmcX9MPYh9ZtFEdOETlJ0mSHQLkPZTgJ73ZIEHyErEgnzuhPKSr4FIWxU1
-	ZchloEtLWS/O3vaJHzMurg/Dghq3TAvt+TPruSD9JdqW61vyR+ypCxAUMLOXz0k8Wxumj/A+6XW
-	B88ue58OyBjZo6BQjWSbjwEEMWVud/d0EXpL44NiCBWpnXTOTJeYRcUipzNSOsa8QJPPDALD5Y4
-	ATnifjB2GK1UQPxnjYwb47k7gMFCP1lmv+ZHgczy7lWuA4H3gnA+tA9o5pzTUixmTmYbDmJmbFi
-	v6SqCfzOAGZkeBM0p2mcRwnXC3FigtHWFuKdA9OklXY6u0xMTCJFK1mhxFTfT6aEjt+DBPd4CQW
-	KgeVJLTJk75Nqir4BbgtgzwogXo8gQW3zet7V4dkZvBwQq45rDb0xSJLeLgWFHi8fv9iJIlNJpJ
-	2z0lt56qL+MQu79nVmqGQZ0TrhNlM=
-X-Received: by 2002:a05:6a00:1d27:b0:81f:9b97:5e4f with SMTP id d2e1a72fcca58-826daa64007mr7800879b3a.47.1771898558468;
-        Mon, 23 Feb 2026 18:02:38 -0800 (PST)
+        bh=bk572Rvhfjk0oj9QGnDog3MM+v9kEr3Zu/TrV5s9IUw=;
+        b=cxqvkppu3rUHbvEVSBOmTWqGqAn137MF1cNZ4tvnqAa1UoYV+IL2gPofthlKdGd0Co
+         R12Ny0sqzoZcYxQ1QLLMBaF4A98ZjbXxXR1pkvob8xxlf9BMnTf1KwxnN7LHmXQVOLEL
+         C8ypUc3YRZriL7TOwU5JB8YfCrvvV69xAV/pMFseM3w3vfFzB7Pc1SB9WNqXy7fPzVZL
+         dbltN+fK6qEOtBXpMJaoHlsFS+w7zllfbtNNEZ+cPgchw6rjIPgoFUPpUopszw1tEBy+
+         jIF6txhINf6DubHocmZGzxYmsaS0sFQd7+FXIyR/qX7V3eUs0soHO2WhwbWbYfubrqjD
+         bsnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771898563; x=1772503363;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=bk572Rvhfjk0oj9QGnDog3MM+v9kEr3Zu/TrV5s9IUw=;
+        b=rhKcDUKRxs//pQkGc7jECuZiBKL5ir7Gn0VpyKgkjzXc4DjuefyqBlJQeKi7zxj/VT
+         cKZm+Mw4mB4+IRj/tdxUIqtDhvkLR1fZ00I4/NuZhXipiQ/Vgb3F1oNv6NVfH/aqZ6yl
+         fNNStntomIauLszmzM0SeSTVNob6ea3crbjwJNdx4lUMY2ZySbv23p4zdbFeHOpScYfs
+         ettPbDUS9Hp3wEcpwAimlwMsIO/1WjKmm2diPMMvzTvJ2uab+fIZ2XV7I8r4F7L7DN9t
+         x/Ay3MIHz8vTVLW6bHX/HJNSwYGkB+MapWkt+VYaCBnf9r5rzHCoA80u4zxj0AkcIXhC
+         e15A==
+X-Gm-Message-State: AOJu0Yz4ZPnw3ZjgApfULJ20amksraI2ALZd1VBXGCbR+R6djmhcm35H
+	YiN5JBYEARzEWqm0wGgAnG3s93PQR5p9EUNMk8FgxoTUOaweJm7Pjbw/0L81y8Ko
+X-Gm-Gg: ATEYQzxpDCK8UztQAIZUlpkjQ/EAQVaRJOwntrs7/gmq27BaNHMsQmtEneHlWkZRBWb
+	ncGa/134Nk3Q7Sr/CFR6aVciYL8DsSvux1oDPZ5O/09JO6Y2YjzHfYXszVaUCladoFU/SU9XWCU
+	8ET6BWYvmpRyHtazeL3llZDSx+CroJDyIvBz4iqFQS6BAgi8iS6Y1BhPIxU+utkZhe4wTzJ1svr
+	BmMhlPX0ZkyPkXRSqR+d/Ld0NxNP/VxkzODTJMKdkM16FdP9juYgqJSEhUdYjJY4JGBRP+uQjOr
+	a7OoMkp5U6X3gz6XVK2Ja1w7mGU1mEmrm6y36i6w0WmIoJayYI1PfgNortFM+NrEP/zC585+fx2
+	M9zAUSY72pPPmwVoE1DawkLP+eZ18Po3uimNl+Pe9NT43bXdPNVPq4b/YnXr/nsAJM7H9UCX+YR
+	8/oGi2IgeLAfHDwT2SLB+1g+hJNls=
+X-Received: by 2002:a17:902:ecc6:b0:2aa:d7fe:8603 with SMTP id d9443c01a7336-2ad74419e3emr102184315ad.8.1771898562636;
+        Mon, 23 Feb 2026 18:02:42 -0800 (PST)
 Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-826dd6c30dfsm8802099b3a.27.2026.02.23.18.02.34
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-826dd6c30dfsm8802099b3a.27.2026.02.23.18.02.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Feb 2026 18:02:37 -0800 (PST)
+        Mon, 23 Feb 2026 18:02:42 -0800 (PST)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Jay Vosburgh <jv@jvosburgh.net>,
@@ -83,10 +85,12 @@ Cc: Jay Vosburgh <jv@jvosburgh.net>,
 	Paolo Abeni <pabeni@redhat.com>,
 	David Ahern <dsahern@kernel.org>,
 	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCH net-next] bonding: print churn state via netlink
-Date: Tue, 24 Feb 2026 02:02:14 +0000
-Message-ID: <20260224020215.6012-1-liuhangbin@gmail.com>
+Subject: [PATCH iproute2-next] iplink: bond_slave: print actor and partner churn state
+Date: Tue, 24 Feb 2026 02:02:15 +0000
+Message-ID: <20260224020215.6012-2-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20260224020215.6012-1-liuhangbin@gmail.com>
+References: <20260224020215.6012-1-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,7 +105,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -109,11 +113,11 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[jvosburgh.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260303-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-260304-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
@@ -124,59 +128,63 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 69EB9180CB9
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 90166180CE0
 X-Rspamd-Action: no action
 
-Currently, the churn state is printed only in sysfs. Add netlink support
-so users could get the state via netlink.
+Add ability to print both actor and partner port churn states
+(MONITOR/CHURN/NO_CHURN) via netlink attributes. This provides
+visibility into the LACP churn detection state for bond slaves.
 
 Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- drivers/net/bonding/bond_netlink.c | 9 +++++++++
- include/uapi/linux/if_link.h       | 2 ++
- 2 files changed, 11 insertions(+)
+ ip/iplink_bond_slave.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-diff --git a/drivers/net/bonding/bond_netlink.c b/drivers/net/bonding/bond_netlink.c
-index 286f11c517f7..ea1a80e658ae 100644
---- a/drivers/net/bonding/bond_netlink.c
-+++ b/drivers/net/bonding/bond_netlink.c
-@@ -29,6 +29,8 @@ static size_t bond_get_slave_size(const struct net_device *bond_dev,
- 		nla_total_size(sizeof(u16)) +	/* IFLA_BOND_SLAVE_AD_PARTNER_OPER_PORT_STATE */
- 		nla_total_size(sizeof(s32)) +	/* IFLA_BOND_SLAVE_PRIO */
- 		nla_total_size(sizeof(u16)) +	/* IFLA_BOND_SLAVE_ACTOR_PORT_PRIO */
-+		nla_total_size(sizeof(u8)) +	/* IFLA_BOND_SLAVE_AD_CHURN_ACTOR_STATE */
-+		nla_total_size(sizeof(u8)) +	/* IFLA_BOND_SLAVE_AD_CHURN_PARTNER_STATE */
- 		0;
+diff --git a/ip/iplink_bond_slave.c b/ip/iplink_bond_slave.c
+index c88100e248dd..5dfe2970941e 100644
+--- a/ip/iplink_bond_slave.c
++++ b/ip/iplink_bond_slave.c
+@@ -86,6 +86,12 @@ static void print_slave_oper_state(FILE *fp, const char *name, __u16 state)
+ 	close_json_array(PRINT_ANY, "> ");
  }
  
-@@ -77,6 +79,13 @@ static int bond_fill_slave_info(struct sk_buff *skb,
- 					IFLA_BOND_SLAVE_AD_PARTNER_OPER_PORT_STATE,
- 					ad_port->partner_oper.port_state))
- 				goto nla_put_failure;
++static const char *port_churn_state[] = {
++	"MONITOR",
++	"CHURN",
++	"NO_CHURN",
++};
 +
-+			if (nla_put_u8(skb, IFLA_BOND_SLAVE_AD_CHURN_ACTOR_STATE,
-+				       ad_port->sm_churn_actor_state))
-+				goto nla_put_failure;
-+			if (nla_put_u8(skb, IFLA_BOND_SLAVE_AD_CHURN_PARTNER_STATE,
-+				       ad_port->sm_churn_partner_state))
-+				goto nla_put_failure;
- 		}
+ static void bond_slave_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
+ {
+ 	SPRINT_BUF(b1);
+@@ -148,6 +154,26 @@ static void bond_slave_print_opt(struct link_util *lu, FILE *f, struct rtattr *t
+ 		print_slave_oper_state(f, "ad_partner_oper_port_state_str", state);
+ 	}
  
- 		if (nla_put_u16(skb, IFLA_BOND_SLAVE_ACTOR_PORT_PRIO,
-diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-index e9b5f79e1ee1..83a96c56b8ca 100644
---- a/include/uapi/linux/if_link.h
-+++ b/include/uapi/linux/if_link.h
-@@ -1568,6 +1568,8 @@ enum {
- 	IFLA_BOND_SLAVE_AD_PARTNER_OPER_PORT_STATE,
- 	IFLA_BOND_SLAVE_PRIO,
- 	IFLA_BOND_SLAVE_ACTOR_PORT_PRIO,
-+	IFLA_BOND_SLAVE_AD_CHURN_ACTOR_STATE,
-+	IFLA_BOND_SLAVE_AD_CHURN_PARTNER_STATE,
- 	__IFLA_BOND_SLAVE_MAX,
- };
- 
++	if (tb[IFLA_BOND_SLAVE_AD_CHURN_ACTOR_STATE]) {
++		__u8 state = rta_getattr_u8(tb[IFLA_BOND_SLAVE_AD_CHURN_ACTOR_STATE]);
++
++		if (state >= ARRAY_SIZE(port_churn_state))
++			print_int(PRINT_ANY, "churn_actor_state", "churn_actor_state %u ", state);
++		else
++			print_string(PRINT_ANY, "churn_actor_state", "churn_actor_state %s ",
++				     port_churn_state[state]);
++	}
++
++	if (tb[IFLA_BOND_SLAVE_AD_CHURN_PARTNER_STATE]) {
++		__u8 state = rta_getattr_u8(tb[IFLA_BOND_SLAVE_AD_CHURN_PARTNER_STATE]);
++
++		if (state >= ARRAY_SIZE(port_churn_state))
++			print_int(PRINT_ANY, "churn_partner_state", "churn_partner_state %u ", state);
++		else
++			print_string(PRINT_ANY, "churn_partner_state", "churn_partner_state %s ",
++				     port_churn_state[state]);
++	}
++
+ 	if (tb[IFLA_BOND_SLAVE_ACTOR_PORT_PRIO])
+ 		print_int(PRINT_ANY,
+ 			  "actor_port_prio",
 -- 
 2.50.1
 
