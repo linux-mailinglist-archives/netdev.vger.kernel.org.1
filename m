@@ -1,162 +1,216 @@
-Return-Path: <netdev+bounces-260443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260444-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sLsONaZ6nWmAQAQAu9opvQ
-	(envelope-from <netdev+bounces-260443-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 11:17:10 +0100
+	id qM59OId7nWmAQAQAu9opvQ
+	(envelope-from <netdev+bounces-260444-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 11:20:55 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 424FC185343
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 11:17:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B3B81853F0
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 11:20:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3F6E23002768
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 10:13:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 65066300C938
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 10:17:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 901B4376BC8;
-	Tue, 24 Feb 2026 10:13:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB3F737755D;
+	Tue, 24 Feb 2026 10:17:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E7x50uWa"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="b48dGVhM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A706376496
-	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 10:13:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771928004; cv=pass; b=bp1meC/e3BOyVQYikHw7RMwHAKyBVFTpTTpqvfw0Gj0Vs0lAXSsnIHukH6X5qhlajWM+CCmciPKALjuGskU2fYpDf5Bx1qAIJT/o9SEcAM8VCRInzlNQdcjaVKBL1RGy8kzqgiSQMrrWvRAQ0t6Fu4TDwcWHbInpEMM5FNVtNz0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771928004; c=relaxed/simple;
-	bh=d0mfGlNjIQR/pptqP2vIVW80q542uQSSoqMLUbno824=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Y6Mptz0ET7vpm1aY0ZvcTJ9GJutjWIpK2qrAGKYRZ5gBTrGVbhXWbDZOpnQPD5q8er2BeyIIWJMm8tjFR+H+HfY1HCIhMsf6at776jGVLU1ZZlNaV/KA6IYD5Ziyb5olsmrUng0TabwH2QIGW8Cx1WCquw0yKprlZrEhIaWuXW0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E7x50uWa; arc=pass smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2adae92249eso2308705ad.0
-        for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 02:13:23 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771928003; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Dr+rtIFh4ldvxNLYGHAAgBmBvdF9bmZLviNGaJZPN9uh0gP1NMAV6azLJKXPb/DsYW
-         oQZ0E0Co3OO9s8aS3bTrVMDFHM/uT+nRGdW/fud/ttkoEJPNyItgx3mhSQ2pD+Ju84GL
-         26B68/Km1REputvR2kr/QQ0j2pXQoj2w1jzvvGztG69IuNh0MU70fcXcjL5++9JMIIr7
-         +2RdBhvVL3Gn6ule85GOswflv3/7l81zIsZ8aOhxG90fbmMAsSMKlDp95sjjOFADm7rT
-         6qCiUtV7ywFrEWXQdPdSuD0EtRIgSGu21/PPE076vidwYoWAPFCxIijLX87Yr9bHNc8O
-         TtDg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=d0mfGlNjIQR/pptqP2vIVW80q542uQSSoqMLUbno824=;
-        fh=UvGkBQFEZNkktOK68E6auk1/cjSsnb6TMze8T6dMQD4=;
-        b=kNUywVXZ74+VnasrGmgwp7rDnlGq4+5Uk+lF4JhPgPKV5wEUEMAnTfyj5GAVC64Bhs
-         MQXejR5BklpXr14wOTa1aWsML0J8D7WET/811oiG4nrNz488E6z2aqYnret+7eb+4IaN
-         vA3O5CGng52umO9zpDQ9qVUAr6OOAgjdhKg5oY2ktvhXr7LejmdqDZaK7Ijg356l1AOd
-         byyuhImBpAj/NY5iqLvfEyK9fuKalgK357E8U0hTk4PFh3IeViMdZlbArSFK/6kTBp+d
-         REswTa4NYgspIUVr/CjHRm5TT5PJFIyJhloLbxowKCin4c8fN3NqaMT887n6zZSNucaQ
-         lllg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771928003; x=1772532803; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=d0mfGlNjIQR/pptqP2vIVW80q542uQSSoqMLUbno824=;
-        b=E7x50uWauMKW9ep6osiiSWj4vSTFotxHJ4RREtyuCAmfy8ifJLwf0F04+6XNNP9lJW
-         o+MNKd8lBiP7d0FAnIJlQoVCWTkv8C5BoPVKXMifeark+wUJqKl8QQEAjaf2bokN9N7t
-         ty20AqFtfC44wR+tx7PoNXHV9b6xFr073LtInehJlMdulAH4YPqKaxBkAMPhX60YUaRL
-         mclIpKPsSZgF4b8wqluxKiIpsnmXwSeTwb8ZrZ6GWWEpXTMX0etz0cb3tjt681PHgweC
-         TYYWuYXL5u78Cfj22UIpZQ+ujc/uupkHIs9dUb8cutAYnL/spR1MufsvnkCBR6C0qUfc
-         vjHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771928003; x=1772532803;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d0mfGlNjIQR/pptqP2vIVW80q542uQSSoqMLUbno824=;
-        b=nfJJw0myoCEmsFvJPbDU1aKxRYBW/JF5ImzGExUpT94GR5YGtS38VBFqwqBhj/B4ux
-         rKlzzQHhpwRhXk0UN/1eZsc/iKqxP5G6SMRGJApquDjwHVTio7Wpu3meaEAfk8u16OYL
-         FYEZDqqnOIh3RekTxId94WfKo6TbebAKefjOnsk39JTwPLG3UAPQNj57etd6iZahzVKE
-         XRg6JxpxwpTTMdxW4EE7C6R8h2O8c5rUKUt1TRaK/R8ohO3KjdwwuBLuUE/65vUKfF9+
-         /+wC9meUAIXU3qq9ozOB8V5Kym/gvecGLXE2k0aLo/4TrMFdN9ugBZ78OCKQo7Mkbqmx
-         vN/g==
-X-Forwarded-Encrypted: i=1; AJvYcCWL8p0GSkf8HPtl0qDA60PcoGMtgRkNBJWqDKTCTpwRSSYf/r8AYlZqA0JAc4EdxrMgUXpM/3Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxtqC/n+oiqp9Rc7+AzsHzr924Fu6qFQD2LigkM+QYfT8EPptw
-	U0O5d9KFRyf0V+ZU02fPAGsnXfIebGfBALqXUmLzqQQSnSNC2hRFVVa4Tqw9dr2JCafpQu2z2sU
-	WfnTLt9uX6iYLPIUWQTge2PddkjmFxis=
-X-Gm-Gg: ATEYQzyi5CXn0YXzkTN8IysHhGhHC9FnlrUL2MxEceEW88r8mMbXhKqegFGeCCaOuzo
-	+T2ukVCnjYIAFvzUqJFVkjYeQMGD8UdSWkuZla4UHP1FGBRDEK5AD3ydIadgDeWEwrxrGh6bhdj
-	AVgvwt2ZkjbcmINORSIsGVUoCdEKoWzoqXenAhRhUggoo6V2di8aCbSn8naosGFEh37CY2R7o6x
-	AfyHu2y0nDPEx3avRoPHEggCNh+MAyfP/cDjHINXuhgMiLlgORWIMIKVCo0ua+cVjyhRDLuj2d1
-	Bmlm+YaK6Picz1bgXYp+Yj/tO4CycSb6PFb4i++X
-X-Received: by 2002:a17:903:3b8f:b0:2aa:f2f3:bca1 with SMTP id
- d9443c01a7336-2ad743e304emr110809035ad.9.1771928002758; Tue, 24 Feb 2026
- 02:13:22 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D72D37757D
+	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 10:17:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771928243; cv=none; b=NHajrpbmGC+7Wb2Qon5tA+ijMIYSx8Ud1V4VSOmiq9EAR44OEnVVPVrVOMN6V9UP5TJ3j9ztI3s2GUn84nODN1LzQafA3XXfIboh6Lnvcx+c8OC5Jnx8DR4P1MLY5tIhiBraAcD+xbeTOg1DRStulX2+cDPpeXh9A5ueDsXPwdk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771928243; c=relaxed/simple;
+	bh=rFF4K8Zgf1BYVWvYDIyd09wkETxX/B9s2eyJGQxFkWw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t6BhcBtzGK5DnMG+4QT2d3CcdrmsfODyMsTjwKuqyo37bd9U0rWHy6XlI5tJ3/9S6iuyxRSWh/bZps/WMT/1RISC6BE8FdgQEPyRBBPfhpS3XH7pR4TmcIM8T3GyogZy+ANXyYed5g5bkMEWyhuQ1LSR+UMY2SRsI/r+arJ5+v4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=b48dGVhM; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=4YULu+uW6OF//44jjpCFpruF8dDEiT3NVbgUKXDQoeo=; b=b48dGVhMPjMoM08ZEEUU/QM7fE
+	C8DARAtpoZNoXE/PzyN0mcJUmKJipxT2Gmo6ObVnTUmby8DwSObRPAZVcFN4w/9bAWjKeTmnwA5st
+	AUc7/QUNaf9FUtVYlvkcSr5mJbtR6pLRRZ2UadZWkn+qhy7ymyEaZzMHK+KDqBHdRiC97YAn5KcWW
+	YOdQ5IU13i85wdF07/d6skemAdQbJwzJuqoyEB8lmqKq8ZJx9NZAO2snSHrh3dDA3xmZt2+QUio0N
+	4dedSkl20KMRCguCC287I2r21si+Z3sppmdq4vvUHTFtXc0Bmtczn5o8BEuGOYMynEm12xW5I81mm
+	qd+GeF9Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55642)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vupTh-0000000055S-0ACt;
+	Tue, 24 Feb 2026 10:17:17 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vupTe-000000008I5-3sCB;
+	Tue, 24 Feb 2026 10:17:14 +0000
+Date: Tue, 24 Feb 2026 10:17:14 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Nicolai Buchwitz <nb@tipi-net.de>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, claudiu.beznea@tuxon.dev,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	nicolas.ferre@microchip.com, pabeni@redhat.com,
+	phil@raspberrypi.com
+Subject: Re: [PATCH net-next v2 3/5] net: cadence: macb: implement EEE TX LPI
+ support
+Message-ID: <aZ16qgIsRxkUuoW1@shell.armlinux.org.uk>
+References: <20260224091821.47671-1-nb@tipi-net.de>
+ <20260224091821.47671-4-nb@tipi-net.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260223-dpll-v1-1-d99f18c12bae@gmail.com> <d0a3a425-689a-4d97-8940-05bf83b7b513@redhat.com>
-In-Reply-To: <d0a3a425-689a-4d97-8940-05bf83b7b513@redhat.com>
-From: Felix Gu <ustc.gu@gmail.com>
-Date: Tue, 24 Feb 2026 18:13:10 +0800
-X-Gm-Features: AaiRm508WQm3Cupvs60IoJb6_RASyGlhrjEHm_IPXkZu4cEk288ag9CMJj_Wnh4
-Message-ID: <CAN4SLj3eAw8aXo78AZg6O4p5qFKK8YYdV9RMmd_OcSKvdxsMvg@mail.gmail.com>
-Subject: Re: [PATCH] dpll: zl3073x: Remove redundant cleanup in devm_dpll_init()
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: Prathosh Satish <Prathosh.Satish@microchip.com>, 
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Jakub Kicinski <kuba@kernel.org>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260224091821.47671-4-nb@tipi-net.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260443-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260444-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ustcgu@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.932];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 424FC185343
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,shell.armlinux.org.uk:mid,armlinux.org.uk:url]
+X-Rspamd-Queue-Id: 3B3B81853F0
 X-Rspamd-Action: no action
 
-> Please use:
->
-> return devm_add_action_or_reset(...);
->
-> Otherwise, LGTM. With this change:
->
-> Reviewed-by: Ivan Vecera <ivecera@redhat.com>
->
+On Tue, Feb 24, 2026 at 10:18:19AM +0100, Nicolai Buchwitz wrote:
+> Implement Energy Efficient Ethernet TX Low Power Idle using phylink's
+> managed EEE framework. The Cadence GEM MAC has no built-in idle timer
+> - TXLPIEN (NCR bit 19) immediately blocks all TX when set and the MAC
+> does NOT auto-wake - so the driver uses a software delayed_work timer
+> for idle detection.
+> 
+> The TX LPI lifecycle:
+>   - phylink calls mac_enable_tx_lpi() after link-up with the negotiated
+>     timer value. The driver defers the first LPI entry by 1 second per
+>     IEEE 802.3az section 22.7a.
+>   - macb_tx_complete() reschedules the idle timer after each TX drain.
+>   - macb_start_xmit() wakes from LPI by clearing TXLPIEN, cancelling
+>     the pending work, and waiting 50us (conservative Tw_sys) before
+>     initiating the transmit.
+>   - phylink calls mac_disable_tx_lpi() before link-down, which cancels
+>     the work and clears TXLPIEN.
+> 
+> The phylink_config is populated with LPI capabilities (MII, GMII, RGMII
+> modes; 100FD and 1000FD speeds) and a 250ms default idle timer, gated
+> on MACB_CAPS_EEE.
 
-Hi Ivan,
+Much better, thanks. One suggestion:
 
-Thanks for the review.
-I will update it in V2.
+> +static void macb_tx_lpi_set(struct macb *bp, bool enable)
 
-Best regards,
-Felix
+bool return type.
+
+> +{
+> +	unsigned long flags;
+> +	u32 ncr;
+
+	u32 old, ncr;
+
+> +
+> +	spin_lock_irqsave(&bp->lock, flags);
+> +	ncr = macb_readl(bp, NCR);
+
+	old = ncr;
+
+> +	if (enable)
+> +		ncr |= GEM_BIT(TXLPIEN);
+> +	else
+> +		ncr &= ~GEM_BIT(TXLPIEN);
+
+	if (old != ncr)
+> +	macb_writel(bp, NCR, ncr);
+> +	bp->tx_lpi_enabled = enable;
+
+No need for tx_lpi_enabled
+
+> +	spin_unlock_irqrestore(&bp->lock, flags);
+
+	return old != ncr;
+
+> +}
+
+...
+
+> +/* Wake from LPI before transmitting. The MAC must deassert TXLPIEN
+> + * and wait for the PHY to exit LPI before any frame can be sent.
+> + * IEEE 802.3az Tw_sys is ~17us for 1000BASE-T, ~30us for 100BASE-TX;
+> + * we use a conservative 50us.
+> + */
+> +static void macb_tx_lpi_wake(struct macb *bp)
+> +{
+> +	if (!bp->tx_lpi_enabled)
+> +		return;
+
+No need for this if().
+
+> +
+> +	macb_tx_lpi_set(bp, false);
+
+instead:
+	if (!macb_tx_lpi_set(bp, false))
+		return;
+
+The presence of the spinlock in macb_tx_lpi_set() suggests that there
+could be races, so keeping the state completely inside the spinlock
+region would be sensible.
+
+> +	cancel_delayed_work(&bp->tx_lpi_work);
+
+I wonder whether this is reliable on its own. cancel_delayed_work()
+documentation says:
+
+ * Note:
+ * The work callback function may still be running on return, unless
+ * it returns %true and the work doesn't re-arm itself.  Explicitly flush or
+ * use cancel_delayed_work_sync() to wait on it.
+
+That means macb_tx_lpi_work_fn() could have just been entered at the
+point that cancel_delayed_work() has been called. Would that cause a
+problem, e.g. setting LPI mode again, or would we be guaranteed that
+macb_tx_all_queues_idle() returns false preventing LPI mode being set
+again?
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
