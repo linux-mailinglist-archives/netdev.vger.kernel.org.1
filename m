@@ -1,166 +1,138 @@
-Return-Path: <netdev+bounces-260399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260396-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0HIUElBfnWmxOgQAu9opvQ
-	(envelope-from <netdev+bounces-260399-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 09:20:32 +0100
+	id CK29GYtfnWmxOgQAu9opvQ
+	(envelope-from <netdev+bounces-260396-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 09:21:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A17B183883
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 09:20:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B467F1838CD
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 09:21:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3111C301F69A
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 08:20:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 891CD3011BF3
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 08:20:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1241E366821;
-	Tue, 24 Feb 2026 08:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D0142C21EC;
+	Tue, 24 Feb 2026 08:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EfQAJmHJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="df4+jp0l"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF039366558;
-	Tue, 24 Feb 2026 08:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A8EA46B5
+	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 08:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771921225; cv=none; b=PSi3EUnvs4BzJftiIICRbOWHJ8IEcUwPzv4yoD47fpBaD//uLUdISMLFrmQNhAWM3FA7Eja9/qgxXAF7MesVSr0mD63KdLD6ULMfEVhxNDPuaMd/BbL4DFdeChdPpPxtLeRB/WK0wJB6gTy/K7rXHwZQ+1oEmxuIkjLFHjANav4=
+	t=1771921223; cv=none; b=eRbOI7GutqIP9RNi3U1Qb/qmz3lQQed6CqgR0EKCxUfD/rcAOUmqXYfGXcP0oroRr0Oj0L9dnjdzHIgcwc7P7s26HJnLOzQup+SAR5gq3xWPHNRtiRcgIEIxVW44HAAKJePJ+K42g0eKvXT5PudX67OBfd6RKFHGOaKyIRqpoLY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771921225; c=relaxed/simple;
-	bh=Yho54yKeF0+pYUwHDqezl+RQxQv9QgV7ZpFQWc0NSEQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Kqy2ZJ6NAWkBVGffMsinKezUe4jzGHzIryoJLT/cudpnrR2ycqCPX+cIYoa1eGVfuI9tYETT1jA6i95JyRmq+2utd9WqAZhI9clCoIsLHy1Sts1iCIxVb5u9SdhWZRtFiLI7rJ1IPm1gQLxWdKzXF/YW3rjJu3pCnOrzUwXbBCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EfQAJmHJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A4C7DC19424;
-	Tue, 24 Feb 2026 08:20:25 +0000 (UTC)
+	s=arc-20240116; t=1771921223; c=relaxed/simple;
+	bh=vc2/Zx/lrYf4qKoRckwGCOkcVJNGdfTsDsZn7VP7Vw0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=agLxCjkiYW9DOSclOfcH0TlUJyTqbSH7fN+OYuSp4fg2QiH+qtnxghojtd0nmDqKVCW7p/JNt50aeK9vPPA3IWl5XRTO17HVS4cg1/Z2512tXJQqKNco4v/aX6WABQ4EfTo37f2La7pb1omgO9UQpY7LHjXvRcz3Uoy0E0CipjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=df4+jp0l; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CD91C116D0;
+	Tue, 24 Feb 2026 08:20:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771921225;
-	bh=Yho54yKeF0+pYUwHDqezl+RQxQv9QgV7ZpFQWc0NSEQ=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=EfQAJmHJGNbiIGcEZN4GeBg1JKjQJ59o/LZTIRkyaJtM3/RL57Ei6duYcvWqRCi9I
-	 FMhV8nlpe2rebGrnrekA5i/yAhfxGj6vyPRoUIlt20Nl3bfVVtCbjWSkhDvytNAHol
-	 ubUrEYtgHJJoces84gnGyOzO0ixg8FqMO16C94OIOJBeKMeb2kb05rCcqc0qtepGHn
-	 p2+kSclE8T1WMf1b8OfQLiECzUFWjuRWPaHkedqtnzPoJ3GnbZCDuaIT5T7JOIGFz8
-	 rI7Xmkz4y9qqHiAe81z3xJAiECeTMEwjn+mGMiQCN3i2GPQn8/nhF4tUpt8+K32bmL
-	 qjSaP+XCOejig==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93C89EFB814;
-	Tue, 24 Feb 2026 08:20:25 +0000 (UTC)
-From: Simon Baatz via B4 Relay <devnull+gmbnomis.gmail.com@kernel.org>
-Date: Tue, 24 Feb 2026 09:20:13 +0100
-Subject: [PATCH net v2 2/2] selftests/net: packetdrill: Verify acceptance
- of FIN packets when RWIN is 0
+	s=k20201202; t=1771921222;
+	bh=vc2/Zx/lrYf4qKoRckwGCOkcVJNGdfTsDsZn7VP7Vw0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=df4+jp0lbuV+uVB6SMq9uAlLGgEQAi9EeMQ/WDw/1ykVq809q6vmNxTYGkxUtg0Jd
+	 iH0ARwSDPs7nhOBLM83idVaNh5MRqrGwz06iIYApeO2XZGOa4A/7Ch4Es02QIIQFRI
+	 FBs6ezcj54MLXA25Wcp2FBYGymQWrl32tzMIqOnKmkDv2f2mlumvTkYo61x0F1oqp8
+	 YH8ZaxdoZ830o5X86wgXTmpeDaNXErrBCM+KYVN6/2BGtb9Ff4PbaGosZ3c2lP0Snw
+	 UEFK539iZNjiBfNaXQugpzCwWCQvzRwjhPdGIPoC3YxDWPIZpcbhCnAlTMoy8M2qVM
+	 zKk73wxa0Hzrw==
+Message-ID: <027d191f-f04e-4ead-a9b8-a6626e0828c1@kernel.org>
+Date: Tue, 24 Feb 2026 09:20:16 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260224-fix_zero_wnd_fin-v2-2-a16677ea7cea@gmail.com>
-References: <20260224-fix_zero_wnd_fin-v2-0-a16677ea7cea@gmail.com>
-In-Reply-To: <20260224-fix_zero_wnd_fin-v2-0-a16677ea7cea@gmail.com>
-To: Eric Dumazet <edumazet@google.com>, 
- Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, Simon Baatz <gmbnomis@gmail.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1771921224; l=1458;
- i=gmbnomis@gmail.com; s=20260220; h=from:subject:message-id;
- bh=H8ZjJQB2JKY6JAi2lxsgvvCVKMl7+c9eEHI+rYT/o+E=;
- b=U+Im8KLHDGvfSdGH6ZJ4Pbo/TI6ozyHEDdYtHgVRn3+rZ6VnvnSOwiAc7vyyHHaWdGEccskrB
- odip6I5gtU9C8FskMM09BSTFIdrChX/Pp9M8cWuXODj5aTITgZuuUfj
-X-Developer-Key: i=gmbnomis@gmail.com; a=ed25519;
- pk=T/JIz/6F5bf1uQJr69lmyi7czVG+F9TVZ/8x5z9Wtqw=
-X-Endpoint-Received: by B4 Relay for gmbnomis@gmail.com/20260220 with
- auth_id=641
-X-Original-From: Simon Baatz <gmbnomis@gmail.com>
-Reply-To: gmbnomis@gmail.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: fs_enet: add missing kfree in _remove
+To: Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org
+Cc: Pantelis Antoniou <pantelis.antoniou@gmail.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Russell King <linux@armlinux.org.uk>
+References: <20260224015517.354145-1-rosenp@gmail.com>
+Content-Language: fr-FR
+From: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
+In-Reply-To: <20260224015517.354145-1-rosenp@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	FREEMAIL_REPLYTO_NEQ_FROM(2.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-260396-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260399-lists,netdev=lfdr.de,gmbnomis.gmail.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_REPLYTO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	HAS_REPLYTO(0.00)[gmbnomis@gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7A17B183883
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[chleroy@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B467F1838CD
 X-Rspamd-Action: no action
 
-From: Simon Baatz <gmbnomis@gmail.com>
 
-Add a packetdrill test that verifies we accept bare FIN packets when
-the advertised receive window is zero.
 
-Signed-off-by: Simon Baatz <gmbnomis@gmail.com>
----
- .../net/packetdrill/tcp_rcv_zero_wnd_fin.pkt       | 27 ++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+Le 24/02/2026 à 02:55, Rosen Penev a écrit :
+> The kfree is present in _probe on failure but not in remove.
 
-diff --git a/tools/testing/selftests/net/packetdrill/tcp_rcv_zero_wnd_fin.pkt b/tools/testing/selftests/net/packetdrill/tcp_rcv_zero_wnd_fin.pkt
-new file mode 100644
-index 0000000000000000000000000000000000000000..e245359a1a91d4b6d7ef64496681cea57792cb71
---- /dev/null
-+++ b/tools/testing/selftests/net/packetdrill/tcp_rcv_zero_wnd_fin.pkt
-@@ -0,0 +1,27 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+// Some TCP stacks send FINs even though the window is closed. We break
-+// a possible FIN/ACK loop by accepting the FIN.
-+
-+--mss=1000
-+
-+`./defaults.sh`
-+
-+// Establish a connection.
-+   +0 socket(..., SOCK_STREAM, IPPROTO_TCP) = 3
-+   +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
-+   +0 setsockopt(3, SOL_SOCKET, SO_RCVBUF, [20000], 4) = 0
-+   +0 bind(3, ..., ...) = 0
-+   +0 listen(3, 1) = 0
-+
-+   +0 < S 0:0(0) win 32792 <mss 1000,nop,wscale 7>
-+   +0 > S. 0:0(0) ack 1 <mss 1460,nop,wscale 0>
-+   +0 < . 1:1(0) ack 1 win 257
-+
-+   +0 accept(3, ..., ...) = 4
-+
-+   +0 < P. 1:60001(60000) ack 1 win 257
-+    * > .  1:1(0) ack 60001 win 0
-+
-+   +0 < F. 60001:60001(0) ack 1 win 257
-+   +0 > . 1:1(0) ack 60002 win 0
+Which kfree ? Which structure ?
 
--- 
-2.53.0
+Provide more details in the commit message.
 
+> 
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> ---
+>   drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c b/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
+> index d3c772ed5fc9..ee2b7e8866ee 100644
+> --- a/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
+> +++ b/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
+> @@ -1008,6 +1008,7 @@ static void fs_enet_remove(struct platform_device *ofdev)
+>   	dev_set_drvdata(fep->dev, NULL);
+>   	phylink_destroy(fep->phylink);
+>   	free_netdev(ndev);
+> +	kfree(fep);
+
+This is not correct I think. fep is allocated by alloc_etherdev() and 
+released by free_netdev()
+
+>   }
+> 
+>   static const struct of_device_id fs_enet_match[] = {
+> --
+> 2.53.0
+> 
+> 
 
 
