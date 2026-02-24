@@ -1,236 +1,174 @@
-Return-Path: <netdev+bounces-260506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260507-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0Iu/G9GbnWnwQgQAu9opvQ
-	(envelope-from <netdev+bounces-260506-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 13:38:41 +0100
+	id MK9gH/ubnWnwQgQAu9opvQ
+	(envelope-from <netdev+bounces-260507-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 13:39:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E2E51870E9
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 13:38:40 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2B47187125
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 13:39:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 02069300C6CC
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 12:38:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3C62E3078A08
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 12:38:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08F87396D27;
-	Tue, 24 Feb 2026 12:38:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99AFF39A7E8;
+	Tue, 24 Feb 2026 12:38:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=siemens.com header.i=zdenek.bouska@siemens.com header.b="c0FUpjxz"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="e1xgz6l8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-64-226.siemens.flowmailer.net (mta-64-226.siemens.flowmailer.net [185.136.64.226])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAAC737C102
-	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 12:38:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.226
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BFC239A7EE;
+	Tue, 24 Feb 2026 12:38:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771936714; cv=none; b=s9DibmbgtxkqVp4T5Ko9Q0r6sqExzdOnTljGzMnA/qWCaxgUllFRvJD3rFO0qBreuYknz5GZvsTPEyxU/Fs+J5SVouOFDneoQK3XmojAxDtYQ7xoG/lPFmjIx2pGjdCPWVzaLhu4YR+XcxNzGYOgQ4sg+hb1gPiNGjhLGgcb2/0=
+	t=1771936723; cv=none; b=qPgbnSFLcf60zJ2r2lTFcBc1/jJTS4KTmgtsiNTBIcr5tQgPEpXY91wbiQZVqu/yVrgJcKeJFScWgd1xOpdwTc1qZ7OST9DEg0GtM48C92je+WbMOdiboF4MhQIuySO9pR3XOfbXqKs5nt83vEZFALPU9hyPx59ZOh+l34Upltw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771936714; c=relaxed/simple;
-	bh=oXDKd50PcR3o8XNqPf8uMrmunzOoieZCrT9mA1rTgsY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=IEYf9AlRCF7Lln81riL4xACWz6dWwHrScTgI0Ntc3W/axZ8mRDfuOKHhXmCkBHMZqvAsgqd6uDtUfH4biKUmnaHYpWcMR8Kwj9mbwkFxHL90X/lGhkCmEkIPMGdwLO+HWN4MfBBozJp1bUtN0c5SpJjyCW9DekyI7cdOHYSR+HQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=zdenek.bouska@siemens.com header.b=c0FUpjxz; arc=none smtp.client-ip=185.136.64.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-64-226.siemens.flowmailer.net with ESMTPSA id 202602241238213481a00bee000207a0
-        for <netdev@vger.kernel.org>;
-        Tue, 24 Feb 2026 13:38:21 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm2;
- d=siemens.com; i=zdenek.bouska@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc;
- bh=ZK6pwPA0ICZ+Gacpu5r5lttbWewOZgHz7aEYNA6FSLk=;
- b=c0FUpjxzDpLswDhMBIkvrYF6Y53m3VIxMptKCF63PXx8L2xGtB8D89PuQZ1PBVS7/JHbFk
- jMHtrok/h42ZkISlsW7LK9Nm2oJ/FiGSyTDSpjzQsrKPVnHJYKROhIgZQwdaK4Jvh1RBDVzt
- NaGr+0gxAhDfogMllwYXC4GfVJfvAoyBzpU97ieCzdRUkZYEocvWgVKgg4xlJ3VL0qKAiUOl
- BfYMy091s4OOt+p60UZ/ad9DYkrvF+pxa0+qusrFj6tpBG1+VY5UTRGLNEkF7Nir3B3l7hVN
- nC7PPh2lYP74MCf17Pj42LPdeQjZjz7OlkLb+Nqxir5D85kR90Ayl16g==;
-From: Zdenek Bouska <zdenek.bouska@siemens.com>
-Date: Tue, 24 Feb 2026 13:38:13 +0100
-Subject: [PATCH] igc: fix page fault in XDP TX timestamps handling
+	s=arc-20240116; t=1771936723; c=relaxed/simple;
+	bh=+8dfnuPCvheAZoj489Lw7VaqrKEQ66nLtTo4AaRsAxw=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=PJYuKqBuVwXWcAKVxO3OKFSLNEBKwkCXFp7aTydv136zndE+H90i0tbd0VVAAdvAp/dBvAPbiYDns97cR8Dx5oH/J9+V50wPV5DDnLVpgIJ205LEsjVfQUEFnL4mYIJtyZe5uTu4oC8XJ5cHmdAyzMs+TJZPtqpwaLpw2HogT4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=e1xgz6l8; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id 63B3E20B6F02; Tue, 24 Feb 2026 04:38:36 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 63B3E20B6F02
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1771936716;
+	bh=fWYrBpZ0QKK9eLfeDvRYeB6kFeBxTaLv8KWU5s0DQvc=;
+	h=Date:From:To:Subject:From;
+	b=e1xgz6l8MW+phkYu38JX0G3e4yO51wiYtpZAZUt9bv0qraZ8WRh0iPY5WOsU/b5Cg
+	 0uklXhOxgBKiCgFT+7ZT5gHJsZ4Vn9jo1l4bvAKogf72UWfhmGteZ8+eJRavQFVKMN
+	 5kbWXRfbKncroWU+DLxLkKDzt5WcZoU4qPOkAxzM=
+Date: Tue, 24 Feb 2026 04:38:36 -0800
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	dipayanroy@microsoft.com
+Subject: [PATCH net] net: mana: Fix double destroy_workqueue on service
+ rescan PCI path
+Message-ID: <aZ2bzL64NagfyHpg@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260224-igc-fix-xdp-tx-tstamp-pagefault-v1-1-7c729ef61ee5@siemens.com>
-X-B4-Tracking: v=1; b=H4sIALSbnWkC/x2NQQqDMBAAvyJ7dkG3VopfKR62yZouVBuSKAHJ3
- w0eB4aZE6IElQhTc0KQQ6P+twp924D58uYE1VYG6mjsqCdUZ3DRjNl6TBlTTLx69Oxk4f2X0Az
- 8sTI8H6+RoFZ8kKrfh/dcygXMciYIcQAAAA==
-X-Change-ID: 20260212-igc-fix-xdp-tx-tstamp-pagefault-c4abde453862
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
- Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Stanislav Fomichev <sdf@fomichev.me>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Song Yoong Siang <yoong.siang.song@intel.com>, 
- Lai Peter Jun Ann <jun.ann.lai@intel.com>
-Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>, 
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
- Florian Bezdeka <florian.bezdeka@siemens.com>, 
- Zdenek Bouska <zdenek.bouska@siemens.com>
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-1328595:519-21489:flowmailer
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[siemens.com,reject];
-	R_DKIM_ALLOW(-0.20)[siemens.com:s=fm2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260506-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-260507-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zdenek.bouska@siemens.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[siemens.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,siemens.com:mid,siemens.com:dkim,siemens.com:email]
-X-Rspamd-Queue-Id: 7E2E51870E9
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.microsoft.com:dkim,linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid]
+X-Rspamd-Queue-Id: F2B47187125
 X-Rspamd-Action: no action
 
-If an XDP application that requested TX timestamping is shutting down
-while the link of the interface in use is still up the following kernel
-splat is reported:
+While testing corner cases in the driver, a use-after-free crash
+was found on the service rescan PCI path.
 
-[  883.803618] [   T1554] BUG: unable to handle page fault for address: ffffcfb6200fd008
-...
-[  883.803650] [   T1554] Call Trace:
-[  883.803652] [   T1554]  <TASK>
-[  883.803654] [   T1554]  igc_ptp_tx_tstamp_event+0xdf/0x160 [igc]
-[  883.803660] [   T1554]  igc_tsync_interrupt+0x2d5/0x300 [igc]
-...
+When mana_serv_reset() calls mana_gd_suspend(), mana_gd_cleanup()
+destroys gc->service_wq. If the subsequent mana_gd_resume() fails
+with -ETIMEDOUT or -EPROTO, the code falls through to
+mana_serv_rescan() which triggers pci_stop_and_remove_bus_device().
+This invokes the PCI .remove callback (mana_gd_remove), which calls
+mana_gd_cleanup() a second time, attempting to destroy the already-
+freed workqueue. Fix this by NULL-checking gc->service_wq in
+mana_gd_cleanup() and setting it to NULL after destruction.
 
-During shutdown of the TX ring the xsk_meta pointers are left behind, so
-that the IRQ handler is trying to touch them.
+Call stack of issue for reference:
+[Sat Feb 21 18:53:48 2026] Call Trace:
+[Sat Feb 21 18:53:48 2026]  <TASK>
+[Sat Feb 21 18:53:48 2026]  mana_gd_cleanup+0x33/0x70 [mana]
+[Sat Feb 21 18:53:48 2026]  mana_gd_remove+0x3a/0xc0 [mana]
+[Sat Feb 21 18:53:48 2026]  pci_device_remove+0x41/0xb0
+[Sat Feb 21 18:53:48 2026]  device_remove+0x46/0x70
+[Sat Feb 21 18:53:48 2026]  device_release_driver_internal+0x1e3/0x250
+[Sat Feb 21 18:53:48 2026]  device_release_driver+0x12/0x20
+[Sat Feb 21 18:53:48 2026]  pci_stop_bus_device+0x6a/0x90
+[Sat Feb 21 18:53:48 2026]  pci_stop_and_remove_bus_device+0x13/0x30
+[Sat Feb 21 18:53:48 2026]  mana_do_service+0x180/0x290 [mana]
+[Sat Feb 21 18:53:48 2026]  mana_serv_func+0x24/0x50 [mana]
+[Sat Feb 21 18:53:48 2026]  process_one_work+0x190/0x3d0
+[Sat Feb 21 18:53:48 2026]  worker_thread+0x16e/0x2e0
+[Sat Feb 21 18:53:48 2026]  kthread+0xf7/0x130
+[Sat Feb 21 18:53:48 2026]  ? __pfx_worker_thread+0x10/0x10
+[Sat Feb 21 18:53:48 2026]  ? __pfx_kthread+0x10/0x10
+[Sat Feb 21 18:53:48 2026]  ret_from_fork+0x269/0x350
+[Sat Feb 21 18:53:48 2026]  ? __pfx_kthread+0x10/0x10
+[Sat Feb 21 18:53:48 2026]  ret_from_fork_asm+0x1a/0x30
+[Sat Feb 21 18:53:48 2026]  </TASK>
 
-This issue is now being fixed by cleaning up the stale xsk meta data on
-TX shutdown. TX timestamps on other queues remain unaffected.
-
-Fixes: 15fd021bc427 ("igc: Add Tx hardware timestamp request for AF_XDP zero-copy packet")
-Signed-off-by: Zdenek Bouska <zdenek.bouska@siemens.com>
+Fixes: 505cc26bcae0 ("net: mana: Add support for auxiliary device servicing events")
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
 ---
- drivers/net/ethernet/intel/igc/igc.h      |  2 ++
- drivers/net/ethernet/intel/igc/igc_main.c |  7 +++++++
- drivers/net/ethernet/intel/igc/igc_ptp.c  | 33 +++++++++++++++++++++++++++++++
- 3 files changed, 42 insertions(+)
+ drivers/net/ethernet/microsoft/mana/gdma_main.c | 5 ++++-
+ drivers/net/ethernet/microsoft/mana/mana_en.c   | 4 +++-
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
-index a427f05814c1ae7330c6f7034cd0f2b40b74dab6..17236813965d334f14eba928affbd4f91b96ecd4 100644
---- a/drivers/net/ethernet/intel/igc/igc.h
-+++ b/drivers/net/ethernet/intel/igc/igc.h
-@@ -781,6 +781,8 @@ int igc_ptp_hwtstamp_set(struct net_device *netdev,
- 			 struct kernel_hwtstamp_config *config,
- 			 struct netlink_ext_ack *extack);
- void igc_ptp_tx_hang(struct igc_adapter *adapter);
-+void igc_ptp_clear_xsk_tx_tstamp_queue(struct igc_adapter *adapter,
-+				       u16 queue_id);
- void igc_ptp_read(struct igc_adapter *adapter, struct timespec64 *ts);
- void igc_ptp_tx_tstamp_event(struct igc_adapter *adapter);
+diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+index 0055c231acf6..3926d18f1840 100644
+--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
++++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+@@ -1946,7 +1946,10 @@ static void mana_gd_cleanup(struct pci_dev *pdev)
  
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 89a321a344d263ace5c66f7ade782b40cc482566..570e90fab67d653bbbb242d242d0b64a49fba602 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -193,6 +193,7 @@ static void igc_unmap_tx_buffer(struct device *dev, struct igc_tx_buffer *buf)
-  */
- static void igc_clean_tx_ring(struct igc_ring *tx_ring)
- {
-+	struct igc_adapter *adapter;
- 	u16 i = tx_ring->next_to_clean;
- 	struct igc_tx_buffer *tx_buffer = &tx_ring->tx_buffer_info[i];
- 	u32 xsk_frames = 0;
-@@ -264,6 +265,12 @@ static void igc_clean_tx_ring(struct igc_ring *tx_ring)
- 	/* reset next_to_use and next_to_clean */
- 	tx_ring->next_to_use = 0;
- 	tx_ring->next_to_clean = 0;
-+
-+	/* Clear any lingering XSK TX timestamp requests */
-+	if (test_bit(IGC_RING_FLAG_TX_HWTSTAMP, &tx_ring->flags)) {
-+		adapter = netdev_priv(tx_ring->netdev);
-+		igc_ptp_clear_xsk_tx_tstamp_queue(adapter, tx_ring->queue_index);
+ 	mana_gd_remove_irqs(pdev);
+ 
+-	destroy_workqueue(gc->service_wq);
++	if (gc->service_wq) {
++		destroy_workqueue(gc->service_wq);
++		gc->service_wq = NULL;
 +	}
+ 	dev_dbg(&pdev->dev, "mana gdma cleanup successful\n");
  }
  
- /**
-diff --git a/drivers/net/ethernet/intel/igc/igc_ptp.c b/drivers/net/ethernet/intel/igc/igc_ptp.c
-index 7aae83c108fd7611b00bf075592f93a902b83422..98491346d21b80925ce42ba276d851d4318e66b7 100644
---- a/drivers/net/ethernet/intel/igc/igc_ptp.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ptp.c
-@@ -576,6 +576,39 @@ static void igc_ptp_clear_tx_tstamp(struct igc_adapter *adapter)
- 	spin_unlock_irqrestore(&adapter->ptp_tx_lock, flags);
- }
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index 9b5a72ada5c4..f69e42651359 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -3762,7 +3762,9 @@ void mana_rdma_remove(struct gdma_dev *gd)
+ 	}
  
-+/**
-+ * igc_ptp_clear_xsk_tx_tstamp_queue - Clear pending XSK TX timestamps for a queue
-+ * @adapter: Board private structure
-+ * @queue_id: TX queue index to clear timestamps for
-+ *
-+ * Iterates over all TX timestamp registers and releases any pending
-+ * timestamp requests associated with the given TX queue. This is
-+ * called when an XDP pool is being disabled to ensure no stale
-+ * timestamp references remain.
-+ */
-+void igc_ptp_clear_xsk_tx_tstamp_queue(struct igc_adapter *adapter, u16 queue_id)
-+{
-+	unsigned long flags;
-+	int i;
+ 	WRITE_ONCE(gd->rdma_teardown, true);
+-	flush_workqueue(gc->service_wq);
 +
-+	spin_lock_irqsave(&adapter->ptp_tx_lock, flags);
-+
-+	for (i = 0; i < IGC_MAX_TX_TSTAMP_REGS; i++) {
-+		struct igc_tx_timestamp_request *tstamp = &adapter->tx_tstamp[i];
-+
-+		if (tstamp->buffer_type != IGC_TX_BUFFER_TYPE_XSK)
-+			continue;
-+		if (tstamp->xsk_queue_index != queue_id)
-+			continue;
-+		if (!tstamp->xsk_tx_buffer)
-+			continue;
-+
-+		igc_ptp_free_tx_buffer(adapter, tstamp);
-+	}
-+
-+	spin_unlock_irqrestore(&adapter->ptp_tx_lock, flags);
-+}
-+
- static void igc_ptp_disable_tx_timestamp(struct igc_adapter *adapter)
- {
- 	struct igc_hw *hw = &adapter->hw;
-
----
-base-commit: 05f7e89ab9731565d8a62e3b5d1ec206485eeb0b
-change-id: 20260212-igc-fix-xdp-tx-tstamp-pagefault-c4abde453862
-
-Best regards,
++	if (gc->service_wq)
++		flush_workqueue(gc->service_wq);
+ 
+ 	if (gd->adev)
+ 		remove_adev(gd);
 -- 
-Zdenek Bouska
-
-Siemens, s.r.o.
-Foundational Technologies
+2.43.0
 
 
