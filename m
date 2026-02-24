@@ -1,156 +1,237 @@
-Return-Path: <netdev+bounces-260309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260310-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2OA1J4QKnWmtMgQAu9opvQ
-	(envelope-from <netdev+bounces-260309-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 03:18:44 +0100
+	id yEN1LrgKnWmtMgQAu9opvQ
+	(envelope-from <netdev+bounces-260310-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 03:19:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02915180F39
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 03:18:38 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA278180F4F
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 03:19:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 800373044B90
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 02:18:37 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 731403006D42
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 02:19:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A16971EDA2C;
-	Tue, 24 Feb 2026 02:18:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80B6E2459D1;
+	Tue, 24 Feb 2026 02:19:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=smail.nju.edu.cn header.i=@smail.nju.edu.cn header.b="UJpBUgtQ"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Ndn0Pf+3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D631DFDB8;
-	Tue, 24 Feb 2026 02:18:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.243.244.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB38C1E9B1A;
+	Tue, 24 Feb 2026 02:19:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771899516; cv=none; b=KUT6+51STRBVdiDgltJQWHp1RkAX3Ut5n7qomUHEY8Zrmb7gM59eOAHIEvz3BnNbm1mq8ZFq+Af8m2NfWUSG4+x4YIS9kRPjNNw9HxzSC2N+5N8RUfLVqrzgEUGBMa7oorN0R3ho0X17sGV0p/8n+KVPomHldMujFllkzUz9sKE=
+	t=1771899571; cv=none; b=GxrtELfr6bFKEDchk8Gm/1rZb5VEVNvG2I5zV9SjMyJeHTA2mWOCwBPgbXRsJPlYobJhV1dJGjNB7DFr1Flkx2xVhvEtRX5g+Hlt5S2Tfh3r8gb5kqIKriHquXU9MIr7zqepi9d2oIRQ0qQmh6005ULDi1Cbxt/67RsW1q2II20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771899516; c=relaxed/simple;
-	bh=44ACn5di4J3w1od786Mkcp7QTDFfaTzS+0u2GgvELDQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dzzWkFbEuu6parHIdPnxHD54006l37h6BCmKOthAVABogA2ZI43gMU9q6TBCAQksVylsJbOm3tKMSbp61DyNsaQ0sMZ4SWPZ7unRhKFv5eXzejnmvr1HdJBwqI/o9Kt7DR3XuRSXTB6UTsbpmK7IwP4CSvUTwEc1OltOxrYmQoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=smail.nju.edu.cn; spf=pass smtp.mailfrom=smail.nju.edu.cn; dkim=pass (1024-bit key) header.d=smail.nju.edu.cn header.i=@smail.nju.edu.cn header.b=UJpBUgtQ; arc=none smtp.client-ip=54.243.244.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=smail.nju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=smail.nju.edu.cn
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=smail.nju.edu.cn;
-	s=iohv2404; t=1771899508;
-	bh=LbvuuLJu4CgcdoGs6th6vU7TlTYjgjZg+n5UER/RNCo=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version;
-	b=UJpBUgtQaM0WmSp3JiRjx0Ei9Cf8yOvKh45gSusQgi4RvYOL+pxqEP9pFKOlbFvqM
-	 QJR1ZfGY/CrH7bsHhaAbqeWv6PAp32lSoJHCzhnrNqFV5FGI5oTYWhp7uoFjGU5HnN
-	 J/r6s3GyXXECGShsOZcUmgWOdkbu/xP/4/0biYoM=
-X-QQ-mid: esmtpgz10t1771899506t16bd0e9e
-X-QQ-Originating-IP: 50H3+bxVZtbNaEbnu1Lugn3yYR141lDfnh1NJi6sweU=
-Received: from localhost.localdomain ( [116.172.93.199])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 24 Feb 2026 10:18:23 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 4511652541337569547
-EX-QQ-RecipientCnt: 14
-From: kexinsun <kexinsun@smail.nju.edu.cn>
-To: steffen.klassert@secunet.com
-Cc: herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	julia.lawall@inria.fr,
-	xutong.ma@inria.fr,
-	yunbolyu@smu.edu.sg,
-	ratnadiraw@smu.edu.sg,
-	kexinsun@smail.nju.edu.cn
-Subject: [PATCH] xfrm: update outdated comment
-Date: Tue, 24 Feb 2026 10:18:21 +0800
-Message-Id: <20260224021821.1502-1-kexinsun@smail.nju.edu.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1771899571; c=relaxed/simple;
+	bh=P1/UInNRTPbopanuJYg1QuNK9n0JH1eKu+uglbJlSL8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nExCm5cTQpVzr8bPw3lwve8ewUO+BEjr8wnoVZ88sE8PKjF6xFVQ5Q2g/ZpowKA8Tlo4Q7QX7vn+L08owIwnePeuMq4nx4JO6+Lup1Xi4jxEsrgg61ezzEoi4pTULq2eMgtbccdD4784OLk2zLpU4r4F4u2cNmfdo1STo25oWcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Ndn0Pf+3; arc=none smtp.client-ip=115.124.30.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1771899565; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=9NJlGZYkY4YMHtEUyi3QBzwIAufqLmLbDzPVClrsg80=;
+	b=Ndn0Pf+3yf93iNGFbLKetXLPq/P10jtU5orrsJ+wsyIeJPG8MSTHYd+EeTFBN0iWGODnc56Cwp+ixBkKOvfOhGMJdqhOp4uSSbCKzcydUONPkNwFaMCBRfvTiQ5aNoO+fipXStQuqqOqY8JBW6FmNyFKN+UCdcVBWVgTGGDigjI=
+Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WzhsA2w_1771899564 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 24 Feb 2026 10:19:24 +0800
+Date: Tue, 24 Feb 2026 10:19:24 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com    >
+To: Mahanta Jambigi <mjambigi@linux.ibm.com>
+Cc: "D. Wythe" <alibuda@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dust Li <dust.li@linux.alibaba.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sidraya Jayagond <sidraya@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Simon Horman <horms@kernel.org>, Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org, oliver.yang@linux.alibaba.com,
+	pasic@linux.ibm.com
+Subject: Re: [PATCH RFC net-next] net/smc: transition to RDMA core CQ pooling
+Message-ID: <20260224021924.GA53803@j66a10360.sqa.eu95>
+References: <20260202094800.30373-1-alibuda@linux.alibaba.com>
+ <daefb72f-398e-489f-bdbc-db997ef9c5ae@linux.ibm.com>
+ <20260209075338.GA61095@j66a10360.sqa.eu95>
+ <2d71bab3-161d-414e-90e3-0e408ca931c2@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:smail.nju.edu.cn:qybglogicsvrgz:qybglogicsvrgz5b-0
-X-QQ-XMAILINFO: N9i10iaAV/LhNslK1pwJ3a1JvcfP6WWVzUBn0EY74rstv1GcdEXcpwRK
-	ObSYs5454gfdSa6CjkQKJCuJKhiXQrNVsww0tPUE9Yu0M52Yea65P7I7kgABks1IsQpyMGd
-	PFtfzOh9yGg96faXOFNRIH/Vd0kisPrd8r3kxHg7nklGtV7ydncMuu7Q/mCLZDOKpQvGmN8
-	7zaMJed4Ztc7/aaGdR9bvyDv6UdLHJU4P963DQPDLPAyewPQPJNK0tZDBRqwcozdSlQhrG8
-	UJ2MQKMaLeVmrerp8agbQjYcvAn+n7QDnGjeljqoCwK4RRw+IHDZyi7iU7YUmIxc4USI/E+
-	MbAkPeebfoQgO4wQh1kUMNhuthbIemDTIGQ8aZ7CoYQ8dcq8Laanur/7Gh9hxWs6E5FmoKP
-	wwLg4AIpx7+IWyRP466Wyy4Xe+hsT5UFezlsPl0vIbU6+G/1Q9lEjDpK+siYT6KoS7dB684
-	ZTG2lR94OTjTZO4HAL0pzGr35hlT+9oORSmfuEkVjkX92OpcmyRSWr4Zxzrh0Citzp3DWYr
-	FC9zbBVyOccx6HAGaw5IyuWZUBHLZ8oQf/qYN+dGgrifrB/Rk7ckY7nhZTd3YtWfVE6hI8l
-	ucYwV/avALibvYST+0zQcyAnRq8AFlYEXBeupCAdvc/LjpiL5JigvG6XLlVvvO0xeJoBqRR
-	INpRYDOQQDOIibnGwsPTM88UrSBuofDkNoBV+e1nwLpvua3tjmKlP/T1vfMR0/IfPudMH9f
-	n4WAQELpamG0ot/PLkvRIDrmqpPv4bSQbQyP/PyYT7UN5PGneqvthF/CrtZ2+cE6LOaju5R
-	bp1v802ssDLpEo93Oso6tCqp25reJhbO3D+DGe7RVrdAcmcxIkph3PMDtabUnXWz2WJuToh
-	MBY+CbGjsofznrDTKWXaGxzNd3Nt7NnCgL0CS8I6htiIqbcM3OF4KpNvLfyXhlaRg1AGSQ5
-	MPr+UnHCqzQucvFmzlFwMmKlYwgVgeKK8wAiFX7q/vN+X8KShSx6bzz4300qJzuEEHGmoII
-	zZ7es6CCaG4gsWpi/qIwdwAp2LNopYyoIQxtXZgYXpT8SIYjYxVkgPYG3iZrHJQstWnvcLN
-	rucx6jvDt2gMSmjLR5YLByypQotyLEHFq3fZ78QC4Iffkn0m44ZbSU=
-X-QQ-XMRINFO: M/715EihBoGS47X28/vv4NpnfpeBLnr4Qg==
-X-QQ-RECHKSPAM: 0
+In-Reply-To: <2d71bab3-161d-414e-90e3-0e408ca931c2@linux.ibm.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-9.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260309-lists,netdev=lfdr.de];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[smail.nju.edu.cn:?];
+	TAGGED_FROM(0.00)[bounces-260310-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[kexinsun@smail.nju.edu.cn,netdev@vger.kernel.org];
-	DMARC_DNSFAIL(0.00)[smail.nju.edu.cn : SPF/DKIM temp error,reject];
-	TO_DN_NONE(0.00)[];
-	NEURAL_SPAM(0.00)[0.588];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	NEURAL_HAM(-0.00)[-0.996];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	R_DKIM_TEMPFAIL(0.00)[smail.nju.edu.cn:s=iohv2404];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,smail.nju.edu.cn:mid,nju.edu.cn:email]
-X-Rspamd-Queue-Id: 02915180F39
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.alibaba.com:dkim]
+X-Rspamd-Queue-Id: DA278180F4F
 X-Rspamd-Action: no action
 
-The function __xfrm4_bundle_create() was refactored into
-xfrm_bundle_create() (among others) by commit 25ee3286dcbc
-("xfrm: Merge common code into xfrm_bundle_create"). The
-responsibility for setting dst->obsolete to DST_OBSOLETE_FORCE_CHK
-now lives in xfrm_bundle_create(). Update the comment accordingly.
+On Fri, Feb 13, 2026 at 04:53:28PM +0530, Mahanta Jambigi wrote:
+> 
+> 
+> On 09/02/26 1:23 pm, D. Wythe wrote:
+> > On Fri, Feb 06, 2026 at 04:58:23PM +0530, Mahanta Jambigi wrote:
+> >>
+> >>
+> >> On 02/02/26 3:18 pm, D. Wythe wrote:
+> >>> The current SMC-R implementation relies on global per-device CQs
+> >>> and manual polling within tasklets, which introduces severe
+> >>> scalability bottlenecks due to global lock contention and tasklet
+> >>> scheduling overhead, resulting in poor performance as concurrency
+> >>> increases.
+> >>>
+> >>> Refactor the completion handling to utilize the ib_cqe API and
+> >>> standard RDMA core CQ pooling. This transition provides several key
+> >>> advantages:
+> >>>
+> >>> 1. Multi-CQ: Shift from a single shared per-device CQ to multiple
+> >>> link-specific CQs via the CQ pool. This allows completion processing
+> >>> to be parallelized across multiple CPU cores, effectively eliminating
+> >>> the global CQ bottleneck.
+> >>>
+> >>> 2. Leverage DIM: Utilizing the standard CQ pool with IB_POLL_SOFTIRQ
+> >>> enables Dynamic Interrupt Moderation from the RDMA core, optimizing
+> >>> interrupt frequency and reducing CPU load under high pressure.
+> >>>
+> >>> 3. O(1) Context Retrieval: Replaces the expensive wr_id based lookup
+> >>> logic (e.g., smc_wr_tx_find_pending_index) with direct context retrieval
+> >>> using container_of() on the embedded ib_cqe.
+> >>>
+> >>> 4. Code Simplification: This refactoring results in a reduction of
+> >>> ~150 lines of code. It removes redundant sequence tracking, complex lookup
+> >>> helpers, and manual CQ management, significantly improving maintainability.
+> >>>
+> >>> Performance Test: redis-benchmark with max 32 connections per QP
+> >>> Data format: Requests Per Second (RPS), Percentage in brackets
+> >>> represents the gain/loss compared to TCP.
+> >>>
+> >>> | Clients | TCP      | SMC (original)      | SMC (cq_pool)       |
+> >>> |---------|----------|---------------------|---------------------|
+> >>> | c = 1   | 24449    | 31172  (+27%)       | 34039  (+39%)       |
+> >>> | c = 2   | 46420    | 53216  (+14%)       | 64391  (+38%)       |
+> >>> | c = 16  | 159673   | 83668  (-48%)  <--  | 216947 (+36%)       |
+> >>> | c = 32  | 164956   | 97631  (-41%)  <--  | 249376 (+51%)       |
+> >>> | c = 64  | 166322   | 118192 (-29%)  <--  | 249488 (+50%)       |
+> >>> | c = 128 | 167700   | 121497 (-27%)  <--  | 249480 (+48%)       |
+> >>> | c = 256 | 175021   | 146109 (-16%)  <--  | 240384 (+37%)       |
+> >>> | c = 512 | 168987   | 101479 (-40%)  <--  | 226634 (+34%)       |
+> >>>
+> >>> The results demonstrate that this optimization effectively resolves the
+> >>> scalability bottleneck, with RPS increasing by over 110% at c=64
+> >>> compared to the original implementation.
+> >>
+> >> I applied your patch to the latest kernel(6.19-rc8) & saw below
+> >> Performance results:
+> >>
+> >> 1) In my evaluation, I ran several *uperf* based workloads using a
+> >> request/response (RR) pattern, and I observed performance *degradation*
+> >> ranging from *4%* to *59%*, depending on the specific read/write sizes
+> >> used. For example, with a TCP RR workload using 50 parallel clients
+> >> (nprocs=50) sending a 200‑byte request and reading a 1000‑byte response
+> >> over a 60‑second run, I measured approximately 59% degradation compared
+> >> to SMC‑R original performance.
+> >>
+> > 
+> > The only setting I changed was net.smc.smcr_max_conns_per_lgr = 32, all
+> > other parameters were left at their default values. redis-benchmark is a
+> > classic Request/Response (RR) workload, which contradicts your test
+> > results. Since I'm unable to reproduce your results, it would be
+> > very helpful if you could share the specific test configuration for my
+> > analysis.
+> 
+> I used a simple client–server setup connected via 25 Gb/s RoCE_Express2
+> adapters on the same LAN(connection established via SMC-R v1). After
+> running the commands shown below, I observed a performance degradation
+> of up to 59%.
+> 
+> Server: smc_run uperf -s
+> Client: smc_run uperf -m rr1c-200x1000-50.xml
+> 
+> cat rr1c-200x1000-50.xml
+> 
+> <?xml version="1.0"?>
+> <profile name="TCP_RR">
+> 	<group nprocs="50">
+> 		<transaction iterations="1">
+> 			<flowop type="connect" options="remotehost=server_ip protocol=tcp
+> tcp_nodelay" />
+> 		</transaction>
+> 		<transaction duration="60">
+> 			<flowop type="write" options="size=200"/>
+> 			<flowop type="read" options="size=1000"/>
+> 		</transaction>
+> 		<transaction iterations="1">
+> 			<flowop type="disconnect" />
+> 		</transaction>
+> 	</group>
+> </profile>
 
-Signed-off-by: kexinsun <kexinsun@smail.nju.edu.cn>
----
- net/xfrm/xfrm_policy.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Using the exact same XML profile you provided, I tested this on a 25Gb
+NIC. I observed no degradation. Instead, performance improved
+significantly:
 
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index ee8bb445c4d3..326824af4928 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -3910,7 +3910,7 @@ EXPORT_SYMBOL(__xfrm_route_forward);
- 
- static struct dst_entry *xfrm_dst_check(struct dst_entry *dst, u32 cookie)
- {
--	/* Code (such as __xfrm4_bundle_create()) sets dst->obsolete
-+	/* Code (such as xfrm_bundle_create()) sets dst->obsolete
- 	 * to DST_OBSOLETE_FORCE_CHK to force all XFRM destinations to
- 	 * get validated by dst_ops->check on every use.  We do this
- 	 * because when a normal route referenced by an XFRM dst is
--- 
-2.25.1
+Original: ~1.08 Gb/s
+Patched: ~5.1 Gb/s
 
+I suspect the 59% drop might be due to connections falling back to TCP.
+Could you check smcss -a during your test to see if the traffic is
+actually running over SMC-R?
+
+> 
+> I installed redis-server on the server machine & redis-benchmark on the
+> client machine & I was able to establish the SMC-R using below commands.
+> If you could help me with the exact commands you used to measure the
+> redis-benchmark performance, I can try the same on my setup.
+> 
+> Server: smc_run redis-server --port <port_num> --save "" --appendonly no
+>   --protected-mode no --bind 0.0.0.0
+> Client: smc_run redis-benchmark -h <server_ip> -p <port_num> -n 10000 -c
+> 50 -t ping_inline,ping_bulk -q
+
+Here are the exact commands and scripts I used for the
+redis-benchmark:
+
+Server: smc_run redis-server --protected-mode no --save
+
+Client: smc_run redis-benchmark -h <server_ip> -n 5000000 -t set --threads 3
+-c <conn_num>
+
+D. Wythe
 
