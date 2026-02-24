@@ -1,63 +1,62 @@
-Return-Path: <netdev+bounces-260672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260673-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aVHUM9Q2nmmqUAQAu9opvQ
-	(envelope-from <netdev+bounces-260672-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 00:40:04 +0100
+	id kKFZLvc3nmm1UAQAu9opvQ
+	(envelope-from <netdev+bounces-260673-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 00:44:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2413118E2A1
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 00:40:04 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1880218E2D3
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 00:44:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 46BAE30523D5
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 23:40:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9A8F53053773
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 23:44:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A713363C71;
-	Tue, 24 Feb 2026 23:40:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA08F363C7C;
+	Tue, 24 Feb 2026 23:44:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O64OJIjj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N0sfX/HQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6683C363C65;
-	Tue, 24 Feb 2026 23:40:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8489721638D;
+	Tue, 24 Feb 2026 23:44:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771976401; cv=none; b=E4EetWzYwAQr3SKdT/ygAzKDnvrOa480kGUUyO4chjjtksAzo+5M/s+kOD4ZIC0JeGPUun+MS23gEJCKLZsBmNHDnp+sg5lS+jbahOGdiIPjnXTyeOjN6uycf4UYljkC9bNZOtET2SmIiAjimztelU7xdyc59UnmsniYPbF9/K8=
+	t=1771976689; cv=none; b=eFWx1n2ZNnbmSpzUTH8guV3wjiabBeRZzPAiCNQyMkElhjv+t5DVfP4dhWwQHoTJgEsb9EbQMQ/nUvDe/SwTn+XnZnwECh0+vDqwml480JgWq8p7K+sz06RCyPexuxKma2h08eLN94oTvdBXuL+BgQj8JR1tZrIsz9AO0SmD9Xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771976401; c=relaxed/simple;
-	bh=RfpPTLmpfCQiuYVVZmxNZXm7WaThlYc20pYBYNDxcqw=;
+	s=arc-20240116; t=1771976689; c=relaxed/simple;
+	bh=Te9Sf434ncdnfzDw9exdh64Guu6TGx9lSLSzoDo6dxk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Uwfzi8MXsAKVSDlgdPSfenpeQuuNuhWqVBMHYvwRO4tdwfI1w3baJjTgYPxxF1vvIZ3kHilGFfjOS0qXxOxO8xYYHpZDBst/Zb4XgSZ3lWpfwYnJe99MKUf6j56D7pcb24iyGbc7UXglntsVEA5Cs6SKlOEXdPkBKnFHcMafCJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O64OJIjj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FA34C116D0;
-	Tue, 24 Feb 2026 23:40:00 +0000 (UTC)
+	 MIME-Version:Content-Type; b=iu3UnLE+hzHbukniljuqHduo4AY+ZkU5iZ+S729xfWQMGzCk3ggVhYFbp45ClCOCkjGwHfOXNXPZQP0laHA7jj68AIUi0vOWnhHsNiYQ14qU/G9ZqWWBU/1Q+6L2tRKETK0WLL6Ey4qtl+V5OnCB4ilhHe6UL9CO+FsKI3ZA24c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N0sfX/HQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96E6EC116D0;
+	Tue, 24 Feb 2026 23:44:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771976400;
-	bh=RfpPTLmpfCQiuYVVZmxNZXm7WaThlYc20pYBYNDxcqw=;
+	s=k20201202; t=1771976689;
+	bh=Te9Sf434ncdnfzDw9exdh64Guu6TGx9lSLSzoDo6dxk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=O64OJIjjtxptlfTvC7kWkQyoYlL3MmhLhfCq2O3vhFxogM6e4jaSU5Ri5UMo3v0/L
-	 EnnTqGv49PQjDsI/JjSyXrGtyBXXFoQ1iVI2+Iy4h/xCiWy+dmFCY49+vxd3GzoRdB
-	 uiYjLHo0wkSk4YvyazyGKH6lWwXZLxH8W8mWAlIv40zL/M8c5hqSDe5j762fQvxpDo
-	 PxR58i2Eu7j8ROf6rtUV5q8yzEnbjja22o01DO73IzASnHTrKheyNdf6nBDBkwBgAy
-	 /DGCS0m/Pfl70ZUmIR1YuIsiz3kW8yFIQIja8YPaIDdFZcoYlF+MGaPXC4gWVQEfqy
-	 M9Sl0xXlb6MOA==
-Date: Tue, 24 Feb 2026 15:39:59 -0800
+	b=N0sfX/HQPZZm/5dIbvJN9WmvSMdgFLV3+BggJukbhaVUT1VBNxaltJyCJctKN/Ql3
+	 /FPPl8Le13kdRHYUMxoNCtm90AL1CdoQIzsyGZ5nNIiD9Mg3snvzBGaO6S/WTE+yJ3
+	 CQSz0jxcuOxfAH2KA6oDKrUolyQvj3NKw/lKtR7ermp0tePh8ypf/5uriiBVvT9sOH
+	 pxJFCZTsjs5yRt/rjMjeZIRU08DAo9wqr8K5Om1yNXyv2u3GZ8aOY0j9zIhmf0OiCT
+	 zg8Rm/6/SC/6oI1GWwPSCTEZBujz2KJYQpy7q+PWB+9XiWfU8EPtPCS2Sks+S2zX1H
+	 POHDLZmPRfoCQ==
+Date: Tue, 24 Feb 2026 15:44:47 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Nimrod Oren <noren@nvidia.com>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
- <ilias.apalodimas@linaro.org>, "David S. Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Dragos
- Tatulea <dtatulea@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [RFC net-next] net: page_pool: cap alloc cache size and refill
- by pool ring size
-Message-ID: <20260224153959.377a8e32@kernel.org>
-In-Reply-To: <20260223092410.2149014-1-noren@nvidia.com>
-References: <20260223092410.2149014-1-noren@nvidia.com>
+To: Sun Jian <sun.jian.kdev@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+ davem@davemloft.net, horms@kernel.org, shuah@kernel.org, kees@kernel.org,
+ luto@amacapital.net, wad@chromium.org
+Subject: Re: [PATCH v2 1/2] selftests/harness: order TEST_F and XFAIL_ADD
+ constructors
+Message-ID: <20260224154447.61be24de@kernel.org>
+In-Reply-To: <20260224113900.3331-1-sun.jian.kdev@gmail.com>
+References: <20260222111847.692325-1-sun.jian.kdev@gmail.com>
+	<20260224113900.3331-1-sun.jian.kdev@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,54 +66,61 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260672-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-260673-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2413118E2A1
+X-Rspamd-Queue-Id: 1880218E2D3
 X-Rspamd-Action: no action
 
-On Mon, 23 Feb 2026 11:24:10 +0200 Nimrod Oren wrote:
-> I'd appreciate feedback on:
-> * Whether this per-pool cache capping approach makes sense
-> * If so, which option is preferable
-> * Any alternative suggestions to better cap/scale the page_pool cache
->   parameters for large pages
+On Tue, 24 Feb 2026 19:38:59 +0800 Sun Jian wrote:
+>   *
+>   * EXPECT_* and ASSERT_* are valid in a TEST() { } context.
+>   */
+> +#define KSELFTEST_PRIO_TEST_F  20000
+> +#define KSELFTEST_PRIO_XFAIL   20001
+> +
+>  #define TEST_SIGNAL(test_name, signal) __TEST_IMPL(test_name, signal)
 
-I'd simply change the defines based on PAGE_SIZE. The allocation batch
-size has nothing to do with the ring size, it's just amortizing
-allocations within a single NAPI cycle.
+You inserted these defines between the kdoc for TEST_SIGNAL() and its
+definition.
 
-#if PAGE_SIZE >= 64K
-#define PP_ALLOC_CACHE_REFILL	16
-#elif PAGE_SIZE >= 16K
-#define PP_ALLOC_CACHE_REFILL	32
-#else
-#define PP_ALLOC_CACHE_REFILL	64
-#endif
+When you respin, two notes:
+ - please wait 24h after the previous version before sending a new one,
+   to allow people in all timezones to comment and avoid splintering
+   the discussion
+ - please start a new thread for each submission, and refer to the
+   previous one with a link in the changelog:
 
-#define PP_ALLOC_CACHE_SIZE	(PP_ALLOC_CACHE_REFILL * 2)
+ v2:
+  - bla
+  - bla
+ v1: https://lore.kernel.org/20260224104434.14912-1-sun.jian.kdev@gmail.com
+-- 
+pw-bot: cr
 
