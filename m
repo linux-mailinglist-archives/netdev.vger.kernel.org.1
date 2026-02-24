@@ -1,154 +1,206 @@
-Return-Path: <netdev+bounces-260263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260264-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sN4fCwjrnGnqMAQAu9opvQ
-	(envelope-from <netdev+bounces-260263-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 01:04:24 +0100
+	id YHsUHxXsnGnqMAQAu9opvQ
+	(envelope-from <netdev+bounces-260264-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 01:08:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C79981801CA
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 01:04:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3504180239
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 01:08:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B007A3081808
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:04:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DAC10304C056
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:08:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFC8212D21B;
-	Tue, 24 Feb 2026 00:04:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AF9F288D2;
+	Tue, 24 Feb 2026 00:08:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BiCxi3L9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I+jGxPVu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB3473EBF3A;
-	Tue, 24 Feb 2026 00:04:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58057288AD
+	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 00:08:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771891447; cv=none; b=IZhNJnfHSwRwgEeBoyhtx/43E80eSQkLqvXAExdXib7UlrgcV1cESIdEnVFg4flNCsdQXWRhKOSGuvxzegrj+smCRAT7RD9GW7pBbjEdPiMykd9ma7YxoPrKiTaH6TFWv2WJnsGQt61gpm27n2EZN92qwa4zJPNN9Kn4yFNPAew=
+	t=1771891724; cv=none; b=ApsrPlpMXgyfnsgrz2abhDOQws1F2QBa6BIG3MXYiDPPvV/aGiiO8gjmLQ4sRNt4Ho20oKuRSLIWb+eecjnvb3NPKDYdTbnOCRQ0LKFjBvjhnXnyeI7PN9HAMChzVn7EXSwK4BRAJ2J083R1UDO6ogrZgBm79OKaHZyQq74UEb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771891447; c=relaxed/simple;
-	bh=eSEVzSG1u7kDX0qIB57v1bGEdvuxp7q/644aS2mjq3Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EUWhWVfdRsZ9Quo3bUn6Vo+FlBriw+gEfnVK9MtfSoow7SkR/FBrUN2FPNGDok1FeyKeJcbQwZYYOhvDb46X9nSr7xyUHXM0Oiugx0fhQw8f/wUbPBGzDnJZ8SOLvEOe5eqEUT/E+tC1RCHRl0T0JpDL80/J2Yam9Uoffkwb3YY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BiCxi3L9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E022C116C6;
-	Tue, 24 Feb 2026 00:04:03 +0000 (UTC)
+	s=arc-20240116; t=1771891724; c=relaxed/simple;
+	bh=X+dD3Zd4BKRK6kL2365WEU6XRvxLSGbOCCn8RgFzyTo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IrMLMz7NcZAo/VfD5U0rbsq+HFcuz7DhNfTzyiw4I2cNll8Gg5oGzfrvLU75Gax8hMrz6iw5sXaeA8X6dSTITq+VsyPdScjqArgIm4jERg0+DLJXp7dF16y8kQwbXzN1eyfqKyGVTH/ojOSrCmxGgYWWiOo+OXCF2qZD4B0nIjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I+jGxPVu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EB24C116C6;
+	Tue, 24 Feb 2026 00:08:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771891447;
-	bh=eSEVzSG1u7kDX0qIB57v1bGEdvuxp7q/644aS2mjq3Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BiCxi3L9JoXgkrh8SC5MAkJMhbY/Gt/ee8dkTYQlEReSuB4BTdHAinqlJ2OFDp6yS
-	 K2IocFIKpN9ibOJpRL9+VOLTSUbH7qQsPiBKrovipxTbo9eajt0gUvhxCDhwVDhO+8
-	 5Rlxa1CWbGyQ9Q36KM5NC+FfklyKper67d1Qv2aJIuTZ7s4KnLHKQM7iB0zRPc84mq
-	 jsXCWBPoX2cNDpVLYgAQmic4uvU8sr2uc48rEwfkKkj6Mxf3f1OBn5Wx+AaROlWqSn
-	 ntIjCz+6RR634lgigRfzRx83aoqzpm4WdYAuAXJwSFy0UCaudKb02bX6tegaaBV0nb
-	 MfkMoAbVPBZkQ==
-Date: Mon, 23 Feb 2026 16:04:02 -0800
+	s=k20201202; t=1771891723;
+	bh=X+dD3Zd4BKRK6kL2365WEU6XRvxLSGbOCCn8RgFzyTo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=I+jGxPVuXrKWFUOi+JgcirOBI6W0Amal5bGhV+5qq0sDCQbgyXPLDZB4clcWXfclG
+	 eKaIeULDasyBVSAjwQ7CmHMImCPMWybYlnMFL13Jt7jRqAkQZgZkJY6EcdrHRbMnxJ
+	 0wlZcl5/wlV1qIer6xdULZkTWVqrRXuOzFngn7FLK4g9qIyuKGz5mjvvY1YaJImU6B
+	 XRTRc3X3zvnC5XF+6HoZMwraiN5R6HrCYhsN2P4MlxMAqIUVg3VpqA4N1qGHk2i6Ar
+	 e2xBy0mHynEsWizj0TE/JnTK+nJUy+21v8/JLdT4rJ7bfEhK8DpfyNKbhkiE0yP1Dp
+	 QwPF1n3KAA7Sw==
 From: Jakub Kicinski <kuba@kernel.org>
-To: Shawn Lin <shawn.lin@rock-chips.com>
-Cc: Bjorn Helgaas <bhelgaas@google.com>, "Vaibhaav Ram T . L"
- <vaibhaavram.tl@microchip.com>, Kumaravel Thiagarajan
- <kumaravel.thiagarajan@microchip.com>, Even Xu <even.xu@intel.com>, Xinpeng
- Sun <xinpeng.sun@intel.com>, Srinivas Pandruvada
- <srinivas.pandruvada@linux.intel.com>, Jiri Kosina <jikos@kernel.org>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>, Zhou Wang
- <wangzhou1@hisilicon.com>, Longfang Liu <liulongfang@huawei.com>, Vinod
- Koul <vkoul@kernel.org>, Lee Jones <lee@kernel.org>, Jijie Shao
- <shaojijie@huawei.com>, Jian Shen <shenjian15@huawei.com>, Sunil Goutham
- <sgoutham@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Heiner
- Kallweit <hkallweit1@gmail.com>, "David S . Miller" <davem@davemloft.net>,
- Jeff Hugo <jeff.hugo@oss.qualcomm.com>, Oded Gabbay <ogabbay@kernel.org>,
- Maciej Falkowski <maciej.falkowski@linux.intel.com>, Karol Wachowski
- <karol.wachowski@linux.intel.com>, Min Ma <mamin506@gmail.com>, Lizhi Hou
- <lizhi.hou@amd.com>, Andreas Noever <andreas.noever@gmail.com>, Mika
- Westerberg <westeri@kernel.org>, Tomasz Jeznach <tjeznach@rivosinc.com>,
- Will Deacon <will@kernel.org>, Xinliang Liu <xinliang.liu@linaro.org>, Tian
- Tao <tiantao6@hisilicon.com>, Davidlohr Bueso <dave@stgolabs.net>, Jonathan
- Cameron <jonathan.cameron@huawei.com>, Srujana Challa
- <schalla@marvell.com>, Bharat Bhushan <bbhushan2@marvell.com>, Antoine
- Tenart <atenart@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, Raag
- Jadav <raag.jadav@intel.com>, Hans de Goede <hansg@kernel.org>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby
- <jirislaby@kernel.org>, Andy Shevchenko <andy@kernel.org>, Manivannan
- Sadhasivam <mani@kernel.org>, Mika Westerberg
- <mika.westerberg@linux.intel.com>, Andi Shyti <andi.shyti@kernel.org>,
- Robert Richter <rric@kernel.org>, Mark Brown <broonie@kernel.org>, Nirmal
- Patel <nirmal.patel@linux.intel.com>, Kurt Schwemmer
- <kurt.schwemmer@microsemi.com>, Logan Gunthorpe <logang@deltatee.com>,
- Linus Walleij <linusw@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>,
- Sakari Ailus <sakari.ailus@linux.intel.com>, Bingbu Cao
- <bingbu.cao@intel.com>, Ulf Hansson <ulf.hansson@linaro.org>, Arnd Bergmann
- <arnd@arndb.de>, Benjamin Tissoires <bentiss@kernel.org>,
- linux-input@vger.kernel.org, linux-i3c@lists.infradead.org,
- dmaengine@vger.kernel.org, Philipp Stanner <phasta@kernel.org>,
- netdev@vger.kernel.org, nic_swsd@realtek.com,
- linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-usb@vger.kernel.org, iommu@lists.linux.dev,
- linux-riscv@lists.infradead.org, David Airlie <airlied@gmail.com>, Simona
- Vetter <simona@ffwll.ch>, linux-cxl@vger.kernel.org,
- linux-crypto@vger.kernel.org, platform-driver-x86@vger.kernel.org,
- linux-serial@vger.kernel.org, mhi@lists.linux.dev, Andy Shevchenko
- <andriy.shevchenko@linux.intel.com>, Jan Dabros <jsd@semihalf.com>,
- linux-i2c@vger.kernel.org, Daniel Mack <daniel@zonque.org>, Haojian Zhuang
- <haojian.zhuang@gmail.com>, linux-spi@vger.kernel.org, Jonathan Derrick
- <jonathan.derrick@linux.dev>, linux-pci@vger.kernel.org,
- linux-gpio@vger.kernel.org, Mauro Carvalho Chehab <mchehab@kernel.org>,
- linux-media@vger.kernel.org, linux-mmc@vger.kernel.org
-Subject: Re: [PATCH 01/37] PCI/MSI: Add Devres managed IRQ vectors
- allocation
-Message-ID: <20260223160402.3ad8f079@kernel.org>
-In-Reply-To: <1771860581-82092-2-git-send-email-shawn.lin@rock-chips.com>
-References: <1771860581-82092-1-git-send-email-shawn.lin@rock-chips.com>
-	<1771860581-82092-2-git-send-email-shawn.lin@rock-chips.com>
+To: pvalerio@redhat.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	davem@davemloft.net,
+	claudiu.beznea@tuxon.dev,
+	nicolas.ferre@microchip.com,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	theo.lebrun@bootlin.com,
+	netdev@vger.kernel.org,
+	lorenzo@kernel.org,
+	andrew+netdev@lunn.ch
+Subject: Re: [net-next,v2,1/8] net: macb: move Rx buffers alloc from link up to open
+Date: Mon, 23 Feb 2026 16:08:32 -0800
+Message-ID: <20260224000841.140390-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260223182632.1681809-2-pvalerio@redhat.com>
+References: <20260223182632.1681809-2-pvalerio@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[google.com,microchip.com,intel.com,linux.intel.com,kernel.org,bootlin.com,hisilicon.com,huawei.com,marvell.com,lunn.ch,gmail.com,davemloft.net,oss.qualcomm.com,amd.com,rivosinc.com,linaro.org,stgolabs.net,gondor.apana.org.au,linuxfoundation.org,microsemi.com,deltatee.com,arndb.de,vger.kernel.org,lists.infradead.org,realtek.com,lists.freedesktop.org,lists.linux.dev,ffwll.ch,semihalf.com,zonque.org,linux.dev];
-	TAGGED_FROM(0.00)[bounces-260263-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[87];
+	TAGGED_FROM(0.00)[bounces-260264-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C79981801CA
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: D3504180239
 X-Rspamd-Action: no action
 
-On Mon, 23 Feb 2026 23:29:40 +0800 Shawn Lin wrote:
-> pcim_alloc_irq_vectors() and pcim_alloc_irq_vectors_affinity() are created for
-> pci device drivers which rely on the devres machinery to help cleanup the IRQ
-> vectors.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-If you can please add this API with just a few users, and then convert
-remaining users via the subsystem trees in the next cycle.
-There's no need to risk wasting maintainer time on conflicts with
-conversions like this.
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+net: macb: move Rx buffers alloc from link up to open
+
+This commit moves Rx buffer allocation to macb_open() to enable early
+error propagation, adding a fail_early parameter to control whether ring
+initialization fails fast or continues on error.
+
+> diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
+> index 87414a2ddf6e..2cb65ec37d44 100644
+> --- a/drivers/net/ethernet/cadence/macb.h
+> +++ b/drivers/net/ethernet/cadence/macb.h
+> @@ -1180,7 +1180,7 @@ struct macb_queue;
+>  struct macb_or_gem_ops {
+>  	int	(*mog_alloc_rx_buffers)(struct macb *bp);
+>  	void	(*mog_free_rx_buffers)(struct macb *bp);
+> -	void	(*mog_init_rings)(struct macb *bp);
+> +	int	(*mog_init_rings)(struct macb *bp, bool fail_early);
+>  	int	(*mog_rx)(struct macb_queue *queue, struct napi_struct *napi,
+>  			  int budget);
+>  };
+
+[ ... ]
+
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+> index 43cd013bb70e..8cc16f2b4024 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+
+[ ... ]
+
+> @@ -2544,8 +2547,6 @@ static int macb_alloc_consistent(struct macb *bp)
+>  		if (!queue->tx_skb)
+>  			goto out_err;
+>  	}
+> -	if (bp->macbgem_ops.mog_alloc_rx_buffers(bp))
+> -		goto out_err;
+>
+>  	/* Required for tie off descriptor for PM cases */
+>  	if (!(bp->caps & MACB_CAPS_QUEUE_DISABLE)) {
+> @@ -2557,6 +2558,11 @@ static int macb_alloc_consistent(struct macb *bp)
+>  			goto out_err;
+>  	}
+>
+> +	if (bp->macbgem_ops.mog_alloc_rx_buffers(bp))
+> +		goto out_err;
+> +	if (bp->macbgem_ops.mog_init_rings(bp, true))
+> +		goto out_err;
+> +
+>  	return 0;
+>
+>  out_err:
+
+[ ... ]
+
+> @@ -2951,7 +2971,7 @@ static int macb_open(struct net_device *dev)
+>  		goto pm_exit;
+>  	}
+>
+> -	bp->macbgem_ops.mog_init_rings(bp);
+> +	bp->macbgem_ops.mog_init_rings(bp, true);
+>  	macb_init_buffers(bp);
+>
+>  	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
+
+Is mog_init_rings() being called twice in the macb_open() path? Looking at
+the code flow:
+
+macb_open()
+  macb_alloc_consistent() at line 2967
+    mog_init_rings(bp, true) at line 2563
+  mog_init_rings(bp, true) at line 2974
+
+The first call inside macb_alloc_consistent() initializes the rings and
+checks the return value. The second call in macb_open() appears to be
+redundant: by the time macb_open() reaches line 2974, gem_init_rings() has
+already refilled all Rx slots via the earlier call.
+
+When gem_init_rings() runs the second time, CIRC_SPACE returns 0 because
+all slots are filled, so gem_rx_refill() effectively does nothing. The
+second call reinitializes head/tail pointers that are already set and runs
+a no-op refill.
+
+Should this second call be removed to avoid the redundancy?
+
+Additionally, the return value from the second mog_init_rings(bp, true)
+call is silently discarded. The stated purpose of this patch is to "fail
+early and loudly rather than init the device with Rx mostly broken," but
+this call site doesn't check for errors while the call in
+macb_alloc_consistent() does.
+
+If the second call is intentional, should its return value be checked?
+
+This was noted in the v2 review by Théo Lebrun (Jan 8, 2026) who pointed
+out that commit 99537d5c476c relocated mog_init_rings() from
+macb_mac_link_up() to macb_open(), making this second call redundant. Paolo
+acknowledged this with "will do" but the duplicate call remains.
+-- 
+pw-bot: cr
 
