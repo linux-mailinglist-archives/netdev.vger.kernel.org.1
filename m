@@ -1,130 +1,130 @@
-Return-Path: <netdev+bounces-260433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260434-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aGuyOBlwnWlyQAQAu9opvQ
-	(envelope-from <netdev+bounces-260433-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 10:32:09 +0100
+	id AHwDA71wnWk9QAQAu9opvQ
+	(envelope-from <netdev+bounces-260434-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 10:34:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E402184A60
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 10:32:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F6BC184AD9
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 10:34:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6F068303A265
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 09:28:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 77A133129DC3
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 09:30:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82E0636B074;
-	Tue, 24 Feb 2026 09:28:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 908FD36C0B0;
+	Tue, 24 Feb 2026 09:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OUZpqHl9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l1GW3YGv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 605E4283FC9
-	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 09:28:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CEBC36BCD5;
+	Tue, 24 Feb 2026 09:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771925287; cv=none; b=owyFabYyBV0XqhxROG4oDN+nwIsEm0bP+Ofl9PVh4/0EtId0sFQRRL7us539IKMAITH2dsTjKQfjxmMXLrqQ3LvET41VE9BnThvcYM1kZT/MR+N9GDxltStBfSYktiBbVXyVsJr+KcaipEJ9oFoV9gi6tZcGAYq0H5vjlsCGCYE=
+	t=1771925400; cv=none; b=pNlhPqVQb0NiME4P4uc41whgNYHSYbBtG7MSRQOnYxOmMCnw7Wv374pbUbJXsROCCpdBjDNEStQJ0E8fZ5qwSghabtY81UTIazKVM65qYyHMZh19YvuN+fNlvTLbAo2ON756BKzSNAt1DU/G4/KfljnB/5DaJ+rWjVGACtUXXHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771925287; c=relaxed/simple;
-	bh=UjV+lVT62XoKCNm3uXANF9IwXBOBlVqxQ2pDtUbIBXc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q9Z5Y7FzKY0t5ExqmEhe1o0IMbhHME7q+9lewz3H4gw8a8rN68epyuVzakespB/zFxDxFeummYpcWpIumF9DrzXI7iHophfr6Kc3nXw0LtwLUDzapqqW8DVMWS4jCgys7mjP67o93iVrDDUQTuN1cdkhruSgM3G3TXqMmX8lX6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OUZpqHl9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFDE2C116D0;
-	Tue, 24 Feb 2026 09:28:04 +0000 (UTC)
+	s=arc-20240116; t=1771925400; c=relaxed/simple;
+	bh=JAI0OR3VuXdSn2ZKBVSC+tlsKlgsrnppoSbksVlkOpg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=cGDpk8dutcW+b9nJPZetZap0TgHCq1f5FrJefeyGXg/Bo1qCTz1ZpcSnfkQ0pxrNpQe6ngA4txPclsWFMpYHWVl9JbUrGXtBko9FXTFKZxo4lvRbX4CEfFzP6gjhxI/OqhcE9lCy9Qak2pUGGwrGgQe83jWHVfwE8b3T4Y6V83I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l1GW3YGv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED945C116D0;
+	Tue, 24 Feb 2026 09:29:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771925287;
-	bh=UjV+lVT62XoKCNm3uXANF9IwXBOBlVqxQ2pDtUbIBXc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OUZpqHl9KOq3NztIgVFQnBX5c8PRe87hioP2HSuqHpab1UHLsBZ1svI4vteAQLBs7
-	 OLLP0B1MFP/TXSaItgMk2liCMMbrwVVrCe+rnHoxFAEUmwjVdmFQDavW+rwWOqJ6wT
-	 7pDiHJ5lAQmlfqabozb2hCqOok6MNK0d4i2zEO/Bu11+ZHQITQfh5m1iXI/D5QprT8
-	 /NIQxW8w1xhBkngwn/+JQoxH43uRqFerkMTn1IqsD6LCH32ro2/JEbLk2R+8O+K3Lw
-	 ENg9Hux853QsTM7B6D/Kuz1Ct7LNCm+u4eznPQk+7+1lWUHYhmYn8qwwgBlHh3MKGp
-	 NbzsPIp6HJN3Q==
-Date: Tue, 24 Feb 2026 09:28:02 +0000
-From: Simon Horman <horms@kernel.org>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next] net: stmmac: fix timestamping configuration
- after suspend/resume
-Message-ID: <aZ1vImgrq1yxBIyy@horms.kernel.org>
-References: <E1vuUu4-0000000Afea-0j9B@rmk-PC.armlinux.org.uk>
+	s=k20201202; t=1771925400;
+	bh=JAI0OR3VuXdSn2ZKBVSC+tlsKlgsrnppoSbksVlkOpg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=l1GW3YGvn6d6dfImSOtV9JG7mIncKElc5sgDmxi2yYcAy3I6xwmoMy4SHwde/VjU7
+	 viMfva/no6S4e1IUYln7R2JuuNItEZlsXi9j7BUan35Qt/e7BKdDyUwoUqUYAKt1hs
+	 hQdRrxPq+uXP0nR2m4repGKJye3mHvRnuTKxkvygs8kX+9WsRoL3IvkhztzDaSBWBP
+	 a5xA4A3F0ln6B+KH2FSKEtsvdSGpbShs9DuL32wURE4BfXSl/AfGjjAO7JuIUeAE3/
+	 8BaSmx1JFh38Nw4SN120x4Y3tUpOK9sHZ/DMJTug60r85MSpNJDDqEFJYoUQ/BY7up
+	 H4Km/29m2BFQg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02DFF3808200;
+	Tue, 24 Feb 2026 09:30:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1vuUu4-0000000Afea-0j9B@rmk-PC.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3] net/rds: fix recursive lock in
+ rds_tcp_conn_slots_available
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177192540555.3410242.14094838767425800227.git-patchwork-notify@kernel.org>
+Date: Tue, 24 Feb 2026 09:30:05 +0000
+References: <20260219075738.4403-1-fmancera@suse.de>
+In-Reply-To: <20260219075738.4403-1-fmancera@suse.de>
+To: Fernando Fernandez Mancera <fmancera@suse.de>
+Cc: netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+ linux-rdma@vger.kernel.org, gerd.rausch@oracle.com, horms@kernel.org,
+ pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+ allison.henderson@oracle.com,
+ syzbot+5efae91f60932839f0a5@syzkaller.appspotmail.com
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260433-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260434-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_NO_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,horms.kernel.org:mid,armlinux.org.uk:email]
-X-Rspamd-Queue-Id: 8E402184A60
+	TAGGED_RCPT(0.00)[netdev,5efae91f60932839f0a5];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9F6BC184AD9
 X-Rspamd-Action: no action
 
-On Mon, Feb 23, 2026 at 12:19:08PM +0000, Russell King (Oracle) wrote:
-> When stmmac_init_timestamping() is called, it clears the receive and
-> transmit path booleans that allow timestamps to be read. These are
-> never re-initialised until after userspace requests timestamping
-> features to be enabled.
-> 
-> However, our copy of the timestamp configuration is not cleared, which
-> means we return the old configuration to userspace when requested.
-> This is inconsistent. Fix this by clearing the timestamp configuration.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
-> 
-> I'm in two minds whether this should go via net or net-next - no one
-> has noticed that getting the timestamp configuration after resume
-> doesn't reflect the hardware state. Here's the commit that introduced
-> the problem:
-> 
-> Fixes: d6228b7cdd6e ("net: stmmac: implement the SIOCGHWTSTAMP ioctl")
+Hello:
 
-My feeling is that the bar is not if someone noticed or not.
-So I would lean towards a fix for net in this case.
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Regardless, feel free to include:
+On Thu, 19 Feb 2026 08:57:38 +0100 you wrote:
+> syzbot reported a recursive lock warning in rds_tcp_get_peer_sport() as
+> it calls inet6_getname() which acquires the socket lock that was already
+> held by __release_sock().
+> 
+>  kworker/u8:6/2985 is trying to acquire lock:
+>  ffff88807a07aa20 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1709 [inline]
+>  ffff88807a07aa20 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: inet6_getname+0x15d/0x650 net/ipv6/af_inet6.c:533
+> 
+> [...]
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Here is the summary with links:
+  - [net,v3] net/rds: fix recursive lock in rds_tcp_conn_slots_available
+    https://git.kernel.org/netdev/net/c/021fd0f87004
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
