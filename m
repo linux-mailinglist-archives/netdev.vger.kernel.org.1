@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-260354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260355-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UAKgA/9KnWmhOQQAu9opvQ
-	(envelope-from <netdev+bounces-260354-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 07:53:51 +0100
+	id 6FIkHnxLnWmhOQQAu9opvQ
+	(envelope-from <netdev+bounces-260355-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 07:55:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAB501828EB
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 07:53:50 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF14818298E
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 07:55:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E3112303ACB8
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 06:53:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 05F4830B60B8
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 06:53:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D3013081DF;
-	Tue, 24 Feb 2026 06:53:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EB4630B53A;
+	Tue, 24 Feb 2026 06:53:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hhk52DEA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ltcHuZkC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BF7F3093DB
-	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 06:53:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEA203093CF
+	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 06:53:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771915997; cv=none; b=VtC+2xtFh3IRjuRi4a294AYaCifeNf7qjPZeAvJjIeHIJtHU4LUznPSk03BbPtola5NHFZpzigdredrhd3NQl9rGRHp+BNwltUcDZMBkELy5zRWvyQkMQY2SdFHf5GYfVS4qTB+04PSRAPB38XS0kXqmmIdr/HbwHCvhVYtz1sk=
+	t=1771915999; cv=none; b=Ymc2P46wjxmmA09INGCCdmEv1gudqg29UeFr/gQ6czhnV1/w4O/nu2j0pw54R18pQlwfeRgM3SF8MlkRPyUNXMTdjom9wIru3++6H8CjJ5PmaJvMpHuCV4xVU1GQWU57V+zzbUMlGmZMrAlD6PGcbzUgtMXMszNCUnZ0ofwYA3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771915997; c=relaxed/simple;
-	bh=s5w90tjQkJYYzbC3vOYs6oXg7h6S7OJfWNsP/+o7GlI=;
+	s=arc-20240116; t=1771915999; c=relaxed/simple;
+	bh=YUxeWiumDIevi3pfAqr7wG32llGuW6KcesoGqx9k/lI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NQAtzrEHjSc4IxdCueIM3a1v0ossVc8vQpGwJ5DWARRs1VNNJLWkintATkZ8DKe1Y8Tg83PKl3L19t6Xq1BV/TBCKNEMtkzJ3TGJg2ZV/zmbziiI3uS2E7NPfLFn7K9gWfAjFnwQaDrKM125AUCuSOHfpCrfjDpdbXhKb+tBzEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hhk52DEA; arc=none smtp.client-ip=209.85.208.54
+	 MIME-Version; b=IPkX6HA+8rTvVsuYnEzpaICWLijzGpUrs67qFw4gFr24cxVoHO6cxd3ObYUTNPQAseUQG2Et89mVvM62NxhqCPMhKrXVFUXx0LSKVGYjXk5/IOh7R8Wy4cmk0q1XPju61eudVM3QY6qFkH0liN6202IRGMlQIBLtzmH59CrwPlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ltcHuZkC; arc=none smtp.client-ip=209.85.208.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-65a40f3f048so9549240a12.3
-        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 22:53:16 -0800 (PST)
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-65807298140so7666492a12.2
+        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 22:53:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771915995; x=1772520795; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1771915996; x=1772520796; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TWLpgkJWRF7bEw/Zu91fLz8PWNtrMB/wH+bAcmEPFvw=;
-        b=hhk52DEAYcaUOc50p/Tu45xjiuPLoKFj42Up34NHhs3VpxGny8pv+L7DfhWTffPxFk
-         h3u5gnEfeUm9z9a20Viy5ru4n9nNQl92hBJNmpRopaCr1UCN5/hFDR/Gres9fAY/0L7o
-         EE5f8kXA5UhJSSt09n1ELOlW31KkYfsNmlPRnSj3RKyiiWXywx8DHKXxvdlxQ/JgIgmO
-         NryzkJWnm4tDJLuxjU/jB3dvGl0sWpkGluRJ1DoQUaFakX28EhsejcJSBrcu51zmQqzt
-         bhOJeXeKtSFSv9kSGfdIzQ0zdJskS1aZHA/enpCDlgTRVqX0LHrrRLT5ZHAQpv1emvHa
-         mp3w==
+        bh=gYuYJwbEOhynhWIFlwCSfc7cGmzyMZHQheg8tgUujHU=;
+        b=ltcHuZkCaNBcYUNGsqjNuv2AU+7UWZgTTTBQFTu2b2wyXQZPCtGVen9cjJcftxJ6dj
+         Su8KrAQ12hRZMcnMgexuci4hnCN7PSc1nrZBii4I+uK/80jfvHYp+5SHv5T6ofIXQqcr
+         yR8PXWe8gqxJROVK612GItwdR0JxtlSNIIuWbBzdLp4a7hHSUhSIQBciHkR6Ur2xK2Em
+         AKF+QHh1XcJ+su/lO+ulIQIg6RHFH4XJm4IciGRmqORYlbs3eNZ1B2r8gGoMkZMYg/bF
+         1FK8L/2tuwK3P+kEMBFLY3LVL3sv9zApi3DsPqtR2XsaEQuYjHecAfirVXs3SyZTJ2tP
+         qCVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771915995; x=1772520795;
+        d=1e100.net; s=20230601; t=1771915996; x=1772520796;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=TWLpgkJWRF7bEw/Zu91fLz8PWNtrMB/wH+bAcmEPFvw=;
-        b=PaUGCvJ1rNuslfGQWt4vbu/LfK9GUWb+mn63mXC+2G3tXdv8bhonOSZOEf0DbX8iUE
-         xRJoGIRfNWdLSSgcm/eio9LiMGdEXz5Kq6fFxaiGoqG9hDA79NgUIX2UGDGFgd5PoxTB
-         2lTwgyy/Aebix5k9QJwHb6706vTq6bds2lucQyGvkRnCcrFM15qN0MVfKa6fqTXHkFyH
-         cIb69jijIXyVqEqZpBSJ6pBC3VY/Elw1zELVSS5flEVm+dlT6cB/3V1GyLpz6OCM+jcJ
-         f3NQtJ+kcnLLHFOUtU/sySK5MYXWyKDuoyToKHY/wvPZSJ2CFiTPh3b/fuAO7JrTwyS2
-         O8lg==
-X-Gm-Message-State: AOJu0Yyr3rAj4HTKqhcQQ8ICZXcbfgWSPGNyjHCeLHP2wMyswwVYZEgQ
-	wkuV9+kb8kZTe44JmUdivvdMQ3pQvmK+z1y+xBNmIBtvF57nA2yxbrx5
-X-Gm-Gg: AZuq6aJrPZUmn0GOZsvCs4EFW0vj8SchBIqOofB5GhlvqbROGT3ik1K2fOi5l9hwU3W
-	MdSH2XlFPr+r2sDEOcqLlDagZusdjIWIvrA25tF0dJ9yihMBiwgIN3h1a/2bxFgEPbFZdgTXdQE
-	dj9FIjzoc8LH2r+Z2d+8U9TncKiqegvUsVwJqJPyPUcvZ5boWa3bMd7AfIsuDkHJzuHNIJRCbVx
-	Ofp3G9ao6j9EJ4LnDtitOIlsI7ZCY2i4gpGt41iBEV02wOgTmwJsaNKdaod+/MICvllBhmrFkwn
-	tnVwtbNMVQGVRXIGQPcDoLmzGPp/zD+DtYQjkbFUNuAc1vqkpDQWGmTv7l4Tm4UpOLU8q4YMUWN
-	kjNzLjpc17lJwCM2QjGz2XRMZYjeOklTXWtTKjC3kolMFk7YJgdnmXDMgRfwBEO7I/xDlUtbC8b
-	CI6+1MbUkCglLaJ4NNJUJyNbOjElw2o/KK1Isk+BvWh/DgGiRBKjIpfLQK2tyO45cQ1sCJbPcP/
-	Mc4Y+iXlJWOjohmys8nnlln2Q9TFd5T9/FpKveIQ+wC9iYsX4OdLA8=
-X-Received: by 2002:a17:906:4455:b0:b8f:8ff5:45d with SMTP id a640c23a62f3a-b9081c19dd5mr506369666b.53.1771915994218;
-        Mon, 23 Feb 2026 22:53:14 -0800 (PST)
+        bh=gYuYJwbEOhynhWIFlwCSfc7cGmzyMZHQheg8tgUujHU=;
+        b=GPdRPIp81RyjrQqqF6SsKgvkTUDVDPhZ73AUpk1q5pypPv5jTmdzlBxnXA0fOOn+Z+
+         Lt3rZnVKDcovL2eZmsZPdasTxKXb8Xr+Quqz+gJZy9aSYTa+tT7GhNuw9OUn3vYa4C4/
+         qn3V7pya/MFWxJYniqHWh+d8JHcnkws9+ILZJkoyEiD28BcC9zPITTPcs/EcOp4z0C0N
+         YeD0mnpEXwTPOet67abQPGYeecTVLAHJbD+BRhIBcJHi+MxbyvmsKcbFpZmQcnLh17DU
+         fCjGlkb/gLTCWlccAaFKMqeoEFoEI8QAGYUHpU+NahW+Q3auEl7yDxT6Pf6jdPalBU4H
+         BCWw==
+X-Gm-Message-State: AOJu0YzlIklEwmUAF2AGIfMpmHcmHfuKFeS7hv3Q9LCIpL2EXgShhSjw
+	LVEOgMtMZC1K/pD7ipbEGqm4hhMg7lES7O82nYzmK+FeKtGYhDJrWWqe
+X-Gm-Gg: AZuq6aK8qAW5UCwgG4zvQbFU8sHLROGIhqgrpDuZun2BhOG/AxcdVxrZlRGzvudT6BC
+	3zHThBvDYMNzk1R6uqLxIhJ+UvausgHGOKZXxXOtpBpXylSzWrAEmc+yYNSv6MbemYklZwoKU0l
+	qTRhnkV5ZUerbagMBT4Z25GtKPVgJUpV17qg5sw5BvE9h/XHio+ggGDX6JbLFXpomF1gqDKTTrt
+	wV5oj7SXn6w7j4p8g2I0atc6RX7sFr1CpuNXK+oGPw8ItHpwRidkxgrQCiybE0YcbEvLJcDndGM
+	YBxwXU6Z83zQMX4Vs/EtwaiVyBcSwGH/9vj7KvFy4DDaYdD+XvE4G84MpAw8Qv4heB85JweLh2D
+	Qa5TxrxBs9VUbY0zdZQTeCOmETID0nc/0eycDAiE74jXxtKHD5STvl118+WsnafNWccSmVWvOfT
+	xp5SyP64tdVYTIfB/mW3pJiz/OUHPJGj0Hcf5AD33gdJZ7G88Y+3/rI3TBdKeIR2hUBTQyjMSkC
+	St/dPV8b0MyI63Sf+Kh6viWm+57lUAg+pUihquCtVhtop1p4I8TrHg=
+X-Received: by 2002:a17:906:c08f:b0:b88:5b21:b162 with SMTP id a640c23a62f3a-b9081b4e959mr536995366b.28.1771915995872;
+        Mon, 23 Feb 2026 22:53:15 -0800 (PST)
 Received: from eric (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-65eaba13866sm3096698a12.18.2026.02.23.22.53.12
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-65eaba13866sm3096698a12.18.2026.02.23.22.53.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Feb 2026 22:53:13 -0800 (PST)
+        Mon, 23 Feb 2026 22:53:14 -0800 (PST)
 From: Eric Woudstra <ericwouds@gmail.com>
 To: Michal Ostrowski <mostrows@earthlink.net>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -92,11 +92,10 @@ To: Michal Ostrowski <mostrows@earthlink.net>,
 Cc: netdev@vger.kernel.org,
 	netfilter-devel@vger.kernel.org,
 	bridge@lists.linux.dev,
-	Eric Woudstra <ericwouds@gmail.com>,
-	Kees Cook <kees@kernel.org>
-Subject: [PATCH v19 nf-next 1/5] net: pppoe: avoid zero-length arrays in struct pppoe_hdr
-Date: Tue, 24 Feb 2026 07:53:02 +0100
-Message-ID: <20260224065307.120768-2-ericwouds@gmail.com>
+	Eric Woudstra <ericwouds@gmail.com>
+Subject: [PATCH v19 nf-next 2/5] netfilter: utils: nf_checksum(_partial) correct data!=networkheader
+Date: Tue, 24 Feb 2026 07:53:03 +0100
+Message-ID: <20260224065307.120768-3-ericwouds@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260224065307.120768-1-ericwouds@gmail.com>
 References: <20260224065307.120768-1-ericwouds@gmail.com>
@@ -114,92 +113,115 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260354-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[earthlink.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,netfilter.org,strlen.de,nwl.cc,blackwall.org,nvidia.com];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-260355-lists,netdev=lfdr.de];
+	SUBJECT_HAS_EXCLAIM(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,gmail.com,kernel.org];
+	FREEMAIL_TO(0.00)[earthlink.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,netfilter.org,strlen.de,nwl.cc,blackwall.org,nvidia.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,gmail.com];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[ericwouds@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: BAB501828EB
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EF14818298E
 X-Rspamd-Action: no action
 
-Jakub Kicinski suggested following patch:
+In the conntrack hook it may not always be the case that:
+skb_network_header(skb) == skb->data, i.e. skb_network_offset(skb)
+is zero.
 
-W=1 C=1 GCC build gives us:
+This is problematic when L4 function nf_conntrack_handle_packet()
+is accessing L3 data. This function uses thoff and ip_hdr()
+to finds it's data. But it also calculates the checksum.
+nf_checksum() and nf_checksum_partial() both use lower skb-checksum
+functions that are based on using skb->data.
 
-net/bridge/netfilter/nf_conntrack_bridge.c: note: in included file (through
-../include/linux/if_pppox.h, ../include/uapi/linux/netfilter_bridge.h,
-../include/linux/netfilter_bridge.h): include/uapi/linux/if_pppox.h:
-153:29: warning: array of flexible structures
+Adjust for skb_network_offset(skb), so that the checksum is calculated
+correctly.
 
-It doesn't like that hdr has a zero-length array which overlaps proto.
-The kernel code doesn't currently need those arrays.
-
-PPPoE connection is functional after applying this patch.
-
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-Reviewed-by: Kees Cook <kees@kernel.org>
 Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
 ---
- drivers/net/ppp/pppoe.c       | 2 +-
- include/uapi/linux/if_pppox.h | 4 ++++
- 2 files changed, 5 insertions(+), 1 deletion(-)
+ net/netfilter/utils.c | 28 ++++++++++++++++++++++------
+ 1 file changed, 22 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/ppp/pppoe.c b/drivers/net/ppp/pppoe.c
-index 4275b393a454..7900cc3212a5 100644
---- a/drivers/net/ppp/pppoe.c
-+++ b/drivers/net/ppp/pppoe.c
-@@ -885,7 +885,7 @@ static int pppoe_sendmsg(struct socket *sock, struct msghdr *m,
- 	skb->protocol = cpu_to_be16(ETH_P_PPP_SES);
+diff --git a/net/netfilter/utils.c b/net/netfilter/utils.c
+index 008419db815a..4f8b5442b650 100644
+--- a/net/netfilter/utils.c
++++ b/net/netfilter/utils.c
+@@ -124,16 +124,25 @@ __sum16 nf_checksum(struct sk_buff *skb, unsigned int hook,
+ 		    unsigned int dataoff, u8 protocol,
+ 		    unsigned short family)
+ {
++	unsigned int nhpull = skb_network_offset(skb);
+ 	__sum16 csum = 0;
  
- 	ph = skb_put(skb, total_len + sizeof(struct pppoe_hdr));
--	start = (char *)&ph->tag[0];
-+	start = (char *)ph + sizeof(*ph);
++	if (WARN_ON_ONCE(!skb_pointer_if_linear(skb, nhpull, 0)))
++		return 0;
++
++	/* pull/push because the lower csum functions assume that
++	 * skb_network_offset(skb) is zero.
++	 */
++	__skb_pull(skb, nhpull);
+ 	switch (family) {
+ 	case AF_INET:
+-		csum = nf_ip_checksum(skb, hook, dataoff, protocol);
++		csum = nf_ip_checksum(skb, hook, dataoff - nhpull, protocol);
+ 		break;
+ 	case AF_INET6:
+-		csum = nf_ip6_checksum(skb, hook, dataoff, protocol);
++		csum = nf_ip6_checksum(skb, hook, dataoff - nhpull, protocol);
+ 		break;
+ 	}
++	__skb_push(skb, nhpull);
  
- 	error = memcpy_from_msg(start, m, total_len);
- 	if (error < 0) {
-diff --git a/include/uapi/linux/if_pppox.h b/include/uapi/linux/if_pppox.h
-index 9abd80dcc46f..29b804aa7474 100644
---- a/include/uapi/linux/if_pppox.h
-+++ b/include/uapi/linux/if_pppox.h
-@@ -122,7 +122,9 @@ struct sockaddr_pppol2tpv3in6 {
- struct pppoe_tag {
- 	__be16 tag_type;
- 	__be16 tag_len;
-+#ifndef __KERNEL__
- 	char tag_data[];
-+#endif
- } __attribute__ ((packed));
+ 	return csum;
+ }
+@@ -143,18 +152,25 @@ __sum16 nf_checksum_partial(struct sk_buff *skb, unsigned int hook,
+ 			    unsigned int dataoff, unsigned int len,
+ 			    u8 protocol, unsigned short family)
+ {
++	unsigned int nhpull = skb_network_offset(skb);
+ 	__sum16 csum = 0;
  
- /* Tag identifiers */
-@@ -150,7 +152,9 @@ struct pppoe_hdr {
- 	__u8 code;
- 	__be16 sid;
- 	__be16 length;
-+#ifndef __KERNEL__
- 	struct pppoe_tag tag[];
-+#endif
- } __packed;
++	if (WARN_ON_ONCE(!skb_pointer_if_linear(skb, nhpull, 0)))
++		return 0;
++
++	/* See nf_checksum() */
++	__skb_pull(skb, nhpull);
+ 	switch (family) {
+ 	case AF_INET:
+-		csum = nf_ip_checksum_partial(skb, hook, dataoff, len,
+-					      protocol);
++		csum = nf_ip_checksum_partial(skb, hook, dataoff - nhpull,
++					      len, protocol);
+ 		break;
+ 	case AF_INET6:
+-		csum = nf_ip6_checksum_partial(skb, hook, dataoff, len,
+-					       protocol);
++		csum = nf_ip6_checksum_partial(skb, hook, dataoff - nhpull,
++					       len, protocol);
+ 		break;
+ 	}
++	__skb_push(skb, nhpull);
  
- /* Length of entire PPPoE + PPP header */
+ 	return csum;
+ }
 -- 
 2.53.0
 
