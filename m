@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-260264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260265-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YHsUHxXsnGnqMAQAu9opvQ
-	(envelope-from <netdev+bounces-260264-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 01:08:53 +0100
+	id oAuHNirsnGnqMAQAu9opvQ
+	(envelope-from <netdev+bounces-260265-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 01:09:14 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3504180239
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 01:08:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F4A8180241
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 01:09:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DAC10304C056
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:08:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B9093304D271
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 00:08:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AF9F288D2;
-	Tue, 24 Feb 2026 00:08:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A9FB3B2BA;
+	Tue, 24 Feb 2026 00:08:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I+jGxPVu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QhtdOzjW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58057288AD
-	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 00:08:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384EC288AD
+	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 00:08:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771891724; cv=none; b=ApsrPlpMXgyfnsgrz2abhDOQws1F2QBa6BIG3MXYiDPPvV/aGiiO8gjmLQ4sRNt4Ho20oKuRSLIWb+eecjnvb3NPKDYdTbnOCRQ0LKFjBvjhnXnyeI7PN9HAMChzVn7EXSwK4BRAJ2J083R1UDO6ogrZgBm79OKaHZyQq74UEb4=
+	t=1771891731; cv=none; b=inCbjm9Q/NyKf0Ml2UMVooILSER28LmeqvnvqLG1CMI3MyuUNIDzrxoj+VF9DXt6oyuzb0XuQfVNWR3WwsHw+pso2kE4fGDOhxqaIPteOnaLqVEHm3/Nk/iMmSAn5d5mDP6zaj2o5j78MGtm7x+EAD8mkdSCfuwS29T5zff8Cdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771891724; c=relaxed/simple;
-	bh=X+dD3Zd4BKRK6kL2365WEU6XRvxLSGbOCCn8RgFzyTo=;
+	s=arc-20240116; t=1771891731; c=relaxed/simple;
+	bh=pa+SU9lNeb8yTs+hPUAIX2h2PO3bJVsFfm9H2FFbxdw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IrMLMz7NcZAo/VfD5U0rbsq+HFcuz7DhNfTzyiw4I2cNll8Gg5oGzfrvLU75Gax8hMrz6iw5sXaeA8X6dSTITq+VsyPdScjqArgIm4jERg0+DLJXp7dF16y8kQwbXzN1eyfqKyGVTH/ojOSrCmxGgYWWiOo+OXCF2qZD4B0nIjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I+jGxPVu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EB24C116C6;
-	Tue, 24 Feb 2026 00:08:43 +0000 (UTC)
+	 MIME-Version; b=amR4kxzjjJVi9GwqUDa6WueNucncts/yXJM/CBhVy1h842I2AmOSgn6Jqq6NtTr5AMtXKRS2/ZO/YcltVGarU709uUduoAqNsW/I1TEodS733RsaHrhkZhq4h8CrQKBA/Vp922P6oVEsZe4jbAHV/3iSxfNxt82j94W4qofD9a4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QhtdOzjW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3F1DC116C6;
+	Tue, 24 Feb 2026 00:08:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771891723;
-	bh=X+dD3Zd4BKRK6kL2365WEU6XRvxLSGbOCCn8RgFzyTo=;
+	s=k20201202; t=1771891731;
+	bh=pa+SU9lNeb8yTs+hPUAIX2h2PO3bJVsFfm9H2FFbxdw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=I+jGxPVuXrKWFUOi+JgcirOBI6W0Amal5bGhV+5qq0sDCQbgyXPLDZB4clcWXfclG
-	 eKaIeULDasyBVSAjwQ7CmHMImCPMWybYlnMFL13Jt7jRqAkQZgZkJY6EcdrHRbMnxJ
-	 0wlZcl5/wlV1qIer6xdULZkTWVqrRXuOzFngn7FLK4g9qIyuKGz5mjvvY1YaJImU6B
-	 XRTRc3X3zvnC5XF+6HoZMwraiN5R6HrCYhsN2P4MlxMAqIUVg3VpqA4N1qGHk2i6Ar
-	 e2xBy0mHynEsWizj0TE/JnTK+nJUy+21v8/JLdT4rJ7bfEhK8DpfyNKbhkiE0yP1Dp
-	 QwPF1n3KAA7Sw==
+	b=QhtdOzjWFoYBVVOOjWR83jInB6cpt1EmHykFDQEEb1PdQP4p05FfQ+E6Re691FTES
+	 QSWwTgHqs4VNuVvMxqc04VN4tLkaa7j7F4cW3iqX/eSN1rbCoKC3YEdwZtZRmK4apj
+	 A731l9tlIZAYM7C6KPW8Lx1Qr5pzbTXehwqCJ6Py6wpIsP0YBoMWrbM7sgFjaro2J6
+	 xl0b+7QO4u9QwLBoTm9UDBYvP7cMpI9fa9hTs9iLeodL3B9h3VuHkp7Mn6Xf+zzsse
+	 ibnwkl4TJKqHharL7SZnXLqHwkTYTIxsd2v9Jn7xmt8VRh/S+LpeNvGAHkEleQrLbk
+	 W9+CD72boCh5A==
 From: Jakub Kicinski <kuba@kernel.org>
 To: pvalerio@redhat.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -56,49 +56,49 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	netdev@vger.kernel.org,
 	lorenzo@kernel.org,
 	andrew+netdev@lunn.ch
-Subject: Re: [net-next,v2,1/8] net: macb: move Rx buffers alloc from link up to open
-Date: Mon, 23 Feb 2026 16:08:32 -0800
-Message-ID: <20260224000841.140390-1-kuba@kernel.org>
+Subject: Re: [net-next,v2,5/8] net: macb: add XDP support for gem
+Date: Mon, 23 Feb 2026 16:08:44 -0800
+Message-ID: <20260224000844.140431-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260223182632.1681809-2-pvalerio@redhat.com>
-References: <20260223182632.1681809-2-pvalerio@redhat.com>
+In-Reply-To: <20260223182632.1681809-6-pvalerio@redhat.com>
+References: <20260223182632.1681809-6-pvalerio@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260264-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260265-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: D3504180239
+X-Rspamd-Queue-Id: 3F4A8180241
 X-Rspamd-Action: no action
 
 This is an AI-generated review of your patch. The human sending this
@@ -106,101 +106,230 @@ email has considered the AI review valid, or at least plausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-net: macb: move Rx buffers alloc from link up to open
+net: macb: add XDP support for gem
 
-This commit moves Rx buffer allocation to macb_open() to enable early
-error propagation, adding a fail_early parameter to control whether ring
-initialization fails fast or continues on error.
+This patch introduces basic XDP support for the macb/gem driver with
+XDP_PASS, XDP_DROP, and XDP_REDIRECT verdict support.
 
 > diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
-> index 87414a2ddf6e..2cb65ec37d44 100644
+> index a78ad00f53b1..33a963b6dd4d 100644
 > --- a/drivers/net/ethernet/cadence/macb.h
 > +++ b/drivers/net/ethernet/cadence/macb.h
-> @@ -1180,7 +1180,7 @@ struct macb_queue;
->  struct macb_or_gem_ops {
->  	int	(*mog_alloc_rx_buffers)(struct macb *bp);
->  	void	(*mog_free_rx_buffers)(struct macb *bp);
-> -	void	(*mog_init_rings)(struct macb *bp);
-> +	int	(*mog_init_rings)(struct macb *bp, bool fail_early);
->  	int	(*mog_rx)(struct macb_queue *queue, struct napi_struct *napi,
->  			  int budget);
->  };
+> @@ -15,6 +15,7 @@
+>  #include <linux/phy/phy.h>
+>  #include <linux/workqueue.h>
+>  #include <net/page_pool/helpers.h>
+> +#include <net/xdp.h>
 
 [ ... ]
 
 > diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-> index 43cd013bb70e..8cc16f2b4024 100644
+> index 708107e47ae3..26b517ed251c 100644
 > --- a/drivers/net/ethernet/cadence/macb_main.c
 > +++ b/drivers/net/ethernet/cadence/macb_main.c
 
 [ ... ]
 
-> @@ -2544,8 +2547,6 @@ static int macb_alloc_consistent(struct macb *bp)
->  		if (!queue->tx_skb)
->  			goto out_err;
->  	}
-> -	if (bp->macbgem_ops.mog_alloc_rx_buffers(bp))
-> -		goto out_err;
+> @@ -1247,9 +1248,27 @@ static int macb_tx_complete(struct macb_queue *queue, int budget)
+>  	return packets;
+>  }
 >
->  	/* Required for tie off descriptor for PM cases */
->  	if (!(bp->caps & MACB_CAPS_QUEUE_DISABLE)) {
-> @@ -2557,6 +2558,11 @@ static int macb_alloc_consistent(struct macb *bp)
->  			goto out_err;
->  	}
->
-> +	if (bp->macbgem_ops.mog_alloc_rx_buffers(bp))
-> +		goto out_err;
-> +	if (bp->macbgem_ops.mog_init_rings(bp, true))
-> +		goto out_err;
+> +static unsigned int gem_rx_headroom(struct macb *bp)
+> +{
+> +	if (rcu_access_pointer(bp->prog))
+> +		return XDP_PACKET_HEADROOM;
 > +
->  	return 0;
->
->  out_err:
+> +	return NET_SKB_PAD;
+> +}
+> +
+> +static unsigned int gem_max_rx_data_size(int base_sz)
+> +{
+> +	return SKB_DATA_ALIGN(base_sz + ETH_HLEN + ETH_FCS_LEN);
+> +}
+> +
+> +static unsigned int gem_max_rx_buffer_size(int data_sz, struct macb *bp)
+> +{
+> +	return SKB_HEAD_ALIGN(data_sz + bp->rx_headroom);
+> +}
 
 [ ... ]
 
-> @@ -2951,7 +2971,7 @@ static int macb_open(struct net_device *dev)
->  		goto pm_exit;
->  	}
+> @@ -1340,12 +1360,61 @@ static void discard_partial_frame(struct macb_queue *queue, unsigned int begin,
+>  	 */
+>  }
 >
-> -	bp->macbgem_ops.mog_init_rings(bp);
-> +	bp->macbgem_ops.mog_init_rings(bp, true);
->  	macb_init_buffers(bp);
+> +static u32 gem_xdp_run(struct macb_queue *queue, void *buff_head,
+> +		       unsigned int len)
+> +{
+> +	struct net_device *dev;
+> +	struct bpf_prog *prog;
+> +	struct xdp_buff xdp;
+> +
+> +	u32 act = XDP_PASS;
+> +
+> +	rcu_read_lock();
+> +
+> +	prog = rcu_dereference(queue->bp->prog);
+> +	if (!prog)
+> +		goto out;
+> +
+> +	xdp_init_buff(&xdp, gem_total_rx_buffer_size(queue->bp), &queue->xdp_rxq);
+> +	xdp_prepare_buff(&xdp, buff_head, queue->bp->rx_headroom, len, false);
+> +	xdp_buff_clear_frags_flag(&xdp);
+> +	dev = queue->bp->dev;
+> +
+> +	act = bpf_prog_run_xdp(prog, &xdp);
+> +	switch (act) {
+> +	case XDP_PASS:
+> +		goto out;
+> +	case XDP_REDIRECT:
+> +		if (unlikely(xdp_do_redirect(dev, &xdp, prog))) {
+> +			act = XDP_DROP;
+> +			break;
+> +		}
+> +		goto out;
+> +	default:
+> +		bpf_warn_invalid_xdp_action(dev, prog, act);
+> +		fallthrough;
+> +	case XDP_ABORTED:
+> +		trace_xdp_exception(dev, prog, act);
+> +		fallthrough;
+> +	case XDP_DROP:
+> +		break;
+> +	}
+
+Does this function need to handle XDP_TX? The driver advertises
+NETDEV_XDP_ACT_BASIC (set in macb_probe() below), which declares support
+for XDP_ABORTED, XDP_DROP, XDP_PASS, and XDP_TX per the UAPI definition
+in include/uapi/linux/netdev.h. An XDP program returning XDP_TX will fall
+through to the default case, call bpf_warn_invalid_xdp_action(), and
+treat it as XDP_DROP. The packet won't be transmitted; it will be dropped
+with a warning instead.
+
+[ ... ]
+
+> @@ -2641,21 +2724,23 @@ static int macb_alloc_consistent(struct macb *bp)
+>  	return -ENOMEM;
+>  }
 >
->  	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
+> -static int gem_create_page_pool(struct macb_queue *queue)
+> +static int gem_create_page_pool(struct macb_queue *queue, int qid)
+>  {
+>  	struct page_pool_params pp_params = {
+>  		.order = 0,
+>  		.flags = PP_FLAG_DMA_MAP,
+>  		.pool_size = queue->bp->rx_ring_size,
+>  		.nid = NUMA_NO_NODE,
+> -		.dma_dir = DMA_FROM_DEVICE,
+> +		.dma_dir = rcu_access_pointer(queue->bp->prog)
+> +				? DMA_BIDIRECTIONAL
+> +				: DMA_FROM_DEVICE,
+>  		.dev = &queue->bp->pdev->dev,
+>  		.netdev = queue->bp->dev,
+>  		.napi = &queue->napi_rx,
+>  		.max_len = PAGE_SIZE,
+>  	};
+>  	struct page_pool *pool;
+> -	int err = 0;
+> +	int err;
+>
+>  	/* This can happen in the case of HRESP error.
+>  	 * Do nothing as page pool is already existing.
+>  	 */
+>  	if (queue->page_pool)
+>  		return err;
+                       ^^^
 
-Is mog_init_rings() being called twice in the macb_open() path? Looking at
-the code flow:
+Does this return an uninitialized value? The patch changed 'int err = 0'
+to 'int err' without initialization. The early-return path for HRESP error
+recovery returns err when the page pool already exists.
 
-macb_open()
-  macb_alloc_consistent() at line 2967
-    mog_init_rings(bp, true) at line 2563
-  mog_init_rings(bp, true) at line 2974
+gem_init_rings() calls this function during HRESP error recovery:
 
-The first call inside macb_alloc_consistent() initializes the rings and
-checks the return value. The second call in macb_open() appears to be
-redundant: by the time macb_open() reaches line 2974, gem_init_rings() has
-already refilled all Rx slots via the earlier call.
+drivers/net/ethernet/cadence/macb_main.c:gem_init_rings()
+	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
+		...
+		err = gem_create_page_pool(queue, q);
+		if (err) {
+			last_err = err;
+			if (fail_early)
+				return err;
+			continue;
+		}
 
-When gem_init_rings() runs the second time, CIRC_SPACE returns 0 because
-all slots are filled, so gem_rx_refill() effectively does nothing. The
-second call reinitializes head/tail pointers that are already set and runs
-a no-op refill.
+When err is non-zero, gem_init_rings() skips gem_rx_refill() for that
+queue via continue, potentially leaving the RX queue without buffers.
 
-Should this second call be removed to avoid the redundancy?
+The unmodified macb_hresp_error_task() calls mog_init_rings(bp, false)
+which calls gem_init_rings() to recover from HRESP errors. During
+recovery, page pools already exist from the initial open, so the
+early-return is taken. If err happens to be non-zero, gem_init_rings()
+skips gem_rx_refill(), breaking packet reception on affected queues after
+HRESP error recovery.
 
-Additionally, the return value from the second mog_init_rings(bp, true)
-call is silently discarded. The stated purpose of this patch is to "fail
-early and loudly rather than init the device with Rx mostly broken," but
-this call site doesn't check for errors while the call in
-macb_alloc_consistent() does.
+[ ... ]
 
-If the second call is intentional, should its return value be checked?
+> @@ -3167,11 +3275,27 @@ static int macb_close(struct net_device *dev)
+>  	return 0;
+>  }
+>
+> +static bool gem_xdp_valid_mtu(struct macb *bp, int mtu)
+> +{
+> +	int max_frame_size;
+> +
+> +	max_frame_size = gem_max_rx_buffer_size(gem_max_rx_data_size(mtu), bp);
+> +
+> +	return max_frame_size <= PAGE_SIZE;
+> +}
 
-This was noted in the v2 review by Théo Lebrun (Jan 8, 2026) who pointed
-out that commit 99537d5c476c relocated mog_init_rings() from
-macb_mac_link_up() to macb_open(), making this second call redundant. Paolo
-acknowledged this with "will do" but the duplicate call remains.
--- 
-pw-bot: cr
+Looking at the XDP setup flow, is this MTU validation using the correct
+headroom value?
+
+When gem_xdp_setup() calls gem_xdp_valid_mtu():
+
+drivers/net/ethernet/cadence/macb_main.c:gem_xdp_setup()
+	if (prog && !gem_xdp_valid_mtu(bp, dev->mtu)) {
+		NL_SET_ERR_MSG_MOD(extack, "MTU too large for XDP");
+		return -EOPNOTSUPP;
+	}
+
+	running = netif_running(dev);
+	need_update = !!bp->prog != !!prog;
+	if (running && need_update)
+		macb_close(dev);
+
+	old_prog = rcu_replace_pointer(bp->prog, prog, lockdep_rtnl_is_held());
+
+The validation happens before bp->prog is updated. gem_max_rx_buffer_size()
+uses bp->rx_headroom, which is cached during macb_init_rx_buffer_size().
+At validation time, bp->rx_headroom still holds the non-XDP value
+(NET_SKB_PAD, typically 64 bytes) rather than the XDP value
+(XDP_PACKET_HEADROOM = 256 bytes). This makes the validation 192 bytes too
+permissive.
+
+An MTU close to the PAGE_SIZE limit could pass validation but then cause
+gem_total_rx_buffer_size() to exceed PAGE_SIZE once the correct XDP
+headroom is applied in macb_open()->macb_init_rx_buffer_size().
+
+[ ... ]
+
+> @@ -5744,13 +5911,9 @@ static int macb_probe(struct platform_device *pdev)
+>  	if (err)
+>  		goto err_out_phy_exit;
+>
+> -	if (macb_is_gem(bp)) {
+> -		bp->rx_headroom = NET_SKB_PAD;
+> -		if (!(bp->caps & MACB_CAPS_RSC)) {
+> -			bp->rx_ip_align = NET_IP_ALIGN;
+> -			bp->rx_headroom += NET_IP_ALIGN;
+> -		}
+> -	}
+> +	if (macb_is_gem(bp))
+> +		dev->xdp_features = NETDEV_XDP_ACT_BASIC |
+> +				    NETDEV_XDP_ACT_REDIRECT;
+
+Is NETDEV_XDP_ACT_BASIC accurate here? Looking at gem_xdp_run() above,
+XDP_TX falls through to the default case and is treated as XDP_DROP with
+a warning. NETDEV_XDP_ACT_BASIC includes XDP_TX support per the UAPI
+definition, but the driver doesn't implement it.
 
