@@ -1,459 +1,267 @@
-Return-Path: <netdev+bounces-260626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260627-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id q8vwJVXrnWngSgQAu9opvQ
-	(envelope-from <netdev+bounces-260626-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 19:17:57 +0100
+	id yEksOg/tnWncSgQAu9opvQ
+	(envelope-from <netdev+bounces-260627-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 19:25:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ADE518B2ED
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 19:17:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57DBB18B55A
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 19:25:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AC0BA310CF28
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 18:11:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7DA2431246BB
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 18:14:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D79B02C1585;
-	Tue, 24 Feb 2026 18:10:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E53462868B0;
+	Tue, 24 Feb 2026 18:14:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LvSqG5X/"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="KIGb4oIB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010031.outbound.protection.outlook.com [52.101.61.31])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 241772BD012
-	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 18:10:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771956636; cv=none; b=eoH1plhw5fD2+d3UPtQly78o3McX5gWLVwXTAP/NJ3neM7kiB+ks7ICtZhQSl/DE1o3QQk6kzb81SN+C3vnXJe7EoBP9rPuj7tUg8taWNfuzv9ylYMMiPfbHBE5tp8H93Byke6w/pjA0R/COhpxt8agyZX5ltFW/jJv+vAefcjc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771956636; c=relaxed/simple;
-	bh=rGFIzZzH3dmbkld5GRkauQMh/HRTh9712CmQjHFkRjs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lq7D0Kif+PTx5s+83ON7FWRDSRo1uPhBz0XReLeR7ITRna1HvrC165E+CRFAb/YISPTtE6Uq1r8ue2dm1yAAZejhOO6OBWOVtkxCo2Q8e3ET79SsqfQqjqaD27Z/v8KWYWkwb1HCtMfLA7gtXscM/oBADVpdPV8Gp4G+o8BcdCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LvSqG5X/; arc=none smtp.client-ip=74.125.224.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-64ca423ad53so557273d50.0
-        for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 10:10:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771956634; x=1772561434; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zhDtZovMyV1w4JDAIshQ8A/sqBQSikZh0fB1QgWojsU=;
-        b=LvSqG5X/KDY5LjH7HXrvkPyupTtOdUriSBHZ055I8X2STVjxMQ1SeOS8v6Mipjmvqk
-         W1I9CXNUzB5EekD4vlX1VMTVlEcmWZjWf/V1dTh8GkAydOLboEBHWANYsXZl1cRCZnmn
-         svwBXt9Hf2UTSzqEK9erWTk2xiuepPs7yJ2tc/7CIczQRRg51EOQR1utvLX6NbOI8K7c
-         HrqPFrU4ZcY0i80Al37h90JisVXUDCSz9WJ4FChYpdTxU0PZj/iLaL9cawhMVwxta7J9
-         Klw5lWby5m2H1tWPGkhiNQh37hMt6csqGxKl+qMcaTCANNWZ/01JsEYRPmAZkXipzHSN
-         RShg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771956634; x=1772561434;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zhDtZovMyV1w4JDAIshQ8A/sqBQSikZh0fB1QgWojsU=;
-        b=g7T0snBO7h9DdI6rnyWUF6TRQMgKXA7mBkOEo1kP1VPKyyjRJAGLcUGh5FoyIjeSvn
-         SzqMYgOJeXY96Dr6FL2UknXxUIGusdv6c/GdL4UEP8L4y1bPgSmffdsUvybsO4gipdIh
-         2zotPDJ74tDtuieT4o/TjUVCgyMXr9QjhOT657l1/qjdAJQHwZkvVTSXZDfK11Qcsw6j
-         JoZ5jmiOwHp8Sn2RXz6X7IOWnaj7oWpVFpcTySTNj55YNB9+L9Tx0SHOqZM3eqgpmKp+
-         ZVfQOq02H3+yMttc4MyGhDj5N2nhfTtx8ghhf+e7earuq2TKfZDBEkOnhHBxDXfuWALV
-         OGpQ==
-X-Gm-Message-State: AOJu0YyiW02lK1MPJ8BhyxyiGf3gDd97+toReCZTL8FsiL8uxtw2C/tA
-	odkpdSmAl9afrRlZSQrv+YjW02e86ORuZtwO9b/lQ0bdKkERLtDLDFHe
-X-Gm-Gg: ATEYQzyYo6jeXvgxL9Jp1R5wuJkII9NdpZQXwD5N/sNES/WC/kuKKV0QGV9EPlmlzLU
-	UwdHX9sVfmbxmfhC/Cg7Ib7NIdlF6gTAzE7GJot26iBk8D9cQos1NV3r0vubAwgnD6RYQqOdy0a
-	b0r8APkZ3xwJNcrbtyBSd7UDYdvBcttFCta+yvH5/XrF+Yzp49GiATrelkIIkzYTLx3Ss8XP2H1
-	0UkZysggHtGPvV0ndt3hRGLPk8dZAL0JAYcOUYxj+tUan1LY9TJ1Wz6qV/ohxe5NiesMMCKWRT1
-	7Ghq6gOSqKXivpc2Q0dd2VbwOX1TKCdqftNC7ed/JCv+XTIWtTSPhSPYcj4dNxyoS7Rq3gJzo35
-	1IZodNDRWopFXDITy5rgXVoBVSsILTOyCetsCiwWwTmbfb1M0Lmwpp66U8sZCX2QTsCGp/iYlSR
-	4zajoq99gKIYB0Xd5Xz8ORbg9tXrz1EBZMfW+G5mbZb3LdPrW2+OienjRH
-X-Received: by 2002:a05:690e:2496:b0:63f:afdb:b936 with SMTP id 956f58d0204a3-64c787d70e3mr7901569d50.8.1771956634081;
-        Tue, 24 Feb 2026 10:10:34 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:c::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-64c7a35b43csm4526601d50.11.2026.02.24.10.10.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Feb 2026 10:10:33 -0800 (PST)
-Date: Tue, 24 Feb 2026 10:10:31 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Wei Wang <weibunny@fb.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Daniel Zahka <daniel.zahka@gmail.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	David Wei <dw@davidwei.uk>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Daniel Borkmann <daniel@iogearbox.net>
-Subject: Re: [PATCH net-next 3/9] selftests/net: Add env for container based
- tests
-Message-ID: <aZ3pl177Q6+uJCCN@devvm11784.nha0.facebook.com>
-References: <20260224002410.1553838-1-weibunny@fb.com>
- <20260224002410.1553838-4-weibunny@fb.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96ADE19E97F;
+	Tue, 24 Feb 2026 18:14:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.31
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771956854; cv=fail; b=nlwRHqtWJ9WLqFq/xJR8F/+1jyqz2toKZVPHlHEUn9lfgUobP+9oF7voCn3KwvVZme4BgX11hxPXqHfIFltODaenIQpkEvXaKIB4ytKaW6QXxbCzbLw62Od9UylNmTY9DfcVZWqJ8Sa0TjtB01YDA+e+rkXVBSIgkUV7d71xtHA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771956854; c=relaxed/simple;
+	bh=CkS6F0s77ZgH1kFop8W5HVLYLccN63jicBIsFEmX7VA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZMpjSlwWQugjS34de/tv/az++N5ZEHKt1KZuS9Dr9xckfLxyYIzKyCq6UWFiYxQ1kc9zZz8mI92OyLpNYIKXccqnYctCCcs1KB0I2uy1NaAEi0eKkJNYvFVKjKgKFSOA/iD37RVe7FKUPqQ9S+vJG5kcB6ptttMKAuadD/V98B4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=KIGb4oIB; arc=fail smtp.client-ip=52.101.61.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Jc2Lcz4TYa/0fYLPSWC0IRMGyW++l1vSt+05teMaymi3v2i3FCdjOT7SgJ5K0zWcNiWP5D798Bln7b2nyhnYnL4FiF0h/a8GwslyRvYQslVps5OP1JCf7RC81pt2nXWu2IDzR9AK+7Ztn95L1pudgpnEgEiOpV0yQL1vgB21s6SD3Goub8paSZ/8smPi7h5Hts3V91ZL7ilM6Z7o5m7kAiJ0QRFPK9toCcnCcW6lzY7cJpBETbrnPLwVllMx+klIA/y7PB4RJVZzkm7CH68p0E36u8ki2/yhMCRTgdDnhOO1fkGrcSHacAhvcQW/3OVct/yemEbfjT3ieXNGh9h1Qw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FZpVrSr7xY2T0SlmQw9FpRAEpQD8WcGMPBE532oXY3g=;
+ b=cwBy78iIOs1IWvN/jVKJDxfqCgwP8Y87ehYriXpDO/7QEMWWm5Y+IUb+oL9lTYLTwpp57QZr4d+x8HnMY9tO5bOcSLwffWqQphz8e6V7SIOGAIGuyXjEcD0qElYklAOXp5NURLYBB1H4sW5yCzOcor1sZlGdrJOFNyZIkg7B0rTpLNclTdQ63LR+kIo10NJXzgH2bNKVsVHCvA0BpAbx32kzstGpxsSlMLygDyVuvtgt8Nd0+ugHJjl7V4vz42PRjsa5GRaLs4DpT08VUUDqgFEbeVtSSAYT4j0KQzbjEvFD4Z3E0ZT2TKg5aFTtTHvYV3X0Q8jUaM0Vw6oDivM3/A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.21.195) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=ti.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FZpVrSr7xY2T0SlmQw9FpRAEpQD8WcGMPBE532oXY3g=;
+ b=KIGb4oIBvyLNYIB4Ibsf0q4ZdTC5h3xbrhUNpC0HU+z20Rt+Uxfuy7lfS1ISJzubnEdm151hbRZqhI+tHEstWLA2UDEPpZP33arGVT2xu9hRbSSHrOJKSXirwSpP98bquRzbTT5C7ixyYs6XP3Y2/GB6W80DbhNMIOOXdB3WUqA=
+Received: from BLAP220CA0026.NAMP220.PROD.OUTLOOK.COM (2603:10b6:208:32c::31)
+ by IA0PR10MB7382.namprd10.prod.outlook.com (2603:10b6:208:43f::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.22; Tue, 24 Feb
+ 2026 18:14:08 +0000
+Received: from BL02EPF00021F6A.namprd02.prod.outlook.com
+ (2603:10b6:208:32c:cafe::a8) by BLAP220CA0026.outlook.office365.com
+ (2603:10b6:208:32c::31) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.22 via Frontend Transport; Tue,
+ 24 Feb 2026 18:14:04 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.21.195)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.21.195 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.21.195; helo=flwvzet201.ext.ti.com; pr=C
+Received: from flwvzet201.ext.ti.com (198.47.21.195) by
+ BL02EPF00021F6A.mail.protection.outlook.com (10.167.249.6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9632.12 via Frontend Transport; Tue, 24 Feb 2026 18:14:06 +0000
+Received: from DFLE201.ent.ti.com (10.64.6.59) by flwvzet201.ext.ti.com
+ (10.248.192.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 24 Feb
+ 2026 12:14:06 -0600
+Received: from DFLE214.ent.ti.com (10.64.6.72) by DFLE201.ent.ti.com
+ (10.64.6.59) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 24 Feb
+ 2026 12:14:03 -0600
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE214.ent.ti.com
+ (10.64.6.72) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Tue, 24 Feb 2026 12:14:03 -0600
+Received: from localhost (chintan-thinkstation-p360-tower.dhcp.ti.com [172.24.231.164])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 61OIE2JV2700432;
+	Tue, 24 Feb 2026 12:14:02 -0600
+From: Chintan Vankar <c-vankar@ti.com>
+To: Mugunthan V N <mugunthanvnm@ti.com>, Richard Cochran
+	<richardcochran@gmail.com>, Stefan Wiehler <stefan.wiehler@nokia.com>,
+	"Thomas Gleixner" <tglx@kernel.org>, Ingo Molnar <mingo@kernel.org>, Vishnu
+ Singh <v-singh1@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>, Matthias
+ Schiffer <matthias.schiffer@ew.tq-group.com>, Vadim Fedorenko
+	<vadim.fedorenko@linux.dev>, Nishanth Menon <nm@ti.com>, Chintan Vankar
+	<c-vankar@ti.com>, Michael Walle <mwalle@kernel.org>, Simon Horman
+	<horms@kernel.org>, Roger Quadros <rogerq@kernel.org>, Siddharth Vadapalli
+	<s-vadapalli@ti.com>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski
+	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, "David S. Miller"
+	<davem@davemloft.net>, Andrew Lunn <andrew+netdev@lunn.ch>
+CC: <linux-omap@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>
+Subject: [PATCH net v2] net: ethernet: ti: am65-cpsw-nuss/cpsw-ale: Fix multicast entry handling in ALE table
+Date: Tue, 24 Feb 2026 23:43:59 +0530
+Message-ID: <20260224181359.2055322-1-c-vankar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260224002410.1553838-4-weibunny@fb.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF00021F6A:EE_|IA0PR10MB7382:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8dd8b51b-8ca6-4433-e35a-08de73d07fff
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700013|376014|7416014|1800799024|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?1RxpsBdjeMXox2Ig7ndHD2J5aITgHuPM1OO6XNPxldQlJZykVBMXZrSelNgl?=
+ =?us-ascii?Q?ZjSMIBWAu36rx5tkSCuISq/qqRkxEq9jZ03qnLBFb1xGjyZ57zTRpqumq80D?=
+ =?us-ascii?Q?smbs049OhVlNf0A0xdiKA5F7K68iwiAZuNYKObXzk8wCmT5MuKL9f1aMV6n8?=
+ =?us-ascii?Q?enN25FKsccMCJ99YVMt3XZMvTyue8agTGtijw65TFmwSSyN6nkQafPcfHjjb?=
+ =?us-ascii?Q?OsckVjnNGKVY1AImMYErNaIFyKdN7bEXWukapTBC7rtYjadHcZVaY5suvUNV?=
+ =?us-ascii?Q?805MxuNOd79mpLhciowdRWlLS284jm6LFa1IZbrNyB1BAKBMFGCOuX1OoEht?=
+ =?us-ascii?Q?EUKybsl1qvyXaKn0QEvD3jt635kRwrqwCGM7/nDoykfhLgjA1Yf9IRC/WtT1?=
+ =?us-ascii?Q?dD1Wi8qgNUSo+R2+nPQTzkQz24CHpyZtcVwdZ4bJd+CfWi9kUCAf/EVJ6Tz6?=
+ =?us-ascii?Q?lyfO/PCk+qa/NMpDg9nbUVJJG4SIN0PfVQcbbvtukS5QKaNpgYR10Z0MuHOQ?=
+ =?us-ascii?Q?KlLLWWRVqM2G5j5mP7cA65+aWWMAYOoDT8OdZV4yW5FvOC/UJc6ttTpHxJOJ?=
+ =?us-ascii?Q?rD3MZdGhUJ6JGCSqSUjElEyPhbTDT+Ql6bkNqQ1LzRrbcJB6yB0krI2KdLQo?=
+ =?us-ascii?Q?KL+487Rxo/awI1nzEutqnPGB4b7w8l08gBSqPQLEcI9UTJ55QN2AMI+ZkOP0?=
+ =?us-ascii?Q?GqP9gKvyd2YvwfVWB+I3YXRNAQMZp9bB6v6lkaWhWOHXpD5IHkjfOe56jLO2?=
+ =?us-ascii?Q?Wf/K6SJL3rFj4PY3rX1C38tCYqrwi4GvdJasjF51m/LA7zOKFeUads5KYRoH?=
+ =?us-ascii?Q?SnfnTW2jIkKVr3hLldxftHwXoZL1SPy7AxTMTlhvdJ6bObH9qYTu27+35cot?=
+ =?us-ascii?Q?UabrDUNwmjSVQRYtFVoxrGqUxyTHyXwhYg2hqJefK19tAdZPbB12oBM4ONEt?=
+ =?us-ascii?Q?Ws55Ki53IAV0et6MhFVCZtGKJd/5NP7JFVeA/zz7JbcJOnHBEO0iti48Afwu?=
+ =?us-ascii?Q?sxU7msBvV0efu9p5/ZzwmlCCacs22eo/GGp9h/7DeqXEDtOoUQcjD1RyMCzb?=
+ =?us-ascii?Q?J0GtFbyVMkyWNkm9cK0lX+H7UKJSsXKKgrf39nMR/9VTG/TNGoOWTbMNGRpi?=
+ =?us-ascii?Q?XTc/wtUaxwLweSgXGnucIgjIDD/BQ0WvmJexni4MVr0tjpKm4wgxKFIK+dYD?=
+ =?us-ascii?Q?akP/b2RBou81V+nBbf9LbAHepCijTm9Wugs1wzH23ZiPCIYtBR5q5LEgh4uU?=
+ =?us-ascii?Q?ohV62ZUsWOpMGdF8QE4UK0ssaSsze2qHK2kptCvSKThxldRBC7MbbsZYe++J?=
+ =?us-ascii?Q?1fxnydWBaKMnOFyTwbNOQgkb/CeY/vmboMQAZ5XSY7BvcGt22omLE5cEg7Ko?=
+ =?us-ascii?Q?FccGiMQj8inZ1OZsWe2wplSUm+LBJwkDghfVZA2Wi/JkV2lmqtJFBlqGygTi?=
+ =?us-ascii?Q?UlOnmGRp5s9dXC6khnEHZw84ev/wbjcgWH1AGH1sDbOIOJI+MH3VRxqToYKS?=
+ =?us-ascii?Q?d+pbdzUFLfhglC55AmGPpmV6+PgDvXk/BuX+KKGG/Jj/eojU60c5SLO/pso6?=
+ =?us-ascii?Q?dksLD2+w+zB0esTMHZ/pnEoO4MKTd8zgC86KGDWPJhpc8tE5lxYBBbU+3LDV?=
+ =?us-ascii?Q?rCqKD1LTP/KJItclua1kIbEY6m1W3n2kEOn9a5x/TnrfPjkQSvK6TKowlDit?=
+ =?us-ascii?Q?UzgSYhB40jQDfKAaxreqvuoxko8=3D?=
+X-Forefront-Antispam-Report:
+	CIP:198.47.21.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:flwvzet201.ext.ti.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(376014)(7416014)(1800799024)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	ySGKTIO33R0e35EopesMsnlljfQ0opJj8CjOldXa8nPFibX3XQz/jpOfaIHYEQdSqqBLsD1Z7ENFPxGL/Z+zuRZ9r1K1NncbwoypCfY2OCbx8MN/+J6wHnYIZ+DxTgOkQ8VJSuKtQF1xQVmYOmyvFElVI9JcIntGc1Gvgw0CCoBEsgZSog10nrMxFY59EAaq7uCYygYG1tDXxQ+EQgaAbccchwgT7STpiChDAQUExHXtM8apXDE1ZhTrqYLC2t+dpz8VW+kqWVJGDOotv+cWLy2g95xjhvPhl8244CHmKVTSkTImgfxXPGkc0es5DHyXfF/lA5PxDxSWKbn72i8nii7q/dp1Qj8Iy7RiVKLruJMUuwU/Kujmx1CGw3cy45syh4SmsfeJ5O3qJkfgsNlFerhnDtgXcePtTEjOQm8e41D2jWzvokvMNjjEmdvftuLr
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2026 18:14:06.9822
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8dd8b51b-8ca6-4433-e35a-08de73d07fff
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.21.195];Helo=[flwvzet201.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL02EPF00021F6A.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR10MB7382
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,gmail.com,davidwei.uk,lunn.ch,davemloft.net,google.com,iogearbox.net];
-	TAGGED_FROM(0.00)[bounces-260626-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[ti.com,gmail.com,nokia.com,kernel.org,ew.tq-group.com,linux.dev,redhat.com,google.com,davemloft.net,lunn.ch];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260627-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DKIM_TRACE(0.00)[ti.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[c-vankar@ti.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ti.com:mid,ti.com:dkim,ti.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lib.py:url,devvm11784.nha0.facebook.com:mid]
-X-Rspamd-Queue-Id: 3ADE518B2ED
+	NEURAL_HAM(-0.00)[-0.991];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: 57DBB18B55A
 X-Rspamd-Action: no action
 
-On Mon, Feb 23, 2026 at 04:24:03PM -0800, Wei Wang wrote:
-> From: David Wei <dw@davidwei.uk>
-> 
-> Add an env NetDrvContEnv for container based selftests. This automates
-> the setup of a netns, netkit pair with one inside the netns, and a BPF
-> program that forwards skbs from the NETIF host inside the container.
-> 
-> Currently only netkit is used, but other virtual netdevs e.g. veth can
-> be used too.
-> 
-> Expect netkit container datapath selftests to have a publicly routable
-> IP prefix to assign to netkit in a container, such that packets will
-> land on eth0. The BPF skb forward program will then forward such packets
-> from the host netns to the container netns.
-> 
-> Signed-off-by: David Wei <dw@davidwei.uk>
-> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-> ---
->  .../testing/selftests/drivers/net/README.rst  |  19 ++
->  .../drivers/net/hw/lib/py/__init__.py         |   7 +-
->  .../selftests/drivers/net/lib/py/__init__.py  |   7 +-
->  .../selftests/drivers/net/lib/py/env.py       | 163 ++++++++++++++++++
->  4 files changed, 190 insertions(+), 6 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/drivers/net/README.rst b/tools/testing/selftests/drivers/net/README.rst
-> index eb838ae94844..39370a83f238 100644
-> --- a/tools/testing/selftests/drivers/net/README.rst
-> +++ b/tools/testing/selftests/drivers/net/README.rst
-> @@ -62,6 +62,25 @@ LOCAL_V4, LOCAL_V6, REMOTE_V4, REMOTE_V6
->  
->  Local and remote endpoint IP addresses.
->  
-> +LOCAL_PREFIX_V4, LOCAL_PREFIX_V6
-> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In the current implementation, flushing multicast entries in MAC mode
+incorrectly deletes entries for all ports instead of only the target port,
+disrupting multicast traffic on other ports. The cause is adding multicast
+entries by setting only host port bit, and not setting the MAC port bits.
 
-Still not sure we want LOCAL_PREFIX_V4 here, since it is not supported?
+Fix this by setting the MAC port's bit in the port mask while adding the
+multicast entry. Also fix the flush logic to preserve the host port bit
+during removal of MAC port and free ALE entries when mask contains only
+host port.
 
-> +
-> +Local IP prefix/subnet which can be used to allocate extra IP addresses (for
-> +network name spaces behind macvlan, veth, netkit devices). DUT must be
-> +reachable using these addresses from the endpoint.
-> +
-> +  +-------------+        +----------------------------+
-> +  | INIT NS     |        | TEST NS                    |
-> +  | +---------+ |        | +------------------------+ |
-> +  | | NETIF   | |  bpf   | | Netkit                 | |
-> +  | |         |-|--------|>| nk_guest               | |
-> +  | +---------+ |        | | {LOCAL_PREFIX_V6}::2:2 | |
-> +  | +---------+ |        | +------------------------+ |
-> +  | | Netkit  | |        +----------------------------+
-> +  | | nk_host | |
-> +  | +---------+ |
-> +  +-------------+
-> +
+Fixes: 5c50a856d550 ("drivers: net: ethernet: cpsw: add multicast address to ALE table")
+Signed-off-by: Chintan Vankar <c-vankar@ti.com>
+---
 
-One thing I noticed when I tested this was the flow broke down when
-NETIF's address happened to match LOCAL_PREFIX_V6. I didn't fully reason
-through why this was the case, but maybe it's worth mentioning in the
-docs here?
+This patch is based on commit 'd4f687fbbce4' of origin/main branch of
+Linux net repo.
 
->  REMOTE_TYPE
->  ~~~~~~~~~~~
->  
-> diff --git a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-> index d5d247eca6b7..022008249313 100644
-> --- a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-> +++ b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-> @@ -3,6 +3,7 @@
->  """
->  Driver test environment (hardware-only tests).
->  NetDrvEnv and NetDrvEpEnv are the main environment classes.
-> +NetDrvContEnv extends NetDrvEpEnv with netkit container support.
->  Former is for local host only tests, latter creates / connects
->  to a remote endpoint. See NIPA wiki for more information about
->  running and writing driver tests.
-> @@ -29,7 +30,7 @@ try:
->      from net.lib.py import ksft_eq, ksft_ge, ksft_in, ksft_is, ksft_lt, \
->          ksft_ne, ksft_not_in, ksft_raises, ksft_true, ksft_gt, ksft_not_none
->      from drivers.net.lib.py import GenerateTraffic, Remote, Iperf3Runner
-> -    from drivers.net.lib.py import NetDrvEnv, NetDrvEpEnv
-> +    from drivers.net.lib.py import NetDrvEnv, NetDrvEpEnv, NetDrvContEnv
->  
->      __all__ = ["NetNS", "NetNSEnter", "NetdevSimDev",
->                 "EthtoolFamily", "NetdevFamily", "NetshaperFamily",
-> @@ -44,8 +45,8 @@ try:
->                 "ksft_eq", "ksft_ge", "ksft_in", "ksft_is", "ksft_lt",
->                 "ksft_ne", "ksft_not_in", "ksft_raises", "ksft_true", "ksft_gt",
->                 "ksft_not_none", "ksft_not_none",
-> -               "NetDrvEnv", "NetDrvEpEnv", "GenerateTraffic", "Remote",
-> -               "Iperf3Runner"]
-> +               "NetDrvEnv", "NetDrvEpEnv", "NetDrvContEnv", "GenerateTraffic",
-> +               "Remote", "Iperf3Runner"]
->  except ModuleNotFoundError as e:
->      print("Failed importing `net` library from kernel sources")
->      print(str(e))
-> diff --git a/tools/testing/selftests/drivers/net/lib/py/__init__.py b/tools/testing/selftests/drivers/net/lib/py/__init__.py
-> index a18e21069f7a..6b55068d5370 100644
-> --- a/tools/testing/selftests/drivers/net/lib/py/__init__.py
-> +++ b/tools/testing/selftests/drivers/net/lib/py/__init__.py
-> @@ -3,6 +3,7 @@
->  """
->  Driver test environment.
->  NetDrvEnv and NetDrvEpEnv are the main environment classes.
-> +NetDrvContEnv extends NetDrvEpEnv with netkit container support.
->  Former is for local host only tests, latter creates / connects
->  to a remote endpoint. See NIPA wiki for more information about
->  running and writing driver tests.
-> @@ -43,12 +44,12 @@ try:
->                 "ksft_ne", "ksft_not_in", "ksft_raises", "ksft_true", "ksft_gt",
->                 "ksft_not_none", "ksft_not_none"]
->  
-> -    from .env import NetDrvEnv, NetDrvEpEnv
-> +    from .env import NetDrvEnv, NetDrvEpEnv, NetDrvContEnv
->      from .load import GenerateTraffic, Iperf3Runner
->      from .remote import Remote
->  
-> -    __all__ += ["NetDrvEnv", "NetDrvEpEnv", "GenerateTraffic", "Remote",
-> -                "Iperf3Runner"]
-> +    __all__ += ["NetDrvEnv", "NetDrvEpEnv", "NetDrvContEnv", "GenerateTraffic",
-> +                "Remote", "Iperf3Runner"]
->  except ModuleNotFoundError as e:
->      print("Failed importing `net` library from kernel sources")
->      print(str(e))
-> diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
-> index 41cc248ac848..857ae0f37516 100644
-> --- a/tools/testing/selftests/drivers/net/lib/py/env.py
-> +++ b/tools/testing/selftests/drivers/net/lib/py/env.py
-> @@ -1,13 +1,16 @@
->  # SPDX-License-Identifier: GPL-2.0
->  
-> +import ipaddress
->  import os
->  import time
-> +import json
->  from pathlib import Path
->  from lib.py import KsftSkipEx, KsftXfailEx
->  from lib.py import ksft_setup, wait_file
->  from lib.py import cmd, ethtool, ip, CmdExitFailure
->  from lib.py import NetNS, NetdevSimDev
->  from .remote import Remote
-> +from . import bpftool, RtnlFamily, Netlink
->  
->  
->  class NetDrvEnvBase:
-> @@ -289,3 +292,163 @@ class NetDrvEpEnv(NetDrvEnvBase):
->                  data.get('stats-block-usecs', 0) / 1000 / 1000
->  
->          time.sleep(self._stats_settle_time)
-> +
-> +
-> +class NetDrvContEnv(NetDrvEpEnv):
-> +    """
-> +    Class for an environment with a netkit pair setup for forwarding traffic
-> +    between the physical interface and a network namespace.
-> +    +-------------+        +----------------------------+
-> +    | INIT NS     |        | TEST NS                    |
-> +    | +---------+ |        | +------------------------+ |
-> +    | | NETIF   | |  bpf   | | Netkit                 | |
-> +    | |         |-|--------|>| nk_guest               | |
-> +    | +---------+ |        | | {LOCAL_PREFIX_V6}::2:2 | |
-> +    | +---------+ |        | +------------------------+ |
-> +    | | Netkit  | |        +----------------------------+
-> +    | | nk_host | |
-> +    | +---------+ |
-> +    +-------------+
-> +    """
-> +
-> +    def __init__(self, src_path, rxqueues=1, **kwargs):
-> +        super().__init__(src_path, **kwargs)
-> +
-> +        self.netns = None
-> +        self._nk_host_ifname = None
-> +        self._nk_guest_ifname = None
-> +        self._tc_clsact_added = False
-> +        self._tc_attached = False
-> +        self._bpf_prog_pref = None
-> +        self._bpf_prog_id = None
-> +        self._init_ns_attached = False
+Link to v1:
+https://lore.kernel.org/r/20260205070951.3170631-1-c-vankar@ti.com/
 
-One problem with these attrs is that if super().__init__() fails
-(NetDrvEpEnv.__init__()) then these will raise attribute errors in
-__del__().
+Changes from v1 to v2:
+- Squashed two patches into one as a fix of the older implementation.
+- Added "Fixes" tag in the commit.
 
-This can happen if NetDrvEpEnv.remote_remote_ifc() (for example) throws
-an exception because it couldn't find the address the user configured.
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c | 2 +-
+ drivers/net/ethernet/ti/cpsw_ale.c       | 9 ++++-----
+ 2 files changed, 5 insertions(+), 6 deletions(-)
 
-One alternative to getattr() is moving these assignments before
-super().__init__()?
+diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+index 5924db6be3fe..967918050433 100644
+--- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
++++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+@@ -391,7 +391,7 @@ static void am65_cpsw_nuss_ndo_slave_set_rx_mode(struct net_device *ndev)
+ 	cpsw_ale_set_allmulti(common->ale,
+ 			      ndev->flags & IFF_ALLMULTI, port->port_id);
+ 
+-	port_mask = ALE_PORT_HOST;
++	port_mask = BIT(port->port_id) | ALE_PORT_HOST;
+ 	/* Clear all mcast from ALE */
+ 	cpsw_ale_flush_multicast(common->ale, port_mask, -1);
+ 
+diff --git a/drivers/net/ethernet/ti/cpsw_ale.c b/drivers/net/ethernet/ti/cpsw_ale.c
+index bb969dd435b4..be7b69319221 100644
+--- a/drivers/net/ethernet/ti/cpsw_ale.c
++++ b/drivers/net/ethernet/ti/cpsw_ale.c
+@@ -450,14 +450,13 @@ static void cpsw_ale_flush_mcast(struct cpsw_ale *ale, u32 *ale_entry,
+ 				      ale->port_mask_bits);
+ 	if ((mask & port_mask) == 0)
+ 		return; /* ports dont intersect, not interested */
+-	mask &= ~port_mask;
++	mask &= (~port_mask | ALE_PORT_HOST);
+ 
+-	/* free if only remaining port is host port */
+-	if (mask)
++	if (mask == 0x0 || mask == ALE_PORT_HOST)
++		cpsw_ale_set_entry_type(ale_entry, ALE_TYPE_FREE);
++	else
+ 		cpsw_ale_set_port_mask(ale_entry, mask,
+ 				       ale->port_mask_bits);
+-	else
+-		cpsw_ale_set_entry_type(ale_entry, ALE_TYPE_FREE);
+ }
+ 
+ int cpsw_ale_flush_multicast(struct cpsw_ale *ale, int port_mask, int vid)
+-- 
+2.34.1
 
-Best,
-Bobby
-
-> +
-> +        self.require_ipver("6")
-> +        local_prefix = self.env.get("LOCAL_PREFIX_V6")
-> +        if not local_prefix:
-> +            raise KsftSkipEx("LOCAL_PREFIX_V6 required")
-> +
-> +        local_prefix = local_prefix.rstrip("/64").rstrip("::").rstrip(":")
-> +        self.ipv6_prefix = f"{local_prefix}::"
-> +        self.nk_host_ipv6 = f"{local_prefix}::2:1"
-> +        self.nk_guest_ipv6 = f"{local_prefix}::2:2"
-> +
-> +        rtnl = RtnlFamily()
-> +        rtnl.newlink(
-> +            {
-> +                "linkinfo": {
-> +                    "kind": "netkit",
-> +                    "data": {
-> +                        "mode": "l2",
-> +                        "policy": "forward",
-> +                        "peer-policy": "forward",
-> +                    },
-> +                },
-> +                "num-rx-queues": rxqueues,
-> +            },
-> +            flags=[Netlink.NLM_F_CREATE, Netlink.NLM_F_EXCL],
-> +        )
-> +
-> +        all_links = ip("-d link show", json=True)
-> +        netkit_links = [link for link in all_links
-> +                        if link.get('linkinfo', {}).get('info_kind') == 'netkit'
-> +                        and 'UP' not in link.get('flags', [])]
-> +
-> +        if len(netkit_links) != 2:
-> +            raise KsftSkipEx("Failed to create netkit pair")
-> +
-> +        netkit_links.sort(key=lambda x: x['ifindex'])
-> +        self._nk_host_ifname = netkit_links[1]['ifname']
-> +        self._nk_guest_ifname = netkit_links[0]['ifname']
-> +        self.nk_host_ifindex = netkit_links[1]['ifindex']
-> +        self.nk_guest_ifindex = netkit_links[0]['ifindex']
-> +
-> +        self._setup_ns()
-> +        self._attach_bpf()
-> +
-> +    def __del__(self):
-> +        if self._tc_attached:
-> +            cmd(f"tc filter del dev {self.ifname} ingress pref {self._bpf_prog_pref}")
-> +            self._tc_attached = False
-> +
-> +        if self._tc_clsact_added:
-> +            cmd(f"tc qdisc del dev {self.ifname} clsact")
-> +            self._tc_clsact_added = False
-> +
-> +        if self._nk_host_ifname:
-> +            cmd(f"ip link del dev {self._nk_host_ifname}")
-> +            self._nk_host_ifname = None
-> +            self._nk_guest_ifname = None
-> +
-> +        if self._init_ns_attached:
-> +            cmd("ip netns del init", fail=False)
-> +            self._init_ns_attached = False
-> +
-> +        if self.netns:
-> +            del self.netns
-> +            self.netns = None
-> +
-> +        super().__del__()
-> +
-> +    def _setup_ns(self):
-> +        self.netns = NetNS()
-> +        cmd("ip netns attach init 1")
-> +        self._init_ns_attached = True
-> +        ip("netns set init 0", ns=self.netns)
-> +        ip(f"link set dev {self._nk_guest_ifname} netns {self.netns.name}")
-> +        ip(f"link set dev {self._nk_host_ifname} up")
-> +        ip(f"-6 addr add fe80::1/64 dev {self._nk_host_ifname} nodad")
-> +        ip(f"-6 route add {self.nk_guest_ipv6}/128 via fe80::2 dev {self._nk_host_ifname}")
-> +
-> +        ip("link set lo up", ns=self.netns)
-> +        ip(f"link set dev {self._nk_guest_ifname} up", ns=self.netns)
-> +        ip(f"-6 addr add fe80::2/64 dev {self._nk_guest_ifname}", ns=self.netns)
-> +        ip(f"-6 addr add {self.nk_guest_ipv6}/64 dev {self._nk_guest_ifname} nodad", ns=self.netns)
-> +        ip(f"-6 route add default via fe80::1 dev {self._nk_guest_ifname}", ns=self.netns)
-> +
-> +    def _tc_ensure_clsact(self):
-> +        qdisc = json.loads(cmd(f"tc -j qdisc show dev {self.ifname}").stdout)
-> +        for q in qdisc:
-> +            if q['kind'] == 'clsact':
-> +                return
-> +        cmd(f"tc qdisc add dev {self.ifname} clsact")
-> +        self._tc_clsact_added = True
-> +
-> +    def _get_bpf_prog_ids(self):
-> +        filter = json.loads(cmd(f"tc -j filter show dev {self.ifname} ingress").stdout)
-> +        for bpf in filter:
-> +            if 'options' not in bpf:
-> +                continue
-> +            if bpf['options']['bpf_name'].startswith('nk_forward.bpf'):
-> +                return (bpf['pref'], bpf['options']['prog']['id'])
-> +        if self._bpf_prog_pref is None:
-> +            raise Exception("Failed to get BPF prog ID")
-> +
-> +    def _attach_bpf(self):
-> +        bpf_obj = self.test_dir / "nk_forward.bpf.o"
-> +        if not bpf_obj.exists():
-> +            raise KsftSkipEx("BPF prog not found")
-> +
-> +        self._tc_ensure_clsact()
-> +        cmd(f"tc filter add dev {self.ifname} ingress bpf obj {bpf_obj} sec tc/ingress direct-action")
-> +        self._tc_attached = True
-> +
-> +        (self._bpf_prog_pref, self._bpf_prog_id) = self._get_bpf_prog_ids()
-> +        prog_info = bpftool(f"prog show id {self._bpf_prog_id}", json=True)
-> +        map_ids = prog_info.get("map_ids", [])
-> +
-> +        bss_map_id = None
-> +        for map_id in map_ids:
-> +            map_info = bpftool(f"map show id {map_id}", json=True)
-> +            if map_info.get("name").endswith("bss"):
-> +                bss_map_id = map_id
-> +
-> +        if bss_map_id is None:
-> +            raise Exception("Failed to find .bss map")
-> +
-> +        ipv6_addr = ipaddress.IPv6Address(self.ipv6_prefix)
-> +        ipv6_bytes = ipv6_addr.packed
-> +        ifindex_bytes = self.nk_host_ifindex.to_bytes(4, byteorder='little')
-> +        value = ipv6_bytes + ifindex_bytes
-> +        value_hex = ' '.join(f'{b:02x}' for b in value)
-> +        bpftool(f"map update id {bss_map_id} key hex 00 00 00 00 value hex {value_hex}")
-> -- 
-> 2.47.3
-> 
 
