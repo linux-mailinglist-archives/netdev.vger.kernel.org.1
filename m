@@ -1,53 +1,100 @@
-Return-Path: <netdev+bounces-260299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260301-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +EWrAqIEnWk7MgQAu9opvQ
-	(envelope-from <netdev+bounces-260299-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 02:53:38 +0100
+	id UHInGwoEnWk7MgQAu9opvQ
+	(envelope-from <netdev+bounces-260301-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 02:51:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54218180C0D
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 02:53:37 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5394180BDE
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 02:51:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3AB7D3169A81
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 01:50:11 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4A85B302EC85
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 01:51:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D782023C8AE;
-	Tue, 24 Feb 2026 01:50:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7EBC241C8C;
+	Tue, 24 Feb 2026 01:51:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="afQEeL63"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JF/vHxM0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B50F11A073F
-	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 01:50:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 249061A262A
+	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 01:51:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771897810; cv=none; b=a9loUEUBZ9b9veR8MDbQPFiNfA2lm4OwrIfBESkk8OXEaheHqP3QthyQLrqloAIZo1vQnGGWUbftJcqfbfvCN+rcW+lUmSeBHqyP9Mpx3yxkJMOya0V5ZgKNjx5DbVNQFt0TUBvC/wIBN0XgmFrmtwWEGMC0/ExmQ2nkbvgJfBw=
+	t=1771897862; cv=none; b=Y1VfkYbkMgK8/gpQYvA7EoFquMhSmfHAh6o+v0eSvvgCf73vL5+ZDxMGRJD1K/vi7WeKigJEV0PfM29xQfY3RY6JLT+FTfDuA45l4XaQ0Tlo6Ly/0E8ypjjQW/Z0Sj1Ql+G3FIBfm5gX8iSzTKjtA+YftE6hsZhlF+iRzv/0kR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771897810; c=relaxed/simple;
-	bh=iSSBYag+Ia0G5kcMQ68qgo4sSE9p7e0YDlzgzUdz7wc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=uDXFNCnnV3eC2wPPwkYLMPv06Er5iGsBEr5fmeFXjAC+mM8GJ9G1ktcu49PV+cxC362CuLpkLUFnMPmYG5Qirp8366YzR8tfQVKMkMxpoITsDSiCInM63UxsLIPkBwpET4dns0sgNgU8+wPaz1TbO1l+brxwOBdBiPyIEKJyCGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=afQEeL63; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56D93C116C6;
-	Tue, 24 Feb 2026 01:50:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771897810;
-	bh=iSSBYag+Ia0G5kcMQ68qgo4sSE9p7e0YDlzgzUdz7wc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=afQEeL63wh7QjdlB/r8H10SSDfXBPL8T7uzYFmsYvOyricf3Bp06vZqKtx9iVqsh9
-	 yYXIpFvpRtYE9ID+Muy0k1CS2dB7E+gx+6GTq9QgoZiwvVrPpn69wSi34BVyb7TUd5
-	 VDeUdz84yD5nmMLkAbBQsfZUEDIF3BA44DWsOitaiAB+A/cZa484AYzJ1N0JTlsyyi
-	 ZmIiNYwuuvmLO7NMfj1fcxdZITVzq0x1i18PWLkBr3wy6z1T7/zOtw5EmXzHcd8pMs
-	 rgQSc231rCSvr1I2ZY/42vbE7pCRRr9O3oE4tm7MH0ONx0+YghZWm48sM4GgwbgHlE
-	 tPKiv/bNAxYSg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CF3B3808200;
-	Tue, 24 Feb 2026 01:50:17 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1771897862; c=relaxed/simple;
+	bh=q04FzcRBjS6yuADUwXzK64Nd9dTcPL5AiSbU8fS5n9Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=V5ydT+xWLdNXans+6g2rdpFQmjZUxCC64pQPT0m9b22shV0JeEJ1hdj58Q78O+fN+CeB7776R81DO5Fy9UcXHugFf2apGhw1eoctsieoSDlq5w5/sFVSvDg2dBUlNIj9ySJnsOkhFGiJe6heXkAxrZFpDMjcArjC1JFFO0QvqjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JF/vHxM0; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-b8f8f2106f1so675601966b.2
+        for <netdev@vger.kernel.org>; Mon, 23 Feb 2026 17:51:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771897859; x=1772502659; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=X/UdYQBE0ID3Mvn30rVSJTpyiHsXE3QizzYSsa0sEKI=;
+        b=JF/vHxM0y4dPev0cwtOlllHvX6+DTBlRYKvmoqRDsqUcLmY5OsTl956CFWRrVpsRxP
+         hglBxNEuaE2eTj0C2PKlxhq1Zf5cbAv+RgGPriANbb0UgpBxjU2XL2K+W2IvIu3wDC5x
+         gK8Mn9nY0yD9yKDdkXNa20knDzVYBeaueVLmEQzGDF6sN69D4dnS8OpR/BBIzdcvi/5q
+         aQEimpWXAWh027M+/mQHpnVAbuCEaDV77x3T4tjYHvr5JOHwnueMflZGK4AUTquOnBSu
+         Qwz0aqjDd++Vsw+oCTebrT2KkmPxFw4rkup6UeoTQijbu2wqJ4mLX/wSBThh4BfJhZed
+         T9nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771897859; x=1772502659;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X/UdYQBE0ID3Mvn30rVSJTpyiHsXE3QizzYSsa0sEKI=;
+        b=eEoKU2q+2ayv3FZ3vfLs5jb9F3OvijZJWgo2s1uM3GH7QA/d3jhUlpKINE40Lave/b
+         zjZcW1zeaxgGxvFU760KmbmTiP2tRTereGKcaocMeAc13/SSSHboHnWNB12sFOhig3to
+         nam8j67R+aycGO0i/rnJSnxdCLfNMcgabaejn/iuctDnrmdT8N+RR6Sc+15ZarsiPqhc
+         gYQD+smJmBwczNnwxc/Xf15JdveHTdXdmwfZfWOXfIm8hFwbiJr5iGbh3VQ6+bQUVrCI
+         tY2A7DCw/4McZZFEIWO5rMEefnnclS+154EWiKdEDuScVeJjWeT5Y9fuSXBJ9oliZP9v
+         hp2w==
+X-Forwarded-Encrypted: i=1; AJvYcCUzoAxOQcCbNe6d+JdxaGrIJf5p0AaByfVYzGDX92OR9XmVL60LiIvJf71wSj84drrG9uE0FtE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyAaTglr6EtrFWJIWFd7dVnpLt7BmL+aM81kUlSBJHHJhgzU2RH
+	mEr8k5SVOeNvxhD3vQjBlP4Nw1IFTfNrEeL3oknePHWqLzcqCdw+Z4vW
+X-Gm-Gg: AZuq6aJSv71TK3pFajG0d2iEpUA7aEs8OFX8h0BegcxeQ/XDRe7ntI7fiTetu/fBQNz
+	2/Lz8BRWzJjQX9feYUZ5/2b68/UmSDpHukZZ9gyRs/QXm9r69M1YR2o7OoKKPOAu9n0wddPS/Qe
+	NSwhni1UqO2nf1rTcLiu4cV/R07xXj2+zp9CxvO+ptb03IGH5dtNlsS9rewy6ooBAYqyw7NMpbf
+	1dDJdeu0nTIrl/Y/auEe/3UiAPQgTRxVONQZH9NbbDag6qtBBlPzFoNfgmb3SF/xwrQA1vhDg9X
+	cRVd15K76LgNofLrxnr+O1wcldbAu6z0KgInaANegxNp/M6MhQE/fQOOhNYcvykXM3eN4S+0qHy
+	4gKeivdlQeToj5bYS6SbblwcfkxB6QReIoci2/jEhU0ui5XhwODeLWOgsHYVjGjLuz2JALrKyys
+	Io+xpCsMQQZM8sqg==
+X-Received: by 2002:a17:906:4783:b0:b8a:f29e:307a with SMTP id a640c23a62f3a-b9081bf70e7mr731128666b.57.1771897859195;
+        Mon, 23 Feb 2026 17:50:59 -0800 (PST)
+Received: from gmail.com ([2a09:bac5:4e25:2719::3e5:33])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9084e8b790sm387772166b.49.2026.02.23.17.50.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Feb 2026 17:50:58 -0800 (PST)
+From: Qingfang Deng <dqfext@gmail.com>
+To: linux-ppp@vger.kernel.org,
+	Michal Ostrowski <mostrows@earthlink.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Michal Ostrowski <mostrows@gmail.com>,
+	Dianne Skoll <dianne@skoll.ca>,
+	Paul Mackerras <paulus@ozlabs.org>,
+	Jaco Kroon <jaco@uls.co.za>,
+	James Carlson <carlsonj@workingcode.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Guillaume Nault <gnault@redhat.com>
+Subject: [PATCH net-next] pppoe: remove kernel-mode relay support
+Date: Tue, 24 Feb 2026 09:50:52 +0800
+Message-ID: <20260224015053.42472-1-dqfext@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,73 +102,257 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] tipc: fix duplicate publication key in
- tipc_service_insert_publ()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177189781629.3271663.1500511190271606977.git-patchwork-notify@kernel.org>
-Date: Tue, 24 Feb 2026 01:50:16 +0000
-References: <20260220050541.237962-1-tung.quang.nguyen@est.tech>
-In-Reply-To: <20260220050541.237962-1-tung.quang.nguyen@est.tech>
-To: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, jmaloy@redhat.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_CC(0.00)[gmail.com,skoll.ca,ozlabs.org,uls.co.za,workingcode.com,arndb.de,redhat.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-260301-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260299-lists,netdev=lfdr.de,netdevbpf];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[vger.kernel.org,earthlink.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dqfext@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 54218180C0D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E5394180BDE
 X-Rspamd-Action: no action
 
-Hello:
+The kernel-mode PPPoE relay feature and its two associated ioctls
+(PPPOEIOCSFWD and PPPOEIOCDFWD) are not used by any existing userspace
+PPPoE implementations. The most commonly-used package, RP-PPPoE [1],
+handles the relaying entirely in userspace.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This legacy code has remained in the driver since its introduction in
+kernel 2.3.99-pre7 for over two decades, but has served no practical
+purpose.
 
-On Fri, 20 Feb 2026 05:05:41 +0000 you wrote:
-> TIPC uses named table to store TIPC services represented by type and
-> instance. Each time an application calls TIPC API bind() to bind a
-> type/instance to a socket, an entry is created and inserted into the
-> named table. It looks like this:
-> 
-> named table:
-> key1, entry1 (type, instance ...)
-> key2, entry2 (type, instance ...)
-> 
-> [...]
+Remove the unused relay code.
 
-Here is the summary with links:
-  - [net] tipc: fix duplicate publication key in tipc_service_insert_publ()
-    https://git.kernel.org/netdev/net/c/3aa677625c8f
+[1] https://dianne.skoll.ca/projects/rp-pppoe/
 
-You are awesome, thank you!
+Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+Acked-by: Arnd Bergmann <arnd@arndb.de>
+Reviewed-by: Guillaume Nault <gnault@redhat.com>
+---
+ Repost as non-RFC:
+ - https://lore.kernel.org/netdev/20260213091605.132561-1-dqfext@gmail.com/
+
+ drivers/net/ppp/pppoe.c       | 79 -----------------------------------
+ drivers/net/ppp/pppox.c       |  3 --
+ include/linux/if_pppox.h      |  6 ---
+ include/uapi/linux/if_pppox.h | 10 -----
+ 4 files changed, 98 deletions(-)
+
+diff --git a/drivers/net/ppp/pppoe.c b/drivers/net/ppp/pppoe.c
+index 4275b393a454..7a6dcfa421e9 100644
+--- a/drivers/net/ppp/pppoe.c
++++ b/drivers/net/ppp/pppoe.c
+@@ -237,25 +237,6 @@ static inline struct pppox_sock *get_item(struct pppoe_net *pn, __be16 sid,
+ 	return po;
+ }
+ 
+-static inline struct pppox_sock *__get_item_by_addr(struct net *net,
+-						    struct sockaddr_pppox *sp)
+-{
+-	struct net_device *dev;
+-	struct pppoe_net *pn;
+-	struct pppox_sock *pppox_sock = NULL;
+-
+-	int ifindex;
+-
+-	dev = dev_get_by_name_rcu(net, sp->sa_addr.pppoe.dev);
+-	if (dev) {
+-		ifindex = dev->ifindex;
+-		pn = pppoe_pernet(net);
+-		pppox_sock = __get_item(pn, sp->sa_addr.pppoe.sid,
+-					sp->sa_addr.pppoe.remote, ifindex);
+-	}
+-	return pppox_sock;
+-}
+-
+ static inline void delete_item(struct pppoe_net *pn, __be16 sid,
+ 					char *addr, int ifindex)
+ {
+@@ -369,7 +350,6 @@ static struct notifier_block pppoe_notifier = {
+ static int pppoe_rcv_core(struct sock *sk, struct sk_buff *skb)
+ {
+ 	struct pppox_sock *po = pppox_sk(sk);
+-	struct pppox_sock *relay_po;
+ 
+ 	/* Backlog receive. Semantics of backlog rcv preclude any code from
+ 	 * executing in lock_sock()/release_sock() bounds; meaning sk->sk_state
+@@ -378,17 +358,6 @@ static int pppoe_rcv_core(struct sock *sk, struct sk_buff *skb)
+ 
+ 	if (sk->sk_state & PPPOX_BOUND) {
+ 		ppp_input(&po->chan, skb);
+-	} else if (sk->sk_state & PPPOX_RELAY) {
+-		relay_po = __get_item_by_addr(sock_net(sk),
+-					      &po->pppoe_relay);
+-		if (relay_po == NULL)
+-			goto abort_kfree;
+-
+-		if ((sk_pppox(relay_po)->sk_state & PPPOX_CONNECTED) == 0)
+-			goto abort_kfree;
+-
+-		if (!__pppoe_xmit(sk_pppox(relay_po), skb))
+-			goto abort_kfree;
+ 	} else {
+ 		if (sock_queue_rcv_skb(sk, skb))
+ 			goto abort_kfree;
+@@ -656,7 +625,6 @@ static int pppoe_connect(struct socket *sock, struct sockaddr_unsized *uservaddr
+ 
+ 		po->pppoe_ifindex = 0;
+ 		memset(&po->pppoe_pa, 0, sizeof(po->pppoe_pa));
+-		memset(&po->pppoe_relay, 0, sizeof(po->pppoe_relay));
+ 		memset(&po->chan, 0, sizeof(po->chan));
+ 		po->next = NULL;
+ 		po->num = 0;
+@@ -783,53 +751,6 @@ static int pppoe_ioctl(struct socket *sock, unsigned int cmd,
+ 		err = 0;
+ 		break;
+ 
+-	case PPPOEIOCSFWD:
+-	{
+-		struct pppox_sock *relay_po;
+-
+-		err = -EBUSY;
+-		if (sk->sk_state & (PPPOX_BOUND | PPPOX_DEAD))
+-			break;
+-
+-		err = -ENOTCONN;
+-		if (!(sk->sk_state & PPPOX_CONNECTED))
+-			break;
+-
+-		/* PPPoE address from the user specifies an outbound
+-		   PPPoE address which frames are forwarded to */
+-		err = -EFAULT;
+-		if (copy_from_user(&po->pppoe_relay,
+-				   (void __user *)arg,
+-				   sizeof(struct sockaddr_pppox)))
+-			break;
+-
+-		err = -EINVAL;
+-		if (po->pppoe_relay.sa_family != AF_PPPOX ||
+-		    po->pppoe_relay.sa_protocol != PX_PROTO_OE)
+-			break;
+-
+-		/* Check that the socket referenced by the address
+-		   actually exists. */
+-		rcu_read_lock();
+-		relay_po = __get_item_by_addr(sock_net(sk), &po->pppoe_relay);
+-		rcu_read_unlock();
+-		if (!relay_po)
+-			break;
+-
+-		sk->sk_state |= PPPOX_RELAY;
+-		err = 0;
+-		break;
+-	}
+-
+-	case PPPOEIOCDFWD:
+-		err = -EALREADY;
+-		if (!(sk->sk_state & PPPOX_RELAY))
+-			break;
+-
+-		sk->sk_state &= ~PPPOX_RELAY;
+-		err = 0;
+-		break;
+-
+ 	default:
+ 		err = -ENOTTY;
+ 	}
+diff --git a/drivers/net/ppp/pppox.c b/drivers/net/ppp/pppox.c
+index 08364f10a43f..5861a2f6ce3e 100644
+--- a/drivers/net/ppp/pppox.c
++++ b/drivers/net/ppp/pppox.c
+@@ -102,9 +102,6 @@ EXPORT_SYMBOL(pppox_ioctl);
+ #ifdef CONFIG_COMPAT
+ int pppox_compat_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
+ {
+-	if (cmd == PPPOEIOCSFWD32)
+-		cmd = PPPOEIOCSFWD;
+-
+ 	return pppox_ioctl(sock, cmd, (unsigned long)compat_ptr(arg));
+ }
+ 
+diff --git a/include/linux/if_pppox.h b/include/linux/if_pppox.h
+index db45d6f1c4f4..8bbf676c2a85 100644
+--- a/include/linux/if_pppox.h
++++ b/include/linux/if_pppox.h
+@@ -25,8 +25,6 @@ struct pppoe_opt {
+ 	struct net_device      *dev;	  /* device associated with socket*/
+ 	int			ifindex;  /* ifindex of device associated with socket */
+ 	struct pppoe_addr	pa;	  /* what this socket is bound to*/
+-	struct sockaddr_pppox	relay;	  /* what socket data will be
+-					     relayed to (PPPoE relaying) */
+ 	struct work_struct      padt_work;/* Work item for handling PADT */
+ };
+ 
+@@ -53,7 +51,6 @@ struct pppox_sock {
+ #define pppoe_dev	proto.pppoe.dev
+ #define pppoe_ifindex	proto.pppoe.ifindex
+ #define pppoe_pa	proto.pppoe.pa
+-#define pppoe_relay	proto.pppoe.relay
+ 
+ static inline struct pppox_sock *pppox_sk(struct sock *sk)
+ {
+@@ -80,14 +77,11 @@ extern void pppox_unbind_sock(struct sock *sk);/* delete ppp-channel binding */
+ extern int pppox_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg);
+ extern int pppox_compat_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg);
+ 
+-#define PPPOEIOCSFWD32    _IOW(0xB1 ,0, compat_size_t)
+-
+ /* PPPoX socket states */
+ enum {
+     PPPOX_NONE		= 0,  /* initial state */
+     PPPOX_CONNECTED	= 1,  /* connection established ==TCP_ESTABLISHED */
+     PPPOX_BOUND		= 2,  /* bound to ppp device */
+-    PPPOX_RELAY		= 4,  /* forwarding is enabled */
+     PPPOX_DEAD		= 16  /* dead, useless, please clean me up!*/
+ };
+ 
+diff --git a/include/uapi/linux/if_pppox.h b/include/uapi/linux/if_pppox.h
+index 9abd80dcc46f..8fdf0a681a4e 100644
+--- a/include/uapi/linux/if_pppox.h
++++ b/include/uapi/linux/if_pppox.h
+@@ -103,16 +103,6 @@ struct sockaddr_pppol2tpv3in6 {
+ 	struct pppol2tpv3in6_addr pppol2tp;
+ } __packed;
+ 
+-/*********************************************************************
+- *
+- * ioctl interface for defining forwarding of connections
+- *
+- ********************************************************************/
+-
+-#define PPPOEIOCSFWD	_IOW(0xB1 ,0, size_t)
+-#define PPPOEIOCDFWD	_IO(0xB1 ,1)
+-/*#define PPPOEIOCGFWD	_IOWR(0xB1,2, size_t)*/
+-
+ /* Codes to identify message types */
+ #define PADI_CODE	0x09
+ #define PADO_CODE	0x07
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
