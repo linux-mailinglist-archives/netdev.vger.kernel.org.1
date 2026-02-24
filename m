@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-260641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260642-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YIYoCkgKnmnkTAQAu9opvQ
-	(envelope-from <netdev+bounces-260641-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 21:30:00 +0100
+	id SD8kLEcKnmnkTAQAu9opvQ
+	(envelope-from <netdev+bounces-260642-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 21:29:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96B2218C60D
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5631218C60C
 	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 21:29:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5C2B830B2403
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 20:29:52 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A8294303CB33
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 20:29:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8786F33A71B;
-	Tue, 24 Feb 2026 20:29:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA4F733A02D;
+	Tue, 24 Feb 2026 20:29:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="lCo6yPtQ"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="BCvCyUhT"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0013F33A010;
-	Tue, 24 Feb 2026 20:29:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACD9034CDD;
+	Tue, 24 Feb 2026 20:29:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771964990; cv=none; b=KOXZeMf3NiSUJNPRsu7kaMN5s+0F3hLJnxhsR2WsRAVNgsliAEXtk1ZMYDa6wPj37LmFsOPHo75wSmuvDyTOv9GlOX+qf3VBf/szcxFC2sDa3g9XIOqeyBAz9hyNz6MlSJiNK1/jzw7lbafp7oBw1YRiBLqIuXCnCEOO0+o8HEM=
+	t=1771964996; cv=none; b=ZwtnMQkmTnawVBMe0A4UKVBw/pxLt1i1/0qJC0nJEF6MKzCXJaecNBKJLaNJSrgjDb0C+Bgq3LQGWUdVTHw9w6iZN1G9xFNHgfPOtq7AEfNDY0N3qE5T0GL7Xn0mi3Xlzoqy+dqFFHxtJkma2a66ia1upx7VXnMtIcdT2IgFk2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771964990; c=relaxed/simple;
-	bh=1VEm0arbUZfxX0v/fT6FqQBpqJKnwvcYGvUGlchmwxo=;
+	s=arc-20240116; t=1771964996; c=relaxed/simple;
+	bh=JYrKBiLiuP7chA3VIle2cWQufy5LUnFCNtHJLGMMsTM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Y97r6vVdjg6CIuL2gP5ZyhKca9T650XJAciCI70l7GEWI49bxhF62n3B3SVRFyK2hPj03aSAvD0udb+4Z0xDvKrx4DXVvU0BvrMPoM3Y8PPaVNulckeHcj68DlFUyFsckzlY9eLXdTT+HBVFFVAsGAxtwcYBmmpS0nZZWwy+LJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=lCo6yPtQ; arc=none smtp.client-ip=68.232.154.123
+	 MIME-Version:Content-Type; b=MWdQsbcQ/NWxJuVLOw1q81BV91NkYm+0ZzX0EqeG3D54TF4MB1ayClBwMsy16DB3BjIDm8tB37wZbPhmNXHMchnkjaQ4fVzkXIMRFFFW65WnMX6TtDKzGXIqRw2sG0Vw+8zrxG+n2ThNSKeFc1zlhcoI/Bg/dSQH6S/LQdBHNTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=BCvCyUhT; arc=none smtp.client-ip=68.232.153.233
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1771964987; x=1803500987;
+  t=1771964996; x=1803500996;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=1VEm0arbUZfxX0v/fT6FqQBpqJKnwvcYGvUGlchmwxo=;
-  b=lCo6yPtQOpCE0XNolJDqT5+bRSDsDpYYjln4TUfzOhQBm8rETf+E1jYg
-   I7mMqEXDdFCdk0RqNJwZ5/DDJj53rFDs0blOHIWKE1OcH0sXGjjfSqaCR
-   5cQa1GheacooHhhgLOMhO+56XOt3Mi3uXISCOliDKVIrWLQEpE6VV7nZT
-   eFiGwOePv4ZAyubeRCA9k883y1cQZ8kHTMspfc82ZxeCADYmjHE0447Wd
-   W8Nn+yiplUMjIapn3MpdLlFk4JFBGNadm0n6D2cN6gXdSnRaufz0F0Gx0
-   zYqevSOBEt/7yE/1SyuZ+OLr5T2v/6hhOlLVMFYVb2el9sFHh6Ai28tkL
+  bh=JYrKBiLiuP7chA3VIle2cWQufy5LUnFCNtHJLGMMsTM=;
+  b=BCvCyUhTUWtAHI6uPgypxCYQOT4hY33E/kJ7xhurkzCr0jgtPjTLszGv
+   rIzoBzw120hHNTKc7q9EsAjho9jrTFgQhZcsPtKXDaYRy8KzFcea5NhfT
+   UvFt0O5LsoWH0J24giTOtSjCG6P/k8vcnqUkvcPGAoj+FXIqa0Krd7FCA
+   8eIuywAtPiclPR5Oo2+W0SRn61+4AjZz1SvV5UCDsC4fL2kmPw+aXh8md
+   J1rC9IV4EafQmY1HdFvsdXqA+0/3ahOZcFe2mhMXZX+sDW4GTWbCgTWPA
+   pDMeDiqU/GpHW+/+CpirDq8JkDs9rzbLlzHuLUQMjpSVikJclzRsrsn5i
    w==;
-X-CSE-ConnectionGUID: CU6nEk3VSSKbTSpVLGI17Q==
-X-CSE-MsgGUID: cIybErY6RLa4XitBa8VsTQ==
+X-CSE-ConnectionGUID: q8IE9EiCRpeM7ZzmGaO9hg==
+X-CSE-MsgGUID: 0jgpgC3WRwCaJijj4ru4FQ==
 X-IronPort-AV: E=Sophos;i="6.21,309,1763449200"; 
-   d="scan'208";a="54233071"
+   d="scan'208";a="53802224"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2026 13:29:44 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.87.152) by
- chn-vm-ex1.mchp-main.com (10.10.87.30) with Microsoft SMTP Server
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Feb 2026 13:29:55 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.35; Tue, 24 Feb 2026 13:29:30 -0700
+ 15.1.2507.58; Tue, 24 Feb 2026 13:29:34 -0700
 Received: from bby-cbu-swbuild03.eng.microchip.com (10.10.85.11) by
  chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Tue, 24 Feb 2026 13:29:28 -0700
+ 15.1.2507.58 via Frontend Transport; Tue, 24 Feb 2026 13:29:33 -0700
 From: Charles Perry <charles.perry@microchip.com>
 To: <netdev@vger.kernel.org>
 CC: Charles Perry <charles.perry@microchip.com>, Sean Anderson
@@ -70,9 +70,9 @@ CC: Charles Perry <charles.perry@microchip.com>, Sean Anderson
  Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
 	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next v2 1/3] net: macb: fix SGMII with inband aneg disabled
-Date: Tue, 24 Feb 2026 12:28:52 -0800
-Message-ID: <20260224202854.112813-2-charles.perry@microchip.com>
+Subject: [PATCH net-next v2 2/3] net: macb: add support for reporting SGMII inband link status
+Date: Tue, 24 Feb 2026 12:28:53 -0800
+Message-ID: <20260224202854.112813-3-charles.perry@microchip.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260224202854.112813-1-charles.perry@microchip.com>
 References: <20260224202854.112813-1-charles.perry@microchip.com>
@@ -92,7 +92,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
 	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -100,8 +100,8 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-260641-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-260642-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[charles.perry@microchip.com,netdev@vger.kernel.org];
@@ -111,17 +111,15 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-0.995];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,microchip.com:mid,microchip.com:dkim,microchip.com:email]
-X-Rspamd-Queue-Id: 96B2218C60D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:mid,microchip.com:dkim,microchip.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5631218C60C
 X-Rspamd-Action: no action
 
-Make it possible to connect a PHY which does not use inband
-autoneg to a gem MAC using phylink's information.
+This makes it possible to use in-band autonegotiation with
+SGMII.
 
-The previous implementation relied on whether or not the link
-was a fixed-link to disable SGMII autoneg. This commit extend
-this to all link which are not configured for inband
-autonegotiation.
+If using a device tree, this can be done by adding the managed =
+"in-band-status" property to the gem node.
 
 Signed-off-by: Charles Perry <charles.perry@microchip.com>
 ---
@@ -129,66 +127,28 @@ Signed-off-by: Charles Perry <charles.perry@microchip.com>
 Notes:
     Changes in v2:
       * Move my notes to the cover letter
-      * Remove the spinlock in macb_pcs_config
-      * Keep the comment about the PCSSEL register
 
- drivers/net/ethernet/cadence/macb_main.c | 36 +++++++++++++-----------
- 1 file changed, 20 insertions(+), 16 deletions(-)
+ drivers/net/ethernet/cadence/macb_main.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index f72270a39d25..f4250e76cef0 100644
+index f4250e76cef0..f6efc1bb88b6 100644
 --- a/drivers/net/ethernet/cadence/macb_main.c
 +++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -574,6 +574,26 @@ static int macb_pcs_config(struct phylink_pcs *pcs,
- 			   const unsigned long *advertising,
- 			   bool permit_pause_to_mac)
+@@ -560,7 +560,12 @@ static int macb_usx_pcs_config(struct phylink_pcs *pcs,
+ static void macb_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
+ 			       struct phylink_link_state *state)
  {
+-	state->link = 0;
 +	struct macb *bp = container_of(pcs, struct macb, phylink_sgmii_pcs);
-+	u32 old, new;
++	u16 bmsr, lpa;
 +
-+	old = gem_readl(bp, PCSANADV);
-+	new = phylink_mii_c22_pcs_encode_advertisement(interface, advertising);
-+	if (new != -EINVAL && old != new)
-+		gem_writel(bp, PCSANADV, new);
-+
-+	/* Disable AN if it's not to be used, enable otherwise.
-+	 * Must be written after PCSSEL is set in NCFGR which is done in
-+	 * macb_mac_config(), otherwise writes will not take effect.
-+	 */
-+	old = gem_readl(bp, PCSCNTRL);
-+	if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED)
-+		new = old | BMCR_ANENABLE;
-+	else
-+		new = old & ~BMCR_ANENABLE;
-+	if (old != new)
-+		gem_writel(bp, PCSCNTRL, new);
-+
- 	return 0;
++	bmsr = gem_readl(bp, PCSSTS);
++	lpa = gem_readl(bp, PCSANLPBASE);
++	phylink_mii_c22_pcs_decode_state(state, neg_mode, bmsr, lpa);
  }
  
-@@ -628,22 +648,6 @@ static void macb_mac_config(struct phylink_config *config, unsigned int mode,
- 	if (old_ncr ^ ncr)
- 		macb_or_gem_writel(bp, NCR, ncr);
- 
--	/* Disable AN for SGMII fixed link configuration, enable otherwise.
--	 * Must be written after PCSSEL is set in NCFGR,
--	 * otherwise writes will not take effect.
--	 */
--	if (macb_is_gem(bp) && state->interface == PHY_INTERFACE_MODE_SGMII) {
--		u32 pcsctrl, old_pcsctrl;
--
--		old_pcsctrl = gem_readl(bp, PCSCNTRL);
--		if (mode == MLO_AN_FIXED)
--			pcsctrl = old_pcsctrl & ~GEM_BIT(PCSAUTONEG);
--		else
--			pcsctrl = old_pcsctrl | GEM_BIT(PCSAUTONEG);
--		if (old_pcsctrl != pcsctrl)
--			gem_writel(bp, PCSCNTRL, pcsctrl);
--	}
--
- 	spin_unlock_irqrestore(&bp->lock, flags);
- }
- 
+ static void macb_pcs_an_restart(struct phylink_pcs *pcs)
 -- 
 2.47.3
 
