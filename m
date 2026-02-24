@@ -1,196 +1,185 @@
-Return-Path: <netdev+bounces-260575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260569-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6BaSN4LHnWk8SAQAu9opvQ
-	(envelope-from <netdev+bounces-260575-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 16:45:06 +0100
+	id OCV0BpvHnWk8SAQAu9opvQ
+	(envelope-from <netdev+bounces-260569-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 16:45:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 742031893CA
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 16:45:05 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B6FA1893E0
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 16:45:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 230073073EE0
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 15:42:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6B8F531D0686
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 15:40:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47A5F3A63ED;
-	Tue, 24 Feb 2026 15:42:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A992F28853E;
+	Tue, 24 Feb 2026 15:40:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vrCx26Eg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qYtwN44p"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCFCD3A4F58
-	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 15:42:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771947748; cv=none; b=AxSwNSJxLW18A6kpQkxs2OO8OnHAzEyqlY+GqjIR/6D8b1zfRVXjKLKXz2+AMyA1rP6dvniSYFVRmS/NGVZaU+yE0ByYyvhWB+WB4ZPeX+Drd+aobnZHnFF9j6IdbvD9XefdiSOIkiBqwZP7cWvJInpR+/zYEkBfIRL03Oyy2gg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771947748; c=relaxed/simple;
-	bh=MnFhEKNIzjXvigv4lxIPNTGgFi/zYkk/xBW6Z/qPfVA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=idkTdto7kl9aEf7fK7MLdyKHm5YQrRgiQhvLS4UsDwnoDjX3rBj0zl60v0bLlwTrIBARhmDtjbeCkbc+3YDX+gggOl/LeDEWuYEbONqHucyjRD5aDOECraw9OuRm9E+HUd0A7q3DHU1dWX08HcCc7voklt/DYaXg9bNqV2Q7YWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vrCx26Eg; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1771947745;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/b+70PPkY/pfbfwzHHp1MTkubPK3K5BdD6G2vC79gfY=;
-	b=vrCx26Eg2houGeS4NexccmEm22FNdHtVz5G+g/Sjm2mJvX/nP/+HkunFUwk5ONLwk/jVX4
-	lcpWGFzfdS7VG0z3b9Mr9uLh8pBItyBG8fiApzWSki+jC3J5IsvoKC21psNEV0RUKyvI8I
-	J9unfd3UUprSA0mXC04TwPg72ajaZFA=
-From: Leon Hwang <leon.hwang@linux.dev>
-To: bpf@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Feng Yang <yangfeng@kylinos.cn>,
-	Leon Hwang <leon.hwang@linux.dev>,
-	Menglong Dong <menglong8.dong@gmail.com>,
-	Puranjay Mohan <puranjay@kernel.org>,
-	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
-	Pu Lehui <pulehui@huawei.com>,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org,
-	kernel-patches-bot@fb.com
-Subject: [PATCH bpf-next 5/8] bpf: Disallow !call_session_is_return progs tail-calling call_session_is_return progs
-Date: Tue, 24 Feb 2026 23:40:21 +0800
-Message-ID: <20260224154024.12504-6-leon.hwang@linux.dev>
-In-Reply-To: <20260224154024.12504-1-leon.hwang@linux.dev>
-References: <20260224154024.12504-1-leon.hwang@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BE14292B4B
+	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 15:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771947637; cv=pass; b=TNcsMhFYBw3+nGggG4eCPHpRi94TuY0mkJ7ntUd0xSlvYnNslFfUJEEZbXbK/OWFSKvU75+KioxXiplMw7lqeN4+xrwLUoxKWlbAnPD6ogN/cnc2ZLGoCMFs4qFj+WabEsjfu02hs7DuDFYiiygQ818Qoiy6U9Ove4OlMSJ6phY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771947637; c=relaxed/simple;
+	bh=O3QyF9FLKTP6W6pa/p3xJuZO0tSDoqWpWsvRiZjDSKc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EhzFQ10W5Ya/cSc31EykX4+ZeQLrBNZw+XwrS438cJ1tEE75frikb8+i57zP+s86PXd8jep0tkHibsiqe5hDkHJPU6i5GAYhEKx7JqPnLlq/W3hSPTbycdyAVC0tS0UHmL1D7OZqhxgcAePqIY/Xa8wYrcfaMTqvHCP7ICmf+jA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qYtwN44p; arc=pass smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-5062fc5d86aso53971701cf.1
+        for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 07:40:36 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771947635; cv=none;
+        d=google.com; s=arc-20240605;
+        b=KI21W6ecUL4t4z7IGBzgILecXL1qelNorBUX6vmBL5u1jti4lll+2QMW+EcRDE+gUi
+         qHdZHC9ax6JE+UEjrSmrxoVJfGt8b4Xz1iytYeyaveuxlUBmluhW9xgAFHg3P6t1FWqf
+         F0spEhblB0BDcdthygxJqqd1qVXKwqBIhAjWs3P9Kw8nkUIU6iAx6DnGwR+pMU2+v+aj
+         n/Jp34Pe72wlcI/tK5kqhbmiQQu4/GgRt79RnOt78/GEkPnC1eI3Ynmw/XQ7DJZTIhl+
+         /hmg5wcTJStt+2zh4LEcm79wqiiHO9LnQuXxBNzEOGDJmr28AVecHjK5SytDLgNREPJA
+         zzoA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=s1imFveo5pSvSVBui0etS47YYyKWam8zfgbleGHkHh8=;
+        fh=F9Pa3NeVI0ElM4w8oSGkuVZPpQ5kQ4uD4fHIr5y8sNE=;
+        b=Kp3MgBYiwUmpHUmsgRPLpJuEwahVCQkzbBmkBYqj4mlSaFrV4qd613FsOFb9pndL7T
+         I+PR3Iqon7/5YwKvCk2PvkVs3m2bhvB6zfk9oYf1j+6cP6MPsZvRMhBiWwR5m1cGrSrd
+         h9YzsyYL1Ul8FGX2CyP/tLLmcmZKcxJzhHvievwrvLYcpIB02s1mVKlW90cHDRSkiePO
+         6Wau+htaczIGhTpX99bpmqLcSYOJHcsAlsDt7Cy5zA1f2mJBLXJHMUesM7lbyiR4Olo+
+         KSQBLm0Lz/yNKReGDQJNOvrdiM6RJ/yUHvCkCKnoOE0qUpmw/YCv0zKmPHxsOSelhqOR
+         r8jg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1771947635; x=1772552435; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=s1imFveo5pSvSVBui0etS47YYyKWam8zfgbleGHkHh8=;
+        b=qYtwN44pAzzsRjFi4t7xLa0ihOwQ8nhRGHkL8576eBlADkU6wyLDBoOUpnRgQgcPEb
+         PqnK7OgqBlt9NniKN6IZ3MdxpswrU4NMGgc6deoAezK5eOgmcYeiZQoyB6JwIg87cy2+
+         ph7FB2Mr94J4WJin09SwjDWdlWPks611GwxrtsPXm2lE9Tkf73WjFIdtSx5OxNap6is3
+         oUowm56NJPIYC74UYWwTGi4diPjOq5h1ExMjnzWDB+csjA6s4ExuWgN0KHXL4vxYEynt
+         uOGVzM69ZdwzUNDEyerZYFFzr4+SEFBvZKm/Irq+MOC49sx2LooDjDVOBtSfTQInDVLF
+         nSoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771947635; x=1772552435;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=s1imFveo5pSvSVBui0etS47YYyKWam8zfgbleGHkHh8=;
+        b=oxXg4JvdCPgOD/8RLch44AcCkvu4EMFDo5oz0INcJgeJwAepSLUw8ySY94hsP17ZLD
+         thk2zydTmu/m0Mx2UcZx8jIW47VKUDbvETy3mvqrRHHA4JeZA9yy5AfWwHUdkRnWlGbh
+         bYzr1JQiAvr6JBdDxeG0Rt46DPfU4mQbm7GpxShP7Jj7FMMuLYuPuB/MKdlvEMujmcL2
+         QVqfKWozASTGHMC0v5tg1f4/RCjhGRLR842FeEX0zHoPXkrYKMzyiS1H/D2pYTFdyiVs
+         f9jSTxr9QgCj0hWD3AZzHyzsyARUkOyaJrjOZFVw9mAYZxfZrC/KimRM+86WrBnhDlh1
+         Yd6w==
+X-Forwarded-Encrypted: i=1; AJvYcCVjEFocb/2Js7FjIW5iaLh+/BLBfKeIW0AXTtS0PR83a6qqVZckQlE+cxQqAbtbWuaBL/f6pWI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzE1q7qm4ozCmgGcfsFbi/3jVAhtXLKkAgnnc/sEpGChLqn+cLg
+	yQJVLGRGo8uqRvVIdbe0wgcnyYtKEt10GCQjJSP1UCdOFMJWN99PDawL+mYgVxrYN2W7o9B6XvF
+	jVDU2Z/6/3Y5sOeqJT9ULr98dj20U3mTkUdkXCXKG
+X-Gm-Gg: AZuq6aKQPuoL7KOfT5MNiHO5XhqLwIzkgbRm/2eeqLBcgiWyzpIfuHw7u3g8M/b+lIx
+	0QhnliELwIrOaf4E3ixLrLYz/qbyma6y816nfFZ6U9t1EscRQQI51DltcKILg/dnVdmWlHv08NL
+	mi8ZG5ElA51mWZ4A9coWIfxsF2vUJNuBSqBZ2eYs02U8htv9AaveodcFdzMBq4LN7qZm0udr4Pu
+	CIDh6FSt9kdRLYQaGxuUfafwD9XmrAkiKbboSyMyI9xzmJCDUiLI6Cv6EB09LuLLlOGrC6/dWFN
+	QOGe56Th3nXX+8BqXrlx3cK9zPHyygIKGTkLL+Uopw==
+X-Received: by 2002:a05:622a:155:b0:501:466b:513f with SMTP id
+ d75a77b69052e-5070bb81aecmr170572891cf.15.1771947634673; Tue, 24 Feb 2026
+ 07:40:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20260224122856.3152608-1-edumazet@google.com> <aZ2fA2x5nHsnQoBu@strlen.de>
+In-Reply-To: <aZ2fA2x5nHsnQoBu@strlen.de>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 24 Feb 2026 16:40:21 +0100
+X-Gm-Features: AaiRm533J9ZDgyKQm7SRyYWq-5zpwgDCD5gGsi5iohdc-GX4zvKgIhR8q5fnwgE
+Message-ID: <CANn89iLP2xFerYywu=x8bnox_+vjrDVUxkEf-nUEJM0VmNfVdA@mail.gmail.com>
+Subject: Re: [PATCH net-next] netfilter: xt_owner: no longer acquire
+ sk_callback_lock in mt_owner()
+To: Florian Westphal <fw@strlen.de>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Pablo Neira Ayuso <pablo@netfilter.org>, 
+	Jozsef Kadlecsik <kadlec@netfilter.org>, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260575-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	SUBJECT_HAS_EXCLAIM(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,kylinos.cn,huawei.com,vger.kernel.org,fb.com];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon.hwang@linux.dev,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,netfilter.org,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-260569-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.992];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim,linux.dev:email]
-X-Rspamd-Queue-Id: 742031893CA
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,strlen.de:email]
+X-Rspamd-Queue-Id: 4B6FA1893E0
 X-Rspamd-Action: no action
 
-bpf_session_is_return() depends on consistent session metadata stored on
-stack for fsession programs. Mixing fsession programs that do and do not
-rely on these helpers in tail calls can violate that runtime contract.
+On Tue, Feb 24, 2026 at 1:52=E2=80=AFPM Florian Westphal <fw@strlen.de> wro=
+te:
+>
+> Eric Dumazet <edumazet@google.com> wrote:
+> > After commit 983512f3a87f ("net: Drop the lock in skb_may_tx_timestamp(=
+)")
+> > from Sebastian Andrzej Siewior, apply the same logic in mt_owner()
+> > to avoid touching sk_callback_lock.
+> > -     read_lock_bh(&sk->sk_callback_lock);
+> > -     filp =3D sk->sk_socket ? sk->sk_socket->file : NULL;
+> > +     /* The sk pointer remains valid as long as the skb is. The sk_soc=
+ket and
+> > +      * file pointer may become NULL if the socket is closed. Both str=
+uctures
+> > +      * (including file->cred) are RCU freed which means they can be a=
+ccessed
+> > +      * within a RCU read section.
+> > +      */
+> > +     rcu_read_lock();
+> > +     sock =3D READ_ONCE(sk->sk_socket);
+> > +     filp =3D sock ? READ_ONCE(sock->file) : NULL;
+>
+> Thanks for doing this Eric!
+>
+> Minor nit: rcu_read_lock is already acquired from nf_hook() helper, so
+> we aleays have it in both iptables and nftables.
+>
+> Reviewed-by: Florian Westphal <fw@strlen.de>
 
-Disallow the combination of !call_session_is_return progs and
-call_session_is_return progs in __bpf_prog_map_compatible() to address
-the issue.
+Sure, I will remove the rcu_read_lock()/rcu_read_unlock()
 
-Fixes: 27d89baa6da8 ("bpf: support fsession for bpf_session_is_return")
-Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
----
- include/linux/bpf.h   | 4 +++-
- kernel/bpf/core.c     | 4 ++++
- kernel/bpf/verifier.c | 2 ++
- 3 files changed, 9 insertions(+), 1 deletion(-)
+Do you think adding lockdep_assert_in_rcu_read_lock() would be useful
+or would it be too much, iptables/nftables willl always be run under RCU
+and this is well understood ?
 
-diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-index c74db70f9be1..6be5f81b61e7 100644
---- a/include/linux/bpf.h
-+++ b/include/linux/bpf.h
-@@ -290,7 +290,8 @@ struct bpf_map_owner {
- 	    sleepable:1,
- 	    kprobe_write_ctx:1,
- 	    call_get_func_ip:1,
--	    call_session_cookie:1;
-+	    call_session_cookie:1,
-+	    call_session_is_return:1;
- 	u64 storage_cookie[MAX_BPF_CGROUP_STORAGE_TYPE];
- 	const struct btf_type *attach_func_proto;
- 	enum bpf_attach_type expected_attach_type;
-@@ -1699,6 +1700,7 @@ struct bpf_prog_aux {
- 	bool changes_pkt_data;
- 	bool might_sleep;
- 	bool kprobe_write_ctx;
-+	bool call_session_is_return; /* Do we call bpf_session_is_return */
- 	u64 prog_array_member_cnt; /* counts how many times as member of prog_array */
- 	struct mutex ext_mutex; /* mutex for is_extended and prog_array_member_cnt */
- 	struct bpf_arena *arena;
-diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
-index 904a8dbfd56f..44aeb49b2d1b 100644
---- a/kernel/bpf/core.c
-+++ b/kernel/bpf/core.c
-@@ -2405,6 +2405,7 @@ static bool __bpf_prog_map_compatible(struct bpf_map *map,
- 		map->owner->kprobe_write_ctx = aux->kprobe_write_ctx;
- 		map->owner->call_get_func_ip = fp->call_get_func_ip;
- 		map->owner->call_session_cookie = fp->call_session_cookie;
-+		map->owner->call_session_is_return = aux->call_session_is_return;
- 		map->owner->expected_attach_type = fp->expected_attach_type;
- 		map->owner->attach_func_proto = aux->attach_func_proto;
- 		for_each_cgroup_storage_type(i) {
-@@ -2426,6 +2427,9 @@ static bool __bpf_prog_map_compatible(struct bpf_map *map,
- 		if (ret && (!map->owner->call_session_cookie && fp->call_session_cookie &&
- 			    prog_type == BPF_PROG_TYPE_TRACING))
- 			ret = false;
-+		if (ret && (!map->owner->call_session_is_return && aux->call_session_is_return &&
-+			    prog_type == BPF_PROG_TYPE_TRACING))
-+			ret = false;
- 		if (ret &&
- 		    map->map_type == BPF_MAP_TYPE_PROG_ARRAY &&
- 		    map->owner->expected_attach_type != fp->expected_attach_type)
-diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-index 9e9c04e08fba..919075ee3479 100644
---- a/kernel/bpf/verifier.c
-+++ b/kernel/bpf/verifier.c
-@@ -14409,6 +14409,8 @@ static int check_kfunc_call(struct bpf_verifier_env *env, struct bpf_insn *insn,
- 
- 	if (meta.func_id == special_kfunc_list[KF_bpf_session_cookie])
- 		env->prog->call_session_cookie = true;
-+	if (meta.func_id == special_kfunc_list[KF_bpf_session_is_return])
-+		env->prog->aux->call_session_is_return = true;
- 
- 	return 0;
- }
--- 
-2.52.0
-
+Thanks.
 
