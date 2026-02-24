@@ -1,67 +1,59 @@
-Return-Path: <netdev+bounces-260608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260609-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2PUZNoDhnWnpSQQAu9opvQ
-	(envelope-from <netdev+bounces-260608-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 18:36:00 +0100
+	id 0GxWHP7hnWnpSQQAu9opvQ
+	(envelope-from <netdev+bounces-260609-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 18:38:06 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C73118A986
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 18:36:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CC64318A9E6
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 18:38:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DF96A303FFF0
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 17:35:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5A67A30160F4
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 17:36:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 368293A9627;
-	Tue, 24 Feb 2026 17:35:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBF683A9D97;
+	Tue, 24 Feb 2026 17:36:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="34+3n7Bv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cHCKBZvj"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D10A227F195;
-	Tue, 24 Feb 2026 17:35:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8893E555;
+	Tue, 24 Feb 2026 17:36:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771954558; cv=none; b=RkA4WnH2D13NP8xMvYlivszScotI1bTa5JsVfGFW1Tw7k10+hL5deiz94wkxIxvjCW2shuLpLYgw7X65uNLOMNmewEiIxzshppLfYlfVzRERiu+smU4CcoGwv0XK9S3p7rNnrOncURLt6CyTG1wEP6PYmmuJTaje60bCdY33/WU=
+	t=1771954612; cv=none; b=o6FOha5nvzNlTTQamkkhRC8jUAvQ5HIukOFsI+6Ch2PWT6UseseJKfkqwgjHSiqoXpDxkrC/+EiEzln5b1bXV60vW3sSdB5+qDK+mYp9woi7QmFt/PMxdvO0DWddNjph7WpbC3GvmvZKyGNHXvy88P4c5G7qX+JD4TLcWDMjAl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771954558; c=relaxed/simple;
-	bh=FANanv60YdJdTgmgZVSFI8cwXQJOUroiY4SelPO6sOM=;
+	s=arc-20240116; t=1771954612; c=relaxed/simple;
+	bh=D2ttvjm0kDTDRJSJsU4I6IT2so61IzcGQYqgQil448U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XI0vRFRyuNC1jr2sSZ28AkLm4N3CUBcDOkfNnXb7TwSU5hQX6ES6MXs5vzyNBSkwhGbs9s0z9rtx3G/dulwItVjwNF6IQerhogAjzVSF7SsQcGS7u4lnZQr6El9YvdvPMK4lVFZE3tS3ri7MD6eqBsClXKtEcW4THyFqIQj0HGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=34+3n7Bv; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=qbE0xjTqfcKiqtqbVBu1tzAoErqu/IOiLVqQbElaH1Q=; b=34+3n7BvkImara/zAH0UxjSOh1
-	iNJvkhrQlHnoxn+9bKXdrAxUDGns8m2ZCmsVvtRRxeQZYPfDQWmzTV6OxT2rXjSgj2zhK98qoEEen
-	OC3Ath1NqgiuMmUJ9qxFk2qLYWcDL/RSXcRRcx3WtcEDWLXzdyk8PzChRTF/J6E4wi7o=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vuwK0-008dQt-7J; Tue, 24 Feb 2026 18:35:44 +0100
-Date: Tue, 24 Feb 2026 18:35:44 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Artem Lytkin <iprintercanon@gmail.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	Trevor Gross <tmgross@umich.edu>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Miguel Ojeda <ojeda@kernel.org>, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 0/2] net: phy: add Rust reference driver for
- ET1011C
-Message-ID: <f968578d-0e3a-404f-8aa7-6a8852e9a134@lunn.ch>
-References: <20260224043211.1747-1-iprintercanon@gmail.com>
- <20260224164926.1760-1-iprintercanon@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=NljVWlxHvKs/OUui5bg7+pfN1iODJU3VUl4D47/2KOOZf2O8CHFuPMN/z29q3Ny49yPqINQyWSxPzaWZbdV8KHnrjdm0vYZkXxDxQajcT81seYN3kHdxbg7hjQCaGrj1yPqANEnq2lRcCht6EOWRe0Hx8FQBDKr0CV9b6rC5MNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cHCKBZvj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27490C116D0;
+	Tue, 24 Feb 2026 17:36:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771954612;
+	bh=D2ttvjm0kDTDRJSJsU4I6IT2so61IzcGQYqgQil448U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cHCKBZvjHpSEtIHnJF1gPsw4Z4CBV1bEIGIZBUKzwOfuMRK1v04Eajx2tTQcNIJJS
+	 aVD6FcNF60XKXaN60frgafhQlVg7qx8GJmxe3h4aNsclNH/zNGeue9ElGyyjW3IS4S
+	 1cZo67R+5fHxkvKMx7MKCgn+PXJPl2K/4C5QInGP0Inpq7TRON2zh+N01ejvBGoSfQ
+	 xEouHhsJtgWtFJxJXuUp9gzQ+CRMbpHBiLy/Q1sO6d2//tiE2HlSpQs32FmbBBzURi
+	 b1s4f6svMojDR3luceLEu+WaNDyYjXrogCx0U3CmXOQG53aKQcYH3x7WpXgXPuzGWP
+	 Klcuw7gM4ZPLA==
+Date: Tue, 24 Feb 2026 17:36:48 +0000
+From: Simon Horman <horms@kernel.org>
+To: kexinsun <kexinsun@smail.nju.edu.cn>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, julia.lawall@inria.fr,
+	xutong.ma@inria.fr, yunbolyu@smu.edu.sg, ratnadiraw@smu.edu.sg
+Subject: Re: [PATCH] net/hsr: update outdated comment
+Message-ID: <aZ3hsP_GoUN8Yn-7@horms.kernel.org>
+References: <20260224021205.1285-1-kexinsun@smail.nju.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,64 +62,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260224164926.1760-1-iprintercanon@gmail.com>
+In-Reply-To: <20260224021205.1285-1-kexinsun@smail.nju.edu.cn>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260608-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,umich.edu,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-260609-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ax88796b_rust.rs:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
-X-Rspamd-Queue-Id: 3C73118A986
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nju.edu.cn:email]
+X-Rspamd-Queue-Id: CC64318A9E6
 X-Rspamd-Action: no action
 
-On Tue, Feb 24, 2026 at 04:49:24PM +0000, Artem Lytkin wrote:
-> This series adds a Rust reference driver for the LSI ET1011C PHY,
-> following the pattern established by the existing Rust Asix PHY driver
-> (ax88796b_rust.rs).
+On Tue, Feb 24, 2026 at 10:12:05AM +0800, kexinsun wrote:
+> The function hsr_rcv() was renamed hsr_handle_frame() and moved to
+> net/hsr/hsr_slave.c by commit 81ba6afd6e64 ("net/hsr: Switch from
+> dev_add_pack() to netdev_rx_handler_register()"). Update the comment
+> accordingly.
 > 
-> Patch 1 adds a speed() getter to phy::Device, needed to detect speed
-> changes in read_status.
-> 
-> Patch 2 adds the Rust ET1011C driver itself, implementing soft_reset
-> and read_status callbacks.
+> Signed-off-by: kexinsun <kexinsun@smail.nju.edu.cn>
 
-Please don't post a new version within 24 hours.
+I notice that you have sent a number of similar fixes recently.
+I am curious to know how you found these problems.
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+If you are using a tool, please consider using the Assisted-by tag:
+https://docs.kernel.org/process/coding-assistants.html
 
-Also, each version should be in a thread of its own.
+Also, both git grep and our AI generated code review
+tell me that this is not the only instance of hsr_rcv lingering
+in comments in this driver. Please update all of them.
 
-Yes, the code is the easy bit, getting the processes correct is
-hard. But given the volume of patches, you need to follow the
-processes otherwise it does not scale.
-
-There are also some unanswered questions from the last version. Please
-don't post a new version until the discussion has come to a
-conclusion.
-
-	Andrew
+-- 
+pw-bot: changes-requested
 
