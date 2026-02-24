@@ -1,152 +1,169 @@
-Return-Path: <netdev+bounces-260476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260477-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2AkGHaiMnWn5QQQAu9opvQ
-	(envelope-from <netdev+bounces-260476-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 12:34:00 +0100
+	id yINSOUqNnWkXQgQAu9opvQ
+	(envelope-from <netdev+bounces-260477-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 12:36:42 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7206186582
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 12:33:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DF6C186636
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 12:36:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E6FAD304E723
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 11:29:55 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3C46A303F9CD
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 11:35:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C42337C10F;
-	Tue, 24 Feb 2026 11:29:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79B6737D132;
+	Tue, 24 Feb 2026 11:35:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JDh5Dx0E"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zmwp6GCL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C1937C108
-	for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 11:29:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556F736D51B;
+	Tue, 24 Feb 2026 11:35:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771932593; cv=none; b=TKsLjDjn7i44simZRA2K5IPE5wvBJI0e6RfqyCJHZ52e3cbvw2DAzkId9XjaziXbK13CFrJQEro+nidv6S84RHU0ndhgSSFjyVAUeeRLrs/qau1r+7aFDqxF2kB1Rx2kyuYqdWNbgAJ0fOZi8n838WToFUVJV9HfKcWYT9X4pWc=
+	t=1771932918; cv=none; b=LMSATDJIXH8z7DYZHOWopKtuKmSrP5wcN/4mg3WVvfeTxljDL+mgbX+IXYNpf719CxYcYXRy+8qGDlwZDTpoh8+gzyBxyMDgkfnoagFVsiIRVExxUg6dew+YXuMUgAX/akvJMFpGZ+TLpWnyH/oovfrARcmiggcNecMCo8cZ1D4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771932593; c=relaxed/simple;
-	bh=qae+KiV0H06twWryyZRy7nDOgPhLMz/Ho0BGykyklJo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iq2y6ppHYp5zcTirD9BrEDQTmb18mNAHwViOfEg+hq5fvRUL0yMzprIsQPDIKKY2sLsNmCj1cQOsa9nxjS6h23aRRdt59yzsxekUTWdN8oQTzsocuC/ENSaV/BAlCEvhCLSjDPC8RUnCn/5/ljTIkT7fku2Cri9OwLffRGKywoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JDh5Dx0E; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 736CBC116D0;
-	Tue, 24 Feb 2026 11:29:50 +0000 (UTC)
+	s=arc-20240116; t=1771932918; c=relaxed/simple;
+	bh=3gnRD+YMffokRF85VUUxKomjtZQMuEx117IH58zzsDk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=UPYEzAQ7fo/ArVRQoxzJlwDVoFKRK4MtlD4sjKe5SzVHzEHUvcEMJ1A2ZIBxk460twmFqNwfRgv9SGn1EysvSYg083W4ugawU0EiIaxAqyknA2/VJiKDG/peBpAivc5eiYTSeNu9Z0cLotR6SrFFQMpXzrfbb0Yktf4nb9MA3B8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zmwp6GCL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A707C116D0;
+	Tue, 24 Feb 2026 11:35:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771932592;
-	bh=qae+KiV0H06twWryyZRy7nDOgPhLMz/Ho0BGykyklJo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JDh5Dx0EpWIZ64bcRaZ27qvAnJXequ/LMJZm4dN0Hcri0QTx6R3nsCe/hglXvzRlr
-	 WsV9QiFJFmNxwfDwP+P9MdJWbU/RbK+hH2+Ajz+kDBw5bG1foZM5utHkfNHuIdEzYZ
-	 j1hxzKVTMDL19wu+McDjN2CYQ7kIPaf9m2E+UDGxMj6e1fcWAMkfNFBu6kqG0QKInx
-	 u2mOO18OtXEeSGxB2iFubpjCXq4Sf1Epo+TT75cKEoVtuInl1p6SJqZJv5aeFuTlCz
-	 QI5xiYYfC3bo/CXqbw/m+pJrOJohUKOS8BVi6dS3dGbypYKAfAjFi9hrKN/ZUDuX5r
-	 EiSqkp9FOe2aw==
-Date: Tue, 24 Feb 2026 11:29:48 +0000
-From: Simon Horman <horms@kernel.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next] net: stmmac: ptp: limit n_per_out
-Message-ID: <aZ2LrDLPTR61TfQP@horms.kernel.org>
-References: <E1vuUvf-0000000AfhS-0lJR@rmk-PC.armlinux.org.uk>
- <aZ1uxX_fddwO7UYD@horms.kernel.org>
- <aZ13Gjav_5PYNGEN@shell.armlinux.org.uk>
+	s=k20201202; t=1771932918;
+	bh=3gnRD+YMffokRF85VUUxKomjtZQMuEx117IH58zzsDk=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Zmwp6GCLddeROusLGLpWhGSP4fUuythHuve767U0EiZ/a/vHNxkRAuDo33kZWj75C
+	 qPCaD7gqZs6GGr0chX+GqxJAr+4aLZQ3ge6S9kGcq3ji3oT4xARrD++btVTOarELA1
+	 ZAU1fUDshNgCQYrurJDqzR2KiCLiOJ3yxX3zKAKVGUiWqcBSCxFwFIrQJbrMeORIcW
+	 dCs/tlC1HgP4OmrwsUxZaO8OHYeuuZCH61cSHrHqUXot76w8KOdIsjDNmICLWaidzZ
+	 jmSI8r3U/ycKV7xrWSa7tPShUo4lY14imCtZMSmaKglFVOXlzBZlSUACw6Ws3/8R1X
+	 M2LhILNQcqhJw==
+From: Konrad Dybcio <konradybcio@kernel.org>
+Subject: [net-next PATCH v5 0/3] Grab IPA IMEM slice through DT
+Date: Tue, 24 Feb 2026 12:34:45 +0100
+Message-Id: <20260224-topic-ipa_imem-v5-0-015bf09e123e@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aZ13Gjav_5PYNGEN@shell.armlinux.org.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3XOwWrDMAyA4VcpPs8lcmLH6anvUcZwLGUVLHUat
+ 2Gj5N2rFgqFLBfBL9CHbirTyJTVbnNTI02cOZ0k7MdGxWM4fZNmlFamMLawptSXNHDUPIQv7qn
+ XSJ1zMQbvySo5Gkbq+PcJHj6lj5wvafx7+hM8tqvUBLrQrUVbOtNArLt9ynl7voafmPp+K0M9x
+ Mm8K/VCMaI4hBCwgdZXsKKUL8UVBpZKKQo69ISAXevqFaV6V5qFUokCvpFPsCXy1T/KPM93l7i
+ Ud4UBAAA=
+X-Change-ID: 20250523-topic-ipa_imem-def66cca88e5
+To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Alex Elder <elder@kernel.org>
+Cc: Marijn Suijten <marijn.suijten@somainline.org>, 
+ linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>, 
+ Alex Elder <elder@riscstar.com>, 
+ Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
+ Simon Horman <horms@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1771932912; l=2134;
+ i=konrad.dybcio@oss.qualcomm.com; s=20230215; h=from:subject:message-id;
+ bh=3gnRD+YMffokRF85VUUxKomjtZQMuEx117IH58zzsDk=;
+ b=JcBeFRW09GILIBAXiQluD9TA0a1XPsxjYNtRHJ0cavVDjBFeKrSHj20xpYbgAMNGlq8Q0rPny
+ /DErP1P2ZeZAqxSIflthgVLvsBULahbwn8JSkBk0c7we+iSIFXJFUZu
+X-Developer-Key: i=konrad.dybcio@oss.qualcomm.com; a=ed25519;
+ pk=iclgkYvtl2w05SSXO5EjjSYlhFKsJ+5OSZBjOkQuEms=
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260476-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260477-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[konradybcio@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.998];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A7206186582
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,oss.qualcomm.com:mid]
+X-Rspamd-Queue-Id: 1DF6C186636
 X-Rspamd-Action: no action
 
-On Tue, Feb 24, 2026 at 10:02:02AM +0000, Russell King (Oracle) wrote:
-> On Tue, Feb 24, 2026 at 09:26:29AM +0000, Simon Horman wrote:
-> > On Mon, Feb 23, 2026 at 12:20:47PM +0000, Russell King (Oracle) wrote:
+This adds the necessary driver change to migrate over from
+hardcoded-per-IPA-version-but-varying-per-implementation numbers, while
+unfortunately keeping them in there for backwards compatibility.
 
-...
+The DT changes will be submitted in a separate series, this one is OK
+to merge independently.
 
-> > > This could be a user exploitable bug (although one has to be root
-> > > so the gun is already pointing at one's foot.) This is the commit
-> > > which introduced the problem:
-> > 
-> > Hi Russell,
-> > 
-> > From the description I assumed that for this problem to manifest
-> > out-of-range values would need to be turned by hardware.
-> > But maybe I misunderstand things.
-> > 
-> > Could you elaborate on the vector you have in mind?
+Signed-off-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+---
+Changes in v5:
+- Rebase on next-20260223 (NOP)
+- Resend after the merge window formally closed..
+- Link to v4: https://lore.kernel.org/r/20260219-topic-ipa_imem-v4-0-189d91dbee84@oss.qualcomm.com
 
-...
+Changes in v4:
+- Fix a memmap() leak
+- Adjust comment style, take Alex's suggestion about very explicit
+  DEPRECATION notices
+- Pick up tags
+- Link to v3: https://lore.kernel.org/r/20260217-topic-ipa_imem-v3-0-d6d8ed1dfb67@oss.qualcomm.com
 
-> Either code should care about values > 4, or it shouldn't. The current
-> code cares about it in one place but then ignores it in all other
-> places where the index is under userspace control, allowing the
-> potential for array overrun.
+Changes in v3:
+- Pick up tags, rebase (effectively a NOP)
+- Add actual binding constraints for modem-tables, drop Alex's r-b
+- Better describe the purpose of this region, as much as I can anyway
+- Link to v2: https://lore.kernel.org/r/20250527-topic-ipa_imem-v2-0-6d1aad91b841@oss.qualcomm.com
 
-Hi Russell,
+Changes in v2:
+- Actually pass the retrieved data to the target function
+- Re-wrap comments to match net/ style
+- Mention next-next in the mail subjects
+- Pick up tags
+- Link to v1: https://lore.kernel.org/r/20250523-topic-ipa_imem-v1-0-b5d536291c7f@oss.qualcomm.com
 
-Thanks for the clarification.
+---
+Konrad Dybcio (3):
+      dt-bindings: sram: qcom,imem: Allow modem-tables subnode
+      dt-bindings: net: qcom,ipa: Add sram property for describing IMEM slice
+      net: ipa: Grab IMEM slice base/size from DTS
 
-Personally I think it would be best if the Kernel took a robust approach
-and assumed that hw may provide out of range values. But in my experience
-this is generally not the approach taken by drivers. And it's not a hill I
-which to spend too much time occupying.
+ .../devicetree/bindings/net/qcom,ipa.yaml          |  7 +++++++
+ .../devicetree/bindings/sram/qcom,imem.yaml        | 14 ++++++++++++++
+ drivers/net/ipa/ipa_data.h                         |  9 +++++++--
+ drivers/net/ipa/ipa_mem.c                          | 22 +++++++++++++++++++++-
+ 4 files changed, 49 insertions(+), 3 deletions(-)
+---
+base-commit: 779cae956c8316aebc1946ef86ca001f99658270
+change-id: 20250523-topic-ipa_imem-def66cca88e5
 
-IOW, I don't think the current practice is to treat such cases as bugs.
-
-On the other hand, I agree that the code should be consistent.
-And I would lean towards verifying rather than not, although again,
-I don't think that one can find plenty of cases where the Kernel
-doesn't do that.
-
-Which is to say that I agree with the approach taken by your patch.
-But I lean towards it not being a fix.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
+Best regards,
+-- 
+Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 
 
