@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-260670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260671-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oM0/DBkwnmk/UAQAu9opvQ
-	(envelope-from <netdev+bounces-260670-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 00:11:21 +0100
+	id UALyH14wnmk/UAQAu9opvQ
+	(envelope-from <netdev+bounces-260671-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 00:12:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5747818E172
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 00:11:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4C1618E1A3
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 00:12:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id AECEB3033E27
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 23:11:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4969D309F6AF
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 23:11:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 120B0353EE3;
-	Tue, 24 Feb 2026 23:11:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8CB9355023;
+	Tue, 24 Feb 2026 23:11:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="AvbFVnLx"
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="sPzxhZxZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11023105.outbound.protection.outlook.com [40.107.201.105])
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11021089.outbound.protection.outlook.com [52.101.62.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E7234B18F;
-	Tue, 24 Feb 2026 23:11:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.105
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF53735B137;
+	Tue, 24 Feb 2026 23:11:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.89
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771974674; cv=fail; b=gktYp8EWQSFXFp6Rm1ELu/bdxMg1iCuK5WfYmrE4jmE06aYGxvrCTMbqAvGf67yNaURoPiZ+3RGRXPZzQSs73OsZ/YapcWs6hnI6FHvqrU5wqsRFHhrJOfku9bUs8DzX49zP6kqeo2pAvMb2EmyXc4W0xgJckbovLXHCm+z9Szs=
+	t=1771974676; cv=fail; b=pYbocCX+arIJoMpUMStHpc5E1Z25VcRHj5euU4lviaDBxr/cmCcTBgvZBEsGPMdRJrOeWCFcX+/gsj6jbUWGcYjRpEMBVbskiA9+V2hJIxh6pQPVq9Uk/uBDiQqvFmDHnhTDj8LtaxndfoNmgLZFUgc3XzPYxfBDpusFw8KpTDg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771974674; c=relaxed/simple;
-	bh=44Z3LEvu+77/ob4V1mYzmBKiYIZAmAzGZHf/nLtT2yo=;
+	s=arc-20240116; t=1771974676; c=relaxed/simple;
+	bh=roOieSuX6uSfna8UeDFrQGAt4ALCWwbuX7jhvNCvxFw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=eQuaBTCehwAa42doE+LOEV3GSs+Gt025ji5+qzSlhigVdnTiL4IPrL8bcOvUxLfArS1tbO2rkhLk/P4MYCMeAci5HrsCc3glXicU+mq0iq99TPqdhtsrdkrtYG9uD5Lblk+1yN2A2NMPro0thFbG+76kb7/p7vtwNWX+dF2bHyM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=AvbFVnLx; arc=fail smtp.client-ip=40.107.201.105
+	 Content-Type:MIME-Version; b=B/6pZyFZ1juyFvSn8xGFPzvQ8AwwrcgPnKH/Jg85THFK61DqVba0t4xAR1VR32LWuWDOcvDX2GRkmzXkxKpCCUWwNk/4EFfFkkHkt7MjSOTTU3fzrBogix5FYBAXUIL1CKSYteLEaBN9AI5nCsSBjRmM+5F+tcKcmmuEUzGppTs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=sPzxhZxZ; arc=fail smtp.client-ip=52.101.62.89
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=m5N29j2wvHxdIvbvo/CqwTGPke5OaoBMQf8EQL2hDyNVJZhkSfwEl5HCfVaUZA4IWfnCho6sdiRf1aw/z5OmV+RVPYQLaWquCy0D6JmFKmR1PgduACgagOqIT4PIwBVf2tcHVYeprd7HQI/Lr4aHH4RflWEV1uzlc+JNlrPJSfxXVBReUUmMCCQt+8A+jVDVuQHZ1tC/hGrdgbc06qdOp2z3tuIC0iNWkXdmQWGHyR2s1NG3H21n1ZCc1Jtp/j6Q1ZShlJ+sLL9f+5M5LQuhX4fvYJz+hFgT/JFN7krDRFVutT7UEJ8ccUd/h2FF/oX8/BQXmSyX+vPpuv7pDM6xkw==
+ b=k0dbykHuq3vKDozPfUzJyIXmPZ282E+GFFdHbyZ0wbMK2ZRKV6kbBIwl6s2agzey0YZDfedu2tSRBW6BAMkZNHFx9lB8SV7IcyZmVpHmnGb5EW8SGQdXVMpcRzqescQSpVmuQwoxxLg5fbOcWAwQH++MdE3fVWjj8vsq5HO4P4I5Z3lnq2vOC0CxvsSKS6YUo64nGggEnWTjKlutrmvzp5F4w1TSlBxJ+jr5eonsNvN3QyBPf3k4bO5tFBVYlr9tQ+mUENRH8LbzriS0oa4sa5sef9AutQpAZ8RrnIzSFX1Te/g1P8X5D2APzT9SFhJjNEj9OBCLlJsHhwN2QzwAcA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=51pfuFUG1X8DJ0IZdCPlMaMFyaHq8cUze8aUARdMP9w=;
- b=m3GM5G7R88jG9L2XtJuP7eU5YuhREiimaU7biLZGstrgBAyhgvcTwcavqwX+jkb7Wi//mti/09HQW5ucP+Ku8ynsNlcM852rsf3Jiko6lWZl0hU52LlcP3WBRZM69FFACrFxHi0fIseYsLSvYj4IzalitINEUS4t59bORbold1ciAsagSZnw+1qCwVf8YNrOzYy+0qztnmY0SW88mAtpXQ6cQVp5r44UsNKKQtlmkHyoaF+/eBzoCPV6q1ITUhxOJe/1vQfq+kN/gAqbO736TjcgQ7cZFgHF8wW/8tuKlnJxfru5Wy9yz8UW3+x6GB9tx9a1ekQGOJ6Uk0tfHTwEXw==
+ bh=1HDQCl3GV8QZIEjD53uqi+aRkpWQjQgs0EQVHRv7hYk=;
+ b=EHJkNEXHLpxyTJTDZ9EYPCj0Uo5hghvsrA73wNg2+E6rlmbAnrULUZzacWeodC9vcd7SfkQkVj6jUoaOq5p24J4U0wOpzlvaMEAAEw9cJR6UyVeDGKm2aP9SVZhZOpojh5pF2WWVldMLPF0I0NoKaBuBa80bATBRXOErCv8cSalN3jhMAV/IkJaR+9vCRnChCJU7QXR1HN2+QMOGo0mGvcG15GjNsq9PGYCctJWwZ8GsUj+61n7zMCmT5Q5T2qsvKMcnZO7hQ+Q6/0W1QglNVD2w5K87wp5hM6xGs/ZD2Gd1wean7FAxuz9W9r/QR7OMnoE2h+VeiaGEea9NhbhqTA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
  header.from=os.amperecomputing.com; dkim=pass
@@ -48,45 +48,41 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=os.amperecomputing.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=51pfuFUG1X8DJ0IZdCPlMaMFyaHq8cUze8aUARdMP9w=;
- b=AvbFVnLxGK95TM3yhX40ne0zaqCT8W+0hp2wAGhMNxtMm5jF9x3otxh3oGkUz7uVt6tHfZZ43Y9Kdu+pMWZE106i8g70uIWIsfUkQkrNc+K/TPh3zvb/pT0QSEuxDub9UrlqtOhMjFj/HiY6nisGlOFCiLoUI117BN9dEFHNVoo=
+ bh=1HDQCl3GV8QZIEjD53uqi+aRkpWQjQgs0EQVHRv7hYk=;
+ b=sPzxhZxZBMyMKcyX+M2Ngt9yStrDCLPn5FY3wha+PHxGWqTocHQR+hFayQAV9X9T1NEe6LaHBmcbp1a5SPES7o5fcYHquA+GJ8Aglpkltnhtf4oxa7ns/5W/ZFFPr5mnnwB6ewDsjJJmnhFLwu0TuTt3Skes3ZX+fQLC9Q3Tt3c=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
 Received: from BN3PR01MB9212.prod.exchangelabs.com (2603:10b6:408:2cb::8) by
  CYYPR01MB8567.prod.exchangelabs.com (2603:10b6:930:c2::16) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9632.22; Tue, 24 Feb 2026 23:11:07 +0000
+ 15.20.9632.22; Tue, 24 Feb 2026 23:11:11 +0000
 Received: from BN3PR01MB9212.prod.exchangelabs.com
  ([fe80::44f3:1050:dce8:1ea9]) by BN3PR01MB9212.prod.exchangelabs.com
  ([fe80::44f3:1050:dce8:1ea9%6]) with mapi id 15.20.9632.017; Tue, 24 Feb 2026
- 23:11:07 +0000
+ 23:11:11 +0000
 From: Adam Young <admiyo@os.amperecomputing.com>
-To: Sudeep Holla <sudeep.holla@kernel.org>,
-	Jassi Brar <jassisinghbrar@gmail.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Robert Moore <robert.moore@intel.com>,
-	Len Brown <lenb@kernel.org>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jeremy Kerr <jk@codeconstruct.com.au>,
+To: Jeremy Kerr <jk@codeconstruct.com.au>,
 	Matt Johnston <matt@codeconstruct.com.au>,
-	"David S . Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	Sudeep Holla <sudeep.holla@arm.com>,
 	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
 	Huisong Li <lihuisong@huawei.com>
-Subject: [net-next v31 1/2] mailbox: pcc: functions for reading and writing PCC extended data
-Date: Tue, 24 Feb 2026 18:10:51 -0500
-Message-ID: <20260224231055.393329-2-admiyo@os.amperecomputing.com>
+Subject: [net-next v31 2/2] mctp pcc: Implement MCTP over PCC Transport
+Date: Tue, 24 Feb 2026 18:10:52 -0500
+Message-ID: <20260224231055.393329-3-admiyo@os.amperecomputing.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260224231055.393329-1-admiyo@os.amperecomputing.com>
 References: <20260224231055.393329-1-admiyo@os.amperecomputing.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: CY5PR20CA0022.namprd20.prod.outlook.com
- (2603:10b6:930:3::15) To BN3PR01MB9212.prod.exchangelabs.com
+X-ClientProxiedBy: CY8PR02CA0012.namprd02.prod.outlook.com
+ (2603:10b6:930:4d::22) To BN3PR01MB9212.prod.exchangelabs.com
  (2603:10b6:408:2cb::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -96,104 +92,104 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: BN3PR01MB9212:EE_|CYYPR01MB8567:EE_
-X-MS-Office365-Filtering-Correlation-Id: fd3cabed-fab2-4f89-6e11-08de73f9fd77
+X-MS-Office365-Filtering-Correlation-Id: 4a63d93c-3a1a-467e-de3d-08de73f9ffe2
 X-MS-Exchange-AtpMessageProperties: SA
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|10070799003|366016|1800799024|52116014|376014|7416014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ZiK/LNX6VmqT5/6/NwX7t7Z43IeZfy3ZXNkAnWd9oydOVLnIHsellrkpcg2m?=
- =?us-ascii?Q?FcxdglgH1MQilmJPjiFjipMC8gEyTYXQeAfn8yoKmU1bp+QY+P6UIr860w29?=
- =?us-ascii?Q?iffSEgutuXnwCyP7y3CD8nkUKkLJ6d0xgYHXhdc2OyZ7UgMnvL6Iw9GCw3g5?=
- =?us-ascii?Q?kViM5q6W61INZ5j2Z2ElH60v2fHMo+W0XwHRrDNUJxOm6d+/TsEWZ3ria24p?=
- =?us-ascii?Q?2KvuZxEk01UeNQqUTFZCMyS/ykll1JzyjqHgXO3m5kufTJchfsYy8YRDmIx7?=
- =?us-ascii?Q?SB2lNb2gJEugg4uZXJDvgJxzN2TiLllu+lBtEMW8a7SYw1DeX+3Q2i1TjqmA?=
- =?us-ascii?Q?tS9ar2j3bTVoSRodoBlCmbzcTr0g+zQzVx5flaGYZoa6hpZpg751jnV5fpZK?=
- =?us-ascii?Q?7+cz4YNkDo/jqieYDt8ZrMhWN5M0WVxxP3ldjOSCA0RoHlnAUE7UwCnaftBm?=
- =?us-ascii?Q?WwHSJ/lqVDZ/O3OiHruw2GG61aDT0SW96v1ZzqQG+JxCSG7+Rw/4EY5BfyDv?=
- =?us-ascii?Q?mhSyWd4FZrgopz4TnLbykxjQlzW2tzX3iymxG+azezgvYE9IBujYriY7L0R7?=
- =?us-ascii?Q?XeuaNQK5T+EY9nFqDoK72qvDZv+mhR8lZs4C1T0613TIIlnWV9EHPkFSB4mw?=
- =?us-ascii?Q?0OsR79bsJRKGjQSWPlfk+TP9FCh8+I3N5YiGBkflxQQfYTaMI62r1Sl54FPx?=
- =?us-ascii?Q?Gc33+aLlxoaBTFXwFVzuCRB5S8HbPrDcj8+mAITxjr3HautYu5IhLMf5/ppY?=
- =?us-ascii?Q?XVJJia5FDokHLHXrGQ0XXB9UXrCYWAz3E2Li7lrgeQtSye8/mg1qxg1yuExr?=
- =?us-ascii?Q?/D9yzGZhkD/h+XRlrZNzgNdfJwbD1Nix7pTHGtVOAKUne2eHLJD97C6WIu/3?=
- =?us-ascii?Q?gymX0ROf7JhduC9B2rAhZkWmXuRWcGffZn+q7GgMkzvJ/qTPHFsTGLj9E9K7?=
- =?us-ascii?Q?V6egaXGARuXYkTCiptHjyUweY1tkxLEDnMsKhImqr1Mhg3A3W9gc+vzlzDB9?=
- =?us-ascii?Q?vGWVPNFBlu0oxGd7xP8qmsG+topxBvNTJC4lwqFMfWzHEuHOqOEp+BWOmBCJ?=
- =?us-ascii?Q?nP7Fx/9laIS0mf4OBELHZ2kXKNMVk1Zm55h6oEPBHIzVAQFMOkvf6wfuELBp?=
- =?us-ascii?Q?YWyHBtWvUXVqUvM70l4eRAavzQDIbopKf3teRciVkHb8DxqUsgEbRpYILoEU?=
- =?us-ascii?Q?z6ZvFrdULO6loSYAwBMG4eF9tAPNHuyDIw6kve/ozrk7T6VVM8l2K73BCIAn?=
- =?us-ascii?Q?C4C8ss/q5/CbKyBDjY31DF6NU61nfNVqAKIyDhmZsh3SMSoZA9vWPE9S6hvt?=
- =?us-ascii?Q?kJe1h04tdd7s0KHYxKSuLZWN7y+QotOtUm39QfzwC38xW8db0tbQ/v1V31qR?=
- =?us-ascii?Q?c0pq/Jd7z18kDJwj5Z0quZNg1KCr2TBz3/t3f4mF+vSPOBf1LDVkiXdKdwmx?=
- =?us-ascii?Q?blDatFv8mLlDqWB0ipzc8HP02YkVBnoN2OxfjlegeeSOa0y/+NxGoUxmQ1/a?=
- =?us-ascii?Q?EDTQZteqQyr8oM/oM+mYdu8edSdNq9HcJyfQ+AGySZ6OoyY4iDTOPGk8avC1?=
- =?us-ascii?Q?tfPOpEf6G1+hmm/pe+s=3D?=
+	=?us-ascii?Q?Jy301pCFqgsNRJyc5dNgTRT0hWMtqtiAbHn8Bt3KMPfXTCl/OQKHex11Rokq?=
+ =?us-ascii?Q?aXori7ThF3MVciEk0m05yuiIa5ZTUB/8Wp5pgbTIYjw9ObdDemH6vMdvD8ok?=
+ =?us-ascii?Q?JVHjddtfT/gZOGQcaVRz/quWIsptVJ+px0EG/ESRvheJqgmEsiwKy+fLPqGj?=
+ =?us-ascii?Q?Cc0LZ5xKje3Yp+HYMKpCQgQnSbGnOBIEEEYQV5qtZW9SPLe8nRVP320CbCV/?=
+ =?us-ascii?Q?czMJlAjtn+kqpO5YpH8C2UoniwBWKkULyf2atJJ3ta104NMK/NYlMpftgYd6?=
+ =?us-ascii?Q?pmg8YTjPNNhMdnwq2DJKplXwvKbzgGvDStT+PXQdlm26MfS2oCuPDD8kBMMc?=
+ =?us-ascii?Q?v0/0rE+HHKidPcGjOkmKQC9Wpn+FYJiC6XvIcY3A6sgQYBK6RPo6wBSxhaNN?=
+ =?us-ascii?Q?oGHlxEsZtn1WDr6LKSFNKvK0cAQeLb4msLelJU7Gd00lYZuOn2Cxom8nvs3q?=
+ =?us-ascii?Q?IBntKfjyvS1FXRZO+YjrcX5W96WfX16ug+tN8PBDlzetCMMGyGmEpNmh0px2?=
+ =?us-ascii?Q?eiEMmN7ZTSb6omArnkbv/tSQlgvVveqbmad0o9uZxqG3EuQzcVGb5Cesakcl?=
+ =?us-ascii?Q?h0USTsV8MfI3wvWHvpuBYzJ7tQs9KpUigpM2ddHnvx2QNcYEeBRpBVnzSNK+?=
+ =?us-ascii?Q?dAq+2k7zhpp8jOZi1sIBm0UGCzhuN0PMPeiKwEBwNHbRlV4fdX+SZSPIbRDA?=
+ =?us-ascii?Q?jkJFcmgjlDiCldxUdgF2VwP1jrw2bwO9ciRHw2YXuH5sANfVcXLIUXMZsrbn?=
+ =?us-ascii?Q?jmIj7ahOs2lMypDnR46JWQHXXOxZWDBYDknD9aCQCZaAajP/CmOUUQMsOcv7?=
+ =?us-ascii?Q?kCaFFOPxmFhfxTXH2N6hm1/45SdVEGzUCu8toE4sZuLSW+tRCyO5/CGVv+K+?=
+ =?us-ascii?Q?UwG6bKLc8A9pnH5OUKA4aX3850O5XtEvtd5xOoldLDSvGWC8qpdZDk2ZwnoG?=
+ =?us-ascii?Q?WpV3aefxrTBfEkWMEIo9gjCq5BLl1VmuAt8mQFxW1i8yCuMLVV9VfkPVE9C7?=
+ =?us-ascii?Q?1Iwt5ZEwtstYmVKDEu7Su6nTiIWYNYhuJ+sFVOx4P5/dE8hUgbLEAEpB6XRp?=
+ =?us-ascii?Q?zxP6uRbge4FOBH6s5PSCwTHjQ6hfPPGkf18I464MBS7K2ncneQ2ZIK4g0G6N?=
+ =?us-ascii?Q?JV/ccQaT/STNjiLYoQSB8+MvF0i+PVvMukB1Olh4I94jpXibDZli5GlN5Ho+?=
+ =?us-ascii?Q?qMDwXLgmUA+tyHgdQcd0i9R+ZUi3/UXJNAeN61lKAgD+wwHGEhQIxKczmdNZ?=
+ =?us-ascii?Q?mIjqf/xes1FsP5iFVDboc1Hc3AQeOW+EE0Q9edKdFBqyzk/zzTQDxvB9utFl?=
+ =?us-ascii?Q?2dqb4nm7b7zB9j6E6UhzAQsTfbN89ShZ0wDwsEn0/TAHb6L6Ih1va/tFt0am?=
+ =?us-ascii?Q?Tu2aHDq0dHa+O1n/w94QBXy655Z8fAHCmwlilZrbfN42W+l1b1snvhsjvyxB?=
+ =?us-ascii?Q?N9N3bngjdezzd1cam79YFYoqw9rd0D4ge/q5HdeoIeixaOWPyDagbZI1GrRw?=
+ =?us-ascii?Q?7yxySIxoh6I8qFxd/kjTHPjlWCYHaHy5Feh1tdhpumX406o24P0bMAPfYvKj?=
+ =?us-ascii?Q?7pkky6Q3H7LRq+f8jtk=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN3PR01MB9212.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(366016)(1800799024)(52116014)(376014)(7416014);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?G1D4s/i/gOVMJgwo2dyRirBUM+XPWSnmKUoaC4zhp7yUDEYv4hB3mxGx2erR?=
- =?us-ascii?Q?8JAj94b6/azGFyoS2g7W0LdTI7InP0RujQIF5KQFSNXozhIL+fwgs/kSihzq?=
- =?us-ascii?Q?Oi6++7HvJR1iIZg1pR6JsNVbEqQ0FWezRywzUEXr6H7VXSdj+FG8Mx1NIgtX?=
- =?us-ascii?Q?xtv9jyYebGhmeoy9OBiFUa13zhzkcEy0GyQfDNlPZowaiG+6pAg3bIj8Wb2b?=
- =?us-ascii?Q?Rt1XBWj8IowsCV13PsJT5XZ3eKc15mKzTg146aE9HqIgrQele/g8AjPFSLrq?=
- =?us-ascii?Q?BVjaapTe2HKNrLO+ghnZTQ5QN2LJEf7jb+q1BU0ruOYir6Ev5jsvXYHfsIXb?=
- =?us-ascii?Q?BSpbKheGft/H9LtJ7yMUHIlNtiuNHqQmc72XVQ2EoeahZ58Qieej2wB8sLCn?=
- =?us-ascii?Q?UXwOJ2tlSYiRv66V0rZ6/qxA/8INHqHTN5RYx7OV1l38105gjcThQebFuz3B?=
- =?us-ascii?Q?FHb2R0UPDj8lYZP1eoOH/Z/bkvNk0AsYNn56nspLUNHIh097PhMK5BBLnCkW?=
- =?us-ascii?Q?Aci1hn6UkozC7EU5T4r6pB5K+COzT0/pwRnNaj1TD+L/4WpDsqvyRvAOFQNH?=
- =?us-ascii?Q?JdaDfke2UWrlBK9D+Soqe3NZuG01iE5y/gwjedn6INbfZ5jBa8S35dKqN4Ht?=
- =?us-ascii?Q?MphlNqzvGwYW9yW8Fuk+lpOKjuPautAXmrzxhDeVpc8ULdqOVt7Sbr0X4gsY?=
- =?us-ascii?Q?N37ot1bfNXdZJLHBKP2RlDEwhjP6WWNmzrxrMUMLsNU2WPxsHqyulRNeQB3h?=
- =?us-ascii?Q?JAYkA46ay0GfQy+JHv5vxC4vcdjZjVZEEEyqB84hEm2VnbtoSSgusUdzNz5F?=
- =?us-ascii?Q?ha/fXerm5JAkhhFkaySUiS8YnRPIp+NVndXfDoX8MzW54dviGWCVz1bLqkic?=
- =?us-ascii?Q?SwcPAlmNxCX8aLiJZgp6cZh9i3w2XC8EoTxN4EmleaKgKd+v5Sr7DwfNlQKf?=
- =?us-ascii?Q?w6pPARBZNd7X9WnlITfWkIloeG1rtdyW1oprjl7Sk3USInQE2Tei3ZaIY55c?=
- =?us-ascii?Q?E+Qa9hcoYe2K5bF3lk40OSbEI/+g3XfTjGWaWT/eq6DogoCufBCmHumoW0TS?=
- =?us-ascii?Q?40YPds7KlrUe3kgpVGopkwI+3tT6xtI2RNVtokNnl9nihEKF6+rOqLgTEH/x?=
- =?us-ascii?Q?H+IL/0BtwVGSA8iYP+HVo85XE/ZYIw221wuzs21+8neQGLZoAbXex5KkYbhr?=
- =?us-ascii?Q?SNiNvM4F1JqX7hjes5DMcsSpZbholpcIz/vcQ7igsDFbAcd1QcPgsNOxIxnc?=
- =?us-ascii?Q?PRxa6AZuz8ESvFBr3c/ihz7Yii3YTO3fOozyY8daAkGWcs7SSW4ogXT1Xz/Z?=
- =?us-ascii?Q?x4QTJwKQIMDOtYDVaII6JTVIPURfZckQW19htptN16ZlmAkb7oa03/NJ2pym?=
- =?us-ascii?Q?0rqapavJuq58johQi3t6pyELaNvgqecv9lCeypDaaRlYtwEpLrl3Lpqee3w+?=
- =?us-ascii?Q?G6GChCGz8wDIOroGlzFLEFkC+ZxbDJrZNsZPSOxLlh0JuBPPRak6wJe+WBXV?=
- =?us-ascii?Q?HeZY26mhdo0twb09AsTUZ/ay00cvJdp539pN2EohswgElk1tQP8WmYFwIKeO?=
- =?us-ascii?Q?IMTFX6krDXddlja8jcexfjCOqQfdwqOOwrn3HZ8+arGNGSFmfZOmwJM5lldp?=
- =?us-ascii?Q?QpWH+ZbkJrSnUB0SpYdPoM+tUBmiEyMLyLR4rHJrYMK+KSGgbl0yGzUR0Zgb?=
- =?us-ascii?Q?U1CCnrxnXZ19KWZrscNpfrPWto3OVEm0aeRjr+AJrtRg/eqlsC+dFHxM+1B4?=
- =?us-ascii?Q?i4zV2bEC5oW+mL9Pfor5G3aSunKg+JzdM5LioUp3lXQyGIhkzifj57FBjAcO?=
+	=?us-ascii?Q?BMZ4fePGrzj/700981OMq+iC0R4WhL8I4YYejzS4MdrfaeCxIoCVBAM2rBxQ?=
+ =?us-ascii?Q?3YEhPhX9RYmm6+1qdPGyr9fi4iQRNbyPwP7walSo/MfmgEHC2l8Sf5MqjfxC?=
+ =?us-ascii?Q?fY1RSAzfypPL8YWy+MvwAIjDFF+YOraAK1+xLSvhkomno1TXqyf29HHrPF0P?=
+ =?us-ascii?Q?aaaYRXUzRTwv9Wyvdvulm6pZeOrXde4tkMsBP2Qng7S8e95+oXNiHieo8Ul/?=
+ =?us-ascii?Q?HT2OhzHhx5vSdyvQaYRUqVhndENMYzTLq5mNhPoNF1GRFKTBnJ13F4xyZt6i?=
+ =?us-ascii?Q?No+VqhDFRn8zzp8RD8bsR8DA/KvaemlFJGWgfJtcL8V+v1AOlt4sOOooYhlW?=
+ =?us-ascii?Q?srvZ66P+22/kBlL9QqZOd5MwvoKAjSh/DAtEqknhLHQhtkoQhATXrQL0wwpm?=
+ =?us-ascii?Q?cyu2nVqRswaj3jCNQjqPbPqlHiTMRS9sNW/0jZHGg6ICCwXzciO45EGzVaAG?=
+ =?us-ascii?Q?AS8Koxfx0iypJf6XGEvRNyroCMshAaoYeuQSuuyg6ISrRETPbzzJ/eadOmMa?=
+ =?us-ascii?Q?YPngXBDoKStdRmueKj2Ld2MQ+2t6IZhDqEZXeYQgNCjFyCyetbi+gK3Gq+cN?=
+ =?us-ascii?Q?IaahWE8JITnBofWROnTzS7M1rNg88EeS6YP4svdOfVl21tzf7WlQ2QGNUcjg?=
+ =?us-ascii?Q?qG+Fbm4RNu5gt3St4M/n95s4weus3OstY8bbc6LTo42kxxJjfTrLRPXUgayV?=
+ =?us-ascii?Q?pIbFNAcaNk0Z2Lyfwao6YRuIqkZI5udh1xKHPHEqJG7nhQjpLc797kaKFkai?=
+ =?us-ascii?Q?CgFZbXyBU3XlcK64nIWBE1IqAieUbRdz30w4xLdl/u8AtX2Iy+OZfYzJ1Zyc?=
+ =?us-ascii?Q?Rx+G1sznJPZ9Y9Z/rlguhFzbmPOLmNhSob9pMdHyO8/lxX4mR1qp2UFKBLrH?=
+ =?us-ascii?Q?NmG+Wa3iN5B6tefByIN65Z52TsTA11kqdhEdr8yvFlLP5yZi+Zed3j/tpbiR?=
+ =?us-ascii?Q?xrg3yqWytwiw1Gj39/8DVMg853KyOqmM/XMepOOJJCfzeWBuY2ooxsnDjRPx?=
+ =?us-ascii?Q?mn6Lhz8xUbrYYxp6i9L02eTNroTou1fSAu6NLybvAHEaT0+aKLRqAha1O1ok?=
+ =?us-ascii?Q?KuTkP0w+kvTH3JA7/NveiI4DF5iZjKtKft3onepS8FDt6EVAM74vgMmO7olZ?=
+ =?us-ascii?Q?5LtSKlMDlJg/vI3BAuLKzWZc+3Do1sgw4FVcfyt5or3M2ADP0sk+EsRsXqaW?=
+ =?us-ascii?Q?vP/Uy1Q8TVqVJQMBXGsp5yWPWQWW+7UyfkISd+Qk9m4mGflnamJVISAWZ8Wh?=
+ =?us-ascii?Q?VmaZppAEPtlksDZOn9oW6RsYdFE3xD4HX2wXq/V0UvWG8ThSzGZoO7Njo750?=
+ =?us-ascii?Q?qI55kqP+BtBJIjBettASXIjcaZ6keCV9trmo65XY9OGWJ/vWQIXdvcFWEMRh?=
+ =?us-ascii?Q?UKsLBF+4fshnfY4eqVaF+q2+PkHg0PwEcKYXS1bsWe+nYGDq51ZZ5O25Os+Q?=
+ =?us-ascii?Q?pOU9Rf8kMZYzORpYcewi6iR5Ked/B7a+Ean2Qjmz3v4Ua80UNN14NopEAgI7?=
+ =?us-ascii?Q?mAdocqtMS+5JAIzAWrwH3/Nd/3ALuUn92ENgBSdYft4DOrrmnIe4G0nlx4YI?=
+ =?us-ascii?Q?OQhKZ1QESIjpwX/bxudjxEbLVi2U4/4zCdlToakNtlbuUU2vlQJh+5cUqYqF?=
+ =?us-ascii?Q?sH3RJgOxHZWkmEx97M05CiyXhFf+IpG5/yIztLmb9Q+HLd9oSb8Tx9pjjmz7?=
+ =?us-ascii?Q?Zo17tSIlte9dhV0FYx3GKMKeAIzc++MbaHr6mAkI5AVGyU/olbwSrU7DHGbK?=
+ =?us-ascii?Q?3sOd1v3W/svwBX+6KkRUVjdPouNm5v60GMYym/lh9EubkUOYPx/Tw9wpYxlR?=
 X-MS-Exchange-AntiSpam-MessageData-1:
-	2INTxaqDU1i09Vy5N+iCyzy7Hgky4d172hpF2knLug7FWJxQ9FbkWIrE
+	+UbG30ql2jaXlpu2QetRlAh6NfvuWA2K0jWj7i/gDFjFzjo1uMZBqtgo
 X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fd3cabed-fab2-4f89-6e11-08de73f9fd77
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4a63d93c-3a1a-467e-de3d-08de73f9ffe2
 X-MS-Exchange-CrossTenant-AuthSource: BN3PR01MB9212.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2026 23:11:07.0783
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2026 23:11:11.1684
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2mZCLlj8KlcWBow5hMd/3A/uWEf7rmWAuBJA5TPM6fUNGgbTulzZMKzfkeLfLsVEifO8eiGhB7tfbzeNGNwuetpvDFRHqHItWplH02xqlqt/j8cKz/wvaNFAAVBjA6rL
+X-MS-Exchange-CrossTenant-UserPrincipalName: IuCivu35eUAyphbaaeO2xlfhJR40f8msQ/voqS739d/8k8FjfS5w8SG9bLH1nkxVLbVlG3z6EeefeA+Rgm0Yya3WL8HfRsy/45nbbLpEtYwSKNjSviAQ8DrJI17CVWFP
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR01MB8567
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [2.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[amperecomputing.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[os.amperecomputing.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260670-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,gmail.com,intel.com];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-260671-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -202,164 +198,445 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	DKIM_TRACE(0.00)[os.amperecomputing.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5747818E172
+	NEURAL_HAM(-0.00)[-0.990];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[os.amperecomputing.com:mid,os.amperecomputing.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amperecomputing.com:email,oracle.com:email]
+X-Rspamd-Queue-Id: D4C1618E1A3
 X-Rspamd-Action: no action
 
-Adds functions that aid in compliance with the PCC protocol by
-checking the command complete flag status.
+Implementation of network driver for
+Management Component Transport Protocol(MCTP)
+over Platform Communication Channel(PCC)
 
-Adds a function that exposes the size of the shared buffer without
-activating the channel.
+DMTF DSP:0292
+https://www.dmtf.org/sites/default/files/standards/documents/\
+DSP0292_1.0.0WIP50.pdf
 
-Adds a function that allows a client to query the number of bytes
-avaialbel to read in order to preallocate buffers for reading.
+MCTP devices are specified via ACPI by entries
+in DSDT/SSDT and reference channels specified
+in the PCCT. Messages are sent on a type 3 and
+received on a type 4 channel.  Communication with
+other devices use the PCC based doorbell mechanism;
+a shared memory segment with a corresponding
+interrupt and a memory register used to trigger
+remote interrupts.
+
+This driver takes advantage of PCC mailbox shared functions
+management. Unlike the existing Type 2 drivers, the mssg
+parameter is actively used. The data section of the struct sk_buff
+that contains the outgoing packet is sent to the mailbox,
+already properly formatted as a PCC exctended message.
+
+The driver makes use of the pcc mailbox buffer management helpers.
+These allow the network driver to use common code for the reading and
+wrting from the shared memory buffer to the mailbox driver,
+attempting to get a single implementation of the PCC protocol for
+Type3/4.
+
+If the mailbox ring buffer is full, the driver stops the
+incoming packet queues until a message has been sent,
+freeing space in the ring buffer.
+
+When the Type 3 channel outbox receives a txdone response
+interrupt, it consumes the outgoing sk_buff, allowing
+it to be freed.
+
+Bringing up an interface creates the channel between the
+network driver and the mailbox driver. This enables
+communication with the remote endpoint, to include the
+receipt of new messages. Bringing down an interface
+removes the channel, and no new messages can be delivered.
+Stopping the interface also frees any packets that are
+cached in the mailbox ringbuffer.
 
 Signed-off-by: Adam Young <admiyo@os.amperecomputing.com>
 ---
- drivers/mailbox/pcc.c | 86 +++++++++++++++++++++++++++++++++++++++++++
- include/acpi/pcc.h    | 22 +++++++++++
- 2 files changed, 108 insertions(+)
+ MAINTAINERS                 |   5 +
+ drivers/net/mctp/Kconfig    |  13 ++
+ drivers/net/mctp/Makefile   |   1 +
+ drivers/net/mctp/mctp-pcc.c | 323 ++++++++++++++++++++++++++++++++++++
+ 4 files changed, 342 insertions(+)
+ create mode 100644 drivers/net/mctp/mctp-pcc.c
 
-diff --git a/drivers/mailbox/pcc.c b/drivers/mailbox/pcc.c
-index 22e70af1ae5d..8ccce401fcce 100644
---- a/drivers/mailbox/pcc.c
-+++ b/drivers/mailbox/pcc.c
-@@ -419,6 +419,92 @@ void pcc_mbox_free_channel(struct pcc_mbox_chan *pchan)
- }
- EXPORT_SYMBOL_GPL(pcc_mbox_free_channel);
+diff --git a/MAINTAINERS b/MAINTAINERS
+index b8d8a5c41597..e90d8d5abbaa 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -15293,6 +15293,11 @@ F:	include/net/mctpdevice.h
+ F:	include/net/netns/mctp.h
+ F:	net/mctp/
  
-+/**
-+ * pcc_mbox_query_bytes_available
++MANAGEMENT COMPONENT TRANSPORT PROTOCOL (MCTP) over PCC (MCTP-PCC) Driver
++M:	Adam Young <admiyo@os.amperecomputing.com>
++S:	Maintained
++F:	drivers/net/mctp/mctp-pcc.c
++
+ MAPLE TREE
+ M:	Liam R. Howlett <Liam.Howlett@oracle.com>
+ R:	Alice Ryhl <aliceryhl@google.com>
+diff --git a/drivers/net/mctp/Kconfig b/drivers/net/mctp/Kconfig
+index cf325ab0b1ef..77cd4091050c 100644
+--- a/drivers/net/mctp/Kconfig
++++ b/drivers/net/mctp/Kconfig
+@@ -47,6 +47,19 @@ config MCTP_TRANSPORT_I3C
+ 	  A MCTP protocol network device is created for each I3C bus
+ 	  having a "mctp-controller" devicetree property.
+ 
++config MCTP_TRANSPORT_PCC
++	tristate "MCTP PCC transport"
++	depends on ACPI
++	help
++	  Provides a driver to access MCTP devices over PCC transport,
++	  A MCTP protocol network device is created via ACPI for each
++	  entry in the DSDT/SSDT that matches the identifier. The Platform
++	  communication channels are selected from the corresponding
++	  entries in the PCCT.
++
++	  Say y here if you need to connect to MCTP endpoints over PCC. To
++	  compile as a module, use m; the module will be called mctp-pcc.
++
+ config MCTP_TRANSPORT_USB
+ 	tristate "MCTP USB transport"
+ 	depends on USB
+diff --git a/drivers/net/mctp/Makefile b/drivers/net/mctp/Makefile
+index c36006849a1e..0a591299ffa9 100644
+--- a/drivers/net/mctp/Makefile
++++ b/drivers/net/mctp/Makefile
+@@ -1,4 +1,5 @@
+ obj-$(CONFIG_MCTP_SERIAL) += mctp-serial.o
+ obj-$(CONFIG_MCTP_TRANSPORT_I2C) += mctp-i2c.o
+ obj-$(CONFIG_MCTP_TRANSPORT_I3C) += mctp-i3c.o
++obj-$(CONFIG_MCTP_TRANSPORT_PCC) += mctp-pcc.o
+ obj-$(CONFIG_MCTP_TRANSPORT_USB) += mctp-usb.o
+diff --git a/drivers/net/mctp/mctp-pcc.c b/drivers/net/mctp/mctp-pcc.c
+new file mode 100644
+index 000000000000..d8fa54068bd3
+--- /dev/null
++++ b/drivers/net/mctp/mctp-pcc.c
+@@ -0,0 +1,323 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * mctp-pcc.c - Driver for MCTP over PCC.
++ * Copyright (c) 2024-2025, Ampere Computing LLC
 + *
-+ * @pchan pointer to channel associated with buffer
-+ * Return: the number of bytes available to read from the shared buffer
 + */
-+int pcc_mbox_query_bytes_available(struct pcc_mbox_chan *pchan)
++
++/* Implementation of MCTP over PCC DMTF Specification DSP0256
++ * https://www.dmtf.org/sites/default/files/standards/documents/DSP0292_1.0.0WIP50.pdf
++ */
++
++#include <linux/acpi.h>
++#include <linux/hrtimer.h>
++#include <linux/if_arp.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/mailbox_client.h>
++#include <linux/module.h>
++#include <linux/netdevice.h>
++#include <linux/platform_device.h>
++#include <linux/skbuff.h>
++#include <linux/string.h>
++
++#include <acpi/acpi_bus.h>
++#include <acpi/acpi_drivers.h>
++#include <acpi/acrestyp.h>
++#include <acpi/actbl.h>
++#include <acpi/pcc.h>
++#include <net/mctp.h>
++#include <net/mctpdevice.h>
++
++#define MCTP_SIGNATURE          "MCTP"
++#define MCTP_SIGNATURE_LENGTH   (sizeof(MCTP_SIGNATURE) - 1)
++#define MCTP_MIN_MTU            68
++#define PCC_DWORD_TYPE          0x0c
++
++struct mctp_pcc_mailbox {
++	u32 index;
++	struct pcc_mbox_chan *chan;
++	struct mbox_client client;
++};
++
++/* The netdev structure. One of these per PCC adapter. */
++struct mctp_pcc_ndev {
++	struct net_device *ndev;
++	struct acpi_device *acpi_device;
++	struct mctp_pcc_mailbox inbox;
++	struct mctp_pcc_mailbox outbox;
++};
++
++static void mctp_pcc_client_rx_callback(struct mbox_client *cl, void *mssg)
 +{
 +	struct acpi_pcct_ext_pcc_shared_memory pcc_header;
-+	struct pcc_chan_info *pinfo = pchan->mchan->con_priv;
-+	int data_len;
-+	u64 val;
++	struct mctp_pcc_ndev *mctp_pcc_ndev;
++	struct mctp_pcc_mailbox *inbox;
++	struct mctp_skb_cb *cb;
++	struct sk_buff *skb;
++	int size;
 +
-+	pcc_chan_reg_read(&pinfo->cmd_complete, &val);
-+	if (val) {
-+		pr_info("%s Buffer not enabled for reading", __func__);
-+		return -1;
++	mctp_pcc_ndev = container_of(cl, struct mctp_pcc_ndev, inbox.client);
++	inbox = &mctp_pcc_ndev->inbox;
++	size = pcc_mbox_query_bytes_available(inbox->chan);
++	if (size == 0)
++		return;
++	skb = netdev_alloc_skb(mctp_pcc_ndev->ndev, size);
++	if (!skb) {
++		dev_dstats_rx_dropped(mctp_pcc_ndev->ndev);
++		return;
 +	}
-+	memcpy_fromio(&pcc_header, pchan->shmem,
-+		      sizeof(pcc_header));
-+	data_len = pcc_header.length - sizeof(u32) + sizeof(pcc_header);
-+	return data_len;
++	skb_put(skb, size);
++	skb->protocol = htons(ETH_P_MCTP);
++	pcc_mbox_read_from_buffer(inbox->chan, size, skb->data);
++	dev_dstats_rx_add(mctp_pcc_ndev->ndev, skb->len);
++	skb_reset_mac_header(skb);
++	skb_pull(skb, sizeof(pcc_header));
++	skb_reset_network_header(skb);
++	cb = __mctp_cb(skb);
++	cb->halen = 0;
++	netif_rx(skb);
 +}
-+EXPORT_SYMBOL_GPL(pcc_mbox_query_bytes_available);
 +
-+/**
-+ * pcc_mbox_read_from_buffer - Copy bytes from shared buffer into data
-+ *
-+ * @pchan - channel associated with the shared buffer
-+ * @len - number of bytes to read
-+ * @data - pointer to memory in which to write the data from the
-+ *         shared buffer
-+ *
-+ * Return: number of bytes read and written into daa
-+ */
-+int pcc_mbox_read_from_buffer(struct pcc_mbox_chan *pchan, int len, void *data)
++static netdev_tx_t mctp_pcc_tx(struct sk_buff *skb, struct net_device *ndev)
 +{
-+	struct pcc_chan_info *pinfo = pchan->mchan->con_priv;
-+	int data_len;
-+	u64 val;
++	struct acpi_pcct_ext_pcc_shared_memory *pcc_header;
++	struct mctp_pcc_ndev *mpnd = netdev_priv(ndev);
++	int len = skb->len;
++	int rc;
 +
-+	pcc_chan_reg_read(&pinfo->cmd_complete, &val);
-+	if (val) {
-+		pr_info("%s buffer not enabled for reading", __func__);
-+		return -1;
++	rc = skb_cow_head(skb, sizeof(*pcc_header));
++	if (rc) {
++		dev_dstats_tx_dropped(ndev);
++		kfree_skb(skb);
++		return NETDEV_TX_OK;
 +	}
-+	data_len  = pcc_mbox_query_bytes_available(pchan);
-+	if (len < data_len)
-+		data_len = len;
-+	memcpy_fromio(data, pchan->shmem, len);
-+	return len;
++
++	pcc_header = skb_push(skb, sizeof(*pcc_header));
++	pcc_header->signature = PCC_SIGNATURE | mpnd->outbox.index;
++	pcc_header->flags = PCC_CMD_COMPLETION_NOTIFY;
++	memcpy(&pcc_header->command, MCTP_SIGNATURE, MCTP_SIGNATURE_LENGTH);
++	pcc_header->length = len + MCTP_SIGNATURE_LENGTH;
++
++	rc = mbox_send_message(mpnd->outbox.chan->mchan, skb);
++	if (rc < 0) {
++		netif_stop_queue(ndev);
++		return NETDEV_TX_BUSY;
++	}
++
++	dev_dstats_tx_add(ndev, len);
++	return NETDEV_TX_OK;
 +}
-+EXPORT_SYMBOL_GPL(pcc_mbox_read_from_buffer);
 +
-+/**
-+ * pcc_mbox_write_to_buffer, copy the contents of the data
-+ * pointer to the shared buffer.  Confirms that the command
-+ * flag has been set prior to writing.  Data should be a
-+ * properly formatted extended data buffer.
-+ * pcc_mbox_write_to_buffer
-+ * @pchan: channel
-+ * @len: Length of the overall buffer passed in, including the
-+ *       Entire header. The length value in the shared buffer header
-+ *       Will be calculated from len.
-+ * @data: Client specific data to be written to the shared buffer.
-+ * Return: number of bytes written to the buffer.
-+ */
-+int pcc_mbox_write_to_buffer(struct pcc_mbox_chan *pchan, int len, void *data)
++static void mctp_pcc_tx_prepare(struct mbox_client *cl, void *mssg)
 +{
-+	struct acpi_pcct_ext_pcc_shared_memory *pcc_header = data;
-+	/*
-+	 * The PCC header length includes the command field
-+	 * but not the other values from the header.
-+	 */
-+	pcc_header->length = len - sizeof(struct acpi_pcct_ext_pcc_shared_memory) + sizeof(u32);
++	struct mctp_pcc_ndev *mctp_pcc_ndev;
++	struct mctp_pcc_mailbox *outbox;
++	struct sk_buff *skb = mssg;
++	int len_sent;
 +
-+	if (len > pchan->shmem_size)
-+		return 0;
++	mctp_pcc_ndev = container_of(cl, struct mctp_pcc_ndev, outbox.client);
++	outbox = &mctp_pcc_ndev->outbox;
 +
-+	memcpy_toio(pchan->shmem,  data, len);
++	if (!skb)
++		return;
 +
-+	return len;
++	len_sent = pcc_mbox_write_to_buffer(outbox->chan, skb->len, skb->data);
++	if (len_sent == 0)
++		netdev_info(mctp_pcc_ndev->ndev,  "packet dropped");
 +}
-+EXPORT_SYMBOL_GPL(pcc_mbox_write_to_buffer);
 +
-+
- /**
-  * pcc_send_data - Called from Mailbox Controller code. Used
-  *		here only to ring the channel doorbell. The PCC client
-diff --git a/include/acpi/pcc.h b/include/acpi/pcc.h
-index 840bfc95bae3..9be1ae358056 100644
---- a/include/acpi/pcc.h
-+++ b/include/acpi/pcc.h
-@@ -37,6 +37,14 @@ struct pcc_mbox_chan {
- extern struct pcc_mbox_chan *
- pcc_mbox_request_channel(struct mbox_client *cl, int subspace_id);
- extern void pcc_mbox_free_channel(struct pcc_mbox_chan *chan);
-+extern
-+int pcc_mbox_write_to_buffer(struct pcc_mbox_chan *pchan, int len, void *data);
-+extern
-+int pcc_mbox_query_bytes_available(struct pcc_mbox_chan *pchan);
-+extern
-+int pcc_mbox_read_from_buffer(struct pcc_mbox_chan *pchan, int len,
-+			      void *data);
-+
- #else
- static inline struct pcc_mbox_chan *
- pcc_mbox_request_channel(struct mbox_client *cl, int subspace_id)
-@@ -44,6 +52,20 @@ pcc_mbox_request_channel(struct mbox_client *cl, int subspace_id)
- 	return ERR_PTR(-ENODEV);
- }
- static inline void pcc_mbox_free_channel(struct pcc_mbox_chan *chan) { }
-+static inline
-+int pcc_mbox_write_to_buffer(struct pcc_mbox_chan *pchan, int len, void *data)
++static void mctp_pcc_tx_done(struct mbox_client *c, void *mssg, int r)
 +{
++	struct mctp_pcc_ndev *mctp_pcc_ndev;
++	struct mctp_pcc_mailbox *outbox;
++	struct sk_buff *skb = mssg;
++
++	mctp_pcc_ndev = container_of(c, struct mctp_pcc_ndev, outbox.client);
++	outbox = container_of(c, struct mctp_pcc_mailbox, client);
++	dev_consume_skb_any(skb);
++	netif_wake_queue(mctp_pcc_ndev->ndev);
++}
++
++static int mctp_pcc_ndo_open(struct net_device *ndev)
++{
++	struct mctp_pcc_ndev *mctp_pcc_ndev = netdev_priv(ndev);
++	struct mctp_pcc_mailbox *outbox, *inbox;
++
++	outbox = &mctp_pcc_ndev->outbox;
++	inbox = &mctp_pcc_ndev->inbox;
++
++	outbox->chan = pcc_mbox_request_channel(&outbox->client, outbox->index);
++	if (IS_ERR(outbox->chan))
++		return PTR_ERR(outbox->chan);
++
++	inbox->client.rx_callback = mctp_pcc_client_rx_callback;
++	inbox->chan = pcc_mbox_request_channel(&inbox->client, inbox->index);
++	if (IS_ERR(inbox->chan)) {
++		pcc_mbox_free_channel(outbox->chan);
++		return PTR_ERR(inbox->chan);
++	}
 +	return 0;
 +}
-+static inline int pcc_mbox_query_bytes_available(struct pcc_mbox_chan *pchan);
++
++static int mctp_pcc_ndo_stop(struct net_device *ndev)
 +{
++	struct mctp_pcc_ndev *mctp_pcc_ndev = netdev_priv(ndev);
++
++	pcc_mbox_free_channel(mctp_pcc_ndev->outbox.chan);
++	pcc_mbox_free_channel(mctp_pcc_ndev->inbox.chan);
 +	return 0;
 +}
-+static inline
-+int pcc_mbox_read_from_buffer(struct pcc_mbox_chan *pchan, int len, void *data)
++
++static const struct net_device_ops mctp_pcc_netdev_ops = {
++	.ndo_open = mctp_pcc_ndo_open,
++	.ndo_stop = mctp_pcc_ndo_stop,
++	.ndo_start_xmit = mctp_pcc_tx,
++};
++
++static void mctp_pcc_setup(struct net_device *ndev)
 +{
++	ndev->type = ARPHRD_MCTP;
++	ndev->hard_header_len = sizeof(struct acpi_pcct_ext_pcc_shared_memory);
++	ndev->tx_queue_len = 0;
++	ndev->flags = IFF_NOARP;
++	ndev->netdev_ops = &mctp_pcc_netdev_ops;
++	ndev->needs_free_netdev = true;
++	ndev->pcpu_stat_type = NETDEV_PCPU_STAT_DSTATS;
++}
++
++struct mctp_pcc_lookup_context {
++	int index;
++	u32 inbox_index;
++	u32 outbox_index;
++};
++
++static acpi_status lookup_pcct_indices(struct acpi_resource *ares,
++				       void *context)
++{
++	struct mctp_pcc_lookup_context *luc = context;
++	struct acpi_resource_address32 *addr;
++
++	if (ares->type != PCC_DWORD_TYPE)
++		return AE_OK;
++
++	addr = ACPI_CAST_PTR(struct acpi_resource_address32, &ares->data);
++	switch (luc->index) {
++	case 0:
++		luc->outbox_index = addr[0].address.minimum;
++		break;
++	case 1:
++		luc->inbox_index = addr[0].address.minimum;
++		break;
++	}
++	luc->index++;
++	return AE_OK;
++}
++
++static void mctp_cleanup_netdev(void *data)
++{
++	struct net_device *ndev = data;
++
++	mctp_unregister_netdev(ndev);
++}
++
++static int initialize_MTU(struct net_device *ndev)
++{
++	struct mctp_pcc_ndev *mctp_pcc_ndev;
++	struct mctp_pcc_mailbox *outbox;
++	int mctp_pcc_mtu = MCTP_MIN_MTU;
++	struct pcc_mbox_chan *pchan;
++
++	mctp_pcc_ndev = netdev_priv(ndev);
++	outbox = &mctp_pcc_ndev->outbox;
++
++	pchan = pcc_mbox_request_channel(&outbox->client, outbox->index);
++	if (IS_ERR(pchan))
++		return -1;
++
++	mctp_pcc_mtu = pchan->shmem_size;
++	pcc_mbox_free_channel(pchan);
++
++	mctp_pcc_mtu = mctp_pcc_mtu - sizeof(struct acpi_pcct_ext_pcc_shared_memory);
++	ndev->mtu = MCTP_MIN_MTU;
++	ndev->max_mtu = mctp_pcc_mtu;
++	ndev->min_mtu = MCTP_MIN_MTU;
++
 +	return 0;
 +}
- #endif
- 
- #endif /* _PCC_H */
++
++static int mctp_pcc_driver_add(struct acpi_device *acpi_dev)
++{
++	struct mctp_pcc_lookup_context context = {0};
++	struct mctp_pcc_ndev *mctp_pcc_ndev;
++	struct device *dev = &acpi_dev->dev;
++	struct net_device *ndev;
++	acpi_handle dev_handle;
++	acpi_status status;
++	char name[32];
++	int rc;
++
++	dev_dbg(dev, "Adding mctp_pcc device for HID %s\n",
++		acpi_device_hid(acpi_dev));
++	dev_handle = acpi_device_handle(acpi_dev);
++	status = acpi_walk_resources(dev_handle, "_CRS", lookup_pcct_indices,
++				     &context);
++	if (!ACPI_SUCCESS(status)) {
++		dev_err(dev, "FAILED to lookup PCC indexes from CRS\n");
++		return -EINVAL;
++	}
++
++	snprintf(name, sizeof(name), "mctppcc%d", context.inbox_index);
++	ndev = alloc_netdev(sizeof(*mctp_pcc_ndev), name, NET_NAME_PREDICTABLE,
++			    mctp_pcc_setup);
++	if (!ndev)
++		return -ENOMEM;
++
++	mctp_pcc_ndev = netdev_priv(ndev);
++
++	mctp_pcc_ndev->inbox.index = context.inbox_index;
++	mctp_pcc_ndev->inbox.client.dev = dev;
++	mctp_pcc_ndev->outbox.index = context.outbox_index;
++	mctp_pcc_ndev->outbox.client.dev = dev;
++
++	mctp_pcc_ndev->outbox.client.tx_prepare = mctp_pcc_tx_prepare;
++	mctp_pcc_ndev->outbox.client.tx_done = mctp_pcc_tx_done;
++	mctp_pcc_ndev->acpi_device = acpi_dev;
++	mctp_pcc_ndev->ndev = ndev;
++	acpi_dev->driver_data = mctp_pcc_ndev;
++
++	rc = initialize_MTU(ndev);
++	if (rc)
++		goto free_netdev;
++
++	rc = mctp_register_netdev(ndev, NULL, MCTP_PHYS_BINDING_PCC);
++	if (rc)
++		goto free_netdev;
++
++	return devm_add_action_or_reset(dev, mctp_cleanup_netdev, ndev);
++free_netdev:
++	free_netdev(ndev);
++	return rc;
++}
++
++static const struct acpi_device_id mctp_pcc_device_ids[] = {
++	{ "DMT0001" },
++	{}
++};
++
++static struct acpi_driver mctp_pcc_driver = {
++	.name = "mctp_pcc",
++	.class = "Unknown",
++	.ids = mctp_pcc_device_ids,
++	.ops = {
++		.add = mctp_pcc_driver_add,
++	},
++};
++
++module_acpi_driver(mctp_pcc_driver);
++
++MODULE_DEVICE_TABLE(acpi, mctp_pcc_device_ids);
++
++MODULE_DESCRIPTION("MCTP PCC ACPI device");
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Adam Young <admiyo@os.amperecomputing.com>");
 -- 
 2.43.0
 
