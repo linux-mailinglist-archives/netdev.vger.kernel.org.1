@@ -1,316 +1,236 @@
-Return-Path: <netdev+bounces-260509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260510-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +JKrLSCdnWnwQgQAu9opvQ
-	(envelope-from <netdev+bounces-260509-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 13:44:16 +0100
+	id eLmRMmWenWnwQgQAu9opvQ
+	(envelope-from <netdev+bounces-260510-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 13:49:41 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EAC0187226
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 13:44:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 47EE7187362
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 13:49:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2DB1C310A605
-	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 12:40:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BB3D8306115A
+	for <lists+netdev@lfdr.de>; Tue, 24 Feb 2026 12:48:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B2839A7FD;
-	Tue, 24 Feb 2026 12:40:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E454E39A7E9;
+	Tue, 24 Feb 2026 12:48:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=louisalexis.eyraud@collabora.com header.b="MV5O3D43"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="vPQ+4wXT"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010048.outbound.protection.outlook.com [52.101.46.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1760A39A7EA;
-	Tue, 24 Feb 2026 12:40:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B04237FF43;
+	Tue, 24 Feb 2026 12:48:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.48
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771936853; cv=pass; b=Ros5iwWQTekectT0q2NHNaGxWyZbmm4olwEhH7Mc3dlTTdnwpd3D35y9uhN5T2GwcBBnAq/mFfOWf+v1LC0j4iKzVAkg8/WCGoHi/CTJYC2s/Zgj157u/1buJBe0fogFa87mmJ8d3gNnXFEchnPW+ccD6zTbkoYpRbVqvvwkjVA=
+	t=1771937291; cv=fail; b=CEdO2TSXoxT5sTNCsItV+QqIKoJYK/MrovX3eJW8RKnUVTa/c7poBUXL1HEPcviTsXm8rWxCMPuQ7NSQW2koILsGXARVNazoYaaKNemo1j4lcYhV0Ae2omet1//NLvhlgqLSOgdh45Nr7CXmDMzC6+6Rrj2BWZCLg/+MxioxhfU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771936853; c=relaxed/simple;
-	bh=DBE/hOYm2uxq8ao7TJcQpf3nluCraOjknYn0QORUTTo=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=IkAlRx0vrjmW/kD8JmOxwTFNJDkmvrgai61DDo6cbb4RDfyUpf7A0fuS10GQkKzuD/SMgRmw8BH8PrxZUoupEJgd23n2TmLV0nZoJufoBrS/f/zRJuottDhiaxhbwJfdk6687EMYms4VMKIGuMqhS+kcv6VB9M5DEBeJU5Af6Ck=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=louisalexis.eyraud@collabora.com header.b=MV5O3D43; arc=pass smtp.client-ip=136.143.188.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1771936826; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=SqUdUsUQcnjO0yJANGrZuNzL9PCGuKWgRkHOd2/Z1f0X6hYFcX0dLEnGZcUyC6V5WJhUZvuts6fzKYwWnh4i5ahw7QrjjcUAu1EUjgeRD0oYGW4icYnXnrP0evXZzKSOtv4RKPR2eip6HIieZgIIZg1lUf3tmCFaMLPcboRKqQQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1771936826; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=eOZEdnbp46Z76LsK49tdtTNIOhWoViPgM8WCccLIHUE=; 
-	b=jnHZYsjvx4bgXFj2fwDjKLViSY7aFM9q4NORoOs0BAUUhH/SRf432yZgbOHMaP/PWKFYrOKUhOqShxi+hn8sMixSYSQ5r232ekx4Orp0a7vhLE8ba6JnaFAmyXM4VP48oRJY/JdmRYwaBbXUp3EWi/K9jqTUw5YT7cYLBEcRR4k=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=louisalexis.eyraud@collabora.com;
-	dmarc=pass header.from=<louisalexis.eyraud@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1771936826;
-	s=zohomail; d=collabora.com; i=louisalexis.eyraud@collabora.com;
-	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:Date:Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-Id:Reply-To;
-	bh=eOZEdnbp46Z76LsK49tdtTNIOhWoViPgM8WCccLIHUE=;
-	b=MV5O3D43ndbEy9mp7nq8rtLMNyNdMG8MnNEj8pZPqcPhftte69WLFJV/+8o398ir
-	hnrOTRXSzormLfL1sqLDROsM6DuSbgYyrUldvmoXs9AKEKiYHyLHp7IgeqoP0ObRD+6
-	16nALCxSkfRZeVakaq7j3J69dFlLJpiwcMVvkiJM=
-Received: by mx.zohomail.com with SMTPS id 1771936824130242.17321167502485;
-	Tue, 24 Feb 2026 04:40:24 -0800 (PST)
-Message-ID: <ba9d9132bab9d897b89bd686192693ef22bd2923.camel@collabora.com>
-Subject: Re: [PATCH v5 06/18] clk: mediatek: Add MT8189 vlpcfg clock support
-From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
-To: "irving.ch.lin" <irving-ch.lin@mediatek.com>, Michael Turquette	
- <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, Rob Herring	
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley	
- <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Richard Cochran <richardcochran@gmail.com>, Bartosz Golaszewski	
- <brgl@kernel.org>, Chen-Yu Tsai <wenst@chromium.org>, Miles Chen	
- <miles.chen@mediatek.com>
-Cc: linux-clk@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
-	Project_Global_Chrome_Upstream_Group@mediatek.com, Qiqi Wang	
- <qiqi.wang@mediatek.com>, sirius.wang@mediatek.com,
- vince-wl.liu@mediatek.com, 	jh.hsu@mediatek.com
-Date: Tue, 24 Feb 2026 13:40:16 +0100
-In-Reply-To: <20260202062840.342707-7-irving-ch.lin@mediatek.com>
-References: <20260202062840.342707-1-irving-ch.lin@mediatek.com>
-	 <20260202062840.342707-7-irving-ch.lin@mediatek.com>
-Organization: Collabora Ltd
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	s=arc-20240116; t=1771937291; c=relaxed/simple;
+	bh=12Xy9+XSkPXDGYfgVNLJJn4mmRL9zHn4YYLaEztVurQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=aaD+N4Y7Jlvi3W5fkB33UGVwyKXJjOBOc/9Q+sSGRu+mGtKa8z+UeyQsewK+PWxC/iIBYradzt7Ykr/4M6LoesAgdNp9vBNBd3NuuEsJ+ttDbxnTrKMUSuA4Xc86K8nAASHb/ErgVohQhJr0hpnC7I5Q3uW+/FnrdrCZ9LYFqTM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=vPQ+4wXT; arc=fail smtp.client-ip=52.101.46.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=MCjvWz/btvQdfdSvAK2H1X0G0wGezMq/RKwpymYV1hse2Cw3Vr+04QUKyt6i4sEpStROdTOAYUTU+Vwci9UttftIh5wkKC2DpC7AA0gmumjaLGkcab4nDOo94zQVmM57+e71Tk5asyRpL1C6Rn1+rXSsOtVeIVpnVPW9+9HF471Lhxb4c17jXDCod/+a4X34IAteYj+qZREqHuPHdP0i5+d8ILwUfxHFEt9tnyc8Yd1F1QcZR9LOpN36hFhNhpRH90WZdxwBTUPPNSgkg+hSFkYZgc3u1YkNpdFRH7mxXdrLa3ie8ePhIK5DAckvtmBl7NSVx4uhIxyL+AzGwaf8+w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xA4IRi0Df62BomVkKrmJ7Km3tkoHgv/+pl0VoYzl0pQ=;
+ b=rckpEEPxzokHHoxpkmTXDoJtcI61P/aVSPWxeprol22f3WA7pFPXmcgLKZUoiL8BMOUneMmpRP0JOZGQKwgMetmyI84C1Zq/Cjye5PO/9IBpNrKICnKX7ueE+3Z2hVV332l/GmbqNWKWd6es9um6BdvxKIO7Az/4J3Kr+4XjuysDDQrO6ojda4kDLTrJRK4vW1fDzSz23JXYTZy8VyX382Mr/AxE1ruIeqEZL8uhSLoZr50T++7HA4VOE2L0A+eWCvQmsHyAO6XcuPMrK8oiZf5/MNi+w2FEuk/Gy01o27A+Rx3UXDG25V6lj7XBYwDfhItizq6WgaBJOMA9DRoJ9A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.23.194) smtp.rcpttodomain=gmail.com smtp.mailfrom=ti.com; dmarc=pass
+ (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
+ (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xA4IRi0Df62BomVkKrmJ7Km3tkoHgv/+pl0VoYzl0pQ=;
+ b=vPQ+4wXTnwScIPstgC/vgsRAiOV4Q0MTeYUeZOFZZ5WbvX3x9o3ZuV5XXHJyysqSaO8lKCFDyWlZ9f4y3+loHROlYlXIbbunOoYH/hWpHrzltWttwS5FZbCsm9/Tr0jGwR756sclE53U7Hy7op4hnbW7moSITuDEiLkMcjT/VbU=
+Received: from BL1PR13CA0396.namprd13.prod.outlook.com (2603:10b6:208:2c2::11)
+ by SN4PR10MB5573.namprd10.prod.outlook.com (2603:10b6:806:204::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.21; Tue, 24 Feb
+ 2026 12:48:07 +0000
+Received: from BL02EPF0001A102.namprd05.prod.outlook.com
+ (2603:10b6:208:2c2:cafe::35) by BL1PR13CA0396.outlook.office365.com
+ (2603:10b6:208:2c2::11) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.21 via Frontend Transport; Tue,
+ 24 Feb 2026 12:48:11 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.194)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.23.194 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.23.194; helo=lewvzet200.ext.ti.com; pr=C
+Received: from lewvzet200.ext.ti.com (198.47.23.194) by
+ BL02EPF0001A102.mail.protection.outlook.com (10.167.241.134) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9632.12 via Frontend Transport; Tue, 24 Feb 2026 12:48:07 +0000
+Received: from DLEE213.ent.ti.com (157.170.170.116) by lewvzet200.ext.ti.com
+ (10.4.14.103) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 24 Feb
+ 2026 06:48:07 -0600
+Received: from DLEE201.ent.ti.com (157.170.170.76) by DLEE213.ent.ti.com
+ (157.170.170.116) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 24 Feb
+ 2026 06:48:06 -0600
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE201.ent.ti.com
+ (157.170.170.76) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Tue, 24 Feb 2026 06:48:06 -0600
+Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 61OCm6jM2255786;
+	Tue, 24 Feb 2026 06:48:06 -0600
+Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 61OCm59s020521;
+	Tue, 24 Feb 2026 06:48:06 -0600
+From: Meghana Malladi <m-malladi@ti.com>
+To: <haokexin@gmail.com>, <vadim.fedorenko@linux.dev>,
+	<jacob.e.keller@intel.com>, <m-malladi@ti.com>, <horms@kernel.org>,
+	<basharath@couthit.com>, <parvathi@couthit.com>, <afd@ti.com>,
+	<vladimir.oltean@nxp.com>, <rogerq@kernel.org>, <danishanwar@ti.com>,
+	<pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
+	<davem@davemloft.net>, <andrew+netdev@lunn.ch>
+CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <srk@ti.com>, Vignesh Raghavendra
+	<vigneshr@ti.com>
+Subject: [PATCH net-next v4 0/2] Add Frame Preemption MAC Merge support for ICSSG
+Date: Tue, 24 Feb 2026 18:18:01 +0530
+Message-ID: <20260224124803.3634808-1-m-malladi@ti.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ZohoMailClient: External
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF0001A102:EE_|SN4PR10MB5573:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8f165ca5-da0d-42e2-b46b-08de73a2f5b8
+X-LD-Processed: e5b49634-450b-4709-8abb-1e2b19b982b7,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|36860700013|82310400026|1800799024|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?qNr7BXRZQzOs/aRCjY6NcmDguWAlRpeygxTlqSg3ISRu6x4Z8U4t0UQfL8ol?=
+ =?us-ascii?Q?O3g5Qu8FmP4MwRwhKFvOeuOz8MWHE8ZVe8ryOTRflfSFEE9s/9GI21sNbrVd?=
+ =?us-ascii?Q?klD7O8uU3Y0cIY/SapZTmWI/T6nwAEuAsyYSAj1OuAl5s1kFQX7u6hn/SYJ4?=
+ =?us-ascii?Q?uxIXcLtM+T+XxrF5ui/BpajS7h/FFw+YP6NJ7BW8Z1qowk6O4+CQUknRu1dK?=
+ =?us-ascii?Q?B1xvj5dYDvb3lv8Sor4lguSfJJCWJfi7yKnQQ5uZqk6FrCYq8AUh3v3nTXD2?=
+ =?us-ascii?Q?gBhKfV4mF45+NmQo2G+wwwNc8ihGULbtko2G9QzoiYSylSQT0i6WixcoiZ6Z?=
+ =?us-ascii?Q?JXX3jVYuKHf9JxbycegWCQjYqJ2yt63P4/wZGySLNU9jfIQSYAwkPF9frgxO?=
+ =?us-ascii?Q?v9l4cAyf8FhVe+Swwyd3M9YPCj6+qCGizUZRsSxj0wsnA2Hw8+QXE8ki6pCQ?=
+ =?us-ascii?Q?0Z+Qu7yjWwe8Y5fy3G+d5rWDzwT3dUsKPYhKOP49TLGViX8gChDnxvIyqFhu?=
+ =?us-ascii?Q?CPNQLCmXEHTAf+jcYyXYry7jUdAuJlOhA081IAq6FHan1+szdtifqnG+AN94?=
+ =?us-ascii?Q?eskwn1rKH2UQFiufep7BACmNoaUYGbg9WMzUzLi9Tvmh2rfgi7u6q/Fhv8hN?=
+ =?us-ascii?Q?+iPkhTJHq4dthUDcryvsO8nBWqnbqSRtgQczeQvDkDgn3qh+fiC1dHleKkpm?=
+ =?us-ascii?Q?sx6lKX2s08+qrt/vI+sNl40/g7j6LWpQmU/RmqQjtTTipAp+EglUUjHGbSM8?=
+ =?us-ascii?Q?7Y9ShO6nHFYO6d5FQC0Bs8zSuvpfJbndfnOIUAaAggmseBYnxCFoHYPQi4HV?=
+ =?us-ascii?Q?QL4O6v7gbsukiATPBi+V9y58CHbQ+YAA2NBppPJ9Inrj9R0DXfoYflG+JBE4?=
+ =?us-ascii?Q?K/HQOuFPgPsJWR2SMZmxRfp1vmjxHJr/HkT/pHYE5j+ltrKk+qEMG8QS4pjB?=
+ =?us-ascii?Q?2XY7UUREgFLU8tFsUMIKsKhwjYSRZsH2ThAk1bWtKXv1EnKshK1aRl/gYZ4X?=
+ =?us-ascii?Q?41ys92X/jlMfo93WZjfUo5Up4QAngVyOq4iKY8mpx3zsqbNf2rigHZaNgTmd?=
+ =?us-ascii?Q?cofxIWrF+pfewrygeTZ4aSspS+TDQNoQDIhpNVlMdbAKTm//nAJhYfHQRhUZ?=
+ =?us-ascii?Q?/QnfAZ1dUs814B5hTcSzCm4LaY+gqBJWfWVs6IkT16irV3VHH6QoY5169LNc?=
+ =?us-ascii?Q?owAlvBDfVUCSj9lADxv2IMpeMbtrGsFDu0sitQqH+3COmU0OGKdwiv4TeZY9?=
+ =?us-ascii?Q?5u2oOY7HnjaHId9B3aIK5Q9aqqz//j7eU1gJ6ypjudYhw1KsRiIjW77mAjxq?=
+ =?us-ascii?Q?7ACSLy2VRUTy6XJ2zlOYdDMxJuZr3TrnsbIIz6psp/b3Cj6c9Uq4sD5oiRuf?=
+ =?us-ascii?Q?mnExnlLbk0IJlhCsyU/MuziNPeGxVAuhD8tzP97/eSuIKTUshk/ThOFXTMBo?=
+ =?us-ascii?Q?siy8hzv/8tcnlXI5oh3ni1nrKqWv8doKVGr83A6jGHe1BYfG4GVlGkCnRwUW?=
+ =?us-ascii?Q?6BK6H4aYTCXCJ3zWcvbsN7tf0P595P2X7jz0GpMIiAtN6dGmXMHtc4Wm87Fg?=
+ =?us-ascii?Q?f2nCztz8kxCW4gPgSqj6+OsGf9KYWhP+zgvPK6oqUqFpHzbS6JnT5uhsjo45?=
+ =?us-ascii?Q?KtBs9mRGSwLjMUgmuvuX32c7JT9pXl8UwHMtTYgqWSyzTXVwHnfYnl0C9qg0?=
+ =?us-ascii?Q?jBxo82BWukqiPUEGqZ3069x14qY=3D?=
+X-Forefront-Antispam-Report:
+	CIP:198.47.23.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet200.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(36860700013)(82310400026)(1800799024)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	NTOho7GLZOa/00HHpVhA6PPlilKnfo7JoiscwOWeij2kQeSwXqJHPUhFRx/GNdbwR7RnnN1O8cPDe/TBRRsfaRD+4EWfgwP9N1KJhEaH3FoZPDf+arTgU1n21eMjzdRY7XvxA9tsZXOetmZ0JIZ3oB4k1JTNjnNc0nEBDvL6tKHzvukCEv1sZKNUJW8NoBGyXMOZs7RlBoVYr09XT7+tPzrc3IAdyPJ+lEjDoHpvBWSbcAXKBmgzIW4fmxL6bk5QyF+dB4cujvVCVLejljVHM1YLvqImKYYujfNtbG3CZ4RlKQwZaYrD+7/vcEjF25bQa7TOABjbkXcOxhMFo9bn+FB+hNcnUyFZ26Wj7pVIu9CgYZKjuvdEsOO6QjLb3qvaHoXtwilybWymM3AIrupttfQw/w9IBvjit/kmEyGU5itPJp0kqKNOptPUuz7FpRwu
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2026 12:48:07.6398
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8f165ca5-da0d-42e2-b46b-08de73a2f5b8
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.194];Helo=[lewvzet200.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL02EPF0001A102.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR10MB5573
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[collabora.com,none];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[collabora.com:s=zohomail];
+	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260509-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[mediatek.com,baylibre.com,kernel.org,gmail.com,collabora.com,chromium.org];
-	HAS_ORG_HEADER(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,linux.dev,intel.com,ti.com,kernel.org,couthit.com,nxp.com,redhat.com,google.com,davemloft.net,lunn.ch];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260510-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DKIM_TRACE(0.00)[ti.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[louisalexis.eyraud@collabora.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[m-malladi@ti.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[collabora.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ti.com:mid,ti.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.991];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mediatek.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,collabora.com:mid,collabora.com:dkim]
-X-Rspamd-Queue-Id: 6EAC0187226
+	RCVD_COUNT_SEVEN(0.00)[11]
+X-Rspamd-Queue-Id: 47EE7187362
 X-Rspamd-Action: no action
 
-Hi Irving-CH,
+This patch series adds QoS support to the ICSSG PRUETH driver.
+The first patch implements mqprio qdisc handling and TC offload hooks
+so userspace can request TC mappings and queue counts.
 
-On Mon, 2026-02-02 at 14:28 +0800, irving.ch.lin wrote:
-> From: Irving-CH Lin <irving-ch.lin@mediatek.com>
->=20
-> Add support for the MT8189 vlpcfg clock controller,
-> which provides clock gate control for vlp domain IPs.
->=20
-> Signed-off-by: Irving-CH Lin <irving-ch.lin@mediatek.com>
-> ---
-> =C2=A0drivers/clk/mediatek/Makefile=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 2 +-
-> =C2=A0drivers/clk/mediatek/clk-mt8189-vlpcfg.c | 111
-> +++++++++++++++++++++++
-> =C2=A02 files changed, 112 insertions(+), 1 deletion(-)
-> =C2=A0create mode 100644 drivers/clk/mediatek/clk-mt8189-vlpcfg.c
->=20
-> diff --git a/drivers/clk/mediatek/Makefile
-> b/drivers/clk/mediatek/Makefile
-> index 3b25df9e7b50..d9279b237b7b 100644
-> --- a/drivers/clk/mediatek/Makefile
-> +++ b/drivers/clk/mediatek/Makefile
-> @@ -124,7 +124,7 @@ obj-$(CONFIG_COMMON_CLK_MT8188_VENCSYS) +=3D clk-
-> mt8188-venc.o
-> =C2=A0obj-$(CONFIG_COMMON_CLK_MT8188_VPPSYS) +=3D clk-mt8188-vpp0.o clk-
-> mt8188-vpp1.o
-> =C2=A0obj-$(CONFIG_COMMON_CLK_MT8188_WPESYS) +=3D clk-mt8188-wpe.o
-> =C2=A0obj-$(CONFIG_COMMON_CLK_MT8189) +=3D clk-mt8189-apmixedsys.o clk-
-> mt8189-topckgen.o \
-> -				=C2=A0=C2=A0 clk-mt8189-vlpckgen.o
-> +				=C2=A0=C2=A0 clk-mt8189-vlpckgen.o clk-mt8189-
-> vlpcfg.o
-> =C2=A0obj-$(CONFIG_COMMON_CLK_MT8192) +=3D clk-mt8192-apmixedsys.o clk-
-> mt8192.o
-> =C2=A0obj-$(CONFIG_COMMON_CLK_MT8192_AUDSYS) +=3D clk-mt8192-aud.o
-> =C2=A0obj-$(CONFIG_COMMON_CLK_MT8192_CAMSYS) +=3D clk-mt8192-cam.o
-> diff --git a/drivers/clk/mediatek/clk-mt8189-vlpcfg.c
-> b/drivers/clk/mediatek/clk-mt8189-vlpcfg.c
-> new file mode 100644
-> index 000000000000..2b9c3101f2b4
-> --- /dev/null
-> +++ b/drivers/clk/mediatek/clk-mt8189-vlpcfg.c
-> @@ -0,0 +1,111 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (c) 2025 MediaTek Inc.
-> + * Author: Qiqi Wang <qiqi.wang@mediatek.com>
-> + */
-> +
-> +#include <linux/clk-provider.h>
-> +#include <linux/module.h>
-> +#include <linux/of_device.h>
-> +#include <linux/platform_device.h>
-> +
-> +#include "clk-mtk.h"
-> +#include "clk-gate.h"
-> +
-> +#include <dt-bindings/clock/mediatek,mt8189-clk.h>
-> +
-> +static const struct mtk_gate_regs vlpcfg_ao_reg_cg_regs =3D {
-> +	.set_ofs =3D 0x0,
-> +	.clr_ofs =3D 0x0,
-> +	.sta_ofs =3D 0x0,
-> +};
-> +
-> +#define GATE_VLPCFG_AO_REG(_id, _name, _parent,
-> _shift)		\
-> +	GATE_MTK(_id, _name, _parent, &vlpcfg_ao_reg_cg_regs,
-> _shift, &mtk_clk_gate_ops_no_setclr)
-> +
-> +static const struct mtk_gate vlpcfg_ao_reg_clks[] =3D {
-> +	GATE_VLPCFG_AO_REG(CLK_VLPCFG_AO_APEINT_RX,
-> "vlpcfg_ao_apeint_rx", "clk26m", 8),
-> +};
-> +
-> +static const struct mtk_clk_desc vlpcfg_ao_reg_mcd =3D {
-> +	.clks =3D vlpcfg_ao_reg_clks,
-> +	.num_clks =3D ARRAY_SIZE(vlpcfg_ao_reg_clks),
-> +};
-> +
-> +static const struct mtk_gate_regs vlpcfg_reg_cg_regs =3D {
-> +	.set_ofs =3D 0x4,
-> +	.clr_ofs =3D 0x4,
-> +	.sta_ofs =3D 0x4,
-> +};
-> +
-> +#define GATE_VLPCFG_REG_FLAGS(_id, _name, _parent, _shift,
-> _flags)		\
-> +	GATE_MTK_FLAGS(_id, _name, _parent, &vlpcfg_reg_cg_regs,
-> _shift,	\
-> +		=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 &mtk_clk_gate_ops_no_setclr_inv, =
-_flags)
-> +
-> +#define GATE_VLPCFG_REG(_id, _name, _parent, _shift)		\
-> +	GATE_VLPCFG_REG_FLAGS(_id, _name, _parent, _shift, 0)
-> +
-> +static const struct mtk_gate vlpcfg_reg_clks[] =3D {
-> +	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_SCP, "vlpcfg_scp",
-> +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "vlp_scp_sel", 28, CLK_IS_CRITICAL),
-> +	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_RG_R_APXGPT_26M,
-> "vlpcfg_r_apxgpt_26m",
-> +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "clk26m", 24, CLK_IS_CRITICAL),
-> +	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_DPMSRCK_TEST,
-> "vlpcfg_dpmsrck_test",
-> +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "clk26m", 23, CLK_IS_CRITICAL),
-> +	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_RG_DPMSRRTC_TEST,
-> "vlpcfg_dpmsrrtc_test",
-> +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "clk32k", 22, CLK_IS_CRITICAL),
-> +	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_DPMSRULP_TEST,
-> "vlpcfg_dpmsrulp_test",
-> +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "osc_d10", 21, CLK_IS_CRITICAL),
-> +	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_SPMI_P_MST,
-> "vlpcfg_spmi_p",
-> +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "vlp_spmi_p_sel", 20,
-> CLK_IS_CRITICAL),
-> +	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_SPMI_P_MST_32K,
-> "vlpcfg_spmi_p_32k",
-> +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "clk32k", 18, CLK_IS_CRITICAL),
-> +	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_PMIF_SPMI_P_SYS,
-> "vlpcfg_pmif_spmi_p_sys",
-> +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "vlp_pwrap_ulposc_sel", 13,
-> CLK_IS_CRITICAL),
-There is no such "vlp_pwrap_ulposc_sel" clock defined in your mt8189
-clock driver patch series. The parent clock should probably be
-"vlp_pwrap_osc_sel" (that is defined in clk-mt8189-vlpckgen.c) instead.
+It also integrates a driver-side mechanism to program the firmware
+with the IET/FPE preemption mask and to kick the firmware verify state
+machine when frame preemption is enabled. The second patch adds ethtool
+perations for the MAC Merge (Frame Preemption) sublayer, exposing .get_mm,
+.set_mm and .get_mm_stats so admins can view and change MAC Merge
+parameters and retrieve preemption statistics.
 
-Same thing for vlpcfg_pmif_spmi_p_tmr, vlpcfg_pmif_spmi_m_sys and
-vlpcfg_pmif_spmi_m_tmr below that have the same parent clock.
+v3: https://lore.kernel.org/all/20260205184747.2451816-1-m-malladi@ti.com/
 
-Best regards,
-Louis-Alexis
+MD Danish Anwar (2):
+  net: ti: icssg-prueth: Add Frame Preemption MAC Merge support
+  net: ti: icssg-prueth: Add ethtool ops for Frame Preemption MAC Merge
 
-> +	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_PMIF_SPMI_P_TMR,
-> "vlpcfg_pmif_spmi_p_tmr",
-> +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "vlp_pwrap_ulposc_sel", 12,
-> CLK_IS_CRITICAL),
-> +	GATE_VLPCFG_REG(CLK_VLPCFG_REG_PMIF_SPMI_M_SYS,
-> "vlpcfg_pmif_spmi_m_sys",
-> +			"vlp_pwrap_ulposc_sel", 11),
-> +	GATE_VLPCFG_REG(CLK_VLPCFG_REG_PMIF_SPMI_M_TMR,
-> "vlpcfg_pmif_spmi_m_tmr",
-> +			"vlp_pwrap_ulposc_sel", 10),
-> +	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_DVFSRC,
-> "vlpcfg_dvfsrc",
-> +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "vlp_dvfsrc_sel", 9, CLK_IS_CRITICAL),
-> +	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_PWM_VLP,
-> "vlpcfg_pwm_vlp",
-> +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "vlp_pwm_vlp_sel", 8,
-> CLK_IS_CRITICAL),
-> +	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_SRCK, "vlpcfg_srck",
-> +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "vlp_srck_sel", 7, CLK_IS_CRITICAL),
-> +	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_SSPM_F26M,
-> "vlpcfg_sspm_f26m",
-> +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "vlp_sspm_f26m_sel", 4,
-> CLK_IS_CRITICAL),
-> +	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_SSPM_F32K,
-> "vlpcfg_sspm_f32k",
-> +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "clk32k", 3, CLK_IS_CRITICAL),
-> +	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_SSPM_ULPOSC,
-> "vlpcfg_sspm_ulposc",
-> +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "vlp_sspm_ulposc_sel", 2,
-> CLK_IS_CRITICAL),
-> +	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_VLP_32K_COM,
-> "vlpcfg_vlp_32k_com",
-> +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "clk32k", 1, CLK_IS_CRITICAL),
-> +	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_VLP_26M_COM,
-> "vlpcfg_vlp_26m_com",
-> +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "clk26m", 0, CLK_IS_CRITICAL),
-> +};
-> +
-> +static const struct mtk_clk_desc vlpcfg_reg_mcd =3D {
-> +	.clks =3D vlpcfg_reg_clks,
-> +	.num_clks =3D ARRAY_SIZE(vlpcfg_reg_clks),
-> +};
-> +
-> +static const struct of_device_id of_match_clk_mt8189_vlpcfg[] =3D {
-> +	{ .compatible =3D "mediatek,mt8189-vlp-ao", .data =3D
-> &vlpcfg_ao_reg_mcd },
-> +	{ .compatible =3D "mediatek,mt8189-vlpcfg-ao", .data =3D
-> &vlpcfg_reg_mcd },
-> +	{ /* sentinel */ }
-> +};
-> +
-> +static struct platform_driver clk_mt8189_vlpcfg_drv =3D {
-> +	.probe =3D mtk_clk_simple_probe,
-> +	.remove =3D mtk_clk_simple_remove,
-> +	.driver =3D {
-> +		.name =3D "clk-mt8189-vlpcfg",
-> +		.of_match_table =3D of_match_clk_mt8189_vlpcfg,
-> +	},
-> +};
-> +
-> +module_platform_driver(clk_mt8189_vlpcfg_drv);
-> +MODULE_DESCRIPTION("MediaTek MT8189 vlpcfg clocks driver");
-> +MODULE_LICENSE("GPL");
+ drivers/net/ethernet/ti/Makefile              |   2 +-
+ drivers/net/ethernet/ti/icssg/icssg_config.h  |   9 -
+ drivers/net/ethernet/ti/icssg/icssg_ethtool.c |  98 +++++++-
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c  |  10 +
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h  |   7 +-
+ drivers/net/ethernet/ti/icssg/icssg_qos.c     | 223 ++++++++++++++++++
+ drivers/net/ethernet/ti/icssg/icssg_qos.h     |  80 +++++++
+ drivers/net/ethernet/ti/icssg/icssg_stats.c   |   1 -
+ drivers/net/ethernet/ti/icssg/icssg_stats.h   |   5 +
+ .../net/ethernet/ti/icssg/icssg_switch_map.h  |   5 +
+ 10 files changed, 426 insertions(+), 14 deletions(-)
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_qos.c
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_qos.h
+
+
+base-commit: 8bf22c33e7a172fbc72464f4cc484d23a6b412ba
+-- 
+2.43.0
+
 
