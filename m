@@ -1,261 +1,247 @@
-Return-Path: <netdev+bounces-261020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261021-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kIvJFfscn2lcZAQAu9opvQ
-	(envelope-from <netdev+bounces-261020-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 17:02:03 +0100
+	id mHQwJzQfn2lcZAQAu9opvQ
+	(envelope-from <netdev+bounces-261021-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 17:11:32 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B2A219A2CF
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 17:01:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 191C719A4B2
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 17:11:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 00359316B8A4
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:48:54 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C47B431C7481
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:49:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15FA33EFD38;
-	Wed, 25 Feb 2026 15:42:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B48A3DA7CB;
+	Wed, 25 Feb 2026 15:45:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="WxTeL4HM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eGDskJud"
 X-Original-To: netdev@vger.kernel.org
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010021.outbound.protection.outlook.com [52.101.61.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72153EDADB;
-	Wed, 25 Feb 2026 15:42:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.21
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772034126; cv=fail; b=DgiJh+vM92iuDKXNHxWZlS/ekemBhiD42QhxTMN7SFTxtT9enjfoxQ1s54S1tSmyHDpBuHkNO2fQcvccc7K7cFCYhM4EQtLm2o9DvgI6SyW1IfVVQ4NURoboaPXdTqgPI6Kbj2c8bMNULHVLGs5JPVlVw87+CRp/mdXCfVxt+0M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772034126; c=relaxed/simple;
-	bh=Y4gDuYh+U+IX2M78aPN80goJmULszAn3paqqn7vMaKY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=nqQABUgQfbkjBU12ds+893enxfj87edCldQ0LqTNHaWxGNhE83jomayxyQAQdJ/raK55/wserKx+0s9DXG+wOHspTX9n3gj7QcVPlF/r7sB6Is87FrKvacBeMY94JwDCEg2fYAw03sgE8sESfY57xJM+SwVuniOewnndq0yL3IU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=WxTeL4HM; arc=fail smtp.client-ip=52.101.61.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZEfrNoDs3eOeCBJ4OS/tnjKJtuMmjnzeyk9uiuTshI3vkvU7vy3EZFHcLZSbx/Qiq0/1LvKeAtmHuQuZvpoYU8+kCXtRRkgrwoiSBRewORsqaKniGIPxSL6og2Myl471JhKmwz/WaLbiLWtMw+LSVdbh0T4MCqmTa0RgBFy3W7JsCuz+PHEu9J/rWWA4puNhfuVWZFjjsEwVmx8mQJKy8rTvUSNtTcnx/JQsuGf6DNpoBgh1mXSV2Vvo+2zynizWf3oQw/qaFO2uKqxjRs/e/T5U3PJwZgXD55QB1kNgVpY53j9Wf6TnCkElf+NnS/9yNFABbhyDq2X3pREtVPJj7A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iZDqo9Htf0TSZlEpLnRma/8qjLWDAe/gqvQRZdOYp0o=;
- b=WNeK8WQbMdVqRIM/ZLdVEsJb4St0+OtL1NgfUwUyCZZHvAA7fAniajTz7KTiNCpF1F9DWxXUmwoJ4vEmU3Ppss/c066jQWvb40rN2oKUqCwzc2RRFSnbXudA07gGBdmfXCOWrdLchAupciaRQtS/j0jO1oiOTN7Dt8A6+L6YoMXXVMKAQ7dF7oNzEDS362kNA4znuM6RuTJ3Ec5QdI7GnhnlAvRKiKuEEYwlUhSaghv7KGKEap8f1/ykueVByj12Wvf4PI7Z69ZZ2YpMEacmVZu9ML8n+/A4PQxDgPkahLqf5S37chdCiDhaLbSBB37ksOXCNjve0WmFRaTHNfiCAg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iZDqo9Htf0TSZlEpLnRma/8qjLWDAe/gqvQRZdOYp0o=;
- b=WxTeL4HM0T8yOgXqPV4H41uOe0ojdHgF+QkFwpB+Jyx1aQ/WJMd2YX+EQ4kcb5d6pn3TjK4lg/VoKIGwvoDNorgLqxK4/jebgz3UDm2SnmOvD9X91yfxHUjJ7aX/7hfrodk0MFcmwUmdhVdJkkfWc8X0rJOtIE79aNuvfqQ+u85mN1TDb4ePpzF7Z0HlgWoR3v0gdGZaAFLnNt7kyKFL6yGLUhywc8slNvxHvBKpPfgOthJNvkjogfWIzhwmreBRWU8m6duLpXtyE0b57rpiW693CNamkc3o3a32DqCwMK4XRUZg2yhUJuhs9GAr1gSc4wklSGcUZVxbCal9BnqcXw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from PH0PR12MB8800.namprd12.prod.outlook.com (2603:10b6:510:26f::12)
- by SJ0PR12MB8089.namprd12.prod.outlook.com (2603:10b6:a03:4eb::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.22; Wed, 25 Feb
- 2026 15:42:00 +0000
-Received: from PH0PR12MB8800.namprd12.prod.outlook.com
- ([fe80::f79d:ddc5:2ad7:762d]) by PH0PR12MB8800.namprd12.prod.outlook.com
- ([fe80::f79d:ddc5:2ad7:762d%4]) with mapi id 15.20.9632.017; Wed, 25 Feb 2026
- 15:42:00 +0000
-Date: Wed, 25 Feb 2026 10:41:58 -0500
-From: Yury Norov <ynorov@nvidia.com>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Yury Norov <yury.norov@gmail.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Matthew Brost <matthew.brost@intel.com>,
-	David Laight <david.laight.linux@gmail.com>
-Subject: Re: [PATCH RESEND 0/3] ice: use better bitmap API
-Message-ID: <aZ8YRsdcRDcEUHmO@yury>
-References: <20260225000007.255837-1-ynorov@nvidia.com>
- <7e4e207b-e839-4cfd-941b-5bec7a9ebff4@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7e4e207b-e839-4cfd-941b-5bec7a9ebff4@intel.com>
-X-ClientProxiedBy: BN9PR03CA0771.namprd03.prod.outlook.com
- (2603:10b6:408:13a::26) To PH0PR12MB8800.namprd12.prod.outlook.com
- (2603:10b6:510:26f::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAEA13DA7D8
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 15:45:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772034314; cv=none; b=tsvWmzxHBLx7vgrKjyi38gjC8vv1iHtnIRHhZ8wDh3+WD4Oy1VMC1QS+c7dkic3D3xszj55tKKd/o2wgTjpigkC3W8ZgsJSbRr2ZeK3vmYLL2CnXnqYU87b/A33wjHJxelsXib8V+ac6s5FZtbTFAXEN3k9OdTsm7OX4XcauSqw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772034314; c=relaxed/simple;
+	bh=gPvFcEfXiqPuy7lYBnMUvduvXgSEpCGhKTVWVx2/xH4=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=iNUSRlXUy379/aE0j/6O1D/Pzb712VqZuVKzTB7YEbWAhTigfpR1+cl2pn9imvlMLQMP2N0jInpYjNu/G8rIS/m/mkY5KlKn2q2N8TWLxj1h3lNpK4QdST7nrqZ9u3Z1EEo1OF1eVoaiQmKEsYLiPLJJakmrw3ftWiARwBpBXYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eGDskJud; arc=none smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-798527f822cso32817767b3.3
+        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 07:45:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772034312; x=1772639112; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uO65KSWBr0mQ6tb0/2KN58uTscIuAO7gxPT58NJtVsw=;
+        b=eGDskJudULKb/RUybAan/2Ryee8o0N11aDPibQUfrc9YGkz/71ZBZTqdyYUvyLokoE
+         MtVLmwz2KoHoXbwumeTFJe2VroVsRQHeqbSkV227hLYQr7fBMaYd6GFVZmccAWV95aSN
+         VT2Czwc6ZCrtb8gDL3y8oDfRemKfUnbNN4Uq0wn5uybtnyJWThAIyMRN350xWD66OHqg
+         jiTrTciICrM/tl1e0Oep2PvQWr3dQ1qC4mS5SD7l4Aq1sSaSDFdZBKhyDWsSUNJMKXgQ
+         FAIjJzvqhbiAH4KuUG7B5hGBBROn/EMpRP9Luue0YJx1kkF/1oDTPSRPpQTQcSwUsGna
+         5bgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772034312; x=1772639112;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uO65KSWBr0mQ6tb0/2KN58uTscIuAO7gxPT58NJtVsw=;
+        b=RxZC+DqYMZaTdRQsjk3HHzMIO5E4ZihEtm3zDE42ZfZFXdglSKAPs1lF9bCcphbdyk
+         I13Rd/iIt4eQr7c2fDMoPQI2pcWPAzqzC47Q0JhapUmfarTdsjdE7LsfyAjzt30305PH
+         //cJU+89FhOk+5xIgmwVbhtEAdODQDTc8aje3sbhLfBYbq/m0+tWbicHqADfYjYTZOsa
+         AWvJyU6joSkeIXUzU6ewPRlMvwfuQIqF/iAcpOVs3wHURTVmGTkYhOaSAb9o1xSpiB2X
+         ZHzqxQ8KoTHkNKFTYuJk67a21YK/744tlkqWpqRRF19Lrc7tSUTPrijfG6kcFkB/EesK
+         OvsA==
+X-Forwarded-Encrypted: i=1; AJvYcCVSP9qJVGX4nBupc9knA4ZtfUGFFag18H0KOPXMPsnoivr2TWsMzuKlTkqDY5hk86B/ofJ4ccI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLkrIQo1/qq3jSUmZPTlHmfPc/Tw9QSamq9xuMPoGO1ySxAWMX
+	6QORuaIwvGLxoY6PiKkdO/V03DnXSgQ68YLBvBuIJ+DvTHZ/5y4qcB2A
+X-Gm-Gg: ATEYQzx4GezRLUTw+Z93mbuTYXPZPVMvRRzKqUW1oj7sDlkPomXP12fmay1t1toVNFo
+	dORB0RGzlhu9Z6tTq9Qkap00YmqMbnzRaWlqO1b1N/ucSAv3/awYTmrnD3NBcRAL8UTgcBK1BS6
+	YoxCyYlFt4vetOttAEXcz3zNZ2D2Bvb9DNxzTz4OV/ZZ8H2tXFVpKI6SC2DAV4kxbGODB+iRXPr
+	tDlRd4iAJP95/nT0/GwfGgkIBbQ8suQzEUZn2BN7sl/WFFP97mrFlUmabZione/egeqHjsp35x7
+	DZqRQibtbQAxaLSGELaOyoopiOme4ZOnfh/Z7dmBg1F9e2px02dfNiPwPqCl4XvO7hhuwFJigYA
+	hHU9ciXGnuvOiM9tn3RWCJDCHX4wRQXYg8v/a/OWW1/FAD2cZgY9ruMqoBK07LQwk8YJnbai+mk
+	3SummWldQUHvNBqJRdlTH/15cCHJ65k7NEhk3UvAmPj11Y1+rf7G/RPZ4fiZiza2s9hQuyiAUgM
+	HiagR25Gg==
+X-Received: by 2002:a05:690c:6010:b0:796:3079:ab9 with SMTP id 00721157ae682-7986fca012dmr7700337b3.23.1772034311854;
+        Wed, 25 Feb 2026 07:45:11 -0800 (PST)
+Received: from gmail.com (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-79868dc683csm8102117b3.3.2026.02.25.07.45.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Feb 2026 07:45:10 -0800 (PST)
+Date: Wed, 25 Feb 2026 10:45:09 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: "Hudson, Nick" <nhudson@akamai.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "Glasgall, Anna" <aglasgal@akamai.com>, 
+ "Tottenham, Max" <mtottenh@akamai.com>, 
+ "Hunt, Joshua" <johunt@akamai.com>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, 
+ Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, 
+ Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Jason Xing <kerneljasonxing@gmail.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Paul Chaignon <paul.chaignon@gmail.com>, 
+ Mykyta Yatsenko <yatsenko@meta.com>, 
+ Tao Chen <chen.dylane@linux.dev>, 
+ Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
+ Anton Protopopov <a.s.protopopov@gmail.com>, 
+ Tobias Klauser <tklauser@distanz.ch>, 
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Message-ID: <willemdebruijn.kernel.7c6e5a81afba@gmail.com>
+In-Reply-To: <7C8018C7-B0E2-435F-B155-60F29BCF5018@akamai.com>
+References: <20260219104710.1490304-1-nhudson@akamai.com>
+ <20260219104710.1490304-2-nhudson@akamai.com>
+ <willemdebruijn.kernel.5766d0a10c73@gmail.com>
+ <7C8018C7-B0E2-435F-B155-60F29BCF5018@akamai.com>
+Subject: Re: [RFC PATCH 1/1] bpf: Add tunnel decapsulation and GSO state
+ updates per new flags
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR12MB8800:EE_|SJ0PR12MB8089:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7f0a683d-2451-4074-5fe4-08de74846a5b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|376014|10070799003|7416014;
-X-Microsoft-Antispam-Message-Info:
-	OJ7ZHWrR1eJKEf20NVqgusgH3eHBlwQoP5qp3KHxwnNB1YWwXsrka4kH17jFt4Fv2eDknacGNk+AHDAx34M6175xKTBt5tcynjrvbZaooYXx4U2T3gz8kxof27DTOWvc/BiMYHMj1pPSFfkwOaSCppmXwwMCTR2ggS0zEAvFKW9xhoOgGK2ljSzKzbCksgRAbLPhlpCxR2JDngUO6k8gwrmf3t0ZtXrMUCVKzy8FPd1VpQ0Eorf683OqVkCMJgCPlDai3JriTCFFUG3SYUXpeuqmBMys+OcC3PQBoyLi7FP/atEL6hx0ht/fdG782Efp9v9PuIu4ho7SckiKfDWJjkgoqreyG2hSebtnayv78yn7cFDIIq2dikxqkjuGxH+xzlnbIrr6soK0s49hHKHBVlXeX4QDPiGRBJ5ap+687phszeM+/rGWaal6d8/mk5RTpw1rlZS9OsdEPuvX6ivFSv8zT8YcuKMD9DMaD9Cd0pk7xusGFJfoEA6QN9Dg8VPweitcp3qdIiSzRj6bkwY2482F658hYVj07SGvzQtlOaxrDujbIq8C9nYfX3NxbKDIjmicxMzqIYu8/JzrqgS9kIo2dnMgBOB6qKlBSc4Vu6rgTYHMRzrIr/aLGYqN0mUcVR8X9+ipCJewxoItk+HzvLO3edNWuvgpJZEfwz4d0ZusAFtFtV6N+2RlKODTdkngIIGdMmL7gQQK8epvpNgqKrgqO+A1wU0VTUygzjx4+O8=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB8800.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(10070799003)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?LKqocfCvW6RV0Kkc9UNRmyHNE3eCqExGfBrHTylKNU5H5b/MjFMLjLocekr/?=
- =?us-ascii?Q?LYL+G7pPWX5yjTdNhCKLJPyCWfAL/pIJQnuEKWpyYIp8B9zeauTmNEVvdZaJ?=
- =?us-ascii?Q?Yh2A2rRwnijYcULcbEEwW+5/7YCgoPCNe/A9ThX6EdvwtQdWI2lGHpW2Parp?=
- =?us-ascii?Q?Tf4hBk4hEH0QrfrwHnSznu4RaZ65M5C5QmCcF2prlrwXixaN61uPXLprVHZV?=
- =?us-ascii?Q?wIJD6E7bydjMWeGnsgpssq9OrKPmftjbFy9jw8250InhHZE9iT6btEwqk280?=
- =?us-ascii?Q?LJcp2Z0cWRLYt1U9MYgPexl3Q242/C4j5SLmYtI8N2f93u5+AHrhJ5slRbrj?=
- =?us-ascii?Q?MCykqJKFveEoJWtFN/U6b/CiULqMDMT4QohtOVdYdxERFXiTdzAKbCHyqFDN?=
- =?us-ascii?Q?rNiuHjS+Z9Uz/ddaTqOu0bFmQB2Bl3wriTBkxayYGOzix4li4n3Xvb4yPKjI?=
- =?us-ascii?Q?HoxoHotCUwecWXTtJBjID4DPyf9p8j36KAk3LLvO7NpqYxYvFplfcn4oOLhT?=
- =?us-ascii?Q?KKkIYqjer9dKy2yoCj27yAVgAac6KK/LAJZbXRR14C9uB2k8gdpmy1WZ/VE4?=
- =?us-ascii?Q?J4PbZT4PECOoqKoak+T14ytTyUAFvrk69YL40Y41bextXQaO45iD1Sif9kW5?=
- =?us-ascii?Q?vI9P5q/ePCMkfWErECk4FyxGe1ZeklnV/F9ru3BCHYOo6+c2499BTCJyAtoA?=
- =?us-ascii?Q?7o4Q9xX+spF9bENz5CH0/0LN50OUNuq6DomxENnBM0xecChUGY39sDDgZ+oX?=
- =?us-ascii?Q?gLfvvPPhqHIh9UnicV03NjegjtN5cH5EYQh4q2RrBcenV2+97E60cxz4FLtk?=
- =?us-ascii?Q?V2TOl7sv7LZABcO3owwX91Z6zgSqZLrIxQgJHj/JjJGKBHSgyZySJlG/odkP?=
- =?us-ascii?Q?CNlTW78Ua5N4J2hwmFW17kUl9cZcK+FhLYJtuN+XWJTxjhOwP0mqs1bpL4qy?=
- =?us-ascii?Q?KGp7L9dJ3UvVBBPgLzDXEShlGwXMIcFHu9qvCGYBZvjYzvZqZcXodxESemD8?=
- =?us-ascii?Q?dZewMfsfx3qnPkDJkuZx6BGg6V/PspGz5djjeSwV4KnkzFSsd+1NY/YPevHx?=
- =?us-ascii?Q?kX3/AtR5J8ZOb0L51jrjZw4ZDOWXs5hdUDtjMclMwBFfjl6iUzJTtGHTPqx5?=
- =?us-ascii?Q?+yPE6c6JFMZazv6yMcChkIRXnMl1LCOp3b/RyrtrVzw6YcnsATmPKZ7ufah4?=
- =?us-ascii?Q?7zLBEabeirW6lnS2Ob7+44H1FPYS0yHjy0GuVrpEyVUwZ2R4AJQ/p7rhoI53?=
- =?us-ascii?Q?CzJWwT/zRCiYugM0xsdMHRTfFm8j8bAgB/cLMcI7kpor2M99bvcMUgPeYmLM?=
- =?us-ascii?Q?ADw45i98PDwjf0VkedQ/DxyAM+O6i1q9mc9qEBdAnTaDBdPVYhiDxzr7Cd6o?=
- =?us-ascii?Q?M+JuRdalotwVuyYjX3FveKFErIgOuxs49PfX6vcdvfbFnpZLjaVNyyj3sU8m?=
- =?us-ascii?Q?vb/HthHFa/eaEa5j4h9o0QMM6dL382QGUi5CAxarOiYYiGij2sA+5n+zJKNe?=
- =?us-ascii?Q?gnzndYnFUJLSgEBeneM1nXYjJPsjMrwitI1bqvsLLlTMPd/JuVCyfGcU60XR?=
- =?us-ascii?Q?i7O0KFva/Cd3Rfn2/sBI5DLvK6ci2C9P7S2x+5JZuzNYL84UgvJnuckFtqJF?=
- =?us-ascii?Q?ZszSFddkO7CHJXLL2/i4psay4ewL8wMjsSjqbgBG2C4KoNJruchTnjJ/wKiJ?=
- =?us-ascii?Q?G9jn1Iq3vGXb5Q53n5QOjO12VVt5EWPBtILvD+ZKSkC+bc+CitwLMpGu58UK?=
- =?us-ascii?Q?8xhfIwDtnpxaDu0Hwf6SBOINTWcVOmv557yxy5vG4HaiasBz+WFn?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7f0a683d-2451-4074-5fe4-08de74846a5b
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB8800.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2026 15:42:00.5480
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QqfvfHG6M4oGMz2omV4f5IaEFufprBpPu9RkBCAgYR/rAu2EPpqdm58iLtdKE3I7Hy8jgei9d3R0TBmDpMNqew==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB8089
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MV_CASE(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-261021-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261020-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RSPAMD_URIBL_FAIL(0.00)[nvidia.com:query timed out,Nvidia.com:query timed out];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,rasmusvillemoes.dk,linux-foundation.org,lists.osuosl.org,vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ynorov@nvidia.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.986];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	RSPAMD_EMAILBL_FAIL(0.00)[ynorov.nvidia.com:query timed out];
+	FREEMAIL_TO(0.00)[akamai.com,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	ASN_FAIL(0.00)[1.2.3.5.c.f.2.1.0.0.0.0.0.0.0.0.c.6.3.0.1.0.0.e.4.0.c.3.0.0.6.2.asn6.rspamd.com:server fail];
+	FREEMAIL_CC(0.00)[akamai.com,kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,davemloft.net,redhat.com,meta.com,distanz.ch,vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.998];
+	MID_RHS_MATCH_FROM(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:email]
-X-Rspamd-Queue-Id: 0B2A219A2CF
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 191C719A4B2
 X-Rspamd-Action: no action
 
-On Wed, Feb 25, 2026 at 01:02:35PM +0100, Przemek Kitszel wrote:
-> On 2/25/26 01:00, Yury Norov wrote:
-> > Use better bitmap API where appropriate.
-> > 
-> > Original series:
-> > 
-> > https://lore.kernel.org/all/20251223162303.434659-1-yury.norov@gmail.com/
-> > 
-> > RESEND: rebase on top of v7.0-rc1
-> > 
-> > Yury Norov (3):
-> >    bitmap: introduce bitmap_weighted_xor()
-> >    ice: use bitmap_weighted_xor() in ice_find_free_recp_res_idx()
-> 
-> Thank you for working on better API.
-> Do you want this to go through intel, then netdev, tree?
-> Likely that would slow any future user, if you have already one in mind.
->
-> >    ice: use bitmap_empty() in ice_vf_has_no_qs_ena
-> 
-> For unrelated reasons I have one series that will possibly conflict
-> with your patch. Would prefer to not wait/block each other, so will
-> be best if we (Tony) just take this one (in case you will proceed
-> with the first two patches via your tree)
+Hudson, Nick wrote:
+> =
 
-Another trivial user (recently added) for bitmap_weighted_xx() is
-xe_pagefault_queue_init() in drivers/gpu/drm/xe/xe_pagefault.c, but
-it's again the Intel's driver, so it will go with your tree anyways.
- 
-I'm not aware of others, so I believe Tony's tree is the best route.
+> =
 
-> >   drivers/net/ethernet/intel/ice/ice_switch.c |  4 +---
-> >   drivers/net/ethernet/intel/ice/ice_vf_lib.c |  4 ++--
-> >   include/linux/bitmap.h                      | 14 ++++++++++++++
-> >   lib/bitmap.c                                |  7 +++++++
-> >   4 files changed, 24 insertions(+), 5 deletions(-)
+> > On 20 Feb 2026, at 21:08, Willem de Bruijn <willemdebruijn.kernel@gma=
+il.com> wrote:
+> > =
 
- + Matthew Brost
+> > !-------------------------------------------------------------------|=
 
-Attaching a patch for xe_pagefault_queue_init(). Feel free to append it
-to this series, or let me know if it's better to send it separately.
+> >  This Message Is From an External Sender
+> >  This message came from outside your organization.
+> > |-------------------------------------------------------------------!=
 
-Thanks,
-Yury
+> > =
 
-From 21804f4ae1674aa166e3566fa898996806ebd3e3 Mon Sep 17 00:00:00 2001
-From: Yury Norov <ynorov@nvidia.com>
-Date: Wed, 25 Feb 2026 10:02:22 -0500
-Subject: [PATCH] drm/xe: switch xe_pagefault_queue_init() to using
- bitmap_weighted_or()
+> > Nick Hudson wrote:
+> >> Enable BPF programs to properly handle GSO state when decapsulating
+> >> tunneled packets by adding selective GSO flag clearing and a trusted=
 
-The function calls bitmap_or() immediately followed by bitmap_weight().
-Switch to using the dedicated bitmap_weighted_or() and save one bitmap
-traverse.
+> >> mode for GSO handling.
+> >> =
 
-Signed-off-by: Yury Norov <ynorov@nvidia.com>
----
- drivers/gpu/drm/xe/xe_pagefault.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+> >> New decapsulation flags:
+> >> =
 
-diff --git a/drivers/gpu/drm/xe/xe_pagefault.c b/drivers/gpu/drm/xe/xe_pagefault.c
-index 6bee53d6ffc3..c4ce3cfe2164 100644
---- a/drivers/gpu/drm/xe/xe_pagefault.c
-+++ b/drivers/gpu/drm/xe/xe_pagefault.c
-@@ -285,10 +285,9 @@ static int xe_pagefault_queue_init(struct xe_device *xe,
- 		xe_dss_mask_t all_dss;
- 		int num_dss, num_eus;
- 
--		bitmap_or(all_dss, gt->fuse_topo.g_dss_mask,
-+		num_dss = bitmap_weighted_or(all_dss, gt->fuse_topo.g_dss_mask,
- 			  gt->fuse_topo.c_dss_mask, XE_MAX_DSS_FUSE_BITS);
- 
--		num_dss = bitmap_weight(all_dss, XE_MAX_DSS_FUSE_BITS);
- 		num_eus = bitmap_weight(gt->fuse_topo.eu_mask_per_dss,
- 					XE_MAX_EU_FUSE_BITS) * num_dss;
- 
--- 
-2.43.0
+> >> - BPF_F_ADJ_ROOM_DECAP_L4_UDP: Clear UDP tunnel GSO flags
+> >>  (SKB_GSO_UDP_TUNNEL, SKB_GSO_UDP_TUNNEL_CSUM)
+> >> - BPF_F_ADJ_ROOM_DECAP_L4_GRE: Clear GRE tunnel GSO flags
+> >>  (SKB_GSO_GRE, SKB_GSO_GRE_CSUM)
+> >> - BPF_F_ADJ_ROOM_DECAP_IPXIP4: Clear SKB_GSO_IPXIP4 flag for
+> >>  IPv4-in-IPv4 (IPIP) and IPv6-in-IPv4 (SIT) tunnels
+> >> - BPF_F_ADJ_ROOM_DECAP_IPXIP6: Clear SKB_GSO_IPXIP6 flag for
+> >>  IPv6-in-IPv6 and IPv4-in-IPv6 tunnels
+> >> - BPF_F_ADJ_ROOM_NO_DODGY: Preserve gso_segs and don't set
+> >>  SKB_GSO_DODGY when the BPF program is trusted and modifications
+> >>  are known to be valid
+> >> =
 
+> >> The existing anonymous enum for BPF_FUNC_skb_adjust_room flags is
+> >> renamed to enum bpf_adj_room_flags to enable CO-RE (Compile Once -
+> >> Run Everywhere) lookups in BPF programs.
+> >> =
+
+> >> By default, bpf_skb_adjust_room sets SKB_GSO_DODGY and resets
+> >> gso_segs to 0, forcing revalidation. The NO_DODGY flag bypasses this=
+
+> >> for trusted programs that guarantee GSO correctness.
+> >> =
+
+> >> Usage example (decapsulating UDP tunnel with IPv4 inner packet):
+> >>  bpf_skb_adjust_room(skb, -hdr_len, BPF_ADJ_ROOM_NET,
+> >>                      BPF_F_ADJ_ROOM_DECAP_L3_IPV4 |
+> >>                      BPF_F_ADJ_ROOM_DECAP_L4_UDP);
+> > =
+
+> > This patch is doing to much in one patch.
+> =
+
+> Sure, I=E2=80=99ll split it up.
+> =
+
+> > =
+
+> > Also not convinced of the need for the NO_DODGY flag.
+> =
+
+> The reason for NO_DODGY is that, without it, the egress interface will =
+see the
+> SKB_GSO_DODGY flag. In our use case, we want to avoid marking the egres=
+s tap as
+> NETIF_F_GSO_ROBUST, so the skb will fail skb_gso_ok() with SKB_GSO_DODG=
+Y set.
+> When skb_gso_ok() fails, validate_xmit_skb() calls skb_gso_segment().
+
+I understand why you might want it. But the dodgy check has long been
+there for a reason: becauses these transformations are not blindly
+accepted by the kernel. This use case does not change that.=
 
