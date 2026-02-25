@@ -1,197 +1,158 @@
-Return-Path: <netdev+bounces-260713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260715-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +LcZLGNbnmlrUwQAu9opvQ
-	(envelope-from <netdev+bounces-260713-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 03:16:03 +0100
+	id uAADJuVXnmkjUwQAu9opvQ
+	(envelope-from <netdev+bounces-260715-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 03:01:09 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90D13190C7E
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 03:16:02 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 407DB19062A
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 03:01:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A1F65315C5D6
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 01:53:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E646130054FE
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 01:57:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01E5F256C8B;
-	Wed, 25 Feb 2026 01:52:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3EE2252917;
+	Wed, 25 Feb 2026 01:57:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nymQXvCz"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="hVpCXyYJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C391FE45D;
-	Wed, 25 Feb 2026 01:52:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45EC32505B2;
+	Wed, 25 Feb 2026 01:57:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771984377; cv=none; b=kZbZyOs69f8NkoPpT0MuSlOkVpvUuTYOJ1cGxQqI5cwUrTmje3PONabYfSc3NMeLvV22yrWw5TnGubmGM9FdEqEhU203J1f6QW6Vg51954UvgK1uVGdnRQqFV/zAEt3N8aGZ9bnrBNB8LhG3uq9PX1CgJlAz3/ZehNlHNKtG3bI=
+	t=1771984625; cv=none; b=uYoXYr2O7f56ENPJpyM4/rxWybeRZvGTNXrCw4dygIbIh34m1K8GApBIJmrusaXP7K1/vNfOyF/oDYSVH2GUYpEK/AnAv18r0uQgyjyTAB3DVXnAkd2aXQhbmXzoB7SCuIoXZgfgpGSSDNHXmfVTEz9l8xJ/37UmtQmSF9fz5XY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771984377; c=relaxed/simple;
-	bh=i/biUd2rDEtE2nEDkGOA3//Fh0kr3ME9dH02WVsIbs8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=m/4RWBdH/+aazfHkKPV1SF4l85mFPs1mlY1wFZ/fpjwS4r8HJDun6gwdJ/D+7QXS/dIOlMlV9DTFKfI875yX0hyMr1rJsFmLTVos8F08ROyfAhFDanL17ZpMl1NrpBdJXHYx3NyL+huykUL8b6qcoLIPtMfmRegq1Byk2Nkyph8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nymQXvCz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DAC7C19424;
-	Wed, 25 Feb 2026 01:52:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771984377;
-	bh=i/biUd2rDEtE2nEDkGOA3//Fh0kr3ME9dH02WVsIbs8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nymQXvCzy4P7iuBwuxxkqnsRGGu3X5oOqtVpt1S5x1t9Nj8AO9/DP3DXBIf19QvgL
-	 idHWbDhSxNHl0ZlIqSxxiME6eN3X9hPJyqyvQ7QVw+w4Rk8CkvfPTdcVb1DVgPBITv
-	 6uiaEnN+/QOAK+PaGbPCdVVdT9srT/p2LF1SyPVCs8LMxD1w55QiNgjMqDdL1aR88b
-	 /6x9eqnArIYVvGkVn4Kf4j0niD1TzR3uUVf+CcW1KtctktnVS+dYV0W8cGQ/lUtZaV
-	 2hiNOyJF0sMo1O3wccYynMzF/4QPJ1SDqr9owauyBGmzqtmJvaXnP664PQ4QhvG0Qw
-	 V4TS1CsnHZOyw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: ericwouds@gmail.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	mostrows@earthlink.net,
-	netfilter-devel@vger.kernel.org,
-	pabeni@redhat.com,
-	kees@kernel.org,
-	edumazet@google.com,
-	razor@blackwall.org,
-	horms@kernel.org,
-	fw@strlen.de,
-	pablo@netfilter.org,
-	andrew+netdev@lunn.ch,
-	idosch@nvidia.com,
-	netdev@vger.kernel.org,
-	davem@davemloft.net,
-	bridge@lists.linux.dev,
-	phil@nwl.cc
-Subject: Re: [v19,nf-next,4/5] netfilter: nft_set_pktinfo_ipv4/6_validate: Add nhoff argument
-Date: Tue, 24 Feb 2026 17:52:56 -0800
-Message-ID: <20260225015256.967692-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260224065307.120768-5-ericwouds@gmail.com>
-References: <20260224065307.120768-5-ericwouds@gmail.com>
+	s=arc-20240116; t=1771984625; c=relaxed/simple;
+	bh=iX1vuBEHioUWth5SQ/gIG0ctnR9Imkegqk1Txkur6Bc=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TIRd8ALEP9WH8GAqkGWbqg+op73xEM5FHNIb2TqEtQornXmkOIBYwobFTevl8XrQUR71oLs0qHOS+Zm1dSZR6yRBsKZOYyRlSivVjN6NTT0Wdt/sH7ZAK++0607nBehZrEnnD0E1+w5stGSiVtZHNL2G9mIDXYWFH1LWc19Ky7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=hVpCXyYJ; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61ONRoxM1176380;
+	Tue, 24 Feb 2026 17:56:51 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=N8HjTjjDc4OOjtft1aCSlShXT
+	lMLdH1wa8usCFRcCZk=; b=hVpCXyYJyDXXMZvUTobF6ZS2pR7pHYXs1zLJgik6r
+	ISsbsUaAPrsI5Lwx2NPOEmOguWt9fZKKl9qWVts5N7+1WVUBoBBJ4FnPJRfHLpyU
+	AwPAW69ZbO4Om56wyRn6aJerrS+wRLZUmJo9xEqSDH+v3OHhYrqPI9XV5EHY6Sv/
+	JEIuFkTc2rgX9OkkOBx5NRg8Z4TLOQu1h4xZ/1czASUJUJu674ELH39POrTFfR3A
+	RQbxKuVz92euXund1S91OAoRbUxSF7ebJG6tQ7b2gaasJw56++N4qJ6lhfScMoqe
+	SeB8fxVHc++xixMiiYyeqRLwAkWihzYYQu0UQYG4039Cw==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4chnp8r8x2-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 24 Feb 2026 17:56:51 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Tue, 24 Feb 2026 17:56:51 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Tue, 24 Feb 2026 17:56:50 -0800
+Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id 603D35C68EE;
+	Tue, 24 Feb 2026 17:56:48 -0800 (PST)
+Date: Wed, 25 Feb 2026 07:26:47 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <pabeni@redhat.com>, <andrew+netdev@lunn.ch>
+Subject: Re: [PATCH net-next v9 00/13] NPC HW block support for cn20k
+Message-ID: <aZ5W35hJWsU8btAN@rkannoth-OptiPlex-7090>
+References: <20260224080009.4147301-1-rkannoth@marvell.com>
+ <20260224103537.4eed8e8b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260224103537.4eed8e8b@kernel.org>
+X-Proofpoint-ORIG-GUID: nwYeR_hedoixjp4sLtHzxjk5PSyjICqD
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI1MDAxNSBTYWx0ZWRfX1i8Pl6w8PGAB
+ cdCvc5MQmaNjeTsosTvM3RYoIiqwnJ0eR3OGTDO0YP6o/Eq866wWuucofkcKCBDnZRvyqp2RbS9
+ EGIGPEhH8Tq8G+ax10IbVo2HXEdZtoQJxYlpeCRwwrlmBTK+1Mdau7gjZqnLpyADiQYvaZAHUZL
+ XzBvaxQOeLdzkuYVHqswYdXMOTsWmjJ8PaYwezI9S8Ba4F3/LjcFBtfbNaDhJRuGJGLevR8Zulz
+ OxIxorqcN4k2BoCUU+NgHU3b9rcI15cEpAU/TOaoUE4WMYWRHdwcqtARHI+GmJZcLV0vBdAvEbS
+ vOOsbGUrW4d5TERHNAuKyxEK+awxD5s9c4yTXFwz0eiYh9ZL8w93a42NsFCMIEWGeUN+NlhPVFF
+ XVwIIe4wYIZWmnarO3eJ3B5ydlj6zltaRt+g62z988eOGffWk6z5HCcla1+vGu/Y27l0HGfvPcn
+ z57Xw1zbaPVPEaEmeCg==
+X-Authority-Analysis: v=2.4 cv=bNYb4f+Z c=1 sm=1 tr=0 ts=699e56e3 cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+ a=kj9zAlcOel0A:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=EAYMVhzMl8SCOHhVQcBL:22 a=VwQbUJbxAAAA:8
+ a=M5GUcnROAAAA:8 a=WljHKSap0GIyhByar9MA:9 a=CjuIK1q_8ugA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22 a=lhd_8Stf4_Oa5sg58ivl:22
+X-Proofpoint-GUID: nwYeR_hedoixjp4sLtHzxjk5PSyjICqD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-24_03,2026-02-23_03,2025-10-01_01
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260713-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-260715-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.992];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,earthlink.net,vger.kernel.org,redhat.com,google.com,blackwall.org,strlen.de,netfilter.org,lunn.ch,nvidia.com,davemloft.net,lists.linux.dev,nwl.cc];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 90D13190C7E
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 407DB19062A
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email says "The tracking of feedback in the AI bot is often wrong,
-but FWIW this is what it has to say about the submission"
-
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-netfilter: nft_set_pktinfo_ipv4/6_validate: Add nhoff argument
-
-This commit adds the ability to specify an offset when calling
-nft_set_pktinfo_ipv4/6_validate() for cases where the IP header is not
-at skb_network_header().
-
-> diff --git a/include/net/netfilter/nf_tables_ipv4.h b/include/net/netfilter/nf_tables_ipv4.h
-> index fcf967286e37..bd354937134f 100644
-> --- a/include/net/netfilter/nf_tables_ipv4.h
-> +++ b/include/net/netfilter/nf_tables_ipv4.h
-
-[ ... ]
-
-> diff --git a/include/net/netfilter/nf_tables_ipv6.h b/include/net/netfilter/nf_tables_ipv6.h
-> index c53ac00bb974..1e84a891f268 100644
-> --- a/include/net/netfilter/nf_tables_ipv6.h
-> +++ b/include/net/netfilter/nf_tables_ipv6.h
-> @@ -24,17 +24,17 @@ static inline void nft_set_pktinfo_ipv6(struct nft_pktinfo *pkt)
->  	pkt->fragoff = frag_off;
->  }
+On 2026-02-25 at 00:05:37, Jakub Kicinski (kuba@kernel.org) wrote:
+> On Tue, 24 Feb 2026 13:29:56 +0530 Ratheesh Kannoth wrote:
+> > v8 -> v9: Addressed Jakub comments.
+> > 	https://lore.kernel.org/netdev/20260204182428.05a77b13@kernel.org/
 >
-> -static inline int __nft_set_pktinfo_ipv6_validate(struct nft_pktinfo *pkt)
-> +static inline int __nft_set_pktinfo_ipv6_validate(struct nft_pktinfo *pkt, u32 nhoff)
->  {
->  #if IS_ENABLED(CONFIG_IPV6)
->  	unsigned int flags = IP6_FH_F_AUTH;
->  	struct ipv6hdr *ip6h, _ip6h;
-> -	unsigned int thoff = 0;
-> +	unsigned int thoff = nhoff;
-                             ^^^^^
+> v8 was 20 days ago. You replied to the review comments _today_ and then
+> immediately posted v9. This is very frustrating, because corrections
+> I suggested in the reply to v8 obviously can't be part of v9. Making v9
+> pretty much useless. If you can't follow common sense rules of
+> engagement with the community we will not merge any of your code.
 
-When nhoff != 0, does ipv6_find_hdr() interpret 'thoff' as a relative or
-absolute offset?
+I understand your frustration, and I apologize for posting v9 immediately
+after replying to the v8 review comments.  My intention was to keep the
+process moving forward, as new AI generated review comments are generated each time.
+I had asked the same question in v7
+(https://lore.kernel.org/netdev/20260129083339.264386-12-rkannoth@marvell.com/T/#m0681b88b55f80b0f58fc1e6e9be2220220111224).
 
-Looking at the IPv6 header read above:
+But I see now that doing so prevented your latest suggestions from being incorporated and disrupted the expected
+review workflow. That was not my intent. I appreciate the time and effort you put into reviewing the patches,
+and I certainly do not want to undermine that process.
 
-	ip6h = skb_header_pointer(pkt->skb, skb_network_offset(pkt->skb) + nhoff,
-				  sizeof(*ip6h), &_ip6h);
+Going forward, I will wait for feedback after replying to review comments before posting a new version,
+ to ensure that all suggested corrections are properly addressed. If there are additional changes you would like
+included beyond what was already discussed, I am happy to incorporate them in the next revision.
 
-The IPv6 header is at absolute offset 'skb_network_offset(pkt->skb) + nhoff'.
-
-But when ipv6_find_hdr() is called:
-
-	protohdr = ipv6_find_hdr(pkt->skb, &thoff, -1, &frag_off, &flags);
-
-ipv6_find_hdr() interprets a non-zero *offset as an absolute offset from
-skb->data (it does: ip6 = skb_header_pointer(skb, *offset, ...) and
-start = *offset + sizeof(struct ipv6hdr)).
-
-In bridge contexts where skb_network_offset != 0 (typically 14 for Ethernet),
-ipv6_find_hdr() will read from the wrong location when nhoff != 0. Shouldn't
-this be 'unsigned int thoff = skb_network_offset(pkt->skb) + nhoff;' to match
-how the IPv6 header is read?
-
-The IPv4 version correctly computes absolute offsets:
-
-	pkt->thoff = skb_network_offset(pkt->skb) + nhoff + thoff;
-
-All current callers pass nhoff=0, so this is dormant until a future patch
-enables non-zero nhoff (which this commit is designed to support).
-
->  	unsigned short frag_off;
->  	u32 pkt_len, skb_len;
->  	int protohdr;
->
-> -	ip6h = skb_header_pointer(pkt->skb, skb_network_offset(pkt->skb),
-> +	ip6h = skb_header_pointer(pkt->skb, skb_network_offset(pkt->skb) + nhoff,
->  				  sizeof(*ip6h), &_ip6h);
->  	if (!ip6h)
->  		return -1;
-
-[ ... ]
-
-Florian Westphal raised a concern in v18 about a build warning in
-include/uapi/linux/if_pppox.h:153:29 ('array of flexible structures').
-He requested a new version to fix this. The author addressed this in v19 by
-adding patch 1/5 'net: pppoe: avoid zero-length arrays in struct pppoe_hdr'
-that wraps the flexible arrays in '#ifndef __KERNEL__' guards.
-
-Reference: https://lore.kernel.org/netdev/aZynSuGMtK7JOOCj@strlen.de/
+Thank you again for the review and for your guidance on community expectations.
 
