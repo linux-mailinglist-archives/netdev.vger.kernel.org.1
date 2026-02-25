@@ -1,235 +1,240 @@
-Return-Path: <netdev+bounces-260784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260779-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OH23Kd2mnmmrWgQAu9opvQ
-	(envelope-from <netdev+bounces-260784-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 08:38:05 +0100
+	id cM0PMN2inmlPWgQAu9opvQ
+	(envelope-from <netdev+bounces-260779-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 08:21:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B190193908
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 08:38:04 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7665F19341C
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 08:21:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A8A6530131E9
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 07:36:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F25B0303B4F7
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 07:20:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD462F7478;
-	Wed, 25 Feb 2026 07:36:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B2C92E8B81;
+	Wed, 25 Feb 2026 07:20:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PUG0fwgp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3s3CKya/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-dl1-f46.google.com (mail-dl1-f46.google.com [74.125.82.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A352E0938
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 07:36:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1535E2D7DCE
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 07:20:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.46
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772004977; cv=pass; b=Rb8Lxqc0LTTZua0hYe6nOaPQAwSxVu7BHFsu6aCeZXGzsNVVZwmNJRfOuznrVMqO9aOXgavdsoQrdGNsOSOZJnkY6N879WUAgZM/QA6jAXFsh19lP3eABsDJ3oHAEy7Sm3GQJYpwTXQD9lpgjaIfzB3kyJXj3ADriqvomZDlG/s=
+	t=1772004009; cv=pass; b=ik1VlRG0ZgeDWd5mAAvwJc51rwPvi2T20WgXa+roggBD1vhaG3MIrf220GVjyEcsM/EAmZXKlwNI29NA6BfT2fhfatkkB3b+cl9KFbMce6mzMjJhtt5Ej1+/RVTa5uTMhCrKANnUkkDup3fK3A5bL9NrTu1nuGWBPuRkueF3Q+M=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772004977; c=relaxed/simple;
-	bh=qPMyRmiQw7pJhER5YKqD7lk1WLwtH8C/KfNioQXmSXY=;
+	s=arc-20240116; t=1772004009; c=relaxed/simple;
+	bh=5I29VZbalTCm3rqbnUgdsldcNOKbt8fBfZD9i7LyvUc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nMG9O9DrNYRgCrM7hJ15DYTgnEvPbw/IexQTYM5wlg5HMthYM9tAixQvCo/OKYDLi1PTXxC90bR22uEnJl6JQR/UgRDdSKgY3kFcqTsHnlgLiYI/K3p+bM2AWTlmvYTJRiuE32+nwQ/oLEtQOBtKvs/GTGLu/zUgaoIhPOmqXMc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PUG0fwgp; arc=pass smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-43984d7e49bso1346986f8f.2
-        for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 23:36:15 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772004974; cv=none;
+	 To:Cc:Content-Type; b=a/ICvVa9JWRP8qplLlIdE/AsF1M4T4wGNxgbmcXOm+0TDz/v1KegFlpw3qmKtToVU7boBgJKBmKGBWqu2Ng9mx0sz5t7/GcmtxLOmS8OAOtAJ57bDQ975Jckw1CakahcQslxWy9onJthdjP4n++gl1i9221qhlHQZoOgJi+xvEE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3s3CKya/; arc=pass smtp.client-ip=74.125.82.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f46.google.com with SMTP id a92af1059eb24-1270adc5121so7540081c88.0
+        for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 23:20:07 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772004007; cv=none;
         d=google.com; s=arc-20240605;
-        b=Bx/N9XopshQN1VlLONaYujZQLjrqEiEr5vpcdHOBQDtp04TpTLIfOQWaIczIBgIKwK
-         H8O7iQ/5i6+GQvQ8P7vq+H0WZormKGtT43FmT1zMOBhmtZ8N2hFz3GPImbW5DBCoQjaV
-         QL4Xg6TvxZb+Oi8xN6C5DaYziUs1ZlOf3TfPNrqKwUFMBaUzZUGWZXaRK81qpwBFoabM
-         54NjLgIlctLXKNo4xMl3xn3oUCySeXUe9JdA6i1TrsTv0EgLRHH8UFiZuAH9x4Qxv2hD
-         QBXaiLanwdPOq+lHt/n//L+YJJHGWObf4hON0cn1JGpCMSG0Qa1VCWRKGWaqXUyYmbWC
-         RMNg==
+        b=OJgBlN0NM152TzQjk18vnaVZl7EL0poYNLrdnfTz6FtvQmEn/rEogNaKVF1CCep+/8
+         MXrbVBo5oNhE/UVCBnfjtP0dm8jbz1/HfmJETSHg0SMRZCIFXhkxrgibc0D2sS8fdNCp
+         s/5/cc7ZDR0lr9zkWU7pj5tKaUpRRFmtCKP7Sti9x57r7EJ5OZiP+/W5hqmvf8YyXxGQ
+         HrJhjDTFL1ZLl08JR+6z5yq0lgsth/rl9TcR4J1ntT1Ao7rcLjDY+H8qjv0GaFhMLeoZ
+         ivhMCKlL4wlOFL92uqx2/bZiAFyz5fKGw9eq670kwKl1KqwOPxWcSuKdTQlDd4KgTMXv
+         13DA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=cPsEREjpbbRl+Ykcb3p5rXFShnBdQuEGwwIZOOJ5aCo=;
-        fh=FmPeW7fpm18BmxHH5bTwO42lg9wwF+kG4Ilj8tqK4QA=;
-        b=TNusb4Jz60bacsQI/1GoB8pQ9UT2VDYKf4wFhr5d5zycubCbAftKgH+RFh2MFQHeBy
-         +bzB8U3VkbRRa+wSyuJzI2vauKyVzTTgBvfC0h+yIF4SvALH+cikrxnDBVlRdV2+VWSx
-         s1l5E3IB+xfF3JyvFVQmsSp6GgCGmDUMBeigisN2mIoFPygXs4dxVYJBU6Ze04M5pOec
-         wJIJOp+RvhQdJXc5qOXErhSlkhCtT+YHGF2364zxKOa933TNn44g0I0jNQYwTdIzKzL8
-         SLcnJ0pEk1i49hm2zhO4bDL1jnxdrd2TifhbjeRPsnrblapzTsR9QodgRi7eJRcVlT1T
-         EO5g==;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=mqhpk74uT9fBv8HKiORUn49XOvxveD9GSNmoEX4BxXA=;
+        fh=mVZQEoNHncbthRrRLCk76GHy1sn/e6DmJvk8fUDYde4=;
+        b=Bss3dDjspYEvbJGbUYMNxOVBP/+cdmVSllYoFVTAQlQ2wTISzttsWXWKxFi3J2bGpf
+         ePsOulPRdLuozUGdK6FFKyAdz//aH3riSwddXh/LoGy4CXbJG4kweh7uW8hHL8UkdQap
+         p6FhVXFY9o9eo0q+3dU6c2JOdbaAJh8R/gG0nM7HxpULn2uirNAy7Lx0f2Ah6eif19fs
+         1hirjtxRVWYUkdZ/t9j5LUwWzxnsUD/XGTb06qFJlreXDOJZQnVCwWI+xMGnYkOE8Fx0
+         szAEbzsIyZRkIm8pB0XPYbNQip5HRzSII/fLo+bRV7GY8plXQkpBcyh14AtQoHQXlMoA
+         02qg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772004974; x=1772609774; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=cPsEREjpbbRl+Ykcb3p5rXFShnBdQuEGwwIZOOJ5aCo=;
-        b=PUG0fwgplVBzSMC2G2vQcXHqb6X/6eDcrRJdxegwb+lxeVbWESdRNczbsXGyZOA+zD
-         ZSM6t/28ah8E7kaHKovf8z1mtBKT7t+GgLFtBx3mUrvbD5U9SarbLPyczDV9611so0uz
-         LPoRafj2E4W7HflbslC5IUoim3oNT+ra8ZpkupeAeIl/io25q3akz4y/bb2CFIg8EqCR
-         Y3De+1SMPE6MfKtTKxNs6VwRjDBVsL1GkuETnScJsy0H/i1cQSQoqfZ4Wsve52nPb7EO
-         VEn5vrlI/yy+ylH+mEFm8a2p2omh6i9V14vB1UCwroCPSzUOtryW/RyxV3gNsM30T7T2
-         JYDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772004974; x=1772609774;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1772004007; x=1772608807; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cPsEREjpbbRl+Ykcb3p5rXFShnBdQuEGwwIZOOJ5aCo=;
-        b=pEo6yxg+kcooIFrdfTrai2svOVUcSUjRHV3X3RAXFqN68Tgf6Q/B7DaqaI7HeKgqe/
-         DAwmrLElEuMqh9mbNEFzPqVnot+lUMn2gz3ebYCS1pGKPZyh54/Xhk5iQyQFIfpVvJCy
-         dlWNuGTgHPLye75/34LDu2LcFnomfy4PudYZqX+f9oLBu1ZnbfpFzWfSfo1DDP0/riSC
-         rjqfgYogbEKPTxIIoEbg+SUAF+LiGpIiFFEESFBdnSWTpUq22rMWjvcfBZwOZ++hP6wX
-         vQxYMojRIxjPjwhJJGPz6MXOFURMVF26g9LgEyq9kruwDB7/LBfdy4wS5z5VeGkqcwN4
-         wKVg==
-X-Forwarded-Encrypted: i=1; AJvYcCVJAGDr6USZifOiLttTRKV6CXe5MZ4RnED/YNq+PqYJuqYq+aXMrM2f4rgnEZ/SLkAQfQOywdM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFuVKbeLoOxWth6VgA+rHkzQWreNq4dZcb6LnJwIng7b6DyAiV
-	azk9/bzgHunRVgSzCKKjM0GherlRcHmYvSAztCLRJkwx0KSZqqa2mxJOdRb1IMbQ3hhVk3M0iJY
-	YoTAVajHHNm+IQY7PibnZUMurIZ5U8jY=
-X-Gm-Gg: ATEYQzxvbqwU6EBIXsExL0XSstm96qxNsqlWzTY8pCbGlNjTwCxkZKpdxd1b0+w3zXI
-	xvr/wtZ4rTXXiGe0+uQvuhO6i7WIeJMVIWv6xf1khQzfVfgqBhgRev6ROT7/xYnyY5aYW9PZaKV
-	KvcnZvMPRwApT7cOObIeha0g0rMyG1pRans+J3pFxP4R/zOSaMKD+a/mY6YoKqHqTL4gHdYTvl1
-	Zd2aAbpLUPjVDKkX7cWk9v6zPz0oak1v8mhPMNaRAOs1BuDpITfaxbPRE83dRwqmcUyWvLJKyaF
-	CGRnOQm6gFLawUo=
-X-Received: by 2002:a05:6000:438a:b0:437:6661:fcc9 with SMTP id
- ffacd0b85a97d-4396f17d264mr27401304f8f.50.1772004973270; Tue, 24 Feb 2026
- 23:36:13 -0800 (PST)
+        bh=mqhpk74uT9fBv8HKiORUn49XOvxveD9GSNmoEX4BxXA=;
+        b=3s3CKya/MduQruj6qCa5pUYnvsEwgiJy+Vt/yYhtH2fnyhH9zEjKgGQFUgsAfQl78h
+         wj/bv1CrGJHLZtbftzcG4f8yd0+crroHoQuZ3tSS9CocmPlKVSVdnsNGM7OV28OVgM/I
+         grygw+s93jiQnby3raaNikOTzF2g2g5ZQ83tQF405vWjQGTl2/I3KOCG/C6WaNeWnv8E
+         f1uazdjeundr6yyNuFDeUtNzUKFIY+ojjW9y+rYEJ6u5nV1IEe8f21MtZSM1diUA6cnv
+         vJ6WdPcFqn4Y8CKOM+s089/ZLiH1VCagoKwcE81x0SxnaRrCybabjCiVmO4Y5V5ZX5wt
+         tA8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772004007; x=1772608807;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=mqhpk74uT9fBv8HKiORUn49XOvxveD9GSNmoEX4BxXA=;
+        b=WxSTWlx+fkuIhngDRhu5jmLAfyjafUQloDWiJ0cxsj0R4MnC+w0PvbqzD669P1XTWO
+         y3a+wB3MH1y3Dj8HuPi7M/th1FHs6JS7GgL7LwXcQ6gonGXWE+FX1sWpN3TT6iU/xoO5
+         FF3YGPm1cJwJoPQK5nHc/vILrE6de+2SSF00k1ZDSdQ9II5aQQ3imTvF8Htxdx6j+Xe7
+         ia8oCZIXi1XO3aiWsSMjfuYBTur6Ce42QHuYeFLwm35hnzjYkwsgljCrmu8RU1IK567B
+         vbU7TyAkZHwU3cYxK/02srY3RBBiuFHEON+Cz/tb9dq0sWlC9zNQO43Sj3Lqyr1NYhEU
+         evNA==
+X-Forwarded-Encrypted: i=1; AJvYcCUat9Max/K+J/8nGnaua5jCjvRKZyBblhqRlBk77tZVTzDZe/y2Iluc31BoIeRgZWUiaVpbcbw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxS5SlX1mqVHyz30QgLkEdJ8AzGfZgmzH7mLpOh3dhOf3bZ1a6M
+	Ku64llg3z+HEFwaAOxiYGfpvY1VFN1SvXHpFyHjEFS2De/+ewYfYfFUjkVJNjXvOumtzX+uU9dy
+	cwfBRMn0FjYHgglM6EcnImC/roW/RfGwTOEJi3WXk
+X-Gm-Gg: ATEYQzysIBsPqPL2o08GZx8B9XQ0RZnyKSma7X7wxz2A3V7sHX+4BaongBwtVE/j3sP
+	VRM4ND5HUbZle8M7b+5RtW+k8sgEBrYxzfMimVX2iLEdUG9qUg7zg62VIQyQvzDyEaonWmnmWaT
+	39z6iZkvQi5JSxJEYeUrom0ZuuZkMzhAPnYHkXun7IiOL9EFSRybLijRt6QjNugN9C0csMOLUnA
+	WVk4tS0P5N9/HsVVXoC/wfx7Nt+qk3dKCY9oCFJkOeTJRnf6OPMhBTJvJalfRKhZQaAhqvqqjWx
+	lEmFVLM90g5s7wijn7XkFM+ySKEuP4QV4ylp15PcZGWn7kPog95/Z4EQ+16XkjnaHp174nTp
+X-Received: by 2002:a05:7022:40f:b0:122:2f4:b285 with SMTP id
+ a92af1059eb24-1276ad61d72mr6277793c88.25.1772004006544; Tue, 24 Feb 2026
+ 23:20:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAPh3n803k8JcBPV5qEzUB-oKzWkAs-D5CU7z=Vd_nLRCr5ZqQg@mail.gmail.com>
- <95ccf5a6-975b-4543-80a3-595f1ee20543@redhat.com>
-In-Reply-To: <95ccf5a6-975b-4543-80a3-595f1ee20543@redhat.com>
-From: Daniele Palmas <dnlplm@gmail.com>
-Date: Wed, 25 Feb 2026 08:19:46 +0100
-X-Gm-Features: AaiRm53G8wva2-r8k7hpjoD_2UgFtTWerh0eqF47qBCR6-DpITxxvsKCTqNKHBU
-Message-ID: <CAGRyCJE85fLOahUR3PAUnS_jH4+qpBq37qpged=nvObbg1m+Qw@mail.gmail.com>
-Subject: Re: commit 662dc80a5e86 breaks rmnet over usb
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: Koen Vandeputte <koen.vandeputte@citymesh.com>, oneukum@suse.com, andrew+netdev@lunn.ch, 
-	Eric Dumazet <edumazet@google.com>, kuba@kernel.org, pabeni@redhat.com, 
-	netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+References: <20260225033216.601205-1-edumazet@google.com>
+In-Reply-To: <20260225033216.601205-1-edumazet@google.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Tue, 24 Feb 2026 23:19:55 -0800
+X-Gm-Features: AaiRm50D8_9Hxq6I2GHjqHBaqarKrq1O1FH2tgukzto__lUBLDRAtg-ozb0nbow
+Message-ID: <CAAVpQUDMTefL+Rsb_9FnMFf5o8UsqhxpZ3Vgg56_TDQQbPHCRQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: use cmpxchg() in lock_sock_nested()
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260784-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-260779-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dnlplm@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com]
-X-Rspamd-Queue-Id: 0B190193908
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 7665F19341C
 X-Rspamd-Action: no action
 
-Hello,
+On Tue, Feb 24, 2026 at 7:32=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> Add a fast path in lock_sock_nested(), to avoid acquiring
+> the socket spinlock only to set @owned to one:
+>
+>         spin_lock_bh(&sk->sk_lock.slock);
+>         if (unlikely(sock_owned_by_user_nocheck(sk)))
+>                 __lock_sock(sk);
+>         sk->sk_lock.owned =3D 1;
+>         spin_unlock_bh(&sk->sk_lock.slock);
+>
+> On x86_64 compiler generates something quite efficient:
+>
+> ffffffff81e96100 <lock_sock_nested>:
+> ffffffff81e96100:       f3 0f 1e fa             endbr64
+> ffffffff81e96104:       0f 1f 44 00 00          nopl   0x0(%rax,%rax,1)
+> ffffffff81e96109:       b9 01 00 00 00          mov    $0x1,%ecx
+> ffffffff81e9610e:       31 c0                   xor    %eax,%eax
+> ffffffff81e96110:       f0 48 0f b1 8f 48 01    lock cmpxchg %rcx,0x148(%=
+rdi)
+> ffffffff81e96117:       00 00
+> ffffffff81e96119:       48 85 c0                test   %rax,%rax
+> ffffffff81e9611c:       74 33                   je     ffffffff81e96151 <=
+lock_sock_nested+0x51>
+> ...// slow path
+> ffffffff81e96151:       2e e9 19 c4 33 00       cs jmp ffffffff821d2570 <=
+__pi___x86_return_thunk>
 
-Il giorno lun 23 feb 2026 alle ore 15:08 Laurent Vivier
-<lvivier@redhat.com> ha scritto:
+Wow, this is interesting !
+
 >
-> On 2/23/26 13:04, Koen Vandeputte wrote:
-> > Hi Laurent,
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  include/net/sock.h |  9 +++++++--
+>  net/core/sock.c    | 10 ++++++++++
+>  2 files changed, 17 insertions(+), 2 deletions(-)
 >
-> Hi Koen,
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index 55b61e4b0d8318887d527e919fc1103d78ac6d14..84c21fb38a28406e387dc33e0=
+fb5decd18893950 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -81,8 +81,13 @@
+>   * mini-semaphore synchronizes multiple users amongst themselves.
+>   */
+>  typedef struct {
+> -       spinlock_t              slock;
+> -       int                     owned;
+> +       union {
+> +               struct slock_owned {
+> +                       int             owned;
+> +                       spinlock_t      slock;
+> +               };
+> +               long    combined;
+> +       };
+>         wait_queue_head_t       wq;
+>         /*
+>          * We express the mutex-alike socket_lock semantics
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index cfb2a6209946089669882cdbd5d1b36c53838989..2a03d1432111f2dcea9d700f8=
+0efb7b0bb4a47d8 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -3780,6 +3780,16 @@ void noinline lock_sock_nested(struct sock *sk, in=
+t subclass)
+>         mutex_acquire(&sk->sk_lock.dep_map, subclass, 0, _RET_IP_);
 >
-> > I'm testing the latest openwrt state and found an issue probably
-> > caused by your usb mtu limit patch :-)
-> >
-> > I'm talking about this one:
-> > 662dc80a5e86 ("usbnet: limit max_mtu based on device's hard_mtu")
-> >
-> > https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=v6.12.74&id=662dc80a5e86b35bbf339e0b87b7cc3f07c09de1
-> >
-> >
-> > When using wwan0 iface normally, this makes sense, but the problem is
-> > when using QMI modems combined with the rmnet driver and aggregated
-> > frames.
-> >
-> > - The modem is configured to frame sizes of 16383 or 32767 using QMI
-> > - wwan0 (using qmi_wwan) is configured to match this frame size by
-> > setting it's MTU to the same value
-> > - Frames of this size are sent over to qmi_wwan driver (containing
-> > multiple data packets)
-> > - Frames are then forwarded to the rmnet driver
-> > - Frames get de-aggregated here and sent to the network stack for processing.
-> >
-> > The reason here is to reduce USB transfers heavily.
-> >
-> >
-> > As you see, it's perfectly possible here to use very large MTU sizes
-> > as the aggregation feature by rmnet relies on this.
-> > Also the modem can be perfectly configured to send very large aggregated frames.
-> >
-> > After your patch, wwan0 is limited to 1500 bytes it seems, effectively
-> > breaking aggregation.
-> >
-> > On my tests, download speeds are reduced from >300Mbps to ~.8Mbps
-> >
-> > I also made a build reverting this patch and all works well again.
-> >
-> >
-> > Is there any other solution to fix this?
-> > I guess it should be reverted otherwise :-)
->
-> It's weird to be able to set an MTU that is not supported by the hardware.
->
-> To restore performance I think the rx_usb_size should be decoupled from MTU max in qmi_wwan.
->
-> Could you try something like:
->
-> diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
-> index 3a4985b582cb..6b4796fac692 100644
-> --- a/drivers/net/usb/qmi_wwan.c
-> +++ b/drivers/net/usb/qmi_wwan.c
-> @@ -788,6 +788,8 @@ static int qmi_wwan_bind(struct usbnet *dev, struct usb_interface *intf)
->                  usbnet_get_ethernet_addr(dev, cdc_ether->iMACAddress);
->          }
->
-> +       dev->rx_urb_size = 32768;
+>         might_sleep();
+> +#ifdef CONFIG_64BIT
+> +       if (sizeof(struct slock_owned) =3D=3D sizeof(long)) {
+> +               socket_lock_t tmp;
 > +
+> +               tmp.slock =3D __SPIN_LOCK_UNLOCKED(tmp.slock);
+> +               tmp.owned =3D 1;
+> +               if (likely(!cmpxchg(&sk->sk_lock.combined, 0, tmp.combine=
+d)))
 
-So far userspace tools (e.g. also the most important one which is
-ModemManager) rely on changing the rx_urb_size by changing the MTU: I
-know this is ugly, but it is a behavior that has been there since a
-lot of time, not sure how many tools based on this assumption could
-break.
+Should we use __SPIN_LOCK_UNLOCKED() for the old
+value too ?  Looks like parisc assigns a non-zero value for it.
 
-There's also the chance that there are modems which require a higher
-rx_urb_size, so having this fixed could not work well.
+arch/parisc/include/asm/spinlock_types.h:5:#define
+__ARCH_SPIN_LOCK_UNLOCKED_VAL 0x1a46
 
-Unfortunately usbnet serves many drivers, I agree with Koen that a
-revert is the safest option.
 
-Regards,
-Daniele
-
->          /* claim data interface and set it up */
->          if (info->control != info->data) {
->                  status = usb_driver_claim_interface(driver, info->data, dev);
->
-> Thanks,
-> Laurent
->
+> +                       return;
+> +       }
+> +#endif
+>         spin_lock_bh(&sk->sk_lock.slock);
+>         if (unlikely(sock_owned_by_user_nocheck(sk)))
+>                 __lock_sock(sk);
+> --
+> 2.53.0.414.gf7e9f6c205-goog
 >
 
