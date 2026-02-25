@@ -1,163 +1,156 @@
-Return-Path: <netdev+bounces-260721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260722-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UGnAIVZcnmlrUwQAu9opvQ
-	(envelope-from <netdev+bounces-260721-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 03:20:06 +0100
+	id SAdeFmxcnml3UwQAu9opvQ
+	(envelope-from <netdev+bounces-260722-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 03:20:28 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04D7A190D4C
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 03:20:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CAC5F190D5A
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 03:20:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9C41030D6D21
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 02:10:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E85B0318FF02
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 02:12:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7026B26CE39;
-	Wed, 25 Feb 2026 02:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19DA426CE39;
+	Wed, 25 Feb 2026 02:12:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sg9duFII"
+	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="VrPOW2h4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-106101.protonmail.ch (mail-106101.protonmail.ch [79.135.106.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4655526560A
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 02:10:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.182
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771985446; cv=pass; b=add8XsnfdPXv1cupNHO/uf7NLn+O2Qcgnov0Stswdv7+L0eX8XdNPWbCYv8rpsAh6+Z2PLXDQoFiZ0gSh2NrGWESnWevwUTv4nuIdEFXL9MDTOfbUy//y9siZZO7wu4Qwv99AN9nRuxzPjm16pwbjeW4K1KDMbuChac0382jREg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771985446; c=relaxed/simple;
-	bh=2Ia4JQRYF0+vu5ltlafPtPyaUjJd82F6ErOYljpmSaA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qqlYT9fqgBAkgGJA7ImbFKEGPGwsJgAprEEWwYXIQCWT+7bXRGdySh5JloiNg+dVsA7WDD8KxQAlpsdtfETMdq/CG2EALzYzFNX7E4AxJqk0V4iMLSspKknCePI5BkQHGsPmjyMzle9WeW6u+xUvV2KUmcaA93bQuKorbcdq33o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sg9duFII; arc=pass smtp.client-ip=209.85.128.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-793fdbb8d3aso53555047b3.3
-        for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 18:10:45 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771985444; cv=none;
-        d=google.com; s=arc-20240605;
-        b=PeVr99EXoX6IbF8WN7yVMAoz62MlPIg+qiEJ/vvi08jEuJBMwV5tGWPyPn476KQYYp
-         17vmNs0bTp5Hj9iSaox69k3SBgnRAwxYRyJFlpKIl0i89khcqj2gOV8mjY3Rn8dlJLw+
-         9Bze6pFQVpE/vIXBaACa44dMv23kzKYPZuSwMQvCEWOpnK8VnD1wyUeH+lcDumUId5Cd
-         zyeE7R0ofnBkV05w2JRomMjD5D7Hd+DlNYJRhwW/Pn8s+5FRSbUWN5jozva3ARgH1A0x
-         xhT/1KKJQ3xroMsDfpA/zXPShvfzBcEESOj+3zMlgFkTsclCp1u+pZEvPJZq7Tj/hsRP
-         RlJQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=RewW6RsQuKBcy+FVC2qZgDOi7JEc3XkGCwTSJ1lCkm8=;
-        fh=kjiZ8TKPCP4P3EDxs0ooDxMl4koc12JheTmFsr22b+A=;
-        b=UTKwbG0B+4IT75Oz/ZJRcruO36ScnnVo4LLXlBhnbSg5aPqKtRMLY9tAGHL/DgDLyU
-         KrA7qwothfbdKBXNfXiQXtaOFNr9b6ijV9TZ9R8DlCucxSGcykux+/t+F1Fu7jvDuHJR
-         hWynNt+0jTiZ9d2Zm3b36jkG7uLNvThwcCElhpcjNhucimQfZbJwG285/EquIPzyoULk
-         zfNMYjYNr4tgvK5tqD1K+dZVyUhXOvhuqOpfVauXt1BdtrBg2R/6vPr4/kfyVSfRtQ34
-         GXRBqlfB/lUlWSlaMwelgQfwHsrMWKbETsAfnm99Yebo3/tVvSqYw/9Wx1V2vROitift
-         IgHA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771985444; x=1772590244; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=RewW6RsQuKBcy+FVC2qZgDOi7JEc3XkGCwTSJ1lCkm8=;
-        b=Sg9duFIIBzNagLlrMQ/BKm0QzaAlTtKU1nuhkjG19YHOYFhDSvh5jKrZIc6JJPZNj1
-         kGlq2pr00+a3Top2Vp86O1ehWkxCuoHLdcOye4Rb1I6Jtb/OIAZIeXsavqLZp7XtQhfW
-         lkpTb5LRqZc4NZ8xTCm1VfA4W7Z2wolTpGR5QiljmJ1c4ho2nQUWg0FhpNz7Tn5uBeVu
-         nsZJmYOVZO3CUeynXG14ZPIf+7OBuUDg87D+i8mRlEIypuhLH6ab6g6B+hWwil+plSkC
-         av0CtBdpG+Y35pkIr/mK7eiZAGPnATZYGUtvHgAQp/Zy8iPb4gvRunKk92erjR2Vgi0E
-         kuIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771985444; x=1772590244;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RewW6RsQuKBcy+FVC2qZgDOi7JEc3XkGCwTSJ1lCkm8=;
-        b=bN5iog5nWHY5ChiL3r+nSSvEI25lz4Z5fOYUiylH/DqqYVfALGxJg5BS1u5kaeG2me
-         Ne4yn0bWjfk9RSvsQ3YDnWGEJahFbxE1GfX+qO4tNCHtPdlZxziBLcgQsw1u10mbTW1+
-         qrZA0gBWSCWd9qISaFhP+b0Ck03A4xoXlmAqr8YTxJPcFacbTXnhSAOlVJA6Ncuv0o4V
-         NR+j7r9oRP/HnJH/013os/wiZpB4u+XZI4IvipcqwDysH/fgwrF+KPo6aE/qeYTC4lZ6
-         qs1MjJVu8E75b8nMu/53YUdpzZx+pbwLtWQp1uaJ2KX7RPvJIPe9Qd1UbMMNRAaK/E6M
-         mBsA==
-X-Gm-Message-State: AOJu0YwwiUB+RxtasehHwm3r1vuFW8whGf5DfS+z++sHzGGeMVmIgTo/
-	jH245TB6+NaiACHL2dF8lJipqAg1TVUL2hUvTXqGg6f3PmE+VAB8WHhIjh/ZaImIWcUmSIRtknv
-	FfAFTXLQCInU1soCZRwXD6Ys65Z2f3Hk=
-X-Gm-Gg: ATEYQzyuzVVrT6MZo9l1sEKxDHoPoMm5Oq0KPUVVMnCt5x1NAOrKZuUF3tYC4+avY9i
-	P6ysDt5lb5HNMFG6II9Cd2xWqXtPnDi2tp/XDsnpuYGyW3MAs41acDplVP2gSdVA8WulAHmHAUF
-	AJUqpBOVw/U2HDBytJgf++J4sw4vDuuwKkuxJomQsMZVPJviTgePzEAsA5saUJDkfmyB0UBzNus
-	jmKwMqXnriqV45R2IihsB3KNmCku2n1JpvtLZYjyyUWMglyxcukcQzMzIZADjbb/p6bi4C4pKGf
-	f3io9jFki5LLiBZaykcQoZjE8w==
-X-Received: by 2002:a05:690c:a92:b0:797:df7c:3e1b with SMTP id
- 00721157ae682-79828ef29afmr127790467b3.4.1771985444319; Tue, 24 Feb 2026
- 18:10:44 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3677C1FE45A
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 02:12:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.101
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771985525; cv=none; b=SXq0kDXdL/SGDwoe5QWT+W/Lsx4ZhcW9UyHCPXWohU+GmgJh3jPoCr9+dvQf8UCuj7EabzO77XAMMA7NNo+xL4n8ypg7n1wg42RjcHOm2/2bNosZDqC7urhXXwCseyLoJ/LI/5k2OYp/Ascvh65HxiaHVMzTxKM8LidEnaJd9Ms=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771985525; c=relaxed/simple;
+	bh=igQlCcJjveTSd4HMVaRsubbsY6JwCSFyX08budxIONc=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Vtou5lSUWQ60aUXFuqyn7rIkPixEE+lTdgnZnKJ9mHHa2c32CFGqVM7U9GlKp/CBi6TM8cxPCgrWjrNUX0xARAz4S0IqUlc4nTmX9rGwVQX0zMtTWquVmD6FYdj8lUx66Z+lYQNNSgzQY2kJiq17QZp6KVnFLMunwQEQ1bmbkxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=VrPOW2h4; arc=none smtp.client-ip=79.135.106.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+	s=protonmail3; t=1771985514; x=1772244714;
+	bh=igQlCcJjveTSd4HMVaRsubbsY6JwCSFyX08budxIONc=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=VrPOW2h4twjdjkpq7+qffkn4RJvFizm01KGa1yHQC0uwCuSSwRjs981Ap6bQlPqaB
+	 ywvoly2H79udtIrYbfHdTDREmesTR15jL+vsI+7767HuG20tTQ3chK4+GxW2JR4Bvy
+	 HQBepMR9brjtmsiRCDbk0KL6YHUuvysaLyHiB66J0eVWUUrenb+GE9c+Yww4E7XGas
+	 bdx588tNksLXeQe9nnC27btIUazrfzsEnVTNIGyF6twQjR62FS8xMk8H+lx6GtSwie
+	 K6N020PXLmJCw8WeSun7dO9JG8zJrIa76DSF6UQ2aBcMRJwbJnmynTp28QaVEd4cxP
+	 /06Xggp32GBuw==
+Date: Wed, 25 Feb 2026 02:11:52 +0000
+To: Linux Networking <netdev@vger.kernel.org>
+From: Turritopsis Dohrnii Teo En Ming <teo.en.ming@protonmail.com>
+Cc: "ceo@teo-en-ming-corp.com" <ceo@teo-en-ming-corp.com>
+Subject: nmap port scanning commands 25 Feb 2026 Wednesday
+Message-ID: <_VMay9nKqntMLSxUx4YBoVEOuZRcrNg-1RPvmeZFdlFdMbpLI-MZlwUSWEVzxLM_3-tbsN4xRUBWvNRQcoV1TDsv3y-hfnd835Va0u5ctwQ=@protonmail.com>
+Feedback-ID: 39510961:user:proton
+X-Pm-Message-ID: bdcf39f085aac459521ec8ac06bf6bc86d92450e
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260222111847.692325-1-sun.jian.kdev@gmail.com>
- <20260224113900.3331-1-sun.jian.kdev@gmail.com> <20260224154447.61be24de@kernel.org>
-In-Reply-To: <20260224154447.61be24de@kernel.org>
-From: sun jian <sun.jian.kdev@gmail.com>
-Date: Wed, 25 Feb 2026 10:10:32 +0800
-X-Gm-Features: AaiRm50L-4FmoPTjMiSIpbVZQBpkITknQo3RkybcQdVthWClKqiATz6dSZ5LrwA
-Message-ID: <CABFUUZFK6jr7Bf9W009vo1LhAnAgvrB1RhmGtYw4viku0+L+nQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] selftests/harness: order TEST_F and XFAIL_ADD constructors
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, pabeni@redhat.com, edumazet@google.com, 
-	davem@davemloft.net, horms@kernel.org, shuah@kernel.org, kees@kernel.org, 
-	luto@amacapital.net, wad@chromium.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[protonmail.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[protonmail.com:s=protonmail3];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260721-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWO(0.00)[2];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260722-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[teo.en.ming@protonmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[protonmail.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 04D7A190D4C
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[protonmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[]
+X-Rspamd-Queue-Id: CAC5F190D5A
 X-Rspamd-Action: no action
 
-On Tue, Feb 24, 2026 at 07:38:59PM +0800, Sun Jian wrote:
-> You inserted these defines between the kdoc for TEST_SIGNAL() and its
-> definition.
+Subject: nmap port scanning commands 25 Feb 2026 Wednesday
 
-Ack. I'll move the KSELFTEST_PRIO_* defines out of the TEST_SIGNAL() KDoc
-block so the comment stays adjacent to the macro it documents.
+Good day from Singapore,
 
-> When you respin, two notes:
->  - please wait 24h after the previous version before sending a new one,
->    to allow people in all timezones to comment and avoid splintering
->    the discussion
->  - please start a new thread for each submission, and refer to the
->    previous one with a link in the changelog:
+[01] nmap command to scan all 65535 TCP ports
 
-Ack as well. I'll wait at least 24h before respinning, and I'll send v3
-as a new thread with lore links to v1/v2 in the changelog.
+nmap -p- -sS -sV -O -T4 -vv public_ip
 
-Thanks,
-Sun Jian
+What Each Option Does
+
+-p- =E2=86=92 Scan all 65,535 TCP ports
+
+-sS =E2=86=92 TCP SYN scan (standard for firewall auditing)
+
+-sV =E2=86=92 Service/version detection
+
+-O =E2=86=92 OS detection (helps verify what=E2=80=99s exposed externally)
+
+-T4 =E2=86=92 Faster timing, fine for Internet audit
+
+[02] nmap command to scan all 65535 UDP ports
+
+nmap -p- -sU -T4 -vv target_ip
+
+What Each Option Does
+
+-p- =E2=86=92 Scan all 65,535 UDP ports
+
+-sU =E2=86=92 UDP scan
+
+-sV =E2=86=92 Service/version detection on open UDP ports
+
+-O =E2=86=92 OS detection
+
+-T4 =E2=86=92 Faster timing
+
+[03] nmap command to scan list and range of TCP ports
+
+nmap -sS -sV -p 22,80,443,1000-2000 -vv target_ip
+
+[04] nmap command to scan list and range of UDP ports
+
+nmap -sU -sV -p 53,123,500,1000-2000 -vv target_ip
+
+Please remember to use Verbose Mode -vv.
+
+Regards,
+
+Mr. Turritopsis Dohrnii Teo En Ming
+Extremely Democratic People's Republic of Singapore
+25 Feb 2026 Wednesday 10.11 am Singapore Time
+
+
+
+
+
+
+
+
+
+
+
 
