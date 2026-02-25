@@ -1,198 +1,392 @@
-Return-Path: <netdev+bounces-261027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261028-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uKjuD14mn2mPZAQAu9opvQ
-	(envelope-from <netdev+bounces-261027-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 17:42:06 +0100
+	id 6KOoJfAnn2nmZAQAu9opvQ
+	(envelope-from <netdev+bounces-261028-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 17:48:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0619519AD3A
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 17:42:05 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9052119AF45
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 17:48:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 999E530087F7
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 16:38:24 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B6CF330046A8
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 16:46:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A65231917FB;
-	Wed, 25 Feb 2026 16:35:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE1A23D7D89;
+	Wed, 25 Feb 2026 16:46:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nG+HvkFo"
+	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="j5gatyMu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810F83D7D7F
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 16:35:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772037346; cv=none; b=lJg9dBBp46SQeaYfMI3rCBWlIZ0iBspqXuUomUPzCRGA3u7JtW25y9749cC5euTpL6Cn2Ox/+XGi9JjF98FIi1WrtMboT2Upht+lCWQDdAwcMeeK5oRT9qcxYmJnTwimd/PvghFUNUzXyeLrCKCHF4hq1nJgoRmxSNGoGdIYuO0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772037346; c=relaxed/simple;
-	bh=N2UMPrkIe31j4aJuqbuRgVryoskRYO0Far8UeIfsCB4=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ogYXcGEkJQthf+PGdwDf+/k6yvn1voQX1X3fRGtnBGGheSpWFu5gSmAHgQX+tf0b3ffiB29jA0LT5rE2k5mwbwuvx1HOkbdnrUgO/kplGeO7L/KWdFxFYRlXVu0GgLgMySi75HnsXJwiOy9qB9DsvqNLF1ByN/akfF2PR1SLA3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nG+HvkFo; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-358f5aeb46eso766697a91.1
-        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 08:35:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772037345; x=1772642145; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=FF5rB0m7X9JopCsNwyZqrTsOQj25863I1pJhudGCwMI=;
-        b=nG+HvkFozWDEtePs5/my1C/sRFbrZOepiOIcVM1nr2XO9qJZDf1iFBqka6n7C6K1fA
-         XUlFTfBk9MBIvOj40lCkJBaSlJq2VqKcu9aLTmdJp6536WwMI1ZvNxlJQfAmj6RdKDGl
-         nVGmwkjkLi7Nzsu5mphwJIKEujH0fAADE8M9k5EHHWC1hgJG9pUKvMjPjIeEK3AkRhZg
-         hWAfbxUoe0J5Z+0U7xkveW2fIf7HYcdiWEXTAbpcX6yNHYof4OjEdHE+7m9QzPecxZuw
-         U8tGDy3N8geSa8V0Ck73zgQXyNxtFcnPhAnZr6ZiLWtTzXJRuIjnJD4K5ytkaZaGQ+RN
-         NqBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772037345; x=1772642145;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FF5rB0m7X9JopCsNwyZqrTsOQj25863I1pJhudGCwMI=;
-        b=ZVcb3N/sOVkbQZ3rda0Ow/MI4SU4zuHNxYLJkOZVjrcEfLlq4Dpd7g09cnlykZLCW1
-         H6q53Y6EuDGWtT92hUcTTr9PgebOugkr647ty5cWM7zmYBQRB5rBD+8qwOP8pOwJ4d+v
-         Wunv6tbCifr1tTzBmFeyUKnRkaK/pr+fPzToPxS9OdaLUGgJT9D0aaOi8ND9DdfKjhP8
-         GcHGgmqoC1Txsgr7I/nLvM5JU++2x75AKDj2ogVt0/+sWorYTIQuUJqVLA/wOjBY9CfE
-         p8vVeItWI/rlqfQ4HehrwdB3ofZoc9YVQzf8YvJvwtzu1XwzCFc0wpZeT/K1Pm3j10b7
-         rvcg==
-X-Forwarded-Encrypted: i=1; AJvYcCWl0AlEh6G/i+Roq+98jYMY7A+vwG23tpsBT6nQFvEPUM9bn5pZMduy3N0m1PtdThszYrbVcKs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwybuAj0beTBulIIMO7mmFkZDVoJBS6gulvvsqJCtaTH0d2a1wq
-	RjkHApvX2wIOlLgy94SqvpT2nBNlspxba/xidNnvYSADX5IXJESoo+Xi
-X-Gm-Gg: ATEYQzwxVvj+f2iV5+UwZpemoWDzTi0peaCisS7U1LlAvyjVtS72SZq7gM2NrSaaHhu
-	6FWb2t+MYLLLlo//yGSei4svbFIlO/lsVc4y2gYjZJ/hzGpuwhtpugINY7OU+rtv5C0FGNwtlyG
-	k/xbXOMqz6ScxzcikOjaVLOURh64xcGW9q8J3zaJCn16ulu9MRBRIFlRd3yQR5cbaiLXYXBahrk
-	OFxnaJSgk6I7fWTnjF48sECx7ScVTdAK3Niu8f0Gh6m9cbe1SswxKfMnqSD/+Qzv6L262PcXhU0
-	o4wfwU19zZqm4j1J8CiAwf4yNGFd6TjAFqcpIOD/yZUpY4e0SXAxe3WNS4k2N5BWPLS05jKclRq
-	AmT+s0RQRhy6x0Vkk1rwfM6HIcp9aW2W4s5VOWz0WYdkljYMqkLMBgv7xlnIfTfeWXinNhh6PcW
-	rms15HbtRVkOKmP+BHyS+/W0sghDvp3VgLlLuiXN4TPDNIGV2P/WLktPDiYuX3PeJ8ZW4S
-X-Received: by 2002:a17:90b:1fcf:b0:358:d80e:383a with SMTP id 98e67ed59e1d1-35928a59dbfmr733451a91.2.1772037344875;
-        Wed, 25 Feb 2026 08:35:44 -0800 (PST)
-Received: from ?IPV6:2405:201:2c:5868:dd50:6a2e:d27f:77bf? ([2405:201:2c:5868:dd50:6a2e:d27f:77bf])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35912f4afddsm937092a91.2.2026.02.25.08.35.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Feb 2026 08:35:44 -0800 (PST)
-Message-ID: <b7df8a5b-95ad-4cd6-860c-1adb1f89a7f6@gmail.com>
-Date: Wed, 25 Feb 2026 22:05:39 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E056332909
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 16:46:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772037962; cv=fail; b=VbvJuTsA5EAODLLY5uyfEkZXhFeGBZJf10pzKG6yzcpVZLvICXtPiBWfTksZaeUTw1ECGCBY3z/HAa+dU2Va4PHmvzEr8PEKatW4YLXCM1XRtgdz4Vzf4BT296e1fQGa/vV49eSrWX4Dfm0r8hVwQl/f5JzTYGVnxC6q4HmFSI0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772037962; c=relaxed/simple;
+	bh=1FgRn9iavnBqEg4BwAlT2j0Y/I3DxNIZG2uXKeZEuPI=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=VOsiI2bb113CY7Ln13lqwsDHzIN2v4t2zvKvs69i1neXmHXBILmIWr0m3gaSze6zKtOIBKd6p0LREPJ4ZAKfPP+m2Gy2Ckk+JHrWOfQ72HRlFpILjXqA96y8bouX9iBRm7dCnqspgN5Mi02QZIh/Xid3MetoLtzN8rRwzw6779M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=j5gatyMu; arc=fail smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61PGTEv71363425;
+	Wed, 25 Feb 2026 08:45:41 -0800
+Received: from mw6pr02cu001.outbound.protection.outlook.com (mail-westus2azon11022140.outbound.protection.outlook.com [52.101.48.140])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4chqcysxht-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 25 Feb 2026 08:45:41 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=GIah8LfE2QM+zilrc2neVkSE+GLuvCEsqEOgl8F3UC16wKO0ENQJsbqmC3DFUq1wjY6WvOdP14bOkIiK0qSKmrPDwlzr2sZFr0cqgJ/IZMqyHbMgfUjl7EhLw2WnGKT0pDg2d63d/ZSMmkkAtFG/gLvD1raTiv1L9/1eOlefauG+2wjYQaSw3GbrfcDG5yUcXaokz6Dnj+OYH8ouIfvzGXl7VVUmkNY2Smnj5DMMf+M2LWC1B/RxxSh3qX/11KinOCdI9GQ8oV8TJvR00MOeNFy5+TqloRItsE17xhXij8JG0OpW0p3HvOIeX209Ng3ArvUojKZSHyfNPnuJrbpvmQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YFKi38YOKZ9sisHL+mHYqao454oPWSmWYSe4zMHkL80=;
+ b=E80UgxEXWPIyRatCqL9EEK6t5M3DWt7HUFfG+vh69fhNxUmK2oQ5MmIWDUr0oLAhXmqwONGMkaP5VGPmV5tNGgA92dAGpOgSKecF4y2yhdCzSq3ulcqFGopWl+/s75Kquz2gs08REnxoKl2RttPwH2aU6YJLdG/kcWklNbdVXNJNr6/5hlgB9m4C9s1/75p2GwbTe7BKfpJyX8e0NMp3dr9dtqoEh3DPnP/8RR5/DbLJcgG8eg9oJBsaWhsXn2j5CitVL1xmPi6ke7z5iJf6HLXwwAdQLj078TvkYIum3ocd9YG6kAHnyjJssC24seoF3dpm/Z5bc0Rml07HL1zZDA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YFKi38YOKZ9sisHL+mHYqao454oPWSmWYSe4zMHkL80=;
+ b=j5gatyMuOEnTgvZZGp351WG/nqk5kEQR6ED9BRPTTMkhE+vFzsN6ihIhnDmBS97jc5y6ZhT7doccGTilGI66pDNAME6u/iuRHeAU5BX8ILXO4zk9gFyNqJNPY1Nc0XkXiMVs4KNhZhpOZF6D834IxxjrmqCnGZv8aOPUf9zKhLA=
+Received: from BYAPR18MB3735.namprd18.prod.outlook.com (2603:10b6:a02:ca::16)
+ by CO1PR18MB4633.namprd18.prod.outlook.com (2603:10b6:303:e0::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.11; Wed, 25 Feb
+ 2026 16:45:37 +0000
+Received: from BYAPR18MB3735.namprd18.prod.outlook.com
+ ([fe80::448e:bd83:47c:f8b3]) by BYAPR18MB3735.namprd18.prod.outlook.com
+ ([fe80::448e:bd83:47c:f8b3%5]) with mapi id 15.20.9654.007; Wed, 25 Feb 2026
+ 16:45:37 +0000
+From: Sai Krishna Gajula <saikrishnag@marvell.com>
+To: Maciek Machnikowski <maciek@machnikowski.net>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "richardcochran@gmail.com"
+	<richardcochran@gmail.com>,
+        "milena.olech@intel.com"
+	<milena.olech@intel.com>,
+        "willemdebruijn.kernel@gmail.com"
+	<willemdebruijn.kernel@gmail.com>,
+        "andrew@lunn.ch" <andrew@lunn.ch>,
+        "vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
+        "horms@kernel.org"
+	<horms@kernel.org>
+Subject: RE: [PATCH v3 net-next 3/3] selftests:net: Implement ptp4l sync test
+ using netdevsim
+Thread-Topic: [PATCH v3 net-next 3/3] selftests:net: Implement ptp4l sync test
+ using netdevsim
+Thread-Index: AQHcpnYrJujnvnukwUmOcYIC7m4HOQ==
+Date: Wed, 25 Feb 2026 16:45:37 +0000
+Message-ID:
+ <BYAPR18MB373527B461555491BBA10FF1A075A@BYAPR18MB3735.namprd18.prod.outlook.com>
+References: <20260225153858.29486-1-maciek@machnikowski.net>
+ <20260225153858.29486-4-maciek@machnikowski.net>
+In-Reply-To: <20260225153858.29486-4-maciek@machnikowski.net>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BYAPR18MB3735:EE_|CO1PR18MB4633:EE_
+x-ms-office365-filtering-correlation-id: 0507ce08-5e25-4876-91bb-08de748d4da5
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|376014|7053199007|38070700021;
+x-microsoft-antispam-message-info:
+ sgs4ITaKRo9LxJ10Jj97kYqWbyCi3YDdXy5/Yjac8GoWdGrhqnp3UlcLUc1/WHs1B15C7gXdmUSsVFPi7xYudAKpltGAKFDCTdP6EMoVAibb+bA4kpVQ1zJuwVXSd1coRB/MMp2fYMnvvYIqNbVWlFzUsn5Gkpjud6jvUbENCpjMuum3dcXJvQutBorbo8re4lnXq6XpSlAI6eccZ8UbfFkyrXRjRXWNNe8BiWO+bwnxdS6+VcRrXqtNv483VWqk7qMUpQ5BKqJeW2E9AdAynuIbnc4atnOr3zHBoNgRufCA5jAb79WdtwHFSFMp5rx8dgTg67E+CqMFTfdjZFa3exGEheYSiSUHG5Ccp1PEYmBSUS6TEERQWT9GO+bxIm55Fr9q/UHJOqiU5iiwtQeysX1162OR1vmtGUBhq4nVRL1AY++tWYRHjbMXhSWPIAtmd0p0BbualSd5rHuRKnDz4+9OkrLFlWJjfnkYi2XaQnrl2qSJh/Qwow6OVdPJRxFdCweha6mw6xOx9RXrC++hfulwzYp7fZgo+zJB56cEdk4j1ABUfl4T2I9hmU0NGAjzSQIu4eO6pCMUiEKdjm1LBnvy0Q+XZxYaRjNhb7zDkMNUv93NfkLfsyt/f0sLLWc1tD5qJIEYBSOSYk1Lf/7IEyX5jS9O0d3hWRTWeARHYW81NvLJu0dORPRjItaUObA6to1/8usNMZFN7tiTcd52Kp/48l3VSUYgR/3EYwqOvyBObCTQKNtxFCiprv4q61OP5ERHqIMuFmbexcMTFph33tFAvc6M44025olBd8/F6YQ=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR18MB3735.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7053199007)(38070700021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?MkrzOWnehDDDXpenEGqkvTwodK/BwLqm+rwIy/wqvqwUDgv3cG4tXTAO1P9A?=
+ =?us-ascii?Q?gYFwIoOMDUm+la73lKZsfRlNWHwoDP8M0z9iir9bZme5LxKtEdar5qL6BO+O?=
+ =?us-ascii?Q?qbGyy5pZ/ygea/gmk0Oume1ep8wYvOVvytmL3EUiWi4snxtHiCxlfnbOteT/?=
+ =?us-ascii?Q?C9itvcwYHxaSfvSXOkirTYLOv6y6rj+6RUL1YJWhtVyYnSnvDAP5DPHWOqTA?=
+ =?us-ascii?Q?YvkgyM04hTY/bbmnNkwaHZrkkNWN63+gwVKdtvqDbmPGD5zaGhYcXEM+5hLu?=
+ =?us-ascii?Q?px+RSVXZ+c1miH7L6hrU1jCxuQ1RWT6jPBk3R+xWXVr88VYGMzirlcaDmjYq?=
+ =?us-ascii?Q?l0Vo8et8DsigoqKm49Nsd2E+8Z7HduS5JxgTwHhMLPLrQ3m4N0ev1KWd9XIa?=
+ =?us-ascii?Q?aqKY6QCA7q/eQ82areLjpFp9p7kE3m41HYQjubQpHqDNEDwRwOF+1qBTeLtF?=
+ =?us-ascii?Q?l4iRGxmFH/gSN6EUIiW5I8R0L3ph+Ux2zvUddFpab+4LI5eN91pI73dW4VOE?=
+ =?us-ascii?Q?qJss1c68kNBVIYzkoFRiMDfpW2dmQZ0aRpTlGB2xVEWnioq853d4Wui7bwL7?=
+ =?us-ascii?Q?mem539ANsx4S9SOPtBpk/F2NYs5zC1fOdyDrJ7fuO7xQr0XpPP2Z8Rg4O3sg?=
+ =?us-ascii?Q?209j5b+0RHTa6nisRgPqyXozoudlTmxVMcD/cbX4qnMUBcsdeQPJ7LRUPwpJ?=
+ =?us-ascii?Q?wrUwbaNHVGQI00kabn0HYddWl3y93+Z8t1LmdrhqRbjMHnXI74FB47Hvgmmu?=
+ =?us-ascii?Q?tMGA6zKoLHsmNNF2KO/2Y25/sGu8Fgty0K1pIYUJlItT22Ei7VI3zbLTGzYv?=
+ =?us-ascii?Q?tyFbCRKjHXRhGBZLhLO0EjzFkf0/OIH+8ubjOlR7oGX8fsT7t1cvIJA8ebQK?=
+ =?us-ascii?Q?FUT2s2Zw6dvjz86UIEnx9Pa47bElXk4UT7kE46mW6SMjorH4IokSIFmAoH+q?=
+ =?us-ascii?Q?KCy22s/c70x17iVcaDvcnAI+AjzXVm55lObGUmTxzoJtCbTiKCoQSvIPJzcL?=
+ =?us-ascii?Q?XgcITdIhvY6MyFniW4E5F6UkDPTt8YRNbsYTMX5l6NByWRFHdfBZws43I2l6?=
+ =?us-ascii?Q?e0ruFOd2OboyGlh74N45M+U8uqBELKx8svZMCbIiHTblQBi2oK7BswR4WSgN?=
+ =?us-ascii?Q?twvVSOM0wL0L/F4Znrwi1m5S+yh9XY3ytFgcpXdWuavUn6riPrNh3dJ3tiMv?=
+ =?us-ascii?Q?cL3g4n7i+yrS368NLUJa286f1iH431W7xMkrTPtrSoylFjJuVY5Vz+qNlYrF?=
+ =?us-ascii?Q?YDZetmmtgL0+I5CiOq4NBhXg0x1Bn4RUmtqd1sFp7DTPbnHRQz9WAC1u6/Wr?=
+ =?us-ascii?Q?RNTHR0tulCYP+BBz48etXZQBj8+8ReE7VMuVD4U13izABivUrOCEkR9/Xi7L?=
+ =?us-ascii?Q?aLkAGQ5nbsnUeYMaBy7oD82plRsq3Snc1Dl/5tbZxKJ1PKuMUol1IaYeNTQt?=
+ =?us-ascii?Q?CoX+FYkjp/rqF6k3vdYaLP1l8D2bsK9Gvm6C2bbWWGZkSP8EwQiYyGSEuvLz?=
+ =?us-ascii?Q?oWRJ4ipXF+sqrSrxXcbp7EzhmhiuYWeXAqy912NgEXiFXNt4evXkANO98zBD?=
+ =?us-ascii?Q?5fCP1exLP4dyIoxceHO1cUN2Pg3Zf82zg69e0WZ1SCVi3MsE/vZYc9wU1Tr7?=
+ =?us-ascii?Q?8Goodmq+PrTQy/8REAb3VtGt+41QDDk86DjHgPMwHYEx0bYgqZ5dND9RsA6x?=
+ =?us-ascii?Q?8vuZ00SWEbR+aAtvTYK+2GdX2g45hjsxNb4vCgKUDIaa7otv9wSMGbI4DNKy?=
+ =?us-ascii?Q?8p3s3tWqUA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net/sched: Fix divide error in tabledist
-From: Manas Ghandat <ghandatmanas@gmail.com>
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: stephen@networkplumber.org, jhs@mojatatu.com, jiri@resnulli.us,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251222061306.28902-1-ghandatmanas@gmail.com>
- <aVA4YJIT6at11JwH@pop-os.localdomain>
- <e68da695-2fdd-4692-999b-566c1b521f47@gmail.com>
-Content-Language: en-US
-Autocrypt: addr=ghandatmanas@gmail.com; keydata=
- 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
-In-Reply-To: <e68da695-2fdd-4692-999b-566c1b521f47@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR18MB3735.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0507ce08-5e25-4876-91bb-08de748d4da5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Feb 2026 16:45:37.5068
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: AXwoe5vBaSk5GhEzrFeHJsLIc21v2Ta0KMRdrCIvSL9UfkbinGKxsttGhpzd03tMlK+hNtDLDowHUoibv+snCg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR18MB4633
+X-Proofpoint-GUID: 5YcJvnySYNTSgIKgvLhHC0L1Byr2SY5i
+X-Proofpoint-ORIG-GUID: 5YcJvnySYNTSgIKgvLhHC0L1Byr2SY5i
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI1MDE2MSBTYWx0ZWRfXy59GRUzKZ2OS
+ nfy6fbHulzHngwsf9TzHySqagMkw77GN2EXc9QilsGwFUIsdr+kVQ0qmofem89bwSr4xjzhDOKy
+ R90E8N7E9kdCTpJMzRRE6qqdLynqOZLSNLrkLRYJtKdl/RtBaRzDqUbUAjZ9uW/djIVjGVmlMdZ
+ C/k3KGfnTGP7maqaVIroO9ciOotXp+mH6j0EVayhQSzVoO6AeLKtymZq6gwAlcZ7imItJQMMxYy
+ gwPSIOnkUp38EIiSFkhv4aPXuXOtaKXm8rtEmHyuIl4dXvG0kEueOdIZQRv4CqWIfOWkvFcAdlq
+ dPcn5wg5nSl/gtmAGvGtmwETo18/oh3RiOLiWpgPQQgvXrkQPVpc4Q9pmmzvY0YMJIl3UUdh8dA
+ 28vTABgjAlKzlk7lqR4bkCcb/ddVToAiPcfnElgSRsh9bKGh2KEonpi7jGA2oH82LU3UynOn9or
+ qzE7zurlXJgBO7Get8g==
+X-Authority-Analysis: v=2.4 cv=B/S0EetM c=1 sm=1 tr=0 ts=699f2735 cx=c_pps
+ a=j1s/UBwfdopMoDbT8vzgZA==:117 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
+ a=HzLeVaNsDn8A:10 a=-AAbraWEqlQA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=QXcCYyLzdtTjyudCfB6f:22 a=6gHIKlzYAAAA:8
+ a=VwQbUJbxAAAA:8 a=pGLkceISAAAA:8 a=QyXUC8HyAAAA:8 a=M5GUcnROAAAA:8
+ a=W1b5NI9UyvRFvDWWSvIA:9 a=CjuIK1q_8ugA:10 a=IZuCIVfSzXAHSwQMVxNu:22
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-25_02,2026-02-25_01,2025-10-01_01
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261027-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261028-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,intel.com,lunn.ch,linux.dev];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ghandatmanas@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[saikrishnag@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	NEURAL_HAM(-0.00)[-0.997];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0619519AD3A
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 9052119AF45
 X-Rspamd-Action: no action
 
-Hi,
+> -----Original Message-----
+> From: Maciek Machnikowski <maciek@machnikowski.net>
+> Sent: Wednesday, February 25, 2026 9:09 PM
+> To: netdev@vger.kernel.org
+> Cc: kuba@kernel.org; maciek@machnikowski.net;
+> richardcochran@gmail.com; milena.olech@intel.com;
+> willemdebruijn.kernel@gmail.com; andrew@lunn.ch;
+> vadim.fedorenko@linux.dev; horms@kernel.org
+> Subject:  [PATCH v3 net-next 3/3] selftests:net: Implement ptp4l
+> sync test using netdevsim
+>=20
+> Add PTP synchronization test using ptp4l and netdevsim. The test creates =
+two
+> netdevsim adapters, links them together and runs the ptp4l leader and ptp=
+4l
+> follower on two ends of the netdevsim link and waits for the follower to
+> report the synchronized=20
+> Add PTP synchronization test using ptp4l and netdevsim.
+>=20
+> The test creates two netdevsim adapters, links them together and runs the
+> ptp4l leader and ptp4l follower on two ends of the netdevsim link and wai=
+ts
+> for the follower to report the synchronized state (s2) in its output log.
+>=20
+> This implementation runs the test runs over IPv4 link.
+>=20
+> Signed-off-by: Maciek Machnikowski <maciek@machnikowski.net>
+> ---
+>  tools/testing/selftests/net/Makefile |   1 +
+>  tools/testing/selftests/net/ptp.sh   | 105 +++++++++++++++++++++++++++
+>  2 files changed, 106 insertions(+)
+>  create mode 100755 tools/testing/selftests/net/ptp.sh
+>=20
+> diff --git a/tools/testing/selftests/net/Makefile
+> b/tools/testing/selftests/net/Makefile
+> index afdea6d95..db576ea96 100644
+> --- a/tools/testing/selftests/net/Makefile
+> +++ b/tools/testing/selftests/net/Makefile
+> @@ -64,6 +64,7 @@ TEST_PROGS :=3D \
+>  	nl_netdev.py \
+>  	pmtu.sh \
+>  	psock_snd.sh \
+> +	ptp.sh \
+>  	reuseaddr_ports_exhausted.sh \
+>  	reuseport_addr_any.sh \
+>  	route_hint.sh \
+> diff --git a/tools/testing/selftests/net/ptp.sh
+> b/tools/testing/selftests/net/ptp.sh
+> new file mode 100755
+> index 000000000..8e5b3e1e4
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/ptp.sh
+> @@ -0,0 +1,105 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0-only # shellcheck disable=3DSC2329 # =
+#
+> +By Maciek Machnikowski <maciek@machnikowski.net> (c) 2026, # #
+> +Self-tests for HW timestamping and 1588 synchronization on the
+> +netdevsim # emulation with ptp_mock.
+> +#
+> +# This test:
+> +# - Creates two netdevsim instances in two separate namespaces # -
+> +Assigns IPv4 addresses to those instances # - Runs ptp4l leader in the
+> +nssv namespace using IPv4 traffic # - Runs ptp4l follower in the nscl
+> +namespace using IPv4 traffic # - Waits for the follower to reach
+> +synchronized state (s2) or the timeout
+> +
+> +source lib.sh
+> +
+> +NSIM_DEV_1_ID=3D$((256 + RANDOM % 256))
+> +NSIM_DEV_2_ID=3D$((512 + RANDOM % 256))
+> +
+> +NSIM_DEV_SYS_LINK=3D/sys/bus/netdevsim/link_device
+> +NSIM_DEV_SYS_UNLINK=3D/sys/bus/netdevsim/unlink_device
+> +PTP4L_SYNC_TIMEOUT=3D20
+> +
+> +setup_netdevsim()
+> +{
+> +	set -e
+> +	ip netns add nssv
+> +	ip netns add nscl
+> +
+> +	NSIM_DEV_1_NAME=3D$(create_netdevsim "$NSIM_DEV_1_ID" "nssv")
+> +	NSIM_DEV_2_NAME=3D$(create_netdevsim "$NSIM_DEV_2_ID" "nscl")
+> +
+> +	ip netns exec nssv ip addr add '192.168.1.1/24' dev
+> "$NSIM_DEV_1_NAME"
+> +	ip netns exec nscl ip addr add '192.168.1.2/24' dev
+> "$NSIM_DEV_2_NAME"
+> +
+> +	set +e
+> +}
+> +
+> +cleanup()
+> +{
+> +	[ -n "${PTP4L_LEADER_PID-}" ] && {
+> +		kill "$PTP4L_LEADER_PID" "$PTP4L_FOLLOWER_PID"
+> 2>/dev/null
+> +		wait "$PTP4L_LEADER_PID" "$PTP4L_FOLLOWER_PID"
+> 2>/dev/null
+> +		rm -f "$PTP4L_LEADER_LOG" "$PTP4L_FOLLOWER_LOG"
+> +	}
+> +
+> +	[ -n "${NSIM_DEV_1_FD-}" ] && [ -n "${NSIM_DEV_1_IFIDX-}" ] && \
+> +		echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX" >
+> "$NSIM_DEV_SYS_UNLINK" 2>/dev/null
+> +	cleanup_netdevsim "${NSIM_DEV_2_ID-}" 2>/dev/null
+> +	cleanup_netdevsim "${NSIM_DEV_1_ID-}" 2>/dev/null
+> +
+> +	ip netns del nscl 2>/dev/null
+> +	ip netns del nssv 2>/dev/null
+> +
+> +	modprobe -r netdevsim 2>/dev/null
+> +}
+> +
+> +if [ ! -x "$(command -v ptp4l)" ]; then
+> +	echo "ptp4l command not found. Skipping PTP sync test"
+> +	exit 4
+> +fi
+> +
+> +trap cleanup EXIT
+> +
+> +setup_netdevsim
+> +
+> +# Link netdevsim1 with netdevsim2
+> +NSIM_DEV_1_FD=3D$((256 + RANDOM % 256))
+> +exec {NSIM_DEV_1_FD}</var/run/netns/nssv
+> +NSIM_DEV_1_IFIDX=3D$(ip netns exec nssv cat
+> +"/sys/class/net/$NSIM_DEV_1_NAME/ifindex")
+> +
+> +NSIM_DEV_2_FD=3D$((512 + RANDOM % 256))
+> +exec {NSIM_DEV_2_FD}</var/run/netns/nscl
+> +NSIM_DEV_2_IFIDX=3D$(ip netns exec nscl cat
+> +"/sys/class/net/$NSIM_DEV_2_NAME/ifindex")
+> +
+> +if ! echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX" \
+> +	  "$NSIM_DEV_2_FD:$NSIM_DEV_2_IFIDX" > "$NSIM_DEV_SYS_LINK";
+> then
+> +	echo "linking netdevsim1 with netdevsim2 failed"
+> +	exit 1
+> +fi
+> +
+> +# PTP synchronization test: run ptp4l leader in nssv and follower in
+> +nscl, # then parse follower output to verify they synchronized (servo st=
+ate s2
+> =3D locked).
+> +PTP4L_LEADER_LOG=3D$(mktemp)
+> +PTP4L_FOLLOWER_LOG=3D$(mktemp)
+> +ip netns exec nssv ptp4l -i "$NSIM_DEV_1_NAME" -m -4 -P \
+> +	> "$PTP4L_LEADER_LOG" 2>&1 &
+> +PTP4L_LEADER_PID=3D$!
+> +
+> +ip netns exec nscl ptp4l -i "$NSIM_DEV_2_NAME" -s -m -4 -P \
+> +	> "$PTP4L_FOLLOWER_LOG" 2>&1 &
+> +PTP4L_FOLLOWER_PID=3D$!
+Minor nit, =20
+ptp4l master, ptp4l slave started back-to-back. =20
+Better practice is to=20
+Start master
+Sleep 1
+Then start follower
 
-I just wanted an update since the patch has not been merged yet.
-
-On 12/28/25 20:54, Manas Ghandat wrote:
-> 
-> Hi Cong,
-> 
-> On 12/28/25 01:19, Cong Wang wrote:
->> We are reverting the check_netem_in_tree() code due to user-space
->> breakage. I hope reverting it could also fix the bug you repported here?
->>
->> See: https://lore.kernel.org/netdev/20251227194135.1111972-3-xiyou.wangcong@gmail.com/
->>
->> Thanks!
->> Cong
-> 
-> Reverting the above patch would fix the bug which I have reported.
-
+Otherwise initial announce might be missed, causing unnecessary delay.
+> +
+> +
+> +for _ in $(seq 1 "$PTP4L_SYNC_TIMEOUT"); do
+> +	if grep -q ' s2 ' "$PTP4L_FOLLOWER_LOG" 2>/dev/null; then
+> +		exit 0
+> +	fi
+> +	sleep 1
+> +done
+> +
+> +echo "ptp4l follower did not reach locked state (s2) within
+> ${PTP4L_SYNC_TIMEOUT}s"
+> +exit 1
+> --
+> 2.53.0
+>=20
+Reviewed-by: Sai Krishna <saikrishnag@marvell.com>
 
