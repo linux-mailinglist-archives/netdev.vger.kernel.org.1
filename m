@@ -1,175 +1,141 @@
-Return-Path: <netdev+bounces-261088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261089-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UFe3Iy1nn2lRagQAu9opvQ
-	(envelope-from <netdev+bounces-261088-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 22:18:37 +0100
+	id qNtEFChon2lRagQAu9opvQ
+	(envelope-from <netdev+bounces-261089-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 22:22:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 155AA19DC31
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 22:18:37 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 846D219DCA3
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 22:22:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6540F30DD9A6
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 21:16:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1BA38301411E
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 21:22:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37CCC30FF29;
-	Wed, 25 Feb 2026 21:16:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E9830F7EA;
+	Wed, 25 Feb 2026 21:22:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AxFlNoLV"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="uwZ/wCKG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D488314D16
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 21:16:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C2E223DD4
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 21:22:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772054161; cv=none; b=GvwTWNuDpOqvhMHC6JB1NxDD8iAMKiUDHlY0icxkwjZuHfSRpz3C1qvu2Xfcr5Obv8q4DexNfVhMNXIQbR7Wx9Mtm8lpGezC4FtOC4L1IsFgM8c9icvgG4XSXXPQhyWaa7gC4wr+p8VqMAR/X3C6p/QprNABqiKZ+kcxTr/kr2s=
+	t=1772054565; cv=none; b=apf7Fpcl0UeG4NE3O19oRa6M+XjoUuSbYE6lIa770Ufr/9pKtjDWDy+KDxMmxAFaV8WwMnTEdXs4gr0sNraJv9CceAw8YQD8UtrU+jKMqG2O7/OIAYJV5FEdUXU/Z0q2p0zK+L9AjebmEIovaY/Z3er6eT1IR5V7kUfF29SmP6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772054161; c=relaxed/simple;
-	bh=1KcvINjx2zyVslDHy0Ibpn02518YOwAK8XndWCYYeaY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CUjDZwtC2gSTPnezyNoY2zzApsa5zLwkSAHU7xQ6G//R9sVS8q+5MFxbW09xXqmB5cA/JY8RMtOU4wLgHf8aTqNKnxGgsf/K6j0G85D2XSQ23kYTTGbbrbAxklSLpscv/jkKqmZ3zO3xCubMhdp1ow64cX1q5L06sZ1/fsGVufQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AxFlNoLV; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772054161; x=1803590161;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=1KcvINjx2zyVslDHy0Ibpn02518YOwAK8XndWCYYeaY=;
-  b=AxFlNoLVRyuZfISvkly8PrtRP73OFHnOvHjzp/ES+wafgFOFulAc434J
-   9iSTA/j0H39COkaaMlTUV3+xzt0rc8izOl1umV5tsOfj3YunVLSX316lZ
-   XJTr7khXYv4HAK8wdySz/gaKe5DnhmE5YeEL8k6lrfpz+TGXZdTvVaAVI
-   664auOl4H4dSBb/uZ+vZHkPh4/VfCeNGB3O487KsGfWL8fnqLPFvdG9/g
-   c0e1STW72L2G1JIuMqZQphMYwuRHLWwC6KeJnlNY1ec5GVv90wHPkaFiH
-   V1jxfm8sAYV3oQgNqkT8oQi3lrL50eFGHHiRtX2kz+/O+Uh7iDaxUeNXB
-   g==;
-X-CSE-ConnectionGUID: jGcehJdMTgeM7QafIi9aOQ==
-X-CSE-MsgGUID: mUbUJUVUTx6XTw64Tgs5Dw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11712"; a="73013838"
-X-IronPort-AV: E=Sophos;i="6.21,311,1763452800"; 
-   d="scan'208";a="73013838"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2026 13:15:58 -0800
-X-CSE-ConnectionGUID: /CqauMncSG+YIF2nlWDc/Q==
-X-CSE-MsgGUID: whuDQDsBQRyDIg318YrG5Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,311,1763452800"; 
-   d="scan'208";a="239349715"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa002.fm.intel.com with ESMTP; 25 Feb 2026 13:15:57 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Vitaly Lifshits <vitaly.lifshits@intel.com>,
-	anthony.l.nguyen@intel.com,
-	dima.ruinskiy@intel.com,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Avigail Dahan <avigailx.dahan@intel.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>
-Subject: [PATCH net v2 12/12] e1000e: clear DPG_EN after reset to avoid autonomous power-gating
-Date: Wed, 25 Feb 2026 13:15:43 -0800
-Message-ID: <20260225211546.1949260-13-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20260225211546.1949260-1-anthony.l.nguyen@intel.com>
-References: <20260225211546.1949260-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1772054565; c=relaxed/simple;
+	bh=uOBpExV43q0oD6CkrFpJuRHou/jN5DyGY6iAhyLfX8Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MfSoV+wuZJGrR4hbtWoqYnixxgRYtq99GG3ybZuki7blLydpcWaEP5P9vErtCFQprPJWgG0B1TekW4Hiw1fuo6J4v86tydOHf0SIXkc4EX7S5RbZqdu2M3MPDz3WRI+dQhf9B+kDima7I/Otfq4793CGSmmKC6kfvJjYDvwl4fQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=uwZ/wCKG; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-8cb3b3e643dso4234085a.2
+        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 13:22:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1772054563; x=1772659363; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LxH1/Ug7KHoIXoZ/9Q65N888ZlyiIRs//V6tziN0qXk=;
+        b=uwZ/wCKGaG2KI4WRWApnykxQp5QUwCCZG/NG05NkIPQjEJlL/sbjY1dA7heqJEc4p6
+         lmH39kBlRb9VwL365lj/AZb3vIlu/UZKYCTK4jJww1XcFMJ4yIfwlcx/hCDooWFrenoO
+         5gi6mYxYVoD0CpUpaG94hZ/EoDdEM2NLQ1JZ8D6BPzZ+Q3MWKjzBlooqQbRROdao4Tgq
+         eo5eoNsi/7nJFT7YXMNfi6KjPyBUDSOe+z4jbMa5nFJxmV7vgvinhB302UoZiHzSb8ec
+         pUQ4UAEY4fQyzCd8VLnL5vQZMIk8BFw11wqQ8yDplWoKG3TvNMcoqAa87Ql+FX54N7th
+         m+gQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772054563; x=1772659363;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=LxH1/Ug7KHoIXoZ/9Q65N888ZlyiIRs//V6tziN0qXk=;
+        b=PQFwBxMg/wXEP12FpkYGyQOuCIn3tlz8mG1YLe0A/W1CkcQbAzKT/XqhLJSiK8ueGa
+         q86gmmD+7871cAhfYp/Az9ugX8GnT6Mg10lOJkVCF4hi1rIlWvrLc4w3aTQNnLQTdHyg
+         AWfWlDtDHZNROwefd0JrAzOg9dzjuG+zgiJXd1Ca214vek/+Opc1QJdA5ihlZ93XeZLa
+         C/5ruqCmum+zzNwQJUXw4DcCulmjw7XEEXAed3piuCPYpnNzL4vnUuKpaE0BwgnsDlkJ
+         LdnPGZYBySuUdGPt+m1GnEzkr8zhv/w8n7J+SfLo4QsNFj/trDap0ydmUnrrX3O6XIDW
+         TlEw==
+X-Gm-Message-State: AOJu0YxIwx7lEBz44qDw5VSqJapdH/xjDuMN+VC1uKpZrGilmMo3IaPQ
+	a+YTX8BmT/ZOBUNzEBxc5luP64CiZsviP7j2JtP+14g5QyX/Zh3AlaFDftSy6vDL9w8=
+X-Gm-Gg: ATEYQzwDfmjyLFzGWU+M5YuTCId/an/AgaTuPyw5dhHOyCajkTD/7wqT8fShFmworep
+	n8sCnntgIyVNwE3ORl9Fdvoz88Z3nPHMMy0jnSSfX+KRfLMKRFhDpNgjXbmHbEPooWQPnYlT+Rc
+	cuEkS6hbjdYgxSnfTa0c9d2EJDwgHKrr6VIlx7bmwIXrrBH7tRmlYLwJSqaQteHwksb842QEV3K
+	H0v+hESKB8OnOFc5P4eKcts2CpUzzxcGa9MuXWkdMyIfQ6JXYSWJ4Z6WSdMhuBjXz9Tca9I7hOo
+	fX5ldZKvuYbVecjvm1YaghFEN8SA/lGHE81FAVZw7vv5RboeevWhNUoksdasHw5+ayPD/BC73oT
+	kq5eN/DaGKEFEGTaY25+tHP5LwRU8HF5coT9iAoQqLo35a6Cm+Zrb1pe6wlMT6foObegg5ldgWW
+	L1mCcaeFK8c8oH7ZyVGi28rDzm8kyG3rsZNA44l2xUDnTpYek7KFbLFcN6FPcYxeLX
+X-Received: by 2002:a05:620a:28cb:b0:8cb:4128:ec3c with SMTP id af79cd13be357-8cb8ca8205cmr2112009385a.64.1772054563202;
+        Wed, 25 Feb 2026 13:22:43 -0800 (PST)
+Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cbbf64efafsm30011985a.6.2026.02.25.13.22.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Feb 2026 13:22:43 -0800 (PST)
+Date: Wed, 25 Feb 2026 13:22:39 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
+Subject: Re: [PATCH iproute2-next] iplink: bond_slave: print actor and
+ partner churn state
+Message-ID: <20260225132239.34fba967@phoenix.local>
+In-Reply-To: <20260224020215.6012-2-liuhangbin@gmail.com>
+References: <20260224020215.6012-1-liuhangbin@gmail.com>
+	<20260224020215.6012-2-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.06 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[networkplumber-org.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261089-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-261088-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[networkplumber-org.20230601.gappssmtp.com:+];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,intel.com:email,mpg.de:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 155AA19DC31
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,phoenix.local:mid,networkplumber-org.20230601.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: 846D219DCA3
 X-Rspamd-Action: no action
 
-From: Vitaly Lifshits <vitaly.lifshits@intel.com>
+On Tue, 24 Feb 2026 02:02:15 +0000
+Hangbin Liu <liuhangbin@gmail.com> wrote:
 
-Panther Lake systems introduced an autonomous power gating feature for
-the integrated Gigabit Ethernet in shutdown state (S5) state. As part of
-it, the reset value of DPG_EN bit was changed to 1. Clear this bit after
-performing hardware reset to avoid errors such as Tx/Rx hangs, or packet
-loss/corruption.
+> +	if (tb[IFLA_BOND_SLAVE_AD_CHURN_ACTOR_STATE]) {
+> +		__u8 state = rta_getattr_u8(tb[IFLA_BOND_SLAVE_AD_CHURN_ACTOR_STATE]);
+> +
+> +		if (state >= ARRAY_SIZE(port_churn_state))
+> +			print_int(PRINT_ANY, "churn_actor_state", "churn_actor_state %u ", state);
 
-Fixes: 0c9183ce61bc ("e1000e: Add support for the next LOM generation")
-Signed-off-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Tested-by: Avigail Dahan <avigailx.dahan@intel.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/e1000e/defines.h | 1 +
- drivers/net/ethernet/intel/e1000e/ich8lan.c | 9 +++++++++
- 2 files changed, 10 insertions(+)
-
-diff --git a/drivers/net/ethernet/intel/e1000e/defines.h b/drivers/net/ethernet/intel/e1000e/defines.h
-index ba331899d186..d4a1041e456d 100644
---- a/drivers/net/ethernet/intel/e1000e/defines.h
-+++ b/drivers/net/ethernet/intel/e1000e/defines.h
-@@ -33,6 +33,7 @@
- 
- /* Extended Device Control */
- #define E1000_CTRL_EXT_LPCD  0x00000004     /* LCD Power Cycle Done */
-+#define E1000_CTRL_EXT_DPG_EN	0x00000008 /* Dynamic Power Gating Enable */
- #define E1000_CTRL_EXT_SDP3_DATA 0x00000080 /* Value of SW Definable Pin 3 */
- #define E1000_CTRL_EXT_FORCE_SMBUS 0x00000800 /* Force SMBus mode */
- #define E1000_CTRL_EXT_EE_RST    0x00002000 /* Reinitialize from EEPROM */
-diff --git a/drivers/net/ethernet/intel/e1000e/ich8lan.c b/drivers/net/ethernet/intel/e1000e/ich8lan.c
-index 23421a640097..dea208db1be5 100644
---- a/drivers/net/ethernet/intel/e1000e/ich8lan.c
-+++ b/drivers/net/ethernet/intel/e1000e/ich8lan.c
-@@ -4932,6 +4932,15 @@ static s32 e1000_reset_hw_ich8lan(struct e1000_hw *hw)
- 	reg |= E1000_KABGTXD_BGSQLBIAS;
- 	ew32(KABGTXD, reg);
- 
-+	/* The hardware reset value of the DPG_EN bit is 1.
-+	 * Clear DPG_EN to prevent unexpected autonomous power gating.
-+	 */
-+	if (hw->mac.type >= e1000_pch_ptp) {
-+		reg = er32(CTRL_EXT);
-+		reg &= ~E1000_CTRL_EXT_DPG_EN;
-+		ew32(CTRL_EXT, reg);
-+	}
-+
- 	return 0;
- }
- 
--- 
-2.47.1
-
+You should use print_uint for unsigned values.
 
