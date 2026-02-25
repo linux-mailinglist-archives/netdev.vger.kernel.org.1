@@ -1,291 +1,206 @@
-Return-Path: <netdev+bounces-260869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260868-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OGuXGovPnmnwXQQAu9opvQ
-	(envelope-from <netdev+bounces-260869-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:31:39 +0100
+	id CE7zJAPPnmnwXQQAu9opvQ
+	(envelope-from <netdev+bounces-260868-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:29:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7C47195C92
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:31:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EADC5195C4C
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:29:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5735F30420A9
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:28:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 55DB930036C9
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:27:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1090392830;
-	Wed, 25 Feb 2026 10:28:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 911C238F93B;
+	Wed, 25 Feb 2026 10:27:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nzt5lNi2"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="iMEGM5uA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1A915A86D;
-	Wed, 25 Feb 2026 10:28:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B37EE38E5D4
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 10:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772015331; cv=none; b=fpGncvJ7echfQ4+ibZU/YBg/LSLgjkJKc5XTJ9KSwDPJ6WDjTqGiRBrGDN2lBoa5dQqOeGejU0J/UQKvabREVtyJlPR6HGvZduDDnMZpD4lj57b2l55HQbXqlWIB/NNVb7eNo69KMWV9HHR40XZSa7Du+bSyM0OiFzIQFabWD7Y=
+	t=1772015243; cv=none; b=GLEVjCwrxvSRsBj2B+CI/pNSXRLZb4pVud6gkH/AuYkA0gp+ai59BhTfv1o2Zjn1YTUvwdXkOV6GOqe0F/WuvXn6HtU+mtPGXSHZizFk+RTEnBsb3/h9E+ns81R7fFhA0XIhXAKHDIU1QLUrT3oew6a9xyFPgyEu+eT9gRL8MOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772015331; c=relaxed/simple;
-	bh=lq3b8BduZCpi8O0DlQWm6T4JJHOVeZL+j/YOabPb0Wg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=P08jodtuKXu4gejGRCJ2KTuFkRyXQ0W9KndgutfINgSfetcfkUBZXLjiqmnuj4zhdkTJOvMpz0Ojm9pNGCMSoAVSTsTjVyj4ko+xr6Zs4MI0XnS4e3AcX0NnvD6XzRgrFUahiuPzf0yW3Gjp6Mog5UAuO3bX48CWsqlYNiommss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nzt5lNi2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 339FEC19423;
-	Wed, 25 Feb 2026 10:28:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772015331;
-	bh=lq3b8BduZCpi8O0DlQWm6T4JJHOVeZL+j/YOabPb0Wg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nzt5lNi2bF9n1jopImFCzolRPSFRboNA7MgpUEk+KuoT+u3B4JBxNT2Ybk595qfmg
-	 eistXvwyWeM1C3m9kSVstNAp+Zdmwl2P36jSbFLuRYOqRCqdi+f3AqWCqkW4YdsyQq
-	 wNjWcNKeBln1fmc3fqrFPoDpi8Csw23IW0h2SSULwjUDW+v5efyPs+zT0Z0kcPi/IO
-	 mH/5W/TwMMfgVC7gEz78QDRiY1NKejNcCgzTWcX4mZvBtZcxuVnD3Uy05kJo+QQUpC
-	 NqZlexX3+kpmZ3rLeqAyoj3KlpYSDJepsd6uXBPeVTJzIIvrncbJaPz4jT18hxy5sM
-	 VXZSFXmjopLWQ==
-From: Simon Horman <horms@kernel.org>
-To: cedric.jehasse@luminex.be
-Cc: Simon Horman <horms@kernel.org>,
-	edumazet@google.com,
-	andrew@lunn.ch,
-	netdev@vger.kernel.org,
-	olteanv@gmail.com,
-	pabeni@redhat.com,
-	linux@armlinux.org.uk,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	davem@davemloft.net
-Subject: Re: [net-next,v3] net: dsa: mv88e6xxx: Add partial support for TCAM entries
-Date: Wed, 25 Feb 2026 10:25:29 +0000
-Message-ID: <20260225102528.177319-2-horms@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260224-net-next-mv88e6xxx-tcam-v3-1-dc18887d71f2@luminex.be>
-References: <20260224-net-next-mv88e6xxx-tcam-v3-1-dc18887d71f2@luminex.be>
+	s=arc-20240116; t=1772015243; c=relaxed/simple;
+	bh=bVuxr7oD6CxY5dKEZdU4U2U87QAlo86CA1+hvomKmnY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GWLEnlAQgo6nbdJ+koc5qxF+oo+KR/UmwcXkyCW0PfrYZyeHPKRk+wQdAkS8JDJAwkwFGuDQr8i9WEqNMKqnXudfv4t8pWfdZ0+BToN8+a3t66nSXUDW8/dKtbUCw8TAr1GfcevWlmyNODYi2sauZSxTFSV1ZNF09+8QbKgJotY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=iMEGM5uA; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=MS2C1+DWOJkYiCXagfDbmCgTOM+diuI355eHVdbYXXk=; b=iMEGM5uApadFg7FMmgibdnXkbS
+	7nJCsVc9yb4juYDjZ4yXPpqgJ1LlwQX8GHxOGAsUlG4ePOuPiuOpCatUKUrkzLZB0G0iD2Pq0r9Hj
+	+jkPIJ7csHDEyBf2lP/uRMWwdRByUR55j2Lutq17Mu/RSJcNtAeVFmKo9bFbntgPM6nFTCsTJ4BLC
+	ycFJFy6/OKIRL8SzRs9fKcuuuvj0GUqpNAkClu+uoJMIg6Hb4QnIsZxr2aixCtQxnixvy9il8Hv+w
+	Flu/sVF+roC9WMXGjzZV0LkXGTOmY3FxjJXv8ZkUWrOIAnH2DMBJsn//vRoq0OVJRVP8U9jJOYDgD
+	ZEtwKC9g==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41072)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vvC6q-000000006Qz-33W0;
+	Wed, 25 Feb 2026 10:27:12 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vvC6n-000000000rp-2lXH;
+	Wed, 25 Feb 2026 10:27:09 +0000
+Date: Wed, 25 Feb 2026 10:27:09 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next] net: stmmac: fix .ndo_fix_features()
+Message-ID: <aZ7Ofd7O0xUDh7YG@shell.armlinux.org.uk>
+References: <E1vuU3X-0000000Ae9G-1Er8@rmk-PC.armlinux.org.uk>
+ <20260224173037.7871e5ac@kernel.org>
+ <aZ6xqig4zh_Un8R7@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aZ6xqig4zh_Un8R7@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,lunn.ch,vger.kernel.org,gmail.com,redhat.com,armlinux.org.uk,davemloft.net];
-	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260869-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	TAGGED_FROM(0.00)[bounces-260868-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.920];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B7C47195C92
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:url,shell.armlinux.org.uk:mid]
+X-Rspamd-Queue-Id: EADC5195C4C
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+On Wed, Feb 25, 2026 at 08:24:10AM +0000, Russell King (Oracle) wrote:
+> On Tue, Feb 24, 2026 at 05:30:37PM -0800, Jakub Kicinski wrote:
+> > On Mon, 23 Feb 2026 11:24:51 +0000 Russell King (Oracle) wrote:
+> > > netdev features documentation requires that .ndo_fix_features() is
+> > > stateless: it shouldn't modify driver state. Yet, stmmac_fix_features()
+> > > does exactly that, changing whether GSO frames are processed by the
+> > > driver.
+> > > 
+> > > Move this code to stmmac_set_features() instead, which is the correct
+> > > place for it. We don't need to check whether TSO is supported; this
+> > > is already handled via the setup of netdev->hw_features, and we are
+> > > guaranteed that if netdev->hw_features indicates that a feature is
+> > > not supported, .ndo_set_features() won't be called with it set.
+> > 
+> > No lies detected, but is this enough? The whole TSO enablement 
+> > looks quite wobbly (as you mentioned in another email IIRC). 
+> > 
+> > Only stmmac_hw_setup() actually calls stmmac_enable_tso(). 
+> > And stmmac_set_features() does not call stmmac_hw_setup().
+> 
+> Looking deeper, dwmac4_enable_tso() has two paths depending on the "en"
+> flag, both of which are commented as "enable TSO".
+> 
+> Then, looking at the "Enable TSO" block of code in stmmac_hw_setup(),
+> it looks to me like we can end up with some queues that have TSO
+> enabled, and others which don't (because TBS has been enabled on the
+> queue.) As far as I'm aware, the network layer doesn't support
+> per-queue TSO.
+> 
+> We can't call stmmac_hw_setup() from any path that we care about any
+> state being preserved - it issues a software reset which causes
+> everything, including the PTP clock, to be reset and all state then
+> needs to be reloaded.
+> 
+> Lastly, we don't need to disable the TSE bit (via stmmac_enable_tso()
+> when we disable TSO, because there's a bit in the descriptors that
+> also needs to be set for the packet to undergo TSO. However, if the
+> system undergoes a suspend/resume with TSO disabled by the user, we'll
+> call stmmac_hw_setup(), which as I note in the previous paragraph will
+> reset all state, including the TSE bit. stmmac_enable_tso() won't be
+> called, and thus the TSE bit will remain clear. If the user
+> subsequently re-enables TSO, then we'll queue packets for TSO but
+> the hardware won't have that enabled...
+> 
+> That's a problem today. So, while you're right to point this out (I
+> had missed it) it's a separate problem to the one being addressed
+> in this patch. In fact, I think there's two new issues that have now
+> been identified here.
+> 
+> 1. The lack of setting TSE on resume if TSO is supported but but has
+>    been disabled by the user.
+> 2. The interaction of TBS and TSO feature where some channels can
+>    support TSO and others not, which I don't think can be supported.
+>    So, I think if we have _any_ channel with TBS enabled, we have to
+>    disable TSO on the entire netdev.
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-net: dsa: mv88e6xxx: Add partial support for TCAM entries
+With the assumption that TBS + TSO is not supported, then the following
+drivers have a problem:
 
-This patch adds partial TCAM support for mv88e6390 and mv88e6393 family
-switches, allowing the switch to match frame headers and take actions on
-matched frames via tc flower offload. It supports matching on IP
-addresses and protocol, and trapping packets to the CPU.
+dwmac-intel.c: intel_mgbe_common_data() sets TBS for tx queues other
+ than the first, but also sets STMMAC_FLAG_TSO_EN.
 
-> diff --git a/drivers/net/dsa/mv88e6xxx/tcam.c b/drivers/net/dsa/mv88e6xxx/tcam.c
-> new file mode 100644
-> index 000000000000..ed02c8798200
-> --- /dev/null
-> +++ b/drivers/net/dsa/mv88e6xxx/tcam.c
+dwmac-qcom-ethqos.c: same as dwmac-intel for TBS, but TSO depends on a
+ DT property.
 
-[ ... ]
+dwmac-socfpga.c: always sets STMMAC_FLAG_TSO_EN, but configures queues
+ 6 and 7 for TBS.
 
-> +/* insert tcam entry in ordered list and move existing entries if necessary */
-> +static int mv88e6xxx_tcam_insert_entry(struct mv88e6xxx_chip *chip,
-> +				       struct mv88e6xxx_tcam_entry *entry)
-> +{
-> +	struct mv88e6xxx_tcam_entry *elem;
-> +	struct list_head *hpos;
-> +	int err;
-> +
-> +	list_for_each_prev(hpos, &chip->tcam.entries) {
-> +		u8 move_idx;
-> +
-> +		elem = list_entry(hpos, struct mv88e6xxx_tcam_entry, list);
-> +		if (entry->prio >= elem->prio)
-> +			break;
-> +
-> +		move_idx = elem->hw_idx + 1;
-> +
-> +		err = mv88e6xxx_tcam_flush_entry(chip, move_idx);
-> +		if (err)
-> +			return err;
-> +
-> +		err = chip->info->ops->tcam_ops->entry_add(chip, elem,
-> +							   move_idx);
-> +		if (err)
-> +			return err;
-> +
-> +		elem->hw_idx = move_idx;
-> +	}
+stmmac_pci.c: snps_gmac5_default_data() sets STMMAC_FLAG_TSO_EN and
+ enables TBS for tx queues other than the first.
 
-If entry_add() fails after some entries have already been moved to new
-hardware positions (with their hw_idx updated), doesn't the function
-return without rolling back those partial moves? The software list would
-then have some entries pointing to their new positions while the gap for
-the new entry is only partially created, leaving the TCAM in an
-inconsistent state for subsequent operations.
+In each of these cases, we end up with some transmit queues that can
+support TSO, and others that can't (because TBS is enabled.)
 
-[ ... ]
+What a nice can of worms...
 
-> +int mv88e6xxx_tcam_entry_del(struct mv88e6xxx_chip *chip,
-> +			     struct mv88e6xxx_tcam_entry *entry)
-> +{
-> +	struct mv88e6xxx_tcam_entry *elem = entry;
-> +	u8 move_idx = entry->hw_idx;
-> +	int err;
-> +
-> +	err = mv88e6xxx_tcam_flush_entry(chip, entry->hw_idx);
-> +
-> +	/* move entries that come after the deleted entry forward */
-> +	list_for_each_entry_continue(elem, &chip->tcam.entries, list) {
-> +		u8 tmp_idx = elem->hw_idx;
-> +
-> +		err = chip->info->ops->tcam_ops->entry_add(chip, elem,
-> +							   move_idx);
-> +
-> +		elem->hw_idx =  move_idx;
-> +		move_idx = tmp_idx;
-> +
-> +		/* flush the last entry after moving entries */
-> +		if (list_is_last(&elem->list, &chip->tcam.entries))
-> +			err = mv88e6xxx_tcam_flush_entry(chip, tmp_idx);
-> +	}
-> +
-> +	list_del(&entry->list);
-> +	return err;
-> +}
+The options as I see it are:
+1. scan the transmit queue configuration, if any have TBS enabled,
+   disable TSO support for the entire interface.
 
-Can errors be silently lost in mv88e6xxx_tcam_entry_del()? The initial
-mv88e6xxx_tcam_flush_entry() result is stored in err, but then err is
-unconditionally overwritten by entry_add() and the final flush_entry()
-in the loop.
+or
 
-If the initial flush fails but subsequent operations succeed, the error
-is lost and success is returned. Additionally, elem->hw_idx is updated
-even when entry_add() fails, so the software model diverges from the
-hardware state.
+2. rip out TSO support, making the code simpler, and thereby removing
+   the need to try and fix the problems here, and making this patch
+   unnecessary.
 
-> diff --git a/drivers/net/dsa/mv88e6xxx/tcflower.c b/drivers/net/dsa/mv88e6xxx/tcflower.c
-> new file mode 100644
-> index 000000000000..693f4ad8f32f
-> --- /dev/null
-> +++ b/drivers/net/dsa/mv88e6xxx/tcflower.c
-
-[ ... ]
-
-> +static int mv88e6xx_flower_parse_key(struct mv88e6xxx_chip *chip,
-> +				     struct netlink_ext_ack *extack,
-> +				     struct flow_cls_offload *cls,
-> +				     struct mv88e6xxx_tcam_key *key)
-> +{
-> +	struct flow_rule *rule = flow_cls_offload_flow_rule(cls);
-> +	struct flow_dissector *dissector = rule->match.dissector;
-> +	u16 addr_type = 0;
-> +
-> +	if (dissector->used_keys &
-> +	    ~(BIT_ULL(FLOW_DISSECTOR_KEY_BASIC) |
-> +	      BIT_ULL(FLOW_DISSECTOR_KEY_CONTROL) |
-> +	      BIT_ULL(FLOW_DISSECTOR_KEY_IPV4_ADDRS) |
-> +	      BIT_ULL(FLOW_DISSECTOR_KEY_IPV6_ADDRS))) {
-> +		NL_SET_ERR_MSG_MOD(extack,
-> +				   "Unsupported keys used");
-> +		return -EOPNOTSUPP;
-> +	}
-
-FLOW_DISSECTOR_KEY_IPV6_ADDRS is included in the allowed keys bitmask
-but there is no code below to parse IPv6 addresses into the TCAM key.
-If a user creates a tc flower rule with IPv6 addresses, the rule passes
-this validation check but the addresses are never programmed into the
-TCAM, causing the hardware entry to match broader traffic than intended.
-
-Should FLOW_DISSECTOR_KEY_IPV6_ADDRS be removed from the allowed keys
-until IPv6 parsing is implemented?
-
-[ ... ]
-
-> +int mv88e6xxx_cls_flower_add(struct dsa_switch *ds, int port,
-> +			     struct flow_cls_offload *cls, bool ingress)
-> +{
-
-[ ... ]
-
-> +	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
-> +	if (!entry) {
-> +		err = -EEXIST;
-> +		goto err_unlock;
-> +	}
-
-Should this be -ENOMEM instead of -EEXIST? When kzalloc() fails, the
-error code tells callers the entry already exists rather than reporting
-the actual memory allocation failure. This appears to be a copy-paste
-from the cookie-exists check immediately above. Note that this was
-correct (-ENOMEM) in v2 of this patch and changed to -EEXIST in v3.
-
-[ ... ]
-
-> +	err = mv88e6xxx_tcam_entry_add(chip, entry);
-> +	mv88e6xxx_reg_unlock(chip);
-> +	if (err)
-> +		goto err_free_entry;
-> +
-> +	mv88e6xxx_reg_unlock(chip);
-> +	return  0;
-> +
-> +err_free_entry:
-> +	kfree(entry);
-> +err_unlock:
-> +	mv88e6xxx_reg_unlock(chip);
-> +	return err;
-> +}
-
-Does this double unlock chip->reg_lock? On the success path,
-mv88e6xxx_reg_unlock(chip) is called after mv88e6xxx_tcam_entry_add(),
-and then called again before returning 0.
-
-On the error path from mv88e6xxx_tcam_entry_add(), the unlock fires,
-then goto err_free_entry falls through to err_unlock which unlocks a
-second time.
-
-mv88e6xxx_reg_lock/unlock wrap mutex_lock/mutex_unlock. Double
-mutex_unlock causes undefined behavior and corrupts the mutex state.
-chip->reg_lock is the central serialization mutex used by the entire
-mv88e6xxx driver, so this corruption would affect all subsequent
-register access operations. Andrew Lunn raised the locking pattern
-as suspicious during the v2 review:
-https://lore.kernel.org/netdev/ab9b4278-2c0a-4ed5-9da0-2a7a3f928ed7@lunn.ch/
-
-This bug appears to have been introduced in v3 when restructuring the
-lock/unlock calls.
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
