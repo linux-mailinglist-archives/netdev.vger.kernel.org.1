@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-260984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260985-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qLc5Ag8Hn2neYgQAu9opvQ
-	(envelope-from <netdev+bounces-260984-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:28:31 +0100
+	id +PyIIkgHn2neYgQAu9opvQ
+	(envelope-from <netdev+bounces-260985-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:29:28 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AC95198BC3
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:28:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E2AC7198BFF
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:29:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B7C1830BF994
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:24:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 21E6430E2BA5
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:24:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E93B3B8D4A;
-	Wed, 25 Feb 2026 14:24:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72813B8D4A;
+	Wed, 25 Feb 2026 14:24:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4059D392822;
-	Wed, 25 Feb 2026 14:24:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D5983D349B;
+	Wed, 25 Feb 2026 14:24:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772029492; cv=none; b=UY8un1aUfdYTaBlPnUvnvM7qeTRLFAa7dvmcmOWEDmpSKrZCEHWmD0W0YJcTusf6U4ZlMImbX1wx5WredXRQMF63auFRmZXVPxlRI52+1LoVBzW9vajOJTuIwWL/Q9pjlHVIHe6ycopbGxLwYxw4FCfdEpZf73q5VAeE61+Nm0c=
+	t=1772029497; cv=none; b=QLCmP6DIZuNbyFbYwrlgQDkV4lYc41vmjrDQm2XXx8BCJJt1sEp54SzQbnmn3eSAhiXGJD2nSZGIVJK3ShGhPd5v7kMJv0JAelj30X4nSeKOS6U6VzutL9RYR10AXEc4MwhYD80zJxXPZhwXedPWKp/Xj4upXaJ3MeCAgIT+cqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772029492; c=relaxed/simple;
-	bh=90v2V3edTeUdWM0oAbEoX+Yh7zyuJt/oEpYWh3miwjQ=;
+	s=arc-20240116; t=1772029497; c=relaxed/simple;
+	bh=+RmBZM1X2mmeQ5E0ux8AhVEjIHMn5mMEsxCjHMYhfOU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OwPM/wwlb8jXwo7QORy4TR5qre9evxKWRP2W4ByWVZ3iPZXCocWmD8ZYUGJzTLlLqYLvhOK/Ls4yWDSdH3u5oow85BQJmTvSe3jgG5iG7AzOxTxWPA1xSZP2IbaHaqQBV8laA46nqUfuXPQcAYYmm1LKxaWmC0rmOq3iFbcM4ls=
+	 MIME-Version; b=TqL2ZpZGLivHnkTK0At7IaB4kUr5hZqcsNXOhdEVfMuo6AW5bZbEn/F1cIEni1/JGfG348hRe3KQOBqzlnBIm5vHYCb6FpJ6ML2jFNZz7pFIzrlkw8IVJ11fzu/hR3fsnZZovwkMh6smzoRD1TkztP/r3UMBqE70VM8Iq3IRKVI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; arc=none smtp.client-ip=210.160.252.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
-X-CSE-ConnectionGUID: L+IALaWDRBO0q4YalVUyWw==
-X-CSE-MsgGUID: cCWN2MKST6q+m7KfE0ELWQ==
+X-CSE-ConnectionGUID: wjXg1zDVTHaep9JmLwo6EA==
+X-CSE-MsgGUID: pbnM9QIVQWudH1d9Ob5JRQ==
 Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
-  by relmlie5.idc.renesas.com with ESMTP; 25 Feb 2026 23:24:49 +0900
+  by relmlie5.idc.renesas.com with ESMTP; 25 Feb 2026 23:24:55 +0900
 Received: from vm01.adwin.renesas.com (unknown [10.226.92.192])
-	by relmlir5.idc.renesas.com (Postfix) with ESMTP id D25B14017D8D;
-	Wed, 25 Feb 2026 23:24:42 +0900 (JST)
+	by relmlir5.idc.renesas.com (Postfix) with ESMTP id B10104017D8D;
+	Wed, 25 Feb 2026 23:24:49 +0900 (JST)
 From: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
 To: andrew+netdev@lunn.ch,
 	davem@davemloft.net,
@@ -58,9 +58,9 @@ Cc: netdev@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 4/5] net: stmmac: Add write_hw parameter to VLAN filter operations
-Date: Wed, 25 Feb 2026 14:24:13 +0000
-Message-ID: <20260225142414.130144-5-ovidiu.panait.rb@renesas.com>
+Subject: [PATCH net-next v2 5/5] net: stmmac: Defer VLAN HW configuration when interface is down
+Date: Wed, 25 Feb 2026 14:24:14 +0000
+Message-ID: <20260225142414.130144-6-ovidiu.panait.rb@renesas.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260225142414.130144-1-ovidiu.panait.rb@renesas.com>
 References: <20260225142414.130144-1-ovidiu.panait.rb@renesas.com>
@@ -83,7 +83,7 @@ X-Spamd-Result: default: False [1.64 / 15.00];
 	DMARC_POLICY_SOFTFAIL(0.10)[renesas.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260984-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-260985-lists,netdev=lfdr.de];
 	TO_DN_NONE(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
@@ -93,213 +93,145 @@ X-Spamd-Result: default: False [1.64 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.988];
+	NEURAL_HAM(-0.00)[-0.989];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev,kernel];
 	PRECEDENCE_BULK(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[20];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[renesas.com:mid,renesas.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7AC95198BC3
+X-Rspamd-Queue-Id: E2AC7198BFF
 X-Rspamd-Action: no action
 
-Add a write_hw parameter to the VLAN add/delete HW filter functions and
-to stmmac_vlan_update(). This flag controls whether the actual hardware
-register accesses are performed. When set to false, only the software
-state is updated.
+VLAN register accesses on the MAC side require the PHY RX clock to be
+active. When the network interface is down, the PHY is suspended and
+the RX clock is unavailable, causing VLAN operations to fail with
+timeouts.
 
-The next commit will use this to defer hardware writes when the
-interface is down.
+The VLAN core automatically removes VID 0 after the interface goes down
+and re-adds it when it comes back up, so these timeouts happen during
+normal interface down/up:
 
-No functional change.
+    # ip link set end1 down
+    renesas-gbeth 15c40000.ethernet end1: Timeout accessing MAC_VLAN_Tag_Filter
+    renesas-gbeth 15c40000.ethernet end1: failed to kill vid 0081/0
+
+Adding VLANs while the interface is down also fails:
+
+    # ip link add link end1 name end1.10 type vlan id 10
+    renesas-gbeth 15c40000.ethernet end1: Timeout accessing MAC_VLAN_Tag_Filter
+    RTNETLINK answers: Device or resource busy
+
+Use the write_hw parameter introduced in the previous commit to skip
+hardware register writes when the interface is down. The software state
+is always kept up to date regardless of interface state.
+
+When the interface is brought up, stmmac_vlan_restore() is called
+to write the VLAN state to hardware.
 
 Signed-off-by: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
 ---
-v2 changes: none.
+v2 changes:
+- Split this commit - added a new commit (3/5) which fixes VLAN
+  restore on resume and open paths.
+- Dropped phylink_rx_clk_stop_block()/unblock() calls around VLAN restore.
 
- drivers/net/ethernet/stmicro/stmmac/hwif.h    |  6 ++--
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 25 +++++++++-----
- .../net/ethernet/stmicro/stmmac/stmmac_vlan.c | 34 ++++++++++++-------
- 3 files changed, 41 insertions(+), 24 deletions(-)
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c    | 16 ++++++++++------
+ .../net/ethernet/stmicro/stmmac/stmmac_vlan.c    |  9 ++-------
+ 2 files changed, 12 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-index 0db96a387259..d7598c76251f 100644
---- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-@@ -647,10 +647,12 @@ struct stmmac_vlan_ops {
- 	void (*set_hw_vlan_mode)(struct mac_device_info *hw);
- 	int (*add_hw_vlan_rx_fltr)(struct net_device *dev,
- 				   struct mac_device_info *hw,
--				   __be16 proto, u16 vid);
-+				   __be16 proto, u16 vid,
-+				   bool write_hw);
- 	int (*del_hw_vlan_rx_fltr)(struct net_device *dev,
- 				   struct mac_device_info *hw,
--				   __be16 proto, u16 vid);
-+				   __be16 proto, u16 vid,
-+				   bool write_hw);
- 	void (*restore_hw_vlan_rx_fltr)(struct net_device *dev,
- 					struct mac_device_info *hw);
- };
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index a02575f67057..19c86e3b42cc 100644
+index 19c86e3b42cc..1098227272ed 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -6751,7 +6751,8 @@ static u32 stmmac_vid_crc32_le(__le16 vid_le)
- 	return crc;
- }
- 
--static int stmmac_vlan_update(struct stmmac_priv *priv, bool is_double)
-+static int stmmac_vlan_update(struct stmmac_priv *priv, bool is_double,
-+			      bool write_hw)
+@@ -6787,6 +6787,7 @@ static int stmmac_vlan_update(struct stmmac_priv *priv, bool is_double,
+ static int stmmac_vlan_rx_add_vid(struct net_device *ndev, __be16 proto, u16 vid)
  {
- 	u32 crc, hash = 0;
- 	u16 pmatch = 0;
-@@ -6773,7 +6774,11 @@ static int stmmac_vlan_update(struct stmmac_priv *priv, bool is_double)
- 		hash = 0;
- 	}
- 
--	return stmmac_update_vlan_hash(priv, priv->hw, hash, pmatch, is_double);
-+	if (write_hw)
-+		return stmmac_update_vlan_hash(priv, priv->hw, hash, pmatch,
-+					       is_double);
-+
-+	return 0;
- }
- 
- /* FIXME: This may need RXC to be running, but it may be called with BH
-@@ -6795,17 +6800,18 @@ static int stmmac_vlan_rx_add_vid(struct net_device *ndev, __be16 proto, u16 vid
+ 	struct stmmac_priv *priv = netdev_priv(ndev);
++	bool write_hw = netif_running(ndev);
+ 	unsigned int num_double_vlans;
+ 	bool is_double = false;
+ 	int ret;
+@@ -6800,7 +6801,7 @@ static int stmmac_vlan_rx_add_vid(struct net_device *ndev, __be16 proto, u16 vid
  
  	set_bit(vid, priv->active_vlans);
  	num_double_vlans = priv->num_double_vlans + is_double;
--	ret = stmmac_vlan_update(priv, num_double_vlans);
-+	ret = stmmac_vlan_update(priv, num_double_vlans, true);
+-	ret = stmmac_vlan_update(priv, num_double_vlans, true);
++	ret = stmmac_vlan_update(priv, num_double_vlans, write_hw);
  	if (ret) {
  		clear_bit(vid, priv->active_vlans);
  		goto err_pm_put;
- 	}
+@@ -6808,10 +6809,11 @@ static int stmmac_vlan_rx_add_vid(struct net_device *ndev, __be16 proto, u16 vid
  
  	if (priv->hw->num_vlan) {
--		ret = stmmac_add_hw_vlan_rx_fltr(priv, ndev, priv->hw, proto, vid);
-+		ret = stmmac_add_hw_vlan_rx_fltr(priv, ndev, priv->hw, proto,
-+						 vid, true);
+ 		ret = stmmac_add_hw_vlan_rx_fltr(priv, ndev, priv->hw, proto,
+-						 vid, true);
++						 vid, write_hw);
  		if (ret) {
  			clear_bit(vid, priv->active_vlans);
--			stmmac_vlan_update(priv, priv->num_double_vlans);
-+			stmmac_vlan_update(priv, priv->num_double_vlans, true);
+-			stmmac_vlan_update(priv, priv->num_double_vlans, true);
++			stmmac_vlan_update(priv, priv->num_double_vlans,
++					   write_hw);
  			goto err_pm_put;
  		}
  	}
-@@ -6837,17 +6843,18 @@ static int stmmac_vlan_rx_kill_vid(struct net_device *ndev, __be16 proto, u16 vi
+@@ -6830,6 +6832,7 @@ static int stmmac_vlan_rx_add_vid(struct net_device *ndev, __be16 proto, u16 vid
+ static int stmmac_vlan_rx_kill_vid(struct net_device *ndev, __be16 proto, u16 vid)
+ {
+ 	struct stmmac_priv *priv = netdev_priv(ndev);
++	bool write_hw = netif_running(ndev);
+ 	unsigned int num_double_vlans;
+ 	bool is_double = false;
+ 	int ret;
+@@ -6843,7 +6846,7 @@ static int stmmac_vlan_rx_kill_vid(struct net_device *ndev, __be16 proto, u16 vi
  
  	clear_bit(vid, priv->active_vlans);
  	num_double_vlans = priv->num_double_vlans - is_double;
--	ret = stmmac_vlan_update(priv, num_double_vlans);
-+	ret = stmmac_vlan_update(priv, num_double_vlans, true);
+-	ret = stmmac_vlan_update(priv, num_double_vlans, true);
++	ret = stmmac_vlan_update(priv, num_double_vlans, write_hw);
  	if (ret) {
  		set_bit(vid, priv->active_vlans);
  		goto del_vlan_error;
- 	}
+@@ -6851,10 +6854,11 @@ static int stmmac_vlan_rx_kill_vid(struct net_device *ndev, __be16 proto, u16 vi
  
  	if (priv->hw->num_vlan) {
--		ret = stmmac_del_hw_vlan_rx_fltr(priv, ndev, priv->hw, proto, vid);
-+		ret = stmmac_del_hw_vlan_rx_fltr(priv, ndev, priv->hw, proto,
-+						 vid, true);
+ 		ret = stmmac_del_hw_vlan_rx_fltr(priv, ndev, priv->hw, proto,
+-						 vid, true);
++						 vid, write_hw);
  		if (ret) {
  			set_bit(vid, priv->active_vlans);
--			stmmac_vlan_update(priv, priv->num_double_vlans);
-+			stmmac_vlan_update(priv, priv->num_double_vlans, true);
+-			stmmac_vlan_update(priv, priv->num_double_vlans, true);
++			stmmac_vlan_update(priv, priv->num_double_vlans,
++					   write_hw);
  			goto del_vlan_error;
  		}
  	}
-@@ -6870,7 +6877,7 @@ static int stmmac_vlan_restore(struct stmmac_priv *priv)
- 	if (priv->hw->num_vlan)
- 		stmmac_restore_hw_vlan_rx_fltr(priv, priv->dev, priv->hw);
- 
--	ret = stmmac_vlan_update(priv, priv->num_double_vlans);
-+	ret = stmmac_vlan_update(priv, priv->num_double_vlans, true);
- 	if (ret)
- 		netdev_err(priv->dev, "Failed to restore VLANs\n");
- 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.c
-index fcc34867405e..f81015179d04 100644
+index f81015179d04..261bc751ade2 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.c
-@@ -53,7 +53,8 @@ static int vlan_write_filter(struct net_device *dev,
- 
- static int vlan_add_hw_rx_fltr(struct net_device *dev,
- 			       struct mac_device_info *hw,
--			       __be16 proto, u16 vid)
-+			       __be16 proto, u16 vid,
-+			       bool write_hw)
+@@ -147,7 +147,6 @@ static int vlan_del_hw_rx_fltr(struct net_device *dev,
+ static void vlan_restore_hw_rx_fltr(struct net_device *dev,
+ 				    struct mac_device_info *hw)
  {
- 	int index = -1;
- 	u32 val = 0;
-@@ -76,7 +77,8 @@ static int vlan_add_hw_rx_fltr(struct net_device *dev,
- 		}
+-	u32 val;
+ 	int i;
  
- 		hw->vlan_filter[0] = vid;
--		vlan_write_single(dev, vid);
-+		if (write_hw)
-+			vlan_write_single(dev, vid);
- 
- 		return 0;
- 	}
-@@ -97,17 +99,21 @@ static int vlan_add_hw_rx_fltr(struct net_device *dev,
- 		return -EPERM;
+ 	/* Single Rx VLAN Filter */
+@@ -157,12 +156,8 @@ static void vlan_restore_hw_rx_fltr(struct net_device *dev,
  	}
  
--	ret = vlan_write_filter(dev, hw, index, val);
-+	if (write_hw) {
-+		ret = vlan_write_filter(dev, hw, index, val);
-+		if (ret)
-+			return ret;
-+	}
- 
--	if (!ret)
--		hw->vlan_filter[index] = val;
-+	hw->vlan_filter[index] = val;
- 
--	return ret;
-+	return 0;
+ 	/* Extended Rx VLAN Filter Enable */
+-	for (i = 0; i < hw->num_vlan; i++) {
+-		if (hw->vlan_filter[i] & VLAN_TAG_DATA_VEN) {
+-			val = hw->vlan_filter[i];
+-			vlan_write_filter(dev, hw, i, val);
+-		}
+-	}
++	for (i = 0; i < hw->num_vlan; i++)
++		vlan_write_filter(dev, hw, i, hw->vlan_filter[i]);
  }
  
- static int vlan_del_hw_rx_fltr(struct net_device *dev,
- 			       struct mac_device_info *hw,
--			       __be16 proto, u16 vid)
-+			       __be16 proto, u16 vid,
-+			       bool write_hw)
- {
- 	int i, ret = 0;
- 
-@@ -115,7 +121,8 @@ static int vlan_del_hw_rx_fltr(struct net_device *dev,
- 	if (hw->num_vlan == 1) {
- 		if ((hw->vlan_filter[0] & VLAN_TAG_VID) == vid) {
- 			hw->vlan_filter[0] = 0;
--			vlan_write_single(dev, 0);
-+			if (write_hw)
-+				vlan_write_single(dev, 0);
- 		}
- 		return 0;
- 	}
-@@ -124,12 +131,13 @@ static int vlan_del_hw_rx_fltr(struct net_device *dev,
- 	for (i = 0; i < hw->num_vlan; i++) {
- 		if ((hw->vlan_filter[i] & VLAN_TAG_DATA_VEN) &&
- 		    ((hw->vlan_filter[i] & VLAN_TAG_DATA_VID) == vid)) {
--			ret = vlan_write_filter(dev, hw, i, 0);
-+			if (write_hw) {
-+				ret = vlan_write_filter(dev, hw, i, 0);
-+				if (ret)
-+					return ret;
-+			}
- 
--			if (!ret)
--				hw->vlan_filter[i] = 0;
--			else
--				return ret;
-+			hw->vlan_filter[i] = 0;
- 		}
- 	}
- 
+ static void vlan_update_hash(struct mac_device_info *hw, u32 hash,
 -- 
 2.51.0
 
