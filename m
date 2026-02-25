@@ -1,175 +1,195 @@
-Return-Path: <netdev+bounces-260998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260999-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QPQyEVIMn2neYgQAu9opvQ
-	(envelope-from <netdev+bounces-260998-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:50:58 +0100
+	id OOmHLnINn2neYgQAu9opvQ
+	(envelope-from <netdev+bounces-260999-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:55:46 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD4EE198FDB
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:50:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 81C741990BD
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:55:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D20493015853
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:50:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0BBD531025BB
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:52:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39DA53B8BCA;
-	Wed, 25 Feb 2026 14:50:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 341543D4118;
+	Wed, 25 Feb 2026 14:52:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g8F/n5Ab"
+	dkim=pass (1024-bit key) header.d=smail.nju.edu.cn header.i=@smail.nju.edu.cn header.b="5cteETRY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCE0627A45C
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 14:50:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 349CF3B8D48
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 14:52:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772031032; cv=none; b=PJURIMloIPzLq7TxTwFkHL8ZCrWH2uoqkC4w8eeKV0eeWHLv4+d97jT2AsKCbXe134/kLn8yxoBvyT2RVTYNZpSvwUl9ntJ+bXVE51suWgaL4UwAW+CQ8xK4xT4KtIR75mQjmsYCLRdc/MttFPjp7y84PR+g59RYODJyZFrAL1E=
+	t=1772031138; cv=none; b=NSZ1mjAATKFa9PT7gGap57LQGwQ8k4013D/bAd1QlnsH9t+NdvxErmMsd4JZY5ibrLYYGadd5wwyrigjWMKAQ3aKAxu2C9fqPMAzHpzHgVJqnUVkp58ybVa4QHlq065Kwf23Q8xGj5a+OgCE9YGZCf2U8vqMb3M6ikFMavicq2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772031032; c=relaxed/simple;
-	bh=9cOn+icfMwJvWMpM83O2pGeAdt2CDV53l+nZGfUDC80=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tgQjy9DYcYTq/MdjtD6QMPXCZ/pST6X8TgGfoTpDyorObIZO092iKaOX8PUi/RkOnJB1+WRMgc8tqlsCzxYH9cAJFgBijfDeGuq6wSQDgUk6xuqMmuFVjPH0TeBmCk2GXxv+LjdThjNgaicbvxNTY+luKpKnqIq+l/kJC9I13AI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g8F/n5Ab; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-4398d9a12c6so893199f8f.2
-        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 06:50:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772031029; x=1772635829; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pReYA+QjnSS0jJEBr+XFghFAyZTC7b05jHSUp2QiLn8=;
-        b=g8F/n5AbNhLpICuWZlwvCbY1wV6oulDzTSyJe6lBB/4+qIXAuJvs5Fbmo09yrWnPV+
-         N/OmAVQPXRNaQs9LyqFv5e1eUryGUZd/M/OcyxALeT3L8vOlPgxGq96FafqBLBurj3QE
-         Fa/WII7BRd8KX93hqWky8vCLKVCbV7PHcnLNKAP9QIWoErwS4Rvq1FSCdTC2TrMmdro9
-         NS9YqZBfaETZ5MWoxJYwpimUqX1n/yG6+ts/YIYB3P1wEjTNlyeC6SqMXS3I9+B9Mb7a
-         E/dPjHgRQxKvhtRYJ7dOTq7+gP2pQVSn3Z9KUjsfM/ci1F88AWVd98+ACjGCKc6MsR3N
-         NY5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772031029; x=1772635829;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=pReYA+QjnSS0jJEBr+XFghFAyZTC7b05jHSUp2QiLn8=;
-        b=oC2t9gzFtInlqWyfc3G12Qgx6Ualfdy5wCVRQtQezSKjzHfCzZAYqjnp8VXzQv28Kl
-         vCAZqjr0aH8UUbexpByF/947bhRLzBIP0Op4exOFsY5YGy71qEGBSgdcCJHY4qTPqwgy
-         yyq80xcHavbBr9tLYV/vxU+u9If708k6p/YSpEiOZAC8QN2vNV7/uQXWmXiq+Nx9Nohv
-         S8SgKjKKwfMFBt+kniVuFjwgyBJrIlKeqpURmlJ2+H4Xe6oEqSOBbR1WtiDbRHS3RQYg
-         Iv3djvyxECYfcEVcxxmUDwLntmpwe/7fN+194RUmePV6kCsHIR8EZEnveoNdeMn60fOf
-         eN+A==
-X-Gm-Message-State: AOJu0YxpTEaXWl3LpPUsmLuHwJmDSTSJo7WpszVM10B05tGY8JVcbp0p
-	cU+YZHCTw/ABuVv0QxNdxFByUWwLnQeQoUXWFBWqHtHBSWb+6rpqDnVG
-X-Gm-Gg: ATEYQzzD0DhzueTQHQMaXXbsTPDMbK+8q758WXFb6ToOHR57ax64+bgF0w9t5P5V2J7
-	VxSGZcH0S4vCXo/bWOjSXNFUaLh/cIITLvVXCzuVZ7NQnNUm/5p1Oda49SYuIgx2Q/tFcwbdmsw
-	q1FkmAgGEq0jbdFSFoM00YDkjCP/qCKqEwqljMCP87oa4V92rIQUknAJroBMdI30r7tXrCgsgCz
-	GfXD/x+d0PyP2sleqFUTDUT1lNkmWJEo3HpcSddYLQxN2BAsNnuFwBcbZ4Yvswj/h/0rZKNHltC
-	pppV3xf+aSxRtuZMmYgfVIwrJPicDsqeoFVrmlogT3yVRvhr/yoIWmPVjreINx80ZHZAeQKc395
-	4R0a7b6MAFWO5ML+ODs6AE6eNhz6AKDCw59HtM8gmN3GmtQ0YCIXShviaFfOlMP02qFYNW40Iav
-	cOkZ2jhlplG4dsgTHmVDvxKX7Z69tIA9qi17NXnNkKkTi8dQEeJTSGEQ3bfRNuQS3LrsARTY3xL
-	V4=
-X-Received: by 2002:a05:6000:3105:b0:439:94ac:9d9b with SMTP id ffacd0b85a97d-43994aca6c4mr945744f8f.55.1772031028962;
-        Wed, 25 Feb 2026 06:50:28 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43970c00d95sm32981718f8f.13.2026.02.25.06.50.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Feb 2026 06:50:28 -0800 (PST)
-Date: Wed, 25 Feb 2026 14:50:27 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Srujana Challa <schalla@marvell.com>
-Cc: <netdev@vger.kernel.org>, <virtualization@lists.linux.dev>,
- <pabeni@redhat.com>, <mst@redhat.com>, <jasowang@redhat.com>,
- <xuanzhuo@linux.alibaba.com>, <eperezma@redhat.com>, <davem@davemloft.net>,
- <edumazet@google.com>, <kuba@kernel.org>, <ndabilpuram@marvell.com>,
- <kshankar@marvell.com>
-Subject: Re: [PATCH net-next,2/2] virtio_net: replace RSS key size max check
- with BUILD_BUG_ON
-Message-ID: <20260225145027.29d666ac@pumpkin>
-In-Reply-To: <20260224065850.962826-2-schalla@marvell.com>
-References: <20260224065850.962826-1-schalla@marvell.com>
-	<20260224065850.962826-2-schalla@marvell.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1772031138; c=relaxed/simple;
+	bh=opwUYNH38scw+UmNhElFi9TNwz9MwggV9L7fvYqLQrM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hT/6+jTcCCshuQIJISTCBlUadgPJmgNecc//0uF1p8Nt/8gsTM3+y2RHMH3p68eGXy6C5UanPQO3t+NTlYlLw2cv3c80nyDyL4OXEh7hnUWIHuYDa7v9eeVkEQaadgrbRAhyI3Its5eio3D5LVwuIxfWFKmuQAyKQRDxSSGCns0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=smail.nju.edu.cn; spf=pass smtp.mailfrom=smail.nju.edu.cn; dkim=pass (1024-bit key) header.d=smail.nju.edu.cn header.i=@smail.nju.edu.cn header.b=5cteETRY; arc=none smtp.client-ip=15.184.224.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=smail.nju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=smail.nju.edu.cn
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=smail.nju.edu.cn;
+	s=iohv2404; t=1772031125;
+	bh=EaLjfNINaEIan7dIiuFrul+vjYsQXQhbKE6yTcVjiKY=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version;
+	b=5cteETRYoZ8LW7MRowGrc2v8Cr0TLuyyinA+gBixzAaoZRVDVdt9OxTW4qecVQVoV
+	 zGQPPsOgRj/aaVA4jSoVPLW0YXXQYyLiXYztXuxxDAmp+cTRymt2+D9ItpU1hbcLy8
+	 Yrztvna1rUh4leURQnYacxGtE9UcJpl+llQLedT8=
+X-QQ-mid: zesmtpgz3t1772031124t812d4778
+X-QQ-Originating-IP: 9cUJV9iOSMYlGSDt0yiEffx30v+BwPEEEuERR4z3tzc=
+Received: from localhost.localdomain ( [116.172.93.199])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 25 Feb 2026 22:52:02 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 9594701865739000727
+EX-QQ-RecipientCnt: 12
+From: Kexin Sun <kexinsun@smail.nju.edu.cn>
+To: davem@davemloft.net
+Cc: edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	julia.lawall@inria.fr,
+	xutong.ma@inria.fr,
+	yunbolyu@smu.edu.sg,
+	ratnadiraw@smu.edu.sg,
+	Kexin Sun <kexinsun@smail.nju.edu.cn>
+Subject: [PATCH net-next v2] net/hsr: update outdated comments
+Date: Wed, 25 Feb 2026 22:51:59 +0800
+Message-Id: <20260225145159.2953-1-kexinsun@smail.nju.edu.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpgz:smail.nju.edu.cn:qybglogicsvrgz:qybglogicsvrgz5b-0
+X-QQ-XMAILINFO: NOdx4eXqnHG3aqzp+Sn5leOBj1VlvLaX1YUgB68s075OGzEdLwWSyL7U
+	/KbVfTk87nA2twhrnIjfqJk2DNITR75hbTLEpF4Kp62QGdQfYan/U6Fw0K9U5pbUmE9Gv2D
+	LNmPNUnPv9/ujbJYxEvzewuStBj/BONb2MXbUEvxyMuO+F1V2KGYHGSkgWt4vMDksIL3/L9
+	sImSGylMBxEVSN+NGPqbux3HICFxufaU5AetxvDE1Dzf5yirXVoAgDE2OCApdcHLRswnMOV
+	/efvqaT6Of6uujTwthWW1LIBToiIGJxeE1YtknQ6KIv1jpqiwu80bz+EGrFkbqe5maSxiL9
+	AelCzTSe3AjgQ+wtRBYOeoyHEPZyKfzWCmQWFAl5PBAN+j/QGVc/IaA0g+q6igqGVzRacjw
+	EVi/swI3d3yrc1WOjEobR7m6md65s0akmUYotNEpqhmc2+YpKw1NpWXDQLDwAMDdYHGkJE0
+	IRZp6uvbnCyfrtEQ6de9gDbt/0XTvKNRJZ8Z/LEvayuIvoV77pcT8XMMlRnrWXnCPPi0tFu
+	osNi9TmB6FSLXpscuC7UPHkya5p4eO6Ok8oCLtiOyTXJw0NF41kFRSD74NlPatCugUR8X7z
+	KHeOYQlaQMfLc2UvTlWB1GaaT3Qyvoe6VcfeJW5htfCx2zXiZ8nhbpLWaTg/7/S15Y/Jrc6
+	D5JUjSc+zpk35YX+t90yitGFPhahplwQin5NwEpT5Y+4OytRBDDtio0+cFBZMqHy1fccBxh
+	Seqw2YwQfIR7+oh/GICaSGB2eZcSf+mv0OOM+1jeviiuMbyFoPn9hgFFdRYx3G7RBDmvLPt
+	QTomT4bskCVjBOMFG0NrjpQ4asHhFsOLXwKjk90VqjDZbXtyu52eubHZaptudAujaoySbX5
+	ML7/1LZXFbKPTLp/30iMKJMKisNWngHW/pjE2WqDuQPnFhyzPFLCSXW7J0NDaH6CbLHFbl5
+	Pm85i2qKCaMahST1NsDYpRBNyrO5vB8TA1D8OajyrD2OVOPrdDhJaIg0nZI6aDQ4KF63N3C
+	xji7rWVwbLKLFJ6MMIyG8O3dAiYEM+mKKzx481okHPC5xm6AMhTTsWtjhmUwNl9MNiApdd/
+	fq0riMbq3YjXhr8UmbomwF8WAXwCfvrF4SqyCYj6Wpw
+X-QQ-XMRINFO: NyFYKkN4Ny6FuXrnB5Ye7Aabb3ujjtK+gg==
+X-QQ-RECHKSPAM: 0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[smail.nju.edu.cn:s=iohv2404];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-260998-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-260999-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kexinsun@smail.nju.edu.cn,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[smail.nju.edu.cn:+];
+	DMARC_DNSFAIL(0.00)[nju.edu.cn : query timed out];
 	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BD4EE198FDB
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 81C741990BD
 X-Rspamd-Action: no action
 
-On Tue, 24 Feb 2026 12:28:50 +0530
-Srujana Challa <schalla@marvell.com> wrote:
+The function hsr_rcv() was renamed hsr_handle_frame() and moved to
+net/hsr/hsr_slave.c by commit 81ba6afd6e64 ("net/hsr: Switch from
+dev_add_pack() to netdev_rx_handler_register()").
 
-> Since NETDEV_RSS_KEY_LEN was increased to 256 in net-next, use
-> BUILD_BUG_ON to enforce the limit at compile time and remove the
-> redundant runtime max check.
-> 
-> Signed-off-by: Srujana Challa <schalla@marvell.com>
-> ---
->  drivers/net/virtio_net.c | 8 +-------
->  1 file changed, 1 insertion(+), 7 deletions(-)
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index eeefe8abc122..768ad5523dfa 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -6639,13 +6639,7 @@ static int virtnet_validate(struct virtio_device *vdev)
->  			__virtio_clear_bit(vdev, VIRTIO_NET_F_RSS);
->  			__virtio_clear_bit(vdev, VIRTIO_NET_F_HASH_REPORT);
->  		}
-> -		if (key_sz > NETDEV_RSS_KEY_LEN) {
-> -			dev_warn(&vdev->dev,
-> -				 "rss_max_key_size=%u exceeds driver limit %u, disabling RSS\n",
-> -				 key_sz, NETDEV_RSS_KEY_LEN);
-> -			__virtio_clear_bit(vdev, VIRTIO_NET_F_RSS);
-> -			__virtio_clear_bit(vdev, VIRTIO_NET_F_HASH_REPORT);
-> -		}
-> +		BUILD_BUG_ON(type_max(key_sz) >= NETDEV_RSS_KEY_LEN);
+Update all remaining references in the comments accordingly.
 
-type_max is horrid.
-I did read the later discussion (but it has fallen out of my brain)
-but isn't that check broken and/or backwards anyway?
+Signed-off-by: Kexin Sun <kexinsun@smail.nju.edu.cn>
+---
+Hi Simon,
 
-I'd also question why you are using u8 for a local (I didn't find this
-version of the file), it will generate worse code that [unsigned] int.
+Regarding your question about how these were found: we are building a 
+research prototype for identifying and fixing dangling method references 
+in comments. Generally, we use Coccinelle to check for dangling references 
+and DeepSeek-V3.2 to generate the fixes. 
 
-	David
+Since it is still a work-in-progress, we haven't settled on a proper tool 
+name yet. Therefore, I chose to omit the `Assisted-by:` tag in this v2 
+patch for now. Do you have any suggestions on what would be appropriate 
+to use in this situation?
 
->  	}
->  
->  	return 0;
+ net/hsr/hsr_device.c   | 2 +-
+ net/hsr/hsr_framereg.c | 4 ++--
+ net/hsr/hsr_main.c     | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
+index d1bfc49b5f01..5c3eca2235ce 100644
+--- a/net/hsr/hsr_device.c
++++ b/net/hsr/hsr_device.c
+@@ -742,7 +742,7 @@ int hsr_dev_finalize(struct net_device *hsr_dev, struct net_device *slave[2],
+ 		hsr->proto_ops = &hsr_ops;
+ 	}
+ 
+-	/* Make sure we recognize frames from ourselves in hsr_rcv() */
++	/* Make sure we recognize frames from ourselves in hsr_handle_frame() */
+ 	res = hsr_create_self_node(hsr, hsr_dev->dev_addr,
+ 				   slave[1]->dev_addr);
+ 	if (res < 0)
+diff --git a/net/hsr/hsr_framereg.c b/net/hsr/hsr_framereg.c
+index 50996f4de7f9..577fb588bc2f 100644
+--- a/net/hsr/hsr_framereg.c
++++ b/net/hsr/hsr_framereg.c
+@@ -71,8 +71,8 @@ bool hsr_is_node_in_db(struct list_head *node_db,
+ 	return !!find_node_by_addr_A(node_db, addr);
+ }
+ 
+-/* Helper for device init; the self_node is used in hsr_rcv() to recognize
+- * frames from self that's been looped over the HSR ring.
++/* Helper for device init; the self_node is used in hsr_handle_frame() to
++ * recognize frames from self that's been looped over the HSR ring.
+  */
+ int hsr_create_self_node(struct hsr_priv *hsr,
+ 			 const unsigned char addr_a[ETH_ALEN],
+diff --git a/net/hsr/hsr_main.c b/net/hsr/hsr_main.c
+index bc94b07101d8..33951d9bd3c5 100644
+--- a/net/hsr/hsr_main.c
++++ b/net/hsr/hsr_main.c
+@@ -89,7 +89,7 @@ static int hsr_netdev_notify(struct notifier_block *nb, unsigned long event,
+ 			}
+ 		}
+ 
+-		/* Make sure we recognize frames from ourselves in hsr_rcv() */
++		/* Make sure we recognize frames from ourselves in hsr_handle_frame() */
+ 		port = hsr_port_get_hsr(hsr, HSR_PT_SLAVE_B);
+ 		res = hsr_create_self_node(hsr,
+ 					   master->dev->dev_addr,
+-- 
+2.25.1
 
 
