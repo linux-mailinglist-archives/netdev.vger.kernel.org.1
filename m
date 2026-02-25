@@ -1,153 +1,147 @@
-Return-Path: <netdev+bounces-260839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260840-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AGSDGMvBnmnsXAQAu9opvQ
-	(envelope-from <netdev+bounces-260839-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:32:59 +0100
+	id KFkCE2fCnmnsXAQAu9opvQ
+	(envelope-from <netdev+bounces-260840-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:35:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3F911950C1
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:32:58 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6A93195155
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:35:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A28B430F7274
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 09:25:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 21BEB3114F4A
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 09:26:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCD0338E5FA;
-	Wed, 25 Feb 2026 09:25:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DD1F38E5ED;
+	Wed, 25 Feb 2026 09:25:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UBGkd68i"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="hlifViC1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3DE638E5DB
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 09:25:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB7FC38E5DD;
+	Wed, 25 Feb 2026 09:25:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772011526; cv=none; b=ols3l8lvfvrmMEscOA0I59FCXvh384sxYp6zHKyAkDil4BelTmw+iy1SaC5+U+w4DYAw3+xbTrTxSX8QQ8TLdsZuFp8D/mSBsfNBNNTkzMdfudMtBMerMmi0brG/OXw3Esr6Tb75ri3Y+NVBaSdIW21W8dSV9Cj31TMrk8B8U9o=
+	t=1772011554; cv=none; b=K+gyrAspFof1JcqrATcJTQhHCC5G1Omugq9+IF+irLi9/izROi6f8+WwL8e11CCH9grZtRoILByjtQWd1UYopgLqGeyDFnZ+67CG0S9Qd1CFJpA7siKq93D9TEPz7K6EIW/EgYExP/Xu0GMPq0pc/abCbtm+vl7ALf/t+tX/19I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772011526; c=relaxed/simple;
-	bh=SNY7wKlCxt32Um0FCt8oDeUEABOZBms0H/s6DRK+Exg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dKBoE4bb65KJvln1fbjYeFNPHqjDz38NdlnuM72XNlbd7T3vEggBWBPl9F91JXIyextdYlQFwNh+XdOAPrJwixgAN7AH2Vni+mFKqD5V+AKj2QAMknEj6YbxctOCv/88A793NyJ421b+VQVj9KBnjS9CNmTXdtqR/5bJuJ1qAIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UBGkd68i; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-48378136adcso38565095e9.1
-        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 01:25:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772011523; x=1772616323; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NFxGd8tt1psILcxBsQnx7nL9xt0mE3Hus9OpWjd1eMY=;
-        b=UBGkd68iZ7u3IO5x+WMdFi6xqr7x2Bl0SyLkZT/js7Tg2uWkIrDAusjqblk/wgL1CW
-         u7P0SU7jtROsHATMeV3m9QYY3ZW8qrw8UXa+GbRUs/YIlFxA08dqdq/7Jkp7YV3dBp5D
-         bjg9OXAStKavQSBbX75ECY/TifBLKdsQMjUcbX+GnVI24TthmQLlsc+xmsyJuBVxIiq1
-         jOhuDiY7zh0RqdNnaAKDHpnCuDUJc9WMfK1pTgK/5nSNW+ksHJgKLTcsxpLT/Llu0nyi
-         i5DBQf5S2IpBYDJIU4Av9SEeQtp7Yvepc0mOBdHwfUWXvUb3BW5UFcRSpQGB53FfAdl/
-         Gnvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772011523; x=1772616323;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NFxGd8tt1psILcxBsQnx7nL9xt0mE3Hus9OpWjd1eMY=;
-        b=hGd3x7KztlR9vB8ts76MJRKGD4XAXB3qHjoKm/Q9lYapC9/QnwB6Ca956ZoPFyyf2O
-         2nHAymRRE5se2SN5Z7Wy2flC6tikpU4ptQzfulO8XI+0zTP5GX9qkKGFt43stghlDfIL
-         8IXdCozKyi/oSvSpGGMAEU5wqAA6PkeVuejdzv501gybfN4YE06dD/MCxkaWc730OY/J
-         E8L3GFD+4z1JsfX5Al3RPgx0xYkDk2nY5Q/LDuDSGUDXSQzAPPJG4C2FFN7ikbAU6o2e
-         CIF/+pufCH+lmTU3NBUQ0/zjf965zEUjj9FCsDxhiTso6JVCX/73HD3M42BqIElXjdqX
-         djVA==
-X-Forwarded-Encrypted: i=1; AJvYcCUwJBXwgcQBv9vzsAUXDe8lHUmIl8rGf4Ofth2toHkhCRkPuOUN1Ogcp/CzvBickzFDC9Ph9tc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8U5pesUusD/+86vaCH6uWB27tvPuRZRdcKlyi+r8+8zNz40mW
-	v++2yL4dTmZez9kEt38V1lK33zq6s+9Uzu/nguZL36uyY/UawhrtPHfWCuz0GQ==
-X-Gm-Gg: ATEYQzzi/UUi70qxv/KTR0q6zLbN7WkgTGo/JKeDzhupFzVcJbElGTWU/kvSmz0DeaH
-	zgRyz4i5PnM6nMFV2V0b2QqXqqWxUpfVr09fd4g7kRvWr0vqxXMc0TY4z5Lc0atYrDgN1lLfv1U
-	pQ1y9sWj/o5eT0g2Ss1jQm+UeqESZC3F+q4ceRAzXHF6dNEIddKCywy2PGE2CIEk7URu0ZQg4ET
-	Dee5xIQtZcFMxnY9cn1tbUzlZWeqTEzMRZ08EnYZBiV8VG6Ve60Uu6DiGTTcBrzGazVuQWIBXpr
-	DPdT9ykzYIsLic2/Qabqlxf/oO4WuuqTLF3nNGBZU6dd78D4m1opXJK464YGIooi/W9qfnAJGIG
-	69n4SZd90J5StA4puds1YLIfBaWEYHGdTkuQt0Wnw/FdevGn/jo0EUdyWrsJ9vZxgjLDD8GiYO+
-	ESKMrE/koo8lFq3hV5Hol+d4G+2l2P/wOD4hFc1F3nocH7Z7eTcue7V0xktxrBbM8YM0LcZertc
-	RlUG8De9wmShYyg619CwYcvcJThgo4ByfzoarLZT7+NVaqOGeU74GfDznOLsrgDMgC6kHLckb4x
-	Xw==
-X-Received: by 2002:a05:600c:4f90:b0:477:55ce:f3c2 with SMTP id 5b1f17b1804b1-483bef2a427mr34570355e9.14.1772011523170;
-        Wed, 25 Feb 2026 01:25:23 -0800 (PST)
-Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bd726a35sm50268215e9.9.2026.02.25.01.25.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Feb 2026 01:25:22 -0800 (PST)
-Message-ID: <bad6cd67-88c4-45ee-bb51-e24331263dc2@gmail.com>
-Date: Wed, 25 Feb 2026 09:25:20 +0000
+	s=arc-20240116; t=1772011554; c=relaxed/simple;
+	bh=rgKp5YVqKagpJ90dBd1U0u98y/nDFSmcQ/5cAIgBGO4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QQ3V9mcwwiVipqlQOUezLRS7m7Gh8weKS7b+wm3Opmn+HyE5xloZOqRwi/7zzuDt5y0+AoVNp1sgh4dLwcDN1E6Xo8IBuHspnQN7J1DcWlesVncnwSNubrOiXFWzBjZRqDhfA/WdJOVB8PG5NVz0is26e02CYFJVEppyACVsOyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=hlifViC1; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=id9ft50ikpeYq2+DbJZJyBUEH3jA2m0GVsep0KOPZy4=; b=hlifViC1PGDWeKiILXqnlayMso
+	ML3lAMkdhTOBBO9Q7f/62nWqghLstcjiKEe2DJci0UOgpAUqXOzzx0RPIyepl68I/nr9mEg5/tqr4
+	0ge+0080csH7Cf9webe7Nj7vj+3VM5itj5uwP1rCjk+T1oPTBZFm0w+hqelpvhsAsRt6RUcX1VTmJ
+	L6QIiwR4Rv3WtzI8idcTPYnpENciT49idMr69PlYCwIB5AQmdDticanOvDeqXfx5hCRoIqDXfSKD0
+	MlQJyTX5mezGgVjhCqHVPz9aYRQpTMPyQsJPsqWafrYW6LTySQSiKTchGrefDZSiHEvJqJQiOiVbG
+	gzyvf4NQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46704)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vvB9B-000000006Lo-0h2P;
+	Wed, 25 Feb 2026 09:25:33 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vvB96-000000000pi-2Vrn;
+	Wed, 25 Feb 2026 09:25:28 +0000
+Date: Wed, 25 Feb 2026 09:25:28 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: jan.petrous@oss.nxp.com
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Chester Lin <chester62515@gmail.com>,
+	Matthias Brugger <mbrugger@suse.com>,
+	Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>,
+	NXP S32 Linux Team <s32@nxp.com>, Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Frank Li <Frank.Li@nxp.com>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev, devicetree@vger.kernel.org
+Subject: Re: [PATCH v6 3/5] dt-bindings: net: nxp,s32-dwmac: Declare
+ per-queue interrupts
+Message-ID: <aZ7ACLx1yUMWPAsZ@shell.armlinux.org.uk>
+References: <20260225-dwmac_multi_irq-v6-0-245bf1d7110c@oss.nxp.com>
+ <20260225-dwmac_multi_irq-v6-3-245bf1d7110c@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RESEND PATCH net-next] netmem: remove the pp fields from net_iov
-To: Byungchul Park <byungchul@sk.com>, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- kernel_team@skhynix.com, harry.yoo@oracle.com, hawk@kernel.org,
- andrew+netdev@lunn.ch, david@kernel.org, lorenzo.stoakes@oracle.com,
- Liam.Howlett@oracle.com, vbabka@suse.cz, ziy@nvidia.com,
- willy@infradead.org, toke@redhat.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- axboe@kernel.dk, ncardwell@google.com, kuniyu@google.com,
- dsahern@kernel.org, almasrymina@google.com, sdf@fomichev.me, dw@davidwei.uk,
- ap420073@gmail.com, dtatulea@nvidia.com, shivajikant@google.com,
- io-uring@vger.kernel.org
-References: <20260224061424.11219-1-byungchul@sk.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20260224061424.11219-1-byungchul@sk.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260225-dwmac_multi_irq-v6-3-245bf1d7110c@oss.nxp.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260839-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kvack.org,skhynix.com,oracle.com,kernel.org,lunn.ch,suse.cz,nvidia.com,infradead.org,redhat.com,davemloft.net,google.com,kernel.dk,fomichev.me,davidwei.uk,gmail.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[31];
+	TAGGED_FROM(0.00)[bounces-260840-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,suse.com,oss.nxp.com,nxp.com,pengutronix.de,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.789];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: F3F911950C1
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,shell.armlinux.org.uk:mid,suse.com:email,armlinux.org.uk:url,nxp.com:email]
+X-Rspamd-Queue-Id: B6A93195155
 X-Rspamd-Action: no action
 
-On 2/24/26 06:14, Byungchul Park wrote:
-> Now that the pp fields in net_iov have no users, remove them from
-> net_iov and clean up.
+On Wed, Feb 25, 2026 at 10:20:35AM +0100, Jan Petrous via B4 Relay wrote:
+> From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+> 
+> The DWMAC IP on NXP S32G/R SoCs has connected queue-based IRQ lines,
+> set them to allow using Multi-IRQ mode.
+> 
+> Reviewed-by: Matthias Brugger <mbrugger@suse.com>
+> Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+> Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+> ---
+>  .../devicetree/bindings/net/nxp,s32-dwmac.yaml     | 44 +++++++++++++++++++---
 
-Looks good, it's great to get rid of all this aliasing.
-
-Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
+As you have added support for these IRQs into the generic code,
+shouldn't the generic dwmac binding doc reflect that this is now
+supported?
 
 -- 
-Pavel Begunkov
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
