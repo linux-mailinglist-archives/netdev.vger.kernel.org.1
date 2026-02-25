@@ -1,188 +1,154 @@
-Return-Path: <netdev+bounces-260958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260956-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2E2uDbj8nmm+YAQAu9opvQ
-	(envelope-from <netdev+bounces-260958-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:44:24 +0100
+	id mItmDAf9nmm+YAQAu9opvQ
+	(envelope-from <netdev+bounces-260956-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:45:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BB4519852F
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:44:23 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B65D19855F
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:45:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DDF43302CC21
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 13:42:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5D5C5316F477
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 13:39:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4EB83B95F4;
-	Wed, 25 Feb 2026 13:42:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00F463D300A;
+	Wed, 25 Feb 2026 13:39:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="PIL01JTb";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="nZGbCDTi";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="fy9FwyIk";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Y7CFRDk1"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RZGrMJit"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E92E33B96F
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 13:42:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 085333D2FF4;
+	Wed, 25 Feb 2026 13:39:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772026933; cv=none; b=U/dmq7ijFCY7MQ/q61+RHwDBpgTMeH3h5cxEVjEpXm8qwRTuaf1qJDLQHcJqp29ZznVwRASVPgP1ejdS/XFIHrVs6VwlRHh/Kw17nMAQPK7uzmRnP0RQ4G+gJRCvo+w8SxlR0vhiMN1qUejQBjdFJF+y3godOdVTJk5AbHy4/ms=
+	t=1772026762; cv=none; b=mZodAChqiic5A5860/Eyx9cF1Vr4TN2l1r8l24XTyh8IG7zCNwnw8ctj4eael+zw8sNS7ARwfER3j4HmtErA/74ma7rxNI9O/wAPKzSmgK3XJu7CscqAevXQV1JqHomYfT+1bPWH+7YeNruW6So0chDZyi2dASSO+M7LXBjrsmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772026933; c=relaxed/simple;
-	bh=yxVFLdm33KsMlSlc4xGhy4Xh/lIXe6ydeFC0jS8Q6kQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eDjeGGoUQ3QO2bASxbxowR0avxT++GenHBcfgwmgk68Gw+l7nkWA1aazTX3K+rYTJatMwpLPENMhb1guILpgfhzpWxp6ztJqmlJZlz0u4EZECF4fDLMjEwrCQrVTD38jwQfSo4PTdI7SSZNcAsHXy9xMavSfBvbnk5rbF72Z7MU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=PIL01JTb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=nZGbCDTi; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=fy9FwyIk; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Y7CFRDk1; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 64D215C66C;
-	Wed, 25 Feb 2026 13:42:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772026929; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=uWvR7N40cFYsmM/FHVHwZttrkmyobfSR9FBNswNUI7M=;
-	b=PIL01JTbQaVCYz1Nvgm9iLleep96DQWVHgo2pyiB13eUlDW/uLlX04hynCKEKJ4I1uceau
-	ljsg5nTZ3/jm8kJOK76BXWd1lo8BQFUx6XnKpcOB7iypRTEWQjcMfFstmJcWv9OUlf1THP
-	SAEEq6BmdUokYb7JDAQkmLHABQ5Dhyw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772026929;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=uWvR7N40cFYsmM/FHVHwZttrkmyobfSR9FBNswNUI7M=;
-	b=nZGbCDTiOCZP3e7h1wGSL5n7VPeFam5MKT7gt2LT1+dN/Lo9BIK29PcpZMrHYncln1422f
-	0C4bbNHy+0Npq6BQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772026928; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=uWvR7N40cFYsmM/FHVHwZttrkmyobfSR9FBNswNUI7M=;
-	b=fy9FwyIkg1hwv9ycueKQhQhBUQ3rCR5bmeOfwr1U9dJm80FgEV0Yb5zMgwpPIch34ibrGv
-	wK7nd7XPSIA9bBW3+psu5WUEDp6Vx0WDmEiV2QHENkI0nZlyHlENYxXHEeXcQx92hEl5rj
-	31QUPQHGUACbGL0/6KKjTLYKRFg3hfc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772026928;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=uWvR7N40cFYsmM/FHVHwZttrkmyobfSR9FBNswNUI7M=;
-	b=Y7CFRDk16DY9Cd9G4/shl+DmoVrgVnToFDH9yfgyJJX7CjuJjlK9yUGGxpepbsnNHY0dM9
-	cWntorKS1OXJa7Ag==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C3F2C3EA65;
-	Wed, 25 Feb 2026 13:42:07 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id +zSbLC/8nmnwJwAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Wed, 25 Feb 2026 13:42:07 +0000
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-To: netdev@vger.kernel.org
-Cc: horms@kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	dsahern@kernel.org,
-	davem@davemloft.net,
-	Fernando Fernandez Mancera <fmancera@suse.de>
-Subject: [PATCH net-next v2] ipv6: discard fragment queue earlier if there is malformed datagram
-Date: Wed, 25 Feb 2026 14:37:58 +0100
-Message-ID: <20260225133758.4553-1-fmancera@suse.de>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1772026762; c=relaxed/simple;
+	bh=w9TTacDsMn+nFqKTYgVyxw9ETvEiQ06XOrWFPbUwPj0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CzlGJex+JfFFK4Xe50dwrEbZBlXnYwC3BMRB0zBRJTpF0Vx8RwvHwdUORCCcqs+jDa2G7vsL4e4cQTRsYeuTFJ4toGaIc9lb4m3qKIZXcoJDBc9BG88dHzri1/WGALHeGQLm4gjA6ItUq5+4IZz7Wf9SeFQS+/6Tci5ne70PfCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RZGrMJit; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=+JGgXRK/xFUteYEv1aGaPLDzheuYNlzBktbMXhesNc0=; b=RZGrMJitK8U2SqULVjSzjrRC75
+	nX0viijBp14vOq6k40bDuV5nhyzWQCuzNb495zVZg/rJczzBpPDltMLF9Za8sTjgy/bv3U79830oW
+	W8ycUiW9b8KJ46XilEDeH2F2D5mHAvcAZsbCLYYNv/8Zmdep2/F3cXfOwZy3oEXm+aBo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vvF6b-008kau-Ap; Wed, 25 Feb 2026 14:39:09 +0100
+Date: Wed, 25 Feb 2026 14:39:09 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jens Emil Schulz Ostergaard <jensemil.schulzostergaard@microchip.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	o.rempel@pengutronix.de,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: phy: micrel: Add support for lan9645x
+ internal phy
+Message-ID: <42918203-276e-42a9-a9da-34d43a5e6a98@lunn.ch>
+References: <20260130-phy_micrel_add_support_for_lan9645x_internal_phy-v2-1-202ac31cf9c4@microchip.com>
+ <92ba22ee64b2670448295b44d663d8ae7e8fe9c4.camel@microchip.com>
+ <641d92a2-93fb-4ffe-89d8-77bf10edecf8@gmail.com>
+ <1b14f42944d21fff1cb45132fe6dc9e5c18289a1.camel@microchip.com>
+ <00f03a3f-fc12-4875-b4b5-7470e7f0452d@gmail.com>
+ <5876361bab237e2e1c73395d7e65c93279865f63.camel@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Score: -2.80
-X-Spam-Level: 
-X-Spam-Flag: NO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5876361bab237e2e1c73395d7e65c93279865f63.camel@microchip.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[suse.de:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260958-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-260956-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,pengutronix.de,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,suse.de:email]
-X-Rspamd-Queue-Id: 6BB4519852F
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9B65D19855F
 X-Rspamd-Action: no action
 
-Currently the kernel IPv6 implementation is not dicarding the fragment
-queue upon receiving a IPv6 fragment that is not 8 bytes aligned. It
-relies on queue expiration to free the queue.
+> > > > > > +static int lan9645x_suspend(struct phy_device *phydev)
+> > > > > > +{
+> > > > > > +    int ret, val;
+> > > > > > +
+> > > > > > +    /* Force link down before software power down (SPD), by doing software
+> > > > > > +     * soft reset. This resets the PHY, but keeps all register configuration
+> > > > > > +     * intact. The bit self clears.
+> > > > > > +     *
+> > > > > > +     * This is needed as a workaround for an issue where performing SPD on a
+> > > > > > +     * port can bring adjacent ports down, when there is traffic flowing
+> > > > > > +     * through the ports.
+> > > > > > +     */
+> > > > > > +    ret = phy_modify(phydev, LAN9645X_CONTROL_REGISTER,
+> > > > > > +                     LAN9645X_CONTROL_REGISTER_SOFT_RESET, 1);
+> > > > 
+> > > > Any specific reason why you use a vendor-specific register here instead of BMCR
+> > > > via genphy_soft_reset()?
+> > > > 
+> > > > 
+> > > 
+> > > Sorry I missed your mail. genphy_soft_reset() will do a software (hard) reset via
+> > > bit 15 (BMCR_RESET). In particular it will reset the registers. We want to do
+> > > a software soft reset, which resets the PHY without changing register values.
+> > > 
+> > No, BMCR_RESET usually doesn't reset configuration registers. That's why the
+> > function is called genphy_*soft*_reset. In case your PHY behaves different,
+> > which configuration registers does it change?
+> > 
+> 
+> Ok I tought that was the usual behavior. The register spec says BMCR_RESET will reset
+> the PHY and all its registers to their default state.
 
-While RFC 8200 section 4.5 does not explicitly mention that the rest of
-fragments must be discarded, it does not make sense to keep them. The
-parameter problem message is sent regardless that. In addition, if the
-sender is able to re-compose the datagram so it is 8 bytes aligned it
-would qualify as a new whole datagram not fitting into the same fragment
-queue.
+Most PHYs do a soft reset when this bit is set, but some do a much
+harder reset, resetting all state including registers.
 
-The same situation happens if segment end is exceeding the IPv6 maximum
-packet length. The sooner we can free resources the better during
-reassembly, the better.
+Does the documentation say anything about
+LAN9645X_CONTROL_REGISTER_SOFT_RESET and self clearing? BMCR_RESET
+should be cleared by the PHY when the reset is
+complete. genphy_soft_reset() uses phy_poll_reset() to wait for the
+bit to clear. If you don't wait, it could be your start writing to
+registers while the reset is still happening, and those writes get
+lost. You might have the same issue here.
 
-Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
----
-v2: handle segment end bigger than IPv6 maximum packet length 
----
- net/ipv6/reassembly.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/net/ipv6/reassembly.c b/net/ipv6/reassembly.c
-index 25ec8001898d..11f9144bebbe 100644
---- a/net/ipv6/reassembly.c
-+++ b/net/ipv6/reassembly.c
-@@ -132,6 +132,9 @@ static int ip6_frag_queue(struct net *net,
- 		/* note that if prob_offset is set, the skb is freed elsewhere,
- 		 * we do not free it here.
- 		 */
-+		inet_frag_kill(&fq->q, refs);
-+		__IP6_INC_STATS(net, ip6_dst_idev(skb_dst(skb)),
-+				IPSTATS_MIB_REASMFAILS);
- 		return -1;
- 	}
- 
-@@ -163,6 +166,9 @@ static int ip6_frag_queue(struct net *net,
- 			 * this case. -DaveM
- 			 */
- 			*prob_offset = offsetof(struct ipv6hdr, payload_len);
-+			inet_frag_kill(&fq->q, refs);
-+			__IP6_INC_STATS(net, ip6_dst_idev(skb_dst(skb)),
-+					IPSTATS_MIB_REASMFAILS);
- 			return -1;
- 		}
- 		if (end > fq->q.len) {
--- 
-2.53.0
-
+      Andrew
 
