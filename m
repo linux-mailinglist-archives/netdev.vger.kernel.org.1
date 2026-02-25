@@ -1,145 +1,203 @@
-Return-Path: <netdev+bounces-260890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260891-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8Pw4NDfZnmkTXgQAu9opvQ
-	(envelope-from <netdev+bounces-260890-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 12:12:55 +0100
+	id UJ8cJuDZnmkTXgQAu9opvQ
+	(envelope-from <netdev+bounces-260891-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 12:15:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 741CB1964C2
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 12:12:55 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04EA319650E
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 12:15:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6DF5A301C565
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:12:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E27F430160C9
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:15:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EC7330E839;
-	Wed, 25 Feb 2026 11:12:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65E42393DCA;
+	Wed, 25 Feb 2026 11:15:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sePre3lH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LNgDjIEB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E162364020
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 11:12:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62D5D393DDE
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 11:15:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772017972; cv=none; b=UwJeZVBvv/zbOxaYyNfZvyyGT4fWzSds1lKuHIXgaMQ5zGQb2+3tJuPSIVXl8Vt1lHkpl1ds2B9sdeNuZgzUJlw/Ph9gTEyzmtsRKoqJ1vLMXWSUXK7ijU+WX5Vrl2gRKx4+gxYG/U4BxkiN4n/r9b2TvbrytkIF37KZuvybUrw=
+	t=1772018138; cv=none; b=eRT6fMsiN4eYZxOuUZpy2grH6HCVCeXt6efHtR0kFtgrbLjt4pDWfPjpMVXUnXqYJsvQ7rHw5wjFh8Cak985dXvby7z/zj4zN7wbCsD8XFsKzfjZIyDXE8OKx193adlF41CysQGQhTrMIVNBam9lP57DQrZXQ1UpyxzUwh6Saw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772017972; c=relaxed/simple;
-	bh=NZQ5aqGdj3t9c3WSdmsR1ZCcozQn6Lp2eFAxaQNensU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gvkmz2lmKQmOonBj0IZ6IIYWFkuzb2WOLYX0+aNrPKXxeEVjd4Oh5QvfEccHQn2VIXadVE+U1QH28DLYywRw1VzE+EH11pZv0LJ6AOqBIuOIZX/TkyqkUzmB92FbcLrImKZvp01fubZcTMO6QHDWO/W4+0Hn02inDDqquMmJmkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=sePre3lH; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-48371119eacso76808125e9.2
-        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 03:12:50 -0800 (PST)
+	s=arc-20240116; t=1772018138; c=relaxed/simple;
+	bh=ngMIJOMRnJXLYEUhjLgmW0+cnyNeco/cgTA/LjKrN4A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GhhcPpGXYbqgjyn+wPQT2WxAA/1rUU/MUBZ4BUuxBX+/FXcxo4kulV/plaCOdxIx2nt/U7F5FVAxPNwWDUJmE/ydcicWfc+cM8AsxUY9TtejIwsddjlUDHcxo9bjwZfWfrGJH1w4kzDn+a5YUWboFQ7cYIpBoWvwPRELqX2/EO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LNgDjIEB; arc=none smtp.client-ip=209.85.167.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-45f09874c4cso4066297b6e.3
+        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 03:15:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1772017969; x=1772622769; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=k42r/wZU6ZvLwUBvdfXFIAWDBVbvy5Zr19fCDdW7dzw=;
-        b=sePre3lH7lCnOYqQedvZ8BJxwGIjZQ6VHnmD68BICm0cNRxPTbrRXJ97oy/vC46+vt
-         pzKSVMtpXdUbsijkkx0EpctfM1oCmhQTUNlD4GXeE3+8KEB8F2jBzvpSjQOfeHooL4xU
-         Csi/4TD9764o0dfzmmJw41WTNghny6sH6H5usA9FR8FaKxOHeO+uos6j/PNwgqxvA1ek
-         El9btRrgzm8MuxOdapwXjdOENjnFfokKZqAswpjidXNRTI993j58vIyFDVRta/yvQfR/
-         MAprb4alNz/XWHGwxJouqgWgY1IDImsvJ8rK3Y3koNwR9gPJ+SH6oBG7hfEbUEPkreBR
-         rSQQ==
+        d=gmail.com; s=20230601; t=1772018135; x=1772622935; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KCzNXohVpDD6xCDz15ty9eD9uNVVw6l0koWlP3YqGoU=;
+        b=LNgDjIEBXWQKdyfrrBOX6MDFztAyhCSz2+giXWVQQI+OXmd7i0rn7K4/S47DIKNW/f
+         0Yu6tH0b9b6lV+4Xmf+GLHIoZfvbPyf+30MJlefV2rPaKGQ6jKM2VNIPPZWg9hNNqmH/
+         7S2487M9WNwlcVOIemMGOGv3wfUNQWcIvPqC5YesMd6os6FfSiUNEUf99okfuHqN+2Ty
+         x7GSc8DC9ePaXrArAE6QsEzimO8krOD/eeV6Iq0R1dT6UrxxjuQ1lfE4UdQR8dQykunZ
+         96WH3D816IGtBDUMtRsZNVRQIYYjsqCrMcfKtjxo/0+7C/FR5/r1GFK1CqehxCWenJSR
+         qWZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772017969; x=1772622769;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=k42r/wZU6ZvLwUBvdfXFIAWDBVbvy5Zr19fCDdW7dzw=;
-        b=Lf/9OXYs4VljiofCxpYZ9lw5vj0LxBSdu89i6Vydtojdb9s/Gjsm6si4GWvJ7Y6bx/
-         uBFkEp3z2fisnyzDTo5ARd8WiSgLCvXUghnoQcW0smfNIZMnUqI6Dgc7osiWYsmS1146
-         sdnlndRcLcEHFB0h+fXmrjgmk3NpQLiMiWbsmlZ2wqSFd3NHkl/+0nVPt4ZLEtkTURNQ
-         5y46M6p+MdzSW2IyKpWGh6azBRZieb8gxE7/fSqsc++Lw5ynwkiF/Wnv2PQMTs8pK9Vu
-         a1MIbgmX6Xtfiu6hv+rfqbFdPHekHRxWlddMD1yQZZMQlnecCx//wwUYnAzFBD1pj7Ev
-         bcjw==
-X-Forwarded-Encrypted: i=1; AJvYcCW8pY+0OWv5nghM4rbhTjzHhWHvH7mOVppbRRpuBpH8iZp0OTVBBWr3fjQASeV5v5YiF1ANPMo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYRWE9KnzRaO36/qe3CL+vWIDLmtULrDg8v5ELP/AZbPQzelkf
-	i+PbUzSQ/BORd8pPTjY52MzO/wsQEJYTFs7uI80bNTN5FYHj0X0MvFJcS1M3SFiq1Gc=
-X-Gm-Gg: ATEYQzzriFeCM1qEv66NerBcbccf+tfIa08S/Al+r10pXoAw7gHCICosrSX8BV7speL
-	yuySl5HKMsT720NEcoWeSuqrTN6THlnreS+i2r/H4tdFkYv8mXXOpeiWpX6QNqfOJO8LpU0g3yb
-	J+bAYSJvgWrwrDIGbRpfBmNemq80carlQ3j2gQj42spd1E1ICuukoclu7gVqLFwm8JW9ZyH9X06
-	OrMA8v9pf09nhcZPTQTIaQWes1eXVfnPwW3QQMGvyNLGbLIx2Y84yULMCfeXAAcnOBNqHmelnEZ
-	yPlQJQqY/JyR3adiHuMR8M601QTnA+MAxwzz4OolZVTWEBsgzwZXcAAi0PKDR8HR+gn2YOb9jEo
-	jxgYdNTYcmCUT3mHcMobjAMFeq2buAmsfph3EUIQRVFUumdCK17YgDOVEIcr1jQVkYttvGHOnXA
-	LoT/dzjNIvZZTMpXlaxwKxPJ5QWwc=
-X-Received: by 2002:a05:600c:c3cc:20b0:483:afbb:a064 with SMTP id 5b1f17b1804b1-483afbba23cmr174155785e9.1.1772017968958;
-        Wed, 25 Feb 2026 03:12:48 -0800 (PST)
-Received: from localhost ([41.210.147.106])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bd7030b9sm53663815e9.4.2026.02.25.03.12.48
+        d=1e100.net; s=20230601; t=1772018135; x=1772622935;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KCzNXohVpDD6xCDz15ty9eD9uNVVw6l0koWlP3YqGoU=;
+        b=s8IS6lQBeI7Xly1ne2FHSw0LGCD8fXPE0IEAcs/I3nXNIDm4d4OXY3xnlnSRv57//p
+         W+UsvqiUFVp97o1Ury9Er9lydy3DGovoDUxwG2ZPdGoCfozlR8yCfYBY26RVBZ0fLIv4
+         GJvYuhLiC7vUCIyVYVjIJZ+VDmH3MB6vu8M5CgQht/7UIUJ/s1mzKbwhk4qBoJgIC3W4
+         k1swtUmgx2vrrnpKSw5aPHbknLw8+m+JHKqMPVP4DibpdZjhy+h1AGtZ86MKbMxCEgji
+         18bbbGYctP6NdmpzVqOQmdwpPHFi0F7czksS2wWEQlGLVyR46ly/70qqebwYINrMZqiN
+         5pMg==
+X-Forwarded-Encrypted: i=1; AJvYcCXrfF38hC+9eekMdhaTgXf+87cetQCV3HcNglXmuhlONkZGJT/8rXwZUkrdaoJ48kA44+82sOk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSb6hkrlc885k3v2f8V79n9sV0ORPP2AbGWl+xTiY05i4NIcoN
+	QPR9dd2EBuPp7bgwyJZ++Lh8N16YsAwqkSOGEwvJaotTR8OpiphicyLg
+X-Gm-Gg: ATEYQzzdQT3pUdK8/PbxDyILiElQcvqq7RGiLmgGlJl644J45Dht7cmwxiIsKfiZoCg
+	m1s0eV+jXUDZzWFyPrkigMiSo/jQvMD4ham4nQ1UP2APR+dhtvBbQMu8+jQdAe9AxEiu6hj3NNa
+	K1Dpaak/KOO+YsCp2x1+LJiM2F+RwFUrFUFcKw9nitzsKLUPWPJm0fg0otD7MzO1n/4QLTfsqbC
+	5On0h3VXKfAtA9PnUkCt124VormzoUAN4uDuseALUZaIhxodBC+zhEu6VgNFMAxd7XFGXC6wxrp
+	ZVJem0WoprI5LnYaIe68gvZKPX9G5X8cv1akpRD5QbHkiCAZa1iihsiKCrqUnRm1hC+pzkoTKBX
+	Z+i/4fshWwF9Q2H16V8Ti/wLORYdFLR+/jzQ0bs755Qlj9WP7FH4Ia7hygNMDy8HBRNkU/crgfz
+	eu2NTL64yy/pdgGF7/E4P/SvoH4zimaiyvG9yJDlUBEBeqEUgbqjPQYLnQCUYtQte9lHIJgQWqr
+	KGSJxq5jtxzmpoPaRFY61M=
+X-Received: by 2002:a05:6870:328f:b0:409:61b0:fd28 with SMTP id 586e51a60fabf-4157b1ccb7fmr9403756fac.46.1772018135281;
+        Wed, 25 Feb 2026 03:15:35 -0800 (PST)
+Received: from localhost.localdomain (108-214-96-168.lightspeed.sntcca.sbcglobal.net. [108.214.96.168])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4157d34a224sm13053927fac.17.2026.02.25.03.15.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Feb 2026 03:12:48 -0800 (PST)
-Date: Wed, 25 Feb 2026 14:12:42 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	Jiayuan Chen <jiayuan.chen@shopee.com>,
-	syzbot+72e3ea390c305de0e259@syzkaller.appspotmail.com,
-	"David S. Miller" <davem@davemloft.net>,
+        Wed, 25 Feb 2026 03:15:34 -0800 (PST)
+From: Sun Jian <sun.jian.kdev@gmail.com>
+To: Shuah Khan <shuah@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kees Cook <kees@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v1] atm: lec: fix null-ptr-deref in lec_arp_clear_vccs
-Message-ID: <aZ7ZKk1ZUtvPnNeV@stanley.mountain>
-References: <20260224044648.243578-1-jiayuan.chen@linux.dev>
- <aZ60sfG1tdraA0zB@horms.kernel.org>
- <aZ7Ex6c1ZeqvWLFp@horms.kernel.org>
- <beb5b67858a5e90709e67b7935430b9986306279@linux.dev>
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Sun Jian <sun.jian.kdev@gmail.com>
+Subject: [PATCH v3 v3 1/2] selftests/harness: order TEST_F and XFAIL_ADD constructors
+Date: Wed, 25 Feb 2026 19:14:50 +0800
+Message-ID: <20260225111451.347923-1-sun.jian.kdev@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <beb5b67858a5e90709e67b7935430b9986306279@linux.dev>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
-	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260890-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[linaro.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260891-lists,netdev=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dan.carpenter@linaro.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,davemloft.net,google.com,redhat.com,gmail.com];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.996];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,72e3ea390c305de0e259];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linaro.org:dkim,stanley.mountain:mid]
-X-Rspamd-Queue-Id: 741CB1964C2
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 04EA319650E
 X-Rspamd-Action: no action
 
-It's pretty common to have multiple Fixes tags.  But I don't think the
-AI is correct in this case, actually.  I agree with you that it doesn't
-really make sense to split the patch up into two half bugfixes just to
-make backporting easier.  Plus the affected kernels would be six years
-old by now.
+TEST_F() allocates and registers its struct __test_metadata via mmap()
+inside its constructor, and only then assigns the
+_##fixture_##test##_object pointer.
 
-regards,
-dan carpenter
+XFAIL_ADD() runs in a constructor too and reads
+_##fixture_##test##_object to initialize xfail->test. If XFAIL_ADD runs
+first, xfail->test can be NULL and the expected failure will be reported
+as FAIL.
+
+Use constructor priorities to ensure TEST_F registration runs before
+XFAIL_ADD, without adding extra state or runtime lookups.
+
+Fixes: 2709473c9386 ("selftests: kselftest_harness: support using xfail")
+Signed-off-by: Sun Jian <sun.jian.kdev@gmail.com>
+---
+v3:
+  - Move KSELFTEST_PRIO_* definitions above the TEST_SIGNAL() kdoc block.
+
+v2:
+  - Drop the lazy string-matching approach.
+  - Use constructor priorities to enforce initialization order.
+  Link:
+    https://lore.kernel.org/all/20260224113859.12345-1-sun.jian.kdev@gmail.com/
+
+v1:
+  Link:
+    https://lore.kernel.org/all/20260222111846.12345-1-sun.jian.kdev@gmail.com/
+---
+ tools/testing/selftests/kselftest_harness.h | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/selftests/kselftest_harness.h
+index 16a119a4656c..4afaef01c22e 100644
+--- a/tools/testing/selftests/kselftest_harness.h
++++ b/tools/testing/selftests/kselftest_harness.h
+@@ -76,6 +76,9 @@ static inline void __kselftest_memset_safe(void *s, int c, size_t n)
+ 		memset(s, c, n);
+ }
+ 
++#define KSELFTEST_PRIO_TEST_F  20000
++#define KSELFTEST_PRIO_XFAIL   20001
++
+ #define TEST_TIMEOUT_DEFAULT 30
+ 
+ /* Utilities exposed to the test definitions */
+@@ -465,7 +468,7 @@ static inline void __kselftest_memset_safe(void *s, int c, size_t n)
+ 			fixture_name##_teardown(_metadata, self, variant); \
+ 	} \
+ 	static struct __test_metadata *_##fixture_name##_##test_name##_object; \
+-	static void __attribute__((constructor)) \
++	static void __attribute__((constructor(KSELFTEST_PRIO_TEST_F))) \
+ 			_register_##fixture_name##_##test_name(void) \
+ 	{ \
+ 		struct __test_metadata *object = mmap(NULL, sizeof(*object), \
+@@ -880,7 +883,7 @@ struct __test_xfail {
+ 		.fixture = &_##fixture_name##_fixture_object, \
+ 		.variant = &_##fixture_name##_##variant_name##_object, \
+ 	}; \
+-	static void __attribute__((constructor)) \
++	static void __attribute__((constructor(KSELFTEST_PRIO_XFAIL))) \
+ 		_register_##fixture_name##_##variant_name##_##test_name##_xfail(void) \
+ 	{ \
+ 		_##fixture_name##_##variant_name##_##test_name##_xfail.test = \
+
+base-commit: 7dff99b354601dd01829e1511711846e04340a69
+-- 
+2.43.0
 
 
