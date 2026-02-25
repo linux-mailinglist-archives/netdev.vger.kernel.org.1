@@ -1,195 +1,282 @@
-Return-Path: <netdev+bounces-260916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260917-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QJgdHmDrnmk/XwQAu9opvQ
-	(envelope-from <netdev+bounces-260916-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 13:30:24 +0100
+	id WDfhNPDqnmk/XwQAu9opvQ
+	(envelope-from <netdev+bounces-260917-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 13:28:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C30CA1975C0
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 13:30:23 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A2A7197547
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 13:28:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D4638319CE8E
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 12:24:50 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BD0423068057
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 12:25:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 615D83B52FB;
-	Wed, 25 Feb 2026 12:24:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B310C3AEF4B;
+	Wed, 25 Feb 2026 12:25:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UYZIKKo7";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="JEdVTRyL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D143B52F8
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 12:24:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C4293AEF40
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 12:25:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772022271; cv=none; b=eqPrsTQurMAaVoWTC8qua1aZ6CRIq8j5b824f5q4/pBuDZlIliBW5qe/U7wqhzEg/Dubm9Om8I2VSzCoey6J/Fx+9zkaUOkep8PVXmcctYu/60Wr2HqXxn4xCFMbNjGyl6Iow4loS0yebC0gcYWpKUgYcLTPh87SDVJx62ppRls=
+	t=1772022304; cv=none; b=kEdQi2s/ALkTBQbiF6hcEhbQiWaakhCN6fJuUJS3ylvrm+KJpZ1xcoU9UO28s5p1O2h+bU5kLIM4THcqzZ5Mfh5/viS5g56MGsYr/awGJx0GXBuCa0RvgEmd8vOCd1P4AUG/ThzmBbcG+QbOh/S4rgBpdDoxFrVKB0uxxu27d2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772022271; c=relaxed/simple;
-	bh=w0RkkI60n0NfVjeD3GCvWy9379xhuF9l5DYLh+Frc74=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=lcHVojBZEeZbjUbvb8umaKp5HXlNZRwOc/TiqADg78331nusFXYGj20FJZsxWDkZlBitnRV1P/mAft9Gw1U5/qcqELEgUiFemSZHEvxmvbJ8fT8cGWoHmUSQZnvDUQ/MODSSbzPoG0ZuGl0vC6HfWsFqbocnhjowuYFNRraW088=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-7d4be1dee67so109938540a34.1
-        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 04:24:29 -0800 (PST)
+	s=arc-20240116; t=1772022304; c=relaxed/simple;
+	bh=KpzWjtfsWv3qhAGhWyvVbyhPwgnmWZ3Fr4zjNZr3GdU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JRAjOQXomVpRlDhZuKCxQ5QY8GYwEMpccyImFISLpFuer5vtDSvnNUSZFSegRp8S7a/SYN0wAf7Sgd3qzgvAuSYPo8XfMU3qF7EHkVWSwX3zn5933KL3inZvtsFu+xQtlP8Y9xRHMy5YRrHQ8WURCAlIxaFj+7qnYArPp8z4slo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UYZIKKo7; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=JEdVTRyL; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772022302;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LMzUQOTDOi7UoTOS/hJ+EQEdYM7FgK5Sbr9EcZoRwiY=;
+	b=UYZIKKo79psuCtgoz3gbRTuov8qK59BLTRELMmi6ivTA7krI4F4Rzyt7wzFMUZpgxI9iHZ
+	EnGhRuV7sbnFfT37Gcw6L+pPscQ3rzDPVD6IKj/o0bAMnuWdzy9JnI8T2xJVTtvE1xdJ9x
+	RKQox9ovBYsDe+8onEFRgPU/XstLNIw=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-170-0bFBd5-6NL2pfHivlWSaiA-1; Wed, 25 Feb 2026 07:25:00 -0500
+X-MC-Unique: 0bFBd5-6NL2pfHivlWSaiA-1
+X-Mimecast-MFC-AGG-ID: 0bFBd5-6NL2pfHivlWSaiA_1772022300
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-48079ae1001so35756065e9.0
+        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 04:25:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1772022299; x=1772627099; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=LMzUQOTDOi7UoTOS/hJ+EQEdYM7FgK5Sbr9EcZoRwiY=;
+        b=JEdVTRyLI3+YCqdHhT56QZdhyObhaHQCzxYdtUl2lkk8NvlvegMNhaWFFpVnP8UQkO
+         tM6oozZmbB1hTP0ioiSl3NjazcLzafOJ9CaV6SvaQ+ZvuRkXC3HpZoSCl7Xku27QHPNe
+         cLU0w/QD87CpvO34H6QoQu40jPoEgqArVBcZXYgD1Xgvh3uuIX4+hGdxADRtNoX2auLV
+         2zY6EJFcxDKTIBXV12mq3lLcXuKrQcQdQ06xowRIHPGkyzrrenoQnvjP01uYCzywjN11
+         UNMbiH0l7ymTm4NojuIylaHYdQ9oMUQXnB89+7t7NU7f8Lkg4W3uJGRODNNSACUF0z4o
+         5auA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772022269; x=1772627069;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vxgM2+7tBarSdr5Mf2egulRHzkOHvLOxJK/f02SHmAk=;
-        b=PjD9lzgbFC5mBSMlu/G5JZ8e5P0ZPFytaEWlQBn/1Uvsbf+UbKP3jAovlpLTPl2mQE
-         QC5P79cCIVYzNw645no+KoUF6Jn1sFMQ7Y3bFJKCe7u2u78AiqySH+CLSI6Na9Dw/guD
-         z5/XqMuzVpoQHGPGk7kzboaFEOcQzyxE+z613HvhrxUoGUmbXB5ij0XaF9KIZ7g3oP9x
-         YNEhR9jkfo6fjVBuMz7bZLGET92qCAx/QfRDPBhhxxyFUgYw2GSlU1rHHBSc6GRaa1SU
-         LaynG1VdgO3jRLLyNEscLuOhyKTzY91MKlhCSWH+L/I9lJhxzdTVg/OVfJ4gj9tBB/jV
-         KC+w==
-X-Forwarded-Encrypted: i=1; AJvYcCX/h6xo0c4kOqOsAeK2pJyA/tT6ezgXT90J407JVUoqn9OW4dD6XiKWCO/3lR1eNYwdWoJ5O3Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzs+gEmB9M0JV/Ly+3ZMGwba2RZSp57J5i7dF7U4WUdNSZbDXXC
-	axeZMfXm8Sxhy/f60+LChHQSXr+lDMtwfg/gU8wksUa62RcTcuVPcHPSJAPRlk/gTMD6u2UUzFp
-	EZUp8Psp+5Teb8EfbT+O/EunCP2KIFCt8BOVrRxqpnPen8t/hB1cVhwNUVPI=
+        d=1e100.net; s=20230601; t=1772022299; x=1772627099;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LMzUQOTDOi7UoTOS/hJ+EQEdYM7FgK5Sbr9EcZoRwiY=;
+        b=S7JHkIRLWj/f9FqlKvoUSImuaxLErctspZadTl1xwKTJv1TIlz0Ecb47gkLVNr4Zkz
+         9rhSYSPmsLftPqtiXh0Kejxo8sBQ4xC7MNDB2UvqgyRdjjjR2t3Q7Hv/QQq5BoBMdQGq
+         1ihHM76j2wpDQZI0Wg2eNTcq4/NM2x6X53mXFHCd7BNjTEQWLryU+ssTy61Vr5ORFnPk
+         nxBf7LYFAV8z3wkaVLqZTCuaMdGx+QzHFNQaf/yhRgxaNTtbHmIvInG6xPVGXXYk4v0A
+         g9H2mA739MOB+S4TVeYIOwCZ455ub2N9gAHwDXtsMeNTIVgBkeIxRmiProK23U5Y4xlY
+         Txzg==
+X-Gm-Message-State: AOJu0Yy+CPz3CUOHankW+1ie+68A0Yy140RLdHB1x3kL6V3l68qWyex5
+	MVyzJpKK8HYFBp4TjxQx4KHZGjb5JkZy0rjUdFkXgGY1IFbSfa1KFgres2fpZsnlzjty5wPI0nB
+	gCcL9+D/YPYuKkhM3fH4ajXMvInS8kc2vVvDc5gUdH3DZh1PJlbsRSa94+w==
+X-Gm-Gg: ATEYQzw3nfWtlrwIFK9Xs5xfYjreLvlFvRCHe4CK+k2TAcYIU7Jr1Gl9BHLIL3a2ov8
+	66DOvxVCH3gp85CBasU90xnTIFpmJr0KsIpaRlMWJ/YLacW1adkw0Th0Qd/5yaZV0kib7YrQVVp
+	6+kivUfADn5CKU6jizZguFqNAenPPDyJnE8+zIqsrr5jsw1/cvG/6QyNmykcD+aMYNW4I1R66CE
+	NFGz0iU0Bak4hWgcbNhnYZpKE4ufqhtBFCLwz7opjX84jM1eM1Qy4OSHaRxsiZOtZLCsze9RTj3
+	0YDqP7Z/+bDTQcXdlM565AflElk4wnl7oSzN8kYWej6bWkeXQV46iCm31gwGGGdm79yWajWpO8A
+	LUtt/VgdYCsxICMyBKu0YddpHLTMWbhA/G1PczXWijoaDsw==
+X-Received: by 2002:a05:600c:3e0b:b0:480:1c85:88bf with SMTP id 5b1f17b1804b1-483c21a57aemr2858145e9.27.1772022299477;
+        Wed, 25 Feb 2026 04:24:59 -0800 (PST)
+X-Received: by 2002:a05:600c:3e0b:b0:480:1c85:88bf with SMTP id 5b1f17b1804b1-483c21a57aemr2857655e9.27.1772022299002;
+        Wed, 25 Feb 2026 04:24:59 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-79-166.inter.net.il. [80.230.79.166])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bd70e692sm61847325e9.7.2026.02.25.04.24.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Feb 2026 04:24:58 -0800 (PST)
+Date: Wed, 25 Feb 2026 07:24:55 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Srujana Challa <schalla@marvell.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
+	"eperezma@redhat.com" <eperezma@redhat.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	Nithin Kumar Dabilpuram <ndabilpuram@marvell.com>,
+	Shiva Shankar Kommula <kshankar@marvell.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [EXTERNAL] Re: [PATCH net,v4,1/2] virtio_net: Improve RSS key
+ size validation and use NETDEV_RSS_KEY_LEN
+Message-ID: <20260225072355-mutt-send-email-mst@kernel.org>
+References: <20260224065850.962826-1-schalla@marvell.com>
+ <20260225050154-mutt-send-email-mst@kernel.org>
+ <BY1PR18MB63744FC9F4786AB2F617AC4CA075A@BY1PR18MB6374.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:16a3:b0:679:94ff:6ea7 with SMTP id
- 006d021491bc7-679c4251e3dmr8290560eaf.15.1772022268917; Wed, 25 Feb 2026
- 04:24:28 -0800 (PST)
-Date: Wed, 25 Feb 2026 04:24:28 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <699ee9fc.050a0220.1cd54b.0009.GAE@google.com>
-Subject: [syzbot] [net?] [bpf?] KCSAN: data-race in sk_psock_drop / unix_stream_sendmsg
-From: syzbot <syzbot+87f770387a9e5dc6b79b@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, jakub@cloudflare.com, john.fastabend@gmail.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <BY1PR18MB63744FC9F4786AB2F617AC4CA075A@BY1PR18MB6374.namprd18.prod.outlook.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=70c3ed59b49365c3];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,vger.kernel.org,iogearbox.net,davemloft.net,google.com,cloudflare.com,gmail.com,redhat.com,googlegroups.com];
-	TAGGED_FROM(0.00)[bounces-260916-lists,netdev=lfdr.de,87f770387a9e5dc6b79b];
+	TAGGED_FROM(0.00)[bounces-260917-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[storage.googleapis.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,googlegroups.com:email,syzkaller.appspot.com:url,appspotmail.com:email,goo.gl:url];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.987];
-	REDIRECTOR_URL(0.00)[goo.gl];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	SUBJECT_HAS_QUESTION(0.00)[]
-X-Rspamd-Queue-Id: C30CA1975C0
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,marvell.com:email]
+X-Rspamd-Queue-Id: 2A2A7197547
 X-Rspamd-Action: no action
 
-Hello,
+On Wed, Feb 25, 2026 at 12:22:50PM +0000, Srujana Challa wrote:
+> > On Tue, Feb 24, 2026 at 12:28:49PM +0530, Srujana Challa wrote:
+> > > Replace hardcoded RSS max key size limit with NETDEV_RSS_KEY_LEN to
+> > > align with kernel's standard RSS key length. Add validation for RSS
+> > > key size against spec minimum (40 bytes) and driver maximum. When
+> > > validation fails, gracefully disable RSS features and continue
+> > > initialization rather than failing completely.
+> > >
+> > > Cc: stable@vger.kernel.org
+> > > Fixes: 3f7d9c1964fc ("virtio_net: Add hash_key_length check")
+> > > Signed-off-by: Srujana Challa <schalla@marvell.com>
+> > 
+> > --- should come here before changelog.
+> > 
+> > > v3:
+> > > - Moved RSS key validation checks to virtnet_validate.
+> > > - Add fixes: tag and CC -stable
+> > > v4:
+> > > - Use NETDEV_RSS_KEY_LEN instead of type_max for the maximum rss key
+> > size.
+> > > ---
+> > >  drivers/net/virtio_net.c | 34 ++++++++++++++++++++++++----------
+> > >  1 file changed, 24 insertions(+), 10 deletions(-)
+> > >
+> > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c index
+> > > db88dcaefb20..eeefe8abc122 100644
+> > > --- a/drivers/net/virtio_net.c
+> > > +++ b/drivers/net/virtio_net.c
+> > > @@ -381,8 +381,6 @@ struct receive_queue {
+> > >  	struct xdp_buff **xsk_buffs;
+> > >  };
+> > >
+> > > -#define VIRTIO_NET_RSS_MAX_KEY_SIZE     40
+> > > -
+> > >  /* Control VQ buffers: protected by the rtnl lock */  struct
+> > > control_buf {
+> > >  	struct virtio_net_ctrl_hdr hdr;
+> > > @@ -486,7 +484,7 @@ struct virtnet_info {
+> > >
+> > >  	/* Must be last as it ends in a flexible-array member. */
+> > >  	TRAILING_OVERLAP(struct virtio_net_rss_config_trailer, rss_trailer,
+> > hash_key_data,
+> > > -		u8 rss_hash_key_data[VIRTIO_NET_RSS_MAX_KEY_SIZE];
+> > > +		u8 rss_hash_key_data[NETDEV_RSS_KEY_LEN];
+> > >  	);
+> > >  };
+> > >  static_assert(offsetof(struct virtnet_info,
+> > > rss_trailer.hash_key_data) == @@ -6627,6 +6625,29 @@ static int
+> > virtnet_validate(struct virtio_device *vdev)
+> > >  		__virtio_clear_bit(vdev, VIRTIO_NET_F_STANDBY);
+> > >  	}
+> > >
+> > > +	if (virtio_has_feature(vdev, VIRTIO_NET_F_RSS) ||
+> > > +	    virtio_has_feature(vdev, VIRTIO_NET_F_HASH_REPORT)) {
+> > > +		u8 key_sz = virtio_cread8(vdev,
+> > > +					  offsetof(struct virtio_net_config,
+> > > +						   rss_max_key_size));
+> > > +		/* Spec requires at least 40 bytes */ #define
+> > > +VIRTIO_NET_RSS_MIN_KEY_SIZE 40
+> > > +		if (key_sz < VIRTIO_NET_RSS_MIN_KEY_SIZE) {
+> > > +			dev_warn(&vdev->dev,
+> > > +				 "rss_max_key_size=%u is less than spec
+> > minimum %u, disabling RSS\n",
+> > > +				 key_sz, VIRTIO_NET_RSS_MIN_KEY_SIZE);
+> > > +			__virtio_clear_bit(vdev, VIRTIO_NET_F_RSS);
+> > > +			__virtio_clear_bit(vdev,
+> > VIRTIO_NET_F_HASH_REPORT);
+> > > +		}
+> > > +		if (key_sz > NETDEV_RSS_KEY_LEN) {
+> > > +			dev_warn(&vdev->dev,
+> > > +				 "rss_max_key_size=%u exceeds driver limit
+> > %u, disabling RSS\n",
+> > > +				 key_sz, NETDEV_RSS_KEY_LEN);
+> > > +			__virtio_clear_bit(vdev, VIRTIO_NET_F_RSS);
+> > > +			__virtio_clear_bit(vdev,
+> > VIRTIO_NET_F_HASH_REPORT);
+> > 
+> > you flipped the logic here and it makes no sense now.
+> > 
+> > Did you test this path?
+> Yes, tested with Marvell's Octeon device.
+> > 
+> > 
+> > So if device is powerful and supports a very big key size then...
+> > we disable the feature? how does this make sense?
+> The intent isn’t to disable the feature on capable devices, but to ensure the driver never advertises
+> support for RSS key sizes larger than what the net device can actually handle. Even if a device reports
+> a very large key size, the driver is constrained by NETDEV_RSS_KEY_LEN, since netdev_rss_key_fill() enforces:
+> BUG_ON(len > sizeof(netdev_rss_key));
 
-syzbot found the following issue on:
+so cap it to NETDEV_RSS_KEY_LEN. Why is that a reason to clear the feature?
 
-HEAD commit:    23b0f90ba871 Merge tag 'sysctl-7.00-rc1' of git://git.kern..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=13f3695a580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=70c3ed59b49365c3
-dashboard link: https://syzkaller.appspot.com/bug?extid=87f770387a9e5dc6b79b
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+> > 
+> > 
+> > > +		}
+> > > +	}
+> > > +
+> > >  	return 0;
+> > >  }
+> > >
+> > > @@ -6839,13 +6860,6 @@ static int virtnet_probe(struct virtio_device
+> > *vdev)
+> > >  	if (vi->has_rss || vi->has_rss_hash_report) {
+> > >  		vi->rss_key_size =
+> > >  			virtio_cread8(vdev, offsetof(struct virtio_net_config,
+> > rss_max_key_size));
+> > > -		if (vi->rss_key_size > VIRTIO_NET_RSS_MAX_KEY_SIZE) {
+> > > -			dev_err(&vdev->dev, "rss_max_key_size=%u exceeds
+> > the limit %u.\n",
+> > > -				vi->rss_key_size,
+> > VIRTIO_NET_RSS_MAX_KEY_SIZE);
+> > > -			err = -EINVAL;
+> > > -			goto free;
+> > > -		}
+> > > -
+> > >  		vi->rss_hash_types_supported =
+> > >  		    virtio_cread32(vdev, offsetof(struct virtio_net_config,
+> > supported_hash_types));
+> > >  		vi->rss_hash_types_supported &=
+> > > --
+> > > 2.25.1
+> 
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/ae3bcc875a04/disk-23b0f90b.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/1a4dbd53da8f/vmlinux-23b0f90b.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/3c3824777f5c/bzImage-23b0f90b.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+87f770387a9e5dc6b79b@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KCSAN: data-race in sk_psock_drop / unix_stream_sendmsg
-
-write to 0xffff88810220dc08 of 8 bytes by task 3611 on cpu 1:
- sk_psock_stop_verdict net/core/skmsg.c:1311 [inline]
- sk_psock_drop+0x12f/0x270 net/core/skmsg.c:896
- sk_psock_put include/linux/skmsg.h:506 [inline]
- sock_map_unref+0x2a5/0x300 net/core/sock_map.c:185
- __sock_map_delete net/core/sock_map.c:426 [inline]
- sock_map_delete_from_link net/core/sock_map.c:439 [inline]
- sock_map_unlink net/core/sock_map.c:1608 [inline]
- sock_map_remove_links+0x228/0x340 net/core/sock_map.c:1623
- sock_map_close+0xa1/0x340 net/core/sock_map.c:1684
- unix_release+0x4e/0x80 net/unix/af_unix.c:1183
- __sock_release net/socket.c:662 [inline]
- sock_close+0x6b/0x150 net/socket.c:1455
- __fput+0x29b/0x650 fs/file_table.c:469
- fput_close_sync+0xad/0x190 fs/file_table.c:574
- __do_sys_close fs/open.c:1509 [inline]
- __se_sys_close fs/open.c:1494 [inline]
- __x64_sys_close+0x55/0xf0 fs/open.c:1494
- x64_sys_call+0x275d/0x3020 arch/x86/include/generated/asm/syscalls_64.h:4
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x12c/0x370 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-read to 0xffff88810220dc08 of 8 bytes by task 3605 on cpu 0:
- unix_stream_sendmsg+0x7f8/0xbb0 net/unix/af_unix.c:2480
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg net/socket.c:742 [inline]
- ____sys_sendmsg+0x5af/0x600 net/socket.c:2592
- ___sys_sendmsg+0x195/0x1e0 net/socket.c:2646
- __sys_sendmsg net/socket.c:2678 [inline]
- __do_sys_sendmsg net/socket.c:2683 [inline]
- __se_sys_sendmsg net/socket.c:2681 [inline]
- __x64_sys_sendmsg+0xd4/0x160 net/socket.c:2681
- x64_sys_call+0x194c/0x3020 arch/x86/include/generated/asm/syscalls_64.h:47
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x12c/0x370 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-value changed: 0xffffffff8486dd00 -> 0xffffffff8472c9f0
-
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 0 UID: 0 PID: 3605 Comm: syz.4.30 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2026
-==================================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
