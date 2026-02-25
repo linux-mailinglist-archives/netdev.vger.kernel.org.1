@@ -1,228 +1,221 @@
-Return-Path: <netdev+bounces-260906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260907-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KL6+Hq3hnmmCXgQAu9opvQ
-	(envelope-from <netdev+bounces-260906-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 12:49:01 +0100
+	id rcZSFanjnmnQXgQAu9opvQ
+	(envelope-from <netdev+bounces-260907-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 12:57:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFE64196DCD
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 12:49:00 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB301196E97
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 12:57:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 26D36304E0CB
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:47:21 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2D7FB3025E12
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:57:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6709E3A9DB0;
-	Wed, 25 Feb 2026 11:47:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7E44396D16;
+	Wed, 25 Feb 2026 11:57:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T7uVi0dK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i55h3Baq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 431C028C854;
-	Wed, 25 Feb 2026 11:47:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9443128C854
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 11:57:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772020040; cv=none; b=Lf9UjI5TYMazXGBJ+PmFolZmiyfbzKOFptgG4Qu/WnO1tuF504y6Fkhsod/TmlZMM2yxbfZsVL8SAbmN3KWiYJooS9GkVeonQQzb4yp5wuhwf4KadPOTYDNQMotkvcPnf/F8NtxCtr5cZzxbfrp+0dwTFM7kQV5TrUPUMTVE8jc=
+	t=1772020646; cv=none; b=psizedKNFChZ9O3BvHi4+0EViYVmi21SzdQbAeUXo99a/wXdYSsP6eII6/Eotn1hKPaJKYED4xmax/G81ySC1DrluTWsaP5nLonZvZyrO5RSer3nJmkdQgOkXuu2P5OGFUrdx/8Wydww/IbNSw6eCjeMP3hDpNggPGv5D/tNHPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772020040; c=relaxed/simple;
-	bh=SnXGJnTrEuLwTL+SfTgHDgMsC/M1iJfW8DD5Wj/SUOI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XcW+VdxMwTAYgwq/+hzx4vE5lu7ROWvBPDr1ho7lRdThoPT8/h/MOMXn7oJy2vzRs4kzsjuYo5rDVyI3+CNRi/AY/NU3euobCi2x/1PZKog4XDmWmiba5vtPpLxWt59vGkXYxvC7rxUnvZ7HoZy/TVv/NbaLg3y2troArBqi76k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T7uVi0dK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72E65C116D0;
-	Wed, 25 Feb 2026 11:47:19 +0000 (UTC)
+	s=arc-20240116; t=1772020646; c=relaxed/simple;
+	bh=gRRaI+geC4oozfeB8XGa0j0UpRd1bkCutfhQjfTPm28=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LfmCg/uPfvQ81IU0hRmTh/cbM6huUmP+3JMqf/ZaLYnQnMg1GJuSZStGIBQqoVCuuZavR119ZQfAZMLX8c3MZsooTpc7uRXGHnyDYIMpzs8TiXdmaXaGYuTdCJ9P2XlzBQulzu133to7619U5LAA2OKh2E8OlN9/q/742AYgXPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i55h3Baq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0034AC116D0;
+	Wed, 25 Feb 2026 11:57:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772020039;
-	bh=SnXGJnTrEuLwTL+SfTgHDgMsC/M1iJfW8DD5Wj/SUOI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=T7uVi0dK4F2jMpMH5VnBaT44RQf9qjplGsOs0SYVCw0aRPqZcCL3F+rilfv/EninI
-	 yDVy4Y4XQQHF2w5RwkXccFV0pphMsJmBfjBK1kv+D7AglGSAm0TZn7uh271umFJJoM
-	 Inf4mHwIfKSyw6NTD0DUAk4CFyHBcCjebr/j7nVLuFBq5a+z4EYahZ8nRrue7HTLEb
-	 Oq83cE2zwPsNNG/YIW33IzLOT8xupP9rf3ByKQ68W8mHJfzVCpgltzPH03UCVSJ5sp
-	 yjyQFlnciY0dIpLEoVa2zm4Lzz75tqwcQ8we64bn558/w3A8063FYEaR1uax62g8fm
-	 LgyPIwqrzFUaw==
-Date: Wed, 25 Feb 2026 13:47:16 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Edward Srouji <edwards@nvidia.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, Michael Guralnik <michaelgur@nvidia.com>,
-	Chiara Meiohas <cmeiohas@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Patrisious Haddad <phaddad@nvidia.com>
-Subject: Re: [PATCH rdma-next v3 00/11] RDMA/core: Introduce FRMR pools
- infrastructure
-Message-ID: <20260225114716.GD9541@unreal>
-References: <20260202-frmr_pools-v3-0-b8405ed9deba@nvidia.com>
+	s=k20201202; t=1772020646;
+	bh=gRRaI+geC4oozfeB8XGa0j0UpRd1bkCutfhQjfTPm28=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=i55h3BaqiZSzNZ4pm7zPDUntoGHf9LXdKOoQRiFpGjhZmMPF5xo3VTyhOYaiSgV0j
+	 Jol03Wzr5kzhfDxhIy53KYJFZt6saiBHqPkumHCENy+LUv5nK8SXQRKsdwPB9WgHXw
+	 gIgw+DzGUx/C2nl4zng7/uV31gLP12+Oda3bJg7ojJVXAI4u3vzEIzvyJT1REqAxm+
+	 4RBDaUawJX/6u0nEK9IEvkKdA3fMjhsrvmHJZNBwLGBvamWsxgOEX4LqbT/yZ+Z0wq
+	 pvWucSzZa4C4C35eUSBJ4vRJsppjbOKAA8gRqQ4OFnhBASCCRRMpiAwG+xGO+e57Ru
+	 ZhL2B4i/byTVw==
+Message-ID: <bf7df838-7337-4ef8-b0c4-492f9c9bced7@kernel.org>
+Date: Wed, 25 Feb 2026 12:57:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260202-frmr_pools-v3-0-b8405ed9deba@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net-next 3/3] tcp: make tcp_v{4,6}_send_check() static:
+ manual merge
+To: Eric Dumazet <edumazet@google.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com, "David S . Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Mark Brown <broonie@kernel.org>
+References: <20260223100729.3761597-1-edumazet@google.com>
+ <20260223100729.3761597-4-edumazet@google.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Content-Language: en-GB, fr-BE
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20260223100729.3761597-4-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260906-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com,davemloft.net,redhat.com];
+	TAGGED_FROM(0.00)[bounces-260907-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	HAS_ORG_HEADER(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
-X-Rspamd-Queue-Id: CFE64196DCD
+	FORGED_SENDER_MAILLIST(0.00)[]
+X-Rspamd-Queue-Id: DB301196E97
 X-Rspamd-Action: no action
 
-On Mon, Feb 02, 2026 at 05:59:52PM +0200, Edward Srouji wrote:
-> From Michael:
-> 
-> This patch series introduces a new FRMR (Fast Registration Memory Region)
-> pool infrastructure for the RDMA core subsystem. The goal is to provide
-> efficient management and allow reuse of MRs (Memory Regions) for RDMA
-> device drivers.
-> 
-> Background
-> ==========
-> 
-> Memory registration and deregistration can be a significant bottleneck in
-> RDMA applications that need to register memory regions dynamically in
-> their data path or must re-register memory on application restart.
-> Repeatedly allocating and freeing these resources introduces overhead,
-> particularly in high-throughput or latency-sensitive environments where
-> memory regions are frequently cycled. Notably, the mlx5_ib driver has
-> already adopted memory registration reuse mechanisms and has demonstrated
-> notable performance improvements as a result.
-> 
-> FRMR pools will store handles of the reusable objects, giving drivers
-> the flexibility to choose what to store (e.g: pointers or indexes).
-> Device driver integration requires the ability to modify the hardware
-> objects underlying MRs when reusing FRMR handles, allowing the update
-> of pre-allocated handles to fit the parameters of requested MR
-> registrations. The FRMR pools manage memory region handles with respect
-> to attributes that cannot be changed after allocation such as access flags,
-> ATS capabilities, vendor keys, and DMA block size so each pool is uniquely
-> characterized by these non-modifiable attributes.
-> This ensures compatibility and correctness while allowing drivers
-> flexibility in managing other aspects of the MR lifecycle.
-> 
-> Solution Overview
-> =================
-> 
-> This patch series introduces a centralized, per-device FRMR pooling
-> infrastructure that provides:
-> 
-> 1. Pool Organization: Uses an RB-tree to organize pools by FRMR
->    characteristics (ATS support, access flags, vendor-specific keys,
->    and DMA block count). This allows efficient lookup and reuse of
->    compatible FRMR handles.
-> 
-> 2. Dynamic Allocation: Pools grow dynamically on demand when no cached
->    handles are available, ensuring optimal memory usage without
->    sacrificing performance.
-> 
-> 3. Aging Mechanism: Implements an aging system. Unused handles are
->    gradually moved to the freed after a configurable aging period
->    (default: 60 seconds), preventing memory bloat during idle periods.
-> 
-> 4. Pinned Handles: Supports pinning a minimum number of handles per
->    pool to maintain performance for latency-sensitive workloads, avoiding
->    allocation overhead on critical paths.
-> 
-> 5. Driver Flexibility: Provides a callback-based interface
->    (ib_frmr_pool_ops) that allows drivers to implement their own FRMR
->    creation/destruction logic while leveraging the common pooling
->    infrastructure.
-> 
-> API
-> ===
-> 
-> The infrastructure exposes the following APIs:
-> 
-> - ib_frmr_pools_init(): Initialize FRMR pools for a device
-> - ib_frmr_pools_cleanup(): Clean up all pools for a device
-> - ib_frmr_pool_pop(): Get an FRMR handle from the pool
-> - ib_frmr_pool_push(): Return an FRMR handle to the pool
-> - ib_frmr_pools_set_aging_period(): Configure aging period
-> - ib_frmr_pools_set_pinned(): Set minimum pinned handles per pool
-> 
-> mlx5_ib
-> =======
-> 
-> The partial control and visability we had only over the 'persistent'
-> cache entries through debugfs is replaced by the netlink FRMR API that
-> allows showing and setting properties of all available pools.
-> This series also changes the default behavior MR cache had for PFs
-> (Physical Functions) by dropping the pre-allocation of MKEYs that was
-> costing 100MB of memory per PF and slowing down the loading and
-> unloading of the driver.
-> 
-> Signed-off-by: Michael Guralnik <michaelgur@nvidia.com>
-> Signed-off-by: Edward Srouji <edwards@nvidia.com>
-> ---
-> Changes in v3:
-> - Use rbtree helpers for pool find and find_add operations.
-> - Use cmp_int() for pool key comparison.
-> - Make key comparison inline.
-> - Link to v2: https://lore.kernel.org/r/20251222-frmr_pools-v2-0-f06a99caa538@nvidia.com
-> 
-> Changes in v2:
-> - Fix stack size warning in netlink set_pinned flow.
-> - Add commit to move async command context init and cleanup out of MR
->   cache logic.
-> - Add enforcement of access flags in set_pinned flow and enforce used
->   bits in vendor specific fields to ensure old kernels fail if any
->   unknown parameter is passed.
-> - Add an option to expose kernel-internal pools through netlink.
-> - Link to v1: https://lore.kernel.org/r/20251116-frmr_pools-v1-0-5eb3c8f5c9c4@nvidia.com
-> 
-> ---
-> Chiara Meiohas (1):
->       RDMA/mlx5: Move device async_ctx initialization
-> 
-> Michael Guralnik (10):
->       IB/core: Introduce FRMR pools
->       RDMA/core: Add aging to FRMR pools
->       RDMA/core: Add FRMR pools statistics
->       RDMA/core: Add pinned handles to FRMR pools
->       RDMA/mlx5: Switch from MR cache to FRMR pools
->       net/mlx5: Drop MR cache related code
->       RDMA/nldev: Add command to get FRMR pools
->       RDMA/core: Add netlink command to modify FRMR aging
->       RDMA/nldev: Add command to set pinned FRMR handles
->       RDMA/nldev: Expose kernel-internal FRMR pools in netlink
+Hi Eric,
 
+Thank you for the patch!
 
-There is a need to rebase this series, it doesn't apply.
+On 23/02/2026 11:07, Eric Dumazet wrote:
+> tcp_v{4,6}_send_check() are only called from tcp_output.c
+> and should be made static so that the compiler does not need
+> to put an out of line copy of them.
+> 
+> Remove (struct inet_connection_sock_af_ops) send_check field
+> and use instead @net_header_len.
+> 
+> Move @net_header_len close to @queue_xmit for data locality
+> as both are used in TCP tx fast path.
 
-Thanks
+(...)
+> diff --git a/include/net/inet_connection_sock.h b/include/net/inet_connection_sock.h
+> index ecb362025c4e5183ec78aef4b45c249da87c19ea..bbc9355871c767b51e3d1a4d2436022a8556416c 100644
+> --- a/include/net/inet_connection_sock.h
+> +++ b/include/net/inet_connection_sock.h
+> @@ -34,7 +34,7 @@ struct tcp_congestion_ops;
+>   */
+>  struct inet_connection_sock_af_ops {
+>  	int	    (*queue_xmit)(struct sock *sk, struct sk_buff *skb, struct flowi *fl);
+> -	void	    (*send_check)(struct sock *sk, struct sk_buff *skb);
+> +	u16	    net_header_len;
+>  	int	    (*rebuild_header)(struct sock *sk);
+>  	void	    (*sk_rx_dst_set)(struct sock *sk, const struct sk_buff *skb);
+>  	int	    (*conn_request)(struct sock *sk, struct sk_buff *skb);
+> @@ -43,7 +43,6 @@ struct inet_connection_sock_af_ops {
+>  				      struct dst_entry *dst,
+>  				      struct request_sock *req_unhash,
+>  				      bool *own_req);
+> -	u16	    net_header_len;
+
+FYI, I got a small conflict when merging 'net' in 'net-next' in the
+MPTCP tree due to this patch applied in 'net':
+
+  858d2a4f67ff ("tcp: fix potential race in tcp_v6_syn_recv_sock()")
+
+and this one from 'net-next':
+
+  fcd3d039fab6 ("tcp: make tcp_v{4,6}_send_check() static")
+
+The conflict was in the context: here 'net_header_len' has been moved,
+while in net-next, the line above has been modified. I'm sharing the 3w
+patch resolving the conflict, just in case it can help others. Rerere
+cache is available as well:
+
+ https://github.com/multipath-tcp/mptcp-upstream-rr-cache/commit/d58bc4b
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
+------------------------ 8< ------------------------
+diff --cc include/net/inet_connection_sock.h
+index 5cb3056d6ddc,bbc9355871c7..433c2df23076
+--- a/include/net/inet_connection_sock.h
++++ b/include/net/inet_connection_sock.h
+@@@ -42,10 -42,7 +42,9 @@@ struct inet_connection_sock_af_ops 
+  				      struct request_sock *req,
+  				      struct dst_entry *dst,
+  				      struct request_sock *req_unhash,
+ -				      bool *own_req);
+ +				      bool *own_req,
+ +				      void (*opt_child_init)(struct sock *newsk,
+ +							     const struct sock *sk));
+- 	u16	    net_header_len;
+  	int	    (*setsockopt)(struct sock *sk, int level, int optname,
+  				  sockptr_t optval, unsigned int optlen);
+  	int	    (*getsockopt)(struct sock *sk, int level, int optname,
+------------------------ 8< ------------------------
 
