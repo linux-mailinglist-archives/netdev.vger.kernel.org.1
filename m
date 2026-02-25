@@ -1,150 +1,235 @@
-Return-Path: <netdev+bounces-260778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260784-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IGa+M6KinmlPWgQAu9opvQ
-	(envelope-from <netdev+bounces-260778-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 08:20:02 +0100
+	id OH23Kd2mnmmrWgQAu9opvQ
+	(envelope-from <netdev+bounces-260784-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 08:38:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 716E01933B4
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 08:20:02 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B190193908
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 08:38:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1CE27305A2C5
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 07:19:42 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A8A6530131E9
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 07:36:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDE952E0938;
-	Wed, 25 Feb 2026 07:19:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD462F7478;
+	Wed, 25 Feb 2026 07:36:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z24wLhm5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PUG0fwgp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA71E22F177;
-	Wed, 25 Feb 2026 07:19:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772003978; cv=none; b=d76LxzerUZAd+1Up6N1U2JSmClFC3zTmOWdoA27HHkKT5GpzRmaGlzRriLK8ymGeUN40iqzbs9zVW/sYA2XmuZV3sSCAOL9p/3+KjNeEZbmwgIU8kWewwUtRKvWSraXWC7DD85RIiqev51NP0KXlgmx3Hmirwslksc1OkIkEKwE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772003978; c=relaxed/simple;
-	bh=A7lRttC43wF7lpKdY61+Fq1GW0SYqkp06OO3jF4y3oM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ls2GjI2ugw0OAx2gHcfgHMNpmWHhNqLHlply6CoxQPs8PJJFYXQcy3pkxw0bLRkZPZnDDMa0ImaO4SB/aT+1smFZwBgnA7t58DGoNFi0IHKfmp1IB3G6fFlNN8D1KucYNvPdA+1dRPS3OKxC6AbCJulZtKkQTPOI7IJUHrIObbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z24wLhm5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58C22C19425;
-	Wed, 25 Feb 2026 07:19:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772003978;
-	bh=A7lRttC43wF7lpKdY61+Fq1GW0SYqkp06OO3jF4y3oM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Z24wLhm5/hlhU0gkoIm6x9z2KjkAIaHXIYJV4uUyDIR+3hmm2Bl1Ycmw6+TIfLpcL
-	 bdzlprkx0zhWuNM6KdsT2ER383xrUWorB+MYjjkLrUhH8WPSfmMZv5ai9+Dr62Nuqk
-	 yEvyIlsaervGrjeETEBQg8ogKCxZ+bH7A+mCTe+Wwu4h4wbMH4u23XDfo/Mfhun2jA
-	 hdJleBHr2kYeLtdzt7VMWUxAjImTT4y134nJTkge4cKYuTcAYRY93H5gmbl5yzfICn
-	 IlOcLpRZB71TR98tr5eHZ+mjbXIc8ocAa6yULW9aAt+hOsjlchEgDrR+oCf4sdLm6A
-	 6n2iLJ74d0RJw==
-Date: Wed, 25 Feb 2026 09:19:21 +0200
-From: Mike Rapoport <rppt@kernel.org>
-To: Byungchul Park <byungchul@sk.com>
-Cc: linux-mm@kvack.org, akpm@linux-foundation.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
-	harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
-	davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
-	john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com,
-	leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
-	andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
-	david@redhat.com, lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com, vbabka@suse.cz, surenb@google.com,
-	mhocko@suse.com, horms@kernel.org, jackmanb@google.com,
-	hannes@cmpxchg.org, ziy@nvidia.com, ilias.apalodimas@linaro.org,
-	willy@infradead.org, brauner@kernel.org, kas@kernel.org,
-	yuzhao@google.com, usamaarif642@gmail.com,
-	baolin.wang@linux.alibaba.com, almasrymina@google.com,
-	toke@redhat.com, asml.silence@gmail.com, bpf@vger.kernel.org,
-	linux-rdma@vger.kernel.org, sfr@canb.auug.org.au, dw@davidwei.uk,
-	ap420073@gmail.com, dtatulea@nvidia.com
-Subject: Re: [PATCH v4] mm: introduce a new page type for page pool in page
- type
-Message-ID: <aZ6ieTRCPs3IKWpp@kernel.org>
-References: <20260224051347.19621-1-byungchul@sk.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A352E0938
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 07:36:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772004977; cv=pass; b=Rb8Lxqc0LTTZua0hYe6nOaPQAwSxVu7BHFsu6aCeZXGzsNVVZwmNJRfOuznrVMqO9aOXgavdsoQrdGNsOSOZJnkY6N879WUAgZM/QA6jAXFsh19lP3eABsDJ3oHAEy7Sm3GQJYpwTXQD9lpgjaIfzB3kyJXj3ADriqvomZDlG/s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772004977; c=relaxed/simple;
+	bh=qPMyRmiQw7pJhER5YKqD7lk1WLwtH8C/KfNioQXmSXY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nMG9O9DrNYRgCrM7hJ15DYTgnEvPbw/IexQTYM5wlg5HMthYM9tAixQvCo/OKYDLi1PTXxC90bR22uEnJl6JQR/UgRDdSKgY3kFcqTsHnlgLiYI/K3p+bM2AWTlmvYTJRiuE32+nwQ/oLEtQOBtKvs/GTGLu/zUgaoIhPOmqXMc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PUG0fwgp; arc=pass smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-43984d7e49bso1346986f8f.2
+        for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 23:36:15 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772004974; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Bx/N9XopshQN1VlLONaYujZQLjrqEiEr5vpcdHOBQDtp04TpTLIfOQWaIczIBgIKwK
+         H8O7iQ/5i6+GQvQ8P7vq+H0WZormKGtT43FmT1zMOBhmtZ8N2hFz3GPImbW5DBCoQjaV
+         QL4Xg6TvxZb+Oi8xN6C5DaYziUs1ZlOf3TfPNrqKwUFMBaUzZUGWZXaRK81qpwBFoabM
+         54NjLgIlctLXKNo4xMl3xn3oUCySeXUe9JdA6i1TrsTv0EgLRHH8UFiZuAH9x4Qxv2hD
+         QBXaiLanwdPOq+lHt/n//L+YJJHGWObf4hON0cn1JGpCMSG0Qa1VCWRKGWaqXUyYmbWC
+         RMNg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=cPsEREjpbbRl+Ykcb3p5rXFShnBdQuEGwwIZOOJ5aCo=;
+        fh=FmPeW7fpm18BmxHH5bTwO42lg9wwF+kG4Ilj8tqK4QA=;
+        b=TNusb4Jz60bacsQI/1GoB8pQ9UT2VDYKf4wFhr5d5zycubCbAftKgH+RFh2MFQHeBy
+         +bzB8U3VkbRRa+wSyuJzI2vauKyVzTTgBvfC0h+yIF4SvALH+cikrxnDBVlRdV2+VWSx
+         s1l5E3IB+xfF3JyvFVQmsSp6GgCGmDUMBeigisN2mIoFPygXs4dxVYJBU6Ze04M5pOec
+         wJIJOp+RvhQdJXc5qOXErhSlkhCtT+YHGF2364zxKOa933TNn44g0I0jNQYwTdIzKzL8
+         SLcnJ0pEk1i49hm2zhO4bDL1jnxdrd2TifhbjeRPsnrblapzTsR9QodgRi7eJRcVlT1T
+         EO5g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772004974; x=1772609774; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=cPsEREjpbbRl+Ykcb3p5rXFShnBdQuEGwwIZOOJ5aCo=;
+        b=PUG0fwgplVBzSMC2G2vQcXHqb6X/6eDcrRJdxegwb+lxeVbWESdRNczbsXGyZOA+zD
+         ZSM6t/28ah8E7kaHKovf8z1mtBKT7t+GgLFtBx3mUrvbD5U9SarbLPyczDV9611so0uz
+         LPoRafj2E4W7HflbslC5IUoim3oNT+ra8ZpkupeAeIl/io25q3akz4y/bb2CFIg8EqCR
+         Y3De+1SMPE6MfKtTKxNs6VwRjDBVsL1GkuETnScJsy0H/i1cQSQoqfZ4Wsve52nPb7EO
+         VEn5vrlI/yy+ylH+mEFm8a2p2omh6i9V14vB1UCwroCPSzUOtryW/RyxV3gNsM30T7T2
+         JYDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772004974; x=1772609774;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cPsEREjpbbRl+Ykcb3p5rXFShnBdQuEGwwIZOOJ5aCo=;
+        b=pEo6yxg+kcooIFrdfTrai2svOVUcSUjRHV3X3RAXFqN68Tgf6Q/B7DaqaI7HeKgqe/
+         DAwmrLElEuMqh9mbNEFzPqVnot+lUMn2gz3ebYCS1pGKPZyh54/Xhk5iQyQFIfpVvJCy
+         dlWNuGTgHPLye75/34LDu2LcFnomfy4PudYZqX+f9oLBu1ZnbfpFzWfSfo1DDP0/riSC
+         rjqfgYogbEKPTxIIoEbg+SUAF+LiGpIiFFEESFBdnSWTpUq22rMWjvcfBZwOZ++hP6wX
+         vQxYMojRIxjPjwhJJGPz6MXOFURMVF26g9LgEyq9kruwDB7/LBfdy4wS5z5VeGkqcwN4
+         wKVg==
+X-Forwarded-Encrypted: i=1; AJvYcCVJAGDr6USZifOiLttTRKV6CXe5MZ4RnED/YNq+PqYJuqYq+aXMrM2f4rgnEZ/SLkAQfQOywdM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFuVKbeLoOxWth6VgA+rHkzQWreNq4dZcb6LnJwIng7b6DyAiV
+	azk9/bzgHunRVgSzCKKjM0GherlRcHmYvSAztCLRJkwx0KSZqqa2mxJOdRb1IMbQ3hhVk3M0iJY
+	YoTAVajHHNm+IQY7PibnZUMurIZ5U8jY=
+X-Gm-Gg: ATEYQzxvbqwU6EBIXsExL0XSstm96qxNsqlWzTY8pCbGlNjTwCxkZKpdxd1b0+w3zXI
+	xvr/wtZ4rTXXiGe0+uQvuhO6i7WIeJMVIWv6xf1khQzfVfgqBhgRev6ROT7/xYnyY5aYW9PZaKV
+	KvcnZvMPRwApT7cOObIeha0g0rMyG1pRans+J3pFxP4R/zOSaMKD+a/mY6YoKqHqTL4gHdYTvl1
+	Zd2aAbpLUPjVDKkX7cWk9v6zPz0oak1v8mhPMNaRAOs1BuDpITfaxbPRE83dRwqmcUyWvLJKyaF
+	CGRnOQm6gFLawUo=
+X-Received: by 2002:a05:6000:438a:b0:437:6661:fcc9 with SMTP id
+ ffacd0b85a97d-4396f17d264mr27401304f8f.50.1772004973270; Tue, 24 Feb 2026
+ 23:36:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260224051347.19621-1-byungchul@sk.com>
+References: <CAPh3n803k8JcBPV5qEzUB-oKzWkAs-D5CU7z=Vd_nLRCr5ZqQg@mail.gmail.com>
+ <95ccf5a6-975b-4543-80a3-595f1ee20543@redhat.com>
+In-Reply-To: <95ccf5a6-975b-4543-80a3-595f1ee20543@redhat.com>
+From: Daniele Palmas <dnlplm@gmail.com>
+Date: Wed, 25 Feb 2026 08:19:46 +0100
+X-Gm-Features: AaiRm53G8wva2-r8k7hpjoD_2UgFtTWerh0eqF47qBCR6-DpITxxvsKCTqNKHBU
+Message-ID: <CAGRyCJE85fLOahUR3PAUnS_jH4+qpBq37qpged=nvObbg1m+Qw@mail.gmail.com>
+Subject: Re: commit 662dc80a5e86 breaks rmnet over usb
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: Koen Vandeputte <koen.vandeputte@citymesh.com>, oneukum@suse.com, andrew+netdev@lunn.ch, 
+	Eric Dumazet <edumazet@google.com>, kuba@kernel.org, pabeni@redhat.com, 
+	netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260778-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kvack.org,linux-foundation.org,vger.kernel.org,skhynix.com,oracle.com,kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,nvidia.com,lunn.ch,google.com,redhat.com,suse.cz,suse.com,cmpxchg.org,linaro.org,infradead.org,linux.alibaba.com,canb.auug.org.au,davidwei.uk];
-	RCPT_COUNT_TWELVE(0.00)[47];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-260784-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.991];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rppt@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dnlplm@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sk.com:email,suse.cz:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:email]
-X-Rspamd-Queue-Id: 716E01933B4
+	FREEMAIL_FROM(0.00)[gmail.com]
+X-Rspamd-Queue-Id: 0B190193908
 X-Rspamd-Action: no action
 
-On Tue, Feb 24, 2026 at 02:13:47PM +0900, Byungchul Park wrote:
-> Currently, the condition 'page->pp_magic == PP_SIGNATURE' is used to
-> determine if a page belongs to a page pool.  However, with the planned
-> removal of @pp_magic, we should instead leverage the page_type in struct
-> page, such as PGTY_netpp, for this purpose.
-> 
-> Introduce and use the page type APIs e.g. PageNetpp(), __SetPageNetpp(),
-> and __ClearPageNetpp() instead, and remove the existing APIs accessing
-> @pp_magic e.g. page_pool_page_is_pp(), netmem_or_pp_magic(), and
-> netmem_clear_pp_magic().
-> 
-> Plus, add @page_type to struct net_iov at the same offset as struct page
-> so as to use the page_type APIs for struct net_iov as well.  While at it,
-> reorder @type and @owner in struct net_iov to avoid a hole and
-> increasing the struct size.
-> 
-> This work was inspired by the following link:
-> 
->   https://lore.kernel.org/all/582f41c0-2742-4400-9c81-0d46bf4e8314@gmail.com/
-> 
-> While at it, move the sanity check for page pool to on the free path.
-> 
-> Suggested-by: David Hildenbrand <david@redhat.com>
-> Co-developed-by: Pavel Begunkov <asml.silence@gmail.com>
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> Signed-off-by: Byungchul Park <byungchul@sk.com>
-> Acked-by: David Hildenbrand <david@redhat.com>
-> Acked-by: Zi Yan <ziy@nvidia.com>
-> Acked-by: Vlastimil Babka <vbabka@suse.cz>
-> Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
+Hello,
 
-Acked-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
+Il giorno lun 23 feb 2026 alle ore 15:08 Laurent Vivier
+<lvivier@redhat.com> ha scritto:
+>
+> On 2/23/26 13:04, Koen Vandeputte wrote:
+> > Hi Laurent,
+>
+> Hi Koen,
+>
+> > I'm testing the latest openwrt state and found an issue probably
+> > caused by your usb mtu limit patch :-)
+> >
+> > I'm talking about this one:
+> > 662dc80a5e86 ("usbnet: limit max_mtu based on device's hard_mtu")
+> >
+> > https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=v6.12.74&id=662dc80a5e86b35bbf339e0b87b7cc3f07c09de1
+> >
+> >
+> > When using wwan0 iface normally, this makes sense, but the problem is
+> > when using QMI modems combined with the rmnet driver and aggregated
+> > frames.
+> >
+> > - The modem is configured to frame sizes of 16383 or 32767 using QMI
+> > - wwan0 (using qmi_wwan) is configured to match this frame size by
+> > setting it's MTU to the same value
+> > - Frames of this size are sent over to qmi_wwan driver (containing
+> > multiple data packets)
+> > - Frames are then forwarded to the rmnet driver
+> > - Frames get de-aggregated here and sent to the network stack for processing.
+> >
+> > The reason here is to reduce USB transfers heavily.
+> >
+> >
+> > As you see, it's perfectly possible here to use very large MTU sizes
+> > as the aggregation feature by rmnet relies on this.
+> > Also the modem can be perfectly configured to send very large aggregated frames.
+> >
+> > After your patch, wwan0 is limited to 1500 bytes it seems, effectively
+> > breaking aggregation.
+> >
+> > On my tests, download speeds are reduced from >300Mbps to ~.8Mbps
+> >
+> > I also made a build reverting this patch and all works well again.
+> >
+> >
+> > Is there any other solution to fix this?
+> > I guess it should be reverted otherwise :-)
+>
+> It's weird to be able to set an MTU that is not supported by the hardware.
+>
+> To restore performance I think the rx_usb_size should be decoupled from MTU max in qmi_wwan.
+>
+> Could you try something like:
+>
+> diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
+> index 3a4985b582cb..6b4796fac692 100644
+> --- a/drivers/net/usb/qmi_wwan.c
+> +++ b/drivers/net/usb/qmi_wwan.c
+> @@ -788,6 +788,8 @@ static int qmi_wwan_bind(struct usbnet *dev, struct usb_interface *intf)
+>                  usbnet_get_ethernet_addr(dev, cdc_ether->iMACAddress);
+>          }
+>
+> +       dev->rx_urb_size = 32768;
+> +
 
--- 
-Sincerely yours,
-Mike.
+So far userspace tools (e.g. also the most important one which is
+ModemManager) rely on changing the rx_urb_size by changing the MTU: I
+know this is ugly, but it is a behavior that has been there since a
+lot of time, not sure how many tools based on this assumption could
+break.
+
+There's also the chance that there are modems which require a higher
+rx_urb_size, so having this fixed could not work well.
+
+Unfortunately usbnet serves many drivers, I agree with Koen that a
+revert is the safest option.
+
+Regards,
+Daniele
+
+>          /* claim data interface and set it up */
+>          if (info->control != info->data) {
+>                  status = usb_driver_claim_interface(driver, info->data, dev);
+>
+> Thanks,
+> Laurent
+>
+>
 
