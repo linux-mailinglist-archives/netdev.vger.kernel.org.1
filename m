@@ -1,219 +1,144 @@
-Return-Path: <netdev+bounces-260977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260979-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0OJHN6QFn2mZYgQAu9opvQ
-	(envelope-from <netdev+bounces-260977-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:22:28 +0100
+	id GMgNDc4Gn2neYgQAu9opvQ
+	(envelope-from <netdev+bounces-260979-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:27:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 430D1198A3A
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:22:28 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F380198B8E
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:27:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B94973058190
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:20:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6A862301C116
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:21:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 357723D4106;
-	Wed, 25 Feb 2026 14:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B582E387362;
+	Wed, 25 Feb 2026 14:21:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aMQF+tXJ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kDmLlarz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 122F53D34AD;
-	Wed, 25 Feb 2026 14:19:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 760A272627;
+	Wed, 25 Feb 2026 14:21:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772029199; cv=none; b=JDEjt2nE+G1bIv1g9nQG2IkZxfv5JozQsvfpcO6oRndIRDdwDf9uDyS8DmtnVLVDAupY1B5mqxsMRoq3M9N477Dhjqorr3RQnsC3qTKllwah8zCD7qNBVGihhH9wQ+MGyk3KjB2AhNuwBqYZGd4gYFoYL/kqtVAdI8DdPA8e2j8=
+	t=1772029317; cv=none; b=Xt/SSd/NX5nUpbHlpez3j/f1mXYnQRh4anO9sN21eHMlmG9qMXHl/fDlcNGkVkki8QGPePmOFyDiJ6MlPsEYOLmRJVpfEX8I6tP/wNPfTstIVqiSIk/XuXgaL9x/Fl4rpBsn0yo+OMM95J+DiJTtiWvZE2hobcHNoQPOMXQKxKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772029199; c=relaxed/simple;
-	bh=IWfIW+hzTkf5nStjv+pYV1pJ3Vmlm4ZHSTNuOGvG28E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mRD9eFRJ9dp2lSb9LtRmepPvR7KrU7sXPdgKhQJEfrh54F5j52kyGOb2kFfOwQ7B0QLg9Xr8/fukI6K2dGBPpcU4QuoLaRSFIYCQIxlCS8YWIZcoVdMYVRPO4/eS5JCcXCuKeDtX8apwCt+ky6DDfwCmxPPaJf/fGP2z6PU4SFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aMQF+tXJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48714C116D0;
-	Wed, 25 Feb 2026 14:19:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772029198;
-	bh=IWfIW+hzTkf5nStjv+pYV1pJ3Vmlm4ZHSTNuOGvG28E=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aMQF+tXJfP7CBNQnr+pR/bKhDKwwVWOMiGQqTKj63Ty1JgOGxyrGyH+lGjtG6aj28
-	 N+tolxetZSs4XEjYAxrJXbH5QvzMGq8+AuAfkw5TbV0+jIWmGb1QvALgc05f+noXJ4
-	 dGoZHWPjKTvYv8IwqNk1gNzF99XmsMdhVXg14jEzBCZwOTwQK9TR1nnB/IsHrB8TIp
-	 WQTn86d4i4bkuXh5TLKC6ltql3e5md4zkB87Gu+swkLUgSMoGIutrRvn3G5cslKAJj
-	 tx7OicPUFRzHsNNfQlQmHBxWnH+8ZnWlcFIIIyiiGaKnVn6k9LxYVNs0keMISewCEr
-	 fSjlrAvNMuiDw==
-From: Leon Romanovsky <leon@kernel.org>
-To: Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Mark Bloch <mbloch@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1772029317; c=relaxed/simple;
+	bh=/yJB9goswptPCUWhnj+e3XoMlYvzVeG8i5OMylKAlEg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=da6pwebaAzg75fZ8NcXj8X0fl2GDMwMzJuVbmbZe/ghBCHS8TXAGlxPqB/LmmgbgU4cJX4VPGlB03WnRLUJuB3fH3/TrPXHmfRyxF36IJx3aA2agqXfEgAgVpl2v7ff0h6PxlReyrEaNVDVALb1TL41mo16YPLYUlgTqLe3yqIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kDmLlarz; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=U0bNEX/g9oEGxx38Gdtazi2VGtPKXCH7XZpQ6BCjdyw=; b=kD
+	mLlarzxJrAG2oYqOLwucuxHyGFWVpFr4Mevg38BSzRi8KSlNwD4dzAH78zuibAVgkuI7aAF9CqsuK
+	r4fO7vT/IE5hI2xyEmPA1vcNzTWsNQ0f8tkwkw0P4IAIF7HEZwWLga+p9dizZ/WGn8vmhlotnzWIC
+	SOZuNg6H4YQ6/7E=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vvFlt-008kv5-1E; Wed, 25 Feb 2026 15:21:49 +0100
+Date: Wed, 25 Feb 2026 15:21:49 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: David Yang <mmyangfl@gmail.com>
+Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>
-Cc: linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Maher Sanalla <msanalla@nvidia.com>
-Subject: [PATCH rdma-next 6/6] RDMA/mlx5: Add VAR object query method for cross-process sharing
-Date: Wed, 25 Feb 2026 16:19:36 +0200
-Message-ID: <20260225-var-tlp-v1-6-fe14a7ac7731@nvidia.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260225-var-tlp-v1-0-fe14a7ac7731@nvidia.com>
-References: <20260225-var-tlp-v1-0-fe14a7ac7731@nvidia.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/3] net: dsa: yt921x: Refactor long register
+ helpers
+Message-ID: <26925118-5b6d-4518-b9a1-8df6455c7af5@lunn.ch>
+References: <20260225090853.2021140-1-mmyangfl@gmail.com>
+ <20260225090853.2021140-2-mmyangfl@gmail.com>
+ <cb52e6e5-c047-4190-9e06-4f80a8bef051@lunn.ch>
+ <CAAXyoMOVdeScayuJbtNKmS+QVmWdH1_5EGTUsLH9Oc4bkwDoVQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Mailer: b4 0.15-dev-47773
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAAXyoMOVdeScayuJbtNKmS+QVmWdH1_5EGTUsLH9Oc4bkwDoVQ@mail.gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_MATCH_TO(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260977-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-260979-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,nvidia.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 430D1198A3A
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,lunn.ch:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9F380198B8E
 X-Rspamd-Action: no action
 
-From: Maher Sanalla <msanalla@nvidia.com>
+On Wed, Feb 25, 2026 at 10:12:36PM +0800, David Yang wrote:
+> On Wed, Feb 25, 2026 at 9:52 PM Andrew Lunn <andrew@lunn.ch> wrote:
+> >
+> > > -/* Some registers, like VLANn_CTRL, should always be written in 64-bit, even if
+> > > - * you are to write only the lower / upper 32 bits.
+> > > +/* Some registers, like VLANn_CTRL, should always be written in chunks, even if
+> > > + * you only want to write parts of 32 bits.
+> > >   *
+> > > - * There is no such restriction for reading, but we still provide 64-bit read
+> > > - * wrappers so that we always handle u64 values.
+> > > + * There is no such restriction for reading, but we still provide multi-chunk
+> > > + * read wrappers so that we can handle them consistently.
+> > >   */
+> > >
+> > > -static int yt921x_reg64_read(struct yt921x_priv *priv, u32 reg, u64 *valp)
+> > > +static int
+> > > +yt921x_longreg_read(struct yt921x_priv *priv, u32 reg, u32 *vals,
+> > > +                 unsigned int span)
+> >
+> > Just looking at this, it is not obvious what units span is. Many bulk
+> > read operations takes bytes, even if the underlying code works in
+> > words. I would probably rename span to something like num_u32.
+> >
+> > I would also keep yt921x_reg64_read, yt921x_reg64_write,
+> > yt921x_reg64_update_bits() and just makes them wrappers which call
+> > yt921x_longreg_read().
+> >
+> 
+> I don't think keeping reg64_* would make it better. There will be more
+> 96-bit regs as subsequent series progressing. It would be more messy
+> to have three types of regs: u32, u64, and u32[].
 
-Introduce MLX5_IB_METHOD_VAR_OBJ_QUERY to enable cross-process sharing
-of VAR objects. This method allows a process that has imported the uverbs
-fd via ibv_import_device() to query an existing VAR handle and obtain
-the mmap parameters needed to map the VAR region into its address space.
+The lower level helper takes a u32[], but your higher level is always
+yt921x_reg32_read(), yt921x_reg64_read(), or yt921x_reg96_read(). That
+makes it obvious what size you are reading, and keeps your patch
+small.
 
-This follows the same pattern as UVERBS_METHOD_QUERY_MR, allowing
-userspace to implement mlx5dv_import_var() analogous to ibv_import_mr().
-
-Signed-off-by: Maher Sanalla <msanalla@nvidia.com>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- drivers/infiniband/hw/mlx5/main.c        | 47 +++++++++++++++++++++++++++++++-
- include/uapi/rdma/mlx5_user_ioctl_cmds.h |  8 ++++++
- 2 files changed, 54 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/infiniband/hw/mlx5/main.c b/drivers/infiniband/hw/mlx5/main.c
-index 77cd11c6cca9..a75769f55d31 100644
---- a/drivers/infiniband/hw/mlx5/main.c
-+++ b/drivers/infiniband/hw/mlx5/main.c
-@@ -4263,6 +4263,34 @@ static int UVERBS_HANDLER(MLX5_IB_METHOD_VAR_OBJ_ALLOC)(
- 	return err;
- }
- 
-+static int UVERBS_HANDLER(MLX5_IB_METHOD_VAR_OBJ_QUERY)(
-+	struct uverbs_attr_bundle *attrs)
-+{
-+	struct mlx5_user_mmap_entry *entry =
-+		uverbs_attr_get_obj(attrs, MLX5_IB_ATTR_VAR_OBJ_QUERY_HANDLE);
-+	u64 mmap_offset;
-+	u32 length;
-+	int err;
-+
-+	mmap_offset = mlx5_entry_to_mmap_offset(entry);
-+	if (check_mul_overflow(entry->rdma_entry.npages, (u32)PAGE_SIZE, &length))
-+		return -EOVERFLOW;
-+
-+	err = uverbs_copy_to(attrs, MLX5_IB_ATTR_VAR_OBJ_QUERY_MMAP_OFFSET,
-+			     &mmap_offset, sizeof(mmap_offset));
-+	if (err)
-+		return err;
-+
-+	err = uverbs_copy_to(attrs, MLX5_IB_ATTR_VAR_OBJ_QUERY_PAGE_ID,
-+			     &entry->page_idx, sizeof(entry->page_idx));
-+	if (err)
-+		return err;
-+
-+	err = uverbs_copy_to(attrs, MLX5_IB_ATTR_VAR_OBJ_QUERY_MMAP_LENGTH,
-+			     &length, sizeof(length));
-+	return err;
-+}
-+
- DECLARE_UVERBS_NAMED_METHOD(
- 	MLX5_IB_METHOD_VAR_OBJ_ALLOC,
- 	UVERBS_ATTR_IDR(MLX5_IB_ATTR_VAR_OBJ_ALLOC_HANDLE,
-@@ -4289,10 +4317,27 @@ DECLARE_UVERBS_NAMED_METHOD_DESTROY(
- 			UVERBS_ACCESS_DESTROY,
- 			UA_MANDATORY));
- 
-+DECLARE_UVERBS_NAMED_METHOD(
-+	MLX5_IB_METHOD_VAR_OBJ_QUERY,
-+	UVERBS_ATTR_IDR(MLX5_IB_ATTR_VAR_OBJ_QUERY_HANDLE,
-+			MLX5_IB_OBJECT_VAR,
-+			UVERBS_ACCESS_READ,
-+			UA_MANDATORY),
-+	UVERBS_ATTR_PTR_OUT(MLX5_IB_ATTR_VAR_OBJ_QUERY_PAGE_ID,
-+			    UVERBS_ATTR_TYPE(u32),
-+			    UA_MANDATORY),
-+	UVERBS_ATTR_PTR_OUT(MLX5_IB_ATTR_VAR_OBJ_QUERY_MMAP_LENGTH,
-+			    UVERBS_ATTR_TYPE(u32),
-+			    UA_MANDATORY),
-+	UVERBS_ATTR_PTR_OUT(MLX5_IB_ATTR_VAR_OBJ_QUERY_MMAP_OFFSET,
-+			    UVERBS_ATTR_TYPE(u64),
-+			    UA_MANDATORY));
-+
- DECLARE_UVERBS_NAMED_OBJECT(MLX5_IB_OBJECT_VAR,
- 			    UVERBS_TYPE_ALLOC_IDR(mmap_obj_cleanup),
- 			    &UVERBS_METHOD(MLX5_IB_METHOD_VAR_OBJ_ALLOC),
--			    &UVERBS_METHOD(MLX5_IB_METHOD_VAR_OBJ_DESTROY));
-+			    &UVERBS_METHOD(MLX5_IB_METHOD_VAR_OBJ_DESTROY),
-+			    &UVERBS_METHOD(MLX5_IB_METHOD_VAR_OBJ_QUERY));
- 
- static bool var_is_supported(struct ib_device *device)
- {
-diff --git a/include/uapi/rdma/mlx5_user_ioctl_cmds.h b/include/uapi/rdma/mlx5_user_ioctl_cmds.h
-index 01a2a050e468..7db03b3fdae6 100644
---- a/include/uapi/rdma/mlx5_user_ioctl_cmds.h
-+++ b/include/uapi/rdma/mlx5_user_ioctl_cmds.h
-@@ -146,9 +146,17 @@ enum mlx5_ib_var_obj_destroy_attrs {
- 	MLX5_IB_ATTR_VAR_OBJ_DESTROY_HANDLE = (1U << UVERBS_ID_NS_SHIFT),
- };
- 
-+enum mlx5_ib_var_obj_query_attrs {
-+	MLX5_IB_ATTR_VAR_OBJ_QUERY_HANDLE = (1U << UVERBS_ID_NS_SHIFT),
-+	MLX5_IB_ATTR_VAR_OBJ_QUERY_PAGE_ID,
-+	MLX5_IB_ATTR_VAR_OBJ_QUERY_MMAP_OFFSET,
-+	MLX5_IB_ATTR_VAR_OBJ_QUERY_MMAP_LENGTH,
-+};
-+
- enum mlx5_ib_var_obj_methods {
- 	MLX5_IB_METHOD_VAR_OBJ_ALLOC = (1U << UVERBS_ID_NS_SHIFT),
- 	MLX5_IB_METHOD_VAR_OBJ_DESTROY,
-+	MLX5_IB_METHOD_VAR_OBJ_QUERY,
- };
- 
- enum mlx5_ib_uar_alloc_attrs {
-
--- 
-2.53.0
-
+      Andrew
 
