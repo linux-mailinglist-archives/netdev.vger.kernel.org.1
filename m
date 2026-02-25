@@ -1,239 +1,159 @@
-Return-Path: <netdev+bounces-261001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261002-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iH/tFNoNn2neYgQAu9opvQ
-	(envelope-from <netdev+bounces-261001-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:57:30 +0100
+	id QA4XDpUQn2neYgQAu9opvQ
+	(envelope-from <netdev+bounces-261002-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 16:09:09 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B063E19912E
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:57:29 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF0B319938E
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 16:09:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3C8BB3013A91
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:57:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D061B305328C
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:03:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD9203AEF5F;
-	Wed, 25 Feb 2026 14:57:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F1393D4104;
+	Wed, 25 Feb 2026 15:03:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UnLHqxHF";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="DetyLtqt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="co2AlpS4"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A7C34CFBA
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 14:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C25A3D3D03;
+	Wed, 25 Feb 2026 15:03:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772031447; cv=none; b=g5ALtD2BNxkcBZSQNY89PG8/k2f8wB4cEuM9uPqkahUkhLd2mrSCQi5aMZSmzmWJaCPJP3wLvayiZDo3RLSS9pV3bV9roVQlk9LqVQTjUp1VLzb4J2CzZC1hhGXgvWKNJG+Kuu7UvoNwSMLfgI7/CaDfGl+ciQ/8th1DxkAOaNI=
+	t=1772031821; cv=none; b=PbIQeW9D0kuWJZan9fLOvLW4x+ud0AGPIQnQtkCtnbpmu4oYt4CdVbgsaaHNlv0orkvg85UlVhTNPhDGo2BKjMOLnjBPAu7ziM1ADLfBO3EWK+hhBUQSK5uEwfRO7+D6lTWgZqusnxnKrsIyWo8P3a/wyTfTsOFZ6fo1o1Psssc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772031447; c=relaxed/simple;
-	bh=3nDq6V9sMil92xFBi9eCRFNPceNL07AhmXRsNjKjL9M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UTkAlUCL3kc+n/FQftH68Pus8+hU8Qlj65X/enngjHh3nfKn13BN5CNw30PRYeRVTz+RdBe69a8K1aZL9VjdAN5CZjDLb6KFWRzY8KMKhwjHUgMjx1yKQ2lijpgtkaWVSUs0hvhWDxT5wIEPp3FxQLTbLjbx6KWvPjKeBqtbX/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UnLHqxHF; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=DetyLtqt; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772031445;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WOFZD4dDncjyTTf4CK7xsUk9kkt0EXLPHp2enm9+JaE=;
-	b=UnLHqxHFxlwQozkurPLpQAcGGnGZw12Pw35CCjA039TSiqGIKszuKqzAdJkBxEaGkJZTlK
-	ISBgYS9+4OZklZd1rOE1nUVvUaKmlDDoYKSWEbD1rTiv/nXnI09V0whY99bG2dV04UUdci
-	0wXtm4zg2w1JTAKrAInkO+M+pUeINbo=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-14-dRLauFdzNMu9EL0-auVHug-1; Wed, 25 Feb 2026 09:57:23 -0500
-X-MC-Unique: dRLauFdzNMu9EL0-auVHug-1
-X-Mimecast-MFC-AGG-ID: dRLauFdzNMu9EL0-auVHug_1772031442
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-3883f5ddd9aso42089021fa.1
-        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 06:57:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1772031442; x=1772636242; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WOFZD4dDncjyTTf4CK7xsUk9kkt0EXLPHp2enm9+JaE=;
-        b=DetyLtqt17ZgNG3gI1AEf5+2z8RUgsnqAmltNnWsD6SgNdwC3ijkmWbx+8zIka1SJI
-         wizBsVL3WFAxpnc3iHzIU0h5hdXbFfOdjWYlOyPbNeQaUcgu4F74JJg79RDYG0ZbneA4
-         MW4mn5HldO/RFNZaAt1DSktTs92JvnMFWi/m2EqvmAS82HIoIpwR1xT3/juf+tJkB3dS
-         lzfIMKgzNyKi+h2llbzOM/h/OM3TslMr8Fh/zMN+yyLiPZ49g4u0xhMWBMSN3dqfNXEv
-         PdUP+EiWpogx4HoCO+Kk99dRvYsAh8kStHsF4Xg/k5A/vj5d2gJJMkWIRMWnhvgid/wQ
-         ID6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772031442; x=1772636242;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WOFZD4dDncjyTTf4CK7xsUk9kkt0EXLPHp2enm9+JaE=;
-        b=Zq6A9kDzV7zL/odH+zH8a6J/e5ICIEZ9cmV7q0hZWh23N/fbLmrsDMNt4sSUu4z2FK
-         3Mz/40FC0Qn/qad378JNorQciN0Bvt/ghmldvz1A/eY2352q/h4FsAOOQcOsxYX3ChOA
-         sUF+AYHkM9K31f5wsowwE+MMHPXxJDMphRrp6e6QSM6uBEuAoP24hy9KRCdqIWBvhSb3
-         tNYM1d7Pr2FYdFtWR3kHYPflTZb7ry05XK7t3DeIorfB1/Sd7nM3bN049YggrWiSK/mL
-         LYbZGlMx0b1eJ8mzyEdwPahtzoqJli4wB0SnrH/pFHRFYSpMtkUFD7HWux8LuUIg068q
-         5cpQ==
-X-Gm-Message-State: AOJu0YzYLIlL8THs+bdAMyUPGD7pMOBO9rd0oRd//kwbddOp1JDOHl7y
-	/CY63RdZxCCesQ1Zztxq94bEAZkM1jAlfS6/T7q7q10MdBkYUGdUmNE8xZk5w0aF89rAS1IpfAs
-	oJcFM0Yb8xWhkG3FuW36cCfWsOvWF9Er40zJT4wf4mw7kq63GChEngaO/dQ==
-X-Gm-Gg: ATEYQzyLLNCjKLo4tbFQPN6qyW/MB18B78CzI2gLP7JgoBENLChf836TcysHeICsjgY
-	rnrW0YNtBIWBTHsdZjcD6f8ANsh6ut8tVFDqF/SSp4w/vfb7kXnHWB4sCFbxadgtO9dgpNuJDMo
-	EdzPcFBohiH782ZqKgGHevn5skAMIjZDj3h3owxmdDP8VWjjTs9Vf0W368jV8+DkwNfhtzGJzXk
-	cIJyTXwnUXLLyt5CnxSf8R0rBixrTqX9b69vb/OZ7EtjZZ/qnSQNZCAhgW6EDyS4XxDDAX7u2Cw
-	AqEa6w/ZmE34Tnq5P0RFuBNQHfaTjQIigy1KlX8RLR+0VGPPRvtzB1uS6/XcocS4ooEVMSwjDz0
-	3WuV7a9LhBF4zKT95fV4K
-X-Received: by 2002:a05:651c:1581:b0:387:799:17f8 with SMTP id 38308e7fff4ca-389a5d4e7f8mr51094561fa.16.1772031442088;
-        Wed, 25 Feb 2026 06:57:22 -0800 (PST)
-X-Received: by 2002:a05:651c:1581:b0:387:799:17f8 with SMTP id 38308e7fff4ca-389a5d4e7f8mr51094491fa.16.1772031441579;
-        Wed, 25 Feb 2026 06:57:21 -0800 (PST)
-Received: from [192.168.2.83] ([46.175.183.46])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-389a770ecb7sm30766031fa.0.2026.02.25.06.57.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Feb 2026 06:57:20 -0800 (PST)
-Message-ID: <6d93637e-cc59-45e5-9365-8140f53e4004@redhat.com>
-Date: Wed, 25 Feb 2026 15:57:16 +0100
+	s=arc-20240116; t=1772031821; c=relaxed/simple;
+	bh=QN7ZJdtc/ozhlLaHW7uYptsjLSToVtIBzHuU8im4kWQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=VSGq6UU8vkIE9jELdEvZ+DYxZgE2h4C5bYCpfaWEPvxVYLC7iurAEWGNgUoN9IevWkYtRVdqPxalrkZE434uhhrOvr+k7Fv/cYh19qDhRI5Y6NSFUlZ/J5z/2ocZgl4HdyhSVbhv3wwEDUICvyGPv7fSPS1gxAyVE17/Ja8aeOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=co2AlpS4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CD7CC116D0;
+	Wed, 25 Feb 2026 15:03:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772031820;
+	bh=QN7ZJdtc/ozhlLaHW7uYptsjLSToVtIBzHuU8im4kWQ=;
+	h=Date:From:To:Cc:Subject:From;
+	b=co2AlpS4vccR71sVZhjLLQB/sBtysZ0Gax8OcAyig2RHhbQH3rCWGENT0hpzF3dag
+	 ChTTsW/XGpdzxjfl84Bbcqg26wOrELu4NT9w7QJXyfeOrP7iJ60WSQODJ61eNDA5+H
+	 YN+Yklolv4pNJou1qESNUzIsADhIMwN1d6SY4M+oBjs9FD1S5ngb2zD6+IKSIgEMtS
+	 1/31MUMQea2LvX5jSwyoGj9u38FoYVG9NrzVyQa9dCSAFTU2zdc41qHKeJ5oh6O3EU
+	 zMDVV2MfklThyIA27kYhUNAlKxPq3fkWBff+vlbD8yzwu7R4FMBVLMVILNR5UEOTxs
+	 830vylWV/LSJg==
+Date: Wed, 25 Feb 2026 15:03:36 +0000
+From: Mark Brown <broonie@kernel.org>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Networking <netdev@vger.kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the net-next tree with the net tree
+Message-ID: <aZ8PSFLzBrEU3I89@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net] iavf: fix VLAN filter lost on
- add/delete race
-To: Michal Schmidt <mschmidt@redhat.com>
-Cc: netdev@vger.kernel.org, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Eric Dumazet <edumazet@google.com>, Ahmed Zaki <ahmed.zaki@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, intel-wired-lan@lists.osuosl.org,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org
-References: <20260225100137.383527-1-poros@redhat.com>
- <CADEbmW2WNCLuRYVs5FTKR6GR16yOMmQGyg0vYR98SQCCwb_5HA@mail.gmail.com>
-Content-Language: en-US
-From: Petr Oros <poros@redhat.com>
-In-Reply-To: <CADEbmW2WNCLuRYVs5FTKR6GR16yOMmQGyg0vYR98SQCCwb_5HA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="QMKYyv9/62lws9d/"
+Content-Disposition: inline
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-4.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-261002-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261001-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	TO_DN_ALL(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.997];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[broonie@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B063E19912E
+	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AF0B319938E
 X-Rspamd-Action: no action
 
 
-On 2/25/26 12:17, Michal Schmidt wrote:
-> On Wed, Feb 25, 2026 at 11:02 AM Petr Oros <poros@redhat.com> wrote:
->> When iavf_add_vlan() finds an existing filter in IAVF_VLAN_REMOVE
->> state, it transitions the filter to IAVF_VLAN_ACTIVE assuming the
->> pending delete can simply be cancelled. However, there is no guarantee
->> that iavf_del_vlans() has not already processed the delete AQ request
->> and removed the filter from the PF. In that case the filter remains in
->> the driver's list as IAVF_VLAN_ACTIVE but is no longer programmed on
->> the NIC. Since iavf_add_vlans() only picks up filters in
->> IAVF_VLAN_ADD state, the filter is never re-added, and spoof checking
->> drops all traffic for that VLAN.
->>
->>    CPU0                       CPU1                     Workqueue
->>    ----                       ----                     ---------
->>    iavf_del_vlan(vlan 100)
->>      f->state = REMOVE
->>      schedule AQ_DEL_VLAN
->>                               iavf_add_vlan(vlan 100)
->>                                 f->state = ACTIVE
->>                                                        iavf_del_vlans()
->>                                                          f is ACTIVE, skip
->>                                                        iavf_add_vlans()
->>                                                          f is ACTIVE, skip
->>
->>    Filter is ACTIVE in driver but absent from NIC.
-> I don't get it. If, as the diagram shows, iavf_del_vlans() skipped it,
-> then how does the filter become absent from NIC?
+--QMKYyv9/62lws9d/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-VLAN teardown            Workqueue           VLAN setup
--------------            ---------           ----------
-iavf_del_vlan(100)
-   f->state = REMOVE
-   schedule AQ_DEL_VLAN
-                                              iavf_open()
-                                                restore_filters()
-                                                  f is REMOVE, skip
-                                                iavf_add_vlan(100)
-                                                 f->state = ACTIVE
+Hi all,
 
-                          iavf_del_vlans()
-                           f is ACTIVE, skip
-                          iavf_add_vlans()
-                           f is ACTIVE, skip
+Today's linux-next merge of the net-next tree got a conflict in:
 
-Is it clear like this?
+  include/net/inet_connection_sock.h
 
-> Michal
->
->> Transition to IAVF_VLAN_ADD instead and schedule
->> IAVF_FLAG_AQ_ADD_VLAN_FILTER so iavf_add_vlans() re-programs the
->> filter.  A duplicate add is idempotent on the PF.
->>
->> Fixes: 0c0da0e95105 ("iavf: refactor VLAN filter states")
->>
->> Signed-off-by: Petr Oros <poros@redhat.com>
->> ---
->>   drivers/net/ethernet/intel/iavf/iavf_main.c | 9 ++++++---
->>   1 file changed, 6 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
->> index 4b0fc8f354bc90..6046b93c7f3472 100644
->> --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
->> +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
->> @@ -782,10 +782,13 @@ iavf_vlan_filter *iavf_add_vlan(struct iavf_adapter *adapter,
->>                  adapter->num_vlan_filters++;
->>                  iavf_schedule_aq_request(adapter, IAVF_FLAG_AQ_ADD_VLAN_FILTER);
->>          } else if (f->state == IAVF_VLAN_REMOVE) {
->> -               /* IAVF_VLAN_REMOVE means that VLAN wasn't yet removed.
->> -                * We can safely only change the state here.
->> +               /* Re-add the filter since we cannot tell whether the
->> +                * pending delete has already been processed by the PF.
->> +                * A duplicate add is harmless.
->>                   */
->> -               f->state = IAVF_VLAN_ACTIVE;
->> +               f->state = IAVF_VLAN_ADD;
->> +               iavf_schedule_aq_request(adapter,
->> +                                        IAVF_FLAG_AQ_ADD_VLAN_FILTER);
->>          }
->>
->>   clearout:
->> --
->> 2.52.0
->>
+between commit:
 
+  858d2a4f67ff6 ("tcp: fix potential race in tcp_v6_syn_recv_sock()")
+
+=66rom the net tree and commit:
+
+  fcd3d039fab69 ("tcp: make tcp_v{4,6}_send_check() static")
+
+=66rom the net-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+diff --cc include/net/inet_connection_sock.h
+index 5cb3056d6ddc7,bbc9355871c76..0000000000000
+--- a/include/net/inet_connection_sock.h
++++ b/include/net/inet_connection_sock.h
+@@@ -42,10 -42,7 +42,9 @@@ struct inet_connection_sock_af_ops=20
+  				      struct request_sock *req,
+  				      struct dst_entry *dst,
+  				      struct request_sock *req_unhash,
+ -				      bool *own_req);
+ +				      bool *own_req,
+ +				      void (*opt_child_init)(struct sock *newsk,
+ +							     const struct sock *sk));
+- 	u16	    net_header_len;
+  	int	    (*setsockopt)(struct sock *sk, int level, int optname,
+  				  sockptr_t optval, unsigned int optlen);
+  	int	    (*getsockopt)(struct sock *sk, int level, int optname,
+
+--QMKYyv9/62lws9d/
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmmfD0cACgkQJNaLcl1U
+h9Dofwf7BX6pxkyrHNFlvAU7ffZ/Q2hssJ8XCjwdBJXKoxWISMCUCUAOy0En9lzO
+kVRXlFPfkztphCl9Pj4wD6C08Jix5E/tqmkDgInKSNafHR2zcD819D3NALLx9pd4
+Z3yIQJvuZcsikuMBYUupuOopb0Flp3VvUgAVlPSdQY9PADZnxW7l6QD6RxEya8Ep
+JySihEGGPrNbtO/7/15cJYTInuGaUUikSe95u5d3a9nsVSZowNo/rZ5ujK8N6hdr
+WPEFUBGMUIn6dO0tc8jgPoLnne8nfXz3h3a4uU82YW2UiAmcRQp7wFhWInG0kKFN
+h7c4k/Dntn5Kf1hInM91w429n31o+Q==
+=LLwQ
+-----END PGP SIGNATURE-----
+
+--QMKYyv9/62lws9d/--
 
