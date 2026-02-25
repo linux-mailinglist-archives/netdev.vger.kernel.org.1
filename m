@@ -1,321 +1,278 @@
-Return-Path: <netdev+bounces-260960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260961-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6DJANqX9nmlAYgQAu9opvQ
-	(envelope-from <netdev+bounces-260960-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:48:21 +0100
+	id +DNCFGP+nmlAYgQAu9opvQ
+	(envelope-from <netdev+bounces-260961-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:51:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BF531985A2
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:48:21 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B16F3198615
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:51:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C9CE23119CB2
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 13:44:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5AA78306D8BE
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 13:45:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7657A3C1969;
-	Wed, 25 Feb 2026 13:44:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1900A3C199F;
+	Wed, 25 Feb 2026 13:45:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="Gb7H2x8X"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="UJGKpdDH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 084013C199B
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 13:44:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772027052; cv=none; b=Plr7ChB+4pnZBaE7tU6fF0NhHnUrvbhCvjUgu/EamB/2qWRadWvkhImWqotKLFN+o/RopwuA5rl3JbmhbwhHd0Djite3uEW/ghSyU2n9rff5AWFre11KlC6BmmajJxGc+/IBDGfsoTKPb2S8lbbcEvnHimX73yhZU3XgnEEaTok=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772027052; c=relaxed/simple;
-	bh=Z3wETqtdY+99nIQi00tRq5Q8s30/sYNgwtM3aoAhZdU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pJDiLgcHpM2+FXT/KptjkHF5xC7HVccPSTIAwgTr4tFSBovk7ksKg3rDLwGrvd3kq9o276wEC/631es1+3IECSGR3oVtpOSiQ632BP+9Bt6uBcfgiuwwmoUohQCAw5xlQd/VAec1Xxwh/OE315F/J+8pOy8tJzW5lkAlUPUI8pg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=Gb7H2x8X; arc=none smtp.client-ip=209.85.221.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE2A3C196A
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 13:45:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772027123; cv=pass; b=eqQn+92tm1ZdTVD19xQ3SGpgguwH/d7bm+5I3B2b97nUKANmXmIVJduJEiODoKdSiyRbnzjClAOQGjR4vXOSBGKB6fWboHT7XRFFIUXFjEXZND8xorGBpWrWB60yvaF6Nq66Ov6uJDTUHYq7uwffbOy82E87LYZ7LpkjxFkdEig=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772027123; c=relaxed/simple;
+	bh=NFgNLsvPHKV3rjCsZ0uIMaGA8hfvaIE8ZhHKIA+7aZI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ebC/nEI3E0O8/ljK1G0kbLtkRG8PgS+2Dy7eNoPqYqyC0tLAsbq84my5zDuWnVhfDgM8mHjY1XZrDqND/Ej3NLlWXazVrlhFzdXlOKdCHR+wtGS/74sxEjV/3xIP61eFUpq2DneFhkeRGxaW+lX1N7lDZwmND1Tq7dHVaPULnuY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=UJGKpdDH; arc=pass smtp.client-ip=209.85.216.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-56a857578a8so180492e0c.3
-        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 05:44:10 -0800 (PST)
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-358f3ef464bso900515a91.3
+        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 05:45:22 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772027122; cv=none;
+        d=google.com; s=arc-20240605;
+        b=BnX9ifnuwgSHI28DUTLdcQtOuTUUzDTD8SmtqC1jOBqWgMh0ZqhQp6YcW5ybDxXSKE
+         hHO5V4ao4CaRU33BgzqUnn5UAJT/FP4keCS0f0WemDtUwMQLlNfOTKe4snO5npkTIurw
+         8X7pJcwj05vinr3WOAjwevmr6MCKDiMjUJ/sgvwBDB6fVTUcJMqDj4o4NI1NS64pBuP+
+         CpGbTXDRc/D7jPRcYULRbWryF29pHmQG1Mtlx7IsyH3ZN3nO9qjwI+iqNWy7FL/O+6WS
+         eEBmryI18QE39rgCDNBj8ivqXzN/xjfRW9vZ/7skPKR43AalW7GJsFYGFqo6SejopolN
+         ZamA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ELtbWp1JWcLapCtb8EORqUYFREzoqoeiE7kP7vh9lFU=;
+        fh=6niVe/oviuG9jOHs9h0UExEEAE/3kSiaRpRYDDCbcro=;
+        b=Z3Df2S5/Tx+ulyYClyRyfx6iimHRhqtZB0xP9lsFzPga3VWQ+cuUTcEq00B0lQgPUw
+         FSKbWA2N7bWvmgKvYYtqmZ0iIkypfjUWjCsmYaO+Cri3VGGYtDR+Zi2244BJsjAm2Yty
+         UL7skc09JJvIlOSZ08LIGWwLGF64YJVlOQ9wmib8MP+/Ly5L4oeuTzhM4BCgZ4hYGAy+
+         /NiAC5A1b1BaPF4ENnCd/xZcOrrpcDZxhbh6MwYxkxOoVf4IPBnbBqb7719NqP1qddoB
+         lIljULdxkv4otYcHnifj31xx+SdbHhuGfecOORe/priPv2NElwTGY1AQfwnanzgbhvo9
+         i7Dg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1772027050; x=1772631850; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1772027122; x=1772631922; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Jm8FF3h6v51A2110njbtLbphOX6DPLuV8jnMfO76iwo=;
-        b=Gb7H2x8Xkp+HM7VHxMrGf1g57xjx+2dRKwNrnbUs51/dPliSd2Tq+0yy3phIpjqEPK
-         2H5VReMDEVFPukMLLpYEicSJSDpZN/U+7ZDSm6fHUQVUsKdHP4NBOdhYMWafJF3VKoPh
-         mzpS2VUFapso/rptO1iHwSwyf4Ijh6opRPw939VY20U9nBbyWG0XCu8vf0vJFQliy3Ig
-         rcQM6lV2+TvafG98MravFzDVieNmZ5L4k4VsvEQMh9p8Ui3XH6WHh6aHYqopv/BJki/I
-         kPCayDwm4w7eCr9DIIEXvV+iwlvml5Vgw+e+CUcIwQbC3STyOHMPD7W1dC1FjfcP95u8
-         0DBA==
+        bh=ELtbWp1JWcLapCtb8EORqUYFREzoqoeiE7kP7vh9lFU=;
+        b=UJGKpdDHfM/hgbDL6YhjSRxPzCb96mL/7r/gyCuyqRv+8qVnfqxnuhoLWcvycDeger
+         CSs5ewXsQdtQhBnS8Nj6tdU5bwxRJhPeePNJfHKVx7iFuK0sXM/wAamdic4f9TADAsSF
+         lTjHku+ScdAZXkbdsymh4fxNXQ3cj3lIDVfkEzi6uXAFyEWwZDncTD2RCjvV87aCS/1l
+         8Gsgq3OZyQ9kjXF6/dfkSLk4NC9HyTfNEZs8XoH4Li20zTAKOVxtRgxEbfiPALPmuM5B
+         r00l/ofLXuzA68eb1msyy2ADU+P1vIdj7h0FT6j9xH4HXDbcP6/e9xUvZZeiLjATyAU4
+         Nx1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772027050; x=1772631850;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1772027122; x=1772631922;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Jm8FF3h6v51A2110njbtLbphOX6DPLuV8jnMfO76iwo=;
-        b=A/00WvvAxWZQB9/FAJAt0dU3MTnMDvp1SAljJjddDzYHo5i4a+sJpfCMb3dMiagmxn
-         sGza0iY6FI0HoV+3hdDVAN9DI3luxblR3ZcPyZEzch2bPAldavbYDqJ+OK2fj/nXe/sc
-         JhurREf//0Fbs/Us/oHpprVGHoJnxPjGXEoZmTQ1OTpZ3Z6spY7TZiiH3SF/1Gw3Jkfo
-         Bc+ytQnAJTSLKiPmhbxQEqB2ivjrnXk7Ff12DbRkhjABjg0bBHSqxTQh/qG3jqk/L0R+
-         XWh3wShHK11ES9qQzHye8Ge9gSlRROb/fV+tptuXF6XlwUBh+laBa30QQKlnEidqzJpQ
-         THuQ==
-X-Gm-Message-State: AOJu0Yz3CL8eMbtrMgPDA18BbuI6nWSSNoYG+3UQxD88MpJqnmmCVaUT
-	xy2zBg5XmNN8ySHGtqItcEcehQ54C5l/EDrvFOc8AruNSb3S6gXd2xwBsme27sUi+A==
-X-Gm-Gg: ATEYQzzRW7Ty1AT0oZFxLdtkRaeQLWSRA92L/dueujsI0ybgMbAbHZWM4EIrBFcuLUb
-	tSW3FGiQaxHuQggzLLghsf5Co6hxRjamtpKmR8jUmaxyC5OExFIiaLJL4LkikJWFs3IAXomo5fQ
-	dl8d/JAoXUZWFr6WXoXQjJiKdzzA1YC3Uak3YTZpMqiaj0FYca9QOWzLacS/91gTKWi9lZfvB4A
-	oGh/Qg0ey5HcjntyyzSxOBhbBdKJQac19/vYU7GCUr8v8N0RrfIHCxfT2bYBfz0xOdm03NUKxYh
-	JXeyZJ6TiSLr3zyXMi0Eg38QiPFmLQEVjY+g55Hjk6ZoNEb0IKBqk3UEypii+oD07lbaecVj2Y+
-	KEW0IJJEU4ZAJCFeuDWwEzgzSXSiWjwD0pssLquYjv+9lCYQdcaZbv9Qjv2w2Ev1gIRxidIHIhh
-	wGjgWhNXQ=
-X-Received: by 2002:a05:6122:468a:b0:55b:74ac:72cf with SMTP id 71dfb90a1353d-56a8bcb4e16mr238128e0c.17.1772027049852;
-        Wed, 25 Feb 2026 05:44:09 -0800 (PST)
-Received: from exu-caveira ([2804:14d:5c54:4efb::1c9d])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-568e57d42fbsm15971517e0c.6.2026.02.25.05.44.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Feb 2026 05:44:09 -0800 (PST)
-From: Victor Nogueira <victor@mojatatu.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jhs@mojatatu.com,
-	jiri@resnulli.us,
-	horms@kernel.org,
-	taoliu828@163.com
-Cc: netdev@vger.kernel.org,
-	pctammela@mojatatu.com,
-	km.kim1503@gmail.com
-Subject: [PATCH net 2/2] selftests/tc-testing: Create tests to exercise act_ct binding restrictions
-Date: Wed, 25 Feb 2026 10:43:49 -0300
-Message-ID: <20260225134349.1287037-2-victor@mojatatu.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260225134349.1287037-1-victor@mojatatu.com>
-References: <20260225134349.1287037-1-victor@mojatatu.com>
+        bh=ELtbWp1JWcLapCtb8EORqUYFREzoqoeiE7kP7vh9lFU=;
+        b=qYJtpBBq/AGjKAefiqy8HR1MyRd0rqjog1ENBg9mVfS2R5MRlVY1FLBXqetJicmQRO
+         6KQE8u78+Fs+nwypyQxXDZwNI5ig4ijgrWBrdksywNej4pfA1eDNh1nenQriDkZa2btZ
+         ue29yrfe9VWZKkNOmGq9tEXcBfvKsBoCFdTb/MLWEqtLA1GI0O8S0THAIQgp9qfku3e3
+         uN0cjd9uM8gnJDLhGvjAZini0g0JefLeYK6OGlA/svN34eA9nqRbLpW4fcK+rSiYqbq6
+         1v5ijahNhJOnWI150FLUtv3ygsBAqqWYgwrFdfcsSXcMSsZShFUZhn21HCiq9Od4s4Rf
+         N8aw==
+X-Forwarded-Encrypted: i=1; AJvYcCVhxYxEcB3/yPJYYdZd+sO754iOnvAUFjjsh6KIvqCebVF5iyH7uuFR/R8cNTl+ZZ+aSihHntY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAocXazZiQSP0ClCteBrdxPfcMXuWy+HpbY0ukW6nNq0NJuJ+N
+	cW/M0+uwvbY5bFH4Tui7nyyVOame8aqInpRCOqoHpqumaNOjCQnVA2xBgmef4i2/2Lhd4BIEXby
+	IKvnk6TghzN+jjcTI7tPcbuCMJ6wlHQI6LmhersWrWlpNx8SWjdI=
+X-Gm-Gg: ATEYQzx2AJPbTpyy6C+C4R5ACVK4wZ5MRJF+48cRMq1p2Ggx3+4qFsjaHJkfJyhtljs
+	rwiQ0HFRTBUhLR5pDtrjXUzghvjOcKORj8qWr7hhZYbWWEZkIee9JQsv0VOVce3IRXWIgWUe3sd
+	mqWd28gmMMZ08GidyjD8h5qwumGY8CRVE1Q8Myip2U7+mrU15qY/RWwe2XCPsLOLPOzzILz+0r/
+	Srii6+G3EhXcj2nR3AH+uu7lLdaKyhMGOS+cJwDt/yt/Bqc1caM1FC6djXDrEO5Fon6LKiBWWgw
+	pKv9GCeXF9UoSk0=
+X-Received: by 2002:a17:90b:35c7:b0:356:3cfd:3ed5 with SMTP id
+ 98e67ed59e1d1-358ae8b79b6mr15921780a91.18.1772027122084; Wed, 25 Feb 2026
+ 05:45:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <28504887df314588c7255e9911769c36f751edee.1771964872.git.dcaratti@redhat.com>
+In-Reply-To: <28504887df314588c7255e9911769c36f751edee.1771964872.git.dcaratti@redhat.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 25 Feb 2026 08:45:10 -0500
+X-Gm-Features: AaiRm52IPf97axinIVryHo2xfZHgZJFyL2sw3EqjHThVqSdBXWzxvtjN7IMUMeI
+Message-ID: <CAM0EoMkBsSn_xpdtutUozEQyEjSnhFyf94MHQ6oVLmgGLNyoCA@mail.gmail.com>
+Subject: Re: [PATCH net] net/sched: ets: fix divide by zero in the offload path
+To: Davide Caratti <dcaratti@redhat.com>
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Petr Machata <petrm@mellanox.com>, Ido Schimmel <idosch@mellanox.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260960-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-260961-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	DMARC_NA(0.00)[mojatatu.com];
-	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,redhat.com,mojatatu.com,resnulli.us,163.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,mojatatu.com,gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.988];
-	TO_DN_NONE(0.00)[];
-	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
-	TAGGED_RCPT(0.00)[netdev];
+	DMARC_NA(0.00)[mojatatu.com];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mojatatu.com:mid,mojatatu.com:email]
-X-Rspamd-Queue-Id: 3BF531985A2
+	FREEMAIL_CC(0.00)[gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,mellanox.com,vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,mojatatu.com:email]
+X-Rspamd-Queue-Id: B16F3198615
 X-Rspamd-Action: no action
 
-Add 4 test cases to exercise new act_ct binding restrictions:
+Hi Davide,
 
-- Try to attach act_ct to an ets qdisc
-- Attach act_ct to an ingress qdisc
-- Attach act_ct to a clsact/egress qdisc
-- Attach act_ct to a shared block
+On Tue, Feb 24, 2026 at 3:30=E2=80=AFPM Davide Caratti <dcaratti@redhat.com=
+> wrote:
+>
+> Offloading ETS requires computing each class' WRR weight: this is done by
+> averaging over the sums of quanta as 'q_sum' and 'q_psum'. Using unsigned
+> int, the same integer size as the individual DRR quanta, can overflow and
+> even cause division by zero, like it happened in the following splat:
+>
 
-Signed-off-by: Victor Nogueira <victor@mojatatu.com>
----
- .../tc-testing/tc-tests/actions/ct.json       | 159 ++++++++++++++++++
- 1 file changed, 159 insertions(+)
+Was there a setup/test that resulted in the splat? It would be nice if
+you could document it.
+The fix looks good, so:
 
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/actions/ct.json b/tools/testing/selftests/tc-testing/tc-tests/actions/ct.json
-index 7d07c55bb668..33bb8f3ff8ed 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/actions/ct.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/actions/ct.json
-@@ -505,5 +505,164 @@
-         "teardown": [
-             "$TC qdisc del dev $DEV1 ingress"
-         ]
-+    },
-+    {
-+        "id": "8883",
-+        "name": "Try to attach act_ct to an ets qdisc",
-+        "category": [
-+            "actions",
-+            "ct"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            [
-+                "$TC actions flush action ct",
-+                0,
-+                1,
-+                255
-+            ],
-+            "$TC qdisc add dev $DEV1 root handle 1: ets bands 2"
-+        ],
-+        "cmdUnderTest": "$TC filter add dev $DEV1 parent 1: prio 1 protocol ip matchall action ct index 42",
-+        "expExitCode": "2",
-+        "verifyCmd": "$TC -j filter ls dev $DEV1 parent 1: prio 1 protocol ip",
-+        "matchJSON": [],
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 root"
-+        ]
-+    },
-+    {
-+        "id": "3b10",
-+        "name": "Attach act_ct to an ingress qdisc",
-+        "category": [
-+            "actions",
-+            "ct"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            [
-+                "$TC actions flush action ct",
-+                0,
-+                1,
-+                255
-+            ],
-+            "$TC qdisc add dev $DEV1 ingress"
-+        ],
-+        "cmdUnderTest": "$TC filter add dev $DEV1 ingress prio 1 protocol ip matchall action ct index 42",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j filter ls dev $DEV1 ingress prio 1 protocol ip",
-+        "matchJSON": [
-+            {
-+                "kind": "matchall"
-+            },
-+            {
-+                "options": {
-+                    "actions": [
-+                        {
-+                            "order": 1,
-+                            "kind": "ct",
-+                            "index": 42,
-+                            "ref": 1,
-+                            "bind": 1
-+                        }
-+                    ]
-+                }
-+            }
-+        ],
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 ingress"
-+        ]
-+    },
-+    {
-+        "id": "0337",
-+        "name": "Attach act_ct to a clsact/egress qdisc",
-+        "category": [
-+            "actions",
-+            "ct"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            [
-+                "$TC actions flush action ct",
-+                0,
-+                1,
-+                255
-+            ],
-+            "$TC qdisc add dev $DEV1 clsact"
-+        ],
-+        "cmdUnderTest": "$TC filter add dev $DEV1 egress prio 1 protocol ip matchall action ct index 42",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j filter ls dev $DEV1 egress prio 1 protocol ip",
-+        "matchJSON": [
-+            {
-+                "kind": "matchall"
-+            },
-+            {
-+                "options": {
-+                    "actions": [
-+                        {
-+                            "order": 1,
-+                            "kind": "ct",
-+                            "index": 42,
-+                            "ref": 1,
-+                            "bind": 1
-+                        }
-+                    ]
-+                }
-+            }
-+        ],
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 clsact"
-+        ]
-+    },
-+    {
-+        "id": "4f60",
-+        "name": "Attach act_ct to a shared block",
-+        "category": [
-+            "actions",
-+            "ct"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            [
-+                "$TC actions flush action ct",
-+                0,
-+                1,
-+                255
-+            ],
-+            "$TC qdisc add dev $DEV1 ingress_block 21 clsact"
-+        ],
-+        "cmdUnderTest": "$TC filter add block 21 prio 1 protocol ip matchall action ct index 42",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j filter ls block 21 prio 1 protocol ip",
-+        "matchJSON": [
-+            {
-+                "kind": "matchall"
-+            },
-+            {
-+                "options": {
-+                    "actions": [
-+                        {
-+                            "order": 1,
-+                            "kind": "ct",
-+                            "index": 42,
-+                            "ref": 1,
-+                            "bind": 1
-+                        }
-+                    ]
-+                }
-+            }
-+        ],
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 ingress_block 21 clsact"
-+        ]
-     }
- ]
--- 
-2.52.0
+Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
 
+cheers,
+jamal
+
+>  Oops: divide error: 0000 [#1] SMP PTI
+>  CPU: 13 UID: 0 PID: 487 Comm: tc Tainted: G            E       6.19.0-vi=
+rtme #45 PREEMPT(full)
+>  Tainted: [E]=3DUNSIGNED_MODULE
+>  Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+>  RIP: 0010:ets_offload_change+0x11f/0x290 [sch_ets]
+>  Code: e4 45 31 ff eb 03 41 89 c7 41 89 cb 89 ce 83 f9 0f 0f 87 b7 00 00 =
+00 45 8b 08 31 c0 45 01 cc 45 85 c9 74 09 41 6b c4 64 31 d2 <41> f7 f2 89 c=
+2 44 29 fa 45 89 df 41 83 fb 0f 0f 87 c7 00 00 00 44
+>  RSP: 0018:ffffd0a180d77588 EFLAGS: 00010246
+>  RAX: 00000000ffffff38 RBX: ffff8d3d482ca000 RCX: 0000000000000000
+>  RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffd0a180d77660
+>  RBP: ffffd0a180d77690 R08: ffff8d3d482ca2d8 R09: 00000000fffffffe
+>  R10: 0000000000000000 R11: 0000000000000000 R12: 00000000fffffffe
+>  R13: ffff8d3d472f2000 R14: 0000000000000003 R15: 0000000000000000
+>  FS:  00007f440b6c2740(0000) GS:ffff8d3dc9803000(0000) knlGS:000000000000=
+0000
+>  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>  CR2: 000000003cdd2000 CR3: 0000000007b58002 CR4: 0000000000172ef0
+>  Call Trace:
+>   <TASK>
+>   ets_qdisc_change+0x870/0xf40 [sch_ets]
+>   qdisc_create+0x12b/0x540
+>   tc_modify_qdisc+0x6d7/0xbd0
+>   rtnetlink_rcv_msg+0x168/0x6b0
+>   netlink_rcv_skb+0x5c/0x110
+>   netlink_unicast+0x1d6/0x2b0
+>   netlink_sendmsg+0x22e/0x470
+>   ____sys_sendmsg+0x38a/0x3c0
+>   ___sys_sendmsg+0x99/0xe0
+>   __sys_sendmsg+0x8a/0xf0
+>   do_syscall_64+0x111/0xf80
+>   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>  RIP: 0033:0x7f440b81c77e
+>  Code: 4d 89 d8 e8 d4 bc 00 00 4c 8b 5d f8 41 8b 93 08 03 00 00 59 5e 48 =
+83 f8 fc 74 11 c9 c3 0f 1f 80 00 00 00 00 48 8b 45 10 0f 05 <c9> c3 83 e2 3=
+9 83 fa 08 75 e7 e8 13 ff ff ff 0f 1f 00 f3 0f 1e fa
+>  RSP: 002b:00007fff951e4c10 EFLAGS: 00000202 ORIG_RAX: 000000000000002e
+>  RAX: ffffffffffffffda RBX: 0000000000481820 RCX: 00007f440b81c77e
+>  RDX: 0000000000000000 RSI: 00007fff951e4cd0 RDI: 0000000000000003
+>  RBP: 00007fff951e4c20 R08: 0000000000000000 R09: 0000000000000000
+>  R10: 0000000000000000 R11: 0000000000000202 R12: 00007fff951f4fa8
+>  R13: 00000000699ddede R14: 00007f440bb01000 R15: 0000000000486980
+>   </TASK>
+>  Modules linked in: sch_ets(E) netdevsim(E)
+>  ---[ end trace 0000000000000000 ]---
+>  RIP: 0010:ets_offload_change+0x11f/0x290 [sch_ets]
+>  Code: e4 45 31 ff eb 03 41 89 c7 41 89 cb 89 ce 83 f9 0f 0f 87 b7 00 00 =
+00 45 8b 08 31 c0 45 01 cc 45 85 c9 74 09 41 6b c4 64 31 d2 <41> f7 f2 89 c=
+2 44 29 fa 45 89 df 41 83 fb 0f 0f 87 c7 00 00 00 44
+>  RSP: 0018:ffffd0a180d77588 EFLAGS: 00010246
+>  RAX: 00000000ffffff38 RBX: ffff8d3d482ca000 RCX: 0000000000000000
+>  RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffd0a180d77660
+>  RBP: ffffd0a180d77690 R08: ffff8d3d482ca2d8 R09: 00000000fffffffe
+>  R10: 0000000000000000 R11: 0000000000000000 R12: 00000000fffffffe
+>  R13: ffff8d3d472f2000 R14: 0000000000000003 R15: 0000000000000000
+>  FS:  00007f440b6c2740(0000) GS:ffff8d3dc9803000(0000) knlGS:000000000000=
+0000
+>  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>  CR2: 000000003cdd2000 CR3: 0000000007b58002 CR4: 0000000000172ef0
+>  Kernel panic - not syncing: Fatal exception
+>  Kernel Offset: 0x30000000 from 0xffffffff81000000 (relocation range: 0xf=
+fffffff80000000-0xffffffffbfffffff)
+>  ---[ end Kernel panic - not syncing: Fatal exception ]---
+>
+> Fix this using 64-bit integers for 'q_sum' and 'q_psum'.
+>
+> Cc: stable@vger.kernel.org
+> Fixes: d35eb52bd2ac ("net: sch_ets: Make the ETS qdisc offloadable")
+> Signed-off-by: Davide Caratti <dcaratti@redhat.com>
+> ---
+>  net/sched/sch_ets.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
+>
+> diff --git a/net/sched/sch_ets.c b/net/sched/sch_ets.c
+> index 306e046276d4..a4b07b661b77 100644
+> --- a/net/sched/sch_ets.c
+> +++ b/net/sched/sch_ets.c
+> @@ -115,12 +115,12 @@ static void ets_offload_change(struct Qdisc *sch)
+>         struct ets_sched *q =3D qdisc_priv(sch);
+>         struct tc_ets_qopt_offload qopt;
+>         unsigned int w_psum_prev =3D 0;
+> -       unsigned int q_psum =3D 0;
+> -       unsigned int q_sum =3D 0;
+>         unsigned int quantum;
+>         unsigned int w_psum;
+>         unsigned int weight;
+>         unsigned int i;
+> +       u64 q_psum =3D 0;
+> +       u64 q_sum =3D 0;
+>
+>         if (!tc_can_offload(dev) || !dev->netdev_ops->ndo_setup_tc)
+>                 return;
+> @@ -138,8 +138,12 @@ static void ets_offload_change(struct Qdisc *sch)
+>
+>         for (i =3D 0; i < q->nbands; i++) {
+>                 quantum =3D q->classes[i].quantum;
+> -               q_psum +=3D quantum;
+> -               w_psum =3D quantum ? q_psum * 100 / q_sum : 0;
+> +               if (quantum) {
+> +                       q_psum +=3D quantum;
+> +                       w_psum =3D div64_u64(q_psum * 100, q_sum);
+> +               } else {
+> +                       w_psum =3D 0;
+> +               }
+>                 weight =3D w_psum - w_psum_prev;
+>                 w_psum_prev =3D w_psum;
+>
+> --
+> 2.52.0
+>
 
