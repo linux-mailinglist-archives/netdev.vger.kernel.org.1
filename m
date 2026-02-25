@@ -1,187 +1,165 @@
-Return-Path: <netdev+bounces-260936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260937-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CAdhJtf2nmm+YAQAu9opvQ
-	(envelope-from <netdev+bounces-260936-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:19:19 +0100
+	id sMPBEBv3nmm+YAQAu9opvQ
+	(envelope-from <netdev+bounces-260937-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:20:27 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15C56197E93
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:19:19 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C239C197F8E
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:20:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 98F1C3021465
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 13:19:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8EF2A302925C
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 13:20:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5578E3B8BB2;
-	Wed, 25 Feb 2026 13:19:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 341613B8BC4;
+	Wed, 25 Feb 2026 13:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jYgI/wBB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cO6MYkoO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f73.google.com (mail-yx1-f73.google.com [74.125.224.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30D0D3ACF0B;
-	Wed, 25 Feb 2026 13:19:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E283AE701
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 13:20:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772025553; cv=none; b=W9lDWk+e7zPkIo1XtDmiKAyYkxkuQPVOiGuytCWIdo9oZDlpEUhU5zjvgAPUPeUkI3Oq50Lg61NN1/p8UU4he2zDAh2ygl3hu7USCoHtlCWuZBleQJZNN/+cv9J/O4wqVJStr456kVIKsMK3nBILC37/Ga6dgeJnzCegIxPRkcQ=
+	t=1772025625; cv=none; b=oWActFM8IZrPU4ghTh9c0hL4x3oJrXlaqBwfIG5HB0ZNQ9OPOUXCCu3AdulDE34xG2kowMZSHqoTWr1TYirAaOkYWCY7a0YpJ4hCHJe4sm+z5IzexsFGCOQdFrmDPvfQtUS2SPZ9ybmQL2gSYkAh5S2iSdIi10u3UtSZHjlbNeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772025553; c=relaxed/simple;
-	bh=JsHNTuDpDaTenv/doXJeT6JTO4Gzv/IyY7siVzebZek=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rwJEC0NJGq7DDRtTDuKtKAc27iuTW3OXln2jILAN9O47/j/RTyHn87Jt2wcazjSAGG52e4sm8WQUn3z7ukE7oIK5WNzrk3O1Kvu1oxLCDC9U13cpfmy58xPwJJMLZWx/OOMaL/+ArpjSef9dhCetXBuy7SNgm+9GviutkK3/FdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jYgI/wBB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF600C116D0;
-	Wed, 25 Feb 2026 13:19:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772025552;
-	bh=JsHNTuDpDaTenv/doXJeT6JTO4Gzv/IyY7siVzebZek=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jYgI/wBBIjm7WRhcOiIVl3RoGnGfZMdVlbgwEUIWrVx8v7cLefQKJTlI86LkLu6eC
-	 k0XT2Yp05DVZC9Bjl5I2tH+opZM7btcHssfQrsUnY1ZrqoNoXz6/+mBt91buZcevYZ
-	 75DLbWXpWPQYFXvTv+TVfi/ywxUD0k4BPN0VAM+h3CSSS5T2Egg9wnVYzBy5MfeYYY
-	 4LD00VeqE7ZOt34uIGB+8ZoPDVhC7B1+fm+w5uN6qkWsOqxDfapHLgXSun+66EC/Sb
-	 YCWBrxfRn7o/HYA+s6HkXHTwnrgmPqkVqpU8HiKN+im03/fmToQkvlo/y5u9iqMLOK
-	 os0KW0LWcRTUw==
-Date: Wed, 25 Feb 2026 13:19:06 +0000
-From: Simon Horman <horms@kernel.org>
-To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	longli@microsoft.com, kotaranov@microsoft.com,
-	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
-	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	dipayanroy@microsoft.com, Leon Romanovsky <leon@kernel.org>
-Subject: Re: [PATCH net] net: mana: Fix double destroy_workqueue on service
- rescan PCI path
-Message-ID: <aZ72yhY98hVbHSrr@horms.kernel.org>
-References: <aZ2bzL64NagfyHpg@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	s=arc-20240116; t=1772025625; c=relaxed/simple;
+	bh=dWkOdHUNZY084evNatRVHBp93SP9Ud6vhumdrqM0qYw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ZprPvHcOxbzP+qUtpUMkq6OcqavJ+GIu+HVdrKwX1JzZdtQBbO3cUKOcqmhSuGPiFox4l+hqJxO9MCabkYS2jRfp6Ueq5XcbaiuHrQqtcoSC6pUJI+//9sqbZCNLLqDRmRMNFylUzXM4eeXBC6Dg4vkpUhM1Scz0HdvHMMIMB28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cO6MYkoO; arc=none smtp.client-ip=74.125.224.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yx1-f73.google.com with SMTP id 956f58d0204a3-64956932a51so8321472d50.0
+        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 05:20:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772025623; x=1772630423; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=+IhwFnC60BkZSlrOC/ALdUxYIAf2cwE+9LjagsdzVp8=;
+        b=cO6MYkoOXx2KGXSjTTP9BEAAz8ELdZtwu3Z8UGIcGqZytlou56ifqnnFs7zeNBFw79
+         R5rsrTit5M5QP9ycOEOECgePI96le9IKADfkqWq6AMsGXeR1WYkCVxWgYgk4aHUwwt1q
+         A7a4xsVY1t6p4icBCp5r3IOIU7TltZ68XKYDxG9Jw9byvwywdUUdaGZ/wxzZHAT3ZqaX
+         tMR1/7MX5XX7Ms/7tHqOvS0cHnH1HPkEuMtBqgTsx0xAhdQXaxkSvp9Fz5buVQYmP9Cp
+         0MMIscL0P7vgHgbhmhQFCSEXyU2M/eM4zB3GvtERZKAyy4blAffTAlRKrYCRmJXVxLzb
+         U2qQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772025623; x=1772630423;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+IhwFnC60BkZSlrOC/ALdUxYIAf2cwE+9LjagsdzVp8=;
+        b=EfKUrKPxtBlZX7PUpGGkO6lAZ1q7hajLU2ZoCBhswHsz6CMZjCGl8vaY+uA2my/Vts
+         2QRLmfy0/uICBAFOV05UHNmPgha9wJSJhljEtJGvpW23QGtC3jy1zMNEJ2uYFPvAGVDl
+         kNSuRdi43iBGyy87tNjbkTPcOpO92dGiRrf2RoMh6dQhqJYtjWWyhZMwJP0FoYDOaFlV
+         UVwhJZnrXcwaV6v5E5JE8QGWoi6gtJGT9IBGnLqA4LKJe8+omvQ10czYKZd4z6rjOL7H
+         Qki7t7eHIKDjjL9HZ63qUcOc9EJ4UX0UVPzyVRvZTh/POqw41MYXjtF8eIlYS8umWefD
+         Ppzw==
+X-Gm-Message-State: AOJu0YwGLE7ApuNTt+GJmXntgGjcGdFW2RdK5OCG3TYOIGrFOubfOd9g
+	5qoxBTL2dST6cfhNuLKT3hYtdYrjmfWSqN69DStNkt9FLjo/EAE9+388ITyt+viiB8ustQo3k6y
+	WaE0fAGuhAd/kFw==
+X-Received: from yxyb18.prod.google.com ([2002:a05:690e:1d2:b0:646:e5d7:6a2a])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a53:cd86:0:b0:64a:d9b3:6ef3 with SMTP id 956f58d0204a3-64c787d6ed6mr10402222d50.6.1772025622596;
+ Wed, 25 Feb 2026 05:20:22 -0800 (PST)
+Date: Wed, 25 Feb 2026 13:20:19 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aZ2bzL64NagfyHpg@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.414.gf7e9f6c205-goog
+Message-ID: <20260225132019.1103701-1-edumazet@google.com>
+Subject: [PATCH v2 nf-next] netfilter: nf_log_syslog: no longer acquire
+ sk_callback_lock in nf_log_dump_sk_uid_gid()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	coreteam@netfilter.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260936-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,netfilter.org,gmail.com,google.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260937-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-0.971];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 15C56197E93
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[strlen.de:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C239C197F8E
 X-Rspamd-Action: no action
 
-+ Leon
+After commit 983512f3a87f ("net: Drop the lock in skb_may_tx_timestamp()")
+from Sebastian Andrzej Siewior, apply the same logic in nf_log_dump_sk_uid_gid()
+to avoid touching sk_callback_lock.
 
-On Tue, Feb 24, 2026 at 04:38:36AM -0800, Dipayaan Roy wrote:
-> While testing corner cases in the driver, a use-after-free crash
-> was found on the service rescan PCI path.
-> 
-> When mana_serv_reset() calls mana_gd_suspend(), mana_gd_cleanup()
-> destroys gc->service_wq. If the subsequent mana_gd_resume() fails
-> with -ETIMEDOUT or -EPROTO, the code falls through to
-> mana_serv_rescan() which triggers pci_stop_and_remove_bus_device().
-> This invokes the PCI .remove callback (mana_gd_remove), which calls
-> mana_gd_cleanup() a second time, attempting to destroy the already-
-> freed workqueue. Fix this by NULL-checking gc->service_wq in
-> mana_gd_cleanup() and setting it to NULL after destruction.
-> 
-> Call stack of issue for reference:
-> [Sat Feb 21 18:53:48 2026] Call Trace:
-> [Sat Feb 21 18:53:48 2026]  <TASK>
-> [Sat Feb 21 18:53:48 2026]  mana_gd_cleanup+0x33/0x70 [mana]
-> [Sat Feb 21 18:53:48 2026]  mana_gd_remove+0x3a/0xc0 [mana]
-> [Sat Feb 21 18:53:48 2026]  pci_device_remove+0x41/0xb0
-> [Sat Feb 21 18:53:48 2026]  device_remove+0x46/0x70
-> [Sat Feb 21 18:53:48 2026]  device_release_driver_internal+0x1e3/0x250
-> [Sat Feb 21 18:53:48 2026]  device_release_driver+0x12/0x20
-> [Sat Feb 21 18:53:48 2026]  pci_stop_bus_device+0x6a/0x90
-> [Sat Feb 21 18:53:48 2026]  pci_stop_and_remove_bus_device+0x13/0x30
-> [Sat Feb 21 18:53:48 2026]  mana_do_service+0x180/0x290 [mana]
-> [Sat Feb 21 18:53:48 2026]  mana_serv_func+0x24/0x50 [mana]
-> [Sat Feb 21 18:53:48 2026]  process_one_work+0x190/0x3d0
-> [Sat Feb 21 18:53:48 2026]  worker_thread+0x16e/0x2e0
-> [Sat Feb 21 18:53:48 2026]  kthread+0xf7/0x130
-> [Sat Feb 21 18:53:48 2026]  ? __pfx_worker_thread+0x10/0x10
-> [Sat Feb 21 18:53:48 2026]  ? __pfx_kthread+0x10/0x10
-> [Sat Feb 21 18:53:48 2026]  ret_from_fork+0x269/0x350
-> [Sat Feb 21 18:53:48 2026]  ? __pfx_kthread+0x10/0x10
-> [Sat Feb 21 18:53:48 2026]  ret_from_fork_asm+0x1a/0x30
-> [Sat Feb 21 18:53:48 2026]  </TASK>
-> 
-> Fixes: 505cc26bcae0 ("net: mana: Add support for auxiliary device servicing events")
-> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-> Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Florian Westphal <fw@strlen.de>
+---
+ net/netfilter/nf_log_syslog.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+diff --git a/net/netfilter/nf_log_syslog.c b/net/netfilter/nf_log_syslog.c
+index 41503847d9d7fb21824fabb1b57b45f2622b9310..0507d67cad27530dd814aabaf806fdcd3583fe01 100644
+--- a/net/netfilter/nf_log_syslog.c
++++ b/net/netfilter/nf_log_syslog.c
+@@ -165,18 +165,26 @@ static struct nf_logger nf_arp_logger __read_mostly = {
+ static void nf_log_dump_sk_uid_gid(struct net *net, struct nf_log_buf *m,
+ 				   struct sock *sk)
+ {
++	const struct socket *sock;
++	const struct file *file;
++
+ 	if (!sk || !sk_fullsock(sk) || !net_eq(net, sock_net(sk)))
+ 		return;
+ 
+-	read_lock_bh(&sk->sk_callback_lock);
+-	if (sk->sk_socket && sk->sk_socket->file) {
+-		const struct cred *cred = sk->sk_socket->file->f_cred;
++	/* The sk pointer remains valid as long as the skb is. The sk_socket and
++	 * file pointer may become NULL if the socket is closed. Both structures
++	 * (including file->cred) are RCU freed which means they can be accessed
++	 * within a RCU read section.
++	 */
++	sock = READ_ONCE(sk->sk_socket);
++	file = sock ? READ_ONCE(sock->file) : NULL;
++	if (file) {
++		const struct cred *cred = file->f_cred;
+ 
+ 		nf_log_buf_add(m, "UID=%u GID=%u ",
+ 			       from_kuid_munged(&init_user_ns, cred->fsuid),
+ 			       from_kgid_munged(&init_user_ns, cred->fsgid));
+ 	}
+-	read_unlock_bh(&sk->sk_callback_lock);
+ }
+ 
+ static noinline_for_stack int
+-- 
+2.53.0.414.gf7e9f6c205-goog
 
-> ---
->  drivers/net/ethernet/microsoft/mana/gdma_main.c | 5 ++++-
->  drivers/net/ethernet/microsoft/mana/mana_en.c   | 4 +++-
->  2 files changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> index 0055c231acf6..3926d18f1840 100644
-> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> @@ -1946,7 +1946,10 @@ static void mana_gd_cleanup(struct pci_dev *pdev)
->  
->  	mana_gd_remove_irqs(pdev);
->  
-> -	destroy_workqueue(gc->service_wq);
-> +	if (gc->service_wq) {
-> +		destroy_workqueue(gc->service_wq);
-> +		gc->service_wq = NULL;
-> +	}
->  	dev_dbg(&pdev->dev, "mana gdma cleanup successful\n");
->  }
->  
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> index 9b5a72ada5c4..f69e42651359 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> @@ -3762,7 +3762,9 @@ void mana_rdma_remove(struct gdma_dev *gd)
->  	}
->  
->  	WRITE_ONCE(gd->rdma_teardown, true);
-> -	flush_workqueue(gc->service_wq);
-> +
-> +	if (gc->service_wq)
-> +		flush_workqueue(gc->service_wq);
->  
->  	if (gd->adev)
->  		remove_adev(gd);
-> -- 
-> 2.43.0
-> 
 
