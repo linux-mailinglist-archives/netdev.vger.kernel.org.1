@@ -1,127 +1,116 @@
-Return-Path: <netdev+bounces-260704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260705-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QKkQOPdVnmnyUgQAu9opvQ
-	(envelope-from <netdev+bounces-260704-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 02:52:55 +0100
+	id CHEUIrRanmlSUwQAu9opvQ
+	(envelope-from <netdev+bounces-260705-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 03:13:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95690190190
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 02:52:55 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id F048A190B88
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 03:13:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C7B57309797D
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 01:47:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1B145311B877
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 01:49:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 688B628FFE7;
-	Wed, 25 Feb 2026 01:45:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 151AF1D5ABA;
+	Wed, 25 Feb 2026 01:49:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="WAIDdKWu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kRtoee47"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1114A28A3FA;
-	Wed, 25 Feb 2026 01:45:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E622A1FC7
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 01:49:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771983951; cv=none; b=A9k3VwZPZtnAb0FRhzHJeT03gk9+eVKcTCUU43k+uNBA52+en9bJsPJhTmQ7yR+sZRH3dA9b6XHfwDqfNMyCYg7hIvw8XhQFxZ2tZv3pJFB/7zD9vdwLUxNZUcj3AtT6Ali6wQKiUMFVy/QSgvZJT1VeERelH+pVaOspJvJ4s10=
+	t=1771984151; cv=none; b=D7uWyVWue2IahytcZSTYfxtwbT4o44vT/IZGeomIO7OnlUwO4SFGEqAX+zvo1ny7KygO7pKN6IbJyj8tQ4ImYPflOtl4kj7AxHmpFvtIX7l60ie5mT14UWMZfzP+AAVmAkMRFdIwdBZIUeAxesAw7nFJRiP7mRZI+TqSJB3iYCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771983951; c=relaxed/simple;
-	bh=U87I1AJLHguxn79pLOdJU1CrX0Y7Wl2GoTWom5CKtks=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rPPmhwn0oeurJykMWC2ybItzxceCNIkPex/3bUYe13yLhPwjI0VvgE/dVnZ+eyKL94Sx2+xy1Kvvdqb2iT7/SPWrwTZ1s8l1M7E6IN1OdgBPrTNtIwLmBxUAmHJ30jEHeF9qDfWoAujwT2mCyhHL4KD4yc1VpYulUkhFs1SgFpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=WAIDdKWu; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1771983946; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=UibE2I8JbVmcSHsndJX9DCfJwX/LXdoM0FXt05GZLDs=;
-	b=WAIDdKWuldeF6VOT5R0I0iJANHjKRbuWp9B3Cs7F2ZAoAIs8rXoSxWJDrPKLDbWMbjCTaAok9rh22YzeRwwvBBRg9zgJ+OJFgsNx+y8hjmDsuVdk2OCqyXc6N2BLEob/03/C+ev2I+WiEi+sWy3f7zGKskWc/3trHrz7rW3de2s=
-Received: from 30.221.130.33(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WzkmwlC_1771983937 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 25 Feb 2026 09:45:45 +0800
-Message-ID: <3929f57c-afd2-461f-a840-7bfee6bfb5dd@linux.alibaba.com>
-Date: Wed, 25 Feb 2026 09:45:37 +0800
+	s=arc-20240116; t=1771984151; c=relaxed/simple;
+	bh=BKecuLxxsoO4d9l/uMD9NnqyrqSECOB371UrynbH51I=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=R7sFLphqlI8JPcnX2mjXhp0EBrL5jcWOXR3O7kQo8S1WIlSbP2eBWhlKvrXG2AR7qzhXBOVIlWr/+sLlXks/Sm3LGV1ALINThHKigL1HEfubYGDRdCMW2hufeI/kxe/LMYqVxYg/iQwIcrOXz/XNatA4454X+LHnn0tfirfjdtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kRtoee47; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 599C4C116D0;
+	Wed, 25 Feb 2026 01:49:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771984150;
+	bh=BKecuLxxsoO4d9l/uMD9NnqyrqSECOB371UrynbH51I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kRtoee47sTmqDafzcqILZefLz7s7LpQhXktIWPq19X9oM+wTi88e4MBlzRbllX+HS
+	 Tsln6t8TXn7mWuz5U91/QJrBserIo1kKNsRa+vUNxeVza8Mk5l7j2NyviBgpQ07Wcb
+	 kDaGJ7KW2fQ+Ui67Lyx2bnZG5YbpQWILRgvdhjIkOBTzesdJJZjFiJnvUAaLIOWNAk
+	 EgY6pJb9VoivQjwdOK6aBMuMsli/O+AYz92Mp0by2z/OKxXQk/A7KG5mthit+OHMgo
+	 Cgi6a+Bz3ddkGCTv6zDKwyHgClbXBlmhkl9MKiXa6LdJyC4QjghScaxB2jEIteYSDd
+	 3hlc3CZSor9Ug==
+Date: Tue, 24 Feb 2026 17:49:09 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Kuniyuki Iwashima
+ <kuniyu@google.com>, David Ahern <dsahern@kernel.org>,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
+Subject: Re: [PATCH net-next] ipv6: move ip6_dst_hoplimit() to
+ net/ipv6/ip6_output.c
+Message-ID: <20260224174909.59f52345@kernel.org>
+In-Reply-To: <20260223153342.892477-1-edumazet@google.com>
+References: <20260223153342.892477-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] Defining a home/maintenance model for non-NIC PHC devices
- using the /dev/ptpX API
-To: Imran Shaik <imran.shaik@oss.qualcomm.com>,
- Thomas Gleixner <tglx@linutronix.de>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>,
- Richard Cochran <richardcochran@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Dust Li <dust.li@linux.alibaba.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- David Woodhouse <dwmw2@infradead.org>, virtualization@lists.linux.dev,
- Nick Shi <nick.shi@broadcom.com>, Sven Schnelle <svens@linux.ibm.com>,
- Paolo Abeni <pabeni@redhat.com>, linux-clk@vger.kernel.org,
- Taniya Das <taniya.das@oss.qualcomm.com>
-References: <0afe19db-9c7f-4228-9fc2-f7b34c4bc227@linux.alibaba.com>
- <51e8d8ce-f291-4e31-a938-2c1a0e8684c2@linux.alibaba.com>
- <bb28589e-714b-459d-a609-0153b97ac158@oss.qualcomm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <bb28589e-714b-459d-a609-0153b97ac158@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260704-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_TO(0.00)[oss.qualcomm.com,linutronix.de,vger.kernel.org,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[guwen@linux.alibaba.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,redhat.com,kernel.org,google.com,vger.kernel.org,gmail.com];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-260705-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	NEURAL_HAM(-0.00)[-0.995];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.alibaba.com:mid,linux.alibaba.com:dkim]
-X-Rspamd-Queue-Id: 95690190190
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: F048A190B88
 X-Rspamd-Action: no action
 
-
-
-On 2026/2/19 17:29, Imran Shaik wrote:
+On Mon, 23 Feb 2026 15:33:42 +0000 Eric Dumazet wrote:
+> Move ip6_dst_hoplimit() to net/ipv6/ip6_output.c so that compiler
+> can (auto)inline it from ip6_xmit().
 > 
-> Hi Wen,
-> 
-> Thanks for driving this discussion.
-> 
-> Is there a patch series posted that reflects the new proposal?
-> 
-> As Manivannan mentioned, some Qcom MHI devices have similar requirements. Once the reorganized changes are posted, we will also resend our patch series adopting the latest changes.
-> 
-> Thanks,
-> Imran
+> $ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
+> add/remove: 0/0 grow/shrink: 1/0 up/down: 47/0 (47)
+> Function                                     old     new   delta
+> ip6_xmit                                    1481    1528     +47
+> Total: Before=25076476, After=25076523, chg +0.00%
 
-Hi Imran,
+allmodconfig is not happy:
 
-Yes, I will send a patch series reflecting the new proposal in the next couple of days.
-
-Thanks.
+ld.lld: error: undefined symbol: ip6_dst_hoplimit
+>>> referenced by xfrm_output.c:348 (/srv/nipa-poller/net-next/wt-0/build_clang/../net/xfrm/xfrm_output.c:348)
+>>>               vmlinux.o:(xfrm_outer_mode_output)
+-- 
+pw-bot: cr
 
