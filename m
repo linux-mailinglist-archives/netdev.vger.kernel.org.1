@@ -1,147 +1,172 @@
-Return-Path: <netdev+bounces-260840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260841-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KFkCE2fCnmnsXAQAu9opvQ
-	(envelope-from <netdev+bounces-260840-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:35:35 +0100
+	id aH9cKvfDnmkuXQQAu9opvQ
+	(envelope-from <netdev+bounces-260841-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:42:15 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6A93195155
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:35:34 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC914195307
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:42:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 21BEB3114F4A
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 09:26:02 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 58833302258E
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 09:31:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DD1F38E5ED;
-	Wed, 25 Feb 2026 09:25:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01E8938E131;
+	Wed, 25 Feb 2026 09:31:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="hlifViC1"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="PqB+nIcj"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB7FC38E5DD;
-	Wed, 25 Feb 2026 09:25:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9750385520
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 09:30:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772011554; cv=none; b=K+gyrAspFof1JcqrATcJTQhHCC5G1Omugq9+IF+irLi9/izROi6f8+WwL8e11CCH9grZtRoILByjtQWd1UYopgLqGeyDFnZ+67CG0S9Qd1CFJpA7siKq93D9TEPz7K6EIW/EgYExP/Xu0GMPq0pc/abCbtm+vl7ALf/t+tX/19I=
+	t=1772011860; cv=none; b=lgrfM2fmVPMcNL60plVdBOVseNhfnJ719Sqb9SdvHSVcU7vYim3XBR12qBZF8qxVWmMgIC4rS/k7E0qMQI5g6NZLkWMY0VufTjOfRYMgPFQAZAM0Vfb4CqtVfCgUtbKnsSzp7hUp3yGwG/88fpu514okcm4NlltkPKeHkqitPIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772011554; c=relaxed/simple;
-	bh=rgKp5YVqKagpJ90dBd1U0u98y/nDFSmcQ/5cAIgBGO4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QQ3V9mcwwiVipqlQOUezLRS7m7Gh8weKS7b+wm3Opmn+HyE5xloZOqRwi/7zzuDt5y0+AoVNp1sgh4dLwcDN1E6Xo8IBuHspnQN7J1DcWlesVncnwSNubrOiXFWzBjZRqDhfA/WdJOVB8PG5NVz0is26e02CYFJVEppyACVsOyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=hlifViC1; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=id9ft50ikpeYq2+DbJZJyBUEH3jA2m0GVsep0KOPZy4=; b=hlifViC1PGDWeKiILXqnlayMso
-	ML3lAMkdhTOBBO9Q7f/62nWqghLstcjiKEe2DJci0UOgpAUqXOzzx0RPIyepl68I/nr9mEg5/tqr4
-	0ge+0080csH7Cf9webe7Nj7vj+3VM5itj5uwP1rCjk+T1oPTBZFm0w+hqelpvhsAsRt6RUcX1VTmJ
-	L6QIiwR4Rv3WtzI8idcTPYnpENciT49idMr69PlYCwIB5AQmdDticanOvDeqXfx5hCRoIqDXfSKD0
-	MlQJyTX5mezGgVjhCqHVPz9aYRQpTMPyQsJPsqWafrYW6LTySQSiKTchGrefDZSiHEvJqJQiOiVbG
-	gzyvf4NQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46704)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vvB9B-000000006Lo-0h2P;
-	Wed, 25 Feb 2026 09:25:33 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vvB96-000000000pi-2Vrn;
-	Wed, 25 Feb 2026 09:25:28 +0000
-Date: Wed, 25 Feb 2026 09:25:28 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: jan.petrous@oss.nxp.com
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Chester Lin <chester62515@gmail.com>,
-	Matthias Brugger <mbrugger@suse.com>,
-	Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>,
-	NXP S32 Linux Team <s32@nxp.com>, Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Frank Li <Frank.Li@nxp.com>,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev, devicetree@vger.kernel.org
-Subject: Re: [PATCH v6 3/5] dt-bindings: net: nxp,s32-dwmac: Declare
- per-queue interrupts
-Message-ID: <aZ7ACLx1yUMWPAsZ@shell.armlinux.org.uk>
-References: <20260225-dwmac_multi_irq-v6-0-245bf1d7110c@oss.nxp.com>
- <20260225-dwmac_multi_irq-v6-3-245bf1d7110c@oss.nxp.com>
+	s=arc-20240116; t=1772011860; c=relaxed/simple;
+	bh=CHBqn97VcBBUxsnUo1U/Qb8m4li5OZxXTDQy4F7pUjQ=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=fuvoBqZNDqDwH8dUWzqZuXLMn2mlFdkLxPoZwzeIu44vFHHkUVBp4QopSZUG07/h1Fq0GTc2fqxfaM3o5yIkZzDgWXiUvW1KDYCCNnI/xNXdQxa3u+OwDh0MizPLL0RR1zH9nDji18MO+IQ+PzIKUdjathPssyDXOBteXAGvLS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=PqB+nIcj; arc=none smtp.client-ip=115.124.30.113
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1772011855; h=Message-ID:Subject:Date:From:To;
+	bh=GxQYjVLQB0nTHOWpQ17UZEBT3XLyqCWVg8QZsJrTc+Q=;
+	b=PqB+nIcjvV/Wl0FdhskP0RSx0xa9Xow4tBT0Zt1ZhUKJrvfy77O4TRyPd6MScD93L3XKxC/7bD+jspP7Q53Wr5+PnpAc2vamR5KU3SU2xL5+ftUYCbjfO+6DHb2ZsgQE5SyJVGYwTMngnDqAR19Oi05SXrvgAg6ejblRpNxbDa0=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Wzm3QU1_1772011854 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 25 Feb 2026 17:30:55 +0800
+Message-ID: <1772011833.9281492-3-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next,2/2] virtio_net: replace RSS key size max check with BUILD_BUG_ON
+Date: Wed, 25 Feb 2026 17:30:33 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Srujana Challa <schalla@marvell.com>,
+ pabeni@redhat.com,
+ jasowang@redhat.com,
+ eperezma@redhat.com,
+ davem@davemloft.net,
+ edumazet@google.com,
+ kuba@kernel.org,
+ ndabilpuram@marvell.com,
+ kshankar@marvell.com,
+ netdev@vger.kernel.org,
+ virtualization@lists.linux.dev
+References: <20260224065850.962826-1-schalla@marvell.com>
+ <20260224065850.962826-2-schalla@marvell.com>
+ <1772010702.3747633-2-xuanzhuo@linux.alibaba.com>
+ <20260225042302-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20260225042302-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260225-dwmac_multi_irq-v6-3-245bf1d7110c@oss.nxp.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-7.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260840-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,suse.com,oss.nxp.com,nxp.com,pengutronix.de,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260841-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_THREE(0.00)[4];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.789];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,shell.armlinux.org.uk:mid,suse.com:email,armlinux.org.uk:url,nxp.com:email]
-X-Rspamd-Queue-Id: B6A93195155
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,marvell.com:email,linux.alibaba.com:mid,linux.alibaba.com:dkim]
+X-Rspamd-Queue-Id: CC914195307
 X-Rspamd-Action: no action
 
-On Wed, Feb 25, 2026 at 10:20:35AM +0100, Jan Petrous via B4 Relay wrote:
-> From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
-> 
-> The DWMAC IP on NXP S32G/R SoCs has connected queue-based IRQ lines,
-> set them to allow using Multi-IRQ mode.
-> 
-> Reviewed-by: Matthias Brugger <mbrugger@suse.com>
-> Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
-> Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
-> ---
->  .../devicetree/bindings/net/nxp,s32-dwmac.yaml     | 44 +++++++++++++++++++---
+On Wed, 25 Feb 2026 04:24:14 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> On Wed, Feb 25, 2026 at 05:11:42PM +0800, Xuan Zhuo wrote:
+> > On Tue, 24 Feb 2026 12:28:50 +0530, Srujana Challa <schalla@marvell.com> wrote:
+> > > Since NETDEV_RSS_KEY_LEN was increased to 256 in net-next, use
+> > > BUILD_BUG_ON to enforce the limit at compile time and remove the
+> > > redundant runtime max check.
+> > >
+> > > Signed-off-by: Srujana Challa <schalla@marvell.com>
+> > > ---
+> > >  drivers/net/virtio_net.c | 8 +-------
+> > >  1 file changed, 1 insertion(+), 7 deletions(-)
+> > >
+> > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > > index eeefe8abc122..768ad5523dfa 100644
+> > > --- a/drivers/net/virtio_net.c
+> > > +++ b/drivers/net/virtio_net.c
+> > > @@ -6639,13 +6639,7 @@ static int virtnet_validate(struct virtio_device *vdev)
+> > >  			__virtio_clear_bit(vdev, VIRTIO_NET_F_RSS);
+> > >  			__virtio_clear_bit(vdev, VIRTIO_NET_F_HASH_REPORT);
+> > >  		}
+> > > -		if (key_sz > NETDEV_RSS_KEY_LEN) {
+> > > -			dev_warn(&vdev->dev,
+> > > -				 "rss_max_key_size=%u exceeds driver limit %u, disabling RSS\n",
+> > > -				 key_sz, NETDEV_RSS_KEY_LEN);
+> > > -			__virtio_clear_bit(vdev, VIRTIO_NET_F_RSS);
+> > > -			__virtio_clear_bit(vdev, VIRTIO_NET_F_HASH_REPORT);
+> > > -		}
+> > > +		BUILD_BUG_ON(type_max(key_sz) >= NETDEV_RSS_KEY_LEN);
+> >
+> > Do we really need this check?
+> >
+> > If I understand correctly, the intention is to cap key_sz at 256. However, since
+> > key_sz is of type u8, its maximum value is inherently 255, making this check
+> > redundant. This is not only limited by this kernel code, the virtio-net spec
+> > defines this.
+>
+> That's why it's BUILD_BUG_ON. It checks it has the right type.
+>
+> We never *need* BUILD_BUG_ON by definition, what this does is
+> document the assumption.
+>
+>
+> > Moreover, if NETDEV_RSS_KEY_LEN is ever reduced to a value smaller than 256 in
+> > the future, this check would no longer enforce the intended limit correctly.
+>
+> then it would fail build.
 
-As you have added support for these IRQs into the generic code,
-shouldn't the generic dwmac binding doc reflect that this is now
-supported?
+So, does this mean we don't need to account for the case where
+NETDEV_RSS_KEY_LEN is 128, but the key_sz reported by the device is 64?
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks.
+
+
+>
+> >
+> > Moreover, you should add a cover letter.
+> >
+> > Thanks.
+> >
+> >
+> >
+> >
+> >
+> > >  	}
+> > >
+> > >  	return 0;
+> > > --
+> > > 2.25.1
+> > >
+>
 
