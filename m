@@ -1,143 +1,164 @@
-Return-Path: <netdev+bounces-261055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261056-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KCLRNBQ/n2laZgQAu9opvQ
-	(envelope-from <netdev+bounces-261055-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 19:27:32 +0100
+	id OCOWMTg/n2laZgQAu9opvQ
+	(envelope-from <netdev+bounces-261056-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 19:28:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3081219C405
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 19:27:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31F1819C42B
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 19:28:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F313D30804E5
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 18:23:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 82ED9317DB32
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 18:23:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D59562ED872;
-	Wed, 25 Feb 2026 18:23:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 056F32F260E;
+	Wed, 25 Feb 2026 18:23:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="BYctJZUy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cEjz7bZA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F84B2DF6EA
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 18:23:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF6712F0C79
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 18:23:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772043816; cv=none; b=k5/wjUymKHALzw76PYuztbpoQr/gyhmZ2E7qn+TsFCNpY0VimojpNABWcXWtfSP+50SeVZplBoLufA/oreopOl6yZKYZ1pPgS6i0VrTGqNXcSh0rBtfwStnsugNKBSvTNTQp18gPsGGcJdVm70DstG5Q5i7PzWdpJ/YaKwIQgvI=
+	t=1772043825; cv=none; b=FlCYTJbAQoe56lN9bwvE8x40rGHjXeJHqBSHOYnDW6jWL8NRdmYeYPGR8Sep/cddJUabdTRkhp5uL+pBrJoIPl/zWRc8dlVmc+30HqYgpJDs2hQjPZNLgz4f0+Z8aBQ87sCRJZ0Pmny5nw2zLHn8oOsfCVKBxvhIwjXoVfG7wmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772043816; c=relaxed/simple;
-	bh=0K3LKFnDvLjGWKrTbbUMIQkBc8xXSAG7fXip7GjvrwU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Qb/+NzhYkkkE663MBakCCMy5uCDBnHBYIydNYuHeR6mnoW0o3+OLw29AiyFS0EE8GTtQajtR3VsL4GOCCig6Fg011BIQ67CDXaJC751Njf63PU+y6n2E6g0TwqnSdSswhTax8MJpYOZY5jwMja0/skUjQ4t3KOOvY1pwRxRPCCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=BYctJZUy; arc=none smtp.client-ip=74.125.82.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-2bdc8bb60f5so700951eec.1
-        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 10:23:35 -0800 (PST)
+	s=arc-20240116; t=1772043825; c=relaxed/simple;
+	bh=zbbAb4hbGZG9ZX0c/X+ExzY3EiH2KjgoJF/y/bXgQT0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=SOaTR1/Em0Vfyn/fD90ktSQoxeHdah+V0G9/Azq1tpQjwtEWm1Ua7KvwoFSEqiZMuWYkbb0+8DPr6koq/5aFMiiDz0BL+rkLa1BWhfm0FRUXGgA80KIUwhrw/mZbWm9hlKRdWrcIQLBgh7bB3kbQa8lKO1H5ZhBuc4NynJ/PoBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cEjz7bZA; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-824bbce0a44so128112b3a.2
+        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 10:23:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1772043814; x=1772648614; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AUXqNEsrT4CsEBjMs2pgaovA/4zhcTSAPVWmFZa4btM=;
-        b=BYctJZUywCvPNhvTOPsAbvKmNLnwJr+wyyAmOk5X2DlGXp+/KfkrayOd2JF/NVtQXf
-         j/cR/Rd0mCxeDf67Wrhw4+BTYg+vTvec1kPHk7oQv6XGDPjC2OR2yR+UWiohjWXiW8ze
-         rxrfNLg2THFXgqxmL+tHHQfrzXs/yCrJZyIhbQrvANeYz2cyqehzGmFDv1V92FTrkIAp
-         KFNmQcw0CijJWUyWZldMpOih13N22F5L8E94VOIOcP5rVCgrRYuPHl4MDFXMJkpqWIF0
-         zw0OvNt813NyhfOloaUazNgvcej1cKuc097aMMm00wXRT7o//EzkhFcDiNDmxZcREr+O
-         dqdA==
+        d=google.com; s=20230601; t=1772043824; x=1772648624; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ktu6SeGgYKKiMVsHnqdxWPPUmtvwSDIR8ap7D3L+YXA=;
+        b=cEjz7bZAOWntpjzS0pUYyB0h2bPxwkqpCT2XRYXjwZf+UdDQeo81EpJ7PvcKJ97HGG
+         4GD4Uym2jO2n+7BfUXOTlPuaCyk3SX5hcsT5rk87ZVBGkMZjo27hbYU33u73FM0PDi6d
+         G8owm7+Gs5jpnu6D/Z5qo/a+igOnBNQBYUckCmjrP1P8UYlO1pLaeJgPz6v537ctMuff
+         MWqb1TS0j76rRKnpwqMeJk5YiOGf/X+ZJYfrjG7BIyEmrcZePwNJcltVsoNzq9t3Xn5a
+         4Tit/Xh0jN2XboUHmqOra8GZMM+p4SkeAHzoWHPn6Vy49JE1zDCraie5b4fmdDiD2lUg
+         ilJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772043814; x=1772648614;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=AUXqNEsrT4CsEBjMs2pgaovA/4zhcTSAPVWmFZa4btM=;
-        b=O63YP805ex/LeiQxSQfzuR77oUToOTW/2wn4W81Gtr9SeHeZRi0kKxe0W7b+bE8x0+
-         sSV1FLl4RWRLw4ccNO59/jcilWYtkoCQRqLjV1ZhJgYGOTF03mKiB4KQyIhAoVjLMvng
-         TbwEo87xHeTBjZdcMbQXjBl6UIkLcGLvsBkRdjw1X+K68g2sA34L2kMDSNDBOzk8tEU/
-         5VtzEpnv8MONwRfJynRx9azNLnzk9FS0r9MAeXaqvJFJdfIkFvYQ5EmtQYiYDQK1aBIj
-         M7B6dcHLGpXyCpzVaZ7qS93604COB95YlNDK30wv/bl6QmI42Z6rTaBcvWwcYzwwcK9J
-         bcUg==
-X-Gm-Message-State: AOJu0YxYYSEzE8/3zOipJ+5ykGBWhkvdRkHHmd9H+MsyGZ9mNCrTl2Ea
-	rQpSs9u7mVK2dYnLqdqgteuEVmAz8GgpLxbJWbccZWvyBLNq9jP+OvWeDDritBdsEDw=
-X-Gm-Gg: ATEYQzwCo5d0PQe6J0yDDTzb8f/17kOqE3CV+Rp2TIwrIveUA22mcX9ywXj09mfs5X9
-	kQJnZGy5z/OAXStV5cFROrbt/Ob51QpB33eRO8OhixBHgCWlMeKnpLF3qvMZIjoZOHMU0Z64cnU
-	XWYmRjFkXBfMN/wNZQqfsClWfQTPCJifyn3YXf33nAYBq3o89X5mXM//TvtJsHQRYZ/SREPpZvx
-	cpsHi5/9ZW8K+fndfiMRZE3QNPNYAW0UvyvOT4MrsV4aAeD9aY6E78I/6oVdO7cweNFThK8x6/R
-	BMAv681u37T+rIenW9aNjXH5L66m7fk9gw/yXVoRYtoTo4yDRONLOG8ftVwIiHrHJ9+y3VkgIkq
-	6h3w+cOy/q1tGKfpeRguOT869HU/aY8+eu5CPsTr4soLpBfAmr2smUtNH6gDIjfTkHU3nx4zrm9
-	+JRvT7edUZykHDPiiiXOWI5I1TXC1FohmYwsQNbfQTGjYS1MGdYYE4w4g0/9MzLfGqIlZ+N/Gi4
-	3w=
-X-Received: by 2002:a05:7301:678e:b0:2b7:a27f:3a6a with SMTP id 5a478bee46e88-2bd7b9d9844mr6755759eec.4.1772043814353;
-        Wed, 25 Feb 2026 10:23:34 -0800 (PST)
-Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2bd7dc37895sm9529700eec.33.2026.02.25.10.23.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Feb 2026 10:23:34 -0800 (PST)
-Date: Wed, 25 Feb 2026 10:23:31 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Daniel Schulte <trilader@schroedingers-bit.net>
-Cc: netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>
-Subject: Re: [PATCH iproute2-next] ss: Remove trailing whitespace when
- output is not a TTY
-Message-ID: <20260225102331.6d09b8b9@phoenix.local>
-In-Reply-To: <b0414a07-f26e-4795-a697-37fb32d05595@schroedingers-bit.net>
-References: <b0414a07-f26e-4795-a697-37fb32d05595@schroedingers-bit.net>
+        d=1e100.net; s=20230601; t=1772043824; x=1772648624;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ktu6SeGgYKKiMVsHnqdxWPPUmtvwSDIR8ap7D3L+YXA=;
+        b=CyT1lsY43MfAplU5OVtU3cCrK5lagEsTccpe8MVGPwWpvqkNg/I152jAl0EuxEUBWn
+         3GgiLnPwjW9HQaCKeB38nzoO5kQ+Id0tXGA+xDJ8IZV2hgWQbpu2g2u2fe5DD/NngZPv
+         W0P51FR9sNuSJZssFOeQ6AHVXfluuVds5gatwJ4VxA7WL50sGOVsXYDyE+bb7zF879u0
+         IJVkMckinUa9RE+TXXb4aMrNilG9Xx4dKZyC7hcQUYSSD+yWw2t8nPEtGDO8j9wX8qvI
+         HGZY7ODxntD2/+PLPz0t75vKFrc3GyKGDNVjqjQ1kRHf1uHa4u1+GnHhP+rIU2R0MYP8
+         Xggw==
+X-Gm-Message-State: AOJu0YxQo/Wpg4NIk2aN+A9BznyJd1acqR3CEUsTCg0oJ85P11hkOaMd
+	/dTiSkBsSu45pbXbnUSqKXy0CH/pgwPtaYD7MvignzRhOzHjaogVf22lGMg4ZVvluC3tzCmzlcr
+	+7/mUdEZfYi7wuOmYVh5RFJ+OY29shQCNgaLe9TKMLIlBhCnmUa+J91H59JjBTTomlmsbTdi0ek
+	Ty0v8U3Y28XXBjPjmgIlC8hP+HDuwgRz3UUHURdf4T9vYuJQ0=
+X-Received: from pfnr15.prod.google.com ([2002:aa7:844f:0:b0:81e:87c3:f7a6])
+ (user=joshwash job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:2e85:b0:7b9:420:cc0f with SMTP id d2e1a72fcca58-826da8ee344mr14377279b3a.14.1772043823762;
+ Wed, 25 Feb 2026 10:23:43 -0800 (PST)
+Date: Wed, 25 Feb 2026 10:23:40 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.414.gf7e9f6c205-goog
+Message-ID: <20260225182342.1049816-1-joshwash@google.com>
+Subject: [PATCH net-next v2 0/2] gve: Support larger ring sizes in DQO-QPL mode
+From: Joshua Washington <joshwash@google.com>
+To: netdev@vger.kernel.org
+Cc: Joshua Washington <joshwash@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, Jordan Rhee <jordanrhee@google.com>, 
+	John Fraker <jfraker@google.com>, Ziwei Xiao <ziweixiao@google.com>, 
+	Matt Olson <maolson@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
+	Bailey Forrest <bcf@google.com>, Tim Hostetler <thostet@google.com>, linux-kernel@vger.kernel.org, 
+	Max Yuan <maxyuan@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.56 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[networkplumber-org.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[networkplumber-org.20230601.gappssmtp.com:+];
-	TAGGED_FROM(0.00)[bounces-261055-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-261056-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[joshwash@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-0.990];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,networkplumber-org.20230601.gappssmtp.com:dkim,phoenix.local:mid]
-X-Rspamd-Queue-Id: 3081219C405
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 31F1819C42B
 X-Rspamd-Action: no action
 
-On Wed, 18 Feb 2026 22:19:53 +0100
-Daniel Schulte <trilader@schroedingers-bit.net> wrote:
+From: Max Yuan <maxyuan@google.com>
 
-> Sometimes a value in the last column might be very long.
-> When grepping ss output the matched lines are also padded to the longest value.
-> In some cases this can result in multiple lines of the terminal getting filled
-> with spaces.
-> 
-> Don't print right padding in last visible column when ss can't determine the
-> screen width.
-> 
-> Signed-off-by: Daniel Schulte <trilader@schroedingers-bit.net>
+This patch series updates the gve driver to improve Queue Page List
+(QPL) management and enable support for larger ring sizes when using the
+DQO-QPL queue format.
 
-Patch makes sense, but will not apply because either your mail system
-is corrupting the patch or you are using an out of date version.
+Previously, the driver used hardcoded multipliers to determine the
+number of pages to register for QPLs (e.g., 2x ring size for RX). This
+rigid approach made it difficult to support larger ring sizes without
+potentially exceeding the "max_registered_pages" limit reported by the
+device.
 
-Please fix and resubmit
+The first patch introduces a unified and flexible logic for calculating
+QPL page requirements. It balances TX and RX page allocations based on
+the configured ring sizes and scales the total count down proportionally
+if it would otherwise exceed the device's global registration limit.
+
+The second patch leverages this new flexibility to stop ignoring the
+maximum ring size supported by the device in DQO-QPL mode. Users can now
+configure ring sizes up to the device-reported maximum, as the driver
+will automatically adjust the QPL size to stay within allowed memory
+bounds.
+
+Changes in v2:
+   - Fixed 32-bit compilation issue by using div64_u64 and div_u64 instead
+     of division operator. (Paolo Abeni)
+
+Matt Olson (2):
+  gve: Update QPL page registration logic
+  gve: Enable reading max ring size from the device in DQO-QPL mode
+
+ drivers/net/ethernet/google/gve/gve.h                 | 18 ++++++--------
+ drivers/net/ethernet/google/gve/gve_adminq.c          | 18 ++++----------
+ drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c |  2 +-
+ drivers/net/ethernet/google/gve/gve_main.c            | 41 ++++++++++++++++++++++++++++++++
+ drivers/net/ethernet/google/gve/gve_rx.c              |  5 +---
+ drivers/net/ethernet/google/gve/gve_rx_dqo.c          |  6 ++---
+ drivers/net/ethernet/google/gve/gve_tx.c              |  5 +---
+ drivers/net/ethernet/google/gve/gve_tx_dqo.c          |  4 +---
+ 8 files changed, 58 insertions(+), 41 deletions(-)
+
+--
+2.53.0.273.g2a3d683680-goog
+
 
