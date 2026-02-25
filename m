@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-261087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261086-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SM20F+Nmn2lRagQAu9opvQ
-	(envelope-from <netdev+bounces-261087-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 22:17:23 +0100
+	id +OtlEN1mn2lRagQAu9opvQ
+	(envelope-from <netdev+bounces-261086-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 22:17:17 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97AAD19DC11
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 22:17:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 571A519DC0A
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 22:17:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A1E77304350F
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 21:16:23 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2E67D3042473
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 21:16:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DCBC3161AB;
-	Wed, 25 Feb 2026 21:16:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6B0131579B;
+	Wed, 25 Feb 2026 21:16:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="In8aS3Sy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gJH0f5KV"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AA7F314A82;
-	Wed, 25 Feb 2026 21:15:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51EFE2C3244
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 21:15:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772054161; cv=none; b=GsarXG9b4NU+CQTrASruWMadyqJVQyCrFNkFBNBDkYYmtt2n/DNqsxZTmw6DzotsL1wPLx4qU2vsdrmWwES7LJkSfUUPemZawcfMLLQgK+NQBm5JYyG+Elwh66HrYYNAClrhYqEf/u1N02hOxO6pqR4odAV7VFtBTyFzj74CkIs=
+	t=1772054160; cv=none; b=nSoXjEsRpqlwSfV+za6t2YHsj2jMO4WR+qvJx3SMRUi8chLs8lFdvamGudCz835haB44cn8k+cOEPO41TOFgklTJhmJPf/bUn4mjZx2lRxl8jVEPL2wH+TNFCpcq9uzcvtzWh+r9JpirdKkEJdZvHNW0JUQOEMMRENcK8DoDBqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772054161; c=relaxed/simple;
-	bh=rWG09sxb4d5oN6hg5wMkg4dgKd29FcaXmVKoIXL5BCQ=;
+	s=arc-20240116; t=1772054160; c=relaxed/simple;
+	bh=kFtBCng7ZSYIZhAaLkiDNmPLg2yD/8IbcyECZtCdeGg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=d02/2Om4lwJ6C8GjXz6I2bKZBy5maPZ6ErdDIpPEy81S0Ntz+Cvj0OtQrMPf1zB/hCQuBtBMYcHIEGDnVQMWf17hNyZbPNQGhZZ2qY8kLE0lnxbSxjZq5SGx024AbDIsQyka4jybn8Ip9ySZQO3JX24O2pI3FXHSkQf2HB9NklQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=In8aS3Sy; arc=none smtp.client-ip=192.198.163.17
+	 MIME-Version; b=XRU3NlYeUYCOdG18iGc5SxrwcZUnadzH99gPBFYsY908RULWUkCavoDxsxQp2AWfkRM1d74xfqicVla9p0UFRMAtSyekb7ZbgjtOEcq9uvcGdUZMl2qBFjEcGRrUM7EMFz7OWqPkuHqbhCDOKwLILSk3HwPMimFx5i3jUi2H9lE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gJH0f5KV; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -39,28 +39,28 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1772054160; x=1803590160;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=rWG09sxb4d5oN6hg5wMkg4dgKd29FcaXmVKoIXL5BCQ=;
-  b=In8aS3SyDKaq6whzj98c6tYVlNuWNbIWqoDn6ciSzMUFOW26elcwYZ8e
-   ldKFP5sw3jN2OxRf2fDR3pWFzbLszsbwUi0j2ffQAvtSKdmNzyD/B20+k
-   GRHYkq8lljdBCEKzNFTqcwg1sKbLfyQRNHLeOKHE0LxEUEAy+L6iI796L
-   +Fokbezo/4B0q5sSofmzLRlC34dKjyu6OX0jryFWwKlOFi0BleqmkMTK1
-   gd1goOgGZhIgHYOqzgolmCBLOCjkhdNkkFqRxiu07rypuLidtlDZtONa+
-   NfMFHbyie5TxyzFm8p42DUCKbnfJkQiHAIW4/t/bfLpgIK8CUuwJTvtHd
-   g==;
-X-CSE-ConnectionGUID: CouMLEInSPC8kPg6W4WipA==
-X-CSE-MsgGUID: t/l7djzKRKaZleTPC3puPw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11712"; a="73013822"
+  bh=kFtBCng7ZSYIZhAaLkiDNmPLg2yD/8IbcyECZtCdeGg=;
+  b=gJH0f5KVEabQD4hOZEffPmOWwj6Uub0bQgLbzt22sT9TNc0vx885I/UQ
+   spdwIOFAjNsnlIaMdSquudcYhAfWBKG/iu+6roSLdCsJgYcGOWMK+fc/l
+   zY+6B3hQGb7XkX2dGQiA9T59hm29gPqUHSpEXikIfvMtGH6GlbKj0m6Hs
+   SlU68xorbXdQ5B7ktX0yx/yeO3W76c5p0tlLzE05vB59nAFDN/uYCzTdl
+   ECWnvkeUKHOYjRgFsbRbJZWFhwdHvMHvxHhHeIcrthcnD4KEoFmQ9gTxi
+   PaKuAeixdgCa+y8YQU9yOBmUBXKmj7cqtQ48xRdh7LKmwbsA0c7HMuRc/
+   A==;
+X-CSE-ConnectionGUID: JVa3JxqTQGeDzk7nHnQflw==
+X-CSE-MsgGUID: 2euhzgguTVuhurSzc8shKg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11712"; a="73013830"
 X-IronPort-AV: E=Sophos;i="6.21,311,1763452800"; 
-   d="scan'208";a="73013822"
+   d="scan'208";a="73013830"
 Received: from fmviesa002.fm.intel.com ([10.60.135.142])
   by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2026 13:15:57 -0800
-X-CSE-ConnectionGUID: HapgMNX6RRWe/CySXzci0A==
-X-CSE-MsgGUID: EgtshCswRl62FloiBDDDog==
+X-CSE-ConnectionGUID: eUO9A3q8TUmVSCJyLX9oWg==
+X-CSE-MsgGUID: fYOzwtsfQiaTR3BroRQk2w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,311,1763452800"; 
-   d="scan'208";a="239349709"
+   d="scan'208";a="239349712"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa002.fm.intel.com with ESMTP; 25 Feb 2026 13:15:56 -0800
+  by fmviesa002.fm.intel.com with ESMTP; 25 Feb 2026 13:15:57 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -68,16 +68,15 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+Cc: Vitaly Lifshits <vitaly.lifshits@intel.com>,
 	anthony.l.nguyen@intel.com,
+	dima.ruinskiy@intel.com,
+	Avigail Dahan <avigailx.dahan@intel.com>,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	stable@vger.kernel.org,
-	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: [PATCH net v2 10/12] ixgbevf: fix link setup issue
-Date: Wed, 25 Feb 2026 13:15:41 -0800
-Message-ID: <20260225211546.1949260-11-anthony.l.nguyen@intel.com>
+	Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: [PATCH net v2 11/12] e1000e: introduce new board type for Panther Lake PCH
+Date: Wed, 25 Feb 2026 13:15:42 -0800
+Message-ID: <20260225211546.1949260-12-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20260225211546.1949260-1-anthony.l.nguyen@intel.com>
 References: <20260225211546.1949260-1-anthony.l.nguyen@intel.com>
@@ -102,9 +101,9 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-261087-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-261086-lists,netdev=lfdr.de];
 	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -113,56 +112,136 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.995];
+	NEURAL_HAM(-0.00)[-0.997];
 	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,intel.com:email,mpg.de:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 97AAD19DC11
+X-Rspamd-Queue-Id: 571A519DC0A
 X-Rspamd-Action: no action
 
-From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+From: Vitaly Lifshits <vitaly.lifshits@intel.com>
 
-It may happen that VF spawned for E610 adapter has problem with setting
-link up. This happens when ixgbevf supporting mailbox API 1.6 cooperates
-with PF driver which doesn't support this version of API, and hence
-doesn't support new approach for getting PF link data.
+Add new board type for Panther Lake devices for separating device-specific
+features and flows.
+Additionally, remove the deprecated device IDs 0x57B5 and 0x57B6, which
+are not used by any existing devices.
 
-In that case VF asks PF to provide link data but as PF doesn't support
-it, returns -EOPNOTSUPP what leads to early bail from link configuration
-sequence.
-
-Avoid such situation by using legacy VFLINKS approach whenever negotiated
-API version is less than 1.6.
-
-To reproduce the issue just create VF and set its link up - adapter must
-be any from the E610 family, ixgbevf must support API 1.6 or higher while
-ixgbevf must not.
-
-Fixes: 53f0eb62b4d2 ("ixgbevf: fix getting link speed data for E610 devices")
+Signed-off-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
+Tested-by: Avigail Dahan <avigailx.dahan@intel.com>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
 Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: stable@vger.kernel.org
-Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ixgbevf/vf.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/intel/e1000e/e1000.h   |  4 +++-
+ drivers/net/ethernet/intel/e1000e/hw.h      |  2 --
+ drivers/net/ethernet/intel/e1000e/ich8lan.c | 22 ++++++++++++++++++++-
+ drivers/net/ethernet/intel/e1000e/netdev.c  | 15 +++++++-------
+ 4 files changed, 31 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ixgbevf/vf.c b/drivers/net/ethernet/intel/ixgbevf/vf.c
-index 74d320879513..b67b580f7f1c 100644
---- a/drivers/net/ethernet/intel/ixgbevf/vf.c
-+++ b/drivers/net/ethernet/intel/ixgbevf/vf.c
-@@ -852,7 +852,8 @@ static s32 ixgbevf_check_mac_link_vf(struct ixgbe_hw *hw,
- 	if (!mac->get_link_status)
- 		goto out;
+diff --git a/drivers/net/ethernet/intel/e1000e/e1000.h b/drivers/net/ethernet/intel/e1000e/e1000.h
+index aa08f397988e..63ebe00376f5 100644
+--- a/drivers/net/ethernet/intel/e1000e/e1000.h
++++ b/drivers/net/ethernet/intel/e1000e/e1000.h
+@@ -117,7 +117,8 @@ enum e1000_boards {
+ 	board_pch_cnp,
+ 	board_pch_tgp,
+ 	board_pch_adp,
+-	board_pch_mtp
++	board_pch_mtp,
++	board_pch_ptp
+ };
  
--	if (hw->mac.type == ixgbe_mac_e610_vf) {
-+	if (hw->mac.type == ixgbe_mac_e610_vf &&
-+	    hw->api_version >= ixgbe_mbox_api_16) {
- 		ret_val = ixgbevf_get_pf_link_state(hw, speed, link_up);
- 		if (ret_val)
- 			goto out;
+ struct e1000_ps_page {
+@@ -527,6 +528,7 @@ extern const struct e1000_info e1000_pch_cnp_info;
+ extern const struct e1000_info e1000_pch_tgp_info;
+ extern const struct e1000_info e1000_pch_adp_info;
+ extern const struct e1000_info e1000_pch_mtp_info;
++extern const struct e1000_info e1000_pch_ptp_info;
+ extern const struct e1000_info e1000_es2_info;
+ 
+ void e1000e_ptp_init(struct e1000_adapter *adapter);
+diff --git a/drivers/net/ethernet/intel/e1000e/hw.h b/drivers/net/ethernet/intel/e1000e/hw.h
+index fc8ed38aa095..c7ac599e5a7a 100644
+--- a/drivers/net/ethernet/intel/e1000e/hw.h
++++ b/drivers/net/ethernet/intel/e1000e/hw.h
+@@ -118,8 +118,6 @@ struct e1000_hw;
+ #define E1000_DEV_ID_PCH_ARL_I219_V24		0x57A1
+ #define E1000_DEV_ID_PCH_PTP_I219_LM25		0x57B3
+ #define E1000_DEV_ID_PCH_PTP_I219_V25		0x57B4
+-#define E1000_DEV_ID_PCH_PTP_I219_LM26		0x57B5
+-#define E1000_DEV_ID_PCH_PTP_I219_V26		0x57B6
+ #define E1000_DEV_ID_PCH_PTP_I219_LM27		0x57B7
+ #define E1000_DEV_ID_PCH_PTP_I219_V27		0x57B8
+ #define E1000_DEV_ID_PCH_NVL_I219_LM29		0x57B9
+diff --git a/drivers/net/ethernet/intel/e1000e/ich8lan.c b/drivers/net/ethernet/intel/e1000e/ich8lan.c
+index 0ff8688ac3b8..23421a640097 100644
+--- a/drivers/net/ethernet/intel/e1000e/ich8lan.c
++++ b/drivers/net/ethernet/intel/e1000e/ich8lan.c
+@@ -528,7 +528,7 @@ static s32 e1000_init_phy_params_pchlan(struct e1000_hw *hw)
+ 
+ 	phy->id = e1000_phy_unknown;
+ 
+-	if (hw->mac.type == e1000_pch_mtp) {
++	if (hw->mac.type == e1000_pch_mtp || hw->mac.type == e1000_pch_ptp) {
+ 		phy->retry_count = 2;
+ 		e1000e_enable_phy_retry(hw);
+ 	}
+@@ -6208,3 +6208,23 @@ const struct e1000_info e1000_pch_mtp_info = {
+ 	.phy_ops		= &ich8_phy_ops,
+ 	.nvm_ops		= &spt_nvm_ops,
+ };
++
++const struct e1000_info e1000_pch_ptp_info = {
++	.mac			= e1000_pch_ptp,
++	.flags			= FLAG_IS_ICH
++				  | FLAG_HAS_WOL
++				  | FLAG_HAS_HW_TIMESTAMP
++				  | FLAG_HAS_CTRLEXT_ON_LOAD
++				  | FLAG_HAS_AMT
++				  | FLAG_HAS_FLASH
++				  | FLAG_HAS_JUMBO_FRAMES
++				  | FLAG_APME_IN_WUC,
++	.flags2			= FLAG2_HAS_PHY_STATS
++				  | FLAG2_HAS_EEE,
++	.pba			= 26,
++	.max_hw_frame_size	= 9022,
++	.get_variants		= e1000_get_variants_ich8lan,
++	.mac_ops		= &ich8_mac_ops,
++	.phy_ops		= &ich8_phy_ops,
++	.nvm_ops		= &spt_nvm_ops,
++};
+diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
+index ddbe2f7d8112..814698807f3d 100644
+--- a/drivers/net/ethernet/intel/e1000e/netdev.c
++++ b/drivers/net/ethernet/intel/e1000e/netdev.c
+@@ -55,6 +55,7 @@ static const struct e1000_info *e1000_info_tbl[] = {
+ 	[board_pch_tgp]		= &e1000_pch_tgp_info,
+ 	[board_pch_adp]		= &e1000_pch_adp_info,
+ 	[board_pch_mtp]		= &e1000_pch_mtp_info,
++	[board_pch_ptp]		= &e1000_pch_ptp_info,
+ };
+ 
+ struct e1000_reg_info {
+@@ -7925,14 +7926,12 @@ static const struct pci_device_id e1000_pci_tbl[] = {
+ 	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_PCH_LNP_I219_V21), board_pch_mtp },
+ 	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_PCH_ARL_I219_LM24), board_pch_mtp },
+ 	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_PCH_ARL_I219_V24), board_pch_mtp },
+-	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_PCH_PTP_I219_LM25), board_pch_mtp },
+-	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_PCH_PTP_I219_V25), board_pch_mtp },
+-	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_PCH_PTP_I219_LM26), board_pch_mtp },
+-	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_PCH_PTP_I219_V26), board_pch_mtp },
+-	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_PCH_PTP_I219_LM27), board_pch_mtp },
+-	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_PCH_PTP_I219_V27), board_pch_mtp },
+-	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_PCH_NVL_I219_LM29), board_pch_mtp },
+-	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_PCH_NVL_I219_V29), board_pch_mtp },
++	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_PCH_PTP_I219_LM25), board_pch_ptp },
++	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_PCH_PTP_I219_V25), board_pch_ptp },
++	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_PCH_PTP_I219_LM27), board_pch_ptp },
++	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_PCH_PTP_I219_V27), board_pch_ptp },
++	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_PCH_NVL_I219_LM29), board_pch_ptp },
++	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_PCH_NVL_I219_V29), board_pch_ptp },
+ 
+ 	{ 0, 0, 0, 0, 0, 0, 0 }	/* terminate list */
+ };
 -- 
 2.47.1
 
