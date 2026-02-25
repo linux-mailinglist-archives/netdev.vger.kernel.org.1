@@ -1,247 +1,223 @@
-Return-Path: <netdev+bounces-260876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260878-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yK1lC/HVnmkTXgQAu9opvQ
-	(envelope-from <netdev+bounces-260876-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:58:57 +0100
+	id eCT8DD3XnmkTXgQAu9opvQ
+	(envelope-from <netdev+bounces-260878-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 12:04:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3F95196204
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:58:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B187196331
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 12:04:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 35E86302FE4C
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:58:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CCBFF304BCEE
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:59:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A2F3939CE;
-	Wed, 25 Feb 2026 10:58:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B89C3939AF;
+	Wed, 25 Feb 2026 10:59:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J9eYSS4U"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="bZQfow/v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com [209.85.221.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 549802D0C82
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 10:58:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44972392831;
+	Wed, 25 Feb 2026 10:59:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772017133; cv=none; b=eL17sosyxcRuIAdhCNBKqkuHUXufJXjmmiqW24/S8NyRivMRr+7S7fcRucIuN3HHmDd9l9wky9BNGhLfBeZlRNpmfEvZtGwWYfGVDlj5ChgWTAcmFGRlkryGfa/WJPZlUG9jluSQ+MNekgKAF7rnqCmVFM2+beqK5187bgNgYso=
+	t=1772017168; cv=none; b=BsE4GRoMUy9APHXjj0IHDwL8M1XF9El8MG9oo+GuDHG2YUBVxSgtawCM3jcLUm00y9kO+v97F1oQomypzkfQa2vr+oOZf0Av3+lZppmenYz7Y+zDpkoNn4DKBTGol42ntYuBAU0ihFoeP9D7n3w3Hz+O37Fs2kWFmxVH0Fnoju0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772017133; c=relaxed/simple;
-	bh=DPQ/B0yNcFKdxTDFMr/6BjzBWJxZRyvE01ySyp+G1Gg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OT7TomzjWZdeVNdl/8oiQHJx/FaJ77KY/p/UkgdRSK8zGzpWtyXg3RqpvKKx3GixwC3t3a5E7lL+ixaDMGF3FaqoyFe43fqbS7cCcw8jEoaLg7skOvteLVDg/X17jeYt2NQVZad6g/m2jhrEk+uMn+/s6IL+ug4yaxKb0OXDinU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=J9eYSS4U; arc=none smtp.client-ip=209.85.221.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f65.google.com with SMTP id ffacd0b85a97d-4377174e1ebso4967137f8f.3
-        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 02:58:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1772017131; x=1772621931; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VIdRCk7t4GWQocuOik2n76ea1IYJUFZ1loDMZ8piecQ=;
-        b=J9eYSS4UQR9nKC5YqxSoDnYWv4R+Js1MrQTKqQl+nxqfu4TFgr9RMxWJMChmAcjVOS
-         fJ+cjdTHDymKhI/mOxhDAgPKrnsEHpwpGQn+z2/qpx4o0BeOrURhq7pKCihYIq+X17zW
-         49doZq7qi3sRQpl9reqrDU2ygAD1llJcG92iVfD0YPqdTs61DwcADxk+sTAuO7QQdqDP
-         UUbmPd9LwqS8NGRGHLDQ1kcQUVS2kOEwTVyt/PTnEwbKRIPI0V2YwoScdvOFIYKv2zBQ
-         QI5mDZ/JSRfuNYuesWiC4sFMeJ3SG5mJoaHKHW6a2YhbtDM2PnNCLZTsPyQVPXWbuI2r
-         42DQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772017131; x=1772621931;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VIdRCk7t4GWQocuOik2n76ea1IYJUFZ1loDMZ8piecQ=;
-        b=Qm6zmJtMUlDBEmwH5SgP3Hmi/qFko068RlAMvYn2+iboENJSWWUSMuNVOrR/w7yO23
-         TPm9Cbif7r7xdMLWb4KqJfa4QXLAGokUqlTY/NfHgEBYJdB5FSridAM4UJWAcTUFYgJM
-         UuD5GbLRzCW5AUrAM0soAE9efncy3GzuPT3MVP+zT5sPkEhVXBVyE2IwkxA71cpOgFHF
-         jT6I1d2+GVUUEt8yyPz+9bfyw6iGBfXWBqjkUJLFCuLSHMqVprF+WNRHQI5eniBaHhhv
-         YprTPT0dQc93ebeYQZQ7MgMgLcNElEV0EpdQgNSus1knU8lFHVbzQj5z/HiVxsijFoK1
-         ICWA==
-X-Gm-Message-State: AOJu0Yz/TCrQpHwi0kc0cQdtzg80CLs3xFei//eXB5PbFS6LdnPvIFIH
-	ORhAeqIfyQBgzRPtjo+kFGql71RHECfO5sAqIMNyGdMKiKiDt7LpJ69wK9FBNwy61/U=
-X-Gm-Gg: ATEYQzwmkPmff7RbJzJTJsV5yv/1eOvTycPQtlbhF3XiJHxp8t5XMhNRcPCK8O51Qre
-	D+E664rg+aAv2GnNtZC5o97b1Hmj3OkwVIbNh1Aofye+litz2oRfmwPzrRB3G1hW2TxY6/UbjvJ
-	2wRu83t6BmuCm24A47CrIvWZeVCLnAAnDBNGBehdqWqVA3ilJvkxpXYk5rmQbBANwUXfRUL45n4
-	EDkzQeYUgtapyCepGhaELygSvqOu/ykXmiZNF889F9KK+wX/d+XlWDXhCqfeBxbNoh87uXsWvAL
-	FJgjqyxTsWo9W/bTA6joECg11IAdxWxaHqqYnLidszVlI+TVqXvGDYqdTqz04mHB9ZjeZMrgAtA
-	9Z6f9C5sXgA6VzVw9GxIAwSA70B8RBVQn7r30FU6Mftb/Tkxo9o84DQPJu/ARBzYmPyadhiMWtY
-	cv9w24Z/QLGQX8I1v6vMeeOoQ7xY4=
-X-Received: by 2002:a5d:5885:0:b0:439:8f9f:4994 with SMTP id ffacd0b85a97d-4398f9f4d4bmr2551757f8f.0.1772017130528;
-        Wed, 25 Feb 2026 02:58:50 -0800 (PST)
-Received: from localhost ([41.210.147.106])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43970d4c95dsm36546719f8f.33.2026.02.25.02.58.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Feb 2026 02:58:50 -0800 (PST)
-Date: Wed, 25 Feb 2026 13:58:45 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: netdev@vger.kernel.org, Jiayuan Chen <jiayuan.chen@shopee.com>,
-	syzbot+72e3ea390c305de0e259@syzkaller.appspotmail.com,
+	s=arc-20240116; t=1772017168; c=relaxed/simple;
+	bh=/fV4awh80lsBWfTC8nzGkofg3hP7NYlEQKqMqJBC6NA=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=m+HxRkHmgcatVCxqthcsK8TVccPN5LtB3JdFbO8J2pn1eLA5aZeobsp9u0+dYXerLmsZ4+Hs3653rNI0BP9dI5lYFQVAQdNpUhXlBFSSfOcmoWeDAxDl5nwC1Ej7Yz4t7XV0vF5Tt2Hk25TrqPUOUQ47K9ul/I/NIaJ7ivPi69w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=bZQfow/v; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ga10eSgFE90ZtSvOsQUcopfNpkOfowVKw1XZ4wXDdCM=; b=bZQfow/vi7pdFWOl/ITz9NlKxT
+	aPIQ4Nc+zafMdUFWqbqwe7vzDE/yfiDweu0EQjca7ABawF104R0HybfM2KBqI05evdZYCRb98uDJm
+	UEk+d33k3k2znQRRIOpgyXXUWEVgbacqv4YBeJb4/kzo5TUdimo0TeIWXu3ikIQyBDg21zQ64Iiiz
+	K8ymEyol/Th1oW1AIpDgAaG89RKOeEXGtngt1pl4BLRbvZaaXmQELfq4we3jY8VaUWoVcUAur+S1N
+	Rok8C9bRzDmA92JbnokqNDD4BX85Ywfnp5dY39JFJdv7S7p2dQsIySYk+4mkaHp5B/NMN7HczYjpm
+	ElOUlZEg==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:44156 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1vvCbu-000000006Uw-39e5;
+	Wed, 25 Feb 2026 10:59:18 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1vvCbt-0000000ArKy-3Wog;
+	Wed, 25 Feb 2026 10:59:17 +0000
+In-Reply-To: <aZ66OT9scKipRRu2@shell.armlinux.org.uk>
+References: <aZ66OT9scKipRRu2@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Ingo Molnar <mingo@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v1] atm: lec: fix null-ptr-deref in lec_arp_clear_vccs
-Message-ID: <aZ7V5b5ZplD4B9i1@stanley.mountain>
-References: <20260224044648.243578-1-jiayuan.chen@linux.dev>
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-phy@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vinod Koul <vkoul@kernel.org>
+Subject: [PATCH net-next 2/8] phy: qcom-sgmii-eth: add .set_mode() and
+ .validate() methods
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260224044648.243578-1-jiayuan.chen@linux.dev>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1vvCbt-0000000ArKy-3Wog@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Wed, 25 Feb 2026 10:59:17 +0000
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
-	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260876-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-260878-lists,netdev=lfdr.de,kernel];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[linaro.org:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dan.carpenter@linaro.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.980];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,72e3ea390c305de0e259];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linaro.org:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,shopee.com:email]
-X-Rspamd-Queue-Id: C3F95196204
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,armlinux.org.uk:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nxp.com:email,rmk-PC.armlinux.org.uk:mid]
+X-Rspamd-Queue-Id: 8B187196331
 X-Rspamd-Action: no action
 
-On Tue, Feb 24, 2026 at 12:46:38PM +0800, Jiayuan Chen wrote:
-> From: Jiayuan Chen <jiayuan.chen@shopee.com>
-> 
-> syzkaller reported a null-ptr-deref in lec_arp_clear_vccs().
-> This issue can be easily reproduced using the syzkaller reproducer.
-> 
-> In the ATM LANE (LAN Emulation) module, the same atm_vcc can be shared by
-> multiple lec_arp_table entries (e.g., via entry->vcc or entry->recv_vcc).
-> When the underlying VCC is closed, lec_vcc_close() iterates over all
-> ARP entries and calls lec_arp_clear_vccs() for each matched entry.
-> 
-> For example, when lec_vcc_close() iterates through the hlists in
-> priv->lec_arp_empty_ones or other ARP tables:
-> 
-> 1. In the first iteration, for the first matched ARP entry sharing the VCC,
-> lec_arp_clear_vccs() frees the associated vpriv (which is vcc->user_back)
-> and sets vcc->user_back to NULL.
-> 2. In the second iteration, for the next matched ARP entry sharing the same
-> VCC, lec_arp_clear_vccs() is called again. It obtains a NULL vpriv from
-> vcc->user_back (via LEC_VCC_PRIV(vcc)) and then attempts to dereference it
-> via `vcc->pop = vpriv->old_pop`, leading to a null-ptr-deref crash.
-> 
-> Fix this by adding a null check for vpriv before dereferencing it. If
-> vpriv is already NULL, it means the VCC has been cleared by a previous
-> call, so we can safely skip the cleanup and just clear the entry's
-> vcc/recv_vcc pointers. Note that the added check is intentional and
-> necessary to avoid calling vcc_release_async() multiple times on the
-> same vcc/recv_vcc, not just protecting the kfree().
-> 
-> Reported-by: syzbot+72e3ea390c305de0e259@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/all/68c95a83.050a0220.3c6139.0e5c.GAE@google.com/T/
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
-> ---
->  net/atm/lec.c | 27 +++++++++++++++------------
->  1 file changed, 15 insertions(+), 12 deletions(-)
-> 
-> diff --git a/net/atm/lec.c b/net/atm/lec.c
-> index afb8d3eb2185..a5b80d6df603 100644
-> --- a/net/atm/lec.c
-> +++ b/net/atm/lec.c
-> @@ -1260,24 +1260,27 @@ static void lec_arp_clear_vccs(struct lec_arp_table *entry)
->  		struct lec_vcc_priv *vpriv = LEC_VCC_PRIV(vcc);
->  		struct net_device *dev = (struct net_device *)vcc->proto_data;
->  
-> -		vcc->pop = vpriv->old_pop;
-> -		if (vpriv->xoff)
-> -			netif_wake_queue(dev);
-> -		kfree(vpriv);
-> -		vcc->user_back = NULL;
-> -		vcc->push = entry->old_push;
-> -		vcc_release_async(vcc, -EPIPE);
-> +		if (vpriv) {
-> +			vcc->pop = vpriv->old_pop;
-> +			if (vpriv->xoff)
-> +				netif_wake_queue(dev);
-> +			kfree(vpriv);
-> +			vcc->user_back = NULL;
-> +			vcc->push = entry->old_push;
-> +			vcc_release_async(vcc, -EPIPE);
-> +		}
->  		entry->vcc = NULL;
->  	}
->  	if (entry->recv_vcc) {
->  		struct atm_vcc *vcc = entry->recv_vcc;
->  		struct lec_vcc_priv *vpriv = LEC_VCC_PRIV(vcc);
->  
-> -		kfree(vpriv);
-> -		vcc->user_back = NULL;
-> -
-> -		entry->recv_vcc->push = entry->old_recv_push;
-> -		vcc_release_async(entry->recv_vcc, -EPIPE);
-> +		if (vpriv) {
-> +			kfree(vpriv);
-> +			vcc->user_back = NULL;
-> +			vcc->push = entry->old_recv_push;
-> +			vcc_release_async(vcc, -EPIPE);
+qcom-sgmii-eth is an Ethernet SerDes supporting only Ethernet mode
+using SGMII, 1000BASE-X and 2500BASE-X.
 
-I wasn't going say anything, but since it seems like maybe you're going
-to redo this patch anyway.  Changing "entry->recv_vcc->push" to
-"vcc->push" is obviously nice but could you do that in a separate
-patch?
+Add an implementation of the .set_mode() method, which can be used
+instead of or as well as the .set_speed() method. The Ethernet
+interface modes mentioned above all have a fixed data rate, so
+setting the mode is sufficient to fully specify the operating
+parameters.
 
-I use a tool to strip out the indenting changes:
-https://github.com/error27/rename_rev
+Add an implementation of the .validate() method, which will be
+necessary to allow discovery of the SerDes capabilities for platform
+independent SerDes support in the stmmac network driver.
 
-So when I review a patch like this, I want to pipe it to my script and
-just see:
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Acked-by: Vinod Koul <vkoul@kernel.org>
+Tested-by: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
 
-+		if (vpriv) {
-			vcc->pop = vpriv->old_pop;
-			if (vpriv->xoff)
-				netif_wake_queue(dev);
-			kfree(vpriv);
-			vcc->user_back = NULL;
-			vcc->push = entry->old_push;
-			vcc_release_async(vcc, -EPIPE);
-+		}
-  		entry->vcc = NULL;
-  	}
-  	if (entry->recv_vcc) {
-  		struct atm_vcc *vcc = entry->recv_vcc;
-  		struct lec_vcc_priv *vpriv = LEC_VCC_PRIV(vcc);
+Resending as netdev (and others) were missing.
 
-+		if (vpriv) {
-			kfree(vpriv);
-			vcc->user_back = NULL;
+ drivers/phy/qualcomm/phy-qcom-sgmii-eth.c | 43 +++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
-			entry->recv_vcc->push = entry->old_recv_push;
-			vcc_release_async(entry->recv_vcc, -EPIPE);
-+		}
+diff --git a/drivers/phy/qualcomm/phy-qcom-sgmii-eth.c b/drivers/phy/qualcomm/phy-qcom-sgmii-eth.c
+index 5b1c82459c12..4ea3dce7719f 100644
+--- a/drivers/phy/qualcomm/phy-qcom-sgmii-eth.c
++++ b/drivers/phy/qualcomm/phy-qcom-sgmii-eth.c
+@@ -7,6 +7,7 @@
+ #include <linux/ethtool.h>
+ #include <linux/module.h>
+ #include <linux/of.h>
++#include <linux/phy.h>
+ #include <linux/phy/phy.h>
+ #include <linux/platform_device.h>
+ #include <linux/regmap.h>
+@@ -286,6 +287,37 @@ static int qcom_dwmac_sgmii_phy_power_off(struct phy *phy)
+ 	return 0;
+ }
+ 
++static int qcom_dwmac_sgmii_phy_speed(enum phy_mode mode, int submode)
++{
++	if (mode != PHY_MODE_ETHERNET)
++		return -EINVAL;
++
++	if (submode == PHY_INTERFACE_MODE_SGMII ||
++	    submode == PHY_INTERFACE_MODE_1000BASEX)
++		return SPEED_1000;
++
++	if (submode == PHY_INTERFACE_MODE_2500BASEX)
++		return SPEED_2500;
++
++	return -EINVAL;
++}
++
++static int qcom_dwmac_sgmii_phy_set_mode(struct phy *phy, enum phy_mode mode,
++					 int submode)
++{
++	struct qcom_dwmac_sgmii_phy_data *data = phy_get_drvdata(phy);
++	int speed;
++
++	speed = qcom_dwmac_sgmii_phy_speed(mode, submode);
++	if (speed < 0)
++		return speed;
++
++	if (speed != data->speed)
++		data->speed = speed;
++
++	return qcom_dwmac_sgmii_phy_calibrate(phy);
++}
++
+ static int qcom_dwmac_sgmii_phy_set_speed(struct phy *phy, int speed)
+ {
+ 	struct qcom_dwmac_sgmii_phy_data *data = phy_get_drvdata(phy);
+@@ -296,10 +328,21 @@ static int qcom_dwmac_sgmii_phy_set_speed(struct phy *phy, int speed)
+ 	return qcom_dwmac_sgmii_phy_calibrate(phy);
+ }
+ 
++static int qcom_dwmac_sgmii_phy_validate(struct phy *phy, enum phy_mode mode,
++					 int submode,
++					 union phy_configure_opts *opts)
++{
++	int ret = qcom_dwmac_sgmii_phy_speed(mode, submode);
++
++	return ret < 0 ? ret : 0;
++}
++
+ static const struct phy_ops qcom_dwmac_sgmii_phy_ops = {
+ 	.power_on	= qcom_dwmac_sgmii_phy_power_on,
+ 	.power_off	= qcom_dwmac_sgmii_phy_power_off,
++	.set_mode	= qcom_dwmac_sgmii_phy_set_mode,
+ 	.set_speed	= qcom_dwmac_sgmii_phy_set_speed,
++	.validate	= qcom_dwmac_sgmii_phy_validate,
+ 	.calibrate	= qcom_dwmac_sgmii_phy_calibrate,
+ 	.owner		= THIS_MODULE,
+ };
+-- 
+2.47.3
 
-The renames are nice but now I have to check things by hand.
-
-regards,
-dan carpenter
 
