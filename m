@@ -1,374 +1,1056 @@
-Return-Path: <netdev+bounces-260954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260955-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gD25OMn6nmm+YAQAu9opvQ
-	(envelope-from <netdev+bounces-260954-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:36:09 +0100
+	id cKKWMwP8nmm+YAQAu9opvQ
+	(envelope-from <netdev+bounces-260955-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:41:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9795E198298
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:36:09 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41643198403
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:41:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 094D53050CC7
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 13:35:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6C2FD30DEC72
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 13:37:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C1F23D1CC0;
-	Wed, 25 Feb 2026 13:34:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D893F3BFE5A;
+	Wed, 25 Feb 2026 13:37:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="GulP3TxK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FsHwQnht"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B5A53D1CCF
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 13:34:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B21863BFE50;
+	Wed, 25 Feb 2026 13:37:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772026480; cv=none; b=I6lU+ex7ZWCZT5j+kOGnXoCwhigH9AhwgCF7mYaJkEu+MKUHrTaZyNHhi1sbtxT2qYadgxJsF7ZUlvGirmHUfQiHFFyR6j8OBmDN10Mth4Zg9o03EViWGj9bjxSPJnqhcNuNQxVmQVHvBv2O+v+JEqIEn4aIAhilBZ1Ne9cgs0A=
+	t=1772026666; cv=none; b=HxMA8mm7dql6pkJ0OWqO/5Oo3KZvEJ1Mv1dR5yWOoG2UC5EZeGE7TpFddtGLJTtt63cEI4wHwJHOfhl4dw2Mg1V0ksQXmxDYEL9yH/poh4g++JGR9ijlWpBetf7cPXZ0BS7JHZ30JIAd1heRVjz+QE4IdVurc4FzOkvYQrBUjbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772026480; c=relaxed/simple;
-	bh=HccXAmm/5fdm0cg9tl21YBHJRBOvdlQmY+4n98V88WY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lh5rJQMZR3yU618yvND1RqvBFqD4jmj3v9E3IyV0cyXQi85xHhLLuqGUoU8F4JQmGNy5Dcya2P0wvovTrvAoLaP9XiwBmCtpi6i4XKLZKbBBR9hBQ1tR0KGBnM3xnuTuH4tZgqZSJA2O2RjqlGORkMXrV63vD+cMfu8HV0N7lMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=GulP3TxK; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4806f3fc50bso75089725e9.0
-        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 05:34:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1772026477; x=1772631277; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CiceKnm9w1qg/Cw16qmU4bMQ/NW+uz/fZoBkOukH2ls=;
-        b=GulP3TxKigKdGgN09nY9zXCb2k2y0GDizEGnMq6otQGl9H/voPR3VtQiJSMcKGunBE
-         s3xG0vG4U/QczU5wqZJdt4+a97YNGl8+sDJ8oRzKvv7B0OJawE+8RkzINW2RRwxeZZdp
-         SZO/W7WM58WbrqmML34/MuuQ+5UppqP9kTSVwgzm+nxQCZsz/xmyiKK+4/lvSUmEBlen
-         TwgBEviMZOzrCFY3ENKJnFShnHPGOj9tHkGuWx8q2l7S0ZpFaFIYEdE8iKaHV9de5Yvn
-         o+jrtrgyty1mHagbQIe6FH12iEZzIz6G3UkUEI+F3JaeN1fDnXJ7Pqqw2bXFqLxDI26t
-         b4JQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772026477; x=1772631277;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=CiceKnm9w1qg/Cw16qmU4bMQ/NW+uz/fZoBkOukH2ls=;
-        b=qzj7zjKMDyjfBaMKx67M2HoRCL/Ed1uvKsHDhc4NKjx18lo7uqN8gI5UQMBwtChpLh
-         WNHYCt40D3okUjAK+AZepLLYh3LzJ+vAfSEW9Q7ZGGe3V8cEf5SMkDu9T4iyLpAEm5yR
-         Q14sXbLksssnJ6YGcprOKZePCu62y4H0zbBg/6K130MtGZ7uddwxw8to6pByMeArbkfp
-         ee2PJHgADUfYvihtPkW1vjkfw6tlUHS1FMF9hF+5Cv4PQkgBOWecluI7BZx+bGpO5m45
-         tlWNp0av/OLyURxrDujLkfhK5t6nxjG3H2/7sXDc8xZaJKay3gUjWMBdCuay+zx/mbzo
-         nezA==
-X-Gm-Message-State: AOJu0YyUTvbWMHczrc/31iCqZsKhwXGKBNZ2cx1yghmuLIGpbtrPtN9C
-	lZW6zO/+pPoi79hGCRkuuKy6aCCkpuUCTZjNZvEhAgbT248mL8bFxrkpKrbx6kMLneOHEFUktsz
-	5Crr+
-X-Gm-Gg: ATEYQzz7i/uJxilfVlInG59ih6Tp2BsQ0D3BvU90TmLLria59Bty5L6YzHsyVNqylbT
-	vRcfaVE6mUOgomcdjXbZuDqwTOVNel9mjKiipXq1tq9jswYP7fpZn/pa6grDIYpUgaI1mxgJjLQ
-	/GqcZ3qer3RkCHuzER2XMtyYfYxd0jeICX1DbyfNSlTl4FmDiCJ49VF2VGz/fq/euqtVizpaJk6
-	niR7qbhI/jnm06wHn9hrl1183ZPWRjL+0IWmsujiKNZJ+BvQSp6p7XA8/CyYDuU2AYQaNQaMKlD
-	28UddCv3N/ijzCF6MeeHVkUuS2xtzkdeyhG5kuPYqRVnUgNrN8m/ROiVzVuqkHPiJGfG1Vn6J2i
-	PPManao4H+//6WpaBn3dc58RMZ6CZpIIowOCOldsh9rEscSzr3hBLCOTTDn5I1lyxmcwlvn28To
-	LyRdJq/1j9fJmqkg==
-X-Received: by 2002:a05:600c:348b:b0:483:612d:7a5c with SMTP id 5b1f17b1804b1-483c21a117cmr5991925e9.25.1772026476777;
-        Wed, 25 Feb 2026 05:34:36 -0800 (PST)
-Received: from localhost ([85.163.81.98])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bfb1390bsm23962915e9.1.2026.02.25.05.34.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Feb 2026 05:34:36 -0800 (PST)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	donald.hunter@gmail.com,
-	corbet@lwn.net,
-	skhan@linuxfoundation.org,
-	saeedm@nvidia.com,
-	leon@kernel.org,
-	tariqt@nvidia.com,
-	mbloch@nvidia.com,
-	przemyslaw.kitszel@intel.com,
-	mschmidt@redhat.com,
-	andrew+netdev@lunn.ch,
-	rostedt@goodmis.org,
-	mhiramat@kernel.org,
-	mathieu.desnoyers@efficios.com,
-	chuck.lever@oracle.com,
-	matttbe@kernel.org,
-	cjubran@nvidia.com,
-	daniel.zahka@gmail.com,
-	linux-doc@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 10/10] net/mlx5: Add a shared devlink instance for PFs on same chip
-Date: Wed, 25 Feb 2026 14:34:22 +0100
-Message-ID: <20260225133422.290965-11-jiri@resnulli.us>
-X-Mailer: git-send-email 2.51.1
-In-Reply-To: <20260225133422.290965-1-jiri@resnulli.us>
-References: <20260225133422.290965-1-jiri@resnulli.us>
+	s=arc-20240116; t=1772026666; c=relaxed/simple;
+	bh=mpFemABWd0MGhwFKf2uBA0+4SFL6quFU8m4s5qnowI4=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=b4w0vuTzM48oezCvrT+L0JLScAI+tsN/BH+bXX7lcqgQd+w846FykMxI0QkyQwA3oeTD16sbydHXM5Tyr4RqjQZ3JaawsMohBmeN+LkXNxmxTzPC0BIsCjama2BH6LormZlHBcTgrMKwtnVSny5HNosvqRmlbYcMc4OBg9tudi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FsHwQnht; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 41F6DC2BC86;
+	Wed, 25 Feb 2026 13:37:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772026666;
+	bh=mpFemABWd0MGhwFKf2uBA0+4SFL6quFU8m4s5qnowI4=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=FsHwQnht71/3K5oqfXFs+JSbeLMABT3I83z3rEoA532hUh9Vzlc67SoelnMgZKxFJ
+	 z2zUeaojDkhv6VEUhPiqJHiFu1gMiVEN6KQWzM6qMQQmE1vesIL4SCjlo6sqWrLAsx
+	 T2xknA7hXU+94ocPbSMqwu3Kji6iGI75SKLT/ez5N4PSTfHi+BuxouGkivG6IUXzIe
+	 tLIDR/O2qcTnIZo/avUr7YvLCXsxj58N2fCK9zqlQ9enFfoyTxk8pD58wSB2zRfZ04
+	 lAgw7ZgMCkLOL5Pp/bbb3e3mDKXQR9oj/qmFqYtZDw+gBZyUh092kONVsIn74wy0Vq
+	 TpCaOdTaLc78w==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 319D2FD375F;
+	Wed, 25 Feb 2026 13:37:46 +0000 (UTC)
+From: Cedric Jehasse via B4 Relay <devnull+cedric.jehasse.luminex.be@kernel.org>
+Date: Wed, 25 Feb 2026 14:37:31 +0100
+Subject: [PATCH net-next v4] net: dsa: mv88e6xxx: Add partial support for
+ TCAM entries
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260225-net-next-mv88e6xxx-tcam-v4-1-117f600e41d7@luminex.be>
+X-B4-Tracking: v=1; b=H4sIABr7nmkC/4XNQQrCMBAF0KuUrI0k0zQNrryHuGiTiQ3YKmkNk
+ dK7GwNCRYqLWXxm/puZjOgdjuRQzMRjcKO7DSmIXUF01wwXpM6kTICBZMBLOuCUJk60D0qhjDH
+ SSTc9tbJqkUvGlG1Jat89WhezfCKfEjmnTefG6eaf+WXgef9XD5xyyiqOVQUIjdXH66N36XLfY
+ kYDrKF6G4IEGSW0FcBMI+QPVK4gENtQ+YY0V0rVpuYWvqBlWV5ForTLWwEAAA==
+X-Change-ID: 20260213-net-next-mv88e6xxx-tcam-f65be16008fb
+To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Russell King <linux@armlinux.org.uk>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ Cedric Jehasse <cedric.jehasse@luminex.be>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1772026664; l=27663;
+ i=cedric.jehasse@luminex.be; s=20260213; h=from:subject:message-id;
+ bh=1KfG0yCoCQgvnEBVYAdyvPDjTwJ4U5BObF7QlxvhWOE=;
+ b=Y/Lzb+4gD7uMKODC1Ob4RYSYU8pjs8EGB5cQGWZ/X+9de5TfAVZbv9K7MqS3uLoUBJFlSKxCn
+ 2dCypbwzoqxBzZ9Gz4j1CSbHn1vlL3dTUIXp1wCQgZym7f2oDRtulbz
+X-Developer-Key: i=cedric.jehasse@luminex.be; a=ed25519;
+ pk=DL2RaHc2bc7tTDTMJdugm42BtJk4Ip+7V41Gkj+Avjk=
+X-Endpoint-Received: by B4 Relay for cedric.jehasse@luminex.be/20260213
+ with auth_id=638
+X-Original-From: Cedric Jehasse <cedric.jehasse@luminex.be>
+Reply-To: cedric.jehasse@luminex.be
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20230601.gappssmtp.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lwn.net,linuxfoundation.org,nvidia.com,intel.com,lunn.ch,goodmis.org,efficios.com,oracle.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[resnulli.us];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260954-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DKIM_TRACE(0.00)[resnulli-us.20230601.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260955-lists,netdev=lfdr.de,cedric.jehasse.luminex.be];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	HAS_REPLYTO(0.00)[cedric.jehasse@luminex.be];
 	RCVD_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-0.969];
-	TO_DN_NONE(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,resnulli.us:mid,resnulli-us.20230601.gappssmtp.com:dkim,nvidia.com:email]
-X-Rspamd-Queue-Id: 9795E198298
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,luminex.be:mid,luminex.be:email,luminex.be:replyto]
+X-Rspamd-Queue-Id: 41643198403
 X-Rspamd-Action: no action
 
-From: Jiri Pirko <jiri@nvidia.com>
+From: Cedric Jehasse <cedric.jehasse@luminex.be>
 
-Use the previously introduced shared devlink infrastructure to create
-a shared devlink instance for mlx5 PFs that reside on the same physical
-chip. The shared instance is identified by the chip's serial number
-extracted from PCI VPD (V3 keyword, with fallback to serial number
-for older devices).
+This patch adds partial Ternary Content Addressable Memory (TCAM) for
+the mv88e6390 and mv88e6393 family of switches. TCAM entries allow the
+switch to match the first 48 or 96 bytes of a frame and take actions on
+matched frames.
 
-Each PF that probes calls mlx5_shd_init() which extracts the chip serial
-number and uses devlink_shd_get() to get or create the shared instance.
-When a PF is removed, mlx5_shd_uninit() calls devlink_shd_put()
-to release the reference. The shared instance is automatically destroyed
-when the last PF is removed.
+This patch introduces a subset of the available TCAM functionality.
+Matching on ip addresses/protocol and trapping to the cpu.
 
-Make the PF devlink instances nested in this shared devlink instance,
-allowing userspace to identify which PFs belong to the same physical
-chip.
+Eg. to trap traffic with destination ip 224.0.1.129 to the cpu:
 
-Example:
+tc qdisc add dev p1 clsact
+tc filter add dev p1 ingress protocol ip flower skip_sw \
+    dst_ip 224.0.1.129 action trap
 
-pci/0000:08:00.0: index 0
-  nested_devlink:
-    auxiliary/mlx5_core.eth.0
-devlink_index/1: index 1
-  nested_devlink:
-    pci/0000:08:00.0
-    pci/0000:08:00.1
-auxiliary/mlx5_core.eth.0: index 2
-pci/0000:08:00.1: index 3
-  nested_devlink:
-    auxiliary/mlx5_core.eth.1
-auxiliary/mlx5_core.eth.1: index 4
-
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+Signed-off-by: Cedric Jehasse <cedric.jehasse@luminex.be>
 ---
- .../net/ethernet/mellanox/mlx5/core/Makefile  |  5 +-
- .../net/ethernet/mellanox/mlx5/core/main.c    | 17 +++++
- .../ethernet/mellanox/mlx5/core/sh_devlink.c  | 62 +++++++++++++++++++
- .../ethernet/mellanox/mlx5/core/sh_devlink.h  | 12 ++++
- include/linux/mlx5/driver.h                   |  1 +
- 5 files changed, 95 insertions(+), 2 deletions(-)
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.h
+Changes in v4:
+- return -ENOMEM on allocation failure
+- fix double mv88e6xxx_reg_unlock
+- return -EOPNOTSUPP for unsupported addr_type
+- improve error handling in mv88e6xxx_tcam_entry_del
+- Link to v3: https://lore.kernel.org/r/20260224-net-next-mv88e6xxx-tcam-v3-1-dc18887d71f2@luminex.be
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Makefile b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-index 8ffa286a18f5..d39fe9c4a87c 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-@@ -16,8 +16,9 @@ mlx5_core-y :=	main.o cmd.o debugfs.o fw.o eq.o uar.o pagealloc.o \
- 		transobj.o vport.o sriov.o fs_cmd.o fs_core.o pci_irq.o \
- 		fs_counters.o fs_ft_pool.o rl.o lag/debugfs.o lag/lag.o dev.o events.o wq.o lib/gid.o \
- 		lib/devcom.o lib/pci_vsc.o lib/dm.o lib/fs_ttc.o diag/fs_tracepoint.o \
--		diag/fw_tracer.o diag/crdump.o devlink.o diag/rsc_dump.o diag/reporter_vnic.o \
--		fw_reset.o qos.o lib/tout.o lib/aso.o wc.o fs_pool.o lib/nv_param.o
-+		diag/fw_tracer.o diag/crdump.o devlink.o sh_devlink.o diag/rsc_dump.o \
-+		diag/reporter_vnic.o fw_reset.o qos.o lib/tout.o lib/aso.o wc.o fs_pool.o \
-+		lib/nv_param.o
+Changes in v3:
+- move locking to top level functions
+- use defines for match field offsets
+- use correct comment style
+- remove warning used for debugging
+- rename rc variables to err
+- limit line length to 80 characters
+- Link to v2: https://lore.kernel.org/r/20260217-net-next-mv88e6xxx-tcam-v2-1-d84cf420da46@luminex.be
+
+Changes in RFC-v2:
+- moved tcam_addr to chip info struct and remove tcam_support field
+- added 6393-specific tcam ops that write the TCAM extension register
+- rename the defines for TCAM registers to be consistent
+- reverse christmas tree variable declarations
+- Link to v1: https://lore.kernel.org/r/20260213-net-next-mv88e6xxx-tcam-v1-1-051e552e2afc@luminex.be
+---
+ drivers/net/dsa/mv88e6xxx/Makefile   |   2 +
+ drivers/net/dsa/mv88e6xxx/chip.c     |  30 ++++
+ drivers/net/dsa/mv88e6xxx/chip.h     |  51 ++++++
+ drivers/net/dsa/mv88e6xxx/port.c     |  27 ++-
+ drivers/net/dsa/mv88e6xxx/port.h     |   7 +-
+ drivers/net/dsa/mv88e6xxx/tcam.c     | 325 +++++++++++++++++++++++++++++++++++
+ drivers/net/dsa/mv88e6xxx/tcam.h     |  41 +++++
+ drivers/net/dsa/mv88e6xxx/tcflower.c | 164 ++++++++++++++++++
+ drivers/net/dsa/mv88e6xxx/tcflower.h |  13 ++
+ 9 files changed, 658 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/dsa/mv88e6xxx/Makefile b/drivers/net/dsa/mv88e6xxx/Makefile
+index dd961081d631..b0b08c6f159c 100644
+--- a/drivers/net/dsa/mv88e6xxx/Makefile
++++ b/drivers/net/dsa/mv88e6xxx/Makefile
+@@ -21,6 +21,8 @@ mv88e6xxx-objs += serdes.o
+ mv88e6xxx-objs += smi.o
+ mv88e6xxx-objs += switchdev.o
+ mv88e6xxx-objs += trace.o
++mv88e6xxx-objs += tcflower.o
++mv88e6xxx-objs += tcam.o
  
- #
- # Netdev basic
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-index 55b4e0cceae2..0aefcbaf4761 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-@@ -74,6 +74,7 @@
- #include "mlx5_irq.h"
- #include "hwmon.h"
- #include "lag/lag.h"
-+#include "sh_devlink.h"
+ # for tracing framework to find trace.h
+ CFLAGS_trace.o := -I$(src)
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+index 09002c853b78..b95212dc2f75 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.c
++++ b/drivers/net/dsa/mv88e6xxx/chip.c
+@@ -43,6 +43,8 @@
+ #include "ptp.h"
+ #include "serdes.h"
+ #include "smi.h"
++#include "tcam.h"
++#include "tcflower.h"
  
- MODULE_AUTHOR("Eli Cohen <eli@mellanox.com>");
- MODULE_DESCRIPTION("Mellanox 5th generation network adapters (ConnectX series) core driver");
-@@ -1520,10 +1521,16 @@ int mlx5_init_one(struct mlx5_core_dev *dev)
- 	int err;
- 
- 	devl_lock(devlink);
-+	if (dev->shd) {
-+		err = devl_nested_devlink_set(dev->shd, devlink);
-+		if (err)
-+			goto unlock;
-+	}
- 	devl_register(devlink);
- 	err = mlx5_init_one_devl_locked(dev);
- 	if (err)
- 		devl_unregister(devlink);
-+unlock:
- 	devl_unlock(devlink);
- 	return err;
- }
-@@ -2005,6 +2012,13 @@ static int probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
- 		goto pci_init_err;
+ static void assert_reg_lock(struct mv88e6xxx_chip *chip)
+ {
+@@ -3560,6 +3562,11 @@ static int mv88e6xxx_setup_port(struct mv88e6xxx_chip *chip, int port)
+ 		if (err)
+ 			return err;
  	}
- 
-+	err = mlx5_shd_init(dev);
-+	if (err) {
-+		mlx5_core_err(dev, "mlx5_shd_init failed with error code %d\n",
-+			      err);
-+		goto shd_init_err;
++	if (chip->info->ops->port_enable_tcam) {
++		err = chip->info->ops->port_enable_tcam(chip, port);
++		if (err)
++			return err;
 +	}
-+
- 	err = mlx5_init_one(dev);
- 	if (err) {
- 		mlx5_core_err(dev, "mlx5_init_one failed with error code %d\n",
-@@ -2018,6 +2032,8 @@ static int probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
- 	return 0;
  
- err_init_one:
-+	mlx5_shd_uninit(dev);
-+shd_init_err:
- 	mlx5_pci_close(dev);
- pci_init_err:
- 	mlx5_mdev_uninit(dev);
-@@ -2039,6 +2055,7 @@ static void remove_one(struct pci_dev *pdev)
- 	mlx5_drain_health_wq(dev);
- 	mlx5_sriov_disable(pdev, false);
- 	mlx5_uninit_one(dev);
-+	mlx5_shd_uninit(dev);
- 	mlx5_pci_close(dev);
- 	mlx5_mdev_uninit(dev);
- 	mlx5_adev_idx_free(dev->priv.adev_idx);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c b/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
-new file mode 100644
-index 000000000000..f0561c40f52a
---- /dev/null
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
-@@ -0,0 +1,62 @@
-+// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
-+/* Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved. */
-+
-+#include <linux/mlx5/driver.h>
-+#include <net/devlink.h>
-+
-+#include "sh_devlink.h"
-+
-+static const struct devlink_ops mlx5_shd_ops = {
-+};
-+
-+int mlx5_shd_init(struct mlx5_core_dev *dev)
+ 	if (chip->info->ops->port_tag_remap) {
+ 		err = chip->info->ops->port_tag_remap(chip, port);
+@@ -3938,6 +3945,14 @@ static int mv88e6xxx_mdios_register(struct mv88e6xxx_chip *chip)
+ 	return 0;
+ }
+ 
++static int mv88e6xxx_tcam_setup(struct mv88e6xxx_chip *chip)
 +{
-+	u8 *vpd_data __free(kfree) = NULL;
-+	struct pci_dev *pdev = dev->pdev;
-+	unsigned int vpd_size, kw_len;
-+	struct devlink *devlink;
-+	const char *sn;
-+	char *end;
-+	int start;
-+	int err;
-+
-+	if (!mlx5_core_is_pf(dev))
++	if (!mv88e6xxx_has_tcam(chip))
 +		return 0;
 +
-+	vpd_data = pci_vpd_alloc(pdev, &vpd_size);
-+	if (IS_ERR(vpd_data)) {
-+		err = PTR_ERR(vpd_data);
-+		return err == -ENODEV ? 0 : err;
-+	}
-+	start = pci_vpd_find_ro_info_keyword(vpd_data, vpd_size, "V3", &kw_len);
-+	if (start < 0) {
-+		/* Fall-back to SN for older devices. */
-+		start = pci_vpd_find_ro_info_keyword(vpd_data, vpd_size,
-+						     PCI_VPD_RO_KEYWORD_SERIALNO, &kw_len);
-+		if (start < 0)
-+			return -ENOENT;
-+	}
-+	sn = kstrndup(vpd_data + start, kw_len, GFP_KERNEL);
-+	if (!sn)
-+		return -ENOMEM;
-+	/* Firmware may return spaces at the end of the string, strip it. */
-+	end = strchrnul(sn, ' ');
-+	*end = '\0';
++	return chip->info->ops->tcam_ops->flush_tcam(chip);
++}
 +
-+	/* Get or create shared devlink instance */
-+	devlink = devlink_shd_get(sn, &mlx5_shd_ops, 0);
-+	kfree(sn);
-+	if (!devlink)
-+		return -ENOMEM;
+ static void mv88e6xxx_teardown(struct dsa_switch *ds)
+ {
+ 	struct mv88e6xxx_chip *chip = ds->priv;
+@@ -4083,6 +4098,10 @@ static int mv88e6xxx_setup(struct dsa_switch *ds)
+ 	if (err)
+ 		goto unlock;
+ 
++	err = mv88e6xxx_tcam_setup(chip);
++	if (err)
++		goto unlock;
 +
-+	dev->shd = devlink;
+ unlock:
+ 	mv88e6xxx_reg_unlock(chip);
+ 
+@@ -5134,6 +5153,7 @@ static const struct mv88e6xxx_ops mv88e6290_ops = {
+ 	.ptp_ops = &mv88e6390_ptp_ops,
+ 	.phylink_get_caps = mv88e6390_phylink_get_caps,
+ 	.pcs_ops = &mv88e6390_pcs_ops,
++	.tcam_ops = &mv88e6390_tcam_ops,
+ };
+ 
+ static const struct mv88e6xxx_ops mv88e6320_ops = {
+@@ -5525,6 +5545,7 @@ static const struct mv88e6xxx_ops mv88e6390_ops = {
+ 	.serdes_get_regs = mv88e6390_serdes_get_regs,
+ 	.phylink_get_caps = mv88e6390_phylink_get_caps,
+ 	.pcs_ops = &mv88e6390_pcs_ops,
++	.tcam_ops = &mv88e6390_tcam_ops,
+ };
+ 
+ static const struct mv88e6xxx_ops mv88e6390x_ops = {
+@@ -5621,6 +5642,7 @@ static const struct mv88e6xxx_ops mv88e6393x_ops = {
+ 	.port_set_cmode = mv88e6393x_port_set_cmode,
+ 	.port_setup_message_port = mv88e6xxx_setup_message_port,
+ 	.port_set_upstream_port = mv88e6393x_port_set_upstream_port,
++	.port_enable_tcam = mv88e6xxx_port_enable_tcam,
+ 	.stats_snapshot = mv88e6390_g1_stats_snapshot,
+ 	.stats_set_histogram = mv88e6390_g1_stats_set_histogram,
+ 	.stats_get_sset_count = mv88e6320_stats_get_sset_count,
+@@ -5652,6 +5674,7 @@ static const struct mv88e6xxx_ops mv88e6393x_ops = {
+ 	.ptp_ops = &mv88e6352_ptp_ops,
+ 	.phylink_get_caps = mv88e6393x_phylink_get_caps,
+ 	.pcs_ops = &mv88e6393x_pcs_ops,
++	.tcam_ops = &mv88e6393_tcam_ops,
+ };
+ 
+ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+@@ -6132,6 +6155,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.phy_base_addr = 0x0,
+ 		.global1_addr = 0x1b,
+ 		.global2_addr = 0x1c,
++		.tcam_addr = 0x1f,
+ 		.age_time_coeff = 3750,
+ 		.g1_irqs = 10,
+ 		.g2_irqs = 14,
+@@ -6233,6 +6257,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.phy_base_addr = 0x0,
+ 		.global1_addr = 0x1b,
+ 		.global2_addr = 0x1c,
++		.tcam_addr = 0x1f,
+ 		.age_time_coeff = 3750,
+ 		.g1_irqs = 9,
+ 		.g2_irqs = 14,
+@@ -6445,6 +6470,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.phy_base_addr = 0x0,
+ 		.global1_addr = 0x1b,
+ 		.global2_addr = 0x1c,
++		.tcam_addr = 0x1f,
+ 		.age_time_coeff = 3750,
+ 		.g1_irqs = 9,
+ 		.g2_irqs = 14,
+@@ -6497,6 +6523,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.phy_base_addr = 0x0,
+ 		.global1_addr = 0x1b,
+ 		.global2_addr = 0x1c,
++		.tcam_addr = 0x1f,
+ 		.age_time_coeff = 3750,
+ 		.g1_irqs = 10,
+ 		.g2_irqs = 14,
+@@ -6589,6 +6616,7 @@ static struct mv88e6xxx_chip *mv88e6xxx_alloc_chip(struct device *dev)
+ 	INIT_LIST_HEAD(&chip->mdios);
+ 	idr_init(&chip->policies);
+ 	INIT_LIST_HEAD(&chip->msts);
++	INIT_LIST_HEAD(&chip->tcam.entries);
+ 
+ 	return chip;
+ }
+@@ -7184,6 +7212,8 @@ static const struct dsa_switch_ops mv88e6xxx_switch_ops = {
+ 	.port_hwtstamp_get	= mv88e6xxx_port_hwtstamp_get,
+ 	.port_txtstamp		= mv88e6xxx_port_txtstamp,
+ 	.port_rxtstamp		= mv88e6xxx_port_rxtstamp,
++	.cls_flower_add		= mv88e6xxx_cls_flower_add,
++	.cls_flower_del         = mv88e6xxx_cls_flower_del,
+ 	.get_ts_info		= mv88e6xxx_get_ts_info,
+ 	.devlink_param_get	= mv88e6xxx_devlink_param_get,
+ 	.devlink_param_set	= mv88e6xxx_devlink_param_set,
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
+index e073446ee7d0..68f19b5bd2ae 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.h
++++ b/drivers/net/dsa/mv88e6xxx/chip.h
+@@ -141,6 +141,7 @@ struct mv88e6xxx_info {
+ 	unsigned int phy_base_addr;
+ 	unsigned int global1_addr;
+ 	unsigned int global2_addr;
++	unsigned int tcam_addr;
+ 	unsigned int age_time_coeff;
+ 	unsigned int g1_irqs;
+ 	unsigned int g2_irqs;
+@@ -210,6 +211,7 @@ struct mv88e6xxx_avb_ops;
+ struct mv88e6xxx_ptp_ops;
+ struct mv88e6xxx_pcs_ops;
+ struct mv88e6xxx_cc_coeffs;
++struct mv88e6xxx_tcam_ops;
+ 
+ struct mv88e6xxx_irq {
+ 	u16 masked;
+@@ -339,6 +341,10 @@ struct mv88e6xxx_hw_stat {
+ 	int type;
+ };
+ 
++struct mv88e6xxx_tcam {
++	struct list_head entries;
++};
++
+ struct mv88e6xxx_chip {
+ 	const struct mv88e6xxx_info *info;
+ 
+@@ -444,6 +450,35 @@ struct mv88e6xxx_chip {
+ 
+ 	/* FID map */
+ 	DECLARE_BITMAP(fid_bitmap, MV88E6XXX_N_FID);
++
++	/* TCAM entries */
++	struct mv88e6xxx_tcam tcam;
++};
++
++#define TCAM_MATCH_SIZE 96
++
++struct mv88e6xxx_tcam_key {
++	u16 spv;
++	u16 spv_mask;
++
++	u8 frame_data[TCAM_MATCH_SIZE];
++	u8 frame_mask[TCAM_MATCH_SIZE];
++};
++
++struct mv88e6xxx_tcam_action {
++	u8 dpv_mode;
++	u16 dpv;
++};
++
++struct mv88e6xxx_tcam_entry {
++	struct list_head list;
++	unsigned long cookie;
++	u32 prio;
++	u8 hw_idx;
++
++	struct mv88e6xxx_tcam_key key;
++	struct mv88e6xxx_tcam_action action;
++
+ };
+ 
+ struct mv88e6xxx_bus_ops {
+@@ -678,6 +713,11 @@ struct mv88e6xxx_ops {
+ 
+ 	/* Max Frame Size */
+ 	int (*set_max_frame_size)(struct mv88e6xxx_chip *chip, int mtu);
++
++	int (*port_enable_tcam)(struct mv88e6xxx_chip *chip, int port);
++
++	/* Ternary Content Addressable Memory operations */
++	const struct mv88e6xxx_tcam_ops *tcam_ops;
+ };
+ 
+ struct mv88e6xxx_irq_ops {
+@@ -752,6 +792,12 @@ struct mv88e6xxx_pcs_ops {
+ 
+ };
+ 
++struct mv88e6xxx_tcam_ops {
++	int (*entry_add)(struct mv88e6xxx_chip *chip,
++			 struct mv88e6xxx_tcam_entry *entry, u8 idx);
++	int (*flush_tcam)(struct mv88e6xxx_chip *chip);
++};
++
+ static inline bool mv88e6xxx_has_stu(struct mv88e6xxx_chip *chip)
+ {
+ 	return chip->info->max_sid > 0 &&
+@@ -769,6 +815,11 @@ static inline bool mv88e6xxx_has_lag(struct mv88e6xxx_chip *chip)
+ 	return !!chip->info->global2_addr;
+ }
+ 
++static inline bool mv88e6xxx_has_tcam(struct mv88e6xxx_chip *chip)
++{
++	return !!chip->info->tcam_addr;
++}
++
+ static inline unsigned int mv88e6xxx_num_databases(struct mv88e6xxx_chip *chip)
+ {
+ 	return chip->info->num_databases;
+diff --git a/drivers/net/dsa/mv88e6xxx/port.c b/drivers/net/dsa/mv88e6xxx/port.c
+index 66b1b7277281..38616a2f8de3 100644
+--- a/drivers/net/dsa/mv88e6xxx/port.c
++++ b/drivers/net/dsa/mv88e6xxx/port.c
+@@ -1380,7 +1380,32 @@ int mv88e6xxx_port_disable_learn_limit(struct mv88e6xxx_chip *chip, int port)
+ 
+ int mv88e6xxx_port_disable_pri_override(struct mv88e6xxx_chip *chip, int port)
+ {
+-	return mv88e6xxx_port_write(chip, port, MV88E6XXX_PORT_PRI_OVERRIDE, 0);
++	u16 reg;
++	int err;
++
++	err = mv88e6xxx_port_read(chip, port, MV88E6XXX_PORT_PRI_OVERRIDE,
++				  &reg);
++	if (err)
++		return err;
++
++	reg &= MV88E6XXX_PORT_PRI_OVERRIDE_TCAM_MODE_MASK;
++	return mv88e6xxx_port_write(chip, port, MV88E6XXX_PORT_PRI_OVERRIDE,
++				    reg);
++}
++
++int mv88e6xxx_port_enable_tcam(struct mv88e6xxx_chip *chip, int port)
++{
++	u16 reg;
++	int err;
++
++	err = mv88e6xxx_port_read(chip, port, MV88E6XXX_PORT_PRI_OVERRIDE,
++				  &reg);
++	if (err)
++		return err;
++
++	reg |= MV88E6XXX_PORT_PRI_OVERRIDE_TCAM_MODE_96_BYTE;
++	return mv88e6xxx_port_write(chip, port, MV88E6XXX_PORT_PRI_OVERRIDE,
++				    reg);
+ }
+ 
+ /* Offset 0x0E: Policy & MGMT Control Register for FAMILY 6191X 6193X 6393X */
+diff --git a/drivers/net/dsa/mv88e6xxx/port.h b/drivers/net/dsa/mv88e6xxx/port.h
+index c1d2f99efb1c..a2492cf4d920 100644
+--- a/drivers/net/dsa/mv88e6xxx/port.h
++++ b/drivers/net/dsa/mv88e6xxx/port.h
+@@ -254,7 +254,10 @@
+ #define MV88E6XXX_PORT_ATU_CTL		0x0c
+ 
+ /* Offset 0x0D: Priority Override Register */
+-#define MV88E6XXX_PORT_PRI_OVERRIDE	0x0d
++#define MV88E6XXX_PORT_PRI_OVERRIDE			0x0d
++#define MV88E6XXX_PORT_PRI_OVERRIDE_TCAM_MODE_MASK	0x0003
++#define MV88E6XXX_PORT_PRI_OVERRIDE_TCAM_MODE_48_BYTE	0x0001
++#define MV88E6XXX_PORT_PRI_OVERRIDE_TCAM_MODE_96_BYTE	0x0002
+ 
+ /* Offset 0x0E: Policy Control Register */
+ #define MV88E6XXX_PORT_POLICY_CTL		0x0e
+@@ -608,4 +611,6 @@ int mv88e6xxx_port_hidden_wait(struct mv88e6xxx_chip *chip);
+ int mv88e6xxx_port_hidden_read(struct mv88e6xxx_chip *chip, int block, int port,
+ 			       int reg, u16 *val);
+ 
++int mv88e6xxx_port_enable_tcam(struct mv88e6xxx_chip *chip, int port);
++
+ #endif /* _MV88E6XXX_PORT_H */
+diff --git a/drivers/net/dsa/mv88e6xxx/tcam.c b/drivers/net/dsa/mv88e6xxx/tcam.c
+new file mode 100644
+index 000000000000..f56cc7e0c00f
+--- /dev/null
++++ b/drivers/net/dsa/mv88e6xxx/tcam.c
+@@ -0,0 +1,325 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Marvell 88E6xxx Switch TCAM support
++ *
++ * Copyright (c) 2026 Luminex Network Intelligence
++ */
++
++#include "linux/list.h"
++
++#include "chip.h"
++#include "tcam.h"
++
++/* TCAM operatation register */
++#define MV88E6XXX_TCAM_OP			0x00
++#define MV88E6XXX_TCAM_OP_BUSY			0x8000
++#define MV88E6XXX_TCAM_OP_OP_MASK		0x7000
++#define MV88E6XXX_TCAM_OP_OP_FLUSH_ALL		0x1000
++#define MV88E6XXX_TCAM_OP_OP_FLUSH		0x2000
++#define MV88E6XXX_TCAM_OP_OP_LOAD		0x3000
++#define MV88E6XXX_TCAM_OP_OP_GET_NEXT		0x4000
++#define MV88E6XXX_TCAM_OP_OP_READ		0x5000
++
++/* TCAM extension register */
++#define MV88E6XXX_TCAM_EXTENSION		0x01
++
++/* TCAM keys register 1 */
++#define MV88E6XXX_TCAM_KEYS1			0x02
++#define MV88E6XXX_TCAM_KEYS1_FT_MASK		0xC000
++#define MV88E6XXX_TCAM_KEYS1_SPV_MASK		0x0007
++
++/* TCAM keys register 1 */
++#define MV88E6XXX_TCAM_KEYS2			0x03
++#define MV88E6XXX_TCAM_KEYS2_SPV_MASK		0x00ff
++
++#define MV88E6XXX_TCAM_ING_ACT3			0x04
++#define MV88E6XXX_TCAM_ING_ACT3_SF		0x0800
++#define MV88E6XXX_TCAM_ING_ACT3_DPV_MASK	0x07ff
++
++#define MV88E6XXX_TCAM_ING_ACT5			0x06
++#define MV88E6XXX_TCAM_ING_ACT5_DPV_MODE_MASK	0xc000
++
++static int mv88e6xxx_tcam_write(struct mv88e6xxx_chip *chip, int reg, u16 val)
++{
++	return mv88e6xxx_write(chip, chip->info->tcam_addr, reg, val);
++}
++
++static int mv88e6xxx_tcam_wait(struct mv88e6xxx_chip *chip)
++{
++	int bit = __bf_shf(MV88E6XXX_TCAM_OP_BUSY);
++
++	return mv88e6xxx_wait_bit(chip, chip->info->tcam_addr,
++				  MV88E6XXX_TCAM_OP, bit, 0);
++}
++
++static int mv88e6xxx_tcam_read_page(struct mv88e6xxx_chip *chip, u8 page,
++				    u8 entry)
++
++{
++	u16 val = MV88E6XXX_TCAM_OP_BUSY | MV88E6XXX_TCAM_OP_OP_READ |
++		  (page & 0x3) << 10 | entry;
++	int err;
++
++	err = mv88e6xxx_tcam_write(chip, MV88E6XXX_TCAM_OP, val);
++	if (err)
++		return err;
++
++	return mv88e6xxx_tcam_wait(chip);
++}
++
++static int mv88e6xxx_tcam_load_page(struct mv88e6xxx_chip *chip, u8 page,
++				    u8 entry)
++{
++	u16 val = MV88E6XXX_TCAM_OP_BUSY | MV88E6XXX_TCAM_OP_OP_LOAD |
++		  (page & 0x3) << 10 | entry;
++	int err;
++
++	err = mv88e6xxx_tcam_write(chip, MV88E6XXX_TCAM_OP, val);
++	if (err)
++		return err;
++
++	return mv88e6xxx_tcam_wait(chip);
++}
++
++static int mv88e6xxx_tcam_flush_entry(struct mv88e6xxx_chip *chip, u8 entry)
++{
++	u16 val = MV88E6XXX_TCAM_OP_BUSY | MV88E6XXX_TCAM_OP_OP_FLUSH | entry;
++	int err;
++
++	err = mv88e6xxx_tcam_write(chip, MV88E6XXX_TCAM_OP, val);
++	if (err)
++		return err;
++
++	return mv88e6xxx_tcam_wait(chip);
++}
++
++static int mv88e6xxx_tcam_flush_all(struct mv88e6xxx_chip *chip)
++{
++	u16 val = MV88E6XXX_TCAM_OP_BUSY | MV88E6XXX_TCAM_OP_OP_FLUSH_ALL;
++	int err;
++
++	err = mv88e6xxx_tcam_write(chip, MV88E6XXX_TCAM_OP, val);
++	if (err)
++		return err;
++
++	return mv88e6xxx_tcam_wait(chip);
++}
++
++struct mv88e6xxx_tcam_entry *
++mv88e6xxx_tcam_entry_find(struct mv88e6xxx_chip *chip, unsigned long cookie)
++{
++	struct mv88e6xxx_tcam_entry *entry;
++
++	list_for_each_entry(entry, &chip->tcam.entries, list)
++		if (entry->cookie == cookie)
++			return entry;
++
++	return NULL;
++}
++
++/* insert tcam entry in ordered list and move existing entries if necessary */
++static int mv88e6xxx_tcam_insert_entry(struct mv88e6xxx_chip *chip,
++				       struct mv88e6xxx_tcam_entry *entry)
++{
++	struct mv88e6xxx_tcam_entry *elem;
++	struct list_head *hpos;
++	int err;
++
++	list_for_each_prev(hpos, &chip->tcam.entries) {
++		u8 move_idx;
++
++		elem = list_entry(hpos, struct mv88e6xxx_tcam_entry, list);
++		if (entry->prio >= elem->prio)
++			break;
++
++		move_idx = elem->hw_idx + 1;
++
++		err = mv88e6xxx_tcam_flush_entry(chip, move_idx);
++		if (err)
++			return err;
++
++		err = chip->info->ops->tcam_ops->entry_add(chip, elem,
++							   move_idx);
++		if (err)
++			return err;
++
++		elem->hw_idx = move_idx;
++	}
++
++	if (list_is_head(hpos, &chip->tcam.entries)) {
++		entry->hw_idx = 0;
++	} else {
++		elem = list_entry(hpos, struct mv88e6xxx_tcam_entry, list);
++		entry->hw_idx = elem->hw_idx + 1;
++	}
++	list_add(&entry->list, hpos);
 +	return 0;
 +}
 +
-+void mlx5_shd_uninit(struct mlx5_core_dev *dev)
++int mv88e6xxx_tcam_entry_add(struct mv88e6xxx_chip *chip,
++			     struct mv88e6xxx_tcam_entry *entry)
 +{
-+	if (!dev->shd)
-+		return;
++	int err;
 +
-+	devlink_shd_put(dev->shd);
++	err = mv88e6xxx_tcam_insert_entry(chip, entry);
++	if (err)
++		return err;
++
++	err = mv88e6xxx_tcam_flush_entry(chip, entry->hw_idx);
++	if (err)
++		goto unlink_out;
++
++	err = chip->info->ops->tcam_ops->entry_add(chip, entry, entry->hw_idx);
++	if (err)
++		goto unlink_out;
++
++	return 0;
++
++unlink_out:
++	list_del(&entry->list);
++	return err;
 +}
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.h b/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.h
++
++int mv88e6xxx_tcam_entry_del(struct mv88e6xxx_chip *chip,
++			     struct mv88e6xxx_tcam_entry *entry)
++{
++	struct mv88e6xxx_tcam_entry *elem = entry;
++	u8 move_idx = entry->hw_idx;
++	int err;
++
++	err = mv88e6xxx_tcam_flush_entry(chip, entry->hw_idx);
++	if (err)
++		return err;
++
++	/* move entries that come after the deleted entry forward */
++	list_for_each_entry_continue(elem, &chip->tcam.entries, list) {
++		u8 tmp_idx = elem->hw_idx;
++
++		err = mv88e6xxx_tcam_flush_entry(chip, move_idx);
++		if (err)
++			break;
++
++		err = chip->info->ops->tcam_ops->entry_add(chip, elem,
++							   move_idx);
++		if (err)
++			break;
++
++		elem->hw_idx =  move_idx;
++		move_idx = tmp_idx;
++
++		/* flush the last entry after moving entries */
++		if (list_is_last(&elem->list, &chip->tcam.entries))
++			err = mv88e6xxx_tcam_flush_entry(chip, tmp_idx);
++	}
++
++	list_del(&entry->list);
++	return err;
++}
++
++static int mv88e6390_tcam_entry_add(struct mv88e6xxx_chip *chip,
++				    struct mv88e6xxx_tcam_entry *entry, u8 idx)
++{
++	int err = 0;
++	int i;
++
++	err = mv88e6xxx_tcam_read_page(chip, 2, idx);
++	if (err)
++		return err;
++	if (entry->action.dpv_mode != 0) {
++		u16 val = MV88E6XXX_TCAM_ING_ACT3_SF |
++			 (entry->action.dpv & MV88E6XXX_TCAM_ING_ACT3_DPV_MASK);
++
++		err = mv88e6xxx_tcam_write(chip, MV88E6XXX_TCAM_ING_ACT3, val);
++		if (err)
++			return err;
++
++		val = entry->action.dpv_mode << 14;
++		err = mv88e6xxx_tcam_write(chip, MV88E6XXX_TCAM_ING_ACT5, val);
++		if (err)
++			return err;
++	}
++	err = mv88e6xxx_tcam_load_page(chip, 2, idx);
++	if (err)
++		return err;
++
++	err = mv88e6xxx_tcam_read_page(chip, 1, idx);
++	if (err)
++		return err;
++
++	for (i = PAGE0_MATCH_SIZE;
++	     i < PAGE0_MATCH_SIZE + PAGE1_MATCH_SIZE; i++) {
++		if (entry->key.frame_mask[i]) {
++			u16 val = entry->key.frame_mask[i] << 8 |
++				  entry->key.frame_data[i];
++
++			err = mv88e6xxx_tcam_write(chip,
++						   i - PAGE0_MATCH_SIZE + 2,
++						   val);
++			if (err)
++				return err;
++		}
++	}
++	err = mv88e6xxx_tcam_load_page(chip, 1, idx);
++	if (err)
++		return err;
++
++	err = mv88e6xxx_tcam_read_page(chip, 0, idx);
++	if (err)
++		return err;
++
++	for (i = 0; i < PAGE0_MATCH_SIZE; i++) {
++		if (entry->key.frame_mask[i]) {
++			u16 val = entry->key.frame_mask[i] << 8 |
++				  entry->key.frame_data[i];
++
++			err = mv88e6xxx_tcam_write(chip, i + 6, val);
++			if (err)
++				return err;
++		}
++	}
++	u16 spv_mask = entry->key.spv_mask & mv88e6xxx_port_mask(chip);
++	u16 spv = entry->key.spv & mv88e6xxx_port_mask(chip);
++	/* frame type mask bits must be set for a valid entry */
++	err = mv88e6xxx_tcam_write(chip, MV88E6XXX_TCAM_KEYS1,
++				   MV88E6XXX_TCAM_KEYS1_FT_MASK |
++				   (spv_mask & 0x0700) | (spv >> 8));
++	if (err)
++		return err;
++
++	err = mv88e6xxx_tcam_write(chip, MV88E6XXX_TCAM_KEYS2,
++				   (spv_mask << 8) | (spv & 0x00ff));
++	if (err)
++		return err;
++
++	err = mv88e6xxx_tcam_load_page(chip, 0, idx);
++	if (err)
++		return err;
++
++	entry->hw_idx = idx;
++	return 0;
++}
++
++static int mv88e6393_tcam_entry_add(struct mv88e6xxx_chip *chip,
++				    struct mv88e6xxx_tcam_entry *entry, u8 idx)
++{
++	int err;
++
++	/* select block 0 port 0, then adding an entry is the same as 6390 as
++	 * other blocks aren't used at the moment
++	 */
++	err = mv88e6xxx_tcam_write(chip, MV88E6XXX_TCAM_EXTENSION, 0x00);
++	if (err)
++		return err;
++
++	return mv88e6390_tcam_entry_add(chip, entry, idx);
++}
++
++const struct mv88e6xxx_tcam_ops mv88e6390_tcam_ops = {
++	.entry_add = mv88e6390_tcam_entry_add,
++	.flush_tcam = mv88e6xxx_tcam_flush_all,
++};
++
++const struct mv88e6xxx_tcam_ops mv88e6393_tcam_ops = {
++	.entry_add = mv88e6393_tcam_entry_add,
++	.flush_tcam = mv88e6xxx_tcam_flush_all,
++};
+diff --git a/drivers/net/dsa/mv88e6xxx/tcam.h b/drivers/net/dsa/mv88e6xxx/tcam.h
 new file mode 100644
-index 000000000000..8ab8d6940227
+index 000000000000..d82bc9bc0768
 --- /dev/null
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.h
-@@ -0,0 +1,12 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB */
-+/* Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved. */
++++ b/drivers/net/dsa/mv88e6xxx/tcam.h
+@@ -0,0 +1,41 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
 +
-+#ifndef __MLX5_SH_DEVLINK_H__
-+#define __MLX5_SH_DEVLINK_H__
++/*
++ * Copyright (c) 2026 Luminex Network Intelligence
++ */
++#ifndef _MV88E6XXX_TCAM_H_
++#define _MV88E6XXX_TCAM_H_
 +
-+#include <linux/mlx5/driver.h>
++#define PAGE0_MATCH_SIZE 22
++#define PAGE1_MATCH_SIZE 26
 +
-+int mlx5_shd_init(struct mlx5_core_dev *dev);
-+void mlx5_shd_uninit(struct mlx5_core_dev *dev);
++#define DPV_MODE_NOP		0x0
++#define DPV_MODE_AND		0x1
++#define DPV_MODE_OR		0x2
++#define DPV_MODE_REPLACE	0x3
 +
-+#endif /* __MLX5_SH_DEVLINK_H__ */
-diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
-index 04dcd09f7517..1268fcf35ec7 100644
---- a/include/linux/mlx5/driver.h
-+++ b/include/linux/mlx5/driver.h
-@@ -798,6 +798,7 @@ struct mlx5_core_dev {
- 	enum mlx5_wc_state wc_state;
- 	/* sync write combining state */
- 	struct mutex wc_state_lock;
-+	struct devlink *shd;
- };
- 
- struct mlx5_db {
++int mv88e6xxx_tcam_entry_add(struct mv88e6xxx_chip *chip,
++			     struct mv88e6xxx_tcam_entry *entry);
++int mv88e6xxx_tcam_entry_del(struct mv88e6xxx_chip *chip,
++			     struct mv88e6xxx_tcam_entry *entry);
++struct mv88e6xxx_tcam_entry *
++mv88e6xxx_tcam_entry_find(struct mv88e6xxx_chip *chip, unsigned long cookie);
++#define mv88e6xxx_tcam_match_set(key, _offset, data, mask) \
++	do { \
++		typeof(_offset) (offset) = (_offset); \
++		BUILD_BUG_ON((offset) + sizeof((data)) > TCAM_MATCH_SIZE); \
++		__mv88e6xxx_tcam_match_set(key, offset, sizeof(data), \
++					   (u8 *)&(data), (u8 *)&(mask)); \
++	} while (0)
++
++static inline void __mv88e6xxx_tcam_match_set(struct mv88e6xxx_tcam_key *key,
++					      unsigned int offset, size_t size,
++					      u8 *data, u8 *mask)
++{
++	memcpy(&key->frame_data[offset], data, size);
++	memcpy(&key->frame_mask[offset], mask, size);
++}
++
++extern const struct mv88e6xxx_tcam_ops mv88e6390_tcam_ops;
++extern const struct mv88e6xxx_tcam_ops mv88e6393_tcam_ops;
++#endif
+diff --git a/drivers/net/dsa/mv88e6xxx/tcflower.c b/drivers/net/dsa/mv88e6xxx/tcflower.c
+new file mode 100644
+index 000000000000..05b289463834
+--- /dev/null
++++ b/drivers/net/dsa/mv88e6xxx/tcflower.c
+@@ -0,0 +1,164 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Marvell 88E6xxx Switch flower support
++ *
++ * Copyright (c) 2026 Luminex Network Intelligence
++ */
++
++#include "chip.h"
++#include "tcflower.h"
++#include "tcam.h"
++
++#define MV88E6XXX_ETHTYPE_OFFSET 16
++#define MV88E6XXX_IP_PROTO_OFFSET 27
++#define MV88E6XXX_IPV4_SRC_OFFSET 30
++#define MV88E6XXX_IPV4_DST_OFFSET 34
++
++static int mv88e6xx_flower_parse_key(struct mv88e6xxx_chip *chip,
++				     struct netlink_ext_ack *extack,
++				     struct flow_cls_offload *cls,
++				     struct mv88e6xxx_tcam_key *key)
++{
++	struct flow_rule *rule = flow_cls_offload_flow_rule(cls);
++	struct flow_dissector *dissector = rule->match.dissector;
++	u16 addr_type = 0;
++
++	if (dissector->used_keys &
++	    ~(BIT_ULL(FLOW_DISSECTOR_KEY_BASIC) |
++	      BIT_ULL(FLOW_DISSECTOR_KEY_CONTROL) |
++	      BIT_ULL(FLOW_DISSECTOR_KEY_IPV4_ADDRS) |
++	      BIT_ULL(FLOW_DISSECTOR_KEY_IPV6_ADDRS))) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "Unsupported keys used");
++		return -EOPNOTSUPP;
++	}
++
++	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_CONTROL)) {
++		struct flow_match_control match;
++
++		flow_rule_match_control(rule, &match);
++		addr_type = match.key->addr_type;
++
++		if (flow_rule_has_control_flags(match.mask->flags,
++						cls->common.extack))
++			return -EOPNOTSUPP;
++	}
++	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_BASIC)) {
++		struct flow_match_basic match;
++
++		flow_rule_match_basic(rule, &match);
++		mv88e6xxx_tcam_match_set(key, MV88E6XXX_ETHTYPE_OFFSET,
++					 match.key->n_proto,
++					 match.mask->n_proto);
++		mv88e6xxx_tcam_match_set(key, MV88E6XXX_IP_PROTO_OFFSET,
++					 match.key->ip_proto,
++					 match.mask->ip_proto);
++	}
++
++	if (addr_type == FLOW_DISSECTOR_KEY_IPV4_ADDRS) {
++		struct flow_match_ipv4_addrs match;
++
++		flow_rule_match_ipv4_addrs(cls->rule, &match);
++		mv88e6xxx_tcam_match_set(key, MV88E6XXX_IPV4_SRC_OFFSET,
++					 match.key->src,
++					 match.mask->src);
++		mv88e6xxx_tcam_match_set(key, MV88E6XXX_IPV4_DST_OFFSET,
++					 match.key->dst,
++					 match.mask->dst);
++	} else {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "Unsupported address type");
++		return -EOPNOTSUPP;
++	}
++
++	return 0;
++}
++
++int mv88e6xxx_cls_flower_add(struct dsa_switch *ds, int port,
++			     struct flow_cls_offload *cls, bool ingress)
++{
++	struct flow_rule *rule = flow_cls_offload_flow_rule(cls);
++	struct netlink_ext_ack *extack = cls->common.extack;
++	struct mv88e6xxx_chip *chip = ds->priv;
++	struct mv88e6xxx_tcam_key key = { 0 };
++	const struct flow_action_entry *act;
++	unsigned long cookie = cls->cookie;
++	struct mv88e6xxx_tcam_entry *entry;
++	int err, i;
++
++	if (!mv88e6xxx_has_tcam(chip)) {
++		NL_SET_ERR_MSG_MOD(extack, "hardware offload not supported");
++		return -EOPNOTSUPP;
++	}
++
++	err = mv88e6xx_flower_parse_key(chip, extack, cls, &key);
++	if (err)
++		return err;
++
++	mv88e6xxx_reg_lock(chip);
++	entry = mv88e6xxx_tcam_entry_find(chip, cookie);
++	if (entry) {
++		err = -EEXIST;
++		goto err_unlock;
++	}
++
++	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
++	if (!entry) {
++		err = -ENOMEM;
++		goto err_unlock;
++	}
++
++	entry->cookie = cookie;
++	entry->prio = cls->common.prio;
++	entry->key = key;
++
++	flow_action_for_each(i, act, &rule->action) {
++		switch (act->id) {
++		case FLOW_ACTION_TRAP: {
++			int cpu = dsa_upstream_port(ds, port);
++
++			entry->action.dpv_mode = DPV_MODE_REPLACE;
++			entry->action.dpv = BIT(cpu);
++			break;
++		}
++		default:
++			NL_SET_ERR_MSG_MOD(extack, "action not supported");
++			err = -EOPNOTSUPP;
++			goto err_free_entry;
++		}
++	}
++
++	entry->key.spv = BIT(port);
++	entry->key.spv_mask = mv88e6xxx_port_mask(chip);
++
++	err = mv88e6xxx_tcam_entry_add(chip, entry);
++	if (err)
++		goto err_free_entry;
++
++	mv88e6xxx_reg_unlock(chip);
++	return  0;
++
++err_free_entry:
++	kfree(entry);
++err_unlock:
++	mv88e6xxx_reg_unlock(chip);
++	return err;
++}
++
++int mv88e6xxx_cls_flower_del(struct dsa_switch *ds, int port,
++			     struct flow_cls_offload *cls, bool ingress)
++{
++	struct mv88e6xxx_chip *chip = ds->priv;
++	struct mv88e6xxx_tcam_entry *entry;
++	int err = 0;
++
++	mv88e6xxx_reg_lock(chip);
++	entry = mv88e6xxx_tcam_entry_find(chip, cls->cookie);
++
++	if (entry) {
++		err = mv88e6xxx_tcam_entry_del(chip, entry);
++		kfree(entry);
++	}
++	mv88e6xxx_reg_unlock(chip);
++	return  err;
++}
+diff --git a/drivers/net/dsa/mv88e6xxx/tcflower.h b/drivers/net/dsa/mv88e6xxx/tcflower.h
+new file mode 100644
+index 000000000000..96bb8da80bec
+--- /dev/null
++++ b/drivers/net/dsa/mv88e6xxx/tcflower.h
+@@ -0,0 +1,13 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++
++/*
++ * Copyright (c) 2026 Luminex Network Intelligence
++ */
++#ifndef _MV88E6XXX_TCFLOWER_H_
++#define _MV88E6XXX_TCFLOWER_H_
++
++int mv88e6xxx_cls_flower_add(struct dsa_switch *ds, int port,
++			     struct flow_cls_offload *cls, bool ingress);
++int mv88e6xxx_cls_flower_del(struct dsa_switch *ds, int port,
++			     struct flow_cls_offload *cls, bool ingress);
++#endif
+
+---
+base-commit: cd51b40495c09b92beea6893663b3d0ed7605e81
+change-id: 20260213-net-next-mv88e6xxx-tcam-f65be16008fb
+
+Best regards,
 -- 
-2.51.1
+Cedric Jehasse <cedric.jehasse@luminex.be>
+
 
 
