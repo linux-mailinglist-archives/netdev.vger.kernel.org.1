@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-260809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260804-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uJjLOLG8nmnKXAQAu9opvQ
-	(envelope-from <netdev+bounces-260809-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:11:13 +0100
+	id WEPlM6C7nmnwWwQAu9opvQ
+	(envelope-from <netdev+bounces-260804-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:06:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4486E194B69
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:11:13 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77591194A06
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:06:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 049623025421
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 09:07:57 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B2C1A301BA84
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 09:06:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9674A3793BE;
-	Wed, 25 Feb 2026 09:06:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52A4836E48C;
+	Wed, 25 Feb 2026 09:06:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="SzyTkc61"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="lFpp0k4K"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5595A37107B;
-	Wed, 25 Feb 2026 09:06:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 573C036D4E4;
+	Wed, 25 Feb 2026 09:06:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772010415; cv=none; b=nCkUHQ/CpomqBcRQVnnTmvjWUDWOovLQ6Rc71XduN6SKjNCLYLdcCWBaUTdUnCn0QOtikuKFk86lNlQvsjodooWCWUk4df0pdBfwiCfZWOevawPJ7XBH1gA7piECQGUP5g1U+S6oi0J1oMmKDaHvEWHNJNkc6opiDwTtnuQQ2lA=
+	t=1772010386; cv=none; b=FHkd78UjtcdAE/470t+/1+5hWfQ0zgIhmy4ddECG6VgfAo1WVvdBvWBJDtf5GzLNCJ+VThsnlMwseV7MrBBNd6iGkX4fFV4sljXpYU3UXULkVXh6IIZteZbXNQAV3Dv1vwHI/aXNkQoYL8N8hTkwrQS5d0C3dy+QYKKiKLyTwpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772010415; c=relaxed/simple;
-	bh=tM4XdMCygnhhnecObA64rz3/1LPZ7QdO3ptWuL+K8Dc=;
+	s=arc-20240116; t=1772010386; c=relaxed/simple;
+	bh=Ms5EvdSvw59+pigEbOTMZYJRJle67s3XN/MmS6G0DeM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=OM/et8LMjDStWpm7mC4qs/7rL5iVl5kEquucToQ6TB2R6dyOthp2ExQA//nj7tBbKOnQP6ibcm5Ky2rymtGGED7PkQIxDj6sIpeORp0I6Kv/oyU6aTwcYlphrADT73ULTB0smt4t9jM4ZwXVmCZ6DSKD2826yhNmw7fyKNymD/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=SzyTkc61; arc=none smtp.client-ip=68.232.154.123
+	 In-Reply-To:To:CC; b=G3g7cXKcYpAHILzEzD7Bu9ICsaEnvVcGx4+r2lDrK7r+NHl84S01pL7EKo4azglOyNYedfgdr06FyNqR3c50tZWrn2F+G6g/fh+NZiaR2xxfqECIjg4bS7OKgo49ia7VXAJNHW+F5c7xnu12cGho84xoJiYPwoTFtgdVboV1xHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=lFpp0k4K; arc=none smtp.client-ip=68.232.153.233
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1772010410; x=1803546410;
+  t=1772010384; x=1803546384;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=tM4XdMCygnhhnecObA64rz3/1LPZ7QdO3ptWuL+K8Dc=;
-  b=SzyTkc61tkWWzPicsnZ7r3j70eQpfdgCowrnldE/fckjeXpclzmMu/cu
-   6brzQMTC0CxtDUoVzcY6k16mP0cCKMbjMKyX3T3H9GOcRrVULfeQfCht+
-   4khIiqODurUtMXXM1dYdaIujGmjDhuqFiizbZyM5ZUrw6QX80NUT6bzB4
-   XSUeSoNsyIL2VAEDwG+PCrYOq5lE0RJXEC4YbQc5Q0V8Egm4bbt45OxmI
-   4G/eMyzcRfYbEdBoHpaz2Rlg5aXUfw/SiqLxenwRUS1uXRF7JlnjB9I+l
-   T3N7GyxnHLmo6V9lfJOzcdXiLzuncIqocgXAT/3SXI+cNbQ4gbR5M7Wkh
-   Q==;
-X-CSE-ConnectionGUID: BbhGCtIlQZOkUhkWOAVukw==
-X-CSE-MsgGUID: tjMTnoSvSBiVsapcaAugRw==
+  bh=Ms5EvdSvw59+pigEbOTMZYJRJle67s3XN/MmS6G0DeM=;
+  b=lFpp0k4KQvdHwlO0f7ncNkg0ixmqqESgsmERVC/c/10Fa4wJheIiHtih
+   H9if6dQFVsKTC8sfnNQjW9MVtS63cX39KyEj1lJS4iEq1/MnlBkFugDdr
+   4GmTptgUmUYf4Wpe3PlRhHGSYdrI9zLu4X32q91dDbWMWwNtD30xGX3he
+   WAeUvr1J+GzawqXwEOq6AQRFCilIWJNxZe6soDR9UHWcOWVPDIhxdC71t
+   LmHt4KeXmVD1dETrF7Yq4LbG5JU4p6bg8gFm4a1xBhEomZN1ZS0G+as5O
+   USoH85bXG1XzWpwxA3EtCASBqG+BhxWhb7GDJVnZA8gcnf0mVGk9nVUTO
+   w==;
+X-CSE-ConnectionGUID: GvK6L9OjSSuGPw39llTOAQ==
+X-CSE-MsgGUID: wGZ5CqykQMGMVoCtVHo6Sg==
 X-IronPort-AV: E=Sophos;i="6.21,310,1763449200"; 
-   d="scan'208";a="221112786"
+   d="scan'208";a="61259299"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Feb 2026 02:06:46 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2026 02:06:23 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.87.151) by
+ chn-vm-ex3.mchp-main.com (10.10.87.32) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Wed, 25 Feb 2026 02:06:12 -0700
+ 15.2.2562.35; Wed, 25 Feb 2026 02:06:14 -0700
 Received: from DEN-DL-M70577.microsemi.net (10.10.85.11) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Wed, 25 Feb 2026 02:06:10 -0700
+ 15.1.2507.58 via Frontend Transport; Wed, 25 Feb 2026 02:06:12 -0700
 From: Daniel Machon <daniel.machon@microchip.com>
-Date: Wed, 25 Feb 2026 10:05:25 +0100
-Subject: [PATCH net-next 2/7] net: sparx5: move netdev and notifier block
- registration to probe
+Date: Wed, 25 Feb 2026 10:05:26 +0100
+Subject: [PATCH net-next 3/7] net: sparx5: move VCAP initialization to
+ probe
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,7 +73,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20260225-sparx5-init-deinit-v1-2-97036580b9f0@microchip.com>
+Message-ID: <20260225-sparx5-init-deinit-v1-3-97036580b9f0@microchip.com>
 References: <20260225-sparx5-init-deinit-v1-0-97036580b9f0@microchip.com>
 In-Reply-To: <20260225-sparx5-init-deinit-v1-0-97036580b9f0@microchip.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
@@ -89,7 +89,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -97,7 +97,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-260809-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-260804-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[microchip.com:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -106,123 +106,110 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[daniel.machon@microchip.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-0.999];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,microchip.com:mid,microchip.com:dkim,microchip.com:email]
-X-Rspamd-Queue-Id: 4486E194B69
+	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:mid,microchip.com:dkim,microchip.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 77591194A06
 X-Rspamd-Action: no action
 
-Move netdev registration and notifier block registration from
-sparx5_start() to probe(). This allows proper cleanup via goto-based
-error labels in probe().
+Move the VCAP initialization code from sparx5_start() to probe(). Add
+proper error handling with a cleanup_vcap label and sparx5_vcap_deinit()
+call.
 
-Also, remove the sparx5_cleanup_ports() helper as its functionality is now
-split between sparx5_unregister_netdevs() and sparx5_destroy_netdevs()
-called at appropriate points.
+Also, rename sparx5_vcap_destroy() to sparx5_vcap_deinit() to stay
+consistent with the naming.
 
 Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
 ---
- .../net/ethernet/microchip/sparx5/sparx5_main.c    | 43 +++++++++++-----------
- 1 file changed, 22 insertions(+), 21 deletions(-)
+ drivers/net/ethernet/microchip/sparx5/sparx5_main.c      | 16 ++++++++++------
+ drivers/net/ethernet/microchip/sparx5/sparx5_main.h      |  2 +-
+ drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.c |  2 +-
+ 3 files changed, 12 insertions(+), 8 deletions(-)
 
 diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-index d7e823fe4ab9..9887a260bafc 100644
+index 9887a260bafc..28ee45815c7f 100644
 --- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
 +++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-@@ -773,20 +773,11 @@ static int sparx5_start(struct sparx5 *sparx5)
- 	mutex_init(&sparx5->mdb_lock);
- 	INIT_LIST_HEAD(&sparx5->mdb_entries);
+@@ -775,10 +775,6 @@ static int sparx5_start(struct sparx5 *sparx5)
  
--	err = sparx5_register_netdevs(sparx5);
+ 	sparx5_board_init(sparx5);
+ 
+-	err = sparx5_vcap_init(sparx5);
 -	if (err)
 -		return err;
 -
- 	sparx5_board_init(sparx5);
--	err = sparx5_register_notifier_blocks(sparx5);
--	if (err)
--		return err;
- 
- 	err = sparx5_vcap_init(sparx5);
--	if (err) {
--		sparx5_unregister_notifier_blocks(sparx5);
-+	if (err)
- 		return err;
--	}
- 
  	/* Start Frame DMA with fallback to register based INJ/XTR */
  	err = -ENXIO;
-@@ -823,12 +814,6 @@ static int sparx5_start(struct sparx5 *sparx5)
- 	return err;
- }
+ 	if (sparx5->fdma_irq >= 0) {
+@@ -985,12 +981,18 @@ static int mchp_sparx5_probe(struct platform_device *pdev)
+ 		goto cleanup_ports;
+ 	}
  
--static void sparx5_cleanup_ports(struct sparx5 *sparx5)
--{
--	sparx5_unregister_netdevs(sparx5);
--	sparx5_destroy_netdevs(sparx5);
--}
--
- static int mchp_sparx5_probe(struct platform_device *pdev)
- {
- 	struct initial_port_config *configs, *config;
-@@ -1002,21 +987,37 @@ static int mchp_sparx5_probe(struct platform_device *pdev)
- 
- 	INIT_LIST_HEAD(&sparx5->mall_entries);
- 
-+	err = sparx5_register_netdevs(sparx5);
++	err = sparx5_vcap_init(sparx5);
 +	if (err) {
-+		dev_err(sparx5->dev, "Failed to register net devices\n");
++		dev_err(sparx5->dev, "Failed to initialize VCAP\n");
 +		goto cleanup_ptp;
 +	}
 +
-+	err = sparx5_register_notifier_blocks(sparx5);
-+	if (err) {
-+		dev_err(sparx5->dev, "Failed to register notifier blocks\n");
-+		goto cleanup_netdevs;
-+	}
-+
- 	/* Start the rest of the initialization and enable interrupts. Must be
- 	 * called last, after all subsystems are initialized.
- 	 */
- 	err = sparx5_start(sparx5);
+ 	INIT_LIST_HEAD(&sparx5->mall_entries);
+ 
+ 	err = sparx5_register_netdevs(sparx5);
  	if (err) {
- 		dev_err(sparx5->dev, "Start failed\n");
+ 		dev_err(sparx5->dev, "Failed to register net devices\n");
 -		goto cleanup_ptp;
-+		goto cleanup_notifiers;
++		goto cleanup_vcap;
  	}
  
- 	goto cleanup_config;
- 
-+cleanup_notifiers:
-+	sparx5_unregister_notifier_blocks(sparx5);
-+cleanup_netdevs:
-+	sparx5_unregister_netdevs(sparx5);
+ 	err = sparx5_register_notifier_blocks(sparx5);
+@@ -1014,6 +1016,8 @@ static int mchp_sparx5_probe(struct platform_device *pdev)
+ 	sparx5_unregister_notifier_blocks(sparx5);
+ cleanup_netdevs:
+ 	sparx5_unregister_netdevs(sparx5);
++cleanup_vcap:
++	sparx5_vcap_deinit(sparx5);
  cleanup_ptp:
  	sparx5_ptp_deinit(sparx5);
  cleanup_ports:
--	sparx5_cleanup_ports(sparx5);
-+	sparx5_destroy_netdevs(sparx5);
- 	if (sparx5->mact_queue)
- 		destroy_workqueue(sparx5->mact_queue);
- cleanup_config:
-@@ -1044,12 +1045,12 @@ static void mchp_sparx5_remove(struct platform_device *pdev)
- 		disable_irq(sparx5->ptp_irq);
- 		sparx5->ptp_irq = -ENXIO;
+@@ -1047,9 +1051,9 @@ static void mchp_sparx5_remove(struct platform_device *pdev)
  	}
-+	sparx5_unregister_notifier_blocks(sparx5);
-+	sparx5_unregister_netdevs(sparx5);
+ 	sparx5_unregister_notifier_blocks(sparx5);
+ 	sparx5_unregister_netdevs(sparx5);
++	sparx5_vcap_deinit(sparx5);
  	sparx5_ptp_deinit(sparx5);
  	ops->fdma_deinit(sparx5);
--	sparx5_cleanup_ports(sparx5);
- 	sparx5_vcap_destroy(sparx5);
--	/* Unregister netdevs */
--	sparx5_unregister_notifier_blocks(sparx5);
-+	sparx5_destroy_netdevs(sparx5);
+-	sparx5_vcap_destroy(sparx5);
+ 	sparx5_destroy_netdevs(sparx5);
  	destroy_workqueue(sparx5->mact_queue);
  }
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.h b/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
+index fe7d8bcc0cd9..6a069434fca6 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
+@@ -563,7 +563,7 @@ void sparx5_get_hwtimestamp(struct sparx5 *sparx5,
  
+ /* sparx5_vcap_impl.c */
+ int sparx5_vcap_init(struct sparx5 *sparx5);
+-void sparx5_vcap_destroy(struct sparx5 *sparx5);
++void sparx5_vcap_deinit(struct sparx5 *sparx5);
+ 
+ /* sparx5_pgid.c */
+ enum sparx5_pgid_type {
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.c b/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.c
+index 25066ddb8d4d..9b4ea3e22ef8 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.c
+@@ -2083,7 +2083,7 @@ int sparx5_vcap_init(struct sparx5 *sparx5)
+ 	return err;
+ }
+ 
+-void sparx5_vcap_destroy(struct sparx5 *sparx5)
++void sparx5_vcap_deinit(struct sparx5 *sparx5)
+ {
+ 	struct vcap_control *ctrl = sparx5->vcap_ctrl;
+ 	struct vcap_admin *admin, *admin_next;
 
 -- 
 2.34.1
