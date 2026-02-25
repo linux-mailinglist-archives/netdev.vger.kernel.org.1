@@ -1,194 +1,176 @@
-Return-Path: <netdev+bounces-260856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260858-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YAwdK4jJnmm0XQQAu9opvQ
-	(envelope-from <netdev+bounces-260856-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:06:00 +0100
+	id 0FaCOKXInmmnXQQAu9opvQ
+	(envelope-from <netdev+bounces-260858-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:02:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07C441957BC
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:06:00 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CF8C1956E7
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:02:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 611F7300B454
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:01:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 01FE43014531
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:02:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB8A4315D43;
-	Wed, 25 Feb 2026 10:01:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 754A934EF15;
+	Wed, 25 Feb 2026 10:02:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="b81YPu5K"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g4G9fJdC"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B19F2797AC
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 10:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395912DA749
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 10:02:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772013691; cv=none; b=uLLk8+VFADJYiOZZWx8+3roR4x0hAYKKkUf7oB8oc2GEGlMlbHk+143ikSt3ZeoA/UxDLwMlHXgSt/TwI8u5MYa1l2bYjXxTfA9GVos30RXcpb/sm407BlyS0tO+imBlSnhmbCXkIFsU6DDfG7+Wavw+jQd4qs7e23rva68/Bgk=
+	t=1772013730; cv=none; b=FzLelr5jYrUSN24uNYmBC79Aa3TmdGYHfYs9H6jw/zd4X/g/l/sFCMlXakza8bvtdg0tkupysdYhBbPdjzddyF+7wnmJ+jLwsstPzyTfLZnoZwr7bqdrX+skwEd1JLJYdM75t0cqJvyXhX+mSSzV06EZwOwrwmSjg0lTbFFPymo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772013691; c=relaxed/simple;
-	bh=wftJBCl/vWiQW7kZNuJyhe/wrFaM9lJOofFztIZiuK8=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=GSonlFXgONUwi64DHlwsvpUgUcfigFVzegAjUP32mH/yazxPLxdXdu2kQMehEAuFsVybTc+/Qn7AVt2GaEWwbHxwKuvgajLKUjMsd5Qsw4MdlGfinn5msZuc6HZ7S/JGHCVUgYEn5nTwhMODIjHpDSAh6dOjP7SAJt6wsH3+WRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=b81YPu5K; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=odC0PopPEA/tOfTIBbe/FUrifUTRh+GoHfGQHk9LwPU=; b=b81YPu5KAlT+TCHG1tAH3zmUsq
-	5SMQWzwsxThMHslwKd9Oa5FYW/EWAgewCbEJM2eexmQMlTFaXCnSAI/C8ZCwBlxtKIdhN8vRTmpVm
-	p5hzXKO6jtF6Ib1zlvh4qvfDUUTOZQMGsVMs2bxf0OW+NECM1Q4/4e294ll6DpNM9xn7LJ0EqFfji
-	yErkAkwq2M3k+NaWNFVpZWNKz7jz0uzHdLcVZVFhx5rhh4V1CVFDWvlhtGlGqYjGCE8Gf3cVLnY0C
-	CE4P7BKS6xP6CGBMjemCUGEGGRSM7W+Z0hnPahGFG3wViqGhn5jHnf83eof1ikxV6HT3wKKpzpxh/
-	LEWnG6hg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:58662 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vvBho-000000006OO-3bIq;
-	Wed, 25 Feb 2026 10:01:20 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vvBhn-0000000ArCg-4C4u;
-	Wed, 25 Feb 2026 10:01:20 +0000
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	s=arc-20240116; t=1772013730; c=relaxed/simple;
+	bh=IhVt4phoj1lYkoSFK3OYPIsDBh/FpkWOM7axoUMASqc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PnZHWvaDeesslFofiRizPcj138ZG1BEbd00FVwN6qi7yIjpZlAikdO1+fAQply6ISTyDDxgomFNNqKZTAl1ZY7DrVcGYjWZIeXFv6eIopFR6Erf8BVixWb40XzJAVcEMVPIYlllt5MH/68jRhWdrPzEpbhzen0O3sL1TKOe4h9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g4G9fJdC; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772013728;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Cg5Gjl2amw0T9d2qORAIX+1bQ59fHlgumxxtVuZFhPM=;
+	b=g4G9fJdCR6UmP05cWln5du9bQKq+iNtg1gNee+5wl0kGpUdDupPfR3or5Jac0N/8tv1IUc
+	Kjp4TKMyWCc5ts7sGlYIvr9OUwmN1peKsn+dLY1xChIU/cmBsnUsv7JQEXYD4nm6J1LxEG
+	nx9SJzt1rWTI0LJYZ8r8XLRaV3mX1+4=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-648-Xc32Keg6NpmMeZ1XcMuGJw-1; Wed,
+ 25 Feb 2026 05:02:04 -0500
+X-MC-Unique: Xc32Keg6NpmMeZ1XcMuGJw-1
+X-Mimecast-MFC-AGG-ID: Xc32Keg6NpmMeZ1XcMuGJw_1772013722
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 82D53195609F;
+	Wed, 25 Feb 2026 10:02:01 +0000 (UTC)
+Received: from ShadowPeak.redhat.com (unknown [10.45.225.132])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6067E3003D8C;
+	Wed, 25 Feb 2026 10:01:58 +0000 (UTC)
+From: Petr Oros <poros@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Petr Oros <poros@redhat.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v2] net: stmmac: ptp: limit n_per_out
+	Paolo Abeni <pabeni@redhat.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH iwl-net] iavf: fix VLAN filter lost on add/delete race
+Date: Wed, 25 Feb 2026 11:01:37 +0100
+Message-ID: <20260225100137.383527-1-poros@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vvBhn-0000000ArCg-4C4u@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 25 Feb 2026 10:01:19 +0000
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260856-lists,netdev=lfdr.de,kernel];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260858-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.978];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[rmk-PC.armlinux.org.uk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:email]
-X-Rspamd-Queue-Id: 07C441957BC
+	NEURAL_HAM(-0.00)[-0.998];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6CF8C1956E7
 X-Rspamd-Action: no action
 
-ptp_clock_ops.n_per_out sets the number of PPS outputs, which the PTP
-subsystem uses to validate userspace input, such as the index number
-used in a PTP_CLK_REQ_PEROUT request.
+When iavf_add_vlan() finds an existing filter in IAVF_VLAN_REMOVE
+state, it transitions the filter to IAVF_VLAN_ACTIVE assuming the
+pending delete can simply be cancelled. However, there is no guarantee
+that iavf_del_vlans() has not already processed the delete AQ request
+and removed the filter from the PF. In that case the filter remains in
+the driver's list as IAVF_VLAN_ACTIVE but is no longer programmed on
+the NIC. Since iavf_add_vlans() only picks up filters in
+IAVF_VLAN_ADD state, the filter is never re-added, and spoof checking
+drops all traffic for that VLAN.
 
-stmmac_enable() uses this to index the priv->pps array, which is an
-array of size STMMAC_PPS_MAX. ptp_clock_ops.n_per_out is initialised
-using priv->dma_cap.pps_out_num, which is a three bit field read from
-hardware.
+  CPU0                       CPU1                     Workqueue
+  ----                       ----                     ---------
+  iavf_del_vlan(vlan 100)
+    f->state = REMOVE
+    schedule AQ_DEL_VLAN
+                             iavf_add_vlan(vlan 100)
+                               f->state = ACTIVE
+                                                      iavf_del_vlans()
+                                                        f is ACTIVE, skip
+                                                      iavf_add_vlans()
+                                                        f is ACTIVE, skip
 
-Documentation that I've checked suggests that values >= 5 are reserved,
-but that doesn't mean such values won't appear, and if they do, we
-can overrun the priv->pps array in stmmac_enable().
+  Filter is ACTIVE in driver but absent from NIC.
 
-stmmac_ptp_register() has protection against this in its loop, but it
-doesn't act to limit ptp_clock_ops.n_per_out.
+Transition to IAVF_VLAN_ADD instead and schedule
+IAVF_FLAG_AQ_ADD_VLAN_FILTER so iavf_add_vlans() re-programs the
+filter.  A duplicate add is idempotent on the PF.
 
-Fix this by introducing a local variable, pps_out_num which is limited
-to STMMAC_PPS_MAX, and use that when initialising the array and setting
-priv->ptp_clock_ops.n_per_out. Print a warning when we limit the number
-of outputs.
+Fixes: 0c0da0e95105 ("iavf: refactor VLAN filter states")
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Signed-off-by: Petr Oros <poros@redhat.com>
 ---
+ drivers/net/ethernet/intel/iavf/iavf_main.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-This could be a user exploitable bug (although one has to be root
-so the gun is already pointing at one's foot.) This is the commit
-which introduced the problem:
-
-Fixes: 9a8a02c9d46d ("net: stmmac: Add Flexible PPS support")
-
-v2: add warning print
----
- .../net/ethernet/stmicro/stmmac/stmmac_ptp.c    | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
-index 3e30172fa129..98da499ba3b1 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
-@@ -334,14 +334,19 @@ const struct ptp_clock_info dwmac1000_ptp_clock_ops = {
-  */
- void stmmac_ptp_register(struct stmmac_priv *priv)
- {
-+	unsigned int pps_out_num = priv->dma_cap.pps_out_num;
- 	int i;
- 
--	for (i = 0; i < priv->dma_cap.pps_out_num; i++) {
--		if (i >= STMMAC_PPS_MAX)
--			break;
--		priv->pps[i].available = true;
-+	if (pps_out_num > STMMAC_PPS_MAX) {
-+		dev_warn(priv->device,
-+			 "pps outputs (%u) exceeds driver maximum, limiting to %u\n",
-+			 pps_out_num, STMMAC_PPS_MAX);
-+		pps_out_num = STMMAC_PPS_MAX;
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
+index 4b0fc8f354bc90..6046b93c7f3472 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_main.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+@@ -782,10 +782,13 @@ iavf_vlan_filter *iavf_add_vlan(struct iavf_adapter *adapter,
+ 		adapter->num_vlan_filters++;
+ 		iavf_schedule_aq_request(adapter, IAVF_FLAG_AQ_ADD_VLAN_FILTER);
+ 	} else if (f->state == IAVF_VLAN_REMOVE) {
+-		/* IAVF_VLAN_REMOVE means that VLAN wasn't yet removed.
+-		 * We can safely only change the state here.
++		/* Re-add the filter since we cannot tell whether the
++		 * pending delete has already been processed by the PF.
++		 * A duplicate add is harmless.
+ 		 */
+-		f->state = IAVF_VLAN_ACTIVE;
++		f->state = IAVF_VLAN_ADD;
++		iavf_schedule_aq_request(adapter,
++					 IAVF_FLAG_AQ_ADD_VLAN_FILTER);
  	}
  
-+	for (i = 0; i < pps_out_num; i++)
-+		priv->pps[i].available = true;
-+
- 	/* Calculate the clock domain crossing (CDC) error if necessary */
- 	priv->plat->cdc_error_adj = 0;
- 	if (priv->plat->core_type == DWMAC_CORE_GMAC4)
-@@ -350,8 +355,8 @@ void stmmac_ptp_register(struct stmmac_priv *priv)
- 	/* Update the ptp clock parameters based on feature discovery, when
- 	 * available
- 	 */
--	if (priv->dma_cap.pps_out_num)
--		priv->ptp_clock_ops.n_per_out = priv->dma_cap.pps_out_num;
-+	if (pps_out_num)
-+		priv->ptp_clock_ops.n_per_out = pps_out_num;
- 
- 	if (priv->dma_cap.aux_snapshot_n)
- 		priv->ptp_clock_ops.n_ext_ts = priv->dma_cap.aux_snapshot_n;
+ clearout:
 -- 
-2.47.3
+2.52.0
 
 
