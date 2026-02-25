@@ -1,223 +1,259 @@
-Return-Path: <netdev+bounces-260895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260897-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8EhwBg7enmkTXgQAu9opvQ
-	(envelope-from <netdev+bounces-260895-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 12:33:34 +0100
+	id GI1nEcbenmkTXgQAu9opvQ
+	(envelope-from <netdev+bounces-260897-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 12:36:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D2FB1968A5
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 12:33:33 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C89519697C
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 12:36:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 76ADD303456F
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:30:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A9569302A533
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:33:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17EC623536B;
-	Wed, 25 Feb 2026 11:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17FAA3624DB;
+	Wed, 25 Feb 2026 11:33:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="VYee9wS6"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LnilUjxh"
 X-Original-To: netdev@vger.kernel.org
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012035.outbound.protection.outlook.com [52.101.43.35])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52B7F30EF6D;
-	Wed, 25 Feb 2026 11:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.35
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772019024; cv=fail; b=Xwn2TvnZuG5a8tTv5rOZJBzBdlodnUXNJneLgZ7MaFE2menFO6H3LqmdjA9sUu0U0i2PEn8F9Zfv/9RtWrFHSNN69GuZjZO+keNlCoy6qUW4m7BuulzSifUE/2G78KbL2aqIpLJRDs8wtlC8rJXAXgw3Y26dnNr2l5PRWwnK8Xc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772019024; c=relaxed/simple;
-	bh=1A3bQG6kfFK4eYKDdyRnpmo3ZJp13lAt7XYYn9XKcO8=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=JsbYQYfOrQkN0cuxTSgIt6fEL4HuAztX3NVghSWYp3lNdme6vF393BsEFprWqWWXXnq8WLT609MC+70LLQX225gaIJmq4gC3/Ug9tfdFWzD3l5rppjO2wr5YP8YBoBZWUX6zVfWXqWU6hmSdnCZ7PuA9RAjDS7m9H/vhyzvlsVI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=VYee9wS6; arc=fail smtp.client-ip=52.101.43.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=i++4MCa8engPMJvzu7jwwsGH12i0ZaYJKr5GGrSeFLh041L1kvdqNBoaQuptD7SEJahjPhorzkUKZ19rNO4bPWkMtw9fUkrlmRETQcTzJq1IuvCpibq78RP1K2lqjPYZ+GRgGenCU24b7YsvBauMw/sBXoYdf2xnlTfrrzokuVImRfu1i7nwqWEkgnJSINm1/DR4a+w30P6rZ788y+0kDAfC6RkcQcmpW7+AejzgTz+PES8Qx5TCA5Fx+dd4UCV73bkdmk9CyiKRo0t5JlByAtCBbsSOal8vj0LH/+9fE5dGyM5XPwD+byfFEu9eeq9Vbn3mO8oyLNoYan5hrL/M/A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gIcjRkgDXXZ21fzpUwT34Kz0T0NXfaHGRqAWvD2CI+o=;
- b=wPiigvNvj1HaxZcBW8BwojNdrKqZwIqOqjbv5/OUTFeAYyeY9EqcUXk8tLXME9XQwpxcrmJkYDMy6YskNna+5N/c1GCjXdItpi28rr2FgSJU+b5besJQwvNeQqtYp9/j1IchH8/oSGAhJZDI0SzAsJQsY6QhPKTsXXSVIPBwVfrBQvbTf3kYiaKG9jG0c/zDaWX1MIP5IIqutXlYTTrK3j4keVa+m+b017nxLk30m25qfcmw1v5QLg1GJ0794VuX9OUOj2hiEJYyD9/KNAphASy1grWyNHVXNPKlRBx6dtG/ESl0VrwUrqAPB4XzPDltOK1Cn7I5p7HTW4WsJbR84g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.21.195) smtp.rcpttodomain=lists.infradead.org smtp.mailfrom=ti.com;
- dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gIcjRkgDXXZ21fzpUwT34Kz0T0NXfaHGRqAWvD2CI+o=;
- b=VYee9wS6REKazjzTl3QX7CETfSXHR3PlvZ+ejTawK+7JNgBE32l2vT4HWDeylNxfIAxZr69bogOjR1n3dPMvaEbe2bOe7wagq5vCQzwquF5qLhjfx/SdcstyRSRN/MA32LUxAyDdMMquClYItTRz1rXkkWQ9AafI1985NrHQPNc=
-Received: from MW4PR03CA0007.namprd03.prod.outlook.com (2603:10b6:303:8f::12)
- by DSWPR10MB997826.namprd10.prod.outlook.com (2603:10b6:8:36e::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.23; Wed, 25 Feb
- 2026 11:30:17 +0000
-Received: from CO1PEPF000075EF.namprd03.prod.outlook.com
- (2603:10b6:303:8f:cafe::ad) by MW4PR03CA0007.outlook.office365.com
- (2603:10b6:303:8f::12) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.23 via Frontend Transport; Wed,
- 25 Feb 2026 11:30:06 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.21.195)
- smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
- action=none header.from=ti.com;
-Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.21.195 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.21.195; helo=flwvzet201.ext.ti.com; pr=C
-Received: from flwvzet201.ext.ti.com (198.47.21.195) by
- CO1PEPF000075EF.mail.protection.outlook.com (10.167.249.38) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9632.12 via Frontend Transport; Wed, 25 Feb 2026 11:30:15 +0000
-Received: from DFLE207.ent.ti.com (10.64.6.65) by flwvzet201.ext.ti.com
- (10.248.192.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 25 Feb
- 2026 05:30:07 -0600
-Received: from DFLE200.ent.ti.com (10.64.6.58) by DFLE207.ent.ti.com
- (10.64.6.65) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 25 Feb
- 2026 05:30:06 -0600
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE200.ent.ti.com
- (10.64.6.58) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Wed, 25 Feb 2026 05:30:06 -0600
-Received: from [10.24.73.74] (uda0492258.dhcp.ti.com [10.24.73.74])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 61PBU1k64060009;
-	Wed, 25 Feb 2026 05:30:01 -0600
-Message-ID: <be80263f-667c-4330-bc24-5078fe07b994@ti.com>
-Date: Wed, 25 Feb 2026 17:01:31 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B96083624B7
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 11:33:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772019190; cv=none; b=tCkU59L+rPFCKlr0UuoWHrGcMXrmQJQhnQpVRAyR3fc4gguT+aKtX6mmbicuRGNpMYQrCkTOj90cZnKiVZLFXm/mMxuSrpdeYnQwTCZKjnnNIt9b8DKIrEaZddHMqLxJ3xJX5gH9iAe/vXe/sRm9HqbQa0Pu6Hx3/BKnzCNNoEQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772019190; c=relaxed/simple;
+	bh=1vwQ/nMJsLop8N5hvJ/dUKTWBgC7/d4/WbdSYyScdtQ=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=M0Rv8DNs/A9oHYn9rnZZBw35a9ouXlTHSxKR14ZDthj2v+aWNXrZp0r2tNrjl/Ebh5l5w33naR0gkZlnjWKip2G48G9M5rP53dCKUPpCPedZe36Nb2+uXlh7/X3j2FpTvwXUh5yb/EhC/uVL/OQYyLsx02+0Gw+J2bYoNGrcOyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LnilUjxh; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <danishanwar@ti.com>, <rogerq@kernel.org>,
-	<horms@kernel.org>, <mwalle@kernel.org>, <nm@ti.com>, <v-singh1@ti.com>,
-	<vadim.fedorenko@linux.dev>, <matthias.schiffer@ew.tq-group.com>,
-	<vigneshr@ti.com>, <m-malladi@ti.com>, <jacob.e.keller@intel.com>,
-	<stable@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<srk@ti.com>, <s-vadapalli@ti.com>
-Subject: Re: [PATCH net 2/3] net: ethernet: ti: icssg_common: set irq_disabled
- after disabling TX IRQ
-To: Jakub Kicinski <kuba@kernel.org>
-References: <20260220041431.372610-1-s-vadapalli@ti.com>
- <20260220041431.372610-3-s-vadapalli@ti.com>
- <20260223184840.06069afa@kernel.org>
- <57e05b57556e94ed666acd8b4c542efc28e7408b.camel@ti.com>
- <20260224154953.63b558c1@kernel.org>
-Content-Language: en-US
-From: Siddharth Vadapalli <s-vadapalli@ti.com>
-In-Reply-To: <20260224154953.63b558c1@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000075EF:EE_|DSWPR10MB997826:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0c66ef88-c5ff-4160-11de-08de74613f70
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|376014|7416014|34070700014|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	Q/KWWsiZtI6c8XlZ3Th+YENMCjHuZiOTw31tUfjz8z7HzmLWzQ2ZVUDtNUX0DDStAUpXkaWx5BeWA6RQvAv+h6vbZDXQDIgR4Rv3B/kxDYdsBG56soC2TM0a1/QDz1RUCZ2t6BjbswMvlLFFNbrzeb3y82Dt0HcL6E0Fre4/t71gI/EICTX3pcgtvsBwmjttnYrMBxQCImI40XtkStpVjRXR87FSQMdv7LdUXUnmjKQowR15hScKbqOgBBcvP8OCCw0m9drFdFgeuTZrDE7QyOP4+PTpfJIs5h2oA1AiqA2cYCaGASOp+T5BrZx9JM7p7x9rckO8WBapJJTcGcN8yAIxE95AxUrP+2Oit7WaWwUt+U6ECCmCUtGbnr/QjKoiYe3Jr9pwc5KUyQbXQTh41l06vdlX5LGzBSbZi2S2Efw+nCHFL0QlEZ7bLk1JdFXpFUcGPNY8BBt/Vqwil3QYdmHLM1qinFGPQsF5VKLwzopdAiMDsKEKKbInI2k/Lj4hZ4X0HdCt9NaPTsNk1jpfTVMIhAC0M5MbJZDCe2MtCuS98Cg4xmcHPA5EB1FBJJJM8vd88GL82Lo4O+afNGcnUrv+Hy1OzVfXpREIv6YiMp2NkoQomrFOngZiwxSh0dksq0z5SG02VtMv21FAN8SEIEP+gOdLHiAEd6qEAC7hXU6Awf6wMOgL/DxIy8xsQYj3HuHU8/xvNhBcpI8YHKiidU4w2Ra73WGwLd695M+sNG0JHvKbsRYXSpiEvfzTvs1hbug2kfXnk7fWZSlfsEiEXIRo+pMQqQEVa/prosvg+95o0CaDYJ6TnCbq3XLte44icmC/WTHOz2cF5fnYbCfqUA==
-X-Forefront-Antispam-Report:
-	CIP:198.47.21.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:flwvzet201.ext.ti.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(7416014)(34070700014)(36860700013);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	CvoVt9bcxwyZoUPsHFh6TwdNrq3UnR942LAbiD6i56a8leDz6Wp+7wFKEIPf+DgdQ1wPlGRVRjaD97yuzlpp68DeQaPM2KURKmLW2VNVgNI7Q9Vxnm161KGY2Zmo79Fct+tt635HAiIsD57SSF1Ck201MiHem6v5sGG14GyiC7LwKdAWy4LPdL4mDd4ivqJTxPCvWgntoTz4CeDq5PwghVSLuAVbYhsax3cjjbQHZBUHE+9K9zDz8qU9B4NsjfAAjtJW70CP8PIBiIKsGIcloR0QNlW4YIKjelWFUUh7zeIQ4YJOqpmQEGER1pdnExjLyIUmmDU75XkgAxVe2122ZzojfKMMuRke8XiQ5rh61uHPSUhMDGUtEfKFBr4XOVy6nuA2euOttfHL7vj/ngIwtxpdH3WCJiTYjxPW3zabj1jcZBNnPiaDTdCOW7/W0YY+
-X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2026 11:30:15.6814
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0c66ef88-c5ff-4160-11de-08de74613f70
-X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.21.195];Helo=[flwvzet201.ext.ti.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000075EF.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DSWPR10MB997826
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1772019181;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=h+lbL37yynnkKGbwipJpDDZmvOkYT+qnsK9JcYSaGTw=;
+	b=LnilUjxhTJLE9DX/53E5Ez9QxJzc6UpfeeawPl8/gnZgSp3wG3Akfir638PiCGtA459I/9
+	YjyV2PRqywrG89bAY/r0GPbmMRbcDqo7EnrsCAaMxMGZWI4LlUMrvadt/8X4viLKlICZ0I
+	5bqtHgWZDyPjwpWyZeVv1DFxOE5h07k=
+Date: Wed, 25 Feb 2026 11:32:52 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
+Message-ID: <6bc6f7fe686e53fe2aaca467920ccf300546d5bf@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH net v1] atm: lec: fix null-ptr-deref in
+ lec_arp_clear_vccs
+To: "Dan Carpenter" <dan.carpenter@linaro.org>
+Cc: netdev@vger.kernel.org, "Jiayuan Chen" <jiayuan.chen@shopee.com>,
+ syzbot+72e3ea390c305de0e259@syzkaller.appspotmail.com, "David S. Miller"
+ <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Simon
+ Horman" <horms@kernel.org>, "Ingo Molnar" <mingo@kernel.org>, "Thomas
+ Gleixner" <tglx@kernel.org>, linux-kernel@vger.kernel.org
+In-Reply-To: <aZ7V5b5ZplD4B9i1@stanley.mountain>
+References: <20260224044648.243578-1-jiayuan.chen@linux.dev>
+ <aZ7V5b5ZplD4B9i1@stanley.mountain>
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	TAGGED_FROM(0.00)[bounces-260895-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ti.com:mid,ti.com:dkim];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[s-vadapalli@ti.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-260897-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[ti.com:+];
-	NEURAL_HAM(-0.00)[-0.997];
-	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 6D2FB1968A5
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,72e3ea390c305de0e259];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linaro.org:email,appspotmail.com:email,shopee.com:email]
+X-Rspamd-Queue-Id: 7C89519697C
 X-Rspamd-Action: no action
 
-On 25/02/26 05:19, Jakub Kicinski wrote:
-> On Tue, 24 Feb 2026 17:54:18 +0530 Siddharth Vadapalli wrote:
->> 			CPU0						
->> 				CPU1
->> 		----------------
->> 								--------------
->> 1.	TX HARD IRQ Handler entered				NAPI TX
->> Handler is running
->> 2.	irq_disabled is
->> set							Sees irq_disabled being set
->> 3.	Starts executing disable_irq_nosync()		Invokes
->> enable_irq() for TX IRQ before its really disabled
-> 
-> Could you resend your last email fixing the line wrap issue? It's very
-> hard to read as it arrived on the list.
+February 25, 2026 at 18:58, "Dan Carpenter" <dan.carpenter@linaro.org mai=
+lto:dan.carpenter@linaro.org?to=3D%22Dan%20Carpenter%22%20%3Cdan.carpente=
+r%40linaro.org%3E > wrote:
 
-I have changed my email client now to fix the line wrap issue. Sorry for 
-the inconvenience cause. I am repeating my earlier message below with 
-proper formatting. It is in response to the following statement:
 
- > AFAICT the flow on the Tx bug is not buggy, owner ship of the IRQ
- > vector passes handler -> NAPI -> timer. I don't see how those can
- > race.
+>=20
+>=20On Tue, Feb 24, 2026 at 12:46:38PM +0800, Jiayuan Chen wrote:
+>=20
+>=20>=20
+>=20> From: Jiayuan Chen <jiayuan.chen@shopee.com>
+> >=20=20
+>=20>  syzkaller reported a null-ptr-deref in lec_arp_clear_vccs().
+> >  This issue can be easily reproduced using the syzkaller reproducer.
+> >=20=20
+>=20>  In the ATM LANE (LAN Emulation) module, the same atm_vcc can be sh=
+ared by
+> >  multiple lec_arp_table entries (e.g., via entry->vcc or entry->recv_=
+vcc).
+> >  When the underlying VCC is closed, lec_vcc_close() iterates over all
+> >  ARP entries and calls lec_arp_clear_vccs() for each matched entry.
+> >=20=20
+>=20>  For example, when lec_vcc_close() iterates through the hlists in
+> >  priv->lec_arp_empty_ones or other ARP tables:
+> >=20=20
+>=20>  1. In the first iteration, for the first matched ARP entry sharing=
+ the VCC,
+> >  lec_arp_clear_vccs() frees the associated vpriv (which is vcc->user_=
+back)
+> >  and sets vcc->user_back to NULL.
+> >  2. In the second iteration, for the next matched ARP entry sharing t=
+he same
+> >  VCC, lec_arp_clear_vccs() is called again. It obtains a NULL vpriv f=
+rom
+> >  vcc->user_back (via LEC_VCC_PRIV(vcc)) and then attempts to derefere=
+nce it
+> >  via `vcc->pop =3D vpriv->old_pop`, leading to a null-ptr-deref crash=
+.
+> >=20=20
+>=20>  Fix this by adding a null check for vpriv before dereferencing it.=
+ If
+> >  vpriv is already NULL, it means the VCC has been cleared by a previo=
+us
+> >  call, so we can safely skip the cleanup and just clear the entry's
+> >  vcc/recv_vcc pointers. Note that the added check is intentional and
+> >  necessary to avoid calling vcc_release_async() multiple times on the
+> >  same vcc/recv_vcc, not just protecting the kfree().
+> >=20=20
+>=20>  Reported-by: syzbot+72e3ea390c305de0e259@syzkaller.appspotmail.com
+> >  Closes: https://lore.kernel.org/all/68c95a83.050a0220.3c6139.0e5c.GA=
+E@google.com/T/
+> >  Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> >  Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+> >  ---
+> >  net/atm/lec.c | 27 +++++++++++++++------------
+> >  1 file changed, 15 insertions(+), 12 deletions(-)
+> >=20=20
+>=20>  diff --git a/net/atm/lec.c b/net/atm/lec.c
+> >  index afb8d3eb2185..a5b80d6df603 100644
+> >  --- a/net/atm/lec.c
+> >  +++ b/net/atm/lec.c
+> >  @@ -1260,24 +1260,27 @@ static void lec_arp_clear_vccs(struct lec_ar=
+p_table *entry)
+> >  struct lec_vcc_priv *vpriv =3D LEC_VCC_PRIV(vcc);
+> >  struct net_device *dev =3D (struct net_device *)vcc->proto_data;
+> >=20=20
+>=20>  - vcc->pop =3D vpriv->old_pop;
+> >  - if (vpriv->xoff)
+> >  - netif_wake_queue(dev);
+> >  - kfree(vpriv);
+> >  - vcc->user_back =3D NULL;
+> >  - vcc->push =3D entry->old_push;
+> >  - vcc_release_async(vcc, -EPIPE);
+> >  + if (vpriv) {
+> >  + vcc->pop =3D vpriv->old_pop;
+> >  + if (vpriv->xoff)
+> >  + netif_wake_queue(dev);
+> >  + kfree(vpriv);
+> >  + vcc->user_back =3D NULL;
+> >  + vcc->push =3D entry->old_push;
+> >  + vcc_release_async(vcc, -EPIPE);
+> >  + }
+> >  entry->vcc =3D NULL;
+> >  }
+> >  if (entry->recv_vcc) {
+> >  struct atm_vcc *vcc =3D entry->recv_vcc;
+> >  struct lec_vcc_priv *vpriv =3D LEC_VCC_PRIV(vcc);
+> >=20=20
+>=20>  - kfree(vpriv);
+> >  - vcc->user_back =3D NULL;
+> >  -
+> >  - entry->recv_vcc->push =3D entry->old_recv_push;
+> >  - vcc_release_async(entry->recv_vcc, -EPIPE);
+> >  + if (vpriv) {
+> >  + kfree(vpriv);
+> >  + vcc->user_back =3D NULL;
+> >  + vcc->push =3D entry->old_recv_push;
+> >  + vcc_release_async(vcc, -EPIPE);
+> >=20
+>=20I wasn't going say anything, but since it seems like maybe you're goi=
+ng
+> to redo this patch anyway. Changing "entry->recv_vcc->push" to
+> "vcc->push" is obviously nice but could you do that in a separate
+> patch?
+>=20
+>=20I use a tool to strip out the indenting changes:
+> https://github.com/error27/rename_rev
+>=20
+>=20So when I review a patch like this, I want to pipe it to my script an=
+d
+> just see:
+>=20
+>=20+ if (vpriv) {
+>  vcc->pop =3D vpriv->old_pop;
+>  if (vpriv->xoff)
+>  netif_wake_queue(dev);
+>  kfree(vpriv);
+>  vcc->user_back =3D NULL;
+>  vcc->push =3D entry->old_push;
+>  vcc_release_async(vcc, -EPIPE);
+> + }
+>  entry->vcc =3D NULL;
+>  }
+>  if (entry->recv_vcc) {
+>  struct atm_vcc *vcc =3D entry->recv_vcc;
+>  struct lec_vcc_priv *vpriv =3D LEC_VCC_PRIV(vcc);
+>=20
+>=20+ if (vpriv) {
+>  kfree(vpriv);
+>  vcc->user_back =3D NULL;
+>=20
+>=20 entry->recv_vcc->push =3D entry->old_recv_push;
+>  vcc_release_async(entry->recv_vcc, -EPIPE);
+> + }
+>=20
+>=20The renames are nice but now I have to check things by hand.
 
-The issue is seen in practice. Interrupt coalescing (hrtimer) isn't used.
-The call sequence leading to the warning is:
 
-	net_rx_action
-		__napi_poll
-			NAPI TX Handler
 
-It does seem strange that the 'net_rx_action' leads to the NAPI TX Handler.
-However, it is exactly this path that causes the warning, and it is due to
-this that we could end up in the following situation:
+Hi Dan,
 
-                 CPU0                             CPU1
-    -----------------------------      -----------------------------
-1. TX HARD IRQ Handler entered         NAPI TX Handler is running
-2. irq_disabled is set to true         Sees irq_disabled being true
-3. Calls disable_irq_nosync()          Calls enable_irq()
-4. Enters disable_irq_nosync()         [WARNING: Unbalanced enable for IRQ]
+Thanks for the review. You're right, the entry->recv_vcc->push to vcc->pu=
+sh rename should not be mixed into the bug fix patch.
 
-> 
->  From what I gather you're concerned about the case when hard IRQ and
-> NAPI run in parallel. But I don't see how that could ever happen for
-> Tx (there are some complexities like netpoll and busy poll but those
-> will return false from napi_complete_done()).
+I think I should only adds the if (vpriv) guards without any other change=
+s.
 
-Weirdly, net_rx_action() is leading to NAPI TX Handler.
+I'll drop the cleanup rename entirely since this is legacy code and not w=
+orth a separate patch.
+
+Best,
+Jiayuan
+
+> regards,
+> dan carpenter
+>
 
