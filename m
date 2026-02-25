@@ -1,147 +1,178 @@
-Return-Path: <netdev+bounces-260687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260688-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mj7iHbFAnmlgUQQAu9opvQ
-	(envelope-from <netdev+bounces-260687-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 01:22:09 +0100
+	id UuiKAPFBnmlsUQQAu9opvQ
+	(envelope-from <netdev+bounces-260688-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 01:27:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CE4618E5B2
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 01:22:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5072818E611
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 01:27:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 524AA30391C2
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 00:22:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7BED43029257
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 00:27:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE6A421420B;
-	Wed, 25 Feb 2026 00:22:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB1F113D51E;
+	Wed, 25 Feb 2026 00:27:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ge0AiJIv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VFYuCuk+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBEAC1EFFB7
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 00:22:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7C1F2248B9
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 00:27:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771978925; cv=none; b=b6fWxylDhQB7w/pwn1KawbmBoI5FlzpCY4oS+wcS6UIJ1F6ZLpuc1b1gKfLIJNVkMttoHOaHLQkAOwEeU9RpBbsLABkidzqtDAZCK5WSA7qq2qqJ2aq9feOtRKmoBQyo7e72OI6Pk+e1eQxYY5suPAT1dRr7V8PzTM+zV358Shg=
+	t=1771979241; cv=none; b=fHmw39DC7u7uA+ohr9jxZshaqi7EUJPLMnXB16FdyiXbhr80hTCwhVuG/3n1vPZkflDTDdKW397b99aMkBc5ECU6O7EWO3tsXSy77a6JZluOmJu2y9zV4d18yrMhqCKQDEy/hQVMuTTAOCt1JuhHcE76f3okE61aMVJ/YIE4Hls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771978925; c=relaxed/simple;
-	bh=ynS84/0PMmxwKi16uvPa1XSyB0im66wxPhqSCK6S0ds=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=biNOO8KOCzAODv8Hd6zDV6/PSW2ntbfWXn9zsDzOytA1eJp4BqHDyEzIbnG/eYLj80fMnunCOhXlIUwa2C6aR4iMMfPJEg0H4adg2yp+1dqHiMm2ISv/vqg1we05FjWo0Me3HM91uh1TdMHsKbkcmOqwSzO9brr/Ygk8Dd2bUQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ge0AiJIv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8666EC116D0;
-	Wed, 25 Feb 2026 00:22:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771978925;
-	bh=ynS84/0PMmxwKi16uvPa1XSyB0im66wxPhqSCK6S0ds=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ge0AiJIvBbl8tSOzxzpG6pDDxdakdYHxj/SGqI3iokbedOLglImYp+KS38hGNLx0a
-	 aM4z068jN6vU+r6rQx96V354L/n0avRsXMP61aiek7Wk/sTQI/b/qtcaYXPMNI4jIj
-	 pUvPi6m8MfYfGpMMgEMs1mEvyNGFgZsjTHt2fO9tuWmafIKW9JNw94xJZSonkwZQhO
-	 N7N+6eS2Ypj6Qedc00oqWRi1T7HC9ThxHiXUEdpSGv68DZ7fIpzGbprS9+eBwESEDG
-	 WBdNBdDQRHLx2jz2FBUpPSykRhJDOHutCVc2UfCQYFN0Xags6ULJmM8vzqnJm5JvDH
-	 ICcFRdvLF48gQ==
-Date: Tue, 24 Feb 2026 16:22:03 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Riana Tauro <riana.tauro@intel.com>
-Cc: intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
- aravind.iddamsetty@linux.intel.com, anshuman.gupta@intel.com,
- rodrigo.vivi@intel.com, joonas.lahtinen@linux.intel.com,
- simona.vetter@ffwll.ch, airlied@gmail.com, pratik.bari@intel.com,
- joshua.santosh.ranjan@intel.com, ashwin.kumar.kulkarni@intel.com,
- shubham.kumar@intel.com, ravi.kishore.koppuravuri@intel.com,
- raag.jadav@intel.com, anvesh.bakwad@intel.com, Zack McKevitt
- <zachary.mckevitt@oss.qualcomm.com>, Lijo Lazar <lijo.lazar@amd.com>,
- Hawking Zhang <Hawking.Zhang@amd.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
- <edumazet@google.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH v8 1/5] drm/ras: Introduce the DRM RAS infrastructure
- over generic netlink
-Message-ID: <20260224162203.279f7b74@kernel.org>
-In-Reply-To: <20260223060541.526397-8-riana.tauro@intel.com>
-References: <20260223060541.526397-7-riana.tauro@intel.com>
-	<20260223060541.526397-8-riana.tauro@intel.com>
+	s=arc-20240116; t=1771979241; c=relaxed/simple;
+	bh=yUjgGCXypjVaqKsPFMnQOEvR8jza87vhKcQRAaEN68o=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=BFFEr/9blq9mUV7MShJOU11ICq3FBGQxxZErxIC+aj7H8HlHDjn+pg7DwpFqWfvK2siTPev9wqYaBrhrL9CekVoNzj1ErcJ2m+NXFktRR/TY9GBIZxWLsWV+oQzbclaA6fp9evwgE5TxVA8bZ11ZGCoOopXtZtbM5axal1wv+0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VFYuCuk+; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a943e214daso375310285ad.3
+        for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 16:27:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1771979237; x=1772584037; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=3rMppqfYtaPEAuHbTGzBYHmmoOP/37UfjTQ36I4vyww=;
+        b=VFYuCuk+WvfJ128K2RxYzMTfU31pSSi5VQRDZC0CY5bQAXQi2Dy6/trVuKS5yIDqo9
+         x6B93ClYVDu9X5ED5pDzgeAlpM7YWBcwEg06wBPseJBE0Xn7DVgsymYI7HzI118NS6DJ
+         /E+IDIMe0NiRu+cu/tIha9+6dg9QPf3zcseCcwMD3E9tCRCjRSMjHAxLL5pCct0n56/f
+         KLCKaC6bPMkpt7oI7iS+SojB+uOjwitUDh3Op95mexD2is8NYrikdozdQzcs6sPCkiIj
+         jlkcwg27JQYJ/NY6PxpEsRWywNivrhtsZ5pQxTvht7QcIxarf7Dvxwg/MfTSnvwNb0R9
+         tJ5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771979237; x=1772584037;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3rMppqfYtaPEAuHbTGzBYHmmoOP/37UfjTQ36I4vyww=;
+        b=mqpw/YG0wO0TlO7P54h2rOujSBT3b7hnxZYNgvW2ixU+xdRQBe5xHRq5jQCPO0Q8TF
+         CFww/OdkyJVVf/6pTR8EEIyfZo8rd5A9421cDfbSneleGiAt2lVMAIrLUfBWDNCMFNUr
+         QTF4Qw3RQKyZ8Ligk6o5OgAjk5Eehnh/AMqLA6bNkVngWCQg6twL4i3iXVjD8M2Idd9P
+         hTqFsCIkpwieuIpCkLRtYVDoqX1cyvxFMm7YY0d12F5PTI2ojcA4VFeCnIgijDveQtZ0
+         HpxUGD+tZjJXuvA90IZetH7xBnsEorPEeqGtsOQVII1JXxYSoKreZlQjlDaLmjT49b1h
+         822g==
+X-Forwarded-Encrypted: i=1; AJvYcCWzyZ4V52wh7fR/4x1dXhbKERH1HHd1yInrA7Y8QkxCh32U8fElZ6yKHizVp90Dtve1JvMVAlM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzI1iShfvybVpNhTo80Yxx+L0cVspmanfeYJgq+oPoNaK8rOaGW
+	YQkz7AOsOItH7j0/dIxKQLvwH8OOKD2C4UC/xtybM/75NgNS4NTdt+8MO04XLw8Lo6l5rinV5B1
+	4tyTAeA==
+X-Received: from pldq4.prod.google.com ([2002:a17:902:c9c4:b0:2aa:ed18:fbb1])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3c4c:b0:2a1:3cd9:a734
+ with SMTP id d9443c01a7336-2ad7452bbcfmr139332215ad.43.1771979236737; Tue, 24
+ Feb 2026 16:27:16 -0800 (PST)
+Date: Wed, 25 Feb 2026 00:26:20 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.414.gf7e9f6c205-goog
+Message-ID: <20260225002709.156882-1-kuniyu@google.com>
+Subject: [PATCH v1 net] udp: Unhash auto-bound connected sk from 4-tuple hash
+ table when disconnected.
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Philo Lu <lulie@linux.alibaba.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lists.freedesktop.org,linux.intel.com,intel.com,ffwll.ch,gmail.com,oss.qualcomm.com,amd.com,davemloft.net,redhat.com,google.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-260687-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-260688-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,linux.alibaba.com,google.com,gmail.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-0.987];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0CE4618E5B2
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5072818E611
 X-Rspamd-Action: no action
 
-On Mon, 23 Feb 2026 11:35:41 +0530 Riana Tauro wrote:
-> From: Rodrigo Vivi <rodrigo.vivi@intel.com>
-> 
-> Introduces the DRM RAS infrastructure over generic netlink.
-> 
-> The new interface allows drivers to expose RAS nodes and their
-> associated error counters to userspace in a structured and extensible
-> way. Each drm_ras node can register its own set of error counters, which
-> are then discoverable and queryable through netlink operations. This
-> lays the groundwork for reporting and managing hardware error states
-> in a unified manner across different DRM drivers.
+Let's say we bind() an UDP socket to the wildcard address with a
+non-zero port, connect() it to an address, and disconnect it from
+the address.
 
-Family itself LGTM.
+bind() sets SOCK_BINDPORT_LOCK on sk->sk_userlocks (but not
+SOCK_BINDADDR_LOCK), and connect() calls udp_lib_hash4() to put
+the socket into the 4-tuple hash table.
 
-I'm getting this diff when running regen:
+Then, __udp_disconnect() clears the source address and calls
+sk->sk_prot->rehash(sk).
 
-diff --git a/drivers/gpu/drm/drm_ras_nl.c b/drivers/gpu/drm/drm_ras_nl.c
-index 4714a574a143..8bc85eab751f 100644
---- a/drivers/gpu/drm/drm_ras_nl.c
-+++ b/drivers/gpu/drm/drm_ras_nl.c
-@@ -7,6 +7,8 @@
- #include <net/netlink.h>
- #include <net/genetlink.h>
+It computes a new hash based on the wildcard address and moves
+the socket to a new slot in the 4-tuple hash table, leaving a
+garbage in the chain that no packet hits.
+
+Let's remove such a socket from 4-tuple hash table when disconnected.
+
+Fixes: 78c91ae2c6de ("ipv4/udp: Add 4-tuple hash for connected socket")
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+---
+ net/ipv4/udp.c | 22 +++++++++++++---------
+ 1 file changed, 13 insertions(+), 9 deletions(-)
+
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index b96e47f1c8a2..3388e4ab9056 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -2321,15 +2321,19 @@ void udp_lib_rehash(struct sock *sk, u16 newhash, u16 newhash4)
+ 		if (udp_hashed4(sk)) {
+ 			spin_lock_bh(&hslot->lock);
  
-+#include "drm_ras_nl.h"
+-			udp_rehash4(udptable, sk, newhash4);
+-			if (hslot2 != nhslot2) {
+-				spin_lock(&hslot2->lock);
+-				udp_hash4_dec(hslot2);
+-				spin_unlock(&hslot2->lock);
+-
+-				spin_lock(&nhslot2->lock);
+-				udp_hash4_inc(nhslot2);
+-				spin_unlock(&nhslot2->lock);
++			if (inet_rcv_saddr_any(sk)) {
++				udp_unhash4(udptable, sk);
++			} else {
++				udp_rehash4(udptable, sk, newhash4);
++				if (hslot2 != nhslot2) {
++					spin_lock(&hslot2->lock);
++					udp_hash4_dec(hslot2);
++					spin_unlock(&hslot2->lock);
 +
- #include <uapi/drm/drm_ras.h>
- #include <drm/drm_ras_nl.h>
++					spin_lock(&nhslot2->lock);
++					udp_hash4_inc(nhslot2);
++					spin_unlock(&nhslot2->lock);
++				}
+ 			}
  
+ 			spin_unlock_bh(&hslot->lock);
+-- 
+2.53.0.414.gf7e9f6c205-goog
 
-Is there a reason why drm_ras_nl.h is in the global include/ path and
-not in drivers/gpu/drm/, directly? This header is meant to be used
-just between the generated C code (which is mostly structs at this
-point) and the C source implementing the family. We haven't had any
-use case which would require making it global so generator doesn't
-support that.
-
-The source needs to be clean after regen, so we either need to move 
-the header in this patch or I can send you a patch to add a new
-generator feature to override the header location. LMK.
 
