@@ -1,48 +1,50 @@
-Return-Path: <netdev+bounces-260824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260823-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aNwDF5C/nmnsXAQAu9opvQ
-	(envelope-from <netdev+bounces-260824-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:23:28 +0100
+	id wMmGOg6+nmnYXAQAu9opvQ
+	(envelope-from <netdev+bounces-260823-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:17:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB736194DEE
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:23:27 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE0CE194C38
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:17:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CEB0230B8E3F
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5FFB0301F3AD
 	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 09:16:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F05D38756E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BD1A38756A;
 	Wed, 25 Feb 2026 09:16:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="x+Y07UUN"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="hzQyRRhx"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37FFF38734A
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 09:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 383C9387361
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 09:16:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772011004; cv=none; b=RK6EWHU0kXp7EXbqhAZnEp34aNgf4LJ2LYwe0A+PUaipnYsEyx+a/54UUOXiWFYM/x2TPL1t+fU16myEJEKy5yzyox3CM6TF9s/VzMoTW7jHzu5p24/4d/zD/G/CGUAwAGHwHMmNTNoBGadD5r/zPUlEpq4iWy3W2xdLateG1E8=
+	t=1772011003; cv=none; b=BcBtTs9PwUFPZxlGe5XvP08/GjDNJJPHiG1sZCwYKiZpqJ267TaobPpYYgYfxJCRKwrZ//K0KOXdo7qmIkZKj6VP2W8897krLarmESMsjDaK6hpuyYWBWtxT7ibv8dWXX2kO62N9gYxyUXIYFZ28NgHugGoVNGRflkYyiDn8Dos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772011004; c=relaxed/simple;
-	bh=OS3HIAiAl9cuFNPjezz+0nevLqZ4Z3L5TU/f99l7Y/w=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sPxQKj3IfgwRLnlblT7/YCXcD9rQhk2ligtSqv9SE8Mxd2hRkVgbAUiVdmNbQigotfgqcSAly+xtPrGRFhykkBE3d10vE51nFFfAMjSmPHrhqyqnhBWTINkg+bUzAV6xEzJnyWusNltrw91jc90Mzn3BIqw7VS4XHM7lAahmXA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=x+Y07UUN; arc=none smtp.client-ip=194.13.80.246
+	s=arc-20240116; t=1772011003; c=relaxed/simple;
+	bh=Lw5PO5FUMSxJvJUyOGgj9zsv+1kml1xiUFsh4F5NiZw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=DqB26yAe2A18ssdhJC7pCkeZg7OLOVE8wGqwTIAd6afb6TgPxxcob8Uj8PFYqjHuFmsqhWzZYNRmX+DA+oDxeudHbRjKjs/jl7BZP7MQeDfS6O4TiKFHfEEufB3jWdOtCyVXAXtktteef2p6DEY4pudsxTsl/MxkT5eVY6bTiiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=hzQyRRhx; arc=none smtp.client-ip=194.13.80.246
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id EBC7DA3ECF;
-	Wed, 25 Feb 2026 10:16:32 +0100 (CET)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 8CAE9A3F77;
+	Wed, 25 Feb 2026 10:16:36 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
 	t=1772010996; h=from:subject:date:message-id:to:cc:mime-version:
-	 content-transfer-encoding; bh=Zn+xXznsJbvbUfrQPzNJESFaWy1EgzaoNyj/zbd4pFQ=;
-	b=x+Y07UUNN7ebXj7OW1qyu14TMMr17oD5XhGYohUDXEaMnq0jsf+55FqCDxhXH1ovrchOw0
-	IHVO7vdW4NbuJSPDAoKAC9u25t+zesgoYIKW2Cw3LEk+1eZ06Ur4PLqwOXnSHhi6TLAWWy
-	d8oXM0GjjOcamOKm2Q94I+/mgE32FRW2YEcwkZNPgkE7QnDkoLv0YgPiA/DR6gI9Hte5WB
-	bAMwS/1XokXhBSpcelzNL8I75yv4LXQpuSUBZXWTxGKyrLhc2pumuADdlBsQkmbQ8+zK+Y
-	hOzkvj+CS5NC4njZpILcSPoXDeRDAOj7bOeaVvRXb1KX9z0km9VuWQAJlw3/7A==
+	 content-transfer-encoding:in-reply-to:references;
+	bh=GKw5TM2U60IlvGW7WqGbWJVMzu0vjPwT1qos5LagtiU=;
+	b=hzQyRRhx/AEgzstE5/2oZDIARfBo3FPc5yOnnZveeL0sJk9112zif3GSNERNc+MczHHhiB
+	bAn993Ag9iI+u+B7VCDBF5Uwl3D+X+cf4qjatP8qzbwwUQYgOF67LvpA/6bsi5B3QBwJlB
+	K7pZQtl7XWXKonO06hhJ/3Wx0YxMtoyDTxNXyj6SP9LemLj62JAx9vA1sLJ2bAPmAdNxcV
+	Vs9EC6iVei/Y359jBbCtPZfVwXBAiWuPNJ9GCEJoiuT2jYRlERK54evMwZPxvQ+lj1kUY1
+	gsoJf+9HEXRo2nBDkV1YQdTBVL71jK+o7JpcRE4fConEFrwoi/WClUmPcBjuBQ==
 From: Nicolai Buchwitz <nb@tipi-net.de>
 To: netdev@vger.kernel.org
 Cc: andrew+netdev@lunn.ch,
@@ -55,10 +57,12 @@ Cc: andrew+netdev@lunn.ch,
 	linux@armlinux.org.uk,
 	phil@raspberrypi.com,
 	Nicolai Buchwitz <nb@tipi-net.de>
-Subject: [PATCH net-next v3 0/5] net: cadence: macb: add IEEE 802.3az EEE support
-Date: Wed, 25 Feb 2026 10:15:53 +0100
-Message-Id: <20260225091558.51157-1-nb@tipi-net.de>
+Subject: [PATCH 1/5] net: cadence: macb: add EEE register definitions and capability flag
+Date: Wed, 25 Feb 2026 10:15:54 +0100
+Message-Id: <20260225091558.51157-2-nb@tipi-net.de>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20260225091558.51157-1-nb@tipi-net.de>
+References: <20260225091558.51157-1-nb@tipi-net.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,104 +78,83 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	DMARC_NA(0.00)[tipi-net.de];
-	TAGGED_FROM(0.00)[bounces-260824-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-260823-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[tipi-net.de:+];
-	NEURAL_HAM(-0.00)[-0.992];
+	NEURAL_HAM(-0.00)[-0.996];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,tipi-net.de:mid,tipi-net.de:dkim]
-X-Rspamd-Queue-Id: CB736194DEE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,tipi-net.de:mid,tipi-net.de:dkim,tipi-net.de:email]
+X-Rspamd-Queue-Id: CE0CE194C38
 X-Rspamd-Action: no action
 
-Add Energy Efficient Ethernet (IEEE 802.3az) support to the Cadence GEM
-(macb) driver using phylink's managed EEE framework. The GEM MAC has
-hardware LPI registers but no built-in idle timer, so the driver
-implements software-managed TX LPI using a delayed_work timer while
-delegating EEE negotiation and ethtool state to phylink.
+Add register and bitfield definitions for the Cadence GEM MAC's
+IEEE 802.3az Energy Efficient Ethernet (EEE) support:
 
-Changes from v2:
-  - macb_tx_lpi_set() now returns bool indicating whether the register
-    value actually changed, avoiding redundant writes.
-  - Removed tx_lpi_enabled field from struct macb; LPI state is tracked
-    entirely within the spinlock-protected register read/modify/write.
-  - macb_tx_lpi_wake() uses the return value of macb_tx_lpi_set() to
-    skip the cancel/udelay when TXLPIEN was already clear.
-  All changes based on feedback from Russell King.
+- LPI statistics counter registers (GEM_RXLPI, GEM_RXLPITIME,
+  GEM_TXLPI, GEM_TXLPITIME) at offsets 0x270-0x27c
+- TX LPI enable bitfield (GEM_TXLPIEN) in the NCR register (bit 19),
+  which directly asserts/deasserts LPI on the transmit path
+- MACB_CAPS_EEE capability flag to gate EEE support per platform
 
-Changes from v1:
-  - Rewrote to use phylink managed EEE (mac_enable_tx_lpi /
-    mac_disable_tx_lpi callbacks) instead of the obsolete
-    phy_init_eee() approach, as recommended by Russell King.
-  - ethtool get_eee/set_eee are now pure phylink passthroughs.
-  - Removed all manual EEE state tracking from mac_link_up/down;
-    phylink handles the lifecycle.
+These registers are present in all Cadence GEM revisions that support
+EEE (verified on SAMA5D2, SAME70, PIC32CZ, and RP1 variants).
 
-The series is structured as follows:
+No functional change.
 
-  1. Register definitions: LPI counter offsets (0x270-0x27c), TXLPIEN
-     bitfield (NCR bit 19), and MACB_CAPS_EEE capability flag.
+Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
+---
+ drivers/net/ethernet/cadence/macb.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-  2. LPI statistics: Expose the four hardware EEE counters (RX/TX LPI
-     transitions and time) through ethtool -S, accumulated in software
-     since they are clear-on-read.
-
-  3. TX LPI engine: phylink mac_enable_tx_lpi / mac_disable_tx_lpi
-     callbacks with a delayed_work-based idle timer. LPI entry is
-     deferred 1 second after link-up per IEEE 802.3az. Wake before
-     transmit with a conservative 50us PHY wake delay.
-
-  4. ethtool EEE ops: get_eee/set_eee delegating to phylink for PHY
-     negotiation and timer management.
-
-  5. RP1 enablement: Set MACB_CAPS_EEE for the Raspberry Pi 5's RP1
-     southbridge (Cadence GEM_GXL rev 0x00070109 + BCM54213PE PHY).
-
-Tested on Raspberry Pi 5 (1000BASE-T, BCM54213PE PHY, 250ms LPI timer):
-
-  iperf3 throughput (no regression):
-    TCP TX: 937.8 Mbit/s (EEE on) vs 937.0 Mbit/s (EEE off)
-    TCP RX: 936.5 Mbit/s both
-
-  Latency (ping RTT, small expected increase from LPI wake):
-    1s interval:  0.273 ms (EEE on) vs 0.181 ms (EEE off)
-    10ms interval: 0.206 ms (EEE on) vs 0.168 ms (EEE off)
-    flood ping:   0.200 ms (EEE on) vs 0.156 ms (EEE off)
-
-  LPI counters (ethtool -S, 1s-interval ping, EEE on):
-    tx_lpi_transitions: 112
-    tx_lpi_time: 15574651
-
-  Zero packet loss across all tests. Also verified with
-  ethtool --show-eee / --set-eee and cable unplug/replug cycling.
-
-Nicolai Buchwitz (5):
-  net: cadence: macb: add EEE register definitions and capability flag
-  net: cadence: macb: add EEE LPI statistics counters
-  net: cadence: macb: implement EEE TX LPI support
-  net: cadence: macb: add ethtool EEE support
-  net: cadence: macb: enable EEE for Raspberry Pi RP1
-
- drivers/net/ethernet/cadence/macb.h      |  20 ++++
- drivers/net/ethernet/cadence/macb_main.c | 136 ++++++++++++++++++++++-
- 2 files changed, 155 insertions(+), 1 deletion(-)
-
+diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
+index 87414a2ddf6e..729751d424c2 100644
+--- a/drivers/net/ethernet/cadence/macb.h
++++ b/drivers/net/ethernet/cadence/macb.h
+@@ -170,6 +170,10 @@
+ #define GEM_PCSANNPTX		0x021c /* PCS AN Next Page TX */
+ #define GEM_PCSANNPLP		0x0220 /* PCS AN Next Page LP */
+ #define GEM_PCSANEXTSTS		0x023c /* PCS AN Extended Status */
++#define GEM_RXLPI		0x0270 /* RX LPI Transitions */
++#define GEM_RXLPITIME		0x0274 /* RX LPI Time */
++#define GEM_TXLPI		0x0278 /* TX LPI Transitions */
++#define GEM_TXLPITIME		0x027c /* TX LPI Time */
+ #define GEM_DCFG1		0x0280 /* Design Config 1 */
+ #define GEM_DCFG2		0x0284 /* Design Config 2 */
+ #define GEM_DCFG3		0x0288 /* Design Config 3 */
+@@ -305,6 +309,8 @@
+ #define MACB_IRXFCS_SIZE	1
+ 
+ /* GEM specific NCR bitfields. */
++#define GEM_TXLPIEN_OFFSET		19
++#define GEM_TXLPIEN_SIZE		1
+ #define GEM_ENABLE_HS_MAC_OFFSET	31
+ #define GEM_ENABLE_HS_MAC_SIZE		1
+ 
+@@ -779,6 +785,7 @@
+ #define MACB_CAPS_DMA_PTP			BIT(22)
+ #define MACB_CAPS_RSC				BIT(23)
+ #define MACB_CAPS_NO_LSO			BIT(24)
++#define MACB_CAPS_EEE				BIT(25)
+ 
+ /* LSO settings */
+ #define MACB_LSO_UFO_ENABLE			0x01
 -- 
 2.51.0
 
