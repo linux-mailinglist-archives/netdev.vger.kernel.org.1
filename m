@@ -1,253 +1,286 @@
-Return-Path: <netdev+bounces-260785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260786-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2OI/CiSonmmrWgQAu9opvQ
-	(envelope-from <netdev+bounces-260785-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 08:43:32 +0100
+	id uExKH/SonmntWgQAu9opvQ
+	(envelope-from <netdev+bounces-260786-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 08:47:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92596193AB4
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 08:43:31 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91F20193AE0
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 08:46:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 82D0E30038F3
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 07:43:30 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4AB3F300B9ED
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 07:46:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A51F22EFDA1;
-	Wed, 25 Feb 2026 07:43:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21B662D0620;
+	Wed, 25 Feb 2026 07:46:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2a7lISA9"
+	dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b="bo2ZnJuD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296732F4A0C
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 07:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772005409; cv=pass; b=a7cf0fS7xBxGGta0dDQVSXM46j8pl/BXBzGK1Hq9LWtBch3Ubdmul+pZCYWnvfNh6grJaA+WnO0WFAGJ1u6G58rChe4ZX2HJDy9DTCvSvY/ToKY5Q0Q48Gpzn7EJJlCCKcIG/L/MhIYC0jl4ZQCrXgl/DfyyKe3D8AM+tDEMfhU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772005409; c=relaxed/simple;
-	bh=pD5qgSyj+M+ZKRt0xRcrtKgBujxN495BZuFlw6/RleE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=K01rOGYXsEhJvMRqx95KQn08vxhYqgjRx9K8wEmPNp0SwTDKD8pryBWrT3tzPj9ELZJLQVSJb6bZUcHLvVpAd/pO0yCQ6sAm4YjQ3Mw5xW/gx6zprK0HzWlxs+9Qbjw1Rq2fzq8B0z34kVFHKcT5QvowgXVVndfvCfF7nccuIcI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2a7lISA9; arc=pass smtp.client-ip=74.125.82.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-1277d379936so1566945c88.1
-        for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 23:43:27 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772005407; cv=none;
-        d=google.com; s=arc-20240605;
-        b=BmBqOeDMoTqCmBiwclQSk3EB/Bi/nS1kRrFf9HaNTpgZsp+xPNQyTulh0642V3+WfM
-         r5EMk9iXJzd/lenuJwBFSpweBc2dB2OGG96FZSOy8LLW4rHntIKejbm9gl/QeI0fqM4D
-         zCR6SJR+XUwI3nkyB2WbQaXH2HOSk55CDBe/2pZx/VI9QoYKyubBPMcHK7XmT4jeZVZ7
-         eDJIbz2I7RANiXpRWgNHUWaKHx7hdyZouMiWQlYXoKQsX2c3lum5FeS2EqI6MxI+aowc
-         Vfew59bUFurmX+r30Y3ljsI3tdj1oEOe3jGidX2LY8EAIy2TPDmQpVQf4uaPteJwm5ui
-         tAkQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=31tKxIamTKYA+kb9Yej+epsVr+m056uORYnUnfM4tIQ=;
-        fh=XgIqm8f/4rP5JqkRLrBgw7sDDwws/HvLfnTtZ8roUo8=;
-        b=eekwfJ40ZeE7OSi3L3Ylv+em6L3WUgNBR9+dUQbBEiyxUFrEXuJNV0trTEQP9Eixth
-         BPcjHortjzcf9ITNv5YnmmE6F+ikEb8ROxccy/jdgfj1qFZyR2NAlyG/AXZ5xCd+fxX9
-         OLR87O+sBYP/Y0Bbz6wouxJVCUgegvSzKCSqMDy1HOYFDsh9RJwqPe9KexyVVu9abhNJ
-         XyF8gsT/gDA5lsy+OoRV7PQWJGdmQ67yLoOw2zgjbV64vx425mr/xp5eIlLMZveb5bPS
-         GNE43e+gsXBWYKXNhBfoluNO6vMBnbgcB8W9QSGjtsrKw6n35dm1Fmh8HPI9kpRiUwuI
-         AOBg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04CA1C860C
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 07:46:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772005613; cv=none; b=klltxbQbM4iOxDHMjKEXs5n/EoVoL738t03D2dTcUczthwUEfpa5haZWyir9lPBA+piNLMdKswPYMCV0pTGS5YESQhIZ8doeyxyHBmtg02Uzd0HQ6D8nrUy+YnzlI8rPxnxmi+/LwMilLZIkOiR2cisW9mJVEMgPOo+aFyJQCtI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772005613; c=relaxed/simple;
+	bh=oVSmkTDt2CC7vagB/7IKxbULhl8iz92yFIuiTzbBb00=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dAa8HPQ8xbFbE3CanWSm2brSOD5lnpZ8ZQ5DWjVn2c9CFPwQrekZ+2QXVE1LBXV0PwpYlywxIPRkWfPlyLp+F0/Y6Z0PlVXotyxBfxDwhwGn9zGsrFJNhj0cUXA4iYo977TtRAgv1Ac6wnkcDLSJ3w+blaT0szSJaYu8iV+w/ss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com; spf=pass smtp.mailfrom=shopee.com; dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b=bo2ZnJuD; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shopee.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2a871daa98fso46011255ad.1
+        for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 23:46:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772005407; x=1772610207; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=31tKxIamTKYA+kb9Yej+epsVr+m056uORYnUnfM4tIQ=;
-        b=2a7lISA9mMWG7B2HSe+/iD0XEsgdG4WXd3QQlLKDdcHl40hC5Db9rPnhYxFJDlJh9X
-         c0PAUUJJI1tDYQNiO5gwbDx59duTy1PQTHv70LDt+DIal+zGGe8/4hmiZkhmGEr5Te9p
-         sUxiTT5FPmv2jratSKV2OYE7ybcsJcNooXyQNMFmajFCVHqy3eItA7wCPnI3vPRJpmDS
-         sL7iEgwjguXXKiVjju+r6yIZKS+E1kkkdFAfIjUzK4GhtX6LDj7aDDh3WjwOKDMVc1ZX
-         ZzVUGjncNWrR7lybLjRqN2hHwT0puidEV6R9idUk/KeEe0CMgTI/SAvUqhPQSfTlIcfV
-         nIQw==
+        d=shopee.com; s=shopee.com; t=1772005611; x=1772610411; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=d5uWqej63a79hXQBLP6LiTHLyAOyVWFc6uQobJ5V1EQ=;
+        b=bo2ZnJuDYLLJgRlA4uyEoN/74nIOfy+iPbb+OKNNKGWgphs98VJtywYP5pBwY8pyZh
+         NnhRNY8xxTi7G4wjVX7W7GSna0P/NuUuY2ARQ4yHi1O76xU9wTP7un7tDW1C/fVKt9bW
+         Q/YW2nncF8tg8hWdTOS7Ce4KGRSrVWuSuZM6cRHy4Eqj8ibNVyl6/56TF77jkdFbjP2h
+         8APO1XN6lFkcHrwleVBdqVtqUM5sGMnAGmF+cH6tmc2mcb+fPBeGzg2F2Uf/Lx6zJ642
+         AuobWZAee3wfiOBqDB0pXZm3iyXlDjf0Hg0NQmSgws6KEm12P8Hw8tiSHjxC0fz8OPfj
+         lQPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772005407; x=1772610207;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=31tKxIamTKYA+kb9Yej+epsVr+m056uORYnUnfM4tIQ=;
-        b=FIdtKqKbFS1RacKKMpvmgr3nfgSLP3Iym53zukmeNiAxLGUXBkpa+Y+4SwLLGD+U+B
-         CB7zwR/1ZQfnEj/iOvR8iw3e57Xag+2Ifk5VJ2x+4nD6YXYUfdC6WpsaYDzZJOAvHQ9l
-         HIjelMRKWHBlgfhaeK9Vsf9Keq3GsMD2X1novZYBkXAPKYTfWjXbsD/UYntD3n/aHdrg
-         yS7CcwtMpHRsgbBvVoAEX5gSRMaLjQNDqebjB3mWhMquH4bwkB31CjOJOGHO8MwDTz1e
-         jHqdkGwPrKAz0T0GArcocATGm5UKt054Cs7ZJb9PmxDlZtvM0Gcmvoy/TYQhGnDQU7l2
-         vL6A==
-X-Forwarded-Encrypted: i=1; AJvYcCVxKUx1eAgOoZHnmnoKBF1CastL6D1utuj4OErtR0Jg//SLCzxHg9xJ9wP1JJdKVlYBXEFoHlw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrX9LuAEPOzt1/BNTMI4GsWx76yUHqVfgrxD92z1r1VOt9Wudk
-	RlbylsCgCSzlgll3ozeYG6BsuIAboocYmuHsASi+SZ+mOxCrM31Nu86K1pgTI349D0730vYvmcw
-	fuXgHz46iz0+pRXzgjOIw9js2HZiL9CUXnQUdV3kS
-X-Gm-Gg: ATEYQzwY5m7TURUBuvlhhCJoOPpYNLLgp1QjvZXPfSwpOSid/muxrWyQxyKzXgq2WN2
-	5VMh6NliqcZ9OAsJthquys5D+7846Kf/hbxzFCIlQ1ZhWQ9NS+xQ22jE2EO0dIEnucfSc+uq8ru
-	yeDW4AS5JInTx4eUJ2zjL2jzuw236ks8+EhJDB38j2t2ikVE2dMPek4fN3I3giVMXsE6lrGGfPO
-	VrkjAX6/Rc6SwZdNqIadKUFdN06xY380iRICvaAeuZZ6vkbjvg40zfy//bdwc/eG7qL9GbzzyYw
-	d/rLWR1gQgZ2sEJ4bYLHqHKX92OH8HcDEozcL9P99BKRps1D4p3I2AlLLDlgh2jYKM4S16ZN
-X-Received: by 2002:a05:7022:6724:b0:119:e569:f61b with SMTP id
- a92af1059eb24-12781df5bc9mr599957c88.20.1772005406674; Tue, 24 Feb 2026
- 23:43:26 -0800 (PST)
+        d=1e100.net; s=20230601; t=1772005611; x=1772610411;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=d5uWqej63a79hXQBLP6LiTHLyAOyVWFc6uQobJ5V1EQ=;
+        b=TvFRp+6+hXPM9oyHvpLGV3tgp6p6cfjKFl18OrvrSuWDTr8VPxJojZBU6Q87KC9MUL
+         vM6ARr46lz0I6rgcfODe86huBHQFGXn230nMM34lp1lOLXrd/wKyJphLSh5Cby4X4ldO
+         yo2yqE5vhBROjFyB6roUI6WExjAsMJu/kmkktLNms0AJ/5QCD9bQqqvObDZ/QaL2EmdT
+         2Ku0K4pUFaPDBODOBwjytxrtrbj4vA6znZTby9K5fBY1UIeERPPzV4yAd+Dw6+KxRUEX
+         85n2rs6eTFcGXdUmZghIjlyLRDJ9ZbAJwO+NJPcqHraDhF2yD86WuVtiajeq15HSHh3a
+         rzmQ==
+X-Gm-Message-State: AOJu0YybU2mAkYuYnN7Hptw5pqMEMRzsyNzDLflXRuSRTKFeVUIWQgbk
+	n8szQHvimMHEcCdTrGj6sQPde7YxNUvceMcTfwsStLj04HiJ5VLQ/o7g//+aMtbcVe72QYFOgGN
+	N8CASWjEiuM9UDw5J3SQz6A95+lkFP0j+AX+E6a8ai4+7iUVK5R4PYK95aXwTv6kAeOFKccZz0K
+	5fyQC2SSGwo29Bm4YKcHiZ8RQ9H854VafBQWcRdH4Tt/I9ifN7
+X-Gm-Gg: ATEYQzyxJ9xTZIY0whMFEVEBmMpOnTQHQfG1dyTZertXWOWiPlJQrAz2sC0peDshfjv
+	eIxSmCwvtJwXKg+Avg31FRrsKmOZ115keocXS2yGA1XSAPgRmKlmNbln6z2+v4OAAlnshJJN+9v
+	DPFBg0JAI6J0snGooMsLE+cD2m+jvOdIQUkeYmzSLMChLpfWZ8/WUi7vmG3JBpygbMIQz96Hki8
+	pmBk54EWYZXMxYeygQA36dYhC7UTSrh4CQP2b9fziuvPEPxL7xcLDWY2CfUzQwLMRfzx8x7vMcS
+	huRna5kEJc6i/t7D5WbZlaUN7K0xnqjIdf/KK5XDqCmHtIRW70syVyTIGwhthsqWI8uxZX6U/IE
+	VqpLNbARbuROh9BJCI4ky8h5anHbMU81kqums6LXdDZxUKDGqqBqdOENorUNx2rmke/weCucwHE
+	FXUasY5aUL0RBODuSVvGXSAmqEq0nfRkyPEbnot53/9eKRSlxG
+X-Received: by 2002:a17:902:e885:b0:2ad:b957:e7ff with SMTP id d9443c01a7336-2add14401b4mr16154695ad.45.1772005610812;
+        Tue, 24 Feb 2026 23:46:50 -0800 (PST)
+Received: from bms-ytl-d1-app-10-251-178-27 ([147.136.157.1])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ad7500e062sm170844165ad.48.2026.02.24.23.46.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Feb 2026 23:46:50 -0800 (PST)
+From: Leon Hwang <leon.huangfu@shopee.com>
+To: netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	David Ahern <dsahern@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ij@kernel.org>,
+	Leon Hwang <leon.huangfu@shopee.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	kerneljasonxing@gmail.com,
+	lance.yang@linux.dev,
+	jiayuan.chen@linux.dev,
+	Leon Hwang <leon.hwang@linux.dev>,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH net-next] tcp: Add net.ipv4.tcp_purge_receive_queue sysctl
+Date: Wed, 25 Feb 2026 15:46:33 +0800
+Message-ID: <20260225074633.149590-1-leon.huangfu@shopee.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260225033216.601205-1-edumazet@google.com> <CAAVpQUDMTefL+Rsb_9FnMFf5o8UsqhxpZ3Vgg56_TDQQbPHCRQ@mail.gmail.com>
- <CANn89i+oE7SpzKq8cVw4J=0DTHvQt2Ou_v=cxmNKhCviK7fXRw@mail.gmail.com> <CANn89iKfD5-MZUcCFjnkWV1E=RwBVf6T+sSFRv+zEiAMEc46Sg@mail.gmail.com>
-In-Reply-To: <CANn89iKfD5-MZUcCFjnkWV1E=RwBVf6T+sSFRv+zEiAMEc46Sg@mail.gmail.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 24 Feb 2026 23:43:14 -0800
-X-Gm-Features: AaiRm513VY2ZpjytvehcsVn7C9rFth2yqVf00mZMtSsAOzmmuozodI_ObzQ3EiI
-Message-ID: <CAAVpQUBMF5Awq_JRJTRrNMx5SrqFwrCHc2ySFw-4O6+QL2Zkag@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: use cmpxchg() in lock_sock_nested()
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[shopee.com,reject];
+	R_DKIM_ALLOW(-0.20)[shopee.com:s=shopee.com];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-260785-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	MISSING_XM_UA(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,shopee.com,nvidia.com,gmail.com,linux.dev,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-260786-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[shopee.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[leon.huangfu@shopee.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 92596193AB4
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,shopee.com:mid,shopee.com:dkim,shopee.com:email]
+X-Rspamd-Queue-Id: 91F20193AE0
 X-Rspamd-Action: no action
 
-On Tue, Feb 24, 2026 at 11:29=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> On Wed, Feb 25, 2026 at 8:23=E2=80=AFAM Eric Dumazet <edumazet@google.com=
-> wrote:
-> >
-> > On Wed, Feb 25, 2026 at 8:20=E2=80=AFAM Kuniyuki Iwashima <kuniyu@googl=
-e.com> wrote:
-> > >
-> > > On Tue, Feb 24, 2026 at 7:32=E2=80=AFPM Eric Dumazet <edumazet@google=
-.com> wrote:
-> > > >
-> > > > Add a fast path in lock_sock_nested(), to avoid acquiring
-> > > > the socket spinlock only to set @owned to one:
-> > > >
-> > > >         spin_lock_bh(&sk->sk_lock.slock);
-> > > >         if (unlikely(sock_owned_by_user_nocheck(sk)))
-> > > >                 __lock_sock(sk);
-> > > >         sk->sk_lock.owned =3D 1;
-> > > >         spin_unlock_bh(&sk->sk_lock.slock);
-> > > >
-> > > > On x86_64 compiler generates something quite efficient:
-> > > >
-> > > > ffffffff81e96100 <lock_sock_nested>:
-> > > > ffffffff81e96100:       f3 0f 1e fa             endbr64
-> > > > ffffffff81e96104:       0f 1f 44 00 00          nopl   0x0(%rax,%ra=
-x,1)
-> > > > ffffffff81e96109:       b9 01 00 00 00          mov    $0x1,%ecx
-> > > > ffffffff81e9610e:       31 c0                   xor    %eax,%eax
-> > > > ffffffff81e96110:       f0 48 0f b1 8f 48 01    lock cmpxchg %rcx,0=
-x148(%rdi)
-> > > > ffffffff81e96117:       00 00
-> > > > ffffffff81e96119:       48 85 c0                test   %rax,%rax
-> > > > ffffffff81e9611c:       74 33                   je     ffffffff81e9=
-6151 <lock_sock_nested+0x51>
-> > > > ...// slow path
-> > > > ffffffff81e96151:       2e e9 19 c4 33 00       cs jmp ffffffff821d=
-2570 <__pi___x86_return_thunk>
-> > >
-> > > Wow, this is interesting !
-> >
-> > And using try_cmpxchg() might remove the "test %rax,%rax" after the
-> > "lock cmpxchg"
-> >
-> > >
-> > > Should we use __SPIN_LOCK_UNLOCKED() for the old
-> > > value too ?  Looks like parisc assigns a non-zero value for it.
-> > >
-> > > arch/parisc/include/asm/spinlock_types.h:5:#define
-> > > __ARCH_SPIN_LOCK_UNLOCKED_VAL 0x1a46
-> > >
-> >
-> > I will take a look thanks !
->
-> WIth this diff on top of V1 we indeed remove one test.
+Introduce a new sysctl knob, net.ipv4.tcp_purge_receive_queue, to
+address a memory leak scenario related to TCP sockets.
 
-Cool, I was wondering why the test was needed and
-understood it was just to clear ZF which we can reuse
-with try_cmpxchg() !
+Issue:
+When a TCP socket in the CLOSE_WAIT state receives a RST packet, the
+current implementation does not clear the socket's receive queue. This
+causes SKBs in the queue to remain allocated until the socket is
+explicitly closed by the application. As a consequence:
 
-With that diff:
+1. The page pool pages held by these SKBs are not released.
+2. The associated page pool cannot be freed.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+RFC 9293 Section 3.10.7.4 specifies that when a RST is received in
+CLOSE_WAIT state, "all segment queues should be flushed." However, the
+current implementation does not flush the receive queue.
 
-Thanks!
+Solution:
+Add a per-namespace sysctl (net.ipv4.tcp_purge_receive_queue) that,
+when enabled, causes the kernel to purge the receive queue when a RST
+packet is received in CLOSE_WAIT state. This allows immediate release
+of SKBs and their associated memory resources.
 
->
-> diff --git a/net/core/sock.c b/net/core/sock.c
-> index 2a03d1432111f2dcea9d700f80efb7b0bb4a47d8..86185f194d64b4eea0835ee0f=
-9b53fda184c73cb
-> 100644
-> --- a/net/core/sock.c
-> +++ b/net/core/sock.c
-> @@ -3782,11 +3782,14 @@ void noinline lock_sock_nested(struct sock
-> *sk, int subclass)
->         might_sleep();
->  #ifdef CONFIG_64BIT
->         if (sizeof(struct slock_owned) =3D=3D sizeof(long)) {
-> -               socket_lock_t tmp;
-> +               socket_lock_t tmp, old;
->
->                 tmp.slock =3D __SPIN_LOCK_UNLOCKED(tmp.slock);
->                 tmp.owned =3D 1;
-> -               if (likely(!cmpxchg(&sk->sk_lock.combined, 0, tmp.combine=
-d)))
-> +               old.slock =3D __SPIN_LOCK_UNLOCKED(old.slock);
-> +               old.owned =3D 0;
-> +               if (likely(try_cmpxchg(&sk->sk_lock.combined,
-> +                                      &old.combined, tmp.combined)))
->                         return;
->         }
->  #endif
->
-> 00000000000077c0 <lock_sock_nested>:
->     77c0:       f3 0f 1e fa             endbr64
->     77c4:       e8 00 00 00 00          call   77c9 <lock_sock_nested+0x9=
->
->                         77c5: R_X86_64_PLT32    __fentry__-0x4
->     77c9:       b9 01 00 00 00          mov    $0x1,%ecx
->     77ce:       31 c0                   xor    %eax,%eax
->     77d0:       f0 48 0f b1 8f 48 01    lock cmpxchg %rcx,0x148(%rdi)
->     77d7:       00 00
->     77d9:       75 06                   jne    77e1
-> <lock_sock_nested+0x21> // slow path
->     77db:       2e e9 00 00 00 00       cs jmp 77e1 <lock_sock_nested+0x2=
-1>
->                         77dd: R_X86_64_PLT32    __x86_return_thunk-0x4
+The feature is disabled by default to maintain backward compatibility
+with existing behavior.
+
+Signed-off-by: Leon Hwang <leon.huangfu@shopee.com>
+---
+ Documentation/networking/ip-sysctl.rst         | 18 ++++++++++++++++++
+ .../net_cachelines/netns_ipv4_sysctl.rst       |  1 +
+ include/net/netns/ipv4.h                       |  1 +
+ net/ipv4/sysctl_net_ipv4.c                     |  9 +++++++++
+ net/ipv4/tcp_input.c                           | 16 ++++++++++++++++
+ 5 files changed, 45 insertions(+)
+
+diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
+index d1eeb5323af0..71a529462baa 100644
+--- a/Documentation/networking/ip-sysctl.rst
++++ b/Documentation/networking/ip-sysctl.rst
+@@ -1441,6 +1441,24 @@ tcp_rto_max_ms - INTEGER
+ 
+ 	Default: 120,000
+ 
++tcp_purge_receive_queue - BOOLEAN
++	When a socket in the TCP_CLOSE_WAIT state receives a RST packet, the
++	default behavior is to not clear its receive queue.  As a result,
++	any SKBs in the queue are not freed until the socket is closed.
++	Consequently, the pages held by these SKBs are not released, which
++	can also prevent the associated page pool from being freed.
++
++	If enabled, the receive queue is purged upon receiving the RST,
++	allowing the SKBs and their associated memory to be released
++	promptly.
++
++	Possible values:
++
++	- 0 (disabled)
++	- 1 (enabled)
++
++	Default: 0 (disabled)
++
+ UDP variables
+ =============
+ 
+diff --git a/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst b/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
+index beaf1880a19b..f2c42e7d84a9 100644
+--- a/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
++++ b/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
+@@ -123,6 +123,7 @@ unsigned_long                   sysctl_tcp_comp_sack_delay_ns
+ unsigned_long                   sysctl_tcp_comp_sack_slack_ns                                                        __tcp_ack_snd_check
+ int                             sysctl_max_syn_backlog
+ int                             sysctl_tcp_fastopen
++u8                              sysctl_tcp_purge_receive_queue
+ struct_tcp_congestion_ops       tcp_congestion_control                                                               init_cc
+ struct_tcp_fastopen_context     tcp_fastopen_ctx
+ unsigned_int                    sysctl_tcp_fastopen_blackhole_timeout
+diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
+index 8e971c7bf164..ab973f30f502 100644
+--- a/include/net/netns/ipv4.h
++++ b/include/net/netns/ipv4.h
+@@ -220,6 +220,7 @@ struct netns_ipv4 {
+ 	u8 sysctl_tcp_nometrics_save;
+ 	u8 sysctl_tcp_no_ssthresh_metrics_save;
+ 	u8 sysctl_tcp_workaround_signed_windows;
++	u8 sysctl_tcp_purge_receive_queue;
+ 	int sysctl_tcp_challenge_ack_limit;
+ 	u8 sysctl_tcp_min_tso_segs;
+ 	u8 sysctl_tcp_reflect_tos;
+diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
+index 643763bc2142..da30970bb5d5 100644
+--- a/net/ipv4/sysctl_net_ipv4.c
++++ b/net/ipv4/sysctl_net_ipv4.c
+@@ -1641,6 +1641,15 @@ static struct ctl_table ipv4_net_table[] = {
+ 		.extra1		= SYSCTL_ONE_THOUSAND,
+ 		.extra2		= &tcp_rto_max_max,
+ 	},
++	{
++		.procname       = "tcp_purge_receive_queue",
++		.data           = &init_net.ipv4.sysctl_tcp_purge_receive_queue,
++		.maxlen         = sizeof(u8),
++		.mode           = 0644,
++		.proc_handler   = proc_dou8vec_minmax,
++		.extra1         = SYSCTL_ZERO,
++		.extra2         = SYSCTL_ONE,
++	},
+ };
+ 
+ static __net_init int ipv4_sysctl_init_net(struct net *net)
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 6c3f1d031444..43f32fb5831d 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -4895,6 +4895,7 @@ EXPORT_IPV6_MOD(tcp_done_with_error);
+ /* When we get a reset we do this. */
+ void tcp_reset(struct sock *sk, struct sk_buff *skb)
+ {
++	const struct net *net = sock_net(sk);
+ 	int err;
+ 
+ 	trace_tcp_receive_reset(sk);
+@@ -4911,6 +4912,21 @@ void tcp_reset(struct sock *sk, struct sk_buff *skb)
+ 		err = ECONNREFUSED;
+ 		break;
+ 	case TCP_CLOSE_WAIT:
++		/* RFC9293 3.10.7.4. Other States
++		 *   Second, check the RST bit:
++		 *     CLOSE-WAIT STATE
++		 *
++		 * If the RST bit is set, then any outstanding RECEIVEs and
++		 * SEND should receive "reset" responses.  All segment queues
++		 * should be flushed.  Users should also receive an unsolicited
++		 * general "connection reset" signal.  Enter the CLOSED state,
++		 * delete the TCB, and return.
++		 *
++		 * If net.ipv4.tcp_purge_receive_queue is enabled,
++		 * sk_receive_queue will be flushed too.
++		 */
++		if (unlikely(net->ipv4.sysctl_tcp_purge_receive_queue))
++			skb_queue_purge(&sk->sk_receive_queue);
+ 		err = EPIPE;
+ 		break;
+ 	case TCP_CLOSE:
+-- 
+2.52.0
+
 
