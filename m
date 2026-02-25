@@ -1,86 +1,77 @@
-Return-Path: <netdev+bounces-261075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261076-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8GHNHFFmn2lRagQAu9opvQ
-	(envelope-from <netdev+bounces-261075-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 22:14:57 +0100
+	id 0JDMMaBmn2lRagQAu9opvQ
+	(envelope-from <netdev+bounces-261076-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 22:16:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2EFF19DB96
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 22:14:56 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60FF819DBC9
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 22:16:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C46DC303FAD0
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 21:11:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F2A2D3043AEF
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 21:15:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3677C30CDB6;
-	Wed, 25 Feb 2026 21:11:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4EE724E4C6;
+	Wed, 25 Feb 2026 21:15:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="rt4qkx8h"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mg4zm1Qg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8D1427A927
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 21:11:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A664F23E35F
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 21:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772053883; cv=none; b=aFn5qZ/XttOSf4l0l+7vnUj09jEkOY0F5g9dfEmeOmcSQy+NwKCQCD+PQ9L/EE5LTNr5fY8Ojs1PR29Nx6c8EKu227MvbS2qAJm4EVtuFJZphmgSM5gzIOfrtqT6+wPZa97DBFwMYp+WRp4pmdJLAhrNXAzTacROVXjfIEr2oUE=
+	t=1772054154; cv=none; b=dPwgDFWhdwhLQKVi5ZBJP3e/rFJgOb2lp0+aqg8tz5xcNXRpwEy5rggjhbY8R6dBC5hVzaow/s6kgInNBybUYj6zhiHT7cskoUCglD5fPYFQN8DDozyIknPiJN+y8Wvkn6lABMIyq+GLY+jXEJX7RXDr1u8QFaw/hThFwPxmIFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772053883; c=relaxed/simple;
-	bh=5yCS2ENyGebYWm4QR6WtcX3t1/V4wC3uAWzvrnxV/zc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PnhHNbgbU8SzIzmyEKQtx3qf26LdaG+CsjOEC+FojyhC6K1E182KZbUHDlGErUqsIhhrQFeEjwT3eZKqBJhCbeBYGObehVu10z1VDZczGyjtpDkdNMfXuc30JtOa3AUYijw5IYnDtLOE40b3/G6X3MXeG9X6uk5JeeoCDOkeS68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=rt4qkx8h; arc=none smtp.client-ip=74.125.82.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-2b4520f6b32so143188eec.0
-        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 13:11:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1772053881; x=1772658681; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=BNmTXCq2fTVbuDc5LvGj3dl9DEC7Kg0+x8gfaozwtk8=;
-        b=rt4qkx8hRtX109bztZ9Ssuc4lE/dVSGg9I97Nh+l/XPVA/e7Rs8rDpGlaFU33ctTNo
-         1Rr0ExiCsN5AwrGaUlRklqVXGTFCV5XTUlBWsZJxW/KORCKj6no1Dk3yLuwxj10Pi9i/
-         dxbpNhTX7AVFQOkDA4DwZJY1bk3yIAjwYMlA0G4r+budYLgwfCPV/w7+9HwcZwRxmwGe
-         k2eoCxFcOybpPkjDWvY0hbOpJrE6zCH5YXhYGrLSWT/u79fx+MT7rnL9XMERrO8Uvu5d
-         aJdsnN9xM/vSbg4+TJADpi1gZYAOH8aQrJJM/m8h6XNMaNR/gF7l879uvJ8XwFuQZMMC
-         kGsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772053881; x=1772658681;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BNmTXCq2fTVbuDc5LvGj3dl9DEC7Kg0+x8gfaozwtk8=;
-        b=fsNvZ9FU4lsbDEoskpi4DC6mTsH4zDbpIp+mKj0ieeOb8ojHgaW/UaL7hZgrBcsbYC
-         A98lRx59YCSPOk7u+sodOPq2C39AaXDmQibFOwsYa7HvZlv+w+OJuSURgiR5iFL9k1vA
-         xHrc/sACFc5yqHNNqcHSX8t5D4BqhN/l982GMtJcSI0/UqaHdoH+NRZD2wWTfxvyBN3F
-         uGQfQJGA8SvPdYKMcuyBNu/yo4SsI9/elZHu3mT7YE1X1yVndBeuU8ZeZBmI/nyaleI6
-         0/hno2gDSCCtQ4XtgvRGL77nj5fMxNZJLw+Z+Ai9jAoedOpoh2HeWIX9bELkihpWxtiz
-         7n4g==
-X-Gm-Message-State: AOJu0Yyw8SU3PFa6L1h65FrdCF2X8vd1TmaVZpQcfinrRYJEYRyZAlId
-	OhTGQYvojL4ILiX98IacOTe0ytJ/rHZcCJTneB3zEu4tiyOK9L3cbsBqNJWdUyjCcng9BIYpWWZ
-	9zsrbFfg=
-X-Gm-Gg: ATEYQzywipU6AIshj9RUfbhHh/tL1vXgblu/EVedkZL4uiTDRmEC5CVeZZdHeIAiluL
-	pS1Gi+F3s/FTI8pBAc9u246jzLSaRxNGdFnb2L7pgP7yO4HxZrCK5yE17CXHYg035n/lOI7cF1M
-	eFuBzHzDu+BQ6TUmIb8UFuLQ2LBL6+CIq4X2Knazl2C6YnNNFe1tyV7jbotE48kJ7X48tG1UnK2
-	P5sZ/fzmbFPun6kbNgZ3wO3o3/oBjfjapXlXnpzn6CSVJixnyqzrqxdLOYTCbV+azzPiqCTdto5
-	aAA5bmgkWezcRowoEaW3i5p3W3CO4P7Lf/ebgTLb6OzHOYM6c2UFkfw+caMMhWCG+4CVG7Vaipm
-	lHLDQ87rdtOG/xB3tzugyBuINxqBQliJsT2b7mHjvs6C2LQKnhi/mqkJj4ED+sP46Nl48au3u2S
-	oxa25t1H2UKd9cA29yNs88Mg3CJtWYV9l/LElyYCDlA/ADJupZrD0cYdNA49aObg==
-X-Received: by 2002:a05:693c:3002:b0:2ba:7b63:3f4f with SMTP id 5a478bee46e88-2bd7b9f1ddemr6683017eec.15.1772053880596;
-        Wed, 25 Feb 2026 13:11:20 -0800 (PST)
-Received: from phoenix.lan (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2bdd1bce276sm171898eec.3.2026.02.25.13.11.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Feb 2026 13:11:20 -0800 (PST)
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH iproute2] ss: suppress netlink errors for unsupported protocols
-Date: Wed, 25 Feb 2026 13:10:25 -0800
-Message-ID: <20260225211118.314008-1-stephen@networkplumber.org>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1772054154; c=relaxed/simple;
+	bh=ywTLj6d3tUU3utmjwhHS4lz2bj5RQM9ID63YDWolGmI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kc2PWwXf2KKOIZq5wGNGHtyI10qmrXslKCYsOAy2uRWXyRmK/CgavkFWthJKhUZmEHNO+dZ95kbOx3a1D1lF4rg/3iAOfNeYfu9q4pVJsQA93LdZYtucLDraMPXj50E4873f9pY13/97bu69R46Mg7rw35Fx9klnPp2HF1w/Nd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mg4zm1Qg; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772054154; x=1803590154;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ywTLj6d3tUU3utmjwhHS4lz2bj5RQM9ID63YDWolGmI=;
+  b=mg4zm1QgGj8yQXNLGc929PEHrn26IGxRrsD7GL9S2nxRQRgnWPWegkIX
+   1qlYv/imsqEDwJeprNgSe4VJRq7uCfvXgemzLbaFVQpTXhd//6JPY5XUh
+   pb9NwuBM3l5tvvpH6Pb0FEjaaozZUjL9wuEVMMU3DFy9beRNn/Ao/wO/V
+   npqIm4rh7TBION6nhLXcHFteKMzoSnq7ezibIXrnD5W36axtDjV535/0B
+   4BXGXQQw88n/Zn+61F1QkZAP9bx6+YT2PaOe97h+ai+8dkxmePYICt1H4
+   yTG+5SxSL7ZtCl7Qx4HaMYEHcWRUyk94+VyOLBEenXHphQGhjOPCPgGrx
+   w==;
+X-CSE-ConnectionGUID: sxmcgx/DRcu0w3ZiKjkg3Q==
+X-CSE-MsgGUID: Cvww5SkER3GvGu0oWmILOw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11712"; a="73013752"
+X-IronPort-AV: E=Sophos;i="6.21,311,1763452800"; 
+   d="scan'208";a="73013752"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2026 13:15:53 -0800
+X-CSE-ConnectionGUID: Bd7vG9trQbie0eKktwVJ7Q==
+X-CSE-MsgGUID: 8LsmURh2RHGlz1CSLI6yrA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,311,1763452800"; 
+   d="scan'208";a="239349674"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmviesa002.fm.intel.com with ESMTP; 25 Feb 2026 13:15:53 -0800
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net v2 00/12][pull request] Intel Wired LAN Driver Updates 2026-02-19 (idpf, ice, i40e, ixgbevf, e1000e)
+Date: Wed, 25 Feb 2026 13:15:31 -0800
+Message-ID: <20260225211546.1949260-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,75 +80,124 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.06 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[networkplumber-org.20230601.gappssmtp.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWO(0.00)[2];
+	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261076-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261075-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-0.987];
 	RCVD_COUNT_FIVE(0.00)[5];
-	DKIM_TRACE(0.00)[networkplumber-org.20230601.gappssmtp.com:+];
 	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C2EFF19DB96
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 60FF819DBC9
 X-Rspamd-Action: no action
 
-Error messages from sock_diag were only suppressed for extended
-protocols (> 255).  Protocols like SCTP and DCCP also get EINVAL
-when their kernel modules are not loaded.  Remove the conditional
-so all protocols suppress the error.
+For idpf:
+Li Li moves the check for software marker to occur after incrementing
+next to clean to avoid re-encountering the same packet. He also adds a
+couple of checks to prevent NULL pointer dereferences and NULLs rss_key,
+after free, in error path so that later checks are properly evaluated.
 
-This fixes the problem where:
-  $ ss >/dev/null
-RTNETLINK answers: Invalid argument
+Brian Vazquez adjusts IRQ naming to have correlation with netdev naming.
 
-Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+Sreedevi removes validation of action type as part of ntuple rule
+deletion.
+
+For ice:
+Aaron Ma breaks RDMA initialization into two steps and adjusts calls so
+that VSIs are entirely configured before plugging.
+
+Michal Schmidt fixes initialization of loopback VSI to have proper
+resources allocated to allow for loopback testing to occur.
+
+For i40e:
+Thomas Gleixner fixes a leak of preempt count by replacing get_cpu()
+with smp_processor_id().
+
+For ixgbevf:
+Jedrzej adds a check for mailbox version before attempting to call an
+associated link state call that is supported in that mailbox version.
+
+For e1000e:
+Vitaly clears power gating feature for Panther Lake systems to avoid
+packet issues.
 ---
- misc/ss.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+v2:
+- Drop last patch; e1000e XTAL clock adjustment
 
-diff --git a/misc/ss.c b/misc/ss.c
-index b3566f6b..7520003a 100644
---- a/misc/ss.c
-+++ b/misc/ss.c
-@@ -4120,13 +4120,13 @@ static int inet_show_netlink(struct filter *f, FILE *dump_fp, int protocol)
- 	if (preferred_family == PF_INET6)
- 		family = PF_INET6;
- 
--	/* extended protocol will use INET_DIAG_REQ_PROTOCOL,
--	 * not supported by older kernels. On such kernel
--	 * rtnl_dump will bail with rtnl_dump_error().
--	 * Suppress the error to avoid confusing the user
-+	/* Suppress netlink errors. Older kernels do not support extended
-+	 * protocol requests using INET_DIAG_REQ_PROTOCOL, and some protocols
-+	 * may not be available in the running kernel (e.g. SCTP, DCCP).
-+	 * In both cases the kernel returns EINVAL which would cause
-+	 * rtnl_dump_error() to print a confusing "RTNETLINK answers" error.
- 	 */
--	if (protocol > 255)
--		rth.flags |= RTNL_HANDLE_F_SUPPRESS_NLERR;
-+	rth.flags |= RTNL_HANDLE_F_SUPPRESS_NLERR;
- 
- again:
- 	if ((err = sockdiag_send(family, rth.fd, protocol, f)))
+v1: https://lore.kernel.org/netdev/20260220004027.729384-1-anthony.l.nguyen@intel.com/
+
+The following are changes since commit 2f61f38a217462411fed950e843b82bc119884cf:
+  net: stmmac: fix timestamping configuration after suspend/resume
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 200GbE
+
+Aaron Ma (1):
+  ice: recap the VSI and QoS info after rebuild
+
+Brian Vazquez (1):
+  idpf: change IRQ naming to match netdev and ethtool queue numbering
+
+Jedrzej Jagielski (1):
+  ixgbevf: fix link setup issue
+
+Li Li (4):
+  idpf: increment completion queue next_to_clean in sw marker wait
+    routine
+  idpf: skip deallocating bufq_sets from rx_qgrp if it is NULL
+  idpf: skip deallocating txq group's txqs if it is NULL
+  idpf: nullify pointers after they are freed
+
+Michal Schmidt (1):
+  ice: fix crash in ethtool offline loopback test
+
+Sreedevi Joshi (1):
+  idpf: Fix flow rule delete failure due to invalid validation
+
+Thomas Gleixner (1):
+  i40e: Fix preempt count leak in napi poll tracepoint
+
+Vitaly Lifshits (2):
+  e1000e: introduce new board type for Panther Lake PCH
+  e1000e: clear DPG_EN after reset to avoid autonomous power-gating
+
+ drivers/net/ethernet/intel/e1000e/defines.h   |  1 +
+ drivers/net/ethernet/intel/e1000e/e1000.h     |  4 +-
+ drivers/net/ethernet/intel/e1000e/hw.h        |  2 -
+ drivers/net/ethernet/intel/e1000e/ich8lan.c   | 31 ++++++++++++-
+ drivers/net/ethernet/intel/e1000e/netdev.c    | 15 +++----
+ drivers/net/ethernet/intel/i40e/i40e_trace.h  |  2 +-
+ drivers/net/ethernet/intel/ice/ice.h          |  1 +
+ drivers/net/ethernet/intel/ice/ice_base.c     |  5 ++-
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  |  4 ++
+ drivers/net/ethernet/intel/ice/ice_idc.c      | 44 ++++++++++++++-----
+ drivers/net/ethernet/intel/ice/ice_lib.c      | 15 ++++---
+ drivers/net/ethernet/intel/ice/ice_main.c     |  7 ++-
+ .../net/ethernet/intel/idpf/idpf_ethtool.c    |  3 --
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    |  1 +
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 14 ++++--
+ drivers/net/ethernet/intel/ixgbevf/vf.c       |  3 +-
+ 16 files changed, 114 insertions(+), 38 deletions(-)
+
 -- 
-2.51.0
+2.47.1
 
 
