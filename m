@@ -1,353 +1,247 @@
-Return-Path: <netdev+bounces-260860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260861-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eDqSJCDJnmm0XQQAu9opvQ
-	(envelope-from <netdev+bounces-260860-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:04:16 +0100
+	id sNNSKQ3Knmm0XQQAu9opvQ
+	(envelope-from <netdev+bounces-260861-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:08:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id C41D2195768
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:04:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F128195806
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:08:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B69023007A74
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:03:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E1049300D161
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:04:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0DFA38E5F7;
-	Wed, 25 Feb 2026 10:03:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C9A638F929;
+	Wed, 25 Feb 2026 10:04:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="bY9jJ7Cc";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="FIXe/zs/";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Kuto3dG5";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="8X6DC6sq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aqSFo7u3";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="t9e1us5M"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D692A38F25D
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 10:03:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9296738F258
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 10:03:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772013788; cv=none; b=tVfuOp6QJaDmlBr0+YaUKywsxqCAsbUYExGTC4DH9npP7eXxIXRZnSo03rQ2A16RV4Ct90pZVxXagntInSDyrY8ZIbpv4ttVsolBvlc69gv0Hm70AYIP9+4NSJXYoqM0mEmbPqWGHXarHIB9jOs56kMRaiQoYMlDQcL0CEb//Iw=
+	t=1772013839; cv=none; b=CeT8oJfr7JRius0d5Ad3vrac4TAuftag2lYUd+aw/KjS+EpPbCO2NFpI4pDO9hLU7qcOL4TWRLU+QYMA3TzTq25PjK15eg6/ztxqPsBDi1ScTsXzW5zODu7KIQ45rjgas5pG4T/ujEi3ghYgg7BPdYuk61M6MjD2C6lVZ8w4HcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772013788; c=relaxed/simple;
-	bh=m6B9jhZ+B0oMB2+Ycjj3lO7A0wNXCx7dGZotLgXREr0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fpmja5CEkfgYSuAIKOd3fe5RpprmW2WL7J4oVeXYwmAn1FvYzfsS70vU/hwxrLZYhXnO4fB0NGDFNFUqLBs175RaYW8uXQ2Qf3QEqk50GzgUU9giKcLro+4/gRXCeYRN67Ucvkkv4hsFTRfg31rzxVGandHFae+smEiFhTgmWAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=bY9jJ7Cc; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=FIXe/zs/; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Kuto3dG5; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=8X6DC6sq; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 19AF75BD50;
-	Wed, 25 Feb 2026 10:03:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772013785; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
+	s=arc-20240116; t=1772013839; c=relaxed/simple;
+	bh=MlGwjzWpXwzqj1theVwJR7UUQV7kxnwLCrbDJttd5R4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JWBs+AfitMZsZwNfZiD4TTNXvgVb45npC6puDuIOVe0Bene3oM6Tdx4aNUSc6zlFeahPJVK27oqk8BwD964G1qXItkMwsO0e8ZGy//hrn4IcW3JsLDHJoGfo7f06jCF8FbcoN4XBsmGGrJJJqqovZbOQLfV50cQ5LnvPNJjM8Qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aqSFo7u3; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=t9e1us5M; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772013837;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uhtVnzPxAUjTmMJ3BEWMtQwHsrUk9NlVIiFobRqyYuc=;
-	b=bY9jJ7CcuUnWZcf8RSfO5rKHMDBkMTmsBCHpNa0Qvh5H3m5EHpKg1ooYDY1pzeZjYyUM3z
-	FVMn+EXle0IB+3kt8IVySv0lYHEio9lFmIREHkrqr82ZKgdfDpwtv0x9UHEN1xmrUuOHjq
-	vDc3MCywlLduEWJ9UGKUHtoOyHS01Z8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772013785;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uhtVnzPxAUjTmMJ3BEWMtQwHsrUk9NlVIiFobRqyYuc=;
-	b=FIXe/zs/EAIPY+8kNaiwGkZldVd/UwHB2dJOp//vfxBCeBpshTE+8mfem49XZdBcin1oUc
-	ZUzZXWng/ipe4iDg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772013784; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uhtVnzPxAUjTmMJ3BEWMtQwHsrUk9NlVIiFobRqyYuc=;
-	b=Kuto3dG5+tzwpYw8k9/FszymJeXruy4E9DFXkgVanZaGMDn1mqBGuXkibCNGp53WBjSPvi
-	Dd1QXgY517juOutvufuPAdKYrQimKSybxjRZRrN+bRkAi6UWamLWWh8lpHNL7Q0XjVGJuH
-	77cck8bVEp6/2t93EWhkqCnvqDseg3I=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772013784;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uhtVnzPxAUjTmMJ3BEWMtQwHsrUk9NlVIiFobRqyYuc=;
-	b=8X6DC6sqXflIr50LcsdzT9t8ROmNH+ZsKVqROZx8MedyKHZQaopo7nj91qXa14T82JqU1Z
-	DsnN20yHjpn+rtCQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E18CA3EA65;
-	Wed, 25 Feb 2026 10:03:01 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id oNySMtXInmn7PQAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Wed, 25 Feb 2026 10:03:01 +0000
-Message-ID: <0e4c862e-cde4-4fa6-b9fa-3667429abf29@suse.de>
-Date: Wed, 25 Feb 2026 11:02:49 +0100
+	bh=pdDT+ULPxR7vs0Kn+FgSJEXLQt+Ky2Cw9evRXmYJ0ZA=;
+	b=aqSFo7u3TPDOhVRiJEOHdInGecH73KkpYWLQhACNv6pTOshgNzf2sL/Ej0JkfGd1HzlvRM
+	k/VsZdZ7o6GF650vXaC0WRVw9uQrAjjE5U7/Myn/NlbYE6u6vS6IfR490DsaUOtI2Anfos
+	E2r/MRnxo1OINGwKxHPqK1rTDm2x6zU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-470-0EjsRxztNBaw8jt9L8dizg-1; Wed, 25 Feb 2026 05:03:56 -0500
+X-MC-Unique: 0EjsRxztNBaw8jt9L8dizg-1
+X-Mimecast-MFC-AGG-ID: 0EjsRxztNBaw8jt9L8dizg_1772013835
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-48071615686so14840175e9.1
+        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 02:03:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1772013835; x=1772618635; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pdDT+ULPxR7vs0Kn+FgSJEXLQt+Ky2Cw9evRXmYJ0ZA=;
+        b=t9e1us5MxjbgUPdNIDsBGADQj0ZVFf9J/6G1QtD40/FONFIhYhLEq8XZeAI6EBpuuL
+         HG4ZYW00Jjki5sxFDOH8HvSNraEhcSQjD6vGK7Qhj9i9PwmcGcdYY0nY1pIZZPoiB45L
+         4zhg1z4CpAeN0Bz6XQylGboGXg9AWzBR2eoOT8XXAbJPJ8PuNrkdIqstqY67mTl+xVZP
+         ot6FMAViBXxQFD1/hJrxSiqwnXnhytuP9sG7Y4w5fTLbnqtu+QKa0CuMmC52+3Zp7Jrh
+         IoGgI5BCU2OWkIAQ1hzW26QfgqZKSJ8qCn1+J61aqjsI26M2v38jORrGdCKeUHqJuUas
+         4ByQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772013835; x=1772618635;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pdDT+ULPxR7vs0Kn+FgSJEXLQt+Ky2Cw9evRXmYJ0ZA=;
+        b=n8LkIMqrcYrE8+JTur76TivumZnYRwa+h/DYyEFaui0aPelSJC5augoxzR7/xsPUTO
+         qWtvb0kf5q8iQB4MujqIQM7PxFjZXn9U8iYPUR0EplOmxyVijSK/xk1kQuLQIRzuj9NF
+         8bAVFnm4vmSisUWAtKAjBVLWnr0JrXHGt/8q3DqxY8TfhRl14mJHyY2j32i0S/fzpJUp
+         ZQmlwbD5RjyfQXGnewJYqrdm93VzPA3lejk6VDzGxcLds9NV8/xSDYkO7AEnHov5znVa
+         T9n8TG8X/K0caRQXjrCYz0fY6AIIqHB8itlg16E3mwfp5PtlqQfsU7VH/K90Rv4EmspV
+         tn3g==
+X-Gm-Message-State: AOJu0YwpgmcF1RHzI+K/kmuOF90inCYXx8LGO/pbI5Ajj9L5t5X8hpfW
+	96YL2pZoyvSDZpL2+xe7t2jQt//RKszka4RWJf2D818zC3ygUC4N6cJsB9gXTklWENV4VOwsbBn
+	orLDTgLvWkWVlVEQqpRmulPgzwwvwynUEThNmBlZrrQiarZOu1ES0X2iPq4s40amubw==
+X-Gm-Gg: ATEYQzx4DyM864Gd8zDZl999OUUQxmBmxVQUarjr7IW+aNfN8/LvBXmqbNmFtR13cti
+	8pWvw8d1YE1GnIO3mbNyW5aVn6bcef1cIXChKG5GcXT5+N5A1S287KuSh2NkDmV6CM2SD4Kcftd
+	l4I/z6mAym+Hil0/nLcWaeauW+2+TEpagqh/YeofZGjSDPn2VdrtWwEB0Uqo4sJFdW7rKnGGG4I
+	slRFefec2lJwDTH88LS04qtW6J7Bg9rSJcjxlr3p7ugIBQwy6pvmwHT6M+PVljhGg9WI9M6x8od
+	Oa7zAyN3A1aqDFGZksEkQJgY9RyDhK8tFrxmFlHWmZgarzLPTtoBODaa/uKkfpPXwTp3MU9XQdR
+	3js4QbiREXKuNGsh7Svm83yZUXOiFvBEVKjoAA7K2pYnWdA==
+X-Received: by 2002:a05:600c:8b66:b0:483:6f7c:19f4 with SMTP id 5b1f17b1804b1-483a95ed6f3mr232787315e9.30.1772013834429;
+        Wed, 25 Feb 2026 02:03:54 -0800 (PST)
+X-Received: by 2002:a05:600c:8b66:b0:483:6f7c:19f4 with SMTP id 5b1f17b1804b1-483a95ed6f3mr232786485e9.30.1772013833899;
+        Wed, 25 Feb 2026 02:03:53 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-79-166.inter.net.il. [80.230.79.166])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bd6f19f5sm143757215e9.1.2026.02.25.02.03.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Feb 2026 02:03:53 -0800 (PST)
+Date: Wed, 25 Feb 2026 05:03:50 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Srujana Challa <schalla@marvell.com>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
+	pabeni@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, ndabilpuram@marvell.com, kshankar@marvell.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net,v4,1/2] virtio_net: Improve RSS key size validation
+ and use NETDEV_RSS_KEY_LEN
+Message-ID: <20260225050154-mutt-send-email-mst@kernel.org>
+References: <20260224065850.962826-1-schalla@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] inet: add ip_local_port_step_width sysctl to
- improve port usage distribution
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, ij@kernel.org,
- chia-yu.chang@nokia-bell-labs.com, idosch@nvidia.com, willemb@google.com,
- dsahern@kernel.org, ncardwell@google.com, corbet@lwn.net, horms@kernel.org,
- pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, davem@davemloft.net
-References: <20260224150537.3800-1-fmancera@suse.de>
- <CAAVpQUAiCu3dJ56Le3_SSR2qg-+kKP3-HC09BRuVwbswEH=5kw@mail.gmail.com>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <CAAVpQUAiCu3dJ56Le3_SSR2qg-+kKP3-HC09BRuVwbswEH=5kw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Score: -4.30
-X-Spam-Level: 
-X-Spam-Flag: NO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260224065850.962826-1-schalla@marvell.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-260860-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260861-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[0xffsoftware.com:url,suse.de:mid,suse.de:dkim,suse.de:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C41D2195768
+	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0F128195806
 X-Rspamd-Action: no action
 
-On 2/25/26 7:28 AM, Kuniyuki Iwashima wrote:
-> On Tue, Feb 24, 2026 at 7:05 AM Fernando Fernandez Mancera
-> <fmancera@suse.de> wrote:
->>
->> With the current port selection algorithm, ports after a reserved port
->> range or long time used port are used more often than others [1]. This
->> causes an uneven port usage distribution. This combines with cloud
->> environments blocking connections between the application server and the
->> database server if there was a previous connection with the same source
->> port, leading to connectivity problems between applications on cloud
->> environments.
->>
->> The real issue here is that these firewalls cannot cope with
->> standards-compliant port reuse. This is a workaround for such situations
->> and an improvement on the distribution of ports selected.
->>
->> The proposed solution is to implement a variant of RFC 6056 Algorithm 5.
->> The step size is selected randomly on every connect() call ensuring it
->> is a coprime with respect to the size of the range of ports we want to
->> scan. This way, we can ensure that all ports within the range are
->> scanned before returning an error. To enable this algorithm, the user
->> must configure the new sysctl option "net.ipv4.ip_local_port_step_width".
->>
->> In addition, on graphs generated we can observe that the distribution of
->> source ports is more even with the proposed approach. [2]
->>
->> [1] https://0xffsoftware.com/port_graph_current_alg.html
->>
->> [2] https://0xffsoftware.com/port_graph_random_step_alg.html
->>
->> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
->> ---
->>   Documentation/networking/ip-sysctl.rst        |  9 ++++++++
->>   .../net_cachelines/netns_ipv4_sysctl.rst      |  1 +
->>   include/net/netns/ipv4.h                      |  1 +
->>   net/ipv4/inet_hashtables.c                    | 22 ++++++++++++++++---
->>   net/ipv4/sysctl_net_ipv4.c                    |  7 ++++++
->>   5 files changed, 37 insertions(+), 3 deletions(-)
->>
->> diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
->> index 6921d8594b84..9e2625ee778c 100644
->> --- a/Documentation/networking/ip-sysctl.rst
->> +++ b/Documentation/networking/ip-sysctl.rst
->> @@ -1612,6 +1612,15 @@ ip_local_reserved_ports - list of comma separated ranges
->>
->>          Default: Empty
->>
->> +ip_local_port_step_width - INTEGER
->> +        Defines the numerical maximum increment between successive port
->> +        allocations within the ephemeral port range when an unavailable port is
->> +        reached. This can be used to mitigate accumulated nodes in port
->> +        distribution when reserved ports have been configured. Please note that
->> +        port collisions may be more frequent in a system with a very high load.
->> +
->> +        Default: 0 (disabled)
->> +
->>   ip_unprivileged_port_start - INTEGER
->>          This is a per-namespace sysctl.  It defines the first
->>          unprivileged port in the network namespace.  Privileged ports
->> diff --git a/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst b/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
->> index beaf1880a19b..c0e194a6e4ee 100644
->> --- a/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
->> +++ b/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
->> @@ -47,6 +47,7 @@ u8                              sysctl_tcp_ecn
->>   u8                              sysctl_tcp_ecn_fallback
->>   u8                              sysctl_ip_default_ttl                                                                ip4_dst_hoplimit/ip_select_ttl
->>   u8                              sysctl_ip_no_pmtu_disc
->> +u32                             sysctl_ip_local_port_step_width
->>   u8                              sysctl_ip_fwd_use_pmtu                       read_mostly                             ip_dst_mtu_maybe_forward/ip_skb_dst_mtu
->>   u8                              sysctl_ip_fwd_update_priority                                                        ip_forward
->>   u8                              sysctl_ip_nonlocal_bind
->> diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
->> index 8e971c7bf164..fb7c2235af21 100644
->> --- a/include/net/netns/ipv4.h
->> +++ b/include/net/netns/ipv4.h
->> @@ -166,6 +166,7 @@ struct netns_ipv4 {
->>          u8 sysctl_ip_autobind_reuse;
->>          /* Shall we try to damage output packets if routing dev changes? */
->>          u8 sysctl_ip_dynaddr;
->> +       u32 sysctl_ip_local_port_step_width;
->>   #ifdef CONFIG_NET_L3_MASTER_DEV
->>          u8 sysctl_raw_l3mdev_accept;
->>   #endif
->> diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
->> index f5826ec4bcaa..1992dc21818f 100644
->> --- a/net/ipv4/inet_hashtables.c
->> +++ b/net/ipv4/inet_hashtables.c
->> @@ -16,6 +16,7 @@
->>   #include <linux/wait.h>
->>   #include <linux/vmalloc.h>
->>   #include <linux/memblock.h>
->> +#include <linux/gcd.h>
->>
->>   #include <net/addrconf.h>
->>   #include <net/inet_connection_sock.h>
->> @@ -1046,12 +1047,12 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
->>          struct net *net = sock_net(sk);
->>          struct inet_bind2_bucket *tb2;
->>          struct inet_bind_bucket *tb;
->> +       int step, scan_step, l3mdev;
->> +       u32 index, max_rand_step;
->>          bool tb_created = false;
->>          u32 remaining, offset;
->>          int ret, i, low, high;
->>          bool local_ports;
->> -       int step, l3mdev;
->> -       u32 index;
->>
->>          if (port) {
->>                  local_bh_disable();
->> @@ -1065,6 +1066,8 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
->>
->>          local_ports = inet_sk_get_local_port_range(sk, &low, &high);
->>          step = local_ports ? 1 : 2;
->> +       scan_step = step;
->> +       max_rand_step = READ_ONCE(net->ipv4.sysctl_ip_local_port_step_width);
->>
->>          high++; /* [32768, 60999] -> [32768, 61000[ */
->>          remaining = high - low;
->> @@ -1083,9 +1086,22 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
->>           */
->>          if (!local_ports)
->>                  offset &= ~1U;
->> +
->> +       if (max_rand_step && remaining > 1) {
->> +               u32 range = (step == 1) ? remaining : (remaining / 2);
->> +               u32 upper_bound = min(range, max_rand_step);
->> +
->> +               scan_step = get_random_u32_inclusive(1, upper_bound);
->> +               while (gcd(scan_step, range) != 1) {
->> +                       scan_step++;
+On Tue, Feb 24, 2026 at 12:28:49PM +0530, Srujana Challa wrote:
+> Replace hardcoded RSS max key size limit with NETDEV_RSS_KEY_LEN to
+> align with kernel's standard RSS key length. Add validation for RSS
+> key size against spec minimum (40 bytes) and driver maximum. When
+> validation fails, gracefully disable RSS features and continue
+> initialization rather than failing completely.
 > 
-> If both scan_step and range are even, an extra
-> increment here saves 1/2 calls of gcd().
+> Cc: stable@vger.kernel.org
+> Fixes: 3f7d9c1964fc ("virtio_net: Add hash_key_length check")
+> Signed-off-by: Srujana Challa <schalla@marvell.com>
+
+--- should come here before changelog.
+
+> v3:
+> - Moved RSS key validation checks to virtnet_validate.
+> - Add fixes: tag and CC -stable
+> v4:
+> - Use NETDEV_RSS_KEY_LEN instead of type_max for the maximum rss key size.
+> ---
+>  drivers/net/virtio_net.c | 34 ++++++++++++++++++++++++----------
+>  1 file changed, 24 insertions(+), 10 deletions(-)
 > 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index db88dcaefb20..eeefe8abc122 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -381,8 +381,6 @@ struct receive_queue {
+>  	struct xdp_buff **xsk_buffs;
+>  };
+>  
+> -#define VIRTIO_NET_RSS_MAX_KEY_SIZE     40
+> -
+>  /* Control VQ buffers: protected by the rtnl lock */
+>  struct control_buf {
+>  	struct virtio_net_ctrl_hdr hdr;
+> @@ -486,7 +484,7 @@ struct virtnet_info {
+>  
+>  	/* Must be last as it ends in a flexible-array member. */
+>  	TRAILING_OVERLAP(struct virtio_net_rss_config_trailer, rss_trailer, hash_key_data,
+> -		u8 rss_hash_key_data[VIRTIO_NET_RSS_MAX_KEY_SIZE];
+> +		u8 rss_hash_key_data[NETDEV_RSS_KEY_LEN];
+>  	);
+>  };
+>  static_assert(offsetof(struct virtnet_info, rss_trailer.hash_key_data) ==
+> @@ -6627,6 +6625,29 @@ static int virtnet_validate(struct virtio_device *vdev)
+>  		__virtio_clear_bit(vdev, VIRTIO_NET_F_STANDBY);
+>  	}
+>  
+> +	if (virtio_has_feature(vdev, VIRTIO_NET_F_RSS) ||
+> +	    virtio_has_feature(vdev, VIRTIO_NET_F_HASH_REPORT)) {
+> +		u8 key_sz = virtio_cread8(vdev,
+> +					  offsetof(struct virtio_net_config,
+> +						   rss_max_key_size));
+> +		/* Spec requires at least 40 bytes */
+> +#define VIRTIO_NET_RSS_MIN_KEY_SIZE 40
+> +		if (key_sz < VIRTIO_NET_RSS_MIN_KEY_SIZE) {
+> +			dev_warn(&vdev->dev,
+> +				 "rss_max_key_size=%u is less than spec minimum %u, disabling RSS\n",
+> +				 key_sz, VIRTIO_NET_RSS_MIN_KEY_SIZE);
+> +			__virtio_clear_bit(vdev, VIRTIO_NET_F_RSS);
+> +			__virtio_clear_bit(vdev, VIRTIO_NET_F_HASH_REPORT);
+> +		}
+> +		if (key_sz > NETDEV_RSS_KEY_LEN) {
+> +			dev_warn(&vdev->dev,
+> +				 "rss_max_key_size=%u exceeds driver limit %u, disabling RSS\n",
+> +				 key_sz, NETDEV_RSS_KEY_LEN);
+> +			__virtio_clear_bit(vdev, VIRTIO_NET_F_RSS);
+> +			__virtio_clear_bit(vdev, VIRTIO_NET_F_HASH_REPORT);
 
-Ah right, thanks!
+you flipped the logic here and it makes no sense now.
 
-> 
->> +                       if (unlikely(scan_step > upper_bound))
->> +                               scan_step = 1;
->> +               }
->> +               scan_step *= step;
->> +       }
->>   other_parity_scan:
-> 
-> Doing "other_parity_scan" will be just redundant
-> unless scan_step is 2 ?
-> 
+Did you test this path?
 
-I have tried to preserve the parity behavior. Maybe I missed something, 
-let me explain why it isn't redundant in my opinion.
 
-In essence, when calculating the range we first look at "step". If step 
-== 1 we use all the remaining ports as range, otherwise we use remaining/2.
+So if device is powerful and supports a very big key size then...
+we disable the feature? how does this make sense?
 
-If step == 1 we do not care about parity so let's look at step == 2.
 
-If step == 2, we calculate a step_scan that is coprime with remaining/2. 
-Once we have it, we multiply it by 2 so we make sure scan_step is even.
-
-Then it works exactly like with the current algorithm, we look for the 
-even ports first, everytime we reach the high we subtract the size of 
-the range (remaining is actually a bad name IMHO) and continue. When i 
- >= remaining (keep on mind that i is incresed by step, that is by 2 on 
-each iteration), we start again for the odd numbers.
-
-They key piece is that step_scan/2 is coprime with remaining/2. As long 
-as that holds, we should visit first all the even numbers and then the 
-odd ones.
-
-Thanks,
-Fernando.
-
-> 
->>          port = low + offset;
->> -       for (i = 0; i < remaining; i += step, port += step) {
->> +       for (i = 0; i < remaining; i += step, port += scan_step) {
->>                  if (unlikely(port >= high))
->>                          port -= remaining;
->>                  if (inet_is_local_reserved_port(net, port))
->> diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
->> index 643763bc2142..c533374f656c 100644
->> --- a/net/ipv4/sysctl_net_ipv4.c
->> +++ b/net/ipv4/sysctl_net_ipv4.c
->> @@ -822,6 +822,13 @@ static struct ctl_table ipv4_net_table[] = {
->>                  .mode           = 0644,
->>                  .proc_handler   = ipv4_local_port_range,
->>          },
->> +       {
->> +               .procname       = "ip_local_port_step_width",
->> +               .maxlen         = sizeof(u32),
->> +               .data           = &init_net.ipv4.sysctl_ip_local_port_step_width,
->> +               .mode           = 0644,
->> +               .proc_handler   = proc_douintvec,
->> +       },
->>          {
->>                  .procname       = "ip_local_reserved_ports",
->>                  .data           = &init_net.ipv4.sysctl_local_reserved_ports,
->> --
->> 2.53.0
->>
+> +		}
+> +	}
+> +
+>  	return 0;
+>  }
+>  
+> @@ -6839,13 +6860,6 @@ static int virtnet_probe(struct virtio_device *vdev)
+>  	if (vi->has_rss || vi->has_rss_hash_report) {
+>  		vi->rss_key_size =
+>  			virtio_cread8(vdev, offsetof(struct virtio_net_config, rss_max_key_size));
+> -		if (vi->rss_key_size > VIRTIO_NET_RSS_MAX_KEY_SIZE) {
+> -			dev_err(&vdev->dev, "rss_max_key_size=%u exceeds the limit %u.\n",
+> -				vi->rss_key_size, VIRTIO_NET_RSS_MAX_KEY_SIZE);
+> -			err = -EINVAL;
+> -			goto free;
+> -		}
+> -
+>  		vi->rss_hash_types_supported =
+>  		    virtio_cread32(vdev, offsetof(struct virtio_net_config, supported_hash_types));
+>  		vi->rss_hash_types_supported &=
+> -- 
+> 2.25.1
 
 
