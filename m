@@ -1,258 +1,261 @@
-Return-Path: <netdev+bounces-261019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261020-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wAMBLK0an2kzZAQAu9opvQ
-	(envelope-from <netdev+bounces-261019-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 16:52:13 +0100
+	id kIvJFfscn2lcZAQAu9opvQ
+	(envelope-from <netdev+bounces-261020-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 17:02:03 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D52C19A028
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 16:52:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B2A219A2CF
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 17:01:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 74F1830D0525
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:44:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 00359316B8A4
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:48:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6CA83E8C4D;
-	Wed, 25 Feb 2026 15:39:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15FA33EFD38;
+	Wed, 25 Feb 2026 15:42:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b="bmgw4dBT"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="WxTeL4HM"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-of-o55.zoho.com (sender4-of-o55.zoho.com [136.143.188.55])
+Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010021.outbound.protection.outlook.com [52.101.61.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 839A93D3314
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 15:39:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72153EDADB;
+	Wed, 25 Feb 2026 15:42:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.21
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772033997; cv=pass; b=r1jU7WQ1n4SeMdkWrE3EbTOetWQTwHI3cvfuPV6bNqQsr2OjipRSEqcfHPJr91Iy7cURjiowaLDZ6BfUpYwI0bM6TPu3usZwkbkEnRFGTAXFxMYG5xE32Ncodh0alQpL7G55z/5KCBMS7NMci88qXjZwAMHG5ojR8FjvtVDFwfU=
+	t=1772034126; cv=fail; b=DgiJh+vM92iuDKXNHxWZlS/ekemBhiD42QhxTMN7SFTxtT9enjfoxQ1s54S1tSmyHDpBuHkNO2fQcvccc7K7cFCYhM4EQtLm2o9DvgI6SyW1IfVVQ4NURoboaPXdTqgPI6Kbj2c8bMNULHVLGs5JPVlVw87+CRp/mdXCfVxt+0M=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772033997; c=relaxed/simple;
-	bh=+7OfSqVl2JRMxe+6A+3HIBmjGoXVouUjJsi0i08PFFY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=phAKpIJJcaRA8Ss3cRJy9QJ839bm59pVt/TkJRyZZyaNhMBoH2pvLZkXVQMMIzlX1ze+wH+jzQ8c4Gs93TGroaf7Ms+TbI/AK8knDbj53N+6XCqwEo8aOoKOnWhv9WLPtEa7epHJJ6adZ4FSdu0A0K00+XZc0ld3Cz7Cps5vMXo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net; spf=pass smtp.mailfrom=machnikowski.net; dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b=bmgw4dBT; arc=pass smtp.client-ip=136.143.188.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=machnikowski.net
-ARC-Seal: i=1; a=rsa-sha256; t=1772033952; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=caasC2rZUM74NCYZnKVeLw8g3s2eW1JpFDunKiDWcKYnwYReTCypba5R6wY0Yh7Wz92X0ulIUobTBoLB44ZFUy51DRQHAsW4pzyVPQysGk0mjT3ocvxC8OXLMu/pMBSMENOmWzx4WxI823z/pX6o4S5M1yxHjEn17uv1CXkhhXU=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1772033952; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=bZsVjpj3tS2NcSPeVCwY36YWu9qsHzN4VwqVHxl0Hrc=; 
-	b=KxnuNvMy6PTCuLX01J40LXApiq1MRXvYWYyIDo+K7cGBuHdn0jdP06i6TkgLzBBF8MtbOIlnFYNfiC8YVvBsEJMWggdC0UqXQ6rUgWaZbu34C0MYVmqH0upfWpcufr2eQfQZMJGxCyw/Dh58Iq7PB/iF0Fge/EL5NNJaNgdDfco=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=machnikowski.net;
-	spf=pass  smtp.mailfrom=maciek@machnikowski.net;
-	dmarc=pass header.from=<maciek@machnikowski.net>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1772033951;
-	s=zoho; d=machnikowski.net; i=maciek@machnikowski.net;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=bZsVjpj3tS2NcSPeVCwY36YWu9qsHzN4VwqVHxl0Hrc=;
-	b=bmgw4dBT3wIw/Clc86Ys7HH12xJexgiZco0zmMy4gJWNvu1s1HK00PTl3zrFEi/n
-	QRWcylTaSesf1uE2H7H7BV0Z5Ni3VmHkPY93v/VqLTw0zu0BOPH+igc/gyJLoFCU47f
-	kcu8CnM6qT7hSR4KYm1SRqc0o95hwrofJGLFF5u2wspL/WJOrOHXxBiQVi8rNjZWBNz
-	m2KomVUTWFTVal0vZToOf/753yiMoMOeYgFM2AuSh1gyG9l8DKKg4ABYmvxd5XYBzAu
-	c2o62vitNflggH57LEjFcoTmZu2ezT3t7QsOAh261A2njAnWjOz4jDxVHIQgE7KaVkN
-	PQplNEtjRQ==
-Received: by mx.zohomail.com with SMTPS id 1772033950667606.3964192503419;
-	Wed, 25 Feb 2026 07:39:10 -0800 (PST)
-From: Maciek Machnikowski <maciek@machnikowski.net>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	maciek@machnikowski.net,
-	richardcochran@gmail.com,
-	milena.olech@intel.com,
-	willemdebruijn.kernel@gmail.com,
-	andrew@lunn.ch,
-	vadim.fedorenko@linux.dev,
-	horms@kernel.org
-Subject: [PATCH v3 net-next 3/3] selftests:net: Implement ptp4l sync test using netdevsim
-Date: Wed, 25 Feb 2026 16:38:58 +0100
-Message-ID: <20260225153858.29486-4-maciek@machnikowski.net>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260225153858.29486-1-maciek@machnikowski.net>
-References: <20260225153858.29486-1-maciek@machnikowski.net>
+	s=arc-20240116; t=1772034126; c=relaxed/simple;
+	bh=Y4gDuYh+U+IX2M78aPN80goJmULszAn3paqqn7vMaKY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=nqQABUgQfbkjBU12ds+893enxfj87edCldQ0LqTNHaWxGNhE83jomayxyQAQdJ/raK55/wserKx+0s9DXG+wOHspTX9n3gj7QcVPlF/r7sB6Is87FrKvacBeMY94JwDCEg2fYAw03sgE8sESfY57xJM+SwVuniOewnndq0yL3IU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=WxTeL4HM; arc=fail smtp.client-ip=52.101.61.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZEfrNoDs3eOeCBJ4OS/tnjKJtuMmjnzeyk9uiuTshI3vkvU7vy3EZFHcLZSbx/Qiq0/1LvKeAtmHuQuZvpoYU8+kCXtRRkgrwoiSBRewORsqaKniGIPxSL6og2Myl471JhKmwz/WaLbiLWtMw+LSVdbh0T4MCqmTa0RgBFy3W7JsCuz+PHEu9J/rWWA4puNhfuVWZFjjsEwVmx8mQJKy8rTvUSNtTcnx/JQsuGf6DNpoBgh1mXSV2Vvo+2zynizWf3oQw/qaFO2uKqxjRs/e/T5U3PJwZgXD55QB1kNgVpY53j9Wf6TnCkElf+NnS/9yNFABbhyDq2X3pREtVPJj7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iZDqo9Htf0TSZlEpLnRma/8qjLWDAe/gqvQRZdOYp0o=;
+ b=WNeK8WQbMdVqRIM/ZLdVEsJb4St0+OtL1NgfUwUyCZZHvAA7fAniajTz7KTiNCpF1F9DWxXUmwoJ4vEmU3Ppss/c066jQWvb40rN2oKUqCwzc2RRFSnbXudA07gGBdmfXCOWrdLchAupciaRQtS/j0jO1oiOTN7Dt8A6+L6YoMXXVMKAQ7dF7oNzEDS362kNA4znuM6RuTJ3Ec5QdI7GnhnlAvRKiKuEEYwlUhSaghv7KGKEap8f1/ykueVByj12Wvf4PI7Z69ZZ2YpMEacmVZu9ML8n+/A4PQxDgPkahLqf5S37chdCiDhaLbSBB37ksOXCNjve0WmFRaTHNfiCAg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iZDqo9Htf0TSZlEpLnRma/8qjLWDAe/gqvQRZdOYp0o=;
+ b=WxTeL4HM0T8yOgXqPV4H41uOe0ojdHgF+QkFwpB+Jyx1aQ/WJMd2YX+EQ4kcb5d6pn3TjK4lg/VoKIGwvoDNorgLqxK4/jebgz3UDm2SnmOvD9X91yfxHUjJ7aX/7hfrodk0MFcmwUmdhVdJkkfWc8X0rJOtIE79aNuvfqQ+u85mN1TDb4ePpzF7Z0HlgWoR3v0gdGZaAFLnNt7kyKFL6yGLUhywc8slNvxHvBKpPfgOthJNvkjogfWIzhwmreBRWU8m6duLpXtyE0b57rpiW693CNamkc3o3a32DqCwMK4XRUZg2yhUJuhs9GAr1gSc4wklSGcUZVxbCal9BnqcXw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from PH0PR12MB8800.namprd12.prod.outlook.com (2603:10b6:510:26f::12)
+ by SJ0PR12MB8089.namprd12.prod.outlook.com (2603:10b6:a03:4eb::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.22; Wed, 25 Feb
+ 2026 15:42:00 +0000
+Received: from PH0PR12MB8800.namprd12.prod.outlook.com
+ ([fe80::f79d:ddc5:2ad7:762d]) by PH0PR12MB8800.namprd12.prod.outlook.com
+ ([fe80::f79d:ddc5:2ad7:762d%4]) with mapi id 15.20.9632.017; Wed, 25 Feb 2026
+ 15:42:00 +0000
+Date: Wed, 25 Feb 2026 10:41:58 -0500
+From: Yury Norov <ynorov@nvidia.com>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Matthew Brost <matthew.brost@intel.com>,
+	David Laight <david.laight.linux@gmail.com>
+Subject: Re: [PATCH RESEND 0/3] ice: use better bitmap API
+Message-ID: <aZ8YRsdcRDcEUHmO@yury>
+References: <20260225000007.255837-1-ynorov@nvidia.com>
+ <7e4e207b-e839-4cfd-941b-5bec7a9ebff4@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7e4e207b-e839-4cfd-941b-5bec7a9ebff4@intel.com>
+X-ClientProxiedBy: BN9PR03CA0771.namprd03.prod.outlook.com
+ (2603:10b6:408:13a::26) To PH0PR12MB8800.namprd12.prod.outlook.com
+ (2603:10b6:510:26f::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB8800:EE_|SJ0PR12MB8089:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7f0a683d-2451-4074-5fe4-08de74846a5b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|376014|10070799003|7416014;
+X-Microsoft-Antispam-Message-Info:
+	OJ7ZHWrR1eJKEf20NVqgusgH3eHBlwQoP5qp3KHxwnNB1YWwXsrka4kH17jFt4Fv2eDknacGNk+AHDAx34M6175xKTBt5tcynjrvbZaooYXx4U2T3gz8kxof27DTOWvc/BiMYHMj1pPSFfkwOaSCppmXwwMCTR2ggS0zEAvFKW9xhoOgGK2ljSzKzbCksgRAbLPhlpCxR2JDngUO6k8gwrmf3t0ZtXrMUCVKzy8FPd1VpQ0Eorf683OqVkCMJgCPlDai3JriTCFFUG3SYUXpeuqmBMys+OcC3PQBoyLi7FP/atEL6hx0ht/fdG782Efp9v9PuIu4ho7SckiKfDWJjkgoqreyG2hSebtnayv78yn7cFDIIq2dikxqkjuGxH+xzlnbIrr6soK0s49hHKHBVlXeX4QDPiGRBJ5ap+687phszeM+/rGWaal6d8/mk5RTpw1rlZS9OsdEPuvX6ivFSv8zT8YcuKMD9DMaD9Cd0pk7xusGFJfoEA6QN9Dg8VPweitcp3qdIiSzRj6bkwY2482F658hYVj07SGvzQtlOaxrDujbIq8C9nYfX3NxbKDIjmicxMzqIYu8/JzrqgS9kIo2dnMgBOB6qKlBSc4Vu6rgTYHMRzrIr/aLGYqN0mUcVR8X9+ipCJewxoItk+HzvLO3edNWuvgpJZEfwz4d0ZusAFtFtV6N+2RlKODTdkngIIGdMmL7gQQK8epvpNgqKrgqO+A1wU0VTUygzjx4+O8=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB8800.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(10070799003)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?LKqocfCvW6RV0Kkc9UNRmyHNE3eCqExGfBrHTylKNU5H5b/MjFMLjLocekr/?=
+ =?us-ascii?Q?LYL+G7pPWX5yjTdNhCKLJPyCWfAL/pIJQnuEKWpyYIp8B9zeauTmNEVvdZaJ?=
+ =?us-ascii?Q?Yh2A2rRwnijYcULcbEEwW+5/7YCgoPCNe/A9ThX6EdvwtQdWI2lGHpW2Parp?=
+ =?us-ascii?Q?Tf4hBk4hEH0QrfrwHnSznu4RaZ65M5C5QmCcF2prlrwXixaN61uPXLprVHZV?=
+ =?us-ascii?Q?wIJD6E7bydjMWeGnsgpssq9OrKPmftjbFy9jw8250InhHZE9iT6btEwqk280?=
+ =?us-ascii?Q?LJcp2Z0cWRLYt1U9MYgPexl3Q242/C4j5SLmYtI8N2f93u5+AHrhJ5slRbrj?=
+ =?us-ascii?Q?MCykqJKFveEoJWtFN/U6b/CiULqMDMT4QohtOVdYdxERFXiTdzAKbCHyqFDN?=
+ =?us-ascii?Q?rNiuHjS+Z9Uz/ddaTqOu0bFmQB2Bl3wriTBkxayYGOzix4li4n3Xvb4yPKjI?=
+ =?us-ascii?Q?HoxoHotCUwecWXTtJBjID4DPyf9p8j36KAk3LLvO7NpqYxYvFplfcn4oOLhT?=
+ =?us-ascii?Q?KKkIYqjer9dKy2yoCj27yAVgAac6KK/LAJZbXRR14C9uB2k8gdpmy1WZ/VE4?=
+ =?us-ascii?Q?J4PbZT4PECOoqKoak+T14ytTyUAFvrk69YL40Y41bextXQaO45iD1Sif9kW5?=
+ =?us-ascii?Q?vI9P5q/ePCMkfWErECk4FyxGe1ZeklnV/F9ru3BCHYOo6+c2499BTCJyAtoA?=
+ =?us-ascii?Q?7o4Q9xX+spF9bENz5CH0/0LN50OUNuq6DomxENnBM0xecChUGY39sDDgZ+oX?=
+ =?us-ascii?Q?gLfvvPPhqHIh9UnicV03NjegjtN5cH5EYQh4q2RrBcenV2+97E60cxz4FLtk?=
+ =?us-ascii?Q?V2TOl7sv7LZABcO3owwX91Z6zgSqZLrIxQgJHj/JjJGKBHSgyZySJlG/odkP?=
+ =?us-ascii?Q?CNlTW78Ua5N4J2hwmFW17kUl9cZcK+FhLYJtuN+XWJTxjhOwP0mqs1bpL4qy?=
+ =?us-ascii?Q?KGp7L9dJ3UvVBBPgLzDXEShlGwXMIcFHu9qvCGYBZvjYzvZqZcXodxESemD8?=
+ =?us-ascii?Q?dZewMfsfx3qnPkDJkuZx6BGg6V/PspGz5djjeSwV4KnkzFSsd+1NY/YPevHx?=
+ =?us-ascii?Q?kX3/AtR5J8ZOb0L51jrjZw4ZDOWXs5hdUDtjMclMwBFfjl6iUzJTtGHTPqx5?=
+ =?us-ascii?Q?+yPE6c6JFMZazv6yMcChkIRXnMl1LCOp3b/RyrtrVzw6YcnsATmPKZ7ufah4?=
+ =?us-ascii?Q?7zLBEabeirW6lnS2Ob7+44H1FPYS0yHjy0GuVrpEyVUwZ2R4AJQ/p7rhoI53?=
+ =?us-ascii?Q?CzJWwT/zRCiYugM0xsdMHRTfFm8j8bAgB/cLMcI7kpor2M99bvcMUgPeYmLM?=
+ =?us-ascii?Q?ADw45i98PDwjf0VkedQ/DxyAM+O6i1q9mc9qEBdAnTaDBdPVYhiDxzr7Cd6o?=
+ =?us-ascii?Q?M+JuRdalotwVuyYjX3FveKFErIgOuxs49PfX6vcdvfbFnpZLjaVNyyj3sU8m?=
+ =?us-ascii?Q?vb/HthHFa/eaEa5j4h9o0QMM6dL382QGUi5CAxarOiYYiGij2sA+5n+zJKNe?=
+ =?us-ascii?Q?gnzndYnFUJLSgEBeneM1nXYjJPsjMrwitI1bqvsLLlTMPd/JuVCyfGcU60XR?=
+ =?us-ascii?Q?i7O0KFva/Cd3Rfn2/sBI5DLvK6ci2C9P7S2x+5JZuzNYL84UgvJnuckFtqJF?=
+ =?us-ascii?Q?ZszSFddkO7CHJXLL2/i4psay4ewL8wMjsSjqbgBG2C4KoNJruchTnjJ/wKiJ?=
+ =?us-ascii?Q?G9jn1Iq3vGXb5Q53n5QOjO12VVt5EWPBtILvD+ZKSkC+bc+CitwLMpGu58UK?=
+ =?us-ascii?Q?8xhfIwDtnpxaDu0Hwf6SBOINTWcVOmv557yxy5vG4HaiasBz+WFn?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7f0a683d-2451-4074-5fe4-08de74846a5b
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB8800.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2026 15:42:00.5480
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QqfvfHG6M4oGMz2omV4f5IaEFufprBpPu9RkBCAgYR/rAu2EPpqdm58iLtdKE3I7Hy8jgei9d3R0TBmDpMNqew==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB8089
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [1.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[machnikowski.net:s=zoho];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,machnikowski.net,gmail.com,intel.com,lunn.ch,linux.dev];
-	DMARC_NA(0.00)[machnikowski.net];
-	TAGGED_FROM(0.00)[bounces-261019-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[machnikowski.net:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maciek@machnikowski.net,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-261020-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RSPAMD_URIBL_FAIL(0.00)[nvidia.com:query timed out,Nvidia.com:query timed out];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,rasmusvillemoes.dk,linux-foundation.org,lists.osuosl.org,vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.972];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ynorov@nvidia.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.986];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lib.sh:url,machnikowski.net:mid,machnikowski.net:dkim,machnikowski.net:email,ptp.sh:url]
-X-Rspamd-Queue-Id: 0D52C19A028
+	RSPAMD_EMAILBL_FAIL(0.00)[ynorov.nvidia.com:query timed out];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:email]
+X-Rspamd-Queue-Id: 0B2A219A2CF
 X-Rspamd-Action: no action
 
-Add PTP synchronization test using ptp4l and netdevsim.
+On Wed, Feb 25, 2026 at 01:02:35PM +0100, Przemek Kitszel wrote:
+> On 2/25/26 01:00, Yury Norov wrote:
+> > Use better bitmap API where appropriate.
+> > 
+> > Original series:
+> > 
+> > https://lore.kernel.org/all/20251223162303.434659-1-yury.norov@gmail.com/
+> > 
+> > RESEND: rebase on top of v7.0-rc1
+> > 
+> > Yury Norov (3):
+> >    bitmap: introduce bitmap_weighted_xor()
+> >    ice: use bitmap_weighted_xor() in ice_find_free_recp_res_idx()
+> 
+> Thank you for working on better API.
+> Do you want this to go through intel, then netdev, tree?
+> Likely that would slow any future user, if you have already one in mind.
+>
+> >    ice: use bitmap_empty() in ice_vf_has_no_qs_ena
+> 
+> For unrelated reasons I have one series that will possibly conflict
+> with your patch. Would prefer to not wait/block each other, so will
+> be best if we (Tony) just take this one (in case you will proceed
+> with the first two patches via your tree)
 
-The test creates two netdevsim adapters, links them together
-and runs the ptp4l leader and ptp4l follower on two ends
-of the netdevsim link and waits for the follower to report the
-synchronized state (s2) in its output log.
+Another trivial user (recently added) for bitmap_weighted_xx() is
+xe_pagefault_queue_init() in drivers/gpu/drm/xe/xe_pagefault.c, but
+it's again the Intel's driver, so it will go with your tree anyways.
+ 
+I'm not aware of others, so I believe Tony's tree is the best route.
 
-This implementation runs the test runs over IPv4 link.
+> >   drivers/net/ethernet/intel/ice/ice_switch.c |  4 +---
+> >   drivers/net/ethernet/intel/ice/ice_vf_lib.c |  4 ++--
+> >   include/linux/bitmap.h                      | 14 ++++++++++++++
+> >   lib/bitmap.c                                |  7 +++++++
+> >   4 files changed, 24 insertions(+), 5 deletions(-)
 
-Signed-off-by: Maciek Machnikowski <maciek@machnikowski.net>
+ + Matthew Brost
+
+Attaching a patch for xe_pagefault_queue_init(). Feel free to append it
+to this series, or let me know if it's better to send it separately.
+
+Thanks,
+Yury
+
+From 21804f4ae1674aa166e3566fa898996806ebd3e3 Mon Sep 17 00:00:00 2001
+From: Yury Norov <ynorov@nvidia.com>
+Date: Wed, 25 Feb 2026 10:02:22 -0500
+Subject: [PATCH] drm/xe: switch xe_pagefault_queue_init() to using
+ bitmap_weighted_or()
+
+The function calls bitmap_or() immediately followed by bitmap_weight().
+Switch to using the dedicated bitmap_weighted_or() and save one bitmap
+traverse.
+
+Signed-off-by: Yury Norov <ynorov@nvidia.com>
 ---
- tools/testing/selftests/net/Makefile |   1 +
- tools/testing/selftests/net/ptp.sh   | 105 +++++++++++++++++++++++++++
- 2 files changed, 106 insertions(+)
- create mode 100755 tools/testing/selftests/net/ptp.sh
+ drivers/gpu/drm/xe/xe_pagefault.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index afdea6d95..db576ea96 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -64,6 +64,7 @@ TEST_PROGS := \
- 	nl_netdev.py \
- 	pmtu.sh \
- 	psock_snd.sh \
-+	ptp.sh \
- 	reuseaddr_ports_exhausted.sh \
- 	reuseport_addr_any.sh \
- 	route_hint.sh \
-diff --git a/tools/testing/selftests/net/ptp.sh b/tools/testing/selftests/net/ptp.sh
-new file mode 100755
-index 000000000..8e5b3e1e4
---- /dev/null
-+++ b/tools/testing/selftests/net/ptp.sh
-@@ -0,0 +1,105 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0-only
-+# shellcheck disable=SC2329
-+#
-+# By Maciek Machnikowski <maciek@machnikowski.net> (c) 2026,
-+#
-+# Self-tests for HW timestamping and 1588 synchronization on the netdevsim
-+# emulation with ptp_mock.
-+#
-+# This test:
-+# - Creates two netdevsim instances in two separate namespaces
-+# - Assigns IPv4 addresses to those instances
-+# - Runs ptp4l leader in the nssv namespace using IPv4 traffic
-+# - Runs ptp4l follower in the nscl namespace using IPv4 traffic
-+# - Waits for the follower to reach synchronized state (s2) or the timeout
-+
-+source lib.sh
-+
-+NSIM_DEV_1_ID=$((256 + RANDOM % 256))
-+NSIM_DEV_2_ID=$((512 + RANDOM % 256))
-+
-+NSIM_DEV_SYS_LINK=/sys/bus/netdevsim/link_device
-+NSIM_DEV_SYS_UNLINK=/sys/bus/netdevsim/unlink_device
-+PTP4L_SYNC_TIMEOUT=20
-+
-+setup_netdevsim()
-+{
-+	set -e
-+	ip netns add nssv
-+	ip netns add nscl
-+
-+	NSIM_DEV_1_NAME=$(create_netdevsim "$NSIM_DEV_1_ID" "nssv")
-+	NSIM_DEV_2_NAME=$(create_netdevsim "$NSIM_DEV_2_ID" "nscl")
-+
-+	ip netns exec nssv ip addr add '192.168.1.1/24' dev "$NSIM_DEV_1_NAME"
-+	ip netns exec nscl ip addr add '192.168.1.2/24' dev "$NSIM_DEV_2_NAME"
-+
-+	set +e
-+}
-+
-+cleanup()
-+{
-+	[ -n "${PTP4L_LEADER_PID-}" ] && {
-+		kill "$PTP4L_LEADER_PID" "$PTP4L_FOLLOWER_PID" 2>/dev/null
-+		wait "$PTP4L_LEADER_PID" "$PTP4L_FOLLOWER_PID" 2>/dev/null
-+		rm -f "$PTP4L_LEADER_LOG" "$PTP4L_FOLLOWER_LOG"
-+	}
-+
-+	[ -n "${NSIM_DEV_1_FD-}" ] && [ -n "${NSIM_DEV_1_IFIDX-}" ] && \
-+		echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX" > "$NSIM_DEV_SYS_UNLINK" 2>/dev/null
-+	cleanup_netdevsim "${NSIM_DEV_2_ID-}" 2>/dev/null
-+	cleanup_netdevsim "${NSIM_DEV_1_ID-}" 2>/dev/null
-+
-+	ip netns del nscl 2>/dev/null
-+	ip netns del nssv 2>/dev/null
-+
-+	modprobe -r netdevsim 2>/dev/null
-+}
-+
-+if [ ! -x "$(command -v ptp4l)" ]; then
-+	echo "ptp4l command not found. Skipping PTP sync test"
-+	exit 4
-+fi
-+
-+trap cleanup EXIT
-+
-+setup_netdevsim
-+
-+# Link netdevsim1 with netdevsim2
-+NSIM_DEV_1_FD=$((256 + RANDOM % 256))
-+exec {NSIM_DEV_1_FD}</var/run/netns/nssv
-+NSIM_DEV_1_IFIDX=$(ip netns exec nssv cat "/sys/class/net/$NSIM_DEV_1_NAME/ifindex")
-+
-+NSIM_DEV_2_FD=$((512 + RANDOM % 256))
-+exec {NSIM_DEV_2_FD}</var/run/netns/nscl
-+NSIM_DEV_2_IFIDX=$(ip netns exec nscl cat "/sys/class/net/$NSIM_DEV_2_NAME/ifindex")
-+
-+if ! echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX" \
-+	  "$NSIM_DEV_2_FD:$NSIM_DEV_2_IFIDX" > "$NSIM_DEV_SYS_LINK"; then
-+	echo "linking netdevsim1 with netdevsim2 failed"
-+	exit 1
-+fi
-+
-+# PTP synchronization test: run ptp4l leader in nssv and follower in nscl,
-+# then parse follower output to verify they synchronized (servo state s2 = locked).
-+PTP4L_LEADER_LOG=$(mktemp)
-+PTP4L_FOLLOWER_LOG=$(mktemp)
-+ip netns exec nssv ptp4l -i "$NSIM_DEV_1_NAME" -m -4 -P \
-+	> "$PTP4L_LEADER_LOG" 2>&1 &
-+PTP4L_LEADER_PID=$!
-+
-+ip netns exec nscl ptp4l -i "$NSIM_DEV_2_NAME" -s -m -4 -P \
-+	> "$PTP4L_FOLLOWER_LOG" 2>&1 &
-+PTP4L_FOLLOWER_PID=$!
-+
-+
-+for _ in $(seq 1 "$PTP4L_SYNC_TIMEOUT"); do
-+	if grep -q ' s2 ' "$PTP4L_FOLLOWER_LOG" 2>/dev/null; then
-+		exit 0
-+	fi
-+	sleep 1
-+done
-+
-+echo "ptp4l follower did not reach locked state (s2) within ${PTP4L_SYNC_TIMEOUT}s"
-+exit 1
+diff --git a/drivers/gpu/drm/xe/xe_pagefault.c b/drivers/gpu/drm/xe/xe_pagefault.c
+index 6bee53d6ffc3..c4ce3cfe2164 100644
+--- a/drivers/gpu/drm/xe/xe_pagefault.c
++++ b/drivers/gpu/drm/xe/xe_pagefault.c
+@@ -285,10 +285,9 @@ static int xe_pagefault_queue_init(struct xe_device *xe,
+ 		xe_dss_mask_t all_dss;
+ 		int num_dss, num_eus;
+ 
+-		bitmap_or(all_dss, gt->fuse_topo.g_dss_mask,
++		num_dss = bitmap_weighted_or(all_dss, gt->fuse_topo.g_dss_mask,
+ 			  gt->fuse_topo.c_dss_mask, XE_MAX_DSS_FUSE_BITS);
+ 
+-		num_dss = bitmap_weight(all_dss, XE_MAX_DSS_FUSE_BITS);
+ 		num_eus = bitmap_weight(gt->fuse_topo.eu_mask_per_dss,
+ 					XE_MAX_EU_FUSE_BITS) * num_dss;
+ 
 -- 
-2.53.0
+2.43.0
 
 
