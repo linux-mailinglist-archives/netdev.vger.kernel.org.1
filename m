@@ -1,419 +1,267 @@
-Return-Path: <netdev+bounces-260995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260996-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mNZcFv0Jn2neYgQAu9opvQ
-	(envelope-from <netdev+bounces-260995-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:41:01 +0100
+	id 0AftF6YLn2neYgQAu9opvQ
+	(envelope-from <netdev+bounces-260996-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:48:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 657A1198D9C
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:41:00 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCA2D198ED9
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:48:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B2E0330086BE
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:40:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8FEAA3025C5C
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:48:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 504DE285C9F;
-	Wed, 25 Feb 2026 14:40:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE7373D3CFC;
+	Wed, 25 Feb 2026 14:48:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="JLs7g9SC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hasTqElL"
 X-Original-To: netdev@vger.kernel.org
-Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012055.outbound.protection.outlook.com [52.101.48.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97CA5396D2A;
-	Wed, 25 Feb 2026 14:40:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8058D2877E5
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 14:48:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.45
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772030455; cv=fail; b=T5oJxLQ+/xZ3c5XWpLOnBGDzDIB793ePCwmUkubalsGfmyy/gnGFWfrkkMw6AIWpvLVopnfbn3/F0IbzPr7GLCCH7CRo9MPp8dlYUnkU3xVAJWBvkK8/rdsFwGkJRk4pp5OTa0wDoEgmb7oIqJZVL+vE3wj2DT3NumYyMWuJqzA=
+	t=1772030881; cv=pass; b=Ybow3IY98rC6RSBMn9btHCwZOpqq0X7beVe+CK2pIiEsuDfKOkZMghTRmng6C5HCnLj3C6ndWxOp9zjsSn92amcINoKPOkYgY84WB8sWkLhaihFKHBkprqgZJm9IsIvk9FiDlizVS3Vxd6UazXsnnJA+nEag+v2HcBsAfaYp0XU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772030455; c=relaxed/simple;
-	bh=2vdEuW65FxHeyUQ3z0Wgi+Kvm7AX4Zros52VWtF8rm4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PB8qLiGIiYamgjQ0d+RWaIgSQRM3KGz9OpEmeY9EkGu9hr8j1pAKoHey28GiJA62jpB5WgiuFI/6JXOW3dvLbjGjWC5g/TUurs4PI3zZftMkm/XpM5Fby0b0KPpBus6MZKQH0WWNShRVVAdYyX0b8yXF6tTBpjzLv6dgOnH1SDI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=JLs7g9SC; arc=fail smtp.client-ip=52.101.48.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Rnn94A155RHkdN//uA9n5PcMvOcEvN+MXtIjclUB8VeElRKg+1XVtDcrd8sGOvaHRjB0UvYxqiM576SrPtZZNIpGMO+RY/ZngO7QXIMXxvGbpkAK570J0YRTwYxwZ1rGpO0kTTDz4AeUkC6AdJUMTTCF8kv6bn5ek3oe/KyqVyVnr/ZfykbOy7prkInQCFjr81uCbXT0A2yb4/bMsrrLcMJziA0cbLVF1k2z4VbfvuNMyKQkcnGQHKZzNcjv78s+eq4Cp0lw2EjY94ZFtOiT+vJdgwD9DQCeK/K0qxqRriaztkGj3pLSvzFqn0S7PXZY12y6Fp/nlnXpdgQXnPDWKA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sUa+RbNoHp7r8f/nYXTWjygZ+DnBbJvzhpJ07gNVj2c=;
- b=HTeQDYt/Oaq6zoSecxLolvtxx9hD6UYksI/ddJZfqElSd7l1xzdrS8o0yPeu+qBcI5n7EI5kevX97zmvRcqmEvaWPjH0w/ZyCcBT5LEc/Q61rCzoN7u8SSEMIf7hiSzMsk8/FpgmavtPNDvRkM8y7u/oUcweuZwhlkRK2zZd28MYQCL2AzfMLdEtEJKtyyO+61JTElH+mdt+vU8Rruwo6us25Y57122+l9KHGcGs86sQECKKbnluFsMfbyT0auMzwDp42s7K5EjrBIVet3O4WwLnyYEA5IlV5jmBrhfMPTjsXIkGtS8iskzObs52fJuhWbmEA2E4CjKC96LW2njdtQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sUa+RbNoHp7r8f/nYXTWjygZ+DnBbJvzhpJ07gNVj2c=;
- b=JLs7g9SC+mgkEiWwlgU5bQI+Zu193KjkJgbgfEUzmqvtDkZncv9ppa6DaYhtfaw+DlxxcskMlnClktR2sU9OgPf9kQUMV/1YYTGN790ze8b7a+1hgSs5F7Jb8DzOU+D9F9Gl/tezwgm3rhhrdaEHNFdOBsUqLvh3YHroFqcMVxnl15X2wcpKtqATtNz+vSRluINfi2/7ZWOyfMLAa9IJAStIu4JQDk0vRjp/dDtyI9KcvXnfUbNxOo2Qm/U7Dt/PTer3w+zlVicGUzxyNAWB0l2I9Oluu9jcwH40pOUb7GGm6JohbOiiXYaVCzflGp33IbQzvgtAMFVQSufznkwb6Q==
-Received: from SJ0P220CA0028.NAMP220.PROD.OUTLOOK.COM (2603:10b6:a03:41b::11)
- by IA1PR12MB9467.namprd12.prod.outlook.com (2603:10b6:208:594::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.11; Wed, 25 Feb
- 2026 14:40:44 +0000
-Received: from SJ5PEPF00000209.namprd05.prod.outlook.com
- (2603:10b6:a03:41b:cafe::e0) by SJ0P220CA0028.outlook.office365.com
- (2603:10b6:a03:41b::11) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.23 via Frontend Transport; Wed,
- 25 Feb 2026 14:40:21 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SJ5PEPF00000209.mail.protection.outlook.com (10.167.244.42) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9632.12 via Frontend Transport; Wed, 25 Feb 2026 14:40:43 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 25 Feb
- 2026 06:40:20 -0800
-Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.231.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.20; Wed, 25 Feb 2026 06:40:17 -0800
-From: Danielle Ratson <danieller@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: <razor@blackwall.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
-	<shuah@kernel.org>, <linux-kernel@vger.kernel.org>, <bridge@lists.linux.dev>,
-	<linux-kselftest@vger.kernel.org>, <idosch@nvidia.com>, <petrm@nvidia.com>,
-	Danielle Ratson <danieller@nvidia.com>
-Subject: [PATCH net v2 2/2] selftests: net: Add bridge VLAN range grouping tests
-Date: Wed, 25 Feb 2026 16:39:56 +0200
-Message-ID: <20260225143956.3995415-3-danieller@nvidia.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260225143956.3995415-1-danieller@nvidia.com>
-References: <20260225143956.3995415-1-danieller@nvidia.com>
+	s=arc-20240116; t=1772030881; c=relaxed/simple;
+	bh=b02ayuuJrrJYAQOqFctTzanPk6a09+Yfai8bQ2pW0r4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tidDrsiiOck3X9Qry5uXe9uXijq1+I2NQ6+UkUQ7UxA+LI0MiLwU4k6vdf1zDP/wAFBiyvwYcGCvOR9LI5QLPYcQRw3sH3TiTEWaQQhJrh7vU4lABf0ywOMhuXbdoiDKYg/KnEqL84HQqenVovZ1gnSIFyde2eh80NPy0Zg0CVA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hasTqElL; arc=pass smtp.client-ip=209.85.210.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7d18c654458so2863065a34.3
+        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 06:48:00 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772030879; cv=none;
+        d=google.com; s=arc-20240605;
+        b=WdSPCxdZd95GjstljqwjaLaDcEGqJ9zayKtzX4oac8EcVYMfX7XhVGT7bb3K6fyhZr
+         3Bq6xE9/DefTS0qednY4Q9iOt18cRTP5EcAktkGSWRKy9gD+Mq1Jn8FuCJdinirvihTT
+         9ONiGT5Fy2rrvAGWc3LZr2lyFjL9NSYR9ji9SOBR6MVvNAErNIHY1JujQyYAxWz3o71y
+         npFAelELI+29pgEgRK+F2EM6hmZnAm7HGUtCSMd8sOhir5U0b3plRnLYMWbQvADDwuil
+         Gt3XufZgvzkvyZq49BWrO5FoNsv0UykBa7BCSS8D7wqqxI4sBez+ULJA8juq1OUCnpf/
+         qnTA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=u0kfbmdw6mfzinq2TVFcXbBmnMywl5U7cR9oYK1yBVE=;
+        fh=1ffhz1LCn+XjckKwJV4d58j3PNJFvGXtZYChy/J7jCo=;
+        b=WW1+wFUGhTSfsZt7PAA7rW78CrehpVE0Y4qG82dCwW3nk3vo9V3QHExuGFkbwzY4RP
+         gHPsdjUEcdPuTlzek1XblfFpSbnq1+TYzoVMPAhPKIB/JpVmcJTN+UFteOTdN+S6ZYtM
+         XghsA2JEisf/wT6zlbMSkO6uIC3+e8uxB6jhfCmXsdG7lCAna1beyQ0/gm6FpXwRXg45
+         w5n+tu/EE1snuu3laXw6L7/ZwkK9aenQxTqFKCcz/3PktH5PDMvaEpl/cF+RoSG/vYP7
+         2rsKwPXGTXSek/TQt1eqiezz7nMFggrrAOKnYmJ3uZj+ENPwKkCo6T0X+9mrivOkIsb4
+         cmhw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772030879; x=1772635679; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u0kfbmdw6mfzinq2TVFcXbBmnMywl5U7cR9oYK1yBVE=;
+        b=hasTqElLxpVsAcPJKgKUOcUjNIQivSA9lfLiPizCDsLmzSc/g1a0FJeE4AYZ82PL8r
+         +M0+lWI+v0yTxIzKhvEph8SITLBWZrMYN/mjtecGGtp3xlEEtcZUOE8YC0xqXIUPEAW+
+         g0jcJY9NCMdSCEfZcolQK8v5wqcy6okxQ66ZbZIYtOGfRpISSgz5EzVeeywBTVD81eji
+         RCcric0k8d9TM2dxugQatpR/HTcS8unTMhNlL/MrwMjaVYLPvKe5z1PALF9devQN/nL9
+         sMVpXg9MWtJAjKZJ+n40NFdIk4WwRa78Ca2OBzds8mEAiIHN5f6yKGs0kqJ4RwlQ2yMd
+         QjAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772030879; x=1772635679;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=u0kfbmdw6mfzinq2TVFcXbBmnMywl5U7cR9oYK1yBVE=;
+        b=qqKRHbaxVjPZvsebjNRgtUHQGrTmdC+QHnuEAkovfGMc18ffXqtwmBpu17EQU9P437
+         o/ypF4Oib64MgZ8hOQIEes6EBWcultmWXPnog2q7MYhDlEwCql4VTooivhh9pDI0BiJl
+         Dl8zruEm8RQrXTtEVX6JzbOBd9mSZeHKR52tIt4i6zhLUEh5jKut+tyANcC4HhbLhWgT
+         21fdDvw4kp2UO963nMqZF+BH2qCubJ5LdIqa+VBrcjXS75laS+W3TtpVmWn90+91yDi1
+         rJAvJiGU1TybflVCgJzQ6LFfEQPLrJg8bq74V/ZbYTgbyLTxz4OyUoEVebV+/NsV2P+Y
+         1CXw==
+X-Gm-Message-State: AOJu0YyLB0lWtmrwdzDwRX0Vps6H8/EW2lHyKn0AphJLX5u/6aBV7y12
+	VWSRX8ckkLU6z+6BxJNhn1JQA9ogW/QYVLHO37q2iAKgfI7HwAWwdZCDry9cLQ1vPUnRoRS5rS2
+	c2dVDGf4O52XVm/IfBx41gFseKmJ2HBU=
+X-Gm-Gg: ATEYQzzQ1kr7otGKxoBIAUX/Xel8pBQ5NuoJWX2sHy60HadFV39nrmzcr9LqvJTx+/q
+	vfsXcgA3GeCvR5jlLH5A0Y3heZ5IZWet5yvj7Yrp/qcMu2TeGH6M/9lSrWnQfvIcQfCTvSzduQ2
+	LeVjRIqKGxFhJuNatIcxjwjc+WHUWryEDKqy5v6u96IY6j6/V7xkeAIeeu7VJs/3nkAvQ0hyyIa
+	/zFNlfzS7N7+PMiFLbEeq7SCVh8iDd81LMfXgUbnzpRsx9L7mp6Tz1GDck23/B1Hy6rUVXbpKhj
+	h/5ttfk3kvJgLPszWs8ofBgYHegr39PT7tjJ5K5RuZvYDMeaqQTC
+X-Received: by 2002:a05:6820:2d01:b0:662:c7a9:bb14 with SMTP id
+ 006d021491bc7-679c46eb230mr8727481eaf.35.1772030879206; Wed, 25 Feb 2026
+ 06:47:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF00000209:EE_|IA1PR12MB9467:EE_
-X-MS-Office365-Filtering-Correlation-Id: 71da2e7d-1282-47ef-293c-08de747bdb39
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|376014|7416014|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	Aa+hqAkW2oroBRyEbUDCbJGkpnZ5oo2TAWiEkl7Pebm9b25xk5DRTA35pNjzP6IGgNcuPkA6M27Ll/PvOfa95NK3L8GhxtywErTM3sWYCaaSXLvRv5szGRP02jeewqCo8iKQgnPWqMtSirEgukere5JV0jdhPgGyA54eY7BFF+JG/9TctEVa8OTY6VVyy17eZU3HIh2lWKx+oP1ccA697RVGYmhZmMbwvT/SNi4mO4OtHz0XmwFBBGCqDdiybOYpbfTpGoCXxPpculMKNNMxwKhDlLiudobys1h7N3NF3tb4RQqwkGE+7ENej1OWZwbARtPMPWtXnqu91Z6APyV9BLfx4wFtbbpoFH3jdx+Veowtuq9K0yPTJ9vtVIxU+AAh6VU4VtsyZPACAIUs2kwPhpFO/nLEojNLOs67jrKM6LZRtmlyOtQeeBMb9kHklU1eZ+EJe+7rvE28WTJgj1Fl6l6a3NroXmF2WNs5E+A6QTRxzl+Tmryi0taALNMR3vEFv70keuA2Yb052QJyCKRhndzSHjkZzNiMfMWcUuxk4bIcHvDcfOd1/ma/3vtyrTsQpYLRBZCA2TeIuZLCTMCMOsFClbArSUVNPZwMt2kCmUTKDmJUFCCpwE2o3y1F9it9MqkcBej+GTG6csde2wahXGcqbvkadJzAHLj7kUsKNaXDv8Sktww5PqsVogKB3egUFDqhYpOYlXeyCOw3tG6fskVoqNuzUrP4Lkqb2mphkXHb3ND8MpS6k1JaZCXsSaoowly1zmO/Av/XFpP/Ko8n8wJ8HfcOxZYgHIwhb0PE2Pw0SeASTDXGt/l20q5osaOVtnCfWDxE6jb1MnatCp7CeA==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(7416014)(82310400026);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	q2poM7u7Imk+7ixzmpBaA+kDtuTSEtabJ8yWCxUYcWPAlZ8srpYTXK3U7NN9HsPCpr7T6z9CMfaJ5O18REwTkoAlQpfRCkZylzPl+Gji72nyf+vZzpTsR+lYIjSipQQcaKBWhBU+317x72BmKfX3PJ4iCCOVsvtRYz1pRK9zXRGHU77vGoFBq+jEHV+sGk6VhWE+yVPkcCb/gbidzU7Lu9nbRhnoaCDY95SWkTu91+GLI7355pqzbXBx53rEzUZCTu1Ui9fcQSFmlzX+pfsG1R2/ejaxcK5rm4vYqRZJkWYgCLTHj7Em95u60cGKs1mqm/HcMzk9bfmjUUbidyPNZ/qYViF2RmZ0LFbA3vtfUQvvjpKu+QS2IW6m3UrKi+2Yro89+TepyCi+5VdbWeCbGoIWD2cwlVJBfyeJeBQTqRxIbX7stR4RFDO9Di3lLZKO
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2026 14:40:43.9908
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 71da2e7d-1282-47ef-293c-08de747bdb39
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF00000209.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB9467
+References: <20260225090853.2021140-1-mmyangfl@gmail.com> <20260225090853.2021140-3-mmyangfl@gmail.com>
+ <8be7610c-c606-4c7d-8c8b-b2873bed082e@lunn.ch>
+In-Reply-To: <8be7610c-c606-4c7d-8c8b-b2873bed082e@lunn.ch>
+From: David Yang <mmyangfl@gmail.com>
+Date: Wed, 25 Feb 2026 22:47:18 +0800
+X-Gm-Features: AaiRm51d5-BFQPrh02PDGjoOq1kDLlwBa_UczElG4BhDTU4G_FbKGvP24cPa_Cw
+Message-ID: <CAAXyoMO7YS28fwAkf93qN8Bc45qE2M6N9OzzKW+wSTJ_ujeXnQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/3] net: dsa: yt921x: Add port police support
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260995-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[danieller@nvidia.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-260996-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bridge_vlan_dump.sh:url,Nvidia.com:dkim,nvidia.com:mid,nvidia.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 657A1198D9C
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,lunn.ch:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: CCA2D198ED9
 X-Rspamd-Action: no action
 
-Add a new test file bridge_vlan_dump.sh with four test cases that verify
-VLANs with different per-VLAN options are not incorrectly grouped into
-ranges in the dump output.
+On Wed, Feb 25, 2026 at 10:17=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote=
+:
+...
+> > +/* v * 2^e */
+> > +#define ldexpi(v, e) ({ \
+> > +     __auto_type _v =3D (v); \
+> > +     __auto_type _e =3D (e); \
+> > +     _e >=3D 0 ? _v << _e : _v >> -_e; \
+> > +})
+> > +
+> > +/* slot (ns) * rate (/s) / 10^9 (ns/s) =3D 2^C * token * 4^unit */
+> > +#define rate2token(rate, unit, slot_ns, C) \
+> > +     ((u32)(ldexpi((slot_ns) * (rate), \
+> > +                   -(2 * (unit) + (C) + YT921X_TOKEN_RATE_C)) / 100000=
+0000))
+> > +#define token2rate(token, unit, slot_ns, C) \
+> > +     (ldexpi(1000000000 * (u64)(token), \
+> > +             2 * (unit) + (C) + YT921X_TOKEN_RATE_C) / (slot_ns))
+> > +
+> > +/* burst =3D 2^C * token * 4^unit */
+> > +#define burst2token(burst, unit, C) ((u32)ldexpi((burst), -(2 * (unit)=
+ + (C))))
+> > +#define token2burst(token, unit, C) ldexpi((u64)(token), 2 * (unit) + =
+(C))
+>
+> Please avoid macros like this. Write functions. The compiler will
+> inline them if that makes sense. But you gain type checking, etc.
+>
 
-The tests verify the kernel's br_vlan_opts_eq_range() function correctly
-prevents VLAN range grouping when neigh_suppress, mcast_max_groups,
-mcast_n_groups, or mcast_enabled options differ.
+ldexpi is generic over integer types and we do type conversions in the
+formulas below. So I think it cannot be expressed as a function.
 
-Each test verifies that VLANs with different option values appear as
-individual entries rather than ranges, and that VLANs with matching
-values are properly grouped together.
+> > +static struct yt921x_meter
+> > +yt921x_meter_tfm(struct yt921x_priv *priv, int port, unsigned int slot=
+_ns,
+> > +              u64 rate, u64 burst, unsigned int flags,
+> > +              u32 cir_max, u32 cbs_max, int unit_max)
+> > +{
+> > +     const int C =3D flags & YT921X_METER_PKT_MODE ? YT921X_TOKEN_PKT_=
+C :
+> > +                   YT921X_TOKEN_BYTE_C;
+> > +     struct device *dev =3D to_device(priv);
+> > +     struct yt921x_meter meter;
+> > +     bool distorted;
+> > +     u64 burst_est;
+> > +     u64 burst_max;
+> > +     u64 rate_max;
+> > +
+> > +     meter.unit =3D unit_max;
+> > +     rate_max =3D token2rate(cir_max, meter.unit, slot_ns, C);
+> > +     burst_max =3D token2burst(cbs_max, meter.unit, C);
+> > +
+> > +     /* Clamp rate and burst */
+> > +     if (rate > rate_max || burst > burst_max) {
+> > +             dev_warn(dev,
+> > +                      "rate %llu, burst %llu too high, max is %llu, %l=
+lu, clamping...\n",
+> > +                      rate, burst, rate_max, burst_max);
+>
+> I'm not sure clamping is the correct thing to do here. -ERANGE would
+> make it clearer that what the user requests is not possible.
+>
 
-Example output:
+The maxima are way larger than the physical limitations of GbE, so
+they are also acceptable. Still it would be quite unusual for users to
+supply such values.
 
-$ ./bridge_vlan_dump.sh
-TEST: VLAN range grouping with neigh_suppress                       [ OK ]
-TEST: VLAN range grouping with mcast_max_groups                     [ OK ]
-TEST: VLAN range grouping with mcast_n_groups                       [ OK ]
-TEST: VLAN range grouping with mcast_enabled                        [ OK ]
+> > +
+> > +             if (rate > rate_max)
+> > +                     rate =3D rate_max;
+> > +             if (burst > burst_max)
+> > +                     burst =3D burst_max;
+> > +
+> > +             burst_est =3D slot_ns * rate / 1000000000;
+> > +     } else {
+> > +             u64 burst_sug;
+> > +
+> > +             burst_est =3D slot_ns * rate / 1000000000;
+> > +             burst_sug =3D burst_est;
+> > +             if (flags & YT921X_METER_PKT_MODE)
+> > +                     burst_sug++;
+> > +             else
+> > +                     burst_sug +=3D ETH_HLEN + yt921x_mtu_fetch(priv, =
+port) +
+> > +                                  ETH_FCS_LEN;
+> > +             if (burst_sug > burst)
+> > +                     dev_warn(dev,
+> > +                              "Consider burst at least %llu to match r=
+ate %llu\n",
+> > +                              burst_sug, rate);
+> > +
+> > +             /* Select unit */
+> > +             for (; meter.unit > 0; meter.unit--) {
+> > +                     if (rate > (rate_max >> 2) || burst > (burst_max =
+>> 2))
+> > +                             break;
+> > +                     rate_max >>=3D 2;
+> > +                     burst_max >>=3D 2;
+> > +             }
+> > +     }
+> > +
+> > +     /* Calculate information rate and bucket size */
+> > +     distorted =3D false;
+> > +     meter.cir =3D rate2token(rate, meter.unit, slot_ns, C);
+> > +     if (!meter.cir) {
+> > +             distorted =3D true;
+> > +             meter.cir =3D 1;
+> > +     } else if (meter.cir > cir_max) {
+> > +             WARN_ON(1);
+> > +             meter.cir =3D cir_max;
+>
+> What does this WARN_ON() indicate? If this fires, you want somebody
+> who is debugging it to be able to understand it.
+>
 
-Signed-off-by: Danielle Ratson <danieller@nvidia.com>
-Reviewed-by: Petr Machata <petrm@nvidia.com>
----
+It means logical error during unit selection. Surely internal error
+and the debugger must be familiar with the implementation details, I
+think.
 
-Notes:
-    v2:
-    	* Address SC issues by adding double-quoting to relevant places,
-    	  and adding ignore tags to irrelevant issues.
-
- tools/testing/selftests/net/Makefile          |   1 +
- .../testing/selftests/net/bridge_vlan_dump.sh | 204 ++++++++++++++++++
- 2 files changed, 205 insertions(+)
- create mode 100755 tools/testing/selftests/net/bridge_vlan_dump.sh
-
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index afdea6d95bde..605c54c0e8a3 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -15,6 +15,7 @@ TEST_PROGS := \
- 	big_tcp.sh \
- 	bind_bhash.sh \
- 	bpf_offload.py \
-+	bridge_vlan_dump.sh \
- 	broadcast_ether_dst.sh \
- 	broadcast_pmtu.sh \
- 	busy_poll_test.sh \
-diff --git a/tools/testing/selftests/net/bridge_vlan_dump.sh b/tools/testing/selftests/net/bridge_vlan_dump.sh
-new file mode 100755
-index 000000000000..ad66731d2a6f
---- /dev/null
-+++ b/tools/testing/selftests/net/bridge_vlan_dump.sh
-@@ -0,0 +1,204 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Test bridge VLAN range grouping. VLANs are collapsed into a range entry in
-+# the dump if they have the same per-VLAN options. These tests verify that
-+# VLANs with different per-VLAN option values are not grouped together.
-+
-+# shellcheck disable=SC1091,SC2034,SC2154,SC2317
-+source lib.sh
-+
-+ALL_TESTS="
-+	vlan_range_neigh_suppress
-+	vlan_range_mcast_max_groups
-+	vlan_range_mcast_n_groups
-+	vlan_range_mcast_enabled
-+"
-+
-+setup_prepare()
-+{
-+	setup_ns NS
-+	defer cleanup_all_ns
-+
-+	ip -n "$NS" link add name br0 type bridge vlan_filtering 1 \
-+		vlan_default_pvid 0 mcast_snooping 1 mcast_vlan_snooping 1
-+	ip -n "$NS" link set dev br0 up
-+
-+	ip -n "$NS" link add name dummy0 type dummy
-+	ip -n "$NS" link set dev dummy0 master br0
-+	ip -n "$NS" link set dev dummy0 up
-+}
-+
-+vlan_range_neigh_suppress()
-+{
-+	RET=0
-+
-+	# Add two new consecutive VLANs for range grouping test
-+	bridge -n "$NS" vlan add vid 10 dev dummy0
-+	defer bridge -n "$NS" vlan del vid 10 dev dummy0
-+
-+	bridge -n "$NS" vlan add vid 11 dev dummy0
-+	defer bridge -n "$NS" vlan del vid 11 dev dummy0
-+
-+	# Configure different neigh_suppress values and verify no range grouping
-+	bridge -n "$NS" vlan set vid 10 dev dummy0 neigh_suppress on
-+	check_err $? "Failed to set neigh_suppress for VLAN 10"
-+
-+	bridge -n "$NS" vlan set vid 11 dev dummy0 neigh_suppress off
-+	check_err $? "Failed to set neigh_suppress for VLAN 11"
-+
-+	# Verify VLANs are not shown as a range, but individual entries exist
-+	bridge -n "$NS" -d vlan show dev dummy0 | grep -q "10-11"
-+	check_fail $? "VLANs with different neigh_suppress incorrectly grouped"
-+
-+	bridge -n "$NS" -d vlan show dev dummy0 | grep -Eq "^\S+\s+10$|^\s+10$"
-+	check_err $? "VLAN 10 individual entry not found"
-+
-+	bridge -n "$NS" -d vlan show dev dummy0 | grep -Eq "^\S+\s+11$|^\s+11$"
-+	check_err $? "VLAN 11 individual entry not found"
-+
-+	# Configure same neigh_suppress value and verify range grouping
-+	bridge -n "$NS" vlan set vid 11 dev dummy0 neigh_suppress on
-+	check_err $? "Failed to set neigh_suppress for VLAN 11"
-+
-+	bridge -n "$NS" -d vlan show dev dummy0 | grep -q "10-11"
-+	check_err $? "VLANs with same neigh_suppress not grouped"
-+
-+	log_test "VLAN range grouping with neigh_suppress"
-+}
-+
-+vlan_range_mcast_max_groups()
-+{
-+	RET=0
-+
-+	# Add two new consecutive VLANs for range grouping test
-+	bridge -n "$NS" vlan add vid 10 dev dummy0
-+	defer bridge -n "$NS" vlan del vid 10 dev dummy0
-+
-+	bridge -n "$NS" vlan add vid 11 dev dummy0
-+	defer bridge -n "$NS" vlan del vid 11 dev dummy0
-+
-+	# Configure different mcast_max_groups values and verify no range grouping
-+	bridge -n "$NS" vlan set vid 10 dev dummy0 mcast_max_groups 100
-+	check_err $? "Failed to set mcast_max_groups for VLAN 10"
-+
-+	bridge -n "$NS" vlan set vid 11 dev dummy0 mcast_max_groups 200
-+	check_err $? "Failed to set mcast_max_groups for VLAN 11"
-+
-+	# Verify VLANs are not shown as a range, but individual entries exist
-+	bridge -n "$NS" -d vlan show dev dummy0 | grep -q "10-11"
-+	check_fail $? "VLANs with different mcast_max_groups incorrectly grouped"
-+
-+	bridge -n "$NS" -d vlan show dev dummy0 | grep -Eq "^\S+\s+10$|^\s+10$"
-+	check_err $? "VLAN 10 individual entry not found"
-+
-+	bridge -n "$NS" -d vlan show dev dummy0 | grep -Eq "^\S+\s+11$|^\s+11$"
-+	check_err $? "VLAN 11 individual entry not found"
-+
-+	# Configure same mcast_max_groups value and verify range grouping
-+	bridge -n "$NS" vlan set vid 11 dev dummy0 mcast_max_groups 100
-+	check_err $? "Failed to set mcast_max_groups for VLAN 11"
-+
-+	bridge -n "$NS" -d vlan show dev dummy0 | grep -q "10-11"
-+	check_err $? "VLANs with same mcast_max_groups not grouped"
-+
-+	log_test "VLAN range grouping with mcast_max_groups"
-+}
-+
-+vlan_range_mcast_n_groups()
-+{
-+	RET=0
-+
-+	# Add two new consecutive VLANs for range grouping test
-+	bridge -n "$NS" vlan add vid 10 dev dummy0
-+	defer bridge -n "$NS" vlan del vid 10 dev dummy0
-+
-+	bridge -n "$NS" vlan add vid 11 dev dummy0
-+	defer bridge -n "$NS" vlan del vid 11 dev dummy0
-+
-+	# Add different numbers of multicast groups to each VLAN
-+	bridge -n "$NS" mdb add dev br0 port dummy0 grp 239.1.1.1 vid 10
-+	check_err $? "Failed to add mdb entry to VLAN 10"
-+	defer bridge -n "$NS" mdb del dev br0 port dummy0 grp 239.1.1.1 vid 10
-+
-+	bridge -n "$NS" mdb add dev br0 port dummy0 grp 239.1.1.2 vid 10
-+	check_err $? "Failed to add second mdb entry to VLAN 10"
-+	defer bridge -n "$NS" mdb del dev br0 port dummy0 grp 239.1.1.2 vid 10
-+
-+	bridge -n "$NS" mdb add dev br0 port dummy0 grp 239.1.1.1 vid 11
-+	check_err $? "Failed to add mdb entry to VLAN 11"
-+	defer bridge -n "$NS" mdb del dev br0 port dummy0 grp 239.1.1.1 vid 11
-+
-+	# Verify VLANs are not shown as a range due to different mcast_n_groups
-+	bridge -n "$NS" -d vlan show dev dummy0 | grep -q "10-11"
-+	check_fail $? "VLANs with different mcast_n_groups incorrectly grouped"
-+
-+	bridge -n "$NS" -d vlan show dev dummy0 | grep -Eq "^\S+\s+10$|^\s+10$"
-+	check_err $? "VLAN 10 individual entry not found"
-+
-+	bridge -n "$NS" -d vlan show dev dummy0 | grep -Eq "^\S+\s+11$|^\s+11$"
-+	check_err $? "VLAN 11 individual entry not found"
-+
-+	# Add another group to VLAN 11 to match VLAN 10's count
-+	bridge -n "$NS" mdb add dev br0 port dummy0 grp 239.1.1.2 vid 11
-+	check_err $? "Failed to add second mdb entry to VLAN 11"
-+	defer bridge -n "$NS" mdb del dev br0 port dummy0 grp 239.1.1.2 vid 11
-+
-+	bridge -n "$NS" -d vlan show dev dummy0 | grep -q "10-11"
-+	check_err $? "VLANs with same mcast_n_groups not grouped"
-+
-+	log_test "VLAN range grouping with mcast_n_groups"
-+}
-+
-+vlan_range_mcast_enabled()
-+{
-+	RET=0
-+
-+	# Add two new consecutive VLANs for range grouping test
-+	bridge -n "$NS" vlan add vid 10 dev br0 self
-+	defer bridge -n "$NS" vlan del vid 10 dev br0 self
-+
-+	bridge -n "$NS" vlan add vid 11 dev br0 self
-+	defer bridge -n "$NS" vlan del vid 11 dev br0 self
-+
-+	bridge -n "$NS" vlan add vid 10 dev dummy0
-+	defer bridge -n "$NS" vlan del vid 10 dev dummy0
-+
-+	bridge -n "$NS" vlan add vid 11 dev dummy0
-+	defer bridge -n "$NS" vlan del vid 11 dev dummy0
-+
-+	# Configure different mcast_snooping for bridge VLANs
-+	# Port VLANs inherit BR_VLFLAG_MCAST_ENABLED from bridge VLANs
-+	bridge -n "$NS" vlan global set dev br0 vid 10 mcast_snooping 1
-+	bridge -n "$NS" vlan global set dev br0 vid 11 mcast_snooping 0
-+
-+	# Verify port VLANs are not grouped due to different mcast_enabled
-+	bridge -n "$NS" -d vlan show dev dummy0 | grep -q "10-11"
-+	check_fail $? "VLANs with different mcast_enabled incorrectly grouped"
-+
-+	bridge -n "$NS" -d vlan show dev dummy0 | grep -Eq "^\S+\s+10$|^\s+10$"
-+	check_err $? "VLAN 10 individual entry not found"
-+
-+	bridge -n "$NS" -d vlan show dev dummy0 | grep -Eq "^\S+\s+11$|^\s+11$"
-+	check_err $? "VLAN 11 individual entry not found"
-+
-+	# Configure same mcast_snooping and verify range grouping
-+	bridge -n "$NS" vlan global set dev br0 vid 11 mcast_snooping 1
-+
-+	bridge -n "$NS" -d vlan show dev dummy0 | grep -q "10-11"
-+	check_err $? "VLANs with same mcast_enabled not grouped"
-+
-+	log_test "VLAN range grouping with mcast_enabled"
-+}
-+
-+# Verify the newest tested option is supported
-+if ! bridge vlan help 2>&1 | grep -q "neigh_suppress"; then
-+	echo "SKIP: iproute2 too old, missing per-VLAN neighbor suppression support"
-+	exit "$ksft_skip"
-+fi
-+
-+trap defer_scopes_cleanup EXIT
-+setup_prepare
-+tests_run
-+
-+exit "$EXIT_STATUS"
--- 
-2.51.0
-
+...
 
