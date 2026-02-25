@@ -1,239 +1,190 @@
-Return-Path: <netdev+bounces-260968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260969-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0DCQFMQAn2lAYgQAu9opvQ
-	(envelope-from <netdev+bounces-260968-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:01:40 +0100
+	id gG6oNl0Bn2lAYgQAu9opvQ
+	(envelope-from <netdev+bounces-260969-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:04:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC90319878C
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:01:34 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59A231987EB
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 15:04:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2060C30152FC
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:01:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 52500301027B
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:04:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A73D3D331D;
-	Wed, 25 Feb 2026 14:01:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63F563B5311;
+	Wed, 25 Feb 2026 14:04:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jHdNK1Dz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e9Ecg6bt";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="MvJYm+dR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B70E71F03DE
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 14:01:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772028089; cv=pass; b=uoTn7Pa1L4xKLLE0FO8HCV2bMJAEWaMz/mD2xd9JDPEh6pwuTX4QS4ZAsi9MHLr2SBWPaWi5g0Itd5u3Y0NpP615FY8xRhzENjPBGevQ+dyTw3O+zkvdDPsypDKns+2c57STFpkvcvSDAiVZWlisSQua4NCsJQMadpp6UtPc3Bg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772028089; c=relaxed/simple;
-	bh=5Ju3OHVhNRhJLBEGBDX8Dh0cbgt/b4S0cI5EoETOJUk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R2iV3b+t2xkCdcwkza9xyDADom4VuqRKyA+ARIJ8qcfXLkHFfwOBbCXQbmzCBqj/CJQuK9UWMzFVRK2hJc515vaLDv0pdxFdDPPOrMYDLS+eIuOD+UvCxROblH8F1PhRZFvT4W6ghELhb08M7bPXYzsHlCDoSv+pIP/1rhXyC6M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=jHdNK1Dz; arc=pass smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-b9047e72201so990522866b.2
-        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 06:01:27 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772028086; cv=none;
-        d=google.com; s=arc-20240605;
-        b=VznS17QdH/upjyd2LyMEM2mciuuotkk8Fst4nY9rWzG1ACvFGG6GwK+0skxodSSbtN
-         Tvwiard5V39KjZcyn9aPbT4G2zZgA3Ko0OXYB6TUG/YqeHl55BLcGsCrPUSf4abJMMcW
-         aIE2C8/iJL+nJa2J377qcX28pUIPTmTSLQkKvUe/3i0SkvVtiFSJNwSdR12LG3M4hYBv
-         pzby2TkejDj2HdoZGbkzv2sMfMKHusWqvWGEcWetAdq30yT1zSLeX1QKqX9WSD0eC6Sp
-         s2ppV4MqFttUshTYzxL1zEz4ta62LOKgoLKVPIkQLQKLL1erK/lklK76F2R0ilsJ+62u
-         hNxQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=Vy6cNiKVqqdOzrXGU51JG+BLZ2VHPDg76L+Bf6A/K7w=;
-        fh=QQ6RUWmd0XDyicqKNRKkmRM4bjkG1UegudntuwhBBDM=;
-        b=GjjAqrCvub5vCXAz1vESraSS+A8LrJipt5qVvQENWNNBr+24lmxRfYtgnJvpJLcgpF
-         990fjI0GlTlgPQIuskM/xjB32+A711NxSnnUYz/AknLSSVaPQdtF+jS9eWLGhn4tLoQ2
-         fOWhIyrxzeKJ1Lk6TpLbb4zU8fzBHW7E8HV9N+6oJdHBBkYTOjPP66cnTV23FG9ESAes
-         vwJaTVMx+TeqSfItq7QHJCyeZxbyftdEZ0YGzdjSV/35Got6rfDbsAHxiDKpZCH4U/c3
-         U+Nw4aAojwhMfa6isM5O2cudTGW1IK1Pf+V2iXdLmzaIJSZkJHt95R0rOiJB0VaBagZL
-         RAnQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A38D7081E
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 14:04:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772028251; cv=none; b=L4cOOfbI7G0Hfz5us/j1fDbY/Uy26KAAqEJsMwIWQyI3BHKzOLzhg9BHGNU7LKRDrGE9/cEb98Lp9Ab2w5gvsHH7uheh8p/VXhUt8mn4ZgK95E6ktgdYJoohLhIQBH4ChSIVE96V6plEU5Gwfxtf4jw3Upu+zcZ7CVOdIoV+acY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772028251; c=relaxed/simple;
+	bh=wOSi5rx6f5nGUdvzxPTXmIrUP9ydcxmZUG6CbYDYbyE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jeNuwtGwKA6B5m0GysXby9K4gDoG9MlS79yZhqdy74EP+s5/zk1wOfqPCP74u5u/va0/8ahIspqNDvsrV07Uu2u2B/PLaAfWSPvF53uoV1pe+p5A5V+GPjahT5nM0546ZcfU1NSCTxa5YoTMorVY6sUjKNwu737DP46qquWukDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e9Ecg6bt; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=MvJYm+dR; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772028249;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tP8jO23/u4UiTgyTAefvEVx29QmJIqpB1z8C2aG2V5g=;
+	b=e9Ecg6btWSJ3FLdHlga7YNr3Bu5QKMUqzCb0ADZvXKMZfQ9pcxyXW5GMEqi5IqpbJMXER3
+	o3RiIdsOQcCCbwUkJmt9/aWACqP9TNJ0zTnHwCeFk9n7TkzcW+NhBxaUurjhTD59nS5xwD
+	lG22Lc0FEXUzrdh10NH1qOE7Y+iZfDQ=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-428-owSgYUwoPVOUbUE9fPlzPA-1; Wed, 25 Feb 2026 09:04:07 -0500
+X-MC-Unique: owSgYUwoPVOUbUE9fPlzPA-1
+X-Mimecast-MFC-AGG-ID: owSgYUwoPVOUbUE9fPlzPA_1772028246
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-48379489438so79734335e9.2
+        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 06:04:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1772028086; x=1772632886; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vy6cNiKVqqdOzrXGU51JG+BLZ2VHPDg76L+Bf6A/K7w=;
-        b=jHdNK1Dziza9lJ6rugocpTGVZu/G3QSLFYrvyupXi/mIgIyldKtdPGj/zZiwE9RlgA
-         5Veug2uCKJ70ahbrTzYODxc16HSLU4p2ca1FmK9pYEoToy3AJofN6PNjB3tw4QmUXr3V
-         CEg8XRe62zw5EMgfrJGoHTM/iB2gMOw41WHryzUP6Ev5VIVfAxA/k0tZCeAyGJUKX9Jl
-         yIpK8w8Vg/fLhtMzrEZVWg6taW+G3BNuytDf0czNjKg4B78rjh+ddsay3nF17+Tovq5O
-         WIWDQ4wa9HvK94c3Fv0t+Fa7ndtJmOzEMw9xv6iwiM0FEHCg9SVzWKTkbqNxn+HAeiPW
-         bXAg==
+        d=redhat.com; s=google; t=1772028246; x=1772633046; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=tP8jO23/u4UiTgyTAefvEVx29QmJIqpB1z8C2aG2V5g=;
+        b=MvJYm+dR1zRPcZODaicIcyrWXCH34/MCoBWbC3JCrj738cf/K7ceKSleg+EH73aF7s
+         GM0qVtx+bLJUlPArxCO4tZshQtsoQ95PAn+YBdIZqmyqiEiANRozlbUnyAgTbTXoIBNl
+         1wyGPFa+VVmoinQEN5E0Vgbxn7y1XT+TSlOUHhmEnloHnVoikVkNuid/VcR4FqK1ZH4L
+         zTWpnxplhOCLj+/BiK3KuhrianEVY5ZfySjLRx7NWFqsv6t8u/jCOTx6ZKMegMu3ftdF
+         sOcrnZvrS6c92iP+XDdCMLzMnOWyvA/vKcpDTyhxVUI/tF7GGD3WYxjTd8srG2Gw+awe
+         nWiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772028086; x=1772632886;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Vy6cNiKVqqdOzrXGU51JG+BLZ2VHPDg76L+Bf6A/K7w=;
-        b=DhbetONOM9+MvIalzIm/TIrZCL4a4MYDF7FLXgm1Jyor3d4G+uvt5BIBw+3hvN5rYn
-         3/61F/1QBPHRPe/A3/DUmgtrtUx9d3sOpaedfIgiMUK2i8BFfPahygYEgLB7D+3BBQ90
-         JOFObZbvX4LMSD7Xukz5Db9gLL8hWHRUf1xFCTVSL8Bd3WMgq1JjnTg81+ECqRom8KFe
-         KAGuudgdH8Vd2IzYWJVii9Z/8hT1RiMqB3tcs8iz2KD3eZvg7M/bRlvdn5eAO3Mu8AMV
-         VffU74ZvcAyXnTa/qv40cWO7cpdSWC5+q67l7uOFF4x4ljbWH6ZR8RR09S0Z1XpQGIuD
-         BLCw==
-X-Forwarded-Encrypted: i=1; AJvYcCWKj1V5hcLAaMIFUgb/LKOq9G8JwWeJoIAxaJSsh1zswpoHEHaPi6gnld/ScVYv0dsgC1q71/o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxG38p0DC6eof4RBk1vkgK5UmA8YB0GFikUtViN4DM9QATiNlZT
-	k7x0h/8PxVxy0i0rYlIP7QmteRx32S1gx17MwY4LKvvYEbcpW0eR3UxlOhIYJgk04StqMu45R8S
-	j/nASntR6S52fQssFi4V+x7O6+DMqd5/n9sqEM5tU0g==
-X-Gm-Gg: ATEYQzxzkuG5bCoN+RV0nYiENuCGoHRmoOg970JEcU66kas4KPgLybOFXOIplnCs806
-	Cv6hdAmhCoA2XTQ5uQD3o50HUJ0c53Ncf482yPKJ2St2Kc95Q4rQkedmxDWBG3Fy66khPBfmlSu
-	ZLvddVzDIa8oMELM8hQmmhUJT2cOkGXAGCgyTFtOcelCb9rY9aleWEinPoxIrWN975mdcLYbL6q
-	gpclksldpjD/vQFty2G7W8CdPdq+T1FRYXRKCFGSD12Sd5rsNnDFWtKji8NqptvQpuvULDPsuX4
-	arFkmetDGr19RHl5E5bXO0SNJPEkZPM8ow==
-X-Received: by 2002:a17:907:2d89:b0:b93:5297:b3a2 with SMTP id
- a640c23a62f3a-b935297b3bdmr8044466b.59.1772028085419; Wed, 25 Feb 2026
- 06:01:25 -0800 (PST)
+        d=1e100.net; s=20230601; t=1772028246; x=1772633046;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tP8jO23/u4UiTgyTAefvEVx29QmJIqpB1z8C2aG2V5g=;
+        b=gHs/Lam10QScPOGPwyAuQUbkkUG68oe5OBMz47ymxBiJWmvBx9Fsf6AC+VOUL7MBPD
+         LkWaIMTPGNM+LsncxnUfSCEP/kZ+ju4yB3y8pkx8hCHgnjBldRoAVGj888rsYgC3Vja3
+         fwy1u2LS1qfWHIzTrFSXds17OkD6Wmpcnijmq2RaaRdEl1kYIx4jtmizFCV5M8xZk3KO
+         E5woU95WXsKyrjnJeIqtwEhEQMqKluUGIuWhDJQAp+kVBefG6DoXJEn/AicSqeDYxm5H
+         voeSxWTCBHDEfv8RqJ6fSKZMTvsDN9fazr8n0sHV/FJuBbnPjWN8oCRqJQ5Y4uIzhdAo
+         7/ng==
+X-Forwarded-Encrypted: i=1; AJvYcCVWIXQnF84nQnj0l0mlBNmPI3GSu1RmVihY+ERBmz6PMr7i9KzjLZhlHdenmJnxNJmZFQjf0os=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYeh6rJ0Ev2sVBOeqNFCjmTnTHM8PMqdmwTlHQK838Bjyw1Y/0
+	PGEOfAz+Z5owECcVDZCaNGAuBOc67tqlyJ/hMpU2YBADc4y/F99FfY3P7F2Ef2M2nlM2I3Nfo0p
+	gfV+Hm9aKExn4CPydnQ1NsIiYC4Ok7RLEQhZK1T+luUxETVM/ZsDY91E2rQ==
+X-Gm-Gg: ATEYQzyU+A6rgpN2+hBz+W1O9BfSb8riFM5C4tbs0EU8iZaEYesxoECL5QjRTxYTEjZ
+	+3C1PbpkKb4WIa3+jVQKa4b/L7rAOzq43gEjUqgSwsvU1IDNj4FyaTWk68n/MAcK29hNLHeY9LO
+	uOzE7nifh6wqHcetD47hmTii3fPXOwOszuz1Gh6bqNGxN7MIyl2sJD5QGIWs0s7mDSIunhLIy58
+	k7xZWz8AxqsGBL4mGnSJM+OlBElG9lmWQQqSRQ4tVM4liMbbXMhBmHHvnWTBuQbLHnmiEDLZJmI
+	DN9s96iz+Dc5wlG7PKkRQwgeg+CkVMDkLwo5peDNnlhppEN0hdoE0p2FJpGmxyaGVZ0jll/+sdB
+	AmulmuuqcgeP8Mq85n/7o
+X-Received: by 2002:a05:600c:45cc:b0:483:4807:210c with SMTP id 5b1f17b1804b1-483a95f5611mr291247105e9.24.1772028246016;
+        Wed, 25 Feb 2026 06:04:06 -0800 (PST)
+X-Received: by 2002:a05:600c:45cc:b0:483:4807:210c with SMTP id 5b1f17b1804b1-483a95f5611mr291246375e9.24.1772028245505;
+        Wed, 25 Feb 2026 06:04:05 -0800 (PST)
+Received: from localhost ([2a01:e11:1007:ea0:8374:5c74:dd98:a7b2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bd6f2f88sm73743565e9.2.2026.02.25.06.04.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Feb 2026 06:04:04 -0800 (PST)
+Date: Wed, 25 Feb 2026 15:04:04 +0100
+From: Davide Caratti <dcaratti@redhat.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Petr Machata <petrm@mellanox.com>,
+	Ido Schimmel <idosch@mellanox.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH net] net/sched: ets: fix divide by zero in the offload
+ path
+Message-ID: <aZ8BVHcOc1xkx8Nd@dcaratti.users.ipa.redhat.com>
+References: <28504887df314588c7255e9911769c36f751edee.1771964872.git.dcaratti@redhat.com>
+ <CAM0EoMkBsSn_xpdtutUozEQyEjSnhFyf94MHQ6oVLmgGLNyoCA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260203161917.1666696-1-vincent.guittot@linaro.org>
- <20260203161917.1666696-2-vincent.guittot@linaro.org> <20260210004011.GA2188625-robh@kernel.org>
- <aY2rR3Hlm525kGUN@shell.armlinux.org.uk>
-In-Reply-To: <aY2rR3Hlm525kGUN@shell.armlinux.org.uk>
-From: Vincent Guittot <vincent.guittot@linaro.org>
-Date: Wed, 25 Feb 2026 15:01:13 +0100
-X-Gm-Features: AaiRm52xymbtUvdX0WARhHIKYaRvNgdQ5-vzrvF5qBi6nov6q2mJRcNPXMItfGk
-Message-ID: <CAKfTPtBB6ZNde+-t7FKkf0F5Uvy0rDvebM_fsGTy9tk=CBq6Xg@mail.gmail.com>
-Subject: Re: [PATCH 1/4 v2] dt-bindings: serdes: s32g: Add NXP serdes subsystem
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Rob Herring <robh@kernel.org>, vkoul@kernel.org, neil.armstrong@linaro.org, 
-	krzk+dt@kernel.org, conor+dt@kernel.org, ciprianmarian.costea@oss.nxp.com, 
-	s32@nxp.com, p.zabel@pengutronix.de, ghennadi.procopciuc@nxp.com, 
-	Ionut.Vicovan@nxp.com, linux-phy@lists.infradead.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
-	horms@kernel.org, Frank.li@nxp.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAM0EoMkBsSn_xpdtutUozEQyEjSnhFyf94MHQ6oVLmgGLNyoCA@mail.gmail.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260968-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RSPAMD_URIBL_FAIL(0.00)[armlinux.org.uk:query timed out];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,mellanox.com,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-260969-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vincent.guittot@linaro.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linaro.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	FROM_NEQ_ENVFROM(0.00)[dcaratti@redhat.com,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RSPAMD_EMAILBL_FAIL(0.00)[linux.armlinux.org.uk:query timed out];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linaro.org:dkim,armlinux.org.uk:url,armlinux.org.uk:email]
-X-Rspamd-Queue-Id: AC90319878C
+	NEURAL_HAM(-0.00)[-0.994];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mojatatu.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 59A231987EB
 X-Rspamd-Action: no action
 
-Sorry for the delayed reply. Some days off kept me away from keyboard
-
-On Thu, 12 Feb 2026 at 11:28, Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
->
-> On Mon, Feb 09, 2026 at 06:40:11PM -0600, Rob Herring wrote:
-> > On Tue, Feb 03, 2026 at 05:19:14PM +0100, Vincent Guittot wrote:
-> > > +description: |
-> > > +  The SerDes subsystem on S32G SoC Family includes two types of PHYs:
-> > > +    - One PCIe PHY: Supports various PCIe operation modes
-> > > +    - Two Ethernet Physical Coding Sublayer (XPCS) controllers
-> > > +
-> > > +  SerDes operation mode selects the enabled PHYs and speeds. Clock frequency
-> > > +  must be adapted accordingly. Below table describes all possible operation
-> > > +  modes.
-> > > +
-> > > +  Mode  PCIe       XPCS0           XPCS1           PHY clock       Description
-> > > +                SGMII              SGMII             (MHz)
-> > > +  -------------------------------------------------------------------------
-> > > +  0        Gen3    N/A             N/A             100             Single PCIe
-> > > +  1        Gen2    1.25Gbps        N/A             100             PCIe/SGMII
-> > > +  2        Gen2    N/A             1.25Gbps        100             PCIe/SGMII
-> > > +  3        N/A     1.25Gbps        1.25Gbps        100,125         SGMII
-> > > +  4        N/A     3.125/1.25Gbps  3.125/1.25Gbps  125             SGMII
-> > > +  5        Gen2    N/A             3.125Gbps       100             PCIe/SGMII
+On Wed, Feb 25, 2026 at 08:45:10AM -0500, Jamal Hadi Salim wrote:
+> Hi Davide,
+> 
+> On Tue, Feb 24, 2026 at 3:30 PM Davide Caratti <dcaratti@redhat.com> wrote:
 > >
-> > Mixed tabs and spaces. Drop the tabs.
+> > Offloading ETS requires computing each class' WRR weight: this is done by
+> > averaging over the sums of quanta as 'q_sum' and 'q_psum'. Using unsigned
+> > int, the same integer size as the individual DRR quanta, can overflow and
+> > even cause division by zero, like it happened in the following splat:
 > >
-> > What's not clear to me is do you have 2 or 4 lanes?
-> >
-> ...
-> > > +  nxp,sys-mode:
-> > > +    $ref: /schemas/types.yaml#/definitions/uint32
-> >
-> >        maximum: 5
-> >
-> > Though isn't this redundant with the child nodes? You could use the
-> > standard 'phy-mode' property in each child.
->
-> phy-mode is ethernet, but the above is more than just ethernet.
->
-> I've been wondering why a generic PHY driver needs to know this via DT
-> when the generic PHY API has:
->
-> phy_set_mode() / phy_set_mode_ext()
->  - sets the type of the PHY and its submode (e.g. ethernet interface
->     mode)
-> phy_set_speed()
-> phy_set_bus_width()
->
-> Surely these are sufficient to describe what mode is required from the
-> generic PHY, and the generic PHY driver can figure out whether the
-> mode is permitted from the above table, programming the PHY as
-> desired.
+> 
+> Was there a setup/test that resulted in the splat? It would be nice if
+> you could document it.
+> The fix looks good, so:
+> 
+> Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
 
-For the lanes that output SGMII, we don't register a generic phy
-driver but we provide the pcs with
+hi Jamal, thanks for reviewing!
 
-pcs-handle = <&phy_xpcs0_0>;
+the test is a single line :
 
->
-> For Ethernet, we don't call the 3.125Gbps "SGMII" using that term. We
-> use SGMII strictly for Cisco SGMII, which runs at 1.25Gbps. 3.125Gbps
-> single-lane serdes ethernet is not able to use Cisco SGMII inband
-> signalling because running the underlying data rate with 10 or 100
-> symbol replications makes no sense. So we have decided to all this
-> 2500BASE-X. If such a SerDes is connected to a SFP cage, then we
-> support switching between 1.25Gbps and 3.125Gbps mode depending on
-> the module inserted, which requires dynamic reconfiguration of the
-> SerDes.
+# tc qdisc add dev eth0 root ets bands 3 quanta 4294967294 1 1
 
-yes, I still have to figure out how to handle 3.125Gbps and 2500BASE-X mode
+but to see p_sum = 0 as divisor, eth0 must support offload for TC_SETUP_QDISC_ETS.
+I see that netdevsim only supports TAPRIO offload, and I plan to follow-up on
+net-next adding support for ETS offload on netdevsim (maybe also other qdiscs
+deserve this, just to let syzkaller explore some  "new" areas).
 
->
-> What I'm saying is that describing a single mode covering several ports
-> could make things difficult in the future, so make sure you think
-> carefully.
+This way, I can write a TDC test-case similar to those we have for taprio
+or cake-mq. 
 
-The serdes mode (deciding wether to output pcie or ethernet for each
-lane) has to be decided before de-asserting the reset of the HW IP so
-we can't really make it dynamic
+-- 
+davide
 
-
-
->
-> --
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
