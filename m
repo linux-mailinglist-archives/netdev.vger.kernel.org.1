@@ -1,118 +1,64 @@
-Return-Path: <netdev+bounces-260857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260859-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iPEQDKfInmkuXQQAu9opvQ
-	(envelope-from <netdev+bounces-260857-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:02:15 +0100
+	id eLZIH9zInmkuXQQAu9opvQ
+	(envelope-from <netdev+bounces-260859-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:03:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3AC81956EE
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:02:14 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DC40195733
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:03:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 98BDE3016AC2
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:01:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6BFAB30156E6
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:02:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 371DB3624B9;
-	Wed, 25 Feb 2026 10:01:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e44QXep2";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="FYiCpTDm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA6C73624B9;
+	Wed, 25 Feb 2026 10:02:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from inva021.nxp.com (inva021.nxp.com [92.121.34.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7AA8322749
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 10:01:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1371919B5B1;
+	Wed, 25 Feb 2026 10:02:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772013713; cv=none; b=JAYIfwhbHQbK1RnVuJMAU04R25dW3ue3Air5ZJKWhjsrhBaU0ASg1WlIYmjCdu7tIEFpvBasRa/jhoEcqjSbQRVTKYMhnGVdwa9vIX+Uyc9F8+hxvUoDtJbjXb+UAL79+FFhyh7873gSltyuFAi3eD2ibOpoF/rtRn94XBcISZ4=
+	t=1772013770; cv=none; b=adO934OpumRdITCGXh4RDdkQ2k1RqtXeqtX3JqJFFYIoP90RFxM0g/O9mWV6hz8xmlSwtj+afzTnTe4HkmiAnejgYoKasMEh0GAxbCV6PfoP1OhBv4LFXWCGB6npC2Xtu+Ls5Mui6cTFRgZtQnnR7817UyKMg9raUO0GKtt2I+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772013713; c=relaxed/simple;
-	bh=u9CvtSP91YekIS68SSQl4Vt/A8tkQgw8jEa8fPceo7c=;
+	s=arc-20240116; t=1772013770; c=relaxed/simple;
+	bh=5qu0+i5/S8lFVCwnC3vdFY4BnnruuoF7pmrW57g1tqo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C/QTZ8ljrMR+DOt/El3HcFfqpAMntDnc4FlegL90y5LAS4IRiZR9WdmUSqBqHR0Ty5Gd6fvZ5p66X5c9HQWDOZUGvhVnGERhfoQKeXRUS1iG3FqTDEq+ytts4NbglM7UzsMzmyTI+eGPfhTMLbaoReEGZ7JxU47JZ1Hge4JJ69c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e44QXep2; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=FYiCpTDm; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772013710;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qItuZ2RIB8SUFWGgO0o0RQca3VPYW8nU8swiC3uXqcs=;
-	b=e44QXep2kMptJYuRZWsP7wIInz6mCGt/7YjDt4gYIFgQCliT9oIs6LF5t4+8iYAK/Poe0d
-	OGLSXl82AVoLW2AiFhEFFQ7Dz42wMlv6dxmhPdvVvc1CadHMBir1tPnMK6DjfUMul36mSX
-	Nei2ndBbZIrEzhCHrn1zTQPYU/5UA6Q=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-120-96b8TGCQMM6YsAi7MBGQyg-1; Wed, 25 Feb 2026 05:01:49 -0500
-X-MC-Unique: 96b8TGCQMM6YsAi7MBGQyg-1
-X-Mimecast-MFC-AGG-ID: 96b8TGCQMM6YsAi7MBGQyg_1772013708
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-48071615686so14819305e9.1
-        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 02:01:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1772013708; x=1772618508; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qItuZ2RIB8SUFWGgO0o0RQca3VPYW8nU8swiC3uXqcs=;
-        b=FYiCpTDmUngK8hd5WmXuBmorOuS5iyT7hO4gLwceFqPCZboX1xNv7sq5RGIM0JVgxX
-         2X+UlnHy61gtk+TtjQciLiJ0Zsy1WwY/UtckFH6Q4TPXciUFnLcbNrawzVHG14TS8MIw
-         CD1+ds0jyapw2qXkveU99POOHBHTNkvB3sUyqKJ/CzAZb42KE2UcG39VEaR5ZKBhKxN0
-         CE6Y1gXaVD2xlNiXHCWul/MUvY/vZdyPbN0jwWZdRIXKosNNGHytpFfsZZWEJWEmuCg7
-         DUwubCe5Tj703EkCVJToxgmtz75WwwPjgrMibTl2SuJ9bBuMLGezRCg0/LS6JRcTuDI1
-         7+ng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772013708; x=1772618508;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qItuZ2RIB8SUFWGgO0o0RQca3VPYW8nU8swiC3uXqcs=;
-        b=Y+pv0HKneNuZWNIMVo9QdBx0lrTVWrTGb5Spj9RYiQy/vQa7EVtx8uXS1rQbJIl/po
-         wj/rB3VZtnjwoL1pH74fO/XI8z9zVJbiamOuY0MAU3rjGM81JhrTPw+y7vuUemXga5Ut
-         4qI1/EpsVQfo+qmJjrAcedybEm1YZT+3gqeNhd/E9LdeZxieP/6IvokaLoZ6LMuWLOYN
-         WDgGV5/nuL+KKQefInt0PKh0BjNpFstV4A5QYQ4HRLyrJKyha+Kwzg25enKWl0lHVAc6
-         catP6ixWp9hjmFfxblhntKpPW1pPtS0Uz8ENy/eEvwwSXnPJpd0bMZylaWZXn0wpEND3
-         eoNw==
-X-Forwarded-Encrypted: i=1; AJvYcCVbZ5haXyyq+ZSPHc24zImjwoK+6oC3qdLFBe5OamfkZd9e3jUx4ML+MSzsUrwZFer16tRSt/Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywg79RMXQRh2MTbMiQ+oSjqIZm45pFcObMSzvHTL4gySUSrUZ5o
-	Q6YU/DdiANwerEDULhusdPM9MTb+I90Y63v6t5B64OAfbVpdNhLwhEOqm7lViYKi9ayxcHjlfWT
-	MGBMUM9Nem+UyR/c2o7DRgjjVWgS/mCtjLJge5OVObIRXmejb2hUUTjnl8Q==
-X-Gm-Gg: ATEYQzxvQjYxVCCLYqlOLUh1e4AOx+EtZ9WY7IAwtx9DVYW+J60Zc9oHScyE0crWZMQ
-	eGzLwp/6yBYPnz4CmLwA9CDkKsXGdw0Tc2mNVFj6p+iVSJF+RD6COeTIEn4mxUTg3mBJG6NPUfX
-	UPQGxgAj2Bi+5QzvYJUZ3y37bolLhJvRLWe/19jYMGwePIqCRcX6qu/pwXWj5BICeSlAmAThRZd
-	8GIsMj/Ay7E+w4dnBXxir6a0hYF90L5JuSuqFaYeNxrIAddNw+Z44UKa5QnLNvRMvqyrYOt6G7O
-	VKp9qeHdI1BuPD87Xe6zUVrML8z6SvJBGvjalAD0bUuem147+xNxbKzXQiolI5hXyOWjU1tEUeV
-	sAHLaFuKbJ9SxFth3kFORTT1ygVg9LZp/n+Vocir54UQ/Rg==
-X-Received: by 2002:a05:600c:4589:b0:480:1e9e:f9b with SMTP id 5b1f17b1804b1-483a95dea3emr316810155e9.16.1772013707920;
-        Wed, 25 Feb 2026 02:01:47 -0800 (PST)
-X-Received: by 2002:a05:600c:4589:b0:480:1e9e:f9b with SMTP id 5b1f17b1804b1-483a95dea3emr316809155e9.16.1772013707338;
-        Wed, 25 Feb 2026 02:01:47 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-79-166.inter.net.il. [80.230.79.166])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bfb776easm8576745e9.6.2026.02.25.02.01.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Feb 2026 02:01:46 -0800 (PST)
-Date: Wed, 25 Feb 2026 05:01:43 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: Srujana Challa <schalla@marvell.com>, pabeni@redhat.com,
-	jasowang@redhat.com, eperezma@redhat.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, ndabilpuram@marvell.com,
-	kshankar@marvell.com, netdev@vger.kernel.org,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH net-next,2/2] virtio_net: replace RSS key size max check
- with BUILD_BUG_ON
-Message-ID: <20260225045757-mutt-send-email-mst@kernel.org>
-References: <20260224065850.962826-1-schalla@marvell.com>
- <20260224065850.962826-2-schalla@marvell.com>
- <1772010702.3747633-2-xuanzhuo@linux.alibaba.com>
- <20260225042302-mutt-send-email-mst@kernel.org>
- <1772011833.9281492-3-xuanzhuo@linux.alibaba.com>
- <20260225043249-mutt-send-email-mst@kernel.org>
- <1772012166.8117785-4-xuanzhuo@linux.alibaba.com>
- <20260225044528-mutt-send-email-mst@kernel.org>
- <1772013149.5017734-5-xuanzhuo@linux.alibaba.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pNngFNGjmfiZb0YNI8ch604aah6+m8cBgt8YkAf8FL0L/3PaDNs7zykGqCgeeuxmr3ue2FkWLHWbImg1AcM0KBSGtAIOhkWlLJv6JLvf3+gjJS4ObJpb5IF5t8S/k8VrUBtZPe1gECpGhHUfqxatBas67uxg98Pm7Fz/UetIY/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; arc=none smtp.client-ip=92.121.34.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 2FA77200D05;
+	Wed, 25 Feb 2026 11:02:42 +0100 (CET)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 13AFE200D16;
+	Wed, 25 Feb 2026 11:02:42 +0100 (CET)
+Received: from lsv051416.swis.nl-cdc01.nxp.com (lsv051416.swis.nl-cdc01.nxp.com [10.168.48.122])
+	by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id CD6852037D;
+	Wed, 25 Feb 2026 11:02:41 +0100 (CET)
+Date: Wed, 25 Feb 2026 11:02:42 +0100
+From: Jan Petrous <jan.petrous@oss.nxp.com>
+To: Simon Horman <horms@kernel.org>
+Cc: alexandre.torgue@foss.st.com, devicetree@vger.kernel.org,
+	festevam@gmail.com, chester62515@gmail.com, s.hauer@pengutronix.de,
+	linux-arm-kernel@lists.infradead.org, davem@davemloft.net,
+	mbrugger@suse.com, netdev@vger.kernel.org, andrew+netdev@lunn.ch,
+	s32@nxp.com, pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, Frank.Li@nxp.com,
+	robh@kernel.org, kuba@kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	ghennadi.procopciuc@oss.nxp.com, kernel@pengutronix.de,
+	shawnguo@kernel.org, edumazet@google.com, mcoquelin.stm32@gmail.com,
+	imx@lists.linux.dev
+Subject: Re: [v5,4/4] stmmac: s32: enable support for Multi-IRQ mode
+Message-ID: <aZ7IwgwP5iy2kej8@lsv051416.swis.nl-cdc01.nxp.com>
+References: <20260223-dwmac_multi_irq-v5-4-8fc699a5fac4@oss.nxp.com>
+ <20260225092513.174261-1-horms@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -121,164 +67,106 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1772013149.5017734-5-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20260225092513.174261-1-horms@kernel.org>
+X-Virus-Scanned: ClamAV using ClamSMTP
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[nxp.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260857-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	FREEMAIL_CC(0.00)[foss.st.com,vger.kernel.org,gmail.com,pengutronix.de,lists.infradead.org,davemloft.net,suse.com,lunn.ch,nxp.com,redhat.com,kernel.org,st-md-mailman.stormreply.com,oss.nxp.com,google.com,lists.linux.dev];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260859-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,marvell.com:email]
-X-Rspamd-Queue-Id: E3AC81956EE
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jan.petrous@oss.nxp.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.940];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lsv051416.swis.nl-cdc01.nxp.com:mid]
+X-Rspamd-Queue-Id: 3DC40195733
 X-Rspamd-Action: no action
 
-On Wed, Feb 25, 2026 at 05:52:29PM +0800, Xuan Zhuo wrote:
-> On Wed, 25 Feb 2026 04:47:22 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > On Wed, Feb 25, 2026 at 05:36:06PM +0800, Xuan Zhuo wrote:
-> > > On Wed, 25 Feb 2026 04:33:57 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > > On Wed, Feb 25, 2026 at 05:30:33PM +0800, Xuan Zhuo wrote:
-> > > > > On Wed, 25 Feb 2026 04:24:14 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > > > > On Wed, Feb 25, 2026 at 05:11:42PM +0800, Xuan Zhuo wrote:
-> > > > > > > On Tue, 24 Feb 2026 12:28:50 +0530, Srujana Challa <schalla@marvell.com> wrote:
-> > > > > > > > Since NETDEV_RSS_KEY_LEN was increased to 256 in net-next, use
-> > > > > > > > BUILD_BUG_ON to enforce the limit at compile time and remove the
-> > > > > > > > redundant runtime max check.
-> > > > > > > >
-> > > > > > > > Signed-off-by: Srujana Challa <schalla@marvell.com>
-> > > > > > > > ---
-> > > > > > > >  drivers/net/virtio_net.c | 8 +-------
-> > > > > > > >  1 file changed, 1 insertion(+), 7 deletions(-)
-> > > > > > > >
-> > > > > > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > > > > > > index eeefe8abc122..768ad5523dfa 100644
-> > > > > > > > --- a/drivers/net/virtio_net.c
-> > > > > > > > +++ b/drivers/net/virtio_net.c
-> > > > > > > > @@ -6639,13 +6639,7 @@ static int virtnet_validate(struct virtio_device *vdev)
-> > > > > > > >  			__virtio_clear_bit(vdev, VIRTIO_NET_F_RSS);
-> > > > > > > >  			__virtio_clear_bit(vdev, VIRTIO_NET_F_HASH_REPORT);
-> > > > > > > >  		}
-> > > > > > > > -		if (key_sz > NETDEV_RSS_KEY_LEN) {
-> > > > > > > > -			dev_warn(&vdev->dev,
-> > > > > > > > -				 "rss_max_key_size=%u exceeds driver limit %u, disabling RSS\n",
-> > > > > > > > -				 key_sz, NETDEV_RSS_KEY_LEN);
-> > > > > > > > -			__virtio_clear_bit(vdev, VIRTIO_NET_F_RSS);
-> > > > > > > > -			__virtio_clear_bit(vdev, VIRTIO_NET_F_HASH_REPORT);
-> > > > > > > > -		}
-> > > > > > > > +		BUILD_BUG_ON(type_max(key_sz) >= NETDEV_RSS_KEY_LEN);
-> > > > > > >
-> > > > > > > Do we really need this check?
-> > > > > > >
-> > > > > > > If I understand correctly, the intention is to cap key_sz at 256. However, since
-> > > > > > > key_sz is of type u8, its maximum value is inherently 255, making this check
-> > > > > > > redundant. This is not only limited by this kernel code, the virtio-net spec
-> > > > > > > defines this.
-> > > > > >
-> > > > > > That's why it's BUILD_BUG_ON. It checks it has the right type.
-> > > > > >
-> > > > > > We never *need* BUILD_BUG_ON by definition, what this does is
-> > > > > > document the assumption.
-> > > > > >
-> > > > > >
-> > > > > > > Moreover, if NETDEV_RSS_KEY_LEN is ever reduced to a value smaller than 256 in
-> > > > > > > the future, this check would no longer enforce the intended limit correctly.
-> > > > > >
-> > > > > > then it would fail build.
-> > > > >
-> > > > > So, does this mean we don't need to account for the case where
-> > > > > NETDEV_RSS_KEY_LEN is 128, but the key_sz reported by the device is 64?
-> > > > >
-> > > > > Thanks.
-> > > > >
-> > > >
-> > > > yes.
-> > >
-> > > Why?
-> > >
-> > > If NETDEV_RSS_KEY_LEN is 128 but the device reports a key_sz of 64, does this
-> > > violate the spec?
-> >
-> > not the value of key_sz. If type of key_sz
-> >
-> >
-> > i actually do not understand the question. this is not what BUILD_BUG_ON
-> > checks.
+On Wed, Feb 25, 2026 at 09:25:13AM +0000, Simon Horman wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
 > 
-> So this is the issue. Originally, the code checked whether the value of key_sz
-> was less than NETDEV_RSS_KEY_LEN.
-
-
-No, and the check was plain wrong:
-
--               if (key_sz > NETDEV_RSS_KEY_LEN) {
--
-
-so if device supports a larger key then .... we disable the feature
-completely? Silly.
-
-
-But the issue is present in net just the same.
-
-So I think the commit log should be rewritten to explain the real issue,
-and target net, not net-next.
-
-> However, switching to a type_max check means
-> it no longer covers the scenario I described. Therefore, I think this is
-> unreasonable.
+> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+> ---
+> stmmac: s32: enable support for Multi-IRQ mode
 > 
-> Thanks
+> This commit enables Multi-IRQ mode for the S32 DWMAC driver, allowing
+> per-queue IRQs for improved performance. The driver checks for multiple
+> queues and per-queue IRQs, enabling multi-IRQ mode when both are present.
+> 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
+> > index af594a096676..4aad7077c9d6 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
+> 
+> [ ... ]
+> 
+> > @@ -165,6 +165,16 @@ static int s32_dwmac_probe(struct platform_device *pdev)
+> >  	plat->core_type = DWMAC_CORE_GMAC4;
+> >  	plat->pmt = 1;
+> >  	plat->flags |= STMMAC_FLAG_SPH_DISABLE;
+> > +
+> > +	/* Check for multi-IRQ config. Assumption: symmetrical rx/tx queues */
+> > +	if (plat->rx_queues_to_use > 1 &&
+> > +	    (res.rx_irq[0] > 0 && res.tx_irq[0] > 0)) {
+> > +		plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
+> > +		dev_info(dev, "Multi-IRQ mode (per queue IRQs) selected\n");
+> > +	} else {
+> > +		dev_info(dev, "MAC IRQ mode selected\n");
+> > +	}
+> 
+> Does this validation check all queues have IRQs? The condition verifies
+> only res.rx_irq[0] and res.tx_irq[0] but doesn't confirm that higher
+> queues have IRQs when rx_queues_to_use > 1.
+> 
+> If a device tree specifies multiple queues but only provides IRQs for
+> queue 0:
+> 
+>     snps,rx-queues-to-use = <2>;
+>     interrupt-names = "macirq", "rx-queue-0", "tx-queue-0";
+>                       /* queue 1 IRQs missing */
+> 
+> The driver would enable STMMAC_FLAG_MULTI_MSI_EN, but later in
+> stmmac_request_irq_multi_msi() (drivers/net/ethernet/stmicro/stmmac/
+> stmmac_main.c), queues with rx_irq[i] == 0 are silently skipped:
+> 
+>     for (i = 0; i < priv->plat->rx_queues_to_use; i++) {
+>         if (priv->rx_irq[i] <= 0)
+>             continue;  /* queue 1+ skipped, no handler registered */
+>         ...
+>     }
+> 
+> This would leave higher-numbered queues with no interrupt handler,
+> causing packet loss when traffic arrives on those queues.
+> 
+> Would it be safer to validate all queue IRQs before enabling multi-IRQ
+> mode, or fall back to MAC IRQ mode if any queue IRQ is missing?
+> 
+> > +
+> >  	plat->rx_fifo_size = 20480;
+> >  	plat->tx_fifo_size = 20480;
 
+Hi Simon,
 
+I already addressed this in v6 I sent today.
 
-
-> >
-> > > > the code makes assumptions but it documents them and not
-> > > > just documents them, build will fail if they are violated.
-> > >
-> > > About this, I am ok.
-> > >
-> > > Thanks.
-> > >
-> > >
-> > > >
-> > > >
-> > > > > >
-> > > > > > >
-> > > > > > > Moreover, you should add a cover letter.
-> > > > > > >
-> > > > > > > Thanks.
-> > > > > > >
-> > > > > > >
-> > > > > > >
-> > > > > > >
-> > > > > > >
-> > > > > > > >  	}
-> > > > > > > >
-> > > > > > > >  	return 0;
-> > > > > > > > --
-> > > > > > > > 2.25.1
-> > > > > > > >
-> > > > > >
-> > > >
-> >
-
+/Jan
 
