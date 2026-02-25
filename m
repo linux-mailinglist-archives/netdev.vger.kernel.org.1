@@ -1,53 +1,73 @@
-Return-Path: <netdev+bounces-260711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260712-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iOeJBtNXnmkjUwQAu9opvQ
-	(envelope-from <netdev+bounces-260711-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 03:00:51 +0100
+	id KNybI6BbnmlrUwQAu9opvQ
+	(envelope-from <netdev+bounces-260712-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 03:17:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70B3C1905FD
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 03:00:50 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2AB0190CAA
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 03:17:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CDBA732AAAC7
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 01:51:43 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E3F4B30193BF
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 01:52:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2467728C864;
-	Wed, 25 Feb 2026 01:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85FED20C012;
+	Wed, 25 Feb 2026 01:52:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jiQmGY6c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sE3eh2qG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 005D1256C6C;
-	Wed, 25 Feb 2026 01:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 637251FE45D;
+	Wed, 25 Feb 2026 01:52:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771984231; cv=none; b=NJ80tsYwWM6+pq2FRuEDnHVUAX+vSu8eB7+Qzonua2TaX1ttL6IUWWqUrVNuIXXIxqhZlJ1gJ2mEekjil1njW7Y2Evqp/YDyraFEHSLe75z1y7NdyZpNOXzH8Ziah+AD7AIRYM2XQrSEQM5ezEphC4Yglzs7NTBlrIzldH+TcNI=
+	t=1771984376; cv=none; b=fWFp7zZSfCrV9CTZBOqHZ1/OLpfWQOCOFohcxTc7JEaBekIrHmbIViAeWbNnL/HDy+Nd6ksC8h2d+Bt/Z2Lw49KayrfklKWMkNKEoWOKNIobGkVJWchYFL9855VklCyc7z2dIH4eTWCwQiLsN8IAAwMUJgFbPnV/C05qVdc6ru4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771984231; c=relaxed/simple;
-	bh=ydW/R9nMe7Z3plvXt/PQOL6RZakAoSHEBA32j8646bM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=M476yz/EGg7VOauwUMp74gbp/uPR1skm6Bm/xY2WhTyrM+hlzY8cM2yp/OR8kFkMw8H6fsidXyoCtm/rZmdCt+PqASqANH1P4T9HVTuTuyI3u51Pr4L3nGYc0bMCHxm4gl/9D1aGJsL4xCgfPHz+v6p3FVp0xt5jDeV5mQlsgfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jiQmGY6c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A73B2C2BCB0;
-	Wed, 25 Feb 2026 01:50:30 +0000 (UTC)
+	s=arc-20240116; t=1771984376; c=relaxed/simple;
+	bh=IACWKJ8NQgW46rPKrUtEAAc4l8/vFQANiaDAzWwriC4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Zh7roptEoIeGFWjHMSFpxcfqneYTSY/XQDRn1/NjLHPfMNSFqsck+HIjNw0nV4erPWM62Oek6+hMaVKDdwVagzaCvJoftgP7GvQexuZkjoztEek8ToZOJ5koJEFLApJeqzI6LxNDqYmcAcpKw6kivSF1RKWkK5lR1TaO5KrJVF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sE3eh2qG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B853C116D0;
+	Wed, 25 Feb 2026 01:52:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771984230;
-	bh=ydW/R9nMe7Z3plvXt/PQOL6RZakAoSHEBA32j8646bM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jiQmGY6cn57d6BOaEFwBAFstfP7KNZ5HBf1KO3S9Qvgt8izec5aaC6A2/b47NYpSc
-	 tBjhhuOdJPU8foz8w4VhZ5yiEpQ7ZfPdcP0hRhnrw/VH353SkMnBWG9DEPysqGuonr
-	 ZJXtY3ASIBfHQGBI2e1huSXJ/7jy0HLK/E+TjjRAAgDdkKWV3diBFLVynFReOHedcp
-	 sqdfb1qtt0sNxqwQXRglULvHKvrSqv2SGTEx+ovGPXkSUD0uMN+KVVtL8ucJ8yj2LQ
-	 lIT6AEsNaTv17qRqVWB6wa1gcf9EpQAYc5+68WtGJxIfrN9sDz7+QdvWpId6hnrizb
-	 qfCaWKAJ4ummQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FEA63808203;
-	Wed, 25 Feb 2026 01:50:37 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1771984376;
+	bh=IACWKJ8NQgW46rPKrUtEAAc4l8/vFQANiaDAzWwriC4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=sE3eh2qGh/nnkQbTd+X72/iZvN1yzhv17OkQvM9ecrDumsaxfENW+5sXy7MW4tAVK
+	 dJtat05Gv2CzX3Z0Jb1GVCO6yNL+bFFzyNm0RauW4PWiqz4klO6JMpAmLO0RbPTyZ+
+	 edWOCDIU2FQq2lJ5CmXgid2KZHYWv8aN0L1onXMHTIiV0Sb7SFnZ8b7lXa5w1P+n4r
+	 RVfQVaGOuZuveg7BWfRFK9L23iBl2mYGHJ7LediLTor5f5fljd/sOeALtg2xlIlkpX
+	 Pm/+4ELgc1+snHSStbq7EJ2M+/fhCotamHYoXFakUFScdRdKHFn6ss11drPgSMKpeR
+	 NMV9vF76Mmhxg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: ericwouds@gmail.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	mostrows@earthlink.net,
+	netfilter-devel@vger.kernel.org,
+	pabeni@redhat.com,
+	kees@kernel.org,
+	edumazet@google.com,
+	razor@blackwall.org,
+	horms@kernel.org,
+	fw@strlen.de,
+	pablo@netfilter.org,
+	andrew+netdev@lunn.ch,
+	idosch@nvidia.com,
+	netdev@vger.kernel.org,
+	davem@davemloft.net,
+	bridge@lists.linux.dev,
+	phil@nwl.cc
+Subject: Re: [v19,nf-next,3/5] netfilter: bridge: Add conntrack double vlan and pppoe
+Date: Tue, 24 Feb 2026 17:52:35 -0800
+Message-ID: <20260225015235.967500-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260224065307.120768-4-ericwouds@gmail.com>
+References: <20260224065307.120768-4-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,73 +75,234 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] docs: net: document neigh gc_stale_time
- sysctl
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177198423578.31093.15379027390417770777.git-patchwork-notify@kernel.org>
-Date: Wed, 25 Feb 2026 01:50:35 +0000
-References: <20260223101257.47563-1-g.goller@proxmox.com>
-In-Reply-To: <20260223101257.47563-1-g.goller@proxmox.com>
-To: Gabriel Goller <g.goller@proxmox.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
- skhan@linuxfoundation.org, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-260712-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260711-lists,netdev=lfdr.de,netdevbpf];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.995];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,earthlink.net,vger.kernel.org,redhat.com,google.com,blackwall.org,strlen.de,netfilter.org,lunn.ch,nvidia.com,davemloft.net,lists.linux.dev,nwl.cc];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 70B3C1905FD
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: B2AB0190CAA
 X-Rspamd-Action: no action
 
-Hello:
+This is an AI-generated review of your patch. The human sending this
+email says "The tracking of feedback in the AI bot is often wrong,
+but FWIW this is what it has to say about the submission"
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+netfilter: bridge: Add conntrack double vlan and pppoe
 
-On Mon, 23 Feb 2026 11:12:54 +0100 you wrote:
-> Add missing documentation for a neighbor table garbage collector sysctl
-> parameter in ip-sysctl.rst:
-> 
-> neigh/default/gc_stale_time: controls how long an unused neighbor entry
-> is kept before becoming eligible for garbage collection (default: 60
-> seconds)
-> 
-> [...]
+This patch adds connection tracking capabilities for PPPoE encapsulated
+packets and for inner 802.1q combined with outer 802.1ad or 802.1q
+encapsulation in bridge netfilter.
 
-Here is the summary with links:
-  - [net-next,v2] docs: net: document neigh gc_stale_time sysctl
-    https://git.kernel.org/netdev/net-next/c/3197cce4d48c
+> diff --git a/net/bridge/netfilter/nf_conntrack_bridge.c b/net/bridge/netfilter/nf_conntrack_bridge.c
+> index 58a33d0380b0..49e01083278c 100644
+> --- a/net/bridge/netfilter/nf_conntrack_bridge.c
+> +++ b/net/bridge/netfilter/nf_conntrack_bridge.c
+> @@ -16,6 +16,7 @@
+>  #include <net/netfilter/nf_conntrack_helper.h>
+>  #include <net/netfilter/nf_conntrack_bridge.h>
+>
+> +#include <linux/ppp_defs.h>
+>  #include <linux/netfilter_ipv4.h>
+>
+>  #include "../br_private.h"
+> @@ -236,58 +237,116 @@ static int nf_ct_br_ipv6_check(const struct sk_buff *skb)
+>  	return 0;
+>  }
+>
+> +static int nf_ct_bridge_pre_inner(struct sk_buff *skb, __be16 *proto, u32 *len)
+> +{
+> +	switch (*proto) {
+> +	case htons(ETH_P_PPP_SES): {
+> +		struct ppp_hdr {
+> +			struct pppoe_hdr hdr;
+> +			__be16 proto;
+> +		} *ph;
+> +
+> +		if (!pskb_may_pull(skb, PPPOE_SES_HLEN))
+> +			return -1;
+> +		ph = (struct ppp_hdr *)(skb->data);
+> +		switch (ph->proto) {
+> +		case htons(PPP_IP):
+> +			*proto = htons(ETH_P_IP);
+> +			*len = ntohs(ph->hdr.length) - 2;
+> +			skb_set_network_header(skb, PPPOE_SES_HLEN);
+> +			return PPPOE_SES_HLEN;
+> +		case htons(PPP_IPV6):
+> +			*proto = htons(ETH_P_IPV6);
+> +			*len = ntohs(ph->hdr.length) - 2;
+> +			skb_set_network_header(skb, PPPOE_SES_HLEN);
+> +			return PPPOE_SES_HLEN;
+> +		}
+> +		break;
+> +	}
 
-You are awesome, thank you!
+Is there validation on the PPPoE length field before using it? Florian
+Westphal raised this concern during v14 review:
+
+https://lore.kernel.org/netfilter-devel/aG2VDyHfVsp5L2zR@strlen.de/
+
+The code reads ph->hdr.length and uses it directly to compute *len without
+checking if the value is reasonable. While pskb_may_pull and pskb_trim_rcsum
+provide bounds checking later in the code path, garbage or malicious
+ph->hdr.length values could cause issues before those checks occur.
+
+Should there be explicit validation of the PPPoE length field here to ensure
+it's within acceptable bounds?
+
+[ ... ]
+
+> @@ -236,58 +237,116 @@ static int nf_ct_br_ipv6_check(const struct sk_buff *skb)
+>
+[ ... ]
+
+>  static unsigned int nf_ct_bridge_pre(void *priv, struct sk_buff *skb,
+>  				     const struct nf_hook_state *state)
+>  {
+>  	struct nf_hook_state bridge_state = *state;
+> +	int ret = NF_ACCEPT, offset = 0;
+>  	enum ip_conntrack_info ctinfo;
+> +	u32 len, pppoe_len = 0;
+>  	struct nf_conn *ct;
+> -	u32 len;
+> -	int ret;
+> +	__be16 proto;
+>
+>  	ct = nf_ct_get(skb, &ctinfo);
+>  	if ((ct && !nf_ct_is_template(ct)) ||
+>  	    ctinfo == IP_CT_UNTRACKED)
+>  		return NF_ACCEPT;
+>
+> -	switch (skb->protocol) {
+> -	case htons(ETH_P_IP):
+> -		if (!pskb_may_pull(skb, sizeof(struct iphdr)))
+> +	proto = skb->protocol;
+> +
+> +	if (ct && nf_ct_zone_id(nf_ct_zone(ct), CTINFO2DIR(ctinfo)) !=
+> +			NF_CT_DEFAULT_ZONE_ID) {
+> +		offset = nf_ct_bridge_pre_inner(skb, &proto, &pppoe_len);
+> +		if (offset < 0)
+>  			return NF_ACCEPT;
+> +	}
+> +
+> +	switch (proto) {
+> +	case htons(ETH_P_IP):
+> +		if (!pskb_may_pull(skb, offset + sizeof(struct iphdr)))
+> +			goto do_not_track;
+>
+>  		len = skb_ip_totlen(skb);
+> -		if (pskb_trim_rcsum(skb, len))
+> -			return NF_ACCEPT;
+> +		if (pppoe_len && pppoe_len != len)
+> +			goto do_not_track;
+> +		if (pskb_trim_rcsum(skb, offset + len))
+> +			goto do_not_track;
+>
+>  		if (nf_ct_br_ip_check(skb))
+> -			return NF_ACCEPT;
+> +			goto do_not_track;
+>
+>  		bridge_state.pf = NFPROTO_IPV4;
+>  		ret = nf_ct_br_defrag4(skb, &bridge_state);
+>  		break;
+>  	case htons(ETH_P_IPV6):
+> -		if (!pskb_may_pull(skb, sizeof(struct ipv6hdr)))
+> -			return NF_ACCEPT;
+> +		if (!pskb_may_pull(skb, offset + sizeof(struct ipv6hdr)))
+> +			goto do_not_track;
+>
+>  		len = sizeof(struct ipv6hdr) + skb_ipv6_payload_len(skb);
+> -		if (pskb_trim_rcsum(skb, len))
+> -			return NF_ACCEPT;
+> +		if (pppoe_len && pppoe_len != len)
+> +			goto do_not_track;
+> +		if (pskb_trim_rcsum(skb, offset + len))
+> +			goto do_not_track;
+>
+>  		if (nf_ct_br_ipv6_check(skb))
+> -			return NF_ACCEPT;
+> +			goto do_not_track;
+>
+>  		bridge_state.pf = NFPROTO_IPV6;
+>  		ret = nf_ct_br_defrag6(skb, &bridge_state);
+>  		break;
+>  	default:
+>  		nf_ct_set(skb, NULL, IP_CT_UNTRACKED);
+> -		return NF_ACCEPT;
+> +		goto do_not_track;
+>  	}
+>
+> -	if (ret != NF_ACCEPT)
+> -		return ret;
+> +	if (ret == NF_ACCEPT)
+> +		ret = nf_conntrack_in(skb, &bridge_state);
+> +
+> +do_not_track:
+> +	if (offset && ret == NF_ACCEPT)
+> +		skb_reset_network_header(skb);
+>
+> -	return nf_conntrack_in(skb, &bridge_state);
+> +	return ret;
+>  }
+
+This patch introduces PPPoE and inner VLAN encapsulated packet processing,
+but skb->protocol is never modified. When a PPPoE or VLAN-encapsulated
+fragmented IP packet is reassembled by ip_defrag via nf_ct_br_defrag4 (or
+nf_ct_br_defrag6 for IPv6), the br_skb_cb_restore call sets
+BR_INPUT_SKB_CB(skb)->frag_max_size to a non-zero value.
+
+Later in the packet path, nf_ct_bridge_post calls nf_ct_bridge_refrag:
+
+net/bridge/netfilter/nf_conntrack_bridge.c:nf_ct_bridge_refrag() {
+    ...
+    if (BR_INPUT_SKB_CB(skb)->frag_max_size) {
+        switch (skb->protocol) {
+        case htons(ETH_P_IP):
+            nf_br_ip_fragment(state->net, state->sk, skb, &data, output);
+            break;
+        case htons(ETH_P_IPV6):
+            nf_br_ip6_fragment(state->net, state->sk, skb, &data, output);
+            break;
+        default:
+            WARN_ON_ONCE(1);
+            return NF_DROP;
+        }
+    }
+}
+
+Since skb->protocol is still ETH_P_PPP_SES or ETH_P_8021Q (not ETH_P_IP or
+ETH_P_IPV6), nf_ct_bridge_refrag hits the default case for reassembled
+packets. This triggers WARN_ON_ONCE(1) and returns NF_DROP, dropping the
+packet and emitting a kernel warning.
+
+Should skb->protocol be updated to reflect the inner protocol, or should
+nf_ct_bridge_refrag be extended to handle these encapsulation types?
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: awaiting-upstream
 
