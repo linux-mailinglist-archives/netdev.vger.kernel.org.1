@@ -1,165 +1,205 @@
-Return-Path: <netdev+bounces-260937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260938-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sMPBEBv3nmm+YAQAu9opvQ
-	(envelope-from <netdev+bounces-260937-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:20:27 +0100
+	id ILwbMF33nmm+YAQAu9opvQ
+	(envelope-from <netdev+bounces-260938-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:21:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C239C197F8E
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:20:26 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F004197FB4
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:21:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8EF2A302925C
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 13:20:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 08AF53031AFA
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 13:21:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 341613B8BC4;
-	Wed, 25 Feb 2026 13:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2979E3B8D53;
+	Wed, 25 Feb 2026 13:21:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cO6MYkoO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RFBCMogU";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="OK12alkZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f73.google.com (mail-yx1-f73.google.com [74.125.224.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E283AE701
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 13:20:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D941F39282E
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 13:21:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772025625; cv=none; b=oWActFM8IZrPU4ghTh9c0hL4x3oJrXlaqBwfIG5HB0ZNQ9OPOUXCCu3AdulDE34xG2kowMZSHqoTWr1TYirAaOkYWCY7a0YpJ4hCHJe4sm+z5IzexsFGCOQdFrmDPvfQtUS2SPZ9ybmQL2gSYkAh5S2iSdIi10u3UtSZHjlbNeI=
+	t=1772025686; cv=none; b=U3vK1+tr6WWglNaOJhLoucLRhamhCTap+wI3EaLMTbUO/ekpYebdxWfoDWW7efth1J80TbbWTk45+WHhpzQKc1rL5GAbX/5yXfRSJfl+Oeg24BNp3pi7Cf5corkung+z8XIf20RWKJrl8J2CaZ1HeyJUvODeKiXgobMPiTsmzmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772025625; c=relaxed/simple;
-	bh=dWkOdHUNZY084evNatRVHBp93SP9Ud6vhumdrqM0qYw=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ZprPvHcOxbzP+qUtpUMkq6OcqavJ+GIu+HVdrKwX1JzZdtQBbO3cUKOcqmhSuGPiFox4l+hqJxO9MCabkYS2jRfp6Ueq5XcbaiuHrQqtcoSC6pUJI+//9sqbZCNLLqDRmRMNFylUzXM4eeXBC6Dg4vkpUhM1Scz0HdvHMMIMB28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cO6MYkoO; arc=none smtp.client-ip=74.125.224.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yx1-f73.google.com with SMTP id 956f58d0204a3-64956932a51so8321472d50.0
-        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 05:20:23 -0800 (PST)
+	s=arc-20240116; t=1772025686; c=relaxed/simple;
+	bh=gPd6+PZcmUbTbkDvrJ11b6yWE2uDUvuPbL8XSCOXmns=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N+1LIumUOAiBCaLmHTSpqcDQVQ9/x4yacvWujyQGa0rJ9yeNqEm/zoBCQ7IzHPgdLZSxeRWEGsRE7KL0n0n5CgjJvwvRZdTz8XxF31UnhVbj1M7hGwkbPpRMcXZE/RoOfOCACjFQPHhrMdPabg62TzrBEmk7GRhlxQ/Izht5Rj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RFBCMogU; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=OK12alkZ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772025683;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=A9FXhwMMHFtDvmmN9O+r+h6L/Zassq9EP7jemgy3/40=;
+	b=RFBCMogUMVpq1g0g3KCsQBQ3fDVnpByqUFVUG1MOQsxYLaR9NnESvUYyRHP2zdpzGqgdKo
+	XDOESXoHBPpZK9k8xbqfk3nPfwGhHXbQrtEpwlby6LXJiM34oa3bchAejkJcCwVHJWA2LQ
+	e3+acIhcwkFGyXfd/z5uuE9PCuORCxM=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-658-vIlXnpvGMs2F8oH27_MwSg-1; Wed, 25 Feb 2026 08:21:22 -0500
+X-MC-Unique: vIlXnpvGMs2F8oH27_MwSg-1
+X-Mimecast-MFC-AGG-ID: vIlXnpvGMs2F8oH27_MwSg_1772025681
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-437159d3ff2so4399478f8f.1
+        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 05:21:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772025623; x=1772630423; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=+IhwFnC60BkZSlrOC/ALdUxYIAf2cwE+9LjagsdzVp8=;
-        b=cO6MYkoOXx2KGXSjTTP9BEAAz8ELdZtwu3Z8UGIcGqZytlou56ifqnnFs7zeNBFw79
-         R5rsrTit5M5QP9ycOEOECgePI96le9IKADfkqWq6AMsGXeR1WYkCVxWgYgk4aHUwwt1q
-         A7a4xsVY1t6p4icBCp5r3IOIU7TltZ68XKYDxG9Jw9byvwywdUUdaGZ/wxzZHAT3ZqaX
-         tMR1/7MX5XX7Ms/7tHqOvS0cHnH1HPkEuMtBqgTsx0xAhdQXaxkSvp9Fz5buVQYmP9Cp
-         0MMIscL0P7vgHgbhmhQFCSEXyU2M/eM4zB3GvtERZKAyy4blAffTAlRKrYCRmJXVxLzb
-         U2qQ==
+        d=redhat.com; s=google; t=1772025681; x=1772630481; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=A9FXhwMMHFtDvmmN9O+r+h6L/Zassq9EP7jemgy3/40=;
+        b=OK12alkZTJlEg2byMp7L8vec/l4RYh/iLnJcm1wCKjXuwldfczS1wJevya08eAGKfZ
+         cf9XY/wf+gHZ/f3nKbL3e189ru+G1GkvKLjsjpXK+wPBjLGKsOtbd4YquY237PkzrBMe
+         U8OoRIudaP2LnvC24yzd1ERlciOlu7AJ/UnWOnyl7J59peU+jYo4NHZt1sJUsE9/TKp0
+         A2MinrgZjknHcDCZdjYpAiu2QMPP1e5AYAygrbcv+/1XsY1MAZfJEaWUI2Lx/CVeVzgU
+         YmDObNUb2+TNDWTZObBi250Pf9iuKOpQ0Rcis7EKP8LfMC4EnM/qe2A8iRV/PZlqJ4he
+         Zv0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772025623; x=1772630423;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+IhwFnC60BkZSlrOC/ALdUxYIAf2cwE+9LjagsdzVp8=;
-        b=EfKUrKPxtBlZX7PUpGGkO6lAZ1q7hajLU2ZoCBhswHsz6CMZjCGl8vaY+uA2my/Vts
-         2QRLmfy0/uICBAFOV05UHNmPgha9wJSJhljEtJGvpW23QGtC3jy1zMNEJ2uYFPvAGVDl
-         kNSuRdi43iBGyy87tNjbkTPcOpO92dGiRrf2RoMh6dQhqJYtjWWyhZMwJP0FoYDOaFlV
-         UVwhJZnrXcwaV6v5E5JE8QGWoi6gtJGT9IBGnLqA4LKJe8+omvQ10czYKZd4z6rjOL7H
-         Qki7t7eHIKDjjL9HZ63qUcOc9EJ4UX0UVPzyVRvZTh/POqw41MYXjtF8eIlYS8umWefD
-         Ppzw==
-X-Gm-Message-State: AOJu0YwGLE7ApuNTt+GJmXntgGjcGdFW2RdK5OCG3TYOIGrFOubfOd9g
-	5qoxBTL2dST6cfhNuLKT3hYtdYrjmfWSqN69DStNkt9FLjo/EAE9+388ITyt+viiB8ustQo3k6y
-	WaE0fAGuhAd/kFw==
-X-Received: from yxyb18.prod.google.com ([2002:a05:690e:1d2:b0:646:e5d7:6a2a])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a53:cd86:0:b0:64a:d9b3:6ef3 with SMTP id 956f58d0204a3-64c787d6ed6mr10402222d50.6.1772025622596;
- Wed, 25 Feb 2026 05:20:22 -0800 (PST)
-Date: Wed, 25 Feb 2026 13:20:19 +0000
+        d=1e100.net; s=20230601; t=1772025681; x=1772630481;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=A9FXhwMMHFtDvmmN9O+r+h6L/Zassq9EP7jemgy3/40=;
+        b=MSATobPQuzZQBT/VI3+ftzntY9ShrxBmQw4DT/cPg8roIm0guPMG6W+q3xTj+wnU4z
+         g5jb2Te+cz9AI8hf76RnfhKuOuxdlw/3Mo0pxSWyCVp4Ajw1vGHdKKFaJSL1+FFgIaKM
+         u2QKZWpPOtTRQMQLarKiCXeoKaA/LEZOn/+dyh2oWK1R+W6K37UySqGTKnB8buxFsQFU
+         lGgRF/y1ldwz02Tiwk/yoSw5O1Haq3U6OzkumuemL9yNUJCIIKlYzJMrdDJtwXF1GS1J
+         I6gIsVMp3qzIT/1Qc/9XyHJ98M30bKJBVhbBxetx+bMhhLy58OFBl8oGqFWZ59OJMjjy
+         cQnw==
+X-Gm-Message-State: AOJu0Yy/kVxZWI1KD3F7YletveajlFn152ZhskXdM5+meuQb7F/X5IP3
+	5j821NBh06CnxqG14k2Q4vaUmAbKlwGRb/rMYnWKJ0DIU/bbmV/hg8SpiE4xzFyOh/y5oAMRp/5
+	pwOyRq7o7T5YsNKYl54+lgkq227TQ5fS2wBM9hM5MHx0/3bWKv1LmEaC7AQ==
+X-Gm-Gg: ATEYQzzOWf49gZ5NZLLyHTAVgwyxKcrO4MWiD0Qm5UgN58E4RzdkM2y0YvEjxTdZQMC
+	oHp85lh9kiA8oedOn2xYsR/lr9Rrff27FLSvihmeoEHk1CMt9ZcpMFSsyat4lsfjkyLgJc/G6Ji
+	XHKk5lbvFAiw0x4BTsNb31HOqBzqaROiiQQctDKjkZPAzM/S3PBksxTgJttKRPez7V7EojFS9ui
+	vCh7TlhHsr8iu25Mpcldzdb3N7VCa+nk1RswK2kvxUklxUMDI+dkvFveaCV3tznM6EQ7zrYaXdb
+	W5c497hf5zQILz0SNBKnIzJyNa9u+kWYnfb351sOS3i28W/4fdq7FBStI15JxgjQBmTGIp3wUw3
+	2MydEo+hE3HUVOCm9gsmWku9vaZPsA/kr/hVPS5ssc4t+aw==
+X-Received: by 2002:a05:6000:4009:b0:436:7ab:9290 with SMTP id ffacd0b85a97d-4396f16e345mr29973665f8f.1.1772025681016;
+        Wed, 25 Feb 2026 05:21:21 -0800 (PST)
+X-Received: by 2002:a05:6000:4009:b0:436:7ab:9290 with SMTP id ffacd0b85a97d-4396f16e345mr29973604f8f.1.1772025680520;
+        Wed, 25 Feb 2026 05:21:20 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-79-166.inter.net.il. [80.230.79.166])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43970d3fdd0sm33025046f8f.19.2026.02.25.05.21.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Feb 2026 05:21:20 -0800 (PST)
+Date: Wed, 25 Feb 2026 08:21:16 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Srujana Challa <schalla@marvell.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
+	"eperezma@redhat.com" <eperezma@redhat.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	Nithin Kumar Dabilpuram <ndabilpuram@marvell.com>,
+	Shiva Shankar Kommula <kshankar@marvell.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [EXTERNAL] Re: [PATCH net,v4,1/2] virtio_net: Improve RSS key
+ size validation and use NETDEV_RSS_KEY_LEN
+Message-ID: <20260225081735-mutt-send-email-mst@kernel.org>
+References: <20260224065850.962826-1-schalla@marvell.com>
+ <20260225050154-mutt-send-email-mst@kernel.org>
+ <BY1PR18MB63744FC9F4786AB2F617AC4CA075A@BY1PR18MB6374.namprd18.prod.outlook.com>
+ <20260225072355-mutt-send-email-mst@kernel.org>
+ <BY1PR18MB6374C4D43F9BD88443A8B067A075A@BY1PR18MB6374.namprd18.prod.outlook.com>
+ <20260225073537-mutt-send-email-mst@kernel.org>
+ <BY1PR18MB63741BBD1FEF6CB7328A7B44A075A@BY1PR18MB6374.namprd18.prod.outlook.com>
+ <BY1PR18MB6374C5EC263CB6812B197296A075A@BY1PR18MB6374.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.414.gf7e9f6c205-goog
-Message-ID: <20260225132019.1103701-1-edumazet@google.com>
-Subject: [PATCH v2 nf-next] netfilter: nf_log_syslog: no longer acquire
- sk_callback_lock in nf_log_dump_sk_uid_gid()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	coreteam@netfilter.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <BY1PR18MB6374C5EC263CB6812B197296A075A@BY1PR18MB6374.namprd18.prod.outlook.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,netfilter.org,gmail.com,google.com];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260938-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260937-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-0.971];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[strlen.de:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C239C197F8E
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3F004197FB4
 X-Rspamd-Action: no action
 
-After commit 983512f3a87f ("net: Drop the lock in skb_may_tx_timestamp()")
-from Sebastian Andrzej Siewior, apply the same logic in nf_log_dump_sk_uid_gid()
-to avoid touching sk_callback_lock.
+On Wed, Feb 25, 2026 at 12:56:19PM +0000, Srujana Challa wrote:
+> > > > > > >
+> > > > > > >
+> > > > > > > So if device is powerful and supports a very big key size then...
+> > > > > > > we disable the feature? how does this make sense?
+> > > > > > The intent isn’t to disable the feature on capable devices, but
+> > > > > > to ensure the driver never advertises support for RSS key sizes
+> > > > > > larger than what the net device can actually handle. Even if a
+> > > > > > device reports a very
+> > > > > large key size, the driver is constrained by NETDEV_RSS_KEY_LEN,
+> > > > > since
+> > > > > netdev_rss_key_fill() enforces:
+> > > > > > BUG_ON(len > sizeof(netdev_rss_key));
+> > > > >
+> > > > > so cap it to NETDEV_RSS_KEY_LEN. Why is that a reason to clear the
+> > > feature?
+> > > > Our device mandates that hash_key_length must be identical to
+> > > > rss_max_key_size to guarantee symmetric bidirectional flow hashing.
+> > > > If rss_max_key_size is larger than VIRTIO_NET_RSS_MAX_KEY_SIZE,
+> > > > clamping
+> > > the value is not feasible.
+> > >
+> > > I don't know what to tell you. rss_max_key_size is just the max device
+> > > supports. driver should be free to use a smaller size.
+> > My understanding is that this patch prevents the probe from failing by
+> > disabling the feature instead.
+> > Given the current implementation, the driver becomes unusable when this
+> > condition is hit.
+> 
+> I understand that the driver is allowed to use a smaller RSS key than the device’s advertised rss_max_key_size.
+> But, our hardware does not behave correctly in that configuration. For symmetric bidirectional hashing,
+> the device requires that the hash_key_length match rss_max_key_size exactly.
+> If the driver uses a smaller key, the hardware produces inconsistent hash values for forward vs reverse flows.
+> Because of this device requirement, we cannot cap the key to NETDEV_RSS_KEY_LEN when the device advertises
+> a larger rss_max_key_size.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Florian Westphal <fw@strlen.de>
----
- net/netfilter/nf_log_syslog.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+Would you not say it's a buggy device then?
 
-diff --git a/net/netfilter/nf_log_syslog.c b/net/netfilter/nf_log_syslog.c
-index 41503847d9d7fb21824fabb1b57b45f2622b9310..0507d67cad27530dd814aabaf806fdcd3583fe01 100644
---- a/net/netfilter/nf_log_syslog.c
-+++ b/net/netfilter/nf_log_syslog.c
-@@ -165,18 +165,26 @@ static struct nf_logger nf_arp_logger __read_mostly = {
- static void nf_log_dump_sk_uid_gid(struct net *net, struct nf_log_buf *m,
- 				   struct sock *sk)
- {
-+	const struct socket *sock;
-+	const struct file *file;
-+
- 	if (!sk || !sk_fullsock(sk) || !net_eq(net, sock_net(sk)))
- 		return;
- 
--	read_lock_bh(&sk->sk_callback_lock);
--	if (sk->sk_socket && sk->sk_socket->file) {
--		const struct cred *cred = sk->sk_socket->file->f_cred;
-+	/* The sk pointer remains valid as long as the skb is. The sk_socket and
-+	 * file pointer may become NULL if the socket is closed. Both structures
-+	 * (including file->cred) are RCU freed which means they can be accessed
-+	 * within a RCU read section.
-+	 */
-+	sock = READ_ONCE(sk->sk_socket);
-+	file = sock ? READ_ONCE(sock->file) : NULL;
-+	if (file) {
-+		const struct cred *cred = file->f_cred;
- 
- 		nf_log_buf_add(m, "UID=%u GID=%u ",
- 			       from_kuid_munged(&init_user_ns, cred->fsuid),
- 			       from_kgid_munged(&init_user_ns, cred->fsgid));
- 	}
--	read_unlock_bh(&sk->sk_callback_lock);
- }
- 
- static noinline_for_stack int
 -- 
-2.53.0.414.gf7e9f6c205-goog
+MST
 
 
