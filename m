@@ -1,153 +1,211 @@
-Return-Path: <netdev+bounces-260803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260808-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CIMEOW28nmnKXAQAu9opvQ
-	(envelope-from <netdev+bounces-260803-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:10:05 +0100
+	id IGcgNQa8nmnwWwQAu9opvQ
+	(envelope-from <netdev+bounces-260808-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:08:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 944AC194B2D
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:10:05 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA4F7194A9A
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:08:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3986B3124DE2
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 09:03:00 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 29B6D302C2BB
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 09:07:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB7B324707;
-	Wed, 25 Feb 2026 09:02:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80A6C376BF8;
+	Wed, 25 Feb 2026 09:06:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="OXWchm/h"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Gigsq7bb"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 789A0315D43;
-	Wed, 25 Feb 2026 09:02:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469F936E499;
+	Wed, 25 Feb 2026 09:06:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772010179; cv=none; b=F2DxknE/RPsnotd4KEF8vkbYF71AhK9jmPhR12b9fK/Bi0iUwUCpwiSioc+Jz8j12mE5n1DyPQRiTOe7NPCECA0dGgjdZOMqHPmNz3yFs0/8uvI/ZzKxwW0fHz8zROAysixnn4Ndp20oIWTTYFpuysB32m1mXntoQCYYuCpfH6k=
+	t=1772010412; cv=none; b=RA7b64hb0kqaG9LReB5Bkt0bG5+V1EpdIxcU8If4SIPdFeAvFFueZtER6d3o91Pg8l/kEFawS1CqMAaYkszX4bbsZhbnFnX30YE7L2V5xiaLZJ9p+EGUIv4CagsT6tAlFcKuQqer+KlxKOw5YmaeyLdeUBFc7hdJIor4qa0qb74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772010179; c=relaxed/simple;
-	bh=H9+DBdlE8x00eUqoZDGOVOqgsAOU/jAQ7XS7u05/bqM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fFjCQvnltCJXkI4AbbuWCsNiEs+oHvggF0oMjbxnSz7GBPQiZL4/5v5BjxGWgtcZTnM8xgyn/+LtHQ+nEE4bqG1WOc6QM1pxGM9ODGdFkWAzHKwmCslScd0q/bI/bNZhSy5ecw+UjL7dEjnINAKnNexY5zwkwk1M3ddgrhJfJ8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=OXWchm/h; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=+lPxBPC3Dnkz/F6LRRTTUMzYTCUigzfPqij8o+dSSuU=; b=OXWchm/hvQcnPIi1R43Rll9Qlj
-	Jar0vLf4GN4vbSpoesm3SfjgSl/86ccGrDy0U7BV/8HXW1DKe+HvaBzKBXEdXzBswXqse9tk105Mi
-	rzTA1llYwtb1NmgnBknI+jQCTwCC31eATotRe/PRmcH+kksWnZWqXwhaty2qz3xw4G8zcR/ZKbpEY
-	ea6b8xuz5OovfZOZHREtTASyyXPmVP4tRC7S3xDEi2BkyY1uf0NhDD62uY98cMj6hzOh6zu/7j2ti
-	qdWAIgVQ+WvZ+EbwZrut/IlzGZ7FV5OTS8CgfMRoyBlULS48FQEUhleuoB1L1vlnhV3zPZa+ROUFk
-	+eeYDvcw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33598)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vvAnE-000000006HK-35li;
-	Wed, 25 Feb 2026 09:02:52 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vvAnC-000000000oQ-0Xf2;
-	Wed, 25 Feb 2026 09:02:50 +0000
-Date: Wed, 25 Feb 2026 09:02:49 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-phy@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
-Subject: Re: [PATCH net-next 0/9] net: stmmac: qcom-ethqos: further serdes
- reorganisation
-Message-ID: <aZ66uXCwGgH7B_A-@shell.armlinux.org.uk>
-References: <aZ66OT9scKipRRu2@shell.armlinux.org.uk>
+	s=arc-20240116; t=1772010412; c=relaxed/simple;
+	bh=Rd8pBFRnXnJ5AAxlXaHhnrRJoWW4lC1dGDjHsSzEHx4=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=axQnReYGvRxk0aU1yrBNWH6n5+Hp89D/KRhxoHOu7ug4m1JgzA46w3wV2iSXaxYiFlW9odniwG+4h0pUQnPnQPAwtkpJt/l4YYpeSGw3YjmfiG9eV5S57TkKs60nSNxY3/CosMIL+FIsDu+l3wa7ilzD292T/gxEUK5PL3OEWG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Gigsq7bb; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1772010407; x=1803546407;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=Rd8pBFRnXnJ5AAxlXaHhnrRJoWW4lC1dGDjHsSzEHx4=;
+  b=Gigsq7bbvYvUr8xntrZg0MHCqpUdcZZDav5cRDxBgybyeWy7nnLUS92+
+   QF5lMgvf7N23qoj+ptMgi0eJHi4biHqryrqzB5bVoL0+Gt2ARWdIuk+Eg
+   jVzNxbam5QDlINkxA/te5IevX01zeDEdMbiTNAJvB8cVQoC77LQGHIiXd
+   aNTPb/59FVHk68t4Vqy4ceVGqvLoupJRZkFdq1yCrCcp++8ODZpblecLk
+   QWq6iqIzW15Np5dJhpKDs1kxovGDlw53dfAasaJqYL3BxENuVO1UVP+iZ
+   CBOcSD4wjqWsvmiI9DInhF1mMZShOx87b8ktf3MVagoDgYuDGoAJy1Vyy
+   A==;
+X-CSE-ConnectionGUID: BbhGCtIlQZOkUhkWOAVukw==
+X-CSE-MsgGUID: rC2Dz5dBSou9sgbq3vMbFw==
+X-IronPort-AV: E=Sophos;i="6.21,310,1763449200"; 
+   d="scan'208";a="221112785"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Feb 2026 02:06:46 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Wed, 25 Feb 2026 02:06:07 -0700
+Received: from DEN-DL-M70577.microsemi.net (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Wed, 25 Feb 2026 02:06:05 -0700
+From: Daniel Machon <daniel.machon@microchip.com>
+Subject: [PATCH net-next 0/7] net: sparx5: clean up probe/remove init and
+ deinit paths
+Date: Wed, 25 Feb 2026 10:05:23 +0100
+Message-ID: <20260225-sparx5-init-deinit-v1-0-97036580b9f0@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aZ66OT9scKipRRu2@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAFS7nmkC/x2MwQqAIBAFfyX23IIaGfQr0SHsVXvZQiWE6N+TT
+ sMcZh5KiIJEY/NQxC1JTq1i24bCsegOlrU6OeO8cdZzupZYehaVzCt+mG4Im/V98A5Uwytik/J
+ PJ1JkVpRM8/t+7oHzwm4AAAA=
+X-Change-ID: 20260216-sparx5-init-deinit-037cf165c62e
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Steen Hegelund
+	<Steen.Hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>, "Richard
+ Cochran" <richardcochran@gmail.com>
+CC: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>
+X-Mailer: b4 0.14.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260803-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-260808-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.931];
+	FROM_NEQ_ENVFROM(0.00)[daniel.machon@microchip.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,shell.armlinux.org.uk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 944AC194B2D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:mid,microchip.com:dkim,microchip.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AA4F7194A9A
 X-Rspamd-Action: no action
 
-Note: only 8 patches in this series, not 9 as the subject line says,
-as the set_clk_tx_rate() patch became part of the first series.
+This series refactors the sparx5 init and deinit code out of
+sparx5_start() and into probe(), adding proper per-subsystem cleanup
+labels and deinit functions.
 
-On Wed, Feb 25, 2026 at 09:00:41AM +0000, Russell King (Oracle) wrote:
-> This is part 2 of the qcom-ethqos series, part 1 has now been merged.
-> 
-> This part of the series focuses on the generic PHY driver, but these
-> changes have dependencies on the ethernet driver, hence why
-> it will need to go via net-next. Furthermore, subsequent changes
-> depend on these patches.
-> 
-> The underlying ideas here are:
-> 
-> - get rid of the driver using phy_set_speed() with SPEED_1000 and
->   SPEED_2500 which makes no sense for an ethernet SerDes due to the
->   PCS 8B10B data encoding, which inflates the data rate at the SerDes
->   compared to the MAC. This is replaced with phy_set_mode_ext().
-> - allow phy_power_on() / phy_set_mode*() to be called in any order.
-> 
-> Mohd has tested this series, but it would be great to get acks/reviews
-> from the generic PHY maintainers.
-> 
->  .../ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    | 31 +++--------
->  drivers/phy/qualcomm/phy-qcom-sgmii-eth.c          | 62 +++++++++++++++++-----
->  2 files changed, 57 insertions(+), 36 deletions(-)
-> 
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
-> 
+Currently, the sparx5 driver initializes most subsystems inside
+sparx5_start(), which is called from probe(). This includes registering
+netdevs, starting worker threads for stats and MAC table polling,
+requesting PTP IRQs, and initializing VCAP. The function has grown to
+handle many unrelated subsystems, and has no granular error handling —
+it either succeeds entirely or returns an error, leaving cleanup to a
+single catch-all label in probe().
 
+The remove() path has a similar problem: teardown is not structured as
+the reverse of initialization, and several subsystems lack proper deinit
+functions. For example, the stats workqueue has no corresponding
+cleanup, and the mact workqueue is destroyed without first cancelling
+its delayed work.
+
+Refactor this by moving each init function out of sparx5_start() and
+into probe(), with a corresponding goto-based cleanup label. Add deinit
+functions for subsystems that allocate resources, to properly cancel
+work and destroy workqueues. Ensure that cleanup order in both error
+paths and remove() follows the reverse of initialization order. What
+remains in sparx5_start() is only hardware register setup and FDMA/XTR
+initialization that does not require cleanup.
+
+Before this series, most init functions live inside sparx5_start() with
+no individual cleanup:
+
+  probe():
+    sparx5_start():              <- no granular error handling
+      sparx5_mact_init()
+      sparx_stats_init()           <- starts worker, no cleanup
+      mact_queue setup             <- no cancel on teardown
+      sparx5_register_netdevs()
+      sparx5_register_notifier_blocks()
+      sparx5_vcap_init()
+    sparx5_ptp_init()
+
+    probe() error path:
+      cleanup_ports:
+        sparx5_cleanup_ports()
+        destroy_workqueue(mact_queue)
+
+After this series, probe() initializes subsystems in order with
+matching cleanup labels, and remove() tears down in reverse:
+
+probe():
+    sparx5_ptp_init()
+    sparx5_vcap_init()
+    sparx5_mact_init()
+    sparx5_stats_init()
+    sparx5_register_netdevs()
+    sparx5_register_notifier_blocks()
+    sparx5_start()
+
+  remove():
+    sparx5_unregister_notifier_blocks()
+    sparx5_unregister_netdevs()
+    sparx5_stats_deinit()
+    sparx5_mact_deinit()
+    sparx5_vcap_deinit()
+    sparx5_ptp_deinit()
+    sparx5_destroy_netdevs()
+
+Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
+---
+Daniel Machon (7):
+      net: sparx5: call sparx5_start() last in probe()
+      net: sparx5: move netdev and notifier block registration to probe
+      net: sparx5: move VCAP initialization to probe
+      net: sparx5: move MAC table initialization and add deinit function
+      net: sparx5: move stats initialization and add deinit function
+      net: sparx5: move calendar initialization to probe
+      net: sparx5: move remaining init functions from start() to probe()
+
+ .../ethernet/microchip/sparx5/sparx5_calendar.c    |  15 ++-
+ .../net/ethernet/microchip/sparx5/sparx5_ethtool.c |   9 +-
+ .../ethernet/microchip/sparx5/sparx5_mactable.c    |  27 +++-
+ .../net/ethernet/microchip/sparx5/sparx5_main.c    | 149 ++++++++++-----------
+ .../net/ethernet/microchip/sparx5/sparx5_main.h    |  12 +-
+ drivers/net/ethernet/microchip/sparx5/sparx5_ptp.c |  13 ++
+ .../ethernet/microchip/sparx5/sparx5_vcap_impl.c   |   2 +-
+ 7 files changed, 135 insertions(+), 92 deletions(-)
+---
+base-commit: 17d0056f71b13050317a662a505b1a36fb7009e5
+change-id: 20260216-sparx5-init-deinit-037cf165c62e
+
+Best regards,
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Daniel Machon <daniel.machon@microchip.com>
+
 
