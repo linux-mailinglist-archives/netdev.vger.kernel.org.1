@@ -1,154 +1,144 @@
-Return-Path: <netdev+bounces-260833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260816-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QGw2IrDBnmnsXAQAu9opvQ
-	(envelope-from <netdev+bounces-260833-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:32:32 +0100
+	id EKfwDEu9nmnYXAQAu9opvQ
+	(envelope-from <netdev+bounces-260816-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:13:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6D79195092
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:32:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40DAA194B9A
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:13:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1E4D8305766D
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 09:22:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BB9A030210D5
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 09:13:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82DCE38B7D5;
-	Wed, 25 Feb 2026 09:22:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7CF12561A7;
+	Wed, 25 Feb 2026 09:13:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="yWlss9bZ"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="PLaTp9+I"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+Received: from canpmsgout09.his.huawei.com (canpmsgout09.his.huawei.com [113.46.200.224])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD2EE38E10B
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 09:22:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D6343806D8;
+	Wed, 25 Feb 2026 09:13:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.224
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772011333; cv=none; b=fXQnHHkbnB9d30oH9ahuNF5IacdyoAWvS4uMvwUE/43ryZPkbBQn7ovEDRSh6vXqH44CNhlxT9MEKm5CTklgavHOoXDhoO5DW1zA+Olh+e/cZu5xgTqj4KtAMKO4CCoqQoUOz0fiUC5vSiWevEVBlwGKz6mSW+I76KCDv9y80v4=
+	t=1772010822; cv=none; b=V7buga4LLIqnHOLZTLFAmAeeL39DbwAjX1yVwCf2JNdphYy2xTmDOaChYFNdk/dvzRZkf1vLuUIod72zw4vcUTCTS+RWP37fZt3vmke1JvwT3W0t8o75971SPXUFStcHr6fctW6V5/cW5evBqfA6qYn/+hJ0xar3puQXjndZpVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772011333; c=relaxed/simple;
-	bh=usJdWGjdVWHyoeOFLpeq87JVlSPKqO+60Ixrrf+Cd2w=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=HtFibpqwL21fVN6JeKCxjSWDV7TTui70Vkee8bP2ektDR6GF1PRNVmRwGsuoF9dekAepLZogl0JyeTDGeY66jdRcZdYwiBaChAwqT8JIZQANzIJSi2d4qgsJpSFnS5iU5WAdzey2KnFhXKPI66HGmsxZF8FJNynf4xquFJkRAds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=yWlss9bZ; arc=none smtp.client-ip=115.124.30.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1772011322; h=Message-ID:Subject:Date:From:To;
-	bh=Jij/vp1VmGg7OCxxZ+6UMDbKQTv+EwP6Pty7TdVomV0=;
-	b=yWlss9bZB1aI9+tW0k6ICUYUgnMs0LTF+W2p5TCp91YEbokbqJQsir9sIU+/wKk7mab8rz63LoxjGIhIukf86PpKs31DtF2Fs1BVjHgsuh1cSSuSnVn34QwzmnBK//2HtFeBIj6O00umXmvGfT0pxO+O26uatGzJk/uu0TtC4SI=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Wzm3MxA_1772011321 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 25 Feb 2026 17:22:02 +0800
-Message-ID: <1772010702.3747633-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next,2/2] virtio_net: replace RSS key size max check with BUILD_BUG_ON
-Date: Wed, 25 Feb 2026 17:11:42 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Srujana Challa <schalla@marvell.com>
-Cc: <pabeni@redhat.com>,
- <mst@redhat.com>,
- <jasowang@redhat.com>,
- <xuanzhuo@linux.alibaba.com>,
- <eperezma@redhat.com>,
- <davem@davemloft.net>,
- <edumazet@google.com>,
- <kuba@kernel.org>,
- <ndabilpuram@marvell.com>,
- <kshankar@marvell.com>,
- <schalla@marvell.com>,
- <netdev@vger.kernel.org>,
- <virtualization@lists.linux.dev>
-References: <20260224065850.962826-1-schalla@marvell.com>
- <20260224065850.962826-2-schalla@marvell.com>
-In-Reply-To: <20260224065850.962826-2-schalla@marvell.com>
+	s=arc-20240116; t=1772010822; c=relaxed/simple;
+	bh=fcYQNX+dsQkTsWfuCFVmKfA1rruaZ9TkRJ9npZsfuNk=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=jcV1vVuh/CiqfCRtcIIXaZHf5RCk2Oyjndu/+Xk/5+ISpR6Jj0r0KjQVdUCeq11UcbyRX8Xt7oDE9K2mrpbAqNT1KCk/lTBvnTIoXF2UTiZJFHO49qk8NPkALlZ+Hnf8VqGTN2Tfw1coPCur7gp2fid4u4bueL8zQsWgRyAsmHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=PLaTp9+I; arc=none smtp.client-ip=113.46.200.224
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=4/dgtOlrG2tnOFcCm68A8jmq/5buZwuVT1Nvka9+ekM=;
+	b=PLaTp9+I18iY81SzhfnUgxsAkhi56nf5XkEBxZQ8v02we3EPPDztxYGJVoMR0Tp1Wob2Idg71
+	CFKfV5k00acNO1T0MxO4dxJx5y3Ut5SzczK+zjUHwQPLlRlJHiQ6yph3ygEx2VwWwN3DeVnjj4T
+	qGpdNR+DuIxGqDjjJhG3aVM=
+Received: from mail.maildlp.com (unknown [172.19.163.214])
+	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4fLTKX5WHFz1cyQF;
+	Wed, 25 Feb 2026 17:08:48 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5971F40561;
+	Wed, 25 Feb 2026 17:13:35 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Wed, 25 Feb 2026 17:13:34 +0800
+Message-ID: <5191a479-fd32-4e64-b0b1-af013412b989@huawei.com>
+Date: Wed, 25 Feb 2026 17:13:32 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, Claudiu
+ Manoil <claudiu.manoil@nxp.com>, Alexandre Belloni
+	<alexandre.belloni@bootlin.com>, "maintainer:OCELOT ETHERNET SWITCH DRIVER"
+	<UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, open list
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] net: dsa: felix: use kmalloc_flex helper
+To: Rosen Penev <rosenp@gmail.com>, <netdev@vger.kernel.org>
+References: <20260225040323.69497-1-rosenp@gmail.com>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20260225040323.69497-1-rosenp@gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260833-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260816-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,marvell.com:email]
-X-Rspamd-Queue-Id: A6D79195092
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,huawei.com:mid,huawei.com:dkim]
+X-Rspamd-Queue-Id: 40DAA194B9A
 X-Rspamd-Action: no action
 
-On Tue, 24 Feb 2026 12:28:50 +0530, Srujana Challa <schalla@marvell.com> wrote:
-> Since NETDEV_RSS_KEY_LEN was increased to 256 in net-next, use
-> BUILD_BUG_ON to enforce the limit at compile time and remove the
-> redundant runtime max check.
+
+on 2026/2/25 12:03, Rosen Penev wrote:
+> A little simpler than using a separate size variable.
 >
-> Signed-off-by: Srujana Challa <schalla@marvell.com>
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
 > ---
->  drivers/net/virtio_net.c | 8 +-------
->  1 file changed, 1 insertion(+), 7 deletions(-)
+>   drivers/net/dsa/ocelot/felix_vsc9959.c | 5 ++---
+>   1 file changed, 2 insertions(+), 3 deletions(-)
 >
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index eeefe8abc122..768ad5523dfa 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -6639,13 +6639,7 @@ static int virtnet_validate(struct virtio_device *vdev)
->  			__virtio_clear_bit(vdev, VIRTIO_NET_F_RSS);
->  			__virtio_clear_bit(vdev, VIRTIO_NET_F_HASH_REPORT);
->  		}
-> -		if (key_sz > NETDEV_RSS_KEY_LEN) {
-> -			dev_warn(&vdev->dev,
-> -				 "rss_max_key_size=%u exceeds driver limit %u, disabling RSS\n",
-> -				 key_sz, NETDEV_RSS_KEY_LEN);
-> -			__virtio_clear_bit(vdev, VIRTIO_NET_F_RSS);
-> -			__virtio_clear_bit(vdev, VIRTIO_NET_F_HASH_REPORT);
-> -		}
-> +		BUILD_BUG_ON(type_max(key_sz) >= NETDEV_RSS_KEY_LEN);
+> diff --git a/drivers/net/dsa/ocelot/felix_vsc9959.c b/drivers/net/dsa/ocelot/felix_vsc9959.c
+> index 8387dd208adb..cb132679fd99 100644
+> --- a/drivers/net/dsa/ocelot/felix_vsc9959.c
+> +++ b/drivers/net/dsa/ocelot/felix_vsc9959.c
+> @@ -2254,7 +2254,7 @@ static int vsc9959_psfp_filter_add(struct ocelot *ocelot, int port,
+>   	struct felix_stream_gate *sgi;
+>   	struct ocelot_psfp_list *psfp;
+>   	struct ocelot_policer pol;
+> -	int ret, i, size;
+> +	int ret, i;
+>   	u64 rate, burst;
+>   	u32 index;
+>   
+> @@ -2271,8 +2271,7 @@ static int vsc9959_psfp_filter_add(struct ocelot *ocelot, int port,
+>   	flow_action_for_each(i, a, &f->rule->action) {
+>   		switch (a->id) {
+>   		case FLOW_ACTION_GATE:
+> -			size = struct_size(sgi, entries, a->gate.num_entries);
+> -			sgi = kzalloc(size, GFP_KERNEL);
+> +			sgi = kzalloc_flex(*sgi, entries, a->gate.num_entries, GFP_KERNEL);
 
-Do we really need this check?
+Sorry, the subject is kmalloc_flex but code is kzalloc_flex
 
-If I understand correctly, the intention is to cap key_sz at 256. However, since
-key_sz is of type u8, its maximum value is inherently 255, making this check
-redundant. This is not only limited by this kernel code, the virtio-net spec
-defines this.
-
-Moreover, if NETDEV_RSS_KEY_LEN is ever reduced to a value smaller than 256 in
-the future, this check would no longer enforce the intended limit correctly.
-
-
-Moreover, you should add a cover letter.
-
-Thanks.
-
-
-
-
-
->  	}
->
->  	return 0;
-> --
-> 2.25.1
->
+>   			if (!sgi) {
+>   				ret = -ENOMEM;
+>   				goto err;
 
