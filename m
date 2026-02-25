@@ -1,200 +1,135 @@
-Return-Path: <netdev+bounces-261053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261041-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KHCzIlM9n2kiZgQAu9opvQ
-	(envelope-from <netdev+bounces-261053-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 19:20:03 +0100
+	id MJ5NNGE2n2m5ZQQAu9opvQ
+	(envelope-from <netdev+bounces-261041-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 18:50:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D57EC19C2BD
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 19:20:02 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74B3719BC85
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 18:50:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 03E8330E66D0
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 18:18:04 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DA10B302EC9C
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 17:50:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00B8E2F25F8;
-	Wed, 25 Feb 2026 18:17:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 584642D5C83;
+	Wed, 25 Feb 2026 17:50:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="euKsbWn1"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="eo67cY3v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FB523ED11D;
-	Wed, 25 Feb 2026 18:17:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C714433B3
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 17:50:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772043472; cv=none; b=Bdu+fjOc9oZ8FUVDfW4hJhZ8SFC61R71Vk5Mg4tr713vZLzA/pYAwSufNRFLaH4iLYqNvSeL6lfxhJ9o1zCpwoA/0t2svbfdZ7NpENuKHQDP78SVewkvbbu0p9fjgEAQeLWyFTGkhw2qDJACzDvJSSOEod9p9r+UwL1ecaeoFVc=
+	t=1772041822; cv=none; b=Zwje1w/f43j9I9iccBLxd4k5zta6ygBQa6MvKMqvkM2K2VB8pv3a7C4AZe2x/OrIbKIGTZVQ19466ONofX4ViIWrIx571c3DfsdVwXnQHw9XCGbz5LurdUf4qBPMZoKN0xUPruZ18cgAf7OFsXMwemWBXBpRCcMTphUI5PTOHZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772043472; c=relaxed/simple;
-	bh=Ho6uKwZTjfD8R8eQTjIOJqbiTAM698Fa7rzKNku20yc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Wbzb60ECyyVVqEhi2LV/WfqQ7k1AoLiE8ZOf4chXGsLgBOk4CllhhnofJYQlzeatre7K1buvr3VzZNVZ5x/AF9NqPSA1b52xEsI3frFclwF4Mio8mnKhvgtwCNC1k0VL04dRiyLEn8gkRBsOkqKH8G5jneJzsy17a6eIv9jd448=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=euKsbWn1; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772043465; x=1803579465;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Ho6uKwZTjfD8R8eQTjIOJqbiTAM698Fa7rzKNku20yc=;
-  b=euKsbWn1FpFYfkPc4J5aUxwgIkHooO0ZF4juDnFay9B3MmirXMgTlg0j
-   OOlgI/g+UIdQlfq4jbO81HGzQP8id8DROKu41iGqBxbEHqKwo3zbCExjo
-   U7Pefh8FM/xCopLGz1tMTXnxNWFAqnXQ2YB1xoF43Nb44FXHaS4i1RAlH
-   7KoUlKaIwtTHdXKltfcUWXscbG+luyaIlYVBaQXJl+jl8AFVvghFZZXd9
-   jBN8Hmrd7wCCcBdcmrPbT/4e9CqgHWVnHpRHQHvLlWD7KjaZAXZJ/1EgR
-   fD2LKW6SkRbh8L39lPoPHm92K0v8njLqiocwMUMdXoptZPu6HWdjGSIDB
-   w==;
-X-CSE-ConnectionGUID: fHMR76VdSVmITnlZ4DSAUA==
-X-CSE-MsgGUID: oXp3J3AzSnKy8eW1MlIwtA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11712"; a="76928025"
-X-IronPort-AV: E=Sophos;i="6.21,311,1763452800"; 
-   d="scan'208";a="76928025"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2026 10:17:44 -0800
-X-CSE-ConnectionGUID: gyLPuxhrSK+ASMyn0+Po+Q==
-X-CSE-MsgGUID: bVBYp09hSsiGRDLEMoBYuw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,311,1763452800"; 
-   d="scan'208";a="216337834"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orviesa008.jf.intel.com with ESMTP; 25 Feb 2026 10:17:41 -0800
-Received: from lincoln.igk.intel.com (lincoln.igk.intel.com [10.102.21.235])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 672BB32C87;
-	Wed, 25 Feb 2026 18:17:39 +0000 (GMT)
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	intel-wired-lan@lists.osuosl.org
-Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Natalia Wochtman <natalia.wochtman@intel.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH iwl-next v2 10/10] ixgbevf: allow changing MTU when XDP program is attached
-Date: Wed, 25 Feb 2026 18:46:44 +0100
-Message-ID: <20260225174646.3514556-11-larysa.zaremba@intel.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260225174646.3514556-1-larysa.zaremba@intel.com>
-References: <20260225174646.3514556-1-larysa.zaremba@intel.com>
+	s=arc-20240116; t=1772041822; c=relaxed/simple;
+	bh=bk58F2GzH/RlTRTTtPRboEFPupA02RhtI9p7QHOCNSc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SciAX24IZFNfjPt57OHH+EnBQAB6HOQ3Xf/+nOuJD1h1JH30A37jl5t4+OS0fvZaU9L+BXOcVipOOGs4g+TdVNwCiWi+sIqVXEK5h90uSTb+SBBFTUy1ZS/8VkbsWjPdIIbzWb72RYT/wVwVhtOPJPrNpjt2i16eTsu4ZK9hLLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=eo67cY3v; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=EQQY3uqd3zLWuRKt8lN5oNMmp8hnL6v12hW4GdilSfQ=; b=eo67cY3vb2phmPo19cUVuczCFF
+	RR5w2RJp6t1jQ2175sprEaCb6MLALA+R1zop6f8OOaM/WakBqG1X67msUjE6ZlvFryd3wmeyrhFAd
+	T9ySH9vw6L1lTjFw+TaLdA0qYdCwQ6bJpG0nrlH6l6rDUn4suuDN8GqP/4PlbEkBRw4dumWH9km2s
+	IstfaqJ322CblAaDN1d2RVK8ApR9YEDQnv4Rvpz0fiJ90VnsYGoHqJt9QAhFVd7MROiXAUYkJOBCZ
+	7LDW5/6MSdibPnkDEAAshWAvaQFnlYO3OYE5WrL4G9JO/CIc37H7K5zYGRiHDyge96c8ulD8ouPZ2
+	LdZRVa5g==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59194)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vvJ1c-000000006zk-0hUf;
+	Wed, 25 Feb 2026 17:50:16 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vvJ1Z-0000000019d-0lBO;
+	Wed, 25 Feb 2026 17:50:13 +0000
+Date: Wed, 25 Feb 2026 17:50:12 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: =?iso-8859-1?Q?Th=E9o?= Lebrun <theo.lebrun@bootlin.com>
+Cc: Nicolai Buchwitz <nb@tipi-net.de>, netdev@vger.kernel.org,
+	andrew+netdev@lunn.ch, claudiu.beznea@tuxon.dev,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	nicolas.ferre@microchip.com, pabeni@redhat.com,
+	phil@raspberrypi.com,
+	=?iso-8859-1?Q?Gr=E9gory?= Clement <gregory.clement@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH 3/5] net: cadence: macb: implement EEE TX LPI support
+Message-ID: <aZ82VFPu2FDmPpJ0@shell.armlinux.org.uk>
+References: <20260225091558.51157-1-nb@tipi-net.de>
+ <20260225091558.51157-4-nb@tipi-net.de>
+ <DGO88446M74S.6C1O0I79IM0E@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <DGO88446M74S.6C1O0I79IM0E@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261041-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	TAGGED_FROM(0.00)[bounces-261053-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[larysa.zaremba@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.944];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.981];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: D57EC19C2BD
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 74B3719BC85
 X-Rspamd-Action: no action
 
-xskxceiver attempts to change MTU after attaching XDP program,
-ixgbevf rejects the request leading to test being failed.
+On Wed, Feb 25, 2026 at 06:42:08PM +0100, Théo Lebrun wrote:
+> On Wed Feb 25, 2026 at 10:15 AM CET, Nicolai Buchwitz wrote:
+> > @@ -2349,6 +2454,8 @@ static netdev_tx_t macb_start_xmit(struct sk_buff *skb, struct net_device *dev)
+> >  	netdev_tx_sent_queue(netdev_get_tx_queue(bp->dev, queue_index),
+> >  			     skb->len);
+> >  
+> > +	macb_tx_lpi_wake(bp);
+> 
+> Should this be protected by a bp->eee_active condition? It could go
+> in macb_tx_lpi_wake(). We avoid a spinlock acquire per xmit for most
+> platforms. Probably negligeable though.
 
-Support MTU change operation even when XDP program is already attached,
-perform the same frame size check as when attaching a program.
+It will read the register, find the bit clear, and then return if
+EEE is already disabled.
 
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
----
- .../net/ethernet/intel/ixgbevf/ixgbevf_main.c | 24 +++++++++++++------
- 1 file changed, 17 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-index 606c6123d7eb..ccefb44c524e 100644
---- a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-+++ b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-@@ -4078,6 +4078,18 @@ static int ixgbevf_set_mac(struct net_device *netdev, void *p)
- 	return 0;
- }
- 
-+static bool ixgbevf_xdp_mtu_ok(const struct ixgbevf_adapter *adapter,
-+			       const struct bpf_prog *prog, unsigned int mtu)
-+{
-+	u32 frame_size = mtu + LIBETH_RX_LL_LEN;
-+	bool requires_mbuf;
-+
-+	requires_mbuf = frame_size > IXGBEVF_RX_PAGE_LEN(LIBETH_XDP_HEADROOM) ||
-+			adapter->flags & IXGBEVF_FLAG_HSPLIT;
-+
-+	return prog->aux->xdp_has_frags || !requires_mbuf;
-+}
-+
- /**
-  * ixgbevf_change_mtu - Change the Maximum Transfer Unit
-  * @netdev: network interface device structure
-@@ -4093,8 +4105,10 @@ static int ixgbevf_change_mtu(struct net_device *netdev, int new_mtu)
- 	int ret;
- 
- 	/* prevent MTU being changed to a size unsupported by XDP */
--	if (adapter->xdp_prog) {
--		dev_warn(&adapter->pdev->dev, "MTU cannot be changed while XDP program is loaded\n");
-+	if (adapter->xdp_prog &&
-+	    !ixgbevf_xdp_mtu_ok(adapter, adapter->xdp_prog, new_mtu)) {
-+		netdev_warn(netdev,
-+			    "MTU value provided cannot be set while current XDP program is attached\n");
- 		return -EPERM;
- 	}
- 
-@@ -4257,14 +4271,10 @@ ixgbevf_features_check(struct sk_buff *skb, struct net_device *dev,
- static int ixgbevf_xdp_setup(struct net_device *dev, struct bpf_prog *prog,
- 			     struct netlink_ext_ack *extack)
- {
--	u32 frame_size = READ_ONCE(dev->mtu) + LIBETH_RX_LL_LEN;
- 	struct ixgbevf_adapter *adapter = netdev_priv(dev);
- 	struct bpf_prog *old_prog;
--	bool requires_mbuf;
- 
--	requires_mbuf = frame_size > IXGBEVF_RX_PAGE_LEN(LIBETH_XDP_HEADROOM) ||
--			adapter->flags & IXGBEVF_FLAG_HSPLIT;
--	if (prog && !prog->aux->xdp_has_frags && requires_mbuf) {
-+	if (prog && !ixgbevf_xdp_mtu_ok(adapter, prog, READ_ONCE(dev->mtu))) {
- 		NL_SET_ERR_MSG_MOD(extack,
- 				   "Configured MTU or HW limitations require non-linear frames and XDP prog does not support frags");
- 		return -EOPNOTSUPP;
 -- 
-2.52.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
