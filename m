@@ -1,131 +1,175 @@
-Return-Path: <netdev+bounces-260894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260896-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GDFHCwLcnmkTXgQAu9opvQ
-	(envelope-from <netdev+bounces-260894-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 12:24:50 +0100
+	id OMFkLonenmkTXgQAu9opvQ
+	(envelope-from <netdev+bounces-260896-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 12:35:37 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49B361966A3
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 12:24:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 16A1F19690F
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 12:35:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BADEC3147CD6
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:21:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 717473017261
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 11:32:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8395393DDA;
-	Wed, 25 Feb 2026 11:21:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 133B934EEFC;
+	Wed, 25 Feb 2026 11:32:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IXJOuJec"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="BAalCMZ/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3044392C27
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 11:21:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD4A35A93B;
+	Wed, 25 Feb 2026 11:32:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772018468; cv=none; b=hf4tgbE+bb8gPRjgvQJrs0FSuIASn/fOwpK/oU9C4T/1KnDi7CikuTznx+YxHS8jKZugSpsdD3h1EWcWgajJXAMPEgM1Lz+ccO9sbX4Zgb3hxLALtMufEWDz6BO+6r7Npzb4eAmvmmviNLZ68ScjSABxSY7J5r9/U0SD3AddJ+M=
+	t=1772019128; cv=none; b=NVsCri6vshiEPSIdP+95a0qO2j6BTtGY/S6wzI8jQL0nTUG/nbBN+oWGw9zCXq53Q7DmJYmNOJDlDxmbSGrfaWf6tEzyRzDOXUu/uK+ja7P1Z3zuPWj0FcApmxOL0PBh8xg8Tu9FoRCFrQs2P/OeQ7qcc7oegaBcjVWbB+hxiY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772018468; c=relaxed/simple;
-	bh=94eou5dwcDYbC4JsEVVYRj5YGau7pBRIrx95NAHD+Zk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LL49RZmThMl1XrFZ9EapulzPadPv9qCcLeNsskmQ6pmJaA+QDc4zMqFK0mAs9pmzNH4qZGXRRKpJqRiqFelbL2gfV4nBtfVB9z7Ms3Odrrb+XjBbMQocM/9doerM17qyHFYVH8Fz708JXqDWI7lYisDb6B1uPlQa4RHHkbGdJqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IXJOuJec; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EEA7C2BC87
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 11:21:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772018468;
-	bh=94eou5dwcDYbC4JsEVVYRj5YGau7pBRIrx95NAHD+Zk=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=IXJOuJecyjqABMtQopgtEtDs9qv7MscforTU/eGRmhBCvGsW+EDoIYbs77pgjA7jZ
-	 sSxlMyVZtBlvORg+YRsFnRR5tqIh3xKjY5IHLFq/Xh5weLnZI9o6fjbHan+7t5k79z
-	 7VvTYtIQu3KOMqKnjaoE6DKpcSIsy6Hgun89ilZG/n/sxS7PU7+vAEqHQ+eFLS/LUD
-	 FIN36bOAi+dDQ9YfDEsd0eshihgfS4L/33qaR3hjIzgsue4Ya0NlN0Bmi5cceFXtSy
-	 uuGlbGFj7T8sJnVM02zRQk+UeOw95mTQzTQSeCsVxKOYDFL/g1Oti78SNCcuDZ+gMA
-	 s5cQxRDqvi+Ig==
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-8cb20bcff5aso676947085a.3
-        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 03:21:08 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXzokpicOUMcOIs0sTQf/JFHawCa8GJ/EfPwDYGQZ/9k54hasR5jUR9tnkQWw5iekZV5JR9f/M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHGro55BYW/jcUDz99kPzFjqL8p+wu81xZgBL70DO4cuKy0u6G
-	dty/wRIAkXhYF/NErExDgO0pLmi+1EAVW72LK0JNGXQE97JV8K3FPjv3E/3/o1jrxqBCsqFozkW
-	C1eGOaPSU/cSieLwbOB+e0SFSbIv7uho=
-X-Received: by 2002:a05:622a:180a:b0:4f0:24e2:8de6 with SMTP id
- d75a77b69052e-5070bcb8b63mr220590271cf.64.1772018467522; Wed, 25 Feb 2026
- 03:21:07 -0800 (PST)
+	s=arc-20240116; t=1772019128; c=relaxed/simple;
+	bh=zhpfY0tW6mUlM/LrUd2CtAhKkrj45rbYAgdl/BFwYoE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R8oP5ZlOGOKzQPYPgroaqWNfF6NzW89DSDOm+7AKvS+lN9dQQzWwyGnAzHcYAeMV4VVG10wbPuWq65S13p86vjEt/NmKB30rlSQYBCALXG7aQvk9+d+SuMdASotclNufTgQpFAMLa2cTmF8FLlufiYgbezhdcduLtvRVPDjvBwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=BAalCMZ/; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=UBOnCtJsXwUvWJZdCobnV9ydQHVTu9HMk4QIxx/wMd4=; t=1772019125; x=1773228725; 
+	b=BAalCMZ/RV6RHJ1HtZzdWXsNrYmIH4Qqw76MrQ8I4c4iRAIoAggQSx0+z6GrYdq9u8V+aLYVa94
+	kr0ewJM7UQJ+SiXZUiQEvyjeq/q3U4RRyQa8d+HKZTY4LjpH9z69RSGTyBiJht383UPrusz2GzbYb
+	e6gnlxAbMoUvbwKsiR6x5A3FOyd3JTyvAxYIqekb1tIE+2cG+zqCdKol97wHlX6zKG+buM9Fw/o58
+	nT7NEByYwQvzWbwXXhY9v4GRBFl70ub8OS3eMLOTVsbbGNzYHkgP9qZt8PjufJhvUNIw/vyCFxbSi
+	REEEUGuAvh00UArwhIIKP2iYfbPIojlu5MTA==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1vvD7b-00000001PYZ-0PdV;
+	Wed, 25 Feb 2026 12:32:03 +0100
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Subject: [GIT PULL] wireless-2026-02-25
+Date: Wed, 25 Feb 2026 12:30:47 +0100
+Message-ID: <20260225113159.360574-3-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260219130050.2390226-1-bjorn@kernel.org> <415c4922-cc8d-4e35-bbac-3a532f44d238@lunn.ch>
- <20260219160519.323041bf@kernel.org> <3b0949fa-0b05-4bce-86c0-2a7a058865a5@lunn.ch>
- <20260220131254.03874c4c@kernel.org> <CAJ+HfNgXqpqDYsmAa-mpHnO82aDgC7XbyVw3TmXk-ySFmGA-JQ@mail.gmail.com>
- <71848101-e97c-4674-ad07-aec720123d64@bootlin.com>
-In-Reply-To: <71848101-e97c-4674-ad07-aec720123d64@bootlin.com>
-From: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-Date: Wed, 25 Feb 2026 12:20:55 +0100
-X-Gmail-Original-Message-ID: <CAJ+HfNi77f6aNbLHTkxVQfAh92+eXiZTzgLT7ezHVkOYtHnmKA@mail.gmail.com>
-X-Gm-Features: AaiRm50PhSWPI5h6c3LcI9-yoWrsjAE377vDWpfd_YTYiOEo7L6NvYN8vZyV6zg
-Message-ID: <CAJ+HfNi77f6aNbLHTkxVQfAh92+eXiZTzgLT7ezHVkOYtHnmKA@mail.gmail.com>
-Subject: Re: [RFC net-next 0/4] ethtool: CMIS module diagnostic loopback support
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org, 
-	Donald Hunter <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Michael Chan <michael.chan@broadcom.com>, 
-	Hariprasad Kelam <hkelam@marvell.com>, Ido Schimmel <idosch@nvidia.com>, 
-	Danielle Ratson <danieller@nvidia.com>, linux-kernel@vger.kernel.org, 
-	linux-rdma@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.01 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.67)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[sipsolutions.net,none];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[sipsolutions.net:s=mail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,vger.kernel.org,gmail.com,davemloft.net,google.com,redhat.com,nvidia.com,broadcom.com,marvell.com];
-	TAGGED_FROM(0.00)[bounces-260894-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260896-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_TWO(0.00)[2];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[bjorn@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 49B361966A3
+	NEURAL_HAM(-0.00)[-0.999];
+	DKIM_TRACE(0.00)[sipsolutions.net:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sipsolutions.net:mid,sipsolutions.net:dkim]
+X-Rspamd-Queue-Id: 16A1F19690F
 X-Rspamd-Action: no action
 
-Maxime!
+Hi,
 
-On Wed, 25 Feb 2026 at 11:22, Maxime Chevallier
-<maxime.chevallier@bootlin.com> wrote:
+So for some reason a whole bunch of fixes came in recently,
+including quite a few (potential) crashes and similar. Most
+even are long-standing issues.
 
-> I'm very sorry not to have looked into this yet, I'm having some family
-> events to handle right-now but I hope to be back next monday to take a
-> close look at this :)
+Please pull and let us know if there's any problem.
 
-No rush, and thank you! Take care of your family -- the patches will
-still be around when you're back!
+Thanks,
+johannes
 
-Cheers,
-Bj=C3=B6rn
+
+
+The following changes since commit 8bf22c33e7a172fbc72464f4cc484d23a6b412ba:
+
+  Merge tag 'net-7.0-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2026-02-19 10:39:08 -0800)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2026-02-25
+
+for you to fetch changes up to 017c1792525064a723971f0216e6ef86a8c7af11:
+
+  wifi: mac80211: fix NULL pointer dereference in mesh_rx_csa_frame() (2026-02-24 10:03:10 +0100)
+
+----------------------------------------------------------------
+A good number of fixes:
+ - cfg80211:
+   - cancel rfkill work appropriately
+   - fix radiotap parsing to correctly reject field 18
+   - fix wext (yes...) off-by-one for IGTK key ID
+ - mac80211:
+   - fix for mesh NULL pointer dereference
+   - fix for stack out-of-bounds (2 bytes) write on
+     specific multi-link action frames
+   - set default WMM parameters for all links
+ - mwifiex: check dev_alloc_name() return value correctly
+ - libertas: fix potential timer use-after-free
+ - brcmfmac: fix crash on probe failure
+
+----------------------------------------------------------------
+Ariel Silver (1):
+      wifi: mac80211: bounds-check link_id in ieee80211_ml_reconfiguration
+
+Chen-Yu Tsai (1):
+      wifi: mwifiex: Fix dev_alloc_name() return value check
+
+Daniel Hodges (1):
+      wifi: libertas: fix use-after-free in lbs_free_adapter()
+
+Daniil Dulov (1):
+      wifi: cfg80211: cancel rfkill_block work in wiphy_unregister()
+
+Johannes Berg (2):
+      wifi: cfg80211: wext: fix IGTK key ID off-by-one
+      wifi: radiotap: reject radiotap with unknown bits
+
+Marek Szyprowski (1):
+      wifi: brcmfmac: Fix potential kernel oops when probe fails
+
+Ramanathan Choodamani (1):
+      wifi: mac80211: set default WMM parameters on all links
+
+Vahagn Vardanian (1):
+      wifi: mac80211: fix NULL pointer dereference in mesh_rx_csa_frame()
+
+ drivers/net/wireless/broadcom/brcm80211/brcmfmac/bcmsdh.c | 7 +++----
+ drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c   | 7 ++++---
+ drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.h   | 2 +-
+ drivers/net/wireless/marvell/libertas/main.c              | 4 ++--
+ drivers/net/wireless/marvell/mwifiex/cfg80211.c           | 2 +-
+ net/mac80211/link.c                                       | 2 ++
+ net/mac80211/mesh.c                                       | 3 +++
+ net/mac80211/mlme.c                                       | 3 +++
+ net/wireless/core.c                                       | 1 +
+ net/wireless/radiotap.c                                   | 4 ++--
+ net/wireless/wext-compat.c                                | 2 +-
+ 11 files changed, 23 insertions(+), 14 deletions(-)
 
