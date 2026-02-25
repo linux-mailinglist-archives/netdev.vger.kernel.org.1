@@ -1,183 +1,153 @@
-Return-Path: <netdev+bounces-260838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260839-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QOviKKvBnmnsXAQAu9opvQ
-	(envelope-from <netdev+bounces-260838-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:32:27 +0100
+	id AGSDGMvBnmnsXAQAu9opvQ
+	(envelope-from <netdev+bounces-260839-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:32:59 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2052B195084
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:32:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F3F911950C1
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:32:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3EB59302866E
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 09:25:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A28B430F7274
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 09:25:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6D3238E120;
-	Wed, 25 Feb 2026 09:25:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCD0338E5FA;
+	Wed, 25 Feb 2026 09:25:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uJXxxlHB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UBGkd68i"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2CF638759D;
-	Wed, 25 Feb 2026 09:25:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3DE638E5DB
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 09:25:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772011522; cv=none; b=rmAKFAlc3FV5FhskqnAl/UiQFVmQAkONUVbwi8Y0izmlN4KczugUxfACAUnNOhWUSMkPvPhb9/yMRjL8Efl7Ys7Q962Hfld1O/CgSMxY5eNLGk3z2clxFZt7fQkZgQ/o5Mjutq00cI1LGzQHS0VUpsgTQmXEEz0gVfr5Bghdf5w=
+	t=1772011526; cv=none; b=ols3l8lvfvrmMEscOA0I59FCXvh384sxYp6zHKyAkDil4BelTmw+iy1SaC5+U+w4DYAw3+xbTrTxSX8QQ8TLdsZuFp8D/mSBsfNBNNTkzMdfudMtBMerMmi0brG/OXw3Esr6Tb75ri3Y+NVBaSdIW21W8dSV9Cj31TMrk8B8U9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772011522; c=relaxed/simple;
-	bh=3F7Z5Pfj8Pt/optjPDV9G8Xvyryo9NuHarxp+2EdQZw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qEyHQFMdKByNwgclp+gwk7Yt3QSPo3FIg8Ok0rBT+1eAKz6Glnn1LnlUasub7ndmzPCM8RIVWtJ8lDiFe8AkyBBknSt2DcNCjxBajzoFUquPzJApzZY2S74KwKcqGSKbuYt9T/GU1ZZtbHH7S08I3ubiydiH/TZU3PZWQFIT4NA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uJXxxlHB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98EE0C2BC86;
-	Wed, 25 Feb 2026 09:25:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772011522;
-	bh=3F7Z5Pfj8Pt/optjPDV9G8Xvyryo9NuHarxp+2EdQZw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uJXxxlHBV0DRrSf9EXAEusXlJPeHnoT0EXFvLsrldQu/5D1nC+cn49GEzCZn5mSbM
-	 A/xtGjS6xvWhP74lBLA/DVb/a4R6aeCiawcKj3TaGKNHT/TXw8XSi16nLSzWcQlnis
-	 v0m+TCnAHsyPXyt2AknbqUGNEyD6LZYPnXc76KzrSaqQiZhlkwECxt+w/6vM3LLfHp
-	 khpI2max/MI8mlIiNJLbDhcnYr2sSLHsuQBluXaRBJHXwNwXKsHHqzTo30n1Yu2Ss+
-	 qSurO9g1H5v2Zq3H06S6xZDG61BdabR3sXwIssrYT/w6bZq7HIzDkIaA3SmP20SxVt
-	 Lug+csEN4rnXw==
-From: Simon Horman <horms@kernel.org>
-To: jan.petrous@oss.nxp.com
-Cc: Simon Horman <horms@kernel.org>,
-	alexandre.torgue@foss.st.com,
-	devicetree@vger.kernel.org,
-	festevam@gmail.com,
-	chester62515@gmail.com,
-	s.hauer@pengutronix.de,
-	linux-arm-kernel@lists.infradead.org,
-	davem@davemloft.net,
-	mbrugger@suse.com,
-	netdev@vger.kernel.org,
-	andrew+netdev@lunn.ch,
-	s32@nxp.com,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	Frank.Li@nxp.com,
-	robh@kernel.org,
-	kuba@kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	ghennadi.procopciuc@oss.nxp.com,
-	kernel@pengutronix.de,
-	shawnguo@kernel.org,
-	edumazet@google.com,
-	mcoquelin.stm32@gmail.com,
-	imx@lists.linux.dev
-Subject: Re: [v5,4/4] stmmac: s32: enable support for Multi-IRQ mode
-Date: Wed, 25 Feb 2026 09:25:13 +0000
-Message-ID: <20260225092513.174261-1-horms@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260223-dwmac_multi_irq-v5-4-8fc699a5fac4@oss.nxp.com>
-References: <20260223-dwmac_multi_irq-v5-4-8fc699a5fac4@oss.nxp.com>
+	s=arc-20240116; t=1772011526; c=relaxed/simple;
+	bh=SNY7wKlCxt32Um0FCt8oDeUEABOZBms0H/s6DRK+Exg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dKBoE4bb65KJvln1fbjYeFNPHqjDz38NdlnuM72XNlbd7T3vEggBWBPl9F91JXIyextdYlQFwNh+XdOAPrJwixgAN7AH2Vni+mFKqD5V+AKj2QAMknEj6YbxctOCv/88A793NyJ421b+VQVj9KBnjS9CNmTXdtqR/5bJuJ1qAIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UBGkd68i; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-48378136adcso38565095e9.1
+        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 01:25:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772011523; x=1772616323; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NFxGd8tt1psILcxBsQnx7nL9xt0mE3Hus9OpWjd1eMY=;
+        b=UBGkd68iZ7u3IO5x+WMdFi6xqr7x2Bl0SyLkZT/js7Tg2uWkIrDAusjqblk/wgL1CW
+         u7P0SU7jtROsHATMeV3m9QYY3ZW8qrw8UXa+GbRUs/YIlFxA08dqdq/7Jkp7YV3dBp5D
+         bjg9OXAStKavQSBbX75ECY/TifBLKdsQMjUcbX+GnVI24TthmQLlsc+xmsyJuBVxIiq1
+         jOhuDiY7zh0RqdNnaAKDHpnCuDUJc9WMfK1pTgK/5nSNW+ksHJgKLTcsxpLT/Llu0nyi
+         i5DBQf5S2IpBYDJIU4Av9SEeQtp7Yvepc0mOBdHwfUWXvUb3BW5UFcRSpQGB53FfAdl/
+         Gnvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772011523; x=1772616323;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NFxGd8tt1psILcxBsQnx7nL9xt0mE3Hus9OpWjd1eMY=;
+        b=hGd3x7KztlR9vB8ts76MJRKGD4XAXB3qHjoKm/Q9lYapC9/QnwB6Ca956ZoPFyyf2O
+         2nHAymRRE5se2SN5Z7Wy2flC6tikpU4ptQzfulO8XI+0zTP5GX9qkKGFt43stghlDfIL
+         8IXdCozKyi/oSvSpGGMAEU5wqAA6PkeVuejdzv501gybfN4YE06dD/MCxkaWc730OY/J
+         E8L3GFD+4z1JsfX5Al3RPgx0xYkDk2nY5Q/LDuDSGUDXSQzAPPJG4C2FFN7ikbAU6o2e
+         CIF/+pufCH+lmTU3NBUQ0/zjf965zEUjj9FCsDxhiTso6JVCX/73HD3M42BqIElXjdqX
+         djVA==
+X-Forwarded-Encrypted: i=1; AJvYcCUwJBXwgcQBv9vzsAUXDe8lHUmIl8rGf4Ofth2toHkhCRkPuOUN1Ogcp/CzvBickzFDC9Ph9tc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8U5pesUusD/+86vaCH6uWB27tvPuRZRdcKlyi+r8+8zNz40mW
+	v++2yL4dTmZez9kEt38V1lK33zq6s+9Uzu/nguZL36uyY/UawhrtPHfWCuz0GQ==
+X-Gm-Gg: ATEYQzzi/UUi70qxv/KTR0q6zLbN7WkgTGo/JKeDzhupFzVcJbElGTWU/kvSmz0DeaH
+	zgRyz4i5PnM6nMFV2V0b2QqXqqWxUpfVr09fd4g7kRvWr0vqxXMc0TY4z5Lc0atYrDgN1lLfv1U
+	pQ1y9sWj/o5eT0g2Ss1jQm+UeqESZC3F+q4ceRAzXHF6dNEIddKCywy2PGE2CIEk7URu0ZQg4ET
+	Dee5xIQtZcFMxnY9cn1tbUzlZWeqTEzMRZ08EnYZBiV8VG6Ve60Uu6DiGTTcBrzGazVuQWIBXpr
+	DPdT9ykzYIsLic2/Qabqlxf/oO4WuuqTLF3nNGBZU6dd78D4m1opXJK464YGIooi/W9qfnAJGIG
+	69n4SZd90J5StA4puds1YLIfBaWEYHGdTkuQt0Wnw/FdevGn/jo0EUdyWrsJ9vZxgjLDD8GiYO+
+	ESKMrE/koo8lFq3hV5Hol+d4G+2l2P/wOD4hFc1F3nocH7Z7eTcue7V0xktxrBbM8YM0LcZertc
+	RlUG8De9wmShYyg619CwYcvcJThgo4ByfzoarLZT7+NVaqOGeU74GfDznOLsrgDMgC6kHLckb4x
+	Xw==
+X-Received: by 2002:a05:600c:4f90:b0:477:55ce:f3c2 with SMTP id 5b1f17b1804b1-483bef2a427mr34570355e9.14.1772011523170;
+        Wed, 25 Feb 2026 01:25:23 -0800 (PST)
+Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bd726a35sm50268215e9.9.2026.02.25.01.25.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 Feb 2026 01:25:22 -0800 (PST)
+Message-ID: <bad6cd67-88c4-45ee-bb51-e24331263dc2@gmail.com>
+Date: Wed, 25 Feb 2026 09:25:20 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RESEND PATCH net-next] netmem: remove the pp fields from net_iov
+To: Byungchul Park <byungchul@sk.com>, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ kernel_team@skhynix.com, harry.yoo@oracle.com, hawk@kernel.org,
+ andrew+netdev@lunn.ch, david@kernel.org, lorenzo.stoakes@oracle.com,
+ Liam.Howlett@oracle.com, vbabka@suse.cz, ziy@nvidia.com,
+ willy@infradead.org, toke@redhat.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ axboe@kernel.dk, ncardwell@google.com, kuniyu@google.com,
+ dsahern@kernel.org, almasrymina@google.com, sdf@fomichev.me, dw@davidwei.uk,
+ ap420073@gmail.com, dtatulea@nvidia.com, shivajikant@google.com,
+ io-uring@vger.kernel.org
+References: <20260224061424.11219-1-byungchul@sk.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20260224061424.11219-1-byungchul@sk.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,foss.st.com,vger.kernel.org,gmail.com,pengutronix.de,lists.infradead.org,davemloft.net,suse.com,lunn.ch,nxp.com,redhat.com,st-md-mailman.stormreply.com,oss.nxp.com,google.com,lists.linux.dev];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	TAGGED_FROM(0.00)[bounces-260838-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-260839-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kvack.org,skhynix.com,oracle.com,kernel.org,lunn.ch,suse.cz,nvidia.com,infradead.org,redhat.com,davemloft.net,google.com,kernel.dk,fomichev.me,davidwei.uk,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[31];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.954];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2052B195084
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: F3F911950C1
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+On 2/24/26 06:14, Byungchul Park wrote:
+> Now that the pp fields in net_iov have no users, remove them from
+> net_iov and clean up.
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-stmmac: s32: enable support for Multi-IRQ mode
+Looks good, it's great to get rid of all this aliasing.
 
-This commit enables Multi-IRQ mode for the S32 DWMAC driver, allowing
-per-queue IRQs for improved performance. The driver checks for multiple
-queues and per-queue IRQs, enabling multi-IRQ mode when both are present.
+Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-> index af594a096676..4aad7077c9d6 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
+-- 
+Pavel Begunkov
 
-[ ... ]
-
-> @@ -165,6 +165,16 @@ static int s32_dwmac_probe(struct platform_device *pdev)
->  	plat->core_type = DWMAC_CORE_GMAC4;
->  	plat->pmt = 1;
->  	plat->flags |= STMMAC_FLAG_SPH_DISABLE;
-> +
-> +	/* Check for multi-IRQ config. Assumption: symmetrical rx/tx queues */
-> +	if (plat->rx_queues_to_use > 1 &&
-> +	    (res.rx_irq[0] > 0 && res.tx_irq[0] > 0)) {
-> +		plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
-> +		dev_info(dev, "Multi-IRQ mode (per queue IRQs) selected\n");
-> +	} else {
-> +		dev_info(dev, "MAC IRQ mode selected\n");
-> +	}
-
-Does this validation check all queues have IRQs? The condition verifies
-only res.rx_irq[0] and res.tx_irq[0] but doesn't confirm that higher
-queues have IRQs when rx_queues_to_use > 1.
-
-If a device tree specifies multiple queues but only provides IRQs for
-queue 0:
-
-    snps,rx-queues-to-use = <2>;
-    interrupt-names = "macirq", "rx-queue-0", "tx-queue-0";
-                      /* queue 1 IRQs missing */
-
-The driver would enable STMMAC_FLAG_MULTI_MSI_EN, but later in
-stmmac_request_irq_multi_msi() (drivers/net/ethernet/stmicro/stmmac/
-stmmac_main.c), queues with rx_irq[i] == 0 are silently skipped:
-
-    for (i = 0; i < priv->plat->rx_queues_to_use; i++) {
-        if (priv->rx_irq[i] <= 0)
-            continue;  /* queue 1+ skipped, no handler registered */
-        ...
-    }
-
-This would leave higher-numbered queues with no interrupt handler,
-causing packet loss when traffic arrives on those queues.
-
-Would it be safer to validate all queue IRQs before enabling multi-IRQ
-mode, or fall back to MAC IRQ mode if any queue IRQ is missing?
-
-> +
->  	plat->rx_fifo_size = 20480;
->  	plat->tx_fifo_size = 20480;
 
