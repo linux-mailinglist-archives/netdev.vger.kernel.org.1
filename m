@@ -1,286 +1,285 @@
-Return-Path: <netdev+bounces-260786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260787-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uExKH/SonmntWgQAu9opvQ
-	(envelope-from <netdev+bounces-260786-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 08:47:00 +0100
+	id iORnK6mpnmntWgQAu9opvQ
+	(envelope-from <netdev+bounces-260787-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 08:50:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91F20193AE0
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 08:46:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04499193B56
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 08:50:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4AB3F300B9ED
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 07:46:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E442E304C139
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 07:48:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21B662D0620;
-	Wed, 25 Feb 2026 07:46:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D31A28B7EA;
+	Wed, 25 Feb 2026 07:48:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b="bo2ZnJuD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I2j69cl8";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="WapxTVIp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04CA1C860C
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 07:46:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23D9C1DF723
+	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 07:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772005613; cv=none; b=klltxbQbM4iOxDHMjKEXs5n/EoVoL738t03D2dTcUczthwUEfpa5haZWyir9lPBA+piNLMdKswPYMCV0pTGS5YESQhIZ8doeyxyHBmtg02Uzd0HQ6D8nrUy+YnzlI8rPxnxmi+/LwMilLZIkOiR2cisW9mJVEMgPOo+aFyJQCtI=
+	t=1772005696; cv=none; b=RGLTf82176uzaqMevohJqqNV+GcAsgEgYvYnaiaEfG+vZ46lhE/k2r6ZD6ZXSsygXIhqEvFp2q0aZy3WgUMrhSKBwJ7mISayyCRF5pqpBVTVzLGnU+ppx9HaLUNJSWNtkttRAhbVjQC+9u+Jl0dchLbNW3NQy0Y6iba3Ws1y6x8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772005613; c=relaxed/simple;
-	bh=oVSmkTDt2CC7vagB/7IKxbULhl8iz92yFIuiTzbBb00=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dAa8HPQ8xbFbE3CanWSm2brSOD5lnpZ8ZQ5DWjVn2c9CFPwQrekZ+2QXVE1LBXV0PwpYlywxIPRkWfPlyLp+F0/Y6Z0PlVXotyxBfxDwhwGn9zGsrFJNhj0cUXA4iYo977TtRAgv1Ac6wnkcDLSJ3w+blaT0szSJaYu8iV+w/ss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com; spf=pass smtp.mailfrom=shopee.com; dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b=bo2ZnJuD; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shopee.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2a871daa98fso46011255ad.1
-        for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 23:46:51 -0800 (PST)
+	s=arc-20240116; t=1772005696; c=relaxed/simple;
+	bh=/tb7tVFuMJRtrPQxEwJyjr8HCiYG0DRMyfsOFaObgR4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Sdryz49WGwtsTIVx+VaDKFzfHJTRJwQAM0kghrhg5X1wiTjaOMTyK+M0Hr/kw7Kc+ZzlbRHbcBe64n88q2B7Tob+dg50SeOKNuvtw2kjId8NGzNqeK1Y7RCFBFAxDvycoNqb8BSikOmAB6bb4zZtMCyIHSNr5wz6EEocdW5M7jw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I2j69cl8; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=WapxTVIp; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772005694;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=KIFbR9N1epYqMk+/ts+pAMZXD1gwVSceo470CquD4QE=;
+	b=I2j69cl8N2BdA/aD8yzqOSCVj/eBTHom4e+ucfWcCzrc7+x22ovPO0TZiuCg2n3jWVt6ym
+	3g5hZVZ8Ap/a/VlMx2dfgodumUij3EvXr0rIRegOXbc7TeoToEfEk1SY3kM5WdE/cqp7kB
+	HGOVCQo1zEIF+ur+1UmW0qzgfLmZvdA=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-601-guQwYpO6MduPWvoP_zIipQ-1; Wed, 25 Feb 2026 02:48:11 -0500
+X-MC-Unique: guQwYpO6MduPWvoP_zIipQ-1
+X-Mimecast-MFC-AGG-ID: guQwYpO6MduPWvoP_zIipQ_1772005691
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-43637c70876so2946126f8f.2
+        for <netdev@vger.kernel.org>; Tue, 24 Feb 2026 23:48:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shopee.com; s=shopee.com; t=1772005611; x=1772610411; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=d5uWqej63a79hXQBLP6LiTHLyAOyVWFc6uQobJ5V1EQ=;
-        b=bo2ZnJuDYLLJgRlA4uyEoN/74nIOfy+iPbb+OKNNKGWgphs98VJtywYP5pBwY8pyZh
-         NnhRNY8xxTi7G4wjVX7W7GSna0P/NuUuY2ARQ4yHi1O76xU9wTP7un7tDW1C/fVKt9bW
-         Q/YW2nncF8tg8hWdTOS7Ce4KGRSrVWuSuZM6cRHy4Eqj8ibNVyl6/56TF77jkdFbjP2h
-         8APO1XN6lFkcHrwleVBdqVtqUM5sGMnAGmF+cH6tmc2mcb+fPBeGzg2F2Uf/Lx6zJ642
-         AuobWZAee3wfiOBqDB0pXZm3iyXlDjf0Hg0NQmSgws6KEm12P8Hw8tiSHjxC0fz8OPfj
-         lQPw==
+        d=redhat.com; s=google; t=1772005690; x=1772610490; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=KIFbR9N1epYqMk+/ts+pAMZXD1gwVSceo470CquD4QE=;
+        b=WapxTVIpys6lrco3z+GsF1r7Y4iZ7Zo3M2mGBLEnGeQNmQHkJH90H9PKxbIqZjuDqq
+         GTHCJlRkJl61bAHDeEbCZRoe6yCBEUIpwKLgMVbYZyOpX6tC8CfQ+wwvWH94R0yznJrs
+         z5CZmVHp3LD/Zy3tj8aBbEnMpftTRLRPIrJpHiXJ43+YVyLtnniCNgiakagEOp9rDSO0
+         FW8IQ7JF96y7j74MYiVaHuBt6irWvQrAYVF2ExKOy0qLUKKV97Bm4KZ5VUR3MSPkJVem
+         xW2SI/psgvSgu/PwsXYyCfHl6BXYHAL4tqsZam/AJx/Ljzdr1ot8mpK9M980hIOU5cXP
+         9Qlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772005611; x=1772610411;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1772005690; x=1772610490;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=d5uWqej63a79hXQBLP6LiTHLyAOyVWFc6uQobJ5V1EQ=;
-        b=TvFRp+6+hXPM9oyHvpLGV3tgp6p6cfjKFl18OrvrSuWDTr8VPxJojZBU6Q87KC9MUL
-         vM6ARr46lz0I6rgcfODe86huBHQFGXn230nMM34lp1lOLXrd/wKyJphLSh5Cby4X4ldO
-         yo2yqE5vhBROjFyB6roUI6WExjAsMJu/kmkktLNms0AJ/5QCD9bQqqvObDZ/QaL2EmdT
-         2Ku0K4pUFaPDBODOBwjytxrtrbj4vA6znZTby9K5fBY1UIeERPPzV4yAd+Dw6+KxRUEX
-         85n2rs6eTFcGXdUmZghIjlyLRDJ9ZbAJwO+NJPcqHraDhF2yD86WuVtiajeq15HSHh3a
-         rzmQ==
-X-Gm-Message-State: AOJu0YybU2mAkYuYnN7Hptw5pqMEMRzsyNzDLflXRuSRTKFeVUIWQgbk
-	n8szQHvimMHEcCdTrGj6sQPde7YxNUvceMcTfwsStLj04HiJ5VLQ/o7g//+aMtbcVe72QYFOgGN
-	N8CASWjEiuM9UDw5J3SQz6A95+lkFP0j+AX+E6a8ai4+7iUVK5R4PYK95aXwTv6kAeOFKccZz0K
-	5fyQC2SSGwo29Bm4YKcHiZ8RQ9H854VafBQWcRdH4Tt/I9ifN7
-X-Gm-Gg: ATEYQzyxJ9xTZIY0whMFEVEBmMpOnTQHQfG1dyTZertXWOWiPlJQrAz2sC0peDshfjv
-	eIxSmCwvtJwXKg+Avg31FRrsKmOZ115keocXS2yGA1XSAPgRmKlmNbln6z2+v4OAAlnshJJN+9v
-	DPFBg0JAI6J0snGooMsLE+cD2m+jvOdIQUkeYmzSLMChLpfWZ8/WUi7vmG3JBpygbMIQz96Hki8
-	pmBk54EWYZXMxYeygQA36dYhC7UTSrh4CQP2b9fziuvPEPxL7xcLDWY2CfUzQwLMRfzx8x7vMcS
-	huRna5kEJc6i/t7D5WbZlaUN7K0xnqjIdf/KK5XDqCmHtIRW70syVyTIGwhthsqWI8uxZX6U/IE
-	VqpLNbARbuROh9BJCI4ky8h5anHbMU81kqums6LXdDZxUKDGqqBqdOENorUNx2rmke/weCucwHE
-	FXUasY5aUL0RBODuSVvGXSAmqEq0nfRkyPEbnot53/9eKRSlxG
-X-Received: by 2002:a17:902:e885:b0:2ad:b957:e7ff with SMTP id d9443c01a7336-2add14401b4mr16154695ad.45.1772005610812;
-        Tue, 24 Feb 2026 23:46:50 -0800 (PST)
-Received: from bms-ytl-d1-app-10-251-178-27 ([147.136.157.1])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ad7500e062sm170844165ad.48.2026.02.24.23.46.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Feb 2026 23:46:50 -0800 (PST)
-From: Leon Hwang <leon.huangfu@shopee.com>
-To: netdev@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	David Ahern <dsahern@kernel.org>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ij@kernel.org>,
-	Leon Hwang <leon.huangfu@shopee.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	kerneljasonxing@gmail.com,
-	lance.yang@linux.dev,
-	jiayuan.chen@linux.dev,
-	Leon Hwang <leon.hwang@linux.dev>,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH net-next] tcp: Add net.ipv4.tcp_purge_receive_queue sysctl
-Date: Wed, 25 Feb 2026 15:46:33 +0800
-Message-ID: <20260225074633.149590-1-leon.huangfu@shopee.com>
-X-Mailer: git-send-email 2.52.0
+        bh=KIFbR9N1epYqMk+/ts+pAMZXD1gwVSceo470CquD4QE=;
+        b=APFLsLmUe2khdAzPdAqrT0D51w1cf+jQJM9vPPkKuKFzm8dIgvlEgw/1l8BqAc7Sk9
+         rxb5kN/xCNqiBuPKPOLy0g+ZZEPFj8EdXXNPplD8SCgvEAk5FHH4Lah9kiglvHjD3N8S
+         IWruJQEClQdIXk3dq7/zJZ2nzXMs6YMeoALDfxYGL/sruILz8oHemxJkasR2J/+seq2m
+         v8DeVw9cVeTyVxeYIfELgbRlqxWSSM3trDsWy3gq0mrQvNBRnuC5Y+H9MQwictDv82dp
+         IQzkwmOxmylTpBxpchUn+xelJ0ubz7fVG3dmQBfQ9s+u2/VFL4F2ZoIeEkyvrzZc5w9F
+         olIA==
+X-Forwarded-Encrypted: i=1; AJvYcCVCI1oZ88rlbqnG4dGdzKBXKCBwJMyYDSbIGx+JuPbV8ptdd0ij17teMD4TBBLkIfj1TW1e1wk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyb4MnZidcmFhtK3zfUw7V1oFyOc2nE3+8h8zuMCWwsek65CyVJ
+	Qojcx/kIT1s5KTDeqmumcX9NTogFO8vZs7uygwVufdrAh0nQzPS9IPcpQIlIWxXG5gFZyv+s9ZR
+	B0fynFZ6RL3CClwXl0UHdt0JgY8NlGPAihSiCEF74gViV2y1cirs0+H+hJg==
+X-Gm-Gg: ATEYQzxFI4I9TKosz5Mndf52AYTxmTVzzSs2K53oDR2GXZM3Mcum/67WR8aRfUKqZQ9
+	EwYj5mhlSJ3yeAFu6/BHlfZLx/weEcyDaQkJwO2qJxidzc7FgcNZWVoj5lzp8tohT5YuwI2yVO1
+	RF/Vu5zsLvfxpItuYOVfkQ41UXbswHSDKO5CHVmtPJFjRZJe442q/9KApDPrJ5u3/MLDXTL5pbx
+	Ur4PppdtEQHnJ+59YdKLb/J0D4m+XEMOuLe5DkfKcJWwIuSRMjMFDHVJ6uP+HMdWq0SVHOWFKyk
+	8euEC/d9aUpM4kf5LkoEqlyr1sieB6jg+SuhzbWQcC8lKHRA68xnjN9CwR5t0B1fODNCxyJftCQ
+	FyQO6yHpOVH2MD1oCQ1jpo5U3rkXurnrd2O4f3xokeCGAPBfCzKzHjiOxCqJvoqjawvedqlnNu/
+	k2jvaqfAP/1I1xIm7hcVh33yMiBXrO8KxBhKZNPyOBX91IvUgDdYgmUp1q
+X-Received: by 2002:a05:6000:2912:b0:439:881a:6578 with SMTP id ffacd0b85a97d-4398fa91363mr2248206f8f.21.1772005690462;
+        Tue, 24 Feb 2026 23:48:10 -0800 (PST)
+X-Received: by 2002:a05:6000:2912:b0:439:881a:6578 with SMTP id ffacd0b85a97d-4398fa91363mr2248161f8f.21.1772005689924;
+        Tue, 24 Feb 2026 23:48:09 -0800 (PST)
+Received: from ?IPV6:2a01:cb00:8ef9:5300:877b:aaab:2ea7:8695? (2a01cb008ef95300877baaab2ea78695.ipv6.abo.wanadoo.fr. [2a01:cb00:8ef9:5300:877b:aaab:2ea7:8695])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43970bfa015sm32337470f8f.8.2026.02.24.23.48.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Feb 2026 23:48:09 -0800 (PST)
+Message-ID: <28cd2d03-6491-490d-89e2-19f81e9bad69@redhat.com>
+Date: Wed, 25 Feb 2026 08:48:08 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: commit 662dc80a5e86 breaks rmnet over usb
+To: Daniele Palmas <dnlplm@gmail.com>
+Cc: Koen Vandeputte <koen.vandeputte@citymesh.com>, oneukum@suse.com,
+ andrew+netdev@lunn.ch, Eric Dumazet <edumazet@google.com>, kuba@kernel.org,
+ pabeni@redhat.com, netdev <netdev@vger.kernel.org>,
+ linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <CAPh3n803k8JcBPV5qEzUB-oKzWkAs-D5CU7z=Vd_nLRCr5ZqQg@mail.gmail.com>
+ <95ccf5a6-975b-4543-80a3-595f1ee20543@redhat.com>
+ <CAGRyCJE85fLOahUR3PAUnS_jH4+qpBq37qpged=nvObbg1m+Qw@mail.gmail.com>
+Content-Language: en-US
+From: Laurent Vivier <lvivier@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; keydata=
+ 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
+In-Reply-To: <CAGRyCJE85fLOahUR3PAUnS_jH4+qpBq37qpged=nvObbg1m+Qw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[shopee.com,reject];
-	R_DKIM_ALLOW(-0.20)[shopee.com:s=shopee.com];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,shopee.com,nvidia.com,gmail.com,linux.dev,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-260786-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-260787-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[shopee.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon.huangfu@shopee.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lvivier@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.998];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,shopee.com:mid,shopee.com:dkim,shopee.com:email]
-X-Rspamd-Queue-Id: 91F20193AE0
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 04499193B56
 X-Rspamd-Action: no action
 
-Introduce a new sysctl knob, net.ipv4.tcp_purge_receive_queue, to
-address a memory leak scenario related to TCP sockets.
+On 2/25/26 08:19, Daniele Palmas wrote:
+> Hello,
 
-Issue:
-When a TCP socket in the CLOSE_WAIT state receives a RST packet, the
-current implementation does not clear the socket's receive queue. This
-causes SKBs in the queue to remain allocated until the socket is
-explicitly closed by the application. As a consequence:
+Hello Daniele,
 
-1. The page pool pages held by these SKBs are not released.
-2. The associated page pool cannot be freed.
+> 
+> Il giorno lun 23 feb 2026 alle ore 15:08 Laurent Vivier
+> <lvivier@redhat.com> ha scritto:
+>>
+>> On 2/23/26 13:04, Koen Vandeputte wrote:
+>>> Hi Laurent,
+>>
+>> Hi Koen,
+>>
+>>> I'm testing the latest openwrt state and found an issue probably
+>>> caused by your usb mtu limit patch :-)
+>>>
+>>> I'm talking about this one:
+>>> 662dc80a5e86 ("usbnet: limit max_mtu based on device's hard_mtu")
+>>>
+>>> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=v6.12.74&id=662dc80a5e86b35bbf339e0b87b7cc3f07c09de1
+>>>
+>>>
+>>> When using wwan0 iface normally, this makes sense, but the problem is
+>>> when using QMI modems combined with the rmnet driver and aggregated
+>>> frames.
+>>>
+>>> - The modem is configured to frame sizes of 16383 or 32767 using QMI
+>>> - wwan0 (using qmi_wwan) is configured to match this frame size by
+>>> setting it's MTU to the same value
+>>> - Frames of this size are sent over to qmi_wwan driver (containing
+>>> multiple data packets)
+>>> - Frames are then forwarded to the rmnet driver
+>>> - Frames get de-aggregated here and sent to the network stack for processing.
+>>>
+>>> The reason here is to reduce USB transfers heavily.
+>>>
+>>>
+>>> As you see, it's perfectly possible here to use very large MTU sizes
+>>> as the aggregation feature by rmnet relies on this.
+>>> Also the modem can be perfectly configured to send very large aggregated frames.
+>>>
+>>> After your patch, wwan0 is limited to 1500 bytes it seems, effectively
+>>> breaking aggregation.
+>>>
+>>> On my tests, download speeds are reduced from >300Mbps to ~.8Mbps
+>>>
+>>> I also made a build reverting this patch and all works well again.
+>>>
+>>>
+>>> Is there any other solution to fix this?
+>>> I guess it should be reverted otherwise :-)
+>>
+>> It's weird to be able to set an MTU that is not supported by the hardware.
+>>
+>> To restore performance I think the rx_usb_size should be decoupled from MTU max in qmi_wwan.
+>>
+>> Could you try something like:
+>>
+>> diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
+>> index 3a4985b582cb..6b4796fac692 100644
+>> --- a/drivers/net/usb/qmi_wwan.c
+>> +++ b/drivers/net/usb/qmi_wwan.c
+>> @@ -788,6 +788,8 @@ static int qmi_wwan_bind(struct usbnet *dev, struct usb_interface *intf)
+>>                   usbnet_get_ethernet_addr(dev, cdc_ether->iMACAddress);
+>>           }
+>>
+>> +       dev->rx_urb_size = 32768;
+>> +
+> 
+> So far userspace tools (e.g. also the most important one which is
+> ModemManager) rely on changing the rx_urb_size by changing the MTU: I
+> know this is ugly, but it is a behavior that has been there since a
+> lot of time, not sure how many tools based on this assumption could
+> break.
+> 
+> There's also the chance that there are modems which require a higher
+> rx_urb_size, so having this fixed could not work well.
+> 
+> Unfortunately usbnet serves many drivers, I agree with Koen that a
+> revert is the safest option.
 
-RFC 9293 Section 3.10.7.4 specifies that when a RST is received in
-CLOSE_WAIT state, "all segment queues should be flushed." However, the
-current implementation does not flush the receive queue.
+And there is no intermediate driver (qmi_wwan or rmnet) that can define a max_mtu higher 
+than that defined by usbnet?
 
-Solution:
-Add a per-namespace sysctl (net.ipv4.tcp_purge_receive_queue) that,
-when enabled, causes the kernel to purge the receive queue when a RST
-packet is received in CLOSE_WAIT state. This allows immediate release
-of SKBs and their associated memory resources.
-
-The feature is disabled by default to maintain backward compatibility
-with existing behavior.
-
-Signed-off-by: Leon Hwang <leon.huangfu@shopee.com>
----
- Documentation/networking/ip-sysctl.rst         | 18 ++++++++++++++++++
- .../net_cachelines/netns_ipv4_sysctl.rst       |  1 +
- include/net/netns/ipv4.h                       |  1 +
- net/ipv4/sysctl_net_ipv4.c                     |  9 +++++++++
- net/ipv4/tcp_input.c                           | 16 ++++++++++++++++
- 5 files changed, 45 insertions(+)
-
-diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-index d1eeb5323af0..71a529462baa 100644
---- a/Documentation/networking/ip-sysctl.rst
-+++ b/Documentation/networking/ip-sysctl.rst
-@@ -1441,6 +1441,24 @@ tcp_rto_max_ms - INTEGER
- 
- 	Default: 120,000
- 
-+tcp_purge_receive_queue - BOOLEAN
-+	When a socket in the TCP_CLOSE_WAIT state receives a RST packet, the
-+	default behavior is to not clear its receive queue.  As a result,
-+	any SKBs in the queue are not freed until the socket is closed.
-+	Consequently, the pages held by these SKBs are not released, which
-+	can also prevent the associated page pool from being freed.
-+
-+	If enabled, the receive queue is purged upon receiving the RST,
-+	allowing the SKBs and their associated memory to be released
-+	promptly.
-+
-+	Possible values:
-+
-+	- 0 (disabled)
-+	- 1 (enabled)
-+
-+	Default: 0 (disabled)
-+
- UDP variables
- =============
- 
-diff --git a/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst b/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
-index beaf1880a19b..f2c42e7d84a9 100644
---- a/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
-+++ b/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
-@@ -123,6 +123,7 @@ unsigned_long                   sysctl_tcp_comp_sack_delay_ns
- unsigned_long                   sysctl_tcp_comp_sack_slack_ns                                                        __tcp_ack_snd_check
- int                             sysctl_max_syn_backlog
- int                             sysctl_tcp_fastopen
-+u8                              sysctl_tcp_purge_receive_queue
- struct_tcp_congestion_ops       tcp_congestion_control                                                               init_cc
- struct_tcp_fastopen_context     tcp_fastopen_ctx
- unsigned_int                    sysctl_tcp_fastopen_blackhole_timeout
-diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
-index 8e971c7bf164..ab973f30f502 100644
---- a/include/net/netns/ipv4.h
-+++ b/include/net/netns/ipv4.h
-@@ -220,6 +220,7 @@ struct netns_ipv4 {
- 	u8 sysctl_tcp_nometrics_save;
- 	u8 sysctl_tcp_no_ssthresh_metrics_save;
- 	u8 sysctl_tcp_workaround_signed_windows;
-+	u8 sysctl_tcp_purge_receive_queue;
- 	int sysctl_tcp_challenge_ack_limit;
- 	u8 sysctl_tcp_min_tso_segs;
- 	u8 sysctl_tcp_reflect_tos;
-diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
-index 643763bc2142..da30970bb5d5 100644
---- a/net/ipv4/sysctl_net_ipv4.c
-+++ b/net/ipv4/sysctl_net_ipv4.c
-@@ -1641,6 +1641,15 @@ static struct ctl_table ipv4_net_table[] = {
- 		.extra1		= SYSCTL_ONE_THOUSAND,
- 		.extra2		= &tcp_rto_max_max,
- 	},
-+	{
-+		.procname       = "tcp_purge_receive_queue",
-+		.data           = &init_net.ipv4.sysctl_tcp_purge_receive_queue,
-+		.maxlen         = sizeof(u8),
-+		.mode           = 0644,
-+		.proc_handler   = proc_dou8vec_minmax,
-+		.extra1         = SYSCTL_ZERO,
-+		.extra2         = SYSCTL_ONE,
-+	},
- };
- 
- static __net_init int ipv4_sysctl_init_net(struct net *net)
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 6c3f1d031444..43f32fb5831d 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -4895,6 +4895,7 @@ EXPORT_IPV6_MOD(tcp_done_with_error);
- /* When we get a reset we do this. */
- void tcp_reset(struct sock *sk, struct sk_buff *skb)
- {
-+	const struct net *net = sock_net(sk);
- 	int err;
- 
- 	trace_tcp_receive_reset(sk);
-@@ -4911,6 +4912,21 @@ void tcp_reset(struct sock *sk, struct sk_buff *skb)
- 		err = ECONNREFUSED;
- 		break;
- 	case TCP_CLOSE_WAIT:
-+		/* RFC9293 3.10.7.4. Other States
-+		 *   Second, check the RST bit:
-+		 *     CLOSE-WAIT STATE
-+		 *
-+		 * If the RST bit is set, then any outstanding RECEIVEs and
-+		 * SEND should receive "reset" responses.  All segment queues
-+		 * should be flushed.  Users should also receive an unsolicited
-+		 * general "connection reset" signal.  Enter the CLOSED state,
-+		 * delete the TCB, and return.
-+		 *
-+		 * If net.ipv4.tcp_purge_receive_queue is enabled,
-+		 * sk_receive_queue will be flushed too.
-+		 */
-+		if (unlikely(net->ipv4.sysctl_tcp_purge_receive_queue))
-+			skb_queue_purge(&sk->sk_receive_queue);
- 		err = EPIPE;
- 		break;
- 	case TCP_CLOSE:
--- 
-2.52.0
+Thanks,
+Laurent
 
 
