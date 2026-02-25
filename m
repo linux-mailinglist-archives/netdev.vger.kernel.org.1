@@ -1,187 +1,349 @@
-Return-Path: <netdev+bounces-260792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260796-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iPlsNK2znmnZWwQAu9opvQ
-	(envelope-from <netdev+bounces-260792-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 09:32:45 +0100
+	id QNFvLhS3nmnwWwQAu9opvQ
+	(envelope-from <netdev+bounces-260796-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 09:47:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76954194465
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 09:32:45 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ABC01945FA
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 09:47:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A0E643015D89
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 08:32:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 13B9E302BDDD
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 08:47:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EF4C31B839;
-	Wed, 25 Feb 2026 08:32:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7ED630C35E;
+	Wed, 25 Feb 2026 08:47:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EGS2ZSu/"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="cVlQchii"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D75A7315D33
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 08:32:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.175
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772008362; cv=pass; b=mHMPhLR+3G/QmKh2jLUAtONWfBR2h+luDBw1CRJIOpoHK8ptz4/oZwkHIlrEoG1g8Zs7zKpKTpa7t5z8U4LPFOZBDtB7W22WfIJ+0UXIaiNwQdDXvuDAmK48fgCQr0DbSkLHn62t+zywlGJTCMv5LKEPeEoB2q+mdVIvkBuxWXI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772008362; c=relaxed/simple;
-	bh=j1XDmOFF9ikLIHIw8UOC65mfDZU8nF4o3uQ12APFwhw=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=RCyZV8Cg6ic08qK1rS2IkFvaL5qImI91PRbFrcdGQ/7ylT26Qcu4wrXxxWdhVlGmKCAOsSFxybGuBGEwlv/RIECG+V3B4F9XZSMgVQUaEvpbISQLsQZySOm3tEB+4BCnf/Dh/bB8agmLrxXMeuGQQ9+kRKAKsq1PJXaINEqlMNY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EGS2ZSu/; arc=pass smtp.client-ip=74.125.82.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-2bdb17511aaso1869725eec.0
-        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 00:32:40 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772008360; cv=none;
-        d=google.com; s=arc-20240605;
-        b=arLqyPFcb213IA/HRmQtWCExWniltB6NynDF80Ht6DXsAjcz2tqhDY8YgzqCz4+dDY
-         4sFgl+103CZNOqpZ/VIFc+tKeKgPeED2FnX9/uQrurYHC1cpTqZLgy+3lSIORrNY4kzd
-         By1QQWnDK8FkphRbcWNEU5tGFgieAyf8eLqPANdeYzAjMFmsrASd9Obm4AZtpcdg6TRJ
-         lCVPLoZhEbRdVB2vouXa1N0jtRP3qfaj8TxBWJGAJfHAObU2NRAidrljlsOZyAXCRp7V
-         xAliz8A/QtAbRAEpN1t+2x7GKM692zDQET+YCrsxfO1XkhC4ZuQp0KOleQ9DGjwVkSAy
-         ooDA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=j1XDmOFF9ikLIHIw8UOC65mfDZU8nF4o3uQ12APFwhw=;
-        fh=aDUZZ9N6NPmO6DMPx8G1ADwl9DVnQFUvUJ2oivftvxg=;
-        b=O1c0IZzQmFsRDX48TV9Ir8UQ5OAtSXUmPHjq4RZjMh0IhWL77cSCpJIjHetbYYL/o+
-         ipilRj036aKKn5ante2yL/mz5DioQ3sN1XJag/YL6bVIKsitC34PP+esR5ST9pefKqfe
-         i+RVtBQukTW4fjFLDA2NOk5IWNfAx7uhQLouSxQzxAPsRazW+9EiKZOsk+ddTQWmFEyA
-         rajDGw0hh4TNElUuUEHHGHQY/eEfInnaQVcZyNbUYfhTHP+9SM2+QHzptsPFfauUwmXY
-         7QU+wG6SYkYc91UUUuh+uHglDsJ4ifoKY/0L7+Wjy5Ljs96NUY4zGNR+3xfEXO6pY94K
-         g7/w==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772008360; x=1772613160; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=j1XDmOFF9ikLIHIw8UOC65mfDZU8nF4o3uQ12APFwhw=;
-        b=EGS2ZSu/dbx947UHtrB5yzB+j9326+Jm0MzQJZHrxlYuA/ZNNBr/opB0LqCk2DBmXy
-         EnCMOBZd0ptiuOI56A+cc119iDkdzzaJ25g4LF2veHEGtgkP0Kl96trdW5HMvka3I6aq
-         w2Q+SwZWtAlodgvOURYnh2FaK7cquzPaXAncX2kDvXT1j8OyKgRjFdFNRHxpamMqgGq8
-         vFXEDT3ecqNmcqGewDucJxC3lpAHc2gXs6XehVcxhZzbCR63WCiLXXVTDy7q9oKT1NV/
-         Z30M7MJRdGYejrLmVArusPRdwC+NAdkSxXNuSFmunT07is01GhTf7w/nK0k+oM2v0UXu
-         pN5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772008360; x=1772613160;
-        h=to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j1XDmOFF9ikLIHIw8UOC65mfDZU8nF4o3uQ12APFwhw=;
-        b=jx9s9srNq1k8hV8Xk6wSLxkSbpojH4q6Vekc546nrRu5i/xBHy++Hgc8U1DZSchlcH
-         tAQ5mX+T6VwLE53jciO+RuYCtcsRx3zhW/7uwpVHvb27tiGQ/x6xVXkbZatH4+YQ4zc/
-         /en3U5x20ixbD6EPnCPeRqgHDqxWDHroNJTZuFTtKIP38X3XUamJyhuyTduU9N4EfqZI
-         xbz3hMOVOjyPeMZJ6JGlwSWw1CBZ2xFsCk2/p2xLSkqHaaVWHct30ZuRk7xp1gSlkL32
-         J/6vRc0XESFnC/AHQzeSdykwnwN0LmEe2fg+1g2ammn/+rKp15cACPMGZ5fBIWdrp9ES
-         tuAA==
-X-Gm-Message-State: AOJu0YztXMG4my84LpNLIN/2N1KIBFOdyLyEK+uUhqf1+v7xnRvd6nEW
-	go7jEIeSAlB22XQ5RNsM+i640YP8x7B7Rnk/siwXdOY01O7DenCu3ZOxIP9D4Labj4pvwWekmM1
-	DUjJinBjzFYYCq1JmmsL+IcTVmPeDo6TqryqR
-X-Gm-Gg: ATEYQzwLb7x/z5nlOWqgEK9snRv7ConlPoAjcmz1AjCCQl7gsbd9JgS3/u5YWUtq0Y1
-	I8AnVtZtUJvUYCpM0ukXALIqIOVb9nhKz+sK56ulFlGyMmhF3KzN9ATg4P0ed38bVMthSJG1DD0
-	rQPzqRhFBJZDR+Kol5LykgtXbK52rxVAQSKndSmW7IjJJdNXPZSWUxasDuLnsxhtJEhdL87C1z+
-	/17QViy/fBxa+SQ1y0l40t7sUDQ713kUVUiA2cAhH1dU2uEOqSxVJzucQ5G/dqaTSwyGVsFAtRz
-	polQnd2tIdbmF2jPAGCKOJLnaq11LCK03BZcVlByw7omJJEMd28w8CgKZci5eEvyl1M=
-X-Received: by 2002:a05:7300:d4cb:b0:2ba:a3c5:ccd with SMTP id
- 5a478bee46e88-2bd7bd7162cmr5712863eec.37.1772008359742; Wed, 25 Feb 2026
- 00:32:39 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EA8529BDAD;
+	Wed, 25 Feb 2026 08:47:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772009232; cv=none; b=VDECSwA6krAuW5/J6N8BPQ90PzeY8XPqSv3+VTzgnBG+lWVTsuv3GHELeUhyHiKY+VgxJPt/FwiYffTIxWfL/BOkrU65GmOnZj0CSUoVLARoHzXNKgo9jrVdCPYwgLwEWvXQbO8AQ95zjqHIIL19V+o4fUyexDacspWxGw19sUQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772009232; c=relaxed/simple;
+	bh=J0xQlvBaT1CYJzoXhT+Hqqxjx8UNG50bDfPQ6DkbRoc=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=KaUhpx/nPb6iOCN3i65OQcXUti3b5+F7UZ6K0/58BYNufeX9Kyy0dCEAVZBSDR0+feeYsy6By6+KkMYk33bB9m24MKE+tOY52Y6PRREoqBFhOzwYMegCJevdrvpLf9IDxfjZ3bUWLkamKmrqq8C7iMryrI3XYGE5XEjQCM2YuRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=cVlQchii; arc=none smtp.client-ip=115.124.30.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1772009227; h=Message-ID:Subject:Date:From:To;
+	bh=rEo0rrJ0NbhWhP4748gknPgRXYAsuEdXqjPgMHubl+0=;
+	b=cVlQchiijdqPGBxpQy0+nZjJEt6sEj2gx1Weha434hUcfJXT1gsJTkQPDhS7UIXleN2GRnWF981OvZJAXqO7c3b4IwYOHOyq4WLx34cZF1WDE+XH9iTe5eNg/TifL52Q80M9s6ygVb6AvfWLA1SMLA+96GcPpMm6jXR1fZ6ZgV4=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WzlrSwg_1772009226 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 25 Feb 2026 16:47:06 +0800
+Message-ID: <1772008398.9732423-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH v7 RESEND net-next] virtio_net: add page_pool support for buffer allocation
+Date: Wed, 25 Feb 2026 16:33:18 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Vishwanath Seshagiri <vishs@meta.com>
+Cc: =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ David Wei <dw@davidwei.uk>,
+ Matteo Croce <technoboy85@gmail.com>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ <netdev@vger.kernel.org>,
+ <virtualization@lists.linux.dev>,
+ <linux-kernel@vger.kernel.org>,
+ <kernel-team@meta.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>
+References: <20260225044910.1328791-1-vishs@meta.com>
+In-Reply-To: <20260225044910.1328791-1-vishs@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: Patryk <pbiel7@gmail.com>
-Date: Wed, 25 Feb 2026 09:32:28 +0100
-X-Gm-Features: AaiRm520FyidZTc_8ReftC7rg60pv0xElcTnBLRnDGOJ5M2FiQy94KW00QeURAA
-Message-ID: <CA+DkFDaW_wJ5p9_P7pMpz-8iE6xeKkdF-MQcd2m2GcyVUE3S4Q@mail.gmail.com>
-Subject: 10G-QXGMII phy no autonegotiation on LS1028A
-To: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+X-Spamd-Result: default: False [-6.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260792-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_ONE(0.00)[1];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pbiel7@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_CC(0.00)[redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,davidwei.uk,gmail.com,linaro.org,vger.kernel.org,lists.linux.dev,meta.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 76954194465
+	TAGGED_FROM(0.00)[bounces-260796-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	NEURAL_HAM(-0.00)[-0.995];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,pp_params.dev:url,meta.com:email]
+X-Rspamd-Queue-Id: 1ABC01945FA
 X-Rspamd-Action: no action
 
-Hello, I've been trying to bring-up the 10G-QXGMII PHY on LS1028A
-based board and I have some problems. I guess that they come from the
-fact that I do not see the whole picture as this is the second phy
-I've been working on (actually the first one that uses serdes, the
-previous one was connected through RGMII). Anyway I decided to send
-this mail and post some of my questions hoping someone will find some
-time to steer a newbie in the right direction.
+On Tue, 24 Feb 2026 20:49:10 -0800, Vishwanath Seshagiri <vishs@meta.com> wrote:
+> Use page_pool for RX buffer allocation in mergeable and small buffer
+> modes to enable page recycling and avoid repeated page allocator calls.
+> skb_mark_for_recycle() enables page reuse in the network stack.
+>
+> Big packets mode is unchanged because it uses page->private for linked
+> list chaining of multiple pages per buffer, which conflicts with
+> page_pool's internal use of page->private.
+>
+> Implement conditional DMA premapping using virtqueue_dma_dev():
+> - When non-NULL (vhost, virtio-pci): use PP_FLAG_DMA_MAP with page_pool
+>   handling DMA mapping, submit via virtqueue_add_inbuf_premapped()
+> - When NULL (VDUSE, direct physical): page_pool handles allocation only,
+>   submit via virtqueue_add_inbuf_ctx()
+>
+> This preserves the DMA premapping optimization from commit 31f3cd4e5756b
+> ("virtio-net: rq submits premapped per-buffer") while adding page_pool
+> support as a prerequisite for future zero-copy features (devmem TCP,
+> io_uring ZCRX).
+>
+> Page pools are created in probe and destroyed in remove (not open/close),
+> following existing driver behavior where RX buffers remain in virtqueues
+> across interface state changes.
+>
+> Signed-off-by: Vishwanath Seshagiri <vishs@meta.com>
+> ---
+> Resend for net-next window (no changes from v7).
+> - v7:
+>   https://lore.kernel.org/virtualization/20260210014305.3236342-1-vishs@meta.com/
+>
+> Changes in v7:
+> - Replace virtnet_put_page() helper with direct page_pool_put_page()
+>   calls (Xuan Zhuo)
+> - Add virtnet_no_page_pool() helper to consolidate big_packets mode check
+>   (Michael S. Tsirkin)
+> - Add DMA sync_for_cpu for subsequent buffers in xdp_linearize_page() when
+>   use_page_pool_dma is set (Michael S. Tsirkin)
+> - Remove unused pp_params.dev assignment in non-DMA path
+> - Add page pool recreation in virtnet_restore_up() for freeze/restore support (Chris Mason's
+> Review Prompt)
+> - v6:
+>   https://lore.kernel.org/virtualization/20260208175410.1910001-1-vishs@meta.com/
+>
+> Changes in v6:
+> - Drop page_pool_frag_offset_add() helper and switch to page_pool_alloc_va();
+>   page_pool_alloc_netmem() already handles internal fragmentation internally
+>   (Jakub Kicinski)
+> - v5:
+>   https://lore.kernel.org/virtualization/20260206002715.1885869-1-vishs@meta.com/
+>
+> Benchmark results:
+>
+> Configuration: pktgen TX -> tap -> vhost-net | virtio-net RX -> XDP_DROP
+>
+> Small packets (64 bytes, mrg_rxbuf=off):
+>   1Q:  853,493 -> 868,923 pps  (+1.8%)
+>   2Q: 1,655,793 -> 1,696,707 pps (+2.5%)
+>   4Q: 3,143,375 -> 3,302,511 pps (+5.1%)
+>   8Q: 6,082,590 -> 6,156,894 pps (+1.2%)
+>
+> Mergeable RX (64 bytes):
+>   1Q:   766,168 ->   814,493 pps  (+6.3%)
+>   2Q: 1,384,871 -> 1,670,639 pps (+20.6%)
+>   4Q: 2,773,081 -> 3,080,574 pps (+11.1%)
+>   8Q: 5,600,615 -> 6,043,891 pps  (+7.9%)
+>
+> Mergeable RX (1500 bytes):
+>   1Q:   741,579 ->   785,442 pps  (+5.9%)
+>   2Q: 1,310,043 -> 1,534,554 pps (+17.1%)
+>   4Q: 2,748,700 -> 2,890,582 pps  (+5.2%)
+>   8Q: 5,348,589 -> 5,618,664 pps  (+5.0%)
+>
+>  drivers/net/Kconfig      |   1 +
+>  drivers/net/virtio_net.c | 467 ++++++++++++++++++++-------------------
+>  2 files changed, 243 insertions(+), 225 deletions(-)
+>
+> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+> index ac12eaf11755..f1e6b6b0a86f 100644
+> --- a/drivers/net/Kconfig
+> +++ b/drivers/net/Kconfig
+> @@ -450,6 +450,7 @@ config VIRTIO_NET
+>  	depends on VIRTIO
+>  	select NET_FAILOVER
+>  	select DIMLIB
+> +	select PAGE_POOL
+>  	help
+>  	  This is the virtual network driver for virtio.  It can be used with
+>  	  QEMU based VMMs (like KVM or Xen).  Say Y or M.
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index db88dcaefb20..32aede2b1ed5 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -26,6 +26,7 @@
+>  #include <net/netdev_rx_queue.h>
+>  #include <net/netdev_queues.h>
+>  #include <net/xdp_sock_drv.h>
+> +#include <net/page_pool/helpers.h>
+>
+>  static int napi_weight = NAPI_POLL_WEIGHT;
+>  module_param(napi_weight, int, 0444);
+> @@ -290,14 +291,6 @@ struct virtnet_interrupt_coalesce {
+>  	u32 max_usecs;
+>  };
+>
+> -/* The dma information of pages allocated at a time. */
+> -struct virtnet_rq_dma {
+> -	dma_addr_t addr;
+> -	u32 ref;
+> -	u16 len;
+> -	u16 need_sync;
+> -};
+> -
+>  /* Internal representation of a send virtqueue */
+>  struct send_queue {
+>  	/* Virtqueue associated with this send _queue */
+> @@ -356,8 +349,10 @@ struct receive_queue {
+>  	/* Average packet length for mergeable receive buffers. */
+>  	struct ewma_pkt_len mrg_avg_pkt_len;
+>
+> -	/* Page frag for packet buffer allocation. */
+> -	struct page_frag alloc_frag;
+> +	struct page_pool *page_pool;
+> +
+> +	/* True if page_pool handles DMA mapping via PP_FLAG_DMA_MAP */
+> +	bool use_page_pool_dma;
+>
+>  	/* RX: fragments + linear part + virtio header */
+>  	struct scatterlist sg[MAX_SKB_FRAGS + 2];
+> @@ -370,9 +365,6 @@ struct receive_queue {
+>
+>  	struct xdp_rxq_info xdp_rxq;
+>
+> -	/* Record the last dma info to free after new pages is allocated. */
+> -	struct virtnet_rq_dma *last_dma;
+> -
+>  	struct xsk_buff_pool *xsk_pool;
+>
+>  	/* xdp rxq used by xsk */
+> @@ -521,11 +513,14 @@ static int virtnet_xdp_handler(struct bpf_prog *xdp_prog, struct xdp_buff *xdp,
+>  			       struct virtnet_rq_stats *stats);
+>  static void virtnet_receive_done(struct virtnet_info *vi, struct receive_queue *rq,
+>  				 struct sk_buff *skb, u8 flags);
+> -static struct sk_buff *virtnet_skb_append_frag(struct sk_buff *head_skb,
+> +static struct sk_buff *virtnet_skb_append_frag(struct receive_queue *rq,
+> +					       struct sk_buff *head_skb,
+>  					       struct sk_buff *curr_skb,
+>  					       struct page *page, void *buf,
+>  					       int len, int truesize);
+>  static void virtnet_xsk_completed(struct send_queue *sq, int num);
+> +static void free_unused_bufs(struct virtnet_info *vi);
+> +static void virtnet_del_vqs(struct virtnet_info *vi);
+>
+>  enum virtnet_xmit_type {
+>  	VIRTNET_XMIT_TYPE_SKB,
+> @@ -706,15 +701,18 @@ static struct page *get_a_page(struct receive_queue *rq, gfp_t gfp_mask)
+>  	return p;
+>  }
+>
+> +static bool virtnet_no_page_pool(struct virtnet_info *vi)
+> +{
 
-The phy I've been using, once started, autoconfigures to 10G-QXGMII
-mode with auto negotiation enabled. It detects the link partner
-abilities and completes the autoneg process (at least on the line
-side). I think we can assume it works as expected. From the SoC side,
-as I understand the crucial part is pcs-lynx implementation. It
-configures the USXGMII mode, checks the state, reads the link partner
-ability that is carried "in-band". and so on. In the device tree I
-configure my phy to use mode="in-band-status".
+Can we check vi->page_pool?
 
-The problem is as follows - the pcs-lynx correctly detect the USXGII
-link however does not detect the link partner ability thus, the link
-never becomes functional. It looks like the autonegotiation on the SoC
-side does not work at all. I browsed through the pcs-lynx sources,
-looking at the LS1028A reference manual, and I've found that Serdes
-module on this SoC features some MDIO devices, whereas one of them is
-"QXGMII USXGMII Replicator" (LS1028ARM 29.6 MDIO register spaces for
-anyone interested). I checked this device and it features the Control
-Register, which contains the Auto_Negotiation_Enable bit that is never
-set by the pcs-lynx driver. I patched the driver (just out of
-curiosity) and in lynx_pcs_config_usxgmii I added code that sets this
-bit. Somehow after this change the autoneg state machine kicked-in and
-pcs-lynx was able to detect the link partner abilities, the negotiated
-speed and make the link functional. I was even able to exchange some
-information through this link - ping, scp file.
+In virtnet_create_page_pools, we can check
+"vi->big_packets && !vi->mergeable_rx_bufs" directly.
 
-But this is ofc - in my opinion - not the solution, as I just can't
-believe that someone just forgot to set this bit in the pcs-lynx
-driver, I guess that the real solution is somewhere else. If this bit
-is not set in the driver then what makes the autoneg process enabled?
-I'm wondering if perhaps someone here has done something like this
-before and would like to share some hints on how to approach this? The
-second question I have - I mentioned that I was able to establish
-communication with the link partner, however there were some errors
-especially while sending bigger packets, e.g. sending ping -s 20 ended
-up with 100% success rate, however ping -s 300 ended with ~50% success
-rate. I'm wondering how big of an impact on the communication quality
-has the fact that the PHY I've been using is connected through the
-connector, not directly soldered on the PCB? It's just my feeling -
-but if I were to guess I would say that in the case of 10G QXGMII it
-may be significant, but I'm not that experienced to be sure of this
-statement.
+Then other calls will be more efficient.
 
-Best regards
-Patryk
+
+> +	return vi->big_packets && !vi->mergeable_rx_bufs;
+> +}
+> +
+>  static void virtnet_rq_free_buf(struct virtnet_info *vi,
+>  				struct receive_queue *rq, void *buf)
+>  {
+> -	if (vi->mergeable_rx_bufs)
+> -		put_page(virt_to_head_page(buf));
+> -	else if (vi->big_packets)
+> +	if (virtnet_no_page_pool(vi))
+>  		give_pages(rq, buf);
+>  	else
+> -		put_page(virt_to_head_page(buf));
+> +		page_pool_put_page(rq->page_pool, virt_to_head_page(buf), -1, false);
+>  }
+>
+
+
+[...]
+
+
+>
+>  err_buf:
+> @@ -2666,32 +2586,40 @@ static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
+>  static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
+>  			     gfp_t gfp)
+>  {
+> -	char *buf;
+>  	unsigned int xdp_headroom = virtnet_get_headroom(vi);
+>  	void *ctx = (void *)(unsigned long)xdp_headroom;
+> -	int len = vi->hdr_len + VIRTNET_RX_PAD + GOOD_PACKET_LEN + xdp_headroom;
+> +	unsigned int len = vi->hdr_len + VIRTNET_RX_PAD + GOOD_PACKET_LEN + xdp_headroom;
+> +	struct page *page;
+> +	dma_addr_t addr;
+> +	char *buf;
+>  	int err;
+>
+>  	len = SKB_DATA_ALIGN(len) +
+>  	      SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+>
+> -	if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag, gfp)))
+> -		return -ENOMEM;
+> -
+> -	buf = virtnet_rq_alloc(rq, len, gfp);
+> +	buf = page_pool_alloc_va(rq->page_pool, &len, gfp);
+>  	if (unlikely(!buf))
+>  		return -ENOMEM;
+>
+>  	buf += VIRTNET_RX_PAD + xdp_headroom;
+>
+> -	virtnet_rq_init_one_sg(rq, buf, vi->hdr_len + GOOD_PACKET_LEN);
+> +	if (rq->use_page_pool_dma) {
+> +		page = virt_to_head_page(buf);
+> +		addr = page_pool_get_dma_addr(page) +
+> +		       (buf - (char *)page_address(page));
+>
+> -	err = virtqueue_add_inbuf_premapped(rq->vq, rq->sg, 1, buf, ctx, gfp);
+> -	if (err < 0) {
+> -		virtnet_rq_unmap(rq, buf, 0);
+> -		put_page(virt_to_head_page(buf));
+> +		sg_init_table(rq->sg, 1);
+> +		sg_fill_dma(rq->sg, addr, vi->hdr_len + GOOD_PACKET_LEN);
+> +		err = virtqueue_add_inbuf_premapped(rq->vq, rq->sg, 1,
+> +						    buf, ctx, gfp);
+> +	} else {
+> +		sg_init_one(rq->sg, buf, vi->hdr_len + GOOD_PACKET_LEN);
+> +		err = virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1,
+> +					      buf, ctx, gfp);
+>  	}
+
+Maybe we should introduce a helper to do this, as the merge mode needs this
+too.
+
+
+Thanks.
 
