@@ -1,168 +1,193 @@
-Return-Path: <netdev+bounces-260845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260846-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mEhoEcTFnmkuXQQAu9opvQ
-	(envelope-from <netdev+bounces-260845-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:49:56 +0100
+	id kEd0LGTFnmkuXQQAu9opvQ
+	(envelope-from <netdev+bounces-260846-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:48:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B57271954D2
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:49:55 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FBC9195459
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 10:48:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 21CB13015883
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 09:43:44 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9A972303B933
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 09:45:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC23038F241;
-	Wed, 25 Feb 2026 09:43:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01F3B38759D;
+	Wed, 25 Feb 2026 09:45:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mvn8bl4V";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="KoMl7KZN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NpzSYJS1"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC04823AB88
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 09:43:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D369F33CE85;
+	Wed, 25 Feb 2026 09:45:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772012613; cv=none; b=cV/F//G++xFSPDuSTrdpUMtDI9O6H93/m2v3mDstkRonAR6F9lB52XlJMlMlAgBuRPLvpLNc62rPLXPMO3Im03eblFZwTPvz3j1GLpb3wUPtwGDJQ/IkPR/dL8Xrn5SpVozgczuvRfZ3paNaFIY1W6fGKASBOBi2OrrgT7fE0oo=
+	t=1772012748; cv=none; b=j84bW/D4Gu+h0Noy5Q2yv/dvLI+qOnp8if82ReLE+rZBMEJv2+Wga7QGN2kk/b/8sMMnyFfsh9frrrRMfvw3bFEZT8hqgYiTk5LuZzd5iq6nSu35b36nGX0nyKJya/tXLhFC4SdL8TS24Sdc2f1kkMuYvftIF5ChsdhrQhZ09ag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772012613; c=relaxed/simple;
-	bh=dJBC8mLDABEEc1VlJb5lfgoDrRuha1EpEiY4jlkAt8U=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=GNhPwaS9mWnaBfy5nrlJdNzx3cIXPbMUKdVmBdMNh+APlLHy907T4zNOpm+5IXHxxGKLzfIkFEQD+yF8kk0KsizvHLsE46lpCcfiQTfEjZMfgMhLAsHb50nD8DJTbnkhzQ+Z4NcuYYLb/nmNApeFO8yqoFUXRStcWyBeXHG+mZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Mvn8bl4V; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=KoMl7KZN; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772012611;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dJBC8mLDABEEc1VlJb5lfgoDrRuha1EpEiY4jlkAt8U=;
-	b=Mvn8bl4VU4bXDD/sgHok6NZpQewQH63MALr+5PybB1pBTTneud4ClXCdFhKsE6OCNct60a
-	ENb3Y5myCsPuOyu5XeT5G7pWK3gYyZst2z7us7Smi+0Qfozjydyd0lRmllLbZXy320tD2A
-	LickXAq90OEc6FUWmOOOawSU5A5pG1M=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-60-K4942J8kPqmoHwp341MN2Q-1; Wed, 25 Feb 2026 04:43:29 -0500
-X-MC-Unique: K4942J8kPqmoHwp341MN2Q-1
-X-Mimecast-MFC-AGG-ID: K4942J8kPqmoHwp341MN2Q_1772012608
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4837b9913c9so61786045e9.0
-        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 01:43:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1772012608; x=1772617408; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dJBC8mLDABEEc1VlJb5lfgoDrRuha1EpEiY4jlkAt8U=;
-        b=KoMl7KZNMKRGFlR55s5YCU5dmbxj0YLXiZqQ3iA6Za00ccoF6Hqcst/frmVGq2259D
-         B0oEbu1rpqdWDzSljKSXfJ7fPvhN7oFzSZkigNlaqMU4qM0J86aUIcVHT/4bcx0+2rBd
-         rith62M3/jHcLWm0ItZuggcwPGXmTFQtQoNrTZCCWsXedOC0RKbCSwnF3SZQhmdIqJfu
-         3fW549yI8HrDgFnlpOVer8d7gVppOTOBs3WE3hmbbpZUZwhRC+wx5iTVYHlGpYp7o61b
-         7dWuCcxQ+ZO5g+0ox2QFDRSZGe+0KRpTxycu0Hb370Sx6Tz6eOw+scMpPGWS3tZS8Ti7
-         9c6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772012608; x=1772617408;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=dJBC8mLDABEEc1VlJb5lfgoDrRuha1EpEiY4jlkAt8U=;
-        b=UVWuPtzP2AiPNtxqNOH+JX0xwZc+gdh946lQwS+e6eqtE2HM0XI3Ylvn54T7JAJmZK
-         mNlM/jKdE36iZK19aL+4oite2FLsmLSGq60c2+8oljouUiytSpejvSiQ9+wlcm76B686
-         Q/Uwc0q6j+zJ9ZtKE/Hvmar/Me6CGWqjW/9tPENIdroM3HPw9o2vbynN5wPQoDR2KGRj
-         YgLACXTPCXlnLARIAbxC8aA+h3kwM1AWY8l8RjncABYEJtEzKEXVS9OjmFYebdYWiVd4
-         i471CKHi9vPxNt9ubudmgiIR49PeXisdYDEBD0HBpDSlurpV1UPXvjbKNhkF1SQrJer/
-         4qsg==
-X-Forwarded-Encrypted: i=1; AJvYcCX0sKKE7FCglT3GjitBOdUcjY/xeuXyR9tSt1cqSVtP+4JcYtaTS3gDTFYXjfeTfnxTYjfyeGc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrXf1inmnHe3oc/FzOU5EFhXW2tbeCBs/OUVWfYfKQ4s6TGHGn
-	1pDhr+QWj8n3hM8EQ+vPBAFWiymNPxlUCydsLI6ea0SHHK9ocyh2GclExRXk7R9iOofXBLR0J6j
-	1Ze0r2vryUwSx8Z8RNZkCN/uSYshFp6y8W562lKkcAtcaRDFtzBYFugQKhQ==
-X-Gm-Gg: ATEYQzxkzG/sfKiVRpB5RGPQ3xyI0CAPtA3a3G/c8XAHUMjLYFjpM12iFSxSa8OcbyY
-	DiCin49Vwd76hmlQTD1tJJ9QF9k6b2gbEOHAhelUe+O2Looodl024LwfY6ROUsxHbVg/tJd5kfz
-	cK9WHR8gfUkmwRok3CraCktiYz8tXPDskwUCrxHEHrB9L3w3Z2EFYEYNfJ9oScdfd+QyAAlDUs8
-	2HDQcLHXdlSBf/lo8LVXqNA8Rw/GFb+T0Pd64Fv55ANRT8C+k+SttsXJp5teWNuL9DPFFuc3p8k
-	y+Xc8O1c91uSKppg2K5ZHV/+w36Puhz+xGgwk2L/4pnDYMsXUzlRnbsnWp9L8p50vPfxxDTTYpv
-	DNKXqEbnCNGQBZS+5gk+33Rvjt4m8ot5+0aUqbK+g6pZvX2uQ
-X-Received: by 2002:a05:600c:8287:b0:480:3a71:92b2 with SMTP id 5b1f17b1804b1-483a95eab99mr223255615e9.26.1772012608006;
-        Wed, 25 Feb 2026 01:43:28 -0800 (PST)
-X-Received: by 2002:a05:600c:8287:b0:480:3a71:92b2 with SMTP id 5b1f17b1804b1-483a95eab99mr223255025e9.26.1772012607592;
-        Wed, 25 Feb 2026 01:43:27 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bfb85c58sm8490385e9.9.2026.02.25.01.43.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Feb 2026 01:43:26 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 7DC33516AE5; Wed, 25 Feb 2026 10:43:28 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Byungchul Park <byungchul@sk.com>, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- kernel_team@skhynix.com, harry.yoo@oracle.com, hawk@kernel.org,
- andrew+netdev@lunn.ch, david@kernel.org, lorenzo.stoakes@oracle.com,
- Liam.Howlett@oracle.com, vbabka@suse.cz, ziy@nvidia.com,
- willy@infradead.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- asml.silence@gmail.com, axboe@kernel.dk, ncardwell@google.com,
- kuniyu@google.com, dsahern@kernel.org, almasrymina@google.com,
- sdf@fomichev.me, dw@davidwei.uk, ap420073@gmail.com, dtatulea@nvidia.com,
- shivajikant@google.com, io-uring@vger.kernel.org
-Subject: Re: [RESEND PATCH net-next] netmem: remove the pp fields from net_iov
-In-Reply-To: <20260224061424.11219-1-byungchul@sk.com>
-References: <20260224061424.11219-1-byungchul@sk.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Wed, 25 Feb 2026 10:43:28 +0100
-Message-ID: <87fr6pma4f.fsf@toke.dk>
+	s=arc-20240116; t=1772012748; c=relaxed/simple;
+	bh=+AIaFX+M+97g0FC7V8T6FVbRuf2pCtdY/Mu0e3fv1TI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tdgXof8WcXswiAPeTeGvoIfkhoTx7QkYieA0lXr8WBvRjZlEIyH9LXwpG7w7ggk6kRi91MAV3e2wPop2ET62SthpvYW8e62g+aFCMyAHQbmucJh8IMQvM8c9DwYQjBy0A11kluxzxk3TFvYPm19ZkMZ7w+RzwLpHUQp49Ge/0G4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NpzSYJS1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 977B5C116D0;
+	Wed, 25 Feb 2026 09:45:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772012747;
+	bh=+AIaFX+M+97g0FC7V8T6FVbRuf2pCtdY/Mu0e3fv1TI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NpzSYJS1CLjwf1gP9zjWL5R7sOqJQopkUI/fGiONizbjjUNeYhAPx0pLhy5qRA+kR
+	 +0ZlTWW1tHvehApcLXhXKIkKYYRsGo8nNTCBg/sAG+zNXcHydLi26uF6HPm6seEOsJ
+	 nqAOrz2LONUq5ChfKIwcnVneUjWDjfK/0HGfXFZPz5G1dzxrpr0Spdnz78cPCBLtyj
+	 H+UKCe9kGtmNYq9mfwXSW9c6zYjOvZPJF8v9Rx/eQDnpSGK/A8nrrFXPwucS24asdo
+	 UfZ0AsqpjmNp2604wDGLWd+D/Ft3UQikwu59PWWin5AVLLeXhgtnSaWwRkrHlrE/Wg
+	 zWSHkk2Ty2JFA==
+Date: Wed, 25 Feb 2026 09:45:43 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: netdev@vger.kernel.org, Jiayuan Chen <jiayuan.chen@shopee.com>,
+	syzbot+72e3ea390c305de0e259@syzkaller.appspotmail.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v1] atm: lec: fix null-ptr-deref in lec_arp_clear_vccs
+Message-ID: <aZ7Ex6c1ZeqvWLFp@horms.kernel.org>
+References: <20260224044648.243578-1-jiayuan.chen@linux.dev>
+ <aZ60sfG1tdraA0zB@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aZ60sfG1tdraA0zB@horms.kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.04 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.63)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-260845-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kvack.org,skhynix.com,oracle.com,kernel.org,lunn.ch,suse.cz,nvidia.com,infradead.org,davemloft.net,google.com,redhat.com,gmail.com,kernel.dk,fomichev.me,davidwei.uk];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,sk.com:email,toke.dk:mid];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[31];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[toke@redhat.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-260846-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: B57271954D2
+	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,72e3ea390c305de0e259];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,appspotmail.com:email,shopee.com:email]
+X-Rspamd-Queue-Id: 5FBC9195459
 X-Rspamd-Action: no action
 
-Byungchul Park <byungchul@sk.com> writes:
+On Wed, Feb 25, 2026 at 08:37:05AM +0000, Simon Horman wrote:
+> On Tue, Feb 24, 2026 at 12:46:38PM +0800, Jiayuan Chen wrote:
+> > From: Jiayuan Chen <jiayuan.chen@shopee.com>
+> > 
+> > syzkaller reported a null-ptr-deref in lec_arp_clear_vccs().
+> > This issue can be easily reproduced using the syzkaller reproducer.
+> > 
+> > In the ATM LANE (LAN Emulation) module, the same atm_vcc can be shared by
+> > multiple lec_arp_table entries (e.g., via entry->vcc or entry->recv_vcc).
+> > When the underlying VCC is closed, lec_vcc_close() iterates over all
+> > ARP entries and calls lec_arp_clear_vccs() for each matched entry.
+> > 
+> > For example, when lec_vcc_close() iterates through the hlists in
+> > priv->lec_arp_empty_ones or other ARP tables:
+> > 
+> > 1. In the first iteration, for the first matched ARP entry sharing the VCC,
+> > lec_arp_clear_vccs() frees the associated vpriv (which is vcc->user_back)
+> > and sets vcc->user_back to NULL.
+> > 2. In the second iteration, for the next matched ARP entry sharing the same
+> > VCC, lec_arp_clear_vccs() is called again. It obtains a NULL vpriv from
+> > vcc->user_back (via LEC_VCC_PRIV(vcc)) and then attempts to dereference it
+> > via `vcc->pop = vpriv->old_pop`, leading to a null-ptr-deref crash.
+> > 
+> > Fix this by adding a null check for vpriv before dereferencing it. If
+> > vpriv is already NULL, it means the VCC has been cleared by a previous
+> > call, so we can safely skip the cleanup and just clear the entry's
+> > vcc/recv_vcc pointers. Note that the added check is intentional and
+> > necessary to avoid calling vcc_release_async() multiple times on the
+> > same vcc/recv_vcc, not just protecting the kfree().
 
-> Now that the pp fields in net_iov have no users, remove them from
-> net_iov and clean up.
->
-> Signed-off-by: Byungchul Park <byungchul@sk.com>
+Sorry for coming back to this a 2nd time.
+After thinking about this some more I'd like to pass on
+some feedback from the AI powered review.
 
-Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+I'll put the full text below. But in a nutshell: could you clarify
+why it is necessary to avoid calling vcc_release_async() multiple times.
 
+AI output was:
+
+  Is this description of the guard's purpose accurate? The commit message
+  states that the null check is "necessary to avoid calling
+  vcc_release_async() multiple times on the same vcc/recv_vcc, not just
+  protecting the kfree()."
+
+  Looking at vcc_release_async() in net/atm/common.c, it sets ATM_VF_CLOSE
+  flag, sets sk_shutdown |= RCV_SHUTDOWN, sets sk_err, clears ATM_VF_WAITING,
+  and calls sk_state_change(sk). Calling it multiple times would redundantly
+  set flags that are already set and trigger sk_state_change() multiple times
+  on an already-shutting-down socket.
+
+  While preventing multiple vcc_release_async() calls is beneficial, the guard
+  is primarily needed to prevent the NULL dereference on vpriv->old_pop (which
+  would crash) and secondarily to prevent use-after-free on the kfree'd vpriv.
+  None of the repeated vcc_release_async() operations would necessarily cause
+  a crash or data corruption -- they would just set already-set flags and
+  trigger redundant callbacks.
+
+  Could the commit message be more precise about the primary purpose of the
+  guard being to prevent the NULL dereference, with preventing multiple
+  vcc_release_async() calls being a beneficial side effect rather than the
+  main reason for the check?
+
+And, I believe due to that, AI goes on to comment about the fixes tag.  FWIIW,
+I think the commit you cited is correct with respect to the first part of
+your patch which protecting against double-free. But I do begin to wonder
+if we may have two fixes in one patch.
+
+  Should the Fixes tag point to a more recent commit? The null pointer
+  dereference bug was directly introduced by commit 8d9f73c0ad2f ("atm: fix a
+  memory leak of vcc->user_back") in 2020. That commit added cleanup code for
+  entry->recv_vcc that frees vpriv and sets vcc->user_back to NULL without
+  checking if vpriv is already NULL.
+
+  When multiple ARP entries share the same VCC, the second call to
+  lec_arp_clear_vccs() dereferences a NULL vpriv, causing the crash. While the
+  entry->vcc path had similar code since 2005, commit 8d9f73c0ad2f introduced
+  the recv_vcc path with the same vulnerability, making the bug exploitable.
+
+  Consider:
+    Fixes: 8d9f73c0ad2f ("atm: fix a memory leak of vcc->user_back")
+
+> > 
+> > Reported-by: syzbot+72e3ea390c305de0e259@syzkaller.appspotmail.com
+> > Closes: https://lore.kernel.org/all/68c95a83.050a0220.3c6139.0e5c.GAE@google.com/T/
+> > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> > Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> 
+> 
 
