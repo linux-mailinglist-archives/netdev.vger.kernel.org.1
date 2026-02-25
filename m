@@ -1,163 +1,147 @@
-Return-Path: <netdev+bounces-260963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-260964-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AGarNNf+nmlAYgQAu9opvQ
-	(envelope-from <netdev+bounces-260963-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:53:27 +0100
+	id SDHfKcf+nmlAYgQAu9opvQ
+	(envelope-from <netdev+bounces-260964-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:53:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49228198649
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:53:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E50B3198642
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 14:53:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A41EC303CEED
-	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 13:48:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 190CB303FA9D
+	for <lists+netdev@lfdr.de>; Wed, 25 Feb 2026 13:53:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 406963C199E;
-	Wed, 25 Feb 2026 13:48:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AFB63D2FF7;
+	Wed, 25 Feb 2026 13:53:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="oPrcLuzK"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5XwRpasB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB3FD396B9F
-	for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 13:48:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772027314; cv=pass; b=uhKF9ezrwif4t4xzZRuH1cKnJrWoc75weOx76oBGPVSBPf/uIFNFJ4iwvdINkd2gIje6b0bEw9uy9AOgP2l9atkdPClsa9uW10SlWpviZk9EOzhr7L2iKwhn8gA2dsAk2+W7gnYTvEaDB3cxg9ND0fMnU8T2Ht2B9aIS0Tct6ZI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772027314; c=relaxed/simple;
-	bh=SssUEHOHY/uF1odyg5G0fB8AX0zxj3pYD2qqdMBOJes=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nZvklQc7Cs5nQdnCeb7F7JKpguuKmP/YfJ1rE9XPDwkR97+FpqI9cZH6kkj7H2TMzqYL6gA5avlFPce0nHZgWkMUMTcZJUnVS1lNe82IWOIje4RUlOP3iS6Ex6F0qba044fYWhTGjhCBuVoiwstgl2hGsYUvXY2dnvVahNTAZvk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=oPrcLuzK; arc=pass smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-356337f058aso3066837a91.2
-        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 05:48:32 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772027312; cv=none;
-        d=google.com; s=arc-20240605;
-        b=NndZ9tVc6ZsP8hkdW60EHMp9j+QJSmkEo5LUlXlF5T6zTsx5ZJ9Ako27nI8oPjwVF3
-         6qbMZiugO1NqDhHke69lyNQ1grS+UOJI3o2UBywF+nOzgSnsrLfYxQqSSLP7yfC2YsRT
-         rnCDyR1k9Gp4IAcn5P3cxJnYsZhrlO3bSwj4o/2dRn1rTiAjgOO9N21CRMyyPXl4uF5B
-         8FxLx3Jg9Z8rdSZ+dpnKEZ14bps8EvMYN58jOTLJcD3WeO9gNGQ+i1XCpL5O82Esuvb6
-         +Y999qRYaav4OshagjLqaAqsZ57GZoUIObYDyNDGtX7fT4US/7XhxVJdUsQaS0hm1f8B
-         kqSQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=SssUEHOHY/uF1odyg5G0fB8AX0zxj3pYD2qqdMBOJes=;
-        fh=Wls+cvjdYtEyrQbuwxCXTTLhOGLyDxnWxmAnRBguiHE=;
-        b=PSAsISDZjFKlA0jiThXF0PsRjE9i+ICckaaRc6fsN8Ll6Qz+qKnr+N5fg2/Y4SkzXA
-         MBJtRzxy5vBMtbCK8iBD/CRSA/qCm2c8yN90y0sw5hjp1FaBSqtIHWCnITcRwfmkcCLH
-         PmWSBRpj83qdRKRdlidcwqQcvLk4ZsukXL9ycslTg3vkrxuAVkyISp+9Tk2K1A6a6anC
-         EAeNtEpulD0UBIk/8VdTy2Fv0viPjjcgOhHlCkYoai9BbxL+nyBDtCdEPGPow+QUUmod
-         RsOssusbTRZSPOnGeOjGGAewk1XIcAW8x9ekIB3n0f8K5XSGpTDDvNoM00xE/YNYBKHq
-         IKJA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1772027312; x=1772632112; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SssUEHOHY/uF1odyg5G0fB8AX0zxj3pYD2qqdMBOJes=;
-        b=oPrcLuzKRdh48hSTw0cQnSuv5ko+jy7XSL0AHUDwq55A0QnJiTZPjHx0N4hL9z936l
-         qRIy2EgJd43Eq12ZKcKcNk6NG9dmAJpLExetfAZYtzZuPDiOk8XuA/0RQdumht5EjXiR
-         hzimFR2Mz4jV51HTTDbngcw7VFEFzeooAvVVH7tjRRRECtTOrMDA1tDpyIy7BktFFYeA
-         4mdLHpQfAzWUkkVeMui4tU4pzU0IrKWsQGdnXsBoITprJDW7Xq5u4DEIGHEPTYsZ8iL0
-         tvl8v1pjxQHd7A2kIt29En+rrd1FRgaVpuSUJuTDfqIWnZuf1VA+1EFe84Xm3idHoKzY
-         zWwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772027312; x=1772632112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=SssUEHOHY/uF1odyg5G0fB8AX0zxj3pYD2qqdMBOJes=;
-        b=hokUBhky+dxfEHMe7Gv4mD/bKg230UZB29sdK7s21SesxRfDNZUZhlxY1hXEcmIu1u
-         1+VYQD2kZTY/vVLhRkt2Ns8r4hJorgsSH0SNn9qnIYcp3PPLmhe5Si48DXn6wj1IsnyN
-         Iy0Q/AVmquoWhs6FrnzFU9NC++0ZtFVGIQ8uEqY5jC3/O2LHiPihVOoIyqhGtTvxGZnD
-         LhONNou3qtB3tKfBKDXbeEinGPFw2PubM2ZHfBrvd8d/5YNcXqtkKW8bgHUZTWc9XPlg
-         9aIxnt75sMaTrOwGkrxIOcUnzqzkh7Hjo8N2ZqMHduonX5LrU/wSlHcDm6xjxuhzV4Vm
-         GklQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV+pVB3Nb6jUAke5tT1uQMcArRJdvLcwyL9B1YrA5BkpDsldbjFpPVtpHAg5HzbvAJ6bJGgi24=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHK13v4lK3ICd9UitoiM45xL3fGaazKUWNGat+FDcUYyy6qLbu
-	SyiQZIGCjmcuCtioMezeJRXRpKdR3NpRUpAhq14VrD8kBADEXZYcFlJrRvUi9upvK70YoFX+J91
-	7VOaTT10A3HHmyfydQLzN3eEJqoMoRjkNomtcMvdW
-X-Gm-Gg: ATEYQzyqPp+28povm9+7DPAZo8kYH2ZrspT+4Ekixgrq8WNo21DD3S3U2SMVXPgnrxx
-	ZVsva4NVn/OvQ685V5dcWhp/4kG6iIvbaJd5R/ghsQXt+H6pAScmSe4qOLrhh3XQWbNO6bwue5o
-	jYnC3xXOaCfFw9wLzv6+7VMdSIi6b5QjKdZ4gDrBQrSFeOksumQDKRzoEEcKBs0VAtxZn8b5FiN
-	S8rJG6I9sc5TmoDNZCFuUpcRFm0j/lGPT4wNuVRLu45q4dTtHgG4BY6by5xtu2WWYfK3z4XLm3s
-	tSOItYN2y3MRQfo=
-X-Received: by 2002:a17:90b:2541:b0:354:bf10:e69e with SMTP id
- 98e67ed59e1d1-358ae7fd8b1mr15571129a91.9.1772027311914; Wed, 25 Feb 2026
- 05:48:31 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFBAA3B531F;
+	Wed, 25 Feb 2026 13:53:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772027587; cv=none; b=mp4ul7EKFc0TfF5koDQxbgDXaojvKageOTetPn6KZKhEcKE0sLAIeemuUX3pdKsnIylzllXwNP/fQS0LJip7XsgpwNLefZxqTAVzloJZwI6FteY/2mHXY9qZYZI5wnOSMeiHneIB5IK6pxqp/pZIOIVsv8yf7XhGeIxpQ8HFtPY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772027587; c=relaxed/simple;
+	bh=EePpNLxqxLe1Xitsf7KtdEbcUkE17+A5mIaZP3VE5L0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZJz8EX1zHKvLF2p3ucDMeHPBaYCbJJN/9N5d/Ey8ifSxoh/q5/365znGeZcQyuRDenp2noIeQx22YdvLgnspOoQRehPcyLmi18lzNybj+Wy1Er0XFbyaX8SKqTzH1ux+ks/L0lLlPfUHZVoFqQu3CbQWKU/8OrxRNHO1jYMpGnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5XwRpasB; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=9+QIZxMPWkCD8lT7ZXdcb3F5dkJik3lX7EUr4It56N0=; b=5XwRpasBU2G6LPWg6d9UC8RQuv
+	FDdJ4b+IklPno3gMeR3Ng+6vIEcGh21szFPQ89liM4c03q3QPqu/PlurYOCZFgkBrkvEB/x8zM6KV
+	l/YGYENHdhSebOC3N/yr1+4ZE8FT3ik6Nhb+ls9gZy11CZLPgdJ9dt9zOYn+1Oos0tWQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vvFJy-008khZ-II; Wed, 25 Feb 2026 14:52:58 +0100
+Date: Wed, 25 Feb 2026 14:52:58 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: David Yang <mmyangfl@gmail.com>
+Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/3] net: dsa: yt921x: Refactor long register
+ helpers
+Message-ID: <cb52e6e5-c047-4190-9e06-4f80a8bef051@lunn.ch>
+References: <20260225090853.2021140-1-mmyangfl@gmail.com>
+ <20260225090853.2021140-2-mmyangfl@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260225134349.1287037-1-victor@mojatatu.com> <20260225134349.1287037-2-victor@mojatatu.com>
-In-Reply-To: <20260225134349.1287037-2-victor@mojatatu.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 25 Feb 2026 08:48:20 -0500
-X-Gm-Features: AaiRm526z78kb6pqwv5yjTnNLSTq-cnznJZR1oL_ql82KIDgESYV2mk0Horahpk
-Message-ID: <CAM0EoM=Q0qFkXC8ZhAkZzKqfqPQWWBZwPjLc1QAp4KVprp5EJQ@mail.gmail.com>
-Subject: Re: [PATCH net 2/2] selftests/tc-testing: Create tests to exercise
- act_ct binding restrictions
-To: Victor Nogueira <victor@mojatatu.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, jiri@resnulli.us, horms@kernel.org, taoliu828@163.com, 
-	netdev@vger.kernel.org, pctammela@mojatatu.com, km.kim1503@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260225090853.2021140-2-mmyangfl@gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-260963-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-260964-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,resnulli.us,163.com,vger.kernel.org,mojatatu.com,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mojatatu.com:email]
-X-Rspamd-Queue-Id: 49228198649
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
+X-Rspamd-Queue-Id: E50B3198642
 X-Rspamd-Action: no action
 
-On Wed, Feb 25, 2026 at 8:44=E2=80=AFAM Victor Nogueira <victor@mojatatu.co=
-m> wrote:
->
-> Add 4 test cases to exercise new act_ct binding restrictions:
->
-> - Try to attach act_ct to an ets qdisc
-> - Attach act_ct to an ingress qdisc
-> - Attach act_ct to a clsact/egress qdisc
-> - Attach act_ct to a shared block
->
-> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+> -/* Some registers, like VLANn_CTRL, should always be written in 64-bit, even if
+> - * you are to write only the lower / upper 32 bits.
+> +/* Some registers, like VLANn_CTRL, should always be written in chunks, even if
+> + * you only want to write parts of 32 bits.
+>   *
+> - * There is no such restriction for reading, but we still provide 64-bit read
+> - * wrappers so that we always handle u64 values.
+> + * There is no such restriction for reading, but we still provide multi-chunk
+> + * read wrappers so that we can handle them consistently.
+>   */
+>  
+> -static int yt921x_reg64_read(struct yt921x_priv *priv, u32 reg, u64 *valp)
+> +static int
+> +yt921x_longreg_read(struct yt921x_priv *priv, u32 reg, u32 *vals,
+> +		    unsigned int span)
 
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Just looking at this, it is not obvious what units span is. Many bulk
+read operations takes bytes, even if the underlying code works in
+words. I would probably rename span to something like num_u32.
 
-cheers,
-jamal
+I would also keep yt921x_reg64_read, yt921x_reg64_write,
+yt921x_reg64_update_bits() and just makes them wrappers which call
+yt921x_longreg_read(). 
+
+> -static int
+> -yt921x_vlan_del(struct yt921x_priv *priv, int port, u16 vid)
+> +static int yt921x_vlan_del(struct yt921x_priv *priv, int port, u16 vid)
+>  {
+> -	u64 mask64;
+> +	u32 masks[YT921X_VLAN_CTRL_S];
+>  
+> -	mask64 = YT921X_VLAN_CTRL_PORTS(port) |
+> -		 YT921X_VLAN_CTRL_UNTAG_PORTn(port);
+> +	masks[0] = YT921X_VLAN_CTRLa_PORTn(port);
+> +	masks[1] = YT921X_VLAN_CTRLb_UNTAG_PORTn(port);
+>  
+> -	return yt921x_reg64_clear_bits(priv, YT921X_VLANn_CTRL(vid), mask64);
+> +	return yt921x_longreg_clear_bits(priv, YT921X_VLANn_CTRL(vid), masks,
+> +					 YT921X_VLAN_CTRL_S);
+
+By keeping the names, you don't need changes like this. And
+yt921x_reg64_clear_bits() is much more obvious than
+yt921x_longreg_clear_bits(). And the patch will be much smaller.
+
+	Andrew
 
