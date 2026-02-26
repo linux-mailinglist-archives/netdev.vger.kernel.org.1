@@ -1,59 +1,61 @@
-Return-Path: <netdev+bounces-261175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261176-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gHj1G7fBn2lOdgQAu9opvQ
-	(envelope-from <netdev+bounces-261175-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 04:44:55 +0100
+	id MEklAvbCn2nkdgQAu9opvQ
+	(envelope-from <netdev+bounces-261176-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 04:50:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9CC21A0A8E
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 04:44:54 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9069C1A0AF2
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 04:50:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5AC163013A92
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 03:44:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 73AB830269E6
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 03:50:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E7423876AD;
-	Thu, 26 Feb 2026 03:44:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69A86374179;
+	Thu, 26 Feb 2026 03:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c/PUb+sm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jeRQCogR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A9711A3164;
-	Thu, 26 Feb 2026 03:44:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4545B2C08C4;
+	Thu, 26 Feb 2026 03:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772077491; cv=none; b=pa+9PMey2gfw2T6MewSr8gJ+BoGfWVcsqe9YaRml7wO4IQHoHL1jjFqRigA3a6wNoc6dKRktBwCz6DoivlAmX6DDX8Zg7STgsETXjkTwPxT7inRA6dYRNRgbsC5X2+8d4eux5O9WVujhVzAeKqPbFO3wG6X8HtMSZV4dMNWEA8E=
+	t=1772077806; cv=none; b=SFV1dSJCD6AUzcKTfYrS+tf5iIcLtiBe1+KcIZlPWuN2cBIvVTrRAzLvSWNnbHltOCcH2Emfr+0M47IcXuzv2p53KNszL/G1lxs6gayD1YBvRKU4VITIR/0J9LnZj8tCpBAtvEZBMLcUaVhIWHNC3NLcVCGLrRbmqFEFSiLHuQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772077491; c=relaxed/simple;
-	bh=jdQ4TlTnvlE66MsCiRDSlmmGWeSt5nVcvT0Y6fdtRyA=;
+	s=arc-20240116; t=1772077806; c=relaxed/simple;
+	bh=xxHKk4q36A/mXOTAolHsUTG9EkGS8bqo95HONHTr6K4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OUT/SPi1XMPzTucRX4dZNv5XhQxF92Fytx6ux+6NzN30zQ30yB8Pv47YFRfzO53Z4qsuNM/VhDzbTtYlkljHsedOiEavjHiiIotr6A3EhST6/hFPbsA6UO96SJLTkGnuHvqZVVRp3kdnaEBoWjCx3HUIRr/lSTK4rNK7Z75mKyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c/PUb+sm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52E83C116C6;
-	Thu, 26 Feb 2026 03:44:50 +0000 (UTC)
+	 MIME-Version:Content-Type; b=gYzXrIvltHa1pN97JGReVW8Ri5+5mL/tr4+AO3ZOTBmDVSw7FLHnHXhxiZGkThFffMbHf75F5w8Z8AP2iKlKym4B+7N6JQoUXzl9fswu5ObFNSo0p2zvlKpoQsP5b3L1w0noh3WaWFk1hwhxJMVUVoPX7bz3faFAG9MdJ+rEwjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jeRQCogR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79D01C116C6;
+	Thu, 26 Feb 2026 03:50:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772077490;
-	bh=jdQ4TlTnvlE66MsCiRDSlmmGWeSt5nVcvT0Y6fdtRyA=;
+	s=k20201202; t=1772077806;
+	bh=xxHKk4q36A/mXOTAolHsUTG9EkGS8bqo95HONHTr6K4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=c/PUb+smhA2x0Cyyo1IRI6RY7t94X9rr0GCoOV5Q5k0sq3jvxGG64yngdjLNd1+7q
-	 hLo7h80xIJw2nfH8gT2LRCEAD+gVruth+g0Ty5tXWsEG5P8zDxuEf8lo3E++/r9wzg
-	 KMjJ14+DG30Ka2VCDy02/VphwMqxQG7lnpJwyPMt8RRR6IYY3Q1pBHqnhwMoKekFm+
-	 o2M3GMnhAX0Ga8nCoiWWmYYIFan7aYzV+BYWrfMOenfUVt1h7+DdGKKs+tiA+4VV04
-	 T8PqSL2X8Is+aTNsxpNMuLxoJ7XzeCSnBlyc20ck8ewRrSmlBqpQbj8IybBee6zboG
-	 SjnRdQ3YOd70w==
-Date: Wed, 25 Feb 2026 19:44:49 -0800
+	b=jeRQCogRYffBWqKh4OgzlrBJlyTnCOuPaYCdt2oF4B1/Q069D3p3lYcrRyUplT76V
+	 D8ybdk6SR6KcSlHu6DbVHqfGkDr9xvNtHEnQIkaksLPqCoPrz8Uukv0cdg+HnjTB9/
+	 X3eg1Shf8wh3mhqVic8iyz96sT1dbIn0BMOcAWMs+DzXIsAZwJhIr4FjAXZ4rop5qR
+	 wC2oGU7K5RXT2NZf/DRVA53SZOTCqBo7JKGQGdi5oe4YPSBwognG7twhfSUG2qqPq4
+	 WIWCDbKmRhEyEG4bJH3V6oeLfYDguYq6A8nIem6ZVl61JNiyK8bmD0UijiKn3hZEBV
+	 Y/9YGvVId6oIQ==
+Date: Wed, 25 Feb 2026 19:50:04 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: fw@strlen.de
-Cc: netfilter-devel@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, netdev@vger.kernel.org, pablo@netfilter.org
-Subject: Re: [net-next,4/9] ipvs: do not keep dest_dst after dest is removed
-Message-ID: <20260225194449.546cb6a1@kernel.org>
-In-Reply-To: <20260226034124.1806970-1-kuba@kernel.org>
-References: <20260224205048.4718-5-fw@strlen.de>
-	<20260226034124.1806970-1-kuba@kernel.org>
+To: Koichiro Den <den@valinux.co.jp>
+Cc: Jon Mason <jdmason@kudzu.us>, Dave Jiang <dave.jiang@intel.com>, Allen
+ Hubbe <allenbh@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, ntb@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/3] net: ntb_netdev: Add Multi-queue support
+Message-ID: <20260225195004.7e9c8b3a@kernel.org>
+In-Reply-To: <20260224152809.1799199-1-den@valinux.co.jp>
+References: <20260224152809.1799199-1-den@valinux.co.jp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,53 +65,44 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_CC(0.00)[kudzu.us,intel.com,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,lists.linux.dev,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-261176-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-261175-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C9CC21A0A8E
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9069C1A0AF2
 X-Rspamd-Action: no action
 
-On Wed, 25 Feb 2026 19:41:24 -0800 Jakub Kicinski wrote:
-> > -			if (!rt_dev_is_down(dst_dev_rcu(&rt->dst)))
-> > +			if (!rt_dev_is_down(dst_dev_rcu(&rt->dst)) &&
-> > +			    dest->flags & IP_VS_DEST_F_AVAILABLE)
-> >  				__ip_vs_dst_set(dest, dest_dst, &rt->dst, 0);  
-> 
-> Should this be wrapped in parentheses?
-> 
-> In C operator precedence, the logical AND (&&) binds more tightly than
-> the bitwise AND (&). The expression here parses as:
-> 
->     (!rt_dev_is_down(...) && dest->flags) & IP_VS_DEST_F_AVAILABLE
-> 
-> This works correctly only because IP_VS_DEST_F_AVAILABLE is 0x0001, and
-> the logical AND produces 0 or 1, so the bitwise AND with 0x0001 still
-> produces the expected result.
+On Wed, 25 Feb 2026 00:28:06 +0900 Koichiro Den wrote:
+> Usage (example):
+>   - modprobe ntb_netdev ntb_num_queues=<N> # Patch 2 takes care of it
+>   - ethtool -l <ifname> # Patch 3 takes care of it
 
-Ah, should have skipped this one. It is of course bs. Chris reported 
-it to the developers of the model.
+Module parameters are not a very user friendly choice for uAPI.
+You use ethtool -l for GET, what's the challenge with implementing SET
+via ethtool -L?
 
