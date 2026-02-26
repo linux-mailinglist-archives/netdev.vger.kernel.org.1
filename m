@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-261256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261257-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AHz9A84NoGnbfQQAu9opvQ
-	(envelope-from <netdev+bounces-261256-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 10:09:34 +0100
+	id uG8pJ/cNoGnbfQQAu9opvQ
+	(envelope-from <netdev+bounces-261257-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 10:10:15 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6723D1A32B9
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 10:09:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC9CE1A32D6
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 10:10:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A5C0930E050B
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:06:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 89AFD30F52F4
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:06:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C0E1399013;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5B54399029;
 	Thu, 26 Feb 2026 09:06:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="UXjWHBwU"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="g83q9yol"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB3B9392809
-	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 09:06:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 311FC395269
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 09:06:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772096798; cv=none; b=domZdo/s0eYsxP/sUBPv9CBV/GACKGaGMeSqm12yxF+7WCeL19NszxpsqPdu2uiAR5UWZoMB0FK93ilyl3ABCoZ8tt4fWRk4V3T58hajwKdqbHeSujXJSUtTAgOyjXXtLeZUcuNgzMLB7yVEATUamhvl1mkClx3nHnvDKqNLfLc=
+	t=1772096798; cv=none; b=SXPIwdQifKE3IkV9l4eZfZkn3I6LevmExTL4GdL3KqxfiIU6ldAnkXF9Jw2JQ0hr0QzXaPxx/32qoyFyc3IdUWFrmb9gCwTT6b9KMFmgmXH0RWDsTgcZl1TIEBmD/SVaboqyym+ohgTF7KOGiyDgVgno9pZEEgrC0xMqR2JG0lY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1772096798; c=relaxed/simple;
-	bh=NfEimO0Ca/KTca2pNC2LHgscpIVyluVcG2M15liwbiU=;
+	bh=n63b4Ffnhv2zySw/JD2R+cxH18bBKNVk4LRD0T3ivOI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eVGr47ef8tikloMipJFQzi4R4Vq39Qvqht4r8i0ZZUF4z2BzTRmu0f9Owoz28DgOFBJZO3NL1bx2SwukFjcAOZl7DRbi+hmp707KagsTDK6e78kSv1/TSoTcHn3Bh1S71wizOwyD0xp33k7O+9OQxjSMFFtz9xdpMPzqni/6vuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=UXjWHBwU; arc=none smtp.client-ip=194.13.80.246
+	 MIME-Version:Content-Type; b=EO8NhfJhZ9EkODu7usreHbVg7PC13tyRI6BBzNkfdxK4ak24MDOQLsSly6ORHUaZNKBeOmGZrc4w1Z4W+eiVKdOUsexUaiDrVR9AwtggkMgBbb3oEgtNgjPlRTPN4bbeBWDFCyiWF/80HefuCyQTsbotXVLx+vyYsXPup1jQhkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=g83q9yol; arc=none smtp.client-ip=194.13.80.246
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 69B29A47AD;
-	Thu, 26 Feb 2026 10:06:33 +0100 (CET)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 289D2A445D;
+	Thu, 26 Feb 2026 10:06:34 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1772096793; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1772096794; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=de3MyHGvpmUqGBX2V1574ySxhSLv3EF953/DzyIiJeU=;
-	b=UXjWHBwUk3Fg5FvZ1Do7J5DZWy0v5UDyifWLO+zm8BDU+0e1u4B9nM1N4oCTcs/xWhpI/E
-	BI0OXbcvv4C3jqTpr85gGkqkJ7bdtv5PftXzCjRCEV14ncDJ+WAyBOvlOcY9euyGvuJU33
-	0s2LMvetUS113ClgZnNaBPrGrnd6wQ9dD/xI2TlB8YvXDgeWnGHHNggf9JVIKftfQr/Z05
-	uGDibInCNq8Nmc90lGdjWqXNGs6SFvRJCsj50rQ/qJdwQLTwYsLLSEFuMyeN1YePW1F5Tj
-	ALltwG9kpQVrM9qnxA6zQ00pW+KAsi2V04Xdntpbz5chmfhWQf5Jgxy3mgV8Lg==
+	bh=OL7oERbZT9pmoVyR3ii4qa+x/vINl0XE5iozDnBkiGU=;
+	b=g83q9yoloaVfxYhLeHcAp9o3hOlnmXLMBWn4pAiE+FKVWr1lNtrgjNjt6VKX6soAVbkY8W
+	KebErq6ehKAIYQLC5Q8nGHXgEDRRj8NaqGDb1/60kRkif0LeXG5Ghg3kUUYZN3BK2R/PCq
+	Ng7rPBraDkW+r0ZkZRuxk5VttfNEXzulU9VawwKl+H4pSfQ1UnVDWCy9i0YzGO1AnSGor1
+	lyaAqhSSMdu2CZ8aIY7If5gzZ7uh1CQ9vsj4MaguQYSx8WY7I2HmdryiBs2GtHjGZT2oz7
+	Ib3Ys5gA4/lh8F9qF30DBSZuBq+yy01Actm/PZ8O7OAT/G7Dya7r49tlTFzSUQ==
 From: Nicolai Buchwitz <nb@tipi-net.de>
 To: netdev@vger.kernel.org
 Cc: andrew+netdev@lunn.ch,
@@ -59,9 +59,9 @@ Cc: andrew+netdev@lunn.ch,
 	rmk+kernel@armlinux.org.uk,
 	phil@raspberrypi.com,
 	Nicolai Buchwitz <nb@tipi-net.de>
-Subject: [PATCH net-next v4 2/4] net: cadence: macb: implement EEE TX LPI support
-Date: Thu, 26 Feb 2026 10:06:06 +0100
-Message-Id: <20260226090608.54802-3-nb@tipi-net.de>
+Subject: [PATCH net-next v4 3/4] net: cadence: macb: add ethtool EEE support
+Date: Thu, 26 Feb 2026 10:06:07 +0100
+Message-Id: <20260226090608.54802-4-nb@tipi-net.de>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20260226090608.54802-1-nb@tipi-net.de>
 References: <20260226090608.54802-1-nb@tipi-net.de>
@@ -92,281 +92,76 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261256-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-261257-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[tipi-net.de:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.991];
+	NEURAL_HAM(-0.00)[-0.997];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,kernel];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tipi-net.de:mid,tipi-net.de:dkim,tipi-net.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:email]
-X-Rspamd-Queue-Id: 6723D1A32B9
+X-Rspamd-Queue-Id: DC9CE1A32D6
 X-Rspamd-Action: no action
 
-The GEM MAC has hardware LPI registers (NCR bit 19: TXLPIEN) but no
-built-in idle timer, so asserting TXLPIEN blocks all TX immediately
-with no automatic wake. A software idle timer is required, as noted
-in Microchip documentation (section 40.6.19): "It is best to use
-firmware to control LPI."
+Implement get_eee and set_eee ethtool ops for GEM, delegating to
+phylink_ethtool_get_eee() and phylink_ethtool_set_eee(). Both
+handlers return -EOPNOTSUPP when MACB_CAPS_EEE is absent, keeping
+the ops safe to register unconditionally in gem_ethtool_ops.
 
-Implement phylink managed EEE using the mac_enable_tx_lpi and
-mac_disable_tx_lpi callbacks:
-
-- macb_tx_lpi_set(): atomically sets or clears TXLPIEN under the
-  existing bp->lock spinlock; returns bool indicating whether the
-  register actually changed, avoiding redundant writes.
-
-- macb_tx_lpi_work_fn(): delayed_work handler that enters LPI if all
-  TX queues are idle and EEE is still active.
-
-- macb_tx_lpi_schedule(): arms the work timer using the LPI timer
-  value provided by phylink (default 250 ms). Called from
-  macb_tx_complete() after each TX drain so the idle countdown
-  restarts whenever the ring goes quiet.
-
-- macb_tx_lpi_wake(): called from macb_start_xmit() before TSTART.
-  Clears TXLPIEN and applies a 50 us udelay for PHY wake (IEEE
-  802.3az Tw_sys_tx is 16.5 us for 1000BASE-T / 30 us for
-  100BASE-TX; GEM has no hardware enforcement). Only delays when
-  TXLPIEN was actually set, avoiding overhead on the common path.
-  The delay is placed after tx_head is advanced so the work_fn's
-  queue-idle check sees a non-empty ring and cannot race back into
-  LPI before the frame is transmitted.
-
-- mac_enable_tx_lpi: stores the timer and sets eee_active, then
-  defers the first LPI entry by 1 second per IEEE 802.3az section
-  22.7a.
-
-- mac_disable_tx_lpi: clears eee_active, cancels the work, and
-  deasserts TXLPIEN.
-
-Populate phylink_config lpi_interfaces (MII, GMII, RGMII variants)
-and lpi_capabilities (MAC_100FD | MAC_1000FD) so phylink can
-negotiate EEE with the PHY and call the callbacks appropriately.
-Set lpi_timer_default to 250000 us and eee_enabled_default to true.
+Phylink owns the full EEE lifecycle: PHY advertisement, link
+partner negotiation, timer management and ethtool state; the MAC
+driver only provides the mac_enable_tx_lpi / mac_disable_tx_lpi
+callbacks wired up in the previous patch.
 
 Reviewed-by: Théo Lebrun <theo.lebrun@bootlin.com>
 Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
 ---
- drivers/net/ethernet/cadence/macb.h      |   8 ++
- drivers/net/ethernet/cadence/macb_main.c | 112 +++++++++++++++++++++++
- 2 files changed, 120 insertions(+)
+ drivers/net/ethernet/cadence/macb_main.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
-index 19aa98d01c8c..c69828b27dae 100644
---- a/drivers/net/ethernet/cadence/macb.h
-+++ b/drivers/net/ethernet/cadence/macb.h
-@@ -309,6 +309,8 @@
- #define MACB_IRXFCS_SIZE	1
- 
- /* GEM specific NCR bitfields. */
-+#define GEM_TXLPIEN_OFFSET		19
-+#define GEM_TXLPIEN_SIZE		1
- #define GEM_ENABLE_HS_MAC_OFFSET	31
- #define GEM_ENABLE_HS_MAC_SIZE		1
- 
-@@ -783,6 +785,7 @@
- #define MACB_CAPS_DMA_PTP			BIT(22)
- #define MACB_CAPS_RSC				BIT(23)
- #define MACB_CAPS_NO_LSO			BIT(24)
-+#define MACB_CAPS_EEE				BIT(25)
- 
- /* LSO settings */
- #define MACB_LSO_UFO_ENABLE			0x01
-@@ -1369,6 +1372,11 @@ struct macb {
- 
- 	struct work_struct	hresp_err_bh_work;
- 
-+	/* EEE / LPI state */
-+	bool			eee_active;
-+	struct delayed_work	tx_lpi_work;
-+	u32			tx_lpi_timer;
-+
- 	int	rx_bd_rd_prefetch;
- 	int	tx_bd_rd_prefetch;
- 
 diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 43cd013bb70e..6b9c63195970 100644
+index 6b9c63195970..a7e00b99e9a8 100644
 --- a/drivers/net/ethernet/cadence/macb_main.c
 +++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -10,6 +10,7 @@
- #include <linux/clk-provider.h>
- #include <linux/clk.h>
- #include <linux/crc32.h>
-+#include <linux/delay.h>
- #include <linux/dma-mapping.h>
- #include <linux/etherdevice.h>
- #include <linux/firmware/xlnx-zynqmp.h>
-@@ -589,6 +590,94 @@ static const struct phylink_pcs_ops macb_phylink_pcs_ops = {
- 	.pcs_config = macb_pcs_config,
+@@ -4034,6 +4034,26 @@ static const struct ethtool_ops macb_ethtool_ops = {
+ 	.set_ringparam		= macb_set_ringparam,
  };
  
-+static bool macb_tx_lpi_set(struct macb *bp, bool enable)
++static int macb_get_eee(struct net_device *dev, struct ethtool_keee *eee)
 +{
-+	unsigned long flags;
-+	u32 old, ncr;
++	struct macb *bp = netdev_priv(dev);
 +
-+	spin_lock_irqsave(&bp->lock, flags);
-+	ncr = macb_readl(bp, NCR);
-+	old = ncr;
-+	if (enable)
-+		ncr |= GEM_BIT(TXLPIEN);
-+	else
-+		ncr &= ~GEM_BIT(TXLPIEN);
-+	if (old != ncr)
-+		macb_writel(bp, NCR, ncr);
-+	spin_unlock_irqrestore(&bp->lock, flags);
++	if (!(bp->caps & MACB_CAPS_EEE))
++		return -EOPNOTSUPP;
 +
-+	return old != ncr;
++	return phylink_ethtool_get_eee(bp->phylink, eee);
 +}
 +
-+static bool macb_tx_all_queues_idle(struct macb *bp)
++static int macb_set_eee(struct net_device *dev, struct ethtool_keee *eee)
 +{
-+	unsigned int q;
++	struct macb *bp = netdev_priv(dev);
 +
-+	for (q = 0; q < bp->num_queues; q++) {
-+		struct macb_queue *queue = &bp->queues[q];
++	if (!(bp->caps & MACB_CAPS_EEE))
++		return -EOPNOTSUPP;
 +
-+		if (queue->tx_head != queue->tx_tail)
-+			return false;
-+	}
-+	return true;
++	return phylink_ethtool_set_eee(bp->phylink, eee);
 +}
 +
-+static void macb_tx_lpi_work_fn(struct work_struct *work)
-+{
-+	struct macb *bp = container_of(work, struct macb, tx_lpi_work.work);
-+
-+	if (bp->eee_active && macb_tx_all_queues_idle(bp))
-+		macb_tx_lpi_set(bp, true);
-+}
-+
-+static void macb_tx_lpi_schedule(struct macb *bp)
-+{
-+	if (bp->eee_active)
-+		mod_delayed_work(system_wq, &bp->tx_lpi_work,
-+				 usecs_to_jiffies(bp->tx_lpi_timer));
-+}
-+
-+/* Wake from LPI before transmitting. The MAC must deassert TXLPIEN
-+ * and wait for the PHY to exit LPI before any frame can be sent.
-+ * IEEE 802.3az Tw_sys is ~17us for 1000BASE-T, ~30us for 100BASE-TX;
-+ * we use a conservative 50us.
-+ */
-+static void macb_tx_lpi_wake(struct macb *bp)
-+{
-+	if (!macb_tx_lpi_set(bp, false))
-+		return;
-+
-+	cancel_delayed_work(&bp->tx_lpi_work);
-+	udelay(50);
-+}
-+
-+static void macb_mac_disable_tx_lpi(struct phylink_config *config)
-+{
-+	struct net_device *ndev = to_net_dev(config->dev);
-+	struct macb *bp = netdev_priv(ndev);
-+
-+	bp->eee_active = false;
-+	cancel_delayed_work_sync(&bp->tx_lpi_work);
-+	macb_tx_lpi_set(bp, false);
-+}
-+
-+static int macb_mac_enable_tx_lpi(struct phylink_config *config, u32 timer,
-+				  bool tx_clk_stop)
-+{
-+	struct net_device *ndev = to_net_dev(config->dev);
-+	struct macb *bp = netdev_priv(ndev);
-+
-+	bp->tx_lpi_timer = timer;
-+	bp->eee_active = true;
-+
-+	/* Defer initial LPI entry by 1 second after link-up per
-+	 * IEEE 802.3az section 22.7a.
-+	 */
-+	mod_delayed_work(system_wq, &bp->tx_lpi_work, msecs_to_jiffies(1000));
-+
-+	return 0;
-+}
-+
- static void macb_mac_config(struct phylink_config *config, unsigned int mode,
- 			    const struct phylink_link_state *state)
- {
-@@ -753,6 +842,8 @@ static const struct phylink_mac_ops macb_phylink_ops = {
- 	.mac_config = macb_mac_config,
- 	.mac_link_down = macb_mac_link_down,
- 	.mac_link_up = macb_mac_link_up,
-+	.mac_disable_tx_lpi = macb_mac_disable_tx_lpi,
-+	.mac_enable_tx_lpi = macb_mac_enable_tx_lpi,
+ static const struct ethtool_ops gem_ethtool_ops = {
+ 	.get_regs_len		= macb_get_regs_len,
+ 	.get_regs		= macb_get_regs,
+@@ -4055,6 +4075,8 @@ static const struct ethtool_ops gem_ethtool_ops = {
+ 	.get_rxnfc			= gem_get_rxnfc,
+ 	.set_rxnfc			= gem_set_rxnfc,
+ 	.get_rx_ring_count		= gem_get_rx_ring_count,
++	.get_eee		= macb_get_eee,
++	.set_eee		= macb_set_eee,
  };
  
- static bool macb_phy_handle_exists(struct device_node *dn)
-@@ -848,6 +939,18 @@ static int macb_mii_probe(struct net_device *dev)
- 		}
- 	}
- 
-+	/* Configure EEE LPI if supported */
-+	if (bp->caps & MACB_CAPS_EEE) {
-+		__set_bit(PHY_INTERFACE_MODE_MII,
-+			  bp->phylink_config.lpi_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_GMII,
-+			  bp->phylink_config.lpi_interfaces);
-+		phy_interface_set_rgmii(bp->phylink_config.lpi_interfaces);
-+		bp->phylink_config.lpi_capabilities = MAC_100FD | MAC_1000FD;
-+		bp->phylink_config.lpi_timer_default = 250000;
-+		bp->phylink_config.eee_enabled_default = true;
-+	}
-+
- 	bp->phylink = phylink_create(&bp->phylink_config, bp->pdev->dev.fwnode,
- 				     bp->phy_interface, &macb_phylink_ops);
- 	if (IS_ERR(bp->phylink)) {
-@@ -1244,6 +1347,9 @@ static int macb_tx_complete(struct macb_queue *queue, int budget)
- 		netif_wake_subqueue(bp->dev, queue_index);
- 	spin_unlock_irqrestore(&queue->tx_ptr_lock, flags);
- 
-+	if (packets)
-+		macb_tx_lpi_schedule(bp);
-+
- 	return packets;
- }
- 
-@@ -2349,6 +2455,8 @@ static netdev_tx_t macb_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 	netdev_tx_sent_queue(netdev_get_tx_queue(bp->dev, queue_index),
- 			     skb->len);
- 
-+	macb_tx_lpi_wake(bp);
-+
- 	spin_lock(&bp->lock);
- 	macb_writel(bp, NCR, macb_readl(bp, NCR) | MACB_BIT(TSTART));
- 	spin_unlock(&bp->lock);
-@@ -3010,6 +3118,8 @@ static int macb_close(struct net_device *dev)
- 		netdev_tx_reset_queue(netdev_get_tx_queue(dev, q));
- 	}
- 
-+	cancel_delayed_work_sync(&bp->tx_lpi_work);
-+
- 	phylink_stop(bp->phylink);
- 	phylink_disconnect_phy(bp->phylink);
- 
-@@ -5616,6 +5726,7 @@ static int macb_probe(struct platform_device *pdev)
- 	}
- 
- 	INIT_WORK(&bp->hresp_err_bh_work, macb_hresp_error_task);
-+	INIT_DELAYED_WORK(&bp->tx_lpi_work, macb_tx_lpi_work_fn);
- 
- 	netdev_info(dev, "Cadence %s rev 0x%08x at 0x%08lx irq %d (%pM)\n",
- 		    macb_is_gem(bp) ? "GEM" : "MACB", macb_readl(bp, MID),
-@@ -5659,6 +5770,7 @@ static void macb_remove(struct platform_device *pdev)
- 		mdiobus_free(bp->mii_bus);
- 
- 		device_set_wakeup_enable(&bp->pdev->dev, 0);
-+		cancel_delayed_work_sync(&bp->tx_lpi_work);
- 		cancel_work_sync(&bp->hresp_err_bh_work);
- 		pm_runtime_disable(&pdev->dev);
- 		pm_runtime_dont_use_autosuspend(&pdev->dev);
+ static int macb_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 -- 
 2.51.0
 
