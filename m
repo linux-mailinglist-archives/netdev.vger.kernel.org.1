@@ -1,194 +1,253 @@
-Return-Path: <netdev+bounces-261500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261501-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6Hp9FV1/oGlgkQQAu9opvQ
-	(envelope-from <netdev+bounces-261500-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 18:14:05 +0100
+	id oMvHJjyFoGknkgQAu9opvQ
+	(envelope-from <netdev+bounces-261501-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 18:39:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A16B1ABFCF
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 18:14:05 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00ECF1AC99F
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 18:39:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9449133F4798
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 17:05:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8F74133013C3
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 17:06:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9AEE355F41;
-	Thu, 26 Feb 2026 16:58:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 149F9426692;
+	Thu, 26 Feb 2026 17:00:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="nlx+CJv1"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="LSI6TqCT";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="j2L9eAxr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C4B936894F;
-	Thu, 26 Feb 2026 16:58:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 103683D7D7F;
+	Thu, 26 Feb 2026 16:59:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772125129; cv=none; b=ZA1KbuQfA4mooOuJ1CI/dt5xHZ7xnJQ8jAQJTPz/fnEFWL3neKB3j2iVpAw8ztba7xpD0zlWrUzs1arNarHKCBrq/35K0hb9CQSPE7SD4ExWSNS9pYRsLVefyj17AAsoDjOUHLF84L/qjjMJtJ/j0WHEL+25Vm/uEILPG0k3bAA=
+	t=1772125201; cv=none; b=TrfkovIgAL0FuTFmPbT2NNUMD0Z05VllwaoluN0FN4quPK+OLUZ6eZwqh1OI3UZC6IH74n7IuWJGFjVuJ1q8LWCB7dRS0tB5W4DmrxDc2F4wTnDP6InKNGuVNuqxYBYvlDO3lV+t19h75WkJvHF8n+xpph753GVfaj8PIYjBEHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772125129; c=relaxed/simple;
-	bh=BTBsFxFgqkwEIGB43dDZrV44AEDn/svkEIniI0FsAnc=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=ZYEhMYwQdbbwpw4yM7y2k5rrRyaSNbZEQVNf6kg6y202KqOX4mgttlxdncLBWMEdjgTOr4+T3QoVhhRhpfwAfelV1sDdPqh4S2ryEc6A8w3ogpkmNuw5CfkLn2DodZVZ1fH2BdexN/RDojaQROZereHxlzOEf/7VZya7HcCB15U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=nlx+CJv1; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=GBAAeNpvfWupATD/Mqi5LhBKxQa5mgBWtQkeTAghv8U=; b=nlx+CJv1x/UuNttwKXynH0qJFV
-	GGPlyhyb56jCAmfo2Dkhao6Akb/whBUWKrLHAtLp2UnbAxsZRiEEnc/PA6a02dlJyun7VB/WjZ/4Y
-	gSNeA6HN4mQbMGOcTdkRiDsoEk5l6Ssb6qUdMgoH7JYTbpZDll0K3Gc9Sl8LgYozq3/3dgHYhmDwe
-	fRUIm7haKSMEmY1/NzzgcvEuyT7l/TJWKX2NJMO7AKfx12ThZPHB/q8MyHq+NyeW4NqEFdN0DjrLH
-	BhCTcfbtcrlXDP67PmPWXw2HF4zz7VIOb15e9g0uBhXA6DI+uxHuKzWDbVQB6y2V+HCbHUW7dwsue
-	9tQXYUVA==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.99.1)
-	id 1vvegu-00000000rdY-0Taa;
-	Thu, 26 Feb 2026 13:58:20 -0300
-Message-ID: <8dcf2c77013a0de245c4417eb4726752@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: Jeff Layton <jlayton@kernel.org>, Alexander Viro
- <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan
- Kara <jack@suse.cz>, Steven Rostedt <rostedt@goodmis.org>, Masami
- Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers
- <mathieu.desnoyers@efficios.com>, Dan Williams <dan.j.williams@intel.com>,
- Matthew Wilcox <willy@infradead.org>, Eric Biggers <ebiggers@kernel.org>,
- "Theodore Y. Ts'o" <tytso@mit.edu>, Muchun Song <muchun.song@linux.dev>,
- Oscar Salvador <osalvador@suse.de>, David Hildenbrand <david@kernel.org>,
- David Howells <dhowells@redhat.com>, Andreas Dilger
- <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>, Jaegeuk Kim
- <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>, Trond Myklebust
- <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, Chuck Lever
- <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>, Olga Kornievskaia
- <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
- <tom@talpey.com>, Steve French <sfrench@samba.org>, Ronnie Sahlberg
- <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>,
- Bharath SM <bharathsm@microsoft.com>, Alexander Aring
- <alex.aring@gmail.com>, Ryusuke Konishi <konishi.ryusuke@gmail.com>,
- Viacheslav Dubeyko <slava@dubeyko.com>, Eric Van Hensbergen
- <ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>, Dominique
- Martinet <asmadeus@codewreck.org>, Christian Schoenebeck
- <linux_oss@crudebyte.com>, David Sterba <dsterba@suse.com>, Marc Dionne
- <marc.dionne@auristor.com>, Ian Kent <raven@themaw.net>, Luis de
- Bethencourt <luisbg@kernel.org>, Salah Triki <salah.triki@gmail.com>,
- "Tigran A. Aivazian" <aivazian.tigran@gmail.com>, Ilya Dryomov
- <idryomov@gmail.com>, Alex Markuze <amarkuze@redhat.com>, Jan Harkes
- <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu, Nicolas Pitre <nico@fluxnic.net>,
- Tyler Hicks <code@tyhicks.com>, Amir Goldstein <amir73il@gmail.com>,
- Christoph Hellwig <hch@infradead.org>, John Paul Adrian Glaubitz
- <glaubitz@physik.fu-berlin.de>, Yangtao Li <frank.li@vivo.com>, Mikulas
- Patocka <mikulas@artax.karlin.mff.cuni.cz>, David Woodhouse
- <dwmw2@infradead.org>, Richard Weinberger <richard@nod.at>, Dave Kleikamp
- <shaggy@kernel.org>, Konstantin Komarov
- <almaz.alexandrovich@paragon-software.com>, Mark Fasheh <mark@fasheh.com>,
- Joel Becker <jlbec@evilplan.org>, Joseph Qi <joseph.qi@linux.alibaba.com>,
- Mike Marshall <hubcap@omnibond.com>, Martin Brandenburg
- <martin@omnibond.com>, Miklos Szeredi <miklos@szeredi.hu>, Anders Larsen
- <al@alarsen.net>, Zhihao Cheng <chengzhihao1@huawei.com>, Damien Le Moal
- <dlemoal@kernel.org>, Naohiro Aota <naohiro.aota@wdc.com>, Johannes
- Thumshirn <jth@kernel.org>, John Johansen <john.johansen@canonical.com>,
- Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, "Serge
- E. Hallyn" <serge@hallyn.com>, Mimi Zohar <zohar@linux.ibm.com>, Roberto
- Sassu <roberto.sassu@huawei.com>, Dmitry Kasatkin
- <dmitry.kasatkin@gmail.com>, Eric Snowberg <eric.snowberg@oracle.com>, Fan
- Wu <wufan@kernel.org>, Stephen Smalley <stephen.smalley.work@gmail.com>,
- Ondrej Mosnacek <omosnace@redhat.com>, Casey Schaufler
- <casey@schaufler-ca.com>, Alex Deucher <alexander.deucher@amd.com>,
- Christian =?utf-8?Q?K=C3=B6nig?= <christian.koenig@amd.com>, David Airlie
- <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Sumit Semwal
- <sumit.semwal@linaro.org>, Eric Dumazet <edumazet@google.com>, Kuniyuki
- Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, Willem de
- Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, Oleg
- Nesterov <oleg@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Ingo
- Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa
- <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, Adrian Hunter
- <adrian.hunter@intel.com>, James Clark <james.clark@linaro.org>, "Darrick
- J. Wong" <djwong@kernel.org>, Martin Schiller <ms@dev.tdt.de>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, nvdimm@lists.linux.dev,
- fsverity@lists.linux.dev, linux-mm@kvack.org, netfs@lists.linux.dev,
- linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
- linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
- samba-technical@lists.samba.org, linux-nilfs@vger.kernel.org,
- v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
- autofs@vger.kernel.org, ceph-devel@vger.kernel.org,
- codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
- linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net,
- ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev,
- devel@lists.orangefs.org, linux-unionfs@vger.kernel.org,
- apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
- linux-integrity@vger.kernel.org, selinux@vger.kernel.org,
- amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
- linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
- netdev@vger.kernel.org, linux-perf-users@vger.kernel.org,
- linux-fscrypt@vger.kernel.org, linux-xfs@vger.kernel.org,
- linux-hams@vger.kernel.org, linux-x25@vger.kernel.org, Jeff Layton
- <jlayton@kernel.org>
-Subject: Re: [PATCH 14/61] smb: remove cifs_uniqueid_to_ino_t()
-In-Reply-To: <20260226-iino-u64-v1-14-ccceff366db9@kernel.org>
-References: <20260226-iino-u64-v1-0-ccceff366db9@kernel.org>
- <20260226-iino-u64-v1-14-ccceff366db9@kernel.org>
-Date: Thu, 26 Feb 2026 13:58:19 -0300
+	s=arc-20240116; t=1772125201; c=relaxed/simple;
+	bh=fnh5iSifVccC2P+7Bw9Ravyrahm0sqQFHCjFTlbqT1U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D6gdCEJwjqcdWeK1eOTDdnopiZyG0JwLalFBMaQljmIqqCnDIbbKvsmKlcGK2JCHZ776wO1LIQjLcY6cwqNhX4LGcBiIjD8T+UBjhXNO9Brf1v45Y/A0Lrl11hiI2rIoHhAXtdI/ejh/cFeHV94zn2TKUODXteuNmJ3d5AedDwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=LSI6TqCT; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=j2L9eAxr; arc=none smtp.client-ip=103.168.172.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 197BD140019C;
+	Thu, 26 Feb 2026 11:59:56 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Thu, 26 Feb 2026 11:59:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1772125195; x=
+	1772211595; bh=rMpdeGppPamOfXcrHEpeM2JvhdgBbq/Wcs0zQ8hwPjg=; b=L
+	SI6TqCTNh56+j7MsNGyoGyawIIG+05JEh6GU0T1QKUBgAOS9qAfqzi8bjQ6RPOBC
+	E5E7pGXLLyNJv1wTazVwnfYLF+5bWrcam5xypVgZyxSLLo95LP6pA155BmnD7br8
+	dIcZ3CqTUP7UH0iJJpFE58dqXPY78HK8ymheLtqQcf598i9Opo76aR4vIxzbdyer
+	Niez65EhzVZXlF9KNya6ztCUFwh1MUBs6QfLaJEOEZlTjnwesoHkaJowAcwoF/OB
+	jnrSGXf7WuYtRDXRDKmxebx/G/yyJpH7OXDwqpXT6QmUPM9rnKZPKWK1O99sfc/e
+	ccK+4zA5rAAefHkAoj8iw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1772125195; x=1772211595; bh=rMpdeGppPamOfXcrHEpeM2JvhdgBbq/Wcs0
+	zQ8hwPjg=; b=j2L9eAxr7OtIwWGTypc/mioZ2HJAZxQRgSIcxTUjD3Vf1myc0ak
+	GKppsGXbvz/ILqscqe6d6NKvC1HaZ5LTwMC44PxLlCmQ+6oijk1tJ2R+qMBFP83A
+	zFDojXzwgPhT1nOjMnpbAAd4E+cFOhzYEZZUBXWjwLvhzapiz/GnmcdtUM6s1fZx
+	PuztRQ3PT302E8jqEp8fDmFoUQt5ew1LjIRKCNDm6bT3VruyvqugMkuKxN+tpeTS
+	5UI01kNGpo2Frg3k6iQr+GKq82n8Y0+Z4FI3SbU5sWVQEDhBSOGTYZXIuoihUzMl
+	a6SCw53tOLWN4/TdehXICRK6X4ho20n6HMg==
+X-ME-Sender: <xms:Cnygae93VQh55DwIR8DKmI5Fq5oEQ2jVP9DeFQRETXLoDSfqrOJjQw>
+    <xme:CnygabFKWWmvBZxF6aa_-1LAMbIorMIwJzjwfuGFbnHSVbm_EZiFgw0cDMMsSdvHB
+    fCOx9-N9XgM_DovuvAbXCHaCTjzIhxZb1WlHHqN9zebSFkYONGvSA>
+X-ME-Received: <xmr:CnygaYdkB7BEEsH0rDvLqSMzUPmmP5a236QzoJmInDlEKk_3LXeMCYSra4Az>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvgeeiheekucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedugedpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnthhonhihsehphhgvnhhomhgvrdhorh
+    hgpdhrtghpthhtoheprghnthhonhihrdgrnhhtohhnhiesshgvtghunhgvthdrtghomhdp
+    rhgtphhtthhopehsthgvfhhfvghnrdhklhgrshhsvghrthesshgvtghunhgvthdrtghomh
+    dprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdrohhrghdrrghu
+    pdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpth
+    htohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgr
+    iigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdroh
+    hrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
+X-ME-Proxy: <xmx:CnygaUksIN37UpJQeUAzFBgwrB7RfjRTG0XqlAA9u9RRYFUPcMauow>
+    <xmx:CnygafoQj9yp5pA2UNzwCHeCfUyUXNABf6P_d97BUenXgVEi0L9GBw>
+    <xmx:CnygaZH6CQBo9gPg94As4B3h7jRXfHFvwykWcFy3N7MhC-NzW-Z1hQ>
+    <xmx:CnygadT6NEsZ7O7SKLIkk9_EDULTTCJAKk99G1ub7DhkxFly89jPuQ>
+    <xmx:C3ygaY6hnlc6CNOUzDf_MYCSrtHhwXhuxXin6sU4V7s1uwLOcAAky_u1>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 26 Feb 2026 11:59:53 -0500 (EST)
+Date: Thu, 26 Feb 2026 17:59:52 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antony Antony <antony@phenome.org>
+Cc: Antony Antony <antony.antony@secunet.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Chiachang Wang <chiachangwang@google.com>,
+	Yan Yan <evitayan@google.com>, devel@linux-ipsec.org,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [devel-ipsec] Re: [PATCH ipsec-next v5 7/8] xfrm: add error
+ messages to state migration
+Message-ID: <aaB8CL1uZ8_PzyLA@krikkit>
+References: <cover.1769509130.git.antony.antony@secunet.com>
+ <dd1d5b341323d6e0f93057c214adf4fc51c3cbd1.1769509131.git.antony.antony@secunet.com>
+ <aXygrzQrsQxGdDG5@krikkit>
+ <aaBqGgkGWfjPdJRv@Antony2201.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aaBqGgkGWfjPdJRv@Antony2201.local>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[manguebit.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[manguebit.org:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[kernel.org,zeniv.linux.org.uk,suse.cz,goodmis.org,efficios.com,intel.com,infradead.org,mit.edu,linux.dev,suse.de,redhat.com,dilger.ca,suse.com,oracle.com,brown.name,talpey.com,samba.org,gmail.com,microsoft.com,dubeyko.com,ionkov.net,codewreck.org,crudebyte.com,auristor.com,themaw.net,cs.cmu.edu,fluxnic.net,tyhicks.com,physik.fu-berlin.de,vivo.com,artax.karlin.mff.cuni.cz,nod.at,paragon-software.com,fasheh.com,evilplan.org,linux.alibaba.com,omnibond.com,szeredi.hu,alarsen.net,huawei.com,wdc.com,canonical.com,paul-moore.com,namei.org,hallyn.com,linux.ibm.com,schaufler-ca.com,amd.com,ffwll.ch,linaro.org,google.com,davemloft.net,arm.com,linux.intel.com,dev.tdt.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261500-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[manguebit.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pc@manguebit.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261501-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[146];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0A16B1ABFCF
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,queasysnail.net:dkim,messagingengine.com:dkim,secunet.com:email]
+X-Rspamd-Queue-Id: 00ECF1AC99F
 X-Rspamd-Action: no action
 
-Jeff Layton <jlayton@kernel.org> writes:
+2026-02-26, 16:43:22 +0100, Antony Antony wrote:
+> On Fri, Jan 30, 2026 at 01:14:39PM +0100, Sabrina Dubroca via Devel wrote:
+> > 2026-01-27, 11:43:42 +0100, Antony Antony wrote:
+> > > Add descriptive(extack) error messages for all error paths
+> > > in state migration. This improves diagnostics by
+> > > providing clear feedback when migration fails.
+> > > 
+> > > Signed-off-by: Antony Antony <antony.antony@secunet.com>
+> > > ---
+> > > v4->v5: - added this patch
+> > > ---
+> > >  net/xfrm/xfrm_state.c | 13 ++++++++++---
+> > >  1 file changed, 10 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+> > > index 88a362e46972..2e03871ae872 100644
+> > > --- a/net/xfrm/xfrm_state.c
+> > > +++ b/net/xfrm/xfrm_state.c
+> > > @@ -2129,15 +2129,21 @@ struct xfrm_state *xfrm_state_migrate_create(struct xfrm_state *x,
+> > >  	struct xfrm_state *xc;
+> > > 
+> > >  	xc = xfrm_state_clone_and_setup(x, encap, m);
+> > > -	if (!xc)
+> > > +	if (!xc) {
+> > > +		NL_SET_ERR_MSG(extack, "Failed to clone and setup state");
+> > 
+> > When xfrm_state_clone_and_setup fails it's because some allocation
+> > failed and the user won't be able to do much about this, right? I
+> > don't feel extack in those situations is super helpful.
+> 
+> I felt it was usefaul to know, and to log this happened. May not a great 
+> idea.
 
-> Now that i_ino is u64, cifs_uniqueid_to_ino_t() is a trivial identity
-> function. Remove it and use fattr->cf_uniqueid directly at both call
-> sites.
->
-> Also remove the now-unused #include <linux/hash.h>, which was only
-> needed for the old XOR-folding logic.
->
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> ---
->  fs/smb/client/cifsfs.h  | 11 -----------
->  fs/smb/client/inode.c   |  2 +-
->  fs/smb/client/readdir.c |  2 +-
->  3 files changed, 2 insertions(+), 13 deletions(-)
+I don't have a super strong opinion. IIRC that was the approach I
+picked when I added extack (no extack for kernel events that the user
+can't do anything about and don't result from an invalid netlink
+message), but maybe that kind of stuff deserves an extack too.
 
-Acked-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Also, I thought that something that ends up returning ENOMEM to
+userspace is explicit enough, without adding a string "failed to
+allocate memory for $object" in extack. But I don't work on *swan, so
+maybe it's more useful than I think.
+
+(Steffen has the final word, and you're closer to him than I am :))
+
+
+> > >  		return NULL;
+> > > +	}
+> > > 
+> > > -	if (xfrm_init_state(xc) < 0)
+> > > +	if (xfrm_init_state(xc) < 0) {
+> > > +		NL_SET_ERR_MSG(extack, "Failed to initialize migrated state");
+> > 
+> > xfrm_init_state itself doesn't handle extack, but it's just a wrapper
+> > around functions that do. Maybe better to make xfrm_init_state
+> > propagate extack?
+> 
+> That is a great idea. May be in a future patch set. For now, I will drop 
+> this patch from this series. To move forward quickly.
+
+Ok. Or keep the patch with just the fixup right below this, I'm not
+NACKing it.
+
+> > >  		goto error;
+> > > +	}
+> > > 
+> > >  	/* configure the hardware if offload is requested */
+> > > -	if (xuo && xfrm_dev_state_add(net, xc, xuo, extack))
+> > > +	if (xuo && xfrm_dev_state_add(net, xc, xuo, extack)) {
+> > > +		NL_SET_ERR_MSG(extack, "Failed to initialize state offload");
+> > 
+> > We already set an extack in xfrm_dev_state_add, this chunk should be
+> > dropped to avoid overwriting the more specific info we got.
+> > 
+> > >  		goto error;
+> > > +	}
+> > > 
+> > >  	return xc;
+> > >  error:
+> > > @@ -2161,6 +2167,7 @@ int xfrm_state_migrate_install(const struct xfrm_state *x,
+> > >  		xfrm_state_insert(xc);
+> > >  	} else {
+> > >  		if (xfrm_state_add(xc) < 0) {
+> > > +			NL_SET_ERR_MSG(extack, "Failed to add migrated state");
+> > 
+> > Not a strong objection, but this case would be the EEXIST situation
+> > from xfrm_state_add, and there's not much the user can do about this?
+> 
+> Fair point, but logging it still has value too, userspace can track these
+> over time and adapt. Let's revisit when we add extack to xfrm_init_state.
+
+Ok.
+
+> > >  			if (xuo)
+> > >  				xfrm_dev_state_delete(xc);
+> > >  			xc->km.state = XFRM_STATE_DEAD;
+> > 
+
+-- 
+Sabrina
 
