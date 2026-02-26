@@ -1,150 +1,191 @@
-Return-Path: <netdev+bounces-261121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261122-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YNZ6CO+rn2m1dAQAu9opvQ
-	(envelope-from <netdev+bounces-261121-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 03:11:59 +0100
+	id 4DlOCxGsn2m1dAQAu9opvQ
+	(envelope-from <netdev+bounces-261122-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 03:12:33 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7885E1A00AC
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 03:11:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C8B81A00BB
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 03:12:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F39033019B93
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 02:10:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 884F330037D9
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 02:12:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5901B374753;
-	Thu, 26 Feb 2026 02:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E102E374720;
+	Thu, 26 Feb 2026 02:12:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WseTGvba"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BPWob0Dj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36DD6374193
-	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 02:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8103A17A2EA
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 02:12:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772071830; cv=none; b=u0FJs36twQJ48DPtNkTtyaWdNlRpCZTb4I0Y9bQ7UcuvWEqswZb9gRQgwAbRWQKJ8jPM9oRZ+KRBR20siAusiS6fz+bVFtHO0euhuo9lOfc4211SlMflxLZ6XezAv9a94hTE0uXtWaFD8XonDCLCs7NyTCXtBU5LgX0jR3molQ8=
+	t=1772071939; cv=none; b=LjpmfvQYLXdpGA+oQ1dQ2vguB6/bNwQ/KdQmfXk3YAtPyZFolgEfRbtszErBlnR3PgSkFQESArnyE4xRTGzv/HRy+UCaXx9KNxwdZmY3uURsDr6UeEMAxVn40qfoI7SbgKo7u6JsaOin2n9btiBJ/uBwVQsR+YLEZE6aEwTwhG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772071830; c=relaxed/simple;
-	bh=6E28dy9r3Sp+NRdZMBmCMEQWDvuIwmiE4LghEM0da0g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=apZ6NywZB5GOaH7G/0bBUu7xRg5jAu+yf/XCDRrtA6KKtxJlq+mrL+oDthaE3SQhTeu/mNDv58tCEIoI/NkQnPlq107po/24qf66H5q+61no0NJ17zMVAew98D3EbZ29pxffN/RvoZEzdFwhIMFHQYbzPbce4yyaqBliJsrsO58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WseTGvba; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2ad9f316d68so1332845ad.2
-        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 18:10:28 -0800 (PST)
+	s=arc-20240116; t=1772071939; c=relaxed/simple;
+	bh=+orr7kYXfOvNC/mR3Z0b1f98AwTwNlX8vtKfILvKOok=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=mSDK+DlXf19P59hYXPNI4yOZEAk4R0yHqPSkaB6qHYpukTugBnvWsvZE1/i0JEwcuOBsGRs63sBb3mujX6Vi86t+9UJ50L7Rc8cmAnWT7LvKQrVagnfMwt/zU9sFt7QslUgwsPF8Zb/BqcvvjV2RKMae2DWuyvl0p3kReYuBMN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BPWob0Dj; arc=none smtp.client-ip=209.85.222.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8c70e610242so256211785a.2
+        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 18:12:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772071828; x=1772676628; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4mOEzlF5WfXh7SYCkHvZdArVwTunpx1k40WIVxQv49M=;
-        b=WseTGvbaB5jQ+NDpARRBIEBBfaPQ0u2iL6kYo9PpZulpRFhhz00f/1iyb/FY2Xwslw
-         zys8REPIigTQrxRt7PWCNEfv8Ur3FGUhduBDsVgitqsV7bud32JFHUuSO8wG5vKqBZKl
-         w1x/f5lkABxu+cvnDW7D+RMBhE026PSP/nniRkV88lQ4+8zXbxaXyEJC5KQeAuVXg1tB
-         CnbeuUj6W+/rZjEvZGin47xhnrue0XyZKpfwS5MweTcT6fBdodBQ+khEyM4TvbL7alun
-         2jb1xr/XnVkCXce8Cw6WNMuJ0FnAtDnuFWL4BMrIm4UZYDcH7ZtgZqgnh/XKBquVUryx
-         yX2A==
+        d=google.com; s=20230601; t=1772071937; x=1772676737; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=8x5PMqoCU2sVal4Rvp+zYR8oS4mEgBVna2xiVUJcyVY=;
+        b=BPWob0DjKZuFibMRhQznCPvWywWU4GE+/bq7diCP0pgd9nZM/NQqn+RRoZPAzjIeDa
+         Vk+hyU5h3vpsXk6cPKE5HVHde5dei9nKvj6G+3Gs5b4Qi+ErrQUO6dxZnlZXRRnpMsgk
+         xMuiw5qF+kAOyrS44dIbi5iQHb4ihvG2+BxD1Lp7gA96xQZ2cbVd2wt5kcpqWSGY6CuV
+         kw+tLBNpoaj/8e3hgIv79+wfFaQiQ3vMJnIZRteFc6YmRC4ddZHZnTgn5s0DnCC2YWtQ
+         mZ2kV3OJO41PrMTRsVcn6rDNe+PL6EwCLXCNS+Q+GjuLAYHOf3Mjw0/jpSJFiMZx0kZd
+         XL6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772071828; x=1772676628;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4mOEzlF5WfXh7SYCkHvZdArVwTunpx1k40WIVxQv49M=;
-        b=p0CmLw6vruLuVSpI+KLi5xz0oobsjtV4C6Mtpzb4wR3+FM+d5JA2VlYWbdG4eaNnti
-         m5ptEeWcqPD1ra6uduWc6z/LV1I8tXf/eSjm9r2vjZwcpwstVmj0jlVp1nn4+AsQ/0ub
-         4iL9Ex51QksgvF4v6eaIQ8DkJoeObfxHOdj0NuRaR+jvWYKWeR89NcK/CDMMUNhptWPs
-         yQedPNEytVHdeNKE/4A1O3OH3YQ6IjCXWmwgQCLQrEOTj3abP4Z1+qBOSnq0HPkU+Ilz
-         VIwCFPzhFJ4fokNFNVqXQd5z3Bz76CX+veJErqiSXKrd9SSaCjkFMNiBFiKriinQkpEx
-         kQHA==
-X-Gm-Message-State: AOJu0Yxi+lCuKu2K3XUSgHdlqfbKNyYb2WQN4zDccX66FrWtkAv83Voa
-	HLSzE+HdHPfheaiV/r6J32eFUh0iKnC81g1vCW0E7zk/N2x+XziGiwhR
-X-Gm-Gg: ATEYQzzQkSqQ+Q9RgvVw7ktWB6SpUg0psWtAZ7Qfnz1sHe20UAjEnG82ehQFlDQuO/B
-	hI752YHd1rbAdPnI6U7X7wvF4up4AKETqUwB485GzBHSBg2EPoATlWwVzLt8PrbaL7LNUqD/SGD
-	UMjACLTa5coHnI2HJ8Oru4yjPvpKoClsbaW05N8gZUCTgK/BzsnZLQsmd5T7k++UTwjsyMtbebG
-	CfwH3vnjQRjB7s2LEHqIid0fE+7e5tqtd5ocJYBCVODIujJ4jOqjWzx+yc0O5r3A0bpfczWiPRV
-	mK+pv2Zy3JHffAvzQqvXCflj3T/y/y5hLzG7uS7NOebOABFgqousNBka+RnYLqz6lwDB9a0sJuI
-	Aa3UK5AG8B1vnxT/QUoNu8HdCU0RVMwFHpEG2JoYA8g708kg0FpMNAw+gHOd+Px/d26LcRrwkvp
-	QlV21epdOR1OAZXBJFY4oT0lsr1qA=
-X-Received: by 2002:a17:902:d2c7:b0:2a0:c942:8adf with SMTP id d9443c01a7336-2ae02969954mr6118965ad.8.1772071828409;
-        Wed, 25 Feb 2026 18:10:28 -0800 (PST)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2adfb5b03ffsm7454675ad.1.2026.02.25.18.10.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Feb 2026 18:10:27 -0800 (PST)
-Date: Thu, 26 Feb 2026 02:10:21 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>
-Subject: Re: [PATCH iproute2-next] iplink: bond_slave: print actor and
- partner churn state
-Message-ID: <aZ-rjaU32FbTbn9I@fedora>
-References: <20260224020215.6012-1-liuhangbin@gmail.com>
- <20260224020215.6012-2-liuhangbin@gmail.com>
- <20260225132239.34fba967@phoenix.local>
+        d=1e100.net; s=20230601; t=1772071937; x=1772676737;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8x5PMqoCU2sVal4Rvp+zYR8oS4mEgBVna2xiVUJcyVY=;
+        b=P+V+1s3xSRI2WBZjKVpXjWT6xji5BPkibGtwPjFpR17WTRuWb49hjlT4CTzPDDg++l
+         azw8qjuJxauBsxrrtc3QvC/dszIHTcaDeVpolYihWRhR73UhxLGLJk3+qb0LfPUzzptw
+         beArEM3WN4J+7Ge19x0cmMQR7F9hZPENPh9bpSt0txL631UDqilvaCRZtwiWIaue1o4t
+         rQSoQYfgGxRC4dCDbv8JHNG0NDoqynKw3EzQxQ56vw5hf5KaAX8K+XxqUzyQ/pszT7ME
+         VPc7YmW3GVkx2Umh7GZa9e5cz+bi34cwEPApJNpUllhInIZPHK//mUgo7JBS6gSB89qb
+         R+dQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWOXJR3qkL+8RNXgGQcpEhg1N0bThZYSBK9p2On3kpExNudx/2UWZFe2oWKAE0XXewo3m4El+Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkrBJGfTX5LnrrgvpgXGOlmiGZ/LUzXW6GNWLSFHKcXQs8WGy2
+	FaNQNRmihsQs0oiJTF2oWHQe/ZKTXzJQJIu7LwdHk9VUz13lECtrzsGJnOQ1s/b7JDyRfgJpXEE
+	k9LucvO8AurIjRw==
+X-Received: from qks6.prod.google.com ([2002:a05:620a:4c6:b0:8c7:d46:dadb])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:254b:b0:8b2:f191:2b3a with SMTP id af79cd13be357-8cb8ca65f09mr2387527085a.53.1772071937278;
+ Wed, 25 Feb 2026 18:12:17 -0800 (PST)
+Date: Thu, 26 Feb 2026 02:12:15 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260225132239.34fba967@phoenix.local>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.414.gf7e9f6c205-goog
+Message-ID: <20260226021215.1764237-1-edumazet@google.com>
+Subject: [PATCH v2 net-next] net: use try_cmpxchg() in lock_sock_nested()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261121-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-261122-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-0.974];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7885E1A00AC
+X-Rspamd-Queue-Id: 7C8B81A00BB
 X-Rspamd-Action: no action
 
-On Wed, Feb 25, 2026 at 01:22:39PM -0800, Stephen Hemminger wrote:
-> On Tue, 24 Feb 2026 02:02:15 +0000
-> Hangbin Liu <liuhangbin@gmail.com> wrote:
-> 
-> > +	if (tb[IFLA_BOND_SLAVE_AD_CHURN_ACTOR_STATE]) {
-> > +		__u8 state = rta_getattr_u8(tb[IFLA_BOND_SLAVE_AD_CHURN_ACTOR_STATE]);
-> > +
-> > +		if (state >= ARRAY_SIZE(port_churn_state))
-> > +			print_int(PRINT_ANY, "churn_actor_state", "churn_actor_state %u ", state);
-> 
-> You should use print_uint for unsigned values.
+Add a fast path in lock_sock_nested(), to avoid acquiring
+the socket spinlock only to set @owned to one:
 
-Thanks, should I post a v2 version for both the kernel and iproute2 patches,
-Or just the iproute2 patch?
+        spin_lock_bh(&sk->sk_lock.slock);
+        if (unlikely(sock_owned_by_user_nocheck(sk)))
+                __lock_sock(sk);
+        sk->sk_lock.owned = 1;
+        spin_unlock_bh(&sk->sk_lock.slock);
 
-Hangbin
+On x86_64 compiler generates something quite efficient:
+
+00000000000077c0 <lock_sock_nested>:
+    77c0:       f3 0f 1e fa                 endbr64
+    77c4:       e8 00 00 00 00              call   __fentry__
+    77c9:       b9 01 00 00 00              mov    $0x1,%ecx
+    77ce:       31 c0                       xor    %eax,%eax
+    77d0:       f0 48 0f b1 8f 48 01 00 00  lock cmpxchg %rcx,0x148(%rdi)
+    77d9:       75 06                       jne    slow_path
+    77db:       2e e9 00 00 00 00           cs jmp __x86_return_thunk-0x4
+slow_path:      ...
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+---
+ include/net/sock.h |  9 +++++++--
+ net/core/sock.c    | 13 +++++++++++++
+ 2 files changed, 20 insertions(+), 2 deletions(-)
+
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 55b61e4b0d8318887d527e919fc1103d78ac6d14..84c21fb38a28406e387dc33e0fb5decd18893950 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -81,8 +81,13 @@
+  * mini-semaphore synchronizes multiple users amongst themselves.
+  */
+ typedef struct {
+-	spinlock_t		slock;
+-	int			owned;
++	union {
++		struct slock_owned {
++			int		owned;
++			spinlock_t	slock;
++		};
++		long	combined;
++	};
+ 	wait_queue_head_t	wq;
+ 	/*
+ 	 * We express the mutex-alike socket_lock semantics
+diff --git a/net/core/sock.c b/net/core/sock.c
+index cfb2a6209946089669882cdbd5d1b36c53838989..86185f194d64b4eea0835ee0f9b53fda184c73cb 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -3780,6 +3780,19 @@ void noinline lock_sock_nested(struct sock *sk, int subclass)
+ 	mutex_acquire(&sk->sk_lock.dep_map, subclass, 0, _RET_IP_);
+ 
+ 	might_sleep();
++#ifdef CONFIG_64BIT
++	if (sizeof(struct slock_owned) == sizeof(long)) {
++		socket_lock_t tmp, old;
++
++		tmp.slock = __SPIN_LOCK_UNLOCKED(tmp.slock);
++		tmp.owned = 1;
++		old.slock = __SPIN_LOCK_UNLOCKED(old.slock);
++		old.owned = 0;
++		if (likely(try_cmpxchg(&sk->sk_lock.combined,
++				       &old.combined, tmp.combined)))
++			return;
++	}
++#endif
+ 	spin_lock_bh(&sk->sk_lock.slock);
+ 	if (unlikely(sock_owned_by_user_nocheck(sk)))
+ 		__lock_sock(sk);
+-- 
+2.53.0.414.gf7e9f6c205-goog
+
 
