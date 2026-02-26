@@ -1,238 +1,221 @@
-Return-Path: <netdev+bounces-261300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261299-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GBbjERowoGmLgAQAu9opvQ
-	(envelope-from <netdev+bounces-261300-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:35:54 +0100
+	id MBJUFAQwoGmLgAQAu9opvQ
+	(envelope-from <netdev+bounces-261299-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:35:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8A571A5279
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:35:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A22D01A522E
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:35:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C9DCA30C73B6
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 11:34:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 94F4F30480E0
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 11:33:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85978374736;
-	Thu, 26 Feb 2026 11:34:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C932E374736;
+	Thu, 26 Feb 2026 11:33:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fHIgb3r2"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="hItviFXI"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011051.outbound.protection.outlook.com [52.101.62.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6D237416E
-	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 11:34:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772105655; cv=none; b=qNGulKxChMujB5fWNPmS7bXtrdymKHSjSbdFbb7W1B2o4Ukysl/WiqPm48Rr1rCfZTJCYS2t9wlCSsITfE0zcd2wj906FnIv1MXP2yiD/6oLkgbtr1cXRUkn9XypCuvq1SOrk9FrcKO+vOGVZ7Zt7rxo/Cw08kMThzk2mUfil/g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772105655; c=relaxed/simple;
-	bh=vzLjgUo8sEzeWsoG/ZrURZKNZ3wEdOprVFXTzgadt3A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jWcVwJvHLer0BHRsWuYokc2XaVPWRtmMOaLZVOX2fQOjmh76GOC/x89ZCSTQjRgKloirlcbaKZlIk6tEUKqjSsewETDqtoGFZE/R0X8jOmSlOW6msCr5p5mdzyOghncY0ty29etJHA/wOJbqYuZTHmT3jBv1gN0rqYhUArpORBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fHIgb3r2; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772105653;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mKKbKDKeeGzX9hOTv641TR8mAiL2GCNqFtF0g7/bl6Y=;
-	b=fHIgb3r2YfgaXwpoeX76SgCC6qo7hKM2CuqTKN5sM4ZISlNDLLuNvQF7Os4zQr4C9AfdpT
-	X2nelMBVQUHu0mi29TlClYJEELxngb3Sp8yc1Ps8XiWNUAZWjP6Vb505cjia24MBs0bflt
-	faCLYjziim22pCHQzAae1IHdmIYmbLE=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-696-CQwMgTzbNQey5SHIhrM51Q-1; Thu,
- 26 Feb 2026 06:34:09 -0500
-X-MC-Unique: CQwMgTzbNQey5SHIhrM51Q-1
-X-Mimecast-MFC-AGG-ID: CQwMgTzbNQey5SHIhrM51Q_1772105648
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8EA8F19560A7;
-	Thu, 26 Feb 2026 11:34:07 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.225.206])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E131D1800671;
-	Thu, 26 Feb 2026 11:34:03 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: javen_xu@realsil.com.cn
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org,
-	horms@kernel.org,
-	edumazet@google.com,
-	hkallweit1@gmail.com,
-	nic_swsd@realtek.com,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next,v5] r8169: add support for RTL8125cp
-Date: Thu, 26 Feb 2026 12:33:50 +0100
-Message-ID: <20260226113350.119833-1-pabeni@redhat.com>
-In-Reply-To: <20260224025335.298-1-javen_xu@realsil.com.cn>
-References: <20260224025335.298-1-javen_xu@realsil.com.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0443311960;
+	Thu, 26 Feb 2026 11:33:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772105607; cv=fail; b=rbkwwOa8vgBACnCdvWXAZ/meACBGkpD7+IUsaJ/MxaN1DvBxJjy8pM5CisciSRxa0DgGb+xwwTn53NVeR83UbBpsN+Sqw5MsJf+DgzqPAWORozjPQoH3FrML3e1HGfqRv9Ba7ARpWa3MZgYgkoK4a40S1dgHq3WVxwigYJA87Jo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772105607; c=relaxed/simple;
+	bh=DOfdBpcBdACnWCavRBhgu4+1AGQl4zDdqVTFpCPi0K8=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=JyJS3jn1ifjRx5NoffXfq46cYB8aICIV3NjwAdzmU9zxLqsEUSwRXGC7TNCyZYtTQVUmNAbrHasHCHQyUTMbPdGVaOrO0qbVgWP8/MBt4pr8ga76aaxOnoX+wNjr00OBBUJgQ1Wh+O9GQCOBRenXCJ/LD2295vtQM3VMXtg3UTM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=hItviFXI; arc=fail smtp.client-ip=52.101.62.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jBVP8SIzGcx4hUNDGitz8CYJkggOrHniA09cNnIUPrDS/5brCwjwL6bli6sbqRSNae/ysWfb6YBUKeQjezqCY4+qf3g47pst76FGIGFj7wWHUq5QmQkGt5Ejt6Ed2rriolFNhmXlqvarNp+kO+2ChZiEcKbMz3EGwTATmuAd0kFuNjjPxVMZtTzQ6xIuvO8r1JTyd8w8a30KtZz6QIHPftWmZqjU4kn0aJ8O+kUuRIm4dm0teYejpEyYil6DDcFz+glMsDEyFr59OP5S6xsLot7ogZmHnKeo29rgZweznt3YUgj1M1DLiWQ+OkuSC5xigCm+jV40bwKHpUBgzKN/Cg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kf9Lsk9tqa0JEoB1QAiR37ScRsWtnO5bb48lhJxCaFk=;
+ b=krqHDt7FbqfBllJ0JqHHdZwRIorIwKagY2W4cluVip32/DTmYcbXofpxhavybc53qdkBKXns3G53SgMMqTykqjbekSQFdsimFYefPhs09fHRXhY296D5muX1AtWI6sboLyXWg4NFBehhoUXN6Tl1W2AlLNukSinZq9dFvPuVt4ix3OMd4owby1eLdMMcqyEa27guIMAnwpp569qG8uvmjcCeSRI4dDmoOWngTkSbxaOpRdIGBSe4WvxUfQE7BYjjBu4lM08BRjaHImMCL/6QxN94qv9klcGPu8BVrH8NW0jMqor2b5AxAllW2YgnCwNgd6zww+2FPU1IQR8rQddHFQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.23.195) smtp.rcpttodomain=lists.infradead.org smtp.mailfrom=ti.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kf9Lsk9tqa0JEoB1QAiR37ScRsWtnO5bb48lhJxCaFk=;
+ b=hItviFXI+0+803aK2GTfv2CsnPbrT6gxl6I1yoIfEltbvkaVKQBWFRJ7IpbcZNNSXTxGCYt2804RBo5aDC1OUU7SJVu3Bf70jmu++HhNQGzbTiH9XncMcVJaTenUM6daRK3XEB6VK1Qfmi4McEOi2MN4EffIhdj56qkvSoctW/o=
+Received: from CYZPR05CA0013.namprd05.prod.outlook.com (2603:10b6:930:89::11)
+ by SJ0PR10MB5890.namprd10.prod.outlook.com (2603:10b6:a03:3ef::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.23; Thu, 26 Feb
+ 2026 11:33:23 +0000
+Received: from CY4PEPF0000EE34.namprd05.prod.outlook.com
+ (2603:10b6:930:89:cafe::15) by CYZPR05CA0013.outlook.office365.com
+ (2603:10b6:930:89::11) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9654.14 via Frontend Transport; Thu,
+ 26 Feb 2026 11:33:23 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.195)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.23.195 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.23.195; helo=lewvzet201.ext.ti.com; pr=C
+Received: from lewvzet201.ext.ti.com (198.47.23.195) by
+ CY4PEPF0000EE34.mail.protection.outlook.com (10.167.242.40) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9632.12 via Frontend Transport; Thu, 26 Feb 2026 11:33:23 +0000
+Received: from DLEE213.ent.ti.com (157.170.170.116) by lewvzet201.ext.ti.com
+ (10.4.14.104) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 26 Feb
+ 2026 05:33:21 -0600
+Received: from DLEE208.ent.ti.com (157.170.170.97) by DLEE213.ent.ti.com
+ (157.170.170.116) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 26 Feb
+ 2026 05:33:20 -0600
+Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE208.ent.ti.com
+ (157.170.170.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Thu, 26 Feb 2026 05:33:20 -0600
+Received: from [10.24.73.74] (uda0492258.dhcp.ti.com [10.24.73.74])
+	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 61QBXFg62288259;
+	Thu, 26 Feb 2026 05:33:15 -0600
+Message-ID: <668bab11-0362-4b12-a935-c2db784fb034@ti.com>
+Date: Thu, 26 Feb 2026 17:04:45 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+User-Agent: Mozilla Thunderbird
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <danishanwar@ti.com>, <rogerq@kernel.org>,
+	<horms@kernel.org>, <mwalle@kernel.org>, <nm@ti.com>, <v-singh1@ti.com>,
+	<vadim.fedorenko@linux.dev>, <matthias.schiffer@ew.tq-group.com>,
+	<vigneshr@ti.com>, <m-malladi@ti.com>, <jacob.e.keller@intel.com>,
+	<stable@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<srk@ti.com>, <s-vadapalli@ti.com>
+Subject: Re: [PATCH net 2/3] net: ethernet: ti: icssg_common: set irq_disabled
+ after disabling TX IRQ
+To: Jakub Kicinski <kuba@kernel.org>
+References: <20260220041431.372610-1-s-vadapalli@ti.com>
+ <20260220041431.372610-3-s-vadapalli@ti.com>
+ <20260223184840.06069afa@kernel.org>
+ <57e05b57556e94ed666acd8b4c542efc28e7408b.camel@ti.com>
+ <20260224154953.63b558c1@kernel.org>
+ <be80263f-667c-4330-bc24-5078fe07b994@ti.com>
+ <20260225160958.64bbc4c5@kernel.org>
+Content-Language: en-US
+From: Siddharth Vadapalli <s-vadapalli@ti.com>
+In-Reply-To: <20260225160958.64bbc4c5@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE34:EE_|SJ0PR10MB5890:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3db4e07b-c3b2-42a3-3ed9-08de752ad9b7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|34020700016|376014|7416014|1800799024|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	pni9iQC6njGGA4/4hxKnpRhJUub6ChgWvjEURJxh85qnWeq9RDKS72AbPobP8J2JqZDClIhSohmHcHIeVLVxsn4lX+g/hDMeg1VKbaYBjucDbyZ2hsx3jXUqVpbDyySvM7Y1x57t/GX4tr3jAhfmgofGnFnGcZD+Z5chp1Xo6JAVzUFUeWNLoXhsOl0FXAYV63yS/myTu9q0rU6peg0YJteMrbhuxSfgzKxMjMi7poKkELHejGpF34Ku6twNYOHjhXTfwhO149NnIU7fuUNEaeqJgZmbRK727azY1u/mfiexwPU6mhAH78f/8lakVUtqeNUNXnQmewv+kzymiPVnc90U5d8eCP6FN74BPlPCkEfio7jgA2kEUN/2fn5j/jLgp6cB29LptGjPyEV4/ppnUh3XkmwPe7bS+j6I/CwfKV4sX0FEMRxWUJjZrHKNwe6KO1yHW87NsytXbUjSxK4cW6cs0HAfKsPrJdDZL2XUViBUd6tvTGvrfy3IH2Gk5EdPzhrZicorqDK1i+7eI5Z+xley+5hpfSfyVohuRkPxzr27wq78q8eeXMrbSv2hhO3yzNtWEyJ2NwSndD2Ocf1iyTwnLJch0LdbVzs0ygGKrHaPvwVyq/FpIIbAgIxtmPT1aOFkLax7eQVNt7ebQ8fGOzC2tIZJW5gzFqsGMaBUH5NvZRIFrq7cbkZ88KxUgfDDwhe/LdSb++pD58qmZFeehMe3OHu2Nzb/zdSnrgaMTkJ3AZlyM0GdD0vEvoI/R767U2YoAlxr0CYHZS2mFqSDb25EY1SH1NFFBzKitvT4JWuPTdtG/ts7GuZctiqUfEeaf07i42YmLwLJw53cd6fRmw==
+X-Forefront-Antispam-Report:
+	CIP:198.47.23.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet201.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(34020700016)(376014)(7416014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	gZnurVpEXGr65YH527d+wITAb+HZH/QebMctRcFIwSb+k3sp61NPqdb2nVX+LiIV23U8We2GdsixzDk9J8ICkBlQGUXFQWDV2MFKLbl8/pCO4MdhoSBzCHhEQbe/iFI9DV8cIAUk5Ma1OfQyqdaKVAetk35DT5DTGQcAkVcvo5sqUXnaR+d3vL4vC6XDPB8OMJnBtrvCViETGNuhxMYhPhRqb0b7tVJx8u9VIsZNvxHw3xnTDCAoYLOw0TW/XyGWtIBXR1xqh6IdrNqBj/A86lqdbMHscfKY+hQJNRljk9vHnJJ6FVERDMkbug3gcIGnLKFyb0uWqgWGgY9TUBS7gbAQ0QEPo1xqG33N/348te4oXaaQ4h7qtMOdCLq5B5/SNl6xgaNJZK0a7Yy7U9AHW7yCcvq1/jip8uwyz2m6JRayQ2qHc5AJxxQW/69mKKnP
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2026 11:33:23.4000
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3db4e07b-c3b2-42a3-3ed9-08de752ad9b7
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.195];Helo=[lewvzet201.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE34.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR10MB5890
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_NONE(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,lunn.ch,vger.kernel.org,google.com,gmail.com,realtek.com,redhat.com];
-	TAGGED_FROM(0.00)[bounces-261300-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.993];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: B8A571A5279
+	RCPT_COUNT_TWELVE(0.00)[22];
+	TAGGED_FROM(0.00)[bounces-261299-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ti.com:mid,ti.com:dkim];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[s-vadapalli@ti.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[ti.com:+];
+	NEURAL_HAM(-0.00)[-0.998];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: A22D01A522E
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+On 26/02/26 05:39, Jakub Kicinski wrote:
+> On Wed, 25 Feb 2026 17:01:31 +0530 Siddharth Vadapalli wrote:
+>> 	net_rx_action
+>> 		__napi_poll
+>> 			NAPI TX Handler
+>>
+>> It does seem strange that the 'net_rx_action' leads to the NAPI TX Handler.
+> 
+> For historic reason rx_action runs all NAPI, it's fine.
+> 
+>> However, it is exactly this path that causes the warning, and it is due to
+>> this that we could end up in the following situation:
+>>
+>>                   CPU0                             CPU1
+>>      -----------------------------      -----------------------------
+>> 1. TX HARD IRQ Handler entered         NAPI TX Handler is running
+>> 2. irq_disabled is set to true         Sees irq_disabled being true
+>> 3. Calls disable_irq_nosync()          Calls enable_irq()
+>> 4. Enters disable_irq_nosync()         [WARNING: Unbalanced enable for IRQ]
+> 
+> Right, but for Tx NAPI is only scheduled from the IRQ so this is not
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-r8169: add support for RTL8125cp
+But the NAPI TX Handler running on CPU1 at step-1 is a previously queued 
+instance and not the one corresponding to the TX HARD IRQ Handler running 
+on CPU0 in step-1.
 
-This patch adds support for chip RTL8125cp with XID 0x708, applying
-different firmware (rtl8125cp-1.fw) and a dedicated PHY configuration
-function.
+> possible. For Rx yes, AFAICT there are paths in the driver which
+> schedule the Rx NAPI (AF_XDP?). But Tx NAPI seemed to have only
+> been scheduled by IRQ. And if that's the case the NAPI can't run
+> until CPU0's IRQ handler calls napi_schedule().
 
-> diff --git a/drivers/net/ethernet/realtek/r8169.h b/drivers/net/ethernet/realtek/r8169.h
-> index aed4cf852091..0b9c1d4eb48b 100644
-> --- a/drivers/net/ethernet/realtek/r8169.h
-> +++ b/drivers/net/ethernet/realtek/r8169.h
-> @@ -68,6 +68,7 @@ enum mac_version {
->  	RTL_GIGA_MAC_VER_61,
->  	RTL_GIGA_MAC_VER_63,
->  	RTL_GIGA_MAC_VER_64,
-> +	RTL_GIGA_MAC_VER_65,
->  	RTL_GIGA_MAC_VER_66,
->  	RTL_GIGA_MAC_VER_70,
->  	RTL_GIGA_MAC_VER_80,
-
-[ ... ]
-
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index 2f7d9809c373..d040f2074db6 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-
-[ ... ]
-
-> @@ -4021,6 +4026,7 @@ static void rtl_hw_config(struct rtl8169_private *tp)
->  		[RTL_GIGA_MAC_VER_61] = rtl_hw_start_8125a_2,
->  		[RTL_GIGA_MAC_VER_63] = rtl_hw_start_8125b,
->  		[RTL_GIGA_MAC_VER_64] = rtl_hw_start_8125d,
-> +		[RTL_GIGA_MAC_VER_65] = rtl_hw_start_8125d,
->  		[RTL_GIGA_MAC_VER_66] = rtl_hw_start_8125d,
->  		[RTL_GIGA_MAC_VER_70] = rtl_hw_start_8126a,
->  		[RTL_GIGA_MAC_VER_80] = rtl_hw_start_8127a,
-
-RTL_GIGA_MAC_VER_65 (RTL8125CP) maps to rtl_hw_start_8125d, which is also
-used by VER_64 and VER_66. However, these versions need special handling in
-rtl_hw_start_8125():
-
-static void rtl_hw_start_8125(struct rtl8169_private *tp)
-{
-	...
-	switch (tp->mac_version) {
-	case RTL_GIGA_MAC_VER_61:
-	case RTL_GIGA_MAC_VER_64:
-	case RTL_GIGA_MAC_VER_66:
-	case RTL_GIGA_MAC_VER_80:
-		for (i = 0xa00; i < 0xb00; i += 4)
-			RTL_W32(tp, i, 0);
-		if (tp->mac_version == RTL_GIGA_MAC_VER_80)
-			RTL_W16(tp, INT_CFG1_8125, 0x0000);
-		break;
-	default:
-		break;
-	}
-	...
-}
-
-Should RTL_GIGA_MAC_VER_65 be added to this case group? Both VER_64 and
-VER_66, which share the same rtl_hw_start_8125d function as VER_65, are
-explicitly listed here to disable interrupt coalescing (clearing registers
-0xa00-0xb00). Without this, the RTL8125CP may operate with stale interrupt
-coalescing settings, potentially causing incorrect interrupt delivery.
-
-> diff --git a/drivers/net/ethernet/realtek/r8169_phy_config.c b/drivers/net/ethernet/realtek/r8169_phy_config.c
-> index 032d9d2cfa2a..f78c3dd36483 100644
-> --- a/drivers/net/ethernet/realtek/r8169_phy_config.c
-> +++ b/drivers/net/ethernet/realtek/r8169_phy_config.c
-> @@ -1102,6 +1102,27 @@ static void rtl8125d_hw_phy_config(struct rtl8169_private *tp,
->  	rtl8125_config_eee_phy(phydev);
->  }
->
-> +static void rtl8125cp_hw_phy_config(struct rtl8169_private *tp,
-> +				    struct phy_device *phydev)
-> +{
-> +	r8169_apply_firmware(tp);
-> +	rtl8168g_enable_gphy_10m(phydev);
-> +
-> +	phy_modify_paged(phydev, 0xad0, 0x17, 0x007f, 0x000b);
-> +	phy_modify_paged(phydev, 0xad7, 0x14, 0x0000, BIT(4));
-> +	rtl8125_phy_param(phydev, 0x807f, 0xff00, 0x5300);
-> +	r8168g_phy_param(phydev, 0x81b8, 0xffff, 0x00b4);
-> +	r8168g_phy_param(phydev, 0x81ba, 0xffff, 0x00e4);
-> +	r8168g_phy_param(phydev, 0x81c5, 0xffff, 0x0104);
-> +	r8168g_phy_param(phydev, 0x81d0, 0xffff, 0x054d);
-> +	phy_modify_paged(phydev, 0x0a43, 0x10, 0x0000, 0x0003);
-                                                           ^^^^^^
-
-Andrew Lunn suggested in v4 review that magic bit values should be replaced
-with named constants. The value 0x0003 sets bits for 'link speed 10m PLL
-OFF' (bit 0) and 'ALDPS PLL OFF' (bit 1). This would improve code
-readability and maintainability. Andrew suggested defines like
-RTL8125CP_LINK_SPEED_10M_PLL_OFF BIT(0), RTL8125CP_ALDPS_PLL_OFF BIT(1),
-etc.
-
-Reference: https://lore.kernel.org/netdev/1a36b013-ae9b-4d51-8259-92728644ceab@lunn.ch/
-
-> +	phy_modify_paged(phydev, 0x0a44, 0x11, 0x0000, BIT(7));
-> +
-> +	rtl8125_legacy_force_mode(phydev);
-> +	rtl8168g_disable_aldps(phydev);
-> +	rtl8125_config_eee_phy(phydev);
-> +}
-> +
->  static void rtl8125bp_hw_phy_config(struct rtl8169_private *tp,
->  				    struct phy_device *phydev)
->  {
-
-[ ... ]
+Wouldn't net_rx_action periodically schedule the NAPI TX Handler? Please 
+note the following:
+1. The call trace shows net_rx_action scheduling the NAPI TX Handler.
+2. Since CPU0 entered the TX HARD IRQ Handler for the TX Completion 
+Interrupt, it indicates that the TX Interrupt was indeed enabled at that 
+point in time. Hence, a previous instance of the NAPI TX Handler has 
+already invoked 'enable_irq()' and enabled the TX Interrupt.
+3. Given that 'another' previous instance of the NAPI TX Handler is running 
+even though the TX Interrupt is already enabled (given that CPU0 takes the 
+interrupt), it indicates that it has been scheduled by some entity.
+4. The entity that seems to schedule the NAPI TX Handler despite TX 
+Interrupt already being enabled by a previous run of the NAPI TX Handler 
+seems to be 'net_rx_action'.
 
 
