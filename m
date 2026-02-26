@@ -1,62 +1,61 @@
-Return-Path: <netdev+bounces-261600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261601-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WI9XEYW8oGnrmAQAu9opvQ
-	(envelope-from <netdev+bounces-261600-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 22:35:01 +0100
+	id QGXJInbAoGk1mQQAu9opvQ
+	(envelope-from <netdev+bounces-261601-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 22:51:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD3B81AFE08
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 22:35:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3D9D1B0165
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 22:51:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 17DC03011350
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 21:35:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3C9F6301E3C4
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 21:50:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4129F3A0B30;
-	Thu, 26 Feb 2026 21:34:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7143A37474A;
+	Thu, 26 Feb 2026 21:50:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BzXk8lea"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pr0erWDl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D772389E14;
-	Thu, 26 Feb 2026 21:34:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FBBD371069
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 21:50:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772141696; cv=none; b=POvIRo63851neaeSmQatzVBW6vvvQyd9SidQ4xjzG/XTqG68gV1bFzKxGaGKmGvxJmZXAagRk6K5Q1sFuwotRRfr/SMvM4D3dlrjbiXapPIBhykOGhF/ZwJRwezobqMuhyu7xxdwtBbY9tQ34RJUezWmEVez8xvKvJbUGFEGqtM=
+	t=1772142644; cv=none; b=ssj3SoJTi327rmJimL44vUj/qR1KX21c5sGZWiCC6H8hesrwcewTvN6stcJMRdr3dkENIeLPDH1MA3ko+cPDI8H/bvy1nESjs16byy8OV/Pnexx6+Z66vUSE/G7e6BXhGYkkh9/3Crhr++/tSxAxcM1261JrEbRacR76PvQFs4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772141696; c=relaxed/simple;
-	bh=9nUUaoM3WbzkeWzo1yrHWw8wUwpA8/X0UVvQxvXVE60=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gjV47vpzwdEa7WVzeyfJd75eemHcUvWifAEuwWHp0nt9pak4CwG27Kjy7rVLrFkEKjVLOfLxzhXJ/eEQQ5JXwSk+JsM8E5eB+AKSEoOpq4u/16ot1Qly1dlFOHVf/cRpci+AtPPr/4rwG6zb2k3TkcG+GqFmI7ZW/HGvewlpDNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BzXk8lea; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 230CBC19423;
-	Thu, 26 Feb 2026 21:34:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772141695;
-	bh=9nUUaoM3WbzkeWzo1yrHWw8wUwpA8/X0UVvQxvXVE60=;
-	h=From:To:Cc:Subject:Date:From;
-	b=BzXk8lea11EjSe2Ca8CztMeOaCs8VlYfJo+r0Ex6gJ9j/m5/3mF12YwzcQ95CCsFz
-	 bD1wLeYHdc04+SyJmhInvl9cgduChYxvdADojI9g8V+ENwrebOeEhnYnJddv6y4hNy
-	 OAoSDe37XKXXAGjd8Wv0VGxuyHMbL6Ebtr9OuhLOeRk9iGlTnXG/Df1pDk7hzaIywR
-	 93s9x/QcjtWE/dMUklO0PbTfdm2k4/EybdbATy5Dy0dU55BvCkw5vk7SQpHbeE9rEz
-	 DoTFd6D+exQevPdVgeHIGeB2nyuAdd3Dk3i9AWxRSFf2BBWSyeHOqRqxSBZx9li15M
-	 m3bsMYjP37vEQ==
-From: Allison Henderson <achender@kernel.org>
-To: netdev@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	rds-devel@oss.oracle.com,
-	kuba@kernel.org,
-	horms@kernel.org,
-	linux-rdma@vger.kernel.org,
-	allison.henderson@oracle.com
-Subject: [PATCH net-next] net/rds: Fix circular locking dependency in rds_tcp_tune
-Date: Thu, 26 Feb 2026 14:34:54 -0700
-Message-ID: <20260226213454.85586-1-achender@kernel.org>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1772142644; c=relaxed/simple;
+	bh=CSV+m72mnmToW621YIZp9bVTf9rkjaYunWFtN8HQugQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=shlrix5bvxIH2myU4PxjMJIZ67k4Gh5B2k3RpBAKj6MVUcWy6GgX2tEPeyly+Fx6ipoDgWnmSPCZpqy3MhEClV/R+iN4ZjrmTwTsSwB+iNDdzyoAxNnmmSyVSxlga5Npuw07IDOBzR8Psxyj13CG84Wt0jFwZvJEfCo5Vc0A+U4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pr0erWDl; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1772142640;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=m/VMPk7L7XpjPfDSURdzShzsddu6apjP5T3tDOQx7t8=;
+	b=pr0erWDlUPPP+oGucNUxBaN2jRJPc47A5aB15bfRuRvzvyQtS30XpoNR0muDG1Rc3itcmh
+	vKFRONKkXHzSTG0J9GS/p4Btu1zWYMsZ9ItPLStDysoGlvXLLmrfb8GAXyd8cnR3789rQu
+	XuQRYxsRJmxzI9K1BAplD8gJmmAS3R8=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: linux-hardening@vger.kernel.org,
+	Thorsten Blum <thorsten.blum@linux.dev>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] keys, dns: Use kmalloc_flex to improve dns_resolver_preparse
+Date: Thu, 26 Feb 2026 22:49:29 +0100
+Message-ID: <20260226214930.785423-3-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,99 +63,61 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-261600-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261601-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[thorsten.blum@linux.dev,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.999];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,syzkaller.appspot.com:url]
-X-Rspamd-Queue-Id: CD3B81AFE08
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim,linux.dev:email]
+X-Rspamd-Queue-Id: B3D9D1B0165
 X-Rspamd-Action: no action
 
-syzbot reported a circular locking dependency in rds_tcp_tune() where
-sk_net_refcnt_upgrade() is called while holding the socket lock:
+Use kmalloc_flex() when allocating a new 'struct user_key_payload' in
+dns_resolver_preparse() to replace the open-coded size arithmetic.
 
-======================================================
-WARNING: possible circular locking dependency detected
-------------------------------------------------------
-kworker/u10:8/15040 is trying to acquire lock:
-ffffffff8e9aaf80 (fs_reclaim){+.+.}-{0:0}, at: __kmalloc_cache_noprof+0x4b/0x6f0
-
-but task is already holding lock:
-ffff88805a3c1ce0 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: rds_tcp_tune+0xd7/0x930
-
-The issue occurs because sk_net_refcnt_upgrade() performs memory allocation
-(via get_net_track() -> ref_tracker_alloc()) while the socket lock is held,
-creating a circular dependency with fs_reclaim.
-
-Fix this by moving sk_net_refcnt_upgrade() outside the socket lock critical
-section. Since the fresh socket is not yet exposed to other threads, no
-locks are needed at this time.
-
-Reported-by: syzbot+2e2cf5331207053b8106@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=2e2cf5331207053b8106
-Fixes: 5c70eb5c593d ("net: better track kernel sockets lifetime")
-Signed-off-by: Allison Henderson <achender@kernel.org>
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 ---
- net/rds/tcp.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ net/dns_resolver/dns_key.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/rds/tcp.c b/net/rds/tcp.c
-index 04f310255692..da22b3dfdbf0 100644
---- a/net/rds/tcp.c
-+++ b/net/rds/tcp.c
-@@ -490,18 +490,24 @@ bool rds_tcp_tune(struct socket *sock)
- 	struct rds_tcp_net *rtn;
+diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
+index c42ddd85ff1f..891287a86979 100644
+--- a/net/dns_resolver/dns_key.c
++++ b/net/dns_resolver/dns_key.c
+@@ -215,7 +215,7 @@ dns_resolver_preparse(struct key_preparsed_payload *prep)
+ 	kdebug("store result");
+ 	prep->quotalen = result_len;
  
- 	tcp_sock_set_nodelay(sock->sk);
--	lock_sock(sk);
- 	/* TCP timer functions might access net namespace even after
- 	 * a process which created this net namespace terminated.
- 	 */
- 	if (!sk->sk_net_refcnt) {
--		if (!maybe_get_net(net)) {
--			release_sock(sk);
-+		if (!maybe_get_net(net))
- 			return false;
--		}
-+		/*
-+		 * We call sk_net_refcnt_upgrade before the lock_sock since it is
-+		 * not yet shared, no lock is needed at this time.  Further,
-+		 * because sk_net_refcnt_upgrade does a GFP_KERNEL allocation,
-+		 * this can trigger an fs_reclaim in other systems which creates
-+		 * a circular lock dependancy.  Avoid this by upgrading the
-+		 * refcnt before the locking the socket.
-+		 */
- 		sk_net_refcnt_upgrade(sk);
- 		put_net(net);
- 	}
-+	lock_sock(sk);
- 	rtn = net_generic(net, rds_tcp_netid);
- 	if (rtn->sndbuf_size > 0) {
- 		sk->sk_sndbuf = rtn->sndbuf_size;
+-	upayload = kmalloc(sizeof(*upayload) + result_len + 1, GFP_KERNEL);
++	upayload = kmalloc_flex(*upayload, data, result_len + 1);
+ 	if (!upayload) {
+ 		kleave(" = -ENOMEM");
+ 		return -ENOMEM;
 -- 
-2.43.0
+Thorsten Blum <thorsten.blum@linux.dev>
+GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
 
 
