@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-261149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261150-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WxnBJpa5n2n5dQQAu9opvQ
-	(envelope-from <netdev+bounces-261149-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 04:10:14 +0100
+	id 8PYvDKG5n2n5dQQAu9opvQ
+	(envelope-from <netdev+bounces-261150-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 04:10:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7C9B1A0552
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 04:10:13 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE2CD1A0560
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 04:10:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id EEB2B3015B8C
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 03:10:10 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B72943055453
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 03:10:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91E2F314B82;
-	Thu, 26 Feb 2026 03:10:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E10E23815FB;
+	Thu, 26 Feb 2026 03:10:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fpSHxhvg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fEoJmjlC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F0CE19CCF5;
-	Thu, 26 Feb 2026 03:10:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEA5C3815D1;
+	Thu, 26 Feb 2026 03:10:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772075407; cv=none; b=q61yp9s4TqHC2W8Hgzpny9RcTzzOyG1952cwkLgrkAG5uzTCdTth/2SS+2Al4sskY1ILdjJHvstPt0YSXCcaKQPBhROl5IvXtdj858UYuQ3snL3ZiPQpcLXzyNCqcisHioaCiE9RIr4vKF8upgMGqPUoEafAzX9+swebfAy22y4=
+	t=1772075408; cv=none; b=LviQNtr+s6Du55gLE3+QrF6eRxroiBYBDC6pejUeJkCdHhn1C01//heLidFOFArPqStVhxPfnF9zCCnHovxDP2vHrlOiD9lXoKJCPvTIiHH7Avx8A/SalWB1K3zbDYdPpTXp2grUocqw3byHI1oQYiC3Y/N0udblU6sHIb+lKMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772075407; c=relaxed/simple;
-	bh=Iam7PncFOpUQ16hUdhzEUV/z3lh8+hl2Iv3l0b8oDhE=;
+	s=arc-20240116; t=1772075408; c=relaxed/simple;
+	bh=8ER8QLa0zkIVGnKagiBVB1Mye1+VrGFuKc4qivqP3Eg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=u6MGUUV/p2RMPvJnsHpLXkWNKcT7cLJgsrIW5QsdwIC8t5DXvTgH5E2PBu70dj2oqS7/4BJdqHv4k2DwkjHlXGLElcTgW+Yrq86HL4rGhPkCgaOGbVPxBn69wAud2wizYmUaSTifJemJv90yJx2WffQhjplGKtByHMHNSyFp0k8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fpSHxhvg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14A67C116D0;
-	Thu, 26 Feb 2026 03:10:07 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=GL6VCwwCc+i7UYF7yw3PQaMCPQZrWTob8/vOZmvNkweVokTuT08rXmEse5477mWryBE+zMU21uM5qRogvKs06xJ86Pn4+4N3RzJ1nPeAtrIz1IElyurnuSp/QBf5k67GHpQtZbHepvBR1VVM0wTEovDqAS+19g+UQHR86JCnwBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fEoJmjlC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81972C19425;
+	Thu, 26 Feb 2026 03:10:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772075407;
-	bh=Iam7PncFOpUQ16hUdhzEUV/z3lh8+hl2Iv3l0b8oDhE=;
+	s=k20201202; t=1772075408;
+	bh=8ER8QLa0zkIVGnKagiBVB1Mye1+VrGFuKc4qivqP3Eg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fpSHxhvgyiikhw+byfDgZBtaolTuLSKpp68nqam7sfqFRDsp6znDdvnGgv2nh1S/H
-	 DphRlJPLcj8LEAEXFG2J6EFe4Fth0XGZPLzsWszqSu1yJ460q5hH58YpvI15gisMhT
-	 tOQS4IQQvAQmG75UjOWy94ISjRqzN5oYyOa9RXkL+/N+vleNhcCAvr3dGwhgFFSySG
-	 NVG5wpqhSWPUCjgvWjtIJfoxTb/kgwDJEgkv2oNsKlNQyJTs+/kAUGD9zXMeGGOJwS
-	 Ep7+G9LzmMYY44LYt/M1AWS3a5MT6UR+9uq4r5nbXHkHsVzm/MAJkT/VU0zlIsfpGn
-	 R+uKqo2duk67Q==
+	b=fEoJmjlCAGHbdWa+JJ97SsuJ3eCdrCnulX3bkK1ZzjZnkHUuJLinphXl/d9nhMPlC
+	 A14lWIBJmaC/iEt4tddzbiy4Dq5OVtiULO5c12fr67PsKoqi6w5+TIHYf3nqWlTljn
+	 hsQqSsqBEQDw6fVVioiLFdgdWCT2USwq0+goEEb5QAAFPN9cW9g5ZNVMDw/4mslliV
+	 6aE5Hgx4/Mr9tHLjw6BtT5Rc7pud/LJufuL5BlK3I5qgdjaBUdGubu70Rix5XZwI85
+	 OrJH+nv5xetWPUcduNSeKunsprL8zQpsy6A1jRr2yOy+jjNWyYUXTIsqgl2FSOuJkX
+	 E4iZXRnmUDQ0g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02F13380A94B;
-	Thu, 26 Feb 2026 03:10:13 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7D061380A94B;
+	Thu, 26 Feb 2026 03:10:14 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,35 +55,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: usb: kaweth: validate USB endpoints
+Subject: Re: [PATCH net v2 0/2] tcp: re-enable acceptance of FIN packets when
+ RWIN is 0
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177207541180.1014739.15278757505426867455.git-patchwork-notify@kernel.org>
-Date: Thu, 26 Feb 2026 03:10:11 +0000
-References: <2026022305-substance-virtual-c728@gregkh>
-In-Reply-To: <2026022305-substance-virtual-c728@gregkh>
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@kernel.org
+ <177207541303.1014739.8301517056403543881.git-patchwork-notify@kernel.org>
+Date: Thu, 26 Feb 2026 03:10:13 +0000
+References: <20260224-fix_zero_wnd_fin-v2-0-a16677ea7cea@gmail.com>
+In-Reply-To: <20260224-fix_zero_wnd_fin-v2-0-a16677ea7cea@gmail.com>
+To: Simon Baatz <gmbnomis@gmail.com>
+Cc: edumazet@google.com, ncardwell@google.com, kuniyu@google.com,
+ davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, shuah@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261149-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-261150-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FROM_NO_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
@@ -91,31 +95,32 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linuxfoundation.org:email]
-X-Rspamd-Queue-Id: B7C9B1A0552
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BE2CD1A0560
 X-Rspamd-Action: no action
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 23 Feb 2026 14:00:06 +0100 you wrote:
-> The kaweth driver should validate that the device it is probing has the
-> proper number and types of USB endpoints it is expecting before it binds
-> to it.  If a malicious device were to not have the same urbs the driver
-> will crash later on when it blindly accesses these endpoints.
+On Tue, 24 Feb 2026 09:20:11 +0100 you wrote:
+> Hi,
 > 
-> Cc: stable <stable@kernel.org>
-> Assisted-by: gkh_clanker_2000
-> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> this series restores the ability to accept in‑sequence FIN packets
+> even when the advertised receive window is zero, and adds a
+> packetdrill test to guard the behavior.
+> 
+> Signed-off-by: Simon Baatz <gmbnomis@gmail.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: usb: kaweth: validate USB endpoints
-    https://git.kernel.org/netdev/net/c/4b063c002ca7
+  - [net,v2,1/2] tcp: re-enable acceptance of FIN packets when RWIN is 0
+    https://git.kernel.org/netdev/net/c/1e3bb184e941
+  - [net,v2,2/2] selftests/net: packetdrill: Verify acceptance of FIN packets when RWIN is 0
+    https://git.kernel.org/netdev/net/c/745113323098
 
 You are awesome, thank you!
 -- 
