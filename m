@@ -1,426 +1,336 @@
-Return-Path: <netdev+bounces-261560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261559-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +BDsCt2joGk9lQQAu9opvQ
-	(envelope-from <netdev+bounces-261560-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:49:49 +0100
+	id 8GWGBd6koGk9lQQAu9opvQ
+	(envelope-from <netdev+bounces-261559-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:54:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E9621AEAAA
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:49:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DFF51AEBC5
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:54:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id CF8123006019
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:49:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 08102300DF51
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:48:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB8324611FC;
-	Thu, 26 Feb 2026 19:49:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF4DE4657E7;
+	Thu, 26 Feb 2026 19:48:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="fGVM3f4I";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="Oy682hd5"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="KK/t+d6Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11023105.outbound.protection.outlook.com [40.107.201.105])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D293ACA7B;
-	Thu, 26 Feb 2026 19:49:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0C84534BF;
+	Thu, 26 Feb 2026 19:48:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.105
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772135381; cv=fail; b=I5yfukeniy+K/nUvV4m/5AXV26C1dTpDgNLGs879w0PyEoN1IqfiyRJoJ7NAhvuctAEWTUV0FxYrGgfSh/2d0mntfOrIhmaHVt3dVve07jrhak1cFg1RqmZXU1DsRfCF0zpivUaHd0h8UtqwLGAnlzhw6w4A8vGwZmlHVOqvHwY=
+	t=1772135317; cv=fail; b=jl44FjJjSwyGasEdbCFdF7yfJM9D+Lnom6CGWRbL/8tmG0b7IdmyLZRGF4vE54mvEawDK6WsEFrdVHL8ybLVTxxZ2523dHNMyWtWyjSNoD67Xla27PVtMJv3rUWkLP82kWk/5w3DRO9Zz7TU/DTuLOj0yuXKQ7YYbItrVLysZVs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772135381; c=relaxed/simple;
-	bh=BlVqbZ/JpIskQj47WwYl6PI3fPnTgncjhJtmiAU1ztc=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Uvct4I72SPwiMWPCRS2z5MbbRhExmsE6x9DhxhEQmNjeTr+6M6iHjGBrHCpugDmLvM8SoijbFFEuT6LpltuytNC5zLT1AAcTUI6gJ2Aw4Qx5D70sKOLxhUe0mfOQO5aD6+0ee/FrbQ111JFKOmnybpMtEICdb27Pl7ZYvXQZkW8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=fGVM3f4I; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=Oy682hd5; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61QDNDZ3107289;
-	Thu, 26 Feb 2026 19:48:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2025-04-25; bh=oBC2hHKkmFQcxzSwn4/aFZcgBel5pry1r3QHBWM313U=; b=
-	fGVM3f4IEk2qkHPwkvtGxAJT2OZzed2MrVDpc4OeXf6ITiu/cUyha9YwESWHtnZP
-	bZyR8War430V8h4VQB5Q72xs1DsxeftuHUWhAOdPJ1yu03eo8suvikn6i+zA2NKd
-	ikxwPReDM823pj3lbVeQCQnKZmjBjQ1Lbj5K4ecaEkcrtu2D6XPAXca/pUz6guDP
-	uaT6VVIFFSvrfkpn7HXs7NaYBnBy2CHwDn2taszM24r/XYCx642qxKCIrAgVaV11
-	jX4+2EYLfNXzn7qM4ikYAu9HmpuLJoIAs5TqpH+QwkW6/4azSvSPOlH1RHg/X15l
-	VZZqGWDGYHBDL3tvwPzZNA==
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4cjh019bnf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 26 Feb 2026 19:48:54 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 61QIV95d027931;
-	Thu, 26 Feb 2026 19:48:53 GMT
-Received: from dm5pr21cu001.outbound.protection.outlook.com (mail-centralusazon11011063.outbound.protection.outlook.com [52.101.62.63])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4cf35hxxtd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 26 Feb 2026 19:48:53 +0000
+	s=arc-20240116; t=1772135317; c=relaxed/simple;
+	bh=6ZhFEuT1xaxqqezxyPpHIbf8Jfy8fsOa+uXVbD7EKWI=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=VkjTr6nTnnX/GN/z+cgupBHtgkq9UVT2eaMo1HVIWP933EmX6NTbZOLBvRUdeOSxIAy/QkfjD9E+tFAu9RIZSIM66ZdkEO66eXUVUXy44w9///ASRvIe6BmBjDBO9WnwKRuzOUxfiAGtnoMH/0xpRu0bR1ePtSALG1rAKlDf2Pk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=KK/t+d6Y; arc=fail smtp.client-ip=40.107.201.105
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=C8gBIDUxIkvWt4YcpMe5Hjt+9MNBenWmxLiaWSnIaN619PSVHId/TqtjKmBQyUamm8JfbxZTzL1cYZBAiRU1/y/egS+htyjBCeNfwnkssZ8k75MQL8DvC78ZRYXCI1lia5ACh27UZbEKYQUhOkpLrJDAzKa6e1Bzn+gYnK4RW0uI8F396KD3RKAqLaeNH+8kqXneG6Vg5JDZIofmSumfGzF4Bmv6kjMLgUF6f9boUVe8AlExdjvFs6YHepH8V9CjTqRtcOTU10JQpbstiqi0ZCsBfHDOOLuJIhaiWYuXihuGjDy/d4zKznmFhKPqNSk5YC0ZJQtbAOWVvjzBhUq1dg==
+ b=dbbXZrX6zJ5OhoWh3nQL2TyjdeZ7WQksXy1Dj76X6IdGS3JgWSZWLuV1ziqbbNUFoAyDzB2Njkfl2Xx2kwBmD4lMDmfB4KiFS/fASY+rV4yYodUT1DEr2LNO1cY9t1cz76hKJLumS/DcdBAkhOub89GML4NCzGbMEiFRVJzzVp/UuDQis2ouB0nNSfvgB1sx2hOccfRFyozht1A+xqeRExNJ3pvD1e3tT4PJpepooNZQfTebiymC/WATxWPOEysIJ+rmRMhgUFjLAWW5UygXwuKk1Jw5mIX8ylC7Uj0btAoGoTmuL9XEcYjnlCNiAMwYeZ9LDaFDV6p7WfkHKcSJOQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oBC2hHKkmFQcxzSwn4/aFZcgBel5pry1r3QHBWM313U=;
- b=eFdW/YXWaRraQwdnnY7gdIXypqjz7Vf2dZiS9m0GaXlsOBHodspz18k4X1wvLftvAddRiq+/kKhQZOCrj3jbpKPHAOG+8mK7TDqPL6zLpdYV2G6Wz2Nhr6VGcG1BRQjZp0jnZOIg0swFxSMLArqpkbw0iGoMxILNDHLPy3d6B/r70Pxa9NLjgYB7roF4/Eidvq2+RegfmCrAUDBjLeYTyYqKUVeK/JQIFD3f+7W53vXW5tUxBI6WVOPkEetsrCBTCWsOWZ4pHIR/I5jfH7nOhEdih75V1qoGgxzWwnkQSUJ5qw4td36jOW8xBSGzxT5+QqFL2VJRr/RuuaYqNj5UYA==
+ bh=gBRjUzBd33cu85rAUs6b1PvgsWzymJ+vXXZxsKL/ZW8=;
+ b=GJnQRiTH5gDvIV8SnA482uC9vdEObsLlEr/DdqGjeqlbB2K9J4m4ID321thfr+yURSpJ8WUs+oLwLlZC3t1z/F9GZjjqD3aWLKrGsAjiHwubRBnsFdXiERtVxMR/h7xqqPnEPJvxl3skO/oBh1qD5URffHDAY/URZargyFmJeddmSAEBOaM4u9oVgUnu7GMeErN2MjwF6Qh9x+efT8TxCxfNctzqJ62ghQC6s29PZpUn9+vGTXYv5JO7yiDdllU5XTQNCYPR5ec0HOU1ZNKRHz5g4rWP7XHfkxkAjoZItiK3c6pWbm/5AT9txXsYCsq/UReCopeC7jSEM/e3iYsPKQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oBC2hHKkmFQcxzSwn4/aFZcgBel5pry1r3QHBWM313U=;
- b=Oy682hd5bljcoALU3Y+SlOWa8lBZEeLU0mgjleu9LmnE0yxY7kHLDGTbop/N7/hPg1KHbeAAykfqXxrf9tfU5owTCOM+lqC4EGrD7Zru5HBFemzOqfc4fDhm9QepOaIHRlIgoPNVy9idg6ImbvcMUxrirM9+4yg3x2auHBq6GRA=
-Received: from BN0PR10MB5128.namprd10.prod.outlook.com (2603:10b6:408:117::24)
- by DM3PPF3D2127785.namprd10.prod.outlook.com (2603:10b6:f:fc00::c20) with
+ bh=gBRjUzBd33cu85rAUs6b1PvgsWzymJ+vXXZxsKL/ZW8=;
+ b=KK/t+d6Y3gJQQznHD7bzB7CV+7MFZlza7VSIcN8+lqXR3nJzPAQuFtkb5POXs38NpUdOb8GcUr5/fCuieYbEi3CPSnj891BNhItB2dGTu6m5SrZKumTNAIH4rxQl5i3KOzB1Nlx9Ta1IEhrCVcW5uGKNMCSdleoro51TaAU5b2s=
+Received: from DS3PR21MB5735.namprd21.prod.outlook.com (2603:10b6:8:2e0::20)
+ by DSWPR21MB6966.namprd21.prod.outlook.com (2603:10b6:8:35f::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.14; Thu, 26 Feb
- 2026 19:48:38 +0000
-Received: from BN0PR10MB5128.namprd10.prod.outlook.com
- ([fe80::4083:91ab:47a4:f244]) by BN0PR10MB5128.namprd10.prod.outlook.com
- ([fe80::4083:91ab:47a4:f244%4]) with mapi id 15.20.9654.007; Thu, 26 Feb 2026
- 19:48:38 +0000
-Message-ID: <8b0bb056-9504-4835-8063-7ddeba328721@oracle.com>
-Date: Thu, 26 Feb 2026 14:48:28 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 12/61] nfsd: update format strings for u64 i_ino
-To: Jeff Layton <jlayton@kernel.org>,
-        Alexander Viro
- <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Matthew Wilcox
- <willy@infradead.org>,
-        Eric Biggers <ebiggers@kernel.org>, "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Muchun Song <muchun.song@linux.dev>,
-        Oscar Salvador <osalvador@suse.de>,
-        David Hildenbrand <david@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        Paulo Alcantara <pc@manguebit.org>,
-        Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
-        NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>,
-        Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
-        Steve French <sfrench@samba.org>,
-        Ronnie Sahlberg
- <ronniesahlberg@gmail.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Bharath SM <bharathsm@microsoft.com>,
-        Alexander Aring
- <alex.aring@gmail.com>,
-        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-        Viacheslav Dubeyko <slava@dubeyko.com>,
-        Eric Van Hensbergen <ericvh@kernel.org>,
-        Latchesar Ionkov
- <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Christian Schoenebeck <linux_oss@crudebyte.com>,
-        David Sterba <dsterba@suse.com>,
-        Marc Dionne <marc.dionne@auristor.com>, Ian Kent <raven@themaw.net>,
-        Luis de Bethencourt <luisbg@kernel.org>,
-        Salah Triki <salah.triki@gmail.com>,
-        "Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
-        Ilya Dryomov <idryomov@gmail.com>, Alex Markuze <amarkuze@redhat.com>,
-        Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,
-        Nicolas Pitre <nico@fluxnic.net>, Tyler Hicks <code@tyhicks.com>,
-        Amir Goldstein <amir73il@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-        Yangtao Li <frank.li@vivo.com>,
-        Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Richard Weinberger <richard@nod.at>, Dave Kleikamp <shaggy@kernel.org>,
-        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-        Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Mike Marshall
- <hubcap@omnibond.com>,
-        Martin Brandenburg <martin@omnibond.com>,
-        Miklos Szeredi <miklos@szeredi.hu>, Anders Larsen <al@alarsen.net>,
-        Zhihao Cheng <chengzhihao1@huawei.com>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        Johannes Thumshirn <jth@kernel.org>,
-        John Johansen <john.johansen@canonical.com>,
-        Paul Moore
- <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, Mimi Zohar <zohar@linux.ibm.com>,
-        Roberto Sassu <roberto.sassu@huawei.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        Eric Snowberg <eric.snowberg@oracle.com>, Fan Wu <wufan@kernel.org>,
-        Stephen Smalley <stephen.smalley.work@gmail.com>,
-        Ondrej Mosnacek <omosnace@redhat.com>,
-        Casey Schaufler <casey@schaufler-ca.com>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
-        David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-        Sumit Semwal <sumit.semwal@linaro.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
-        Willem de Bruijn <willemb@google.com>,
-        "David S. Miller"
- <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-        Oleg Nesterov <oleg@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        James Clark
- <james.clark@linaro.org>,
-        "Darrick J. Wong" <djwong@kernel.org>, Martin Schiller <ms@dev.tdt.de>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-trace-kernel@vger.kernel.org, nvdimm@lists.linux.dev,
-        fsverity@lists.linux.dev, linux-mm@kvack.org, netfs@lists.linux.dev,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-nilfs@vger.kernel.org,
-        v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
-        autofs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
-        linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net,
-        ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev,
-        devel@lists.orangefs.org, linux-unionfs@vger.kernel.org,
-        apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
-        linux-integrity@vger.kernel.org, selinux@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-        netdev@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-hams@vger.kernel.org, linux-x25@vger.kernel.org
-References: <20260226-iino-u64-v1-0-ccceff366db9@kernel.org>
- <20260226-iino-u64-v1-12-ccceff366db9@kernel.org>
-From: Chuck Lever <chuck.lever@oracle.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.9; Thu, 26 Feb
+ 2026 19:48:30 +0000
+Received: from DS3PR21MB5735.namprd21.prod.outlook.com
+ ([fe80::a3f4:6107:de7c:5925]) by DS3PR21MB5735.namprd21.prod.outlook.com
+ ([fe80::a3f4:6107:de7c:5925%5]) with mapi id 15.20.9654.007; Thu, 26 Feb 2026
+ 19:48:31 +0000
+From: Long Li <longli@microsoft.com>
+To: Dipayaan Roy <dipayanroy@linux.microsoft.com>, KY Srinivasan
+	<kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
+	"wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui <DECUI@microsoft.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>, "horms@kernel.org"
+	<horms@kernel.org>, "shradhagupta@linux.microsoft.com"
+	<shradhagupta@linux.microsoft.com>, "ssengar@linux.microsoft.com"
+	<ssengar@linux.microsoft.com>, "ernis@linux.microsoft.com"
+	<ernis@linux.microsoft.com>, Shiraz Saleem <shirazsaleem@microsoft.com>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, Dipayaan Roy
+	<dipayanroy@microsoft.com>
+Subject: RE: [PATCH, net-next] net: mana: Trigger VF reset/recovery on health
+ check failure due to HWC timeout
+Thread-Topic: [PATCH, net-next] net: mana: Trigger VF reset/recovery on health
+ check failure due to HWC timeout
+Thread-Index: AQHcpKEB0nVc09Lh2069xcpeS8HmdrWVZ0Qw
+Date: Thu, 26 Feb 2026 19:48:31 +0000
+Message-ID:
+ <DS3PR21MB5735F00E300CB4B7E54DA710CE72A@DS3PR21MB5735.namprd21.prod.outlook.com>
+References:
+ <aZwUDlTkb5xunIkH@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+In-Reply-To:
+ <aZwUDlTkb5xunIkH@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+Accept-Language: en-US
 Content-Language: en-US
-In-Reply-To: <20260226-iino-u64-v1-12-ccceff366db9@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH0PR03CA0120.namprd03.prod.outlook.com
- (2603:10b6:610:cd::35) To BN0PR10MB5128.namprd10.prod.outlook.com
- (2603:10b6:408:117::24)
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=0f825b0a-340c-433d-bb1f-6481016ef6ce;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2026-02-26T19:44:03Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
+ 3, 0, 1;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS3PR21MB5735:EE_|DSWPR21MB6966:EE_
+x-ms-office365-filtering-correlation-id: 10aa41a7-f7be-4433-3bcc-08de757004fd
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|376014|7416014|921020|38070700021;
+x-microsoft-antispam-message-info:
+ bx3iuiRuhaKuvCIUBtFxKllulZVcnMb59ozP1bGJ/Du7xrRkIzThg5Uio0cs9BDUPshOG26XOAZZiw6sLES1TJLwLtqlh3A3fSNhVqQj5Nbo2uQxp2q/fF9WIFZTKV5EjnXdCOTPBgxRpWxXm9HiY0VFywdAf6kbuZVk4h0Ej3emPISd1iahFTLsTYT6p4vaU9jGYgybkcqtRql0OYq04z02WOF6X9wAh2uKmrxUO4ZGXtXV69GD6VtkAfNlVPfOtZHZ/6PAIHBQn/i6yumDSNd06RsCcJvpVxoh52jqq8ATSRuAA3i6wYBkG4p5khunKZKlXmOUjTMBdwTsEGePlVmh8Aq9ikmc32VPacqwOeDJ5RxUw4V+NVTRBj1tOzBEMUEz3X5rkMqaW2cjT7soF/DnmU6C5rAKUEaC2UVjXbBz4jrhXXrP/8eWGrLZdn3pWZoEeqeFcUVdwOfUrKKGEI8y/zeQaCYEdiA3mTMMQ7SKmmJ/X2Iy7isbWeqI8m4VacsRG/aO+DEqXu9HQ4EBdTadhJ4egZzqOH995R2MfiEy4cl+z+cuH4rS7TOkI77RbxC12FB1guKioOBkHQ5COWr7YXn13fV8oAIAXC6+8fakSrnZsGcFXEhpMgxd1gIF0wZvAbS9OlJnGKG5M9QWdOUbpJfqPGSyvVAA29IwcCoZXdx79iVKFm4VMHRIKEQKd0kIiE92zoNNjOxFImUAGonL3Z2tJpx0ICUVsZ7WBtgZyLp64Iqw30hevl6INoX9oyvEyYXinPQj/7zU4IcGs6jFgxR2HKCxOkDIxAfpp5vvjoxHj9SkHH27dE6RIHGV
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS3PR21MB5735.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(921020)(38070700021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?j8gdug8iRWpeRiQ3HlZCGp9P8niZt2mVrpEN49+5fKfbK6CMC/M4G6byMH4e?=
+ =?us-ascii?Q?OOh1BqZHWUjPdpN+j95hSd7MCMbbXFbotxQvT3U4aarY2WoX5HPL3RD90ca7?=
+ =?us-ascii?Q?ukzVWVqY0NCLWO54X9Q43b+Lgay/WSCuvqRqZ4krsXy3UAGogrH6PLM58sO4?=
+ =?us-ascii?Q?WLWafsipMa3MbaG+vHcrZ5EK+mURWUi7SBr0FcWv/enH8cRfPRaqNuCDyjQz?=
+ =?us-ascii?Q?3YgwJ5R48xmV5dNXBpjM9qP3nT+8xJDVPIREW5ZCT9b/29NJcvBnHKOq5Gal?=
+ =?us-ascii?Q?/STMgd6AlGRtE5RoZS0q3lX3r6RzW9mczt2enON7YmGBPutprBXpALSUTU2F?=
+ =?us-ascii?Q?kxetk+VsZDW3QjyYM3xqAUlmsWzr3FHFnV6uFrOFMsNiLiDJ3hpTw8iO5763?=
+ =?us-ascii?Q?Rr05DMErNKf3I5fMv0P+gVX5pobpMFIgseI2heshcxCeDhTkW1aHE7doBHlw?=
+ =?us-ascii?Q?/7fxJXfp49+j7ykkHen8Pf6/qKCi6msa2rK5bqKs/n8V6UoS9/hDm2L17y9g?=
+ =?us-ascii?Q?4Z+1pn6LMvpAA+DdasP2dAS3dS1Vi5/CX+YG9Q84gobIZBkTjm8ukboUl+cP?=
+ =?us-ascii?Q?Buu39l/r+9UibUdh1E2SuoE4WOqaoAs8yeJpDnotdPs6tMljZVMwFsSG7f+7?=
+ =?us-ascii?Q?lB/wLoI0BlfJ1e1f16AbKmkK1jHJN9lfpQS5+hIWsNzq9f4m+iGT9DcBiHN/?=
+ =?us-ascii?Q?3N/w7XZ+zEBwI41iQQYXaXqEc6Xg8E96mRJYIym17lYzlXUaA3jXpITPrS0t?=
+ =?us-ascii?Q?qqLIKizCkRWfkzHRdsf1BrCosyIiIGpF2PxbNudIjn4wdQB4ix9gvi+MV30v?=
+ =?us-ascii?Q?ESqRBcknZ6bOnB8I6BGvaOUQ1KbGcderBJftdbEOGrzLsAijCIq5ih5ygja8?=
+ =?us-ascii?Q?jpsJ0vK++99+2TvqsgeDYV+ig6Pt9mYb51sFStaPl4WLgS9c08BQ25itcUbd?=
+ =?us-ascii?Q?GZcBL4rhEKI4KQ/jYtFZX5rqvSwdDPQCSTdsLxTsWd2vPvI9IMde8b7q+c/1?=
+ =?us-ascii?Q?U6rI8rhDvC8wKgsaZ7eDJ3ENTPLa7jLbUR/ce5bn95dezY7/dEiHPggUEhhs?=
+ =?us-ascii?Q?mpS2sE4UJu4cVlkYbChcvi9ZHnIwlhc1AMJFRB4dogAC4vQKDMclRfrGa5k3?=
+ =?us-ascii?Q?yq+tH8K5hROmqGv485TeHUOmA9U8bLPWvVo6dzbSGBECvWsQZJFWr1TejEXO?=
+ =?us-ascii?Q?dW1hKvEChdRh5qkviCeOJpyOSXMaE3EeWwGqHuOaURG7Oh/Tt1RogrLCcojm?=
+ =?us-ascii?Q?LzpHn1+Q5YNWZy8k2K6O04AsymhIuvhHuNnK5zs2sPZe7vHynmg1WBMFtBHd?=
+ =?us-ascii?Q?IGwihM6cObV+DHO6GuT6pPxWNUGoMiZaXOuldvuNNf1HKQYDN3mLIHqoJqxi?=
+ =?us-ascii?Q?iw7yzYmPaYg9KkjRDXhetTtuGFPk3hVYUlp+bbZD8rajNW0KGhUsvzzelApA?=
+ =?us-ascii?Q?/uheD05gBurwpixZXoOhaU1t5MByi7xEBADcr7Nz4LrY84GtlsBE2V82OHCf?=
+ =?us-ascii?Q?lO9V0TfJgO5rRgliLrg1zFWqY/w5/+2hY5y2EvMVha2acbCHuKWELCj2SXBO?=
+ =?us-ascii?Q?fEn3GA2MxcponXYFI2jM7wXtRfAhLddMxLhjh+uXU0tDuq7lcqqWdObI4H7j?=
+ =?us-ascii?Q?EL8cHeu21743T5o1eRx5w2Qyg0fnZNFF03Z3jo/aQHODLQXBjBMYnSZoRzjb?=
+ =?us-ascii?Q?iKNssCxboJcIjzJwMkBYX6m/KS3BNT+jc0j4FYy0BUA/kwIA?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN0PR10MB5128:EE_|DM3PPF3D2127785:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3789d7d1-f5f3-4f38-4055-08de7570092b
-X-LD-Processed: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
- BCL:0;ARA:13230040|1800799024|376014|366016|7416014|921020|7053199007;
-X-Microsoft-Antispam-Message-Info:
- Hg+j6gD3vB4WWeEonaK+n0iwIcKdTMWuTeka27JXzZXV4RfY3IF3M5wpcLvfxnx2rCN+2pQpfT1AOxeN3To05r+cqbKsnBm2uCXFAhVdO7mZ8vdNE1rr6QXhGR6gHFzpkpLESyCQpl8fp0OQ+16HLvUh+SbCvRzABSJbeIkfVwJk0l80LmQHjUhQ532Lqj5aO9l+0gN+0QsPs3MwZgGDPwjWMq2vGzeKnerBhqqQKVX3nRx7o4/mR7AXopE/0SM0HHkUm+xLqyziwVkl+Lz82gFf4Btpvar/5W8JG264cDDJS8WnCv4XS/I+2Icw19hIHGj7ivDftBbTH0wmFMTE3lz80EPHEG515bAIl8lE1bOzwyNEjG+Q3xK7az1MWBzAoSLDUSldonHbLb044TgnKsm1LRjah+zrOUmYYR7jBPuP9JAElUHUNUThpBVwPW4RV1RqhQMQTTNOJAwRpFPUtm4/pM8Sbw96J4sf4WZMTou3WNMcOPoYh01720n6BR/UUALT3e2FcDQ4Mqbg6WY/Jc+FJl80XhKZZ8Bn6dHCzkp0aPwl6E5BtFYJCX8/3dKf+rMg55dyKPIIq5naqs99SEkXOHPZ3HeuPm8KSEtzIHSJ/INs7dWIrzyOG85M32cXkCLPwsBizx46JqU+VHmEXwUz1NDAPo/OrStP5WKmR3Wy1WPq57C60KgOs00DMknN7xW7zmKrHPtLO10VKb9T0wDBOHzYOhRH5NeYMPxThRbgD0hY1X+PuzvW1FO38AswEd7uqHDJH6DrfZvsmwsF3Q==
-X-Forefront-Antispam-Report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5128.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7416014)(921020)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
- =?utf-8?B?ZEJHaXk0K0RjVWFINDRxY1M4MFVCeVc1dnNScEhGZzVvV0tmYkswQkRwT1RE?=
- =?utf-8?B?alFxdW5XNzhaVFcxMmJRd1gwNWQzbXJXdFJWTkhtRWRrR0Vob3dOdC9kQnpu?=
- =?utf-8?B?b2dwUzFZck5wOGpsZjlBUVdNYStMaitOcDRYSVZPM0JOdU9yNTdPNSt6SHQ3?=
- =?utf-8?B?SVFZdlNxdHc1Rmk1YTVOYStyS0o1MGNhOFA1aGNraEVpTGZ5QTJqYzVoR0Z3?=
- =?utf-8?B?eW9KSEl6czFwMUU5RDY3R3ZEZjlBNVMxa0xMeXB0cnBMTXJjTVJhRk94UVNo?=
- =?utf-8?B?WStvaUNGS05Xd3ppSTVJcUhmZFBFdXB4MkxaZXZaL05scktFc21qTzBwWTBT?=
- =?utf-8?B?a05kWUprM0pRNVp0TWUxajNVa3dWL1F0QXYzVVQwSHVJemtjZk9IVUFndmND?=
- =?utf-8?B?UUJCSkgrMFpVZGRSUmRlaUV2SGNxM3dncGk4em1RdDRxWjlKL1pIRHFKZ0Q4?=
- =?utf-8?B?U0ZJeUREdE1zM0hhbC9LUDJ1MmN2T09ra0J1YUd2emlSSGlybS91cHJ4TUR1?=
- =?utf-8?B?SnAwV0VQVndVdkJKMmRFT2ZRbVMrcktmS0UwK2dod0tVbjF4MWNJQVNvYU42?=
- =?utf-8?B?VTdoYW5mdWE3d3JkaHJRT2JGQ3R3Q0w2SkVPRW5UN0RnamM1WGtXeGVZalJI?=
- =?utf-8?B?bDNUSTVSSHpyME4ySVh2VDFISzVDL1dudHFkQnY2MTZ0bGlUYVBkMTZHQ3Q5?=
- =?utf-8?B?cmRmMVEwT0lOcDVhL2VDYktwYnhKdHRNZ3p5RkRkNVh3eGFUd0FsUS9ScWZL?=
- =?utf-8?B?NldheXhJVTBLWVdRUFRaQ2JITUw0SlZmbXVQS2o3UTNxZjBvM0ZGTU1rMXFv?=
- =?utf-8?B?S0hsek45bUNvdVJFVUFYd3dEc3JtRGVFZ2Q3TXQ2TVpSa291OWtBNlRBbldS?=
- =?utf-8?B?NC9YUE04b21EZHV5UHp2WWVhSllTbDIwUHYzdWgrY2RYS1hrVEpndmtPYTNS?=
- =?utf-8?B?RjUrYXhzeXBidWd2WklLNXJ1MXJXdTgxZVYwbDd5ZDNQc3RERExRVlhHd2pC?=
- =?utf-8?B?WFR5VXV1YldLdGZUV3NwS2FpTy9wYXAzK3oxUHJqcThSS2lUTHl0N3J1RW1q?=
- =?utf-8?B?RW03SzNOaEZkYUFLRnUxdE1WTDRPRkFJVlpsTklpcWxJbGFZMmlzMENML1R3?=
- =?utf-8?B?N2VZcGdQaEtOaUJTVHRJNWRoUzdjd012WnNRQzY2SnJHQTZCSG54WDkwaEMy?=
- =?utf-8?B?V3EvOXFVdWFnYnU0czFjZnoyV0NzRTFKZmxHQ2Nlb0ViU1lJL2FOZXgwc3Zi?=
- =?utf-8?B?cDVNa3A3WWd1cGlVcXlFUE9NMGJNelhwbHZDWi9haEJIMEc1OU1pblpmSDdN?=
- =?utf-8?B?a2Qwc0F0ZkZSOFI1QUdvRFJucnVPVFpXU09KUnZtTHdXVlN2M0IwWnVjQjla?=
- =?utf-8?B?cDZWR0VJbkRCS29kaFhmMnNZcGdvK3pIRWpjK3didHlJNm5lMGZSTjJsZWFM?=
- =?utf-8?B?SEVvZVN4cHhlR21RUzVpTG03K2wwRVptUHQzdDR5Z3ZQdEhPRjRXNmppZ3Y5?=
- =?utf-8?B?OE95bEJMajRUSlJmNVBWdWc2dDJBZ0ZVOCtPM1p5YVN0RmU1OVR4aTQ4b3Mz?=
- =?utf-8?B?NjZOSjhXM1pvWUNEcE9LOW9SSlA3eEx0eE5GbTdSKzEwbEhWbW04VWorOFlF?=
- =?utf-8?B?UmxiOS9UMmFwMGJiTnh3RmtZWlJ3aHRrWWxYdkRodnN3emo5dXNHdVJFUFFT?=
- =?utf-8?B?NjFsVnRqZTRLc0x0RTZtSXhwSnY4QzF4SEhJbnVkQW5ScSsxZzJuT0wwbW9q?=
- =?utf-8?B?MjZudnV2dG9BSFhHMzJKeUhrTm1hZ2dHQ2Z4WUcwRExCOVVPWlNydnJ6N3A1?=
- =?utf-8?B?UmxENXA2N1BlL2RkbjlkRXQ2ZkxoTVNaZ3VUYVRrVWhIRDVqVTFkT0YyUyth?=
- =?utf-8?B?L0wzRkJqdk1wZ3lUeEFRRkI0dEF5VTZaSDFnbFJoa3MySEdsV1pSdno4RVJl?=
- =?utf-8?B?Y1NJUWhSNVh2OFNaQWpqdWdwT2xPQ1htTVJGNkQ3UWF2S0RUbUpmUCtzVEIw?=
- =?utf-8?B?NTRNbUlmc0FIWEJaUVJUWHlhY3dMMFE5bnlGWVNkOUp5YlJzcUYvMFV0ZVB4?=
- =?utf-8?B?SFBkVEZZUjRNYk51UGpNeHA4cmFaRnV6UWdCRSs2eUR1THBwMDFOZGozVXBr?=
- =?utf-8?B?OUZpS3NVLzh6V0tqWGRNdldSeGM5cVF6c2M2NFE2UjVDRVJVY0p3N09aYk5Q?=
- =?utf-8?B?M1dCYzlQSUszRVk1OG9GNC9VRWNEV2tKa3ZOMXhEdHlIWjdDcEdzNEVRS0JR?=
- =?utf-8?B?Q001SGREUVdXZXFnL0VvOGpUOVBPRlEzOHhMaVdQZjJkYUt6bTh0ZXpOdHY0?=
- =?utf-8?B?Szk3TVozZmVjYktnMzdUWUFPdHJyRTBBWDdJbE1MWGtmSmlqWWdaQT09?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	y48lDFGgfLNkYP38AweaPOcL3ElHRBGNwoUYpIHzLt9OK0R+6zBjM+u3AZv71eVcivr7jxyHGVMQ8ze7yNTCQfEZ4A0wcKOtD1z2aTRC8mLkSR3MPByaHAUwyo4AKOkCJGEzF7ImK6F+yWhPw37gCQIM48JqFQoJZ0l49fLGaQO59TUMz9D/VhKmyFxJ+43ISWLiQiuhBQ6sj5s1jo5IHN8OliRXblb8Rl1LEEcKzcNvTQ0P6icUcLtZQ7fguVC4fVtUdcb6A4itXZ8VTHYR9qLSnTijxlvTYm3hr6uiZuugKImfNbzO9ROrfkjODyk7CO/vpCm/hw3b0RZRB7zXVGaoskvNTP/zcaw/1iQ1tClXFSBhzc0jlwLvgZZLbSzVyynDPSBpEbgieCU7IH1NfGLRyB0yumxwmyK15qKaZ6Fzijd0n9Nz57PubAut1A1b5wR++AW0oHOpBodM+9qjBrp/Lix9b2fsu9wAOmo59gyt6q7oLXVleAp4I4eAYInW5lMhiuY2dF4KL9DqVHTRtKiYwXSoshWpaXdx41uJ1TXqU6vyrflouhQ6TOP3GVJKEdHCHNsSOSHyJQdworB3mmq8DITVAGOYmAa9e4Zgw1w=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3789d7d1-f5f3-4f38-4055-08de7570092b
-X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5128.namprd10.prod.outlook.com
+X-OriginatorOrg: microsoft.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2026 19:48:38.6126
+X-MS-Exchange-CrossTenant-AuthSource: DS3PR21MB5735.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 10aa41a7-f7be-4433-3bcc-08de757004fd
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Feb 2026 19:48:31.3468
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4oM0RLA5RsX6GKN1udkOcWkSQnRKZZkmyOj3tRErr361HcicgtNAArJ2Bs4n2AjEynhldC5PnsGo8pfVQHaNXw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PPF3D2127785
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-26_02,2026-02-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 adultscore=0 mlxscore=0
- phishscore=0 spamscore=0 malwarescore=0 mlxlogscore=999 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2602130000
- definitions=main-2602260181
-X-Proofpoint-ORIG-GUID: oD8tm_bjeRzgV8NAFwwGdmQGa1GgnlAJ
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI2MDE4MSBTYWx0ZWRfX5nPijMDVeKL0
- aWv4Pzj5DMN6/Qa4FTpjBp2rLK+4NTanOtr+Gg0HBef0YAdsZgrkUuh3XlwlcVWcEYNL8MiNr05
- kkO2FCWwvmOsCD0/6LU48+qezJiStyCu/EEyJPZyml9P7JYlWzBzXSkbWMDHClirnZh4Pgp0/JA
- +edt9h23UNxMjaUODzMRNbKxQ+NIDG8CVOVC0M0fTTsKG5lRONtLj6y7Mt6gMp+/yj+d6nyPD1a
- FGWMNXFhvzy2i+cxSt/npNoDDACHVfulReQwLxlWBje5P+x2BoOWzUOLJbR3k3WGi0iP6zKYLzw
- 5YVjIFrXRgMkt45JjFAM41SmkPpT2eKFEcYVXNK/rQB4vy3GygndpTZvZVBab3hWa67vDb5vUUO
- TJWh2OM3nhMwz3AXiH6pjmpYrvSj/M3ukReSJstWKJeQqSaMVzeY+mlem12aeUIaK2Cu/Wtbtwk
- sG6fhD3cxqDt7ykXAwOZJufAyLH1XXkIp4WiIpSg=
-X-Proofpoint-GUID: oD8tm_bjeRzgV8NAFwwGdmQGa1GgnlAJ
-X-Authority-Analysis: v=2.4 cv=D+xK6/Rj c=1 sm=1 tr=0 ts=69a0a3a6 b=1 cx=c_pps
- a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=HzLeVaNsDn8A:10 a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=VwQbUJbxAAAA:8
- a=yPCof4ZbAAAA:8 a=ffxj3DESZ4ORkukIaKkA:9 a=QEXdDO2ut3YA:10 cc=ntf
- awl=host:12262
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: sRg9lUm4QwVQb7+S4dzzHNI41+DxN2hKctUXIC5anuUwSL3+k1XrNwi+dP0dyEGcoZlLM76mt0PaTYS696mcsg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DSWPR21MB6966
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[oracle.com,reject];
-	R_DKIM_ALLOW(-0.20)[oracle.com:s=corp-2025-04-25,oracle.onmicrosoft.com:s=selector2-oracle-onmicrosoft-com];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[microsoft.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[microsoft.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261560-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:mid,oracle.com:dkim,oracle.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,oracle.onmicrosoft.com:dkim];
-	FREEMAIL_TO(0.00)[kernel.org,zeniv.linux.org.uk,suse.cz,goodmis.org,efficios.com,intel.com,infradead.org,mit.edu,linux.dev,suse.de,redhat.com,manguebit.org,dilger.ca,suse.com,brown.name,oracle.com,talpey.com,samba.org,gmail.com,microsoft.com,dubeyko.com,ionkov.net,codewreck.org,crudebyte.com,auristor.com,themaw.net,cs.cmu.edu,fluxnic.net,tyhicks.com,physik.fu-berlin.de,vivo.com,artax.karlin.mff.cuni.cz,nod.at,paragon-software.com,fasheh.com,evilplan.org,linux.alibaba.com,omnibond.com,szeredi.hu,alarsen.net,huawei.com,wdc.com,canonical.com,paul-moore.com,namei.org,hallyn.com,linux.ibm.com,schaufler-ca.com,amd.com,ffwll.ch,linaro.org,google.com,davemloft.net,arm.com,linux.intel.com,dev.tdt.de];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-261559-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[oracle.com:+,oracle.onmicrosoft.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[microsoft.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[chuck.lever@oracle.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[longli@microsoft.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[145];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[9]
-X-Rspamd-Queue-Id: 7E9621AEAAA
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[DS3PR21MB5735.namprd21.prod.outlook.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8DFF51AEBC5
 X-Rspamd-Action: no action
 
-On 2/26/26 10:55 AM, Jeff Layton wrote:
-> Update format strings from %ld/%lu to %lld/%llu for i_ino, which is
-> now a u64.
-> 
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> The GF stats periodic query is used as mechanism to monitor HWC health ch=
+eck.
+> If this HWC command times out, it is a strong indication that the device/=
+SoC is in a
+> faulty state and requires recovery.
+>=20
+> Today, when a timeout is detected, the driver marks hwc_timeout_occurred,
+> clears cached stats, and stops rescheduling the periodic work. However, t=
+he
+> device itself is left in the same failing state.
+>=20
+> Extend the timeout handling path to trigger the existing MANA VF recovery
+> service by queueing a GDMA_EQE_HWC_RESET_REQUEST work item.
+> This is expected to initiate the appropriate recovery flow by suspende re=
+sume
+> first and if it fails then trigger a bus rescan.
+>=20
+> This change is intentionally limited to HWC command timeouts and does not
+> trigger recovery for errors reported by the SoC as a normal command respo=
+nse.
+>=20
+> Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
 > ---
->  fs/nfsd/export.c    | 2 +-
->  fs/nfsd/nfs4state.c | 4 ++--
->  fs/nfsd/nfsfh.c     | 4 ++--
->  fs/nfsd/vfs.c       | 2 +-
->  4 files changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/fs/nfsd/export.c b/fs/nfsd/export.c
-> index 8fdbba7cad96443d92cc7fdeea6158c4cc681be1..334b63eb966e71e6af6adde61aa1123f01b4390b 100644
-> --- a/fs/nfsd/export.c
-> +++ b/fs/nfsd/export.c
-> @@ -1039,7 +1039,7 @@ exp_rootfh(struct net *net, struct auth_domain *clp, char *name,
->  	}
->  	inode = d_inode(path.dentry);
->  
-> -	dprintk("nfsd: exp_rootfh(%s [%p] %s:%s/%ld)\n",
-> +	dprintk("nfsd: exp_rootfh(%s [%p] %s:%s/%lld)\n",
->  		 name, path.dentry, clp->name,
->  		 inode->i_sb->s_id, inode->i_ino);
->  	exp = exp_parent(cd, clp, &path);
-> diff --git a/fs/nfsd/nfs4state.c b/fs/nfsd/nfs4state.c
-> index 6b9c399b89dfb71a52b9c97f0efe9a1dea0558a6..a569d89ac9123d66bb47e7d74c7c98610de21da2 100644
-> --- a/fs/nfsd/nfs4state.c
-> +++ b/fs/nfsd/nfs4state.c
-> @@ -1253,7 +1253,7 @@ static void nfsd4_finalize_deleg_timestamps(struct nfs4_delegation *dp, struct f
->  	if (ret) {
->  		struct inode *inode = file_inode(f);
->  
-> -		pr_notice_ratelimited("nfsd: Unable to update timestamps on inode %02x:%02x:%lu: %d\n",
-> +		pr_notice_ratelimited("nfsd: Unable to update timestamps on inode %02x:%02x:%llu: %d\n",
->  					MAJOR(inode->i_sb->s_dev),
->  					MINOR(inode->i_sb->s_dev),
->  					inode->i_ino, ret);
-> @@ -2888,7 +2888,7 @@ static void nfs4_show_superblock(struct seq_file *s, struct nfsd_file *f)
+>  .../net/ethernet/microsoft/mana/gdma_main.c   | 14 +++-------
+>  drivers/net/ethernet/microsoft/mana/mana_en.c | 28 ++++++++++++++++++-
+>  include/net/mana/gdma.h                       | 16 +++++++++--
+>  3 files changed, 45 insertions(+), 13 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> index 0055c231acf6..16c438d2aaa3 100644
+> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> @@ -490,15 +490,9 @@ static void mana_serv_reset(struct pci_dev *pdev)
+>  		dev_info(&pdev->dev, "MANA reset cycle completed\n");
+>=20
+>  out:
+> -	gc->in_service =3D false;
+> +	clear_bit(GC_IN_SERVICE, &gc->flags);
+>  }
+>=20
+> -struct mana_serv_work {
+> -	struct work_struct serv_work;
+> -	struct pci_dev *pdev;
+> -	enum gdma_eqe_type type;
+> -};
+> -
+>  static void mana_do_service(enum gdma_eqe_type type, struct pci_dev *pde=
+v)
+> {
+>  	switch (type) {
+> @@ -542,7 +536,7 @@ static void mana_recovery_delayed_func(struct
+> work_struct *w)
+>  	spin_unlock_irqrestore(&work->lock, flags);  }
+>=20
+> -static void mana_serv_func(struct work_struct *w)
+> +void mana_serv_func(struct work_struct *w)
 >  {
->  	struct inode *inode = file_inode(f->nf_file);
->  
-> -	seq_printf(s, "superblock: \"%02x:%02x:%ld\"",
-> +	seq_printf(s, "superblock: \"%02x:%02x:%llu\"",
->  					MAJOR(inode->i_sb->s_dev),
->  					 MINOR(inode->i_sb->s_dev),
->  					 inode->i_ino);
-> diff --git a/fs/nfsd/nfsfh.c b/fs/nfsd/nfsfh.c
-> index ed85dd43da18e6d4c4667ff14dc035f2eacff1d6..cfd143b41eb1fb53868f378d668905c1c7d5f868 100644
-> --- a/fs/nfsd/nfsfh.c
-> +++ b/fs/nfsd/nfsfh.c
-> @@ -601,9 +601,9 @@ fh_compose(struct svc_fh *fhp, struct svc_export *exp, struct dentry *dentry,
->  	struct inode * inode = d_inode(dentry);
->  	dev_t ex_dev = exp_sb(exp)->s_dev;
->  
-> -	dprintk("nfsd: fh_compose(exp %02x:%02x/%ld %pd2, ino=%ld)\n",
-> +	dprintk("nfsd: fh_compose(exp %02x:%02x/%lld %pd2, ino=%lld)\n",
->  		MAJOR(ex_dev), MINOR(ex_dev),
-> -		(long) d_inode(exp->ex_path.dentry)->i_ino,
-> +		(long long) d_inode(exp->ex_path.dentry)->i_ino,
->  		dentry,
->  		(inode ? inode->i_ino : 0));
->  
-> diff --git a/fs/nfsd/vfs.c b/fs/nfsd/vfs.c
-> index c884c3f34afb044ee5cacc962a04a97de2f7fd88..dde09f3734c2844a3fe0b6d18d596276a19aa2d1 100644
-> --- a/fs/nfsd/vfs.c
-> +++ b/fs/nfsd/vfs.c
-> @@ -1163,7 +1163,7 @@ nfsd_direct_read(struct svc_rqst *rqstp, struct svc_fh *fhp,
->  	} else if (unlikely(host_err == -EINVAL)) {
->  		struct inode *inode = d_inode(fhp->fh_dentry);
->  
-> -		pr_info_ratelimited("nfsd: Direct I/O alignment failure on %s/%ld\n",
-> +		pr_info_ratelimited("nfsd: Direct I/O alignment failure on %s/%lld\n",
->  				    inode->i_sb->s_id, inode->i_ino);
->  		host_err = -ESERVERFAULT;
+>  	struct mana_serv_work *mns_wk;
+>  	struct pci_dev *pdev;
+> @@ -624,7 +618,7 @@ static void mana_gd_process_eqe(struct gdma_queue
+> *eq)
+>  			break;
+>  		}
+>=20
+> -		if (gc->in_service) {
+> +		if (test_bit(GC_IN_SERVICE, &gc->flags)) {
+>  			dev_info(gc->dev, "Already in service\n");
+>  			break;
+>  		}
+> @@ -641,7 +635,7 @@ static void mana_gd_process_eqe(struct gdma_queue
+> *eq)
+>  		}
+>=20
+>  		dev_info(gc->dev, "Start MANA service type:%d\n", type);
+> -		gc->in_service =3D true;
+> +		set_bit(GC_IN_SERVICE, &gc->flags);
+>  		mns_wk->pdev =3D to_pci_dev(gc->dev);
+>  		mns_wk->type =3D type;
+>  		pci_dev_get(mns_wk->pdev);
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> index 91c418097284..8da574cf06f2 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> @@ -879,7 +879,7 @@ static void mana_tx_timeout(struct net_device *netdev=
+,
+> unsigned int txqueue)
+>  	struct gdma_context *gc =3D ac->gdma_dev->gdma_context;
+>=20
+>  	/* Already in service, hence tx queue reset is not required.*/
+> -	if (gc->in_service)
+> +	if (test_bit(GC_IN_SERVICE, &gc->flags))
+>  		return;
+>=20
+>  	/* Note: If there are pending queue reset work for this port(apc), @@ -
+> 3533,6 +3533,8 @@ static void mana_gf_stats_work_handler(struct work_stru=
+ct
+> *work)  {
+>  	struct mana_context *ac =3D
+>  		container_of(to_delayed_work(work), struct mana_context,
+> gf_stats_work);
+> +	struct gdma_context *gc =3D ac->gdma_dev->gdma_context;
+> +	struct mana_serv_work *mns_wk;
+>  	int err;
+>=20
+>  	err =3D mana_query_gf_stats(ac);
+> @@ -3540,6 +3542,30 @@ static void mana_gf_stats_work_handler(struct
+> work_struct *work)
+>  		/* HWC timeout detected - reset stats and stop rescheduling */
+>  		ac->hwc_timeout_occurred =3D true;
+>  		memset(&ac->hc_stats, 0, sizeof(ac->hc_stats));
+> +		dev_warn(gc->dev,
+> +			 "Gf stats wk handler: gf stats query timed out.\n");
+> +
+> +		/* As HWC timed out, indicating a faulty HW state and needs a
+> +		 * reset.
+> +		 */
+> +		if (!test_and_set_bit(GC_IN_SERVICE, &gc->flags)) {
+> +			if (!try_module_get(THIS_MODULE)) {
+> +				dev_info(gc->dev, "Module is unloading\n");
+> +				return;
+> +			}
+> +
+> +			mns_wk =3D kzalloc(sizeof(*mns_wk), GFP_ATOMIC);
+> +			if (!mns_wk) {
+> +				module_put(THIS_MODULE);
+
+Maybe it's not necessary: check if you want to call  clear_bit(GC_IN_SERVIC=
+E, &gc->flags) here?
+
+> +				return;
+> +			}
+> +
+> +			mns_wk->pdev =3D to_pci_dev(gc->dev);
+> +			mns_wk->type =3D GDMA_EQE_HWC_RESET_REQUEST;
+> +			pci_dev_get(mns_wk->pdev);
+> +			INIT_WORK(&mns_wk->serv_work, mana_serv_func);
+> +			schedule_work(&mns_wk->serv_work);
+> +		}
+>  		return;
 >  	}
-> 
+>  	schedule_delayed_work(&ac->gf_stats_work,
+> MANA_GF_STATS_PERIOD); diff --git a/include/net/mana/gdma.h
 
-Suggestion: Let's use the %llu format specifier consistently for
-inode->i_ino, which is unsigned.
-
-Reviewed-by: Chuck Lever <chuck.lever@oracle.com>
-
-
--- 
-Chuck Lever
 
