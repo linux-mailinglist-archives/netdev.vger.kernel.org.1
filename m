@@ -1,158 +1,192 @@
-Return-Path: <netdev+bounces-261296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261297-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oDMhOPspoGlrfwQAu9opvQ
-	(envelope-from <netdev+bounces-261296-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:09:47 +0100
+	id CPwBCYsqoGlrfwQAu9opvQ
+	(envelope-from <netdev+bounces-261297-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:12:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 078611A4DA7
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:09:46 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 432531A4E1D
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:12:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 67A2A3008D0A
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 11:09:44 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 93DF830074E2
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 11:11:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37DA3338599;
-	Thu, 26 Feb 2026 11:09:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0535337118;
+	Thu, 26 Feb 2026 11:11:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lMwXjfJR"
+	dkim=pass (2048-bit key) header.d=gehealthcare.com header.i=@gehealthcare.com header.b="TP0QA4jg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013050.outbound.protection.outlook.com [40.93.201.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1470C336EF7;
-	Thu, 26 Feb 2026 11:09:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772104183; cv=none; b=QkF2MCbZPyoRMnwKTlze1HIS34WAiu93qhIcvjFQAmQOeQ0+BJtIJgcKB4Fjt9OkaZAHfCYZcPXhIcurxR1WdE6YJeKO0hbguWEFjj17VyLN9uuGwaBoUZ0/Z3YrFgkfx1/zHzFHKrXilEn+j6ZrzvX1AN30zOt+UVxT0g8DBu4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772104183; c=relaxed/simple;
-	bh=Kc3y4vF5C5ht3a1XMvsgWskMHYvLykSYzITc23T1NDk=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81CEB3370FE;
+	Thu, 26 Feb 2026 11:11:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772104312; cv=fail; b=d3qHlwgiGjOCLrV3M0epv8Bwz93Ki/dgeij5ifyCfe+x6XNBaQaXkerWBLO0z4E1Fm/xlufwrnf6aXYDaEWUDj1WbqBUCQQYtZm0hJVnhnB3uH/+OyvQ282pEitsNWS/5Lpti9X5c279mL/WO3tKpGrXTa9LyZyl97kx4vbQc8A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772104312; c=relaxed/simple;
+	bh=8fYIy443oN4XJ6SNmXS1Rq72lNZtH8WfL+jsoXLtU/8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m3ogPpjlAgkNTrM4SGDdteBmafvXXC4T4DLMUwRRnlXti99S5M7FcDZmGVXx3jJa8Fww6NESlIhEZRQg7PT4prv07HA//p/CkzSUvk/OvU9mJYHlXfrlcfEYrRmfKaKWiRuS4/SoOWJ7ZNFmNt8ipjLpHTMmStuJquhj6ZWRMCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lMwXjfJR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CE57C116C6;
-	Thu, 26 Feb 2026 11:09:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772104182;
-	bh=Kc3y4vF5C5ht3a1XMvsgWskMHYvLykSYzITc23T1NDk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lMwXjfJRiBEVT78l5CXkOIawXNBob9Tdyzc3m9YFg/yr5NW3jo4xUaZtWPHv/0yac
-	 /Hly1F07PxVhWGDQNVpxeu2kGBaCqUkT2niVyH2Y51jDtlazKYy4ZzF0zT64lhSV5o
-	 LqftKpjqtq5SNHLyEZNtnrjab3+k7UHOZzkEAVCuK6S/GvLCFQcQA2x2unfm1lRdd+
-	 3dnowboT25KCF+kAVqUMa4lMBCn4RSwnSPU6Qw/z3VOAKkQZVJulE82qq1AlLjkWcv
-	 UStRFoipY7jmgC/3t5JHneFEUpm8fXDGBS6hTpKTLLiA2ZFH/pDkKky4e68MHVo1Z4
-	 9KfmULnHylmTw==
-Date: Thu, 26 Feb 2026 11:09:35 +0000
-From: Conor Dooley <conor@kernel.org>
-To: netdev@vger.kernel.org
-Cc: Conor Dooley <conor.dooley@microchip.com>,
-	Valentina.FernandezAlanis@microchip.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Daire McNamara <daire.mcnamara@microchip.com>,
-	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Samuel Holland <samuel.holland@sifive.com>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	Neil Armstrong <narmstrong@baylibre.com>,
-	Dave Stevenson <dave.stevenson@raspberrypi.com>,
-	Sean Anderson <sean.anderson@linux.dev>,
-	Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
-	Abin Joseph <abin.joseph@amd.com>,
-	=?iso-8859-1?Q?Th=E9o?= Lebrun <theo.lebrun@bootlin.com>
-Subject: Re: [PATCH net-next v2 1/8] riscv: dts: microchip: add tsu clock to
- macb on mpfs
-Message-ID: <20260226-untimely-overcoat-a335a7016adc@spud>
-References: <20260226-snowshoe-amusable-6716d4ddea11@spud>
- <20260226-briskly-severity-69c2988e8dc8@spud>
+	 Content-Type:Content-Disposition:In-Reply-To; b=jqllb3fSr1ZeFjV4nEqV977pNIH4s5o6SRz10mQSAJMdWVmMSrUcONCi35LexqlmUSbEX66HfAYDNQMJOoaqp/2OTtxwqrq0J37ZW0U7DOrCqbZLy/oDXCRfl8pAKC9+UQjOPzRSlBPARkc2IVKrum8seKH1zrjDtUvJI/XbFUg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gehealthcare.com; spf=pass smtp.mailfrom=gehealthcare.com; dkim=pass (2048-bit key) header.d=gehealthcare.com header.i=@gehealthcare.com header.b=TP0QA4jg; arc=fail smtp.client-ip=40.93.201.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gehealthcare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gehealthcare.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=NC9IuP0KRQR9be4yRlESvBExOumsJ43eYdAMMx2++h7iFcxtNxbgXRM3AiB2aIbJhe6rnMV5dZe5fWO9ys2FvW5HGeJsQBR6VkoyRBQSCEECyvTggpo1X3/MJhO54ViQsiphgePaB5aSJ0XTnC+xDFjkQsHmBXQHqtQ0oZFcQB3uc83h67dz+eUZqX0VdfmwNPi4gEGlc32RFPXS2gwC3IXXJgv4cn0ChbquEaMNsC0kqu3UzquNyy/xvuqEj+PdbMmtjd6JmGkwqHHLCHWXQXbzaY7VTqnmBx4CRNZKrG1XhNA8dZx8CmsnigZzsT2mLc89K4CbG/VInrtmVIY7Gg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ka7OgTHLSg5cQrQlTEmEn50QJYXRVG/PEkuBEQOKjE0=;
+ b=BwpFegex2P7TGe2FYsnEzbQudX2RNoPU0VaFNjq7yXTXTsfyZCXtO/hc5rOc+XXA8xb6Jdbxk/rxJoGrpOEUfC4aXCRLIKnDSL9T15pupOWzO7e4inMB+kFOczcyY1ZUtoQhht2Jq5woa7PUjv0w8IH1fVohG6X2fijR/YWmLWNNa1lI7+yj4dbPpKPi1jaj/3fdP47z7pfSeK6aAXaYLBufkZfewWDMn7D69jRPWfWXfgviEgGxNraUwklOtuIatndR6uyT4MrX5iGLUZkRmWuzLByQsJtuW/oCW4GHPnjIpEcnPobGcicC9+wKx8pdNyq90C/zmQj2GwH5crzHYw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
+ 165.85.157.49) smtp.rcpttodomain=vger.kernel.org
+ smtp.mailfrom=gehealthcare.com; dmarc=fail (p=quarantine sp=quarantine
+ pct=100) action=quarantine header.from=gehealthcare.com; dkim=none (message
+ not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gehealthcare.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ka7OgTHLSg5cQrQlTEmEn50QJYXRVG/PEkuBEQOKjE0=;
+ b=TP0QA4jgDmZ/6Dm9ZGUSIoevoqdmBvCzRD1ZKyQnsi72ZNt+8diMWg6CvVveJlh+GsCV+nNp6EUs6Nwd+bqEuWJNtrhldnBjQ6NxrM5W60BWraD0i0TOfcbrj7ZQpm8fbFxlg/4uct7uU9cL76aq537/bo9UB91I5L4TMnih+xSoBQwVhrfzuHZ6PVBxU4SXt5eWxBiAtfuobyNSPweBIBt/tl98gCabaR70ThBBJ/Rdw+Rzj1PVXtz/Cp/XAyJU1OA32Z+TzSU799KQpLjXfvho/FvAyaZiXm3jbkJRGfMCy4UufZxwZYO7ActGVVT8HNp5rRN5CaVYc9ycg38E2Q==
+Received: from BN0PR04CA0164.namprd04.prod.outlook.com (2603:10b6:408:eb::19)
+ by DS7PR22MB3670.namprd22.prod.outlook.com (2603:10b6:8:79::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.14; Thu, 26 Feb
+ 2026 11:11:48 +0000
+Received: from BN2PEPF000044A8.namprd04.prod.outlook.com
+ (2603:10b6:408:eb:cafe::2a) by BN0PR04CA0164.outlook.office365.com
+ (2603:10b6:408:eb::19) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.25 via Frontend Transport; Thu,
+ 26 Feb 2026 11:11:47 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 165.85.157.49)
+ smtp.mailfrom=gehealthcare.com; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=quarantine header.from=gehealthcare.com;
+Received-SPF: Fail (protection.outlook.com: domain of gehealthcare.com does
+ not designate 165.85.157.49 as permitted sender)
+ receiver=protection.outlook.com; client-ip=165.85.157.49;
+ helo=mkerelay1.compute.ge-healthcare.net;
+Received: from mkerelay1.compute.ge-healthcare.net (165.85.157.49) by
+ BN2PEPF000044A8.mail.protection.outlook.com (10.167.243.102) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9632.12 via Frontend Transport; Thu, 26 Feb 2026 11:11:47 +0000
+Received: from zeus (zoo13.fihel.lab.ge-healthcare.net [10.168.174.111])
+	by builder1.fihel.lab.ge-healthcare.net (Postfix) with SMTP id 4ECFAE8F2D;
+	Thu, 26 Feb 2026 13:11:45 +0200 (EET)
+Date: Thu, 26 Feb 2026 13:11:44 +0200
+From: Ian Ray <ian.ray@gehealthcare.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Samuel Ortiz <sameo@linux.intel.com>,
+	=?utf-8?Q?Cl=C3=A9ment?= Perrochaud <clement.perrochaud@nxp.com>,
+	stable@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V2] nfc: nxp-nci: allow GPIOs to sleep
+Message-ID: <aaAqcFSxarIKYlEp@zeus>
+References: <20260223070533.106625-1-ian.ray@gehealthcare.com>
+ <d60bc526-fb21-46c6-916e-b063c959259e@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="HXcvzNaRR2Bb/QYt"
-Content-Disposition: inline
-In-Reply-To: <20260226-briskly-severity-69c2988e8dc8@spud>
-X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	MAILLIST(-0.15)[generic];
-	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261296-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,tuxon.dev,gmail.com,sifive.com,vger.kernel.org,lists.infradead.org,baylibre.com,raspberrypi.com,linux.dev,amd.com,bootlin.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,microchip.com:email]
-X-Rspamd-Queue-Id: 078611A4DA7
-X-Rspamd-Action: no action
-
-
---HXcvzNaRR2Bb/QYt
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <d60bc526-fb21-46c6-916e-b063c959259e@redhat.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN2PEPF000044A8:EE_|DS7PR22MB3670:EE_
+X-MS-Office365-Filtering-Correlation-Id: 87661400-d346-4f27-85ff-08de7527d565
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	IqglH7Dz6C/8Aeax5mFzyHx4mYI/TSDC+M4k59/4oKD6Yy3qpJ8nE4GaKgYE1cYgiJNKd5RMAWdxsJLzCTGhdO/YVjlNpgO7NsN4kBTq1SRKkSLVclbL1W73MNNeUZ7c+gvSy6FuDiccEA6UiTOqYij4RC9Rr0NGGJ9lJKGRVP31RQPvKD658S+zpW3f3fJmSuxNqx53ghIIO1sof6SfdHUCa8ouRUKUhU8td1ZNdgcpU8Qt4ZryGlmTF9tt1tAh7SJsoSza5TvdxY/ZA7ufmOTViO7aCBffXyrZaty7mSLJTxtVSXaBMEoLf+Z4VtqX7aBUB3+WIJrAOM/EjDT12+9YIU0dnyFtJ/x9Lhj9INLTsi6nzHka5ZIH2DARxJcGCnSTr2OwlqnN22CTxMAVNyWzjELFXeMsL/LqFo0nGwZDEeZR+7qtauyP4q1FoNGrWh/mm5rTif5XKZP90zmCxwKI/LfjJLfghLqYPaRhWf1GXQwL60YUWHAUsF3uf8fIjrAKhgmtN7MxLwTm7BW1U0HHVADEEiPxh/G4y1c+yvkqSKgB2y9XYFjgxvJKGpj0uljvJrchQoyxXHxYWGqes1hLjciDO0974Wq0B524BLQMBZmw/+xMFIBhr4rXLrWb4wcDMT35U+ZnER/iuOAJKeXW37R5U3zD6NWWRKimowdR2mFLLce5vGi6Ujgb0ETir8yWr5I6wK1WGKyYKPkvuuuzu6dyE8genXmceGJNkJpSfh3B+RiIiRDdDrDPD08RSWjC2VQqOcdko7eBWfpN4gvpURWzLPmEaWLPF+Pbk9bK5zcac3de1kM9vZFHZPpq8sxQwZMkykE1vrXdzu4gCQ==
+X-Forefront-Antispam-Report:
+	CIP:165.85.157.49;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mkerelay1.compute.ge-healthcare.net;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	MKCBrSpfzFbk6xnlnolcH42bEopf1VJjU+bjKFr4L2o+5bbbsAEuD8QR68/HoTT+DPKK3xozz8O49CYc6ejXo5WpispEEpSOjffiNJrJAae8ZXYno3K2C62dF4bWmgCc4jgxdt5D/73X0tGgXOgakPGmQP8Yj8h5rGiJUfswD7F8w4hERl1STXiuU4cCcuvzUlxssfSr/DNjdYNuqgxiBcgHULhdFkzz9ujHgG18F2EmUJp8Ipar0WYrC9fqkw4xuECybVa61XaHOfgN4d9bEdhKYklOV/vD9eSTDl2edV/D96XT9WOJeUb2WxySsk/azCK/AIwXWpelAE76jPgjdp235uQHx405PkJdYsJJqboubMGtpL4HXRCviA2N/YEGmg/69dxwcNJ3cKUyA+OZRL9gNBkj+kzptkInuJk4D51ap+dDzVUA5ITCrhRM+p3Q
+X-OriginatorOrg: gehealthcare.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2026 11:11:47.4448
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 87661400-d346-4f27-85ff-08de7527d565
+X-MS-Exchange-CrossTenant-Id: 9a309606-d6ec-4188-a28a-298812b4bbbf
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=9a309606-d6ec-4188-a28a-298812b4bbbf;Ip=[165.85.157.49];Helo=[mkerelay1.compute.ge-healthcare.net]
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: TreatMessagesAsInternal-BN2PEPF000044A8.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR22MB3670
+X-Rspamd-Server: lfdr
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gehealthcare.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[gehealthcare.com:s=selector1];
+	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
+	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261297-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,gehealthcare.com:email,gehealthcare.com:dkim];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ian.ray@gehealthcare.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gehealthcare.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 432531A4E1D
+X-Rspamd-Action: no action
 
-On Thu, Feb 26, 2026 at 11:03:16AM +0000, Conor Dooley wrote:
-> From: Conor Dooley <conor.dooley@microchip.com>
->=20
-> In increment mode, the tsu clock for the macb is provided separately to
-> the pck, usually the same clock as the reference to the rtc provided by
-> an off-chip oscillator. pclk is 150 MHz typically, and the reference is
-> either 100 MHz or 125 MHz, so having the tsu clock is required for
-> correct rate selection.
->=20
-> Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
-> ---
->  arch/riscv/boot/dts/microchip/Makefile.orig | 26 +++++++++++++++++++++
+On Tue, Feb 24, 2026 at 01:31:16PM +0100, Paolo Abeni wrote:
+> On 2/23/26 8:05 AM, Ian Ray wrote:
+> > Allow the firmware and enable GPIOs to sleep.
+> >
+> > This fixes a `WARN_ON' and allows the driver to operate GPIOs which are
+> > connected to I2C GPIO expanders.
+> >
+> > -- >8 --
+> > kernel: WARNING: CPU: 3 PID: 2636 at drivers/gpio/gpiolib.c:3880 gpiod_set_value+0x88/0x98
+> > -- >8 --
+> >
+> > Fixes: 6be88670fc59 ("NFC: nxp-nci_i2c: Add I2C support to NXP NCI driver")
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Ian Ray <ian.ray@gehealthcare.com>
+> 
+> When resubmitting with the correct fixes tag, please additionally
+> include the target tree in the subj prefix (in this case 'net').
 
-Of course I noticed this only after sending, but this patch isn't for
-net anyway so it's kinda moot and I could fix it myself on application
-or in the likely v3.
+Is that prefix correct?  At least recent changes use the "nfc" prefix
+that I used in the subject.
 
---HXcvzNaRR2Bb/QYt
-Content-Type: application/pgp-signature; name="signature.asc"
+$ git log --oneline drivers/nfc/ | head
+57be33f85e36 nfc: nxp-nci: remove interrupt trigger type
+f40ddcc0c0ca Revert "nfc/nci: Add the inconsistency check between the input data length and count"
+885bebac9909 nfc: pn533: Fix error code in pn533_acr122_poweron_rdr()
+7cf3ac8a9c0a NFC: mei_phy: fix kernel-doc warnings
+661bfb4699f8 nfc: s3fwrn5: Use SHA-1 library instead of crypto_shash
+c6f68f69416d nfc: pn533: Delete an unnecessary check
+5d69351820ea NFC: trf7970a: Create device-tree parameter for RX gain reduction
+41cb08555c41 treewide, timers: Rename from_timer() to timer_container_of()
 
------BEGIN PGP SIGNATURE-----
+> 
+> Thanks,
+> 
+> Paolo
+> 
 
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaaAp7wAKCRB4tDGHoIJi
-0uBQAP0Sp42MPDxWXYk+ByvyugQefv2Lt1layvBUVWDkCGvzLwD6A8UBJsHEysQT
-QWWCpEpvz0l96P/zT0bSG3dWzXFJhQI=
-=Mz+3
------END PGP SIGNATURE-----
-
---HXcvzNaRR2Bb/QYt--
+Thanks,
+Ian
 
