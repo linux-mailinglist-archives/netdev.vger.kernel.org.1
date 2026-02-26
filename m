@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-261217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261219-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WBJQJ6f+n2n3fAQAu9opvQ
-	(envelope-from <netdev+bounces-261217-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:04:55 +0100
+	id QI6pAL3+n2n3fAQAu9opvQ
+	(envelope-from <netdev+bounces-261219-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:05:17 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DB911A23E8
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:04:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AC1601A2405
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:05:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 512773000E0D
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 08:01:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 19DE930B6CBF
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 08:01:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A98C1392834;
-	Thu, 26 Feb 2026 08:01:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E5E7392C59;
+	Thu, 26 Feb 2026 08:01:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ICaLfeCv"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="mJrR6gj2"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010061.outbound.protection.outlook.com [52.101.193.61])
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010042.outbound.protection.outlook.com [52.101.56.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8E8392809;
-	Thu, 26 Feb 2026 08:01:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3E2392C22;
+	Thu, 26 Feb 2026 08:01:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.42
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772092901; cv=fail; b=FKJ5dakXPlUezFMobqSJnpaxP+loVuAqLos0oqzbRvSfjVwKaE0c2iwdmCPpPzdMgxkCJ6UWkt/xNXkc8J7SGIXqk7eWHhrXKGej+Kx1ViLl7fJOTbvkkM/T9ma9fcrqwixQvAWm518gFEcJkeZ//sl3wNgNksFTMrnTOwB7f3A=
+	t=1772092911; cv=fail; b=b6FTf0yYgf9C0TF+0Eet3pjcIORyyyAUf5GU8ZrpW1nII5ZeGDOfn4RnyiNmLvuG22iuXvtYbahBWBHmGGunCB1448xZyPhLKeSdq8YoOdrTIp1AfLVWf+i9Db/VmGp9YQaorU31qQjihBhQHZ+Vq99W43fWKQcGtK603Xfy478=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772092901; c=relaxed/simple;
-	bh=z+57HIIsA55vrVIFk571rvGqxBYClTO5F6JE9LfEPyU=;
+	s=arc-20240116; t=1772092911; c=relaxed/simple;
+	bh=towvVODpATeg5h2gO3uaPIyJNdUnPH67fDZ3lSIh9d4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=WaAMrh6pPA6b4H8vt0xVOAkAUmpKoL2Q0rwUE3TVaRHZfPOXILAaMQxF3LFn3s7QnEFFANLPI60y6p0uDYOpXmU7e4ohT0RtwEwAVbLXcb/b50sez48GBNAwNlVF6Se0YXQgu9FZShyVmZ57YLnxxxxwyReIsteL2KNeheAX4t0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ICaLfeCv; arc=fail smtp.client-ip=52.101.193.61
+	 Content-Type:MIME-Version; b=lc7Emc9jJ031sel6dz08SMipF5jJxJfkdOCCcy7yc/vxYbWCjVxnkWXuL82VgSGurkYHSa9cUICEgRD3mlw7N5TMWwtGTMVPyj4e6TRKCs4uy+2d34FV5CGWeVdOd36TNLYsRT9llB6+C+6iRANinl3UMuQv/woPVPdzwKmwkkA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=mJrR6gj2; arc=fail smtp.client-ip=52.101.56.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dIh+LHbSOp1XeJ4Axh/BwrfNzNQmotwD70D73XXutJWkUuC7QQ+kymTp/cgeG0iYpDBWFGgpcfXitEhH85hscH1ae+TI+f3TeLWM6YJcybo8kNRBXMMhybLfnu8dJgTU1c15atKR4fmP4HdbWnGWlV0gjc7JJgGlMe7hliXkYLj/BKaxXB48UZPlhvFEfV/pBGhUiifdFxdDm6/pXgmrSRNODT1B50LvIdu8YJB0grpfnwjh47VGPSoElDN9ijlVHjJ7dIe8PQwUMx9nNJKcpdyV+4ByspAp/osttYOUUwI2Z9b3mQCHyc699lx3PO8ULWaW+vl762GHWzR7krdXrQ==
+ b=oXnhNhivHHb4JEwi/uWlJeS2rljDinK7X+uJpcn9gvrbkUXqILUo9FiC+m/UVNZ4oxc+REgXuFRa663uTM8hHsds5qk1J0IHFvPKWYO2kSxHkJvEvXKzj8ObXtyUe2ZC5D/VqmxDFQLlbXCS3yv2jwGBf43tYWH9eKMqh07QqnjFcBxLi/mtHj2Lx6fiebzuVRDkB/pvwZKo9zFVH8WoCSj1N9N/iYKX0wjK2uifS83X5RI0bl4u079Wvld/aqayNQkBeGb25F89hJf8Vqy+djNeoemFxJeZ4YP9mRYbTMGMC7WY1b42i2slzTlCZXkYMM7nTTyInI1nPj+7HeekKA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=69CUdYqDgatz7b0lOQQi9ZtWllMfKO23ISGNNZLRGmU=;
- b=VoQ3vMNroLMYq2r7kVH2xt5Y2E4EQPd00o/gQkBZgshx/Lvcs74KlbcScUcOidQQnBR/jqqU12qdWI0TSzQyzBbR+eYeZgeIJCfRDsPgef+bwjWWcBafQzEI+CQmXhJRmOS00qXaSF6/bI6oz8QPmGivdqhISpDWxws9zFDXnp0E4eZc1FyL1BEolTp+tvQhP6b6IClyVHA8S/ueiLAEbuHugox+t8aTwmQRIaNm40jFQgRVGdw15NQXY3giuupt5+QcbN83tdu7jQjLFoWYhcfVQOc/CRyc8oG2s+0vaxewWvJhdtnd0F3PVOb5UUNj90sUtGlfINukM2ufGi8Ozg==
+ bh=q2mHPJ3nuU6QWzHRKECaeijrMiqdYNfVaCq2YGUNkMY=;
+ b=lWzzTn7uAqbRSPImyXsIx/gApkPpZhQV0e+adaVwwNCpSk736T7zQFC7HQvPWfEclUmxrWLymJveIODOzTOGocoKRJcbVWGiROSFc15AYs6AHNKcwfM7jjCLnPhM2oZpx65OAHDXVFJkA9OM2xrD8cMp5i9uWCpnsp6ROsgFC6Ibv+oaWOPFeZPwd323Hq2zwQw/6mvsM2H3bujNaoGT9RrZkvivMBE9wKJjNcv9BlH+FijUFYXOwiloqOYuDNBb3eQuarevDVFpbI0koBkx+I0n3c4SL//PP0B5dNjrkIed5YYrVd2UomNwVirA3KcI2ZU1EwheUnMTXHa0quTGrA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=69CUdYqDgatz7b0lOQQi9ZtWllMfKO23ISGNNZLRGmU=;
- b=ICaLfeCvSFumgjuYGysj7RCj0Y9Dr0GyaJPWx4Bfb4ThYi+yjkROv6y0bEOVNl+yc/9B+839Lpq4lfRGzq7FcK/uHkDiBt00omJHiNq1ywEMf7Gzhi3xk5HcYNTgfU/qgrBTOF2vbd7OwXjQxK/I7AIwHDgnCUN6uwNBv1oC4QZ3GvOublJlhSeFfKO8akig98JqrNmo4A4g3BA2m/bijsXLGwakI71N5wn45pqDrACgz9QdxO8TA7g5+wXCtzyZ3oD6anrlFmqTRYiap7fkkBJ+ViyZ1aQje8cGolURlMWMYy+Fy4hLRxD3vgpsZ2tuGBrD1H8mMnlrZSMcy7knSA==
+ bh=q2mHPJ3nuU6QWzHRKECaeijrMiqdYNfVaCq2YGUNkMY=;
+ b=mJrR6gj2iORKMy7tvpVV0fykNeNPsGkZctl5BVAq0WhCQ51eUD3XA04PpcbOc7jGAlK5zuOPlV1F34NWcqMrp8dPzIOa1qSXX649bB8nQkCHfXaO6fpKiKVYiW4K3HAdWA0ve374BRZNzCnbh543EJOgJtoAnC/W44G2JTGq2M+NhHBhdqtinSZCqNi+kwmZ0TJ8PLd4atVSaj7SAxWj98oGU4e4lgIEYud4gs0ov+KXdUGWOPfNZ7dIAbXndgIJUtp44gI42cu6Zz6Jcub2cqA+cjwb4qQ/h65P3cBfTtEvXqNnweUoIGxrNri8zbNOv8X7f2gKjA8QEEtpL6vu1g==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from DS0PR12MB7900.namprd12.prod.outlook.com (2603:10b6:8:14e::10)
  by SJ1PR12MB6362.namprd12.prod.outlook.com (2603:10b6:a03:454::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.22; Thu, 26 Feb
- 2026 08:01:37 +0000
+ 2026 08:01:47 +0000
 Received: from DS0PR12MB7900.namprd12.prod.outlook.com
  ([fe80::3033:67fc:3646:c62f]) by DS0PR12MB7900.namprd12.prod.outlook.com
  ([fe80::3033:67fc:3646:c62f%5]) with mapi id 15.20.9632.010; Thu, 26 Feb 2026
- 08:01:37 +0000
+ 08:01:47 +0000
 From: Ido Schimmel <idosch@nvidia.com>
 To: netdev@vger.kernel.org,
 	bpf@vger.kernel.org
@@ -77,16 +77,16 @@ Cc: davem@davemloft.net,
 	john.fastabend@gmail.com,
 	sdf@fomichev.me,
 	Ido Schimmel <idosch@nvidia.com>
-Subject: [RFC PATCH bpf-next 6/9] bpf: fib_lookup: Honor oif in IPv6 output route lookups
-Date: Thu, 26 Feb 2026 10:00:00 +0200
-Message-ID: <20260226080003.524935-7-idosch@nvidia.com>
+Subject: [RFC PATCH bpf-next 7/9] selftests/bpf: fib_lookup: Add IPv6 output route tests
+Date: Thu, 26 Feb 2026 10:00:01 +0200
+Message-ID: <20260226080003.524935-8-idosch@nvidia.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260226080003.524935-1-idosch@nvidia.com>
 References: <20260226080003.524935-1-idosch@nvidia.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: FR0P281CA0162.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:b3::9) To DS0PR12MB7900.namprd12.prod.outlook.com
+X-ClientProxiedBy: FR0P281CA0164.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:b3::6) To DS0PR12MB7900.namprd12.prod.outlook.com
  (2603:10b6:8:14e::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -96,56 +96,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DS0PR12MB7900:EE_|SJ1PR12MB6362:EE_
-X-MS-Office365-Filtering-Correlation-Id: 19b84b6c-6e1e-43a3-0ee7-08de750d4428
+X-MS-Office365-Filtering-Correlation-Id: 8a02df10-5fba-4231-3b92-08de750d4a01
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	X+ZzqKJvYMnqbLCVsqlipWfn83NHlsaYuwqJlThW8GaAH7Cd+KJuyn99uRDjL31JCqbhg47KFl7lYrrJddFrzjQXQyXfCTjejnmHqdrZbvtJCFXa+hjnvBQW69ulm0h67HkFfDfeqTNFH1K6vw55vZi60yaV/8QG0FGxdlSdTXMBcex/H6XJVJ9+UpW0j6YWTXZF8QjuRdyhhF0l/5s6CgbzElPTxurQ85RJPNmLfd2GdbmyQ8aPWkPu9lNG7VEc9Mb+xmm7r30ah8FqOALPrHaLY+30MmdPjlHWE+VN/CoOfu7BsED9JaWd+mdb+lf43rzXZ7k9oBs3L2jlFbxeA3TVuaR5HUoW5/CwVYai9sb/BkA+joA8eOtjiaF7b4T2FruXO8CYnnFrXqNfFSk6ADjcf5gD40fnySddiW7VjxeU40hRTrZk94yRXeJ/ZjvphEbmZH/JswRQydzd848zHwawyBcMwvxP2wZD/YSImbIuHeCGHBHGZj2zP0FP4dnEfyq7umPs6MsQ300GOoIZ5apobZYi5/S1YveTAP3+2QmeZUKdMVAKiMAtezuAeh9+L0ZxAHTmV9aNmG7HLcwAwWQhzaB9SxJg5taFrbZbwl5akG/9XI2RJ9V75y1sFZ7M7RLA0cEHF5x6bk3oMimmst9NP1NZSN4pGHGyhUM2t7PE3xKhDCWRQSob/eqrxNzCFAux4v/jTWzjrVwTwRF75iBvUCUrA1EBtyBDtFinPIo=
+	AwQGV1ZXhE9KtqPf/v7mzcPu1HcvfhSqMoQUsf0NQAO3R0HAOG7LQL5K9JnwBG8m9oUM/0s9O3rAKb1N2jaMNmJ7/DzSf4OSLjLxAHI83fSBplTDr3+dijMtug9Fx/otdjVrI+4z8PXvhF0kN7eKseUwN82zcz5G4QSFluYhQIDE9/OcV5iereiPQ0x69JEKHstSFad08V3jmNu8Cg5l/lcp8s2VIAiZHa83FOyN7lJ4UOJseSydQ1X/07ZBx7bKsd/jJblrWywK4AXFQ4s3SWJw2npFTAg8xRLb6PKutH0mnUOTzjlOsqV6HgIvvA3Ba5yOByKVBzSLvFswV2HN1y8svzMgyoazqQ/3G3bndAh5OVhGPEu9FvZHPqk7V1a7Py0SxzKvtgnIjK0jm/fBBlPYgG1HBRX2XZhWCBGv0vBaztvNJkB+FMiFQBI12waoaZ3wlMv6cMXKI5w2oezOyq+qi0xWQgs9nr1OhWQmXdGcpfgt7X2wym6dpkyGk+BJqYTCCuo/5lNYU4dm4xl740ZSaawap+VqkWpEAsOxCGMe0DxmsPPUkTaDw1aJpiQSw1msaoM27eWbf7sAjp74C9nx/rJKyXHdFXHh/tvg1jU7rd0kMHOSt71eM8oCb1Ter3lptVc4w41pAKpyFLLtj9vZ090Ak7iySG/Ngpyq5ZktbEMvSiKW6vaczG/nF3xDn0HQwLgT6mfsups4kpR8x9uc7SdmJxwfjcqBYrLrcM4=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB7900.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Kai5FpoYyZXK5miw2XcniOCaQ2dZlu7Q52rs9d7P6iHKEYV+LvERGvSB4GsC?=
- =?us-ascii?Q?UVeM6jjJTsD2z5YRtC5Tan9LIZ+8K1XTtmTC65Ou/wzZtUdZZ1haHSPkVChr?=
- =?us-ascii?Q?7w0PPcUebtEZG+F1m8WIm+rbM8yaNOpmP8RDav0kSi+2tHKsmpt9r54PWRkp?=
- =?us-ascii?Q?zPpk80rIVIg+gaoYy10THcj0O6iYxc/8AOMdeWLUS5Y7a3DrT+VIznyU3SfM?=
- =?us-ascii?Q?lKSSEE+fg/ymXuOpvHKYmoDy12gORX4JjCJTA//a3N7KAm1um08KBgEnXjJP?=
- =?us-ascii?Q?BBciH0K1Vzo/aKeLaeSCdgf/BZOZPy/Iq+GQCOi7kXbB0mPOhHluwmJTdwwZ?=
- =?us-ascii?Q?6frpEwZu1u2EvO6djg8A0ycKHrEJX54HcbFXC+FVUCJ4WpoOvWqbv9xXRGO1?=
- =?us-ascii?Q?b9WVtmFV8u87/PPilgcuGiOUGnz9E4kl+UZGF3QlJvmUPs0Pv4vwhCtjDu0q?=
- =?us-ascii?Q?n5q/5f8as1LnaPA/7E8Hntau/v5Iq81MiG+dUZrDBqEjL+G9YUMldAzMaYbW?=
- =?us-ascii?Q?K+bVtf2UfH7lZpMZyhyXC/8fFxkkvFDAkngtYNeJkytcz+2ykMQeisll361+?=
- =?us-ascii?Q?NXQ5pC9/BOqJuNLlLe8JZC9hKvNgaHIxVxT9dt2raRFBOE73+0W6NYpu6GcP?=
- =?us-ascii?Q?r1VhfLItwKYOtoIa+PoLPjgHIU+wONITgfccpZDSJn6WyOFboKOPzgoplh20?=
- =?us-ascii?Q?iPHdpWjrkyqLsR0OHauFeGm8S11TJEHiRGWZluZFIEjAbdmfwMc6xtdPRMF/?=
- =?us-ascii?Q?jPMA5S8bvtJdxLQ0J6Po3acHkY4/v2L3PZbdF4veME3xgpWMVxnt4o3rzoE+?=
- =?us-ascii?Q?ZCLi6o1Cn/7++f5Zblayq1/3lWyaO9SM7zloQFXqqOocoReL260SuzuBooLm?=
- =?us-ascii?Q?4IV2z3r31Cnbsqpy5t2kFi7+EL9OHu3XrvcQaavfQ1ifcv4FsI/AdCmVInoe?=
- =?us-ascii?Q?yCP5N2GNmV18nzbRSXdsb1DF8CgQkUh+ybnKwsLEf/3qw4MsjPzMCjK189CV?=
- =?us-ascii?Q?Z0lz6kOdsQK3JaGvKeAOcXDRzhnLpxi2Bdo5EyeE9PVMKDZLHjlOhGV7hwnq?=
- =?us-ascii?Q?VkPW/almrhrLZBr8VFuCus3sXrOaWIfrLSeFcxYThGEc5wnjTCSaJFMgRNSL?=
- =?us-ascii?Q?NPMjwIPoGm4rXXtzYxEMEM97h2KKCkqKVanOc3XVjDmyOJ9QDx5Fq/GpYe1M?=
- =?us-ascii?Q?Hw2LHNUaJZfTpQPlFvZg45tv3EtN1RwaHVjBgOHuTxoGjlkliAwFYByH93P4?=
- =?us-ascii?Q?rf5FPBFRm8DujE+68WB52VuB3fXhO+SF/B/oRg/vrzHLKV72NVpg3x+fb+bw?=
- =?us-ascii?Q?mWiLtxq2u+QINS687Bta/EiSdsUeP4n1cEZdb5ck+1L/hg8DxgIamof2nhf9?=
- =?us-ascii?Q?F0eRqgQvED1vaNtK6nAKXIosbBT7xj6Gdk8/D8rtygrag6dkLhG1yofnChih?=
- =?us-ascii?Q?Gz/+kk4/yrxd8jE1Gv62S17QCglIFsfUhaPBju1vP4J2CXpnPiDRJuHLEgRK?=
- =?us-ascii?Q?aXxUmPST+3xzDIhHAnIpS0dBR/WCTQFtsxsUbH08Ryvn/mH0ZJdNlAB0GKHy?=
- =?us-ascii?Q?hGvAOEPLmvOeOepImE/YIJwV3gHLDFFJjM4nSlWYL4MdGCMzp5IGYqV4Su1C?=
- =?us-ascii?Q?+gaEMtG9MD4GaXV4n4bvNR64jB3Unw4DXrFTPwa/tGIHIhIrYGJhhp79ICr8?=
- =?us-ascii?Q?LaFeCYUGCpCjm9kfjCyhWr9qm/beG/zy0iEKK1q/jkhlxaPdbkh5RJWc7qIL?=
- =?us-ascii?Q?sjyctLILtw=3D=3D?=
+	=?us-ascii?Q?c9gLhLhwsleyjq2aIwHib7sJapovS6Q1cpYyYFaomA0tojAPLe0Caxvdgljo?=
+ =?us-ascii?Q?JsotpUv5b71fUmad636jRaEuuu6bfMYu1/MM0B4WU6oPOFjZg0+wdx3U/JQc?=
+ =?us-ascii?Q?RatLooxy0mTOUT5hTcULf3XsEQAD14yL7d1e8V5ATzJEUjyJ52coPoN6rufY?=
+ =?us-ascii?Q?lahG+oaQsvyfnJucfislXxSmnwKMpUTlax9ip/hJl1VeD0yfhu4KMTFeIkLA?=
+ =?us-ascii?Q?NNfBea0zJl+d9pPekb6JVqBz8vowXsWFJyhvii91/+WL61h8WN75x5g3y5+W?=
+ =?us-ascii?Q?5lcQeRc6lEGvsSN/PhqjMa2/3pRACKKeQJQubGtITmApCEZR4nUEPGt0zklN?=
+ =?us-ascii?Q?1Q0QKRyAp9dUsRI/VUOTISudGlHPoJhP+Vzizhkglh/89UASB0B9A/oPSz+Z?=
+ =?us-ascii?Q?7XMLaVnweD9bNBMzVUt8Tx9QCNtlKUi2W+hIt1C/FbM1laz552DM0+94wOlm?=
+ =?us-ascii?Q?Da4J4gmKPxkhDw2Cdtxkr9HbXu4Uy3Lw+fnwdUxZ8j4jVoS7erWzXBrIX8z0?=
+ =?us-ascii?Q?fFK8iQLhwPLy5XzzuZZ1mfvnOmi3Jka2qcATUlcqTJOVVgjkLHSoWpwa8Cfq?=
+ =?us-ascii?Q?gABCjV/fDOiMIOBCdPrMzwra3zb3r6xbHEO8iD+mwSPn9oHKS5b5VsFTfwGB?=
+ =?us-ascii?Q?fUu96OQeMi/scKDm382s4MtVPdmksUdrubLBUY15sr+SaaqsmxIcfkn1BsCT?=
+ =?us-ascii?Q?r9S+HGrPYAo/IgFgNEBe0HcdO1Rah14APaqstC/EvxjoEDJOa6tc1RczVGpa?=
+ =?us-ascii?Q?xu4t1Dhab1hv2YplGe9ZguLsB73JhM6owfjTRqxrGGPxvsgfTXRmCdynhWs1?=
+ =?us-ascii?Q?JXJuK+gx3BpNgO5d20ZAViBTN4qrr+ZeugqFvTCTK1VQEj0cCvG0qv+sY6Ku?=
+ =?us-ascii?Q?8Ixhxnu+Jxy85Ld5JzBMeJd/sVQ0VGMfBjkIDjf8b1/wqQ6sVOjfluMAit3x?=
+ =?us-ascii?Q?69kwi/+C1cM01GMK9ZgxiOVT52gszfUvlBDEDLOBVbItczAlPaJ07B6JBe4P?=
+ =?us-ascii?Q?JtqabYt+6XcUTzY4jq9Pn052YrTkDKG0XO6sdXehuowFd/LFS1C9BEn7IVOW?=
+ =?us-ascii?Q?kU3/pysrHy8vOQve5EHW0LVGn6nPG/nsyLazEIN5T4Cw/AZZXh+LcunVJtaw?=
+ =?us-ascii?Q?OLRKpIr3TcNNMdLFZrf2/cgOl7bijKfNLC5ACqTGw2GwjpYP9BNh6gHVkWiK?=
+ =?us-ascii?Q?KMd9zpSN1gPpGG2iBcGmDo002Owq18s7SAQqV04dUSTz3KwZwXjlG5oilzNB?=
+ =?us-ascii?Q?XHfA7ln/Cc+9ZSEnRi8OLXyxIMLBeVgsmbHDhv6aY6jy9I3IayWja7MND6Of?=
+ =?us-ascii?Q?ECNwZ5IQz8GgrX2sj33sxNyXhrmOVNR4Ltgk11hjW87u07jGycT1fGeB033/?=
+ =?us-ascii?Q?uEAnV9n3dqWbUz5vc9eAvSpKPYnQeiTgG5+eXISUgFOFvhUvN48C2r1L/KAZ?=
+ =?us-ascii?Q?RVgNW37IXRslu3lUagH7CJ+zKjBoA2QRUwwLPwDsKceIgxEdquAlgvKAJyW6?=
+ =?us-ascii?Q?rOQNvmBEdKVDDazooNwOgFvu4YVPLIDoMGNqBTS44m95xJHNhotB2Ll7c3J6?=
+ =?us-ascii?Q?yyshtSScpjtZX2MGnvZpCqIN6ZFKOIashu7trNUj4GOZRR/1aRfqn3qO2a1R?=
+ =?us-ascii?Q?n2V5UPWeK1+uTffKj5xi48yyzKfzTMNipmXlsw5V1DfjwqHxeRcgZjRuB6t3?=
+ =?us-ascii?Q?jnZDPga+dQjkfNwCmwfVthxFLQGdpn+D4bD5gEd3ERevmnmcaiqUbDmsP2J3?=
+ =?us-ascii?Q?bGAnze5mBg=3D=3D?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 19b84b6c-6e1e-43a3-0ee7-08de750d4428
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8a02df10-5fba-4231-3b92-08de750d4a01
 X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB7900.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2026 08:01:37.3737
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2026 08:01:47.1210
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qA5uQz3e6edLWn2f1ganHcKSffGEzJPqZqAau5kg3z0ohyvkrsUILjVlpDLZ9/0myKVGOsg7Pbf5y5yNwwIJ/Q==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9x37gHVUMiJyOfQvw7q/BrERuq3ii8mJqGun1frrznYu8cnGN+QnGz9TdRHUREM5Z45jX3r5xTxtI7ORuHTn3w==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6362
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [2.84 / 15.00];
@@ -162,7 +162,7 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,gmail.com,nvidia.com,iogearbox.net,linux.dev,fomichev.me];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-261217-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-261219-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[Nvidia.com:+];
@@ -173,44 +173,112 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.983];
+	NEURAL_HAM(-0.00)[-0.986];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,Nvidia.com:dkim,nvidia.com:mid,nvidia.com:email]
-X-Rspamd-Queue-Id: 2DB911A23E8
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:mid,nvidia.com:email,Nvidia.com:dkim]
+X-Rspamd-Queue-Id: AC1601A2405
 X-Rspamd-Action: no action
 
-Currently, output route lookups behave differently between IPv4 and IPv6
-when performed via the bpf_fib_lookup() helper with the
-BPF_FIB_LOOKUP_OUTPUT flag.
+In a similar fashion to the IPv4 output route tests, add equivalent IPv6
+tests.
 
-IPv4 honors the oif and resolves the most specific route whose nexthop
-device matches the oif. If no such route exists, an error is returned.
+Output without "bpf: fib_lookup: Honor oif in IPv6 output route
+lookups":
 
-On the other hand, IPv6 simply resolves the most specific route, even if
-its nexthop device does not match the specified oif.
+ # ./test_progs -a fib_lookup
+ [...]
+ Testing IPv6 output route, without source, via second device test_fib_lookup:PASS:bpf_prog_test_run_opts 0 nsec
+ test_fib_lookup:PASS:fib_lookup_ret 0 nsec
+ test_fib_lookup:FAIL:ifindex does not match unexpected ifindex does not match: actual 10010 != expected 10020
+ [...]
+ Testing IPv6 output route, with source, via second device set_lookup_params:PASS:inet_pton(IPV6_IFACE_ADDR) 0 nsec
+ test_fib_lookup:PASS:bpf_prog_test_run_opts 0 nsec
+ test_fib_lookup:PASS:fib_lookup_ret 0 nsec
+ test_fib_lookup:FAIL:ifindex does not match unexpected ifindex does not match: actual 10010 != expected 10020
+ [...]
+ Testing IPv6 output route, oif mismatch set_lookup_params:PASS:inet_pton(IPV6_IFACE_ADDR) 0 nsec
+ test_fib_lookup:PASS:bpf_prog_test_run_opts 0 nsec
+ test_fib_lookup:FAIL:fib_lookup_ret unexpected fib_lookup_ret: actual 0 != expected 4
+ [...]
+ #119     fib_lookup:FAIL
+ Summary: 0/0 PASSED, 0 SKIPPED, 1 FAILED
 
-Fix this by setting the RT6_LOOKUP_F_IFACE flag when performing an
-output route lookup, so that a device mismatch will be considered a
-fatal error.
+Output with "bpf: fib_lookup: Honor oif in IPv6 output route lookups":
+
+ # ./test_progs -a fib_lookup
+ #119     fib_lookup:OK
+ Summary: 1/0 PASSED, 0 SKIPPED, 0 FAILED
+
+That is, without the specified patch, unlike IPv4, IPv6 would always
+resolve the most specific route with the lowest metric, even if its
+nexthop device does not match the specified oif.
 
 Reviewed-by: Petr Machata <petrm@nvidia.com>
 Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 ---
- net/core/filter.c | 1 +
- 1 file changed, 1 insertion(+)
+ .../selftests/bpf/prog_tests/fib_lookup.c     | 35 +++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 0d5d5a17acb2..e92552b139b1 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -6255,6 +6255,7 @@ static int bpf_ipv6_fib_lookup(struct net *net, struct bpf_fib_lookup *params,
- 	if (flags & BPF_FIB_LOOKUP_OUTPUT) {
- 		fl6.flowi6_iif = 1;
- 		oif = fl6.flowi6_oif = params->ifindex;
-+		strict = RT6_LOOKUP_F_IFACE;
- 	} else {
- 		oif = fl6.flowi6_iif = params->ifindex;
- 		fl6.flowi6_oif = 0;
+diff --git a/tools/testing/selftests/bpf/prog_tests/fib_lookup.c b/tools/testing/selftests/bpf/prog_tests/fib_lookup.c
+index 6ceeecbdca43..9e933daf56d7 100644
+--- a/tools/testing/selftests/bpf/prog_tests/fib_lookup.c
++++ b/tools/testing/selftests/bpf/prog_tests/fib_lookup.c
+@@ -45,6 +45,8 @@
+ #define IFINDEX_VETH2		10020
+ #define IPV4_OUTPUT_NET		"192.0.2.0"
+ #define IPV4_OUTPUT_DST		"192.0.2.1"
++#define IPV6_OUTPUT_NET		"2001:db8:1::"
++#define IPV6_OUTPUT_DST		"2001:db8:1::1"
+ 
+ struct fib_lookup_test {
+ 	const char *desc;
+@@ -177,6 +179,34 @@ static const struct fib_lookup_test tests[] = {
+ 	  .expected_ret = BPF_FIB_LKUP_RET_NOT_FWDED,
+ 	  .lookup_flags = BPF_FIB_LOOKUP_OUTPUT | BPF_FIB_LOOKUP_SKIP_NEIGH,
+ 	  .ifindex = IFINDEX_VETH2, },
++	{ .desc = "IPv6 output route, without source, via first device",
++	  .daddr = IPV6_OUTPUT_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
++	  .lookup_flags = BPF_FIB_LOOKUP_OUTPUT | BPF_FIB_LOOKUP_SRC,
++	  .dmac = DMAC_INIT, .ifindex = IFINDEX_VETH1,
++	  .expected_ifindex = IFINDEX_VETH1, },
++	{ .desc = "IPv6 output route, without source, via second device",
++	  .daddr = IPV6_OUTPUT_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
++	  .lookup_flags = BPF_FIB_LOOKUP_OUTPUT | BPF_FIB_LOOKUP_SRC,
++	  .dmac = DMAC_INIT2, .ifindex = IFINDEX_VETH2,
++	  .expected_ifindex = IFINDEX_VETH2, },
++	{ .desc = "IPv6 output route, with source, via first device",
++	  .daddr = IPV6_OUTPUT_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
++	  .lookup_flags = BPF_FIB_LOOKUP_OUTPUT, .dmac = DMAC_INIT,
++	  .ifindex = IFINDEX_VETH1, .expected_ifindex = IFINDEX_VETH1, },
++	{ .desc = "IPv6 output route, with source, via second device",
++	  .daddr = IPV6_OUTPUT_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
++	  .lookup_flags = BPF_FIB_LOOKUP_OUTPUT, .dmac = DMAC_INIT2,
++	  .ifindex = IFINDEX_VETH2, .expected_ifindex = IFINDEX_VETH2, },
++	{ .desc = "IPv6 output route, oif match",
++	  .daddr = IPV6_NUD_STALE_ADDR,
++	  .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
++	  .lookup_flags = BPF_FIB_LOOKUP_OUTPUT | BPF_FIB_LOOKUP_SKIP_NEIGH,
++	  .ifindex = IFINDEX_VETH1, .expected_ifindex = IFINDEX_VETH1, },
++	{ .desc = "IPv6 output route, oif mismatch",
++	  .daddr = IPV6_NUD_STALE_ADDR,
++	  .expected_ret = BPF_FIB_LKUP_RET_NOT_FWDED,
++	  .lookup_flags = BPF_FIB_LOOKUP_OUTPUT | BPF_FIB_LOOKUP_SKIP_NEIGH,
++	  .ifindex = IFINDEX_VETH2, },
+ };
+ 
+ static int setup_netns(void)
+@@ -254,6 +284,11 @@ static int setup_netns(void)
+ 	SYS(fail, "ip neigh add %s dev veth1 lladdr %s nud perm", IPV4_OUTPUT_DST, DMAC);
+ 	SYS(fail, "ip neigh add %s dev veth2 lladdr %s nud perm", IPV4_OUTPUT_DST, DMAC2);
+ 
++	SYS(fail, "ip route add %s/64 dev veth1 metric 100", IPV6_OUTPUT_NET);
++	SYS(fail, "ip route add %s/64 dev veth2 metric 200", IPV6_OUTPUT_NET);
++	SYS(fail, "ip neigh add %s dev veth1 lladdr %s nud perm", IPV6_OUTPUT_DST, DMAC);
++	SYS(fail, "ip neigh add %s dev veth2 lladdr %s nud perm", IPV6_OUTPUT_DST, DMAC2);
++
+ 	return 0;
+ fail:
+ 	return -1;
 -- 
 2.53.0
 
