@@ -1,254 +1,102 @@
-Return-Path: <netdev+bounces-261179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261180-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uJ6LBIzEn2kRdwQAu9opvQ
-	(envelope-from <netdev+bounces-261179-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 04:57:00 +0100
+	id oNAwBLbEn2kRdwQAu9opvQ
+	(envelope-from <netdev+bounces-261180-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 04:57:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C1851A0B79
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 04:56:59 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 927831A0B81
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 04:57:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C95EA301CCC4
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 03:56:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7EED63034DED
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 03:57:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 172E53876C6;
-	Thu, 26 Feb 2026 03:56:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B69153876D2;
+	Thu, 26 Feb 2026 03:57:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sCMcLdLJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NBRJ0YwT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8EFD374179;
-	Thu, 26 Feb 2026 03:56:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 943EB37A490;
+	Thu, 26 Feb 2026 03:57:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772078197; cv=none; b=tOPq5DXHTeH4F+i5TEvZA1FDSdUUBP7Bnh9DcD401jww2MLhzxORRvgRNI0woXL13yxRW19vjts/LWh+vxKJAoYJ8109U/Ieo69sFYmbrlyRSOcQfX49Gonu+pOiiXVM+md8gZ1w71SuRDp5zLzGjA2OZMYhaKY4WlHltZdfz3o=
+	t=1772078255; cv=none; b=tRkDcSlhwQpploAOnp4v/V8h9DED0Dzfn1H4QkHVEUp/MAxGfM9JcDtQ0FQGJ2WLYJ1UdDS564/wfxQzAjGahF9ZmTyl3YCOg6X8mg/pkZgXL5C6rrNthz4LvVzS1iqLt/g/Ss9tid/KawygXgjWoXyZGxOD4qgo0oaNl8PU5kU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772078197; c=relaxed/simple;
-	bh=ke5ENIBnaxIX4/dyRyrHjIfdMRzU+L/so66Dykvkkuw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=L1fGDEt2w4/nh1KnfPmF0Pt0OC+idNt3OkPttWNpg5GpKlvLbjXqctPJqPlOqwrGhX2TLcjUAqd5MeNByNrkjS27BS9uZ13fTZrVF3dZj3cuZTClNnv20tBBaVjxc8sxMqjKLvvDqnaXvtdkNpiJ9n3xwD8JX88aRt3PgdI5X6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sCMcLdLJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 310A3C19424;
-	Thu, 26 Feb 2026 03:56:36 +0000 (UTC)
+	s=arc-20240116; t=1772078255; c=relaxed/simple;
+	bh=i0sp9WLqxzYgI0+UUA6dgpyWXFQmjqb62PqojjSSXEo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Nu/o+Z461gDOL8ghbBP+q2jcMWIzJlkao5qrESAzd0Pf7mnCHGk8c4dftnmy/z+IlwetgeHekyUE+cSqqgSQLY3BMWJX4Ax3cULZWNWiGOxukBo9tld4NVh/Ig3UWK6tjizR4y9YicewL2kc/spRkx0lJl2HTnxq81HJElogCgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NBRJ0YwT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 056C5C116C6;
+	Thu, 26 Feb 2026 03:57:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772078196;
-	bh=ke5ENIBnaxIX4/dyRyrHjIfdMRzU+L/so66Dykvkkuw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sCMcLdLJFgpQV0ObhIqSsbh4ry1cIgOYSiL2WKmStrRIUysdb+KFss+oPUjZta9ei
-	 Lv6iNipYacrECUKaoG6YP0DOfMurq4KwhcgdKgqDTEw/dVp32fwlSNCAZCOCca+RBR
-	 wyQZH9ojv6blB7IpiGa7wQwoAl9pFSVMzS0mowaXmPtIepygBkrxwZBZW7Uqwu/aPd
-	 OJWM+3IMQQPuFEMRF88PisDIlOc5s5R31pZh5NjyoXXv4V8JoDOpejBi9Q3ij8rjb0
-	 9s8tJ6sSwnx0VknCyveXXYRZJRGz9egQa4JN0LLlzN52gttr2HVl6GBifl33UKo8Pl
-	 egpqJbJ+CkigQ==
+	s=k20201202; t=1772078255;
+	bh=i0sp9WLqxzYgI0+UUA6dgpyWXFQmjqb62PqojjSSXEo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NBRJ0YwToN6AOXBGFx4gCo0gest+WGqyMNYmtOJAaHkWNYQxDVpO4KIFkEh5BoEa3
+	 aumeCRZFSojpP+6a4Y8IfzJm9/P9w7D2j3/ODvC+lbLcU0P2zRF572I2pLy9AjWzTk
+	 cjMxTKU/e+9BrjKA55MNfJm+IXZsFWoO1sGMvEtXV9Nn62m5E/LS5jSz56GyYbQziq
+	 sxNcjSnL3hUFcnN/XOw1Z+C2l66jDgRHG3wfZhTgRVLOZS+FLb30WLhaUMoiKFrnzr
+	 NHx/10UqLBJV2RbDr1wSt7KXFLCnLVG34+MnEpYj/duEE68vDqOLWZdzl0LwPCGkTW
+	 CzG282HcbbOcg==
+Date: Wed, 25 Feb 2026 19:57:34 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: fw@strlen.de
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	edumazet@google.com,
-	netfilter-devel@vger.kernel.org,
-	pabeni@redhat.com,
-	pablo@netfilter.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org
-Subject: Re: [net,2/2] netfilter: nf_tables: unconditionally bump set->nelems before insertion
-Date: Wed, 25 Feb 2026 19:56:28 -0800
-Message-ID: <20260226035628.1827287-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260225130619.1248-3-fw@strlen.de>
-References: <20260225130619.1248-3-fw@strlen.de>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: Re: [GIT PULL] wireless-2026-02-25
+Message-ID: <20260225195734.1d789102@kernel.org>
+In-Reply-To: <20260225113159.360574-3-johannes@sipsolutions.net>
+References: <20260225113159.360574-3-johannes@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261179-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-261180-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[3];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6C1851A0B79
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 927831A0B81
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email says "Is this legit?"
+On Wed, 25 Feb 2026 12:30:47 +0100 Johannes Berg wrote:
+> So for some reason a whole bunch of fixes came in recently,
+> including quite a few (potential) crashes and similar. Most
+> even are long-standing issues.
+> 
+> Please pull and let us know if there's any problem.
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-netfilter: nf_tables: unconditionally bump set->nelems before insertion
-
-This commit addresses a race condition where a new element gets published
-then removed without waiting for the RCU grace period when the set is full.
-The fix moves the nelems increment before insertion and adds cleanup logic
-using the abort path to safely unwind the set.
-
-> diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-> index 0c5a4855b97d..834736237b09 100644
-> --- a/net/netfilter/nf_tables_api.c
-> +++ b/net/netfilter/nf_tables_api.c
-> @@ -7171,6 +7171,7 @@ static int nft_add_set_elem(struct nft_ctx *ctx, struct nft_set *set,
->  	struct nft_data_desc desc;
->  	enum nft_registers dreg;
->  	struct nft_trans *trans;
-> +	bool set_full = false;
->  	u64 expiration;
->  	u64 timeout;
->  	int err, i;
-> @@ -7462,10 +7463,18 @@ static int nft_add_set_elem(struct nft_ctx *ctx, struct nft_set *set,
->  	if (err < 0)
->  		goto err_elem_free;
->
-> +	if (!(flags & NFT_SET_ELEM_CATCHALL)) {
-> +		unsigned int max = nft_set_maxsize(set), nelems;
-> +
-> +		nelems = atomic_inc_return(&set->nelems);
-> +		if (nelems > max)
-> +			set_full = true;
-> +	}
-> +
->  	trans = nft_trans_elem_alloc(ctx, NFT_MSG_NEWSETELEM, set);
->  	if (trans == NULL) {
->  		err = -ENOMEM;
-> -		goto err_elem_free;
-> +		goto err_set_size;
->  	}
->
->  	ext->genmask = nft_genmask_cur(ctx->net);
-> @@ -7517,7 +7526,7 @@ static int nft_add_set_elem(struct nft_ctx *ctx, struct nft_set *set,
->
->  					ue->priv = elem_priv;
->  					nft_trans_commit_list_add_elem(ctx->net, trans);
-> -					goto err_elem_free;
-> +					goto err_set_size;
->  				}
->  			}
->  		}
-> @@ -7535,23 +7544,16 @@ static int nft_add_set_elem(struct nft_ctx *ctx, struct nft_set *set,
->  		goto err_element_clash;
->  	}
->
-> -	if (!(flags & NFT_SET_ELEM_CATCHALL)) {
-> -		unsigned int max = nft_set_maxsize(set);
-> -
-> -		if (!atomic_add_unless(&set->nelems, 1, max)) {
-> -			err = -ENFILE;
-> -			goto err_set_full;
-> -		}
-> -	}
-> -
->  	nft_trans_container_elem(trans)->elems[0].priv = elem.priv;
->  	nft_trans_commit_list_add_elem(ctx->net, trans);
-> -	return 0;
->
-> -err_set_full:
-> -	nft_setelem_remove(ctx->net, set, elem.priv);
-> +	return set_full ? -ENFILE : 0;
-> +
->  err_element_clash:
->  	kfree(trans);
-> +err_set_size:
-> +	if (!(flags & NFT_SET_ELEM_CATCHALL) && !set_full)
-> +		atomic_dec(&set->nelems);
-
-Does this properly handle the element update path when the set is full?
-
-When updating an existing element on a full set (NLM_F_EXCL not set,
-timeout changes), the code reaches line 7526 and jumps to err_set_size with
-the transaction already added to the commit list via
-nft_trans_commit_list_add_elem(). The function then returns 0 (success).
-
-On commit, nft_trans_elem_update() is called, but it doesn't touch nelems.
-On abort, nft_trans_elems_new_abort() skips the atomic_dec for updates:
-
-if (te->elems[i].update != NULL) {
-    ...
-    continue;  // skips atomic_dec
-}
-
-Since set_full is true, the !set_full condition at err_set_size prevents the
-decrement here. Result: nelems is permanently inflated by 1 for each update
-operation performed when the set is full.
-
-Over time, this progressively reduces the effective maximum set size. Can the
-update path decrement nelems when set_full is true, or should the abort path
-handle updates differently?
-
-
-What happens when nft_setelem_insert() fails with -EEXIST on a full set?
-
-When the set is at maximum capacity (set_full==true after atomic_inc_return)
-and nft_setelem_insert() then fails with -EEXIST due to a duplicate element,
-the code jumps to err_element_clash:
-
-err_element_clash:
-    kfree(trans);
-err_set_size:
-    if (!(flags & NFT_SET_ELEM_CATCHALL) && !set_full)
-        atomic_dec(&set->nelems);
-
-Since set_full is true, the !set_full condition prevents the atomic_dec. But
-the transaction was freed via kfree(trans) and never added to the commit list,
-so the abort path (nft_trans_elems_new_abort) will never see this element and
-cannot correct the counter.
-
-The nelems counter is permanently inflated by 1 with no corresponding element
-in the set. Repeated occurrences accumulate, progressively reducing the
-effective maximum set size. Should atomic_dec be called unconditionally, or
-should the condition be adjusted for this case?
-
-
-Can insertion failures on a full set leak nelems increments?
-
-The patch moves atomic_inc_return(&set->nelems) to before
-nft_setelem_insert(). When the set is at capacity (set_full==true) and
-subsequent insertion fails (e.g., -EEXIST duplicate, -ENOTEMPTY overlap), the
-error path reaches err_set_size where the decrement is guarded by !set_full:
-
-err_set_size:
-    if (!(flags & NFT_SET_ELEM_CATCHALL) && !set_full)
-        atomic_dec(&set->nelems);
-
-Since set_full is true, the decrement is skipped. The transaction was freed at
-err_element_clash and never added to the commit list, so the abort path cannot
-correct the counter either.
-
-Each such operation permanently inflates set->nelems by 1. Over time, this
-causes nft_dynset_new() in the packet-processing data path to always see a
-full set (atomic_add_unless fails against set->size), rejecting all new
-dynamic element insertions.
-
-In the old code, atomic_add_unless(&set->nelems, 1, max) was placed AFTER
-nft_setelem_insert(), so insertion failures never incremented nelems. Should
-the decrement at err_set_size account for these failure cases?
-
->  err_elem_free:
->  	nf_tables_set_elem_destroy(ctx, set, elem.priv);
->  err_parse_data:
+Pulled, thanks!
 
