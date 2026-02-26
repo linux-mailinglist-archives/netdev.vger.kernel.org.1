@@ -1,71 +1,70 @@
-Return-Path: <netdev+bounces-261341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261340-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GAr7N65EoGkZhwQAu9opvQ
-	(envelope-from <netdev+bounces-261341-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 14:03:42 +0100
+	id sK8MDIFEoGkZhwQAu9opvQ
+	(envelope-from <netdev+bounces-261340-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 14:02:57 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADC021A60B9
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 14:03:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 602BF1A6083
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 14:02:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BA6BA31593D7
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:58:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 778DF30E6454
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:58:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4466C2E2665;
-	Thu, 26 Feb 2026 12:58:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA8992DCF45;
+	Thu, 26 Feb 2026 12:58:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com [209.85.161.71])
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 921B72DB7A1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E2ED242D76
 	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 12:58:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.71
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772110718; cv=none; b=L6wiedJuCHSAReCnqCSJnPnQewbf9gBtb5Za44aNXGvPd2Ya/8BYncmSr75ya/B685RKs4tfxaV7Q043RpIU7MhnrzvuCFR+TeBwcLl4eUa8PP609drfhdVKbrShuAJQ/74efgz2EGi39DztKGpCdIuu4xrUaxNOzBzfFSf/hIM=
+	t=1772110717; cv=none; b=MoIGwCkthgvQS/LlOkwJF8j/YHGr1s1zBiRfuAFhiI8Lw2/J+jhzIiZUvtEZ1d8GsnnlgEz8gEncxi7OWAF0pL8DIxXojSgQQcVkIFtrN/tQAMXV6+Z3fm+Rq1Ox/HMvXv8diR4YX2KQe+qhpOhcarApA2MfuUCj69vOIW9/fNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772110718; c=relaxed/simple;
-	bh=TiqbeE6FK5tIk/RJQnJ1wxvW8bDjSQKh5wvvtBQbv4g=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=C5jyDEmGgh+jp/OrZvCpGd2gpDnj2And1esYmDt4VDjLW6sraRrRjq+6tjAsXewimwFORCnM5T2IVjwyObl5s3RbhrjmxATMRutCghbZx3LscKk75KutTZMqc0n2rlbtu8pdOPcSgo3ELdi6vRSo4ahLRyyh32ZivqWVavMGg7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.71
+	s=arc-20240116; t=1772110717; c=relaxed/simple;
+	bh=jgTMHcWDHylG0I0dXdBiZGDrftWEX9QlvkG1P7mnCho=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ecl8GOhOSt46nZsVxj+O2uwv0hfUU6w5kn0LX5M5cetl4wA3VmBnb4F8LBOuNTLLbnPxduFJKZ0PIV29jIX5oSyp0+am4WI78XBy3Xr0XKHo6LJVq3JE2ioFebLNWsP7dQL7JpK7CV+1V52fHcNU1TSxji/trNTHcW4YcJ2QRD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-679c69b46c6so7366807eaf.0
-        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 04:58:36 -0800 (PST)
+Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-67995e1ecacso18395567eaf.0
+        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 04:58:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772110716; x=1772715516;
+        d=1e100.net; s=20230601; t=1772110715; x=1772715515;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ahVCnuEXR3Y0gW4V9lcm+HW1q/eix0cX0sztaTxYmyk=;
-        b=sFxk4irurM6MNKVdwHYjhQGk7LiUByBtvEIeCnHJny84LRIaAH7ijQTcWs+aC9QB2q
-         tns+iYDmy0RQ7OiC4A9lkE3aNjFyN2xtOA7exeRUD2QlbHGmcBw7CwU6Yo11siSEJslC
-         39kC5GpvmtTcAfKhPJn5PMYVlsaiiypKeKnmW0Z8YAM3tUf2H5GcEi1FV5awPxBknRvM
-         pu3Owcxo+NnNDuhJ36axYzvVIVBN1oSFUOW4G8Xie5gOqiklc2w7Kwi+U0y0GwVWKFn3
-         rRJ7ZLfxTtrLUW1aJiRmFammjIYaqag5w6MAWRTvVt3CbqoGyx1q9Trg+UdDqxg/v5og
-         HztA==
-X-Forwarded-Encrypted: i=1; AJvYcCW0QQdmMuvdhXwi4jCDaqbZo9YiWUINp2yiNkwnmWsHCGUwNgLcitGyrIpFRUPPaOFZzgikWRI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrhG8U+tOAFXsK16r8a/FYnN6HWqKmoViNl6M1aAV9YNftB56p
-	UT8Utfc/9UU0wsVWDBsltpr6Kn36Wb/BMljXP8NwxiDs1KXAvyNz+J59xnEQipxmU4wxJ0Gs5AQ
-	SzxOmuxAkvdOCSarB1XuKvpNsegJsgpoGqIG22cSOzIfOCXSdWtt78fG2iIs=
+        bh=r8k5Nu+4WdoFwZvOfUmhYahsobY/Ezi5a3CfLGRDfYM=;
+        b=VA8iv524G9CRkQ8IoVs60EbipRU/MjKsVZBwPpM6UyodnPvDSrt8Gs3IrVnBqZcre4
+         ObM2rE8PlsLPeqZCCgQTlonYUFe7tUnPD/emJGBEAZ0lVVCHY7SiDeK92Nnsbng4Iasa
+         r+q5i2AuDfPHDkzph01LIQo72UWiTfcy+XknR203VrPAXKE7BVyQKCvgieN4T50RWC1j
+         8Dj6XnfRtSf/gcyE2lK3y9YlUFoACwmPTqEX4csFDmplUXSt6nmWgxyf4QGhqKlVh7O5
+         wvh2LpngkxN751m/UzTMMs/JLe3EAAeLjGg1gfnnDdx0UOgiLMB3bFLIbg9rr8zFV7AI
+         xA+g==
+X-Forwarded-Encrypted: i=1; AJvYcCX4Zg6FgfmgYJrmwbdUDvEOriu+2XD5//Rkn8GbYQObN3tZYmyy74DR+qTroVgF7SLvXdcfbsI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNhrItWNkW8A8educMqls4Cwks9DD4KLQA8czWbqvgtCK/O6eF
+	+Sd+UnLdHzaDq+UJSOHVD5mOr330RswZyohZa8htVYXRjxQ4KEsaKIwMPjCWcQ7/KTKgMLljmpc
+	n6yhIR8xsYBxVR+9ySg7iotvBbGtnawtj3hChxRWn0EWwdUJa6VNvbk3CRcA=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:169e:b0:662:c0f7:bed8 with SMTP id
- 006d021491bc7-679ef7fb075mr1712875eaf.12.1772110715794; Thu, 26 Feb 2026
+X-Received: by 2002:a05:6820:999:b0:679:f08b:5382 with SMTP id
+ 006d021491bc7-679f08b5ebemr2171559eaf.11.1772110715212; Thu, 26 Feb 2026
  04:58:35 -0800 (PST)
 Date: Thu, 26 Feb 2026 04:58:35 -0800
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69a0437b.a00a0220.21906d.00e9.GAE@google.com>
-Subject: [syzbot] Monthly netfilter report (Feb 2026)
-From: syzbot <syzbot+listc25fa2ef6d483674daf7@syzkaller.appspotmail.com>
-To: fw@strlen.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, pablo@netfilter.org, 
-	syzkaller-bugs@googlegroups.com
+Message-ID: <69a0437b.a00a0220.21906d.00e6.GAE@google.com>
+Subject: [syzbot] Monthly hams report (Feb 2026)
+From: syzbot <syzbot+liste72a2905ed88c1b0dc99@syzkaller.appspotmail.com>
+To: linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.36 / 15.00];
@@ -76,52 +75,58 @@ X-Spamd-Result: default: False [-1.36 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261341-lists,netdev=lfdr.de,listc25fa2ef6d483674daf7];
+	RCPT_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-261340-lists,netdev=lfdr.de,liste72a2905ed88c1b0dc99];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	REDIRECTOR_URL(0.00)[goo.gl];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_FIVE(0.00)[6];
+	ASN_FAIL(0.00)[1.2.3.5.c.f.2.1.0.0.0.0.0.0.0.0.b.d.0.0.1.0.0.e.a.0.c.3.0.0.6.2.asn6.rspamd.com:query timed out];
 	TO_DN_NONE(0.00)[];
 	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[googlegroups.com:email,syzkaller.appspot.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,goo.gl:url]
-X-Rspamd-Queue-Id: ADC021A60B9
+	DBL_BLOCKED_OPENRESOLVER(0.00)[goo.gl:url,syzkaller.appspot.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,googlegroups.com:email]
+X-Rspamd-Queue-Id: 602BF1A6083
 X-Rspamd-Action: no action
 
-Hello netfilter maintainers/developers,
+Hello hams maintainers/developers,
 
-This is a 31-day syzbot report for the netfilter subsystem.
+This is a 31-day syzbot report for the hams subsystem.
 All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/netfilter
+https://syzkaller.appspot.com/upstream/s/hams
 
-During the period, 1 new issues were detected and 2 were fixed.
-In total, 15 issues are still open and 194 have already been fixed.
+During the period, 2 new issues were detected and 0 were fixed.
+In total, 16 issues are still open and 46 have already been fixed.
 
 Some of the still happening issues:
 
-Ref Crashes Repro Title
-<1> 4865    Yes   INFO: rcu detected stall in worker_thread (9)
-                  https://syzkaller.appspot.com/bug?extid=225bfad78b079744fd5e
-<2> 906     Yes   BUG: unable to handle kernel paging request in ip_route_output_key_hash_rcu
-                  https://syzkaller.appspot.com/bug?extid=334190e097a98a1b81bb
-<3> 671     Yes   INFO: rcu detected stall in addrconf_rs_timer (6)
-                  https://syzkaller.appspot.com/bug?extid=fecf8bd19c1f78edb255
-<4> 311     Yes   INFO: rcu detected stall in gc_worker (3)
-                  https://syzkaller.appspot.com/bug?extid=eec403943a2a2455adaa
-<5> 47      No    WARNING in nf_hook_entry_head (2)
-                  https://syzkaller.appspot.com/bug?extid=6f6a1d20567a8d6b2a58
-<6> 32      Yes   KASAN: use-after-free Read in nf_hook_entry_head
-                  https://syzkaller.appspot.com/bug?extid=bb9127e278fa198e110c
-<7> 14      Yes   WARNING in __nf_unregister_net_hook (9)
-                  https://syzkaller.appspot.com/bug?extid=78ac1e46d2966eb70fda
+Ref  Crashes Repro Title
+<1>  13802   Yes   possible deadlock in nr_rt_device_down (3)
+                   https://syzkaller.appspot.com/bug?extid=ccdfb85a561b973219c7
+<2>  6378    Yes   possible deadlock in nr_rt_ioctl (2)
+                   https://syzkaller.appspot.com/bug?extid=14afda08dc3484d5db82
+<3>  2258    Yes   WARNING: ODEBUG bug in handle_softirqs
+                   https://syzkaller.appspot.com/bug?extid=60db000b8468baeddbb1
+<4>  1878    Yes   general protection fault in rose_transmit_link (4)
+                   https://syzkaller.appspot.com/bug?extid=d00f90e0af54102fb271
+<5>  1005    Yes   possible deadlock in nr_remove_neigh (2)
+                   https://syzkaller.appspot.com/bug?extid=8863ad36d31449b4dc17
+<6>  162     Yes   possible deadlock in nr_del_node (2)
+                   https://syzkaller.appspot.com/bug?extid=6eb7834837cf6a8db75b
+<7>  24      Yes   WARNING: refcount bug in ax25_setsockopt
+                   https://syzkaller.appspot.com/bug?extid=0ee4da32f91ae2a3f015
+<8>  23      Yes   KASAN: slab-use-after-free Read in nr_rt_ioctl
+                   https://syzkaller.appspot.com/bug?extid=df52f4216bf7b4d768e7
+<9>  10      Yes   KASAN: slab-use-after-free Read in ax25_find_cb
+                   https://syzkaller.appspot.com/bug?extid=caa052a0958a9146870d
+<10> 6       No    KASAN: slab-use-after-free Read in rose_t0timer_expiry
+                   https://syzkaller.appspot.com/bug?extid=44cccec2c6a4501f6a45
 
 ---
 This report is generated by a bot. It may contain errors.
