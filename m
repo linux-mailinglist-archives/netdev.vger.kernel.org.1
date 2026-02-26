@@ -1,212 +1,198 @@
-Return-Path: <netdev+bounces-261317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261318-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OEZ9Dj43oGkqgwQAu9opvQ
-	(envelope-from <netdev+bounces-261317-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 13:06:22 +0100
+	id YAHoBmM3oGkqgwQAu9opvQ
+	(envelope-from <netdev+bounces-261318-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 13:06:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C63E01A58E0
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 13:06:21 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 806E61A5900
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 13:06:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 93F46307D82B
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:02:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9D2BE30D3EEF
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:03:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5658C3803C6;
-	Thu, 26 Feb 2026 12:02:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F74A37B3F0;
+	Thu, 26 Feb 2026 12:03:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ao5mVLq6"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Q7Y8D6AY";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rlGKHnkK";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Q7Y8D6AY";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rlGKHnkK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1D4F18BC3D
-	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 12:02:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.181
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772107367; cv=pass; b=YqzJsUzcGhI5Bi4M4cFff4AGInTUtE3F0YLLM7YiYMo+/2vtvcqTWc/ZKV5M/2YVB8+u8AQ+qY9Zf+e1cERjraaNEqN32aE5BDo0He9T8c7/Y9ppQofPkg2Qbq9Ok7TmNWPuAASxzbxbrjfoV7DKHfXDH6PxXWal8p3yTdAK6/c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772107367; c=relaxed/simple;
-	bh=fHxx47e62Ab7AB98KxFyfkkORZp6y4ke1RxkXL5ZGIs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RHhNi3xWN7pnkBpHyuc7FVRbGR6PMtH9PlIjOm/HRdDyAFWfbfT6m3JHPIPyELlFxS81TJozNZEMEV4aKvWfKTcrNjq3yPsAWyRofa93b8wAf13Q0QyECShfD8QnsmEG1nZ+/cleLNwSVKDGp+IWg7K2zxr1qTSt70FtPH91KBY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ao5mVLq6; arc=pass smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-506989e8516so7745091cf.0
-        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 04:02:45 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772107365; cv=none;
-        d=google.com; s=arc-20240605;
-        b=RKDG9g65C76KCovmJ5LuMVFazSTHGuz6Ji3tHTdpb88DANjDgL13VLGbB3I12OJPpP
-         Be8JG925em6aDdECGWV3CdUZ5kOoGbnzgoosvU14pceEdDGT0SFzYjqmrlG8lFpUB3fa
-         ahX30p7IprGFSOveHqG9tt+Cn93ZUh8YkTe5w021afz6pkXsHRDExVVrR5OQWRYODrH8
-         hRc5EXHSfcM6/eOl8TBOCFdgFegRuk9Npb+Ofg+IoSqNzv/wtbS+svlXloYaRnZBaj/l
-         U6dCJCgppg3h5YUZgu+iW32t+QJkIGcFf7W+b1sxesljaYGKRUhA5HXuUuUghBhKP77C
-         nxnw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=WTO8df51m5646oak+wdzFx9B/WJc7HZU55MTR+mSHDU=;
-        fh=n3icroo2Gbj/o0+qWLCbvZ70kfxAWJocRKUBsTC2NPw=;
-        b=AaRLqmfOKy7JT+vq6LWzzDC0HL1DWJkRaDKEeM7jZZYKo/sRCdU2coH4r+HDRg6ZK6
-         H7lTB55EIv7bHjKmo6r5J8UXgINIyHEnVeeLFiBdnOQhDp/iqPtVAZcBoXr/et5HGBj6
-         aFeqyU45rGKcl3jHSbC/YyoH4yu7FLJj3/C3a5gz8MYHO9y3NA41FzgUJrf1aI+qh98C
-         OUZ1+PZkFrBvQy4lO+tR3nNijNbfrK5+F824wYyutsMfosmpddQQ1cjU5wpQB5XruTKs
-         cdSSRe4kV4cMkyasHMyVOagznCuP3v1P7ibvaIOhWWhqKd9szFI3cF/AnADdur2UzGzF
-         DSXg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772107365; x=1772712165; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WTO8df51m5646oak+wdzFx9B/WJc7HZU55MTR+mSHDU=;
-        b=ao5mVLq6QFnmB2NeyDzwo/+IorfyoFeg/cddjuoQKY2Z697rT+W7Sc+DtOZ+QkVtaX
-         ksfuRbra5FivJAZacCrVlqdKQJS0bTVNKDXUkIFG6aUZnMoMPWE94ybw9mjJnfLYoOzP
-         RIwbzT4xKnR83zblzVGufazrMk/To6c1EocV3P2M9kpmHNewE9Fz9f0XCYkbSiqBEBPH
-         SKTUdjprYEnDh+w5Dx+eDlS/wa/gpFxZX39RmHqom6LncwIte9osOa0aYmH6YZP89J15
-         fcLJCTLamKC1/wANUlZGywIxuUOZEZMMLxfjgDo/Mdwdy+RveHDX404mdRJ4a0DNv1Br
-         qe6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772107365; x=1772712165;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=WTO8df51m5646oak+wdzFx9B/WJc7HZU55MTR+mSHDU=;
-        b=cYfValWm29zPYx9tz+QevJr8rRpdqzjdvazXaLO81xEVViNqL1QXtuXnwpLk+Z2qS5
-         MfGztFoIxUnCbOs9td2jZ5F0hpNyvpg9hgEp0nO7xYhgB0tq9zwi9jM6C7lE69BThxA2
-         eccJK8IPNILQTyXEj4ACYnwSX0iM45i1kig5ANGRG9FPjLjw/Cn+H0uN0k8f2dnvvL2Y
-         eK+en6z4pvm2auhhEvmfTXYWo8jjG4fwq8nA7P2LSKaPpVhCQZkUpFwWDSWDafaziWNR
-         3FARxklblnhr8WloSPQA+C28481p9CELTOguXncw69jCYcnhwG6ORORmXVFJqXyigV9m
-         YFtA==
-X-Forwarded-Encrypted: i=1; AJvYcCVD5EQGxkEauXmDwEZN6IXuqglo81Ay9dPR6jyslMPwkKWnlBsWuYCoZQFStbz2lZN5Pi2p2a8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrCwdUMqJ+Pq5q5yGqdQCuVuUiTxxD6UgIjwV6+tiYZAxn83jk
-	JqYSWpipgBOoM0BFcp+P54Wm5XnuDqk8/2dTdunAbatlq8INfoX1HjQpKrOEUeYz9fVL2rHEU4A
-	PZ3cE9oE0o0kAU7oR3Z70MKAP1JboyQOrovyKDWiE
-X-Gm-Gg: ATEYQzxbg06TOz/KvGeInQ0pbvO9nfF7+1iFccrWiXqy1uUC/IzvxLWVGnXkmJjRCVG
-	HrGHQQs7Cl1zo2FVKUKHM/nUeMax37B+NFdqYYPu1rN9qiViH+Dhb2Y9xfO0FYITfh7ld7yqUvg
-	SsQqXc2sRHtVBaKVQgZYYCmC07+Tnlci8WfQF9oOhg67kP5hucQtMRKu51KgwIu1lpUgPymoL94
-	JIErWMFVNzAHvC4JtV0WCCM1rFJ7L+bpVft1FZqywAODjrZ3ZFvopmDei6aCGGjkoHQBCn53bLI
-	XGTzm0HrX943yxYZT6Y2xbGZO/dUYpKezKXLgX6yDoUchNqYSwc=
-X-Received: by 2002:ac8:7c4e:0:b0:506:1c3b:c896 with SMTP id
- d75a77b69052e-50745ed2822mr19991151cf.11.1772107364456; Thu, 26 Feb 2026
- 04:02:44 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC1D364026
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 12:03:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772107386; cv=none; b=YODprfhLswQ0RlA533IErqtOmilNljS09gT8gbwRt6GUQ9TQiPgNHwzPW+olkiCU/uYBkSv2cr2S53Zd2YPAN4xreRkxC96dchfo7tvoLIeveQfuKYei1nXTUi9vBl8GmTzuk0rGFzGnO+rqAk45QGWBq/RsA1KAlCpi4bGqEqc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772107386; c=relaxed/simple;
+	bh=BsB+oEPzvEnbOuwAtJ69eebytdrFzUZWsWhC2mPRS30=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Avwco8Qrxu2QsdN6/HfpumnNNTuD/nrwTc4U7SXPiO2EutEQVDqMjD5Sd0dkV8fVj/tqh27b5jVP/Hw0VBUgWFQwjamgOnkfDm5qFzOWV2GoiPvSr4w2aGM16EDcQjXSJecTPnuWkpm2vIKfgFMyVBVj8qxW4zTtsJABBkMcSbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Q7Y8D6AY; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=rlGKHnkK; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Q7Y8D6AY; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=rlGKHnkK; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id DF5201F43B;
+	Thu, 26 Feb 2026 12:02:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772107379; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=lKApDUyIFUIzliUqleBEaoniXopBT8Tn71tpN6GHZTc=;
+	b=Q7Y8D6AYioQe/Q+SHsI57k2dXfbMtSTyskyVEwf91C76t/RrZ7IlJ/PCS8hVxhxb171QFh
+	N7meD+y+Z143zELHzXVxF8xewVjAxYCBFWymhA6ONLhCt9TJL/iOvcv7tnkKN4D2D528G2
+	XUiUBponmxcfTJVVBGQpPIAHBpkp51E=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772107379;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=lKApDUyIFUIzliUqleBEaoniXopBT8Tn71tpN6GHZTc=;
+	b=rlGKHnkK5aRxOwb+DwcEaJ6BTVUgK1ota7rJSiMPq2QnKMvxZGjHydUS7Ik1Zm2cPJLg7r
+	gx6boKJDsJYdwBDw==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772107379; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=lKApDUyIFUIzliUqleBEaoniXopBT8Tn71tpN6GHZTc=;
+	b=Q7Y8D6AYioQe/Q+SHsI57k2dXfbMtSTyskyVEwf91C76t/RrZ7IlJ/PCS8hVxhxb171QFh
+	N7meD+y+Z143zELHzXVxF8xewVjAxYCBFWymhA6ONLhCt9TJL/iOvcv7tnkKN4D2D528G2
+	XUiUBponmxcfTJVVBGQpPIAHBpkp51E=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772107379;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=lKApDUyIFUIzliUqleBEaoniXopBT8Tn71tpN6GHZTc=;
+	b=rlGKHnkK5aRxOwb+DwcEaJ6BTVUgK1ota7rJSiMPq2QnKMvxZGjHydUS7Ik1Zm2cPJLg7r
+	gx6boKJDsJYdwBDw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 510053EA62;
+	Thu, 26 Feb 2026 12:02:59 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id uPPKEHM2oGktfQAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Thu, 26 Feb 2026 12:02:59 +0000
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+To: netdev@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org,
+	shuah@kernel.org,
+	horms@kernel.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	Fernando Fernandez Mancera <fmancera@suse.de>
+Subject: [PATCH net-next v2] selftests: net: add ipv6 RA route to ECMP merge test
+Date: Thu, 26 Feb 2026 13:02:37 +0100
+Message-ID: <20260226120237.5352-1-fmancera@suse.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260226111721.25454-1-yuuchihsu@gmail.com>
-In-Reply-To: <20260226111721.25454-1-yuuchihsu@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 26 Feb 2026 13:02:31 +0100
-X-Gm-Features: AaiRm53OMr1sZRwTFEY50Od6VH3Wz_vM8hHKwZUR308MKmTdUom4P_0a0eb-MOs
-Message-ID: <CANn89i+rJeZHoGna5PGWN31UGDO3jy1xx-rWs0SA23H6mU6qKw@mail.gmail.com>
-Subject: Re: [PATCH] net: ipv6: fix ARM64 alignment fault in fib_multipath_hash_from_keys()
-To: Yung Chih Su <yuuchihsu@gmail.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, nathan@kernel.org, 
-	nick.desaulniers+lkml@gmail.com, morbo@google.com, justinstitt@google.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Spam-Score: -2.80
+X-Spam-Level: 
+X-Spam-Flag: NO
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261317-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[suse.de:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,gmail.com,google.com,vger.kernel.org,lists.linux.dev];
-	TAGGED_RCPT(0.00)[netdev,lkml];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_FROM(0.00)[bounces-261318-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: C63E01A58E0
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,suse.de:mid,suse.de:dkim,suse.de:email]
+X-Rspamd-Queue-Id: 806E61A5900
 X-Rspamd-Action: no action
 
-On Thu, Feb 26, 2026 at 12:18=E2=80=AFPM Yung Chih Su <yuuchihsu@gmail.com>=
- wrote:
->
-> struct sysctl_fib_multipath_hash_seed contains two u32 fields (user_seed
-> and mp_seed), making it an 8-byte structure with a 4-byte alignment requi=
-rement.
->
-> In fib_multipath_hash_from_keys(), the code evaluates the entire struct
-> atomically via READ_ONCE():
->
-> mp_seed =3D READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed).mp_seed;
-> While this silently works on GCC by falling back to unaligned regular loa=
-ds
-> (e.g., LDR/LDUR) which the ARM64 kernel tolerates, it causes a fatal kern=
-el
-> panic when compiled with Clang and LTO enabled.
->
-> Commit e35123d83ee3 ("arm64: lto: Strengthen READ_ONCE() to acquire when
-> CONFIG_LTO=3Dy") strengthens READ_ONCE() to use Load-Acquire instructions
-> (ldar / ldapr) to prevent compiler reordering bugs under Clang LTO.
->
-> Since the macro evaluates the full 8-byte struct, Clang emits a 64-bit
-> ldar instruction. ARM64 architecture strictly requires ldar to be
-> naturally aligned. Executing a 64-bit ldar on a 4-byte aligned address
-> (e.g., ending in 0xEC) triggers a strict Alignment Fault (FSC =3D 0x21).
->
-> Fix this by moving the READ_ONCE() directly to the specific u32 member:
->
-> mp_seed =3D READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed.mp_seed);
-> This instructs the compiler to emit a 32-bit load (ldar Wn or ldr Wn),
-> which perfectly satisfies the 4-byte alignment requirement and resolves
-> the crash.
->
-> Fixes: [4ee2a8cace3fb9a34aea6a56426f89d26dd514f3] ("net: ipv4: Add a sysc=
-tl to set multipath hash seed")
-> Signed-off-by: Yung Chih Su <yuuchihsu@gmail.com>
-> ---
->  include/net/ip_fib.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/include/net/ip_fib.h b/include/net/ip_fib.h
-> index b4495c38e0a0..318593743b6e 100644
-> --- a/include/net/ip_fib.h
-> +++ b/include/net/ip_fib.h
-> @@ -559,7 +559,7 @@ static inline u32 fib_multipath_hash_from_keys(const =
-struct net *net,
->         siphash_aligned_key_t hash_key;
->         u32 mp_seed;
->
-> -       mp_seed =3D READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed).m=
-p_seed;
-> +       mp_seed =3D READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed.mp=
-_seed);
->         fib_multipath_hash_construct_key(&hash_key, mp_seed);
->
->         return flow_hash_from_keys_seed(keys, &hash_key);
+As commit bbf4a17ad9ff ("ipv6: Fix ECMP sibling count mismatch when
+clearing RTF_ADDRCONF") pointed out, RA routes are not elegible for ECMP
+merging.
 
-What about proc_fib_multipath_hash_set_seed() ?
+Add a test scenario mixing RA and static routes with gateway to check
+that they are not getting merged.
 
-It has :
+Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+---
+v2: added CONFIG_IPV6_ROUTE_INFO to the config
+---
+ tools/testing/selftests/net/config       |  1 +
+ tools/testing/selftests/net/fib_tests.sh | 17 +++++++++++++++++
+ 2 files changed, 18 insertions(+)
 
-WRITE_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed, new);
+diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
+index cd49b7dfe216..69e22bde0fdb 100644
+--- a/tools/testing/selftests/net/config
++++ b/tools/testing/selftests/net/config
+@@ -43,6 +43,7 @@ CONFIG_IPV6_ILA=m
+ CONFIG_IPV6_IOAM6_LWTUNNEL=y
+ CONFIG_IPV6_MROUTE=y
+ CONFIG_IPV6_MULTIPLE_TABLES=y
++CONFIG_IPV6_ROUTE_INFO=y
+ CONFIG_IPV6_RPL_LWTUNNEL=y
+ CONFIG_IPV6_SEG6_LWTUNNEL=y
+ CONFIG_IPV6_SIT=y
+diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
+index c5694cc4ddd2..1262ee1ea09b 100755
+--- a/tools/testing/selftests/net/fib_tests.sh
++++ b/tools/testing/selftests/net/fib_tests.sh
+@@ -1534,6 +1534,23 @@ fib6_ra_to_static()
+ 
+ 	log_test $ret 0 "ipv6 promote RA route to static"
+ 
++	# Prepare for RA route with gateway
++	$NS_EXEC sysctl -wq net.ipv6.conf.veth1.accept_ra_rt_info_max_plen=64
++
++	# Add initial route to cause ECMP merging
++	$IP -6 route add 2001:12::/64 via fe80::dead:beef dev veth1
++
++	$NS_EXEC ra6 -i veth2 -d 2001:10::1 -R 2001:12::/64#1#120
++
++	# Routes are not merged as RA routes are not elegible for ECMP
++	check_rt_num 2 "$($IP -6 route list | grep -c "2001:12::/64 via")"
++
++	$IP -6 route append 2001:12::/64 via fe80::dead:feeb dev veth1
++
++	check_rt_num 2 "$($IP -6 route list | grep -c "nexthop via")"
++
++	log_test "$ret" 0 "ipv6 RA route with nexthop do not merge into ECMP with static"
++
+ 	set +e
+ 
+ 	cleanup &> /dev/null
+-- 
+2.53.0
 
-Which is IMO strange, regardless of ARM64 clang and whats not.
 
