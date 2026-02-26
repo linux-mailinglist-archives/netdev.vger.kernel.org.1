@@ -1,131 +1,161 @@
-Return-Path: <netdev+bounces-261270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261271-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gGAdFoIboGmzfgQAu9opvQ
-	(envelope-from <netdev+bounces-261270-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 11:08:02 +0100
+	id 2INACcMcoGmzfgQAu9opvQ
+	(envelope-from <netdev+bounces-261271-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 11:13:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9D721A3FC3
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 11:08:01 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C88511A415F
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 11:13:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D68B93086DC1
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 10:05:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A6D7530088AD
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 10:10:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A0E73A0B1C;
-	Thu, 26 Feb 2026 10:05:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B72753939B8;
+	Thu, 26 Feb 2026 10:10:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AZsuW3xd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AMF7jBr1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2133A1E8B
-	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 10:05:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 941132D4805;
+	Thu, 26 Feb 2026 10:10:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772100319; cv=none; b=gVxBdOuo+KA4RG8ClOErDnTTNzWum+tzHsJRj538my1TY6HI2SdOnWu5/wtcHQjNHcrrwdAG0rtC2MOaHvbXnWN4715M6VpfRlUVZz6+07sTJnZ070b2jsLwfug1WivHMbUfCnJVmx7lSN+LBKJVTNUPt9OFswF0JX9POHx4eqw=
+	t=1772100637; cv=none; b=iDvkJ1/+72uJPht+bDjsaj23pm4jJTn7FKA96GLa3YNZ36f8apUSdJTHZqjgE44wKIRDcs7yU/9xFWDriwxm2V/KF9XaFftaVP3G6Q6i6vgRlNtJFnbXVzB77dcP9L+EwYNJrDjySFuSkOjIYG0cR2Yw+mvli2WIKCity2nuZ/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772100319; c=relaxed/simple;
-	bh=il5BobYPO13HOqKz/MlB9UiuKZcEcL1hHpkOQGFX1kE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TDetx46r2E9zrtp7unqeorZreYcbXvH8bm0QbX3+ABWUow1EtnJdy9XpTnItlI3sqSnZly5s/XBQAkSjTrdH+vmwqYIAxtMUv1hAhcBtsaZiOrobwc+e8AgWGEBTzK0go8K8QH4JQAkTpsWy5osQiY/0jw7RMVz/xKgQw/FflYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AZsuW3xd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF165C19423;
-	Thu, 26 Feb 2026 10:05:17 +0000 (UTC)
+	s=arc-20240116; t=1772100637; c=relaxed/simple;
+	bh=OOec1l6d7yBEUrYf/oSgYiUEniykn/mgb4ahxOg/szs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=cxEEQ3I/s04WzDjfLuEFwJykU6NF3xSrynleTPXyJuZF+K7+oJILO0CArYoo/IlPg0wwexvhrel2efbHl2NsPUO59swribiaxYcEoHmGKunsojFx3FkE1x+WFvbt65/PZeZyvzLFqz46pMgPjNlOj8LeWTsbQ9WjR6uNb5iKtlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AMF7jBr1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33CECC19422;
+	Thu, 26 Feb 2026 10:10:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772100318;
-	bh=il5BobYPO13HOqKz/MlB9UiuKZcEcL1hHpkOQGFX1kE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AZsuW3xdcaAFnbzRWJ2pJKCT16LHWPOBz0L4Q4CF34qqBXg1pvEK2fuyC9C9Jz0/N
-	 GDT565/+MXQ7kh0oR7ZgmFeDRcFSM5F4IZuA/WfeSAe7Kaueot4iE72RS4oSTltclP
-	 40oowlkBgHml4nggBU0cEMY3Jfi4LEcxGNtibEDFSXJO27viB1ruvHK69SJyOTa1lO
-	 jTdfOm/9nUwfDE0siomd63p8eX8Io6pJL3IDK5KJJRUPCuq9CO5r/DTD7QjKAVcRM0
-	 aTDFO/ff0TYcdmSGV5qpMQGiafkJIPyo3rqoxqP82QHslA6iX/r3c+YL3BMf8O+bHr
-	 hxWrXh8w9A6dw==
-Date: Thu, 26 Feb 2026 12:05:14 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Cheng-Yang Chou <yphbchou0911@gmail.com>
-Cc: netdev@vger.kernel.org, saeedm@nvidia.com, tariqt@nvidia.com,
-	mbloch@nvidia.com, jserv@ccns.ncku.edu.tw, charlie910417@gmail.com
-Subject: Re: [PATCH 1/1] net/mlx5/core: Allocate ttc_params on heap
-Message-ID: <20260226100514.GH12611@unreal>
-References: <20260226092857.1583984-1-yphbchou0911@gmail.com>
- <20260226092857.1583984-2-yphbchou0911@gmail.com>
+	s=k20201202; t=1772100637;
+	bh=OOec1l6d7yBEUrYf/oSgYiUEniykn/mgb4ahxOg/szs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=AMF7jBr1UkOwE6dRa2ScYMTYyqPVb8+m5YauzlxMdJDk+ijLGVyAMzt94ORCKKWm3
+	 7d1Ge7ADqEJO/7qaACUyIe8owYexdpRVF5C2fX8N9VqC/0Soa5hsHjh6mm+XhHfkbX
+	 VGfd3oEGK0PnofDltaNTPaQY7/VuyYvihNqnRPOdSXuM9oJno8h8uM+y+sH6Pap3PN
+	 NNIxPxjaCam5g/63tn1FwAxXSqFtp3XHpOaOaOjwCpwUori+AJdmAivu+jtyfvPPSK
+	 /xSDhtt4+4sN7KvBOwFEUN5vyWdlp8Or5KboHOLd38A+5B+p86Ds41Q1e/66bPmuIf
+	 /F4TyGWxylTKA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02DE2380A977;
+	Thu, 26 Feb 2026 10:10:43 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260226092857.1583984-2-yphbchou0911@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 00/15] net/mlx5e: SHAMPO,
+ Allow high order pages in zerocopy mode
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177210064179.1142974.16555075271250106665.git-patchwork-notify@kernel.org>
+Date: Thu, 26 Feb 2026 10:10:41 +0000
+References: <20260223204155.1783580-1-tariqt@nvidia.com>
+In-Reply-To: <20260223204155.1783580-1-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
+ leon@kernel.org, mbloch@nvidia.com, ast@kernel.org, daniel@iogearbox.net,
+ hawk@kernel.org, john.fastabend@gmail.com, richardcochran@gmail.com,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, gal@nvidia.com,
+ dtatulea@nvidia.com, cratiu@nvidia.com, asml.silence@gmail.com,
+ dw@davidwei.uk
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261270-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,ccns.ncku.edu.tw,gmail.com];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-261271-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,redhat.com,lunn.ch,davemloft.net,nvidia.com,iogearbox.net,gmail.com,vger.kernel.org,davidwei.uk];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	FROM_NO_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B9D721A3FC3
+X-Rspamd-Queue-Id: C88511A415F
 X-Rspamd-Action: no action
 
-On Thu, Feb 26, 2026 at 05:28:55PM +0800, Cheng-Yang Chou wrote:
-> The ttc_params structure is too large to be allocated on the stack,
-> triggering warnings for exceeding the 1024-byte frame size limit.
-> Consuming excessive stack space risks causing stack overflows.
-> 
-> Allocate the structure dynamically to maintain safe stack boundaries.
-> 
-> Signed-off-by: Po-Ying Chiu <charlie910417@gmail.com>
-> Signed-off-by: Cheng-Yang Chou <yphbchou0911@gmail.com>
-> ---
->  .../net/ethernet/mellanox/mlx5/core/en_rep.c  | 15 +++++++++----
->  .../net/ethernet/mellanox/mlx5/core/en_tc.c   | 15 ++++++++++---
->  .../mellanox/mlx5/core/lag/port_sel.c         | 22 ++++++++++++++-----
->  3 files changed, 39 insertions(+), 13 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-> index 6eec88fa6d10..8e3862f5b563 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-> @@ -966,27 +966,34 @@ static int mlx5e_create_rep_ttc_table(struct mlx5e_priv *priv)
->  {
->  	struct mlx5e_rep_priv *rpriv = priv->ppriv;
->  	struct mlx5_eswitch_rep *rep = rpriv->rep;
-> -	struct ttc_params ttc_params = {};
-> +	struct ttc_params *ttc_params;
->  	int err;
->  
-> +	ttc_params = kzalloc(sizeof(*ttc_params), GFP_KERNEL);
+Hello:
 
-It needs to be kzalloc_obj(*ttc_params).
-https://lore.kernel.org/linux-rdma/20260226071913.GD12611@unreal/T/#u
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Thanks
+On Mon, 23 Feb 2026 22:41:40 +0200 you wrote:
+> Hi,
+> 
+> This series adds support for high order pages when io_uring/devmem
+> zero copy is used.
+> 
+> See detailed description by Dragos below.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,01/15] net/mlx5e: Make mlx5e_rq_param naming consistent
+    https://git.kernel.org/netdev/net-next/c/376cf4227401
+  - [net-next,02/15] net/mlx5e: Extract striding rq param calculation in function
+    https://git.kernel.org/netdev/net-next/c/d3a99b71a29c
+  - [net-next,03/15] net/mlx5e: Extract max_xsk_wqebbs into its own function
+    https://git.kernel.org/netdev/net-next/c/a2ff2f5f808f
+  - [net-next,04/15] net/mlx5e: Expose and rename xsk channel parameter function
+    https://git.kernel.org/netdev/net-next/c/ba4f39c256f5
+  - [net-next,05/15] net/mlx5e: Alloc xsk channel param out of mlx5e_open_xsk()
+    https://git.kernel.org/netdev/net-next/c/8a96b9144f18
+  - [net-next,06/15] net/mlx5e: Move xsk param into new option container struct
+    https://git.kernel.org/netdev/net-next/c/099efb294e0a
+  - [net-next,07/15] net/mlx5e: Drop unused channel parameters
+    https://git.kernel.org/netdev/net-next/c/3707a73854c1
+  - [net-next,08/15] net/mlx5e: SHAMPO, Always calculate page size
+    https://git.kernel.org/netdev/net-next/c/dff1c3164a69
+  - [net-next,09/15] net/mlx5e: Set page_pool order based on calculated page_shift
+    https://git.kernel.org/netdev/net-next/c/3a145cf492a3
+  - [net-next,10/15] net/mlx5e: Alloc rq drop page based on calculated page_shift
+    https://git.kernel.org/netdev/net-next/c/0285cc3dac1b
+  - [net-next,11/15] net/mlx5e: RX, Make page frag bias more robust
+    https://git.kernel.org/netdev/net-next/c/8611660778bf
+  - [net-next,12/15] net/mlx5e: Add queue config ops for page size
+    https://git.kernel.org/netdev/net-next/c/0fa8c9335760
+  - [net-next,13/15] net/mlx5e: Pass netdev queue config to param calculations
+    https://git.kernel.org/netdev/net-next/c/585cfa99d357
+  - [net-next,14/15] net/mlx5e: Add param helper to calculate max page size
+    https://git.kernel.org/netdev/net-next/c/5b6e0ddb3686
+  - [net-next,15/15] net/mlx5e: SHAMPO, Allow high order pages in zerocopy mode
+    https://git.kernel.org/netdev/net-next/c/df5135fced85
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
