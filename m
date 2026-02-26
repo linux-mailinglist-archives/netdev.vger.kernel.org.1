@@ -1,198 +1,169 @@
-Return-Path: <netdev+bounces-261395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261396-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IJcrHc9loGkejQQAu9opvQ
-	(envelope-from <netdev+bounces-261395-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 16:25:03 +0100
+	id mBV5GvBpoGk3jgQAu9opvQ
+	(envelope-from <netdev+bounces-261396-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 16:42:40 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC5A41A8A04
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 16:25:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF6E61A8FB1
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 16:42:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4411E30817D9
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 15:16:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C31F53225BAB
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 15:16:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 338D241C31C;
-	Thu, 26 Feb 2026 15:12:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 247314218B8;
+	Thu, 26 Feb 2026 15:12:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Xs4qOZM2"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="QYDBiJUO";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="DlFZsMlf";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="QYDBiJUO";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="DlFZsMlf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f225.google.com (mail-pf1-f225.google.com [209.85.210.225])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49E7141325F
-	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 15:12:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.225
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772118727; cv=pass; b=UFps8CGZXZeMEXlGFGvW2I5RvOBz2LKcfQQ2JDRNioBx6xb1y1pjB/JC7elINmFSneqSVON+agGvI6geQpC1ncPet5P5meoYSjnSkCqhDvi9s64dsKwfiGvkInR+/RZ9x/06MwcjOjNk1tN/l0PdoVM2yLgVojwYAgtyT/VJSiY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772118727; c=relaxed/simple;
-	bh=NbJET6KxkAXnaJPsRNK+gXgAfNUd5YHwy/v7Bw6FEBY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=brgfeAqbWIJ4BL87XaSkiFlijFXaicWXaeefBBgn4MW9qnroQS36NU7sXBQhfd5yYr/IVpuFcHBFQACiNSw4ULH7pgzIUl+Z1eJgD5/a2yldnY3c0963/95nHukJ4r38zI05oSyqxmnGGBvsN+SIFA1m/Vga+IincikDeh/13/M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Xs4qOZM2; arc=pass smtp.client-ip=209.85.210.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f225.google.com with SMTP id d2e1a72fcca58-8272ccb554fso847491b3a.2
-        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 07:12:02 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772118721; x=1772723521;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NbJET6KxkAXnaJPsRNK+gXgAfNUd5YHwy/v7Bw6FEBY=;
-        b=WD83vY4n2a4F0rD+42qA7xPL7/9HOuG2lf9TdPiSxr1wYvCksF2p3ILBZjyylx48qU
-         Tl69MdlxeiF5OTfjrRTGxrUjHrrtAaFz9DWL6yHdK4Gz9EW+vkUKA9gByfKvesQEiLQB
-         A8yoZgMja9DBWxOfInCADgPgopziTp/pz3sfW2Ti6cZoz/k0mU7DY/I08+mKgWpXqGd7
-         1RWPPsTAS+bUzbRZ4E7T+kBsP3netqet5KWiHfcpO+vVZfvFouJoQaixkDyzV/RhN9hj
-         ciR6oclbRvYeN6V2btgKCcsNvyS9/2RP7PxEcnbjmbxowSfr1myRgeHVx2opdIfpP0sw
-         iMtA==
-X-Forwarded-Encrypted: i=2; AJvYcCVtx5KLYjKeqfDFOV7ZPZPdZPBeWkTk21qO5C3dAJSP8tkLA1xkxXb4dZSZPFdGadrAIqPHuUw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLw97Ium3WTOdNga2cS4RWL0JB2USg+WcB0ac5jgNEeCrFk3YF
-	YpGIAB+hh6FQd2Mg9VSW0hQByoIlU/af1+dYCkgUaQNL6Tii2CTpksrpblDdgEIr7bw/EBM6fyG
-	fFMZrfVZEQ3fwBkbi9KtdAkcsZuQQPYQcHsaVZZUS+Ghn8soFEk3dQbhiZ5n+PFiZ/RFLCFVHZs
-	eQn43yJBOGsOXFup62NZx7VdPrr89DN3Wt80QEGW1rNjs0HzdRm5q9iuw77h7nG3ituC+iv/ONL
-	gqASajhIQ==
-X-Gm-Gg: ATEYQzwNy8gMmBW9H/dbjU65hL8BbDTs6jsrvj3hfYAnGHA6CaT1Larv5WABGrkddMg
-	x6tD05K14nahi4OWX8GF6xd9UbPzw9LuPsK4QvgEE2Xa4ttLUG2VxuLzIKiIs0GzOCGWa5zzXXZ
-	dRArbvo/543UN8Q08R79zcD3S1h6ORfw8UF/R9rE463GzJtLfhGvehw10+bF13gmdic7RazREQE
-	HYPJpisdxaodbxte0ULzV9otxS7lyC1vLvE2olTnR/K8OLcXym+1NGqC4mIu9YlzR5RSLtMNYjL
-	6TIkHxtxmcC0sZ6Imkn5ImMuTSWg+f9/ml6E/4zSUS6fT0tq9lzcyvZzn8iO3FPMI5XiP8bB0F6
-	sjNw30GgMK1WoKBzpEQGOgwSnRq5ZyorlsVRvDxtJWuHuEllM6mHKVePOFYkRvfErVjrJrIrstZ
-	gIKCqHQO0A5ff8JsNdf3sIb8AuKYWrTqZVDKRiCUk9je1JUOGGa8M/j14=
-X-Received: by 2002:a05:6a20:1604:b0:393:8fc:5284 with SMTP id adf61e73a8af0-39546027fb1mr19152726637.70.1772118721194;
-        Thu, 26 Feb 2026 07:12:01 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-95.dlp.protect.broadcom.com. [144.49.247.95])
-        by smtp-relay.gmail.com with ESMTPS id 41be03b00d2f7-c70fa5eb78dsm164960a12.4.2026.02.26.07.12.00
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 26 Feb 2026 07:12:01 -0800 (PST)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-3594620fe97so2572487a91.1
-        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 07:12:00 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772118719; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Rz909PUxcpB+4CjA7MQEzo5WWhqlGR12kjQLZV6xC/tJHpq3BuwWZnnRFc/X6pwOIh
-         fvDhLrsCAvBU9wxn19SzO6GejPbvDoTF0Xu/GGfadBamSlL+xKQFMt+n0UGOfm9MlYHU
-         vVhQXUI7YYQhRIAzgWs8SDYnIG6N6Hg1n66L6c9L+MRVtwy4iyGfdN7hWNjrivu+LLOV
-         P7ENnUt0Zj0S9Fp90mh/0Wuz+iV1/DZImZm6s86dZp/qPUDTkzaSNZBLaLInNVjOGVz8
-         KsczA1d2s5mg71EyS080W/u+Qs6OeHfVzVhy585jxwPP4F+by3YKw/5qEdZi51YiGuS2
-         RkgA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=NbJET6KxkAXnaJPsRNK+gXgAfNUd5YHwy/v7Bw6FEBY=;
-        fh=7bwWSC4wo//SNCFkq7qpunPY6LAJSkK1wOJFOJWDqEw=;
-        b=D8iWPqzjHFpukN6X+M1g/A/u9mbgm2HndCCN0g3/ldn8iZk1N/eHF1ICGBV45Ww4OV
-         LbTkmb+/Jp7Col7VCyF+zwEGGhvWBozqN7kq4P/0WP3a7blzOIafuN5kJQygR+aUR5za
-         RhKLJdYyx3pfqu7Ykp7DJjC8uwbZz0Mmgock959PqRlgvHqdPlka5T1LiajLTDqHglin
-         B0e08Ro9zBXG45dpBgxvyromxhd4VJbhL/kwO/NzzIMWjHiKXUtBy6SDXvQ8mIYTSUGT
-         8r/IHiydeydnXNCohhHr4YDUjpcMxnn68CVvlcoRWNq4cGN80Q5t4sBkF8u0l3QW0f4s
-         brZw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1772118719; x=1772723519; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NbJET6KxkAXnaJPsRNK+gXgAfNUd5YHwy/v7Bw6FEBY=;
-        b=Xs4qOZM2Ax2hHJZ5a6lXAaVtxzgBYKzbhar2EmUBtvAz8bmekiBRE6kMlR3uSWDkER
-         +htrEv0lqIAm8cD+1u1l9JAJtNh0jxadMUQI2Fj5YtrJzyF6xbXrD77lt6aYPLyw256k
-         lALqs8J2mEfRe8YJno4uzB2Rl2j+opxCU089Y=
-X-Forwarded-Encrypted: i=1; AJvYcCU87WpjsTSGPdD2fep6sdSMhi/3nPDHLD78w6KAfq+B5Ou0BbET0oM8YPAqHthUEbwxxqEHgpw=@vger.kernel.org
-X-Received: by 2002:a17:90b:17c8:b0:349:9d63:8511 with SMTP id 98e67ed59e1d1-358ae8d5ac1mr15851878a91.25.1772118719455;
-        Thu, 26 Feb 2026 07:11:59 -0800 (PST)
-X-Received: by 2002:a17:90b:17c8:b0:349:9d63:8511 with SMTP id
- 98e67ed59e1d1-358ae8d5ac1mr15851856a91.25.1772118718922; Thu, 26 Feb 2026
- 07:11:58 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC62641C2E3
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 15:12:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772118729; cv=none; b=jOE7OSOktEyvWiRWOzg9O+hLpNcbs2U1e8PZ+RxqEC0y9mdZftJS1/h+wJl+bicSvC38sHOxdlUQ4UGZ2SYeSXmSnU5C8ljLWMC333S4ow0R8QepGJxn9IGYaM5mj6qSlbeg9nZaMvK0NVe56M4Ghz28yoz7owsB5YNI466rrZk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772118729; c=relaxed/simple;
+	bh=kPHygWe2jbtSUP7zW5kgWVyEx1bg3NULJKIn+Ov37sQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=oZE7vWRvDYuFX5K+6n4OPez/Ovlw8kr2q4I4q/jxYSDLGTsKZ7ncZbi5SdC8lQCbSh7k8zxhNAedFYdROjOAmlHHverKhlTRyWNpKN5lWPPlIjDtbsucxj1QPPnMHmCH2r5dQ/FF5ft+vBjIAtFI2AZDWXTPsVvHWDRyA+H7Kys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=QYDBiJUO; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=DlFZsMlf; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=QYDBiJUO; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=DlFZsMlf; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id C79981FA90;
+	Thu, 26 Feb 2026 15:12:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772118722; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SdufMlCZQDp9ZXMcX56HdtTjDnN3EG8pEvb9VFS/2YI=;
+	b=QYDBiJUOj0+MrhAnzP+aa/DRAWjZv1B6WCYhwsqZkb4dcMLrPzGG6ah9hZDU3bcsbSMbEQ
+	8peAjDoetMTds8elsrwxnC1a8WbZqZfaqXJeAXM1CMpmgyf+8+PxMoemSksk7Q8CMAdzHN
+	1W++k3/zYh+u/rDJqSYQM5rv3r47Cac=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772118722;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SdufMlCZQDp9ZXMcX56HdtTjDnN3EG8pEvb9VFS/2YI=;
+	b=DlFZsMlfI9xCEro4v/rlT2MK5XcHNhllExlqNuH0OIe9rPyW2F2+w98D5iogSXXeUGka4S
+	bD+2hPQMASpapeBA==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=QYDBiJUO;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=DlFZsMlf
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772118722; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SdufMlCZQDp9ZXMcX56HdtTjDnN3EG8pEvb9VFS/2YI=;
+	b=QYDBiJUOj0+MrhAnzP+aa/DRAWjZv1B6WCYhwsqZkb4dcMLrPzGG6ah9hZDU3bcsbSMbEQ
+	8peAjDoetMTds8elsrwxnC1a8WbZqZfaqXJeAXM1CMpmgyf+8+PxMoemSksk7Q8CMAdzHN
+	1W++k3/zYh+u/rDJqSYQM5rv3r47Cac=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772118722;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SdufMlCZQDp9ZXMcX56HdtTjDnN3EG8pEvb9VFS/2YI=;
+	b=DlFZsMlfI9xCEro4v/rlT2MK5XcHNhllExlqNuH0OIe9rPyW2F2+w98D5iogSXXeUGka4S
+	bD+2hPQMASpapeBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9796C3EA69;
+	Thu, 26 Feb 2026 15:12:02 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id T/XUIcJioGlJSQAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Thu, 26 Feb 2026 15:12:02 +0000
+Message-ID: <d71fbf78-4950-42c1-b941-b6356f42c74e@suse.de>
+Date: Thu, 26 Feb 2026 16:11:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260223191154.2800616-1-kiran.kella@broadcom.com>
- <20260223191154.2800616-2-kiran.kella@broadcom.com> <0a850f65-be67-4a66-941f-17d8440e987b@gmail.com>
- <CAPHeo3eJRYc503Ta24h9r+Uu1cGqb1dCfmnxuZQ4MJLCTFd9Lw@mail.gmail.com> <aed01ac3-a393-486f-9fee-09928fea9a94@gmail.com>
-In-Reply-To: <aed01ac3-a393-486f-9fee-09928fea9a94@gmail.com>
-From: Kiran Kella <kiran.kella@broadcom.com>
-Date: Thu, 26 Feb 2026 20:41:20 +0530
-X-Gm-Features: AaiRm53rO7ITBP5JMVQy16JE7syQMnZbBMripOsAUWzzka_WcVUpPNBSdhG2tOk
-Message-ID: <CAPHeo3fo2KBv+5K+Jmz2cNALf8ohDa_bah8AScsTgvyhkczrdg@mail.gmail.com>
-Subject: Re: [net-next, v2 1/2] psp: Support for transmit on logical device
- when the underlying transport device supports PSP.
-To: Daniel Zahka <daniel.zahka@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	willemb@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch, 
-	horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	jayakrishnan.udayavarma@broadcom.com, ajit.khaparde@broadcom.com, 
-	akhilesh.samineni@broadcom.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+User-Agent: Mozilla Thunderbird
+Subject: Re: [BUG] Kernel Panic in br_do_suppress_nd when ipv6.disable=1 (NULL
+ pointer dereference)
+To: Guruprasad C P <gurucp2005@gmail.com>, netdev@vger.kernel.org
+References: <CAHXs0ORzd62QOG-Fttqa2Cx_A_VFp=utE2H2VTX5nqfgs7LDxQ@mail.gmail.com>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <CAHXs0ORzd62QOG-Fttqa2Cx_A_VFp=utE2H2VTX5nqfgs7LDxQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Flag: NO
+X-Spam-Score: -4.51
+X-Spam-Level: 
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-261396-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261395-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWO(0.00)[2];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.de:+];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kiran.kella@broadcom.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: CC5A41A8A04
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:mid,suse.de:dkim]
+X-Rspamd-Queue-Id: DF6E61A8FB1
 X-Rspamd-Action: no action
 
-On Thu, Feb 26, 2026 at 7:41=E2=80=AFPM Daniel Zahka <daniel.zahka@gmail.co=
-m> wrote:
->
->
->
-> On 2/26/26 6:46 AM, Kiran Kella wrote:
-> > On Wed, Feb 25, 2026 at 2:28=E2=80=AFAM Daniel Zahka <daniel.zahka@gmai=
-l.com> wrote:
-> >> The lack of support for netns is a bit of a gap for this feature. It m=
-ay
-> >> make sense to see if what was posted in
-> >> https://lore.kernel.org/netdev/20260224002410.1553838-1-weibunny@fb.co=
-m/
-> >> is sufficient for your use case, as it handles cases where upper devic=
-es
-> >> are in a different netns from psd->main_netdev.
-> > Thanks. Went through the changes in
-> > https://lore.kernel.org/netdev/20260224002410.1553838-1-weibunny@fb.com=
-/
-> > It is sufficient for my use case too, although it specifically
-> > addresses the cross-netns virtual devices use case.
-> > But the same net-ns stacked devices like VLANs can be handled with
-> > this patch implicitly, without user intervention through dev-assoc.
-> > I think both approaches can co-exist without conflict.
->
-> I agree they can co-exist, and automatically propagating psp devices is
-> useful. I was just pointing out that support for upper devices will
-> eventually need to deal with netns, because when I looked at this patch
-> things like ipvlan and macvlan came to mind.
+On 2/26/26 12:14 AM, Guruprasad C P wrote:
+> We have identified a 100% reproducible kernel panic in the bridge driver 
+> (|net/bridge/br_arp_nd_proxy.c|) on kernels up to at least 5.15 and 6.x.
+> 
+> *Description:* The crash occurs when the kernel is booted with | 
+> ipv6.disable=1| and a bridge port has |neigh_suppress| enabled. When the 
+> bridge receives an ICMPv6 Neighbor Solicitation, it attempts to perform 
+> a lookup in the neighbor table via |ipv6_stub->nd_tbl|. Because IPv6 was 
+> disabled at boot, |nd_tbl| is NULL, leading to an immediate dereference 
+> panic.
+> 
 
-Ack
+This is a nice catch. The key here is that inet6_init() is exiting 
+before ndisc_init() is called.
+
+Hm I wonder if there are more parts of the kernel where this might be a 
+problem. I noticed several uses of ipv6_stub->nd_tbl that relies on 
+IS_ENABLED(CONFIG_IPV6) check..
+
+I am writing a patch for this.
+
+Thank you!
 
