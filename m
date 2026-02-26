@@ -1,453 +1,258 @@
-Return-Path: <netdev+bounces-261397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261399-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eEXJHr9ooGm+jQQAu9opvQ
-	(envelope-from <netdev+bounces-261397-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 16:37:35 +0100
+	id IOSfC8BpoGk3jgQAu9opvQ
+	(envelope-from <netdev+bounces-261399-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 16:41:52 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 886111A8D68
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 16:37:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D8371A8F75
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 16:41:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E48753114DDF
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 15:21:32 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6D56831286A0
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 15:23:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4F7D3D904D;
-	Thu, 26 Feb 2026 15:16:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C21B83ED121;
+	Thu, 26 Feb 2026 15:21:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U35PRSrX"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="h9zmMPOH"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010053.outbound.protection.outlook.com [52.101.69.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A712475D0
-	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 15:16:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772118974; cv=none; b=NVD1/QjtdSGBM/mggTHAUBiR+OXK0U/aI8572+1Njsf4mQXeirWFiNwFNiqRyGpoMYlUIJC2JaMuepWQz+e/JZrv0HsLlzwLa9lxKrtUUzRpaufMEq8Tl1dXKRamf6kb6iVyT8EIZK/Dj1tgj3J/xURuWzsN/H+EgLCIWuOL7DE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772118974; c=relaxed/simple;
-	bh=xPZFoULc2JwbaamFciNGqAmiOhKbnuUTs2vTk+Vqc70=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BgJfv8M53aH1OPM95xF7nbzOpGMWFbHgR4PHjFJOchniEVwrSnP/UydVZSV/WSI82z0wpDnlvFf9D+gz216Q3hTk5g2rCh9vd7re0mgkCAKwLCuCoNIBEriASyTfg4HPRJLvAQtYzfQ98g8IFes42KLIopSAaAraqnU5yFAcefI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U35PRSrX; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772118971;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=RtEl8sRnm/HrySb1Vc2xq9e0d9E2C+eHr3d6BxIgR4M=;
-	b=U35PRSrXFQ9rf776jGnwymJb/5GSe/9Z4CxwsVNnDcPq7ozTeNtpZPWyHDJPpKJ8puasHz
-	0BUaqRWIeT8rOEWAjCUrmCZi01o3rzABQZBvAW4m07XprEZufHXF/9Z53HQShQAlTaofWu
-	AD7bAbQbnwWxnmKHC7rrWWajYZbolHQ=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-676-kGZZSJOPOxaRbnKLnURflQ-1; Thu,
- 26 Feb 2026 10:16:07 -0500
-X-MC-Unique: kGZZSJOPOxaRbnKLnURflQ-1
-X-Mimecast-MFC-AGG-ID: kGZZSJOPOxaRbnKLnURflQ_1772118966
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9BC131800A3B;
-	Thu, 26 Feb 2026 15:16:04 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.225.206])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BDC64180058C;
-	Thu, 26 Feb 2026 15:16:02 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [GIT PULL] Networking for v7.0-rc2
-Date: Thu, 26 Feb 2026 16:15:29 +0100
-Message-ID: <20260226151529.259438-1-pabeni@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6334C3D6470;
+	Thu, 26 Feb 2026 15:21:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772119284; cv=fail; b=C5UiLyglA04NbUdpGvhlUG7M1nprLEh0m9qVUWBkEgLLmMXRifqzm4lAzOez4soBObGcIvYxjyqCKRUzla0+xs4uhLFLfXudsgDch4ctuaoRdWh5H0Z5hP0N0IX0SUT3NBL+3o7j+ygPGUQcLGpMAlFgFnYesJOaOyjU0X/EHqs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772119284; c=relaxed/simple;
+	bh=MD6jkIcz5Osrw+SEoNIZqUv71CRIslDz6T/cXBSV8zo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=RMZ98n5InhKLhXHr7mbbZwoQtCxIxwVXKPpU+38O9P3uYie0efOw0ZjIBkLfj8WB4c0hXKknSDu+viaPKy/PWXnsEp85FaerLy+TmgZ55bUFhCLbn2DbLUW0ldVZz+102SZac7pmp9O+QMuFQWtHQ+5kZNvF0TZZRrcu5yYzF0Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=h9zmMPOH; arc=fail smtp.client-ip=52.101.69.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=rkh2UB5ry4tesRCkvlkZu8gcdWi6lEJ3BgFBYYrjRUuLaVDYEv5EHoetkzD2jFaMBFPHs3CQ72gDL0YNBhi2nIuk95YgNYMJFTYfFWwo9xBEiFz1M3poXl8f0yFxf+Xl6uRA0Gug+p3UpE5BrshxJSdLd1mfz7TPU4dVleBUrBot+iJUB91gFn4F1j1Y9sES9Ok8F8/Ajh6mtQQwvSv46L7phlcMsuHYl9h7nllHbdogcIHQzpwLEQUKmPNZyNW3Ii8WcZHnWIlnYR6IlVdGXIWJ1S0EgvY27HN38Yz29FCG1vEqhaz2bICarVP3+CK2rCIIT6qvBaZrCWpRAT+7+g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=v4wCEKw0Nt9I7N3arAqX3iSp8OwAWsyE+JK61yKbXB4=;
+ b=oj3sglAqfi1xps/5TDNujClGRxhsTmznfi17r/zRHlzvVGvB5lKFobg75H07SLK5DemuS9RHfkm1C1BmbyanEJXF9t8PVkhukh6PTkFqaEkvL2HYDwabM/jxsvy2/Ci2OhjKpHB7ZIgNN5ZlXvRoPs5cd3wSg/be8dJkOHW2oRQy0CBFabZP7HPZm9rBCBpxmYCcn5v6kTOTn5iMhmLKiEqma3S2h5euMpcttktz2dDdKsT6+Vu/nhqmVLFk4/zfHdQRN2/5pFLy1gyznkvSaWvgtJf06bJXvDoHvw7fpOJ9jGOxg+DTsg+hinUfkRu5AhFvXqi7jTGGGXJl/LePlA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=v4wCEKw0Nt9I7N3arAqX3iSp8OwAWsyE+JK61yKbXB4=;
+ b=h9zmMPOH7ro/CT7af2u9Xoay1fcQKmDd3trEPBmnj8y8wHBeVq2iAuqnBJiWR2q8VImnIKiWhMks60WUl3W7O2Ryf37X9TLHCNZ3K2DxPmvmXjbcy8Hx4WafjU7+j9a+gfZQ/ZXbyQcmevdYwkjau1NrGpeHNNock1huxblbyCCH7KyivLnUMKHb/5Wkh9pFwFoDLzbo5hEYW+zTMVx7T4f4DEzgqmA4M7EJ0YRQffIVvXfUxGwArqMea7WXQ9bgehloz1wgLUMyHZA+uB7mkvhsSQRPRKOpr6FN7cEeXTjsbVdNDGnKN7Y9TWg7Q/Nj2WhbuzSQC37CC1aLJzs99A==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
+ by AS8PR04MB8834.eurprd04.prod.outlook.com (2603:10a6:20b:42d::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.13; Thu, 26 Feb
+ 2026 15:21:19 +0000
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::f010:fca8:7ef:62f4]) by AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::f010:fca8:7ef:62f4%4]) with mapi id 15.20.9632.017; Thu, 26 Feb 2026
+ 15:21:19 +0000
+Date: Thu, 26 Feb 2026 17:21:15 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-phy@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Daniel Golle <daniel@makrotopia.org>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	=?utf-8?B?QmrDuHJu?= Mork <bjorn@mork.no>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Eric Woudstra <ericwouds@gmail.com>,
+	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
+	Lee Jones <lee@kernel.org>,
+	Patrice Chotard <patrice.chotard@foss.st.com>,
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+	KUnit Development <kunit-dev@googlegroups.com>
+Subject: Re: [PATCH v3 net-next 05/10] phy: add phy_get_rx_polarity() and
+ phy_get_tx_polarity()
+Message-ID: <20260226152115.pwizozoapudgvmgl@skbuf>
+References: <20260111093940.975359-1-vladimir.oltean@nxp.com>
+ <20260111093940.975359-6-vladimir.oltean@nxp.com>
+ <CAMuHMdUBaoYKNj52gn8DQeZFZ42Cvm6xT6fvo0-_twNv1k3Jhg@mail.gmail.com>
+ <20260226151036.x4z4bdlxwgsqlkhs@skbuf>
+ <CAMuHMdXKbiKUkP=+FDA_-Kd_qx1X6vzSuyPU+Tdd9MgR=Q5WMw@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMuHMdXKbiKUkP=+FDA_-Kd_qx1X6vzSuyPU+Tdd9MgR=Q5WMw@mail.gmail.com>
+X-ClientProxiedBy: VI1PR0102CA0001.eurprd01.prod.exchangelabs.com
+ (2603:10a6:802::14) To AM9PR04MB8585.eurprd04.prod.outlook.com
+ (2603:10a6:20b:438::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|AS8PR04MB8834:EE_
+X-MS-Office365-Filtering-Correlation-Id: b055fcec-1338-462f-bb97-08de754ab126
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|10070799003|7416014|376014|19092799006|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	yCTu7NqRjOcSyfuz8akNiR7s9YrEgBQSVhdnlSBxACX2Dv/X+kLsOYkZCf7L1HZsAd+YfFL4r+H5WfXwYjFJPgm1fw3lG9MLU5Ze+fdg5QZ7bEP2HAKAs7cwTFflEyJ/RqcS/hJOiEgvqWZ01z3zLfOeKggQCFgm5iYoRI2fUlNMyN4mPS43Bz3lIwcqGzq86y4mN4R9PlyMsNAHRjzoV6KgwPqWwmSic9PsHGiqH17NTaZsq6QTAZwn6vFJAiQU07cMMfRdkRxOHEBuzYWSsGOUBebL0GTigiLgd2Tj0llHIgrP/YQZiMao0BxtLH2FpUH6MqLZLp3ZhjDyzFFJdovHkb+AlNz6qswOW/TLk6cYcUGjxAFf7E0DOnmvR7URGBg7205lIreFDg+vAZgK+ITlTsdRr0IHg8dSxdGkpwZLiUuKIStnztl0EilTdDHwfEwtF36czBdhVSO35LH9iAIclIb9InQflxYK7T4D+bZZbdohBn5pqj1phZVmE1+kxyooySgwRAY9aGl0MZo8x3seIzH5eInWM3jTBq6dG0eUkTDvtv2gllv2oOpK2wF/gg26vcND/JfRNCp3BzGPuMYRA00ClRLU8iYx4MML0rCeXTjSq0A2ZZJCPGIxThAgIwY+a5j5sRDQc0yStIgt2zGck+X2yN26/8yHGLyCxPflJgnrP4NyfyU2hTKe8kvlkY5YxZrsgqHhf4Pk0LNhVpup6+n7AlEQ3mETt709EF8=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(7416014)(376014)(19092799006)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?698eYqcizXUElIsFaOD3UJEhPiwyrjuVQPcIaZtH7v1EIXwgsG5UtweF+xOH?=
+ =?us-ascii?Q?qAmn1b7VBj6FBoJi75woP2kmGNfZ0OJU4SmySTf9MGB/lDlYwP44ROAo1NeL?=
+ =?us-ascii?Q?gWOVeXdYyqt95mXtEAW20bVD/2mzeCWy9FPRdnWJ5HzRh1lNWc9MmWmT6NU5?=
+ =?us-ascii?Q?4uhLtGumsHQtBB7qWw2/j9ZtCCtf54fKglGVLGFtrSjcQtoQSuQ9FJAH2IQj?=
+ =?us-ascii?Q?5azbpAFMP5/Qmo+kpSJZToc/t4qonYZiExmwfXvCqXU1f9BdX0QkU0dkJICG?=
+ =?us-ascii?Q?l9wybXXi+8GgfjPgJ09WvPNkk2e+Krgjo0qtSJpaJV1tUZ8psZ7I7Qb51gh5?=
+ =?us-ascii?Q?6zbHHgJUp0HbjzGrO8Rk2yLjuaRq6yrnqJT9ySRoY1z/YTWw2WjBWByc99rY?=
+ =?us-ascii?Q?EtlbRTGluv6uWKzqQVWsj5dFraeCnQNUINXOSiJ6TpsaUXh25uty7wlncafP?=
+ =?us-ascii?Q?rbcpAt5CpGpsn7fW9SxhH35p8fevlPJhPSEaCvO6h+xHlCEWJHrXWnPJgSnu?=
+ =?us-ascii?Q?UYET5pETZjeFfRqK1uZMCwxlYOKbSzzk1dl3Wvv+tKoQe2zrAvG2cWSqP8kl?=
+ =?us-ascii?Q?1AAkg68DnVA5ILN2ndw16Erjp50z4RbuTVV75Cw5fv+LrawuMXfHBGb/Lg0m?=
+ =?us-ascii?Q?/vxT6cFuSta/xxQ8WrpI6HIsgxjY3dUGrjmngwXyRFCl1xwT45x7sytfhhuA?=
+ =?us-ascii?Q?xMa/Qt3z6X+MYuhItJe64DOLRmmQPxYZMHG0avAQ4OdmIsHeyEO/oJ5duo1T?=
+ =?us-ascii?Q?oseZRLWKVBptwPltHz3i62T3ph3ju8iUAGuSRmROq7VC2vXQj843K5Aafccu?=
+ =?us-ascii?Q?cKzg/Nqlgf++/4s1SyR62WpOtSLqbXnwO2iTpAy1FKPqI4N1Gzrt6df1xwOW?=
+ =?us-ascii?Q?r4JiRfxmE7lp9op0yVxU1fuJMg0AqLiG/wHawe679TGj3TxjYlPjKhmexa3u?=
+ =?us-ascii?Q?k76mOsEcKSviF7eu+xoxYERhAUHP9adndC/5BTFRsmnjX8f2aTO1nvzXHK6A?=
+ =?us-ascii?Q?9AlT05xiok5eZWJqg6leS+7jdmP6f4wj8E7upUxXNJKH2UzATBgTtR9RbR6S?=
+ =?us-ascii?Q?8A1MU+S3992l94HDV5IL+HHOhETbI3cAFyIJq55OHH8a6wKk4+r3EUROcb5a?=
+ =?us-ascii?Q?GHzdE/cSZd1vnjooEUY1+V0GEBINrw4+CFjzaVw2YOehOnm6spWQd7pTK3YB?=
+ =?us-ascii?Q?s5sxKZrN11kC4/bhlRtv/aSrRnwC2wwtCAcf0286P+KnwmQVCY6H500gfs1h?=
+ =?us-ascii?Q?joOqDNeqJn7lgc/IZXeCllQuqmn7HTpmyRJMOo6Sy+0DjeVYXGjLzynZ9wLa?=
+ =?us-ascii?Q?6XAZBmId4egeb8oeoBI35Y2DTQze4YHoNMXcmdu/3Llhgemr0kpQ2bXyL0dt?=
+ =?us-ascii?Q?XbPv/fx+fk7FSM6SN7jRttD7QffvrFfZczUIXuBRmltTXTioRItndClBD/xZ?=
+ =?us-ascii?Q?8eCksSpU3ObV8n5az4oQPryUCArYDbTxl6SP8rUpuS01SYP2rYuD4jeUwQM5?=
+ =?us-ascii?Q?fiKTbH+FLygKjg2tlGnuJUXibfntFwcy8Lvyds6fImn73a/9t4SEUeyKE2yy?=
+ =?us-ascii?Q?6iNP/WKSAGZM+QXvmdIYOdoMa9JtPxF+X4gSmzB9lnnqGKyWNHIe/gEBlPoZ?=
+ =?us-ascii?Q?xA990DtNv1c1cmMeEHjEZK8DOE8l1bGuO0RCz31wNA9pSKt6co6kmzCjQNpD?=
+ =?us-ascii?Q?T4YnsiT0YFpX0vhIKINolbGcF1++BYgDASjFqffFTYPRc10JPFOg12KWGsuq?=
+ =?us-ascii?Q?h5UDR35nHpTs6Es1Rv6PuS0+x7GjwF+ZxHVQkPTLDsKZz5tKscZ+Bk2Z0k1b?=
+X-MS-Exchange-AntiSpam-MessageData-1: jiCcLuiNKnAZkMrKFxoRRzF9Xj0pKy207bQ=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b055fcec-1338-462f-bb97-08de754ab126
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2026 15:21:19.7289
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: xQ1fSJqX/vs0rJlre7s93hjhSGKe7CefqdZ2ZUYwz67DBPjglzgpB4/ZSLpk250A7bP8qmRpIMmaPoFJUh4Nnw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8834
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+X-Spamd-Result: default: False [1.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261397-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261399-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[30];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,makrotopia.org,microchip.com,mork.no,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,linaro.org,collabora.com,foss.st.com,googlegroups.com];
+	DKIM_TRACE(0.00)[nxp.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[vladimir.oltean@nxp.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.996];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 886111A8D68
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,nxp.com:email,nxp.com:dkim]
+X-Rspamd-Queue-Id: 4D8371A8F75
 X-Rspamd-Action: no action
 
-Hi Linus!
-
-The following changes since commit 8bf22c33e7a172fbc72464f4cc484d23a6b412ba:
-
-  Merge tag 'net-7.0-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2026-02-19 10:39:08 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-7.0-rc2
-
-for you to fetch changes up to baed0d9ba91d4f390da12d5039128ee897253d60:
-
-  netfilter: nf_conntrack_h323: fix OOB read in decode_choice() (2026-02-26 12:50:42 +0100)
-
-----------------------------------------------------------------
-Including fixes from IPsec, Bluetooth and netfilter
-
-Current release - regressions:
-
-  - wifi: fix dev_alloc_name() return value check
-
-  - rds: fix recursive lock in rds_tcp_conn_slots_available
-
-Current release - new code bugs:
-
-  - vsock: lock down child_ns_mode as write-once
-
-Previous releases - regressions:
-
-  - core:
-    - do not pass flow_id to set_rps_cpu()
-    - consume xmit errors of GSO frames
-
-  - netconsole: avoid OOB reads, msg is not nul-terminated
-
-  - netfilter: h323: fix OOB read in decode_choice()
-
-  - tcp: re-enable acceptance of FIN packets when RWIN is 0
-
-  - udplite: fix null-ptr-deref in __udp_enqueue_schedule_skb().
-
-  - wifi: brcmfmac: fix potential kernel oops when probe fails
-
-  - phy: register phy led_triggers during probe to avoid AB-BA deadlock
-
-  - eth: bnxt_en: fix deleting of Ntuple filters
-
-  - eth: wan: farsync: fix use-after-free bugs caused by unfinished tasklets
-
-  - eth: xscale: check for PTP support properly
-
-Previous releases - always broken:
-
-  - tcp: fix potential race in tcp_v6_syn_recv_sock()
-
-  - kcm: fix zero-frag skb in frag_list on partial sendmsg error
-
-  - xfrm:
-    - fix race condition in espintcp_close()
-    - always flush state and policy upon NETDEV_UNREGISTER event
-
-  - bluetooth:
-    - purge error queues in socket destructors
-    - fix response to L2CAP_ECRED_CONN_REQ
-
-  - eth: mlx5:
-    - fix circular locking dependency in dump
-    - fix "scheduling while atomic" in IPsec MAC address query
-
-  - eth: gve: fix incorrect buffer cleanup for QPL
-
-  - eth: team: avoid NETDEV_CHANGEMTU event when unregistering slave
-
-  - eth: usb: validate USB endpoints
-
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-
-----------------------------------------------------------------
-Andrew Lunn (1):
-      net: phy: register phy led_triggers during probe to avoid AB-BA deadlock
-
-Ankit Garg (1):
-      gve: fix incorrect buffer cleanup in gve_tx_clean_pending_packets for QPL
-
-Ariel Silver (1):
-      wifi: mac80211: bounds-check link_id in ieee80211_ml_reconfiguration
-
-Bobby Eshleman (3):
-      selftests/vsock: change tests to respect write-once child ns mode
-      vsock: lock down child_ns_mode as write-once
-      vsock: document write-once behavior of the child_ns_mode sysctl
-
-Chen-Yu Tsai (1):
-      wifi: mwifiex: Fix dev_alloc_name() return value check
-
-Daniel Hodges (1):
-      wifi: libertas: fix use-after-free in lbs_free_adapter()
-
-Daniil Dulov (1):
-      wifi: cfg80211: cancel rfkill_block work in wiphy_unregister()
-
-Dipayaan Roy (1):
-      net: mana: Fix double destroy_workqueue on service rescan PCI path
-
-Dmitry Torokhov (1):
-      net: phy: qcom: qca807x: normalize return value of gpio_get
-
-Duoming Zhou (1):
-      net: wan: farsync: Fix use-after-free bugs caused by unfinished tasklets
-
-Eric Dumazet (3):
-      tcp: fix potential race in tcp_v6_syn_recv_sock()
-      psp: use sk->sk_hash in psp_write_headers()
-      net: do not pass flow_id to set_rps_cpu()
-
-Felix Gu (1):
-      dpll: zl3073x: Remove redundant cleanup in devm_dpll_init()
-
-Fernando Fernandez Mancera (1):
-      net/rds: fix recursive lock in rds_tcp_conn_slots_available
-
-Greg Kroah-Hartman (5):
-      nfc: pn533: properly drop the usb interface reference on disconnect
-      net: usb: pegasus: validate USB endpoints
-      net: usb: kalmia: validate USB endpoints
-      net: usb: kaweth: validate USB endpoints
-      vsock: Use container_of() to get net namespace in sysctl handlers
-
-Heitor Alves de Siqueira (1):
-      Bluetooth: purge error queues in socket destructors
-
-Hyunwoo Kim (2):
-      espintcp: Fix race condition in espintcp_close()
-      tls: Fix race condition in tls_sw_cancel_work_tx()
-
-Ido Schimmel (1):
-      selftests: team: Add a reference count leak test
-
-Ivan Vecera (1):
-      dpll: zl3073x: fix REF_PHASE_OFFSET_COMP register width for some chip IDs
-
-Jakub Kicinski (9):
-      Merge tag 'ipsec-2026-02-20' of git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec
-      Merge branch 'bnxt_en-fix-rss-context-and-ntuple-filter-issues'
-      MAINTAINERS: include all of framer under pef2256
-      netconsole: avoid OOB reads, msg is not nul-terminated
-      Merge branch 'tcp-re-enable-acceptance-of-fin-packets-when-rwin-is-0'
-      Merge branch 'team-fix-reference-count-leak-when-changing-port-netns'
-      Merge tag 'wireless-2026-02-25' of https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless
-      Merge branch 'mlx5-misc-fixes-2026-02-24'
-      net: consume xmit errors of GSO frames
-
-Jianbo Liu (1):
-      net/mlx5e: Fix "scheduling while atomic" in IPsec MAC address query
-
-Jiayuan Chen (2):
-      xfrm6: fix uninitialized saddr in xfrm6_get_saddr()
-      kcm: fix zero-frag skb in frag_list on partial sendmsg error
-
-Jinwang Li (1):
-      Bluetooth: hci_qca: Cleanup on all setup failures
-
-Johannes Berg (2):
-      wifi: cfg80211: wext: fix IGTK key ID off-by-one
-      wifi: radiotap: reject radiotap with unknown bits
-
-Junrui Luo (1):
-      dpaa2-switch: validate num_ifs to prevent out-of-bounds write
-
-Kuniyuki Iwashima (1):
-      udplite: Fix null-ptr-deref in __udp_enqueue_schedule_skb().
-
-Leon Romanovsky (1):
-      xfrm: skip templates check for packet offload tunnel mode
-
-Linus Walleij (1):
-      net: ethernet: xscale: Check for PTP support properly
-
-Luiz Augusto von Dentz (5):
-      Bluetooth: L2CAP: Fix invalid response to L2CAP_ECRED_RECONF_REQ
-      Bluetooth: L2CAP: Fix result of L2CAP_ECRED_CONN_RSP when MTU is too short
-      Bluetooth: L2CAP: Fix response to L2CAP_ECRED_CONN_REQ
-      Bluetooth: L2CAP: Fix not checking output MTU is acceptable on L2CAP_ECRED_CONN_REQ
-      Bluetooth: L2CAP: Fix missing key size check for L2CAP_LE_CONN_REQ
-
-Marek Szyprowski (1):
-      wifi: brcmfmac: Fix potential kernel oops when probe fails
-
-Mariusz Skamra (1):
-      Bluetooth: Fix CIS host feature condition
-
-Martin Pålsson (1):
-      net: usb: lan78xx: scan all MDIO addresses on LAN7801
-
-Mohd Ayaan Anwar (1):
-      MAINTAINERS: Update maintainer entry for QUALCOMM ETHQOS ETHERNET DRIVER
-
-Paolo Abeni (2):
-      Merge tag 'for-net-2026-02-23' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth
-      Merge branch 'vsock-add-write-once-semantics-to-child_ns_mode'
-
-Pavan Chebbi (3):
-      bnxt_en: Fix RSS context delete logic
-      bnxt_en: Fix deleting of Ntuple filters
-      selftests: drv-net: rss_ctx: test RSS contexts persist after ifdown/up
-
-Ralf Lici (1):
-      ovpn: tcp - fix packet extraction from stream
-
-Ramanathan Choodamani (1):
-      wifi: mac80211: set default WMM parameters on all links
-
-Russell King (Oracle) (1):
-      net: stmmac: fix timestamping configuration after suspend/resume
-
-Satish Kharat (1):
-      MAINTAINERS: update enic and usnic maintainers
-
-Sebastian Andrzej Siewior (1):
-      net: Drop the lock in skb_may_tx_timestamp()
-
-Shay Drory (4):
-      net/mlx5: DR, Fix circular locking dependency in dump
-      net/mlx5: LAG, disable MPESW in lag_disable_change()
-      net/mlx5: E-switch, Clear legacy flag when moving to switchdev
-      net/mlx5: Fix missing devlink lock in SRIOV enable error path
-
-Shyam Sundar S K (1):
-      MAINTAINERS: Update AMD XGBE driver maintainers
-
-Simon Baatz (2):
-      tcp: re-enable acceptance of FIN packets when RWIN is 0
-      selftests/net: packetdrill: Verify acceptance of FIN packets when RWIN is 0
-
-Tetsuo Handa (2):
-      xfrm: always flush state and policy upon NETDEV_UNREGISTER event
-      team: avoid NETDEV_CHANGEMTU event when unregistering slave
-
-Tung Nguyen (1):
-      tipc: fix duplicate publication key in tipc_service_insert_publ()
-
-Vahagn Vardanian (2):
-      wifi: mac80211: fix NULL pointer dereference in mesh_rx_csa_frame()
-      netfilter: nf_conntrack_h323: fix OOB read in decode_choice()
-
-Vladimir Oltean (1):
-      net: dsa: sja1105: protect link replay helpers against NULL phylink instance
-
-Ziyi Guo (2):
-      net: usb: kaweth: remove TX queue manipulation in kaweth_set_rx_mode
-      net: usb: pegasus: enable basic endpoint checking
-
- Documentation/admin-guide/sysctl/net.rst           |   3 +
- MAINTAINERS                                        |  10 +--
- drivers/bluetooth/hci_qca.c                        |  24 ++---
- drivers/dpll/zl3073x/core.c                        |   7 +-
- drivers/dpll/zl3073x/core.h                        |  28 ++++++
- drivers/dpll/zl3073x/dpll.c                        |   7 +-
- drivers/dpll/zl3073x/ref.c                         |  25 ++++--
- drivers/dpll/zl3073x/regs.h                        |   1 +
- drivers/net/dsa/sja1105/sja1105_main.c             |   9 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c          |  13 +--
- .../net/ethernet/freescale/dpaa2/dpaa2-switch.c    |   7 ++
- drivers/net/ethernet/google/gve/gve_tx_dqo.c       |  56 ++++++------
- .../ethernet/mellanox/mlx5/core/en_accel/ipsec.c   |   3 +-
- .../ethernet/mellanox/mlx5/core/eswitch_offloads.c |   2 +
- drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c  |   8 +-
- .../net/ethernet/mellanox/mlx5/core/lag/mpesw.c    |   8 +-
- .../net/ethernet/mellanox/mlx5/core/lag/mpesw.h    |   5 ++
- drivers/net/ethernet/mellanox/mlx5/core/sriov.c    |   2 +
- .../mellanox/mlx5/core/steering/sws/dr_dbg.c       |   4 +-
- drivers/net/ethernet/microsoft/mana/gdma_main.c    |   5 +-
- drivers/net/ethernet/microsoft/mana/mana_en.c      |   4 +-
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |   1 +
- drivers/net/ethernet/xscale/ixp4xx_eth.c           |   5 +-
- drivers/net/ethernet/xscale/ptp_ixp46x.c           |   3 +
- drivers/net/netconsole.c                           |   3 +-
- drivers/net/ovpn/tcp.c                             |  53 +++++++----
- drivers/net/phy/phy_device.c                       |  25 ++++--
- drivers/net/phy/qcom/qca807x.c                     |   2 +-
- drivers/net/team/team_core.c                       |  26 ++++--
- drivers/net/usb/kalmia.c                           |   7 ++
- drivers/net/usb/kaweth.c                           |  15 +++-
- drivers/net/usb/lan78xx.c                          |   2 -
- drivers/net/usb/pegasus.c                          |  48 ++++++++--
- drivers/net/wan/farsync.c                          |   2 +
- .../wireless/broadcom/brcm80211/brcmfmac/bcmsdh.c  |   7 +-
- .../wireless/broadcom/brcm80211/brcmfmac/sdio.c    |   7 +-
- .../wireless/broadcom/brcm80211/brcmfmac/sdio.h    |   2 +-
- drivers/net/wireless/marvell/libertas/main.c       |   4 +-
- drivers/net/wireless/marvell/mwifiex/cfg80211.c    |   2 +-
- drivers/nfc/pn533/usb.c                            |   1 +
- include/net/af_vsock.h                             |  13 ++-
- include/net/bluetooth/l2cap.h                      |   8 +-
- include/net/inet_connection_sock.h                 |   4 +-
- include/net/netns/vsock.h                          |   3 +
- include/net/sock.h                                 |   2 +-
- include/net/tcp.h                                  |   4 +-
- net/bluetooth/hci_sock.c                           |   1 +
- net/bluetooth/hci_sync.c                           |   2 +-
- net/bluetooth/iso.c                                |   1 +
- net/bluetooth/l2cap_core.c                         |  95 ++++++++++++++------
- net/bluetooth/l2cap_sock.c                         |  16 +++-
- net/bluetooth/sco.c                                |   1 +
- net/core/dev.c                                     |  35 +++++---
- net/core/skbuff.c                                  |  23 +++--
- net/ipv4/syncookies.c                              |   2 +-
- net/ipv4/tcp_fastopen.c                            |   2 +-
- net/ipv4/tcp_input.c                               |  18 +++-
- net/ipv4/tcp_ipv4.c                                |   8 +-
- net/ipv4/tcp_minisocks.c                           |   2 +-
- net/ipv4/udplite.c                                 |   3 +-
- net/ipv6/tcp_ipv6.c                                |  98 +++++++++-----------
- net/ipv6/udplite.c                                 |   3 +-
- net/ipv6/xfrm6_policy.c                            |   7 +-
- net/kcm/kcmsock.c                                  |  21 ++++-
- net/mac80211/link.c                                |   2 +
- net/mac80211/mesh.c                                |   3 +
- net/mac80211/mlme.c                                |   3 +
- net/mptcp/subflow.c                                |   6 +-
- net/netfilter/nf_conntrack_h323_asn1.c             |   2 +-
- net/psp/psp_main.c                                 |  39 +++++++-
- net/rds/connection.c                               |   3 +
- net/rds/tcp_listen.c                               |  28 ++----
- net/smc/af_smc.c                                   |   6 +-
- net/socket.c                                       |   2 +-
- net/tipc/name_table.c                              |   6 +-
- net/tls/tls_sw.c                                   |   2 +-
- net/vmw_vsock/af_vsock.c                           |  19 ++--
- net/wireless/core.c                                |   1 +
- net/wireless/radiotap.c                            |   4 +-
- net/wireless/wext-compat.c                         |   2 +-
- net/xfrm/espintcp.c                                |   2 +-
- net/xfrm/xfrm_device.c                             |  12 ++-
- net/xfrm/xfrm_policy.c                             |  11 ++-
- tools/testing/selftests/drivers/net/hw/rss_ctx.py  | 100 ++++++++++++++++++++-
- tools/testing/selftests/drivers/net/team/Makefile  |   1 +
- .../testing/selftests/drivers/net/team/refleak.sh  |  17 ++++
- .../net/packetdrill/tcp_rcv_zero_wnd_fin.pkt       |  27 ++++++
- tools/testing/selftests/vsock/vmtest.sh            |  41 ++++-----
- 88 files changed, 826 insertions(+), 331 deletions(-)
- create mode 100755 tools/testing/selftests/drivers/net/team/refleak.sh
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_rcv_zero_wnd_fin.pkt
-
+On Thu, Feb 26, 2026 at 04:13:59PM +0100, Geert Uytterhoeven wrote:
+> Hi Vladimir,
+> 
+> On Thu, 26 Feb 2026 at 16:10, Vladimir Oltean <vladimir.oltean@nxp.com> wrote:
+> > On Thu, Feb 26, 2026 at 02:22:29PM +0100, Geert Uytterhoeven wrote:
+> > > > +config PHY_COMMON_PROPS
+> > > > +       bool
+> > > > +       help
+> > > > +         This parses properties common between generic PHYs and Ethernet PHYs.
+> > > > +
+> > > > +         Select this from consumer drivers to gain access to helpers for
+> > > > +         parsing properties from the
+> > > > +         Documentation/devicetree/bindings/phy/phy-common-props.yaml schema.
+> > > > +
+> > > > +config PHY_COMMON_PROPS_TEST
+> > > > +       tristate "KUnit tests for PHY common props" if !KUNIT_ALL_TESTS
+> > > > +       select PHY_COMMON_PROPS
+> > >
+> > > This select means that enabling KUNIT_ALL_TESTS also enables extra
+> > > functionality, which may not be desirable in a production system.
+> > > As PHY_COMMON_PROPS is bool, this extra functionality is even part of
+> > > the base kernel if KUNIT_ALL_TESTS=m.  Unfortunately PHY_COMMON_PROPS is
+> > > invisible, so this cannot just be changed from "select" to "depends on".
+> > > But perhaps PHY_COMMON_PROPS can be made visible if KUNIT_ALL_TESTS,
+> > > so the select can be turned into a dependency?
+> >
+> > Is this what you're asking for?
+> >
+> > -- >8 --
+> > diff --git a/drivers/phy/Kconfig b/drivers/phy/Kconfig
+> > index 02467dfd4fb0..1875d5b784f6 100644
+> > --- a/drivers/phy/Kconfig
+> > +++ b/drivers/phy/Kconfig
+> > @@ -6,7 +6,7 @@
+> >  menu "PHY Subsystem"
+> >
+> >  config PHY_COMMON_PROPS
+> > -       bool
+> > +       bool "PHY common properties" if KUNIT_ALL_TESTS
+> >         help
+> >           This parses properties common between generic PHYs and Ethernet PHYs.
+> >
+> > @@ -16,8 +16,7 @@ config PHY_COMMON_PROPS
+> >
+> >  config PHY_COMMON_PROPS_TEST
+> >         tristate "KUnit tests for PHY common props" if !KUNIT_ALL_TESTS
+> > -       select PHY_COMMON_PROPS
+> > -       depends on KUNIT
+> > +       depends on KUNIT && PHY_COMMON_PROPS
+> >         default KUNIT_ALL_TESTS
+> >         help
+> >           This builds KUnit tests for the PHY common property API.
+> > -- >8 --
+> 
+> Yes, that would work.  Do you think it is acceptable?
+> Thanks!
+
+Yes, I think it's fine. I misinterpreted what kunit_"all"_tests means,
+then read its prompt which says "All KUnit tests with satisfied dependencies".
+
+I'll send a patch.
 
