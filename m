@@ -1,113 +1,191 @@
-Return-Path: <netdev+bounces-261521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261523-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iOPpBCmMoGkCkwQAu9opvQ
-	(envelope-from <netdev+bounces-261521-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:08:41 +0100
+	id QG7QK+uQoGllkwQAu9opvQ
+	(envelope-from <netdev+bounces-261523-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:28:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7331B1AD49B
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:08:40 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C8981ADA1D
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:28:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ACCE1315D819
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 17:53:44 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C1B5F30E162E
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 18:04:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E688E355F4B;
-	Thu, 26 Feb 2026 17:53:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 039B53603DE;
+	Thu, 26 Feb 2026 18:04:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AFfTsZTR"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ABg26jN5";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="yxK92OaI";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ABg26jN5";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="yxK92OaI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33D1355F43;
-	Thu, 26 Feb 2026 17:53:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A1C3603C0
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 18:04:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772128420; cv=none; b=j5ioHDgVfmXtMDZlc0mVqnSe0p0/0nejVsJN6DRoZaXavKqhdAsIhb0a2Pin+24NPPfvjGPjGDrDpBnsygJLpZ6y4/+/c54SPMJFJhlScVmwwFtfY53KbxIQOgQyUGaJ9oBjrUYSJ/Xhu7rdKUlV/g6w1HiK9It+vRoxJH9lAak=
+	t=1772129054; cv=none; b=KQRM3IGj2fpZLegkng2El9HKQVskVbR2e26iukAJqTD2aJi9HpkVhy+TkW6cpBBQ9IQC+YNyuQ9GIslF1uriN5J41Orcix9SBMEqPkp/FamvSPEwgeV6LGH79RPN0eH3d9r4rVLpIYXq1JAC05lS5AIfQW+IONplJYf15hPzJh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772128420; c=relaxed/simple;
-	bh=Xd+5YKu839LfJvfx00zvQchEU5HBqB1+xnhUcdfU01Y=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=LTLsm4ZWDrEVJ6FvshVoy7qmwpwKmsCkzh+qkC7DLLQwuTOSbb4GYVwKk2HpqG45DrmnYYLAbqMr5iyiL8F/ja0LoXFKkeh6hlozKIcwhCXg1+icePgIn7/GkUqTvU/UNVcRXBrmVF50gy9EQHyfpBEWdkWvqAhTbECZlahKxmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AFfTsZTR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EABDC2BC86;
-	Thu, 26 Feb 2026 17:53:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772128420;
-	bh=Xd+5YKu839LfJvfx00zvQchEU5HBqB1+xnhUcdfU01Y=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=AFfTsZTRyDrBxsYMIWepYEynjuCJgv1FW/4HqAmzVVjOxDhtXHw2iALMMqhBnXyO0
-	 rVJ36y0gadGqqhmD1jOEs7jWm9sRKdoC/u9f8F2Ocs/DA0AnZqvE2+BMbJgyDtu2UV
-	 tFyDNm7v+JfsAmPibtOYhBq10oWwXHH91qCZCITb4ccPPlQHgrKN+FSfMN3OwEyPi2
-	 ytq08rYUmU78ec+QWJexOEMI2Zim8yXZgK0Bjw/9QHx1oZyQV9vyg+pXPo+2slYC6s
-	 YNk8oEhqV6KH+3fVJnzvHvUbXV92n1ENTKjGzDhG2Y7mtcrpM93E8nuscZ/TrhUFna
-	 flf7j0MnT9iPQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 030EF393093E;
-	Thu, 26 Feb 2026 17:53:46 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v7.0-rc2
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20260226151529.259438-1-pabeni@redhat.com>
-References: <20260226151529.259438-1-pabeni@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20260226151529.259438-1-pabeni@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-7.0-rc2
-X-PR-Tracked-Commit-Id: baed0d9ba91d4f390da12d5039128ee897253d60
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: b9c8fc2caea6ff7e45c6942de8fee53515c66b34
-Message-Id: <177212842450.1769138.14012357854011263431.pr-tracker-bot@kernel.org>
-Date: Thu, 26 Feb 2026 17:53:44 +0000
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+	s=arc-20240116; t=1772129054; c=relaxed/simple;
+	bh=fKuMQg0ldtZHKTse9XiKRNDeaT11C/n6qWR3+E4swRw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l7BGhzdhtowRz0vkpgyxhhAG3mnko6y89E8HgCVvnYnHtWNdnOKbFwQryKcJd9fHnQ96szrOVTcCFFe5RmZdQ26U7dfZn5q6+ki1e8Yvf0WyIrqmNRZ1b1D/G8TK+CZao2lhsutrPBKrP17DjOwJcpKJro4KmDYWlgPpxSj3xVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ABg26jN5; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=yxK92OaI; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ABg26jN5; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=yxK92OaI; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id A6A0A4D372;
+	Thu, 26 Feb 2026 18:04:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772129050; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Bw/pxMCs3PGZ3t1xDbLU2eOlXd2FRM6wCa/DdIh9vIw=;
+	b=ABg26jN5sboOiEbl5mP+ymHsjVlzRkzTWU3bUObNqTlzwN3AvDMtymW7EOU6+A0WAT/Xz3
+	bn2QUhGjXnjp9DtTQr7G+ZucZ7cTITq8CtiR1F+OEU9HtAMG84jWnw4gi6ffjtUW2tPq0h
+	Cbi5zVZRytmf/6jYXpkGdjlXGE7jI34=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772129050;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Bw/pxMCs3PGZ3t1xDbLU2eOlXd2FRM6wCa/DdIh9vIw=;
+	b=yxK92OaIInZOuWsYJVe12akQvMahjC0j0h1rnulH/CXOsA3ISY/56bvMtNLVX7NAn80XCP
+	YhNS71eeOaKifODw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=ABg26jN5;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=yxK92OaI
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772129050; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Bw/pxMCs3PGZ3t1xDbLU2eOlXd2FRM6wCa/DdIh9vIw=;
+	b=ABg26jN5sboOiEbl5mP+ymHsjVlzRkzTWU3bUObNqTlzwN3AvDMtymW7EOU6+A0WAT/Xz3
+	bn2QUhGjXnjp9DtTQr7G+ZucZ7cTITq8CtiR1F+OEU9HtAMG84jWnw4gi6ffjtUW2tPq0h
+	Cbi5zVZRytmf/6jYXpkGdjlXGE7jI34=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772129050;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Bw/pxMCs3PGZ3t1xDbLU2eOlXd2FRM6wCa/DdIh9vIw=;
+	b=yxK92OaIInZOuWsYJVe12akQvMahjC0j0h1rnulH/CXOsA3ISY/56bvMtNLVX7NAn80XCP
+	YhNS71eeOaKifODw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8C0A53EA62;
+	Thu, 26 Feb 2026 18:04:09 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id PXyWHhmLoGk6fQAAD6G6ig
+	(envelope-from <pfalcato@suse.de>); Thu, 26 Feb 2026 18:04:09 +0000
+Date: Thu, 26 Feb 2026 18:04:07 +0000
+From: Pedro Falcato <pfalcato@suse.de>
+To: syzbot <syzbot+709f5ab0e03871dec50a@syzkaller.appspotmail.com>
+Cc: Liam.Howlett@oracle.com, akpm@linux-foundation.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, lorenzo.stoakes@oracle.com, 
+	shakeel.butt@linux.dev, surenb@google.com, syzkaller-bugs@googlegroups.com, 
+	vbabka@suse.cz, netdev@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>, 
+	linux-block@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [syzbot] [mm?] possible deadlock in lock_mm_and_find_vma (4)
+Message-ID: <btgotj7xgnzgoqwkfwk3pviof4cd6dnhxes3g32ncxz5ogcslk@epki2rug5yor>
+References: <69a05ea3.050a0220.305b49.0022.GAE@google.com>
+ <ibhdm4y3cwmornxfyxckosbznmtx3hi37tdp4xvha7a7wyaktp@rkrjyxdqmgb2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ibhdm4y3cwmornxfyxckosbznmtx3hi37tdp4xvha7a7wyaktp@rkrjyxdqmgb2>
+X-Spam-Flag: NO
+X-Spam-Score: -2.51
+X-Spam-Level: 
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261523-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,suse.de:dkim];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261521-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pr-tracker-bot@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[suse.de:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pfalcato@suse.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev,709f5ab0e03871dec50a];
 	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7331B1AD49B
+	SUBJECT_HAS_QUESTION(0.00)[]
+X-Rspamd-Queue-Id: 7C8981ADA1D
 X-Rspamd-Action: no action
 
-The pull request you sent on Thu, 26 Feb 2026 16:15:29 +0100:
+On Thu, Feb 26, 2026 at 05:40:26PM +0000, Pedro Falcato wrote:
+> +Cc netdev, block, nbd people
+> 
+> On Thu, Feb 26, 2026 at 06:54:27AM -0800, syzbot wrote:
+> <snip>
+> > 
+> > Chain exists of:
+> >   fs_reclaim --> k-sk_lock-AF_INET6 --> &mm->mmap_lock
+> > 
+> >  Possible unsafe locking scenario:
+> > 
+> >        CPU0                    CPU1
+> >        ----                    ----
+> >   rlock(&mm->mmap_lock);
+> >                                lock(k-sk_lock-AF_INET6);
+> >                                lock(&mm->mmap_lock);
+> >   lock(fs_reclaim);
+> > 
+> >  *** DEADLOCK ***
+> > 
+> > 2 locks held by syz.3.3387/17804:
+> >  #0: ffffffff905e2228 (br_ioctl_mutex){+.+.}-{4:4}, at: br_ioctl_call+0x34/0xa0 net/socket.c:1225
+> >  #1: ffff88807ad4b440 (&mm->mmap_lock){++++}-{4:4}, at: mmap_read_trylock include/linux/mmap_lock.h:611 [inline]
+> >  #1: ffff88807ad4b440 (&mm->mmap_lock){++++}-{4:4}, at: get_mmap_lock_carefully mm/mmap_lock.c:441 [inline]
+> >  #1: ffff88807ad4b440 (&mm->mmap_lock){++++}-{4:4}, at: lock_mm_and_find_vma+0x35/0x6f0 mm/mmap_lock.c:501
+> >
+> 
+> It looks to me like the issue is:
+>  setsockopt(nbd_sock) -> takes sk_lock -> copy_from_user -> page fault ->
+>    mmap_lock -> allocation needs reclaim -> fs_reclaim -> fs does IO -> nbd
+>    grabs sk_lock -> deadlock
+> 
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-7.0-rc2
+Another funny case that came to me just now:
+sendmsg(nbd_sock) -> lock_sock(nbd_sock) -> tcp_sendmsg_locked(nbd_sock) ->
+copy_from_user() -> if VMA is backed by file on nbd bdev -> ... ->
+lock_sock(nbd_sock)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/b9c8fc2caea6ff7e45c6942de8fee53515c66b34
-
-Thank you!
+Right? Is there something extremely crucial that I'm missing?
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Pedro
 
