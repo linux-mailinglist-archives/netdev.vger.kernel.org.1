@@ -1,217 +1,267 @@
-Return-Path: <netdev+bounces-261567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261568-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EOAGJ2qpoGlGlgQAu9opvQ
-	(envelope-from <netdev+bounces-261567-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 21:13:30 +0100
+	id +I8EACqqoGlGlgQAu9opvQ
+	(envelope-from <netdev+bounces-261568-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 21:16:42 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E89231AEEE6
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 21:13:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F0ED1AEFAD
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 21:16:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D95B13019FF4
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:13:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 00D2F3001814
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:16:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF08D426EC1;
-	Thu, 26 Feb 2026 20:13:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2062A44E031;
+	Thu, 26 Feb 2026 20:16:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="dqjLefHA"
+	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="ugkUzpo7";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="LNjHst4Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from fout-b5-smtp.messagingengine.com (fout-b5-smtp.messagingengine.com [202.12.124.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F99542B736;
-	Thu, 26 Feb 2026 20:13:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E02C739280F
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 20:16:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772136806; cv=none; b=BeKafSaGFMXnTMdaVBNaUh+8SRm04YdM6GzWhQVfdeiF37eGlPkR1ouGwmbVAAeg0zvcnPXzmMJbkZDSAsnohM1MK5g66hbqYZEXna6DgYetVxoRPj58NW+aZM1KtYh7W9vi/3VkgtP0Z/E1xuya17qCF5d+hBLdIYO0YXYFNxU=
+	t=1772136999; cv=none; b=pcaLTKRn8w0zN6s5Yg1M/hwKU5hnuG4fjkGoKGQnu7kW5wJfzBQwbMd7LTGYccoJ+HPdvVoF9EvxFpxjw3b4HTondgLDKJdt4CLmrgolJ/QKnlhSV3qtzyqb5JNy3FxuvuvN0kj68r6a0tCMOjwktB6leePJCl3zwhVTcMuuvbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772136806; c=relaxed/simple;
-	bh=f+FH5u6NePnJWpkXpdMf0rFuk3vM+W+gFD63G5LmYC0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HypIBQ5zsAS2jnBifT7FkMsYJ0NYk9pPzyPAyoadbY9Htrr8nBNQ+s5ILFE+TNX7Vg6ylnYTJ2hVWtSrEY89aB/tDMM6yn7s9SZiBY/yiSfzdko8GDPVhPHboQL01YBPV8UfRnHy5VJLrzSqcenk+589w3okJlvWJNrkR5df+Ws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=dqjLefHA; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1772136805; x=1803672805;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=f+FH5u6NePnJWpkXpdMf0rFuk3vM+W+gFD63G5LmYC0=;
-  b=dqjLefHA0oOMQ1BfEcaMoXi6iPyWIAYmqFUnaWZeheQYBy6KDI1vCXmi
-   kWWeU2WtSCfsqlgI9ms5AiZJoISM8q3ATrqGZSFplMsiu17xO1YdCcLlH
-   EAx4/blR+fj+J8QxVz6dBLnNeV0L4lP27SQTjC5ce3iWn0a+FZHn0H5eB
-   T8e8JIJNz82wUYlPp88nAy7HgwpPEyl2cacefIg3OaOXSceypklhM+ZLj
-   yDzO237GjyGphFyh+hTJf0v7dIkM5zTkDPYxXcMYQlrPPxnYihLDA4BLg
-   xQ2bApGovNCDEGZ2pTYSNP+5++PCSoxAtCnNHvdtJ+tTRWitwXy5KXvmV
-   g==;
-X-CSE-ConnectionGUID: /3wlzlSWTeqatQ0/5yW24Q==
-X-CSE-MsgGUID: u1+A7DOrQWul7wPPEnGxgA==
-X-IronPort-AV: E=Sophos;i="6.21,312,1763449200"; 
-   d="scan'208";a="54359471"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Feb 2026 13:13:18 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Thu, 26 Feb 2026 13:12:37 -0700
-Received: from DEN-DL-M70577.microsemi.net (10.10.85.11) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Thu, 26 Feb 2026 13:12:35 -0700
-Date: Thu, 26 Feb 2026 21:12:35 +0100
-From: Daniel Machon <daniel.machon@microchip.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Steen Hegelund
-	<Steen.Hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>, "Richard
- Cochran" <richardcochran@gmail.com>, <netdev@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 0/7] net: sparx5: clean up probe/remove init and
- deinit paths
-Message-ID: <20260226201235.vbnnp3skx3tv3obb@DEN-DL-M70577.microsemi.net>
-References: <20260225-sparx5-init-deinit-v1-0-97036580b9f0@microchip.com>
- <aZ69uEQHdhASe5dj@shell.armlinux.org.uk>
+	s=arc-20240116; t=1772136999; c=relaxed/simple;
+	bh=Fi9Ai8JKWzJ7raQudfT62PlKQ0kIC6YVTanh/qV9xP0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ltSKWCYPNw627kmEHz6qvsgCPWMTIi2mNu/uCeqZwW2v4r6oLU3bvMY4BFlrhQJtuyr+PuIAzLdykFdlZvDUxL1R9KQJvZsKV84gM1dKmTz36rpVUOZsVr4b6YY4YPT4iGgFKZCQ1q6RCN/gH8wpJDTAcydwZRghlDaMOsohhMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=ugkUzpo7; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=LNjHst4Q; arc=none smtp.client-ip=202.12.124.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.im
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfout.stl.internal (Postfix) with ESMTP id 766471D000C0;
+	Thu, 26 Feb 2026 15:16:35 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-02.internal (MEProxy); Thu, 26 Feb 2026 15:16:36 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm3; t=1772136995; x=1772223395; bh=zB8IoujtT/GJR3Nv7VvVk
+	xLt92Z2zMMjAcqpqP7/kso=; b=ugkUzpo7NosZsic2a5Nae+i/B9MB2Vif60Mxb
+	dtBfxQQXzqPYJ2OGEAiYvjJsE7ggP4eRnrYLeNevvFAwHk8O/htts87u7qGakZHb
+	OqW2iTd9E7SIFrwgdDBSQqjtS2WlRcUMZ5p+G8fysOrBfA/yfOMTGpvbLGgogULF
+	EvVkUOFnBaei2lRsBfGomnWC46DO7gclnylEzXlsU7r85a6IltHv5NSOXpjZuILe
+	dYGZfMgG9kfpMu5SDKnqE/PN6FyVZ3u8vvzhTz8uW+J8QY8zl7UxbQ52HzUcmynG
+	3Q4h6mSb/UGz7kJrTvoYcoJqsPhLAVVcvWsdn4zfeYys5xO4A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1772136995; x=1772223395; bh=zB8IoujtT/GJR3Nv7VvVkxLt92Z2zMMjAcq
+	pqP7/kso=; b=LNjHst4QJ7j28eQukajmAzK0TTNpqdEA0XdjSmFj6KNL7g4bsiz
+	AV4HwKLD9fNaUDimiQF+g7wwIB56w9sFfROBb2jMb3ktTq0mz3aQFkY0Bq0bIcHx
+	JJ+Rlgiu3CMHdSPcqQqKCOIytYLsxZXZoG4VZVcnzxs717xSWEyUDyzF9LKi6yYf
+	g+QLtSsEK+DZe8AZvhOrpLX1+I1BdZsXmIs2jeyx7/dIdIToowdPGIbcS/55i9jR
+	rKZnMtXDHaEkNsMCgMryML42ywwVZ6ZKF5/w99ZleGLvk8lQVnCnLb4DmehKh+7c
+	oDibmYf/MI2v3lpIrEQRMLPn3NFffMDRbcw==
+X-ME-Sender: <xms:IqqgaR4IRv6lH4orQ1K7OWPks3D_f1wZ5n1SgX1s67AKYztwPZ8NzA>
+    <xme:IqqgafXbbuJhE9ZS-4C7mfarFd5DKRQ_tTdcl7zZMGK3OxFiCtxtjcx6tW2GFo8q1
+    Y3qkrDzidwm0ZWCeaJk1SPiuHq3e23wzn-q4pgtNpxaoM9a2m_ia3A>
+X-ME-Received: <xmr:IqqgaYM1kZ-etw6k9Q7kQCokkASwJhAjqBnGCmeml28jdtwkpCCN1ubc0UuFXQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvgeejtdduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomheptehlihgtvgcuofhi
+    khhithihrghnshhkrgcuoegrlhhitggvrdhkvghrnhgvlhesfhgrshhtmhgrihhlrdhimh
+    eqnecuggftrfgrthhtvghrnhepheduiedvieefffduueelgeehuefhleekuefffeeiheeu
+    hfetjedtvefffefgfeegnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhush
+    htvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrlhhitggvrdhkvghr
+    nhgvlhesfhgrshhtmhgrihhlrdhimhdpnhgspghrtghpthhtohepudeipdhmohguvgepsh
+    hmthhpohhuthdprhgtphhtthhopegurghnihgvlhesihhoghgvrghrsghogidrnhgvthdp
+    rhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvg
+    guuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhn
+    vghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtph
+    htthhopehluhgtihgvnhdrgihinhesghhmrghilhdrtghomhdprhgtphhtthhopeifihhl
+    lhgvmhguvggsrhhuihhjnhdrkhgvrhhnvghlsehgmhgrihhlrdgtohhmpdhrtghpthhtoh
+    epughsrghhvghrnheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprhgriihorhessghl
+    rggtkhifrghllhdrohhrgh
+X-ME-Proxy: <xmx:IqqgaWhKPaw1-aw7bzYulW9QQI3-CwKkTinW-1KDzbu1Nuyz07g-5w>
+    <xmx:Iqqgae4ofUk5O9C5IhwcBGq29rp_aNfZXc5g8kO3-6wdSQis8iewrQ>
+    <xmx:IqqgadegK5DxF7ihHxjQTb_rkg8-Q-KfFDs3C3larF7LWNSYs-3R-Q>
+    <xmx:IqqgaXAtmmHuqOPRVOmoBT6TuLpKk5Co9pAspM79meYLGkNLhFRSFg>
+    <xmx:I6qgaXS6xo2Y4RVR2OLjpWrS9O_uN-wuf56FLyCF7ruaYN0qa6KTP-Rp>
+Feedback-ID: i559e4809:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 26 Feb 2026 15:16:33 -0500 (EST)
+From: Alice Mikityanska <alice.kernel@fastmail.im>
+To: Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	David Ahern <dsahern@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>
+Cc: Shuah Khan <shuah@kernel.org>,
+	Stanislav Fomichev <stfomichev@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Florian Westphal <fw@strlen.de>,
+	netdev@vger.kernel.org,
+	Alice Mikityanska <alice@isovalent.com>
+Subject: [PATCH net-next v2 00/12] BIG TCP for UDP tunnels
+Date: Thu, 26 Feb 2026 22:15:48 +0200
+Message-ID: <20260226201600.222044-1-alice.kernel@fastmail.im>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <aZ69uEQHdhASe5dj@shell.armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[fastmail.im,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[fastmail.im:s=fm3,messagingengine.com:s=fm3];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261567-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,gmail.com,vger.kernel.org,lists.infradead.org];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lunn.ch,strlen.de,vger.kernel.org,isovalent.com];
+	FREEMAIL_FROM(0.00)[fastmail.im];
+	TAGGED_FROM(0.00)[bounces-261568-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[iogearbox.net,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,blackwall.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel.machon@microchip.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	NEURAL_HAM(-0.00)[-0.982];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,microchip.com:email,microchip.com:dkim,armlinux.org.uk:url,DEN-DL-M70577.microsemi.net:mid]
-X-Rspamd-Queue-Id: E89231AEEE6
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alice.kernel@fastmail.im,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[fastmail.im:+,messagingengine.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.995];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,messagingengine.com:dkim,fastmail.im:mid,fastmail.im:dkim]
+X-Rspamd-Queue-Id: 0F0ED1AEFAD
 X-Rspamd-Action: no action
 
-Hi Russell,
+From: Alice Mikityanska <alice@isovalent.com>
 
-> > This series refactors the sparx5 init and deinit code out of
-> > sparx5_start() and into probe(), adding proper per-subsystem cleanup
-> > labels and deinit functions.
-> >
-> > Currently, the sparx5 driver initializes most subsystems inside
-> > sparx5_start(), which is called from probe(). This includes registering
-> > netdevs, starting worker threads for stats and MAC table polling,
-> > requesting PTP IRQs, and initializing VCAP. The function has grown to
-> > handle many unrelated subsystems, and has no granular error handling —
-> > it either succeeds entirely or returns an error, leaving cleanup to a
-> > single catch-all label in probe().
-> >
-> > The remove() path has a similar problem: teardown is not structured as
-> > the reverse of initialization, and several subsystems lack proper deinit
-> > functions. For example, the stats workqueue has no corresponding
-> > cleanup, and the mact workqueue is destroyed without first cancelling
-> > its delayed work.
-> >
-> > Refactor this by moving each init function out of sparx5_start() and
-> > into probe(), with a corresponding goto-based cleanup label. Add deinit
-> > functions for subsystems that allocate resources, to properly cancel
-> > work and destroy workqueues. Ensure that cleanup order in both error
-> > paths and remove() follows the reverse of initialization order. What
-> > remains in sparx5_start() is only hardware register setup and FDMA/XTR
-> > initialization that does not require cleanup.
-> >
-> > Before this series, most init functions live inside sparx5_start() with
-> > no individual cleanup:
-> >
-> >   probe():
-> >     sparx5_start():              <- no granular error handling
-> >       sparx5_mact_init()
-> >       sparx_stats_init()           <- starts worker, no cleanup
-> >       mact_queue setup             <- no cancel on teardown
-> >       sparx5_register_netdevs()
-> >       sparx5_register_notifier_blocks()
-> >       sparx5_vcap_init()
-> >     sparx5_ptp_init()
-> >
-> >     probe() error path:
-> >       cleanup_ports:
-> >         sparx5_cleanup_ports()
-> >         destroy_workqueue(mact_queue)
-> >
-> > After this series, probe() initializes subsystems in order with
-> > matching cleanup labels, and remove() tears down in reverse:
-> >
-> > probe():
-> >     sparx5_ptp_init()
-> >     sparx5_vcap_init()
-> >     sparx5_mact_init()
-> >     sparx5_stats_init()
-> >     sparx5_register_netdevs()
-> >     sparx5_register_notifier_blocks()
-> >     sparx5_start()
-> >
-> >   remove():
-> >     sparx5_unregister_notifier_blocks()
-> >     sparx5_unregister_netdevs()
-> >     sparx5_stats_deinit()
-> >     sparx5_mact_deinit()
-> >     sparx5_vcap_deinit()
-> >     sparx5_ptp_deinit()
-> >     sparx5_destroy_netdevs()
-> >
-> > Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
-> 
-> Note that there is the general principle that drivers should not
-> "publish" themselves (aka register their netdevs and/or ptp) until
-> they have initialised enough so the facility that has been published
-> is functional.
-> 
-> That, in general, means that there should be very little initialisation
-> after the calls to register the netdevs and ptp.
-> 
-> It's fine if something gets published and then a later publication of
-> another interface fails, causing the first publication to be withdrawn,
-> that is pretty much unavoidable, but in such scenarios, one would want
-> to do as much of the initialisation that may fail before any
-> publication of any user interfaces.
-> 
-> --
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+This series is a follow-up to "BIG TCP without HBH in IPv6", and it adds
+support for BIG TCP IPv4/IPv6 workloads in vxlan and geneve. Now that
+IPv6 BIG TCP doesn't require stripping the HBH in all various
+combinations in tunneled traffic, adding BIG TCP becomes feasible.
 
+Patches 01-03 are small fixups to some related code that I'm changing in
+the series.
 
-Thanks for pointing this out.
+Patch 04 adds accessors for the length field in the UDP header, as
+suggested by Paolo in review. The usage of udp_set_len is then added in
+the following patches that start using length=0 in BIG TCP UDP packets.
 
-Before this series, quite a bit of initialization was already done after
-publication. But as a consequence of moving netdev registration out of
-sparx5_start() (patch #2), some initialization that previously happened before
-publication now happens after — which is the wrong direction.
+Patches 05-07 close the gaps that prevent BIG TCP packets from going
+through UDP tunnel code.
 
-I will do some reordering to fix this in v2.
+Patch 08 re-adds proper validation of malformed packets that arrive with
+length=0 from the wire.
 
-Thanks!
+Patch 09 is for proper formatting in tcpdump (set UDP len to 0 rather
+than a trimmed value on overflow).
+
+Patches 10-11 bump up tso_max_size for VXLAN and GENEVE.
+
+Patch 12 adds selftests.
+
+Thanks all!
+
+v2 changes: Addressed the review comments: added UDP len helpers,
+consolidated UDP len sanity checks in patch 08 into one, added
+selftests. Added fixups to related code (patch 01-03).
+
+v1: https://lore.kernel.org/netdev/20250923134742.1399800-1-maxtram95@gmail.com/
+
+Alice Mikityanska (11):
+  net/sched: act_csum: don't mangle UDP tunnel GSO packets
+  udp: gso: Simplify handling length in GSO_PARTIAL
+  geneve: Fix off-by-one comparing with GRO_LEGACY_MAX_SIZE
+  net: Use helpers to get/set UDP len tree-wide
+  net: Enable BIG TCP with partial GSO
+  udp: Support gro_ipv4_max_size > 65536
+  udp: Support BIG TCP GSO packets where they can occur
+  udp: Validate UDP length in udp_gro_receive
+  udp: Set length in UDP header to 0 for big GSO packets
+  vxlan: Enable BIG TCP packets
+  selftests: net: Add a test for BIG TCP in UDP tunnels
+
+Daniel Borkmann (1):
+  geneve: Enable BIG TCP packets
+
+ drivers/infiniband/core/lag.c                 |   2 +-
+ drivers/infiniband/sw/rxe/rxe_net.c           |   4 +-
+ drivers/net/amt.c                             |   6 +-
+ drivers/net/ethernet/intel/i40e/i40e_txrx.c   |   2 +-
+ drivers/net/ethernet/intel/iavf/iavf_txrx.c   |   2 +-
+ drivers/net/ethernet/intel/ice/ice_txrx.c     |   2 +-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   |   2 +-
+ .../marvell/octeontx2/nic/otx2_txrx.c         |   2 +-
+ .../net/ethernet/mellanox/mlx5/core/en_rx.c   |   4 +-
+ .../ethernet/mellanox/mlx5/core/en_selftest.c |   2 +-
+ drivers/net/ethernet/sfc/falcon/selftest.c    |   4 +-
+ drivers/net/ethernet/sfc/selftest.c           |   4 +-
+ drivers/net/ethernet/sfc/siena/selftest.c     |   4 +-
+ drivers/net/ethernet/sfc/tc_encap_actions.c   |   2 +-
+ .../stmicro/stmmac/stmmac_selftests.c         |   4 +-
+ drivers/net/geneve.c                          |   6 +-
+ drivers/net/netdevsim/dev.c                   |   2 +-
+ drivers/net/netdevsim/psample.c               |   2 +-
+ drivers/net/netdevsim/psp.c                   |   8 +-
+ drivers/net/vxlan/vxlan_core.c                |   2 +
+ drivers/net/wireguard/receive.c               |   2 +-
+ include/linux/udp.h                           |  16 ++
+ include/net/udplite.h                         |   4 +-
+ include/trace/events/icmp.h                   |   2 +-
+ lib/tests/blackhole_dev_kunit.c               |   2 +-
+ net/6lowpan/nhc_udp.c                         |  10 +-
+ net/core/netpoll.c                            |   2 +-
+ net/core/pktgen.c                             |   4 +-
+ net/core/selftests.c                          |   4 +-
+ net/core/skbuff.c                             |  10 +-
+ net/core/tso.c                                |   3 +-
+ net/ipv4/esp4.c                               |   2 +-
+ net/ipv4/fou_core.c                           |   2 +-
+ net/ipv4/ipconfig.c                           |   6 +-
+ net/ipv4/netfilter/nf_nat_snmp_basic_main.c   |   4 +-
+ net/ipv4/route.c                              |   2 +-
+ net/ipv4/udp.c                                |   8 +-
+ net/ipv4/udp_offload.c                        |  58 +++----
+ net/ipv4/udp_tunnel_core.c                    |   2 +-
+ net/ipv6/esp6.c                               |   5 +-
+ net/ipv6/fou6.c                               |   2 +-
+ net/ipv6/ip6_udp_tunnel.c                     |   2 +-
+ net/ipv6/udp.c                                |   3 +-
+ net/ipv6/udp_offload.c                        |   2 +-
+ net/l2tp/l2tp_core.c                          |   2 +-
+ net/netfilter/ipvs/ip_vs_xmit.c               |   2 +-
+ net/netfilter/nf_conntrack_proto_udp.c        |  19 ++-
+ net/netfilter/nf_log_syslog.c                 |   2 +-
+ net/netfilter/nf_nat_helper.c                 |   2 +-
+ net/psp/psp_main.c                            |   2 +-
+ net/sched/act_csum.c                          |  12 +-
+ net/xfrm/xfrm_nat_keepalive.c                 |   2 +-
+ tools/testing/selftests/net/Makefile          |   1 +
+ .../testing/selftests/net/big_tcp_tunnels.sh  | 145 ++++++++++++++++++
+ 54 files changed, 298 insertions(+), 114 deletions(-)
+ create mode 100755 tools/testing/selftests/net/big_tcp_tunnels.sh
+
+-- 
+2.52.0
+
 
