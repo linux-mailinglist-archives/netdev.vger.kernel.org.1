@@ -1,209 +1,219 @@
-Return-Path: <netdev+bounces-261191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261192-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yFseJ1Dwn2kyfAQAu9opvQ
-	(envelope-from <netdev+bounces-261191-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 08:03:44 +0100
+	id +EFENvj0n2kyfAQAu9opvQ
+	(envelope-from <netdev+bounces-261192-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 08:23:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 497311A190D
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 08:03:44 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 131FE1A1CE7
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 08:23:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 914B03055C73
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 07:03:41 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 71684300D376
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 07:23:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D186C38BF9C;
-	Thu, 26 Feb 2026 07:03:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02E8238552B;
+	Thu, 26 Feb 2026 07:23:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="hfUrcUcs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W6OUiFpf"
 X-Original-To: netdev@vger.kernel.org
-Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011039.outbound.protection.outlook.com [52.101.65.39])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B3EE2BE641;
-	Thu, 26 Feb 2026 07:03:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.39
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772089420; cv=fail; b=WP5zFyCTljrkpWSGDCknWDnKBeO/Tf71sjJyL2beljU/1OH5unD/QiYIt3Wv5/qtEQ0uuCG7pz6GREyWpmXgT5PzCRKWv3BZtrVMnhN+T15KueKuOHqzHBVWDgB+kAZhmQa3I1XXfYrHjWWPh+ZnnnZfBcfuh3L8qKqlUuHDJ/8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772089420; c=relaxed/simple;
-	bh=xvqV6ZZZ2/YuT1qj+ajPfjjjYMSBCa917hyGOodPUQw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=q+xCpspWSb1USIcBT7ykxX2i7O83JrGdtj6/OIC69JtNuT5Ukl/jM6uQGDPtp9ZRc8Gfw+ZDc04r8tXrGAASPuKze5M5m2M1gHVe9hjAFdaDh0v2DSWAd4sWbNuHqZtgcBLNAtZvNm2n5FEoKe1i8qC1IzjSKpBROVM7QcMIBPk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=hfUrcUcs; arc=fail smtp.client-ip=52.101.65.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bFSCG6Xxy+F/FmEZfGipskEovExmd+Zc78zzrLWXVuTUMeRRynXsfjlDuMU0BkPFPQND3RY4mSUwqAo2dwuuB8NCMZ7fSn6srUf0YN3r3qPwDnKjl6+iuhN2ZqPCiZG/O6pBDMY+OVD7PR8we1D07HKjmj84/IjrViUWH3kH3Zf0g1uedZJcGgFjoOukY3npHvk9roExq/2+mb1ay4jkx1efhPs4nm+pY3he2RA5bGYq3FqOmO6971bP2QotMr5LOCIOLlEOoIKKTWCMPK1zlyjo+g5pCiT+tgrz9swS2Ust3hN3G0amSqn14p+Y41tlbCgIwpVDTEiGB1u9XQct8A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UmVw9K2YDvOvWL/s3+OM+5bLdH1K4sfvsPsgSxbOweU=;
- b=q5see/qkuj3/FN88ofL/EXuKRnpj8O3ujkd9K5TRjHJmCsr5CHQL8hhYjs3Vk+al8ZWpLGYerHaCdByOjWtKF9gq4b35+TOJ/eJ/j5IHFZPbOHrI/c9WXw3a3oE7glqn8adQY76nqMkbxCDkRvUfbp10HypFFYlz8x9X1axlq0ozIzzja5czV48Np0xaBcdBcozY5SNuSQPwiDSnkyOqyrCwCQ71vRV6zOd3siqXjhOzOdIGdrV52YvLPmcUIrOPrBZHkoRPXMg9AAtbOgEX54/kDopj0WmYijAY3B8IzWRqpm1EOEr/DIilPw7/o1ZPprjrdgrYZzjKeJ2VkO3YFg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UmVw9K2YDvOvWL/s3+OM+5bLdH1K4sfvsPsgSxbOweU=;
- b=hfUrcUcsuO5ViwKxoFhhMPD5RvrZ1B2qD2W8gSToZ28QfPZj4grv8ToNvKmw3wWxLk5z7OBNUEBtsh7S0uzNDpF8ptknOtxrFp/FPPgDhAkmzL1JmK+Ibft1hr/CM4RAr19Xoca5eREjl5HUvqP8AouHao9pq9kSM1Ww+Rr8XZP3PS0vCJKbTMWi4Gd8LH1EQPuQICUvxcaX4zpcSwm2PVSGX4L+I/TeobfuuLyx55HnMMCacxT097B+KGDsfs93sxH5NiUb/ssLMOGHfT/FKzRoU5CQp+at+7wgqlAQ3HL9Wcat5DSEtsoCEIaQl1gzOOkgf5DiLwydU+2Yn+79dw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB8253.eurprd04.prod.outlook.com (2603:10a6:102:1bf::7)
- by AS8PR04MB8945.eurprd04.prod.outlook.com (2603:10a6:20b:42c::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.13; Thu, 26 Feb
- 2026 07:03:36 +0000
-Received: from PAXPR04MB8253.eurprd04.prod.outlook.com
- ([fe80::2b4e:8130:4419:d633]) by PAXPR04MB8253.eurprd04.prod.outlook.com
- ([fe80::2b4e:8130:4419:d633%3]) with mapi id 15.20.9654.013; Thu, 26 Feb 2026
- 07:03:36 +0000
-Date: Thu, 26 Feb 2026 09:03:32 +0200
-From: Ioana Ciornei <ioana.ciornei@nxp.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next 5/5] selftests: drivers: hw: add tests for the
- ethtool standard counters
-Message-ID: <osswnpbiyy35ycs7ha2ufugj7dzmvpeq3x7vjq4j53qtwamkuw@ihwl5qjuydnv>
-References: <20260225150648.1542206-1-ioana.ciornei@nxp.com>
- <20260225150648.1542206-6-ioana.ciornei@nxp.com>
- <77f3e4e8-430e-4ae1-aa1f-8f70b4d8d3da@lunn.ch>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <77f3e4e8-430e-4ae1-aa1f-8f70b4d8d3da@lunn.ch>
-X-ClientProxiedBy: FR4P281CA0389.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:f7::7) To PAXPR04MB8253.eurprd04.prod.outlook.com
- (2603:10a6:102:1bf::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0F11823DD;
+	Thu, 26 Feb 2026 07:23:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772090612; cv=none; b=PbHOdkqpcbg1Dvt2CyUswheiLnX55BqC2tWgzltDXRKRcmK/JOKR5w/SoOrmBHxmDznW0LMY1VKCHm2wFs42ulF1sROKPV3SavXWQSahINwFdaCpEwlk5JSzmVqzGox0uIYTzLD8DET/b1InQziBXJghfLEEiLRl530AJpo+qwI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772090612; c=relaxed/simple;
+	bh=GCPuXk8MuiUtk6Jf+apT8eJklqsp4FrEkzQCLhHjJzA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u25HQkc/vaeK5Btkhk8Son3AUq11jLGeEPzqhE2SXVwNCyS9yf1hEuwepGLGGvOSpK1z+LbtICxidD/FC9boR6U30pxLHYU7UroZfzBqWkJITJYZ4nvYsdcwRf3KH3DGcdLOyzMELCLpZGyTREOnT1gpLcyP/Fok4DdTiBSr540=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W6OUiFpf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 196F8C19422;
+	Thu, 26 Feb 2026 07:23:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772090612;
+	bh=GCPuXk8MuiUtk6Jf+apT8eJklqsp4FrEkzQCLhHjJzA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=W6OUiFpfAJHJOfeUHzXkGt0sQWDLMLXxHhTfm3DuKlrM0/dxA2DC1pvO5kYbPGRPY
+	 ZKxMfIsB60L2EkntNk5xEzwZUTdOZjcPEYRvIOyJEVrR6h0Qdtpj9dvb545jIsKaIf
+	 sHLQ4eRE+E/awQbe2GKPK+XGaldnXP5IFVyhEKooj1TuDrz5PEGKlcZneB5poOeQjK
+	 /7sDPvUtu6P/ezaEVLmVYFEvMzMs4WSuCJ3tTbT8Kkb7baXcECCktjwRJ3k5t0M3px
+	 2xudCbXvFPE6PihONxc13xt9Jeqml+ZIiSD4mLcnt40AATgv5phXvsoaGeEoZfmop7
+	 7wVoSRn4cwi+A==
+Message-ID: <ccaf0b4a-ba1e-4443-89d3-8fecdcfd3a14@kernel.org>
+Date: Thu, 26 Feb 2026 08:23:23 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB8253:EE_|AS8PR04MB8945:EE_
-X-MS-Office365-Filtering-Correlation-Id: 792f60b7-9530-4773-631c-08de7505296e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|19092799006;
-X-Microsoft-Antispam-Message-Info:
-	X0wmb6W/JvPXFBq36zY1lUrQbvkcfmC+y0JQ0Cjo9BpOLrEEa2Php9ynVlxH+F0OUZ7sraReel7bQZ22DLD5Z03dKl5Oqz/ASwUiVo/SFcT21Uk5cmJmhRHmvd0kj5sTX20FVEWZQQ1s9dbqQH7OYkCyPB3shWI6FYphDePak29TKEJOLA66q1/w1gx9vM5NSc/sf5U95RaNiVc5GmTgS9mfNyBW42USsGz3v+q8byjNT0yMkYNaMTvWxTdbIE8h22nItOXLXL4YjTVpCtTPWreioWIdZWsjYpWn3ZqDNSbKj3VXvlCOJ8fM8r4kvClAYZRVLTm+JS2V/JuTL8h6sdjOt359U7mOuQoUWIMMTkQOqVgrHOF1uLTQWxS/jSFFfeUG5kVyw7Z2TH9vWR/gCvLzCRfQh8BnYdzVtD/y3IJOoiwAWARKKuI7yzTf6xg+6TTdj1Ktk4HAT+URL+6T5TNkIs/fB1E/U+iF4nDG/r5XX5AfjPshhn4Kfc57qbdrNVspN1xitN9HmTrM3pOK4zxN82I+aKPw8rKKBredTvW3w4LNvmamU1zTlHvvAdSgLqxdDVmf6qdC9AdTpV9gSwEz/OwPSRSefRgMXQRqQU3Zwas51nPdxTdCT7axcbfcFe5aeLOdcUJESR6J1JbGSxomWi/1dAilahqgbLhfIkjVrgwmmi6KdBroAhnvr14csXthYkJgFJUyyxRkO2y4nfccZvqBVynkQKr6K131vwI=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8253.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(19092799006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?XRVlGi6aUFg4fWa+zPLawKEcEY0ULwH+cq8ecZK/htacmNYCMY+T/EPz92p7?=
- =?us-ascii?Q?jF1VFQEyiydl41IvWgEEoUQRtKcD/JzUmYAFCbYazaHwKQpstRClYqoFtVs0?=
- =?us-ascii?Q?GyWLRPz1/M4475TFe/ibWuGC4OEWxq3k3rB/aB5weamDyVBGPvMKizjkPxsr?=
- =?us-ascii?Q?QpsiP/mw1CZ0KxzP4T2z+euH3FMyk6+mIIT2Yhbk5eIzQMVTZPW3u3a8e2lA?=
- =?us-ascii?Q?/krh1Zzk6o+rqkzfyVB+QnOZAxFeDt0iZn5lNCvHgdprbf7mqgPBc1ab72CU?=
- =?us-ascii?Q?H4TIAAH/wL1OTkSguCkMhEphNCnTSRVYrsKwlAHWU+/f+xqiA9SvTqnTQVRV?=
- =?us-ascii?Q?HLhN+rLbmn4++kaZjSXug3t0pxpcfBh31XscZ9uR2PEPe2K+3F6pEkF86AWk?=
- =?us-ascii?Q?QYrAHuJ4BntVA7bgNu7Gwdhj1wOWi28CXKrIsl4NK+IUduokBdTPTg67dEK8?=
- =?us-ascii?Q?xPZ4PeCZCy5EysVRgFsU3tP+HskXd9wohQREhJsJTIjD7AaW2r4kFd7yy8yO?=
- =?us-ascii?Q?4YyOtUT1SY/8Qh9An/KhfdrK0F4pfoDRLiQvaIvkqYWg8pvrhKBMPOgYVKhS?=
- =?us-ascii?Q?vd3oB1ylRrnIVoUCfo1g6h6iAO4kS6C7VGhL8GdhxeviARzF5gEzJJ5sQtt8?=
- =?us-ascii?Q?e3V71P+YM4Qh5CQBy5eoLHvtZPTbbb1z8WBgO0YN3ONJFiy//pasBSSjAR/X?=
- =?us-ascii?Q?XnHS4wqfjLuEVkDuSKEVmxbOyXzp+t+g5886xvaJJlYo9qEL5UxSVIFSi6O9?=
- =?us-ascii?Q?vO4mcn8QIfZNErbCK3Z5AsdEHtIvJ+bpG6MncyOVbCLt16YG1RX8DJ62Syrm?=
- =?us-ascii?Q?Q0sFknNw6RQkyvvStRJ+BH84/gl+4K1n6VTM/qGXnyopqw9OumfEIts2UHG0?=
- =?us-ascii?Q?iVlvpbeWo0D77Gcf5N8/XvzuZmAe4tJ/Y9qTqmAGDS9f1wjqOEEYUWnp5VwI?=
- =?us-ascii?Q?usB+yPttGx94GHFDYk1fmE+RXU4QLYYhhcd+m/Vx9x3sgDcuTrM9RY3aousA?=
- =?us-ascii?Q?DCVBBGhHTw7cot4VpAoxYh2L53K2n0oDD04e+vgEUzoh8zyFQ/SzeFhdGuk3?=
- =?us-ascii?Q?RO6rBEhT7hx2Yerc6Ar1pR+KrTFsHdSzBtbJjsUDtyfL84hAsHRuxBsW4aqd?=
- =?us-ascii?Q?uX0hb4eAKfzLfE1dfPxy84RWRr6MVHUBl4uvXKDAnZW2EQW1KCrpCBO1HNkU?=
- =?us-ascii?Q?aX2z10OejFMyuuBKrfs5ReKCcGCl9en1gloT0eQwLawAWWzwPrRzjNzlB/x/?=
- =?us-ascii?Q?hlTVGDtvkjTGyGzpZvLpoKYP5RwH5VDWcqslv8WVIIqXQ5SkJp4Ma6JiI+la?=
- =?us-ascii?Q?01njJrM22WwPr8r/RthZAer/XszRyXSbmCBTqVupzsOmY12aPiFXbydsqGOi?=
- =?us-ascii?Q?vlrdUdoS/YUZzO6O84cZAOFzEnLQwY0N/yhxEwJsvHyKhm+7/ibOhcncF3uR?=
- =?us-ascii?Q?2PxZrPMLzOUADhhrUV0/aq9fpvwHUmR7pVZPWkWWzA0zvC1B+rZa/mh+eRTc?=
- =?us-ascii?Q?oi1Pno+WmcSuT8wHhL1hDlV8YLE8HFjKIaRn0ierm+zxJvEPhHBHEtTwMmzp?=
- =?us-ascii?Q?uYWvD62fCPlpwb4tYkMMLxNAkrngmX+RLlQ4XoA2xByvx/up8x70D47jyS0w?=
- =?us-ascii?Q?0F0J6O793JeMr+vuYGMhacm89qU57mv3gDac2Dr43IzOPHUb4dnIT/tMuCNU?=
- =?us-ascii?Q?BoWMCC+KOY/sb1fby/eDZxoGa7JRw5xIQaQWmxwycbuirjdJ4nTtWAQietHd?=
- =?us-ascii?Q?cQIC/ow+Hw=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 792f60b7-9530-4773-631c-08de7505296e
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8253.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2026 07:03:36.4900
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nof5ZzDF/Aoz5YRVoIFqPXVLSyFqJ4PemgG9U01J6Q4l0JKfAuiMzbeNsd+Y2dadsYxxO3b/Uup0f//DR5+jHw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8945
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/2] selftests: drv-net: rss: Generate unique
+ ports for RSS context tests: manual merge
+Content-Language: en-GB, fr-BE
+To: Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
+ Willem de Bruijn <willemb@google.com>, Stanislav Fomichev <sdf@fomichev.me>,
+ Daniel Zahka <daniel.zahka@gmail.com>, Carolina Jubran <cjubran@nvidia.com>,
+ Gal Pressman <gal@nvidia.com>, David Wei <dw@davidwei.uk>,
+ Mohsin Bashir <mohsin.bashr@gmail.com>, Nimrod Oren <noren@nvidia.com>,
+ Breno Leitao <leitao@debian.org>, Petr Machata <petrm@nvidia.com>,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ "David S . Miller" <davem@davemloft.net>, Mark Brown <broonie@kernel.org>,
+ linux-next@vger.kernel.org
+References: <20260224224659.1507082-1-dimitri.daskalakis1@gmail.com>
+ <20260224224659.1507082-3-dimitri.daskalakis1@gmail.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20260224224659.1507082-3-dimitri.daskalakis1@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261191-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261192-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FREEMAIL_CC(0.00)[lunn.ch,google.com,kernel.org,redhat.com,fomichev.me,gmail.com,nvidia.com,davidwei.uk,debian.org,vger.kernel.org,davemloft.net];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
+	HAS_ORG_HEADER(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ethtool_std_stats.sh:url,nxp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 497311A190D
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lib.py:url]
+X-Rspamd-Queue-Id: 131FE1A1CE7
 X-Rspamd-Action: no action
 
-On Thu, Feb 26, 2026 at 12:38:58AM +0100, Andrew Lunn wrote:
-> On Wed, Feb 25, 2026 at 05:06:48PM +0200, Ioana Ciornei wrote:
-> > Add a new selftest - ethtool_std_stats.sh - which validates the
-> > eth-ctrl, eth-mac and pause standard statistics exported by an
-> > interface. Not all counters can be validated in software, especially
-> > those that are keeping track of errors. Counters such as
-> > SingleCollisionFrames, FrameCheckSequenceErrors etc are not tested nor
-> > included in this new selftest.
-> 
-> Hi Ioana
-> 
-> Thanks for the test!
-> 
-> Do we actually expect errors when running such a test? How many times
-> have you run this test and seen any of the error counters be anything
-> other than 0?
+Hello,
 
-No, we don't expect any errors with this test and I didn't see any error
-counters incremenent in the tens of times that I ran the selftest. But,
-to be fair, I was not looking for them thoroughly through testing.
-
+On 24/02/2026 23:46, Dimitri Daskalakis wrote:
+> The RSS ctx tests rely on NFC rules with unique ports to steer packets
+> to the correct ctx. This updates the test to use the new rand_ports()
+> helper to guarantee the ports are unique.
 > 
-> Which do you think is more likely:
-> 
-> 1) A real error happens
-> 
-> 2) Bug in the driver so that it reports a value in the wrong place?
-> 
+> Manual testing shows that generating 32 ports with the existing method
+> would result in at least one duplicate 4% of the time.
+FYI, we got a small conflict when merging 'net' in 'net-next' in the
+MPTCP tree due to this patch applied in 'net':
 
-I would say that having a driver bug is much likely than, for example,
-having an FCS error.
+  ce5a0f4612db ("selftests: drv-net: rss_ctx: test RSS contexts persist after ifdown/up")
 
-> Maybe we should check the error counters are zero? 
+and this one from 'net-next':
 
-Ok, I will extend the test to check the errors against zero and see how it behaves.
+  19c3a2a81d2b ("selftests: drv-net: rss: Generate unique ports for RSS context tests")
 
-Thanks!
+----- Generic Message -----
+The best is to avoid conflicts between 'net' and 'net-next' trees but if
+they cannot be avoided when preparing patches, a note about how to fix
+them is much appreciated.
+
+The conflict has been resolved on our side [1] and the resolution we
+suggest is attached to this email. Please report any issues linked to
+this conflict resolution as it might be used by others. If you worked on
+the mentioned patches, don't hesitate to ACK this conflict resolution.
+---------------------------
+
+This conflict was in the context: modifying one line here in 'net-next',
+and the ones around in 'net'
+
+Rerere cache is available:
+
+ https://github.com/multipath-tcp/mptcp-upstream-rr-cache/commit/8e4747e
+
+Cheers,
+Matt
+
+1: https://github.com/multipath-tcp/mptcp_net-next/commit/098b2437f100
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
+--------------------- 8< ---------------------
+diff --cc tools/testing/selftests/drivers/net/hw/rss_ctx.py
+index b9b7527c2c6b,cbeb3a38fdfe..9a1fba247708
+--- a/tools/testing/selftests/drivers/net/hw/rss_ctx.py
++++ b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
+@@@ -10,9 -9,8 +10,9 @@@ from lib.py import ksft_eq, ksft_ne, ks
+  from lib.py import NetDrvEpEnv
+  from lib.py import EthtoolFamily, NetdevFamily
+  from lib.py import KsftSkipEx, KsftFailEx
+ +from lib.py import ksft_disruptive
+- from lib.py import rand_port
++ from lib.py import rand_port, rand_ports
+ -from lib.py import ethtool, ip, defer, GenerateTraffic, CmdExitFailure
+ +from lib.py import cmd, ethtool, ip, defer, GenerateTraffic, CmdExitFailure, wait_file
+  
+  
+  def _rss_key_str(key):
+--------------------- 8< ---------------------
 
