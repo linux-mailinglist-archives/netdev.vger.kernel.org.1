@@ -1,269 +1,226 @@
-Return-Path: <netdev+bounces-261584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261585-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WFgED6StoGnDlgQAu9opvQ
-	(envelope-from <netdev+bounces-261584-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 21:31:32 +0100
+	id 0LEpLCGwoGnUlgQAu9opvQ
+	(envelope-from <netdev+bounces-261585-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 21:42:09 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D8461AF2A2
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 21:31:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 166421AF3A0
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 21:42:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E58E830D4F8D
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:25:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 059FB30D0B30
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:40:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2297F466B59;
-	Thu, 26 Feb 2026 20:25:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E3E843634B;
+	Thu, 26 Feb 2026 20:40:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c1Mxwomz"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="B6VPzRhF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11021133.outbound.protection.outlook.com [52.101.62.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F4F14657E8
-	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 20:25:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772137514; cv=none; b=sxzECAbsinH9Li2V5Q0grVQWXD1oapGKRczWZv2E5rsYMIHVvLcN3/cgn+JgsRGJVhx608Icd4fATOfKDJ7y/xE1on76uf3yo0Dw6KKZvKEYS9I9SXX7pH1ItKPnHrmM3Y9mWh5ZTgeVo4n6nL4UXTUJjpIFgT4zQbx/UbY4diA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772137514; c=relaxed/simple;
-	bh=o27oXpvDYmo+Hd3Ij7Vp1JsD82MPOMW7K0izYU/HSb8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P3EZVimUw1QH1vtHQ0MMv+yCjNEZuVSwpSpv9UX2BOVZ3xxyktrDGu+2lOvcbXLZmmvoWg9IPTIPb19ioO7GusSc4yc+aHUkdcGZDF9t++orOKFkH29q9NduLkqXKiKNhUjy8+LW0AxZkYLYn/3FBgAWpnHyfYoicvqbdbUWzNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c1Mxwomz; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-65f89c40547so3155776a12.1
-        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 12:25:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772137510; x=1772742310; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=r+mozqxx0sXudTCUTXzQUXfn4TfviDBKZn5vV62DKS8=;
-        b=c1MxwomztfbVpqAjOlG0baLrdiIIBTcIRS6Z7eVI5XTNjbAaYYNfKhEuRCaYcoIehI
-         E71OM+vHt7Faj810Gz/PUyaQziHPU2QBO0pu0BXkm8yVu0T36XW+WUQVq72+owRKwIcQ
-         BiN3iP7nIMDlHtEv8VoVS2a93X5cyWe3BltrDkyoS0CnJUNLYGTjOE/MFiadqsKlD3QB
-         JuAyftVZztqZcc7VgGc9JpUyObTSaru5x9FdWkQPQMSKXDfYNcyxxgHH/1IpOt3m9Q//
-         lguRJaYIN7L/eMQ5VqZXw4tdL9EZe1r/eBm3upeFJUOkdCTUaeZCv+5jM+3GI8QBppE4
-         49+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772137510; x=1772742310;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=r+mozqxx0sXudTCUTXzQUXfn4TfviDBKZn5vV62DKS8=;
-        b=gDegs1PsGmyLnZ+z7Ng1CekRkMDyYvJ7HqkusGd2l5ft6NiFJBwxRf92tlha79Vj0n
-         a08KuqoWD/9L+0ynB4biUahXe74Suj4bhYFtDyzsQe1jU4LhxponwVK0ZGyKncG+1Nu0
-         wH/O4Xyk0cdhFTsuMKl5XQ+Zm1A23YLeZUO5C0g/8Wv5m1hfmIWHERSGg/ljr3+7pzdL
-         ju41EJOpbf2Qlbqu5+CnPhJbuX2xfe2jD/Rv+V7MKmE98DYARmjJuIL3ccpY8D5FgrB9
-         ew1LJixuAjpCb0ERHWDQHKenPLvOBM//QkZx/ojMdUeIFBCYJJzQ/IHaKnfJczy2xslH
-         YbOg==
-X-Forwarded-Encrypted: i=1; AJvYcCXNoL5ivGWXcbq75KqYTRilW+GW7huU++ghFF7O8Hilmk40McKnTxZT6unTNol4sE/Sj4e2bCc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YylTAksrAAb/ivK4BkT1CJk6tB60gduMmDCOgXnJn5KoWtZx3Nl
-	37JLUv2tyRHKtuxkgeEPf587OYNkz/MfyZsdJcsPkzZAEZNyTOHtPCj8
-X-Gm-Gg: ATEYQzzm4Jj11apwk8V7UEu5wyST2d1zQgkGgSmj3u0ddHkXJje0HkiPloLcDmUV9cY
-	c1vpXIdYPupcKUcGykOOCWUa1nnOIHJlORsmPjoWRDLfLbwOo3u4VwRHMu4i+TGBkxJQGrNjPtN
-	NiHhKx+yvXL+G8Iqrebbays0Iw/eNMW5zIDwlnmIBGG6gDHqrsZs76b+tq579TWFkgJmPb8xAAW
-	gZ+rvhBHdLIAKriN1gLMQ3Af5iQEck5a9S7JLuKOMwQdsM6gzVjb5TddDQhSUbGwiRlzC7wObks
-	1omsbSjzA4izuQ1EpJ8ughQqyFhgMork3z3vdQmdXGyd9/vNOYWhfQCmXnfGlM781RXyIwej3E6
-	YVUOS7zdmvVpIkm5Mv/rfGBDx0y1o3Tn+KUxmBA2c/Axaz/gCCOiNpEyuywqCg2gj0Om8nfz/2A
-	xHLz9LiXV93xZAD/09S5gdpzNdC7CbzabIn1NTVzMOSLnRGwOBkuQ=
-X-Received: by 2002:a17:907:78e:b0:b8f:dec3:6606 with SMTP id a640c23a62f3a-b937595fe4bmr20263766b.23.1772137510071;
-        Thu, 26 Feb 2026 12:25:10 -0800 (PST)
-Received: from [192.168.33.7] ([89.151.31.85])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-b935aedd746sm84219466b.59.2026.02.26.12.25.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Feb 2026 12:25:09 -0800 (PST)
-Message-ID: <ce4d9b7b-aaf6-4796-94fb-8c3d6a1dcd4d@gmail.com>
-Date: Thu, 26 Feb 2026 21:24:59 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD104611FD;
+	Thu, 26 Feb 2026 20:40:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.133
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772138440; cv=fail; b=kg1VUqqrEwMl84eZOSURT4iqp2pvq2bc+e/azZ2VGRMbk2rV0Il6Wyq3pCkvBBcAZN2Z0jBp2YglhFBsSOYjlNtc3fIFdHRQTGdUHLcRe8P3o2gogw6BeU0pGf/uPQR02RyNNSwUznXuRs+s506rO9jMYyHM105UH2BLGEgpnI4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772138440; c=relaxed/simple;
+	bh=nPQlogu2dO3oFLNYuWsYVDLnNz1afhxsdzzo/Y0Ildg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=O3z9tk3kuwFOE6ksqkiUhlChDPJXJd5uI4fLTdp7lgTCuICpQDUMYjbAPT/ZTwkDu5qlzbzYxDS+/k+cz+12NI6dLtcREb//aZZdmneeF2rovLGKWVgSlj0fJsMkyVnzuHpWZzYlAvUa6xJ2cMiyW4Duecb1afCQo+YJidnUsEI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=B6VPzRhF; arc=fail smtp.client-ip=52.101.62.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=d6pgfitM5s7e5C1MydpPRDB6Slvq4MrxdYqyJ1cJCUMLcmaQHNC33MnVXmVHC3cPTsrSNJTS/kzfVo4JO13JDpHN3hWc7ysKyskWh77/3SEGp9C/ZNuAqkOKE9/hvUZtjjMIDEv2+JJrU2o0vAuz97W+0LN84rJBbMDNJvV5R963IgLBGF3Utl+ZQEf26xc24m9clym6EAjYiGpexbA+AdQPptyvJl+2WkmL72o9pRfQezhWGxS5mf0/DYA71fQXyNnxNThhnv4mJYpg1hvKdzo4HQqjDPRTaK7lOc361htzyilLzaz0R/N9SXlaxqUWQJHGjsHBCssjwK22n0zosA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nPQlogu2dO3oFLNYuWsYVDLnNz1afhxsdzzo/Y0Ildg=;
+ b=GrnxKalVq+S8ion5Bia3CsSoEuSpSvktuZIAl6f/i5seYfGyeO+O1ySO7nw0VMSGGM//F/jRwkQ96rMPsTpxhgtP4lYZWFO3ovK88W7uSrlepa1tHO0xFnnOVRQgPUS6TvM7x3RP0+kpXrsYqcXfbJzbTFFEbONunCVfXXqjm2FsV3WSPRAKGucMmHs5ei0EVRpRSbvg12pj9esqr6N2dsK2u8/nVPE05PDlXafgrCjXCz/jtudOfMagadaaepJlznVGq/6JdZG10lMosoq4OF2KmJ/Vffz2/9knykE+ltO7J9br8Qyw21p5C34cfsJn72UNoSJ/W5p8S1iyYx7eLw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nPQlogu2dO3oFLNYuWsYVDLnNz1afhxsdzzo/Y0Ildg=;
+ b=B6VPzRhFPU1PBDkcx87sY/MX+yjSLoWidiZ6FwVm+SaYgS4pGRBtnxPRVYtIzsJjoLDfereA2yu6SMRekHRowyUINpZkfPa3rkquZ53cKIt2mIVdzG9UEcHy6V3I7VMJkfSURzKJzsmkYNng4iuRgtjUBP2enHIGeln/ZJ3gJwc=
+Received: from SA3PR21MB3867.namprd21.prod.outlook.com (2603:10b6:806:2fc::15)
+ by LV4PR21MB6751.namprd21.prod.outlook.com (2603:10b6:408:357::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.9; Thu, 26 Feb
+ 2026 20:40:33 +0000
+Received: from SA3PR21MB3867.namprd21.prod.outlook.com
+ ([fe80::70ff:4d3:2cb6:92a3]) by SA3PR21MB3867.namprd21.prod.outlook.com
+ ([fe80::70ff:4d3:2cb6:92a3%6]) with mapi id 15.20.9678.008; Thu, 26 Feb 2026
+ 20:40:33 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: Long Li <longli@microsoft.com>, KY Srinivasan <kys@microsoft.com>, Wei Liu
+	<wei.liu@kernel.org>, Dexuan Cui <DECUI@microsoft.com>, Long Li
+	<longli@microsoft.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S .
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: Shradha Gupta <shradhagupta@linux.microsoft.com>, Erni Sri Satya Vennela
+	<ernis@linux.microsoft.com>, "linux-hyperv@vger.kernel.org"
+	<linux-hyperv@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>
+Subject: RE: [PATCH net v2] net: mana: Ring doorbell at 4 CQ wraparounds
+Thread-Topic: [PATCH net v2] net: mana: Ring doorbell at 4 CQ wraparounds
+Thread-Index: AQHcp1YfNnhXh6DjLUC+foiYIdZZLbWVcV3g
+Date: Thu, 26 Feb 2026 20:40:33 +0000
+Message-ID:
+ <SA3PR21MB3867C66522EAC16C3BBEE907CA72A@SA3PR21MB3867.namprd21.prod.outlook.com>
+References: <20260226192833.1050807-1-longli@microsoft.com>
+In-Reply-To: <20260226192833.1050807-1-longli@microsoft.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=bf0665bb-d438-4ee2-969b-5f6aa02c8d09;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2026-02-26T20:39:35Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
+ 3, 0, 1;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA3PR21MB3867:EE_|LV4PR21MB6751:EE_
+x-ms-office365-filtering-correlation-id: c884b157-6847-4b69-c3b3-08de757749eb
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|7416014|366016|1800799024|921020|38070700021;
+x-microsoft-antispam-message-info:
+ +JyeQYatR2XOpHHsS60TQjGWj4+tzxY+5Fz+BuxzZG2sn8klbda+lNYSjYjxf55XT/4coW4V47WwG9A77tSCdrzRtPxLpLx2E4LxsMJiziYc43pjZWGfbTKnorbwU7s9/xozAmVmIDfDAYizuVN5pE9EhVSf0UP1iZNGHdqCNWu/9mXWoMLT70wHgZOUY4LgCyTAAmsE4X4wDtpI8MNe/ON+WgBpD16qSUeznNxSCmRK75nujg8hMiUVX1MlN3kFPk4uwiKcxAx8k2aYsapPTPxRfOETDO5DOEBZCumGiv5BQacrpxOiBybpkqi1ztNm2/gZPLPPdTXC6ufGzKWnlPOM/XSf9YPFFeEnIW60Hq3L6zEhprBDFXTKXB0BMckjYiZoUmVRo1vSKb0Qo8EOa582XOJBQAIzvi3aX1wp9HMh4O3QxaDCqZr/GHU3pBzNlbogysCDfev0Mz+y/2ftafQGKnPwMGG4C8g55kRJlKYSCSszAB8+cfTs+z16p8So8ykcsjoDowdRaaQE4oXT8hJJB5fj2O41NtDLNJTtAUAzwKBG2B54baG0+Y/Ku2lmra7GfqvcZzdNkbjh/emO6mTzLepu+byeVZB3VXyDZIFS00m+3WcknmmO624qARNTtTfhFwKEDhw4BmLMH9Hlb9aPNAuAHR4HZlJPPx5PhSC7XPhGn2ZSWT0EFPoFtmycUDCavsXSBLLc8sB9GvVofnOw+girQHw2qJqLXmtGt8poBGWDO3nXv2lr24g5rK2lAkV52r/AyncwCQCpu3/t1OvULmuDlbcU3mjU4vLcz0TXEAgQ0BHMagFZfjDUTxW+
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR21MB3867.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(921020)(38070700021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?MzhOQJaSBXe2O1lMfSgJXXJ0R7JPucVWvGfeeD026yqTo5CMLbyvhr2yqF6B?=
+ =?us-ascii?Q?nf/zAiytpIGsYeF6acYjC6pDokJ45LILPvb8DUwxz0pb72PQsL1F+VRAaVLR?=
+ =?us-ascii?Q?n00cttMSzkFYYGtFSzTKGKF6w3rjFB2Y92R7e+896Vs5w5Wr2mlpohF0Ukif?=
+ =?us-ascii?Q?Cgm/Fv9FqdDpoN+W12pOXLs/OWq4+QA45WpXQX0lkYHp7YCSAV1XE3SG3oCr?=
+ =?us-ascii?Q?2B2uJhrZ5SbG6+EAStSdI5hwHEzVMSjXWICs82DJtaw9B5REvCezSr4X3T03?=
+ =?us-ascii?Q?GxIdn1bmdR0IcMy/u9XUpFbOjVOLO1A9dAyu7PjflXu8EwRirJvJf8/WOMBD?=
+ =?us-ascii?Q?lE/cb8p5d2kTEQnuDcOhgDb+B0Gjcq8hz0zM8GK+jc3UHb5CSCIO2xuE7zwX?=
+ =?us-ascii?Q?sB1pNrXHmzqrQuweQdFD799VIa2LX/JNoYZay5+FaRHARthpSeEtLALX3Fwt?=
+ =?us-ascii?Q?8s/pLJSP9d52p4ufmnlYtjNWYzLQ94QF5i8QJC9gDIYBU54FEHR4N2iambOF?=
+ =?us-ascii?Q?AkwBUnhmJZuTPvKTqr7GuMo/HIoWHG847UmmZ4mDc9WNmmeZLs44RikhHyJA?=
+ =?us-ascii?Q?nzCQv4n74vofWChrqCeOPJjS5WUINvd16WAgwsxABYzLBBNR2PWkq/BdEymR?=
+ =?us-ascii?Q?vF/PuWUlyfEVjgegZiz7b7n2oAbNgfZCLdiZ9e9e0BFQHUkUVRWzZ5s+GpEl?=
+ =?us-ascii?Q?JEYqbs/ZNlj1d0rnccUFk0A5+SVQ+msdLt9PMbRHMGfqw/LqAQ1fCY09vO/X?=
+ =?us-ascii?Q?JKIqgnUmSePWxoHG33oFOAaqMyVSfHq5Gdx+znZJ8gtlo9U4lwpFbQEK6AUb?=
+ =?us-ascii?Q?b8zh/2q4UtIaqldUF1e0zB1j+8IDYfkcHk92IHPyzmxIvmShfqe3/MM3I62A?=
+ =?us-ascii?Q?q+913vWiVWCVvWLkbSkgsNU62/eqXjtGNnAbL6QfQaAIA4Bw3ahMwN/ApBWh?=
+ =?us-ascii?Q?JTrFz3ceJGtIepAAwSnfWRcWioUmTD4+Ii6VjCYidmtVTaqZlbiZ9bPWOByF?=
+ =?us-ascii?Q?+Rq/dlh9DD322533DyzEmiMLsuwny02TA/xQgUxMHPARunDvdrcfTdbRhtcn?=
+ =?us-ascii?Q?4rz/3IMnb1BbiC52b0Vm2919gRiePuyLbnsWAntQ48eiz9pJDMsqI/rQnxjK?=
+ =?us-ascii?Q?I9J099GI9ImFd1tqogQI97rkj1Ej0ETuIuazAVOJ+elmIS+Q73/nJNBbmbGQ?=
+ =?us-ascii?Q?lNsqSJvTa0vA58/DxXVgv9XQdGHJl4NzxjrexWPXgiuwJnQL8qTIpkYTHsnW?=
+ =?us-ascii?Q?0E2q5Tj1UHNLleOV1BHJMHnbNNe5HMX94X/4quhhuFfsdPUuXpGZjv41Cz5N?=
+ =?us-ascii?Q?oqRqFePEugskPrSGWYLM9RBv5yjsuDS8FJjfU3jpkEJ+ArrKusQ+K4M/Vo4s?=
+ =?us-ascii?Q?n6spwU7uibWLLDfwrDTw2TMm6rO5DxS+LC1h2DgbxhTfUTNPUpcvAdqxQdLF?=
+ =?us-ascii?Q?hjiP0+qiKVKlz2Tz3L9dHe3bjZ1HpNJC5alPhbSRG0Z0Ve/TZj9c+QhqkXw9?=
+ =?us-ascii?Q?yu/M7xfLZRqRzeKEUSR4R/FLQ0ZS+5FAiutgFBEqt4E46LWcTCW2oNhdUi69?=
+ =?us-ascii?Q?HlI62tdITsvhOt9PbPyzw2AH7NXpLBU4Dq7Shjrwc4cawqZ7VNwENo7W7Bpb?=
+ =?us-ascii?Q?CertEp3YX1WS83K963aLz16XqRmKSO1RoUGXoL3iR1W4G90C650sKKEIyc5b?=
+ =?us-ascii?Q?ZLx/rJgZ0ZZ/+KMELT50/KUxKR2aLXnsYhWvVgcFYCaTXht6OCDrObJ9Tuwp?=
+ =?us-ascii?Q?MZjCzQHYsw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: dsa: b53: prevent standalone from trying to
- forward to other ports
-To: Jonas Gorski <jonas.gorski@gmail.com>,
- Florian Fainelli <florian.fainelli@broadcom.com>,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250508091424.26870-1-jonas.gorski@gmail.com>
-Content-Language: en-US
-From: =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>
-In-Reply-To: <20250508091424.26870-1-jonas.gorski@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR21MB3867.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c884b157-6847-4b69-c3b3-08de757749eb
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Feb 2026 20:40:33.4317
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: PRHFuc86aKmq2z2qZ2uJw97fw7UAtxKvu+C1GCRbCddNOeclGhQ47rP3/7yU+EhPoSQ7Lb1SlC8fc4roLGziKg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV4PR21MB6751
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.10 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.56)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[microsoft.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[microsoft.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-261584-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	TAGGED_FROM(0.00)[bounces-261585-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DKIM_TRACE(0.00)[microsoft.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[zajec5@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[haiyangz@microsoft.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8D8461AF2A2
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[davemloft.net:email,SA3PR21MB3867.namprd21.prod.outlook.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 166421AF3A0
 X-Rspamd-Action: no action
 
-W dniu 8.05.2025 o 11:14, Jonas Gorski pisze:
-> When bridged ports and standalone ports share a VLAN, e.g. via VLAN
-> uppers, or untagged traffic with a vlan unaware bridge, the ASIC will
-> still try to forward traffic to known FDB entries on standalone ports.
-> But since the port VLAN masks prevent forwarding to bridged ports, this
-> traffic will be dropped.
-> 
-> This e.g. can be observed in the bridge_vlan_unaware ping tests, where
-> this breaks pinging with learning on.
-> 
-> Work around this by enabling the simplified EAP mode on switches
-> supporting it for standalone ports, which causes the ASIC to redirect
-> traffic of unknown source MAC addresses to the CPU port.
-> 
-> Since standalone ports do not learn, there are no known source MAC
-> addresses, so effectively this redirects all incoming traffic to the CPU
-> port.
-
-This change broke standalone ports (those not being part of bridge) on Northstar (BCM5301X) devices. We got reports from users about WAN ports on routers not working anymore:
-https://github.com/openwrt/openwrt/issues/21187
-https://github.com/openwrt/openwrt/issues/21349
-
-Can you take another look at those changes, see if something me be wrong / missing?
 
 
-> Fixes: ff39c2d68679 ("net: dsa: b53: Add bridge support")
-> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+> -----Original Message-----
+> From: Long Li <longli@microsoft.com>
+> Sent: Thursday, February 26, 2026 2:29 PM
+> To: KY Srinivasan <kys@microsoft.com>; Haiyang Zhang
+> <haiyangz@microsoft.com>; Wei Liu <wei.liu@kernel.org>; Dexuan Cui
+> <DECUI@microsoft.com>; Long Li <longli@microsoft.com>; Andrew Lunn
+> <andrew+netdev@lunn.ch>; David S . Miller <davem@davemloft.net>; Eric
+> Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
+> Abeni <pabeni@redhat.com>
+> Cc: Shradha Gupta <shradhagupta@linux.microsoft.com>; Erni Sri Satya
+> Vennela <ernis@linux.microsoft.com>; linux-hyperv@vger.kernel.org;
+> netdev@vger.kernel.org; linux-kernel@vger.kernel.org;
+> stable@vger.kernel.org
+> Subject: [PATCH net v2] net: mana: Ring doorbell at 4 CQ wraparounds
+>=20
+> MANA hardware requires at least one doorbell ring every 8 wraparounds
+> of the CQ. The driver rings the doorbell as a form of flow control to
+> inform hardware that CQEs have been consumed.
+>=20
+> The NAPI poll functions mana_poll_tx_cq() and mana_poll_rx_cq() can
+> poll up to CQE_POLLING_BUFFER (512) completions per call. If the CQ
+> has fewer than 512 entries, a single poll call can process more than
+> 4 wraparounds without ringing the doorbell. The doorbell threshold
+> check also uses ">" instead of ">=3D", delaying the ring by one extra
+> CQE beyond 4 wraparounds. Combined, these issues can cause the driver
+> to exceed the 8-wraparound hardware limit, leading to missed
+> completions and stalled queues.
+>=20
+> Fix this by capping the number of CQEs polled per call to 4 wraparounds
+> of the CQ in both TX and RX paths. Also change the doorbell threshold
+> from ">" to ">=3D" so the doorbell is rung as soon as 4 wraparounds are
+> reached.
+>=20
+> Cc: stable@vger.kernel.org
+> Fixes: 58a63729c957 ("net: mana: Fix doorbell out of order violation and
+> avoid unnecessary doorbell rings")
+> Signed-off-by: Long Li <longli@microsoft.com>
 > ---
->   drivers/net/dsa/b53/b53_common.c | 33 ++++++++++++++++++++++++++++++++
->   drivers/net/dsa/b53/b53_regs.h   | 14 ++++++++++++++
->   2 files changed, 47 insertions(+)
-> 
-> diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-> index 9eb39cfa5fb2..7216eb8f9493 100644
-> --- a/drivers/net/dsa/b53/b53_common.c
-> +++ b/drivers/net/dsa/b53/b53_common.c
-> @@ -326,6 +326,26 @@ static void b53_get_vlan_entry(struct b53_device *dev, u16 vid,
->   	}
->   }
->   
-> +static void b53_set_eap_mode(struct b53_device *dev, int port, int mode)
-> +{
-> +	u64 eap_conf;
-> +
-> +	if (is5325(dev) || is5365(dev) || dev->chip_id == BCM5389_DEVICE_ID)
-> +		return;
-> +
-> +	b53_read64(dev, B53_EAP_PAGE, B53_PORT_EAP_CONF(port), &eap_conf);
-> +
-> +	if (is63xx(dev)) {
-> +		eap_conf &= ~EAP_MODE_MASK_63XX;
-> +		eap_conf |= (u64)mode << EAP_MODE_SHIFT_63XX;
-> +	} else {
-> +		eap_conf &= ~EAP_MODE_MASK;
-> +		eap_conf |= (u64)mode << EAP_MODE_SHIFT;
-> +	}
-> +
-> +	b53_write64(dev, B53_EAP_PAGE, B53_PORT_EAP_CONF(port), eap_conf);
-> +}
-> +
->   static void b53_set_forwarding(struct b53_device *dev, int enable)
->   {
->   	u8 mgmt;
-> @@ -586,6 +606,13 @@ int b53_setup_port(struct dsa_switch *ds, int port)
->   	b53_port_set_mcast_flood(dev, port, true);
->   	b53_port_set_learning(dev, port, false);
->   
-> +	/* Force all traffic to go to the CPU port to prevent the ASIC from
-> +	 * trying to forward to bridged ports on matching FDB entries, then
-> +	 * dropping frames because it isn't allowed to forward there.
-> +	 */
-> +	if (dsa_is_user_port(ds, port))
-> +		b53_set_eap_mode(dev, port, EAP_MODE_SIMPLIFIED);
-> +
->   	return 0;
->   }
->   EXPORT_SYMBOL(b53_setup_port);
-> @@ -2042,6 +2069,9 @@ int b53_br_join(struct dsa_switch *ds, int port, struct dsa_bridge bridge,
->   		pvlan |= BIT(i);
->   	}
->   
-> +	/* Disable redirection of unknown SA to the CPU port */
-> +	b53_set_eap_mode(dev, port, EAP_MODE_BASIC);
-> +
->   	/* Configure the local port VLAN control membership to include
->   	 * remote ports and update the local port bitmask
->   	 */
-> @@ -2077,6 +2107,9 @@ void b53_br_leave(struct dsa_switch *ds, int port, struct dsa_bridge bridge)
->   			pvlan &= ~BIT(i);
->   	}
->   
-> +	/* Enable redirection of unknown SA to the CPU port */
-> +	b53_set_eap_mode(dev, port, EAP_MODE_SIMPLIFIED);
-> +
->   	b53_write16(dev, B53_PVLAN_PAGE, B53_PVLAN_PORT_MASK(port), pvlan);
->   	dev->ports[port].vlan_ctl_mask = pvlan;
->   
-> diff --git a/drivers/net/dsa/b53/b53_regs.h b/drivers/net/dsa/b53/b53_regs.h
-> index bfbcb66bef66..5f7a0e5c5709 100644
-> --- a/drivers/net/dsa/b53/b53_regs.h
-> +++ b/drivers/net/dsa/b53/b53_regs.h
-> @@ -50,6 +50,9 @@
->   /* Jumbo Frame Registers */
->   #define B53_JUMBO_PAGE			0x40
->   
-> +/* EAP Registers */
-> +#define B53_EAP_PAGE			0x42
-> +
->   /* EEE Control Registers Page */
->   #define B53_EEE_PAGE			0x92
->   
-> @@ -480,6 +483,17 @@
->   #define   JMS_MIN_SIZE			1518
->   #define   JMS_MAX_SIZE			9724
->   
-> +/*************************************************************************
-> + * EAP Page Registers
-> + *************************************************************************/
-> +#define B53_PORT_EAP_CONF(i)		(0x20 + 8 * (i))
-> +#define  EAP_MODE_SHIFT			51
-> +#define  EAP_MODE_SHIFT_63XX		50
-> +#define  EAP_MODE_MASK			(0x3ull << EAP_MODE_SHIFT)
-> +#define  EAP_MODE_MASK_63XX		(0x3ull << EAP_MODE_SHIFT_63XX)
-> +#define  EAP_MODE_BASIC			0
-> +#define  EAP_MODE_SIMPLIFIED		3
-> +
->   /*************************************************************************
->    * EEE Configuration Page Registers
->    *************************************************************************/
+
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
 
 
