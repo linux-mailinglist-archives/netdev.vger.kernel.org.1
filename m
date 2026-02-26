@@ -1,197 +1,245 @@
-Return-Path: <netdev+bounces-261547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261551-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8LsvH5SdoGlVlAQAu9opvQ
-	(envelope-from <netdev+bounces-261547-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:23:00 +0100
+	id GPs9DomfoGlVlAQAu9opvQ
+	(envelope-from <netdev+bounces-261551-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:31:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08BCF1AE498
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:22:59 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AD421AE5E6
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:31:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5D2193060CC2
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:15:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 080D93006B5A
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:25:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A954D44CF3A;
-	Thu, 26 Feb 2026 19:15:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4098D44CAF2;
+	Thu, 26 Feb 2026 19:25:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yxI2e8U3"
+	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="vwHaHfhU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 607B2426D20
-	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 19:15:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A9344CF55;
+	Thu, 26 Feb 2026 19:25:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772133322; cv=none; b=Rt9qJZPhfHGvLgw/TLk9y3M5f6ZBQjfA8uemM0qX1y8srmEOMdplktN4+edCl2eJK9dU+PsTVFk1n5LqKXhFgmS/UbmN1oAFtlux59shhHdYpw1W43odHSY1JhOSDYotwcV6r3LjBfyeLdyMBFHh7vRblxZ6U8/YEPVNzD+qdYg=
+	t=1772133949; cv=none; b=Av1Lle/v2HVKuBJsN8Wxyy7ewBDRkSOBL2IBCYDZniCwlNNNPJ/qim7o3SAQQN3aUgmgTkw29TO0A/vTlv0AvG53m8xCR0jSKE7ljN1abhT12vRiu9tCru3qKQ/uT0aTaKkz43FdIxwPaO6vpF2znOzCxjTDGH0hXYUEnFF72kw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772133322; c=relaxed/simple;
-	bh=0WaVqEgcJlDY02tN0zXYGgU0sjaZ14hTVaCR4FdDCXE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dwN7BBEhXVAhxXWrMifAK87o3p9F3cUVAl3FgHTuPG+2tCPXBMEqRkHxPYfZXnP2lHmZT+KfMuh4+8XBxGRPlqWvwOM37vtzFz5VQ4e8ErwyDDpo0Ki+j58urQ7Rt8O72w82ezS9dhqLYacXTfwMA2jo9TxupoG3WpMHVg90iKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yxI2e8U3; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2adca7aba8bso10204045ad.0
-        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 11:15:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772133317; x=1772738117; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5kvTHTqe9ndDnP2daAlPvuqmWQOnnNZG2WdCPppQRAU=;
-        b=yxI2e8U3xWNzgmrfKemysD86hvlPghx7l0zahDpMCoYBgrEVgHOwVBadk1aZPhw9fQ
-         f18L9fNaoRgjHpTyPytVD3YH0JMb0c6Xb2sQ5LH8oPqK7yOfu9tGiEEtQNEGtDRmgWh6
-         wG0hdmhS4tDfDGqPlGXnDpNv3PkR5Mq16+OndWDB6bV5r1srGfU9nSmO8uumU27+54vx
-         N/OfxHQw9ViG58pTfPbMSIqAUO5AwR3T8HV6F8JOezRSrzwup6f89ZrFouUJHa8I2uKc
-         fQJxXPU11k/J+zRVp9AeoTDE1W6wfdYhLuOcIUAwLzBiUKogp9fEBuhKE7Pt4hdS+UkY
-         Svcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772133317; x=1772738117;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5kvTHTqe9ndDnP2daAlPvuqmWQOnnNZG2WdCPppQRAU=;
-        b=mKJQDPuSsHg5wM9F2tfuL5m/sXlvIhjSrQwx8fQIL2v5KkPUly7i7uCac5nA3oa3UB
-         qnH/QSodo7wP36W3H8RYFJUGSg8KWD2qb/pC8wenL1EfwQLFDQI9OIQgZ7m2KOJnrNSf
-         eaUZSVrRARvidUevt7iHf7eQWjPooA6BNhkCmed/ppCDnEfwBC8PM1NDOa1YbDOdNSdC
-         VSFUFqE9CmIYiiT6X4lAZjrE5aJLYLNxG1c0MqcwTfHx8mZKxZHIo/gdpT7iHoJKoKp8
-         7aSiZGJdkOHdYjDZLMCjqIjMLrGP8/Ax8B9g/f1Rfk6CeNjmHuQCWzpTKu3Qsb4A6hsr
-         PzDA==
-X-Forwarded-Encrypted: i=1; AJvYcCVIqqDse5bcWt6wLgvtTQSEu5fI5die09wB+9uAHXzAu4lmu8Gw80EfPDL4Ln54jTY/TVnLMT8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTN1orxCWGUJlyektuRAX87+fuFTTglMFh9O4Z5cXj8+oQyCHY
-	sWtUabcFUoLoPIEfeWYZvmGHDzz6wgO/wHJFuM0FdxhsvENh5skIMAEevJWyFrfh8TlfVjBSJAJ
-	CO3vBOQ==
-X-Received: from plgz12.prod.google.com ([2002:a17:903:18c:b0:298:465f:129])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2283:b0:2aa:f07f:a776
- with SMTP id d9443c01a7336-2ae2e4b5727mr86095ad.43.1772133317292; Thu, 26 Feb
- 2026 11:15:17 -0800 (PST)
-Date: Thu, 26 Feb 2026 19:14:14 +0000
-In-Reply-To: <69a07c1b.050a0220.16c224.0006.GAE@google.com>
+	s=arc-20240116; t=1772133949; c=relaxed/simple;
+	bh=i3wKPYd8EFlc8IZ73L+p7gW+K0o00fx/yJw+0Jptrls=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=ZZPj5BK886Ok3JFCOwIZYa/r65zrWUYXxr/hiZYd5pj6rr3gpd/GCXoNOw61uQgXsis2CXKwKDP1gLsedokz58gLJk9FLjWEJExECZlGUfei6g17J3FbAp4rZSoPon9gRuJw8J96K1DRhq1ks3IbwzDPmyLnYv5reH0cjMYr6Q4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=vwHaHfhU; arc=none smtp.client-ip=193.238.174.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
+Received: from mx.ssi.bg (localhost [127.0.0.1])
+	by mx.ssi.bg (Potsfix) with ESMTP id BAD5C21D4F;
+	Thu, 26 Feb 2026 21:19:57 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
+	:content-type:content-type:date:from:from:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
+	 bh=Exe2tq+Qjn8oUB9BaUlHxkZcSCOCRHMqp4FnkJz94AA=; b=vwHaHfhUI3ig
+	HqMDxpDmjZtDDoNUW0vdk5vA1ZUiCEb+TOtFQJWazf0ycFFYQ8ad4mVFYEdwHlMc
+	QHQ3N/MKMKI08qtrpPXAs0VqctHG8vBVhok6snlwBWmH3O4iLTZjVbw8VPDl4JFL
+	jdukUF9LW9PfA6HNUrmfwlFoozuo/YJGu0GsuTXSKn18ECk36j5setNOpLWSxUeH
+	bXD7hEF0t1Nz3Y6WAouOkkurY5oLu7r9S89sPynTMC7XpBEGAROTwxo7sUhv7o7v
+	7AG30BPppCXanbbtBy99fujFEJlGdZP6J77zxb2s+pze8NnINqYR9T7VDUFcAXDF
+	4I/Qx/5+MeOlM1yvXZ2BS7JlAdH274hxSPaOuVu/5lsmvL887TPZ4ho6CDtpepg6
+	jNPzgdR1kbc/CC6ZBYEqCPRyUCIMqGKMgdvI+LFMjMmtj9oEwOGPjnK4XgpRGN4y
+	IM+T5tIRegh0Jo+yp0tQFYthWjVX9B6Xd9k7Sas2EDWRISphDiMNegH4cEqR+vm1
+	THe+Xck2d/VLBFk8/3tS8RJlZroze6tM1/6B80jMFEPEtQ/i0Y70OpFSfbpJRnGJ
+	W3tvNOvYEK+IBLSWK8KLcuTB4iJqZHRtpT5xjWFEQmXzJ3FnN8sajocVjhym0IJF
+	Pr95suJflirl2+2JJaEh3a6DepqRQpk=
+Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
+	by mx.ssi.bg (Potsfix) with ESMTPS;
+	Thu, 26 Feb 2026 21:19:56 +0200 (EET)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by box.ssi.bg (Potsfix) with ESMTPSA id 911EA60973;
+	Thu, 26 Feb 2026 21:19:54 +0200 (EET)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.18.1/8.18.1) with ESMTP id 61QJJhQF062224;
+	Thu, 26 Feb 2026 21:19:44 +0200
+Date: Thu, 26 Feb 2026 21:19:43 +0200 (EET)
+From: Julian Anastasov <ja@ssi.bg>
+To: Jakub Kicinski <kuba@kernel.org>
+cc: fw@strlen.de, netfilter-devel@vger.kernel.org, pabeni@redhat.com,
+        davem@davemloft.net, edumazet@google.com, netdev@vger.kernel.org,
+        pablo@netfilter.org
+Subject: Re: [net-next,1/9] ipvs: make ip_vs_svc_table and ip_vs_svc_fwm_table
+ per netns
+In-Reply-To: <20260226034114.1806906-1-kuba@kernel.org>
+Message-ID: <2b88af71-9294-e4a6-968a-cb9b314bc87f@ssi.bg>
+References: <20260224205048.4718-2-fw@strlen.de> <20260226034114.1806906-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <69a07c1b.050a0220.16c224.0006.GAE@google.com>
-X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260226191515.2953716-1-kuniyu@google.com>
-Subject: Re: [syzbot ci] Re: ipmr: No RTNL for RTNL_FAMILY_IPMR rtnetlink.
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: syzbot+ci7bfbcdccdcddd61f@syzkaller.appspotmail.com
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, kuni1840@gmail.com, kuniyu@google.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzbot@lists.linux.dev, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[ssi.bg,reject];
+	R_DKIM_ALLOW(-0.20)[ssi.bg:s=ssi];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,gmail.com,vger.kernel.org,redhat.com,lists.linux.dev,googlegroups.com];
-	TAGGED_FROM(0.00)[bounces-261547-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[ssi.bg:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ssi.bg:mid,ssi.bg:dkim,ssi.bg:email];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261551-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,ci7bfbcdccdcddd61f];
-	NEURAL_HAM(-0.00)[-0.958];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[syzbot.org:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,appspotmail.com:email]
-X-Rspamd-Queue-Id: 08BCF1AE498
+	FROM_NEQ_ENVFROM(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 8AD421AE5E6
 X-Rspamd-Action: no action
 
-From: syzbot ci <syzbot+ci7bfbcdccdcddd61f@syzkaller.appspotmail.com>
-Date: Thu, 26 Feb 2026 09:00:11 -0800
-> syzbot ci has tested the following series
-> 
-> [v1] ipmr: No RTNL for RTNL_FAMILY_IPMR rtnetlink.
-> https://lore.kernel.org/all/20260226023637.1335854-1-kuniyu@google.com
-> * [PATCH v1 net-next 01/15] selftest: net: Add basic functionality tests for ipmr.
-> * [PATCH v1 net-next 02/15] ipmr: Annotate access to mrt->mroute_do_{pim,assert,wrvifwhole}.
-> * [PATCH v1 net-next 03/15] ipmr: Convert ipmr_rtm_dumplink() to RCU.
-> * [PATCH v1 net-next 04/15] ipmr: Use MAXVIFS in mroute_msgsize().
-> * [PATCH v1 net-next 05/15] ipmr: Convert ipmr_rtm_getroute() to RCU.
-> * [PATCH v1 net-next 06/15] ipmr: Convert ipmr_rtm_dumproute() to RCU.
-> * [PATCH v1 net-next 07/15] ipmr: Move unregister_netdevice_many() out of mroute_clean_tables().
-> * [PATCH v1 net-next 08/15] ipmr: Move unregister_netdevice_many() out of ipmr_free_table().
-> * [PATCH v1 net-next 09/15] ipmr: Convert ipmr_net_exit_batch() to ->exit_rtnl().
-> * [PATCH v1 net-next 10/15] ipmr: Remove RTNL in ipmr_rules_init() and ipmr_net_init().
-> * [PATCH v1 net-next 11/15] ipmr: Call fib_rules_unregister() without RTNL.
-> * [PATCH v1 net-next 12/15] ipmr: Define net->ipv4.{ipmr_notifier_ops,ipmr_seq} under CONFIG_IP_MROUTE.
-> * [PATCH v1 net-next 13/15] ipmr/ip6mr: Convert net->ipv[46].ipmr_seq to atomic_t.
-> * [PATCH v1 net-next 14/15] ipmr: Add dedicated mutex for mrt->{mfc_hash,mfc_cache_list}.
-> * [PATCH v1 net-next 15/15] ipmr: Don't hold RTNL for ipmr_rtm_route().
-> 
-> and found the following issue:
-> WARNING in ipmr_free_table
-> 
-> Full report is available here:
-> https://ci.syzbot.org/series/d7068eba-72b1-4110-aeb0-d4528e03fd24
-> 
-> ***
-> 
-> WARNING in ipmr_free_table
-> 
-> tree:      net-next
-> URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
-> base:      c7f5c6fb0f2b1a44490a36582a251f0a304d6b0c
-> arch:      amd64
-> compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-> config:    https://ci.syzbot.org/builds/0afa280b-14ff-4aec-8a20-7f8507025dd8/config
-> C repro:   https://ci.syzbot.org/findings/e38687c7-5a8b-4c68-909c-a0ffdd17a674/c_repro
-> syz repro: https://ci.syzbot.org/findings/e38687c7-5a8b-4c68-909c-a0ffdd17a674/syz_repro
-> 
-> ------------[ cut here ]------------
-> !net_initialized(net) && !list_empty(dev_kill_list)
-> WARNING: net/ipv4/ipmr.c:450 at ipmr_free_table+0x150/0x180 net/ipv4/ipmr.c:450, CPU#1: syz.1.18/6004
 
-I forgot dev_kill_list could have some devices collected
-from _other_ ->rtnl_exit() _after_ successful ipmr init.
+	Hello,
 
-My assumption in patch 10 is still correct, and I'll squash
-this in v2.
+On Wed, 25 Feb 2026, Jakub Kicinski wrote:
 
-diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
-index 4e645a87dc6c..89e151121cea 100644
---- a/net/ipv4/ipmr.c
-+++ b/net/ipv4/ipmr.c
-@@ -437,17 +437,19 @@ static struct mr_table *ipmr_new_table(struct net *net, u32 id)
- static void ipmr_free_table(struct mr_table *mrt, struct list_head *dev_kill_list)
- {
- 	struct net *net = read_pnet(&mrt->net);
-+	LIST_HEAD(ipmr_dev_kill_list);
- 
- 	WARN_ON_ONCE(!mr_can_free_table(net));
- 
- 	timer_shutdown_sync(&mrt->ipmr_expire_timer);
- 	mroute_clean_tables(mrt, MRT_FLUSH_VIFS | MRT_FLUSH_VIFS_STATIC |
- 			    MRT_FLUSH_MFC | MRT_FLUSH_MFC_STATIC,
--			    dev_kill_list);
-+			    &ipmr_dev_kill_list);
- 	rhltable_destroy(&mrt->mfc_hash);
- 	kfree(mrt);
- 
--	WARN_ON_ONCE(!net_initialized(net) && !list_empty(dev_kill_list));
-+	WARN_ON_ONCE(!net_initialized(net) && !list_empty(&ipmr_dev_kill_list));
-+	list_splice(&ipmr_dev_kill_list, dev_kill_list);
- }
- 
- /* Service routines creating virtual interfaces: DVMRP tunnels and PIMREG */
+> This is an AI-generated review of your patch. The human sending this
+> email says "FYI"
+> 
+> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+> ---
+> ipvs: make ip_vs_svc_table and ip_vs_svc_fwm_table per netns
+> 
+> This commit converts the global IPVS service tables and their
+> associated mutex from global to per-netns, improving lookup
+> performance in large-scale deployments with multiple network
+> namespaces.
+> 
+> > diff --git a/include/net/ip_vs.h b/include/net/ip_vs.h
+> > index 29a36709e7f3..074a204ec6db 100644
+> > --- a/include/net/ip_vs.h
+> > +++ b/include/net/ip_vs.h
+> > @@ -33,6 +33,12 @@
+> >
+> >  #define IP_VS_HDR_INVERSE	1
+> >  #define IP_VS_HDR_ICMP		2
+> > +/*
+> > + *	Hash table: for virtual service lookups
+> > + */
+> > +#define IP_VS_SVC_TAB_BITS 8
+> > +#define IP_VS_SVC_TAB_SIZE BIT(IP_VS_SVC_TAB_BITS)
+> > +#define IP_VS_SVC_TAB_MASK (IP_VS_SVC_TAB_SIZE - 1)
+> 
+> The patch removes the global mutex definition DEFINE_MUTEX(__ip_vs_mutex)
+> from net/netfilter/ipvs/ip_vs_ctl.c and replaces all usage sites with the
+> per-netns ipvs->service_mutex. However, the extern declaration at line 52
+> of include/net/ip_vs.h is still present:
+> 
+>     extern struct mutex __ip_vs_mutex;
+
+	I have fixes for all these issues in a followup
+patches. Sorry that I forgot to push them to the right
+patch.
+
+> Since no in-tree code references __ip_vs_mutex after this conversion,
+> should this declaration be removed for consistency?
+
+	It will be removed in a followup patchset, in its patch 3/5.
+
+> 
+> [ ... ]
+> 
+> > diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
+> > index 068702894377..d871273ce917 100644
+> > --- a/net/netfilter/ipvs/ip_vs_ctl.c
+> > +++ b/net/netfilter/ipvs/ip_vs_ctl.c
+> 
+> [ ... ]
+> 
+> > @@ -2306,9 +2282,9 @@ static struct ip_vs_service *ip_vs_info_array(struct seq_file *seq, loff_t pos)
+> >
+> >  	/* look in hash by protocol */
+> >  	for (idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
+> > -		hlist_for_each_entry_rcu(svc, &ip_vs_svc_table[idx], s_list) {
+> > -			if ((svc->ipvs == ipvs) && pos-- == 0) {
+> > -				iter->table = ip_vs_svc_table;
+> > +		hlist_for_each_entry_rcu(svc, &ipvs->svc_table[idx], s_list) {
+> > +			if (pos-- == 0) {
+> > +				iter->table = ipvs->svc_table;
+> >  				iter->bucket = idx;
+> >  				return svc;
+> >  			}
+> > @@ -2317,10 +2293,10 @@ static struct ip_vs_service *ip_vs_info_array(struct seq_file *seq, loff_t pos)
+> >
+> >  	/* keep looking in fwmark */
+> >  	for (idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
+> > -		hlist_for_each_entry_rcu(svc, &ip_vs_svc_fwm_table[idx],
+> > +		hlist_for_each_entry_rcu(svc, &ipvs->svc_fwm_table[idx],
+> >  					 f_list) {
+> > -			if ((svc->ipvs == ipvs) && pos-- == 0) {
+> > -				iter->table = ip_vs_svc_fwm_table;
+> > +			if (pos-- == 0) {
+> > +				iter->table = ipvs->svc_fwm_table;
+> >  				iter->bucket = idx;
+> >  				return svc;
+> >  			}
+> 
+> [ ... ]
+> 
+> > @@ -2414,7 +2392,7 @@ static int ip_vs_info_seq_show(struct seq_file *seq, void *v)
+> >
+> >  		if (svc->ipvs != ipvs)
+> >  			return 0;
+> > -		if (iter->table == ip_vs_svc_table) {
+> > +		if (iter->table == ipvs->svc_table) {
+> >  #ifdef CONFIG_IP_VS_IPV6
+> >  			if (svc->af == AF_INET6)
+> >  				seq_printf(seq, "%s  [%pI6]:%04X %s ",
+> 
+> The conversion to per-netns tables makes 'svc->ipvs != ipvs' always false
+> here in ip_vs_info_seq_show(). Every service in ipvs->svc_table belongs
+> to that netns by construction.
+> 
+> Looking at the patch, similar checks were removed everywhere else:
+> - ip_vs_flush(): removed 'svc->ipvs == ipvs' check
+> - ip_vs_dst_event(): removed 'svc->ipvs == ipvs' check
+> - ip_vs_zero_all(): removed 'svc->ipvs == ipvs' check
+> - __ip_vs_service_find(): removed 'svc->ipvs == ipvs' check
+> - __ip_vs_svc_fwm_find(): removed 'svc->ipvs == ipvs' check
+> - ip_vs_genl_dump_services(): removed 'svc->ipvs != ipvs' check
+> - __ip_vs_get_service_entries(): removed 'svc->ipvs != ipvs' check
+> - ip_vs_info_array(): removed 'svc->ipvs == ipvs' check
+> 
+> But this one in ip_vs_info_seq_show() was left behind. Should it also
+> be removed for consistency?
+
+	It was removed later in patch 3 ("ipvs: use single svc table").
+
+	Comments about patch 3/9:
+
+- svc_fwm_table in comments will be removed in a followup
+patchset, in its patch 3/5.
+
+	Comments about patch 4/9:
+
+- bitwise ops have precedence over the logical ops but as the
+series is already applied we can make it less confusing later
+
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
+
 
