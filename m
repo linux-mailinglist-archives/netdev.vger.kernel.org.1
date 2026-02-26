@@ -1,198 +1,113 @@
-Return-Path: <netdev+bounces-261318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261319-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YAHoBmM3oGkqgwQAu9opvQ
-	(envelope-from <netdev+bounces-261318-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 13:06:59 +0100
+	id sCqVJvc2oGkqgwQAu9opvQ
+	(envelope-from <netdev+bounces-261319-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 13:05:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 806E61A5900
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 13:06:58 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C9851A58B2
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 13:05:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9D2BE30D3EEF
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:03:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 64CF630093BF
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:05:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F74A37B3F0;
-	Thu, 26 Feb 2026 12:03:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26A983803C6;
+	Thu, 26 Feb 2026 12:05:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Q7Y8D6AY";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rlGKHnkK";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Q7Y8D6AY";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rlGKHnkK"
+	dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b="UAxOvLyk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.toke.dk (mail.toke.dk [45.145.95.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC1D364026
-	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 12:03:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E78936682C
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 12:04:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.145.95.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772107386; cv=none; b=YODprfhLswQ0RlA533IErqtOmilNljS09gT8gbwRt6GUQ9TQiPgNHwzPW+olkiCU/uYBkSv2cr2S53Zd2YPAN4xreRkxC96dchfo7tvoLIeveQfuKYei1nXTUi9vBl8GmTzuk0rGFzGnO+rqAk45QGWBq/RsA1KAlCpi4bGqEqc=
+	t=1772107501; cv=none; b=svvi+pzIKBSLjrWJ08CADSxFtTbdy2GCdn01oWr4fb2vykhcQAUKOwkxcqDiAkd3NZKn54qIiwARLGjZLVbKaT+R7qTLCqypJa8gEDxmwymIPls8KbrASB+GZEhLozQlObKFVof1ygMigiixrD/YvjvLYaKHEd+oeMTk3HJxYtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772107386; c=relaxed/simple;
-	bh=BsB+oEPzvEnbOuwAtJ69eebytdrFzUZWsWhC2mPRS30=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Avwco8Qrxu2QsdN6/HfpumnNNTuD/nrwTc4U7SXPiO2EutEQVDqMjD5Sd0dkV8fVj/tqh27b5jVP/Hw0VBUgWFQwjamgOnkfDm5qFzOWV2GoiPvSr4w2aGM16EDcQjXSJecTPnuWkpm2vIKfgFMyVBVj8qxW4zTtsJABBkMcSbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Q7Y8D6AY; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=rlGKHnkK; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Q7Y8D6AY; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=rlGKHnkK; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id DF5201F43B;
-	Thu, 26 Feb 2026 12:02:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772107379; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=lKApDUyIFUIzliUqleBEaoniXopBT8Tn71tpN6GHZTc=;
-	b=Q7Y8D6AYioQe/Q+SHsI57k2dXfbMtSTyskyVEwf91C76t/RrZ7IlJ/PCS8hVxhxb171QFh
-	N7meD+y+Z143zELHzXVxF8xewVjAxYCBFWymhA6ONLhCt9TJL/iOvcv7tnkKN4D2D528G2
-	XUiUBponmxcfTJVVBGQpPIAHBpkp51E=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772107379;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=lKApDUyIFUIzliUqleBEaoniXopBT8Tn71tpN6GHZTc=;
-	b=rlGKHnkK5aRxOwb+DwcEaJ6BTVUgK1ota7rJSiMPq2QnKMvxZGjHydUS7Ik1Zm2cPJLg7r
-	gx6boKJDsJYdwBDw==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772107379; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=lKApDUyIFUIzliUqleBEaoniXopBT8Tn71tpN6GHZTc=;
-	b=Q7Y8D6AYioQe/Q+SHsI57k2dXfbMtSTyskyVEwf91C76t/RrZ7IlJ/PCS8hVxhxb171QFh
-	N7meD+y+Z143zELHzXVxF8xewVjAxYCBFWymhA6ONLhCt9TJL/iOvcv7tnkKN4D2D528G2
-	XUiUBponmxcfTJVVBGQpPIAHBpkp51E=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772107379;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=lKApDUyIFUIzliUqleBEaoniXopBT8Tn71tpN6GHZTc=;
-	b=rlGKHnkK5aRxOwb+DwcEaJ6BTVUgK1ota7rJSiMPq2QnKMvxZGjHydUS7Ik1Zm2cPJLg7r
-	gx6boKJDsJYdwBDw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 510053EA62;
-	Thu, 26 Feb 2026 12:02:59 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id uPPKEHM2oGktfQAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Thu, 26 Feb 2026 12:02:59 +0000
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-To: netdev@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org,
-	shuah@kernel.org,
-	horms@kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	Fernando Fernandez Mancera <fmancera@suse.de>
-Subject: [PATCH net-next v2] selftests: net: add ipv6 RA route to ECMP merge test
-Date: Thu, 26 Feb 2026 13:02:37 +0100
-Message-ID: <20260226120237.5352-1-fmancera@suse.de>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1772107501; c=relaxed/simple;
+	bh=qMKVcxH3JxZ2sUWwtxj/iC4YG2Sf3lqypstyaZYLIew=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=iLNJD2lrAot3Lk4DxjofOxpnkml2JrmkVv8WNlNoVpRexT8/Vzp+jH9XTLHtlWUnvMsDxCf4x0jvcj44mn/+69cTG0Q3DpPT0nz/rrtAIvF2ibFE6rFsIG7SFoLNq1fPbx3DxyZMVUHYxjY+LX3RL/8KQg8kjt0T6X83guj67JQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk; spf=pass smtp.mailfrom=toke.dk; dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b=UAxOvLyk; arc=none smtp.client-ip=45.145.95.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=toke.dk
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=toke.dk; s=20161023;
+	t=1772107490; bh=qMKVcxH3JxZ2sUWwtxj/iC4YG2Sf3lqypstyaZYLIew=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=UAxOvLyksafMv4xOBZT3Ygt991y/0VBfiJ0GXPzNRzSuatbgpYuwtJV8NwH6YOaXo
+	 tSPGYce3i+p97CYUNxL91cpme4NOlQhmPfz3Ch1K58j9kLWo4GKXNCNI90emm4z/nk
+	 vLhhNliVEh96U2xXQlKAYa4TJFTd5JPzndf0EwlNM1hJdkrqxb6nJdqLdKJtpfeG7Y
+	 p0AhEbJNX1t5djKpQjNpap5aRezlUwJCsNzpSB6LsBElo6C1bKcByYZrC4t+jFMzAN
+	 kmpCNFCAD+q56R9AuX2rIeByonzUM52xHy+H/HW+uXZFUqHxJhLPLFrjzFdIuYNO46
+	 IQ3AvEb9/eJsg==
+To: Jonas =?utf-8?Q?K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>, Jamal Hadi
+ Salim
+ <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>
+Cc: cake@lists.bufferbloat.net, netdev@vger.kernel.org, Jonas =?utf-8?Q?K?=
+ =?utf-8?Q?=C3=B6ppeler?=
+ <j.koeppeler@tu-berlin.de>
+Subject: Re: [PATCH net 1/2] net/sched: sch_cake: avoid sync overhead when
+ unlimited
+In-Reply-To: <20260226-cake-mq-skip-sync-bandwidth-unlimited-v1-1-01830bb4db87@tu-berlin.de>
+References: <20260226-cake-mq-skip-sync-bandwidth-unlimited-v1-0-01830bb4db87@tu-berlin.de>
+ <20260226-cake-mq-skip-sync-bandwidth-unlimited-v1-1-01830bb4db87@tu-berlin.de>
+Date: Thu, 26 Feb 2026 13:04:47 +0100
+X-Clacks-Overhead: GNU Terry Pratchett
+Message-ID: <87v7fjlnhc.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Score: -2.80
-X-Spam-Level: 
-X-Spam-Flag: NO
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-1.57 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_MIXED_CHARSET(0.59)[subject];
+	DMARC_POLICY_ALLOW(-0.50)[toke.dk,reject];
+	R_DKIM_ALLOW(-0.20)[toke.dk:s=20161023];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[suse.de:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261318-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-261319-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[toke.dk:+];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[toke@toke.dk,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,suse.de:mid,suse.de:dkim,suse.de:email]
-X-Rspamd-Queue-Id: 806E61A5900
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[toke.dk:mid,toke.dk:dkim,toke.dk:email,tu-berlin.de:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9C9851A58B2
 X-Rspamd-Action: no action
 
-As commit bbf4a17ad9ff ("ipv6: Fix ECMP sibling count mismatch when
-clearing RTF_ADDRCONF") pointed out, RA routes are not elegible for ECMP
-merging.
+Jonas K=C3=B6ppeler <j.koeppeler@tu-berlin.de> writes:
 
-Add a test scenario mixing RA and static routes with gateway to check
-that they are not getting merged.
+> Skip inter-instance sync when no rate limit is configured, as it serves
+> no purpose and only adds overhead.
+>
+> Fixes: 1bddd758bac2 ("net/sched: sch_cake: share shaper state across sub-=
+instances of cake_mq")
+> Signed-off-by: Jonas K=C3=B6ppeler <j.koeppeler@tu-berlin.de>
 
-Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
----
-v2: added CONFIG_IPV6_ROUTE_INFO to the config
----
- tools/testing/selftests/net/config       |  1 +
- tools/testing/selftests/net/fib_tests.sh | 17 +++++++++++++++++
- 2 files changed, 18 insertions(+)
-
-diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
-index cd49b7dfe216..69e22bde0fdb 100644
---- a/tools/testing/selftests/net/config
-+++ b/tools/testing/selftests/net/config
-@@ -43,6 +43,7 @@ CONFIG_IPV6_ILA=m
- CONFIG_IPV6_IOAM6_LWTUNNEL=y
- CONFIG_IPV6_MROUTE=y
- CONFIG_IPV6_MULTIPLE_TABLES=y
-+CONFIG_IPV6_ROUTE_INFO=y
- CONFIG_IPV6_RPL_LWTUNNEL=y
- CONFIG_IPV6_SEG6_LWTUNNEL=y
- CONFIG_IPV6_SIT=y
-diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
-index c5694cc4ddd2..1262ee1ea09b 100755
---- a/tools/testing/selftests/net/fib_tests.sh
-+++ b/tools/testing/selftests/net/fib_tests.sh
-@@ -1534,6 +1534,23 @@ fib6_ra_to_static()
- 
- 	log_test $ret 0 "ipv6 promote RA route to static"
- 
-+	# Prepare for RA route with gateway
-+	$NS_EXEC sysctl -wq net.ipv6.conf.veth1.accept_ra_rt_info_max_plen=64
-+
-+	# Add initial route to cause ECMP merging
-+	$IP -6 route add 2001:12::/64 via fe80::dead:beef dev veth1
-+
-+	$NS_EXEC ra6 -i veth2 -d 2001:10::1 -R 2001:12::/64#1#120
-+
-+	# Routes are not merged as RA routes are not elegible for ECMP
-+	check_rt_num 2 "$($IP -6 route list | grep -c "2001:12::/64 via")"
-+
-+	$IP -6 route append 2001:12::/64 via fe80::dead:feeb dev veth1
-+
-+	check_rt_num 2 "$($IP -6 route list | grep -c "nexthop via")"
-+
-+	log_test "$ret" 0 "ipv6 RA route with nexthop do not merge into ECMP with static"
-+
- 	set +e
- 
- 	cleanup &> /dev/null
--- 
-2.53.0
-
+Acked-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@toke.dk>
 
