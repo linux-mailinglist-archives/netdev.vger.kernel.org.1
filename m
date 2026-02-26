@@ -1,163 +1,159 @@
-Return-Path: <netdev+bounces-261377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261378-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KKaBFA9YoGkNigQAu9opvQ
-	(envelope-from <netdev+bounces-261377-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 15:26:23 +0100
+	id CIpIKrlZoGlPigQAu9opvQ
+	(envelope-from <netdev+bounces-261378-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 15:33:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECD801A780D
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 15:26:22 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B83691A79B1
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 15:33:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 08E3B3054AC2
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 14:11:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0151D30B7A89
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 14:12:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC6763ACA6D;
-	Thu, 26 Feb 2026 14:11:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 174EC3B52F6;
+	Thu, 26 Feb 2026 14:11:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HT4A5vc8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nRS2lvn9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7AC53A1D05;
-	Thu, 26 Feb 2026 14:11:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D1B3A1D05
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 14:11:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772115107; cv=none; b=HbbxWsmwYArknB/C2d4KFoRCApXfZaKzU56ZWkTyubvYYQ6aazOXtKg7i9NZOscP7ub2KgWv1/A5gXgXgExvLsjp6/gvQN5uvvphm39JQxjtVANtaYXTuXDMBxfuTl9pjolBdsbA07L0twydSRPAofrvm87i+HnmxZFdQCV8f7k=
+	t=1772115114; cv=none; b=rM5K4bN55qHLseVbO2AJfAX3f5Ks97uOvx3NysLFUXiFNvDlcu5BS79j8zXKOyrwZ5GtbflzJBT8FjfVIrHSq1CVNW+8QmCXf8JV8AqE2R+7hXdziTuo/LYPJ01PhF+1WKmN0y4CIQXVTMKS0/4qNaEZAjWXjTzxq3AuDrJ0dhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772115107; c=relaxed/simple;
-	bh=rmixfCyuY4ZHADoHIxc8XhbWon9XNBP0d/2Oe1yKNbU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WUlwGvX9N/5mc9h0xDZzkCZwQDiBAAw7+xqklJb/CJs0mb3rfuDcm+yNSDj411NSVpDLwiaXOKrTmymY3SmX+6XxVkm7BHGucEw54Ld0R3DBGMbwRP9eimdiuyzfcVRteYJ7qVkZPp+dWyEKq/Oeu7U4i2TxouK98iPzY8nw2Dc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HT4A5vc8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF04BC116C6;
-	Thu, 26 Feb 2026 14:11:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772115107;
-	bh=rmixfCyuY4ZHADoHIxc8XhbWon9XNBP0d/2Oe1yKNbU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HT4A5vc8KxUukbWtjBSkvnW8S0FJT2Q3p/fhCu5oyx5wOLxll9vCG9tiGMaKX6Dyt
-	 3EcgWgvz11+j1XK2Id8RyqDPEYis2aChTMiCVcahm7xPt+Uqp5JWMxz80sdNNRwuiF
-	 Zw2AF6cRJxQIFO+HSCU1M7VxiBMyrI0HsMjJDBTXRnD5kb3U1x++XUgG12dxMjKfXE
-	 WjRJtiNJfCTIgv/GbAS7QWec/a2r7PsFl75xH6ZB+4MFLmewxjkU3CJHrAbYE84x39
-	 eQMCoya9WF3ZIOsFb9mHnWq03XaiyosQPT45ocgT306G2zNKryrOWA0u9zKkRor5Qt
-	 BEXa5hIXh6JaQ==
-Date: Thu, 26 Feb 2026 16:11:43 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Edward Srouji <edwards@nvidia.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, Michael Guralnik <michaelgur@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH rdma-next v4 02/11] IB/core: Introduce FRMR pools
-Message-ID: <20260226141143.GJ12611@unreal>
-References: <20260226-frmr_pools-v4-0-95360b54f15e@nvidia.com>
- <20260226-frmr_pools-v4-2-95360b54f15e@nvidia.com>
+	s=arc-20240116; t=1772115114; c=relaxed/simple;
+	bh=IWJI96C1hm5T5E8JU3McSYrn42gSEdOiuSDzu++GdB0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ulk1IFwEQjLiVlwMy7DURhkUrqzUZjmI+55Y+z+PlrmuyJOAqF4wwmCzhnU0+rl6Zv3F6I7OKX0TGvqGMei1j9gx+Sn1IdCYbhQcciVUmoAlm+5R3049E52PMMQlOqoAEGiYmsFa4ZUuzsJ+wry7f5UHKoU5EeAjc3jiVeNCyCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nRS2lvn9; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4833115090dso9568155e9.3
+        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 06:11:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772115111; x=1772719911; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=elBwMb4z5MofDN6jcMpR4NV6A6fCLcuI5CqbFDS4134=;
+        b=nRS2lvn9hoXh+cXMIYLN8219IZ+Mrp3hBhk2CC3ysDVb+OjKrRxMTd87Ll14JQg6VH
+         gNYf6Mp1wUqLGD+9mLDdZb4WP5mgdq1gBky4tELzvYAml+Lf8EZPIaLxFYF9UkRXXlHQ
+         /0Kzp2aCCvo7r5tmYg4bGnqQDldKSjAZc1fU6EKEjGqpjIP4gfZtwiIrSZ1lvRgKryoS
+         d76WYTWu9X4Byb15QNSRXUVv0NudOmAjw3KVu7uEYOlHxoQh+jLibM/N+PWRoPWqEOEi
+         z/WNrGzFYzFOXsz2cR5biuckptWd6/PQ8yUAO5ALi4G06nzj/Jxic7mvgX1iL0/TpIY8
+         YJHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772115111; x=1772719911;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=elBwMb4z5MofDN6jcMpR4NV6A6fCLcuI5CqbFDS4134=;
+        b=fM1tcTrXH7BlGiGW0C11AZy/NMshUFD0cFIZcFQJkkl3c0rspWM6yvHBgvIsrLMrka
+         FN1/T+0LFQnQlssuBhyHEfy9qpQOt6QE+q51aKYC+8HaPd06urkRwKqVqfD+vK1qKtyy
+         qVfmHu2DJr5UZbMBvp59ngOiCJwKBT0YRwvIDpUqfxVf/S5v48JqYwAB6TYbukM60jv1
+         gLEDHQNvp+2D+kM3991j/qnNUDOHxJqJ5TB2rLsVhI91lFD7eo9WeDvL18xGiHXPz7U6
+         1/Ki+bSDYa+ueIUlFc3nWJ6eI2nHsLDjVdZtCPKIvBy7Uljy565BH+Ju7pGZ189Fe+jL
+         IIsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV32Jj6oaDxRLXglIX1ICACEw7cAZ/nQtqKgPQolOO7M++t85pgoV8k+CfOKSBcAN4hoCLei6c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZlWs5V9ol/f9QM88ZqFQX+OoGmh6pSoz/Xn9s995CXei5hzh1
+	ZmzGWP3EjFum/sjBmxVSz345vOjcyoUV3g+udug1Ki6ga47aKykzT5+/
+X-Gm-Gg: ATEYQzwfmLqLCKUb1SwK1GmZ9pen0CZU4hNX4Lmm/r3+tVNk+Or09FJQfxOh0S2mhEq
+	BCUDrHD8pkLvvuUK0woJcwHek50TYEUm8ftt4aCPVs73ujqCy9CYKSlldT/PXGx1tOZCZYQmiwX
+	H/Rc477E4TpT5Vo34rx0tV183dG+USoymdpdsR+e0l62h+LlSLvZ2r8ET7Wwh5K1sF83CeABOan
+	7rvQvJBqjdl2ta46Bp0ROWZWf3/8T2cVGAgwAOS5XiN7Nf8OPw4t9cyHIKYwceFz8jVDC8tLrY2
+	F9jRMcBKu26vf2U3tOBGOntY4HPnvyZW150qnfRjvseTT+cTV5cjrwcuGEMARhpObE/BI+N5EO3
+	HF8aXHgmQ1ErtHw+JLGJ9Sc+GoUzmQYrdxZf+dF8d6qNjguWIaiVQ0tbRGPstdBxb0m2jqWKYCL
+	EdiqntvvQLnu+VngWSMY3wh0E+OiSOC20JyqeRanh5sDMpc/7JDn5kP+k=
+X-Received: by 2002:a05:600c:4e93:b0:480:4a90:1b06 with SMTP id 5b1f17b1804b1-483c3df874emr36999745e9.34.1772115110675;
+        Thu, 26 Feb 2026 06:11:50 -0800 (PST)
+Received: from ?IPV6:2a03:83e0:1145:4:2818:da16:a542:ef07? ([2620:10d:c091:500::1:a491])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439899da8dbsm19894484f8f.18.2026.02.26.06.11.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Feb 2026 06:11:50 -0800 (PST)
+Message-ID: <aed01ac3-a393-486f-9fee-09928fea9a94@gmail.com>
+Date: Thu, 26 Feb 2026 09:11:47 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260226-frmr_pools-v4-2-95360b54f15e@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next, v2 1/2] psp: Support for transmit on logical device
+ when the underlying transport device supports PSP.
+To: Kiran Kella <kiran.kella@broadcom.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ willemb@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
+ horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ jayakrishnan.udayavarma@broadcom.com, ajit.khaparde@broadcom.com,
+ akhilesh.samineni@broadcom.com
+References: <20260223191154.2800616-1-kiran.kella@broadcom.com>
+ <20260223191154.2800616-2-kiran.kella@broadcom.com>
+ <0a850f65-be67-4a66-941f-17d8440e987b@gmail.com>
+ <CAPHeo3eJRYc503Ta24h9r+Uu1cGqb1dCfmnxuZQ4MJLCTFd9Lw@mail.gmail.com>
+Content-Language: en-US
+From: Daniel Zahka <daniel.zahka@gmail.com>
+In-Reply-To: <CAPHeo3eJRYc503Ta24h9r+Uu1cGqb1dCfmnxuZQ4MJLCTFd9Lw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261377-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-261378-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[danielzahka@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: ECD801A780D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B83691A79B1
 X-Rspamd-Action: no action
 
-On Thu, Feb 26, 2026 at 03:52:07PM +0200, Edward Srouji wrote:
-> From: Michael Guralnik <michaelgur@nvidia.com>
-> 
-> Add a generic Fast Registration Memory Region pools mechanism to allow
-> drivers to optimize memory registration performance.
-> Drivers that have the ability to reuse MRs or their underlying HW
-> objects can take advantage of the mechanism to keep a 'handle' for those
-> objects and use them upon user request.
-> We assume that to achieve this goal a driver and its HW should implement
-> a modify operation for the MRs that is able to at least clear and set the
-> MRs and in more advanced implementations also support changing a subset
-> of the MRs properties.
-> 
-> The mechanism is built using an RB-tree consisting of pools, each pool
-> represents a set of MR properties that are shared by all of the MRs
-> residing in the pool and are unmodifiable by the vendor driver or HW.
-> 
-> The exposed API from ib_core to the driver has 4 operations:
-> Init and cleanup - handles data structs and locks for the pools.
-> Push and pop - store and retrieve 'handle' for a memory registration
-> or deregistrations request.
-> 
-> The FRMR pools mechanism implements the logic to search the RB-tree for
-> a pool with matching properties and create a new one when needed and
-> requires the driver to implement creation and destruction of a 'handle'
-> when pool is empty or a handle is requested or is being destroyed.
-> 
-> Later patch will introduce Netlink API to interact with the FRMR pools
-> mechanism to allow users to both configure and track its usage.
-> A vendor wishing to configure FRMR pool without exposing it or without
-> exposing internal MR properties to users, should use the
-> kernel_vendor_key field in the pools key. This can be useful in a few
-> cases, e.g, when the FRMR handle has a vendor-specific un-modifiable
-> property that the user registering the memory might not be aware of.
-> 
-> Signed-off-by: Michael Guralnik <michaelgur@nvidia.com>
-> Reviewed-by: Yishai Hadas <yishaih@nvidia.com>
-> Signed-off-by: Edward Srouji <edwards@nvidia.com>
-> ---
->  drivers/infiniband/core/Makefile     |   2 +-
->  drivers/infiniband/core/frmr_pools.c | 319 +++++++++++++++++++++++++++++++++++
->  drivers/infiniband/core/frmr_pools.h |  48 ++++++
->  include/rdma/frmr_pools.h            |  37 ++++
->  include/rdma/ib_verbs.h              |   8 +
->  5 files changed, 413 insertions(+), 1 deletion(-)
 
-<...>
 
-> +// SPDX-License-Identifier: GPL-2.0-only
+On 2/26/26 6:46 AM, Kiran Kella wrote:
+> On Wed, Feb 25, 2026 at 2:28 AM Daniel Zahka <daniel.zahka@gmail.com> wrote:
+>> The lack of support for netns is a bit of a gap for this feature. It may
+>> make sense to see if what was posted in
+>> https://lore.kernel.org/netdev/20260224002410.1553838-1-weibunny@fb.com/
+>> is sufficient for your use case, as it handles cases where upper devices
+>> are in a different netns from psd->main_netdev.
+> Thanks. Went through the changes in
+> https://lore.kernel.org/netdev/20260224002410.1553838-1-weibunny@fb.com/
+> It is sufficient for my use case too, although it specifically
+> addresses the cross-netns virtual devices use case.
+> But the same net-ns stacked devices like VLANs can be handled with
+> this patch implicitly, without user intervention through dev-assoc.
+> I think both approaches can co-exist without conflict.
 
-<...>
-
-> +EXPORT_SYMBOL(ib_frmr_pools_init);
-
-It is odd to see these two lines together. Either update the SPDX license to
-'GPL-2.0 OR Linux-OpenIB', as we do for uverbs, and keep EXPORT_SYMBOL() as is,
-or keep the current SPDX-License-Identifier and switch to EXPORT_SYMBOL_GPL().
-
-Thanks
+I agree they can co-exist, and automatically propagating psp devices is 
+useful. I was just pointing out that support for upper devices will 
+eventually need to deal with netns, because when I looked at this patch 
+things like ipvlan and macvlan came to mind.
 
