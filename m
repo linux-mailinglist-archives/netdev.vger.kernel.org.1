@@ -1,71 +1,53 @@
-Return-Path: <netdev+bounces-261143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261144-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SASjFaazn2kpdQQAu9opvQ
-	(envelope-from <netdev+bounces-261143-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 03:44:54 +0100
+	id IASJBze3n2mKdQQAu9opvQ
+	(envelope-from <netdev+bounces-261144-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 04:00:07 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B949C1A031A
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 03:44:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A1F21A043E
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 04:00:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B6910300B11F
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 02:42:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CB798305DA8C
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 03:00:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEC1137B3EF;
-	Thu, 26 Feb 2026 02:42:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEBD5385507;
+	Thu, 26 Feb 2026 03:00:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="RNl8NcKR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pByMDzh9"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 373112D7DD9;
-	Thu, 26 Feb 2026 02:42:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56EE237B3EF;
+	Thu, 26 Feb 2026 03:00:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772073765; cv=none; b=XwFNXJ5/AAjFfxIzRlm9tTx1u9wHqnejtEodrGUu28804VIjvaUvpN83kPtUkWOGE55kvYksQCR5UvN0IHu9C3LrKnc1d5FboXqXO+hIl5WduAxfQBZVNaWMRrwrKHTC2P2DDULMAUfkz+CJccMtgF8pvmorkLuep2IiPbt20Rc=
+	t=1772074802; cv=none; b=SXr1wTRQoSJbJDkpPHuACZIkcwSvO8m8qcNSnOJpD6qx1lxRqmrzU/vE09oFYOasXZZr1xh7NXHLmWoQIBwj8JYLxOU3p6vLgq5lrWh7ADp6xbFi+ZjDCUqncW5NmC6h7Kc9I7XncZSgr3qlX7R6Qn9K+aOS/B9b3QS2n1ZFkFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772073765; c=relaxed/simple;
-	bh=4X4xeZaAEDiSH5/EyfICbKLACJ826PFhGinFJCgeVoU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FQJmoZqRy5HdXTh2W6DOkTCAd3kGdLfA9d5zPE2SXJZEkiv0Wn2wBSTvNreWFOCHt+7fDUb2r3f8x0N1n2NwZn4RGvdVWpiOQ674FZOzgSSxf/82rrvR+bRc5Q8Sg2OhRzwLj8VVPytTFZHIqiMCTtNzNyFkXMvt9VMyJR1N3jk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=RNl8NcKR; arc=none smtp.client-ip=220.197.31.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=cs
-	j3I2Hh0axpARrMAY/JNBtqgshUyDLfkG9MfsSGEus=; b=RNl8NcKR7+6I+n+kXI
-	8zwfeKNmhDac11onaRdTORVzGiOS7yHWJE6mgL/z9AfIU41gtzfn0lKUsUrns2Sz
-	p1prq/79ugWvsnsPlrJPulpTN5Ja6JxNxkbqUrK9Rt4e3FsHbKbS84KQfsi5Juy0
-	bETVBrxc3nkVRxgI9iY+TlADs=
-Received: from pek-lpg-core5.wrs.com (unknown [])
-	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wD3B0K_sp9pVNYaOA--.27764S2;
-	Thu, 26 Feb 2026 10:41:04 +0800 (CST)
-From: Robert Garcia <rob_garcia@163.com>
-To: stable@vger.kernel.org,
-	David Howells <dhowells@redhat.com>
-Cc: Marc Dionne <marc.dionne@auristor.com>,
-	Robert Garcia <rob_garcia@163.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	linux-kernel@vger.kernel.org,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-afs@lists.infradead.org,
-	linux-trace-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Faith <faith@zellic.io>,
-	Pumpkin Chang <pumpkin@devco.re>,
-	Nir Ohfeld <niro@wiz.io>,
-	Willy Tarreau <w@1wt.eu>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH 6.6.y] rxrpc: Fix recvmsg() unconditional requeue
-Date: Thu, 26 Feb 2026 10:41:02 +0800
-Message-Id: <20260226024102.3522867-1-rob_garcia@163.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1772074802; c=relaxed/simple;
+	bh=OFagvjvC8U7g8UKx5nCn+eSYxzfVlmkV76bNuRUnuXs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=eM/wmxxMiDf8M1BO3YBrBPvSQSQUuO7qFGoXobW1jJB1EP9Vbu5NTQ5cKam0G59wfhpPGE1de+/mbYeaCyz0D9L1ockjIawiKATKUuqtKU66/vtPJphMfFLKEAwT40qqJmkmWyq7glPZ2XvUr4H7mWdwbIQf5hGZP17xXEhpdlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pByMDzh9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE496C116D0;
+	Thu, 26 Feb 2026 03:00:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772074801;
+	bh=OFagvjvC8U7g8UKx5nCn+eSYxzfVlmkV76bNuRUnuXs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pByMDzh9sFCBau7jy6g1XhnRxlqvmMlHNhoAgAVjM9Mb5N/M9yHIhSYgAP+kRudmb
+	 s62E9O2f73HIMzEr2l+G+7r+l3Lvgtcjt9rsD82WTw65Idi3bzR+0xI1t9A7xeoHpi
+	 THgXZjwyfH5L4H6HcqE1K3DGmq8C+xw73OPnJKHrJv6d8HSEGjokpU8SqSB8Wxjoeb
+	 UG2HrvZc9UZQWxg+wLVRfUQyarA1KnBBxtuDqOeB369tbXVOhzsIZyjfLSWZwvwHge
+	 7fqRLPT9eeey8k/t8wlMiht9MFUjgqyRRmw76uH5oCGN+2kvsfnt4daVif0WPf6EHk
+	 ykvRd2uuZURQw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 40076380A94B;
+	Thu, 26 Feb 2026 03:00:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,146 +55,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3B0K_sp9pVNYaOA--.27764S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxWF4Duw4DWryxKF17Cry7trb_yoWrury8pF
-	n8ArsxZw18Xw1IvFZ3GFy8W3WUWFs7Wr17Jr1fZasakr1xZw4vqF1jgw45ZF1rGanrArWU
-	XF1DWw4jyrs8X37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UIdgZUUUUU=
-X-CM-SenderInfo: 5uresw5dufxti6rwjhhfrp/xtbDAQEfimmfssFDeQAA3q
+Subject: Re: [PATCH net] nfc: pn533: properly drop the usb interface reference
+ on
+ disconnect
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177207480605.1011529.4354590118191782765.git-patchwork-notify@kernel.org>
+Date: Thu, 26 Feb 2026 03:00:06 +0000
+References: <2026022329-flashing-ought-7573@gregkh>
+In-Reply-To: <2026022329-flashing-ought-7573@gregkh>
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@kernel.org
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261143-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-261144-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[163.com];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FREEMAIL_CC(0.00)[auristor.com,163.com,goodmis.org,vger.kernel.org,kernel.org,davemloft.net,google.com,redhat.com,lists.infradead.org,zellic.io,devco.re,wiz.io,1wt.eu];
-	DKIM_TRACE(0.00)[163.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rob_garcia@163.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_THREE(0.00)[4];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,infradead.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B949C1A031A
+	FROM_NO_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6A1F21A043E
 X-Rspamd-Action: no action
 
-From: David Howells <dhowells@redhat.com>
+Hello:
 
-[ Upstream commit 2c28769a51deb6022d7fbd499987e237a01dd63a ]
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-If rxrpc_recvmsg() fails because MSG_DONTWAIT was specified but the call at
-the front of the recvmsg queue already has its mutex locked, it requeues
-the call - whether or not the call is already queued.  The call may be on
-the queue because MSG_PEEK was also passed and so the call was not dequeued
-or because the I/O thread requeued it.
+On Mon, 23 Feb 2026 12:28:30 +0100 you wrote:
+> When the device is disconnected from the driver, there is a "dangling"
+> reference count on the usb interface that was grabbed in the probe
+> callback.  Fix this up by properly dropping the reference after we are
+> done with it.
+> 
+> Cc: stable <stable@kernel.org>
+> Assisted-by: gkh_clanker_2000
+> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> 
+> [...]
 
-The unconditional requeue may then corrupt the recvmsg queue, leading to
-things like UAFs or refcount underruns.
+Here is the summary with links:
+  - [net] nfc: pn533: properly drop the usb interface reference on disconnect
+    https://git.kernel.org/netdev/net/c/12133a483dfa
 
-Fix this by only requeuing the call if it isn't already on the queue - and
-moving it to the front if it is already queued.  If we don't queue it, we
-have to put the ref we obtained by dequeuing it.
-
-Also, MSG_PEEK doesn't dequeue the call so shouldn't call
-rxrpc_notify_socket() for the call if we didn't use up all the data on the
-queue, so fix that also.
-
-Fixes: 540b1c48c37a ("rxrpc: Fix deadlock between call creation and sendmsg/recvmsg")
-Reported-by: Faith <faith@zellic.io>
-Reported-by: Pumpkin Chang <pumpkin@devco.re>
-Signed-off-by: David Howells <dhowells@redhat.com>
-Acked-by: Marc Dionne <marc.dionne@auristor.com>
-cc: Nir Ohfeld <niro@wiz.io>
-cc: Willy Tarreau <w@1wt.eu>
-cc: Simon Horman <horms@kernel.org>
-cc: linux-afs@lists.infradead.org
-cc: stable@kernel.org
-Link: https://patch.msgid.link/95163.1768428203@warthog.procyon.org.uk
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-[Use spin_unlock instead of spin_unlock_irq to maintain context consistency.]
-Signed-off-by: Robert Garcia <rob_garcia@163.com>
----
- include/trace/events/rxrpc.h |  4 ++++
- net/rxrpc/recvmsg.c          | 19 +++++++++++++++----
- 2 files changed, 19 insertions(+), 4 deletions(-)
-
-diff --git a/include/trace/events/rxrpc.h b/include/trace/events/rxrpc.h
-index 743f8f1f42a7..ceb09fabfb04 100644
---- a/include/trace/events/rxrpc.h
-+++ b/include/trace/events/rxrpc.h
-@@ -270,6 +270,7 @@
- 	EM(rxrpc_call_put_kernel,		"PUT kernel  ") \
- 	EM(rxrpc_call_put_poke,			"PUT poke    ") \
- 	EM(rxrpc_call_put_recvmsg,		"PUT recvmsg ") \
-+	EM(rxrpc_call_put_recvmsg_peek_nowait,	"PUT peek-nwt") \
- 	EM(rxrpc_call_put_release_sock,		"PUT rls-sock") \
- 	EM(rxrpc_call_put_release_sock_tba,	"PUT rls-sk-a") \
- 	EM(rxrpc_call_put_sendmsg,		"PUT sendmsg ") \
-@@ -287,6 +288,9 @@
- 	EM(rxrpc_call_see_distribute_error,	"SEE dist-err") \
- 	EM(rxrpc_call_see_input,		"SEE input   ") \
- 	EM(rxrpc_call_see_recvmsg,		"SEE recvmsg ") \
-+	EM(rxrpc_call_see_recvmsg_requeue,	"SEE recv-rqu") \
-+	EM(rxrpc_call_see_recvmsg_requeue_first, "SEE recv-rqF") \
-+	EM(rxrpc_call_see_recvmsg_requeue_move,	"SEE recv-rqM") \
- 	EM(rxrpc_call_see_release,		"SEE release ") \
- 	EM(rxrpc_call_see_userid_exists,	"SEE u-exists") \
- 	EM(rxrpc_call_see_waiting_call,		"SEE q-conn  ") \
-diff --git a/net/rxrpc/recvmsg.c b/net/rxrpc/recvmsg.c
-index e24a44bae9a3..b6e524c065f0 100644
---- a/net/rxrpc/recvmsg.c
-+++ b/net/rxrpc/recvmsg.c
-@@ -430,7 +430,8 @@ int rxrpc_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
- 	if (rxrpc_call_has_failed(call))
- 		goto call_failed;
- 
--	if (!skb_queue_empty(&call->recvmsg_queue))
-+	if (!(flags & MSG_PEEK) &&
-+	    !skb_queue_empty(&call->recvmsg_queue))
- 		rxrpc_notify_socket(call);
- 	goto not_yet_complete;
- 
-@@ -461,11 +462,21 @@ int rxrpc_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
- error_requeue_call:
- 	if (!(flags & MSG_PEEK)) {
- 		spin_lock(&rx->recvmsg_lock);
--		list_add(&call->recvmsg_link, &rx->recvmsg_q);
--		spin_unlock(&rx->recvmsg_lock);
-+		if (list_empty(&call->recvmsg_link)) {
-+			list_add(&call->recvmsg_link, &rx->recvmsg_q);
-+			rxrpc_see_call(call, rxrpc_call_see_recvmsg_requeue);
-+			spin_unlock(&rx->recvmsg_lock);
-+		} else if (list_is_first(&call->recvmsg_link, &rx->recvmsg_q)) {
-+			spin_unlock(&rx->recvmsg_lock);
-+			rxrpc_put_call(call, rxrpc_call_see_recvmsg_requeue_first);
-+		} else {
-+			list_move(&call->recvmsg_link, &rx->recvmsg_q);
-+			spin_unlock(&rx->recvmsg_lock);
-+			rxrpc_put_call(call, rxrpc_call_see_recvmsg_requeue_move);
-+		}
- 		trace_rxrpc_recvmsg(call_debug_id, rxrpc_recvmsg_requeue, 0);
- 	} else {
--		rxrpc_put_call(call, rxrpc_call_put_recvmsg);
-+		rxrpc_put_call(call, rxrpc_call_put_recvmsg_peek_nowait);
- 	}
- error_no_call:
- 	release_sock(&rx->sk);
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
