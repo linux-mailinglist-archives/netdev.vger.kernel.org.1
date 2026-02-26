@@ -1,245 +1,164 @@
-Return-Path: <netdev+bounces-261551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261548-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GPs9DomfoGlVlAQAu9opvQ
-	(envelope-from <netdev+bounces-261551-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:31:21 +0100
+	id wK10ImueoGlVlAQAu9opvQ
+	(envelope-from <netdev+bounces-261548-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:26:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AD421AE5E6
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:31:20 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E17CE1AE4FB
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:26:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 080D93006B5A
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:25:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 50DAF30880D0
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:20:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4098D44CAF2;
-	Thu, 26 Feb 2026 19:25:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E38544266AA;
+	Thu, 26 Feb 2026 19:20:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="vwHaHfhU"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="aneUitLm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A9344CF55;
-	Thu, 26 Feb 2026 19:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E794C28850C
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 19:20:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772133949; cv=none; b=Av1Lle/v2HVKuBJsN8Wxyy7ewBDRkSOBL2IBCYDZniCwlNNNPJ/qim7o3SAQQN3aUgmgTkw29TO0A/vTlv0AvG53m8xCR0jSKE7ljN1abhT12vRiu9tCru3qKQ/uT0aTaKkz43FdIxwPaO6vpF2znOzCxjTDGH0hXYUEnFF72kw=
+	t=1772133640; cv=none; b=nrPAbPmaSODX6pCENIesVqLXp1PstY5CJVj1sbFawvUR1C1ToqIAyF9vAipRkEV9Zoq3mQftFHxd89yhqidsrvNr+4XkGLNPJUmNBRxpwcHhpJb4lcddunaSDDZUVYZNCgMs8UoswAVwjbPvZI6kdfk3aAitv27YSA8Le1lozZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772133949; c=relaxed/simple;
-	bh=i3wKPYd8EFlc8IZ73L+p7gW+K0o00fx/yJw+0Jptrls=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=ZZPj5BK886Ok3JFCOwIZYa/r65zrWUYXxr/hiZYd5pj6rr3gpd/GCXoNOw61uQgXsis2CXKwKDP1gLsedokz58gLJk9FLjWEJExECZlGUfei6g17J3FbAp4rZSoPon9gRuJw8J96K1DRhq1ks3IbwzDPmyLnYv5reH0cjMYr6Q4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=vwHaHfhU; arc=none smtp.client-ip=193.238.174.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
-Received: from mx.ssi.bg (localhost [127.0.0.1])
-	by mx.ssi.bg (Potsfix) with ESMTP id BAD5C21D4F;
-	Thu, 26 Feb 2026 21:19:57 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
-	:content-type:content-type:date:from:from:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
-	 bh=Exe2tq+Qjn8oUB9BaUlHxkZcSCOCRHMqp4FnkJz94AA=; b=vwHaHfhUI3ig
-	HqMDxpDmjZtDDoNUW0vdk5vA1ZUiCEb+TOtFQJWazf0ycFFYQ8ad4mVFYEdwHlMc
-	QHQ3N/MKMKI08qtrpPXAs0VqctHG8vBVhok6snlwBWmH3O4iLTZjVbw8VPDl4JFL
-	jdukUF9LW9PfA6HNUrmfwlFoozuo/YJGu0GsuTXSKn18ECk36j5setNOpLWSxUeH
-	bXD7hEF0t1Nz3Y6WAouOkkurY5oLu7r9S89sPynTMC7XpBEGAROTwxo7sUhv7o7v
-	7AG30BPppCXanbbtBy99fujFEJlGdZP6J77zxb2s+pze8NnINqYR9T7VDUFcAXDF
-	4I/Qx/5+MeOlM1yvXZ2BS7JlAdH274hxSPaOuVu/5lsmvL887TPZ4ho6CDtpepg6
-	jNPzgdR1kbc/CC6ZBYEqCPRyUCIMqGKMgdvI+LFMjMmtj9oEwOGPjnK4XgpRGN4y
-	IM+T5tIRegh0Jo+yp0tQFYthWjVX9B6Xd9k7Sas2EDWRISphDiMNegH4cEqR+vm1
-	THe+Xck2d/VLBFk8/3tS8RJlZroze6tM1/6B80jMFEPEtQ/i0Y70OpFSfbpJRnGJ
-	W3tvNOvYEK+IBLSWK8KLcuTB4iJqZHRtpT5xjWFEQmXzJ3FnN8sajocVjhym0IJF
-	Pr95suJflirl2+2JJaEh3a6DepqRQpk=
-Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
-	by mx.ssi.bg (Potsfix) with ESMTPS;
-	Thu, 26 Feb 2026 21:19:56 +0200 (EET)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by box.ssi.bg (Potsfix) with ESMTPSA id 911EA60973;
-	Thu, 26 Feb 2026 21:19:54 +0200 (EET)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.18.1/8.18.1) with ESMTP id 61QJJhQF062224;
-	Thu, 26 Feb 2026 21:19:44 +0200
-Date: Thu, 26 Feb 2026 21:19:43 +0200 (EET)
-From: Julian Anastasov <ja@ssi.bg>
-To: Jakub Kicinski <kuba@kernel.org>
-cc: fw@strlen.de, netfilter-devel@vger.kernel.org, pabeni@redhat.com,
-        davem@davemloft.net, edumazet@google.com, netdev@vger.kernel.org,
-        pablo@netfilter.org
-Subject: Re: [net-next,1/9] ipvs: make ip_vs_svc_table and ip_vs_svc_fwm_table
- per netns
-In-Reply-To: <20260226034114.1806906-1-kuba@kernel.org>
-Message-ID: <2b88af71-9294-e4a6-968a-cb9b314bc87f@ssi.bg>
-References: <20260224205048.4718-2-fw@strlen.de> <20260226034114.1806906-1-kuba@kernel.org>
+	s=arc-20240116; t=1772133640; c=relaxed/simple;
+	bh=IH82CZWzXLu6IPJZwxdwz3oIPHY88p983vrCud2TCV4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JXu0GCATi93AkjbYOykY/JtWIoA17BkXiHO2HJbMe2uHrYfq9ZqSBvXkpuREvql1j1lAhmeMfwt/BqEKvK3JoMaQRusbmomMq3s/jdUHvgp+eJgIsOHFBm9SnALI4ZvPPC6T5rxokNw3Ruqzf78xP9XLZszMZb0b/UZxGYP/G9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=aneUitLm; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=0JRXUjLKDgtadEi9V5u/y+iAHVrvNf83A9b1xHD5VYY=; b=aneUitLmfompVwolaS3zHId++A
+	L/iOV0m99sUxcbDgCE918nOj9LEzbZ3rKcFTRlCiYb51Uf8B9sJph6GESgtMsx9+WiKuRCmCemFC9
+	y0vpGV/ZZ5hNnzCuL7srGb7nE7opXay86eDPVKYGucK3lSnS83ESAG+T/5628swJmVRXsVzplNrDt
+	/56bTg70qX5Djo0j3VQz7B1qTvrThYE5Um7+6XEpPDyOvNLv1GYZEr/pRlC90ZY0SCb+PISXAS6lc
+	ycOXFu9uGCy2UIw70dG31rMKTsVhjDM9JLWJDr8WuXGmnOMme2TiDOOWYHN3bj/AaNHm4F3ueVbRF
+	iQpFyFvQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49406)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vvguY-000000008N0-1kri;
+	Thu, 26 Feb 2026 19:20:34 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vvguU-000000002Gf-1tCk;
+	Thu, 26 Feb 2026 19:20:30 +0000
+Date: Thu, 26 Feb 2026 19:20:30 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Nicolai Buchwitz <nb@tipi-net.de>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, claudiu.beznea@tuxon.dev,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	nicolas.ferre@microchip.com, pabeni@redhat.com,
+	theo.lebrun@bootlin.com, phil@raspberrypi.com
+Subject: Re: [PATCH net-next v4 3/4] net: cadence: macb: add ethtool EEE
+ support
+Message-ID: <aaCc_pfAheT9VoUd@shell.armlinux.org.uk>
+References: <20260226090608.54802-1-nb@tipi-net.de>
+ <20260226090608.54802-4-nb@tipi-net.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260226090608.54802-4-nb@tipi-net.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ssi.bg,reject];
-	R_DKIM_ALLOW(-0.20)[ssi.bg:s=ssi];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[ssi.bg:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ssi.bg:mid,ssi.bg:dkim,ssi.bg:email];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261551-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261548-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-0.937];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 8AD421AE5E6
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:email,armlinux.org.uk:url]
+X-Rspamd-Queue-Id: E17CE1AE4FB
 X-Rspamd-Action: no action
 
-
-	Hello,
-
-On Wed, 25 Feb 2026, Jakub Kicinski wrote:
-
-> This is an AI-generated review of your patch. The human sending this
-> email says "FYI"
+On Thu, Feb 26, 2026 at 10:06:07AM +0100, Nicolai Buchwitz wrote:
+> Implement get_eee and set_eee ethtool ops for GEM, delegating to
+> phylink_ethtool_get_eee() and phylink_ethtool_set_eee(). Both
+> handlers return -EOPNOTSUPP when MACB_CAPS_EEE is absent, keeping
+> the ops safe to register unconditionally in gem_ethtool_ops.
 > 
-> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+> Phylink owns the full EEE lifecycle: PHY advertisement, link
+> partner negotiation, timer management and ethtool state; the MAC
+> driver only provides the mac_enable_tx_lpi / mac_disable_tx_lpi
+> callbacks wired up in the previous patch.
+> 
+> Reviewed-by: Théo Lebrun <theo.lebrun@bootlin.com>
+> Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
 > ---
-> ipvs: make ip_vs_svc_table and ip_vs_svc_fwm_table per netns
+>  drivers/net/ethernet/cadence/macb_main.c | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
 > 
-> This commit converts the global IPVS service tables and their
-> associated mutex from global to per-netns, improving lookup
-> performance in large-scale deployments with multiple network
-> namespaces.
-> 
-> > diff --git a/include/net/ip_vs.h b/include/net/ip_vs.h
-> > index 29a36709e7f3..074a204ec6db 100644
-> > --- a/include/net/ip_vs.h
-> > +++ b/include/net/ip_vs.h
-> > @@ -33,6 +33,12 @@
-> >
-> >  #define IP_VS_HDR_INVERSE	1
-> >  #define IP_VS_HDR_ICMP		2
-> > +/*
-> > + *	Hash table: for virtual service lookups
-> > + */
-> > +#define IP_VS_SVC_TAB_BITS 8
-> > +#define IP_VS_SVC_TAB_SIZE BIT(IP_VS_SVC_TAB_BITS)
-> > +#define IP_VS_SVC_TAB_MASK (IP_VS_SVC_TAB_SIZE - 1)
-> 
-> The patch removes the global mutex definition DEFINE_MUTEX(__ip_vs_mutex)
-> from net/netfilter/ipvs/ip_vs_ctl.c and replaces all usage sites with the
-> per-netns ipvs->service_mutex. However, the extern declaration at line 52
-> of include/net/ip_vs.h is still present:
-> 
->     extern struct mutex __ip_vs_mutex;
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+> index 6b9c63195970..a7e00b99e9a8 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -4034,6 +4034,26 @@ static const struct ethtool_ops macb_ethtool_ops = {
+>  	.set_ringparam		= macb_set_ringparam,
+>  };
+>  
+> +static int macb_get_eee(struct net_device *dev, struct ethtool_keee *eee)
+> +{
+> +	struct macb *bp = netdev_priv(dev);
+> +
+> +	if (!(bp->caps & MACB_CAPS_EEE))
+> +		return -EOPNOTSUPP;
 
-	I have fixes for all these issues in a followup
-patches. Sorry that I forgot to push them to the right
-patch.
+There's no need for these checks, because phylink implements them
+(phylink's implmentation is designed to relieve the driver writer of as
+much burden as possible.)
 
-> Since no in-tree code references __ip_vs_mutex after this conversion,
-> should this declaration be removed for consistency?
+You already tell phylink that you implement LPI support by populating
+the two operations in struct phylink_mac_ops. This results in
+pl->mac_supports_eee_ops being set true during phylink_create().
+However, if you then don't supply both config->lpi_capabilities and
+config->lpi_interfaces, then pl->mac_supports_eee will be false. This
+will cause both phylink EEE ops to return -EOPNOTSUPP.
 
-	It will be removed in a followup patchset, in its patch 3/5.
+As you're already conditionally populating those depending on
+MACB_CAPS_EEE, you've done everything already for phylink to return
+-EOPNOTSUPP when MACB_CAPS_EEE is not set.
 
-> 
-> [ ... ]
-> 
-> > diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
-> > index 068702894377..d871273ce917 100644
-> > --- a/net/netfilter/ipvs/ip_vs_ctl.c
-> > +++ b/net/netfilter/ipvs/ip_vs_ctl.c
-> 
-> [ ... ]
-> 
-> > @@ -2306,9 +2282,9 @@ static struct ip_vs_service *ip_vs_info_array(struct seq_file *seq, loff_t pos)
-> >
-> >  	/* look in hash by protocol */
-> >  	for (idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
-> > -		hlist_for_each_entry_rcu(svc, &ip_vs_svc_table[idx], s_list) {
-> > -			if ((svc->ipvs == ipvs) && pos-- == 0) {
-> > -				iter->table = ip_vs_svc_table;
-> > +		hlist_for_each_entry_rcu(svc, &ipvs->svc_table[idx], s_list) {
-> > +			if (pos-- == 0) {
-> > +				iter->table = ipvs->svc_table;
-> >  				iter->bucket = idx;
-> >  				return svc;
-> >  			}
-> > @@ -2317,10 +2293,10 @@ static struct ip_vs_service *ip_vs_info_array(struct seq_file *seq, loff_t pos)
-> >
-> >  	/* keep looking in fwmark */
-> >  	for (idx = 0; idx < IP_VS_SVC_TAB_SIZE; idx++) {
-> > -		hlist_for_each_entry_rcu(svc, &ip_vs_svc_fwm_table[idx],
-> > +		hlist_for_each_entry_rcu(svc, &ipvs->svc_fwm_table[idx],
-> >  					 f_list) {
-> > -			if ((svc->ipvs == ipvs) && pos-- == 0) {
-> > -				iter->table = ip_vs_svc_fwm_table;
-> > +			if (pos-- == 0) {
-> > +				iter->table = ipvs->svc_fwm_table;
-> >  				iter->bucket = idx;
-> >  				return svc;
-> >  			}
-> 
-> [ ... ]
-> 
-> > @@ -2414,7 +2392,7 @@ static int ip_vs_info_seq_show(struct seq_file *seq, void *v)
-> >
-> >  		if (svc->ipvs != ipvs)
-> >  			return 0;
-> > -		if (iter->table == ip_vs_svc_table) {
-> > +		if (iter->table == ipvs->svc_table) {
-> >  #ifdef CONFIG_IP_VS_IPV6
-> >  			if (svc->af == AF_INET6)
-> >  				seq_printf(seq, "%s  [%pI6]:%04X %s ",
-> 
-> The conversion to per-netns tables makes 'svc->ipvs != ipvs' always false
-> here in ip_vs_info_seq_show(). Every service in ipvs->svc_table belongs
-> to that netns by construction.
-> 
-> Looking at the patch, similar checks were removed everywhere else:
-> - ip_vs_flush(): removed 'svc->ipvs == ipvs' check
-> - ip_vs_dst_event(): removed 'svc->ipvs == ipvs' check
-> - ip_vs_zero_all(): removed 'svc->ipvs == ipvs' check
-> - __ip_vs_service_find(): removed 'svc->ipvs == ipvs' check
-> - __ip_vs_svc_fwm_find(): removed 'svc->ipvs == ipvs' check
-> - ip_vs_genl_dump_services(): removed 'svc->ipvs != ipvs' check
-> - __ip_vs_get_service_entries(): removed 'svc->ipvs != ipvs' check
-> - ip_vs_info_array(): removed 'svc->ipvs == ipvs' check
-> 
-> But this one in ip_vs_info_seq_show() was left behind. Should it also
-> be removed for consistency?
-
-	It was removed later in patch 3 ("ipvs: use single svc table").
-
-	Comments about patch 3/9:
-
-- svc_fwm_table in comments will be removed in a followup
-patchset, in its patch 3/5.
-
-	Comments about patch 4/9:
-
-- bitwise ops have precedence over the logical ops but as the
-series is already applied we can make it less confusing later
-
-Regards
-
---
-Julian Anastasov <ja@ssi.bg>
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
