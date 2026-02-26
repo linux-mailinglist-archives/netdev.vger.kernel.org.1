@@ -1,93 +1,93 @@
-Return-Path: <netdev+bounces-261534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261535-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kEuFMKCToGl+kwQAu9opvQ
-	(envelope-from <netdev+bounces-261534-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:40:32 +0100
+	id ICNiHkaSoGllkwQAu9opvQ
+	(envelope-from <netdev+bounces-261535-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:34:46 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFBD91ADD6C
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:40:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DFA81ADBB6
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:34:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7A8AD309439F
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 18:23:57 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id ED0303086A2E
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 18:24:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6895425CC3;
-	Thu, 26 Feb 2026 18:22:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36DE0426ED8;
+	Thu, 26 Feb 2026 18:22:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Uz8RFV+v"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="NuE5huPK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f228.google.com (mail-pf1-f228.google.com [209.85.210.228])
+Received: from mail-pl1-f228.google.com (mail-pl1-f228.google.com [209.85.214.228])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E38342668C
-	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 18:22:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.228
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67643D34BC
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 18:22:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772130157; cv=none; b=lNkdaXKUdxuby8N6ZxsSPVQXyeBkK6d1cdL37V+gDtD+84upVJAUgNk89HoOENmdThpgS9pxZDa0OqTjM9U/mUHb8+VlHE0n5/z+8HKlEY6MSl5p4oqAhmItfoJ61jhubMLVzBeYG8g1wrxJzmCKi6/dENDaZmEVedw4f4fdOLM=
+	t=1772130163; cv=none; b=r9gfkXjwp4sH3pNFXPzorZR+/a99ZMyEAlz6dopWqkS3CLICgp91gwZn6Sl10f7xOZ6q15jzSiJ7fgA3FfJ1UrhL0dOuLd3k/amWErqHJopDg+uFxiNZ3gaW3qSLdwj0LWt8SmQDsqvsAdR2VfzKi2NJMep5KLzNQyzTMBPTSTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772130157; c=relaxed/simple;
-	bh=RI2O/lNGf1FHG8lBBdNR6Rg/0jZYOOT3Qiqv5EhsqVw=;
+	s=arc-20240116; t=1772130163; c=relaxed/simple;
+	bh=cV2ROgnTpsnGLu+3zcIV9/eG/QYifZuI+RX8hraKNOw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NBZyXfdPFkT+7efMfejQX7jKwHZm42QNI5UeqFPNJLvKlj028hh/k1AmLBnxLz+yRCr7vWhjcOM5ObVnsIUyCLEtKoTAIw9EXXypzJcBu4U/X/N8SMcGR7HNr+djFK6A3GAVRxfuLxG4yvwZKUEsUU6hwcOaVc6n05bGU843Z/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Uz8RFV+v; arc=none smtp.client-ip=209.85.210.228
+	 MIME-Version; b=W5ks7DvzhW/d+I/Yit7pfsAOB/wJ4PAKFFgoTyz4B23z3JfPtIeKNZ3b5QmEpHlRnoioN/UM5E8g1UsOZNwjo2PMAK4uS2RlltvzL2SmhkiITU8AUj631ua+ZFx8PGtrH1qDR0CsN/E6h03hdnFI73chRpyMajIll6uvaw7f7VI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=NuE5huPK; arc=none smtp.client-ip=209.85.214.228
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f228.google.com with SMTP id d2e1a72fcca58-827270d50d4so1258830b3a.3
-        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 10:22:35 -0800 (PST)
+Received: by mail-pl1-f228.google.com with SMTP id d9443c01a7336-2aaf5d53eaaso8428875ad.0
+        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 10:22:41 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772130155; x=1772734955;
+        d=1e100.net; s=20230601; t=1772130161; x=1772734961;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dBT6MFXOtTSgU5rguyWXBbF7aVNVj3aF2y1eOVL320U=;
-        b=sV/oXPWqpCmvQaupZy1H0JKHOcKF1mn4xs3YsPTHJjQDqci7De/W7KUI/5IA5KZ14L
-         OWB2CE15iORALPoEI4YpnluEJ7HvGFgEVDweCGk8CTabSoNX+RrXRUF0wkEEJ0L2RFlr
-         xxeQ2m1r6CgVYs/iM8PE8FGhBoPkSmbVKxQ28pqESS9ml0HJIz5cfDWgj3LplVLoTZta
-         ulAdQ/OfiZYhekE31pmllkme9B/Ev02d095nByd23s+LqAe8D1eNWw9sRLqkSuZrLv1a
-         4CCwYaJrxIjW0An1HACLIweJzJVFeNOPW5+hsGeA+dQW2qVrj2p52wlG8zC10xKVp/v3
-         NSDQ==
-X-Gm-Message-State: AOJu0Yx+FF2eu2WbmcMwoBQE9p9ZsPckXRTGBFSygJ6VUg+nDxG+1y0d
-	L7wnVGkqiCj7c9dOxH0/8tcvxKHX7LiUAL1sgUcuvqJfzGUQa+3t6LLTlY+tn0efVEkRYbgnxTQ
-	OWzanTGqRxzXiCchG6Po+xJ9Zm3nIvXAqoQk2ZVeghwW1YJvCUUTzmvNctvb6oUD+0tHgyFzX8r
-	e4mHleTz54Kh0YrHBmbQ12LysZMqnUtFt0ssRQWrSGsE5j7P/tIa2nlc5yH7gSImneWot/FKT1e
-	3XVjAt8oPM6OS+HcQ==
-X-Gm-Gg: ATEYQzwqh6RwVIQiCkdyb47aaLiUcli7dra3j8V4+H53R1wcRtRMBuSKXkGDmNFDJrF
-	WhqLrvyaKaBhn7TkQM388NHvbD4TijDA24pWvmLHsoCGwqUkPC9yu4gzLH1tFcepURCQEcmNHNS
-	cdgvpHFW1YyOqp6C5ls84cqxaRtzKg0frdU+EukPx8vwnCBI8EUXIotEwqKgwBouIl+iGo0FSFi
-	u9tM8ndPnf37KHgKjqkTLKSJZ5q4J/FV2hd+E1/xPaQlWlICmXKF6shZek/W2g3fmHw4yHrnZWQ
-	vAK9fT8pomaDauaRPM64B4I61sQd1xMfT7VUXoieM5+hIBAL0j4TcFNRmgjM1NbRmHwXgRZlSDI
-	20aZQfF+pmtoDYbQug01+VKrAQaPSAvN9VadjAGZsUckTOIwQ3+zFx2A5h2CkCrH/ohCTn+Zbiw
-	p0Z+fa2Abmp9Qa/VBiMpFD0M/+8Znm6w/10i6CE4SM5d5Eg6hy/cR4KfKIR9NjdWSMGg==
-X-Received: by 2002:a05:6a00:9506:b0:7f7:5d81:172b with SMTP id d2e1a72fcca58-8274d9f43d8mr22809b3a.42.1772130155376;
-        Thu, 26 Feb 2026 10:22:35 -0800 (PST)
+        bh=GsFXNLVi8biehzm02nHBgM2Y+8KMGDGeY0mSl4IbDLc=;
+        b=RLMRaoYZtt6JNMPzO3qe6bW+UObTKNsH/lqJtO3HqI5MzKJsCNOdwb5SKXCzlAd+ap
+         Yl9J0/R/T9bI8WKTQzPR8Ew1stgSl8k/Ne2+yg0QUWeh4TcyYZWSpeoDcFdl7eMlw1zF
+         JSqV7HFI6o+A3gF11qQxClj8qnRP+Y0Lzklmbp//exu6DgaDHPVEuu6viTxuYaYPhdHB
+         B3TIk/ZwALJzYfTlLU7/kPgE4MMqYXzLFc3/O3z+42wG2tlEHFtY+X18vwSzsezwgigy
+         R0WhFaIoDySYT0YO5JKsTKaU7mUmSGpHpYBt1qpqgZzakxXhnyHDkmHFzeFoGOp3o8Pc
+         mG4w==
+X-Gm-Message-State: AOJu0Yz0sjQTT1lutNAlYNEe7Xhp7b8eLrUD/wlTGcb6jkJV5cNbP45U
+	cMUPGLqMroomsrsES9VD1KnjCeIoGry/np03EzwKMUi/pZ2IJ/20SolweK5MB6I1uSuQwGbjwZj
+	DiTeGr3y6cNiHQdr9eKA3btAKmdbUEOnieBOXObJJ3GmySyWlnC2ZgHnOihPolFLllvLgK6eBtI
+	PG1ksWolMmxWxCJY/lE82brfB9CKfGwT4X9zm0VFt/i1+v0X7cQzmnMcTAPehdEzbsQeT+2fvoi
+	MC0xDzA4it7ICUfww==
+X-Gm-Gg: ATEYQzyRg0rqGuzg/6fS/OvQWwBfLIS9v24g7qKl9OZQk9YNpguSF+Kd2hMnFgO3ytm
+	MwaBmD4pwLkMN84IpvkZdnnjNSiycjNO7goUwbsiD5UK/mJMa38YCBZ6nkkbt3iQVw1fCJuBKxD
+	6emFrJqKA9LHMg4E5WKIkXJTmvP4RUFR3PPKAEEka+8MT3CBpXiEjWtH6fFp8dnIDalGuID6A7h
+	fqHU+NPWoz+ELyTwytU1cRH3bC+88qul23vGBpEBK3RJQ3HHGgtJyB/OThzgQD7lJi038K8Dn+I
+	6kQ1GZp4x+tyz4wkOz0kvySOqn662NkJmPVrquIZ5czB51rAmuh2gbdyhc5qVQg5fSxeofVUoBO
+	h8kku0f4gA2VlV5nbCR3mh5hMqIotijg3cIsVI1bYT7K2/P4J04Y+81/9xch/R7cQaat4rHL/qM
+	zqCa3nKa6zhRvt5vz8p9Gb/VK7+Z/yy4K/6CvgbNnguCftMYw9a/WLU9RdeYrPopGkUg==
+X-Received: by 2002:a17:903:2f04:b0:2aa:e3c7:6048 with SMTP id d9443c01a7336-2ade99a6871mr42700615ad.23.1772130160863;
+        Thu, 26 Feb 2026 10:22:40 -0800 (PST)
 Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-118.dlp.protect.broadcom.com. [144.49.247.118])
-        by smtp-relay.gmail.com with ESMTPS id d2e1a72fcca58-82739f88d68sm348995b3a.8.2026.02.26.10.22.35
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2adfb5dbabbsm3355495ad.26.2026.02.26.10.22.40
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 26 Feb 2026 10:22:35 -0800 (PST)
+        Thu, 26 Feb 2026 10:22:40 -0800 (PST)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2ae04f58b19so50641585ad.0
-        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 10:22:34 -0800 (PST)
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2aaf2f3bef6so11475385ad.0
+        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 10:22:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1772130154; x=1772734954; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1772130159; x=1772734959; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dBT6MFXOtTSgU5rguyWXBbF7aVNVj3aF2y1eOVL320U=;
-        b=Uz8RFV+vneg0RGA4o8gmT8bAq0475v5E7eDZ+Y031SvE4PH7Zny9ljfmtIRGvrnale
-         44eT91PVhTdQFla18tvi4bXvaprSfY9WRhmQ/0CKIa00aOu7uN9cUoSmVy8fDPIIxukj
-         lSnf2op1G6K+k85395wx3FCl5L0+HFOO1Yom8=
-X-Received: by 2002:a17:902:ea0a:b0:2ad:ad60:73e3 with SMTP id d9443c01a7336-2ae035cb3ecmr36010465ad.53.1772130153617;
-        Thu, 26 Feb 2026 10:22:33 -0800 (PST)
-X-Received: by 2002:a17:902:ea0a:b0:2ad:ad60:73e3 with SMTP id d9443c01a7336-2ae035cb3ecmr36010185ad.53.1772130153142;
-        Thu, 26 Feb 2026 10:22:33 -0800 (PST)
+        bh=GsFXNLVi8biehzm02nHBgM2Y+8KMGDGeY0mSl4IbDLc=;
+        b=NuE5huPKbvvO+EYC2hYMHW6kHFK4PUiPEp3NCwS0yLuLo8J1A10k/rmc14+l6oT4E8
+         pTWEEZM130aYcR8HRsbv+3/srN5D79cZ3uy6mmO3eAkmBPwtfCFyUWUm8C6YZCFWidYo
+         dzhBEeMgaHXMLgLg4jJA9kuUPDtY4B8WppOj8=
+X-Received: by 2002:a17:903:2c47:b0:2ad:6e0c:6210 with SMTP id d9443c01a7336-2ade9a871f5mr41824035ad.56.1772130159088;
+        Thu, 26 Feb 2026 10:22:39 -0800 (PST)
+X-Received: by 2002:a17:903:2c47:b0:2ad:6e0c:6210 with SMTP id d9443c01a7336-2ade9a871f5mr41823765ad.56.1772130158297;
+        Thu, 26 Feb 2026 10:22:38 -0800 (PST)
 Received: from localhost.localdomain ([192.19.203.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2adfb69ef1csm35941565ad.53.2026.02.26.10.22.29
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2adfb69ef1csm35941565ad.53.2026.02.26.10.22.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Feb 2026 10:22:32 -0800 (PST)
+        Thu, 26 Feb 2026 10:22:37 -0800 (PST)
 From: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -101,10 +101,12 @@ Cc: netdev@vger.kernel.org,
 	pavan.chebbi@broadcom.com,
 	vsrama-krishna.nemani@broadcom.com,
 	vikas.gupta@broadcom.com,
-	Bhargava Marreddy <bhargava.marreddy@broadcom.com>
-Subject: [PATCH net-next v2 4/8] bng_en: implement ethtool pauseparam operations
-Date: Thu, 26 Feb 2026 23:51:29 +0530
-Message-ID: <20260226182133.1566714-5-bhargava.marreddy@broadcom.com>
+	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
+	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>,
+	Ajit Kumar Khaparde <ajit.khaparde@broadcom.com>
+Subject: [PATCH net-next v2 5/8] bng_en: add support for link async events
+Date: Thu, 26 Feb 2026 23:51:30 +0530
+Message-ID: <20260226182133.1566714-6-bhargava.marreddy@broadcom.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260226182133.1566714-1-bhargava.marreddy@broadcom.com>
 References: <20260226182133.1566714-1-bhargava.marreddy@broadcom.com>
@@ -129,10 +131,10 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261534-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-261535-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[broadcom.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
@@ -145,95 +147,252 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-0.997];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: AFBD91ADD6C
+X-Rspamd-Queue-Id: 2DFA81ADBB6
 X-Rspamd-Action: no action
 
-Implement .get_pauseparam and .set_pauseparam to support flow control
-configuration. This allows reporting and setting of autoneg, RX pause,
-and TX pause states.
+Register for firmware asynchronous events, including link-status,
+link-speed, and PHY configuration changes. Upon event reception,
+re-query the PHY and update ethtool settings accordingly.
 
 Signed-off-by: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
 Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
+Reviewed-by: Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
+Reviewed-by: Ajit Kumar Khaparde <ajit.khaparde@broadcom.com>
 ---
- .../net/ethernet/broadcom/bnge/bnge_ethtool.c | 58 +++++++++++++++++++
- 1 file changed, 58 insertions(+)
+ .../ethernet/broadcom/bnge/bnge_hwrm_lib.c    | 17 ++++++-
+ .../net/ethernet/broadcom/bnge/bnge_link.c    | 47 +++++++++++++++++++
+ .../net/ethernet/broadcom/bnge/bnge_link.h    |  4 ++
+ .../net/ethernet/broadcom/bnge/bnge_netdev.c  | 19 ++++++++
+ .../net/ethernet/broadcom/bnge/bnge_txrx.c    | 35 ++++++++++++--
+ 5 files changed, 117 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c b/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c
-index e4d3041db0a..01382ad784e 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c
-@@ -42,6 +42,62 @@ static void bnge_get_drvinfo(struct net_device *dev,
- 	strscpy(info->bus_info, pci_name(bd->pdev), sizeof(info->bus_info));
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
+index 836f28b64b4..d18eda40d60 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
+@@ -15,6 +15,13 @@
+ #include "bnge_rmem.h"
+ #include "bnge_resc.h"
+ 
++static const u16 bnge_async_events_arr[] = {
++	ASYNC_EVENT_CMPL_EVENT_ID_LINK_STATUS_CHANGE,
++	ASYNC_EVENT_CMPL_EVENT_ID_LINK_SPEED_CHANGE,
++	ASYNC_EVENT_CMPL_EVENT_ID_LINK_SPEED_CFG_CHANGE,
++	ASYNC_EVENT_CMPL_EVENT_ID_PORT_PHY_CFG_CHANGE,
++};
++
+ int bnge_hwrm_ver_get(struct bnge_dev *bd)
+ {
+ 	u32 dev_caps_cfg, hwrm_ver, hwrm_spec_code;
+@@ -166,10 +173,12 @@ int bnge_hwrm_fw_set_time(struct bnge_dev *bd)
+ 
+ int bnge_hwrm_func_drv_rgtr(struct bnge_dev *bd)
+ {
++	DECLARE_BITMAP(async_events_bmap, 256);
++	u32 *events = (u32 *)async_events_bmap;
+ 	struct hwrm_func_drv_rgtr_output *resp;
+ 	struct hwrm_func_drv_rgtr_input *req;
+ 	u32 flags;
+-	int rc;
++	int rc, i;
+ 
+ 	rc = bnge_hwrm_req_init(bd, req, HWRM_FUNC_DRV_RGTR);
+ 	if (rc)
+@@ -190,6 +199,12 @@ int bnge_hwrm_func_drv_rgtr(struct bnge_dev *bd)
+ 	req->ver_min = cpu_to_le16(DRV_VER_MIN);
+ 	req->ver_upd = cpu_to_le16(DRV_VER_UPD);
+ 
++	memset(async_events_bmap, 0, sizeof(async_events_bmap));
++	for (i = 0; i < ARRAY_SIZE(bnge_async_events_arr); i++)
++		__set_bit(bnge_async_events_arr[i], async_events_bmap);
++	for (i = 0; i < ARRAY_SIZE(req->async_event_fwd); i++)
++		req->async_event_fwd[i] |= cpu_to_le32(events[i]);
++
+ 	resp = bnge_hwrm_req_hold(bd, req);
+ 	rc = bnge_hwrm_req_send(bd, req);
+ 	if (!rc) {
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_link.c b/drivers/net/ethernet/broadcom/bnge/bnge_link.c
+index 474001993cd..7baede20c45 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_link.c
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_link.c
+@@ -94,6 +94,21 @@ static void bnge_set_auto_speed(struct bnge_net *bn)
+ 	elink_info->advertising_pam4 = link_info->auto_pam4_link_speeds;
  }
  
-+static void bnge_get_pauseparam(struct net_device *dev,
-+				struct ethtool_pauseparam *epause)
++static u16 bnge_get_force_speed(struct bnge_net *bn)
 +{
-+	struct bnge_net *bn = netdev_priv(dev);
++	struct bnge_ethtool_link_info *elink_info = &bn->eth_link_info;
++	struct bnge_link_info *link_info;
 +	struct bnge_dev *bd = bn->bd;
 +
-+	if (bd->phy_flags & BNGE_PHY_FL_NO_PAUSE) {
-+		epause->autoneg = 0;
-+		epause->rx_pause = 0;
-+		epause->tx_pause = 0;
++	link_info = &bd->link_info;
++
++	if (bd->phy_flags & BNGE_PHY_FL_SPEEDS2)
++		return link_info->force_link_speed2;
++	if (elink_info->req_signal_mode == BNGE_SIG_MODE_PAM4)
++		return link_info->force_pam4_link_speed;
++	return link_info->force_link_speed;
++}
++
+ static void bnge_set_force_speed(struct bnge_net *bn)
+ {
+ 	struct bnge_ethtool_link_info *elink_info = &bn->eth_link_info;
+@@ -1256,3 +1271,35 @@ int bnge_set_link_ksettings(struct net_device *dev,
+ set_setting_exit:
+ 	return rc;
+ }
++
++void bnge_link_async_event_process(struct bnge_net *bn,
++				   u16 event_id, u32 evt_data)
++{
++	switch (event_id) {
++	case ASYNC_EVENT_CMPL_EVENT_ID_LINK_SPEED_CFG_CHANGE: {
++		struct bnge_ethtool_link_info *elink_info = &bn->eth_link_info;
++
++		/* print unsupported speed warning in forced speed mode only */
++		if (!(elink_info->autoneg & BNGE_AUTONEG_SPEED) &&
++		    (evt_data & BNGE_SPEED_CFG_CHANGE_SP_NOT_SUPP)) {
++			u16 fw_speed = bnge_get_force_speed(bn);
++			u32 speed = bnge_fw_to_ethtool_speed(fw_speed);
++
++			if (speed != SPEED_UNKNOWN)
++				netdev_warn(bn->netdev, "Link speed %d no longer supported\n",
++					    speed);
++		}
++		set_bit(BNGE_LINK_SPEED_CHNG_SP_EVENT, &bn->sp_event);
++		fallthrough;
++	}
++	case ASYNC_EVENT_CMPL_EVENT_ID_LINK_SPEED_CHANGE:
++	case ASYNC_EVENT_CMPL_EVENT_ID_PORT_PHY_CFG_CHANGE:
++		set_bit(BNGE_LINK_CFG_CHANGE_SP_EVENT, &bn->sp_event);
++		fallthrough;
++	case ASYNC_EVENT_CMPL_EVENT_ID_LINK_STATUS_CHANGE:
++		set_bit(BNGE_LINK_CHNG_SP_EVENT, &bn->sp_event);
++		break;
++	default:
++		break;
++	}
++}
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_link.h b/drivers/net/ethernet/broadcom/bnge/bnge_link.h
+index 12be5cab579..bdcb75a941c 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_link.h
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_link.h
+@@ -197,4 +197,8 @@ int bnge_set_link_ksettings(struct net_device *dev,
+ int bnge_get_link_ksettings(struct net_device *dev,
+ 			    struct ethtool_link_ksettings *lk_ksettings);
+ u32 bnge_get_link(struct net_device *dev);
++#define BNGE_SPEED_CFG_CHANGE_SP_NOT_SUPP	BIT(17)
++
++void bnge_link_async_event_process(struct bnge_net *bn,
++				   u16 event_id, u32 evt_data);
+ #endif /* _BNGE_LINK_H_ */
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
+index d549274e703..22d6b3e03fc 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
+@@ -160,6 +160,25 @@ static void bnge_sp_task(struct work_struct *work)
+ 		}
+ 	}
+ 
++	if (test_and_clear_bit(BNGE_LINK_CHNG_SP_EVENT, &bn->sp_event)) {
++		int rc;
++
++		netdev_lock(bn->netdev);
++		if (test_and_clear_bit(BNGE_LINK_SPEED_CHNG_SP_EVENT,
++				       &bn->sp_event))
++			bnge_hwrm_phy_qcaps(bd);
++
++		rc = bnge_update_link(bn, true);
++		if (rc)
++			netdev_err(bn->netdev, "SP task cannot update link (rc: %d)\n",
++				   rc);
++
++		if (test_and_clear_bit(BNGE_LINK_CFG_CHANGE_SP_EVENT,
++				       &bn->sp_event))
++			bnge_init_ethtool_link_settings(bn);
++		netdev_unlock(bn->netdev);
++	}
++
+ 	/* Ensure all sp_task work is done before clearing the state */
+ 	smp_mb__before_atomic();
+ 	clear_bit(BNGE_STATE_IN_SP_TASK, &bn->state);
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_txrx.c b/drivers/net/ethernet/broadcom/bnge/bnge_txrx.c
+index a2616f03755..88f9cf1db30 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_txrx.c
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_txrx.c
+@@ -1128,6 +1128,29 @@ static void __bnge_poll_work_done(struct bnge_net *bn, struct bnge_napi *bnapi,
+ 	}
+ }
+ 
++static void bnge_async_event_process(struct bnge_net *bn,
++				     struct hwrm_async_event_cmpl *cmpl)
++{
++	u16 event_id = le16_to_cpu(cmpl->event_id);
++	u32 data1 = le32_to_cpu(cmpl->event_data1);
++	u32 data2 = le32_to_cpu(cmpl->event_data2);
++
++	netdev_dbg(bn->netdev, "hwrm event 0x%x {0x%x, 0x%x}\n",
++		   event_id, data1, data2);
++
++	switch (event_id) {
++	case ASYNC_EVENT_CMPL_EVENT_ID_LINK_SPEED_CFG_CHANGE:
++	case ASYNC_EVENT_CMPL_EVENT_ID_LINK_SPEED_CHANGE:
++	case ASYNC_EVENT_CMPL_EVENT_ID_PORT_PHY_CFG_CHANGE:
++	case ASYNC_EVENT_CMPL_EVENT_ID_LINK_STATUS_CHANGE:
++		bnge_link_async_event_process(bn, event_id, data1);
++		break;
++	default:
 +		return;
 +	}
-+
-+	epause->autoneg = !!(bn->eth_link_info.autoneg &
-+			     BNGE_AUTONEG_FLOW_CTRL);
-+	epause->rx_pause = !!(bn->eth_link_info.req_flow_ctrl &
-+			      BNGE_LINK_PAUSE_RX);
-+	epause->tx_pause = !!(bn->eth_link_info.req_flow_ctrl &
-+			      BNGE_LINK_PAUSE_TX);
++	__bnge_queue_sp_work(bn);
 +}
 +
-+static int bnge_set_pauseparam(struct net_device *dev,
-+			       struct ethtool_pauseparam *epause)
-+{
-+	struct bnge_ethtool_link_info *elink_info;
-+	struct bnge_net *bn = netdev_priv(dev);
-+	struct bnge_dev *bd = bn->bd;
-+
-+	if (!BNGE_PHY_CFG_ABLE(bd) || (bd->phy_flags & BNGE_PHY_FL_NO_PAUSE))
-+		return -EOPNOTSUPP;
-+
-+	elink_info = &bn->eth_link_info;
-+
-+	if (epause->autoneg) {
-+		if (!(elink_info->autoneg & BNGE_AUTONEG_SPEED))
-+			return -EINVAL;
-+
-+		elink_info->autoneg |= BNGE_AUTONEG_FLOW_CTRL;
-+	} else {
-+		if (elink_info->autoneg & BNGE_AUTONEG_FLOW_CTRL)
-+			elink_info->force_link_chng = true;
-+		elink_info->autoneg &= ~BNGE_AUTONEG_FLOW_CTRL;
-+	}
-+
-+	elink_info->req_flow_ctrl = 0;
-+	if (epause->rx_pause)
-+		elink_info->req_flow_ctrl |= BNGE_LINK_PAUSE_RX;
-+	if (epause->tx_pause)
-+		elink_info->req_flow_ctrl |= BNGE_LINK_PAUSE_TX;
-+
-+	if (netif_running(dev))
-+		return bnge_hwrm_set_pause(bn);
-+
-+	return 0;
-+}
-+
- static const struct ethtool_ops bnge_ethtool_ops = {
- 	.cap_link_lanes_supported	= 1,
- 	.get_link_ksettings	= bnge_get_link_ksettings,
-@@ -49,6 +105,8 @@ static const struct ethtool_ops bnge_ethtool_ops = {
- 	.get_drvinfo		= bnge_get_drvinfo,
- 	.get_link		= bnge_get_link,
- 	.nway_reset		= bnge_nway_reset,
-+	.get_pauseparam		= bnge_get_pauseparam,
-+	.set_pauseparam		= bnge_set_pauseparam,
- };
+ static void
+ bnge_hwrm_update_token(struct bnge_dev *bd, u16 seq_id,
+ 		       enum bnge_hwrm_wait_state state)
+@@ -1146,7 +1169,7 @@ bnge_hwrm_update_token(struct bnge_dev *bd, u16 seq_id,
+ 	dev_err(bd->dev, "Invalid hwrm seq id %d\n", seq_id);
+ }
  
- void bnge_set_ethtool_ops(struct net_device *dev)
+-static int bnge_hwrm_handler(struct bnge_dev *bd, struct tx_cmp *txcmp)
++static int bnge_hwrm_handler(struct bnge_net *bn, struct tx_cmp *txcmp)
+ {
+ 	struct hwrm_cmpl *h_cmpl = (struct hwrm_cmpl *)txcmp;
+ 	u16 cmpl_type = TX_CMP_TYPE(txcmp), seq_id;
+@@ -1154,10 +1177,14 @@ static int bnge_hwrm_handler(struct bnge_dev *bd, struct tx_cmp *txcmp)
+ 	switch (cmpl_type) {
+ 	case CMPL_BASE_TYPE_HWRM_DONE:
+ 		seq_id = le16_to_cpu(h_cmpl->sequence_id);
+-		bnge_hwrm_update_token(bd, seq_id, BNGE_HWRM_COMPLETE);
++		bnge_hwrm_update_token(bn->bd, seq_id, BNGE_HWRM_COMPLETE);
+ 		break;
+ 
+ 	case CMPL_BASE_TYPE_HWRM_ASYNC_EVENT:
++		bnge_async_event_process(bn,
++					 (struct hwrm_async_event_cmpl *)txcmp);
++		break;
++
+ 	default:
+ 		break;
+ 	}
+@@ -1235,7 +1262,7 @@ static int __bnge_poll_work(struct bnge_net *bn, struct bnge_cp_ring_info *cpr,
+ 		} else if (unlikely(cmp_type == CMPL_BASE_TYPE_HWRM_DONE ||
+ 				    cmp_type == CMPL_BASE_TYPE_HWRM_FWD_REQ ||
+ 				    cmp_type == CMPL_BA_TY_HWRM_ASY_EVT)) {
+-			bnge_hwrm_handler(bn->bd, txcmp);
++			bnge_hwrm_handler(bn, txcmp);
+ 		}
+ 		raw_cons = NEXT_RAW_CMP(raw_cons);
+ 
+@@ -1355,7 +1382,7 @@ int bnge_napi_poll(struct napi_struct *napi, int budget)
+ 						      budget - work_done);
+ 			nqr->has_more_work |= cpr->has_more_work;
+ 		} else {
+-			bnge_hwrm_handler(bn->bd, (struct tx_cmp *)nqcmp);
++			bnge_hwrm_handler(bn, (struct tx_cmp *)nqcmp);
+ 		}
+ 		raw_cons = NEXT_RAW_CMP(raw_cons);
+ 	}
 -- 
 2.47.3
 
