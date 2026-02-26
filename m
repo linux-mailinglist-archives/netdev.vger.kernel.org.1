@@ -1,244 +1,197 @@
-Return-Path: <netdev+bounces-261546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261547-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sHaUK3OcoGlVlAQAu9opvQ
-	(envelope-from <netdev+bounces-261546-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:18:11 +0100
+	id 8LsvH5SdoGlVlAQAu9opvQ
+	(envelope-from <netdev+bounces-261547-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:23:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E63571AE42A
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:18:10 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08BCF1AE498
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:22:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8237C3016517
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:10:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5D2193060CC2
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:15:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C366F28726D;
-	Thu, 26 Feb 2026 19:10:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A954D44CF3A;
+	Thu, 26 Feb 2026 19:15:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Uuo9qJeA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yxI2e8U3"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6F3230E820;
-	Thu, 26 Feb 2026 19:10:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 607B2426D20
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 19:15:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772133048; cv=none; b=NPT3SkIX+BwzW0hgEFtD6yKJSBongtUlikX1CL1HmwebJcnDzckEPFMG7/52naige8C8j7Itk8PtOg8GGnDQQgRRs4fGlmxD1UHkzeXsJalyU5PBPdvDDwWz2vQJ78OGWti77ACaAIxYyv6DB3F/+t8gPijlLRzERUaLLYmV7po=
+	t=1772133322; cv=none; b=Rt9qJZPhfHGvLgw/TLk9y3M5f6ZBQjfA8uemM0qX1y8srmEOMdplktN4+edCl2eJK9dU+PsTVFk1n5LqKXhFgmS/UbmN1oAFtlux59shhHdYpw1W43odHSY1JhOSDYotwcV6r3LjBfyeLdyMBFHh7vRblxZ6U8/YEPVNzD+qdYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772133048; c=relaxed/simple;
-	bh=1IzP64jz/SkcJX5dvo8R+ulnS8fQwbekOalpkBEHnII=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gi9O4ontiPdPbsuNHjeNxnm4agOKEemPOgm955rfcfKG4BGxANlEWavz6qvr95LXA1IdPhSZllUpjysYuXhLeRrLJ/2HAhUik7w5atTLQSC3zaAOyO2Ert5pfR0w146qrl685Emf2heXo+FxA/nExjeDxpNKHHTQeasykqUtqnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Uuo9qJeA; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=HjiR1TwqXK5Qwrd2T9B+rxf4jSStXBuyud6ZyusRPjc=; b=Uuo9qJeAxZxhSDQvCG2THyfgn6
-	goN/SZ5wYmb4g5wzXTMlNaPWkQqKj7uB/6w566SYrPrujxs50sfZYENwPPn3t9yfpjvYbPXUlilqs
-	8efDz3idaa358SjlUOzL6LOYivhtxwyWu6qwu3GnzrfJyZW8mWfOAmfqaObgWxP9unvufSwvsMrOf
-	edMti+IBUeaF7wa0m+Tt/d92YkneueFcO8a80EDhHf73MxhTIn4vGXNBuZxqaS/gxlDyEiqUPTdNd
-	5T+8sKrFrKX+VM2XS0Y+YFMS15vuekaYIfoUBiFJ/j1X7MnCd4/6ap/QOzc5nMk2L1DHkyOZq4WYj
-	fIDgys9g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50450)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vvgkl-000000008Lp-1Mml;
-	Thu, 26 Feb 2026 19:10:27 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vvgkg-000000002GM-2Yxa;
-	Thu, 26 Feb 2026 19:10:22 +0000
-Date: Thu, 26 Feb 2026 19:10:22 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: jan.petrous@oss.nxp.com
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Chester Lin <chester62515@gmail.com>,
-	Matthias Brugger <mbrugger@suse.com>,
-	Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>,
-	NXP S32 Linux Team <s32@nxp.com>, Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Frank Li <Frank.Li@nxp.com>,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev, devicetree@vger.kernel.org,
-	vladimir.oltean@nxp.com, boon.khai.ng@altera.com
-Subject: Re: [PATCH v7 2/5] net: stmmac: platform: read channels irq
-Message-ID: <aaCankErMJZ2XM_s@shell.armlinux.org.uk>
-References: <20260226-dwmac_multi_irq-v7-0-f8fe3b945bb4@oss.nxp.com>
- <20260226-dwmac_multi_irq-v7-2-f8fe3b945bb4@oss.nxp.com>
+	s=arc-20240116; t=1772133322; c=relaxed/simple;
+	bh=0WaVqEgcJlDY02tN0zXYGgU0sjaZ14hTVaCR4FdDCXE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=dwN7BBEhXVAhxXWrMifAK87o3p9F3cUVAl3FgHTuPG+2tCPXBMEqRkHxPYfZXnP2lHmZT+KfMuh4+8XBxGRPlqWvwOM37vtzFz5VQ4e8ErwyDDpo0Ki+j58urQ7Rt8O72w82ezS9dhqLYacXTfwMA2jo9TxupoG3WpMHVg90iKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yxI2e8U3; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2adca7aba8bso10204045ad.0
+        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 11:15:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772133317; x=1772738117; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5kvTHTqe9ndDnP2daAlPvuqmWQOnnNZG2WdCPppQRAU=;
+        b=yxI2e8U3xWNzgmrfKemysD86hvlPghx7l0zahDpMCoYBgrEVgHOwVBadk1aZPhw9fQ
+         f18L9fNaoRgjHpTyPytVD3YH0JMb0c6Xb2sQ5LH8oPqK7yOfu9tGiEEtQNEGtDRmgWh6
+         wG0hdmhS4tDfDGqPlGXnDpNv3PkR5Mq16+OndWDB6bV5r1srGfU9nSmO8uumU27+54vx
+         N/OfxHQw9ViG58pTfPbMSIqAUO5AwR3T8HV6F8JOezRSrzwup6f89ZrFouUJHa8I2uKc
+         fQJxXPU11k/J+zRVp9AeoTDE1W6wfdYhLuOcIUAwLzBiUKogp9fEBuhKE7Pt4hdS+UkY
+         Svcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772133317; x=1772738117;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5kvTHTqe9ndDnP2daAlPvuqmWQOnnNZG2WdCPppQRAU=;
+        b=mKJQDPuSsHg5wM9F2tfuL5m/sXlvIhjSrQwx8fQIL2v5KkPUly7i7uCac5nA3oa3UB
+         qnH/QSodo7wP36W3H8RYFJUGSg8KWD2qb/pC8wenL1EfwQLFDQI9OIQgZ7m2KOJnrNSf
+         eaUZSVrRARvidUevt7iHf7eQWjPooA6BNhkCmed/ppCDnEfwBC8PM1NDOa1YbDOdNSdC
+         VSFUFqE9CmIYiiT6X4lAZjrE5aJLYLNxG1c0MqcwTfHx8mZKxZHIo/gdpT7iHoJKoKp8
+         7aSiZGJdkOHdYjDZLMCjqIjMLrGP8/Ax8B9g/f1Rfk6CeNjmHuQCWzpTKu3Qsb4A6hsr
+         PzDA==
+X-Forwarded-Encrypted: i=1; AJvYcCVIqqDse5bcWt6wLgvtTQSEu5fI5die09wB+9uAHXzAu4lmu8Gw80EfPDL4Ln54jTY/TVnLMT8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTN1orxCWGUJlyektuRAX87+fuFTTglMFh9O4Z5cXj8+oQyCHY
+	sWtUabcFUoLoPIEfeWYZvmGHDzz6wgO/wHJFuM0FdxhsvENh5skIMAEevJWyFrfh8TlfVjBSJAJ
+	CO3vBOQ==
+X-Received: from plgz12.prod.google.com ([2002:a17:903:18c:b0:298:465f:129])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2283:b0:2aa:f07f:a776
+ with SMTP id d9443c01a7336-2ae2e4b5727mr86095ad.43.1772133317292; Thu, 26 Feb
+ 2026 11:15:17 -0800 (PST)
+Date: Thu, 26 Feb 2026 19:14:14 +0000
+In-Reply-To: <69a07c1b.050a0220.16c224.0006.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260226-dwmac_multi_irq-v7-2-f8fe3b945bb4@oss.nxp.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Mime-Version: 1.0
+References: <69a07c1b.050a0220.16c224.0006.GAE@google.com>
+X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+Message-ID: <20260226191515.2953716-1-kuniyu@google.com>
+Subject: Re: [syzbot ci] Re: ipmr: No RTNL for RTNL_FAMILY_IPMR rtnetlink.
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: syzbot+ci7bfbcdccdcddd61f@syzkaller.appspotmail.com
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org, kuni1840@gmail.com, kuniyu@google.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzbot@lists.linux.dev, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261546-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,suse.com,oss.nxp.com,nxp.com,pengutronix.de,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,lists.linux.dev,altera.com];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,gmail.com,vger.kernel.org,redhat.com,lists.linux.dev,googlegroups.com];
+	TAGGED_FROM(0.00)[bounces-261547-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.748];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,shell.armlinux.org.uk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.com:email,armlinux.org.uk:url]
-X-Rspamd-Queue-Id: E63571AE42A
+	RCPT_COUNT_TWELVE(0.00)[12];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,ci7bfbcdccdcddd61f];
+	NEURAL_HAM(-0.00)[-0.958];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[syzbot.org:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,appspotmail.com:email]
+X-Rspamd-Queue-Id: 08BCF1AE498
 X-Rspamd-Action: no action
 
-On Thu, Feb 26, 2026 at 09:54:07AM +0100, Jan Petrous via B4 Relay wrote:
-> From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+From: syzbot ci <syzbot+ci7bfbcdccdcddd61f@syzkaller.appspotmail.com>
+Date: Thu, 26 Feb 2026 09:00:11 -0800
+> syzbot ci has tested the following series
 > 
-> Read IRQ resources for all rx/tx channels, to allow Multi-IRQ mode
-> for platform glue drivers.
+> [v1] ipmr: No RTNL for RTNL_FAMILY_IPMR rtnetlink.
+> https://lore.kernel.org/all/20260226023637.1335854-1-kuniyu@google.com
+> * [PATCH v1 net-next 01/15] selftest: net: Add basic functionality tests for ipmr.
+> * [PATCH v1 net-next 02/15] ipmr: Annotate access to mrt->mroute_do_{pim,assert,wrvifwhole}.
+> * [PATCH v1 net-next 03/15] ipmr: Convert ipmr_rtm_dumplink() to RCU.
+> * [PATCH v1 net-next 04/15] ipmr: Use MAXVIFS in mroute_msgsize().
+> * [PATCH v1 net-next 05/15] ipmr: Convert ipmr_rtm_getroute() to RCU.
+> * [PATCH v1 net-next 06/15] ipmr: Convert ipmr_rtm_dumproute() to RCU.
+> * [PATCH v1 net-next 07/15] ipmr: Move unregister_netdevice_many() out of mroute_clean_tables().
+> * [PATCH v1 net-next 08/15] ipmr: Move unregister_netdevice_many() out of ipmr_free_table().
+> * [PATCH v1 net-next 09/15] ipmr: Convert ipmr_net_exit_batch() to ->exit_rtnl().
+> * [PATCH v1 net-next 10/15] ipmr: Remove RTNL in ipmr_rules_init() and ipmr_net_init().
+> * [PATCH v1 net-next 11/15] ipmr: Call fib_rules_unregister() without RTNL.
+> * [PATCH v1 net-next 12/15] ipmr: Define net->ipv4.{ipmr_notifier_ops,ipmr_seq} under CONFIG_IP_MROUTE.
+> * [PATCH v1 net-next 13/15] ipmr/ip6mr: Convert net->ipv[46].ipmr_seq to atomic_t.
+> * [PATCH v1 net-next 14/15] ipmr: Add dedicated mutex for mrt->{mfc_hash,mfc_cache_list}.
+> * [PATCH v1 net-next 15/15] ipmr: Don't hold RTNL for ipmr_rtm_route().
 > 
-> Reviewed-by: Matthias Brugger <mbrugger@suse.com>
-> Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
-> ---
->  .../net/ethernet/stmicro/stmmac/stmmac_platform.c  | 46 +++++++++++++++++++++-
->  1 file changed, 45 insertions(+), 1 deletion(-)
+> and found the following issue:
+> WARNING in ipmr_free_table
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> index 5c9fd91a1db9..93bd915ab6eb 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> @@ -697,9 +697,40 @@ struct clk *stmmac_pltfr_find_clk(struct plat_stmmacenet_data *plat_dat,
->  }
->  EXPORT_SYMBOL_GPL(stmmac_pltfr_find_clk);
->  
-> +static int stmmac_pltfr_get_queue_irqs(struct platform_device *pdev,
-> +				       struct stmmac_resources *stmmac_res,
-> +				       bool tx)
-> +{
-> +	int *irqs = tx ? &stmmac_res->tx_irq[0] : &stmmac_res->rx_irq[0];
-> +	char name[16];
-> +	int i;
-> +
-> +	/* RX channels irq */
-> +	STMMAC_FOREACH_MTL_QUEUE(i, MTL_MAX_RX_QUEUES) {
+> Full report is available here:
+> https://ci.syzbot.org/series/d7068eba-72b1-4110-aeb0-d4528e03fd24
+> 
+> ***
+> 
+> WARNING in ipmr_free_table
+> 
+> tree:      net-next
+> URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
+> base:      c7f5c6fb0f2b1a44490a36582a251f0a304d6b0c
+> arch:      amd64
+> compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+> config:    https://ci.syzbot.org/builds/0afa280b-14ff-4aec-8a20-7f8507025dd8/config
+> C repro:   https://ci.syzbot.org/findings/e38687c7-5a8b-4c68-909c-a0ffdd17a674/c_repro
+> syz repro: https://ci.syzbot.org/findings/e38687c7-5a8b-4c68-909c-a0ffdd17a674/syz_repro
+> 
+> ------------[ cut here ]------------
+> !net_initialized(net) && !list_empty(dev_kill_list)
+> WARNING: net/ipv4/ipmr.c:450 at ipmr_free_table+0x150/0x180 net/ipv4/ipmr.c:450, CPU#1: syz.1.18/6004
 
-You've missed that there are two separate definitions for tx and rx
-queues - while they are currently the same number, code shouldn't
-make that assumption.
+I forgot dev_kill_list could have some devices collected
+from _other_ ->rtnl_exit() _after_ successful ipmr init.
 
-> +		scnprintf(name, sizeof(name), "%cx-queue-%d",
-> +			  tx ? 't' : 'r', i);
+My assumption in patch 10 is still correct, and I'll squash
+this in v2.
 
-I'm not happy with this method of combining the two loops.
-
-Maybe instead:
-
-static int stmmac_pltfr_get_irq_array(struct platform_device *pdev,
-				      const char *fmt, int *irqs,
-				      size_t num)
-{
-	char name[16];
-	size_t i;
-
-	for (i = 0; i < num; i++) {
-		if (snprintf(name, sizeof(name), fmt, i) >= sizeof(name))
-			return -EINVAL;
-
-		irqs[i] = platform_get_irq_byname_optional(pdev, name);
-		if (irqs[i] == -EPROBE_DEFER) {
-			return irqs[i];
-		} else if (irqs[i] <= 0) {
-			dev_dbg(&pdev->dev, "IRQ %s not found\n", name);
-
-			irqs[i] = 0;
-			break;
-		}
-	}
-
-	return 0;
-}
-
-which has the advantage that it becomes a generic helper for getting an
-any array of IRQs.
-
->  int stmmac_get_platform_resources(struct platform_device *pdev,
->  				  struct stmmac_resources *stmmac_res)
->  {
-> +	int ret;
-> +
->  	memset(stmmac_res, 0, sizeof(*stmmac_res));
->  
->  	/* Get IRQ information early to have an ability to ask for deferred
-> @@ -735,7 +766,20 @@ int stmmac_get_platform_resources(struct platform_device *pdev,
->  
->  	stmmac_res->addr = devm_platform_ioremap_resource(pdev, 0);
->  
-> -	return PTR_ERR_OR_ZERO(stmmac_res->addr);
-> +	if (IS_ERR(stmmac_res->addr))
-> +		return PTR_ERR(stmmac_res->addr);
-> +
-> +	/* TX channels irq */
-> +	ret = stmmac_pltfr_get_queue_irqs(pdev, stmmac_res, true);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* RX channels irq */
-> +	ret = stmmac_pltfr_get_queue_irqs(pdev, stmmac_res, false);
-> +	if (ret)
-> +		return ret;
-
-These then become:
-
-	ret = stmmac_pltfr_get_irq_array(pdev, "tx-queue-%d", 
-					 stmmac_res->tx_irq,
-					 MTL_MAX_TX_QUEUES);
-	if (ret)
-		return ret;
-
-	ret = stmmac_pltfr_get_irq_array(pdev, "rx-queue-%d", 
-					 stmmac_res->rx_irq,
-					 MTL_MAX_RX_QUEUES);
-	if (ret)
-		return ret;
-
-This has the advantage that one can grep for rx-queue to find it,
-and we also use the correct limit for each queue type.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
+index 4e645a87dc6c..89e151121cea 100644
+--- a/net/ipv4/ipmr.c
++++ b/net/ipv4/ipmr.c
+@@ -437,17 +437,19 @@ static struct mr_table *ipmr_new_table(struct net *net, u32 id)
+ static void ipmr_free_table(struct mr_table *mrt, struct list_head *dev_kill_list)
+ {
+ 	struct net *net = read_pnet(&mrt->net);
++	LIST_HEAD(ipmr_dev_kill_list);
+ 
+ 	WARN_ON_ONCE(!mr_can_free_table(net));
+ 
+ 	timer_shutdown_sync(&mrt->ipmr_expire_timer);
+ 	mroute_clean_tables(mrt, MRT_FLUSH_VIFS | MRT_FLUSH_VIFS_STATIC |
+ 			    MRT_FLUSH_MFC | MRT_FLUSH_MFC_STATIC,
+-			    dev_kill_list);
++			    &ipmr_dev_kill_list);
+ 	rhltable_destroy(&mrt->mfc_hash);
+ 	kfree(mrt);
+ 
+-	WARN_ON_ONCE(!net_initialized(net) && !list_empty(dev_kill_list));
++	WARN_ON_ONCE(!net_initialized(net) && !list_empty(&ipmr_dev_kill_list));
++	list_splice(&ipmr_dev_kill_list, dev_kill_list);
+ }
+ 
+ /* Service routines creating virtual interfaces: DVMRP tunnels and PIMREG */
 
