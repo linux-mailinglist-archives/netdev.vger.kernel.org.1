@@ -1,356 +1,267 @@
-Return-Path: <netdev+bounces-261495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261496-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sMw+MDOGoGknkgQAu9opvQ
-	(envelope-from <netdev+bounces-261495-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 18:43:15 +0100
+	id 0Kj/E76IoGlvkgQAu9opvQ
+	(envelope-from <netdev+bounces-261496-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 18:54:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C50E1ACB5A
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 18:43:15 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C7BA1ACFA1
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 18:54:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DB53B3089BAA
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 16:58:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1B63831B2AD8
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 17:00:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 026E647D940;
-	Thu, 26 Feb 2026 16:42:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C710A438FFD;
+	Thu, 26 Feb 2026 16:49:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="swyeQXgP"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="hAYgA2jp";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="zCgOS19u";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="hAYgA2jp";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="zCgOS19u"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7929244A73E;
-	Thu, 26 Feb 2026 16:42:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C9EE42EECC
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 16:49:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772124137; cv=none; b=bF7l0jmL2DofMAWMnmGZItEjhqGU9PYTnEqV/GBgoYaMPt+aav6qcdP1pupGDjg9bnLarJqF3YQQ3GRp+2ds/5xygqkH8VFMSScCdc/pcX+iLsxHYllzPG9E2YvQ2nwHFQJxSBN6Qs3urGk43EGHfPRdz0OxlVXotRJ/ehr2B5M=
+	t=1772124566; cv=none; b=XxPMY+1VkiBDCKTzmVESVaSis8T/ZEHCW59I9gOUXkU32Z/6Q5vQhya2LJRg35T2wdjEyuzay8R2QpPQwF8Oj21A5aVtl0Myss0BzUEijgSvqe07zVsyAIvwnHlD5XiEIKaiyxpLb+pfd9ninpz5cS5bgQhg5DGZhlO8WllZdUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772124137; c=relaxed/simple;
-	bh=KRmKGQBWH+ts0/8aEiIDuVI5DrNundB/A7IAzt1uPew=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=nqgpDdyOBOUj9hz7rNCfkTSZHKlc6OYXua+Ni3V6vlT1OnvqRKjPGGdYA/KaKozFN2ARbGBdk2is2lZt+XYbN0H+aDvjR9FoOHSngCRL9WdPaYgqRiF20zkhYjvqVAgXbGGlRuhkvyw79wkNXNoc7tA/Gpt71cGMSszZCraE1+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=swyeQXgP; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id A70F5C4069A;
-	Thu, 26 Feb 2026 16:42:30 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 2F1045FDE9;
-	Thu, 26 Feb 2026 16:42:15 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id CEE7D10369401;
-	Thu, 26 Feb 2026 17:42:12 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1772124134; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=wc0PGEj/+qz44Y7I/+GAB4/Qv1uHFLPLhpqG4sAl0N0=;
-	b=swyeQXgPW5vmCBKn/fa7Y+0qy348cjjwn7GRfpBVbWKq/77uo9Gl5//H+HqLFU1mJSGIJ3
-	1JPhZ9RYXdWG6UUtAuBG33kk8wrJKSMcJ6DFAFsjr8o9O8b7i3DuBqqUwEbhetQeasG+AB
-	Rpyb1DF640x9HCiVejR/NpcJAfAy78nUvQQ6TabC7FInPAYL8aXAsgPcBTtfsWFIbkbslb
-	1+1+4S/BKuB9dhi8OYyHS8VCkW3YlTKl5deBadDZsgv91ECfNuOgWabhIQW77oYP95tLzq
-	P65Kg7Kxlg50ZtMGRZ7bU8xYcxIIPaV+w9H/SvMJcRnD4gnMJr0dIUAuMc4DUQ==
-From: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-Date: Thu, 26 Feb 2026 17:41:56 +0100
-Subject: [PATCH net-next v5 9/9] net: dsa: microchip: Add two-step PTP
- support for KSZ8463
+	s=arc-20240116; t=1772124566; c=relaxed/simple;
+	bh=VqGVgXxY2G6zwg2uiSi6OSBwSy2bKCiV2e1rsbEF/QA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KgTubVOrvD6k/20MyKbHMIOQoK96oot3k/y448OHslNMMn7TKT+VRdV6vatOLcRcT1HbHR8daRv53myAozo645qgeFqW7rp7PFQpBg6YxQn1hBGAM/4THu24lCsT3gdGmgw9vzoIdazQZ6+frEkrDtCTATMwLs74U+2MyAzMnWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=hAYgA2jp; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=zCgOS19u; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=hAYgA2jp; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=zCgOS19u; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id CD87E4D4CA;
+	Thu, 26 Feb 2026 16:49:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1772124560;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BNwEAWIsld/a3bTo0jTTEGruuvEsAoMftAo147KwrkY=;
+	b=hAYgA2jpZa4xi0xhqaRwMEM4MmatY7e7kOD/E1qjGdJ66bF2R3siOjYy5Y6Yg9dDfzUDD4
+	aeuOtKCnl8v1QoxCgsTX8W1RjLx4+PdWc/SXCUL+OLAvf+woDLtaeDL8YsARBgnzpciH/g
+	IVXCKBa3wKZd2silyKmBo19Po0OpWAk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1772124560;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BNwEAWIsld/a3bTo0jTTEGruuvEsAoMftAo147KwrkY=;
+	b=zCgOS19u4C6rF6D6cMRbA7dGGq7ArZv1u0GnIvuUsaX35ZbUbgb8M1Ez+SVwqYgh9euqH2
+	kmxPCc+6nDwXgTAQ==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=hAYgA2jp;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=zCgOS19u
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1772124560;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BNwEAWIsld/a3bTo0jTTEGruuvEsAoMftAo147KwrkY=;
+	b=hAYgA2jpZa4xi0xhqaRwMEM4MmatY7e7kOD/E1qjGdJ66bF2R3siOjYy5Y6Yg9dDfzUDD4
+	aeuOtKCnl8v1QoxCgsTX8W1RjLx4+PdWc/SXCUL+OLAvf+woDLtaeDL8YsARBgnzpciH/g
+	IVXCKBa3wKZd2silyKmBo19Po0OpWAk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1772124560;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BNwEAWIsld/a3bTo0jTTEGruuvEsAoMftAo147KwrkY=;
+	b=zCgOS19u4C6rF6D6cMRbA7dGGq7ArZv1u0GnIvuUsaX35ZbUbgb8M1Ez+SVwqYgh9euqH2
+	kmxPCc+6nDwXgTAQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3626B3EA62;
+	Thu, 26 Feb 2026 16:49:20 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id GqJ+DJB5oGkrMQAAD6G6ig
+	(envelope-from <dsterba@suse.cz>); Thu, 26 Feb 2026 16:49:20 +0000
+Date: Thu, 26 Feb 2026 17:49:15 +0100
+From: David Sterba <dsterba@suse.cz>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Eric Biggers <ebiggers@kernel.org>,
+	"Theodore Y. Ts'o" <tytso@mit.edu>,
+	Muchun Song <muchun.song@linux.dev>,
+	Oscar Salvador <osalvador@suse.de>,
+	David Hildenbrand <david@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>,
+	Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
+	Steve French <sfrench@samba.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+	Viacheslav Dubeyko <slava@dubeyko.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>,
+	David Sterba <dsterba@suse.com>,
+	Marc Dionne <marc.dionne@auristor.com>, Ian Kent <raven@themaw.net>,
+	Luis de Bethencourt <luisbg@kernel.org>,
+	Salah Triki <salah.triki@gmail.com>,
+	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	Alex Markuze <amarkuze@redhat.com>,
+	Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,
+	Nicolas Pitre <nico@fluxnic.net>, Tyler Hicks <code@tyhicks.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+	Yangtao Li <frank.li@vivo.com>,
+	Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Richard Weinberger <richard@nod.at>,
+	Dave Kleikamp <shaggy@kernel.org>,
+	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+	Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>,
+	Joseph Qi <joseph.qi@linux.alibaba.com>,
+	Mike Marshall <hubcap@omnibond.com>,
+	Martin Brandenburg <martin@omnibond.com>,
+	Miklos Szeredi <miklos@szeredi.hu>, Anders Larsen <al@alarsen.net>,
+	Zhihao Cheng <chengzhihao1@huawei.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Naohiro Aota <naohiro.aota@wdc.com>,
+	Johannes Thumshirn <jth@kernel.org>,
+	John Johansen <john.johansen@canonical.com>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Mimi Zohar <zohar@linux.ibm.com>,
+	Roberto Sassu <roberto.sassu@huawei.com>,
+	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+	Eric Snowberg <eric.snowberg@oracle.com>, Fan Wu <wufan@kernel.org>,
+	Stephen Smalley <stephen.smalley.work@gmail.com>,
+	Ondrej Mosnacek <omosnace@redhat.com>,
+	Casey Schaufler <casey@schaufler-ca.com>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+	Oleg Nesterov <oleg@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	James Clark <james.clark@linaro.org>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	Martin Schiller <ms@dev.tdt.de>, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	nvdimm@lists.linux.dev, fsverity@lists.linux.dev,
+	linux-mm@kvack.org, netfs@lists.linux.dev,
+	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org, linux-nilfs@vger.kernel.org,
+	v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
+	autofs@vger.kernel.org, ceph-devel@vger.kernel.org,
+	codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
+	linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net,
+	ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev,
+	devel@lists.orangefs.org, linux-unionfs@vger.kernel.org,
+	apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
+	linux-integrity@vger.kernel.org, selinux@vger.kernel.org,
+	amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+	netdev@vger.kernel.org, linux-perf-users@vger.kernel.org,
+	linux-fscrypt@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-hams@vger.kernel.org, linux-x25@vger.kernel.org
+Subject: Re: [PATCH 19/61] affs: update format strings for u64 i_ino
+Message-ID: <20260226164914.GG26902@suse.cz>
+Reply-To: dsterba@suse.cz
+References: <20260226-iino-u64-v1-0-ccceff366db9@kernel.org>
+ <20260226-iino-u64-v1-19-ccceff366db9@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260226-ksz8463-ptp-v5-9-1bc24fb9627d@bootlin.com>
-References: <20260226-ksz8463-ptp-v5-0-1bc24fb9627d@bootlin.com>
-In-Reply-To: <20260226-ksz8463-ptp-v5-0-1bc24fb9627d@bootlin.com>
-To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Richard Cochran <richardcochran@gmail.com>, Simon Horman <horms@kernel.org>
-Cc: Pascal Eberhard <pascal.eberhard@se.com>, 
- =?utf-8?q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-X-Mailer: b4 0.14.2
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260226-iino-u64-v1-19-ccceff366db9@kernel.org>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+X-Spamd-Bar: /
+X-Spam-Flag: NO
+X-Spam-Score: -0.71
+X-Spam-Level: 
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261495-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	FREEMAIL_CC(0.00)[zeniv.linux.org.uk,kernel.org,suse.cz,goodmis.org,efficios.com,intel.com,infradead.org,mit.edu,linux.dev,suse.de,redhat.com,manguebit.org,dilger.ca,suse.com,oracle.com,brown.name,talpey.com,samba.org,gmail.com,microsoft.com,dubeyko.com,ionkov.net,codewreck.org,crudebyte.com,auristor.com,themaw.net,cs.cmu.edu,fluxnic.net,tyhicks.com,physik.fu-berlin.de,vivo.com,artax.karlin.mff.cuni.cz,nod.at,paragon-software.com,fasheh.com,evilplan.org,linux.alibaba.com,omnibond.com,szeredi.hu,alarsen.net,huawei.com,wdc.com,canonical.com,paul-moore.com,namei.org,hallyn.com,linux.ibm.com,schaufler-ca.com,amd.com,ffwll.ch,linaro.org,google.com,davemloft.net,arm.com,linux.intel.com,dev.tdt.de,vger.kernel.org,lists.linux.dev,kvack.org,lists.sourceforge.net,lists.samba.org,lists.infradead.org,coda.cs.cmu.edu,lists.orangefs.org,lists.ubuntu.com,lists.freedesktop.org,lists.linaro.org];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-261496-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[suse.cz];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[];
+	HAS_REPLYTO(0.00)[dsterba@suse.cz];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_GT_50(0.00)[146];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dsterba@suse.cz,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-0.996];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:mid,bootlin.com:dkim,bootlin.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8C50E1ACB5A
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.cz:mid,suse.cz:dkim,suse.cz:replyto,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5C7BA1ACFA1
 X-Rspamd-Action: no action
 
-The KSZ8463 switch supports PTP but it's not supported by driver.
+On Thu, Feb 26, 2026 at 10:55:21AM -0500, Jeff Layton wrote:
+> Update format strings and local variable types in affs for the
+> i_ino type change from unsigned long to u64.
+> 
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
 
-Add L2 two-step PTP support for the KSZ8463. IPv4 and IPv6 layers aren't
-supported. Neither is one-step PTP.
-
-The pdelay_req and pdelay_resp timestamps share one interrupt bit status
-while they're located in two different registers. So introduce
-last_tx_is_pdelayresp to keep track of the last sent event type. This
-flag is set by the xmit worker right before sending the packet and then
-used in the interrupt handler to retrieve the timestamp location.
-
-Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
----
- drivers/net/dsa/microchip/ksz8.c        |  9 ++---
- drivers/net/dsa/microchip/ksz8_reg.h    |  1 +
- drivers/net/dsa/microchip/ksz_common.c  |  1 +
- drivers/net/dsa/microchip/ksz_common.h  |  1 +
- drivers/net/dsa/microchip/ksz_ptp.c     | 72 ++++++++++++++++++++++++++++-----
- drivers/net/dsa/microchip/ksz_ptp_reg.h |  4 ++
- 6 files changed, 71 insertions(+), 17 deletions(-)
-
-diff --git a/drivers/net/dsa/microchip/ksz8.c b/drivers/net/dsa/microchip/ksz8.c
-index a05527899b8bab6d53509ba38c58101b79e98ee5..f4dfdbd52b9daeab8a0134fb09cf4c960d9d9409 100644
---- a/drivers/net/dsa/microchip/ksz8.c
-+++ b/drivers/net/dsa/microchip/ksz8.c
-@@ -143,9 +143,9 @@ int ksz8_reset_switch(struct ksz_device *dev)
- 			KSZ8863_GLOBAL_SOFTWARE_RESET | KSZ8863_PCS_RESET, false);
- 	} else if (ksz_is_ksz8463(dev)) {
- 		ksz_cfg(dev, KSZ8463_REG_SW_RESET,
--			KSZ8463_GLOBAL_SOFTWARE_RESET, true);
-+			KSZ8463_GLOBAL_SOFTWARE_RESET | KSZ8463_PTP_SOFTWARE_RESET, true);
- 		ksz_cfg(dev, KSZ8463_REG_SW_RESET,
--			KSZ8463_GLOBAL_SOFTWARE_RESET, false);
-+			KSZ8463_GLOBAL_SOFTWARE_RESET | KSZ8463_PTP_SOFTWARE_RESET, false);
- 	} else {
- 		/* reset switch */
- 		ksz_write8(dev, REG_POWER_MANAGEMENT_1,
-@@ -1763,10 +1763,7 @@ void ksz8_config_cpu_port(struct dsa_switch *ds)
- 					   COPPER_RECEIVE_ADJUSTMENT, 0);
- 		}
- 
--		/* Turn off PTP function as the switch's proprietary way of
--		 * handling timestamp is not supported in current Linux PTP
--		 * stack implementation.
--		 */
-+		/* Turn off PTP function as the switch enables it by default */
- 		regmap_update_bits(ksz_regmap_16(dev),
- 				   KSZ8463_PTP_MSG_CONF1,
- 				   PTP_ENABLE, 0);
-diff --git a/drivers/net/dsa/microchip/ksz8_reg.h b/drivers/net/dsa/microchip/ksz8_reg.h
-index 332408567b473c141c3695328a524f257f2cfc70..0558740ae57738fa7e4a8f3f429254033c54af12 100644
---- a/drivers/net/dsa/microchip/ksz8_reg.h
-+++ b/drivers/net/dsa/microchip/ksz8_reg.h
-@@ -765,6 +765,7 @@
- #define KSZ8463_REG_SW_RESET		0x126
- 
- #define KSZ8463_GLOBAL_SOFTWARE_RESET	BIT(0)
-+#define KSZ8463_PTP_SOFTWARE_RESET	BIT(2)
- 
- #define KSZ8463_PTP_CLK_CTRL		0x600
- 
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 4b36a3b88f49363273e72d19f9625e542bff1b06..1ba0d27b56bd56e9faeb295968f9d3deb02a1b64 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -1512,6 +1512,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
- 		.supports_mii = {false, false, true},
- 		.supports_rmii = {false, false, true},
- 		.internal_phy = {true, true, false},
-+		.ptp_capable = true,
- 	},
- 
- 	[KSZ8563] = {
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index dfbc3d13daca8d7a8b9d3ffe6a7c1ec9927863f2..1fface82086eed87749d4702b046fcab313663e9 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -150,6 +150,7 @@ struct ksz_port {
- 	struct kernel_hwtstamp_config tstamp_config;
- 	bool hwts_tx_en;
- 	bool hwts_rx_en;
-+	bool last_tx_is_pdelayresp;
- 	struct ksz_irq ptpirq;
- 	struct ksz_ptp_irq ptpmsg_irq[3];
- 	ktime_t tstamp_msg;
-diff --git a/drivers/net/dsa/microchip/ksz_ptp.c b/drivers/net/dsa/microchip/ksz_ptp.c
-index 7eb033157f226b1169bc184d71569328e9a20a5b..c6a85bdf87b1791f7841948cea3ff82bd840c545 100644
---- a/drivers/net/dsa/microchip/ksz_ptp.c
-+++ b/drivers/net/dsa/microchip/ksz_ptp.c
-@@ -308,15 +308,20 @@ int ksz_get_ts_info(struct dsa_switch *ds, int port, struct kernel_ethtool_ts_in
- 			      SOF_TIMESTAMPING_RX_HARDWARE |
- 			      SOF_TIMESTAMPING_RAW_HARDWARE;
- 
--	ts->tx_types = BIT(HWTSTAMP_TX_OFF) | BIT(HWTSTAMP_TX_ONESTEP_P2P);
-+	ts->tx_types = BIT(HWTSTAMP_TX_OFF);
- 
--	if (is_lan937x(dev))
-+	if (!ksz_is_ksz8463(dev))
-+		ts->tx_types |= BIT(HWTSTAMP_TX_ONESTEP_P2P);
-+
-+	if (is_lan937x(dev) || ksz_is_ksz8463(dev))
- 		ts->tx_types |= BIT(HWTSTAMP_TX_ON);
- 
- 	ts->rx_filters = BIT(HWTSTAMP_FILTER_NONE) |
--			 BIT(HWTSTAMP_FILTER_PTP_V2_L4_EVENT) |
--			 BIT(HWTSTAMP_FILTER_PTP_V2_L2_EVENT) |
--			 BIT(HWTSTAMP_FILTER_PTP_V2_EVENT);
-+			 BIT(HWTSTAMP_FILTER_PTP_V2_L2_EVENT);
-+	if (!ksz_is_ksz8463(dev)) {
-+		ts->rx_filters |= BIT(HWTSTAMP_FILTER_PTP_V2_L4_EVENT) |
-+				  BIT(HWTSTAMP_FILTER_PTP_V2_EVENT);
-+	}
- 
- 	ts->phc_index = ptp_clock_index(ptp_data->clock);
- 
-@@ -353,6 +358,9 @@ static int ksz_set_hwtstamp_config(struct ksz_device *dev,
- 		prt->hwts_tx_en = false;
- 		break;
- 	case HWTSTAMP_TX_ONESTEP_P2P:
-+		if (ksz_is_ksz8463(dev))
-+			return -ERANGE;
-+
- 		prt->ptpmsg_irq[KSZ_SYNC_MSG].ts_en  = false;
- 		prt->ptpmsg_irq[KSZ_XDREQ_MSG].ts_en = true;
- 		prt->ptpmsg_irq[KSZ_PDRES_MSG].ts_en = false;
-@@ -364,14 +372,19 @@ static int ksz_set_hwtstamp_config(struct ksz_device *dev,
- 
- 		break;
- 	case HWTSTAMP_TX_ON:
--		if (!is_lan937x(dev))
-+		if (!is_lan937x(dev) && !ksz_is_ksz8463(dev))
- 			return -ERANGE;
- 
--		prt->ptpmsg_irq[KSZ_SYNC_MSG].ts_en  = true;
--		prt->ptpmsg_irq[KSZ_XDREQ_MSG].ts_en = true;
--		prt->ptpmsg_irq[KSZ_PDRES_MSG].ts_en = true;
--		prt->hwts_tx_en = true;
-+		if (ksz_is_ksz8463(dev)) {
-+			prt->ptpmsg_irq[KSZ8463_SYNC_MSG].ts_en  = true;
-+			prt->ptpmsg_irq[KSZ8463_XDREQ_PDRES_MSG].ts_en = true;
-+		} else {
-+			prt->ptpmsg_irq[KSZ_SYNC_MSG].ts_en  = true;
-+			prt->ptpmsg_irq[KSZ_XDREQ_MSG].ts_en = true;
-+			prt->ptpmsg_irq[KSZ_PDRES_MSG].ts_en = true;
-+		}
- 
-+		prt->hwts_tx_en = true;
- 		ret = ksz_rmw16(dev, regs[PTP_MSG_CONF1], PTP_1STEP, 0);
- 		if (ret)
- 			return ret;
-@@ -387,6 +400,8 @@ static int ksz_set_hwtstamp_config(struct ksz_device *dev,
- 		break;
- 	case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
- 	case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
-+		if (ksz_is_ksz8463(dev))
-+			return -ERANGE;
- 		config->rx_filter = HWTSTAMP_FILTER_PTP_V2_L4_EVENT;
- 		prt->hwts_rx_en = true;
- 		break;
-@@ -397,6 +412,8 @@ static int ksz_set_hwtstamp_config(struct ksz_device *dev,
- 		break;
- 	case HWTSTAMP_FILTER_PTP_V2_EVENT:
- 	case HWTSTAMP_FILTER_PTP_V2_SYNC:
-+		if (ksz_is_ksz8463(dev))
-+			return -ERANGE;
- 		config->rx_filter = HWTSTAMP_FILTER_PTP_V2_EVENT;
- 		prt->hwts_rx_en = true;
- 		break;
-@@ -565,6 +582,27 @@ static void ksz_ptp_txtstamp_skb(struct ksz_device *dev,
- 	skb_complete_tx_timestamp(skb, &hwtstamps);
- }
- 
-+static void ksz8463_set_pdelayresp_flag(struct ksz_port *prt, struct sk_buff *skb)
-+{
-+	struct ptp_header *hdr;
-+	unsigned int type;
-+	u8 ptp_msg_type;
-+
-+	if (!ksz_is_ksz8463(prt->ksz_dev))
-+		return;
-+
-+	type = ptp_classify_raw(skb);
-+	if (type == PTP_CLASS_NONE)
-+		return;
-+
-+	hdr = ptp_parse_header(skb, type);
-+	if (!hdr)
-+		return;
-+
-+	ptp_msg_type = ptp_get_msgtype(hdr, type);
-+	prt->last_tx_is_pdelayresp = (ptp_msg_type == PTP_MSGTYPE_PDELAY_RESP);
-+}
-+
- void ksz_port_deferred_xmit(struct kthread_work *work)
- {
- 	struct ksz_deferred_xmit_work *xmit_work = work_to_xmit_work(work);
-@@ -581,6 +619,8 @@ void ksz_port_deferred_xmit(struct kthread_work *work)
- 
- 	reinit_completion(&prt->tstamp_msg_comp);
- 
-+	ksz8463_set_pdelayresp_flag(prt, skb);
-+
- 	dsa_enqueue_skb(skb, skb->dev);
- 
- 	ksz_ptp_txtstamp_skb(dev, prt, clone);
-@@ -972,7 +1012,17 @@ void ksz_ptp_clock_unregister(struct dsa_switch *ds)
- 
- static int ksz_read_ts(struct ksz_port *port, u16 reg, u32 *ts)
- {
--	return ksz_read32(port->ksz_dev, reg, ts);
-+	u16 ts_reg = reg;
-+
-+	/**
-+	 * On KSZ8463 DREQ and DRESP timestamps share one interrupt line
-+	 * so we have to check the nature of the latest event sent to know
-+	 * where the timestamp is located
-+	 */
-+	if (ksz_is_ksz8463(port->ksz_dev) && port->last_tx_is_pdelayresp)
-+		ts_reg += KSZ8463_DRESP_TS_OFFSET;
-+
-+	return ksz_read32(port->ksz_dev, ts_reg, ts);
- }
- 
- static irqreturn_t ksz_ptp_msg_thread_fn(int irq, void *dev_id)
-diff --git a/drivers/net/dsa/microchip/ksz_ptp_reg.h b/drivers/net/dsa/microchip/ksz_ptp_reg.h
-index e80fb4bd1a0e970ba3570374d3dc82c8e2cc15b4..ac9d0f2b348b0469abbeed0e645fe8ef441d35fb 100644
---- a/drivers/net/dsa/microchip/ksz_ptp_reg.h
-+++ b/drivers/net/dsa/microchip/ksz_ptp_reg.h
-@@ -125,6 +125,10 @@
- #define KSZ8463_REG_PORT_SYNC_TS	0x064C
- #define KSZ8463_REG_PORT_DRESP_TS	0x0650
- 
-+#define KSZ8463_DRESP_TS_OFFSET		(KSZ8463_REG_PORT_DRESP_TS - KSZ8463_REG_PORT_DREQ_TS)
-+#define KSZ8463_SYNC_MSG		0
-+#define KSZ8463_XDREQ_PDRES_MSG		1
-+
- #define REG_PTP_PORT_TX_INT_STATUS__2	0x0C14
- #define REG_PTP_PORT_TX_INT_ENABLE__2	0x0C16
- 
-
--- 
-2.53.0
-
+Acked-by: David Sterba <dsterba@suse.com>
 
