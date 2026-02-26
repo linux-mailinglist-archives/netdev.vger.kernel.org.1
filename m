@@ -1,127 +1,118 @@
-Return-Path: <netdev+bounces-261167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261168-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eAeYGlq+n2lOdgQAu9opvQ
-	(envelope-from <netdev+bounces-261167-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 04:30:34 +0100
+	id sG2TIZi+n2lOdgQAu9opvQ
+	(envelope-from <netdev+bounces-261168-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 04:31:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD2CC1A0908
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 04:30:33 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F3E31A0925
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 04:31:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3CD3A306B59D
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 03:30:07 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8785F30361B3
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 03:31:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B596138759C;
-	Thu, 26 Feb 2026 03:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CF9438550B;
+	Thu, 26 Feb 2026 03:31:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QS2W0Sbq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IyZ1IFKX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92D9D38757C;
-	Thu, 26 Feb 2026 03:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCE57374180;
+	Thu, 26 Feb 2026 03:31:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772076603; cv=none; b=PMg7xsgymnMg1tOGtwHl7YB070Dt78vCOVBCIYryLj10lN7IUavOm8aKlh+iccS+UnRtXt0674VQ+FAf83Fm1QBVKZ1a2Ogpwj6YTEceo/9os8Oi1Kxyeb+5XMflNGf6c9F/5LNsPrjTmS4H42Ep20MjvwqRpEmKYQbE6CWiIjk=
+	t=1772076693; cv=none; b=FxNuWfZlMTiMx9EF5zY/dJRBocXHwbCwoi5As04LSX9cfa0n48rkdNuPLCilaVb6HkSrsJO3mpyV0DE/jPDH2Bu2h76j3PfhY0hYPs2+4Q727d8LHo/+KQh3K3Ayesl3knuiftUoi/odtDKZU13vWAGuMQTULirHv7qH1ErKJcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772076603; c=relaxed/simple;
-	bh=33Ebxl7znvHKx+8A7TAbQF1LHlHnjRkX06qgA4XsYGA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=VvPn8V4ocCt+k8XxWcGZLZDZ0j9XNxXnQOcpgvPqbb0GbPQs5PZqx4VdroyvYE4CIrXU3P9IE2oIK6s+B13+4WD0pVZn5MFcK2zhOQ6ATG7zP4W+qZ1Q1YxIq7SEIu2x9O+njFD1NtilRC4yciUMrlxIK/a+bI00o72nB/DeZF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QS2W0Sbq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4824CC2BC87;
-	Thu, 26 Feb 2026 03:30:03 +0000 (UTC)
+	s=arc-20240116; t=1772076693; c=relaxed/simple;
+	bh=S9OWgfpyYGSyuYQoVFxt18Q6NmD4zFRCvKi1nyNjpts=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V+pWPIohxWAlhpWJThJkZa3XrSr4TNAMcKT4naPgq8ZXXQ6nqCguF8ATeFyFLbu46SJX0EkFLiUkODDiVhc0Whe2rQmRFFbEn+sajYJY9YYBoS/nOIBsehYTfPniOFDBnrNnST7cNtZ32KIg9MUQFC8sPgbUOJchtxkwvWPaneE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IyZ1IFKX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32F5FC116C6;
+	Thu, 26 Feb 2026 03:31:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772076603;
-	bh=33Ebxl7znvHKx+8A7TAbQF1LHlHnjRkX06qgA4XsYGA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QS2W0Sbqjve4+0R093xbdELBKvDaog1KVN0Qkz/XkL0bOl3wZ4jd0Ukg1UWnrBCmx
-	 hPjL9nTQi5P9Uy37RvYh32AT2XGp5fn9t8roNM/eivecxcKnFfhxJ+B4WjQM2Ivg+q
-	 TrtcMvMCceIhtHTIt3V9aV1DUIzhEUWeAzmywO/loOAlppX+IXPUSrDtjC4IUR8fyX
-	 ZteBCfcRmHV/kQHKI96/cEcaf8WjhXpCNGB0LD0wJ1thwOS8tyPutUy09JgDa9qshv
-	 NQQUWJ0xTdEmuWWi/FBgg8yTN38YGviG1VaeQ95m9vWRwHS66vFfBnpP5aeAAWslws
-	 FvxokNXcCSnFA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FD85380A94B;
-	Thu, 26 Feb 2026 03:30:09 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1772076693;
+	bh=S9OWgfpyYGSyuYQoVFxt18Q6NmD4zFRCvKi1nyNjpts=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IyZ1IFKX+tqXGtMvnRwwweN+Qv/YPsMS5XTUU6N/3R+VQfxCRVi2YEXcN2skLR24j
+	 o+exkEDzPWMXp+xDgJ4LPGAU2c/RpwhTDz3eNdf7wKntSO7nZ1ydNuaQKMrCbs9zB2
+	 cOR3TR5BizlmWdFKGmNMJ/6aM7xf08pfaMEF5xfvdGOX6+drDUL9zNMEdtpm1Y5//8
+	 zqH6XgwdknVxeP15aeN9W2DxrNSo9E2AW0DtpDTjZ3b0mqfxSxG/ZgbZcsqbSfk8DA
+	 E7gTS0GeryXCkgDV3yNETXMeuUXOhCnT/WQ1M/b4L1Hn2PpgX9Z188wKspOoU2JgiA
+	 z3IalCWEAgE3w==
+Date: Wed, 25 Feb 2026 19:31:32 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: lirongqing <lirongqing@baidu.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH][net-next] net/devlink: Move health recovery
+ notification after abort check
+Message-ID: <20260225193132.54bd2a34@kernel.org>
+In-Reply-To: <20260225021003.1837-1-lirongqing@baidu.com>
+References: <20260225021003.1837-1-lirongqing@baidu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: cadence: macb: add ethtool nway_reset
- support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177207660779.1022268.11131318699777211358.git-patchwork-notify@kernel.org>
-Date: Thu, 26 Feb 2026 03:30:07 +0000
-References: <20260224145723.49450-1-nb@tipi-net.de>
-In-Reply-To: <20260224145723.49450-1-nb@tipi-net.de>
-To: Nicolai Buchwitz <nb@tipi-net.de>
-Cc: netdev@vger.kernel.org, nicolas.ferre@microchip.com,
- claudiu.beznea@tuxon.dev, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261167-lists,netdev=lfdr.de,netdevbpf];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-261168-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DD2CC1A0908
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 2F3E31A0925
 X-Rspamd-Action: no action
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 24 Feb 2026 15:57:23 +0100 you wrote:
-> Wire phy_ethtool_nway_reset() as the .nway_reset ethtool operation,
-> allowing userspace to restart PHY autonegotiation via 'ethtool -r'.
+On Tue, 24 Feb 2026 21:10:03 -0500 lirongqing wrote:
+> In devlink_health_report(), the DEVLINK_CMD_HEALTH_REPORTER_RECOVER
+> notification is sent immediately after setting the error state, before
+> checking if recovery should be aborted via devlink_health_recover_abort().
 > 
-> Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
-> ---
->  drivers/net/ethernet/cadence/macb_main.c | 1 +
->  1 file changed, 1 insertion(+)
+> When devlink_health_recover_abort() returns true (e.g., due to rate
+> limiting), the recovery process terminates early, but userspace has already
+> received a notification implying that recovery is underway. This creates a
+> misleading view of the reporter's activity.
+> 
+> Move the notification after the abort check, ensuring it is only sent when
+> recovery will actually proceed. This aligns the notification with the
+> actual recovery behavior.
 
-Here is the summary with links:
-  - [net-next,v2] net: cadence: macb: add ethtool nway_reset support
-    https://git.kernel.org/netdev/net-next/c/45ce4b753a50
-
-You are awesome, thank you!
+Hm, we don't have solid documentation for this notification, but I
+think it's supposed to be triggered on any change in the health state.
+It's not just a notification that recovery has taken place.
+devlink_health_reporter_state_update() for instance sends it whether
+the update is healthy -> error or error -> healthy.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: reject
 
