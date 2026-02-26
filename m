@@ -1,51 +1,99 @@
-Return-Path: <netdev+bounces-261278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261279-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6PwrJmsioGkDfwQAu9opvQ
-	(envelope-from <netdev+bounces-261278-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 11:37:31 +0100
+	id mPdCDyYjoGkDfwQAu9opvQ
+	(envelope-from <netdev+bounces-261279-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 11:40:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 424241A4649
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 11:37:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98C331A46CB
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 11:40:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 89EAA30186B8
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 10:37:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0323E303E487
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 10:39:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C5951946C8;
-	Thu, 26 Feb 2026 10:37:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A869D3A7F7A;
+	Thu, 26 Feb 2026 10:39:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cda4uqdt"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="YNjDaZ2m";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="aM4zKX9M";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="YNjDaZ2m";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="aM4zKX9M"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 161353921DC;
-	Thu, 26 Feb 2026 10:37:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D3D6395D9B
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 10:39:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772102249; cv=none; b=SZ90tzeOe4vu0IG8Mv7K+aZ2Q+58zRFDNocNaBQrNCGxotO5Ff6TV0bAYShBQlI4JP6dCqp/rISO8WioPqqpStyhVdSQT/vaBKn341kFVd0LVlwp41yoq+bRphnD5EK1R08Z2/y5TuEjEEmuVdYsUHCus8oT/RuDZxT7QxTFhk8=
+	t=1772102374; cv=none; b=DfMPM+w+ujZfkxaBZtMxR5bw2kUU7ExUadTLEOTNpPKCdiiZgcrytEHzson/Mkwv17fTIq1drTrAxA1hmcIS5uUNEP1b747Q8vL96qzxP8IHGl0HqWLSWO0bK5MZyGzBP13oZE+H3u5cmMePicLnYWUEji1eLqOzjiGvzdiwKyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772102249; c=relaxed/simple;
-	bh=jRguEYYtb4ZZbxpzkqF/CDzS5i7msaNviAjY3Nd+mJc=;
+	s=arc-20240116; t=1772102374; c=relaxed/simple;
+	bh=ar0U+BGmBVDFSgfHZrMXew9fJ6JICS1iCoUoOwezuhk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EERU3CkxYMHRffAEEcSFuCTqPDuhx3EF/zq8jAPcZSvjys4EVqJ5zPDhR8VH7uCP3UwsxoiBuK5DtmO8pPytAaPnFX6NOSRF/L8pSnQXN5NGA1lGRQn66vcY1k8o2MqNbfhNosbj2t1mlvSDg8lRuzSeGK+w6+fGQhN2W/LU5Og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cda4uqdt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFEF3C116C6;
-	Thu, 26 Feb 2026 10:37:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772102248;
-	bh=jRguEYYtb4ZZbxpzkqF/CDzS5i7msaNviAjY3Nd+mJc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Cda4uqdt0BgL+RT4YlpvVgnK8h6oHFEpj5J/6/yFj2+jHNHI7rshLnhl//UP9aXFW
-	 5/CHa4KYAJy/FHHxBpnRIXGBxBD0cE7uxMaFDwdrOlR7wjqbb8QK9fthU4zG6UBcDO
-	 zZjugzma31Elj/j9d4zdSrLPl4Tvqrd+hx7meV5kdrvd3S4bqgvkNb3alUDE8Jmnyp
-	 BM1YFgzIfQCKU2/ZaCwE+stUv5XC6DqXrAKMiZPuxeqMdqNGuLMctpSDlV+nrCqBt6
-	 LlWGLBwqoF/rc2atTGikKQ8Rx5R9rZ8vDu95JMvqTDpo24uSfO2CovcyHpdzQW6uLL
-	 0UniQX59zyuRA==
-Message-ID: <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org>
-Date: Thu, 26 Feb 2026 11:37:23 +0100
+	 In-Reply-To:Content-Type; b=DO25Eo3umPzlVuMLyoS51dZV0duIvgj3xF2mEMvyscLCm5TH1n5+GKr3o43BVYnFgjt9nSANAggkobSgK43jBgnMYMcULRU26JaLFj3SLa95hvxgKj3JOGYPcLh+xzm7JMjwOD8IGgm/wMX0ghRFSfUr8rEWi52rWxE3dhWXxqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=YNjDaZ2m; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=aM4zKX9M; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=YNjDaZ2m; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=aM4zKX9M; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 741991F43B;
+	Thu, 26 Feb 2026 10:39:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772102364; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mmuaoW/FsYVERWSO4KYbhQM93tVpbetW98w5JWtoJ7o=;
+	b=YNjDaZ2mZaUe6bmJQ9L1J9QV2fYYC0QGrJeBZlRImTAa27Q7/UKnyCwgN4UT7HOCpQ16YI
+	qMu/pjDUtFbHIVqnaLtzw8G/aa0QW8LjKIjlnv/i7N1BHMkMBrvp1QlqEJ23gqPfXvVXBK
+	58awd4w/1PLV/36OuAVbBq+8wC1Z8ec=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772102364;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mmuaoW/FsYVERWSO4KYbhQM93tVpbetW98w5JWtoJ7o=;
+	b=aM4zKX9MNUVi3Eh3PYVr5ykNw3iMGLGQUGPi5FAGVDJ1iZTvDZnSgLDaEsT8lW1viS+o0+
+	nYddJNx1GAjSFWCw==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=YNjDaZ2m;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=aM4zKX9M
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772102364; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mmuaoW/FsYVERWSO4KYbhQM93tVpbetW98w5JWtoJ7o=;
+	b=YNjDaZ2mZaUe6bmJQ9L1J9QV2fYYC0QGrJeBZlRImTAa27Q7/UKnyCwgN4UT7HOCpQ16YI
+	qMu/pjDUtFbHIVqnaLtzw8G/aa0QW8LjKIjlnv/i7N1BHMkMBrvp1QlqEJ23gqPfXvVXBK
+	58awd4w/1PLV/36OuAVbBq+8wC1Z8ec=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772102364;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mmuaoW/FsYVERWSO4KYbhQM93tVpbetW98w5JWtoJ7o=;
+	b=aM4zKX9MNUVi3Eh3PYVr5ykNw3iMGLGQUGPi5FAGVDJ1iZTvDZnSgLDaEsT8lW1viS+o0+
+	nYddJNx1GAjSFWCw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9E8463EA62;
+	Thu, 26 Feb 2026 10:39:23 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 4DO6I9sioGmBIgAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Thu, 26 Feb 2026 10:39:23 +0000
+Message-ID: <06ae5fc9-fb72-44cc-bb63-941f52a2b70d@suse.de>
+Date: Thu, 26 Feb 2026 11:39:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,143 +101,223 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups, RCU
- stalls, timeout
-To: Matthieu Baerts <matttbe@kernel.org>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev,
- Netdev <netdev@vger.kernel.org>, rcu@vger.kernel.org,
- MPTCP Linux <mptcp@lists.linux.dev>,
- Linux Kernel <linux-kernel@vger.kernel.org>,
- Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- Dave Hansen <dave.hansen@linux.intel.com>, "luto@kernel.org"
- <luto@kernel.org>
-References: <b24ffcb3-09d5-4e48-9070-0b69bc654281@kernel.org>
+Subject: Re: [PATCH net-next] inet: add ip_local_port_step_width sysctl to
+ improve port usage distribution
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, ij@kernel.org,
+ chia-yu.chang@nokia-bell-labs.com, idosch@nvidia.com, willemb@google.com,
+ dsahern@kernel.org, ncardwell@google.com, corbet@lwn.net, horms@kernel.org,
+ pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, davem@davemloft.net
+References: <20260224150537.3800-1-fmancera@suse.de>
+ <CAAVpQUAiCu3dJ56Le3_SSR2qg-+kKP3-HC09BRuVwbswEH=5kw@mail.gmail.com>
+ <0e4c862e-cde4-4fa6-b9fa-3667429abf29@suse.de>
+ <CAAVpQUBMPoUj57LGEyr9m4E54CTLeabSH2aZca+EcYzYRNBfXA@mail.gmail.com>
 Content-Language: en-US
-From: Jiri Slaby <jirislaby@kernel.org>
-Autocrypt: addr=jirislaby@kernel.org; keydata=
- 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
-In-Reply-To: <b24ffcb3-09d5-4e48-9070-0b69bc654281@kernel.org>
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <CAAVpQUBMPoUj57LGEyr9m4E54CTLeabSH2aZca+EcYzYRNBfXA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Score: -4.51
+X-Spam-Level: 
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261278-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-261279-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jirislaby@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 424241A4649
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,suse.de:email,0xffsoftware.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 98C331A46CB
 X-Rspamd-Action: no action
 
-On 06. 02. 26, 12:54, Matthieu Baerts wrote:
-> Our CI for the MPTCP subsystem is now regularly hitting various stalls
-> before even starting the MPTCP test suite. These issues are visible on
-> top of the latest net and net-next trees, which have been sync with
-> Linus' tree yesterday. All these issues have been seen on a "public CI"
-> using GitHub-hosted runners with KVM support, where the tested kernel is
-> launched in a nested (I suppose) VM. I can see the issue with or without
-> debug.config. According to the logs, it might have started around
-> v6.19-rc0, but I was unavailable for a few weeks, and I couldn't react
-> quicker, sorry for that. Unfortunately, I cannot reproduce this locally,
-> and the CI doesn't currently have the ability to execute bisections.
-
-Hmm, after the switch of the qemu guest kernels to 6.19, our (opensuse) 
-build service is stalling in smp_call_function_many_cond() randomly too:
-https://bugzilla.suse.com/show_bug.cgi?id=1258936
-
-The attachment from there contains sysrq-t logs too:
-https://bugzilla.suse.com/attachment.cgi?id=888612
-
-> The stalls happen before starting the MPTCP test suite. The init program
-> creates a VSOCK listening socket via socat [1], and different hangs are
-> then visible: RCU stalls followed by a soft lockup [2], only a soft
-> lockup [3], sometimes the soft lockup comes with a delay [4] [5], or
-> there is no RCU stalls or soft lockups detected after one minute, but VM
-> is stalled [6]. In the last case, the VM is stopped after having
-> launched GDB to get more details about what was being executed.
+On 2/25/26 6:33 PM, Kuniyuki Iwashima wrote:
+> On Wed, Feb 25, 2026 at 2:03 AM Fernando Fernandez Mancera
+> <fmancera@suse.de> wrote:
+>>
+>> On 2/25/26 7:28 AM, Kuniyuki Iwashima wrote:
+>>> On Tue, Feb 24, 2026 at 7:05 AM Fernando Fernandez Mancera
+>>> <fmancera@suse.de> wrote:
+>>>>
+>>>> With the current port selection algorithm, ports after a reserved port
+>>>> range or long time used port are used more often than others [1]. This
+>>>> causes an uneven port usage distribution. This combines with cloud
+>>>> environments blocking connections between the application server and the
+>>>> database server if there was a previous connection with the same source
+>>>> port, leading to connectivity problems between applications on cloud
+>>>> environments.
+>>>>
+>>>> The real issue here is that these firewalls cannot cope with
+>>>> standards-compliant port reuse. This is a workaround for such situations
+>>>> and an improvement on the distribution of ports selected.
+>>>>
+>>>> The proposed solution is to implement a variant of RFC 6056 Algorithm 5.
+>>>> The step size is selected randomly on every connect() call ensuring it
+>>>> is a coprime with respect to the size of the range of ports we want to
+>>>> scan. This way, we can ensure that all ports within the range are
+>>>> scanned before returning an error. To enable this algorithm, the user
+>>>> must configure the new sysctl option "net.ipv4.ip_local_port_step_width".
+>>>>
+>>>> In addition, on graphs generated we can observe that the distribution of
+>>>> source ports is more even with the proposed approach. [2]
+>>>>
+>>>> [1] https://0xffsoftware.com/port_graph_current_alg.html
+>>>>
+>>>> [2] https://0xffsoftware.com/port_graph_random_step_alg.html
+>>>>
+>>>> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+>>>> ---
+>>>>    Documentation/networking/ip-sysctl.rst        |  9 ++++++++
+>>>>    .../net_cachelines/netns_ipv4_sysctl.rst      |  1 +
+>>>>    include/net/netns/ipv4.h                      |  1 +
+>>>>    net/ipv4/inet_hashtables.c                    | 22 ++++++++++++++++---
+>>>>    net/ipv4/sysctl_net_ipv4.c                    |  7 ++++++
+>>>>    5 files changed, 37 insertions(+), 3 deletions(-)
+>>>>
+>>>> diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
+>>>> index 6921d8594b84..9e2625ee778c 100644
+>>>> --- a/Documentation/networking/ip-sysctl.rst
+>>>> +++ b/Documentation/networking/ip-sysctl.rst
+>>>> @@ -1612,6 +1612,15 @@ ip_local_reserved_ports - list of comma separated ranges
+>>>>
+>>>>           Default: Empty
+>>>>
+>>>> +ip_local_port_step_width - INTEGER
+>>>> +        Defines the numerical maximum increment between successive port
+>>>> +        allocations within the ephemeral port range when an unavailable port is
+>>>> +        reached. This can be used to mitigate accumulated nodes in port
+>>>> +        distribution when reserved ports have been configured. Please note that
+>>>> +        port collisions may be more frequent in a system with a very high load.
+>>>> +
+>>>> +        Default: 0 (disabled)
+>>>> +
+>>>>    ip_unprivileged_port_start - INTEGER
+>>>>           This is a per-namespace sysctl.  It defines the first
+>>>>           unprivileged port in the network namespace.  Privileged ports
+>>>> diff --git a/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst b/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
+>>>> index beaf1880a19b..c0e194a6e4ee 100644
+>>>> --- a/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
+>>>> +++ b/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
+>>>> @@ -47,6 +47,7 @@ u8                              sysctl_tcp_ecn
+>>>>    u8                              sysctl_tcp_ecn_fallback
+>>>>    u8                              sysctl_ip_default_ttl                                                                ip4_dst_hoplimit/ip_select_ttl
+>>>>    u8                              sysctl_ip_no_pmtu_disc
+>>>> +u32                             sysctl_ip_local_port_step_width
+>>>>    u8                              sysctl_ip_fwd_use_pmtu                       read_mostly                             ip_dst_mtu_maybe_forward/ip_skb_dst_mtu
+>>>>    u8                              sysctl_ip_fwd_update_priority                                                        ip_forward
+>>>>    u8                              sysctl_ip_nonlocal_bind
+>>>> diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
+>>>> index 8e971c7bf164..fb7c2235af21 100644
+>>>> --- a/include/net/netns/ipv4.h
+>>>> +++ b/include/net/netns/ipv4.h
+>>>> @@ -166,6 +166,7 @@ struct netns_ipv4 {
+>>>>           u8 sysctl_ip_autobind_reuse;
+>>>>           /* Shall we try to damage output packets if routing dev changes? */
+>>>>           u8 sysctl_ip_dynaddr;
+>>>> +       u32 sysctl_ip_local_port_step_width;
+>>>>    #ifdef CONFIG_NET_L3_MASTER_DEV
+>>>>           u8 sysctl_raw_l3mdev_accept;
+>>>>    #endif
+>>>> diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+>>>> index f5826ec4bcaa..1992dc21818f 100644
+>>>> --- a/net/ipv4/inet_hashtables.c
+>>>> +++ b/net/ipv4/inet_hashtables.c
+>>>> @@ -16,6 +16,7 @@
+>>>>    #include <linux/wait.h>
+>>>>    #include <linux/vmalloc.h>
+>>>>    #include <linux/memblock.h>
+>>>> +#include <linux/gcd.h>
+>>>>
+>>>>    #include <net/addrconf.h>
+>>>>    #include <net/inet_connection_sock.h>
+>>>> @@ -1046,12 +1047,12 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
+>>>>           struct net *net = sock_net(sk);
+>>>>           struct inet_bind2_bucket *tb2;
+>>>>           struct inet_bind_bucket *tb;
+>>>> +       int step, scan_step, l3mdev;
+>>>> +       u32 index, max_rand_step;
+>>>>           bool tb_created = false;
+>>>>           u32 remaining, offset;
+>>>>           int ret, i, low, high;
+>>>>           bool local_ports;
+>>>> -       int step, l3mdev;
+>>>> -       u32 index;
+>>>>
+>>>>           if (port) {
+>>>>                   local_bh_disable();
+>>>> @@ -1065,6 +1066,8 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
+>>>>
+>>>>           local_ports = inet_sk_get_local_port_range(sk, &low, &high);
+>>>>           step = local_ports ? 1 : 2;
+>>>> +       scan_step = step;
+>>>> +       max_rand_step = READ_ONCE(net->ipv4.sysctl_ip_local_port_step_width);
+>>>>
+>>>>           high++; /* [32768, 60999] -> [32768, 61000[ */
+>>>>           remaining = high - low;
+>>>> @@ -1083,9 +1086,22 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
+>>>>            */
+>>>>           if (!local_ports)
+>>>>                   offset &= ~1U;
+>>>> +
+>>>> +       if (max_rand_step && remaining > 1) {
+>>>> +               u32 range = (step == 1) ? remaining : (remaining / 2);
+>>>> +               u32 upper_bound = min(range, max_rand_step);
+>>>> +
+>>>> +               scan_step = get_random_u32_inclusive(1, upper_bound);
+>>>> +               while (gcd(scan_step, range) != 1) {
+>>>> +                       scan_step++;
+>>>
+>>> If both scan_step and range are even, an extra
+>>> increment here saves 1/2 calls of gcd().
+>>>
+>>
+>> Ah right, thanks!
+>>
+>>>
+>>>> +                       if (unlikely(scan_step > upper_bound))
+>>>> +                               scan_step = 1;
+>>>> +               }
+>>>> +               scan_step *= step;
+>>>> +       }
+>>>>    other_parity_scan:
+>>>
+>>> Doing "other_parity_scan" will be just redundant
+>>> unless scan_step is 2 ?
+>>>
+>>
+>> I have tried to preserve the parity behavior. Maybe I missed something,
+>> let me explain why it isn't redundant in my opinion.
+>>
+>> In essence, when calculating the range we first look at "step". If step
+>> == 1 we use all the remaining ports as range, otherwise we use remaining/2.
+>>
+>> If step == 1 we do not care about parity so let's look at step == 2.
+>>
+>> If step == 2, we calculate a step_scan that is coprime with remaining/2.
+>> Once we have it, we multiply it by 2 so we make sure scan_step is even.
 > 
-> It feels like the issue is not directly caused by the VSOCK listening
-> socket, but the stalls always happen after having started the socat
-> command [1] in the background.
+> Ah, I missed scan_step *= step.  Then looks good.
+> Maybe we can set range = remaining / step similarly.
 
-It fails randomly while building random packages (go, libreoffice, 
-bayle, ...). I don't think it is VSOCK related in those cases, but who 
-knows what the builds do...
-
-I cannot reproduce locally either.
-
-I came across:
-   614da1d3d4cd x86: make page fault handling disable interrupts properly
-but I have no idea if it could have impact on this at all.
-
-thanks,
--- 
-js
-suse labs
+Yes, let's do that. Thanks!
 
 
