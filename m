@@ -1,91 +1,93 @@
-Return-Path: <netdev+bounces-261530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261531-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0E0MA5OWoGnhkwQAu9opvQ
-	(envelope-from <netdev+bounces-261530-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:53:07 +0100
+	id 8E0lASGSoGllkwQAu9opvQ
+	(envelope-from <netdev+bounces-261531-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:34:09 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06B631AE066
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:53:05 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 969571ADB9F
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:34:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E2196301BD79
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 18:23:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 88A58301062E
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 18:23:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9572364953;
-	Thu, 26 Feb 2026 18:22:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6072438A2BE;
+	Thu, 26 Feb 2026 18:22:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="J+Z3xs61"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="MIVm4WO8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f232.google.com (mail-qk1-f232.google.com [209.85.222.232])
+Received: from mail-ua1-f98.google.com (mail-ua1-f98.google.com [209.85.222.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15BF7376479
-	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 18:22:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C60593ED11F
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 18:22:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772130140; cv=none; b=hGN8MCBJo8oqzzaxfR5Dqlv7vvkj15lAXJmI7nVulUFbPL+SFwLlZmzIeI5eGJRVNeYKkPyTmM8I0fNWE7AecPO1f5Lb/F2tz1IrRvoMrAv513H6Ls97OYy649mW3LznQP1f6U+XjLzWp4cOS6ZfxOrzN1y44YKrVZOtRB8dqgM=
+	t=1772130143; cv=none; b=fMOrJdUL8dpYCwkTuxOVKEW5FX3R3rMON+zlw+PjvtZpN7fAc+Xh62DMdW8LQBYCmhgB9NfmoXwc8LSnwqp/xuztdqW3SrExKRGb0B1J9hEpfl+Hn4y8jJY27dTT5GaFlW9FPUhHsqOqGoobe4SSriooeG/p6+fW558rXJ1Fgdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772130140; c=relaxed/simple;
-	bh=sZ42wyatsVJo7JJtX1FirxBJniKFyuzHSURwlztrR20=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CmPdJU2Bc8Yf5j3JpCo1eOilsUh3bd6pQQ3MYQCYIDQsMzOglz7sgA969Ywcyr/raijq3LDCsUofPwMKSGl9u4QKE3h8z2hBIVokjj99hQ1Wo5dHXlhzCkcpXqTg+qf/XA7sbIX/uC1Na3SQqehMNaivRzFpP2fCPhxxb/d5azY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=J+Z3xs61; arc=none smtp.client-ip=209.85.222.232
+	s=arc-20240116; t=1772130143; c=relaxed/simple;
+	bh=cV88O1HPdBJ1+6w3Gg07zJFGsOyrPaGcpk/m8VQovXk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=b489/zdvXCMxznOSq6jKdq0Zhm/cQcfe1gqNa/YhgRllR26Dvn3Lr4VKW9MWzRzT/Iae3Ieo7/y6KSzQtv4IzGpNKvwA3mPQ7OuHlR2/U28UTqVVUBIOa0rok792OJX0XbMS0bq+/9li+yFESBUQHxIiKN2cc2wkepzdOI/SQx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=MIVm4WO8; arc=none smtp.client-ip=209.85.222.98
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qk1-f232.google.com with SMTP id af79cd13be357-8cb3b3e643dso70648985a.2
-        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 10:22:16 -0800 (PST)
+Received: by mail-ua1-f98.google.com with SMTP id a1e0cc1a2514c-94dcf70af41so310853241.1
+        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 10:22:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772130136; x=1772734936;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rNoJHTgrkqEC+jke5kbp/HlblBsCRQSSyvD6QvO9e9c=;
-        b=rLFpmzRIf2PnvFtfKH8CzyXTNCHoG0m7QpvPzDJjs/Bn9F1BflDGZqSrpLBAEWjSqT
-         BKPffFtAYrSGpHiKCCpCnC7L5Z6orR/4M4OoPVLHD3986Fy12lY4b3W732GLlqRQsQjX
-         qndBJqyICRo2tLN/XnBQfiK3ss1tfjhDPQw5fQ9KTfiuLOG+mfvCe5dpCcma8qSWJs3f
-         ft+vTuf0rLHP3ES3rjaGo1CQdipkDp6nWOHdVcF0Z97C3sIQYUMps5iQR+bJB+s9FmNg
-         JH1P5KWZtyInyVvczxh83MVHkZA/QPfyrZil0DeXVPLaeha6y4fwIsQw/dRupkNmiYfP
-         lbjg==
-X-Gm-Message-State: AOJu0Yz6iwt2yTkZVHLgZZelpj9as1TSRQ/MS/zYht1jsHOv0WrW5uLk
-	iAacWyeBtto4xPOHwDFecnkv8QUkXHFx6flRJ6kdFhzj0x+y9BvKjbTMIeg82A6orJHfzYl/L2n
-	/k+GHlscMNhGF4s5FM0TFaIi+dLdnvablWlCjKg9RTWM/R8RJ25JnEoPkL+5Xh0/ji+LnP+9vdd
-	nEHwJ0XLh6TLMGTqXssPiqNwvD4v/VmCIFGgg++/Ms2yfq95W/kQjh1V5uUwu7KWg0yL82vRBW5
-	7fzGY11JXrfVi11QOjr
-X-Gm-Gg: ATEYQzz9TnbHJEzjQr7ohCyA1Xb1SmFzm111mnro4Qne1PL/EsL9mXyCvG/uThMfu3d
-	SOYXLkw9Xyd+OlGmmzyjs0AyiwaaeO2TM8Sk/J5qMTuBmHzV6lSM64T29O2CjF5s403etpfjcVs
-	8SYDj8QiW/s16K8S63Wm49E4vHqDa2oBOsdj9Saj2LM0dY9oAOX81jrl92DtoTXq3HHsh08UZxP
-	zTKtlVRFtLHA+X4lpmVI5dEjrEYIxqiuZSPGDOXfiJwnd/BM1bomBBRlR8+oZLa5WVp65MpGyAU
-	jpr+fxkNggpYA7Neay1Rky71gvvwsHI9Ow3hiNkt8YG9QMmyiYYHGg3sPX6QjnspCh7xyNOHtt5
-	lca7V6TbQVSvyDM5mCD1EJ9Jd8Zj3nvg6HjATMKJGkHeBMxUpP/tJ+MQ5bcw7ju4uHbFILiDQkJ
-	RbIN5KZOmkW9NTuhQ2tDqqpneaW3qFBgOA/BFDsGvL2b9AvtSylz47Kf0pszvun+z6zQ==
-X-Received: by 2002:a05:622a:347:b0:506:a43d:777e with SMTP id d75a77b69052e-50745eb8911mr41697561cf.12.1772130135613;
-        Thu, 26 Feb 2026 10:22:15 -0800 (PST)
+        d=1e100.net; s=20230601; t=1772130141; x=1772734941;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rhhnux0nQTx2lyWd1Iv9Pc2Z2Kf52feY5K+/r+Rvr8I=;
+        b=nEV3ymobQSM2Vj4o4uK88C5GFSVNSD5U9db+7s7P+sqkfT3fBvEs+dIgGhbKZRVIWW
+         Qa329Vzw1zdTMKUhOZy/NHc7uO0CT0ha6Kidymsh4YIZMTcHElboTPAYLkE6/EPXzpGv
+         gfJW1ebOpZ+tJh7SjqJ7HWsPmhQ+XsklRxSY66dzNbDnY7S6CgXNFefZTYxREJWkgVeY
+         DnyDuOPbbRap+QxAWk1YWwIWTG9QDKhrXv8R5ZKMFknzw6Ia4mT6uLMahd5hJdp736vS
+         ilEyzsLSrmEUEoLFf0j9GVKJ1C4XCnowNgRcS0DO1Yg7ra6V+StdZk4DnaZ+Mm27z4Y+
+         WVNA==
+X-Gm-Message-State: AOJu0YwvT1ss7Kz3LIIG/T6aYLJk7DEtUyIvAfM3jcKoTTyuQqnp1jCB
+	uKXYEmR2RYDCFFODtyBzogqMHDenHDM+mAd6KSPMB5eJHXw3NOdvi/1oXtRy8ywv4riteHKDgcU
+	0jgGG1fLfjAZWvYC7m/0j0IlrK9qsSK6TqgjgzD0fSeI/FigtHEhF16HTV4AjKMyyMWCBwVUy0m
+	PrXtFl8H8QibVvjATpUVO4+9wvdecc9M45fDP62OXT46kwsA1coXJDCkP/TyY/++OG80rhkfZGz
+	2midmQhNCC8e3cVng==
+X-Gm-Gg: ATEYQzy3UL4ZcJSKaF4NbK9QY9vA1hePvsh1pPUyR1PwIb380thRXFh5WydTh4z4KMZ
+	2OoYMFW6qT6f8nhJxXK2uexKchyMpUUmj8irX8RsI0NcOBjEzwzbfaHFfH9n1xm6masp4bNcJl5
+	HOe2bIU9+CVGX7cgTSTYSEjiyivZ88j6nQj+B9V+X5i8iL+XEHRac2r8EWOO7sRLMLLv1635Nve
+	atvaAobmbbclzb45tLRN2ywWykw7GKQpHbRO8iqj0aAIsDApVZKqprJhPI/c+XpNEmOo7etyMsD
+	3zxAN89sjmPH+7jnI0MSGOxODs7oO3SKa/5vmbHU8WJvoBLsUuBRKOPA4+dmkG//eAJEMcyDgtJ
+	lvbvmc5j3Y9OfBDiyLDYAymCcW+NGx9//W7wAFl5ZYCGaXMwJmhLvp1dOlsuB3aHWUFtYkdYJiI
+	FqonVqgvpRCn+El0IwMbXtzdvgDUoOD6zFQ21Nui2DW5VnAvIDZ5fiP7P1R4BKI/EVfA==
+X-Received: by 2002:a05:6102:2909:b0:5fd:eff4:825 with SMTP id ada2fe7eead31-5ff324d922amr113726137.26.1772130140487;
+        Thu, 26 Feb 2026 10:22:20 -0800 (PST)
 Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-118.dlp.protect.broadcom.com. [144.49.247.118])
-        by smtp-relay.gmail.com with ESMTPS id d75a77b69052e-50744ac6246sm3151721cf.9.2026.02.26.10.22.15
+        by smtp-relay.gmail.com with ESMTPS id ada2fe7eead31-5ff1e99a28dsm270294137.3.2026.02.26.10.22.20
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 26 Feb 2026 10:22:15 -0800 (PST)
+        Thu, 26 Feb 2026 10:22:20 -0800 (PST)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2adba04421eso59433125ad.3
-        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 10:22:15 -0800 (PST)
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-35658758045so758420a91.3
+        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 10:22:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1772130134; x=1772734934; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rNoJHTgrkqEC+jke5kbp/HlblBsCRQSSyvD6QvO9e9c=;
-        b=J+Z3xs61AaJM76GGqrs9O1J6yBrGx28KqCbPWM6Q/bdIFOtnpyKV74CMw6EVllC1Xl
-         hzzT+hBTmX0lhc0g4534E8ncEjJMnXtXezfgidvVh3FACZAjtTXNH5uFzZHm03Wk+ki+
-         uur2+S/vq4JXzv44hY5IZaSmgRvd4D0YLhg70=
-X-Received: by 2002:a17:903:1965:b0:2a9:6281:6a48 with SMTP id d9443c01a7336-2ae034aa27emr32882595ad.44.1772130134409;
-        Thu, 26 Feb 2026 10:22:14 -0800 (PST)
-X-Received: by 2002:a17:903:1965:b0:2a9:6281:6a48 with SMTP id d9443c01a7336-2ae034aa27emr32882335ad.44.1772130133951;
-        Thu, 26 Feb 2026 10:22:13 -0800 (PST)
+        d=broadcom.com; s=google; t=1772130139; x=1772734939; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rhhnux0nQTx2lyWd1Iv9Pc2Z2Kf52feY5K+/r+Rvr8I=;
+        b=MIVm4WO85HSV7rMu/0+QBxSNT2hHTXSkmVWWFtkZPP0VXBEGezOtkhnGoV3F50vaIV
+         DyMDtkeugY7EXpxIMagdrWQfpRghiYT0icLEDNsQeo0RmW8V19bIQTjekrPCH+Ol7agu
+         E2AVDdYzKW7oMdtvxiJlr4NC7khIJxMQiItok=
+X-Received: by 2002:a17:90b:1b45:b0:352:f2a6:334 with SMTP id 98e67ed59e1d1-35965c9c9a0mr113138a91.16.1772130139221;
+        Thu, 26 Feb 2026 10:22:19 -0800 (PST)
+X-Received: by 2002:a17:90b:1b45:b0:352:f2a6:334 with SMTP id 98e67ed59e1d1-35965c9c9a0mr113102a91.16.1772130138632;
+        Thu, 26 Feb 2026 10:22:18 -0800 (PST)
 Received: from localhost.localdomain ([192.19.203.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2adfb69ef1csm35941565ad.53.2026.02.26.10.22.09
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2adfb69ef1csm35941565ad.53.2026.02.26.10.22.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Feb 2026 10:22:13 -0800 (PST)
+        Thu, 26 Feb 2026 10:22:18 -0800 (PST)
 From: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -99,11 +101,14 @@ Cc: netdev@vger.kernel.org,
 	pavan.chebbi@broadcom.com,
 	vsrama-krishna.nemani@broadcom.com,
 	vikas.gupta@broadcom.com,
-	Bhargava Marreddy <bhargava.marreddy@broadcom.com>
-Subject: [PATCH net-next v2 0/8] bng_en: add link management and statistics support
-Date: Thu, 26 Feb 2026 23:51:25 +0530
-Message-ID: <20260226182133.1566714-1-bhargava.marreddy@broadcom.com>
+	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
+	Ajit Kumar Khaparde <ajit.khaparde@broadcom.com>
+Subject: [PATCH net-next v2 1/8] bng_en: add per-PF workqueue, timer, and slow-path task
+Date: Thu, 26 Feb 2026 23:51:26 +0530
+Message-ID: <20260226182133.1566714-2-bhargava.marreddy@broadcom.com>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260226182133.1566714-1-bhargava.marreddy@broadcom.com>
+References: <20260226182133.1566714-1-bhargava.marreddy@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -119,101 +124,228 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261530-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-261531-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[broadcom.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[bhargava.marreddy@broadcom.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[broadcom.com:mid,broadcom.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,broadcom.com:mid,broadcom.com:dkim,broadcom.com:email];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.995];
+	NEURAL_HAM(-0.00)[-0.996];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 06B631AE066
+X-Rspamd-Queue-Id: 969571ADB9F
 X-Rspamd-Action: no action
 
-Hi,
+Add a dedicated single-thread workqueue and a timer for each PF
+to drive deferred slow-path work such as link event handling and
+stats collection. The timer is stopped via timer_delete_sync()
+when interrupts are disabled and restarted on open. The open and
+close paths now start and drain these resources.
 
-This series enhances the bng_en driver by adding:
-1. Link/PHY support
-   a. Link query
-   b. Async Link events
-   c. Ethtool link set/get functionality
-2. Hardware statistics reporting via ethtool -S
+Signed-off-by: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
+Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
+Reviewed-by: Ajit Kumar Khaparde <ajit.khaparde@broadcom.com>
+---
+ .../net/ethernet/broadcom/bnge/bnge_netdev.c  | 87 ++++++++++++++++++-
+ .../net/ethernet/broadcom/bnge/bnge_netdev.h  | 13 ++-
+ 2 files changed, 98 insertions(+), 2 deletions(-)
 
-This version incorporates feedback received prior to splitting the
-original series into two parts. 
-
- Addressed following comments from Andrew Lunn
-   - Apply Rev-xmas fix in several places.
-   - Correct ethtool-speed comment to reflect accurate behavior.
-   https://lore.kernel.org/netdev/49930724-74b8-41fe-8f5c-482afc976b82@lunn.ch/
-   https://lore.kernel.org/netdev/CANXQDtb5XuLKOOorCMYDUpVz6aFuQgvmQZ4pS6RJGkAgeM8n1A@mail.gmail.com/
-
- Addressed following comments from Jakub Kicinski
-   - Took care of missing mutex_init()
-   https://lore.kernel.org/netdev/20251127190855.69779791@kernel.org/#t
-   https://lore.kernel.org/netdev/CANXQDtYy2JziaaVi=Cqt+gAJNt4NjFFs8NbhrS=RBV61ORwinA@mail.gmail.com/
-
- Addressed following comments from ALOK TIWARI
-   - Add newline for clarity/formatting.
-   https://lore.kernel.org/netdev/CANXQDtZbLhdwEtN+kKg1OVLV+uy-gsNfX+rU4MR77QPuO6_y9A@mail.gmail.com/
-
-v2:
- Addressed comments from Andrew Lunn:
-  - Add implementation for .get_pauseparam and .set_pauseparam to support
-    a full flow control configuration, covering global autoneg, independent
-    pause autoneg, and forced RX/TX pause functionality.
-  - Move MAC, PHY, Control, Pause, and RMON statistics from
-    .get_ethtool_stats to their respective structured ethtool
-    callbacks (e.g., .get_eth_mac_stats, .get_rmon_stats).
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
+index b8e258842c6..a9dffebb8dc 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
+@@ -101,6 +101,45 @@ static int bnge_alloc_ring_stats(struct bnge_net *bn)
+ 	return rc;
+ }
  
- Addressed comments from Jakub Kicinski:
-  - Fix potential out-of-bounds read in speed mask array by adding 
-    the missing sentinel.
-  - Simplify timer synchronization by removing the redundant intr_sem.
-  - Replace link_lock with the netdev instance lock, as it is sufficient
-    to handle the required synchronization.
-
-v1: https://lore.kernel.org/all/20260223163641.755200-1-bhargava.marreddy@broadcom.com/
-
-Bhargava Marreddy (8):
-  bng_en: add per-PF workqueue, timer, and slow-path task
-  bng_en: query PHY capabilities and report link status
-  bng_en: add ethtool link settings, get_link, and nway_reset
-  bng_en: implement ethtool pauseparam operations
-  bng_en: add support for link async events
-  bng_en: add initial support for ethtool stats display
-  bng_en: periodically fetch and accumulate hardware statistics
-  bng_en: implement ndo_get_stats64
-
- drivers/net/ethernet/broadcom/bnge/Makefile   |    3 +-
- drivers/net/ethernet/broadcom/bnge/bnge.h     |   12 +
- .../net/ethernet/broadcom/bnge/bnge_core.c    |    1 +
- .../net/ethernet/broadcom/bnge/bnge_ethtool.c |  811 ++++++++++
- .../ethernet/broadcom/bnge/bnge_hwrm_lib.c    |  382 ++++-
- .../ethernet/broadcom/bnge/bnge_hwrm_lib.h    |    8 +
- .../net/ethernet/broadcom/bnge/bnge_link.c    | 1305 +++++++++++++++++
- .../net/ethernet/broadcom/bnge/bnge_link.h    |  204 +++
- .../net/ethernet/broadcom/bnge/bnge_netdev.c  |  582 +++++++-
- .../net/ethernet/broadcom/bnge/bnge_netdev.h  |  121 +-
- .../net/ethernet/broadcom/bnge/bnge_txrx.c    |   35 +-
- 11 files changed, 3445 insertions(+), 19 deletions(-)
- create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_link.c
- create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_link.h
-
++static void bnge_timer(struct timer_list *t)
++{
++	struct bnge_net *bn = timer_container_of(bn, t, timer);
++	struct bnge_dev *bd = bn->bd;
++
++	if (!netif_running(bn->netdev) ||
++	    !test_bit(BNGE_STATE_OPEN, &bd->state))
++		return;
++
++	/* Periodic work added by later patches */
++
++	mod_timer(&bn->timer, jiffies + bn->current_interval);
++}
++
++static void bnge_sp_task(struct work_struct *work)
++{
++	struct bnge_net *bn = container_of(work, struct bnge_net, sp_task);
++	struct bnge_dev *bd = bn->bd;
++
++	set_bit(BNGE_STATE_IN_SP_TASK, &bn->state);
++	/* Ensure sp_task state is visible before checking BNGE_STATE_OPEN */
++	smp_mb__after_atomic();
++	if (!test_bit(BNGE_STATE_OPEN, &bd->state)) {
++		clear_bit(BNGE_STATE_IN_SP_TASK, &bn->state);
++		return;
++	}
++
++	/* Event handling work added by later patches */
++
++	/* Ensure all sp_task work is done before clearing the state */
++	smp_mb__before_atomic();
++	clear_bit(BNGE_STATE_IN_SP_TASK, &bn->state);
++}
++
++static bool bnge_drv_busy(struct bnge_net *bn)
++{
++	return test_bit(BNGE_STATE_IN_SP_TASK, &bn->state);
++}
++
+ static void bnge_free_nq_desc_arr(struct bnge_nq_ring_info *nqr)
+ {
+ 	struct bnge_ring_struct *ring = &nqr->ring_struct;
+@@ -2517,6 +2556,9 @@ static int bnge_open_core(struct bnge_net *bn)
+ 	bnge_enable_int(bn);
+ 
+ 	bnge_tx_enable(bn);
++
++	mod_timer(&bn->timer, jiffies + bn->current_interval);
++
+ 	return 0;
+ 
+ err_free_irq:
+@@ -2552,6 +2594,12 @@ static void bnge_close_core(struct bnge_net *bn)
+ 	bnge_tx_disable(bn);
+ 
+ 	clear_bit(BNGE_STATE_OPEN, &bd->state);
++	/* Ensure BNGE_STATE_OPEN is cleared before checking drv_busy */
++	smp_mb__after_atomic();
++	while (bnge_drv_busy(bn))
++		msleep(20);
++
++	timer_delete_sync(&bn->timer);
+ 	bnge_shutdown_nic(bn);
+ 	bnge_disable_napi(bn);
+ 	bnge_free_all_rings_bufs(bn);
+@@ -2700,6 +2748,23 @@ static void bnge_init_ring_params(struct bnge_net *bn)
+ 	bn->netdev->cfg->hds_thresh = max(BNGE_DEFAULT_RX_COPYBREAK, rx_size);
+ }
+ 
++static struct workqueue_struct *
++bnge_create_workqueue_thread(struct bnge_dev *bd, const char *thread_name)
++{
++	struct workqueue_struct *wq;
++	char *wq_name;
++
++	wq_name = kasprintf(GFP_KERNEL, "%s-%s", thread_name,
++			    dev_name(bd->dev));
++	if (!wq_name)
++		return NULL;
++
++	wq = create_singlethread_workqueue(wq_name);
++	kfree(wq_name);
++
++	return wq;
++}
++
+ int bnge_netdev_alloc(struct bnge_dev *bd, int max_irqs)
+ {
+ 	struct net_device *netdev;
+@@ -2784,6 +2849,17 @@ int bnge_netdev_alloc(struct bnge_dev *bd, int max_irqs)
+ 	if (bd->tso_max_segs)
+ 		netif_set_tso_max_segs(netdev, bd->tso_max_segs);
+ 
++	INIT_WORK(&bn->sp_task, bnge_sp_task);
++	timer_setup(&bn->timer, bnge_timer, 0);
++	bn->current_interval = BNGE_TIMER_INTERVAL;
++
++	bn->bnge_pf_wq = bnge_create_workqueue_thread(bd, "bnge_pf_wq");
++	if (!bn->bnge_pf_wq) {
++		netdev_err(netdev, "Unable to create workqueue.\n");
++		rc = -ENOMEM;
++		goto err_netdev;
++	}
++
+ 	bn->rx_ring_size = BNGE_DEFAULT_RX_RING_SIZE;
+ 	bn->tx_ring_size = BNGE_DEFAULT_TX_RING_SIZE;
+ 	bn->rx_dir = DMA_FROM_DEVICE;
+@@ -2799,11 +2875,13 @@ int bnge_netdev_alloc(struct bnge_dev *bd, int max_irqs)
+ 	rc = register_netdev(netdev);
+ 	if (rc) {
+ 		dev_err(bd->dev, "Register netdev failed rc: %d\n", rc);
+-		goto err_netdev;
++		goto err_free_workq;
+ 	}
+ 
+ 	return 0;
+ 
++err_free_workq:
++	destroy_workqueue(bn->bnge_pf_wq);
+ err_netdev:
+ 	free_netdev(netdev);
+ 	return rc;
+@@ -2812,8 +2890,15 @@ int bnge_netdev_alloc(struct bnge_dev *bd, int max_irqs)
+ void bnge_netdev_free(struct bnge_dev *bd)
+ {
+ 	struct net_device *netdev = bd->netdev;
++	struct bnge_net *bn;
++
++	bn = netdev_priv(netdev);
+ 
+ 	unregister_netdev(netdev);
++
++	cancel_work_sync(&bn->sp_task);
++	destroy_workqueue(bn->bnge_pf_wq);
++
+ 	free_netdev(netdev);
+ 	bd->netdev = NULL;
+ }
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
+index 70f1a7c2481..b00d2e3922d 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
+@@ -224,6 +224,13 @@ struct bnge_tpa_info {
+ #define BNGE_NQ_HDL_TYPE(hdl)	(((hdl) & BNGE_NQ_HDL_TYPE_MASK) >>	\
+ 				 BNGE_NQ_HDL_TYPE_SHIFT)
+ 
++enum bnge_net_state {
++	BNGE_STATE_NAPI_DISABLED,
++	BNGE_STATE_IN_SP_TASK,
++};
++
++#define BNGE_TIMER_INTERVAL	HZ
++
+ struct bnge_net {
+ 	struct bnge_dev		*bd;
+ 	struct net_device	*netdev;
+@@ -281,13 +288,17 @@ struct bnge_net {
+ 	u32			stats_coal_ticks;
+ 
+ 	unsigned long		state;
+-#define BNGE_STATE_NAPI_DISABLED	0
+ 
+ 	u32			msg_enable;
+ 	u16			max_tpa;
+ 	__be16			vxlan_port;
+ 	__be16			nge_port;
+ 	__be16			vxlan_gpe_port;
++
++	unsigned int		current_interval;
++	struct timer_list	timer;
++	struct workqueue_struct *bnge_pf_wq;
++	struct work_struct	sp_task;
+ };
+ 
+ #define BNGE_DEFAULT_RX_RING_SIZE	511
 -- 
 2.47.3
 
