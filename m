@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-261127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261128-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WOipLh6yn2kpdQQAu9opvQ
-	(envelope-from <netdev+bounces-261127-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 03:38:22 +0100
+	id UD5wM9Sxn2kpdQQAu9opvQ
+	(envelope-from <netdev+bounces-261128-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 03:37:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EBD31A027A
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 03:38:22 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FDE11A0240
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 03:37:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C70D03039ECB
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 02:36:48 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B4FE1300CA3F
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 02:36:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A57FE378825;
-	Thu, 26 Feb 2026 02:36:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F2123783CB;
+	Thu, 26 Feb 2026 02:36:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zDFiL3Zi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CLXNsinJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C4EB3783CB
-	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 02:36:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A6B537757E
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 02:36:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772073408; cv=none; b=I2O47V6anroQQcJnN2bn05wuUxUWikFrgXm62JOmOz6CN48yVIYtYU06z6JxnumJ3UPrZ9z1LbWYM71OMRDAT0+5Zh5Cuz8dsOkC5IBVHT+xkEyYWQQkjvtRRwaMTb7T/STtg+Ks/ZN24zBMEUSapNolkVwJ+LBllF4sFtwTQa0=
+	t=1772073410; cv=none; b=fjg6mftXTqo4tBpYxz1WgluLORbsmfj8LeV7vPxFFeRbxa8hVhccbP3qdFidYWKiPpeqgCmTiRQaI+WffLoS358Z4tCk6xnHZNFpO5x9BVV/02m0FDcpcSxKvVnN6qA/1/IsbwaOS4orcqNbGrWanYUzxz8C06EoXCOlW8l8z4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772073408; c=relaxed/simple;
-	bh=TxElnz8etyRrDjzxoYnLqPFI/gxChg0wDj+b+eqHF6w=;
+	s=arc-20240116; t=1772073410; c=relaxed/simple;
+	bh=UhPLy2NdZEVNTnwgphV1eOTjlcuC1B2FZlMSrWbJCMg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pPv33KmbUyIUNKSyS8XhWEn/uyfkdtiOjMagsmko0qXdGAqqw9Cup1pjjrgm5jQUH94kLh13R/9b9d/0bIRJntjJRoiGOlZ+71Oqrxbc7IphZqbeN2bPaGWEt8POgdVeVK23C0ukEpuUfKip6Jvj1Xbtsz+JtYzHOkmfPJQvpZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zDFiL3Zi; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=vFQY3H9LaYCP5ZRTxthaM2d6lmHIReKQ7TeLJ4f1PNPum+hPRLf6DldJIz4NEdqTDjDTkl1J5FxfRUCcGyBcxrt0D421jyOSSeoQ6e87QG/U/OC+lHIXKLuZGz0LbfBhDMMw6bnMV/Ru/rOPUiaHjb8UDiLTWfTlAxiGkUyahbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CLXNsinJ; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c6e1dab2328so1334544a12.0
-        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 18:36:47 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2aae146bab0so4338165ad.0
+        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 18:36:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772073407; x=1772678207; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772073408; x=1772678208; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mM0QVhyFIOOIwqpYioW7bXwyl8Sva+0Ve/5FcAcHPsQ=;
-        b=zDFiL3Zi/Je1n98dZA1VFBgzGBaGmFiKQ0pJW9aI35UbILpWgIB4O4F7pBOuYmntLD
-         gVn+sx+ZVPqkAqQR7r1Y/K7zHbd0JZwoLcQJcgTwd1ISG3Rd4dOZM+iPiB59fg/gtFCM
-         R7U/LGTbck6kcWLvkXmHjnp5s515IsliRob5xLM8wFAhz8FVwZQd178NOLeivB+0ud2E
-         /iKERzCsXby1D3dHAMzgKaMRaGetUlew+grchU+26YiZyqi4iTvsw6+nsIz5gc1X59Eg
-         ANjA2uMauIDU5nCnd+V4uTC6nnChMIQpL29n2DzMX0jG9kGptb5IPDpFIjjaWnfSO8xr
-         5Tqw==
+        bh=b80yeffNDkKe/EV21ALS5NroshAoSRH0GlnLHngz3vg=;
+        b=CLXNsinJ0AfbUQtCXL7AhWAfSxm/qPcszxGv+AIeDIfONUPqj+MOWcxAbvV1hdfpAd
+         GH057HiHMELXgpdrlx1a9ICFPeEkR4YACFUGr8FH+vQdeoICL6eA/S8Vaep7lol1P0h5
+         HOmC1Qy3/F5a1Jj2NavIjLBz0iyXCOb7x2c3vJqQMmH2zT1YL607+xAlU0B+g67VfpQx
+         1eYlbDCrP2IMp0UrnsVKmiP8e7Z6Qd3PYkiZTuc7p/gfpvyhA0lijpyBbuKMMuvbOWbZ
+         tNlVWSDIhkB6bFyKpp5cB0OTJ7fYMgcqJaliamEx7oqX4L5Vp65FDQ4HwWlnlCsJxcHo
+         IBQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772073407; x=1772678207;
+        d=1e100.net; s=20230601; t=1772073408; x=1772678208;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mM0QVhyFIOOIwqpYioW7bXwyl8Sva+0Ve/5FcAcHPsQ=;
-        b=HF2UlKw6gveJyBwh/BtCpAp4CvD0FEyuw7TnuqRKg0yBBrd+xCpcWyCw1Wg/+Uq5Uh
-         f9WjisKrlNLS2m/oMcMjLYbobK+hw5W8AYPCjqFe+Fv6VMa31dUKdQRDCa9LYCZA/9Fp
-         kKSm2qzIbheBHbYBXDXmCMaYUBDIYO5Gss/xmuByI4WVaAsQUrxFZAbBvwPbVJpd+IsY
-         ukc4EzVoUYB4Y1J8GaIupEFiqdomvq/byLSTaIW+8mD3iN6K4achb0mb4ivwK61lXqkH
-         oCiL6p78y2+S5g/swCvAOKHTby93HUIB+Cc+i2fiCOzcEMuAxsClZyRs2ZqDEGxJJ0zB
-         yATg==
-X-Forwarded-Encrypted: i=1; AJvYcCU9iE4quSSoqbp4aBiOEbIY8WP6Svc5j7jEzvmooK8D+N4uhg0ouIOkm/yujsKJOJMFNa6216w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKh3hUNr8tUHtERfNKlciGuPXB2HeeJpSUOB+E79Pv8yXmQERc
-	YbtwPpDbipkJ1ktEF3zog8z1qG1leOVkB14gpLS2wUjCXmorn7jrFmyXlaAR0BbAep9gWpRYKE0
-	bsU+n2w==
-X-Received: from pgbgc9.prod.google.com ([2002:a05:6a02:4b89:b0:c70:e8d8:1404])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:9186:b0:38b:ec0d:51ed
- with SMTP id adf61e73a8af0-395b49a390emr817093637.69.1772073406655; Wed, 25
- Feb 2026 18:36:46 -0800 (PST)
-Date: Thu, 26 Feb 2026 02:35:16 +0000
+        bh=b80yeffNDkKe/EV21ALS5NroshAoSRH0GlnLHngz3vg=;
+        b=BtB69iW7rXQrhPceezt1SFEjvx3Z/V81zPTK/njtsr8C8NGYFcM6Sb/q7D/FkvP7l6
+         DSR9MsGGA+LZ+5DlrB6zzM7mrZXShEI2PPpStVyhSQDgiduR0OOY3clZq1XcibzpLdbg
+         fdnWnuaReBcAhtsqiCLZb36cbMR4X8L1Xva8cDj+s8PVP632VtAFLXTnBOTWv6I/sK84
+         a+O397ZkO5Ynf7VbtlUya9kT859AYumB87RKmSoqXWY7T0rw6sZHc34nYFkSN85+lOxz
+         9u9MQ4n5MUz6X6+BQUYHQLl3bRQE/RRdPHUpjnN/AjXjPwYNGjivbvWTZLebINFla0lG
+         vU1w==
+X-Forwarded-Encrypted: i=1; AJvYcCVPXrsQj3mo7P1Ki5gIavzfqJOZsuE7M54xa8E0NomEk20v4pL7Nv02uS7vPZ+IkYds5m9j5RU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFj6wBpV7pDIk8SJvK5PXlBb5XVxioy75S63qxUU/pI2BezqFq
+	cJXaz2ricaN9JahxRc++ayLq1wFSIUr0JEldGZZXdD0kUCfT0G+EGZZgidi6q614KgpKHe6xq87
+	7fuq4Qg==
+X-Received: from plgz12.prod.google.com ([2002:a17:903:18c:b0:2ad:bd51:34cb])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d504:b0:2ad:ad0f:bbbe
+ with SMTP id d9443c01a7336-2adad0fbdf7mr84867865ad.29.1772073408273; Wed, 25
+ Feb 2026 18:36:48 -0800 (PST)
+Date: Thu, 26 Feb 2026 02:35:17 +0000
 In-Reply-To: <20260226023637.1335854-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260226023637.1335854-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.53.0.414.gf7e9f6c205-goog
-Message-ID: <20260226023637.1335854-5-kuniyu@google.com>
-Subject: [PATCH v1 net-next 04/15] ipmr: Use MAXVIFS in mroute_msgsize().
+Message-ID: <20260226023637.1335854-6-kuniyu@google.com>
+Subject: [PATCH v1 net-next 05/15] ipmr: Convert ipmr_rtm_getroute() to RCU.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
@@ -91,89 +91,152 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261127-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-261128-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4EBD31A027A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6FDE11A0240
 X-Rspamd-Action: no action
 
-mroute_msgsize() calculates skb size needed for ipmr_fill_mroute().
+ipmr_rtm_getroute() calls __ipmr_get_table(), ipmr_cache_find(),
+and ipmr_fill_mroute().
 
-The size differs based on mrt->maxvif.
+The table is not removed until netns dismantle, and net->ipv4.mr_tables
+is managed with RCU list API, so __ipmr_get_table() is safe under RCU.
 
-We will drop RTNL for ipmr_rtm_getroute() and mrt->maxvif may
-change under RCU.
+struct mfc_cache is freed by mr_cache_put() after RCU grace period,
+so we can use ipmr_cache_find() under RCU.  rcu_read_lock() around
+it was just to avoid lockdep splat for rhl_for_each_entry_rcu().
 
-To avoid -EMSGSIZE, let's calculate the size with the maximum
-value of mrt->maxvif, MAXVIFS.
+ipmr_fill_mroute() calls mr_fill_mroute(), which properly uses RCU.
 
-struct rtnexthop is 8 bytes and MAXVIFS is 32, so the maximum delta
-is 256 bytes, which is small enough.
+Let's drop RTNL for ipmr_rtm_getroute() and use RCU instead.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- net/ipv4/ipmr.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ net/ipv4/ipmr.c      | 34 ++++++++++++++++++----------------
+ net/ipv4/ipmr_base.c |  4 ++--
+ 2 files changed, 20 insertions(+), 18 deletions(-)
 
 diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
-index a4bc653e04ed..7b5177b673d3 100644
+index 7b5177b673d3..53dda438ba32 100644
 --- a/net/ipv4/ipmr.c
 +++ b/net/ipv4/ipmr.c
-@@ -2510,7 +2510,7 @@ static int _ipmr_fill_mroute(struct mr_table *mrt, struct sk_buff *skb,
- 				cmd, flags);
- }
- 
--static size_t mroute_msgsize(bool unresolved, int maxvif)
-+static size_t mroute_msgsize(bool unresolved)
+@@ -2680,9 +2680,9 @@ static int ipmr_rtm_getroute(struct sk_buff *in_skb, struct nlmsghdr *nlh,
  {
- 	size_t len =
- 		NLMSG_ALIGN(sizeof(struct rtmsg))
-@@ -2523,7 +2523,7 @@ static size_t mroute_msgsize(bool unresolved, int maxvif)
- 		len = len
- 		      + nla_total_size(4)	/* RTA_IIF */
- 		      + nla_total_size(0)	/* RTA_MULTIPATH */
--		      + maxvif * NLA_ALIGN(sizeof(struct rtnexthop))
-+		      + MAXVIFS * NLA_ALIGN(sizeof(struct rtnexthop))
- 						/* RTA_MFC_STATS */
- 		      + nla_total_size_64bit(sizeof(struct rta_mfc_stats))
- 		;
-@@ -2538,8 +2538,7 @@ static void mroute_netlink_event(struct mr_table *mrt, struct mfc_cache *mfc,
- 	struct sk_buff *skb;
- 	int err = -ENOBUFS;
+ 	struct net *net = sock_net(in_skb->sk);
+ 	struct nlattr *tb[RTA_MAX + 1];
+-	struct sk_buff *skb = NULL;
+ 	struct mfc_cache *cache;
+ 	struct mr_table *mrt;
++	struct sk_buff *skb;
+ 	__be32 src, grp;
+ 	u32 tableid;
+ 	int err;
+@@ -2695,39 +2695,40 @@ static int ipmr_rtm_getroute(struct sk_buff *in_skb, struct nlmsghdr *nlh,
+ 	grp = nla_get_in_addr_default(tb[RTA_DST], 0);
+ 	tableid = nla_get_u32_default(tb[RTA_TABLE], 0);
  
--	skb = nlmsg_new(mroute_msgsize(mfc->_c.mfc_parent >= MAXVIFS,
--				       mrt->maxvif),
-+	skb = nlmsg_new(mroute_msgsize(mfc->_c.mfc_parent >= MAXVIFS),
- 			GFP_ATOMIC);
- 	if (!skb)
- 		goto errout;
-@@ -2711,7 +2710,7 @@ static int ipmr_rtm_getroute(struct sk_buff *in_skb, struct nlmsghdr *nlh,
- 		goto errout_free;
++	skb = nlmsg_new(mroute_msgsize(false), GFP_KERNEL);
++	if (!skb) {
++		err = -ENOBUFS;
++		goto errout;
++	}
++
++	rcu_read_lock();
++
+ 	mrt = __ipmr_get_table(net, tableid ? tableid : RT_TABLE_DEFAULT);
+ 	if (!mrt) {
+ 		err = -ENOENT;
+-		goto errout_free;
++		goto errout_unlock;
  	}
  
--	skb = nlmsg_new(mroute_msgsize(false, mrt->maxvif), GFP_KERNEL);
-+	skb = nlmsg_new(mroute_msgsize(false), GFP_KERNEL);
- 	if (!skb) {
- 		err = -ENOBUFS;
- 		goto errout_free;
+-	/* entries are added/deleted only under RTNL */
+-	rcu_read_lock();
+ 	cache = ipmr_cache_find(mrt, src, grp);
+-	rcu_read_unlock();
+ 	if (!cache) {
+ 		err = -ENOENT;
+-		goto errout_free;
+-	}
+-
+-	skb = nlmsg_new(mroute_msgsize(false), GFP_KERNEL);
+-	if (!skb) {
+-		err = -ENOBUFS;
+-		goto errout_free;
++		goto errout_unlock;
+ 	}
+ 
+ 	err = ipmr_fill_mroute(mrt, skb, NETLINK_CB(in_skb).portid,
+ 			       nlh->nlmsg_seq, cache,
+ 			       RTM_NEWROUTE, 0);
+ 	if (err < 0)
+-		goto errout_free;
++		goto errout_unlock;
+ 
+-	err = rtnl_unicast(skb, net, NETLINK_CB(in_skb).portid);
++	rcu_read_unlock();
+ 
++	err = rtnl_unicast(skb, net, NETLINK_CB(in_skb).portid);
+ errout:
+ 	return err;
+ 
+-errout_free:
++errout_unlock:
++	rcu_read_unlock();
+ 	kfree_skb(skb);
+ 	goto errout;
+ }
+@@ -3297,7 +3298,8 @@ static const struct rtnl_msg_handler ipmr_rtnl_msg_handlers[] __initconst = {
+ 	{.protocol = RTNL_FAMILY_IPMR, .msgtype = RTM_DELROUTE,
+ 	 .doit = ipmr_rtm_route},
+ 	{.protocol = RTNL_FAMILY_IPMR, .msgtype = RTM_GETROUTE,
+-	 .doit = ipmr_rtm_getroute, .dumpit = ipmr_rtm_dumproute},
++	 .doit = ipmr_rtm_getroute, .dumpit = ipmr_rtm_dumproute,
++	 .flags = RTNL_FLAG_DOIT_UNLOCKED},
+ };
+ 
+ int __init ip_mr_init(void)
+diff --git a/net/ipv4/ipmr_base.c b/net/ipv4/ipmr_base.c
+index 28d77d454d44..9a38419e0f26 100644
+--- a/net/ipv4/ipmr_base.c
++++ b/net/ipv4/ipmr_base.c
+@@ -223,7 +223,7 @@ int mr_fill_mroute(struct mr_table *mrt, struct sk_buff *skb,
+ 
+ 	rcu_read_lock();
+ 	vif_dev = rcu_dereference(mrt->vif_table[c->mfc_parent].dev);
+-	if (vif_dev && nla_put_u32(skb, RTA_IIF, vif_dev->ifindex) < 0) {
++	if (vif_dev && nla_put_u32(skb, RTA_IIF, READ_ONCE(vif_dev->ifindex)) < 0) {
+ 		rcu_read_unlock();
+ 		return -EMSGSIZE;
+ 	}
+@@ -252,7 +252,7 @@ int mr_fill_mroute(struct mr_table *mrt, struct sk_buff *skb,
+ 
+ 			nhp->rtnh_flags = 0;
+ 			nhp->rtnh_hops = c->mfc_un.res.ttls[ct];
+-			nhp->rtnh_ifindex = vif_dev->ifindex;
++			nhp->rtnh_ifindex = READ_ONCE(vif_dev->ifindex);
+ 			nhp->rtnh_len = sizeof(*nhp);
+ 		}
+ 	}
 -- 
 2.53.0.414.gf7e9f6c205-goog
 
