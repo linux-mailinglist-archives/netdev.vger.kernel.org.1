@@ -1,187 +1,183 @@
-Return-Path: <netdev+bounces-261194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261209-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oCwyJIf4n2n3fAQAu9opvQ
-	(envelope-from <netdev+bounces-261194-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 08:38:47 +0100
+	id uM8gEbT9n2n3fAQAu9opvQ
+	(envelope-from <netdev+bounces-261209-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:00:52 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 105D71A1ECF
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 08:38:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA2951A2316
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:00:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3F6DF3026500
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 07:38:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9DA1D308605F
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 07:59:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7F0438F229;
-	Thu, 26 Feb 2026 07:38:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3295038F92A;
+	Thu, 26 Feb 2026 07:59:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MuUKU8Ha"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BGCKaC/4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C483914D29B;
-	Thu, 26 Feb 2026 07:38:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A9C392C25;
+	Thu, 26 Feb 2026 07:59:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772091522; cv=none; b=tDQBQIuL0xKBSg6WXGRMxRlLcPuZEFEDO96B56hD2l6iCU8L4wmdGmrJODrVfL8jIpMMs0CauKgscqJyqV/q5sgqMAjKYOaLfkfyYZklpL26ocFSQxo75CCPh9ezi5L+7Kp5TFCnCXeCELqYWVrIYMjuxSXQhR5y5XSb30vqFsM=
+	t=1772092773; cv=none; b=ELXEAoGMApfXQ/AMTwF/bx8CteUkt/ZpegFob+mZSMYziI6wHF0F1goHGgOXc1vm9cc8FP/keOshqyTu193BuWBoRdS+FkXEzFtVdz9DSfBq64Ze1nb9XnHEyZbLjvI/oHDUuK2kxkqcUps5zr72KoIT8Ef3AXlPDjeOJiHG9mw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772091522; c=relaxed/simple;
-	bh=Wrc4xAun5CwndqcKF0a9rvejO9WBiD5pCK7g3zIJna4=;
+	s=arc-20240116; t=1772092773; c=relaxed/simple;
+	bh=rs0qEAZbdxZqApzkbG0FHEalQVhLZ+XgQWmJpEIvOnc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XeGfcdgYJoFg84u7SK2vfiFgDnHFIbFK96uOVVMhfGo17l1JLlfClKiswInfa9JzV2ht3AaGOINf3l5aPOk3sTYA3BM9NZRurDGn41jatRwtTfRpr+S169uo1al2EE+U+ytTKqw/6Z9gcAtQCmKePA5vkev5IXDLpfpfSHiaslc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MuUKU8Ha; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0698DC19424;
-	Thu, 26 Feb 2026 07:38:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772091522;
-	bh=Wrc4xAun5CwndqcKF0a9rvejO9WBiD5pCK7g3zIJna4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MuUKU8HaopIuxCmBB3FBoI5xYavpPuRdntHOycIA4tf/iyw0mu44c+PlbVfX5HlI8
-	 tKNN3qDS+T2o39hlVjIkJFbLFbbidazicsEVmV0EE7rPRF9nWpLNeuL083/z5vLWCi
-	 GhEUWa679c8MByObex9yLlneYIZWL/GMfxJj8bJaKIzKsq6b87YEw6K/LMMzPwXnm8
-	 wzXB/6gsTdbZMMi23oQpbE0hEQRuqkYro/rWrJR0htwTugrgCVOa7YbtnZEFjpDWzD
-	 wN7YBYghNls8CUdgkBfzjmiZoMDitC1Hc6ZEYLzi2E6T+LK3GjgVYkUseG430trA95
-	 6O4pY3UPxw2lA==
-Date: Thu, 26 Feb 2026 08:38:39 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Zhengping Zhang <aquapinn@qq.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com, zhengping.zhang@airoha.com,
-	upstream@airoha.com, Simon Horman <horms@kernel.org>
-Subject: Re: [RESEND PATCH net-next] net: airoha: fix typo in function name
-Message-ID: <aZ_4f5LrAlKpG6cZ@lore-desk>
-References: <tencent_E4FD5D6BC0131E617D848896F5F9FCED6E0A@qq.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ocrEaihzW9hXAhYrWz8g7DN9mKyJ9680dE7kDYYh6IgBx1YWXpxWuMx3wPtFruT6dysXC/Gk5fhxCWtS15GV4a5bCgChvAVyXTUIrt7vJcD1vuqrJ9SskuHHLaqnwunezY0qrVTxB1/IsaOPl7gvRpsGskDCFyY75Gf3AyYoe9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BGCKaC/4; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772092771; x=1803628771;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=rs0qEAZbdxZqApzkbG0FHEalQVhLZ+XgQWmJpEIvOnc=;
+  b=BGCKaC/4Y/7r2QjozsOIM8/GJiwHkczy4z1Pyq74VsATwUzok/6mjejx
+   lg0Rt/7dpletnSQsY3UQs4ZEqOhzIwFSk7zA/EntThZ29XZJQxAtooTTL
+   ozy/d8EdYtfLsc90h1Eq1yV+CzCEj8K8GhzkW+h/8WGXQbjKggmHyjPmN
+   FoRfqH6aIp94d9PcU/fRLfmoJDWYvxRIRyj++aDb/MOQFw9HN0n1JGnIG
+   pcDT1Yagj9oRLqIIuaGiWyJ9NRRyVdZqpO9sgGpGNb6XqAmnP5lPKwvYS
+   QUO9SrIerbfPxinuXGcf+pXvXD9kWq2tqsi39XHZDoaZDGuYBynyCyFsB
+   g==;
+X-CSE-ConnectionGUID: LYEW1837SVO1RU7MM+Kzfw==
+X-CSE-MsgGUID: TP2nw6Y9R12xbKscDpOgjQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11712"; a="73018073"
+X-IronPort-AV: E=Sophos;i="6.21,311,1763452800"; 
+   d="scan'208";a="73018073"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2026 23:59:30 -0800
+X-CSE-ConnectionGUID: HXHY4jaTS763fk0dqYE34Q==
+X-CSE-MsgGUID: n89NMNHmQ2uMu7evv5CMDQ==
+X-ExtLoop1: 1
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by fmviesa003.fm.intel.com with ESMTP; 25 Feb 2026 23:59:20 -0800
+Date: Thu, 26 Feb 2026 15:39:46 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Yury Norov <ynorov@nvidia.com>
+Cc: linux-kernel@vger.kernel.org,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Peter Zijlstra (Intel)" <peterz@infradead.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Antoine Tenart <atenart@kernel.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Ingo Molnar <mingo@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+	James Clark <james.clark@linaro.org>,
+	Jerin Jacob <jerinj@marvell.com>,
+	Linu Cherian <lcherian@marvell.com>,
+	Lukasz Luba <lukasz.luba@arm.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Mike Leach <mike.leach@linaro.org>, Moritz Fischer <mdf@kernel.org>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Tom Rix <trix@redhat.com>, Xu Yilun <yilun.xu@intel.com>,
+	Yajun Deng <yajun.deng@linux.dev>,
+	Yury Norov <yury.norov@gmail.com>, Zhang Rui <rui.zhang@intel.com>,
+	hariprasad <hkelam@marvell.com>, coresight@lists.linaro.org,
+	linux-arm-kernel@lists.infradead.org, linux-fpga@vger.kernel.org,
+	linux-pm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 09/12] fpga: m10bmc-sec: switch show_canceled_csk() to
+ using scnprintf()
+Message-ID: <aZ/4whL40HHi/85Z@yilunxu-OptiPlex-7050>
+References: <20260219181407.290201-1-ynorov@nvidia.com>
+ <20260219181407.290201-10-ynorov@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ywZFAiZulEAzxkCv"
-Content-Disposition: inline
-In-Reply-To: <tencent_E4FD5D6BC0131E617D848896F5F9FCED6E0A@qq.com>
-X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	MAILLIST(-0.15)[generic];
-	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261194-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[qq.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lists.infradead.org,vger.kernel.org,gmail.com,collabora.com,airoha.com];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,qq.com:email]
-X-Rspamd-Queue-Id: 105D71A1ECF
-X-Rspamd-Action: no action
-
-
---ywZFAiZulEAzxkCv
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20260219181407.290201-10-ynorov@nvidia.com>
+X-Rspamd-Server: lfdr
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
+	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-261209-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[44];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,davemloft.net,infradead.org,linux.intel.com,lunn.ch,linux-foundation.org,linaro.org,google.com,marvell.com,arm.com,linux.ibm.com,ellerman.id.au,gmail.com,redhat.com,rasmusvillemoes.dk,fomichev.me,intel.com,linux.dev,lists.linaro.org,lists.infradead.org,lists.ozlabs.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yilun.xu@linux.intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-0.997];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BA2951A2316
+X-Rspamd-Action: no action
 
-> Corrected the typo in the function name from
->  `airhoa_is_lan_gdm_port` to `airoha_is_lan_gdm_port`. This change ensures
->  consistency in the API naming convention.
-
-Acked-by: Lorenzo Bianconi <lorenzo@kernel.org>
-
->=20
-> Signed-off-by: Zhengping Zhang <aquapinn@qq.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
+On Thu, Feb 19, 2026 at 01:14:01PM -0500, Yury Norov wrote:
+> Switch show_canceled_csk() to use a more common scnprintf("%*pbl").
+> 
+> Signed-off-by: Yury Norov <ynorov@nvidia.com>
 > ---
->  drivers/net/ethernet/airoha/airoha_eth.c | 2 +-
->  drivers/net/ethernet/airoha/airoha_eth.h | 2 +-
->  drivers/net/ethernet/airoha/airoha_ppe.c | 2 +-
->  3 files changed, 3 insertions(+), 3 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
-net/airoha/airoha_eth.c
-> index 62bcbbbe2a95..3779f93b47bc 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> @@ -76,7 +76,7 @@ static void airoha_set_macaddr(struct airoha_gdm_port *=
-port, const u8 *addr)
->  	struct airoha_eth *eth =3D port->qdma->eth;
->  	u32 val, reg;
-> =20
-> -	reg =3D airhoa_is_lan_gdm_port(port) ? REG_FE_LAN_MAC_H
-> +	reg =3D airoha_is_lan_gdm_port(port) ? REG_FE_LAN_MAC_H
->  					   : REG_FE_WAN_MAC_H;
->  	val =3D (addr[0] << 16) | (addr[1] << 8) | addr[2];
->  	airoha_fe_wr(eth, reg, val);
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ether=
-net/airoha/airoha_eth.h
-> index 20e602d61e61..59ed7569f7c3 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.h
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.h
-> @@ -626,7 +626,7 @@ u32 airoha_rmw(void __iomem *base, u32 offset, u32 ma=
-sk, u32 val);
->  #define airoha_qdma_clear(qdma, offset, val)			\
->  	airoha_rmw((qdma)->regs, (offset), (val), 0)
-> =20
-> -static inline bool airhoa_is_lan_gdm_port(struct airoha_gdm_port *port)
-> +static inline bool airoha_is_lan_gdm_port(struct airoha_gdm_port *port)
->  {
->  	/* GDM1 port on EN7581 SoC is connected to the lan dsa switch.
->  	 * GDM{2,3,4} can be used as wan port connected to an external
-> diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ether=
-net/airoha/airoha_ppe.c
-> index 2221bafaf7c9..9e07b4653af1 100644
-> --- a/drivers/net/ethernet/airoha/airoha_ppe.c
-> +++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-> @@ -321,7 +321,7 @@ static int airoha_ppe_foe_entry_prepare(struct airoha=
-_eth *eth,
->  			/* For downlink traffic consume SRAM memory for hw
->  			 * forwarding descriptors queue.
->  			 */
-> -			if (airhoa_is_lan_gdm_port(port))
-> +			if (airoha_is_lan_gdm_port(port))
->  				val |=3D AIROHA_FOE_IB2_FAST_PATH;
->  			if (dsa_port >=3D 0)
->  				val |=3D FIELD_PREP(AIROHA_FOE_IB2_NBQ,
-> --=20
+>  drivers/fpga/intel-m10-bmc-sec-update.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/fpga/intel-m10-bmc-sec-update.c b/drivers/fpga/intel-m10-bmc-sec-update.c
+> index 10f678b9ed36..5ae76b8ece18 100644
+> --- a/drivers/fpga/intel-m10-bmc-sec-update.c
+> +++ b/drivers/fpga/intel-m10-bmc-sec-update.c
+> @@ -10,6 +10,7 @@
+>  #include <linux/firmware.h>
+>  #include <linux/mfd/intel-m10-bmc.h>
+>  #include <linux/mod_devicetable.h>
+> +#include <linux/mm.h>
+>  #include <linux/module.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/slab.h>
+> @@ -183,7 +184,7 @@ show_canceled_csk(struct device *dev, u32 addr, char *buf)
+>  
+>  	bitmap_from_arr32(csk_map, csk32, CSK_BIT_LEN);
+>  	bitmap_complement(csk_map, csk_map, CSK_BIT_LEN);
+> -	return bitmap_print_to_pagebuf(1, buf, csk_map, CSK_BIT_LEN);
+> +	return scnprintf(buf, rest_of_page(buf), "%*pbl\n", CSK_BIT_LEN, csk_map);
+
+As Thomas mentioned, use sysfs_emit()
+
+>  }
+>  
+>  #define DEVICE_ATTR_SEC_CSK_RO(_name)						\
+> -- 
 > 2.43.0
->=20
-
---ywZFAiZulEAzxkCv
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaZ/4fwAKCRA6cBh0uS2t
-rFNxAQC51ZWEWtupLqf0J9rgQp3GNeH/exHXOYErWxwPix1qdAEAh4brjMkl6Kj7
-jXa2inBVSXHqhZ8HLhfMmH1E28YqxQ8=
-=YVf+
------END PGP SIGNATURE-----
-
---ywZFAiZulEAzxkCv--
+> 
+> 
 
