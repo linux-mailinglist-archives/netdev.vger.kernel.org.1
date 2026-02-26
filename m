@@ -1,210 +1,176 @@
-Return-Path: <netdev+bounces-261230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261232-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MKhjN98DoGl/fQQAu9opvQ
-	(envelope-from <netdev+bounces-261230-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:27:11 +0100
+	id UK3HF3YEoGl/fQQAu9opvQ
+	(envelope-from <netdev+bounces-261232-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:29:42 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39C5F1A286D
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:27:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AA03E1A290C
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:29:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4F0673047E70
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 08:26:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A8B6B30048E5
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 08:29:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F57B38F230;
-	Thu, 26 Feb 2026 08:26:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B0CA394464;
+	Thu, 26 Feb 2026 08:29:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UbdKFfrR"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="kGYDhB86"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from server.couthit.com (server.couthit.com [162.240.164.96])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231AB2AE68
-	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 08:26:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772094387; cv=pass; b=kwg7pEZy5iMpbz+CVcXRLMqt+bUh9OHfwWQBn3cx9OJ9T0TVT8Ls8fx2Ko8IRZgMVAI080t54KVdPjphmPKMRIpP5TnsbdeRkuxVq9Qy/Cz4IiC060i5/hT212I4auVFSbm2hfO6Nz7wcmqFXYOyocdKvGDfSPC7G9gx9Othzbw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772094387; c=relaxed/simple;
-	bh=dSbRnTtbphPH/CVU76suyGb8H6esoTis5rJLM+HBS2k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dIjdiGW6qBoYR75bNzUgwiBWM8FYuM8YpoA+j1wEEFxTgYhyprwJwRilxk99Ron3fcCd7wCJzw8QekK5vuFsx6Kir8a3wqm4MugT9n60iU07aRLg1bbJDY6TZ7kHc91OMwWND5vSfqmlinpf8vCI4rk6Uah0O444Q97B9CB5QPw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UbdKFfrR; arc=pass smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-43767807da6so359141f8f.2
-        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 00:26:25 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772094384; cv=none;
-        d=google.com; s=arc-20240605;
-        b=kHHjef7C6Ve0hUfHtQLOT9WF9HR/uwAJXGJbEt+eyoNyKLL4WvFPgvrjKlgGmVjNqR
-         VgqirjtU5z5LY5qF7NLlYGZ0fBDyC5DkzB+msDutO3+zcVHFD8giz4kd1CNfkFK6qj/i
-         DPR21PBAUZ17MPl60SSWs3kifrCmYhidLwMVXdTw9L58XMrpVSOWNFtfgjAeUm38En/N
-         DV8fKsD0o9qbm6CjKutBEIaj6kW/E8oyQTohU7OrVahIaBnIJMsxvUjc5SxXO+RnxDA0
-         Xbe8hNGZ60NVnvjc5J2ZW5agQGBrdFwrdmziyZfP9z2/1xlnC7U9EAKzuc6X8QQB4673
-         +fxg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=p8tFDUI/IrHDdHe0oMgvftUeNiQenULG77NWOiabLck=;
-        fh=q9arsb+XP23/FtlzKx4t+g1QYtxhNYaoy3MbapfGAPg=;
-        b=FfiPSqEIb6oM+NgY6cZvU65KAaHS/M8slxHSDzgt/n8otpTlYQxn/HRtOPFUxhMpBX
-         4CjoF4bVzN+xlJFeZ9GRYamDC1SlJmjNNq5NQc4FKeuemZIGtqASbu8fSeH7TOibU7PL
-         lAOOa7RCfoiuqDd3aZp3NZu6jCaunJgKpgOd9VXmYKEwcO29yaO6W7MzEWRUM9U0g4UL
-         CEzmLjQiFY36fcWEN92WVJlEGKdOdam+dGQNm4syDoDjLJPCoQpgnTTq/SnUVs4bBMC7
-         wYcbLRI6wKgnOzXoYLE/gWAIt0LWaXusY4wD0xqlQoh31F/juahaFZeAbzah2/0PzoMz
-         Ueag==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772094384; x=1772699184; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=p8tFDUI/IrHDdHe0oMgvftUeNiQenULG77NWOiabLck=;
-        b=UbdKFfrRIuoE+NPjCjrp3b5Fi5iZjQrTqUSSVbgIjGRHmU5cJy6Ik9z2Ejq2qk6uYX
-         znU/JPq2+5E40iQUH1MvGEixQ0nnbAgXtNJ+eo5ayxRgw1EBZob6C6V0cQNLhlhTLKgZ
-         Thf1L6WQHkbyvSNxVN3fhAX3gcICxzO+ME1+0uXBwjz/+GehBBAqwlF8OLay9Bz1YK/T
-         VznmC4xf9ZZkfa4dpnaIGlwQxuxq4bjzTM8IwzxxeNYPXK1alIjpRrENTkTOJ2kDuL8M
-         OPU2I//+xuXnHL2aUBjBB05I9YIPA39n6i6D1YwBsr7FhZCTgIIWOxNqZg/2jKSRMdeI
-         L1Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772094384; x=1772699184;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=p8tFDUI/IrHDdHe0oMgvftUeNiQenULG77NWOiabLck=;
-        b=MpUuZ4TwD8mDJ/0ch0e4dxLwSn9xiWUZjbaIBH1W1Ld/mC1cjIKp4jX0jQ8YB4SuDS
-         Jj1cUWJev4+oC0Wood6YYjhOIU78wo/crMvC85tYWpavov7KIGW6XGipAAW00NeVWnTn
-         oEe0rALZMxbBAVQ13d91k9+mNUEYDwIV2fNc3AsEg06gWJPGmeojlsGC72427Kkluff2
-         Vnc7GF3mCCDR5S2KNg/+abNdft4AMPWJ+d2t4d751SYQplzzzSYpu3pE825abJhTIV7x
-         o4GIpOtpnNINGAqsnqcz2ic5DMozpemBE8/0a+G8Myw2qqXCG4mNcfcMv8eaeit3iNr5
-         GT8A==
-X-Forwarded-Encrypted: i=1; AJvYcCUehGyr0gwAiU1AYG+q0y1jN4lIPvmDgdVOczmRzK/+ISbPkAvfYNOYiFUrAzw6MojrFZAElYc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwWhRQZWGqXIRNu0WqUSw6TuUNdg1WuFunJKnYTCrxiA9xxa+G
-	cMWDMQFdeUQM1perPFdl/ies5dUQCzrFLVv8ahW7X4zv0Og5VDuXWJmx3BLzhfLvKOCAYExlcxE
-	erc0DWNR5b8wH/c65Npk2cT7Yrbf+aG4=
-X-Gm-Gg: ATEYQzyeRv7QROd+Z057knbbO0DEwZgXLFLYHC16JXs2bu8F1xFITPVoa67kmdy8qrS
-	4GwfY5jKr76rXgrcuJMHVpbbFMczbu2K/4RotcMTcz2MrmhtbdhNwcRwCHDz+zlf62Xp7wXEzJS
-	GovcJwrv77Zo+9wUGZN+dq7mx8xMzXXvneVFOJtddVnUlXokuu+CVAU1Nm1kRXC17lvuVTdTWDf
-	g8Y+bBCi29MM1qS0mEVts7DvIyLgLeyuwB13wyLz59DGnUSbDdfbrBZSW9SO8/CrQayJ7DRxIue
-	rAkR6ILvxaQALcqR5g==
-X-Received: by 2002:a05:6000:1a8c:b0:439:9124:f2b7 with SMTP id
- ffacd0b85a97d-43997f341bemr2365098f8f.29.1772094384270; Thu, 26 Feb 2026
- 00:26:24 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 214F9393DDE;
+	Thu, 26 Feb 2026 08:29:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772094552; cv=none; b=qNXveyntVbXK96S0Z/INv/XukKYXAC4yTjMVtLviJCOmc5srV6TJEP/JdeckmKuK04riKLVYB2hD1HW9qbqx20t1wGXRD3YAqNdi+h1KiDYp8JtXkWHTZhwVg0zVUu2CjyeAXfK/I205tAuCy8uOWmQ6kqit9doAhJx/zuu5tjM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772094552; c=relaxed/simple;
+	bh=uq0Fvn0gt+zivwrRJU8ydweAWsX+EfqCoqbAPIyBb5Q=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=KwGOs95kf+YCDdCmXTjfJzj6vrq0rz+q6AaNgxnL3JE527RY5G2VqGywVNBb0Gr+1q6QlvjDHHcl+IOlUGj9zWot0OGFYKl2VeeJgY5rCLJpi5DZAyFT9b35TBqa4ZEv61kvbptKDALivvGQT63/mmiFUT+3MI9R6ZZrt4arzi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=kGYDhB86; arc=none smtp.client-ip=162.240.164.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
+	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=0KxSh7kE1xxfS6NJZSSWiiAxS5+M/OE0yk9rnVdu/qE=; b=kGYDhB86DcXU4gvoVGY3M6ezaA
+	2nQHOBEwvyNErKKCWgCcyvWrVY7rOg9KwibQc8V3Oqynrttm7VZ7VhHG6tboHF6ASM9kZxdr0n20G
+	06duKl1oltlhm93b4HTWaf4u5ce8RDVRBYbyqmyCXcQZqORglVVOFi3H+pi2RBYqXwpiDurd2Df7i
+	WeTRl5lPS4bj+z32py39l4QWyPO798DB2Nty/9yVAmyNHr9eYdExbb3BouJwcvFN7LsyEYq41vASj
+	af0Mru9snnjdT3vBfeDOTWOr2ZiLZ2KGAoNjrMV6YgxYCA9tbQNmIJtCseqrZ6FLf7O5WlL0c45kO
+	QC9iFUzw==;
+Received: from [122.175.9.182] (port=2058 helo=zimbra.couthit.local)
+	by server.couthit.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98.1)
+	(envelope-from <parvathi@couthit.com>)
+	id 1vvWjx-00000009GTo-1OXd;
+	Thu, 26 Feb 2026 03:28:57 -0500
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id C2C231B4B20E;
+	Thu, 26 Feb 2026 13:58:50 +0530 (IST)
+Received: from zimbra.couthit.local ([127.0.0.1])
+ by localhost (zimbra.couthit.local [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id CAXoQSXLACbx; Thu, 26 Feb 2026 13:58:50 +0530 (IST)
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id 39DF91B4B201;
+	Thu, 26 Feb 2026 13:58:50 +0530 (IST)
+X-Virus-Scanned: amavis at couthit.local
+Received: from zimbra.couthit.local ([127.0.0.1])
+ by localhost (zimbra.couthit.local [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id WTMalfr6gkLY; Thu, 26 Feb 2026 13:58:50 +0530 (IST)
+Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
+	by zimbra.couthit.local (Postfix) with ESMTP id 0F4211B4B20E;
+	Thu, 26 Feb 2026 13:58:50 +0530 (IST)
+Date: Thu, 26 Feb 2026 13:58:49 +0530 (IST)
+From: Parvathi Pudi <parvathi@couthit.com>
+To: "H. Nikolaus Schaller" <hns@goldelico.com>
+Cc: nm <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>, afd <afd@ti.com>, 
+	Kevin Hilman <khilman@baylibre.com>, rogerq <rogerq@kernel.org>, 
+	tony <tony@atomide.com>, robh <robh@kernel.org>, 
+	krzk+dt <krzk+dt@kernel.org>, conor+dt <conor+dt@kernel.org>, 
+	richardcochran <richardcochran@gmail.com>, 
+	aaro koskinen <aaro.koskinen@iki.fi>, andreas <andreas@kemnade.info>, 
+	Andrew Lunn <andrew@lunn.ch>, 
+	linux-omap <linux-omap@vger.kernel.org>, 
+	devicetree <devicetree@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	netdev <netdev@vger.kernel.org>, danishanwar <danishanwar@ti.com>, 
+	pratheesh <pratheesh@ti.com>, j-rameshbabu <j-rameshbabu@ti.com>, 
+	praneeth <praneeth@ti.com>, srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
+	krishna <krishna@couthit.com>, mohan <mohan@couthit.com>, 
+	pmohan <pmohan@couthit.com>, basharath <basharath@couthit.com>, 
+	Murali Karicheri <m-karicheri2@ti.com>
+Message-ID: <1885117045.525472.1772094529965.JavaMail.zimbra@couthit.local>
+In-Reply-To: <B3077F98-CC5C-4093-8319-CF45EECEAE4D@goldelico.com>
+References: <20260105162546.1809714-1-parvathi@couthit.com> <20260105162546.1809714-3-parvathi@couthit.com> <B3077F98-CC5C-4093-8319-CF45EECEAE4D@goldelico.com>
+Subject: Re: [PATCH v4 2/2] arm: dts: ti: Adds support for AM335x and AM437x
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAPh3n803k8JcBPV5qEzUB-oKzWkAs-D5CU7z=Vd_nLRCr5ZqQg@mail.gmail.com>
- <95ccf5a6-975b-4543-80a3-595f1ee20543@redhat.com> <CAGRyCJE85fLOahUR3PAUnS_jH4+qpBq37qpged=nvObbg1m+Qw@mail.gmail.com>
- <20260225170155.0ae83ae9@kernel.org>
-In-Reply-To: <20260225170155.0ae83ae9@kernel.org>
-From: Daniele Palmas <dnlplm@gmail.com>
-Date: Thu, 26 Feb 2026 09:26:11 +0100
-X-Gm-Features: AaiRm50DmBPE8bIbQbuDkJOR9inJwsjkwvr1SpWPBNCMnCqpiSUe-nkgxF4o3fM
-Message-ID: <CAGRyCJGYLemYFDNw8cfcCHoxe8YqfRRgnJXgz03WVssKDYXhUA@mail.gmail.com>
-Subject: Re: commit 662dc80a5e86 breaks rmnet over usb
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Laurent Vivier <lvivier@redhat.com>, Koen Vandeputte <koen.vandeputte@citymesh.com>, oneukum@suse.com, 
-	andrew+netdev@lunn.ch, Eric Dumazet <edumazet@google.com>, pabeni@redhat.com, 
-	netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: Zimbra 9.0.0_ZEXTRAS_20240927 (ZimbraWebClient - GC138 (Linux)/9.0.0_ZEXTRAS_20240927)
+Thread-Topic: Adds support for AM335x and AM437x
+Thread-Index: m3OSGARO0zXzTDEelPMcISDqFz/iTQ==
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.couthit.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: smtp@couthit.com
+X-Authenticated-Sender: server.couthit.com: smtp@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_REJECT(1.00)[couthit.com:s=default];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[couthit.com : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261230-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[ti.com,baylibre.com,kernel.org,atomide.com,gmail.com,iki.fi,kemnade.info,lunn.ch,vger.kernel.org,couthit.com];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TO_DN_ALL(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ti.com:email,couthit.local:mid,couthit.com:email];
+	HAS_X_GMSV(0.00)[smtp@couthit.com];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dnlplm@gmail.com,netdev@vger.kernel.org];
+	HAS_X_AS(0.00)[smtp@couthit.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_FROM(0.00)[bounces-261232-lists,netdev=lfdr.de];
+	HAS_X_SOURCE(0.00)[];
+	DKIM_TRACE(0.00)[couthit.com:-];
+	FROM_NEQ_ENVFROM(0.00)[parvathi@couthit.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	NEURAL_HAM(-0.00)[-0.649];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	HAS_X_ANTIABUSE(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 39C5F1A286D
+	RCVD_COUNT_SEVEN(0.00)[9]
+X-Rspamd-Queue-Id: AA03E1A290C
 X-Rspamd-Action: no action
 
-Hello Jakub,
+Hi, 
 
-Il giorno gio 26 feb 2026 alle ore 02:01 Jakub Kicinski
-<kuba@kernel.org> ha scritto:
->
-> On Wed, 25 Feb 2026 08:19:46 +0100 Daniele Palmas wrote:
-> > > Could you try something like:
-> > >
-> > > diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
-> > > index 3a4985b582cb..6b4796fac692 100644
-> > > --- a/drivers/net/usb/qmi_wwan.c
-> > > +++ b/drivers/net/usb/qmi_wwan.c
-> > > @@ -788,6 +788,8 @@ static int qmi_wwan_bind(struct usbnet *dev, struct usb_interface *intf)
-> > >                  usbnet_get_ethernet_addr(dev, cdc_ether->iMACAddress);
-> > >          }
-> > >
-> > > +       dev->rx_urb_size = 32768;
-> > > +
-> >
-> > So far userspace tools (e.g. also the most important one which is
-> > ModemManager) rely on changing the rx_urb_size by changing the MTU: I
-> > know this is ugly, but it is a behavior that has been there since a
-> > lot of time, not sure how many tools based on this assumption could
-> > break.
->
-> What's the policy in ModemManager to change the rx_urb_size?
-> Increase it to make sure it can hold some specific cmd / packet?
->
-> I wonder if having rx_urb_size max of (mtu, 32k) would break anything.
->
+> Hi,
+> 
+>> Am 05.01.2026 um 17:21 schrieb Parvathi Pudi <parvathi@couthit.com>:
+>> 
+>> From: Roger Quadros <rogerq@ti.com>
+>> 
+>> PRU-ICSS instance consists of two PRU cores along with various
+>> peripherals such as the Interrupt Controller (PRU_INTC), the Industrial
+>> Ethernet Peripheral(IEP), the Real Time Media Independent Interface
+>> controller (MII_RT), and the Enhanced Capture (eCAP) event module.
+>> 
+> 
+> I am just wondering about the subject of this patch.
+> 
+> It reads as if general AM335x and AM437x support is introduced for the first
+> time.
+> IMHO it should tell which subsystem/improvement is added.
+> 
 
-Typically the host sends a QMI request to the modem for setting the
-size of the maximum QMAP aggregated packets block. Then the modem
-replies with the maximum size it supports and that one is then set by
-the host through changing the MTU of the netdevice. Low-cat modems
-usually support 4-8 KB, while 5G 16-32KB.
+Sure, we will address this in the next version.
 
-On ModemManager side this is currently fixed at 16KB, but one can use
-other tools e.g. qmicli to set custom values as far as they are
-supported by the modem.
-
-> Since we're talking about rx buffer config the right API to configure
-> it is likely ethtool -G rx-buf-len :(
->
-
-Thanks for the hint, I'll try to have a look at that to improve qmi_wwan.
-
-> > There's also the chance that there are modems which require a higher
-> > rx_urb_size, so having this fixed could not work well.
-> >
-> > Unfortunately usbnet serves many drivers, I agree with Koen that a
-> > revert is the safest option.
->
-> Then again the usbnet driver is brittle enough as is, if it's just qmi
-> that needs this workaround we would be making common code less robust
-> for a benefit of a single "hack" (for lack of a better term)
-
-Makes sense, also Laurent proposed a solution to keep his fix in
-usbnet and make qmi_wwan the exception.
-
-Regards,
-Daniele
+Thanks and Regards,
+Parvathi
 
