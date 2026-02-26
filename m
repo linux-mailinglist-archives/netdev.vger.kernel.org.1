@@ -1,132 +1,182 @@
-Return-Path: <netdev+bounces-261235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261236-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6MgLEe0HoGl/fQQAu9opvQ
-	(envelope-from <netdev+bounces-261235-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:44:29 +0100
+	id SL+xCnUHoGl/fQQAu9opvQ
+	(envelope-from <netdev+bounces-261236-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:42:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 944C01A2C85
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:44:28 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F9261A2BD0
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:42:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8D4B530AD48E
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 08:41:24 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 637C0301F581
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 08:41:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1C23395252;
-	Thu, 26 Feb 2026 08:41:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E994339524C;
+	Thu, 26 Feb 2026 08:41:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W3ifEhTv"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="obKdMJXe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A2939446D;
-	Thu, 26 Feb 2026 08:41:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD6DB39524B;
+	Thu, 26 Feb 2026 08:41:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772095278; cv=none; b=cdjKxECk+1L9LsSyFjDW59er/vcPSk841+iNlZp3ms4B58sfCyN5EEFgcJsgzAAzyWMWXvIu/gEHGbcpIPwG0Omz+uzI/rMPXmoP1Io78KviZa79+/SoA3oxa7VoJO0zHeImvPq9gIy+AiGKPhXCtMjttWegoicWSVa9AgFBxyI=
+	t=1772095294; cv=none; b=Td4ZI+d0tDD2beVSL5BXrHQspIN+I658vIZ60OaBwWiI4Dpbv+FQQGk1fHF0M21IIZkvxOrbzZdHIHa0DWoSLdEeiIR14GIvqKfTwTU6bNXw/ZdhPTcJAgzifvaxhEN9XjgCQfN/HaMcNLycdPSbSy3hYXVQJk0nmX4P/S8byVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772095278; c=relaxed/simple;
-	bh=kiR7FCHXtf812rJJzmbWd2klQTsmdQZuOWMjeWWVNOw=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=Ame92TlTgCeVUiGciIIRf/o9ucE7qqSvte0cXE/fIcJBSxVXdM4BFWLLiy5Plk/KflyAUrSGfVWJi2um0xBHlusu5HDLX7ZQs3l5hhaSKsqFDTRgEASz0GmXbCd+HuMI4Mw87stqSkQ29AiXAZgT0ZpNTp3drVsihl7ZGt4oNqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W3ifEhTv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59EB2C19422;
-	Thu, 26 Feb 2026 08:41:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772095278;
-	bh=kiR7FCHXtf812rJJzmbWd2klQTsmdQZuOWMjeWWVNOw=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=W3ifEhTvEPDvURXLjJxR+16d66NJgm5q451vPEUUCFlisIvtIbXp5T7gTOjNgcybq
-	 Amv/p1rWh4xN2zezcwmN6O4TKxnnFxKosBYXUL9qxkCmx21JqJFBqEYdthJ9KkO4+2
-	 E38EUGKp+Skyow7pRG0iQ3fzefcCOPtqATMkqtZ/rsJmxuRcYsKwHI/zYKVkp4DVOV
-	 PjlNN2sWVHBvxkZF3FBdmyNZP4NRUJkvlr1kfdgfJDgILLBIfgE0CYz5poZ1Vtf5E2
-	 Dtoffd667N8B8bL8F+Xrj4TIAlPbu5BkuKkOEIAepyTo/8tmGv9oouT2crAF1sXhRx
-	 pVKhkyv07Xk0g==
-Content-Type: multipart/mixed; boundary="===============5987427679039999653=="
+	s=arc-20240116; t=1772095294; c=relaxed/simple;
+	bh=vKdt4rq40Y5Khbvd8zfRF313SjSO/zYEU1eQdhH3zRs=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=bPVEjDZrWrpdrlLCDfVif5xUX1L84p2K5YtyiwNtnF1X3Ws9V/aQ8Tko1C8ToZjMCXZt60ajHDpWcuULegmKembjT0TmhYEzaHebVkkePDVgiivAsys2KtSgV7vsmEYQcZ0n4s/zYbkezm//YfzYDCHJkKrZN3OJKMp1yImeEIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=obKdMJXe; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=mowyMJmjCIhMn0C2DG7n77SSsLvmJxlX5WvGffL0C9Q=; b=obKdMJXe/8mnt2hbHr3LvYnvXR
+	pqsEItrQ+KugairnHpaLkTBtqa1T00DYAocIKx/e/s5Me6R3ojqf9lyQYxNV80Ovkr0K5EMCKC8zk
+	zVLGDe+vuDLqNxJyX6WH0qmYlcZdxy7wNjyrbhedcCPSc53yllZKCn3V8b05I3wPn/UbxPOnzwkxr
+	tWtlsGozmFQst0l1hgcqF2APjDH9HV/8tNPGpOOj2mx5bWD6Pz2yjt7SYjrCfLUeBAfJJaXTE5doW
+	OupP4mMfPhXHqghFKZeC+R/Icy+TL3rdMbHjiIz1DlQ2ptHq1yNsZ+qyF6A1l6iEN21ct8VJbvYWg
+	qrB2KT6w==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:59150 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1vvWw2-000000007c9-0fSS;
+	Thu, 26 Feb 2026 08:41:26 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1vvWw1-0000000AtJx-1VwF;
+	Thu, 26 Feb 2026 08:41:25 +0000
+In-Reply-To: <aaAHD_wWv2xCKntW@shell.armlinux.org.uk>
+References: <aaAHD_wWv2xCKntW@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-phy@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vinod Koul <vkoul@kernel.org>
+Subject: [PATCH RESEND net-next 1/8] net: stmmac: qcom-ethqos: move
+ ethqos_set_serdes_speed()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <9923d7a71f5623f84db40fa20cf3fb4e8625fc5f2661c4584dfa9237c2d98bcb@mail.kernel.org>
-In-Reply-To: <20260226080003.524935-7-idosch@nvidia.com>
-References: <20260226080003.524935-7-idosch@nvidia.com>
-Subject: Re: [RFC PATCH bpf-next 6/9] bpf: fib_lookup: Honor oif in IPv6 output route lookups
-From: bot+bpf-ci@kernel.org
-To: idosch@nvidia.com,netdev@vger.kernel.org,bpf@vger.kernel.org
-Cc: davem@davemloft.net,kuba@kernel.org,pabeni@redhat.com,edumazet@google.com,dsahern@gmail.com,petrm@nvidia.com,horms@kernel.org,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,martin.lau@linux.dev,john.fastabend@gmail.com,sdf@fomichev.me,idosch@nvidia.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Thu, 26 Feb 2026 08:41:16 +0000 (UTC)
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1vvWw1-0000000AtJx-1VwF@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Thu, 26 Feb 2026 08:41:25 +0000
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	CTYPE_MIXED_BOGUS(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,gmail.com,nvidia.com,iogearbox.net,linux.dev,fomichev.me,meta.com];
-	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-261236-lists,netdev=lfdr.de,kernel];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-261235-lists,netdev=lfdr.de,bpf-ci];
-	MIME_TRACE(0.00)[0:+,1:+];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	NEURAL_HAM(-0.00)[-0.997];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.982];
+	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.kernel.org:mid]
-X-Rspamd-Queue-Id: 944C01A2C85
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,rmk-PC.armlinux.org.uk:mid,qualcomm.com:email,armlinux.org.uk:email]
+X-Rspamd-Queue-Id: 4F9261A2BD0
 X-Rspamd-Action: no action
 
---===============5987427679039999653==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Combine ethqos_set_serdes_speed() with ethqos_mac_finish_serdes() to
+simplify the code.
 
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 0d5d5a17acb2..e92552b139b1 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -6255,6 +6255,7 @@ static int bpf_ipv6_fib_lookup(struct net *net, struct bpf_fib_lookup *params,
->  	if (flags & BPF_FIB_LOOKUP_OUTPUT) {
->  		fl6.flowi6_iif = 1;
->  		oif = fl6.flowi6_oif = params->ifindex;
-> +		strict = RT6_LOOKUP_F_IFACE;
->  	} else {
-
-The fix itself looks correct. Since this addresses a bug that has been
-present since the original bpf_fib_lookup helper was introduced, should
-this carry a Fixes tag?
-
-Fixes: 87f5fc7e48dd ("bpf: Provide helper to do forwarding lookups in kernel FIB table")
-
-
+Reviewed-by: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+Tested-by: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+ .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 22 +++++++++----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/22433453774
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+index ad5b5d950fff..57cbe800f652 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+@@ -591,14 +591,6 @@ static void ethqos_configure_rgmii(struct qcom_ethqos *ethqos,
+ 	ethqos_rgmii_macro_init(ethqos, speed);
+ }
+ 
+-static void ethqos_set_serdes_speed(struct qcom_ethqos *ethqos, int speed)
+-{
+-	if (ethqos->serdes_speed != speed) {
+-		phy_set_speed(ethqos->serdes_phy, speed);
+-		ethqos->serdes_speed = speed;
+-	}
+-}
+-
+ static void ethqos_pcs_set_inband(struct stmmac_priv *priv, bool enable)
+ {
+ 	stmmac_pcs_ctrl_ane(priv, enable, 0);
+@@ -683,15 +675,23 @@ static int ethqos_mac_finish_serdes(struct net_device *ndev, void *priv,
+ 				    phy_interface_t interface)
+ {
+ 	struct qcom_ethqos *ethqos = priv;
++	int speed, ret = 0;
+ 
+ 	qcom_ethqos_set_sgmii_loopback(ethqos, false);
+ 
++	speed = SPEED_UNKNOWN;
+ 	if (interface == PHY_INTERFACE_MODE_SGMII)
+-		ethqos_set_serdes_speed(ethqos, SPEED_1000);
++		speed = SPEED_1000;
+ 	else if (interface == PHY_INTERFACE_MODE_2500BASEX)
+-		ethqos_set_serdes_speed(ethqos, SPEED_2500);
++		speed = SPEED_2500;
+ 
+-	return 0;
++	if (speed != SPEED_UNKNOWN && speed != ethqos->serdes_speed) {
++		ret = phy_set_speed(ethqos->serdes_phy, speed);
++		if (ret == 0)
++			ethqos->serdes_speed = speed;
++	}
++
++	return ret;
+ }
+ 
+ static int ethqos_clks_config(void *priv, bool enabled)
+-- 
+2.47.3
 
-AI-authorship-score: low
-AI-authorship-explanation: Precise one-line kernel networking fix by a known kernel maintainer with deep routing subsystem expertise, characteristic of experienced human developers.
-issues-found: 1
-issue-severity-score: low
-issue-severity-explanation: Missing Fixes tag for a bug present since the original bpf_fib_lookup helper introduction; the code fix itself is correct.
-
---===============5987427679039999653==--
 
