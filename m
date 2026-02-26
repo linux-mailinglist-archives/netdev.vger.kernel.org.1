@@ -1,178 +1,212 @@
-Return-Path: <netdev+bounces-261316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261317-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SKReI342oGkqgwQAu9opvQ
-	(envelope-from <netdev+bounces-261316-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 13:03:10 +0100
+	id OEZ9Dj43oGkqgwQAu9opvQ
+	(envelope-from <netdev+bounces-261317-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 13:06:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3F1D1A5875
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 13:03:09 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C63E01A58E0
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 13:06:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E3B163010777
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:02:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 93F46307D82B
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:02:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D49737FF6F;
-	Thu, 26 Feb 2026 12:02:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5658C3803C6;
+	Thu, 26 Feb 2026 12:02:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TLfZrHWE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ao5mVLq6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77B3237BE6D;
-	Thu, 26 Feb 2026 12:02:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772107327; cv=none; b=uS0GaZmG2grq81UkWV7Fs690gtSoy6/lJwlsEYqaPGkweX6+xiubhacySIWCy6VHA2hjcdTD+wCH+a33BWZTG1EGbptwH2F7c8HUaYP1Fr1U78bYhwdPFHXcheQ76SSvD4QpxUMdUS6hs/bCpO/0CdN4rowu1QYpZ38iTmQnY1o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772107327; c=relaxed/simple;
-	bh=sGT3zB4PMQOjRhDKzNF3kekJSTQmbRUhYHGyuKAUGNA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PX6CSvQHiKDwMdgsXUqC/0nSL1pdjbJKnRnGiwZBtjFp3rrmtaRKFgYZGeXm5++8L9Zad2Xmdue0UyVwxxEX0iFY19vtBEeBgmRQbJZ3cSdYV1tlhBQE70kUj1lpVT0ta/+fyF3jQJwgfcWmiXkSUI77p9DvLkquXBi8Pcrjv2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TLfZrHWE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 683BDC116C6;
-	Thu, 26 Feb 2026 12:02:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772107327;
-	bh=sGT3zB4PMQOjRhDKzNF3kekJSTQmbRUhYHGyuKAUGNA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TLfZrHWENmWZlBh81ogh6V/eGtLXm0ERJty8FFF8pp7dCJw3dmsqN/quGAJLid+l1
-	 MdQb07FXpoVMclP/sCh1opQYGsbNOkjzGHNfFJmF3fMMHoUlmPMKMDhql1WLd92w0S
-	 fqdxDfkyCb6k8QsI+Gti5qGykVvLMCtQA95nGUrVQ5pr+lFYHOW3GQeR/r5ty151re
-	 2NlRX1iv7osBll+mfheLd3oX+Dk1WhbkmMyW4WmYvMjTCTWWUW/2WkpbkAk17lAVut
-	 LtvidLytHdtiwt8Eo/gb0HanXjO3czrTjkAqhDKVmHh8z1lvNSpsJmKZ/Y+RmlqP2t
-	 LbPveDPjVPaAA==
-Date: Thu, 26 Feb 2026 12:02:00 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jan Petrous <jan.petrous@oss.nxp.com>
-Cc: alexandre.torgue@foss.st.com, devicetree@vger.kernel.org,
-	festevam@gmail.com, chester62515@gmail.com, s.hauer@pengutronix.de,
-	linux-arm-kernel@lists.infradead.org, davem@davemloft.net,
-	mbrugger@suse.com, netdev@vger.kernel.org, andrew+netdev@lunn.ch,
-	s32@nxp.com, pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, Frank.Li@nxp.com,
-	robh@kernel.org, kuba@kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	ghennadi.procopciuc@oss.nxp.com, kernel@pengutronix.de,
-	shawnguo@kernel.org, edumazet@google.com, mcoquelin.stm32@gmail.com,
-	imx@lists.linux.dev
-Subject: Re: [v5,4/4] stmmac: s32: enable support for Multi-IRQ mode
-Message-ID: <aaA2ODfcRcFDkPPt@horms.kernel.org>
-References: <20260223-dwmac_multi_irq-v5-4-8fc699a5fac4@oss.nxp.com>
- <20260225092513.174261-1-horms@kernel.org>
- <aZ7IwgwP5iy2kej8@lsv051416.swis.nl-cdc01.nxp.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1D4F18BC3D
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 12:02:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.181
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772107367; cv=pass; b=YqzJsUzcGhI5Bi4M4cFff4AGInTUtE3F0YLLM7YiYMo+/2vtvcqTWc/ZKV5M/2YVB8+u8AQ+qY9Zf+e1cERjraaNEqN32aE5BDo0He9T8c7/Y9ppQofPkg2Qbq9Ok7TmNWPuAASxzbxbrjfoV7DKHfXDH6PxXWal8p3yTdAK6/c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772107367; c=relaxed/simple;
+	bh=fHxx47e62Ab7AB98KxFyfkkORZp6y4ke1RxkXL5ZGIs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RHhNi3xWN7pnkBpHyuc7FVRbGR6PMtH9PlIjOm/HRdDyAFWfbfT6m3JHPIPyELlFxS81TJozNZEMEV4aKvWfKTcrNjq3yPsAWyRofa93b8wAf13Q0QyECShfD8QnsmEG1nZ+/cleLNwSVKDGp+IWg7K2zxr1qTSt70FtPH91KBY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ao5mVLq6; arc=pass smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-506989e8516so7745091cf.0
+        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 04:02:45 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772107365; cv=none;
+        d=google.com; s=arc-20240605;
+        b=RKDG9g65C76KCovmJ5LuMVFazSTHGuz6Ji3tHTdpb88DANjDgL13VLGbB3I12OJPpP
+         Be8JG925em6aDdECGWV3CdUZ5kOoGbnzgoosvU14pceEdDGT0SFzYjqmrlG8lFpUB3fa
+         ahX30p7IprGFSOveHqG9tt+Cn93ZUh8YkTe5w021afz6pkXsHRDExVVrR5OQWRYODrH8
+         hRc5EXHSfcM6/eOl8TBOCFdgFegRuk9Npb+Ofg+IoSqNzv/wtbS+svlXloYaRnZBaj/l
+         U6dCJCgppg3h5YUZgu+iW32t+QJkIGcFf7W+b1sxesljaYGKRUhA5HXuUuUghBhKP77C
+         nxnw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=WTO8df51m5646oak+wdzFx9B/WJc7HZU55MTR+mSHDU=;
+        fh=n3icroo2Gbj/o0+qWLCbvZ70kfxAWJocRKUBsTC2NPw=;
+        b=AaRLqmfOKy7JT+vq6LWzzDC0HL1DWJkRaDKEeM7jZZYKo/sRCdU2coH4r+HDRg6ZK6
+         H7lTB55EIv7bHjKmo6r5J8UXgINIyHEnVeeLFiBdnOQhDp/iqPtVAZcBoXr/et5HGBj6
+         aFeqyU45rGKcl3jHSbC/YyoH4yu7FLJj3/C3a5gz8MYHO9y3NA41FzgUJrf1aI+qh98C
+         OUZ1+PZkFrBvQy4lO+tR3nNijNbfrK5+F824wYyutsMfosmpddQQ1cjU5wpQB5XruTKs
+         cdSSRe4kV4cMkyasHMyVOagznCuP3v1P7ibvaIOhWWhqKd9szFI3cF/AnADdur2UzGzF
+         DSXg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772107365; x=1772712165; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WTO8df51m5646oak+wdzFx9B/WJc7HZU55MTR+mSHDU=;
+        b=ao5mVLq6QFnmB2NeyDzwo/+IorfyoFeg/cddjuoQKY2Z697rT+W7Sc+DtOZ+QkVtaX
+         ksfuRbra5FivJAZacCrVlqdKQJS0bTVNKDXUkIFG6aUZnMoMPWE94ybw9mjJnfLYoOzP
+         RIwbzT4xKnR83zblzVGufazrMk/To6c1EocV3P2M9kpmHNewE9Fz9f0XCYkbSiqBEBPH
+         SKTUdjprYEnDh+w5Dx+eDlS/wa/gpFxZX39RmHqom6LncwIte9osOa0aYmH6YZP89J15
+         fcLJCTLamKC1/wANUlZGywIxuUOZEZMMLxfjgDo/Mdwdy+RveHDX404mdRJ4a0DNv1Br
+         qe6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772107365; x=1772712165;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=WTO8df51m5646oak+wdzFx9B/WJc7HZU55MTR+mSHDU=;
+        b=cYfValWm29zPYx9tz+QevJr8rRpdqzjdvazXaLO81xEVViNqL1QXtuXnwpLk+Z2qS5
+         MfGztFoIxUnCbOs9td2jZ5F0hpNyvpg9hgEp0nO7xYhgB0tq9zwi9jM6C7lE69BThxA2
+         eccJK8IPNILQTyXEj4ACYnwSX0iM45i1kig5ANGRG9FPjLjw/Cn+H0uN0k8f2dnvvL2Y
+         eK+en6z4pvm2auhhEvmfTXYWo8jjG4fwq8nA7P2LSKaPpVhCQZkUpFwWDSWDafaziWNR
+         3FARxklblnhr8WloSPQA+C28481p9CELTOguXncw69jCYcnhwG6ORORmXVFJqXyigV9m
+         YFtA==
+X-Forwarded-Encrypted: i=1; AJvYcCVD5EQGxkEauXmDwEZN6IXuqglo81Ay9dPR6jyslMPwkKWnlBsWuYCoZQFStbz2lZN5Pi2p2a8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzrCwdUMqJ+Pq5q5yGqdQCuVuUiTxxD6UgIjwV6+tiYZAxn83jk
+	JqYSWpipgBOoM0BFcp+P54Wm5XnuDqk8/2dTdunAbatlq8INfoX1HjQpKrOEUeYz9fVL2rHEU4A
+	PZ3cE9oE0o0kAU7oR3Z70MKAP1JboyQOrovyKDWiE
+X-Gm-Gg: ATEYQzxbg06TOz/KvGeInQ0pbvO9nfF7+1iFccrWiXqy1uUC/IzvxLWVGnXkmJjRCVG
+	HrGHQQs7Cl1zo2FVKUKHM/nUeMax37B+NFdqYYPu1rN9qiViH+Dhb2Y9xfO0FYITfh7ld7yqUvg
+	SsQqXc2sRHtVBaKVQgZYYCmC07+Tnlci8WfQF9oOhg67kP5hucQtMRKu51KgwIu1lpUgPymoL94
+	JIErWMFVNzAHvC4JtV0WCCM1rFJ7L+bpVft1FZqywAODjrZ3ZFvopmDei6aCGGjkoHQBCn53bLI
+	XGTzm0HrX943yxYZT6Y2xbGZO/dUYpKezKXLgX6yDoUchNqYSwc=
+X-Received: by 2002:ac8:7c4e:0:b0:506:1c3b:c896 with SMTP id
+ d75a77b69052e-50745ed2822mr19991151cf.11.1772107364456; Thu, 26 Feb 2026
+ 04:02:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aZ7IwgwP5iy2kej8@lsv051416.swis.nl-cdc01.nxp.com>
+References: <20260226111721.25454-1-yuuchihsu@gmail.com>
+In-Reply-To: <20260226111721.25454-1-yuuchihsu@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 26 Feb 2026 13:02:31 +0100
+X-Gm-Features: AaiRm53OMr1sZRwTFEY50Od6VH3Wz_vM8hHKwZUR308MKmTdUom4P_0a0eb-MOs
+Message-ID: <CANn89i+rJeZHoGna5PGWN31UGDO3jy1xx-rWs0SA23H6mU6qKw@mail.gmail.com>
+Subject: Re: [PATCH] net: ipv6: fix ARM64 alignment fault in fib_multipath_hash_from_keys()
+To: Yung Chih Su <yuuchihsu@gmail.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, nathan@kernel.org, 
+	nick.desaulniers+lkml@gmail.com, morbo@google.com, justinstitt@google.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261316-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-261317-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[foss.st.com,vger.kernel.org,gmail.com,pengutronix.de,lists.infradead.org,davemloft.net,suse.com,lunn.ch,nxp.com,redhat.com,kernel.org,st-md-mailman.stormreply.com,oss.nxp.com,google.com,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[26];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.991];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	DKIM_TRACE(0.00)[google.com:+];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,linux.dev:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A3F1D1A5875
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,gmail.com,google.com,vger.kernel.org,lists.linux.dev];
+	TAGGED_RCPT(0.00)[netdev,lkml];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: C63E01A58E0
 X-Rspamd-Action: no action
 
-On Wed, Feb 25, 2026 at 11:02:42AM +0100, Jan Petrous wrote:
-> On Wed, Feb 25, 2026 at 09:25:13AM +0000, Simon Horman wrote:
-> > This is an AI-generated review of your patch. The human sending this
-> > email has considered the AI review valid, or at least plausible.
-> > 
-> > For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
-> > ---
-> > stmmac: s32: enable support for Multi-IRQ mode
-> > 
-> > This commit enables Multi-IRQ mode for the S32 DWMAC driver, allowing
-> > per-queue IRQs for improved performance. The driver checks for multiple
-> > queues and per-queue IRQs, enabling multi-IRQ mode when both are present.
-> > 
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-> > > index af594a096676..4aad7077c9d6 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-> > 
-> > [ ... ]
-> > 
-> > > @@ -165,6 +165,16 @@ static int s32_dwmac_probe(struct platform_device *pdev)
-> > >  	plat->core_type = DWMAC_CORE_GMAC4;
-> > >  	plat->pmt = 1;
-> > >  	plat->flags |= STMMAC_FLAG_SPH_DISABLE;
-> > > +
-> > > +	/* Check for multi-IRQ config. Assumption: symmetrical rx/tx queues */
-> > > +	if (plat->rx_queues_to_use > 1 &&
-> > > +	    (res.rx_irq[0] > 0 && res.tx_irq[0] > 0)) {
-> > > +		plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
-> > > +		dev_info(dev, "Multi-IRQ mode (per queue IRQs) selected\n");
-> > > +	} else {
-> > > +		dev_info(dev, "MAC IRQ mode selected\n");
-> > > +	}
-> > 
-> > Does this validation check all queues have IRQs? The condition verifies
-> > only res.rx_irq[0] and res.tx_irq[0] but doesn't confirm that higher
-> > queues have IRQs when rx_queues_to_use > 1.
-> > 
-> > If a device tree specifies multiple queues but only provides IRQs for
-> > queue 0:
-> > 
-> >     snps,rx-queues-to-use = <2>;
-> >     interrupt-names = "macirq", "rx-queue-0", "tx-queue-0";
-> >                       /* queue 1 IRQs missing */
-> > 
-> > The driver would enable STMMAC_FLAG_MULTI_MSI_EN, but later in
-> > stmmac_request_irq_multi_msi() (drivers/net/ethernet/stmicro/stmmac/
-> > stmmac_main.c), queues with rx_irq[i] == 0 are silently skipped:
-> > 
-> >     for (i = 0; i < priv->plat->rx_queues_to_use; i++) {
-> >         if (priv->rx_irq[i] <= 0)
-> >             continue;  /* queue 1+ skipped, no handler registered */
-> >         ...
-> >     }
-> > 
-> > This would leave higher-numbered queues with no interrupt handler,
-> > causing packet loss when traffic arrives on those queues.
-> > 
-> > Would it be safer to validate all queue IRQs before enabling multi-IRQ
-> > mode, or fall back to MAC IRQ mode if any queue IRQ is missing?
-> > 
-> > > +
-> > >  	plat->rx_fifo_size = 20480;
-> > >  	plat->tx_fifo_size = 20480;
-> 
-> Hi Simon,
-> 
-> I already addressed this in v6 I sent today.
+On Thu, Feb 26, 2026 at 12:18=E2=80=AFPM Yung Chih Su <yuuchihsu@gmail.com>=
+ wrote:
+>
+> struct sysctl_fib_multipath_hash_seed contains two u32 fields (user_seed
+> and mp_seed), making it an 8-byte structure with a 4-byte alignment requi=
+rement.
+>
+> In fib_multipath_hash_from_keys(), the code evaluates the entire struct
+> atomically via READ_ONCE():
+>
+> mp_seed =3D READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed).mp_seed;
+> While this silently works on GCC by falling back to unaligned regular loa=
+ds
+> (e.g., LDR/LDUR) which the ARM64 kernel tolerates, it causes a fatal kern=
+el
+> panic when compiled with Clang and LTO enabled.
+>
+> Commit e35123d83ee3 ("arm64: lto: Strengthen READ_ONCE() to acquire when
+> CONFIG_LTO=3Dy") strengthens READ_ONCE() to use Load-Acquire instructions
+> (ldar / ldapr) to prevent compiler reordering bugs under Clang LTO.
+>
+> Since the macro evaluates the full 8-byte struct, Clang emits a 64-bit
+> ldar instruction. ARM64 architecture strictly requires ldar to be
+> naturally aligned. Executing a 64-bit ldar on a 4-byte aligned address
+> (e.g., ending in 0xEC) triggers a strict Alignment Fault (FSC =3D 0x21).
+>
+> Fix this by moving the READ_ONCE() directly to the specific u32 member:
+>
+> mp_seed =3D READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed.mp_seed);
+> This instructs the compiler to emit a 32-bit load (ldar Wn or ldr Wn),
+> which perfectly satisfies the 4-byte alignment requirement and resolves
+> the crash.
+>
+> Fixes: [4ee2a8cace3fb9a34aea6a56426f89d26dd514f3] ("net: ipv4: Add a sysc=
+tl to set multipath hash seed")
+> Signed-off-by: Yung Chih Su <yuuchihsu@gmail.com>
+> ---
+>  include/net/ip_fib.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/include/net/ip_fib.h b/include/net/ip_fib.h
+> index b4495c38e0a0..318593743b6e 100644
+> --- a/include/net/ip_fib.h
+> +++ b/include/net/ip_fib.h
+> @@ -559,7 +559,7 @@ static inline u32 fib_multipath_hash_from_keys(const =
+struct net *net,
+>         siphash_aligned_key_t hash_key;
+>         u32 mp_seed;
+>
+> -       mp_seed =3D READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed).m=
+p_seed;
+> +       mp_seed =3D READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed.mp=
+_seed);
+>         fib_multipath_hash_construct_key(&hash_key, mp_seed);
+>
+>         return flow_hash_from_keys_seed(keys, &hash_key);
 
-Thanks!
+What about proc_fib_multipath_hash_set_seed() ?
+
+It has :
+
+WRITE_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed, new);
+
+Which is IMO strange, regardless of ARM64 clang and whats not.
 
