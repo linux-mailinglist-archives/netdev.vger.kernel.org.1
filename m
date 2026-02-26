@@ -1,55 +1,54 @@
-Return-Path: <netdev+bounces-261224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261225-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MLHKMH7/n2n3fAQAu9opvQ
-	(envelope-from <netdev+bounces-261224-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:08:30 +0100
+	id kJfMKaz/n2n3fAQAu9opvQ
+	(envelope-from <netdev+bounces-261225-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:09:16 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33E3D1A24A5
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:08:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 516AC1A24D7
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:09:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2A94C30BB539
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 08:03:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4513A30D924C
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 08:04:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C1073939A7;
-	Thu, 26 Feb 2026 08:03:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CC70392C58;
+	Thu, 26 Feb 2026 08:04:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xm/D/gmf"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Jf6U3W9b"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9272B392C2F
-	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 08:03:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BCC8392C2F;
+	Thu, 26 Feb 2026 08:04:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772093033; cv=none; b=XcdNHMQ8pMWNu1uNFYjGiVQDbTbB0AD2vsxUqlm5c0nC58exBFn27HLsugl8Ja/3TdSHab9WR3Cx1WPUZ+E2u/hfLh1z7iVgcG9uSQ4xDc+FwcYgJvFBlFKeoIIoSr2yAUlk4o6TvmfSPTVTakSbe2+wUY/gVsoWVwL1dJ0BbDk=
+	t=1772093042; cv=none; b=qxBaM8DiOFdfugHHMkMiTr3mtmBV5oOdAEo66Htkf8xuYz35gN7aHnutnnWR59YkiO7WH2dzELq4AWypq1uZMM2mNtDwfQqetaqQclTVSidWIRt6RkZjRFunXJn627BKBRCEd0FNNOF27rmpio2PYZhvPlZIflcPymKS5egwTHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772093033; c=relaxed/simple;
-	bh=ao2JN9o8rgMD9ewIXTsOj16/l7c71xfGRqxIq1BebNc=;
+	s=arc-20240116; t=1772093042; c=relaxed/simple;
+	bh=+hycExEGWtE0bdhgqOqRMa23UKIfFwblRH3Up5uYKWA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GsZx+wujTCMEA65+61eQd0akqJBxksj3H5vyYewG0Z/v0rdahL05D4SjDR+Cvqx1QnDulNNXAEYmb8jHqCGrw7L78KNr9gxuzLlrUXU2hTbreo2lw2twhmm2XQiBWuM8i+lJMOXDwjzmp3NGKYXL2g0MXR92F2aLuITW7vqyA5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xm/D/gmf; arc=none smtp.client-ip=95.215.58.178
+	 MIME-Version; b=JpEDCL53TG3Cqan8tSXMKl3L9dGuzSbysZsVCEPXqvDp3rJ/DXCC/Pc5FFo/opRgiXYTgOZRfll0SZZoJpuST5YhBxNWvIQHdLc84DRm6zhXjU0a/pgkAs/MKY5aCnsMaTwA/Ct7yAdsU5/Nq4ubMijrPGoB8OAbbCb2ExOZVZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Jf6U3W9b; arc=none smtp.client-ip=95.215.58.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772093029;
+	t=1772093038;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=RGngwSjwz2jDUPqIlsxjsx9PtSmCzj/KBjQeZXWW0sM=;
-	b=xm/D/gmfKMiLN0uXkcO22+38CFUYiAGM3uOpoZ4FjCZ9X/ihuk45FHM64xCgwSejeXWE4h
-	2JQrGLzCp/DKhvp8qlMycfzzpu1gVxgcDtJwCR/t1Uy0DdF15st5xm55J8x+zWpXJ1k6ew
-	CCbaFOtIf4nFLsA/IBIfnJLJU+pXcCU=
+	bh=hIDvQi4bdzbhu4OAyfHcd+4UtYB4c2IfZnH8v6PcyJg=;
+	b=Jf6U3W9bLn8qRUhhikNDWYnCQFuU2LEpJoXug0DVuZIal5/7LSYQMA1LMFf7SAv7jLXe8T
+	8X2d4i/eN4nCqTVoUED4zfr7P5g4zpN509xgfavUzdj2dzjhUE+FGq4625JiEyUoJLDaiX
+	2IrVVq522eKtQvNMdS1F8Qw8We5tyG4=
 From: Jiayuan Chen <jiayuan.chen@linux.dev>
 To: netdev@vger.kernel.org
 Cc: jiayuan.chen@linux.dev,
 	jiayuan.chen@shopee.com,
-	syzbot+5a287bcdc08104bc3132@syzkaller.appspotmail.com,
 	Jay Vosburgh <jv@jvosburgh.net>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -63,8 +62,8 @@ Cc: jiayuan.chen@linux.dev,
 	John Fastabend <john.fastabend@gmail.com>,
 	Stanislav Fomichev <sdf@fomichev.me>,
 	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
 	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
 	Song Liu <song@kernel.org>,
 	Yonghong Song <yonghong.song@linux.dev>,
 	KP Singh <kpsingh@kernel.org>,
@@ -76,9 +75,9 @@ Cc: jiayuan.chen@linux.dev,
 	linux-kernel@vger.kernel.org,
 	bpf@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH net v1 1/2] bpf/bonding: reject vlan+srcmac xmit_hash_policy change when XDP is loaded
-Date: Thu, 26 Feb 2026 16:03:01 +0800
-Message-ID: <20260226080306.98766-2-jiayuan.chen@linux.dev>
+Subject: [PATCH net v1 2/2] selftests/bpf: add test for xdp_bonding xmit_hash_policy compat
+Date: Thu, 26 Feb 2026 16:03:02 +0800
+Message-ID: <20260226080306.98766-3-jiayuan.chen@linux.dev>
 In-Reply-To: <20260226080306.98766-1-jiayuan.chen@linux.dev>
 References: <20260226080306.98766-1-jiayuan.chen@linux.dev>
 Precedence: bulk
@@ -101,10 +100,10 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[linux.dev,shopee.com,syzkaller.appspotmail.com,jvosburgh.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
+	FREEMAIL_CC(0.00)[linux.dev,shopee.com,jvosburgh.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[30];
-	TAGGED_FROM(0.00)[bounces-261224-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	TAGGED_FROM(0.00)[bounces-261225-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -114,120 +113,108 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-0.978];
+	NEURAL_HAM(-0.00)[-0.993];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,5a287bcdc08104bc3132,linux];
+	TAGGED_RCPT(0.00)[netdev,linux];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[shopee.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim,appspotmail.com:email]
-X-Rspamd-Queue-Id: 33E3D1A24A5
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim,shopee.com:email]
+X-Rspamd-Queue-Id: 516AC1A24D7
 X-Rspamd-Action: no action
 
 From: Jiayuan Chen <jiayuan.chen@shopee.com>
 
-bond_option_mode_set() already rejects mode changes that would make a
-loaded XDP program incompatible via bond_xdp_check().  However,
-bond_option_xmit_hash_policy_set() has no such guard.
+Add a selftest to verify that changing xmit_hash_policy to vlan+srcmac
+is rejected when a native XDP program is loaded on a bond in 802.3ad
+mode.  Without the fix in bond_option_xmit_hash_policy_set(), the change
+succeeds silently, creating an inconsistent state that triggers a kernel
+WARNING in dev_xdp_uninstall() when the bond is torn down.
 
-For 802.3ad and balance-xor modes, bond_xdp_check() returns false when
-xmit_hash_policy is vlan+srcmac, because the 802.1q payload is usually
-absent due to hardware offload.  This means a user can:
+The test attaches native XDP to a bond0 (802.3ad, layer2+3), then
+attempts to switch xmit_hash_policy to vlan+srcmac and asserts the
+operation fails.  It also verifies the change succeeds after XDP is
+detached, confirming the rejection is specific to the XDP-loaded state.
 
-1. Attach a native XDP program to a bond in 802.3ad/balance-xor mode
-   with a compatible xmit_hash_policy (e.g. layer2+3).
-2. Change xmit_hash_policy to vlan+srcmac while XDP remains loaded.
-
-This leaves bond->xdp_prog set but bond_xdp_check() now returning false
-for the same device.  When the bond is later destroyed, dev_xdp_uninstall()
-calls bond_xdp_set(dev, NULL, NULL) to remove the program, which hits
-the bond_xdp_check() guard and returns -EOPNOTSUPP, triggering:
-
-WARN_ON(dev_xdp_install(dev, mode, bpf_op, NULL, 0, NULL))
-
-Fix this by rejecting xmit_hash_policy changes to vlan+srcmac when an
-XDP program is loaded on a bond in 802.3ad or balance-xor mode.
-
-commit 39a0876d595b ("net, bonding: Disallow vlan+srcmac with XDP")
-introduced bond_xdp_check() which returns false for 802.3ad/balance-xor
-modes when xmit_hash_policy is vlan+srcmac.  The check was wired into
-bond_xdp_set() to reject XDP attachment with an incompatible policy, but
-the symmetric path -- preventing xmit_hash_policy from being changed to an
-incompatible value after XDP is already loaded -- was left unguarded in
-bond_option_xmit_hash_policy_set().
-
-Note:
-commit 094ee6017ea0 ("bonding: check xdp prog when set bond mode")
-later added a similar guard to bond_option_mode_set(), but
-bond_option_xmit_hash_policy_set() remained unprotected.
-
-Reported-by: syzbot+5a287bcdc08104bc3132@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/6995aff6.050a0220.2eeac1.014e.GAE@google.com/T/
-Fixes: 39a0876d595b ("net, bonding: Disallow vlan+srcmac with XDP")
 Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
 ---
- drivers/net/bonding/bond_main.c    | 9 +++++++--
- drivers/net/bonding/bond_options.c | 2 ++
- include/net/bonding.h              | 1 +
- 3 files changed, 10 insertions(+), 2 deletions(-)
+ .../selftests/bpf/prog_tests/xdp_bonding.c    | 58 +++++++++++++++++++
+ 1 file changed, 58 insertions(+)
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 78cff904cdc3..2854cdfa4af9 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -324,7 +324,7 @@ static bool bond_sk_check(struct bonding *bond)
- 	}
+diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_bonding.c b/tools/testing/selftests/bpf/prog_tests/xdp_bonding.c
+index a5b15e464018..0d4ec1e5b401 100644
+--- a/tools/testing/selftests/bpf/prog_tests/xdp_bonding.c
++++ b/tools/testing/selftests/bpf/prog_tests/xdp_bonding.c
+@@ -704,6 +704,61 @@ static void test_xdp_bonding_features(struct skeletons *skeletons)
+ 	system("ip link del bond");
  }
  
--bool bond_xdp_check(struct bonding *bond, int mode)
-+bool __bond_xdp_check(int mode, int xmit_policy)
- {
- 	switch (mode) {
- 	case BOND_MODE_ROUNDROBIN:
-@@ -335,7 +335,7 @@ bool bond_xdp_check(struct bonding *bond, int mode)
- 		/* vlan+srcmac is not supported with XDP as in most cases the 802.1q
- 		 * payload is not in the packet due to hardware offload.
- 		 */
--		if (bond->params.xmit_policy != BOND_XMIT_POLICY_VLAN_SRCMAC)
-+		if (xmit_policy != BOND_XMIT_POLICY_VLAN_SRCMAC)
- 			return true;
- 		fallthrough;
- 	default:
-@@ -343,6 +343,11 @@ bool bond_xdp_check(struct bonding *bond, int mode)
- 	}
- }
- 
-+bool bond_xdp_check(struct bonding *bond, int mode)
++/*
++ * Test that changing xmit_hash_policy to vlan+srcmac is rejected when a
++ * native XDP program is loaded on a bond in 802.3ad or balance-xor mode.
++ * These modes support XDP only when xmit_hash_policy != vlan+srcmac; freely
++ * changing the policy creates an inconsistency that triggers a WARNING in
++ * dev_xdp_uninstall() during device teardown.
++ */
++static void test_xdp_bonding_xmit_policy_compat(struct skeletons *skeletons)
 +{
-+	return __bond_xdp_check(mode, bond->params.xmit_policy);
++	struct nstoken *nstoken = NULL;
++	int bond_ifindex = -1;
++	int xdp_fd, err;
++
++	SYS(out, "ip netns add ns_xmit_policy");
++	nstoken = open_netns("ns_xmit_policy");
++	if (!ASSERT_OK_PTR(nstoken, "open ns_xmit_policy"))
++		goto out;
++
++	/* 802.3ad with layer2+3 policy: native XDP is supported */
++	SYS(out, "ip link add bond0 type bond mode 802.3ad xmit_hash_policy layer2+3");
++	SYS(out, "ip link add veth0 type veth peer name veth0p");
++	SYS(out, "ip link set veth0 master bond0");
++	SYS(out, "ip link set bond0 up");
++
++	bond_ifindex = if_nametoindex("bond0");
++	if (!ASSERT_GT(bond_ifindex, 0, "bond0 ifindex"))
++		goto out;
++
++	xdp_fd = bpf_program__fd(skeletons->xdp_dummy->progs.xdp_dummy_prog);
++	if (!ASSERT_GE(xdp_fd, 0, "xdp_dummy fd"))
++		goto out;
++
++	err = bpf_xdp_attach(bond_ifindex, xdp_fd, XDP_FLAGS_DRV_MODE, NULL);
++	if (!ASSERT_OK(err, "attach XDP to bond0"))
++		goto out;
++
++	/* With XDP loaded, switching to vlan+srcmac must be rejected */
++	err = system("ip link set bond0 type bond xmit_hash_policy vlan+srcmac 2>/dev/null");
++	ASSERT_NEQ(err, 0, "vlan+srcmac change with XDP loaded should fail");
++
++	/* Detach XDP first, then the same change must succeed */
++	ASSERT_OK(bpf_xdp_detach(bond_ifindex, XDP_FLAGS_DRV_MODE, NULL),
++		  "detach XDP from bond0");
++
++	bond_ifindex = -1;
++	err = system("ip link set bond0 type bond xmit_hash_policy vlan+srcmac 2>/dev/null");
++	ASSERT_OK(err, "vlan+srcmac change without XDP should succeed");
++
++out:
++	if (bond_ifindex > 0)
++		bpf_xdp_detach(bond_ifindex, XDP_FLAGS_DRV_MODE, NULL);
++	close_netns(nstoken);
++	SYS_NOFAIL("ip netns del ns_xmit_policy");
 +}
 +
- /*---------------------------------- VLAN -----------------------------------*/
- 
- /* In the following 2 functions, bond_vlan_rx_add_vid and bond_vlan_rx_kill_vid,
-diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
-index f1c6e9d8f616..adc216df4345 100644
---- a/drivers/net/bonding/bond_options.c
-+++ b/drivers/net/bonding/bond_options.c
-@@ -1574,6 +1574,8 @@ static int bond_option_fail_over_mac_set(struct bonding *bond,
- static int bond_option_xmit_hash_policy_set(struct bonding *bond,
- 					    const struct bond_opt_value *newval)
+ static int libbpf_debug_print(enum libbpf_print_level level,
+ 			      const char *format, va_list args)
  {
-+	if (bond->xdp_prog && !__bond_xdp_check(BOND_MODE(bond), newval->value))
-+		return -EOPNOTSUPP;
- 	netdev_dbg(bond->dev, "Setting xmit hash policy to %s (%llu)\n",
- 		   newval->string, newval->value);
- 	bond->params.xmit_policy = newval->value;
-diff --git a/include/net/bonding.h b/include/net/bonding.h
-index 4ad5521e7731..395c6e281c5f 100644
---- a/include/net/bonding.h
-+++ b/include/net/bonding.h
-@@ -699,6 +699,7 @@ void bond_debug_register(struct bonding *bond);
- void bond_debug_unregister(struct bonding *bond);
- void bond_debug_reregister(struct bonding *bond);
- const char *bond_mode_name(int mode);
-+bool __bond_xdp_check(int mode, int xmit_policy);
- bool bond_xdp_check(struct bonding *bond, int mode);
- void bond_setup(struct net_device *bond_dev);
- unsigned int bond_get_num_tx_queues(void);
+@@ -771,6 +826,9 @@ void serial_test_xdp_bonding(void)
+ 				test_case->xmit_policy);
+ 	}
+ 
++	if (test__start_subtest("xdp_bonding_xmit_policy_compat"))
++		test_xdp_bonding_xmit_policy_compat(&skeletons);
++
+ 	if (test__start_subtest("xdp_bonding_redirect_multi"))
+ 		test_xdp_bonding_redirect_multi(&skeletons);
+ 
 -- 
 2.43.0
 
