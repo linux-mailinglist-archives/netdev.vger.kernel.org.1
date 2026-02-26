@@ -1,200 +1,232 @@
-Return-Path: <netdev+bounces-261632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261633-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2L1UC93SoGmrnAQAu9opvQ
-	(envelope-from <netdev+bounces-261632-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 00:10:21 +0100
+	id UAXqAX3WoGl0nQQAu9opvQ
+	(envelope-from <netdev+bounces-261633-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 00:25:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 599D51B0C7C
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 00:10:20 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2D411B0E26
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 00:25:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DB7B0302EE36
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 23:10:11 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 517B33019CB6
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 23:25:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D6D63A4F23;
-	Thu, 26 Feb 2026 23:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE4EF3242AC;
+	Thu, 26 Feb 2026 23:25:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wESK0CpD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eGEm9YrP"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1128542B724;
-	Thu, 26 Feb 2026 23:10:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772147411; cv=none; b=ULq0VjAyWU966YnLInrPPUSa09UH0m59Z64GgJu+wGL+XLdwSP3aesx91wMyMEMPccz1ApL400OqN68OZoLIpPHzgphqEUTsn0AUHRGJjg9Y2dqHqzXfkwKW3C8E7aCnuLCNW4ffaS7KXC9+mApr59swk7oGT3W9QQNWQZZBlDA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772147411; c=relaxed/simple;
-	bh=NMrML7XWpFxonb99SXNOJH6rQio3XyQFef3xUJwrD30=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=UVBDn+eP3XNkav04p8yb3UKrbTJcuX216jqyvRGicI0sH4smek11IVXFE++YfRgZ2lxxqtbsVRZ3gaGlBrXN6IaIZSNz0/vB20EnUesdk+zce5fJodCP3igNR6ehsH98wSEq0L6PVp5L0950/VIWu6/yfrjDwrnNEvpSHT3M3bg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wESK0CpD; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=PkRfojPSv3CP3LZanTyC5uu1PLQ8pOplU1rIVTgxy/U=; b=wESK0CpDUNq8UiEZ7oh1WCl0bY
-	o69axdMyXf87MeMvhJXBXTDZV5j7Rzx6/2uuezIRoNPL3nMk7nNhdkSTSkvVxdcFX/RwdWwX/dVC0
-	YPSAxT+3Ri0ywW/juB8zZ67g4hvSpbFVCTjeTKw16ZQmu9dbcRPz/K7FG3/4gWHrlB5M486A/LdzO
-	4zc6ULVrVin8DKHijumKHR9BXRiVSdXhWW8TRNOFcNU0l9FacDbxXyzbkA0KQ5YijCct0QpwIJvDK
-	DP+278tRDlmGCCcUZPWZPyOskRdy9B5QOrD1tijdAWnCvC245ZAmz1GxgUikTBhrd+4J4B1x93kn3
-	/wi2pteA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:40152 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vvkUa-0000000005l-2ZN5;
-	Thu, 26 Feb 2026 23:10:00 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vvkUX-0000000AuPo-3mEw;
-	Thu, 26 Feb 2026 23:09:58 +0000
-In-Reply-To: <aaDSJAc-x2-klvHJ@shell.armlinux.org.uk>
-References: <aaDSJAc-x2-klvHJ@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-phy@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>
-Subject: [PATCH RESEND2 net-next 8/8] net: stmmac: qcom-ethqos: remove
- phy_set_mode_ext() after phy_power_on()
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099CA318ED5
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 23:25:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772148345; cv=pass; b=AiJeAnGReFz/fr4hBxnMyzmEfsQSsSlI5yyXLutDx27JX9X+tYbSQo0X+JoAZQqqi2hcMP1d8mhMl6f8v+AkmV9LjcHAqYJmROliqxcfwMstegwOPKGvezyUCnFRu4wx0mc/Itko7rtTlkX+1BhbF9Yjuge9DRIBKCJq1fWc/tk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772148345; c=relaxed/simple;
+	bh=fKEN7m274g2FOvgWDmD5sdNxcW6bHpUV80grnqbWDQU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ee9P0HtWkDaU0GswCBmQIC0njVKqapW+KpnJF/Zq150Saw+VchjLfsJzlKIPXkBj/wthN3StP0zxqZCTVXz4t0P688ft6d9S96W5p7AB0QrQlnKv2lX3oF/YFXydnX4sfKlmXwK6NveCAqg0tqFqWMbJqVck3N6+Dn15lSYtAx4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eGEm9YrP; arc=pass smtp.client-ip=209.85.128.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-7947cf097c1so14810027b3.2
+        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 15:25:42 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772148342; cv=none;
+        d=google.com; s=arc-20240605;
+        b=PsM1iRWTIct1+wHr0IVu+thassho2wWphv5a2VkL/ff78IQAxv43cOypKMiLL8kKOs
+         24DjZ+egJw7VyxDjs08B9I2G9M5t/Lh7fh1MBYDO0q5ev+lxWEXbs4B00y4wY/dlgybr
+         2aMorMZ6nWAy5RDl2efEVCtiNCHBL3slYtY7a5IRAdDD9P7VatD2I/YWXyMWfAQnzOH/
+         d2JN2GIsBtyvT3dTlQCAiHNDigqE4c/SojIReIdmBlDjZpUCdinKRHcSHK35vkjA+WiC
+         ecZoly1xCpQXmcZ6eZN/c8nYvkU5CTEGlucIM1+hD8fl8Fvz4b6DmnIoHp5T/F1q+/Ik
+         YuzQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=RA9ZhPtteEti8GBIEl7r2i+X0yhHEMSgTXlmvWuYNUM=;
+        fh=rQ8YblswCEBSMb111uJMQGSAgM0AOoSMwSN/KykvW2k=;
+        b=ln6UIPAk6g9K5p8uFcssSTgmD0YWcD3dcHEm4Lfs1x92jjVnmnr8KrztNuQo2mcjIw
+         3BFuhxTKDTi1o541t/7wLSkCWx09H0Uo7fBEYdACVAz/L00EACEgpuAouxqnr7xEnURn
+         R1I+635Dz/mYSdFtdX2i8f/CbctCfPZQtWhZaGhjh0e5LPmzr3ihwspkNMsI39A6qMS4
+         VqWHpDLZlvJVraJg43D/0da7xldF526JHqjrtDVf41CPk8bvtMzpplDf7QE1SGDqL+1e
+         F1okCXrr27ASMzqwaveXYSJ0fMYHh4/Le2GDxmBcgPnJ8nSPldeqOaAhzxGmvI2mWvcY
+         r7OQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772148342; x=1772753142; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RA9ZhPtteEti8GBIEl7r2i+X0yhHEMSgTXlmvWuYNUM=;
+        b=eGEm9YrPBH9UT4gKVrl8GfB7soAVA24EhWRqFQg1ow68GFbn2OlEBY5+KOHucUWCFj
+         cQU4teBNyVmFMOT+8H7ks0D7d633c340hjFp4+VllwfWBNlAKvru1vW7iOFa9F5M6L4W
+         /AG4jtWaWnCeT0cU/qiFfuRezO8z3MOaL/MnBKi8u4bsmDKqTqTZgrlfIdNWU2OBN0dF
+         iuEB+1efiA8MHJDKxhxRJfpBFYxrjNVBP2oKjsxljnvETCehl4RbD381mVBZVnrdUpXw
+         lM5+FQAkcSO1qylSco/t4OAEHGFxKNzd+OxNYkIeJ389Sg6Wo3sN6R3SPltJc9cRxazu
+         CflA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772148342; x=1772753142;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=RA9ZhPtteEti8GBIEl7r2i+X0yhHEMSgTXlmvWuYNUM=;
+        b=KtCNpdZag3r+oAH/acDabd8UFIitbScYn8cWZc5bbqnQ/pV40JGIBOUDWihFxDxp8r
+         DVkuSRl/ieZoBJB8maWIShP823yH3Xc7PmVzlkpqZjnW4CNRGMEMhOrLtm5stOfstgSE
+         Xx0ojCBhj3MAPxC7wX6KAkmR/Z9m1WKhU6K86M0NfDgXx0BOnL/0fBkAfnN12RhbvGrs
+         WEMAy5FSesGHtRe7AYoenIINMvdLWLYzmoD56jqxDfhs0cMWmXCv7NnWaGEQfCs7BNa2
+         shMO3hLSR2z7iFcR76CuLyO+6ghaiCLsgAzMECXGnywEMqh4Ns74Eu9LPGcvc6+8S6QR
+         uwMw==
+X-Gm-Message-State: AOJu0Yz0+InxW+g/xEWFy7T5ZETERCKptd8h3rXMwJjOds3dtaGicBPH
+	rhndnWNLmOnFzKbNMZD5kgrm0i1GqAd9D/QsFkQtvbOcHkEoI4DV+nUUD0RR0Wzqhcewpp1s+ii
+	MRgTbXmCn/diuTD9SfQTUGVMBsTlmzKbGni9PW2+3
+X-Gm-Gg: ATEYQzz3QG1s7xjP5QpjOFq9uJa3DHRrG4ka3gSQGogGkk6NgPy5qxQvdRW8YxPW/x5
+	bp7CigZBvKnsHQOM+uRQ7ebUNaaTHHei62z5O1E1TJ85htC9ksvV0ERvtw8NBy0awbfsbpoM1Gq
+	d7SM31WHBvYzCza3uOLfwr4TCji5ia0fXSatkFVAEqnvIJjpoPqjOlskq0+nmVXpxa5KNIJQnE6
+	/PfPLu/c5+EArOyX4psBy+z5D7VCEdJek4HAUNIEXPmB/dRqw6hHqdY3OYBrUbnPK9aNqGeVKuT
+	dL5nIoGEvBdGESo1mtYoojaDs82kvqIEBQt4dSpV
+X-Received: by 2002:a05:690c:d83:b0:796:3977:9f28 with SMTP id
+ 00721157ae682-798855da97bmr10368887b3.51.1772148341487; Thu, 26 Feb 2026
+ 15:25:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vvkUX-0000000AuPo-3mEw@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 26 Feb 2026 23:09:57 +0000
+References: <20260226213454.85586-1-achender@kernel.org>
+In-Reply-To: <20260226213454.85586-1-achender@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 27 Feb 2026 00:25:29 +0100
+X-Gm-Features: AaiRm503t44yYtqzVG2hHOZcr0Eczfg-LoG2ToaT51Z1g1hmiCtsxqgH8nuFLs4
+Message-ID: <CANn89iLGtL+Mka4dww-y+vZpqggMhsNzp5XJbo3RB6RG7=Tgbw@mail.gmail.com>
+Subject: Re: [PATCH net-next] net/rds: Fix circular locking dependency in rds_tcp_tune
+To: Allison Henderson <achender@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, pabeni@redhat.com, 
+	rds-devel@oss.oracle.com, kuba@kernel.org, horms@kernel.org, 
+	linux-rdma@vger.kernel.org, allison.henderson@oracle.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261632-lists,netdev=lfdr.de,kernel];
+	TAGGED_FROM(0.00)[bounces-261633-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.979];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,rmk-PC.armlinux.org.uk:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,qualcomm.com:email]
-X-Rspamd-Queue-Id: 599D51B0C7C
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E2D411B0E26
 X-Rspamd-Action: no action
 
-The call to phy_set_mode_ext() after phy_power_on() was a work-around
-for the qcom-sgmii-eth SerDes driver that only re-enabled its clocks on
-phy_power_on() but did not configure the PHY. Now that the SerDes driver
-fully configures the SerDes at phy_power_on(), there is no need to call
-phy_set_mode_ext() immediately afterwards.
+On Thu, Feb 26, 2026 at 10:34=E2=80=AFPM Allison Henderson <achender@kernel=
+.org> wrote:
+>
+> syzbot reported a circular locking dependency in rds_tcp_tune() where
+> sk_net_refcnt_upgrade() is called while holding the socket lock:
+>
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
+> WARNING: possible circular locking dependency detected
+> ------------------------------------------------------
+> kworker/u10:8/15040 is trying to acquire lock:
+> ffffffff8e9aaf80 (fs_reclaim){+.+.}-{0:0}, at: __kmalloc_cache_noprof+0x4=
+b/0x6f0
+>
+> but task is already holding lock:
+> ffff88805a3c1ce0 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: rds_tcp_tune+0xd7/=
+0x930
+>
+> The issue occurs because sk_net_refcnt_upgrade() performs memory allocati=
+on
+> (via get_net_track() -> ref_tracker_alloc()) while the socket lock is hel=
+d,
+> creating a circular dependency with fs_reclaim.
+>
+> Fix this by moving sk_net_refcnt_upgrade() outside the socket lock critic=
+al
+> section. Since the fresh socket is not yet exposed to other threads, no
+> locks are needed at this time.
+>
+> Reported-by: syzbot+2e2cf5331207053b8106@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3D2e2cf5331207053b8106
+> Fixes: 5c70eb5c593d ("net: better track kernel sockets lifetime")
 
-This also means we no longer need to record the previous operating mode
-of the driver - this is up to the SerDes driver. In any case, the only
-thing that we care about is the SerDes provides the necessary clocks to
-the stmmac core to allow it to reset at this point. The actual mode is
-irrelevant at this point as the correct mode will be configured in
-ethqos_mac_finish_serdes() just before the network device is brought
-online.
+Are you sure this is the right Fixes: tag ?
 
-Reviewed-by: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-Tested-by: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- .../stmicro/stmmac/dwmac-qcom-ethqos.c         | 18 ++----------------
- 1 file changed, 2 insertions(+), 16 deletions(-)
+Before this patch we had a GFP_KERNEL allocation already ?
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index 8913f6f02b9e..cb1c074c2053 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -105,7 +105,6 @@ struct qcom_ethqos {
- 
- 	struct clk *link_clk;
- 	struct phy *serdes_phy;
--	phy_interface_t serdes_mode;
- 	phy_interface_t phy_mode;
- 
- 	const struct ethqos_emac_por *rgmii_por;
-@@ -648,17 +647,8 @@ static int qcom_ethqos_serdes_powerup(struct net_device *ndev, void *priv)
- 		return ret;
- 
- 	ret = phy_power_on(ethqos->serdes_phy);
--	if (ret) {
--		phy_exit(ethqos->serdes_phy);
--		return ret;
--	}
--
--	ret = phy_set_mode_ext(ethqos->serdes_phy, PHY_MODE_ETHERNET,
--			       ethqos->serdes_mode);
--	if (ret) {
--		phy_power_off(ethqos->serdes_phy);
-+	if (ret)
- 		phy_exit(ethqos->serdes_phy);
--	}
- 
- 	return ret;
- }
-@@ -681,12 +671,9 @@ static int ethqos_mac_finish_serdes(struct net_device *ndev, void *priv,
- 	qcom_ethqos_set_sgmii_loopback(ethqos, false);
- 
- 	if (interface == PHY_INTERFACE_MODE_SGMII ||
--	    interface == PHY_INTERFACE_MODE_2500BASEX) {
-+	    interface == PHY_INTERFACE_MODE_2500BASEX)
- 		ret = phy_set_mode_ext(ethqos->serdes_phy, PHY_MODE_ETHERNET,
- 				       interface);
--		if (ret == 0)
--			ethqos->serdes_mode = interface;
--	}
- 
- 	return ret;
- }
-@@ -839,7 +826,6 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
- 		plat_dat->host_dma_width = data->dma_addr_width;
- 
- 	if (ethqos->serdes_phy) {
--		ethqos->serdes_mode = PHY_INTERFACE_MODE_SGMII;
- 		plat_dat->serdes_powerup = qcom_ethqos_serdes_powerup;
- 		plat_dat->serdes_powerdown  = qcom_ethqos_serdes_powerdown;
- 	}
--- 
-2.47.3
+This might instead come from
 
+commit 3a58f13a881ed351198ffab4cf9953cf19d2ab3a
+    net: rds: acquire refcount on TCP sockets
+
+> Signed-off-by: Allison Henderson <achender@kernel.org>
+> ---
+>  net/rds/tcp.c | 14 ++++++++++----
+>  1 file changed, 10 insertions(+), 4 deletions(-)
+>
+> diff --git a/net/rds/tcp.c b/net/rds/tcp.c
+> index 04f310255692..da22b3dfdbf0 100644
+> --- a/net/rds/tcp.c
+> +++ b/net/rds/tcp.c
+> @@ -490,18 +490,24 @@ bool rds_tcp_tune(struct socket *sock)
+>         struct rds_tcp_net *rtn;
+>
+>         tcp_sock_set_nodelay(sock->sk);
+> -       lock_sock(sk);
+>         /* TCP timer functions might access net namespace even after
+>          * a process which created this net namespace terminated.
+>          */
+>         if (!sk->sk_net_refcnt) {
+> -               if (!maybe_get_net(net)) {
+> -                       release_sock(sk);
+> +               if (!maybe_get_net(net))
+>                         return false;
+> -               }
+> +               /*
+> +                * We call sk_net_refcnt_upgrade before the lock_sock sin=
+ce it is
+> +                * not yet shared, no lock is needed at this time.  Furth=
+er,
+> +                * because sk_net_refcnt_upgrade does a GFP_KERNEL alloca=
+tion,
+> +                * this can trigger an fs_reclaim in other systems which =
+creates
+> +                * a circular lock dependancy.  Avoid this by upgrading t=
+he
+> +                * refcnt before the locking the socket.
+> +                */
+>                 sk_net_refcnt_upgrade(sk);
+>                 put_net(net);
+>         }
+> +       lock_sock(sk);
+>         rtn =3D net_generic(net, rds_tcp_netid);
+>         if (rtn->sndbuf_size > 0) {
+>                 sk->sk_sndbuf =3D rtn->sndbuf_size;
+> --
+> 2.43.0
+>
 
