@@ -1,139 +1,269 @@
-Return-Path: <netdev+bounces-261349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261350-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eF5LGphMoGnvhwQAu9opvQ
-	(envelope-from <netdev+bounces-261349-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 14:37:28 +0100
+	id CNCpCrVOoGmIiAQAu9opvQ
+	(envelope-from <netdev+bounces-261350-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 14:46:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D399D1A6B21
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 14:37:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B6E71A6E39
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 14:46:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0034630C367A
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 13:33:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E1BA730480C4
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 13:40:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4031E361677;
-	Thu, 26 Feb 2026 13:33:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 634D627587D;
+	Thu, 26 Feb 2026 13:40:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KsTS9u2U"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HZz5O2lT";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="0jtwE0fH";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HZz5O2lT";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="0jtwE0fH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD9C236213E;
-	Thu, 26 Feb 2026 13:33:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5F472472A6
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 13:39:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772112797; cv=none; b=hn58zQg6v7NCUtCr4bkNPwJ0wI89df9m7a63zFh7EEkfQExHbUCtVdb6fYdaoQe3+29eoUk+bnaWt+/MUALDfjoNY31Ngs/+EkHH17h9+CFAN3zxN+RnFLK/aFn/xhgSWUr8MWwBgfcdcTNWCCw27iYruDe/TMofWTQ6liYTM9E=
+	t=1772113201; cv=none; b=KiIitZ1Wi46mH0JhWf752B8mmJwozmV/NQ7L5AIrG2Ge00gtIdX6hgF5R1AuNmUQrv6UmOQTkHW/ZDeSLxh24NsZ1V+OaR0EkjPS+SozujjUPxCBgvmkytlJuiIL5CIU4H9QzntDt7I8BoSyXRk81F5i/0PzLtrd4n6JfpXKaJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772112797; c=relaxed/simple;
-	bh=SXJFppxWUm/YXXdkvyUruOdJHlBV/gZGSuq7rtyW5MI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W7lANMJBRrwucxmyaCkBpv4zLV+hWcjJKM+JfuTfYUDwNVcqJC8yVV/VZVRygS4jZQSnCoW99cEKhsY7dRjlUYWY/BwloBeCE5NWCHQaPLFuLb8BpKJkwS8ue3x2cAIwAS1JPCBl+SnAQ6mLjj03IfgzmffWmFk4DWm5kGJ6x5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KsTS9u2U; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21E61C116C6;
-	Thu, 26 Feb 2026 13:33:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772112797;
-	bh=SXJFppxWUm/YXXdkvyUruOdJHlBV/gZGSuq7rtyW5MI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KsTS9u2UyLqPp0D8teli+dTbuMSj2ZZGaojDMInwxrJT47HEJDBKXPsHdYTT3zo1f
-	 khGl0SLSwzKWoVI4EsiYfacNFUgrC81WiJ9BliGNvY4rNd6can1JoW9oNqcEbQvbk9
-	 qQ1pZwz7v2opW0GtEQdKma6+DXwjirAIF0eui31/GnJGmqh5jd/aW75kRjPYjkDQTS
-	 TOOi6fdOjIPjOq0f91I6QyBLAYKGXN1BPAl6j1bzz67Mnw1QC4q6iAzjtWYAMCefGf
-	 XehfVug8DfwfKJqFn46h9rIGIBWwV0plCSDyVbJ2SPpERPTbdYw5BkpCc5NRrPS+dQ
-	 Ux0hjYlOBJ9TA==
-Date: Thu, 26 Feb 2026 13:33:12 +0000
-From: Simon Horman <horms@kernel.org>
-To: Kexin Sun <kexinsun@smail.nju.edu.cn>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, julia.lawall@inria.fr,
-	xutong.ma@inria.fr, yunbolyu@smu.edu.sg, ratnadiraw@smu.edu.sg
-Subject: Re: [PATCH net-next v2] net/hsr: update outdated comments
-Message-ID: <aaBLmF9w7jf8pqTT@horms.kernel.org>
-References: <20260225145159.2953-1-kexinsun@smail.nju.edu.cn>
+	s=arc-20240116; t=1772113201; c=relaxed/simple;
+	bh=OoAR2IUdPfUFDpfthAytr+7Vy8Nge9nY+Ri2mkl1RVI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eL9Dsd246BQCApNROAJ94f1KjqFsmIrlYZ/0iaTXbssGXuZdxh5np0GKJSBI9GdsEqXeD0nBx2zmrSZUAfzC5BjMI/dFSnBzNulQn6uul9oCvXP/uK/UIwKloGkdpnkOuRtm/gM4oJVNRvG0Fajx3sWkwCOa6+Bb4BEzk161Zvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HZz5O2lT; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=0jtwE0fH; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HZz5O2lT; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=0jtwE0fH; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 247BE4D372;
+	Thu, 26 Feb 2026 13:39:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772113198; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=cvDSo/Pj6gpV1QbypJ6eAriHqDylEig072dIyeJz0Yk=;
+	b=HZz5O2lTX7Msoykuyf2J3xSVaOa8tr11H222P7uip6rXjajUUNXwQ4CMvOLwg+kb2x12xl
+	Ch+5Y5n+VAJoR8SjEH4kgdgpvKAFMZgd5+HsmJW0OjQgAWyfeQcDn/8j+9ZjHl5hXcBHHL
+	gPkF0hGBBJ4eFoylW6tvcXqynUhsJj0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772113198;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=cvDSo/Pj6gpV1QbypJ6eAriHqDylEig072dIyeJz0Yk=;
+	b=0jtwE0fHGnzwtLoGTaQ9trNntLJvJrdi/AEmvSQfsZs3J64PNRondRaqaqn4ISNCQ8/R8w
+	+amQO2H299Ui6VAQ==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=HZz5O2lT;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=0jtwE0fH
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772113198; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=cvDSo/Pj6gpV1QbypJ6eAriHqDylEig072dIyeJz0Yk=;
+	b=HZz5O2lTX7Msoykuyf2J3xSVaOa8tr11H222P7uip6rXjajUUNXwQ4CMvOLwg+kb2x12xl
+	Ch+5Y5n+VAJoR8SjEH4kgdgpvKAFMZgd5+HsmJW0OjQgAWyfeQcDn/8j+9ZjHl5hXcBHHL
+	gPkF0hGBBJ4eFoylW6tvcXqynUhsJj0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772113198;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=cvDSo/Pj6gpV1QbypJ6eAriHqDylEig072dIyeJz0Yk=;
+	b=0jtwE0fHGnzwtLoGTaQ9trNntLJvJrdi/AEmvSQfsZs3J64PNRondRaqaqn4ISNCQ8/R8w
+	+amQO2H299Ui6VAQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 853F33EA62;
+	Thu, 26 Feb 2026 13:39:57 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id hA9fHS1NoGl/ZQAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Thu, 26 Feb 2026 13:39:57 +0000
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+To: netdev@vger.kernel.org
+Cc: tgraf@infradead.org,
+	horms@kernel.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	dsahern@kernel.org,
+	davem@davemloft.net,
+	Fernando Fernandez Mancera <fmancera@suse.de>
+Subject: [PATCH 1/2 net-next v2] ipv4: validate IPV4_DEVCONF attributes properly
+Date: Thu, 26 Feb 2026 14:39:48 +0100
+Message-ID: <20260226133949.17070-1-fmancera@suse.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260225145159.2953-1-kexinsun@smail.nju.edu.cn>
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Score: -3.01
+X-Spam-Level: 
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[suse.de:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-261349-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261350-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D399D1A6B21
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:mid,suse.de:dkim,suse.de:email]
+X-Rspamd-Queue-Id: 8B6E71A6E39
 X-Rspamd-Action: no action
 
-On Wed, Feb 25, 2026 at 10:51:59PM +0800, Kexin Sun wrote:
-> The function hsr_rcv() was renamed hsr_handle_frame() and moved to
-> net/hsr/hsr_slave.c by commit 81ba6afd6e64 ("net/hsr: Switch from
-> dev_add_pack() to netdev_rx_handler_register()").
-> 
-> Update all remaining references in the comments accordingly.
-> 
-> Signed-off-by: Kexin Sun <kexinsun@smail.nju.edu.cn>
-> ---
-> Hi Simon,
-> 
-> Regarding your question about how these were found: we are building a 
-> research prototype for identifying and fixing dangling method references 
-> in comments. Generally, we use Coccinelle to check for dangling references 
-> and DeepSeek-V3.2 to generate the fixes. 
-> 
-> Since it is still a work-in-progress, we haven't settled on a proper tool 
-> name yet. Therefore, I chose to omit the `Assisted-by:` tag in this v2 
-> patch for now. Do you have any suggestions on what would be appropriate 
-> to use in this situation?
+As the IPV4_DEVCONF netlink attributes are not being validated, it is
+possible to use netlink to set read-only values like mc_forwarding. In
+addition, valid ranges are not being validated neither but that is less
+relevant as they aren't in sysctl.
 
-Hi Kexin,
+To avoid similar situations in the future, define a NLA policy for
+IPV4_DEVCONF attributes which are nested in IFLA_INET_CONF.
 
-I think many people are experimenting.
-And likewise, the use of Assisted-by is evolving.
+Please note that MEDIUM_ID is defined as NLA_U32 too because currently
+its usage through netlink is broken for its valid value -1. Modifying
+the type to NLA_S32 would break existing users of set/get netlink
+operation.
 
-My reading of [1] is that an Assisted-by tag is appropriate here.
-I would suggest:
+Fixes: 9f0f7272ac95 ("ipv4: AF_INET link address family")
+Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+---
+v2: no changes
+---
+ net/ipv4/devinet.c | 81 ++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 71 insertions(+), 10 deletions(-)
 
-Assisted-by: deepseek-v3.2 coccinelle
+diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
+index 942a887bf089..590c68e979f5 100644
+--- a/net/ipv4/devinet.c
++++ b/net/ipv4/devinet.c
+@@ -2063,12 +2063,76 @@ static const struct nla_policy inet_af_policy[IFLA_INET_MAX+1] = {
+ 	[IFLA_INET_CONF]	= { .type = NLA_NESTED },
+ };
+ 
++static const struct nla_policy inet_devconf_policy[IPV4_DEVCONF_MAX + 1] = {
++	[IPV4_DEVCONF_FORWARDING]			  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++	[IPV4_DEVCONF_MC_FORWARDING]			  = { .type = NLA_REJECT },
++	[IPV4_DEVCONF_PROXY_ARP]			  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++	[IPV4_DEVCONF_ACCEPT_REDIRECTS]			  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++	[IPV4_DEVCONF_SECURE_REDIRECTS]			  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++	[IPV4_DEVCONF_SEND_REDIRECTS]			  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++	[IPV4_DEVCONF_SHARED_MEDIA]			  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++	[IPV4_DEVCONF_RP_FILTER]			  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 2),
++	[IPV4_DEVCONF_ACCEPT_SOURCE_ROUTE]		  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++	[IPV4_DEVCONF_BOOTP_RELAY]			  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++	[IPV4_DEVCONF_LOG_MARTIANS]			  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++	[IPV4_DEVCONF_TAG]				  = { .type = NLA_U32 },
++	[IPV4_DEVCONF_ARPFILTER]			  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++	[IPV4_DEVCONF_MEDIUM_ID]			  = { .type = NLA_U32 },
++	[IPV4_DEVCONF_NOXFRM]				  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++	[IPV4_DEVCONF_NOPOLICY]				  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++	[IPV4_DEVCONF_FORCE_IGMP_VERSION]		  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 3),
++	[IPV4_DEVCONF_ARP_ANNOUNCE]			  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 2),
++	[IPV4_DEVCONF_ARP_IGNORE]			  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 8),
++	[IPV4_DEVCONF_PROMOTE_SECONDARIES]		  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++	[IPV4_DEVCONF_ARP_ACCEPT]			  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++	[IPV4_DEVCONF_ARP_NOTIFY]			  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++	[IPV4_DEVCONF_ACCEPT_LOCAL]			  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++	[IPV4_DEVCONF_SRC_VMARK]			  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++	[IPV4_DEVCONF_PROXY_ARP_PVLAN]			  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++	[IPV4_DEVCONF_ROUTE_LOCALNET]			  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++	[IPV4_DEVCONF_IGMPV2_UNSOLICITED_REPORT_INTERVAL] = { .type = NLA_U32 },
++	[IPV4_DEVCONF_IGMPV3_UNSOLICITED_REPORT_INTERVAL] = { .type = NLA_U32 },
++	[IPV4_DEVCONF_IGNORE_ROUTES_WITH_LINKDOWN]	  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++	[IPV4_DEVCONF_DROP_UNICAST_IN_L2_MULTICAST]	  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++	[IPV4_DEVCONF_DROP_GRATUITOUS_ARP]		  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++	[IPV4_DEVCONF_BC_FORWARDING]			  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++	[IPV4_DEVCONF_ARP_EVICT_NOCARRIER]		  = NLA_POLICY_RANGE(NLA_U32,
++									     0, 1),
++};
++
+ static int inet_validate_link_af(const struct net_device *dev,
+ 				 const struct nlattr *nla,
+ 				 struct netlink_ext_ack *extack)
+ {
+-	struct nlattr *a, *tb[IFLA_INET_MAX+1];
+-	int err, rem;
++	struct nlattr *tb[IFLA_INET_MAX + 1], *nested_tb[IPV4_DEVCONF_MAX + 1];
++	int err;
+ 
+ 	if (dev && !__in_dev_get_rtnl(dev))
+ 		return -EAFNOSUPPORT;
+@@ -2079,15 +2143,12 @@ static int inet_validate_link_af(const struct net_device *dev,
+ 		return err;
+ 
+ 	if (tb[IFLA_INET_CONF]) {
+-		nla_for_each_nested(a, tb[IFLA_INET_CONF], rem) {
+-			int cfgid = nla_type(a);
++		err = nla_parse_nested(nested_tb, IPV4_DEVCONF_MAX,
++				       tb[IFLA_INET_CONF], inet_devconf_policy,
++				       extack);
+ 
+-			if (nla_len(a) < 4)
+-				return -EINVAL;
+-
+-			if (cfgid <= 0 || cfgid > IPV4_DEVCONF_MAX)
+-				return -EINVAL;
+-		}
++		if (err < 0)
++			return err;
+ 	}
+ 
+ 	return 0;
+-- 
+2.53.0
 
-or
-
-Assisted-by: unnamed:deepseek-v3.2 coccinelle
-
-[1] https://docs.kernel.org/process/coding-assistants.html
-
-
-Overall, this now looks good to me.
-Thanks for the update.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
 
