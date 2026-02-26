@@ -1,243 +1,187 @@
-Return-Path: <netdev+bounces-261323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261324-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OKfCJmA6oGmagwQAu9opvQ
-	(envelope-from <netdev+bounces-261323-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 13:19:44 +0100
+	id YJT8CY06oGmagwQAu9opvQ
+	(envelope-from <netdev+bounces-261324-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 13:20:29 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC60B1A5A12
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 13:19:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C9581A5A2A
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 13:20:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 99503301378A
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:19:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6CC403013AB3
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:20:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2538922A4F8;
-	Thu, 26 Feb 2026 12:19:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B453327EFE3;
+	Thu, 26 Feb 2026 12:20:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="O61Gb5Ac"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cgYEFS1D"
 X-Original-To: netdev@vger.kernel.org
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012058.outbound.protection.outlook.com [52.101.66.58])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF7DB1D88AC;
-	Thu, 26 Feb 2026 12:19:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.58
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772108382; cv=fail; b=dC2wcSenF9xTxlLvkDeHKtsQKWtb0Ux5ZQWBJ9nM31S7LXkmC9CsVDI0YN/ttwDIIa+dWhq4PgAxwQXbaGUDiLudf2m/8TWXb3oamQUN0/2/pxbXi3EAPczmnlbDoPNP1/Vf39RWxBtB7cLdUjQlWjS73x9K58AvOE9QEtA0nro=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772108382; c=relaxed/simple;
-	bh=dN3E1iPGZJJ1b7CPxlWu5+08bPZfkAzBPU4GVLawZqo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=ERo3h4kWUUKD2on950D6lFXuIWJkmBRfebi2+HEk34293eIMYQJUSOeCSJsKz8Vc/XMnOEuUMiHtWdlAyoOOQiV259+0Jr62TZra/lSUw86wgsoGV9/YfREFNfzSKPF/p3DZhsykKceXwTuwd/wHfDcK+/rJxihxK2rgUPFOk0g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=O61Gb5Ac; arc=fail smtp.client-ip=52.101.66.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sVnrt+m/jyNftRno8c/XccWw0wBEyetDty4jXB7j/b+2Z7S9gc8C7igeeMNNRtKV9v3BIjqENyIGDZOJ861GdF079WZw4oiuNM0Q8Uuj9s1F9/7BQyIcxXLA8GMzPcVHoByA/BZV1Q0m6FpYcBVmw0K/tUJOgIjB5pWk8VtqU4f5Q7ldf6DEdm/Bl6shjQqHYEsdJru1Nu+przY4htNsEh0gueBOltSI7iTcMMJPv0s3mGREGmq+Lb4hWkQyupa5Q++L4ZnXglnkr312DV8XmJ7SJkMMiRiPVQYmmFxVAVcoOaX4e6xrRL+CDzrsIEjm+Kqekh6KQdivkrgWCxYRrQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ky4PjCTWCve2yauhbJ4UoBmmcSL4AhdMK6LSmDT84/c=;
- b=KxFVTMN9SLv0idGf9GULANupeywGMTQ56gw0hC7fhpFwTDV1tJ/JCRE863v4conWVMqV1tw3/R6IkMDCoxWSSCvR7pqPGivCrl6r2dL7HRL3zVhcAn4bAqr4SQLbMGK/wMoHOskwhzNRh09uNW17KJChh5aIpQcg2uGk0jEMFq19lpPj0R4EfmzVfXhr07M2Kgviaikurv/0AlOPGetnvYS3qulxGaD4d1aMKj1oAV4mitF08i0z/GbEQDtEJBXD+A0RvRfPdnsfVRK9u0OMSW7SrY7k+Sy5RcRwXYC3xNtQUkG/hM49Z+InG6BsEe4E1aLgqmjkanLQ/P76zuWtpA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ky4PjCTWCve2yauhbJ4UoBmmcSL4AhdMK6LSmDT84/c=;
- b=O61Gb5AcgFm0TXxVEbd7Z/YKzR/KGUIu2SN/cAa8ch8QOA+srLzYPaHqTPfXQYNKwFdmCvKEtOJK055Gabf7a8bbZE6ouIsZulrMxBWuxbd9AC51UDyt7oWYZSB/spbJ4OUCG/ayrOE3TsdEJXr/PKgIQJGnSgIPe96RDCkiosW901oD1yvxQwP7+UxxfwAoGVyLGY96fsBIVT4hIzoW1mQzT6ArjWru5CwbtCdsEDDbJqqWsUxrIhVqqv+8bFIFTVYciWelxVU/2yjZ5PIYrl5dVbIyrAFQd26stmkPGj7OrU5ASC4QnzsET/NsMupLCncf1oD3hVoJhaCTyZRyHQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB8253.eurprd04.prod.outlook.com (2603:10a6:102:1bf::7)
- by AS8PR04MB8659.eurprd04.prod.outlook.com (2603:10a6:20b:42a::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.23; Thu, 26 Feb
- 2026 12:19:37 +0000
-Received: from PAXPR04MB8253.eurprd04.prod.outlook.com
- ([fe80::2b4e:8130:4419:d633]) by PAXPR04MB8253.eurprd04.prod.outlook.com
- ([fe80::2b4e:8130:4419:d633%3]) with mapi id 15.20.9654.013; Thu, 26 Feb 2026
- 12:19:37 +0000
-Date: Thu, 26 Feb 2026 14:19:33 +0200
-From: Ioana Ciornei <ioana.ciornei@nxp.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next 5/5] selftests: drivers: hw: add tests for the
- ethtool standard counters
-Message-ID: <ph7vs3fsxti3nlypmmvm6wqvsnnsn76wct3qpi5omphggcjqrt@3any2dqzlgsr>
-References: <20260225150648.1542206-1-ioana.ciornei@nxp.com>
- <20260225150648.1542206-6-ioana.ciornei@nxp.com>
- <77f3e4e8-430e-4ae1-aa1f-8f70b4d8d3da@lunn.ch>
- <osswnpbiyy35ycs7ha2ufugj7dzmvpeq3x7vjq4j53qtwamkuw@ihwl5qjuydnv>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <osswnpbiyy35ycs7ha2ufugj7dzmvpeq3x7vjq4j53qtwamkuw@ihwl5qjuydnv>
-X-ClientProxiedBy: AM8P189CA0024.EURP189.PROD.OUTLOOK.COM
- (2603:10a6:20b:218::29) To PAXPR04MB8253.eurprd04.prod.outlook.com
- (2603:10a6:102:1bf::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469A827B50F;
+	Thu, 26 Feb 2026 12:20:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772108420; cv=none; b=rvsttWBFWEPTQpk9kKONBAetk1sQhPSh9sl++S7z9USXhNfTaGFfPPOX2zz+StzaWLqNfRhsjHBq4vvk39DkFQ4uTVIJ2V3gSPL1E2tnWMuwLBCHy0CnXZqziCxREB5nAzkElkU6xX4Sj0unwbiofEXE34j7qq0hA3lpLsijGQg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772108420; c=relaxed/simple;
+	bh=iiBtXlalbGXXCRQ1WO64lC7nwJGkJ7XOXhtNK/4xRkE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k04ZA0b/k9IUxhLHa8gSCV7bF9B3zsQUjRiTBfYvbMyAEO3KQFNOsDDgE0icND172ZSYURzaUf6rTzehAY83dJS8XIiuN8hB5uopIQMd6omuihz9s/A0OG/8JxrpEvYru8fclFSOqWD5F4dJg1IgckdNnWnfuqrk+FNDIiQeMGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cgYEFS1D; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A825AC116C6;
+	Thu, 26 Feb 2026 12:20:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772108419;
+	bh=iiBtXlalbGXXCRQ1WO64lC7nwJGkJ7XOXhtNK/4xRkE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cgYEFS1DCq4e/v1wNCyNETOTZ35sPU8PYMbRbUfOwZltvgIcmU9UWyVKdljcH4owT
+	 2Zlu5XZ43oBkuoZ2CzhhybqAvtT7cIkYg9a/ujhkZcEluZiT7PTHq2AdVQsjAzx0ct
+	 7vo88HIZIPZ/qoERTlNrQIIACUEtAYi/SWVbg+p9bXfgfcVrNiX2Gd3Jmy4BXl0oot
+	 ZbijcKn/gWqNOXAIg6yM4NX22ooFRwO0a39J7sKsWweAs4MYSU3n/Rp7oJvdlPQ+dL
+	 5XDMnd6T1UemkSHe6z7N2NRA7Lv5fQeFLqXFFvzQrwZ9Tp2s9m1duXzhWC3Pl0TU0v
+	 0zOD3lg7daEmg==
+Date: Thu, 26 Feb 2026 12:20:15 +0000
+From: Simon Horman <horms@kernel.org>
+To: Sagi Maimon <maimon.sagi@gmail.com>
+Cc: jonathan.lemon@gmail.com, vadim.fedorenko@linux.dev,
+	richardcochran@gmail.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v1] ptp: ocp: Add support for Xilinx-based Adva TimeCard
+ variant
+Message-ID: <aaA6f5xS5yONVlmE@horms.kernel.org>
+References: <20260225102938.4131-1-maimon.sagi@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB8253:EE_|AS8PR04MB8659:EE_
-X-MS-Office365-Filtering-Correlation-Id: 865fec6c-8184-40d9-be3f-08de75314f03
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|1800799024|19092799006|366016;
-X-Microsoft-Antispam-Message-Info:
-	xJXzsS9ZGhTxBoE4pqGSPcuAlUoNkuU/fkDnNTndzM9HCgvfTTra5HGfvYYplFInhwpZEei+eTLsIvYWjnmh5YX1v7dqaoMiHHZ+hUR0mpzQWIKPkSvGUCFTF/lPNfZ8Yi/x7iSMF8glwm//6IXWUU3BYvr2AGboVxeyfb5h4Zhiq3ZaC3qjP8py+Ge7ggNOsPCMEBD7Bh0uXT3CfMzQMHFuh2DGN6vr5cOLY7b+6cPjaceIpqL6hVmy0aEJROJW1MpmTFuYTVQt53dIXiGUbDpO9a1dTmlEIoZEuyOm3g5qmkYLX9UTnVG95ruR5ZMHVGVut8632Ysg8eg7CxPn3PAJW6d9lva686HFTeO4zRCLa/8EeGSOH8yQBR5DK/A8BiH8x3g/Zd9Cz6anF5xFBwjtFq3iO/OVsGGkEvEerQzf9viZJR4JyE5zTIbsmXdnOYFtB23dgh0uAS3HD2/BaS9QRhEbZ1dszC5O2tCsOqK8K0rDWCnLaNKvbNNBAltU/p5qm8oxkUiekJRECi2rRiPNqrjuNLzAG+SYIWifC3MNtmZu8LwIw+UEu3zcj4K7n7WGZYNJZi0yf3ucNXlOO69gasu1YyN45KjxoQ0jqgqt60vPhLJe54WYNvqDMBpU8uiKeEmSGNdHZXtwUrHtL1P0mcb9YJNRKur3t5pXtRMHO98uw/WcS1f6Q57XlR8g/+vv3VZVWyf4e/5jw1Vauw9DoA+bFZcM/T5XR8KTmXc=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8253.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(19092799006)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?GsExRBDDZ2URA+jLLtePnurfH3t4QluRt9Pm1ydbprTtg0MxeECUKfBd4xPr?=
- =?us-ascii?Q?8ra4xliXajxoB4mZbRCOpLxpUEjybbl5KPKHzeuJNU5VE9cD5gBkDJ++vF6J?=
- =?us-ascii?Q?Su/SkoAfFPxTPPdydPmkrAWOjPVZmm4u7FFfDxgSVEwqL8Uuo2FEa6qAkNre?=
- =?us-ascii?Q?9PlQzlvRGuwDrz5iirvRzoNe3VPh1AgEiTJjtKt6k4DJNaFbWgJyx194NwN8?=
- =?us-ascii?Q?KHTxR7vqGz1NT43tNpAwwrfEEeqSkf29eTVqFVnAjLn/95MhayW11uKxkJWx?=
- =?us-ascii?Q?Fy02sGVICdSs2OfMs1o3fE22Hxysku/hOpvEIUWblBTo+YAbFqj9L+wIgm/y?=
- =?us-ascii?Q?V+iDro73Y+ClQi7LtrwLmoe0HL3bx27ZLCIUP8X2yuUqaOo/qhjYvZc4PnGM?=
- =?us-ascii?Q?kpYTuiQJgpLaX53tbbxsJU9tX52Bey1WhQILraRjQzGAisSVopkSVKMrIm7g?=
- =?us-ascii?Q?YP7g459118OszK6KQaPV3OTQ+bz2hfxiiIOuBtDFv5yDSDDT1L3BCTelnssq?=
- =?us-ascii?Q?CXQn3h8cmahSGj7MGkTithXYish/DoXZnzdVdwGi0PQrV+vk7hL/ikpoNYfM?=
- =?us-ascii?Q?fJYMz6ucY0fAfqFAdy2cZ1RScUzYyWhrvdGSd9PB+l2yJ4YrlDA5/IHwQAMg?=
- =?us-ascii?Q?zbJtfwaefMsE8ECgBtqhRBgyr7vIuujkR0LaqU9RqD/mCkskuOxVwihWjOd6?=
- =?us-ascii?Q?0tuxOJqFttH/CUNaYJzh5+pNABFdC9X9TVwGCbcs8cjsXdyyWAvV3gws1eSN?=
- =?us-ascii?Q?IyuIuXd4BupteGxzWC6hzSfJyj7MnWtUnLhZQzG2vybR+5cgWwykM5w9JSpI?=
- =?us-ascii?Q?U7FHNoxQhGJz7tqKVFlDCSoye4AL2WgVnWsdh9c3432cjpEjjSAkmCUUxslD?=
- =?us-ascii?Q?D3ujvyqrEKaJK5kRwRQGhTTa18dRpZU+ocBWcwfkNU9ULfyJTQ510j6rkSh2?=
- =?us-ascii?Q?t/+6q0mQB8pGM2GJ4QpcT2nzbQQk2hKnC2s65ZpeeoWfFF65MvgXxi660NjE?=
- =?us-ascii?Q?mETmR6+3oA9vkJEwypo7dy3po+YV1X/2NH+wtHxaZnDS/FPUT7KcaOJtSz0B?=
- =?us-ascii?Q?2xCb5cimukKM7HugzJwO+KuwCbdYQtiPSqPLxS31spRbHcq/48X/lsmfp5Ym?=
- =?us-ascii?Q?dsuqXi3fw9ItpaxtCvBObHCaRSHy+tqy7h8G103IM/MTKk75tBx/xSqJTr/H?=
- =?us-ascii?Q?yIQTmR9T4vYZei5xdWBaIj9G5g6hs784BMBbgIVncfQPUbt2qCz2qGSSBUr1?=
- =?us-ascii?Q?cRoBB64E7CnxirB2p+q1kiziXwd6DCmDUZBO9zAvFz77jMhitqiO2s/XLrpC?=
- =?us-ascii?Q?7/KXVGh87rsoD3NqzWxUApFDlH6AbFtf5R0cbm5Pw5v6b3lGLB2XLOQ4Qp0s?=
- =?us-ascii?Q?/rgRIjT5SVxuyaevf9t2ByuuLKNqmNlV2y6OQ3z+PKJKtPunVpYl1s8850gO?=
- =?us-ascii?Q?NpBCuGrWrChFhcuvYt6Uv5Rm6vG2ka06UELkCM1p5tDTWBI/QlY9OB1bp7XW?=
- =?us-ascii?Q?Ezg5FpxSWYLQ09mtGv2Y7JAbwKJHJqSjYHqED33LsxJRTaauRrkOOKld4xcQ?=
- =?us-ascii?Q?k5d9aTD0KBeilGQmuC5jDDviVohGLUY0ufZ1DWDvoHl31AW5ZTlNgla/Lrps?=
- =?us-ascii?Q?4GAQ1io432kwp1adIoHrm+7f4u/HSYBu+AIz0wtyAFDB5JgOHVUKCoj+WOoe?=
- =?us-ascii?Q?JPVGAOc5S3O2sAh/8U+sCohpIPudAxMPjrKHNjumte7fOCj3SHkzNbyI3cWZ?=
- =?us-ascii?Q?hiN1zGoXuQ=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 865fec6c-8184-40d9-be3f-08de75314f03
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8253.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2026 12:19:37.5462
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: m5YwmNVDGRlyxc1YDtriSTd+n6m95aWAPAhctkZBnh2cyTwB+U2/FKjy9fVcR2tOpQxqkv8bRN9tq8giRk4nvA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8659
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260225102938.4131-1-maimon.sagi@gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[gmail.com,linux.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-261324-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261323-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: EC60B1A5A12
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid]
+X-Rspamd-Queue-Id: 7C9581A5A2A
 X-Rspamd-Action: no action
 
-On Thu, Feb 26, 2026 at 09:03:32AM +0200, Ioana Ciornei wrote:
-> On Thu, Feb 26, 2026 at 12:38:58AM +0100, Andrew Lunn wrote:
-> > On Wed, Feb 25, 2026 at 05:06:48PM +0200, Ioana Ciornei wrote:
-> > > Add a new selftest - ethtool_std_stats.sh - which validates the
-> > > eth-ctrl, eth-mac and pause standard statistics exported by an
-> > > interface. Not all counters can be validated in software, especially
-> > > those that are keeping track of errors. Counters such as
-> > > SingleCollisionFrames, FrameCheckSequenceErrors etc are not tested nor
-> > > included in this new selftest.
-> > 
-> > Hi Ioana
-> > 
-> > Thanks for the test!
-> > 
-> > Do we actually expect errors when running such a test? How many times
-> > have you run this test and seen any of the error counters be anything
-> > other than 0?
+On Wed, Feb 25, 2026 at 12:29:38PM +0200, Sagi Maimon wrote:
+> Add support for the Adva TimeCard model built on a Xilinx-based design.
+> This patch enables detection and integration of the new hardware within
+> the existing OCP timecard framework.
 > 
-> No, we don't expect any errors with this test and I didn't see any error
-> counters incremenent in the tens of times that I ran the selftest. But,
-> to be fair, I was not looking for them thoroughly through testing.
+> The Xilinx variant relies on the shared driver infrastructure, requiring
+> only small, targeted additions to accommodate its specific
+> characteristics.
 > 
-> > 
-> > Which do you think is more likely:
-> > 
-> > 1) A real error happens
-> > 
-> > 2) Bug in the driver so that it reports a value in the wrong place?
-> > 
+> Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
+> ---
+>  drivers/ptp/ptp_ocp.c | 318 ++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 318 insertions(+)
 > 
-> I would say that having a driver bug is much likely than, for example,
-> having an FCS error.
-> 
-> > Maybe we should check the error counters are zero? 
-> 
-> Ok, I will extend the test to check the errors against zero and see how it behaves.
-> 
+> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
 
-I am back with a bit more information. The counters which were not
-checked in this version can be grouped in two categories:
+...
 
-- Error counters such as:
+> @@ -2926,6 +3168,45 @@ ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
+>  	return ptp_ocp_init_clock(bp, r->extra);
+>  }
+>  
+> +/* ADVA specific board X initializers; last "resource" registered. */
+> +static int
+> +ptp_ocp_adva_board_x1_init(struct ptp_ocp *bp, struct ocp_resource *r)
+> +{
+> +	int err;
+> +	u32 version;
+> +
+> +	bp->flash_start = 0x1000000;
+> +	bp->eeprom_map = fb_eeprom_map;
+> +	bp->sma_op = &ocp_adva_x1_sma_op;
+> +	bp->signals_nr = 4;
+> +	bp->freq_in_nr = 4;
+> +
+> +	version = ioread32(&bp->image->version);
+> +	/* if lower 16 bits are empty, this is the fw loader. */
+> +	if ((version & 0xffff) == 0) {
+> +		version = version >> 16;
+> +		bp->fw_loader = true;
+> +	}
+> +	bp->fw_tag = 3;
+> +	bp->fw_version = version & 0xffff;
+> +	bp->fw_cap = OCP_CAP_BASIC | OCP_CAP_SIGNAL | OCP_CAP_FREQ;
+> +
+> +	ptp_ocp_tod_init(bp);
+> +	ptp_ocp_nmea_out_init(bp);
+> +	ptp_ocp_signal_init(bp);
+> +
+> +	err = ptp_ocp_attr_group_add(bp, adva_timecard_x1_groups);
+> +	if (err)
+> +		return err;
+> +
+> +	err = ptp_ocp_set_pins(bp);
+> +	if (err)
+> +		return err;
+> +	ptp_ocp_sma_init(bp);
+> +
+> +	return ptp_ocp_init_clock(bp, r->extra);
+> +}
 
-	u64 FrameCheckSequenceErrors;
-	u64 AlignmentErrors;
-	u64 FramesLostDueToIntMACXmitError;
-	u64 CarrierSenseErrors;
-	u64 FramesLostDueToIntMACRcvError;
-	u64 InRangeLengthErrors;
-	u64 OutOfRangeLengthField;
-	u64 FrameTooLongErrors;
-	u64 FramesAbortedDueToXSColls;
+Hi Sagi,
 
-  I did extend the selftest with these ones so that we check them
-  against zero. I ran the test hundreds of times and I did not see any
-  problems.
+I see similar patterns elsewhere in this driver. So I assume that I'm
+overlooking something obvious. But it strikes me that
+ptp_ocp_attr_group_add() and ptp_ocp_set_pins() allocate memory. Shouldn't
+that be cleaned up if an error subsequently occurs in this function?
 
-- Collision related counters (not really errors):
+And also, shouldn't ptp_ocp_attr_group_add() relase the memory it
+allocates if an error occurs in that function?
 
-	u64 SingleCollisionFrames;
-	u64 MultipleCollisionFrames;
-	u64 FramesWithDeferredXmissions;
-	u64 LateCollisions;
-	u64 FramesWithExcessiveDeferral;
+Lastly, the AI generated code review suggests that there may be
+some scope for sharing code:
 
-  With these I don't know what to do. Theoretically, they could be
-  non-zero in half-duplex circumstances which means that checking for
-  zero would not be entirely accurate.
+  This isn't a bug, but ptp_ocp_adva_board_x1_init() is nearly identical to
+  ptp_ocp_adva_board_init(), differing only in flash_start (0x1000000 vs
+  0xA00000), sma_op assignment, signals_nr (4 vs 2), freq_in_nr (4 vs 2),
+  and the attr group passed to ptp_ocp_attr_group_add(). The version-reading
+  logic and the entire initialization call sequence are duplicated.
 
+  Looking at the existing driver convention, each board variant (fb, art,
+  adva) uses this same pattern with separate init functions. Would it be
+  worth parameterizing these differences in a future cleanup?
 
- Ioana
+...
 
