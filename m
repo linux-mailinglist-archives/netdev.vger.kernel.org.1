@@ -1,176 +1,180 @@
-Return-Path: <netdev+bounces-261232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261233-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UK3HF3YEoGl/fQQAu9opvQ
-	(envelope-from <netdev+bounces-261232-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:29:42 +0100
+	id KI0/OHMEoGl/fQQAu9opvQ
+	(envelope-from <netdev+bounces-261233-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:29:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA03E1A290C
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:29:41 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D3D01A2905
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:29:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A8B6B30048E5
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 08:29:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B4FCA3014A0C
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 08:29:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B0CA394464;
-	Thu, 26 Feb 2026 08:29:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23787394469;
+	Thu, 26 Feb 2026 08:29:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="kGYDhB86"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="obNBBClo"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.couthit.com (server.couthit.com [162.240.164.96])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 214F9393DDE;
-	Thu, 26 Feb 2026 08:29:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DCD438E5CA
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 08:29:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772094552; cv=none; b=qNXveyntVbXK96S0Z/INv/XukKYXAC4yTjMVtLviJCOmc5srV6TJEP/JdeckmKuK04riKLVYB2hD1HW9qbqx20t1wGXRD3YAqNdi+h1KiDYp8JtXkWHTZhwVg0zVUu2CjyeAXfK/I205tAuCy8uOWmQ6kqit9doAhJx/zuu5tjM=
+	t=1772094575; cv=none; b=cdpM6GumWs8AB+v4m0QkSQCBfuoQB2MNZa6kDYf5VWxfKBZHqzSpK32EAvFM7h1TDCvEbhKA1cdjhOPfSfK1RpHwGSIuozyl0lYH020hAjduYlqV9SThIUVJdvzVO0GwNprVnzOUO8l0lSN4XJR1zSiAPExgDW8Ul6eKBCkJH9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772094552; c=relaxed/simple;
-	bh=uq0Fvn0gt+zivwrRJU8ydweAWsX+EfqCoqbAPIyBb5Q=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=KwGOs95kf+YCDdCmXTjfJzj6vrq0rz+q6AaNgxnL3JE527RY5G2VqGywVNBb0Gr+1q6QlvjDHHcl+IOlUGj9zWot0OGFYKl2VeeJgY5rCLJpi5DZAyFT9b35TBqa4ZEv61kvbptKDALivvGQT63/mmiFUT+3MI9R6ZZrt4arzi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=kGYDhB86; arc=none smtp.client-ip=162.240.164.96
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
-	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
-	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=0KxSh7kE1xxfS6NJZSSWiiAxS5+M/OE0yk9rnVdu/qE=; b=kGYDhB86DcXU4gvoVGY3M6ezaA
-	2nQHOBEwvyNErKKCWgCcyvWrVY7rOg9KwibQc8V3Oqynrttm7VZ7VhHG6tboHF6ASM9kZxdr0n20G
-	06duKl1oltlhm93b4HTWaf4u5ce8RDVRBYbyqmyCXcQZqORglVVOFi3H+pi2RBYqXwpiDurd2Df7i
-	WeTRl5lPS4bj+z32py39l4QWyPO798DB2Nty/9yVAmyNHr9eYdExbb3BouJwcvFN7LsyEYq41vASj
-	af0Mru9snnjdT3vBfeDOTWOr2ZiLZ2KGAoNjrMV6YgxYCA9tbQNmIJtCseqrZ6FLf7O5WlL0c45kO
-	QC9iFUzw==;
-Received: from [122.175.9.182] (port=2058 helo=zimbra.couthit.local)
-	by server.couthit.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.98.1)
-	(envelope-from <parvathi@couthit.com>)
-	id 1vvWjx-00000009GTo-1OXd;
-	Thu, 26 Feb 2026 03:28:57 -0500
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTP id C2C231B4B20E;
-	Thu, 26 Feb 2026 13:58:50 +0530 (IST)
-Received: from zimbra.couthit.local ([127.0.0.1])
- by localhost (zimbra.couthit.local [127.0.0.1]) (amavis, port 10032)
- with ESMTP id CAXoQSXLACbx; Thu, 26 Feb 2026 13:58:50 +0530 (IST)
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTP id 39DF91B4B201;
-	Thu, 26 Feb 2026 13:58:50 +0530 (IST)
-X-Virus-Scanned: amavis at couthit.local
-Received: from zimbra.couthit.local ([127.0.0.1])
- by localhost (zimbra.couthit.local [127.0.0.1]) (amavis, port 10026)
- with ESMTP id WTMalfr6gkLY; Thu, 26 Feb 2026 13:58:50 +0530 (IST)
-Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
-	by zimbra.couthit.local (Postfix) with ESMTP id 0F4211B4B20E;
-	Thu, 26 Feb 2026 13:58:50 +0530 (IST)
-Date: Thu, 26 Feb 2026 13:58:49 +0530 (IST)
-From: Parvathi Pudi <parvathi@couthit.com>
-To: "H. Nikolaus Schaller" <hns@goldelico.com>
-Cc: nm <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>, afd <afd@ti.com>, 
-	Kevin Hilman <khilman@baylibre.com>, rogerq <rogerq@kernel.org>, 
-	tony <tony@atomide.com>, robh <robh@kernel.org>, 
-	krzk+dt <krzk+dt@kernel.org>, conor+dt <conor+dt@kernel.org>, 
-	richardcochran <richardcochran@gmail.com>, 
-	aaro koskinen <aaro.koskinen@iki.fi>, andreas <andreas@kemnade.info>, 
-	Andrew Lunn <andrew@lunn.ch>, 
-	linux-omap <linux-omap@vger.kernel.org>, 
-	devicetree <devicetree@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	netdev <netdev@vger.kernel.org>, danishanwar <danishanwar@ti.com>, 
-	pratheesh <pratheesh@ti.com>, j-rameshbabu <j-rameshbabu@ti.com>, 
-	praneeth <praneeth@ti.com>, srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
-	krishna <krishna@couthit.com>, mohan <mohan@couthit.com>, 
-	pmohan <pmohan@couthit.com>, basharath <basharath@couthit.com>, 
-	Murali Karicheri <m-karicheri2@ti.com>
-Message-ID: <1885117045.525472.1772094529965.JavaMail.zimbra@couthit.local>
-In-Reply-To: <B3077F98-CC5C-4093-8319-CF45EECEAE4D@goldelico.com>
-References: <20260105162546.1809714-1-parvathi@couthit.com> <20260105162546.1809714-3-parvathi@couthit.com> <B3077F98-CC5C-4093-8319-CF45EECEAE4D@goldelico.com>
-Subject: Re: [PATCH v4 2/2] arm: dts: ti: Adds support for AM335x and AM437x
+	s=arc-20240116; t=1772094575; c=relaxed/simple;
+	bh=HSNHNWilE0WePK9+G9tgFk2R/X9oV5NWXBly4avELcc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=PUMMjSm/wPRD0XPj6uj9l8vFWzUZRQjC90M2quLu3pMo0VCAWbJn+nM3T1YZ6ls74HMF/YzSAH7hfRsxOQEFXQIK2ahLXvhnRaWxsrf5zFHl9fbQQkLndY5vrkqocIr0hM90wMejGfFYtTnSeIwIR6x3Vv3yj5bMzRub6GtgFbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=obNBBClo; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8cb5359e9d3so513911185a.2
+        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 00:29:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772094568; x=1772699368; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=iCsbJfC3CsgwU4dZ0i+L360fn2q0VpoL/Uu/WwKuSu8=;
+        b=obNBBCloCk2YQLv6LA72CHHEJa8rOY863a94oJ32kSt6Z126kAprYX7pgoKbcGvC06
+         t+w+7vRan3FG+xsJgiyNfQ10tILXGlJso/8H8JBVVzx3Svxa/2Q0ZqDPxdwj4UdG3Rzn
+         J5i1hnOfmj/c0gUKU8aErNLhJ/rrm6XdOINZsjbm8tjyu4eZSb9wDsoU5FfVoVZ2PEYx
+         0yYBKPrFF38fhZwIdlnDORVSaGrrFxEvacpJ/Spi1RBmZOLnl/ImzUejrzm+ceT7RQTP
+         O9mQKgMjHuyD7v1Jk7z4hqxgz7g88ADqerB46onDsI8hWJD7vdDubYnhNoyXj/d6LXmK
+         q0lg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772094568; x=1772699368;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iCsbJfC3CsgwU4dZ0i+L360fn2q0VpoL/Uu/WwKuSu8=;
+        b=i/q/tDziO7mdUy86biGTRF7E6IKTtk9+1zKWMgrKr11FNjefhzcE2Y6H22bFsF7b5P
+         XN9vpuowz5LPjS9lpAAzXZDK2EdlFfHGVIgqdRWyr3jcnJ0vZZ1mbSgpUag9Bk/VRNUu
+         UU0XfiVC+d6+q5Pt8AjzvIerOua6vUIZlcOzbd0UfO0hc4Bo3RGahj4lBLQMaQb+pDes
+         EDls8Gf/oC5NPjYmMBXyBYlOpIqfF1/2a0Y7D0nuGXLyUpcUnJYHHFcgngvZet/GiZY/
+         U0/Re0zlSHwMvbAqEww/yAJU9rpIIW744qUrYoi2b8rmmxXw6AOMeewbl/R8ElCUWv1v
+         zg5w==
+X-Gm-Message-State: AOJu0YylRpw52P4+F7zWioKxXy84VTjAA5o7zA8JTZajwV+6hwZoieyh
+	+AaC9aUOIubwYbv4c26U0pxjSb9Q1ZfgZV3K0n4KjyIOWmbB0i9MCDaUsXN+F/KkKei/4X6gSIp
+	LLSiXI8EvddUFMw==
+X-Received: from qkbc19.prod.google.com ([2002:a05:620a:31d3:b0:8c7:cb6:2f03])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:2947:b0:8c6:abc5:f169 with SMTP id af79cd13be357-8cbc11db1d9mr133441985a.73.1772094567693;
+ Thu, 26 Feb 2026 00:29:27 -0800 (PST)
+Date: Thu, 26 Feb 2026 08:29:22 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 9.0.0_ZEXTRAS_20240927 (ZimbraWebClient - GC138 (Linux)/9.0.0_ZEXTRAS_20240927)
-Thread-Topic: Adds support for AM335x and AM437x
-Thread-Index: m3OSGARO0zXzTDEelPMcISDqFz/iTQ==
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.couthit.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: smtp@couthit.com
-X-Authenticated-Sender: server.couthit.com: smtp@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.414.gf7e9f6c205-goog
+Message-ID: <20260226082922.2246271-1-edumazet@google.com>
+Subject: [PATCH nf-next] netfilter: nft_meta: no longer acquire
+ sk_callback_lock in nft_meta_get_eval_skugid()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	coreteam@netfilter.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[couthit.com:s=default];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[couthit.com : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[ti.com,baylibre.com,kernel.org,atomide.com,gmail.com,iki.fi,kemnade.info,lunn.ch,vger.kernel.org,couthit.com];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_ALL(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ti.com:email,couthit.local:mid,couthit.com:email];
-	HAS_X_GMSV(0.00)[smtp@couthit.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,netfilter.org,gmail.com,google.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	HAS_X_AS(0.00)[smtp@couthit.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261232-lists,netdev=lfdr.de];
-	HAS_X_SOURCE(0.00)[];
-	DKIM_TRACE(0.00)[couthit.com:-];
-	FROM_NEQ_ENVFROM(0.00)[parvathi@couthit.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261233-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	NEURAL_HAM(-0.00)[-0.649];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	HAS_X_ANTIABUSE(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[9]
-X-Rspamd-Queue-Id: AA03E1A290C
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-0.953];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8D3D01A2905
 X-Rspamd-Action: no action
 
-Hi, 
+After commit 983512f3a87f ("net: Drop the lock in skb_may_tx_timestamp()")
+from Sebastian Andrzej Siewior, apply the same logic in
+nft_meta_get_eval_skugid() to avoid touching sk->sk_callback_lock.
 
-> Hi,
-> 
->> Am 05.01.2026 um 17:21 schrieb Parvathi Pudi <parvathi@couthit.com>:
->> 
->> From: Roger Quadros <rogerq@ti.com>
->> 
->> PRU-ICSS instance consists of two PRU cores along with various
->> peripherals such as the Interrupt Controller (PRU_INTC), the Industrial
->> Ethernet Peripheral(IEP), the Real Time Media Independent Interface
->> controller (MII_RT), and the Enhanced Capture (eCAP) event module.
->> 
-> 
-> I am just wondering about the subject of this patch.
-> 
-> It reads as if general AM335x and AM437x support is introduced for the first
-> time.
-> IMHO it should tell which subsystem/improvement is added.
-> 
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/netfilter/nft_meta.c | 23 +++++++++++++----------
+ 1 file changed, 13 insertions(+), 10 deletions(-)
 
-Sure, we will address this in the next version.
+diff --git a/net/netfilter/nft_meta.c b/net/netfilter/nft_meta.c
+index 983158274c68dc6626032e6f55afc452c4be443f..d0df6cf374d1abe83ce2a02d93fb366e12b3d8d2 100644
+--- a/net/netfilter/nft_meta.c
++++ b/net/netfilter/nft_meta.c
+@@ -131,33 +131,36 @@ nft_meta_get_eval_skugid(enum nft_meta_keys key,
+ 			 u32 *dest,
+ 			 const struct nft_pktinfo *pkt)
+ {
+-	struct sock *sk = skb_to_full_sk(pkt->skb);
+-	struct socket *sock;
++	const struct sock *sk = skb_to_full_sk(pkt->skb);
++	const struct socket *sock;
++	const struct file *file;
+ 
+ 	if (!sk || !sk_fullsock(sk) || !net_eq(nft_net(pkt), sock_net(sk)))
+ 		return false;
+ 
+-	read_lock_bh(&sk->sk_callback_lock);
+-	sock = sk->sk_socket;
+-	if (!sock || !sock->file) {
+-		read_unlock_bh(&sk->sk_callback_lock);
++	/* The sk pointer remains valid as long as the skb is. The sk_socket and
++	 * file pointer may become NULL if the socket is closed. Both structures
++	 * (including file->cred) are RCU freed which means they can be accessed
++	 * within a RCU read section.
++	 */
++	sock = READ_ONCE(sk->sk_socket);
++	file = sock ? READ_ONCE(sock->file) : NULL;
++	if (!file)
+ 		return false;
+-	}
+ 
+ 	switch (key) {
+ 	case NFT_META_SKUID:
+ 		*dest = from_kuid_munged(sock_net(sk)->user_ns,
+-					 sock->file->f_cred->fsuid);
++					 file->f_cred->fsuid);
+ 		break;
+ 	case NFT_META_SKGID:
+ 		*dest =	from_kgid_munged(sock_net(sk)->user_ns,
+-					 sock->file->f_cred->fsgid);
++					 file->f_cred->fsgid);
+ 		break;
+ 	default:
+ 		break;
+ 	}
+ 
+-	read_unlock_bh(&sk->sk_callback_lock);
+ 	return true;
+ }
+ 
+-- 
+2.53.0.414.gf7e9f6c205-goog
 
-Thanks and Regards,
-Parvathi
 
