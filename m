@@ -1,159 +1,249 @@
-Return-Path: <netdev+bounces-261378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261379-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CIpIKrlZoGlPigQAu9opvQ
-	(envelope-from <netdev+bounces-261378-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 15:33:29 +0100
+	id sG77ISpYoGkNigQAu9opvQ
+	(envelope-from <netdev+bounces-261379-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 15:26:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B83691A79B1
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 15:33:28 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB43D1A7839
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 15:26:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0151D30B7A89
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 14:12:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 27C0F3140BEB
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 14:13:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 174EC3B52F6;
-	Thu, 26 Feb 2026 14:11:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AC243ACEFD;
+	Thu, 26 Feb 2026 14:13:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nRS2lvn9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uKW60KEq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D1B3A1D05
-	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 14:11:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2214835DCE3;
+	Thu, 26 Feb 2026 14:13:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772115114; cv=none; b=rM5K4bN55qHLseVbO2AJfAX3f5Ks97uOvx3NysLFUXiFNvDlcu5BS79j8zXKOyrwZ5GtbflzJBT8FjfVIrHSq1CVNW+8QmCXf8JV8AqE2R+7hXdziTuo/LYPJ01PhF+1WKmN0y4CIQXVTMKS0/4qNaEZAjWXjTzxq3AuDrJ0dhM=
+	t=1772115193; cv=none; b=YxJLuUHRBgrIiUOBbNVsYQ2wn5CbzLM8VgSqfUHfmTJ7MthF439I62u2vy+2B14mXyDepzkw9ajg3m8P3UIcisd08DgqHpJw325Riu8JckRcqOv/S+t0xj6h7vM3DCm5Br/P9ZNTTpdhNLenCjhKBna3sw0coXlSHOcZJKhT5+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772115114; c=relaxed/simple;
-	bh=IWJI96C1hm5T5E8JU3McSYrn42gSEdOiuSDzu++GdB0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ulk1IFwEQjLiVlwMy7DURhkUrqzUZjmI+55Y+z+PlrmuyJOAqF4wwmCzhnU0+rl6Zv3F6I7OKX0TGvqGMei1j9gx+Sn1IdCYbhQcciVUmoAlm+5R3049E52PMMQlOqoAEGiYmsFa4ZUuzsJ+wry7f5UHKoU5EeAjc3jiVeNCyCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nRS2lvn9; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4833115090dso9568155e9.3
-        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 06:11:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772115111; x=1772719911; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=elBwMb4z5MofDN6jcMpR4NV6A6fCLcuI5CqbFDS4134=;
-        b=nRS2lvn9hoXh+cXMIYLN8219IZ+Mrp3hBhk2CC3ysDVb+OjKrRxMTd87Ll14JQg6VH
-         gNYf6Mp1wUqLGD+9mLDdZb4WP5mgdq1gBky4tELzvYAml+Lf8EZPIaLxFYF9UkRXXlHQ
-         /0Kzp2aCCvo7r5tmYg4bGnqQDldKSjAZc1fU6EKEjGqpjIP4gfZtwiIrSZ1lvRgKryoS
-         d76WYTWu9X4Byb15QNSRXUVv0NudOmAjw3KVu7uEYOlHxoQh+jLibM/N+PWRoPWqEOEi
-         z/WNrGzFYzFOXsz2cR5biuckptWd6/PQ8yUAO5ALi4G06nzj/Jxic7mvgX1iL0/TpIY8
-         YJHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772115111; x=1772719911;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=elBwMb4z5MofDN6jcMpR4NV6A6fCLcuI5CqbFDS4134=;
-        b=fM1tcTrXH7BlGiGW0C11AZy/NMshUFD0cFIZcFQJkkl3c0rspWM6yvHBgvIsrLMrka
-         FN1/T+0LFQnQlssuBhyHEfy9qpQOt6QE+q51aKYC+8HaPd06urkRwKqVqfD+vK1qKtyy
-         qVfmHu2DJr5UZbMBvp59ngOiCJwKBT0YRwvIDpUqfxVf/S5v48JqYwAB6TYbukM60jv1
-         gLEDHQNvp+2D+kM3991j/qnNUDOHxJqJ5TB2rLsVhI91lFD7eo9WeDvL18xGiHXPz7U6
-         1/Ki+bSDYa+ueIUlFc3nWJ6eI2nHsLDjVdZtCPKIvBy7Uljy565BH+Ju7pGZ189Fe+jL
-         IIsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV32Jj6oaDxRLXglIX1ICACEw7cAZ/nQtqKgPQolOO7M++t85pgoV8k+CfOKSBcAN4hoCLei6c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZlWs5V9ol/f9QM88ZqFQX+OoGmh6pSoz/Xn9s995CXei5hzh1
-	ZmzGWP3EjFum/sjBmxVSz345vOjcyoUV3g+udug1Ki6ga47aKykzT5+/
-X-Gm-Gg: ATEYQzwfmLqLCKUb1SwK1GmZ9pen0CZU4hNX4Lmm/r3+tVNk+Or09FJQfxOh0S2mhEq
-	BCUDrHD8pkLvvuUK0woJcwHek50TYEUm8ftt4aCPVs73ujqCy9CYKSlldT/PXGx1tOZCZYQmiwX
-	H/Rc477E4TpT5Vo34rx0tV183dG+USoymdpdsR+e0l62h+LlSLvZ2r8ET7Wwh5K1sF83CeABOan
-	7rvQvJBqjdl2ta46Bp0ROWZWf3/8T2cVGAgwAOS5XiN7Nf8OPw4t9cyHIKYwceFz8jVDC8tLrY2
-	F9jRMcBKu26vf2U3tOBGOntY4HPnvyZW150qnfRjvseTT+cTV5cjrwcuGEMARhpObE/BI+N5EO3
-	HF8aXHgmQ1ErtHw+JLGJ9Sc+GoUzmQYrdxZf+dF8d6qNjguWIaiVQ0tbRGPstdBxb0m2jqWKYCL
-	EdiqntvvQLnu+VngWSMY3wh0E+OiSOC20JyqeRanh5sDMpc/7JDn5kP+k=
-X-Received: by 2002:a05:600c:4e93:b0:480:4a90:1b06 with SMTP id 5b1f17b1804b1-483c3df874emr36999745e9.34.1772115110675;
-        Thu, 26 Feb 2026 06:11:50 -0800 (PST)
-Received: from ?IPV6:2a03:83e0:1145:4:2818:da16:a542:ef07? ([2620:10d:c091:500::1:a491])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439899da8dbsm19894484f8f.18.2026.02.26.06.11.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Feb 2026 06:11:50 -0800 (PST)
-Message-ID: <aed01ac3-a393-486f-9fee-09928fea9a94@gmail.com>
-Date: Thu, 26 Feb 2026 09:11:47 -0500
+	s=arc-20240116; t=1772115193; c=relaxed/simple;
+	bh=N5/QKsWZbsr4w598jQ56Ld6v9RY+C417xqu4x5xdLQM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bJKSmJ4Kb50oq5RfJYF6ZuVIxdyeQfGlupEzzmqqNNDNpgUByZwUO/qSYlEyQPbZVpsinfSVQC8tM4I5ARFj1yjanSgvX9XptnR42mRx3/MwuGhtE9GwSP5cww4YottaJeQK/DVXPpKDUpiyxRj7p+QlcQhr6dQyHkNFRBpxQQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uKW60KEq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7572EC116C6;
+	Thu, 26 Feb 2026 14:13:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772115192;
+	bh=N5/QKsWZbsr4w598jQ56Ld6v9RY+C417xqu4x5xdLQM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uKW60KEqNhiHAIq10IXrgV0I3CoYcb87PeEF4BKvZhL1FtMmsGmyBLVi+EAopz9Fu
+	 H5vHpj6/Sy09tpigOKvOhqDsKo+8jxmPnMUs7WCzbK5wCUvCy5YSl1bRK6FtmcFNjg
+	 l61NVb7zB7ziL8QDcBivHoqVw3vsuLki2z55HT4zjbLOEpyyWrvOSRXCujBbc9bVQV
+	 uma2uNoMZzWRsRgBXL4OZQqF+aHn8xx7zV2oMEkFLzFNRslRx9xQr5gT9u/8wAOQqb
+	 zwpu5nxMPqnIp8f+XtwJGQNrKMMmsbHM1gm4TL3kngeH+oQ92h0jrqOEqwc4pFcbXk
+	 +/aSvXgbFe0+Q==
+Date: Thu, 26 Feb 2026 14:13:04 +0000
+From: Lee Jones <lee@kernel.org>
+To: Yousef El Bouzidi <elbouzidyyousef@gmail.com>
+Cc: linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org,
+	rafael@kernel.org, dakr@kernel.org, tglx@kernel.org,
+	herbert@gondor.apana.org.au, davem@davemloft.net, hansg@kernel.org,
+	ilpo.jarvinen@linux.intel.com, ansuelsmth@gmail.com,
+	atenart@kernel.org, wens@kernel.org, hauke@hauke-m.de,
+	andrew+netdev@lunn.ch, kuba@kernel.org, david.e.box@linux.intel.com,
+	akrowiak@linux.ibm.com, pasic@linux.ibm.com, jjherne@linux.ibm.com,
+	hca@linux.ibm.com, driver-core@lists.linux.dev,
+	linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+	platform-driver-x86@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [PATCH] treewide: fix duplicated word "the" in comments
+Message-ID: <20260226141304.GE8023@google.com>
+References: <20260224065300.454633-1-elbouzidyyousef@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next, v2 1/2] psp: Support for transmit on logical device
- when the underlying transport device supports PSP.
-To: Kiran Kella <kiran.kella@broadcom.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- willemb@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
- horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- jayakrishnan.udayavarma@broadcom.com, ajit.khaparde@broadcom.com,
- akhilesh.samineni@broadcom.com
-References: <20260223191154.2800616-1-kiran.kella@broadcom.com>
- <20260223191154.2800616-2-kiran.kella@broadcom.com>
- <0a850f65-be67-4a66-941f-17d8440e987b@gmail.com>
- <CAPHeo3eJRYc503Ta24h9r+Uu1cGqb1dCfmnxuZQ4MJLCTFd9Lw@mail.gmail.com>
-Content-Language: en-US
-From: Daniel Zahka <daniel.zahka@gmail.com>
-In-Reply-To: <CAPHeo3eJRYc503Ta24h9r+Uu1cGqb1dCfmnxuZQ4MJLCTFd9Lw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260224065300.454633-1-elbouzidyyousef@gmail.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261378-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[danielzahka@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-261379-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,linuxfoundation.org,kernel.org,gondor.apana.org.au,davemloft.net,linux.intel.com,gmail.com,hauke-m.de,lunn.ch,linux.ibm.com,lists.linux.dev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lee@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B83691A79B1
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EB43D1A7839
 X-Rspamd-Action: no action
 
+On Tue, 24 Feb 2026, Yousef El Bouzidi wrote:
 
+> Remove duplicated word "the" from comments across various subsystems.
+> All instances are clear typos where "the" appeared twice in
+> succession, often merged with the following word (e.g. "the they",
+> "the there", "the these", "the them").
+> 
+> Files fixed:
+>   - drivers/base/platform.c
+>   - drivers/crypto/inside-secure/eip93/eip93-hash.c
+>   - drivers/mfd/axp20x.c
+>   - drivers/net/ethernet/lantiq_xrx200.c
+>   - drivers/platform/x86/intel/chtwc_int33fe.c
+>   - drivers/platform/x86/intel/pmt/class.c
+>   - drivers/s390/crypto/vfio_ap_ops.c
+>   - kernel/irq/migration.c
+> 
+> Signed-off-by: Yousef El Bouzidi <elbouzidyyousef@gmail.com>
+> ---
+>  drivers/base/platform.c                         | 2 +-
+>  drivers/crypto/inside-secure/eip93/eip93-hash.c | 2 +-
 
-On 2/26/26 6:46 AM, Kiran Kella wrote:
-> On Wed, Feb 25, 2026 at 2:28 AM Daniel Zahka <daniel.zahka@gmail.com> wrote:
->> The lack of support for netns is a bit of a gap for this feature. It may
->> make sense to see if what was posted in
->> https://lore.kernel.org/netdev/20260224002410.1553838-1-weibunny@fb.com/
->> is sufficient for your use case, as it handles cases where upper devices
->> are in a different netns from psd->main_netdev.
-> Thanks. Went through the changes in
-> https://lore.kernel.org/netdev/20260224002410.1553838-1-weibunny@fb.com/
-> It is sufficient for my use case too, although it specifically
-> addresses the cross-netns virtual devices use case.
-> But the same net-ns stacked devices like VLANs can be handled with
-> this patch implicitly, without user intervention through dev-assoc.
-> I think both approaches can co-exist without conflict.
+>  drivers/mfd/axp20x.c                            | 2 +-
 
-I agree they can co-exist, and automatically propagating psp devices is 
-useful. I was just pointing out that support for upper devices will 
-eventually need to deal with netns, because when I looked at this patch 
-things like ipvlan and macvlan came to mind.
+Acked-by: Lee Jones <lee@kernel.org>
+
+>  drivers/net/ethernet/lantiq_xrx200.c            | 2 +-
+>  drivers/platform/x86/intel/chtwc_int33fe.c      | 2 +-
+>  drivers/platform/x86/intel/pmt/class.c          | 2 +-
+>  drivers/s390/crypto/vfio_ap_ops.c               | 2 +-
+>  kernel/irq/migration.c                          | 2 +-
+>  8 files changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/base/platform.c b/drivers/base/platform.c
+> index b45d41b018ca..3e3b6fcfa194 100644
+> --- a/drivers/base/platform.c
+> +++ b/drivers/base/platform.c
+> @@ -565,7 +565,7 @@ struct platform_object {
+>  };
+>  
+>  /*
+> - * Set up default DMA mask for platform devices if the they weren't
+> + * Set up default DMA mask for platform devices if they weren't
+>   * previously set by the architecture / DT.
+>   */
+>  static void setup_pdev_dma_masks(struct platform_device *pdev)
+> diff --git a/drivers/crypto/inside-secure/eip93/eip93-hash.c b/drivers/crypto/inside-secure/eip93/eip93-hash.c
+> index 2705855475b2..d91a1ac152f0 100644
+> --- a/drivers/crypto/inside-secure/eip93/eip93-hash.c
+> +++ b/drivers/crypto/inside-secure/eip93/eip93-hash.c
+> @@ -432,7 +432,7 @@ static int eip93_hash_update(struct ahash_request *req)
+>  
+>  /*
+>   * With map_data true, we map the sa_record and sa_state. This is needed
+> - * for finup() as the they are mapped before calling update()
+> + * for finup() as they are mapped before calling update()
+>   */
+>  static int __eip93_hash_final(struct ahash_request *req, bool map_dma)
+>  {
+> diff --git a/drivers/mfd/axp20x.c b/drivers/mfd/axp20x.c
+> index 679364189ea5..0c6e93eb3955 100644
+> --- a/drivers/mfd/axp20x.c
+> +++ b/drivers/mfd/axp20x.c
+> @@ -1417,7 +1417,7 @@ int axp20x_device_probe(struct axp20x_dev *axp20x)
+>  	 * 1 bit customizable at the factory, and 1 bit depending on the
+>  	 * state of an external pin. The latter is writable. The device
+>  	 * will only respond to operations to its other registers when
+> -	 * the these device addressing bits (in the upper 4 bits of the
+> +	 * these device addressing bits (in the upper 4 bits of the
+>  	 * registers) match.
+>  	 *
+>  	 * By default we support an AXP806 chained to an AXP809 in slave
+> diff --git a/drivers/net/ethernet/lantiq_xrx200.c b/drivers/net/ethernet/lantiq_xrx200.c
+> index b8766fb7a844..dde651d901c8 100644
+> --- a/drivers/net/ethernet/lantiq_xrx200.c
+> +++ b/drivers/net/ethernet/lantiq_xrx200.c
+> @@ -157,7 +157,7 @@ static int xrx200_open(struct net_device *net_dev)
+>  	/* The boot loader does not always deactivate the receiving of frames
+>  	 * on the ports and then some packets queue up in the PPE buffers.
+>  	 * They already passed the PMAC so they do not have the tags
+> -	 * configured here. Read the these packets here and drop them.
+> +	 * configured here. Read these packets here and drop them.
+>  	 * The HW should have written them into memory after 10us
+>  	 */
+>  	usleep_range(20, 40);
+> diff --git a/drivers/platform/x86/intel/chtwc_int33fe.c b/drivers/platform/x86/intel/chtwc_int33fe.c
+> index d183aa53c318..1fca9fdd8f5b 100644
+> --- a/drivers/platform/x86/intel/chtwc_int33fe.c
+> +++ b/drivers/platform/x86/intel/chtwc_int33fe.c
+> @@ -14,7 +14,7 @@
+>   *
+>   * So this driver is a stub / pseudo driver whose only purpose is to
+>   * instantiate I²C clients for chips 2 - 4, so that standard I²C drivers
+> - * for these chips can bind to the them.
+> + * for these chips can bind to them.
+>   */
+>  
+>  #include <linux/dmi.h>
+> diff --git a/drivers/platform/x86/intel/pmt/class.c b/drivers/platform/x86/intel/pmt/class.c
+> index be3c8d9e4fff..99bf7e0afdf1 100644
+> --- a/drivers/platform/x86/intel/pmt/class.c
+> +++ b/drivers/platform/x86/intel/pmt/class.c
+> @@ -239,7 +239,7 @@ static int intel_pmt_populate_entry(struct intel_pmt_entry *entry,
+>  
+>  		/*
+>  		 * Some hardware use a different calculation for the base address
+> -		 * when access_type == ACCESS_LOCAL. On the these systems
+> +		 * when access_type == ACCESS_LOCAL. On these systems
+>  		 * ACCESS_LOCAL refers to an address in the same BAR as the
+>  		 * header but at a fixed offset. But as the header address was
+>  		 * supplied to the driver, we don't know which BAR it was in.
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index 44b3a1dcc1b3..334aaa2d97b2 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -610,7 +610,7 @@ static int handle_pqap(struct kvm_vcpu *vcpu)
+>  	matrix_mdev = container_of(vcpu->kvm->arch.crypto.pqap_hook,
+>  				   struct ap_matrix_mdev, pqap_hook);
+>  
+> -	/* If the there is no guest using the mdev, there is nothing to do */
+> +	/* If there is no guest using the mdev, there is nothing to do */
+>  	if (!matrix_mdev->kvm) {
+>  		vfio_ap_le_guid_to_be_uuid(&matrix_mdev->mdev->uuid, uuid);
+>  		VFIO_AP_DBF_WARN("%s: mdev %08lx-%04lx-%04lx-%04lx-%04lx%08lx not in use: apqn=0x%04x\n",
+> diff --git a/kernel/irq/migration.c b/kernel/irq/migration.c
+> index f2b2929986ff..b29d13baee55 100644
+> --- a/kernel/irq/migration.c
+> +++ b/kernel/irq/migration.c
+> @@ -89,7 +89,7 @@ void irq_move_masked_irq(struct irq_data *idata)
+>  
+>  		ret = irq_do_set_affinity(data, desc->pending_mask, false);
+>  		/*
+> -		 * If the there is a cleanup pending in the underlying
+> +		 * If there is a cleanup pending in the underlying
+>  		 * vector management, reschedule the move for the next
+>  		 * interrupt. Leave desc->pending_mask intact.
+>  		 */
+> -- 
+> 2.43.0
+> 
+
+-- 
+Lee Jones [李琼斯]
 
