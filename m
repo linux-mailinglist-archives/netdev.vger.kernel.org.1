@@ -1,324 +1,258 @@
-Return-Path: <netdev+bounces-261188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261189-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 7LSoISLjn2nCegQAu9opvQ
-	(envelope-from <netdev+bounces-261188-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 07:07:30 +0100
+	id wP4EKCTkn2nCegQAu9opvQ
+	(envelope-from <netdev+bounces-261189-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 07:11:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C27F61A132B
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 07:07:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B39C1A13DC
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 07:11:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 54811302AD2C
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 06:07:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0682E30817DE
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 06:11:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D8E238A71B;
-	Thu, 26 Feb 2026 06:07:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 878AA38B7B2;
+	Thu, 26 Feb 2026 06:11:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="em6/OmEM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com [209.85.167.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D357F36BCC9
-	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 06:07:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.197
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772086047; cv=none; b=jBMMH50LEsfHOrNJ8ki5GaxjTGijfoMf8fXCwS0wTT/DqIVkHovzN43AypXYoX2Ujq18vReIeplNBtDNyQyXQ3+HCDQY6pMDqi5+quigmsb8rvlQxqfvKnEpVwXKW9yshQANpeF5C/pTqUzppci433X2qAS0lQOcK65xuktC568=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772086047; c=relaxed/simple;
-	bh=Ggw6zAI22toJswX3uAomFTmkYCm4O9c72cL+2FfP3+0=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=eRTEWdior4Awgepsu+dbUIdR6CakbUAKxoMfcpczxlccxgpGbZQWnx/W6maej+zXkpegz/6LqZBHE3Ih3xpC6Pqp1T6GFmfklBeOabLk7/zrGRQHBH9W2sw0okpOWDg494YJQ3TqTIbP36MlsbMHAp1kpsVtCk4GuMQIDCaY5gI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-45f11f18a89so3184132b6e.2
-        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 22:07:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772086045; x=1772690845;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MatsSPIVtuY+WUTnEXIa4ztuXljbJyhy3ptWfpIfBts=;
-        b=Q4FymfZ1FFOa9DA1RZgJL5Dp6hOV07OYVBxdQww4qPFhKsdkLy2I9LF3ZcuegZee68
-         w9KT42005tH6iNvPsc0IMKDbwnVmFFZaAo1WVJpU0r6WpwC5woyWZb4/4uDWYF+4dr13
-         GCkvBtFezNJTbuOCxReEI2aXJvRjOBDqqL26gXpu2AvBtoK3vWLCvbXfTqz316v9S2uF
-         VDPVaUF+j8QlfH3tys0S5MlxakCUyOZekTKzc7qbpFkm0ZNCca027IYs4RtjNzkoOYHu
-         duCrp/ZwAMbacG7gUBE1Z8ZE8PwVH30YyyMCAJKxWMD6sdIEgJszEf5fM6di9PWLT47w
-         l1Qw==
-X-Forwarded-Encrypted: i=1; AJvYcCWv6zKmOe0muKk3ZquisE7sNHSQpFPZhiFsvBsCesq3Oddq0vKegJ6hMAK/gPP5ub1B6wj5c9I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+SgXslg44+QNn25Ey8LxWBKDaT+7uYhWzKB2EwSn6p1Uba3Wl
-	YkdtfL+6Wv6rkvWcnwS8qtyg5Ki7deWt6bMuVgUcznOy2BclTxVLpZvS1FMP/dnWN1f7inzHvkb
-	lN//TF+/zp4iU05pNSkhEOPV5XwF7FsqTJqC3tmrCKSAnHJ3UHRIMnkk/Zhg=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 485AA38B7A1
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 06:11:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772086267; cv=fail; b=QeSNHdl0zIMjLne1h459ZyvULMEXmN/rawYWoo3MZNf9+tTRs+7SAYKcHRvzus3OytCCAp85byZigw1hticARb8U9s0x6HUfLmZJxUk54VdGoXAvz5m0WXpHlkq9DIlq9U6Hba+SwwnIzsxB+xmQJAHYHAMo6umsWOkq6rN+NkQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772086267; c=relaxed/simple;
+	bh=EuZDohLq9tgWlBQCsWODxF7HrltuV05+/s9Pqic8S4k=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=czIpgtrUgPq8IDxWbd9KgNQ4KBRWJT1GUugn9sPT5EdTQCTblu4wTi1UbYFloAoVSdPK+DJ9BGHzOzLNVjYTnc+mi0Kg++tBNdG16xEsSwy3BMiba3m2csgfA6/DW0yjfhiIYthTKYf1k1LnxYW7uwM9I55wAxLfPzeyjOuAysw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=em6/OmEM; arc=fail smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772086265; x=1803622265;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=EuZDohLq9tgWlBQCsWODxF7HrltuV05+/s9Pqic8S4k=;
+  b=em6/OmEMFcAjOGdXQQBeENeaKI2vB/bwjITe8Mx8NiUVXfxLNwtMVYpj
+   Me0CssMI1FRidHcqdggrj1lAfH8QxuV1ZBNHd8GLfjGWpqeb6VcHxtByw
+   bNkRDhz4pO1Qtk5GgEYrSCEL+VmaHmk7YESkegFzOoYxJqoiuCusqpXLk
+   aXNDKNZeXPO0ox/F0eup4/o1YXII4mtQqDJr570yv8ruVnwMHI7lZDuYd
+   b72EWXsOcm+HPTwBo+X/aqzp7FRPtHJ9iFvXWihgzJdJ+pdWsyGaDTkXy
+   zD5dxlPPVYKTJhgYmzW+9Iq8e7VGfeHJwUIDF/gyF8tfeCVx/MYVC0I0z
+   A==;
+X-CSE-ConnectionGUID: XAWqATQETX2ocr4zM459sQ==
+X-CSE-MsgGUID: TrOdala3TZahSDnhG5CctA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11712"; a="77007481"
+X-IronPort-AV: E=Sophos;i="6.21,311,1763452800"; 
+   d="scan'208";a="77007481"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2026 22:11:03 -0800
+X-CSE-ConnectionGUID: hXf0yhqyQa+1+5opdMrqug==
+X-CSE-MsgGUID: Chquo2ziR2m1fEtw/n1iRQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,311,1763452800"; 
+   d="scan'208";a="219817039"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2026 22:11:03 -0800
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 25 Feb 2026 22:11:03 -0800
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Wed, 25 Feb 2026 22:11:03 -0800
+Received: from BN1PR04CU002.outbound.protection.outlook.com (52.101.56.64) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Wed, 25 Feb 2026 22:11:02 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=J8eHmk9BF41zEnVNWTY8zCpN6XV7q2FyIiavOZV49ptDm/aI+fxo3+W8P4SvtjJni4cxVtL9fBBIuDrl0hKL2BaUqy1rrsK2MQHlIRI3P5Lu8/43/IQuBv8rbHgLnT/WhsikaVTNhVkoeZYwUbl8Fb7oxjgpnKNQWTE3coIGPI/+uJLr8CCVxwooPzrpfDv/xAmn/v7Yk6y95JfqRnZKZwWwZlN3gsqOnsecmiaEdQboDYmERpE3yJ5rjS7vknPZ0vp/2ZDxA5soFJImvPluRffXA8svzDYRW9JXtmA4zzMyduv/P0N+NrYnZgSI54PdREIqHINWvLHasrK3nFlBnA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RshLtqYg4PeOOi4Di83gawPkIw0wT2tApo3T66Tc5WQ=;
+ b=mzmcDcEpTvb+/Ssr/Kgp+fxOqNScqkl+con1chRej1a0ZI3GvIWZe/A46ZC1PgI0M4LyIABRQQ133gj/1xMdO7ND20rabGm7Nyig00NTHBiKFXQYcyNpGz05PXSd5iKWxusbJrF1VcX77J3ea+RRN4trwpR3R+bn88+KFa5RGjOEJzYNm6p1yb7Wv9VsQdqxFtuaaWIWWhJijkEziEasiWJN8VEGAuEHOQTd5qLjgidraDwIaPUspZZVMbLAOx13ynIRdDrzssIxLRzmNnH1Yw7R7x3VPbm1FKemwtySLX0kw4Wyz/Hv9Gp/9rXzoL5g7rVAVFpnR/n81oIyRejwqQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
+ by SN7PR11MB6680.namprd11.prod.outlook.com (2603:10b6:806:268::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.22; Thu, 26 Feb
+ 2026 06:10:54 +0000
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::7ac8:884c:5d56:9919]) by IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::7ac8:884c:5d56:9919%4]) with mapi id 15.20.9632.017; Thu, 26 Feb 2026
+ 06:10:54 +0000
+From: "Rinitha, SX" <sx.rinitha@intel.com>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Loktionov, Aleksandr"
+	<aleksandr.loktionov@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-net v1] libie: don't unroll if fwlog
+ isn't supported
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v1] libie: don't unroll if
+ fwlog isn't supported
+Thread-Index: AQHcmzrudPyxhM6/XEWFOIgfGXgpubWUljmw
+Date: Thu, 26 Feb 2026 06:10:54 +0000
+Message-ID: <IA1PR11MB6241365692F65DA76AE810738B72A@IA1PR11MB6241.namprd11.prod.outlook.com>
+References: <20260211091140.236389-1-michal.swiatkowski@linux.intel.com>
+In-Reply-To: <20260211091140.236389-1-michal.swiatkowski@linux.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|SN7PR11MB6680:EE_
+x-ms-office365-filtering-correlation-id: 45513a84-e3af-4a5d-d697-08de74fdcd04
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700021;
+x-microsoft-antispam-message-info: 5bmb0qDbhz6GhE2jpm2fn6xTl+nwixSJpxKERBAmLoK4x6RUlaqS6N3KL1OiYLr9uxpgoKZFRu0Ws0cD25yTO63uxYHovFeETC3pBP82Frk34Ke3ur7YT7C7dO+vyDtKuEIIJZDzj3krGv/+NS1f7a338A34gsidG/gu/Ksl5QbvT3aIjW349XPJds2VBplwr64bgEeVXBJHfOKlbiUvMvGjKo60qt4/m7KaKuximj/cgkknhMLR1ZvoaJ/qmRfAYEIRzclkTtIHRjQ8nJ92tTS2wpTAeznla8mXyNcX69rGmkoxrjzn/T+vGjDAJttSfOLGB0kS+Ng6V4ilCkrl78S27L/iLpTLpFg1T8Zk8jQP6BDfYAeI0roQ7aCY6/4odw8x7roy2oUnjHupXq0MbtEHEPxdpQN03ra31vCZKUQ9l3Pi73gFxVDN/r3JRorASbjtcapwNu9LS27yA+b29GthaX0OH8VynYj7a8d4z12VW3w64drB+mrrZNXkpApMXBR8gRiCv2EgD6FWobD7oqr6Oe9oYGYPnj/Q03n+AlLpW9gYNzltfN5PT9AaDPpsDTAadKl+XRO7kPBJx71wnDxXOMoj5C9jfK9wOg6Q5PF0rPLxe+SHiTAiW/d+dTMCY6r+xJYS/bmhLsvLiP863Tjo0TvpuaLDd8dQi0EC8NLRvBc8jyVOc/Mg388fsfONLLf7cq1KZNztI23jiBRtgPpmv10CUgX8ZO7MFd0lHQ+R6VY5/f/vmDe89GAy+maQATxxPL2t9o8M4ab4TLlH6Hdz4vYOfuaQfL/AZHS7z8M=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?yKEfI+snXo1m2tbuKVm3dbJAzUSJ6Ri4kBihg45uGjg5kbgsOberHhkC450j?=
+ =?us-ascii?Q?O0Jc9pENh9QBBk3226Q9d3sp+qwwpuCc1QidkDAMKMJ1JDrbvK42I/rF8/DU?=
+ =?us-ascii?Q?ECsbAF/kqPoG4V2GknvEaFyVvvt99VvUAq6KlBNVLsatuN4tz3+QpXMZaRAe?=
+ =?us-ascii?Q?efGRn7ES5mtarGh/RJl+MOYyhLLYkvCgWhlxnf5ZhYaI1x0LuqzcY77WZHEs?=
+ =?us-ascii?Q?Uq5h9uqswZDLeXS7tI/Iy/WEDQL+qx0F6mcnQr0ntODixRmT3IrMWlszgNi9?=
+ =?us-ascii?Q?OJALy+yK2YdR/f0scRZg+Qfy9KBtrgmei0+74wbabn/arDfHDmeJosTtXz9a?=
+ =?us-ascii?Q?j+O7Qdk2bJoc986lSlqZZ6Tiu6VgWZ5Er+MGmr9Z8G6O5gmcs7GfKlsOwjZa?=
+ =?us-ascii?Q?CuZWeWAvgM/D74IsBqhw10dwRCr8B6WKBa7PZ1sOuHwtV27PwQ42815RoEv5?=
+ =?us-ascii?Q?kVo4KMfF+maEaihiHGf6zkU6ZZNLqPc/lN3Y2haTyv9Th7392+jebhQ0/8oz?=
+ =?us-ascii?Q?ENAaTWxkGhmF3H2VtZK7F74VQxXyRrlyUOMg2dI1GDprt11Cwk+avv+Q82kQ?=
+ =?us-ascii?Q?VWuQCTw+8JUSUjbnveYhHH6Ug21LGHdCQ+j+cg9SgKW36V6yd8fz3aS0tRyr?=
+ =?us-ascii?Q?EqoVkBYLXPgvYaTNUxz3FXknynkarMePAP2WvwFFWkXrIkFR7KE/KLnH44Wx?=
+ =?us-ascii?Q?1SEtPTC0zZ8hyAP4CRiGb7IK04Mjp9ac/W0Jpi8RQI4pJspegel1z9na0qAy?=
+ =?us-ascii?Q?by2xhsZ3rsHy79DglfUMQzzh358DJTe2XgzSQWbPeCaH92LwmjZpnc6k4iWr?=
+ =?us-ascii?Q?RhWbtbcyLFf0bS8mpU2GzHie/RkmJXnLDbnPSA5EYNKwwGb+mHqdyuzVjxSi?=
+ =?us-ascii?Q?xCkpWvRxN8wXXcEze6jcomOsFds8i+Wj969iXr4SBgU4sTt/Nltmk/Mjc4vb?=
+ =?us-ascii?Q?JIgLyqX7KMRDmGq5/h3hpJd7BJfoevfPIlFzh/py9i58b6v/uWOeFY4w+mxK?=
+ =?us-ascii?Q?T3Buvu/Aw2kgg7/ltH6ZD11lvSv1yAZUGQH/eugvV5xlbNtaZcxhOGH4dODP?=
+ =?us-ascii?Q?vTg6S7hDHDbR2l1Ruz25EDzbumeMawcuGO+dFlSJV9yEomEMOZwJ0Vd+4udI?=
+ =?us-ascii?Q?DE9iK+3tvbFAWwn++LNaXL3Gl1KrXkCPQtwd2SAsSgNtlQomGVNKHuFrvHNs?=
+ =?us-ascii?Q?OXVEoLrTTkQb+aV7RNY+WStd/DkloheED8ae/YCMiY9p/GoMOt1sgC4UyWtT?=
+ =?us-ascii?Q?WYr4N/yP8GB27DW86AoW0MCVHdYdmJbItedyD9mxe6v6WRaGquT7L9EuWVMX?=
+ =?us-ascii?Q?hdacaKzUU99Vt0KP8fPqgtmQj5ktvs3OCtUaKdPKenyarNOojAlse3GbvrqL?=
+ =?us-ascii?Q?vAuTzttGk7Se6pL1s+8JiJDYuoNB2LpFQPzMDvo/hgG7PGghBij2QEiLalRg?=
+ =?us-ascii?Q?k0tEd44LB/B5YM5mvWYPp0L4dBhg3Su1DB1/5kOV9SxsVxGcCQUAKKXleN3W?=
+ =?us-ascii?Q?2xm5K45PJ7M9Zzow8wnWAfQTizHWjpH/23ih4j+cgn8Flm5a805bWLEG/8xO?=
+ =?us-ascii?Q?XXQ0huShM41e13mxHV236Z4SpXc/TbdrzCJt6CTiOvWAHJ02YOaCrVqmOtiR?=
+ =?us-ascii?Q?4Qi+bksJPG4iRJOHC22XFog2RaYQw6yzaUsd2HUqfeh4NVMQw2ZLHjZBcVQW?=
+ =?us-ascii?Q?WihRZT8ZfdhMtsg9YSEby6UioTCNRvqRhIOJmHZ+KLCFudma?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:4a87:b0:679:a463:c933 with SMTP id
- 006d021491bc7-679f3dd6923mr401671eaf.71.1772086044827; Wed, 25 Feb 2026
- 22:07:24 -0800 (PST)
-Date: Wed, 25 Feb 2026 22:07:24 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <699fe31c.050a0220.2fcbed.0002.GAE@google.com>
-Subject: [syzbot] [kernfs?] possible deadlock in __kernfs_remove (3)
-From: syzbot <syzbot+1075f6dc93f398c1857e@syzkaller.appspotmail.com>
-To: driver-core@lists.linux.dev, gregkh@linuxfoundation.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, tj@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 45513a84-e3af-4a5d-d697-08de74fdcd04
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Feb 2026 06:10:54.8232
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 0UaR6HVoHbfeXi9Osql+64EFCkGkKo+r7IzZ6w/fTQK7p8tCxT+nEZayLrrLlTgcJMShhaGQiumgncSSvY2eAQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6680
+X-OriginatorOrg: intel.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=665cbf0979cda6c5];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-261188-lists,netdev=lfdr.de,1075f6dc93f398c1857e];
+	TAGGED_FROM(0.00)[bounces-261189-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[sx.rinitha@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	RCPT_COUNT_THREE(0.00)[4];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[googlegroups.com:email,storage.googleapis.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,goo.gl:url]
-X-Rspamd-Queue-Id: C27F61A132B
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: 1B39C1A13DC
 X-Rspamd-Action: no action
 
-Hello,
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of M=
+ichal Swiatkowski
+> Sent: 11 February 2026 14:42
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; Michal Swiatkowski <michal.swiatkowski@linux.=
+intel.com>; Loktionov, Aleksandr <aleksandr.loktionov@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-net v1] libie: don't unroll if fwlo=
+g isn't supported
+>
+> The libie_fwlog_deinit() function can be called during driver unload even=
+ when firmware logging was never properly initialized. This led to call
+trace:
+>
+> [  148.576156] Oops: Oops: 0000 [#1] SMP NOPTI [  148.576167] CPU: 80 UID=
+: 0 PID: 12843 Comm: rmmod Kdump: loaded Not tainted 6.17.0-rc7next-queue-3=
+oct-01915-g06d79d51cf51 #1 PREEMPT(full) [  148.576177] Hardware name: HPE =
+ProLiant DL385 Gen10 Plus/ProLiant DL385 Gen10 Plus, BIOS A42 07/18/2020 [ =
+ 148.576182] RIP: 0010:__dev_printk+0x16/0x70 [  148.576196] Code: 1f 44 00=
+ 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 41 55 41=
+ 54 49 89 d4 55 48 89 fd 53 48 85 f6 74 3c <4c> 8b 6e 50 48 89 f3 4d 85 ed =
+75 03 4c 8b 2e 48 89 df e8 f3 27 98 [  148.576204] RSP: 0018:ffffd2fd7ea17a=
+48 EFLAGS: 00010202 [  148.576211] RAX: ffffd2fd7ea17aa0 RBX: ffff8eb288ae2=
+000 RCX: 0000000000000000 [  148.576217] RDX: ffffd2fd7ea17a70 RSI: 0000000=
+0000000c8 RDI: ffffffffb68d3d88 [  148.576222] RBP: ffffffffb68d3d88 R08: 0=
+000000000000000 R09: 0000000000000000 [  148.576227] R10: 00000000000000c8 =
+R11: ffff8eb2b1a49400 R12: ffffd2fd7ea17a70 [  148.576231] R13: ffff8eb3141=
+fb000 R14: ffffffffc1215b48 R15: ffffffffc1215bd8 > [  148.576236] FS:  000=
+07f5666ba6740(0000) GS:ffff8eb2472b9000(0000) knlGS:0000000000000000 [  148=
+.576242] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033 [  148.576247] C=
+R2: 0000000000000118 CR3: 000000011ad17000 CR4: 0000000000350ef0 [  148.576=
+252] Call Trace:
+> [  148.576258]  <TASK>
+> [  148.576269]  _dev_warn+0x7c/0x96
+> [  148.576290]  libie_fwlog_deinit+0x112/0x117 [libie_fwlog] [  148.57630=
+3]  ixgbe_remove+0x63/0x290 [ixgbe] [  148.576342]  pci_device_remove+0x42/=
+0xb0 [  148.576354]  device_release_driver_internal+0x19c/0x200
+> [  148.576365]  driver_detach+0x48/0x90
+> [  148.576372]  bus_remove_driver+0x6d/0xf0 [  148.576383]  pci_unregiste=
+r_driver+0x2e/0xb0 [  148.576393]  ixgbe_exit_module+0x1c/0xd50 [ixgbe] [  =
+148.576430]  __do_sys_delete_module.isra.0+0x1bc/0x2e0
+> [  148.576446]  do_syscall_64+0x7f/0x980
+>
+> It can be reproduced by trying to unload ixgbe driver in recovery mode.
+>
+> Fix that by checking if fwlog is supported before doing unroll.
+>
+> Fixes: 641585bc978e ("ixgbe: fwlog support for e610")
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> ---
+> drivers/net/ethernet/intel/libie/fwlog.c | 4 ++++
+> 1 file changed, 4 insertions(+)
+>
 
-syzbot found the following issue on:
-
-HEAD commit:    d4f687fbbce4 ovpn: tcp - fix packet extraction from stream
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=12dba44a580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=665cbf0979cda6c5
-dashboard link: https://syzkaller.appspot.com/bug?extid=1075f6dc93f398c1857e
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/ee42a61b2ee7/disk-d4f687fb.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/e5470ff18ff8/vmlinux-d4f687fb.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/d50957aaabf2/bzImage-d4f687fb.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+1075f6dc93f398c1857e@syzkaller.appspotmail.com
-
-======================================================
-WARNING: possible circular locking dependency detected
-syzkaller #0 Not tainted
-------------------------------------------------------
-syz.2.13134/20856 is trying to acquire lock:
-ffff888064e8e3c8 (kn->active#14){++++}-{0:0}, at: __kernfs_remove+0x3cf/0x660 fs/kernfs/dir.c:1513
-
-but task is already holding lock:
-ffff888033048788 (&rdev->wiphy.mtx){+.+.}-{4:4}, at: class_wiphy_constructor include/net/cfg80211.h:6441 [inline]
-ffff888033048788 (&rdev->wiphy.mtx){+.+.}-{4:4}, at: ieee80211_remove_interfaces+0x132/0x6d0 net/mac80211/iface.c:2415
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #2 (&rdev->wiphy.mtx){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:614 [inline]
-       __mutex_lock+0x19f/0x1300 kernel/locking/mutex.c:776
-       class_wiphy_constructor include/net/cfg80211.h:6441 [inline]
-       ieee80211_change_mac+0xb5/0x1410 net/mac80211/iface.c:324
-       netif_set_mac_address+0x317/0x4e0 net/core/dev.c:9989
-       do_setlink+0x9b1/0x4590 net/core/rtnetlink.c:3110
-       rtnl_changelink net/core/rtnetlink.c:3776 [inline]
-       __rtnl_newlink net/core/rtnetlink.c:3935 [inline]
-       rtnl_newlink+0x15a9/0x1be0 net/core/rtnetlink.c:4072
-       rtnetlink_rcv_msg+0x7d5/0xbe0 net/core/rtnetlink.c:6958
-       netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2550
-       netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
-       netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1344
-       netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1894
-       sock_sendmsg_nosec net/socket.c:727 [inline]
-       __sock_sendmsg net/socket.c:742 [inline]
-       ____sys_sendmsg+0xa68/0xad0 net/socket.c:2592
-       ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
-       __sys_sendmsg net/socket.c:2678 [inline]
-       __do_sys_sendmsg net/socket.c:2683 [inline]
-       __se_sys_sendmsg net/socket.c:2681 [inline]
-       __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #1 (dev_addr_sem){++++}-{4:4}:
-       down_read+0x47/0x2e0 kernel/locking/rwsem.c:1537
-       address_show+0x25/0x250 net/core/net-sysfs.c:266
-       dev_attr_show+0x58/0xc0 drivers/base/core.c:2421
-       sysfs_kf_seq_show+0x310/0x490 fs/sysfs/file.c:65
-       seq_read_iter+0x4ef/0xe10 fs/seq_file.c:231
-       new_sync_read fs/read_write.c:493 [inline]
-       vfs_read+0x582/0xa70 fs/read_write.c:574
-       ksys_read+0x150/0x270 fs/read_write.c:717
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (kn->active#14){++++}-{0:0}:
-       check_prev_add kernel/locking/lockdep.c:3165 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3284 [inline]
-       validate_chain kernel/locking/lockdep.c:3908 [inline]
-       __lock_acquire+0x15a5/0x2cf0 kernel/locking/lockdep.c:5237
-       lock_acquire+0xf0/0x2e0 kernel/locking/lockdep.c:5868
-       kernfs_drain+0x284/0x600 fs/kernfs/dir.c:511
-       __kernfs_remove+0x3cf/0x660 fs/kernfs/dir.c:1513
-       kernfs_remove_by_name_ns+0xaf/0x130 fs/kernfs/dir.c:1722
-       kernfs_remove_by_name include/linux/kernfs.h:633 [inline]
-       remove_files fs/sysfs/group.c:28 [inline]
-       sysfs_remove_group+0xfc/0x2e0 fs/sysfs/group.c:328
-       sysfs_remove_groups+0x54/0xb0 fs/sysfs/group.c:352
-       device_remove_groups drivers/base/core.c:2843 [inline]
-       device_remove_attrs+0x229/0x280 drivers/base/core.c:2979
-       device_del+0x51f/0x8f0 drivers/base/core.c:3877
-       unregister_netdevice_many_notify+0x1e0e/0x2370 net/core/dev.c:12438
-       unregister_netdevice_many net/core/dev.c:12466 [inline]
-       unregister_netdevice_queue+0x31f/0x360 net/core/dev.c:12280
-       unregister_netdevice include/linux/netdevice.h:3408 [inline]
-       _cfg80211_unregister_wdev+0x155/0x570 net/wireless/core.c:1297
-       ieee80211_remove_interfaces+0x49c/0x6d0 net/mac80211/iface.c:2440
-       ieee80211_unregister_hw+0x5d/0x2c0 net/mac80211/main.c:1691
-       mac80211_hwsim_del_radio+0x28a/0x490 drivers/net/wireless/virtual/mac80211_hwsim.c:5916
-       remove_user_radios drivers/net/wireless/virtual/mac80211_hwsim.c:6727 [inline]
-       mac80211_hwsim_netlink_notify+0xfae/0x1310 drivers/net/wireless/virtual/mac80211_hwsim.c:6741
-       notifier_call_chain+0x1be/0x400 kernel/notifier.c:85
-       blocking_notifier_call_chain+0x6a/0x90 kernel/notifier.c:380
-       netlink_release+0x123b/0x1ad0 net/netlink/af_netlink.c:761
-       __sock_release net/socket.c:662 [inline]
-       sock_close+0xc3/0x240 net/socket.c:1455
-       __fput+0x44f/0xa70 fs/file_table.c:469
-       task_work_run+0x1d9/0x270 kernel/task_work.c:233
-       resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
-       __exit_to_user_mode_loop kernel/entry/common.c:67 [inline]
-       exit_to_user_mode_loop+0xed/0x480 kernel/entry/common.c:98
-       __exit_to_user_mode_prepare include/linux/irq-entry-common.h:226 [inline]
-       syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:256 [inline]
-       syscall_exit_to_user_mode include/linux/entry-common.h:325 [inline]
-       do_syscall_64+0x32d/0xf80 arch/x86/entry/syscall_64.c:100
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  kn->active#14 --> dev_addr_sem --> &rdev->wiphy.mtx
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&rdev->wiphy.mtx);
-                               lock(dev_addr_sem);
-                               lock(&rdev->wiphy.mtx);
-  lock(kn->active#14);
-
- *** DEADLOCK ***
-
-4 locks held by syz.2.13134/20856:
- #0: ffff88809099c708 (&sb->s_type->i_mutex_key#14){+.+.}-{4:4}, at: inode_lock include/linux/fs.h:1028 [inline]
- #0: ffff88809099c708 (&sb->s_type->i_mutex_key#14){+.+.}-{4:4}, at: __sock_release net/socket.c:661 [inline]
- #0: ffff88809099c708 (&sb->s_type->i_mutex_key#14){+.+.}-{4:4}, at: sock_close+0x9b/0x240 net/socket.c:1455
- #1: ffffffff8fc374b0 ((netlink_chain).rwsem){++++}-{4:4}, at: blocking_notifier_call_chain+0x54/0x90 kernel/notifier.c:379
- #2: ffffffff8fbcb808 (rtnl_mutex){+.+.}-{4:4}, at: ieee80211_unregister_hw+0x55/0x2c0 net/mac80211/main.c:1684
- #3: ffff888033048788 (&rdev->wiphy.mtx){+.+.}-{4:4}, at: class_wiphy_constructor include/net/cfg80211.h:6441 [inline]
- #3: ffff888033048788 (&rdev->wiphy.mtx){+.+.}-{4:4}, at: ieee80211_remove_interfaces+0x132/0x6d0 net/mac80211/iface.c:2415
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 20856 Comm: syz.2.13134 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2026
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- print_circular_bug+0x2e1/0x300 kernel/locking/lockdep.c:2043
- check_noncircular+0x12e/0x150 kernel/locking/lockdep.c:2175
- check_prev_add kernel/locking/lockdep.c:3165 [inline]
- check_prevs_add kernel/locking/lockdep.c:3284 [inline]
- validate_chain kernel/locking/lockdep.c:3908 [inline]
- __lock_acquire+0x15a5/0x2cf0 kernel/locking/lockdep.c:5237
- lock_acquire+0xf0/0x2e0 kernel/locking/lockdep.c:5868
- kernfs_drain+0x284/0x600 fs/kernfs/dir.c:511
- __kernfs_remove+0x3cf/0x660 fs/kernfs/dir.c:1513
- kernfs_remove_by_name_ns+0xaf/0x130 fs/kernfs/dir.c:1722
- kernfs_remove_by_name include/linux/kernfs.h:633 [inline]
- remove_files fs/sysfs/group.c:28 [inline]
- sysfs_remove_group+0xfc/0x2e0 fs/sysfs/group.c:328
- sysfs_remove_groups+0x54/0xb0 fs/sysfs/group.c:352
- device_remove_groups drivers/base/core.c:2843 [inline]
- device_remove_attrs+0x229/0x280 drivers/base/core.c:2979
- device_del+0x51f/0x8f0 drivers/base/core.c:3877
- unregister_netdevice_many_notify+0x1e0e/0x2370 net/core/dev.c:12438
- unregister_netdevice_many net/core/dev.c:12466 [inline]
- unregister_netdevice_queue+0x31f/0x360 net/core/dev.c:12280
- unregister_netdevice include/linux/netdevice.h:3408 [inline]
- _cfg80211_unregister_wdev+0x155/0x570 net/wireless/core.c:1297
- ieee80211_remove_interfaces+0x49c/0x6d0 net/mac80211/iface.c:2440
- ieee80211_unregister_hw+0x5d/0x2c0 net/mac80211/main.c:1691
- mac80211_hwsim_del_radio+0x28a/0x490 drivers/net/wireless/virtual/mac80211_hwsim.c:5916
- remove_user_radios drivers/net/wireless/virtual/mac80211_hwsim.c:6727 [inline]
- mac80211_hwsim_netlink_notify+0xfae/0x1310 drivers/net/wireless/virtual/mac80211_hwsim.c:6741
- notifier_call_chain+0x1be/0x400 kernel/notifier.c:85
- blocking_notifier_call_chain+0x6a/0x90 kernel/notifier.c:380
- netlink_release+0x123b/0x1ad0 net/netlink/af_netlink.c:761
- __sock_release net/socket.c:662 [inline]
- sock_close+0xc3/0x240 net/socket.c:1455
- __fput+0x44f/0xa70 fs/file_table.c:469
- task_work_run+0x1d9/0x270 kernel/task_work.c:233
- resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
- __exit_to_user_mode_loop kernel/entry/common.c:67 [inline]
- exit_to_user_mode_loop+0xed/0x480 kernel/entry/common.c:98
- __exit_to_user_mode_prepare include/linux/irq-entry-common.h:226 [inline]
- syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:256 [inline]
- syscall_exit_to_user_mode include/linux/entry-common.h:325 [inline]
- do_syscall_64+0x32d/0xf80 arch/x86/entry/syscall_64.c:100
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f182d99c629
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f182e8af028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: 0000000000000018 RBX: 00007f182dc15fa0 RCX: 00007f182d99c629
-RDX: 0000000000000300 RSI: 0000200000000040 RDI: 0000000000000004
-RBP: 00007f182da32b39 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f182dc16038 R14: 00007f182dc15fa0 R15: 00007fff4353ce78
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 
