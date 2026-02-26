@@ -1,153 +1,141 @@
-Return-Path: <netdev+bounces-261276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261277-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CEciDPkgoGkDfwQAu9opvQ
-	(envelope-from <netdev+bounces-261276-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 11:31:21 +0100
+	id 0ASdGvIhoGkDfwQAu9opvQ
+	(envelope-from <netdev+bounces-261277-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 11:35:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 851A51A447A
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 11:31:20 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7B2B1A45E1
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 11:35:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 57DAB309FCB1
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 10:30:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1672430A8706
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 10:33:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C890A3A1E9E;
-	Thu, 26 Feb 2026 10:30:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 279B63A7F63;
+	Thu, 26 Feb 2026 10:33:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="VHkOSePR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NjUVAQ1o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 201D3306B21
-	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 10:30:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D354E3A1D18
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 10:33:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772101809; cv=none; b=N8jP0O0/Pa3D7Sh1a5PP/05YY92W3GPIUh6q9Gr9xmAYvzftdwlYdo5lbGyrJ4JCJrAKiigcT0cHKkVngak23OFKm6q1mLEN6D2nZXD/duShxy57HWP1CmQNVYeeGWY/CLyeQUYvP+Db92OCbQHN5WTRysujtFmntiVHife2a+M=
+	t=1772102021; cv=none; b=qbeOSl0MqXXZvvElR9sYXFyrBkIOfu6VDSKwv1S7ma4A44Efj+eSpH6EyV11DPA0v1ih7w3HYMVF56pw3pm3CvJTTP9vmSiXs/eEt8SYJ7eiIcfoH8KCvLXCwzDoHoo/txmM84E17YFmqNSl75rema/EXccUVawJXgjtHDsny/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772101809; c=relaxed/simple;
-	bh=KDP+0cuTHeTx7lGCoa/n85lP6YYmj8Jic6OhIZFcWA0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Hj9gAGsWS+VQl4ROkJSnwTUQGOZHF233EBag7OeH/QwmiF1Rw7fTBMuFzX96amy1EUP277kQtLYzgOfrv+oS0Bvbwxekg2GKyFrj+huStxydA8/d/5j37uZ94KTkUE41NZseX/N4z9JuBx0Pp0Hciu1nBtMyjUViOcUmaSUEAh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=VHkOSePR; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 53458207B3;
-	Thu, 26 Feb 2026 11:30:06 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id E6RH0j8FLa1C; Thu, 26 Feb 2026 11:30:05 +0100 (CET)
-Received: from EXCH-02.secunet.de (rl2.secunet.de [10.32.0.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 11862205E5;
-	Thu, 26 Feb 2026 11:30:05 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 11862205E5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1772101805;
-	bh=jkUt4jM727hJC1aRcBFJPoh0b3Z7p8cpiNkeyYKZ5LU=;
-	h=From:To:CC:Subject:Date:From;
-	b=VHkOSePROh6xM8NfR7zLJ656k2v+CaM27/zKZVh/r7XWVdSHMDi15W14ugTtfmVmc
-	 p9/zfGBtFuGMWKt4bN6hINhzUOI4vGxzunT95es8LFzoi/eJNBmTitjf3tk1TeyP+M
-	 54poTkW/x010HG0S+3xxQvsY40Wf0cFhlIvnkJrkRh/6XsnoIgfBmpACsI5Seq0+DN
-	 p6U4dEHvf8AONavCGEiJ/pzOZYSHXS7qcnVX/fr9lEQCHmB9KP3O/SOEQsKutIr0uv
-	 GszwylvazX6pVUKd7Z2F5BEgo5gEd0fIHsRWLsY1gW7Qf17dHTRO3L58+bAM8CRxSD
-	 74+EOkccsjhcQ==
-Received: from moon.secunet.de (172.18.149.1) by EXCH-02.secunet.de
- (10.32.0.172) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 26 Feb
- 2026 11:30:03 +0100
-From: Antony Antony <antony.antony@secunet.com>
-To: Antony Antony <antony.antony@secunet.com>, Jakub Kicinski
-	<kuba@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>,
-	<netdev@vger.kernel.org>
-CC: "David S . Miller" <davem@davemloft.net>, David Ahern
-	<dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>, Herbert Xu <herbert@gondor.apana.org.au>, Shuah Khan
-	<shuah@kernel.org>, <devel@linux-ipsec.org>, Tobias Brunner
-	<tobias@strongswan.org>, Simon Horman <horms@kernel.org>, Sabrina Dubroca
-	<sd@queasysnail.net>
-Subject: [PATCH net-next v5 0/2] icmp: Fix icmp error source address over xfrm tunnel
-Date: Thu, 26 Feb 2026 11:29:51 +0100
-Message-ID: <cover.1772101380.git.antony.antony@secunet.com>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1772102021; c=relaxed/simple;
+	bh=Enj90gtfUFq+0CH7LsZ51Q9ykjr4YYVafTlxZ9EaAMs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MWJMnVkwRJGUDTo8gt09ZlChofGmGEAGm0DDYYFzdDSQuIF3jzQUnm4JggZxI+oACxl05lCLljFjiI0nfdZLvqzikT1wJe1SJy5sfG31MSRdNsugVyPFiJf+xcftIujVGcUQBhK081D576IvutGPM95LMAJgBgLNu+iRHILSJfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NjUVAQ1o; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2ad9a9be502so4626075ad.0
+        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 02:33:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772102019; x=1772706819; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aL2jI/4a7nFCZtj9lSEiRIWCdkLhqPjvVGi39JfAcNk=;
+        b=NjUVAQ1oz2oR+u6ouSYeYP1ebsH0B0qkuTRzPQ7/d0oPcvlsrTk6MhCpxecmVXYUkd
+         ARnp2C+Xt713TBuAQnDTAYyyhl/0HIH6hn2X6wVekrV5DkrI5m0WbeH/iLK4Xhinns9i
+         eKl3yrEFfbwlr7wkSlvlZNDMUswtkvKoeHP9kT0Crq+6X9XC+6zLXeK2hcBHlUgYlr2f
+         NMZSewU39WBjxzHtitBmLYzYda0OyBQO3gljI/bFCcjoGM3It8G4eBtA/6KfngDtIoPK
+         KjJgVj4riYI6xFCrZdFWqrGSc8ACl+K0XCErVljCEaBK/UPdXj/DQx+AhLZVG9i6uy2J
+         X5wQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772102019; x=1772706819;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aL2jI/4a7nFCZtj9lSEiRIWCdkLhqPjvVGi39JfAcNk=;
+        b=ufgzNJJa8i/m0bt9lQHUvDrSiAkq2ktMTcX6+jG3m/vvR5fiFs+k/fOVIV99Q8JtZp
+         /51UW4eKqJlAeOYrBmYhwAPDs5QQwY1laMDMZ/GkaNwJJGMt7nS+4TZv50USYAbFlYG1
+         gGin4IQ4tLg8fL6VsCNnkIYKQBkn9OVXwg1LBM3WTEd4zeoJnnGxrZwnY91WlpqnWrko
+         gG1CsVZD2h4GRNDp97iJTLyj54V79QcGxuImUGXzWJwQx38bYmDAUKSTVNWdt7xJE4nf
+         ABJ0zu2+OjTGmqd9tCK+SuM+6n3ImlnMcD7FeFN30EiMkHo8zMzfz//BjIRk2YpmwaPZ
+         +GLA==
+X-Gm-Message-State: AOJu0YxRtdrzyv/YsJnxbs50WP4YTQ+82/ffCkQoAsB9fHWAEIp8eDeB
+	b2bvrw1GKqOfQ4ijT1e4ObD/KzhCBjfA0zOiI8eZdMB+6rNKv+pD3/Co
+X-Gm-Gg: ATEYQzxVYRzgsP3C6b2NdfEDMYN19P/SxZdDcxrwoicf1oT0zDMSguRNaQeMAkt7rmK
+	9c+BGhKLhadjcyvHL/5bOiixywiKi67HXC39pCHHpnb1/rTRmQ2gzxlxCEf4ew6PEVdtS39DgF6
+	/IkyT+NifCglYBrRsdCmNpFYt7nIleyv6OBWrySgeibUvJ/ASFxf3N1P6gTMIrLHIw2AZZXjgx4
+	2J6CPAjOvPMhR/hDVMT5iI3thcb0QdeF2yqm3xWpE16j+lJL6iBT5uOq7Jxt58yZM4iXpaaFoVz
+	x++XIi3N1KZKkkrs6Yo4XWMhYM2NU2T4hc5j3UinF1076nCg3jyMgefo66C51RNi3k8HWSNUEdQ
+	Qbx810aeBxB0easxovLe9lGgCw5wjazScv1ICDKXVIRiyLUVKf36+FLIu8ZVsuoaomFB69ZZwnN
+	GiIuYWeB1/j8K7qy1lOk+oja4vVip3IBTSYWZ5lwunCHh+XqTDW//N7ypBU5z7
+X-Received: by 2002:a17:902:e743:b0:2aa:f43d:7c42 with SMTP id d9443c01a7336-2ade99a71c9mr38555825ad.24.1772102019024;
+        Thu, 26 Feb 2026 02:33:39 -0800 (PST)
+Received: from eric-acer (36-225-69-192.dynamic-ip.hinet.net. [36.225.69.192])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2adfb6d24b3sm20012575ad.78.2026.02.26.02.33.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Feb 2026 02:33:38 -0800 (PST)
+Date: Thu, 26 Feb 2026 18:33:34 +0800
+From: Cheng-Yang Chou <yphbchou0911@gmail.com>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: netdev@vger.kernel.org, saeedm@nvidia.com, tariqt@nvidia.com,
+	mbloch@nvidia.com, jserv@ccns.ncku.edu.tw, charlie910417@gmail.com
+Subject: Re: [PATCH 1/1] net/mlx5/core: Allocate ttc_params on heap
+Message-ID: <aaAhfgBoQnI3Qdaj@eric-acer>
+References: <20260226092857.1583984-1-yphbchou0911@gmail.com>
+ <20260226092857.1583984-2-yphbchou0911@gmail.com>
+ <20260226100514.GH12611@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EXCH-03.secunet.de (10.32.0.183) To EXCH-02.secunet.de
- (10.32.0.172)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260226100514.GH12611@unreal>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-261276-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[antony.antony@secunet.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-261277-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,ccns.ncku.edu.tw,gmail.com];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[secunet.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,secunet.com:mid,secunet.com:dkim];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 851A51A447A
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yphbchou0911@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C7B2B1A45E1
 X-Rspamd-Action: no action
 
+On Thu, Feb 26, 2026 at 12:05:14PM +0200, Leon Romanovsky wrote:
+> > +	ttc_params = kzalloc(sizeof(*ttc_params), GFP_KERNEL);
+> 
+> It needs to be kzalloc_obj(*ttc_params).
+> https://lore.kernel.org/linux-rdma/20260226071913.GD12611@unreal/T/#u
+> 
+> Thanks
 
-icmp: Fix icmp error source address over xfrm tunnel
+Thanks for the head-up. I'll send a v2 patch.
 
-This fix, originally sent to XFRM/IPsec, has been recommended by
-Steffen Klassert to submit to the net tree, since it changes ICMP
-behavior.
-
-The patch addresses a minor issue related to the IPv4 source address
-of ICMP error messages. The bug only occurs when xfrm policies are
-configured. It originated from an old 2011 commit:
-
-commit 415b3334a21a ("icmp: Fix regression in nexthop resolution during
-replies.")
-
-Submitting to net-next with a selftest.
-
-v1->v2 : add kernel selftest script
-v2->v3 : fix test script.
-v3->v4 : fix test script based on reviews
-     - clarify commit message
-     - Changed subsystem prefix to icmp: since fix is in net/ipv4/icmp.c
-v4->v5 : fix shellcheck warnings
-
-Antony Antony (2):
-  icmp: fix ICMP error source address when xfrm policy matches
-  selftests: net: add ICMP error source address test over xfrm tunnel
-
- net/ipv4/icmp.c                           |   1 -
- tools/testing/selftests/net/Makefile      |   1 +
- tools/testing/selftests/net/xfrm_state.sh | 613 ++++++++++++++++++++++
- 3 files changed, 614 insertions(+), 1 deletion(-)
- create mode 100755 tools/testing/selftests/net/xfrm_state.sh
-
---
-2.39.5
+Thanks,
+Cheng-Yang
 
