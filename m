@@ -1,78 +1,80 @@
-Return-Path: <netdev+bounces-261335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261336-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6BEgHWpCoGmrhAQAu9opvQ
-	(envelope-from <netdev+bounces-261335-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 13:54:02 +0100
+	id GJi6MKFCoGmrhAQAu9opvQ
+	(envelope-from <netdev+bounces-261336-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 13:54:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 877041A5F0F
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 13:54:01 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4699B1A5F43
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 13:54:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E2621302F23C
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:53:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 456DA30AB0EF
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:53:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C6602D97A6;
-	Thu, 26 Feb 2026 12:53:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 453212DAFAA;
+	Thu, 26 Feb 2026 12:53:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d4Fy2gX+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h8FryCGa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78C512D8DB1
-	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 12:53:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1879B2DA76A
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 12:53:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772110429; cv=none; b=gzA6suQmS7+qX8aC2BPTWqL9Fb64J5P5GOxWQbQHCl48TsLiW42hPPzJkIr+ISsk/n/tBS4I+jZ0nFJayZmgBZpa73YD+SwqQDg3vdsW5hdzJscoFt0Q6t0cMh6i89iqaCQGzQBPlnUJy00FXpYL/UuO0tFQXV+y6PoRRVcH1xA=
+	t=1772110435; cv=none; b=TgWLsI1G2KgV3KOoi1jaW4LwKvpt0pkNO/ELURAavehO5sbzDb6RJfhLk2T0AG60mIGMPqtHS+Fmepoj669lJqrr323BHe4EFp8IQJm0xyGrq6cjDXSL5YfYvWaPizv4rndnqeyPMD/MsKuF1xZQWnzFtlENsXCOnb2AyivEqYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772110429; c=relaxed/simple;
-	bh=dwiStO/chK1OLFBK71wNHFWP6SlMqftxFvbc+vvnPhU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dvlIMKtfub2KwyppO4XIClql92EYWvUu7xjI4kI59H7hL3xvzn8J3pCpSeQUw9XV41eYtyya3akJgb4qw4BPwhJbLwiksTgRtmuBEB0w7iNO2PP4vpwMc+vPNvGW8fqWWcfEDjam8cArOBJbRTJl/c6ZNHA3iCgTYXlM+Jeycx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d4Fy2gX+; arc=none smtp.client-ip=209.85.214.171
+	s=arc-20240116; t=1772110435; c=relaxed/simple;
+	bh=fFttaZMGeLdp3UAEasDbHujAJF5yaSFRST6gXJrpxk8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WYXhtGfRoJ/vOQbTSVCzb/+cYECo9Vy+slAQtTFo8cG6pxnOzMm2WApTKhM7Qu6luopvXOimO+LoR5tlupBti2aJFefRDKyrz88z7oobZXGeHTH2PWYbRPWYzVZGoTZ/l/Sr2gMD/pGgk5r58roWZ30ZPzvR3mxpK4LUF5FHKWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h8FryCGa; arc=none smtp.client-ip=209.85.215.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2aaecf9c325so5074205ad.1
-        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 04:53:48 -0800 (PST)
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-c70f191313cso306045a12.3
+        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 04:53:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772110428; x=1772715228; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=pU3Nlc8ltUu4dkb2Y0/KvgT3i+9qT+K1/h3U6dSw2Oc=;
-        b=d4Fy2gX+XQ4X9Hnh9IH86jGWxpldlwGJQZwJgM/fyA2arJQcp3NSkJFUtHNbWSZjVY
-         mqmgdovi+ztArNPF70hMQbuJpPcJ4nI5hsUJfx6oW0euYK9hY5qWRgtYN1vq04wfr59n
-         pwpXxwmbc6Z/7qXDgKWhdaSf8ZL3V7X3UYdeZ+56t15UiRU4RxEzaZ73FeddH684RCwr
-         K1vPmmEggsiKp+z+2XnpGlQJ4WNDi12zbUhzPLLbRfKJXthRRS7QZ11hMeZKlNNnXBa0
-         ivX7zkAYzrXHilb83NYqD+WNM0RQvX7ScuXPg/fcbpDAKdB38iXnSZZnXvxWe/KuWl4k
-         7VMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772110428; x=1772715228;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1772110433; x=1772715233; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pU3Nlc8ltUu4dkb2Y0/KvgT3i+9qT+K1/h3U6dSw2Oc=;
-        b=U8ljhOE4JdxSuAzhZxULvIBazosmwOiU7fM5PqSRhDyqpGMjSv4XLnA2dbOCwPg5zo
-         qAlQ4W/XTWHLakYUs+a7Bk7dd8FHpyAd33ed96suuUM6PctHSYH/hkFH7kEA4aPy2j8N
-         T8TS7X8qxyu2eQHkjEnu4sg+xGeAiATb93RCsbr+8MstM+HH4fO5VBGUYl74tjg72o+5
-         l10GRGhShFDCMB4SxS83gXTn+EmjEDtvFswkwqqg7yR4k1hxJGkhqbCgvu+1xcoZQed+
-         awkcZaMvFKlWjA4eBHej2tm5zi11uWRUJCVWOXG0pQMpl+K0KXjQpmwpkkvkYxJlSWcI
-         3Jhw==
-X-Gm-Message-State: AOJu0Yx2L1qvnvu/7ZTUoitAi9ZJp4FgmClnmc2rqh+1cTT+CN/wbi2m
-	aEb0vLHShEtKTayRtSoUV7uruX51abPFW5C2gccsye6SEH4ss+wdYBD6r7+8Y2MpwXE=
-X-Gm-Gg: ATEYQzw5E9T8m+Jegmo4OhdDdvAfvYOSK0tTBle18lps3jBax66qWFs/Lmbo0v1NZFQ
-	JWj9LOkYfJ0ztroH0NqBfCC9Wapi2f0X8bQ22ITa1umv+zoKThDu0+Ug5vhGhg+1uWVAwI0+zFN
-	dPLFe5FXNNgQg+5czirLNwvRWoM5u/18uBkptYhu40NrOY4TD9sd0L9Y0k0dn30xQWGLcPuOQl8
-	0sQtZmRni43ENj79YdFD+Na0Y1lMZs5t76AaB6cLoGrqCuFoH1GMsOsKTj48FQOuV+r+Ar8rtHc
-	valUiIaZaYkSJvaxCBULzh8GBZdAAU8GrgovRuPlBzPoRLiR5/kYlneOLkOAemVvrpEdtOXwaLa
-	CEVVMfqcmF9vVNtfzIL3pgaC/trTkrIA5oxg8xV+96m7Svrss0AJUg/QXcUlw3Naig2v8Vgcwg5
-	za9mls6wzaZTjSycJSQiOw41Zr1i4=
-X-Received: by 2002:a17:903:2307:b0:2a9:320d:285e with SMTP id d9443c01a7336-2adf79c86ecmr24944385ad.27.1772110427685;
-        Thu, 26 Feb 2026 04:53:47 -0800 (PST)
+        bh=cyD5MkH20QdTZJ8Vxn6Kuz/fsHPnaaXUSaeZ35cNF/E=;
+        b=h8FryCGabceH9Uy/AtyN5Lz6GYCvlmmIf7UfGPYiuWu0iCZw2yIhli6nqTrYPByTXk
+         n2jN/4pvIKrXTzq0bnXPhHgfW0Sfrg/op9I1LUkMuCjZ70rim2QeGZEvfGF/SYBQMSvc
+         w+ZotR4ZQl5MRpI9hWpaAqHt4YIJhii9Vp5KS9/9oGYGBEVKxhFylDK/c9CSv+k5zTY8
+         fVWoKcBzq30qkW+C+vUeG2LJs97YcPJ2qD3rkfnG4oxbu/KRLq6vMdYPwUVnpIVNyxnM
+         c8Xak5sObzy/ZEZFahWvrCDkwJUbFcgwhCvJWq4uDkto89yzAZXnt1d5rCPCdhFu8GXE
+         T21g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772110433; x=1772715233;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=cyD5MkH20QdTZJ8Vxn6Kuz/fsHPnaaXUSaeZ35cNF/E=;
+        b=JafVJvbwL0F2yi2goZSjPQlzQZ+yl3igVc5aaHx8CKbahQ7EXEnR8LpK68m4wQnbhw
+         jn6kYME2sffnyGsfjcCi4hwpu90B1ZodfqVj4eu4A/Eg7VPrFqXJfsHKDb3kjFCZwgPR
+         FSOmJjvFi84lFpmyUzQXHa5VlEq0lbqA5XOZhqiGkGKVnHuHFGlmCuzKIc75p0kqF3Ye
+         Uff1cpR3+p1RDDFaYEoAgrN7Yr2alhYF32/7V8VvGpxwNT7EH4r3EGhQTZjSf7tKlgPB
+         KFCN45B2Qj6+ZRl7ObbhiiHsYtTMwkx9eipp5PQNdqg520CDzY6RY0uQs0f/ahoZe2IQ
+         yv/w==
+X-Gm-Message-State: AOJu0Yy7Ed7fPWyxrATRYt4XExjCO3NWLRLuAPmBr3YYpgivx2McZ1rC
+	q4601JvrLAdpN0imOLI27qU+9BLyPzPiYunHtMJrb0/duu+vaPOC3dK5+SnB+Wjo9MU=
+X-Gm-Gg: ATEYQzx3WqwpHhvZRCNOqwHvSB/ibGyJcmL+7K8oqtXKkP49keMEKi1c3yEQxSjevul
+	Fui7Sk7cEXAsFNU5nJCu204e4LBBZQ5298gzN38oVqQzBhoA7uiht6JfQ9ndRUKnlBpWMsqWJ0H
+	s1FgQE3P25KotCamted2pKJSTmQFpN/totnoYgvSex0/1JRi0O/dMXFqrvR/lrLa0EQ/F82tmci
+	djWwMyZXLOXBq96sgPcgV5nU2tUobgDXpzNFjKj8tZd12lueoBruwT9jKFNcEThUaSdOUP3qSvW
+	BY4UxERDdE94fLpA+BX5djtupqtGZ1sGI63yvUTZijwOOqTrEYRERxkCizkgaHgBJSvkAP9wS1o
+	oYXMgkl5W1luNgDEDJkIwjNXyxg28g3pV4LfcvOT7L19qrxwWDPK3FDNo9lRfarz2Kf/wYaxEKy
+	B0c4KM+hRu9zidUGxkDeMIMc1FHcM=
+X-Received: by 2002:a17:902:ec81:b0:2aa:d29f:1444 with SMTP id d9443c01a7336-2ae02969668mr21350065ad.10.1772110433295;
+        Thu, 26 Feb 2026 04:53:53 -0800 (PST)
 Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2adfb705b53sm25276715ad.92.2026.02.26.04.53.42
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2adfb705b53sm25276715ad.92.2026.02.26.04.53.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Feb 2026 04:53:46 -0800 (PST)
+        Thu, 26 Feb 2026 04:53:52 -0800 (PST)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Jay Vosburgh <jv@jvosburgh.net>,
@@ -87,10 +89,12 @@ Cc: Jay Vosburgh <jv@jvosburgh.net>,
 	linux-kernel@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv3 net 0/3] bonding: fix 802.3ad churn machine and port state issues
-Date: Thu, 26 Feb 2026 12:53:27 +0000
-Message-ID: <20260226125331.28147-1-liuhangbin@gmail.com>
+Subject: [PATCHv3 net 1/3] bonding: set AD_RX_PORT_DISABLED when disabling a port
+Date: Thu, 26 Feb 2026 12:53:28 +0000
+Message-ID: <20260226125331.28147-2-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20260226125331.28147-1-liuhangbin@gmail.com>
+References: <20260226125331.28147-1-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,14 +109,14 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[jvosburgh.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,blackwall.org,vger.kernel.org,gmail.com];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-261335-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-261336-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
@@ -127,50 +131,48 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bond_lacp_prio.sh:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 877041A5F0F
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4699B1A5F43
 X-Rspamd-Action: no action
 
-This series fixes two issues in the bonding 802.3ad implementation
-related to port state management and churn detection:
+When disabling a port’s collecting and distributing states, updating only
+rx_disabled is not sufficient. We also need to set AD_RX_PORT_DISABLED
+so that the rx_machine transitions into the AD_RX_EXPIRED state.
 
-1. When disabling a port, we need to set AD_RX_PORT_DISABLED to ensure
-   proper state machine transitions, preventing ports from getting stuck
-   in AD_RX_CURRENT state.
+One example is in ad_agg_selection_logic(): when a new aggregator is
+selected and old active aggregator is disabled, if AD_RX_PORT_DISABLED is
+not set, the disabled port may remain stuck in AD_RX_CURRENT due to
+continuing to receive partner LACP messages.
 
-2. The ad_churn_machine implementation is restructured to follow IEEE
-   802.1AX-2014 specifications correctly. The current implementation has
-   several issues: it doesn't transition to "none" state immediately when
-   synchronization is achieved, and can get stuck in churned state in
-   multi-aggregator scenarios.
+The __disable_port() called by ad_disable_collecting_distributing()
+does not have this issue, since its caller also clears the
+collecting/distributing bits.
 
-3. Selftests are enhanced to validate both mux state machine and churn
-   state logic under aggregator selection and failover scenarios.
+The __disable_port() called by bond_3ad_bind_slave() should also be fine,
+as the RX state machine is re-initialized to AD_RX_INITIALIZE.
 
-These changes ensure proper LACP state machine behavior and fix issues
-where ports could remain in incorrect states during aggregator failover.
+Let's fix this only in ad_agg_selection_logic() to reduce the chances of
+unintended side effects.
 
-v3: re-post to net, no code change (Jakub)
-v2:
-  * set AD_RX_PORT_DISABLED only in ad_agg_selection_logic to avoid side effect. (Paolo Abeni)
-  * remove actor_churn as it can only be true when the state is ACTOR_CHURN (Paolo Abeni)
-  * remove AD_PORT_CHURNED since we don't need it anywhere (Paolo Abeni)
-  * I didn't add new helper for ad_churn_machine() as it looks not help much.
-  * https://lore.kernel.org/netdev/20260114064921.57686-1-liuhangbin@gmail.com
-v1: https://lore.kernel.org/netdev/20251124043310.34073-1-liuhangbin@gmail.com
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
+ drivers/net/bonding/bond_3ad.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Hangbin Liu (3):
-  bonding: set AD_RX_PORT_DISABLED when disabling a port
-  bonding: restructure ad_churn_machine
-  selftests: bonding: add mux and churn state testing
-
- drivers/net/bonding/bond_3ad.c                | 97 ++++++++++++++-----
- .../selftests/drivers/net/bonding/Makefile    |  2 +-
- ...nd_lacp_prio.sh => bond_lacp_ad_select.sh} | 73 ++++++++++++++
- 3 files changed, 146 insertions(+), 26 deletions(-)
- rename tools/testing/selftests/drivers/net/bonding/{bond_lacp_prio.sh => bond_lacp_ad_select.sh} (64%)
-
+diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
+index af7f74cfdc08..c47f6a69fd2a 100644
+--- a/drivers/net/bonding/bond_3ad.c
++++ b/drivers/net/bonding/bond_3ad.c
+@@ -1932,6 +1932,7 @@ static void ad_agg_selection_logic(struct aggregator *agg,
+ 		if (active) {
+ 			for (port = active->lag_ports; port;
+ 			     port = port->next_port_in_aggregator) {
++				port->sm_rx_state = AD_RX_PORT_DISABLED;
+ 				__disable_port(port);
+ 			}
+ 		}
 -- 
 2.50.1
 
