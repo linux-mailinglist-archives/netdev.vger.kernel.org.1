@@ -1,336 +1,345 @@
-Return-Path: <netdev+bounces-261559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261561-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8GWGBd6koGk9lQQAu9opvQ
-	(envelope-from <netdev+bounces-261559-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:54:06 +0100
+	id 6HyBN3qkoGk9lQQAu9opvQ
+	(envelope-from <netdev+bounces-261561-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:52:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DFF51AEBC5
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:54:05 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 564E31AEB79
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 20:52:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 08102300DF51
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:48:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3BCFA30068F5
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:52:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF4DE4657E7;
-	Thu, 26 Feb 2026 19:48:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28E72450907;
+	Thu, 26 Feb 2026 19:52:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="KK/t+d6Y"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="bcvKO/2m"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11023105.outbound.protection.outlook.com [40.107.201.105])
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011034.outbound.protection.outlook.com [52.101.65.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0C84534BF;
-	Thu, 26 Feb 2026 19:48:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.105
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D76644E031;
+	Thu, 26 Feb 2026 19:52:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.34
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772135317; cv=fail; b=jl44FjJjSwyGasEdbCFdF7yfJM9D+Lnom6CGWRbL/8tmG0b7IdmyLZRGF4vE54mvEawDK6WsEFrdVHL8ybLVTxxZ2523dHNMyWtWyjSNoD67Xla27PVtMJv3rUWkLP82kWk/5w3DRO9Zz7TU/DTuLOj0yuXKQ7YYbItrVLysZVs=
+	t=1772135528; cv=fail; b=pbcPwqHSWUJuxI2jGXpM/EN5KTgOIPUNTCBcB9hhPeHE8+8TeBBEvzoGa9ZbnjpoZq7QmY92ivajJO3I0sitYvn6vSEHng33ELjXRwwO161aZUrM9XDnxAFkqV/ShrE+4Lz1VbA8Ks2691SsrXdJR2dIvSEzxSx8gurwpnMXaOE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772135317; c=relaxed/simple;
-	bh=6ZhFEuT1xaxqqezxyPpHIbf8Jfy8fsOa+uXVbD7EKWI=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=VkjTr6nTnnX/GN/z+cgupBHtgkq9UVT2eaMo1HVIWP933EmX6NTbZOLBvRUdeOSxIAy/QkfjD9E+tFAu9RIZSIM66ZdkEO66eXUVUXy44w9///ASRvIe6BmBjDBO9WnwKRuzOUxfiAGtnoMH/0xpRu0bR1ePtSALG1rAKlDf2Pk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=KK/t+d6Y; arc=fail smtp.client-ip=40.107.201.105
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+	s=arc-20240116; t=1772135528; c=relaxed/simple;
+	bh=Q4YT5zeL7EBzHGGcoMBKlpFpSJJ2RmYtABqP6eoxoJI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=ooaDgVaNCvzUzMt+z2c2ZkqEbyKC10+gGCjAzzYpHddqm8fsiE6Ww6PUFTRsBpj1W2wTxLlUpPx+ejOQqco8OQwVnVzAV5P4g5IZcgWb+OSqUA+LlSIXOtXpX6ryfbkQRW+/AzvZiTCtC8bOfXn16xxBCmliN8TuluC+7EPwq9g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=bcvKO/2m; arc=fail smtp.client-ip=52.101.65.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dbbXZrX6zJ5OhoWh3nQL2TyjdeZ7WQksXy1Dj76X6IdGS3JgWSZWLuV1ziqbbNUFoAyDzB2Njkfl2Xx2kwBmD4lMDmfB4KiFS/fASY+rV4yYodUT1DEr2LNO1cY9t1cz76hKJLumS/DcdBAkhOub89GML4NCzGbMEiFRVJzzVp/UuDQis2ouB0nNSfvgB1sx2hOccfRFyozht1A+xqeRExNJ3pvD1e3tT4PJpepooNZQfTebiymC/WATxWPOEysIJ+rmRMhgUFjLAWW5UygXwuKk1Jw5mIX8ylC7Uj0btAoGoTmuL9XEcYjnlCNiAMwYeZ9LDaFDV6p7WfkHKcSJOQ==
+ b=Y+oo3ZVFzOG9t3vzGD4a6eS5lfmXe4hwDjQ2ShEspPbEWv4kW3oNbjpHw8ZWVEpCGJqMrHr7E13N9GMln9Tw5fvHb8WSBHd0O/MFwUy15Fjq473uG2FPB8QcRnnUY9gdL0NJIY7Jd0m0YHpHaVc/tRk+IBF9UwqrcfH0fIdDiGXxmtXRdj7Hy4hpTFf1MkjbKqdZHj1xFD16gMgBW8cmdn8WrBo17y+mT0tEZBcx/WxWRxbtFoNvZ0zdNB51x73fb5mMapMcrSQ0JWJympsBGal0MCf4alxFEm40pP2h5fUxZN5kR0XzrIwiuRocIgGW8lr+r84qaVtMEE0RVtOKXw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gBRjUzBd33cu85rAUs6b1PvgsWzymJ+vXXZxsKL/ZW8=;
- b=GJnQRiTH5gDvIV8SnA482uC9vdEObsLlEr/DdqGjeqlbB2K9J4m4ID321thfr+yURSpJ8WUs+oLwLlZC3t1z/F9GZjjqD3aWLKrGsAjiHwubRBnsFdXiERtVxMR/h7xqqPnEPJvxl3skO/oBh1qD5URffHDAY/URZargyFmJeddmSAEBOaM4u9oVgUnu7GMeErN2MjwF6Qh9x+efT8TxCxfNctzqJ62ghQC6s29PZpUn9+vGTXYv5JO7yiDdllU5XTQNCYPR5ec0HOU1ZNKRHz5g4rWP7XHfkxkAjoZItiK3c6pWbm/5AT9txXsYCsq/UReCopeC7jSEM/e3iYsPKQ==
+ bh=PKtTCw8nxDeCqQOQILoB8r6N6fo623AEr4kUt7BQVI4=;
+ b=oepVTSw8t4zw7dZaWdl2QwhlUOFumTNPO3FbkaFf99g/tDPIpVtiMtHaBJeN5BKQ3yI9/gu6nfTO5GjCxP9LuRKrezyMpyn7g7jYxzExAssZw1XpNk4UtMS5CvwB25+QrVE2uAa9NlTYmsFzefDO/M3xIbLnfykMOxnxSiVHTSi0lpDCiS6ZLnmLNGjOOZVdC/yv/XZCXvia/fVx4upF8Ii+MUiNDP1Q91JQfawdHSCkrOcfYRVZ1v/Jhyzxraog39Ac/6QNOmuJW2Wo/2ncpX6n7MnDEcosFmggcrjlwFVmpSsVoACoOTp00UPb9CU1V5xV8WnqZyUyQmuLaTmqZw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gBRjUzBd33cu85rAUs6b1PvgsWzymJ+vXXZxsKL/ZW8=;
- b=KK/t+d6Y3gJQQznHD7bzB7CV+7MFZlza7VSIcN8+lqXR3nJzPAQuFtkb5POXs38NpUdOb8GcUr5/fCuieYbEi3CPSnj891BNhItB2dGTu6m5SrZKumTNAIH4rxQl5i3KOzB1Nlx9Ta1IEhrCVcW5uGKNMCSdleoro51TaAU5b2s=
-Received: from DS3PR21MB5735.namprd21.prod.outlook.com (2603:10b6:8:2e0::20)
- by DSWPR21MB6966.namprd21.prod.outlook.com (2603:10b6:8:35f::16) with
+ bh=PKtTCw8nxDeCqQOQILoB8r6N6fo623AEr4kUt7BQVI4=;
+ b=bcvKO/2m8nQMqOJN8cLZH5tDqRSChPhsVl0NCd/lFpPfPhpHVXIfMABdRDOt2u2M3rrJBMVfI85O6yNP3kQaePW1KZ/cLOZhZiUJxDFxKBR5ac75oOvaE09ASqbzdHG5bkCdi962QcUwVx3M/xg1YlOhJ1xvMPIsrVu6C75Y8JNEnM0paq0ndIyqUeHSMrMgSfOrdmOJn8byqEN8hs2DuFDKX2KaPq3mn92/8O0NCPfoYcTxmld0Am82YeJLPGcV0s+I10rYhT6fBK4s4/ED34EV0A2GNFgs/ydSXIerXkYgNGEmJdhT/t9BTt2ZzyS6XXtLKlGW7EhdoB3rQ7rqDw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
+ by VI1PR04MB7182.eurprd04.prod.outlook.com (2603:10a6:800:121::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.9; Thu, 26 Feb
- 2026 19:48:30 +0000
-Received: from DS3PR21MB5735.namprd21.prod.outlook.com
- ([fe80::a3f4:6107:de7c:5925]) by DS3PR21MB5735.namprd21.prod.outlook.com
- ([fe80::a3f4:6107:de7c:5925%5]) with mapi id 15.20.9654.007; Thu, 26 Feb 2026
- 19:48:31 +0000
-From: Long Li <longli@microsoft.com>
-To: Dipayaan Roy <dipayanroy@linux.microsoft.com>, KY Srinivasan
-	<kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui <DECUI@microsoft.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>, "horms@kernel.org"
-	<horms@kernel.org>, "shradhagupta@linux.microsoft.com"
-	<shradhagupta@linux.microsoft.com>, "ssengar@linux.microsoft.com"
-	<ssengar@linux.microsoft.com>, "ernis@linux.microsoft.com"
-	<ernis@linux.microsoft.com>, Shiraz Saleem <shirazsaleem@microsoft.com>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, Dipayaan Roy
-	<dipayanroy@microsoft.com>
-Subject: RE: [PATCH, net-next] net: mana: Trigger VF reset/recovery on health
- check failure due to HWC timeout
-Thread-Topic: [PATCH, net-next] net: mana: Trigger VF reset/recovery on health
- check failure due to HWC timeout
-Thread-Index: AQHcpKEB0nVc09Lh2069xcpeS8HmdrWVZ0Qw
-Date: Thu, 26 Feb 2026 19:48:31 +0000
-Message-ID:
- <DS3PR21MB5735F00E300CB4B7E54DA710CE72A@DS3PR21MB5735.namprd21.prod.outlook.com>
-References:
- <aZwUDlTkb5xunIkH@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-In-Reply-To:
- <aZwUDlTkb5xunIkH@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=0f825b0a-340c-433d-bb1f-6481016ef6ce;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2026-02-26T19:44:03Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
- 3, 0, 1;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS3PR21MB5735:EE_|DSWPR21MB6966:EE_
-x-ms-office365-filtering-correlation-id: 10aa41a7-f7be-4433-3bcc-08de757004fd
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|376014|7416014|921020|38070700021;
-x-microsoft-antispam-message-info:
- bx3iuiRuhaKuvCIUBtFxKllulZVcnMb59ozP1bGJ/Du7xrRkIzThg5Uio0cs9BDUPshOG26XOAZZiw6sLES1TJLwLtqlh3A3fSNhVqQj5Nbo2uQxp2q/fF9WIFZTKV5EjnXdCOTPBgxRpWxXm9HiY0VFywdAf6kbuZVk4h0Ej3emPISd1iahFTLsTYT6p4vaU9jGYgybkcqtRql0OYq04z02WOF6X9wAh2uKmrxUO4ZGXtXV69GD6VtkAfNlVPfOtZHZ/6PAIHBQn/i6yumDSNd06RsCcJvpVxoh52jqq8ATSRuAA3i6wYBkG4p5khunKZKlXmOUjTMBdwTsEGePlVmh8Aq9ikmc32VPacqwOeDJ5RxUw4V+NVTRBj1tOzBEMUEz3X5rkMqaW2cjT7soF/DnmU6C5rAKUEaC2UVjXbBz4jrhXXrP/8eWGrLZdn3pWZoEeqeFcUVdwOfUrKKGEI8y/zeQaCYEdiA3mTMMQ7SKmmJ/X2Iy7isbWeqI8m4VacsRG/aO+DEqXu9HQ4EBdTadhJ4egZzqOH995R2MfiEy4cl+z+cuH4rS7TOkI77RbxC12FB1guKioOBkHQ5COWr7YXn13fV8oAIAXC6+8fakSrnZsGcFXEhpMgxd1gIF0wZvAbS9OlJnGKG5M9QWdOUbpJfqPGSyvVAA29IwcCoZXdx79iVKFm4VMHRIKEQKd0kIiE92zoNNjOxFImUAGonL3Z2tJpx0ICUVsZ7WBtgZyLp64Iqw30hevl6INoX9oyvEyYXinPQj/7zU4IcGs6jFgxR2HKCxOkDIxAfpp5vvjoxHj9SkHH27dE6RIHGV
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS3PR21MB5735.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(921020)(38070700021);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?j8gdug8iRWpeRiQ3HlZCGp9P8niZt2mVrpEN49+5fKfbK6CMC/M4G6byMH4e?=
- =?us-ascii?Q?OOh1BqZHWUjPdpN+j95hSd7MCMbbXFbotxQvT3U4aarY2WoX5HPL3RD90ca7?=
- =?us-ascii?Q?ukzVWVqY0NCLWO54X9Q43b+Lgay/WSCuvqRqZ4krsXy3UAGogrH6PLM58sO4?=
- =?us-ascii?Q?WLWafsipMa3MbaG+vHcrZ5EK+mURWUi7SBr0FcWv/enH8cRfPRaqNuCDyjQz?=
- =?us-ascii?Q?3YgwJ5R48xmV5dNXBpjM9qP3nT+8xJDVPIREW5ZCT9b/29NJcvBnHKOq5Gal?=
- =?us-ascii?Q?/STMgd6AlGRtE5RoZS0q3lX3r6RzW9mczt2enON7YmGBPutprBXpALSUTU2F?=
- =?us-ascii?Q?kxetk+VsZDW3QjyYM3xqAUlmsWzr3FHFnV6uFrOFMsNiLiDJ3hpTw8iO5763?=
- =?us-ascii?Q?Rr05DMErNKf3I5fMv0P+gVX5pobpMFIgseI2heshcxCeDhTkW1aHE7doBHlw?=
- =?us-ascii?Q?/7fxJXfp49+j7ykkHen8Pf6/qKCi6msa2rK5bqKs/n8V6UoS9/hDm2L17y9g?=
- =?us-ascii?Q?4Z+1pn6LMvpAA+DdasP2dAS3dS1Vi5/CX+YG9Q84gobIZBkTjm8ukboUl+cP?=
- =?us-ascii?Q?Buu39l/r+9UibUdh1E2SuoE4WOqaoAs8yeJpDnotdPs6tMljZVMwFsSG7f+7?=
- =?us-ascii?Q?lB/wLoI0BlfJ1e1f16AbKmkK1jHJN9lfpQS5+hIWsNzq9f4m+iGT9DcBiHN/?=
- =?us-ascii?Q?3N/w7XZ+zEBwI41iQQYXaXqEc6Xg8E96mRJYIym17lYzlXUaA3jXpITPrS0t?=
- =?us-ascii?Q?qqLIKizCkRWfkzHRdsf1BrCosyIiIGpF2PxbNudIjn4wdQB4ix9gvi+MV30v?=
- =?us-ascii?Q?ESqRBcknZ6bOnB8I6BGvaOUQ1KbGcderBJftdbEOGrzLsAijCIq5ih5ygja8?=
- =?us-ascii?Q?jpsJ0vK++99+2TvqsgeDYV+ig6Pt9mYb51sFStaPl4WLgS9c08BQ25itcUbd?=
- =?us-ascii?Q?GZcBL4rhEKI4KQ/jYtFZX5rqvSwdDPQCSTdsLxTsWd2vPvI9IMde8b7q+c/1?=
- =?us-ascii?Q?U6rI8rhDvC8wKgsaZ7eDJ3ENTPLa7jLbUR/ce5bn95dezY7/dEiHPggUEhhs?=
- =?us-ascii?Q?mpS2sE4UJu4cVlkYbChcvi9ZHnIwlhc1AMJFRB4dogAC4vQKDMclRfrGa5k3?=
- =?us-ascii?Q?yq+tH8K5hROmqGv485TeHUOmA9U8bLPWvVo6dzbSGBECvWsQZJFWr1TejEXO?=
- =?us-ascii?Q?dW1hKvEChdRh5qkviCeOJpyOSXMaE3EeWwGqHuOaURG7Oh/Tt1RogrLCcojm?=
- =?us-ascii?Q?LzpHn1+Q5YNWZy8k2K6O04AsymhIuvhHuNnK5zs2sPZe7vHynmg1WBMFtBHd?=
- =?us-ascii?Q?IGwihM6cObV+DHO6GuT6pPxWNUGoMiZaXOuldvuNNf1HKQYDN3mLIHqoJqxi?=
- =?us-ascii?Q?iw7yzYmPaYg9KkjRDXhetTtuGFPk3hVYUlp+bbZD8rajNW0KGhUsvzzelApA?=
- =?us-ascii?Q?/uheD05gBurwpixZXoOhaU1t5MByi7xEBADcr7Nz4LrY84GtlsBE2V82OHCf?=
- =?us-ascii?Q?lO9V0TfJgO5rRgliLrg1zFWqY/w5/+2hY5y2EvMVha2acbCHuKWELCj2SXBO?=
- =?us-ascii?Q?fEn3GA2MxcponXYFI2jM7wXtRfAhLddMxLhjh+uXU0tDuq7lcqqWdObI4H7j?=
- =?us-ascii?Q?EL8cHeu21743T5o1eRx5w2Qyg0fnZNFF03Z3jo/aQHODLQXBjBMYnSZoRzjb?=
- =?us-ascii?Q?iKNssCxboJcIjzJwMkBYX6m/KS3BNT+jc0j4FYy0BUA/kwIA?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.11; Thu, 26 Feb
+ 2026 19:52:02 +0000
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::f010:fca8:7ef:62f4]) by AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::f010:fca8:7ef:62f4%4]) with mapi id 15.20.9632.017; Thu, 26 Feb 2026
+ 19:52:02 +0000
+Date: Thu, 26 Feb 2026 21:51:58 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Zefir Kurtisi <zefir.kurtisi@gmail.com>
+Cc: claudiu.manoil@nxp.com, wei.fang@nxp.com, xiaoning.wang@nxp.com,
+	davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Zefir Kurtisi <zefir.kurtisi@westermo.com>
+Subject: Re: [PATCH] net: enetc: fix sirq-storm by clearing IDR registers
+Message-ID: <20260226195158.sagjq3hgs6l64w2u@skbuf>
+References: <20260220132930.2521155-1-zefir.kurtisi@gmail.com>
+ <20260223163227.y3yzzpncyf5a7klq@skbuf>
+ <b3d9136c-2803-4203-b1ea-1f9e62de80a1@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b3d9136c-2803-4203-b1ea-1f9e62de80a1@gmail.com>
+X-ClientProxiedBy: VI1PR0202CA0023.eurprd02.prod.outlook.com
+ (2603:10a6:803:14::36) To AM9PR04MB8585.eurprd04.prod.outlook.com
+ (2603:10a6:20b:438::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|VI1PR04MB7182:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0a0666f7-8601-4776-dc1a-08de7570828e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|10070799003|1800799024|19092799006|376014;
+X-Microsoft-Antispam-Message-Info:
+	eF2AG6bTQFlvmpK3ssgIfaTEvihErlswWBFRCxrr4yJss7lcmAdvbGt9AHIoiPG4pOM+7VnVyGwVwk+UuSM6uoxjmlAkXBCQdIwot3Dw5l4kYR03No/Wkbj2OHYfPEsuOAI7KF7F/2RjmPDXLw8towhgD6TnWnllF4icIawRhepVHqRTHZykT4a4F0TFezpSiJc3Ue4bQY7gR/2yC33YiwPKi/GFNn8eQlgIpu/ouQZtZ+ye2GtLX+clSYVcBgtvqpp5ljNOVsVI3iKXd020wGbzd0vyboJUIzcMmVHjuFNP8KKmX4v4Bv2rwd/UgNvbDQJkIafQqDaGa0ETxBdqU4bJkqcdNNFbi8dMvghWcepA4s8n2k6oNFWyr/LxssO6LYBBtON7ynwLiXG6eNFF7cpE6JBnnK+S8iNPlvll8Cy1M3XWXrugbU/NVT/H1jgeM8ge+0yt3L8QbOslJqxlp2YdfWZ2wT0Ec/YNkvLWpZ3Y25eUsDpFyId1koF8TB9LwEOf/7XoJd8vlZgBV1epIWG7gcT157t/4B4qXlk0B/pnwJdmVLeuP1C5j84hhdX9LIQlFJYJ51c/EwuoPm5Ok90k5nzUzQXZMnk4FQyPrYjI586wspkLsdx8itBUixGq3Z9wFtDGwQhUlPomzi+WjDKC6mm7woaftaGRuirZ4KCyUkHxW+ptSDXc8AtAAzp/X6O4fTGwLBtWFYfgf56ZtLe8NH6xWE3cekDYLM2e97E=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(10070799003)(1800799024)(19092799006)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?uFMvOWCIEeyV8JJEtqMUBrmL9uzZ6jeLp0vRmaoLBRN7jJyq3dc+bmO41p1x?=
+ =?us-ascii?Q?PzMRLtjXk5F5lh/0BWeHNoCAoiYJBNEpDHdAWLkcJApDkCwr4xfAoMHHnCGT?=
+ =?us-ascii?Q?BRVrauWG3inG7i2h0xYlyieKEzxOwhYYjDcDRb67qgDFhRblOo/sxp+nVK8W?=
+ =?us-ascii?Q?AViydFobyJpvNnXVVYchVdzRwk4tm+cLLTVqAdjHPum6oyTGzM7gnjT98SLI?=
+ =?us-ascii?Q?JDRUXZBijlMzqqeCk2MUg8nMzVpsWSDvo4sYoOO1PaRiDJ/xWuUvoY+LlT5V?=
+ =?us-ascii?Q?YxMINc8v0u1ZWYWiHC55hAEHg8lL3fdrW8aVYXWGwd+bof+dxIL5YaS2eEor?=
+ =?us-ascii?Q?M0x5D5R0VfSPUWO8Pmz/qIXd4LNDoOxSdyGy3keaLukKHBUCnCd+3dN8U3CV?=
+ =?us-ascii?Q?qZlZkA1LVKaXOp9Djt+PAxdfq4Pib5GIbtq1UVwiW3XiOhysTun7KOqXQ/89?=
+ =?us-ascii?Q?Rl+p2OfGzxR8Gs3qDwFR5AcMFd5v3rHTClzOEL0KJ7PokZ/rRC2CNfFoyMvI?=
+ =?us-ascii?Q?S4urVX1sTto2Pfw3w5mZOyo7NefyknZlzCmVkfIb4CP4QpK5R2HUKbewl8uB?=
+ =?us-ascii?Q?Bj5eHlPuqIdLgMDReJvSvdfYE7uZgjvl4FeYHI6f8j4roE0dPMNNA2N1Nd7k?=
+ =?us-ascii?Q?xdXMmfhmLzALRi9I3BUO9/LRz9mxji0uxHbh4wuA08nHkYXigZxXHLqYAOwO?=
+ =?us-ascii?Q?oUXlcTVT7VWyQggBvLnN8Cc6TTW/atlqlUd+hTlrtEKHmJJ9I3hJZeeL+H38?=
+ =?us-ascii?Q?7vS0gIbnBJ3ha1Vy/fIbM32rnCo/KIserfShkE36IsBrFv8kHu//4hfPtf5G?=
+ =?us-ascii?Q?jnVGM9qdXBGW7Z6pOy/3mUFBjHJgooMIiwC/n+B1Kvs8Gq6+/d7I1FxaJbRG?=
+ =?us-ascii?Q?YDkTRygIl3yTwwB1jiZ1ingG2l7YEgsX3TredYsz9FM9VIFW/R8IO9EHyjVC?=
+ =?us-ascii?Q?0YdzPWJ52LnAh/6pZPdvfawI83q+UZqnnxO7jz+kVYoGgC1rgyMB5E87JDIO?=
+ =?us-ascii?Q?yPDc666MYeYQmAl+sQuyLcjADGhLFj11pnI89rM0YSf7tEYk3t/u8q7/faqm?=
+ =?us-ascii?Q?xiWawPjVA39UDvcMQKUxC9BCg7oT8nCtV3NbwzcR8TwvDY+OMvnF7MRD4JmZ?=
+ =?us-ascii?Q?cZO7nnieSU0xlgWhupDEQXXmCr93PgwrWqO3XRAia5n8vgrK7ugxre/QZVya?=
+ =?us-ascii?Q?zt64Eu8GVjWqIFfR7tUnAHnpuOY+3+f2xP0J5f4msOv0JLDyKKhJC05651Wz?=
+ =?us-ascii?Q?ZFbVnGbGS8ln8qu3Ci9oGLkMo84RBn4qQp0OOzdOyHvuZG9HkfagtpT6dmzA?=
+ =?us-ascii?Q?9Y3nrEbkY3XazIrl/BHgDqSQgcXHe9iN6BCasvW5eWsk9JNyvInvJiJH4c7I?=
+ =?us-ascii?Q?eDxDJUo1UY+DlxlOVmdtUds7lymwHHN9aRDRf1BAoviDvBAR4ey+o5p+x8Yv?=
+ =?us-ascii?Q?haeoPAubVwe1H5Ulevfpz2Yqhj3HJ2FmDGpgAy28NZvxi6sBYrOE4YlwSoKJ?=
+ =?us-ascii?Q?s3wWDFEw/hMg4AnEMv+sWjFT2W031Shsem4q2l0QWTj0CG3MPPLQ/IJp6Viw?=
+ =?us-ascii?Q?Fx8K87OqP04dLrXESAR9OGqMHyHIUz1QgtIy9WHd5fZpR8Z8Wn1jWUisWiNr?=
+ =?us-ascii?Q?3iT0Cl/SCmRk8fbNiTrd0Tx1GYmJ1WODrsCsXxDj5Pncvw2m33Q1j793d+FG?=
+ =?us-ascii?Q?kalR/V0rjJNUIzp7y1AG+4Dl3X4zUixdWABBE9znwY3q3lQHfeSn1ZJXRYci?=
+ =?us-ascii?Q?iTFDFuoZ3FqTZSG7uXE8n4XVIu/9AcmpZ4fux7g2WGTWGIJFB+ewIj43wGJg?=
+X-MS-Exchange-AntiSpam-MessageData-1: uOEBpnzwCsk9XYQPmKjH0OtRMLo1cFJonwM=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0a0666f7-8601-4776-dc1a-08de7570828e
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS3PR21MB5735.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 10aa41a7-f7be-4433-3bcc-08de757004fd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Feb 2026 19:48:31.3468
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2026 19:52:02.2904
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: sRg9lUm4QwVQb7+S4dzzHNI41+DxN2hKctUXIC5anuUwSL3+k1XrNwi+dP0dyEGcoZlLM76mt0PaTYS696mcsg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DSWPR21MB6966
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rV/TBZuOM8FG1RQV7hAhNe1wh1G4BK4+uHjs2KnI1Y10c59efmz7q9KxwM48aETzRZ+c0TpywLIMJn3HmOXa5w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB7182
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [1.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[microsoft.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[microsoft.com:s=selector2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261559-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	TAGGED_FROM(0.00)[bounces-261561-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[microsoft.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[longli@microsoft.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vladimir.oltean@nxp.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[DS3PR21MB5735.namprd21.prod.outlook.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8DFF51AEBC5
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 564E31AEB79
 X-Rspamd-Action: no action
 
-> The GF stats periodic query is used as mechanism to monitor HWC health ch=
-eck.
-> If this HWC command times out, it is a strong indication that the device/=
-SoC is in a
-> faulty state and requires recovery.
->=20
-> Today, when a timeout is detected, the driver marks hwc_timeout_occurred,
-> clears cached stats, and stops rescheduling the periodic work. However, t=
-he
-> device itself is left in the same failing state.
->=20
-> Extend the timeout handling path to trigger the existing MANA VF recovery
-> service by queueing a GDMA_EQE_HWC_RESET_REQUEST work item.
-> This is expected to initiate the appropriate recovery flow by suspende re=
-sume
-> first and if it fails then trigger a bus rescan.
->=20
-> This change is intentionally limited to HWC command timeouts and does not
-> trigger recovery for errors reported by the SoC as a normal command respo=
-nse.
->=20
-> Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+On Thu, Feb 26, 2026 at 08:28:53PM +0100, Zefir Kurtisi wrote:
+> Thank you for the feedback and clarifications.
+> 
+> The statement that SITXIDR/SIRXIDR bits are directly linked to TBaIDR/RBaIDR
+> is missing in the reference manual, i.e. it states that the former represent
+> a summary of the latter, but not that W1C-ing the bits in SITXIDR would also
+> move the other direction and clear TBaIDR. That clarifies quite a bit,
+> thanks.
+> 
+> As for your request to take the mainline branch, I am depending on a OpenWRT
+> build-system and shifting linux kernel-versions is unfortunately not
+> something I can do in no time. As for the potentially missing patch you
+> pointed me to, I backported that one, but it makes no difference.
+> 
+> Luckily meanwhile I was able to narrow down the issue and can provide you a
+> means to hopefully reproduce it. This is the tl;dr version:
+> 
+> * enetc operates eth0
+> * ath9k operates wlan0
+> * both are bridged over OVS
+> * device is AP with an active STA connected to it
+> * STA regularly sends an L2 WNM keep-alive frame
+>  * that frame is 'buggy' as being tagged IPv4 but without payload
+> * through the OVS bridge that frame makes it into eth0 TX path
+> * enetc_start_xmit() enqueues it into TX-BD
+> * HW processes that descriptor, sets IDR and issues interrupt
+> * enetc_clean_tx_ring()
+>  * gets a bds_to_clean=0 (tx_ring->tcir = tx_ring->next_to_clean)
+>   * i.e. HW signals it completed the BD but did not advance TCIR
+>  * skips the while() loop
+>  * and hence never clears the according SITXIDR bit
+> * enetc_poll() after completion of ring processing
+>  * re-enables interrupts
+>  * but the one bit in SITXIDR is now sticky
+> * interrupt is re-asserted immediately
+> * the affected core remains 100% SIRQing
+> * it only recovers when the affected TX ring advances
+> 
+> So in short, enetc breaks when sending 0-byte frames.
+> 
+> The patch that I provided resolves the problem by force-cleaning all IDRs
+> before interrupts are re-enabled. That is the sledge-hammer approach, since
+> it also unmasks BDs that were just completed during
+> execution of enetc_poll() or no_eof BDs. Hence it is not the final
+> solution, but currently anything is better than a freezing box.
+> 
+> Below is the tool I wrote to fire such a frame-of-death. If you can
+> reproduce the observation, I'd prepare a v2 patch to unblock the issue once
+> it happens - preventing enetc_start_xmit() from sending such frames I'd
+> leave to you, since that part looks complex to me to handle it properly.
+> 
+> 
+> Cheers,
+> Zefir
+> 
 > ---
->  .../net/ethernet/microsoft/mana/gdma_main.c   | 14 +++-------
->  drivers/net/ethernet/microsoft/mana/mana_en.c | 28 ++++++++++++++++++-
->  include/net/mana/gdma.h                       | 16 +++++++++--
->  3 files changed, 45 insertions(+), 13 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> index 0055c231acf6..16c438d2aaa3 100644
-> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> @@ -490,15 +490,9 @@ static void mana_serv_reset(struct pci_dev *pdev)
->  		dev_info(&pdev->dev, "MANA reset cycle completed\n");
->=20
->  out:
-> -	gc->in_service =3D false;
-> +	clear_bit(GC_IN_SERVICE, &gc->flags);
->  }
->=20
-> -struct mana_serv_work {
-> -	struct work_struct serv_work;
-> -	struct pci_dev *pdev;
-> -	enum gdma_eqe_type type;
-> -};
-> -
->  static void mana_do_service(enum gdma_eqe_type type, struct pci_dev *pde=
-v)
+> 
+> #include <stdio.h>
+> #include <string.h>
+> #include <stdlib.h>
+> #include <unistd.h>
+> #include <sys/socket.h>
+> #include <net/ethernet.h>
+> #include <netpacket/packet.h>
+> #include <net/if.h>
+> #include <arpa/inet.h>
+> #include <sys/ioctl.h>
+> 
+> /*
+>  * Enetc-Killer
+>  *
+>  * This is a PoC for fsl_enetc Ethernet driver to detect an
+>  * issue the driver has when zero-payload IP packets are sent.
+>  *
+>  * It was detected when using an enetc Ethernet interface bridged
+>  * with a wireless interface operating as AP. A connected client
+>  * regularly sends L2 WNM keep-alive frames without IP payload.
+>  * Through the bridge this 'buggy' packet makes it into the
+>  * enetc TX path, which the driver enqueues for sending and
+>  * the HW signals transmission done but without providing a
+>  * completed TX-BD. This leads to a sticky interrupt detected
+>  * flag causing a SIRQ-storm.
+>  *
+>  * This has been tested on a LS1028A based system under an
+>  * OpenWRT derivative / linux 6.6.93
+>  *
+>  * To test:
+>  * * build and copy binary to device
+>  * * connect over serial, leave eth0 idle
+>  * * ensure device runs with multiple cores enabled (otherwise it freezes)
+>  * * run the program
+>  * * with top, observe that one core is fully loaded with SIRQ
+>  * * to recover, storm-ping eth0 from outside to
+>  *   enforce TX-BD advance
+>  */
+> 
+> int main()
 > {
->  	switch (type) {
-> @@ -542,7 +536,7 @@ static void mana_recovery_delayed_func(struct
-> work_struct *w)
->  	spin_unlock_irqrestore(&work->lock, flags);  }
->=20
-> -static void mana_serv_func(struct work_struct *w)
-> +void mana_serv_func(struct work_struct *w)
->  {
->  	struct mana_serv_work *mns_wk;
->  	struct pci_dev *pdev;
-> @@ -624,7 +618,7 @@ static void mana_gd_process_eqe(struct gdma_queue
-> *eq)
->  			break;
->  		}
->=20
-> -		if (gc->in_service) {
-> +		if (test_bit(GC_IN_SERVICE, &gc->flags)) {
->  			dev_info(gc->dev, "Already in service\n");
->  			break;
->  		}
-> @@ -641,7 +635,7 @@ static void mana_gd_process_eqe(struct gdma_queue
-> *eq)
->  		}
->=20
->  		dev_info(gc->dev, "Start MANA service type:%d\n", type);
-> -		gc->in_service =3D true;
-> +		set_bit(GC_IN_SERVICE, &gc->flags);
->  		mns_wk->pdev =3D to_pci_dev(gc->dev);
->  		mns_wk->type =3D type;
->  		pci_dev_get(mns_wk->pdev);
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> index 91c418097284..8da574cf06f2 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> @@ -879,7 +879,7 @@ static void mana_tx_timeout(struct net_device *netdev=
-,
-> unsigned int txqueue)
->  	struct gdma_context *gc =3D ac->gdma_dev->gdma_context;
->=20
->  	/* Already in service, hence tx queue reset is not required.*/
-> -	if (gc->in_service)
-> +	if (test_bit(GC_IN_SERVICE, &gc->flags))
->  		return;
->=20
->  	/* Note: If there are pending queue reset work for this port(apc), @@ -
-> 3533,6 +3533,8 @@ static void mana_gf_stats_work_handler(struct work_stru=
-ct
-> *work)  {
->  	struct mana_context *ac =3D
->  		container_of(to_delayed_work(work), struct mana_context,
-> gf_stats_work);
-> +	struct gdma_context *gc =3D ac->gdma_dev->gdma_context;
-> +	struct mana_serv_work *mns_wk;
->  	int err;
->=20
->  	err =3D mana_query_gf_stats(ac);
-> @@ -3540,6 +3542,30 @@ static void mana_gf_stats_work_handler(struct
-> work_struct *work)
->  		/* HWC timeout detected - reset stats and stop rescheduling */
->  		ac->hwc_timeout_occurred =3D true;
->  		memset(&ac->hc_stats, 0, sizeof(ac->hc_stats));
-> +		dev_warn(gc->dev,
-> +			 "Gf stats wk handler: gf stats query timed out.\n");
-> +
-> +		/* As HWC timed out, indicating a faulty HW state and needs a
-> +		 * reset.
-> +		 */
-> +		if (!test_and_set_bit(GC_IN_SERVICE, &gc->flags)) {
-> +			if (!try_module_get(THIS_MODULE)) {
-> +				dev_info(gc->dev, "Module is unloading\n");
-> +				return;
-> +			}
-> +
-> +			mns_wk =3D kzalloc(sizeof(*mns_wk), GFP_ATOMIC);
-> +			if (!mns_wk) {
-> +				module_put(THIS_MODULE);
+> 	int sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+> 	if (sock < 0) {
+> 		perror("socket");
+> 		return 1;
+> 	}
+> 
+> 	struct ifreq ifr;
+> 	memset(&ifr, 0, sizeof(ifr));
+> 	strncpy(ifr.ifr_name, "eth0", IFNAMSIZ);
+> 	if (ioctl(sock, SIOCGIFINDEX, &ifr) < 0) {
+> 		perror("ioctl");
+> 		return 1;
+> 	}
+> 
+> 	struct sockaddr_ll addr = { 0 };
+> 	addr.sll_family = AF_PACKET;
+> 	addr.sll_ifindex = ifr.ifr_ifindex;
+> 	addr.sll_halen = ETH_ALEN;
+> 	addr.sll_protocol = htons(ETH_P_IP);
+> 	// Destination MAC (Broadcast)
+> 	addr.sll_addr[0] = 0xff;
+> 	addr.sll_addr[1] = 0xff;
+> 	addr.sll_addr[2] = 0xff;
+> 	addr.sll_addr[3] = 0xff;
+> 	addr.sll_addr[4] = 0xff;
+> 	addr.sll_addr[5] = 0xff;
+> 
+> 	// "broken" packet: only Ethernet-header, no IP-payload
+> 	// as sent by wpa_supplicant as L2 WNM keep-alive frame
+> 	unsigned char buf[14] = {
+> 		0xff, 0xff, 0xff, 0xff, 0xff, 0xff,	// DST MAC
+> 		0x00, 0x11, 0x22, 0x33, 0x44, 0x55,	// SRC MAC
+> 		0x08, 0x00				// EtherType = IPv4
+> 	};
+> 
+> 	if (sendto(sock, buf, sizeof(buf), 0, (struct sockaddr*) &addr,
+> sizeof(addr)) < 0) {
+> 		perror("sendto");
+> 		return 1;
+> 	}
+> 	close(sock);
+> 	return 0;
+> }
+> 
 
-Maybe it's not necessary: check if you want to call  clear_bit(GC_IN_SERVIC=
-E, &gc->flags) here?
+If I understand correctly, this patch should resolve your issue?
 
-> +				return;
-> +			}
-> +
-> +			mns_wk->pdev =3D to_pci_dev(gc->dev);
-> +			mns_wk->type =3D GDMA_EQE_HWC_RESET_REQUEST;
-> +			pci_dev_get(mns_wk->pdev);
-> +			INIT_WORK(&mns_wk->serv_work, mana_serv_func);
-> +			schedule_work(&mns_wk->serv_work);
-> +		}
->  		return;
->  	}
->  	schedule_delayed_work(&ac->gf_stats_work,
-> MANA_GF_STATS_PERIOD); diff --git a/include/net/mana/gdma.h
+From 887cf74648fb10b7dee3c60199349d184c5a851e Mon Sep 17 00:00:00 2001
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+Date: Thu, 26 Feb 2026 21:50:13 +0200
+Subject: [PATCH] net: enetc: avoid sending too short Ethernet frames
+
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+---
+ drivers/net/ethernet/freescale/enetc/enetc.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
+index b0b47b0f7723..4f5e593b348a 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc.c
++++ b/drivers/net/ethernet/freescale/enetc/enetc.c
+@@ -982,6 +982,9 @@ static netdev_tx_t enetc_start_xmit(struct sk_buff *skb,
+ 	struct enetc_bdr *tx_ring;
+ 	int count;
+ 
++	if (eth_skb_pad(skb))
++		return NETDEV_TX_OK;
++
+ 	/* Queue one-step Sync packet if already locked */
+ 	if (enetc_cb->flag & ENETC_F_TX_ONESTEP_SYNC_TSTAMP) {
+ 		if (test_and_set_bit_lock(ENETC_TX_ONESTEP_TSTAMP_IN_PROGRESS,
+-- 
+2.43.0
 
 
