@@ -1,99 +1,82 @@
-Return-Path: <netdev+bounces-261298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261300-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mKO7EqAsoGmLfwQAu9opvQ
-	(envelope-from <netdev+bounces-261298-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:21:04 +0100
+	id GBbjERowoGmLgAQAu9opvQ
+	(envelope-from <netdev+bounces-261300-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:35:54 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9FB61A4FBF
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:21:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B8A571A5279
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:35:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 109B530E3D1F
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 11:18:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C9DCA30C73B6
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 11:34:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7E1D3644B6;
-	Thu, 26 Feb 2026 11:18:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85978374736;
+	Thu, 26 Feb 2026 11:34:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FQvACxiY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fHIgb3r2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BE6D36656C
-	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 11:18:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6D237416E
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 11:34:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772104688; cv=none; b=hX+vKfURARlJ8sv0+ijwNWe2RLvXb+J+MrUvLN4vcQM6DtREneSUI15S5rM4LKO9O9KGQ8+oCNcV60xHkrk9Ib+Bhl/KaYn1IADvO2ys9BBnuXeJKn0jWRMAWvhYc4zUGvsjlWLQU1/ph9iSSuJD/yxnH+3oFJr6xqKCUySrHFk=
+	t=1772105655; cv=none; b=qNGulKxChMujB5fWNPmS7bXtrdymKHSjSbdFbb7W1B2o4Ukysl/WiqPm48Rr1rCfZTJCYS2t9wlCSsITfE0zcd2wj906FnIv1MXP2yiD/6oLkgbtr1cXRUkn9XypCuvq1SOrk9FrcKO+vOGVZ7Zt7rxo/Cw08kMThzk2mUfil/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772104688; c=relaxed/simple;
-	bh=Tda3X1h6hjXboAEqtey5KSiQRBdK9Kh2CQJXrLYM4X0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QmG9prcIZ0bPveivE/juqMCeRS+PZIWISkwd3cKrn7COZe1vvlkYgAV9Ut8ZdoIbuEmdfMh4I/uBBDkOV5E40Xa9Knqg6a+l9b0SMbbAh/ZCbwhpEHHtt/pFwINXH4R3wEeP8K0ivIkWX33ztEpOoDQEg2kjOEJNpliJ0czjobQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FQvACxiY; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-8272c559597so728995b3a.1
-        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 03:18:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772104683; x=1772709483; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jV7kecYCTzcrsCFjFw3qK5G5qwWc4nsIa+UHPnJX5do=;
-        b=FQvACxiYMZI6OIPAnmHZcBTt3ku9aJujLIk9yLB/cOkVKtFKrRfu56+VfrwALwFFtU
-         dud4h9PAysP3MwbkCuP89IAdcs/7md4j280wYF1KwgQaoNTmabeRwHTRJ/HiJRypiW2l
-         yIGxZKQ2y86Lzn8vhII4ucqwcd3Rg3zxifmOb67NOfEKMG5B6wB/6RQapeyxReCdAbiD
-         UC81/fZyEV0NIIRSq3/oRV9picQcnfZNbX43FD6phGzq4umS3rznexd/KoO6sGi9YJfS
-         JSUQLUV3o1u/oq3ECRaGe+gntjOZIbdr9hEyQU9qn9OIkhCSOQ3ZTFM/SeKSVfPKl79H
-         GgwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772104683; x=1772709483;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jV7kecYCTzcrsCFjFw3qK5G5qwWc4nsIa+UHPnJX5do=;
-        b=UD1Gsye3AnEnwBk5eu8pPWafAX4n8u72/Er9Nf9cz8mE1+PY/ljEjfZmkDj8YE+48R
-         VZNaBE442MeZG5Z2lxNuaflWPZ/enQAli1BLc0GEH5YFYTxtvB+XV9zZOcELHay7DN8A
-         TxkvQgloQAByQ7lQPjZ4fF5WGY4AOohpGAKbPA/tfnVRxjafUavg+U6A0HRq8gsT/7pP
-         fieK7RtD9BqyrZQhQvQVWBQ4jzvNpiwdSZkSfTHZ5OyOuQX3DJVGz6bwawHTjn1o+Tv6
-         ZpSyUVsUWEq4N2upNlC5Ws1yPebMBLM25bS2Os7J1Q6L0XrbRRbhBTYW7Ekg2l9G9pF/
-         yR/w==
-X-Gm-Message-State: AOJu0YxDC5z4jRfgfwF8o73nJAiP8Hw6+iXf1PBpmQQQn2R+/b4Enic4
-	O+o/Hy1sYAnv/xJdjn2A/0bFu32/3KZZ1xdmQeIq+KrOoK+kCeMGqPwZ
-X-Gm-Gg: ATEYQzyFjnMsGxLijZC4vPmsXoSHwTqFTvnLzgadhvXKpp0VAjF+2XIf456Lo16429B
-	hrMvkTaE+rB8Rqr6cOWHp73aPTSmH8RyPKw2FU8aHi90LPb+1qaGTFf2pu6EIoxi2bef813jLll
-	mKnnxkjuj1T70XoIoETVWHh7LdQI6P6FCtpr/48vs31pGJPdVFpm1q20+HcrQJFDc1yTU02VcwR
-	lk2YYyheEN8CsgrNoJQPJz/ohCbu6cgs4tYu3wK5KORIkLsrIiCLdNy3vpGiy4E5VpTUhxPX/2L
-	bV55FzvRfJpLCAJ3QARgdBuambv7R0+i2rbH6rTHCTxyDJ5OyFFncEfpG6u820E+CfVezyOGpEn
-	C5bi0pa690cAOSYO9Zz2hsANcRFKtmihmTD30zkxXQfvKOSkWb6TAJkjcWgxYTk5siel09HBOdN
-	jBV+NIttX4kYGqnZEx7bxupektyupubAjMUAbs4z++aH5kiD8r7W+xz4NkPbq5TpFNuYBOKmrWh
-	URP2PF+mgwun/9vxBbEsLyzpF5tM39DBr389F6u/CpNAiCrwiyOcdy+mZYpKFEnqaG7IZJJl2M+
-	xtRhRTyywQ==
-X-Received: by 2002:a05:6a00:3e0b:b0:824:a81e:97b5 with SMTP id d2e1a72fcca58-8273bfa235emr2041811b3a.38.1772104683383;
-        Thu, 26 Feb 2026 03:18:03 -0800 (PST)
-Received: from yuu-U24E.. (2001-b400-e3d7-38de-fa71-5111-1751-cb7a.emome-ip6.hinet.net. [2001:b400:e3d7:38de:fa71:5111:1751:cb7a])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8273a088517sm2110831b3a.65.2026.02.26.03.17.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Feb 2026 03:18:02 -0800 (PST)
-From: Yung Chih Su <yuuchihsu@gmail.com>
-To: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
+	s=arc-20240116; t=1772105655; c=relaxed/simple;
+	bh=vzLjgUo8sEzeWsoG/ZrURZKNZ3wEdOprVFXTzgadt3A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=jWcVwJvHLer0BHRsWuYokc2XaVPWRtmMOaLZVOX2fQOjmh76GOC/x89ZCSTQjRgKloirlcbaKZlIk6tEUKqjSsewETDqtoGFZE/R0X8jOmSlOW6msCr5p5mdzyOghncY0ty29etJHA/wOJbqYuZTHmT3jBv1gN0rqYhUArpORBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fHIgb3r2; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772105653;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mKKbKDKeeGzX9hOTv641TR8mAiL2GCNqFtF0g7/bl6Y=;
+	b=fHIgb3r2YfgaXwpoeX76SgCC6qo7hKM2CuqTKN5sM4ZISlNDLLuNvQF7Os4zQr4C9AfdpT
+	X2nelMBVQUHu0mi29TlClYJEELxngb3Sp8yc1Ps8XiWNUAZWjP6Vb505cjia24MBs0bflt
+	faCLYjziim22pCHQzAae1IHdmIYmbLE=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-696-CQwMgTzbNQey5SHIhrM51Q-1; Thu,
+ 26 Feb 2026 06:34:09 -0500
+X-MC-Unique: CQwMgTzbNQey5SHIhrM51Q-1
+X-Mimecast-MFC-AGG-ID: CQwMgTzbNQey5SHIhrM51Q_1772105648
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8EA8F19560A7;
+	Thu, 26 Feb 2026 11:34:07 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.225.206])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E131D1800671;
+	Thu, 26 Feb 2026 11:34:03 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: javen_xu@realsil.com.cn
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org,
 	horms@kernel.org,
-	nathan@kernel.org,
-	nick.desaulniers+lkml@gmail.com,
-	morbo@google.com,
-	justinstitt@google.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev,
-	Yung Chih Su <yuuchihsu@gmail.com>
-Subject: [PATCH] net: ipv6: fix ARM64 alignment fault in fib_multipath_hash_from_keys()
-Date: Thu, 26 Feb 2026 19:17:21 +0800
-Message-ID: <20260226111721.25454-1-yuuchihsu@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	edumazet@google.com,
+	hkallweit1@gmail.com,
+	nic_swsd@realtek.com,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next,v5] r8169: add support for RTL8125cp
+Date: Thu, 26 Feb 2026 12:33:50 +0100
+Message-ID: <20260226113350.119833-1-pabeni@redhat.com>
+In-Reply-To: <20260224025335.298-1-javen_xu@realsil.com.cn>
+References: <20260224025335.298-1-javen_xu@realsil.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,88 +84,155 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,gmail.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-261298-lists,netdev=lfdr.de];
+	TO_DN_NONE(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,lunn.ch,vger.kernel.org,google.com,gmail.com,realtek.com,redhat.com];
+	TAGGED_FROM(0.00)[bounces-261300-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yuuchihsu@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,lkml];
-	NEURAL_HAM(-0.00)[-0.999];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-0.993];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B9FB61A4FBF
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: B8A571A5279
 X-Rspamd-Action: no action
 
-struct sysctl_fib_multipath_hash_seed contains two u32 fields (user_seed
-and mp_seed), making it an 8-byte structure with a 4-byte alignment requirement.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-In fib_multipath_hash_from_keys(), the code evaluates the entire struct
-atomically via READ_ONCE():
-
-mp_seed = READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed).mp_seed;
-While this silently works on GCC by falling back to unaligned regular loads
-(e.g., LDR/LDUR) which the ARM64 kernel tolerates, it causes a fatal kernel
-panic when compiled with Clang and LTO enabled.
-
-Commit e35123d83ee3 ("arm64: lto: Strengthen READ_ONCE() to acquire when
-CONFIG_LTO=y") strengthens READ_ONCE() to use Load-Acquire instructions
-(ldar / ldapr) to prevent compiler reordering bugs under Clang LTO.
-
-Since the macro evaluates the full 8-byte struct, Clang emits a 64-bit
-ldar instruction. ARM64 architecture strictly requires ldar to be
-naturally aligned. Executing a 64-bit ldar on a 4-byte aligned address
-(e.g., ending in 0xEC) triggers a strict Alignment Fault (FSC = 0x21).
-
-Fix this by moving the READ_ONCE() directly to the specific u32 member:
-
-mp_seed = READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed.mp_seed);
-This instructs the compiler to emit a 32-bit load (ldar Wn or ldr Wn),
-which perfectly satisfies the 4-byte alignment requirement and resolves
-the crash.
-
-Fixes: [4ee2a8cace3fb9a34aea6a56426f89d26dd514f3] ("net: ipv4: Add a sysctl to set multipath hash seed")
-Signed-off-by: Yung Chih Su <yuuchihsu@gmail.com>
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
- include/net/ip_fib.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+r8169: add support for RTL8125cp
 
-diff --git a/include/net/ip_fib.h b/include/net/ip_fib.h
-index b4495c38e0a0..318593743b6e 100644
---- a/include/net/ip_fib.h
-+++ b/include/net/ip_fib.h
-@@ -559,7 +559,7 @@ static inline u32 fib_multipath_hash_from_keys(const struct net *net,
- 	siphash_aligned_key_t hash_key;
- 	u32 mp_seed;
- 
--	mp_seed = READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed).mp_seed;
-+	mp_seed = READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed.mp_seed);
- 	fib_multipath_hash_construct_key(&hash_key, mp_seed);
- 
- 	return flow_hash_from_keys_seed(keys, &hash_key);
--- 
-2.43.0
+This patch adds support for chip RTL8125cp with XID 0x708, applying
+different firmware (rtl8125cp-1.fw) and a dedicated PHY configuration
+function.
+
+> diff --git a/drivers/net/ethernet/realtek/r8169.h b/drivers/net/ethernet/realtek/r8169.h
+> index aed4cf852091..0b9c1d4eb48b 100644
+> --- a/drivers/net/ethernet/realtek/r8169.h
+> +++ b/drivers/net/ethernet/realtek/r8169.h
+> @@ -68,6 +68,7 @@ enum mac_version {
+>  	RTL_GIGA_MAC_VER_61,
+>  	RTL_GIGA_MAC_VER_63,
+>  	RTL_GIGA_MAC_VER_64,
+> +	RTL_GIGA_MAC_VER_65,
+>  	RTL_GIGA_MAC_VER_66,
+>  	RTL_GIGA_MAC_VER_70,
+>  	RTL_GIGA_MAC_VER_80,
+
+[ ... ]
+
+> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+> index 2f7d9809c373..d040f2074db6 100644
+> --- a/drivers/net/ethernet/realtek/r8169_main.c
+> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+
+[ ... ]
+
+> @@ -4021,6 +4026,7 @@ static void rtl_hw_config(struct rtl8169_private *tp)
+>  		[RTL_GIGA_MAC_VER_61] = rtl_hw_start_8125a_2,
+>  		[RTL_GIGA_MAC_VER_63] = rtl_hw_start_8125b,
+>  		[RTL_GIGA_MAC_VER_64] = rtl_hw_start_8125d,
+> +		[RTL_GIGA_MAC_VER_65] = rtl_hw_start_8125d,
+>  		[RTL_GIGA_MAC_VER_66] = rtl_hw_start_8125d,
+>  		[RTL_GIGA_MAC_VER_70] = rtl_hw_start_8126a,
+>  		[RTL_GIGA_MAC_VER_80] = rtl_hw_start_8127a,
+
+RTL_GIGA_MAC_VER_65 (RTL8125CP) maps to rtl_hw_start_8125d, which is also
+used by VER_64 and VER_66. However, these versions need special handling in
+rtl_hw_start_8125():
+
+static void rtl_hw_start_8125(struct rtl8169_private *tp)
+{
+	...
+	switch (tp->mac_version) {
+	case RTL_GIGA_MAC_VER_61:
+	case RTL_GIGA_MAC_VER_64:
+	case RTL_GIGA_MAC_VER_66:
+	case RTL_GIGA_MAC_VER_80:
+		for (i = 0xa00; i < 0xb00; i += 4)
+			RTL_W32(tp, i, 0);
+		if (tp->mac_version == RTL_GIGA_MAC_VER_80)
+			RTL_W16(tp, INT_CFG1_8125, 0x0000);
+		break;
+	default:
+		break;
+	}
+	...
+}
+
+Should RTL_GIGA_MAC_VER_65 be added to this case group? Both VER_64 and
+VER_66, which share the same rtl_hw_start_8125d function as VER_65, are
+explicitly listed here to disable interrupt coalescing (clearing registers
+0xa00-0xb00). Without this, the RTL8125CP may operate with stale interrupt
+coalescing settings, potentially causing incorrect interrupt delivery.
+
+> diff --git a/drivers/net/ethernet/realtek/r8169_phy_config.c b/drivers/net/ethernet/realtek/r8169_phy_config.c
+> index 032d9d2cfa2a..f78c3dd36483 100644
+> --- a/drivers/net/ethernet/realtek/r8169_phy_config.c
+> +++ b/drivers/net/ethernet/realtek/r8169_phy_config.c
+> @@ -1102,6 +1102,27 @@ static void rtl8125d_hw_phy_config(struct rtl8169_private *tp,
+>  	rtl8125_config_eee_phy(phydev);
+>  }
+>
+> +static void rtl8125cp_hw_phy_config(struct rtl8169_private *tp,
+> +				    struct phy_device *phydev)
+> +{
+> +	r8169_apply_firmware(tp);
+> +	rtl8168g_enable_gphy_10m(phydev);
+> +
+> +	phy_modify_paged(phydev, 0xad0, 0x17, 0x007f, 0x000b);
+> +	phy_modify_paged(phydev, 0xad7, 0x14, 0x0000, BIT(4));
+> +	rtl8125_phy_param(phydev, 0x807f, 0xff00, 0x5300);
+> +	r8168g_phy_param(phydev, 0x81b8, 0xffff, 0x00b4);
+> +	r8168g_phy_param(phydev, 0x81ba, 0xffff, 0x00e4);
+> +	r8168g_phy_param(phydev, 0x81c5, 0xffff, 0x0104);
+> +	r8168g_phy_param(phydev, 0x81d0, 0xffff, 0x054d);
+> +	phy_modify_paged(phydev, 0x0a43, 0x10, 0x0000, 0x0003);
+                                                           ^^^^^^
+
+Andrew Lunn suggested in v4 review that magic bit values should be replaced
+with named constants. The value 0x0003 sets bits for 'link speed 10m PLL
+OFF' (bit 0) and 'ALDPS PLL OFF' (bit 1). This would improve code
+readability and maintainability. Andrew suggested defines like
+RTL8125CP_LINK_SPEED_10M_PLL_OFF BIT(0), RTL8125CP_ALDPS_PLL_OFF BIT(1),
+etc.
+
+Reference: https://lore.kernel.org/netdev/1a36b013-ae9b-4d51-8259-92728644ceab@lunn.ch/
+
+> +	phy_modify_paged(phydev, 0x0a44, 0x11, 0x0000, BIT(7));
+> +
+> +	rtl8125_legacy_force_mode(phydev);
+> +	rtl8168g_disable_aldps(phydev);
+> +	rtl8125_config_eee_phy(phydev);
+> +}
+> +
+>  static void rtl8125bp_hw_phy_config(struct rtl8169_private *tp,
+>  				    struct phy_device *phydev)
+>  {
+
+[ ... ]
 
 
