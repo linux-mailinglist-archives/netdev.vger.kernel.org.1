@@ -1,260 +1,295 @@
-Return-Path: <netdev+bounces-261516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261515-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OPqtAUOToGllkwQAu9opvQ
-	(envelope-from <netdev+bounces-261516-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:38:59 +0100
+	id qCWeETKNoGkNkwQAu9opvQ
+	(envelope-from <netdev+bounces-261515-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:13:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 507151ADCEC
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:38:58 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EB561AD60C
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 19:13:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ECBA432D0ACD
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 17:39:30 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DC8FE3007239
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 17:39:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97771355F4A;
-	Thu, 26 Feb 2026 17:39:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D544355F21;
+	Thu, 26 Feb 2026 17:39:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Azvr99h0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RwugQ86/"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013068.outbound.protection.outlook.com [40.107.201.68])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35ABF355F27;
-	Thu, 26 Feb 2026 17:39:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.68
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772127559; cv=fail; b=V20q41dA3r8uViJLQ6JBu9FQbk5o3IGPhBfoIeHChdGu5D8nYGdeb08Z39CLvD7xJiq0Ca3aKquy/9E7pn1fXEfYp2bDNNnZ05qITru72ujncatSZAxvtv7i7VUV8CWxDnynWTWbBfWViR8A4uoHR3UvU9fWBqMizlV9TdPhamE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772127559; c=relaxed/simple;
-	bh=eKyWH9Twt2jVPyHViUONl1Q0S45Jc5a6Cwr9vEUCc4M=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=E2+EDjJAViOnnys44XnedOKIvSZfvcubepcNsurHBRHeyLU5A9nDRwK56YtV70cPAzCK7TV06RuDQiaWF8YuvqHV4Ouu7gv2zwnVXTGe4W/Z81jHdwjxmNwR4VnyDGfS1jn1JVEjU54uMcPO1kDRxbSbrU6LO5dUGo418KFjl0c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Azvr99h0; arc=fail smtp.client-ip=40.107.201.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UhDM83xBFS90NR0QfLj2cqWstN0Pvf+N0NlCoD3880tt1MXdmWMgkDatsoNITi/gdtaBcvbIJrIxfpDRnE8EiEulhdcwgW3dpSL9T9FdCK7NwkQ/Gj/fqPvpfZdgL+OlqJvtmJNBczSr60/1T7PYCzvlYr59wFZriJZIxT6lpbFXB5XEuXSaplWrAD/ubX2vE2jMCMs4XizzpxqkBlTeafgmYFMUzXajMrNdF4lDsBg9/ozSU6usl33gog4wNRSpIINaFkJRkHLoSRIAbLdIMcxgeKJLlQmYeF6vXgiFw7Em/zO/0EaSYnCsYloPnDpTdmsiJd35ZPwvOknK++qwsw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+MvOGeNz3nu587NFk+zyP4uN3zBBw2wQoe+oQGGOh/o=;
- b=fEkABGM0PpYHmvHV8hHPT6jwB+eWyDu4kR1CMo3xiTyejl0YOBchb0hiRTJie61SQep1zgaH6FNblLHwMetzBq9x5DM1w0BVVe7HyD+TZYC3WAh0fEKiC+1SSzShzZgaEndwQnN08TbuEhFdlEXNeeYjgMAVjJ/88kOgyry4DpknW/eyxaVpNMtfRxHgouCqfuiZAFCJrtnsmTxSCT+7RoyXK2FMS6JoGFjzRObFPntq08UUV1IFbXASszoB+gmPfdfWgZShe1AEMQGeaYaVXcFGkbjWqpqULN/gVfkiSTPRVLTIqRhW+UCBx6wV4n0E7kEgYH+G2wweGCdfoLB/Pw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+MvOGeNz3nu587NFk+zyP4uN3zBBw2wQoe+oQGGOh/o=;
- b=Azvr99h0b28xSxRQ3cjKD35yLTESjt4Vi9lVKOxskVA3rFrcfwRorkcjYdLLpNl2EFPElcdzRT8Uw03fUgm2HiadVYsTG07WYkohMjjdsRY6az/0UGJFm/7P0c+utxJAQL86sSMzK1ydr3sD6d4xEvD35WfZlkf4c3o5Y7UrsDYZifROmIAfwHkJlZNJGs/YlO5aJA2NH9dj2qyr0/XyUwClPhl2z4lqPIz5t+DsO2fUvu88VSXg6gljydNE7MSxTIgbpOAaTy/1Cn735qjaX/RsceohE1mtLMsps+g4F6Y9pGbeMPqfny/RLQ4JU6Bant1UkpJghN86IPmAdMfM3w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BL3PR12MB6473.namprd12.prod.outlook.com (2603:10b6:208:3b9::16)
- by DS0PR12MB7559.namprd12.prod.outlook.com (2603:10b6:8:134::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.14; Thu, 26 Feb
- 2026 17:39:14 +0000
-Received: from BL3PR12MB6473.namprd12.prod.outlook.com
- ([fe80::778:72e1:e792:df81]) by BL3PR12MB6473.namprd12.prod.outlook.com
- ([fe80::778:72e1:e792:df81%3]) with mapi id 15.20.9632.017; Thu, 26 Feb 2026
- 17:39:14 +0000
-Message-ID: <48c7be0a-0dcc-48c3-92dd-6cdc390adc44@nvidia.com>
-Date: Thu, 26 Feb 2026 19:39:08 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH rdma-next v4 02/11] IB/core: Introduce FRMR pools
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Saeed Mahameed <saeedm@nvidia.com>,
- Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org, Michael Guralnik <michaelgur@nvidia.com>,
- Yishai Hadas <yishaih@nvidia.com>
-References: <20260226-frmr_pools-v4-0-95360b54f15e@nvidia.com>
- <20260226-frmr_pools-v4-2-95360b54f15e@nvidia.com>
- <20260226141143.GJ12611@unreal>
-Content-Language: en-US
-From: Edward Srouji <edwards@nvidia.com>
-In-Reply-To: <20260226141143.GJ12611@unreal>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR5P281CA0006.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:f2::16) To BL3PR12MB6473.namprd12.prod.outlook.com
- (2603:10b6:208:3b9::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 461613290D3;
+	Thu, 26 Feb 2026 17:39:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772127554; cv=none; b=a/n0sXJooMqTyN6QCfu75trfUmGXiPt6bp8h/nO+/aV2o6WQKfvzEIqN0v1KkWzqleXJ2waw4zUoERVCn5++llDv6ccti+8dBFtkScmm4EiJbebmGirHdrU2sRhHfLTz+KZ8geOzI/jX2Y1FOt+09MUSurkqJxxmVFbtz9hCyiA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772127554; c=relaxed/simple;
+	bh=nThCQLbabJ0yq+l47grbVRbkwAW8YTIAhiJzvLJHKX4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FLOaX5SSzwdUHZopKCYxseLYu2Pl7DjDptxhskAIiXStna2agefS3zvEI0K4B3v+utNPMJthciyO6TupUC50izexmTPjeAgOvZy83r/2kYaZxLQmhyijU+4hH4ih4MpZcGETia9ZONJuuSFuUHXJqigHrYPqYqtnT7R/HYQ9Ftg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RwugQ86/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDAD9C116C6;
+	Thu, 26 Feb 2026 17:39:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772127553;
+	bh=nThCQLbabJ0yq+l47grbVRbkwAW8YTIAhiJzvLJHKX4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RwugQ86/npjsesdwAJsYp2Ax+O2Pngm5aol5NZ55QZJ7T1ahJAkwWQQ2B2OMAFQNt
+	 vvdRAwhJN/5OBlwYrJcnz3QuG41dimSLOXm3zd42wyBClcB6Jzuawao30M0A6fJoSl
+	 feYmXZR44DaBYDiMJlCAwNdAB0WBYOYuDVDA7TYOYWvjFwrphLsqglbNvIypSPNKRw
+	 ZYdurlezM0nrCHqs2jwIg4uTT6CeqXx9YFGZc4ttk8y3B8bMsJY2EOu2jr/VPq5g/M
+	 8LDwDHr2kc2FsYyb6DGCJqN48VEKdUyIhPPYvEeWDR+m2tg7IgZbSCfM9N8iAIKG2N
+	 8WNUpBR13S4Ng==
+Date: Thu, 26 Feb 2026 17:39:09 +0000
+From: Simon Horman <horms@kernel.org>
+To: Birger Koblitz <mail@birger-koblitz.de>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, pabeni@redhat.com,
+	linux-kernel@vger.kernel.org, kuba@kernel.org,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	edumazet@google.com, opensource@vdorst.com
+Subject: Re: [net-next,v2] r8152: Add 2500baseT EEE status/configuration
+ support
+Message-ID: <aaCFPZ2JYur6hdha@horms.kernel.org>
+References: <20260224-b4-eee2g5-v2-1-cf5c83df036e@birger-koblitz.de>
+ <20260225194848.188081-2-horms@kernel.org>
+ <875598e7-5fa1-49b0-be14-181b18ae97fe@birger-koblitz.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR12MB6473:EE_|DS0PR12MB7559:EE_
-X-MS-Office365-Filtering-Correlation-Id: 638414f9-7327-4afe-6302-08de755df52e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	/NXiSbctXJx53Dw/u4ripi8TAgFFp9embMr+WMwg3HM5qQvqdzX2ypm+0bcT6IqOL9YTQE74MssDTJJLGjWt5c9DoTx73cd3ZVVvZSyt3DNP15EebH4lRKDaAi0j9tfcqS2OR5LHGDc6vaexGcw/mUlNZU0FTuNUUoh60145cXWcT4yLBxZ+AwzvmLEAdfyyRX83+uAwjZ/xQLsTNFPHBLoYbG/OIFeZbCx9IepBBI1AHHwFCEor0BxRmXEtTRQbwlfeedBribV/m23RQavFsW4Hy0G/xBFy5HiQHjsAr7+x0K9183xThVTRfsPTthXr8LUzLEN1GM2QLU5AFz34qOcUwGhuqdPJt7diTN2nYEyh8LFdX5W2prMQOmEjcEAs8fzNOGU4eeuvFblas5YKpwwJKZc+nmkzTWGHNdUHF5uLPv/tyjq7FlaJ6SznauUnfSzI+O3TcuLeWjA80PBuV+dZJ+FbbKtkABKIlfU0Ckgfjx0j34+KG8zzEoPpzqYwt9m6ZnaCXZY1+mNN14O05MAhjy0ck358R8hrs9PsfDyY9EA5ncHKphXoKCq9/EzyNX/5YFOimcBS9CaIpI67o5jocPBszdhGD8HoMUnGPYKP84xKeB/Zl5uQT2+pIFDTTAnAvyx4UY/yB2rLZ1+4p/v3tTvsOumcK1LwNkdumqR4eL8dTQVkjLVYDWqRWr+mjqyawH4qxOMLJ1/c0EppRLB8DnZJ12ZNCBSxkdi2M0o=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB6473.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?d1h0ZkJqRlJMbFBBYWhGRXlRQ3ZuNTcvd28xYWt1OHltYTc0b2tVU2dHT1NJ?=
- =?utf-8?B?bjlFTk5ReTdoWWpRdThRMVYySnNTZWpCMGJ2VTIrTFRFUmd3WlZ0RVhwR0ow?=
- =?utf-8?B?MUlGQm1NNGZOa2RIWm94QWJpeXFwdDdibDk5YStsOVpnbjdhM2trb3p6WVNX?=
- =?utf-8?B?QS9FZnBrVlljR2k2QXVZNFByT09EWXBMbmdxb1J1VUJjYzkrb0g4a2M3Rzgz?=
- =?utf-8?B?WlI4cG5SczY2bU9mWlEwd01JWFJhbCtaZDVBUnZjbEYrdWhNZGxzRm1wUzJ5?=
- =?utf-8?B?RWlUSWZmU2NwR3hZemhOc2dzWkRyL3JsVHRQQU1lbW81S3FOMGhsNXBsbVFv?=
- =?utf-8?B?SzdONVRlQmVDQjFRRXdWNHBLM1NZK3BvS1UrNXVNSFY1MHJuSWpsU2habTNv?=
- =?utf-8?B?cExNcTBUaDNiNHdtck44dFJ5YUg0TytSeHJKRGtNT0lpdjhWUi8rK2NXK3dO?=
- =?utf-8?B?K1plMGlXcGR3SENFVWg0ODhVSUliVXBiemZxS25Sc2NDVW1lQkl3eW5JQXJR?=
- =?utf-8?B?ZkN4UGt3OXpKcGg5cERybXVnQVd5RW92UXRicGMxN3BhM1dKdTZubEZockRo?=
- =?utf-8?B?YXZZRTBhZDA4dW81WGVCdGZrZ2h5ZWtBNGlCVFVCMkF2TER4Uk1jK0J1N2k3?=
- =?utf-8?B?bFVIVVkrcHVLUitmYUxXTkVFVDJxZE9XRkI0aVEyWnhmaWV6SlRNMmxCZEVl?=
- =?utf-8?B?T3JmQnFZRUwvNHQ1Q1FOV2hrSlBtU1JUa0U2VGkrc0xjTEkySzZlNzhMS1c2?=
- =?utf-8?B?dEJycytydzFKaWdmUGpnbTVKRG0ycEtveDVGMTdkYVhONTlaNktqV1JNa1FT?=
- =?utf-8?B?WloxLytmTlk5dkZFYWJlNit3R3I4R0N4NTFMNURnaTN2Zy9IYjViUC9GYVJQ?=
- =?utf-8?B?eTlkcU9qbHQ0WXpnODNVN21ySUMzZmJtY0pKMytsV0xvNGNGTUF0eldDUVVL?=
- =?utf-8?B?d2Q3M3gyVmY1VGphQlBZTWtkOHl6ZzdrK0g0RWVUTU9JZXRReXFNZHdBN21y?=
- =?utf-8?B?bXpTUkxWOU9ObjZacTQ4S1ZHQzBMb0QzcWpXQ2tsZmRzeWtzTzg0eWJMWTVP?=
- =?utf-8?B?THo3ZXZiQUNHVnJna1ZiRGpTN1JKVlZ3UkNVbVhkRTQ0Q0l1Mm9OQ082SGkr?=
- =?utf-8?B?YlI1N0U2WitvbHFPOWJRS3ZqVzZSRkdzKzhEVmpndjRjc0VtV1V4ZEozZkx6?=
- =?utf-8?B?alFPNkpvRDMrNlRlTEMvRUhMaGIvajUvbysrWlltUDFBYnpWa3VUcTFoa1pW?=
- =?utf-8?B?ZDdRV1NFNnh1K2ZHeURiak5xOTQzTXI5bFl3aFkzSE56UXM5Y0s4NjVXOUF3?=
- =?utf-8?B?TlIzOFhJeUNiK1hreGU1QTlCUk5wTzFDWFI3c21RbmxvbzVBTms5eGt1RHNY?=
- =?utf-8?B?OU9peDNHaGJ2ZVN5Q2tjOUUvcFFJcThJZE5IV01mVnM3cFMvbEtIOHNnOXFz?=
- =?utf-8?B?L0doOHkrTnhLYjFZd285dVh0NHl0OFZuZWVtb0d2OUVxdzZVSFRhdmNsWEdW?=
- =?utf-8?B?cUVTRWJKY2tYcWdvV2tQWkRMNXRRdjB1bUNWUitiOE1GVzBpNitSeWtISThR?=
- =?utf-8?B?eTJQaGZJT3E4NWhMVk1Pa3NUWUxjTFBXOHZZNVdsYnJxVzhKUUM5WERCTDU5?=
- =?utf-8?B?Y25mN3g3b1ZmOWk5UzV2NWFjQXh3cFNyaEhyKzdkVE5VZDVkYnFPNzhiZEE5?=
- =?utf-8?B?M291c1BuWDMrU29zTlJUU1I4SkpiMXpTNnovanF6Nlo5b0d3c21jdTAvNk9n?=
- =?utf-8?B?UjhZM1F3VlNaYlJweTNoMEk0Z3JSc1NMTk5lWHViOU84U1VDVWlSTEhvSjRa?=
- =?utf-8?B?THBCR0tFeEg4K1A2QTNHdStQbUpGc1BOb3laaFR3dlBGZzJvdXZaNDhWbWxa?=
- =?utf-8?B?WUdGRjFOd3MvcExlS051NkQweE1FVStKd0VjcDU0cXhDM2Y2VU9HNTVycFVF?=
- =?utf-8?B?aW9aUWcrMkgyL2l2RWMydnRlcktpTGpaZDZsb0NZcEJSWmZWaGh3WlVqMnNZ?=
- =?utf-8?B?T3RCKzV0dUJRczZGckthbVVtR0pweTgwVUZzQkVYNXNkTEZiSE92VVZiMHZZ?=
- =?utf-8?B?ODFXUEQxbVI2WXFYOTZZbG5TQktJRkFKaFFOUTA2UjAyZ3NVU1ZCS3Y0Mzhy?=
- =?utf-8?B?SmdDZGY5T2toeW9tT0ZWdk10WktzbWk5K05mL0UwWGhtZlk4YWJicVpKbkdI?=
- =?utf-8?B?TThOaHZsTjZzWTFKYWpPUVVQZXl1UXJ6bVJyNVZpdFM4V1dudi8yYUlieGpN?=
- =?utf-8?B?bHBnbEIrb2xjMGxBdkdPVVZ3R2FuZ3hzUFlXWkk2UEFOVVYxWXFmRXd5VUtO?=
- =?utf-8?B?NkNsZ1E0dmJUQjVFVHVWU0hBWG9lUGh4ZDRTbzcvZklKY1JUaG1uQT09?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 638414f9-7327-4afe-6302-08de755df52e
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB6473.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2026 17:39:14.1824
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cu9bm3zbJ9AFDRfAEOqQW1MBqTugJoMSiXW5F4/hYLqcztFPsMr6AGtFKQA9HFi92kRwIjryaQ/Bq2coetTfZA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7559
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <875598e7-5fa1-49b0-be14-181b18ae97fe@birger-koblitz.de>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-261516-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261515-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.998];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edwards@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	NEURAL_HAM(-0.00)[-0.997];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,Nvidia.com:dkim,nvidia.com:mid,nvidia.com:email]
-X-Rspamd-Queue-Id: 507151ADCEC
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5EB561AD60C
 X-Rspamd-Action: no action
 
+On Wed, Feb 25, 2026 at 11:02:17PM +0100, Birger Koblitz wrote:
+> Hi Simon,
+> 
+> Thanks for the thorough analysis!
+> 
+> On 25/02/2026 8:48 pm, Simon Horman wrote:
+> 
+> > 
+> > > @@ -8922,7 +8924,8 @@ static void rtl8152_get_strings(struct net_device *dev, u32 stringset, u8 *data)
+> > > 
+> > >   static int r8152_get_eee(struct r8152 *tp, struct ethtool_keee *eee)
+> > >   {
+> > > -	__ETHTOOL_DECLARE_LINK_MODE_MASK(common);
+> > > +	__ETHTOOL_DECLARE_LINK_MODE_MASK(common) = {};
+> > > +	u16 speed = rtl8152_get_speed(tp);
+> > >   	u16 val;
+> > > 
+> > >   	val = r8152_mmd_read(tp, MDIO_MMD_PCS, MDIO_PCS_EEE_ABLE);
+> > 
+> > This isn't a bug, but the variable declarations are not in reverse
+> > Christmas tree order. Simon Horman's AI review raised this in v1, you
+> > acknowledged it and said it would be fixed in v2, but the ordering issue
+> > remains. The longest line should come first, followed by shorter lines.
+> > Should be:
+> > 
+> > 	__ETHTOOL_DECLARE_LINK_MODE_MASK(common) = {};
+> > 	u16 speed = rtl8152_get_speed(tp);
+> > 	u16 val;
+> > 
+> I do not understand what the AI is complaining about, here. The lines in the
+> v2 patch are in exactly the order you requested:
+> -	__ETHTOOL_DECLARE_LINK_MODE_MASK(common);
+> +	__ETHTOOL_DECLARE_LINK_MODE_MASK(common) = {};
+> +	u16 speed = rtl8152_get_speed(tp);
+>  	u16 val;
+> gives
+> 	__ETHTOOL_DECLARE_LINK_MODE_MASK(common) = {};
+> 	u16 speed = rtl8152_get_speed(tp);
+>  	u16 val;
 
+Sorry, there was supposed to be some commentary from me included in
+my previous email. But somehow it got lost.
 
-On 2/26/2026 4:11 PM, Leon Romanovsky wrote:
-> External email: Use caution opening links or attachments
-> 
-> 
-> On Thu, Feb 26, 2026 at 03:52:07PM +0200, Edward Srouji wrote:
->> From: Michael Guralnik <michaelgur@nvidia.com>
->>
->> Add a generic Fast Registration Memory Region pools mechanism to allow
->> drivers to optimize memory registration performance.
->> Drivers that have the ability to reuse MRs or their underlying HW
->> objects can take advantage of the mechanism to keep a 'handle' for those
->> objects and use them upon user request.
->> We assume that to achieve this goal a driver and its HW should implement
->> a modify operation for the MRs that is able to at least clear and set the
->> MRs and in more advanced implementations also support changing a subset
->> of the MRs properties.
->>
->> The mechanism is built using an RB-tree consisting of pools, each pool
->> represents a set of MR properties that are shared by all of the MRs
->> residing in the pool and are unmodifiable by the vendor driver or HW.
->>
->> The exposed API from ib_core to the driver has 4 operations:
->> Init and cleanup - handles data structs and locks for the pools.
->> Push and pop - store and retrieve 'handle' for a memory registration
->> or deregistrations request.
->>
->> The FRMR pools mechanism implements the logic to search the RB-tree for
->> a pool with matching properties and create a new one when needed and
->> requires the driver to implement creation and destruction of a 'handle'
->> when pool is empty or a handle is requested or is being destroyed.
->>
->> Later patch will introduce Netlink API to interact with the FRMR pools
->> mechanism to allow users to both configure and track its usage.
->> A vendor wishing to configure FRMR pool without exposing it or without
->> exposing internal MR properties to users, should use the
->> kernel_vendor_key field in the pools key. This can be useful in a few
->> cases, e.g, when the FRMR handle has a vendor-specific un-modifiable
->> property that the user registering the memory might not be aware of.
->>
->> Signed-off-by: Michael Guralnik <michaelgur@nvidia.com>
->> Reviewed-by: Yishai Hadas <yishaih@nvidia.com>
->> Signed-off-by: Edward Srouji <edwards@nvidia.com>
->> ---
->>   drivers/infiniband/core/Makefile     |   2 +-
->>   drivers/infiniband/core/frmr_pools.c | 319 +++++++++++++++++++++++++++++++++++
->>   drivers/infiniband/core/frmr_pools.h |  48 ++++++
->>   include/rdma/frmr_pools.h            |  37 ++++
->>   include/rdma/ib_verbs.h              |   8 +
->>   5 files changed, 413 insertions(+), 1 deletion(-)
-> 
-> <...>
-> 
->> +// SPDX-License-Identifier: GPL-2.0-only
-> 
-> <...>
-> 
->> +EXPORT_SYMBOL(ib_frmr_pools_init);
-> 
-> It is odd to see these two lines together. Either update the SPDX license to
-> 'GPL-2.0 OR Linux-OpenIB', as we do for uverbs, and keep EXPORT_SYMBOL() as is,
-> or keep the current SPDX-License-Identifier and switch to EXPORT_SYMBOL_GPL().
-> 
+I agree the AI is wrong here.
 
-Ugh, I missed that.
-BTW, we already have the same inconsistency in other core files such as 
-cq.c, mr_pools.c, rw.c, and more...
-Let's replace the license with 'GPL-2.0 OR Linux-OpenIB' to stay 
-consistent with the rest of the RDMA core, where all exported symbols 
-are used under the dual license.
-Do you need me to send v5 for this?
+> 
+> > (Reference: https://lore.kernel.org/all/20260224170206.146491-3-horms@kernel.org/)
+> > 
+> > [ ... ]
+> > 
+> > > @@ -8956,7 +8968,8 @@ static int r8152_set_eee(struct r8152 *tp, struct ethtool_keee *eee)
+> > > 
+> > >   static int r8153_get_eee(struct r8152 *tp, struct ethtool_keee *eee)
+> > >   {
+> > > -	__ETHTOOL_DECLARE_LINK_MODE_MASK(common);
+> > > +	__ETHTOOL_DECLARE_LINK_MODE_MASK(common) = {};
+> > > +	u16 speed = rtl8152_get_speed(tp);
+> > >   	u16 val;
+> > > 
+> > >   	val = ocp_reg_read(tp, OCP_EEE_ABLE);
+> > 
+> > Same reverse Christmas tree order issue here. The same pattern should be
+> > applied as in r8152_get_eee().
+> Same argument as above.
 
-> Thanks
+Agreed.
 
+> > [ ... ]
+> > 
+> > > @@ -8968,10 +8981,29 @@ static int r8153_get_eee(struct r8152 *tp, struct ethtool_keee *eee)
+> > >   	val = ocp_reg_read(tp, OCP_EEE_LPABLE);
+> > >   	mii_eee_cap1_mod_linkmode_t(eee->lp_advertised, val);
+> > > 
+> > > +	if (tp->support_2500full) {
+> > > +		linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, eee->supported);
+> > > +
+> > > +		val = ocp_reg_read(tp, OCP_EEE_ADV2);
+> > > +		mii_eee_cap2_mod_linkmode_adv_t(eee->advertised, val);
+> > > +
+> > > +		val = ocp_reg_read(tp, OCP_EEE_LPABLE2);
+> > > +		mii_eee_cap2_mod_linkmode_adv_t(eee->lp_advertised, val);
+> > > +
+> > > +		if (speed & _2500bps)
+> > > +			linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, common);
+> > > +	}
+> > > +
+> > >   	eee->eee_enabled = tp->eee_en;
+> > > 
+> > > -	linkmode_and(common, eee->advertised, eee->lp_advertised);
+> > > -	eee->eee_active = phy_check_valid(tp->speed, tp->duplex, common);
+> > > +	if (speed & _1000bps)
+> > > +		linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT, common);
+> > > +	if (speed & _100bps)
+> > > +		linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT, common);
+> > > +
+> > > +	linkmode_and(common, common, eee->advertised);
+> > > +	linkmode_and(common, common, eee->lp_advertised);
+> > > +	eee->eee_active = !linkmode_empty(common);
+> > > 
+> > >   	return 0;
+> > >   }
+> > 
+> > The eee_active determination logic is now duplicated between
+> > r8152_get_eee() and r8153_get_eee(). Both functions convert speed
+> > register bits to linkmode bits, AND with advertised and lp_advertised,
+> > and test emptiness in the same way. Would it make sense to factor this
+> > into a shared helper to reduce maintenance burden?
+> This could make sense, but I tried to make this as minimally intrusive as
+> possible and was already at a doubt whether I should even fix the RTL8152
+> version of get_eee() to correctly depend on the actual, not the desired
+> speed. Then I decided for fixing this incorrect behavior and have
+> consistency. The style of the existing code has plenty of duplicate code for
+> the different chip-versions and is already difficult to follow to this point
+> depending on the chip version. Personally, I find the readability improved
+> if the few lines of code are repeated instead of separating this out into
+> yet another nested function, and readability also helps code maintenance.
+> Plus, it is quite likely that these functions further diverge with e.g.
+> support for the RTL8157 (5GBit/s).
+
+Understood. I did think this point was worth raising.
+And I appreciate your feedback. We can let this one go for now.
+
+> 
+> > 
+> > > @@ -9512,6 +9544,7 @@ static int rtl_ops_init(struct r8152 *tp)
+> > >   	case RTL_VER_11:
+> > >   		tp->eee_en		= true;
+> > >   		tp->eee_adv		= MDIO_EEE_1000T | MDIO_EEE_100TX;
+> > > +		tp->eee_adv2		= MDIO_EEE_2_5GT;
+> > >   		fallthrough;
+> > >   	case RTL_VER_10:
+> > >   		ops->init		= r8156_init;
+> > 
+> > [ ... ]
+> > 
+> > > @@ -9537,6 +9570,7 @@ static int rtl_ops_init(struct r8152 *tp)
+> > >   	case RTL_VER_15:
+> > >   		tp->eee_en		= true;
+> > >   		tp->eee_adv		= MDIO_EEE_1000T | MDIO_EEE_100TX;
+> > > +		tp->eee_adv2		= MDIO_EEE_2_5GT;
+> > >   		ops->init		= r8156b_init;
+> > >   		ops->enable		= rtl8156b_enable;
+> > >   		ops->disable		= rtl8153_disable;
+> > 
+> > Does RTL_VER_15 support 2.5G links? Looking at the code, only RTL_VER_12
+> > and RTL_VER_13 set tp->support_2500full before falling through, but
+> > RTL_VER_15 does not. With this change, tp->eee_adv2 = MDIO_EEE_2_5GT is
+> > set for VER_15.
+> VER 15 supports 2.5GBit links. The existing code enabled 2.5GBit EEE
+> unconditionally in rtl_eee_enable():
+> 	case RTL_VER_10:
+> 	case RTL_VER_11:
+> 	case RTL_VER_12:
+> 	case RTL_VER_13:
+> 	case RTL_VER_15:
+> 		if (enable) {
+> 			r8156_eee_en(tp, true);
+> 			ocp_reg_write(tp, OCP_EEE_ADV, tp->eee_adv);
+> 		} else {
+> 			r8156_eee_en(tp, false);
+> 			ocp_reg_write(tp, OCP_EEE_ADV, 0);
+> 		}
+> 		break;
+> Note that previously r8156_eee_en() did not conditionally enable the 2.5GBit
+> advertisement depending on tp->eee_adv2, but always enabled it, also for VER
+> 15.
+
+Sorry, I missed that when reviewing the AI generated feedback.
+
+> > When r8156_eee_en() is called for a VER_15 device with EEE enabled:
+> > 
+> > static void r8156_eee_en(struct r8152 *tp, bool enable)
+> > {
+> > 	u16 config;
+> > 
+> > 	config = ocp_reg_read(tp, OCP_EEE_ADV2);
+> > 
+> > 	if (enable && (tp->eee_adv2 & MDIO_EEE_2_5GT))
+> > 		config |= MDIO_EEE_2_5GT;
+> > 
+> > The condition (tp->eee_adv2 & MDIO_EEE_2_5GT) will be true, causing
+> > MDIO_EEE_2_5GT to be written into the OCP_EEE_ADV2 hardware register.
+> > This would advertise 2.5G EEE capability to the link partner on a device
+> > that does not support 2.5Gbit links.
+> > 
+> > Should the eee_adv2 initialization be moved into the RTL_VER_12/13 block
+> > (before the fallthrough), or should RTL_VER_15 be given eee_adv2 = 0 to
+> > remain consistent with its lack of support_2500full?
+> No, see above.
+
+Ack.
+
+It looks like the AI was all false positives this time.
+And I'll mark it accordingly in the system. Thanks for looking over it.
 
