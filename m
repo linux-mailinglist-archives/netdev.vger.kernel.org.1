@@ -1,93 +1,53 @@
-Return-Path: <netdev+bounces-261170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261171-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EJE5OXbAn2lOdgQAu9opvQ
-	(envelope-from <netdev+bounces-261170-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 04:39:34 +0100
+	id eLKRDLXAn2lOdgQAu9opvQ
+	(envelope-from <netdev+bounces-261171-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 04:40:37 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44F301A09F3
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 04:39:34 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CD731A0A14
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 04:40:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 75B12300E71A
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 03:39:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6BCFA305364E
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 03:40:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 024F926FD97;
-	Thu, 26 Feb 2026 03:39:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F32B63876CD;
+	Thu, 26 Feb 2026 03:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TKiGfCxW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uc4BcOcm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1622727E0
-	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 03:38:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5723876C3
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 03:40:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772077140; cv=none; b=RqCHA0jKRhnH7P3XlsuK3t/DYXPseldYBCuXRldfRO5PMRyByOD+Aw11DG2TY6Ahmd4N8eo/Lb8uwnweCyoHC7xlf71+186L0jAmA5hURS2g7kRjE6GGLZTJsy+NsyZ8PL7FBJl2QoMKlOBtfBPxGWG+mcNk8J8BAdTH+am0gQs=
+	t=1772077200; cv=none; b=Q9S8F2FyVSTWJvVpJm60ML+1C92dDQgoEgpK8n5IXISe21YsMIdpwCJSBe64BHpjDmqBD8bhZogrBgYIkYVjUoZhmtW1cWJOIkVodUWJGHWF6Ja7KYODqCJgzoMncfq3i+Jdwn3MGeSCEtkWAv1d3I09yBRSfIvDqm7aCECKh/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772077140; c=relaxed/simple;
-	bh=bB0r+t3MStEJYfFdIZEamdfecKmA2qhnsq10iuPWnSM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sauvFRQ2hD0y3/q/Pdh95SyRgU7v9TM5WWGF7ppayrVcVPSCtSZ/Ck2hs5GDMOCjKoMFYkG/STxoVaXzUyt058v3gKLdyphorRMF12u9q5l576MeZDKw3lurR3Bdh6S3ioWYjqSdjWWbzqXC5EncmE2yXoz9hV0QJTIfuTCYpyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TKiGfCxW; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2ad4d639db3so1633075ad.0
-        for <netdev@vger.kernel.org>; Wed, 25 Feb 2026 19:38:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772077139; x=1772681939; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=FZs2Gcum8CYI+PLbOFcOYoDkS/lf+U8mq3F4iU4slkE=;
-        b=TKiGfCxWxSwhGYpmgWlCRzyOBggsS2TpX77Tk5qBEoivBhKh4GsXNFei/tcye/eXN0
-         LKfS9BVtla7cPrD16jFAQAVv6i7w9ZI48FNEnm/wcW5G6lY0UV/NMAU+yitqxik+MrdT
-         gbBDK+y/PEEPpbCzLR0IF43m+1wOPzs/Zc0kAecZ4sTqzYaFyeP5Jn9FSUBeCs3BD4Hb
-         oO48961hHHExWdV4xvu4BCl1xw0l5Fw+ldE8qN3MkadgFJfG220k9xk31TTTjM6H3VZf
-         RIEtCkYzQ6QSRI+hfU9ZE6lGshYS7vmSua/18IapJLie8ew28iGQL6hAySJVKSVJyUSm
-         oFJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772077139; x=1772681939;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FZs2Gcum8CYI+PLbOFcOYoDkS/lf+U8mq3F4iU4slkE=;
-        b=eoKAkkaAtNRBWBvsZWkg9m7sJGN556coJyqTcMQRgLbTPzOOBbxTKpRWeMGBU4KQdy
-         g3tWbjwxXGCheMhyFJYbFU6MkyqEkDt4qLNiYPkpk2uKNH4qYwf9r3R3+JWRsNWpzEOq
-         CjRHc/1dYdXhZy7nSHY+FpOLwxzxYvEog1ztaUN9/BjRqQhUeIh18nQ/kyflobpD88WR
-         mVMniVOBvykAMIqg6guWaQxjbA8Y5P8YtWVslcBagb4zJFYg54TwHqCwSFUthRMXrpmL
-         uO9V+qad5wu7eofZT+mtzWt6LOHXptv0pDFMPXP5yOr4gUjNXb97rDjyJtzGosXmOF7r
-         IUbw==
-X-Gm-Message-State: AOJu0YzHA5m1nLX5RPwnriRqVzG1Epv61jggyPmrEHyfvvVgURQhei9l
-	UqqZMT+fHZ85yLcBoy0Dvh51yPxfdqTMbvim2ZXciiiXoX7Qij58rngXyf8fZMZmhX8=
-X-Gm-Gg: ATEYQzxhSuHaMvbF9yhK4ia3zSBlIrmZNiB/A/zc8gist4AE98ttAxv/Wvzog88r5CL
-	Ok0MZSQVyg2sk9ai8qMZCZD8BtiOydS6Yq01OCgdFIBET4nuJAxkTeZNUSU4Z9yMnwAyoc6CkDw
-	Exz9mpUAFVqL/63JpAq0RHaG9a7aJ0NUowi0GmFvvGxLZtfWWSN6JB/BOO4AkpA1OLNULkp3prT
-	s9iA/5HsDCs4/cXpQZszyVPUt3Nba6E7XiMVpnrFFvdCIO2g6VJ4usg1GAY6vHU+hzSk6KoCec8
-	Qf6xcTtnKtHRSaVdoZJy56653tTIpe5PqVsyQSMdZbNPdwxfngEan3YLWKPISAD/8n1yZbdH07B
-	MqucwKMl9gRj+svEJKrPuElzjxfIez/fQi+7kSR+X/hRmpdn8vbegMoYpVfFt/2Edbg+nU4ry33
-	alhEMVhOAaq1N8TrFfIQZitE3lCAA=
-X-Received: by 2002:a17:902:e812:b0:2ad:da26:c2e0 with SMTP id d9443c01a7336-2ade9a606d5mr29587395ad.31.1772077139062;
-        Wed, 25 Feb 2026 19:38:59 -0800 (PST)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2adfb69fa65sm7327625ad.58.2026.02.25.19.38.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Feb 2026 19:38:58 -0800 (PST)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv2 iproute2-next] iplink: bond_slave: print actor and partner churn state
-Date: Thu, 26 Feb 2026 03:38:44 +0000
-Message-ID: <20260226033844.18244-1-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1772077200; c=relaxed/simple;
+	bh=Y7oXXIopA0Ah1mNVdAxGUupx5yX6wl8SdgLgl0J+zTk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=M6shPdUTy98DNl8NoRCxVnE8b0ZycvSa7NAiXGG0zvLAlsX+mGAllzfK1b6jlpsFSuKF3OVyH1apNU5v8ZPs68mmzydBtUFwbmglZ5QBqKiYiY+ccB3xxfvUI2HbUS2etlpqLhHOn5acCz0hHJ21gyXuVCQU/wOo814x6wSFe/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uc4BcOcm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59F38C116C6;
+	Thu, 26 Feb 2026 03:40:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772077200;
+	bh=Y7oXXIopA0Ah1mNVdAxGUupx5yX6wl8SdgLgl0J+zTk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Uc4BcOcmoXDXxjVclXdYj+eqCONhUWBbsf0aSEv/5ui5MBcVKPsDAiyCMgBeyGl5a
+	 FbXKOs3db9Ohx+U7cHH32uEM67OpDxfBmyj4wdIpy9YDcZc0o9glNGc/p8XhLYkgIt
+	 bL+cyMj5fA+sPpWTySrSN9Akz07CCFP+euLzjjwhVa8YdJzhFZZ5jxPf4Fa7vkd1Ap
+	 IIAWEcz0YDXAEsmqJrUz0j1gIdDrYThFS6THjl8NoV5swEiq95uo3+nS0aMykjxf/I
+	 pF6uuE2vDIzE7t5N5mLOnEjVx9mySVlJmWaWMMXgZI2YnLyTc6fdjuKnil60St25jc
+	 sn93q9NHjAS0w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FD98380A94B;
+	Thu, 26 Feb 2026 03:40:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,98 +55,77 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v20 net] net: pppoe: avoid zero-length arrays in struct
+ pppoe_hdr
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177207720504.1025014.10601666751150279207.git-patchwork-notify@kernel.org>
+Date: Thu, 26 Feb 2026 03:40:05 +0000
+References: <20260224155030.106918-1-ericwouds@gmail.com>
+In-Reply-To: <20260224155030.106918-1-ericwouds@gmail.com>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: mostrows@earthlink.net, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, fw@strlen.de, razor@blackwall.org, kees@kernel.org
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[jvosburgh.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,networkplumber.org,gmail.com];
+	FREEMAIL_CC(0.00)[earthlink.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,strlen.de,blackwall.org];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261170-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261171-lists,netdev=lfdr.de,netdevbpf];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 44F301A09F3
+X-Rspamd-Queue-Id: 8CD731A0A14
 X-Rspamd-Action: no action
 
-Add ability to print both actor and partner port churn states
-(MONITOR/CHURN/NO_CHURN) via netlink attributes. This provides
-visibility into the LACP churn detection state for bond slaves.
+Hello:
 
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-v2: use print_uint() for unsigned int variable (Stephen Hemminger)
+On Tue, 24 Feb 2026 16:50:30 +0100 you wrote:
+> Jakub Kicinski suggested following patch:
+> 
+> W=1 C=1 GCC build gives us:
+> 
+> net/bridge/netfilter/nf_conntrack_bridge.c: note: in included file (through
+> ../include/linux/if_pppox.h, ../include/uapi/linux/netfilter_bridge.h,
+> ../include/linux/netfilter_bridge.h): include/uapi/linux/if_pppox.h:
+> 153:29: warning: array of flexible structures
+> 
+> [...]
 
----
- ip/iplink_bond_slave.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+Here is the summary with links:
+  - [v20,net] net: pppoe: avoid zero-length arrays in struct pppoe_hdr
+    https://git.kernel.org/netdev/net-next/c/7717fbb14028
 
-diff --git a/ip/iplink_bond_slave.c b/ip/iplink_bond_slave.c
-index c88100e248dd..f4b28fbca948 100644
---- a/ip/iplink_bond_slave.c
-+++ b/ip/iplink_bond_slave.c
-@@ -86,6 +86,12 @@ static void print_slave_oper_state(FILE *fp, const char *name, __u16 state)
- 	close_json_array(PRINT_ANY, "> ");
- }
- 
-+static const char *port_churn_state[] = {
-+	"MONITOR",
-+	"CHURN",
-+	"NO_CHURN",
-+};
-+
- static void bond_slave_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- {
- 	SPRINT_BUF(b1);
-@@ -148,6 +154,26 @@ static void bond_slave_print_opt(struct link_util *lu, FILE *f, struct rtattr *t
- 		print_slave_oper_state(f, "ad_partner_oper_port_state_str", state);
- 	}
- 
-+	if (tb[IFLA_BOND_SLAVE_AD_CHURN_ACTOR_STATE]) {
-+		__u8 state = rta_getattr_u8(tb[IFLA_BOND_SLAVE_AD_CHURN_ACTOR_STATE]);
-+
-+		if (state >= ARRAY_SIZE(port_churn_state))
-+			print_uint(PRINT_ANY, "churn_actor_state", "churn_actor_state %u ", state);
-+		else
-+			print_string(PRINT_ANY, "churn_actor_state", "churn_actor_state %s ",
-+				     port_churn_state[state]);
-+	}
-+
-+	if (tb[IFLA_BOND_SLAVE_AD_CHURN_PARTNER_STATE]) {
-+		__u8 state = rta_getattr_u8(tb[IFLA_BOND_SLAVE_AD_CHURN_PARTNER_STATE]);
-+
-+		if (state >= ARRAY_SIZE(port_churn_state))
-+			print_uint(PRINT_ANY, "churn_partner_state", "churn_partner_state %u ", state);
-+		else
-+			print_string(PRINT_ANY, "churn_partner_state", "churn_partner_state %s ",
-+				     port_churn_state[state]);
-+	}
-+
- 	if (tb[IFLA_BOND_SLAVE_ACTOR_PORT_PRIO])
- 		print_int(PRINT_ANY,
- 			  "actor_port_prio",
+You are awesome, thank you!
 -- 
-2.50.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
