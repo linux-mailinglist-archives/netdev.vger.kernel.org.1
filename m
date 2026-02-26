@@ -1,179 +1,206 @@
-Return-Path: <netdev+bounces-261222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261223-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eCc6DZT+n2n3fAQAu9opvQ
-	(envelope-from <netdev+bounces-261222-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:04:36 +0100
+	id eIBGDD3/n2n3fAQAu9opvQ
+	(envelope-from <netdev+bounces-261223-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:07:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E8E31A23D1
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:04:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89D8B1A2476
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:07:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9175B303843F
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 08:02:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D0B91302453E
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 08:03:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B5A3392C3E;
-	Thu, 26 Feb 2026 08:02:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA5CE392C3E;
+	Thu, 26 Feb 2026 08:03:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pWeDcwtH"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iI/lRdQ2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ECA1392C28
-	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 08:02:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E55C33939AC
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 08:03:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772092932; cv=none; b=XahTFkr7kIzYXo66/FVmJUCZSkAHOvsahFXJM4svtaVCktwEduekTPPPPmOxho5njV2UInYy6qmu79gpTCe7DvV7+eBqLKayBacFC0nBACmKR6GwHT+NXj03wBSkH/o1hSCMXwoUSYjz3fFQU8BHNmctcbvolbpZUJ1wt+n2Qvs=
+	t=1772093022; cv=none; b=aHtmMqfuwlL0yFmSqrDWiDfEGt63brwVYcdkn7Coj6LZOlA9YBanqoGyjJcmOW86iHZ/UUL6ojtI8NQYeDc7Hr1sjPK9chwqYO9F5i4IciZ28jg8eBcLVtJQIu30Lf9/QRJzbuzdOO9OkHW1wRdU5mtednBl02EUexzFtNLkewU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772092932; c=relaxed/simple;
-	bh=psYWwKUvm0boCnP/VBokoXXzODe+2v77zcC70+9bdVU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s/982RsXPxWkI2aucUkuSX/ANZqOhVP2ShwgCLkZ5CAfHSFzdB7f/5jgUmuOmAveXDprFU+ORdjshXUaC78TPgn3Dh8d9s2WQ808c8DCZSkm7E7u9r+vgqao0UarfCfOjwXzDr6F6hcjs5xtK3NIqbOmY983TduyQxpnASrgPiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=pWeDcwtH; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-43770c94dfaso496877f8f.2
-        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 00:02:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1772092929; x=1772697729; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jLAiq0vc9Bp5MrzPDt1hlssSl6Q9GvdlXHn67lqmMxA=;
-        b=pWeDcwtH/SyTRxn/gel4iQdgnwFWvs5yJ/2OOLRnMxf4DhoDBWrdrLaEUQAUdIfCCg
-         dHdlqwvKZFBHEeRcAuBl7UKY5quebtTrvyqdj4mmm0XpFjWMm6sKF3wvSSUCuRUXtYGl
-         tppbX2ixmydtaw7utT039N2BdU79iLrPrbr3JbtRjTXU6qh8jWXQ8nP5edo3WgsumjTI
-         GMT3M4042PYVjNxftpvxsyVeNkvuWW3NXM2uqGRXJ88qNjMlL7vkK8OZH5kbx3dKtdju
-         PAmL88vzpd4Ov1N7UFGIYt076MA71ThtUdaIulRB53bQ0zChNlcDM8A2cGwnJodMpygx
-         vt6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772092929; x=1772697729;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jLAiq0vc9Bp5MrzPDt1hlssSl6Q9GvdlXHn67lqmMxA=;
-        b=X5CULlY034dExT78LxeAW/aTOlaiLpiS3vQwV3vSnxwGW6LGUCV9NKLvBVTcSJzQOO
-         IDImj7mFhXtQb8umKm+4SSaQHb27yX9NwXbWRlRDwgHcA69RcLZ7wBYYaXU1b+XiNbVw
-         hMJvKSJKAxFpJwegug21eVtd7e5hm2nkzuPtZyleptaWj8vj8r9Hyxsyq2eCD4kxHbIX
-         4NT9wHmVmceKbVASl/iIXD6wIn5mkUiKJ4nPlTyq/GNNkgoJJMecKW32gU2zIK6pUL3V
-         Ohr5ksWUlLYWP79saBYrtD/tRPlwUSMKIbZGz1+c4fP1KYykR1d4jAWsr9QuLrTMRaa0
-         fAwA==
-X-Forwarded-Encrypted: i=1; AJvYcCUCS49Ju/J4LiIMUtpiMMbEmF75wLBD9h0ouLjYSfMZttGhNH7hAlgtsP6NSYW61p354a+FAAw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGtY3EU33v7MssOIsfNl7zu7IY7xO8fKm1QDv2p81R91brm0GS
-	CqT8XHDsdOGp0ep3HdtAJqiL+IWTsd8xK9ZgpnFABgrXVrTFrGQOFhGWXvExEw7yYm8zxeG4SeV
-	O5FYQ
-X-Gm-Gg: ATEYQzwYlyl9sqnYH75hkXLBTiLxev0eB38mDlVkrWsfpK51fu9/T1Ag4/c1McRUGl+
-	Vs4RHknNHNG9n1X8zgb0+VfWF5x6Yg7T446gaFgANbY/DVNT6pvE3VZ0MHTkaV+RSZD4QmvK+D3
-	N0tZoFaX5TwOmwop5LbeW3s+raOa+tMsNLfQh4+eh1yFza454ZdOmYgGxjVatBjx8r3VQ4Q24oe
-	A5ZWphaPgD4nvCnOCMM5Ur86Z2ODw1XOrcRlw3LTkjr0w7+3TxelwdQS9Tl4y99JHmdwx1OO8Pd
-	l78gKULn9jZyhtSqq3qkYXBRORePbJX8WMlVQwwhdN/hgfB+JBjhK/KRcOJDk3x3YWPxJuN48eQ
-	u/h07ErP+/KtTKgJjj1Z+fHFKu7fNJn1xXqTLSZS9wLqDOuTGF6AeeQrc2dbfKcIhPdH55rB+b9
-	eLU2w5QAYUIn2yJ7dlipGgYP7BxPXP
-X-Received: by 2002:a5d:588b:0:b0:439:9106:3bb3 with SMTP id ffacd0b85a97d-43997f469ccmr2397212f8f.59.1772092929269;
-        Thu, 26 Feb 2026 00:02:09 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43970c09897sm40536977f8f.17.2026.02.26.00.02.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Feb 2026 00:02:08 -0800 (PST)
-Date: Thu, 26 Feb 2026 11:02:06 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Zeeshan Ahmad <zeeshanahmad022019@gmail.com>
-Cc: Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net v2] net: core: failover: fix NULL pointer dereference
- in failover_slave_register()
-Message-ID: <aZ_9_twriI6Z1oh7@stanley.mountain>
-References: <20260226075737.8948-1-zeeshanahmad022019@gmail.com>
+	s=arc-20240116; t=1772093022; c=relaxed/simple;
+	bh=pPm1NQz/awEqft25cau5tHZU/n5KX7QXvnMptYjLpO0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tPGbVSx9AjJQBvz7A+/md6hgq3PTVnjGwzVLqbRVutAFwFL7uf2RI4nSrO12S3Efcuk3oQkYJrVgw4QV1Czy+FEs00SSgKV/8iSHl4v2/5pWvXnKwwMaUTXF5SL7WgY7OCiSr71NWkPYNP22k5ru6zj9L5kI0MLspfxOPOjSTzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iI/lRdQ2; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1772093013;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=LFrUacmVzVoIS6rMkKRo1xTKd0v7vZ9gwEve89bhung=;
+	b=iI/lRdQ2SWmjXq2Hr1/U+VqOq9KdMyadXmMHD7m+CFEEQ92yrtzDKXAfPjMpvfWMCJ4OaL
+	LupU75VXMrM6btpHTBCgZ6UOS3pkFZDh3ha6LcaA1pzospddQOLeU4bEOsEx64TzpzdwXD
+	IAeHJdUTHHGhwwPSG8RH5ItE3JYW7hM=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: netdev@vger.kernel.org
+Cc: jiayuan.chen@linux.dev,
+	jiayuan.chen@shopee.com,
+	Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Jonathan Toppins <jon.toppins+linux@gmail.com>,
+	Jussi Maki <joamaki@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net v1 0/2] bonding: fix missing XDP compat check on xmit_hash_policy change
+Date: Thu, 26 Feb 2026 16:03:00 +0800
+Message-ID: <20260226080306.98766-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260226075737.8948-1-zeeshanahmad022019@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261222-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[linux.dev,shopee.com,jvosburgh.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	TAGGED_FROM(0.00)[bounces-261223-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linaro.org:+];
-	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dan.carpenter@linaro.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	NEURAL_HAM(-0.00)[-0.985];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,linux];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linaro.org:dkim,stanley.mountain:mid]
-X-Rspamd-Queue-Id: 5E8E31A23D1
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim,syzkaller.appspot.com:url]
+X-Rspamd-Queue-Id: 89D8B1A2476
 X-Rspamd-Action: no action
 
-On Thu, Feb 26, 2026 at 12:57:37PM +0500, Zeeshan Ahmad wrote:
-> Smatch warns that 'fops' is dereferenced at line 69 without a NULL check.
-> While other callbacks in this function properly check 'fops', the
-> rx_handler registration does not.
-> 
-> If failover_get_bymac() returns a valid failover_dev but a NULL fops,
-> the kernel will encounter a NULL pointer dereference when registering
-> the rx_handler.
-> 
-> Following the pattern of other failover callers, add a WARN_ON_ONCE()
-> to catch this misconfiguration. Abort the registration if fops is
-> missing to prevent an inconsistent state where a slave is logically
-> linked to a master but lacks a functional data path hook.
-> 
-> Fixes: 30c8bd5aa8b2 ("net: Introduce generic failover module")
-> Signed-off-by: Zeeshan Ahmad <zeeshanahmad022019@gmail.com>
-> ---
-> v2:
->  - Target 'net' tree as this is a bug fix.
->  - Change logic from an early return (v1) to WARN_ON_ONCE() and abort
->    registration to prevent inconsistent state, as discussed with
->    Simon Horman.
->  - Update commit message with detailed impact analysis.
-> 
->  net/core/failover.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/net/core/failover.c b/net/core/failover.c
-> index 2a140b3ea669..1702bb1feca1 100644
-> --- a/net/core/failover.c
-> +++ b/net/core/failover.c
-> @@ -63,6 +63,9 @@ static int failover_slave_register(struct net_device *slave_dev)
->  	    fops->slave_pre_register(slave_dev, failover_dev))
-           ^^^^^^^^^^^^^^^^^^^^^^^^^
->  		goto done;
->  
-> +	if (WARN_ON_ONCE(!fops))
-> +		goto done;
+syzkaller reported a bug https://syzkaller.appspot.com/bug?extid=5a287bcdc08104bc3132
 
+When a bond device is in 802.3ad or balance-xor mode, XDP is supported
+only when xmit_hash_policy != vlan+srcmac.  This constraint is enforced
+in bond_option_mode_set() via bond_xdp_check(), which prevents switching
+to an XDP-incompatible mode while a program is loaded.  However, the
+symmetric path -- changing xmit_hash_policy while XDP is loaded -- had
+no such guard in bond_option_xmit_hash_policy_set().
 
-Move the NULL check in front of the fops->slave_pre_register() stuff and
-delete the other later NULL checks.
+This means the following sequence silently creates an inconsistent state:
 
-regards,
-dan carpenter
+  1. Create a bond in 802.3ad mode with xmit_hash_policy=layer2+3.
+  2. Attach a native XDP program to the bond.
+  3. Change xmit_hash_policy to vlan+srcmac (no error, not checked).
+
+Now bond->xdp_prog is set but bond_xdp_check() returns false for the
+same device.  When the bond is later torn down (e.g. netns deletion),
+dev_xdp_uninstall() calls bond_xdp_set(dev, NULL) to remove the
+program, which hits the bond_xdp_check() guard and returns -EOPNOTSUPP,
+triggering a kernel WARNING:
+
+  bond1 (unregistering): Error: No native XDP support for the current bonding mode
+  ------------[ cut here ]------------
+  dev_xdp_install(dev, mode, bpf_op, NULL, 0, NULL)
+  WARNING: net/core/dev.c:10361 at dev_xdp_uninstall net/core/dev.c:10361 [inline], CPU#0: kworker/u8:22/11031
+  Modules linked in:
+  CPU: 0 UID: 0 PID: 11031 Comm: kworker/u8:22 Not tainted syzkaller #0 PREEMPT(full)
+  Workqueue: netns cleanup_net
+  RIP: 0010:dev_xdp_uninstall net/core/dev.c:10361 [inline]
+  RIP: 0010:unregister_netdevice_many_notify+0x1efd/0x2370 net/core/dev.c:12393
+  RSP: 0018:ffffc90003b2f7c0 EFLAGS: 00010293
+  RAX: ffffffff8971e99c RBX: ffff888052f84c40 RCX: ffff88807896bc80
+  RDX: 0000000000000000 RSI: 00000000ffffffa1 RDI: 0000000000000000
+  RBP: ffffc90003b2f930 R08: ffffc90003b2f207 R09: 1ffff92000765e40
+  R10: dffffc0000000000 R11: fffff52000765e41 R12: 00000000ffffffa1
+  R13: ffff888052f84c38 R14: 1ffff1100a5f0988 R15: ffffc9000df67000
+  FS:  0000000000000000(0000) GS:ffff8881254ae000(0000) knlGS:0000000000000000
+  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+  CR2: 00007f60871d5d58 CR3: 000000006c41c000 CR4: 00000000003526f0
+  Call Trace:
+   <TASK>
+   ops_exit_rtnl_list net/core/net_namespace.c:187 [inline]
+   ops_undo_list+0x3d3/0x940 net/core/net_namespace.c:248
+   cleanup_net+0x56b/0x800 net/core/net_namespace.c:704
+   process_one_work kernel/workqueue.c:3275 [inline]
+   process_scheduled_works+0xaec/0x17a0 kernel/workqueue.c:3358
+   worker_thread+0xa50/0xfc0 kernel/workqueue.c:3439
+   kthread+0x388/0x470 kernel/kthread.c:467
+   ret_from_fork+0x51e/0xb90 arch/x86/kernel/process.c:158
+   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+   </TASK>
+
+Beyond the WARNING itself, when dev_xdp_install() fails during
+dev_xdp_uninstall(), bond_xdp_set() returns early without calling
+bpf_prog_put() on the old program.  dev_xdp_uninstall() then releases
+only the reference held by dev->xdp_state[], while the reference held
+by bond->xdp_prog is never dropped, leaking the struct bpf_prog.
+
+The fix refactors the core logic of bond_xdp_check() into a new helper
+__bond_xdp_check_mode(mode, xmit_policy) that takes both parameters
+explicitly, avoiding the need to read them from the bond struct.
+bond_xdp_check() becomes a thin wrapper around it.
+bond_option_xmit_hash_policy_set() then uses __bond_xdp_check_mode()
+directly, passing the candidate xmit_policy before it is committed,
+mirroring exactly what bond_option_mode_set() already does for mode
+changes.
+
+Patch 1 adds the kernel fix.
+Patch 2 adds a selftest that reproduces the WARNING by attaching native
+XDP to a bond in 802.3ad mode, then attempting to change xmit_hash_policy
+to vlan+srcmac -- verifying the change is rejected with the fix applied.
+
+Jiayuan Chen (2):
+  bpf/bonding: reject vlan+srcmac xmit_hash_policy change when XDP is
+    loaded
+  selftests/bpf: add test for xdp_bonding xmit_hash_policy compat
+
+ drivers/net/bonding/bond_main.c               |  9 ++-
+ drivers/net/bonding/bond_options.c            |  2 +
+ include/net/bonding.h                         |  1 +
+ .../selftests/bpf/prog_tests/xdp_bonding.c    | 58 +++++++++++++++++++
+ 4 files changed, 68 insertions(+), 2 deletions(-)
+
+-- 
+2.43.0
 
 
