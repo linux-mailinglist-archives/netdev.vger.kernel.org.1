@@ -1,192 +1,188 @@
-Return-Path: <netdev+bounces-261297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261298-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CPwBCYsqoGlrfwQAu9opvQ
-	(envelope-from <netdev+bounces-261297-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:12:11 +0100
+	id mKO7EqAsoGmLfwQAu9opvQ
+	(envelope-from <netdev+bounces-261298-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:21:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 432531A4E1D
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:12:10 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9FB61A4FBF
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 12:21:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 93DF830074E2
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 11:11:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 109B530E3D1F
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 11:18:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0535337118;
-	Thu, 26 Feb 2026 11:11:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7E1D3644B6;
+	Thu, 26 Feb 2026 11:18:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gehealthcare.com header.i=@gehealthcare.com header.b="TP0QA4jg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FQvACxiY"
 X-Original-To: netdev@vger.kernel.org
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013050.outbound.protection.outlook.com [40.93.201.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81CEB3370FE;
-	Thu, 26 Feb 2026 11:11:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772104312; cv=fail; b=d3qHlwgiGjOCLrV3M0epv8Bwz93Ki/dgeij5ifyCfe+x6XNBaQaXkerWBLO0z4E1Fm/xlufwrnf6aXYDaEWUDj1WbqBUCQQYtZm0hJVnhnB3uH/+OyvQ282pEitsNWS/5Lpti9X5c279mL/WO3tKpGrXTa9LyZyl97kx4vbQc8A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772104312; c=relaxed/simple;
-	bh=8fYIy443oN4XJ6SNmXS1Rq72lNZtH8WfL+jsoXLtU/8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jqllb3fSr1ZeFjV4nEqV977pNIH4s5o6SRz10mQSAJMdWVmMSrUcONCi35LexqlmUSbEX66HfAYDNQMJOoaqp/2OTtxwqrq0J37ZW0U7DOrCqbZLy/oDXCRfl8pAKC9+UQjOPzRSlBPARkc2IVKrum8seKH1zrjDtUvJI/XbFUg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gehealthcare.com; spf=pass smtp.mailfrom=gehealthcare.com; dkim=pass (2048-bit key) header.d=gehealthcare.com header.i=@gehealthcare.com header.b=TP0QA4jg; arc=fail smtp.client-ip=40.93.201.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gehealthcare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gehealthcare.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NC9IuP0KRQR9be4yRlESvBExOumsJ43eYdAMMx2++h7iFcxtNxbgXRM3AiB2aIbJhe6rnMV5dZe5fWO9ys2FvW5HGeJsQBR6VkoyRBQSCEECyvTggpo1X3/MJhO54ViQsiphgePaB5aSJ0XTnC+xDFjkQsHmBXQHqtQ0oZFcQB3uc83h67dz+eUZqX0VdfmwNPi4gEGlc32RFPXS2gwC3IXXJgv4cn0ChbquEaMNsC0kqu3UzquNyy/xvuqEj+PdbMmtjd6JmGkwqHHLCHWXQXbzaY7VTqnmBx4CRNZKrG1XhNA8dZx8CmsnigZzsT2mLc89K4CbG/VInrtmVIY7Gg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ka7OgTHLSg5cQrQlTEmEn50QJYXRVG/PEkuBEQOKjE0=;
- b=BwpFegex2P7TGe2FYsnEzbQudX2RNoPU0VaFNjq7yXTXTsfyZCXtO/hc5rOc+XXA8xb6Jdbxk/rxJoGrpOEUfC4aXCRLIKnDSL9T15pupOWzO7e4inMB+kFOczcyY1ZUtoQhht2Jq5woa7PUjv0w8IH1fVohG6X2fijR/YWmLWNNa1lI7+yj4dbPpKPi1jaj/3fdP47z7pfSeK6aAXaYLBufkZfewWDMn7D69jRPWfWXfgviEgGxNraUwklOtuIatndR6uyT4MrX5iGLUZkRmWuzLByQsJtuW/oCW4GHPnjIpEcnPobGcicC9+wKx8pdNyq90C/zmQj2GwH5crzHYw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 165.85.157.49) smtp.rcpttodomain=vger.kernel.org
- smtp.mailfrom=gehealthcare.com; dmarc=fail (p=quarantine sp=quarantine
- pct=100) action=quarantine header.from=gehealthcare.com; dkim=none (message
- not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gehealthcare.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ka7OgTHLSg5cQrQlTEmEn50QJYXRVG/PEkuBEQOKjE0=;
- b=TP0QA4jgDmZ/6Dm9ZGUSIoevoqdmBvCzRD1ZKyQnsi72ZNt+8diMWg6CvVveJlh+GsCV+nNp6EUs6Nwd+bqEuWJNtrhldnBjQ6NxrM5W60BWraD0i0TOfcbrj7ZQpm8fbFxlg/4uct7uU9cL76aq537/bo9UB91I5L4TMnih+xSoBQwVhrfzuHZ6PVBxU4SXt5eWxBiAtfuobyNSPweBIBt/tl98gCabaR70ThBBJ/Rdw+Rzj1PVXtz/Cp/XAyJU1OA32Z+TzSU799KQpLjXfvho/FvAyaZiXm3jbkJRGfMCy4UufZxwZYO7ActGVVT8HNp5rRN5CaVYc9ycg38E2Q==
-Received: from BN0PR04CA0164.namprd04.prod.outlook.com (2603:10b6:408:eb::19)
- by DS7PR22MB3670.namprd22.prod.outlook.com (2603:10b6:8:79::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.14; Thu, 26 Feb
- 2026 11:11:48 +0000
-Received: from BN2PEPF000044A8.namprd04.prod.outlook.com
- (2603:10b6:408:eb:cafe::2a) by BN0PR04CA0164.outlook.office365.com
- (2603:10b6:408:eb::19) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.25 via Frontend Transport; Thu,
- 26 Feb 2026 11:11:47 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 165.85.157.49)
- smtp.mailfrom=gehealthcare.com; dkim=none (message not signed)
- header.d=none;dmarc=fail action=quarantine header.from=gehealthcare.com;
-Received-SPF: Fail (protection.outlook.com: domain of gehealthcare.com does
- not designate 165.85.157.49 as permitted sender)
- receiver=protection.outlook.com; client-ip=165.85.157.49;
- helo=mkerelay1.compute.ge-healthcare.net;
-Received: from mkerelay1.compute.ge-healthcare.net (165.85.157.49) by
- BN2PEPF000044A8.mail.protection.outlook.com (10.167.243.102) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9632.12 via Frontend Transport; Thu, 26 Feb 2026 11:11:47 +0000
-Received: from zeus (zoo13.fihel.lab.ge-healthcare.net [10.168.174.111])
-	by builder1.fihel.lab.ge-healthcare.net (Postfix) with SMTP id 4ECFAE8F2D;
-	Thu, 26 Feb 2026 13:11:45 +0200 (EET)
-Date: Thu, 26 Feb 2026 13:11:44 +0200
-From: Ian Ray <ian.ray@gehealthcare.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Samuel Ortiz <sameo@linux.intel.com>,
-	=?utf-8?Q?Cl=C3=A9ment?= Perrochaud <clement.perrochaud@nxp.com>,
-	stable@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V2] nfc: nxp-nci: allow GPIOs to sleep
-Message-ID: <aaAqcFSxarIKYlEp@zeus>
-References: <20260223070533.106625-1-ian.ray@gehealthcare.com>
- <d60bc526-fb21-46c6-916e-b063c959259e@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BE6D36656C
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 11:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772104688; cv=none; b=hX+vKfURARlJ8sv0+ijwNWe2RLvXb+J+MrUvLN4vcQM6DtREneSUI15S5rM4LKO9O9KGQ8+oCNcV60xHkrk9Ib+Bhl/KaYn1IADvO2ys9BBnuXeJKn0jWRMAWvhYc4zUGvsjlWLQU1/ph9iSSuJD/yxnH+3oFJr6xqKCUySrHFk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772104688; c=relaxed/simple;
+	bh=Tda3X1h6hjXboAEqtey5KSiQRBdK9Kh2CQJXrLYM4X0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QmG9prcIZ0bPveivE/juqMCeRS+PZIWISkwd3cKrn7COZe1vvlkYgAV9Ut8ZdoIbuEmdfMh4I/uBBDkOV5E40Xa9Knqg6a+l9b0SMbbAh/ZCbwhpEHHtt/pFwINXH4R3wEeP8K0ivIkWX33ztEpOoDQEg2kjOEJNpliJ0czjobQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FQvACxiY; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-8272c559597so728995b3a.1
+        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 03:18:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772104683; x=1772709483; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jV7kecYCTzcrsCFjFw3qK5G5qwWc4nsIa+UHPnJX5do=;
+        b=FQvACxiYMZI6OIPAnmHZcBTt3ku9aJujLIk9yLB/cOkVKtFKrRfu56+VfrwALwFFtU
+         dud4h9PAysP3MwbkCuP89IAdcs/7md4j280wYF1KwgQaoNTmabeRwHTRJ/HiJRypiW2l
+         yIGxZKQ2y86Lzn8vhII4ucqwcd3Rg3zxifmOb67NOfEKMG5B6wB/6RQapeyxReCdAbiD
+         UC81/fZyEV0NIIRSq3/oRV9picQcnfZNbX43FD6phGzq4umS3rznexd/KoO6sGi9YJfS
+         JSUQLUV3o1u/oq3ECRaGe+gntjOZIbdr9hEyQU9qn9OIkhCSOQ3ZTFM/SeKSVfPKl79H
+         GgwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772104683; x=1772709483;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jV7kecYCTzcrsCFjFw3qK5G5qwWc4nsIa+UHPnJX5do=;
+        b=UD1Gsye3AnEnwBk5eu8pPWafAX4n8u72/Er9Nf9cz8mE1+PY/ljEjfZmkDj8YE+48R
+         VZNaBE442MeZG5Z2lxNuaflWPZ/enQAli1BLc0GEH5YFYTxtvB+XV9zZOcELHay7DN8A
+         TxkvQgloQAByQ7lQPjZ4fF5WGY4AOohpGAKbPA/tfnVRxjafUavg+U6A0HRq8gsT/7pP
+         fieK7RtD9BqyrZQhQvQVWBQ4jzvNpiwdSZkSfTHZ5OyOuQX3DJVGz6bwawHTjn1o+Tv6
+         ZpSyUVsUWEq4N2upNlC5Ws1yPebMBLM25bS2Os7J1Q6L0XrbRRbhBTYW7Ekg2l9G9pF/
+         yR/w==
+X-Gm-Message-State: AOJu0YxDC5z4jRfgfwF8o73nJAiP8Hw6+iXf1PBpmQQQn2R+/b4Enic4
+	O+o/Hy1sYAnv/xJdjn2A/0bFu32/3KZZ1xdmQeIq+KrOoK+kCeMGqPwZ
+X-Gm-Gg: ATEYQzyFjnMsGxLijZC4vPmsXoSHwTqFTvnLzgadhvXKpp0VAjF+2XIf456Lo16429B
+	hrMvkTaE+rB8Rqr6cOWHp73aPTSmH8RyPKw2FU8aHi90LPb+1qaGTFf2pu6EIoxi2bef813jLll
+	mKnnxkjuj1T70XoIoETVWHh7LdQI6P6FCtpr/48vs31pGJPdVFpm1q20+HcrQJFDc1yTU02VcwR
+	lk2YYyheEN8CsgrNoJQPJz/ohCbu6cgs4tYu3wK5KORIkLsrIiCLdNy3vpGiy4E5VpTUhxPX/2L
+	bV55FzvRfJpLCAJ3QARgdBuambv7R0+i2rbH6rTHCTxyDJ5OyFFncEfpG6u820E+CfVezyOGpEn
+	C5bi0pa690cAOSYO9Zz2hsANcRFKtmihmTD30zkxXQfvKOSkWb6TAJkjcWgxYTk5siel09HBOdN
+	jBV+NIttX4kYGqnZEx7bxupektyupubAjMUAbs4z++aH5kiD8r7W+xz4NkPbq5TpFNuYBOKmrWh
+	URP2PF+mgwun/9vxBbEsLyzpF5tM39DBr389F6u/CpNAiCrwiyOcdy+mZYpKFEnqaG7IZJJl2M+
+	xtRhRTyywQ==
+X-Received: by 2002:a05:6a00:3e0b:b0:824:a81e:97b5 with SMTP id d2e1a72fcca58-8273bfa235emr2041811b3a.38.1772104683383;
+        Thu, 26 Feb 2026 03:18:03 -0800 (PST)
+Received: from yuu-U24E.. (2001-b400-e3d7-38de-fa71-5111-1751-cb7a.emome-ip6.hinet.net. [2001:b400:e3d7:38de:fa71:5111:1751:cb7a])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8273a088517sm2110831b3a.65.2026.02.26.03.17.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Feb 2026 03:18:02 -0800 (PST)
+From: Yung Chih Su <yuuchihsu@gmail.com>
+To: davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	nathan@kernel.org,
+	nick.desaulniers+lkml@gmail.com,
+	morbo@google.com,
+	justinstitt@google.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev,
+	Yung Chih Su <yuuchihsu@gmail.com>
+Subject: [PATCH] net: ipv6: fix ARM64 alignment fault in fib_multipath_hash_from_keys()
+Date: Thu, 26 Feb 2026 19:17:21 +0800
+Message-ID: <20260226111721.25454-1-yuuchihsu@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d60bc526-fb21-46c6-916e-b063c959259e@redhat.com>
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF000044A8:EE_|DS7PR22MB3670:EE_
-X-MS-Office365-Filtering-Correlation-Id: 87661400-d346-4f27-85ff-08de7527d565
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	IqglH7Dz6C/8Aeax5mFzyHx4mYI/TSDC+M4k59/4oKD6Yy3qpJ8nE4GaKgYE1cYgiJNKd5RMAWdxsJLzCTGhdO/YVjlNpgO7NsN4kBTq1SRKkSLVclbL1W73MNNeUZ7c+gvSy6FuDiccEA6UiTOqYij4RC9Rr0NGGJ9lJKGRVP31RQPvKD658S+zpW3f3fJmSuxNqx53ghIIO1sof6SfdHUCa8ouRUKUhU8td1ZNdgcpU8Qt4ZryGlmTF9tt1tAh7SJsoSza5TvdxY/ZA7ufmOTViO7aCBffXyrZaty7mSLJTxtVSXaBMEoLf+Z4VtqX7aBUB3+WIJrAOM/EjDT12+9YIU0dnyFtJ/x9Lhj9INLTsi6nzHka5ZIH2DARxJcGCnSTr2OwlqnN22CTxMAVNyWzjELFXeMsL/LqFo0nGwZDEeZR+7qtauyP4q1FoNGrWh/mm5rTif5XKZP90zmCxwKI/LfjJLfghLqYPaRhWf1GXQwL60YUWHAUsF3uf8fIjrAKhgmtN7MxLwTm7BW1U0HHVADEEiPxh/G4y1c+yvkqSKgB2y9XYFjgxvJKGpj0uljvJrchQoyxXHxYWGqes1hLjciDO0974Wq0B524BLQMBZmw/+xMFIBhr4rXLrWb4wcDMT35U+ZnER/iuOAJKeXW37R5U3zD6NWWRKimowdR2mFLLce5vGi6Ujgb0ETir8yWr5I6wK1WGKyYKPkvuuuzu6dyE8genXmceGJNkJpSfh3B+RiIiRDdDrDPD08RSWjC2VQqOcdko7eBWfpN4gvpURWzLPmEaWLPF+Pbk9bK5zcac3de1kM9vZFHZPpq8sxQwZMkykE1vrXdzu4gCQ==
-X-Forefront-Antispam-Report:
-	CIP:165.85.157.49;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mkerelay1.compute.ge-healthcare.net;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	MKCBrSpfzFbk6xnlnolcH42bEopf1VJjU+bjKFr4L2o+5bbbsAEuD8QR68/HoTT+DPKK3xozz8O49CYc6ejXo5WpispEEpSOjffiNJrJAae8ZXYno3K2C62dF4bWmgCc4jgxdt5D/73X0tGgXOgakPGmQP8Yj8h5rGiJUfswD7F8w4hERl1STXiuU4cCcuvzUlxssfSr/DNjdYNuqgxiBcgHULhdFkzz9ujHgG18F2EmUJp8Ipar0WYrC9fqkw4xuECybVa61XaHOfgN4d9bEdhKYklOV/vD9eSTDl2edV/D96XT9WOJeUb2WxySsk/azCK/AIwXWpelAE76jPgjdp235uQHx405PkJdYsJJqboubMGtpL4HXRCviA2N/YEGmg/69dxwcNJ3cKUyA+OZRL9gNBkj+kzptkInuJk4D51ap+dDzVUA5ITCrhRM+p3Q
-X-OriginatorOrg: gehealthcare.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2026 11:11:47.4448
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 87661400-d346-4f27-85ff-08de7527d565
-X-MS-Exchange-CrossTenant-Id: 9a309606-d6ec-4188-a28a-298812b4bbbf
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=9a309606-d6ec-4188-a28a-298812b4bbbf;Ip=[165.85.157.49];Helo=[mkerelay1.compute.ge-healthcare.net]
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TreatMessagesAsInternal-BN2PEPF000044A8.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR22MB3670
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gehealthcare.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[gehealthcare.com:s=selector1];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-261298-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261297-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,gehealthcare.com:email,gehealthcare.com:dkim];
+	FREEMAIL_TO(0.00)[davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ian.ray@gehealthcare.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[yuuchihsu@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gehealthcare.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 432531A4E1D
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev,lkml];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B9FB61A4FBF
 X-Rspamd-Action: no action
 
-On Tue, Feb 24, 2026 at 01:31:16PM +0100, Paolo Abeni wrote:
-> On 2/23/26 8:05 AM, Ian Ray wrote:
-> > Allow the firmware and enable GPIOs to sleep.
-> >
-> > This fixes a `WARN_ON' and allows the driver to operate GPIOs which are
-> > connected to I2C GPIO expanders.
-> >
-> > -- >8 --
-> > kernel: WARNING: CPU: 3 PID: 2636 at drivers/gpio/gpiolib.c:3880 gpiod_set_value+0x88/0x98
-> > -- >8 --
-> >
-> > Fixes: 6be88670fc59 ("NFC: nxp-nci_i2c: Add I2C support to NXP NCI driver")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Ian Ray <ian.ray@gehealthcare.com>
-> 
-> When resubmitting with the correct fixes tag, please additionally
-> include the target tree in the subj prefix (in this case 'net').
+struct sysctl_fib_multipath_hash_seed contains two u32 fields (user_seed
+and mp_seed), making it an 8-byte structure with a 4-byte alignment requirement.
 
-Is that prefix correct?  At least recent changes use the "nfc" prefix
-that I used in the subject.
+In fib_multipath_hash_from_keys(), the code evaluates the entire struct
+atomically via READ_ONCE():
 
-$ git log --oneline drivers/nfc/ | head
-57be33f85e36 nfc: nxp-nci: remove interrupt trigger type
-f40ddcc0c0ca Revert "nfc/nci: Add the inconsistency check between the input data length and count"
-885bebac9909 nfc: pn533: Fix error code in pn533_acr122_poweron_rdr()
-7cf3ac8a9c0a NFC: mei_phy: fix kernel-doc warnings
-661bfb4699f8 nfc: s3fwrn5: Use SHA-1 library instead of crypto_shash
-c6f68f69416d nfc: pn533: Delete an unnecessary check
-5d69351820ea NFC: trf7970a: Create device-tree parameter for RX gain reduction
-41cb08555c41 treewide, timers: Rename from_timer() to timer_container_of()
+mp_seed = READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed).mp_seed;
+While this silently works on GCC by falling back to unaligned regular loads
+(e.g., LDR/LDUR) which the ARM64 kernel tolerates, it causes a fatal kernel
+panic when compiled with Clang and LTO enabled.
 
-> 
-> Thanks,
-> 
-> Paolo
-> 
+Commit e35123d83ee3 ("arm64: lto: Strengthen READ_ONCE() to acquire when
+CONFIG_LTO=y") strengthens READ_ONCE() to use Load-Acquire instructions
+(ldar / ldapr) to prevent compiler reordering bugs under Clang LTO.
 
-Thanks,
-Ian
+Since the macro evaluates the full 8-byte struct, Clang emits a 64-bit
+ldar instruction. ARM64 architecture strictly requires ldar to be
+naturally aligned. Executing a 64-bit ldar on a 4-byte aligned address
+(e.g., ending in 0xEC) triggers a strict Alignment Fault (FSC = 0x21).
+
+Fix this by moving the READ_ONCE() directly to the specific u32 member:
+
+mp_seed = READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed.mp_seed);
+This instructs the compiler to emit a 32-bit load (ldar Wn or ldr Wn),
+which perfectly satisfies the 4-byte alignment requirement and resolves
+the crash.
+
+Fixes: [4ee2a8cace3fb9a34aea6a56426f89d26dd514f3] ("net: ipv4: Add a sysctl to set multipath hash seed")
+Signed-off-by: Yung Chih Su <yuuchihsu@gmail.com>
+---
+ include/net/ip_fib.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/net/ip_fib.h b/include/net/ip_fib.h
+index b4495c38e0a0..318593743b6e 100644
+--- a/include/net/ip_fib.h
++++ b/include/net/ip_fib.h
+@@ -559,7 +559,7 @@ static inline u32 fib_multipath_hash_from_keys(const struct net *net,
+ 	siphash_aligned_key_t hash_key;
+ 	u32 mp_seed;
+ 
+-	mp_seed = READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed).mp_seed;
++	mp_seed = READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed.mp_seed);
+ 	fib_multipath_hash_construct_key(&hash_key, mp_seed);
+ 
+ 	return flow_hash_from_keys_seed(keys, &hash_key);
+-- 
+2.43.0
+
 
