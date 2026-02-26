@@ -1,200 +1,140 @@
-Return-Path: <netdev+bounces-261243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261244-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iM/sC0kIoGm4fQQAu9opvQ
-	(envelope-from <netdev+bounces-261243-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:46:01 +0100
+	id wLu5JIsLoGnbfQQAu9opvQ
+	(envelope-from <netdev+bounces-261244-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:59:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F7791A2CEC
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:46:00 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D46C21A308A
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 09:59:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1D6233054128
-	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 08:42:31 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 47EA73014932
+	for <lists+netdev@lfdr.de>; Thu, 26 Feb 2026 08:50:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C420395277;
-	Thu, 26 Feb 2026 08:42:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF630392830;
+	Thu, 26 Feb 2026 08:50:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="FuTTFnBa"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Y3K+MQ2v";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="5COcQiaY"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40325395240;
-	Thu, 26 Feb 2026 08:42:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DADC30E0F2
+	for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 08:50:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772095337; cv=none; b=X5m12DViZT25R1d/HZkrc+/r1frb0yuAxYZWz1Jl7tAIkX3QxDVfioYjb5A3aJ36uSCxAGOmi5AMR8rRsdgNqBl5UIil7jP1MrmtbIjO5RAcbYvLjKhZteVbPDyoFlPbdmxtbGu9AUkJfDlnJmzgLWwCl6uj1UNELYMPhXbKV/4=
+	t=1772095838; cv=none; b=GzaYaviHMLthkRtbvZ0UXvk/kHe42oYxMnJwUav4m79ukTlXGLrnA2WoSgP2fsPvq3l4WC71PbHfKapa2ComVH/HSbaQcayYgd44QeX1hG0f0ughp56PhOZTCf2Ybs0spsUFcEOOs5KMnGps7lFd1Bl8NtC0tYuL5Gx6KPvGX2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772095337; c=relaxed/simple;
-	bh=NMrML7XWpFxonb99SXNOJH6rQio3XyQFef3xUJwrD30=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=hoxK4m+JfUJPUqtECup5lDUlb0g5opdm8wl/ASgJMprKYT2klrxJwVOvf/Y6Wm0yw6qeDeYksRrPe//bKs7Y3JYOduN8NaobPuaWVGOfVO6xPdvIE+SAWU0rJ5VRX+dRdMa0PYJW4+WA3c9Em5fl+hUJt77+WPXphYCKB6/rkAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=FuTTFnBa; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=PkRfojPSv3CP3LZanTyC5uu1PLQ8pOplU1rIVTgxy/U=; b=FuTTFnBaht1vnHvhkBb6B+b/+F
-	DZtCKUlKcwAXHvEbJw8m5qkUFn/tIGKmtDs8ZWGo1RkDjGz0wKWeKE9m/VfN3ywx3Je9ztKH/eCIb
-	DFaRf0yKbW0C1BEaAfOIrk6HMU7avoqa5obYuya0Vxa2V9kIMz7UT9+JJnssjYGWeh2FSPJjvfaRA
-	V3laoiHj+Fy6/AG2KwQle20yCg4iMRwdZrLDWEXfmgod1rBJuaVEL3wEBt73MNnCNgi4kUX9nOkKx
-	uLRLUSzNNVFGjgZZNe3OfbA2GYAruFz+SOD8Lq5PIexB72Ag0llltRCQwYKa7TS97/ycqbDPseJfP
-	ox8Qv4Qg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:47470 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vvWwf-000000007eH-25Mi;
-	Thu, 26 Feb 2026 08:42:06 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vvWwb-0000000AtKh-0dWB;
-	Thu, 26 Feb 2026 08:42:01 +0000
-In-Reply-To: <aaAHD_wWv2xCKntW@shell.armlinux.org.uk>
-References: <aaAHD_wWv2xCKntW@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-phy@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>
-Subject: [PATCH RESEND net-next 8/8] net: stmmac: qcom-ethqos: remove
- phy_set_mode_ext() after phy_power_on()
+	s=arc-20240116; t=1772095838; c=relaxed/simple;
+	bh=dYep3U4Zc5IVGubelE0EKQYVSOiGcukJc4hsbggek7o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mHMG+MinPcrnoPV+M3+gCxB0zkFoxdfK6qEg0lXUSfhA2VUHkIVl6yWHHN+Q5PNTPaEUmh1J8w5q0Oci0brqA6UYVAdf8MbU6jakfsWIiSv0GpZfN5X7wvnILg+juGLt20AdyRfcsQvvvbtyXDVxTDwYtR0yI9p6XllbJDAhN18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Y3K+MQ2v; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=5COcQiaY; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Thu, 26 Feb 2026 09:50:33 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1772095835;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DlwFFAUYmlwSm+mwJpPe5OwpT+QqMfVXVr1Yrv1Aw9w=;
+	b=Y3K+MQ2vA4dG2JSz0LgiYAbdt5w1AZuedMbz2YsEi4DrktJIV5e3zqOMOtALXRHiQI9q9g
+	Q50KpBKaMiMOT0p/9F296SDMmlosppfJ6E656v7SEHQx2WHWN90vQlfLX1q3qdwZ8wyXnt
+	Yo5LeM6uB+A209fv7QjsuOAXTSuXTK1EWyeaKQSJC1uGYVh4vQYAuSqHKuBynvlWNNFaG8
+	gF5d4JYwOSq4L8+bWvcKgRr1s4t+KGRej0V8CtsHuHvzEtNFQNynPDz2Ab8Ulx0TKRnuyq
+	e1xW+DpJa6Bx4OagEqka9CKEUms0DsExnt2SqmlF3z8MkirGomD+1LzIAHD9Mg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1772095835;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DlwFFAUYmlwSm+mwJpPe5OwpT+QqMfVXVr1Yrv1Aw9w=;
+	b=5COcQiaYH499Fxg1T22ua3qVZCUhNanfzx07bxlZ+8sbtNImN/dfp2mRtn6VMlnUMq55xZ
+	neRhR2Y2kcitcwAg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Kurt Kanzenbach <kurt@linutronix.de>
+Cc: netdev@vger.kernel.org, willemdebruijn.kernel@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, willemb@google.com
+Subject: Re: [PATCH net v2] net: Drop the lock in skb_may_tx_timestamp()
+Message-ID: <20260226085033.1g_feyIW@linutronix.de>
+References: <20260220183858.N4ERjFW6@linutronix.de>
+ <177193020629.3444651.13248671448207071630.git-patchwork-notify@kernel.org>
+ <87jyvzvs9n.fsf@jax.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vvWwb-0000000AtKh-0dWB@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 26 Feb 2026 08:42:01 +0000
+In-Reply-To: <87jyvzvs9n.fsf@jax.kurt.home>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261243-lists,netdev=lfdr.de,kernel];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
+	TAGGED_FROM(0.00)[bounces-261244-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[linutronix.de:+];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.978];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[rmk-PC.armlinux.org.uk:mid,qualcomm.com:email,armlinux.org.uk:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4F7791A2CEC
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:mid,linutronix.de:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D46C21A308A
 X-Rspamd-Action: no action
 
-The call to phy_set_mode_ext() after phy_power_on() was a work-around
-for the qcom-sgmii-eth SerDes driver that only re-enabled its clocks on
-phy_power_on() but did not configure the PHY. Now that the SerDes driver
-fully configures the SerDes at phy_power_on(), there is no need to call
-phy_set_mode_ext() immediately afterwards.
+On 2026-02-26 09:11:16 [+0100], Kurt Kanzenbach wrote:
+> Hi maintainers,
+> 
+> thanks for applying the patch.
+> 
+> What's your preferred solution for igb? Can we do the time stamping from
+> IRQ context now [1] or should we switch to BH workqueue [2]?
 
-This also means we no longer need to record the previous operating mode
-of the driver - this is up to the SerDes driver. In any case, the only
-thing that we care about is the SerDes provides the necessary clocks to
-the stmmac core to allow it to reset at this point. The actual mode is
-irrelevant at this point as the correct mode will be configured in
-ethqos_mac_finish_serdes() just before the network device is brought
-online.
+We have this quote from Jakub [a]:
 
-Reviewed-by: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-Tested-by: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- .../stmicro/stmmac/dwmac-qcom-ethqos.c         | 18 ++----------------
- 1 file changed, 2 insertions(+), 16 deletions(-)
+| But FWIW I can't stop myself from restating that networking core is not
+| supposed to be called by drivers in hard IRQ context in general.
+| Especially when it comes to anything that may involve user sockets.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index 8913f6f02b9e..cb1c074c2053 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -105,7 +105,6 @@ struct qcom_ethqos {
- 
- 	struct clk *link_clk;
- 	struct phy *serdes_phy;
--	phy_interface_t serdes_mode;
- 	phy_interface_t phy_mode;
- 
- 	const struct ethqos_emac_por *rgmii_por;
-@@ -648,17 +647,8 @@ static int qcom_ethqos_serdes_powerup(struct net_device *ndev, void *priv)
- 		return ret;
- 
- 	ret = phy_power_on(ethqos->serdes_phy);
--	if (ret) {
--		phy_exit(ethqos->serdes_phy);
--		return ret;
--	}
--
--	ret = phy_set_mode_ext(ethqos->serdes_phy, PHY_MODE_ETHERNET,
--			       ethqos->serdes_mode);
--	if (ret) {
--		phy_power_off(ethqos->serdes_phy);
-+	if (ret)
- 		phy_exit(ethqos->serdes_phy);
--	}
- 
- 	return ret;
- }
-@@ -681,12 +671,9 @@ static int ethqos_mac_finish_serdes(struct net_device *ndev, void *priv,
- 	qcom_ethqos_set_sgmii_loopback(ethqos, false);
- 
- 	if (interface == PHY_INTERFACE_MODE_SGMII ||
--	    interface == PHY_INTERFACE_MODE_2500BASEX) {
-+	    interface == PHY_INTERFACE_MODE_2500BASEX)
- 		ret = phy_set_mode_ext(ethqos->serdes_phy, PHY_MODE_ETHERNET,
- 				       interface);
--		if (ret == 0)
--			ethqos->serdes_mode = interface;
--	}
- 
- 	return ret;
- }
-@@ -839,7 +826,6 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
- 		plat_dat->host_dma_width = data->dma_addr_width;
- 
- 	if (ethqos->serdes_phy) {
--		ethqos->serdes_mode = PHY_INTERFACE_MODE_SGMII;
- 		plat_dat->serdes_powerup = qcom_ethqos_serdes_powerup;
- 		plat_dat->serdes_powerdown  = qcom_ethqos_serdes_powerdown;
- 	}
--- 
-2.47.3
+which I kind of agree in terms of "easy" maintenance. The kfree_skb()
+in the error case does not hurt as of today so does the socket
+interaction.
 
+Based on Paolo's [b], we can have this fix and insist on !hardirq
+processing?
+
+[a] https://lore.kernel.org/all/20260220132932.1ed45656@kernel.org/
+[b] https://lore.kernel.org/all/55b24261-45cb-41f1-857f-f29527a1ee8d@redhat.com
+
+> Thanks,
+> Kurt
+> 
+> [1] - https://lore.kernel.org/intel-wired-lan/20260205-igb_irq_ts-v3-1-2efc7bc4b885@linutronix.de/
+> [2] - https://lore.kernel.org/intel-wired-lan/20260211134436.1e623034@kernel.org/
+
+Sebastian
 
