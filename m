@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-262010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262011-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OHnoGuEwomke0wQAu9opvQ
-	(envelope-from <netdev+bounces-262010-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 01:03:45 +0100
+	id AJPMDh4womke0wQAu9opvQ
+	(envelope-from <netdev+bounces-262011-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 01:00:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD3EA1BF4E6
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 01:03:44 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF7DA1BF4A9
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 01:00:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EF305309136A
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 00:00:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 17C1F303873D
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 00:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C36561F30A4;
-	Sat, 28 Feb 2026 00:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF8A9271448;
+	Sat, 28 Feb 2026 00:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="FVeaD7YL"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="Yd8tVhRu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1BFB30F53B
-	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 00:00:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095A42D738A
+	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 00:00:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772236826; cv=none; b=WwDcj0+K8uVOtxIKvOH3evLrBuDQnD98XoqfxnjU2G4e3SH4YXo3Tnwt/ql+x255LGGuONlBGf6SvR95BFFmeLw4TimvTNe648P06ELlcHwTMaGtPNwTmCzugPgHppRch5M6BVu/akQeVC7V8Do3ppJ+xwBetHgAdlrQBsF41J4=
+	t=1772236827; cv=none; b=bAmk80MYTiLxmpq8Iy7KGNWeJpmsV6VbRYa9n1Eybfvqid+n8WW4iaCpmC5eK00SLZayOPJTHxwjZVoV6xtlXpl941e9bufnGGjnMJrjtZRQBzSH3XjjJDhD9hZKpOawbkQMa+HxhLhKEF2i//uBOFB7Xzu0kd3YJL5yUwFAXSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772236826; c=relaxed/simple;
-	bh=853rT8A9XYIfjtXw4TG6HterQA/NNw0zBx8/dhtdAEw=;
+	s=arc-20240116; t=1772236827; c=relaxed/simple;
+	bh=fPUd8BnK2oTvm2f4iEIhlBHqEhKMlX7Y7ESXP1U1zfk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Pr+b1OLvysH9nZfBtv2c7XNubcSHbuWpMFHZe2rlZu7TV6FF0ARf+EgdYVwvsoYNbHKTbGAwIfa/xrRsg3l+2859Wz0M2iejoz7EBz+684h3gDPCk0dJ7oGrG7IG6eakg8JM93YsrNRgJlhv+tOInjsI1d0wV2juYZn5UNvdCeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=FVeaD7YL; arc=none smtp.client-ip=209.85.128.47
+	 MIME-Version; b=B3XFgy26I1nebsG3HsuT6PM+mCxRZqmgtp4mfroegWwzw5x4Tz0UaBTISJVdCug3M/Ge0WZO0oVmtJPPNpoAsL2uADnq+jPJhTlKXHO9mxOlkkI0XS+5BjLEThCKqv/pQIgHZn315cpMXxUBO+4c0SpPhYiTVWxlJUl7kP7/zZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=Yd8tVhRu; arc=none smtp.client-ip=209.85.128.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4836f363ad2so29678715e9.1
-        for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 16:00:22 -0800 (PST)
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4833115090dso25808305e9.3
+        for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 16:00:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1772236821; x=1772841621; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1772236823; x=1772841623; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zbB2Tr331FC//FQzvZHi0Oll7EQUhGq6//q/S/UKOtY=;
-        b=FVeaD7YLbJI6ze6AACRG5NmqNDbtGGWjFRVzB721QUe5Dt5fM6SXZqVoZxLiOv2VUz
-         wRKcTAGP2YuwdSFOg9do+vpeWQLIWS+9IPWsaiQpCCBphic/dJaCVgkpb7mZF6TqL5Uo
-         vJ6gWkXyDCDT+EDcJcR9Km+Nd6jJHcLZhldXvgGr92qF2AdyQ9se3gcOJ2z8Uc13v/T2
-         7Z27+0gSTT11oIQLl1RgWm+VcWPs2R0i4//pHnHnwbIYVoCfvKH+VWwA4mWIsFZrRMlv
-         lmGsJiuHcMVYThnXNki4YlrKBkvDRbz7E8BHptFiBW2HEI0t+99soxlxMu+NWLJhrPL+
-         zXMw==
+        bh=cTog4NKy/1nE67uUmd/XotZuin27hHXYpfRSdZ1MFtc=;
+        b=Yd8tVhRuxS8Xo46c4qAPTpJ5RhCmgu9YYeTCOWzqEQuzRmGwAf/iwkqi/DRodFqP5c
+         DHy5M7Mu38j8ja0hybTUn5WXDztMYLQEpcr267ogY6KBN6AwT29Nc3XycXbj53xnrt24
+         2aziOPVZWkCz4cruU3pPYfTU0vJkRGN3k81ubCGONXoPL2ES7iDLhMR8cuxt1g/sMdN9
+         Oav+7F8VR22u0LCbpOpfaToULAkqdS92LiEKa1bNtcrKASWXSNMirbxQy96/cKp7QXTS
+         NEgqSda1z73i1NwQNUsET+DhLktlK0wOzw2NAk82UATZiz+hem6ijiM6RBkrHCOjp/w8
+         4AFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772236821; x=1772841621;
+        d=1e100.net; s=20230601; t=1772236823; x=1772841623;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=zbB2Tr331FC//FQzvZHi0Oll7EQUhGq6//q/S/UKOtY=;
-        b=YD4A7V+LUx74O0GPgyGzfITrkjzhC+Ds+EQM4UwbbSIfcQ+8nt60hoEpjqcd7If9lH
-         IYjsnIxWH7ytRFcbuh3ZPmF/8AMH9C2D+afLAEN9bdpNEVbvPFCCTrxUEnAPy8nkGrOM
-         85vrZavROF8E4PhJ/pBop90/dx9Te75TKF/paj37RsJKIHacrARjbRPWisQ/MpfvPjaZ
-         SAFFfsF+uM5RmP3A0XCMNwqKNI0vXcqHUIwykozMAkmKOwWP8AM47HutRzJ8YGa3JZCj
-         G/JsI25PRVJdpM6zJdi2+PIjUlxjZbSSBekNOU5TpR5ExIzgH2ThTPQTm0fWVS87vT5T
-         oKyg==
-X-Gm-Message-State: AOJu0YxeGi0FuqP5zq95TaBcbZ/cN1WyVxvtzs2GwE3vr7/dFtQuv8hp
-	MPzYZGEYo+DXtD0FChcZr6p4NyNP0pAgPcqdVdtkp9wIjsh85lGq7HSDzt+/jOOml+2MG4cRvZq
-	MjJ/H8a0mzIcVaP7qboUsJAOOVyy7clOeTq5WtTKenUj7A2j3SsN1uBG2Y6qKyvra
-X-Gm-Gg: ATEYQzxmdnjDQNxbSylj5w5tgqBDycrekt+RCJbaklCWtqb1DxO3OK2f6lcGuCQBP+Z
-	U2JGCU3KkLk75u2G83rw28BXxxmrdlDI4C1xotpcEkiZAZuJSBpQrf8TqOpHnPSsYwIRWNxxlFW
-	oSpSc7l8PMQiK6YRiG8fyt66T6iWL2WP9A/KiWYuRwHLlOcbWFPALpAkG4a5oBnBO+NVlrBG1m+
-	konYMtIo0SofSR1YWpbwD6xT2LbUVoFkBgy5gKH927C91/VsNT3Fg9uQ97BmbecVMOymma0HCrf
-	j/4yOoZI7PcyqGqC9s5rscZIAW7Zgsrr/GRUNKtWUPTjecCpDRT2XMGy0iYc8LTypwrP/5Wo7Jp
-	/pGDoSthJGReAzmMY8uP9BF2GjSqIoTT7Ox30s5VbEx2iCBYRkivj+svtIQyYYoiLWDFfGqWhu3
-	VSmxY7zhdSNQWPC1zzpu2Gud8BSYXfa6BlWlHD
-X-Received: by 2002:a05:600c:a16:b0:483:2c98:4368 with SMTP id 5b1f17b1804b1-483c9c02ef1mr70044625e9.18.1772236820704;
-        Fri, 27 Feb 2026 16:00:20 -0800 (PST)
+        bh=cTog4NKy/1nE67uUmd/XotZuin27hHXYpfRSdZ1MFtc=;
+        b=Gy8cDQAkuys7IvjKO3z/4/7kqPinLiZ7tk1JMzf4p3L1MPVNz9JNWro3IB7+uWH4PN
+         R8DCGYbLhJRxz/r3pFDNR70I85oXrMCFBiqAVGEHvNPE4JL2af16L1FJnVlVMj5Engcp
+         xxKNgzHi5KbBaB7HPwKYTwqBuoRVtcyCkBzRn5p+Eyb+r5iBH3p8m0Z1MG4YQXOMoCJm
+         3rtKgX7iQGBkVa6d7FsZX5SY9bHWqdiQWj/aFG1onOOmwDKhqkatFEoy04Tlw73EOvQt
+         m/r399mHd0Lf30Nh/EvX+NuBo+per8Z6dUTvK/b5spkMAqcGeZvl3T5G0ZVdRG0UVU6V
+         3EkQ==
+X-Gm-Message-State: AOJu0YyheFUqnu8zGkwCqawTmVM2/viM4tj9ukcz80Y6PhKKz8tJ8lUa
+	3AEDj9tQ8maK0syHNfWptzrWKRGUjnTvNGK3uz+1WHQ8y3PeJoDjD0vowe4mYMZjAfGsPqJnqfF
+	RhGncRlu4D4+bTAmvJmi1gdssyeZthP+f1zWoK+bE1zxfp8PK5G6uWbwRomHMs/0o
+X-Gm-Gg: ATEYQzygVGnyoFF1e/S74EDw3TwVusR9Mz8zxhUYdHjoEHNj9tZsYAFB3moCyEpfj8m
+	bXKiWGoG8MKPYAqsnbWqto1XZpFJ84YLO46KK6RYqpnrterzLXcRcj2nV5UM0dI7x4DpV8qJbmy
+	WxtTQ+yvRKSiunXn+y/nrWLw3eYQXT0MoaswdNt1b9dK4w0MYHRGaJ6rQnv7GoaTWAlpJih7Nld
+	ebKAlw0ot3oqpiSTZ4i/bKzaf+q0LZHG1wXHrtmsgQa5ShkIQYS0K0y71cXTW90JX6+nQjtej0M
+	hWHXsU9r5VJxH15X+jrNNuoHjurUfk154UiOBXxdypXIEFBexWK31D7qv6o3PLzvBtRXnrlSByL
+	00oQ5HJRn0Q1IInHRNhJLlmcBRA2CFwmm0wmRQO3IVkhCyWzpfVbBHpHFWwpcIaYcJspFaGl8II
+	XKzQrhOBHX5XZUmlRehXDmYOAR22rTqtBTNYKy
+X-Received: by 2002:a05:600c:8b8a:b0:47a:935f:61a0 with SMTP id 5b1f17b1804b1-483c9b6cfccmr82712405e9.0.1772236822872;
+        Fri, 27 Feb 2026 16:00:22 -0800 (PST)
 Received: from inifinity.mandelbit.com ([2001:67c:2fbc:1:d378:d869:cb10:1603])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bfb77466sm94420695e9.5.2026.02.27.16.00.17
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bfb77466sm94420695e9.5.2026.02.27.16.00.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Feb 2026 16:00:19 -0800 (PST)
+        Fri, 27 Feb 2026 16:00:21 -0800 (PST)
 From: Antonio Quartulli <antonio@openvpn.net>
 To: netdev@vger.kernel.org
 Cc: Ralf Lici <ralf@mandelbit.com>,
@@ -86,9 +86,9 @@ Cc: Ralf Lici <ralf@mandelbit.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Antonio Quartulli <antonio@openvpn.net>
-Subject: [PATCH net-next 5/9] selftests: ovpn: add notification parsing and matching
-Date: Sat, 28 Feb 2026 00:59:51 +0100
-Message-ID: <20260227235955.660-6-antonio@openvpn.net>
+Subject: [PATCH net-next 6/9] ovpn: add support for asymmetric peer IDs
+Date: Sat, 28 Feb 2026 00:59:52 +0100
+Message-ID: <20260227235955.660-7-antonio@openvpn.net>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260227235955.660-1-antonio@openvpn.net>
 References: <20260227235955.660-1-antonio@openvpn.net>
@@ -107,357 +107,294 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262010-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262011-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.987];
+	NEURAL_HAM(-0.00)[-0.997];
 	DKIM_TRACE(0.00)[openvpn.net:+];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,openvpn.net:mid,openvpn.net:dkim,openvpn.net:email,mandelbit.com:email,req.name:url]
-X-Rspamd-Queue-Id: BD3EA1BF4E6
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[openvpn.net:mid,openvpn.net:dkim,openvpn.net:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: CF7DA1BF4A9
 X-Rspamd-Action: no action
 
 From: Ralf Lici <ralf@mandelbit.com>
 
-To verify that netlink notifications are correctly emitted and contain
-the expected fields, this commit uses the tools/net/ynl/pyynl/cli.py
-script to create multicast listeners. These listeners record the
-captured notifications to a JSON file, which is later compared to the
-expected output.
+In order to support the multipeer architecture, upon connection setup
+each side of a tunnel advertises a unique ID that the other side must
+include in packets sent to them. Therefore when transmitting a packet, a
+peer inserts the recipient's advertised ID for that specific tunnel into
+the peer ID field. When receiving a packet, a peer expects to find its
+own unique receive ID for that specific tunnel in the peer ID field.
 
-Since this change introduces additional dependencies (jq, pyyaml,
-jsonschema), the tests are configured to check for their presence and
-conditionally skip the notification check if they are missing.
+Add support for the TX peer ID and embed it into transmitting packets.
+If no TX peer ID is specified, fallback to using the same peer ID both
+for RX and TX in order to be compatible with the non-multipeer compliant
+peers.
 
 Signed-off-by: Ralf Lici <ralf@mandelbit.com>
 Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 ---
- .../selftests/net/ovpn/check_requirements.py  | 41 +++++++++++++++++++
- tools/testing/selftests/net/ovpn/common.sh    | 35 ++++++++++++++++
- .../selftests/net/ovpn/json/peer0-float.json  |  9 ++++
- .../selftests/net/ovpn/json/peer0.json        |  6 +++
- .../selftests/net/ovpn/json/peer1-float.json  |  1 +
- .../selftests/net/ovpn/json/peer1.json        |  1 +
- .../selftests/net/ovpn/json/peer2-float.json  |  1 +
- .../selftests/net/ovpn/json/peer2.json        |  1 +
- .../selftests/net/ovpn/json/peer3-float.json  |  1 +
- .../selftests/net/ovpn/json/peer3.json        |  1 +
- .../selftests/net/ovpn/json/peer4-float.json  |  1 +
- .../selftests/net/ovpn/json/peer4.json        |  1 +
- .../selftests/net/ovpn/json/peer5-float.json  |  1 +
- .../selftests/net/ovpn/json/peer5.json        |  1 +
- .../selftests/net/ovpn/json/peer6-float.json  |  1 +
- .../selftests/net/ovpn/json/peer6.json        |  1 +
- .../selftests/net/ovpn/requirements.txt       |  1 +
- .../testing/selftests/net/ovpn/tcp_peers.txt  |  1 +
- tools/testing/selftests/net/ovpn/test.sh      | 10 +++++
- 19 files changed, 115 insertions(+)
- create mode 100755 tools/testing/selftests/net/ovpn/check_requirements.py
- create mode 100644 tools/testing/selftests/net/ovpn/json/peer0-float.json
- create mode 100644 tools/testing/selftests/net/ovpn/json/peer0.json
- create mode 120000 tools/testing/selftests/net/ovpn/json/peer1-float.json
- create mode 100644 tools/testing/selftests/net/ovpn/json/peer1.json
- create mode 120000 tools/testing/selftests/net/ovpn/json/peer2-float.json
- create mode 100644 tools/testing/selftests/net/ovpn/json/peer2.json
- create mode 120000 tools/testing/selftests/net/ovpn/json/peer3-float.json
- create mode 100644 tools/testing/selftests/net/ovpn/json/peer3.json
- create mode 120000 tools/testing/selftests/net/ovpn/json/peer4-float.json
- create mode 100644 tools/testing/selftests/net/ovpn/json/peer4.json
- create mode 120000 tools/testing/selftests/net/ovpn/json/peer5-float.json
- create mode 100644 tools/testing/selftests/net/ovpn/json/peer5.json
- create mode 120000 tools/testing/selftests/net/ovpn/json/peer6-float.json
- create mode 100644 tools/testing/selftests/net/ovpn/json/peer6.json
- create mode 120000 tools/testing/selftests/net/ovpn/requirements.txt
+ Documentation/netlink/specs/ovpn.yaml | 17 ++++++++++++++++-
+ drivers/net/ovpn/crypto_aead.c        |  2 +-
+ drivers/net/ovpn/netlink-gen.c        | 13 ++++++++++---
+ drivers/net/ovpn/netlink-gen.h        |  6 +++---
+ drivers/net/ovpn/netlink.c            | 14 ++++++++++++--
+ drivers/net/ovpn/peer.c               |  4 ++++
+ drivers/net/ovpn/peer.h               |  4 +++-
+ include/uapi/linux/ovpn.h             |  1 +
+ 8 files changed, 50 insertions(+), 11 deletions(-)
 
-diff --git a/tools/testing/selftests/net/ovpn/check_requirements.py b/tools/testing/selftests/net/ovpn/check_requirements.py
-new file mode 100755
-index 000000000000..6434ebbfe7fe
---- /dev/null
-+++ b/tools/testing/selftests/net/ovpn/check_requirements.py
-@@ -0,0 +1,41 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+# Copyright (C) 2026 OpenVPN, Inc.
-+#
-+#  Author:  Ralf Lici <ralf@mandelbit.com>
-+
-+from importlib.metadata import version, PackageNotFoundError
-+from packaging.requirements import Requirement
-+from packaging.version import Version, InvalidVersion
-+from pathlib import Path
-+import sys
-+
-+def check_requirements(requirements_path="requirements.txt"):
-+    issues = []
-+    with open(requirements_path) as f:
-+        for line in f:
-+            line = line.strip()
-+            if not line or line.startswith("#"):
-+                continue
-+            try:
-+                req = Requirement(line)
-+                try:
-+                    installed_version = Version(version(req.name))
-+                    if req.specifier and installed_version not in req.specifier:
-+                        issues.append(f"{req.name}=={installed_version} does not satisfy {req.specifier}")
-+                except PackageNotFoundError:
-+                    issues.append(f"{req.name} is not installed")
-+                except InvalidVersion:
-+                    issues.append(f"{req.name} has an invalid installed version")
-+            except Exception as e:
-+                issues.append(f"Could not parse requirement line: '{line}' ({e})")
-+    return issues
-+
-+problems = check_requirements()
-+if problems:
-+    print("Dependency issues found:")
-+    for p in problems:
-+        print(" -", p)
-+    sys.exit(1)
-+else:
-+    sys.exit(0)
-diff --git a/tools/testing/selftests/net/ovpn/common.sh b/tools/testing/selftests/net/ovpn/common.sh
-index 88869c675d03..f2b58361255d 100644
---- a/tools/testing/selftests/net/ovpn/common.sh
-+++ b/tools/testing/selftests/net/ovpn/common.sh
-@@ -7,12 +7,18 @@
- UDP_PEERS_FILE=${UDP_PEERS_FILE:-udp_peers.txt}
- TCP_PEERS_FILE=${TCP_PEERS_FILE:-tcp_peers.txt}
- OVPN_CLI=${OVPN_CLI:-./ovpn-cli}
-+YNL_CLI=${YNL_CLI:-../../../../net/ynl/pyynl/cli.py}
- ALG=${ALG:-aes}
- PROTO=${PROTO:-UDP}
- FLOAT=${FLOAT:-0}
+diff --git a/Documentation/netlink/specs/ovpn.yaml b/Documentation/netlink/specs/ovpn.yaml
+index 0d0c028bf96f..b0c782e59a32 100644
+--- a/Documentation/netlink/specs/ovpn.yaml
++++ b/Documentation/netlink/specs/ovpn.yaml
+@@ -43,7 +43,8 @@ attribute-sets:
+         type: u32
+         doc: >-
+           The unique ID of the peer in the device context. To be used to
+-          identify peers during operations for a specific device
++          identify peers during operations for a specific device.
++          Also used to match packets received from this peer.
+         checks:
+           max: 0xFFFFFF
+       -
+@@ -160,6 +161,16 @@ attribute-sets:
+         name: link-tx-packets
+         type: uint
+         doc: Number of packets transmitted at the transport level
++      -
++        name: tx-id
++        type: u32
++        doc: >-
++          The ID value used when transmitting packets to this peer. This
++          way outgoing packets can have a different ID than incoming ones.
++          Useful in multipeer-to-multipeer connections, where each peer
++          will advertise the tx-id to be used on the link.
++        checks:
++          max: 0xFFFFFF
+   -
+     name: peer-new-input
+     subset-of: peer
+@@ -188,6 +199,8 @@ attribute-sets:
+         name: keepalive-interval
+       -
+         name: keepalive-timeout
++      -
++        name: tx-id
+   -
+     name: peer-set-input
+     subset-of: peer
+@@ -214,6 +227,8 @@ attribute-sets:
+         name: keepalive-interval
+       -
+         name: keepalive-timeout
++      -
++        name: tx-id
+   -
+     name: peer-del-input
+     subset-of: peer
+diff --git a/drivers/net/ovpn/crypto_aead.c b/drivers/net/ovpn/crypto_aead.c
+index 77be0942a269..59848c41b7b2 100644
+--- a/drivers/net/ovpn/crypto_aead.c
++++ b/drivers/net/ovpn/crypto_aead.c
+@@ -122,7 +122,7 @@ int ovpn_aead_encrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
+ 	memcpy(skb->data, iv, OVPN_NONCE_WIRE_SIZE);
  
-+JQ_FILTER='map(select(.msg.peer | has("remote-ipv6") | not)) |
-+	map(del(.msg.ifindex)) | sort_by(.msg.peer.id)[]'
- LAN_IP="11.11.11.11"
+ 	/* add packet op as head of additional data */
+-	op = ovpn_opcode_compose(OVPN_DATA_V2, ks->key_id, peer->id);
++	op = ovpn_opcode_compose(OVPN_DATA_V2, ks->key_id, peer->tx_id);
+ 	__skb_push(skb, OVPN_OPCODE_SIZE);
+ 	BUILD_BUG_ON(sizeof(op) != OVPN_OPCODE_SIZE);
+ 	*((__force __be32 *)skb->data) = htonl(op);
+diff --git a/drivers/net/ovpn/netlink-gen.c b/drivers/net/ovpn/netlink-gen.c
+index ecbe9dcf4f7d..2147cec7c2c5 100644
+--- a/drivers/net/ovpn/netlink-gen.c
++++ b/drivers/net/ovpn/netlink-gen.c
+@@ -16,6 +16,10 @@ static const struct netlink_range_validation ovpn_a_peer_id_range = {
+ 	.max	= 16777215ULL,
+ };
  
-+declare -A tmp_jsons=()
-+declare -A listener_pids=()
++static const struct netlink_range_validation ovpn_a_peer_tx_id_range = {
++	.max	= 16777215ULL,
++};
 +
- create_ns() {
- 	ip netns add peer${1}
- }
-@@ -48,6 +54,18 @@ setup_ns() {
- 	ip -n peer${1} link set tun${1} up
- }
+ static const struct netlink_range_validation ovpn_a_keyconf_peer_id_range = {
+ 	.max	= 16777215ULL,
+ };
+@@ -51,7 +55,7 @@ const struct nla_policy ovpn_keydir_nl_policy[OVPN_A_KEYDIR_NONCE_TAIL + 1] = {
+ 	[OVPN_A_KEYDIR_NONCE_TAIL] = NLA_POLICY_EXACT_LEN(OVPN_NONCE_TAIL_SIZE),
+ };
  
-+has_listener_requirements() {
-+	./check_requirements.py && jq --version >/dev/null 2>&1
-+}
-+
-+setup_listener() {
-+	file=$(mktemp)
-+	PYTHONUNBUFFERED=1 ip netns exec peer${p} ${YNL_CLI} --family ovpn \
-+		--subscribe peers --output-json --duration 40 > ${file} &
-+	listener_pids[$1]=$!
-+	tmp_jsons[$1]="${file}"
-+}
-+
- add_peer() {
- 	if [ "${PROTO}" == "UDP" ]; then
- 		if [ ${1} -eq 0 ]; then
-@@ -82,6 +100,23 @@ add_peer() {
- 	fi
- }
+-const struct nla_policy ovpn_peer_nl_policy[OVPN_A_PEER_LINK_TX_PACKETS + 1] = {
++const struct nla_policy ovpn_peer_nl_policy[OVPN_A_PEER_TX_ID + 1] = {
+ 	[OVPN_A_PEER_ID] = NLA_POLICY_FULL_RANGE(NLA_U32, &ovpn_a_peer_id_range),
+ 	[OVPN_A_PEER_REMOTE_IPV4] = { .type = NLA_BE32, },
+ 	[OVPN_A_PEER_REMOTE_IPV6] = NLA_POLICY_EXACT_LEN(16),
+@@ -75,13 +79,14 @@ const struct nla_policy ovpn_peer_nl_policy[OVPN_A_PEER_LINK_TX_PACKETS + 1] = {
+ 	[OVPN_A_PEER_LINK_TX_BYTES] = { .type = NLA_UINT, },
+ 	[OVPN_A_PEER_LINK_RX_PACKETS] = { .type = NLA_UINT, },
+ 	[OVPN_A_PEER_LINK_TX_PACKETS] = { .type = NLA_UINT, },
++	[OVPN_A_PEER_TX_ID] = NLA_POLICY_FULL_RANGE(NLA_U32, &ovpn_a_peer_tx_id_range),
+ };
  
-+compare_ntfs() {
-+	if [ ${#tmp_jsons[@]} -gt 0 ]; then
-+		[ "$FLOAT" == 1 ] && suffix="-float"
-+		expected="json/peer${1}${suffix}.json"
-+		received="${tmp_jsons[$1]}"
-+
-+		kill -TERM ${listener_pids[$1]} || true
-+		wait ${listener_pids[$1]} || true
-+		printf "Checking notifications for peer ${1}... "
-+		diff <(jq -s "${JQ_FILTER}" ${expected}) \
-+			<(jq -s "${JQ_FILTER}" ${received})
-+		echo "OK"
-+
-+		rm -f ${received} || true
-+	fi
-+}
-+
- cleanup() {
- 	# some ovpn-cli processes sleep in background so they need manual poking
- 	killall $(basename ${OVPN_CLI}) 2>/dev/null || true
-diff --git a/tools/testing/selftests/net/ovpn/json/peer0-float.json b/tools/testing/selftests/net/ovpn/json/peer0-float.json
-new file mode 100644
-index 000000000000..682fa58ad4ea
---- /dev/null
-+++ b/tools/testing/selftests/net/ovpn/json/peer0-float.json
-@@ -0,0 +1,9 @@
-+{"name": "peer-float-ntf", "msg": {"ifindex": 0, "peer": {"id": 1, "remote-ipv4": "10.10.1.3", "remote-port": 1}}}
-+{"name": "peer-float-ntf", "msg": {"ifindex": 0, "peer": {"id": 2, "remote-ipv4": "10.10.2.3", "remote-port": 1}}}
-+{"name": "peer-float-ntf", "msg": {"ifindex": 0, "peer": {"id": 3, "remote-ipv4": "10.10.3.3", "remote-port": 1}}}
-+{"name": "peer-del-ntf", "msg": {"ifindex": 0, "peer": {"del-reason": "userspace", "id": 1}}}
-+{"name": "peer-del-ntf", "msg": {"ifindex": 0, "peer": {"del-reason": "userspace", "id": 2}}}
-+{"name": "peer-del-ntf", "msg": {"ifindex": 0, "peer": {"del-reason": "expired", "id": 3}}}
-+{"name": "peer-del-ntf", "msg": {"ifindex": 0, "peer": {"del-reason": "expired", "id": 4}}}
-+{"name": "peer-del-ntf", "msg": {"ifindex": 0, "peer": {"del-reason": "expired", "id": 5}}}
-+{"name": "peer-del-ntf", "msg": {"ifindex": 0, "peer": {"del-reason": "expired", "id": 6}}}
-diff --git a/tools/testing/selftests/net/ovpn/json/peer0.json b/tools/testing/selftests/net/ovpn/json/peer0.json
-new file mode 100644
-index 000000000000..7c46a33d5ecd
---- /dev/null
-+++ b/tools/testing/selftests/net/ovpn/json/peer0.json
-@@ -0,0 +1,6 @@
-+{"name": "peer-del-ntf", "msg": {"ifindex": 0, "peer": {"del-reason": "userspace", "id": 1}}}
-+{"name": "peer-del-ntf", "msg": {"ifindex": 0, "peer": {"del-reason": "userspace", "id": 2}}}
-+{"name": "peer-del-ntf", "msg": {"ifindex": 0, "peer": {"del-reason": "expired", "id": 3}}}
-+{"name": "peer-del-ntf", "msg": {"ifindex": 0, "peer": {"del-reason": "expired", "id": 4}}}
-+{"name": "peer-del-ntf", "msg": {"ifindex": 0, "peer": {"del-reason": "expired", "id": 5}}}
-+{"name": "peer-del-ntf", "msg": {"ifindex": 0, "peer": {"del-reason": "expired", "id": 6}}}
-diff --git a/tools/testing/selftests/net/ovpn/json/peer1-float.json b/tools/testing/selftests/net/ovpn/json/peer1-float.json
-new file mode 120000
-index 000000000000..d28c328d1452
---- /dev/null
-+++ b/tools/testing/selftests/net/ovpn/json/peer1-float.json
-@@ -0,0 +1 @@
-+peer1.json
-\ No newline at end of file
-diff --git a/tools/testing/selftests/net/ovpn/json/peer1.json b/tools/testing/selftests/net/ovpn/json/peer1.json
-new file mode 100644
-index 000000000000..5da4ea9d51fb
---- /dev/null
-+++ b/tools/testing/selftests/net/ovpn/json/peer1.json
-@@ -0,0 +1 @@
-+{"name": "peer-del-ntf", "msg": {"ifindex": 0, "peer": {"del-reason": "userspace", "id": 1}}}
-diff --git a/tools/testing/selftests/net/ovpn/json/peer2-float.json b/tools/testing/selftests/net/ovpn/json/peer2-float.json
-new file mode 120000
-index 000000000000..b9f09980aaa0
---- /dev/null
-+++ b/tools/testing/selftests/net/ovpn/json/peer2-float.json
-@@ -0,0 +1 @@
-+peer2.json
-\ No newline at end of file
-diff --git a/tools/testing/selftests/net/ovpn/json/peer2.json b/tools/testing/selftests/net/ovpn/json/peer2.json
-new file mode 100644
-index 000000000000..8f6db4f8c2ac
---- /dev/null
-+++ b/tools/testing/selftests/net/ovpn/json/peer2.json
-@@ -0,0 +1 @@
-+{"name": "peer-del-ntf", "msg": {"ifindex": 0, "peer": {"del-reason": "userspace", "id": 2}}}
-diff --git a/tools/testing/selftests/net/ovpn/json/peer3-float.json b/tools/testing/selftests/net/ovpn/json/peer3-float.json
-new file mode 120000
-index 000000000000..2700b55bcf2e
---- /dev/null
-+++ b/tools/testing/selftests/net/ovpn/json/peer3-float.json
-@@ -0,0 +1 @@
-+peer3.json
-\ No newline at end of file
-diff --git a/tools/testing/selftests/net/ovpn/json/peer3.json b/tools/testing/selftests/net/ovpn/json/peer3.json
-new file mode 100644
-index 000000000000..bdabd6fa2e64
---- /dev/null
-+++ b/tools/testing/selftests/net/ovpn/json/peer3.json
-@@ -0,0 +1 @@
-+{"name": "peer-del-ntf", "msg": {"ifindex": 0, "peer": {"del-reason": "expired", "id": 3}}}
-diff --git a/tools/testing/selftests/net/ovpn/json/peer4-float.json b/tools/testing/selftests/net/ovpn/json/peer4-float.json
-new file mode 120000
-index 000000000000..460f6c14cd60
---- /dev/null
-+++ b/tools/testing/selftests/net/ovpn/json/peer4-float.json
-@@ -0,0 +1 @@
-+peer4.json
-\ No newline at end of file
-diff --git a/tools/testing/selftests/net/ovpn/json/peer4.json b/tools/testing/selftests/net/ovpn/json/peer4.json
-new file mode 100644
-index 000000000000..c3734bb9251b
---- /dev/null
-+++ b/tools/testing/selftests/net/ovpn/json/peer4.json
-@@ -0,0 +1 @@
-+{"name": "peer-del-ntf", "msg": {"ifindex": 0, "peer": {"del-reason": "expired", "id": 4}}}
-diff --git a/tools/testing/selftests/net/ovpn/json/peer5-float.json b/tools/testing/selftests/net/ovpn/json/peer5-float.json
-new file mode 120000
-index 000000000000..0f725c50ce19
---- /dev/null
-+++ b/tools/testing/selftests/net/ovpn/json/peer5-float.json
-@@ -0,0 +1 @@
-+peer5.json
-\ No newline at end of file
-diff --git a/tools/testing/selftests/net/ovpn/json/peer5.json b/tools/testing/selftests/net/ovpn/json/peer5.json
-new file mode 100644
-index 000000000000..46c4a348299d
---- /dev/null
-+++ b/tools/testing/selftests/net/ovpn/json/peer5.json
-@@ -0,0 +1 @@
-+{"name": "peer-del-ntf", "msg": {"ifindex": 0, "peer": {"del-reason": "expired", "id": 5}}}
-diff --git a/tools/testing/selftests/net/ovpn/json/peer6-float.json b/tools/testing/selftests/net/ovpn/json/peer6-float.json
-new file mode 120000
-index 000000000000..4d9ded3e0a84
---- /dev/null
-+++ b/tools/testing/selftests/net/ovpn/json/peer6-float.json
-@@ -0,0 +1 @@
-+peer6.json
-\ No newline at end of file
-diff --git a/tools/testing/selftests/net/ovpn/json/peer6.json b/tools/testing/selftests/net/ovpn/json/peer6.json
-new file mode 100644
-index 000000000000..aa30f2cff625
---- /dev/null
-+++ b/tools/testing/selftests/net/ovpn/json/peer6.json
-@@ -0,0 +1 @@
-+{"name": "peer-del-ntf", "msg": {"ifindex": 0, "peer": {"del-reason": "expired", "id": 6}}}
-diff --git a/tools/testing/selftests/net/ovpn/requirements.txt b/tools/testing/selftests/net/ovpn/requirements.txt
-new file mode 120000
-index 000000000000..da9fd54081c5
---- /dev/null
-+++ b/tools/testing/selftests/net/ovpn/requirements.txt
-@@ -0,0 +1 @@
-+../../../../net/ynl/requirements.txt
-\ No newline at end of file
-diff --git a/tools/testing/selftests/net/ovpn/tcp_peers.txt b/tools/testing/selftests/net/ovpn/tcp_peers.txt
-index d753eebe8716..b8f3cb33eaa2 100644
---- a/tools/testing/selftests/net/ovpn/tcp_peers.txt
-+++ b/tools/testing/selftests/net/ovpn/tcp_peers.txt
-@@ -3,3 +3,4 @@
- 3 5.5.5.4
- 4 5.5.5.5
- 5 5.5.5.6
-+6 5.5.5.7
-diff --git a/tools/testing/selftests/net/ovpn/test.sh b/tools/testing/selftests/net/ovpn/test.sh
-index e8acdc303307..3ec036fd7ebc 100755
---- a/tools/testing/selftests/net/ovpn/test.sh
-+++ b/tools/testing/selftests/net/ovpn/test.sh
-@@ -17,6 +17,12 @@ for p in $(seq 0 ${NUM_PEERS}); do
- 	create_ns ${p}
- done
+ const struct nla_policy ovpn_peer_del_input_nl_policy[OVPN_A_PEER_ID + 1] = {
+ 	[OVPN_A_PEER_ID] = NLA_POLICY_FULL_RANGE(NLA_U32, &ovpn_a_peer_id_range),
+ };
  
-+if has_listener_requirements; then
-+	for p in $(seq 0 ${NUM_PEERS}); do
-+		setup_listener ${p}
-+	done
-+fi
-+
- for p in $(seq 0 ${NUM_PEERS}); do
- 	setup_ns ${p} 5.5.5.$((${p} + 1))/24 ${MTU}
- done
-@@ -112,6 +118,10 @@ for p in $(seq 3 ${NUM_PEERS}); do
- done
- sleep 5
+-const struct nla_policy ovpn_peer_new_input_nl_policy[OVPN_A_PEER_KEEPALIVE_TIMEOUT + 1] = {
++const struct nla_policy ovpn_peer_new_input_nl_policy[OVPN_A_PEER_TX_ID + 1] = {
+ 	[OVPN_A_PEER_ID] = NLA_POLICY_FULL_RANGE(NLA_U32, &ovpn_a_peer_id_range),
+ 	[OVPN_A_PEER_REMOTE_IPV4] = { .type = NLA_BE32, },
+ 	[OVPN_A_PEER_REMOTE_IPV6] = NLA_POLICY_EXACT_LEN(16),
+@@ -94,9 +99,10 @@ const struct nla_policy ovpn_peer_new_input_nl_policy[OVPN_A_PEER_KEEPALIVE_TIME
+ 	[OVPN_A_PEER_LOCAL_IPV6] = NLA_POLICY_EXACT_LEN(16),
+ 	[OVPN_A_PEER_KEEPALIVE_INTERVAL] = { .type = NLA_U32, },
+ 	[OVPN_A_PEER_KEEPALIVE_TIMEOUT] = { .type = NLA_U32, },
++	[OVPN_A_PEER_TX_ID] = NLA_POLICY_FULL_RANGE(NLA_U32, &ovpn_a_peer_tx_id_range),
+ };
  
-+for p in $(seq 0 ${NUM_PEERS}); do
-+	compare_ntfs ${p}
-+done
-+
- cleanup
+-const struct nla_policy ovpn_peer_set_input_nl_policy[OVPN_A_PEER_KEEPALIVE_TIMEOUT + 1] = {
++const struct nla_policy ovpn_peer_set_input_nl_policy[OVPN_A_PEER_TX_ID + 1] = {
+ 	[OVPN_A_PEER_ID] = NLA_POLICY_FULL_RANGE(NLA_U32, &ovpn_a_peer_id_range),
+ 	[OVPN_A_PEER_REMOTE_IPV4] = { .type = NLA_BE32, },
+ 	[OVPN_A_PEER_REMOTE_IPV6] = NLA_POLICY_EXACT_LEN(16),
+@@ -108,6 +114,7 @@ const struct nla_policy ovpn_peer_set_input_nl_policy[OVPN_A_PEER_KEEPALIVE_TIME
+ 	[OVPN_A_PEER_LOCAL_IPV6] = NLA_POLICY_EXACT_LEN(16),
+ 	[OVPN_A_PEER_KEEPALIVE_INTERVAL] = { .type = NLA_U32, },
+ 	[OVPN_A_PEER_KEEPALIVE_TIMEOUT] = { .type = NLA_U32, },
++	[OVPN_A_PEER_TX_ID] = NLA_POLICY_FULL_RANGE(NLA_U32, &ovpn_a_peer_tx_id_range),
+ };
  
- modprobe -r ovpn || true
+ /* OVPN_CMD_PEER_NEW - do */
+diff --git a/drivers/net/ovpn/netlink-gen.h b/drivers/net/ovpn/netlink-gen.h
+index b2301580770f..67cd85f86173 100644
+--- a/drivers/net/ovpn/netlink-gen.h
++++ b/drivers/net/ovpn/netlink-gen.h
+@@ -18,10 +18,10 @@ extern const struct nla_policy ovpn_keyconf_del_input_nl_policy[OVPN_A_KEYCONF_S
+ extern const struct nla_policy ovpn_keyconf_get_nl_policy[OVPN_A_KEYCONF_CIPHER_ALG + 1];
+ extern const struct nla_policy ovpn_keyconf_swap_input_nl_policy[OVPN_A_KEYCONF_PEER_ID + 1];
+ extern const struct nla_policy ovpn_keydir_nl_policy[OVPN_A_KEYDIR_NONCE_TAIL + 1];
+-extern const struct nla_policy ovpn_peer_nl_policy[OVPN_A_PEER_LINK_TX_PACKETS + 1];
++extern const struct nla_policy ovpn_peer_nl_policy[OVPN_A_PEER_TX_ID + 1];
+ extern const struct nla_policy ovpn_peer_del_input_nl_policy[OVPN_A_PEER_ID + 1];
+-extern const struct nla_policy ovpn_peer_new_input_nl_policy[OVPN_A_PEER_KEEPALIVE_TIMEOUT + 1];
+-extern const struct nla_policy ovpn_peer_set_input_nl_policy[OVPN_A_PEER_KEEPALIVE_TIMEOUT + 1];
++extern const struct nla_policy ovpn_peer_new_input_nl_policy[OVPN_A_PEER_TX_ID + 1];
++extern const struct nla_policy ovpn_peer_set_input_nl_policy[OVPN_A_PEER_TX_ID + 1];
+ 
+ int ovpn_nl_pre_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
+ 		     struct genl_info *info);
+diff --git a/drivers/net/ovpn/netlink.c b/drivers/net/ovpn/netlink.c
+index e10d7f9a28f5..291e2e5bb450 100644
+--- a/drivers/net/ovpn/netlink.c
++++ b/drivers/net/ovpn/netlink.c
+@@ -305,6 +305,12 @@ static int ovpn_nl_peer_modify(struct ovpn_peer *peer, struct genl_info *info,
+ 		dst_cache_reset(&peer->dst_cache);
+ 	}
+ 
++	/* In a multipeer-to-multipeer setup we may have asymmetric peer IDs,
++	 * that is peer->id might be different from peer->tx_id.
++	 */
++	if (attrs[OVPN_A_PEER_TX_ID])
++		peer->tx_id = nla_get_u32(attrs[OVPN_A_PEER_TX_ID]);
++
+ 	if (attrs[OVPN_A_PEER_VPN_IPV4]) {
+ 		rehash = true;
+ 		peer->vpn_addrs.ipv4.s_addr =
+@@ -326,8 +332,8 @@ static int ovpn_nl_peer_modify(struct ovpn_peer *peer, struct genl_info *info,
+ 	}
+ 
+ 	netdev_dbg(peer->ovpn->dev,
+-		   "modify peer id=%u endpoint=%pIScp VPN-IPv4=%pI4 VPN-IPv6=%pI6c\n",
+-		   peer->id, &ss,
++		   "modify peer id=%u tx_id=%u endpoint=%pIScp VPN-IPv4=%pI4 VPN-IPv6=%pI6c\n",
++		   peer->id, peer->tx_id, &ss,
+ 		   &peer->vpn_addrs.ipv4.s_addr, &peer->vpn_addrs.ipv6);
+ 
+ 	spin_unlock_bh(&peer->lock);
+@@ -373,6 +379,7 @@ int ovpn_nl_peer_new_doit(struct sk_buff *skb, struct genl_info *info)
+ 	}
+ 
+ 	peer_id = nla_get_u32(attrs[OVPN_A_PEER_ID]);
++
+ 	peer = ovpn_peer_new(ovpn, peer_id);
+ 	if (IS_ERR(peer)) {
+ 		NL_SET_ERR_MSG_FMT_MOD(info->extack,
+@@ -572,6 +579,9 @@ static int ovpn_nl_send_peer(struct sk_buff *skb, const struct genl_info *info,
+ 	if (nla_put_u32(skb, OVPN_A_PEER_ID, peer->id))
+ 		goto err;
+ 
++	if (nla_put_u32(skb, OVPN_A_PEER_TX_ID, peer->tx_id))
++		goto err;
++
+ 	if (peer->vpn_addrs.ipv4.s_addr != htonl(INADDR_ANY))
+ 		if (nla_put_in_addr(skb, OVPN_A_PEER_VPN_IPV4,
+ 				    peer->vpn_addrs.ipv4.s_addr))
+diff --git a/drivers/net/ovpn/peer.c b/drivers/net/ovpn/peer.c
+index 4e145b4497e6..26b55d813f0e 100644
+--- a/drivers/net/ovpn/peer.c
++++ b/drivers/net/ovpn/peer.c
+@@ -99,7 +99,11 @@ struct ovpn_peer *ovpn_peer_new(struct ovpn_priv *ovpn, u32 id)
+ 	if (!peer)
+ 		return ERR_PTR(-ENOMEM);
+ 
++	/* in the default case TX and RX IDs are the same.
++	 * the user may set a different TX ID via netlink
++	 */
+ 	peer->id = id;
++	peer->tx_id = id;
+ 	peer->ovpn = ovpn;
+ 
+ 	peer->vpn_addrs.ipv4.s_addr = htonl(INADDR_ANY);
+diff --git a/drivers/net/ovpn/peer.h b/drivers/net/ovpn/peer.h
+index a1423f2b09e0..328401570cba 100644
+--- a/drivers/net/ovpn/peer.h
++++ b/drivers/net/ovpn/peer.h
+@@ -21,7 +21,8 @@
+  * struct ovpn_peer - the main remote peer object
+  * @ovpn: main openvpn instance this peer belongs to
+  * @dev_tracker: reference tracker for associated dev
+- * @id: unique identifier
++ * @id: unique identifier, used to match incoming packets
++ * @tx_id: identifier to be used in TX packets
+  * @vpn_addrs: IP addresses assigned over the tunnel
+  * @vpn_addrs.ipv4: IPv4 assigned to peer on the tunnel
+  * @vpn_addrs.ipv6: IPv6 assigned to peer on the tunnel
+@@ -64,6 +65,7 @@ struct ovpn_peer {
+ 	struct ovpn_priv *ovpn;
+ 	netdevice_tracker dev_tracker;
+ 	u32 id;
++	u32 tx_id;
+ 	struct {
+ 		struct in_addr ipv4;
+ 		struct in6_addr ipv6;
+diff --git a/include/uapi/linux/ovpn.h b/include/uapi/linux/ovpn.h
+index 0cce0d58b830..06690090a1a9 100644
+--- a/include/uapi/linux/ovpn.h
++++ b/include/uapi/linux/ovpn.h
+@@ -55,6 +55,7 @@ enum {
+ 	OVPN_A_PEER_LINK_TX_BYTES,
+ 	OVPN_A_PEER_LINK_RX_PACKETS,
+ 	OVPN_A_PEER_LINK_TX_PACKETS,
++	OVPN_A_PEER_TX_ID,
+ 
+ 	__OVPN_A_PEER_MAX,
+ 	OVPN_A_PEER_MAX = (__OVPN_A_PEER_MAX - 1)
 -- 
 2.52.0
 
