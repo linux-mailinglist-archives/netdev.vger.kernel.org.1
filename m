@@ -1,248 +1,167 @@
-Return-Path: <netdev+bounces-261785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261786-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OAeoE0FloWnIsQQAu9opvQ
-	(envelope-from <netdev+bounces-261785-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 10:34:57 +0100
+	id AFpnFntloWkCsgQAu9opvQ
+	(envelope-from <netdev+bounces-261786-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 10:35:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8D6B1B566E
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 10:34:56 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F9D21B56C4
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 10:35:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5256730825F8
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 09:34:07 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E3A02300B455
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 09:35:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BBFF38F92E;
-	Fri, 27 Feb 2026 09:34:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 372C03624A4;
+	Fri, 27 Feb 2026 09:35:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="iT4yGQpi"
+	dkim=pass (2048-bit key) header.d=isovalent.com header.i=@isovalent.com header.b="Mjq9Uh9o"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC660389479;
-	Fri, 27 Feb 2026 09:33:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772184843; cv=none; b=Jf9vHJZXh+xoTSi0yIEMoMmI4sqjrK/ecEmIYZDbDZ4pQpRqQMFh00lm7+W8fOg7U//r3vjH4dm2bmRgWRr5a3AXSSnT/16bY1i1KgsC/cDwE+ciWzKet6yGtNaeBXjPWVzEg/XA8tFshfgcmwJLrBRvzNmsTs+/Fp3LPzrNlGs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772184843; c=relaxed/simple;
-	bh=td37NIOHY2ji/tXN+dKOtfkkarM64lekDKEUZkkeiZs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IK8r1XdwPdfBFaPbrhf7R2sVH2OHAMn+zbFtcSkGdcVV4RorSm6YBqP1DGLk4/VTN1vByg+gu1XoZA+6c20z/ciQO25SHlA5Uz6p2Nv8zQRHkXFvGyPxCchL2g7EBXPhzE+aieVd2OopAx1DMBCAXwFNaS1Ft4ZvaKO4CFxc5dM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=iT4yGQpi; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1772184835; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=Q+XIwkWLlcITtwiYjH9sK/PetlqVXTB9ZTWf1c5WVTo=;
-	b=iT4yGQpiDhNcZKtBzsrBj6Yy9t7nOf9Bg/htmJzp1v2kvrH4qpGXH3XmMAkp5JbYUHUvI9c+bOYvWE4mCVGC4JHY63bvr53C+ZokijJCkbWoaNMi/DNutHnfaBRgWmqsKCyhHmxuBOT80XMr2BCEk1winmQXB+Uj3bv8OwZyk0c=
-Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0Wzu.X7H_1772184834 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 27 Feb 2026 17:33:55 +0800
-Date: Fri, 27 Feb 2026 17:33:54 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com    >
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: alibuda@linux.alibaba.com, netdev@vger.kernel.org, pabeni@redhat.com,
-	linux-rdma@vger.kernel.org, sidraya@linux.ibm.com, horms@kernel.org,
-	davem@davemloft.net, linux-s390@vger.kernel.org,
-	mjambigi@linux.ibm.com, oliver.yang@linux.alibaba.com,
-	edumazet@google.com, wenjia@linux.ibm.com, guwen@linux.alibaba.com,
-	tonylu@linux.alibaba.com, dust.li@linux.alibaba.com,
-	linux-kernel@vger.kernel.org, pasic@linux.ibm.com
-Subject: Re: [net-next] net/smc: transition to RDMA core CQ pooling
-Message-ID: <20260227093354.GA130906@j66a10360.sqa.eu95>
-References: <20260225024513.7861-1-alibuda@linux.alibaba.com>
- <20260227035300.2628494-1-kuba@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E88F7331A73
+	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 09:35:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772184949; cv=pass; b=r4PaRIgVkkjPsq6+bE/I5lGP4lyIJ7uZsSzxvdNIfOiIoe7kPut29wpkji4SNyCZuTOnOXED+WOZ5cJHwYOxbrIBmJQ4nRfktr4y/prgjjYxBfa/eHtVzHg3ndiAz5ppiPqx0HT6Squb9/2/Rrkj2rDO80Cue3c2p7KViBy8ang=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772184949; c=relaxed/simple;
+	bh=WC3wDxJ81RQFU7tnMmVyLM7AnrdfwAVGOYwWBGio0U4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ovuZ0+BobkFwaG54jOdTgBeKi8OFHbkJD+tOeuXTyoSZITPdq5/qvCqIy69zBE1BudXR7emZ6xxfEgj0cgmmjumsoAFvMfuLnDpbZTg1pA3oIEABDLWhSg8G3LqApJ2GRp2CAsug+q5l8JlFeSd7ZzFVm2C4hSUVEsdrlk+Uspk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=isovalent.com; spf=pass smtp.mailfrom=isovalent.com; dkim=pass (2048-bit key) header.d=isovalent.com header.i=@isovalent.com header.b=Mjq9Uh9o; arc=pass smtp.client-ip=74.125.82.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=isovalent.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isovalent.com
+Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-126ea4b77adso2448051c88.1
+        for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 01:35:47 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772184947; cv=none;
+        d=google.com; s=arc-20240605;
+        b=OddiQBVUvTlChvAjcpcvBydq4m7WS8uHp7ypAHatNGyrOMeFJ2QK/j9pNjsJk8ebrF
+         Nc1InlWMz/a/bg7/IhVpX2nOOV29wAgT2qoizveJd5+xs+c3tFsckdapCDoWOpFF1c6u
+         Qt24MnCJZoAnsuggsNqoHPC3c1CUPQtWM1qZTfHItP6ru2EilCl/8a9k/sJ+PXXSgQHJ
+         xj6kniV/dL5qnBU0E01I0kSNoCNbU0cw2NhIcjNCgjmQPvyzKyXpPpUeOyZ0yZT4oBO1
+         MNb0ey6uAV7VpkVX2Hs0uoSIrpd8bAoglMi4779uu3ZudyRrFcJH6f41f56aTcFjAaWW
+         gS9g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=sglaDak+3pSbarmpz4tMjRMwMVnzGXxG34vRHXgczxc=;
+        fh=XLKz1DUt3vYsbHkcwGkmOVYl31rH/Udlqypb4W8ulTQ=;
+        b=d7SLbbPwdFFXmlr4S+4+3C187DaxCM6pwCBdIfcyzNWJtMACl0hxpU5I0Qm3a1+1PG
+         GzilUN65GEQzxZVhaa671rMU/nKD8kGAR5fNie17eUgeKDerq1XbO3okbKt20OX3yCgY
+         p3TzGFYE3wdKzxY5ucGr/Ji/nmh+FKGk9K3lL82G0auVEM7qe6zSkhwKenLEvluWc7oX
+         n2jdgzL+fPgU7iaE/wQeFRfHxZo6i67FCLDrncOakR0J+30fpEvteGxicigZBDeAJpuX
+         AVMSj9xG0RCJZh8gzizat3GoI+D6rZTo61FSu5pQhLTjPqOhHcMtlEqRKvnDxtMj+vUk
+         XrLg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=isovalent.com; s=google; t=1772184947; x=1772789747; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=sglaDak+3pSbarmpz4tMjRMwMVnzGXxG34vRHXgczxc=;
+        b=Mjq9Uh9o7vmLc+tCnCsDYVuGkSxtzRkfwgiYZ1SUArfcWh26b+edmJy3oUbIUXfVC/
+         GqMPhK+XPKS5B9RxVN2bzxBf5a9A1AHojBVSUBC0jBg2Dc5Qy9hZO0qrnDrdmSvRGXLb
+         4wvJsQ8rg4AsP68f4DeY349Tb7u8ppLUMK3Goda36L33eh7hArFQcsLPDeCAbDYL9h5f
+         +fTk+q5aIZ0ISUk4xl9XPizUV0eVeKVIwK/npxHspNTe82aIU3068HPuRL2iyQ3s1OQK
+         jzXUDoryEciOBx5uW/fjQ6fiB49sVcPaWxjlBjRgTKTlDp0P514Zr9WuGyIOAvYPK7wA
+         GXkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772184947; x=1772789747;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sglaDak+3pSbarmpz4tMjRMwMVnzGXxG34vRHXgczxc=;
+        b=klj7rXfCF8iGEBcGm8XfltN0uXHmH56RDD5D1oqKSb7Z8dmo8xIP4XdANa7EbVEfJI
+         a7EnLtVi6fnpOVHcqk/5Lq+7CZVX9wA9I3VXrNKZpCHmZHzDp8bMxBXT/5kB+fXE4Kn7
+         XmxFqxkwxDy4kaCTj3dEAqChwIvh8fPRwS26Ynr4jPRvOlUfhU/XSheRpGQjWi7AX7Pf
+         UQghXIrCn/JeEGAzTLdC/f5CRAIsSA5xoAuIV/j2Ing+ni4+D7O7a42zPIBXClzCUScK
+         RhyA2t7vcZmo7zt4hLVK3s/EIcoaXL/3AJ2/8P344/iQm1hXnlVQCescNg64wKWmmH00
+         8/eg==
+X-Forwarded-Encrypted: i=1; AJvYcCXTp9lFTuS5qZnt6jKoZLdiJHe5cLd0EXeeNMHZHPKh9XrslmmQvCsRzpjY4JTlb+ngR3VRfd0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyORdjl7R8gpbQOy1mUBUchUoN6eJ0qaV7naxJkYKkHNxTZwWzi
+	Xtw9WRafmXS41Y+JNT3234GxI9xZlhFW0hKNOLqXA1/VdUkPHaCNk6XQNqYT65/OX5W4IITC1WI
+	wSz4gyrcwsght1QxQRzqsuSfZDSlo6kJaZRp3uyWKRg==
+X-Gm-Gg: ATEYQzy83NH+sLytNiBroIyMOxvZcuiuAeKAx77xdpcdWAj93xf1JHzNFYAA1k3cUAp
+	Xa02nvhdPEXDnKxvW7XOrG/F+aXciyb9LkmAWITEJT30L8u/ljHi/y9+n/ty1NSFdVvw7dyj81o
+	vqrwM+0uOto8SV3r1XWKQ8TNCTApDHZFp9G00iTugAgpEsxCfHCN6i1fJUT2jsp8KtBWVkDBDb4
+	rAIUOpMG8kvr6/k/pLfniq6JN5pU2sWHd7Oay6L0YQ1GrEx0mPaN/WYkfzvoQz4d6J4twBEPOu4
+	24aFKmtmdDokx/qbZdwWWIQqaWzXLchOIkb8jZiVusM8by9kbtVEqIQx+pgwGTGVEPEzDTateOD
+	zn11LDmqhsdLgjr4Ennp4WpBA
+X-Received: by 2002:a05:7022:e16:b0:11b:82b8:40ae with SMTP id
+ a92af1059eb24-1278fb9c7a4mr944729c88.18.1772184947030; Fri, 27 Feb 2026
+ 01:35:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260227035300.2628494-1-kuba@kernel.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+References: <20260226201600.222044-1-alice.kernel@fastmail.im>
+ <20260226201600.222044-13-alice.kernel@fastmail.im> <20260226173036.56efc7ef@kernel.org>
+In-Reply-To: <20260226173036.56efc7ef@kernel.org>
+From: Alice Mikityanska <alice@isovalent.com>
+Date: Fri, 27 Feb 2026 11:35:30 +0200
+X-Gm-Features: AaiRm521pSWk4eS_rZ6V3ttARBUnb5uGRXMUuQiAo1mnNnIbHAtntIyYL3-TwYY
+Message-ID: <CAD0BsJUVtPyRj=Zv3___cs6hh9G_A0q3bLHGMJ+hU8FZc9b8ww@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 12/12] selftests: net: Add a test for BIG TCP
+ in UDP tunnels
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Alice Mikityanska <alice.kernel@fastmail.im>, Daniel Borkmann <daniel@iogearbox.net>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Xin Long <lucien.xin@gmail.com>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, David Ahern <dsahern@kernel.org>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, Shuah Khan <shuah@kernel.org>, 
+	Stanislav Fomichev <stfomichev@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-9.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[isovalent.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[isovalent.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261785-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261786-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	URIBL_MULTI_FAIL(0.00)[j66a10360.sqa.eu95:server fail,linux.alibaba.com:server fail,tor.lore.kernel.org:server fail,linux.dev:server fail];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_CC(0.00)[fastmail.im,iogearbox.net,davemloft.net,google.com,redhat.com,gmail.com,kernel.org,blackwall.org,lunn.ch,strlen.de,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[alice@isovalent.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[isovalent.com:+];
+	NEURAL_HAM(-0.00)[-0.997];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[j66a10360.sqa.eu95:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:url,linux.alibaba.com:dkim]
-X-Rspamd-Queue-Id: A8D6B1B566E
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid,isovalent.com:dkim]
+X-Rspamd-Queue-Id: 7F9D21B56C4
 X-Rspamd-Action: no action
 
-On Thu, Feb 26, 2026 at 07:53:00PM -0800, Jakub Kicinski wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> 
-> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
-> ---
-> net/smc: transition to RDMA core CQ pooling
-> 
-> This commit refactors SMC-R completion handling to use the ib_cqe API
-> and RDMA core CQ pooling, replacing the previous per-device global CQs
-> and manual tasklet polling. The refactoring aims to eliminate scalability
-> bottlenecks by enabling multi-CQ parallelization and O(1) context retrieval.
-> 
-> > diff --git a/net/smc/smc_wr.c b/net/smc/smc_wr.c
-> > index 5feafa98ab1a..4a4924c5cade 100644
-> > --- a/net/smc/smc_wr.c
-> > +++ b/net/smc/smc_wr.c
-> 
-> [ ... ]
-> 
-> > @@ -63,55 +60,52 @@ void smc_wr_tx_wait_no_pending_sends(struct smc_link *link)
-> >  	wait_event(link->wr_tx_wait, !smc_wr_is_tx_pend(link));
-> >  }
-> >
-> > -static inline int smc_wr_tx_find_pending_index(struct smc_link *link, u64 wr_id)
-> > +static void smc_wr_tx_rdma_process_cqe(struct ib_cq *cq, struct ib_wc *wc)
-> >  {
-> > -	u32 i;
-> > +	struct smc_link *link = wc->qp->qp_context;
-> >
-> > -	for (i = 0; i < link->wr_tx_cnt; i++) {
-> > -		if (link->wr_tx_pends[i].wr_id == wr_id)
-> > -			return i;
-> > -	}
-> > -	return link->wr_tx_cnt;
-> > +	/* terminate link */
-> > +	if (wc->status)
-> > +		smcr_link_down_cond_sched(link);
-> > +}
-> > +
-> > +static void smc_wr_reg_process_cqe(struct ib_cq *cq, struct ib_wc *wc)
-> > +{
-> > +	struct smc_link *link = wc->qp->qp_context;
-> > +
-> > +	if (wc->status)
-> > +		link->wr_reg_state = FAILED;
-> > +	else
-> > +		link->wr_reg_state = CONFIRMED;
-> > +	smc_wr_wakeup_reg_wait(link);
-> >  }
-> >
-> > -static inline void smc_wr_tx_process_cqe(struct ib_wc *wc)
-> > +static void smc_wr_tx_process_cqe(struct ib_cq *cq, struct ib_wc *wc)
-> >  {
-> > -	struct smc_wr_tx_pend pnd_snd;
-> > +	struct smc_wr_tx_pend *tx_pend, pnd_snd;
-> > +	struct smc_ib_send_wr *send_wr;
-> >  	struct smc_link *link;
-> >  	u32 pnd_snd_idx;
-> >
-> >  	link = wc->qp->qp_context;
-> >
-> > -	if (wc->opcode == IB_WC_REG_MR) {
-> > -		if (wc->status)
-> > -			link->wr_reg_state = FAILED;
-> > -		else
-> > -			link->wr_reg_state = CONFIRMED;
-> > -		smc_wr_wakeup_reg_wait(link);
-> > -		return;
-> > -	}
-> > +	send_wr = container_of(wc->wr_cqe, struct smc_ib_send_wr, cqe);
-> > +	pnd_snd_idx = send_wr->idx;
-> > +
-> > +	tx_pend = (pnd_snd_idx == link->wr_tx_cnt) ? link->wr_tx_v2_pend :
-> > +		&link->wr_tx_pends[pnd_snd_idx];
-> > +
-> > +	tx_pend->wc_status = wc->status;
-> > +	memcpy(&pnd_snd, tx_pend, sizeof(pnd_snd));
-> > +	/* clear the full struct smc_wr_tx_pend including .priv */
-> > +	memset(tx_pend, 0, sizeof(*tx_pend));
-> >
-> > -	pnd_snd_idx = smc_wr_tx_find_pending_index(link, wc->wr_id);
-> >  	if (pnd_snd_idx == link->wr_tx_cnt) {
-> > -		if (link->lgr->smc_version != SMC_V2 ||
-> > -		    link->wr_tx_v2_pend->wr_id != wc->wr_id)
-> > -			return;
-> > -		link->wr_tx_v2_pend->wc_status = wc->status;
-> > -		memcpy(&pnd_snd, link->wr_tx_v2_pend, sizeof(pnd_snd));
-> > -		/* clear the full struct smc_wr_tx_pend including .priv */
-> > -		memset(link->wr_tx_v2_pend, 0,
-> > -		       sizeof(*link->wr_tx_v2_pend));
-> >  		memset(link->lgr->wr_tx_buf_v2, 0,
-> >  		       sizeof(*link->lgr->wr_tx_buf_v2));
-> >  	} else {
-> > -		link->wr_tx_pends[pnd_snd_idx].wc_status = wc->status;
-> > -		if (link->wr_tx_pends[pnd_snd_idx].compl_requested)
-> > +		if (tx_pend->compl_requested)
->                     ^^^^^^
-> 
-> Does this read the correct field? The code above memsets tx_pend to zero,
-> so compl_requested is always 0 and complete() is never called.
-> 
-> The refactoring created a local copy pnd_snd before the memset:
-> 
-> memcpy(&pnd_snd, tx_pend, sizeof(pnd_snd));
-> memset(tx_pend, 0, sizeof(*tx_pend));
-> 
-> But then it reads from the zeroed tx_pend instead of pnd_snd. Should this be
-> pnd_snd.compl_requested instead?
-> 
-> This affects smc_wr_tx_send_wait(), which sets compl_requested and waits for
-> the completion that never arrives, causing LLC message timeouts.
-> 
+On Fri, 27 Feb 2026 at 03:30, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Thu, 26 Feb 2026 22:16:00 +0200 Alice Mikityanska wrote:
+> > +     ip netns exec "$SERVER_NS" netserver 2>&1 >/dev/null
+>
+> I'm assuming you want to suppress both stdout and stderr?
 
-Nice catch! It should indeed be pnd_snd.compl_requested here since tx_pend has been zeroed.
-Will fix in v2.
+I think I only wanted to suppress stdout (speed stats, etc.), but
+still see any possible errors from stderr. To be honest, I don't
+remember why I had the stderr>stdout redirect then (I see I don't have
+it with the netperf client). Thanks for pointing it out, let's
+probably keep `> /dev/null` and drop `2>&1`.
 
-> >  			complete(&link->wr_tx_compl[pnd_snd_idx]);
-> > -		memcpy(&pnd_snd, &link->wr_tx_pends[pnd_snd_idx],
-> > -		       sizeof(pnd_snd));
-> > -		/* clear the full struct smc_wr_tx_pend including .priv */
-> > -		memset(&link->wr_tx_pends[pnd_snd_idx], 0,
-> > -		       sizeof(link->wr_tx_pends[pnd_snd_idx]));
-> >  		memset(&link->wr_tx_bufs[pnd_snd_idx], 0,
-> >  		       sizeof(link->wr_tx_bufs[pnd_snd_idx]));
-> >  		if (!test_and_clear_bit(pnd_snd_idx, link->wr_tx_mask))
-> 
-> [ ... ]
-> 
-> > @@ -550,7 +472,7 @@ void smc_wr_remember_qp_attr(struct smc_link *lnk)
-> >  	lnk->wr_tx_cnt = min_t(size_t, lnk->max_send_wr,
-> >  			       lnk->qp_attr.cap.max_send_wr);
-> >  	lnk->wr_rx_cnt = min_t(size_t, lnk->max_recv_wr,
-> > -			       lnk->qp_attr.cap.max_recv_wr);
-> > +			       lnk->qp_attr.cap.max_recv_wr - 1);	/* -1 for ib_draib_rq() */
->                                                                                         ^^^^^^^^^^^^^^
-> This isn't a bug, but there's a typo in the comment: ib_draib_rq() should be
-> ib_drain_rq().
-
-Will fix in v2. Thanks.
-
-D. Wythe
-
-> 
-> >  }
-> 
-> [ ... ]
-> -- 
+> shellcheck points out this won't work, then. 2>&1 has to be last
+> --
 > pw-bot: cr
 
