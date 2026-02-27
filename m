@@ -1,80 +1,83 @@
-Return-Path: <netdev+bounces-261685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261686-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yIF2OroIoWlXpwQAu9opvQ
-	(envelope-from <netdev+bounces-261685-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 04:00:10 +0100
+	id QPKpGdkIoWlXpwQAu9opvQ
+	(envelope-from <netdev+bounces-261686-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 04:00:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 459AF1B225A
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 04:00:10 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6A111B2262
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 04:00:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F20BD30817F2
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 02:59:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B52DE3076B6C
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 03:00:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 281B6302140;
-	Fri, 27 Feb 2026 02:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59263302151;
+	Fri, 27 Feb 2026 03:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N1mMakp/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wuvEMzW5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f202.google.com (mail-dy1-f202.google.com [74.125.82.202])
+Received: from mail-dy1-f201.google.com (mail-dy1-f201.google.com [74.125.82.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD20301037
-	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 02:59:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E8823019C3
+	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 03:00:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772161197; cv=none; b=glnhWzcs0P++DkVOTdhnCWIIel40Pkv4z/Vcu5EnwuWdaMC8ZfYU3/xndkH2lOEKRBvlqHa40qJQrCGxhcw+8JbgLXPxgsPd4A7FxLRxriW4TLzmWpSy3tYoEeGyYVbvneSOFR1Ehyrt1glwU4nrBQBhAs3/ungNMVlwHpqbH98=
+	t=1772161205; cv=none; b=cb3a5TZDID9gQbNKu2KmBrsT36NaAJz7Vmx6vWExGEL/MNVfwsGXSZGdY1BBM1K1qG99FhHIJqzZz78wG8pXmkVxFmGS/qMRlxxpuVgoiqVzBPJLPNyMNbqy4YUP+weRO4zYeJM7YoztG66RWKarbF2Zvx9nG9mUlxSY7BEAq+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772161197; c=relaxed/simple;
-	bh=//7wOODElqYTQiR8nL5gR7HXR2TzZyBl5X8K0sjoxBc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=EoeKDZqelmvEMqFOnoyNTqih6+LFVXl7UIJM68xetSxI6f6kfaSPBvtVyB+/GIoHpzMfvaD+//tHyIP9UAwD7NQQUg6klBLJynHvVqXgUCRmJmSyqhSTBTHUzJRdQgr1ty7dLWqG0Bd21yLBlsENkEclHbbdHp7Oq9MVbnKB3y8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--srutherford.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=N1mMakp/; arc=none smtp.client-ip=74.125.82.202
+	s=arc-20240116; t=1772161205; c=relaxed/simple;
+	bh=5hkSc7MOOP+Ix5AXbXobx1Y0ayCvvlVMxg/JMbz5tJc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=sOtPWWYJN/Speo/qvp0OpAeS5PNcG4Np/gD8ZSvKDc8rkMkx0hB8E7A5j4ZLrNc9n14tHHkWS01reQqH6Dtu3M6Svgngu7+rjV50frju3v4UXS0/PNFkJiq8ZSAzqzYt6btArkka5nTB06RCqxE5nOZThhTyS4Znvcb3mpiyE8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--srutherford.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wuvEMzW5; arc=none smtp.client-ip=74.125.82.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--srutherford.bounces.google.com
-Received: by mail-dy1-f202.google.com with SMTP id 5a478bee46e88-2ba8013a9e3so1565635eec.0
-        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 18:59:54 -0800 (PST)
+Received: by mail-dy1-f201.google.com with SMTP id 5a478bee46e88-2bdd4ce8dc3so23654369eec.0
+        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 19:00:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772161194; x=1772765994; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=C05Mn9JMafI99EWEgRgLLPj/E+g1PjLcWaGlhM4Kvtg=;
-        b=N1mMakp/shPkrt0fOI3qBu/xpT6epAxtg7spoYTucgO6HWxx2rQPUlcI7MC1tBbzeT
-         B4ZA8NNJSAD0fIJEcJIECrv7LjcC/VCpayWnG8jFIvu3t9/cN19VRB754M1s5689lAPA
-         So3c87uL32ag9YFAKDWF4QzXpyiDry4PyRiSswPxSths4Tp9jCqffL3NFO3CojbtdOal
-         bMJIRafZVzSuZXbgF6RLLKu8naV4aKxPjI6uwa+YjY9yen12+C+1uIfGgQkjGYvmNBnU
-         2g9BBGIK2bCDnHwSSvA0pEKpK92Tz6SVa1+Ex4IkF9AHiTJ9q4MK8fju+dW5OHLb7WSL
-         rC8Q==
+        d=google.com; s=20230601; t=1772161203; x=1772766003; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Aag84U4bQMRgEK4LMJHj0ESGi8aRjj2bE+3e30KaXgc=;
+        b=wuvEMzW5GDDo82fRb/xs8DMzQZ3dJlQwuRMfEyyhPriOWUvQsaKJtlkIJjdvqRHIc2
+         fVy+HKRwGBc82DAhE1icQ/IChOi4zKo8eiYuTMfakz3+PDJUn72CytPZ31173LJKkG+n
+         t4zH8Kj5NjcLY87kMD812NjZveVgmFVc25/33n40wqMF8DKu1GWhWHrqZCf1w2PrNHv5
+         mgKGrYs1Ekl2StXznFoKOI7tcYb/L2bh7ZFlZZoTkCnW5N5nXOtL9trpO1UtHy9NHJ78
+         IQwDiN7N8J7Nwe2jJR1SoNR0k4RpQg6igHPiPbGMMEX5Q8fY00J5R+VzN3FdKvFlIFYM
+         2+Ig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772161194; x=1772765994;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=C05Mn9JMafI99EWEgRgLLPj/E+g1PjLcWaGlhM4Kvtg=;
-        b=wvvFu9JKQGsm54PHw9gNd0/Kg3T73MKFXmMMYGfvwGug65fwkZoETddhrHfpMhYARW
-         IkdcFABvYfit3zg2gAWJV4sDH6HnaKM+homMYHDShdd9Oej5ZfBgjJt0FdDmt781/QyT
-         jPnd8d5f7MDB6QwBu70GgQU1aq2KXWBRnPqiA0yufqC7648ctxqVQtcyekXdbc/bGIgH
-         kDCEUNoWBcnw7dlgSBQOMvMChUzOvMVwtNDdVD2Ve4bj+R/GC1sgBURwjnmvoHxTqHjF
-         Tjo29i3Pc+pdnMFTYWrglLa+38N/UsBpH0262zMXyFH8neJQaYeSE9Z3L7gWIkCXUSND
-         49cQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXLmSJpNIcv8R35zWbzOYtAxpW3cCfg499vp21XNANY+nRVYswee2pHeJOD0ech4Jy8yo8cDCc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzV+YS6ENpHeQBgriwPZOoK7jB2UNbSqp2v8tvkWi4PZKYOW61Y
-	aMtm1mBnhmKXT6Ed1g8nmdJgfkp79k2JbHTaMYq/bGb4WpXQuRG3H/JodEyXKPAKMSnkdk5Ojel
-	412YNEze1LakYjNHPkUwkG5KR7w==
-X-Received: from dlbcy24.prod.google.com ([2002:a05:7022:b98:b0:127:1b87:b031])
+        d=1e100.net; s=20230601; t=1772161203; x=1772766003;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Aag84U4bQMRgEK4LMJHj0ESGi8aRjj2bE+3e30KaXgc=;
+        b=KBtPlyFMMQx7OI7nr37VoIf3Ls0tEgZvHfu1ksCTzu+V85eiqxd8xKZ8dteJSTDe1W
+         GlOGzrvkdDoxCpyBnI8/OvoJnDuy3ujJCKYD51lOkryHdJuUn2CnXJfiaMAtp6WKYj1n
+         pfPFr9Jkw08QCYw65B1AdUbil4h0fLYJA2/GsrA7WbzBeek2u8/k60JVgAi7S30wGjG6
+         mKrTD1rO9r6DL6dAloduwzfiEx/zYR6oVi5XHFoX1xBbDRBYlPMYt9SH8M9ADz9FRJ30
+         9VoXVKlwLn+S8VY81RZQLudwQPdlH6uD0CEut36U8G9EoMy7wpKu5PiHNT/12bSu6r3J
+         nmOg==
+X-Forwarded-Encrypted: i=1; AJvYcCVMMWpHcINxwEYLrtyyQRi4LzxfjsrsXylb+Y9Cyz7fzf7/sb+cWI9iopyRNpcUPER+RFhlMC4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxShUftIo1isWp4sHzUP1JmWsBrXQBLTLIXk3XxTsKe84jOaiFI
+	qSnYy9meug3fMPef5hcvltxSQFUP3jmkqJMLMnixpdhbqvQ2ZlGlAgtNjkshaRToGKvc9TfVajz
+	+f2bN9avROHcIBMWiEty/YSa2kQ==
+X-Received: from dybkk8.prod.google.com ([2002:a05:7301:3c88:b0:2bd:b12b:3839])
  (user=srutherford job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:7022:6289:b0:124:a610:62f6 with SMTP id a92af1059eb24-1278fd340a7mr448355c88.44.1772161193541;
- Thu, 26 Feb 2026 18:59:53 -0800 (PST)
-Date: Fri, 27 Feb 2026 02:59:49 +0000
+ 2002:a05:7300:2325:b0:2b8:66f3:2522 with SMTP id 5a478bee46e88-2bde1c0ef97mr761496eec.3.1772161203130;
+ Thu, 26 Feb 2026 19:00:03 -0800 (PST)
+Date: Fri, 27 Feb 2026 02:59:50 +0000
+In-Reply-To: <20260227025950.174755-1-srutherford@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260227025950.174755-1-srutherford@google.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260227025950.174755-1-srutherford@google.com>
-Subject: [RFC PATCH 0/1] IDPF + SWIOTLB Bug
+Message-ID: <20260227025950.174755-2-srutherford@google.com>
+Subject: [RFC PATCH 1/1] Fix header clobber in IDPF with SWIOTLB enabled
 From: Steve Rutherford <srutherford@google.com>
 To: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com, 
 	aleksander.lobakin@intel.com
@@ -91,12 +94,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261685-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-261686-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
@@ -108,33 +111,51 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[srutherford@google.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.989];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.995];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 459AF1B225A
+X-Rspamd-Queue-Id: C6A111B2262
 X-Rspamd-Action: no action
 
-Found an issue with the IDPF driver when SWIOTLB is enabled. The issue
-results in empty headers for packets that hit the split queue workaround
-path. It's caused by a spurious sync in that path. The header is synced
-from the SWIOTLB even when the header was shoved into the payload.
+When SWIOTLB and header split are enabled, IDPF sees empty packets in the
+rx queue.
 
-I cooked up a sample patch, but I'm not an expert in this driver, so I have
-no idea if it's the right solution. It did allow my QEMU VM to boot with a
-superficially functional passed-through IDPF NIC and SWIOTLB=force.
+This is caused by libeth_rx_sync_for_cpu clobbering the synthesized header
+in the workaround (i.e. overflow) path. After the header is synthesized by
+idpf_rx_hsplit_wa, the sync call pulls from the empty SWIOTLB buffer,
+effectively zeroing out the buffer.
 
-The patch was written against COS's 6.12, so I assume that it will not
-apply cleanly elsewhere, but I figured a wrong sample patch was better than
-a long paragraph describing the same thing. My read of more recent kernels
-is that this problem is still present, but could be mistaken.
+This skips the extra sync in the workaround path in most cases. The one
+exception is that it calls sync to trigger a recycle for the header buffer
+when it fails to find a header in the payload.
 
-Steve Rutherford (1):
-  Fix header clobber in IDPF with SWIOTLB enabled
-
+Signed-off-by: Steve Rutherford <srutherford@google.com>
+---
  drivers/net/ethernet/intel/idpf/idpf_txrx.c | 9 +++++++--
  1 file changed, 7 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index 3ddf7b1e85ef..b02195fa2813 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -3007,9 +3007,14 @@ static int idpf_rx_splitq_clean(struct idpf_rx_queue *rxq, int budget)
+ 			u64_stats_update_begin(&rxq->stats_sync);
+ 			u64_stats_inc(&rxq->q_stats.hsplit_buf_ovf);
+ 			u64_stats_update_end(&rxq->stats_sync);
+-		}
+ 
+-		if (libeth_rx_sync_for_cpu(hdr, hdr_len)) {
++			/* Recycle the hdr buffer if unused */
++			if (!hdr_len)
++				libeth_rx_sync_for_cpu(hdr, 0);
++		} else if (!libeth_rx_sync_for_cpu(hdr, hdr_len))
++			hdr_len = 0;
++
++		if (hdr_len) {
+ 			skb = idpf_rx_build_skb(hdr, hdr_len);
+ 			if (!skb)
+ 				break;
 -- 
 2.53.0.473.g4a7958ca14-goog
 
