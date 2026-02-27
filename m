@@ -1,241 +1,170 @@
-Return-Path: <netdev+bounces-261967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261977-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mDs4CMH7oWl4yAQAu9opvQ
-	(envelope-from <netdev+bounces-261967-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 21:17:05 +0100
+	id uCNnA1D+oWl4yAQAu9opvQ
+	(envelope-from <netdev+bounces-261977-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 21:28:00 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67F681BD755
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 21:17:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 609201BD9EE
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 21:27:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D5D8931F55D7
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 20:12:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 91F7430692D3
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 20:23:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27936477997;
-	Fri, 27 Feb 2026 20:11:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68D1C44D695;
+	Fri, 27 Feb 2026 20:23:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="KvnLe+hx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="in37zzSy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f67.google.com (mail-ed1-f67.google.com [209.85.208.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B146472782
-	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 20:11:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43BB438B7C1;
+	Fri, 27 Feb 2026 20:23:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772223071; cv=none; b=gRs2MfwVMQfqTo5u0tbHRol4mNOHYT3HLpGnt86aabYjrMTMrWMZ7YKAvjyuOI7n2xzH8y82Y2/+uus35vM7raSq3ElLe7ZyXqKULf4aMCXUMr4sSPTgaUoUb88CLRg/Gpy7SJE95wEsNxf1kcqL9+T2PlwpWbJO1JzcyMpKtHw=
+	t=1772223818; cv=none; b=HOWkm+RBRdKP3Cpx+hYDMmG5V/1QUheQWnhRMS6pLSImO8GcUxpFo6ZBjlNXvpnNhvfTGZF25wqyHyYcVDxM5XxO5B6/wK+tibzdIhZjtc2sFcO73SYBv7F7JJ+UVhyR2lS5Ly6SoxbE9ZYKWE0lZamX2MD3l9NASAetSFNPxQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772223071; c=relaxed/simple;
-	bh=QzSIfGAK0wUbz+fKdOQHReIUWyKiTXCk/6jtRbFYibQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=jUItfBrNIB4cxWjJEb+dVaIMZmHiD840uvbll8KJvis98zzCdHqPIWGFuv4eM8qylfexSuRkFJuoDDsrfgxvFLM+kAeAdn/Z7YT5f1JS/fwVitTWAfANF31L9/PHbMyy8tyFP59BSMBpXHUBdSyUOkVBCnDEWHTL27o6aq/roR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=KvnLe+hx; arc=none smtp.client-ip=209.85.208.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f67.google.com with SMTP id 4fb4d7f45d1cf-65fa0fbe9fdso4653015a12.3
-        for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 12:11:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1772223068; x=1772827868; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WrCe/NXbUx7RQHF2qacftGJ8uFVJRAsM8E3zSi9beXE=;
-        b=KvnLe+hxT0B6rzDrtdJeSeJ7UBfaRokLri6aMfL4EqRWU0SPBhvcP/lyUlJbYfk7Q/
-         oMWl9gRF50z+ATNEVobA5+r043W2X8SYfKZL7Jj/n158lcXUCEw1Z1+PaEpaBzh5/gwc
-         V6gT7LlDUks6+EWHFKRuhbOA86e8KT1dtSupFbcE1ugXMEMWd0fyYzb3+epdeCgGSGqv
-         DFQa0H7P1I6Xmu1FMC85r485VbxwbN0BHaYIUq+7RHyNbXvKUm55N7SYj2F5SCSnYcp2
-         7rb3dUbTGh/em0brPf732bTVzwrIl6jfnInZiG9G6kV9AjFV+BMWoa0AIpr8DuSDRT7M
-         pfIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772223068; x=1772827868;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=WrCe/NXbUx7RQHF2qacftGJ8uFVJRAsM8E3zSi9beXE=;
-        b=OfKmj1qRdsYFyyIctxEZMKDowPY0sVPufvESIqGSe/iA1Cg8mGQ21S0Hg5/hhZSoIV
-         3bjPQjnTkymz6c54ZxCeWcLgYTWNRs6Z6cNcmPkFyGTkGqIceIYWZTM+Z7KG92Olbmms
-         AtNhXbWUWrvyYwQY81jCYtEIVqbcq/D8Aqb7GcLhYhk6WMnTTymSAjCV9VfggyZxYD//
-         77akVrssUXmZd3h7rZ7HIeQv1X1G5IweDifVFN6FBtkZLlOQaFRc05nmaVvwDcrKYuUk
-         7B0lAyx+Dz8szKIwghcYvFXVED6Fbr0F6D9dSsXKeUz1+C+016/xOYpHLyZZD2GD6ySs
-         QWTw==
-X-Forwarded-Encrypted: i=1; AJvYcCV19qg2s/F3nPx66YeEmkVdXRz6XG2PK6W/4Q+iEmw8pgoO8d572jsBtSKYN8WiVte5YajwXEo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyfFG4KQ9T2jmRBK6V1E4rTh1WW6TNZLVCrzX/jAVZN7XxjUKid
-	3fhtPwx2K6I5Ei1r/h6dfWkYXljo6cNgnVnNn7yLFadLtnFUN/Qojhiksrb4geguNOoLDV5LmtT
-	bXZyciqhYCxjo
-X-Gm-Gg: ATEYQzx+U4/Do/lTau15ZbA+kDEe0Dt+msLYZMhKgDDGfHCHdApd8rOPOWanbPZWUBf
-	BRYXACYyUFj6Hbr16jVXgmLBYyIneR9iNJvBQ4Bg4lw8XeviWvyTQJzDix1ShJOq/f4Qs0mmE+l
-	CyMa3S65rI16uXEfq1++ROgo4Q3PiRQpYxouRAJjtYaMdp3EqeQShW/8h0hEkHtn4kyhrBjpX+/
-	Bt5OteuRmppGAQOF0nUBldXsJ18p7vABtpfcsZ+74QxBmjlH3z1PNvFvFID2mHKnJl1njUNIF+P
-	yETKl78qFXgyG8AqOSM38JLgbPrTSps3jH0d1j2juBqH9J9ukK3RaEWRSMknqMoxcyN///o12nA
-	qUm8X4IYx365wR53IHxN/lXgd6TvrcS3X7nj8P4ycAxgmbDQhT3v/Eb4QTVf6AETh6i1e5S8mXG
-	Hbb9b671O4zsBsMg+HGLn8mt19TSk=
-X-Received: by 2002:a05:6402:3582:b0:65b:e788:5de0 with SMTP id 4fb4d7f45d1cf-65fdd4cc8c7mr2665034a12.7.1772223067682;
-        Fri, 27 Feb 2026 12:11:07 -0800 (PST)
-Received: from cloudflare.com ([104.28.225.185])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-65fabd467d1sm1639567a12.10.2026.02.27.12.11.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Feb 2026 12:11:06 -0800 (PST)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>
-Cc: bpf <bpf@vger.kernel.org>,  Martin KaFai Lau <martin.lau@linux.dev>,
-  Network Development <netdev@vger.kernel.org>,  kernel-team
- <kernel-team@cloudflare.com>
-Subject: Re: [PATCH RFC bpf-next 0/5] skb extension for BPF local storage
-In-Reply-To: <CAADnVQKVfyh3_OZshvYf7GJUF-ph2eMfmaQsxNgwBJd1AJgXTQ@mail.gmail.com>
-	(Alexei Starovoitov's message of "Thu, 26 Feb 2026 13:56:12 -0800")
-References: <20260226-skb-local-storage-v1-0-4ca44f0dd9d1@cloudflare.com>
-	<CAADnVQKVfyh3_OZshvYf7GJUF-ph2eMfmaQsxNgwBJd1AJgXTQ@mail.gmail.com>
-Date: Fri, 27 Feb 2026 21:11:05 +0100
-Message-ID: <87wlzydk12.fsf@cloudflare.com>
+	s=arc-20240116; t=1772223818; c=relaxed/simple;
+	bh=ORNhQA+f5As1svKofS6FajCIQbe9YoKE8GkVfQUGCOc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=C18rZg0RiSTfKAQEBHcSPgYQ7Ly+ETt/S2P7d0UbVpz3mGkGiLSdpx8eKywC8641OvtLAV07dGz8QbTEOqOM5iLPDJIBP8c/THdOJwp1qGH4M4b+pmQ7YWQI6CAQwpEBsjq8Xgm5LInWCiOu8pHKW2iVBdbHh7+0sKramqPBDDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=in37zzSy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E5C6C116C6;
+	Fri, 27 Feb 2026 20:23:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772223817;
+	bh=ORNhQA+f5As1svKofS6FajCIQbe9YoKE8GkVfQUGCOc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=in37zzSyNDRmzaQTF8cASNe5eyrsMY/qybw+Kwtljh77/wJHIMdQ5FFKjEWtRmFa6
+	 b4P3+AhT5B5w97Efs6yezWmIjTNQezZnGzz1HYbCrc5FqhQp+vvBhVH8XJ1pk8Opea
+	 +nB/XPK8sOGGFKQb5jAcba+0e1761Weha0VFoRclk3zUrxo0NNXR8loOCAYYbdKs1F
+	 ACvJ5BU32J1FO8X3MU2Qdal+f8TSZGAi8QRitEP2EVcEeCUt8dw5oeTWLTkttQAK/M
+	 kaP018voC/C+4hgj47WHHhSPsZxtysLyS6yi2TtfRiLKrUFL1FoHeXMOILZF5PMfBB
+	 sLVrGbabsZ9ZQ==
+From: Allison Henderson <achender@kernel.org>
+To: netdev@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	rds-devel@oss.oracle.com,
+	kuba@kernel.org,
+	horms@kernel.org,
+	linux-rdma@vger.kernel.org,
+	allison.henderson@oracle.com
+Subject: [PATCH net v2] net/rds: Fix circular locking dependency in rds_tcp_tune
+Date: Fri, 27 Feb 2026 13:23:36 -0700
+Message-ID: <20260227202336.167757-1-achender@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[cloudflare.com:D:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
-	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261967-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
-	TO_DN_ALL(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[cloudflare.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jakub@cloudflare.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-261977-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,cloudflare.com:mid,cloudflare.com:dkim,cloudflare.com:email]
-X-Rspamd-Queue-Id: 67F681BD755
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,appspotmail.com:email,syzkaller.appspot.com:url]
+X-Rspamd-Queue-Id: 609201BD9EE
 X-Rspamd-Action: no action
 
-On Thu, Feb 26, 2026 at 01:56 PM -08, Alexei Starovoitov wrote:
-> On Thu, Feb 26, 2026 at 1:16=E2=80=AFPM Jakub Sitnicki <jakub@cloudflare.=
-com> wrote:
->>
->> Previously we have attempted to allow BPF users to attach tens of bytes =
-of
->> arbitrary data to packets by making XDP/skb metadata area persist across
->> netstack layers [1].
->>
->> This approach turned out to be unsuccessful. It would require us to
->> restrict the layout of skb headroom and patch call sites which modify the
->> headroom by pushing/pulling the skb->data.
->>
->> As per Jakub's feedback [2] we're turning our attention to skb extensions
->> as the new vehicle for passing BPF metadata. skb extensions avoid these
->> problems by being a separate, opt-in side allocation that doesn't interf=
-ere
->> with skb headroom layout.
->>
->> With the switch to skb extensions, we are no longer restricted by the
->> features of XDP metadata, and hence we propose to extend the concept of =
-BPF
->> local storage to socket buffers - skb local storage.
->>
->> BPF local storage is an established pattern of attaching arbitrary data
->> from BPF context to various common kernel entities (sk, task, cgroup,
->> inode).
->
-> And that list of local storages ends with a solid period.
-> We're not going to add new local storages.
-> Not for skb and not for anything else.
-> We rejected it for cred, bdev and other things.
+syzbot reported a circular locking dependency in rds_tcp_tune() where
+sk_net_refcnt_upgrade() is called while holding the socket lock:
 
-Thanks for the concrete feedback. I appreciate it.
-This saves us from going down a dead-end road.
+======================================================
+WARNING: possible circular locking dependency detected
+======================================================
+kworker/u10:8/15040 is trying to acquire lock:
+ffffffff8e9aaf80 (fs_reclaim){+.+.}-{0:0},
+at: __kmalloc_cache_noprof+0x4b/0x6f0
 
-> The path forward for such "local storage" like use cases is
-> to optimize hash, trie, rhashtable, whatever map, so
-> it's super fast for key =3D=3D sizeof(void *) and use that
-> when you need it.
-> The life cycle of skb already has a tracepoint in the free path.
-> So do map_update(key=3Dskb, ...) when you need to create such "skb local =
-storage"
-> and free it from trace_consume/kfree_skb.
-> Potentially we can add a tracepoint in alloc_skb,
-> so bpf prog can alloc "skb local storage" there,
-> and to clone skb, so you can track the storage through clones
-> if you need to.
+but task is already holding lock:
+ffff88805a3c1ce0 (k-sk_lock-AF_INET6){+.+.}-{0:0},
+at: rds_tcp_tune+0xd7/0x930
 
-That is similar to the workaround we have in place (mentioned at LPC
-[1]).  And it was always our "plan C" to string it together with BPF
-maps. But we wanted to go this way only as a last resort because:
+The issue occurs because sk_net_refcnt_upgrade() performs memory
+allocation (via get_net_track() -> ref_tracker_alloc()) while the
+socket lock is held, creating a circular dependency with fs_reclaim.
 
-1) consume_skb is a very frequent event spread across all CPUs
+Fix this by moving sk_net_refcnt_upgrade() outside the socket lock
+critical section. This is safe because the fields modified by the
+sk_net_refcnt_upgrade() call (sk_net_refcnt, ns_tracker) are not
+accessed by any concurrent code path at this point.
 
-As a happy path it's getting hit 1M+ times/second.  Hit by every kind of
-skb (UNIX, Netlink), not necessarily just those we care about. Even if
-we can keep runtime overhead low, that's wasted effort and potential
-data bouncing issues across CPUs.
+v2:
+  - Corrected fixes tag
+  - check patch line wrap nits
+  - ai commentary nits
 
-$ sudo perf stat -a -e skb:consume_skb -e skb:kfree_skb -- sleep 1
+Reported-by: syzbot+2e2cf5331207053b8106@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=2e2cf5331207053b8106
+Fixes: 3a58f13a881e ("net: rds: acquire refcount on TCP sockets")
+Signed-off-by: Allison Henderson <achender@kernel.org>
+---
+ net/rds/tcp.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
- Performance counter stats for 'system wide':
+diff --git a/net/rds/tcp.c b/net/rds/tcp.c
+index 04f310255692..654e23d13e3d 100644
+--- a/net/rds/tcp.c
++++ b/net/rds/tcp.c
+@@ -490,18 +490,24 @@ bool rds_tcp_tune(struct socket *sock)
+ 	struct rds_tcp_net *rtn;
+ 
+ 	tcp_sock_set_nodelay(sock->sk);
+-	lock_sock(sk);
+ 	/* TCP timer functions might access net namespace even after
+ 	 * a process which created this net namespace terminated.
+ 	 */
+ 	if (!sk->sk_net_refcnt) {
+-		if (!maybe_get_net(net)) {
+-			release_sock(sk);
++		if (!maybe_get_net(net))
+ 			return false;
+-		}
++		/*
++		 * sk_net_refcnt_upgrade() must be called before lock_sock()
++		 * because it does a GFP_KERNEL allocation, which can trigger
++		 * fs_reclaim and create a circular lock dependency with the
++		 * socket lock.  The fields it modifies (sk_net_refcnt,
++		 * ns_tracker) are not accessed by any concurrent code path
++		 * at this point.
++		 */
+ 		sk_net_refcnt_upgrade(sk);
+ 		put_net(net);
+ 	}
++	lock_sock(sk);
+ 	rtn = net_generic(net, rds_tcp_netid);
+ 	if (rtn->sndbuf_size > 0) {
+ 		sk->sk_sndbuf = rtn->sndbuf_size;
+-- 
+2.43.0
 
-         1,132,924      skb:consume_skb
-           410,186      skb:kfree_skb
-
-       1.034636263 seconds time elapsed
-
-$
-
-2) Sizing the "skb storage" maps is tricky
-
-We need to size for the worst case, but the worst case is
-workload-dependent and can change at runtime. IOW, predicting in flight
-skb count is hard to get right. We've got skbs queued in TCP retransmit,
-qdisc backlog, and need to factor in RTT and queue depth to estimate the
-skb life-time.
-
-We'd probably have to arrive at the "right size" empirically.
-
-
-So to exhaust all alternatives I gotta ask - would you and Jakub be open
-to the idea of a plain byte buffer embedded in skb_ext and exposed as a
-bpf_dynptr?
-
-#define BPF_SKB_META_DATA_SIZE  64 /* make it build-time configurable */
-struct bpf_skb_meta_ext {
-    char data[BPF_SKB_META_DATA_SIZE] __aligned(8);
-};
-
-Perhaps by reusing the existing bpf_dynptr_from_skb_meta to give access
-to a "secondary metadata" storage backed by skb_ext.
-
-bpf_dynptr_from_skb_meta(ctx, BPF_DYNPTR_SKB_EXT_F, &meta);
-
-To be fair, the whole BPF local storage approach was never suggested by
-Jakub, only skb extensions. That missed idea is on me.
-
-IOW, what I'm wondering is if you're against a side storage in skb_ext
-in general or just plugging BPF local storage there in particular?
-
-Thanks,
--jkbs
-
-[1] slides 57, 62 in https://lpc.events/event/19/contributions/2269/
 
