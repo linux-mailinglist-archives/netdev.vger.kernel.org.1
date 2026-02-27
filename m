@@ -1,65 +1,84 @@
-Return-Path: <netdev+bounces-261899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261900-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wF8KIYm6oWlhwAQAu9opvQ
-	(envelope-from <netdev+bounces-261899-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 16:38:49 +0100
+	id yNV8DXm6oWlhwAQAu9opvQ
+	(envelope-from <netdev+bounces-261900-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 16:38:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D619A1B9F50
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 16:38:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EDE41B9F40
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 16:38:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1CF6330FF3D0
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 15:31:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C5E5531C1A87
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 15:31:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AF5B329C5F;
-	Fri, 27 Feb 2026 15:31:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF0793242CA;
+	Fri, 27 Feb 2026 15:31:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="oAWAh2Zi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="naHGGDHp"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFEA0328B78;
-	Fri, 27 Feb 2026 15:31:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BF2232825D
+	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 15:31:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772206272; cv=none; b=uWgiW9EPDOyMz0YtPc8UjIGPyqvOOawcK2oYVbGFVay9ZcEwjSGcVPzXREqBcke/87IasDRTVpuijqKS2L5UYeTlpfkTbjULFcbT6tcM/whNXUZHOnr7A5b76HX2r1i1RQ8Bn9cWYkqGDvh789NWltW3fcj0I4rF+TDU/4QQGNs=
+	t=1772206282; cv=none; b=GGU4gGp9bTOehza+18NsRZrpVE4UfTnYWM3WsgAcEeN1lrViTcn7sbhUi3X4ys+m6ckxPscuGhakCeRJWm6lpqBKerKBAe0PlqdrRto4TXCrVmdqWS2tH0RCw744ka5QYl5RhaaNHLEcN9hVIjaZDhdfkEso+mJ5Cw3e3L1i6kA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772206272; c=relaxed/simple;
-	bh=qTfRubKpkYTZtqck1sHTwItRDcKNALL/wlr3aOAdANY=;
+	s=arc-20240116; t=1772206282; c=relaxed/simple;
+	bh=TNIuemAFwWjgXBX8kMH62ik4iFwTOdB85BxIp9iTq4w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hjz5FOEsQaPX/H1MOykuYRlZ+FhulJjwcHt/AKhfAHgJ9dbB+b141uvR0Frm+hniQo7H3q/LKNZXjNi7V8T//fjVBOldsIYtFPfpYADxNNAM0SNgYVMwBKvS1CLTo8u6sFUhl4aXR6+lbuqsiO9wezngWDgOxIrB3dA6xpKC4Cw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=oAWAh2Zi; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=jQYmtftgY0RX16tXlqwd88/gJleQAzTbD+On33MM1a8=; b=oAWAh2ZiVjiMgVk8Slge/IOIaN
-	A0iQ7hBunYzni7w8Ng0FoIrmJ8RE1VIdtUo/FVCZ2X1IfkDN4o6S1IHt4gZH4/V0V6uoOyInUr+pY
-	u1Ewmr6fufghZoByBUwkrfeyFL0NP/FgUcfTtJfzTUYjRxatzEjr75ZBomUxHIxMwh1FK0yKC7ugj
-	AU/gxAzceHRHqiHlaGJSD6u8YcoKG+f90jJ1XBABWgMtCVX0qKofWWS7b5489g2uas7cnJuogPSJM
-	e09RC5oMf6AAhIwphJUFYAxFULfUqIQrc8lYFeGebgE0q9+aB/Wh0xxlwQQM3FBGza5npmdIitNtK
-	5vQLIGtg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53922)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vvznw-0000000010A-2fKv;
-	Fri, 27 Feb 2026 15:31:00 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vvzns-000000003B6-2IHF;
-	Fri, 27 Feb 2026 15:30:56 +0000
-Date: Fri, 27 Feb 2026 15:30:56 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Vinod Koul <vkoul@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=f6LokujOES4Q8MSfIOGoTUcMn/Xo/XIR+YjLhGB9FGD8mQQn5G6BmZG1AnLjzCPaehWOc5C5jWI9gEoGgDo7KutpDQrynGEjzRQpXmdPT5wjchU5PJ8Ml81lRTwW+83+IyCfoMvJKaK59+xk6Y+ilKgIQs6OhRKvG7sgZ3EIDs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=naHGGDHp; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-437696cc5a5so133340f8f.2
+        for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 07:31:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772206279; x=1772811079; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=P2kGl/nxca3gMElmPgWClDsdWOdb0++gHklmfXh1TOU=;
+        b=naHGGDHpOiI+5/JqLdM5XQ0BiJEWf2s9SqwT9KZTEhKU9CfMQnm8azB8L7jFqu9DKx
+         IcEJtGVh4rT6EX8PBYmdgd/+89OHU8LQuI3vMGDShJSueSckzTCPboaGMvzjGhKcs2tk
+         M0MPIBgbor8+ubWe9M4XC7vsBuv8cPuLfxGyTLgJHrJRU/oCeHqdz5U6DpaJj03jlYRG
+         eKCG92ffwWpqBftt4ORQD8NZz65nH/L4g9Y6MmZnk8jHiJAFYPzGbWtzxHOhDQOGoMqM
+         lEZDUGsW86yxK+2lwOf108GbruKktt050RGHNgwb96EMzrw4z2rRDt9gS+NlIn0QEWZc
+         bfUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772206279; x=1772811079;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=P2kGl/nxca3gMElmPgWClDsdWOdb0++gHklmfXh1TOU=;
+        b=m38FHJfFZZRt1VO/HoNgLxtQx0xJDLdpqpEIaU+bOxp2J6K4FopDHl43zEKZgsdzhp
+         a9BIPZ0L5Wb8X9hWIyLYS3txjlP25qtErm6f1I+6PV52LVuUVAdbsMjbpFz/WLuB3cng
+         Gi7/z7jwiNWl6mLAUmL61ijgZWneo7soA5fJsP8qqNFEWfC6LpvcYfv7VXDGGaG9pz6C
+         N0hjP11r5DNh+NTYMaGVsZTNiQBeJH9CNPHn2WLwpXx7RhjAx5r2ETIVozywbz8s+vRa
+         Mcps3RvVfYLFsA6Fr6LY/3YAAPIiDmPLAdpWAP+Aq0u28L7zWm0oxypuZSYJjr4EbRE7
+         Je0w==
+X-Forwarded-Encrypted: i=1; AJvYcCWFky/FtHlrZneavgm07qkiH6UfcVar4ZdMKMRlqkfycddS2VY7jshuLIqE993gZQlZu0sw2sw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yysy7j7e5MtOM6OwUlmGAhIxEeqYoqW+P7lNEtMjIJkM2GPwcyU
+	S5p8qKg+gFfJy8C/kj2GJFQlptjxZB2UBjvKHwKLv6ltgJXASy+GsHAT
+X-Gm-Gg: ATEYQzwdin4qheMPU3FQE6GYFqLMLr0JT4hphTM5NYb+VESVhyabuFGiDnY6Mrsv8Ip
+	qikkzsnI4kThUzvBb9F90Q+b6Jt047lq5PfvBEczsiR99Uq+mf9AL01/zUvqQmfqzjkxZE/mEbE
+	wPxurcBLM2upyV8YAfjOs0tTFy6Gn08ZIxfar70PI+jydC9K2u9DWuT7+yFBE/DQCIS+WQhIAGN
+	RtvmoIaTYWq9o0345ua25n0DgM5g2KyEY7SDQiBd3XqK6YRvs16dEl6D4YsphAM83vxhCCUkapm
+	dyj6+xW0EfWC3TxidRTQVIPYZzEgbecJQ4utadtlKzffivUz2FfJ3tFqMHpDetE1m0VnE20vhdt
+	v+W+AxawJNXErmQHpGtak74GxyBnM2FF7kErLWaYFAdD5q9f7Em5LeoU18dTvGOtbrlKHagtQj1
+	FGQ594T1/orfbYrA==
+X-Received: by 2002:a05:600c:5249:b0:477:a478:3f94 with SMTP id 5b1f17b1804b1-483c9c29b66mr31520385e9.5.1772206278424;
+        Fri, 27 Feb 2026 07:31:18 -0800 (PST)
+Received: from skbuf ([2a02:2f04:d608:3a00:ac95:d4c:390e:fb0a])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bd70e692sm230573145e9.7.2026.02.27.07.31.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Feb 2026 07:31:17 -0800 (PST)
+Date: Fri, 27 Feb 2026 17:31:15 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>,
 	Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -70,100 +89,73 @@ Cc: Vinod Koul <vkoul@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
 	linux-stm32@st-md-mailman.stormreply.com,
 	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
 	Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 0/9] net: stmmac: qcom-ethqos: further serdes
- reorganisation
-Message-ID: <aaG4sBQysN0Z94E3@shell.armlinux.org.uk>
-References: <aZ66OT9scKipRRu2@shell.armlinux.org.uk>
- <aZ66uXCwGgH7B_A-@shell.armlinux.org.uk>
- <aaGgWUpM2A5y11Wh@vaman>
- <20260227152707.k5lobznug3xxxc7h@skbuf>
+	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
+Subject: Re: [PATCH RESEND2 net-next 8/8] net: stmmac: qcom-ethqos: remove
+ phy_set_mode_ext() after phy_power_on()
+Message-ID: <20260227153115.rk7ntq2p4fbjcqdv@skbuf>
+References: <aaDSJAc-x2-klvHJ@shell.armlinux.org.uk>
+ <E1vvkUX-0000000AuPo-3mEw@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260227152707.k5lobznug3xxxc7h@skbuf>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <E1vvkUX-0000000AuPo-3mEw@rmk-PC.armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261899-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261900-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.078];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,shell.armlinux.org.uk:mid,armlinux.org.uk:url]
-X-Rspamd-Queue-Id: D619A1B9F50
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,qualcomm.com:email,nxp.com:email,armlinux.org.uk:email]
+X-Rspamd-Queue-Id: 8EDE41B9F40
 X-Rspamd-Action: no action
 
-On Fri, Feb 27, 2026 at 05:27:07PM +0200, Vladimir Oltean wrote:
-> Hi Vinod,
+On Thu, Feb 26, 2026 at 11:09:57PM +0000, Russell King (Oracle) wrote:
+> The call to phy_set_mode_ext() after phy_power_on() was a work-around
+> for the qcom-sgmii-eth SerDes driver that only re-enabled its clocks on
+> phy_power_on() but did not configure the PHY. Now that the SerDes driver
+> fully configures the SerDes at phy_power_on(), there is no need to call
+> phy_set_mode_ext() immediately afterwards.
 > 
-> On Fri, Feb 27, 2026 at 07:17:05PM +0530, Vinod Koul wrote:
-> > On 25-02-26, 09:02, Russell King (Oracle) wrote:
-> > > Note: only 8 patches in this series, not 9 as the subject line says,
-> > > as the set_clk_tx_rate() patch became part of the first series.
-> > > 
-> > > On Wed, Feb 25, 2026 at 09:00:41AM +0000, Russell King (Oracle) wrote:
-> > > > This is part 2 of the qcom-ethqos series, part 1 has now been merged.
-> > > > 
-> > > > This part of the series focuses on the generic PHY driver, but these
-> > > > changes have dependencies on the ethernet driver, hence why
-> > > > it will need to go via net-next. Furthermore, subsequent changes
-> > > > depend on these patches.
-> > 
-> > This lgtm, can we get signed tag so that we can pull this into phy tree
-> > as well
+> This also means we no longer need to record the previous operating mode
+> of the driver - this is up to the SerDes driver. In any case, the only
+> thing that we care about is the SerDes provides the necessary clocks to
+> the stmmac core to allow it to reset at this point. The actual mode is
+> irrelevant at this point as the correct mode will be configured in
+> ethqos_mac_finish_serdes() just before the network device is brought
+> online.
 > 
-> I think this series is obsolete. It has been superseded in the netdev
-> patchwork by:
-> 
-> [PATCH RESEND2 net-next 0/8] net: stmmac: qcom-ethqos: further serdes reorganisation
-> ├─>[PATCH RESEND2 net-next 1/8] net: stmmac: qcom-ethqos: move ethqos_set_serdes_speed()
-> ├─>[PATCH RESEND2 net-next 2/8] phy: qcom-sgmii-eth: add .set_mode() and .validate() methods
-> ├─>[PATCH RESEND2 net-next 3/8] net: stmmac: qcom-ethqos: convert to use phy_set_mode_ext()
-> ├─>[PATCH RESEND2 net-next 4/8] phy: qcom-sgmii-eth: remove .set_speed() implementation
-> ├─>[PATCH RESEND2 net-next 5/8] phy: qcom-sgmii-eth: use PHY interface mode for SerDes settings
-> ├─>[PATCH RESEND2 net-next 6/8] phy: qcom-sgmii-eth: remove qcom_dwmac_sgmii_phy_interface()
-> ├─>[PATCH RESEND2 net-next 7/8] phy: qcom-sgmii-eth: relax order of .power_on() vs .set_mode*()
-> └─>[PATCH RESEND2 net-next 8/8] net: stmmac: qcom-ethqos: remove phy_set_mode_ext() after phy_power_on()
-> 
-> (with which it is only partially overlapping)
-> 
-> I guess you should give your Acks there as well.
+> Reviewed-by: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+> Tested-by: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
 
-No need. Looking at PW, it seems patch 7 has AI review issues, so will
-need to be re-sent - although I can't fathom what the AI found in patch
-7. I've already added Vinod's acks (since they were just resends to fix
-botched sending, no actual changes in the patches themselves.)
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
