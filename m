@@ -1,321 +1,242 @@
-Return-Path: <netdev+bounces-261760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261761-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GJwfJ4tSoWkfsAQAu9opvQ
-	(envelope-from <netdev+bounces-261760-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 09:15:07 +0100
+	id QKADMAJToWkfsAQAu9opvQ
+	(envelope-from <netdev+bounces-261761-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 09:17:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 449391B456B
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 09:15:07 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EC6D1B45D5
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 09:17:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AB9A93027046
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 08:15:06 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6648430514BF
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 08:16:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 934D137BE8F;
-	Fri, 27 Feb 2026 08:15:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18CAC37106D;
+	Fri, 27 Feb 2026 08:16:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="OZbhvfz8"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="HLS2oM6Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D36636E46B;
-	Fri, 27 Feb 2026 08:15:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772180104; cv=none; b=HeSRVrE/NLSdyC/EBIHnjx18kgD7ot1Rm/ClDApLN40z3sZjel4qmB2HSYNeseeJ91BZ2BLePWuF+TJs5WHwPPPqKGvKMtFg4DKabNP5gE+1LiWXZlIIzZy+1IuKm8AI2NHTXMJugjCMFdW/Im1+Iuc3WeSakPfnta+uymZDohc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772180104; c=relaxed/simple;
-	bh=2bxa/GNfxH37kEAfxhUGoEJSQnU9bLrykRAZ963D8uE=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=g8+WttgpI5KeUSv87vHoqzUqPnkY/Dds9NmFBycADMwp9so+in7/dJQUksOrZ7nxr6QFBY04pD7GhFaDJTX8LdNS4L+IiPLZqqu/qlfxqIMupT44hq6wNoem/H3w7p+AUGQgvjG3xckG9MEPXL7MMirHEmQ01Ta6g9xIyhhipJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=OZbhvfz8; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1204)
-	id B674A20B6F02; Fri, 27 Feb 2026 00:15:02 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B674A20B6F02
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1772180102;
-	bh=f6kjGf+6SmYvSYhEaVCQKRvHv84N5G5n7QGsPjGevtg=;
-	h=Date:From:To:Subject:From;
-	b=OZbhvfz8eKR/k8aHJ5l+0a4TqNxdPqvVTCFoXjvdUieY5CNYXRXuCFWQkudU0wonp
-	 SZacUBk6H1nEq1FIzIAB7XSuqo19A3jj55rs9bLnPJceTPut1oMBjAb1Db4BwvcUHT
-	 AiSOWOCn1Q1NKgGcu9SonU8Fr1HHFtsxeNNtLBK8=
-Date: Fri, 27 Feb 2026 00:15:02 -0800
-From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-To: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	leon@kernel.org, longli@microsoft.com, kotaranov@microsoft.com,
-	horms@kernel.org, shradhagupta@linux.microsoft.com,
-	ssengar@linux.microsoft.com, ernis@linux.microsoft.com,
-	shirazsaleem@microsoft.com, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, dipayanroy@microsoft.com
-Subject: [PATCH net-next, v2] net: mana: Trigger VF reset/recovery on health
- check failure due to HWC timeout
-Message-ID: <aaFShvKnwR5FY8dH@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010011.outbound.protection.outlook.com [52.101.201.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A250630FC2E;
+	Fri, 27 Feb 2026 08:16:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772180185; cv=fail; b=thsXG2k5numlFRoVl0MOjHbD9e7Tl6rqPgd7huDaWtCTZ6fYGCQH36VA7P2RDdmHjXqi75AAzpmyYd2Y3OgHbxdZ+2vRU3OEZm1/z+qjDcJ2+aCz9fQxGi5b9kMEbmuimzshY5YJtXIjNW49hU8GAjjF11rr3OU28HgOiXSVwks=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772180185; c=relaxed/simple;
+	bh=P5ccCvYpAiRp4XMmQRVoeXRIaiAqA47irD50XcjpxtM=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=E0L9gLm335yXMV88HyMuah0y9IG0ZVoV9/vs82GAzCBS7LWck5zrsbfSDPnsfM0iiRFrch1WDDj7SleGbUNXC/td2LFqBoctrw2nyWxFSNDdqNA+h2fIAictBO7fIuzkmdVnPdL1gIPwLCNAMBqXHAjgM8yEPs76ewA+WVxZ3AM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=HLS2oM6Y; arc=fail smtp.client-ip=52.101.201.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=uJieOIZIPJzbCchHrjR2DRw8upBqQK1a/IfUANcvO6hYXndwWrItGzCzLk4gLxyvKRFxbLd6Ny4fJc6/EqCQ95ZLYUPMv9ydRKc5gm7WLYipuThBVBZWwm6FVNrxZpStgWlctXuv279LlSxoHtPX3jG+eRRdWFVpYgENkETKjv8At6eS7FiUfU0sCOXz1ScGMNrxdq1vATQbI4PO7ojYu2p5PDbX2zQ3/EN9lY72hdhqVf2RwPuErND+u0tCPnwa0ED6pmEAsn6AHYfpCoIp3Ld8ZhhlV/AqPhJqLshayJt5f7+9zVNzVXfu9+s/IVYtqWjguSUXQex55pBRspfnrw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Y0GvZ94LsbIvdzkg30/vvx2NxMJIzNexPBR7Q8OOKm8=;
+ b=VJmHP08aod0UKvLBD23YD8s1b3j1ijbrfg9MiMfH/E2BILQhR29gtcBDpB3IdAEH7fdNXwapykoptDWnE8zs3cx/+0BAXl1HXCZsWXF5FRkPjfzcBmNR1PDjF+tKCBxEstfiDOAW1RGbf26A1U0QOokVeqRCmgMn5jcKpf1KlGpq/nlG+lkXS3h9IneIE14qHNfni+PjFaR7axh8yNGtPtpB3Ha5yg6baPyGAbEHEoamEty/ciQ8k6ZAKn3OpdzZwmdmoihGosUmtjbOxsmWXg7IPXJacqJbKuM4HQOliKUEQQ4fCjHGM7YRzXXZAxBpXP+99ihoHiwS3/ps+dVYsQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Y0GvZ94LsbIvdzkg30/vvx2NxMJIzNexPBR7Q8OOKm8=;
+ b=HLS2oM6YHj78oxFBtIRCBAT0ielEsM5gp2mfwaBUwwpzmPIQ5cJ9/1KLQ0+RDm8cz1+l1+2UEV6kqkEfgibec+HYAIVMfQQlYzHDtty7Sm13KUEJJTF7SPke3y/SBzCJEhzVPatkfuCSLIwO6nPk0ArBoaKQ18rFozmaWFtEvg02zlBtG+rBIybHbr9wY4fZPMyueknNw8zv2CVVhBDnLM/BaHJdwNP94PxBVNZcgKrO8WBKsLoMd6fYDGvSmC/L/gBU2arBoFclxI+/JCxauKsYTBE03B+a+VNWileRQRtqFJsWug/1eGZoM17UXtKVspcfj46RCBmiWQpogzS+2g==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from IA1PR12MB7541.namprd12.prod.outlook.com (2603:10b6:208:42f::13)
+ by DM4PR12MB7671.namprd12.prod.outlook.com (2603:10b6:8:104::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.14; Fri, 27 Feb
+ 2026 08:16:07 +0000
+Received: from IA1PR12MB7541.namprd12.prod.outlook.com
+ ([fe80::4445:7716:8576:62c7]) by IA1PR12MB7541.namprd12.prod.outlook.com
+ ([fe80::4445:7716:8576:62c7%5]) with mapi id 15.20.9654.014; Fri, 27 Feb 2026
+ 08:16:06 +0000
+Message-ID: <6391499b-d665-466a-a4df-b3d0b4921e28@nvidia.com>
+Date: Fri, 27 Feb 2026 10:16:00 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/4] PCI/MSI: Conservatively generalize no_64bit_msi
+ into msi_addr_mask
+To: Vivian Wang <wangruikang@iscas.ac.cn>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+ Alex Deucher <alexander.deucher@amd.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Bjorn Helgaas <bhelgaas@google.com>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>, Brett Creeley <brett.creeley@amd.com>
+Cc: Han Gao <gaohan@iscas.ac.cn>, Thomas Gleixner <tglx@kernel.org>,
+ linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+ amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+ netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-sound@vger.kernel.org, linux-riscv@lists.infradead.org,
+ sophgo@lists.linux.dev, Takashi Iwai <tiwai@suse.de>,
+ Maor Gottlieb <maorg@nvidia.com>
+References: <20260129-pci-msi-addr-mask-v4-0-70da998f2750@iscas.ac.cn>
+ <20260129-pci-msi-addr-mask-v4-1-70da998f2750@iscas.ac.cn>
+ <fb23d54a-fca0-43a2-ae1d-03ae52112192@nvidia.com>
+ <c9329ae2-721d-4127-9380-b1ea454bd8f2@iscas.ac.cn>
+Content-Language: en-US
+From: Mark Bloch <mbloch@nvidia.com>
+In-Reply-To: <c9329ae2-721d-4127-9380-b1ea454bd8f2@iscas.ac.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR0P281CA0252.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:af::14) To IA1PR12MB7541.namprd12.prod.outlook.com
+ (2603:10b6:208:42f::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR12MB7541:EE_|DM4PR12MB7671:EE_
+X-MS-Office365-Filtering-Correlation-Id: a84e08db-4c3f-433d-bc96-08de75d874bf
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|921020;
+X-Microsoft-Antispam-Message-Info:
+	fpzdURIRXwUCpTnVZ/zeklUKfb7AJtI4zWuDuv19kcgTkpu1hhONXNDuM01R8wGq9OizN+ncACddFCicyNuWJUJlN5hrNaOuBl7xmAyQqVsEK2lUlw9ysoTr8rbTEf7W+3hM37Z9rImZal7bRMYymCoLzYtAnRczjgoFyaoZqIwcmqnT77kdI2DwAJKe2ORTz63yF8OEOm5mO8pB5jA4Zrz/YgokFlI7yEKuYHFmvYYfxtZLQ1HJaQKBTN3BW4tvD9f0RCMB0u1MyKByh+BAlnhP/E/HWhW1Dcd1cuntPnCOkDvPfKa9lgBzGZ3lgdWI/z8XyT/8IlfTr9pRBngwPIWgouNiaO2DtcnrsuiIF+ZzkLSJ/hPzyTCgX24oIXKi6NqzbmowR03R/CGYNSOCk+8puM/WWVLYMU1Eq1JCC5d+LYUqkke2Ht0lF+0pEaDjQROZfVNSUKkn7HSjYomJXKC1zi5MuxRRcUgtmG1xX800n6tmlzjXZ/4dXoK5ZAYZfy3/cc7Tw5v6ZvDzdGSUj2s1GM7f2OAhee8L1TYmdblsd7KBAqyQwY+aQOxmrFEFU4XjwVi0B1uvnsHED3s+439yt+9kG64ocL7pMrI+ZqUMmNZ/u2bzShplUOpdIo2laY3UXJVfBxKVAuiWQsEsEHtXRZL4yCqrpFrW03c0eVvgEO03iSogm21icoOhCpL/Rs+FBbzUZpegKSenYSWnZs8j/eB5aN4HjLMvZeySqidrFdpb1kucRz4QBFy5SWWj+O3EqwgWA6xhl8d0NZxtNrO7Wq2gqWC2PTaRs+r+mWg=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB7541.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?N3VMc2t5ZVltamlPT2hWZHV1TW40QVVXT05UMTBBTkU3M1BIbDlYNXRveVQz?=
+ =?utf-8?B?eENOTkFCM2kxYk5DMUZabXE4VzFSZWZpNTRqT1RqdjlPdEYyMUc0UDIwSzFW?=
+ =?utf-8?B?T1NDVnZIWEJIY3h0N2t6RTh4YStTU0piS3N5cUZ1OWF5V25MdGRkMDJJSGVw?=
+ =?utf-8?B?STFXemJ4YTNxZUhNSlVPQmMwTStrNlNIa0U3UG5lTGUxd3RtWlpwR2ZiZmd1?=
+ =?utf-8?B?T2NPY0ZRNlpBYkx2WFpsOFYrOHJudzlnNHNBK3dQbXVoU1RZVkMyUTNvNHFE?=
+ =?utf-8?B?Z09obEt6SE9MVERSM25EYXFteVMrVldKdXQxeUkzaXNZUlRaYWlNOE9sY0VQ?=
+ =?utf-8?B?RlluZTRrRFJBQTRJdHZ6dlNjNlEyOEZOZTRHYXYyT2QzNnRkb0lUai91dFc4?=
+ =?utf-8?B?ZXVRdTFxdUlPU0NkLzRUc3VtMXVKNkFhUGNkODJWMWV2V0d4ay9yK1h4ZThz?=
+ =?utf-8?B?anJRSS9hVkZ4eVBlVjhwYXM0RVR3czlFYkMrTEVSRm9PYjNiVjFWdC9Jbmlk?=
+ =?utf-8?B?YkNEOExuYXlLWnRyTjNJTXo0alhIRnh2L0dIbEJMdG5UTVgwS2IyN3Rrb1By?=
+ =?utf-8?B?V0lGWFhTTUFUeVFhUEp2bC9ZbUNLam9Ta1NLNmM5TGFqc2tILzZBVnJQa0hn?=
+ =?utf-8?B?bUxUNVFhamRvbmlmTWQyYXlSZjh2YWVKWGwrM1VUYkUvL2tFT3ZScHR2bUVC?=
+ =?utf-8?B?REJ0VDFLdHI4RmUyNjhVbkJ4VnNMSkJJUmFOUG9tVStFZ0tUUEtuTTdPRSs4?=
+ =?utf-8?B?VjV0R3VRRmRVZE5MZjJ5YlhaVzBsQkY2R0JvMEZUeGt6TGNIdWZWLzA0YlY0?=
+ =?utf-8?B?MTQ4K2g5ZnVaYUlUMUVRY1FQQ0d6eFRWa0h3T1ZPRXVWaC8vV1hsd2xBZ2Fv?=
+ =?utf-8?B?cnFxeDN3anN6N1RUdmxmT0lBclB2TW5WVjVtVjZSVXFUamdaYTlhM2g0cUU5?=
+ =?utf-8?B?ZGx2ZGhLZ0JFNkdob043cWlzREEvUE4zdTU0RlJFdDFGUEFreW0wQmZUcGxr?=
+ =?utf-8?B?U21oSlNmckozcVJFYzBnbFZ3WGZ6NE1DdUZYWjM3ZkdYWnVIU25IWWVjWUZn?=
+ =?utf-8?B?S1FHdldJdlN2Q21USjdZTklPOENZRXYyMDQzanM4OHBKS0ZsM3AwNEtMaXFI?=
+ =?utf-8?B?bHdHbXlQU3ZZdnBSNUZlNFhkdUl4bCtkalVnSzlpdXV4Q0dxcWo3cGtQcVNE?=
+ =?utf-8?B?cXdzZTBCQiswbjY1ZlhtbS9CZWRZUXFkeTgvYlNoNU9RNTlUYTlBSXN4NE5F?=
+ =?utf-8?B?YjhMZ0lEOHlvVnFOc2hGeXhlZzFDNEJiUCtoczUrOU56V0NlajZHVUd2Wk9T?=
+ =?utf-8?B?ZFl4VG1kWHF6TWhvZTRidHhEZVN2a1ZhTVUxUzBqK2pESDluRUtoSFM2WUJC?=
+ =?utf-8?B?SHlvS0pwQnp5VFgvVUZGcmxJUGVBU05XMWxhTE1hczFSelhiK2tJREp6MHBV?=
+ =?utf-8?B?UERXNkcybmsyeWRMQWpTNVpvVFBETm1TRjQ0NDRaUGJYL2NVUGxIL3k4M1B2?=
+ =?utf-8?B?ZEdUL0x3RzhjclcyenFSdkYydFdNSzJzOVgzWDVZZUR6UWFIVGIrNWhuSlFh?=
+ =?utf-8?B?cXJhN3ZCNkRKM3Fyc211cGpkT2xmcksxT0hmTlFrOGt2Um9GS1JTZU1ud3Er?=
+ =?utf-8?B?Ym1WMDM4ak5ERlhYUGZ6c1FBNzE2MzlhcEhaUnJVQUdKZXRDRG9QTlR6eE9k?=
+ =?utf-8?B?Y0t0b2VCOEpiSnZCb05GYS9FWlcxK3pOVE9iaUZXWDA0N05DVnEwWEhGSGFw?=
+ =?utf-8?B?R1RneCtqeGx1UFpETDVjWDBPb0ozbEJGVVhWZjFNZ0lzQi9WZDhNdG5Qdlh2?=
+ =?utf-8?B?RXB4MkZjdTlqTVlUb2NhUEp1QlVLSU9qNllzbGFMUlVkckFQQ0xvck0ydDkr?=
+ =?utf-8?B?clBKNnFxd3N4RWl1MGNTV3JGS094Vkw1UWN1Uyt1WHMxcHpGeGhPR3VPYjRh?=
+ =?utf-8?B?NkQxbDF4ZmhPdklaMkowR2w3NThUaCtOUFRxdnpmVXI0TXF0UTdkM0dHQStm?=
+ =?utf-8?B?Uis5MTRWVzdFVXRacURTdmRNYmZiK21xVVBGQTZCL0JVYlExc095a25tUDNo?=
+ =?utf-8?B?ajR6dVIzcHg0cXBOdm02VEd2NkJFRTdDMG5EbThyLzVQZmd2b0dCZU9SRXo1?=
+ =?utf-8?B?WWxWZzJ4QUFKRGkwVUpUL0NNVURFZDlYZXlhSGFoYW94d0E4bC90Z0RHYzlC?=
+ =?utf-8?B?ZGVONkExUEpUaktxdlFlZTAxRFFQRnA1bEtBSm43UjQxV2RjK3owWnArU1dx?=
+ =?utf-8?B?cDBqWWFMdGxMV3J1TTJOb25nbXZjQWdsSGtCQ3QydzhsUGpaZXJhVjBiV3BO?=
+ =?utf-8?B?OWlZaTlhbmVNUzBUajc2TXVDZWhjaXltcm9FdklhakZ5ZTB2by9MQT09?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a84e08db-4c3f-433d-bc96-08de75d874bf
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB7541.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2026 08:16:06.6869
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2zFIVGaP3j9FcAxUGOJ0tvWB6UjfapvrQRLAaNHUaEsCEDY/tsupjIUrFodbGi42+R7TjJvMcWj7T5Ka7arwLQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7671
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261760-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[22]
-X-Rspamd-Queue-Id: 449391B456B
+	TAGGED_FROM(0.00)[bounces-261761-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[iscas.ac.cn,linux.ibm.com,ellerman.id.au,gmail.com,kernel.org,amd.com,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,perex.cz,suse.com];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[31];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mbloch@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	NEURAL_HAM(-0.00)[-0.998];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 7EC6D1B45D5
 X-Rspamd-Action: no action
 
-The GF stats periodic query is used as mechanism to monitor HWC health
-check. If this HWC command times out, it is a strong indication that
-the device/SoC is in a faulty state and requires recovery.
 
-Today, when a timeout is detected, the driver marks
-hwc_timeout_occurred, clears cached stats, and stops rescheduling the
-periodic work. However, the device itself is left in the same failing
-state.
 
-Extend the timeout handling path to trigger the existing MANA VF
-recovery service by queueing a GDMA_EQE_HWC_RESET_REQUEST work item.
-This is expected to initiate the appropriate recovery flow by suspende
-resume first and if it fails then trigger a bus rescan.
+On 27/02/2026 7:25, Vivian Wang wrote:
+> On 2/27/26 02:25, Mark Bloch wrote:
+> 
+>> On 29/01/2026 3:56, Vivian Wang wrote:
+>>> Some PCI devices have PCI_MSI_FLAGS_64BIT in the MSI capability, but
+>>> implement less than 64 address bits. This breaks on platforms where such
+>>> a device is assigned an MSI address higher than what's reachable.
+>>>
+>>> Currently, the no_64bit_msi bit is set for these devices, meaning that
+>>> only 32-bit MSI addresses are allowed for them. However, on some
+>>> platforms the MSI doorbell address is above the 32-bit limit but within
+>>> the addressable range of the device.
+>>>
+>>> As a first step to enabling MSI on those combinations of devices and
+>>> platforms, conservatively generalize the single-bit flag no_64bit_msi
+>>> into msi_addr_mask. (The name msi_addr_mask is chosen to avoid confusion
+>>> with msi_mask.)
+>>>
+>>> The translation is essentially:
+>>>
+>>> - no_64bit_msi = 1    ->    msi_addr_mask = DMA_BIT_MASK(32)
+>>> - no_64bit_msi = 0    ->    msi_addr_mask = DMA_BIT_MASK(64)
+>>> - if (no_64bit_msi)   ->    if (msi_addr_mask < DMA_BIT_MASK(64))
+>>>
+>> Hey Vivian,
+>>
+>> We are seeing issues while reloading mlx5 on a PPC64 platform.
+> 
+> Mea culpa. There's a fix on the list [1] since last Friday. I'm not sure
+> why it hasn't moved yet, but please take a look.
+> 
 
-This change is intentionally limited to HWC command timeouts and does
-not trigger recovery for errors reported by the SoC as a normal command
-response.
+Thanks! I've looked at the patch, it seems fine and should fix the issue we
+are seeing.
 
-Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
----
-Changes in v2:
-  - Added common helper, proper clearing of gc flags.
----
----
- .../net/ethernet/microsoft/mana/gdma_main.c   | 65 ++++++++++---------
- drivers/net/ethernet/microsoft/mana/mana_en.c |  9 ++-
- include/net/mana/gdma.h                       | 16 ++++-
- 3 files changed, 55 insertions(+), 35 deletions(-)
+Mark
 
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index 37d2f108a839..aef8612b73cb 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -490,15 +490,9 @@ static void mana_serv_reset(struct pci_dev *pdev)
- 		dev_info(&pdev->dev, "MANA reset cycle completed\n");
- 
- out:
--	gc->in_service = false;
-+	clear_bit(GC_IN_SERVICE, &gc->flags);
- }
- 
--struct mana_serv_work {
--	struct work_struct serv_work;
--	struct pci_dev *pdev;
--	enum gdma_eqe_type type;
--};
--
- static void mana_do_service(enum gdma_eqe_type type, struct pci_dev *pdev)
- {
- 	switch (type) {
-@@ -558,12 +552,42 @@ static void mana_serv_func(struct work_struct *w)
- 	module_put(THIS_MODULE);
- }
- 
-+int mana_schedule_serv_work(struct gdma_context *gc, enum gdma_eqe_type type)
-+{
-+	struct mana_serv_work *mns_wk;
-+
-+	if (test_and_set_bit(GC_IN_SERVICE, &gc->flags)) {
-+		dev_info(gc->dev, "Already in service\n");
-+		return -EBUSY;
-+	}
-+
-+	if (!try_module_get(THIS_MODULE)) {
-+		dev_info(gc->dev, "Module is unloading\n");
-+		clear_bit(GC_IN_SERVICE, &gc->flags);
-+		return -ENODEV;
-+	}
-+
-+	mns_wk = kzalloc(sizeof(*mns_wk), GFP_ATOMIC);
-+	if (!mns_wk) {
-+		module_put(THIS_MODULE);
-+		clear_bit(GC_IN_SERVICE, &gc->flags);
-+		return -ENOMEM;
-+	}
-+
-+	dev_info(gc->dev, "Start MANA service type:%d\n", type);
-+	mns_wk->pdev = to_pci_dev(gc->dev);
-+	mns_wk->type = type;
-+	pci_dev_get(mns_wk->pdev);
-+	INIT_WORK(&mns_wk->serv_work, mana_serv_func);
-+	schedule_work(&mns_wk->serv_work);
-+	return 0;
-+}
-+
- static void mana_gd_process_eqe(struct gdma_queue *eq)
- {
- 	u32 head = eq->head % (eq->queue_size / GDMA_EQE_SIZE);
- 	struct gdma_context *gc = eq->gdma_dev->gdma_context;
- 	struct gdma_eqe *eq_eqe_ptr = eq->queue_mem_ptr;
--	struct mana_serv_work *mns_wk;
- 	union gdma_eqe_info eqe_info;
- 	enum gdma_eqe_type type;
- 	struct gdma_event event;
-@@ -623,30 +647,7 @@ static void mana_gd_process_eqe(struct gdma_queue *eq)
- 				 "Service is to be processed in probe\n");
- 			break;
- 		}
--
--		if (gc->in_service) {
--			dev_info(gc->dev, "Already in service\n");
--			break;
--		}
--
--		if (!try_module_get(THIS_MODULE)) {
--			dev_info(gc->dev, "Module is unloading\n");
--			break;
--		}
--
--		mns_wk = kzalloc_obj(*mns_wk, GFP_ATOMIC);
--		if (!mns_wk) {
--			module_put(THIS_MODULE);
--			break;
--		}
--
--		dev_info(gc->dev, "Start MANA service type:%d\n", type);
--		gc->in_service = true;
--		mns_wk->pdev = to_pci_dev(gc->dev);
--		mns_wk->type = type;
--		pci_dev_get(mns_wk->pdev);
--		INIT_WORK(&mns_wk->serv_work, mana_serv_func);
--		schedule_work(&mns_wk->serv_work);
-+		mana_schedule_serv_work(gc, type);
- 		break;
- 
- 	default:
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 933e9d681ded..56ee993e3a43 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -875,7 +875,7 @@ static void mana_tx_timeout(struct net_device *netdev, unsigned int txqueue)
- 	struct gdma_context *gc = ac->gdma_dev->gdma_context;
- 
- 	/* Already in service, hence tx queue reset is not required.*/
--	if (gc->in_service)
-+	if (test_bit(GC_IN_SERVICE, &gc->flags))
- 		return;
- 
- 	/* Note: If there are pending queue reset work for this port(apc),
-@@ -3525,6 +3525,7 @@ static void mana_gf_stats_work_handler(struct work_struct *work)
- {
- 	struct mana_context *ac =
- 		container_of(to_delayed_work(work), struct mana_context, gf_stats_work);
-+	struct gdma_context *gc = ac->gdma_dev->gdma_context;
- 	int err;
- 
- 	err = mana_query_gf_stats(ac);
-@@ -3532,6 +3533,12 @@ static void mana_gf_stats_work_handler(struct work_struct *work)
- 		/* HWC timeout detected - reset stats and stop rescheduling */
- 		ac->hwc_timeout_occurred = true;
- 		memset(&ac->hc_stats, 0, sizeof(ac->hc_stats));
-+		dev_warn(gc->dev,
-+			 "Gf stats wk handler: gf stats query timed out.\n");
-+		/* As HWC timed out, indicating a faulty HW state and needs a
-+		 * reset.
-+		 */
-+		mana_schedule_serv_work(gc, GDMA_EQE_HWC_RESET_REQUEST);
- 		return;
- 	}
- 	schedule_delayed_work(&ac->gf_stats_work, MANA_GF_STATS_PERIOD);
-diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-index 766f4fb25e26..ec17004b10c0 100644
---- a/include/net/mana/gdma.h
-+++ b/include/net/mana/gdma.h
-@@ -215,6 +215,12 @@ enum gdma_page_type {
- 
- #define GDMA_INVALID_DMA_REGION 0
- 
-+struct mana_serv_work {
-+	struct work_struct serv_work;
-+	struct pci_dev *pdev;
-+	enum gdma_eqe_type type;
-+};
-+
- struct gdma_mem_info {
- 	struct device *dev;
- 
-@@ -386,6 +392,7 @@ struct gdma_irq_context {
- 
- enum gdma_context_flags {
- 	GC_PROBE_SUCCEEDED	= 0,
-+	GC_IN_SERVICE		= 1,
- };
- 
- struct gdma_context {
-@@ -411,7 +418,6 @@ struct gdma_context {
- 	u32			test_event_eq_id;
- 
- 	bool			is_pf;
--	bool			in_service;
- 
- 	phys_addr_t		bar0_pa;
- 	void __iomem		*bar0_va;
-@@ -473,6 +479,8 @@ int mana_gd_poll_cq(struct gdma_queue *cq, struct gdma_comp *comp, int num_cqe);
- 
- void mana_gd_ring_cq(struct gdma_queue *cq, u8 arm_bit);
- 
-+int mana_schedule_serv_work(struct gdma_context *gc, enum gdma_eqe_type type);
-+
- struct gdma_wqe {
- 	u32 reserved	:24;
- 	u32 last_vbytes	:8;
-@@ -615,6 +623,9 @@ enum {
- /* Driver can handle hardware recovery events during probe */
- #define GDMA_DRV_CAP_FLAG_1_PROBE_RECOVERY BIT(22)
- 
-+/* Driver supports self recovery on Hardware Channel timeouts */
-+#define GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECOVERY BIT(25)
-+
- #define GDMA_DRV_CAP_FLAGS1 \
- 	(GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
- 	 GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX | \
-@@ -628,7 +639,8 @@ enum {
- 	 GDMA_DRV_CAP_FLAG_1_PERIODIC_STATS_QUERY | \
- 	 GDMA_DRV_CAP_FLAG_1_SKB_LINEARIZE | \
- 	 GDMA_DRV_CAP_FLAG_1_PROBE_RECOVERY | \
--	 GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY)
-+	 GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY | \
-+	 GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECOVERY)
- 
- #define GDMA_DRV_CAP_FLAGS2 0
- 
--- 
-2.34.1
+> Vivian "dramforever" Wang
+> 
+> [1]: https://lore.kernel.org/all/20260220070239.1693303-1-nilay@linux.ibm.com/
+> 
 
 
