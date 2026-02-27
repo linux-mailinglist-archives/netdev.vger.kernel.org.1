@@ -1,237 +1,198 @@
-Return-Path: <netdev+bounces-261659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261660-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iOqdDYH2oGk8oQQAu9opvQ
-	(envelope-from <netdev+bounces-261659-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 02:42:25 +0100
+	id sPSeEcD2oGk8oQQAu9opvQ
+	(envelope-from <netdev+bounces-261660-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 02:43:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBF091B1951
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 02:42:24 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96F651B196F
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 02:43:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3FD25300D77C
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 01:42:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DCAA23051AA8
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 01:43:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51A3D28D8DB;
-	Fri, 27 Feb 2026 01:42:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="idR/M650";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="qsLyARwu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91B93286D4D;
+	Fri, 27 Feb 2026 01:43:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5CCE27E07E;
-	Fri, 27 Feb 2026 01:42:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E135274B46
+	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 01:43:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772156540; cv=none; b=FDq68RXm9gLvt7bRxlehfgFGVi+z8amvoprHUDOr//7efvqbHxG4sMJf9W8aPuLvKEFXoLb6VKLB7FYnLLxJ7TXRGhpVqaDoBHswliFp2Ubof3l6RUXdNwtiwJfpN8aDB+1VpUHFT+2TNuNrJhnmlWlQM4vtNgYN5UZRm9TS1qE=
+	t=1772156604; cv=none; b=H04N43fcmzy40FtT6iLK8LHhasTIoUoRSGDYM2JVHvYHj0lHYSuh90hG62tlTyrxCBD3OX6ViR0gK0fDCPeMbIbrZmsD/zmD/1QUh1vmJxolBikzIQTWTaTSRLoblpBP/IYMClczghvDl82itdyd5rsFTML6z26bSp25dyzxIFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772156540; c=relaxed/simple;
-	bh=MH1JbKo8U096w/4SFfWy4iZNR02/r/hu8EgOy22BlKk=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=FcrhLCon2UPneUquLAgjhgwZ3//1wZgvXTLJSE1q0V2Bt2//MS7Q+wFD3MH4Ph3N4f8i1ieAKQg/S6cWQ8YpDjshIT+73wfj16+YsEM9NaR5ivTGtgkCrbVLoeOmTQMpNRKZNgKBlpEMFqRNaQBruqNmAaYoep6RMq7Zcm1dSJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=idR/M650; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=qsLyARwu; arc=none smtp.client-ip=202.12.124.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 719A87A0099;
-	Thu, 26 Feb 2026 20:42:15 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Thu, 26 Feb 2026 20:42:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm2;
-	 t=1772156535; x=1772242935; bh=S/8T4N0Phog8PIfQ8l0W0QujJkGhGj3J
-	ItKbBB/XGc8=; b=idR/M650cmCb/Acd4RmNsTvOv3qnPVsI/GVTq8P812r2Es0h
-	GWEqxFWLIIb6GjQx5d4hBkWHcHy4ib7Gq44qwvf0gADs67PWwKFh4g/djg3qGPo2
-	MVc7S9fRM6yY6101dQu4Hyp7XleXtIApkuX3QHxmC1lmXSK+3Yo1N7sdOzvHnzuJ
-	n97i5UAcm8JAv1Kx2duaVh4tuIHP78RY2ZsmzXqRmqSCxKRoRiUDWCS6rs9SPHJr
-	uI+hwP623TspAw2UUpVRBR5/g5fx/NZx94yUO3z2G9CwiEmTH453FLw0OwKZ2TO3
-	YI1qFE5x9noO2Lo176jwyD/2Vxy4jeLXgYfvhg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1772156535; x=
-	1772242935; bh=S/8T4N0Phog8PIfQ8l0W0QujJkGhGj3JItKbBB/XGc8=; b=q
-	sLyARwu1vOdFk/bbX3XRdtCG+hui5jIBf5SyKWOS1VMP8TINKrXhS/DdxqCvmlKg
-	j2JWcNibba+T/KY2LWdO5Q1dVXLUoEYVEJOgVUinorwIgKLSlyYewl22ey9VxmLt
-	tvWjqqMD7RX+oBJ0SfSHy8UUHafi4QrDENzq1yUpbSOKpXN7bDw59tnIanKBIpMb
-	y2S7m2e100HboX9/cs3HbMdWI7YH0TdoP4mX21eEjoqpSALeZ5hSbJK/MX0VkOQ+
-	dSubL4asiMpScAZyB8yinwPjavjk0mCR7IkqV3urKBPoSwlzMjWl5ACx3jBwScxu
-	POiUO5kT2zCQ2a5hnbQIw==
-X-ME-Sender: <xms:dvagaXq7UM6RSv7pYlFJ0yIB48WX6qt2IeKDiYE6-RwLX8w9swKrAQ>
-    <xme:dvagaeW68Q5I82egxXZzlKbWsi7Aw0-NyLYX05YoxKxEJQpMtV7xRDCtXdDpZu9Ez
-    r2a1k8asrpawA7uxFPyjRKEe1-ZZIeEDHAQpIap0mpcihHWAI1k0ZM>
-X-ME-Received: <xmr:dvagaYE04OUvt4fR23K6pVlK1TVmJjMrUCgjPSh2x4jnQtm1Y39aLUBy5GJoUx2kQzqiaw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvgeejieekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhephffvvefujghfofggtgfgfffksehtqhertdertdejnecuhfhrohhmpeflrgihucgg
-    ohhssghurhhghhcuoehjvhesjhhvohhssghurhhghhdrnhgvtheqnecuggftrfgrthhtvg
-    hrnhepgeefgffhgffhhfejgfevkefhueekvefftefhgfdtuddtfeffueehleegleeiuefh
-    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepjhhvse
-    hjvhhoshgsuhhrghhhrdhnvghtpdhnsggprhgtphhtthhopedufedpmhhouggvpehsmhht
-    phhouhhtpdhrtghpthhtoheprhgriihorhessghlrggtkhifrghllhdrohhrghdprhgtph
-    htthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheplhhiuhhh
-    rghnghgsihhnsehgmhgrihhlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgoh
-    hoghhlvgdrtghomhdprhgtphhtthhopehmrghhvghshhgssehgohhoghhlvgdrtghomhdp
-    rhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshhhuhgrhh
-    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhu
-    nhhnrdgthhdprhgtphhtthhopehlihgrlhhisehrvgguhhgrthdrtghomh
-X-ME-Proxy: <xmx:dvagaVA0VDIfNxUiRLPPFugt6870usuUHILOvxZA2VufL0G0JHTVcw>
-    <xmx:dvagaaxzEXYBTnuaWrYbONWrzdZYTvcyBPjFbzrNouOwMyRCQm4H2w>
-    <xmx:dvagabcPa-4YVtTKlA9KsJBTvFlsIeb-X8WA6wPO90nzpVsRA8f4Rg>
-    <xmx:dvagafui0gFQdijlSAfUxBcevUrIC6brhzEVPE-N0c4r5R7rXVzHcw>
-    <xmx:d_agaXSoz4SZuQdj4RKJqRmQIVVxCbQQqCNx1Alybdo5niG3fEMLw2Cg>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 26 Feb 2026 20:42:14 -0500 (EST)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id 99F159FCB1; Thu, 26 Feb 2026 17:42:13 -0800 (PST)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id 98F5E9FC39;
-	Thu, 26 Feb 2026 17:42:13 -0800 (PST)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: Hangbin Liu <liuhangbin@gmail.com>
-cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
-    Nikolay Aleksandrov <razor@blackwall.org>,
-    Mahesh Bandewar <maheshb@google.com>, linux-kernel@vger.kernel.org,
-    linux-kselftest@vger.kernel.org, Liang Li <liali@redhat.com>
-Subject: Re: [PATCHv3 net 2/3] bonding: restructure ad_churn_machine
-In-reply-to: <aaDq5vTsk8SW4bIA@fedora>
-References: <20260226125331.28147-1-liuhangbin@gmail.com> <20260226125331.28147-3-liuhangbin@gmail.com> <941081.1772152606@famine> <aaDq5vTsk8SW4bIA@fedora>
-Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
-   message dated "Fri, 27 Feb 2026 00:52:54 +0000."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1772156604; c=relaxed/simple;
+	bh=VWFtlgXmcL9/fmReO0c8ZlT3Ha+3uO+QpINtRuqmwiE=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=uXmuBZ83RQjsS5MZt6Sr3evDSKl61x4cXfws5e1qt9mpxNCHPblPjLLgxLb577WAzBpLtTcW7yduli2hSMJriwb57uI9bakCVwLX3JjHxdwQvxy006SzNe9MxJcCPiooA6kfOX5g2e/dLzY7KTYMRYb/rBUNQTBg85gx9+o880g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-672c40f3873so31259012eaf.2
+        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 17:43:23 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772156602; x=1772761402;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=B+fVH48wga1eGVIKc9mH7KKYUjMOFbW8GCD23h+C4Vk=;
+        b=qX47JXhxVdIqUygjT2ho+7cnHiO7jP2Dt6nIIZuvNf3I0h7gm7ykGfXO5GDfTvvTrT
+         16E+Tl3V9sUuCmhfrK8QJSjeSFoUdyYLI3bDFLWXicwSaYGX312VYLbd5INungEgvhb+
+         hYpJ6djsIvXfpn8MP4F3AoFLz4rroFlWgwkxV6s5sh7DjFx2ZyeAxiimdGzkK4IsgKeL
+         Hud8Fth8/X+av+fFIN2Xdk5Wjby1BEg+Sb9TDum4L4Vbu+v0Eu6Y9zLUnacqcD7ZHXnQ
+         wmfWB4A4OrT24AkNbQkK+ZjqnvBV7gpkHXg7Ofofz6JDVtbxp/6l7P4VC4NdBXRepe8W
+         Z+mw==
+X-Forwarded-Encrypted: i=1; AJvYcCVQhcWHdXlj0to8Nl79aqdDy01IZiBxIIdwwYtYiF8d1nOSxiKr4mYFXvXg/TQyL3EMzw7i0gM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8pemJJtyCGQClgn5YbpTqHXgOvz08LOQSdd5VE337cPPD2uMS
+	DiVlEjRWYFzfdwWJKrFjeiw/tGSa3TaikghLKjFNB7tbbpzZWDm8Znulr3Q8Z/XseUHTaq2+rfG
+	/iBNaj+RHgGNBKgggEIQnshcmONYMxlc82sEPP5ouDtnPYoy7YRw14G0Ai0s=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Feb 2026 17:42:13 -0800
-Message-ID: <943602.1772156533@famine>
+X-Received: by 2002:a05:6820:2299:b0:674:62e7:190f with SMTP id
+ 006d021491bc7-679fadf3c5bmr853461eaf.17.1772156602218; Thu, 26 Feb 2026
+ 17:43:22 -0800 (PST)
+Date: Thu, 26 Feb 2026 17:43:22 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69a0f6ba.050a0220.305b49.0074.GAE@google.com>
+Subject: [syzbot] [wireless?] WARNING in ieee80211_set_disassoc (2)
+From: syzbot <syzbot+4b737df95e84787fec21@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[jvosburgh.net,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[jvosburgh.net:s=fm2,messagingengine.com:s=fm3];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=2208a171312e89b7];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261659-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[jvosburgh.net:email,jvosburgh.net:dkim,messagingengine.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-261660-lists,netdev=lfdr.de,4b737df95e84787fec21];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	SUBJECT_HAS_QUESTION(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jv@jvosburgh.net,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[jvosburgh.net:+,messagingengine.com:+];
+	RCPT_COUNT_FIVE(0.00)[5];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: CBF091B1951
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,goo.gl:url,storage.googleapis.com:url]
+X-Rspamd-Queue-Id: 96F651B196F
 X-Rspamd-Action: no action
 
-Hangbin Liu <liuhangbin@gmail.com> wrote:
+Hello,
 
->On Thu, Feb 26, 2026 at 04:36:46PM -0800, Jay Vosburgh wrote:
->> Hangbin Liu <liuhangbin@gmail.com> wrote:
->>=20
->> >The current ad_churn_machine implementation only transitions the
->> >actor/partner churn state to churned or none after the churn timer expi=
-res.
->> >However, IEEE 802.1AX-2014 specifies that a port should enter the none
->> >state immediately once the actor=E2=80=99s port state enters synchroniz=
-ation.
->> >
->> >Another issue is that if the churn timer expires while the churn machin=
-e is
->> >not in the monitor state (e.g. already in churn), the state may remain
->> >stuck indefinitely with no further transitions. This becomes visible in
->> >multi-aggregator scenarios. For example:
->> >
->> >Ports 1 and 2 are in aggregator 1 (active)
->> >Ports 3 and 4 are in aggregator 2 (backup)
->> >
->> >Ports 1 and 2 should be in none
->> >Ports 3 and 4 should be in churned
->> >
->> >If a failover occurs due to port 2 link down/up, aggregator 2 becomes a=
-ctive.
->> >Under the current implementation, the resulting states may look like:
->> >
->> >agg 1 (backup): port 1 -> none, port 2 -> churned
->> >agg 2 (active): ports 3,4 keep in churned.
->> >
->> >The root cause is that ad_churn_machine() only clears the
->> >AD_PORT_CHURNED flag and starts a timer. When a churned port becomes ac=
-tive,
->> >its RX state becomes AD_RX_CURRENT, preventing the churn flag from bein=
-g set
->> >again, leaving no way to retrigger the timer. Fixing this solely in
->> >ad_rx_machine() is insufficient.
->> >
->> >This patch rewrites ad_churn_machine according to IEEE 802.1AX-2014
->> >(Figures 6-23 and 6-24), ensuring correct churn detection, state transi=
-tions,
->> >and timer behavior. With new implementation, there is no need to set
->> >AD_PORT_CHURNED in ad_rx_machine().
->> >
->> >Fixes: 14c9551a32eb ("bonding: Implement port churn-machine (AD standar=
-d 43.4.17).")
->> >Reported-by: Liang Li <liali@redhat.com>
->> >Tested-by: Liang Li <liali@redhat.com>
->> >Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
->>=20
->> 	I missed this last time it was posted, but reading it now I
->> think the functional change looks good, but I question the usefulness of
->> including the 25 line ASCII art version of the state diagram.
->>=20
->> 	The standard is publicly available, so a comment saying that the
->> state machine logic conforms to IEEE 802.1AX-2014 figures 6-23 and 6-24
->> should be sufficient.  Anyone seriously checking the code against the
->> standard will need to read the relevant text, so they'll be looking it
->> up anyway.
->
->I added it here to help new readers and reviewers understand the logic
->quickly. If you think there=E2=80=99s no need to include it in the code, m=
-aybe
->we can move it to the commit description?
+syzbot found the following issue on:
 
-	Personally, I'd leave it out, and just put a reference.
+HEAD commit:    189f164e573e Convert remaining multi-line kmalloc_obj/flex..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1750855a580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=2208a171312e89b7
+dashboard link: https://syzkaller.appspot.com/bug?extid=4b737df95e84787fec21
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
 
-	The churn machine isn't that critical, even the standards
-committee didn't like it and removed it from the 2020 edition of
-802.1AX.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-	Still, whatever we provide should work in accordance with the
-2014 standard we're nominally conforming to, so functionally the patch
-looks fine to me.
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-189f164e.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/669b52dbab53/vmlinux-189f164e.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/51b76feb584c/bzImage-189f164e.xz
 
-	-J
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+4b737df95e84787fec21@syzkaller.appspotmail.com
+
+mac80211_hwsim: wmediumd released netlink socket, switching to perfect channel medium
+mac80211_hwsim: wmediumd released netlink socket, switching to perfect channel medium
+mac80211_hwsim: wmediumd released netlink socket, switching to perfect channel medium
+wlan1: deauthenticating from 08:02:11:00:00:00 by local choice (Reason: 3=DEAUTH_LEAVING)
+------------[ cut here ]------------
+!ap_sta
+WARNING: net/mac80211/mlme.c:4137 at ieee80211_set_disassoc+0x3c8/0x1a90 net/mac80211/mlme.c:4137, CPU#0: syz.0.0/5315
+Modules linked in:
+CPU: 0 UID: 0 PID: 5315 Comm: syz.0.0 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+RIP: 0010:ieee80211_set_disassoc+0x3c8/0x1a90 net/mac80211/mlme.c:4137
+Code: c4 8c f6 45 85 ff 0f 84 c9 11 00 00 e8 81 c0 8c f6 eb 2b e8 7a c0 8c f6 48 83 7c 24 48 00 0f 85 38 fe ff ff e8 69 c0 8c f6 90 <0f> 0b 90 e9 aa 10 00 00 e8 5b c0 8c f6 eb 05 e8 54 c0 8c f6 48 8d
+RSP: 0018:ffffc9000dd4efa0 EFLAGS: 00010287
+RAX: ffffffff8b38dab7 RBX: ffff888038b28dc0 RCX: 0000000000100000
+RDX: ffffc9000ec12000 RSI: 000000000001762f RDI: 0000000000017630
+RBP: ffffc9000dd4f0b0 R08: 0000000000000001 R09: 0000000000000000
+R10: ffffc9000dd4f1e0 R11: fffff52001ba9e3f R12: ffff888038b297f0
+R13: dffffc0000000000 R14: 1ffff92001ba9e04 R15: ffffc9000dd4f1e0
+FS:  00007f5691c2d6c0(0000) GS:ffff88808ca5b000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ffc7ffad0c8 CR3: 0000000035dd8000 CR4: 0000000000352ef0
+Call Trace:
+ <TASK>
+ ieee80211_mgd_deauth+0x9fa/0xe60 net/mac80211/mlme.c:10198
+ rdev_deauth net/wireless/rdev-ops.h:509 [inline]
+ cfg80211_mlme_deauth+0x51b/0x8f0 net/wireless/mlme.c:536
+ cfg80211_sme_disconnect net/wireless/sme.c:666 [inline]
+ cfg80211_disconnect+0x3b2/0x7c0 net/wireless/sme.c:1559
+ cfg80211_netdev_notifier_call+0x1ba/0x1470 net/wireless/core.c:1599
+ notifier_call_chain+0x1be/0x400 kernel/notifier.c:85
+ call_netdevice_notifiers_extack net/core/dev.c:2287 [inline]
+ call_netdevice_notifiers net/core/dev.c:2301 [inline]
+ __dev_close_many+0x119/0x6d0 net/core/dev.c:1746
+ netif_close_many+0x225/0x420 net/core/dev.c:1800
+ netif_close+0x160/0x220 net/core/dev.c:1817
+ dev_close+0x10a/0x220 net/core/dev_api.c:220
+ cfg80211_shutdown_all_interfaces+0xc4/0x200 net/wireless/core.c:282
+ cfg80211_rfkill_set_block+0x2d/0x50 net/wireless/core.c:312
+ rfkill_set_block+0x1d2/0x440 net/rfkill/core.c:346
+ rfkill_fop_write+0x461/0x5a0 net/rfkill/core.c:1301
+ vfs_write+0x29a/0xb90 fs/read_write.c:686
+ ksys_write+0x150/0x270 fs/read_write.c:740
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f5690d9c629
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f5691c2d028 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 00007f5691015fa0 RCX: 00007f5690d9c629
+RDX: 0000000000000008 RSI: 0000200000000080 RDI: 0000000000000006
+RBP: 00007f5690e32b39 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f5691016038 R14: 00007f5691015fa0 R15: 00007fff6e9cd5a8
+ </TASK>
+
 
 ---
-	-Jay Vosburgh, jv@jvosburgh.net
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
