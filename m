@@ -1,814 +1,316 @@
-Return-Path: <netdev+bounces-261857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261858-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UPJ3GN2toWk3vgQAu9opvQ
-	(envelope-from <netdev+bounces-261857-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 15:44:45 +0100
+	id UHWgJq2uoWk3vgQAu9opvQ
+	(envelope-from <netdev+bounces-261858-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 15:48:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B51511B927E
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 15:44:44 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09C7B1B935C
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 15:48:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D462E30427FA
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 14:43:54 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3D94330CD4A6
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 14:46:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A64B41C30D;
-	Fri, 27 Feb 2026 14:43:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B18F428833;
+	Fri, 27 Feb 2026 14:46:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="PgQomRz0";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="jYKCPPXK";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="kGlBNUG9";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="jWOPGpZ2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BVZ1HpOF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 844D241C2F9
-	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 14:43:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772203433; cv=none; b=rAU92tWR4JlFzgGWt25GYKRH/i6VPQxKoSc3OJO4fTPfZ0+Bhb93owdhN1HEwbyGfaUSRVMt26ZTOw0PzIF0Xf+uKJS0joWwqQCtO35+Jk8Z5h3D306E0CsxrsXzX8lgWt6u6EstLq0AgG4Kr2a8ZpSJJx3i8hSv2zCJ7yRna9Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772203433; c=relaxed/simple;
-	bh=mbSS61NwPWRv/VIdudtXBI5PmLnUKSo903VnFyVbElA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qmwtE2TX3uuRq5dcjPg0LiVIwd6xaNbhC43f6iuIpy4ZkfyrjrEd2O60/o8cqw4qIO1WQZPTRYrIk1Zg95j+Nndms3m+FCGdb6DTkb+oZO82EzJr4heu5rXk51I2AH6RJlPoRvl/zgfc6bVAkSEAovAyuQQiJATTj9V6rbNyaKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=PgQomRz0; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=jYKCPPXK; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=kGlBNUG9; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=jWOPGpZ2; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id E309967FEC;
-	Fri, 27 Feb 2026 14:43:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1772203430; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=y0Qm56mg7WdMgLO+ACnpvLqpMB5iei+ds8qmhq92j7g=;
-	b=PgQomRz0Mu5bg/41FmpV9hfQZbPwtFQmPcDE6lX0VNUAvTg/zqjUobEKzgUA74j9T+oPtW
-	PoQqRlSfzNPn/NqADrxv0y2llWlOaqRvVNeBoPQUH+wpLpBb0txjPqHNYqLBmhE6sVwvsr
-	YuJfQ+zQwOcDb9HKiL3ziPG7j+ikdeI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1772203430;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=y0Qm56mg7WdMgLO+ACnpvLqpMB5iei+ds8qmhq92j7g=;
-	b=jYKCPPXKQhcfrP3QNZgjj3GOCfEtnbiemv7G9jZUWqQT3f4cGikm8eY50mzzHenWWiz1Cm
-	Ci4eh1VhDC7btCAA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1772203429; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=y0Qm56mg7WdMgLO+ACnpvLqpMB5iei+ds8qmhq92j7g=;
-	b=kGlBNUG9cEiR1S6df/6XAC84+QcMsWWpT2h37gwQThNxqRVdBlp6gPi4auwoWQGIDlrW70
-	WfzEixqx9FMOQhkuQ32aIcEukxswrtiwNNgy5SBOujsIX321B/hy3XzxwjGM16G7Hp9d/n
-	UgDX2S6RsGKzj9bXPQXkevvNtuhJe1k=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1772203429;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=y0Qm56mg7WdMgLO+ACnpvLqpMB5iei+ds8qmhq92j7g=;
-	b=jWOPGpZ2RuTRDDmWMsWs5BSp5waOZEiP0MY10mZ9rfe80mmOokOwd6RGtgxoi197R5hYvl
-	gd9+motrpkBJMaDQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D62863EA69;
-	Fri, 27 Feb 2026 14:43:49 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id CjRINKWtoWmXeQAAD6G6ig
-	(envelope-from <jack@suse.cz>); Fri, 27 Feb 2026 14:43:49 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id A4342A06D4; Fri, 27 Feb 2026 15:43:41 +0100 (CET)
-Date: Fri, 27 Feb 2026 15:43:41 +0100
-From: Jan Kara <jack@suse.cz>
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, Jeff Layton <jlayton@kernel.org>, 
-	Josef Bacik <josef@toxicpanda.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Jan Kara <jack@suse.cz>, linux-kernel@vger.kernel.org, Hugh Dickins <hughd@google.com>, 
-	linux-mm@kvack.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Tejun Heo <tj@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Jann Horn <jannh@google.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH 02/14] xattr: add rhashtable-based simple_xattr
- infrastructure
-Message-ID: <75sidfn6zjiodrl3uhaqpakapef5nnjhfumawmxyy7gmumy5lt@lsra3hwfh5p6>
-References: <20260216-work-xattr-socket-v1-0-c2efa4f74cb7@kernel.org>
- <20260216-work-xattr-socket-v1-2-c2efa4f74cb7@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5066341B376;
+	Fri, 27 Feb 2026 14:46:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772203612; cv=fail; b=DvkJ9qmdeF7gHo97PM3S07v02CAE+s75y0rJnvjG8L1xGErh3io74/DGF00GQD2Qj2G60zetesGr14lT6oTVlDQe0NZaSESMVxGimj8VMDrmbkHEQ45yS9Bpus9EkPbDuLv595qGY8w6rtgQZevzbC9c2POcw0Mru97TeqxUKP8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772203612; c=relaxed/simple;
+	bh=+9dKlWa/ygZRKAzMOOVYu+zpTf2RR3gvhr6LrOJnqPw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=V0+IVjgwm0DWxo65MhvR5/Y/IOa5YXtMdJQYgGTvLSK+0v/04y3w0D7begKMDmW0H5B+j3AeRvrls77Ak+9/5NvsudZcCBF48jKba/U68xSkLO767jlGesVRmQ1fsWCGBbQz0LGwv3l0NmZ5gVMSnVl0QAbD5hIMsB+FKIx3jUs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BVZ1HpOF; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772203610; x=1803739610;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=+9dKlWa/ygZRKAzMOOVYu+zpTf2RR3gvhr6LrOJnqPw=;
+  b=BVZ1HpOF09c6kYx9+dlI6QWCFWgEn1wmtxfVjHdeIdp+O07OrmrHTs5I
+   NSHowdyeTAkf3wGmcHX9vIaTTLun19462JLN2wwpHeiN///CrLdlDw+LP
+   yQ4CXCN87fX+C8KZt78dg0q8DQGSDJ1Co2T10mEOaqV8Qw8MW4vR6zhq8
+   nwRGmmwbfFlIr0MpDfI0ANrkQs/2OU+TUVItrceiyEY4ZvP2Qk0mYTlNw
+   uvuZAOjtAevg+eeF8nH7VCzWD8M8VWb0I1ChJjl2BKnJXmhk5+UamsgnQ
+   3nqtPTkBPxZGM96UzPE1PUTR6i0s+AK0+Iuilzha+BHEWB/bMufs+sfWR
+   w==;
+X-CSE-ConnectionGUID: 60ckCOvbQCy4WwNecjEVQA==
+X-CSE-MsgGUID: sudFp0v0Tpm8jcP7GmBcEQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11714"; a="98753570"
+X-IronPort-AV: E=Sophos;i="6.21,314,1763452800"; 
+   d="scan'208";a="98753570"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2026 06:46:49 -0800
+X-CSE-ConnectionGUID: RuyeKUtkRZ+/GXpr8Sk4+A==
+X-CSE-MsgGUID: wphG4fiXTQuSZRWeas0ldw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,314,1763452800"; 
+   d="scan'208";a="214759880"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2026 06:46:49 -0800
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Fri, 27 Feb 2026 06:46:49 -0800
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Fri, 27 Feb 2026 06:46:49 -0800
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (40.93.195.30)
+ by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Fri, 27 Feb 2026 06:46:49 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=m8fEi/HBbrtSbqqKY84bjqyWQ+hSRUfikPHmUv5icFcPWGOPZ91ffgI0AmT4UDu10oTw/r4QIehC0ACZhDSbFJLzTZ0wDlR73tBNNDxoqKJAqwaZrWp9xCnCSjwqPz416Jy8zVQo/v07OKo+TR0unc466d7Mu8bJCU81+mcv+nvmXEtX0a3k9Cik20jRMMWlW3Aasbyh1XjalLAtnGmzvE3QgBZUdYExashf57rkn7amrJ9NaTcsYwVgxe5Rab2XAieXnBVSIm51Owd1l1lS3l783SQFHWOWiaCBKZdGdO3e/iqlp8KFZ7X68nTsXAa/9pfQfiwNbaDREIhyC7N7fw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PNBn4HZdv/3KoB8cATvfXIYMtA8uSnvvq427rwl5mOo=;
+ b=svP2RLpGjSB87hMEn/tiifCjtWONwFFRkZiZM4CSEuD1YTfaJ6B5Ru2hhKZLYaRVuyi3ZDqtH8QYRL0dFcCZsinyrDn5TeJLS95FVFxLG2MZESWnMkH+gh/4JhgG8/gqWLj9oUjIvhVcUOBUXj+u/2DCedfeI5zjIi4gtNH1dQ3U+/XvoESd9XywTlw+In2Zk2Gma8k+n/KoLpB+uZu6izhvaAFHFmQ7KN4KJD3UNNIpBNyaP7ymldv0Q/uD/hjpQONtDFQYRyJjOmlaBd5Qzx+Ziw4YBma6cvHm541noACq1KxqN89GTsmtHTaqU51ygbzVY0wusbwePhWM2LWq8w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SA3PR11MB9485.namprd11.prod.outlook.com (2603:10b6:806:45e::16)
+ by IA3PR11MB9374.namprd11.prod.outlook.com (2603:10b6:208:581::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.22; Fri, 27 Feb
+ 2026 14:46:45 +0000
+Received: from SA3PR11MB9485.namprd11.prod.outlook.com
+ ([fe80::cf2c:dcfc:b6d3:57ba]) by SA3PR11MB9485.namprd11.prod.outlook.com
+ ([fe80::cf2c:dcfc:b6d3:57ba%5]) with mapi id 15.20.9654.014; Fri, 27 Feb 2026
+ 14:46:45 +0000
+From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+To: "Oros, Petr" <poros@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "Vecera, Ivan" <ivecera@redhat.com>, "Oros, Petr" <poros@redhat.com>, lkp
+	<lkp@intel.com>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel,
+ Przemyslaw" <przemyslaw.kitszel@intel.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Kwapulinski,
+ Piotr" <piotr.kwapulinski@intel.com>
+Subject: RE: [PATCH iwl-net v3] ice: fix missing dpll notification for SW pins
+Thread-Topic: [PATCH iwl-net v3] ice: fix missing dpll notification for SW
+ pins
+Thread-Index: AQHconKGFMsGP+O/qUOFdklay2O6uLWWqorA
+Date: Fri, 27 Feb 2026 14:46:45 +0000
+Message-ID: <SA3PR11MB948594FB98369E2FC7D6FC189B73A@SA3PR11MB9485.namprd11.prod.outlook.com>
+References: <20260220140700.2910174-1-poros@redhat.com>
+In-Reply-To: <20260220140700.2910174-1-poros@redhat.com>
+Accept-Language: en-US, pl-PL
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA3PR11MB9485:EE_|IA3PR11MB9374:EE_
+x-ms-office365-filtering-correlation-id: abd12ca2-1067-4fa7-13e6-08de760f07ab
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016|38070700021;
+x-microsoft-antispam-message-info: MFRCzKAK/LbJrm/0hpsxCdc/8ydwUiR2UFPxh9a0i5fGh/iEyxnuSMxR/GA6IVdcbI3711GbqC439LJMARFG0guZeUfV7qbHUVgqkKLVK4qBi6nmb1pDYLjH0wUO2ZCZsFQeqEp1YQCI3X6+NyIFiRSzvqr97f4mkCWFlo0g5MrB9zUls/TfG15DvK/sh/ekpAHlnWTzLc3aiq9Co2v2xVHCMKRzvyK6rCNWNMenZQfIB1O1JJpRm0JtpHaA4MxTlhVNrn8OU5w7F8Xi8gUv40q11HDSDyRM9nTCPRGyNHtsERXkzusI0j4HGVT3V+m1BivjUIuuuDb9r/MuloHCi5b0u0QoAWC5NFsXfUgYojafjthPBPnxTVJ2W0T2I+a8mJt0rCLwfGpgOdFV5TKDv0shjy9dKk994MFk6idrHhKzoh5P2RqzYvXWsksvLazJLAcLvCqyqGHP2EFrPiURwXPJuvu2viN39NjO65ePkQ0ZS5RKdZsXAClxKk5/TJhQJaOXDy/sgm5SNz5L6Z+PlTrgCQ1IbOa7WWYVfF/5ZMmavR9zt2LdMIfOMpf+Tluicmnps8EdlRAMpNY7HaWY/4kzkier03rFw3HRKyaTneaagz1ICKJJRgo+iB5wuD4OU2vXwpoV+q3tGgJFjsg7TvSSDSm2H1qRuxY1i6uz0isNqCI3TgYtBi250MteYF2xdPsi/ZqtW3aaMrtOkTeGj0X2N6Chpep8qt2Kb1GEra4NAQ8iUEB9DwNqUP/dvDwnQ3MMc4QWVooir01CrhbWBb0It7rXXTtut5Pnrl3iuN4=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR11MB9485.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?1Y3WFdWhEu5hQAvomSUwewd9j3iVq2vHlXcu0ARHzFyDXpntAp86zml6BqjW?=
+ =?us-ascii?Q?qAfoo4dnetY7pu0cAqDdahWz5gEh90O4kkxToqf735E/Ez81zpUJ6h0AP7zL?=
+ =?us-ascii?Q?G6fgGFYxMRRLQLW+treTtndoxn+sg/B0Y8KWICVOGfTQYSIXd7V9qjt4LpLx?=
+ =?us-ascii?Q?3esfKJQu+gUQpJjfr7qIVt1wLIGR4MUme7DMRVhRCS5UdbawuB17ZvWHd54Y?=
+ =?us-ascii?Q?JU82MUxmmnqXIxOls4ZvoDf+DIOG2Ge7jeWRlWpIXBv5cyq1mqk0b6fSZOoM?=
+ =?us-ascii?Q?BF+qNEuq8ZZ6DPEtzxndYux0VnHxZl5OAhKC2xjFOeRLVFZxPXkIqp4L/QW+?=
+ =?us-ascii?Q?DLaqh8EOL5aEnFLQbd2l11KPPtMpZuSPMd8ILVPe7VD0zN0mdvh6OKFWug13?=
+ =?us-ascii?Q?ONy1dLKe6SKHwImgpqHBUQjT2NvSGT0KQodIhTnjf2wY+yoaJST2dL0+oegZ?=
+ =?us-ascii?Q?cPP00I3iXYfLW5P4B79je+oFVDV+dyhKmc+6o+C3vsRctGjz35BrzDMASOXS?=
+ =?us-ascii?Q?wWavJ/hmybli9d5pi/83fH6U6F5z4uqxZwreIfrGvjuJG9CDIoUZFPJ+lZ/X?=
+ =?us-ascii?Q?0EtcAI20sxWagVVezkhPRdBT+iHvrx9UJSM+d7AwOnBm1spBdUsFu2kAaJFq?=
+ =?us-ascii?Q?8Rmga1pBhK33K2VuhgV2VxiGeFuWPvFSWKsEo3Yy7grnPX6WInM8Nf9O7Z2A?=
+ =?us-ascii?Q?0jtGgaEQiwVcU5cPaHKnH6ZcOrf1hyP0R7UDm0q1Om+FtpdxjlHBzIlx9hOC?=
+ =?us-ascii?Q?+PQxdi4y4/oRoBzv1FQbaui+s5X454RaBL3umxK64j0NSiX5XxXyFn2prY61?=
+ =?us-ascii?Q?aSb6UmtbipE0QEgYg4r2cvzVn42RoIzA6CYyfL6UhOv0U+r/YiwLxaRu6T9z?=
+ =?us-ascii?Q?2+qqAMkebEreOKyhjFbfMWWEPWcQIV2maYhLkZ10tbTMYbB20lNrFDe0DIO0?=
+ =?us-ascii?Q?FaOQMi9W0+0Y1oBG8jxEtgtvkzFjTeZvfRBdlnNL/Zl71S2GgnscLSlO6xYE?=
+ =?us-ascii?Q?NNT33MxPpwdWGkyKAzmqU3N+lpNjBkuLI4y9qifj3tnsSeUKcMIzAVUnGKlD?=
+ =?us-ascii?Q?VtIpWzz9DNVlFjvLy5evGqzBgRpXfniHPmf/NTQ/48ONtsu4bVDLTbMx+pZi?=
+ =?us-ascii?Q?BjTTe2+UMlt+VmYxt0etpmD3o3LX8s/jTFfhPkEJ4kTgfwybdF1e4+Dtk9Us?=
+ =?us-ascii?Q?vMiCUvMs+lfccfPjxNGKU2eWE8drTuqAB5jDRGUTv/dWkzFmI1co2HxConXh?=
+ =?us-ascii?Q?T8/iCDhDkawv8aH6V7a7lILeofoonoTfVC/B7xY+lf8LPTwhR1r0NiPiNhMb?=
+ =?us-ascii?Q?gVxrvEriMlrLBG6XvbfzvWwsRgBl+45P1lOduwof+THv//ec5Ptjsikp3uxL?=
+ =?us-ascii?Q?udLMHUyr+hE3Fc5jOH3ilA1V6mDNLbVJF+2cJKYeEKmhUiNcd0U1MpLuqXPO?=
+ =?us-ascii?Q?9TAOphP8VPCxzPyBQhlaUagKvwE4Vkj42PMOadnUMIxXe9jZPQQEMIqHTxBP?=
+ =?us-ascii?Q?UPGkQOSG3bGk4/EpzDojI2cDMRJ1BYYA6mTFt8l69PP61Ac0fxnb1qTDCvGf?=
+ =?us-ascii?Q?ciawO9Xb5duomUk0ReYTROJg4fLFFQE7GwMf25Vj+CUWtI/PcRrOSdsT0qm+?=
+ =?us-ascii?Q?mMTyW9thMpCyUBngVKeQkwmWDjSWQU39qDEXfr7T9VkfDyKFIT6aehn61K1G?=
+ =?us-ascii?Q?I8DNzLGreavtC9rJAamfnj5CH/2975OrJIv8lKpJeXxSqdWEzAWcfS0aZ3Nu?=
+ =?us-ascii?Q?YuAw5z7USfPAdSV51iRauf9W0S62IW0=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260216-work-xattr-socket-v1-2-c2efa4f74cb7@kernel.org>
-X-Spam-Flag: NO
-X-Spam-Score: -3.80
-X-Spam-Level: 
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR11MB9485.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: abd12ca2-1067-4fa7-13e6-08de760f07ab
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Feb 2026 14:46:45.8000
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: G8KP5bNGy007g5SEaR1d5tw+r90qZxUMW4QdHIOiY/KDHmTMsututy85NWQlEEIjxdvOM9lwd7SRyeve8m1X4kidsjm69hT6JcAogUnhFxo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR11MB9374
+X-OriginatorOrg: intel.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-261858-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,SA3PR11MB9485.namprd11.prod.outlook.com:mid];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:email,suse.cz:dkim,suse.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	DMARC_NA(0.00)[suse.cz];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261857-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DKIM_TRACE(0.00)[intel.com:+];
 	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jack@suse.cz,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[arkadiusz.kubalewski@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: B51511B927E
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: 09C7B1B935C
 X-Rspamd-Action: no action
 
-On Mon 16-02-26 14:31:58, Christian Brauner wrote:
-> Add rhashtable support to the simple_xattr subsystem while keeping the
-> existing rbtree code fully functional. This allows consumers to be
-> migrated one at a time without breaking any intermediate build.
-> 
-> struct simple_xattrs gains a dispatch flag and a union holding either
-> the rbtree (rb_root + rwlock) or rhashtable state:
-> 
->   struct simple_xattrs {
->       bool use_rhashtable;
->       union {
->           struct { struct rb_root rb_root; rwlock_t lock; };
->           struct rhashtable ht;
->       };
->   };
-> 
-> simple_xattrs_init() continues to set up the rbtree path for existing
-> embedded-struct callers.
-> 
-> Add simple_xattrs_alloc() which dynamically allocates a simple_xattrs
-> and initializes the rhashtable path. This is the entry point for
-> consumers switching to pointer-based lazy allocation.
-> 
-> The five core functions (get, set, list, add, free) dispatch based on
-> the use_rhashtable flag.
-> 
-> Existing callers continue to use the rbtree path unchanged. As each
-> consumer is converted it will switch to simple_xattrs_alloc() and the
-> rhashtable path. Once all consumers are converted a follow-up patch
-> will remove the rbtree code.
-> 
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
+>From: Petr Oros <poros@redhat.com>
+>Sent: Friday, February 20, 2026 3:07 PM
+>
+>ice_dpll_notify_changes() sends dpll_pin_change_ntf() only for the
+>direct CGU input pin stored in d->active_input. Software-controlled
+>pins (SMA/U.FL) are separate dpll_pin objects that wrap a backing CGU
+>input, but they never receive a change notification. As a result,
+>userspace consumers such as synce4l that monitor SMA pins via dpll
+>netlink never learn when the pin state transitions (e.g. from
+>SELECTABLE to CONNECTED), even though 'dpll pin show' reports the
+>correct state on demand.
+>
+>When the active input changes, also send dpll_pin_change_ntf() for any
+>registered SMA/U.FL input pin whose backing CGU input matches the old
+>or new active input.
+>
+>Fixes: 2dd5d03c77e2 ("ice: redesign dpll sma/u.fl pins control")
+>Reported-by: kernel test robot <lkp@intel.com>
+>Closes: https://lore.kernel.org/oe-kbuild-all/202602200046.SGwK2tWh-
+>lkp@intel.com/
+>Signed-off-by: Petr Oros <poros@redhat.com>
 
-Looks good. Feel free to add:
+Petr, many thanks for your patch!
+LGTM.
+Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+>---
+>v3:
+>- Add kdoc for the helper.
+>v2:
+>- Extract ice_dpll_sw_pin_needs_notify() helper for readability,
+>- Move loop variable into for() scope.
+>
+>drivers/net/ethernet/intel/ice/ice_dpll.c | 29 +++++++++++++++++++++++
+> 1 file changed, 29 insertions(+)
+>
+>diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c
+>b/drivers/net/ethernet/intel/ice/ice_dpll.c
+>index c2ad39bfe177db..a9db85a1026388 100644
+>--- a/drivers/net/ethernet/intel/ice/ice_dpll.c
+>+++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
+>@@ -2462,6 +2462,24 @@ static u64 ice_generate_clock_id(struct ice_pf *pf)
+> 	return pci_get_dsn(pf->pdev);
+> }
+>
+>+/**
+>+ * ice_dpll_sw_pin_needs_notify - check if SW pin needs change
+>notification
+>+ * @p: pointer to SW pin (SMA or U.FL)
+>+ * @active: currently active input pin (or NULL)
+>+ * @old: previously active input pin (or NULL)
+>+ *
+>+ * Return: true if the SW pin is an input whose backing CGU pin matches
+>either
+>+ * the old or new active input, meaning its state has changed.
+>+ */
+>+static bool
+>+ice_dpll_sw_pin_needs_notify(struct ice_dpll_pin *p,
+>+			     struct dpll_pin *active, struct dpll_pin *old)
+>+{
+>+	return p->pin &&
+>+	       p->direction =3D=3D DPLL_PIN_DIRECTION_INPUT &&
+>+	       (p->input->pin =3D=3D active || p->input->pin =3D=3D old);
+>+}
+>+
+> /**
+>  * ice_dpll_notify_changes - notify dpll subsystem about changes
+>  * @d: pointer do dpll
+>@@ -2470,6 +2488,7 @@ static u64 ice_generate_clock_id(struct ice_pf *pf)
+>  */
+> static void ice_dpll_notify_changes(struct ice_dpll *d)
+> {
+>+	struct ice_dplls *dplls =3D &d->pf->dplls;
+> 	bool pin_notified =3D false;
+>
+> 	if (d->prev_dpll_state !=3D d->dpll_state) {
+>@@ -2477,6 +2496,8 @@ static void ice_dpll_notify_changes(struct ice_dpll
+>*d)
+> 		dpll_device_change_ntf(d->dpll);
+> 	}
+> 	if (d->prev_input !=3D d->active_input) {
+>+		struct dpll_pin *old =3D d->prev_input;
+>+
+> 		if (d->prev_input)
+> 			dpll_pin_change_ntf(d->prev_input);
+> 		d->prev_input =3D d->active_input;
+>@@ -2484,6 +2505,14 @@ static void ice_dpll_notify_changes(struct ice_dpll
+>*d)
+> 			dpll_pin_change_ntf(d->active_input);
+> 			pin_notified =3D true;
+> 		}
+>+		for (int i =3D 0; i < ICE_DPLL_PIN_SW_NUM; i++) {
+>+			if (ice_dpll_sw_pin_needs_notify(&dplls->sma[i],
+>+							 d->active_input, old))
+>+				dpll_pin_change_ntf(dplls->sma[i].pin);
+>+			if (ice_dpll_sw_pin_needs_notify(&dplls->ufl[i],
+>+							 d->active_input, old))
+>+				dpll_pin_change_ntf(dplls->ufl[i].pin);
+>+		}
+> 	}
+> 	if (d->prev_phase_offset !=3D d->phase_offset) {
+> 		d->prev_phase_offset =3D d->phase_offset;
+>--
+>2.52.0
 
-								Honza
-
-> ---
->  fs/xattr.c            | 439 ++++++++++++++++++++++++++++++++++++++------------
->  include/linux/xattr.h |  25 ++-
->  mm/shmem.c            |   2 +-
->  3 files changed, 357 insertions(+), 109 deletions(-)
-> 
-> diff --git a/fs/xattr.c b/fs/xattr.c
-> index 9cbb1917bcb2..1d98ea459b7b 100644
-> --- a/fs/xattr.c
-> +++ b/fs/xattr.c
-> @@ -22,6 +22,7 @@
->  #include <linux/audit.h>
->  #include <linux/vmalloc.h>
->  #include <linux/posix_acl_xattr.h>
-> +#include <linux/rhashtable.h>
->  
->  #include <linux/uaccess.h>
->  
-> @@ -1228,22 +1229,25 @@ void simple_xattr_free_rcu(struct simple_xattr *xattr)
->   * Allocate a new xattr object and initialize respective members. The caller is
->   * responsible for handling the name of the xattr.
->   *
-> - * Return: On success a new xattr object is returned. On failure NULL is
-> - * returned.
-> + * Return: New xattr object on success, NULL if @value is NULL, ERR_PTR on
-> + * failure.
->   */
->  struct simple_xattr *simple_xattr_alloc(const void *value, size_t size)
->  {
->  	struct simple_xattr *new_xattr;
->  	size_t len;
->  
-> +	if (!value)
-> +		return NULL;
-> +
->  	/* wrap around? */
->  	len = sizeof(*new_xattr) + size;
->  	if (len < sizeof(*new_xattr))
-> -		return NULL;
-> +		return ERR_PTR(-ENOMEM);
->  
->  	new_xattr = kvmalloc(len, GFP_KERNEL_ACCOUNT);
->  	if (!new_xattr)
-> -		return NULL;
-> +		return ERR_PTR(-ENOMEM);
->  
->  	new_xattr->size = size;
->  	memcpy(new_xattr->value, value, size);
-> @@ -1287,6 +1291,33 @@ static int rbtree_simple_xattr_node_cmp(struct rb_node *new_node,
->  	return rbtree_simple_xattr_cmp(xattr->name, node);
->  }
->  
-> +static u32 simple_xattr_hashfn(const void *data, u32 len, u32 seed)
-> +{
-> +	const char *name = data;
-> +	return jhash(name, strlen(name), seed);
-> +}
-> +
-> +static u32 simple_xattr_obj_hashfn(const void *obj, u32 len, u32 seed)
-> +{
-> +	const struct simple_xattr *xattr = obj;
-> +	return jhash(xattr->name, strlen(xattr->name), seed);
-> +}
-> +
-> +static int simple_xattr_obj_cmpfn(struct rhashtable_compare_arg *arg,
-> +				   const void *obj)
-> +{
-> +	const struct simple_xattr *xattr = obj;
-> +	return strcmp(xattr->name, arg->key);
-> +}
-> +
-> +static const struct rhashtable_params simple_xattr_params = {
-> +	.head_offset    = offsetof(struct simple_xattr, hash_node),
-> +	.hashfn         = simple_xattr_hashfn,
-> +	.obj_hashfn     = simple_xattr_obj_hashfn,
-> +	.obj_cmpfn      = simple_xattr_obj_cmpfn,
-> +	.automatic_shrinking = true,
-> +};
-> +
->  /**
->   * simple_xattr_get - get an xattr object
->   * @xattrs: the header of the xattr object
-> @@ -1306,22 +1337,41 @@ int simple_xattr_get(struct simple_xattrs *xattrs, const char *name,
->  		     void *buffer, size_t size)
->  {
->  	struct simple_xattr *xattr = NULL;
-> -	struct rb_node *rbp;
->  	int ret = -ENODATA;
->  
-> -	read_lock(&xattrs->lock);
-> -	rbp = rb_find(name, &xattrs->rb_root, rbtree_simple_xattr_cmp);
-> -	if (rbp) {
-> -		xattr = rb_entry(rbp, struct simple_xattr, rb_node);
-> -		ret = xattr->size;
-> -		if (buffer) {
-> -			if (size < xattr->size)
-> -				ret = -ERANGE;
-> -			else
-> -				memcpy(buffer, xattr->value, xattr->size);
-> +	if (xattrs->use_rhashtable) {
-> +		guard(rcu)();
-> +		xattr = rhashtable_lookup(&xattrs->ht, name,
-> +					  simple_xattr_params);
-> +		if (xattr) {
-> +			ret = xattr->size;
-> +			if (buffer) {
-> +				if (size < xattr->size)
-> +					ret = -ERANGE;
-> +				else
-> +					memcpy(buffer, xattr->value,
-> +					       xattr->size);
-> +			}
-> +		}
-> +	} else {
-> +		struct rb_node *rbp;
-> +
-> +		read_lock(&xattrs->lock);
-> +		rbp = rb_find(name, &xattrs->rb_root,
-> +			      rbtree_simple_xattr_cmp);
-> +		if (rbp) {
-> +			xattr = rb_entry(rbp, struct simple_xattr, rb_node);
-> +			ret = xattr->size;
-> +			if (buffer) {
-> +				if (size < xattr->size)
-> +					ret = -ERANGE;
-> +				else
-> +					memcpy(buffer, xattr->value,
-> +					       xattr->size);
-> +			}
->  		}
-> +		read_unlock(&xattrs->lock);
->  	}
-> -	read_unlock(&xattrs->lock);
->  	return ret;
->  }
->  
-> @@ -1355,78 +1405,134 @@ struct simple_xattr *simple_xattr_set(struct simple_xattrs *xattrs,
->  				      const char *name, const void *value,
->  				      size_t size, int flags)
->  {
-> -	struct simple_xattr *old_xattr = NULL, *new_xattr = NULL;
-> -	struct rb_node *parent = NULL, **rbp;
-> -	int err = 0, ret;
-> +	struct simple_xattr *old_xattr = NULL;
-> +	int err = 0;
->  
-> -	/* value == NULL means remove */
-> -	if (value) {
-> -		new_xattr = simple_xattr_alloc(value, size);
-> -		if (!new_xattr)
-> -			return ERR_PTR(-ENOMEM);
-> +	CLASS(simple_xattr, new_xattr)(value, size);
-> +	if (IS_ERR(new_xattr))
-> +		return new_xattr;
->  
-> +	if (new_xattr) {
->  		new_xattr->name = kstrdup(name, GFP_KERNEL_ACCOUNT);
-> -		if (!new_xattr->name) {
-> -			simple_xattr_free(new_xattr);
-> +		if (!new_xattr->name)
->  			return ERR_PTR(-ENOMEM);
-> -		}
->  	}
->  
-> -	write_lock(&xattrs->lock);
-> -	rbp = &xattrs->rb_root.rb_node;
-> -	while (*rbp) {
-> -		parent = *rbp;
-> -		ret = rbtree_simple_xattr_cmp(name, *rbp);
-> -		if (ret < 0)
-> -			rbp = &(*rbp)->rb_left;
-> -		else if (ret > 0)
-> -			rbp = &(*rbp)->rb_right;
-> -		else
-> -			old_xattr = rb_entry(*rbp, struct simple_xattr, rb_node);
-> -		if (old_xattr)
-> -			break;
-> -	}
-> +	if (xattrs->use_rhashtable) {
-> +		/*
-> +		 * Lookup is safe without RCU here since writes are
-> +		 * serialized by the caller.
-> +		 */
-> +		old_xattr = rhashtable_lookup_fast(&xattrs->ht, name,
-> +						   simple_xattr_params);
-> +
-> +		if (old_xattr) {
-> +			/* Fail if XATTR_CREATE is requested and the xattr exists. */
-> +			if (flags & XATTR_CREATE)
-> +				return ERR_PTR(-EEXIST);
-> +
-> +			if (new_xattr) {
-> +				err = rhashtable_replace_fast(&xattrs->ht,
-> +							     &old_xattr->hash_node,
-> +							     &new_xattr->hash_node,
-> +							     simple_xattr_params);
-> +				if (err)
-> +					return ERR_PTR(err);
-> +			} else {
-> +				err = rhashtable_remove_fast(&xattrs->ht,
-> +							    &old_xattr->hash_node,
-> +							    simple_xattr_params);
-> +				if (err)
-> +					return ERR_PTR(err);
-> +			}
-> +		} else {
-> +			/* Fail if XATTR_REPLACE is requested but no xattr is found. */
-> +			if (flags & XATTR_REPLACE)
-> +				return ERR_PTR(-ENODATA);
-> +
-> +			/*
-> +			 * If XATTR_CREATE or no flags are specified together
-> +			 * with a new value simply insert it.
-> +			 */
-> +			if (new_xattr) {
-> +				err = rhashtable_insert_fast(&xattrs->ht,
-> +							    &new_xattr->hash_node,
-> +							    simple_xattr_params);
-> +				if (err)
-> +					return ERR_PTR(err);
-> +			}
->  
-> -	if (old_xattr) {
-> -		/* Fail if XATTR_CREATE is requested and the xattr exists. */
-> -		if (flags & XATTR_CREATE) {
-> -			err = -EEXIST;
-> -			goto out_unlock;
-> +			/*
-> +			 * If XATTR_CREATE or no flags are specified and
-> +			 * neither an old or new xattr exist then we don't
-> +			 * need to do anything.
-> +			 */
->  		}
-> -
-> -		if (new_xattr)
-> -			rb_replace_node(&old_xattr->rb_node,
-> -					&new_xattr->rb_node, &xattrs->rb_root);
-> -		else
-> -			rb_erase(&old_xattr->rb_node, &xattrs->rb_root);
->  	} else {
-> -		/* Fail if XATTR_REPLACE is requested but no xattr is found. */
-> -		if (flags & XATTR_REPLACE) {
-> -			err = -ENODATA;
-> -			goto out_unlock;
-> -		}
-> +		struct rb_node *parent = NULL, **rbp;
-> +		int ret;
->  
-> -		/*
-> -		 * If XATTR_CREATE or no flags are specified together with a
-> -		 * new value simply insert it.
-> -		 */
-> -		if (new_xattr) {
-> -			rb_link_node(&new_xattr->rb_node, parent, rbp);
-> -			rb_insert_color(&new_xattr->rb_node, &xattrs->rb_root);
-> +		write_lock(&xattrs->lock);
-> +		rbp = &xattrs->rb_root.rb_node;
-> +		while (*rbp) {
-> +			parent = *rbp;
-> +			ret = rbtree_simple_xattr_cmp(name, *rbp);
-> +			if (ret < 0)
-> +				rbp = &(*rbp)->rb_left;
-> +			else if (ret > 0)
-> +				rbp = &(*rbp)->rb_right;
-> +			else
-> +				old_xattr = rb_entry(*rbp, struct simple_xattr,
-> +						     rb_node);
-> +			if (old_xattr)
-> +				break;
->  		}
->  
-> -		/*
-> -		 * If XATTR_CREATE or no flags are specified and neither an
-> -		 * old or new xattr exist then we don't need to do anything.
-> -		 */
-> -	}
-> +		if (old_xattr) {
-> +			/* Fail if XATTR_CREATE is requested and the xattr exists. */
-> +			if (flags & XATTR_CREATE) {
-> +				err = -EEXIST;
-> +				goto out_unlock;
-> +			}
-> +
-> +			if (new_xattr)
-> +				rb_replace_node(&old_xattr->rb_node,
-> +						&new_xattr->rb_node,
-> +						&xattrs->rb_root);
-> +			else
-> +				rb_erase(&old_xattr->rb_node,
-> +					 &xattrs->rb_root);
-> +		} else {
-> +			/* Fail if XATTR_REPLACE is requested but no xattr is found. */
-> +			if (flags & XATTR_REPLACE) {
-> +				err = -ENODATA;
-> +				goto out_unlock;
-> +			}
-> +
-> +			/*
-> +			 * If XATTR_CREATE or no flags are specified together
-> +			 * with a new value simply insert it.
-> +			 */
-> +			if (new_xattr) {
-> +				rb_link_node(&new_xattr->rb_node, parent, rbp);
-> +				rb_insert_color(&new_xattr->rb_node,
-> +						&xattrs->rb_root);
-> +			}
-> +
-> +			/*
-> +			 * If XATTR_CREATE or no flags are specified and
-> +			 * neither an old or new xattr exist then we don't
-> +			 * need to do anything.
-> +			 */
-> +		}
->  
->  out_unlock:
-> -	write_unlock(&xattrs->lock);
-> -	if (!err)
-> -		return old_xattr;
-> -	simple_xattr_free(new_xattr);
-> -	return ERR_PTR(err);
-> +		write_unlock(&xattrs->lock);
-> +		if (err)
-> +			return ERR_PTR(err);
-> +	}
-> +	retain_and_null_ptr(new_xattr);
-> +	return old_xattr;
->  }
->  
->  static bool xattr_is_trusted(const char *name)
-> @@ -1467,7 +1573,6 @@ ssize_t simple_xattr_list(struct inode *inode, struct simple_xattrs *xattrs,
->  {
->  	bool trusted = ns_capable_noaudit(&init_user_ns, CAP_SYS_ADMIN);
->  	struct simple_xattr *xattr;
-> -	struct rb_node *rbp;
->  	ssize_t remaining_size = size;
->  	int err = 0;
->  
-> @@ -1487,23 +1592,62 @@ ssize_t simple_xattr_list(struct inode *inode, struct simple_xattrs *xattrs,
->  	remaining_size -= err;
->  	err = 0;
->  
-> -	read_lock(&xattrs->lock);
-> -	for (rbp = rb_first(&xattrs->rb_root); rbp; rbp = rb_next(rbp)) {
-> -		xattr = rb_entry(rbp, struct simple_xattr, rb_node);
-> +	if (!xattrs)
-> +		return size - remaining_size;
->  
-> -		/* skip "trusted." attributes for unprivileged callers */
-> -		if (!trusted && xattr_is_trusted(xattr->name))
-> -			continue;
-> +	if (xattrs->use_rhashtable) {
-> +		struct rhashtable_iter iter;
->  
-> -		/* skip MAC labels; these are provided by LSM above */
-> -		if (xattr_is_maclabel(xattr->name))
-> -			continue;
-> +		rhashtable_walk_enter(&xattrs->ht, &iter);
-> +		rhashtable_walk_start(&iter);
->  
-> -		err = xattr_list_one(&buffer, &remaining_size, xattr->name);
-> -		if (err)
-> -			break;
-> +		while ((xattr = rhashtable_walk_next(&iter)) != NULL) {
-> +			if (IS_ERR(xattr)) {
-> +				if (PTR_ERR(xattr) == -EAGAIN)
-> +					continue;
-> +				err = PTR_ERR(xattr);
-> +				break;
-> +			}
-> +
-> +			/* skip "trusted." attributes for unprivileged callers */
-> +			if (!trusted && xattr_is_trusted(xattr->name))
-> +				continue;
-> +
-> +			/* skip MAC labels; these are provided by LSM above */
-> +			if (xattr_is_maclabel(xattr->name))
-> +				continue;
-> +
-> +			err = xattr_list_one(&buffer, &remaining_size,
-> +					     xattr->name);
-> +			if (err)
-> +				break;
-> +		}
-> +
-> +		rhashtable_walk_stop(&iter);
-> +		rhashtable_walk_exit(&iter);
-> +	} else {
-> +		struct rb_node *rbp;
-> +
-> +		read_lock(&xattrs->lock);
-> +		for (rbp = rb_first(&xattrs->rb_root); rbp;
-> +		     rbp = rb_next(rbp)) {
-> +			xattr = rb_entry(rbp, struct simple_xattr, rb_node);
-> +
-> +			/* skip "trusted." attributes for unprivileged callers */
-> +			if (!trusted && xattr_is_trusted(xattr->name))
-> +				continue;
-> +
-> +			/* skip MAC labels; these are provided by LSM above */
-> +			if (xattr_is_maclabel(xattr->name))
-> +				continue;
-> +
-> +			err = xattr_list_one(&buffer, &remaining_size,
-> +					     xattr->name);
-> +			if (err)
-> +				break;
-> +		}
-> +		read_unlock(&xattrs->lock);
->  	}
-> -	read_unlock(&xattrs->lock);
->  
->  	return err ? err : size - remaining_size;
->  }
-> @@ -1536,9 +1680,16 @@ static bool rbtree_simple_xattr_less(struct rb_node *new_node,
->  void simple_xattr_add(struct simple_xattrs *xattrs,
->  		      struct simple_xattr *new_xattr)
->  {
-> -	write_lock(&xattrs->lock);
-> -	rb_add(&new_xattr->rb_node, &xattrs->rb_root, rbtree_simple_xattr_less);
-> -	write_unlock(&xattrs->lock);
-> +	if (xattrs->use_rhashtable) {
-> +		WARN_ON(rhashtable_insert_fast(&xattrs->ht,
-> +					       &new_xattr->hash_node,
-> +					       simple_xattr_params));
-> +	} else {
-> +		write_lock(&xattrs->lock);
-> +		rb_add(&new_xattr->rb_node, &xattrs->rb_root,
-> +		       rbtree_simple_xattr_less);
-> +		write_unlock(&xattrs->lock);
-> +	}
->  }
->  
->  /**
-> @@ -1549,10 +1700,80 @@ void simple_xattr_add(struct simple_xattrs *xattrs,
->   */
->  void simple_xattrs_init(struct simple_xattrs *xattrs)
->  {
-> +	xattrs->use_rhashtable = false;
->  	xattrs->rb_root = RB_ROOT;
->  	rwlock_init(&xattrs->lock);
->  }
->  
-> +/**
-> + * simple_xattrs_alloc - allocate and initialize a new xattr header
-> + *
-> + * Dynamically allocate a simple_xattrs header and initialize the
-> + * underlying rhashtable. This is intended for consumers that want
-> + * rhashtable-based xattr storage.
-> + *
-> + * Return: On success a new simple_xattrs is returned. On failure an
-> + * ERR_PTR is returned.
-> + */
-> +struct simple_xattrs *simple_xattrs_alloc(void)
-> +{
-> +	struct simple_xattrs *xattrs __free(kfree) = NULL;
-> +
-> +	xattrs = kzalloc(sizeof(*xattrs), GFP_KERNEL);
-> +	if (!xattrs)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	xattrs->use_rhashtable = true;
-> +	if (rhashtable_init(&xattrs->ht, &simple_xattr_params))
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	return no_free_ptr(xattrs);
-> +}
-> +
-> +/**
-> + * simple_xattrs_lazy_alloc - get or allocate xattrs for a set operation
-> + * @xattrsp: pointer to the xattrs pointer (may point to NULL)
-> + * @value: value being set (NULL means remove)
-> + * @flags: xattr set flags
-> + *
-> + * For lazily-allocated xattrs on the write path. If no xattrs exist yet
-> + * and this is a remove operation, returns the appropriate result without
-> + * allocating. Otherwise ensures xattrs is allocated and published with
-> + * store-release semantics.
-> + *
-> + * Return: On success a valid pointer to the xattrs is returned. On
-> + * failure or early-exit an ERR_PTR or NULL is returned. Callers should
-> + * check with IS_ERR_OR_NULL() and propagate with PTR_ERR() which
-> + * correctly returns 0 for the NULL no-op case.
-> + */
-> +struct simple_xattrs *simple_xattrs_lazy_alloc(struct simple_xattrs **xattrsp,
-> +					       const void *value, int flags)
-> +{
-> +	struct simple_xattrs *xattrs;
-> +
-> +	xattrs = READ_ONCE(*xattrsp);
-> +	if (xattrs)
-> +		return xattrs;
-> +
-> +	if (!value)
-> +		return (flags & XATTR_REPLACE) ? ERR_PTR(-ENODATA) : NULL;
-> +
-> +	xattrs = simple_xattrs_alloc();
-> +	if (!IS_ERR(xattrs))
-> +		smp_store_release(xattrsp, xattrs);
-> +	return xattrs;
-> +}
-> +
-> +static void simple_xattr_ht_free(void *ptr, void *arg)
-> +{
-> +	struct simple_xattr *xattr = ptr;
-> +	size_t *freed_space = arg;
-> +
-> +	if (freed_space)
-> +		*freed_space += simple_xattr_space(xattr->name, xattr->size);
-> +	simple_xattr_free(xattr);
-> +}
-> +
->  /**
->   * simple_xattrs_free - free xattrs
->   * @xattrs: xattr header whose xattrs to destroy
-> @@ -1563,22 +1784,28 @@ void simple_xattrs_init(struct simple_xattrs *xattrs)
->   */
->  void simple_xattrs_free(struct simple_xattrs *xattrs, size_t *freed_space)
->  {
-> -	struct rb_node *rbp;
-> -
->  	if (freed_space)
->  		*freed_space = 0;
-> -	rbp = rb_first(&xattrs->rb_root);
-> -	while (rbp) {
-> -		struct simple_xattr *xattr;
-> -		struct rb_node *rbp_next;
-> -
-> -		rbp_next = rb_next(rbp);
-> -		xattr = rb_entry(rbp, struct simple_xattr, rb_node);
-> -		rb_erase(&xattr->rb_node, &xattrs->rb_root);
-> -		if (freed_space)
-> -			*freed_space += simple_xattr_space(xattr->name,
-> -							   xattr->size);
-> -		simple_xattr_free(xattr);
-> -		rbp = rbp_next;
-> +
-> +	if (xattrs->use_rhashtable) {
-> +		rhashtable_free_and_destroy(&xattrs->ht,
-> +					    simple_xattr_ht_free, freed_space);
-> +	} else {
-> +		struct rb_node *rbp;
-> +
-> +		rbp = rb_first(&xattrs->rb_root);
-> +		while (rbp) {
-> +			struct simple_xattr *xattr;
-> +			struct rb_node *rbp_next;
-> +
-> +			rbp_next = rb_next(rbp);
-> +			xattr = rb_entry(rbp, struct simple_xattr, rb_node);
-> +			rb_erase(&xattr->rb_node, &xattrs->rb_root);
-> +			if (freed_space)
-> +				*freed_space += simple_xattr_space(xattr->name,
-> +								   xattr->size);
-> +			simple_xattr_free(xattr);
-> +			rbp = rbp_next;
-> +		}
->  	}
->  }
-> diff --git a/include/linux/xattr.h b/include/linux/xattr.h
-> index 1328f2bfd2ce..ee4fd40717a0 100644
-> --- a/include/linux/xattr.h
-> +++ b/include/linux/xattr.h
-> @@ -107,8 +107,14 @@ static inline const char *xattr_prefix(const struct xattr_handler *handler)
->  }
->  
->  struct simple_xattrs {
-> -	struct rb_root rb_root;
-> -	rwlock_t lock;
-> +	bool use_rhashtable;
-> +	union {
-> +		struct {
-> +			struct rb_root rb_root;
-> +			rwlock_t lock;
-> +		};
-> +		struct rhashtable ht;
-> +	};
->  };
->  
->  struct simple_xattr {
-> @@ -121,6 +127,9 @@ struct simple_xattr {
->  };
->  
->  void simple_xattrs_init(struct simple_xattrs *xattrs);
-> +struct simple_xattrs *simple_xattrs_alloc(void);
-> +struct simple_xattrs *simple_xattrs_lazy_alloc(struct simple_xattrs **xattrsp,
-> +					       const void *value, int flags);
->  void simple_xattrs_free(struct simple_xattrs *xattrs, size_t *freed_space);
->  size_t simple_xattr_space(const char *name, size_t size);
->  struct simple_xattr *simple_xattr_alloc(const void *value, size_t size);
-> @@ -137,4 +146,16 @@ void simple_xattr_add(struct simple_xattrs *xattrs,
->  		      struct simple_xattr *new_xattr);
->  int xattr_list_one(char **buffer, ssize_t *remaining_size, const char *name);
->  
-> +DEFINE_CLASS(simple_xattr,
-> +	     struct simple_xattr *,
-> +	     if (!IS_ERR_OR_NULL(_T)) simple_xattr_free(_T),
-> +	     simple_xattr_alloc(value, size),
-> +	     const void *value, size_t size)
-> +
-> +DEFINE_CLASS(simple_xattrs,
-> +            struct simple_xattrs *,
-> +            if (!IS_ERR_OR_NULL(_T)) { simple_xattrs_free(_T, NULL); kfree(_T); },
-> +            simple_xattrs_alloc(),
-> +            void)
-> +
->  #endif	/* _LINUX_XATTR_H */
-> diff --git a/mm/shmem.c b/mm/shmem.c
-> index 063b4c3e4ccb..fc8020ce2e9f 100644
-> --- a/mm/shmem.c
-> +++ b/mm/shmem.c
-> @@ -4293,7 +4293,7 @@ static int shmem_initxattrs(struct inode *inode,
->  
->  	for (xattr = xattr_array; xattr->name != NULL; xattr++) {
->  		new_xattr = simple_xattr_alloc(xattr->value, xattr->value_len);
-> -		if (!new_xattr)
-> +		if (IS_ERR(new_xattr))
->  			break;
->  
->  		len = strlen(xattr->name) + 1;
-> 
-> -- 
-> 2.47.3
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
 
