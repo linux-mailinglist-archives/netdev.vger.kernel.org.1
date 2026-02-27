@@ -1,249 +1,197 @@
-Return-Path: <netdev+bounces-261717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261720-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iA6cNisVoWnoqAQAu9opvQ
-	(envelope-from <netdev+bounces-261717-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 04:53:15 +0100
+	id ACYDNqUWoWkUqQQAu9opvQ
+	(envelope-from <netdev+bounces-261720-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 04:59:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DF451B26B0
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 04:53:15 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55C0C1B2726
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 04:59:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0CB9330E186C
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 03:53:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 14D973080C38
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 03:59:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F80F33A71E;
-	Fri, 27 Feb 2026 03:53:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 212C733D6F6;
+	Fri, 27 Feb 2026 03:59:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IsVdHpn0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3ras7j6w"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA6233A70B;
-	Fri, 27 Feb 2026 03:53:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E752F33D6F8
+	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 03:59:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772164382; cv=none; b=sSfdHlCOt+VsRz5ZvAux/bKZ8+z/zK8yt0bplRg9rbBipfrUkJtdgCTtef4u+TRy8GgzYZr5fGJ4xYladK77Tkaa1h7u3mGjYFTwmmBe9chHL0mdaG4/IJt+FNTxs2w8kgihhmOVCkbAoB8X2Xvmzh7WRmGx0atB52q+0vtPvYE=
+	t=1772164771; cv=none; b=qSn4H9bDYeWCN1iqVMx+U18JHwylQ4lkNepHs7X5XODvStPQTFKhk5Gw+4khfcJ3NwcYEyy7BW5YfTHG0Uq/AB7KMA0wt7GKkKuduYrOEBVxXyqzhqhQMUVjoU+PXN/WvrdojkeKlk7bb0LBBiMi2T8R66/4crVSldkZUZOHINI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772164382; c=relaxed/simple;
-	bh=85iHLWRx8ynP5HbfuLYmK1cCtUJceJFWMGhV7uqh/Y4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=O6co+/SPyaJgD175NbmWH86O/4GGY0WTAIoY56lzDKOrKFipGS+ObUaH8VdXbhOr2tZtbqWHzaq86g447o4hENBhYVW6iHPCO33skX5Y1TQSyihna2Fl5B4UbyCPvo5IsWVK31sbuhTwx+QnqQ4u4OBbtxCso5V9sLMuy4hPSuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IsVdHpn0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 945F2C116C6;
-	Fri, 27 Feb 2026 03:53:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772164382;
-	bh=85iHLWRx8ynP5HbfuLYmK1cCtUJceJFWMGhV7uqh/Y4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IsVdHpn0G4PaDJLgkUUJQnMAYpTW/NwSMkIo6MHCCmDgL/nioWn/3Si6cA6NbFqRp
-	 4RJaDBU8jEPtatwM5OsVYMdcqsScIn8noSD6nWmQUaPlR2AZzBjJ/emTHD7YfEfgmv
-	 zYIGWS8yh7oPTgoz2TqnGB72IoB7J1ynDBrwTSJIrU/qBEs9ns1ug8lkrVpTJj/UAI
-	 Z8FGoRNITGI9DGw5/eYIOugB5PcEll4En8hXyuxNGTYipQWr5JGm4mMuTsvXrVjRpV
-	 bhGk/WvWy6+ZEbNYZc7x2R/eeAPAC8uyL8KnKlPh89rUAaZnYjNpKuokbBwBaw1/Cn
-	 HZ9pqU48uBo6g==
-From: Jakub Kicinski <kuba@kernel.org>
-To: alibuda@linux.alibaba.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	linux-rdma@vger.kernel.org,
-	sidraya@linux.ibm.com,
-	horms@kernel.org,
-	davem@davemloft.net,
-	linux-s390@vger.kernel.org,
-	mjambigi@linux.ibm.com,
-	oliver.yang@linux.alibaba.com,
-	edumazet@google.com,
-	wenjia@linux.ibm.com,
-	guwen@linux.alibaba.com,
-	tonylu@linux.alibaba.com,
-	dust.li@linux.alibaba.com,
-	linux-kernel@vger.kernel.org,
-	pasic@linux.ibm.com
-Subject: Re: [net-next] net/smc: transition to RDMA core CQ pooling
-Date: Thu, 26 Feb 2026 19:53:00 -0800
-Message-ID: <20260227035300.2628494-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260225024513.7861-1-alibuda@linux.alibaba.com>
-References: <20260225024513.7861-1-alibuda@linux.alibaba.com>
+	s=arc-20240116; t=1772164771; c=relaxed/simple;
+	bh=AOlUQIQwRM3TfQVWpY8IO+Oimy0yKwkaz63Brgmpmk0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=T+MCvW3JEvoz+JohbpeRjvIUJ5fKYd7pub1dqP+F2YEnz8Gpvi1YtvAzseJgCYw6VKbLtwse8V41y7Y4uI7+ImA5D5+Yhiaa/WmEYe99cnq4EjRX9Ap/CzDzPKffFz+Fv8sfPWHf4FTavPtmx9+/kEzEi15CVlsPl6vcMYhTpME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3ras7j6w; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c6e18b8fe1eso1637885a12.1
+        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 19:59:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772164769; x=1772769569; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=jMr9OVkiEqDw4Lp9EzktAf71Dg6nani4781m7h3dn/8=;
+        b=3ras7j6w9778Xxr8zEGUwr5qnSBaYvEzvqev2lNHSyErm2CwF04Vwqalka4+MO+n9F
+         cwVaMAleLMGnEmeO7x479zKtFMHfgS/5750V4aguXzILZADTJHcPY/tOiIwXQ1Yb22dx
+         XmpT44R2w5Swa3bdYAEzUfKkJjLnNof9EBOCzYt6kau0tjtrcwzyPgBLxT29ij6cdvO2
+         sN1qKfDO5WFns6pSx+qHNFxFnDr4D1qUD87qSRVCPihvLzL/vaV3+5Cp/DESkb3UYtio
+         zXV24hlhK4NvU097jDccAk6IaQWFPTK9vEb5PyI/6bplGD2VSVFj/aUzNQIwhF5Dx2MJ
+         oS9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772164769; x=1772769569;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jMr9OVkiEqDw4Lp9EzktAf71Dg6nani4781m7h3dn/8=;
+        b=BaVkIbtsypFSKgtRatsjfc6LJooGVZocFNXU4ljr5PIba5E2SUbURLM0eA7Cra7lIn
+         bFUp9SgGSxZNw2IZ0tNwD1XEcIF6lNTYTpGbYsCH8cB9w+JEqczxZMjKTjQzFbh3wWkU
+         FuCMin/7+6+asvoicHVRyB9sFKy+C7Peqp2ax006fVR7D/TbfAA+O/gE1nfyKvY62dgV
+         +sPoGthuoj1T+WCe0Ly95SRdapngRhLX/mZa/TYsIfCBQyk30KWNssXflsUj9NCYkZBu
+         XBtHfhDh64VrykxMNtxOjFjaQRnhA0CTV+s8LFIrHzV2wvqsxD2seloSlJI9BOfOaugs
+         I8gg==
+X-Forwarded-Encrypted: i=1; AJvYcCXJu1sWQqbRjoMDEi9QZue8PMgNTl730Ah3CHm4ZoQPbUdZ3+vVeRPmS61WIY/pn9tzdt3MAvc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzv1NnV463VSreUqRCCJWBSYjoKh6KHNUHUCYBvqzDzZ4apQbiZ
+	8wlbjuxTa8qXJq3uG3D7bAShtX6LnpMGbHfd4RnKhW9FfdDSDFqv17JFdR+7UvuYUnAhbxMifTz
+	bxSujpw==
+X-Received: from pgbfp5.prod.google.com ([2002:a05:6a02:2ce5:b0:c0e:c1b4:51a5])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:4d8e:b0:35e:5055:1ec
+ with SMTP id adf61e73a8af0-395c472a18dmr1455185637.17.1772164769058; Thu, 26
+ Feb 2026 19:59:29 -0800 (PST)
+Date: Fri, 27 Feb 2026 03:55:35 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+Message-ID: <20260227035547.3321327-1-kuniyu@google.com>
+Subject: [PATCH v2 net] udp: Unhash auto-bound connected sk from 4-tuple hash
+ table when disconnected.
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Philo Lu <lulie@linux.alibaba.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261717-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261720-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,linux.alibaba.com,google.com,gmail.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: 7DF451B26B0
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-0.968];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 55C0C1B2726
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+Let's say we bind() an UDP socket to the wildcard address with a
+non-zero port, connect() it to an address, and disconnect it from
+the address.
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+bind() sets SOCK_BINDPORT_LOCK on sk->sk_userlocks (but not
+SOCK_BINDADDR_LOCK), and connect() calls udp_lib_hash4() to put
+the socket into the 4-tuple hash table.
+
+Then, __udp_disconnect() calls sk->sk_prot->rehash(sk).
+
+It computes a new hash based on the wildcard address and moves
+the socket to a new slot in the 4-tuple hash table, leaving a
+garbage in the chain that no packet hits.
+
+Let's remove such a socket from 4-tuple hash table when disconnected.
+
+Note that udp_sk(sk)->udp_portaddr_hash needs to be udpated after
+udp_hash4_dec(hslot2) in udp_unhash4().
+
+Fixes: 78c91ae2c6de ("ipv4/udp: Add 4-tuple hash for connected socket")
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
-net/smc: transition to RDMA core CQ pooling
+v2: Moved udp_portaddr_hash update later
+v1: https://lore.kernel.org/netdev/20260225002709.156882-1-kuniyu@google.com/
+---
+ net/ipv4/udp.c | 25 +++++++++++++++----------
+ 1 file changed, 15 insertions(+), 10 deletions(-)
 
-This commit refactors SMC-R completion handling to use the ib_cqe API
-and RDMA core CQ pooling, replacing the previous per-device global CQs
-and manual tasklet polling. The refactoring aims to eliminate scalability
-bottlenecks by enabling multi-CQ parallelization and O(1) context retrieval.
-
-> diff --git a/net/smc/smc_wr.c b/net/smc/smc_wr.c
-> index 5feafa98ab1a..4a4924c5cade 100644
-> --- a/net/smc/smc_wr.c
-> +++ b/net/smc/smc_wr.c
-
-[ ... ]
-
-> @@ -63,55 +60,52 @@ void smc_wr_tx_wait_no_pending_sends(struct smc_link *link)
->  	wait_event(link->wr_tx_wait, !smc_wr_is_tx_pend(link));
->  }
->
-> -static inline int smc_wr_tx_find_pending_index(struct smc_link *link, u64 wr_id)
-> +static void smc_wr_tx_rdma_process_cqe(struct ib_cq *cq, struct ib_wc *wc)
->  {
-> -	u32 i;
-> +	struct smc_link *link = wc->qp->qp_context;
->
-> -	for (i = 0; i < link->wr_tx_cnt; i++) {
-> -		if (link->wr_tx_pends[i].wr_id == wr_id)
-> -			return i;
-> -	}
-> -	return link->wr_tx_cnt;
-> +	/* terminate link */
-> +	if (wc->status)
-> +		smcr_link_down_cond_sched(link);
-> +}
-> +
-> +static void smc_wr_reg_process_cqe(struct ib_cq *cq, struct ib_wc *wc)
-> +{
-> +	struct smc_link *link = wc->qp->qp_context;
-> +
-> +	if (wc->status)
-> +		link->wr_reg_state = FAILED;
-> +	else
-> +		link->wr_reg_state = CONFIRMED;
-> +	smc_wr_wakeup_reg_wait(link);
->  }
->
-> -static inline void smc_wr_tx_process_cqe(struct ib_wc *wc)
-> +static void smc_wr_tx_process_cqe(struct ib_cq *cq, struct ib_wc *wc)
->  {
-> -	struct smc_wr_tx_pend pnd_snd;
-> +	struct smc_wr_tx_pend *tx_pend, pnd_snd;
-> +	struct smc_ib_send_wr *send_wr;
->  	struct smc_link *link;
->  	u32 pnd_snd_idx;
->
->  	link = wc->qp->qp_context;
->
-> -	if (wc->opcode == IB_WC_REG_MR) {
-> -		if (wc->status)
-> -			link->wr_reg_state = FAILED;
-> -		else
-> -			link->wr_reg_state = CONFIRMED;
-> -		smc_wr_wakeup_reg_wait(link);
-> -		return;
-> -	}
-> +	send_wr = container_of(wc->wr_cqe, struct smc_ib_send_wr, cqe);
-> +	pnd_snd_idx = send_wr->idx;
-> +
-> +	tx_pend = (pnd_snd_idx == link->wr_tx_cnt) ? link->wr_tx_v2_pend :
-> +		&link->wr_tx_pends[pnd_snd_idx];
-> +
-> +	tx_pend->wc_status = wc->status;
-> +	memcpy(&pnd_snd, tx_pend, sizeof(pnd_snd));
-> +	/* clear the full struct smc_wr_tx_pend including .priv */
-> +	memset(tx_pend, 0, sizeof(*tx_pend));
->
-> -	pnd_snd_idx = smc_wr_tx_find_pending_index(link, wc->wr_id);
->  	if (pnd_snd_idx == link->wr_tx_cnt) {
-> -		if (link->lgr->smc_version != SMC_V2 ||
-> -		    link->wr_tx_v2_pend->wr_id != wc->wr_id)
-> -			return;
-> -		link->wr_tx_v2_pend->wc_status = wc->status;
-> -		memcpy(&pnd_snd, link->wr_tx_v2_pend, sizeof(pnd_snd));
-> -		/* clear the full struct smc_wr_tx_pend including .priv */
-> -		memset(link->wr_tx_v2_pend, 0,
-> -		       sizeof(*link->wr_tx_v2_pend));
->  		memset(link->lgr->wr_tx_buf_v2, 0,
->  		       sizeof(*link->lgr->wr_tx_buf_v2));
->  	} else {
-> -		link->wr_tx_pends[pnd_snd_idx].wc_status = wc->status;
-> -		if (link->wr_tx_pends[pnd_snd_idx].compl_requested)
-> +		if (tx_pend->compl_requested)
-                    ^^^^^^
-
-Does this read the correct field? The code above memsets tx_pend to zero,
-so compl_requested is always 0 and complete() is never called.
-
-The refactoring created a local copy pnd_snd before the memset:
-
-memcpy(&pnd_snd, tx_pend, sizeof(pnd_snd));
-memset(tx_pend, 0, sizeof(*tx_pend));
-
-But then it reads from the zeroed tx_pend instead of pnd_snd. Should this be
-pnd_snd.compl_requested instead?
-
-This affects smc_wr_tx_send_wait(), which sets compl_requested and waits for
-the completion that never arrives, causing LLC message timeouts.
-
->  			complete(&link->wr_tx_compl[pnd_snd_idx]);
-> -		memcpy(&pnd_snd, &link->wr_tx_pends[pnd_snd_idx],
-> -		       sizeof(pnd_snd));
-> -		/* clear the full struct smc_wr_tx_pend including .priv */
-> -		memset(&link->wr_tx_pends[pnd_snd_idx], 0,
-> -		       sizeof(link->wr_tx_pends[pnd_snd_idx]));
->  		memset(&link->wr_tx_bufs[pnd_snd_idx], 0,
->  		       sizeof(link->wr_tx_bufs[pnd_snd_idx]));
->  		if (!test_and_clear_bit(pnd_snd_idx, link->wr_tx_mask))
-
-[ ... ]
-
-> @@ -550,7 +472,7 @@ void smc_wr_remember_qp_attr(struct smc_link *lnk)
->  	lnk->wr_tx_cnt = min_t(size_t, lnk->max_send_wr,
->  			       lnk->qp_attr.cap.max_send_wr);
->  	lnk->wr_rx_cnt = min_t(size_t, lnk->max_recv_wr,
-> -			       lnk->qp_attr.cap.max_recv_wr);
-> +			       lnk->qp_attr.cap.max_recv_wr - 1);	/* -1 for ib_draib_rq() */
-                                                                                        ^^^^^^^^^^^^^^
-This isn't a bug, but there's a typo in the comment: ib_draib_rq() should be
-ib_drain_rq().
-
->  }
-
-[ ... ]
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 014fdfdd331b..b60fad393e18 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -2287,7 +2287,6 @@ void udp_lib_rehash(struct sock *sk, u16 newhash, u16 newhash4)
+ 				     udp_sk(sk)->udp_port_hash);
+ 		hslot2 = udp_hashslot2(udptable, udp_sk(sk)->udp_portaddr_hash);
+ 		nhslot2 = udp_hashslot2(udptable, newhash);
+-		udp_sk(sk)->udp_portaddr_hash = newhash;
+ 
+ 		if (hslot2 != nhslot2 ||
+ 		    rcu_access_pointer(sk->sk_reuseport_cb)) {
+@@ -2321,19 +2320,25 @@ void udp_lib_rehash(struct sock *sk, u16 newhash, u16 newhash4)
+ 		if (udp_hashed4(sk)) {
+ 			spin_lock_bh(&hslot->lock);
+ 
+-			udp_rehash4(udptable, sk, newhash4);
+-			if (hslot2 != nhslot2) {
+-				spin_lock(&hslot2->lock);
+-				udp_hash4_dec(hslot2);
+-				spin_unlock(&hslot2->lock);
+-
+-				spin_lock(&nhslot2->lock);
+-				udp_hash4_inc(nhslot2);
+-				spin_unlock(&nhslot2->lock);
++			if (inet_rcv_saddr_any(sk)) {
++				udp_unhash4(udptable, sk);
++			} else {
++				udp_rehash4(udptable, sk, newhash4);
++				if (hslot2 != nhslot2) {
++					spin_lock(&hslot2->lock);
++					udp_hash4_dec(hslot2);
++					spin_unlock(&hslot2->lock);
++
++					spin_lock(&nhslot2->lock);
++					udp_hash4_inc(nhslot2);
++					spin_unlock(&nhslot2->lock);
++				}
+ 			}
+ 
+ 			spin_unlock_bh(&hslot->lock);
+ 		}
++
++		udp_sk(sk)->udp_portaddr_hash = newhash;
+ 	}
+ }
+ EXPORT_IPV6_MOD(udp_lib_rehash);
 -- 
-pw-bot: cr
+2.53.0.473.g4a7958ca14-goog
+
 
