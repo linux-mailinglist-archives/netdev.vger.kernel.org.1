@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-261710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261711-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4JiTKiASoWlwqAQAu9opvQ
-	(envelope-from <netdev+bounces-261710-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 04:40:16 +0100
+	id 0FdjEL0SoWlwqAQAu9opvQ
+	(envelope-from <netdev+bounces-261711-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 04:42:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3066C1B2530
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 04:40:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9519E1B2583
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 04:42:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DF9A53077CC6
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 03:39:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D877531593D0
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 03:39:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D231033343D;
-	Fri, 27 Feb 2026 03:39:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B54BA332EB3;
+	Fri, 27 Feb 2026 03:39:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4N59fSLT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sm7RXcG+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB355333421
-	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 03:39:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F017332EBE
+	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 03:39:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772163572; cv=none; b=c7r3auIGt/ESHhF/lDaXmszUpmUhdfYxiGhH1IonIvkHsZH0Dd91LW133IWqIHaeexsXQt4Ka/mFdCXJdFCH6Ve74MYiQJC+JqlPdz4+eFlPpd1av/093ahbGQA3thXku+10zI/2cytEf0qyete/NjS9QlesXk3l813jwiVJmn4=
+	t=1772163574; cv=none; b=ijrhQ8hUM5qDPOqc/Q2OmyURMvwGo1Ep2OHUuzmDxnO5c00sWN41lNETJdRZh89DWoERQz09CXQi6r4r1siE09uoKsxtmg3tVfGjqqG8VxMmY8kNgmrazIBgkOQTKrST9DzKLPQZTkraaxYchDUjRE7nTzZmGCvFVWGUq9WCJMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772163572; c=relaxed/simple;
-	bh=sUITKlX+10cxH1fbitWzrhb91VnNSJeWmS+FzTjoWAE=;
+	s=arc-20240116; t=1772163574; c=relaxed/simple;
+	bh=CR92IMl3iUZiE7HBrQ/JuVz927tARCQcGJJZByxZnPk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=X6VfzhjbNadL/jYXKmH4PhtJ5SDjfXr6PcAG592AtBMYODjiy+/0hRzH8UhhGVUQ4j8ENpDdXjm/pKQVyKfH0bmm2KWBIBWCFlhj+D63T82PEy/O4jGYU6VQFt7c1nKEjR270Enq2Hc9X2HKfSHCF/Ym5R3yFexQlSwHUh4xi8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4N59fSLT; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=aGL9ZtUbpYJYS/MWw1z23MWP/yPI+i4KOYu8yJ3dx64ZOEBICmwGZYTKIN8Pw0vSn7rWY6Ck2OpNdDeZUuoti6R84F6L6qS89gQO0tVkqHrZpZknNHRXI0ndVfIxaAACqMjC1mPaxomVu5ZzxLQx06H70nbDnOITUZJgTLikhiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sm7RXcG+; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3595485abbbso937898a91.2
-        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 19:39:31 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2aaf0dbd073so15672605ad.3
+        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 19:39:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772163571; x=1772768371; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772163573; x=1772768373; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=m1KPSv1Ftq0eYCEN75QjvuHLk2UMpjWbbQMHZ0QmVBo=;
-        b=4N59fSLT2LTXwfJgY8IycTseaTklqSexOMWo2X7Zv3zBhitVS2696APyIpKh6a8w0k
-         6Wz0pG/uBCbY6cW2XALPOjgfS0ZMqIsggv2qgcdbjMri3WIYxKF7fVz3LpRXsjbcsV2X
-         c8DC6HsBOifC0VuqUK8IrbrjObedetkxmBN/PpXI0i8l6GIxmBQnFLcOHPQBZIDUbhDF
-         8Oe7TFUlfvl1zNqL4GDwVi9aQv8lyOIdSyUPdgZBEPMWhS6+GR1jZJO5XiIkOQDjBAw3
-         ub1I4YPawqFMgWO2U7cMh6ENXGulaScxl2MmhsrZBIkvdg4kXdw3HIMSJrSKNlLKcXOb
-         nRLA==
+        bh=2YUlr/rhZta7O3sJP+HczpLHF5TLg57aKx+/633jwYI=;
+        b=sm7RXcG+SQbdRL0eVk42lpyMAR3HJZw9FPgGiQ0QJd6ZpDPGg4CubIfD/FJqYdU5lR
+         52UvK48TQVco4LuGO6MkOEnobvuTftqwuBL37nvFMlZ+fiG8zlumA8Z97NRrXVqurJ8d
+         p1TKcmqJDqTSSBqa2UVeQmrsFjscFEyzh+4Df7pY+01RHwsBs/i+t5DSIh5fdwbEdKD2
+         9mbQ0/LSj/Kk/2bY/18adUBzAaCck9OZIUZqsoID3OgESQV4Dq9f2r530kuazDY9m1kc
+         BNYWVyJ7oGktR1EItJis5//xtrgg5Hm0VjpUSTlKxMbbQ+s5hc3amfK2JG5oB4sjmo4Q
+         j/kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772163571; x=1772768371;
+        d=1e100.net; s=20230601; t=1772163573; x=1772768373;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=m1KPSv1Ftq0eYCEN75QjvuHLk2UMpjWbbQMHZ0QmVBo=;
-        b=Cof80Z3Y2fXoDV+dLLtrnor2LfF4wVODc0JOgeN8YvTja/8w4D1LhRhDiAiG3yVOEq
-         RmXPacwP/a2IF7IuHqIA+umnKPa0AJHDJWtsctZ2Lbv+6AEy84I60gobfE+KxZNV4LTZ
-         uhQXV1UgM9oauLxSmFM9eroX226kOKFx2irGXCaaZ+zLroUcRdRy/C1Aj8kPqc4/ho/N
-         zwbeM42rZy+Ahp6JxsvUh7cC+5dQQqe8D7NSOwg0Ty8kJSNwMle5HkEgCCIeydQAMRj4
-         Us3ciWkgDZ31sjx7nY8MVUL8BUPJ66WBiMiybvyJi1Xh8RaIoWaTRRz49MR0sCjqWgy4
-         VbQg==
-X-Forwarded-Encrypted: i=1; AJvYcCXG/AYGpN+4weONohjxViv6MXYYlKxoMMrDC94XYso3dMztog4OJAm/YmnnxBKxVQKlxPLC23w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLO2EpIe811c4ksq/COhVsggn/M3i5O7O+9mldcF2lEon2m6Kq
-	IV4hb9g1E6Zsi5uXdkef11e4J0aoO+GIeMPNW6UhXRQRv6LCP77plrIa7jPCEgWpD+x7lSeXTPV
-	9wmYfhg==
-X-Received: from pjbnb14.prod.google.com ([2002:a17:90b:35ce:b0:359:135b:b2e7])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2d05:b0:359:427:3df7
- with SMTP id 98e67ed59e1d1-35965c498a9mr1406373a91.15.1772163570907; Thu, 26
- Feb 2026 19:39:30 -0800 (PST)
-Date: Fri, 27 Feb 2026 03:38:37 +0000
+        bh=2YUlr/rhZta7O3sJP+HczpLHF5TLg57aKx+/633jwYI=;
+        b=Jmeba+gbJ8ep7tnFYEUcXDlezRkfcwnN5zftehGTbdDzGF+1NrgkDGgPbH1o7Go/FT
+         5a9grIETcpt+iVPASsAzh3BTIw8LcNsUtlMJzZfazKhyTjLD9T4YfDQVode8Rz0zPiQt
+         T+UEdToaIMmfQGHIzbRTP0rD43fC0aZruLdoV5fMTFEeIESr52GoPbosaQY8xe1+T1pR
+         BZ6kbC86iG5Kp9TepNTh/PQrcJQdmAVLy+B3moCehOEUZgWgUpvDLWxLNyPPSi9iIGeu
+         AeBS2lRSFlzqN91mjThCg61ZjDwdkyuLogj1nkR030TaUwSWzSLVKbw1ggdrJw4OBjpL
+         Aulg==
+X-Forwarded-Encrypted: i=1; AJvYcCXj2VXQkyduzPep+FryZ6FTba1BrJP2Ap9TrEPixBv6rJM4V7IlO5AbN3piuw6lw/nirOEaH5c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjHVh95mKRJxzpyxw/H/77KSSYBtv/y6PRaN0LeEL01KvaTbMo
+	O0o97jMwpOEREnRLOryHoKsOzCpDFqWCzaIh9a/TF7mbcqX6YfE2AIj3yu5BmKAIat/VA1LACLM
+	iIDFkag==
+X-Received: from pjje7.prod.google.com ([2002:a17:90a:6307:b0:358:dfd8:3150])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:244e:b0:35b:b97f:7bd2
+ with SMTP id adf61e73a8af0-395c39de3b3mr1458608637.10.1772163572509; Thu, 26
+ Feb 2026 19:39:32 -0800 (PST)
+Date: Fri, 27 Feb 2026 03:38:38 +0000
 In-Reply-To: <20260227033903.3307272-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260227033903.3307272-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260227033903.3307272-15-kuniyu@google.com>
-Subject: [PATCH v2 net-next 14/15] ipmr: Add dedicated mutex for mrt->{mfc_hash,mfc_cache_list}.
+Message-ID: <20260227033903.3307272-16-kuniyu@google.com>
+Subject: [PATCH v2 net-next 15/15] ipmr: Don't hold RTNL for ipmr_rtm_route().
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
@@ -86,144 +86,157 @@ Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
 Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MID_CONTAINS_FROM(1.00)[];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261711-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-261710-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.998];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 3066C1B2530
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9519E1B2583
 X-Rspamd-Action: no action
 
-We will no longer hold RTNL for ipmr_rtm_route() to modify the
-MFC hash table.
+ipmr_mfc_add() and ipmr_mfc_delete() are already protected
+by a dedicated mutex.
 
-Only __dev_get_by_index() in rtm_to_ipmr_mfcc() is the RTNL
-dependant, otherwise, we just need protection for mrt->mfc_hash
-and mrt->mfc_cache_list.
+rtm_to_ipmr_mfcc() calls __ipmr_get_table(), __dev_get_by_index(),
+amd ipmr_find_vif().
 
-Let's add a new mutex for ipmr_mfc_add(), ipmr_mfc_delete(),
-and mroute_clean_tables() (setsockopt(MRT_FLUSH or MRT_DONE)).
+Once __dev_get_by_index() is converted to dev_get_by_index_rcu(),
+we can move the other two functions under that same RCU section
+and drop RTNL for ipmr_rtm_route().
+
+Let's do that conversion and drop ASSERT_RTNL() in
+mr_call_mfc_notifiers().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- include/net/netns/ipv4.h |  1 +
- net/ipv4/ipmr.c          | 28 ++++++++++++++++++++++------
- 2 files changed, 23 insertions(+), 6 deletions(-)
+ include/linux/mroute_base.h |  1 -
+ net/ipv4/ipmr.c             | 34 +++++++++++++++++++++-------------
+ 2 files changed, 21 insertions(+), 14 deletions(-)
 
-diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
-index 94dca64fec41..4c249aeaf7f1 100644
---- a/include/net/netns/ipv4.h
-+++ b/include/net/netns/ipv4.h
-@@ -281,6 +281,7 @@ struct netns_ipv4 {
- #endif
- 	struct fib_notifier_ops	*ipmr_notifier_ops;
- 	atomic_t		ipmr_seq;
-+	struct mutex		mfc_mutex;
- #endif
- #ifdef CONFIG_IP_ROUTE_MULTIPATH
- 	struct sysctl_fib_multipath_hash_seed sysctl_fib_multipath_hash_seed;
+diff --git a/include/linux/mroute_base.h b/include/linux/mroute_base.h
+index 0baa6f994da9..cf3374580f74 100644
+--- a/include/linux/mroute_base.h
++++ b/include/linux/mroute_base.h
+@@ -208,7 +208,6 @@ static inline int mr_call_mfc_notifiers(struct net *net,
+ 		.tb_id = tb_id
+ 	};
+ 
+-	ASSERT_RTNL();
+ 	atomic_inc(ipmr_seq);
+ 	return call_fib_notifiers(net, event_type, &info.info);
+ }
 diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
-index 77684acc8ad4..9afaa5a3761f 100644
+index 9afaa5a3761f..b9280a8880dd 100644
 --- a/net/ipv4/ipmr.c
 +++ b/net/ipv4/ipmr.c
-@@ -1329,6 +1329,8 @@ static void mroute_clean_tables(struct mr_table *mrt, int flags,
+@@ -1211,7 +1211,6 @@ static int ipmr_mfc_delete(struct mr_table *mrt, struct mfcctl *mfc, int parent)
+ 	struct net *net = read_pnet(&mrt->net);
+ 	struct mfc_cache *c;
  
- 	/* Wipe the cache */
- 	if (flags & (MRT_FLUSH_MFC | MRT_FLUSH_MFC_STATIC)) {
-+		mutex_lock(&net->ipv4.mfc_mutex);
-+
- 		list_for_each_entry_safe(c, tmp, &mrt->mfc_cache_list, list) {
- 			if (((c->mfc_flags & MFC_STATIC) && !(flags & MRT_FLUSH_MFC_STATIC)) ||
- 			    (!(c->mfc_flags & MFC_STATIC) && !(flags & MRT_FLUSH_MFC)))
-@@ -1341,6 +1343,8 @@ static void mroute_clean_tables(struct mr_table *mrt, int flags,
- 			mroute_netlink_event(mrt, cache, RTM_DELROUTE);
- 			mr_cache_put(c);
- 		}
-+
-+		mutex_unlock(&net->ipv4.mfc_mutex);
- 	}
+-	/* The entries are added/deleted only under RTNL */
+ 	rcu_read_lock();
+ 	c = ipmr_cache_find_parent(mrt, mfc->mfcc_origin.s_addr,
+ 				   mfc->mfcc_mcastgrp.s_addr, parent);
+@@ -1238,7 +1237,6 @@ static int ipmr_mfc_add(struct net *net, struct mr_table *mrt,
+ 	if (mfc->mfcc_parent >= MAXVIFS)
+ 		return -ENFILE;
  
- 	if (flags & MRT_FLUSH_MFC) {
-@@ -1498,12 +1502,17 @@ int ip_mroute_setsockopt(struct sock *sk, int optname, sockptr_t optval,
- 		}
- 		if (parent == 0)
- 			parent = mfc.mfcc_parent;
-+
-+		mutex_lock(&net->ipv4.mfc_mutex);
-+
- 		if (optname == MRT_DEL_MFC || optname == MRT_DEL_MFC_PROXY)
- 			ret = ipmr_mfc_delete(mrt, &mfc, parent);
- 		else
- 			ret = ipmr_mfc_add(net, mrt, &mfc,
- 					   sk == rtnl_dereference(mrt->mroute_sk),
- 					   parent);
-+
-+		mutex_unlock(&net->ipv4.mfc_mutex);
- 		break;
- 	case MRT_FLUSH: {
- 		LIST_HEAD(dev_kill_list);
-@@ -2913,21 +2922,26 @@ static int ipmr_rtm_route(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			  struct netlink_ext_ack *extack)
+-	/* The entries are added/deleted only under RTNL */
+ 	rcu_read_lock();
+ 	c = ipmr_cache_find_parent(mrt, mfc->mfcc_origin.s_addr,
+ 				   mfc->mfcc_mcastgrp.s_addr, parent);
+@@ -2853,10 +2851,10 @@ static int rtm_to_ipmr_mfcc(struct net *net, struct nlmsghdr *nlh,
  {
- 	struct net *net = sock_net(skb->sk);
--	int ret, mrtsock, parent;
--	struct mr_table *tbl;
-+	int ret, mrtsock = 0, parent;
-+	struct mr_table *tbl = NULL;
- 	struct mfcctl mfcc;
+ 	struct net_device *dev = NULL;
+ 	u32 tblid = RT_TABLE_DEFAULT;
++	int ret, rem, iif = 0;
+ 	struct mr_table *mrt;
+ 	struct nlattr *attr;
+ 	struct rtmsg *rtm;
+-	int ret, rem;
  
--	mrtsock = 0;
--	tbl = NULL;
- 	ret = rtm_to_ipmr_mfcc(net, nlh, &mfcc, &mrtsock, &tbl, extack);
- 	if (ret < 0)
- 		return ret;
+ 	ret = nlmsg_validate_deprecated(nlh, sizeof(*rtm), RTA_MAX,
+ 					rtm_ipmr_policy, extack);
+@@ -2883,11 +2881,7 @@ static int rtm_to_ipmr_mfcc(struct net *net, struct nlmsghdr *nlh,
+ 			mfcc->mfcc_mcastgrp.s_addr = nla_get_be32(attr);
+ 			break;
+ 		case RTA_IIF:
+-			dev = __dev_get_by_index(net, nla_get_u32(attr));
+-			if (!dev) {
+-				ret = -ENODEV;
+-				goto out;
+-			}
++			iif = nla_get_u32(attr);
+ 			break;
+ 		case RTA_MULTIPATH:
+ 			if (ipmr_nla_get_ttls(attr, mfcc) < 0) {
+@@ -2903,16 +2897,30 @@ static int rtm_to_ipmr_mfcc(struct net *net, struct nlmsghdr *nlh,
+ 			break;
+ 		}
+ 	}
++
++	rcu_read_lock();
++
+ 	mrt = __ipmr_get_table(net, tblid);
+ 	if (!mrt) {
+ 		ret = -ENOENT;
+-		goto out;
++		goto unlock;
+ 	}
++
++	if (iif) {
++		dev = dev_get_by_index_rcu(net, iif);
++		if (!dev) {
++			ret = -ENODEV;
++			goto unlock;
++		}
++
++		mfcc->mfcc_parent = ipmr_find_vif(mrt, dev);
++	}
++
+ 	*mrtret = mrt;
+ 	*mrtsock = rtm->rtm_protocol == RTPROT_MROUTED ? 1 : 0;
+-	if (dev)
+-		mfcc->mfcc_parent = ipmr_find_vif(mrt, dev);
  
- 	parent = ret ? mfcc.mfcc_parent : -1;
-+
-+	mutex_lock(&net->ipv4.mfc_mutex);
-+
- 	if (nlh->nlmsg_type == RTM_NEWROUTE)
--		return ipmr_mfc_add(net, tbl, &mfcc, mrtsock, parent);
-+		ret = ipmr_mfc_add(net, tbl, &mfcc, mrtsock, parent);
- 	else
--		return ipmr_mfc_delete(tbl, &mfcc, parent);
-+		ret = ipmr_mfc_delete(tbl, &mfcc, parent);
-+
-+	mutex_unlock(&net->ipv4.mfc_mutex);
-+
-+	return ret;
++unlock:
++	rcu_read_unlock();
+ out:
+ 	return ret;
  }
- 
- static bool ipmr_fill_table(struct mr_table *mrt, struct sk_buff *skb)
-@@ -3269,6 +3283,8 @@ static int __net_init ipmr_net_init(struct net *net)
- 	LIST_HEAD(dev_kill_list);
- 	int err;
- 
-+	mutex_init(&net->ipv4.mfc_mutex);
-+
- 	err = ipmr_notifier_init(net);
- 	if (err)
- 		goto ipmr_notifier_fail;
+@@ -3343,9 +3351,9 @@ static const struct rtnl_msg_handler ipmr_rtnl_msg_handlers[] __initconst = {
+ 	{.protocol = RTNL_FAMILY_IPMR, .msgtype = RTM_GETLINK,
+ 	 .dumpit = ipmr_rtm_dumplink, .flags = RTNL_FLAG_DUMP_UNLOCKED},
+ 	{.protocol = RTNL_FAMILY_IPMR, .msgtype = RTM_NEWROUTE,
+-	 .doit = ipmr_rtm_route},
++	 .doit = ipmr_rtm_route, .flags = RTNL_FLAG_DOIT_UNLOCKED},
+ 	{.protocol = RTNL_FAMILY_IPMR, .msgtype = RTM_DELROUTE,
+-	 .doit = ipmr_rtm_route},
++	 .doit = ipmr_rtm_route, .flags = RTNL_FLAG_DOIT_UNLOCKED},
+ 	{.protocol = RTNL_FAMILY_IPMR, .msgtype = RTM_GETROUTE,
+ 	 .doit = ipmr_rtm_getroute, .dumpit = ipmr_rtm_dumproute,
+ 	 .flags = RTNL_FLAG_DOIT_UNLOCKED | RTNL_FLAG_DUMP_UNLOCKED},
 -- 
 2.53.0.473.g4a7958ca14-goog
 
