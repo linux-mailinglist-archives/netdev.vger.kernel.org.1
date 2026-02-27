@@ -1,239 +1,204 @@
-Return-Path: <netdev+bounces-261805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261807-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ePOrMyVqoWkOswQAu9opvQ
-	(envelope-from <netdev+bounces-261805-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 10:55:49 +0100
+	id GII9ANxsoWm6swQAu9opvQ
+	(envelope-from <netdev+bounces-261807-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 11:07:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 710D91B5A16
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 10:55:49 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B30A21B5C90
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 11:07:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D12B43026326
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 09:55:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8A30A3048076
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 10:07:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADE823803F8;
-	Fri, 27 Feb 2026 09:55:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 409153E8C5C;
+	Fri, 27 Feb 2026 10:07:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ksyTKNei"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LELv1nLz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8158C35A3AE
-	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 09:55:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772186147; cv=fail; b=JyeO0wpZ+EgFFzRSRBt8D7mQH32ONrhBrdtWq8zj3Mh2N4+egmpaxlUg1inTmD4TKmjUBkRHyfMreYXrRT96crZV1VXh9/oSS7iq0XpMrF9dlZMgbC98dpziZtmBSy8Kpxd9RdXSYOsjD6xArz1yXEo+aGYpuudtG5kTELeH9KI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772186147; c=relaxed/simple;
-	bh=HUKdyveMZ5UZgUcKEORZeb9bY80ZG5rzJ3uXaqDKTaY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=AOaWQDK7ghmzwAfbmtbLhvflhpFSW4jy9NmP42QXfsjxDLk38+09pDHKtiGWu9BApmo/u5sXwChXBtET2uQ5cZuSClO/YaXb4YOstD9Z9cv2cSN+TzeAVn+dflRh+WgIUEbsTw2QagEt2AItlOdewHK2mQokb9fcA6D3+Y7anRo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ksyTKNei; arc=fail smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772186144; x=1803722144;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=HUKdyveMZ5UZgUcKEORZeb9bY80ZG5rzJ3uXaqDKTaY=;
-  b=ksyTKNeiFs+MoI/NPrdHkrVRqcYXHedbPJX0AkchZEkmGr8xeY5Dd4Nb
-   CFwyX7sLJVKaoQxriVof9zXKduJMnIf3WbSpayclipYJ/yvlgNfIVZbGs
-   WRO7tN43zVHj8mn6XEm7LV5DLb7PkFeo6qrxh1B9A8gt8ZW7+tS0LQDFx
-   GLaeZqDuV6Yf7abE0UfOyIsCvbi4d4u99LFIQGSXG7e8wiwxaNgyMRmB0
-   FCcEyqApHrnguBFWl3EzJUuPFia+NndaHpo3zEVf1WYdwTujZpG1MzzsO
-   HXfPVIJ7f9dWq5iRv866GzhnNBZaVDAZBIwgjXnE2X2xSt0+LU9aTIn7z
-   A==;
-X-CSE-ConnectionGUID: xtvgMB3aSoyazFzAyorDWA==
-X-CSE-MsgGUID: ezcKbbXuRZ+9ZMvbz05yJw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11713"; a="73450237"
-X-IronPort-AV: E=Sophos;i="6.21,313,1763452800"; 
-   d="scan'208";a="73450237"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2026 01:55:44 -0800
-X-CSE-ConnectionGUID: NW/qXCCwSvG9t0FAA+r82A==
-X-CSE-MsgGUID: wNVzM3aVRmS86a/3SOc1NA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,313,1763452800"; 
-   d="scan'208";a="214292469"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2026 01:55:46 -0800
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Fri, 27 Feb 2026 01:55:45 -0800
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Fri, 27 Feb 2026 01:55:45 -0800
-Received: from BN1PR04CU002.outbound.protection.outlook.com (52.101.56.9) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Fri, 27 Feb 2026 01:55:44 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dLFQdNiLuXqsWVy9Z64Ep/PLQdEA684VkORX7PFA2nkqsCBXEwgX7R0qfxE+2NDjIaOhVwUZig0daeNKrPCjIoWpLdMgU5Iz1ozsyZe0yyUchmE0FL9GBGr/zYTu+DBeAQ8AXX/0DhZZOm6EFw8wSYYB7foox2kWwOg8icxYC2DY3oxtvSbA9NWJL5TOACWWIC0qVUFHwubeSbGb7BCkZ2WepucAFLwNNmuOnOtKN9WLcWAEBhWyEJlt+yc7IySwSI2cmsEA/MSw3sqPv2jtW4WSDEioKWUKkYazeMMLHFBhPYEF9U5SWs6H54Cte2C/zLT9VCxgWxSnyVen0tAzQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HUKdyveMZ5UZgUcKEORZeb9bY80ZG5rzJ3uXaqDKTaY=;
- b=eALFl+DUUK4WZOvhQigrzotSbFYH0fYPivNQgnKMiSmbkqvPtwAxITVAl171JLzSak1L5o+byPsHgYx4eDpnqMZ4RdhvFuYkBtHBoOQs9s9SdpKUvBBEEBJPGKMcvi7SL2sOK/uLzoiGlO73WFnxxVEUZTLprzeJwHRIT2hxiQp4qjZrk465hEPgYdlPkZOoSKKP3O+SwlfbYuvUCpIY8A+jELh+yio7mNH5ywuw6BSCbmyUz4Yeklb++2yShXd2QMwjBI9BuaFm2mMygEqM9Y8OhdM9kX6EHVj5KSYOFB7YMudooJ+Ie4qoZJQJr6E66A7xOQuhxZ4apeUYg9g2yA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CY5PR11MB6258.namprd11.prod.outlook.com (2603:10b6:930:25::16)
- by IA0PR11MB8333.namprd11.prod.outlook.com (2603:10b6:208:491::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.14; Fri, 27 Feb
- 2026 09:55:37 +0000
-Received: from CY5PR11MB6258.namprd11.prod.outlook.com
- ([fe80::3aeb:4e49:6de6:9ee]) by CY5PR11MB6258.namprd11.prod.outlook.com
- ([fe80::3aeb:4e49:6de6:9ee%3]) with mapi id 15.20.9654.014; Fri, 27 Feb 2026
- 09:55:37 +0000
-From: "Rinitha, SX" <sx.rinitha@intel.com>
-To: Takashi Kozu <takkozu@amazon.com>, "horms@kernel.org" <horms@kernel.org>
-CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Loktionov, Aleksandr"
-	<aleksandr.loktionov@intel.com>, "pmenzel@molgen.mpg.de"
-	<pmenzel@molgen.mpg.de>, "Kwapulinski, Piotr" <piotr.kwapulinski@intel.com>,
-	"enjuk@amazon.com" <enjuk@amazon.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v6 3/3] igb: allow configuring
- RSS key via ethtool set_rxfh
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v6 3/3] igb: allow configuring
- RSS key via ethtool set_rxfh
-Thread-Index: AQHclQx+q82AFEDfwEiX3adA/xRlxrWWarMg
-Date: Fri, 27 Feb 2026 09:55:37 +0000
-Message-ID: <CY5PR11MB625810BD6BA76352434032DF8B73A@CY5PR11MB6258.namprd11.prod.outlook.com>
-References: <20260203125417.37285-5-takkozu@amazon.com>
- <20260203125417.37285-8-takkozu@amazon.com>
-In-Reply-To: <20260203125417.37285-8-takkozu@amazon.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY5PR11MB6258:EE_|IA0PR11MB8333:EE_
-x-ms-office365-filtering-correlation-id: c1954884-f117-46ed-05bb-08de75e65bbb
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014|38070700021;
-x-microsoft-antispam-message-info: CPd+Z5Q2np/dmioQFWIvZ6iJJX+SYVe8kfZDCRJB25cUQH8i6LanQkMvKQV+t7OcZHjvZfvYJXDMYY2Rhhk9BUuqVojTdutUvht2ts5zRD2V4w6Yf52eNLrS+VDR8mBSoAbctCDMQvVY2KCAS0BCiTR6hcep1FEU57tef9g3zKnKbPttLUhOD3d8H/+jqGs/NX2blOCuuIp5GJ4oL/58ptZNxff8UmDV7NkmQsh0JxDVpDGl4ZOidwIP329pIRssPxGjpWk5F5RoC9VfBJ81xxtETA/+7/x+AFygYlFkExsSN0AZVmTRlp9rD+QuUlaO23nnRW+Dck2w9nBYJ72FxY0Yxsy3RPcv9nQs1mA73UnsBx+A3CbtAZ8Y9e2Jwmh37Bkqka31sWCe5bw+B3Scg3prB5JjgEvLWNoC6jN8h3DKdxgwVB7l22hserPXPzAo0MuijnncnbfwDIQ6ntu3kjtfjwIgNMT+UD9MLgajRATTUTx6jRif6ll9/+2DHLcKip3km16sBA8DNlEqCTBAIQXr7/Jb105tvRmi0L9cbs3OHYe5QlfCCrFpx384h6pO4QHxo5xSt3JfiQdGCIeq37g/xhBXhYOazh7K63sndTYWcfUf1WqJiVsd8jxDzkIS3x0fB0xIJNkK+5/VSzYdJYGp2mwhsLAzFmHhp3SK3gVNqYkfGP4gkyuevKGOXa7zkfiqIRWemaR+l8bckaEsPM6Bu1pso8/JFEBTJJaLH4FyAVMKXEL1zvNEMi2dGLB7q5rjdEvDzGSxL9q5ZGXRE1sIvCyojg8kF9huDHrHARk=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6258.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?a0K0sqR1a+yaVLWyJ6HwvEUP80EgFchfNDw5eWpg56byJ+S++Xgox/u4qEv2?=
- =?us-ascii?Q?a5wHun+OZQ68/fb0nlIK4y0RiMT9uZ7jWtxyJXfYzXP8W1R61qMPhrIIhOLz?=
- =?us-ascii?Q?SPV5Jw0do7ZFad2l9j8OoM2GDvUyBWXLYCA6jYCKnLxPjKdRTJxunWfXl+6x?=
- =?us-ascii?Q?5Bj7tCkMCTbK90eSxHCO7+Z+/MfypIWkFvU74YiAKNDAflm6bkt6M9p1qcE9?=
- =?us-ascii?Q?IoWV2t0kKCYu6rFUE/gxLHcG7EfhwwRlpxIy6T6ISc5Rb5w4iney69kS+xNP?=
- =?us-ascii?Q?seeDrwOdUDwEcsxGVAk4ynNc+02/bq3sm9GVofluf9zZmPpKHBL6jiFFD6pC?=
- =?us-ascii?Q?j70d8Dp8XmiIOICd4K7sRTBgtJQnRK4C1UfVDJNlAat92BTDY5Jf0bmehmx8?=
- =?us-ascii?Q?Zmzas2ipF2ojEYw17Jx6UFyWv9IvJqtixai9oT7IBUyvBkLxXYO1qxxcpMkh?=
- =?us-ascii?Q?ZketgZ+lTEgQC0Tt1DKX6GxdqoRjMcTYRuafnKDhIAdmiiFpOXICTz8Dpbsu?=
- =?us-ascii?Q?ddvGj2fbk6QofR7ajPm8s7b2w3mUrtMlZ8LVXKNbRyKk9SQHrbn3ioCdEHmn?=
- =?us-ascii?Q?7ZoIT3kBNbnfzqmWAJQ60eXBVvBU+rxJpcLsb5ksOkMTtyJbBA4Kkbfuoz30?=
- =?us-ascii?Q?ztjA3eXAH0C0+v5HW834G0DyzE9GhoHWYgiGA4y1BEuhIPXvCEIwuMYOBrOZ?=
- =?us-ascii?Q?LDYWKo+YaifIu3RDV98jpQvQGlTsQMFvHCY/YgdtYpaoyoUgiaktX729NFP/?=
- =?us-ascii?Q?xQcS9H1L7zGeyD5tUMQxNdJWQ8ByR16KggE0Y76tp1t5JTKLdS9MqCJ1srqo?=
- =?us-ascii?Q?00fcqu0djuVpIMKJsW3X0996vXc48IL3kWHOmU9Zf+S+V2CzoTl+3LVMMlzM?=
- =?us-ascii?Q?YTaf2cVknbBeP26j3NuCauMaWIlQpa7fkS/9aXBDaZKKIGTMcGIKMr0mwCwj?=
- =?us-ascii?Q?ZX3EwJ7v/FGxYTrbutOM1cDY2poj/+ziHsdV35kQ1WEIj1mWpAOxlpC1QV8U?=
- =?us-ascii?Q?dHuCAaWuliMedTCOAz3udc8Up5+2O0K9TGZOMh76iQPKDst+raVWQ2oyAOA7?=
- =?us-ascii?Q?Vv99zzrnJSMB/mhXS5LmuFC92rT+cRvpDJrmj0kPlpttz43WmxI29TvLRBbd?=
- =?us-ascii?Q?c7ST07QTFlBa4KOT30T5WX+xZUvjidj3v9MNQtSp1kjxR4cMsQzQsAt8zXUH?=
- =?us-ascii?Q?0fErT3zb59uaWnM4PQaBEIXAW/r8U2zMGhZ/fIHVIOpesB8qDFs+xWLUAj2K?=
- =?us-ascii?Q?XTy4ywdPGOeprFnZOEUqvGcAeX2Th8oCBumsUllXZz57T2ge8FbIGxpBIm0u?=
- =?us-ascii?Q?oNLUzXJ7j2EbGoj5K3xwVYxRf/aCj02uOWFQVXdsRkzhDJRbFnd/tv4MadkE?=
- =?us-ascii?Q?diAoYHY79iPe3sXJKHI9wyMPFDbaIs5FZgKXymmZa/glM2/ZTiu2kwGZDnw1?=
- =?us-ascii?Q?sTpoCanoqVW5iXStRq87o4rYDsOSAIWzFoz10nJnqaXLARLkr0/RICCZ+RNx?=
- =?us-ascii?Q?L4ChyRIJQoq07iil0nVBONWBsOnM30xb5G4sMEifZvnODQZBbG9rzzg9yV+8?=
- =?us-ascii?Q?XtrYhb/sHTml/HS436wQwt4YA9IbyXj0kLUHhnwtXZFaQFt4H2jQvZPJhnNb?=
- =?us-ascii?Q?jT7+8/rN1M7UQZQ/4CPk3AxHlnAbCHzta6fDwu4gTr//YaFj9Pp0sTj+Jf38?=
- =?us-ascii?Q?qdfeUvwwktlf9NZ612M0fugB0Ictm4+ySR2qxK3MZnu6mFtI?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B787F39E192;
+	Fri, 27 Feb 2026 10:07:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772186831; cv=none; b=SUPeuNzjIEJ+ipI+jmDhzOgOuadSHRk8GheHfQqt+SC7VKICfATJKOI1xDVuNm5OFRkJdsOV4ojHynZutdizJxpewDBtAZPSYU4Nbt1OoMz3JVLXH/FwoFjS4mrLRPqvogbKOJO6/1VyoVSpHxyqYyXZXIakwmg3Tb+DowJ3Fi8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772186831; c=relaxed/simple;
+	bh=Mp1JXSTiLvThOX9+iafDoJIcaXcdqjP2+vG+mtpInGY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lcg1qTnGtQhxt5quDXzvXc3u59WD5Tvz+9tBRHoXa4RpQIAsuzic/NiSRjbecLsDtE9T9sDc5riyBw/BjfkuNeCd2bX4+EOOT4hcmjryOGDHnNJrL3MoPXzmgorL8VamgIgejZgTIJEyJlPCMciueFLYOpMWKkiUpLgCe35h+Fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LELv1nLz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC9A2C116C6;
+	Fri, 27 Feb 2026 10:06:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772186830;
+	bh=Mp1JXSTiLvThOX9+iafDoJIcaXcdqjP2+vG+mtpInGY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LELv1nLziJIInpPEfBGwhAV2gMFZg12s7lFE0KxfTQldEo18NluQr9e3C+Zct+lyZ
+	 drhXLzadFmCAbIbeq3bsgUtgfAnwVSB9B/lX0VpyOvlAJ9ihOIftg2vbjxkn/BO8qX
+	 uVjQZAzhR6+W+W0J8fzC9LGfhszCyPHqWUyfeWWQk54n5K8J2+Lq3RSoWH238qvmja
+	 zUj111yecfmSqu9Gzo21TEY0Dy7GefpBTvyuB7b0hFZ8/UWmvbKQ/1AsQMoZt7sN+P
+	 SMQhFN/3rME7rBp2YRNdOAUhubk/iwSO58hKw1S3dlOGtmn8p+ue+G/QetiQW6CaQr
+	 Vs7VZ81sfYPdg==
+Date: Fri, 27 Feb 2026 11:06:39 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Dan Williams <dan.j.williams@intel.com>, 
+	Matthew Wilcox <willy@infradead.org>, Eric Biggers <ebiggers@kernel.org>, 
+	"Theodore Y. Ts'o" <tytso@mit.edu>, Muchun Song <muchun.song@linux.dev>, 
+	Oscar Salvador <osalvador@suse.de>, David Hildenbrand <david@kernel.org>, 
+	David Howells <dhowells@redhat.com>, Paulo Alcantara <pc@manguebit.org>, 
+	Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>, Jaegeuk Kim <jaegeuk@kernel.org>, 
+	Chao Yu <chao@kernel.org>, Trond Myklebust <trondmy@kernel.org>, 
+	Anna Schumaker <anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, 
+	NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>, 
+	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Steve French <sfrench@samba.org>, 
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
+	Bharath SM <bharathsm@microsoft.com>, Alexander Aring <alex.aring@gmail.com>, 
+	Ryusuke Konishi <konishi.ryusuke@gmail.com>, Viacheslav Dubeyko <slava@dubeyko.com>, 
+	Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>, 
+	Dominique Martinet <asmadeus@codewreck.org>, Christian Schoenebeck <linux_oss@crudebyte.com>, 
+	David Sterba <dsterba@suse.com>, Marc Dionne <marc.dionne@auristor.com>, 
+	Ian Kent <raven@themaw.net>, Luis de Bethencourt <luisbg@kernel.org>, 
+	Salah Triki <salah.triki@gmail.com>, "Tigran A. Aivazian" <aivazian.tigran@gmail.com>, 
+	Ilya Dryomov <idryomov@gmail.com>, Alex Markuze <amarkuze@redhat.com>, 
+	Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu, Nicolas Pitre <nico@fluxnic.net>, 
+	Tyler Hicks <code@tyhicks.com>, Amir Goldstein <amir73il@gmail.com>, 
+	Christoph Hellwig <hch@infradead.org>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, 
+	Yangtao Li <frank.li@vivo.com>, Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>, 
+	David Woodhouse <dwmw2@infradead.org>, Richard Weinberger <richard@nod.at>, 
+	Dave Kleikamp <shaggy@kernel.org>, Konstantin Komarov <almaz.alexandrovich@paragon-software.com>, 
+	Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>, 
+	Joseph Qi <joseph.qi@linux.alibaba.com>, Mike Marshall <hubcap@omnibond.com>, 
+	Martin Brandenburg <martin@omnibond.com>, Miklos Szeredi <miklos@szeredi.hu>, 
+	Anders Larsen <al@alarsen.net>, Zhihao Cheng <chengzhihao1@huawei.com>, 
+	Damien Le Moal <dlemoal@kernel.org>, Naohiro Aota <naohiro.aota@wdc.com>, 
+	Johannes Thumshirn <jth@kernel.org>, John Johansen <john.johansen@canonical.com>, 
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
+	"Serge E. Hallyn" <serge@hallyn.com>, Mimi Zohar <zohar@linux.ibm.com>, 
+	Roberto Sassu <roberto.sassu@huawei.com>, Dmitry Kasatkin <dmitry.kasatkin@gmail.com>, 
+	Eric Snowberg <eric.snowberg@oracle.com>, Fan Wu <wufan@kernel.org>, 
+	Stephen Smalley <stephen.smalley.work@gmail.com>, Ondrej Mosnacek <omosnace@redhat.com>, 
+	Casey Schaufler <casey@schaufler-ca.com>, Alex Deucher <alexander.deucher@amd.com>, 
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>, David Airlie <airlied@gmail.com>, 
+	Simona Vetter <simona@ffwll.ch>, Sumit Semwal <sumit.semwal@linaro.org>, 
+	Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Simon Horman <horms@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, 
+	Adrian Hunter <adrian.hunter@intel.com>, James Clark <james.clark@linaro.org>, 
+	"Darrick J. Wong" <djwong@kernel.org>, Martin Schiller <ms@dev.tdt.de>, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, nvdimm@lists.linux.dev, 
+	fsverity@lists.linux.dev, linux-mm@kvack.org, netfs@lists.linux.dev, 
+	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net, 
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	linux-nilfs@vger.kernel.org, v9fs@lists.linux.dev, linux-afs@lists.infradead.org, 
+	autofs@vger.kernel.org, ceph-devel@vger.kernel.org, codalist@coda.cs.cmu.edu, 
+	ecryptfs@vger.kernel.org, linux-mtd@lists.infradead.org, 
+	jfs-discussion@lists.sourceforge.net, ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev, 
+	devel@lists.orangefs.org, linux-unionfs@vger.kernel.org, apparmor@lists.ubuntu.com, 
+	linux-security-module@vger.kernel.org, linux-integrity@vger.kernel.org, selinux@vger.kernel.org, 
+	amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org, 
+	linaro-mm-sig@lists.linaro.org, netdev@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	linux-fscrypt@vger.kernel.org, linux-xfs@vger.kernel.org, linux-hams@vger.kernel.org, 
+	linux-x25@vger.kernel.org
+Subject: Re: [PATCH 00/61] vfs: change inode->i_ino from unsigned long to u64
+Message-ID: <20260227-herab-wolken-c52d560f40d5@brauner>
+References: <20260226-iino-u64-v1-0-ccceff366db9@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6258.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c1954884-f117-46ed-05bb-08de75e65bbb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Feb 2026 09:55:37.4867
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: eQZXJUks57YwTJcGkvaF89W835Y3P7R+1NKP+xCvC5H641L7u+c5QUVjSAWkIiby+pzCprhyibH/Fhh9krbcUw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB8333
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260226-iino-u64-v1-0-ccceff366db9@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [3.84 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261805-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-261807-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sx.rinitha@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[zeniv.linux.org.uk,suse.cz,goodmis.org,kernel.org,efficios.com,intel.com,infradead.org,mit.edu,linux.dev,suse.de,redhat.com,manguebit.org,dilger.ca,suse.com,oracle.com,brown.name,talpey.com,samba.org,gmail.com,microsoft.com,dubeyko.com,ionkov.net,codewreck.org,crudebyte.com,auristor.com,themaw.net,cs.cmu.edu,fluxnic.net,tyhicks.com,physik.fu-berlin.de,vivo.com,artax.karlin.mff.cuni.cz,nod.at,paragon-software.com,fasheh.com,evilplan.org,linux.alibaba.com,omnibond.com,szeredi.hu,alarsen.net,huawei.com,wdc.com,canonical.com,paul-moore.com,namei.org,hallyn.com,linux.ibm.com,schaufler-ca.com,amd.com,ffwll.ch,linaro.org,google.com,davemloft.net,arm.com,linux.intel.com,dev.tdt.de,vger.kernel.org,lists.linux.dev,kvack.org,lists.sourceforge.net,lists.samba.org,lists.infradead.org,coda.cs.cmu.edu,lists.orangefs.org,lists.ubuntu.com,lists.freedesktop.org,lists.linaro.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[145];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[brauner@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.668];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 710D91B5A16
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B30A21B5C90
 X-Rspamd-Action: no action
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of T=
-akashi Kozu
-> Sent: 03 February 2026 18:24
-> To: horms@kernel.org
-> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw <=
-przemyslaw.kitszel@intel.com>; andrew+netdev@lunn.ch; davem@davemloft.net; =
-edumazet@google.com; kuba@kernel.org; pabeni@redhat.com; intel-wired-lan@li=
-sts.osuosl.org; netdev@vger.kernel.org; Loktionov, Aleksandr <aleksandr.lok=
-tionov@intel.com>; pmenzel@molgen.mpg.de; Kwapulinski, Piotr <piotr.kwapuli=
-nski@intel.com>; enjuk@amazon.com; Takashi Kozu <takkozu@amazon.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-next v6 3/3] igb: allow configuring=
- RSS key via ethtool set_rxfh
->
-> Change igb_set_rxfh() to accept and save a userspace-provided RSS key. Wh=
-en a key is provided, store it in the adapter and write the
-> E1000 registers accordingly.
->
-> This can be tested using `ethtool -X <dev> hkey <key>`.
->
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: Takashi Kozu <takkozu@amazon.com>
-> ---
-> drivers/net/ethernet/intel/igb/igb_ethtool.c | 48 +++++++++++---------
-> 1 file changed, 26 insertions(+), 22 deletions(-)
->
+On Thu, Feb 26, 2026 at 10:55:02AM -0500, Jeff Layton wrote:
+> Christian said [1] to "just do it" when I proposed this, so here we are!
+> 
+> For historical reasons, the inode->i_ino field is an unsigned long,
+> which means that it's 32 bits on 32 bit architectures. This has caused a
+> number of filesystems to implement hacks to hash a 64-bit identifier
+> into a 32-bit field, and deprives us of a universal identifier field for
+> an inode.
+> 
+> This patchset changes the inode->i_ino field from an unsigned long to a
+> u64. This shouldn't make any material difference on 64-bit hosts, but
+> 32-bit hosts will see struct inode grow by at least 4 bytes. This could
+> have effects on slabcache sizes and field alignment.
+> 
+> The bulk of the changes are to format strings and tracepoints, since the
+> kernel itself doesn't care that much about the i_ino field. The first
+> patch changes some vfs function arguments, so check that one out
+> carefully.
+> 
+> With this change, we may be able to shrink some inode structures. For
+> instance, struct nfs_inode has a fileid field that holds the 64-bit
+> inode number. With this set of changes, that field could be eliminated.
+> I'd rather leave that sort of cleanups for later just to keep this
+> simple.
+> 
+> Much of this set was generated by LLM, but I attributed it to myself
+> since I consider this to be in the "menial tasks" category of LLM usage.
+> 
+> [1]: https://lore.kernel.org/linux-fsdevel/20260219-portrait-winkt-959070cee42f@brauner/
 
-Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
+I'm working under the assumption that we have crossed the threshold and
+people send patches they did completely themselves and also patches that
+were done with the help of or almost completely by a tool. You have to
+defend it one way or the other.
+
+Frankly, as long as you understand what you're doing in general well and
+I know that you are a trusted and thorough developer/maintainer I could
+not care less if you tell me whether or not you did this all on your
+own or with the help of some tool. In my experience, laziness grows with
+experience but so does the amount of ideas. 
+
+So attribute it to yourself or attribute it partially to the tool. I
+personally don't care.
 
