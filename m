@@ -1,141 +1,141 @@
-Return-Path: <netdev+bounces-261684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261685-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8OERHKMDoWlVpQQAu9opvQ
-	(envelope-from <netdev+bounces-261684-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 03:38:27 +0100
+	id yIF2OroIoWlXpwQAu9opvQ
+	(envelope-from <netdev+bounces-261685-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 04:00:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E985F1B218A
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 03:38:26 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 459AF1B225A
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 04:00:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6D4F7302A044
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 02:38:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F20BD30817F2
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 02:59:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CA8C290D81;
-	Fri, 27 Feb 2026 02:38:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 281B6302140;
+	Fri, 27 Feb 2026 02:59:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SQEBe9gX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N1mMakp/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-dy1-f202.google.com (mail-dy1-f202.google.com [74.125.82.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFB221DE2C9
-	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 02:38:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD20301037
+	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 02:59:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772159904; cv=none; b=JANKdCfjSjeocoOBH8pCK1Z9GJWRAJWqn002jZ1yuv67dZG761q3KEsaqnUH+yLKXkbes4WOdyp/20gFR/TfeDDxgx2xQNlvj68ykBNbxx2lUxeeD1i1Cj8E0hKJUKwuLOBz3Jk08sp/awggWR7zXgEmlxaXISy5yrTyNAHeHbQ=
+	t=1772161197; cv=none; b=glnhWzcs0P++DkVOTdhnCWIIel40Pkv4z/Vcu5EnwuWdaMC8ZfYU3/xndkH2lOEKRBvlqHa40qJQrCGxhcw+8JbgLXPxgsPd4A7FxLRxriW4TLzmWpSy3tYoEeGyYVbvneSOFR1Ehyrt1glwU4nrBQBhAs3/ungNMVlwHpqbH98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772159904; c=relaxed/simple;
-	bh=kp5y/dqejQzeVZ05Dw0tg7a0JpUUplp6YZ/04Ae9L9U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aqc4ePX0eTgZJ61EXV7XZ/I5fKFT5ulJsTreAT7p/cG+0t9r3PtVFxfxFnO/pueuM7xqQV1iyNW8QtVY2X6Fri8qqB2EhvDJBIg0Hb26eMVxM/9LjqKG3sbU0QxVctZawtV68QqJTsT9HUTw7NkYgXJbpZmbW2DZY4L/L0xZed4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SQEBe9gX; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2ad21f437eeso11507345ad.0
-        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 18:38:23 -0800 (PST)
+	s=arc-20240116; t=1772161197; c=relaxed/simple;
+	bh=//7wOODElqYTQiR8nL5gR7HXR2TzZyBl5X8K0sjoxBc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=EoeKDZqelmvEMqFOnoyNTqih6+LFVXl7UIJM68xetSxI6f6kfaSPBvtVyB+/GIoHpzMfvaD+//tHyIP9UAwD7NQQUg6klBLJynHvVqXgUCRmJmSyqhSTBTHUzJRdQgr1ty7dLWqG0Bd21yLBlsENkEclHbbdHp7Oq9MVbnKB3y8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--srutherford.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=N1mMakp/; arc=none smtp.client-ip=74.125.82.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--srutherford.bounces.google.com
+Received: by mail-dy1-f202.google.com with SMTP id 5a478bee46e88-2ba8013a9e3so1565635eec.0
+        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 18:59:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772159903; x=1772764703; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vKuElitLd5LW7g7YRPmlUwQxzRJLHGJrlc783qqUFmI=;
-        b=SQEBe9gXI3/K0ivHn2jG0AHzu0UVM7bHa5EvgKr66FhPr6ok0+L5e9wAmZ8h5E7MP9
-         kE84uAZnAJnhdtF9AkoszESbVPsvakAnMSrN6MCeggDD8bnbWjY49SfW0pE62KgKCupw
-         oO2ThhEBhSy0x6UmasK1p7vJBjbWJiQRQeCgeFTiTGc7iqyCUVkE20Zs4nwp8oNLTgOT
-         G3eoxPz7txq+0Lmy1RS1WoBK/lfQKaSnd9MkuMfhEHGvkNFKk9a9r8jDHAm+hyNarRMw
-         gTdP1CJI8jCeTR4s62cOLY3Kd1xYXipu6ckRSv/hTl/t1iPCvc6k4VROAauuMn7o5+YF
-         t18w==
+        d=google.com; s=20230601; t=1772161194; x=1772765994; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=C05Mn9JMafI99EWEgRgLLPj/E+g1PjLcWaGlhM4Kvtg=;
+        b=N1mMakp/shPkrt0fOI3qBu/xpT6epAxtg7spoYTucgO6HWxx2rQPUlcI7MC1tBbzeT
+         B4ZA8NNJSAD0fIJEcJIECrv7LjcC/VCpayWnG8jFIvu3t9/cN19VRB754M1s5689lAPA
+         So3c87uL32ag9YFAKDWF4QzXpyiDry4PyRiSswPxSths4Tp9jCqffL3NFO3CojbtdOal
+         bMJIRafZVzSuZXbgF6RLLKu8naV4aKxPjI6uwa+YjY9yen12+C+1uIfGgQkjGYvmNBnU
+         2g9BBGIK2bCDnHwSSvA0pEKpK92Tz6SVa1+Ex4IkF9AHiTJ9q4MK8fju+dW5OHLb7WSL
+         rC8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772159903; x=1772764703;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vKuElitLd5LW7g7YRPmlUwQxzRJLHGJrlc783qqUFmI=;
-        b=jxX+t7+E0vM4L/qkXzLuSyyHFaxBs6qFwJNDnZJrcsCbz8/ZUu0limVbAdaeZm5DDw
-         Oapwps6sD6OLlT8BFmOQG082Yg0IE5s1fOx2cjQN6/2tHsRwbnQ7Rdl4HQt7KygUg8IO
-         VJh/V9E4UT02uEGh0c5SMPWJOqvHxwyuyyq++aegy+d/nPkmS53ERc3dY2/uBWKg5fyq
-         QvVg4DythcvhpX+sd7bHzpfpYcuV9qots2VNPRDkdCwEoFCiZVcDdg/KCVaTFsGm3zGZ
-         TEkYYw7Xr/6gYNckcr8KWZVsdoLVdJBa3Cfm6IROMdbOAboEdAqhsYLE8YjLOS6/F7DZ
-         oUTA==
-X-Gm-Message-State: AOJu0YyQkx23y1YnzVCAdT3iqHhXknrw+I3CAC5bLj94TXwWkuk9W5Km
-	fIFcqM+fbWaq2z9GHZgfnooATyHcbbihl22lyVfKeGUsDsPmNkHYws69
-X-Gm-Gg: ATEYQzw0e88eCmhMoOrGg2hbrTS3gZhGRJfQt1jPP2ES6vqdlPPwZXWc40iVZ0GauWv
-	muEVdERDlHYGawO7MhFo7KSc55fD5GbQ1oDHrUh1dM/1Y9cN6wVIRhsKDOSDeRKIU7ZyiYdZgtm
-	s6DHc29sIUni161jPn9hkGIsig7ven3legMt+Ym3K9z/2rGM12l3lsvHyXptpX5SKJtZFQF8a2Z
-	xlEDVgQL0TS1CsHqngAsrH7zF3HL57ADPGhlhOGEjgZMjXYN1Y0xmQXLZa1iTRtntJrlwQ+fubO
-	l9aLRcQ8qPMRzqdl9IanIAkrJfzf48ofID4oyoVDqEnarZzQtIS7EcQGbUkH91mMEdxQus2X76g
-	m7RsAkrTo69QupNvWChivuzwGeXV4qwqfolEapiWVReDtgGwJ5E1WhyfV4sSA4OKrMv+Chqj6KD
-	kqBu+lXgkfhVJTreHAE3c2zuq5J9i9hUdBiBl4xuTFl3MwfqEM9/vjc+/COOpI
-X-Received: by 2002:a17:902:d589:b0:2aa:d288:851e with SMTP id d9443c01a7336-2adf79834ddmr39869965ad.19.1772159903149;
-        Thu, 26 Feb 2026 18:38:23 -0800 (PST)
-Received: from eric-acer (36-225-69-192.dynamic-ip.hinet.net. [36.225.69.192])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2adfb705b53sm39057515ad.92.2026.02.26.18.38.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Feb 2026 18:38:22 -0800 (PST)
-Date: Fri, 27 Feb 2026 10:38:19 +0800
-From: Cheng-Yang Chou <yphbchou0911@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, saeedm@nvidia.com, tariqt@nvidia.com,
-	mbloch@nvidia.com, jserv@ccns.ncku.edu.tw, charlie910417@gmail.com
-Subject: Re: [PATCH 1/1] net/mlx5/core: Allocate ttc_params on heap
-Message-ID: <aaEDm7_f1GpfaM4T@eric-acer>
-References: <20260226092857.1583984-1-yphbchou0911@gmail.com>
- <20260226092857.1583984-2-yphbchou0911@gmail.com>
- <aaCN17Xsg9qVM6UX@horms.kernel.org>
+        d=1e100.net; s=20230601; t=1772161194; x=1772765994;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=C05Mn9JMafI99EWEgRgLLPj/E+g1PjLcWaGlhM4Kvtg=;
+        b=wvvFu9JKQGsm54PHw9gNd0/Kg3T73MKFXmMMYGfvwGug65fwkZoETddhrHfpMhYARW
+         IkdcFABvYfit3zg2gAWJV4sDH6HnaKM+homMYHDShdd9Oej5ZfBgjJt0FdDmt781/QyT
+         jPnd8d5f7MDB6QwBu70GgQU1aq2KXWBRnPqiA0yufqC7648ctxqVQtcyekXdbc/bGIgH
+         kDCEUNoWBcnw7dlgSBQOMvMChUzOvMVwtNDdVD2Ve4bj+R/GC1sgBURwjnmvoHxTqHjF
+         Tjo29i3Pc+pdnMFTYWrglLa+38N/UsBpH0262zMXyFH8neJQaYeSE9Z3L7gWIkCXUSND
+         49cQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXLmSJpNIcv8R35zWbzOYtAxpW3cCfg499vp21XNANY+nRVYswee2pHeJOD0ech4Jy8yo8cDCc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzV+YS6ENpHeQBgriwPZOoK7jB2UNbSqp2v8tvkWi4PZKYOW61Y
+	aMtm1mBnhmKXT6Ed1g8nmdJgfkp79k2JbHTaMYq/bGb4WpXQuRG3H/JodEyXKPAKMSnkdk5Ojel
+	412YNEze1LakYjNHPkUwkG5KR7w==
+X-Received: from dlbcy24.prod.google.com ([2002:a05:7022:b98:b0:127:1b87:b031])
+ (user=srutherford job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:7022:6289:b0:124:a610:62f6 with SMTP id a92af1059eb24-1278fd340a7mr448355c88.44.1772161193541;
+ Thu, 26 Feb 2026 18:59:53 -0800 (PST)
+Date: Fri, 27 Feb 2026 02:59:49 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aaCN17Xsg9qVM6UX@horms.kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+Message-ID: <20260227025950.174755-1-srutherford@google.com>
+Subject: [RFC PATCH 0/1] IDPF + SWIOTLB Bug
+From: Steve Rutherford <srutherford@google.com>
+To: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com, 
+	aleksander.lobakin@intel.com
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, intel-wired-lan@lists.osuosl.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Steve Rutherford <srutherford@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261684-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,ccns.ncku.edu.tw,gmail.com];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261685-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yphbchou0911@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	URIBL_MULTI_FAIL(0.00)[sea.lore.kernel.org:server fail];
+	DKIM_TRACE(0.00)[google.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[srutherford@google.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.989];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E985F1B218A
+X-Rspamd-Queue-Id: 459AF1B225A
 X-Rspamd-Action: no action
 
-On Thu, Feb 26, 2026 at 06:15:51PM +0000, Simon Horman wrote:
-> 
-> Please use tabs (8 characters wide) rather than spaces
-> for indentation throughout this patch.
-> 
-> --
+Found an issue with the IDPF driver when SWIOTLB is enabled. The issue
+results in empty headers for packets that hit the split queue workaround
+path. It's caused by a spurious sync in that path. The header is synced
+from the SWIOTLB even when the header was shoved into the payload.
 
-Thanks for the review. This issue has been addressed in v3:
-https://lore.kernel.org/all/20260226174601.2120282-1-yphbchou0911@gmail.com/
+I cooked up a sample patch, but I'm not an expert in this driver, so I have
+no idea if it's the right solution. It did allow my QEMU VM to boot with a
+superficially functional passed-through IDPF NIC and SWIOTLB=force.
 
-Thanks,
-Cheng-Yang
+The patch was written against COS's 6.12, so I assume that it will not
+apply cleanly elsewhere, but I figured a wrong sample patch was better than
+a long paragraph describing the same thing. My read of more recent kernels
+is that this problem is still present, but could be mistaken.
+
+Steve Rutherford (1):
+  Fix header clobber in IDPF with SWIOTLB enabled
+
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+-- 
+2.53.0.473.g4a7958ca14-goog
+
 
