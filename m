@@ -1,133 +1,264 @@
-Return-Path: <netdev+bounces-261757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261758-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YPgsG/9PoWkfsAQAu9opvQ
-	(envelope-from <netdev+bounces-261757-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 09:04:15 +0100
+	id +HK8Mr5QoWkfsAQAu9opvQ
+	(envelope-from <netdev+bounces-261758-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 09:07:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01C041B43B0
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 09:04:14 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E98561B4408
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 09:07:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3D8A5304F20D
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 08:04:11 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D90953006224
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 08:07:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 945F13290A2;
-	Fri, 27 Feb 2026 08:04:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FC403176F8;
+	Fri, 27 Feb 2026 08:07:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="FXvndWdd"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="f8CefGH6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D25155A5D
-	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 08:04:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C208A33A709;
+	Fri, 27 Feb 2026 08:07:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772179450; cv=none; b=Mqk+Qdc4Nn9kQNn31TR9G3mIi03IiNPACnkMsQbujO7aEaKphmFq+FAZrZ8TVWlAyQY+RIMoCPSkcM8IcS2saMKrc4UA4QU6+eI3ADouujn22rg9LlmxEGz/eSfjWYiIJCRabjxFeR4ZFejJfdc+9MdhRnprH/V1+SH7E8j46Z8=
+	t=1772179622; cv=none; b=Rmq4y6NbfCRhTvhB/IqKAvAe3CmoY8Ym2Stb88O4XARivTwt3jKb5jkbzqv8fwDseJGXJttQmuEMXPYYvwFDyK8tCq3YBw2Xd1Dp+kz+43MxqTKDbrh3UMXrGpQnart84Q4GV1wIOAlbdGdSqWEBD7NFUq1hUt6AWKZxUxr1rZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772179450; c=relaxed/simple;
-	bh=2vORYo66yn7LN0cpDhbt+ftJyzsJ6bgxaIEmAJx5oRI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BsnuwWC7l1r+mer82Y/eTJfzPgCp23Jlvt9ZoOTM5568m3kYyoCHgTnvLUfEw9n398eL5xhUN5fIrfhRBwEkHVSMCbTdUH0HN7Y+CKcSlYmjUGFy1baXQBc/lQ1yKV0EmQUbcxgg+RDHWP6bvtuzRSpQsbxXxA8wN5TwGarwDdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=FXvndWdd; arc=none smtp.client-ip=80.241.56.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4fMgnq11x0z9tH7;
-	Fri, 27 Feb 2026 09:03:59 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1772179439;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OE5+O80MO6biQr60RUXZSDWfawGNaQbWAKOhs7fh93U=;
-	b=FXvndWddSvFWqLPXzZb/KifcvGALsYxnGIGqzKA/PMsCH/vq9l05fj8lgxcbALftM+k4KR
-	RuRSPPpmzGjWI0T3yTo0j/YdScpR9GpqpPivMIEyv8bDxw7wVdT0s+WfCKwEmzixt6Oc9p
-	DJ0PqqDQFO/qggYKzVUi3F78uU693iAzTCzuGFzyYNYQ2qhULkSUaoYY2mC6AlwKonCSMx
-	0GDTUnHt65mnAlITIJavfDH4iVJFbwyAfsdPXwPHyvSaod9+rc7nf5M00f1rE3dc8T+qtL
-	iNkCPQXTwhn4wgjjFF3l1oCZljwTKgeRtBkS9SvWW9s0EQ43rYGH4XnhZRf5pQ==
-Message-ID: <79a0ba8c-91a8-47e0-81fa-275f15ede96f@mailbox.org>
-Date: Fri, 27 Feb 2026 09:03:53 +0100
+	s=arc-20240116; t=1772179622; c=relaxed/simple;
+	bh=MYeiqeUz0+cYZL1vIL2doQLbHsHiezb/fmgpGe1KrMY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OR5ypKxTO2GIjn5y8s9yFNjq3mFdClUeCd0Dhzxw7O51mKLyOBoJxN9uc2M4OtMFQ4OQexZ9zoENUesHYO96Nxlx+i2XVJd1DFaM5AbdEZMcx/lqjf12Xj1BUoYfHOjD/cUDn1APP4b6xJyRiVzOtj4C0WL804NgIex58R2rtpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=f8CefGH6; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id 6D5EB20B6F02; Fri, 27 Feb 2026 00:07:00 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6D5EB20B6F02
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1772179620;
+	bh=cmvpUzkiSyC2ORyghMCYrVOpIg4j/U0+skDpYexndIk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=f8CefGH6pUzoj6NkCRIDfvYGJCac/23ZuIIBWoq7LGug9Q7tVCehLQLMgz9hZ8OMZ
+	 TEI9MZrK2GABBRYQpi7N9SF4vV+vVRztIF8HdS84Memxp0caDH0aeDmGQRb6RS/4ve
+	 VL4VrJD20bg0OeO7hXemXV9Ui2aNHOvEKV6rVicQ=
+Date: Fri, 27 Feb 2026 00:07:00 -0800
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: Simon Horman <horms@kernel.org>
+Cc: kuba@kernel.org, decui@microsoft.com, pabeni@redhat.com,
+	dipayanroy@microsoft.com, kotaranov@microsoft.com,
+	linux-kernel@vger.kernel.org, edumazet@google.com,
+	davem@davemloft.net, linux-rdma@vger.kernel.org,
+	shradhagupta@linux.microsoft.com, kys@microsoft.com,
+	ssengar@linux.microsoft.com, haiyangz@microsoft.com,
+	linux-hyperv@vger.kernel.org, wei.liu@kernel.org,
+	netdev@vger.kernel.org, longli@microsoft.com,
+	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+	andrew+netdev@lunn.ch
+Subject: Re: [net-next] net: mana: Trigger VF reset/recovery on health check
+ failure due to HWC timeout
+Message-ID: <aaFQpJG0GP6898e/@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <aZwUDlTkb5xunIkH@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <20260224082641.130868-1-horms@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v4] net: ethernet: mtk_eth_soc: avoid writing to ESW
- registers on MT7628
-To: Daniel Golle <daniel@makrotopia.org>, Joris Vaisvila <joey@tinyisr.com>
-Cc: netdev@vger.kernel.org, nbd@nbd.name, sean.wang@mediatek.com,
- lorenzo@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-References: <20260226154547.68553-1-joey@tinyisr.com>
- <aaBvaG3M58W4lhVC@makrotopia.org>
-Content-Language: en-US
-From: Stefan Roese <stefan.roese@mailbox.org>
-In-Reply-To: <aaBvaG3M58W4lhVC@makrotopia.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-MBO-RS-ID: 49eddd4558c34cb98db
-X-MBO-RS-META: wswkn4153qy9xdma5jozx3zqyfpxbitf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260224082641.130868-1-horms@kernel.org>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261757-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261758-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[mailbox.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stefan.roese@mailbox.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	NEURAL_HAM(-0.00)[-0.997];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mailbox.org:mid,mailbox.org:dkim,mailbox.org:email,makrotpia.org:email]
-X-Rspamd-Queue-Id: 01C041B43B0
+	RCPT_COUNT_TWELVE(0.00)[21];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: E98561B4408
 X-Rspamd-Action: no action
 
-On 2/26/26 17:06, Daniel Golle wrote:
-> On Thu, Feb 26, 2026 at 03:45:18PM +0000, Joris Vaisvila wrote:
->> The MT7628 has a fixed-link PHY and does not expose MAC control
->> registers. Writes to these registers only corrupt the ESW VLAN
->> configuration.
->>
->> This patch explicitly registers no-op phylink_mac_ops for MT7628, as
->> after removing the invalid register accesses, the existing
->> phylink_mac_ops effectively become no-ops.
->>
->> This code was introduced by commit 296c9120752b
->> ("net: ethernet: mediatek: Add MT7628/88 SoC support")
->>
->> Signed-off-by: Joris Vaisvila <joey@tinyisr.com>
+On Tue, Feb 24, 2026 at 08:26:41AM +0000, Simon Horman wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
 > 
-> Reviewed-by: Daniel Golle <daniel@makrotpia.org>
+> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+> ---
+> net: mana: Trigger VF reset/recovery on health check failure due to HWC timeout
 > 
-> Cc: Stefan Roese <sr@denx.de>
+> The GF stats periodic query is used as mechanism to monitor HWC health
+> check. If this HWC command times out, it is a strong indication that
+> the device/SoC is in a faulty state and requires recovery.
+> 
+> Today, when a timeout is detected, the driver marks
+> hwc_timeout_occurred, clears cached stats, and stops rescheduling the
+> periodic work. However, the device itself is left in the same failing
+> state.
+> 
+> Extend the timeout handling path to trigger the existing MANA VF
+> recovery service by queueing a GDMA_EQE_HWC_RESET_REQUEST work item.
+> This is expected to initiate the appropriate recovery flow by suspende
+> resume first and if it fails then trigger a bus rescan.
+> 
+> This change is intentionally limited to HWC command timeouts and does
+> not trigger recovery for errors reported by the SoC as a normal command
+> response.
+> 
+> > diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > index 0055c231acf6..16c438d2aaa3 100644
+> > --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> 
+> [ ... ]
+> 
+> > diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > index 9b5a72ada5c4..e6a4034b40f9 100644
+> > --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> 
+> [ ... ]
+> 
+> > @@ -3530,6 +3530,8 @@ static void mana_gf_stats_work_handler(struct work_struct *work)
+> >  {
+> >  	struct mana_context *ac =
+> >  		container_of(to_delayed_work(work), struct mana_context, gf_stats_work);
+> > +	struct gdma_context *gc = ac->gdma_dev->gdma_context;
+> > +	struct mana_serv_work *mns_wk;
+> >  	int err;
+> >
+> >  	err = mana_query_gf_stats(ac);
+> > @@ -3537,6 +3539,30 @@ static void mana_gf_stats_work_handler(struct work_struct *work)
+> >  		/* HWC timeout detected - reset stats and stop rescheduling */
+> >  		ac->hwc_timeout_occurred = true;
+> >  		memset(&ac->hc_stats, 0, sizeof(ac->hc_stats));
+> > +		dev_warn(gc->dev,
+> > +			 "Gf stats wk handler: gf stats query timed out.\n");
+> > +
+> > +		/* As HWC timed out, indicating a faulty HW state and needs a
+> > +		 * reset.
+> > +		 */
+> > +		if (!test_and_set_bit(GC_IN_SERVICE, &gc->flags)) {
+> > +			if (!try_module_get(THIS_MODULE)) {
+> > +				dev_info(gc->dev, "Module is unloading\n");
+> > +				return;
+> > +			}
+> > +
+> > +			mns_wk = kzalloc(sizeof(*mns_wk), GFP_ATOMIC);
+> > +			if (!mns_wk) {
+> > +				module_put(THIS_MODULE);
+> > +				return;
+> > +			}
+> 
+> Does this leave the GC_IN_SERVICE flag permanently set? When
+> test_and_set_bit() atomically sets the bit and then try_module_get()
+> fails or kzalloc() fails, the function returns without clearing
+> GC_IN_SERVICE.
+> 
+> This would permanently block all future recovery attempts. Looking at
+> mana_gd_process_eqe() in gdma_main.c:
+>
+ACK. 
+> 	if (test_bit(GC_IN_SERVICE, &gc->flags)) {
+> 		dev_info(gc->dev, "Already in service\n");
+> 		break;
+> 	}
+> 
+> It would detect the set bit and skip the reset. Similarly, mana_tx_timeout()
+> in mana_en.c would also short-circuit:
+> 
+> 	if (test_bit(GC_IN_SERVICE, &gc->flags))
+> 		return;
+> 
+> The device cannot recover without manual intervention since the flag is only
+> cleared by mana_serv_reset() at the end of the service work:
+> 
+> drivers/net/ethernet/microsoft/mana/gdma_main.c:mana_serv_reset()
+> {
+> 	...
+> out:
+> 	clear_bit(GC_IN_SERVICE, &gc->flags);
+> }
+> 
+> But since the work is never scheduled in these error paths, clear_bit() is
+> never called.
+> 
+> Note that the existing mana_gd_process_eqe() path avoids this problem by
+> calling set_bit(GC_IN_SERVICE) only AFTER all allocations succeed:
+> 
+> drivers/net/ethernet/microsoft/mana/gdma_main.c:mana_gd_process_eqe()
+> {
+> 	...
+> 	if (test_bit(GC_IN_SERVICE, &gc->flags)) {
+> 		dev_info(gc->dev, "Already in service\n");
+> 		break;
+> 	}
+> 
+> 	if (!try_module_get(THIS_MODULE)) {
+> 		...
+> 		break;
+> 	}
+> 
+> 	mns_wk = kzalloc(sizeof(*mns_wk), GFP_KERNEL);
+> 	if (!mns_wk) {
+> 		module_put(THIS_MODULE);
+> 		break;
+> 	}
+> 
+> 	dev_info(gc->dev, "Start MANA service type:%d\n", type);
+> 	set_bit(GC_IN_SERVICE, &gc->flags);  // Set only after success
+> 	...
+> }
+> 
+> Should clear_bit(GC_IN_SERVICE, &gc->flags) be added before each error
+> return?
+> 
+ACK.
+> > +
+> > +			mns_wk->pdev = to_pci_dev(gc->dev);
+> > +			mns_wk->type = GDMA_EQE_HWC_RESET_REQUEST;
+> > +			pci_dev_get(mns_wk->pdev);
+> > +			INIT_WORK(&mns_wk->serv_work, mana_serv_func);
+> > +			schedule_work(&mns_wk->serv_work);
+> > +		}
+> 
+> This isn't a bug, but the recovery initiation sequence here is a
+> near-duplicate of the pattern in mana_gd_process_eqe() (gdma_main.c).
+> Both perform the identical 7-step sequence: try_module_get, kzalloc
+> mana_serv_work, set pdev, set type, pci_dev_get, INIT_WORK, schedule_work.
+> 
+> The duplication already contributed to the GC_IN_SERVICE error path issue
+> above, where this new copy diverged from the original in its error handling.
+> 
+> Consider extracting a common helper to avoid divergence.
+> 
+ACK.
+> >  		return;
+> >  	}
+> >  	schedule_delayed_work(&ac->gf_stats_work, MANA_GF_STATS_PERIOD);
+> 
+> [ ... ]
 
-Reviewed-by: Stefan Roese <stefan.roese@mailbox.org>
+Thanks Simon, I am addressing these in v2.
 
-Thanks,
-Stefan
-
+Regards
 
