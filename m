@@ -1,246 +1,391 @@
-Return-Path: <netdev+bounces-261672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261674-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kNdSBMz5oGlXogQAu9opvQ
-	(envelope-from <netdev+bounces-261672-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 02:56:28 +0100
+	id SNjZFKH6oGlXogQAu9opvQ
+	(envelope-from <netdev+bounces-261674-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 03:00:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65C621B1AFD
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 02:56:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BC631B1B7B
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 03:00:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0315A303967F
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 01:56:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3F37731190CD
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 01:56:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2C582BE7CD;
-	Fri, 27 Feb 2026 01:56:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 041C62BEFFE;
+	Fri, 27 Feb 2026 01:56:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="qpOEi2k/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="atYcGpos"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45ED2C0F79
-	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 01:56:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D44622BD5A8
+	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 01:56:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772157362; cv=none; b=kud9/vKMBOPNo8yaDPAZHdX96a4NV9lZHpJnLu4jDb/y6Hu5Fh8sGQmVuxWq+VMP91boVE7zHTz1XJCSsd7dflif6KBuPREO1Pb1Unije4zwFbRRrt5Cjq4F/1rUXIQ9GAKEjKAEMVQ+JtT9rk92uHpuAXMOeVROQKuYeQNYMfw=
+	t=1772157383; cv=none; b=cUyPmj6Vx6OkESV5fHOqJRe3nTyN++apW6MDZvRHDk1sAFBaLNY5WTr1wCpgP3vZXyz7C9w7FFkju5A3k0C9zVLx2utujgXVifWtBLWGU/YwEGgqPNutXb5sxYFkw6jD2jvT3XM4xdggrXHXIOwMFh0McMKVi5YDnCGlmC2jqW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772157362; c=relaxed/simple;
-	bh=2kaBpNODLsQxJ8M1dTsdmjGhKAxf+Kg7OFrqMgOaJko=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=fU+6V31znn7Lj/WMHa9VijYGTx0aRcjbXHuTe9ip9xTQn7DwlP659/Bn9fM2iUnqcW263FhbyfgdiG96Ojd/KY2pDephnF8Zb8tszTS8nJSOwD7vEFmPbvYhMaqBh8r6PVBDe/44Vv7HZxEGS5qupQ+p7VhG1Tyi6D2N6dRUjew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=qpOEi2k/; arc=none smtp.client-ip=115.124.30.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1772157353; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=DXIuX/Q5FbKQ4/2C9EEbUgCLSi9Obci3dIRTStM02Lw=;
-	b=qpOEi2k/z+qRjcIRbNVp+WOdFWrthj6iz46GE4FK722Qrb2rCAjsbm0vyWneVwa+6ey1B8x3AecZ5LExLV+snDoNbUbNSEtuNNNqGD/Z7K7aI/U7uzx3LhtpoZnbnM5tCENUC9Pn0yaC9uUmDlbvXEl1GcMRh8kGeK+CAXap0u4=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WzsXO7w_1772157352 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 27 Feb 2026 09:55:52 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1772157383; c=relaxed/simple;
+	bh=1HhXeYvYf4GxGTaxZljFQCqXOMqTu8REfuaebmkeSnk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VaWmDdTkqTuZY/ttj1GWusluZAqnNbCYU/Jav4AcqLYxepsSlpabfnpeHfixHX48fwi/9HbbKUYukJvq/koAv6wVUbEtHRebEu/t/fC5nWkVteuiqVAmF8BDPktP4bMHjdjw6WiS2Zw8JHkAl2gDSehOrCk/XhVNiBlcSklI66Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=atYcGpos; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-65fb991d7e7so2017644a12.1
+        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 17:56:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772157379; x=1772762179; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=98c9GitqRTveJJIvXRWURQ+/NJVCMLwh2Wfc0QaY9pU=;
+        b=atYcGposZ1q32WNDiTjOXP0fEjPhnp+nqfpoZGgl01TSwLHaNW5eKW200XpraUpiM4
+         CJXBgTP0zZRMkBrGlI+sSlvQGDENn9F/EDww04taj8cZE02IG6OOl4UensSyJIJFcHAS
+         qmeEIPIgm/KwehNYfnAx+maxqNPj50Dtd/e99wnGJrli5yB2TzBbABxqq8T4rZgE1W6j
+         2H4mmwGF70s0paHgKB1vYx4GXydZNgkSXK4nfCZvIV+awL61Dvsu+F+SWQSQQMU8WVjd
+         exevrk+DSwkaj2rROiV8Js52lqAUmWavhk2Q0ofOzUhB2Frle9thYYDYW0dejCaRhIba
+         okHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772157379; x=1772762179;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=98c9GitqRTveJJIvXRWURQ+/NJVCMLwh2Wfc0QaY9pU=;
+        b=VGCNct3c0PsPcdHNH4YztN1KnhxLb2epJF5DXRIjAw+Q8BoCKtLxMIUK0l3+C/2cIq
+         umZpjsK78PAI3QS8TMJ/lR6f0xRNmgEOjLZjgq+C0Q5bi5EEvX1djk+1bizoIGN37znM
+         ENZ7HhQyRWyXvjiJTNkXQ4uchGnejWNnkic9Jsg+K01wPp3MVTxdsU2KsO8mPed9dQ3g
+         /1/bkZyBd9wGVXMD36ZFmpdMUd0yXcfZnfUHS/XA4B18BTwMvaCBe8wccMY2rebMAoZH
+         rNllE2DcfwqhV6UxtUhR3axXO3n0m7GAK9HPH4yeFzxQLuSxE6fWn3FqgGFedtaHA3BV
+         gzbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWv3xC97DwqxsG12MZJL3dBeRs93ayYvICAoWq6JTdXuNG+5cWwnrFlqHflFKj1M8X7ki1qTQA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw65TAx3lphp99ztginUWRtc7xAL2TMOZNnqMnyUe52w1Ng0Dat
+	rxZQDvz+tIZMvnKOAGtCldoL8+TatlcbnaWY8nzBfDKW6I8VyklIj19N+jcDMalpCkE=
+X-Gm-Gg: ATEYQzx41Ubha50M+ato5IPlUHsEfk1uQs5jpeLmDoYBswSHYQLNMKPCzWNj9VlaFSS
+	CPSL5E3hPKXW3eFkw6jc7qE/2cXm8M+vxV2faOAmhDnm0bgZku8c11wg9S3iu0bkYsdqdkaKTsU
+	xB7Cir3McW1Na7H6F7A0r5dQThMKutdg5RD7iIL9011S7G6MnUYab5uyTM5wY4gHcGJM2+XdU8h
+	cuHF2i/lMcBRKnUNIhEY06ugEFrd0t6F9JXnyw20FbqTAHJ84lKr+pkoo9/xvnqL4vPECPHaFnI
+	YauzmtsnSI+rVrlg/WmAQ79IvVBQy2xg31bM4Rz66mtzvA8aSwgpcgEDKr6fZmbuHLmHE421BV1
+	JS0ZRxYtkR6VnvPipygPXFHpZzNNOzfUjVyLCS9pb0lCd/Gs+7AL3CXha8uAHqWFrItI1kCDl
+X-Received: by 2002:a17:907:6d0b:b0:b8f:deff:a019 with SMTP id a640c23a62f3a-b937615c4a5mr49484866b.0.1772157378768;
+        Thu, 26 Feb 2026 17:56:18 -0800 (PST)
+Received: from gmail.com ([2a09:bac1:5500::20a:ca])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b935ae613ddsm102113466b.33.2026.02.26.17.56.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Feb 2026 17:56:17 -0800 (PST)
+From: Qingfang Deng <dqfext@gmail.com>
+To: linux-ppp@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Philo Lu <lulie@linux.alibaba.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Dong Yibo <dong100@mucse.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
-	Dust Li <dust.li@linux.alibaba.com>
-Subject: [PATCH net-next v27 8/8] eea: introduce callback for ndo_get_stats64
-Date: Fri, 27 Feb 2026 09:55:46 +0800
-Message-Id: <20260227015546.47336-9-xuanzhuo@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20260227015546.47336-1-xuanzhuo@linux.alibaba.com>
-References: <20260227015546.47336-1-xuanzhuo@linux.alibaba.com>
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Subject: [PATCH net-next] ppp: don't store tx skb in the fastpath
+Date: Fri, 27 Feb 2026 09:56:10 +0800
+Message-ID: <20260227015610.24874-1-dqfext@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Git-Hash: f713bd6bad2c
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-6.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-261672-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.alibaba.com,linux.dev,mucse.com,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-261674-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dqfext@gmail.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-0.997];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.991];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[alibaba.com:email,linux.alibaba.com:mid,linux.alibaba.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 65C621B1AFD
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9BC631B1B7B
 X-Rspamd-Action: no action
 
-This commit introduces ndo_get_stats64 support.
+Currently, ppp->xmit_pending is used in ppp_send_frame() to pass a skb
+to ppp_push(), and holds the skb when a PPP channel cannot immediately
+transmit it. This state is redundant because the transmit queue
+(ppp->file.xq) can already handle the backlog. Furthermore, during
+normal operation, an skb is queued in file.xq only to be immediately
+dequeued, causing unnecessary overhead.
 
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-Reviewed-by: Philo Lu <lulie@linux.alibaba.com>
-Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Refactor the transmit path to avoid stashing the skb when possible:
+- Remove ppp->xmit_pending.
+- Rename ppp_send_frame() to ppp_prepare_tx_skb(), and don't call
+  ppp_push() in it. It returns NULL if the skb is consumed
+  (dropped/queue) or a new skb to be passed to ppp_push().
+- Update ppp_push() to accept the skb. It returns 1 if the skb is
+  consumed, or 0 if the channel is busy.
+- Optimize __ppp_xmit_process():
+  - Fastpath: If the queue is empty, attempt to send the skb directly
+    via ppp_push(). If busy, queue it.
+  - Slowpath: If the queue is not empty, process the backlog in
+    file.xq. Split dequeuing loop into a separate function
+    ppp_xmit_flush() so ppp_channel_push() uses that directly instead of
+    passing a NULL skb to __ppp_xmit_process().
+
+This simplifies the states and reduces locking in the fastpath.
+
+Signed-off-by: Qingfang Deng <dqfext@gmail.com>
 ---
- drivers/net/ethernet/alibaba/eea/eea_net.c | 55 ++++++++++++++++++++++
- drivers/net/ethernet/alibaba/eea/eea_net.h |  5 ++
- 2 files changed, 60 insertions(+)
+ Repost as non-RFC:
+ - https://lore.kernel.org/linux-ppp/20260210031313.29708-1-dqfext@gmail.com/
 
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.c b/drivers/net/ethernet/alibaba/eea/eea_net.c
-index 67bacd295693..182a57add015 100644
---- a/drivers/net/ethernet/alibaba/eea/eea_net.c
-+++ b/drivers/net/ethernet/alibaba/eea/eea_net.c
-@@ -107,6 +107,8 @@ static void eea_bind_q_and_cfg(struct eea_net *enet,
- 	struct eea_net_tx *tx;
- 	int i;
+ drivers/net/ppp/ppp_generic.c | 107 +++++++++++++++++++---------------
+ 1 file changed, 61 insertions(+), 46 deletions(-)
+
+diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
+index e9b41777be80..559bdc223a5e 100644
+--- a/drivers/net/ppp/ppp_generic.c
++++ b/drivers/net/ppp/ppp_generic.c
+@@ -134,7 +134,6 @@ struct ppp {
+ 	int		debug;		/* debug flags 70 */
+ 	struct slcompress *vj;		/* state for VJ header compression */
+ 	enum NPmode	npmode[NUM_NP];	/* what to do with each net proto 78 */
+-	struct sk_buff	*xmit_pending;	/* a packet ready to go out 88 */
+ 	struct compressor *xcomp;	/* transmit packet compressor 8c */
+ 	void		*xc_state;	/* its internal state 90 */
+ 	struct compressor *rcomp;	/* receive decompressor 94 */
+@@ -264,8 +263,8 @@ struct ppp_net {
+ static int ppp_unattached_ioctl(struct net *net, struct ppp_file *pf,
+ 			struct file *file, unsigned int cmd, unsigned long arg);
+ static void ppp_xmit_process(struct ppp *ppp, struct sk_buff *skb);
+-static void ppp_send_frame(struct ppp *ppp, struct sk_buff *skb);
+-static void ppp_push(struct ppp *ppp);
++static struct sk_buff *ppp_prepare_tx_skb(struct ppp *ppp, struct sk_buff *skb);
++static int ppp_push(struct ppp *ppp, struct sk_buff *skb);
+ static void ppp_channel_push(struct channel *pch);
+ static void ppp_receive_frame(struct ppp *ppp, struct sk_buff *skb,
+ 			      struct channel *pch);
+@@ -1651,26 +1650,45 @@ static void ppp_setup(struct net_device *dev)
+  */
  
-+	spin_lock(&enet->stats_lock);
-+
- 	enet->cfg = ctx->cfg;
- 	enet->rx = ctx->rx;
- 	enet->tx = ctx->tx;
-@@ -126,6 +128,8 @@ static void eea_bind_q_and_cfg(struct eea_net *enet,
- 
- 		blk->rx = rx;
- 	}
-+
-+	spin_unlock(&enet->stats_lock);
- }
- 
- static void eea_unbind_q_and_cfg(struct eea_net *enet,
-@@ -135,6 +139,8 @@ static void eea_unbind_q_and_cfg(struct eea_net *enet,
- 	struct eea_net_rx *rx;
- 	int i;
- 
-+	spin_lock(&enet->stats_lock);
-+
- 	ctx->cfg = enet->cfg;
- 	ctx->rx = enet->rx;
- 	ctx->tx = enet->tx;
-@@ -151,6 +157,8 @@ static void eea_unbind_q_and_cfg(struct eea_net *enet,
- 
- 		blk->rx = NULL;
- 	}
-+
-+	spin_unlock(&enet->stats_lock);
- }
- 
- static void eea_free_rxtx_q_mem(struct eea_net_init_ctx *ctx)
-@@ -337,6 +345,50 @@ static int eea_netdev_open(struct net_device *netdev)
- 	return err;
- }
- 
-+static void eea_stats(struct net_device *netdev, struct rtnl_link_stats64 *tot)
+ /* Called to do any work queued up on the transmit side that can now be done */
++static void ppp_xmit_flush(struct ppp *ppp)
 +{
-+	struct eea_net *enet = netdev_priv(netdev);
-+	u64 packets, bytes;
-+	u32 start;
-+	int i;
++	struct sk_buff *skb;
 +
-+	spin_lock(&enet->stats_lock);
-+
-+	if (enet->rx) {
-+		for (i = 0; i < enet->cfg.rx_ring_num; i++) {
-+			struct eea_net_rx *rx = enet->rx[i];
-+
-+			do {
-+				start = u64_stats_fetch_begin(&rx->stats.syncp);
-+				packets = u64_stats_read(&rx->stats.packets);
-+				bytes = u64_stats_read(&rx->stats.bytes);
-+			} while (u64_stats_fetch_retry(&rx->stats.syncp,
-+						       start));
-+
-+			tot->rx_packets += packets;
-+			tot->rx_bytes   += bytes;
++	while ((skb = skb_dequeue(&ppp->file.xq))) {
++		if (unlikely(!ppp_push(ppp, skb))) {
++			skb_queue_head(&ppp->file.xq, skb);
++			return;
 +		}
 +	}
-+
-+	if (enet->tx) {
-+		for (i = 0; i < enet->cfg.tx_ring_num; i++) {
-+			struct eea_net_tx *tx = &enet->tx[i];
-+
-+			do {
-+				start = u64_stats_fetch_begin(&tx->stats.syncp);
-+				packets = u64_stats_read(&tx->stats.packets);
-+				bytes = u64_stats_read(&tx->stats.bytes);
-+			} while (u64_stats_fetch_retry(&tx->stats.syncp,
-+						       start));
-+
-+			tot->tx_packets += packets;
-+			tot->tx_bytes   += bytes;
-+		}
-+	}
-+
-+	spin_unlock(&enet->stats_lock);
++	/* If there's no work left to do, tell the core net code that we can
++	 * accept some more.
++	 */
++	netif_wake_queue(ppp->dev);
 +}
 +
- /* resources: ring, buffers, irq */
- int eea_reset_hw_resources(struct eea_net *enet, struct eea_net_init_ctx *ctx)
+ static void __ppp_xmit_process(struct ppp *ppp, struct sk_buff *skb)
  {
-@@ -567,6 +619,7 @@ static const struct net_device_ops eea_netdev = {
- 	.ndo_stop           = eea_netdev_stop,
- 	.ndo_start_xmit     = eea_tx_xmit,
- 	.ndo_validate_addr  = eth_validate_addr,
-+	.ndo_get_stats64    = eea_stats,
- 	.ndo_features_check = passthru_features_check,
- };
- 
-@@ -600,6 +653,8 @@ static struct eea_net *eea_netdev_alloc(struct eea_device *edev, u32 pairs)
- 		return NULL;
+ 	ppp_xmit_lock(ppp);
+-	if (!ppp->closing) {
+-		ppp_push(ppp);
+-
+-		if (skb)
++	if (unlikely(ppp->closing)) {
++		kfree_skb(skb);
++		goto out;
++	}
++	skb = ppp_prepare_tx_skb(ppp, skb);
++	if (unlikely(!skb))
++		goto out;
++	/* Fastpath: No backlog, just send the new skb. */
++	if (likely(skb_queue_empty(&ppp->file.xq))) {
++		if (unlikely(!ppp_push(ppp, skb))) {
+ 			skb_queue_tail(&ppp->file.xq, skb);
+-		while (!ppp->xmit_pending &&
+-		       (skb = skb_dequeue(&ppp->file.xq)))
+-			ppp_send_frame(ppp, skb);
+-		/* If there's no work left to do, tell the core net
+-		   code that we can accept some more. */
+-		if (!ppp->xmit_pending && !skb_peek(&ppp->file.xq))
+-			netif_wake_queue(ppp->dev);
+-		else
+ 			netif_stop_queue(ppp->dev);
+-	} else {
+-		kfree_skb(skb);
++		}
++		goto out;
  	}
- 
-+	spin_lock_init(&enet->stats_lock);
 +
- 	return enet;
++	/* Slowpath: Enqueue the new skb and process backlog */
++	skb_queue_tail(&ppp->file.xq, skb);
++	ppp_xmit_flush(ppp);
++out:
+ 	ppp_xmit_unlock(ppp);
  }
  
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.h b/drivers/net/ethernet/alibaba/eea/eea_net.h
-index fa14976aa335..cbfba365ad2a 100644
---- a/drivers/net/ethernet/alibaba/eea/eea_net.h
-+++ b/drivers/net/ethernet/alibaba/eea/eea_net.h
-@@ -162,6 +162,11 @@ struct eea_net {
- 	u32 speed;
+@@ -1757,12 +1775,11 @@ pad_compress_skb(struct ppp *ppp, struct sk_buff *skb)
+ }
  
- 	u64 hw_ts_offset;
-+
-+	/* Protect the tx and rx of struct eea_net, when eea_stats accesses the
-+	 * stats from rx and tx queues.
-+	 */
-+	spinlock_t stats_lock;
- };
+ /*
+- * Compress and send a frame.
+- * The caller should have locked the xmit path,
+- * and xmit_pending should be 0.
++ * Compress and prepare to send a frame.
++ * The caller should have locked the xmit path.
+  */
+-static void
+-ppp_send_frame(struct ppp *ppp, struct sk_buff *skb)
++static struct sk_buff *
++ppp_prepare_tx_skb(struct ppp *ppp, struct sk_buff *skb)
+ {
+ 	int proto = PPP_PROTO(skb);
+ 	struct sk_buff *new_skb;
+@@ -1784,7 +1801,7 @@ ppp_send_frame(struct ppp *ppp, struct sk_buff *skb)
+ 					      "PPP: outbound frame "
+ 					      "not passed\n");
+ 			kfree_skb(skb);
+-			return;
++			return NULL;
+ 		}
+ 		/* if this packet passes the active filter, record the time */
+ 		if (!(ppp->active_filter &&
+@@ -1869,42 +1886,38 @@ ppp_send_frame(struct ppp *ppp, struct sk_buff *skb)
+ 			goto drop;
+ 		skb_queue_tail(&ppp->file.rq, skb);
+ 		wake_up_interruptible(&ppp->file.rwait);
+-		return;
++		return NULL;
+ 	}
  
- int eea_net_probe(struct eea_device *edev);
+-	ppp->xmit_pending = skb;
+-	ppp_push(ppp);
+-	return;
++	return skb;
+ 
+  drop:
+ 	kfree_skb(skb);
+ 	++ppp->dev->stats.tx_errors;
++	return NULL;
+ }
+ 
+ /*
+- * Try to send the frame in xmit_pending.
++ * Try to send the frame.
+  * The caller should have the xmit path locked.
++ * Returns 1 if the skb was consumed, 0 if not.
+  */
+-static void
+-ppp_push(struct ppp *ppp)
++static int
++ppp_push(struct ppp *ppp, struct sk_buff *skb)
+ {
+ 	struct list_head *list;
+ 	struct channel *pch;
+-	struct sk_buff *skb = ppp->xmit_pending;
+-
+-	if (!skb)
+-		return;
+ 
+ 	list = &ppp->channels;
+ 	if (list_empty(list)) {
+ 		/* nowhere to send the packet, just drop it */
+-		ppp->xmit_pending = NULL;
+ 		kfree_skb(skb);
+-		return;
++		return 1;
+ 	}
+ 
+ 	if ((ppp->flags & SC_MULTILINK) == 0) {
+ 		struct ppp_channel *chan;
++		int ret;
+ 		/* not doing multilink: send it down the first channel */
+ 		list = list->next;
+ 		pch = list_entry(list, struct channel, clist);
+@@ -1916,27 +1929,26 @@ ppp_push(struct ppp *ppp)
+ 			 * skb but linearization failed
+ 			 */
+ 			kfree_skb(skb);
+-			ppp->xmit_pending = NULL;
++			ret = 1;
+ 			goto out;
+ 		}
+ 
+-		if (chan->ops->start_xmit(chan, skb))
+-			ppp->xmit_pending = NULL;
++		ret = chan->ops->start_xmit(chan, skb);
+ 
+ out:
+ 		spin_unlock(&pch->downl);
+-		return;
++		return ret;
+ 	}
+ 
+ #ifdef CONFIG_PPP_MULTILINK
+ 	/* Multilink: fragment the packet over as many links
+ 	   as can take the packet at the moment. */
+ 	if (!ppp_mp_explode(ppp, skb))
+-		return;
++		return 0;
+ #endif /* CONFIG_PPP_MULTILINK */
+ 
+-	ppp->xmit_pending = NULL;
+ 	kfree_skb(skb);
++	return 1;
+ }
+ 
+ #ifdef CONFIG_PPP_MULTILINK
+@@ -2005,7 +2017,7 @@ static int ppp_mp_explode(struct ppp *ppp, struct sk_buff *skb)
+ 	 * performance if we have a lot of channels.
+ 	 */
+ 	if (nfree == 0 || nfree < navail / 2)
+-		return 0; /* can't take now, leave it in xmit_pending */
++		return 0; /* can't take now, leave it in transmit queue */
+ 
+ 	/* Do protocol field compression */
+ 	if (skb_linearize(skb))
+@@ -2199,8 +2211,12 @@ static void __ppp_channel_push(struct channel *pch, struct ppp *ppp)
+ 	spin_unlock(&pch->downl);
+ 	/* see if there is anything from the attached unit to be sent */
+ 	if (skb_queue_empty(&pch->file.xq)) {
+-		if (ppp)
+-			__ppp_xmit_process(ppp, NULL);
++		if (ppp) {
++			ppp_xmit_lock(ppp);
++			if (!ppp->closing)
++				ppp_xmit_flush(ppp);
++			ppp_xmit_unlock(ppp);
++		}
+ 	}
+ }
+ 
+@@ -3460,7 +3476,6 @@ static void ppp_destroy_interface(struct ppp *ppp)
+ 	}
+ #endif /* CONFIG_PPP_FILTER */
+ 
+-	kfree_skb(ppp->xmit_pending);
+ 	free_percpu(ppp->xmit_recursion);
+ 
+ 	free_netdev(ppp->dev);
 -- 
-2.32.0.3.g01195cf9f
+2.43.0
 
 
