@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-261932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261933-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GPvkBwjYoWlcwgQAu9opvQ
-	(envelope-from <netdev+bounces-261932-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 18:44:40 +0100
+	id aMn3HDvYoWlcwgQAu9opvQ
+	(envelope-from <netdev+bounces-261933-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 18:45:31 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A39B1BB95B
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 18:44:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C342C1BB971
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 18:45:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 342BB3155A59
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 17:42:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D3801317BE2D
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 17:42:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB0443DA48;
-	Fri, 27 Feb 2026 17:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D46344A73F;
+	Fri, 27 Feb 2026 17:42:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="dLS8FUNV"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="SJzUxYFU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
+Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AD7B44B68C
-	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 17:42:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8758343E9C5
+	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 17:42:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772214133; cv=none; b=t+/umlm5HBA4cZQ4K0CAq35AjkIPg0aBT4hppYQIlSE2gpsWUH8bsSP9kOt69qeOWq/VKh0sEu2dNjAB9a6bTG/BYWkVJshIx/5iE14RLHkg6gzCI6T5WEXQsSrcI03LyANcjJdOPAIPlqAPR4lGX6yVm9lKdEoZKEzI8cNr6eE=
+	t=1772214137; cv=none; b=CiA0BCecd7O9L6wzwFGc95ZKID9Lvh6R4zIVEtnzZ88UyWH+bDzbiZX4YnbZwplq5LijA6e/6c4f4tVu1mFGUO8BEkRkhJp8VG1NLb6ouEi+LNBDTfd53GL8FJ0hJ6o7Opxhk/owxoO9J6cQZUInMgyRgYWCPbKTi77/SUCrOhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772214133; c=relaxed/simple;
-	bh=iG0DhWbt+VsFMnXOpZaAVysdoGQruPrbvdF4uDVWyIw=;
+	s=arc-20240116; t=1772214137; c=relaxed/simple;
+	bh=QY4Nm2uJC4I9Iw+gNvxxiXJkI+e+5CmElRJDd7MYJak=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qi5waTTjhM06st6qVHu/nk/bnDq2AOY/olR3v6uKi9saJiav/CdVGSaAKpdcEuy7Fhy7vzFamKFgAKlpuFvtVezSsTEdDDvpBYKdviwAU5M3Y1B+FJAqejb0kEEoTMv394IfsRjf08uGDUNhpS9mGnjK+hy/3NgZ4nfpa5Wlt54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=dLS8FUNV; arc=none smtp.client-ip=209.85.210.44
+	 MIME-Version; b=lVclykx3nv+BiwQKCUDWewNMerhi9whOUJyblpbe5qmG7o4C77o+jkoj+0xtfL7DrrsSRMi7DGo/7zsZ5xo+FMQqMiTztR4h1YA5qL7ovn+FGoDrPMpVTKFZdRGYBdvNUK3q3HE/VGFf7VGurka5/oZX2J0toug9Awwq9lm94oM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=SJzUxYFU; arc=none smtp.client-ip=209.85.167.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-7d598f4c618so369430a34.0
-        for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 09:42:12 -0800 (PST)
+Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-463a94f8475so1834873b6e.0
+        for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 09:42:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1772214131; x=1772818931; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1772214134; x=1772818934; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ETPCtqQ5zGuYJDHbRqq4hLf7csSuCLugoIc0+9S3eO8=;
-        b=dLS8FUNVcCSbiTJw2AI9xg+KVmD11Uwe+h4fGJqjHsQIFRm37AqmmPGiYPKxBDxIb2
-         4Rqymk5Ln1c56TwTiid6YyjjMdk1H8MUaXjUZZL0QtOFKZZuUOJt2o+LAs8quWz75H05
-         bgg4MKuVSADrnlRjLltjDSDRjQQZ5XLR49uYG0z34cN1+y7MALeJ7UCtVZGIIW71PLjk
-         fHV7T77COJP/GLmnKFjkssx2mUfXpRQV9qRSLlcChsKUIeD9B7m9qrHGECLEE+7S0cOy
-         5SHpBH1g1HGTWwMFnnrgOYC3X9SqstDxbuLY94P8fU203EUdEAYtrwKUNPabeJsxMNeK
-         +UZA==
+        bh=PGTnMn3WOQKAnHaIABdLeoazv2H3v3K0zHveE+KWcH8=;
+        b=SJzUxYFUw/YJ6Fc5cU32baaIzF/DV7xFDpFPUAy+05rVdpjWBo6d0bBMI9FHWn0Qjg
+         9t1k5qB2MUaMbd1rrKZHI+49Ar0kVZl/juFqurJyHtlFxl2a9vLX6bQRuiUbkudm1qJm
+         oKGQZSoVOE+c40ztw7iltfKazfhGZmqi/rmEyz1dvBrMvrSZ2eWt52GuOTa7l3pHtbsJ
+         Si+bA+KxYWhVGegCjM+r55Mu6L6FXHAP/YAaNIpBk6uv1Hn0dnd13ATDMtO/MPf2gm7N
+         J4dQGsQc9CU7SveT/QqI3/v7lpczYYadX9ntm2CGYv37iob4rQTV+vUS4kIB8bTZVXIu
+         FKfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772214131; x=1772818931;
+        d=1e100.net; s=20230601; t=1772214134; x=1772818934;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ETPCtqQ5zGuYJDHbRqq4hLf7csSuCLugoIc0+9S3eO8=;
-        b=LKUXl3pu/5ceE6umUJuxFilvdRgraFRqCw4qq+L2QEcr1Wz96VgLXceKvdUS5qdzIz
-         073gNetcXNg8F03R3Cn8D16kwC9VCFCJLPEE2QU0GLZYWk6yPBgcU3I/J5KjNAQ2XMMn
-         WYKgFgQJVBIAA6jDN6CgksxMSbhUmuDXEQnMKrSik4AIzW3iIIJf+Zc5YPigfMZfnCul
-         SyZlxtHr5cmKpZE+8yY+SeVBlIbx6tQcrntxI6KLbUv/Ys25VwQnrs9yTWq5iPGENs4o
-         fCE3HQOUJOWY4N6uVhZ7XKGoQ2AK1HmBMKq386fyGJFziV/I5OhwQisD1ZKk8l7MFGcT
-         Duqg==
-X-Forwarded-Encrypted: i=1; AJvYcCV39fTMcaRxKWiJjLjYWCuZPIv81+xe5GQAWgXzKnAkYt0bEJP+UidWc85UyQglcXbw/njIfe8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYrFSpfP/QXrPS/FyIS2wxc44bxfhjlpH548zkMAd6WkKx4Koc
-	1gw8Eb+PmbYssrIyHhJuBaKrJn0cKtOOjMZ71qwmaXEZ9lT1vhPefZZTlJ509UY9DHo=
-X-Gm-Gg: ATEYQzyGBpf//bZWlw1hV+wp/cF+oqidgMDzXLGq0/TsxEUZ8Af5Nj5wOZCXFUmJK2B
-	FEmSg4QfPwPdn4M7mV1XF4XonCckhpCPaWoWE1ept/OycQs9Gi1BvRmsHQtTQ5YP67dGr3qTT8a
-	HhZn80DwDiHt/GcsMW3NYb0ToSckNdgHITA52Sc/LRC1+9cOq0ZR60APsWdlcYB6NV6LKX4nuxR
-	zOefQAkIPFzfORnTr1M0lIqke/9z4gfGT/jovc+4QxgZeFD42TVuVxOvgx7ZVmWGj2ue8vTSAWe
-	I5KzLgss9kEoBtCloKB4CtWF33QPny3o9I/87BhLbjvT40oBeyzfWBIBVSfCwU7WC/PxWTbLFeW
-	L9CTRbmuPpbaosB8j8FfzGLtNwd8TWW1iIgzolAFFkWkBnej2wH9Y1Tx9XhsluUpBIwWWekdWNj
-	shhQdITWQ=
-X-Received: by 2002:a05:6830:a91:b0:7c9:5ac6:12de with SMTP id 46e09a7af769-7d591b1bef6mr2579131a34.5.1772214131281;
-        Fri, 27 Feb 2026 09:42:11 -0800 (PST)
+        bh=PGTnMn3WOQKAnHaIABdLeoazv2H3v3K0zHveE+KWcH8=;
+        b=e7xytN4g1TSDYBWWlrZ8yZBuRpru3UjFfIz/2m+lZQ+q9EKO/bnV5vKBvt0NpAHh+e
+         /iTXq21Q9i1oY4T5f07TPfegd6E0zDzei1yrfEt+1s4YcL159XckjKqyGVa05V6NK/r9
+         Dbf4KLfpr5/QYtFbOgJ7kpO2W0cWuBTBZTEp0pF4ebRbkqDELmbFwR4wLvJqislrlCcH
+         lclFl1m7zEMu1O80E1LUsmhRSznmwr4S5C6vN1A/xdO+CRt+a/ZbpT4Q5cUNSiKoALZb
+         2u9OoVIE2txDAG+LuVZLJGR+agmg3ksWwIh/ZUNVmaYOnpAOVkM5I7rzQQT5KAA0etG6
+         NlJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXe30dc9OTxyh2vpMMKzjwpIgjrt0uDp6/ocwsWBVRrDC+0/1KjEr702hZDTy6A8FAVpzotkTo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLq53RTNx6AlI2r/zy3KHtCODdOp0lu3UsNvRd0sm9LpC6+Xbl
+	mjVePvshrG6emDt/ql/DipPxK8oyT25Lr9ToEwUzivQfbt8OaqP9HkqpLTRQZhv8w2k=
+X-Gm-Gg: ATEYQzwOcfbB6tG8dMbNiCdW5D/pgT1IukkbdXRGwbR0VYfHUzHA3QSd1ErEtfSUW+G
+	Km2RMPnSR/WEuT7q6LERf5C2NlTJ3em517S7+7gXJdXzkKnH/crWTIhjXQl/djNAA7XclkxfQC6
+	Ddd2EO+7dOJG7bf8RXuUxby6QCS1ptFXIEuCO0zZdY2M9+hBEcEWnmsPOxmdZyh2InBvg4Bq5Nc
+	EmoinieeSdTPuZa/dTKKHF8p+Nd22Wyu9LAXUq9dJ8HUe1b328ycRAanNHZnwhyQY3nAs9WgUs2
+	/JvxQaZdbPeZ6VvsRDCxEii2wtbrEnDJ06UhXVkCG7d/FHGTgUppuKvbtYbm3E3M5fQIjyN7nkP
+	81D5y2tUHrKzUAKlTQ2HPIe2CSHhhu0f7upFvtPwK/qStIryL/t3X0Pi00iOcJvMWUcVn8X1Ue2
+	vun4Gk4n/2WuYmxxUD0A==
+X-Received: by 2002:a05:6808:c3ea:b0:455:e5c2:a6f9 with SMTP id 5614622812f47-464a5dc5377mr4370011b6e.14.1772214134297;
+        Fri, 27 Feb 2026 09:42:14 -0800 (PST)
 Received: from 20HS2G4.. ([2a09:bac1:76c0:540::f:3cb])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d58644edf0sm4723385a34.2.2026.02.27.09.42.09
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d58644edf0sm4723385a34.2.2026.02.27.09.42.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Feb 2026 09:42:10 -0800 (PST)
+        Fri, 27 Feb 2026 09:42:13 -0800 (PST)
 From: Chris J Arges <carges@cloudflare.com>
 To: michael.chan@broadcom.com,
 	pavan.chebbi@broadcom.com,
@@ -94,9 +94,9 @@ Cc: kernel-team@cloudflare.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	bpf@vger.kernel.org
-Subject: [PATCH net-next 1/4] bnxt_en: use bnxt_xdp_buff for xdp context
-Date: Fri, 27 Feb 2026 11:40:17 -0600
-Message-ID: <fcafa0f65dd8bb8cadf7a8fe1afaab0398df56e3.1772211065.git.carges@cloudflare.com>
+Subject: [PATCH net-next 2/4] bnxt_en: Implement XDP RSS hash metadata extraction
+Date: Fri, 27 Feb 2026 11:40:18 -0600
+Message-ID: <7fe1e129215a789e55a446610321737aef10e20e.1772211065.git.carges@cloudflare.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1772211065.git.carges@cloudflare.com>
 References: <cover.1772211065.git.carges@cloudflare.com>
@@ -122,7 +122,7 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-261932-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-261933-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_TO(0.00)[broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me];
@@ -134,118 +134,137 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	DKIM_TRACE(0.00)[cloudflare.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.996];
+	NEURAL_HAM(-0.00)[-0.994];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7A39B1BB95B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,cloudflare.com:mid,cloudflare.com:dkim,cloudflare.com:email]
+X-Rspamd-Queue-Id: C342C1BB971
 X-Rspamd-Action: no action
 
-This adds bnxt_xdp_buff which embeds the xdp_buff struct and stores
-pointers to hardware RX completion descriptors (rx_cmp and rx_cmp_ext)
-along with the completion type.
+Add support for extracting RSS hash values and hash types from hardware
+completion descriptors in XDP programs for bnxt_en.
+
+Add IP_TYPE definition for determining if completion is ipv4 or ipv6. In
+addition add ITYPE_ICMP flag for identifying ICMP completions.
 
 Signed-off-by: Chris J Arges <carges@cloudflare.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 25 +++++++++++--------
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h |  7 ++++++
- 2 files changed, 22 insertions(+), 10 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  5 ++
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  2 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c | 47 +++++++++++++++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h |  3 ++
+ 4 files changed, 57 insertions(+)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index e062d5d400da..a80ec5391b89 100644
+index a80ec5391b89..a8ea73c880e9 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -2118,7 +2118,7 @@ static int bnxt_rx_pkt(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
- 	bool xdp_active = false;
- 	dma_addr_t dma_addr;
- 	struct sk_buff *skb;
--	struct xdp_buff xdp;
-+	struct bnxt_xdp_buff bnxt_xdp;
- 	u32 flags, misc;
- 	u32 cmpl_ts;
- 	void *data;
-@@ -2231,9 +2231,13 @@ static int bnxt_rx_pkt(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
- 	dma_addr = rx_buf->mapping;
+@@ -15905,6 +15905,10 @@ static const struct net_device_ops bnxt_netdev_ops = {
+ 	.ndo_hwtstamp_set	= bnxt_hwtstamp_set,
+ };
  
- 	if (bnxt_xdp_attached(bp, rxr)) {
--		bnxt_xdp_buff_init(bp, rxr, cons, data_ptr, len, &xdp);
-+		bnxt_xdp.rxcmp = rxcmp;
-+		bnxt_xdp.rxcmp1 = rxcmp1;
-+		bnxt_xdp.cmp_type = cmp_type;
-+
-+		bnxt_xdp_buff_init(bp, rxr, cons, data_ptr, len, &bnxt_xdp.xdp);
- 		if (agg_bufs) {
--			u32 frag_len = bnxt_rx_agg_netmems_xdp(bp, cpr, &xdp,
-+			u32 frag_len = bnxt_rx_agg_netmems_xdp(bp, cpr, &bnxt_xdp.xdp,
- 							       cp_cons,
- 							       agg_bufs,
- 							       false);
-@@ -2245,12 +2249,12 @@ static int bnxt_rx_pkt(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
- 	}
- 
- 	if (xdp_active) {
--		if (bnxt_rx_xdp(bp, rxr, cons, &xdp, data, &data_ptr, &len, event)) {
-+		if (bnxt_rx_xdp(bp, rxr, cons, &bnxt_xdp.xdp, data, &data_ptr, &len, event)) {
- 			rc = 1;
- 			goto next_rx;
- 		}
--		if (xdp_buff_has_frags(&xdp)) {
--			sinfo = xdp_get_shared_info_from_buff(&xdp);
-+		if (xdp_buff_has_frags(&bnxt_xdp.xdp)) {
-+			sinfo = xdp_get_shared_info_from_buff(&bnxt_xdp.xdp);
- 			agg_bufs = sinfo->nr_frags;
- 		} else {
- 			agg_bufs = 0;
-@@ -2261,7 +2265,7 @@ static int bnxt_rx_pkt(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
- 		if (!xdp_active)
- 			skb = bnxt_copy_skb(bnapi, data_ptr, len, dma_addr);
- 		else
--			skb = bnxt_copy_xdp(bnapi, &xdp, len, dma_addr);
-+			skb = bnxt_copy_xdp(bnapi, &bnxt_xdp.xdp, len, dma_addr);
- 		bnxt_reuse_rx_data(rxr, cons, data);
- 		if (!skb) {
- 			if (agg_bufs) {
-@@ -2269,7 +2273,7 @@ static int bnxt_rx_pkt(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
- 					bnxt_reuse_rx_agg_bufs(cpr, cp_cons, 0,
- 							       agg_bufs, false);
- 				else
--					bnxt_xdp_buff_frags_free(rxr, &xdp);
-+					bnxt_xdp_buff_frags_free(rxr, &bnxt_xdp.xdp);
- 			}
- 			goto oom_next_rx;
- 		}
-@@ -2293,10 +2297,11 @@ static int bnxt_rx_pkt(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
- 			if (!skb)
- 				goto oom_next_rx;
- 		} else {
--			skb = bnxt_xdp_build_skb(bp, skb, agg_bufs, rxr, &xdp);
-+			skb = bnxt_xdp_build_skb(bp, skb, agg_bufs,
-+						 rxr, &bnxt_xdp.xdp);
- 			if (!skb) {
- 				/* we should be able to free the old skb here */
--				bnxt_xdp_buff_frags_free(rxr, &xdp);
-+				bnxt_xdp_buff_frags_free(rxr, &bnxt_xdp.xdp);
- 				goto oom_next_rx;
- 			}
- 		}
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h
-index 8933a0dec09a..8c66698bde11 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h
-@@ -12,6 +12,13 @@
- 
- DECLARE_STATIC_KEY_FALSE(bnxt_xdp_locking_key);
- 
-+struct bnxt_xdp_buff {
-+	struct xdp_buff xdp;
-+	struct rx_cmp *rxcmp;
-+	struct rx_cmp_ext *rxcmp1;
-+	u8 cmp_type;
++static const struct xdp_metadata_ops bnxt_xdp_metadata_ops = {
++	.xmo_rx_hash		= bnxt_xdp_rx_hash,
 +};
 +
- struct bnxt_sw_tx_bd *bnxt_xmit_bd(struct bnxt *bp,
- 				   struct bnxt_tx_ring_info *txr,
- 				   dma_addr_t mapping, u32 len,
+ static void bnxt_get_queue_stats_rx(struct net_device *dev, int i,
+ 				    struct netdev_queue_stats_rx *stats)
+ {
+@@ -16789,6 +16793,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		goto init_err_free;
+ 
+ 	dev->netdev_ops = &bnxt_netdev_ops;
++	dev->xdp_metadata_ops = &bnxt_xdp_metadata_ops;
+ 	dev->stat_ops = &bnxt_stat_ops;
+ 	dev->watchdog_timeo = BNXT_TX_TIMEOUT;
+ 	dev->ethtool_ops = &bnxt_ethtool_ops;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index 9a41b9e0423c..13eb1ca814b7 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -232,6 +232,7 @@ struct rx_cmp {
+ 	 #define RX_CMP_FLAGS_ITYPE_UDP				 (3 << 12)
+ 	 #define RX_CMP_FLAGS_ITYPE_FCOE			 (4 << 12)
+ 	 #define RX_CMP_FLAGS_ITYPE_ROCE			 (5 << 12)
++	 #define RX_CMP_FLAGS_ITYPE_ICMP			 (7 << 12)
+ 	 #define RX_CMP_FLAGS_ITYPE_PTP_WO_TS			 (8 << 12)
+ 	 #define RX_CMP_FLAGS_ITYPE_PTP_W_TS			 (9 << 12)
+ 	#define RX_CMP_LEN					(0xffff << 16)
+@@ -311,6 +312,7 @@ struct rx_cmp_ext {
+ 	#define RX_CMP_FLAGS2_T_IP_CS_CALC			(0x1 << 2)
+ 	#define RX_CMP_FLAGS2_T_L4_CS_CALC			(0x1 << 3)
+ 	#define RX_CMP_FLAGS2_META_FORMAT_VLAN			(0x1 << 4)
++	#define RX_CMP_FLAGS2_IP_TYPE				(0x1 << 8)
+ 	__le32 rx_cmp_meta_data;
+ 	#define RX_CMP_FLAGS2_METADATA_TCI_MASK			0xffff
+ 	#define RX_CMP_FLAGS2_METADATA_VID_MASK			0xfff
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+index 85cbeb35681c..f75060374163 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+@@ -472,3 +472,50 @@ bnxt_xdp_build_skb(struct bnxt *bp, struct sk_buff *skb, u8 num_frags,
+ 				  xdp_buff_get_skb_flags(xdp));
+ 	return skb;
+ }
++
++int bnxt_xdp_rx_hash(const struct xdp_md *ctx, u32 *hash,
++		     enum xdp_rss_hash_type *rss_type)
++{
++	const struct bnxt_xdp_buff *xdp = (void *)ctx;
++	const struct rx_cmp *rxcmp = xdp->rxcmp;
++	const struct rx_cmp_ext *rxcmp1 = xdp->rxcmp1;
++	u32 itypes;
++	enum xdp_rss_hash_type hash_type = 0;
++
++	if (!rxcmp || !RX_CMP_HASH_VALID(rxcmp))
++		return -ENODATA;
++
++	*hash = le32_to_cpu(rxcmp->rx_cmp_rss_hash);
++
++	if (!rxcmp1) {
++		*rss_type = XDP_RSS_TYPE_L2;
++		return 0;
++	}
++
++	if (xdp->cmp_type == CMP_TYPE_RX_L2_CMP) {
++		itypes = RX_CMP_ITYPES(rxcmp);
++		if (rxcmp1->rx_cmp_flags2 &
++		    cpu_to_le32(RX_CMP_FLAGS2_IP_TYPE)) {
++			hash_type |= XDP_RSS_TYPE_L3_IPV6;
++		} else {
++			hash_type |= XDP_RSS_TYPE_L3_IPV4;
++		}
++
++		switch (itypes) {
++		case RX_CMP_FLAGS_ITYPE_TCP:
++			hash_type |= XDP_RSS_L4 | XDP_RSS_L4_TCP;
++			break;
++		case RX_CMP_FLAGS_ITYPE_UDP:
++			hash_type |= XDP_RSS_L4 | XDP_RSS_L4_UDP;
++			break;
++		case RX_CMP_FLAGS_ITYPE_ICMP:
++			hash_type |= XDP_RSS_L4 | XDP_RSS_L4_ICMP;
++			break;
++		default:
++			break;
++		}
++	}
++
++	*rss_type = hash_type;
++	return 0;
++}
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h
+index 8c66698bde11..fb4f9143929f 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h
+@@ -41,4 +41,7 @@ void bnxt_xdp_buff_frags_free(struct bnxt_rx_ring_info *rxr,
+ struct sk_buff *bnxt_xdp_build_skb(struct bnxt *bp, struct sk_buff *skb,
+ 				   u8 num_frags, struct bnxt_rx_ring_info *rxr,
+ 				   struct xdp_buff *xdp);
++int bnxt_xdp_rx_hash(const struct xdp_md *ctx, u32 *hash,
++		     enum xdp_rss_hash_type *rss_type);
++
+ #endif
 -- 
 2.43.0
 
