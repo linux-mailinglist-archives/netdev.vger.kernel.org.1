@@ -1,65 +1,61 @@
-Return-Path: <netdev+bounces-261648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261649-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id VV7gNC3uoGl5oAQAu9opvQ
-	(envelope-from <netdev+bounces-261648-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 02:06:53 +0100
+	id ICzsJt7voGmOoAQAu9opvQ
+	(envelope-from <netdev+bounces-261649-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 02:14:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45C1B1B1621
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 02:06:53 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B2121B1709
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 02:14:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 247B0302F6A1
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 01:06:52 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 03744300DF5D
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 01:14:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86430262FF8;
-	Fri, 27 Feb 2026 01:06:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 660A026D4DF;
+	Fri, 27 Feb 2026 01:14:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gtzmhoa6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O6MmsRlg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6349225B1CB;
-	Fri, 27 Feb 2026 01:06:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43066B665;
+	Fri, 27 Feb 2026 01:14:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772154408; cv=none; b=uS8Mz0kc/9P5953ItJA6AdanEebfhdA83EJrJou3fGg5YO2LCjUnAp2zG8igj02IWGVfaa4xt8lLxaiLTcs3a0GitTYNGVCc+VHOk+ZX2RG3fRP8ZMJwnu9a+BhzwU6uWzd0RPia9G/PZhHUyejRCwnMLl2zYgNGdQ0OhXdkoZw=
+	t=1772154843; cv=none; b=exXXMX4MgBMHRbL3osPGkJd9VwWboe5EUyBHR0iWfOlS8i4OnMQ3HQIcVxCWJqpBOeFKtb6spaoqkh0mLCFNdLUqmCiVJiWnEtcGO75yUcu+5CBx5oraQMjhKNQ75JK3Hzv274oW3ULLT9YLciRKzQWmmT2GH13NTAfQ8gY2y8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772154408; c=relaxed/simple;
-	bh=n8MLTtLjD/7AzNViZ68ja/2l5vEvrlqxhqGcijtvmNQ=;
+	s=arc-20240116; t=1772154843; c=relaxed/simple;
+	bh=V6e/eZIykA1TVtKFCPhcaT40rDzXPW1GfzxO37XFH6U=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=S5w8BC60Kiv3s1yDBpVU01byNv2XtPhQPlZfWsO7L/X35gW/I2qoAEyX43LN/bqaVOXITG5gtR9gcB0DJlokSsm4Pi2T3rlcObKxQy3yxBZiK8PtQKXoAL8wY3Ffd+ChvPBef0apghyswlHe4Bg9yG9ig2b31ddjuqhWiCsLlvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gtzmhoa6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47DB0C116C6;
-	Fri, 27 Feb 2026 01:06:47 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Mwz0Zk2tDN2A4OvZ310y4NHjE7NhBMGieyZgUcagR+DdOWEklljy8JSjQ9Gzag0pqWfwNDolkBPKJDkwABrv0OBAy0ch5ZkGU0EEVZjTPGyFVHXQIKK9qm9dkI8O4+/JJwXFY6r5pYHaH87gu6hg+NvB8nleaiRwSGt4abRh/b4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O6MmsRlg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50A35C116C6;
+	Fri, 27 Feb 2026 01:14:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772154407;
-	bh=n8MLTtLjD/7AzNViZ68ja/2l5vEvrlqxhqGcijtvmNQ=;
+	s=k20201202; t=1772154842;
+	bh=V6e/eZIykA1TVtKFCPhcaT40rDzXPW1GfzxO37XFH6U=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Gtzmhoa6JkqiNWPKlf/2Q8ezrbm2iQvSO4+7TrBN/P7m7gpiplFnjw9eOvfdJXG22
-	 NCBcz8j+ZKZwGPCB2Kb8F3PEK57Z/gggRuR12zJ73sKJ5R2BCWb+RirdyNTq8lH3lK
-	 SYPmOkR20bcUhx1ZqkQ9Mg4PnRjs+akGDfeiJj8hyP7dudB5gmOVv2cLic8iLCJPF8
-	 xzIzrk7fLKR4rXhXamgu6q47MtB8ZScxQ4cn9u58oI+wb5BkHQ9b8TbkEG1VjKCKav
-	 IWSQ2yd1dRkuTg/qjCRBO0SNfvUAjg0DIiBrulMQW1rZC4g6yi6QslTkFnljpZjD5a
-	 KYd5LDvDFUrug==
-Date: Thu, 26 Feb 2026 17:06:46 -0800
+	b=O6MmsRlgZK2091EGKFaK30O1Q03sRaCY/GBjIC6MH87y7KXPeIHfyNbxm7dcXrcuC
+	 ydOFig/TD8fDCevqtCm5jMwGiZaggsiNlriUv9PkfdB3dzXBxBoEV36X3Gj13YsJpz
+	 ORA+VjM3q7FbO7QONGhOM/eSy1cmi9Tf+RHce2h0+HeNwmKwm+r/qOyzKRoFHQDLJu
+	 HuNdifOvff8ZrrgyPyAO1s7Cb2JrgNd3gehUOIlJrWOjo9qC2BfO6Pn5Tg3qTNMe7V
+	 HMvKqF+p2MN3b1507tsr0xsmPbHKryw6sV2EDg48oR0Uzq2OBohOvtoTo5rre9hz1C
+	 I/DJ2zc/mmIWg==
+Date: Thu, 26 Feb 2026 17:14:01 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Kiran Kella <kiran.kella@broadcom.com>
-Cc: Daniel Zahka <daniel.zahka@gmail.com>, davem@davemloft.net,
- edumazet@google.com, willemb@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, jayakrishnan.udayavarma@broadcom.com,
- ajit.khaparde@broadcom.com, akhilesh.samineni@broadcom.com
-Subject: Re: [net-next, v2 1/2] psp: Support for transmit on logical device
- when the underlying transport device supports PSP.
-Message-ID: <20260226170646.0c4baeb6@kernel.org>
-In-Reply-To: <CAPHeo3eJRYc503Ta24h9r+Uu1cGqb1dCfmnxuZQ4MJLCTFd9Lw@mail.gmail.com>
-References: <20260223191154.2800616-1-kiran.kella@broadcom.com>
-	<20260223191154.2800616-2-kiran.kella@broadcom.com>
-	<0a850f65-be67-4a66-941f-17d8440e987b@gmail.com>
-	<CAPHeo3eJRYc503Ta24h9r+Uu1cGqb1dCfmnxuZQ4MJLCTFd9Lw@mail.gmail.com>
+To: Yung Chih Su <yuuchihsu@gmail.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, nathan@kernel.org,
+ nick.desaulniers+lkml@gmail.com, morbo@google.com, justinstitt@google.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, llvm@lists.linux.dev
+Subject: Re: [PATCH] net: ipv6: fix ARM64 alignment fault in
+ fib_multipath_hash_from_keys()
+Message-ID: <20260226171401.7461b9da@kernel.org>
+In-Reply-To: <20260226111721.25454-1-yuuchihsu@gmail.com>
+References: <20260226111721.25454-1-yuuchihsu@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,54 +70,36 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261648-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261649-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,lunn.ch,kernel.org,vger.kernel.org,broadcom.com];
+	FREEMAIL_TO(0.00)[gmail.com];
 	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,gmail.com,vger.kernel.org,lists.linux.dev];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.992];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 45C1B1B1621
+	TAGGED_RCPT(0.00)[netdev,lkml];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6B2121B1709
 X-Rspamd-Action: no action
 
-On Thu, 26 Feb 2026 17:16:58 +0530 Kiran Kella wrote:
-> > The lack of support for netns is a bit of a gap for this feature. It may
-> > make sense to see if what was posted in
-> > https://lore.kernel.org/netdev/20260224002410.1553838-1-weibunny@fb.com/
-> > is sufficient for your use case, as it handles cases where upper devices
-> > are in a different netns from psd->main_netdev.  
-> 
-> Thanks. Went through the changes in
-> https://lore.kernel.org/netdev/20260224002410.1553838-1-weibunny@fb.com/
-> It is sufficient for my use case too, although it specifically
-> addresses the cross-netns virtual devices use case.
-> But the same net-ns stacked devices like VLANs can be handled with
-> this patch implicitly, without user intervention through dev-assoc.
-> I think both approaches can co-exist without conflict.
-> However, I am ok with using a single approach to use the dev-assoc for
-> the same net-ns use case too.
+On Thu, 26 Feb 2026 19:17:21 +0800 Yung Chih Su wrote:
+> Fixes: [4ee2a8cace3fb9a34aea6a56426f89d26dd514f3] ("net: ipv4: Add a sysctl to set multipath hash seed")
 
-FTR I have mixed feelings about automatic propagation of PSP onto upper
-devices. If we propagate it onto vlan, why not bond, and if bond why not
-bridge. Or macsec (can every device do multiple layers of encryption?)
-
-If user does the propagation and that results in packet loss that's
-user's fault not ours. IDK.
+Please use the traditional abbreviated format of the Fixes tag
 
