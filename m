@@ -1,197 +1,184 @@
-Return-Path: <netdev+bounces-261769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261770-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MDSoDKxdoWmksQQAu9opvQ
-	(envelope-from <netdev+bounces-261769-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 10:02:36 +0100
+	id WGM1CgBeoWmksQQAu9opvQ
+	(envelope-from <netdev+bounces-261770-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 10:04:00 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45BC91B4DD3
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 10:02:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 99E8C1B4E29
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 10:03:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D52F730209CB
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 09:01:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 293673087E25
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 09:03:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 713B531618B;
-	Fri, 27 Feb 2026 09:01:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 611C838BF64;
+	Fri, 27 Feb 2026 09:03:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="KC6dWdzy"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qoPXmVvg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012067.outbound.protection.outlook.com [52.101.48.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F05584A35
-	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 09:01:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772182877; cv=none; b=OEGhzUCk2E6NfARuslnb9MEN79dGsSNAkI/4ybvkh5IutBuPFfGpgJ2x2JE00x9rPb9vaBDv/OGXrfk7M4RlWLduTpeSkf0iv8AvzPKU8uPSdQR1Y8Ki/YZtbM1MBgjv0DxaaPnnzH2CgcHoSaIYRAgUc8H27a5ODG6psUK7A3k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772182877; c=relaxed/simple;
-	bh=N1GrKpz7sYQ3lH34liNNZrwlZu9g2iOBQDK9CTR/8wU=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=j06MgOJ05IHN+ecCsyY6Hxnsc5H7hNMT6GqhXjZkVh49lYtVOJ7zhsCwn3nObE029bLG7FAkI4cEwFKzcsUSE745p8pR+Q4B7ABATz+2z5tBGl63y0NOsw21CdThxW7kUyRmotMyZ8EuOx4fPRmuX/D5/4gllZEMo0SiK6bDilY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=KC6dWdzy; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C9D7BA0387;
-	Fri, 27 Feb 2026 10:00:57 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1772182864; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=GWX4+6wT5AW/5pQ5aV0uBQNunQQTIoD3EExB6jWsI4U=;
-	b=KC6dWdzyf0vYVm+257Uno5h/A2XCxbd9oNlTVwoVZYcWzXcyPf+bSMvC/A104MXuDchXsp
-	PfZ2VtLYsgMo4FI72zCA0LrO9rmnUo5CL7pwdSbUNnW7yXmKvzmfAWrrELzvDZEyxqf5Bd
-	a7WKvJR5hMFZFuzs6Tjaf+GwUNsvYaqrAVQOeItMdfBO2GnGpryOjRnUlpt/e+JUzNJGVD
-	q+BrZxKgqwGKIIZT8SMXZykKWSxTTkSP3To2tFOE5wVZPQoxBVOyWBDSTYUak+wT+FBUA1
-	dUz7qktCBXQxBSni0qgX3VgWF56eMILbFK6lBq5crL2MEAKLTZKqyev8X1CsXA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23ECF36BCFA
+	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 09:03:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.67
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772182990; cv=fail; b=QZAFzL1QQb2fghiWzztIsAzNQaP5zLs/s01hBkE0J3DCKRZneXHsyJs2hewjUWi52HaeIFFvrToBPmTEmML6sOxGvGUM5vVrATmkY3JQ6djNKYCYqiWpFM2ETLecPCBGVRyujKPHc48Lchex+uUD5eMbv2+/o1AlzQ5xvccu6Aw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772182990; c=relaxed/simple;
+	bh=PVhLMmylRGSUJHi7cO/zuAS8enwtCrNFDoHwc0coY/o=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=B3mQBqw+5cj67dl/nXXZ5srdsWY4/aoVVgMWIV0ZogVsDPPDhhc3GxRR8j+ikbZGvuDkN+XB2eQOo/WQJH3YMedA0OHyVUz3VbZYeF5YM/eLU5bfGbPcT/SYjeebU0GZVLA2mefiQ2pwt1Bo9Ay+nvIM49DmnXrCv1oc5PJprFo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qoPXmVvg; arc=fail smtp.client-ip=52.101.48.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bagwIOJlXq99o7cE+O4a6WjqeKR4CZJkKakDewRq+SrZDcAayhoWPSOrkHErEhP/QNRViZ4BnCIlNmC7kLuBAaSbu0qawDjRDE+qId1Bejfl8Gvo9HoJvsuVJu9Du81hOcF2RW0pwjgHUGUOPcci/kiyxgO1w51hHqTmya+qBtIyTNN9ugAHeZ3Pgsa6GIIBPV6y9luKsm8ZZI9mLDTwM8bPdMwNEnjPOe9nZV+XQcgnHCyRKoM4uDUDEU9VQjdAcj7eG+AosBEfxPfjroH1b9GhCoFWH6TdiUscpTOIiUj5nkGbCRtx0DfQ6d+lPnSqv9WmJqYN+68941aH7ZalQA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=k2oQbIKIbeqQEiZPehK8/ztRKz0+u7ZvYpSlk10I1SE=;
+ b=FXi5HgAdubhvsLn+QU8RX2U+G/MHwNVPG6m9hvXUlsoOfyx8GAaGFJQ4S5ebhpl6AGvw2oMpN9kzo6kAZMVO4LEH8TwSvqIjic0liiAs4RhzQ23r2KxAEQq5Ezi/jJnHGUEKOzUE0oZ9/YrJOroA0ehmWVzojIETht1QtiWrKRYikg2z6pYCLBt+Raf+m92SMFhE8AnvZQldx8Nm9bokX/rUwfG15WLrML81y3m1Tvln/PeD07Id/EeGKCnNyKOBNq/g7RbWOfGwlhSR3rDYVLYJwWheDbImJWRaoOAXvWiojuZCKm0ov71R2dABiLn6e8yQb0oj1/VsI1e4DPdwZA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=k2oQbIKIbeqQEiZPehK8/ztRKz0+u7ZvYpSlk10I1SE=;
+ b=qoPXmVvgRKxrixg86jxZ2GOJFbYMqXvwJ+BawfvpqDsYBzDCVEWS0A0HSif2YU4PdarR/hRED0ewWwphe/oUI4J+pVrtskxzZj0M3garUgrwwXH/s0M167ZUDAQvORIAn65kgDT+/JcMDB9QM4QPvDyjSIkvTFiNo+Xqb7D7BGrnIHog+Mp7zR8HenkQAJLV0x2JtMqCCG4A92df7znTWNL+MbXZZKpUuWXv8y/BeGwps+5Vag4BB4zQ0r/v/5ZPhA7CHO2YJ7sRvfLirCZjS0k0hHcYOrB83yxjdQeH4J/sx3cPqU0lnQLroA38me1/7px4b24eNrTwfGlyZ5zN9w==
+Received: from BL0PR02CA0028.namprd02.prod.outlook.com (2603:10b6:207:3c::41)
+ by PH7PR12MB6636.namprd12.prod.outlook.com (2603:10b6:510:212::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.14; Fri, 27 Feb
+ 2026 09:03:02 +0000
+Received: from BN2PEPF000055DD.namprd21.prod.outlook.com
+ (2603:10b6:207:3c:cafe::ce) by BL0PR02CA0028.outlook.office365.com
+ (2603:10b6:207:3c::41) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.26 via Frontend Transport; Fri,
+ 27 Feb 2026 09:02:59 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BN2PEPF000055DD.mail.protection.outlook.com (10.167.245.7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9654.0 via Frontend Transport; Fri, 27 Feb 2026 09:03:01 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 27 Feb
+ 2026 01:02:47 -0800
+Received: from c-237-113-240-247.mtl.labs.mlnx (10.126.230.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Fri, 27 Feb 2026 01:02:44 -0800
+From: Cosmin Ratiu <cratiu@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: Sabrina Dubroca <sd@queasysnail.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Cosmin
+ Ratiu" <cratiu@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
+Subject: [PATCH net-next v2 0/3] macsec: Add support for VLAN filtering in offload mode
+Date: Fri, 27 Feb 2026 11:02:24 +0200
+Message-ID: <20260227090227.1552512-1-cratiu@nvidia.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Fri, 27 Feb 2026 10:00:57 +0100
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, netdev@vger.kernel.org,
- andrew+netdev@lunn.ch, claudiu.beznea@tuxon.dev, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, nicolas.ferre@microchip.com,
- pabeni@redhat.com, phil@raspberrypi.com, =?UTF-8?Q?Gr=C3=A9gory_Clemen?=
- =?UTF-8?Q?t?= <gregory.clement@bootlin.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH 3/5] net: cadence: macb: implement EEE TX LPI support
-In-Reply-To: <DGOXXGNSSMYK.2XNU9AQ6E077P@bootlin.com>
-References: <20260225091558.51157-1-nb@tipi-net.de>
- <20260225091558.51157-4-nb@tipi-net.de>
- <DGO88446M74S.6C1O0I79IM0E@bootlin.com>
- <aZ82VFPu2FDmPpJ0@shell.armlinux.org.uk>
- <DGOSV8GS9VI6.8IV6D1L3F94F@bootlin.com>
- <342fd96e9f9668392705496e54d93eff@tipi-net.de>
- <DGOXXGNSSMYK.2XNU9AQ6E077P@bootlin.com>
-Message-ID: <e90dc9e1ac7c9d85607c8fad6094d6b2@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
 Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN2PEPF000055DD:EE_|PH7PR12MB6636:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4bb2d3b1-4a22-4e9a-090a-08de75df02fb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014;
+X-Microsoft-Antispam-Message-Info:
+	mhT3PyfRYOpZY7nzFknLFnvEhNzAE3tGscBsk9o/MyYyX0YJMvAc77n66lAgzobyFr5FWmgoHsk2AnM8C1UKPCIPIMq4+43m5y0f+Wut6E7ciTzK6t0csdn415Gi5zvpdEGgogj0cysO47mytAVibHxOnkgrXxkvdEAvCTZ/dcPw02bjUrYQT4aB5H/mOrEenBLHCUylcjt61H+KVX60Mk2xbESNC4nL8cGbk4+kIOf0crvJ9qyCIDHVy2PRyy/kipxMhY2T8ZgWalenoGKVDN3MjaSlrgYvBzsEigLgvAeN7DUbk7wmsvt6ewH5qJpRrtShzOdrIKJL0h3Dguc+vgga1aK6nDj51/rHkwN6/EoDSBIa1n8Hd41fHk6AjPc81JbaHYg+zvXI90f+9OtIfSLydjZgotNcL9dHQ4SAHFNgOJ8WylmkNzCjD4D+ioDGluUiP5VZmBbcls7xcylDQ69Vol6w8XPiD0WsYF2DKk1m6z2vxDBqx8delINZYQd86iiZDwwyOYhpz7og/sJk5gux8WdkMKc0vQ5c5+WEltEspGVhYNjVJ7+4oNMe+Pum+eDlb6ctWsIRRCTbBUL/A2t19xsdmJkhO8fhv5zPLby1Zm11r3+NyxdE4ifdf7OLR+CjMyS3gZKdlBnQ6519RamoPBSElgmE/XJ9+wi+gKty1G2eSpUKcRVK3cHBTTp/yKPf2XHr5kg/qRyxoU7ICpcDsdZZRKErtPgFX5JkR+jgZ286MNGvska+8QBySX/1qfmXX1wQQ2dpnFlmDMW/8wuL5my3cdHdbvvFG+tnAzZ+9tUhbd8KiIu2TLfHz+jjVmJ29ll5X+IrMZPUHpmzIQ==
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	r8qBTOIcMLh3x3O20vzORN4r96ZZWpLyVa4vmnhJlc2SAHVHwJS9i2Qm40u7WtxTy0q2/t6eFfJTrxssDd2eh6Bw0yClpzW66ojyha7cgVgrL9/mPpb8KSbTwCm6PB2AIimHBcydwfCoGPiwcDFcq8guhEmB/Cu3A+MUNV4044+xkwaC0V+xXSAW3h8yUy07d1N/2/QXSvbihJaCbWCOBuRp7xvCoFyQJJ/+WlkZBiNoqIBm6G1o9RKnFAQlPXf+2vbHo8az+KDBX2LWUh7igdHxgn8FfhzUps4JIFdEw+gLbhCTcTMHXwGXYXfhVy+BdmeXSwkz2aPmIQ63swWcTq0CdicMqVueVYzniKHUjzg35mjD9wwg+xfwQCmA+wZ6lX3V5VMqmZV2XXRaIqKoEY6L/d48A+Gc//CX8PwDeK14Ot1685U0T8YuSDWzKwoB
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2026 09:03:01.9546
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4bb2d3b1-4a22-4e9a-090a-08de75df02fb
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN2PEPF000055DD.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6636
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	ASN_FAIL(0.00)[10.253.234.172.asn.rspamd.com:query timed out];
-	TAGGED_FROM(0.00)[bounces-261769-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-261770-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[cratiu@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	NEURAL_HAM(-0.00)[-0.993];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 45BC91B4DD3
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 99E8C1B4E29
 X-Rspamd-Action: no action
 
-On 26.2.2026 14:50, Théo Lebrun wrote:
-> On Thu Feb 26, 2026 at 11:49 AM CET, Nicolai Buchwitz wrote:
->> On 26.2.2026 10:52, Théo Lebrun wrote:
->>> On Wed Feb 25, 2026 at 6:50 PM CET, Russell King (Oracle) wrote:
->>>> On Wed, Feb 25, 2026 at 06:42:08PM +0100, Théo Lebrun wrote:
->>>>> On Wed Feb 25, 2026 at 10:15 AM CET, Nicolai Buchwitz wrote:
->>>>> > @@ -2349,6 +2454,8 @@ static netdev_tx_t macb_start_xmit(struct sk_buff *skb, struct net_device *dev)
->>>>> >  	netdev_tx_sent_queue(netdev_get_tx_queue(bp->dev, queue_index),
->>>>> >  			     skb->len);
->>>>> >
->>>>> > +	macb_tx_lpi_wake(bp);
->>>>> 
->>>>> Should this be protected by a bp->eee_active condition? It could go
->>>>> in macb_tx_lpi_wake(). We avoid a spinlock acquire per xmit for 
->>>>> most
->>>>> platforms. Probably negligeable though.
->>>> 
->>>> It will read the register, find the bit clear, and then return if
->>>> EEE is already disabled.
->>> 
->>> Yes I agree with your sentence, sorry my point was unclear. I was not
->>> describing a bug but rather a performance optimisation.
->>> 
->>> We would look up bp->eee_active to know if we can avoid calling
->>> macb_tx_lpi_set(), to avoid grabbing bp->lock once per xmit.
->>> That spinlock is interface-wide.
->> 
->> So you're suggesting to revert to the v2 approach?
->> https://patchwork.kernel.org/project/netdevbpf/patch/20260224091821.47671-4-nb@tipi-net.de/
-> 
-> I discovered this series at its V3.
-> It seems like I was suggesting a mix of both V2 & V3 approaches.
-> 
-> // V2 was:
-> static void macb_tx_lpi_wake(struct macb *bp)
-> {
-> 	if (!bp->eee_active)
-> 		return;
-> 
-> 	macb_tx_lpi_set(bp, false);
-> 	cancel_delayed_work(&bp->tx_lpi_work);
-> 	udelay(50);
-> }
-> 
-> // V3 & V3 are:
-> static void macb_tx_lpi_wake(struct macb *bp)
-> {
-> 	if (!macb_tx_lpi_set(bp, false))
-> 		return;
-> 
-> 	cancel_delayed_work(&bp->tx_lpi_work);
-> 	udelay(50);
-> }
-> 
-> // I was suggesting:
-> static void macb_tx_lpi_wake(struct macb *bp)
-> {
-> 	if (!eee_active || !macb_tx_lpi_set(bp, false))
-> 		return;
-> 
-> 	cancel_delayed_work(&bp->tx_lpi_work);
-> 	udelay(50);
-> }
-> 
-> But talking about perf, let's measure.
+This short series adds support for VLANs in macsec devices when offload
+mode is enabled. This allows VLAN netdevs on top of macsec netdevs to
+function, which accidentally used to be the case in the past, but was
+broken. This series adds back proper support.
 
-Tthanks for testing! Since you have the hardware at hand, would you be 
-willing to add MACB_CAPS_EEE to eyeq5_config as well? I'm happy to 
-include it in the series if you can confirm it works correctly.
+netdevsim was extended to support VLANs and there's also a selftest for
+the new functionality.
 
-> 
-> I don't get any measurable performance improvement on average/max time
-> spent in macb_start_xmit() between net-next and this series. We spend
-> <3µs per call anyway. 10s iperf3 1G TCP test on EyeQ5, ftrace function
-> graph tracer on macb_start_xmit().
-> 
-> Summary: you can ignore my remark.
-> 
-> Thanks,
-> 
-> --
-> Théo Lebrun, Bootlin
-> Embedded Linux and Kernel engineering
-> https://bootlin.com
+V1->V2:
+- Changed VLAN filtering to only function in offload mode. 
+- Added tests.
 
-Nicolai
+Cosmin Ratiu (3):
+  nsim: Add support for VLAN filters
+  selftests: Add macsec offload VLAN tests
+  macsec: Support VLAN-filtering lower devices
+
+ drivers/net/macsec.c                          | 38 +++++++++++-
+ drivers/net/netdevsim/netdev.c                | 59 ++++++++++++++++++-
+ drivers/net/netdevsim/netdevsim.h             |  8 +++
+ .../drivers/net/netdevsim/ethtool-common.sh   |  5 +-
+ .../drivers/net/netdevsim/macsec-offload.sh   | 59 +++++++++++++++++++
+ 5 files changed, 164 insertions(+), 5 deletions(-)
+
+-- 
+2.49.0
+
 
