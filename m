@@ -1,203 +1,165 @@
-Return-Path: <netdev+bounces-261892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261893-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ENA5GMa4oWkYwAQAu9opvQ
-	(envelope-from <netdev+bounces-261892-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 16:31:18 +0100
+	id qJDcHAO5oWkYwAQAu9opvQ
+	(envelope-from <netdev+bounces-261893-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 16:32:19 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 213411B9CFF
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 16:31:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D5A11B9D4F
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 16:32:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 683A730241B5
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 15:26:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 326B230BFF4B
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 15:26:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E6453271EA;
-	Fri, 27 Feb 2026 15:26:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6B733F074C;
+	Fri, 27 Feb 2026 15:26:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="dr07HTs4";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="0vIiX17I";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="dr07HTs4";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="0vIiX17I"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hihaAwzv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 016C73624D2
-	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 15:26:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9B7A275AF0
+	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 15:26:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772205971; cv=none; b=ZZYW8O4Nkya5z+0splOyxAWvDmMC6ZYCyVk5/W18rJuSgc2diNtkdEm2CZNviaUhvvFpUPCpIkBn+N8n3onEBiSOt3FiAjHOPZO3+X0OHxDdemilIBtNUmbMR7pfIp9e3y8JMGBE5BUgV7G0w0pIIuKUPb/NZJP/vp/LvLyoeXk=
+	t=1772206004; cv=none; b=LFPMT9ip0uMpNNJ/Nuxfrx9YcuYr1jPpuhQhFz8dgwL9brtzYxG5Lsp6EpAkXk8tMWdN0kgwvfdN5DqO5dsW8W3SJF0ZPWOPkDa7vk1BQvkOWaJLuSlBjNF0jChTHHlrPX1ra7TKb8b3TFHK/FavAtAdesQyWf1xU5s4Fl+cZ+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772205971; c=relaxed/simple;
-	bh=DYYts9fWhHCY5zabQ1vce14IqqniK1fk4fguYyST7lw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L5RlkIVSArPnH2cH1uRPL3vefbsRuM2YHQvnJySBfFAR6A77ZBmJ+LgYKjQyHz7Pphwj6+zI984jAJqdLH6eQb+g5SlPjQjhIixfhsYsG1Vi3qvfkfsOq4cqxWBMyai8es/K8pU6SYKFuTXKfFHyWHlobcTp7uIPtU7ZmGloheY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=dr07HTs4; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=0vIiX17I; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=dr07HTs4; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=0vIiX17I; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 41E9A5C1A7;
-	Fri, 27 Feb 2026 15:26:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1772205968; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qc5kTPIg0SUn5GOy2ONe2+Zsp5R+gcLDDp/mn1CBSQk=;
-	b=dr07HTs49SWh49lnsTVU/D1W1XQ+NDgzMo4yRr73NScjW1jcD9+lT2CGdh9n4STFj1Twfk
-	eEYeomyzXckJL5DnCF4EXmemOXro+O+K/ESSH/4FciOGhl7OY4U75AOJePTdiyTFb+wEFv
-	VMsHS5eS5NGXxv1shnbGbcLBNwhL3bU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1772205968;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qc5kTPIg0SUn5GOy2ONe2+Zsp5R+gcLDDp/mn1CBSQk=;
-	b=0vIiX17Iyqw56xfSOzDLF2z6K+4GopLa4Hz9GmNCHeQS8CqXOSbnJtcepw2CkTQ6hVGJO4
-	kDUc9gOhmozmWhDw==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1772205968; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qc5kTPIg0SUn5GOy2ONe2+Zsp5R+gcLDDp/mn1CBSQk=;
-	b=dr07HTs49SWh49lnsTVU/D1W1XQ+NDgzMo4yRr73NScjW1jcD9+lT2CGdh9n4STFj1Twfk
-	eEYeomyzXckJL5DnCF4EXmemOXro+O+K/ESSH/4FciOGhl7OY4U75AOJePTdiyTFb+wEFv
-	VMsHS5eS5NGXxv1shnbGbcLBNwhL3bU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1772205968;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qc5kTPIg0SUn5GOy2ONe2+Zsp5R+gcLDDp/mn1CBSQk=;
-	b=0vIiX17Iyqw56xfSOzDLF2z6K+4GopLa4Hz9GmNCHeQS8CqXOSbnJtcepw2CkTQ6hVGJO4
-	kDUc9gOhmozmWhDw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 393A33EA69;
-	Fri, 27 Feb 2026 15:26:08 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id J6D2DZC3oWmrJgAAD6G6ig
-	(envelope-from <jack@suse.cz>); Fri, 27 Feb 2026 15:26:08 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 05E25A06D4; Fri, 27 Feb 2026 16:26:08 +0100 (CET)
-Date: Fri, 27 Feb 2026 16:26:07 +0100
-From: Jan Kara <jack@suse.cz>
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, Jeff Layton <jlayton@kernel.org>, 
-	Josef Bacik <josef@toxicpanda.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Jan Kara <jack@suse.cz>, linux-kernel@vger.kernel.org, Hugh Dickins <hughd@google.com>, 
-	linux-mm@kvack.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Tejun Heo <tj@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Jann Horn <jannh@google.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH 11/14] xattr: support extended attributes on sockets
-Message-ID: <hy7vat2udvtkkgggofdj2z7hdwlky4ehpyuhpzdzrwdz43snyp@km35qarriknf>
-References: <20260216-work-xattr-socket-v1-0-c2efa4f74cb7@kernel.org>
- <20260216-work-xattr-socket-v1-11-c2efa4f74cb7@kernel.org>
+	s=arc-20240116; t=1772206004; c=relaxed/simple;
+	bh=nB4dU5ro4rB0p1psB/tOgNtIOVTU8bVlg3/4Kp9rrRE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HYReXvwQAY2BuluAEQTn8BnE/EFhmewsiPPMoFJUgNP6D6ERVVvX3qZzRXo4pY3DW0qFUahC8NmJq8ojwHf5+JHqs7anVZyk6EgXRcK2WinMYKl7qhUF8T4y9p6U1Fl4CoKNHdBG8c9aGkihH9VlgNqZUOq2TVnQiAIMOicGFFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hihaAwzv; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-35851eadc17so1301651a91.2
+        for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 07:26:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772206003; x=1772810803; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UetmJfyt896bziHLm83oQ5Y9tswodav8qMkgJQV6wLA=;
+        b=hihaAwzvjQqo3nkDiM3b31Iv3mE5GEJwj5l/yTpAzoFQSbbccHT9cZPBmVuilOKrTR
+         hvzhYzNwq8/JdmWkkNKldR2BAiGXp5d7PYZSHNdQNBqr9mUizmtdIefp3JbTq2EwtCDl
+         S2lv68D8O5bDb6jnk7upw/9XFglHTn3jdAGgFF4apH0zN0HtE6W+jp3tI70MdsuyEibT
+         M51y8m3mCJN1Ky8uL/O/E3vtIptwNfG5d3FJNIUm3O9lJV0SvDji9fX8y/7UX6tGL1md
+         KtI8xGQDOPakcuH5qSVEFxATapfYf9KofmkF/Q2ENGtCLmKoHuoKJyKeEoZjNyVT8ZVe
+         g2gA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772206003; x=1772810803;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UetmJfyt896bziHLm83oQ5Y9tswodav8qMkgJQV6wLA=;
+        b=q4bL+FobY62x23IuOsGXlIO4O13fuUJH/I3KtLUnIZPI07wDehgkZiD3hyPIQxIW06
+         Zc+SQlPoLotJCSsiW1Oli1KwBkxcCur5LtyTQV2Dx6rCRfs/84Apsnf36AxJgTmdya07
+         PtGIl+NUbkuhPIsal3E76W/T9DzhH5OVB3CA7qpFjUaFZgY9d1o5Q1sf4oxlTsxtjDNZ
+         LIzVsNG24x4/aZPi5hwP2/qv/pr/YuQC0ZYUluXbJr/MKpRhmkK3pyMLvi4gcGwY1vzz
+         oYhKOprrOTm93XaWur0UX48I/0ZR4N9M5MAqLvYO91hWbPAqLRgfA6u4sgAGIeoEP8Si
+         dOFg==
+X-Gm-Message-State: AOJu0Ywq/dm3KdIriswcHU1RSb1Px+YDe8iWDSPVg1TWT0c3Mhgh8JrC
+	5DpiKLZe97W0vyzFNeqICFyLTAEDIFGAyBL8b/5wJOOQ6rd04lXhTafP
+X-Gm-Gg: ATEYQzyu+5sUXzLhNuo2AFsshp8kA0lyJqz2nz126B68Gh7TSZ8YhATHhgaHaFNBs0C
+	pb1zHPtRTmrJxaA6exePSGwCixgiW3nfSM6IRa8agDmXY4Sc6BhiUPSQXZPRwIb9wubSfDtrRMx
+	MEIXfjcRw5BKtDKSRgSlLncXyz51uWJaFZONeYdzVCXiQ7Bu54D72+smWdBH6jlLVq8651TIR/u
+	OmwnCFo+1xn76ZG6y2gvURnJ6CaMTOmSVIp6XQT9GxTm6/J9Z3QoXL5vQ1VvkMjE/QJI97PoLi4
+	GqELEqApFcRohzaTLWGgpTiT2JxSMH8X5TizjVCwDejOGhTMmdHoI5uH44SCEzc6bbm8zQ35UhU
+	wf4oS75hwxPYMk1vj2Qii4fe0f8lr0HgnGHL+51WglT7nRGIoANqYpISj7rqzbsr2wA/9gGUgTU
+	vJRlPoCi8XETrXwoIP24rufvq5FZxs9E7fHIN0Y8iQ+UtLl0oQxyMlshd8mW5eeRMZcbNfxXXh2
+	+7cfH8=
+X-Received: by 2002:a17:90b:3f10:b0:359:5a82:5f98 with SMTP id 98e67ed59e1d1-35965b2fec7mr3609795a91.0.1772206003011;
+        Fri, 27 Feb 2026 07:26:43 -0800 (PST)
+Received: from sean-All-Series.. (1-160-203-78.dynamic-ip.hinet.net. [1.160.203.78])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35900700e69sm9053211a91.0.2026.02.27.07.26.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Feb 2026 07:26:42 -0800 (PST)
+From: Sean Chang <seanwascoding@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	nicolas.ferre@microchip.com,
+	claudiu.beznea@tuxon.dev,
+	trond.myklebust@hammerspace.com,
+	anna@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Sean Chang <seanwascoding@gmail.com>
+Subject: [PATCH v4 0/2] Fix warnings for RISC-V builds
+Date: Fri, 27 Feb 2026 23:26:22 +0800
+Message-Id: <20260227152624.164964-1-seanwascoding@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260216-work-xattr-socket-v1-11-c2efa4f74cb7@kernel.org>
-X-Spam-Flag: NO
-X-Spam-Score: -3.80
-X-Spam-Level: 
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,suse.cz:email,suse.cz:dkim];
-	DMARC_NA(0.00)[suse.cz];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-261893-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261892-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jack@suse.cz,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 213411B9CFF
+	FROM_NEQ_ENVFROM(0.00)[seanwascoding@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2D5A11B9D4F
 X-Rspamd-Action: no action
 
-On Mon 16-02-26 14:32:07, Christian Brauner wrote:
-> Allow user.* extended attributes on sockets by adding S_IFSOCK to the
-> xattr_permission() switch statement. Previously user.* xattrs were only
-> permitted on regular files and directories. Symlinks and special files
-> including sockets were rejected with -EPERM.
-> 
-> Path-based AF_UNIX sockets have their inodes on the underlying
-> filesystem (e.g. tmpfs) which already supports user.* xattrs through
-> simple_xattrs. So for these the permission check was the only thing
-> missing.
-> 
-> For sockets in sockfs - everything created via socket() including
-> abstract namespace AF_UNIX sockets - the preceding patch added
-> simple_xattr storage with per-inode limits. With the permission check
-> lifted here these sockets can now store user.* xattrs as well.
-> 
-> This enables services to associate metadata with their sockets. For
-> example, a service using Varlink for IPC can label its socket with
-> user.varlink=1 allowing eBPF programs to selectively capture traffic
-> and tools to discover IPC entrypoints by enumerating bound sockets via
-> netlink. Similarly, protocol negotiation can be performed through xattrs
-> such as indicating RFC 5424 structured syslog support on /dev/log.
-> 
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
+This series addresses several compiler warnings found when building the
+kernel for RISC-V.
 
-OK. Feel free to add:
+The first patch fixes unused variable warnings in the NFS client (including
+nfs4proc and flexfilelayout) that occur in certain build configurations.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+The second patch fixes a format-truncation warning in the MACB ethernet
+driver by ensuring the snprintf output fits within the destination buffer.
 
-								Honza
+v4:
+- Refactor patch 1 to use no_printk() in sunrpc headers instead of marking
+  variables as __maybe_unused. This provides a cleaner, global fix and
+  enables compiler type checking.
 
-> ---
->  fs/xattr.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/fs/xattr.c b/fs/xattr.c
-> index 5e559b1c651f..09ecbaaa1660 100644
-> --- a/fs/xattr.c
-> +++ b/fs/xattr.c
-> @@ -163,6 +163,8 @@ xattr_permission(struct mnt_idmap *idmap, struct inode *inode,
->  			if (inode_owner_or_capable(idmap, inode))
->  				break;
->  			return -EPERM;
-> +		case S_IFSOCK:
-> +			break;
->  		default:
->  			return xattr_permission_error(mask);
->  		}
-> 
-> -- 
-> 2.47.3
-> 
+v3:
+- Expand commit descriptions to include technical details regarding macro
+  expansion, as requested by Andrew Lunn.
+- Test the different platform, such as ARM, ARM64, X86_64.
+
+v2:
+- Split the original treewide patch into subsystem-specific commits.
+- Added more detailed commit descriptions to satisfy checkpatch.
+
+Sean Chang (2):
+  sunrpc: fix unused variable warnings by using no_printk
+  net: macb: use ethtool_sprintf to fill ethtool stats strings
+
+ drivers/net/ethernet/cadence/macb_main.c | 7 ++-----
+ include/linux/sunrpc/debug.h             | 4 ++--
+ 2 files changed, 4 insertions(+), 7 deletions(-)
+
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.34.1
+
 
