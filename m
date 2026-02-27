@@ -1,105 +1,273 @@
-Return-Path: <netdev+bounces-261649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261650-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ICzsJt7voGmOoAQAu9opvQ
-	(envelope-from <netdev+bounces-261649-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 02:14:06 +0100
+	id UBokFy3woGmOoAQAu9opvQ
+	(envelope-from <netdev+bounces-261650-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 02:15:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B2121B1709
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 02:14:06 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 815C11B174B
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 02:15:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 03744300DF5D
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 01:14:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 17764303E792
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 01:15:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 660A026D4DF;
-	Fri, 27 Feb 2026 01:14:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99D86283CBF;
+	Fri, 27 Feb 2026 01:14:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O6MmsRlg"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="U9/JjTBl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43066B665;
-	Fri, 27 Feb 2026 01:14:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772154843; cv=none; b=exXXMX4MgBMHRbL3osPGkJd9VwWboe5EUyBHR0iWfOlS8i4OnMQ3HQIcVxCWJqpBOeFKtb6spaoqkh0mLCFNdLUqmCiVJiWnEtcGO75yUcu+5CBx5oraQMjhKNQ75JK3Hzv274oW3ULLT9YLciRKzQWmmT2GH13NTAfQ8gY2y8Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772154843; c=relaxed/simple;
-	bh=V6e/eZIykA1TVtKFCPhcaT40rDzXPW1GfzxO37XFH6U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Mwz0Zk2tDN2A4OvZ310y4NHjE7NhBMGieyZgUcagR+DdOWEklljy8JSjQ9Gzag0pqWfwNDolkBPKJDkwABrv0OBAy0ch5ZkGU0EEVZjTPGyFVHXQIKK9qm9dkI8O4+/JJwXFY6r5pYHaH87gu6hg+NvB8nleaiRwSGt4abRh/b4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O6MmsRlg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50A35C116C6;
-	Fri, 27 Feb 2026 01:14:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772154842;
-	bh=V6e/eZIykA1TVtKFCPhcaT40rDzXPW1GfzxO37XFH6U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=O6MmsRlgZK2091EGKFaK30O1Q03sRaCY/GBjIC6MH87y7KXPeIHfyNbxm7dcXrcuC
-	 ydOFig/TD8fDCevqtCm5jMwGiZaggsiNlriUv9PkfdB3dzXBxBoEV36X3Gj13YsJpz
-	 ORA+VjM3q7FbO7QONGhOM/eSy1cmi9Tf+RHce2h0+HeNwmKwm+r/qOyzKRoFHQDLJu
-	 HuNdifOvff8ZrrgyPyAO1s7Cb2JrgNd3gehUOIlJrWOjo9qC2BfO6Pn5Tg3qTNMe7V
-	 HMvKqF+p2MN3b1507tsr0xsmPbHKryw6sV2EDg48oR0Uzq2OBohOvtoTo5rre9hz1C
-	 I/DJ2zc/mmIWg==
-Date: Thu, 26 Feb 2026 17:14:01 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Yung Chih Su <yuuchihsu@gmail.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- pabeni@redhat.com, horms@kernel.org, nathan@kernel.org,
- nick.desaulniers+lkml@gmail.com, morbo@google.com, justinstitt@google.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH] net: ipv6: fix ARM64 alignment fault in
- fib_multipath_hash_from_keys()
-Message-ID: <20260226171401.7461b9da@kernel.org>
-In-Reply-To: <20260226111721.25454-1-yuuchihsu@gmail.com>
-References: <20260226111721.25454-1-yuuchihsu@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 325A0271443
+	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 01:14:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.215.175
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772154897; cv=pass; b=n+YDxTDjGOLq98a6IHJ5P6nK/VmXtnOxOvLBfdbHMocVnbvS47tzPNsyU9zHpFXzyVBC6JLhysRaoTujQwtNOM743s/UfYPwRqqb4PHoldTCail++OurCU1fotmN8TFeJOYP3prGgau19bkdXXMOEOnFBu6Kjy604CDg/K3+J+Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772154897; c=relaxed/simple;
+	bh=AFxEP4SVCc1CPd/QViXf8u7kAv9Bo53ydmyQL2ZQjQY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bRMEwnYWnX7bMeDv2nBaKtvYw7TZ111YuuWIMEWzHDC2A0MIitgfC+AaQI+2fMn+NTIOf6H4kcgfnBx9APK08DKHWwKJvnFF0cjWXQ6wDyddylgxdWmsbhM/0UjKg3a2G/qve//fA8/6/dPe45QU5xFi+UOYcrPoi3cM/MRnij8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=U9/JjTBl; arc=pass smtp.client-ip=209.85.215.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-c70ece855e2so944313a12.0
+        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 17:14:56 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772154895; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Ji154YivYpVRPcehmhpOGmlGnFRW8lUx4uvH4AgisVAh+KuiBkjZpmnt7Q+FydyVTx
+         EW1zxX4CDnoa+rNF5KSIQGNhYuiNoKJdrZt+0ZzgWwbzbzBuibppYuqEr1du6n134Clw
+         5c26KFuL5ivVVUm/9/oRO9Smk0PdH1wbxnly1U0cIyN7+HwBu+oy60D+QvgODzWVdrR2
+         HQCZO50NW1BmTSeEejHhV7tEmSePREn802D0xvf9g5CJ5E0OFHo6uG6Pj/FkhvbY6hes
+         ktqA6oR7TikWlg8wfn5RdX9KN5mW7TfHM1zOxSquRSG1/U1kT3ZOLOgVyF7rfbst7R0P
+         8eFg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=OQqUVN9Jj0ur5CDgtlNPFsrMXqiRpbvuG+RpeE9RNCs=;
+        fh=vulDx/k1pMb0FahbHMfeA/J20/hoAcfvNvfPK8l0G1A=;
+        b=UUFqOasWuWJIWYFCRwofHIa2n6v3urzEy1DBvu0gSJ4mA02qgpbMdp7Jz+uJ17CQgo
+         N05xxBMnO3hyT739WaoHIIobNLq9zGyPsX4HMlYTWk3olumEupPUIiabir3DGId52SgE
+         m7UbwXmeU/xGwZ2ewyU8ZYsH0JuB/XluGXrk/fTf6ywBFK5aao5JJlmsGUw/SoY54Jo/
+         wfSM/5/Ty+wK2AFFp2fsaZgjPetaQY2jqBkSg9Tnkyz9lYSx4Ryo6qGYQDYzcZ/EauhU
+         I8gLLe7fmLCWENeTOkwe2GdxEnhi3Tk0GCjx0zzPgdEJXOc8TS1OJmZV5N+bkwmnV5FK
+         5Ihg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1772154895; x=1772759695; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OQqUVN9Jj0ur5CDgtlNPFsrMXqiRpbvuG+RpeE9RNCs=;
+        b=U9/JjTBlnXUCb5bT+gPaB/6RoLQSwkluV0LnilvZSz8hFnRPy9U4G3zXt692hqnWU4
+         aZ8AXHzEwkVvm+ExE1/Gck7CSbwyZUJpHaf2WAlt0BAvm4IhttqriMbMT7kprL4yvCuB
+         hpAjYHuSXXtd3it6hUXirUiV2GpnvRShJ4+UX+ORqyTO2JIYctr8C+0Y7Gt1bXO0p9UA
+         o8EAGjK04H5swdMXwP+lpE37+dIDSSPR2BWh74RRZ2TtidJvHxM8FrbZJDeQkLL5LYOo
+         3TCy2FPI+F5NNsqr+xqTO+FrFqxOatWAjdq08zlrzNB+sXZwgGrrLBANij8A7w10+WB/
+         nH6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772154895; x=1772759695;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=OQqUVN9Jj0ur5CDgtlNPFsrMXqiRpbvuG+RpeE9RNCs=;
+        b=Z74ZPfK8N+M3I9zHHoTcmoW3U7x2u+vG/j1EbDH5HXdxSvW77gPaCRRyH/K0ddZ0u8
+         jtf8dnUiBZt+Gq5LeH3LvGpNgGck3lQKYEcFYuoU6wgbQ/M3qwhiYa3FwtZkU1bZMdwI
+         Sw9HVjtOcfJAFpqhebhPNc55sn/M9m3wF1M87jNg+t2kcyHGL4HR10PA83mJZI9cEt8S
+         C0z9B7CDHEx+lGzb3oGv9xUGcSBotHDD3215gOm5txBt9QtKoe8eTCJUopKPrKBlBLFm
+         w/nFG6y5OhtEe9EGvllA/Z8xfBA0Xgah58537KYzZ3DRtwO5nrOaRTrZAMLtkMRwP4Rs
+         +R5A==
+X-Forwarded-Encrypted: i=1; AJvYcCUZcj62jnJMBZ9YourkyXJJzO5m2En4lrmqNH/4WLgvUDziP7e6nBlvRpv2Q26IMCoWe2LpFIs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlPp6SaaEiWxpKkyvATs4nHsaL9vIvXLD7EmGgvyLNyCnFbWPc
+	Xs9z+yWzgluBttbgfr8Lw7bjKRnEavHcsR79Xdu39z5yjjNtER//fT6XAcQHUM1on2JNsJ2GEsf
+	6z0UA8b152v9jWgIqAjh5xNduJipvrFP90fgJIRUwuDHmw8Ij/gJCnJhO
+X-Gm-Gg: ATEYQzwEFTEzSqd8HJasrxFFGA8psa/IEon1zvB/NJjIi4WYiv5U9QELsF70Z08COdX
+	AC6AQRWPP5YrK+3zWOa7GxhbkEeOjCmtj91ZyCbSDeMDsU6rp0iGsH30doScp/Jh9xGKqIxCKgl
+	uoK5f3sIG0eLKImwiZFnj+U+iw5YCS+9uCQHQsSuSoTNEBqcOlMqOKVa8157r+k4dke7WL31GuR
+	i8TCV00GNjR89fWvbpLGOalFk+M35qRJ87erqCF+ywWpxtU+//AkEGRrxQYf1/D7DKVXk5V0cAa
+	EkTlSec=
+X-Received: by 2002:a17:90b:544b:b0:352:ece8:1f6c with SMTP id
+ 98e67ed59e1d1-3593862e0f3mr3813116a91.8.1772154895448; Thu, 26 Feb 2026
+ 17:14:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <93d291db-4175-48c4-830c-e83bab373ae2@I-love.SAKURA.ne.jp>
+ <CAHC9VhQPKU5DqG-ryZsiCV2vZeGGf_a-JStR_LVVCCn03C4usQ@mail.gmail.com>
+ <f9b88268-03dc-4356-8b31-0bab73cc9b1e@I-love.SAKURA.ne.jp>
+ <CAHC9VhRzRAR+hhn4TFADnHWpzjOxjmh0S_Hg_HktkPkKQ35ycg@mail.gmail.com>
+ <74a70504-8ff8-4d97-b35f-774364779889@I-love.SAKURA.ne.jp>
+ <7ef21dab-3805-4eae-80d7-9779aeff3f58@I-love.SAKURA.ne.jp>
+ <aYmoDwO-YXrc4W1c@secunet.com> <85546d35-c7bd-49bf-b0c3-9677bde25859@I-love.SAKURA.ne.jp>
+ <aYnDWbxo-jAzR4ca@secunet.com> <7c17884d-dbf1-4c2c-9813-0c5369cfdcc9@I-love.SAKURA.ne.jp>
+ <aY76t_xYCHmLq6Ur@secunet.com>
+In-Reply-To: <aY76t_xYCHmLq6Ur@secunet.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Thu, 26 Feb 2026 20:14:43 -0500
+X-Gm-Features: AaiRm51x621_XfCY40Hc8f8iSKC879LJQZ171MjucCMdOkNtdcj3-nihadK0SaY
+Message-ID: <CAHC9VhRvw+YCkxkdLr2smK+dXRTXSZY8zD=md-1CD02rRJbALg@mail.gmail.com>
+Subject: Re: [PATCH] xfrm: kill xfrm_dev_{state,policy}_flush_secctx_check()
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, SELinux <selinux@vger.kernel.org>, 
+	linux-security-module <linux-security-module@vger.kernel.org>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[paul-moore.com,none];
+	R_DKIM_ALLOW(-0.20)[paul-moore.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261649-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,gmail.com,vger.kernel.org,lists.linux.dev];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261650-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,lkml];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[paul-moore.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6B2121B1709
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[paul@paul-moore.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 815C11B174B
 X-Rspamd-Action: no action
 
-On Thu, 26 Feb 2026 19:17:21 +0800 Yung Chih Su wrote:
-> Fixes: [4ee2a8cace3fb9a34aea6a56426f89d26dd514f3] ("net: ipv4: Add a sysctl to set multipath hash seed")
+On Fri, Feb 13, 2026 at 5:19=E2=80=AFAM Steffen Klassert
+<steffen.klassert@secunet.com> wrote:
+> On Mon, Feb 09, 2026 at 11:26:14PM +0900, Tetsuo Handa wrote:
+> > On 2026/02/09 20:22, Steffen Klassert wrote:
+> > > On Mon, Feb 09, 2026 at 07:02:47PM +0900, Tetsuo Handa wrote:
+> > >> On 2026/02/09 18:25, Steffen Klassert wrote:
 
-Please use the traditional abbreviated format of the Fixes tag
+...
+
+> And here we come to the other problem I mentioned. When a LSM policy
+> rejects to flush the xfrm states and policies on network namespace
+> exit, we leak all the xfrm states and policies in that namespace.
+> Here we have no other option, we must flush the xfrm states and
+> policies regardless of any LSM policy. This can be fixed with
+> something like that:
+>
+> diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+> index 72678053bd69..8a4b2cbba0e0 100644
+> --- a/net/xfrm/xfrm_policy.c
+> +++ b/net/xfrm/xfrm_policy.c
+> @@ -1822,9 +1822,11 @@ int xfrm_policy_flush(struct net *net, u8 type, bo=
+ol task_valid)
+>
+>         spin_lock_bh(&net->xfrm.xfrm_policy_lock);
+>
+> -       err =3D xfrm_policy_flush_secctx_check(net, type, task_valid);
+> -       if (err)
+> -               goto out;
+> +       if (task_valid) {
+> +               err =3D xfrm_policy_flush_secctx_check(net, type, task_va=
+lid);
+> +               if (err)
+> +                       goto out;
+> +       }
+>
+>  again:
+>         list_for_each_entry(pol, &net->xfrm.policy_all, walk.all) {
+> diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+> index f2aef404b583..fd00f2d20425 100644
+> --- a/net/xfrm/xfrm_state.c
+> +++ b/net/xfrm/xfrm_state.c
+> @@ -923,9 +923,11 @@ int xfrm_state_flush(struct net *net, u8 proto, bool=
+ task_valid)
+>         int i, err =3D 0, cnt =3D 0;
+>
+>         spin_lock_bh(&net->xfrm.xfrm_state_lock);
+> -       err =3D xfrm_state_flush_secctx_check(net, proto, task_valid);
+> -       if (err)
+> -               goto out;
+> +       if (task_valid) {
+> +               err =3D xfrm_state_flush_secctx_check(net, proto, task_va=
+lid);
+> +               if (err)
+> +                       goto out;
+> +       }
+>
+>         err =3D -ESRCH;
+>         for (i =3D 0; i <=3D net->xfrm.state_hmask; i++) {
+
+This seems reasonable to me, and please correct me if I'm wrong, but
+if the network namespace is gone at this point, we don't really have
+to worry about traffic from any applications because there should no
+longer be any processes in that namespace, yes?  I suppose there is
+still a chance we'll see inbound traffic for endpoints in that
+namespace, but I imagine the initns stack will reject it.
+
+> > >> For example, we don't check permission for unmount when a mount is d=
+eleted
+> > >> due to teardown of a mount namespace. I wonder why you want to check=
+ permission
+> > >> for unregistering a net_device when triggered by a teardown path.
+> > >
+> > > I just try to find out what's the right thing to do here.
+> > > If a policy goes away, packets that match this policy will
+> > > find another path through the network stack. As best, they
+> > > are dropped somewhere, but they can also leave on some other
+> > > device without encryption. A LSM that implements xfrm hooks
+> > > must be able to check the permission to delete the xfrm policy
+> > > or state.
+> >
+> > Do you mean that calling xfrm_dev_down()/xfrm_dev_unregister() might
+> > result in network traffic to be sent in cleartext ?
+>
+> Yes this can happen, but it is known. You can either install
+> a global block policy with low priority or use a LSM to
+> prevent this. The latter does not work unfortunately.
+
+If I understand you correctly, the proposal below would address this
+last part, yes?
+
+> > If yes, we need to consider updating the other patch at
+> > https://lkml.kernel.org/r/20260202123655.GK34749@unreal to replace
+> > the NETDEV_UNREGISTER net_device with the blackhole_netdev. (That is,
+> > xfrm_dev_{state,policy}_flush() does not actually delete a state/policy
+> > but instead updates that state/policy to behave as a blackhole. Then,
+> > we won't need to call LSM hooks because we no longer delete).
+>
+> I think there is a clean way to fix this. We could just unlink
+> policy and state from the device. Then we could do the same as
+> we do when a state becomes unavailable due to expiration. We mark
+> the state as invalid with a flag. On expiration we do this with
+> XFRM_STATE_EXPIRED. We can add a new flag and do the same as
+> xfrm_state_check_expire() does on a hard expire. I.e. fire
+> a timer that notifies the userspace key manager that this
+> path is not avalable anymore and return an error. This way
+> userspace is informed about that and all packets matching
+> the policy are dropped.
+
+This looks interesting.  The traffic would be dropped, and presumably
+userspace could then cleanup the old state and establish any new
+policy as required, yes?
+
+> This is of course a bit more work and requires testing.
+
+Tetsuo, Steffen, any chance one of the two of you would be able to
+work on some patches for this?
+
+--=20
+paul-moore.com
 
