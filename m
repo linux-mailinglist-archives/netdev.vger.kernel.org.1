@@ -1,204 +1,144 @@
-Return-Path: <netdev+bounces-261818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261819-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ANj9OHl3oWnJtQQAu9opvQ
-	(envelope-from <netdev+bounces-261818-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 11:52:41 +0100
+	id FgF9E6N3oWngtQQAu9opvQ
+	(envelope-from <netdev+bounces-261819-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 11:53:23 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 600311B6390
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 11:52:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE86C1B63B6
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 11:53:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 568D4301D326
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 10:52:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7EC04301F155
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 10:53:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF6043B5303;
-	Fri, 27 Feb 2026 10:52:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1087F39902E;
+	Fri, 27 Feb 2026 10:53:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="uqC5BgEj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fhCCvHJS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CC2237FF6E
-	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 10:52:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EC153A1D0A
+	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 10:53:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772189557; cv=none; b=AStDm4idEwlPVgXXGl6N3kaLQFH4Wu2khcukA2F55GK+/y9KxWhXjWt1qv4yGP+Tycuo2vIpJ4zz3XTLZ6Eq6juI17TnNqxMEfee+oUeIjWz9rETr+dkcVodEabRk83nCo9aJo+d5iO5S67pXXrSNLgFAZ1rrjl6saDz4oIz+7Y=
+	t=1772189591; cv=none; b=ei1fN2SmCRtiIc2ucxiVT0gmdxcI5Y/OgN9C+b06i+wMr2gVpJ2EoX0hW54wdWj88m8c/uXjcmX8Y5LUVBAWq5nUopIOgw0W6M3QMWWGIic9DZrR2IlcaweS+OcCavV72d6zhRnKIbV8Uv6wQAWT1uY1CHahL0eRSk9rgdQhaAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772189557; c=relaxed/simple;
-	bh=ZWP0LURNHTFwo6WdRckV4T1yQKogN+iy1vcJYn+TwZ0=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=iXJlFTx/zj9u0eTs9R3TxldVnIXHp8DkMpkS1qaiin6uoF9RkAWbjI7DaXQNnsFO7wsY/cHVo8C6OW8jtQuotWUDMlsl80OgNjdUzZDtk0567ClS7H3zzQZD5ZZLiBamVlBniKxJBKsnPW7otQzSYovLjapqdHu6U2xL5PY74PM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=uqC5BgEj; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 909A61A1A54;
-	Fri, 27 Feb 2026 10:52:33 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 4DB375FE46;
-	Fri, 27 Feb 2026 10:52:33 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3B5DB10369426;
-	Fri, 27 Feb 2026 11:52:27 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1772189552; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=XObck1fL7yI8Otsd8p4sQIJN4SGqXdd1BQ1y1Vx7rto=;
-	b=uqC5BgEjLO8qP0VzypiTmaft2lVStC26lLYN31L9z2GUmHTfvdO/mwPZrMxf3x0Re1OnXP
-	xpG2Xjs7qrM6MMLLHGyCV1KTAjUkyOYcGaHLBZosAOlSxtMclATXWwHXSFF2msCLjOjzfw
-	92dyPtvYHyvsK7J10G9311uDdVDPV5gpWXCuwBpIqSC1Sn+GsK5yeaHuVw81dpzmcQ9JvG
-	udO/WifOvTkL82tk1dGglukfI78iEfvCMcGe17Zcolr1+UG6ExKj3hW4BUff0Y5qsaGuLN
-	U2OzTeab/EDN054BY1+IaKF8DRJ5MsZOJvDFXtom1SqjkJ3rOFMbrWGw8BiXCQ==
+	s=arc-20240116; t=1772189591; c=relaxed/simple;
+	bh=Edr9N2olxLaxijMUHS0n8GHZ3f5PPU6Cf1V3LCWMLL8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IqFTdI7WGGRPnGQuh9R//YXsbEdb4JBIfuSN7SKoYJwXdo66a1kwC2+93fhtYmZuafgZihE02Y/rIf3JnRacOgjnpbiaSvNDOZRxn+8TvGKe/7volO3dt3SbkJK1m3AHdY73SFYMauKiiCc+18KVzK7Theg7kU8h+xirlPSoeSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fhCCvHJS; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772189589;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=k6zEE769409AJr5AjsfM0SAQkPjG4+rPKOFVf3cs9/A=;
+	b=fhCCvHJSEtf/slqwHpnB/Ol8ZZ+XrOFWQihi1ySK7qas1GUZfd6ZebBx3a9UaSvRXlJHXl
+	eLHHifIYbTBi1b9o1ygWFqCpoxMgMt1OLcM2YeaBo5Jw2D2ImUKG+Vl4XfPmMj4gLrLFC1
+	bQ+EPAr6V9gdDNzegrq8a6eJfxYumAw=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-102-3aD-Mma2OVuECTDZiIXxXQ-1; Fri,
+ 27 Feb 2026 05:53:06 -0500
+X-MC-Unique: 3aD-Mma2OVuECTDZiIXxXQ-1
+X-Mimecast-MFC-AGG-ID: 3aD-Mma2OVuECTDZiIXxXQ_1772189585
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ADC411956071;
+	Fri, 27 Feb 2026 10:53:04 +0000 (UTC)
+Received: from p16v.redhat.com (unknown [10.45.225.15])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EA44D19560B5;
+	Fri, 27 Feb 2026 10:53:01 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Petr Oros <poros@redhat.com>,
+	Michal Schmidt <mschmidt@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 0/2] dpll: zl3073x: consolidate chip info and add temperature reporting
+Date: Fri, 27 Feb 2026 11:52:58 +0100
+Message-ID: <20260227105300.710272-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 27 Feb 2026 11:52:27 +0100
-Message-Id: <DGPORITW7CFW.1DBYQHGBZ8CEC@bootlin.com>
-Subject: Re: [net-next,v2,5/8] net: macb: add XDP support for gem
-Cc: <davem@davemloft.net>, <claudiu.beznea@tuxon.dev>,
- <nicolas.ferre@microchip.com>, <edumazet@google.com>, <pabeni@redhat.com>,
- <theo.lebrun@bootlin.com>, <netdev@vger.kernel.org>, <lorenzo@kernel.org>,
- <andrew+netdev@lunn.ch>, =?utf-8?q?Gr=C3=A9gory_Clement?=
- <gregory.clement@bootlin.com>, "Thomas Petazzoni"
- <thomas.petazzoni@bootlin.com>
-To: "Paolo Valerio" <pvalerio@redhat.com>, "Jakub Kicinski"
- <kuba@kernel.org>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260223182632.1681809-6-pvalerio@redhat.com>
- <20260224000844.140431-1-kuba@kernel.org> <878qcgn0av.fsf@redhat.com>
-In-Reply-To: <878qcgn0av.fsf@redhat.com>
-X-Last-TLS-Session-Version: TLSv1.3
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261818-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	TAGGED_FROM(0.00)[bounces-261819-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-1.000];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.980];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:mid,bootlin.com:url,bootlin.com:dkim]
-X-Rspamd-Queue-Id: 600311B6390
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AE86C1B63B6
 X-Rspamd-Action: no action
 
-Hello Paolo,
+This series refactors the ZL3073x chip variant handling and adds die
+temperature reporting for chips that support it.
 
-On Wed Feb 25, 2026 at 7:30 PM CET, Paolo Valerio wrote:
-> On 23 Feb 2026 at 04:08:44 PM, Jakub Kicinski <kuba@kernel.org> wrote:
->> This is an AI-generated review of your patch. The human sending this
->> email has considered the AI review valid, or at least plausible.
->>
->> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-loc=
-al.html
->> ---
->> net: macb: add XDP support for gem
->>
->> This patch introduces basic XDP support for the macb/gem driver with
->> XDP_PASS, XDP_DROP, and XDP_REDIRECT verdict support.
->>
->>> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/eth=
-ernet/cadence/macb_main.c
->>> index 708107e47ae3..26b517ed251c 100644
->>> --- a/drivers/net/ethernet/cadence/macb_main.c
->>> +++ b/drivers/net/ethernet/cadence/macb_main.c
-[...]
->>> @@ -2641,21 +2724,23 @@ static int macb_alloc_consistent(struct macb *b=
-p)
->>>  	return -ENOMEM;
->>>  }
->>>
->>> -static int gem_create_page_pool(struct macb_queue *queue)
->>> +static int gem_create_page_pool(struct macb_queue *queue, int qid)
->>>  {
->>>  	struct page_pool_params pp_params =3D {
->>>  		.order =3D 0,
->>>  		.flags =3D PP_FLAG_DMA_MAP,
->>>  		.pool_size =3D queue->bp->rx_ring_size,
->>>  		.nid =3D NUMA_NO_NODE,
->>> -		.dma_dir =3D DMA_FROM_DEVICE,
->>> +		.dma_dir =3D rcu_access_pointer(queue->bp->prog)
->>> +				? DMA_BIDIRECTIONAL
->>> +				: DMA_FROM_DEVICE,
->>>  		.dev =3D &queue->bp->pdev->dev,
->>>  		.netdev =3D queue->bp->dev,
->>>  		.napi =3D &queue->napi_rx,
->>>  		.max_len =3D PAGE_SIZE,
->>>  	};
->>>  	struct page_pool *pool;
->>> -	int err =3D 0;
->>> +	int err;
->>>
->>>  	/* This can happen in the case of HRESP error.
->>>  	 * Do nothing as page pool is already existing.
->>>  	 */
->>>  	if (queue->page_pool)
->>>  		return err;
->>                        ^^^
->>
->> Does this return an uninitialized value? The patch changed 'int err =3D =
-0'
->> to 'int err' without initialization. The early-return path for HRESP err=
-or
->> recovery returns err when the page pool already exists.
->>
->
-> argh, I missed this patch removing the initialization while rebasing.
+Patch 1 replaces the five per-variant chip_info structures and their
+exported symbols with a single consolidated lookup table.  The chip
+variant is now detected at runtime from the chip ID register rather
+than being selected at compile time via bus driver match data. This
+simplifies the I2C/SPI drivers and makes adding new variants a
+single-line table addition.  A flags field replaces the hardcoded
+chip_id switch in zl3073x_dev_is_ref_phase_comp_32bit().
 
-I debugged a nasty bug yesterday, which ended up being this typo
-combined with the fact that we call gem_init_rings() through the
-mog_init_rings function pointer twice at open. Once near the end of
-macb_alloc_consistent() and once from macb_open().
+Patch 2 uses the new flags infrastructure to add die temperature
+reporting for chip variants that provide a temperature status register.
+The temp_get callback is conditionally set during device registration
+based on the ZL3073X_FLAG_DIE_TEMP chip flag.
 
-This bug is invisible because we supposedly skip the second
-gem_create_page_pool() with the queue->page_pool check.
+Ivan Vecera (2):
+  dpll: zl3073x: detect DPLL channel count from chip ID at runtime
+  dpll: zl3073x: add die temperature reporting for supported chips
 
-On my system it lead to the "DMA bus error: HRESP not OK" error;
-my theory (which I didn't dig into much as the root cause is known):
- - undefined behaviour leading to the compiler skipping the
-   `if (queue->page_pool)` condition in gem_create_page_pool()
- - leakage of the old page allocator and the old buffers leading to
-   buffer lifetime issues somehow
+ drivers/dpll/zl3073x/core.c | 118 ++++++++++--------------------------
+ drivers/dpll/zl3073x/core.h |  59 +++++++++---------
+ drivers/dpll/zl3073x/dpll.c |  28 ++++++++-
+ drivers/dpll/zl3073x/dpll.h |   2 +
+ drivers/dpll/zl3073x/i2c.c  |  37 ++++-------
+ drivers/dpll/zl3073x/regs.h |   2 +
+ drivers/dpll/zl3073x/spi.c  |  37 ++++-------
+ 7 files changed, 113 insertions(+), 170 deletions(-)
 
-I still don't understand how we all tolerate -Wno-maybe-uninitialized in
-the kernel under GCC. But now that it has been here for a long time
-many false positives slipped in, making it harder to re-enable.
-
-https://elixir.bootlin.com/linux/v6.19.3/source/scripts/Makefile.warn#L184-=
-L186
-
-Thanks,
-
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+-- 
+2.52.0
 
 
