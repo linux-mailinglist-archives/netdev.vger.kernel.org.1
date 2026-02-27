@@ -1,94 +1,93 @@
-Return-Path: <netdev+bounces-262006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262007-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oJAtKT8womke0wQAu9opvQ
-	(envelope-from <netdev+bounces-262006-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 01:01:03 +0100
+	id wPKWEBUwomke0wQAu9opvQ
+	(envelope-from <netdev+bounces-262007-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 01:00:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 160D31BF4B8
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 01:01:01 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04F6F1BF4A0
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 01:00:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1CC703094A22
+	by sto.lore.kernel.org (Postfix) with ESMTP id F25AC3030FDE
 	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 00:00:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A49CF289378;
-	Sat, 28 Feb 2026 00:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67D9F29BD8C;
+	Sat, 28 Feb 2026 00:00:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="Roe2MDZI"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="LFl1enMY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E150224E4C4
-	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 00:00:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDB6226E6FB
+	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 00:00:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772236814; cv=none; b=RSVyuwo+qvgyrBXA2NIEdvIaiXE6moI9hYHD+yEC4l4VtHzU6Gw6UfmhVwWImFEmme+OE4EvPreEb1caQf7YYXzbOkhjehc/JL4JgOOPjdHJ8T9+nD3aPY0bTIK7sW1uhE2Rqkc3f7GGei+OJ9CELOx7HR16V5NJqDz5/dB90Fg=
+	t=1772236815; cv=none; b=XE4VFS3yjuJVB2PoqdUPZYCFd7LLREStCS/gbtfrAzcf8LyXVCn9KxZRoPcV1e2hUb8emE5jmS2t/6EYGqPossokkC0YVmVxZs3hpy2/kPAXMAjyO6q85Tt9mR8k0/o7EcLYnsKdFY7sAji5DzQB/WbtFtNejkOpqYHq8UZnkpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772236814; c=relaxed/simple;
-	bh=mMU/HD7CZewtqH+Zvd4ZWA3qx97JS6oZBhr5627HZZU=;
+	s=arc-20240116; t=1772236815; c=relaxed/simple;
+	bh=aTGdGKIbN78z0HccJeLIaLaLIQQWPHWa0zQSLVb6wio=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FfaBV8uPm8LikCKj1bnsrE5bTptawIbXfK8Qs0mGqbULGmJHKdqbgCqQaAocjLO6Ajs1kp1iON22miO78tW8YZt8Eq/nm/q+0pfTEuRGeq8ilrAN0nDw7tiM+MlWsf6H1cA/yGJWF708BigmOMNiwxiJT01i7IXoBF/nTjjQHrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=Roe2MDZI; arc=none smtp.client-ip=209.85.128.46
+	 MIME-Version; b=Au8+Nzm/iEVGrHbq1SQhBpjUJCjPrqr+iGLG3P1rWj8sb17g2imxUMREgKaTBwiwcl7/W4xlHgblNC2lBKO1vB4OYGTZUmzMkOEn4DDYD8t3NXjMCjz9eGROBO8FUafApn/n5xtZTxEm+sTdg6eVFvKK8QpaCJ6B0PJUplXBxtw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=LFl1enMY; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-48371bb515eso36520335e9.1
-        for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 16:00:12 -0800 (PST)
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-483bd7354efso33438795e9.2
+        for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 16:00:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1772236811; x=1772841611; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1772236812; x=1772841612; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=K+rhQ7JW4pW4abVch+9uicNBzF0g2w/L/0VqI66GB1g=;
-        b=Roe2MDZIe+2FkDNq2ktfGvV5CC0D4sZ4HKUj0p/ZGX4HIby1DuSlAZDyreGZqt08kS
-         hOInkiqMNezgBnwn+cIsaDWsj0WCrMArdUjNcLySma953QNOC6FMsGoIP+kAOHf9SiAl
-         K9kIJlRH/WtFgXMSKAfQwGN4DyWlqtXMChtFrlHsjAXF78LBNGf3YCq7L8+Wo6zaKUa0
-         /nccoY17U0Q68A0tsH9KjImlX1Bs950nDZMNtRBAWqgDSjGQAjZEQiKvDjVt7BQjXGNF
-         wgZJPFBZsecKLqQJTnqkTiX1Vf6dclFxcqc9YLpKAMOJ3CKI1VuOxrl0l1Gw5RcQIu4J
-         VlWg==
+        bh=C+c1YssimIKbOeI4y9o12dVhyqLS9jie10yKUyGHwPU=;
+        b=LFl1enMY7roRyPPwF1GrmVov7+FunnZbvGKy1rMM8VrKnAlfOQVj5caVk9Uc7pvHnC
+         un21/a0hD2QSSt+Jjey3gPgT3MQ8ZDtubNUdbDjpOXW60nIfNwlNL7sEufJu1gEnVMa9
+         DX+GuhuiJTIrao1J2csPld7Ac8ZyUwlZrLXJp+hmvzta9zUNQgDyYYNy4NYgVaadm3Sw
+         B1W+a2zu4H+5VgeqfMd88+EtaCeGZsIJDUhadq/ZG3xaH/w/5s464K7cak9xivNwfkgG
+         k112aFhNKJwlYIoh0Dzgwe7KhPqiCm284EwLE29slO/6JhXeG+suUZzl32VTMmk4YFRe
+         8R+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772236811; x=1772841611;
+        d=1e100.net; s=20230601; t=1772236812; x=1772841612;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=K+rhQ7JW4pW4abVch+9uicNBzF0g2w/L/0VqI66GB1g=;
-        b=Peac4qJczeojyv4aLxJZwFGUoWmD1tOKTu81TdPtEPF7mmAAZWblyVrFRQU3G7UfTb
-         agZseWwiUQPOUSqccHmruVIV197hP0Eo41lMtNH7dOl+qHrHEsMKEIdXoEfKCw91Q80o
-         S3s8kpr5FpG5OQ//pX7mHNkwdKvsPmIQzr1wDqtQ8WZd47PTii95fri/Kcn1Sefcu0Q6
-         4suT1cF1zxs5h1xK7tdSid4sBXDt/AV1TX8l2w/EbHkjB+Lhgwwa7ewrYg4ZeUIcrA8r
-         8NIOkllWPNn7exQ4XaI0mvMH8X8vcWGAY2oRNG22tOXfNEhAKAdXuBeTGTDxsLann1Tt
-         hpuw==
-X-Gm-Message-State: AOJu0Yze4Ema85qpSO1GPnlslm8euUMkz9bnjE3DTDFzIcXsPw7tprF7
-	gmHQsE8HRd2uPddBDsw3/t5GA9PGWCmFfW93IwP3VmnjhKzRiMbQRtBwvAnXrvXzFHs1Z7siT+h
-	opMhc/8QzjuTZSueUaxSa5yPR17/dTDvWYr4z2ADn5oIxPZbiezQ7h6nNRIk7tT0E
-X-Gm-Gg: ATEYQzzGVe/kTQcOyQKXTDlYwPZOMqN5vXdiXl4qjykj8s+4hdImdRYiblAekAV8GbS
-	0rOP/y1fU6TLFn7J+CaNh5BEucKkIhSap9Ba7u5g7ngh0vU/iU6bA6TUL3BaRY3zD1y4qGpNj7f
-	1XMZ6OizdlPwVXHibVGpz68XI9MACngctfufIqpW0ogGWZzHR+YZdPAk3/DnZMwO9tx6IuSszPC
-	3DfBMc452Q0nOI3Eb55di6j4X8+ff2m6+z4JXfgxdONLRWOpPIDmtBp532wXnsQIm8lOw/io02l
-	3IRatDd74/M5e+S+FbVN9e47A4aZG66WnpJBsbKaaa2nfdT6zMV+NIk+p8DifD+/F1byxOz1Nv+
-	4OEqEjJhWR00aMWRTB565LYpoJ+aOa6ajdei0+DRRg4Y9zORnlmDnsKGBMXnTaKwXswqfmC6+nk
-	uH63F7aDVy5mP+kgFhia97jpNAhj4CS7gt8DQt
-X-Received: by 2002:a05:600c:46d5:b0:477:a36f:1a57 with SMTP id 5b1f17b1804b1-483c9bb7c16mr71673265e9.3.1772236810735;
-        Fri, 27 Feb 2026 16:00:10 -0800 (PST)
+        bh=C+c1YssimIKbOeI4y9o12dVhyqLS9jie10yKUyGHwPU=;
+        b=jbxEn/NFZjLC0Izmh0YRUZmCiT7HhyglR5tqfjxqed7yOdi9V45ybV3CfY60Ilp1bv
+         ByBZ1omQ+F8wbRz8ebJq7WbWEljeBescJaQozRSiVTRZPjEDb2cy8vErJBtiabhTr1UW
+         2xgd5M2f6phKqvy9zDy6Z3ae5pg5fkmJHcYoGQR2IfcybA/4wnwmZTViVl+Z9J/S45Gg
+         Bez0GX4lN/Rc4mqruDFbO2iUJwk4ZD9qpP2h+Kbu8hnzNWPdaCOxxOfk72ue4xTl3vOn
+         z0P3jaFsG5QAMF9a32kDKJnOCQ7lDJzev3nCz3cgoKippLfciptxDMsdYwKri7Uxtqrl
+         Tryw==
+X-Gm-Message-State: AOJu0YzEanOcZh39jlFC0A5I8j6C6JCpP8LMeqeyMMFluAUmA0LitthR
+	y3UZ7snzKqxv9A8ExrOnqSgr3LugiLT4e5pYjmafteRa5YmiQSMHp6+Ni66C4C2m+9y7UUcUYV6
+	+wyU0I+A5VVTk3bVtZ29V4j3305fOYP6yEY5SelQu3cBKwQfnzwx0pU7VgG7jpK5+
+X-Gm-Gg: ATEYQzw9fzj5ORG8tb7CsrCN1umOhpDdMEezy9C5gMmUxS2aiOsZ0kQb5KflhV9lGBG
+	98m+v9tEC7BjmfPefzk1WH6UlIh2NvL5U/fOioP9tinWA50sPjr4LXtZ7iIMGC6SfpvH9K3SvFI
+	Z/awlWQwmNvqpWovggYAb6wr+uHCPY7PlSoSRkLxXgRh3SGmsIsKJpeTSX4wpdejgCeVPNgD/Sl
+	bqgJCNESvIgbZ/UdgvX9DnewwXlOwn7bzIXLe5HfWxgZZK5g3PvYAc0DI0paes/KIOvQszFmcSU
+	lU06zJ0PIqtnHAWrYjQEXVbYKU/W3oOEr1kEQDi4sYBxDmozKQxQ3sI6duh7tfXhYR1PqqJaD/Q
+	i8wIrN1aVyBUuac0PVY8AuOjwHjRfnnLUytSAb6yCJ6fYuqmpZ/PPfqeHjBERSw3V6cR/O26Imu
+	U5eVN06ZO3E1ydMLnoPRAqyTVoJ+IJCsReznrt
+X-Received: by 2002:a05:600c:5306:b0:483:6d42:25c6 with SMTP id 5b1f17b1804b1-483c9bc4210mr74586385e9.23.1772236811767;
+        Fri, 27 Feb 2026 16:00:11 -0800 (PST)
 Received: from inifinity.mandelbit.com ([2001:67c:2fbc:1:d378:d869:cb10:1603])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bfb77466sm94420695e9.5.2026.02.27.16.00.08
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bfb77466sm94420695e9.5.2026.02.27.16.00.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Feb 2026 16:00:10 -0800 (PST)
+        Fri, 27 Feb 2026 16:00:11 -0800 (PST)
 From: Antonio Quartulli <antonio@openvpn.net>
 To: netdev@vger.kernel.org
-Cc: Antonio Quartulli <antonio@openvpn.net>,
-	Sabrina Dubroca <sd@queasysnail.net>,
+Cc: Sabrina Dubroca <sd@queasysnail.net>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Shuah Khan <shuah@kernel.org>
-Subject: [PATCH net-next 1/9] selftests: ovpn: allow compiling ovpn-cli.c with mbedtls3
-Date: Sat, 28 Feb 2026 00:59:47 +0100
-Message-ID: <20260227235955.660-2-antonio@openvpn.net>
+	Antonio Quartulli <antonio@openvpn.net>
+Subject: [PATCH net-next 2/9] ovpn: use correct array size to parse nested attributes in ovpn_nl_key_swap_doit
+Date: Sat, 28 Feb 2026 00:59:48 +0100
+Message-ID: <20260227235955.660-3-antonio@openvpn.net>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260227235955.660-1-antonio@openvpn.net>
 References: <20260227235955.660-1-antonio@openvpn.net>
@@ -107,92 +106,60 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262006-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262007-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.984];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-0.998];
 	DKIM_TRACE(0.00)[openvpn.net:+];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[openvpn.net:mid,openvpn.net:dkim,openvpn.net:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 160D31BF4B8
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[openvpn.net:mid,openvpn.net:dkim,openvpn.net:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 04F6F1BF4A0
 X-Rspamd-Action: no action
 
-mbedtls 3 installs headers and calls the shared object
-differently than version 2, therefore we must now rely
-on pkgconfig to fill the right C/LDFLAGS.
+From: Sabrina Dubroca <sd@queasysnail.net>
 
-Moreover the mbedtls3 library expects any base64 file to
-have their content on one line.
-Since this change does no break older versions,
-let's change the sample key file format and make mbedtls3
-happy.
+In ovpn_nl_key_swap_doit, the attributes array used to parse the
+OVPN_A_KEYCONF uses OVPN_A_PEER_MAX instead of
+OVPN_A_KEYCONF_MAX. Note that this does not cause any bug, since
+currently OVPN_A_KEYCONF_MAX < OVPN_A_PEER_MAX.
 
-Cc: Shuah Khan <shuah@kernel.org>
+The wrong constant was introduced by commit 203e2bf55990
+("ovpn: implement key add/get/del/swap via netlink")
+
+Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
 Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
 ---
- tools/testing/selftests/net/ovpn/Makefile   | 14 ++++++++++----
- tools/testing/selftests/net/ovpn/data64.key |  6 +-----
- 2 files changed, 11 insertions(+), 9 deletions(-)
+ drivers/net/ovpn/netlink.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/net/ovpn/Makefile b/tools/testing/selftests/net/ovpn/Makefile
-index dbe0388c8512..d3a070db0bb5 100644
---- a/tools/testing/selftests/net/ovpn/Makefile
-+++ b/tools/testing/selftests/net/ovpn/Makefile
-@@ -2,19 +2,25 @@
- # Copyright (C) 2020-2025 OpenVPN, Inc.
- #
- CFLAGS = -pedantic -Wextra -Wall -Wl,--no-as-needed -g -O0 -ggdb $(KHDR_INCLUDES)
-+CFLAGS += $(shell pkg-config --cflags mbedcrypto-3 mbedtls-3 2>/dev/null)
-+
- VAR_CFLAGS = $(shell pkg-config --cflags libnl-3.0 libnl-genl-3.0 2>/dev/null)
- ifeq ($(VAR_CFLAGS),)
- VAR_CFLAGS = -I/usr/include/libnl3
- endif
- CFLAGS += $(VAR_CFLAGS)
+diff --git a/drivers/net/ovpn/netlink.c b/drivers/net/ovpn/netlink.c
+index c7f382437630..fed0e46b32a3 100644
+--- a/drivers/net/ovpn/netlink.c
++++ b/drivers/net/ovpn/netlink.c
+@@ -1061,8 +1061,8 @@ int ovpn_nl_key_get_doit(struct sk_buff *skb, struct genl_info *info)
  
-+MTLS_LDLIBS= $(shell pkg-config --libs mbedcrypto-3 mbedtls-3 2>/dev/null)
-+ifeq ($(MTLS_LDLIBS),)
-+MTLS_LDLIBS = -lmbedtls -lmbedcrypto
-+endif
-+LDLIBS += $(MTLS_LDLIBS)
- 
--LDLIBS = -lmbedtls -lmbedcrypto
--VAR_LDLIBS = $(shell pkg-config --libs libnl-3.0 libnl-genl-3.0 2>/dev/null)
-+NL_LDLIBS = $(shell pkg-config --libs libnl-3.0 libnl-genl-3.0 2>/dev/null)
- ifeq ($(VAR_LDLIBS),)
--VAR_LDLIBS = -lnl-genl-3 -lnl-3
-+NL_LDLIBS = -lnl-genl-3 -lnl-3
- endif
--LDLIBS += $(VAR_LDLIBS)
-+LDLIBS += $(NL_LDLIBS)
- 
- 
- TEST_FILES = common.sh
-diff --git a/tools/testing/selftests/net/ovpn/data64.key b/tools/testing/selftests/net/ovpn/data64.key
-index a99e88c4e290..d04febcdf5a2 100644
---- a/tools/testing/selftests/net/ovpn/data64.key
-+++ b/tools/testing/selftests/net/ovpn/data64.key
-@@ -1,5 +1 @@
--jRqMACN7d7/aFQNT8S7jkrBD8uwrgHbG5OQZP2eu4R1Y7tfpS2bf5RHv06Vi163CGoaIiTX99R3B
--ia9ycAH8Wz1+9PWv51dnBLur9jbShlgZ2QHLtUc4a/gfT7zZwULXuuxdLnvR21DDeMBaTbkgbai9
--uvAa7ne1liIgGFzbv+Bas4HDVrygxIxuAnP5Qgc3648IJkZ0QEXPF+O9f0n5+QIvGCxkAUVx+5K6
--KIs+SoeWXnAopELmoGSjUpFtJbagXK82HfdqpuUxT2Tnuef0/14SzVE/vNleBNu2ZbyrSAaah8tE
--BofkPJUBFY+YQcfZNM5Dgrw3i+Bpmpq/gpdg5w==
-+jRqMACN7d7/aFQNT8S7jkrBD8uwrgHbG5OQZP2eu4R1Y7tfpS2bf5RHv06Vi163CGoaIiTX99R3Bia9ycAH8Wz1+9PWv51dnBLur9jbShlgZ2QHLtUc4a/gfT7zZwULXuuxdLnvR21DDeMBaTbkgbai9uvAa7ne1liIgGFzbv+Bas4HDVrygxIxuAnP5Qgc3648IJkZ0QEXPF+O9f0n5+QIvGCxkAUVx+5K6KIs+SoeWXnAopELmoGSjUpFtJbagXK82HfdqpuUxT2Tnuef0/14SzVE/vNleBNu2ZbyrSAaah8tEBofkPJUBFY+YQcfZNM5Dgrw3i+Bpmpq/gpdg5w==
+ int ovpn_nl_key_swap_doit(struct sk_buff *skb, struct genl_info *info)
+ {
++	struct nlattr *attrs[OVPN_A_KEYCONF_MAX + 1];
+ 	struct ovpn_priv *ovpn = info->user_ptr[0];
+-	struct nlattr *attrs[OVPN_A_PEER_MAX + 1];
+ 	struct ovpn_peer *peer;
+ 	u32 peer_id;
+ 	int ret;
 -- 
 2.52.0
 
