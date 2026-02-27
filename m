@@ -1,571 +1,169 @@
-Return-Path: <netdev+bounces-261898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261899-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uAFsEf+5oWlhwAQAu9opvQ
-	(envelope-from <netdev+bounces-261898-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 16:36:31 +0100
+	id wF8KIYm6oWlhwAQAu9opvQ
+	(envelope-from <netdev+bounces-261899-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 16:38:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C75A1B9EB2
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 16:36:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D619A1B9F50
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 16:38:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 92CB8302258E
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 15:30:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1CF6330FF3D0
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 15:31:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E4D8328255;
-	Fri, 27 Feb 2026 15:30:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AF5B329C5F;
+	Fri, 27 Feb 2026 15:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="nIJznJMj";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="3ug700Kk";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="ER0jE8ic";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="h9uX+LeD"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="oAWAh2Zi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6133242B8
-	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 15:30:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFEA0328B78;
+	Fri, 27 Feb 2026 15:31:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772206258; cv=none; b=ZNJ5GX8jJ+0UJHjpAqA0pBwUlm90gxbNuvEATdkqLZuYoEkr3W62SpF/xcFwNvsnop9FkIrjsdGJfHza3VcO6vSju7Hxgvn2EhsX9kzJ6pAmFXtlnAfnMph8jcDJRZrr1Vx6ZaTT+iDrzNv9lwvcVr/4VoiH/lrFOlgq/OzUO2E=
+	t=1772206272; cv=none; b=uWgiW9EPDOyMz0YtPc8UjIGPyqvOOawcK2oYVbGFVay9ZcEwjSGcVPzXREqBcke/87IasDRTVpuijqKS2L5UYeTlpfkTbjULFcbT6tcM/whNXUZHOnr7A5b76HX2r1i1RQ8Bn9cWYkqGDvh789NWltW3fcj0I4rF+TDU/4QQGNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772206258; c=relaxed/simple;
-	bh=bTOgeqmoHmmj+yrDca/0uGQlldV4agyZFcBYKxuGa0c=;
+	s=arc-20240116; t=1772206272; c=relaxed/simple;
+	bh=qTfRubKpkYTZtqck1sHTwItRDcKNALL/wlr3aOAdANY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J0yd+FZc9JUUlXRjkUuexO7NiNit31/Y/NQx1NRziRqA71S4ck1DUaXpeOdv+VyNr4d8SVEmDu8kmu2lrxEMVBw7d48QnTNHQbDYPOuZxARei+zpk2ZNB5IcE7L0kpbeOcKn/87teHR/AdazhdCaTuqo9h4CmYMnwquCYv2IaJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=nIJznJMj; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=3ug700Kk; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=ER0jE8ic; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=h9uX+LeD; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 044085C43F;
-	Fri, 27 Feb 2026 15:30:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1772206255; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rFOw/CipdsoxjPCODfI4GMcSSYcQzdPIxtrDNHFZ3c4=;
-	b=nIJznJMjktcoLwWwVlSLsfZIKyVFzo/o9dV4chF33xfSYsWOJJRK6OQH2Qlh2e0j9Z776P
-	zP8GJHTJ0JR5r6Q5knxSQ2Uby1DpQpTn3QTDqgfT4vjwtaKI961zVQAirM6z6y6Se3gGVm
-	dC2XlTgLDhv+5kxT1tiOzPMjN5/vlmc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1772206255;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rFOw/CipdsoxjPCODfI4GMcSSYcQzdPIxtrDNHFZ3c4=;
-	b=3ug700KkirGOaxaxqZrb/7OLkoKkwkmUPN2sx97ELg3WLdiWDPYsZ2emzBNxSeGSITR8Wt
-	+BekfokGwWGZsZCg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1772206254; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rFOw/CipdsoxjPCODfI4GMcSSYcQzdPIxtrDNHFZ3c4=;
-	b=ER0jE8icm2+ekpA8i0zpk6jhD0QkDa63Lys7NGlSPMEgOf7R/SIQ/urMclT7P5wF0dHo64
-	gZJlVrmMeZyvfrJoKD/+oh6WUnyDtbISa3L0loC8of+SjIw++hd8d+IElHU/maHN9qn9tq
-	Cb5W0vQ9gqBwi+O+SOGHTXu20PiDbS8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1772206254;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rFOw/CipdsoxjPCODfI4GMcSSYcQzdPIxtrDNHFZ3c4=;
-	b=h9uX+LeDvz4h+Bsig1IHp1e7FNcBVY8oNM9xDhV1deTySxlga2EZ2D4nppEBHXqM6cvozi
-	A9oVBK1DnvmYbaDQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id ECECC3EA69;
-	Fri, 27 Feb 2026 15:30:53 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 44bVOa24oWlHLAAAD6G6ig
-	(envelope-from <jack@suse.cz>); Fri, 27 Feb 2026 15:30:53 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id B2030A06D4; Fri, 27 Feb 2026 16:30:53 +0100 (CET)
-Date: Fri, 27 Feb 2026 16:30:53 +0100
-From: Jan Kara <jack@suse.cz>
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, Jeff Layton <jlayton@kernel.org>, 
-	Josef Bacik <josef@toxicpanda.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Jan Kara <jack@suse.cz>, linux-kernel@vger.kernel.org, Hugh Dickins <hughd@google.com>, 
-	linux-mm@kvack.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Tejun Heo <tj@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Jann Horn <jannh@google.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH 13/14] selftests/xattr: sockfs socket xattr tests
-Message-ID: <yqxanlt3h4h2dwtpzgywsrzozdry3oe3c4yg22x6wqm2grntbu@pazi2ufzrwfv>
-References: <20260216-work-xattr-socket-v1-0-c2efa4f74cb7@kernel.org>
- <20260216-work-xattr-socket-v1-13-c2efa4f74cb7@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=hjz5FOEsQaPX/H1MOykuYRlZ+FhulJjwcHt/AKhfAHgJ9dbB+b141uvR0Frm+hniQo7H3q/LKNZXjNi7V8T//fjVBOldsIYtFPfpYADxNNAM0SNgYVMwBKvS1CLTo8u6sFUhl4aXR6+lbuqsiO9wezngWDgOxIrB3dA6xpKC4Cw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=oAWAh2Zi; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=jQYmtftgY0RX16tXlqwd88/gJleQAzTbD+On33MM1a8=; b=oAWAh2ZiVjiMgVk8Slge/IOIaN
+	A0iQ7hBunYzni7w8Ng0FoIrmJ8RE1VIdtUo/FVCZ2X1IfkDN4o6S1IHt4gZH4/V0V6uoOyInUr+pY
+	u1Ewmr6fufghZoByBUwkrfeyFL0NP/FgUcfTtJfzTUYjRxatzEjr75ZBomUxHIxMwh1FK0yKC7ugj
+	AU/gxAzceHRHqiHlaGJSD6u8YcoKG+f90jJ1XBABWgMtCVX0qKofWWS7b5489g2uas7cnJuogPSJM
+	e09RC5oMf6AAhIwphJUFYAxFULfUqIQrc8lYFeGebgE0q9+aB/Wh0xxlwQQM3FBGza5npmdIitNtK
+	5vQLIGtg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53922)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vvznw-0000000010A-2fKv;
+	Fri, 27 Feb 2026 15:31:00 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vvzns-000000003B6-2IHF;
+	Fri, 27 Feb 2026 15:30:56 +0000
+Date: Fri, 27 Feb 2026 15:30:56 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Vinod Koul <vkoul@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-phy@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 0/9] net: stmmac: qcom-ethqos: further serdes
+ reorganisation
+Message-ID: <aaG4sBQysN0Z94E3@shell.armlinux.org.uk>
+References: <aZ66OT9scKipRRu2@shell.armlinux.org.uk>
+ <aZ66uXCwGgH7B_A-@shell.armlinux.org.uk>
+ <aaGgWUpM2A5y11Wh@vaman>
+ <20260227152707.k5lobznug3xxxc7h@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260216-work-xattr-socket-v1-13-c2efa4f74cb7@kernel.org>
-X-Spam-Flag: NO
-X-Spam-Score: -3.80
-X-Spam-Level: 
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260227152707.k5lobznug3xxxc7h@skbuf>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,suse.cz:email,suse.cz:dkim];
-	DMARC_NA(0.00)[suse.cz];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261898-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jack@suse.cz,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-261899-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-0.078];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 5C75A1B9EB2
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,shell.armlinux.org.uk:mid,armlinux.org.uk:url]
+X-Rspamd-Queue-Id: D619A1B9F50
 X-Rspamd-Action: no action
 
-On Mon 16-02-26 14:32:09, Christian Brauner wrote:
-> Test user.* extended attribute operations on sockfs sockets. Sockets
-> created via socket() have their inodes in sockfs, which now supports
-> user.* xattrs with per-inode limits.
+On Fri, Feb 27, 2026 at 05:27:07PM +0200, Vladimir Oltean wrote:
+> Hi Vinod,
 > 
-> Tests fsetxattr/fgetxattr/flistxattr/fremovexattr operations including
-> set/get, listing (verifies system.sockprotoname presence), remove,
-> update, XATTR_CREATE/XATTR_REPLACE flags, empty values, size queries,
-> and buffer-too-small errors.
+> On Fri, Feb 27, 2026 at 07:17:05PM +0530, Vinod Koul wrote:
+> > On 25-02-26, 09:02, Russell King (Oracle) wrote:
+> > > Note: only 8 patches in this series, not 9 as the subject line says,
+> > > as the set_clk_tx_rate() patch became part of the first series.
+> > > 
+> > > On Wed, Feb 25, 2026 at 09:00:41AM +0000, Russell King (Oracle) wrote:
+> > > > This is part 2 of the qcom-ethqos series, part 1 has now been merged.
+> > > > 
+> > > > This part of the series focuses on the generic PHY driver, but these
+> > > > changes have dependencies on the ethernet driver, hence why
+> > > > it will need to go via net-next. Furthermore, subsequent changes
+> > > > depend on these patches.
+> > 
+> > This lgtm, can we get signed tag so that we can pull this into phy tree
+> > as well
 > 
-> Also tests per-inode limit enforcement: maximum 128 xattrs, maximum
-> 128KB total value size, limit recovery after removal, and independent
-> limits across different sockets.
+> I think this series is obsolete. It has been superseded in the netdev
+> patchwork by:
 > 
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
+> [PATCH RESEND2 net-next 0/8] net: stmmac: qcom-ethqos: further serdes reorganisation
+> ├─>[PATCH RESEND2 net-next 1/8] net: stmmac: qcom-ethqos: move ethqos_set_serdes_speed()
+> ├─>[PATCH RESEND2 net-next 2/8] phy: qcom-sgmii-eth: add .set_mode() and .validate() methods
+> ├─>[PATCH RESEND2 net-next 3/8] net: stmmac: qcom-ethqos: convert to use phy_set_mode_ext()
+> ├─>[PATCH RESEND2 net-next 4/8] phy: qcom-sgmii-eth: remove .set_speed() implementation
+> ├─>[PATCH RESEND2 net-next 5/8] phy: qcom-sgmii-eth: use PHY interface mode for SerDes settings
+> ├─>[PATCH RESEND2 net-next 6/8] phy: qcom-sgmii-eth: remove qcom_dwmac_sgmii_phy_interface()
+> ├─>[PATCH RESEND2 net-next 7/8] phy: qcom-sgmii-eth: relax order of .power_on() vs .set_mode*()
+> └─>[PATCH RESEND2 net-next 8/8] net: stmmac: qcom-ethqos: remove phy_set_mode_ext() after phy_power_on()
+> 
+> (with which it is only partially overlapping)
+> 
+> I guess you should give your Acks there as well.
 
-Looks good. Feel free to add:
+No need. Looking at PW, it seems patch 7 has AI review issues, so will
+need to be re-sent - although I can't fathom what the AI found in patch
+7. I've already added Vinod's acks (since they were just resends to fix
+botched sending, no actual changes in the patches themselves.)
 
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
-> ---
->  .../testing/selftests/filesystems/xattr/.gitignore |   1 +
->  tools/testing/selftests/filesystems/xattr/Makefile |   2 +-
->  .../filesystems/xattr/xattr_sockfs_test.c          | 363 +++++++++++++++++++++
->  3 files changed, 365 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/filesystems/xattr/.gitignore b/tools/testing/selftests/filesystems/xattr/.gitignore
-> index 5fd015d2257a..00a59c89efab 100644
-> --- a/tools/testing/selftests/filesystems/xattr/.gitignore
-> +++ b/tools/testing/selftests/filesystems/xattr/.gitignore
-> @@ -1 +1,2 @@
->  xattr_socket_test
-> +xattr_sockfs_test
-> diff --git a/tools/testing/selftests/filesystems/xattr/Makefile b/tools/testing/selftests/filesystems/xattr/Makefile
-> index e3d8dca80faa..2cd722dba47b 100644
-> --- a/tools/testing/selftests/filesystems/xattr/Makefile
-> +++ b/tools/testing/selftests/filesystems/xattr/Makefile
-> @@ -1,6 +1,6 @@
->  # SPDX-License-Identifier: GPL-2.0
->  
->  CFLAGS += $(KHDR_INCLUDES)
-> -TEST_GEN_PROGS := xattr_socket_test
-> +TEST_GEN_PROGS := xattr_socket_test xattr_sockfs_test
->  
->  include ../../lib.mk
-> diff --git a/tools/testing/selftests/filesystems/xattr/xattr_sockfs_test.c b/tools/testing/selftests/filesystems/xattr/xattr_sockfs_test.c
-> new file mode 100644
-> index 000000000000..b4824b01a86d
-> --- /dev/null
-> +++ b/tools/testing/selftests/filesystems/xattr/xattr_sockfs_test.c
-> @@ -0,0 +1,363 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +// Copyright (c) 2026 Christian Brauner <brauner@kernel.org>
-> +/*
-> + * Test extended attributes on sockfs sockets.
-> + *
-> + * Sockets created via socket() have their inodes in sockfs, which supports
-> + * user.* xattrs with per-inode limits: up to 128 xattrs and 128KB total
-> + * value size. These tests verify xattr operations via fsetxattr/fgetxattr/
-> + * flistxattr/fremovexattr on the socket fd, as well as limit enforcement.
-> + */
-> +
-> +#define _GNU_SOURCE
-> +#include <errno.h>
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <string.h>
-> +#include <sys/socket.h>
-> +#include <sys/types.h>
-> +#include <sys/xattr.h>
-> +#include <unistd.h>
-> +
-> +#include "../../kselftest_harness.h"
-> +
-> +#define TEST_XATTR_NAME		"user.testattr"
-> +#define TEST_XATTR_VALUE	"testvalue"
-> +#define TEST_XATTR_VALUE2	"newvalue"
-> +
-> +/* Per-inode limits for user.* xattrs on sockfs (from include/linux/xattr.h) */
-> +#define SIMPLE_XATTR_MAX_NR	128
-> +#define SIMPLE_XATTR_MAX_SIZE	(128 << 10)	/* 128 KB */
-> +
-> +#ifndef XATTR_SIZE_MAX
-> +#define XATTR_SIZE_MAX 65536
-> +#endif
-> +
-> +/*
-> + * Fixture for sockfs socket xattr tests.
-> + * Creates an AF_UNIX socket (lives in sockfs, not bound to any path).
-> + */
-> +FIXTURE(xattr_sockfs)
-> +{
-> +	int sockfd;
-> +};
-> +
-> +FIXTURE_SETUP(xattr_sockfs)
-> +{
-> +	self->sockfd = socket(AF_UNIX, SOCK_STREAM, 0);
-> +	ASSERT_GE(self->sockfd, 0) {
-> +		TH_LOG("Failed to create socket: %s", strerror(errno));
-> +	}
-> +}
-> +
-> +FIXTURE_TEARDOWN(xattr_sockfs)
-> +{
-> +	if (self->sockfd >= 0)
-> +		close(self->sockfd);
-> +}
-> +
-> +TEST_F(xattr_sockfs, set_get_user_xattr)
-> +{
-> +	char buf[256];
-> +	ssize_t ret;
-> +
-> +	ret = fsetxattr(self->sockfd, TEST_XATTR_NAME,
-> +			TEST_XATTR_VALUE, strlen(TEST_XATTR_VALUE), 0);
-> +	ASSERT_EQ(ret, 0) {
-> +		TH_LOG("fsetxattr failed: %s", strerror(errno));
-> +	}
-> +
-> +	memset(buf, 0, sizeof(buf));
-> +	ret = fgetxattr(self->sockfd, TEST_XATTR_NAME, buf, sizeof(buf));
-> +	ASSERT_EQ(ret, (ssize_t)strlen(TEST_XATTR_VALUE)) {
-> +		TH_LOG("fgetxattr returned %zd: %s", ret, strerror(errno));
-> +	}
-> +	ASSERT_STREQ(buf, TEST_XATTR_VALUE);
-> +}
-> +
-> +/*
-> + * Test listing xattrs on a sockfs socket.
-> + * Should include user.* xattrs and system.sockprotoname.
-> + */
-> +TEST_F(xattr_sockfs, list_user_xattr)
-> +{
-> +	char list[4096];
-> +	ssize_t ret;
-> +	char *ptr;
-> +	bool found_user = false;
-> +	bool found_proto = false;
-> +
-> +	ret = fsetxattr(self->sockfd, TEST_XATTR_NAME,
-> +			TEST_XATTR_VALUE, strlen(TEST_XATTR_VALUE), 0);
-> +	ASSERT_EQ(ret, 0) {
-> +		TH_LOG("fsetxattr failed: %s", strerror(errno));
-> +	}
-> +
-> +	memset(list, 0, sizeof(list));
-> +	ret = flistxattr(self->sockfd, list, sizeof(list));
-> +	ASSERT_GT(ret, 0) {
-> +		TH_LOG("flistxattr failed: %s", strerror(errno));
-> +	}
-> +
-> +	for (ptr = list; ptr < list + ret; ptr += strlen(ptr) + 1) {
-> +		if (strcmp(ptr, TEST_XATTR_NAME) == 0)
-> +			found_user = true;
-> +		if (strcmp(ptr, "system.sockprotoname") == 0)
-> +			found_proto = true;
-> +	}
-> +	ASSERT_TRUE(found_user) {
-> +		TH_LOG("user xattr not found in list");
-> +	}
-> +	ASSERT_TRUE(found_proto) {
-> +		TH_LOG("system.sockprotoname not found in list");
-> +	}
-> +}
-> +
-> +TEST_F(xattr_sockfs, remove_user_xattr)
-> +{
-> +	char buf[256];
-> +	ssize_t ret;
-> +
-> +	ret = fsetxattr(self->sockfd, TEST_XATTR_NAME,
-> +			TEST_XATTR_VALUE, strlen(TEST_XATTR_VALUE), 0);
-> +	ASSERT_EQ(ret, 0);
-> +
-> +	ret = fremovexattr(self->sockfd, TEST_XATTR_NAME);
-> +	ASSERT_EQ(ret, 0) {
-> +		TH_LOG("fremovexattr failed: %s", strerror(errno));
-> +	}
-> +
-> +	ret = fgetxattr(self->sockfd, TEST_XATTR_NAME, buf, sizeof(buf));
-> +	ASSERT_EQ(ret, -1);
-> +	ASSERT_EQ(errno, ENODATA);
-> +}
-> +
-> +TEST_F(xattr_sockfs, update_user_xattr)
-> +{
-> +	char buf[256];
-> +	ssize_t ret;
-> +
-> +	ret = fsetxattr(self->sockfd, TEST_XATTR_NAME,
-> +			TEST_XATTR_VALUE, strlen(TEST_XATTR_VALUE), 0);
-> +	ASSERT_EQ(ret, 0);
-> +
-> +	ret = fsetxattr(self->sockfd, TEST_XATTR_NAME,
-> +			TEST_XATTR_VALUE2, strlen(TEST_XATTR_VALUE2), 0);
-> +	ASSERT_EQ(ret, 0);
-> +
-> +	memset(buf, 0, sizeof(buf));
-> +	ret = fgetxattr(self->sockfd, TEST_XATTR_NAME, buf, sizeof(buf));
-> +	ASSERT_EQ(ret, (ssize_t)strlen(TEST_XATTR_VALUE2));
-> +	ASSERT_STREQ(buf, TEST_XATTR_VALUE2);
-> +}
-> +
-> +TEST_F(xattr_sockfs, xattr_create_flag)
-> +{
-> +	int ret;
-> +
-> +	ret = fsetxattr(self->sockfd, TEST_XATTR_NAME,
-> +			TEST_XATTR_VALUE, strlen(TEST_XATTR_VALUE), 0);
-> +	ASSERT_EQ(ret, 0);
-> +
-> +	ret = fsetxattr(self->sockfd, TEST_XATTR_NAME,
-> +			TEST_XATTR_VALUE2, strlen(TEST_XATTR_VALUE2),
-> +			XATTR_CREATE);
-> +	ASSERT_EQ(ret, -1);
-> +	ASSERT_EQ(errno, EEXIST);
-> +}
-> +
-> +TEST_F(xattr_sockfs, xattr_replace_flag)
-> +{
-> +	int ret;
-> +
-> +	ret = fsetxattr(self->sockfd, TEST_XATTR_NAME,
-> +			TEST_XATTR_VALUE, strlen(TEST_XATTR_VALUE),
-> +			XATTR_REPLACE);
-> +	ASSERT_EQ(ret, -1);
-> +	ASSERT_EQ(errno, ENODATA);
-> +}
-> +
-> +TEST_F(xattr_sockfs, get_nonexistent)
-> +{
-> +	char buf[256];
-> +	ssize_t ret;
-> +
-> +	ret = fgetxattr(self->sockfd, "user.nonexistent", buf, sizeof(buf));
-> +	ASSERT_EQ(ret, -1);
-> +	ASSERT_EQ(errno, ENODATA);
-> +}
-> +
-> +TEST_F(xattr_sockfs, empty_value)
-> +{
-> +	ssize_t ret;
-> +
-> +	ret = fsetxattr(self->sockfd, TEST_XATTR_NAME, "", 0, 0);
-> +	ASSERT_EQ(ret, 0);
-> +
-> +	ret = fgetxattr(self->sockfd, TEST_XATTR_NAME, NULL, 0);
-> +	ASSERT_EQ(ret, 0);
-> +}
-> +
-> +TEST_F(xattr_sockfs, get_size)
-> +{
-> +	ssize_t ret;
-> +
-> +	ret = fsetxattr(self->sockfd, TEST_XATTR_NAME,
-> +			TEST_XATTR_VALUE, strlen(TEST_XATTR_VALUE), 0);
-> +	ASSERT_EQ(ret, 0);
-> +
-> +	ret = fgetxattr(self->sockfd, TEST_XATTR_NAME, NULL, 0);
-> +	ASSERT_EQ(ret, (ssize_t)strlen(TEST_XATTR_VALUE));
-> +}
-> +
-> +TEST_F(xattr_sockfs, buffer_too_small)
-> +{
-> +	char buf[2];
-> +	ssize_t ret;
-> +
-> +	ret = fsetxattr(self->sockfd, TEST_XATTR_NAME,
-> +			TEST_XATTR_VALUE, strlen(TEST_XATTR_VALUE), 0);
-> +	ASSERT_EQ(ret, 0);
-> +
-> +	ret = fgetxattr(self->sockfd, TEST_XATTR_NAME, buf, sizeof(buf));
-> +	ASSERT_EQ(ret, -1);
-> +	ASSERT_EQ(errno, ERANGE);
-> +}
-> +
-> +/*
-> + * Test maximum number of user.* xattrs per socket.
-> + * The kernel enforces SIMPLE_XATTR_MAX_NR (128), so the 129th should
-> + * fail with ENOSPC.
-> + */
-> +TEST_F(xattr_sockfs, max_nr_xattrs)
-> +{
-> +	char name[32];
-> +	int i, ret;
-> +
-> +	for (i = 0; i < SIMPLE_XATTR_MAX_NR; i++) {
-> +		snprintf(name, sizeof(name), "user.test%03d", i);
-> +		ret = fsetxattr(self->sockfd, name, "v", 1, 0);
-> +		ASSERT_EQ(ret, 0) {
-> +			TH_LOG("fsetxattr %s failed at i=%d: %s",
-> +			       name, i, strerror(errno));
-> +		}
-> +	}
-> +
-> +	ret = fsetxattr(self->sockfd, "user.overflow", "v", 1, 0);
-> +	ASSERT_EQ(ret, -1);
-> +	ASSERT_EQ(errno, ENOSPC) {
-> +		TH_LOG("Expected ENOSPC for xattr %d, got %s",
-> +		       SIMPLE_XATTR_MAX_NR + 1, strerror(errno));
-> +	}
-> +}
-> +
-> +/*
-> + * Test maximum total value size for user.* xattrs.
-> + * The kernel enforces SIMPLE_XATTR_MAX_SIZE (128KB). Individual xattr
-> + * values are limited to XATTR_SIZE_MAX (64KB) by the VFS, so we need
-> + * at least two xattrs to hit the total limit.
-> + */
-> +TEST_F(xattr_sockfs, max_xattr_size)
-> +{
-> +	char *value;
-> +	int ret;
-> +
-> +	value = malloc(XATTR_SIZE_MAX);
-> +	ASSERT_NE(value, NULL);
-> +	memset(value, 'A', XATTR_SIZE_MAX);
-> +
-> +	/* First 64KB xattr - total = 64KB */
-> +	ret = fsetxattr(self->sockfd, "user.big1", value, XATTR_SIZE_MAX, 0);
-> +	ASSERT_EQ(ret, 0) {
-> +		TH_LOG("first large xattr failed: %s", strerror(errno));
-> +	}
-> +
-> +	/* Second 64KB xattr - total = 128KB (exactly at limit) */
-> +	ret = fsetxattr(self->sockfd, "user.big2", value, XATTR_SIZE_MAX, 0);
-> +	free(value);
-> +	ASSERT_EQ(ret, 0) {
-> +		TH_LOG("second large xattr failed: %s", strerror(errno));
-> +	}
-> +
-> +	/* Third xattr with 1 byte - total > 128KB, should fail */
-> +	ret = fsetxattr(self->sockfd, "user.big3", "v", 1, 0);
-> +	ASSERT_EQ(ret, -1);
-> +	ASSERT_EQ(errno, ENOSPC) {
-> +		TH_LOG("Expected ENOSPC when exceeding size limit, got %s",
-> +		       strerror(errno));
-> +	}
-> +}
-> +
-> +/*
-> + * Test that removing an xattr frees limit space, allowing re-addition.
-> + */
-> +TEST_F(xattr_sockfs, limit_remove_readd)
-> +{
-> +	char name[32];
-> +	int i, ret;
-> +
-> +	/* Fill up to the maximum count */
-> +	for (i = 0; i < SIMPLE_XATTR_MAX_NR; i++) {
-> +		snprintf(name, sizeof(name), "user.test%03d", i);
-> +		ret = fsetxattr(self->sockfd, name, "v", 1, 0);
-> +		ASSERT_EQ(ret, 0);
-> +	}
-> +
-> +	/* Verify we're at the limit */
-> +	ret = fsetxattr(self->sockfd, "user.overflow", "v", 1, 0);
-> +	ASSERT_EQ(ret, -1);
-> +	ASSERT_EQ(errno, ENOSPC);
-> +
-> +	/* Remove one xattr */
-> +	ret = fremovexattr(self->sockfd, "user.test000");
-> +	ASSERT_EQ(ret, 0);
-> +
-> +	/* Now we should be able to add one more */
-> +	ret = fsetxattr(self->sockfd, "user.newattr", "v", 1, 0);
-> +	ASSERT_EQ(ret, 0) {
-> +		TH_LOG("re-add after remove failed: %s", strerror(errno));
-> +	}
-> +}
-> +
-> +/*
-> + * Test that two different sockets have independent xattr limits.
-> + */
-> +TEST_F(xattr_sockfs, limits_per_inode)
-> +{
-> +	char buf[256];
-> +	int sock2;
-> +	ssize_t ret;
-> +
-> +	sock2 = socket(AF_UNIX, SOCK_STREAM, 0);
-> +	ASSERT_GE(sock2, 0);
-> +
-> +	/* Set xattr on first socket */
-> +	ret = fsetxattr(self->sockfd, TEST_XATTR_NAME,
-> +			TEST_XATTR_VALUE, strlen(TEST_XATTR_VALUE), 0);
-> +	ASSERT_EQ(ret, 0);
-> +
-> +	/* First socket's xattr should not be visible on second socket */
-> +	ret = fgetxattr(sock2, TEST_XATTR_NAME, NULL, 0);
-> +	ASSERT_EQ(ret, -1);
-> +	ASSERT_EQ(errno, ENODATA);
-> +
-> +	/* Second socket should independently accept xattrs */
-> +	ret = fsetxattr(sock2, TEST_XATTR_NAME,
-> +			TEST_XATTR_VALUE2, strlen(TEST_XATTR_VALUE2), 0);
-> +	ASSERT_EQ(ret, 0);
-> +
-> +	/* Verify each socket has its own value */
-> +	memset(buf, 0, sizeof(buf));
-> +	ret = fgetxattr(self->sockfd, TEST_XATTR_NAME, buf, sizeof(buf));
-> +	ASSERT_EQ(ret, (ssize_t)strlen(TEST_XATTR_VALUE));
-> +	ASSERT_STREQ(buf, TEST_XATTR_VALUE);
-> +
-> +	memset(buf, 0, sizeof(buf));
-> +	ret = fgetxattr(sock2, TEST_XATTR_NAME, buf, sizeof(buf));
-> +	ASSERT_EQ(ret, (ssize_t)strlen(TEST_XATTR_VALUE2));
-> +	ASSERT_STREQ(buf, TEST_XATTR_VALUE2);
-> +
-> +	close(sock2);
-> +}
-> +
-> +TEST_HARNESS_MAIN
-> 
-> -- 
-> 2.47.3
-> 
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
