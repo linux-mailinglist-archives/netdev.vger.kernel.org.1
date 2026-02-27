@@ -1,180 +1,238 @@
-Return-Path: <netdev+bounces-261833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261834-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MPfKNX+NoWnouAQAu9opvQ
-	(envelope-from <netdev+bounces-261833-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 13:26:39 +0100
+	id 6MkUDMmNoWnouAQAu9opvQ
+	(envelope-from <netdev+bounces-261834-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 13:27:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8520C1B70E6
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 13:26:39 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C57E1B7116
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 13:27:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9351E308A404
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 12:25:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E45DF30237B3
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 12:27:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57F813ECBD9;
-	Fri, 27 Feb 2026 12:25:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="CRuEr3JM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F9643ECBDB;
+	Fri, 27 Feb 2026 12:27:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+Received: from inva020.nxp.com (inva020.nxp.com [92.121.34.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D439D3ECBC3;
-	Fri, 27 Feb 2026 12:25:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531D130CD81;
+	Fri, 27 Feb 2026 12:27:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772195119; cv=none; b=p1O44XsK+b0GDpouZ+EHjwVJXQU1RJHr/9qdcHKN1cSauhRbTMwzMSINX8VWxED6hnJx0HWZPKvGXukEwgl+kb4CEJHR4gSCn2qEoC0DfGwyhXIRrxkqLGktSBpMm7AqHvPWBf9omdl1tq5dx7AToMCfU5CPFeYpfcByR5E0olI=
+	t=1772195268; cv=none; b=QUwWfnwdrwqNSeQ1JAmlTben1nF1BiygcUWVuf7j5FEvYlwsrW6ZaKF1EfPslGeNxGEii/TU5xvyVYYh1z8/h3ibblFZPXIR93WrpqD2BnDv8jdz3Tox+td1gYPkcfhTaOhs7f8Xm5KGgbCkBxwzu7BmSWkokZValNPZXDwb1gU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772195119; c=relaxed/simple;
-	bh=6v/LnHgifM1xkyYcS9H8qLXNafJwo9ow+LfRZalgBfA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JfVWtALUu+nN08QqaVwADlgL44CiR42vJDpOCRse1fbDEcKl2Ye19A6H3pmG3CEuVMBj+JljLea+P5skiAi7CdsMCFjkH0mB94cIFIZVreFOJTlAwkMM3P2DpJyRSWCBpKUYq68ZyeRXnX8lMOa1Nvoa+Y7JXTyX2416BiRSz7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=CRuEr3JM; arc=none smtp.client-ip=115.124.30.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1772195114; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=y+2zUoGEZCz6y7wbpFdG8NpN7dLYx9L0ruHzbWaDWx4=;
-	b=CRuEr3JMRLbyQoxrTbDRmOmgpzEQpIqQwPCAp++vHPbZa7t7oq9uE6d5u0dYhMWyK1DDIul0iAbqZTE+ZatVEVW8nYxPdX+JmGVoMq7iw8dLBfci7s+/0jVPZnua7r31iC6QBIQu9mRyPyHQ5dySYP4EO/hU3bu7j3Cm5No2Xuc=
-Received: from 30.221.130.102(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WzuNAu2_1772195111 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 27 Feb 2026 20:25:13 +0800
-Message-ID: <4a9af4b1-6820-4173-8daf-4201bb1bcca5@linux.alibaba.com>
-Date: Fri, 27 Feb 2026 20:25:11 +0800
+	s=arc-20240116; t=1772195268; c=relaxed/simple;
+	bh=YqoFbfdWbbPsgQm61WV7m4USPTx5rp7MoWSHPXxMY0U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YcfUQvvhKYwsvkks4Gh/2FG2SXGPYcVT1xvG8umQoadexH7oPEHEKDyjwFHOWsqSWhCAhEIGfjhH+x9XjFYDmRKjyi7M1GVgd36sTXWaQk8vEXUEA/1W0cE4etmTALC1d5tZviMM5w90MtlRrLDs4Aj01rHicm8xiHHelA8oubs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; arc=none smtp.client-ip=92.121.34.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id CA8E71A1AB3;
+	Fri, 27 Feb 2026 13:27:43 +0100 (CET)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id B31701A1A98;
+	Fri, 27 Feb 2026 13:27:43 +0100 (CET)
+Received: from lsv051416.swis.nl-cdc01.nxp.com (lsv051416.swis.nl-cdc01.nxp.com [10.168.48.122])
+	by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 9B59B20321;
+	Fri, 27 Feb 2026 13:27:42 +0100 (CET)
+Date: Fri, 27 Feb 2026 13:27:43 +0100
+From: Jan Petrous <jan.petrous@oss.nxp.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Chester Lin <chester62515@gmail.com>,
+	Matthias Brugger <mbrugger@suse.com>,
+	Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>,
+	NXP S32 Linux Team <s32@nxp.com>, Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Frank Li <Frank.Li@nxp.com>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev, devicetree@vger.kernel.org,
+	vladimir.oltean@nxp.com, boon.khai.ng@altera.com
+Subject: Re: [PATCH v7 2/5] net: stmmac: platform: read channels irq
+Message-ID: <aaGNvz/n6b4klf1K@lsv051416.swis.nl-cdc01.nxp.com>
+References: <20260226-dwmac_multi_irq-v7-0-f8fe3b945bb4@oss.nxp.com>
+ <20260226-dwmac_multi_irq-v7-2-f8fe3b945bb4@oss.nxp.com>
+ <aaCankErMJZ2XM_s@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC v2 0/2] ptp: Move non-NIC PHC drivers from netdev to
- clock/timekeeping maintainership
-To: David Woodhouse <dwmw2@infradead.org>, tglx@kernel.org,
- tglx@linutronix.de, richardcochran@gmail.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- mani@kernel.org, imran.shaik@oss.qualcomm.com
-Cc: vladimir.oltean@nxp.com, wei.fang@nxp.com, xiaoning.wang@nxp.com,
- jonathan.lemon@gmail.com, vadim.fedorenko@linux.dev, yangbo.lu@nxp.com,
- svens@linux.ibm.com, nick.shi@broadcom.com, ajay.kaher@broadcom.com,
- alexey.makhalov@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
- linux-fpga@vger.kernel.org, imx@lists.linux.dev, linux-s390@vger.kernel.org,
- dust.li@linux.alibaba.com, xuanzhuo@linux.alibaba.com,
- taniya.das@oss.qualcomm.com
-References: <20260227081934.96865-1-guwen@linux.alibaba.com>
- <be4c63a8dc43be15576565b4bd4567b3cf433d58.camel@infradead.org>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <be4c63a8dc43be15576565b4bd4567b3cf433d58.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aaCankErMJZ2XM_s@shell.armlinux.org.uk>
+X-Virus-Scanned: ClamAV using ClamSMTP
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+X-Spamd-Result: default: False [0.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[nxp.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261833-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,suse.com,oss.nxp.com,nxp.com,pengutronix.de,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,lists.linux.dev,altera.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[infradead.org,kernel.org,linutronix.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org,oss.qualcomm.com];
-	RCPT_COUNT_TWELVE(0.00)[30];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261834-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	NEURAL_HAM(-0.00)[-0.998];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[guwen@linux.alibaba.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[nxp.com,gmail.com,linux.dev,linux.ibm.com,broadcom.com,vger.kernel.org,lists.linux.dev,linux.alibaba.com,oss.qualcomm.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.alibaba.com:mid,linux.alibaba.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8520C1B70E6
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jan.petrous@oss.nxp.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.980];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,nxp.com:email]
+X-Rspamd-Queue-Id: 5C57E1B7116
 X-Rspamd-Action: no action
 
-
-
-On 2026/2/27 18:25, David Woodhouse wrote:
-> On Fri, 2026-02-27 at 16:19 +0800, Wen Gu wrote:
->>
->> Patch 1 performs the refactor: move drivers and split Kconfig/Makefiles
->> accordingly, without intended functional changes.
->>
->> Patch 2 updates MAINTAINERS to match the new layout and adds a dedicated entry
->> for drivers/ptp/emulated/, moving review and ownership routing for this class
->> of drivers away from the netdev maintainership.
->>
->> No userspace ABI changes are intended, this is a refactor and maintenance
->> metadata update only.
+On Thu, Feb 26, 2026 at 07:10:22PM +0000, Russell King (Oracle) wrote:
+> On Thu, Feb 26, 2026 at 09:54:07AM +0100, Jan Petrous via B4 Relay wrote:
+> > From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+> > 
+> > Read IRQ resources for all rx/tx channels, to allow Multi-IRQ mode
+> > for platform glue drivers.
+> > 
+> > Reviewed-by: Matthias Brugger <mbrugger@suse.com>
+> > Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+> > ---
+> >  .../net/ethernet/stmicro/stmmac/stmmac_platform.c  | 46 +++++++++++++++++++++-
+> >  1 file changed, 45 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> > index 5c9fd91a1db9..93bd915ab6eb 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> > @@ -697,9 +697,40 @@ struct clk *stmmac_pltfr_find_clk(struct plat_stmmacenet_data *plat_dat,
+> >  }
+> >  EXPORT_SYMBOL_GPL(stmmac_pltfr_find_clk);
+> >  
+> > +static int stmmac_pltfr_get_queue_irqs(struct platform_device *pdev,
+> > +				       struct stmmac_resources *stmmac_res,
+> > +				       bool tx)
+> > +{
+> > +	int *irqs = tx ? &stmmac_res->tx_irq[0] : &stmmac_res->rx_irq[0];
+> > +	char name[16];
+> > +	int i;
+> > +
+> > +	/* RX channels irq */
+> > +	STMMAC_FOREACH_MTL_QUEUE(i, MTL_MAX_RX_QUEUES) {
 > 
-> While no ABI changes are intended in *this* patch series, we do need
-> some.
+> You've missed that there are two separate definitions for tx and rx
+> queues - while they are currently the same number, code shouldn't
+> make that assumption.
+
+Oh, yes. My fault. Next time I shall review my code better.
+
 > 
-> These 'emulated' clocks mostly exist not to emulate IEEE1588 per se,
-> but as a way to provide a precision real time clock to systems
-> (especially virtual guests).
+> > +		scnprintf(name, sizeof(name), "%cx-queue-%d",
+> > +			  tx ? 't' : 'r', i);
 > 
-> We have already discussed the need to expose clock error bounds, and to
-> expose paired timestamps against the actual hardware counter (TSC, arch
-> counter, timebase, etc.).
+> I'm not happy with this method of combining the two loops.
 > 
-> Another key difference is that we'll generally want to be able to
-> derive UTC from these clocks, and feed them directly into the kernel's
-> CLOCK_REALTIME.
+> Maybe instead:
 > 
-> I don't have strong views on whether we extend the /dev/ptpX userspace
-> ABI, or start to treat these 'emulated' clocks as a class of device in
-> their own right and just shim them to /dev/ptpX for compatibility.
+> static int stmmac_pltfr_get_irq_array(struct platform_device *pdev,
+> 				      const char *fmt, int *irqs,
+> 				      size_t num)
+> {
+> 	char name[16];
+> 	size_t i;
+> 
+> 	for (i = 0; i < num; i++) {
+> 		if (snprintf(name, sizeof(name), fmt, i) >= sizeof(name))
+> 			return -EINVAL;
+> 
+> 		irqs[i] = platform_get_irq_byname_optional(pdev, name);
+> 		if (irqs[i] == -EPROBE_DEFER) {
+> 			return irqs[i];
+> 		} else if (irqs[i] <= 0) {
+> 			dev_dbg(&pdev->dev, "IRQ %s not found\n", name);
+> 
+> 			irqs[i] = 0;
+> 			break;
+> 		}
+> 	}
+> 
+> 	return 0;
+> }
+> 
+> which has the advantage that it becomes a generic helper for getting an
+> any array of IRQs.
+> 
+> >  int stmmac_get_platform_resources(struct platform_device *pdev,
+> >  				  struct stmmac_resources *stmmac_res)
+> >  {
+> > +	int ret;
+> > +
+> >  	memset(stmmac_res, 0, sizeof(*stmmac_res));
+> >  
+> >  	/* Get IRQ information early to have an ability to ask for deferred
+> > @@ -735,7 +766,20 @@ int stmmac_get_platform_resources(struct platform_device *pdev,
+> >  
+> >  	stmmac_res->addr = devm_platform_ioremap_resource(pdev, 0);
+> >  
+> > -	return PTR_ERR_OR_ZERO(stmmac_res->addr);
+> > +	if (IS_ERR(stmmac_res->addr))
+> > +		return PTR_ERR(stmmac_res->addr);
+> > +
+> > +	/* TX channels irq */
+> > +	ret = stmmac_pltfr_get_queue_irqs(pdev, stmmac_res, true);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	/* RX channels irq */
+> > +	ret = stmmac_pltfr_get_queue_irqs(pdev, stmmac_res, false);
+> > +	if (ret)
+> > +		return ret;
+> 
+> These then become:
+> 
+> 	ret = stmmac_pltfr_get_irq_array(pdev, "tx-queue-%d", 
+> 					 stmmac_res->tx_irq,
+> 					 MTL_MAX_TX_QUEUES);
+> 	if (ret)
+> 		return ret;
+> 
+> 	ret = stmmac_pltfr_get_irq_array(pdev, "rx-queue-%d", 
+> 					 stmmac_res->rx_irq,
+> 					 MTL_MAX_RX_QUEUES);
+> 	if (ret)
+> 		return ret;
+> 
+> This has the advantage that one can grep for rx-queue to find it,
+> and we also use the correct limit for each queue type.
 > 
 
-As mentioned in RFC v1, the use cases for drivers in the emulated PHC category
-are expected to be quite diverse, and not limited to the virtualization/guest
-time sync use case. For example, existing drivers such as ptp_ocp [1] and
-upcoming ones such as mhi_phc [2] are not related to virtualization use cases.
+Agree, your code looks better. Applied in v8 :) Thanks.
 
-The main motivation for this RFC is to find a clear in-tree home, upstreaming
-path, and review/maintainership model for PHC/PTP drivers that use the existing
-PTP userspace interface, but are not based on the IEEE 1588/network packet
-timestamping pipeline, both for those already in the tree and for future
-additions.
+BTW, I would prefer to use sizeof() instead of constant for array size,
+but this is the style used in stmmac, so I reuse the same approach.
 
-For virtualization-specific extensions (e.g. additional capabilities or ABI
-changes), I agree they are valuable, but I think they are outside the scope of
-this RFC series.
+BR.
+/Jan
 
-[1] https://lore.kernel.org/netdev/c85c77bc-9a8c-4336-ab79-89a981c43e01@linux.dev/
-[2] https://lore.kernel.org/mhi/20250818-tsc_time_sync-v1-0-2747710693ba@oss.qualcomm.com/
-
->> # Request for comments
->>
->> 1. Following the clocksource/timekeeping and POSIX timer areas, this RFC routes
->> changes for drivers/ptp/emulated/ to linux-kernel@vger.kernel.org (rather than
->> netdev). However, the preferred integration path is still unclear (e.g. which
->> tree should take such changes, and who should collect/pull them for merging). We
->> would really appreciate guidance from the time/clock maintainers, especially any
->> input from Thomas Gleixner, on the preferred tree/workflow for these changes.
->>
->> 2. This RFC currently lists us as the maintainers for drivers/ptp/emulated/ as a
->> fallback contact point. Ideally, we would prefer this area to be maintained by
->> clock/time experts in the long run. Suggestions on more suitable maintainers are
->> very welcome.
-> 
-> I'm happy to be involved too.
-
-Thanks, David. It would be great to have you involved. Would you be willing to
-be listed in MAINTAINERS for drivers/ptp/emulated/?
-
-Regards.
 
