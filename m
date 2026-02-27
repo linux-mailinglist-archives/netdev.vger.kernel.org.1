@@ -1,197 +1,241 @@
-Return-Path: <netdev+bounces-261720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261718-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ACYDNqUWoWkUqQQAu9opvQ
-	(envelope-from <netdev+bounces-261720-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 04:59:33 +0100
+	id sBAiLL0VoWnoqAQAu9opvQ
+	(envelope-from <netdev+bounces-261718-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 04:55:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55C0C1B2726
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 04:59:33 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 110C31B26EE
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 04:55:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 14D973080C38
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 03:59:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9535B30E14DD
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 03:55:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 212C733D6F6;
-	Fri, 27 Feb 2026 03:59:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FE5F33BBD4;
+	Fri, 27 Feb 2026 03:55:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3ras7j6w"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oLOFEB20"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E752F33D6F8
-	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 03:59:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D66D33B962;
+	Fri, 27 Feb 2026 03:55:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772164771; cv=none; b=qSn4H9bDYeWCN1iqVMx+U18JHwylQ4lkNepHs7X5XODvStPQTFKhk5Gw+4khfcJ3NwcYEyy7BW5YfTHG0Uq/AB7KMA0wt7GKkKuduYrOEBVxXyqzhqhQMUVjoU+PXN/WvrdojkeKlk7bb0LBBiMi2T8R66/4crVSldkZUZOHINI=
+	t=1772164539; cv=none; b=GCbrA7pO3X93TIwNyrrrJcsjxpxzOI78iF5Fxgrz2zoxZh1WlJ0ZkIvuiTgVx0NQcPgDrYfwfnfIJJIImutga3N3yciEfufVmrUlTYBQ8RYX20lWugO/wQud1q1nh4BpbrH2hVAfiun0UomszlIFLH7q3mjiRBAb2vTffnK0cb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772164771; c=relaxed/simple;
-	bh=AOlUQIQwRM3TfQVWpY8IO+Oimy0yKwkaz63Brgmpmk0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=T+MCvW3JEvoz+JohbpeRjvIUJ5fKYd7pub1dqP+F2YEnz8Gpvi1YtvAzseJgCYw6VKbLtwse8V41y7Y4uI7+ImA5D5+Yhiaa/WmEYe99cnq4EjRX9Ap/CzDzPKffFz+Fv8sfPWHf4FTavPtmx9+/kEzEi15CVlsPl6vcMYhTpME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3ras7j6w; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c6e18b8fe1eso1637885a12.1
-        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 19:59:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772164769; x=1772769569; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=jMr9OVkiEqDw4Lp9EzktAf71Dg6nani4781m7h3dn/8=;
-        b=3ras7j6w9778Xxr8zEGUwr5qnSBaYvEzvqev2lNHSyErm2CwF04Vwqalka4+MO+n9F
-         cwVaMAleLMGnEmeO7x479zKtFMHfgS/5750V4aguXzILZADTJHcPY/tOiIwXQ1Yb22dx
-         XmpT44R2w5Swa3bdYAEzUfKkJjLnNof9EBOCzYt6kau0tjtrcwzyPgBLxT29ij6cdvO2
-         sN1qKfDO5WFns6pSx+qHNFxFnDr4D1qUD87qSRVCPihvLzL/vaV3+5Cp/DESkb3UYtio
-         zXV24hlhK4NvU097jDccAk6IaQWFPTK9vEb5PyI/6bplGD2VSVFj/aUzNQIwhF5Dx2MJ
-         oS9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772164769; x=1772769569;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jMr9OVkiEqDw4Lp9EzktAf71Dg6nani4781m7h3dn/8=;
-        b=BaVkIbtsypFSKgtRatsjfc6LJooGVZocFNXU4ljr5PIba5E2SUbURLM0eA7Cra7lIn
-         bFUp9SgGSxZNw2IZ0tNwD1XEcIF6lNTYTpGbYsCH8cB9w+JEqczxZMjKTjQzFbh3wWkU
-         FuCMin/7+6+asvoicHVRyB9sFKy+C7Peqp2ax006fVR7D/TbfAA+O/gE1nfyKvY62dgV
-         +sPoGthuoj1T+WCe0Ly95SRdapngRhLX/mZa/TYsIfCBQyk30KWNssXflsUj9NCYkZBu
-         XBtHfhDh64VrykxMNtxOjFjaQRnhA0CTV+s8LFIrHzV2wvqsxD2seloSlJI9BOfOaugs
-         I8gg==
-X-Forwarded-Encrypted: i=1; AJvYcCXJu1sWQqbRjoMDEi9QZue8PMgNTl730Ah3CHm4ZoQPbUdZ3+vVeRPmS61WIY/pn9tzdt3MAvc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzv1NnV463VSreUqRCCJWBSYjoKh6KHNUHUCYBvqzDzZ4apQbiZ
-	8wlbjuxTa8qXJq3uG3D7bAShtX6LnpMGbHfd4RnKhW9FfdDSDFqv17JFdR+7UvuYUnAhbxMifTz
-	bxSujpw==
-X-Received: from pgbfp5.prod.google.com ([2002:a05:6a02:2ce5:b0:c0e:c1b4:51a5])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:4d8e:b0:35e:5055:1ec
- with SMTP id adf61e73a8af0-395c472a18dmr1455185637.17.1772164769058; Thu, 26
- Feb 2026 19:59:29 -0800 (PST)
-Date: Fri, 27 Feb 2026 03:55:35 +0000
+	s=arc-20240116; t=1772164539; c=relaxed/simple;
+	bh=vCJxghyfT798EInsE9LvMJSZ9J9gpFJ+AVfK86WiR1s=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ITK2nIkiq1dSTT1mHzKAaKF9/I5lgQBClB0p7Rl9ojRFka6FCr08lzWywr4+K196PRfPhslM/xuc+4TJ4Af83GIWfzn5vF7YOkrnYE2v85121o9EQAIGlgfaU0jJlWWgHZ9o1ulFlqfTjH3vGav5c0PLd9XM7vNQn37LmzSNSDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oLOFEB20; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3AA3C19421;
+	Fri, 27 Feb 2026 03:55:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772164539;
+	bh=vCJxghyfT798EInsE9LvMJSZ9J9gpFJ+AVfK86WiR1s=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=oLOFEB20CcQfYtHS2Z0NLb3jh2DzxgriOVUZovDTKgpMyiEj0Sx1Tn+qTAHsUjR6I
+	 tySv7g4I/UBu5gkIUQk0DPJoLj+0+s4o6IWzcPd6GKINfcqQJFWs7Nn8iTlSWr79Mz
+	 kr3yFZFVxE5bzTkS1JMiyFql5AKVmbJjXFXG3Z9Antc1Y7BfmKdq8Qbb+m/1YHcs6y
+	 esq/lrpzaKDvEPgR6AbARpb0DK4b6SflBPjDPhhxlPoT22pQ0NeQHIb/nAfp9ov4te
+	 o+VQiVxA/QNYsGSOdiZAKMe7k2hvStpoqh3cRJ/wSFwJYvctPZIJOSpLdVZezPU4Oy
+	 6JLWpj6sZKfAg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: cedric.jehasse@luminex.be
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	andrew@lunn.ch,
+	olteanv@gmail.com,
+	edumazet@google.com,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	linux@armlinux.org.uk,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next,v4] net: dsa: mv88e6xxx: Add partial support for TCAM entries
+Date: Thu, 26 Feb 2026 19:55:37 -0800
+Message-ID: <20260227035537.2630823-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260225-net-next-mv88e6xxx-tcam-v4-1-117f600e41d7@luminex.be>
+References: <20260225-net-next-mv88e6xxx-tcam-v4-1-117f600e41d7@luminex.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260227035547.3321327-1-kuniyu@google.com>
-Subject: [PATCH v2 net] udp: Unhash auto-bound connected sk from 4-tuple hash
- table when disconnected.
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Philo Lu <lulie@linux.alibaba.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261720-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,linux.alibaba.com,google.com,gmail.com,vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lunn.ch,gmail.com,google.com,davemloft.net,redhat.com,armlinux.org.uk];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261718-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-0.968];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 55C0C1B2726
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: 110C31B26EE
 X-Rspamd-Action: no action
 
-Let's say we bind() an UDP socket to the wildcard address with a
-non-zero port, connect() it to an address, and disconnect it from
-the address.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-bind() sets SOCK_BINDPORT_LOCK on sk->sk_userlocks (but not
-SOCK_BINDADDR_LOCK), and connect() calls udp_lib_hash4() to put
-the socket into the 4-tuple hash table.
-
-Then, __udp_disconnect() calls sk->sk_prot->rehash(sk).
-
-It computes a new hash based on the wildcard address and moves
-the socket to a new slot in the 4-tuple hash table, leaving a
-garbage in the chain that no packet hits.
-
-Let's remove such a socket from 4-tuple hash table when disconnected.
-
-Note that udp_sk(sk)->udp_portaddr_hash needs to be udpated after
-udp_hash4_dec(hslot2) in udp_unhash4().
-
-Fixes: 78c91ae2c6de ("ipv4/udp: Add 4-tuple hash for connected socket")
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-v2: Moved udp_portaddr_hash update later
-v1: https://lore.kernel.org/netdev/20260225002709.156882-1-kuniyu@google.com/
----
- net/ipv4/udp.c | 25 +++++++++++++++----------
- 1 file changed, 15 insertions(+), 10 deletions(-)
+net: dsa: mv88e6xxx: Add partial support for TCAM entries
 
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 014fdfdd331b..b60fad393e18 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -2287,7 +2287,6 @@ void udp_lib_rehash(struct sock *sk, u16 newhash, u16 newhash4)
- 				     udp_sk(sk)->udp_port_hash);
- 		hslot2 = udp_hashslot2(udptable, udp_sk(sk)->udp_portaddr_hash);
- 		nhslot2 = udp_hashslot2(udptable, newhash);
--		udp_sk(sk)->udp_portaddr_hash = newhash;
- 
- 		if (hslot2 != nhslot2 ||
- 		    rcu_access_pointer(sk->sk_reuseport_cb)) {
-@@ -2321,19 +2320,25 @@ void udp_lib_rehash(struct sock *sk, u16 newhash, u16 newhash4)
- 		if (udp_hashed4(sk)) {
- 			spin_lock_bh(&hslot->lock);
- 
--			udp_rehash4(udptable, sk, newhash4);
--			if (hslot2 != nhslot2) {
--				spin_lock(&hslot2->lock);
--				udp_hash4_dec(hslot2);
--				spin_unlock(&hslot2->lock);
--
--				spin_lock(&nhslot2->lock);
--				udp_hash4_inc(nhslot2);
--				spin_unlock(&nhslot2->lock);
-+			if (inet_rcv_saddr_any(sk)) {
-+				udp_unhash4(udptable, sk);
-+			} else {
-+				udp_rehash4(udptable, sk, newhash4);
-+				if (hslot2 != nhslot2) {
-+					spin_lock(&hslot2->lock);
-+					udp_hash4_dec(hslot2);
-+					spin_unlock(&hslot2->lock);
-+
-+					spin_lock(&nhslot2->lock);
-+					udp_hash4_inc(nhslot2);
-+					spin_unlock(&nhslot2->lock);
-+				}
- 			}
- 
- 			spin_unlock_bh(&hslot->lock);
- 		}
-+
-+		udp_sk(sk)->udp_portaddr_hash = newhash;
- 	}
- }
- EXPORT_IPV6_MOD(udp_lib_rehash);
+This patch adds partial Ternary Content Addressable Memory (TCAM)
+support for the mv88e6390 and mv88e6393 family of switches. The
+implementation introduces matching on IP addresses/protocol with the
+ability to trap matched frames to the CPU.
+
+> diff --git a/drivers/net/dsa/mv88e6xxx/tcam.c b/drivers/net/dsa/mv88e6xxx/tcam.c
+> new file mode 100644
+> index 000000000000..f56cc7e0c00f
+> --- /dev/null
+> +++ b/drivers/net/dsa/mv88e6xxx/tcam.c
+
+[ ... ]
+
+> +/* insert tcam entry in ordered list and move existing entries if necessary */
+> +static int mv88e6xxx_tcam_insert_entry(struct mv88e6xxx_chip *chip,
+> +				       struct mv88e6xxx_tcam_entry *entry)
+> +{
+> +	struct mv88e6xxx_tcam_entry *elem;
+> +	struct list_head *hpos;
+> +	int err;
+> +
+> +	list_for_each_prev(hpos, &chip->tcam.entries) {
+> +		u8 move_idx;
+> +
+> +		elem = list_entry(hpos, struct mv88e6xxx_tcam_entry, list);
+> +		if (entry->prio >= elem->prio)
+> +			break;
+> +
+> +		move_idx = elem->hw_idx + 1;
+> +
+> +		err = mv88e6xxx_tcam_flush_entry(chip, move_idx);
+> +		if (err)
+> +			return err;
+> +
+> +		err = chip->info->ops->tcam_ops->entry_add(chip, elem,
+> +							   move_idx);
+> +		if (err)
+> +			return err;
+> +
+> +		elem->hw_idx = move_idx;
+> +	}
+
+If entry_add() fails after some entries have already been moved to new
+hardware positions with their hw_idx updated, doesn't the function return
+without rolling back those partial moves?
+
+The software list would then have some entries pointing to their new
+positions while the gap for the new entry is only partially created.
+This could leave the TCAM in an inconsistent state for subsequent
+operations.
+
+Is there error handling to ensure the TCAM state remains consistent when
+insertion partially succeeds?
+
+[ ... ]
+
+> diff --git a/drivers/net/dsa/mv88e6xxx/tcflower.c b/drivers/net/dsa/mv88e6xxx/tcflower.c
+> new file mode 100644
+> index 000000000000..05b289463834
+> --- /dev/null
+> +++ b/drivers/net/dsa/mv88e6xxx/tcflower.c
+> @@ -0,0 +1,164 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * Marvell 88E6xxx Switch flower support
+> + *
+> + * Copyright (c) 2026 Luminex Network Intelligence
+> + */
+> +
+> +#include "chip.h"
+> +#include "tcflower.h"
+> +#include "tcam.h"
+> +
+> +#define MV88E6XXX_ETHTYPE_OFFSET 16
+> +#define MV88E6XXX_IP_PROTO_OFFSET 27
+> +#define MV88E6XXX_IPV4_SRC_OFFSET 30
+> +#define MV88E6XXX_IPV4_DST_OFFSET 34
+> +
+> +static int mv88e6xx_flower_parse_key(struct mv88e6xxx_chip *chip,
+> +				     struct netlink_ext_ack *extack,
+> +				     struct flow_cls_offload *cls,
+> +				     struct mv88e6xxx_tcam_key *key)
+> +{
+> +	struct flow_rule *rule = flow_cls_offload_flow_rule(cls);
+> +	struct flow_dissector *dissector = rule->match.dissector;
+> +	u16 addr_type = 0;
+> +
+> +	if (dissector->used_keys &
+> +	    ~(BIT_ULL(FLOW_DISSECTOR_KEY_BASIC) |
+> +	      BIT_ULL(FLOW_DISSECTOR_KEY_CONTROL) |
+> +	      BIT_ULL(FLOW_DISSECTOR_KEY_IPV4_ADDRS) |
+> +	      BIT_ULL(FLOW_DISSECTOR_KEY_IPV6_ADDRS))) {
+> +		NL_SET_ERR_MSG_MOD(extack,
+> +				   "Unsupported keys used");
+> +		return -EOPNOTSUPP;
+> +	}
+
+FLOW_DISSECTOR_KEY_IPV6_ADDRS is included in the allowed keys bitmask,
+but there is no code below to parse IPv6 addresses into the TCAM key.
+
+If a user creates a tc flower rule with IPv6 addresses, the rule passes
+this validation check but the addresses are never programmed into the
+TCAM. This would cause the hardware entry to match broader traffic than
+intended.
+
+Looking at the code further down:
+
+> +	if (addr_type == FLOW_DISSECTOR_KEY_IPV4_ADDRS) {
+> +		struct flow_match_ipv4_addrs match;
+> +
+> +		flow_rule_match_ipv4_addrs(cls->rule, &match);
+> +		mv88e6xxx_tcam_match_set(key, MV88E6XXX_IPV4_SRC_OFFSET,
+> +					 match.key->src,
+> +					 match.mask->src);
+> +		mv88e6xxx_tcam_match_set(key, MV88E6XXX_IPV4_DST_OFFSET,
+> +					 match.key->dst,
+> +					 match.mask->dst);
+> +	} else {
+> +		NL_SET_ERR_MSG_MOD(extack,
+> +				   "Unsupported address type");
+> +		return -EOPNOTSUPP;
+> +	}
+
+The check at line 68-72 rejects non-IPv4 address types, but the IPv6 key
+is still in the allowed keys bitmask at line 30. This creates a confusing
+situation where IPv6 is both 'allowed' and 'unsupported'.
+
+Should FLOW_DISSECTOR_KEY_IPV6_ADDRS be removed from the allowed keys
+until IPv6 parsing is implemented?
 -- 
-2.53.0.473.g4a7958ca14-goog
-
+pw-bot: cr
 
