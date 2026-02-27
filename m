@@ -1,179 +1,205 @@
-Return-Path: <netdev+bounces-261740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261741-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IGnYOddHoWkirwQAu9opvQ
-	(envelope-from <netdev+bounces-261740-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 08:29:27 +0100
+	id MM/TBBNJoWkirwQAu9opvQ
+	(envelope-from <netdev+bounces-261741-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 08:34:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C2EA1B3E6A
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 08:29:27 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABED81B3F5D
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 08:34:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 68DBA3024298
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 07:29:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1AEA7303D11C
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 07:34:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9130F364E91;
-	Fri, 27 Feb 2026 07:29:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C706A347FC0;
+	Fri, 27 Feb 2026 07:34:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X6Loa/Ch"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="PYLd7Oqs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012006.outbound.protection.outlook.com [52.101.66.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CF3E35A385;
-	Fri, 27 Feb 2026 07:29:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772177365; cv=none; b=HFzpJKzRMrX3PnjYiIm7AOWvqV5zlOAq7VnA3Y7GTTslzBovYXgnTZ8HowYzJbi7gwRaiZduHQvdJOoAmsWA8/0gWVI1Xb6QS3oB1G7Tj70T9cRoByYSWCyRNQvZIKQz5iN+vY1WEldmTJ/DkAq8prbF3TVyRw1jxf1+F35+yEQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772177365; c=relaxed/simple;
-	bh=+pO2CN1HpeHqrcwIOzoJdqrONDvuQ8kyTFAt7AyXzOE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QvI0PSuRtGoGrpQSMHoaQLCojyrK//qdTr3UUAAAgEVse7Dt8Zh4mjhW+UNo/xaSyN/dYtgvyEdumIBodQcf1CLvEcW+b3dPkaaMmAzDgQkPpIMyWXWK3OqsK4VpW254rvsBn8b2cIHRbzm1uXaLl+683ZzNnKSUlYhAiJ0qyws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X6Loa/Ch; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E1A3C116C6;
-	Fri, 27 Feb 2026 07:29:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772177365;
-	bh=+pO2CN1HpeHqrcwIOzoJdqrONDvuQ8kyTFAt7AyXzOE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=X6Loa/ChnbOVMGny5zt8fuLl1zTVm89/No8eRv4pW004lh3hf8NHx1vjpzvqh1kId
-	 SgdoN+iiqaqm8U/I3ib18qttIuS8at3yfkRjtYAMFGMk26fY0THoPjLhv5Ht4EjgCt
-	 PlfQ1uupozAUsPOJssLhlFNJsAcXiEgw3IjW1t8/EXBnF52AB6YrS8eZnALDLFARbV
-	 YIwdRoqaYVzadBZPrr849DCjH5bnO+Vb0Ko7PECq8rmnIyCAvzygKiQhCG30uPEGqX
-	 7mCqry+xnBiKD8ngjUgNOrUyy2PjpdniJgxpQMJ2woBi4fcALMEkzDHWaQxNj0U1N+
-	 heZD6OLssPgeg==
-Message-ID: <d6768751-4fee-4ba5-9807-eb64d727a16d@kernel.org>
-Date: Fri, 27 Feb 2026 08:29:21 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68499345CB2;
+	Fri, 27 Feb 2026 07:34:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.6
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772177678; cv=fail; b=eGt16FBs57fJaq3lvVxbyeHb600pfIAADCa+rMpHCODs33XybwWc2VMAQsM/AG/T8PatyoZWG8z+W88i+KFbxi2aeYn/Evc5uBuLTZVV33iwsxhAoUxLlA8rwuQg+yBl8nCpirPshMkCXf2U8lwrkStzkVPhMCaFHZ+LLbfiqGw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772177678; c=relaxed/simple;
+	bh=PP0KrTqW6uNg9y3PhqQshNX8oCb4k5l86f4zxp+465A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=nFDZQBaN3SRgCryG1bhaq1vmQRkfhJYLk6Wz+T6LRRoN6+Ame4IqOG8e1N6Fq2NydmSYD8HyzMPDM0PkVhY5Mu29GPd93QDamnX2pEXQy2coeMSwfjeh6Lq+slt+nLvJtpKwqQkhO7tjByyumrxh46er6LFX1Vg7NN5q/ONzv3o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=PYLd7Oqs; arc=fail smtp.client-ip=52.101.66.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=r6xbMaiASQtl8EqAJJ5oNxz8LxeyJ93T2rD7PX4XPmaiFKCwbMQu0+rtP340DSjn8A2n1y0c7Ph8S928SZvV0ZH6YovK9tZgUpcSVqc5P3pA13VuIjj75AAoQknI5o3cTxlkN0HkKB4rEP00uOhkhiVgFl3vHgmYQIlZabvBO/3NHzyw0QqzTh2ywY6iDhUldzx5mKg8+ww2NPzKpnDsIWF4wSf6XXD2xLw305bQvK+4wwwmbyBFRD31dNpc+85/oq3oB/u9q/J3fI+MQxUdI6Ne3Nf8l7kAQaTV5D/YJwzZTRH8+NwoiYZVX6fmuAsJ/K/TMXqlE4o41aXdNT6Heg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rXZ2+wJ0USATHgjAG7bnGFP0loCZklD8AeUfRp9yqxk=;
+ b=weGp0GrpfZ5tL4aTX8Aq+X7kz9s9kKxVWWdAi2J6k1pjDtWImcKVFEanu0fJ2+3uCfkxbBQt43qvK+I0gd9VNbHDCos2lp3jdYCv+m17Diqo/VGVXA3U4IglWUhhNqtrEIDeERAQmwAN0jK4kTgqDnjyg46GYYZBL2EaBcRjG9iyeAlhjPzCGULHoPQgQ3t4tNqyXeY54N+ryyoYIsxgMM7ogBNYvC4X0BKYRvEieAIZtTl/EaHIgGHqTRQljzh5vQDblIEdBURQmHtmAL2I/uAD5Hs77E8SjvRDXM0d0u75mwpiWaKC/F4+UK9tPtnLrlnDF6ZW3ERTyfsQVfPjNw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rXZ2+wJ0USATHgjAG7bnGFP0loCZklD8AeUfRp9yqxk=;
+ b=PYLd7OqsFJlX27BYkVmuCbpwhqIRuPNjX1BHliZxZnDDz2yNpLjZNS8t9oBqp8yvEJnFIV9JriMEvMLYJEe2yBVDQJEujZ0vJd/oJy7VVeX9hBw0HXNNDwF3DndYMUEu9I+JRsiiHHpNnXfgXrnkTHPX6GCX/0HqbM49WWyVc+ag6jgi3T9oQNR3IGAkNB5NSp59Xwwv/lWbdr2ML8niAW79UuT5QC011Mm0+vpC1HSPI8dZLQo5Mo5WgR/de7xZGmw4LhFOA3B6EkSmrrN1eY8KU0yVVYUBqxnA87vpbybxOlKVYq/hquPwoaF/BttMlrhq4UNVRXU0HGILWDHf9Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB8253.eurprd04.prod.outlook.com (2603:10a6:102:1bf::7)
+ by GV2PR04MB11957.eurprd04.prod.outlook.com (2603:10a6:150:2f3::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.14; Fri, 27 Feb
+ 2026 07:34:33 +0000
+Received: from PAXPR04MB8253.eurprd04.prod.outlook.com
+ ([fe80::2b4e:8130:4419:d633]) by PAXPR04MB8253.eurprd04.prod.outlook.com
+ ([fe80::2b4e:8130:4419:d633%3]) with mapi id 15.20.9654.013; Fri, 27 Feb 2026
+ 07:34:32 +0000
+Date: Fri, 27 Feb 2026 09:34:28 +0200
+From: Ioana Ciornei <ioana.ciornei@nxp.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 5/5] selftests: drivers: hw: add tests for the
+ ethtool standard counters
+Message-ID: <a6qhvs4vaxk33iryntrvybaesbr23v7hcrfn37p53viydd3zhs@6zquhlssfthz>
+References: <20260225150648.1542206-1-ioana.ciornei@nxp.com>
+ <20260225150648.1542206-6-ioana.ciornei@nxp.com>
+ <77f3e4e8-430e-4ae1-aa1f-8f70b4d8d3da@lunn.ch>
+ <osswnpbiyy35ycs7ha2ufugj7dzmvpeq3x7vjq4j53qtwamkuw@ihwl5qjuydnv>
+ <ph7vs3fsxti3nlypmmvm6wqvsnnsn76wct3qpi5omphggcjqrt@3any2dqzlgsr>
+ <031c7375-0407-476a-92eb-0f894ec820f1@lunn.ch>
+ <vcphjyyj3jezenqfgieqac7ayxhslupgeu6kh2ywfukaat3rtf@tsqaz33v4o7c>
+ <20260226182511.0d33f9d1@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260226182511.0d33f9d1@kernel.org>
+X-ClientProxiedBy: AS4P190CA0033.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5d1::13) To PAXPR04MB8253.eurprd04.prod.outlook.com
+ (2603:10a6:102:1bf::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RESEND PATCH] arm64: defconfig: Enable DP83TG720 PHY driver
-To: Meghana Malladi <m-malladi@ti.com>, nm@ti.com
-Cc: kristo@kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, andrew@lunn.ch,
- hkallweit1@gmail.com, "Raghavendra, Vignesh" <vigneshr@ti.com>
-References: <20260226185448.2167189-1-m-malladi@ti.com>
- <79e54fc3-9e61-44ff-9919-b1163bda81e5@kernel.org>
- <ef2d207a-dd51-4db0-a909-955d5a38e1f7@ti.com>
- <76067a68-62b2-4e45-9bf4-6765be61b7f7@kernel.org>
- <1cc7fb44-c08c-4f62-ba88-20434b4954aa@ti.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <1cc7fb44-c08c-4f62-ba88-20434b4954aa@ti.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB8253:EE_|GV2PR04MB11957:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3403cd5d-81db-4d6f-5c43-08de75d2a60d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|19092799006|1800799024|366016|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	k1proLt1Lgc8bTCMcz1W101IxxHeGSSfBstSLp5WD48I5bLCGelzNSv0QK9nnJhxqlrXdg4rm+PPpvQcyRT8gbU+71B3WDmumR0Dl0LEepPDWMdA6HpYQ5B3bf5VWUY0QuFgXvdxgWTUpbzJ5Lrwoe3BmNjMvoJSpQE11N0hzSB6rhvzfRS4BEJVchwErz1n5G9bejF3hUVs2SYsH2Y20cE4lCMM/h4ZW7DS9re9sxAzku68quYG2RpK3D6rvSsD3hjlFg/+lDFNoY08yDvobFqMhPmOYji/tugqtJZIuiUiFhl6yMTySR5m0j0FRS4DVNcG7vvH5nv0Bp5a04pLGr1+RTtgkP0V2VinqAITAU6nvDbs0TwkCeROr0JhRHqLRfWj9iiCWxYRhJGurOTq4isWagdDMc4U1UD9qUxOnPlzWlXuMhbXgXMyTL4YlfZ1o/gJU9UExojpOMqr8l39qg/CRgSdSmt6XAXmHxM9eiw9liT6slyqSbXnNgsVd6DYwzBgtc4jCzkEgQiZb3HiX99JDsepXqmte1/3RxSqwzJJnC2w0yXRucn0Qll4eAqzXEvOzcEPvOklFY86Y/wDuJ+YclayY3t7jamotSuucwGiCj9rT773DZkwjx6lNKrUO/HMjACaWoaf7YGeAuby/+8DWwh8Gx2aQYgFZ94MV3l/o1Sz/5U7PL1RRwyfx7cuvrYZAvnEtA3gPNs1z2LGHlzkktgRUoOHBQpJ1QPvI+E=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8253.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?8ajOjK8sJr8qSjKiRExUBZlGRB2phpKe7W+Y+HgydYg/Hka54qpBD9MFeszm?=
+ =?us-ascii?Q?oLotvtDeXbyoGFu2dH7ZfAtcp95OdpHi1DwXn7s9XdUDywKqUiAOPldnB/XN?=
+ =?us-ascii?Q?nrhxcK+HhARoGPfWwLutfdf8y+WGUPn3vI+C22wsD/3L2btiSFHUcAzqC7wG?=
+ =?us-ascii?Q?RVf+8emxE8A5vqrK7luz9cGYQzm8oc8hoT414Ju+TWUAcT/LZbu0lAOovl2r?=
+ =?us-ascii?Q?Fsjr1sw0RDE6ZR8J2XPMRI2M0iHQ01flzJwc8hbGB01PRave3mieO6MD+PTz?=
+ =?us-ascii?Q?LsFWxMNf7viGoDRhs+TCNZvfB8bHYHcQCBdPl9rNRNuFmBe9imxJBeCZqeSs?=
+ =?us-ascii?Q?B/D+9TDWXwYMJLV1gb6nkrKlH0Nh8zX4kzj6GVC35gaaI7EE1a1Xs4uneGbv?=
+ =?us-ascii?Q?YPezBN+1qOrbP+W1/aeHijwEsaYkCS4HNGn8wN+fGyytMXVQwDcFwMtoG/3O?=
+ =?us-ascii?Q?+VNyqedd2ADL77fK4ylXeXvYxw9QkpDNjFUU5pduh3LkNKysaG1NAHLOoc35?=
+ =?us-ascii?Q?boT/MRIr5EcZZMXPi7OyuEynrC4kQlOCt7XjnHisPGyCr6ssNG2HJ1PSsnF+?=
+ =?us-ascii?Q?T8vcvAGbxahgyPz0C84kfHuUY40b7bTh8qdYrFBzXYAbQF0yMmS1LfIK3soa?=
+ =?us-ascii?Q?KIX3AIVqo4sfognQnMy8HI4Py6SFMHk9co/wH9dncQ3iSDswF9tzsfccY8rE?=
+ =?us-ascii?Q?OMGymWg4ZoQIq+rinXPpr70ZKAY2iwtZh3gFoEkxE3zM99GqmwKZqGTltm75?=
+ =?us-ascii?Q?HW334wjwfjBsHznHd04C0ntgvtsUqbJsw5nyfSW8P4V1aMNVDVDCCJCumVOc?=
+ =?us-ascii?Q?3vqwe8eBVqTywnn7Y3C7Wh3A52s4N7TrdDGsslyw8PN1nUxMPFCa+Nu9Rypt?=
+ =?us-ascii?Q?/5XIrJbpIvVm2ewjp4gfiN845C+Ldcyy8biwoSkLASd8UE7yFEFfj7g3dWDd?=
+ =?us-ascii?Q?ogIcNTP1/FPjbUDlam+NIPKYR39e0NS4GK9ruyO4HRRQCX1uu8xmMvVTMJSQ?=
+ =?us-ascii?Q?IdTNX1XdMsWrQgYvaCXlozI6ILRM7r28XEDZd8r8bjDPiYugR3GB9exVJlxv?=
+ =?us-ascii?Q?FzK2ruoYCqTmBGHGHwexzAlTSolGJuyUhhvpvxoG6tbqPVvZYWi0cFohCMbB?=
+ =?us-ascii?Q?nq3HxPp/jrCq3hyy3EfrKJKwYd+tQr4U5k1r9Z6mOGPRSZl/FCD06TI5huhR?=
+ =?us-ascii?Q?sv+melPbdcyHzKWtXnSK2TAgXR9JGh/jrK95+1WE42HBppK+JW07Lg9bdRHQ?=
+ =?us-ascii?Q?SzDMSDGTs03KIE5TX7NlXnmB8pcjcGVg2CUPHdmcAo/6lUpwHUijXRHqbBJh?=
+ =?us-ascii?Q?PPX0ScIkgPnCtnXBLr28QmGYX3n+cHLsp5y2CztPBoKdUcHpnm9lQS2H05Fh?=
+ =?us-ascii?Q?7L83tUnevBlV7SE0hPUw2CVIUgzL9QpWWt8zAHUwXSjRpftT8BLLMCeJSn+I?=
+ =?us-ascii?Q?fyiODBNEJy9oh+A++RGoBZIUL/lOBMf0wRRGYomUZOAmAJ+BDAtnmNXsStw6?=
+ =?us-ascii?Q?D0dnRmFdi4ihDWYckbFaf+1XBG++s1ERJJGvyrSS42BKOlfU8opu1Bm7xR1z?=
+ =?us-ascii?Q?PEV1gG9U5NpvL9MztdpVgGtgpvXux4yv+ZE4eGuy6H04QZRKVVyzoD3Pfame?=
+ =?us-ascii?Q?3ZpNdMzEa6fCY3ajE+YirNsCYGLPUbB4PwKmQHDAlJFDww5Y0JQGgF7yLL5r?=
+ =?us-ascii?Q?yH4tmJ/Ap8VaI4ngCP6M8EZFD+sAyWYmglS53e2/2Ms4C2nzh2ud5m9p2+Kv?=
+ =?us-ascii?Q?7ciroPWSng=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3403cd5d-81db-4d6f-5c43-08de75d2a60d
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8253.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2026 07:34:32.7518
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7P19TN0wea5gX7xWLJWibZldimmjPJG+PLeIj+kPyzq4XmNslaPQRyBsLm2T7/ChFZXXeIm8EnPNG4icwx+x1Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2PR04MB11957
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+X-Spamd-Result: default: False [1.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,lists.infradead.org,vger.kernel.org,lunn.ch,gmail.com,ti.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-261740-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261741-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.996];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7C2EA1B3E6A
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: ABED81B3F5D
 X-Rspamd-Action: no action
 
-On 27/02/2026 08:24, Meghana Malladi wrote:
+On Thu, Feb 26, 2026 at 06:25:11PM -0800, Jakub Kicinski wrote:
+> On Thu, 26 Feb 2026 16:18:21 +0200 Ioana Ciornei wrote:
+> > > How about, fail the test if any are greater than 1% of the number of
+> > > packets transmitted/received? My _guess_ is, if you have 1% packet
+> > > loss, networking is not going to be happy anyway. It probably means
+> > > you have one end doing Half duplex and the other Full. That is a
+> > > typical configuration error you see causing collisions. Not that i've
+> > > actually seen this for maybe a decade!
+> > > 
+> > > Failing the test, with a comment about checking duplex configuration,
+> > > seems sensible.  
+> > 
+> > Seems reasonable. Thanks for the help!
 > 
-> 
-> On 2/27/26 12:51, Krzysztof Kozlowski wrote:
->> On 27/02/2026 08:15, Meghana Malladi wrote:
->>>
->>>
->>> On 2/27/26 12:12, Krzysztof Kozlowski wrote:
->>>> On 26/02/2026 19:54, Meghana Malladi wrote:
->>>>> Enable DP83TG720 PHY driver as a module to support TI's DP83TG720
->>>>> 1000BASE-T1 Automotive Ethernet PHY. This is required for the
->>>>> DP83TG720-IND-SPE-EVM daughter card used with AM642 EVM ICSSG0
->>>>> interface.
->>>>
->>>> Grepping for DP83TG720 or IND-SPE-EVM gives me no results. Are you sure
->>>> this is the board supported upstream?
->>>>
->>>
->>> Yes, this series adds support adds support for the board:
->>> https://lore.kernel.org/all/20231212054144.87527-1-o.rempel@pengutronix.de/
->>
->> I still wonder why there is no DTS for this.
->>
-> 
-> I posted DTS patch separately for this: 
-> https://lore.kernel.org/all/20260226115454.1730618-1-m-malladi@ti.com/
-> 
-> Does it make more sense to post them together as a series ?
+> FWIW the expectation is that the test should be able to run even on
+> systems / boards with a single interface. So the control traffic
+> (communicating with the traffic generator) will run over the same
+> interface as the test. 1% error is unachievable. I'd only check the
+> lower bound, and use some sanity value for the upper bound (2^30 ?)
+> if at all
 
-Of course, you target the same subsystem - soc. Why triggering all these
-investigations and questions...
+Really? I didn't know of that expectation at all.
 
-Best regards,
-Krzysztof
+I did take ethtool_rmon.sh as an example and that selftest as well
+takes NUM_NETIFS=2 and does check for both a lower bound and upper bound
+that takes into account a 1% deviance from the target.
+
+How would the test even work with only a single interface?
 
