@@ -1,115 +1,143 @@
-Return-Path: <netdev+bounces-261978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261979-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GP4aM/z/oWl4yAQAu9opvQ
-	(envelope-from <netdev+bounces-261978-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 21:35:08 +0100
+	id IKYsEnEAomm9yAQAu9opvQ
+	(envelope-from <netdev+bounces-261979-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 21:37:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 057551BDAFD
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 21:35:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B79591BDBAB
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 21:37:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 465AA30288FD
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 20:30:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6B4023115E35
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 20:35:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B2D33D523F;
-	Fri, 27 Feb 2026 20:30:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BEA0477E33;
+	Fri, 27 Feb 2026 20:35:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aJsE4v2t"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R0iUrGgo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f73.google.com (mail-dl1-f73.google.com [74.125.82.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29215261B71
-	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 20:30:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A39A38551C
+	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 20:35:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772224214; cv=none; b=d/5s8dVQWKwiTZ8SHDC0Phcqq8AmfyQi/e8noU45IF+QN8tp/yKz45XhhKUNM0fNHqc9jO5NGVjo3T+U9FJ4Runf1hcI4iHycPsCVKoGK3BbxaPsZftS/m56mL04m9b+8V6+L6vgiXGzYoQRUPJ5RfgUE6pSkroHhS5tjrLh4ck=
+	t=1772224534; cv=none; b=QhzjoSFXJMr6QJPJXJrrhvQepNnRoiQmkCHjLNi2obs1SDF5iTRn5HVakC6shxz+XSd4Qnxw4McuvYcE9iKI8EpyMU62lPDx8MFzIDaApDQraTe8pjAG/LAcKvbA6uPpaIMHfocW2GW5DmbSRwVUjAf7dIpLxIN5jd/uMBN2C/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772224214; c=relaxed/simple;
-	bh=mVle4ytW4J5vmpgGxb7eoplyg61Pv0xhWPF3sgrQdE4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z23cR58woUHaqDL5w91h1Cbc3DHMGDqon13XtmaKeTBrMYAYSgCt6N6wJLffLsc9GPPLqaAyNZuMrrA8iukUPpp72T2xBeQcR2W61YEnljxqqt5US+HPZSIC8QSU8sQD2SaH3665xwk0L+WVlRXc0sUnApBW2AFwAgs3ooxUSZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aJsE4v2t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADB7DC116C6;
-	Fri, 27 Feb 2026 20:30:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772224213;
-	bh=mVle4ytW4J5vmpgGxb7eoplyg61Pv0xhWPF3sgrQdE4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=aJsE4v2tLtiuFbTjX21Brii/I5EV0y6wSXBWNpfmGnu9ah8J2sHng5m4ihXr0nbvR
-	 x/z/eEJSMUN5pb3UBNE0tCSckcbrRhyIvW+mX4sGOH77iqFL1xs4d/SxRMj3Wv9Z2z
-	 9BMl/nPzqIUTI7DDHolirzisFNAZFku1axtYT+DeFVuZ6RaEMo8uPlHDvin5st7aPm
-	 PHLlqppWBxVRa3UozUlNTwTQoWuwzXkhErUlllVVuqcjzoJlDnUZ38f2A9lko5w+9f
-	 YduFIRGis+qX0CKL5X0+dfjxK3LYYzOYSbvJEgyK17qVzBFWhnMCgOwluaj0PYODEy
-	 sRsbV8iKEBpZw==
-Message-ID: <6fa8c88e-d1fb-42ba-a0a1-f8aa6802b454@kernel.org>
-Date: Fri, 27 Feb 2026 13:30:12 -0700
+	s=arc-20240116; t=1772224534; c=relaxed/simple;
+	bh=rjHPintehtxkM9UQsRWMqrYGwY/SaNBxtvh2ru+FDpM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=LmguNtT0ZgnvTTE16lCsZmftvr/n2FuKYF2nOjeW+wDL4ujM22Fb60WShkmj33oU8UzdPr6s2uC0iR7uLGMpn6yAbGy8VE7144rmB8QhQ0SxutNq9ENhxVavOiplkj2baAJE688NfPfDSLwymZuvBhZ29tZIEou0uY0jp1OuH0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--srutherford.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R0iUrGgo; arc=none smtp.client-ip=74.125.82.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--srutherford.bounces.google.com
+Received: by mail-dl1-f73.google.com with SMTP id a92af1059eb24-12711967e0eso3312458c88.0
+        for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 12:35:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772224531; x=1772829331; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=nRaIjBVYslTopVZnWl1PKdjxejATawghymOdcPvjdcM=;
+        b=R0iUrGgol4tL9q70rFD9WqTyanQutyR67QvrPGpLZ5YfxRdlxNatDfKbkBM4ycM4N1
+         9gyfQnJqwq8X0UmH8YQVHTEAUfopPcMJ/n5LdmxwWiBC7BoYsH5kixJRYNmwLsFwZJnq
+         sBnTsEOm/xoPy/Ii+h0jYkzGnXX1wJ9XqGPvUuF+1roJod37jD56OFZOdnRvtN5bzr9x
+         9q0kxt5sFpTKSx/dsJubyTSYprrAM7WYf6qcK0azms57JoT3/t8Ga9af2WVP2Kue64+Y
+         /ZI6RpyUepX1Zbm8A713ZgKJnTkT6ZAroLD4GvH2cCTo6/Mt8izN9F/xHGl/mszheDmg
+         itmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772224531; x=1772829331;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nRaIjBVYslTopVZnWl1PKdjxejATawghymOdcPvjdcM=;
+        b=j+0uz2jrhu98/LubPhwkAN7poBijqoafxsRfpVD+zhkqPLsvJusUxWim3J84Is+k4r
+         FA1hL24TLFn/gMZbnC1MXpr5+r59bcd8YhQ5XiocxygVb2WZoDedEKYBE1iJ3pGNIJ5+
+         f0rIbkNmPkJqUsMsgK3z38LkBSuIiuy8uEEMnOtmOfmLlgTFqUhotQl5wC6eghsNwJKZ
+         kzEvRN9WM7LWLa8/x0euh+A7mHYnbuTxa/zGuqSq3alI38LH8dxibv1IlGOz8LoILo3e
+         EiRxV8/YofgYV73fH7sn77ewtM6np5+058Azt/Kbidn0r4CF8OILQfXFDIYFv0G9lsyR
+         Y5LA==
+X-Gm-Message-State: AOJu0YzXr0bFPWXhEiyyxkZXwqaEv9/ZCScyfXES/MeRW2ETshuJDdCd
+	qDsw4MX3kRKCC/TKRvzT9gPVTvBYfQS9qYFgfuz5ckqiC/W/hUzxsowchY8rcCkV+rWVbegGH+W
+	on/LHZULpw/+dMog9LLh/PqqJNw==
+X-Received: from dlj37.prod.google.com ([2002:a05:7022:525:b0:127:16fc:ca92])
+ (user=srutherford job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:7022:43aa:b0:119:e56c:18be with SMTP id a92af1059eb24-1278fc8a31cmr1426907c88.38.1772224529468;
+ Fri, 27 Feb 2026 12:35:29 -0800 (PST)
+Date: Fri, 27 Feb 2026 20:34:56 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2] ip/netns: avoid redundant mounts
-Content-Language: en-US
-To: Chen Linxuan <me@black-desk.cn>
-Cc: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org,
- "Eric W. Biederman" <ebiederm@xmission.com>,
- Lennart Poettering <lennart@poettering.net>, Luca Boccassi <bluca@debian.org>
-References: <20260210-netns-redundant-mount-v1-1-0b1ebfc1c79f@black-desk.cn>
- <a9197cec-d406-4201-98d4-a06820b220f3@kernel.org>
- <CAC1kPDOs4MP0=89Aa=Y_nZmVY2_9WUgfQs0x=wd-FPMFedrVqw@mail.gmail.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <CAC1kPDOs4MP0=89Aa=Y_nZmVY2_9WUgfQs0x=wd-FPMFedrVqw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+Message-ID: <20260227203457.558196-1-srutherford@google.com>
+Subject: [RFC PATCHv2 0/1] idpf: IDPF + SWIOTLB Bug
+From: Steve Rutherford <srutherford@google.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, aleksander.lobakin@intel.com, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	David Decotigny <decot@google.com>, Anjali Singhai <anjali.singhai@intel.com>, 
+	Sridhar Samudrala <sridhar.samudrala@intel.com>, Brian Vazquez <brianvv@google.com>, 
+	Li Li <boolli@google.com>, emil.s.tantilov@intel.com, 
+	Steve Rutherford <srutherford@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-261979-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261978-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[srutherford@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 057551BDAFD
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B79591BDBAB
 X-Rspamd-Action: no action
 
-On 2/24/26 6:21 PM, Chen Linxuan wrote:
->> with this patch I am still seeing 2 entries:
->>
->> $ sudo ./ip netns add blah
->> $ cat /proc/self/mountinfo  | grep blah
->> 337 92 0:4 net:[4026532418] /run/netns/blah rw shared:344 - nsfs nsfs rw
->> 338 28 0:4 net:[4026532418] /run/netns/blah rw shared:344 - nsfs nsfs rw
-> 
-> It seems like your old `ip` might have create the /run/netns mount point.
-> After remove all netns then umount /run/netns, and ip netns add blah again.
-> You should see only one entries.
+Found an issue with the IDPF driver when SWIOTLB is enabled. The issue
+results in empty headers for packets that hit the split queue workaround
+path. It's caused by a spurious sync in that path. The header is synced
+from the SWIOTLB even when the header was shoved into the payload.
 
-Fair point. I no longer have the patch, so send it again and I will try
-a test in a new VM.
+I cooked up a sample patch, but I'm not an expert in this driver, so I have
+no idea if it's the right solution. It did allow my QEMU VM to boot with a
+superficially functional passed-through IDPF NIC and SWIOTLB=force.
 
+The patch was written against COS's 6.12, so I assume that it will not
+apply cleanly elsewhere, but I figured a wrong sample patch was better than
+a long paragraph describing the same thing. My read of more recent kernels
+is that this problem is still present, but could be mistaken.
+
+v2 - Updated title and tags based on feedback.
+
+Steve Rutherford (1):
+  idpf: Fix header clobber in IDPF with SWIOTLB enabled
+
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+-- 
+2.53.0.473.g4a7958ca14-goog
 
 
