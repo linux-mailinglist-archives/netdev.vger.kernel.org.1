@@ -1,108 +1,104 @@
-Return-Path: <netdev+bounces-261935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261937-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0AtoNKTYoWlcwgQAu9opvQ
-	(envelope-from <netdev+bounces-261935-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 18:47:16 +0100
+	id uFEABcLXoWlcwgQAu9opvQ
+	(envelope-from <netdev+bounces-261937-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 18:43:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F8CB1BB9B5
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 18:47:16 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62B821BB92E
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 18:43:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D54D631AA7E7
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 17:42:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 824EF30518CE
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 17:43:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 816AB44CACC;
-	Fri, 27 Feb 2026 17:42:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8082244BCB7;
+	Fri, 27 Feb 2026 17:43:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="HLYLc25n"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="HC69O4Du"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f68.google.com (mail-ot1-f68.google.com [209.85.210.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazhn15012042.outbound.protection.outlook.com [52.102.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D84243E9C5
-	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 17:42:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.68
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772214144; cv=none; b=aV6APa1jO+uFL//uIA59VxngJAjS2yq0Xy8tjBzehE7w76fve7dWoRCNFWs8w2bHvo6q7wONqJLFAM6EblRYjWYaGfevYAEd9ClDmf/BCAufide4MfaJVcC4a5yWPYLxWJevW3c9Yp5fwXSUecWo+kRcrDOQ85bHyelQy6zPyd8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772214144; c=relaxed/simple;
-	bh=8rOZ+tcz92iZfnLYzZlxJbEVocSTu0CogNkErHUmH7U=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aTg7+kAI5/SHTPEnU8WC3OzdeWByfZuhqTtxb6Vds/KRUH4hBhMgxWXsGye4DUNaPjUdlk2LZWC+Pj+w9QTjX5rXssS+Lv/TsyMSF9by8U0gas5/p7g+Kcm2eQ7GGNWVJP5/99HnsAU+KmIKpVrGJ0CcCnc5+xVzSN6Jac4ud+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=HLYLc25n; arc=none smtp.client-ip=209.85.210.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ot1-f68.google.com with SMTP id 46e09a7af769-7d596a5be31so821463a34.3
-        for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 09:42:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1772214139; x=1772818939; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EyMpLHKzc9IHBWU2hZy73Xs0ZZK4TMATc0/iCm8bjws=;
-        b=HLYLc25nP2RbxXHRWoDhLNzze/Uzr0ifJyEd1Nz2TMgLtNlhMjAwMwgJisFsvo4L1d
-         jgeb5Ev2aoAzTLpAFjscbw4B85Ruu7pNd+lxW9ELRYvllYpbgUfQtauCpJQvKHn0L2Jq
-         5zMv4eX3xY1i+kjAiun4TFt36ROv3o7u3coFp+dXUIk/p9mteWyAOWPu0/wff8oMDImU
-         UXZrtxxQh6Qeg7Y6FJzf8cpHzZBFazZoJUJd7HMwF86SDNoU+ut0BvPxxIrqjt0rP4hJ
-         PIjWIq5HS7m3ik4xhI16EmTlQzmXiTR9PEUvV3gaVl/PhhFHkOMEWcEOw6ZcdGbjIU8F
-         szZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772214139; x=1772818939;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=EyMpLHKzc9IHBWU2hZy73Xs0ZZK4TMATc0/iCm8bjws=;
-        b=d1oss8TwKpWIQITnzJKE9Zr4eR9PcU9XbH5873iJWoTV8Oyo2xUyI9JZDA2ab+ixey
-         YqXrcJu2F6LMz6rINOFPanjmLYOpvWHbsPziPkwCSAVxODewhH3uG8bakxlUgRiaM1Mh
-         yQmqWOMmPdt5TdbMG/Ab2SLDiKrVrMpFXIRc405QF4ek0E18aV/9MmoTeR8lT645zC2n
-         gB4MqUTAJMBHU4AfD3XhQemmmNK0iLtHJopLN2OX34v49ibQTjb2mPiTVvjrx99TkEZM
-         VpHrRohI7yHz2S16Ge8MFXSGfg1ZEMo3eswK21XRtnoS/Zwvs5ICzC0Z4TWngBLOpnIn
-         Jo0A==
-X-Forwarded-Encrypted: i=1; AJvYcCXO5vsZ7yxB+GlM27MNm9aWWoCnXhHqH/I2xd65qN7D4eN+0OTDqVIgA9rkgtsv65/pIhSI2nM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjUf25zy/HlHBVx70TH408zlnF9/1Spng1S0WA36VrRjKiALce
-	narngesiUS7Yu84u1L1afjaP55vYxTy1M4LXsRfgaI0LB7fizhAGhxKRUljqG2kOaj4=
-X-Gm-Gg: ATEYQzyN8yg2OvaCfRT8UaQZrLktiICVV4fIQKuaxzHtmhK3fhoOEIjlipbD5Q5ibWU
-	SVle5/v+kFqgGidIBnMo/xAER6PpnVHStMXIi/Fts1QuNZotFH1Ce5Xwtn8KOvaHbJwgk36s+bx
-	vXH0/hBCfQq3Kdc9aVJAxtGnANdxLU5tVRAauTr8PzCmz4zmyiO7wGczchyMiweGiJ6eWoGMV+Q
-	1njBMmrEcQE56/hD3ISDnonOvvwMT/6dNIXZB6ihJZT6n086qohmIWxBrHEe9LkB/moC7LnEey4
-	KvgTNKmCtmoKSX5QKbx2mJnBMe75ADX2XpyxT/iyI5G0t9KWe6wph8Pi9x4cvTImK1W5yqAjwA4
-	nTwL3+sEzSWuAXPunQKt8K1nDTHWQBjk28PuQlLdeWNc/UGGq0lVEfhTrgDKtRYXXbuVfODxKda
-	1V+xiTQYE=
-X-Received: by 2002:a05:6830:6609:b0:7d1:66e2:44ce with SMTP id 46e09a7af769-7d591b23859mr2333784a34.1.1772214139176;
-        Fri, 27 Feb 2026 09:42:19 -0800 (PST)
-Received: from 20HS2G4.. ([2a09:bac1:76c0:540::f:3cb])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d58644edf0sm4723385a34.2.2026.02.27.09.42.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Feb 2026 09:42:18 -0800 (PST)
-From: Chris J Arges <carges@cloudflare.com>
-To: michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>
-Cc: kernel-team@cloudflare.com,
-	Chris J Arges <carges@cloudflare.com>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH net-next 4/4] selftests: drv-net: xdp: Add rss_hash metadata tests
-Date: Fri, 27 Feb 2026 11:40:20 -0600
-Message-ID: <4cf6b0ddf92fa8b9bc2107a20be08ea0a232e4ca.1772211065.git.carges@cloudflare.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1772211065.git.carges@cloudflare.com>
-References: <cover.1772211065.git.carges@cloudflare.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92EDD44BCA3;
+	Fri, 27 Feb 2026 17:43:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.102.128.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772214196; cv=fail; b=B3iVNViX2XaudFSCoMRYupZrhGh6XP4ZB+yw432Ypn7m8yid8zGLr+Mv/MwGrJsf8yHKNLRN04NjO2nXfiP0jdS907ea6lx8OKf1MI7QPhoFXqufkzbeZoJjjxf+KAeHPslC73Pu9/meFxGJ9zcAHfpByy9tLZDYOJ3xdkMDdRU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772214196; c=relaxed/simple;
+	bh=/qADd07IQbyjRFT1fZ642bfisUCWwkO7VQw5JzeKeM4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qnpLURNILUMHxw6evHsil9FCDpuZEq87djlAphFfhtLBck3QKCzYBzi0/eGcysJvGzkbIKwCmYiW1QIeRIf2QFIGLKbGy3OASRXnpnvyl3gfs8jCon3wK7L2QEZ4IaMV9HfPq5xkyfWqABRTjFdJLIYt6gv1DveAE7Zk6Me7bWg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=HC69O4Du; arc=fail smtp.client-ip=52.102.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=fnREBcAIGdDKXbO1SoftSTXwOaOLv+jqUhgANyGkGQAY7QWE+hhAwiidEpV42Jjqc3aXEr8EhzKKothjdbGRm+5edhJbGumvpVBDnh8wX0E9G7WoLRUjXFgDLT3mWVmfPprRp2HRQ/NfQwwLxJka4djrnrA3vmUT1BToE/Q/r7dDB4oMTD9/gCiS6qcOYonz9ijRy7QJ0M6f+yrgBFw5d78E5B/iB6xLHUdWWGQyi+2wa6Jzl+n45srbzp5oRx9XAX2RtTmDuyE1hWDJqOhxkK2EGzU+Aouxmq0fkqXADoGudtC9n+e1LatdCRrO+v8+SUXvktA2i62L4KkOshDF9w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PrCCQaBYgKQGcTp3C0fxlRQhhqPKhxAZfjgNw6tNvNY=;
+ b=e8i4YKd8eA97mZetfhxQatm77JQx7CDU/x/30K9dGx4J7MlAq4Nvh0o6zXD9csO42Agce5360Vviq5/jNTQRFxEZFjPW3rSgXGhPz2SGAOdzrOufSsdmQDXHCpmcfUb4hVKHBXXdY5vWpOSt5WaIQCL2w2LIyr4P5lX93klMwmX4Ddh5HgEukPeeX4eUPEfCDWcXbLd9tTzT/nKTu0Av4KAOYrGfpcXB7Wxvomij/tiK9sAElX0xq9PwOybRN/7ZMHQXINa88WrdvOnMhq03zmNct2/KqRPq5tH1h7+OqctXOYsq8PN/VrPzWJTSY2EpeHJxh1s/c1eNAclJJ5cUsA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.23.195) smtp.rcpttodomain=lunn.ch smtp.mailfrom=ti.com; dmarc=pass
+ (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
+ (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PrCCQaBYgKQGcTp3C0fxlRQhhqPKhxAZfjgNw6tNvNY=;
+ b=HC69O4DuUDBYq6ADEcZlt8x1IwQRJ9tMSvZW13O4vTMPx35QkKJUPHYL0N/70nsXka5QDu38Gf+nPbQaH8yHoGWaN55PAFgUhtgvW4a3un/DefpWYilZdlcK2o0cFrue0/syXVil+C8u2ZJ1tQ8I0ISqJ651RnfKihK8zdpQVyY=
+Received: from SA0PR11CA0058.namprd11.prod.outlook.com (2603:10b6:806:d0::33)
+ by DS0PR10MB8030.namprd10.prod.outlook.com (2603:10b6:8:1f7::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.14; Fri, 27 Feb
+ 2026 17:43:08 +0000
+Received: from SN1PEPF0002636D.namprd02.prod.outlook.com
+ (2603:10b6:806:d0:cafe::4f) by SA0PR11CA0058.outlook.office365.com
+ (2603:10b6:806:d0::33) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.27 via Frontend Transport; Fri,
+ 27 Feb 2026 17:42:40 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.195)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.23.195 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.23.195; helo=lewvzet201.ext.ti.com; pr=C
+Received: from lewvzet201.ext.ti.com (198.47.23.195) by
+ SN1PEPF0002636D.mail.protection.outlook.com (10.167.241.138) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9654.16 via Frontend Transport; Fri, 27 Feb 2026 17:43:07 +0000
+Received: from DLEE206.ent.ti.com (157.170.170.90) by lewvzet201.ext.ti.com
+ (10.4.14.104) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 27 Feb
+ 2026 11:42:59 -0600
+Received: from DLEE202.ent.ti.com (157.170.170.77) by DLEE206.ent.ti.com
+ (157.170.170.90) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 27 Feb
+ 2026 11:42:59 -0600
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE202.ent.ti.com
+ (157.170.170.77) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Fri, 27 Feb 2026 11:42:59 -0600
+Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 61RHgxn54139956;
+	Fri, 27 Feb 2026 11:42:59 -0600
+Received: from localhost (dhcp-172-24-231-152.dhcp.ti.com [172.24.231.152])
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 61RHgvst008410;
+	Fri, 27 Feb 2026 11:42:58 -0600
+From: MD Danish Anwar <danishanwar@ti.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Meghana Malladi
+	<m-malladi@ti.com>, Jacob Keller <jacob.e.keller@intel.com>, Kevin Hao
+	<haokexin@gmail.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>
+CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Vignesh Raghavendra <vigneshr@ti.com>, "Roger
+ Quadros" <rogerq@kernel.org>, <danishanwar@ti.com>
+Subject: [PATCH net-next] net: ti: icssg: Add HSR/PRP protocol frame filtering
+Date: Fri, 27 Feb 2026 23:12:54 +0530
+Message-ID: <20260227174254.3821443-1-danishanwar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -110,395 +106,241 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002636D:EE_|DS0PR10MB8030:EE_
+X-MS-Office365-Filtering-Correlation-Id: a473df0b-0ac2-4de9-0838-08de7627aae7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|34020700016|82310400026|36860700013|1800799024|12100799066;
+X-Microsoft-Antispam-Message-Info:
+	8VhGA8GfEctnHy2yjDr/a2BuQXFDV6prXZbikTbFbypYQifFT1yqrHw/Q7xS3Z+QCV2UG2r0OZkV67dVkm0vlvMXEjMtrCfU4rLYRq36iXw6zeHBOAGLcmu1/fBPq4sP28QNZ5XH9zp2ND4lv0JpBN85XFvpCxCqxSl2Ke6tshNn1yJNIe1soZZkYjGH6Y4tD4vaJODvZDP4subISIOMs2HU32BgxRryKXcnNaeTsDlg2CwnvKfrU2VVg6XapWTBBuhyeyF1qyQfvjCm8dfG1WTmNxRRjjrcJbAFiw9xYtKyx0CbM5npyo/3G12OcNVQh9MV/O3y5efb6GD087+amfcket7bLJm0obMeKENanlcuA/eum2V0wiU4XpsbUxaJ0ZKvGAdRt/1bWAru7WIpjhFJCSibguG+q/hhes6IZnzp8ZlOVV/ENpbZr4OiayzaIPNh0Uh6Qrz5MwOIwZFdJ/F1d7hoMR+y1+aInDSiEq4QZ58o/7ZusWCOMKBsVg4u9nZEUpvtKgMzBpKyz+iSVXHr+xlVU9UxUVuD0Dgw9oY6jutR8/7aTWdP1J9RgI2+YVQFhUIVf9l2RabthTjMCG53YzBNAHLu75otPloIbVPpXKk9PsPyHMLyihQnrLs5Q/PHiloDVOD2CGfMxw6RQLfXMmD0ZC6W6k1IJpxhD34Q/MzxhHzhwWwVpih1OQPSf8BOJKoYE/2E7wPdHyP8g1mdqKagzgnW8GRc+g/PpMRs9LLsJhw/z6IUd/qCvuqI7FPnzGAQcRtZvPg9sJOu6pacgE6z9OapyghCx+asBRxo3tdYrTSH3Mo9DRXbJliJoSiAmmATPZqWBFPp3MpMPg==
+X-Forefront-Antispam-Report:
+	CIP:198.47.23.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet201.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(34020700016)(82310400026)(36860700013)(1800799024)(12100799066);DIR:OUT;SFP:1501;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	Id8n87TveFksCTIM4l04n6FHCuD+Q1Ec79BxoriydL1FMEMrzKpbCI9BwwDpL/fdkzwf8zdpNentyBxrWS3Ml1yLSRy8tRLunafiTr947vCw2WCMrEOhKNDTUUY4bW1bSaeYvXtUF05/1LQugXpnZy3qXo+EfqBrIbAXT9HfeSbbaSkumNGdBY+HRV7GfSETnGPkAcNg0WP1D6yrKEFHHi5zqD/ZZb5ydmORnv2dRTrs1CqTti8bt+Aynxox5jQorPe+8n6M+vmYNnXSKHlNqM/RfsZ7gazm7569Xo+Jm9e3kV7pCy4pHHFUyKmFwPvLJGGCulAS0Ysw1pbDVhDLJ5u2Ao0y7r6q7+MCXRnfJ0y3y1Woy63//1EvMHVUZr6JrFqaJopBIPxwM9jDx6HYPeyjYcvZumGhVxNK0sleE6n6GTEclQ9EAH7S2Usv9Dmf
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2026 17:43:07.5876
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: a473df0b-0ac2-4de9-0838-08de7627aae7
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.195];Helo=[lewvzet201.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF0002636D.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB8030
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-6.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[cloudflare.com:D:+];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
-	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,ti.com,intel.com,gmail.com,linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-261935-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-261937-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[ti.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[carges@cloudflare.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[danishanwar@ti.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[cloudflare.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.983];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[cloudflare.com:mid,cloudflare.com:dkim,cloudflare.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lib.py:url,xdp_metadata.py:url]
-X-Rspamd-Queue-Id: 4F8CB1BB9B5
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,ti.com:mid,ti.com:dkim,ti.com:email];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[11]
+X-Rspamd-Queue-Id: 62B821BB92E
 X-Rspamd-Action: no action
 
-This test loads xdp_metadata.bpf which calls bpf_xdp_metadata_rx_hash() on
-incoming packets. The metadata from that packet is then sent to a BPF
-map for validation. It borrows structure from xdp.py, reusing common
-functions.
+Add support for HSR and PRP protocol frame filtering in the ICSSG
+classifier by configuring filter table 3 (FT3) to detect PTP frames
+(EtherType 0x88F7) in HSR/PRP tagged packets.
 
-The test checks the device's xdp-rx-metadata-features via netlink
-before running and skips on devices that do not advertise hash support.
-This allows the tests to pass, but one can override the device and test on
-HW or veth devices.
+Also add rx_class_or_base to miig_rt_offsets structure to support
+RX_CLASS_OR register access, and fix typos in FT1_N_REG and FT3_N_REG
+macros (slize -> slice).
 
-The test is fairly simple and just verifies that a TCP or UDP packet can be
-identified as an L4 flow. This minimal test also passes if run on a veth
-device.
-
-Signed-off-by: Chris J Arges <carges@cloudflare.com>
+Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
 ---
- tools/testing/selftests/drivers/net/Makefile  |   1 +
- .../selftests/drivers/net/xdp_metadata.py     | 144 ++++++++++++++++
- .../selftests/net/lib/xdp_metadata.bpf.c      | 163 ++++++++++++++++++
- 3 files changed, 308 insertions(+)
- create mode 100644 tools/testing/selftests/drivers/net/xdp_metadata.py
- create mode 100644 tools/testing/selftests/net/lib/xdp_metadata.bpf.c
+ .../net/ethernet/ti/icssg/icssg_classifier.c  | 69 ++++++++++++++++++-
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c  |  6 ++
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h  |  2 +
+ 3 files changed, 75 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
-index 8154d6d429d3..6f9708e8d05a 100644
---- a/tools/testing/selftests/drivers/net/Makefile
-+++ b/tools/testing/selftests/drivers/net/Makefile
-@@ -23,6 +23,7 @@ TEST_PROGS := \
- 	shaper.py \
- 	stats.py \
- 	xdp.py \
-+	xdp_metadata.py \
- # end of TEST_PROGS
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_classifier.c b/drivers/net/ethernet/ti/icssg/icssg_classifier.c
+index 833ca86d0b71..cde53d9aaa7b 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_classifier.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_classifier.c
+@@ -27,7 +27,7 @@
+ #define FT1_DA0_MASK	0x8
+ #define FT1_DA1_MASK	0xc
  
- # YNL files, must be before "include ..lib.mk"
-diff --git a/tools/testing/selftests/drivers/net/xdp_metadata.py b/tools/testing/selftests/drivers/net/xdp_metadata.py
-new file mode 100644
-index 000000000000..7b8a3d00b0ac
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/xdp_metadata.py
-@@ -0,0 +1,144 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
+-#define FT1_N_REG(slize, n, reg)	\
++#define FT1_N_REG(slice, n, reg)	\
+ 	(offs[slice].ft1_slot_base + FT1_SLOT_SIZE * (n) + (reg))
+ 
+ #define FT1_LEN_MASK		GENMASK(19, 16)
+@@ -62,7 +62,7 @@ enum ft1_cfg_type {
+ #define FT3_T			0x18
+ #define FT3_T_MASK		0x1c
+ 
+-#define FT3_N_REG(slize, n, reg)	\
++#define FT3_N_REG(slice, n, reg)	\
+ 	(offs[slice].ft3_slot_base + FT3_SLOT_SIZE * (n) + (reg))
+ 
+ /* offsets from rx_class n's base */
+@@ -74,6 +74,9 @@ enum ft1_cfg_type {
+ #define RX_CLASS_N_REG(slice, n, reg)	\
+ 	(offs[slice].rx_class_base + RX_CLASS_EN_SIZE * (n) + (reg))
+ 
++#define RX_CLASS_OR_REG(slice, n, reg)	\
++	(offs[slice].rx_class_or_base + RX_CLASS_EN_SIZE * (n) + (reg))
 +
-+"""
-+Tests for XDP metadata kfuncs (e.g. bpf_xdp_metadata_rx_hash).
+ /* RX Class Gates */
+ #define RX_CLASS_GATES_SIZE	0x4	/* bytes */
+ 
+@@ -102,6 +105,22 @@ enum ft1_cfg_type {
+ 	((BIT(slot) << RX_CLASS_FT_FT1_MATCH_SHIFT) & \
+ 	RX_CLASS_FT_FT1_MATCH_MASK)
+ 
++/* HSR/PRP protocol frame filtering */
++#define HSR_PTP_ETHERTYPE_OFFSET	0x12
++#define PRP_PTP_ETHERTYPE_OFFSET	0x0C
++#define FT3_PTP_PATTERN			0xF788
++#define FT3_ETHERTYPE_MASK		0xFFFF0000U
++#define FT3_VLAN_MODE_BOTH		0x1
++#define RX_CLASS_OR_DUP_PTP		0x4200
++#define RX_CLASS_OR_HSR_TAG		0x4000
++#define RX_CLASS_GATE_PTP		0x50
++#define RX_CLASS_DISABLE		0x0
 +
-+These tests load device-bound XDP programs from xdp_metadata.bpf.o
-+that call metadata kfuncs, send traffic, and verify the extracted
-+metadata via BPF maps.
-+"""
-+from lib.py import ksft_run, ksft_exit, ksft_ge, ksft_ne, ksft_pr
-+from lib.py import KsftNamedVariant, ksft_variants
-+from lib.py import CmdExitFailure, KsftSkipEx, NetDrvEpEnv
-+from lib.py import NetdevFamily
-+from lib.py import bkg, cmd, rand_port, wait_port_listen
-+from lib.py import ip, bpftool, defer
-+from lib.py import bpf_map_set, bpf_map_dump, bpf_prog_map_ids
++/* HSR/PRP classifier indices */
++#define CLASSIFIER_PTP_DUP		10
++#define CLASSIFIER_HSR_TAG		11
++#define FT3_PTP_SLOT			14
 +
+ /* RX class type */
+ enum rx_class_sel_type {
+ 	RX_CLASS_SEL_TYPE_OR = 0,
+@@ -133,6 +152,7 @@ struct miig_rt_offsets {
+ 	u32 ft3_p_base;
+ 	u32 ft_rx_ptr;
+ 	u32 rx_class_base;
++	u32 rx_class_or_base;
+ 	u32 rx_class_cfg1;
+ 	u32 rx_class_cfg2;
+ 	u32 rx_class_gates_base;
+@@ -161,6 +181,7 @@ static const struct miig_rt_offsets offs[] = {
+ 		0x308,
+ 		0x408,
+ 		0x40c,
++		0x410,
+ 		0x48c,
+ 		0x490,
+ 		0x494,
+@@ -186,6 +207,7 @@ static const struct miig_rt_offsets offs[] = {
+ 		0x8d4,
+ 		0x9d4,
+ 		0x9d8,
++		0x9dc,
+ 		0xa58,
+ 		0xa5c,
+ 		0xa60,
+@@ -467,3 +489,46 @@ void icssg_ft1_set_mac_addr(struct regmap *miig_rt, int slice, u8 *mac_addr)
+ 	rx_class_ft1_cfg_set_type(miig_rt, slice, 0, FT1_CFG_TYPE_EQ);
+ }
+ EXPORT_SYMBOL_GPL(icssg_ft1_set_mac_addr);
 +
-+def _load_xdp_metadata_prog(cfg, prog_name, bpf_file="xdp_metadata.bpf.o"):
-+    """Load a device-bound XDP metadata program and return prog/map info.
-+
-+    Returns:
-+        dict with 'id', 'name', and 'maps' (name -> map_id).
-+    """
-+    abs_path = cfg.net_lib_dir / bpf_file
-+    pin_dir = "/sys/fs/bpf/xdp_metadata_test"
-+
-+    cmd(f"rm -rf {pin_dir}", shell=True, fail=False)
-+    cmd(f"mkdir -p {pin_dir}", shell=True)
-+
-+    try:
-+        bpftool(f"prog loadall {abs_path} {pin_dir} type xdp "
-+                f"xdpmeta_dev {cfg.ifname}")
-+    except CmdExitFailure as e:
-+        cmd(f"rm -rf {pin_dir}", shell=True, fail=False)
-+        raise KsftSkipEx(
-+            f"Failed to load device-bound XDP program '{prog_name}'"
-+        ) from e
-+    defer(cmd, f"rm -rf {pin_dir}", shell=True, fail=False)
-+
-+    pin_path = f"{pin_dir}/{prog_name}"
-+    ip(f"link set dev {cfg.ifname} xdpdrv pinned {pin_path}")
-+    defer(ip, f"link set dev {cfg.ifname} xdpdrv off")
-+
-+    xdp_info = ip(f"-d link show dev {cfg.ifname}", json=True)[0]
-+    prog_id = xdp_info["xdp"]["prog"]["id"]
-+
-+    return {"id": prog_id,
-+            "name": xdp_info["xdp"]["prog"]["name"],
-+            "maps": bpf_prog_map_ids(prog_id)}
-+
-+
-+def _send_probe(cfg, port, proto="tcp"):
-+    """Send a single payload from the remote end using socat.
-+
-+    Args:
-+        cfg: Configuration object containing network settings.
-+        port: Port number for the exchange.
-+        proto: Protocol to use, either "tcp" or "udp".
-+    """
-+    cfg.require_cmd("socat", remote=True)
-+
-+    if proto == "tcp":
-+        rx_cmd = f"socat -{cfg.addr_ipver} -T 2 TCP-LISTEN:{port},reuseport STDOUT"
-+        tx_cmd = f"echo -n rss_hash_test | socat -t 2 -u STDIN TCP:{cfg.baddr}:{port}"
-+    else:
-+        rx_cmd = f"socat -{cfg.addr_ipver} -T 2 -u UDP-RECV:{port},reuseport STDOUT"
-+        tx_cmd = f"echo -n rss_hash_test | socat -t 2 -u STDIN UDP:{cfg.baddr}:{port}"
-+
-+    with bkg(rx_cmd, exit_wait=True):
-+        wait_port_listen(port, proto=proto)
-+        cmd(tx_cmd, host=cfg.remote, shell=True)
-+
-+
-+# BPF map keys matching the enums in xdp_metadata.bpf.c
-+_SETUP_KEY_PORT = 1
-+
-+_RSS_KEY_HASH = 0
-+_RSS_KEY_TYPE = 1
-+_RSS_KEY_PKT_CNT = 2
-+_RSS_KEY_ERR_CNT = 3
-+
-+
-+@ksft_variants([
-+    KsftNamedVariant("tcp", "tcp"),
-+    KsftNamedVariant("udp", "udp"),
-+])
-+def test_xdp_rss_hash(cfg, proto):
-+    """Test RSS hash metadata extraction via bpf_xdp_metadata_rx_hash().
-+
-+    This test will only run on devices that support xdp-rx-metadata-features.
-+
-+    Loads the xdp_rss_hash program from xdp_metadata, sends a packet using
-+    the specified protocol, and verifies that the program extracted a non-zero
-+    hash with an L4 hash type.
-+    """
-+    dev_info = cfg.netnl.dev_get({"ifindex": cfg.ifindex})
-+    rx_meta = dev_info.get("xdp-rx-metadata-features", [])
-+    if "hash" not in rx_meta:
-+        raise KsftSkipEx("device does not support XDP rx hash metadata")
-+
-+    prog_info = _load_xdp_metadata_prog(cfg, "xdp_rss_hash")
-+
-+    port = rand_port()
-+    bpf_map_set("map_xdp_setup", _SETUP_KEY_PORT, port)
-+
-+    rss_map_id = prog_info["maps"]["map_rss"]
-+
-+    _send_probe(cfg, port, proto=proto)
-+
-+    rss = bpf_map_dump(rss_map_id)
-+
-+    pkt_cnt = rss.get(_RSS_KEY_PKT_CNT, 0)
-+    err_cnt = rss.get(_RSS_KEY_ERR_CNT, 0)
-+    hash_val = rss.get(_RSS_KEY_HASH, 0)
-+    hash_type = rss.get(_RSS_KEY_TYPE, 0)
-+
-+    ksft_ge(pkt_cnt, 1, "should have received at least one packet")
-+    ksft_pr(f"  RSS hash error count: {err_cnt}")
-+
-+    ksft_ne(hash_val, 0,
-+            f"RSS hash should be non-zero for {proto.upper()} traffic")
-+    ksft_pr(f"  RSS hash: {hash_val:#010x}")
-+
-+    ksft_pr(f"  RSS hash type: {hash_type:#06x}")
-+    XDP_RSS_L4 = 0x8  # BIT(3) from enum xdp_rss_hash_type
-+    ksft_ne(hash_type & XDP_RSS_L4, 0,
-+            f"RSS hash type should include L4 for {proto.upper()} traffic")
-+
-+
-+def main():
-+    with NetDrvEpEnv(__file__) as cfg:
-+        cfg.netnl = NetdevFamily()
-+        ksft_run(
-+            [
-+                test_xdp_rss_hash,
-+            ],
-+            args=(cfg,))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
-diff --git a/tools/testing/selftests/net/lib/xdp_metadata.bpf.c b/tools/testing/selftests/net/lib/xdp_metadata.bpf.c
-new file mode 100644
-index 000000000000..f71f59215239
---- /dev/null
-+++ b/tools/testing/selftests/net/lib/xdp_metadata.bpf.c
-@@ -0,0 +1,163 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <stddef.h>
-+#include <linux/bpf.h>
-+#include <linux/in.h>
-+#include <linux/if_ether.h>
-+#include <linux/ip.h>
-+#include <linux/ipv6.h>
-+#include <linux/udp.h>
-+#include <linux/tcp.h>
-+#include <bpf/bpf_endian.h>
-+#include <bpf/bpf_helpers.h>
-+
-+enum {
-+	XDP_PORT = 1,
-+	XDP_PROTO = 4,
-+} xdp_map_setup_keys;
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__uint(max_entries, 5);
-+	__type(key, __u32);
-+	__type(value, __s32);
-+} map_xdp_setup SEC(".maps");
-+
-+/* RSS hash results: key 0 = hash, key 1 = hash type,
-+ * key 2 = packet count, key 3 = error count.
++/**
++ * icssg_ft3_hsr_configurations - Configure filter table for HSR/PRP protocol frames
++ * @miig_rt: Pointer to the MII-G register map
++ * @slice: ICSSG slice number (0 or 1)
++ * @prueth: Pointer to prueth structure to determine HSR/PRP mode
++ *
++ * Configures FT3 to detect PTP frames (EtherType 0x88F7) in HSR/PRP tagged packets.
++ * HSR frames have a 6-byte tag, while PRP has no tag offset for EtherType detection.
 + */
-+enum {
-+	RSS_KEY_HASH = 0,
-+	RSS_KEY_TYPE = 1,
-+	RSS_KEY_PKT_CNT = 2,
-+	RSS_KEY_ERR_CNT = 3,
-+};
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__type(key, __u32);
-+	__type(value, __u32);
-+	__uint(max_entries, 4);
-+} map_rss SEC(".maps");
-+
-+/* Mirror of enum xdp_rss_hash_type from include/net/xdp.h.
-+ * Needed because the enum is not part of UAPI headers.
-+ */
-+enum xdp_rss_hash_type {
-+	XDP_RSS_L3_IPV4 = 1U << 0,
-+	XDP_RSS_L3_IPV6 = 1U << 1,
-+	XDP_RSS_L3_DYNHDR = 1U << 2,
-+	XDP_RSS_L4 = 1U << 3,
-+	XDP_RSS_L4_TCP = 1U << 4,
-+	XDP_RSS_L4_UDP = 1U << 5,
-+	XDP_RSS_L4_SCTP = 1U << 6,
-+	XDP_RSS_L4_IPSEC = 1U << 7,
-+	XDP_RSS_L4_ICMP = 1U << 8,
-+};
-+
-+extern int bpf_xdp_metadata_rx_hash(const struct xdp_md *ctx, __u32 *hash,
-+				    enum xdp_rss_hash_type *rss_type) __ksym;
-+
-+static __always_inline __u16 get_dest_port(void *l4, void *data_end,
-+					   __u8 protocol)
++void icssg_ft3_hsr_configurations(struct regmap *miig_rt, int slice,
++				  struct prueth *prueth)
 +{
-+	if (protocol == IPPROTO_UDP) {
-+		struct udphdr *udp = l4;
++	u8 offset = (prueth->hsr_prp_version == PRP_V1) ?
++		    PRP_PTP_ETHERTYPE_OFFSET : HSR_PTP_ETHERTYPE_OFFSET;
 +
-+		if ((void *)(udp + 1) > data_end)
-+			return 0;
-+		return udp->dest;
-+	} else if (protocol == IPPROTO_TCP) {
-+		struct tcphdr *tcp = l4;
++	regmap_write(miig_rt, FT3_N_REG(slice, FT3_PTP_SLOT, FT3_START), offset);
++	regmap_write(miig_rt, FT3_N_REG(slice, FT3_PTP_SLOT, FT3_START_AUTO), 0);
++	regmap_write(miig_rt, FT3_N_REG(slice, FT3_PTP_SLOT, FT3_START_OFFSET), 0);
++	regmap_write(miig_rt, FT3_N_REG(slice, FT3_PTP_SLOT, FT3_JUMP_OFFSET), 0);
++	regmap_write(miig_rt, FT3_N_REG(slice, FT3_PTP_SLOT, FT3_LEN), 0);
++	regmap_write(miig_rt, FT3_N_REG(slice, FT3_PTP_SLOT, FT3_CFG), FT3_VLAN_MODE_BOTH);
++	regmap_write(miig_rt, FT3_N_REG(slice, FT3_PTP_SLOT, FT3_T), FT3_PTP_PATTERN);
++	regmap_write(miig_rt, FT3_N_REG(slice, FT3_PTP_SLOT, FT3_T_MASK),
++		     FT3_ETHERTYPE_MASK);
 +
-+		if ((void *)(tcp + 1) > data_end)
-+			return 0;
-+		return tcp->dest;
++	regmap_write(miig_rt, RX_CLASS_N_REG(slice, CLASSIFIER_PTP_DUP, RX_CLASS_AND_EN),
++		     RX_CLASS_DISABLE);
++	regmap_write(miig_rt, RX_CLASS_OR_REG(slice, CLASSIFIER_PTP_DUP, RX_CLASS_OR_EN),
++		     RX_CLASS_OR_DUP_PTP);
++	regmap_write(miig_rt, RX_CLASS_GATES_N_REG(slice, CLASSIFIER_PTP_DUP),
++		     RX_CLASS_GATE_PTP);
++
++	if (prueth->hsr_prp_version != PRP_V1) {
++		regmap_write(miig_rt, RX_CLASS_N_REG(slice, CLASSIFIER_HSR_TAG, RX_CLASS_AND_EN),
++			     RX_CLASS_DISABLE);
++		regmap_write(miig_rt, RX_CLASS_OR_REG(slice, CLASSIFIER_HSR_TAG, RX_CLASS_OR_EN),
++			     RX_CLASS_OR_HSR_TAG);
++		regmap_write(miig_rt, RX_CLASS_GATES_N_REG(slice, CLASSIFIER_HSR_TAG),
++			     RX_CLASS_GATE_PTP);
 +	}
-+
-+	return 0;
 +}
-+
-+SEC("xdp")
-+int xdp_rss_hash(struct xdp_md *ctx)
-+{
-+	void *data_end = (void *)(long)ctx->data_end;
-+	void *data = (void *)(long)ctx->data;
-+	enum xdp_rss_hash_type rss_type = 0;
-+	struct ethhdr *eth = data;
-+	__u8 l4_proto = 0;
-+	__u32 hash = 0;
-+	__u32 key, val;
-+	void *l4 = NULL;
-+	__u32 *cnt;
-+	int ret;
-+
-+	if ((void *)(eth + 1) > data_end)
-+		return XDP_PASS;
-+
-+	if (eth->h_proto == bpf_htons(ETH_P_IP)) {
-+		struct iphdr *iph = (void *)(eth + 1);
-+
-+		if ((void *)(iph + 1) > data_end)
-+			return XDP_PASS;
-+		l4_proto = iph->protocol;
-+		l4 = (void *)(iph + 1);
-+	} else if (eth->h_proto == bpf_htons(ETH_P_IPV6)) {
-+		struct ipv6hdr *ip6h = (void *)(eth + 1);
-+
-+		if ((void *)(ip6h + 1) > data_end)
-+			return XDP_PASS;
-+		l4_proto = ip6h->nexthdr;
-+		l4 = (void *)(ip6h + 1);
++EXPORT_SYMBOL_GPL(icssg_ft3_hsr_configurations);
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+index 0939994c932f..9efa39069c8c 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+@@ -260,6 +260,12 @@ static int prueth_emac_common_start(struct prueth *prueth)
+ 	icssg_class_default(prueth->miig_rt, ICSS_SLICE0, 0, false);
+ 	icssg_class_default(prueth->miig_rt, ICSS_SLICE1, 0, false);
+ 
++	/* Configure HSR/PRP protocol filtering if in HSR offload mode */
++	if (prueth->is_hsr_offload_mode) {
++		icssg_ft3_hsr_configurations(prueth->miig_rt, ICSS_SLICE0, prueth);
++		icssg_ft3_hsr_configurations(prueth->miig_rt, ICSS_SLICE1, prueth);
 +	}
 +
-+	if (!l4)
-+		return XDP_PASS;
-+
-+	/* Filter on the configured protocol (map_xdp_setup key XDP_PROTO).
-+	 * When set, only process packets matching the requested L4 protocol.
-+	 */
-+	key = XDP_PROTO;
-+	__s32 *proto_cfg = bpf_map_lookup_elem(&map_xdp_setup, &key);
-+
-+	if (proto_cfg && *proto_cfg != 0 && l4_proto != (__u8)*proto_cfg)
-+		return XDP_PASS;
-+
-+	/* Filter on the configured port (map_xdp_setup key XDP_PORT).
-+	 * Only applies to protocols with ports (UDP, TCP).
-+	 */
-+	key = XDP_PORT;
-+	__s32 *port_cfg = bpf_map_lookup_elem(&map_xdp_setup, &key);
-+
-+	if (port_cfg && *port_cfg != 0) {
-+		__u16 dest = get_dest_port(l4, data_end, l4_proto);
-+
-+		if (!dest || bpf_ntohs(dest) != (__u16)*port_cfg)
-+			return XDP_PASS;
-+	}
-+
-+	ret = bpf_xdp_metadata_rx_hash(ctx, &hash, &rss_type);
-+	if (ret < 0) {
-+		key = RSS_KEY_ERR_CNT;
-+		cnt = bpf_map_lookup_elem(&map_rss, &key);
-+		if (cnt)
-+			__sync_fetch_and_add(cnt, 1);
-+		return XDP_PASS;
-+	}
-+
-+	key = RSS_KEY_HASH;
-+	bpf_map_update_elem(&map_rss, &key, &hash, BPF_ANY);
-+
-+	key = RSS_KEY_TYPE;
-+	val = (__u32)rss_type;
-+	bpf_map_update_elem(&map_rss, &key, &val, BPF_ANY);
-+
-+	key = RSS_KEY_PKT_CNT;
-+	cnt = bpf_map_lookup_elem(&map_rss, &key);
-+	if (cnt)
-+		__sync_fetch_and_add(cnt, 1);
-+
-+	return XDP_PASS;
-+}
-+
-+char _license[] SEC("license") = "GPL";
+ 	if (prueth->is_switch_mode || prueth->is_hsr_offload_mode)
+ 		icssg_init_fw_offload_mode(prueth);
+ 	else
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+index 3d94fa5a7ac1..df93d15c5b78 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
++++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+@@ -423,6 +423,8 @@ void icssg_class_promiscuous_sr1(struct regmap *miig_rt, int slice);
+ void icssg_class_add_mcast_sr1(struct regmap *miig_rt, int slice,
+ 			       struct net_device *ndev);
+ void icssg_ft1_set_mac_addr(struct regmap *miig_rt, int slice, u8 *mac_addr);
++void icssg_ft3_hsr_configurations(struct regmap *miig_rt, int slice,
++				  struct prueth *prueth);
+ 
+ /* config helpers */
+ void icssg_config_ipg(struct prueth_emac *emac);
+
+base-commit: fd6dad4e1ae296b67b87291256878a58dad36c93
 -- 
-2.43.0
+2.34.1
 
 
