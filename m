@@ -1,346 +1,199 @@
-Return-Path: <netdev+bounces-261750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261751-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mAjGER9KoWnWrwQAu9opvQ
-	(envelope-from <netdev+bounces-261750-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 08:39:11 +0100
+	id 0JE0MppNoWkfsAQAu9opvQ
+	(envelope-from <netdev+bounces-261751-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 08:54:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D699C1B403A
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 08:39:10 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75E031B424C
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 08:54:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F049D3157F34
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 07:36:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DC3F33049D64
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 07:54:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBD933603DD;
-	Fri, 27 Feb 2026 07:36:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 418B4364E91;
+	Fri, 27 Feb 2026 07:53:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ER/OexAf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 877D636AB77
-	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 07:36:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BABBF364046
+	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 07:53:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772177786; cv=none; b=nbICzbfPlxCsWrMbcTVQzCG4n/7ToQHQndgTa93Y6ewRS3dNL5omkXBlS3gELx6M1fwp8poKJfq4LvI64iz4/pRPjWsQVruJDOpa/j2MIT8NjWoxKvCmN6CQcZqW6HEI637fUcOBoi1wM/3bD1rsOXIirTl/uTvm/2cnwnvjXyE=
+	t=1772178838; cv=none; b=Di8HDhsjGGldh0f/lZuV9jADGOlp4YpdCnxuI90bPEW+qDtBTGQYNosiN+K6Z69E7BojpEjSBRwb8DwvG5RW4bpTgWQyLKzkZyCCs3eJxRQFl0lDMPwsYVZA3bln4vo3ZQin0KazAMHWKt/m/p9vZRjc2FJ6fkBJVsoMosRhUiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772177786; c=relaxed/simple;
-	bh=/ndazwx7PAVUiX2eBTyuNB807noBgmPXIeeCsDrnLQc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qSF5FAabrlbWn6/hCPegkVvRxjK6V05VOSDrPMKCGTq9ZSk3GkhcrfDMJboHmERj30SR5CxHaOKYfKTz7ru+WVzHqSmh9ViOum0KYjBhjIOl8KOfG+Db7Rhz1MuPjhtdR00dtH0TMWlGr/l/u314OM4e+0Ls43puJKWX5QXbXEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.204.34.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: esmtpgz16t1772177721t5ccee8d9
-X-QQ-Originating-IP: Ik0Y7M5rPQnWXBVn7RkAW6OrhpRGdA+b2Et414aQI20=
-Received: from lap-jiawenwu.trustnetic.com ( [36.24.96.164])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 27 Feb 2026 15:35:20 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 13465959567694685381
-EX-QQ-RecipientCnt: 9
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1772178838; c=relaxed/simple;
+	bh=h9syD6WVkAmzTGwQ3i1VIb80j/B9jUPw/Vy3A2x0Fv4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ste/KBiwLns62VNnjne6eGizf16GJi6x3i0+qxrav8eV/NBDfOPPSbRfBtJpn1Hg3OrV2CeLieEIGnRjB2ozxnbWEUXILQwFpJ4fRhagidU8DzRfEPlzKKTpKDW+RZWlKPZf8PGQ67AFslnCKzf/wbv1jLw6eI7KfCwFB0rOrXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ER/OexAf; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2aaf43014d0so14126015ad.2
+        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 23:53:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772178836; x=1772783636; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=evrPnhC7VvTZpi7YgqhzDnPSPz72Yoy2AMHX8h76Rd4=;
+        b=ER/OexAfSaNT2a8Zn4t9yC+HtuLjm5H6DDp1rLwM67p15aMrxbUgPkkdqUh4Uk+99l
+         KEZwLGdQO0bkr82e3uh550EMK87ySO+n4Wv5LWcL6fIOIlm0qXYLHnH2Am1fJStQATHg
+         7Vk4gPNgNUB6suw4bj0/TRqy0m2aikdyL9O3BV7SPrk/KH9UmWxHuowZdit17Y7MQB4m
+         dlhkTuSSZG8n51tdV1E9MqbYuSMGfEvfcAh9fvTtIHutmxp2V7hBioLy//yCtiRwiKAG
+         7Kk+p9DLLP3n/H3v7eUgNUxZGenpp3363Zp3YipchJ+D5la2WFGI02t8j4DVx1TXRwo5
+         KcVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772178836; x=1772783636;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=evrPnhC7VvTZpi7YgqhzDnPSPz72Yoy2AMHX8h76Rd4=;
+        b=E5AclVvj7PYUOIPoXsLlIvezWxARXcy2EhCi0RpGpi6e6s26cpexohXp2xe0GmQquF
+         zG8fyMFw2MFha0HmX/jXIpC2Ev8D2GpyUTNS513Z0tesvJcawuV8chSvvvN+Jv5HMCYz
+         yNBMJ3LHFIE9T81Gc8bwjacrl+AHaL3noMwLDLryOQmPvnb97LCi9U+ArTdib5cLi4fN
+         2YzjVsYtfJDXwC/kJYRGSL90syy4I1puDD8nzPsmO22mGhuGkzImbW1pHTYAvJj80Emz
+         tyDRGk20j9pH5JLL4YOV7c1YZJcxo81fZTuM9YiDbAfx3LLtY4o19ENuqUNn0gI7LJf7
+         esAg==
+X-Gm-Message-State: AOJu0YxCkSbY6139jLHDK8BfdPsY8XMdr/ef3Fh21np9riV2cceL5CZF
+	kXaXKfQ1B7Ja3kieBy8ZOZk0WIYtDufQdOZrb8Z8sKq02Efxu8NzShvo1flC05INX7k=
+X-Gm-Gg: ATEYQzwigYP9kr23r2qKCNe5JJ10ORwpsi1yVhLczxqoy5tMcXOt+xOcK2NiiZ5U8AB
+	gSVFZDRa6WEyBWliEwfd15SfSa6sRqyscQgcqX34p0rVXMaqPxmC5NsCUlacKx9NZU1yPFDo0Gm
+	N8Y1ziWZSwIBOyZqaKHrrWGw9EM30Q6F4wOHVFkPa9FT6OREr/R/ULOIRYxFg919UwCmiIYihnj
+	zCF6O3TYa6qxCPQc2J0WCg6Yv5NAhCUkdOcCKfQOHq/iT+JLL0fXztsQJ8MTbUWsTOuVa6G1W7t
+	PcRl/GoZdyeoJxeTYp1baRML7SicJQVU0MB+GtxrpktJDrRtFWnR19hIqOHh6MHgFYw+pscjx6W
+	bmKW7hN03mx9t0797OutyVMrwiuEn0vGLml1Q4ZtqqyffWc2ExWpKHwNAqo66p7T44j1RM2mCoK
+	9/ID7VHNd4XkMdORbKRaugxGKcZRY=
+X-Received: by 2002:a17:903:1208:b0:2ab:3cba:42fa with SMTP id d9443c01a7336-2ae2e4b4c52mr19615825ad.46.1772178835895;
+        Thu, 26 Feb 2026 23:53:55 -0800 (PST)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2adfb5b257esm46817515ad.4.2026.02.26.23.53.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Feb 2026 23:53:55 -0800 (PST)
+Date: Fri, 27 Feb 2026 07:53:46 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v2 8/8] net: wangxun: implement pci_error_handlers ops
-Date: Fri, 27 Feb 2026 15:34:50 +0800
-Message-Id: <20260227073450.23680-9-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.21.0.windows.1
-In-Reply-To: <20260227073450.23680-1-jiawenwu@trustnetic.com>
-References: <20260227073450.23680-1-jiawenwu@trustnetic.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	linux-kernel@vger.kernel.org, bridge@lists.linux.dev
+Subject: Re: [RFC PATCH net-next 2/3] net: use ndo_update_offloads for
+ bonding/bridge/team
+Message-ID: <aaFNilMyFaD9cA2u@fedora>
+References: <20260226114208.27774-1-liuhangbin@gmail.com>
+ <20260226114208.27774-3-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: N55MlACpQQDvmvslgBGehdFH76KJpcrGlL5LWLzrMMxDTNsoouLHqB1o
-	/AUrEGFjG7NYrWWevVK/BbFQSvqmH++p+PZFYA5yUUumLfay+LhKIGwsq8dRVMxg2f1VT3U
-	JsEI3CJpXROYktMOcOozFIaw2qtsSsJ3rnmIQy2h25pPMubmHv0cpwHe5qJYNhT9ReLJx1v
-	2Ms9at0P7VIoTtdAAyXsWzGNtpcl243eevkStH/OvNj8TtgM9M1yNZxac8SbF56UCd0LJml
-	Ru3aHObMWgCY45iiczapjCf0TfxZgM8gnOar3jxPoUGtzHv+TiTi7SRAEUzpfQm60hgpqFe
-	BxthlOBOQu4OvwMN801vlnzkqIwvqqduWuGFBZs74/olB/OAbcs3Aty33hnqtW5J2U4gdsN
-	MKlPvxxCedSH04K+08pfZSW6S/zIQt/R/RUxWEDg9iE6YrOPME8OX7uIzf4KF+OZQk4DRcj
-	7c+t4t/ngl3U+9VXKRVu0MWVHWaEOLsCyoOJqbLrwpthjuRUZMzrxMGf5IAzU/fI7EEB1WF
-	fQpGysKV+JFDXfcWQYYWbVwP5FMDp+0vry2UyjHPH4RU7QgllrA3qXUMknZbxiNDG0nmRQq
-	myj2bx1g8flPlloGLEvKJb9eUh5p8lD6MtSm2tE9tEF1zZ7fIsrWs3YE7ZnJGw9vMeo5Upv
-	eCSFqxl/+Qfrvhvgs3xO4dLaXcn9yg+GIFXsJwPgxLJA5n4brFaF32q2cCufVFRHpnuL3bK
-	44X8zjrLvkOwksQazMBh56Rp1Jkz215coee3j2ic/qFzhWGTpkB0vWGEKyEWAfTA3QN9PFE
-	5kNPtltRIM+/J3qSHxYAXYi65IRp1Swj2D9IZhH7ezTa0S3lKrNGExQRTj+8gCwV1gM3h1C
-	CmV5BRq/2vslGiWXuuLzQKZFnMihfQQdTjnzImDNwRnsesQwEtMoStuVMz2r9WWd3WxcLIg
-	Lv42wTSSpn+cPm1DCkkQRFmzdA10CjJAKT0APtVu+d/4xKzrDYWTbFokBOvORqgWurDDApn
-	qmQ4RZT+ieHcHU1u/SMP4CAFD6c1kp60FVip1HCcWm9tmZVc1K/Ej/R7e45t+F8So3od11e
-	JDh7xghn9Eduu4R8DC11tXaJ0R9z4bDEA==
-X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260226114208.27774-3-liuhangbin@gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.54 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261750-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[trustnetic.com];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-261751-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.969];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,trustnetic.com:mid,trustnetic.com:email]
-X-Rspamd-Queue-Id: D699C1B403A
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 75E031B424C
 X-Rspamd-Action: no action
 
-Support AER driver to handle the PCIe errors.
+On Thu, Feb 26, 2026 at 11:42:07AM +0000, Hangbin Liu wrote:
+> Convert bonding, bridge, and team drivers to use the new
+> ndo_update_offloads callback instead of manually calling
+> netdev_compute_master_upper_features() during port add/remove operations.
+> 
+> This change centralizes the feature computation flow:
+> 
+> Before:
+> - netdev_compute_master_upper_features()
+>   - compute offload features
+>   - netdev_change_features()
+>     - __netdev_update_features()
+>       - update other features
+> 
+> After:
+> - netdev_master_upper_dev_link()
+>   - __netdev_upper_dev_link()
+>     - netdev_change_features()
+>       - __netdev_update_features()
+>         - ndo_update_offloads()
+>           - netdev_compute_master_upper_features()
+>         - update other features
+> 
+> This ensures offload features are computed automatically when
+> upper/lower device links change, removing the need for manual
+> feature computation calls in the driver code.
+> 
+> The netdev_change_features() call in team_uninit() is also removed
+> since it calls team_port_del() for each port, which now triggers
+> feature updates automatically.
+> 
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
+>  drivers/net/bonding/bond_main.c | 10 +++++++---
+>  drivers/net/team/team_core.c    | 11 +++++++----
+>  net/bridge/br_device.c          |  6 ++++++
+>  net/bridge/br_if.c              |  4 ----
+>  net/core/dev.c                  |  8 ++++++--
+>  5 files changed, 26 insertions(+), 13 deletions(-)
+> 
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index d05837c0713a..7043ee022980 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -8893,6 +8893,9 @@ static int __netdev_upper_dev_link(struct net_device *dev,
+>  	__netdev_walk_all_upper_dev(upper_dev, __netdev_update_lower_level,
+>  				    priv);
+>  
+> +	/* re-compute all features after adding link */
+> +	netdev_change_features(upper_dev);
+> +
+>  	return 0;
 
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
- drivers/net/ethernet/wangxun/libwx/wx_err.c   | 98 +++++++++++++++++++
- drivers/net/ethernet/wangxun/libwx/wx_err.h   |  2 +
- drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  3 +-
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |  1 +
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  5 +-
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  5 +-
- 6 files changed, 111 insertions(+), 3 deletions(-)
+Another benefit for this change is, after calling netdev_change_features() here,
+the later netdev_sync_lower_features() will disable LRO automatically.
+So we don't need to call dev_disable_lro() manually in
+bonding/bridge/team/VLAN. I will add this patch in next version.
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.c b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-index bb77bdce69d2..644d2d7bd183 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_err.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-@@ -3,11 +3,109 @@
- 
- #include <linux/netdevice.h>
- #include <linux/pci.h>
-+#include <linux/aer.h>
- 
- #include "wx_type.h"
- #include "wx_lib.h"
- #include "wx_err.h"
- 
-+/**
-+ * wx_io_error_detected - called when PCI error is detected
-+ * @pdev: Pointer to PCI device
-+ * @state: The current pci connection state
-+ *
-+ * This function is called after a PCI bus error affecting
-+ * this device has been detected.
-+ */
-+static pci_ers_result_t wx_io_error_detected(struct pci_dev *pdev,
-+					     pci_channel_state_t state)
-+{
-+	struct wx *wx = pci_get_drvdata(pdev);
-+	struct net_device *netdev;
-+
-+	netdev = wx->netdev;
-+	if (!netif_device_present(netdev))
-+		return PCI_ERS_RESULT_DISCONNECT;
-+
-+	rtnl_lock();
-+	netif_device_detach(netdev);
-+
-+	if (netif_running(netdev))
-+		wx->close_suspend(wx);
-+
-+	if (state == pci_channel_io_perm_failure) {
-+		rtnl_unlock();
-+		return PCI_ERS_RESULT_DISCONNECT;
-+	}
-+
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
-+	rtnl_unlock();
-+
-+	/* Request a slot reset. */
-+	return PCI_ERS_RESULT_NEED_RESET;
-+}
-+
-+/**
-+ * wx_io_slot_reset - called after the pci bus has been reset.
-+ * @pdev: Pointer to PCI device
-+ *
-+ * Restart the card from scratch, as if from a cold-boot.
-+ */
-+static pci_ers_result_t wx_io_slot_reset(struct pci_dev *pdev)
-+{
-+	struct wx *wx = pci_get_drvdata(pdev);
-+	pci_ers_result_t result;
-+
-+	if (pci_enable_device_mem(pdev)) {
-+		wx_err(wx, "Cannot re-enable PCI device after reset.\n");
-+		result = PCI_ERS_RESULT_DISCONNECT;
-+	} else {
-+		/* make all bar access done before reset. */
-+		smp_mb__before_atomic();
-+		clear_bit(WX_STATE_DISABLED, wx->state);
-+		pci_set_master(pdev);
-+		pci_restore_state(pdev);
-+		pci_save_state(pdev);
-+		pci_wake_from_d3(pdev, false);
-+
-+		wx->do_reset(wx->netdev, false);
-+		result = PCI_ERS_RESULT_RECOVERED;
-+	}
-+
-+	pci_aer_clear_nonfatal_status(pdev);
-+
-+	return result;
-+}
-+
-+/**
-+ * wx_io_resume - called when traffic can start flowing again.
-+ * @pdev: Pointer to PCI device
-+ *
-+ * This callback is called when the error recovery driver tells us that
-+ * its OK to resume normal operation.
-+ */
-+static void wx_io_resume(struct pci_dev *pdev)
-+{
-+	struct wx *wx = pci_get_drvdata(pdev);
-+	struct net_device *netdev;
-+
-+	netdev = wx->netdev;
-+	rtnl_lock();
-+	if (netif_running(netdev))
-+		netdev->netdev_ops->ndo_open(netdev);
-+
-+	netif_device_attach(netdev);
-+	rtnl_unlock();
-+}
-+
-+const struct pci_error_handlers wx_err_handler = {
-+	.error_detected = wx_io_error_detected,
-+	.slot_reset = wx_io_slot_reset,
-+	.resume = wx_io_resume,
-+};
-+EXPORT_SYMBOL(wx_err_handler);
-+
- static void wx_reset_subtask(struct wx *wx)
- {
- 	if (!test_bit(WX_FLAG_NEED_PF_RESET, wx->flags))
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.h b/drivers/net/ethernet/wangxun/libwx/wx_err.h
-index e317e6c8d928..8b1a7863b5b1 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_err.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_err.h
-@@ -7,6 +7,8 @@
- #ifndef _WX_ERR_H_
- #define _WX_ERR_H_
- 
-+extern const struct pci_error_handlers wx_err_handler;
-+
- void wx_handle_errors_subtask(struct wx *wx);
- void wx_tx_timeout(struct net_device *netdev, unsigned int txqueue);
- void wx_handle_tx_hang(struct wx_ring *tx_ring, unsigned int next);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-index 5a21478a592b..1cd73b424d7f 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-@@ -3418,7 +3418,8 @@ static void wx_dev_shutdown(struct pci_dev *pdev, bool *enable_wake)
- 	*enable_wake = !!wufc;
- 	wx_control_hw(wx, false);
- 
--	pci_disable_device(pdev);
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
- }
- 
- int wx_suspend(struct pci_dev *pdev, pm_message_t state)
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index 434a582393d7..142b166117fa 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -1196,6 +1196,7 @@ enum wx_state {
- 	WX_STATE_PTP_RUNNING,
- 	WX_STATE_PTP_TX_IN_PROGRESS,
- 	WX_STATE_SERVICE_SCHED,
-+	WX_STATE_DISABLED,
- 	WX_STATE_NBITS		/* must be last */
- };
- 
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-index 0ed33480b4f4..772f4188c00d 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-@@ -819,6 +819,7 @@ static int ngbe_probe(struct pci_dev *pdev,
- 		goto err_register;
- 
- 	pci_set_drvdata(pdev, wx);
-+	pci_save_state(pdev);
- 
- 	return 0;
- 
-@@ -868,7 +869,8 @@ static void ngbe_remove(struct pci_dev *pdev)
- 	kfree(wx->mac_table);
- 	wx_clear_interrupt_scheme(wx);
- 
--	pci_disable_device(pdev);
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
- }
- 
- static struct pci_driver ngbe_driver = {
-@@ -880,6 +882,7 @@ static struct pci_driver ngbe_driver = {
- 	.resume   = wx_resume,
- 	.shutdown = wx_shutdown,
- 	.sriov_configure = wx_pci_sriov_configure,
-+	.err_handler = &wx_err_handler,
- };
- 
- module_pci_driver(ngbe_driver);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index 8d2302c62ebf..1dd5c08d5187 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -886,6 +886,7 @@ static int txgbe_probe(struct pci_dev *pdev,
- 		goto err_remove_phy;
- 
- 	pci_set_drvdata(pdev, wx);
-+	pci_save_state(pdev);
- 
- 	netif_tx_stop_all_queues(netdev);
- 
-@@ -955,7 +956,8 @@ static void txgbe_remove(struct pci_dev *pdev)
- 	kfree(wx->mac_table);
- 	wx_clear_interrupt_scheme(wx);
- 
--	pci_disable_device(pdev);
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
- }
- 
- static struct pci_driver txgbe_driver = {
-@@ -967,6 +969,7 @@ static struct pci_driver txgbe_driver = {
- 	.resume   = wx_resume,
- 	.shutdown = wx_shutdown,
- 	.sriov_configure = wx_pci_sriov_configure,
-+	.err_handler = &wx_err_handler,
- };
- 
- module_pci_driver(txgbe_driver);
--- 
-2.48.1
-
+Hangbin
 
