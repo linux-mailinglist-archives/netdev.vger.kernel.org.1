@@ -1,182 +1,232 @@
-Return-Path: <netdev+bounces-261837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261838-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qCrhHm2ZoWl8ugQAu9opvQ
-	(envelope-from <netdev+bounces-261837-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 14:17:33 +0100
+	id 4DHSEXCaoWl8ugQAu9opvQ
+	(envelope-from <netdev+bounces-261838-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 14:21:52 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF87B1B785A
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 14:17:32 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F29B1B78DA
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 14:21:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 06C2C3037416
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 13:16:56 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 28DDC300D55E
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 13:21:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07CD31DB95E;
-	Fri, 27 Feb 2026 13:16:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CC99221FCF;
+	Fri, 27 Feb 2026 13:21:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="wcEt44fN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eA4Idsw1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2DDC1C7012
-	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 13:16:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772198214; cv=pass; b=bfX8PqFjDVEwbApDoooVzhsgdHUR/tox+cyHnEF09u67QgIXTVlZU3mA2uEWCJC7674bEgqRaas4uvkK0qZkxhPox7Jrjw2ey7vlALupRXJoLWADVOJZcgTriE8x0RGuEHETskSG3BaaL1IiHJKVxJBIuXbGbyHBbSOrBFcQXgM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772198214; c=relaxed/simple;
-	bh=GDaA+XJaA19YoQAlSYfbtQ/U8ksfTNOAogcuVv/TBF4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CcBipR4oX1pbH3vof6T7lgG+oYbsbL3b+b9oAAsyB3rcmaS2X2S7HswghAM8SXuHMli+mcD/2mo0H6FVBz8IedIaPddM69x0SOQFP02Wsw7kOWYeB63UKDybWptbbFaU8MffOKk2HxFdREMbfZWhA2bpfjAqfvvEG5nDKTWFHas=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=wcEt44fN; arc=pass smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-358f5317857so718453a91.3
-        for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 05:16:53 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772198213; cv=none;
-        d=google.com; s=arc-20240605;
-        b=LU86SEJUqimB+pfB/+CcPQ2ZRJR8ZhyaWxJZornQTnZ0yUJquwy5JwIZJk1EXGubuY
-         VIwbgkJhdkKa23aCv05sRfNFQ8hWptG6vn4ck5JY02EA0b7i9pEzkrqS3XITPTwA174T
-         X+gOogDJLxLsLRmx4RTTzf8CVetM6lC+6GsKcIChv566MVZ93ktRvqWmEqcCH6+wdpBi
-         gOPFeKpbpCe1R4B3xYxtht27jiz7vVUHYGx4Z2k0AgsINtg7cAUMO2WU75C8/TjeFGBq
-         WRwUL6gt/BaN9P2huBJSOwrT5f1Z0/Px4yH0/upNNFW4w5JLMmoBsYnXHcb9YtyUE6CB
-         Xbqg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=GDaA+XJaA19YoQAlSYfbtQ/U8ksfTNOAogcuVv/TBF4=;
-        fh=xriQbQw0wwUuChtwUKAyWaW7LQWTQpJ8Uon8y/66FTY=;
-        b=I4GwKnO4sQWE28ifcLJ/wtXk+l8OehVB9uUJwQbr7xmC+o8kxnw0cNEnFMC3vVOiuH
-         04alKJkJcIoVLnslSrhas26CgXnyFGZGlno8SyiwiKx762MQZfmXE5wJxuXsCIDHC+Dc
-         wb13nyluHPAj4NI3ToQTACOkAbDlGyUjq/vClEtJRs3iLQpQnhiU0EU/BGy8+ThYoRyb
-         oFKMLiVpEb8oUPIYdx4p+7BfRBM4a5UWiF8x2J2kvxR/NS2z9VJnwnv3PXLmQwsIgMZk
-         S1MywXjXCFFHsZoEJufNf+2olEITrxCzLD+iPTJNo8BZ2ETYyXbTTsp9/d42t6Y3aFIf
-         N7Sg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1772198213; x=1772803013; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GDaA+XJaA19YoQAlSYfbtQ/U8ksfTNOAogcuVv/TBF4=;
-        b=wcEt44fNSYxHu4VEgpx6m7v0QIASghwvaT9qWQbowiOuywzOJKh3xLi94v1vhyzdpZ
-         svL48MLuzhDCQVEo6qIKrMQNt3AskDm/Mj7/dub7xIiJU91Kpmp0fv5stFUVSwcbruV8
-         EJzYVriccF3q5icnIoC2gLlRr0lw04VRK7DS8tPyVgZGIg1SWhM1UsWRuzLXSm3pT3qH
-         kkPClft3zuP8EDWOSKes79GgHmYVoT01kPD1rSLKRAquq6L5xjlb3MADnjASIvqyLo2O
-         aIYHL9HoFnZcGOy+RQHnHP5RqmjF1Is9GdxZcC5c04yckNLbLLcUNRzBnycW5Bn88oym
-         3QkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772198213; x=1772803013;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=GDaA+XJaA19YoQAlSYfbtQ/U8ksfTNOAogcuVv/TBF4=;
-        b=UwjaSXvyPRQNNIQ87BBkrLn7ialBaErE9B8FI4tmCaqt9aA34zhjp8exa3rmM2tBIs
-         5L0+SCDdQ7+6fbphyDIF8UI3ZIfW9K5kQ89eZ3GsMGiL248juj/586g8y1zfvpUTC9vA
-         lUrpgmySYlZ0v3VaETxbT93+Xrw0gV39qm5B7EdDQSZ4fQdE1K+9ev7zlEa19HGmWehm
-         tKvS38HcO9VK9K+StrtNY8y2KoWuJb4MP14vem6BqsTyqe8Xup7glNKYQBExJsEKp+SG
-         nynTtgBtNrPFhL+Rqsbftbkf3p0A2LI9IYNklzthUz7lG5u1gu6CEu82/kUAu1GBBYLz
-         vvLg==
-X-Forwarded-Encrypted: i=1; AJvYcCXncE9LrrckIbejstNcVUo7MFVV1+9M6z4NlH9RwtHpNnSlVtceWi+rDZzpRip4GG33VOnQL0A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YytDujUHuiB0oxH0W7UB96ZNg4AC/kczar/DPmUAlalWlpZ2DXb
-	wnlKYKMdAYRQijSepGyqsrhZp0nAm/shSLf/ake4dS+igJwUGpnBtPQI+xk+XoT//4Ktuzoxqxr
-	84iRCSt5iWAQGlXeoJgWnr7CYWz40WtMQNcECu9pMPUgfCi2DwWk=
-X-Gm-Gg: ATEYQzwL6i8Jp+/PDoNLgy7ogwh3rvaUX4NWizXX5Sh6gTEaozFmhQtLNlXsJPzghKV
-	w2m+w+8HKj6oIDtLMLltIkTtc2pTci2xKHgEuSQI8nF3jGjZA8AHWSVsEZt0ITg5D+Tc2MD2uKS
-	syTc3nD9RaG0IYMihaRfh0jTcwgUMiBqO/fMf1DiADzms+isaHEGuC+BS5U3TLvqiyPmzgObap8
-	ToYIQX7PdUG/Xpj9z922yBNfDUl43y+h1s9rn6aMdkcbKf/gfV2g0ExAQ9WjB3KvILzytk+v1uW
-	O3F04TW5iI87ETg=
-X-Received: by 2002:a17:90b:38cf:b0:356:2bda:a857 with SMTP id
- 98e67ed59e1d1-35965c9d127mr3060071a91.18.1772198213005; Fri, 27 Feb 2026
- 05:16:53 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29BD3217F27;
+	Fri, 27 Feb 2026 13:21:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772198507; cv=none; b=RMthDo6i2J+U6PmtP/ZCgCdTsRh7kvbR/ssqthAh9Fv4XMEHTgsp+PoV4Gw1IHzICkweA3urv6NIxjWfo9I8+CPCTElqDZfbhgEMCDUUdmZzMYSzVtTxZ535Vf4KlfllbXqR4SGOvAJkNk733qvWh9ZIMidracIhoriZhS93XYw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772198507; c=relaxed/simple;
+	bh=RxKqxEY0Xu8EuSp7+bKFB2HeqvW76FbZw8P16BHa8oU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m4WtxIBd1EBy6ZGZwANpvId9btCkUEC/wmezmFF8+1FR6/1LGWoSN5CJHtbUPyKZmgaW4tv+/vukPyO6pphtsqDAWrLOx6EvD17vvzGQeR/oMDT1sCB4DbxHLhCkyKe2WK8zxzk1my7RNVvscfEHB0/LSsWSNCYgHIezepbS5yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eA4Idsw1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4354BC116C6;
+	Fri, 27 Feb 2026 13:21:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772198506;
+	bh=RxKqxEY0Xu8EuSp7+bKFB2HeqvW76FbZw8P16BHa8oU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eA4Idsw1g4sl/MtQ/mfXzuFUUwt6ojhVGvS8BJ7642ce6l4mCGyqq7peIYz210mjA
+	 JGBIqKUalyg4EgBes27actsgQoPNUhFCqA5qXEJBt+0+saaNaB0gEaxIQoPIfuTAtd
+	 8EYZPxVB8QctXCRh+pukcmgcI5ykwBdqTjSlcgvLNW/kh0o7i/1AYo3Ux2aAzLjEqo
+	 wp9qhfx3uvEgvuKtsIM1Ke8TGFtxrQqcN0eVbneaon0BD+zyrdfwy7Y7t500W23oo0
+	 QJvfKIhB0EdYrtIzQf7Bz6Tl9mYswQ0vMYYDbNrG2vYO/MOcucodVFjLYyBPVvjKD5
+	 LCpNRGUNFDb8g==
+Date: Fri, 27 Feb 2026 14:21:44 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Donald Hunter <donald.hunter@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH bpf-next v3 1/5] netlink: specs: Add XDP RX checksum
+ capability to XDP metadata specs
+Message-ID: <aaGaaExy63bGa7Or@lore-desk>
+References: <20260217-bpf-xdp-meta-rxcksum-v3-0-30024c50ba71@kernel.org>
+ <20260217-bpf-xdp-meta-rxcksum-v3-1-30024c50ba71@kernel.org>
+ <20260218174742.62a4074f@kernel.org>
+ <aZbuWBnmh_SQJyVf@lore-desk>
+ <20260219091344.1d8517f3@kernel.org>
+ <aZyKWoxnywXKWth9@lore-desk>
+ <20260223151845.06db43b0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260223150512.2251594-1-p@1g4.org> <20260223150512.2251594-2-p@1g4.org>
- <CAM0EoMmr0SUf7U3CTqd=MSYX=D60zYOfBS-L=GJOsWB-cxZHcg@mail.gmail.com>
- <20260227013151.qaw4hvb4fyt5roeq@skbuf> <px_b8_2gC-ZLFXok9C1Cjh3OAR-3fh7q3tMvB6ddv9V_IR2UOe0ANtPfCbh_s3xFARel2DT6Yg5cVJe3LPmgLpgDgGfqTrJuPa0OADyxdts=@1g4.org>
-In-Reply-To: <px_b8_2gC-ZLFXok9C1Cjh3OAR-3fh7q3tMvB6ddv9V_IR2UOe0ANtPfCbh_s3xFARel2DT6Yg5cVJe3LPmgLpgDgGfqTrJuPa0OADyxdts=@1g4.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Fri, 27 Feb 2026 08:16:41 -0500
-X-Gm-Features: AaiRm501mvb8cKgXrBcKkwVqLRI4xO1kMuzIWg1rjrI6m_S9GMPSEI5hVakE9Uk
-Message-ID: <CAM0EoM=jY=w7Chj1=oecLfEkyXgbydX63ykywbXoYHrCLafRoQ@mail.gmail.com>
-Subject: Re: [PATCH net v8 1/1] net/sched: act_gate: snapshot parameters with
- RCU on replace
-To: Paul Moses <p@1g4.org>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
-	Vladimir Oltean <olteanv@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="X5UIePTG9Ua3mURR"
+Content-Disposition: inline
+In-Reply-To: <20260223151845.06db43b0@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261837-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-261838-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[30];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,kernel.org,iogearbox.net,fomichev.me,lunn.ch,intel.com,linux.dev,cloudflare.com,vger.kernel.org,lists.osuosl.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-0.997];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[nxp.com,mojatatu.com,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,1g4.org:email]
-X-Rspamd-Queue-Id: CF87B1B785A
+	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6F29B1B78DA
 X-Rspamd-Action: no action
 
-On Fri, Feb 27, 2026 at 7:07=E2=80=AFAM Paul Moses <p@1g4.org> wrote:
->
-> > The ocelot/felix driver doesn't offload standalone actions (TC_SETUP_AC=
-T) so it
-> > doesn't notice changes made to the action using the "tc action" command=
-.
-> >
-> > If I make changes to the "tc gate" action parameters using "tc filter r=
-eplace ...",
-> > then I trigger the "The stream is added on this port" extack error in t=
-he offload
-> > driver, which seems to not have been written to handle parameter change=
-s very well.
->
-> Thanks for testing. Just to confirm: unpatched kernel returns the same er=
-ror?
->
 
-Yes, it just means that Vladmir's hardware doesnt like replacement of
-an existing rule, therefore it gets rejected with that message (error
-code -EEXIST). Yes, the message is not the best it can be but could be
-fixed later.
-Thanks Vladmir for spending the time.
+--X5UIePTG9Ua3mURR
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-And for this patch....
+> On Mon, 23 Feb 2026 18:11:54 +0100 Lorenzo Bianconi wrote:
+> > > Off the top of my head drivers prefer reporting UNNECESSARY when they
+> > > have both, and reserve COMPLETE for cases where L4 could not be found
+> > > or is incorrect. Why don't we report both? We're using 3 args, we sti=
+ll
+> > > have 3 to go. We could turn ip_summed into a bitmap and have explicit
+> > > output args for both level and csum complete value? =20
+> >=20
+> > Ack, thx for the explanation. Just for sake of understanding, is there
+> > any NIC capable of reporting both csum_value and csum for the same pack=
+et
+> > in the DMA descriptor? Or is this change needed to be future-proof?
+>=20
+> Both nfp and fbnic definitely can. Off the top of my head - mlx5 also
+> can, but I haven't double checked.
 
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+ack, thx for pointing this out, I was not aware of it. I will modify the AP=
+Is
+in order to add the capability to report both cksum and csum_level for a gi=
+ven
+packet.
 
-cheers,
-jamal
+>=20
+> > > One more thing I'd like us to at least have a plan for at this stage
+> > > is how to deal with COMPLETE + modified packet + XDP_PASS.
+> > > Right now some drivers discard COMPLETE when XDP is attached since
+> > > they can't be sure if XDP modifies the packet. Other drivers don't
+> > > and we end up with bad csum splat. Do we have a recommendation on
+> > > the correct behavior? If not - should we have a kfunc to adjust /
+> > > discard csum complete explicitly? =20
+> >=20
+> > At the moment there is no way to store the csum value we got running
+> > bpf_xdp_metadata_rx_checksum() in order to be consumed during
+> > xdp_buff/xdp_frame to skb conversion (this info can just be consumed in=
+ the
+> > ebpf program bound to the NIC) but
+>=20
+> I think the scope here is much narrower than the xdp_buf to xdp_frame
+> to skb conversion. We are just pass information between the program and
+> driver which owns xdp_buff. Very similar to your new xmo.
+>=20
+> We could either tell the driver to discard the csum complete or even
+> add a helper to "adjust" the the csum value. Similar to the helper
+> we have to adjust the csum in TC / skb context.
+
+IIUC, for the CSUM_COMPLETE case, we want to add a kfunc used to update (or
+invalidate) the checksum value (if the packet has been modified by the eBPF
+program bounded to the NIC) and report the updated checksum to the driver if
+the XDP verdict is XDP_PASS. Correct?
+
+I guess we could have two approaches here:
+- Write the new checksum value into the xdp_metadata area (if available)
+  where the driver can load it and update the checksum value before
+  allocating the skb.
+  The main downside of this approach is we need modify each driver.
+- Add a new xmo callback used to set the checksum value and report it
+  from the eBPF program into a specific memory area provided by the driver
+  (e.g. DMA descriptor) that is used to build the skb.
+=20
+What do you think?
+
+Moreover, since we already have this issue upstream, do you think this new =
+feature must
+be part this series or can we do it with a follow-up patch/series?
+
+Regards,
+Lorenzo
+
+>=20
+> > I guess the issue you pointed out can be solved in the verifier
+> > during program load time. What do you think?
+>=20
+> It could, but at the verifier level we'd probably have to be fairly
+> coarse-grained. Any write to the packet data would mean csum complete
+> cannot be trusted, that's not too hard. But also any tail call / fentry?
+> I'm not really up to date on the latest in program chaining in BPF but
+> I think a lot of real-life deployments would use either chaining or
+> fentry. So in practice it may be a lot of complexity for having csum
+> complete always disabled w/ XDP, in practice.
+>=20
+> Up to you. I'm totally okay to just say** that drivers should never
+> report csum complete with XDP (until appropriate API is built).
+> Perhaps this will force those who care about XDP+csum_complete to
+> tell us what their requirements are?
+>=20
+> [**] "just say" =3D=3D document and add driver kselftest that validates it
+
+--X5UIePTG9Ua3mURR
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaaGaaAAKCRA6cBh0uS2t
+rKZWAQCkjxOiPEXrSTZT3qkJeVaUw7n0juwuC4GXrIPIsv9pgwD/QH7+ttDrkbKB
+iSiyRZHPZpFfG0J6K+i2c23A6SEVsws=
+=6+Zv
+-----END PGP SIGNATURE-----
+
+--X5UIePTG9Ua3mURR--
 
