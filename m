@@ -1,108 +1,91 @@
-Return-Path: <netdev+bounces-261880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261881-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YDi8Mhe1oWmMvgQAu9opvQ
-	(envelope-from <netdev+bounces-261880-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 16:15:35 +0100
+	id 4EPfOCa1oWmMvgQAu9opvQ
+	(envelope-from <netdev+bounces-261881-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 16:15:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 643251B9886
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 16:15:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62BE21B989E
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 16:15:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 61D09313FE93
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 15:09:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0ECC031462C5
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 15:10:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94D0743C051;
-	Fri, 27 Feb 2026 15:09:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB81543634E;
+	Fri, 27 Feb 2026 15:09:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="n4TpTiQo";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="frjS/mKq";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="n4TpTiQo";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="frjS/mKq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="b6DLQYqB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13FB343C040
-	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 15:09:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCB303E8C6B
+	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 15:09:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772204964; cv=none; b=dNJYvgkKVU/QYGaHC4Z6wAlcOYvXL5WX9gvlKZUhnWChnhCrK0Ede/P2OZEUQLH4xjaaWbKmsFaxXqiX2u3DHBfluNbb6EX2Sn6RMANF03huN+me5uYfi7jfiok7T9HVDpVfR8OXO1V3/qZSaEtL+os9pve2p1vqWfYaJ8DGIo8=
+	t=1772204979; cv=none; b=to0o2AgyxA/hMbAAqcTu0Dg9FWcev57tzdPafgRFkwzOJE1vVLNL3WlGPjlekJIShgR9hYyMFwCzCEGo5fqQeeUVloaf0H54Emn4NHymCgsZL4G8IMgvh+aGlcs1cb2fjEni9K9yMxm/MfgbyhgaJsrw6f9OaIbijYGT1JqdmIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772204964; c=relaxed/simple;
-	bh=9smuQxeW6OC2ywWonZqPlrsd1307vN8mZ2S7bE9T9Ak=;
+	s=arc-20240116; t=1772204979; c=relaxed/simple;
+	bh=YfX2g470dRQCs1s3q3T0iw/zUQuuNWiQgKICrIJTCt4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PTeQMMSWxa77ghE3lQX0bKxZK3CG4wgWXgLLhp1SJyanO6x2XLYONUaKXqyTJKI8Hvh3dCaFy6XhsMHmG9gs4YgdoK++zPp0ngCxMqTvYHAFJcKGZrFYPlGdSXAYNI45bC2B3755Qu1qLBVO5eaJQd7TuzdZL4AJjQUoRU4A0HQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=n4TpTiQo; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=frjS/mKq; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=n4TpTiQo; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=frjS/mKq; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 560223FA0D;
-	Fri, 27 Feb 2026 15:09:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1772204960; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IgC4TAut0oAE46fR5Ae6UByQ/Iym7IYeieMNOTiDBXU=;
-	b=n4TpTiQo7AH/0uoo++HfsYLrlTXL8UK00zJUZSewWB+J9Xg/rbCYE6aWAksOV4N5aan7Fo
-	kaSS8i+8J2EGIq9jijKgQgKPGK9Lm6G9CjT2msnz9SDkcvRWe04rmNHCF55M7si0ZnPElF
-	Du4XWBE0zpoUUPa9Wd8ApwAtnDJs32M=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1772204960;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IgC4TAut0oAE46fR5Ae6UByQ/Iym7IYeieMNOTiDBXU=;
-	b=frjS/mKqtQ041leJMmhBzqFTIWXixTqYMtKv1wh/jYW0R1WZiqPIdmGbbyC58w30PY6FeX
-	mA2R3jREjsJnubBg==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=n4TpTiQo;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b="frjS/mKq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1772204960; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IgC4TAut0oAE46fR5Ae6UByQ/Iym7IYeieMNOTiDBXU=;
-	b=n4TpTiQo7AH/0uoo++HfsYLrlTXL8UK00zJUZSewWB+J9Xg/rbCYE6aWAksOV4N5aan7Fo
-	kaSS8i+8J2EGIq9jijKgQgKPGK9Lm6G9CjT2msnz9SDkcvRWe04rmNHCF55M7si0ZnPElF
-	Du4XWBE0zpoUUPa9Wd8ApwAtnDJs32M=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1772204960;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IgC4TAut0oAE46fR5Ae6UByQ/Iym7IYeieMNOTiDBXU=;
-	b=frjS/mKqtQ041leJMmhBzqFTIWXixTqYMtKv1wh/jYW0R1WZiqPIdmGbbyC58w30PY6FeX
-	mA2R3jREjsJnubBg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4AA553EA69;
-	Fri, 27 Feb 2026 15:09:20 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id nLYzEqCzoWkAFQAAD6G6ig
-	(envelope-from <jack@suse.cz>); Fri, 27 Feb 2026 15:09:20 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 0818AA06D4; Fri, 27 Feb 2026 16:09:16 +0100 (CET)
-Date: Fri, 27 Feb 2026 16:09:15 +0100
-From: Jan Kara <jack@suse.cz>
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, Jeff Layton <jlayton@kernel.org>, 
-	Josef Bacik <josef@toxicpanda.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Jan Kara <jack@suse.cz>, linux-kernel@vger.kernel.org, Hugh Dickins <hughd@google.com>, 
-	linux-mm@kvack.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Tejun Heo <tj@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Jann Horn <jannh@google.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH 05/14] pidfs: adapt to rhashtable-based simple_xattrs
-Message-ID: <qxctwu77wp7gv4ua3hn6kg7r2vt57laomn3ebjisemzzaybagy@mvoo2wpvu2ux>
-References: <20260216-work-xattr-socket-v1-0-c2efa4f74cb7@kernel.org>
- <20260216-work-xattr-socket-v1-5-c2efa4f74cb7@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ExcjYqqsT0F+p5f+ojVNzQ7Oxga9/+19xvuvRmH/C/UrW81lIh1rUBXrFE1MmZnZufeYq7ImOj6rrMoBX+3Ok71By8GzSEKTZaR4vAIgXtWHJIpkdlxncmAv0zxZZlRGK3WJgKtrZfjdMlGNFl4TefdsE/+OnKF9TUY1fvSHtJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=b6DLQYqB; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2a964077671so93115ad.0
+        for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 07:09:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772204978; x=1772809778; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YfX2g470dRQCs1s3q3T0iw/zUQuuNWiQgKICrIJTCt4=;
+        b=b6DLQYqB9MlFY+Is/m/HyI3mx5yN0t+0elB9Mzazp/Y3znVzFRfNf0iBx3J6cpeJFC
+         OJRU/T+q3EAttj97HqRMb+xsON21iIyRXvCB4bJaAt/U83pE2coE90EiPb9AIf/INEyV
+         ZMUYxeqDiJiAA786vci7I0n6ZdC6Mvx+/9tQfW5koz1oO7QLbS4fLBfgBHpOTAvvWIGu
+         1ugBH/jQnI9Y9KdTlWmncrtFVmr+QiKN9vFXcM2YlTk2A30if8eORtSM234AoTlmaWCl
+         uh0vYfYmHNKzL2EYP81D+WPb1kqYGf8RKWes0fK/DlyXQt8zs85vCF6RMz9Ki9x8eM3f
+         nwBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772204978; x=1772809778;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YfX2g470dRQCs1s3q3T0iw/zUQuuNWiQgKICrIJTCt4=;
+        b=JjznxjBgYDpwR2w0RM1r/P2t3CU/XO/BJ04jcdi+Cfr6Uep3Kdt3EWF8Khjyo1Fj6z
+         gZNSMA5bO3vgt4O2MkhETuCEH0lSAirwIA4cnMJge2Q5fSZoR/NKA0hT8xmFzAzOGcim
+         YC8VKVzLT5ZR4nPwgyMGW8TcgINfbFiuHwUXjbmcKG+kXluI6dzX8L30ohWsvp+6pUkj
+         CK/JxP8/sWmM8cpyYC7DWc2JcQAjd5rQiKLPr8rA7ookyt/YGftflPZpcAHkxC3WY5U1
+         cppzS9f2hqZiq8lxA9owrNSZwdtInnfb2VWcVTmVQB41WZH9gailSvF+xVKBIHx+Yp2A
+         1rLA==
+X-Forwarded-Encrypted: i=1; AJvYcCXnIKj9edhaNjUhhf0uyfaLJCSfiXHcngqYEJVCLlYkrL6wRXJZ168Qyg83jKUH/OpkgBC1q+U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDCMV/rQbIn65sLNBYEaWGjrjYeZ+b6a6WKGgne5+vYQA0m2fF
+	kJJExX4Jv+zFli3SRbY9rlo7gO9whpGclcUuEgJl+gdDgwgVw0Ku1CSVpog2dq725w==
+X-Gm-Gg: ATEYQzxX+SKsQUWeHF+MSrbxgCqYU2sOYGqzizB/xfS7qSX8Io2kF3NrC3td1eRTILt
+	0clxIJ5WsLcKLyExDzBZCOQN0Ytnep1hVzjA15dSvvlPDTcJqOQjnRmtlOTVmecgcA4xKQd1EQF
+	RDPSZfUQ0JXPfKWkTFV5Itovds9zcCcLjITAf4kbauCB82fewHpMR7ciEPyhS1OWAJaRsBrTxIL
+	EgMZnyG76pdfSrzQWyujicEY2xAdon9bfY1T+kdI7GFgoQgZyUfsdmb391iVMvF0RgHTMCBLime
+	YMCjE8oTegHV+kegkBbQjpc+oEYn2xbVRVc374IesqTw+eQ9fDBFy09PLc+1XCioOb8t0Lpvj8K
+	HQB2JZH1xbmh8bZqsO5YckAKsUlUHm+tP56DGiU4LlCFoVYXLkdzCmvpGLnjFW3qjReFHihu2Y8
+	0YcjIw0A6IcvNFPYgB8NtMLIxgBmgQX+NZKGa6UWhNCo9ZcZ4b7d4v+1+ChA==
+X-Received: by 2002:a17:902:ec83:b0:299:c368:6b1f with SMTP id d9443c01a7336-2adf77829e3mr5978935ad.18.1772204977547;
+        Fri, 27 Feb 2026 07:09:37 -0800 (PST)
+Received: from google.com (127.200.82.34.bc.googleusercontent.com. [34.82.200.127])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-359131aa5afsm5045853a91.0.2026.02.27.07.09.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Feb 2026 07:09:37 -0800 (PST)
+Date: Fri, 27 Feb 2026 15:09:32 +0000
+From: Jordan Rife <jrife@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: edumazet@google.com, daniel@iogearbox.net, sdf@fomichev.me, 
+	netdev@vger.kernel.org, andrii@kernel.org, bpf@vger.kernel.org, 
+	yusuke.suzuki@isovalent.com, willemdebruijn.kernel@gmail.com, martin.lau@linux.dev
+Subject: Re: [net-next,v1,2/2] selftests/bpf: Ensure dst addr/port are
+ preserved after socket abort
+Message-ID: <mg4c5j3brafehwfbxemda5viihhrtz7x34th5y3mfsme4zpu5q@i74mxbf7iown>
+References: <20260224190516.2102048-3-jrife@google.com>
+ <20260227033658.2599813-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -111,165 +94,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260216-work-xattr-socket-v1-5-c2efa4f74cb7@kernel.org>
-X-Spam-Flag: NO
-X-Spam-Score: -4.01
-X-Spam-Level: 
+In-Reply-To: <20260227033658.2599813-1-kuba@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.com:email];
-	DMARC_NA(0.00)[suse.cz];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261880-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jack@suse.cz,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[google.com,iogearbox.net,fomichev.me,vger.kernel.org,kernel.org,isovalent.com,gmail.com,linux.dev];
 	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261881-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jrife@google.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 643251B9886
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 62BE21B989E
 X-Rspamd-Action: no action
 
-On Mon 16-02-26 14:32:01, Christian Brauner wrote:
-> Adapt pidfs to use the rhashtable-based xattr path by switching from a
-> dedicated slab cache to simple_xattrs_alloc().
-> 
-> Previously pidfs used a custom kmem_cache (pidfs_xattr_cachep) that
-> allocated a struct containing an embedded simple_xattrs plus
-> simple_xattrs_init(). Replace this with simple_xattrs_alloc() which
-> combines kzalloc + rhashtable_init, and drop the dedicated slab cache
-> entirely.
-> 
-> Use simple_xattr_free_rcu() for replaced xattr entries to allow
-> concurrent RCU readers to finish.
-> 
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
+> Should connect_fd be set to -1 after calling destroy() to prevent the double
+> close?
 
-One question below:
+Yep, I'll update this in v2.
 
-> +static LLIST_HEAD(pidfs_free_list);
-> +
-> +static void pidfs_free_attr_work(struct work_struct *work)
-> +{
-> +	struct pidfs_attr *attr, *next;
-> +	struct llist_node *head;
-> +
-> +	head = llist_del_all(&pidfs_free_list);
-> +	llist_for_each_entry_safe(attr, next, head, pidfs_llist) {
-> +		struct simple_xattrs *xattrs = attr->xattrs;
-> +
-> +		if (xattrs) {
-> +			simple_xattrs_free(xattrs, NULL);
-> +			kfree(xattrs);
-> +		}
-> +		kfree(attr);
-> +	}
-> +}
-> +
-> +static DECLARE_WORK(pidfs_free_work, pidfs_free_attr_work);
-> +
+Thanks!
 
-So you bother with postponing the freeing to a scheduled work because
-put_pid() can be called from a context where acquiring rcu to iterate
-rhashtable would not be possible? Frankly I have hard time imagining such
-context (where previous rbtree code wouldn't have issues as well), in
-particular because AFAIR rcu is safe to arbitrarily nest. What am I
-missing?
-
-								Honza
-
-
->  void pidfs_free_pid(struct pid *pid)
->  {
-> -	struct pidfs_attr *attr __free(kfree) = no_free_ptr(pid->attr);
-> -	struct simple_xattrs *xattrs __free(kfree) = NULL;
-> +	struct pidfs_attr *attr = pid->attr;
->  
->  	/*
->  	 * Any dentry must've been wiped from the pid by now.
-> @@ -169,9 +196,10 @@ void pidfs_free_pid(struct pid *pid)
->  	if (IS_ERR(attr))
->  		return;
->  
-> -	xattrs = no_free_ptr(attr->xattrs);
-> -	if (xattrs)
-> -		simple_xattrs_free(xattrs, NULL);
-> +	if (likely(!attr->xattrs))
-> +		kfree(attr);
-> +	else if (llist_add(&attr->pidfs_llist, &pidfs_free_list))
-> +		schedule_work(&pidfs_free_work);
->  }
->  
->  #ifdef CONFIG_PROC_FS
-> @@ -998,7 +1026,7 @@ static int pidfs_xattr_get(const struct xattr_handler *handler,
->  
->  	xattrs = READ_ONCE(attr->xattrs);
->  	if (!xattrs)
-> -		return 0;
-> +		return -ENODATA;
->  
->  	name = xattr_full_name(handler, suffix);
->  	return simple_xattr_get(xattrs, name, value, size);
-> @@ -1018,22 +1046,16 @@ static int pidfs_xattr_set(const struct xattr_handler *handler,
->  	/* Ensure we're the only one to set @attr->xattrs. */
->  	WARN_ON_ONCE(!inode_is_locked(inode));
->  
-> -	xattrs = READ_ONCE(attr->xattrs);
-> -	if (!xattrs) {
-> -		xattrs = kmem_cache_zalloc(pidfs_xattr_cachep, GFP_KERNEL);
-> -		if (!xattrs)
-> -			return -ENOMEM;
-> -
-> -		simple_xattrs_init(xattrs);
-> -		smp_store_release(&pid->attr->xattrs, xattrs);
-> -	}
-> +	xattrs = simple_xattrs_lazy_alloc(&attr->xattrs, value, flags);
-> +	if (IS_ERR_OR_NULL(xattrs))
-> +		return PTR_ERR(xattrs);
->  
->  	name = xattr_full_name(handler, suffix);
->  	old_xattr = simple_xattr_set(xattrs, name, value, size, flags);
->  	if (IS_ERR(old_xattr))
->  		return PTR_ERR(old_xattr);
->  
-> -	simple_xattr_free(old_xattr);
-> +	simple_xattr_free_rcu(old_xattr);
->  	return 0;
->  }
->  
-> @@ -1108,11 +1130,6 @@ void __init pidfs_init(void)
->  					 (SLAB_HWCACHE_ALIGN | SLAB_RECLAIM_ACCOUNT |
->  					  SLAB_ACCOUNT | SLAB_PANIC), NULL);
->  
-> -	pidfs_xattr_cachep = kmem_cache_create("pidfs_xattr_cache",
-> -					       sizeof(struct simple_xattrs), 0,
-> -					       (SLAB_HWCACHE_ALIGN | SLAB_RECLAIM_ACCOUNT |
-> -						SLAB_ACCOUNT | SLAB_PANIC), NULL);
-> -
->  	pidfs_mnt = kern_mount(&pidfs_type);
->  	if (IS_ERR(pidfs_mnt))
->  		panic("Failed to mount pidfs pseudo filesystem");
-> 
-> -- 
-> 2.47.3
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Jordan
 
