@@ -1,243 +1,129 @@
-Return-Path: <netdev+bounces-261711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261712-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0FdjEL0SoWlwqAQAu9opvQ
-	(envelope-from <netdev+bounces-261711-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 04:42:53 +0100
+	id UAXWLswSoWlwqAQAu9opvQ
+	(envelope-from <netdev+bounces-261712-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 04:43:08 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9519E1B2583
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 04:42:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 60EFE1B2591
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 04:43:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D877531593D0
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 03:39:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 58C963101833
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 03:40:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B54BA332EB3;
-	Fri, 27 Feb 2026 03:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 336FD33344B;
+	Fri, 27 Feb 2026 03:40:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sm7RXcG+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vz1ouvGb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F017332EBE
-	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 03:39:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FCA6332EC9;
+	Fri, 27 Feb 2026 03:40:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772163574; cv=none; b=ijrhQ8hUM5qDPOqc/Q2OmyURMvwGo1Ep2OHUuzmDxnO5c00sWN41lNETJdRZh89DWoERQz09CXQi6r4r1siE09uoKsxtmg3tVfGjqqG8VxMmY8kNgmrazIBgkOQTKrST9DzKLPQZTkraaxYchDUjRE7nTzZmGCvFVWGUq9WCJMQ=
+	t=1772163606; cv=none; b=M5MxRUvno6SShbqnrFVM8gMyS+qX1aS2G5ZBDwW2p2UYEi1TqVmwhYsQVbWuHDtRNRyNMvH9ZYT5O3M+/Fj/KlcO5AootJzNXxYCCl84W39A7uY2RYpoMqjO6jzJVuy36XHaoxsm8vZB4Aefaa0oGiPb45Tc8W4Z/LaLd0Iq/s8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772163574; c=relaxed/simple;
-	bh=CR92IMl3iUZiE7HBrQ/JuVz927tARCQcGJJZByxZnPk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=aGL9ZtUbpYJYS/MWw1z23MWP/yPI+i4KOYu8yJ3dx64ZOEBICmwGZYTKIN8Pw0vSn7rWY6Ck2OpNdDeZUuoti6R84F6L6qS89gQO0tVkqHrZpZknNHRXI0ndVfIxaAACqMjC1mPaxomVu5ZzxLQx06H70nbDnOITUZJgTLikhiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sm7RXcG+; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2aaf0dbd073so15672605ad.3
-        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 19:39:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772163573; x=1772768373; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2YUlr/rhZta7O3sJP+HczpLHF5TLg57aKx+/633jwYI=;
-        b=sm7RXcG+SQbdRL0eVk42lpyMAR3HJZw9FPgGiQ0QJd6ZpDPGg4CubIfD/FJqYdU5lR
-         52UvK48TQVco4LuGO6MkOEnobvuTftqwuBL37nvFMlZ+fiG8zlumA8Z97NRrXVqurJ8d
-         p1TKcmqJDqTSSBqa2UVeQmrsFjscFEyzh+4Df7pY+01RHwsBs/i+t5DSIh5fdwbEdKD2
-         9mbQ0/LSj/Kk/2bY/18adUBzAaCck9OZIUZqsoID3OgESQV4Dq9f2r530kuazDY9m1kc
-         BNYWVyJ7oGktR1EItJis5//xtrgg5Hm0VjpUSTlKxMbbQ+s5hc3amfK2JG5oB4sjmo4Q
-         j/kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772163573; x=1772768373;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2YUlr/rhZta7O3sJP+HczpLHF5TLg57aKx+/633jwYI=;
-        b=Jmeba+gbJ8ep7tnFYEUcXDlezRkfcwnN5zftehGTbdDzGF+1NrgkDGgPbH1o7Go/FT
-         5a9grIETcpt+iVPASsAzh3BTIw8LcNsUtlMJzZfazKhyTjLD9T4YfDQVode8Rz0zPiQt
-         T+UEdToaIMmfQGHIzbRTP0rD43fC0aZruLdoV5fMTFEeIESr52GoPbosaQY8xe1+T1pR
-         BZ6kbC86iG5Kp9TepNTh/PQrcJQdmAVLy+B3moCehOEUZgWgUpvDLWxLNyPPSi9iIGeu
-         AeBS2lRSFlzqN91mjThCg61ZjDwdkyuLogj1nkR030TaUwSWzSLVKbw1ggdrJw4OBjpL
-         Aulg==
-X-Forwarded-Encrypted: i=1; AJvYcCXj2VXQkyduzPep+FryZ6FTba1BrJP2Ap9TrEPixBv6rJM4V7IlO5AbN3piuw6lw/nirOEaH5c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjHVh95mKRJxzpyxw/H/77KSSYBtv/y6PRaN0LeEL01KvaTbMo
-	O0o97jMwpOEREnRLOryHoKsOzCpDFqWCzaIh9a/TF7mbcqX6YfE2AIj3yu5BmKAIat/VA1LACLM
-	iIDFkag==
-X-Received: from pjje7.prod.google.com ([2002:a17:90a:6307:b0:358:dfd8:3150])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:244e:b0:35b:b97f:7bd2
- with SMTP id adf61e73a8af0-395c39de3b3mr1458608637.10.1772163572509; Thu, 26
- Feb 2026 19:39:32 -0800 (PST)
-Date: Fri, 27 Feb 2026 03:38:38 +0000
-In-Reply-To: <20260227033903.3307272-1-kuniyu@google.com>
+	s=arc-20240116; t=1772163606; c=relaxed/simple;
+	bh=oQWpT4KXw/jLSEL794lOUbVDdhlEjQMe+JKBmxzE4xU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Ar+L4u/Sa2HFQUhjYKlEUDpe0coKGpqxiz/Wtl4Oei1Lu4GVfFM8Wt2FDSRDam7OsqduEp6EuqR+c3faymvAZRK/M+lRPHoBcfjdKeBvw09vja5GJUoQszkSqQ8J7TYM+vusrcbhttja3gAZxgn0M8WLIRzQsFg/ddoKlth9nL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vz1ouvGb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD76AC116C6;
+	Fri, 27 Feb 2026 03:40:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772163605;
+	bh=oQWpT4KXw/jLSEL794lOUbVDdhlEjQMe+JKBmxzE4xU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Vz1ouvGboc/KSczUBHvbGEKnhAKzRQtP6QfNNF9bsFW/3YbuEjVmls7ezHKrV+mlI
+	 NV589lw6p0MUhehhcAwc8td2mYK1O/bKQ+wILscWCAOK4FccQQ2DX+0bCvLcm7UZT5
+	 2TVL5s/V1fSTpK0YKyvAAd53WmJsFZpkyEqt19B93GlsLLVFgVQgAXUb0QfwwMO6uP
+	 76XlX4KtQvXkgVyfrnc4z0LmaespW923xM8FCCiHdDG/ug894feRJ0NSUK+OAIFI0y
+	 JodwqKiHiQm/AddRqqPS2w2qeF/+rknh/EVq7FyoFHMwxYyoOP8ESqTf4F/ZvIka9C
+	 lyELpPP4GUk5A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FF20393109B;
+	Fri, 27 Feb 2026 03:40:11 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260227033903.3307272-1-kuniyu@google.com>
-X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260227033903.3307272-16-kuniyu@google.com>
-Subject: [PATCH v2 net-next 15/15] ipmr: Don't hold RTNL for ipmr_rtm_route().
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2 0/2] bridge: Check relevant options in VLAN range
+ grouping
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177216361004.1960351.2978917328225513972.git-patchwork-notify@kernel.org>
+Date: Fri, 27 Feb 2026 03:40:10 +0000
+References: <20260225143956.3995415-1-danieller@nvidia.com>
+In-Reply-To: <20260225143956.3995415-1-danieller@nvidia.com>
+To: Danielle Ratson <danieller@nvidia.com>
+Cc: netdev@vger.kernel.org, razor@blackwall.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ shuah@kernel.org, linux-kernel@vger.kernel.org, bridge@lists.linux.dev,
+ linux-kselftest@vger.kernel.org, idosch@nvidia.com, petrm@nvidia.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-261711-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-261712-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NO_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.999];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9519E1B2583
+X-Rspamd-Queue-Id: 60EFE1B2591
 X-Rspamd-Action: no action
 
-ipmr_mfc_add() and ipmr_mfc_delete() are already protected
-by a dedicated mutex.
+Hello:
 
-rtm_to_ipmr_mfcc() calls __ipmr_get_table(), __dev_get_by_index(),
-amd ipmr_find_vif().
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Once __dev_get_by_index() is converted to dev_get_by_index_rcu(),
-we can move the other two functions under that same RCU section
-and drop RTNL for ipmr_rtm_route().
+On Wed, 25 Feb 2026 16:39:54 +0200 you wrote:
+> The br_vlan_opts_eq_range() function determines if consecutive VLANs can
+> be grouped together in a range for compact netlink notifications. It
+> currently checks state, tunnel info, and multicast router configuration,
+> but misses two categories of per-VLAN options that affect the output:
+> 1. User-visible priv_flags (neigh_suppress, mcast_enabled)
+> 2. Port multicast context options (mcast_max_groups, mcast_n_groups)
+> 
+> [...]
 
-Let's do that conversion and drop ASSERT_RTNL() in
-mr_call_mfc_notifiers().
+Here is the summary with links:
+  - [net,v2,1/2] bridge: Check relevant per-VLAN options in VLAN range grouping
+    https://git.kernel.org/netdev/net/c/93c9475c04ac
+  - [net,v2,2/2] selftests: net: Add bridge VLAN range grouping tests
+    https://git.kernel.org/netdev/net/c/13540021be22
 
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- include/linux/mroute_base.h |  1 -
- net/ipv4/ipmr.c             | 34 +++++++++++++++++++++-------------
- 2 files changed, 21 insertions(+), 14 deletions(-)
-
-diff --git a/include/linux/mroute_base.h b/include/linux/mroute_base.h
-index 0baa6f994da9..cf3374580f74 100644
---- a/include/linux/mroute_base.h
-+++ b/include/linux/mroute_base.h
-@@ -208,7 +208,6 @@ static inline int mr_call_mfc_notifiers(struct net *net,
- 		.tb_id = tb_id
- 	};
- 
--	ASSERT_RTNL();
- 	atomic_inc(ipmr_seq);
- 	return call_fib_notifiers(net, event_type, &info.info);
- }
-diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
-index 9afaa5a3761f..b9280a8880dd 100644
---- a/net/ipv4/ipmr.c
-+++ b/net/ipv4/ipmr.c
-@@ -1211,7 +1211,6 @@ static int ipmr_mfc_delete(struct mr_table *mrt, struct mfcctl *mfc, int parent)
- 	struct net *net = read_pnet(&mrt->net);
- 	struct mfc_cache *c;
- 
--	/* The entries are added/deleted only under RTNL */
- 	rcu_read_lock();
- 	c = ipmr_cache_find_parent(mrt, mfc->mfcc_origin.s_addr,
- 				   mfc->mfcc_mcastgrp.s_addr, parent);
-@@ -1238,7 +1237,6 @@ static int ipmr_mfc_add(struct net *net, struct mr_table *mrt,
- 	if (mfc->mfcc_parent >= MAXVIFS)
- 		return -ENFILE;
- 
--	/* The entries are added/deleted only under RTNL */
- 	rcu_read_lock();
- 	c = ipmr_cache_find_parent(mrt, mfc->mfcc_origin.s_addr,
- 				   mfc->mfcc_mcastgrp.s_addr, parent);
-@@ -2853,10 +2851,10 @@ static int rtm_to_ipmr_mfcc(struct net *net, struct nlmsghdr *nlh,
- {
- 	struct net_device *dev = NULL;
- 	u32 tblid = RT_TABLE_DEFAULT;
-+	int ret, rem, iif = 0;
- 	struct mr_table *mrt;
- 	struct nlattr *attr;
- 	struct rtmsg *rtm;
--	int ret, rem;
- 
- 	ret = nlmsg_validate_deprecated(nlh, sizeof(*rtm), RTA_MAX,
- 					rtm_ipmr_policy, extack);
-@@ -2883,11 +2881,7 @@ static int rtm_to_ipmr_mfcc(struct net *net, struct nlmsghdr *nlh,
- 			mfcc->mfcc_mcastgrp.s_addr = nla_get_be32(attr);
- 			break;
- 		case RTA_IIF:
--			dev = __dev_get_by_index(net, nla_get_u32(attr));
--			if (!dev) {
--				ret = -ENODEV;
--				goto out;
--			}
-+			iif = nla_get_u32(attr);
- 			break;
- 		case RTA_MULTIPATH:
- 			if (ipmr_nla_get_ttls(attr, mfcc) < 0) {
-@@ -2903,16 +2897,30 @@ static int rtm_to_ipmr_mfcc(struct net *net, struct nlmsghdr *nlh,
- 			break;
- 		}
- 	}
-+
-+	rcu_read_lock();
-+
- 	mrt = __ipmr_get_table(net, tblid);
- 	if (!mrt) {
- 		ret = -ENOENT;
--		goto out;
-+		goto unlock;
- 	}
-+
-+	if (iif) {
-+		dev = dev_get_by_index_rcu(net, iif);
-+		if (!dev) {
-+			ret = -ENODEV;
-+			goto unlock;
-+		}
-+
-+		mfcc->mfcc_parent = ipmr_find_vif(mrt, dev);
-+	}
-+
- 	*mrtret = mrt;
- 	*mrtsock = rtm->rtm_protocol == RTPROT_MROUTED ? 1 : 0;
--	if (dev)
--		mfcc->mfcc_parent = ipmr_find_vif(mrt, dev);
- 
-+unlock:
-+	rcu_read_unlock();
- out:
- 	return ret;
- }
-@@ -3343,9 +3351,9 @@ static const struct rtnl_msg_handler ipmr_rtnl_msg_handlers[] __initconst = {
- 	{.protocol = RTNL_FAMILY_IPMR, .msgtype = RTM_GETLINK,
- 	 .dumpit = ipmr_rtm_dumplink, .flags = RTNL_FLAG_DUMP_UNLOCKED},
- 	{.protocol = RTNL_FAMILY_IPMR, .msgtype = RTM_NEWROUTE,
--	 .doit = ipmr_rtm_route},
-+	 .doit = ipmr_rtm_route, .flags = RTNL_FLAG_DOIT_UNLOCKED},
- 	{.protocol = RTNL_FAMILY_IPMR, .msgtype = RTM_DELROUTE,
--	 .doit = ipmr_rtm_route},
-+	 .doit = ipmr_rtm_route, .flags = RTNL_FLAG_DOIT_UNLOCKED},
- 	{.protocol = RTNL_FAMILY_IPMR, .msgtype = RTM_GETROUTE,
- 	 .doit = ipmr_rtm_getroute, .dumpit = ipmr_rtm_dumproute,
- 	 .flags = RTNL_FLAG_DOIT_UNLOCKED | RTNL_FLAG_DUMP_UNLOCKED},
+You are awesome, thank you!
 -- 
-2.53.0.473.g4a7958ca14-goog
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
