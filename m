@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-261999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262000-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GPkMMlkhomm4zwQAu9opvQ
-	(envelope-from <netdev+bounces-261999-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 23:57:29 +0100
+	id wN2vAoEhomm4zwQAu9opvQ
+	(envelope-from <netdev+bounces-262000-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 23:58:09 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C4E61BED2C
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 23:57:28 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 774B01BED50
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 23:58:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 580E030A050B
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 22:56:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 72CE530848C6
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 22:58:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D00BF3BFE3F;
-	Fri, 27 Feb 2026 22:56:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9793C3D905B;
+	Fri, 27 Feb 2026 22:58:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="krAlHxqs"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Fg7UU5zL"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C9543D905B;
-	Fri, 27 Feb 2026 22:56:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52EDB3D3D05;
+	Fri, 27 Feb 2026 22:58:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772233002; cv=none; b=DlWc5vJ+zJofgcum3xQV+ltuU8OYW5LLMqdj2a2dTUFeVabtRaLA1587Z80GT+LLJcOY18SDb58EXZhMpx73SUVYAdrCJn5dxbAmVsFLKDyqUETx/EO/qwp8GdmtWN3vEoaMLLb5B6aJufFH/Q5m7+mMttfc4I6NgMw3HVyv1J0=
+	t=1772233086; cv=none; b=YlLA7FxiqSK42O1Lgr7r7ctCQxMLQXgjJpF1/iUCPwmWj1hbMi74AbOXsVa/Mv5572KCXnlr4m1XyvzTOU6v1b3EItBnKCN+FxAuxo/9bHPAnlfxpa/llHZeG1/D6YgXGyNyssnEoCgqvcoaXaF9gNPW11EfCT9omaS4/92TJ9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772233002; c=relaxed/simple;
-	bh=V6npR5hQEOWz6JusvcckNxs8YDE4ZvsZ4sGtGr3OKD4=;
+	s=arc-20240116; t=1772233086; c=relaxed/simple;
+	bh=CTPec1vkBun2UMZ1ay+In7KcaklYycpXjh+JvdUoIbY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=imeWIXoUPwEsw/5Nphjpggv8ROL2jDd1DXQ0B/sQRRspOofQjg9evuf555GKMymutVaFrBVop0ZNud8AJPRFZTOLThvfpyQ24t2VJcjxR1Q+6rMvUQeCt0DupLnd6yNd35oCiReI2liJKzVs3bHR82Gfo4KU6cUl2usVC0HLBgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=krAlHxqs; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=lE/XQABrzxmv++JFXYtWI+KZb0dQR8FXl8TONpm/m8AlfKbJiHhQSutwc/URU0xNC4Ue7v1H1lLeAGIDYcoAZoL1FINvfJo49etRg63h9D2ajeFJYBxbdf4XfokPjyNrsyTjzuT2ZZIGYQqBnIZvMJpo9v+bwS1WNws+fwEftOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Fg7UU5zL; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -39,13 +39,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Vxl3n6UVxlTEujCtUmd2PHjggcQA+AwWL+uPIPgUSac=; b=krAlHxqsOkw60/+66USS8tJnE6
-	NGNI9jKq3Flip8ApbhQDOjXcNmv4zGLPrTjtFJ8hMKmSGQQxvmMpcUTTq3mtJc05fdEuoJuybkS/z
-	7Z0Qdctbar3iu9/zLglfxvhM0WEEEJ1MEuwCmFaiW3ZNBJLuBxnUD8/XWKEfXG4sLYNY=;
+	bh=em5H893df71FG0+5xZNsjJmkdr8PevVd3q53cCo+Z0E=; b=Fg7UU5zLrTZfGVCk3U8DaIdji1
+	CH92B80bZOXoB++hwJNiE6pEtu8ZrSbG04ZwuzEUSOLXf94YEyijwmeG4HtU336VyjSrA5m2fhvEd
+	ramf/cNoIpqFb3YZWoZcGx+/T8ql1ysZ9UA6ulgIPj3BBRLkd4g1bP66PSqHnbMXACeM=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vw6l1-0097xF-On; Fri, 27 Feb 2026 23:56:27 +0100
-Date: Fri, 27 Feb 2026 23:56:27 +0100
+	id 1vw6mL-0097yC-JC; Fri, 27 Feb 2026 23:57:49 +0100
+Date: Fri, 27 Feb 2026 23:57:49 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: "illusion.wang" <illusion.wang@nebula-matrix.com>
 Cc: dimon.zhao@nebula-matrix.com, alvin.wang@nebula-matrix.com,
@@ -55,11 +55,11 @@ Cc: dimon.zhao@nebula-matrix.com, alvin.wang@nebula-matrix.com,
 	horms@kernel.org, vadim.fedorenko@linux.dev,
 	lukas.bulwahn@redhat.com, edumazet@google.com,
 	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v5 net-next 03/11] net/nebula-matrix: add chip related
- definitions
-Message-ID: <c5d2ba02-55b8-4839-bbd1-1d387da27f96@lunn.ch>
+Subject: Re: [PATCH v5 net-next 04/11] net/nebula-matrix: channel msg value
+ and msg struct
+Message-ID: <52729f62-efac-42ba-9c66-81440e9a5ce6@lunn.ch>
 References: <20260226073840.3222-1-illusion.wang@nebula-matrix.com>
- <20260226073840.3222-4-illusion.wang@nebula-matrix.com>
+ <20260226073840.3222-5-illusion.wang@nebula-matrix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,19 +68,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260226073840.3222-4-illusion.wang@nebula-matrix.com>
+In-Reply-To: <20260226073840.3222-5-illusion.wang@nebula-matrix.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
 	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-261999-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262000-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -88,69 +88,23 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
-X-Rspamd-Queue-Id: 3C4E61BED2C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
+X-Rspamd-Queue-Id: 774B01BED50
 X-Rspamd-Action: no action
 
-> +static u32 nbl_sec046_1p_data[] = {
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0xa0000000,
-> +	0x00077c2b, 0x005c0000, 0x00000000, 0x00008100, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x20000000, 0x00073029, 0x00480000,
-> +	0x00000000, 0x00008100, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0x20000000, 0x00073029, 0x00480000, 0x70000000, 0x00000020,
-> +	0x24140000, 0x00000020, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0xa0000000,
-> +	0x00000009, 0x00000000, 0x00000000, 0x00002100, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0xb0000000, 0x00000009, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000100,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000100, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x70000000, 0x00000000, 0x20140000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x70000000, 0x00000000,
-> +	0x20140000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0x38430000, 0x70000006, 0x00000020, 0x24140000, 0x00000020,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x98cb1180, 0x6e36d469, 0x9d8eb91c, 0x87e3ef47, 0xa2931288, 0x08405c5a,
-> +	0x73865086, 0x00000080, 0x30140000, 0x00000080, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0xb0000000, 0x000b3849, 0x38430000, 0x00000006, 0x0000c100,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0xb0000000,
-> +	0x00133889, 0x08400000, 0x03865086, 0x4c016100, 0x00000014, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +	0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> +};
+On Thu, Feb 26, 2026 at 03:38:29PM +0800, illusion.wang wrote:
+> For compatibility, the msg id value is fixed, and each msg struct can
+> only have fields added (not removed).
 
-What is all this data? How big is the object file created from this?
+... added _at the end_.
 
-Should it be const?
-
-Could it be marked __initdata? Or moved into firmware files?
-
-      Andrew
+	Andrew
 
