@@ -1,215 +1,317 @@
-Return-Path: <netdev+bounces-261731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-261732-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gNraAbA6oWlrrQQAu9opvQ
-	(envelope-from <netdev+bounces-261731-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 07:33:20 +0100
+	id GNyRLsE8oWnsrQQAu9opvQ
+	(envelope-from <netdev+bounces-261732-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 07:42:09 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CB3C1B3451
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 07:33:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 242D31B3587
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 07:42:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C9EFC303800B
-	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 06:33:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A34BC3058BB1
+	for <lists+netdev@lfdr.de>; Fri, 27 Feb 2026 06:40:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C11A333261A;
-	Fri, 27 Feb 2026 06:33:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="t9poLRPq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5CCE36493D;
+	Fri, 27 Feb 2026 06:40:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com [209.85.161.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0ECE355F36
-	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 06:33:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51FB436493C
+	for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 06:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772173992; cv=none; b=HMlEMrsbTCAmzaMeSd4colVGYXc3kEaFsFScQNFrCk2KEgDp1qHZgVhue8QXklHAFzwhRnEk8Ip115kPqtI+oknZQ6AUHuDYIh9Rz4ymNWFo1STUPc1YL/15fhB8dlZIc46DYrmqQvZV+jZUXZBM2oXXvNAgUiiZqq/xZbd6ru0=
+	t=1772174427; cv=none; b=DWwf3LJzBUtCOhD/a67XHucXCGqwCMlbdVS0vRR2CH7LZja0pHus1En4UnW84M2NqiGHRL+iszIczsprCpD85XMNVVNAE9oLQgpt7sHnxiQ03dxzVLkQK1YKflmPBVbumX5YcyvM6GNug4wPxFsAP0XPBnbMwum3XIH6D8Dh8gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772173992; c=relaxed/simple;
-	bh=wZ5N7uv8KPTHpoGDDc4HKy8x/Zs2klO0Z9yzwZp9k5w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NPjPzg6kMfU2eSycxzBV+W4D7A4/RlMErhpH76x2WeRd6AIDQ4EZ4T7uvS5Ak8dkozgtlQry2q8f2zJ8zi7IV4kEuTCUx79zSjcYJsDDd+FTLNUAWqLo6FM90CaWbqQMEzjt0qVh2Z4VZRoSmPgNqn6gS70CwXxBJK6+Gg+97Qg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=t9poLRPq; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772173979;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=nTFptO84ZPVQV80rRXeEqqT9kuYpp3EHXOHWrz8HsgI=;
-	b=t9poLRPqjCm97eRBzapRqA4QedwjE+k+pyg74y9xtfsy6E4rg4fRyPznUXdvOCjvoM9fcU
-	GGTQ0fvhjn9YRiVp6Kj7+puXAixUdadmr8PXnTISpH/drM5ovbLdc2/WEHeRuS7OX2Rkfo
-	q1RQ8P3UIjpdr95RswlxGFcAX8Zi9Cc=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: netdev@vger.kernel.org
-Cc: jiayuan.chen@linux.dev,
-	Jiayuan Chen <jiayuan.chen@shopee.com>,
-	syzbot+ca1345cca66556f3d79b@syzkaller.appspotmail.com,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Vakul Garg <vakul.garg@nxp.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v1] tls: fix hung task in tx_work_handler by using non-blocking sends
-Date: Fri, 27 Feb 2026 14:32:31 +0800
-Message-ID: <20260227063231.168520-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1772174427; c=relaxed/simple;
+	bh=KHpV5XnveDHMB9aDeTn9wHnix7sIYMgCQ4A+9Ud+8ko=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=keGzgAIgNr9oUCzYkUuPEChVyqiEPee475aeqi3y4T6Hx8jMiEE3Xd/L94KiGqWPmpOnkK4ZEjH5cEc2eZ8EOhsntEWL+OtQHiKzWG1tZzhGz4joyJtu0LYdVrhPAnA521wTtz5hyVGBZnTo8L8nmX3RC0+hhodSqsxfhDJinx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-66308f16ea1so13918016eaf.2
+        for <netdev@vger.kernel.org>; Thu, 26 Feb 2026 22:40:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772174425; x=1772779225;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=K/m3ThhOi9BghI3jEmSvcKXHlRO+J/KF0TB2yPf2e8A=;
+        b=bAzxYu+LmaXH298gIWDz9ugvaCroKsQrBJpeeL2smSEnbNsZiLDz08z7x17useSBbK
+         C/hyUHB0q6gvmghxf8XHd2V8LL+2iGbjjmMV4wP96ebqo+T6sLjaShn/KXBKnWC+v6Ys
+         VpB3n1F9ijjcj+ROwbsAe31/cdCORpJq+isWJKFhJNYAovZz/rnJ2BvIwqNxA8Qh9IF9
+         iJcU9n9k2D1VzLQ9bJSFzcR2NsbdTWvFCnz9HIqwtI9863RA+SzGOpSnE+52PIFYQOrh
+         ZJPnA1PgzWc0IW5VuJ04e3v/UXt/FjkizQObZp1hREFKS/EYwOzTkv5qMTjwEBPNogJ+
+         OPEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV6shZnfuaxgREYBfvT4vmSVSDfiH8mz6ruV3CrZP2K7gD63/S1gb6X084T+gXfk1DM+6octPE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4pTL3DWyJpAg3gL3cGrEMvXu53L1Cz2ufgLJeYKmcRydDFQ7n
+	DRXK7GRwq++n/Cdl8MR3SqNwvwLYbiAjfsAM+Qb4n7tXzJS0T0T4qKauqzwcsyzRzYEH8dxm9Fc
+	VcTrLbBbn33vXs/+wEVUPsKL+ij/iMiXCxlsgy1+NL3BPOMgb7eNSNIbCBVw=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-Received: by 2002:a05:6820:81d0:b0:679:975b:f224 with SMTP id
+ 006d021491bc7-679fae0ac83mr1456374eaf.18.1772174425275; Thu, 26 Feb 2026
+ 22:40:25 -0800 (PST)
+Date: Thu, 26 Feb 2026 22:40:25 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69a13c59.050a0220.3a55be.0015.GAE@google.com>
+Subject: [syzbot] [wireless?] possible deadlock in ieee80211_change_mac (4)
+From: syzbot <syzbot+1b20ba3b6d47543a7742@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=665cbf0979cda6c5];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[linux.dev,shopee.com,syzkaller.appspotmail.com,gmail.com,kernel.org,queasysnail.net,davemloft.net,google.com,redhat.com,nxp.com,vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-261731-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-0.992];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,ca1345cca66556f3d79b];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9CB3C1B3451
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-261732-lists,netdev=lfdr.de,1b20ba3b6d47543a7742];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	SUBJECT_HAS_QUESTION(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,goo.gl:url,storage.googleapis.com:url,googlegroups.com:email,appspotmail.com:email]
+X-Rspamd-Queue-Id: 242D31B3587
 X-Rspamd-Action: no action
 
-From: Jiayuan Chen <jiayuan.chen@shopee.com>
+Hello,
 
-tx_work_handler calls tls_tx_records with flags=-1, which preserves
-each record's original tx_flags but results in tcp_sendmsg_locked
-using an infinite send timeout. When the peer is unresponsive and the
-send buffer is full, tcp_sendmsg_locked blocks indefinitely in
-sk_stream_wait_memory. This causes tls_sk_proto_close to hang in
-cancel_delayed_work_sync waiting for tx_work_handler to finish,
-leading to a hung task:
+syzbot found the following issue on:
 
-  INFO: task ...: blocked for more than ... seconds.
-  Call Trace:
-    cancel_delayed_work_sync
-    tls_sw_cancel_work_tx
-    tls_sk_proto_close
+HEAD commit:    d4f687fbbce4 ovpn: tcp - fix packet extraction from stream
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=1763544a580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=665cbf0979cda6c5
+dashboard link: https://syzkaller.appspot.com/bug?extid=1b20ba3b6d47543a7742
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
 
-A workqueue handler should never block indefinitely. Fix this by
-introducing __tls_tx_records() with an extra_flags parameter that
-gets OR'd into each record's tx_flags. tx_work_handler uses this to
-pass MSG_DONTWAIT so tcp_sendmsg_locked returns -EAGAIN immediately
-when the send buffer is full, without overwriting the original
-per-record flags (MSG_MORE, MSG_NOSIGNAL, etc.). On -EAGAIN, the
-existing reschedule mechanism retries after a short delay.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Also consolidate the two identical reschedule paths (lock contention
-and -EAGAIN) into one.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/ee42a61b2ee7/disk-d4f687fb.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e5470ff18ff8/vmlinux-d4f687fb.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/d50957aaabf2/bzImage-d4f687fb.xz
 
-Reported-by: syzbot+ca1345cca66556f3d79b@syzkaller.appspotmail.com
-Fixes: a42055e8d2c3 ("net/tls: Add support for async encryption of records for performance")
-Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+1b20ba3b6d47543a7742@syzkaller.appspotmail.com
+
+======================================================
+WARNING: possible circular locking dependency detected
+syzkaller #0 Not tainted
+------------------------------------------------------
+syz.0.4107/21056 is trying to acquire lock:
+ffff888055af0788 (&rdev->wiphy.mtx){+.+.}-{4:4}, at: class_wiphy_constructor include/net/cfg80211.h:6441 [inline]
+ffff888055af0788 (&rdev->wiphy.mtx){+.+.}-{4:4}, at: ieee80211_change_mac+0xb5/0x1410 net/mac80211/iface.c:324
+
+but task is already holding lock:
+ffffffff8fbc12b0 (dev_addr_sem){++++}-{4:4}, at: do_setlink+0x806/0x4590 net/core/rtnetlink.c:3105
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #2 (dev_addr_sem){++++}-{4:4}:
+       down_read+0x47/0x2e0 kernel/locking/rwsem.c:1537
+       address_show+0x25/0x250 net/core/net-sysfs.c:266
+       dev_attr_show+0x58/0xc0 drivers/base/core.c:2421
+       sysfs_kf_seq_show+0x310/0x490 fs/sysfs/file.c:65
+       seq_read_iter+0x4ef/0xe10 fs/seq_file.c:231
+       new_sync_read fs/read_write.c:493 [inline]
+       vfs_read+0x582/0xa70 fs/read_write.c:574
+       ksys_read+0x150/0x270 fs/read_write.c:717
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #1 (kn->active#13){++++}-{0:0}:
+       kernfs_drain+0x284/0x600 fs/kernfs/dir.c:511
+       __kernfs_remove+0x3cf/0x660 fs/kernfs/dir.c:1513
+       kernfs_remove_by_name_ns+0xaf/0x130 fs/kernfs/dir.c:1722
+       kernfs_remove_by_name include/linux/kernfs.h:633 [inline]
+       remove_files fs/sysfs/group.c:28 [inline]
+       sysfs_remove_group+0xfc/0x2e0 fs/sysfs/group.c:328
+       sysfs_remove_groups+0x54/0xb0 fs/sysfs/group.c:352
+       device_remove_groups drivers/base/core.c:2843 [inline]
+       device_remove_attrs+0x229/0x280 drivers/base/core.c:2979
+       device_del+0x51f/0x8f0 drivers/base/core.c:3877
+       unregister_netdevice_many_notify+0x1e0e/0x2370 net/core/dev.c:12438
+       unregister_netdevice_many net/core/dev.c:12466 [inline]
+       unregister_netdevice_queue+0x31f/0x360 net/core/dev.c:12280
+       unregister_netdevice include/linux/netdevice.h:3408 [inline]
+       _cfg80211_unregister_wdev+0x155/0x570 net/wireless/core.c:1297
+       ieee80211_remove_interfaces+0x49c/0x6d0 net/mac80211/iface.c:2440
+       ieee80211_unregister_hw+0x5d/0x2c0 net/mac80211/main.c:1691
+       mac80211_hwsim_del_radio+0x28a/0x490 drivers/net/wireless/virtual/mac80211_hwsim.c:5916
+       remove_user_radios drivers/net/wireless/virtual/mac80211_hwsim.c:6727 [inline]
+       mac80211_hwsim_netlink_notify+0xfae/0x1310 drivers/net/wireless/virtual/mac80211_hwsim.c:6741
+       notifier_call_chain+0x1be/0x400 kernel/notifier.c:85
+       blocking_notifier_call_chain+0x6a/0x90 kernel/notifier.c:380
+       netlink_release+0x123b/0x1ad0 net/netlink/af_netlink.c:761
+       __sock_release net/socket.c:662 [inline]
+       sock_close+0xc3/0x240 net/socket.c:1455
+       __fput+0x44f/0xa70 fs/file_table.c:469
+       task_work_run+0x1d9/0x270 kernel/task_work.c:233
+       get_signal+0x11eb/0x1330 kernel/signal.c:2807
+       arch_do_signal_or_restart+0xbc/0x830 arch/x86/kernel/signal.c:337
+       __exit_to_user_mode_loop kernel/entry/common.c:64 [inline]
+       exit_to_user_mode_loop+0x86/0x480 kernel/entry/common.c:98
+       __exit_to_user_mode_prepare include/linux/irq-entry-common.h:226 [inline]
+       syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:256 [inline]
+       syscall_exit_to_user_mode include/linux/entry-common.h:325 [inline]
+       do_syscall_64+0x32d/0xf80 arch/x86/entry/syscall_64.c:100
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #0 (&rdev->wiphy.mtx){+.+.}-{4:4}:
+       check_prev_add kernel/locking/lockdep.c:3165 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+       validate_chain kernel/locking/lockdep.c:3908 [inline]
+       __lock_acquire+0x15a5/0x2cf0 kernel/locking/lockdep.c:5237
+       lock_acquire+0xf0/0x2e0 kernel/locking/lockdep.c:5868
+       __mutex_lock_common kernel/locking/mutex.c:614 [inline]
+       __mutex_lock+0x19f/0x1300 kernel/locking/mutex.c:776
+       class_wiphy_constructor include/net/cfg80211.h:6441 [inline]
+       ieee80211_change_mac+0xb5/0x1410 net/mac80211/iface.c:324
+       netif_set_mac_address+0x317/0x4e0 net/core/dev.c:9989
+       do_setlink+0x9b1/0x4590 net/core/rtnetlink.c:3110
+       rtnl_changelink net/core/rtnetlink.c:3776 [inline]
+       __rtnl_newlink net/core/rtnetlink.c:3935 [inline]
+       rtnl_newlink+0x15a9/0x1be0 net/core/rtnetlink.c:4072
+       rtnetlink_rcv_msg+0x7d5/0xbe0 net/core/rtnetlink.c:6958
+       netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2550
+       netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+       netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1344
+       netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1894
+       sock_sendmsg_nosec net/socket.c:727 [inline]
+       __sock_sendmsg net/socket.c:742 [inline]
+       ____sys_sendmsg+0xa68/0xad0 net/socket.c:2592
+       ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
+       __sys_sendmsg net/socket.c:2678 [inline]
+       __do_sys_sendmsg net/socket.c:2683 [inline]
+       __se_sys_sendmsg net/socket.c:2681 [inline]
+       __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+Chain exists of:
+  &rdev->wiphy.mtx --> kn->active#13 --> dev_addr_sem
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(dev_addr_sem);
+                               lock(kn->active#13);
+                               lock(dev_addr_sem);
+  lock(&rdev->wiphy.mtx);
+
+ *** DEADLOCK ***
+
+2 locks held by syz.0.4107/21056:
+ #0: ffffffff8fbcb808 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
+ #0: ffffffff8fbcb808 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock net/core/rtnetlink.c:341 [inline]
+ #0: ffffffff8fbcb808 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0x8a1/0x1be0 net/core/rtnetlink.c:4071
+ #1: ffffffff8fbc12b0 (dev_addr_sem){++++}-{4:4}, at: do_setlink+0x806/0x4590 net/core/rtnetlink.c:3105
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 21056 Comm: syz.0.4107 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2026
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_circular_bug+0x2e1/0x300 kernel/locking/lockdep.c:2043
+ check_noncircular+0x12e/0x150 kernel/locking/lockdep.c:2175
+ check_prev_add kernel/locking/lockdep.c:3165 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+ validate_chain kernel/locking/lockdep.c:3908 [inline]
+ __lock_acquire+0x15a5/0x2cf0 kernel/locking/lockdep.c:5237
+ lock_acquire+0xf0/0x2e0 kernel/locking/lockdep.c:5868
+ __mutex_lock_common kernel/locking/mutex.c:614 [inline]
+ __mutex_lock+0x19f/0x1300 kernel/locking/mutex.c:776
+ class_wiphy_constructor include/net/cfg80211.h:6441 [inline]
+ ieee80211_change_mac+0xb5/0x1410 net/mac80211/iface.c:324
+ netif_set_mac_address+0x317/0x4e0 net/core/dev.c:9989
+ do_setlink+0x9b1/0x4590 net/core/rtnetlink.c:3110
+ rtnl_changelink net/core/rtnetlink.c:3776 [inline]
+ __rtnl_newlink net/core/rtnetlink.c:3935 [inline]
+ rtnl_newlink+0x15a9/0x1be0 net/core/rtnetlink.c:4072
+ rtnetlink_rcv_msg+0x7d5/0xbe0 net/core/rtnetlink.c:6958
+ netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2550
+ netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+ netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1344
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1894
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0xa68/0xad0 net/socket.c:2592
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f909439c629
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f90951b3028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f9094616090 RCX: 00007f909439c629
+RDX: 0000000000000000 RSI: 0000200000000080 RDI: 0000000000000004
+RBP: 00007f9094432b39 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f9094616128 R14: 00007f9094616090 R15: 00007fff601b4778
+ </TASK>
+netlink: 8 bytes leftover after parsing attributes in process `syz.0.4107'.
+netlink: 'syz.0.4107': attribute type 5 has an invalid length.
+netlink: 20 bytes leftover after parsing attributes in process `syz.0.4107'.
+geneve2: entered promiscuous mode
+geneve2: entered allmulticast mode
+
+
 ---
- net/tls/tls_sw.c | 31 +++++++++++++++++++++----------
- 1 file changed, 21 insertions(+), 10 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index 9937d4c810f2..c9d3d44581da 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -404,7 +404,7 @@ static void tls_free_open_rec(struct sock *sk)
- 	}
- }
- 
--int tls_tx_records(struct sock *sk, int flags)
-+static int __tls_tx_records(struct sock *sk, int flags, int extra_flags)
- {
- 	struct tls_context *tls_ctx = tls_get_ctx(sk);
- 	struct tls_sw_context_tx *ctx = tls_sw_ctx_tx(tls_ctx);
-@@ -417,9 +417,9 @@ int tls_tx_records(struct sock *sk, int flags)
- 				       struct tls_rec, list);
- 
- 		if (flags == -1)
--			tx_flags = rec->tx_flags;
-+			tx_flags = rec->tx_flags | extra_flags;
- 		else
--			tx_flags = flags;
-+			tx_flags = flags | extra_flags;
- 
- 		rc = tls_push_partial_record(sk, tls_ctx, tx_flags);
- 		if (rc)
-@@ -463,6 +463,11 @@ int tls_tx_records(struct sock *sk, int flags)
- 	return rc;
- }
- 
-+int tls_tx_records(struct sock *sk, int flags)
-+{
-+	return __tls_tx_records(sk, flags, 0);
-+}
-+
- static void tls_encrypt_done(void *data, int err)
- {
- 	struct tls_sw_context_tx *ctx;
-@@ -2629,6 +2634,7 @@ static void tx_work_handler(struct work_struct *work)
- 	struct sock *sk = tx_work->sk;
- 	struct tls_context *tls_ctx = tls_get_ctx(sk);
- 	struct tls_sw_context_tx *ctx;
-+	int rc;
- 
- 	if (unlikely(!tls_ctx))
- 		return;
-@@ -2642,16 +2648,21 @@ static void tx_work_handler(struct work_struct *work)
- 
- 	if (mutex_trylock(&tls_ctx->tx_lock)) {
- 		lock_sock(sk);
--		tls_tx_records(sk, -1);
-+		rc = __tls_tx_records(sk, -1, MSG_DONTWAIT);
- 		release_sock(sk);
- 		mutex_unlock(&tls_ctx->tx_lock);
--	} else if (!test_and_set_bit(BIT_TX_SCHEDULED, &ctx->tx_bitmask)) {
--		/* Someone is holding the tx_lock, they will likely run Tx
--		 * and cancel the work on their way out of the lock section.
--		 * Schedule a long delay just in case.
--		 */
--		schedule_delayed_work(&ctx->tx_work.work, msecs_to_jiffies(10));
-+		if (rc != -EAGAIN)
-+			return;
- 	}
-+
-+	/* Someone is holding the tx_lock, they will likely run Tx
-+	 * and cancel the work on their way out of the lock section.
-+	 * Schedule a long delay just in case.
-+	 * Also reschedule on -EAGAIN when the send buffer is full
-+	 * to avoid blocking the workqueue indefinitely.
-+	 */
-+	if (!test_and_set_bit(BIT_TX_SCHEDULED, &ctx->tx_bitmask))
-+		schedule_delayed_work(&ctx->tx_work.work, msecs_to_jiffies(10));
- }
- 
- static bool tls_is_tx_ready(struct tls_sw_context_tx *ctx)
--- 
-2.43.0
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
