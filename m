@@ -1,112 +1,112 @@
-Return-Path: <netdev+bounces-262163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262164-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OGaaK7cVo2mJ9gQAu9opvQ
-	(envelope-from <netdev+bounces-262163-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 17:20:07 +0100
+	id iNJwKtkVo2mJ9gQAu9opvQ
+	(envelope-from <netdev+bounces-262164-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 17:20:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id C165B1C4412
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 17:20:06 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E4B11C4420
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 17:20:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E5F59302BBBF
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 16:20:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9BAEF30459E7
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 16:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A3262E424F;
-	Sat, 28 Feb 2026 16:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 134AA26ED25;
+	Sat, 28 Feb 2026 16:20:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OVfhk/FP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="npy74shU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CF382DF6EA
-	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 16:20:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDF5918A6A8
+	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 16:20:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772295602; cv=pass; b=Va9xgeDiUUvhVTwwhrI7ZeAHnnsrnxOseuztYzx73V6VhanusX2oHfK6VvoSNfO4HG58h2sc+f/pR8uA1Z4b9PO4YixipBgcGbjJX7hkVwKqhqZOsRmnGxzaqjrVQqrcT2v1jToeHTcAA42nROXFOjkfPk89H8OmBJaUAi7F+us=
+	t=1772295639; cv=pass; b=KG7+b0y/Zjmd7FdC2YWFwEKtBWoOtHodpu+u6xc4KuwJ/LU5Q12Rc11OP/kzjbXh5ICiH6T4PTzmIAzV9tXJmwc2N/dWBhm7cEjyjmncIVAZXd3ctNOgxItg3o1RxMhODwPX+keHbDoQHCcVZIneMFAxTdmxIODm3p0aVcp9W8c=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772295602; c=relaxed/simple;
-	bh=i+0bD5jaj0rtGiFTewJRAOE2xK+2r3ZqxEp4ZrxNpQ4=;
+	s=arc-20240116; t=1772295639; c=relaxed/simple;
+	bh=AdYtHriPwmiUwOJj2Tl58C39ni7VQ+vP+kfC1aP3iQo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DsC/gJN7JDWg/FIa5B/gTED8QCF39aYXJ+tJ0LkXLHTN9SgsPZkHqx3SLQPS5t7xadGKTTWFvd4X2DyJKGqh1i8dwqen4Yvlv9dXnxjWKPunTJhf639yR6MihK2lZ/66V8X3qFcmMkjSFKnS21FjHEDaZL28uN7wFdBoPJxbFng=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OVfhk/FP; arc=pass smtp.client-ip=209.85.160.172
+	 To:Cc:Content-Type; b=Ozu8lOOX52ClJYtk1BVd42VbGd5uK7GDyqEkV1/vz+caRipK8Uax8sE3qPXo5UMedQ3eRDuuUPYujTGNZ8MX3pdsiuucGHeDNvbkLBKYMyMTnaXckVr4kcUfMMtHX6wgflhMK0RW41EqgQFoEgsGONmRzaRaIK7ZX5IiTvSjoyk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=npy74shU; arc=pass smtp.client-ip=209.85.160.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-506a019a7f3so39266471cf.3
-        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 08:20:01 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772295600; cv=none;
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-506989e8516so28148741cf.0
+        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 08:20:37 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772295637; cv=none;
         d=google.com; s=arc-20240605;
-        b=Q4ik4OashXfn15qthLlZ2T16yBhw9UhwaOqeTqfiV9xBp+x3qQMs/tE9v+Bf9vE9HZ
-         kjJQiTyxg/amEGQNKkBsfDR0rZ4vKuPFs7T+6eS4Bc4dU5uZ9TRa65K+9WxDx7gPNgBb
-         jQLwznhhqtPMbO2Ctaifpc0mlETEn0yGk1z+RTbMzcXV4VbNrOJfi+k3udv/IZgHo4i/
-         cuwZHsQ0OB5J6yCPnZu9fSz9SrbZFyOSyhBvG8E7UQP1hh0SXtNYvZf96SVyZlEa7pz5
-         CaiOc3dytC0MXFmIPduSRYsSXdAH2pRZsR6CdEASnIsn/4hWPyb8tzt7mOCZhPRDZZtR
-         tv3A==
+        b=JdW1Jty8xcqHZmi3G0bzCYEzBCclI+RxNyq/q2R6wtOd5IMiBPMYx5rk0LaALwTMsv
+         fvTv/bBHBZA1+gSo1TsWX95lPD+qf1N76wVazTjUaCjmcMgc++PWU9jOC2HNB5SkUfpU
+         v7zBT1DVL6txo1Jj0HIwYVUx1fQ+ommorzpD58Uf4UDvBH+QdgT0AZHxwYBiiPH2Q8Nd
+         J3zjBeF3IHnogxFX2GKI7gbZoTbdAwjEc8lkK51AhFDOhbKeHLdZ8pDELps5DZ78d1jy
+         Il6QmfMCKAKoaCCdTx5ERQISq3OpAuA3kyzkX31kuzS8S61WWgMVVz8X19C+KWpW+50G
+         XAbA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=i+0bD5jaj0rtGiFTewJRAOE2xK+2r3ZqxEp4ZrxNpQ4=;
-        fh=hoTzEdr81/gE3MmSv6oR086jyYFq70TKwjiIqHW3qWA=;
-        b=RTet8kAGirwPBgmukg9ymEha5H7SSzoHqYXkcKnXdo6tr0thmCx57T2uS04OWaYhO6
-         +tFsCWzb8esFvYI63eBmaFQDGmqLu4/aSeDNs3i5ccxPeJX4kHIaSn/1dOMMVF8XhKkf
-         h7Q1UqddfR0EBAvLvKDlTjbwXS9o5zJyNKp6Cy752E0Jvtw+jZzGwQgJlirsUdoEUzxq
-         3H9gks1yLLqkfTnfuzpnQGaCy5bWGH4oQbaIqFoJONlOnme0aZDEvwanwxaOwIcngBpm
-         tFCc6mIDFlyWZIqiPaYPYGTH0AGBXbmmhqr1X0mIAy04lmL1kIMFu5xX847OYQPRZJsD
-         Ekag==;
+        bh=AdYtHriPwmiUwOJj2Tl58C39ni7VQ+vP+kfC1aP3iQo=;
+        fh=UVUEC6hzo/7YgKvMSHiGVhNOwpxjzijIlh9XB01NpFU=;
+        b=JuthTBQE6DjY4lx+fizspGQMua0ElAqbo//RJnIjqUi2fafQI/nUGcbuzsLeifZ3LT
+         Z7EA3aaj72Zs9o88NwleMsfJK0Tj/xjPph5uPrYFMQKZ1bUZT2o/Doj54qQpfRsHGS+m
+         Ogh5/sR7c9F3F0OKsZWGYiRNagUa3Qezp8YsTZ2uOkYL/LvMPUNUK0OpudVa3hNO8HAY
+         pUu9jZ771bRnhy7uoRGgZom7IaWm5UpTc4gCvBIItTo3vUtRAUqa2ijmap1Fj7V4LbvU
+         T3N3yhnL+X5xN9c8YgJis+0vBsw54xzKW2/sP81rtwbhNqCYAjsq2tspjCpDK3MB2u+q
+         +TkA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772295600; x=1772900400; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772295637; x=1772900437; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=i+0bD5jaj0rtGiFTewJRAOE2xK+2r3ZqxEp4ZrxNpQ4=;
-        b=OVfhk/FPjXinsNQ8rbNDemx+ofDBlESdsi4JYHkqhE6O0RpPy9xmOyRNYdzycacVeu
-         kuYDCO4exV4a+L7ECulq5gLg2FRH3r4hbTAn5NSsyvtJTS8gBE1WGlRzteuvclNIF5vJ
-         C5drQkDBKYnvZVNUGPG9yY3KHqWlFDFPBD/EW7p2AJiLi1Pa1SowsoJWavtvDh+Ek3tU
-         IwnVIob5dk9EkUiImX3xD2WK3q+WzS9laoTH8uKwn+WR2ltfDaiP2e1VY/CQZg5Q7S90
-         8sq02j5da91YpumA+zIE73x3juvbF4GP30tGJEahLGpb+djSOWC+QZD3/3ojsQ6WmRrO
-         2ZoQ==
+        bh=AdYtHriPwmiUwOJj2Tl58C39ni7VQ+vP+kfC1aP3iQo=;
+        b=npy74shU+iYJxy+oj0XBcwh5M0WGicgAcZD+5Ff/5KWdgJKTmg8x+l9v+qnbnO0L3P
+         Oi3Jqsnc/Id2ilXwvw7Bwfa8XZ2FOHeNBMzOQGu4GM3tjNaW5EiysI/m/lmlrdgGZaY2
+         sFKQlzDMOUnfrZw0JUAdQt0o1S+ZzU9lCtEzkNjGRqF17Uo4kkqM1JkMMbBGASeIEWkV
+         UHi77iGFBO7b67p5pBzePI7bxFA+mjCRUy/eQY4Qhlr4WctVJlM71/YMKY9ucgm0uHTf
+         6V3jykhbUKgUVSzufw1CJd0APIAGgEeAqAqRzzlj6uQk49bf2iBzsSYvgjkpEuFqBzYJ
+         y/zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772295600; x=1772900400;
+        d=1e100.net; s=20230601; t=1772295637; x=1772900437;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=i+0bD5jaj0rtGiFTewJRAOE2xK+2r3ZqxEp4ZrxNpQ4=;
-        b=sQ/d5M6rFIR8c2ot6kmoFltB4BcwaUtYXRjC3ch+jCchakonRsZm8LYbz/vPbaldT7
-         ONOx44BJTXCmHtgRCBPmIq+AXfn7bzs1W1xN0KEaap+/i3fqcCdAxfj1UPChdGbnJwLM
-         9cBfna9mIwzmc3BFI1JKGo4Mv0VrlJS9io+xSjs3pBbvgPuuGGZcuRfTHMHTzg0KCWDN
-         5xd7nTvbGUvkHiArr+eRL91qSd8ayup9Asx+VxdJHYpAJECEiWxoxePvB64ZxR6u/Duq
-         cw4oO+huV86Wdi3I24otbehopxFpTFozsRO/ByjtQfHWhATGLVZOS2SFrSt4EgedCw3t
-         0AdA==
-X-Forwarded-Encrypted: i=1; AJvYcCWoM57rpsMv6QiC2DVLK7+7qVOp8sZzDKS5RJTXcBEtl3Esrzz85BjsHvDsLSaCoukAMeazRAc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIKW15YcSc2tS7u1fN3XsnDq/WF6xu1nNp8xtlAjNfSwzMLT+n
-	vyZg4Ry64pDRvteO4oP7gqZBO/Sk1zkxwunCDzZd7hUMfTxmNd2kk1k/aFxjeec3W9cLbQ0imnA
-	Q2yOOyPQjC/1pnHs5TA++Z589pI8y9DX4sHaR0zKc
-X-Gm-Gg: ATEYQzxufquWVgcyqMKEAMY88lduzPD0ClQloXs/d4hQp8q+4HgiBLA4TR4fu/q8idn
-	lFQWlIuZkJmayyQQ4zrm++AlzTFP2+azb6K+8kkSbCBCcdR3Elqr5lvw24c3sEse4lK2pmxNhZs
-	ph43BTeoKZT+brxaJSuOSwX+OLjTuBLmtwr1DIcpRmn3I2MF1fvhTk+Aj9UFIuIbVqIiP1p80l9
-	YovsFu7tRG6fgoP7Vebs8PCv6oYHW0yv/EkgoYOaC8uZ4vMYZfZ626Bp5nYEsNNtDJg1tFdCOCs
-	rsYivqs4CsSup9kK9sw=
-X-Received: by 2002:ac8:7f8a:0:b0:501:4420:62d1 with SMTP id
- d75a77b69052e-5075288c88dmr89701821cf.48.1772295599888; Sat, 28 Feb 2026
- 08:19:59 -0800 (PST)
+        bh=AdYtHriPwmiUwOJj2Tl58C39ni7VQ+vP+kfC1aP3iQo=;
+        b=ccR7ASaQ0GMayyWmTrnn39+CMwKJJjKmXZU5p0xLu2paADxY4kEvk7spoEyccHWZFq
+         vDIUljbvi2Lw1tNH/aVDdbvZb4OOmae1PGSO/ORKjEvvhhs8EYmFI57HDSEaEFGdvWNZ
+         fqGn0p6QkjsimFqzkwr2FBNbEUNWyYLd4JdupOY6957RxRVv/AdgjsAawRYf2iE4c4hE
+         11Yi6/HPg9rVTyyxGBF1ey6/gFNu8xoavTcpXuBopBlrgzn4JSd1bKSO+pBB1aihDWC2
+         NkRqROF4+uuHzSdXyeuWM/Hp0krd8Q9CqmgwCthpbAFLWIb4GG6KUgbCswmxk3B0IZaw
+         Rn0A==
+X-Forwarded-Encrypted: i=1; AJvYcCU4vCiaMmdd6pv1OzpcOTg1edhcP6ybX/s8tYDMIfxnSYgD3n57iJS7EBWGxaoCYON91ezSdZE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxuNzZVDhkKpdYotGlmbEoqI0J1fnXPDP8o6WIdqoEQl5sx0uqE
+	DAHuh1iIFVELEhB1prKQTNsGgyUjGKTHR6WeGl3Pz7rPCqFZo1N4zsJseysEVV+tYBxgmm/Jc6P
+	ae4oeg80heMo9FEZRcz+U+dSd1nH+JgTOyD+4zx0K6zIQLnz4XhS1Xghg
+X-Gm-Gg: ATEYQzzgenMDO6KPR3ZH55IbTY+Op3Quhvw/EJ9/2uCkm6f/aPs+CEWb5k8e+KKiIL/
+	FmP5uJJRK54EOzw81Agq74DM5MHDd2QbHsnLIFSKTw7LU41E9iSkvBKaAnEx3QdalnZS5/JAn1H
+	KV8HO9/TAu5ZN91q94X1OWDadBZt/jTzcxnvKy6gbDgv+6AoArR8YbPAyQn+kxpwxKdSa55qJmP
+	dMAXtG+xw70kw6zNYdpcMAnenGrtqUB+wl/3v3byvmAPK1XT1gNN0ICuqAkhGaQ1hZrtIpEsB2t
+	WTJrAIDY
+X-Received: by 2002:a05:622a:130a:b0:4f1:ca82:f1e8 with SMTP id
+ d75a77b69052e-507527cb21dmr76820921cf.7.1772295636357; Sat, 28 Feb 2026
+ 08:20:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260227033903.3307272-1-kuniyu@google.com> <20260227033903.3307272-12-kuniyu@google.com>
-In-Reply-To: <20260227033903.3307272-12-kuniyu@google.com>
+References: <20260227033903.3307272-1-kuniyu@google.com> <20260227033903.3307272-13-kuniyu@google.com>
+In-Reply-To: <20260227033903.3307272-13-kuniyu@google.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Sat, 28 Feb 2026 17:19:48 +0100
-X-Gm-Features: AaiRm50_E2vhpo3As_dwDGlTtjbTlCwrsy9S2mVx_Rbf6NVmj2W3ykC3CZgB_oY
-Message-ID: <CANn89iKhCrt=8=4uLp1dLWPrTo_F3zxLxkYc59AuoMuDxO2p9A@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 11/15] ipmr: Call fib_rules_unregister()
- without RTNL.
+Date: Sat, 28 Feb 2026 17:20:25 +0100
+X-Gm-Features: AaiRm53v5HJZcF2m7PqO-dhtEevF7fg35iejPvdKR-Yzza4XCYeqG6xUVusTxss
+Message-ID: <CANn89iK-PY2=4WYhaZY6EufFSHotuf=vAZKU=s_bjYPzmRC3RA@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 12/15] ipmr: Define net->ipv4.{ipmr_notifier_ops,ipmr_seq}
+ under CONFIG_IP_MROUTE.
 To: Kuniyuki Iwashima <kuniyu@google.com>
 Cc: "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
@@ -118,12 +118,12 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,gmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-262163-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262164-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
@@ -138,22 +138,18 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C165B1C4412
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 0E4B11C4420
 X-Rspamd-Action: no action
 
 On Fri, Feb 27, 2026 at 4:39=E2=80=AFAM Kuniyuki Iwashima <kuniyu@google.co=
 m> wrote:
 >
-> fib_rules_unregister() removes ops from net->rules_ops under
-> spinlock, calls ops->delete() for each rule, and frees the ops.
+> net->ipv4.ipmr_notifier_ops and net->ipv4.ipmr_seq are used
+> only in net/ipv4/ipmr.c.
 >
-> ipmr_rules_ops_template does not have ->delete(), and any
-> operation does not require RTNL there.
->
-> Let's move fib_rules_unregister() from ipmr_rules_exit_rtnl()
-> to ipmr_net_exit().
+> Let's move these definitions under CONFIG_IP_MROUTE.
 >
 > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 
