@@ -1,220 +1,211 @@
-Return-Path: <netdev+bounces-262121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262123-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0HWMMiDoomlG8AQAu9opvQ
-	(envelope-from <netdev+bounces-262121-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 14:05:36 +0100
+	id PDytDQruomny8AQAu9opvQ
+	(envelope-from <netdev+bounces-262123-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 14:30:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3C7D1C317C
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 14:05:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84B6D1C33C1
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 14:30:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 22B173019FCD
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 13:05:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 08407303A8DD
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 13:30:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACE3C36212E;
-	Sat, 28 Feb 2026 13:05:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 975D51EE033;
+	Sat, 28 Feb 2026 13:30:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="LdWYHt/z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="huUMpM+x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58158364944
-	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 13:05:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55B011487F6
+	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 13:30:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.45
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772283931; cv=pass; b=DbwktXJ1KIXCTdiC5Ik3iy+9iRWMB0Mi3LiryJua4i/MxvWmxxC8kwi+YIeK72fYAIsDKbloR6gJsTdABneaPF5E6ZktpSJ5kY31OasIrGAZwVJr19MYscIgntjBc7vnhw9MSh8fvnNX4dy7QLSO5KtlWQhJe5vOk5ayz2/DWZI=
+	t=1772285447; cv=pass; b=mk3EGuUaSgt9oSSIon+Ojxw8CEftJm9UfwaIR9UeVBpuAOw2UxMQg9nzTzHBYDaS0sL8FzCxQe/hLhAfMjm+Q5qgBvGQ8yvujPMUhSVZxOVvVj9/J/K/uzqYdyEnBxLyLrfM3uAvsdt5RxskzTcGrKv8CUbf5qU39OkzMJcH18E=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772283931; c=relaxed/simple;
-	bh=OqozRgE+7Hr2AbFLJnG6hrQ5TWyJLeOE7GLaUeOb7A0=;
+	s=arc-20240116; t=1772285447; c=relaxed/simple;
+	bh=80jwD2gHI64J1JGG4o86aD1JoyB7X9z+PTWBAKv56SQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=V/f7icxEFt/+y7AOkCa6qHjUqCGkWb1BveRhaktI0HBWmlXuhPhiX4PRpclDE1H2uTfUDkDs72QlUioIMUGDkeTuTXG3EBFLgQa2xsYky8T0OafyZQE5ElfCrI5JyeOwSRueT3zKHglIOV2oWVIJxkmZsGoO4KF2UzNhSDsrLaI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=LdWYHt/z; arc=pass smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2ad4d639db3so14239925ad.0
-        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 05:05:30 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772283930; cv=none;
+	 To:Cc:Content-Type; b=mtuNybZBGPyZdFmQLwZu5Zgdj9i0jsYrQRX1Q72U3FgM8siplW379PiWfpVUDG3kHpcwbY6rkPbL4TCGg0ZP4owXctZdixMKVnce+TKrwFMbJ3XyB4LkEqE92Yxz5BNPVTBGeFsmjl+IHmY40/yZ+cl81YBwuXm/V4/8sX3/x9o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=huUMpM+x; arc=pass smtp.client-ip=74.125.224.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-64aea64bf15so2577412d50.2
+        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 05:30:46 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772285445; cv=none;
         d=google.com; s=arc-20240605;
-        b=SbQaJBTJeR5afJW/jjf19ipCgwX94tLpl/PI/9pY/RobRDBBqoMnUcMQxfl/CaOzxx
-         rtVdkY/Mwz4X3p4EaEU33fWr+mZ/bpCTKGGWzH8b/EFhuhintWzzu0xQg6kGcLWvhAbL
-         flZmwoRVKGfJ7D0AmfRDMzomNx3CD7LvjDF9FBuzNzqk+tYJz891G0dkaTXmuuj42fLO
-         uiEZZJNqmELnJL/KjI/Bmqfx617qqKKEAlvemL49aulllfoGN74IDVGRztMDxAGfHCQQ
-         eb7upYUQolBP+2fk7l4EACdD1qUZHx3c4ai10+E7TURk1U8jRHXC0ubRF7ZI3reMCRFg
-         Up5Q==
+        b=VmAgOHpn7eyPUpTbR875ecMVfPGnYYVPbE8LjF+otW+yDXq2rx7p+MRvUDYaTxS+Ue
+         GPxNrwxl9+td3WsTkz606wB8qzrPOWNSGN8fsaeYDwCS9lqdUfmvbYIVosUPLbWGt86j
+         8xkDO8fRzUicfaXrcPuVSC3lhMK0jzhlSJANF0QjPo5W1PZXU2IbZO7mI1tb2rUprX33
+         r5CszzVUgk7luADfCOPd5gsgPot7VeMvzQD4WI59oS7MLJ45seDbh9+Y3h052pP3rC0B
+         LWhgZM/4plf1nzjK/QYfTORVdKLbREtI1OoB9zjwjKozgWI1HSq/iXClxJ2kotSqSCKs
+         0FrQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=OqozRgE+7Hr2AbFLJnG6hrQ5TWyJLeOE7GLaUeOb7A0=;
-        fh=vjLW6jY5srCzNU4cDo2A0X0bPYmeHUDTwq+W+b+Sm2I=;
-        b=aefY3FMyHFgREo8en86vdzvsfzzFAQb7fPFKCsttti8KLY50cjJmYwXce6wKtXl3g8
-         lvM8IzXR/mWjtccwwdJCh5oXdUHphHt2r0ZTjNA7znxZ2o6O3cW34Pxsbe0F2MYw34oC
-         r16dTCHKa53Xse+rBtN2jEDDbbFGQLfvEHnmEX87qWd8pKUrtsMoUJPr1K3VUHfpXRx+
-         zAVveLr6w9l/JttoXc0sjOMoAKrUU/+6RlAsHWVtzLFrpzGlHG+JvieggD4M9doKl4vZ
-         JtB4Xrbob4xQtc4XEd95EVEZk8a7NtP28QMr1qsJ//Uoo3eBYa9hBRsgRCm2zKejedZe
-         GK0Q==;
+        bh=80jwD2gHI64J1JGG4o86aD1JoyB7X9z+PTWBAKv56SQ=;
+        fh=blZ0jvUq9qyU2Kr4RXf1cuMIc2Yf5jghjuGMYjzLMuM=;
+        b=VoJ5KTH5MvLD39qY8EvS5hblt7OI8y27+V5ZgFbgMQxg69CGncT++JVok5s8AfMviT
+         JIzJx04vVwpdgAzaTCH1yJCSNGEUafCG6SFaonTfpKiGFWXp1qntjgBPuqvfQiz42z2n
+         CQrBxQfW8VhY++I1OerpW1hR9AbnoOw4oLHKEyrVvJTawhfOuvC1vC9Xf0G6DOtad2O6
+         5sqB3RF1lHsfx/YsNLERaWiSBGSEpGxbs125BNg9ejsiGbC3UpcIC4y9YJBebR9oJFBg
+         TH2pKkbYfcebp0TDCpZ6/wXMEPPoxRcxtMsRRJKQpzna0fBupXJJHpXrn/h64WWnRRAR
+         E5tA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1772283930; x=1772888730; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1772285445; x=1772890245; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OqozRgE+7Hr2AbFLJnG6hrQ5TWyJLeOE7GLaUeOb7A0=;
-        b=LdWYHt/z7UszWxsjf2OOzfhxDD5y9UTAr37f0eD793Z1/354DhMychY27Dl5AdKmS7
-         0tnSiuN/1u6EHiQ1c7gfR+0qx1vDkgg6y2H5kFW3zv9fwItp3+NzWyV9Jr3PIaI6emgA
-         ni8t0OvdSEAXdImwHwu9QmrpoxYo0kfwZ/ptUW15MfThkPrg+ZbNX9VehwnLynX6cryk
-         7jn4+i2LUJt0hpjkKrXam6FjsGMvWNuIoteW1X6AURnW60TmzuvsWs5qlrVl2Ioh/Ld5
-         ujhzCaGfFVyi6L7z63DNonnNuH/ZC3JhWyjz2VLS8QtXxVZhNnsFDU565TlL/ziwsK+f
-         v8Hg==
+        bh=80jwD2gHI64J1JGG4o86aD1JoyB7X9z+PTWBAKv56SQ=;
+        b=huUMpM+xSbdhhbo+rkqPXBQYdsiCQ56OQXVadbvqGj9xbajdilZVy95JOlxGbEMkAl
+         rSZPKlcEmX/y4p5y8MvfxxVvgfcG+3GsAvPylTKFqJwqpoZxGyhYFwYP+HKjirpnEHUg
+         wH34q/ylpjD6PkjrjmPWrE6dlc76kfZrGAbUTIBl7OCwAWP6gGz58+Je2lYFyXdKavWp
+         AUzRl7xYZl2K1ACkeraoeIeuDjBlTAhZN1E+VrgSgDG/p5nYFPHC/BAiKaAQ69AsNaij
+         SOjl1/OK9d/V3VJ0z6RcJfwyuRfSPb4YXhXjLuWYQ56izVApF6VJjYkJHIPk+KPB1bSQ
+         tEEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772283930; x=1772888730;
+        d=1e100.net; s=20230601; t=1772285445; x=1772890245;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=OqozRgE+7Hr2AbFLJnG6hrQ5TWyJLeOE7GLaUeOb7A0=;
-        b=nYGAcq58HpNXbnkvDVHVWl37NSDFlgZUwX6/6fQRM9mgz7eSoUFguLGUvLkobMUyjq
-         lnc07pXd5iKoq3w20D1tX4InX/vebwqhr1twMQi9FvMhckM6+5u75EYdXQOjXVxUY1S5
-         P9Dzy1xw3XjfLliilRg1yx54c9bl+a8vKnT4D+zz46r58g9NfXQJS6ThkqFi1BXsFD4D
-         /OvzWcpQdaES00/o5bboyycpgmuhMeP3VqbGy/hxavAjcmkFYkaes/rzQr7c3drVvLVf
-         TLFUB/yL2fKnRBQYLOmlje4YDcqg7pAj7bbUQE5PzZq1KogA80nnL1wqkq4jbo5cyBIs
-         tYqw==
-X-Forwarded-Encrypted: i=1; AJvYcCUNgWOQJS4vhnrLX0IQDWNtZEPVP0YSvr9ODbLAZQ+mjmHbmJnaIumZp/4UBqpTT58Ne/7F57w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yykc1vXS+uypq/MmKFA294eQNpgJ5Ln3C72GObyG0Qq5npiSQJQ
-	XQF2nabYg5hZqZlwMj6lLqKUetNYR4ju55w3cqNbOXHiLm/WtnDNxJhh1r67oVkoOYlsX+WgK5X
-	BtGStG2FlBZbA7aiyE7nd2mmZqYeliVWXsTC2J2tv
-X-Gm-Gg: ATEYQzxMJixruRqaZ5c1DaXtwybAOYH258tw55295nA5ddUPXTaZf5ka5Fe11xzc1vG
-	JMC6AXbgOG3OfwKufkmDrEc+FoHUoaXxwqV7z/hsyXbAiUw701iBUm/UwlYzQzfRruSR5SWAvMs
-	hHABr4jXUIxxzShFqLHdUTHTDPyFh8Y7lkDfhSdTJiIkxQJPSgSzTa8ApPRgPLAhfD+1PdMLnTh
-	JxBT89fsyzVSzX4M1xB7ytpJswVuCO95KWbNQsc+bRFKV2BQEEg64c6xG4dz+j+mUnmlOAWBRHz
-	IZUSJHLVaqnT7ieWjq6ynIcO0w==
-X-Received: by 2002:a17:902:cf0f:b0:2ad:99bb:3129 with SMTP id
- d9443c01a7336-2ae2e4e8d73mr54637665ad.50.1772283929489; Sat, 28 Feb 2026
- 05:05:29 -0800 (PST)
+        bh=80jwD2gHI64J1JGG4o86aD1JoyB7X9z+PTWBAKv56SQ=;
+        b=ltciWVKrysxiVI1xeNGXDtVxEYqfeWwsziIUQ6vY1BJJmlzHSv6vkK5YN+BgVDwa9o
+         7mJ4cpSPZizfpGuE6475RdzICTKYB/A7t1hA62CvAp7rJBXhYiYRfCn8Gu5++uO4RmcR
+         X6fIeXnst5o8+MbwQlyqisxgTVP8RIlHcpfnenRVk1DYXTEMb31NQsuJsTG48a5787pO
+         Dk5nquyEa2mcvnB8PphzChXjNiQ1xE9IfJDz+7zKzce9bJC+ly/rldVnl5zC9rfrhaRj
+         L88Py08KmhPbIaofMTCW50mTPIlkUPXBE7abj5srkrP4ldfBdQV6cBQOVQlG5xnLvZO7
+         CWKA==
+X-Forwarded-Encrypted: i=1; AJvYcCV+vUDS81nQWfnqSFF78psUJSjQMYpeY1PrGfCcI+gvHcxk/bsOHyRxorFfoz5Kl2r0R2TWKCc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfgTHO2wMMC6P8MysmPODsNzZpT8Pa5M0aqSuh+nt7Zfnb3U2+
+	KPQQHyhNwf53huxWWMmgwLV6M0Zzs/WyknLPavP/cja/tICUfg9JzQJxNLT12yMj8eK680hshHm
+	FFep+HJelULjIAjkRHd/krf4MjoKXTPs=
+X-Gm-Gg: ATEYQzwx+umDUlFR3jn66BaFUCcdFQtpOis5n+86kLBZkBjRx8uCDL5B0hDLR5agL/R
+	hPs709YMe+KgmlkhYUzqF4GOtYBEuLLpK2//K4JrWJgPqiL5ZZVgBlcFKzYRKqymvfg5FL+xoYA
+	kOVB++g+s+Rte49po8aOBy4b87sz0AZoLMSEvURl4xOQPNmkU2juzYLFQ20Cwm4fNXv5URlA3nK
+	bIcD/QOGcnYRk9URLWSlC3WRCV2PPSWRUJZKGr5umK2eKFjuvVSUzuA8izsCDT+KrU3BNqyCaSJ
+	voxvsuEa
+X-Received: by 2002:a53:b642:0:b0:64a:d74f:257b with SMTP id
+ 956f58d0204a3-64cc2080be0mr3732882d50.7.1772285445069; Sat, 28 Feb 2026
+ 05:30:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260111163947.811248-1-jhs@mojatatu.com> <d42f0c80-e289-4e0f-8608-10580d315fd9@redhat.com>
- <CAM0EoMkFMURPj3+gNOaqO60D4deeht2F3EZWZbmShjO+B4wJBA@mail.gmail.com>
- <CAF=yD-Jah3+1Sj3-Us72fKNu-__sg7pNb+-kC_knAV=iTHAitQ@mail.gmail.com> <CAM0EoMmAQ8RvHRmyEeMwehhNe0yXzn8NU5UvwitzAoL3cwVPqg@mail.gmail.com>
-In-Reply-To: <CAM0EoMmAQ8RvHRmyEeMwehhNe0yXzn8NU5UvwitzAoL3cwVPqg@mail.gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sat, 28 Feb 2026 08:05:18 -0500
-X-Gm-Features: AaiRm50J7n10K1tJc5XtV8aE3FRKjaSqWroTN1RyVqgLAaiRSaTEaJr15HC97dA
-Message-ID: <CAM0EoMmXq67kso-n_+Y6sCMhJkkiE8b0R1Kn-d0rLb_X=ALV3A@mail.gmail.com>
-Subject: Re: [PATCH net 0/6] net/sched: Fix packet loops in mirred and netem
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, horms@kernel.org, andrew+netdev@lunn.ch, 
-	netdev@vger.kernel.org, jiri@resnulli.us, victor@mojatatu.com, 
-	dcaratti@redhat.com, lariel@nvidia.com, daniel@iogearbox.net, 
-	pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de, phil@nwl.cc, 
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-	zyc199902@zohomail.cn, lrGerlinde@mailfence.com, jschung2@proton.me, 
-	Stephen Hemminger <stephen@networkplumber.org>
+References: <20250508091424.26870-1-jonas.gorski@gmail.com>
+ <ce4d9b7b-aaf6-4796-94fb-8c3d6a1dcd4d@gmail.com> <d7f9775e-0af6-4294-837b-47e31e0d30d7@broadcom.com>
+ <CACna6rw1kF-r40dr-nxouV9E0AigmeVj9fxQm_Px34Z_n2up9g@mail.gmail.com>
+ <CACna6ry9B9LiPbWdXzi7FCcaU1YC+HPkor53AiSEaRSNUMcLwQ@mail.gmail.com>
+ <eccf1d40-e4f2-4ea1-a8e2-328606fc0860@gmail.com> <CACna6rzi3_pnduEphRBY3NDKrNqhK2i5TdVTNeEGb4nHm+vOMg@mail.gmail.com>
+In-Reply-To: <CACna6rzi3_pnduEphRBY3NDKrNqhK2i5TdVTNeEGb4nHm+vOMg@mail.gmail.com>
+From: Jonas Gorski <jonas.gorski@gmail.com>
+Date: Sat, 28 Feb 2026 14:30:34 +0100
+X-Gm-Features: AaiRm53elsgk7jk696p2Zj0G5jSypB-BM7g_7_ulmzSDXWuOw76Aoel8UWvKo7A
+Message-ID: <CAOiHx=m9JQkm3pMj_mEMoVwCApB=Ef4J7FBzOf9_8o9eiYbCjg@mail.gmail.com>
+Subject: Re: [PATCH net] net: dsa: b53: prevent standalone from trying to
+ forward to other ports
+To: =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>, Florian Fainelli <florian.fainelli@broadcom.com>, 
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Hauke Mehrtens <hauke@hauke-m.de>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262123-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[mojatatu.com];
+	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	TAGGED_FROM(0.00)[bounces-262121-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[jonasgorski@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,hauke-m.de];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D3C7D1C317C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:email]
+X-Rspamd-Queue-Id: 84B6D1C33C1
 X-Rspamd-Action: no action
 
-()
-Sorry, I was busied out so dropped the ball on this one...
+Hi,
 
-On Thu, Jan 29, 2026 at 4:22=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com>=
- wrote:
+sorry for being late to the party; currently on vacation (be back
+early next week).
+
+On Fri, Feb 27, 2026 at 7:13=E2=80=AFPM Rafa=C5=82 Mi=C5=82ecki <zajec5@gma=
+il.com> wrote:
 >
-> On Thu, Jan 29, 2026 at 12:06=E2=80=AFAM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > On Thu, Jan 15, 2026 at 6:33=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.=
-com> wrote:
+> pt., 27 lut 2026 o 18:58 Florian Fainelli <f.fainelli@gmail.com> napisa=
+=C5=82(a):
+> > On 2/27/26 05:32, Rafa=C5=82 Mi=C5=82ecki wrote:
+> > > pt., 27 lut 2026 o 13:23 Rafa=C5=82 Mi=C5=82ecki <zajec5@gmail.com> n=
+apisa=C5=82(a):
+> > >> czw., 26 lut 2026 o 22:26 Florian Fainelli
+> > >> <florian.fainelli@broadcom.com> napisa=C5=82(a):
+> > >>> Could you try to program GMNGCFG (page 0x02, offset 0) bits 7:6 to =
+have
+> > >>> the value 0b11 which is dual IMP port (IMPO is port 8 and IMP1 is p=
+ort
+> > >>> 5) and see if that helps?
+> > >>
+> > >> On my Luxul XWR-3150 (it uses gmac0 and port 5) the value of
+> > >> B53_MGMT_PAGE (0x02) / B53_GLOBAL_CONFIG (0x00) is 0xc2. Nothing to
+> > >> set there I suppose?
 > > >
-> > > On Thu, Jan 15, 2026 at 5:23=E2=80=AFAM Paolo Abeni <pabeni@redhat.co=
-m> wrote:
-
-[..]
-
-> > > > Generally speaking I think that a more self-encapsulated solution s=
-hould
-> > > > be preferable.
-> > > >
+> > > I tried other possible values:
+> > > 0x02
+> > > 0x82
+> > > 0x42
 > > >
-> > > I dont see a way to do that with mirred. I am more than happy if
-> > > someone else solves that issue or gives me an idea how to.
+> > > None affected my switch / wan / lan ports.
+> > >
 > >
-> > It might be informative that there used to be a redirect ttl field. I
-> > removed it as part of tc_verd in commit aec745e2c520 ("net-tc: remove
-> > unused tc_verd fields"). It was already unused by that time. The
-> > mechanism was removed earlier in commit c19ae86a510c ("tc: remove
-> > unused redirect ttl").
+> > Thanks for giving it a try, how about the BRCM_HDR_CTRL register
+> > programming (page 0x02, offset 0x03)? Can you see whether it is set to
+> > 0x3 or 0x1?
 >
-> True - we used to have 3 bits, but we can leave with two;
-> Unfortunately, a single bit won't work - otherwise we could have just
-> used the one available.
-> Only one bit was available, so we recouped another (skb->from_ingress)
-> and adapted it to use the tc cb struct.
-> There is still a chance that could cause issues - all the users of
-> this field were CC'ed and i was hoping they would respond.
->
+> It's 0x02 which seems to match BRCM_HDR_P5_EN. It makes sense as
+> XWR-3150 uses gmac0 + port 5.
 
-And indeed reclaiming that bit is problematic. So the AI didnt catch this ;=
-->
-Stephen, see if you can improve your prompt to catch this in the
-future. Should be noted this would be nice to include as well in the
-netdev type AI to catch cb stomping bugs. Turning skb->from_ingress
-into an skb->cb field is problematic because the bit gets written way
-before we hit tc. First the mlnx driver writes it in
-mlx5e_tc_int_port_dev_fwd() and then the GRO code trumples over it. So
-by the time it gets to tc it could have an arbitrary value. So I guess
-our overlords are not ready to take over ;->
+Does this affect all ports, or only the wan port?
 
-> > The IFB specific redirect logic remains (tc_at_ingress,
-> > tc_skip_classify, from_ingress, redirected). Maybe some of those bits
-> > can be used more efficiently. The cover letter for commit aec745e2c520
-> > had a few suggestions [1].
-> >
->
-> Using the iif check against netdev feels a bit "dirty," but if there's
-> a strong view that it's okay, we could liberate that bit (some testing
-> needed) and in that case i would leave skb->from_ingress alone.
->
+Have you tried to check the hardware counters if they get sent out a
+different (cpu) port? AFAIK they should be available as ethtool
+counters via gmacs, though I'm not 100% sure.
 
-Let me try to reclaim skb->tc_skip_classify first and see if that
-causes any issues.
+Can you check the contents of the EAP Port config registers? Maybe
+some extra mode is set there by default.
 
-cheers,
-jamal
+I don't have NS(+) device, so I can only guess. Though I always
+wondered if the setup which CPU port (5/8/both) to use is just a
+software thing or actually a hardware thing ... .
+
+Best regards,
+Jonas
 
