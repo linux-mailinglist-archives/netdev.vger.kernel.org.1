@@ -1,149 +1,226 @@
-Return-Path: <netdev+bounces-262105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262106-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eGjfCKy9omkS5QQAu9opvQ
-	(envelope-from <netdev+bounces-262105-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 11:04:28 +0100
+	id QGmqLvDGommy5QQAu9opvQ
+	(envelope-from <netdev+bounces-262106-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 11:44:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D46D1C1E10
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 11:04:27 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E63FE1C235F
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 11:43:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CD6A330879DD
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 10:04:02 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7764A30225BE
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 10:43:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D4036EA87;
-	Sat, 28 Feb 2026 10:04:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1418B423178;
+	Sat, 28 Feb 2026 10:43:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cYuiK8WL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z8kO8Aa8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 063323126CD
-	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 10:04:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772273042; cv=none; b=kz5vNwy9fa6PN/Vo6QubeQ53auRLBMXXCi1upbzRnDlMEsdsRgzaHprHhPQMaeP72fdfFkwnw0zqgLswhKArR+PhDNcQxpBHbL/0PmKrdjgQ3dFpaW0OLFQI1hidIea2pmpDMcXFjtMvFa7D4CEFfjWCsqMXo6DOQ+1ymh+CARw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772273042; c=relaxed/simple;
-	bh=PbDLGt89NFjsAyp83UgRTs0VEEXSdks9u2vfwBm3pVc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JIKwWhvuit4fyqpIhTZd1MQmom6bhmCsHlnOyslP1mSPmRWbqpAo636SeBB+6hVlfMDGHD6Ntj5YNwaCeFPQtDLujykF2JemAmz2eXC3mKFrBawGb/3+tlITbeC6rw8Y0d4jKU+g9/AZPFnQubUR2jG6wbZXs3fEunHv6IX71qA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cYuiK8WL; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772273041; x=1803809041;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=PbDLGt89NFjsAyp83UgRTs0VEEXSdks9u2vfwBm3pVc=;
-  b=cYuiK8WL/BcNmKmQPqz887A0V7r2qDxc56X9JzvcvqmnWCG/gIsdiPpm
-   VhpOx+Szh5IARJhKKnCMc6knHHB5Ss/DFUchvBr67VxqmSAmlRHhufC5N
-   sVfCFZQ/G9brIcAAGXW9wZCVzHod8qAsITxnILnxD3PFpcrMx93i9l2p3
-   6DVw6adAJ+uoWzfB75UfIVIHVWk21yMsyJiZ6YDM+bGVq91Bflu18XTzo
-   Vw338CWNs3NvpZ78g3KBFo0+W3tmuwIMjSEGDOpoBgr35bNQ8bYNPmhf0
-   W+yRTrz9D+H3eVk16BDqerDs0g47vIH18JamBB3Rp5BFyWiH3OpmlrCsE
-   g==;
-X-CSE-ConnectionGUID: om53XQaqTYGc5SBb0Bonvg==
-X-CSE-MsgGUID: 3bok741BQv24jx/nBmElIg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11714"; a="83683031"
-X-IronPort-AV: E=Sophos;i="6.21,315,1763452800"; 
-   d="scan'208";a="83683031"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2026 02:04:01 -0800
-X-CSE-ConnectionGUID: pa8nyYIeQQGifVZE7S0OGg==
-X-CSE-MsgGUID: vRHI+vtoSKa3K3dr+IP5CQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,315,1763452800"; 
-   d="scan'208";a="214911570"
-Received: from lkp-server02.sh.intel.com (HELO a3936d6a266d) ([10.239.97.151])
-  by fmviesa010.fm.intel.com with ESMTP; 28 Feb 2026 02:03:58 -0800
-Received: from kbuild by a3936d6a266d with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vwHAx-00000000BRv-2Hlv;
-	Sat, 28 Feb 2026 10:03:55 +0000
-Date: Sat, 28 Feb 2026 18:03:26 +0800
-From: kernel test robot <lkp@intel.com>
-To: Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net-next 7/7] net-sysfs: use rps_tag_ptr and remove
- metadata from rps_dev_flow_table
-Message-ID: <202602281743.ifacPvjH-lkp@intel.com>
-References: <20260228042503.3726451-8-edumazet@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B778242317D
+	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 10:43:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.177
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772275432; cv=pass; b=Te0f1PxwuII0VxcAyygB2OfzxurJq3UIdlRZglCyhNInpUzZXD7fpSRgTnQ7Y+gGEjwO3oDF+SIuGtUU8jiNvIF8BRH184r2KRNwNExEE2Fct3p9aBpBZeQxWJmV0yMYVBmneQDo/6Z8peFNRAyYU3Ix8ZYXAEjRLhyw63dOckw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772275432; c=relaxed/simple;
+	bh=byrV1y01S9ZllwpxdPTd0kag3viPIA43uIwxs2gGxYE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LIknM9tG3Ae+n/rd63lVDpnUPeOipc1i6uCe6F87RiDMrEixrfLDra9wX7ArYVSRuni3asNcBaYPoKp5FECZqpufwDw7wWKRkvy1uDxdeE1yWR4jmAshisB18P8d5iCocwuZr/Xh8BjzgKhOy3QWLGS8G3OwaQyWt2ipNBIAElc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z8kO8Aa8; arc=pass smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-506a1b23c05so34332831cf.0
+        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 02:43:50 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772275429; cv=none;
+        d=google.com; s=arc-20240605;
+        b=N021ud3KhZJdQxE7ZTHZ0ujJ8mkFz2We9b7Y1VLoKhFsKZVm/gN92a57dz5jTUmbo/
+         2TBLEGjNXgmvHkzxDSr0A/x1m47qI5O+yKOI3+5nkCKqavImMMO2/C4Jb95XJZF+MbZg
+         veOQLhCrMpZ16y/Sy7vQMwsy9V0qKEks2vUH2BO3RHVuJinigY3BRPx2BJN+dlOs/UdH
+         /U0tizwsePF12xTOouCNRT9DKFWGgI9Sp1KP+NACNDA13zdKsAOeQSrBQGN2V2q5Df8E
+         pBJUjxHgOgu5vrQDZYweMKoL+j/dvYRjEBFAXGLDKStbpI91IneKzao9rUYoCoZGQpXe
+         ePeg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=GZJhX6NxH0yZaapEa7kWGpzdjrbqmINjKypnHa5DKd4=;
+        fh=FaKOKa+lfraK287LA7hQ9v+BDmpD/5qg+TfEyY3oXQs=;
+        b=HDyHnLqmWPYTIs5CJb4OtKn+KFZtAFJSaR0V54DRi2ZgpBWmKx31sdS3i7EIHTmjn5
+         M77IEw/rpOrbyzwDF51v96PIr9rf9A+Pljn92HkpkB6i/noCC9JZmnGgCJw9Fs72+bvb
+         Dmbc4eOIRM2sxlgS6IKemQl6uD6NPNSjGftYjy6dnpq8ernxVCuFzaN3/szj92yl4bW1
+         jOiknrhFKQ+gO/8McnxGkuX1bSypCMKyxB3IuFCOXdTYhWnSbiWcQTOj74htvYSlKLdN
+         hEk5G7g9+CVXkC8/ivd9Ol3MSWAwCGJwuXS9AMz5umHMBXtLFTcInpuk/2RCai+esvys
+         vmMQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772275429; x=1772880229; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GZJhX6NxH0yZaapEa7kWGpzdjrbqmINjKypnHa5DKd4=;
+        b=Z8kO8Aa8QSG2E/ix2tvq9c1dGUPne+wHN/OOyKPBGCQCVhmvI9R7PXTBCUonh9IT9Z
+         +pMWwGiUFJtB9DskLQ/5zrzyebdiAfFEClB269oXI8ZdGFt3I9zllp/AroIQaSZNy/wI
+         PfHXCZh50oGDsg7cOn5C5WNuBFHZisNIHX6Zh7SbbM1ml5lVYGKaeV8uzQCL0pHECFgf
+         tIdNya544rOozXx9J7LLG6yZ9OC6yqTAawqvccq5YhqFvr6HojxiACV/3VnUOeLFWPtt
+         VoVE07dwjc3B7LnmKhJfLb+zBn56GHCvedZHPt+lUoTEXt2aleHv8tnawIvcV8/YIa1u
+         w92g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772275429; x=1772880229;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=GZJhX6NxH0yZaapEa7kWGpzdjrbqmINjKypnHa5DKd4=;
+        b=kYZ3AKBkxbjM9ADTLuXTP6FDT8yyoZTnkSO6yumumukLkp2UKyOU5gOX7MZXZCjDOT
+         qSVthVUxpPR5qfTnMY6A1XHRW1LNPGJ+E1YuODI+Vpz/LmqWohsxg+OcswQI9G6Px9A5
+         uZeRmdrojPdgTiwhE/U+l6eZZWxsooDBmrYzGhvJ9S/1+hzbQ8UoPU2BGCRgPe51XBJc
+         zV39Ebx9YfrbimsSfUFsyQWgMX4t22lByfBY/pH+XSvWajAScK7ki9ZEM4ijH204ihqq
+         BcjLNPpK6DXTHmAGm7i9kxHiHZlogjcd5qskz0Bv1zozrH3XU+AKHVfVoUPQ4z1h0sal
+         w9jw==
+X-Gm-Message-State: AOJu0YzigNuEFDzxTU/Zf2IOZth5ZHJbT2vGXvDbc9wp9UsKvk2bao3b
+	bD/AZo6+7wE/EBN85yKe4yzAdiMeGdOw6CqhqNDKnny3oSbrBNqvnqoq3GvD3RYEBmmDBr/OXn0
+	texwQoh7v64E0cZaBmmr2Kh/8IF1644fqlkFvkD8v
+X-Gm-Gg: ATEYQzyVpVivNkkHj1FmtW8UTdCBcJ7/w3d/QglCKFTxNfbQSfeb494Ptylsxxa7iSL
+	tpjpqkMZZNFHS+LLUeOLdyNDyelwSMTOUmUBO1gcHN+RjbrhlcMrjeNDtNvpwDQU5A4V8xp1G+q
+	DDXpLvUiGoZYBa6B/nuXPTbQOUwf1EQAhCY4RGcsFu8OMXZL8Z9xgmVC5gcRk3b2WIT95cvbEJ+
+	uJSt7/lomdtWxP8dgKz5zFOOSTvmHJTXmlhQGqd/qhhxADe2QVr4FplrJNtljBulP1PNtKWGsRN
+	8bxfGTte
+X-Received: by 2002:a05:622a:15c9:b0:506:a50b:3a8f with SMTP id
+ d75a77b69052e-507527a412dmr72813731cf.30.1772275429198; Sat, 28 Feb 2026
+ 02:43:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260228042503.3726451-8-edumazet@google.com>
+References: <20260228090644.362807-1-jiayuan.chen@linux.dev>
+In-Reply-To: <20260228090644.362807-1-jiayuan.chen@linux.dev>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sat, 28 Feb 2026 11:43:36 +0100
+X-Gm-Features: AaiRm504Md_PN1rDK-Pt41giHnp4Eh_LDEFUnni68ItoT1ge6iwGLdz8b9wfpg0
+Message-ID: <CANn89iLphv9XtPnW5Bw1UETNoZZO+rdifQfzC8MxYM+gNHAcTA@mail.gmail.com>
+Subject: Re: [PATCH net-next v1] net: fix sock compilation error under CONFIG_PREEMPT_RT
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: netdev@vger.kernel.org, Jiayuan Chen <jiayuan.chen@shopee.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Clark Williams <clrkwllms@kernel.org>, 
+	Steven Rostedt <rostedt@goodmis.org>, Jason Xing <kerneljasonxing@gmail.com>, 
+	linux-kernel@vger.kernel.org, linux-rt-devel@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lists.linux.dev,kernel.org,google.com,vger.kernel.org,gmail.com];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262106-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262105-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,shopee.com,google.com,redhat.com,davemloft.net,kernel.org,linutronix.de,goodmis.org,gmail.com,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim,intel.com:email,01.org:url]
-X-Rspamd-Queue-Id: 7D46D1C1E10
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: E63FE1C235F
 X-Rspamd-Action: no action
 
-Hi Eric,
+On Sat, Feb 28, 2026 at 10:07=E2=80=AFAM Jiayuan Chen <jiayuan.chen@linux.d=
+ev> wrote:
+>
+> From: Jiayuan Chen <jiayuan.chen@shopee.com>
+>
+> When CONFIG_PREEMPT_RT is enabled, __SPIN_LOCK_UNLOCKED() expands to a
+> brace-enclosed initializer rather than a compound literal, which cannot
+> be used in assignment expressions. This causes a build failure:
+>
+>   net/core/sock.c:3787:29: error: expected expression before '{' token
+>    3787 |                 tmp.slock =3D __SPIN_LOCK_UNLOCKED(tmp.slock);
+>
+> Use declaration-with-initializer instead of assignment, consistent with
+> how __SPIN_LOCK_UNLOCKED() is used elsewhere in the kernel (e.g.
+> DEFINE_SPINLOCK).
+>
+> Fixes: 5151ec54f586 ("net: use try_cmpxchg() in lock_sock_nested()")
+> Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+> ---
+>  net/core/sock.c | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
+>
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 9d841975a7a1..2461aba7b18a 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -3782,12 +3782,10 @@ void noinline lock_sock_nested(struct sock *sk, i=
+nt subclass)
+>         might_sleep();
+>  #ifdef CONFIG_64BIT
+>         if (sizeof(struct slock_owned) =3D=3D sizeof(long)) {
+> -               socket_lock_t tmp, old;
+> -
+> -               tmp.slock =3D __SPIN_LOCK_UNLOCKED(tmp.slock);
+> -               tmp.owned =3D 1;
+> -               old.slock =3D __SPIN_LOCK_UNLOCKED(old.slock);
+> -               old.owned =3D 0;
+> +               socket_lock_t tmp =3D { .slock =3D __SPIN_LOCK_UNLOCKED(t=
+mp.slock),
+> +                                     .owned =3D 1 };
+> +               socket_lock_t old =3D { .slock =3D __SPIN_LOCK_UNLOCKED(o=
+ld.slock),
+> +                                     .owned =3D 0 };
+>                 if (likely(try_cmpxchg(&sk->sk_lock.combined,
+>                                        &old.combined, tmp.combined)))
+>                         return;
 
-kernel test robot noticed the following build warnings:
+Thanks for your patch, could you please use a nicer formatting ?
+(And keep an empty line between variables and code)
 
-[auto build test WARNING on net-next/main]
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 9d841975a7a14a12769450a8d937af96f7777070..fba4d5b8553c58f700bda3dbd82=
+ce68ec74187da
+100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -3782,12 +3782,15 @@ void noinline lock_sock_nested(struct sock
+*sk, int subclass)
+        might_sleep();
+ #ifdef CONFIG_64BIT
+        if (sizeof(struct slock_owned) =3D=3D sizeof(long)) {
+-               socket_lock_t tmp, old;
++               socket_lock_t tmp =3D {
++                       .slock =3D __SPIN_LOCK_UNLOCKED(tmp.slock),
++                       .owned =3D 1,
++               };
++               socket_lock_t old =3D {
++                       .slock =3D __SPIN_LOCK_UNLOCKED(old.slock),
++                       .owned =3D 0,
++               };
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/net-add-rps_tag_ptr-type-and-helpers/20260228-122855
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260228042503.3726451-8-edumazet%40google.com
-patch subject: [PATCH net-next 7/7] net-sysfs: use rps_tag_ptr and remove metadata from rps_dev_flow_table
-config: x86_64-randconfig-161-20260228 (https://download.01.org/0day-ci/archive/20260228/202602281743.ifacPvjH-lkp@intel.com/config)
-compiler: gcc-13 (Debian 13.3.0-16) 13.3.0
-smatch version: v0.5.0-8994-gd50c5a4c
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260228/202602281743.ifacPvjH-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202602281743.ifacPvjH-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> Warning: net/core/dev.c:4990 function parameter 'log' not described in 'rps_flow_is_active'
->> Warning: net/core/dev.c:4990 function parameter 'log' not described in 'rps_flow_is_active'
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+-               tmp.slock =3D __SPIN_LOCK_UNLOCKED(tmp.slock);
+-               tmp.owned =3D 1;
+-               old.slock =3D __SPIN_LOCK_UNLOCKED(old.slock);
+-               old.owned =3D 0;
+                if (likely(try_cmpxchg(&sk->sk_lock.combined,
+                                       &old.combined, tmp.combined)))
+                        return;
 
