@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-262236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262237-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SM13NtJpo2mACgUAu9opvQ
-	(envelope-from <netdev+bounces-262236-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 23:18:58 +0100
+	id EMJxFuRpo2mACgUAu9opvQ
+	(envelope-from <netdev+bounces-262237-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 23:19:16 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42C6F1C9712
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 23:18:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B68891C9719
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 23:19:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 45923306817D
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 22:18:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 558E6307339A
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 22:18:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBA8938F627;
-	Sat, 28 Feb 2026 22:18:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0267E3D4109;
+	Sat, 28 Feb 2026 22:18:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u37emKys"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JcxAFUQY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF4D3D4138
-	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 22:18:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DABEC3D413D
+	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 22:18:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772317089; cv=none; b=JN9dYyvvdgW3WqhazMVcn+9Qk666S5gFzFkxsPU7zcfkoBmNZQb4+8oYQ5qzzGwbqk3WPM9j8TnfrmDH3TNkn34joAKUbhHCWJSIZ5tQ/C7ZRxdbLsx+0oZUSoc1xmElKrORMVbcdTi/0/0+KGo5hNEfNDVDozijgA7ikGlbf8I=
+	t=1772317091; cv=none; b=A4tIhOqm1riQqEXPk5BlUSXjwhT5gmjoc/AvjwpSKVYCcPdsT01GtasTlviI0zc/0H571NCP27NIAO7Di1gc9UE2X/+qzgSrtu5Bm77/2HaNpYQYE+YK3S63cXHX7Bn+5oSnbhnUJ453gTdb92s8+xAGn+tdHZ8aDCgCfoCv1s8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772317089; c=relaxed/simple;
-	bh=500iFZbX5a+N1JO91Notx0qYv9ZeO68ZrDXTOhcO1FM=;
+	s=arc-20240116; t=1772317091; c=relaxed/simple;
+	bh=/sYz6Qa8y4VRFFDmV7lKHqBd9/K/XwopFBJDonKR5As=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=If1O5g1+G1+Gf+jETsgr5JYK5Ko2SBbS1u328f49PW5vRZ6UrCKUWvGpHIYqM0+I4BDon3No6K6OiIS62IdStsfcHl3V4xZ+ao/qUZhldZxCVGfFP90hq57OLf4sad+to5ZfxrOih+FO+uafQvcFXtSn1lIb09H2uytVcaWkowY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=u37emKys; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=IImvkJned8vsbEyNn74+BPZPRd7QLknBbhgurp0QjvWpoakHBxkCLHXuhsfCRsYMg3WuP5pl46LMw6Y6/D33e63JtejS52PI/sHsT8KER5Pq0BQcysnt7js2mEjRwBqZ8fD8B9snsH0WtJyoxhq2Ru7bA1MRZzwddr0eIMb1fqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JcxAFUQY; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-35983ee9f3bso246930a91.1
-        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 14:18:08 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2ab0b2e804cso29630295ad.3
+        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 14:18:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772317088; x=1772921888; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772317090; x=1772921890; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sezDCQ3F4A/GEqeomKVHDpRRHyFgxlheA9HbwLlNCi0=;
-        b=u37emKysdvRBuJtep4EJw6KZk1c0rYzffcH+19jMwQyUbzXplDSB+COX+y/GkeBpSn
-         mhf72g9XokNKdaLr/4gmq5jiYicBOdAD07kcWZ5R+GlpMH5TdnJMonh0W0WvA+8u9Egn
-         hF6jUuJnfYzyzW47ZGwdyyCnVBoVPtZVFy+3SgXiz/5iW3JA4fUQKvcul8cxogLtLB0l
-         b9mhrXlfZ0HYfJQFOv7j7O1tLbl52es1W6tLiVbhTwpqEs0owKOreJY+9twqNNCK5lOD
-         pLoKIZ3zDHzg3BXVrRy5UuNJDcQVqax9kIaTE2uU9Pk4dqhAiJiXOXbhdqWgrJF7b9J7
-         K/vw==
+        bh=RIMwfQGmexEev8GJ28YhfmS6vK7GLe46FYq3+TzSnwU=;
+        b=JcxAFUQYt3fcNCTmQ+5fmnJoT6c0WqaC/lMOmxJ20vIbgq6L2P+POuaSdFlAItGLc+
+         QlQM6SfNqN1dfHHzjxDsCPQqdg0AD82rczSGKZ6+Zpd68U5AsYuBR95pIlyqiXhEJJOj
+         FSpNHUE8JrgzyoJ+XSj9i7peJuJPH50bJ7LTlgnWw8A/ARpmmASG4BCEPg1WjTYkeIBl
+         E4OKGg5Q1jOLrKyeGcAk+dQFw97HJTaa5xUA8wHj3gjK600rdyZqaCB+9t7J3lXIfVOH
+         ydcK0qRTFrRJnSu51TY8I3RDyFAXNrj5vEbAe6hIFkvRtgczQ5xhsRbno6dGlhpdwqjG
+         xjew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772317088; x=1772921888;
+        d=1e100.net; s=20230601; t=1772317090; x=1772921890;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sezDCQ3F4A/GEqeomKVHDpRRHyFgxlheA9HbwLlNCi0=;
-        b=xCS+s7kqbeB7nIclZgL8J8dp/zCLqfOz8YA1/EB0Dblo0FdDoSH58M+TmjZ9P9WaYi
-         Azm1sT98qznYuE2hdbMVR/+7cUxaQdC8x5YpiR7PB0qf/e5/TJiwfYvpWRmyAutkFH0F
-         QYAWV9ekF0zR0yB4CpyeOkpQ826vjBityUq1xhaiedKD1xxpGBl4owg3j+9H1HANELtm
-         0GsP3Tq7724owsZTX9mZ/uYDopKxT9brodg4N4aJhrlHfmGi4KfL1LnFKqr2S4k7TGRk
-         ERJJYyxlt1QF/t/kvGZyvDKsAqjTrFKK/3XUn4pffWmtTPw81ChGBdB5qOMqySJYOXJ1
-         cLUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWF95YdpcKEml9Qg338pJHnuoKrIpPBAjelEeDLnociCHQBa0Zc3L8VfvvWTb0nqEpKu3IaYkY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyqwXxkO5AjEDIYIlIvrfLyabTUS5YQp8Xk0RM5UPZI3qXKnxWD
-	Dys3M5DyS4p4r84VOGc9qpzWmBtV4Cbg9kkTIkOtMt67/zI0yNZgAAMh1Dhpo11i3EEn9LFO1uK
-	yDOcXIQ==
-X-Received: from pgam16.prod.google.com ([2002:a05:6a02:2b50:b0:c6d:e340:fa67])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:44c1:b0:34f:14d6:15f5
- with SMTP id adf61e73a8af0-395c3a47f8emr6875318637.29.1772317087823; Sat, 28
- Feb 2026 14:18:07 -0800 (PST)
-Date: Sat, 28 Feb 2026 22:17:21 +0000
+        bh=RIMwfQGmexEev8GJ28YhfmS6vK7GLe46FYq3+TzSnwU=;
+        b=wphITcBsSc9ymDKmpJFfk0FOim3klj5xCUfgTwXiw3aOWNXR7t2F9uNl+eMSpyLtml
+         JaSEApsTyBrVnoD8A7qUmAUHAGUrXbZfXD1QxBKnE8h6rnapFS6/YBsEwbQm8popUySg
+         B+e+nQEtsl95WPrqsT+NZuT7CF5XkuAB1QH2Dk52JRbkkWzw27pRIJ5X90HePWSxVx/Q
+         qtjpM57vTh942e7XlRPo0L95uA3vwY0NdbQWPQloDOcAJdix6FOpZTGBUD461OjYZ8RV
+         qzpLBHhh+S/7OBEzYjKmZ/otu1+2AghElj44816oKegNU7g438ZjENUIJAT8enDUbN6n
+         3A7w==
+X-Forwarded-Encrypted: i=1; AJvYcCXdmhEr7c0yiNAjFxyBUGZQ7Ktq3GvESi/Ca9N5/AHVGlLz0mIJwHzw7KFFpUIKdjo4KuEc9DA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKJ3F59YOpqzYoFnIRt/cqni6pbfFcuNp0toAXh+ufTHCpvcDA
+	EosE3SiJlK8l4cJ7P/I6ip/K1wFoYfjj8+8hAaZAxFf5+bQgtPsccRMZ2nUKRaVbYsTxRmCn9DK
+	L2fvlkA==
+X-Received: from plbko3.prod.google.com ([2002:a17:903:7c3:b0:2a0:81d1:64f4])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e743:b0:2a0:ba6d:d101
+ with SMTP id d9443c01a7336-2ae2e40b84emr62954645ad.21.1772317090030; Sat, 28
+ Feb 2026 14:18:10 -0800 (PST)
+Date: Sat, 28 Feb 2026 22:17:22 +0000
 In-Reply-To: <20260228221800.1082070-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260228221800.1082070-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260228221800.1082070-4-kuniyu@google.com>
-Subject: [PATCH v3 net-next 03/15] ipmr: Convert ipmr_rtm_dumplink() to RCU.
+Message-ID: <20260228221800.1082070-5-kuniyu@google.com>
+Subject: [PATCH v3 net-next 04/15] ipmr: Use MAXVIFS in mroute_msgsize().
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
@@ -95,7 +95,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262236-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262237-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -112,120 +112,69 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 42C6F1C9712
+X-Rspamd-Queue-Id: B68891C9719
 X-Rspamd-Action: no action
 
-net->ipv4.mr_tables is updated under RTNL and can be read
-safely under RCU.
+mroute_msgsize() calculates skb size needed for ipmr_fill_mroute().
 
-Once created, the multicast route tables are not removed
-until netns dismantle.
+The size differs based on mrt->maxvif.
 
-ipmr_rtm_dumplink() does not need RTNL protection for
-ipmr_for_each_table() and ipmr_fill_table() if RCU is held.
+We will drop RTNL for ipmr_rtm_getroute() and mrt->maxvif may
+change under RCU.
 
-Even if mrt->maxvif changes concurrently, ipmr_fill_vif()
-returns true to continue dumping the next table.
+To avoid -EMSGSIZE, let's calculate the size with the maximum
+value of mrt->maxvif, MAXVIFS.
 
-Let's convert it to RCU.
+struct rtnexthop is 8 bytes and MAXVIFS is 32, so the maximum delta
+is 256 bytes, which is small enough.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 Reviewed-by: Eric Dumazet <edumazet@google.com>
 ---
-v2: Add READ_ONCE() for mrt->maxvif in ipmr_rtm_dumplink().
----
- net/ipv4/ipmr.c | 29 +++++++++++++++++------------
- 1 file changed, 17 insertions(+), 12 deletions(-)
+ net/ipv4/ipmr.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
 diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
-index 970f173654c7..eecc79a835d1 100644
+index eecc79a835d1..9f2dd726affb 100644
 --- a/net/ipv4/ipmr.c
 +++ b/net/ipv4/ipmr.c
-@@ -2901,12 +2901,13 @@ static bool ipmr_fill_table(struct mr_table *mrt, struct sk_buff *skb)
- 	if (nla_put_u32(skb, IPMRA_TABLE_ID, mrt->id) ||
- 	    nla_put_u32(skb, IPMRA_TABLE_CACHE_RES_QUEUE_LEN, queue_len) ||
- 	    nla_put_s32(skb, IPMRA_TABLE_MROUTE_REG_VIF_NUM,
--			mrt->mroute_reg_vif_num) ||
-+			READ_ONCE(mrt->mroute_reg_vif_num)) ||
- 	    nla_put_u8(skb, IPMRA_TABLE_MROUTE_DO_ASSERT,
--		       mrt->mroute_do_assert) ||
--	    nla_put_u8(skb, IPMRA_TABLE_MROUTE_DO_PIM, mrt->mroute_do_pim) ||
-+		       READ_ONCE(mrt->mroute_do_assert)) ||
-+	    nla_put_u8(skb, IPMRA_TABLE_MROUTE_DO_PIM,
-+		       READ_ONCE(mrt->mroute_do_pim)) ||
- 	    nla_put_u8(skb, IPMRA_TABLE_MROUTE_DO_WRVIFWHOLE,
--		       mrt->mroute_do_wrvifwhole))
-+		       READ_ONCE(mrt->mroute_do_wrvifwhole)))
- 		return false;
+@@ -2510,7 +2510,7 @@ static int _ipmr_fill_mroute(struct mr_table *mrt, struct sk_buff *skb,
+ 				cmd, flags);
+ }
  
- 	return true;
-@@ -2919,7 +2920,7 @@ static bool ipmr_fill_vif(struct mr_table *mrt, u32 vifid, struct sk_buff *skb)
- 	struct vif_device *vif;
+-static size_t mroute_msgsize(bool unresolved, int maxvif)
++static size_t mroute_msgsize(bool unresolved)
+ {
+ 	size_t len =
+ 		NLMSG_ALIGN(sizeof(struct rtmsg))
+@@ -2523,7 +2523,7 @@ static size_t mroute_msgsize(bool unresolved, int maxvif)
+ 		len = len
+ 		      + nla_total_size(4)	/* RTA_IIF */
+ 		      + nla_total_size(0)	/* RTA_MULTIPATH */
+-		      + maxvif * NLA_ALIGN(sizeof(struct rtnexthop))
++		      + MAXVIFS * NLA_ALIGN(sizeof(struct rtnexthop))
+ 						/* RTA_MFC_STATS */
+ 		      + nla_total_size_64bit(sizeof(struct rta_mfc_stats))
+ 		;
+@@ -2538,8 +2538,7 @@ static void mroute_netlink_event(struct mr_table *mrt, struct mfc_cache *mfc,
+ 	struct sk_buff *skb;
+ 	int err = -ENOBUFS;
  
- 	vif = &mrt->vif_table[vifid];
--	vif_dev = rtnl_dereference(vif->dev);
-+	vif_dev = vif_dev_read(vif);
- 	/* if the VIF doesn't exist just continue */
- 	if (!vif_dev)
- 		return true;
-@@ -2928,16 +2929,16 @@ static bool ipmr_fill_vif(struct mr_table *mrt, u32 vifid, struct sk_buff *skb)
- 	if (!vif_nest)
- 		return false;
- 
--	if (nla_put_u32(skb, IPMRA_VIFA_IFINDEX, vif_dev->ifindex) ||
-+	if (nla_put_u32(skb, IPMRA_VIFA_IFINDEX, READ_ONCE(vif_dev->ifindex)) ||
- 	    nla_put_u32(skb, IPMRA_VIFA_VIF_ID, vifid) ||
- 	    nla_put_u16(skb, IPMRA_VIFA_FLAGS, vif->flags) ||
--	    nla_put_u64_64bit(skb, IPMRA_VIFA_BYTES_IN, vif->bytes_in,
-+	    nla_put_u64_64bit(skb, IPMRA_VIFA_BYTES_IN, READ_ONCE(vif->bytes_in),
- 			      IPMRA_VIFA_PAD) ||
--	    nla_put_u64_64bit(skb, IPMRA_VIFA_BYTES_OUT, vif->bytes_out,
-+	    nla_put_u64_64bit(skb, IPMRA_VIFA_BYTES_OUT, READ_ONCE(vif->bytes_out),
- 			      IPMRA_VIFA_PAD) ||
--	    nla_put_u64_64bit(skb, IPMRA_VIFA_PACKETS_IN, vif->pkt_in,
-+	    nla_put_u64_64bit(skb, IPMRA_VIFA_PACKETS_IN, READ_ONCE(vif->pkt_in),
- 			      IPMRA_VIFA_PAD) ||
--	    nla_put_u64_64bit(skb, IPMRA_VIFA_PACKETS_OUT, vif->pkt_out,
-+	    nla_put_u64_64bit(skb, IPMRA_VIFA_PACKETS_OUT, READ_ONCE(vif->pkt_out),
- 			      IPMRA_VIFA_PAD) ||
- 	    nla_put_be32(skb, IPMRA_VIFA_LOCAL_ADDR, vif->local) ||
- 	    nla_put_be32(skb, IPMRA_VIFA_REMOTE_ADDR, vif->remote)) {
-@@ -2992,6 +2993,8 @@ static int ipmr_rtm_dumplink(struct sk_buff *skb, struct netlink_callback *cb)
- 	s_t = cb->args[0];
- 	s_e = cb->args[1];
- 
-+	rcu_read_lock();
-+
- 	ipmr_for_each_table(mrt, net) {
- 		struct nlattr *vifs, *af;
- 		struct ifinfomsg *hdr;
-@@ -3026,7 +3029,7 @@ static int ipmr_rtm_dumplink(struct sk_buff *skb, struct netlink_callback *cb)
- 			nlmsg_end(skb, nlh);
- 			goto out;
- 		}
--		for (i = 0; i < mrt->maxvif; i++) {
-+		for (i = 0; i < READ_ONCE(mrt->maxvif); i++) {
- 			if (e < s_e)
- 				goto skip_entry;
- 			if (!ipmr_fill_vif(mrt, i, skb)) {
-@@ -3048,6 +3051,8 @@ static int ipmr_rtm_dumplink(struct sk_buff *skb, struct netlink_callback *cb)
+-	skb = nlmsg_new(mroute_msgsize(mfc->_c.mfc_parent >= MAXVIFS,
+-				       mrt->maxvif),
++	skb = nlmsg_new(mroute_msgsize(mfc->_c.mfc_parent >= MAXVIFS),
+ 			GFP_ATOMIC);
+ 	if (!skb)
+ 		goto errout;
+@@ -2711,7 +2710,7 @@ static int ipmr_rtm_getroute(struct sk_buff *in_skb, struct nlmsghdr *nlh,
+ 		goto errout_free;
  	}
  
- out:
-+	rcu_read_unlock();
-+
- 	cb->args[1] = e;
- 	cb->args[0] = t;
- 
-@@ -3287,7 +3292,7 @@ static struct pernet_operations ipmr_net_ops = {
- 
- static const struct rtnl_msg_handler ipmr_rtnl_msg_handlers[] __initconst = {
- 	{.protocol = RTNL_FAMILY_IPMR, .msgtype = RTM_GETLINK,
--	 .dumpit = ipmr_rtm_dumplink},
-+	 .dumpit = ipmr_rtm_dumplink, .flags = RTNL_FLAG_DUMP_UNLOCKED},
- 	{.protocol = RTNL_FAMILY_IPMR, .msgtype = RTM_NEWROUTE,
- 	 .doit = ipmr_rtm_route},
- 	{.protocol = RTNL_FAMILY_IPMR, .msgtype = RTM_DELROUTE,
+-	skb = nlmsg_new(mroute_msgsize(false, mrt->maxvif), GFP_KERNEL);
++	skb = nlmsg_new(mroute_msgsize(false), GFP_KERNEL);
+ 	if (!skb) {
+ 		err = -ENOBUFS;
+ 		goto errout_free;
 -- 
 2.53.0.473.g4a7958ca14-goog
 
