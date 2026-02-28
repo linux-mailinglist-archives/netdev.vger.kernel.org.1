@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-262262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262263-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0PECDgN5o2lvEAUAu9opvQ
-	(envelope-from <netdev+bounces-262262-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 00:23:47 +0100
+	id EF1tFhJ5o2lvEAUAu9opvQ
+	(envelope-from <netdev+bounces-262263-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 00:24:02 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDE0B1C9AB5
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 00:23:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E7CF31C9ACA
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 00:24:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D33FC3025E54
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 23:23:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AC23F30292D1
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 23:23:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C9B43B3C14;
-	Sat, 28 Feb 2026 23:23:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3DC33E5568;
+	Sat, 28 Feb 2026 23:23:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SCbiGF9U"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HMhisKHN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75243E0C58
-	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 23:23:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58B4B3E0C72
+	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 23:23:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772320990; cv=none; b=sJkyxhMevXoNfDNRHiFwk3RLWQPjqVUIwFDoDNTbQbalek1W/kEIHmyYpbxHZFKp7g+htd/D5azeARyKf7ckrR00nslWQP5tBLhdl5Jc4Y2Y7SBObO1tD2oZgT1eqXrrPLZeV8BXc//EIW+H3veNAgniAIzqh4Ia52Cvc5MMHe0=
+	t=1772320991; cv=none; b=gUBNTtjrQQgFunU2J48KuEKM3H8BI/M1DxcjZ70BA2HTSYCLFwFi3DUQql5RZPiLmmAKTf81BU/SZ8CxX6khhewMwcMMx2uSjA8m1Pugtergom2uk4mA47R573uWggxS7qdFUzVFFZh26GrNLR1E8c/rQtFKZ0h+1GBDusgJllU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772320990; c=relaxed/simple;
-	bh=VLHiua2iLbiZ7Hk6ZHDZpitnvizx9Nykr+jwd3W0HG4=;
+	s=arc-20240116; t=1772320991; c=relaxed/simple;
+	bh=/E00kd06ARqV1EiG6J7bbJMQs/AdElwvl+AD4goyHi8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tcjSDwImoO4eyL1a2XI5lC8pBNCv3sjFugry+oozTld1pl6GAPv9iNkbyaBn0sDahbLzdHX0TNxxx5NeeufpjpHqLNjCS+7VnGzQonqZAqT1OpNkI9X+ZvENRmRFhbRo7wb/nEOaVdc4ZjKj0svAoKqjux+rNc2B3Kr4s8p2iEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SCbiGF9U; arc=none smtp.client-ip=209.85.221.44
+	 MIME-Version:Content-Type; b=ZYlGxVvgILkJzlIptiU2WKW7mryUGbj7oAaJSJvt55/5J+xiD6Gz26Myg8IGGG89fTK99eR4ryIQPpDb3NZk08HQ9fIyT2sdpbw2fQhmQ93FLcHpLT5ShMeyLKqSnC11GY7+DoUxUwY9viwZ1ktULD/bKyjbhyrMGTtMGXVmL3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HMhisKHN; arc=none smtp.client-ip=209.85.221.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-4398d9a12c6so2485296f8f.2
-        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 15:23:08 -0800 (PST)
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-439b2965d4bso67841f8f.2
+        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 15:23:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772320987; x=1772925787; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1772320989; x=1772925789; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TtSinzVGJkzPvF9jByekTq6nORuTGb+Z3JsuJnZZQ7c=;
-        b=SCbiGF9UIEOLCF+7xUb01le0+fKVUf/0ywWyTDAGn2Zi0JErN6Qfw0AnblUTXOT5hC
-         p68qGrZcttEWOf1dQvpUzxchOfIpIczkBts0gJQ4KE0DMHgRbEYoI63D2mwHdLp3dUsN
-         4gZ2pooOhnIvPfy6S9Z/rnojfx9aH3pdogLZ/XydaotNGo8jw6bS2KpCXSH8He8Rfgcj
-         Y3+qOiYtLAgqUUUC3fxgx3ZgZJk8AGYkM+c5pAJI0Gr3wT5LQYQIgW3itAVte6GiYIJd
-         mchAPuwsDAbrsbfzgSkYwrHrxFljjUozdu7Jh723epdYEocQ6AONZxspMNKiSq4w33eW
-         iJ3g==
+        bh=R7E353CUJwnGyuCmm4n5uTZxUZWsHiLJYSS1cugMXcw=;
+        b=HMhisKHNsCap3F38Px4IfUG4LXbhDM37+U5jdmOJ5TCuMNZ6KyEG5VdNuZl9Szztah
+         4i8N+iaPOimo263DldltdsyDv7iAfEEIGnbDHrd/Z5NqcZEGZGlB8NlYbIV+uBwdBTx+
+         8CMd2MtMxwGnkl9jFzUPbIrCjeQ23Pozf8CKUDxLM+9jzolPZ82QEquWa/ts63NpXuyX
+         d/VfDrFRe3+ARFLC3dN3K7cjO2+9BNRjxbf13+YX2/sM1fZjV6G3+RaO9hRDhSvaf0cS
+         q0j3yebzt5VEkQW2CCzZddRW9TA66qurEaCkjx4XesCULjRmUUnhgOLCYNiX1ZFIVu/+
+         mFDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772320987; x=1772925787;
+        d=1e100.net; s=20230601; t=1772320989; x=1772925789;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=TtSinzVGJkzPvF9jByekTq6nORuTGb+Z3JsuJnZZQ7c=;
-        b=vhZDJOWyEeRG6BRcsnvakF6AbkzumpjhA0PPzLs+OK7KXXqcOVIul6gMd1NR5Pv7CW
-         cZ/R387+q8qty23f9oLExoW21/oZ7wRVE4yGejGfDY9qlU+6x+0tVn4XqmPBWqcRF3/L
-         IoJLSyTa6IecP61PKiU9Y9pbMyj0MyFdBcLKRmZlUzZiIPiATzCa6jj0yhUjJdKAfy2S
-         gojnU8V2zoFTSxmXUFM6QIip748o8pFsyJtzVS4Hgne5ZB+jQZyCXUVNUh9TRLHuvL5/
-         teC0egrutpbWv/S21/F/Z/QrmhkeOTm12TZ/wSNnB9uq8B7GpkRz7CtH4cR0DfBDo0jy
-         uxhg==
-X-Forwarded-Encrypted: i=1; AJvYcCWqWQHbYYJQimEmQ9woJ7nOnwBIMtOaNqkTRAv9/owidzFM3OKd6xDTSf04eYmp4LSVB3LAi1U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXcUnYavIA6J0N+xsm4Xyp5P5lZS/231rn5uf/lD2WFnlx7Vnp
-	dA3IL5rGGwJolzY13xCQCnxkwoGT9CksX91NtXCEHt6QLzjmWj0mUHxv
-X-Gm-Gg: ATEYQzxKUBwuVHlVfZKZyqOAF36KiWTG6Ok98UlRgJdbt43HO8AB4nJ5ZnB9UgfayUa
-	7pkfkTb5hpYF+beIIeV5Mr9Y1IHjXGWnQMxjayNnzgqn1K3Ee/gcCAowJGGo4mkyTLK155LfXFA
-	seBoPS9Ool6OLXzHkwAxf2EpvHnNqFqapcNONVuDj11JPlUJtkObVodYEs+CK69s/zUJeERzR0C
-	twXiw8DshdCbkn1+D0cyo9L4a2kMucDl32YUwd4aE6FhJym0A/sWqBPArE0S6kMRooqwEPn3NA8
-	cL5rJM44QB7lRWMQPSHlUAx6/Ev0S7G2LVJ4h+jvpy6e3NfNEQlHxhy4SW2iZwgXqgEC9C6OkrH
-	pL5H7AORkyNrs+E+JV8rCcpsQR0gB0rXVcddGDeApkqb6gCmXApGxUu5DhUPoEmaPyItWXhxi8p
-	L7X6FUl+19Agc0wFEC7jPWiKqwmaTqvRHpIXBLoscwkz0EtCcg4HH5tBJJ5Z+SEmu7kgfBE5WBS
-	4RCWLI=
-X-Received: by 2002:a05:6000:2007:b0:437:6625:d0d7 with SMTP id ffacd0b85a97d-4399de3694fmr12066071f8f.42.1772320987140;
-        Sat, 28 Feb 2026 15:23:07 -0800 (PST)
+        bh=R7E353CUJwnGyuCmm4n5uTZxUZWsHiLJYSS1cugMXcw=;
+        b=WdP+Eobf97WIvAmkiel7Psn48tpXKou0yrMHvTycCDkKkecjneuPkkMdxe+g08yOlQ
+         vUO7qn9lsW0gnVGYZIswWnN+0RQom1TNZdCGijjyr5uCiQpHlsWoybpKjKKf5IIjTaVN
+         LTxn1N1AWCQQIUzYk6irNMi+bg2IqD65METmUU/TUQDwzRxmzOho0mT7bNTf+z5J0cgr
+         dPw8mQ08twVm6Xpltknzq5nTXH5j3b+YmYSuUFYUkUv/wlje/fJyi89D9J0vTMlJNfn/
+         e4Q1oLOQLGe2QYRTy1SZ3/0xhXo46v4Vp1dKEWHBUOjThHTMMUpNwPDsaTZ79x8jasyz
+         8zVw==
+X-Forwarded-Encrypted: i=1; AJvYcCWLV/gRkYSVCn4rD3XQaA3s85vEagVuIPIUxOPHoIFDTbHnks1MBCRBIpx4N3fggjgfP8OISsE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5qktTrKUOuWYXQb+iZ/j5E0+BRAeFVdW/VNYnXZvXDjMMuAgN
+	nvDwSB8iI/okJIKf628vchC6iSQ8EzLTnC/+pt/G+lREYi8cPlCNvCGJ
+X-Gm-Gg: ATEYQzz+0GJH5DlSEyUOWey1FsfhF4UjYcL75iHtdCJs86HL7WtTMdGZ1f/nuSzym3E
+	W5EE5emHqtkFjN/GUealh3DkXFwGG5E4KLW/gbQTaMBiKulKLx8wyzACU/YcaRPHOwa66ubvKK0
+	OH1uL+nrySqDoAIEOM0AYu+JFPPj+C+OqMfQxR35akc2SgD36syEZjhjDp6aIPVfaKL1eFtmDlp
+	g2VPykANheP6n8Unvmi1ok9m+YbFBuO60L2jNh2Cyt5EAK6I7aDjzQXnGX1BNUgnPcbSXYSUS5Q
+	G04sjPTph9QzFKfU/a2Xsyo30DurYT1poXHpF4XkmSOeBpFQpAyjL1JcPjozxLQFXRtEERYLap7
+	T2M73OxRBb4astDKZLAPyB8A1RiYMLNdblP/rt1qvednyr0dubO3zuv7o8X7GtzVOQXqlT6lu8Q
+	tam3klv3WGNsLxvH3w1C55CIErUGrVpiT185QPS1fN6S/Oe4FBKc6U8eTfvw1bAQER555MNggi6
+	79+Txs=
+X-Received: by 2002:a05:6000:2903:b0:439:9312:4b72 with SMTP id ffacd0b85a97d-4399de20ad6mr12654417f8f.30.1772320988508;
+        Sat, 28 Feb 2026 15:23:08 -0800 (PST)
 Received: from pc-kuba-l13.. (snat-2.cgn.sat-an.net. [176.222.226.2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4399c70ed47sm18515680f8f.11.2026.02.28.15.23.05
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4399c70ed47sm18515680f8f.11.2026.02.28.15.23.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 28 Feb 2026 15:23:06 -0800 (PST)
+        Sat, 28 Feb 2026 15:23:08 -0800 (PST)
 From: =?UTF-8?q?Jakub=20Van=C4=9Bk?= <linuxtardis@gmail.com>
 To: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
@@ -91,9 +91,9 @@ Cc: Andrew Lunn <andrew@lunn.ch>,
 	Sai Krishna <saikrishnag@marvell.com>,
 	Daniel Golle <daniel@makrotopia.org>,
 	=?UTF-8?q?Jakub=20Van=C4=9Bk?= <linuxtardis@gmail.com>
-Subject: [PATCH net-next v2 4/5] net: phy: Add infrastructure for PHY address 0 fixups
-Date: Sun,  1 Mar 2026 00:22:40 +0100
-Message-ID: <20260228232241.1274236-5-linuxtardis@gmail.com>
+Subject: [PATCH net-next v2 5/5] net: phy: motorcomm: yt8821: Disable MDIO broadcast
+Date: Sun,  1 Mar 2026 00:22:41 +0100
+Message-ID: <20260228232241.1274236-6-linuxtardis@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260228232241.1274236-1-linuxtardis@gmail.com>
 References: <20260228232241.1274236-1-linuxtardis@gmail.com>
@@ -115,7 +115,7 @@ X-Spamd-Result: default: False [-1.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262262-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262263-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,motor-comm.com,marvell.com,makrotopia.org];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -134,100 +134,133 @@ X-Spamd-Result: default: False [-1.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EDE0B1C9AB5
+X-Rspamd-Queue-Id: E7CF31C9ACA
 X-Rspamd-Action: no action
 
-Certain PHYs incorrectly treat MDIO address 0 as a broadcast address and
-therefore respond both at address 0 and at their assigned address.
-As outlined in the code, this is problematic. Provide a way to
-disable this behaviour via a PHY fixup.
+By default, the YT8821 responds at two MDIO addresses: the address
+selected by its strapping pins and the broadcast address 0.
+This causes problems if another PHY is legitimately configured
+at address 0.
 
-It would be ideal to have these collisions prevented early
-by the bootloader, but there may be hardware (e.g. WiFi routers)
-out there where the bootloader doesn't do this and cannot be easily
-replaced.
+Disable the broadcast address using two mechanisms. The PHY fixup
+prevents collisions during initial MDIO bus scanning.
+yt8821_config_init() then re-disables the broadcast address if the
+PHY goes through a hardware reset (this happens if the PHY has a
+reset GPIO on its device tree node, and the interface is brought
+down and up).
 
+Link: https://github.com/openwrt/openwrt/pull/21584
+Fixes: b671105b88c3 ("net: phy: Add driver for Motorcomm yt8821 2.5G ethernet phy")
 Signed-off-by: Jakub Vaněk <linuxtardis@gmail.com>
 ---
- drivers/net/phy/Makefile            |  3 ++-
- drivers/net/phy/phy_common_fixups.c | 26 ++++++++++++++++++++++++++
- drivers/net/phy/phy_device.c        |  4 ++++
- drivers/net/phy/phylib-internal.h   |  2 ++
- 4 files changed, 34 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/phy/phy_common_fixups.c
+ drivers/net/phy/motorcomm.c         | 29 +++++++++++++++++++++++++
+ drivers/net/phy/phy_common_fixups.c | 33 +++++++++++++++++++++++++++++
+ 2 files changed, 62 insertions(+)
 
-diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
-index 3a34917adea7..3bf9ba208b90 100644
---- a/drivers/net/phy/Makefile
-+++ b/drivers/net/phy/Makefile
-@@ -3,7 +3,8 @@
+diff --git a/drivers/net/phy/motorcomm.c b/drivers/net/phy/motorcomm.c
+index 4d62f7b36212..e1503fab568a 100644
+--- a/drivers/net/phy/motorcomm.c
++++ b/drivers/net/phy/motorcomm.c
+@@ -227,6 +227,9 @@
+ #define YT8521_LED_100_ON_EN			BIT(5)
+ #define YT8521_LED_10_ON_EN			BIT(4)
  
- libphy-y			:= phy.o phy-c45.o phy-core.o phy_device.o \
- 				   linkmode.o phy_link_topology.o \
--				   phy_caps.o mdio_bus_provider.o phy_port.o
-+				   phy_caps.o mdio_bus_provider.o phy_port.o \
-+				   phy_common_fixups.o
- mdio-bus-y			+= mdio_bus.o mdio_device.o
++#define YTPHY_MDIO_ADDRESS_CONTROL_REG		0xA005
++#define YTPHY_MACR_EN_PHY_ADDR_0		BIT(6)
++
+ #define YTPHY_MISC_CONFIG_REG			0xA006
+ #define YTPHY_MCR_FIBER_SPEED_MASK		BIT(0)
+ #define YTPHY_MCR_FIBER_1000BX			(0x1 << 0)
+@@ -2764,6 +2767,28 @@ static int yt8821_soft_reset(struct phy_device *phydev)
+ 					  YT8521_CCR_SW_RST, 0);
+ }
  
- ifdef CONFIG_PHYLIB
++/**
++ * yt8821_disable_mdio_address_zero() - disable MDIO broadcast address 0
++ * @phydev: a pointer to a &struct phy_device
++ *
++ * The YT8821 responds on two MDIO addresses by default:
++ *  - the address selected by its strapping pins
++ *  - the broadcast address 0
++ *
++ * Some other PHYs (e.g. the MT7981B internal Gigabit PHY) are hardwired to
++ * respond only at MDIO address 0. If the YT8821 also listens on address 0,
++ * it may incorrectly react to transactions intended for those PHYs.
++ *
++ * Returns: 0 or negative errno code
++ */
++static int yt8821_disable_mdio_address_zero(struct phy_device *phydev)
++{
++	return ytphy_modify_ext_with_lock(phydev,
++					  YTPHY_MDIO_ADDRESS_CONTROL_REG,
++					  YTPHY_MACR_EN_PHY_ADDR_0,
++					  0);
++}
++
+ /**
+  * yt8821_config_init() - phy initializatioin
+  * @phydev: a pointer to a &struct phy_device
+@@ -2799,6 +2824,10 @@ static int yt8821_config_init(struct phy_device *phydev)
+ 		phydev->rate_matching = RATE_MATCH_PAUSE;
+ 	}
+ 
++	ret = yt8821_disable_mdio_address_zero(phydev);
++	if (ret < 0)
++		return ret;
++
+ 	ret = yt8821_serdes_init(phydev);
+ 	if (ret < 0)
+ 		return ret;
 diff --git a/drivers/net/phy/phy_common_fixups.c b/drivers/net/phy/phy_common_fixups.c
-new file mode 100644
-index 000000000000..fa51c6d7b25f
---- /dev/null
+index fa51c6d7b25f..5a60721b56d6 100644
+--- a/drivers/net/phy/phy_common_fixups.c
 +++ b/drivers/net/phy/phy_common_fixups.c
-@@ -0,0 +1,26 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+
-+#include <linux/phy.h>
-+
-+#include "phylib-internal.h"
+@@ -4,6 +4,32 @@
+ 
+ #include "phylib-internal.h"
+ 
++#define PHY_ID_YT8821				0x4f51ea19
++#define YTPHY_PAGE_SELECT			0x1E
++#define YTPHY_PAGE_DATA				0x1F
++#define YTPHY_MDIO_ADDRESS_CONTROL_REG		0xA005
++#define YTPHY_MACR_EN_PHY_ADDR_0		BIT(6)
 +
 +/**
-+ * phy_register_address_0_fixups - Register fixups for disabling MDIO
-+ * broadcast address 0
-+ *
-+ * Some vendors interpret MDIO address 0 as a broadcast address and so their
-+ * PHYs initially respond both at address 0 as well as at their normal
-+ * address. This is problematic:
-+ *  - Linux may create two struct phy_device for a single device.
-+ *  - MDIO address collision may occur if there is another PHY
-+ *    legitimately listening on address 0.
-+ *
-+ * The broadcast address can often be disabled through some internal
-+ * PHY register. These fixups are designed to do just that --
-+ * they shall stop these PHYs from responding at address 0 before
-+ * the MDIO address 0 is scanned for devices.
++ * yt8821_disable_broadcast - Disable MDIO broadcast on address 0
 + */
-+int phy_register_address_0_fixups(void)
++static int yt8821_disable_broadcast(struct phy_device *phydev)
 +{
-+	return 0;
++	int rc = 0;
++
++	phy_lock_mdio_bus(phydev);
++
++	rc = __phy_write(phydev, YTPHY_PAGE_SELECT, YTPHY_MDIO_ADDRESS_CONTROL_REG);
++	if (rc < 0)
++		goto unlock;
++
++	rc = __phy_modify(phydev, YTPHY_PAGE_DATA, YTPHY_MACR_EN_PHY_ADDR_0, 0);
++
++unlock:
++	phy_unlock_mdio_bus(phydev);
++	return rc;
 +}
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index db187d370eaa..2d4f119b45b4 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -3969,6 +3969,10 @@ static int __init phy_init(void)
- 	if (rc)
- 		goto err_ethtool_phy_ops;
- 
-+	rc = phy_register_address_0_fixups();
-+	if (rc)
-+		goto err_ethtool_phy_ops;
 +
- 	features_init();
- 
- 	rc = phy_driver_register(&genphy_c45_driver, THIS_MODULE);
-diff --git a/drivers/net/phy/phylib-internal.h b/drivers/net/phy/phylib-internal.h
-index dc9592c6bb8e..1e6ff8f2d721 100644
---- a/drivers/net/phy/phylib-internal.h
-+++ b/drivers/net/phy/phylib-internal.h
-@@ -22,4 +22,6 @@ void phy_check_downshift(struct phy_device *phydev);
- 
- int genphy_c45_read_eee_adv(struct phy_device *phydev, unsigned long *adv);
- 
-+int phy_register_address_0_fixups(void);
+ /**
+  * phy_register_address_0_fixups - Register fixups for disabling MDIO
+  * broadcast address 0
+@@ -22,5 +48,12 @@
+  */
+ int phy_register_address_0_fixups(void)
+ {
++	int rc;
 +
- #endif /* __PHYLIB_INTERNAL_H */
++	rc = phy_register_fixup_for_uid(PHY_ID_YT8821, 0xFFFFFFFF,
++					yt8821_disable_broadcast);
++	if (rc < 0)
++		return rc;
++
+ 	return 0;
+ }
 -- 
 2.43.0
 
