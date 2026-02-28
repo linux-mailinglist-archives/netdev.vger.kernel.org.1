@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-262214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262215-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0C/TNlhRo2nW/AQAu9opvQ
-	(envelope-from <netdev+bounces-262214-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 21:34:32 +0100
+	id EAeTGd5io2kABwUAu9opvQ
+	(envelope-from <netdev+bounces-262215-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 22:49:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 490931C86D6
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 21:34:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E76991C944C
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 22:49:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A1A86301A2BB
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 20:31:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C5DFE30ACF11
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 20:44:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2113727B50F;
-	Sat, 28 Feb 2026 20:31:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2A4B27B32C;
+	Sat, 28 Feb 2026 20:44:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ZPIelEqM"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Isai794V"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C03D2D0C79
-	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 20:31:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC53430B8C;
+	Sat, 28 Feb 2026 20:44:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772310688; cv=none; b=HEqU96mmVgKDAmys95ilr97O7gXJcSxT6af+Jmsh46UPul+7PnVUfSMTAzU5FiaHIhxSCl7Q3YPYx8VFOUNRd33oDT76ZRK56PtYzGqQtanQwXviC0jzKfAgVV0mHE/4wBRWkroQmwggdLi6HMYnOj4XPS7vGDxLyCNDeFaRig8=
+	t=1772311474; cv=none; b=Cs83dydjAc6Cglv9MzvOdVw1J1ZnwD5lKKOK21Nr/16Pbo37//MZ+GgKBPwflTfmBKeBmGdjKm4RVjN1+6b9JzMTpcT79DfOn/TBR4unhFKskyws/yXPzSghVPYPGAv4AV9ots6Dwl+K18ZqIJ4leKDgovXXoKwa6iZ2iEc9UJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772310688; c=relaxed/simple;
-	bh=PnltOAfz+yZUl0NCtYutNI1n4JIg3WZLyegty4BKc9k=;
+	s=arc-20240116; t=1772311474; c=relaxed/simple;
+	bh=fouJcXrcIqnS4OK5wrynhLTd93+//OFNPP5WduPOU9s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dyG6Q9KxdhwidAMWsjrk2/rrK3521m0up1dybJOQpRnWMCqHMLYgT0Rk11wjJPf56h2L594AuJhEgq/Cte2yWiRSeF6qG5DhjXPhnUYd876Ea1KgEYhqtCwPfMltiaiFtRZfWV3a4xsb/NJU5sXFIVxyL1EXJ1QPacHftrM1nhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZPIelEqM; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=QtVAvD5n36b7bRR4MEQET5ykbeOFYxPGng3Y2WoSrQhzWmBajmFHV4WequSI+hUl6ZS+DTFv3V3HZ/L2T+mHfKhNeA32Q38P/jZmrXnX7M8tWs0wFUnN608xGwCKjguI7HqQ/nDf1oI4T3UyL9sf4c0E32hOxSGW4PC1o2Lh50o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Isai794V; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -39,25 +39,27 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=nMxDUrLuLUd3EietRVzH2dDww4K4V7mpwa5/kLdWqWs=; b=ZPIelEqME7sp6eUIjb3d/4zMhg
-	tTMHiEiTkCLM5WkA0gujPoy8R7GEC0+fpVNjCoAO/nolK1otT6hrR5RU4B43cp84e0lUqeEwpUWbK
-	2qUcph6hBAo2TtwvqWrhJ5BfQfA6EIMGeiHXFUQWaioarRkRl0htoGP8NMqrOI9BluZw=;
+	bh=SrzHTbYPCKrR1q3pp5B8ty/C+EIi95VJx+2ipEIuh1Q=; b=Isai794V+IltfaW+HZj+S+m8Sh
+	UXkVo7GQuH6Uey8Rp4NvWi2kESCjHagAscaKN9heSSxhs9jMmj4tj+phtOKwg7s0zocpCl2GuByXf
+	rksZ62YmhlCvy/lMVXZ+EQUlt23mrryaOrTKkREkZ3rvj9rPN/7hZ5OIH23ZMsqG4o3k=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vwQyB-009Diw-Vj; Sat, 28 Feb 2026 21:31:23 +0100
-Date: Sat, 28 Feb 2026 21:31:23 +0100
+	id 1vwRAb-009Dpe-Eb; Sat, 28 Feb 2026 21:44:13 +0100
+Date: Sat, 28 Feb 2026 21:44:13 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Joris Vaisvila <joey@tinyisr.com>
-Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [RFC PATCH 2/2 net-next] net: dsa: initial support for MT7628
- embedded switch
-Message-ID: <62e825cd-7b5d-4839-a8d7-ae936dfa03fe@lunn.ch>
-References: <20260228185242.800836-1-joey@tinyisr.com>
- <20260228185242.800836-4-joey@tinyisr.com>
+To: "illusion.wang" <illusion.wang@nebula-matrix.com>
+Cc: dimon.zhao@nebula-matrix.com, alvin.wang@nebula-matrix.com,
+	sam.chen@nebula-matrix.com, netdev@vger.kernel.org,
+	andrew+netdev@lunn.ch, corbet@lwn.net, kuba@kernel.org,
+	linux-doc@vger.kernel.org, lorenzo@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, vadim.fedorenko@linux.dev,
+	lukas.bulwahn@redhat.com, edumazet@google.com,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v5 net-next 06/11] net/nebula-matrix: add common resource
+ implementation
+Message-ID: <10134f9b-e389-45c8-ac57-10e8a465453c@lunn.ch>
+References: <20260226073840.3222-1-illusion.wang@nebula-matrix.com>
+ <20260226073840.3222-7-illusion.wang@nebula-matrix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,83 +68,80 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260228185242.800836-4-joey@tinyisr.com>
+In-Reply-To: <20260226073840.3222-7-illusion.wang@nebula-matrix.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
 	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	TAGGED_FROM(0.00)[bounces-262214-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262215-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 490931C86D6
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E76991C944C
 X-Rspamd-Action: no action
 
-> +static void mt7628_vendor_phys_init(struct dsa_switch *ds)
+> +++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_resource_leonis.c
+> @@ -6,7 +6,32 @@
+>  
+>  #include "nbl_resource_leonis.h"
+>  
+> +static u16 nbl_res_get_vsi_id(struct nbl_resource_mgt *res_mgt, u16 func_id,
+> +			      u16 type)
 > +{
-> +	/* vendor specific init sequence from openwrt/uboot */
-> +	mt7628_phy_write(ds, 0, 31, 0x2000); /* change G2 page */
-> +	mt7628_phy_write(ds, 0, 26, 0x0020);
+> +	return nbl_res_func_id_to_vsi_id(res_mgt, func_id, type);
+> +}
+
+> +int nbl_res_func_id_to_pfvfid(struct nbl_resource_mgt *res_mgt, u16 func_id,
+> +			      int *pfid, int *vfid)
+> +{
+> +	return func_id_to_pfvfid(res_mgt, func_id, pfid, vfid);
+> +}
 > +
-> +	for (int i = 0; i < 5; i++) {
-> +		mt7628_phy_write(ds, i, 31, 0x8000); /* change L0 page */
-> +		mt7628_phy_write(ds, i, 0, 0x3100);
+> +u16 nbl_res_pfvfid_to_vsi_id(struct nbl_resource_mgt *res_mgt, int pfid,
+> +			     int vfid, u16 type)
+> +{
+> +	return pfvfid_to_vsi_id(res_mgt, pfid, vfid, type);
+> +}
 > +
-> +		/* EEE disable */
-> +		mt7628_phy_write(ds, i, 30, 0xa000);
-> +		mt7628_phy_write(ds, i, 31, 0xa000); /* change L2 page */
-> +		mt7628_phy_write(ds, i, 16, 0x0606);
-> +		mt7628_phy_write(ds, i, 23, 0x0f0e);
-> +		mt7628_phy_write(ds, i, 24, 0x1610);
-> +		mt7628_phy_write(ds, i, 30, 0x1f15);
-> +		mt7628_phy_write(ds, i, 28, 0x6111);
-> +		mt7628_phy_write(ds, i, 31, 0x2000);
-> +		mt7628_phy_write(ds, i, 26, 0x0000);
-> +	}
+> +int nbl_res_func_id_to_bdf(struct nbl_resource_mgt *res_mgt, u16 func_id,
+> +			   u8 *bus, u8 *dev, u8 *function)
+> +{
+> +	return func_id_to_bdf(res_mgt, func_id, bus, dev, function);
+> +}
 > +
-> +	/* 100Base AOI setting */
-> +	mt7628_phy_write(ds, 0, 31, 0x5000); /* change G5 page */
-> +	mt7628_phy_write(ds, 0, 19, 0x004a);
-> +	mt7628_phy_write(ds, 0, 20, 0x015a);
-> +	mt7628_phy_write(ds, 0, 21, 0x00ee);
-> +	mt7628_phy_write(ds, 0, 22, 0x0033);
-> +	mt7628_phy_write(ds, 0, 23, 0x020a);
-> +	mt7628_phy_write(ds, 0, 24, 0x0000);
-> +	mt7628_phy_write(ds, 0, 25, 0x024a);
-> +	mt7628_phy_write(ds, 0, 26, 0x035a);
-> +	mt7628_phy_write(ds, 0, 27, 0x02ee);
-> +	mt7628_phy_write(ds, 0, 28, 0x0233);
-> +	mt7628_phy_write(ds, 0, 29, 0x000a);
-> +	mt7628_phy_write(ds, 0, 30, 0x0000);
+> +int nbl_res_vsi_id_to_pf_id(struct nbl_resource_mgt *res_mgt, u16 vsi_id)
+> +{
+> +	return vsi_id_to_pf_id(res_mgt, vsi_id);
+> +}
+> +
+> +u16 nbl_res_func_id_to_vsi_id(struct nbl_resource_mgt *res_mgt, u16 func_id,
+> +			      u16 type)
+> +{
+> +	return func_id_to_vsi_id(res_mgt, func_id, type);
+> +}
 
-Do you have any idea what this is actually doing?
 
-Normally, a MAC driver would not touch the PHY. It would be the PHY
-driver which enables workarounds for erratas etc. 
-
-Does this PHY support C45 over C22? Can EEE be disabled in the normal
-way, writing to the standard EEE registers?
-
-I would try to put this code into the probe function of a PHY driver.
+None of these functions actually do anything. Why do they exist?
 
 	Andrew
 
