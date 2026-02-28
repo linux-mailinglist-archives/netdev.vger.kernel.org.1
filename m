@@ -1,143 +1,170 @@
-Return-Path: <netdev+bounces-262225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262226-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WJFEImRko2myBQUAu9opvQ
-	(envelope-from <netdev+bounces-262225-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 22:55:48 +0100
+	id UMkKEztlo2myBQUAu9opvQ
+	(envelope-from <netdev+bounces-262226-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 22:59:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E373C1C9558
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 22:55:47 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ABCB1C95B6
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 22:59:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5D01F30B2DDD
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 21:18:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C39903047514
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 21:54:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 406FD2877C3;
-	Sat, 28 Feb 2026 21:18:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED17B2DAFDF;
+	Sat, 28 Feb 2026 21:54:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ew5g5c8t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uQiZYNED"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B013175A80;
-	Sat, 28 Feb 2026 21:18:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CACC72D59E8
+	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 21:54:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772313528; cv=none; b=nBJx6CtdOhVkDu60gzAWSLvjeQ46h74j3p1MPKTxVNCZPrqT9y+sEGnDttY1q/jaeMMpa5IofHDeG05f6nmhpNDn2TVIR059gbNDOylkTOMnnFkyfQ3vcUd9HdeeCrjb8l/fa5WgjehdcFHZjp3qRzvxHT7ed6JQeOAnJupPnno=
+	t=1772315686; cv=none; b=KzrtIe0gCn2GR3/TUuO5pCHg6W+rwusOdZjYuBmfT8NExnPkturhMoZfIsj9f0U3noZEJdnd2Jm49rW7gOIpFlhW+i7bto2p9nZMeM3sbqeBB8mSL65XudxhCefj+CFpBlj4L576N4ZuILDI4y8LXGjJE1Bx0xJkhV2MrHsV0Cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772313528; c=relaxed/simple;
-	bh=LrGT6mNI+jCfEdEtzYEm5ownAK+ham3iPLxI8Va3x6I=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EszHQ9RNLioqn2HgX5IUwQzUB5KwB8Jx9ZY37Cq+VfDsIG8YsuMKNtt01xNK0EyZQgmPalgG/XkEYwfGPz/h9VwxSjHUuuxMJVDABUGhC1UB9xiblRzl/8BAoeg+/gmDnb9qb3Af8zVoDU8Nv6pLmGjbP23xmf9RjyVvgDo1Iic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ew5g5c8t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 361BFC116D0;
-	Sat, 28 Feb 2026 21:18:46 +0000 (UTC)
+	s=arc-20240116; t=1772315686; c=relaxed/simple;
+	bh=Sht9SFon629cUZSr1CaElu79VWdo58uPyr6GgvLc9HA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=qRf3ITE1hKC4FAgYegqcsNMmEfavfJZT6n5bCbmhF24sgtWJU/9QivMeUqCQlOuMkcysVaP9A4WLnd+87ABbxsUW+ofuA29aqV2GhhJm50cs3TeuZ84gbV54aXjL6CVuxe+ItlbxNcghRR3qgNxQra5TocYRX9RnkrWayaU1rSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uQiZYNED; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FD8FC19421;
+	Sat, 28 Feb 2026 21:54:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772313527;
-	bh=LrGT6mNI+jCfEdEtzYEm5ownAK+ham3iPLxI8Va3x6I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ew5g5c8tzhBv5k8g1mFuy03Thy+F5AuRIn5yAWi6HNFtQv56oq1bs9bzo03rTCdns
-	 5ztCwasRq6mudOLB9siqGZycUc16wcm5QZ1B1TxiWUg3IgDAyqw8+XehIMUtMeetPq
-	 p2aG7roHkxbBwDGcjGL4QbUj86OrIKbMdR/YtvkVtI598ms6Ljd+UU1rRJBTZmF/QY
-	 Bvd+8BZgAbsbjiEjS38dOameD66tzEhzeS28OOQzeSvOo2oZ+K+X0tfA+rTWId+g4+
-	 IIGgvxEygphcugx6YHcfaUdz4ieS3mOu77DEXncjwKKns4Ra87Va0+phlJS0pZ47sW
-	 f5fWCxoljvdEA==
-Date: Sat, 28 Feb 2026 13:18:45 -0800
+	s=k20201202; t=1772315686;
+	bh=Sht9SFon629cUZSr1CaElu79VWdo58uPyr6GgvLc9HA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=uQiZYNED9444lX7cknop9ZKhfBIh4d1sAoTuWO4WlJ9rxUF7QLrghXB8BGAZpnJ4q
+	 TcsIREdIlcd1QuGtWIN+OHHC4npsdsi9AEI9aV9hY5k0SU3ynrEwcGWcg3i8mxsgsC
+	 TxWk+Jkn7C3nu1MhkckcuDjOlwyrS2RGecQ3PTgnNu3hlZe2Wf8em1XWpDyhvCWKTt
+	 Eenti5nyHO9A7nLVGswNcfTSsvch5nXRBJNczh2qU+ExwCACN9BDerNqgUca7tTQuG
+	 SEpPp1FdBk2wzhP2GhzIdEn8t4Yx6fOuIr4ibgzIEj01toyxCr9yI6CkKSumo7aT+q
+	 uGI23GP5ffPaw==
 From: Jakub Kicinski <kuba@kernel.org>
-To: Inochi Amaoto <inochiama@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Yixun Lan
- <dlan@kernel.org>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre
- Torgue <alexandre.torgue@foss.st.com>, Richard Cochran
- <richardcochran@gmail.com>, Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti
- <alex@ghiti.fr>, "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Yao
- Zi <me@ziyao.cc>, Yanteng Si <siyanteng@cqsoftware.com.cn>, Choong Yong
- Liang <yong.liang.choong@linux.intel.com>, Lad Prabhakar
- <prabhakar.mahadev-lad.rj@bp.renesas.com>, Shangjuan Wei
- <weishangjuan@eswincomputing.com>, Chen-Yu Tsai <wens@kernel.org>, Boon
- Khai Ng <boon.khai.ng@altera.com>, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Quentin Schulz <quentin.schulz@cherry.de>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jose Abreu
- <joabreu@synopsys.com>, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
- spacemit@lists.linux.dev, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, Yixun Lan <dlan@gentoo.org>, Longbin
- Li <looong.bin@gmail.com>
-Subject: Re: [PATCH net-next v5 3/3] net: stmmac: Add glue layer for
- Spacemit K3 SoC
-Message-ID: <20260228131845.70421792@kernel.org>
-In-Reply-To: <20260227075718.2243818-4-inochiama@gmail.com>
-References: <20260227075718.2243818-1-inochiama@gmail.com>
-	<20260227075718.2243818-4-inochiama@gmail.com>
+To: kuniyu@google.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	dsahern@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	davem@davemloft.net,
+	horms@kernel.org,
+	kuni1840@gmail.com,
+	netdev@vger.kernel.org
+Subject: Re: [v2,net-next,01/15] selftest: net: Add basic functionality tests for ipmr.
+Date: Sat, 28 Feb 2026 13:54:36 -0800
+Message-ID: <20260228215436.4094668-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260227033903.3307272-2-kuniyu@google.com>
+References: <20260227033903.3307272-2-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262225-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[37];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,foss.st.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,armlinux.org.uk,ziyao.cc,cqsoftware.com.cn,linux.intel.com,bp.renesas.com,eswincomputing.com,altera.com,bootlin.com,cherry.de,st.com,synopsys.com,vger.kernel.org,lists.infradead.org,lists.linux.dev,st-md-mailman.stormreply.com,gentoo.org];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,google.com,davemloft.net,gmail.com,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262226-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E373C1C9558
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: 9ABCB1C95B6
 X-Rspamd-Action: no action
 
-On Fri, 27 Feb 2026 15:57:17 +0800 Inochi Amaoto wrote:
-> The ethernet controller on Spacemit K3 SoC is Synopsys DesignWare
-> MAC (version 5.40a), with the following special points:
-> 1. The rate of the tx clock line is auto changed when the mac speed
->    rate is changed, and no need for changing the input tx clock.
-> 2. This controller require a extra syscon device to configure the
->    interface type, enable wake up interrupt and delay configuration
->    if needed.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-checkpatch says:
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+selftest: net: Add basic functionality tests for ipmr.
 
-ERROR: "foo* bar" should be "foo *bar"
-#110: FILE: drivers/net/ethernet/stmicro/stmmac/dwmac-spacemit.c:45:
-+static int spacemit_dwmac_set_delay(struct spacmit_dwmac* dwmac,
+This commit adds self-tests for IPv4 multicast routing (ipmr) that
+exercise various setsockopt and rtnetlink paths to catch lockdep issues.
+The tests cover MRT_INIT/DONE, VIF management, MFC operations, and RTNL
+integration.
 
-ERROR: "foo* bar" should be "foo *bar"
-#148: FILE: drivers/net/ethernet/stmicro/stmmac/dwmac-spacemit.c:83:
-+static int spacemit_dwmac_fix_delay(struct spacmit_dwmac* dwmac,
+> diff --git a/tools/testing/selftests/net/forwarding/.gitignore b/tools/testing/selftests/net/forwarding/.gitignore
+> index 2dea317f12e7..418ff96c52ef 100644
+> --- a/tools/testing/selftests/net/forwarding/.gitignore
+> +++ b/tools/testing/selftests/net/forwarding/.gitignore
+> @@ -1,2 +1,3 @@
+>  # SPDX-License-Identifier: GPL-2.0-only
+>  forwarding.config
+> +ipmr
+> diff --git a/tools/testing/selftests/net/forwarding/Makefile b/tools/testing/selftests/net/forwarding/Makefile
+> index ff4a00d91a26..bbaf4d937dd8 100644
+> --- a/tools/testing/selftests/net/forwarding/Makefile
+> +++ b/tools/testing/selftests/net/forwarding/Makefile
 
-WARNING: line length of 99 exceeds 80 columns
-#243: FILE: drivers/net/ethernet/stmicro/stmmac/dwmac-spacemit.c:178:
-+	apmu = syscon_regmap_lookup_by_phandle_args(pdev->dev.of_node, "spacemit,apmu", 2, offset);
+[ ... ]
+
+> diff --git a/tools/testing/selftests/net/forwarding/ipmr.c b/tools/testing/selftests/net/forwarding/ipmr.c
+> new file mode 100644
+> index 000000000000..b6b00e36b3ce
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/forwarding/ipmr.c
+> @@ -0,0 +1,455 @@
+
+[ ... ]
+
+> +static struct rtattr *nl_add_rtattr(struct nlmsghdr *nlmsg, struct rtattr *rta,
+> +				    int type, const void *data, int len)
+> +{
+> +	int unused;
+                ^^^^^^
+
+Does this code have undefined behavior?  The variable 'unused' is declared
+here but never initialized, then passed to RTA_NEXT() which expands to a
+macro that reads its value to perform arithmetic.
+
+In nl_add_rtattr():
+
+	int unused;
+
+	rta->rta_type = type;
+	rta->rta_len = RTA_LENGTH(len);
+	memcpy(RTA_DATA(rta), data, len);
+
+	nlmsg->nlmsg_len += NLMSG_ALIGN(rta->rta_len);
+
+	return RTA_NEXT(rta, unused);
+
+The RTA_NEXT macro performs '(attrlen) -= RTA_ALIGN((rta)->rta_len)', which
+reads the uninitialized 'unused' value.
+
+While the modified value is never subsequently used, the read itself is
+undefined behavior that could trigger compiler warnings with -Wuninitialized
+or unpredictable behavior with certain optimizations.
+
+Initializing unused to 0 at declaration would resolve this: 'int unused = 0;'
 -- 
 pw-bot: cr
 
