@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-262240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262241-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +F8jERtqo2mACgUAu9opvQ
-	(envelope-from <netdev+bounces-262240-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 23:20:11 +0100
+	id yL5GKC1qo2mACgUAu9opvQ
+	(envelope-from <netdev+bounces-262241-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 23:20:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B466D1C9737
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 23:20:10 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 153C61C973E
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 23:20:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3248330965F6
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 22:18:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8EA6330A6275
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 22:18:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA5BC3D4133;
-	Sat, 28 Feb 2026 22:18:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66A6B3D4133;
+	Sat, 28 Feb 2026 22:18:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J8TOQQwe"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BdixoFRK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 912053D411B
-	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 22:18:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33ACE3D5220
+	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 22:18:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772317096; cv=none; b=oe75rzWXRStEJTO2s/rYmVCSyksbdGMdoebWjUiPeIVEdA+bAQESTtEUPVrz3AGOJOMK7Kf7VAyiw3V/I3qZLqKpOiJfZxmOiqu+etgc6bfjnywcGDo7+TVQKpdSJgX8vaf6V62u6IeQ8Qh3BASmyQF8yQdZ9bF9Prm3F6dKqoc=
+	t=1772317098; cv=none; b=qQBro0VNIe7RTQ5eJea+tVYbEEkczLxHNJNjKBIsM2pelRT/Xl2DEZY9V1As40jkz5Y6piziFWKNpvUcA4wpW1wGIcVYTXn5fF8OYSynWV8+H+m5zYFKsDHlOXk/CSsLmZL+rOdkJIyF+Ol8A2trZ7etVahG5Ni1pfA/R48OLHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772317096; c=relaxed/simple;
-	bh=9j6IfFijJcJSGTL8Zu0od2hCNShMpJqQ4sXIY3t7I8k=;
+	s=arc-20240116; t=1772317098; c=relaxed/simple;
+	bh=pkqSvit2/+dtK3MnajdtrtuDmC9DlNrhF2Ffq4eH53Q=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GXyPB57wL/wNf/csAkC7V3IDdSF7d5dhmiRaQJaLvL50UCWmzBCY/5LxtZRD06VShe0hatwuigxakx0r3wYU3v2UG72r+31uK9gmZqx94ZdVvS0P5pzp6FQm0nbMxzlUjrbEIZsIgNGDnt9MILcs8kTJBN42x0bB7pl4CTKLQWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J8TOQQwe; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=s6wauwCSZWQCEm3OOxahFuuP+1KJV2BezgcR7Khx0GRmxnuNWnmYdULg0yeidgsPQ0525XdTDZIqMZJZJ0DUMTWDSoq4np1aKIAmiBK89zk5TyaeQflZdz5F8Y22tHZR2z9sk9RkFB2EsMxZoVcFWx5YcRPGHZYQzzeab4bxzE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BdixoFRK; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2ae48a21d12so576845ad.1
-        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 14:18:15 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2adb085735bso33843795ad.1
+        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 14:18:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772317095; x=1772921895; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772317097; x=1772921897; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wDsINcMa7ubxNLI36LVvkPy3KV20vBdthQ0z1FDe6Y0=;
-        b=J8TOQQwewnrtTIJ1GopnY+lWr2QV9Uag0i86W/baMA4nWrMbNA5OwQIaTqvXbwHlKv
-         5BC5xBPkMzxdQzZCaUequey2+y4r7YSzAci8O9zE2gDDgz5mc4ukn+YVBBSmKl64S++w
-         Yft4/XTh6mFjJG678u+NUvzg5OW7a60pqghGlNADEqcTZxh76EmxC9u8NwjWpgTxh9Vj
-         y+9foyREOqHhMUCldXXIGAyFMmf+Rg5zKBnA/T0WJfHc4mC+CMv6Z51HQx8Tw94rxpW8
-         0/d1O0ALomsQ53PVz8ZSkbbLUnVzAeKwciSyo0+nbDPyOegGBvtySn0U33C2SkI55xci
-         CZBA==
+        bh=hFwqQru6JOSey0Nu9edEv08dpDfYg41CEJ67TRY90dE=;
+        b=BdixoFRK/gTGskVQKGO/Rm2PLQ6rLjZ2Q/6Jp/4wT2WkEKdlS0tccU0mJfKnl7gnBI
+         S1UR9hwP5rgkMytZLT/bpjpV6KonQKIM6D4xIneuTiHWPzPIrKScki8BtG3BgGhRS1yX
+         BxAk3OKa4pFF5W3pt1oO9tdq8DDyo24WTFC0ePYlESkyeXBxIDDwmMRejL//sjNihYNN
+         EuFajjYvx7DNQbmEdYsNhmaE5yUILyuqMugrEDwTu5320g8gw4HjPSIfMUl4IGj3MuY3
+         i97dPi4u0IWOR+CmVZmGWEetF3HxRblWpHnQArjC2s7w3fdR/HzKLRPGMjH6DUPcJnWA
+         42kA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772317095; x=1772921895;
+        d=1e100.net; s=20230601; t=1772317097; x=1772921897;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wDsINcMa7ubxNLI36LVvkPy3KV20vBdthQ0z1FDe6Y0=;
-        b=BD0jvCwv5SI06N6D7HHUCXkciLdCMe00DRjaQXKH6AIxk2GpKJMeoNGgD7lwZgMZkV
-         1Pf8maolnRmZJNmFel9cALhpRq8dihcBe4M9tZWtw2tKugAU7tcLGsu2b2okUOaLTRuV
-         Sqt1XaCVTrP+pyemgJpd0lIUaJCyExG2HSvBkMSKIjAVO0I+wCpmT38QaPxI256KDhXw
-         xcX3CEUIWOG3OmLugi/E7nl80zWDoghpbA6b5UZGHiPpTIuuO4NOX95oNVEihVi85ui8
-         65oLhq8FJ/yQCmknTZF//TBXcdFACOfocIghNN4MeHy7O4yC9FjPX2Jw8WJKnhCtCOhM
-         vWjg==
-X-Forwarded-Encrypted: i=1; AJvYcCXzwlSHQV77RKOCZCZgy0nlofwOasuuQCvJzeXFyL1lxA+nhaDnYwuwK9rh448JcylkWd1pk7c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjnGCCgXgl8nAkaqxkuqwMeUhW2sjavYDONbz2y9emXEew8n3B
-	6cAR79ftUiW4cWlgE0arhoDipLHW7HNFtXcCxvE8MXeJxl+QmDpFCPEqYPTGnWdJUFj+i/7xk6k
-	8Don5/A==
-X-Received: from plaq10.prod.google.com ([2002:a17:903:204a:b0:2a7:5e40:dcf0])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:944:b0:2ae:4999:2194
- with SMTP id d9443c01a7336-2ae49992583mr1278495ad.10.1772317094855; Sat, 28
- Feb 2026 14:18:14 -0800 (PST)
-Date: Sat, 28 Feb 2026 22:17:25 +0000
+        bh=hFwqQru6JOSey0Nu9edEv08dpDfYg41CEJ67TRY90dE=;
+        b=ZdGhYvTsJwqUSOOjlXLmmhUPcvOPvu8WCCNVhO4zgPP2Exx3PgfAgNQvdA+73M6eNe
+         vFjzh4Zd9Q6VgyHtWGS3zF7Ew3i0HbIivJdHuAbSzSXXBDouq1d00WoOoP2n+aZfmyyF
+         LifTBUzyFPQbf8SEyd1mlkz+j6ddiQ3UBX+g/MK/OhffuoQuC8VaRmW9OPAdlYTi+mZI
+         BbVeZA0RhdOYKxvHU5QmRZz/7J5sEVDCNGVkp6Dss7x6woL9L4uakyYn67Gs50BRpWhf
+         O/l39qguzHPfBrQ6xv/T2SdTYYEiS5qnnrn2AbDh63U8qiKw7VrHWokKtraot4TNBnYI
+         Bg/w==
+X-Forwarded-Encrypted: i=1; AJvYcCXCiYcw5KBKd3MquKWwcgPcwg8uHVRsLmx2ABnwkm3ERQ8CQiuNM1V21+bwrSBvoQP4uJXkDAg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9W952TIGs4nSIcxl79Itp15+CwYlxIBObLRIIZFIclrt4e7mj
+	R5GcRj7CMUo5uu48DkhkVP8GtGxLnTKy+pCwIkmz/+KD8Vd8jlhq9wKB3i58Yd2gdf2Ssh4AE2h
+	MaGVidQ==
+X-Received: from plko1.prod.google.com ([2002:a17:902:6b01:b0:2a3:1bf9:d25])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d4cc:b0:29b:e512:752e
+ with SMTP id d9443c01a7336-2ae2e4d650amr75612995ad.47.1772317096462; Sat, 28
+ Feb 2026 14:18:16 -0800 (PST)
+Date: Sat, 28 Feb 2026 22:17:26 +0000
 In-Reply-To: <20260228221800.1082070-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,9 +76,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260228221800.1082070-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260228221800.1082070-8-kuniyu@google.com>
-Subject: [PATCH v3 net-next 07/15] ipmr: Move unregister_netdevice_many() out
- of mroute_clean_tables().
+Message-ID: <20260228221800.1082070-9-kuniyu@google.com>
+Subject: [PATCH v3 net-next 08/15] ipmr: Move unregister_netdevice_many() out
+ of ipmr_free_table().
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
@@ -92,18 +92,18 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262240-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262241-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
@@ -113,132 +113,111 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B466D1C9737
+X-Rspamd-Queue-Id: 153C61C973E
 X-Rspamd-Action: no action
 
 This is a prep commit to convert ipmr_net_exit_batch() to
 ->exit_rtnl().
 
-Let's move unregister_netdevice_many() in mroute_clean_tables()
+Let's move unregister_netdevice_many() in ipmr_free_table()
 to its callers.
 
-As a bonus, mrtsock_destruct() can do batching for all tables.
+Now ipmr_rules_exit() can do batching all tables per netns.
+
+Note that later we will remove RTNL and unregister_netdevice_many()
+in ipmr_rules_init().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 Reviewed-by: Eric Dumazet <edumazet@google.com>
 ---
- net/ipv4/ipmr.c | 34 ++++++++++++++++++++++++----------
- 1 file changed, 24 insertions(+), 10 deletions(-)
+ net/ipv4/ipmr.c | 25 +++++++++++++++++--------
+ 1 file changed, 17 insertions(+), 8 deletions(-)
 
 diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
-index 5c8508788fb6..d15e05662b09 100644
+index d15e05662b09..7e2aa2026f01 100644
 --- a/net/ipv4/ipmr.c
 +++ b/net/ipv4/ipmr.c
-@@ -112,7 +112,8 @@ static int ipmr_cache_report(const struct mr_table *mrt,
- static void mroute_netlink_event(struct mr_table *mrt, struct mfc_cache *mfc,
- 				 int cmd);
- static void igmpmsg_netlink_event(const struct mr_table *mrt, struct sk_buff *pkt);
--static void mroute_clean_tables(struct mr_table *mrt, int flags);
-+static void mroute_clean_tables(struct mr_table *mrt, int flags,
-+				struct list_head *dev_kill_list);
- static void ipmr_expire_process(struct timer_list *t);
+@@ -102,7 +102,8 @@ static DEFINE_SPINLOCK(mfc_unres_lock);
+ static struct kmem_cache *mrt_cachep __ro_after_init;
  
- #ifdef CONFIG_IP_MROUTE_MULTIPLE_TABLES
-@@ -427,12 +428,15 @@ static struct mr_table *ipmr_new_table(struct net *net, u32 id)
- static void ipmr_free_table(struct mr_table *mrt)
+ static struct mr_table *ipmr_new_table(struct net *net, u32 id);
+-static void ipmr_free_table(struct mr_table *mrt);
++static void ipmr_free_table(struct mr_table *mrt,
++			    struct list_head *dev_kill_list);
+ 
+ static void ip_mr_forward(struct net *net, struct mr_table *mrt,
+ 			  struct net_device *dev, struct sk_buff *skb,
+@@ -251,6 +252,7 @@ static const struct fib_rules_ops __net_initconst ipmr_rules_ops_template = {
+ static int __net_init ipmr_rules_init(struct net *net)
+ {
+ 	struct fib_rules_ops *ops;
++	LIST_HEAD(dev_kill_list);
+ 	struct mr_table *mrt;
+ 	int err;
+ 
+@@ -275,7 +277,8 @@ static int __net_init ipmr_rules_init(struct net *net)
+ 
+ err2:
+ 	rtnl_lock();
+-	ipmr_free_table(mrt);
++	ipmr_free_table(mrt, &dev_kill_list);
++	unregister_netdevice_many(&dev_kill_list);
+ 	rtnl_unlock();
+ err1:
+ 	fib_rules_unregister(ops);
+@@ -285,12 +288,15 @@ static int __net_init ipmr_rules_init(struct net *net)
+ static void __net_exit ipmr_rules_exit(struct net *net)
+ {
+ 	struct mr_table *mrt, *next;
++	LIST_HEAD(dev_kill_list);
+ 
+ 	ASSERT_RTNL();
+ 	list_for_each_entry_safe(mrt, next, &net->ipv4.mr_tables, list) {
+ 		list_del(&mrt->list);
+-		ipmr_free_table(mrt);
++		ipmr_free_table(mrt, &dev_kill_list);
+ 	}
++
++	unregister_netdevice_many(&dev_kill_list);
+ 	fib_rules_unregister(net->ipv4.mr_rules_ops);
+ }
+ 
+@@ -349,8 +355,13 @@ static int __net_init ipmr_rules_init(struct net *net)
+ 
+ static void __net_exit ipmr_rules_exit(struct net *net)
+ {
++	LIST_HEAD(dev_kill_list);
++
+ 	ASSERT_RTNL();
+-	ipmr_free_table(net->ipv4.mrt);
++
++	ipmr_free_table(net->ipv4.mrt, &dev_kill_list);
++	unregister_netdevice_many(&dev_kill_list);
++
+ 	net->ipv4.mrt = NULL;
+ }
+ 
+@@ -425,18 +436,16 @@ static struct mr_table *ipmr_new_table(struct net *net, u32 id)
+ 			      ipmr_expire_process, ipmr_new_table_set);
+ }
+ 
+-static void ipmr_free_table(struct mr_table *mrt)
++static void ipmr_free_table(struct mr_table *mrt, struct list_head *dev_kill_list)
  {
  	struct net *net = read_pnet(&mrt->net);
-+	LIST_HEAD(dev_kill_list);
+-	LIST_HEAD(dev_kill_list);
  
  	WARN_ON_ONCE(!mr_can_free_table(net));
  
  	timer_shutdown_sync(&mrt->ipmr_expire_timer);
  	mroute_clean_tables(mrt, MRT_FLUSH_VIFS | MRT_FLUSH_VIFS_STATIC |
--				 MRT_FLUSH_MFC | MRT_FLUSH_MFC_STATIC);
-+			    MRT_FLUSH_MFC | MRT_FLUSH_MFC_STATIC,
-+			    &dev_kill_list);
-+	unregister_netdevice_many(&dev_kill_list);
+ 			    MRT_FLUSH_MFC | MRT_FLUSH_MFC_STATIC,
+-			    &dev_kill_list);
+-	unregister_netdevice_many(&dev_kill_list);
++			    dev_kill_list);
  	rhltable_destroy(&mrt->mfc_hash);
  	kfree(mrt);
  }
-@@ -1293,12 +1297,12 @@ static int ipmr_mfc_add(struct net *net, struct mr_table *mrt,
- }
- 
- /* Close the multicast socket, and clear the vif tables etc */
--static void mroute_clean_tables(struct mr_table *mrt, int flags)
-+static void mroute_clean_tables(struct mr_table *mrt, int flags,
-+				struct list_head *dev_kill_list)
- {
- 	struct net *net = read_pnet(&mrt->net);
--	struct mr_mfc *c, *tmp;
- 	struct mfc_cache *cache;
--	LIST_HEAD(list);
-+	struct mr_mfc *c, *tmp;
- 	int i;
- 
- 	/* Shut down all active vif entries */
-@@ -1308,9 +1312,8 @@ static void mroute_clean_tables(struct mr_table *mrt, int flags)
- 			     !(flags & MRT_FLUSH_VIFS_STATIC)) ||
- 			    (!(mrt->vif_table[i].flags & VIFF_STATIC) && !(flags & MRT_FLUSH_VIFS)))
- 				continue;
--			vif_delete(mrt, i, 0, &list);
-+			vif_delete(mrt, i, 0, dev_kill_list);
- 		}
--		unregister_netdevice_many(&list);
- 	}
- 
- 	/* Wipe the cache */
-@@ -1349,9 +1352,11 @@ static void mroute_clean_tables(struct mr_table *mrt, int flags)
- static void mrtsock_destruct(struct sock *sk)
- {
- 	struct net *net = sock_net(sk);
-+	LIST_HEAD(dev_kill_list);
- 	struct mr_table *mrt;
- 
- 	rtnl_lock();
-+
- 	ipmr_for_each_table(mrt, net) {
- 		if (sk == rtnl_dereference(mrt->mroute_sk)) {
- 			IPV4_DEVCONF_ALL(net, MC_FORWARDING)--;
-@@ -1360,9 +1365,13 @@ static void mrtsock_destruct(struct sock *sk)
- 						    NETCONFA_IFINDEX_ALL,
- 						    net->ipv4.devconf_all);
- 			RCU_INIT_POINTER(mrt->mroute_sk, NULL);
--			mroute_clean_tables(mrt, MRT_FLUSH_VIFS | MRT_FLUSH_MFC);
-+			mroute_clean_tables(mrt, MRT_FLUSH_VIFS | MRT_FLUSH_MFC,
-+					    &dev_kill_list);
- 		}
- 	}
-+
-+	unregister_netdevice_many(&dev_kill_list);
-+
- 	rtnl_unlock();
- }
- 
-@@ -1485,7 +1494,9 @@ int ip_mroute_setsockopt(struct sock *sk, int optname, sockptr_t optval,
- 					   sk == rtnl_dereference(mrt->mroute_sk),
- 					   parent);
- 		break;
--	case MRT_FLUSH:
-+	case MRT_FLUSH: {
-+		LIST_HEAD(dev_kill_list);
-+
- 		if (optlen != sizeof(val)) {
- 			ret = -EINVAL;
- 			break;
-@@ -1494,8 +1505,11 @@ int ip_mroute_setsockopt(struct sock *sk, int optname, sockptr_t optval,
- 			ret = -EFAULT;
- 			break;
- 		}
--		mroute_clean_tables(mrt, val);
-+
-+		mroute_clean_tables(mrt, val, &dev_kill_list);
-+		unregister_netdevice_many(&dev_kill_list);
- 		break;
-+	}
- 	/* Control PIM assert. */
- 	case MRT_ASSERT:
- 		if (optlen != sizeof(val)) {
 -- 
 2.53.0.473.g4a7958ca14-goog
 
