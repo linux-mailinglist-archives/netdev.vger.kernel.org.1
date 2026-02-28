@@ -1,133 +1,132 @@
-Return-Path: <netdev+bounces-262156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262157-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EC1kBEAQo2nk9QQAu9opvQ
-	(envelope-from <netdev+bounces-262156-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 16:56:48 +0100
+	id mMkaELEOo2nY9AQAu9opvQ
+	(envelope-from <netdev+bounces-262157-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 16:50:09 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 601A81C42E7
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 16:56:47 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8E4C1C4236
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 16:50:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CFE9131A7598
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 15:43:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9D5DC3015482
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 15:50:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73D3747D937;
-	Sat, 28 Feb 2026 15:40:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85AE447B43E;
+	Sat, 28 Feb 2026 15:50:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bNYHjIKn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aE2yZFOC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50BA847D930;
-	Sat, 28 Feb 2026 15:40:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59FDE1DF25F;
+	Sat, 28 Feb 2026 15:50:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772293201; cv=none; b=mKWmhlFMwfdTNpUF7j2egX+0vN44j/3jcfhLI0TJE3zgIv+KbLzE9aWenXzN+UXAVmVeKE3KTJ8sZ6LdrwNGUqCHTOja3wFELcd0bt5Qbdn29Vczl7qGOK9z6CzXqWJdhtdlgfRjwdIo/QB8hWnDBecsvlvd8OncWutHIYb5OpA=
+	t=1772293803; cv=none; b=PQvjGK1Ed3EatYrz40QnrM2EFRWKzv0+iz9HY7pDgwKeJc++fO/VxSCD7FHzptJHPFgjKjR/luk4uAHMkWoqpOPpQWJaMP95lMmY8SeUCvJCTT5awlz280E/pY784czJzfRili6TAAoKGZ59NAhLrLMQQRKB7Z3rPXgAQUlqTcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772293201; c=relaxed/simple;
-	bh=csspmxNZhkmoxudo99/uuLUpzgU2EvZBCLsd02ysASo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iWEu9wOhfa6AHHsFqcqBZ+zUbdOAD/+Jz8VJCRHqOB8d1WqU3lVJ70wVPY0RvO10nW0RXOI3I2XjNQdYnGL7J6gq2i1Hgme+Zd9naXTlwcv/yd3MlQqdp0XaZ7Hm1GVCOkZ8j+B2y7wnaRmJY4VIZPOidDMJktBVwaP7D2D0mO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bNYHjIKn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85BABC116D0;
-	Sat, 28 Feb 2026 15:40:00 +0000 (UTC)
+	s=arc-20240116; t=1772293803; c=relaxed/simple;
+	bh=U7iU0O708MosLKMperst8qs1501dpeYaYOoeaCGJkNI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=T0gb24KRoH76ZxHb8SvwY2WDi/rKMtO9w8/pC6hkQcFisYn6Wa8u6HldK3/NRDzKVqwaVkPr/IZyun52est0Z6oOUZQvuaaGycGLheFdCyn10/k8OUlxv/XQpVzfOkWDI2BXVOki9ou9Zaeg7lNISmJaYXo6JuGw/ue8pBpuWKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aE2yZFOC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD869C116D0;
+	Sat, 28 Feb 2026 15:50:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772293200;
-	bh=csspmxNZhkmoxudo99/uuLUpzgU2EvZBCLsd02ysASo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bNYHjIKnQVKheot51RWEEIRyoVUMnWQYQlpKCE6gAsRM01Pstvjusl0xC+xvp7ODy
-	 kwevxeUxUNcflIP+1uE5cuHB3Zdp9WtOHboQTdaKYhg91asxKtDjOH1jqTSaDUKFoK
-	 cBl46+f1iaMRLRx6j/517Voj2XIOA5wSMXpwszMUvqBdbhrb9ekKX3VulIpwB/A2Y0
-	 i3rRKysOKutHwOJgmsHjJMxKMCLcFM9p/OjPVUoInHzQcVqzHNvXWlQkY6eGkyuGu4
-	 yZZfaZdquE1/eoM2+U+xuOkCc8/k4Sf6zMC29glFtmFMIOaJSpoaZEx+GyV3NhEnSy
-	 bFT+nPO0fuovw==
-Date: Sat, 28 Feb 2026 07:39:59 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: netdev@vger.kernel.org, Jiayuan Chen <jiayuan.chen@shopee.com>,
- syzbot+334190e097a98a1b81bb@syzkaller.appspotmail.com, David Ahern
- <dsahern@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v1] net: nexthop: fix panic when IPv4 route
- references IPv6 nexthop
-Message-ID: <20260228073959.0ef1b33f@kernel.org>
-In-Reply-To: <20260228031400.163009-1-jiayuan.chen@linux.dev>
-References: <20260228031400.163009-1-jiayuan.chen@linux.dev>
+	s=k20201202; t=1772293802;
+	bh=U7iU0O708MosLKMperst8qs1501dpeYaYOoeaCGJkNI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=aE2yZFOC0fnwzQOlWC1Yx5ESs6IvmPreJFiJyQAU+7CGhnDeVAeMlsobnmJXykLov
+	 PhFyylnY6FNb4ywBlKkMxMeUVFlFY0kW6gukd5AvmjIsGZcyOjyQ008eQUyqX3GqR7
+	 ycOaErmRgFtTzR6dFFK8x7hohpg3gMOfqvBmEjwZqUwG/F9558dF/Ec6IsxJilMgIB
+	 u3w4RqCCJKVNKhG6ecNJHKKsqd9dZ79/QXUmNKY6WGux7CCx/WXp14Kd6A3OUGy4TM
+	 sKiaEUxH7pH3rCVz8QD5gry5Q/jj01i0qWnH6M/CiUMrfa23lBvp5AGsV7kFNFAXBC
+	 nQGJrILo+Y9ow==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FD9D39F2021;
+	Sat, 28 Feb 2026 15:50:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2] net: fix sock compilation error under
+ CONFIG_PREEMPT_RT
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177229380605.3002732.13851051513590754007.git-patchwork-notify@kernel.org>
+Date: Sat, 28 Feb 2026 15:50:06 +0000
+References: <20260228111319.79506-1-jiayuan.chen@linux.dev>
+In-Reply-To: <20260228111319.79506-1-jiayuan.chen@linux.dev>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: netdev@vger.kernel.org, edumazet@google.com, jiayuan.chen@shopee.com,
+ kuniyu@google.com, pabeni@redhat.com, willemb@google.com,
+ davem@davemloft.net, kuba@kernel.org, horms@kernel.org,
+ bigeasy@linutronix.de, clrkwllms@kernel.org, rostedt@goodmis.org,
+ kerneljasonxing@gmail.com, linux-kernel@vger.kernel.org,
+ linux-rt-devel@lists.linux.dev
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262156-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,shopee.com,redhat.com,davemloft.net,kernel.org,linutronix.de,goodmis.org,gmail.com,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-262157-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NO_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,334190e097a98a1b81bb];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[shopee.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,fib_nexthops.sh:url]
-X-Rspamd-Queue-Id: 601A81C42E7
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[shopee.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B8E4C1C4236
 X-Rspamd-Action: no action
 
-On Sat, 28 Feb 2026 11:13:59 +0800 Jiayuan Chen wrote:
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sat, 28 Feb 2026 19:13:18 +0800 you wrote:
 > From: Jiayuan Chen <jiayuan.chen@shopee.com>
 > 
-> fib_check_nexthop() does not validate that the nexthop family matches
-> the route family. This allows an IPv4 route to reference an IPv6
-> nexthop object. When the IPv4 route is looked up, __mkroute_output()
-> accesses nhc->nhc_pcpu_rth_output which is never allocated for IPv6
-> nexthops (fib6_nh_init does not call fib_nh_common_init), causing a
-> NULL pointer dereference.
+> When CONFIG_PREEMPT_RT is enabled, __SPIN_LOCK_UNLOCKED() expands to a
+> brace-enclosed initializer rather than a compound literal, which cannot
+> be used in assignment expressions. This causes a build failure:
 > 
-> Note that this is not about IPv4 routes with IPv6 gateways (RFC 5549),
-> which uses an AF_INET nexthop with nhc_gw_family=AF_INET6 and properly
-> allocates nhc_pcpu_rth_output via fib_nh_common_init(). The bug here
-> is an AF_INET6 nexthop object being directly referenced by an IPv4
-> route, which is an invalid combination.
+>   net/core/sock.c:3787:29: error: expected expression before '{' token
+>    3787 |                 tmp.slock = __SPIN_LOCK_UNLOCKED(tmp.slock);
 > 
-> Add the missing family check in fib_check_nexthop(), mirroring what
-> fib6_check_nexthop() already does for the reverse direction (rejecting
-> IPv6 routes that reference IPv4 nexthop objects).
+> [...]
 
-AFAICT this breaks a bunch of tests, quickest to repro with is
-gre_multipath_nh.sh but you should probably run fib_nexthops.sh
-on your fix as well.
+Here is the summary with links:
+  - [net-next,v2] net: fix sock compilation error under CONFIG_PREEMPT_RT
+    https://git.kernel.org/netdev/net-next/c/58e443b773ef
 
-> Reproducer:
-> 
->   unshare -rn
->   ip link set lo up
->   ip nexthop add id 100 via fe80::1 dev lo
->   ip route add 172.20.20.0/24 nhid 100
->   ping -c1 172.20.20.1
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
