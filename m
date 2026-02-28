@@ -1,167 +1,185 @@
-Return-Path: <netdev+bounces-262175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262176-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oC56Ee8fo2mC9wQAu9opvQ
-	(envelope-from <netdev+bounces-262175-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 18:03:43 +0100
+	id qN9JGkAgo2mC9wQAu9opvQ
+	(envelope-from <netdev+bounces-262176-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 18:05:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF2C61C4A7D
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 18:03:42 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C04731C4B1C
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 18:05:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 81106302445D
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 17:03:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 058583055413
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 17:04:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ED4B2D8DDB;
-	Sat, 28 Feb 2026 17:03:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 766212F49F6;
+	Sat, 28 Feb 2026 17:04:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dRVlWni6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vTRDmPta"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B9D22E3AF1
-	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 17:03:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772298196; cv=none; b=f9qvmZ9zyC168fvBpDiEyGi9no0iLEzHsSKeq8o1HwGRBpTSlgBik5VnqZ1obPQITO4gZD1pD9AzkD+HzF1bsT/T1b1WbTDr7iJgF/UqvNblRHFDEUm6IlHoojWWr7IS/dJJr5LaObHk8BcL2tCeMKyfrMLpwGl93csh/6uyLx4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772298196; c=relaxed/simple;
-	bh=opqLZKqNnI++/upx0AwCYnXibnHRb6eb9IWHAB5RD3Y=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=C9Qi0khLH2lfTMRUaUxkZfM3nILtWXqqOzvdOqCaYB7y+1m+5dNrX/2j6q42HzSyzzLEI44p0dvkxdZcX5uqYHz2cXCfEVC9yBgzP6ecNjHKZPSPgSM7jVN9fyuG0u+2mnfmcU4WdDVwf05l7ucBAeUQLbuBUr18LD/VcE9AFi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dRVlWni6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6281FC19425;
-	Sat, 28 Feb 2026 17:03:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772298196;
-	bh=opqLZKqNnI++/upx0AwCYnXibnHRb6eb9IWHAB5RD3Y=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=dRVlWni6d4fshi8cYcudxMAt0rLYg2Mx5AqC6YYC/fyww+QnjJp6Tk0u3eipyHDh0
-	 KFkSrRiii8NiyzDxsGyFhfQukMXoULQiWeABmSozdo544JBOqe95lfBjnsj5h6T2nA
-	 WVSTH7j3vwxFtvWqsb/aPcj0ZYPPLisgD/sqRq2Uas2exal0MmNDGqvIqdtZdowWwc
-	 gTzZQj8kg2VXQUAbslGTvmv0WJ87skdzleGOf2fvbQ18PVMI2YoOzZVdl+MIePle1q
-	 gVkyXcmBdqDsNYK450JZpCKM9ijvqFvUmjegLja14GBdvV62LKV4x15zvQs9YQKRV0
-	 qO6BkDxYmQWNQ==
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 513BEF4006C;
-	Sat, 28 Feb 2026 12:03:14 -0500 (EST)
-Received: from phl-imap-15 ([10.202.2.104])
-  by phl-compute-10.internal (MEProxy); Sat, 28 Feb 2026 12:03:14 -0500
-X-ME-Sender: <xms:0h-jaZ1_HN1_FOUSWNrGxoNabG06nKoI21d6I0L0J9pPiMCM95kIIA>
-    <xme:0h-jaa43FGZDZq10aUgVOwJbsBvXRF_4AP9tj4gKzFnq6P1H5HUkde6miQjn5KDd-
-    PKfQLMxsiO3FhNhL1jYqOM9pBhyZ2JznGSKbJ_-Lwgo4KJ9ZHnBtRw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvhedvgeefucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedfvehhuhgt
-    khcunfgvvhgvrhdfuceotggvlheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrh
-    hnpefhffekffeftdfgheeiveekudeuhfdvjedvfedvueduvdegleekgeetgfduhfefleen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegthhhutg
-    hklhgvvhgvrhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudeifeegleel
-    leehledqfedvleekgeegvdefqdgtvghlpeepkhgvrhhnvghlrdhorhhgsehfrghsthhmrg
-    hilhdrtghomhdpnhgspghrtghpthhtohepvdefpdhmohguvgepshhmthhpohhuthdprhgt
-    phhtthhopehnvghilhessghrohifnhdrnhgrmhgvpdhrtghpthhtohepuggrvhgvmhesug
-    grvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnihgtkhdruggvshgruhhlnhhivghr
-    shdolhhkmhhlsehgmhgrihhlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgoh
-    hoghhlvgdrtghomhdprhgtphhtthhopehjuhhsthhinhhsthhithhtsehgohhoghhlvgdr
-    tghomhdprhgtphhtthhopehmohhrsghosehgohhoghhlvgdrtghomhdprhgtphhtthhope
-    htrhhonhgurdhmhihklhgvsghushhtsehhrghmmhgvrhhsphgrtggvrdgtohhmpdhrtghp
-    thhtoheprghnnhgrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehhohhrmhhssehkvg
-    hrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:0h-jaee-oEB2ztOzVUzjcgdOkForXm6paqwzcPvPrnv1qf3UkrgS8Q>
-    <xmx:0h-jaT6ii0tYw9sybwPjmqPiImEjRyz8KbtVtL1R8ClYptYzO17D8g>
-    <xmx:0h-jaaMhqI8Kun0DZgA5Fz3mMTD5w0NUH7LmjMDiy7zRdOB4bUe2sg>
-    <xmx:0h-jac4LPWOOsAPHJ8bGC6NaPqvTd8Bewfc_A6hnLm9_FUVF74o-Cg>
-    <xmx:0h-jaZxaPugMGPmtL1yly6vRQ0j4Pkozppa-bcc1OVnSKHpsUvNwUQuz>
-Feedback-ID: ifa6e4810:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 252B6780075; Sat, 28 Feb 2026 12:03:14 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3837C17ADE0
+	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 17:04:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772298295; cv=pass; b=epVgMnJJNrrvx9L2ns4FgiI1TZfK++T8frU6CJ5+DlUi6jnS0zIl0Sr/LpGrQU0AD/76jYsJLpOubQ5qmk9LRQX3ln39wm1XSvCSoANOQOS6UReCYyHh0qio/3jyOD9GQdyOcKvVZrgSj2+ZaMcmBMaTZdMLGCUAjMjuvzlCbPo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772298295; c=relaxed/simple;
+	bh=lwcs85eb82PnM2kCqSelXTs1AsfWuMBqA/H67xN/sy8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nRv01MuSpgJQQ0KGzcmLXGq7oRa4II2dnHmW0Aqhs01+CMrdB1iXOcICMlgAy2lgY0iEyYA7qM2Zs92BQKAFzy+BltQ4VOEOc5objVsluK8+EDkUsZWuNa6xWFj8uL24sR01dfAmHaxaa4S28TODRtMoMttKj14iPSMUB2qhHmw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vTRDmPta; arc=pass smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-899c97c5afeso21900916d6.1
+        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 09:04:54 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772298293; cv=none;
+        d=google.com; s=arc-20240605;
+        b=fLx1+Xxm1HRsYr4qLDin7oiELh9DbXvkBFTuZZg5BfNyhhMotM95P/CyBzzyegeqDj
+         zhrSzYxHcSYZjHk7jVpyTncC87Sm23+eSSnm8Dz8tLkA0Netfz4lw6oOHwqcMxLo/aPa
+         RTwOSGhsGiS+CRFyOdVcNjkVoJukmSA3l7kmv5Jfhx1oNswmv3ijkULrFaPLkEebNJA/
+         Ii7COvfRYruihUjO5c8xvvZy2IrTinXqzgqSkCaAkT4pcneBKb0Ng9H/WS3Rs9rv3ZQy
+         KI04fVgVufTvczMn7AcW3OR16bypOzytq20xMx9YCvsBPruf03BRpx7r5uXgMoQ1BVIo
+         z1ig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=lwcs85eb82PnM2kCqSelXTs1AsfWuMBqA/H67xN/sy8=;
+        fh=XyZwUWFl3+EYfeMKKd0Kw8LmhSaulbmy2ojGyKAc70w=;
+        b=Dq+HzXIw62Puu4GGQLpe+2SHCohBztowdFWagav8j9BkchpyGwXPR8R6JMoN01onmp
+         pfmQHuDUENW/TJYcUZz4KLim5CzY+DIj3CC1ZSO4VXbxk6biNQCIw5cfaG7ioEC1rAqe
+         S0qz68sTpKT9SEir7ggKy3lXdhlFFJdscgLEEf7JNNWZp8IQcjDYsO8fk3OfX7h0iVWY
+         TzzrdPaTorHXZXWPwej5RQTx/aJjyY8fqkh/g/MpbemAd/l9wW0ApwcGEeHs7loxE6ma
+         WRfeOa1dX7d+jDC7N38IS0TgBVxp4cAguSXGueU00yYd9PnTe5obngRuSCH4abjJUUci
+         A33A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772298293; x=1772903093; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lwcs85eb82PnM2kCqSelXTs1AsfWuMBqA/H67xN/sy8=;
+        b=vTRDmPtaNyiB8BUM2iJFFpa+Rv1tMRl2HM2ieqUpBwGrsbAsktAma9I5F6OPk9YMIo
+         e0cNfDpsvOulXg37RMHod6nXdMP+hyyeQXzFk+4la10e+GbB54K6+6DwB3gtgrNGTq/f
+         W5HcUq5DQ3EsYSUv1DADdmKqbtHGq/3XxHRIScOhfiZely/mAtqKQYFL0zYDzDI9zjmn
+         BRGDeBJKmupKGQ58kLOaBzXbbknIZamQnvKZCojBk/zHQVZ3zISj8NTcxqMfLR7674sH
+         TK8WrLShBTYuXdH59UyPPXIiCyOQ1M5Dk+6BO3HsBub8FJGYE8VbBYKRlJTIkhdJIkqE
+         f89Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772298293; x=1772903093;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=lwcs85eb82PnM2kCqSelXTs1AsfWuMBqA/H67xN/sy8=;
+        b=Eeqk9UqG8HC2+X3KeySj4YTR7MpkZgZnacjKDaWKZVAWX/WO7Y5lND8WFpAAuholJk
+         xZj0kmjiCtATmDh6pDilnjKa50mJH9wuK5veOwyYeXwxppKFobCocQYZwql5WKMnfhqU
+         ykHuDaPjAj01bkFsWFLLxd7U6zIKQXB0xh6mFQJ7NlfEu1KemklzlzCa13TyXmy2BQsV
+         SWiBTWzoKCKdmxT74aYiXe/VeCZSIdUbFWuqj3t+LVJbN8ejeozmocdwKgtFuW6eaQQa
+         2Jm+4a9OzXCkQMJQKaq3ODOaZ3gv/e1z5AHu1A1eZzrO+LJ+K4nVBs2hLKkUU4Re8/Dz
+         n2bQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVLB6/vBzeRw9796tCpduLuldjSNb6tfvr6nwinAPqGbtG5LCd9m00ct0f5HvDpImYb+h0a85A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5R57gMxITiBv9uCqMEH84WO5qfyvXXBXi+VsrI0Eqv+daHyeP
+	7F0mNr18FOF/a5bILMr0rPY6DP/q4Pisyoxlx7gNw2diMvjTCjNOeZA7+cZSUrVlDJvMMVf+8xk
+	QLQ0kR8Ht3nhXGBQ/1PSFtCBgXvOOud17QT0QdbN0
+X-Gm-Gg: ATEYQzwQPuVlOlYQxTofNvpUWjpIJ6+bQ2SFrny7zjkm6UeuvfZAU2OZDU3GV3d6+5J
+	fh2pDn7qttGN6cAnjBTBNCsRHM0OFQ4QKHv1ekXGnZRc1pZed4iN/isOGv6xrKKkkrGXU1vWR4n
+	S92CG8SxaERpTb1PPJyW7SMwtTODb2NloADYCVuQQofHVmi2GShk4O2pZnroOQnbjofp8dLlc4K
+	R3sY8VbOW5ZUtEWOlUdvLhH/9bat1ff7BqAjd3hXVtrHl2HV534I/ELNznwitVMuvm6mFKJIcbE
+	rlUIGEhR
+X-Received: by 2002:a05:622a:190f:b0:4f1:e9f7:4dee with SMTP id
+ d75a77b69052e-5075296e804mr87241821cf.35.1772298292636; Sat, 28 Feb 2026
+ 09:04:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AwZUiapUpQnw
-Date: Sat, 28 Feb 2026 12:02:53 -0500
-From: "Chuck Lever" <cel@kernel.org>
-To: "Andy Shevchenko" <andriy.shevchenko@linux.intel.com>
-Cc: "Jeff Layton" <jlayton@kernel.org>, NeilBrown <neil@brown.name>,
- "Trond Myklebust" <trond.myklebust@hammerspace.com>,
- linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, llvm@lists.linux.dev,
- "Chuck Lever" <chuck.lever@oracle.com>,
- "Trond Myklebust" <trondmy@kernel.org>, "Anna Schumaker" <anna@kernel.org>,
- "Olga Kornievskaia" <okorniev@redhat.com>, "Dai Ngo" <Dai.Ngo@oracle.com>,
- "Tom Talpey" <tom@talpey.com>, "David S. Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
- "Nathan Chancellor" <nathan@kernel.org>,
- "Nick Desaulniers" <nick.desaulniers+lkml@gmail.com>,
- "Bill Wendling" <morbo@google.com>, "Justin Stitt" <justinstitt@google.com>
-Message-Id: <bf983b54-6a1d-4520-b07b-29cba47d5665@app.fastmail.com>
-In-Reply-To: <aaLNTpODbiNCwmps@ashevche-desk.local>
-References: <20260204202437.2762161-1-andriy.shevchenko@linux.intel.com>
- <177024270291.126397.9981743455921781902.b4-ty@oracle.com>
- <aYXDpqqM0qrEVzvy@smile.fi.intel.com> <aaLNTpODbiNCwmps@ashevche-desk.local>
-Subject: Re: [PATCH v3 0/3] sunrpc: Fix `make W=1` build issues
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+References: <20260228031400.163009-1-jiayuan.chen@linux.dev>
+ <20260228073959.0ef1b33f@kernel.org> <3a00c5bf-6740-47c3-b885-c1e0cfe62289@kernel.org>
+In-Reply-To: <3a00c5bf-6740-47c3-b885-c1e0cfe62289@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sat, 28 Feb 2026 18:04:41 +0100
+X-Gm-Features: AaiRm53zZdYxj0hgST7r2_w0rWkvWB9gb4T2R6wOkVmpmm9_S0sYQUiXbiVmCQk
+Message-ID: <CANn89iJjjNW4U6ZxVcuRxWaKPbo1wfEyBD4Etkf+f6CWyhAHFg@mail.gmail.com>
+Subject: Re: [PATCH net v1] net: nexthop: fix panic when IPv4 route references
+ IPv6 nexthop
+To: David Ahern <dsahern@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Jiayuan Chen <jiayuan.chen@linux.dev>, netdev@vger.kernel.org, 
+	Jiayuan Chen <jiayuan.chen@shopee.com>, 
+	syzbot+334190e097a98a1b81bb@syzkaller.appspotmail.com, 
+	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.65 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	XM_UA_NO_VERSION(0.01)[];
-	TAGGED_FROM(0.00)[bounces-262175-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-262176-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,brown.name,hammerspace.com,vger.kernel.org,lists.linux.dev,oracle.com,redhat.com,talpey.com,davemloft.net,google.com,gmail.com];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[app.fastmail.com:mid];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,lkml];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: BF2C61C4A7D
+	TAGGED_RCPT(0.00)[netdev,334190e097a98a1b81bb];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,shopee.com:email,gre_multipath_nh.sh:url,fib_nexthops.sh:url,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: C04731C4B1C
 X-Rspamd-Action: no action
 
-
-On Sat, Feb 28, 2026, at 6:11 AM, Andy Shevchenko wrote:
-> On Fri, Feb 06, 2026 at 12:34:21PM +0200, Andy Shevchenko wrote:
->> On Wed, Feb 04, 2026 at 05:05:35PM -0500, Chuck Lever wrote:
->> > On Wed, 04 Feb 2026 21:21:48 +0100, Andy Shevchenko wrote:
+On Sat, Feb 28, 2026 at 5:33=E2=80=AFPM David Ahern <dsahern@kernel.org> wr=
+ote:
 >
-> [...]
+> On 2/28/26 8:39 AM, Jakub Kicinski wrote:
+> > On Sat, 28 Feb 2026 11:13:59 +0800 Jiayuan Chen wrote:
+> >> From: Jiayuan Chen <jiayuan.chen@shopee.com>
+> >>
+> >> fib_check_nexthop() does not validate that the nexthop family matches
+> >> the route family. This allows an IPv4 route to reference an IPv6
+> >> nexthop object. When the IPv4 route is looked up, __mkroute_output()
+> >> accesses nhc->nhc_pcpu_rth_output which is never allocated for IPv6
+> >> nexthops (fib6_nh_init does not call fib_nh_common_init), causing a
+> >> NULL pointer dereference.
+> >>
+> >> Note that this is not about IPv4 routes with IPv6 gateways (RFC 5549),
+> >> which uses an AF_INET nexthop with nhc_gw_family=3DAF_INET6 and proper=
+ly
+> >> allocates nhc_pcpu_rth_output via fib_nh_common_init(). The bug here
+> >> is an AF_INET6 nexthop object being directly referenced by an IPv4
+> >> route, which is an invalid combination.
+> >>
+> >> Add the missing family check in fib_check_nexthop(), mirroring what
+> >> fib6_check_nexthop() already does for the reverse direction (rejecting
+> >> IPv6 routes that reference IPv4 nexthop objects).
+> >
+> > AFAICT this breaks a bunch of tests, quickest to repro with is
+> > gre_multipath_nh.sh but you should probably run fib_nexthops.sh
+> > on your fix as well.
+> >
 >
->> > Applied to nfsd-testing, thanks!
->> 
->> Thanks!
->> 
->> FWIW, I have got a success report from LKP.
+> nothing to fix. The patch is wrong. IPv4 supports IPv6 gateways; that is
+> a known feature.
 >
-> Any estimations when this appears in Linux Next (or even vanilla)?
+> please post the stack trace for the panic
 
-Applied to nfsd-next just now. Should appear in linux-next the next
-time nfsd-next is pulled (Sunday night US/Eastern, maybe?)
-
-
--- 
-Chuck Lever
+https://lore.kernel.org/all/698f8482.a70a0220.2c38d7.00ca.GAE@google.com/T/
 
