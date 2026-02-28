@@ -1,140 +1,171 @@
-Return-Path: <netdev+bounces-262189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262190-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4OE2NGNIo2mm/AQAu9opvQ
-	(envelope-from <netdev+bounces-262189-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 20:56:19 +0100
+	id MOriID5Oo2nw/QQAu9opvQ
+	(envelope-from <netdev+bounces-262190-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 21:21:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7469A1C7927
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 20:56:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08B391C8426
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 21:21:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7EC19337C023
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 19:47:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 066393300556
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 19:49:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AAFA36DA03;
-	Sat, 28 Feb 2026 17:57:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 812BF345CAE;
+	Sat, 28 Feb 2026 18:04:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v3WBCQRE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mIwXg469"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 424C536D9E9
-	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 17:57:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D56F33A03F;
+	Sat, 28 Feb 2026 18:04:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772301439; cv=none; b=bVgWHui5pk5GRxzqSMJbOGAyXzVelU3OlOkyYB+dZfER50f/KgTte5wwWwF53ivEbKMkJU1Nz0r3RogaDtxcCShf71kYYbBRbLxqyTA5byKwtc3Zi5kfBM20Yn3piyd2bhWM+G2jEuMk4Cmo5ooNkLpEaKHbIcauppzYsPyPu0s=
+	t=1772301891; cv=none; b=d6fq5YOCmxWcwN8XKYqSLLYsRvq/abGPTZG/v0luau2iceFypHjryAMgvfM1f1J6Cct4c2bZaqS1T1/5m/i2R+3+saltDNy8DRW8T2YvTb3gX0YC7eH8PEHwHAZ32SOuN7LhtkNvJdYrPrLqdOMjAE9CqdleKHLCImXxRerCr+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772301439; c=relaxed/simple;
-	bh=MK2PaSh7VH6bc4A7RvBEhSnqKfdSlGiin4gy9olAdHM=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=u1uyd8FP7cyKtmgbrYcZmrRKzJEP9WBEcQeWPnkvPiZT+ap9+I0IZpi38YeNbb5vcbJwDO7s2Tceh/NZI3WzqXgyhr4xnbRa08Ab0RLtiYtHV3QAt3GhEBLZEmTH64XrobuHIFrkdb+f+8MeH3OKKKkJbbUtHr+shqRMabKWpGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=v3WBCQRE; arc=none smtp.client-ip=209.85.160.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-506b3fb32a1so540972471cf.0
-        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 09:57:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772301437; x=1772906237; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=hhhdMsPx+s4xGeYLLnUQAiuVE3AWdCSg2gooxlvr+cg=;
-        b=v3WBCQREuBLUXCOcZylFTfDr2gZR1SZL9+FewOATFwsUBsPUZ/zT8Eh1l6uzrwkZPX
-         SFo2ordzThMn3zfGWr9Xc2xGKeGJUk6MYrgWbTatQGMoj0UeNIicKPAl7Qh7fycLTbol
-         nCZk1Fc/Qh0LrIYiqhKZ95RXW/Mzk75HKayjJleOG5XvpGlY0p9VuXz81mDNpMirzzzM
-         uTwSROIUgRoxOFRURQVlrxgzwW2cTE/PuV6oM7V0UOoE9VyGO2wGlICJdw866LGmbMyo
-         wl4o+eQqNFzdGD5K6HGdg83AgERqq466h45foap1H1gkCjNWoYLYZuw6kaS6FsUQm1YQ
-         ACXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772301437; x=1772906237;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hhhdMsPx+s4xGeYLLnUQAiuVE3AWdCSg2gooxlvr+cg=;
-        b=VS9o9Bw2gVLGoUN9a7MR7NNhfllaYtnqzZC0VzmltKlvFNUwIxY1ymFx8MO5Kkc0y/
-         PnnHl2YDlJJ+w83J6u/SrWQjUTUEDpwD4i/FchKwj9tSacR1bBAVA8604/o2USnFnZ5z
-         ACT/QZmJrv/AyEbD4idv69mD+o+hUiGoiOWiF8bk66fn77bEm003JwzXgsa0kzo7cFwu
-         QnjoS5NfPpjgeJdgk4mtBZU5SbCPbwjtmVPD3Hg/lRndjMwpo5htl2EmNMdpRxc9NW+U
-         9joFYGHib+Yo9qyjm2kFMKUtjd5UXoSIoJrc0yMs+HFeHOHAAmLxAmdzkr4tUqdSC2JA
-         0alA==
-X-Forwarded-Encrypted: i=1; AJvYcCWu77iuAFgFOrnMI1gwGd/1w41NM+8pFKAOOcxnQsK3xHY/HkJEPO64/zOmx0PeE7tSS2EfJVg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyo3YJta/TqVDSM33eZkRzeNTMepYnUe+0YovPtNPsT8tce0xHF
-	f8Qwk4oFTWPimkuQiQySwHa+zwAQtNNx+v5ANZqLgl5QO6vcnmagwbjt/izqtEJgGSU8NzZJqS0
-	M4bvs3wB/CJYvdw==
-X-Received: from qtkn21.prod.google.com ([2002:a05:622a:11d5:b0:502:f1b1:5a64])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:313:b0:501:4cd0:a486 with SMTP id d75a77b69052e-507528a59b2mr94017661cf.54.1772301436971;
- Sat, 28 Feb 2026 09:57:16 -0800 (PST)
-Date: Sat, 28 Feb 2026 17:57:15 +0000
+	s=arc-20240116; t=1772301891; c=relaxed/simple;
+	bh=IyZ03u1C71sNfZ4iXYae0FRb/6Tl8yj5/uTpy5toIyE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LLQBbcwf+zjehRa5WBEEI+XYUanuWgf+OLJgmUR2fCQW9m5MCoSpwIZotRjZmlBkw/N6lyQ33N2AmFAFKTdWZ0Q8dkPHi1LKZRSakiQuA8jE+3/fQ4hc9SpWApKkltn11Nlr/fpNzEL+kmGc/Qjomg9B94ho+Olslqd8I23lHQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mIwXg469; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B69AC116D0;
+	Sat, 28 Feb 2026 18:04:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772301891;
+	bh=IyZ03u1C71sNfZ4iXYae0FRb/6Tl8yj5/uTpy5toIyE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mIwXg469l3LWltd1cE+Y5xaNRTGGrNzbjZDtIcbJamwSBIrY3nwx4bjgkLcFzGQMk
+	 HdSSn8Wzasg9oBu5KLzbVxiQQ5At9BxCJ+bqaZQxXrwQHCuvPvD0WuAJQ8qP+hJkL1
+	 EWNLi0BuE6Zlk+v/L8zJNUN8irbSA+xR5Vy378WgToKiqP9F/syWLdj81kANdf9vun
+	 6AT36sXE4LtZnVzi5I1AYATeApyY4jlF/m+Sfzt5gOFI0WXFvQ1+kJXy5MZCfx6bGv
+	 m39K5zL3vxQVgmfY84JB/R5nUbBiSE1yP/sscOc6hyrMLvV4y8L9ZwbmpP8MGvc96m
+	 5bqNbKargBh1Q==
+Date: Sat, 28 Feb 2026 10:04:49 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kiran Kella <kiran.kella@broadcom.com>, willemb@google.com
+Cc: davem@davemloft.net, edumazet@google.com, daniel.zahka@gmail.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, jayakrishnan.udayavarma@broadcom.com,
+ ajit.khaparde@broadcom.com, akhilesh.samineni@broadcom.com
+Subject: Re: [net-next, v3 1/2] psp: Support for transmit on logical device
+ when the underlying transport device supports PSP.
+Message-ID: <20260228100449.19f6ef13@kernel.org>
+In-Reply-To: <20260226184654.3180648-2-kiran.kella@broadcom.com>
+References: <20260226184654.3180648-1-kiran.kella@broadcom.com>
+	<20260226184654.3180648-2-kiran.kella@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260228175715.1195536-1-edumazet@google.com>
-Subject: [PATCH net-next] mpls: remove test against ipv6_stub
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262190-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262189-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,gmail.com,redhat.com,lunn.ch,kernel.org,vger.kernel.org,broadcom.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7469A1C7927
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 08B391C8426
 X-Rspamd-Action: no action
 
-ipv6_stub is never NULL, let's remove this test.
+On Thu, 26 Feb 2026 10:46:53 -0800 Kiran Kella wrote:
+> This is achieved by propagating the psp_dev from the lower device
+> to the upper devices in the device stack via a netdevice notifier.
+> The lowest device owns the psp_dev pointer while the upper devices
+> just borrow the pointer. When the lower device is unlinked, the
+> borrowed pointer is cleared in the upper device.
+> Assumption being that psp_dev is set on the lowest device before
+> any upper devices are stacked on that lowest device.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/mpls/af_mpls.c | 3 ---
- 1 file changed, 3 deletions(-)
+As I mentioned in the other thread I'd like to establish some clear
+expectation on where psd propagates automatically and where it doesn't.
+I don't want to see a stream of patches that say "fix propagating PSP
+onto X upper". And conversely report saying "PSP got propagated but
+it doesn't actually work" (macvlan in bridge mode etc).
 
-diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
-index ef9e749d5e08f4c04e97b2b2182a67329c04d343..ae85a7654b1f6d2871c29e936f582a6faa5d0656 100644
---- a/net/mpls/af_mpls.c
-+++ b/net/mpls/af_mpls.c
-@@ -640,9 +640,6 @@ static struct net_device *inet6_fib_lookup_dev(struct net *net,
- 	struct dst_entry *dst;
- 	struct flowi6 fl6;
- 
--	if (!ipv6_stub)
--		return ERR_PTR(-EAFNOSUPPORT);
--
- 	memset(&fl6, 0, sizeof(fl6));
- 	memcpy(&fl6.daddr, addr, sizeof(struct in6_addr));
- 	dst = ipv6_stub->ipv6_dst_lookup_flow(net, NULL, &fl6, NULL);
+Hence my preference was to require the user who created the device
+to propagate PSP. Willem, WDYT?
+
+> +/**
+> + * psp_clear_upper_dev_psp_dev() - Clear borrowed psp_dev pointer on upper
+> + *				   device
+> + * @upper_dev:	Upper device that may have borrowed psp_dev pointer
+> + * @priv:	netdev_nested_priv containing the psp_dev being unregistered
+> + *
+> + * Callback for netdev_walk_all_upper_dev_rcu() to clear borrowed psp_dev
+> + * pointers on upper devices when the underlying psp_dev is being unregistered.
+> + *
+> + * Return: 0 to continue walking, non-zero to stop.
+
+Please (tell your LLM) to avoid adding kdoc which restates what the
+code does. For static function really kdoc is only useful if there's
+something not-obvious to say.
+
+> +static int psp_clear_upper_dev_psp_dev(struct net_device *upper_dev,
+> +				       struct netdev_nested_priv *priv)
+
+Please (tell your LLM) that the action goes after the object / noun.
+psp_upper_psp_dev_clear() or some such.
+
+> +{
+> +	struct psp_dev *psd = priv->data;
+> +	struct psp_dev *upper_psd;
+> +
+> +	upper_psd = rcu_dereference(upper_dev->psp_dev);
+> +	if (upper_psd == psd)
+> +		rcu_assign_pointer(upper_dev->psp_dev, NULL);
+> +
+> +	return 0;
+> +}
+> +
+>  /**
+>   * psp_dev_unregister() - unregister PSP device
+>   * @psd:	PSP device structure
+> + *
+> + * Unregisters a PSP device and clears all borrowed psp_dev pointers on
+> + * upper devices (e.g., VLAN subinterfaces) that reference this device.
+> + * This prevents use-after-free if upper devices still have borrowed
+> + * pointers when the psp_dev structure is freed.
+>   */
+>  void psp_dev_unregister(struct psp_dev *psd)
+>  {
+>  	struct psp_assoc *pas, *next;
+> +	struct netdev_nested_priv priv = {
+> +		.data = psd,
+> +	};
+
+reverse xmas tree
 -- 
-2.53.0.473.g4a7958ca14-goog
-
+pw-bot: cr
 
