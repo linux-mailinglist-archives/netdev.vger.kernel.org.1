@@ -1,218 +1,191 @@
-Return-Path: <netdev+bounces-262112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262113-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0OBgJQ/Romli5wQAu9opvQ
-	(envelope-from <netdev+bounces-262112-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 12:27:11 +0100
+	id MEpDOELSomm+5wQAu9opvQ
+	(envelope-from <netdev+bounces-262113-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 12:32:18 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1503B1C28D4
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 12:27:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FCF01C28F1
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 12:32:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6E6C230265BA
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 11:27:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6D066302F278
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 11:32:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 966EC438FF0;
-	Sat, 28 Feb 2026 11:27:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1800242EECE;
+	Sat, 28 Feb 2026 11:32:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="XBQDFS6f";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="j4WJeWxf"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="rXy7rF3p"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011014.outbound.protection.outlook.com [52.101.62.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53ACF82899
-	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 11:27:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772278028; cv=none; b=qF5r/9BFsBrSmjkhMqK/y/e118yIkM+W1eZATscsmsw+VAHyuJsXfYYV3087ataeB7xUrnM0FRGiNjx8AeEWqBWgsF3aP26tBI4dDDExjxzq0UcRDsmxNpRkkJxaPH7oCNGSC7CnJBsNV7Ox91vwLg1N+YsS9RICcysBg1yAB34=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772278028; c=relaxed/simple;
-	bh=VhDChWs/CVn5+ro5e/EzruXXxeOipLnM6ue2nb+WbDk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SZubjMo+bXyT2MZmtFkwP05dA84fScrwwi95y+jRBaZk2EONcMdpl4wQgckX5dcXdN8LupOp5gtesCrsSk1aL93c+syCgI0+ccrX7W2x8dsQoszEFAhOyzAfu2Tc7LbT2mBde5IBqrGR+T0KCvM52ENM4dwAJmEWudHt18j2/og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=XBQDFS6f; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=j4WJeWxf; arc=none smtp.client-ip=103.168.172.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.phl.internal (Postfix) with ESMTP id 808F0EC0AD7;
-	Sat, 28 Feb 2026 06:27:05 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Sat, 28 Feb 2026 06:27:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1772278025; x=
-	1772364425; bh=XVXNAtlju5Fo8FzXkJGNDkl8zfdijgvpF14GD23Tctk=; b=X
-	BQDFS6f3F5IW6j5m+8KPtQY9dQKJrPpLBL0ooaT2QSiqs6lvU6bvgCvea1b9xhpK
-	Ghjkj0lzc/p7r/6R1H5XLHO3kdRmyaQ6WL3IdtcyVbJDr+TR3YP2m4hAQUSDRrh1
-	rq0kRIt2BMr2qnQgDPBKgKGiB7mATFWurgP5N08rv39C2Xsq05Y++cbM9i/7j7XE
-	/v7vTNbQD+CbHuTNzQaIGpAT4rHkg9PCzGyiqYHoZEv0zkBqx4sgw6P9HKD2QOW9
-	d7MiVQA4zCDVBVR2PHMY3G3jkfpsucFhs9zOssVZJPRSRC3JJEGkFljyHKjxDRQ/
-	mE+LtbtXwp8V/XgwH36vw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1772278025; x=1772364425; bh=XVXNAtlju5Fo8FzXkJGNDkl8zfdijgvpF14
-	GD23Tctk=; b=j4WJeWxfNuqI0fb6EeulufnFEthIVPKkW3ww2sC1xGVD8xyRMB/
-	n6Q7DKnRLdnFtJzl5XgAAkkfAcM9VKI5VgP09ewlNfJ0biFDqYfRAgqJPO5VP/jf
-	c2F3xiZzANT8Px3+r3sBhkc4gJHV8w+IWmxL4EeCk9ATpBW/dovmm4LzaNDTl3Ae
-	LCCqsFLa1I7erKY4pb0P2uX3jfw9Tn1nIwdb/bC8hp8i5mhqXoWTV8p2UyhbQTEX
-	gJAUBLWA0/Q1j3TLJihbsmc9kPKOxbUIhEVg6IG2AtBaqsNKbF6VbFmoKNtUy1Pd
-	lZP5SyaQPNf8iSYeUikWHWo7C5Z54F4bpug==
-X-ME-Sender: <xms:CdGiaUWhp3Pci48yltHD8-1fN1_8Vg1rGh6kRQfAHXRz7L0qSneFwQ>
-    <xme:CdGiaXqjSOkNhkQS3efttnh0uNyM3efa92NVubdE_D3qkDMfcHZ3zOTJvyTsoelIl
-    sEpXwE58bz5naZIEsd_DsO7UXQlQCkdn63cma2jWHT4Ctqkvmw6DkY>
-X-ME-Received: <xmr:CdGiaen00aokpuTG46jPyjr5oY3PXW04YgzVO2PndXyXcuaTm-vsS_IWhB4n>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvhedujeeiucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepgefhffdtvedugfekffejvdeiieelhfetffeffefghedvvefhjeejvdek
-    feelgefgnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiii
-    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdr
-    nhgvthdpnhgspghrtghpthhtohepkedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoh
-    epkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegtrhgrthhiuhesnhhvihgu
-    ihgrrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorh
-    hgpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphht
-    thhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrg
-    iivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrght
-    rdgtohhmpdhrtghpthhtohepughtrghtuhhlvggrsehnvhhiughirgdrtghomh
-X-ME-Proxy: <xmx:CdGiaf26I6e5s-9isx9zfkXZEnDyJMJeRLZbYFeBn-7I3lKkWsSxvA>
-    <xmx:CdGiaTR6sDPid0ZedJcBG4Cg--REfpUREBbjQQ70M4PDkuOpibrCWw>
-    <xmx:CdGiaQy-ljBb4Fn17-4Ryeg83xZk3v-mXiiCZW7ZlfZn3iHesq1ybA>
-    <xmx:CdGiabADwTwXekBYHg5HCTiATZg3fXxv4ZpqR0ru3boG-tPSotIJxA>
-    <xmx:CdGiacCxmzPqtZ5X5I5zYn7HJvsSr5uK_HLxGjk9MKoaWcQ8yyDztymz>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 28 Feb 2026 06:27:04 -0500 (EST)
-Date: Sat, 28 Feb 2026 12:27:03 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Cosmin Ratiu <cratiu@nvidia.com>, netdev@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>
-Subject: Re: [PATCH net-next v2 3/3] macsec: Support VLAN-filtering lower
- devices
-Message-ID: <aaLRB-KAUYbFVPao@krikkit>
-References: <20260227090227.1552512-1-cratiu@nvidia.com>
- <20260227090227.1552512-4-cratiu@nvidia.com>
- <20260227065908.6dda892c@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 315CA36C5AD;
+	Sat, 28 Feb 2026 11:32:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772278335; cv=fail; b=F3TsMQn+YG8URKtm1WX56CHhkv6XBtKiBREPAKZYm4LaGgIiAhTco2coj1Kfh9Q3UjBaWbmYNjJ1piw34+16j0PaO07fRrPew+r349rFu4DphpmXv63OJn8YjHW3v4OqKaPFTSMgyGnp3wP00fv/nFy7wWO+fL50k5zB2n3Klq0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772278335; c=relaxed/simple;
+	bh=ziDGncAe1I3X9IfxOcJIgHSOCu3ufmsCXx5EZJxln2E=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LGt+giljbDhNEqBWp+nbh02BT9LKPfPY76jPhMg6NgGgpZzV1MOB9tsvI5ig/LGATPbb4s0k9Czp+KbKJtQpiCEDtfBowscBUGqkkx676zuKKrAfLGJebg3n2ddwD0YUsC0QRY4vlMVWYjL1uE5ryBbYSanelCefgorzPNHD8KA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=rXy7rF3p; arc=fail smtp.client-ip=52.101.62.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=R7LQgD0o3vxv3AUE85B2Ihc1puZjDJZ08goMxV+k0uGCGxRLlffYeqm+FgxRD5xAGLWueL9Dnt1gZA7LkI6+6mwypQVaVC1AM/jcHk5rmIDrG93M/8Ct85F6Ll6y2qOhOpc2pl3V06vNQV0SNecK3fRmQs61sf/QS+LUkNgCdRd+McTpKdVTRCkunFrHsZzZ9ISm6TM40TMgUoqoEXGeyT3ESaAzrzuwTIRRNYnKGl/wFfdYPRukKUUCJHFkRnwCrGYb8eU33AZ9FJpt236mwvF05yfA52/I5HqORAsJpLlHRL8GY5i6T68/x7BncA2Nx4MUsYURYamvFBUsfLXmBg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Z8y/Fediq3Qr3XBKy9zET0+4qiVdSR2XuzANY8mnKOg=;
+ b=xKjrRwKYnjjIk2nqMEvv8QCRX++Jn1EA6pQ8gbwOg/ppSwLmmKOXokxtkuw9q/0WCHAe5WhfN4F4c2cX+qUOiKZleVjjQmqSnyROkUWWSR5R5lb26hP7dRWRPbAOtrfUEkBwTI+14N0UmKB+rAeoE5CpXnrNFayAy5rvKJCpEkj7kDMZ4PUUlqbrxEhP9bL5BCJO7AkLlUd+BixsCMfDksdYEwwq+Ofqyf8alsRwogA6tYBElNssNH7XDSVlnln3pwLnNJ/zdAPWInasAo45HbCNClzn/iumT2A942vQgwTjd2WBVhcIu7HOKnNhKcOvz0awFfcAFkeyPY0frcDnYw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.21.194) smtp.rcpttodomain=kernel.org smtp.mailfrom=ti.com; dmarc=pass
+ (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
+ (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Z8y/Fediq3Qr3XBKy9zET0+4qiVdSR2XuzANY8mnKOg=;
+ b=rXy7rF3pHgEYpZnkgleTxmxbz2IRolMALATgFm33J1fwcMLOKd5UujWRjqow99zw0tB4SEX3DyKzZqmoHC14E1QT29kbQ1DIKf0axdNK7yLnQz5SfIJ49ZClpddTIWvdIl3adIp5oS9JhWcRBgSjBwoMttxNBpo+r6Yy5Gm+eaQ=
+Received: from SA0PR11CA0156.namprd11.prod.outlook.com (2603:10b6:806:1bb::11)
+ by BLAPR10MB5009.namprd10.prod.outlook.com (2603:10b6:208:321::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.22; Sat, 28 Feb
+ 2026 11:32:10 +0000
+Received: from SN1PEPF000397B4.namprd05.prod.outlook.com
+ (2603:10b6:806:1bb:cafe::25) by SA0PR11CA0156.outlook.office365.com
+ (2603:10b6:806:1bb::11) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.27 via Frontend Transport; Sat,
+ 28 Feb 2026 11:32:09 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.21.194)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.21.194 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.21.194; helo=flwvzet200.ext.ti.com; pr=C
+Received: from flwvzet200.ext.ti.com (198.47.21.194) by
+ SN1PEPF000397B4.mail.protection.outlook.com (10.167.248.58) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9654.16 via Frontend Transport; Sat, 28 Feb 2026 11:32:08 +0000
+Received: from DFLE201.ent.ti.com (10.64.6.59) by flwvzet200.ext.ti.com
+ (10.248.192.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sat, 28 Feb
+ 2026 05:32:08 -0600
+Received: from DFLE201.ent.ti.com (10.64.6.59) by DFLE201.ent.ti.com
+ (10.64.6.59) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sat, 28 Feb
+ 2026 05:32:08 -0600
+Received: from fllvem-mr08.itg.ti.com (10.64.41.88) by DFLE201.ent.ti.com
+ (10.64.6.59) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Sat, 28 Feb 2026 05:32:08 -0600
+Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
+	by fllvem-mr08.itg.ti.com (8.18.1/8.18.1) with ESMTP id 61SBW8Hn315366;
+	Sat, 28 Feb 2026 05:32:08 -0600
+Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 61SBW6Vi005180;
+	Sat, 28 Feb 2026 05:32:07 -0600
+From: Meghana Malladi <m-malladi@ti.com>
+To: <nm@ti.com>, <vigneshr@ti.com>
+CC: <conor+dt@kernel.org>, <krzk+dt@kernel.org>, <robh@kernel.org>,
+	<kristo@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<netdev@vger.kernel.org>, <srk@ti.com>, Roger Quadros <rogerq@kernel.org>,
+	<danishanwar@ti.com>, <m-malladi@ti.com>
+Subject: [PATCH v2 0/2] Add ICSSG0 dual EMAC support for AM642 EVM
+Date: Sat, 28 Feb 2026 17:02:01 +0530
+Message-ID: <20260228113203.498839-1-m-malladi@ti.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260227065908.6dda892c@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF000397B4:EE_|BLAPR10MB5009:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8c079b3f-55fa-468e-884e-08de76bd01fa
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|34020700016|1800799024|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	C9ia1/v7w/gJa7xRf79Vnw46A+DBkqybRx6gWlYs/mTaqAozAIY9E4OrTrJIzAlR6kfqrEyMXOw4726nxFONnqzwqdZtr/+GQXiiLBZMHlj/NLhJTAwI8oDqWjL2ce2P16IwckOHkKVPBkOvX30n4/+z07Z7vR4aChRN6mehFQA/IUKm+WY7b2zGgz7QxXaju/UbU4VX66dTLwosaSZYBpgp4KjLKmeojPlEMcpZzBwqFnUpzkiWbIPsPNBlxjyfotUHm9qZHt7vY5rNKRC5pvH+YbqQeK9yDtU10LUGYwkyJktcqfiRxhGnDCPCxcnNeEBupChoShKjQr+D1EgTlK/Gy3tmz9lW4ZuLsaHA6qPUJQBxC1ypSXVngLUA+zzesIwiwTgh67EvcHCi5RugF0Lx96luq4NZppmc+Dq52igthUnFzw66t0wxLuOhoDk0ktfw7wogKNivadldQsjGR64Kdvdp95M9APxl0BTyIgBERgZoiM7KcRFvVnFA1lVIog4Ya+e6j1Hi4lJzl/LRZRV1aUZ2YpHbdlXxaI8VlU2pLDAKv216FEFgPoANYW/LGTeGBZ7XFmrf52Ls5/9qiIWEUJiGefi4fa0T3Q3G77c6PLqnAXKKA6cJvJUaGtoQMer1irE6dn29RqpW/GMY340sbRNKXkx5VypXymFxlCB8iJQMbn6WOJ65SR9XQ2cwFWTPrDGt1Hmy8xoIME+25UBTRXfiLAqSD84M+pi3kza6jx4JZDwRaVYKqfFtA5R6EECyeuXj35c4O0rkhAk0Yg00TKa8Bc25XcQRIESABFFKIESfSXxR4nvjbwcUD2F+
+X-Forefront-Antispam-Report:
+	CIP:198.47.21.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:flwvzet200.ext.ti.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(82310400026)(376014)(34020700016)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	VBW3LOjjxZZnL1pMa3H1j0sT8ImrhbHiqxDpGFMa2Xsuj/mfvtsF8EL4j6AI3dAqCE/kJLwZlcHtUvY/5ps+G/gfijqRJXEHMTGbCOvtZl8pVFxLfqrcm8JfntAk/4REF1G4EWaWsV8RI4t0Qv4DN/chGZCGgu/CMQbhM25jobU+5akdFFsDaLd/NzXDLSLe1ENx/uLdYDGkyLJe9ILrdMZyEKFui7BuZMdCVEHTwvR3uIoB0L7ObdZt7T37/oMv5d8MK26E1Zm0reZQTx5JBhhtGK5n4QmdbsZKIENy6sKWQHQtPMl82xNOFNF44qbmk3QAprk5nIPwL1xxlxc0Bdegy3ax9VEfK1oTrnW4vd66rCKmIuOclzXjvGi8fRIO9HRLCG9R7dFElFc4u5FCg2LljHHhmd2ra2wA1tCGc0xm/svimKo3SaE+rcqu+des
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Feb 2026 11:32:08.6622
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8c079b3f-55fa-468e-884e-08de76bd01fa
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.21.194];Helo=[flwvzet200.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF000397B4.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BLAPR10MB5009
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	TAGGED_FROM(0.00)[bounces-262113-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	TAGGED_FROM(0.00)[bounces-262112-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[m-malladi@ti.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[ti.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ti.com:mid,ti.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 1503B1C28D4
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[11]
+X-Rspamd-Queue-Id: 3FCF01C28F1
 X-Rspamd-Action: no action
 
-2026-02-27, 06:59:08 -0800, Jakub Kicinski wrote:
-> On Fri, 27 Feb 2026 11:02:27 +0200 Cosmin Ratiu wrote:
-> > VLAN-filtering is done through two netdev features
-> > (NETIF_F_HW_VLAN_CTAG_FILTER and NETIF_F_HW_VLAN_STAG_FILTER) and two
-> > netdev ops (ndo_vlan_rx_add_vid and ndo_vlan_rx_kill_vid).
-> > 
-> > Implement these and advertise the features if the lower device supports
-> > them. This allows proper VLAN filtering to work on top of macsec
-> > devices, when the lower device is capable of VLAN filtering.
-> > As a concrete example, having this chain of interfaces now works:
-> > vlan_filtering_capable_dev(1) -> macsec_dev(2) -> macsec_vlan_dev(3)
-> > 
-> > Before commit [1] this used to accidentally work because the macsec
+This series adds device tree overlay support for enabling ICSSG0 dual EMAC
+on the AM642 EVM, along with the necessary PHY driver configuration.
 
-The first submission was for net-next, then Jakub asked to make this a
-fix for net:
-https://lore.kernel.org/netdev/20260106171027.57a7757f@kernel.org/
-which makes sense.
+The overlay enables both ICSSG0 Ethernet interfaces (port0 and port1) in
+dual EMAC mode and can be combined with the existing ICSSG1 overlay to
+enable all four ICSSG interfaces if needed.
 
-So "v1"
-https://lore.kernel.org/netdev/20260107104723.2750725-1-cratiu@nvidia.com
-was for net, and we discussed making it a net-next patch because the
-changes were looking invasive. But in the end by using
-vlan_{get,drop}_rx_*_filter_info it's a pretty simple patch, so I
-think this should still be for net?
+The series also enables the DP83TG720 PHY driver required for the
+DP83TG720-IND-SPE-EVM daughter card used with the ICSSG0 interface.
+
+Meghana Malladi (2):
+  arm64: dts: ti: k3-am642-evm: Add ICSSG0 overlay for dual EMAC support
+  arm64: defconfig: Enable DP83TG720 PHY driver
+
+ arch/arm64/boot/dts/ti/Makefile               |   4 +
+ .../boot/dts/ti/k3-am642-evm-icssg0.dtso      | 203 ++++++++++++++++++
+ arch/arm64/configs/defconfig                  |   1 +
+ 3 files changed, 208 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/ti/k3-am642-evm-icssg0.dtso
 
 
-[...]
-> > @@ -2616,7 +2616,17 @@ static int macsec_update_offload(struct net_device *dev, enum macsec_offload off
-> >  	if (!ops)
-> >  		return -EOPNOTSUPP;
-> >
-> > +	/* Remove VLAN filters when disabling offload. */
-> > +	if (offload == MACSEC_OFFLOAD_OFF) {
-> > +		vlan_drop_rx_ctag_filter_info(dev);
-> > +		vlan_drop_rx_stag_filter_info(dev);
-> > +	}
-> >  	macsec->offload = offload;
-> > +	/* Add VLAN filters when enabling offload. */
-> > +	if (prev_offload == MACSEC_OFFLOAD_OFF) {
-> > +		vlan_get_rx_ctag_filter_info(dev);
-> > +		vlan_get_rx_stag_filter_info(dev);
-> > +	}
-> >
-> >  	ctx.secy = &macsec->secy;
-> >  	ret = offload == MACSEC_OFFLOAD_OFF ? macsec_offload(ops->mdo_del_secy, &ctx)
-> > @@ -2633,6 +2643,11 @@ static int macsec_update_offload(struct net_device *dev, enum macsec_offload off
-> >
-> >  	if (ret) {
-> >  		macsec->offload = prev_offload;
-> > +		if (offload == MACSEC_OFFLOAD_OFF && prev_offload == MACSEC_OFFLOAD_MAC) {
-> > +			vlan_get_rx_ctag_filter_info(dev);
-> > +			vlan_get_rx_stag_filter_info(dev);
-> > +		}
-> > +
-> >  		return ret;
-> >  	}
-> 
-> Does the error path properly restore VLAN filter state when enabling offload
-> fails? When prev_offload is MACSEC_OFFLOAD_OFF and the code calls
-> vlan_get_rx_ctag_filter_info(dev) and vlan_get_rx_stag_filter_info(dev) to
-> push VLAN filters to the lower device, but then macsec_offload() fails and
-> returns an error:
-[...]
-
-Looks like it. Since the vlan_*_filter_info ops can't fail, just move
-them until after we've called mdo_*_secy, and macsec_update_offload
-can't fail anymore?
-
+base-commit: 4916f2e2f3fc9aef289fcd07949301e5c29094c2
 -- 
-Sabrina
+2.43.0
+
 
