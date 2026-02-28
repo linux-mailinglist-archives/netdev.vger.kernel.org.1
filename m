@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-262081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262082-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yGqJNGpuomkn3AQAu9opvQ
-	(envelope-from <netdev+bounces-262081-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 05:26:18 +0100
+	id YE6zJXluomkn3AQAu9opvQ
+	(envelope-from <netdev+bounces-262082-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 05:26:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C90D1C042A
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 05:26:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECEB31C0431
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 05:26:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9D81A30936D4
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 04:25:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 22B0930A5403
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 04:25:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73C20322B6F;
-	Sat, 28 Feb 2026 04:25:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00510244684;
+	Sat, 28 Feb 2026 04:25:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lWZnhru3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cC2U1Siw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C1E2D8DDF
-	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 04:25:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B12942EFD9B
+	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 04:25:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772252715; cv=none; b=mGd/UwToODTVxVYi7F8T3CpCgQt9Fk1B1RtBElRLRPguCi/EOYmAtozoBBTGhI4DzKekTrkD9wShQk2oo9xFcNDhSBmeBqukGtD3Q/m5lkrVvZxw6AjhCFMTJeG1+FdZjVadnqWx9cWUBo8jaOjlMn1/yoMHdh6tFDDrMwpy9e8=
+	t=1772252716; cv=none; b=ameg2g5cma/Ssfi1UH+DFt8Jrz4BYsvzHiafbISsGuQ6n5dwtbfY5pwfhZzFWN26hNLMDDukFI81cBvpX34QuVWS/3R6G79GMoYomlk4o5dhYIUeBfhZ8gzTByHxJbThk+73sTsJGRX4O6GES3T/pZmKUz5cxf0TmaXkYellne0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772252715; c=relaxed/simple;
-	bh=IuxMZBMFrqobeGcVZuf94rOyX+J7U6+ehb2d0jQE/ls=;
+	s=arc-20240116; t=1772252716; c=relaxed/simple;
+	bh=DTXcw5uRU4+3vU4QOduT5oVH+bLt4o+ueIKL1AIvfrs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nGnsyjqUz9nzRm0HGyim93HZvnbUCRZv6aFo4taDSJgBbha6f5nJJHAnOuKxyHAhDZ2PzdYBacgZcBpUHwAERyS5HszQ6+nE1zaPKne67nTIGALUcjrxeLKpL3Yb/xWeuapsNcgzATPlv62HttPBl8iqTO/fSqFsSJAY2eKtBZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lWZnhru3; arc=none smtp.client-ip=209.85.160.201
+	 To:Cc:Content-Type; b=LayQjakQwB43HX7oirB2U6Aqku8VbUF565BuU2uE4aLmcq/tAc03rnFmFOrR3vdraK9Lhc4RYj8eEhJwv7fbefbucuUAzUV6S5vC6dnc3CZH3SBrrYrhzaRqCGD+6BkSyxLErAw01DF6ViBz37fArdCB1B3Bq2g5JcvriP8gUy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cC2U1Siw; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-5033c483b76so279786371cf.1
-        for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 20:25:14 -0800 (PST)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-7986c067508so42164967b3.2
+        for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 20:25:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772252713; x=1772857513; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772252715; x=1772857515; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=m5b1vChdq4tLYF4yAE3zvofZaEJCeckIri/kTwraU9E=;
-        b=lWZnhru3wpxbEdoc6VLfVu+l2rdevQP2L/2XQFGhxjf7S1qGAWfMvC328Y34bHG+Y0
-         kmFd0oHpWmEuiWthpJrzW2vZUJhxmgc86wmAML3htJYqaWKhSsyovh2h3QU8LnivDUig
-         J5C7ZuMzNcyzYvk27GOR2OC7tVw+Gljbz0N3b4dyWclni/hdFHFCapOEoTE17mnv8Uw4
-         O0Fw9uu+UYRQk8qAA0GMUeLDFiXk5W1/pCBjFnOME3j3naJrEv+xWalgAUZh+vjm65Gy
-         yTJ8+PU3aRCMDuIOHSfP5ssr94cxd1pl/lCN0ysRbXQT1u9nPLWRiKU38D8Q4nlghjBc
-         5+4w==
+        bh=rhtBVSo7ifZ0us2wYLpi1g7WYF3aWJIezYYs5dSsYTw=;
+        b=cC2U1SiwF7wkmhiYrKjFXS6srKZcdcm+heUGRb+qSLN5t/m61Jr7RFcEkyDwpvcDSB
+         cR8swExlMsbe71lZ6w9XZI/5fNWnpJvQen7QZarGNhMYvmVGEJtYXpgCULogUVvVSEJo
+         gmbSQ3HntB6robHbJDCcbDZaj0+tWW75x4LocLsD2NkTE8Jx4mfgIJUQPGwgPpfHeRkr
+         wFepAJ7gqpmrcmHMGE2nsceFsuF3EW0qdf82etBrjvL/qZiCA8aG1k3b/OWL9byjqiYZ
+         VNGbVH5pe8BXiqY5D2U8wr/oUReozsFGwDiTGodBBTebsrdYVCyJeKQjKYg7CyNEqEEr
+         01dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772252713; x=1772857513;
+        d=1e100.net; s=20230601; t=1772252715; x=1772857515;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=m5b1vChdq4tLYF4yAE3zvofZaEJCeckIri/kTwraU9E=;
-        b=uR6bnzI5+WrrbGh20De5xqgX068GMG9HIoyoGZc0TeXvh70wH6BS4xCQWiRQWFaK7D
-         8BZK1I+cVO41L2/Cm467+Drui97DHrRN6rRPTSlBikGt4OBxJTj5hM+IdO7Z8T/T9d7R
-         u0DEfI7l8r5zUZf69QTcFJvoqjEPeoypPbre/p8lWoFIMSwiMQiLiQ8Eh5FpXKhD3tKd
-         1WW6zOSHunPnwDUnu839QuteIuLwWIGOrSCAeM27dBXdNsnMoARv3uT1Ernmqst64blN
-         ybqcF9V8GGQdzHk/2FxjVhLoQhDXkClxb4D+dYkVkChrRnzaXAe8DWYDDT41JwXCKDfO
-         cZQg==
-X-Forwarded-Encrypted: i=1; AJvYcCVQxA5/EXo/khDsXCMaWSvAF5Mez1SSePO8RbaENETgXIE8G5hzB64OGBjgw+JrnMqFdGfBZR4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNx0Yz8SujW7PCVTEWYjrKSd7DaVx3M7b7PF4L1+OSeMvMIjP4
-	Dr0UzNe88O7Yylv9WzU7L27nEZETUEFvZ4StQKv+OF9spz9gaI6/DBu0oNbjJZIZ0bRIcZMeTEF
-	/gTjsY3R9qZ4Xvg==
-X-Received: from qtbfp6.prod.google.com ([2002:a05:622a:5086:b0:4ee:c07:cab7])
+        bh=rhtBVSo7ifZ0us2wYLpi1g7WYF3aWJIezYYs5dSsYTw=;
+        b=QlnJHKDci+A1fYaX6ojWDuUPTPzS0Vvwzgh+g4m+tiWIfsNlZD98eEjxoR6gxS7cO9
+         UIVI5PQff5y4US2fECxhcd1MdJKiUQPWlv9+KJy2jR5jcBHlHBLjjxzuzfvIwS2TtPyR
+         4LUOGJzlZ1hZ1+JHrlPLDCnmblAiJ3OB9EWw2+p4dvFRl7X51ri2RnwjkI9vNQ3HgMaz
+         hpx19FRcFJXrUF56X7IFhAPwvVaogVjZgodIqffH0bNix1smxPaCuV7ZyID06Cexi2rA
+         iPGrMY5WRLZVZqemwx5XY0aaiJNcktmSuCKkjuD0nj4yfZ3R5nJqjz4SaPPRNwuczU1W
+         HiyA==
+X-Forwarded-Encrypted: i=1; AJvYcCV+ONqI8eValHCE257l5JNSI3SrWtENORaLV+w8RHEbY2U3+RGi4Ki8yzMIftclKLKq0zbOULY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDiIIGCgSStiC2P/mJlnlCQUXT3WK3J+fApLwNqGEMq9/6KNx2
+	qJB+eYR1gteDK4MxEZFEpmvGzxmmi+QMmFM9n5oq+I8j2TVHvUZuN5ZEqOeyeqo0bwt9kQsLRrZ
+	IsdMd4LGR4s81Dg==
+X-Received: from ywblk6.prod.google.com ([2002:a05:690c:5706:b0:794:f8dd:1266])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:1445:b0:506:6ec8:835 with SMTP id d75a77b69052e-507529bb500mr63712581cf.54.1772252713127;
- Fri, 27 Feb 2026 20:25:13 -0800 (PST)
-Date: Sat, 28 Feb 2026 04:25:01 +0000
+ 2002:a05:690c:112:b0:798:5333:ce1c with SMTP id 00721157ae682-798855090aemr50585897b3.23.1772252714577;
+ Fri, 27 Feb 2026 20:25:14 -0800 (PST)
+Date: Sat, 28 Feb 2026 04:25:02 +0000
 In-Reply-To: <20260228042503.3726451-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260228042503.3726451-1-edumazet@google.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260228042503.3726451-6-edumazet@google.com>
-Subject: [PATCH net-next 5/7] net-sysfs: get rid of rps_dev_flow_lock
+Message-ID: <20260228042503.3726451-7-edumazet@google.com>
+Subject: [PATCH net-next 6/7] net-sysfs: remove rcu field from 'struct rps_dev_flow_table'
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -91,7 +91,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -101,7 +101,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262081-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262082-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -111,70 +111,67 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5C90D1C042A
+X-Rspamd-Queue-Id: ECEB31C0431
 X-Rspamd-Action: no action
 
-Use unrcu_pointer() and xchg() in store_rps_dev_flow_table_cnt()
-instead of a dedicated spinlock.
+Remove rps_dev_flow_table_release() in favor of kvfree_rcu_mightsleep().
 
-Make a similar change in rx_queue_release(), so that both
-functions use a similar construct and synchronization.
+In the following pach, we will remove "u8 @log" field
+and 'struct rps_dev_flow_table' size will be a power-of-two.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/core/net-sysfs.c | 18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
+ include/net/rps.h    |  1 -
+ net/core/net-sysfs.c | 11 ++---------
+ 2 files changed, 2 insertions(+), 10 deletions(-)
 
+diff --git a/include/net/rps.h b/include/net/rps.h
+index 0d9ee2a055e9423f23c677fb3b28b5cfe05eb49f..98f96d6c606e63f5ac31a9cf98ce8a0fb6486ba9 100644
+--- a/include/net/rps.h
++++ b/include/net/rps.h
+@@ -44,7 +44,6 @@ struct rps_dev_flow {
+  */
+ struct rps_dev_flow_table {
+ 	u8			log;
+-	struct rcu_head		rcu;
+ 	struct rps_dev_flow	flows[];
+ };
+ #define RPS_DEV_FLOW_TABLE_SIZE(_num) (sizeof(struct rps_dev_flow_table) + \
 diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index 07624b682b08b24da790d377f1deec4dc0a84269..52fcf7fa58a808e79c1a17c8719830bcfb7c1674 100644
+index 52fcf7fa58a808e79c1a17c8719830bcfb7c1674..fd6f81930bc6437957f32206c84db87ee242fede 100644
 --- a/net/core/net-sysfs.c
 +++ b/net/core/net-sysfs.c
-@@ -1084,7 +1084,6 @@ static ssize_t store_rps_dev_flow_table_cnt(struct netdev_rx_queue *queue,
+@@ -1072,13 +1072,6 @@ static ssize_t show_rps_dev_flow_table_cnt(struct netdev_rx_queue *queue,
+ 	return sysfs_emit(buf, "%lu\n", val);
+ }
+ 
+-static void rps_dev_flow_table_release(struct rcu_head *rcu)
+-{
+-	struct rps_dev_flow_table *table = container_of(rcu,
+-	    struct rps_dev_flow_table, rcu);
+-	vfree(table);
+-}
+-
+ static ssize_t store_rps_dev_flow_table_cnt(struct netdev_rx_queue *queue,
+ 					    const char *buf, size_t len)
  {
- 	unsigned long mask, count;
- 	struct rps_dev_flow_table *table, *old_table;
--	static DEFINE_SPINLOCK(rps_dev_flow_lock);
- 	int rc;
- 
- 	if (!capable(CAP_NET_ADMIN))
-@@ -1128,11 +1127,8 @@ static ssize_t store_rps_dev_flow_table_cnt(struct netdev_rx_queue *queue,
- 		table = NULL;
- 	}
- 
--	spin_lock(&rps_dev_flow_lock);
--	old_table = rcu_dereference_protected(queue->rps_flow_table,
--					      lockdep_is_held(&rps_dev_flow_lock));
--	rcu_assign_pointer(queue->rps_flow_table, table);
--	spin_unlock(&rps_dev_flow_lock);
-+	old_table = unrcu_pointer(xchg(&queue->rps_flow_table,
-+				       RCU_INITIALIZER(table)));
+@@ -1131,7 +1124,7 @@ static ssize_t store_rps_dev_flow_table_cnt(struct netdev_rx_queue *queue,
+ 				       RCU_INITIALIZER(table)));
  
  	if (old_table)
- 		call_rcu(&old_table->rcu, rps_dev_flow_table_release);
-@@ -1161,8 +1157,8 @@ static void rx_queue_release(struct kobject *kobj)
- {
- 	struct netdev_rx_queue *queue = to_rx_queue(kobj);
- #ifdef CONFIG_RPS
-+	struct rps_dev_flow_table *old_table;
- 	struct rps_map *map;
--	struct rps_dev_flow_table *flow_table;
+-		call_rcu(&old_table->rcu, rps_dev_flow_table_release);
++		kvfree_rcu_mightsleep(old_table);
  
- 	map = rcu_dereference_protected(queue->rps_map, 1);
- 	if (map) {
-@@ -1170,11 +1166,9 @@ static void rx_queue_release(struct kobject *kobj)
- 		kfree_rcu(map, rcu);
- 	}
+ 	return len;
+ }
+@@ -1168,7 +1161,7 @@ static void rx_queue_release(struct kobject *kobj)
  
--	flow_table = rcu_dereference_protected(queue->rps_flow_table, 1);
--	if (flow_table) {
--		RCU_INIT_POINTER(queue->rps_flow_table, NULL);
--		call_rcu(&flow_table->rcu, rps_dev_flow_table_release);
--	}
-+	old_table = unrcu_pointer(xchg(&queue->rps_flow_table, NULL));
-+	if (old_table)
-+		call_rcu(&old_table->rcu, rps_dev_flow_table_release);
+ 	old_table = unrcu_pointer(xchg(&queue->rps_flow_table, NULL));
+ 	if (old_table)
+-		call_rcu(&old_table->rcu, rps_dev_flow_table_release);
++		kvfree_rcu_mightsleep(old_table);
  #endif
  
  	memset(kobj, 0, sizeof(*kobj));
