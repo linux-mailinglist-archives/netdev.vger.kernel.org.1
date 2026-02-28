@@ -1,211 +1,146 @@
-Return-Path: <netdev+bounces-262123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262124-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id PDytDQruomny8AQAu9opvQ
-	(envelope-from <netdev+bounces-262123-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 14:30:50 +0100
+	id aLCxF0Duomny8AQAu9opvQ
+	(envelope-from <netdev+bounces-262124-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 14:31:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84B6D1C33C1
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 14:30:49 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B66B11C33D0
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 14:31:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 08407303A8DD
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 13:30:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 69EBC30292FD
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 13:31:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 975D51EE033;
-	Sat, 28 Feb 2026 13:30:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C792623EA87;
+	Sat, 28 Feb 2026 13:31:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="huUMpM+x"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="p0tZkj45"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55B011487F6
-	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 13:30:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772285447; cv=pass; b=mk3EGuUaSgt9oSSIon+Ojxw8CEftJm9UfwaIR9UeVBpuAOw2UxMQg9nzTzHBYDaS0sL8FzCxQe/hLhAfMjm+Q5qgBvGQ8yvujPMUhSVZxOVvVj9/J/K/uzqYdyEnBxLyLrfM3uAvsdt5RxskzTcGrKv8CUbf5qU39OkzMJcH18E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772285447; c=relaxed/simple;
-	bh=80jwD2gHI64J1JGG4o86aD1JoyB7X9z+PTWBAKv56SQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mtuNybZBGPyZdFmQLwZu5Zgdj9i0jsYrQRX1Q72U3FgM8siplW379PiWfpVUDG3kHpcwbY6rkPbL4TCGg0ZP4owXctZdixMKVnce+TKrwFMbJ3XyB4LkEqE92Yxz5BNPVTBGeFsmjl+IHmY40/yZ+cl81YBwuXm/V4/8sX3/x9o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=huUMpM+x; arc=pass smtp.client-ip=74.125.224.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-64aea64bf15so2577412d50.2
-        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 05:30:46 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772285445; cv=none;
-        d=google.com; s=arc-20240605;
-        b=VmAgOHpn7eyPUpTbR875ecMVfPGnYYVPbE8LjF+otW+yDXq2rx7p+MRvUDYaTxS+Ue
-         GPxNrwxl9+td3WsTkz606wB8qzrPOWNSGN8fsaeYDwCS9lqdUfmvbYIVosUPLbWGt86j
-         8xkDO8fRzUicfaXrcPuVSC3lhMK0jzhlSJANF0QjPo5W1PZXU2IbZO7mI1tb2rUprX33
-         r5CszzVUgk7luADfCOPd5gsgPot7VeMvzQD4WI59oS7MLJ45seDbh9+Y3h052pP3rC0B
-         LWhgZM/4plf1nzjK/QYfTORVdKLbREtI1OoB9zjwjKozgWI1HSq/iXClxJ2kotSqSCKs
-         0FrQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=80jwD2gHI64J1JGG4o86aD1JoyB7X9z+PTWBAKv56SQ=;
-        fh=blZ0jvUq9qyU2Kr4RXf1cuMIc2Yf5jghjuGMYjzLMuM=;
-        b=VoJ5KTH5MvLD39qY8EvS5hblt7OI8y27+V5ZgFbgMQxg69CGncT++JVok5s8AfMviT
-         JIzJx04vVwpdgAzaTCH1yJCSNGEUafCG6SFaonTfpKiGFWXp1qntjgBPuqvfQiz42z2n
-         CQrBxQfW8VhY++I1OerpW1hR9AbnoOw4oLHKEyrVvJTawhfOuvC1vC9Xf0G6DOtad2O6
-         5sqB3RF1lHsfx/YsNLERaWiSBGSEpGxbs125BNg9ejsiGbC3UpcIC4y9YJBebR9oJFBg
-         TH2pKkbYfcebp0TDCpZ6/wXMEPPoxRcxtMsRRJKQpzna0fBupXJJHpXrn/h64WWnRRAR
-         E5tA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 136051F63D9
+	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 13:31:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772285499; cv=none; b=EkLh3fuQFlFfyANi+UYvvCUaJJx+ITwrzOj5EFUKCbpnykPwxpL1hCAnYMjADibOpBnuuU1LpvauNovzXPqaKO+JCxPbM0xTa2Wx1SF68M1ELmEngn8bVYNNK7DYvZ8ZdTO7owAvBdFxeT4FOUjzuJin5mEFNIVEOrRExzs9/3g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772285499; c=relaxed/simple;
+	bh=3Q3yyKFfqXOwKJ/RByuaIz38UMKmlRV82Mq+qHpC40E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=c8x0JlqqtDmvpPU+LmfSxa6ZQFGoZqx33Afbm3oaiFvWc3mLz1+wRAB7L+WRgkyPQXxgpcRn5e/C1TQIQN4R4K9XzFwV12BY4eYJCVBgIMNfXwKWF+Z/QC8HqYwsdlv0tdBDtI7uyhytg9LhfoZ07ncxYFrr27KGl2xJ9wwp0p8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=p0tZkj45; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4836e3288cdso19818835e9.0
+        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 05:31:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772285445; x=1772890245; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=80jwD2gHI64J1JGG4o86aD1JoyB7X9z+PTWBAKv56SQ=;
-        b=huUMpM+xSbdhhbo+rkqPXBQYdsiCQ56OQXVadbvqGj9xbajdilZVy95JOlxGbEMkAl
-         rSZPKlcEmX/y4p5y8MvfxxVvgfcG+3GsAvPylTKFqJwqpoZxGyhYFwYP+HKjirpnEHUg
-         wH34q/ylpjD6PkjrjmPWrE6dlc76kfZrGAbUTIBl7OCwAWP6gGz58+Je2lYFyXdKavWp
-         AUzRl7xYZl2K1ACkeraoeIeuDjBlTAhZN1E+VrgSgDG/p5nYFPHC/BAiKaAQ69AsNaij
-         SOjl1/OK9d/V3VJ0z6RcJfwyuRfSPb4YXhXjLuWYQ56izVApF6VJjYkJHIPk+KPB1bSQ
-         tEEw==
+        d=tuxon.dev; s=google; t=1772285496; x=1772890296; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ztFs+gCm7Ys6eM9DB05iXHZYDFLj2KUnU+IxnYtdgtk=;
+        b=p0tZkj45Xq0OXmEjvx15mASiLMqu8RqPYLlsk7j3UGLdf7bXgGWpC/bhQPBQObrm9H
+         /Ea2YckYaYQzmCoMsWKrcVeLyM4TVI+zh2Qg1A5IlxzJ6OnDjV7paYeYtKp1hy/JQR4k
+         092Y2eIVB/DW5dWKkbEXAJmGkfMMAm5VvU+kR/7BYAmA85lWMZ32uABPTNcRVTesfF1c
+         cORAi4c8vzfT7VjTf/q8YO7QgH1IafO94Lzi/vmQRtGPSkzgQuCvyEdOyck2FrYKnYzd
+         FXexVN2oVuq9HSUdPCD2oiyBZPqSconIXLOpAYe9rtsBnvrOoWQiqckhz/U7V1l17zej
+         cLfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772285445; x=1772890245;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=80jwD2gHI64J1JGG4o86aD1JoyB7X9z+PTWBAKv56SQ=;
-        b=ltciWVKrysxiVI1xeNGXDtVxEYqfeWwsziIUQ6vY1BJJmlzHSv6vkK5YN+BgVDwa9o
-         7mJ4cpSPZizfpGuE6475RdzICTKYB/A7t1hA62CvAp7rJBXhYiYRfCn8Gu5++uO4RmcR
-         X6fIeXnst5o8+MbwQlyqisxgTVP8RIlHcpfnenRVk1DYXTEMb31NQsuJsTG48a5787pO
-         Dk5nquyEa2mcvnB8PphzChXjNiQ1xE9IfJDz+7zKzce9bJC+ly/rldVnl5zC9rfrhaRj
-         L88Py08KmhPbIaofMTCW50mTPIlkUPXBE7abj5srkrP4ldfBdQV6cBQOVQlG5xnLvZO7
-         CWKA==
-X-Forwarded-Encrypted: i=1; AJvYcCV+vUDS81nQWfnqSFF78psUJSjQMYpeY1PrGfCcI+gvHcxk/bsOHyRxorFfoz5Kl2r0R2TWKCc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfgTHO2wMMC6P8MysmPODsNzZpT8Pa5M0aqSuh+nt7Zfnb3U2+
-	KPQQHyhNwf53huxWWMmgwLV6M0Zzs/WyknLPavP/cja/tICUfg9JzQJxNLT12yMj8eK680hshHm
-	FFep+HJelULjIAjkRHd/krf4MjoKXTPs=
-X-Gm-Gg: ATEYQzwx+umDUlFR3jn66BaFUCcdFQtpOis5n+86kLBZkBjRx8uCDL5B0hDLR5agL/R
-	hPs709YMe+KgmlkhYUzqF4GOtYBEuLLpK2//K4JrWJgPqiL5ZZVgBlcFKzYRKqymvfg5FL+xoYA
-	kOVB++g+s+Rte49po8aOBy4b87sz0AZoLMSEvURl4xOQPNmkU2juzYLFQ20Cwm4fNXv5URlA3nK
-	bIcD/QOGcnYRk9URLWSlC3WRCV2PPSWRUJZKGr5umK2eKFjuvVSUzuA8izsCDT+KrU3BNqyCaSJ
-	voxvsuEa
-X-Received: by 2002:a53:b642:0:b0:64a:d74f:257b with SMTP id
- 956f58d0204a3-64cc2080be0mr3732882d50.7.1772285445069; Sat, 28 Feb 2026
- 05:30:45 -0800 (PST)
+        d=1e100.net; s=20230601; t=1772285496; x=1772890296;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ztFs+gCm7Ys6eM9DB05iXHZYDFLj2KUnU+IxnYtdgtk=;
+        b=aT8O8PgZf7LuNlysF/onqrvLsYFM2G+wGxWYkNVXXZfqkFa+b+7p7Eg+MX+a24UrQR
+         4HvZbaHhBNFZnNyDeiz3C/B1XQvxChVD+6N2nb0IFUfFTtcGi6FtVWvHt8KA9j57l/HW
+         dL1M4vxsDW0JHlj2+Ly2BxhHwudnKupHc2K4GuaSqS18NnBOjNOYtAmzMgq4gG3uODFd
+         4rqEf7hZTW877Lya+QPShhdj8pQu/lmUeNHiO71jSDNito6UIHXPzOsEPetk2yC5ZHEw
+         OAKwk/V8w0QMuZ2BIPozqSxyVNx9pygZh+nRqSLUlia+XO38W5Q/vit3BqlqbH8lJoV8
+         dj/w==
+X-Forwarded-Encrypted: i=1; AJvYcCXn1NhFtXOkGrs31q+YdiIcp7uuK11UQbBHZ3BYNQa5AijFLEW4Jlcne5LlGc5jJLLvW2d89WU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2o6LRk85dATebWbDXGxesEHOXmFIn/l72Hcq8C5T1iOiGhlXe
+	jXLkOTV4TEWDRZ0Y8uVrvfM7MWWOAmeKcIASfpk1oK6Sc0D38WQv24rI/sQRRR9R5ts=
+X-Gm-Gg: ATEYQzzmjGeQAjVoOXKw/yn50655AlVgyLMsEWvhaDkMwjTHdPn16G45Refu5tW9SZp
+	Rn+LRb5Qj+pHG8nCxMD7sEJI7QLdzHPQHCuBJMUMGnpyWJLnXV38VsI2msVNU/cJzOaoQwGgwMv
+	ZJHcVcDxakc6k34CVoXprRgqR44QgofjGRNoULYFLngASzaNoksj/gdpwlDRvwoW0ViDYaDIiTO
+	Q4YTv/0fwENQkNg2HjoesIbR5VPgIqVDMOdinNcvVugLu1J06F3nud21eoxqhS1uoA6EGpTO2Sd
+	DS+Za4B6mOHFy9oYXd08rIylrMZ1r0/HdshaB6hkFFMIMoZ0oGO5MUnU5C36GmSSx8GAl5D3p37
+	UqV19LDcS56yuUKi/zBmCP0IdmgWF1tNBwAkT6uzALq/vBDcvKQMp89gaaQPJhEhzDBnW+Yc+6A
+	81qzAAeWP3PnTfjb07J+4EmQ5dvOd5DA==
+X-Received: by 2002:a05:600c:4256:b0:483:6fe3:bb49 with SMTP id 5b1f17b1804b1-483c3192683mr110413305e9.0.1772285495739;
+        Sat, 28 Feb 2026 05:31:35 -0800 (PST)
+Received: from [192.168.50.4] ([82.78.167.73])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483c3b7713csm155767645e9.11.2026.02.28.05.31.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 28 Feb 2026 05:31:35 -0800 (PST)
+Message-ID: <6201770d-82bb-4b51-ac12-11156c5004b5@tuxon.dev>
+Date: Sat, 28 Feb 2026 15:31:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250508091424.26870-1-jonas.gorski@gmail.com>
- <ce4d9b7b-aaf6-4796-94fb-8c3d6a1dcd4d@gmail.com> <d7f9775e-0af6-4294-837b-47e31e0d30d7@broadcom.com>
- <CACna6rw1kF-r40dr-nxouV9E0AigmeVj9fxQm_Px34Z_n2up9g@mail.gmail.com>
- <CACna6ry9B9LiPbWdXzi7FCcaU1YC+HPkor53AiSEaRSNUMcLwQ@mail.gmail.com>
- <eccf1d40-e4f2-4ea1-a8e2-328606fc0860@gmail.com> <CACna6rzi3_pnduEphRBY3NDKrNqhK2i5TdVTNeEGb4nHm+vOMg@mail.gmail.com>
-In-Reply-To: <CACna6rzi3_pnduEphRBY3NDKrNqhK2i5TdVTNeEGb4nHm+vOMg@mail.gmail.com>
-From: Jonas Gorski <jonas.gorski@gmail.com>
-Date: Sat, 28 Feb 2026 14:30:34 +0100
-X-Gm-Features: AaiRm53elsgk7jk696p2Zj0G5jSypB-BM7g_7_ulmzSDXWuOw76Aoel8UWvKo7A
-Message-ID: <CAOiHx=m9JQkm3pMj_mEMoVwCApB=Ef4J7FBzOf9_8o9eiYbCjg@mail.gmail.com>
-Subject: Re: [PATCH net] net: dsa: b53: prevent standalone from trying to
- forward to other ports
-To: =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>, Florian Fainelli <florian.fainelli@broadcom.com>, 
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Hauke Mehrtens <hauke@hauke-m.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 5/5] net: cadence: macb: enable EEE for
+ Mobileye EyeQ5
+To: Nicolai Buchwitz <nb@tipi-net.de>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, andrew+netdev@lunn.ch, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
+ nicolas.ferre@microchip.com, linux-kernel@vger.kernel.org,
+ theo.lebrun@bootlin.com, phil@raspberrypi.com
+References: <20260227150610.242215-1-nb@tipi-net.de>
+ <20260227150610.242215-6-nb@tipi-net.de>
+Content-Language: en-US
+From: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+In-Reply-To: <20260227150610.242215-6-nb@tipi-net.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_DKIM_ALLOW(-0.20)[tuxon.dev:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262123-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-262124-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[tuxon.dev];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[tuxon.dev:+];
 	RCPT_COUNT_TWELVE(0.00)[12];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jonasgorski@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,hauke-m.de];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:email]
-X-Rspamd-Queue-Id: 84B6D1C33C1
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[claudiu.beznea@tuxon.dev,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:email,tipi-net.de:email,tuxon.dev:mid,tuxon.dev:dkim,tuxon.dev:email]
+X-Rspamd-Queue-Id: B66B11C33D0
 X-Rspamd-Action: no action
 
-Hi,
 
-sorry for being late to the party; currently on vacation (be back
-early next week).
 
-On Fri, Feb 27, 2026 at 7:13=E2=80=AFPM Rafa=C5=82 Mi=C5=82ecki <zajec5@gma=
-il.com> wrote:
->
-> pt., 27 lut 2026 o 18:58 Florian Fainelli <f.fainelli@gmail.com> napisa=
-=C5=82(a):
-> > On 2/27/26 05:32, Rafa=C5=82 Mi=C5=82ecki wrote:
-> > > pt., 27 lut 2026 o 13:23 Rafa=C5=82 Mi=C5=82ecki <zajec5@gmail.com> n=
-apisa=C5=82(a):
-> > >> czw., 26 lut 2026 o 22:26 Florian Fainelli
-> > >> <florian.fainelli@broadcom.com> napisa=C5=82(a):
-> > >>> Could you try to program GMNGCFG (page 0x02, offset 0) bits 7:6 to =
-have
-> > >>> the value 0b11 which is dual IMP port (IMPO is port 8 and IMP1 is p=
-ort
-> > >>> 5) and see if that helps?
-> > >>
-> > >> On my Luxul XWR-3150 (it uses gmac0 and port 5) the value of
-> > >> B53_MGMT_PAGE (0x02) / B53_GLOBAL_CONFIG (0x00) is 0xc2. Nothing to
-> > >> set there I suppose?
-> > >
-> > > I tried other possible values:
-> > > 0x02
-> > > 0x82
-> > > 0x42
-> > >
-> > > None affected my switch / wan / lan ports.
-> > >
-> >
-> > Thanks for giving it a try, how about the BRCM_HDR_CTRL register
-> > programming (page 0x02, offset 0x03)? Can you see whether it is set to
-> > 0x3 or 0x1?
->
-> It's 0x02 which seems to match BRCM_HDR_P5_EN. It makes sense as
-> XWR-3150 uses gmac0 + port 5.
+On 2/27/26 17:06, Nicolai Buchwitz wrote:
+> Set MACB_CAPS_EEE for the Mobileye EyeQ5 GEM instance. EEE has been
+> verified on EyeQ5 hardware using a loopback setup with ethtool
+> --show-eee confirming EEE active on both ends at 100baseT/Full and
+> 1000baseT/Full.
+> 
+> Tested-by: Théo Lebrun<theo.lebrun@bootlin.com>
+> Signed-off-by: Nicolai Buchwitz<nb@tipi-net.de>
 
-Does this affect all ports, or only the wan port?
-
-Have you tried to check the hardware counters if they get sent out a
-different (cpu) port? AFAIK they should be available as ethtool
-counters via gmacs, though I'm not 100% sure.
-
-Can you check the contents of the EAP Port config registers? Maybe
-some extra mode is set there by default.
-
-I don't have NS(+) device, so I can only guess. Though I always
-wondered if the setup which CPU port (5/8/both) to use is just a
-software thing or actually a hardware thing ... .
-
-Best regards,
-Jonas
+Reviewed-by: Claudiu Beznea <claudiu.beznea@tuxon.dev>
 
