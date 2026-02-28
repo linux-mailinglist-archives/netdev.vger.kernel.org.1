@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-262195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262196-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cA4mLjVKo2nW/AQAu9opvQ
-	(envelope-from <netdev+bounces-262195-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 21:04:05 +0100
+	id CFT5DldPo2nW/AQAu9opvQ
+	(envelope-from <netdev+bounces-262196-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 21:25:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6548E1C7DBD
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 21:04:05 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF7421C8562
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 21:25:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E8CF033491FD
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 19:54:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E281E318B929
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 19:54:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A468335DA5D;
-	Sat, 28 Feb 2026 18:43:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D9BF34CFD9;
+	Sat, 28 Feb 2026 18:45:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LeOnKB9t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r0epXK9Z"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FDBF33D511
-	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 18:43:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB0933D506
+	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 18:45:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772304210; cv=none; b=UeHDeTU9TbxfY7WFHSprb2JKDzUvj9iuQrshrBzKCDdrUMrwZHb8lWwYpz/fbqVBxtzhyAsOT7i3iX+aJvvd2ZVHj3PJeN7sGKsW/SDVJMs6wZj44EcYLonna8ueloOroLIc4MjSv8Dm/UHfdc/V0YmuwhDK7cKFEUBop6+M5Lg=
+	t=1772304349; cv=none; b=Ur3rq2xo8eLySSxGWwzdETZkpb3U71++GodeQpSrIjSUlszreTSorfOzlXQUaIGk8efctpdZs28+26DMYNBC8YGXzc6Y/RGLSfNmFjeOtSbNJO6xdRgRwOfXYlEu5InfFdZCunQsr0bIuUqwGF5aqHwt6AXTOJy/nd3yLEOHHqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772304210; c=relaxed/simple;
-	bh=irvnFrO1m1ePZjBMkyFmsAXF5Y+2ju6MYE+ttpeufFo=;
+	s=arc-20240116; t=1772304349; c=relaxed/simple;
+	bh=u3n0XsrnEAIgqgqlA31gZGjOHyYHDYEH1llZ+tI5tGM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Adl1NA0hvpA7kkyBh6wVmm6zSVrZCqyr63gaee1rhxi+lvqX6XhRYAoxdldbN290iw2ezCSbARYqhimncZr48poY3Un3fOfXBmn/qKYIzwY1nlYtKhtpr3oqSd2k1CVryg9x8xw1EH8Dups1+H4AVhz527lF/ubudHVag6uRk58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LeOnKB9t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7D64C116D0;
-	Sat, 28 Feb 2026 18:43:29 +0000 (UTC)
+	 MIME-Version:Content-Type; b=YSItVTvdqo98+1lS+pbbV1hSiPfYDg9ClddXnGeId1qE++puN9s+5sCAGUqUHZ/Wt/+RfY9WUdJ1jd5EEatt9T1RSHyRRdhC+wsWuiHTz4QRWwc4D4OgEQKDnIb/X3XrCgwJ4ZP6+S5JcczUSe0XuINB+0RTR/FWTNTvifUmcIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r0epXK9Z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6461DC116D0;
+	Sat, 28 Feb 2026 18:45:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772304210;
-	bh=irvnFrO1m1ePZjBMkyFmsAXF5Y+2ju6MYE+ttpeufFo=;
+	s=k20201202; t=1772304348;
+	bh=u3n0XsrnEAIgqgqlA31gZGjOHyYHDYEH1llZ+tI5tGM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LeOnKB9tK5rNk2SxRytrkhRy3yL3ow0Nu9wg5er9nXYkgRzFaHWCOIClwNFPcmt/J
-	 DTvs4jptmWku78yWxU9w78uoFc1EJ3uJM7dTROPXgrA0JLnB7MDT59JwpJKTV/UAaq
-	 Q6/kwzOkcQsXCWDN2fOegnjMJConJsiJPgRP1RM75zP46QV1G/SDk7zNJpSRrXmF68
-	 iYIBS7mQD4CWF+D6EY/k2CVxsL9AVEUR6E81nfAkMJ5qzNtgKFjmGckXiN7T/J/sZI
-	 YPNexieKwIBVut67RMBkOQrnHU4iIQAgmdKpfOGQQrl5MBVY+iQRReyzil37EJSSON
-	 ZG26aCOBQPVTw==
-Date: Sat, 28 Feb 2026 10:43:28 -0800
+	b=r0epXK9Z4lXiobFTd5S/J/x21z2o8rtztaOI1IYeIAfXy0rIwfZ5YPNKfubm29IYL
+	 0bu2m8ZqJ+VQX8L6AJwMBHPoPb0etUvmykJ4vgzNgsssCKj5hbC0tJMR9kX3UmZke1
+	 y+5hDXCopmKtwIPW/3OYTUWCR+UkkQu/ys/LJ4F8speC74hfSkOGxbnBPgdgKuAxSH
+	 CVX2GDFUOKu5NWttH6nBgT+oYGbH7B/xGzKRzJOV/jwZql5UrbMzxMelpuU3xlr5W1
+	 c6fiE2QMN6wvePZ/LxKn6/eR90PjKaYs38Liwg/sbC11Cc9H0Qk+0+Z7q8P+QU0uHE
+	 AMSy3Z3hLSQYA==
+Date: Sat, 28 Feb 2026 10:45:47 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: Fernando Fernandez Mancera <fmancera@suse.de>
 Cc: netdev@vger.kernel.org, tgraf@infradead.org, horms@kernel.org,
  pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org,
  davem@davemloft.net
-Subject: Re: [PATCH 1/2 net-next v2] ipv4: validate IPV4_DEVCONF attributes
- properly
-Message-ID: <20260228104328.260172d2@kernel.org>
-In-Reply-To: <20260226133949.17070-1-fmancera@suse.de>
+Subject: Re: [PATCH 2/2 net-next v2] ipv4: bump rt_genid when a relevant
+ devconf value changes through netlink
+Message-ID: <20260228104547.56186b2d@kernel.org>
+In-Reply-To: <20260226133949.17070-2-fmancera@suse.de>
 References: <20260226133949.17070-1-fmancera@suse.de>
+	<20260226133949.17070-2-fmancera@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,7 +68,7 @@ X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -75,7 +76,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-262195-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262196-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -85,111 +86,25 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6548E1C7DBD
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,suse.de:email]
+X-Rspamd-Queue-Id: EF7421C8562
 X-Rspamd-Action: no action
 
-On Thu, 26 Feb 2026 14:39:48 +0100 Fernando Fernandez Mancera wrote:
-> As the IPV4_DEVCONF netlink attributes are not being validated, it is
-> possible to use netlink to set read-only values like mc_forwarding. In
-> addition, valid ranges are not being validated neither but that is less
-> relevant as they aren't in sysctl.
+On Thu, 26 Feb 2026 14:39:49 +0100 Fernando Fernandez Mancera wrote:
+> When modifying IPv4 devconf values using netlink for some relevant
+> fields the rt_cache_flush() call was missing. In addition, if forwarding
+> is enabled on the interface then disable LRO.
 > 
-> To avoid similar situations in the future, define a NLA policy for
-> IPV4_DEVCONF attributes which are nested in IFLA_INET_CONF.
+> This is needed to avoid possible connectivity issues and ease the
+> responsabilities of user space tools.
+> 
+> Fixes: 9f0f7272ac95 ("ipv4: AF_INET link address family")
+> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
 
-Very nice, I think we should drop the Fixes tag tho.
-Adding missed validation is always tricky, we don't really want people
-to backport this to stable releases, the risk of regression (of broken
-user space) is too high. Unless there's some crash this prevents, in
-which case we'd need a more targeted fix for just those values in net.
-
-> Please note that MEDIUM_ID is defined as NLA_U32 too because currently
-> its usage through netlink is broken for its valid value -1. Modifying
-> the type to NLA_S32 would break existing users of set/get netlink
-> operation.
-
-Say more? The policy type not matching the accessor used by the kernel
-is probably fine in this case (since there's a common accessor used for
-all attrs). If it helps the policy, we can use a different type.
-
-> +static const struct nla_policy inet_devconf_policy[IPV4_DEVCONF_MAX + 1] = {
-> +	[IPV4_DEVCONF_FORWARDING]			  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 1),
-> +	[IPV4_DEVCONF_MC_FORWARDING]			  = { .type = NLA_REJECT },
-> +	[IPV4_DEVCONF_PROXY_ARP]			  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 1),
-> +	[IPV4_DEVCONF_ACCEPT_REDIRECTS]			  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 1),
-> +	[IPV4_DEVCONF_SECURE_REDIRECTS]			  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 1),
-> +	[IPV4_DEVCONF_SEND_REDIRECTS]			  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 1),
-> +	[IPV4_DEVCONF_SHARED_MEDIA]			  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 1),
-> +	[IPV4_DEVCONF_RP_FILTER]			  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 2),
-> +	[IPV4_DEVCONF_ACCEPT_SOURCE_ROUTE]		  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 1),
-> +	[IPV4_DEVCONF_BOOTP_RELAY]			  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 1),
-> +	[IPV4_DEVCONF_LOG_MARTIANS]			  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 1),
-> +	[IPV4_DEVCONF_TAG]				  = { .type = NLA_U32 },
-> +	[IPV4_DEVCONF_ARPFILTER]			  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 1),
-> +	[IPV4_DEVCONF_MEDIUM_ID]			  = { .type = NLA_U32 },
-> +	[IPV4_DEVCONF_NOXFRM]				  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 1),
-> +	[IPV4_DEVCONF_NOPOLICY]				  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 1),
-> +	[IPV4_DEVCONF_FORCE_IGMP_VERSION]		  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 3),
-> +	[IPV4_DEVCONF_ARP_ANNOUNCE]			  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 2),
-> +	[IPV4_DEVCONF_ARP_IGNORE]			  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 8),
-> +	[IPV4_DEVCONF_PROMOTE_SECONDARIES]		  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 1),
-> +	[IPV4_DEVCONF_ARP_ACCEPT]			  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 1),
-> +	[IPV4_DEVCONF_ARP_NOTIFY]			  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 1),
-> +	[IPV4_DEVCONF_ACCEPT_LOCAL]			  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 1),
-> +	[IPV4_DEVCONF_SRC_VMARK]			  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 1),
-> +	[IPV4_DEVCONF_PROXY_ARP_PVLAN]			  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 1),
-> +	[IPV4_DEVCONF_ROUTE_LOCALNET]			  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 1),
-> +	[IPV4_DEVCONF_IGMPV2_UNSOLICITED_REPORT_INTERVAL] = { .type = NLA_U32 },
-> +	[IPV4_DEVCONF_IGMPV3_UNSOLICITED_REPORT_INTERVAL] = { .type = NLA_U32 },
-> +	[IPV4_DEVCONF_IGNORE_ROUTES_WITH_LINKDOWN]	  = NLA_POLICY_RANGE(NLA_U32,
-> +									     0, 1),
-
-The indentation is rather awkward, please adjust to fit the common case
-on one line and special case the long ones.
-
-	// mis-adjust when needed
-	[IPV4_DEVCONF_PROMOTE_SECONDARIES] = NLA_POLICY_RANGE(NLA_U32, 0, 1),
-	// common / normal case
-	[IPV4_DEVCONF_ARP_ACCEPT]	= NLA_POLICY_RANGE(NLA_U32, 0, 1),
-	[IPV4_DEVCONF_ARP_NOTIFY]	= NLA_POLICY_RANGE(NLA_U32, 0, 1),
-	[IPV4_DEVCONF_ACCEPT_LOCAL]	= NLA_POLICY_RANGE(NLA_U32, 0, 1),
-	...
-	// overflow type fully to next line if doesn't fit even mis-adjusted
-	[IPV4_DEVCONF_IGMPV2_UNSOLICITED_REPORT_INTERVAL] =
-		{ .type = NLA_U32 },
-	[IPV4_DEVCONF_IGMPV3_UNSOLICITED_REPORT_INTERVAL] =
-		{ .type = NLA_U32 },
-	[IPV4_DEVCONF_IGNORE_ROUTES_WITH_LINKDOWN] =
-		NLA_POLICY_RANGE(NLA_U32, 0, 1),
--- 
-pw-bot: cr
+This OTOH probably deserves to be a real fix for net?
 
