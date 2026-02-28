@@ -1,192 +1,112 @@
-Return-Path: <netdev+bounces-262212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262213-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MPJpLW9io2myBQUAu9opvQ
-	(envelope-from <netdev+bounces-262212-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 22:47:27 +0100
+	id 0J6INYNio2myBQUAu9opvQ
+	(envelope-from <netdev+bounces-262213-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 22:47:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21AE91C93F2
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 22:47:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79B2D1C93FA
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 22:47:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C9D2430FED76
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 20:30:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DB2013072640
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 20:30:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E7242D0C79;
-	Sat, 28 Feb 2026 20:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFABE1C8603;
+	Sat, 28 Feb 2026 20:30:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BP6YHsWi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ukdzHTEO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91F7925DB12
-	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 20:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD02C175A86;
+	Sat, 28 Feb 2026 20:30:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772310622; cv=none; b=po1xF6TsrmuKjuSO6nKKgX7RU1WVmrkFTaYW1bj1na3cv8ZCmmpd/mlYKWbhNmtPrSWsZS5vv4Bf+uzFMa5+gnW4Oi5s576xh2WoLk+mgS5HylASJ8Q+YUltOz+dzZ3aVC5ClVA9HVFsAV86+uL7RM4HC+U0bVHZQYLoobL1Pxo=
+	t=1772310658; cv=none; b=igD+Wq89fQB8pNDkt5w+HDmkKJA5+uOLdQjX6oPf5GOf5t7t2kDhHMqgZqCk1rvnsC34LrC0yW5O+7vfpGmw2/I5PQpX1hQUfcLlV57p7A4UoIXsKza6i7KMCf1WIfT5+8p1jG4hiewBdzwJ5pwFVG4ybV2gnfuB6FXkz79kFa4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772310622; c=relaxed/simple;
-	bh=4074zt5bpOL7TolVuAmUfn+0Hry0Ban+kCkioaWnFBU=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=NPJ5EEXr2RPg1z1mwnWc75IUaaV++PA/DXeGMq+Ye/Lsatmd47uXn2p8JUZMlnRrISpuhMHHMkNqCtwr8Ju07wEggaJ/YDOqL0hyXUcVnzGmanicVIU2iVvYJ3hIfBYbf3H2d3xwax3BelGk1XiPw3HzRbQk7ha3SXdJ+hjas3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BP6YHsWi; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-79860421382so28886887b3.0
-        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 12:30:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772310619; x=1772915419; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=P4/PHgdImLU0t3MEoKpGi0JejsOQalQw+IM1APjX0G8=;
-        b=BP6YHsWiFXhzch2YEk91ocxwBJT/kwZCsQonTbjsDFaF4yWirHFh8LmCPydmnWNCTh
-         j4Zfkrg9nMDZAEh2AN0nZ/TBP3KEMMEIeXGU97Rjba005ofhAqENWfHHvPc9mDVbFXYe
-         jmFamEhw/Dfy/+pBmLNNk41gXz9vMtrsNfaieaTXJ86SoAhcjY87y4rOvmHCTzW85LWc
-         76ibhA2i/o7sL5HPeX8JPSf3l1nHyAHF/fa/xV1FMIG3aMfMxeGv0dSVlxhTCwaLumxZ
-         rSwYTpFoGXKSIauLz2AlwwuOD307i/F9joUzTJwW9njlQha9f3pn+2mJ206Ozn9LIPLh
-         ijlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772310619; x=1772915419;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=P4/PHgdImLU0t3MEoKpGi0JejsOQalQw+IM1APjX0G8=;
-        b=uIeb6RNrv2gmAnotT8vk8KiW/bhm17lYe/5/aeBaBAeDxJyNLEZvt20eDZmODKt2m0
-         nW9viNf6YuyILlx5RF1Vn5QSDVsM6PdsLTRYkY8oJtJgcdbqP9SKKjewUiM5AZxTAx/C
-         jRVLYv1X7eLUihu+JuCHe5s1PQTK+LMx085RrxvwEceq5p9PcnDj1PMJFspqAxRl6/i3
-         dL84NVyqlpY/aWIpAC0mjbEHCfEZWOt6xM48Ec8GorhCfYybSFNUm96/oY4xAW180HzI
-         yi0/7RaJxdDVvfHtpDjpZnuvlmdIqJNmBCn0sABHNikd7qrcqytQKBoKAQ1YGqqsOkp2
-         Q0ww==
-X-Forwarded-Encrypted: i=1; AJvYcCWPXH1PbhMEZfW4AsryTrSyg1vvWNNN3B9iY/TevW6RU/sd2CS/gYMz45vukyiJ9J9Vjvr+ywk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx9KzI9K1SZOMkn3k7sjLmdMx2ANfZC3e+YU9zCF3pOd99QIP5y
-	ocdFOQPBWwNckOAbsthDdIlZrMg24EeWvAQlCBd2R176xF5ytQ5ZLURi
-X-Gm-Gg: ATEYQzw0gJoNJ2oVpu4QV6unCi0Uo/Ra0ppnrjXLMN987VVeJACBS/6PivauAJv8gsF
-	h9LkzBwEdr0SYJBZPZmUDT3p3o0Xho2HjVpubMnoLLbPoBkIodbQc54iG3mIKr5nKxUVgDcuHkl
-	u1FCERhdWfzzc3YIXzdSMhD8j+FTFXidhOcK0ONHNcAeSskN98PhZm2Y/zhbB4ikUXOLyxYPKzq
-	ae8iB0gfgxzX71vHyD0/aUAFdaP9mcR2PXDlYjW/RsG6J8LgESaL+itQsevsfaimvD04VkJ3Ybh
-	5CYIvOmgCYYIpiCeBaiGQOGOHGW3KDzvBGP4idvYt3Te0diIe6AtS02Wy3TkxSa+EEs77RdMfYT
-	ldLvxEAoqUP82Ut9eWzwi+K7kEnDoGs89f3xeBnqIqr+Oce1AzLLGoOof88LBij2uJiX3YGDvp1
-	uBdEvRizmbfveb4p4/DTScuDh+FJ0Nsg+Kb1giTPhK22k4bQjIX4zswwFHOsHTYMJqcTFm0zPbE
-	BB06cO1pw==
-X-Received: by 2002:a05:690c:f06:b0:798:3051:2f06 with SMTP id 00721157ae682-7988561d674mr73559807b3.53.1772310619559;
-        Sat, 28 Feb 2026 12:30:19 -0800 (PST)
-Received: from gmail.com (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-79876ac7505sm34314707b3.14.2026.02.28.12.30.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 28 Feb 2026 12:30:18 -0800 (PST)
-Date: Sat, 28 Feb 2026 15:30:18 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Kiran Kella <kiran.kella@broadcom.com>, 
- willemb@google.com, 
- davem@davemloft.net, 
- edumazet@google.com, 
- daniel.zahka@gmail.com, 
- pabeni@redhat.com, 
- andrew+netdev@lunn.ch, 
- horms@kernel.org, 
- shuah@kernel.org, 
- linux-kselftest@vger.kernel.org, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- jayakrishnan.udayavarma@broadcom.com, 
- ajit.khaparde@broadcom.com, 
- akhilesh.samineni@broadcom.com
-Message-ID: <willemdebruijn.kernel.c17952a3eaa4@gmail.com>
-In-Reply-To: <20260228121034.48c2d282@kernel.org>
-References: <20260226184654.3180648-1-kiran.kella@broadcom.com>
- <20260226184654.3180648-2-kiran.kella@broadcom.com>
- <20260228100449.19f6ef13@kernel.org>
- <willemdebruijn.kernel.1c3d7105f1c48@gmail.com>
- <20260228121034.48c2d282@kernel.org>
-Subject: Re: [net-next, v3 1/2] psp: Support for transmit on logical device
- when the underlying transport device supports PSP.
+	s=arc-20240116; t=1772310658; c=relaxed/simple;
+	bh=5osuwdeoFbtAVKtAuWPRvfoorRhWrOkgKlCC1JCHjX4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lbuE/hEmxWEcHB0hhiPUTmnltRMnMHXpUIYQjaIKwWB1qqC8UmpOfPnfUhg6pst1LrgQQcTdty4lPygSuGo54aBt9U4wVEmCztSXSHUIQew2Bzemt9H242089qZOvbr+eU95JFL1gOOiE8aUgsxnFYz3k5Y+uCJUUwRsq40aSbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ukdzHTEO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CEAEC116D0;
+	Sat, 28 Feb 2026 20:30:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772310658;
+	bh=5osuwdeoFbtAVKtAuWPRvfoorRhWrOkgKlCC1JCHjX4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ukdzHTEO9sKeX64F965atQW/VYBfheZwuA/3E7Uj4JGWjCKt8pCAWXe+VgfntwdYK
+	 TQsvsprRjBAItAb/WcHOTodq5M3gOpllVFQcJAgwmTjSBi+5HnhDmIeCFTIGioA0no
+	 j1heXxnJCW8D+uXX7va59C+2WR9NTGf1h9LtQlrFTxEfE3daRtgPc/c4jN84gqerXw
+	 4zj6gp5Cno8vuNkmXelrL74R4x/+G9lXWFjw52VV+gx+8u00qF8AMZeMvLStESzE1w
+	 XmfryvVoKxggOAVL7HGhrLl7lRRno/gWlNkm4UCbCy8ee6RCxo+IfQrmBJEJewae+E
+	 Xe/Fu4EhxHlqg==
+Date: Sat, 28 Feb 2026 12:30:57 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Fernando Fernandez Mancera <fmancera@suse.de>
+Cc: netdev@vger.kernel.org, bridge@lists.linux.dev,
+ roopa@cumulusnetworks.com, horms@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, davem@davemloft.net, idosch@nvidia.com,
+ razor@blackwall.org
+Subject: Re: [PATCH net] net: bridge: fix nd_tbl NULL dereference when IPv6
+ is disabled
+Message-ID: <20260228123057.14050980@kernel.org>
+In-Reply-To: <20260226234059.19402-1-fmancera@suse.de>
+References: <20260226234059.19402-1-fmancera@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262212-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[broadcom.com,google.com,davemloft.net,gmail.com,redhat.com,lunn.ch,kernel.org,vger.kernel.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_TO(0.00)[kernel.org,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-262213-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 21AE91C93F2
+X-Rspamd-Queue-Id: 79B2D1C93FA
 X-Rspamd-Action: no action
 
-Jakub Kicinski wrote:
-> On Sat, 28 Feb 2026 14:46:28 -0500 Willem de Bruijn wrote:
-> > Jakub Kicinski wrote:
-> > > On Thu, 26 Feb 2026 10:46:53 -0800 Kiran Kella wrote:  
-> > > > This is achieved by propagating the psp_dev from the lower device
-> > > > to the upper devices in the device stack via a netdevice notifier.
-> > > > The lowest device owns the psp_dev pointer while the upper devices
-> > > > just borrow the pointer. When the lower device is unlinked, the
-> > > > borrowed pointer is cleared in the upper device.
-> > > > Assumption being that psp_dev is set on the lowest device before
-> > > > any upper devices are stacked on that lowest device.  
-> > > 
-> > > As I mentioned in the other thread I'd like to establish some clear
-> > > expectation on where psd propagates automatically and where it doesn't.
-> > > I don't want to see a stream of patches that say "fix propagating PSP
-> > > onto X upper". And conversely report saying "PSP got propagated but
-> > > it doesn't actually work" (macvlan in bridge mode etc).
-> > > 
-> > > Hence my preference was to require the user who created the device
-> > > to propagate PSP. Willem, WDYT?  
-> > 
-> > Can you give a bit more detail what you have in mind?
-> > 
-> > An explicit user (netlink) API to associate a psp_dev with a
-> > net_device?
-> 
-> Yes:
-> https://lore.kernel.org/all/20260224002410.1553838-7-weibunny@fb.com/
+On Fri, 27 Feb 2026 00:40:59 +0100 Fernando Fernandez Mancera wrote:
+> Fix this by adding a check before br_is_local_ip6() or neigh_lookup()
+> call. If ipv6_stub->nd_tbl is NULL, return immediately.
 
-I see. Yes, fair to ask for an explicit sensible policy.
+The problem should probably be fixed by replacing IS_ENABLED(IPV6) in
+the callers with ipv6_mod_enabled(), rather than randomly sprinkling
+null checks?
 
-It would be nice if PSP could transparently be enabled on upper
-devices, similar to dev->features.
+> Fixes: ed842faeb2bd ("bridge: suppress nd pkts on BR_NEIGH_SUPPRESS ports")
+> Closes: https://lore.kernel.org/netdev/CAHXs0ORzd62QOG-Fttqa2Cx_A_VFp=utE2H2VTX5nqfgs7LDxQ@mail.gmail.com/
 
-But this quickly runs into practical questions like when and how can a
-bonding device with multiple independent lower devices support PSP?
-
-dev->features also has type specific carve-outs for upper types, such
-as vlan_features and hw_enc_features. We probably don't want to
-introduce the same for PSP.
+I think we should also have a Reported-by: in this case?
+-- 
+pw-bot: cr
 
