@@ -1,112 +1,111 @@
-Return-Path: <netdev+bounces-262228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262229-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kAl6B7Nlo2ngCAUAu9opvQ
-	(envelope-from <netdev+bounces-262228-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 23:01:23 +0100
+	id cK9nNwpmo2ngCAUAu9opvQ
+	(envelope-from <netdev+bounces-262229-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 23:02:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 653681C95C8
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 23:01:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 463951C95D9
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 23:02:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9211D30048C0
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 21:58:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 952DD301413E
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 21:59:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F88635AC1B;
-	Sat, 28 Feb 2026 21:58:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BE8135F176;
+	Sat, 28 Feb 2026 21:59:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E0LONu78"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2qoEvnqa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
+Received: from mail-dy1-f181.google.com (mail-dy1-f181.google.com [74.125.82.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECA8735AC24
-	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 21:58:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B6CB35E937
+	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 21:59:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.181
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772315889; cv=pass; b=PCgGdxT0cZchPiSYr6aLt9eKw96jfWIf9qOfmcu1wl60mC55V1RLpuNKfF6n/BgHVXUwKSnFjpt0D3r1JWzWibj+oN8YJrovgXHxyKWvrtzYl3qkZ420THUCj3pwFpXNO+uXiz34fJtoR57pGmLwQhgYxVQaloxEEarhHMH6Udg=
+	t=1772315968; cv=pass; b=e1NFAvQZYIjd80UgLu5JQnvmPP2g2RmKt0knCmkeqpm+ZGjI5EqyUGm2lyfeibNdwUXg5SpcybhC5hf+9jYcgNzSbYneNbsVTpCwLNfwbRSi4KQ7LoghmyP6BuK8dtMWsZoy5ITT2ns7dTT6lsrf4IldtoXp5Bh9raROMyR+pA8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772315889; c=relaxed/simple;
-	bh=NOsnm1WMT6oquwFkOKXtq9mpI3K3Gfqoq7wlHkSQeIM=;
+	s=arc-20240116; t=1772315968; c=relaxed/simple;
+	bh=4RAiiyTpAKR6MMPimA06/fpIIvfblyXE77TESdf4Hlc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W1HpzyguA2ow5c43kApo1KBBfn4oY1vooOQZSAlFJ8NH9F6TQKGqjthGUaG+HtRYfXIIXkTHbSs+bLeHsH+SDSflbRNEDu4GDCxJEEPkhtu2IQWqTFqCsyxJ37sl3mKjShZUBfzL27sDU2LUzJN+IsrlzSU+46u8eaU+KHMly+U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=E0LONu78; arc=pass smtp.client-ip=74.125.82.54
+	 To:Cc:Content-Type; b=FRoHYxEUL5dyybFCP0LisKJRU/U1bVfEOu8vhkmyc1JULHc491k7L7utyamM6RG3zr8utBz8Op2sW0+0Le5yxdPraEscQDOa+KEg1MybgqDRsDlLLT4cE6x/LS87/HCcWb56uW5b58+mpoBLUKB5RHjmqNymJVCQgq3bUjK/z7s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2qoEvnqa; arc=pass smtp.client-ip=74.125.82.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-12758ce1e8dso1580565c88.0
-        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 13:58:05 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772315885; cv=none;
+Received: by mail-dy1-f181.google.com with SMTP id 5a478bee46e88-2bdfd129c52so369673eec.0
+        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 13:59:22 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772315962; cv=none;
         d=google.com; s=arc-20240605;
-        b=RUkN5D0uZ9pbrIpDS+EbOxzM2vRasPuU7me50KMt1gmakbej1VKVLv6j2iEJPYMEKQ
-         5fqmaGB9DHekUhx1n0/sQj8BS+jT12ARsOpSdBs6e6hIg0+u5SFycb7p7LieWeSDCyH7
-         kg8DCiwqjc5Wgn5NiZpB+/pW7NNXkF19+7Err04tk8gKgd56sH0nlMuGa1owt6odB5G0
-         3OQ5ZL6SCD80kpUS+CCqpXtTyOxDVoUCCde5TrTATXVCLQy0GVcxUoXpJQFeGw22rAdN
-         gSZ8WYje/gDBYX3NTU+aH+WP2Q7zEyZB9uxi00y/Yc8xb7urYbfwuuMkeffc2YfAG9JU
-         bKZw==
+        b=PpOsDSyKCq0SWCkTz/T32KXY3Nnyo3aSw91Sg+Y8OuztQ8uNaM1BgvX1X3dcgu4qKL
+         deA1ZjFDYSxMlFa7Q1AE6RmL1C2uvY0xS1IWNAjhmlXrqwTsNwKwp8VAwcn22gpvbBtz
+         6pt1wtYuhnaKFxI+A9WUeGtcAtGN/dA52Ldp5YM94x+ov5SPFQGr0Y2oeCY4rdlLqkpY
+         ozfySLGrg7uDmguFywhO+8IALMbEG/22hoiWASF7I06YM+vBgYU26CATIe/9M7dfRJRs
+         Jg7rqrwt0wiTW4AHSepDHdh/xxt93DQLBYRTR4kyrNvhQLHiaSCjq0M8nNZyp9ecoLu1
+         wLew==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=JqewYjJx5AqKptY80zybKuRX9nlvDFB85qIMIDwbEWo=;
-        fh=TLv9cOLAqyInEHzFZSlOyS27QVd8yJk8EWZMXHtRbAA=;
-        b=Wac1GSAZlhPKmt7qaFmdY0aAL92rtIPE6IsYOOkf8qXkCLwJ+3rA34wfMBQtHv7uJt
-         pvvEF76fl3bXmdOKwsiESRr4kHmKT6IwsfXowaCSISvsF13ogtFDoA0mvCIpMQnu+UEm
-         W0dQgmUZk0kNELYy2iua1oYzlnGrVMuD5afCzhEutX2YYgmn2A/DEroVbbJKZPSyXa4m
-         Hxp4BVr6PJvh395DehfP0AKxkhw8yctwpCYtaXinMXxKABhJYNkEtktp8utUsAwjhJd4
-         vCanVaMSNYm9qHUhQqyGMUjtsWVPNvzkUGFar/hwhjBjRoiARHq2KuXRR3DmgJARwZBQ
-         KRtg==;
+        bh=YVvtzdyPVy66rJ8CZESNHEGa7bH++tI+snNLqytob6g=;
+        fh=xvj6tHAfsTWwGGATne7cq8AvHOnKB2DCJRzFCZ5Obvg=;
+        b=TpYWCU+gkQAz4kaFwcZNCPBkkGIY96FfP0nID0ReFs7qiRpivGGGcQDAEnYTjFWQm9
+         Fovk61KRjxaTATr4WgS8+8w6gnuDcwG1ezjbBcfRXi2gTi7kRoYAfLgmPo7zXjyhRN0h
+         lNNiBLqPvPMqYBFybyzLPyAiiW/n6UIJJ7xtoTRKmRdnfFMQipnwI/gBw7AmUHMALs/2
+         cS3Opvoh7AHLU2fEQ1NwGYRrf7wZeWBLKt2Z58pngDq598E9ZYdTxQiBO7RmHWhDhkzJ
+         CqgSr5UDz7jGIyIsVB5hzLcNs270FZE/8C9JjPhB0FR0f1cZ5DRhjzm89VMhWuepISbS
+         BqWg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772315885; x=1772920685; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772315962; x=1772920762; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JqewYjJx5AqKptY80zybKuRX9nlvDFB85qIMIDwbEWo=;
-        b=E0LONu78wBYftoYVeH+b8JhVAESH4oSmdGsklf9xFaZB1N6pmCMNOOveJd1su+OFUN
-         77wE67ikVl6UJ2zN8650kI99fQ+2N15c4jfn9YZ1WiYs/AfQDxnqnYap5rO0vLlLSYYX
-         0YpVOA54Zzo5p6Rkr8/cyC+dFbWBFkd7cxOzjH5j68kIHvqz85Y+IO1719FgHW33XUVh
-         Fr+pETpBpl0L4WbilTqKbeqRFAJ93Oh/OMIosoCX/NGS/amJjblnnW0uotADflk9z35j
-         6yc2iXzhbD3sXnl6ZaTGBkYGUGJFoS+r4FBfMYL0usUp3sOGGVAPXagPD7sK3lPqcJSj
-         Ob3w==
+        bh=YVvtzdyPVy66rJ8CZESNHEGa7bH++tI+snNLqytob6g=;
+        b=2qoEvnqaWZLMlMEnc4hUtRW0Wxs8A4sxisQteRGP/evVKrAVDFvLMfA64sY4R+Mkn/
+         eP+xHrKgy+yYkt6Ljico3xHOMxH6J1gfrf/Qta5oeF+l74kVXOB59oA4U8VVreMgOxhO
+         NhTNZOga0v6NRcpYNNhngUzQ8AVUS+xaB1TqIkpEDgcrZf+e9A1e5CIZOtGWIgYTX+sQ
+         +D6RI78hLhh9IdOAT0oCOTNEq88+NqiFfZMfcm59eRA05tMiyFxG7Ky48t/0bsoZdLr/
+         C115N/qS3HbVPX3JN1/KVzkCOfZ5V5U8GUwjuQ+LtRU00c59HucjvljXRHuY0+J4LZNR
+         FYOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772315885; x=1772920685;
+        d=1e100.net; s=20230601; t=1772315962; x=1772920762;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=JqewYjJx5AqKptY80zybKuRX9nlvDFB85qIMIDwbEWo=;
-        b=d5z40doe5H4wTWvXosGM/CUNP0nSDgd3F6PTut/lHd5JbGnKVOvnFhhp30S8TodT7L
-         CcL4qxO7Ld0G44z4iQI0hZPUv9O1GjiLwOwiHl6ThZvNH2bluvFhPJs/SELEtL0/aqcc
-         G2OCeVjHr+DPi3B0kE5iYayKWHimRAyUwPCupyygurI1D2L4dFTymw5+uqLNGEfIqfqx
-         AKzg47MMqLYbyogmah3SwMqfBLere0R8ow14BtHGG37HAcsIEKh7BdACORpUoaSRxXP8
-         O1POoAgbWcbxmYSy9Rki7Ff//JEgN2VuW1Dy7mq9Y0Vs+O85XXLZxmsO2cJcVvHUqpc/
-         +ZUw==
-X-Forwarded-Encrypted: i=1; AJvYcCXAv19r1DRgoTNg1Qknds0pSKOJYZlyetx3SW1/bO5gS0hY5uWVO6LhBKG/8r7yfwlHDaEqH4U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGXB+jeGa5nvyCID8U9OsrdWGf3K8Ooj5FFTqxFgBNtl3fj8FU
-	+tZegi0aR5B0jczPAZYQObVSZTq6finyOrS0TjtYcgISl8ydp9+BnL+8pP6Ei3juJYRTyHVBARO
-	mWd3SmepfLv5btHc62Jr+4n1xc0q1WeV5aq5lQwj+
-X-Gm-Gg: ATEYQzwOEwioFX7/p+pvqfWnszq4s9jq9i+Zfz4othK28J/rxF+BGOgID7DSmNPw0Zx
-	uhM5cgwtR0mEpFXrDI0trKDLOpoREAbdVWLKwRIsz/J0u5XlX6UOqwpNKeBnHk4ZXRlkUeqO5XC
-	0U1/D+8WpXwB4YuxYXRlBEyXiScfqu1cP6Pg+Yb+H/sBWjfJEPg5bRrSLjGkLqtE+ui35UsuRaP
-	H/OtglLm8LlmkXSKPxIlfEuQZ8jGF6ayB7UrgLwTlJHRzQ2bb8fatC+r96pOlW/WrCxIU9mIMBj
-	R95T1EJpjpuwvs2aUk1mlKIPzdY5DnoYFVbzJRcxAaIV4od3TyAVRK1H29ebyLooRgE1LTU/
-X-Received: by 2002:a05:7022:2217:b0:11b:88a7:e1b0 with SMTP id
- a92af1059eb24-1278fd44074mr2866578c88.26.1772315884311; Sat, 28 Feb 2026
- 13:58:04 -0800 (PST)
+        bh=YVvtzdyPVy66rJ8CZESNHEGa7bH++tI+snNLqytob6g=;
+        b=aIBPQsMYrGFLpSjwCd1U2CMMs2Rh1uCyn0BqtUyY+vglz+RXzLd7CAWVkdqG3ibCvd
+         M3qsnNZT7Z/eXvYAyC3G/kC4LTCqDmcKrviXLC9RDdlIWGXrdGmLrvLj9+zwHccUlTQW
+         1b+azgSl2tMsP7ctrQIbOsgR4KGH2L45wS9tEz4DaIplKoEstUCm6OHCksqBnQC0q+JQ
+         FPGzEjMpcWcYWOVcr2jt6M8lkrtKhnvCehC8Pw9PmlIVO8hDucCIA54MGLa0xnh54uas
+         VrGJ+8iaWJMATllrXaj63JprMmx8yYbhJ5JizBwnlQFAarYTpG1dwIgPFd30s9Bqi8sT
+         r9GA==
+X-Forwarded-Encrypted: i=1; AJvYcCV54WlL5z/6x34NYa2TEalWzpUREouIGW6laknINGV+6D828BbUrK6GQUGTPmb6SxE4EU5ZsWA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YypayCKu/Uh4gY4BzGz85tR4xOoJM+eXdcWZC/sM45A+Opmvh5s
+	D88XjEMeyxhkj8PeeiQ3GHwG4E+50lqYrrQnh3kkfG8pMjtH55Xe2IHzTKFQAeVwreN3daiTiN7
+	JlpoZHBUU9P2//Awpcl0ofgv21VOcRdi2h6dhiCud
+X-Gm-Gg: ATEYQzylB9pcrTuEkOaoEgRjrmKzRMYD0bqqNTDUKH/qPq2FZRo5TGMht/kzZ0KaD9w
+	GUbCzFcUUifoHAeZRv5f/P5WfCb1jnc1IG01urm30PofWgZN4LBQi+zSlgXeJ/SJYqHAbsECmfO
+	nBSjnTDsJiA0gGbYRboIcHVZisJ2b7d2o6bQGM0EDtSqnqxNdQWMjneZyT0gKFksBcXfIYjT76B
+	dBrU131vXqfw4y4ORG2p8LOVtO34Xyc0lD2DvdYwntBoeKoRL5WiAifXHOCGBBXUpgUq46x1mOX
+	p0XyKgTBhVYqVs2TQL7IVFeYgitivh1TZAaF8Xp+iJJ4pXF4q1nrzNeqHddYNt76Id3nbraV
+X-Received: by 2002:a05:7301:2b84:b0:2ba:673b:e32f with SMTP id
+ 5a478bee46e88-2bde1f86090mr2265869eec.37.1772315961565; Sat, 28 Feb 2026
+ 13:59:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260227033903.3307272-2-kuniyu@google.com> <20260228215436.4094668-1-kuba@kernel.org>
-In-Reply-To: <20260228215436.4094668-1-kuba@kernel.org>
+References: <20260227033903.3307272-3-kuniyu@google.com> <20260228215446.4094803-1-kuba@kernel.org>
+In-Reply-To: <20260228215446.4094803-1-kuba@kernel.org>
 From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Sat, 28 Feb 2026 13:57:52 -0800
-X-Gm-Features: AaiRm53tbBSrse7qXHdmJQSvFpNKWls8QJ7MEAnpEev_rLPlpEdJOgx9D-8A4e8
-Message-ID: <CAAVpQUB454JYrDzRRSO_OCs7gaXQa2GYYC9Gr1UdY2cdUTBWyQ@mail.gmail.com>
-Subject: Re: [v2,net-next,01/15] selftest: net: Add basic functionality tests
- for ipmr.
+Date: Sat, 28 Feb 2026 13:59:10 -0800
+X-Gm-Features: AaiRm50z0cP9pq1JIOXG-sr_b7MACQIURLRaXSZZp6RLojkHDEq6hEmfWFEsgS8
+Message-ID: <CAAVpQUD4D-32X1o4KiYqyFmmc6_EjumWWvVHQ6TbvmW7iyKDPw@mail.gmail.com>
+Subject: Re: [v2,net-next,02/15] ipmr: Annotate access to mrt->mroute_do_{pim,assert,wrvifwhole}.
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: dsahern@kernel.org, pabeni@redhat.com, edumazet@google.com, 
 	davem@davemloft.net, horms@kernel.org, kuni1840@gmail.com, 
@@ -118,12 +117,12 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[kernel.org,redhat.com,google.com,davemloft.net,gmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-262228-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262229-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
@@ -138,9 +137,9 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 653681C95C8
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: 463951C95D9
 X-Rspamd-Action: no action
 
 On Sat, Feb 28, 2026 at 1:54=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
@@ -152,77 +151,69 @@ ote:
 > For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-loca=
 l.html
 > ---
-> selftest: net: Add basic functionality tests for ipmr.
+> ipmr: Annotate access to mrt->mroute_do_{pim,assert,wrvifwhole}.
 >
-> This commit adds self-tests for IPv4 multicast routing (ipmr) that
-> exercise various setsockopt and rtnetlink paths to catch lockdep issues.
-> The tests cover MRT_INIT/DONE, VIF management, MFC operations, and RTNL
-> integration.
+> This commit adds READ_ONCE() and WRITE_ONCE() annotations to protect
+> lockless access to three fields in struct mr_table: mroute_do_pim,
+> mroute_do_assert, and mroute_do_wrvifwhole.
 >
-> > diff --git a/tools/testing/selftests/net/forwarding/.gitignore b/tools/=
-testing/selftests/net/forwarding/.gitignore
-> > index 2dea317f12e7..418ff96c52ef 100644
-> > --- a/tools/testing/selftests/net/forwarding/.gitignore
-> > +++ b/tools/testing/selftests/net/forwarding/.gitignore
-> > @@ -1,2 +1,3 @@
-> >  # SPDX-License-Identifier: GPL-2.0-only
-> >  forwarding.config
-> > +ipmr
-> > diff --git a/tools/testing/selftests/net/forwarding/Makefile b/tools/te=
-sting/selftests/net/forwarding/Makefile
-> > index ff4a00d91a26..bbaf4d937dd8 100644
-> > --- a/tools/testing/selftests/net/forwarding/Makefile
-> > +++ b/tools/testing/selftests/net/forwarding/Makefile
+> > diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
+> > index 131382c388e9..377b5848f99c 100644
+> > --- a/net/ipv4/ipmr.c
+> > +++ b/net/ipv4/ipmr.c
 >
 > [ ... ]
 >
-> > diff --git a/tools/testing/selftests/net/forwarding/ipmr.c b/tools/test=
-ing/selftests/net/forwarding/ipmr.c
-> > new file mode 100644
-> > index 000000000000..b6b00e36b3ce
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/net/forwarding/ipmr.c
-> > @@ -0,0 +1,455 @@
+> > @@ -2037,7 +2037,7 @@ static void ip_mr_forward(struct net *net, struct=
+ mr_table *mrt,
+> >
+> >               atomic_long_inc(&c->_c.mfc_un.res.wrong_if);
+> >
+> > -             if (true_vifi >=3D 0 && mrt->mroute_do_assert &&
+> > +             if (true_vifi >=3D 0 && READ_ONCE(mrt->mroute_do_assert) =
+&&
+> >                   /* pimsm uses asserts, when switching from RPT to SPT=
+,
+> >                    * so that we cannot check that packet arrived on an =
+oif.
+> >                    * It is bad, but otherwise we would need to move pre=
+tty
+> > @@ -2050,7 +2050,7 @@ static void ip_mr_forward(struct net *net, struct=
+ mr_table *mrt,
+> >                              MFC_ASSERT_THRESH)) {
+> >                       c->_c.mfc_un.res.last_assert =3D jiffies;
+> >                       ipmr_cache_report(mrt, skb, true_vifi, IGMPMSG_WR=
+ONGVIF);
+> > -                     if (mrt->mroute_do_wrvifwhole)
+> > +                     if (READ_ONCE(mrt->mroute_do_wrvifwhole))
+> >                               ipmr_cache_report(mrt, skb, true_vifi,
+> >                                                 IGMPMSG_WRVIFWHOLE);
+> >               }
 >
-> [ ... ]
+> Should the condition at the start of this block also use READ_ONCE() for
+> mrt->mroute_do_pim? The check reads:
 >
-> > +static struct rtattr *nl_add_rtattr(struct nlmsghdr *nlmsg, struct rta=
-ttr *rta,
-> > +                                 int type, const void *data, int len)
-> > +{
-> > +     int unused;
->                 ^^^^^^
->
-> Does this code have undefined behavior?  The variable 'unused' is declare=
-d
-> here but never initialized, then passed to RTA_NEXT() which expands to a
-> macro that reads its value to perform arithmetic.
->
-> In nl_add_rtattr():
->
->         int unused;
->
->         rta->rta_type =3D type;
->         rta->rta_len =3D RTA_LENGTH(len);
->         memcpy(RTA_DATA(rta), data, len);
->
->         nlmsg->nlmsg_len +=3D NLMSG_ALIGN(rta->rta_len);
->
->         return RTA_NEXT(rta, unused);
->
-> The RTA_NEXT macro performs '(attrlen) -=3D RTA_ALIGN((rta)->rta_len)', w=
-hich
-> reads the uninitialized 'unused' value.
->
-> While the modified value is never subsequently used, the read itself is
-> undefined behavior that could trigger compiler warnings with -Wuninitiali=
-zed
-> or unpredictable behavior with certain optimizations.
->
-> Initializing unused to 0 at declaration would resolve this: 'int unused =
-=3D 0;'
+>                 if (true_vifi >=3D 0 && READ_ONCE(mrt->mroute_do_assert) =
+&&
+>                     (mrt->mroute_do_pim ||
+>                      c->_c.mfc_un.res.ttls[true_vifi] < 255) &&
 
-Fair, will set it to 0.
+Oh how I missed it :)
+Will add READ_ONCE() to mrt-> mroute_do_pim too.
 
 Thanks !
+
+
+>
+> The patch adds WRITE_ONCE() for mrt->mroute_do_pim on the writer side in
+> ip_mroute_setsockopt() and READ_ONCE() for it on the reader side in
+> ip_mroute_getsockopt(), but the lockless read of mrt->mroute_do_pim in
+> this condition is not annotated.
+>
+> Since ip_mr_forward() runs under rcu_read_lock() (not RTNL), this read is
+> lockless and needs READ_ONCE() to pair with the WRITE_ONCE() added on the
+> writer side. The adjacent reads of mrt->mroute_do_assert and
+> mrt->mroute_do_wrvifwhole in the same function were correctly annotated
+> with READ_ONCE() by this patch, making the omission of mrt->mroute_do_pim
+> inconsistent.
 
