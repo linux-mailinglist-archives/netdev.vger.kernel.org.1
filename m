@@ -1,155 +1,133 @@
-Return-Path: <netdev+bounces-262031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262032-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id rdeNKaxGomkJ1gQAu9opvQ
-	(envelope-from <netdev+bounces-262031-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 02:36:44 +0100
+	id aD3rFLpGomkJ1gQAu9opvQ
+	(envelope-from <netdev+bounces-262032-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 02:36:58 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0A341BFC11
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 02:36:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D2421BFC18
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 02:36:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D906E3032064
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 01:36:40 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 202B53033BEC
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 01:36:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1F231E9919;
-	Sat, 28 Feb 2026 01:36:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD6E82E11C5;
+	Sat, 28 Feb 2026 01:36:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rLu74K6L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91BFE2D46C0
-	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 01:36:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA4281E9919;
+	Sat, 28 Feb 2026 01:36:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772242597; cv=none; b=FW/kmOqRaJ4v0KJt6o/P+MgRIFq4uYd2TjleTXnIY7xzGypOUa4VizskQMy1TjqKTH+rYHnW0eBtJmsA4V7/3Gr68nVs6g5aF7cHVhroFubTLEu5WAWEpHYkTkgeeMXsyegcjAcXN+OdTUqNrc45W8hyBd/GY0zvuJXARpYEPjU=
+	t=1772242611; cv=none; b=CAg6bwdjubFrPrv+lVk4SZDJPqCG8AUa0IkjCozBCoCkAefBo7QNyUwXia9/Li6brpvLu1VI2/hOxI4RKXn4wfl7UKw0fhRoQpby1RSJH/8UfdD/3QvanFNZsjlCCU7s2Zl3CXn08pN94WgL9GkoazZ+b0eJsNah7SHJ0dE5IlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772242597; c=relaxed/simple;
-	bh=UZV19VbibPNwF4F+AjCkARvER7vjt3sF706JglzTd8Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QxnGNwPkYk1CNpihhv4X5lKj0MmV9tIm3ZmWiEXLvvPY0/X0Uwm0Qe8x2KcqQAv93FlvSn71x7m0E1BAiQ9sxkqmvtvd3xfCFv/occlR0frbubUUlxXrZLXnXTds4BOxzOH2fht8/6AbqwCIjUUxS7I75DTPz2meg36RCiGPons=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=black-desk.cn; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=74.125.224.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=black-desk.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-64c9ebd1369so2407379d50.1
-        for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 17:36:36 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772242595; x=1772847395;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=OwYEc4mDrdmq/G7hLgokF2l+8tR3VJ7jYqQRsGs6NZo=;
-        b=olJ3ULWLlnO1J7wlrxseUzoshBDhNNy1zqFsHI/dKgrf3zsBAGgg1MeV4KSQJVNZuG
-         fTqEoK7ygd1gYopvzmhIhRHTAMdNpgwx18B7mku9FZhBRd9OKoyCAXoQNgYXrV8yLYMW
-         CKjUQZKwbuHm21L39Aj+gvnscN545z8fFAHMRflI94XYWebeUfcQ+XYBP3h2QJJAhI3J
-         eS48K7HdfwBXM+DXuTpYiKlLqjEXdPimzSgzbnyc6qoz45aAVnNF1qtERpYDPKqm9XRm
-         sMX98gZXy/wGaeB0ntWvDWdHCLjQxlAVRlYffOe8w0kfI2bjFGAUapMPYpCd78B1D5s3
-         Y5sw==
-X-Forwarded-Encrypted: i=1; AJvYcCXJwDaAicITxaFHrLn7TGm2VkoV5euRX6DIUq/aCPI8rYuaY0IRY+/5Chc2n35dg3jtRidLo+8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxU2j7sCOdIBsMG6AmO6c3tpWsZ7WZXUT96YKaxZ/UMuy3BqtLe
-	EdC85gA48G3D5ameK3D3Mi6hcsi28wmZpcfZmZtDYVcjcpri8eqMSvP4fQ+E6FmF
-X-Gm-Gg: ATEYQzzBabygYawo1MoL93zh7UI8NbdMEQ9YZqtt12MV0Z7YOG84jI7GIJGHNxu1+TR
-	IOl3DPLvmAAYiVd6OZBTc0XNVia2ZMb5UhvuFBQzANjZZ647p5gqLd2abZ8bCwybX0wluX48dkD
-	3MpsfUAAEJkeIBbeXKBZURu2eAjm9m+5El7Pxpnz3S1W89fjd4lBfPUMU85jlvLP6I1szM2l9HD
-	UAklzRGDpwpEf5HEJTl4GW6CQDGRvdbTeGdgn9MvZvAKUTnbDJX1XdK1LjebDpWymvNuFxXgGiw
-	lQaNFlF7Z7ZRRWMT85sfySQQQXgQPiuwiZiC12Ov4o6vnDpKGwcopYMB842St/oWxJdFBZQr7bk
-	zZvt9/sMioe4eAxRmGCbgak7vXDQypvTQpBYLZ0aE5cUXFT6vKbaeg0oDWrmvLxSEygwjBY7H3U
-	lUlrQG93mfWG4xyaPHrTI1UM4R2UxlVjEaSmluknl/BgBJaUtXy3YHKkCHnkC+NVWybtt8loWX9
-	f1UeqIsCTAkzeg=
-X-Received: by 2002:a53:ecdb:0:b0:63f:b4d8:1f32 with SMTP id 956f58d0204a3-64cc21186e5mr3171743d50.20.1772242595484;
-        Fri, 27 Feb 2026 17:36:35 -0800 (PST)
-Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com. [74.125.224.51])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-64cb7626e49sm2918187d50.11.2026.02.27.17.36.34
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Feb 2026 17:36:34 -0800 (PST)
-Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-64aea64bf15so2355503d50.2
-        for <netdev@vger.kernel.org>; Fri, 27 Feb 2026 17:36:34 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUIUqNpAvacc9v6n614Smf12QYdPtls2+Zsio9zeOOjoYuTzx5zre2n8x8KHa169IC7AzKJvFY=@vger.kernel.org
-X-Received: by 2002:a53:ecdb:0:b0:63f:b4d8:1f32 with SMTP id
- 956f58d0204a3-64cc21186e5mr3171717d50.20.1772242594546; Fri, 27 Feb 2026
- 17:36:34 -0800 (PST)
+	s=arc-20240116; t=1772242611; c=relaxed/simple;
+	bh=c4pBVGH7zq9UuVP5amo0SjJihT/ZFkBYCMVvrDdIajo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=u62J/o8PgcbLQhvTYDbY+roHyvPCQOZIClxJm2uG4lzJ94bodGGVU4A05skDIyMs6Va54/foRmbI67vHtNXyb0bbV0FwgPmt81itMjSDIm3wYg5OmNh5Ow+4ErsiiMqD1PtbtbWh7fkKLqMGCzcTA7Y+NQtmDFB4WMvyHy5pGjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rLu74K6L; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA1AFC116C6;
+	Sat, 28 Feb 2026 01:36:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772242611;
+	bh=c4pBVGH7zq9UuVP5amo0SjJihT/ZFkBYCMVvrDdIajo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rLu74K6LNFeqnCrjG12I69zGopOJ/Q1p9SDQr6mDIE5Y51IOOl2zxXNdRb/48rxiH
+	 yiZ3XCNKHzHaFd1imxlxpJb+57hOCR8LP25Nf0H7nnisx5zwh4xLiwqILSfIAFwu8F
+	 W2CsLAPQpXaqtG7ySQR1i6INegHqf7gxIuF9qzapRLH0IvxHmZlfIT80GYzRuusl3X
+	 crM9/xMJt/uKUds8AaHPQuE7gM7A8G2uo27SXbnf5Di7czq94wavlWvGA+3flKJfD9
+	 B0ibDXjhAZDXcLZnDeTIaFAnYrCwCHzipAGvP/+k+C4Vdfg0Xf681PLbOg372h34Rz
+	 zd32d7SrXZY+A==
+Date: Fri, 27 Feb 2026 17:36:49 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Zeeshan Ahmad <zeeshanahmad022019@gmail.com>
+Cc: Sridhar Samudrala <sridhar.samudrala@intel.com>, "David S . Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
+ <edumazet@google.com>, netdev@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org, Simon Horman
+ <horms@kernel.org>
+Subject: Re: [PATCH net v3] net: core: failover: fix NULL pointer
+ dereference in failover_slave_register()
+Message-ID: <20260227173649.7a9f202e@kernel.org>
+In-Reply-To: <20260226085601.11343-1-zeeshanahmad022019@gmail.com>
+References: <20260226085601.11343-1-zeeshanahmad022019@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260210-netns-redundant-mount-v1-1-0b1ebfc1c79f@black-desk.cn>
- <a9197cec-d406-4201-98d4-a06820b220f3@kernel.org> <CAC1kPDOs4MP0=89Aa=Y_nZmVY2_9WUgfQs0x=wd-FPMFedrVqw@mail.gmail.com>
- <6fa8c88e-d1fb-42ba-a0a1-f8aa6802b454@kernel.org>
-In-Reply-To: <6fa8c88e-d1fb-42ba-a0a1-f8aa6802b454@kernel.org>
-From: Chen Linxuan <me@black-desk.cn>
-Date: Sat, 28 Feb 2026 09:36:23 +0800
-X-Gmail-Original-Message-ID: <CAC1kPDO=nQ4gGQKoHd-YT8sC3kitw=XHJcmEi61vjoJ3=b=+AQ@mail.gmail.com>
-X-Gm-Features: AaiRm53evMe_67xPTwum2_lgdnxA6DOXVy0_G8GV99EDIH5QpA0myuYwXPSb20w
-Message-ID: <CAC1kPDO=nQ4gGQKoHd-YT8sC3kitw=XHJcmEi61vjoJ3=b=+AQ@mail.gmail.com>
-Subject: Re: [PATCH iproute2] ip/netns: avoid redundant mounts
-To: David Ahern <dsahern@kernel.org>
-Cc: Chen Linxuan <me@black-desk.cn>, Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org, 
-	"Eric W. Biederman" <ebiederm@xmission.com>, Lennart Poettering <lennart@poettering.net>, 
-	Luca Boccassi <bluca@debian.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.36 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[black-desk.cn : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262031-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262032-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[me@black-desk.cn,netdev@vger.kernel.org];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	NEURAL_HAM(-0.00)[-0.987];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid]
-X-Rspamd-Queue-Id: C0A341BFC11
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8D2421BFC18
 X-Rspamd-Action: no action
 
-On Sat, Feb 28, 2026 at 4:30=E2=80=AFAM David Ahern <dsahern@kernel.org> wr=
-ote:
->
-> On 2/24/26 6:21 PM, Chen Linxuan wrote:
-> >> with this patch I am still seeing 2 entries:
-> >>
-> >> $ sudo ./ip netns add blah
-> >> $ cat /proc/self/mountinfo  | grep blah
-> >> 337 92 0:4 net:[4026532418] /run/netns/blah rw shared:344 - nsfs nsfs =
-rw
-> >> 338 28 0:4 net:[4026532418] /run/netns/blah rw shared:344 - nsfs nsfs =
-rw
-> >
-> > It seems like your old `ip` might have create the /run/netns mount poin=
-t.
-> > After remove all netns then umount /run/netns, and ip netns add blah ag=
-ain.
-> > You should see only one entries.
->
-> Fair point. I no longer have the patch, so send it again and I will try
-> a test in a new VM.
+On Thu, 26 Feb 2026 13:56:01 +0500 Zeeshan Ahmad wrote:
+> Smatch warns that 'fops' is dereferenced without a NULL check.
+> While other callbacks in this function properly check 'fops', the
+> rx_handler registration does not.
+> 
+> Consolidate the NULL check for 'fops' at the beginning of the function,
+> before it is first used in slave_pre_register(). This ensures 'fops' is
+> valid for the entire function scope and allows the removal of redundant
+> NULL checks later in the function, as suggested by Dan Carpenter.
+> 
+> Fixes: 30c8bd5aa8b2 ("net: Introduce generic failover module")
 
-Why has this patch been applied?
-https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=3D8=
-2c8b9fe511e6c503ef60c16eebc7a715c3189eb
+Not really a fix, there's only one user - net_failover and it always
+passes the ops and has all callbacks.
 
-What is going on here?
+> diff --git a/net/core/failover.c b/net/core/failover.c
+> index 2a140b3ea669..47e4a91dcaa6 100644
+> --- a/net/core/failover.c
+> +++ b/net/core/failover.c
+> @@ -59,7 +59,10 @@ static int failover_slave_register(struct net_device *slave_dev)
+>  	if (!failover_dev)
+>  		goto done;
+>  
+> -	if (fops && fops->slave_pre_register &&
+> +	if (WARN_ON_ONCE(!fops))
+> +		goto done;
 
->
->
->
+Better still please add this check in failover_register()
+so that we don't allow any device to be registered without ops.
+Then you can delete all the fops checks throughout this file,
+not just in this one function.
+-- 
+pw-bot: cr
 
