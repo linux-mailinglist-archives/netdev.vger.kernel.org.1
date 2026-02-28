@@ -1,204 +1,141 @@
-Return-Path: <netdev+bounces-262036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262037-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6PPzOXxKomk61gQAu9opvQ
-	(envelope-from <netdev+bounces-262036-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 02:53:00 +0100
+	id +Ey9Je1Oomk/1wQAu9opvQ
+	(envelope-from <netdev+bounces-262037-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 03:11:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 326F51BFCB5
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 02:52:59 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB2871BFE1E
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 03:11:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E432A307E870
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 01:52:58 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 41B8B301CAB0
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 02:11:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED6873009ED;
-	Sat, 28 Feb 2026 01:52:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="sexU8DDT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54C533081CA;
+	Sat, 28 Feb 2026 02:11:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D73581A9FB0;
-	Sat, 28 Feb 2026 01:52:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 362C5306496;
+	Sat, 28 Feb 2026 02:11:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772243576; cv=none; b=CZ4xxxuCX9qVDPiCpJODXjQNae1+Nf0bc63LlrNWDrVXJ63pxHM0IHa96zTihFdRB4jyueR7W6hD3hxeFuumUQxjw9E1mAXeh9tILvhwAqyCDcmRM5JURWjulU5NAOIcaQjEoEd6bcUfwUdjfTT1+cpRU7OHR9j4v+NaHkhtxi0=
+	t=1772244711; cv=none; b=He9xah17HqqmgnD2n3oloCaFlT7v9N/YEUf5AmJFzEIixWKBcKpOj7U9HNzILB65qrCBZY2/q1Z11powTgIiYHYTMgc85reCfMLeSGND+RG/GYhZlf4LGvGW4qAkgW7+g1PEsizvPVGtwcSo6EPpe6JsFZqm0KmVKB7K/fN1teU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772243576; c=relaxed/simple;
-	bh=B2YeU3WjsCqsveIQvxStrCLJ4S5p9Q/sC2ikaUwYSI0=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=h21/mFlwIbaxsnhU0+niZR9CL3xJmj3a+VQxSYx7KGyh/os29KtLT8tYQ7FCgrzjNnbSnrIdH6qzvdSKx3pwXUBTMEgo3Qdwsnrrbgk5SsrGy+c7V/oztTY73d3hrvDCOMqrgf83e4v50OcdL23vHpQhuPQ7im8n9Le5xfS08jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=sexU8DDT; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1772243567; h=Message-ID:Subject:Date:From:To;
-	bh=W8d6Bh+HP5EteTq+o9ULWf8DeN2EtdjRgF0wir3dN90=;
-	b=sexU8DDTo0zqcgyxJhhmmHjhZgfbUwXRVB3C3hz72LKKeGbncCD5a52SPjBnX4fgxORtgl2XoRN1w0pbC0VymFVXTwz9txUDvlcu4a3beCA5IdQY2Z3SWXJlBqoW8Ry4P0/M84VoCv35jTEQQ+1mZRoTlmrz6KcdhjcV2J/5LvE=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WzvnDMh_1772243566 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Sat, 28 Feb 2026 09:52:46 +0800
-Message-ID: <1772243553.11669-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next] virtio-net: xsk: Support wakeup on RX side
-Date: Sat, 28 Feb 2026 09:52:33 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org,
- Bui Quang Minh <minhquangbui99@gmail.com>,
- netdev@vger.kernel.org
-References: <20260227150949.13089-1-minhquangbui99@gmail.com>
-In-Reply-To: <20260227150949.13089-1-minhquangbui99@gmail.com>
+	s=arc-20240116; t=1772244711; c=relaxed/simple;
+	bh=uUvD8+nYvhQhsga+shOqjDkaGO4xW0NmG36Y8ASpn5Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NJ0261zGYv3SIxD9CUyP9AkZH0cEviALhgaoJ5zVk4J3jcbzGzL83DmYNfixsYBnf2R87YKw31L+2dwPqFZf/1TS262FkTop9k262ZvKoVfiaYUkOrJn3AhN8/gEykJtYvlIxkvpuG+RaMszDIgt6CH26ltOwDDuLeTk1i9JcWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1202)
+	id D181620B6F02; Fri, 27 Feb 2026 18:11:49 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D181620B6F02
+From: Long Li <longli@microsoft.com>
+To: Long Li <longli@microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K . Y . Srinivasan" <kys@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>
+Cc: Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 0/6] net: mana: Per-vPort EQ and MSI-X interrupt management
+Date: Fri, 27 Feb 2026 18:11:38 -0800
+Message-ID: <20260228021144.85054-1-longli@microsoft.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-6.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+X-Spamd-Result: default: False [3.54 / 15.00];
+	DMARC_POLICY_REJECT(2.00)[microsoft.com : SPF not aligned (relaxed), No valid DKIM,reject];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-262036-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,lists.linux.dev,vger.kernel.org,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-262037-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.137];
+	FROM_NEQ_ENVFROM(0.00)[longli@microsoft.com,netdev@vger.kernel.org];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.alibaba.com:mid,linux.alibaba.com:dkim]
-X-Rspamd-Queue-Id: 326F51BFCB5
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AB2871BFE1E
 X-Rspamd-Action: no action
 
-On Fri, 27 Feb 2026 22:09:49 +0700, Bui Quang Minh <minhquangbui99@gmail.com> wrote:
-> When XDP_USE_NEED_WAKEUP is used and the fill ring is empty so no buffer
-> is allocated on RX side, allow RX NAPI to be descheduled. This avoids
-> wasting CPU cycles on polling. Users will be notified and they need to
-> make a wakeup call after refilling the ring.
->
-> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+This series adds per-vPort Event Queue (EQ) allocation and MSI-X interrupt
+management for the MANA driver. Previously, all vPorts shared a single set
+of EQs. This change enables dedicated EQs per vPort with support for both
+dedicated and shared MSI-X vector allocation modes.
 
-LGTM
+Patch 1 moves EQ ownership from mana_context to per-vPort mana_port_context
+and exports create/destroy functions for the RDMA driver.
 
-Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Patch 2 adds device capability queries to determine whether MSI-X vectors
+should be dedicated per-vPort or shared. When the number of available MSI-X
+vectors is insufficient for dedicated allocation, the driver enables sharing
+mode with bitmap-based vector assignment.
 
-> ---
->  drivers/net/virtio_net.c | 38 ++++++++++++++++++++++++++++++--------
->  1 file changed, 30 insertions(+), 8 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index db88dcaefb20..494acc904b2c 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -1454,8 +1454,19 @@ static int virtnet_add_recvbuf_xsk(struct virtnet_info *vi, struct receive_queue
->  	xsk_buffs = rq->xsk_buffs;
->
->  	num = xsk_buff_alloc_batch(pool, xsk_buffs, rq->vq->num_free);
-> -	if (!num)
-> +	if (!num) {
-> +		if (xsk_uses_need_wakeup(pool)) {
-> +			xsk_set_rx_need_wakeup(pool);
-> +			/* Return 0 instead of -ENOMEM so that NAPI is
-> +			 * descheduled.
-> +			 */
-> +			return 0;
-> +		}
-> +
->  		return -ENOMEM;
-> +	} else {
-> +		xsk_clear_rx_need_wakeup(pool);
-> +	}
->
->  	len = xsk_pool_get_rx_frame_size(pool) + vi->hdr_len;
->
-> @@ -1588,20 +1599,21 @@ static bool virtnet_xsk_xmit(struct send_queue *sq, struct xsk_buff_pool *pool,
->  	return sent;
->  }
->
-> -static void xsk_wakeup(struct send_queue *sq)
-> +static void xsk_wakeup(struct napi_struct *napi, struct virtqueue *vq)
->  {
-> -	if (napi_if_scheduled_mark_missed(&sq->napi))
-> +	if (napi_if_scheduled_mark_missed(napi))
->  		return;
->
->  	local_bh_disable();
-> -	virtqueue_napi_schedule(&sq->napi, sq->vq);
-> +	virtqueue_napi_schedule(napi, vq);
->  	local_bh_enable();
->  }
->
->  static int virtnet_xsk_wakeup(struct net_device *dev, u32 qid, u32 flag)
->  {
->  	struct virtnet_info *vi = netdev_priv(dev);
-> -	struct send_queue *sq;
-> +	struct napi_struct *napi;
-> +	struct virtqueue *vq;
->
->  	if (!netif_running(dev))
->  		return -ENETDOWN;
-> @@ -1609,9 +1621,19 @@ static int virtnet_xsk_wakeup(struct net_device *dev, u32 qid, u32 flag)
->  	if (qid >= vi->curr_queue_pairs)
->  		return -EINVAL;
->
-> -	sq = &vi->sq[qid];
-> +	if (flag == XDP_WAKEUP_TX) {
-> +		struct send_queue *sq = &vi->sq[qid];
-> +
-> +		napi = &sq->napi;
-> +		vq = sq->vq;
-> +	} else {
-> +		struct receive_queue *rq = &vi->rq[qid];
-> +
-> +		napi = &rq->napi;
-> +		vq = rq->vq;
-> +	}
->
-> -	xsk_wakeup(sq);
-> +	xsk_wakeup(napi, vq);
->  	return 0;
->  }
->
-> @@ -1623,7 +1645,7 @@ static void virtnet_xsk_completed(struct send_queue *sq, int num)
->  	 * wakeup the tx napi to consume the xsk tx queue, because the tx
->  	 * interrupt may not be triggered.
->  	 */
-> -	xsk_wakeup(sq);
-> +	xsk_wakeup(&sq->napi, sq->vq);
->  }
->
->  static int __virtnet_xdp_xmit_one(struct virtnet_info *vi,
-> --
-> 2.43.0
->
+Patch 3 introduces the GIC (GDMA IRQ Context) abstraction with reference
+counting, allowing multiple EQs to safely share a single MSI-X vector.
+
+Patch 4 converts the global EQ allocation in probe/resume to use the new
+GIC functions.
+
+Patch 5 adds per-vPort GIC lifecycle management, calling get/put on each
+EQ creation and destruction during vPort open/close.
+
+Patch 6 extends the same GIC lifecycle management to the RDMA driver's EQ
+allocation path.
+
+Long Li (6):
+  net: mana: Create separate EQs for each vPort
+  net: mana: Query device capabilities and configure MSI-X sharing for
+    EQs
+  net: mana: Introduce GIC context with refcounting for interrupt
+    management
+  net: mana: Use GIC functions to allocate global EQs
+  net: mana: Allocate interrupt context for each EQ when creating vPort
+  RDMA/mana_ib: Allocate interrupt contexts on EQs
+
+ drivers/infiniband/hw/mana/main.c             |  47 ++-
+ drivers/infiniband/hw/mana/qp.c               |   4 +-
+ .../net/ethernet/microsoft/mana/gdma_main.c   | 309 +++++++++++++-----
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 164 ++++++----
+ include/net/mana/gdma.h                       |  29 +-
+ include/net/mana/mana.h                       |   7 +-
+ 6 files changed, 402 insertions(+), 158 deletions(-)
+
+-- 
+2.43.0
+
 
