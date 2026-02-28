@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-262268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262269-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0CC5HnyAo2nJFQUAu9opvQ
-	(envelope-from <netdev+bounces-262268-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 00:55:40 +0100
+	id aKAkKH6Ao2nJFQUAu9opvQ
+	(envelope-from <netdev+bounces-262269-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 00:55:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C57711C9C36
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 00:55:39 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F4091C9C3D
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 00:55:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0FB2A300F13B
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 23:55:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C5C42301385D
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 23:55:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6935336C5B3;
-	Sat, 28 Feb 2026 23:55:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0544B3BA248;
+	Sat, 28 Feb 2026 23:55:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DV+8QKB3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KLOm8NTT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45E782868B5
-	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 23:55:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D67112868B5
+	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 23:55:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772322937; cv=none; b=Q70aASbS9C4iaPbDSeStMeA5WSc4t/0iu+DjmjQCNOieOgCe50D4u3tWrDnOXF40W8HYPnox5PnSxP0HEueDRLFP+u9jlaiZyI7Ht545TbTC44EKRu4bHq5Osze66QjZq1VQFpzrcowNgNp6VPohQ5al9s81UqFW6fY5FOEG3Po=
+	t=1772322938; cv=none; b=E5I1foho/JEMyajEDHAxxCKV9THKevmADkkX39gFRfjaLvg/PGgtfIg+r8panr3BNuTBBA6U+XKMtA1N4U+kHX+uz37wj/doVcFgz8zkCHV0T9tW+Dz/ILvHlw58qscBPHj2EMUsKLddza1DgUwe/N8j3PnhNpZ6lgB9x4QcYhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772322937; c=relaxed/simple;
-	bh=Nvq0WNRCvvFGiPU97AHJ2/pliUQHVcaAvhD4KB+d6h0=;
+	s=arc-20240116; t=1772322938; c=relaxed/simple;
+	bh=cnr3TRMVoN6T+ejnJO2HTdPPatU5L1Ty+aAScABcwXY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=G3KOVF0ORhW7VcBESoNBCCprxLF42n00S+WaJxCUrv/sYwSi6Jxh5wnDQBOx4DJjXAhZmV3BgyEp2zjZpMgth3X/mIqIfJKLr/B6gRGqkuzzXpfl9GLW8FmHPpwKRNqmWHSVSZfft7Sp/bqBfJ5S5DJEXgvQygzzko0xRWIftR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DV+8QKB3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E9B6C116D0;
-	Sat, 28 Feb 2026 23:55:36 +0000 (UTC)
+	 MIME-Version; b=iqcOXkolu01D/9V8xHM6lgS91/HR5RU9MQEA7QAiZtIfvCcpBBTqICXzaui4v+92d/k6LaORwS0IGcTsZK4ncPLEQgd/7PG0sFb//KrWqc9mMR6Zs1gE/AZRF/9wWIW+eyE5UpGVMLcYXrLyP7Hp7yKm/V8Ci20jGhaZANMfYR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KLOm8NTT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D93AC116D0;
+	Sat, 28 Feb 2026 23:55:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772322936;
-	bh=Nvq0WNRCvvFGiPU97AHJ2/pliUQHVcaAvhD4KB+d6h0=;
+	s=k20201202; t=1772322938;
+	bh=cnr3TRMVoN6T+ejnJO2HTdPPatU5L1Ty+aAScABcwXY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DV+8QKB3e658jiD8wsW3gXCEQVpjPXUmSW5THeDdhJF8JlFx9CpWYu2HRS+MKFFWT
-	 9Kb9iptuOH8MsBu2/dXuackKM8oCCT/5o7wxdl5LvmGOFw5SZ3zblxj7rjOWt1qo6C
-	 D/6JbQ081l4G4C7zlf3LnEWUiCNQaYrHAk4CaEjllJdTJ0ZDDOK411YjU3uk8QlK6J
-	 z9Jq2I0Pye6LUw31u1f86dJVGixLyCdQr/ONYHfFGAwmq+I3wlNSMlP1Cj1hM8jLfD
-	 L6XtaSH8RL+9O9uU3fsHN0x+Qg9BOt4jbR9oPB4vl5ktD8Z1BqMXy3igbzPOzjjufU
-	 8JkJIgNGRqhvQ==
+	b=KLOm8NTTemgj8EycrJ988OlYGWQmHadpMLNR7RKZLErruV/ypQtFktdg3FRvbUpYM
+	 jvGQoTN/OdmmKDyCDlYQKkVj2jXvNm1IPlv82j2zSxzqNxyO2jjw3E7XueZVmPo8dZ
+	 QEvUfizyvGQOHIzSfkyEI8476LGHomWinTM1f9lp55b12MjaWjZm1wUupSzEzHhWfh
+	 m98sBy0Y/63ZdJ7nN9VJxrlKQmaR6Ou4zl9uw2UUqfrmTPOGYbxLqbTbYoTpuDdA+S
+	 NVg0FFatKb/6XZ0Sm/48WgBBK9rPfBi4D3rO1OCTzLomqlmMjg+wQyiVLfXNs/peUn
+	 aVk3OuRj1GIqQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: xuanzhuo@linux.alibaba.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -61,12 +61,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	netdev@vger.kernel.org,
 	dong100@mucse.com,
 	davem@davemloft.net
-Subject: Re: [net-next,v27,4/8] eea: create/destroy rx,tx queues for netdevice open and stop
-Date: Sat, 28 Feb 2026 15:55:31 -0800
-Message-ID: <20260228235531.30134-1-kuba@kernel.org>
+Subject: Re: [net-next,v27,5/8] eea: implement packet receive logic
+Date: Sat, 28 Feb 2026 15:55:37 -0800
+Message-ID: <20260228235537.31102-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260227015546.47336-5-xuanzhuo@linux.alibaba.com>
-References: <20260227015546.47336-5-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20260227015546.47336-6-xuanzhuo@linux.alibaba.com>
+References: <20260227015546.47336-6-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,14 +82,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[kernel.org,linux.alibaba.com,lunn.ch,gmail.com,google.com,linux.dev,redhat.com,vger.kernel.org,mucse.com,davemloft.net];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-262268-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262269-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -99,12 +99,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: C57711C9C36
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url]
+X-Rspamd-Queue-Id: 0F4091C9C3D
 X-Rspamd-Action: no action
 
 This is an AI-generated review of your patch. The human sending this
@@ -112,76 +112,95 @@ email has considered the AI review valid, or at least plausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-eea: create/destroy rx,tx queues for netdevice open and stop
+eea: implement packet receive logic
 
-This commit adds the netdevice open and stop implementation for the
-Alibaba Elastic Ethernet Adapter (EEA) driver, including queue creation,
-IRQ handling, and NAPI polling infrastructure.
+Implement the core logic for receiving packets in the EEA RX path,
+including packet buffering and basic validation.
 
-> diff --git a/drivers/net/ethernet/alibaba/eea/Makefile b/drivers/net/ethernet/alibaba/eea/Makefile
-> index 91f318e8e046..fa34a005fa01 100644
-> --- a/drivers/net/ethernet/alibaba/eea/Makefile
-> +++ b/drivers/net/ethernet/alibaba/eea/Makefile
-
-[ ... ]
-
-> diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.c b/drivers/net/ethernet/alibaba/eea/eea_net.c
-> index 31cb9ca5b408..2ebf0053d05e 100644
-> --- a/drivers/net/ethernet/alibaba/eea/eea_net.c
-> +++ b/drivers/net/ethernet/alibaba/eea/eea_net.c
+> diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.h b/drivers/net/ethernet/alibaba/eea/eea_net.h
+> index 0398e781dfdb..5a607947a76e 100644
+> --- a/drivers/net/ethernet/alibaba/eea/eea_net.h
+> +++ b/drivers/net/ethernet/alibaba/eea/eea_net.h
 
 [ ... ]
 
-> @@ -116,6 +563,9 @@ static int eea_netdev_init_features(struct net_device *netdev,
+> diff --git a/drivers/net/ethernet/alibaba/eea/eea_rx.c b/drivers/net/ethernet/alibaba/eea/eea_rx.c
+> index a8695704d67d..db74580f296c 100644
+> --- a/drivers/net/ethernet/alibaba/eea/eea_rx.c
+> +++ b/drivers/net/ethernet/alibaba/eea/eea_rx.c
+
+[ ... ]
+
+> @@ -88,12 +180,391 @@ static int eea_alloc_rx_hdr(struct eea_net_init_ctx *ctx, struct eea_net_rx *rx)
+>  	return 0;
 >  }
 >
->  static const struct net_device_ops eea_netdev = {
-> +	.ndo_open           = eea_netdev_open,
-> +	.ndo_stop           = eea_netdev_stop,
-> +	.ndo_start_xmit     = eea_tx_xmit,
->  	.ndo_validate_addr  = eth_validate_addr,
->  	.ndo_features_check = passthru_features_check,
->  };
-
-[ ... ]
-
-> diff --git a/drivers/net/ethernet/alibaba/eea/eea_tx.c b/drivers/net/ethernet/alibaba/eea/eea_tx.c
-> new file mode 100644
-> index 000000000000..259f57674d9f
-> --- /dev/null
-> +++ b/drivers/net/ethernet/alibaba/eea/eea_tx.c
-> @@ -0,0 +1,103 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + * Driver for Alibaba Elastic Ethernet Adapter.
-> + *
-> + * Copyright (C) 2025 Alibaba Inc.
-> + */
-> +
-> +#include <net/netdev_queues.h>
-> +
-> +#include "eea_net.h"
-> +#include "eea_pci.h"
-> +#include "eea_ring.h"
-
-[ ... ]
-
-> +netdev_tx_t eea_tx_xmit(struct sk_buff *skb, struct net_device *netdev)
+> +static void eea_rx_meta_dma_sync_for_cpu(struct eea_net_rx *rx,
+> +					 struct eea_rx_meta *meta, u32 len)
 > +{
-> +	/* Empty function; will be implemented in a subsequent commit. */
-> +	return NETDEV_TX_OK;
+> +	dma_sync_single_for_cpu(rx->enet->edev->dma_dev,
+> +				meta->dma + meta->offset + meta->headroom,
+> +				len, DMA_FROM_DEVICE);
+> +}
+> +
+> +static int eea_harden_check_overflow(struct eea_rx_ctx *ctx,
+> +				     struct eea_net *enet)
+> +{
+> +	u32 max_len;
+> +
+> +	max_len = ctx->meta->truesize - ctx->meta->headroom -
+> +		ctx->meta->tailroom;
+> +
+> +	if (unlikely(ctx->len > max_len)) {
+> +		pr_debug("%s: rx error: len %u exceeds truesize %u\n",
+> +			 enet->netdev->name, ctx->len, max_len);
+> +		return -EINVAL;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int eea_harden_check_size(struct eea_rx_ctx *ctx, struct eea_net *enet)
+> +{
+> +	int err;
+> +
+> +	err = eea_harden_check_overflow(ctx, enet);
+> +	if (err)
+> +		return err;
+> +
+> +	if (ctx->hdr_len) {
+> +		if (unlikely(ctx->hdr_len < ETH_HLEN)) {
+> +			pr_debug("%s: short packet %u\n", enet->netdev->name,
+> +				 ctx->len);
+> +			return -EINVAL;
+> +		}
+> +
+> +		if (unlikely(ctx->hdr_len > enet->cfg.split_hdr)) {
+> +			pr_debug("%s: rx error: hdr len %u exceeds hdr buffer size %u\n",
+> +				 enet->netdev->name, ctx->len,
+> +				 enet->cfg.split_hdr);
+
+Should the second pr_debug argument be ctx->hdr_len instead of ctx->len?
+
+The condition checks 'ctx->hdr_len > enet->cfg.split_hdr', and the format
+string says 'hdr len %u exceeds hdr buffer size %u', but the argument
+passed is ctx->len (the data payload length) rather than ctx->hdr_len (the
+header length that actually triggered the error). This would print the
+wrong value when debugging split-header overflow issues.
+
+> +			return -EINVAL;
+> +		}
+> +
+> +		return 0;
+> +	}
+> +
+> +	if (unlikely(ctx->len < ETH_HLEN)) {
+> +		pr_debug("%s: short packet %u\n", enet->netdev->name, ctx->len);
+> +		return -EINVAL;
+> +	}
+> +
+> +	return 0;
 > +}
 
-Does this stub leak the skb? The function is registered as ndo_start_xmit
-in the net_device_ops structure, and when ndo_start_xmit returns
-NETDEV_TX_OK, the network stack assumes the driver has taken ownership of
-the skb and will not free it. Since this stub neither transmits nor frees
-the skb, every packet sent through the interface will leak memory. The
-device can be opened via eea_netdev_open (which is also added in this
-commit), making this code path reachable.
-
-Would it be better to call dev_kfree_skb(skb) before returning NETDEV_TX_OK
-to prevent the leak until the full implementation is added?
--- 
-pw-bot: cr
+[ ... ]
 
