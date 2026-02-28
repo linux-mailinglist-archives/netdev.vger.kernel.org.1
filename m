@@ -1,184 +1,189 @@
-Return-Path: <netdev+bounces-262221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262222-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CNSQFTBko2myBQUAu9opvQ
-	(envelope-from <netdev+bounces-262221-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 22:54:56 +0100
+	id CATVMj5ko2myBQUAu9opvQ
+	(envelope-from <netdev+bounces-262222-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 22:55:10 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A025D1C9539
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 22:54:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E5D71C9540
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 22:55:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 11618310CC22
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 21:04:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A040330484C6
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 21:12:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88215313E03;
-	Sat, 28 Feb 2026 21:04:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32362289340;
+	Sat, 28 Feb 2026 21:12:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jIA/dAJ3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IQn1FFJg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 237B7430BB3
-	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 21:04:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D3C0430BBA
+	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 21:12:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772312645; cv=none; b=Ry+GidbbGpISHQATT1KgocE3DjVdj1Vi4p2uiidi65cphkPtxNkITM+vrjX3hHffo9Ewo8WLCjYVoGW9ivWpa2SnSSyTkuzki9KHuwpDy/NPRZ6MkFu/a2qmjrhjD2EkWWXFV2WZrRzbMDKvdaVUWkAbdbiEnayvz47Q9qhzhq8=
+	t=1772313170; cv=none; b=JBGNR1bCAiEpNIX8NTrdsB1ijN2OxjjUfyXXeDLS4zm+HMB1Zdkhh4OAwGcSW11EGF2Al+GLPr599rHgbO+VYrWd3uj3wsLAoCPYAkou3F6CDFeApk2/QnEyjmOdEwdw9Io4+3i5FTrab3KCAjVtBLh3N01dMHPIBRfGaJ1t10Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772312645; c=relaxed/simple;
-	bh=vBEnpf4UjvSCu8cugji2tsGiN+WeO6tctn09eypx/3U=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=uh5reLUv1uTlSMwwKyGEqTrOsPYizozfcdllYcMka7yTIGRZoBB3rY4Ib7KtQRD7nFRSI01RMZSv4hl5hgtsDDjf0w0pe7kyMSVb1i/pjipvG/ADSAFBT9EMAp8BAJuPqE4gNrLLv75Xm1/h4xNaNL46ihbpjHTcGDt7fA5xmw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jIA/dAJ3; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-48373a4bca3so18691715e9.0
-        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 13:04:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772312642; x=1772917442; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4Adxq2U5COjMrrCHDDjEJQG++v+swEjEtVNdPRQknj8=;
-        b=jIA/dAJ3BZEdvdixKknJWC9LY804e08wReJMAH6uChTxB4+rJBSBF15AVkrL0frNJH
-         h5CsewH0L7K6KmQPmkUSo5N2XxyhmjruzoBoNtHhf4GE3Ph4z8mqg0lTlQ1Vfj6P9JSk
-         8BHx4P0cO3TqT7PiPS0ScEKBZJwbVOH6TfcZ0H909RBREDyryashLCwW1wSAnfc4ggvk
-         bikbq+oJ2xt6hPg8eoLZm8Yn3EqE00WQ3h7GsxPUxFW73vSHxti/dlfCtw5WaXc7b2NP
-         r/EqzMQiqAatwx+sMODvxeYR+IxGs/dlnJYOoIMtEGkeoTNnUtNhz6Or8PyzgK8xGlV5
-         oNBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772312642; x=1772917442;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4Adxq2U5COjMrrCHDDjEJQG++v+swEjEtVNdPRQknj8=;
-        b=YejO194pVL54X2t+dGqn2Y7N5kE9gJrPCacR6ZnJ1N4I9ETBPHNsN0iQ2FUrQovc6L
-         r+dzFRthngf81VSsQ2t/95xtjTnpdMccQldacTnVEKtUgeSWJVx2HYNUFv1g84Vowuvz
-         id6DYs1zW5jXJCDtWAI1cStWE18VXiSxQQh47i2UqaME2kvVVwmSF8LbIk+ubWLJIJeu
-         4q7O5KeWt3fsX3vAsrM9coOO59F1KaqpiF86qnMjAMOzC9vvCOXs71CQ5ovtRE9kdDcW
-         utQ60SAwelVKYpQuc6C5DYskOSYMeAEyfBVj8U/afnLAzWrc5aHdauJ3CbYZg6Nfv23y
-         6bIA==
-X-Forwarded-Encrypted: i=1; AJvYcCV9tzGvQrqWq6ADyU9MeIRFXk/THxR0dLrzPOY1TyeYqAs/lzwMhLZCJA7QmRr09dy4hYkv0Cw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCKVE/rIFahgN5a8UEBW9kRC6nrO9Y2YtQEyHiCFe+sECFjf/u
-	Ym5FS+Zmf8wkMBKTqlamPTYg+umIBv8hLzwfhezQ7OflLUgqJ6gX7VhQ
-X-Gm-Gg: ATEYQzxZ/Qr508qBaJV8lRPoGuV31Vfb960oQwafAxqC4KoaSNzPxcShtvCaW8Lz59X
-	eF1mS0RpxDrszalUDzqyvZYzePFTU0UHc5XcVdcFRvBcreaH8bhfeXyaeAln2kXDbynQnxBpiXI
-	DZMdpX95JDXeHe0FVvUY+63dLOYhEqjM89teB4HgfATRmbaqq5Ei/b3miFjVm/RsPgCNC+ZpvRn
-	DPgIWSDrLrfR5vf+iwWqUiOeBd3OSyTABYNFGaGDI7Yg33LaB3hQl5rAVQJT1OYN2+1SB3+zexx
-	9ffeSSpmAgbnw3aOF4rFiDz6SFccQUAnsDHy8tWrOgOqvjZBOWi+MiSuDSp0bHM7FOEKrl+tixE
-	U/xCqVf2cAwP/XfuygD85gSJHSLB1WF0oMbdjaX6JjT7+TQdgfJ9wbxdjGc7HZZtlJvSFs9IvZM
-	sAUeGxdFtRWBjhHo7Z0XXm45gns+HMt04I6rd4P+3M28bwDQYAJ0qio2Zo2CYLufE=
-X-Received: by 2002:a05:600c:a0a:b0:47e:e20e:bba3 with SMTP id 5b1f17b1804b1-483c9b9425emr120331305e9.7.1772312642251;
-        Sat, 28 Feb 2026 13:04:02 -0800 (PST)
-Received: from [10.100.102.17] (89-139-129-65.bb.netvision.net.il. [89.139.129.65])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bd68826asm491790005e9.0.2026.02.28.13.04.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 28 Feb 2026 13:04:01 -0800 (PST)
-From: Yedaya Katsman <yedaya.ka@gmail.com>
-Date: Sat, 28 Feb 2026 23:03:59 +0200
-Subject: [PATCH] Update old references to /usr/lib/iproute2
+	s=arc-20240116; t=1772313170; c=relaxed/simple;
+	bh=LVNdPoCszoOTuGSA29xqsmniMw0OBN+/sMcRxeRyuSs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=JFIoJT0sr8tQJBMVqGoIFzlmuo9YWaF2eVMT2rzhpHCcjAIIhsoitQFeMlUYVQ+5NxfHrSsvfhjPYIla1qMvcmIJFnvRjdVbafrSNEmSXB+yhdN/QV+N+yY0feYBOxuCU3o0/UA31vxeaE0Kjl/Gj7z3S6O7IEjIZUQ5ayo6OLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IQn1FFJg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86372C116D0;
+	Sat, 28 Feb 2026 21:12:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772313169;
+	bh=LVNdPoCszoOTuGSA29xqsmniMw0OBN+/sMcRxeRyuSs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=IQn1FFJgA6zPj76ZI6DhpifM63w5SO4U1kCJxsd+Diz0TFwzHja5ln1bfCiMV+oUF
+	 K9+eJqPakUVr3XyNtz075OcuzFOXiIfvFoX9v/EC5NJQVjaRoolZbekPL058s2fu4Z
+	 pytD0IWvIPrBjRnid2TwCI4Y5olheMR5hQO315XUIw0DpR1/U4NndkD43yld6LYmoz
+	 h6mW9alyZlTfq2BldWpds9ZT5D5PE9mdetKHU+7r6MRWrgr8aqPZv3eX4E34P3CDfW
+	 vyqhMiHqUc1RtpRIeA4jhTFmmrmN+uIlzC00dwB0f2VcTC4Ectr0L6nIOVkQuBMYgI
+	 FibnEAnK8vCiQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: jiawenwu@trustnetic.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	mengyuanlou@net-swift.com,
+	netdev@vger.kernel.org,
+	horms@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com
+Subject: Re: [net-next,v2,7/8] net: wangxun: add Tx timeout process
+Date: Sat, 28 Feb 2026 13:12:46 -0800
+Message-ID: <20260228211246.4033548-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260227073450.23680-8-jiawenwu@trustnetic.com>
+References: <20260227073450.23680-8-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260228-usr-lib-to-usr-share-v1-1-a09da2a7675e@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2MMQqAMAwAvyKZDdQMon5FHGpNbUBUEhVB/LvF7
- W64e8BYhQ264gHlS0y2NUtVFhCSX2dGmbIDOaodUYOnKS4y4rH9aMkrY3CtpxgnFxsPOd2Vo9z
- /th/e9wPCUUhNZgAAAA==
-X-Change-ID: 20260228-usr-lib-to-usr-share-c09a2ffd0f8a
-To: Stephen Hemminger <stephen@networkplumber.org>, 
- David Ahern <dsahern@kernel.org>
-Cc: Andrea Claudi <aclaudi@redhat.com>, 
- Luca Boccassi <luca.boccassi@gmail.com>, netdev@vger.kernel.org, 
- Yedaya Katsman <yedaya.ka@gmail.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1772312639; l=1702;
- i=yedaya.ka@gmail.com; s=20260113; h=from:subject:message-id;
- bh=vBEnpf4UjvSCu8cugji2tsGiN+WeO6tctn09eypx/3U=;
- b=BZtZ2PeHKNZeWnUZ6077F9xgsWdyDGnvyKsCWAuoUxaORaDBtSeYqW3n1kCYQ+V1+fNGYA0d/
- CP8nl+7mlStBCWVWwa/W72nECP9CDTQQGTiyT430rDJKzQ0+GtO3OYW
-X-Developer-Key: i=yedaya.ka@gmail.com; a=ed25519;
- pk=CgNmxD3tYSws5dZfpmJfc6re/bV/f47veVijddHLytk=
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262221-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[redhat.com,gmail.com,vger.kernel.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262222-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yedayaka@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.993];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A025D1C9539
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: 4E5D71C9540
 X-Rspamd-Action: no action
 
-In 962692356a1c ("Makefile: use /usr/share/iproute2 for config files")
-The path was changed to /usr/share/, but a comment and a define were still
-using the old path, Update them.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-Signed-off-by: Yedaya Katsman <yedaya.ka@gmail.com>
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
- include/utils.h | 2 +-
- lib/rt_names.c  | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+net: wangxun: add Tx timeout process
 
-diff --git a/include/utils.h b/include/utils.h
-index e0a9c780cb9eb16223905374916813d1b1e7711f..9d3e152775904a7de0cfb5833128590eb94e2f7c 100644
---- a/include/utils.h
-+++ b/include/utils.h
-@@ -40,7 +40,7 @@ extern int echo_request;
- extern int use_iec;
- 
- #ifndef CONF_USR_DIR
--#define CONF_USR_DIR "/usr/lib/iproute2"
-+#define CONF_USR_DIR "/usr/share/iproute2"
- #endif
- #ifndef CONF_ETC_DIR
- #define CONF_ETC_DIR "/etc/iproute2"
-diff --git a/lib/rt_names.c b/lib/rt_names.c
-index 7dc194b1530cfdad3bc3b20c3b9e3bb0d4d09cb0..01ad87b41cb2a02b7bf7ec12c8c50fc38830ebfa 100644
---- a/lib/rt_names.c
-+++ b/lib/rt_names.c
-@@ -208,7 +208,7 @@ rtnl_tabhash_initialize_dir(const char *ddir, const struct tabhash tabhash, cons
- 	snprintf(dirpath_usr, sizeof(dirpath_usr), "%s/%s", CONF_USR_DIR, ddir);
- 	snprintf(dirpath_etc, sizeof(dirpath_etc), "%s/%s", CONF_ETC_DIR, ddir);
- 
--	/* load /usr/lib/iproute2/foo.d/X conf files, unless /etc/iproute2/foo.d/X exists */
-+	/* load /usr/share/iproute2/foo.d/X conf files, unless /etc/iproute2/foo.d/X exists */
- 	rtnl_tabhash_readdir(dirpath_usr, dirpath_etc, tabhash, size);
- 
- 	/* load /etc/iproute2/foo.d/X conf files */
+Implement .ndo_tx_timeout to handle Tx side timeout event. When Tx timeout
+event occur, it will triger driver into reset process.
 
----
-base-commit: 218757a8b8bb431b382d7a104edb6ed4336d3b43
-change-id: 20260228-usr-lib-to-usr-share-c09a2ffd0f8a
+> diff --git a/drivers/net/ethernet/wangxun/libwx/Makefile b/drivers/net/ethernet/wangxun/libwx/Makefile
+> index a71b0ad77de3..c8724bb129aa 100644
+> --- a/drivers/net/ethernet/wangxun/libwx/Makefile
+> +++ b/drivers/net/ethernet/wangxun/libwx/Makefile
+> @@ -4,5 +4,5 @@
+>
+>  obj-$(CONFIG_LIBWX) += libwx.o
+>
+> -libwx-objs := wx_hw.o wx_lib.o wx_ethtool.o wx_ptp.o wx_mbx.o wx_sriov.o
+> +libwx-objs := wx_hw.o wx_lib.o wx_ethtool.o wx_ptp.o wx_mbx.o wx_sriov.o wx_err.o
+>  libwx-objs += wx_vf.o wx_vf_lib.o wx_vf_common.o
 
-Best regards,
+[ ... ]
+
+> diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+> index 4dd7de79431c..0ed33480b4f4 100644
+> --- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+> +++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+
+[ ... ]
+
+> @@ -779,9 +803,11 @@ static int ngbe_probe(struct pci_dev *pdev,
+>  	eth_hw_addr_set(netdev, wx->mac.perm_addr);
+>  	wx_mac_set_default_filter(wx, wx->mac.perm_addr);
+>
+> +	ngbe_init_service(wx);
+> +
+>  	err = wx_init_interrupt_scheme(wx);
+>  	if (err)
+> -		goto err_free_mac_table;
+> +		goto err_cancel_service;
+>
+>  	/* phy Interface Configuration */
+>  	err = ngbe_mdio_init(wx);
+> @@ -801,6 +827,9 @@ static int ngbe_probe(struct pci_dev *pdev,
+>  	wx_control_hw(wx, false);
+>  err_clear_interrupt_scheme:
+>  	wx_clear_interrupt_scheme(wx);
+> +err_cancel_service:
+> +	timer_delete_sync(&wx->service_timer);
+> +	cancel_work_sync(&wx->service_task);
+>  err_free_mac_table:
+>  	kfree(wx->rss_key);
+>  	kfree(wx->mac_table);
+> @@ -826,6 +855,8 @@ static void ngbe_remove(struct pci_dev *pdev)
+>  	struct wx *wx = pci_get_drvdata(pdev);
+>  	struct net_device *netdev;
+>
+> +	cancel_work_sync(&wx->service_task);
+> +
+
+Should timer_delete_sync(&wx->service_timer) be called before
+cancel_work_sync(&wx->service_task) in ngbe_remove()?
+
+The service timer is self-rearming and calls mod_timer() to reschedule
+itself and wx_service_event_schedule() to queue work every 2 seconds:
+
+drivers/net/ethernet/wangxun/libwx/wx_lib.c:wx_service_timer()
+{
+	...
+	wx_service_event_schedule(wx);
+	mod_timer(&wx->service_timer, ...);
+}
+
+If the timer fires after cancel_work_sync returns, it can queue new work
+that runs concurrently with or after device teardown. The probe error path
+shows the correct order:
+
+ngbe_probe() error path:
+err_cancel_service:
+	timer_delete_sync(&wx->service_timer);
+	cancel_work_sync(&wx->service_task);
+
+This stops the timer first to prevent new work from being queued, then
+cancels any pending work.
 -- 
-Yedaya Katsman <yedaya.ka@gmail.com>
-
+pw-bot: cr
 
