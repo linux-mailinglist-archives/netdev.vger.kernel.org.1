@@ -1,61 +1,64 @@
-Return-Path: <netdev+bounces-262186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262187-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iE7hBnNHo2lM/AQAu9opvQ
-	(envelope-from <netdev+bounces-262186-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 20:52:19 +0100
+	id cCtmJsJHo2l//AQAu9opvQ
+	(envelope-from <netdev+bounces-262187-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 20:53:38 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2A201C7739
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 20:52:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 46D9B1C77CE
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 20:53:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 84773355AAC7
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 19:43:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 115463527D33
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 19:45:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1358636CDF1;
-	Sat, 28 Feb 2026 17:49:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4F3E4ADD8C;
+	Sat, 28 Feb 2026 17:55:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AC3DE9uR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hke8etZ8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4E3636B055;
-	Sat, 28 Feb 2026 17:49:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C7447CC62;
+	Sat, 28 Feb 2026 17:55:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772300956; cv=none; b=fqneaGlERXiOy97ASH8CSxVAheUUr5S1q2lculd7HX51FVgIg/pj00AG7OOEJ1Z7LJHwP9AG3qchG7dhk5e89ce1atPCHWfYrT7Gsic/ZzHsd8xj/GvA7H41Mp/wwhcLos8CLPDhwIJVk26YWDYA32qiNEm1WWlWkIemWVcXWkA=
+	t=1772301312; cv=none; b=A9zEbU/ikI0LBcgpi1ao7n8HYWMTGmx/hFciQBRPdRDewRvTo1BvCKGeYB1bFVOpXZBo4d/5J6bnleGXcx2K6vymXMHmgCZB2n3mn/L3TBKJShzElh185ffDt41pOtKP8EFV/LZDbzb9SD0GoSKHXAFqpXBewxpxT3TLS7h0/QQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772300956; c=relaxed/simple;
-	bh=usXkaTvx+omjLiyDKo53ULkvvfCWDmeq0MN+k6XLGw0=;
+	s=arc-20240116; t=1772301312; c=relaxed/simple;
+	bh=BPC0ZAhSoYLqEk8i4/eWc/N+TngjWgfaqRoabhQOknQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ADsXkbWpHgKE3vxDTdjka9kXXIfu/npkdzT8jk6rnq+rOPmlnLhgJ9fH8LV8IY0YfL1eOeIKSJkTURtYGw5b/6im7e9k2BqrmsSlEt5sYbfe+cDfFf0MB2IxVvFNAZ7Hk0OqXOLvhz1KEKvboNK01napYj/75QkoZHQX6p1oJLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AC3DE9uR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6252BC19423;
-	Sat, 28 Feb 2026 17:49:15 +0000 (UTC)
+	 MIME-Version:Content-Type; b=kC3c85saYE/7wehl//aF7VWyhNSFGWJ6lUtr92A06q+5aGFb9j6TzPTFdYk6/T1YzTv7HkWbCibiKTJfs9Yw2aOL0nP4MRPBmoKEGk+cvlhfviBzMMjNTGTtSOrlGFT3z6gL7W9UessgnifUvKO0OOiQBP0/s5adhpzmkAcfK3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hke8etZ8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E34C6C19423;
+	Sat, 28 Feb 2026 17:55:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772300955;
-	bh=usXkaTvx+omjLiyDKo53ULkvvfCWDmeq0MN+k6XLGw0=;
+	s=k20201202; t=1772301312;
+	bh=BPC0ZAhSoYLqEk8i4/eWc/N+TngjWgfaqRoabhQOknQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AC3DE9uRA5Ndn7OfwraP7ZNCB7KRqiap9RapCvgNXRtyeQED+xPYLJ9qxCpNJOorQ
-	 uV60a2NUV3lVYQWHeZs7SAb49mUDlYwIdtWsFrlw2AyuZvijs4DNMMDs/3EQvEkCW6
-	 0FHVRsYcY9Q79xoKOzBqpr0GKPmxwbs8u0Yu6dZbbLADL2v9HtnU9uVZ/oTPV6N8rn
-	 FQxwbmcuWMz/8kdXd2SpvuMR7vj5b5pEulqinGp62EyK8sjcr/u8rpYtT9+xS9TIzs
-	 sRxbVDPB4sJ3uZWsb6QmVx9jRhuOAG7FNbi9BrV4hLXHHkUa8V4CYlqNIBG8SWfFfH
-	 pvWird+xRlXjQ==
-Date: Sat, 28 Feb 2026 09:49:14 -0800
+	b=Hke8etZ8c+QcBGoap+zE20YYUy7S5ng+anwqlDQd7sqtQqHl0e8zk07FIDbsSYwSs
+	 YwELrOOxWdPcX5Kw7Pumj4o0uBUTgGRhzUvjM69iiwpXqOtRfWsZ82SICUU4WZ92Gm
+	 WgnI8JiYBn7s/qd2327+0jdcrCwjbURUGVfAoqLW/Tbx74GkrhOP22u0C9UtRUqkCO
+	 R1qdJxUlgzXPoTR0bfikXsAC196DLY5eh9Cvui4cOqV3ImM+nvak8yi+hwz4Rhm+dY
+	 qJcgyNpbNzOuLF7Q2sDd+MCslWJIoiIZhkqfMWX19/QS8Zd867QGVNXxG5AvblkJVR
+	 fFMnPE0Kj2kyA==
+Date: Sat, 28 Feb 2026 09:55:10 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Shuangpeng Bai <shuangpeng.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, linux-kernel@vger.kernel.org, hdanton@sina.com,
- vadim.fedorenko@linux.dev, horms@kernel.org
-Subject: Re: [PATCH net v3 1/1] serial: caif: hold tty->link reference in
- ldisc_open and ser_release
-Message-ID: <20260228094741.1e248271@kernel.org>
-In-Reply-To: <99a19d63fa322bf21463de1671085655a3f444f9.1772055898.git.shuangpeng.kernel@gmail.com>
-References: <cover.1772055898.git.shuangpeng.kernel@gmail.com>
-	<99a19d63fa322bf21463de1671085655a3f444f9.1772055898.git.shuangpeng.kernel@gmail.com>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, longli@microsoft.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ dipayanroy@linux.microsoft.com, shirazsaleem@microsoft.com,
+ ssengar@linux.microsoft.com, shradhagupta@linux.microsoft.com,
+ gargaditya@linux.microsoft.com, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4] net: mana: Add MAC address to vPort logs
+ and clarify error messages
+Message-ID: <20260228095510.7d5dec24@kernel.org>
+In-Reply-To: <20260225192252.943534-1-ernis@linux.microsoft.com>
+References: <20260225192252.943534-1-ernis@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,14 +77,13 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,redhat.com,sina.com,linux.dev,kernel.org];
-	TAGGED_FROM(0.00)[bounces-262186-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262187-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -90,24 +92,23 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A2A201C7739
+X-Rspamd-Queue-Id: 46D9B1C77CE
 X-Rspamd-Action: no action
 
-On Wed, 25 Feb 2026 20:36:42 -0500 Shuangpeng Bai wrote:
-> Fixes: 308e7e4d0a84 ("serial: caif: fix use-after-free in caif_serial ldisc_close()")
+On Wed, 25 Feb 2026 11:22:41 -0800 Erni Sri Satya Vennela wrote:
+> -			dev_err(hwc->dev, "HWC: Request timed out: %u ms\n",
+> -				hwc->hwc_timeout);
+> +			dev_err(hwc->dev, "%s:%d: Command 0x%x timed out: %u ms\n",
+> +				__func__, __LINE__, command, hwc->hwc_timeout);
 
-Please repost and make sure you CC everyone who has given tags to this
-commit. The get_maintainers script will point them out to you.
-
-And there's no need for a cover letter on a single patch submission,
-just add the extra info under the --- marker in the patch
-
-Also simon.horman@kernel.org is not a real address, horms@ 
+Please don't include __LINE__, they are meaningless given the amount of
+backporting that usually happens in the kernel. The string should be
+unique enough to identify the error, which I think yours is given the
+__func__ + text you have.
 -- 
 pw-bot: cr
 
