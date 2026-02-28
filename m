@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-262153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262152-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YPB2AXsCo2kJ8wQAu9opvQ
-	(envelope-from <netdev+bounces-262153-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 15:58:03 +0100
+	id cJ87I00Co2kJ8wQAu9opvQ
+	(envelope-from <netdev+bounces-262152-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 15:57:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55ABC1C3C0F
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 15:58:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D95381C3BF8
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 15:57:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C2FD3311B20D
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 14:56:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D751A30FF491
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 14:55:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6883D44CF4F;
-	Sat, 28 Feb 2026 14:55:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1167344CF37;
+	Sat, 28 Feb 2026 14:55:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=valinux.co.jp header.i=@valinux.co.jp header.b="e+MQ0t1D"
+	dkim=pass (1024-bit key) header.d=valinux.co.jp header.i=@valinux.co.jp header.b="Q9vSWcg7"
 X-Original-To: netdev@vger.kernel.org
-Received: from OS0P286CU011.outbound.protection.outlook.com (mail-japanwestazon11020096.outbound.protection.outlook.com [52.101.228.96])
+Received: from TYVP286CU001.outbound.protection.outlook.com (mail-japaneastazon11021076.outbound.protection.outlook.com [52.101.125.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27FF844BC89;
-	Sat, 28 Feb 2026 14:55:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.228.96
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77AEE44BCB9;
+	Sat, 28 Feb 2026 14:55:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.125.76
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772290555; cv=fail; b=Y6xy1MEaDmzmEXN7hPZZw2u0+jfCThjLeYfPOzsJ2wE3C1HpRxkxutE3kUiLdSAstjtrayGMw3tnlSv0BIZs4I5Hg24dL6240XOUJAePkv7hLR+BSQx1SBDiNuAQ/eFZSwBbUDRxSQQcLLUKiHOS18qFhKPlsiygfHA64knIWto=
+	t=1772290553; cv=fail; b=li/fbsktVRzvlIPTnB6uJVeQEd0ncMEVrfAjQfORgYxZHSMP6NdrBHfI9O9jXV3zUyugeuF63j7D89LOiwVhYcDiEW4HZxUYKU0HQ+P8ncb89LfD+3Ou9vu68xVuo5kJxtqH8NNM/cvsEqJ9YkLLd1tPkyP5YXEKbbRCSfdGUP4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772290555; c=relaxed/simple;
-	bh=Rs/ureIuz5rpZWNFJATPsZPW2/ha1dch4gJGxyvGaW4=;
+	s=arc-20240116; t=1772290553; c=relaxed/simple;
+	bh=zQLa9bOnoHCwDeWYTV/rY8bZ5b5dl5x4sZDEVROpOa8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=omzdbauyxAz/1QcDxUbLZdE4c+Aq67aWC9gix8jKhbF+rooxUvJPi146IobKil2jQ3PTPOoihqWPGCILZVST6S5Cs4FLyEJIMASCUTIQTtgfeFjOfpwwxkNv3/Hf41lEpD6qwk2W9SL5QMYY34lbKL/QgiYITBhlqIZwPQWYZAk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valinux.co.jp; spf=pass smtp.mailfrom=valinux.co.jp; dkim=pass (1024-bit key) header.d=valinux.co.jp header.i=@valinux.co.jp header.b=e+MQ0t1D; arc=fail smtp.client-ip=52.101.228.96
+	 Content-Type:MIME-Version; b=njFuL304fakutloqBzbytKfy/kFr8zwRxi7Qe+9C6SoW9USwH/LvybrASf18qTonuU8RfVdPhMkRYVrEtY7KxQXK91XVhguwOJjjhe5ZXqbNBfGLfpyRoRLJoiIm/a879bozOEzHUoaIi+/VCvMiZdsm3XwnkDyWEk2Hv/8lygk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valinux.co.jp; spf=pass smtp.mailfrom=valinux.co.jp; dkim=pass (1024-bit key) header.d=valinux.co.jp header.i=@valinux.co.jp header.b=Q9vSWcg7; arc=fail smtp.client-ip=52.101.125.76
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valinux.co.jp
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=valinux.co.jp
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kQMC5jsztpbyRda/tM5hHtnjQTWmM7rXXtZTbOBtbKIAYOqBye4dYKWXHla/kxMZXF+z++I54rDUL3XDAbciGauNq/ar6mgfzTDsj+Fa5K839iY4DO5CYcKPlsSO9CJ8x/+pq1ZHF1KnEReev+93gRDyVV4eetbwzq4nlbjaNlZDjN3k1cX25XsmevrDod+kJVcEMsJYblXiYU+43grAsw4RwlQ0CNva4WDgm+EB/F3NR4Ry/9iJjddszYp57ajRIJ7jtQKjWFU9vJ6uEe0ZkzSpr7SIm41sv/0t0DQFVHlVwMyoy7atr/dTUEvsaxUbbKWeOExN96W59dcf54WYmg==
+ b=r2D5dgi66JtKLm+Vi+COhxQnSnGzskz2WAiLzAlviw66xplj6vj0OciDj/cAoqnqDnBZgpeQGUnjRkW7LuJRAveUfmFidBUfruW/mIZ6sIvmROXOfw0mTPOmUBZur+KaX3kIZBsj3e05HGr+e3mIsrjlEtvVOQ3EhhMNA0Ad0OSh/D2QIuSIk7FejpYwXUiT0QrpCGTT5Ix3rj5w4xaN+a6heKOzpmUiCujsUSE9TTDdre46h9G32+TogKHJB+qW8YjZtO++xlAUfqGNExSNQ482Ce+6fDhtmznjdVMhpcA/PNpVPDYmX3LSmsEPfujm9g0h0/DIc+po2yPJzytvmg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0zZttERInpH2212CkOMsuFpRsaBRmoT7Aty5F6mfMvI=;
- b=Gv6Vjha+l0disY65/8aqcwaMnuuZPi3T5xeqLiifCN693O8Qj7CmvS8ENebiiKxUCKooJxDnsJhqyJLwcUG135IKAYLq3UkuX4xGKP9vP0oK9WV6rSEfc0yje7H1j00hdCkjXGcBDNEOA1l4hVyHtAJcRG0AQ1OOvYlnhBq67j5frdWcA0yDesE2jW+qGI3E7RMIuz75Te4KPjP/LbZ3dpMzOvGbYetbDJIwGgy3dcSEJ8lHQ9c43WetIvVXy1HwOsvGdLHSmgy/DivraqoPbBIiqLdCR4x/y3ufS4aRr8X8uanMjsPnoURQKJMshZcdTFOw1zSs1vTApms3irdxqw==
+ bh=ZY5C4X9dZy+w/CE2+h/nTfa6h78czuprcim2Y5EaD/o=;
+ b=GuYmAAgptXsxDKN1tIJzYcoQi+iJlgqJz4l1Q9KlkNSbZjjRoi13fyycn2cUkl9yaWVVigV/siIORhaZOGLkP8CCududBlXE+4+yGRqhllkjYHBDc8k2SeMyt5/+EGoDRtgFldwE6wq/wmhwDoR6ZoMQ9LBybL1tIq9ZVBamN0rHDiPGj9lGNMEWMkzjr193NZOxB5ZchLoqWg+n/oH+SZxixQPwXiqgrUCMCaJd72uhGFFplbR222O9sxX7q9vo0rwtS47nZg5FFjUNae4r2k0Ta5LWYOOIfISDQNWlpoCWb15BGc3gP6K3Hvc6UBDUodyQY1eXiYSm2Yan0qBf+A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=valinux.co.jp; dmarc=pass action=none
  header.from=valinux.co.jp; dkim=pass header.d=valinux.co.jp; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=valinux.co.jp;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0zZttERInpH2212CkOMsuFpRsaBRmoT7Aty5F6mfMvI=;
- b=e+MQ0t1DP7CwM7trscsqdFo8Gf5lezkipVuuVNbzU8Sv/tsZnzxKZx4OSxe13V+BkGB6FDISQmUgmw7pLotZmOHajotvPrjBkHw0O2r+X4Zky2lNr1ok6xWwltNAO7BSyK9eFEvpiexOBI5rbOaWHlRUdMTmlK9DGlcw5GG+Orc=
+ bh=ZY5C4X9dZy+w/CE2+h/nTfa6h78czuprcim2Y5EaD/o=;
+ b=Q9vSWcg7BMbtFSQNjMV6RuKUIa2mIu67VmxJkjaZzyGdwCZnedKXoQRh8v3FOxHF3wSOFtx8MCrcPdZbNKDV4deSpNt6lSU4t5g7Q+GrNGV9PmI2BrQtlLNzS/FzYG7vGDWDGisG9AH8SqV2oU+52I/+BmLSETiPE+UQSvItHSU=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=valinux.co.jp;
 Received: from TY7P286MB7722.JPNP286.PROD.OUTLOOK.COM (2603:1096:405:38f::10)
- by TYYP286MB5182.JPNP286.PROD.OUTLOOK.COM (2603:1096:405:164::7) with
+ by OSCP286MB5596.JPNP286.PROD.OUTLOOK.COM (2603:1096:604:3c7::5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.18; Sat, 28 Feb
- 2026 14:55:48 +0000
+ 2026 14:55:49 +0000
 Received: from TY7P286MB7722.JPNP286.PROD.OUTLOOK.COM
  ([fe80::2305:327c:28ec:9b32]) by TY7P286MB7722.JPNP286.PROD.OUTLOOK.COM
  ([fe80::2305:327c:28ec:9b32%5]) with mapi id 15.20.9654.013; Sat, 28 Feb 2026
@@ -72,16 +72,16 @@ To: Jon Mason <jdmason@kudzu.us>,
 Cc: ntb@lists.linux.dev,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 3/4] net: ntb_netdev: Factor out multi-queue helpers
-Date: Sat, 28 Feb 2026 23:55:37 +0900
-Message-ID: <20260228145538.3955864-4-den@valinux.co.jp>
+Subject: [PATCH v2 4/4] net: ntb_netdev: Support ethtool channels for multi-queue
+Date: Sat, 28 Feb 2026 23:55:38 +0900
+Message-ID: <20260228145538.3955864-5-den@valinux.co.jp>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260228145538.3955864-1-den@valinux.co.jp>
 References: <20260228145538.3955864-1-den@valinux.co.jp>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: TY4P286CA0076.JPNP286.PROD.OUTLOOK.COM
- (2603:1096:405:36d::10) To TY7P286MB7722.JPNP286.PROD.OUTLOOK.COM
+X-ClientProxiedBy: TYCPR01CA0151.jpnprd01.prod.outlook.com
+ (2603:1096:400:2b1::7) To TY7P286MB7722.JPNP286.PROD.OUTLOOK.COM
  (2603:1096:405:38f::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -90,59 +90,59 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: TY7P286MB7722:EE_|TYYP286MB5182:EE_
-X-MS-Office365-Filtering-Correlation-Id: 067a878b-068f-49d1-b0ab-08de76d9753c
+X-MS-TrafficTypeDiagnostic: TY7P286MB7722:EE_|OSCP286MB5596:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1ba7fdab-f3ae-44df-f484-08de76d975b6
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|1800799024|10070799003|366016;
+	BCL:0;ARA:13230040|366016|1800799024|10070799003|376014|7416014;
 X-Microsoft-Antispam-Message-Info:
-	78Fzm17m0ys5DyReq2kApic6gok4RwiiZse25v+koA8qdPIDUIj9kWl0ji2F67HSwoE5RYRVxsV+oL4aQS352GB4+dtRHZ5ikm+0bApm422/RdBvnI+2XMEwIDpgTYiNVRzjw92pHoLrTybIQiApt8W9scMs2N4SYnbbRoS9KRiJ0XVj15kaVUPInc01x9EMthE1uzrkIKydbrjcl3lhb1qH5Byhn/aoT5ZruSYG9m0cdrRKHVBFXiD7lokdxqWvfQl/OrWYSl3T8LLXvftDX5CPUARE5Jl6aUSlb57MVuljwYmEY6kKpOjZMfPmkhJPceYgLWl4ZGnHPE6fxUlTINd0eRT4sTg3/LwC86BiWFdxTKhC8+dAQQ2458sonGZ+gzPH0u3f3bPYnH5w7lI+AlPQKxDBZ1KVWhROkYiNiW6y0sGfX/BSsPhS64STXbSh/DXLibpa5G5lOGghth2+uuIMWvYvUiU430h+LeStMhXnXsQ8zfYX5Bj/Hj8JxshDFpLg/Rq5d4owYQ1V5vWOW1xzcUWjTfmV65CulS6cK95FYxn5FKZ7ObAvv8Un3T5Kkbm3b+l2kmf96eUNYTa0SIbLzi56QjQpCBcymnB7wSRNxX2YJkRF8hw7eaHrSba0WeYYIO+s3pm7q2C6MHNf7gli7ewRBWNWBb6yt7BbH+k2UCzUTQ8ywYFYm/4AS+8UxS3qAUrQhxi1MZLmJp1zAocXHhQJNxuIPlsaIWllgSc=
+	Fn5ddDTnRqkidJlkl3BKaPH5741wj+rPo6NBcxFVy3gOmP9XdT6zhZJZpLDmrkRLXBt3INwIzx9UrVv7PObPW72cnFF+DDNb4gdE01GTf/dINtLutxMpZkysBAXqQI/G5W3dquHuoelI16K/ClJU+rUL66aSoRGNsK04tzULT7tJnCxToKZrtKO6HSqaf/byXi0gdQxS+YXTgJaBXi2kC4yH8zRUkhvXSZbP7jVHylQdGOnIW1X4PdOCQEwywbm7YplHnTuc9Xh03Nv/OFI7OBC9d5eIiz7iV/17H+NsOkYk/ola6/Nb444LgKaCLY7N26J0mNMdaMrjX81toTBxaxJJ8Dar0tmgxgwmzPJ79dBl3wAu2wofkpJu8HDSjldMIWvQA2PUiN2oFrg4h2vL18BX6dPhNRQwfkihHqaOYDSOGSm9FMavlH7Aslw+IyLR4Yt4dfy9xQX3epL0nfPxlADAFSAyWHifSvRVum6lzQMoj7O1VP/JwGE1QIaVZf1Gy2AQune0r83h1grdADypX94oVpeEe9GGpPbTyO40hUdD9MGkY8HDOosZNwrKFRxXnzhklbXn7ECmiWdOw3ZU6wbVLh3O6kg7FwHNbFA/ucN0IkerK9EZnA1ecER5y9q8VTp4fic+WpzgGo297QDOMF17ib1O5o/vJtqaHYgFJfxnkykgbJPjD4FHenZYKv2Iu4uxRZ03RECLZg7nad12rCJVo1ln3aMp2A6VmdjALA8=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY7P286MB7722.JPNP286.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(10070799003)(366016);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY7P286MB7722.JPNP286.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(10070799003)(376014)(7416014);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?zUwN8Xec5bayQkNueW8hJbPAj7VZYwO270UZHQ1L8obFkZnzamE9gSaWGyGr?=
- =?us-ascii?Q?4yqvMwFTGuxLmAxqf4tnhdqYiVbCOUjtKUiz21v9Qevisks9lAOgiVzJvJdM?=
- =?us-ascii?Q?7oeZGoAS9tWGGaOBBmwapSklXSapLNcJJSt8qX8dWmYlf7Y4m+hXrORaD1ve?=
- =?us-ascii?Q?fJAYJ4xl4CzjIRcC21IR0ixmBDKgVExJu1BfBV3625egZFQCsAmSnLB8Pmt1?=
- =?us-ascii?Q?kOaHA6bQgGI5Ky6G5Cqlu2AfsPrML7uCcUPIlAmm32o7Wz4o6A4XfCs9mrtg?=
- =?us-ascii?Q?mJUbYEkFPeEDF2Judp9R+RoDhDHH3I7P56aHKvlvXHemPEIQIiXayXV6ywBD?=
- =?us-ascii?Q?rcjg00jomw1GQRoTAlm7kuiO3DvTvUx5Yj+z0kc4laXPZnhCw1Kx0Wdq96iU?=
- =?us-ascii?Q?7ZMfWCVxKnqDbwbglVT/YEDX+Bl1HwWpO6a9JtAO08dqYT0j6NyEtAh3Pgyn?=
- =?us-ascii?Q?FXN1fx4LyUyhPe5iNSDOg/bNWiNLEtoliAV6Fv7NaViU/+tkeuTjcDaWFasW?=
- =?us-ascii?Q?5gqXNf8S+8hkB8P7xEzNrrSGi224HpWoBOgDUJkQV1wKJkaysapzolTMVnG0?=
- =?us-ascii?Q?x5bTPOjzHZxVPDhK1FvlDA9EOlMCO7pwTZ8s5vOJURPLVztu7bAnwbl9XEGH?=
- =?us-ascii?Q?89v4/PZmBRLUr2Js+awMs1ezf6lPhDf3fain7U0u6MI4jLp3sr1wQLFznkOk?=
- =?us-ascii?Q?6cOo0Ow8vUQy5xVWDIm1mMc2dK2B/5guoGU+kiterMQLuu2dX+wOwQ5yKZEM?=
- =?us-ascii?Q?1Zed9wlX3vc4I4tLvhLbZyYpTMtilE0iASNrIEcKt9td5ym3Xuh2KcxysjDx?=
- =?us-ascii?Q?kUsoJPhjrBYILWaNAPtOw23NJh/JY8fwq1H04KB7FHBiM1E/L+3igzw8jBy+?=
- =?us-ascii?Q?/krwSH3qNfKK4acVtHFKFhqRT7AcKqP18B9tCaOlhArpYjFKEOVAPb+VYOZO?=
- =?us-ascii?Q?PGr+i/VtRvD+QdYNInVhE4vbvF0f0hBEYfSDiR4zBIqXtEus94qc0aSe9ysG?=
- =?us-ascii?Q?thw1CzTC6rfEYQWiiO5KBKldm9A/SRSVub7B0hebEioel4VgjQS0/LPT7IvQ?=
- =?us-ascii?Q?s7vPalnxNQuHUydUkj2a+7bARdXCFoOiyAZ3aJlHcK5sm/T/IdsrJ/L9pEL2?=
- =?us-ascii?Q?T87jPpuuGXdZU8fMrpKd06xru/+S3Ete4zVehdEY8I2pFpXlLpVyPJ4Q00lR?=
- =?us-ascii?Q?JM7qaT1W09CMYLvi25Gdpdg+OEX9CeU8nOea4chcdTMEDbjiDmmfTEC79kP9?=
- =?us-ascii?Q?tf1tqqdR4x09ZasDEYIZyOB58bp3u781Qvi4+XxrsdK57VA2052zflozC5ya?=
- =?us-ascii?Q?GYJFIaW6wdMIJyYkE8mHtgYyfFYSApDjZjhcKzvy1r+nZgJZs2SJPg9XsBzR?=
- =?us-ascii?Q?q4OL2zzgx8Ebiykx7g9zSBxpqc73DRrUGCsfczbl//ITV0D/V7OPnXi98kwL?=
- =?us-ascii?Q?+ypyS1st45RHF9m2xNApdbWv3WsmrHawapI9hsf7ucxbkEhKbJz/+x7sLnZJ?=
- =?us-ascii?Q?N2K/vqrlgsCATffgEXGmY/O5pM0wRh7EyaBBmcCvWcGwnKDrSYQyMgJ5mAMe?=
- =?us-ascii?Q?tLcqFx9EAmqlV/loBmYPWgGejaB61JwinXSq7Laau0dH5yulOvuiO8d2oh0w?=
- =?us-ascii?Q?joLfVp3Nf6DL9s0G/Hr2WutfavkxQ5P+Kk0Fp5WUW1BvTBiiBfj/4yVB8Rsc?=
- =?us-ascii?Q?P3fnq1AaNHjJXM64mXIaxd1A39pa7eI82HkDaX+5DQiMJvm/6Jw6tNspLLZO?=
- =?us-ascii?Q?+W3hHOy6xuK9SGRtYhwsIN12b6sMCpGdh4+bpX6KEWMAO+VkGAM1?=
+	=?us-ascii?Q?gIl7jiL02EybEEkwR9Ew5ZGlM1ERFJsohz/cI5c/Dd+SjPAlAUxy5NVO9BJC?=
+ =?us-ascii?Q?3ku1mjXLHZMmEVM3DMMRGq2NCCNul9PQ78nzPNMohfJGwSTlq/qRaq3W9J2s?=
+ =?us-ascii?Q?nUtcSZmxPfJmtBySd0D95XYenmu7azsjqF/BVUse/bZsJ93EjM9swH3U9ixC?=
+ =?us-ascii?Q?cTSFRXOKnZf2bZHYtkqWQp3GEBcHRrsHgR5X+tDymE2C5P2bK93zjIOryDBF?=
+ =?us-ascii?Q?sgn6AL0KZZX2xYwUhKvtPW+qARG8StdnYFO1xbWTTpxNwMbQJ9viT65qu4l2?=
+ =?us-ascii?Q?UcmXgnUgx9z/g9l8rLXbOspfz/31vauHdY49BPIakZwM+GSAECpYBhVEZydv?=
+ =?us-ascii?Q?o0UpF9uqtVxq5HOPeMoQyGGl6IFS/B7m8DOMk53KLwRDSSTRonoAy707z296?=
+ =?us-ascii?Q?W4p4zoLrl+oXCij8rlhcjIlexPiRh85JciqPMet7gH9k1DtSA+eDDicRcKP7?=
+ =?us-ascii?Q?D1QpVw3Rg0z2+HxXdYxK5f1aiw2KllrKuC03U30B/i5uZz+pOeAYxi6VPcop?=
+ =?us-ascii?Q?tBGOI6h8DYGbgjHZT382BZ69Jvek6xegi8dFi9Sc0RS/sPHaSZDpD0+7+7Fi?=
+ =?us-ascii?Q?8OEjN9YD2hSayYtnnscnFXr9i0Fx3z661dB0lsWQsxGfXx+ExKUOEkhsp93a?=
+ =?us-ascii?Q?OKlEt/EsqmsTdkIWO1K6o5CwhUv67/J4BvKibInNHX5AHPn4osmRhFvqZfje?=
+ =?us-ascii?Q?bxbAamtnXAMRQejyPbaS+SdrzBB5IV3q1cBIIiJI+hL3hjFua3TiUkRmXeYe?=
+ =?us-ascii?Q?HqrOuaprZ1xBs9ASFlkVPSnTlV2ro3Nzui8hPp2IYzYcZEv2iNhfsiFyPw6e?=
+ =?us-ascii?Q?ZdaYjjHhiwzJefUQsaELa0M/NgfVUwKMUSkTmSIUllwzWT+r141bf4SECGz2?=
+ =?us-ascii?Q?QHtcTOqrTSyi+CH386dFmTXQ1pxRPoKv9V+yeTlprZ3R8PwDb4L+FVT5JaDG?=
+ =?us-ascii?Q?DzJkCMwlgWkvWt7ou5+3qATL5yq3PM1po1VQPnJf23BH+EmXeEG8f9EduMst?=
+ =?us-ascii?Q?v1EnvPENs1w1zWTSk87wvVjxxRDXnwqssQpubw1QqyTMVxwxsv9TBSXCKWjx?=
+ =?us-ascii?Q?dCdrKgSy8mV+jcUJyQMwSHBIriPIdfDTVE4WD38iDh4Eg4lVfXAlXrf/LmHI?=
+ =?us-ascii?Q?FrYtJ7srDzQlT8rx/niWRl9ARSI/uOmpDRt5HnT/ZFbvBkQL/Z92/VzTvREb?=
+ =?us-ascii?Q?qPmMzIZaTcFoM9oG8N5WKg/ip4vD1V9s+xv6SXApt9FINoZBNdT2QqU73bIA?=
+ =?us-ascii?Q?J4hRlW9/NYgOMaIFjJBpd0RupypyC2HGUuJhtMRE2BgNqoJ0I7bgUaV9Nhxx?=
+ =?us-ascii?Q?EE+4H61S3uC9vslzlBYvDgo5rBR2oGt/xzueq4zWtVBklIeg1gy8lqtaTWJk?=
+ =?us-ascii?Q?LDjlBtsQCBtpJ3PWKsK0pRQ4L1HQonGCVx3Tlc312eW13vWVmpnSzeaBwe7U?=
+ =?us-ascii?Q?QTj5PoQXybIPFJaII72StPo9gAeF8qTzfAEcg98r0tSSztCUSAd5rVHO1E/G?=
+ =?us-ascii?Q?8geGxcTwH+xlPBFZVptOFPxP+duHqbmPQqKg7eBb2ZNSO1Ks48FfBHZD2fpC?=
+ =?us-ascii?Q?cMJcY+VWAFEwBBpqo5UsyzYyZ4BLPRkwYB11OketDkAzrKkx8AXg8iuQP+4w?=
+ =?us-ascii?Q?+afUX8Lrz2pr77ukfQaqNLLkDTdFdYKf/H5tH1pR/fzJxaDim4UrQgZR7Iy1?=
+ =?us-ascii?Q?P7saJbmTFEO4l/6Y8jD36ai6xy2xmKqiJABlgfwGemje9vB2UmAsA/5cQCAw?=
+ =?us-ascii?Q?RHZ/fuuora0iwsFQ3YOjDjqWugKRkpIPeFU/jIIToVAXYhK39UOS?=
 X-OriginatorOrg: valinux.co.jp
-X-MS-Exchange-CrossTenant-Network-Message-Id: 067a878b-068f-49d1-b0ab-08de76d9753c
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1ba7fdab-f3ae-44df-f484-08de76d975b6
 X-MS-Exchange-CrossTenant-AuthSource: TY7P286MB7722.JPNP286.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Feb 2026 14:55:48.0588
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Feb 2026 14:55:48.8771
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 7a57bee8-f73d-4c5f-a4f7-d72c91c8c111
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: N4GoqmqfJVMz4PU3t7iCbo8fL2bJznnPUVOQvKzB8ZrtedonJf6WUpC4itK1FObIn+GTeZZMT5F0FG421kFFOw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYYP286MB5182
+X-MS-Exchange-CrossTenant-UserPrincipalName: Jm7XzqMZ71duny4CrU4gArxohhYKwo7noEGwsc3yHxPyvSHIwEWsbk0QGEbNOWhLCqoi503+MSeMMGzyyTFFBw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSCP286MB5596
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -151,7 +151,7 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[valinux.co.jp,none];
 	R_DKIM_ALLOW(-0.20)[valinux.co.jp:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -159,7 +159,7 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_TO(0.00)[kudzu.us,intel.com,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	TAGGED_FROM(0.00)[bounces-262153-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262152-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -168,195 +168,210 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	DKIM_TRACE(0.00)[valinux.co.jp:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.992];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.993];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[valinux.co.jp:mid,valinux.co.jp:dkim,valinux.co.jp:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 55ABC1C3C0F
+X-Rspamd-Queue-Id: D95381C3BF8
 X-Rspamd-Action: no action
 
-Implementing .set_channels will otherwise duplicate the same multi-queue
-operations at multiple call sites. Factor out the following helpers:
+Support dynamic queue pair addition/removal via ethtool channels.
+Use the combined channel count to control the number of netdev TX/RX
+queues, each corresponding to a ntb_transport queue pair.
 
-  - ntb_netdev_update_carrier(): carrier is switched on when at least
-                                 one QP link is up
-  - ntb_netdev_queue_rx_drain(): drain and free all queued RX packets
-                                 for one QP
-  - ntb_netdev_queue_rx_fill():  prefill RX ring for one QP
+When the number of queues is reduced, tear down and free the removed
+ntb_transport queue pairs (not just deactivate them) so other
+ntb_transport clients can reuse the freed resources.
 
-No functional change.
+When the number of queues is increased, create additional queue pairs up
+to NTB_NETDEV_MAX_QUEUES (=64). The effective limit is determined by the
+underlying ntb_transport implementation and NTB hardware resources (the
+number of MWs), so set_channels may return -ENOSPC if no more QPs can be
+allocated.
+
+Keep the default at one queue pair to preserve the previous behavior.
 
 Signed-off-by: Koichiro Den <den@valinux.co.jp>
 ---
- drivers/net/ntb_netdev.c | 99 ++++++++++++++++++++++++----------------
- 1 file changed, 59 insertions(+), 40 deletions(-)
+ drivers/net/ntb_netdev.c | 147 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 147 insertions(+)
 
 diff --git a/drivers/net/ntb_netdev.c b/drivers/net/ntb_netdev.c
-index 19a3383d86f8..6aa59316569c 100644
+index 6aa59316569c..c2b1886775bf 100644
 --- a/drivers/net/ntb_netdev.c
 +++ b/drivers/net/ntb_netdev.c
-@@ -94,24 +94,12 @@ struct ntb_netdev {
- #define	NTB_TX_TIMEOUT_MS	1000
- #define	NTB_RXQ_SIZE		100
- 
--static void ntb_netdev_event_handler(void *data, int link_is_up)
-+static void ntb_netdev_update_carrier(struct ntb_netdev *dev)
- {
--	struct ntb_netdev_queue *q = data;
--	struct ntb_netdev *dev = q->ntdev;
- 	struct net_device *ndev = dev->ndev;
- 	bool any_up = false;
- 	unsigned int i;
- 
--	netdev_dbg(ndev, "Event %x, Link %x, qp %u\n", link_is_up,
--		   ntb_transport_link_query(q->qp), q->qid);
--
--	if (netif_running(ndev)) {
--		if (link_is_up)
--			netif_wake_subqueue(ndev, q->qid);
--		else
--			netif_stop_subqueue(ndev, q->qid);
--	}
--
- 	for (i = 0; i < dev->num_queues; i++) {
- 		if (ntb_transport_link_query(dev->queues[i].qp)) {
- 			any_up = true;
-@@ -125,6 +113,56 @@ static void ntb_netdev_event_handler(void *data, int link_is_up)
+@@ -113,6 +113,24 @@ static void ntb_netdev_update_carrier(struct ntb_netdev *dev)
  		netif_carrier_off(ndev);
  }
  
-+static void ntb_netdev_queue_rx_drain(struct ntb_netdev_queue *queue)
++static void ntb_netdev_sync_subqueues(struct ntb_netdev *dev)
 +{
-+	struct sk_buff *skb;
-+	int len;
-+
-+	while ((skb = ntb_transport_rx_remove(queue->qp, &len)))
-+		dev_kfree_skb(skb);
-+}
-+
-+static int ntb_netdev_queue_rx_fill(struct net_device *ndev,
-+				    struct ntb_netdev_queue *queue)
-+{
-+	struct sk_buff *skb;
-+	int rc, i;
-+
-+	for (i = 0; i < NTB_RXQ_SIZE; i++) {
-+		skb = netdev_alloc_skb(ndev, ndev->mtu + ETH_HLEN);
-+		if (!skb)
-+			return -ENOMEM;
-+
-+		rc = ntb_transport_rx_enqueue(queue->qp, skb, skb->data,
-+					      ndev->mtu + ETH_HLEN);
-+		if (rc) {
-+			dev_kfree_skb(skb);
-+			return rc;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static void ntb_netdev_event_handler(void *data, int link_is_up)
-+{
-+	struct ntb_netdev_queue *q = data;
-+	struct ntb_netdev *dev = q->ntdev;
 +	struct net_device *ndev = dev->ndev;
++	unsigned int q;
 +
-+	netdev_dbg(ndev, "Event %x, Link %x, qp %u\n", link_is_up,
-+		   ntb_transport_link_query(q->qp), q->qid);
++	if (!netif_running(ndev))
++		return;
 +
-+	if (netif_running(ndev)) {
-+		if (link_is_up)
-+			netif_wake_subqueue(ndev, q->qid);
++	for (q = 0; q < dev->num_queues; q++) {
++		struct ntb_netdev_queue *queue = &dev->queues[q];
++
++		if (ntb_transport_link_query(queue->qp))
++			netif_wake_subqueue(ndev, queue->qid);
 +		else
-+			netif_stop_subqueue(ndev, q->qid);
++			netif_stop_subqueue(ndev, queue->qid);
 +	}
-+
-+	ntb_netdev_update_carrier(dev);
 +}
 +
- static void ntb_netdev_rx_handler(struct ntb_transport_qp *qp, void *qp_data,
- 				  void *data, int len)
+ static void ntb_netdev_queue_rx_drain(struct ntb_netdev_queue *queue)
  {
-@@ -299,28 +337,16 @@ static int ntb_netdev_open(struct net_device *ndev)
- {
- 	struct ntb_netdev *dev = netdev_priv(ndev);
- 	struct ntb_netdev_queue *queue;
--	struct sk_buff *skb;
- 	unsigned int q;
--	int rc = 0, i, len;
-+	int rc = 0;
+ 	struct sk_buff *skb;
+@@ -464,6 +482,8 @@ static const struct net_device_ops ntb_netdev_ops = {
+ 	.ndo_set_mac_address = eth_mac_addr,
+ };
  
- 	/* Add some empty rx bufs for each queue */
- 	for (q = 0; q < dev->num_queues; q++) {
- 		queue = &dev->queues[q];
- 
--		for (i = 0; i < NTB_RXQ_SIZE; i++) {
--			skb = netdev_alloc_skb(ndev, ndev->mtu + ETH_HLEN);
--			if (!skb) {
--				rc = -ENOMEM;
--				goto err;
--			}
--
--			rc = ntb_transport_rx_enqueue(queue->qp, skb, skb->data,
--						      ndev->mtu + ETH_HLEN);
--			if (rc) {
--				dev_kfree_skb(skb);
--				goto err;
--			}
--		}
-+		rc = ntb_netdev_queue_rx_fill(ndev, queue);
-+		if (rc)
-+			goto err;
- 
- 		timer_setup(&queue->tx_timer, ntb_netdev_tx_timer, 0);
- 	}
-@@ -336,9 +362,7 @@ static int ntb_netdev_open(struct net_device *ndev)
- err:
- 	for (q = 0; q < dev->num_queues; q++) {
- 		queue = &dev->queues[q];
--
--		while ((skb = ntb_transport_rx_remove(queue->qp, &len)))
--			dev_kfree_skb(skb);
-+		ntb_netdev_queue_rx_drain(queue);
- 	}
- 	return rc;
- }
-@@ -347,9 +371,7 @@ static int ntb_netdev_close(struct net_device *ndev)
- {
- 	struct ntb_netdev *dev = netdev_priv(ndev);
- 	struct ntb_netdev_queue *queue;
--	struct sk_buff *skb;
- 	unsigned int q;
--	int len;
- 
- 	netif_tx_stop_all_queues(ndev);
- 	netif_carrier_off(ndev);
-@@ -358,12 +380,10 @@ static int ntb_netdev_close(struct net_device *ndev)
- 		queue = &dev->queues[q];
- 
- 		ntb_transport_link_down(queue->qp);
--
--		while ((skb = ntb_transport_rx_remove(queue->qp, &len)))
--			dev_kfree_skb(skb);
--
-+		ntb_netdev_queue_rx_drain(queue);
- 		timer_delete_sync(&queue->tx_timer);
- 	}
++static const struct ntb_queue_handlers ntb_netdev_handlers;
 +
+ static void ntb_get_drvinfo(struct net_device *ndev,
+ 			    struct ethtool_drvinfo *info)
+ {
+@@ -491,10 +511,137 @@ static int ntb_get_link_ksettings(struct net_device *dev,
  	return 0;
  }
  
-@@ -429,8 +449,7 @@ static int ntb_netdev_change_mtu(struct net_device *ndev, int new_mtu)
++static void ntb_get_channels(struct net_device *ndev,
++			     struct ethtool_channels *channels)
++{
++	struct ntb_netdev *dev = netdev_priv(ndev);
++
++	channels->combined_count = dev->num_queues;
++	channels->max_combined = ndev->num_tx_queues;
++}
++
++static int ntb_set_channels(struct net_device *ndev,
++			    struct ethtool_channels *channels)
++{
++	struct ntb_netdev *dev = netdev_priv(ndev);
++	unsigned int new = channels->combined_count;
++	unsigned int old = dev->num_queues;
++	bool running = netif_running(ndev);
++	struct ntb_netdev_queue *queue;
++	unsigned int q, created;
++	int rc = 0;
++
++	if (channels->rx_count || channels->tx_count || channels->other_count)
++		return -EINVAL;
++
++	if (!new || new > ndev->num_tx_queues)
++		return -ERANGE;
++
++	if (new == old)
++		return 0;
++
++	if (new < old) {
++		if (running)
++			for (q = new; q < old; q++)
++				netif_stop_subqueue(ndev, q);
++
++		rc = netif_set_real_num_queues(ndev, new, new);
++		if (rc)
++			goto out_restore;
++
++		/* Publish new queue count before invalidating QP pointers */
++		dev->num_queues = new;
++
++		for (q = new; q < old; q++) {
++			queue = &dev->queues[q];
++
++			if (running) {
++				ntb_transport_link_down(queue->qp);
++				ntb_netdev_queue_rx_drain(queue);
++				timer_delete_sync(&queue->tx_timer);
++			}
++
++			ntb_transport_free_queue(queue->qp);
++			queue->qp = NULL;
++		}
++
++		goto out_restore;
++	}
++
++	created = old;
++	for (q = old; q < new; q++) {
++		queue = &dev->queues[q];
++
++		queue->ntdev = dev;
++		queue->qid = q;
++		queue->qp = ntb_transport_create_queue(queue, dev->client_dev,
++						       &ntb_netdev_handlers);
++		if (!queue->qp) {
++			rc = -ENOSPC;
++			goto err_new;
++		}
++		created++;
++
++		if (!running)
++			continue;
++
++		timer_setup(&queue->tx_timer, ntb_netdev_tx_timer, 0);
++
++		rc = ntb_netdev_queue_rx_fill(ndev, queue);
++		if (rc)
++			goto err_new;
++
++		/*
++		 * Carrier may already be on due to other QPs. Keep the new
++		 * subqueue stopped until we get a Link Up event for this QP.
++		 */
++		netif_stop_subqueue(ndev, q);
++	}
++
++	rc = netif_set_real_num_queues(ndev, new, new);
++	if (rc)
++		goto err_new;
++
++	dev->num_queues = new;
++
++	if (running)
++		for (q = old; q < new; q++)
++			ntb_transport_link_up(dev->queues[q].qp);
++
++	return 0;
++
++err_new:
++	if (running) {
++		unsigned int rollback = created;
++
++		while (rollback-- > old) {
++			queue = &dev->queues[rollback];
++			ntb_transport_link_down(queue->qp);
++			ntb_netdev_queue_rx_drain(queue);
++			timer_delete_sync(&queue->tx_timer);
++		}
++	}
++
++	while (created-- > old) {
++		queue = &dev->queues[created];
++		ntb_transport_free_queue(queue->qp);
++		queue->qp = NULL;
++	}
++
++out_restore:
++	if (running) {
++		ntb_netdev_sync_subqueues(dev);
++		ntb_netdev_update_carrier(dev);
++	}
++	return rc;
++}
++
+ static const struct ethtool_ops ntb_ethtool_ops = {
+ 	.get_drvinfo = ntb_get_drvinfo,
+ 	.get_link = ethtool_op_get_link,
+ 	.get_link_ksettings = ntb_get_link_ksettings,
++	.get_channels = ntb_get_channels,
++	.set_channels = ntb_set_channels,
+ };
  
- 		ntb_transport_link_down(queue->qp);
- 
--		while ((skb = ntb_transport_rx_remove(queue->qp, &len)))
--			dev_kfree_skb(skb);
-+		ntb_netdev_queue_rx_drain(queue);
- 	}
- 
- 	netdev_err(ndev, "Error changing MTU, device inoperable\n");
+ static const struct ntb_queue_handlers ntb_netdev_handlers = {
 -- 
 2.51.0
 
