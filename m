@@ -1,151 +1,153 @@
-Return-Path: <netdev+bounces-262109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262110-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0F8VAVvNomkj5gQAu9opvQ
-	(envelope-from <netdev+bounces-262109-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 12:11:23 +0100
+	id koeMAe3NommC5gQAu9opvQ
+	(envelope-from <netdev+bounces-262110-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 12:13:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C8511C2807
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 12:11:22 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D211D1C2831
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 12:13:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BE093301061F
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 11:11:21 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 185CE3024B3B
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 11:13:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E768342E004;
-	Sat, 28 Feb 2026 11:11:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03B0E42DFF2;
+	Sat, 28 Feb 2026 11:13:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PbMQcskD"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jYJ1YA/D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97AD942DFEB;
-	Sat, 28 Feb 2026 11:11:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 724A336C5BB
+	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 11:13:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772277078; cv=none; b=GgKwYnQKraptj6mTe1VEQ7VKE6HpfVJDGIGoDU6JoG/3N9tvZ7NXhB+FmhMf4+2z7X/jMZrUiR+5k8d4WJ2YjezP7jdPWQh8K9PcTpDfz/BaZxq5sQnGl0pE9DbUpWSYmTQels7IQ4QkmUhUSIqwMeUi7ySjgQoYHriG7RL149w=
+	t=1772277222; cv=none; b=U75tkGYybQtr2gTvf+DpNEny2RLKPX6GWDyW/yyL3pdyE/cg96QCoJkLEfILy7BxZ7IPRpuauuaLlMfmDrtvhfa0DRCEtvAEARscSBOcJfrxje9Z2AQ8SnqV9+l2HnIUJQ5XKsRA8nvGWSxztR8Tpc5cwapHtX1CUr/RlkHOAyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772277078; c=relaxed/simple;
-	bh=qeJjeeYo7h+jV66lUjMWyEjvn5PUYwkmIU9ffj0uwZ4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jFvXDpx6+RvVjY/O59P96zrgb7mAGy6yNMavPx5J4Ucvdk0r1XBeZ//kF7IUQnH1Lh4LK09D4vFd/tNCd2rcI/G/lnjC0wSMV35haSC7X/U9p0j1IkGG0VvyWE416Zbl2ZayBrN/aWbiR0tG/j5InC3tJmPGOT/9oUoPcvce5u4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PbMQcskD; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772277077; x=1803813077;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=qeJjeeYo7h+jV66lUjMWyEjvn5PUYwkmIU9ffj0uwZ4=;
-  b=PbMQcskDTU01DJcIs4HnyZP0/+I6EYJuesXJ7R9RsM0jD5Xh7tzLuyNc
-   oEtQTBhQSjZD+Kgz6uNBXJNGgSia4CgREKBtV/gkUVyAgH87Bwatf3Um8
-   utIvc8Cp+QaZyVhzDSOt9PH+eY91sEIE+PuJYOdKRRg52a5L/3gAabBcB
-   JDCLOtYPtTAKT0oHU8yM+qIUTQK3+2RnKGgFSMbL4bCJvZvXN1LOhDSwJ
-   yROlFC+UghX+ssDWt43Dvbl+bcdR/OFPqpqSPMvFAsalYtYULJ5yVjOjK
-   4cycB4aYS82n2l0BUmepgKJ4a3D/vNM3jfAzEgwHIjSoVUpxVE6BZ+gGm
-   w==;
-X-CSE-ConnectionGUID: SCgzXqflQUmMIBCyTCzrUg==
-X-CSE-MsgGUID: uhmhNzptR+a4xZZtAUkJeA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11714"; a="75953792"
-X-IronPort-AV: E=Sophos;i="6.21,316,1763452800"; 
-   d="scan'208";a="75953792"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2026 03:11:17 -0800
-X-CSE-ConnectionGUID: aefoXC9oRfOTlOj+Up/Z2g==
-X-CSE-MsgGUID: 1XdQ5didTryw51+mxbO38g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,316,1763452800"; 
-   d="scan'208";a="214490364"
-Received: from dhhellew-desk2.ger.corp.intel.com (HELO localhost) ([10.245.245.224])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2026 03:11:12 -0800
-Date: Sat, 28 Feb 2026 13:11:10 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Chuck Lever <cel@kernel.org>
-Cc: Jeff Layton <jlayton@kernel.org>, NeilBrown <neil@brown.name>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, llvm@lists.linux.dev,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Olga Kornievskaia <okorniev@redhat.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
+	s=arc-20240116; t=1772277222; c=relaxed/simple;
+	bh=KEtfPjmed9vc8UYUJTd5WRO0PKUsvItWzznuXA+LWAg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ebm8v/Fn1fsR/8fqib+8raOjF67h3hz1GGCy2+2SUw1ASplleYPhDil3GNCBNWLu1Gv7SjVA9gg7dZpKY00TCEpJGb/6TsXQ/J37w2odG8kyB0TgId9Y6Zznkv+Q4EIss5YY7QhFKPI4k0gRVgCdJ8DCG7Hyecdgzn4ZoquHB0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jYJ1YA/D; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1772277208;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=9Yg7j2EaokeIvhOnMiy2qGul7Iq/hLXN+CkZ2bmenGc=;
+	b=jYJ1YA/DLC21QSpt5yFgGbUCKT5Kl7xSe7ek3iek8flsxo51hy6UcglF27f331wQSCPG/U
+	xW92eKHrdnN0PrOB6Zz4LExpsYkPUJklV/rLPQ9dT2QLAlQtYVKxZ7Mv8e31W4cWTCk/4w
+	5TNFNeDT+ZHeixhJxN6Qf157D+2HuYw=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: netdev@vger.kernel.org,
+	edumazet@google.com
+Cc: jiayuan.chen@linux.dev,
+	Jiayuan Chen <jiayuan.chen@shopee.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Simon Horman <horms@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>
-Subject: Re: [PATCH v3 0/3] sunrpc: Fix `make W=1` build issues
-Message-ID: <aaLNTpODbiNCwmps@ashevche-desk.local>
-References: <20260204202437.2762161-1-andriy.shevchenko@linux.intel.com>
- <177024270291.126397.9981743455921781902.b4-ty@oracle.com>
- <aYXDpqqM0qrEVzvy@smile.fi.intel.com>
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Clark Williams <clrkwllms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Jason Xing <kerneljasonxing@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev
+Subject: [PATCH net-next v2] net: fix sock compilation error under CONFIG_PREEMPT_RT
+Date: Sat, 28 Feb 2026 19:13:18 +0800
+Message-ID: <20260228111319.79506-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aYXDpqqM0qrEVzvy@smile.fi.intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,brown.name,hammerspace.com,vger.kernel.org,lists.linux.dev,oracle.com,redhat.com,talpey.com,davemloft.net,google.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-262109-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262110-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[linux.dev,shopee.com,google.com,redhat.com,davemloft.net,kernel.org,linutronix.de,goodmis.org,gmail.com,vger.kernel.org,lists.linux.dev];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,lkml];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,ashevche-desk.local:mid,intel.com:dkim]
-X-Rspamd-Queue-Id: 9C8511C2807
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: D211D1C2831
 X-Rspamd-Action: no action
 
-On Fri, Feb 06, 2026 at 12:34:21PM +0200, Andy Shevchenko wrote:
-> On Wed, Feb 04, 2026 at 05:05:35PM -0500, Chuck Lever wrote:
-> > On Wed, 04 Feb 2026 21:21:48 +0100, Andy Shevchenko wrote:
+From: Jiayuan Chen <jiayuan.chen@shopee.com>
 
-[...]
+When CONFIG_PREEMPT_RT is enabled, __SPIN_LOCK_UNLOCKED() expands to a
+brace-enclosed initializer rather than a compound literal, which cannot
+be used in assignment expressions. This causes a build failure:
 
-> > Applied to nfsd-testing, thanks!
-> 
-> Thanks!
-> 
-> FWIW, I have got a success report from LKP.
+  net/core/sock.c:3787:29: error: expected expression before '{' token
+   3787 |                 tmp.slock = __SPIN_LOCK_UNLOCKED(tmp.slock);
 
-Any estimations when this appears in Linux Next (or even vanilla)?
+Use declaration-with-initializer instead of assignment, consistent with
+how __SPIN_LOCK_UNLOCKED() is used elsewhere in the kernel (e.g.
+DEFINE_SPINLOCK).
 
+Fixes: 5151ec54f586 ("net: use try_cmpxchg() in lock_sock_nested()")
+Suggested-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+---
+ net/core/sock.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 9d841975a7a1..fba4d5b8553c 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -3782,12 +3782,15 @@ void noinline lock_sock_nested(struct sock *sk, int subclass)
+ 	might_sleep();
+ #ifdef CONFIG_64BIT
+ 	if (sizeof(struct slock_owned) == sizeof(long)) {
+-		socket_lock_t tmp, old;
++		socket_lock_t tmp = {
++			.slock = __SPIN_LOCK_UNLOCKED(tmp.slock),
++			.owned = 1,
++		};
++		socket_lock_t old = {
++			.slock = __SPIN_LOCK_UNLOCKED(old.slock),
++			.owned = 0,
++		};
+ 
+-		tmp.slock = __SPIN_LOCK_UNLOCKED(tmp.slock);
+-		tmp.owned = 1;
+-		old.slock = __SPIN_LOCK_UNLOCKED(old.slock);
+-		old.owned = 0;
+ 		if (likely(try_cmpxchg(&sk->sk_lock.combined,
+ 				       &old.combined, tmp.combined)))
+ 			return;
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.43.0
 
 
