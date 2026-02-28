@@ -1,53 +1,56 @@
-Return-Path: <netdev+bounces-262045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262044-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uBBsGxdRommF1wQAu9opvQ
-	(envelope-from <netdev+bounces-262045-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 03:21:11 +0100
+	id OGNRGL9QommF1wQAu9opvQ
+	(envelope-from <netdev+bounces-262044-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 03:19:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0E7D1BFF35
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 03:21:10 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BD831BFF01
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 03:19:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BCD3331262B2
-	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 02:19:43 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D5C0E3059AC5
+	for <lists+netdev@lfdr.de>; Sat, 28 Feb 2026 02:19:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F92B32720C;
-	Sat, 28 Feb 2026 02:19:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8064D32E69A;
+	Sat, 28 Feb 2026 02:19:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Fj32PcGk"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kqHcyjtP"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B14CA32ED2E
-	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 02:19:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB7A0250C06
+	for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 02:19:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772245182; cv=none; b=p8RwejvxlpTlPkAo5/JXBBm1VlrxyAgppZVtoHY9JQFlMEjFQRrKiLNrJlA0EthzcoCVJALSKkAunI2kNaBSqEfQKw4wTKLXX1lRHD2g8kcR7fwKqpav1J7lMSR1aC9pST8kQaZ47ZxX6tFUi3vmSIdXKitwy9RZmVKiDaRZrbw=
+	t=1772245180; cv=none; b=spOqPkHwASgaXTd+cOG89Gtul1BCWMqThsZhXrWsdanGq7fE5rjaJF6veg4bh0PRGoOGt0NIO1PWBYPclKFz6vQl+8MtnwPNC2d7LFFlgvLzKYTH40mDCzLg4c9lkUeUe5IS7cUUWpTa5KB/0y3HYTkDbfRwX09HdcvZTV/Wv7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772245182; c=relaxed/simple;
-	bh=gHIh4sqbYO3XN4sKruePjxab0owym4GgL7g75gy8ct4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kCFrawVMQ66pMvIo6sLYdxX9J1gjiBxVczuse9+rDASBcRDngQuxIc8A7CeQ2H0WonoJb3pNSFCgXdoKpptDR5CzCpejSex0jxukcr0U41MDxzm6qBy2y1deZxNQhpfYRoit59Dsgbr0GqVJ7DBsMH3ynJrw8RP52qPAbk0kO3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Fj32PcGk; arc=none smtp.client-ip=91.218.175.188
+	s=arc-20240116; t=1772245180; c=relaxed/simple;
+	bh=rXow/PRXQEfMD31sAZeBu8Jf9CdmQ4mCbIebBHbaD/U=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=uUeyetFEGsALIY4VNVCnzKVnEdH2T7Y4bgBZMcWuG0uxg8H+hFkSqVXKWog0RGkJN2u5UY0HGZv0VYRi6TKuTLfdGYix4GinPhwWD9l4+oedubzIlVMZj9sUYSHbAGEPCP3OGceyVdsJxC5ws8RjKD+K0eHDo8Bug+aloYEEPXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kqHcyjtP; arc=none smtp.client-ip=91.218.175.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772245168;
+	t=1772245175;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=VBBFXxju4EHAKAvIFPYghqpWPD1q39Oai/LGor6LSrU=;
-	b=Fj32PcGkDiI7U+Q0OcuYbXbNmn3Hjgi7SjTx0DavqfC44/v73/ZJ6kZaej7SsB4O+hEeqA
-	nWJZYB+OZSScIhNwnLBdSsex6K1iXp4f4q7pIDTlDTG643TbgxMAh+y1QGhKQa3zHfPkOJ
-	0SSRBg4x1iXku51mldXq2923TSCYRjk=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZaJBbEzRJdsFnp51qeiA4kb7YNrOB8BN6YafYX4UbiI=;
+	b=kqHcyjtPfncBW/XP7POg97ovV0m1kmRCEuZrb1i0LRXY/QOcBf48vxPTUbKBnxYVElrMm7
+	KHC6+GcZQLTHJfJWtJvIPV+XLkgnwnlCmyBfdvn3nZ9uc8jgWqPlofGYmcDBlXVKrQADlj
+	V9y+mXnPTQ5Qjf0O5tP0Ta7EtLKGzOM=
 From: Jiayuan Chen <jiayuan.chen@linux.dev>
 To: netdev@vger.kernel.org
 Cc: jiayuna.chen@linux.dev,
 	jiayuna.chen@shopee.com,
-	Jiayuan Chen <jiayuan.chen@linux.dev>,
+	Jiayuan Chen <jiayuan.chen@shopee.com>,
+	syzbot+80e046b8da2820b6ba73@syzkaller.appspotmail.com,
 	Jay Vosburgh <jv@jvosburgh.net>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -60,8 +63,8 @@ Cc: jiayuna.chen@linux.dev,
 	John Fastabend <john.fastabend@gmail.com>,
 	Stanislav Fomichev <sdf@fomichev.me>,
 	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
 	Eduard Zingerman <eddyz87@gmail.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
 	Song Liu <song@kernel.org>,
 	Yonghong Song <yonghong.song@linux.dev>,
 	KP Singh <kpsingh@kernel.org>,
@@ -76,9 +79,11 @@ Cc: jiayuna.chen@linux.dev,
 	bpf@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	linux-rt-devel@lists.linux.dev
-Subject: [PATCH net v3 0/2] net,bpf: fix null-ptr-deref in xdp_master_redirect() for bonding and add selftest
-Date: Sat, 28 Feb 2026 10:19:12 +0800
-Message-ID: <20260228021918.141002-1-jiayuan.chen@linux.dev>
+Subject: [PATCH net v3 1/2] bonding: fix null-ptr-deref in bond_rr_gen_slave_id()
+Date: Sat, 28 Feb 2026 10:19:13 +0800
+Message-ID: <20260228021918.141002-2-jiayuan.chen@linux.dev>
+In-Reply-To: <20260228021918.141002-1-jiayuan.chen@linux.dev>
+References: <20260228021918.141002-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,14 +100,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[linux.dev,shopee.com,jvosburgh.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,linutronix.de,goodmis.org,vger.kernel.org,lists.linux.dev];
+	FREEMAIL_CC(0.00)[linux.dev,shopee.com,syzkaller.appspotmail.com,jvosburgh.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,linutronix.de,goodmis.org,vger.kernel.org,lists.linux.dev];
 	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[32];
-	TAGGED_FROM(0.00)[bounces-262045-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	TAGGED_FROM(0.00)[bounces-262044-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -112,92 +117,82 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.997];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,80e046b8da2820b6ba73];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:email,linux.dev:mid,linux.dev:dkim,syzkaller.appspot.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D0E7D1BFF35
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0BD831BFF01
 X-Rspamd-Action: no action
 
-syzkaller reported a kernel panic [1] with the following crash stack:
-
-Call Trace:
-BUG: unable to handle page fault for address: ffff8ebd08580000
-PF: supervisor write access in kernel mode
-PF: error_code(0x0002) - not-present page
-PGD 11f201067 P4D 11f201067 PUD 0
-Oops: Oops: 0002 [#1] SMP PTI
-CPU: 2 UID: 0 PID: 451 Comm: test_progs Not tainted 6.19.0+ #161 PREEMPT_RT
-RIP: 0010:bond_rr_gen_slave_id+0x90/0xd0
-RSP: 0018:ffffd3f4815f3448 EFLAGS: 00010246
-RAX: 0000000000000001 RBX: 0000000000000001 RCX: ffff8ebc8728b17e
-RDX: 0000000000000000 RSI: ffffd3f4815f3538 RDI: ffff8ebc8abcce40
-RBP: ffffd3f4815f3460 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: ffffd3f4815f3538
-R13: ffff8ebc8abcce40 R14: ffff8ebc8728b17f R15: ffff8ebc8728b170
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffff8ebd08580000 CR3: 000000010a808006 CR4: 0000000000770ef0
-PKRU: 55555554
-Call Trace:
- <TASK>
- bond_xdp_get_xmit_slave+0xc0/0x240
- xdp_master_redirect+0x74/0xc0
- bpf_prog_run_generic_xdp+0x2f2/0x3f0
- do_xdp_generic+0x1fd/0x3d0
- __netif_receive_skb_core.constprop.0+0x30d/0x1220
- __netif_receive_skb_list_core+0xfc/0x250
- netif_receive_skb_list_internal+0x20c/0x3d0
- ? eth_type_trans+0x137/0x160
- netif_receive_skb_list+0x25/0x140
- xdp_test_run_batch.constprop.0+0x65b/0x6e0
- bpf_test_run_xdp_live+0x1ec/0x3b0
- bpf_prog_test_run_xdp+0x49d/0x6e0
- __sys_bpf+0x446/0x27b0
- __x64_sys_bpf+0x1a/0x30
- x64_sys_call+0x146c/0x26e0
- do_syscall_64+0xd3/0x1510
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
-
-Problem Description
+From: Jiayuan Chen <jiayuan.chen@shopee.com>
 
 bond_rr_gen_slave_id() dereferences bond->rr_tx_counter without a NULL
 check. rr_tx_counter is a per-CPU counter only allocated in bond_open()
 when the bond mode is round-robin. If the bond device was never brought
-up, rr_tx_counter remains NULL.
+up, rr_tx_counter remains NULL, causing a null-ptr-deref.
 
 The XDP redirect path can reach this code even when the bond is not up:
 bpf_master_redirect_enabled_key is a global static key, so when any bond
 device has native XDP attached, the XDP_TX -> xdp_master_redirect()
-interception is enabled for all bond slaves system-wide.
+interception is enabled for all bond slaves system-wide. This allows the
+path xdp_master_redirect() -> bond_xdp_get_xmit_slave() ->
+bond_xdp_xmit_roundrobin_slave_get() -> bond_rr_gen_slave_id() to be
+reached on a bond that was never opened.
 
-Solution
+The normal TX path (bond_xmit_roundrobin) is not affected because TX
+requires the bond to be UP, which guarantees rr_tx_counter is allocated.
+However, bond_xmit_get_slave() (ndo_get_xmit_slave) has the same code
+pattern via bond_xmit_roundrobin_slave_get() and could theoretically
+hit the same issue.
 
-Patch 1: Allocate rr_tx_counter unconditionally in bond_init() (ndo_init).
-Patch 2: Add a selftest that reproduces the above scenario.
+Fix this by allocating rr_tx_counter unconditionally in bond_init()
+(ndo_init), which is called by register_netdevice() and covers both
+device creation paths (bond_create() and bond_newlink()). This also
+handles the case where bond mode is changed to round-robin after device
+creation. The conditional allocation in bond_open() is removed. Since
+bond_destructor() already unconditionally calls
+free_percpu(bond->rr_tx_counter), the lifecycle is clean: allocate at
+ndo_init, free at destructor.
 
-Changes since v2:
-https://lore.kernel.org/netdev/20260227092254.272603-1-jiayuan.chen@linux.dev/T/#t
-- Moved allocation from bond_create_init() helper into bond_init()
-  (ndo_init), which is the natural single point covering both creation
-  paths and also handles post-creation mode changes to round-robin
+Fixes: 879af96ffd72 ("net, core: Add support for XDP redirection to slave device")
+Reported-by: syzbot+80e046b8da2820b6ba73@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/698f84c6.a70a0220.2c38d7.00cc.GAE@google.com/T/
+Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+---
+ drivers/net/bonding/bond_main.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-Changes since v1:
-https://lore.kernel.org/netdev/20260224112545.37888-1-jiayuan.chen@linux.dev/T/#t
-- Moved the guard for NULL rr_tx_counter from xdp_master_redirect()
-  into the bonding subsystem itself
-  (Suggested by Sebastian Andrzej Siewior <bigeasy@linutronix.de>)
-
-[1] https://syzkaller.appspot.com/bug?extid=80e046b8da2820b6ba73
-
-Jiayuan Chen (2):
-  bonding: fix null-ptr-deref in bond_rr_gen_slave_id()
-  selftests/bpf: add test for xdp_master_redirect with bond not up
-
- drivers/net/bonding/bond_main.c               |  12 +--
- .../selftests/bpf/prog_tests/xdp_bonding.c    | 101 +++++++++++++++++-
- 2 files changed, 105 insertions(+), 8 deletions(-)
-
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 78cff904cdc3..9f63f67d8418 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -4279,12 +4279,6 @@ static int bond_open(struct net_device *bond_dev)
+ 	struct list_head *iter;
+ 	struct slave *slave;
+ 
+-	if (BOND_MODE(bond) == BOND_MODE_ROUNDROBIN && !bond->rr_tx_counter) {
+-		bond->rr_tx_counter = alloc_percpu(u32);
+-		if (!bond->rr_tx_counter)
+-			return -ENOMEM;
+-	}
+-
+ 	/* reset slave->backup and slave->inactive */
+ 	if (bond_has_slaves(bond)) {
+ 		bond_for_each_slave(bond, slave, iter) {
+@@ -6411,6 +6405,12 @@ static int bond_init(struct net_device *bond_dev)
+ 	if (!bond->wq)
+ 		return -ENOMEM;
+ 
++	bond->rr_tx_counter = alloc_percpu(u32);
++	if (!bond->rr_tx_counter) {
++		destroy_workqueue(bond->wq);
++		return -ENOMEM;
++	}
++
+ 	bond->notifier_ctx = false;
+ 
+ 	spin_lock_init(&bond->stats_lock);
 -- 
 2.43.0
 
