@@ -1,99 +1,99 @@
-Return-Path: <netdev+bounces-262444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262445-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KE8bHUCFpGnajAUAu9opvQ
-	(envelope-from <netdev+bounces-262444-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 19:28:16 +0100
+	id GI7xNZmFpGnajAUAu9opvQ
+	(envelope-from <netdev+bounces-262445-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 19:29:45 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D28CB1D1168
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 19:28:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 871DF1D117E
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 19:29:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 828B4300CE67
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 18:28:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A116430158B3
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 18:29:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2A2D30F52A;
-	Sun,  1 Mar 2026 18:28:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60C9C337BB8;
+	Sun,  1 Mar 2026 18:29:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="f1NsDcSZ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="95i0g/cP";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="f1NsDcSZ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="95i0g/cP"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="PLJUbMd2";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="NA1OOFEd";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="l+W0Tv5n";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ONsUcLde"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB85175A7D
-	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 18:28:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ABA62E7F11
+	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 18:29:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772389693; cv=none; b=XwboFeKPcA9iE0CXb7snRzL56CofBnSMcTPtMK77a81DFEEt/wTaiQdthjRMR0PMy2vVVqJ8hN3T80CHPNWBHMn5f7As+NPV0W/UE3gUSZKTMTZcuixouJfrmYVMM1G5N/YG4PEHbv0CYejlonXzN72oG++PO2NvxuwUc5nUy4g=
+	t=1772389780; cv=none; b=GQbSEFbkhtROf1nMHOmU9gWgZCj79cErenbFNvzTEzmdE69qvHOvqeNT4iEX5Vwx+9IQWwZBItCHVb7q/Kb6MoMFuQYHDeCzigJJpgtyfCEWqXnuNju0i4WEnGhTGUQhmqVQFU8mKVIM/qV3ujwduXQWiQpGpUikuza2hN2DbEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772389693; c=relaxed/simple;
-	bh=IwXDuxWm34IQqItaDBHATWEyByNCTdVciA9392jU+k4=;
+	s=arc-20240116; t=1772389780; c=relaxed/simple;
+	bh=FgPbbBcSM4lEV0NiVOq9t96d1nVWn65rLImgX3D41K8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lx7jgvY89mJvwZJJDREgy2yHMr9GiD8cfkQ0TC9QqOFxtpFt62cIHB3X4ZTJYcbo1KZcl2swcEJoMVEKNg2giKOT7lkizoGR6w0/6QQsQ6bdvwLqFW+j5IahK6U1k02pof03u+4zhoY+9ONW4xyZuqWZNMzzHV1S7JQdrMum9xE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=f1NsDcSZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=95i0g/cP; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=f1NsDcSZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=95i0g/cP; arc=none smtp.client-ip=195.135.223.131
+	 In-Reply-To:Content-Type; b=D952Lmg4gy+HeMyEWcUIvtaRspCht+ZrpAe4kmRIy91ozZN26/LaL3QjBdL8dzlvHoYZjLStwOSvImieffDMKVpn7FGSiJzG/o29sXfn4qZ9ZrlMTYWrEMslLqSphBDFgpf7ufgtjMm4UT4wBfSNrswlNBQgQ1SOVtJp/xOQXY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=PLJUbMd2; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=NA1OOFEd; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=l+W0Tv5n; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ONsUcLde; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 586541FAD0;
-	Sun,  1 Mar 2026 18:28:05 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 2FC213E772;
+	Sun,  1 Mar 2026 18:29:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772389685; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1772389776; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=IzqMJaZ02R93CdXd/PqPoLIcnZG6tScdU23T7GvlCoo=;
-	b=f1NsDcSZ0aIYzkcC2hslKQmfbzkAF7wLH1XpiU8xQrYmyMpwnam1buU4xXEQwfhXHPEEgh
-	52svbkRz+hCIyR7bRGNO5Wrl/670sboDhG3eb2/pqWFCa01R/9KCOsdhdjjiu+dxvVCwD5
-	jUP4PkLbgan6EMPXDbhR+k6kX47fx3k=
+	bh=kXs1JgTTVr9rJVaJhuPxysezi0SuGZ4SajJ4SJVSrX8=;
+	b=PLJUbMd2S8YCQK1kdCpa6+6nJ6fbg+6XDzfZyUw/9iREaU5U22YrC+M23piOdrl38Dy1Kg
+	FzJIcjPghVSNKq6RfLLPWdJuHrWFSvLnIEbBBnJDMcDjaJEV6l/0a9/y3fD5KceUb+Vw0V
+	mWIGIDEhSOXutSx1i37ly3gmu2lAn6M=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772389685;
+	s=susede2_ed25519; t=1772389776;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=IzqMJaZ02R93CdXd/PqPoLIcnZG6tScdU23T7GvlCoo=;
-	b=95i0g/cP/ViDP35PQ0wjdxiGmjwDpONcc//koY3DMti9bkxfQpI3WNQD4reyQsCvzCj/hW
-	+H+qw/uWvKPTRDCw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=f1NsDcSZ;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="95i0g/cP"
+	bh=kXs1JgTTVr9rJVaJhuPxysezi0SuGZ4SajJ4SJVSrX8=;
+	b=NA1OOFEdk0nuMWPv1D+y5TJz91RJ9VE6QYW4TjOEvPDNY0pUWWJGyrto3KUlE8RF09/Wa5
+	AJNsnRf3CiUT91Bg==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=l+W0Tv5n;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=ONsUcLde
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772389685; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1772389775; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=IzqMJaZ02R93CdXd/PqPoLIcnZG6tScdU23T7GvlCoo=;
-	b=f1NsDcSZ0aIYzkcC2hslKQmfbzkAF7wLH1XpiU8xQrYmyMpwnam1buU4xXEQwfhXHPEEgh
-	52svbkRz+hCIyR7bRGNO5Wrl/670sboDhG3eb2/pqWFCa01R/9KCOsdhdjjiu+dxvVCwD5
-	jUP4PkLbgan6EMPXDbhR+k6kX47fx3k=
+	bh=kXs1JgTTVr9rJVaJhuPxysezi0SuGZ4SajJ4SJVSrX8=;
+	b=l+W0Tv5nf0INOeMPpg58Fx07ys9EizjoRfDmwqWSGo7OIjduQRIf2CQXkJmruf7DNVyiyR
+	IH3y1n7JHX97w2ek9I1zrueZTu1hIieeyRc1MCiay/DOjo0T5TNokSo+Elf5mCTcIz/a9o
+	TPr43N/yThyrQPBf/Es0Xf72EgacTsc=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772389685;
+	s=susede2_ed25519; t=1772389775;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=IzqMJaZ02R93CdXd/PqPoLIcnZG6tScdU23T7GvlCoo=;
-	b=95i0g/cP/ViDP35PQ0wjdxiGmjwDpONcc//koY3DMti9bkxfQpI3WNQD4reyQsCvzCj/hW
-	+H+qw/uWvKPTRDCw==
+	bh=kXs1JgTTVr9rJVaJhuPxysezi0SuGZ4SajJ4SJVSrX8=;
+	b=ONsUcLdevCxe5sSS/PQn66m6nTCej1s6JYXibL39/+6RUAspjL+U4ntgMMZIMthtBD8olj
+	+AHu7N6dybiqCKBQ==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B39883EA69;
-	Sun,  1 Mar 2026 18:28:04 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CC8773EA69;
+	Sun,  1 Mar 2026 18:29:33 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id wEuQKDSFpGkLEQAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Sun, 01 Mar 2026 18:28:04 +0000
-Message-ID: <a09581fb-a3ad-4c0b-aa60-f16a75779756@suse.de>
-Date: Sun, 1 Mar 2026 19:27:56 +0100
+	id 5831Lo2FpGnzEQAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Sun, 01 Mar 2026 18:29:33 +0000
+Message-ID: <2a2afbf1-acc5-449a-a4d8-83badd49fbab@suse.de>
+Date: Sun, 1 Mar 2026 19:29:29 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,25 +101,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: bridge: fix nd_tbl NULL dereference when IPv6 is
- disabled
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, bridge@lists.linux.dev,
- roopa@cumulusnetworks.com, horms@kernel.org, pabeni@redhat.com,
- edumazet@google.com, davem@davemloft.net, idosch@nvidia.com,
- razor@blackwall.org
-References: <20260226234059.19402-1-fmancera@suse.de>
- <20260228123057.14050980@kernel.org>
+Subject: Re: [PATCH net 0/3] {net,bpf}: nd_tbl fixes for when ipv6.disable=1
+To: =?UTF-8?Q?Ricardo_B=2E_Marli=C3=A8re?= <rbm@suse.com>,
+ Martin KaFai Lau <martin.lau@linux.dev>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ David Ahern <dsahern@kernel.org>, Jay Vosburgh <jv@jvosburgh.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Hangbin Liu <liuhangbin@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260228-net-nd_tbl_fixes-v1-0-2b2a274df9bb@suse.com>
 Content-Language: en-US
 From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20260228123057.14050980@kernel.org>
+In-Reply-To: <20260228-net-nd_tbl_fixes-v1-0-2b2a274df9bb@suse.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Spam-Flag: NO
-X-Spam-Score: -4.51
+X-Spam-Score: -3.01
 X-Spam-Level: 
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
 	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
@@ -127,51 +136,52 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
+	TAGGED_FROM(0.00)[bounces-262445-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[suse.com,linux.dev,iogearbox.net,gmail.com,fomichev.me,kernel.org,google.com,davemloft.net,redhat.com,jvosburgh.net,lunn.ch];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262444-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[26];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[suse.de:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:mid,suse.de:dkim]
-X-Rspamd-Queue-Id: D28CB1D1168
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.com:email]
+X-Rspamd-Queue-Id: 871DF1D117E
 X-Rspamd-Action: no action
 
-On 2/28/26 9:30 PM, Jakub Kicinski wrote:
-> On Fri, 27 Feb 2026 00:40:59 +0100 Fernando Fernandez Mancera wrote:
->> Fix this by adding a check before br_is_local_ip6() or neigh_lookup()
->> call. If ipv6_stub->nd_tbl is NULL, return immediately.
+On 2/28/26 6:46 PM, Ricardo B. Marlière wrote:
+> Hi,
 > 
-> The problem should probably be fixed by replacing IS_ENABLED(IPV6) in
-> the callers with ipv6_mod_enabled(), rather than randomly sprinkling
-> null checks?
+> In line with [1] [2], I'm sending these small fixes for similar crashes.
 > 
-
-I agree about using ipv6__mod_enabled() instead of the NULL check. 
-Thanks for that recommendation, although I do not agree with replacing 
-IS_ENABLED(IPV6) because here there is some ND message suppression that 
-can be applied and at the end bridge should not be look to L3 unless 
-necessary.
-
-E.g NUD is still being suppressed even if ipv6 is disabled on boot.
-
-What do you think? Thanks.
-
->> Fixes: ed842faeb2bd ("bridge: suppress nd pkts on BR_NEIGH_SUPPRESS ports")
->> Closes: https://lore.kernel.org/netdev/CAHXs0ORzd62QOG-Fttqa2Cx_A_VFp=utE2H2VTX5nqfgs7LDxQ@mail.gmail.com/
+> Thanks,
+> -	Ricardo.
 > 
-> I think we should also have a Reported-by: in this case?
+> [1] https://lore.kernel.org/netdev/20260227112701.3990-1-fmancera@suse.de
+> [2] https://lore.kernel.org/netdev/20260226234059.19402-1-fmancera@suse.de
+>
+> Signed-off-by: Ricardo B. Marlière <rbm@suse.com>
+> ---
+> Ricardo B. Marlière (3):
+>        bpf: bpf_out_neigh_v4: Fix nd_tbl NULL dereference when IPv6 is disabled
+>        bpf: bpf_out_neigh_v6: Fix nd_tbl NULL dereference when IPv6 is disabled
+>        net: bonding: Fix nd_tbl NULL dereference when IPv6 is disabled
+> 
+>   drivers/net/bonding/bond_main.c | 4 ++++
+>   net/core/filter.c               | 7 +++++++
+>   2 files changed, 11 insertions(+)
+> ---
 
-Yep, sorry about that. Adding it on the next revision.
+Saving some time here for reviews: 
+https://lore.kernel.org/netdev/20260301155413.GA755501@shredder/ I guess 
+this feedback applies here too.
 
