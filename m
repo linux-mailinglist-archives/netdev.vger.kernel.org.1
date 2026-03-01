@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-262439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262440-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SD9+HZCCpGnOiwUAu9opvQ
-	(envelope-from <netdev+bounces-262439-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 19:16:48 +0100
+	id QM+sFqqCpGnOiwUAu9opvQ
+	(envelope-from <netdev+bounces-262440-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 19:17:14 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D97EA1D1103
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 19:16:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E17B51D110B
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 19:17:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 314BB3028EDC
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 18:15:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A1DC0302BE9E
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 18:15:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C8CF312825;
-	Sun,  1 Mar 2026 18:15:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F5613382CD;
+	Sun,  1 Mar 2026 18:15:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MJkXFcE5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HyaD8kj+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52BA43382E8
-	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 18:15:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3409D3370EC
+	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 18:15:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772388907; cv=none; b=bVTum/O/IPNUJ9WEUQTUoz0NfIBk/qPbJ774lsrLVn89zJebhQxupCL6MEjcgbziLD8Wh8DrhtHrUV0np12oEOXZZ9TZkeSKnbol5Px5MOAbnD1zHPzBqhYcXpeuaA8ajYyVCttrcPLoSzQzGbE1E07U8eYYuTN70H/KIhW1p4s=
+	t=1772388909; cv=none; b=i1fYeI1A6wVHZdzEmMGdddTj4WEqbT407mjuLlPgcukKQfXbHYa9p2QSClTx+ZP82yEJhpcQHrxjIc/2KFOiqhx3JgCPo/rL3FHoxaYyMTTJ8Ij1aGWPrW2u4vWvD5AMfzgNbfGDE1HzcPOAhpftvpAZLz7D2/XXYBKTz1nlef0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772388907; c=relaxed/simple;
-	bh=gnUKG0SfzfKmjI/Z8UM9PpC3eRP0C8SwQQEX9sDCbqQ=;
+	s=arc-20240116; t=1772388909; c=relaxed/simple;
+	bh=IuxMZBMFrqobeGcVZuf94rOyX+J7U6+ehb2d0jQE/ls=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OBxZWeHucSsPl1ADxx+yRnFYV3DHRJ0qnWv3blo9/nmrqOlHqMT9R9OrfKvM8mV/QQF2/d8s9/NMyNxAO7j1CACTazyXxfEGdY8WZjUoZa2l/izMqMRyLlp48uMsYL22EoOt4FxuC/UuZ2bfPRTXJ8GJ6VzfLAioCBO/h7Bfw1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MJkXFcE5; arc=none smtp.client-ip=209.85.219.74
+	 To:Cc:Content-Type; b=CgRFB8hVjXjTk+MxhnaUQ2yt5W5LQtM2b0GKjj2/KiLZc85/LsE1WhldsJN2zj9WH5TLD1RquCfL9GvZVGTMPSK2PCuQYLQst7yflwpvDcxHV3Th+9imsXfUt9qj/ghAVZ8zcbcYZQ+IMGNbiEI6k/DXnG77tqV2QAOUsq4cP7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HyaD8kj+; arc=none smtp.client-ip=209.85.160.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-896fe47cab0so48394596d6.3
-        for <netdev@vger.kernel.org>; Sun, 01 Mar 2026 10:15:06 -0800 (PST)
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-50335bd75bdso411535721cf.0
+        for <netdev@vger.kernel.org>; Sun, 01 Mar 2026 10:15:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772388905; x=1772993705; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772388907; x=1772993707; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yZrwydeiDXzYNtpwe7gqRjPJ9c6nJYl0J+JBZPmIzTQ=;
-        b=MJkXFcE5q61CA8dh32GNJF79GUaR00uyug1gg3yqhGlVRCPgOHfgQAHVcZD2JD/U2N
-         vEnw0W/Nl/uxwtUJBnR2dzOdmsnRY9jxab64V3zEkL93H1PDiw3JjauENCUiRA4T64DZ
-         9bho1DLNFex69YvbZluaCckaXBpjDLrY3YY39YJ7jequUA+/FD2Bu/4m3psrdKjKC0i/
-         fYGzMBZ+sCaVKo8JyO0kpwFCAujWLqRpDC4G5KUO8aG5aqWvKWqFzj45ishJ6IjB+eVa
-         7LG/uubqlIZvmRrkvjBBVeiFSErSukVtNPW/YMZy7FImuy0hi4DlxuTXWU2Q+n5jIVWw
-         3CFA==
+        bh=m5b1vChdq4tLYF4yAE3zvofZaEJCeckIri/kTwraU9E=;
+        b=HyaD8kj+lmKC0QmxXHRGT9wGjeCW7/qxpfUX2x0V2rFYkxVgeaEBaZg5sbcKO8zh9W
+         TIw/1kWV74bJbqzaXRGLbkh9T5HngKe2TVM2xrWadUOxWS4z69Pd00ydtQ/1zCR4rTGm
+         Wn+kQmZbhHJc4jSbj+/COXssRcerbDcZbS8BUJuRAaLdOSVNWali5SfJF2hsxvarlSwd
+         uuFBm/qknLFmlP/f+iEGM+QAkH24ZoGOFmm4i6j0glEMkd6mRIyplLDGLAUPOxcQtPdr
+         ym12CUV4W/wHc0ENeJm77OODLQG8jBV5kEbM03HvrQ6TyuNHCEwfGMsWoXP1cHvGfDSY
+         UT+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772388905; x=1772993705;
+        d=1e100.net; s=20230601; t=1772388907; x=1772993707;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yZrwydeiDXzYNtpwe7gqRjPJ9c6nJYl0J+JBZPmIzTQ=;
-        b=PjMhnGyD4rSCfIa6WO+JtyKB5Tr8VXwdFgMzCIRdQUFmqx7cMvfTpL9ie32owpt+sf
-         iwXi8Mfv+R/v8e4X8phouM/0vs9Y7Cbv0h/Gaehp4pwAjnYyO7D6eTjsOa0ovWggtV8T
-         KnB76yyzS9zLEMGdYR57T1SXHAJQGYt6nB2TqssH0TB7HAT8fDdLVE/vesb9ofFyX+py
-         8Jdp139o7C/hNcayJ6RVy7o4TWNwY2CXXAfokLUGXSg030jn5GDqGswTFG5up5l+ENlJ
-         03KhvcEa/PwITMqLsXb6cFOrlhGNhqcjOiRVWNy+CdaMoer230ippeHsxRuTQ40ua1D1
-         xyvA==
-X-Forwarded-Encrypted: i=1; AJvYcCX0rceKSjjKTZSTQUbMkR4+AABVL8BH2XJ3rc+jovarMi1mecMnt+nP6iXlAQO1AnJLiqoXNwI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+v718HkNcY1RdcRpZSXJagpjhZYKRpOgokFMUsBldnCPOHylz
-	oL5nFjLtQAwez3YmFt6jHzfdg9oM/2iCLCcS0OIgpiqON4TD+53nQrP/M/IOfoZ59m/u1DaaYPO
-	54JZ7q1Newoi8TA==
-X-Received: from qknop20.prod.google.com ([2002:a05:620a:5354:b0:8cb:4057:f3a8])
+        bh=m5b1vChdq4tLYF4yAE3zvofZaEJCeckIri/kTwraU9E=;
+        b=YGw24gg6qN3bxH5As8/zSzS86g90Vk2cloMh6aRpDLilUfe0YPu1Bdykfmeh3LEiqf
+         FooJk0+cdYssGz/e1wkSB3GJlrxVufArLpPWbPcuvb7BjIErUBJJ34p0aVVjDwvxYIKu
+         7M5jlH1fW2lT8ZTZ32sHc0YhtbZ9RWjE08UjtdXz1V9yGuBSGiALltTAUhkJASIIErys
+         5gd4Q3KNtdqJhw9iJyCPLIAQmBls2HMkl6F3vWRRq4MCzCsmYCcDqZochxHRFt89SPhY
+         p2TY/Ej0GqTgkKDCj/2DnzRGWKGT9wZWrVKp7eHpSIIK3q1nuTJ+oZqCIaBVTOfMv+cT
+         4VpA==
+X-Forwarded-Encrypted: i=1; AJvYcCU4dJ6wIlzA3hGSnu6NPPap82BjewrXkV0ZydosycRgIKO1lU8eIu8OkhsrNSxD08lKGK//1mY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWqzvM88mM1DWfNLrzwqJ3UAcPN2siLX32HIHVRwPWK62ZDs8N
+	dT7mI/libl96NH01us6UnHd+35FnFauAZVz+LWXPcdcwbN3o7ywCVmQNM6WMz+xHbJp5s1kdYn4
+	Ei4/7l4TnD+7qrw==
+X-Received: from qtjk4.prod.google.com ([2002:ac8:1404:0:b0:506:45f9:29ec])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:4693:b0:8c7:9e6:3a72 with SMTP id af79cd13be357-8cbc8e6b4f5mr1128576285a.6.1772388905076;
- Sun, 01 Mar 2026 10:15:05 -0800 (PST)
-Date: Sun,  1 Mar 2026 18:14:54 +0000
+ 2002:ac8:5712:0:b0:501:17e3:30bb with SMTP id d75a77b69052e-50752763898mr148226561cf.25.1772388906895;
+ Sun, 01 Mar 2026 10:15:06 -0800 (PST)
+Date: Sun,  1 Mar 2026 18:14:55 +0000
 In-Reply-To: <20260301181457.3539105-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,9 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260301181457.3539105-1-edumazet@google.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260301181457.3539105-5-edumazet@google.com>
-Subject: [PATCH v2 net-next 4/7] net-sysfs: use rps_tag_ptr and remove
- metadata from rps_sock_flow_table
+Message-ID: <20260301181457.3539105-6-edumazet@google.com>
+Subject: [PATCH v2 net-next 5/7] net-sysfs: get rid of rps_dev_flow_lock
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -101,7 +100,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262439-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262440-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -113,336 +112,71 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: D97EA1D1103
+X-Rspamd-Queue-Id: E17B51D110B
 X-Rspamd-Action: no action
 
-Instead of storing the @mask at the beginning of rps_sock_flow_table,
-use 5 low order bits of the rps_tag_ptr to store the log of the size.
+Use unrcu_pointer() and xchg() in store_rps_dev_flow_table_cnt()
+instead of a dedicated spinlock.
 
-This removes a potential cache line miss to fetch @mask.
-
-More importantly, we can switch to vmalloc_huge() without wasting memory.
-
-Tested with:
-
-numactl --interleave=all bash -c "echo 4194304 >/proc/sys/net/core/rps_sock_flow_entries"
+Make a similar change in rx_queue_release(), so that both
+functions use a similar construct and synchronization.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- Documentation/networking/scaling.rst | 13 ++--
- include/net/hotdata.h                |  5 +-
- include/net/rps.h                    | 42 ++++++-------
- net/core/dev.c                       | 12 ++--
- net/core/sysctl_net_core.c           | 89 +++++++++++++++-------------
- 5 files changed, 86 insertions(+), 75 deletions(-)
+ net/core/net-sysfs.c | 18 ++++++------------
+ 1 file changed, 6 insertions(+), 12 deletions(-)
 
-diff --git a/Documentation/networking/scaling.rst b/Documentation/networking/scaling.rst
-index 0023afa530ec166bb13558318053ff5ed0906b71..6c261eb48845a40516f201233df13694863ee8cd 100644
---- a/Documentation/networking/scaling.rst
-+++ b/Documentation/networking/scaling.rst
-@@ -403,16 +403,21 @@ Both of these need to be set before RFS is enabled for a receive queue.
- Values for both are rounded up to the nearest power of two. The
- suggested flow count depends on the expected number of active connections
- at any given time, which may be significantly less than the number of open
--connections. We have found that a value of 32768 for rps_sock_flow_entries
--works fairly well on a moderately loaded server.
-+connections. We have found that a value of 65536 for rps_sock_flow_entries
-+works fairly well on a moderately loaded server. Big servers might
-+need 1048576 or even higher values.
-+
-+On a NUMA host it is advisable to spread rps_sock_flow_entries on all nodes.
-+
-+numactl --interleave=all bash -c "echo 1048576 >/proc/sys/net/core/rps_sock_flow_entries"
- 
- For a single queue device, the rps_flow_cnt value for the single queue
- would normally be configured to the same value as rps_sock_flow_entries.
- For a multi-queue device, the rps_flow_cnt for each queue might be
- configured as rps_sock_flow_entries / N, where N is the number of
--queues. So for instance, if rps_sock_flow_entries is set to 32768 and there
-+queues. So for instance, if rps_sock_flow_entries is set to 131072 and there
- are 16 configured receive queues, rps_flow_cnt for each queue might be
--configured as 2048.
-+configured as 8192.
- 
- 
- Accelerated RFS
-diff --git a/include/net/hotdata.h b/include/net/hotdata.h
-index 6632b1aa7584821fd4ab42163b77dfff6732a45e..62534d1f3c707038cd6b805ccc1889e7709d999d 100644
---- a/include/net/hotdata.h
-+++ b/include/net/hotdata.h
-@@ -6,6 +6,9 @@
- #include <linux/types.h>
- #include <linux/netdevice.h>
- #include <net/protocol.h>
-+#ifdef CONFIG_RPS
-+#include <net/rps-types.h>
-+#endif
- 
- struct skb_defer_node {
- 	struct llist_head	defer_list;
-@@ -33,7 +36,7 @@ struct net_hotdata {
- 	struct kmem_cache	*skbuff_fclone_cache;
- 	struct kmem_cache	*skb_small_head_cache;
- #ifdef CONFIG_RPS
--	struct rps_sock_flow_table __rcu *rps_sock_flow_table;
-+	rps_tag_ptr		rps_sock_flow_table;
- 	u32			rps_cpu_mask;
- #endif
- 	struct skb_defer_node __percpu *skb_defer_nodes;
-diff --git a/include/net/rps.h b/include/net/rps.h
-index 82cdffdf3e6b0035e7ceeb130b5b4ac19772e46c..dee930d9dd38e0e975e78d938bc7adc96048b724 100644
---- a/include/net/rps.h
-+++ b/include/net/rps.h
-@@ -8,6 +8,7 @@
- #include <net/hotdata.h>
- 
- #ifdef CONFIG_RPS
-+#include <net/rps-types.h>
- 
- extern struct static_key_false rps_needed;
- extern struct static_key_false rfs_needed;
-@@ -60,45 +61,38 @@ struct rps_dev_flow_table {
-  * meaning we use 32-6=26 bits for the hash.
-  */
- struct rps_sock_flow_table {
--	u32		_mask;
--
--	u32		ents[] ____cacheline_aligned_in_smp;
-+	u32	ent;
- };
--#define	RPS_SOCK_FLOW_TABLE_SIZE(_num) (offsetof(struct rps_sock_flow_table, ents[_num]))
--
--static inline u32 rps_sock_flow_table_mask(const struct rps_sock_flow_table *table)
--{
--	return table->_mask;
--}
- 
- #define RPS_NO_CPU 0xffff
- 
--static inline void rps_record_sock_flow(struct rps_sock_flow_table *table,
--					u32 hash)
-+static inline void rps_record_sock_flow(rps_tag_ptr tag_ptr, u32 hash)
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index 07624b682b08b24da790d377f1deec4dc0a84269..52fcf7fa58a808e79c1a17c8719830bcfb7c1674 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -1084,7 +1084,6 @@ static ssize_t store_rps_dev_flow_table_cnt(struct netdev_rx_queue *queue,
  {
--	unsigned int index = hash & rps_sock_flow_table_mask(table);
-+	unsigned int index = hash & rps_tag_to_mask(tag_ptr);
- 	u32 val = hash & ~net_hotdata.rps_cpu_mask;
-+	struct rps_sock_flow_table *table;
+ 	unsigned long mask, count;
+ 	struct rps_dev_flow_table *table, *old_table;
+-	static DEFINE_SPINLOCK(rps_dev_flow_lock);
+ 	int rc;
  
- 	/* We only give a hint, preemption can change CPU under us */
- 	val |= raw_smp_processor_id();
- 
-+	table = rps_tag_to_table(tag_ptr);
- 	/* The following WRITE_ONCE() is paired with the READ_ONCE()
- 	 * here, and another one in get_rps_cpu().
- 	 */
--	if (READ_ONCE(table->ents[index]) != val)
--		WRITE_ONCE(table->ents[index], val);
-+	if (READ_ONCE(table[index].ent) != val)
-+		WRITE_ONCE(table[index].ent, val);
- }
- 
- static inline void _sock_rps_record_flow_hash(__u32 hash)
- {
--	struct rps_sock_flow_table *sock_flow_table;
-+	rps_tag_ptr tag_ptr;
- 
- 	if (!hash)
- 		return;
- 	rcu_read_lock();
--	sock_flow_table = rcu_dereference(net_hotdata.rps_sock_flow_table);
--	if (sock_flow_table)
--		rps_record_sock_flow(sock_flow_table, hash);
-+	tag_ptr = READ_ONCE(net_hotdata.rps_sock_flow_table);
-+	if (tag_ptr)
-+		rps_record_sock_flow(tag_ptr, hash);
- 	rcu_read_unlock();
- }
- 
-@@ -125,6 +119,7 @@ static inline void _sock_rps_record_flow(const struct sock *sk)
- static inline void _sock_rps_delete_flow(const struct sock *sk)
- {
- 	struct rps_sock_flow_table *table;
-+	rps_tag_ptr tag_ptr;
- 	u32 hash, index;
- 
- 	hash = READ_ONCE(sk->sk_rxhash);
-@@ -132,11 +127,12 @@ static inline void _sock_rps_delete_flow(const struct sock *sk)
- 		return;
- 
- 	rcu_read_lock();
--	table = rcu_dereference(net_hotdata.rps_sock_flow_table);
--	if (table) {
--		index = hash & rps_sock_flow_table_mask(table);
--		if (READ_ONCE(table->ents[index]) != RPS_NO_CPU)
--			WRITE_ONCE(table->ents[index], RPS_NO_CPU);
-+	tag_ptr = READ_ONCE(net_hotdata.rps_sock_flow_table);
-+	if (tag_ptr) {
-+		index = hash & rps_tag_to_mask(tag_ptr);
-+		table = rps_tag_to_table(tag_ptr);
-+		if (READ_ONCE(table[index].ent) != RPS_NO_CPU)
-+			WRITE_ONCE(table[index].ent, RPS_NO_CPU);
+ 	if (!capable(CAP_NET_ADMIN))
+@@ -1128,11 +1127,8 @@ static ssize_t store_rps_dev_flow_table_cnt(struct netdev_rx_queue *queue,
+ 		table = NULL;
  	}
- 	rcu_read_unlock();
- }
-diff --git a/net/core/dev.c b/net/core/dev.c
-index de70ef784d6363b3af4f9279e107647c90f5af19..d4837b058b2ff02e94f9590e310edbcb06dad0f2 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -5075,9 +5075,9 @@ set_rps_cpu(struct net_device *dev, struct sk_buff *skb,
- static int get_rps_cpu(struct net_device *dev, struct sk_buff *skb,
- 		       struct rps_dev_flow **rflowp)
+ 
+-	spin_lock(&rps_dev_flow_lock);
+-	old_table = rcu_dereference_protected(queue->rps_flow_table,
+-					      lockdep_is_held(&rps_dev_flow_lock));
+-	rcu_assign_pointer(queue->rps_flow_table, table);
+-	spin_unlock(&rps_dev_flow_lock);
++	old_table = unrcu_pointer(xchg(&queue->rps_flow_table,
++				       RCU_INITIALIZER(table)));
+ 
+ 	if (old_table)
+ 		call_rcu(&old_table->rcu, rps_dev_flow_table_release);
+@@ -1161,8 +1157,8 @@ static void rx_queue_release(struct kobject *kobj)
  {
--	const struct rps_sock_flow_table *sock_flow_table;
- 	struct netdev_rx_queue *rxqueue = dev->_rx;
- 	struct rps_dev_flow_table *flow_table;
-+	rps_tag_ptr global_tag_ptr;
+ 	struct netdev_rx_queue *queue = to_rx_queue(kobj);
+ #ifdef CONFIG_RPS
++	struct rps_dev_flow_table *old_table;
  	struct rps_map *map;
- 	int cpu = -1;
- 	u32 tcpu;
-@@ -5108,8 +5108,9 @@ static int get_rps_cpu(struct net_device *dev, struct sk_buff *skb,
- 	if (!hash)
- 		goto done;
+-	struct rps_dev_flow_table *flow_table;
  
--	sock_flow_table = rcu_dereference(net_hotdata.rps_sock_flow_table);
--	if (flow_table && sock_flow_table) {
-+	global_tag_ptr = READ_ONCE(net_hotdata.rps_sock_flow_table);
-+	if (flow_table && global_tag_ptr) {
-+		struct rps_sock_flow_table *sock_flow_table;
- 		struct rps_dev_flow *rflow;
- 		u32 next_cpu;
- 		u32 flow_id;
-@@ -5118,8 +5119,9 @@ static int get_rps_cpu(struct net_device *dev, struct sk_buff *skb,
- 		/* First check into global flow table if there is a match.
- 		 * This READ_ONCE() pairs with WRITE_ONCE() from rps_record_sock_flow().
- 		 */
--		flow_id = hash & rps_sock_flow_table_mask(sock_flow_table);
--		ident = READ_ONCE(sock_flow_table->ents[flow_id]);
-+		flow_id = hash & rps_tag_to_mask(global_tag_ptr);
-+		sock_flow_table = rps_tag_to_table(global_tag_ptr);
-+		ident = READ_ONCE(sock_flow_table[flow_id].ent);
- 		if ((ident ^ hash) & ~net_hotdata.rps_cpu_mask)
- 			goto try_rps;
- 
-diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
-index cfbe798493b5789dc8baedf9dcbe9c20918e2ba6..502705e0464981ecfc32233d22c747e14b3febf7 100644
---- a/net/core/sysctl_net_core.c
-+++ b/net/core/sysctl_net_core.c
-@@ -138,68 +138,73 @@ static int rps_default_mask_sysctl(const struct ctl_table *table, int write,
- static int rps_sock_flow_sysctl(const struct ctl_table *table, int write,
- 				void *buffer, size_t *lenp, loff_t *ppos)
- {
-+	struct rps_sock_flow_table *o_sock_table, *sock_table;
-+	static DEFINE_MUTEX(sock_flow_mutex);
-+	rps_tag_ptr o_tag_ptr, tag_ptr;
- 	unsigned int orig_size, size;
--	int ret, i;
- 	struct ctl_table tmp = {
- 		.data = &size,
- 		.maxlen = sizeof(size),
- 		.mode = table->mode
- 	};
--	struct rps_sock_flow_table *o_sock_table, *sock_table;
--	static DEFINE_MUTEX(sock_flow_mutex);
- 	void *tofree = NULL;
-+	int ret, i;
-+	u8 log;
- 
- 	mutex_lock(&sock_flow_mutex);
- 
--	o_sock_table = rcu_dereference_protected(
--					net_hotdata.rps_sock_flow_table,
--					lockdep_is_held(&sock_flow_mutex));
--	size = o_sock_table ? rps_sock_flow_table_mask(o_sock_table) + 1 : 0;
-+	o_tag_ptr = tag_ptr = net_hotdata.rps_sock_flow_table;
-+
-+	size = o_tag_ptr ? rps_tag_to_mask(o_tag_ptr) + 1 : 0;
-+	o_sock_table = rps_tag_to_table(o_tag_ptr);
- 	orig_size = size;
- 
- 	ret = proc_dointvec(&tmp, write, buffer, lenp, ppos);
- 
--	if (write) {
--		if (size) {
--			if (size > 1<<29) {
--				/* Enforce limit to prevent overflow */
-+	if (!write)
-+		goto unlock;
-+
-+	if (size) {
-+		if (size > 1<<29) {
-+			/* Enforce limit to prevent overflow */
-+			mutex_unlock(&sock_flow_mutex);
-+			return -EINVAL;
-+		}
-+		sock_table = o_sock_table;
-+		size = roundup_pow_of_two(size);
-+		if (size != orig_size) {
-+			sock_table = vmalloc_huge(size * sizeof(*sock_table),
-+						  GFP_KERNEL);
-+			if (!sock_table) {
- 				mutex_unlock(&sock_flow_mutex);
--				return -EINVAL;
--			}
--			sock_table = o_sock_table;
--			size = roundup_pow_of_two(size);
--			if (size != orig_size) {
--				sock_table =
--				    vmalloc(RPS_SOCK_FLOW_TABLE_SIZE(size));
--				if (!sock_table) {
--					mutex_unlock(&sock_flow_mutex);
--					return -ENOMEM;
--				}
--				net_hotdata.rps_cpu_mask =
--					roundup_pow_of_two(nr_cpu_ids) - 1;
--				sock_table->_mask = size - 1;
-+				return -ENOMEM;
- 			}
-+			net_hotdata.rps_cpu_mask =
-+				roundup_pow_of_two(nr_cpu_ids) - 1;
-+			log = ilog2(size);
-+			tag_ptr = (rps_tag_ptr)sock_table | log;
-+		}
- 
--			for (i = 0; i < size; i++)
--				sock_table->ents[i] = RPS_NO_CPU;
--		} else
--			sock_table = NULL;
--
--		if (sock_table != o_sock_table) {
--			rcu_assign_pointer(net_hotdata.rps_sock_flow_table,
--					   sock_table);
--			if (sock_table) {
--				static_branch_inc(&rps_needed);
--				static_branch_inc(&rfs_needed);
--			}
--			if (o_sock_table) {
--				static_branch_dec(&rps_needed);
--				static_branch_dec(&rfs_needed);
--				tofree = o_sock_table;
--			}
-+		for (i = 0; i < size; i++)
-+			sock_table[i].ent = RPS_NO_CPU;
-+	} else {
-+		sock_table = NULL;
-+		tag_ptr = 0UL;
-+	}
-+	if (tag_ptr != o_tag_ptr) {
-+		smp_store_release(&net_hotdata.rps_sock_flow_table, tag_ptr);
-+		if (sock_table) {
-+			static_branch_inc(&rps_needed);
-+			static_branch_inc(&rfs_needed);
-+		}
-+		if (o_sock_table) {
-+			static_branch_dec(&rps_needed);
-+			static_branch_dec(&rfs_needed);
-+			tofree = o_sock_table;
- 		}
+ 	map = rcu_dereference_protected(queue->rps_map, 1);
+ 	if (map) {
+@@ -1170,11 +1166,9 @@ static void rx_queue_release(struct kobject *kobj)
+ 		kfree_rcu(map, rcu);
  	}
  
-+unlock:
- 	mutex_unlock(&sock_flow_mutex);
+-	flow_table = rcu_dereference_protected(queue->rps_flow_table, 1);
+-	if (flow_table) {
+-		RCU_INIT_POINTER(queue->rps_flow_table, NULL);
+-		call_rcu(&flow_table->rcu, rps_dev_flow_table_release);
+-	}
++	old_table = unrcu_pointer(xchg(&queue->rps_flow_table, NULL));
++	if (old_table)
++		call_rcu(&old_table->rcu, rps_dev_flow_table_release);
+ #endif
  
- 	kvfree_rcu_mightsleep(tofree);
+ 	memset(kobj, 0, sizeof(*kobj));
 -- 
 2.53.0.473.g4a7958ca14-goog
 
