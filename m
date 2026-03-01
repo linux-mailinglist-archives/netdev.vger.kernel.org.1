@@ -1,58 +1,60 @@
-Return-Path: <netdev+bounces-262305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262306-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wAKfKtiYo2neHgUAu9opvQ
-	(envelope-from <netdev+bounces-262305-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 02:39:36 +0100
+	id GHefKzqoo2mWJAUAu9opvQ
+	(envelope-from <netdev+bounces-262306-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:45:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5246B1CB400
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 02:39:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 189061CDE07
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:45:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 928EC304465A
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:37:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 626E13265668
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:37:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 560172DF13E;
-	Sun,  1 Mar 2026 01:36:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C691126ED35;
+	Sun,  1 Mar 2026 01:36:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KVDr1nnJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U7Wu8Fvv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3197A29A9E9;
-	Sun,  1 Mar 2026 01:36:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41F4190664;
+	Sun,  1 Mar 2026 01:36:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772328993; cv=none; b=Uh5oSIbMDnEODeAtcq0DAV6ceDZuEC6swO8f8jxZTWEbJ4NbOMPSB/l2X7Sdy8CZbm4czx0gnj+Qx0wuiVTTB93GlLFPOfum4MIrgYeHs8JBxMZC+AaObaIeC7FMfDdPHW0vJk8FSKSRseW8+EL2ZSGnIfw2jYhB4fmgW9M/UzM=
+	t=1772329002; cv=none; b=sIKyrcg95xXNUc77Xsyy0BiWTzCekN6Ko5CIPcVgx2T9QbNkeF/2Ek6gTe0ZrmdfwlvO+HIbEN9FQwys/zuQkyerynNZiZYE31W3cIRTgN/vJFRkLvvTeBAPbrObiRpmK1IgtLNNNud1UFgMWZHWpDiAyNMLflWwbbRzykdHavQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772328993; c=relaxed/simple;
-	bh=A1uZ6PMiuv4NKec+I6ni3b6YBsoxx37nPfmQLnNyS1Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l6pqxZHH6nI5JxOgmp0T0XAswhfvuvZqdDwSxLnTjft7cOgSFC57tJzUM4/GTQex66yitCiSRlsW9IyzEJrxPXcp1XhuNuX2Be/Xd+vu4euAXkb8Ck+yaVHHDkalgM8bmcMetiaDecLP4YC064mqtRNE9NGynPn/n0092STKHjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KVDr1nnJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A1F2C19421;
-	Sun,  1 Mar 2026 01:36:32 +0000 (UTC)
+	s=arc-20240116; t=1772329002; c=relaxed/simple;
+	bh=mcmW7qRb0znSGLQr6DPmCGSmcFCJ6c+r0uNGS+CmCr8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hxDAWeemtd/MvBoNEy1WJNAYCg9CFxdJ6m8jnkM2536sy+jhMpJKZDu0izLB0oCeoODEQDbaQ3d2pfR5rqYkMer488Z4uRhC1UuCjV6R9ZCUXyfOfUYTGOEHlyK02Havobgm5IdpZaLZ8+O2HsmZL5MKMDgoWnn/hZZi/X35vGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U7Wu8Fvv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FDB5C19421;
+	Sun,  1 Mar 2026 01:36:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772328992;
-	bh=A1uZ6PMiuv4NKec+I6ni3b6YBsoxx37nPfmQLnNyS1Y=;
+	s=k20201202; t=1772329002;
+	bh=mcmW7qRb0znSGLQr6DPmCGSmcFCJ6c+r0uNGS+CmCr8=;
 	h=From:To:Cc:Subject:Date:From;
-	b=KVDr1nnJgaVGDZxkrtVQhuTazmHJAvyXTXBHiSU+QWBsB58bVn+3sBSw32ccHd1rU
-	 xxIpC1P5qJO7LqeH4vdTFD4KtAvK96zKfbwRNiE416S6DsJA+ky+bIa6xL68hNnGYu
-	 39E66BRaA9jU/JOYE4r/dCdzrXv5+VcAj5mOut6c4QF17uTzPhv5U27DDuiItZNjz9
-	 vkak3KwDKWKtiNg5rQAddi7guNG3P0zr1+PxmbcVmlwevWOjHn1l/nqFKIJV8Jq9Sm
-	 cm3uT0isGvgxjZIPSG1qliZPT1K4AHpys4gkTbSjMkcf9rKRd1CAzEEAPlqQYD1Knm
-	 Kq8zUkk/Bw1BA==
+	b=U7Wu8Fvvk2PmSkgYaeHUTS3SsU/3vcpH3uFYScxyYFhRvey19kK1P5L6BNGwNWmn2
+	 26IT5x7WK+6PBWHL7EIscpXo/kbzRF9jlmdDgPEgDNTT0F5gR46Vis3u94Oqwj+Cyc
+	 e7nI7ulLbg740DWH07mUGM6LFtKneWI5A//i11iEFvjNvAyt42sPE4xb9oVbjpO6ul
+	 NuTmJ9ZCGiBElvkiO+oxbrXZ6DMYwxVkd1jUVZdnOGDRP8Lh1PueEjDOT//mbQdCAW
+	 oAZ+05FI6tGdmNpku4UMl5VO4NFgewTOBhl8sRx8vJ4/7oiIoJRP0rgaWsIYLFdRBO
+	 BMuUE773b6Ygw==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
-	hodgesd@meta.com
-Cc: Eric Dumazet <edumazet@google.com>,
+	chenhuacai@kernel.org
+Cc: Hongliang Wang <wanghongliang@loongson.cn>,
+	Huacai Chen <chenhuacai@loongson.cn>,
 	Jakub Kicinski <kuba@kernel.org>,
 	netdev@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net
-Subject: FAILED: Patch "tipc: fix RCU dereference race in tipc_aead_users_dec()" failed to apply to 6.6-stable tree
-Date: Sat, 28 Feb 2026 20:36:30 -0500
-Message-ID: <20260301013631.1696492-1-sashal@kernel.org>
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: FAILED: Patch "net: stmmac: dwmac-loongson: Set clk_csr_i to 100-150MHz" failed to apply to 6.6-stable tree
+Date: Sat, 28 Feb 2026 20:36:40 -0500
+Message-ID: <20260301013640.1696690-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -65,32 +67,33 @@ X-stable: review
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262305-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262306-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 5246B1CB400
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,msgid.link:url,loongson.cn:email]
+X-Rspamd-Queue-Id: 189061CDE07
 X-Rspamd-Action: no action
 
 The patch below does not apply to the 6.6-stable tree.
@@ -103,40 +106,41 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From 6a65c0cb0ff20b3cbc5f1c87b37dd22cdde14a1c Mon Sep 17 00:00:00 2001
-From: Daniel Hodges <hodgesd@meta.com>
-Date: Tue, 3 Feb 2026 09:56:21 -0500
-Subject: [PATCH] tipc: fix RCU dereference race in tipc_aead_users_dec()
+From e1aa5ef892fb4fa9014a25e87b64b97347919d37 Mon Sep 17 00:00:00 2001
+From: Huacai Chen <chenhuacai@loongson.cn>
+Date: Tue, 3 Feb 2026 14:29:01 +0800
+Subject: [PATCH] net: stmmac: dwmac-loongson: Set clk_csr_i to 100-150MHz
 
-tipc_aead_users_dec() calls rcu_dereference(aead) twice: once to store
-in 'tmp' for the NULL check, and again inside the atomic_add_unless()
-call.
+Current clk_csr_i setting of Loongson STMMAC (including LS7A1000/2000
+and LS2K1000/2000/3000) are copy & paste from other drivers. In fact,
+Loongson STMMAC use 125MHz clocks and need 62 freq division to within
+2.5MHz, meeting most PHY MDC requirement. So fix by setting clk_csr_i
+to 100-150MHz, otherwise some PHYs may link fail.
 
-Use the already-dereferenced 'tmp' pointer consistently, matching the
-correct pattern used in tipc_aead_users_inc() and tipc_aead_users_set().
-
-Fixes: fc1b6d6de220 ("tipc: introduce TIPC encryption & authentication")
 Cc: stable@vger.kernel.org
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Daniel Hodges <hodgesd@meta.com>
-Link: https://patch.msgid.link/20260203145621.17399-1-git@danielhodges.dev
+Fixes: 30bba69d7db40e7 ("stmmac: pci: Add dwmac support for Loongson")
+Signed-off-by: Hongliang Wang <wanghongliang@loongson.cn>
+Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
+Link: https://patch.msgid.link/20260203062901.2158236-1-chenhuacai@loongson.cn
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/tipc/crypto.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c
-index 970db62bd029b..a3f9ca28c3d53 100644
---- a/net/tipc/crypto.c
-+++ b/net/tipc/crypto.c
-@@ -460,7 +460,7 @@ static void tipc_aead_users_dec(struct tipc_aead __rcu *aead, int lim)
- 	rcu_read_lock();
- 	tmp = rcu_dereference(aead);
- 	if (tmp)
--		atomic_add_unless(&rcu_dereference(aead)->users, -1, lim);
-+		atomic_add_unless(&tmp->users, -1, lim);
- 	rcu_read_unlock();
- }
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+index 107a7c84ace80..c05e3e7a539cf 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+@@ -91,8 +91,8 @@ static void loongson_default_data(struct pci_dev *pdev,
+ 	/* Get bus_id, this can be overwritten later */
+ 	plat->bus_id = pci_dev_id(pdev);
+ 
+-	/* clk_csr_i = 20-35MHz & MDC = clk_csr_i/16 */
+-	plat->clk_csr = STMMAC_CSR_20_35M;
++	/* clk_csr_i = 100-150MHz & MDC = clk_csr_i/62 */
++	plat->clk_csr = STMMAC_CSR_100_150M;
+ 	plat->core_type = DWMAC_CORE_GMAC;
+ 	plat->force_sf_dma_mode = 1;
  
 -- 
 2.51.0
