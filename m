@@ -1,57 +1,56 @@
-Return-Path: <netdev+bounces-262365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262366-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YFl6CLqko2lXJAUAu9opvQ
-	(envelope-from <netdev+bounces-262365-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:30:18 +0100
+	id qHi1OMOko2lXJAUAu9opvQ
+	(envelope-from <netdev+bounces-262366-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:30:27 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89F1C1CD9DD
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:30:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AEA51CD9E4
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:30:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 154CA3355E3B
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 02:05:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CAF2A35A683D
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 02:05:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5A9E2F5328;
-	Sun,  1 Mar 2026 02:05:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46530305047;
+	Sun,  1 Mar 2026 02:05:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="apQ7eytK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m2Xhzpi1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31C82EE262;
-	Sun,  1 Mar 2026 02:05:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 246182EE262;
+	Sun,  1 Mar 2026 02:05:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772330744; cv=none; b=aaiCmZaeETZFS+V8vWLzubuaVfB97l2MTreXjs1PEuhBfrlr8LiIa8s65uTV1ySSVkbVx/QmZhA/xM3jYyfrd8HwA+esxo9Whs8z3RxPTrVM5KiGEKrVxoWo56FSw+czhhCl4vOWQTwbVXdIpQqzwzHtZ133434F5H3z8djG9X4=
+	t=1772330749; cv=none; b=HMok06aVE0/bgi3hCMBNskjpMW5HrfJ+qswaibxapNLvG2469982FQ2X7xM1KA2Y4UnPNMRmBdQb4YqVuv2zKSgrRB+wG5w3AVjBEgIJNm6dwjQkF1RjWYOJPd06pUAYVDDwnuba5s8vcdCJ0r2oyucxVWx/s6iBeYvnPwahv/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772330744; c=relaxed/simple;
-	bh=7AT2OuJbEYaeFOWUkritLUcUxbuaElGtSVRpK9XkyH0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HlLfLw6m71WFIQf1Y158g70vuQiHziVYpMiFi/DpdOtbenRwalTXcce7P7rg22THhd6XqBqOCl/0N0DDO+sj/J2+h6l6H/j9AycClswxWkke/fY6Z4rbpUgrnEgan7KSQPuyNlZ0q4yW+56JKWNqhU4+h0SIygrFmX0KafGDsS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=apQ7eytK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 175ACC19424;
-	Sun,  1 Mar 2026 02:05:44 +0000 (UTC)
+	s=arc-20240116; t=1772330749; c=relaxed/simple;
+	bh=KAoL1cx2EuRA7/IhGFw6mkGmsTeE2YWJNJJwGTPnKfs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J756BEfEnSS/BysOCGtPaxSTNykJJ1koo0LyqIJV/va7E9NmmHQ/cl8AmmQ9acgsbZQuBP78Nhi1ah8ItepVyIm+RA4NR7SVLqZLQQOwcoRJ99Iv4u+QW5azcDmk/4rnLRJjv8QMUpn0V7GbdUADqr1/mABNK1bim6D7VTxvPhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m2Xhzpi1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88D25C19421;
+	Sun,  1 Mar 2026 02:05:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772330744;
-	bh=7AT2OuJbEYaeFOWUkritLUcUxbuaElGtSVRpK9XkyH0=;
+	s=k20201202; t=1772330749;
+	bh=KAoL1cx2EuRA7/IhGFw6mkGmsTeE2YWJNJJwGTPnKfs=;
 	h=From:To:Cc:Subject:Date:From;
-	b=apQ7eytKwnjDqu7nPPcbqMta4vQzSPuybbHWWBOJKLpkn8yhsff2e78UQBAW3eiv8
-	 0hforTCOf8ldmj9f5Db2R8AXBO1fLLKeWGrLTT8pE0n+C44zE/LE8FqI+4esdnk8AH
-	 Qqn3ZFfyBYMP114il6oh0J1P68tXhY1eX+FhfM8GsUBWNIxwlItBxVz+UUpe4KGi/H
-	 ii/YQaQPWLGayqCDD3Pmeywbffk+M0pfPkWCq5EGhCKIsGahCONjuZRlhXOOrdf7Bx
-	 Uk4gTCdoLho4TNbvzpR+7qoe+/26jiyy5uy1nKfIO8/ghN848DLL2/k0XuVmJViV2N
-	 xAmA2vK8AS+vA==
+	b=m2Xhzpi1CAJEZRtOXh0NyZ/UgSnI5ttuMyn0h1oFF9LE6bBC9k1RUO14rohleKBkH
+	 ERa5mIxDYj5aF+EONvIVZm22EdDcK1cpZUrX+ZGqvNgyb+Z2TUJW6OJKNXRfOF7iqZ
+	 ErJCrckA2OV6PuKE7wGz8+GkLFvaif/P8RNmv51KbIS9ZJj1/KWUVKrdVS0BjHvIX7
+	 /8dsJvLlv89rS1BmMza4dFuFeGAWTRJRnvUkUhiEGWTlEGr+xyehV+P7MFr4rhhc+4
+	 r0ejSe0bTuIYzvCozI/zFHWywkRz3XvQwTmY2M0zPjLW5uuLlnMI9CeqfEzKrzZJI5
+	 bZcUNalITWzyg==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
-	enelsonmoore@gmail.com
-Cc: Simon Horman <horms@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+	fourier.thomas@gmail.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
 	netdev@vger.kernel.org
-Subject: FAILED: Patch "net: arcnet: com20020-pci: fix support for 2.5Mbit cards" failed to apply to 5.10-stable tree
-Date: Sat, 28 Feb 2026 21:05:42 -0500
-Message-ID: <20260301020542.1734518-1-sashal@kernel.org>
+Subject: FAILED: Patch "net: ethernet: ec_bhf: Fix dma_free_coherent() dma handle" failed to apply to 5.10-stable tree
+Date: Sat, 28 Feb 2026 21:05:47 -0500
+Message-ID: <20260301020547.1734617-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -68,20 +67,20 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262365-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
 	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262366-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_THREE(0.00)[4];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
@@ -89,9 +88,9 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,msgid.link:url]
-X-Rspamd-Queue-Id: 89F1C1CD9DD
+X-Rspamd-Queue-Id: 4AEA51CD9E4
 X-Rspamd-Action: no action
 
 The patch below does not apply to the 5.10-stable tree.
@@ -104,79 +103,38 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From c7d9be66b71af490446127c6ffcb66d6bb71b8b9 Mon Sep 17 00:00:00 2001
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Date: Thu, 12 Feb 2026 20:55:09 -0800
-Subject: [PATCH] net: arcnet: com20020-pci: fix support for 2.5Mbit cards
+From ffe68c3766997d82e9ccaf1cdbd47eba269c4aa2 Mon Sep 17 00:00:00 2001
+From: Thomas Fourier <fourier.thomas@gmail.com>
+Date: Fri, 13 Feb 2026 17:43:39 +0100
+Subject: [PATCH] net: ethernet: ec_bhf: Fix dma_free_coherent() dma handle
 
-Commit 8c14f9c70327 ("ARCNET: add com20020 PCI IDs with metadata")
-converted the com20020-pci driver to use a card info structure instead
-of a single flag mask in driver_data. However, it failed to take into
-account that in the original code, driver_data of 0 indicates a card
-with no special flags, not a card that should not have any card info
-structure. This introduced a null pointer dereference when cards with
-no flags were probed.
+dma_free_coherent() in error path takes priv->rx_buf.alloc_len as
+the dma handle. This would lead to improper unmapping of the buffer.
 
-Commit bd6f1fd5d33d ("net: arcnet: com20020: Fix null-ptr-deref in
-com20020pci_probe()") then papered over this issue by rejecting cards
-with no driver_data instead of resolving the problem at its source.
+Change the dma handle to priv->rx_buf.alloc_phys.
 
-Fix the original issue by introducing a new card info structure for
-2.5Mbit cards that does not set any flags and using it if no
-driver_data is present.
-
-Fixes: 8c14f9c70327 ("ARCNET: add com20020 PCI IDs with metadata")
-Fixes: bd6f1fd5d33d ("net: arcnet: com20020: Fix null-ptr-deref in com20020pci_probe()")
-Cc: stable@vger.kernel.org
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Link: https://patch.msgid.link/20260213045510.32368-1-enelsonmoore@gmail.com
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Fixes: 6af55ff52b02 ("Driver for Beckhoff CX5020 EtherCAT master module.")
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
+Link: https://patch.msgid.link/20260213164340.77272-2-fourier.thomas@gmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/arcnet/com20020-pci.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/ec_bhf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/arcnet/com20020-pci.c b/drivers/net/arcnet/com20020-pci.c
-index 19e411b2e3a77..dbadda08dce23 100644
---- a/drivers/net/arcnet/com20020-pci.c
-+++ b/drivers/net/arcnet/com20020-pci.c
-@@ -115,6 +115,8 @@ static const struct attribute_group com20020_state_group = {
- 	.attrs = com20020_state_attrs,
- };
+diff --git a/drivers/net/ethernet/ec_bhf.c b/drivers/net/ethernet/ec_bhf.c
+index 67275aa4f65b2..0c86cbb0313c3 100644
+--- a/drivers/net/ethernet/ec_bhf.c
++++ b/drivers/net/ethernet/ec_bhf.c
+@@ -423,7 +423,7 @@ static int ec_bhf_open(struct net_device *net_dev)
  
-+static struct com20020_pci_card_info card_info_2p5mbit;
-+
- static void com20020pci_remove(struct pci_dev *pdev);
- 
- static int com20020pci_probe(struct pci_dev *pdev,
-@@ -140,7 +142,7 @@ static int com20020pci_probe(struct pci_dev *pdev,
- 
- 	ci = (struct com20020_pci_card_info *)id->driver_data;
- 	if (!ci)
--		return -EINVAL;
-+		ci = &card_info_2p5mbit;
- 
- 	priv->ci = ci;
- 	mm = &ci->misc_map;
-@@ -347,6 +349,18 @@ static struct com20020_pci_card_info card_info_5mbit = {
- 	.flags = ARC_IS_5MBIT,
- };
- 
-+static struct com20020_pci_card_info card_info_2p5mbit = {
-+	.name = "ARC-PCI",
-+	.devcount = 1,
-+	.chan_map_tbl = {
-+		{
-+			.bar = 2,
-+			.offset = 0x00,
-+			.size = 0x08,
-+		},
-+	},
-+};
-+
- static struct com20020_pci_card_info card_info_sohard = {
- 	.name = "SOHARD SH ARC-PCI",
- 	.devcount = 1,
+ error_rx_free:
+ 	dma_free_coherent(dev, priv->rx_buf.alloc_len, priv->rx_buf.alloc,
+-			  priv->rx_buf.alloc_len);
++			  priv->rx_buf.alloc_phys);
+ out:
+ 	return err;
+ }
 -- 
 2.51.0
 
