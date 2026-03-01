@@ -1,173 +1,143 @@
-Return-Path: <netdev+bounces-262371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262372-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gM5eFujVo2mdPAUAu9opvQ
-	(envelope-from <netdev+bounces-262371-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 07:00:08 +0100
+	id wN9hCC7bo2kNQAUAu9opvQ
+	(envelope-from <netdev+bounces-262372-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 07:22:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B082E1CE96D
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 07:00:07 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACE201CE9A8
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 07:22:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5FF65301BC2B
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 06:00:05 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7DFCE300F580
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 06:22:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D0B3090C5;
-	Sun,  1 Mar 2026 06:00:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UQ5nOPbv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 713153126BF;
+	Sun,  1 Mar 2026 06:22:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A7592E7F20
-	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 06:00:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4E62DC783
+	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 06:22:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772344804; cv=none; b=Ntlukt663r5t61mBM65IP/5OWYzbGJp4+NoH5xpg/G0RwwY341QN+1ruT9wtTxeuHXsPOF5/UweCZd9miFK6eoLsq6qwvDOnuHH9qfhidgm0H2Vwhyx4d7LPIAviwlqqPitBv/BysBKHv95K9mMrlclj0YWnX7JNcA8yPmnRsTA=
+	t=1772346153; cv=none; b=qqx6FhJxO5LwB9rZ1oyTxT56uppNEFeaHgY9r+mSchoYDeiNlOS6WGrjOGposGf3NEHT/Y3h9EeBFsrmpKxjL0svHGESEFe5XPAUL1D4A/FrTdjcYoaDGOKgW2pDJlM+W18wa4eoIxcM2kVkMqeG4qFOPPxzKlR6JaZn+h0ScOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772344804; c=relaxed/simple;
-	bh=QKni47SVW9Uu35RdotBA7722dJSKwDszVsr/Cmo+eIU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g4s9jncwMxOyyd0KMPkyBdJ1aCG7VSxcTDcruc8+c6/bv0TI4NCB1w4y3jVn2qeD0RnJOHcVgyUpasqeGhRd7dfBZ/d2/oTGnRgWeMa6q4paO4F69+lXp8al9sztlq/B1D12yz2IWM++dYvdP5NaJLYOA/0hRT3Ry6xGFsNIwDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UQ5nOPbv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00559C116C6
-	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 06:00:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772344804;
-	bh=QKni47SVW9Uu35RdotBA7722dJSKwDszVsr/Cmo+eIU=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=UQ5nOPbvJlle9K2ewrCfaXDlMF3/CnrPh10KwTwRpi2D0LMPy+je0uCUAsvXqqNix
-	 lNx1yibvd0/qry8SfG6cxIc92vbq+vTTo2BsKc9Ni21+ueStrli0CqoT2x3vO7wv4z
-	 xZJQkCuee+gJYzc0nQQv5BImFGv0K7nVa78wqZ/ybG0/LD5jADhMXHodNnFsDMNM3I
-	 qTGGD6i7GgbJVwIk7GAfN/1gtMF1ylZSJ44hKqogooCFEMOVpChR5774HprQPfjnas
-	 WMpL/F/d6uJ59bZHAbJdiPXBeJTcH9Vz88oy9mhGxgLFgb0FFQAWDBV82LiWc+ANR3
-	 kw+sJEtg4zm3w==
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-65f980cea07so4876363a12.0
-        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 22:00:03 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCV6yN+BiaY5JaeCTAXh5daNKzQKlkDtPzLlsEn6KhKZS4Cg8UxycrufNoGlNXiy0JgBG6J3BJk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsP8bvenWOQK/YwIAcsNOth3tZjcM/r7mYRtrz/X392BSBM6Xn
-	6yVodbMVVzzRKN2BX/xRI6QjWve6gv1eourb4fAPexzlL7OkvBVgGI33ugGMGhQ9jMeWDVIYNlv
-	/dnhwhh15P+fR/ZVA18zkpaCju+nXkgo=
-X-Received: by 2002:a05:6402:42c4:b0:65b:ec2d:e60d with SMTP id
- 4fb4d7f45d1cf-65fde2d08c7mr5450438a12.32.1772344802355; Sat, 28 Feb 2026
- 22:00:02 -0800 (PST)
+	s=arc-20240116; t=1772346153; c=relaxed/simple;
+	bh=f1FiQs+aGJ//S8Y94Kii5k1eQ7Z3X8sngnQBQI91bmQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Kd+TK19sJHT1mu6QRjTs8CHJJe86I3NqDTPbF3/0MSNyKYo2iAc7sNc+TVzJjMjNljnq+KNwQJhRy10GXXr5zxqAvzIrlnsyn5yLKL0MePxvNyjJFi0ByxJFVVoSg/BH6ANkrK3RI5QT1nHmI1deIK7zyEouylQzC+SPBOsG3o0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-6798747187eso62315929eaf.1
+        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 22:22:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772346151; x=1772950951;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TCkTIOkqY5tRrpKdFM8F2itNl2AA74quBHKheHKTgHQ=;
+        b=BB3xZOkfvOAaRApf5yLR6V3wYTqbRbZpZM2MSLPvmHT2P3Sx9DMGabfFtRQXsjH3K9
+         qgNmlFhS3lVwCBBPUV8/UQ1J3EYFQqsqWWiomVDDrhJ70wU2RmuV7eaWxzGdfHEprXVH
+         0Slc9epVg9n6f4RyCikFl6q9VKcslodfGlUXg04bZvU2au1fyY3yybL/7x2TbGtQW0Ii
+         NyEIcmMKLuxN9ZhPwLbFVk30+fTsU5UIT7oooC824SMJWe/zLwU2cDD3CbmiB7loAjTB
+         aQTVjU+1NHh0toMIZFDkdIaLLKhVc7EkX/PynjbH4z4KCXezmRhAeLnfQLkNmpAXQNsc
+         pPzg==
+X-Forwarded-Encrypted: i=1; AJvYcCVNLKHtQkM/awNJMnFMHdc2646Dxhdfqdv/b8r8qhvUh52GnywCVTnATdBI+xaffG07Z3POVX0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzakI9IMQ9qYP9LA4x4KdsyW1KJO6oCgUpl/pcODiykPpblKUXQ
+	5hQFz9B3WWpPMYBzXrh05OnhMVhkVwnvXi0UazeiPbwbEAeMKnMNOIQuAdyI5NjMdkcA/IGPgBE
+	K3vAaUDzGfsAakXHrQR1A7hbMKru/BM/+WEB8WgBeS0iLG2vuoHY8w29hV+I=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260301012606.1683431-1-sashal@kernel.org>
-In-Reply-To: <20260301012606.1683431-1-sashal@kernel.org>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Sun, 1 Mar 2026 13:59:51 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H7QMmww2E2yZECuW=La0i3s1nKbbQvpODgPzrPci3f0HQ@mail.gmail.com>
-X-Gm-Features: AaiRm50WuaIawTrIMUAzic5HCfeMGfAec2UkDWc3Lhbmb5tQfUpf37UwpYVyxss
-Message-ID: <CAAhV-H7QMmww2E2yZECuW=La0i3s1nKbbQvpODgPzrPci3f0HQ@mail.gmail.com>
-Subject: Re: FAILED: Patch "net: stmmac: dwmac-loongson: Set clk_csr_i to
- 100-150MHz" failed to apply to 6.12-stable tree
-To: Sasha Levin <sashal@kernel.org>
-Cc: stable@vger.kernel.org, Hongliang Wang <wanghongliang@loongson.cn>, 
-	Huacai Chen <chenhuacai@loongson.cn>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org
+X-Received: by 2002:a05:6820:1b10:b0:672:a49f:128e with SMTP id
+ 006d021491bc7-679fadbb765mr5581714eaf.8.1772346151442; Sat, 28 Feb 2026
+ 22:22:31 -0800 (PST)
+Date: Sat, 28 Feb 2026 22:22:31 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69a3db27.050a0220.3a55be.0053.GAE@google.com>
+Subject: [syzbot] Monthly wireless report (Mar 2026)
+From: syzbot <syzbot+list618a5750a9ad1341b093@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262371-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-262372-lists,netdev=lfdr.de,list618a5750a9ad1341b093];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	REDIRECTOR_URL(0.00)[goo.gl];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[chenhuacai@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,msgid.link:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,loongson.cn:email]
-X-Rspamd-Queue-Id: B082E1CE96D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[googlegroups.com:email]
+X-Rspamd-Queue-Id: ACE201CE9A8
 X-Rspamd-Action: no action
 
-Hi, Sasha,
+Hello wireless maintainers/developers,
 
-On Sun, Mar 1, 2026 at 9:26=E2=80=AFAM Sasha Levin <sashal@kernel.org> wrot=
-e:
->
-> The patch below does not apply to the 6.12-stable tree.
-> If someone wants it applied there, or to any other stable or longterm
-> tree, then please email the backport, including the original git commit
-> id to <stable@vger.kernel.org>.
-I have already submit a patch for 6.12 some days ago:
-https://lore.kernel.org/loongarch/20260218121219.2545107-1-chenhuacai@loong=
-son.cn/T/#u
+This is a 31-day syzbot report for the wireless subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wireless
 
-Huacai
+During the period, 4 new issues were detected and 1 were fixed.
+In total, 51 issues are still open and 172 have already been fixed.
 
->
-> Thanks,
-> Sasha
->
-> ------------------ original commit in Linus's tree ------------------
->
-> From e1aa5ef892fb4fa9014a25e87b64b97347919d37 Mon Sep 17 00:00:00 2001
-> From: Huacai Chen <chenhuacai@loongson.cn>
-> Date: Tue, 3 Feb 2026 14:29:01 +0800
-> Subject: [PATCH] net: stmmac: dwmac-loongson: Set clk_csr_i to 100-150MHz
->
-> Current clk_csr_i setting of Loongson STMMAC (including LS7A1000/2000
-> and LS2K1000/2000/3000) are copy & paste from other drivers. In fact,
-> Loongson STMMAC use 125MHz clocks and need 62 freq division to within
-> 2.5MHz, meeting most PHY MDC requirement. So fix by setting clk_csr_i
-> to 100-150MHz, otherwise some PHYs may link fail.
->
-> Cc: stable@vger.kernel.org
-> Fixes: 30bba69d7db40e7 ("stmmac: pci: Add dwmac support for Loongson")
-> Signed-off-by: Hongliang Wang <wanghongliang@loongson.cn>
-> Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
-> Link: https://patch.msgid.link/20260203062901.2158236-1-chenhuacai@loongs=
-on.cn
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drive=
-rs/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> index 107a7c84ace80..c05e3e7a539cf 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> @@ -91,8 +91,8 @@ static void loongson_default_data(struct pci_dev *pdev,
->         /* Get bus_id, this can be overwritten later */
->         plat->bus_id =3D pci_dev_id(pdev);
->
-> -       /* clk_csr_i =3D 20-35MHz & MDC =3D clk_csr_i/16 */
-> -       plat->clk_csr =3D STMMAC_CSR_20_35M;
-> +       /* clk_csr_i =3D 100-150MHz & MDC =3D clk_csr_i/62 */
-> +       plat->clk_csr =3D STMMAC_CSR_100_150M;
->         plat->core_type =3D DWMAC_CORE_GMAC;
->         plat->force_sf_dma_mode =3D 1;
->
-> --
-> 2.51.0
->
->
->
->
+Some of the still happening issues:
+
+Ref  Crashes Repro Title
+<1>  26998   Yes   WARNING in rate_control_rate_init (3)
+                   https://syzkaller.appspot.com/bug?extid=9bdc0c5998ab45b05030
+<2>  10549   Yes   WARNING in __rate_control_send_low (3)
+                   https://syzkaller.appspot.com/bug?extid=34463a129786910405dd
+<3>  10251   No    WARNING in kcov_remote_start (6)
+                   https://syzkaller.appspot.com/bug?extid=3f51ad7ac3ae57a6fdcc
+<4>  6932    Yes   WARNING in __cfg80211_ibss_joined (2)
+                   https://syzkaller.appspot.com/bug?extid=7f064ba1704c2466e36d
+<5>  1226    Yes   WARNING in ieee80211_start_next_roc
+                   https://syzkaller.appspot.com/bug?extid=c3a167b5615df4ccd7fb
+<6>  1043    Yes   INFO: task hung in reg_process_self_managed_hints
+                   https://syzkaller.appspot.com/bug?extid=1f16507d9ec05f64210a
+<7>  864     Yes   INFO: task hung in reg_check_chans_work (7)
+                   https://syzkaller.appspot.com/bug?extid=a2de4763f84f61499210
+<8>  790     Yes   INFO: rcu detected stall in ieee80211_handle_queued_frames
+                   https://syzkaller.appspot.com/bug?extid=1c991592da3ef18957c0
+<9>  691     Yes   WARNING in ieee80211_tx_h_rate_ctrl
+                   https://syzkaller.appspot.com/bug?extid=0d516b33238bd97ee864
+<10> 354     Yes   WARNING in ieee80211_tx_skb_tid
+                   https://syzkaller.appspot.com/bug?extid=8bd4574e8c52c48c2595
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
