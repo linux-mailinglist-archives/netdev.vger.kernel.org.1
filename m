@@ -1,200 +1,186 @@
-Return-Path: <netdev+bounces-262351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262352-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cM76Lxqfo2mZIgUAu9opvQ
-	(envelope-from <netdev+bounces-262351-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:06:18 +0100
+	id SOaCMG+fo2k3IQUAu9opvQ
+	(envelope-from <netdev+bounces-262352-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:07:43 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF4241CCF6C
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:06:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D72C1CD068
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:07:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 47D31304E74F
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:57:51 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 981B230095F1
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:58:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3536D26D4F9;
-	Sun,  1 Mar 2026 01:57:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B8652E7164;
+	Sun,  1 Mar 2026 01:58:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nnOqDWVg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rNIceJu2"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA162BD5BD;
-	Sun,  1 Mar 2026 01:57:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB7572727FC;
+	Sun,  1 Mar 2026 01:58:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772330268; cv=none; b=HIPu7ZAopwDCSd2fYPXkTVr2umaqd+SziQqsdyFQKxBAAJdsc51hnHDHXtj0nM6J6gBy2cupxNsbdQlxgd877KoKxtyEXxDoVR6fUeh/azZ1/jGLvtBFD6AHRaESDppNLPhsx14+J0BaGlZn2jfcYzBvmBOnwK5uoK6SgI4j/Z4=
+	t=1772330314; cv=none; b=VL1xg0K6Gpw2UVuW8Fk8xNNZFba1q3ZwbiIWcpElnLVr1UVP0DurSLu7IyKHDDy13q1B2+7kvcrQA49vD3qJQxZk7yLEqvFoXk0qDfdnighyXf5fyVHKyyQgvV6j4LtDIvVkmC9BKBB1qqx6VeG7Eoc1n74Fsls/KFdlFo6U90E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772330268; c=relaxed/simple;
-	bh=lHU3xSKCjFyLDiY7ZphFFUEStuVglwcMF7pvWtxWCMQ=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=Bw1pKo0JUGcgD2oaUEnomABH3XKdG50XgdRpH2MxUqckuV60TEEuMQo5BjeFSP3W2usZXa8z+eC6eJ/fZkSwme0m4rjcqU0LfaUNkUxW3vNKTjnR1OcAkPJsgE6u9jAqzURLTWHA0uBZXLyiwnVX6xzAI9+w2sm4fBZ0uDOjLFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nnOqDWVg; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1772330314; c=relaxed/simple;
+	bh=DGrJJ+fkSTTybyjjmYGmo6IuR78TSVAUfctzU/b/KdM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J1Of9owT89boO/0QdjepkwIUAqXh+gZojnjqFZ1ZafKuL4YnfGReNUAHCs+CtMXZxH+PRH5BkUgPb/3EfEP1iweK3TvizMcYI3P56nGXMiUeHukxDhL5zJ7jKh25sYXIVNXhnh0X1mCOhnTb9HMtJJZyv1/1WoN2tuOnIt2U38w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rNIceJu2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A84CC19421;
+	Sun,  1 Mar 2026 01:58:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772330313;
+	bh=DGrJJ+fkSTTybyjjmYGmo6IuR78TSVAUfctzU/b/KdM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=rNIceJu2AbHlmOttyRRwLmZmVnH2Sx5Jk0XLaXwTAcBHzbaBU3i5X+qCtZXD7PRI5
+	 Hj/ycyi2wqVYXaK6gi7v+j1h0yW6N7jkreIt6iD0M+zUZs//kVXAZUzCxmNpuyFLoc
+	 KgEJXCHV6Pd8+7L503b+0QI/hAMF/UAUk4P98CR2qF7XttV26JeR+4bgPxkyT6yYrV
+	 6fod4i2emv1k+2DTMEHnpAyccVYE+FU/xY7qjdOce6qM8wZRuwRi12E496QQ2zXvxX
+	 TxZP9dFqeGj1rbs8036unjRgJ4UgQ5sMvfd12/70HR0ykcL/KnRBVqABlV/uOXw/UT
+	 FTI4nGRy4NpzQ==
+From: Sasha Levin <sashal@kernel.org>
+To: stable@vger.kernel.org,
+	enelsonmoore@gmail.com
+Cc: Simon Horman <horms@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: FAILED: Patch "net: arcnet: com20020-pci: fix support for 2.5Mbit cards" failed to apply to 5.15-stable tree
+Date: Sat, 28 Feb 2026 20:58:31 -0500
+Message-ID: <20260301015832.1724012-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772330263;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yxadtNbQWhlhzbbOR6btZRdIspmuB+siJad9zZNDOPI=;
-	b=nnOqDWVgZguYU3rnRRI/jxJEmQTIxV7NcyNEPpLrHmeoWcN5FCuGrsQRRusW76yHk2PMEE
-	XisHpvxlb7pq/Sfl+b2GChJrhwu1YVhL1Bvw9sCx9f3AHS10TyiS2+4od3jlF2+PQ3VB5e
-	zepdnHuQ/gAh4E8fI2NqvO4MjkudiOY=
-Date: Sun, 01 Mar 2026 01:57:33 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Message-ID: <d3722ec10046a2fde021a2b8a51a83431c8bcbac@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH net v1] net: nexthop: fix panic when IPv4 route
- references IPv6 nexthop
-To: "Eric Dumazet" <edumazet@google.com>, "David Ahern" <dsahern@kernel.org>,
- "Jakub Kicinski" <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, "Jiayuan Chen" <jiayuan.chen@shopee.com>,
- syzbot+334190e097a98a1b81bb@syzkaller.appspotmail.com, "David S. Miller"
- <davem@davemloft.net>, "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman"
- <horms@kernel.org>, linux-kernel@vger.kernel.org
-In-Reply-To: <CANn89iJjjNW4U6ZxVcuRxWaKPbo1wfEyBD4Etkf+f6CWyhAHFg@mail.gmail.com>
-References: <20260228031400.163009-1-jiayuan.chen@linux.dev>
- <20260228073959.0ef1b33f@kernel.org>
- <3a00c5bf-6740-47c3-b885-c1e0cfe62289@kernel.org>
- <CANn89iJjjNW4U6ZxVcuRxWaKPbo1wfEyBD4Etkf+f6CWyhAHFg@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+X-Patchwork-Hint: ignore
+X-stable: review
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262351-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262352-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,334190e097a98a1b81bb];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,fib_nexthops.sh:url,shopee.com:email,gre_multipath_nh.sh:url,linux.dev:mid,linux.dev:dkim]
-X-Rspamd-Queue-Id: BF4241CCF6C
+	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,msgid.link:url]
+X-Rspamd-Queue-Id: 0D72C1CD068
 X-Rspamd-Action: no action
 
-March 1, 2026 at 01:04, "Eric Dumazet" <edumazet@google.com mailto:edumaz=
-et@google.com?to=3D%22Eric%20Dumazet%22%20%3Cedumazet%40google.com%3E > w=
-rote:
+The patch below does not apply to the 5.15-stable tree.
+If someone wants it applied there, or to any other stable or longterm
+tree, then please email the backport, including the original git commit
+id to <stable@vger.kernel.org>.
+
+Thanks,
+Sasha
+
+------------------ original commit in Linus's tree ------------------
+
+From c7d9be66b71af490446127c6ffcb66d6bb71b8b9 Mon Sep 17 00:00:00 2001
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Date: Thu, 12 Feb 2026 20:55:09 -0800
+Subject: [PATCH] net: arcnet: com20020-pci: fix support for 2.5Mbit cards
+
+Commit 8c14f9c70327 ("ARCNET: add com20020 PCI IDs with metadata")
+converted the com20020-pci driver to use a card info structure instead
+of a single flag mask in driver_data. However, it failed to take into
+account that in the original code, driver_data of 0 indicates a card
+with no special flags, not a card that should not have any card info
+structure. This introduced a null pointer dereference when cards with
+no flags were probed.
+
+Commit bd6f1fd5d33d ("net: arcnet: com20020: Fix null-ptr-deref in
+com20020pci_probe()") then papered over this issue by rejecting cards
+with no driver_data instead of resolving the problem at its source.
+
+Fix the original issue by introducing a new card info structure for
+2.5Mbit cards that does not set any flags and using it if no
+driver_data is present.
+
+Fixes: 8c14f9c70327 ("ARCNET: add com20020 PCI IDs with metadata")
+Fixes: bd6f1fd5d33d ("net: arcnet: com20020: Fix null-ptr-deref in com20020pci_probe()")
+Cc: stable@vger.kernel.org
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Link: https://patch.msgid.link/20260213045510.32368-1-enelsonmoore@gmail.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+---
+ drivers/net/arcnet/com20020-pci.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/arcnet/com20020-pci.c b/drivers/net/arcnet/com20020-pci.c
+index 19e411b2e3a77..dbadda08dce23 100644
+--- a/drivers/net/arcnet/com20020-pci.c
++++ b/drivers/net/arcnet/com20020-pci.c
+@@ -115,6 +115,8 @@ static const struct attribute_group com20020_state_group = {
+ 	.attrs = com20020_state_attrs,
+ };
+ 
++static struct com20020_pci_card_info card_info_2p5mbit;
++
+ static void com20020pci_remove(struct pci_dev *pdev);
+ 
+ static int com20020pci_probe(struct pci_dev *pdev,
+@@ -140,7 +142,7 @@ static int com20020pci_probe(struct pci_dev *pdev,
+ 
+ 	ci = (struct com20020_pci_card_info *)id->driver_data;
+ 	if (!ci)
+-		return -EINVAL;
++		ci = &card_info_2p5mbit;
+ 
+ 	priv->ci = ci;
+ 	mm = &ci->misc_map;
+@@ -347,6 +349,18 @@ static struct com20020_pci_card_info card_info_5mbit = {
+ 	.flags = ARC_IS_5MBIT,
+ };
+ 
++static struct com20020_pci_card_info card_info_2p5mbit = {
++	.name = "ARC-PCI",
++	.devcount = 1,
++	.chan_map_tbl = {
++		{
++			.bar = 2,
++			.offset = 0x00,
++			.size = 0x08,
++		},
++	},
++};
++
+ static struct com20020_pci_card_info card_info_sohard = {
+ 	.name = "SOHARD SH ARC-PCI",
+ 	.devcount = 1,
+-- 
+2.51.0
 
 
->=20
->=20On Sat, Feb 28, 2026 at 5:33 PM David Ahern <dsahern@kernel.org> wrot=
-e:
->=20
->=20>=20
->=20> On 2/28/26 8:39 AM, Jakub Kicinski wrote:
-> >  On Sat, 28 Feb 2026 11:13:59 +0800 Jiayuan Chen wrote:
-> >  From: Jiayuan Chen <jiayuan.chen@shopee.com>
-> >=20
->=20>  fib_check_nexthop() does not validate that the nexthop family matc=
-hes
-> >  the route family. This allows an IPv4 route to reference an IPv6
-> >  nexthop object. When the IPv4 route is looked up, __mkroute_output()
-> >  accesses nhc->nhc_pcpu_rth_output which is never allocated for IPv6
-> >  nexthops (fib6_nh_init does not call fib_nh_common_init), causing a
-> >  NULL pointer dereference.
-> >=20
->=20>  Note that this is not about IPv4 routes with IPv6 gateways (RFC 55=
-49),
-> >  which uses an AF_INET nexthop with nhc_gw_family=3DAF_INET6 and prop=
-erly
-> >  allocates nhc_pcpu_rth_output via fib_nh_common_init(). The bug here
-> >  is an AF_INET6 nexthop object being directly referenced by an IPv4
-> >  route, which is an invalid combination.
-> >=20
->=20>  Add the missing family check in fib_check_nexthop(), mirroring wha=
-t
-> >  fib6_check_nexthop() already does for the reverse direction (rejecti=
-ng
-> >  IPv6 routes that reference IPv4 nexthop objects).
-> >=20
->=20>  AFAICT this breaks a bunch of tests, quickest to repro with is
-> >  gre_multipath_nh.sh but you should probably run fib_nexthops.sh
-> >  on your fix as well.
-> >=20
->=20>  nothing to fix. The patch is wrong. IPv4 supports IPv6 gateways; t=
-hat is
-> >  a known feature.
-> >=20
->=20>  please post the stack trace for the panic
-> >=20
->=20https://lore.kernel.org/all/698f8482.a70a0220.2c38d7.00ca.GAE@google.=
-com/T/
->
 
 
-My bad, the previous fix was wrong - IPv4 routes referencing IPv6
-nexthop objects is totally via this path.
-
-The crash actually only happens with loopback nexthops, e.g.:
-
-    ip nexthop add id 100 via fe80::1 dev lo
-
-In fib6_nh_init(), nexthop objects always have fc_dst=3D:: (no
-destination prefix), so fib6_is_reject() returns true for any
-nexthop using loopback device. This causes it to skip
-fib_nh_common_init(), leaving nhc_pcpu_rth_output, nhc_exceptions
-and nhc_rth_input all NULL. When an IPv4 route later references
-this nexthop, __mkroute_output() hits raw_cpu_ptr(NULL) and crashes.
-
-The simplest fix is just allocating nhc_pcpu_rth_output in the
-reject path of fib6_nh_init(). The release path already handles
-it correctly.
-
-
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index c0350d97307e..4e7c44101709 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -3643,6 +3643,12 @@ int fib6_nh_init(struct net *net, struct fib6_nh *=
-fib6_nh,
-                                goto out;
-                        }
-                }
-+               fib6_nh->nh_common.nhc_pcpu_rth_output =3D
-+                       alloc_percpu_gfp(struct rtable __rcu *, gfp_flags=
-);
-+               if (!fib6_nh->nh_common.nhc_pcpu_rth_output) {
-+                       err =3D -ENOMEM;
-+                       goto out;
-+               }
-                goto pcpu_alloc;
-        }
-
-
-./fib_nexthops.sh
-Tests passed: 244
-Tests failed:   0
-Tests skipped:  2
-root@bms-ytl-d1-ap
 
