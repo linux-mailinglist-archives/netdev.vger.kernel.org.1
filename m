@@ -1,174 +1,200 @@
-Return-Path: <netdev+bounces-262350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262351-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OL7aEA+fo2lzIgUAu9opvQ
-	(envelope-from <netdev+bounces-262350-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:06:07 +0100
+	id cM76Lxqfo2mZIgUAu9opvQ
+	(envelope-from <netdev+bounces-262351-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:06:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E11C91CCF4F
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:06:06 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF4241CCF6C
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:06:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 68187311D804
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:56:24 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 47D31304E74F
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:57:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D59FD303A0A;
-	Sun,  1 Mar 2026 01:55:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3536D26D4F9;
+	Sun,  1 Mar 2026 01:57:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TD/Zn9Ub"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nnOqDWVg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B250C2FDC20;
-	Sun,  1 Mar 2026 01:55:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA162BD5BD;
+	Sun,  1 Mar 2026 01:57:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772330148; cv=none; b=Uim+iSK3qJ7Hn5cWnzkl0nSHC4FbEHe7KsInukRIn/Nay2yPbI3aoaxRim+cFJoizL/AlF8jyxdkYQunvgAad21KBRE44wvc6xonQN6JYY2La8NLwC4u7vDLiHRjPbhLPkQjckHHwLEeB9UVNWF6xoSy8fDym3FS/OGP96mjjis=
+	t=1772330268; cv=none; b=HIPu7ZAopwDCSd2fYPXkTVr2umaqd+SziQqsdyFQKxBAAJdsc51hnHDHXtj0nM6J6gBy2cupxNsbdQlxgd877KoKxtyEXxDoVR6fUeh/azZ1/jGLvtBFD6AHRaESDppNLPhsx14+J0BaGlZn2jfcYzBvmBOnwK5uoK6SgI4j/Z4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772330148; c=relaxed/simple;
-	bh=QLGSmf0WsWpDwkT28AFBjp+7oRTlRVATq1+eW6bjqG0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dWkiw93RSo6yKcU5AbQPAxLgf2rO0dpLG+LFWpwikM98BfL6h7EKQWeTWSjGsqxza18sUWZoBfARep65Uj9iRvH7idlV0GsSVo2CDtm8uFVBxUAedz6a2GqmzCxmV/oTYivlBCTrWgJDyQF5ckFEpjiIbDI/quOIc62275k57sI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TD/Zn9Ub; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE93AC19421;
-	Sun,  1 Mar 2026 01:55:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772330148;
-	bh=QLGSmf0WsWpDwkT28AFBjp+7oRTlRVATq1+eW6bjqG0=;
-	h=From:To:Cc:Subject:Date:From;
-	b=TD/Zn9UbApVDB+kqOdJzVmcx59EWSv0KjhB/CIey4/0W2qoDYXFN07AFEXuhd31ni
-	 7KOoECu0rg6Il1bqxnkVUD1RuDj4jjGfiXR7W0HFzP34QnARgwvSDB4Pw30L/MQxFi
-	 2rcZ0ITT0GDIN9XCmElXjSZz9b1pAq7Bntamw41QZyjIS6Mhd86A3MQJ90PT8PqKoL
-	 mnD2K0SfLXcpY0CxPhuFuYZk6r2XMhpL8kd9LI0uCuZy/OqO4d9rCxY+i3n2/lClHm
-	 hFu3vnXf7v8JY4IQd71SMjguAahzMNN6BefPMffo3WxOLTWXBFelw6/6TeLiIvClAU
-	 9PU6jVjiTX7eA==
-From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org,
-	duoming@zju.edu.cn
-Cc: stable@kernel.org,
-	Jijie Shao <shaojijie@huawei.com>,
-	Simon Horman <horms@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-atm-general@lists.sourceforge.net,
-	netdev@vger.kernel.org
-Subject: FAILED: Patch "atm: fore200e: fix use-after-free in tasklets during device removal" failed to apply to 5.15-stable tree
-Date: Sat, 28 Feb 2026 20:55:44 -0500
-Message-ID: <20260301015546.1723089-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1772330268; c=relaxed/simple;
+	bh=lHU3xSKCjFyLDiY7ZphFFUEStuVglwcMF7pvWtxWCMQ=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=Bw1pKo0JUGcgD2oaUEnomABH3XKdG50XgdRpH2MxUqckuV60TEEuMQo5BjeFSP3W2usZXa8z+eC6eJ/fZkSwme0m4rjcqU0LfaUNkUxW3vNKTjnR1OcAkPJsgE6u9jAqzURLTWHA0uBZXLyiwnVX6xzAI9+w2sm4fBZ0uDOjLFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nnOqDWVg; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Patchwork-Hint: ignore
-X-stable: review
-Content-Transfer-Encoding: 8bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1772330263;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yxadtNbQWhlhzbbOR6btZRdIspmuB+siJad9zZNDOPI=;
+	b=nnOqDWVgZguYU3rnRRI/jxJEmQTIxV7NcyNEPpLrHmeoWcN5FCuGrsQRRusW76yHk2PMEE
+	XisHpvxlb7pq/Sfl+b2GChJrhwu1YVhL1Bvw9sCx9f3AHS10TyiS2+4od3jlF2+PQ3VB5e
+	zepdnHuQ/gAh4E8fI2NqvO4MjkudiOY=
+Date: Sun, 01 Mar 2026 01:57:33 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
+Message-ID: <d3722ec10046a2fde021a2b8a51a83431c8bcbac@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH net v1] net: nexthop: fix panic when IPv4 route
+ references IPv6 nexthop
+To: "Eric Dumazet" <edumazet@google.com>, "David Ahern" <dsahern@kernel.org>,
+ "Jakub Kicinski" <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, "Jiayuan Chen" <jiayuan.chen@shopee.com>,
+ syzbot+334190e097a98a1b81bb@syzkaller.appspotmail.com, "David S. Miller"
+ <davem@davemloft.net>, "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman"
+ <horms@kernel.org>, linux-kernel@vger.kernel.org
+In-Reply-To: <CANn89iJjjNW4U6ZxVcuRxWaKPbo1wfEyBD4Etkf+f6CWyhAHFg@mail.gmail.com>
+References: <20260228031400.163009-1-jiayuan.chen@linux.dev>
+ <20260228073959.0ef1b33f@kernel.org>
+ <3a00c5bf-6740-47c3-b885-c1e0cfe62289@kernel.org>
+ <CANn89iJjjNW4U6ZxVcuRxWaKPbo1wfEyBD4Etkf+f6CWyhAHFg@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262350-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262351-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,334190e097a98a1b81bb];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,msgid.link:url,huawei.com:email,zju.edu.cn:email]
-X-Rspamd-Queue-Id: E11C91CCF4F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,fib_nexthops.sh:url,shopee.com:email,gre_multipath_nh.sh:url,linux.dev:mid,linux.dev:dkim]
+X-Rspamd-Queue-Id: BF4241CCF6C
 X-Rspamd-Action: no action
 
-The patch below does not apply to the 5.15-stable tree.
-If someone wants it applied there, or to any other stable or longterm
-tree, then please email the backport, including the original git commit
-id to <stable@vger.kernel.org>.
-
-Thanks,
-Sasha
-
------------------- original commit in Linus's tree ------------------
-
-From 8930878101cd40063888a68af73b1b0f8b6c79bc Mon Sep 17 00:00:00 2001
-From: Duoming Zhou <duoming@zju.edu.cn>
-Date: Tue, 10 Feb 2026 17:45:37 +0800
-Subject: [PATCH] atm: fore200e: fix use-after-free in tasklets during device
- removal
-
-When the PCA-200E or SBA-200E adapter is being detached, the fore200e
-is deallocated. However, the tx_tasklet or rx_tasklet may still be running
-or pending, leading to use-after-free bug when the already freed fore200e
-is accessed again in fore200e_tx_tasklet() or fore200e_rx_tasklet().
-
-One of the race conditions can occur as follows:
-
-CPU 0 (cleanup)           | CPU 1 (tasklet)
-fore200e_pca_remove_one() | fore200e_interrupt()
-  fore200e_shutdown()     |   tasklet_schedule()
-    kfree(fore200e)       | fore200e_tx_tasklet()
-                          |   fore200e-> // UAF
-
-Fix this by ensuring tx_tasklet or rx_tasklet is properly canceled before
-the fore200e is released. Add tasklet_kill() in fore200e_shutdown() to
-synchronize with any pending or running tasklets. Moreover, since
-fore200e_reset() could prevent further interrupts or data transfers,
-the tasklet_kill() should be placed after fore200e_reset() to prevent
-the tasklet from being rescheduled in fore200e_interrupt(). Finally,
-it only needs to do tasklet_kill() when the fore200e state is greater
-than or equal to FORE200E_STATE_IRQ, since tasklets are uninitialized
-in earlier states. In a word, the tasklet_kill() should be placed in
-the FORE200E_STATE_IRQ branch within the switch...case structure.
-
-This bug was identified through static analysis.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: stable@kernel.org
-Suggested-by: Jijie Shao <shaojijie@huawei.com>
-Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
-Reviewed-by: Jijie Shao <shaojijie@huawei.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Link: https://patch.msgid.link/20260210094537.9767-1-duoming@zju.edu.cn
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- drivers/atm/fore200e.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/atm/fore200e.c b/drivers/atm/fore200e.c
-index f62e385714403..fec081db36dc4 100644
---- a/drivers/atm/fore200e.c
-+++ b/drivers/atm/fore200e.c
-@@ -373,6 +373,10 @@ fore200e_shutdown(struct fore200e* fore200e)
- 	fallthrough;
-     case FORE200E_STATE_IRQ:
- 	free_irq(fore200e->irq, fore200e->atm_dev);
-+#ifdef FORE200E_USE_TASKLET
-+	tasklet_kill(&fore200e->tx_tasklet);
-+	tasklet_kill(&fore200e->rx_tasklet);
-+#endif
- 
- 	fallthrough;
-     case FORE200E_STATE_ALLOC_BUF:
--- 
-2.51.0
+March 1, 2026 at 01:04, "Eric Dumazet" <edumazet@google.com mailto:edumaz=
+et@google.com?to=3D%22Eric%20Dumazet%22%20%3Cedumazet%40google.com%3E > w=
+rote:
 
 
+>=20
+>=20On Sat, Feb 28, 2026 at 5:33 PM David Ahern <dsahern@kernel.org> wrot=
+e:
+>=20
+>=20>=20
+>=20> On 2/28/26 8:39 AM, Jakub Kicinski wrote:
+> >  On Sat, 28 Feb 2026 11:13:59 +0800 Jiayuan Chen wrote:
+> >  From: Jiayuan Chen <jiayuan.chen@shopee.com>
+> >=20
+>=20>  fib_check_nexthop() does not validate that the nexthop family matc=
+hes
+> >  the route family. This allows an IPv4 route to reference an IPv6
+> >  nexthop object. When the IPv4 route is looked up, __mkroute_output()
+> >  accesses nhc->nhc_pcpu_rth_output which is never allocated for IPv6
+> >  nexthops (fib6_nh_init does not call fib_nh_common_init), causing a
+> >  NULL pointer dereference.
+> >=20
+>=20>  Note that this is not about IPv4 routes with IPv6 gateways (RFC 55=
+49),
+> >  which uses an AF_INET nexthop with nhc_gw_family=3DAF_INET6 and prop=
+erly
+> >  allocates nhc_pcpu_rth_output via fib_nh_common_init(). The bug here
+> >  is an AF_INET6 nexthop object being directly referenced by an IPv4
+> >  route, which is an invalid combination.
+> >=20
+>=20>  Add the missing family check in fib_check_nexthop(), mirroring wha=
+t
+> >  fib6_check_nexthop() already does for the reverse direction (rejecti=
+ng
+> >  IPv6 routes that reference IPv4 nexthop objects).
+> >=20
+>=20>  AFAICT this breaks a bunch of tests, quickest to repro with is
+> >  gre_multipath_nh.sh but you should probably run fib_nexthops.sh
+> >  on your fix as well.
+> >=20
+>=20>  nothing to fix. The patch is wrong. IPv4 supports IPv6 gateways; t=
+hat is
+> >  a known feature.
+> >=20
+>=20>  please post the stack trace for the panic
+> >=20
+>=20https://lore.kernel.org/all/698f8482.a70a0220.2c38d7.00ca.GAE@google.=
+com/T/
+>
 
 
+My bad, the previous fix was wrong - IPv4 routes referencing IPv6
+nexthop objects is totally via this path.
+
+The crash actually only happens with loopback nexthops, e.g.:
+
+    ip nexthop add id 100 via fe80::1 dev lo
+
+In fib6_nh_init(), nexthop objects always have fc_dst=3D:: (no
+destination prefix), so fib6_is_reject() returns true for any
+nexthop using loopback device. This causes it to skip
+fib_nh_common_init(), leaving nhc_pcpu_rth_output, nhc_exceptions
+and nhc_rth_input all NULL. When an IPv4 route later references
+this nexthop, __mkroute_output() hits raw_cpu_ptr(NULL) and crashes.
+
+The simplest fix is just allocating nhc_pcpu_rth_output in the
+reject path of fib6_nh_init(). The release path already handles
+it correctly.
+
+
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index c0350d97307e..4e7c44101709 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -3643,6 +3643,12 @@ int fib6_nh_init(struct net *net, struct fib6_nh *=
+fib6_nh,
+                                goto out;
+                        }
+                }
++               fib6_nh->nh_common.nhc_pcpu_rth_output =3D
++                       alloc_percpu_gfp(struct rtable __rcu *, gfp_flags=
+);
++               if (!fib6_nh->nh_common.nhc_pcpu_rth_output) {
++                       err =3D -ENOMEM;
++                       goto out;
++               }
+                goto pcpu_alloc;
+        }
+
+
+./fib_nexthops.sh
+Tests passed: 244
+Tests failed:   0
+Tests skipped:  2
+root@bms-ytl-d1-ap
 
