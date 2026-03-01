@@ -1,59 +1,58 @@
-Return-Path: <netdev+bounces-262304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262305-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MI4mNFObo2l4IAUAu9opvQ
-	(envelope-from <netdev+bounces-262304-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 02:50:11 +0100
+	id wAKfKtiYo2neHgUAu9opvQ
+	(envelope-from <netdev+bounces-262305-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 02:39:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78ACA1CBEFC
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 02:50:11 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5246B1CB400
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 02:39:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 64BF732420A5
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:36:22 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 928EC304465A
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:37:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96C1E2C11D3;
-	Sun,  1 Mar 2026 01:35:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 560172DF13E;
+	Sun,  1 Mar 2026 01:36:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tNErFEXA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KVDr1nnJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738C11E0B86;
-	Sun,  1 Mar 2026 01:35:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3197A29A9E9;
+	Sun,  1 Mar 2026 01:36:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772328920; cv=none; b=KURGJkDU+0LMkSTKjwnOdO2oDeIjG01SI4KB8gT7JlulTiA3W4xQAytBIsXS9xyg9Ic0+nRaqoaxI2aHs9hlbqsTtHj3GE/Gpd/IiQ+412sZZFUxyCIhl7VxItOFfHlddrTjD6OCvOW+hJbKcbVfSI/fIH22NIkwpFXV1Z8ZIPQ=
+	t=1772328993; cv=none; b=Uh5oSIbMDnEODeAtcq0DAV6ceDZuEC6swO8f8jxZTWEbJ4NbOMPSB/l2X7Sdy8CZbm4czx0gnj+Qx0wuiVTTB93GlLFPOfum4MIrgYeHs8JBxMZC+AaObaIeC7FMfDdPHW0vJk8FSKSRseW8+EL2ZSGnIfw2jYhB4fmgW9M/UzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772328920; c=relaxed/simple;
-	bh=tnwjU9/x5wnrixeJrcov1u/S5SKVjhsE8VXbdXVrCu8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MUZqhKYYQn7hyjyHAS+BmwqSytBCVHfSWsU96ItJV7Oyj54SmK5p0i4s6p6ELnUSzeaOVQNHi/yfmPX/wQpfDufGUHYdMmITPzlSU6Md0CEhcZBIycqn5HrAY2juyz3hT3ov+K9065OI2BNu7FM8Cwd4pffZ3xFTHD0Cfz9I3oM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tNErFEXA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93B44C19424;
-	Sun,  1 Mar 2026 01:35:19 +0000 (UTC)
+	s=arc-20240116; t=1772328993; c=relaxed/simple;
+	bh=A1uZ6PMiuv4NKec+I6ni3b6YBsoxx37nPfmQLnNyS1Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l6pqxZHH6nI5JxOgmp0T0XAswhfvuvZqdDwSxLnTjft7cOgSFC57tJzUM4/GTQex66yitCiSRlsW9IyzEJrxPXcp1XhuNuX2Be/Xd+vu4euAXkb8Ck+yaVHHDkalgM8bmcMetiaDecLP4YC064mqtRNE9NGynPn/n0092STKHjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KVDr1nnJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A1F2C19421;
+	Sun,  1 Mar 2026 01:36:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772328920;
-	bh=tnwjU9/x5wnrixeJrcov1u/S5SKVjhsE8VXbdXVrCu8=;
+	s=k20201202; t=1772328992;
+	bh=A1uZ6PMiuv4NKec+I6ni3b6YBsoxx37nPfmQLnNyS1Y=;
 	h=From:To:Cc:Subject:Date:From;
-	b=tNErFEXAT/9HG7uCO1cVEuuNWvBNjvaUrkjPx0y+6fgJdp4QYc9NkqFSNAyfWLGrC
-	 Eniwk39HhsjPIseIKXaOfsrZv/S7wH5g2GEm5p0Daz2UAS4yjqkPIikQMDPU/5D257
-	 R6ktpf0JLAUCJLT1cNr3iMHfjVhXj5HYXK8TDQlCGdM09K/hGt7yMpXtKakOgef8St
-	 PxFSRll8/yZqpB1Z2FwcOUCJ6Ct46AcG1WWgD5eMRH/oc3+uu/+es7SpmsCBOttnP/
-	 Trosf5bCIEjxO+0jdvLbXWxKKWO9MWh8aBGxMXPJSr2CnDaKHqjgRE7Q4PVT/IFlkl
-	 EToLEL9c9DS/Q==
+	b=KVDr1nnJgaVGDZxkrtVQhuTazmHJAvyXTXBHiSU+QWBsB58bVn+3sBSw32ccHd1rU
+	 xxIpC1P5qJO7LqeH4vdTFD4KtAvK96zKfbwRNiE416S6DsJA+ky+bIa6xL68hNnGYu
+	 39E66BRaA9jU/JOYE4r/dCdzrXv5+VcAj5mOut6c4QF17uTzPhv5U27DDuiItZNjz9
+	 vkak3KwDKWKtiNg5rQAddi7guNG3P0zr1+PxmbcVmlwevWOjHn1l/nqFKIJV8Jq9Sm
+	 cm3uT0isGvgxjZIPSG1qliZPT1K4AHpys4gkTbSjMkcf9rKRd1CAzEEAPlqQYD1Knm
+	 Kq8zUkk/Bw1BA==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
-	eperezma@redhat.com
-Cc: Jason Wang <jasowang@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	virtualization@lists.linux.dev,
-	kvm@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: FAILED: Patch "vhost: move vdpa group bound check to vhost_vdpa" failed to apply to 6.6-stable tree
-Date: Sat, 28 Feb 2026 20:35:18 -0500
-Message-ID: <20260301013518.1694956-1-sashal@kernel.org>
+	hodgesd@meta.com
+Cc: Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net
+Subject: FAILED: Patch "tipc: fix RCU dereference race in tipc_aead_users_dec()" failed to apply to 6.6-stable tree
+Date: Sat, 28 Feb 2026 20:36:30 -0500
+Message-ID: <20260301013631.1696492-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -63,36 +62,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-Patchwork-Hint: ignore
 X-stable: review
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262304-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-262305-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 78ACA1CBEFC
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 5246B1CB400
 X-Rspamd-Action: no action
 
 The patch below does not apply to the 6.6-stable tree.
@@ -105,76 +103,41 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From cd025c1e876b4e262e71398236a1550486a73ede Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
-Date: Mon, 19 Jan 2026 15:32:54 +0100
-Subject: [PATCH] vhost: move vdpa group bound check to vhost_vdpa
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From 6a65c0cb0ff20b3cbc5f1c87b37dd22cdde14a1c Mon Sep 17 00:00:00 2001
+From: Daniel Hodges <hodgesd@meta.com>
+Date: Tue, 3 Feb 2026 09:56:21 -0500
+Subject: [PATCH] tipc: fix RCU dereference race in tipc_aead_users_dec()
 
-Remove duplication by consolidating these here.  This reduces the
-posibility of a parent driver missing them.
+tipc_aead_users_dec() calls rcu_dereference(aead) twice: once to store
+in 'tmp' for the NULL check, and again inside the atomic_add_unless()
+call.
 
-While we're at it, fix a bug in vdpa_sim where a valid ASID can be
-assigned to a group equal to ngroups, causing an out of bound write.
+Use the already-dereferenced 'tmp' pointer consistently, matching the
+correct pattern used in tipc_aead_users_inc() and tipc_aead_users_set().
 
+Fixes: fc1b6d6de220 ("tipc: introduce TIPC encryption & authentication")
 Cc: stable@vger.kernel.org
-Fixes: bda324fd037a ("vdpasim: control virtqueue support")
-Acked-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Message-Id: <20260119143306.1818855-2-eperezma@redhat.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Daniel Hodges <hodgesd@meta.com>
+Link: https://patch.msgid.link/20260203145621.17399-1-git@danielhodges.dev
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/vdpa/mlx5/net/mlx5_vnet.c | 3 ---
- drivers/vdpa/vdpa_sim/vdpa_sim.c  | 6 ------
- drivers/vhost/vdpa.c              | 2 +-
- 3 files changed, 1 insertion(+), 10 deletions(-)
+ net/tipc/crypto.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-index ddaa1366704bb..44062e9d68f00 100644
---- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-+++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-@@ -3640,9 +3640,6 @@ static int mlx5_set_group_asid(struct vdpa_device *vdev, u32 group,
- 	struct mlx5_vdpa_dev *mvdev = to_mvdev(vdev);
- 	int err = 0;
+diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c
+index 970db62bd029b..a3f9ca28c3d53 100644
+--- a/net/tipc/crypto.c
++++ b/net/tipc/crypto.c
+@@ -460,7 +460,7 @@ static void tipc_aead_users_dec(struct tipc_aead __rcu *aead, int lim)
+ 	rcu_read_lock();
+ 	tmp = rcu_dereference(aead);
+ 	if (tmp)
+-		atomic_add_unless(&rcu_dereference(aead)->users, -1, lim);
++		atomic_add_unless(&tmp->users, -1, lim);
+ 	rcu_read_unlock();
+ }
  
--	if (group >= MLX5_VDPA_NUMVQ_GROUPS)
--		return -EINVAL;
--
- 	mvdev->mres.group2asid[group] = asid;
- 
- 	mutex_lock(&mvdev->mres.lock);
-diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-index c1c6431950e1b..df9c7ddc5d782 100644
---- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
-+++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-@@ -606,12 +606,6 @@ static int vdpasim_set_group_asid(struct vdpa_device *vdpa, unsigned int group,
- 	struct vhost_iotlb *iommu;
- 	int i;
- 
--	if (group > vdpasim->dev_attr.ngroups)
--		return -EINVAL;
--
--	if (asid >= vdpasim->dev_attr.nas)
--		return -EINVAL;
--
- 	iommu = &vdpasim->iommu[asid];
- 
- 	mutex_lock(&vdpasim->mutex);
-diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-index 05a481e4c385a..9d25b735b43dd 100644
---- a/drivers/vhost/vdpa.c
-+++ b/drivers/vhost/vdpa.c
-@@ -680,7 +680,7 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
- 	case VHOST_VDPA_SET_GROUP_ASID:
- 		if (copy_from_user(&s, argp, sizeof(s)))
- 			return -EFAULT;
--		if (s.num >= vdpa->nas)
-+		if (idx >= vdpa->ngroups || s.num >= vdpa->nas)
- 			return -EINVAL;
- 		if (!ops->set_group_asid)
- 			return -EOPNOTSUPP;
 -- 
 2.51.0
 
