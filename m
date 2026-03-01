@@ -1,60 +1,56 @@
-Return-Path: <netdev+bounces-262335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262336-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0DIMI7Ofo2noIgUAu9opvQ
-	(envelope-from <netdev+bounces-262335-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:08:51 +0100
+	id ICFnOTeco2l2IQUAu9opvQ
+	(envelope-from <netdev+bounces-262336-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 02:53:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5CDA1CD14B
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:08:50 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9F261CC2EC
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 02:53:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8C3FE3393AD3
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:48:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 610033084103
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:49:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E83672F3C19;
-	Sun,  1 Mar 2026 01:47:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11E7A30B502;
+	Sun,  1 Mar 2026 01:48:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Im7mEb2U"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ShJif7SI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C44B32F39A7;
-	Sun,  1 Mar 2026 01:47:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A5630AACA;
+	Sun,  1 Mar 2026 01:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772329661; cv=none; b=A8p94J0tvHVvFX/J0EVI3Xi6AEhd02lk3GxPcvGqx4PDl9Y+czB0e1CebJR9hkCrvvlgVjPjW/i8kaKpJ0JaEaaioR2uEUsIkbk/XifsQl9iuUyxiBsWFWsL6aKWmsVeP73GjawfAUxT4nJI4UYpHadDm97BcYyl4OUpg6nIB7o=
+	t=1772329685; cv=none; b=cmfl5atDGVtj0wJiZnFMum2M0f3CoWiSKfzE5lJOL6pjvGtYsOjoobOLwVnr3WARDjvrFlVHrYHAwntpiutpOzTJAWtkNOscEL5P8rXjn8gQHcrHXkzqkBc5n6vVOPHPxs27YljQgeLFUlIAYyEdsP4+zqb0qMUSO8oNlb5xb5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772329661; c=relaxed/simple;
-	bh=ARllGZ6tB1zTW9sg85pAasRHhvOtyZxhNhLSBGTqQzk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Z33rgu4BwrdyO+UWXTa31GFQZBwOu30I38bwCJ9zSu8oSnn5WSp0h8bL/tWew+w3llAzWrNt7myc+4+NKUcC0h97KLhOCy3usgwvfKs1nVABFeu0rMrHuSA9j3+sXNfsTInZ+eVeq3KCa2P4qqgtTLKH6xxYKOOaPWWoJnquva4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Im7mEb2U; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB2E7C19421;
-	Sun,  1 Mar 2026 01:47:40 +0000 (UTC)
+	s=arc-20240116; t=1772329685; c=relaxed/simple;
+	bh=r6mEPHl/++ecH7NomQxlYvn0mgbN0FqJfobDYnSEdu8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=c7RhsecoFGIyWAxkSP95xme7gGDd4vgKyJ7IJiAV1ZU1WiUPV2Ck04e42kiOXse/OSr7q+3hXCZnMjyvwVo7/ZcSnv+r3x3FZ2Uif33STjU5OZZIMpXCq2fI93+qM6ysu/jv83ER2j8aCjVtLbo/skUSYfew5nzkB5nF0mdzOno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ShJif7SI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AB17C19421;
+	Sun,  1 Mar 2026 01:48:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772329661;
-	bh=ARllGZ6tB1zTW9sg85pAasRHhvOtyZxhNhLSBGTqQzk=;
+	s=k20201202; t=1772329684;
+	bh=r6mEPHl/++ecH7NomQxlYvn0mgbN0FqJfobDYnSEdu8=;
 	h=From:To:Cc:Subject:Date:From;
-	b=Im7mEb2UKE3W+lvMw7KHPNjPwptFIMTElhlyptUSFT6DXdh0qTFvE99bs47iz/bx+
-	 2r8zr9QLnL+BwSNy1FmhnY3wIj4nRMNNA4rXjvs03MJ95MrN+WDFYzuxnzHayTDf8F
-	 soGpjmCrc4E0w3x48GrPmvRzFNBmOVTt9tiYl+SvAGFvy1VjyUAam9jGW6CaOCmmUL
-	 xQYWcitXpMfFdzFDzvV4xFBZDUF4Mufqi6jxwULMSKtcAdudOjzHcX27qFc3bMT3fH
-	 ldQG+U1hwi9cBjEmPCJYeY+AyPt59RJtuNjTlHhzJcJIsE0Y/eytRI8oyAmnkz+4sG
-	 6GGrGjdqXWOwQ==
+	b=ShJif7SIgAjZiekpOwyj+xQTT7HcQPaNhYwcXkQUzopJ20PCH8CGkuhto9h67wutf
+	 enNiEMYLUy706s+VguPCIuYEllF1o4PoWSDIsMQkpTmZx+Sd7sr+OOoq0kwYF8CIHC
+	 tqnk3/nosSJQMIx90RTVOFoJXEmJyS4wn+If1CcCKZUv61kbRi9cllhs2eeqR5cU5Z
+	 9oN+hkFKkZzJejOnS5jlri+yCv1s72P20OrMZdY822ntTS13qkptGw8pHjrxnS+ZH6
+	 jJrd2XPL0yN9255JC291WjMPgC9ZuvcVis2u9TT15m3pJ07t1+UfZhCFqDvm0NcnzQ
+	 45Uo3MfTsg5Cg==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
-	duoming@zju.edu.cn
-Cc: stable@kernel.org,
-	Jijie Shao <shaojijie@huawei.com>,
-	Simon Horman <horms@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-atm-general@lists.sourceforge.net,
+	cnitlrt@gmail.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
 	netdev@vger.kernel.org
-Subject: FAILED: Patch "atm: fore200e: fix use-after-free in tasklets during device removal" failed to apply to 6.1-stable tree
-Date: Sat, 28 Feb 2026 20:47:37 -0500
-Message-ID: <20260301014739.1711600-1-sashal@kernel.org>
+Subject: FAILED: Patch "net/sched: act_skbedit: fix divide-by-zero in tcf_skbedit_hash()" failed to apply to 6.1-stable tree
+Date: Sat, 28 Feb 2026 20:48:02 -0500
+Message-ID: <20260301014802.1712088-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -67,33 +63,34 @@ X-stable: review
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262335-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262336-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.998];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[zju.edu.cn:email,huawei.com:email,msgid.link:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E5CDA1CD14B
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A9F261CC2EC
 X-Rspamd-Action: no action
 
 The patch below does not apply to the 6.1-stable tree.
@@ -106,65 +103,61 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From 8930878101cd40063888a68af73b1b0f8b6c79bc Mon Sep 17 00:00:00 2001
-From: Duoming Zhou <duoming@zju.edu.cn>
-Date: Tue, 10 Feb 2026 17:45:37 +0800
-Subject: [PATCH] atm: fore200e: fix use-after-free in tasklets during device
- removal
+From be054cc66f739a9ba615dba9012a07fab8e7dd6f Mon Sep 17 00:00:00 2001
+From: Ruitong Liu <cnitlrt@gmail.com>
+Date: Sat, 14 Feb 2026 01:59:48 +0800
+Subject: [PATCH] net/sched: act_skbedit: fix divide-by-zero in
+ tcf_skbedit_hash()
 
-When the PCA-200E or SBA-200E adapter is being detached, the fore200e
-is deallocated. However, the tx_tasklet or rx_tasklet may still be running
-or pending, leading to use-after-free bug when the already freed fore200e
-is accessed again in fore200e_tx_tasklet() or fore200e_rx_tasklet().
+Commit 38a6f0865796 ("net: sched: support hash selecting tx queue")
+added SKBEDIT_F_TXQ_SKBHASH support. The inclusive range size is
+computed as:
 
-One of the race conditions can occur as follows:
+mapping_mod = queue_mapping_max - queue_mapping + 1;
 
-CPU 0 (cleanup)           | CPU 1 (tasklet)
-fore200e_pca_remove_one() | fore200e_interrupt()
-  fore200e_shutdown()     |   tasklet_schedule()
-    kfree(fore200e)       | fore200e_tx_tasklet()
-                          |   fore200e-> // UAF
+The range size can be 65536 when the requested range covers all possible
+u16 queue IDs (e.g. queue_mapping=0 and queue_mapping_max=U16_MAX).
+That value cannot be represented in a u16 and previously wrapped to 0,
+so tcf_skbedit_hash() could trigger a divide-by-zero:
 
-Fix this by ensuring tx_tasklet or rx_tasklet is properly canceled before
-the fore200e is released. Add tasklet_kill() in fore200e_shutdown() to
-synchronize with any pending or running tasklets. Moreover, since
-fore200e_reset() could prevent further interrupts or data transfers,
-the tasklet_kill() should be placed after fore200e_reset() to prevent
-the tasklet from being rescheduled in fore200e_interrupt(). Finally,
-it only needs to do tasklet_kill() when the fore200e state is greater
-than or equal to FORE200E_STATE_IRQ, since tasklets are uninitialized
-in earlier states. In a word, the tasklet_kill() should be placed in
-the FORE200E_STATE_IRQ branch within the switch...case structure.
+queue_mapping += skb_get_hash(skb) % params->mapping_mod;
 
-This bug was identified through static analysis.
+Compute mapping_mod in a wider type and reject ranges larger than U16_MAX
+to prevent params->mapping_mod from becoming 0 and avoid the crash.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: stable@kernel.org
-Suggested-by: Jijie Shao <shaojijie@huawei.com>
-Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
-Reviewed-by: Jijie Shao <shaojijie@huawei.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Link: https://patch.msgid.link/20260210094537.9767-1-duoming@zju.edu.cn
+Fixes: 38a6f0865796 ("net: sched: support hash selecting tx queue")
+Cc: stable@vger.kernel.org # 6.12+
+Signed-off-by: Ruitong Liu <cnitlrt@gmail.com>
+Link: https://patch.msgid.link/20260213175948.1505257-1-cnitlrt@gmail.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/atm/fore200e.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ net/sched/act_skbedit.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/atm/fore200e.c b/drivers/atm/fore200e.c
-index f62e385714403..fec081db36dc4 100644
---- a/drivers/atm/fore200e.c
-+++ b/drivers/atm/fore200e.c
-@@ -373,6 +373,10 @@ fore200e_shutdown(struct fore200e* fore200e)
- 	fallthrough;
-     case FORE200E_STATE_IRQ:
- 	free_irq(fore200e->irq, fore200e->atm_dev);
-+#ifdef FORE200E_USE_TASKLET
-+	tasklet_kill(&fore200e->tx_tasklet);
-+	tasklet_kill(&fore200e->rx_tasklet);
-+#endif
+diff --git a/net/sched/act_skbedit.c b/net/sched/act_skbedit.c
+index 8c1d1554f6575..5450c1293eb50 100644
+--- a/net/sched/act_skbedit.c
++++ b/net/sched/act_skbedit.c
+@@ -126,7 +126,7 @@ static int tcf_skbedit_init(struct net *net, struct nlattr *nla,
+ 	struct tcf_skbedit *d;
+ 	u32 flags = 0, *priority = NULL, *mark = NULL, *mask = NULL;
+ 	u16 *queue_mapping = NULL, *ptype = NULL;
+-	u16 mapping_mod = 1;
++	u32 mapping_mod = 1;
+ 	bool exists = false;
+ 	int ret = 0, err;
+ 	u32 index;
+@@ -194,6 +194,10 @@ static int tcf_skbedit_init(struct net *net, struct nlattr *nla,
+ 			}
  
- 	fallthrough;
-     case FORE200E_STATE_ALLOC_BUF:
+ 			mapping_mod = *queue_mapping_max - *queue_mapping + 1;
++			if (mapping_mod > U16_MAX) {
++				NL_SET_ERR_MSG_MOD(extack, "The range of queue_mapping is invalid.");
++				return -EINVAL;
++			}
+ 			flags |= SKBEDIT_F_TXQ_SKBHASH;
+ 		}
+ 		if (*pure_flags & SKBEDIT_F_INHERITDSFIELD)
 -- 
 2.51.0
 
