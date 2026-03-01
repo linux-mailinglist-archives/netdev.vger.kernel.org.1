@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-262341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262342-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ECccJSqeo2k3IQUAu9opvQ
-	(envelope-from <netdev+bounces-262341-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:02:18 +0100
+	id qDJFHN2do2k3IQUAu9opvQ
+	(envelope-from <netdev+bounces-262342-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:01:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA1C21CCAC3
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:02:17 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2239D1CC9C5
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:01:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 017F130221DB
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:54:46 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C97A030FE7BC
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:54:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C46A302779;
-	Sun,  1 Mar 2026 01:53:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDE4E309EE6;
+	Sun,  1 Mar 2026 01:53:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uxjM9uW4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IFH2hpik"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2947E2F7ADE;
-	Sun,  1 Mar 2026 01:53:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF363090C6;
+	Sun,  1 Mar 2026 01:53:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772330018; cv=none; b=Xsn3UDo7pMZQM4ogoVUeLR4IZSILxPXNWI0jDHImsEilyaT9bEf2G7LoRMoSl9/5FWfTIYPvGxTFBOOgFzlT/nOXHUS9v95YlarYS4818bEPI1sV+KhiQCJLva7MdG64KPxoD/jKe06I7tnU5h57ziB6ACxyDfbpjyvRw9p7J14=
+	t=1772330027; cv=none; b=BynothtNMcsJ+Fkq2v31cnLAybwYzY+mfhN9uEA6DjHaj9GFzW3vNwm4fFIjDFcWVUujnRSOl4kSPuto3KQt5aKo7m9pkAt4KPO0w+NBhOXqAOeuNxEeMV7DzJTMnoYwNKuEzSzZqdZnGo2/PL7hmJbGrCqI276IP+Oj8JbBLtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772330018; c=relaxed/simple;
-	bh=PciDdKfLXuQkAHYWA1nMm6Sh5dpuTfADm5btrykWs7s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=odS9quYdY9wMXP6fP405b+txIk+kVMokkTSRb9q3R774CBsmRV3hwAchRuiiRtq0mDAEPI4O/bCJP/AloEF5/DdWl8y0no3tMuhwV4p67JwsoDrbLnBuHJplIF0Tzunp15791dtGi64Uvsv99flE59xwfaH2TBYDYuMHNsQ09K8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uxjM9uW4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 259CDC19421;
-	Sun,  1 Mar 2026 01:53:37 +0000 (UTC)
+	s=arc-20240116; t=1772330027; c=relaxed/simple;
+	bh=URnU3M5r1G+SEcTaZ9fURdC5FLEbRbEaJtbMoF2LBkw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hd8c76coQRjgSLMJiKG1SYnJGwiNx1bvsHBmBBU8nBEeyKOBCFoYGsqn9eGQAZpONApQNl1dpMgJE+YiAYXoV2VtXS1KT6dWXQ6oeYCc5WocoOZQG7AhBNBckdBsm9HDM39ODt8Dr1gN4XUJ88kic3zIgV0CqcEI5IWN4SszT9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IFH2hpik; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7401C19421;
+	Sun,  1 Mar 2026 01:53:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772330017;
-	bh=PciDdKfLXuQkAHYWA1nMm6Sh5dpuTfADm5btrykWs7s=;
+	s=k20201202; t=1772330027;
+	bh=URnU3M5r1G+SEcTaZ9fURdC5FLEbRbEaJtbMoF2LBkw=;
 	h=From:To:Cc:Subject:Date:From;
-	b=uxjM9uW4ygvKGkUt11Hc9iQuRWN9pBbJvuHv8zhP+bFM/9pG26maC910TQrYtB08A
-	 UBojxIpsOhKPMkNENzYAAhFtP3V865m1hxqd6wJic6dryqrLs8fGDG4z9HL+X6+6RQ
-	 KNIWxxUfQM53YvAmN39OGX4dnbwPoo7JegpZEzTgiy6cU4hNmb+UfBmBU23Hdn0qtU
-	 6m8+q7Un4eEvTZ8VnKV0fjcLaHI2flGAEnRaQwnkwdolDxUVWxZ2JyBf6fO++Qbg8v
-	 7K8rnDP1+udmjrK6qOT4TENUrsXlIzqmcaROF6Xf1Vdq950JvHHB5biFcAqW1mG8v1
-	 i9dF+7VrvdEEQ==
+	b=IFH2hpikDcBg0nW5IpAHL+KqICr0Ev0ZHKnH0LJol4cetw5UsynizitbRzQK6E4bb
+	 1L1LEoDpw8ycOfd6drCifGkR8D5CSPveZk8jFVMV5Y2TyDL6JouWBrOSJs9MWy9zqo
+	 QkEqGBv7oO5HBjsLz2aa851J1sjcKjGsYvRixx1y0UQikpUwxV202npzoygp75PrNL
+	 nWDdWKVNRYPvVqFO9v9JwQkBpiQgpvcmk+LlblC6vwujdD/ZyO7tREwQD10y4ztdFx
+	 UckJPLjP13yjkzPRMvK8zwgR2HjnqLxa3lvlo3faTJ1VyUUf1AtHrSdaQUr2XaEJr8
+	 M//qg5wi7JRyQ==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
-	hodgesd@meta.com
-Cc: Eric Dumazet <edumazet@google.com>,
+	haokexin@gmail.com
+Cc: Alexander Sverdlin <alexander.sverdlin@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net
-Subject: FAILED: Patch "tipc: fix RCU dereference race in tipc_aead_users_dec()" failed to apply to 5.15-stable tree
-Date: Sat, 28 Feb 2026 20:53:35 -0500
-Message-ID: <20260301015336.1720415-1-sashal@kernel.org>
+	linux-omap@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: FAILED: Patch "net: cpsw_new: Fix potential unregister of netdev that has not been registered yet" failed to apply to 5.15-stable tree
+Date: Sat, 28 Feb 2026 20:53:45 -0500
+Message-ID: <20260301015345.1720608-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -67,21 +67,23 @@ X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262341-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-262342-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
@@ -89,9 +91,9 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:email,msgid.link:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AA1C21CCAC3
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2239D1CC9C5
 X-Rspamd-Action: no action
 
 The patch below does not apply to the 5.15-stable tree.
@@ -104,41 +106,51 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From 6a65c0cb0ff20b3cbc5f1c87b37dd22cdde14a1c Mon Sep 17 00:00:00 2001
-From: Daniel Hodges <hodgesd@meta.com>
-Date: Tue, 3 Feb 2026 09:56:21 -0500
-Subject: [PATCH] tipc: fix RCU dereference race in tipc_aead_users_dec()
+From 9d724b34fbe13b71865ad0906a4be97571f19cf5 Mon Sep 17 00:00:00 2001
+From: Kevin Hao <haokexin@gmail.com>
+Date: Thu, 5 Feb 2026 10:47:03 +0800
+Subject: [PATCH] net: cpsw_new: Fix potential unregister of netdev that has
+ not been registered yet
 
-tipc_aead_users_dec() calls rcu_dereference(aead) twice: once to store
-in 'tmp' for the NULL check, and again inside the atomic_add_unless()
-call.
+If an error occurs during register_netdev() for the first MAC in
+cpsw_register_ports(), even though cpsw->slaves[0].ndev is set to NULL,
+cpsw->slaves[1].ndev would remain unchanged. This could later cause
+cpsw_unregister_ports() to attempt unregistering the second MAC.
+To address this, add a check for ndev->reg_state before calling
+unregister_netdev(). With this change, setting cpsw->slaves[i].ndev
+to NULL becomes unnecessary and can be removed accordingly.
 
-Use the already-dereferenced 'tmp' pointer consistently, matching the
-correct pattern used in tipc_aead_users_inc() and tipc_aead_users_set().
-
-Fixes: fc1b6d6de220 ("tipc: introduce TIPC encryption & authentication")
+Fixes: ed3525eda4c4 ("net: ethernet: ti: introduce cpsw switchdev based driver part 1 - dual-emac")
+Signed-off-by: Kevin Hao <haokexin@gmail.com>
 Cc: stable@vger.kernel.org
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Daniel Hodges <hodgesd@meta.com>
-Link: https://patch.msgid.link/20260203145621.17399-1-git@danielhodges.dev
+Reviewed-by: Alexander Sverdlin <alexander.sverdlin@gmail.com>
+Link: https://patch.msgid.link/20260205-cpsw-error-path-v1-2-6e58bae6b299@gmail.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/tipc/crypto.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/ti/cpsw_new.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c
-index 970db62bd029b..a3f9ca28c3d53 100644
---- a/net/tipc/crypto.c
-+++ b/net/tipc/crypto.c
-@@ -460,7 +460,7 @@ static void tipc_aead_users_dec(struct tipc_aead __rcu *aead, int lim)
- 	rcu_read_lock();
- 	tmp = rcu_dereference(aead);
- 	if (tmp)
--		atomic_add_unless(&rcu_dereference(aead)->users, -1, lim);
-+		atomic_add_unless(&tmp->users, -1, lim);
- 	rcu_read_unlock();
- }
+diff --git a/drivers/net/ethernet/ti/cpsw_new.c b/drivers/net/ethernet/ti/cpsw_new.c
+index b9fc31eb06134..7f42f58a4b031 100644
+--- a/drivers/net/ethernet/ti/cpsw_new.c
++++ b/drivers/net/ethernet/ti/cpsw_new.c
+@@ -1472,7 +1472,7 @@ static void cpsw_unregister_ports(struct cpsw_common *cpsw)
  
+ 	for (i = 0; i < cpsw->data.slaves; i++) {
+ 		ndev = cpsw->slaves[i].ndev;
+-		if (!ndev)
++		if (!ndev || ndev->reg_state != NETREG_REGISTERED)
+ 			continue;
+ 
+ 		priv = netdev_priv(ndev);
+@@ -1494,7 +1494,6 @@ static int cpsw_register_ports(struct cpsw_common *cpsw)
+ 		if (ret) {
+ 			dev_err(cpsw->dev,
+ 				"cpsw: err registering net device%d\n", i);
+-			cpsw->slaves[i].ndev = NULL;
+ 			break;
+ 		}
+ 	}
 -- 
 2.51.0
 
