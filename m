@@ -1,164 +1,160 @@
-Return-Path: <netdev+bounces-262399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262400-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8EYLCUhCpGl6bQUAu9opvQ
-	(envelope-from <netdev+bounces-262399-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 14:42:32 +0100
+	id cGWlDBpIpGk0cQUAu9opvQ
+	(envelope-from <netdev+bounces-262400-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 15:07:22 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 141A81D0046
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 14:42:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E9411D0229
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 15:07:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 22DDC3004683
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 13:42:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 29B613006001
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 14:06:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EED4D32D0D3;
-	Sun,  1 Mar 2026 13:42:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E9B1317141;
+	Sun,  1 Mar 2026 14:06:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="mSynvnue"
+	dkim=pass (2048-bit key) header.d=yahoo.pl header.i=@yahoo.pl header.b="JwonDg1n"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sonic307-54.consmr.mail.ir2.yahoo.com (sonic307-54.consmr.mail.ir2.yahoo.com [87.248.110.31])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE8C930B50A;
-	Sun,  1 Mar 2026 13:42:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FAE441C71
+	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 14:06:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=87.248.110.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772372546; cv=none; b=IxtJzkRR1xlpls7u+9cfoXUs65eo5TuCzhd8gVa69Ae4pchvCt9h/4fKcFraG4Z1POhOuvhhp8DKvWWt7NKdQ5qEmVkyI3LeYr16oc695nln574S60y9Lwh88YKs7Nx6s39PizWzWVEZh9oytua4B/UNg2mS7dFpmrQeLrh4SI0=
+	t=1772374014; cv=none; b=AFPucUK5axlZrnfGERABVc8DtKGCNhy3kyMsO8uYtzDgIrsqrdh0DzEbwrbxEdbBiZ4jEQ5oDtq/cIsOAAWcjWCtz00pid3ovVaZ9n/DdMyMR5ApdCeytr4/xPqukXmZYZfxrIBa5lYah6UF9RPESazDIsxESzoMMVUwzV4luh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772372546; c=relaxed/simple;
-	bh=qVD4RKahyay8TGAHGHXvQhEtbsva9khTzVeRXDCOk/U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ghjlvg9EDs+svQHIH1ldP0r7YNH2Dmc6ddZDoq/LEntLCiL1UkQ/piKKfBcPCwLZ4oiDbQLX92jKafnpB0I4ElO+SJ5HI+H210wZCRP/fFdKt5+eHrSKH6g8u4RPFvwevPZXs45qorJuS/ZjTomslRtgOKYr0KbuzkZ30rSJM8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=mSynvnue; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=WpLeXtLyKHRcvN1WgzNsqUfY7g82mlvTHaVSolT+rAw=; b=mSynvnueSrkVI69YpKkbBjRG9f
-	aDqJMD3Z92UYypxgYcWlSpCCtaGG2y5OYeYOflT/SvZk3WJSEFJHK+L4vcEl0QEUh/m7fdWN1X8nD
-	UjUsf4wbB5jtulQNCeRci5aBAJSaol5Z3TYzHhfJ7KrF9ikCaGhXijMFvUJ8Xu7OiZS40PeV0uWKJ
-	6r9q6qFwUJLNJ9ROOSBrzNHPwcUQ2O7GDrXGAjhsH4CViafGcb9wnhbllqGjyN6QWTHhN663z4boG
-	z14caRvnp4pi0+vYszyFsw7gFgYh3yopRncaw+ZSz/0GlrMYVQJy2mfwnHUizYlAXgzrjlVOLi4Ka
-	qv/Sd9YA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41064)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vwh3p-0000000030E-41Ie;
-	Sun, 01 Mar 2026 13:42:18 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vwh3n-0000000052j-1vRB;
-	Sun, 01 Mar 2026 13:42:15 +0000
-Date: Sun, 1 Mar 2026 13:42:15 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-phy@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
-Subject: Re: [PATCH RESEND2 net-next 0/8] net: stmmac: qcom-ethqos: further
- serdes reorganisation
-Message-ID: <aaRCN7zbX6FjUtQ_@shell.armlinux.org.uk>
-References: <aaDSJAc-x2-klvHJ@shell.armlinux.org.uk>
- <aaIysVxy-WxbiJz9@shell.armlinux.org.uk>
- <20260227165556.5cf9e844@kernel.org>
- <20260228083111.5df8550c@kernel.org>
- <20260301001453.lpd2rawy7bqxyivp@skbuf>
+	s=arc-20240116; t=1772374014; c=relaxed/simple;
+	bh=i4H5OPIALoajCcINbTsjmpuKcfw2zVtRCm3NdJXip/c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:References; b=iyZNX/HvQMTYKUez2AOnlXRG/CU2Rf8M1WtOvGiWqEzkRa/rJoJlZYBuyOlqawn2fyUxRbtp8ihJwfNBYglvGekTHb1NBSXQ2ghsvqPJwAikhxPCVpJ0jD5dCEJVntxJbbFMLS8vEnarVBFg2p2bOl90GEdZdIJKwa9lvzWnO6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.pl; spf=pass smtp.mailfrom=yahoo.pl; dkim=pass (2048-bit key) header.d=yahoo.pl header.i=@yahoo.pl header.b=JwonDg1n; arc=none smtp.client-ip=87.248.110.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.pl
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.pl; s=s2048; t=1772374006; bh=zhhGTUWkJKcVqJkFMLukzF0Eie7oa0SIWc2PvG8js5g=; h=From:To:Cc:Subject:Date:References:From:Subject:Reply-To; b=JwonDg1nl25Hmsu5ILqT03FqWvGHVQ+7RLGYT2h6EkC7JJO6whbQJ3WcihSpUTruc4q7dZCHw9QEu5xQMWIG2hkjjCi+8XyXNmdm6mVZp5NxuGnXVUzzjs1bETmnYDCYMGBiNG8w/jBLwum6QQHtm/lrgtbwUj5hvvsnceDaIi/3+kUyvAKbZU/mPyGDcJfTmnWp20/l2yQtxSshbU0yDdQXhrixLAYNY7wFK2VH828UZJPmLtC5OgzmGJybNthngGmwbrdEVAKecHbx0/i5XQgvQu5xwJzm2dmAo25zKmGI7n2q+KIDwJWUIOQO0phCYq9DCV/QGrDgAElTn5uk/g==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1772374006; bh=IK2kp3DaiTfnPUzWXb71Cqu6tBWeqJM/StExl/9eAfP=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=lXFaTvaQBO/G6M6xN1sMhkIT6hyDrqHilS8qWgj/vO0ZoBPyMpaLbvNJdzdWGIjFJuCDbRh1B8Mps3z3i3lFey/jiXmVnr6ZZUnaEULuGKvGE1Gt1I2O0VAfqBgJtKps77uTxXi841y9BjrGlW8/moVy8ceIRixbcjWeYwRfQYFb5PXX4DxJCY3/FHyNx7/S+CGfKoXlazHwkgIMCjRQuZiUwrUSmM3LTLOTmoipDlA0LJrK8NoCU8sqMK3dQmfCFen1cGegMsGw0J9ZNgy/xQYf7O9JJ/btZMJU7m9+35n/nSkNCSnZccn30uIy3W/5pM1TIc1N8lb4WxIeZWKgkQ==
+X-YMail-OSG: ThOzNmUVM1k5FV7FXH84YnP5bGvE5ywU6ZdqxX5r.egBgmMEt1W13K9MjH4VDzu
+ X0O4fbv28Rt3v7jjNqutPmsgG2KzYaudeEv0NpSUXOKEyWFFhhgVzVVVgFWwq.25lTs8sCBRBM6y
+ VfjkEyvLc9l8hUoGWpp86xzLNGIiR9kI016OemzlTtKO4qGJfLPmxY4LjxLER1RVnsyt6gQzDZ2f
+ uw3C0RVqANhtO3MsZCgjimlq0SOYD6x7WixX5J2lzJ2nl13Uv6ViuBKgLT3Bgr.AGzDaxvpGpA86
+ tcySLD5DNnQwVjc7pL8gF9mePXxjanXxh45UQOMofyGrulIsINP4q7TgRuYJoPWU6teCZ7aDmPFq
+ liwruAjaBzCCFtnuDpfmQr76311AyPGD8U24m_jUQltSIYfrqsM_BldlSjUlYikl_8GSqBySiZaV
+ Khw48EM4_3TUJC8FL5QTfep1rOLdFV5M8TCaUOR8VoLOYxuqnwY.X4fchS5KkiXVxwXeTKd_CG3n
+ t5WYdLivDMu8raV.NQrIYm6k48kU27Z4ecGd6EnA8A0f5.0g9DYQ_W9QZL28nwj.OhoMmdccQYcB
+ b9.B4wvnTBQKmDEiH3pC8nB2krWedWKnjWEVtFtNnycpbYW5m3eiUfyqhGLkLsKgiqKdG4lG1OwS
+ DPkAoWj_R6HDWkQRI7nUvew5ntpAER86llBNtoy1duFaCpL5iFPyv7YjoFLBrk6NudiL.2vGVxh0
+ I6PNEnWcQBEWta4LH06oYRhIP899_ojeuIzK8bw86OfAac1jvrNSo4pHZM3AktRmlSBMbsvUxazX
+ 0cNwtjn3gK2uULl2ma5uD22ar3rW80kBBOq2PukQmoYq9jQ57kaAu3EOK3gVxIF1FWIxgfUIBa8X
+ TCblzRsbl_tanRvWsOIGHVo7RyC9Iz7tr3zUux8.8HgqQS1B64IwjFhv.YpjtIJDz2QBlRkh_nhf
+ J0Px2KILbnXF0kh.DxSHssnUL3JCyLch6ujThUw.VKGC3THyua45UA.yKABtaYs9GPm.YP2taUBu
+ IVXzTg4vqYzGFQuIHyXh6ggw8J2B7oUWX4u8wpkc4MVUSXrkRh6..Bojnuzzb5HWMB3Nps7oYcOv
+ hOFgw5b9Mg2KubG8dyRBMyO3QhsHCdNyR8gNd3SeO9E3kh5d2sWextXN8vEIsGVyP_pGEiarCzhg
+ H6Mcajhvc1YIIiCh2UyEHmu6uILtNOs_ZAMwzOpicXp4PRM4DBksjJfenJhRBVNenCXh_NRofTd6
+ sJ8XBa4WqDs2_sGbpJWEntYOcDdmalArkV9TmVcISc1lSyYdGkJ9mMfqCVvNzHaqGTXY7uw0HwHx
+ LieZeL.OuEtgs7yYcAILqd9NuWqrhkzgwY6txZOJrBMPmaZ09B9PGMc9.ln7mQriA.orNFvddyA8
+ AQWtklHYNCNBVz._OP8oZqlDJD1mJgAN.NGH2TaouANyZnkkK5_uHtAUmQUJKrhBkc5D4.olYowd
+ a1hITxIIX4ZyJdFvuwjjR6._JAxlajPvNoW3RTZniadjs8bvjWzXRf6KyBuUZBrNZrHj6FCKp8BY
+ POB.qCPWf8jckqsuEcNCAaViPEhfUASLpD4F25IUJ_iwz6PXE7v_.p_P1fin..9Me9VCnlU31j1.
+ vIffkhGztSK9O7thJiyDsD.3Z95N5jffT4DFI6Xzw19u9auxmHHyXJBC6YqiOT_dNriCLd_pcT08
+ KMXnCvK0ydHRhxbgRe15XiZ9DPrJ9rLHA6dMvClbJmVOc3pTJb0MylGUqlKHkHhruV2IqAtsK_e7
+ Buop4sN_KjR6nHu.GjvS2DEA8.7NhijN5OruFP_RlBnlF0p2Tv2tR6ACYryDWONsClV77SI7eprn
+ ocyiMxL_1agvguTs5DrLlOAcBVkRSTdyScg3TsAEedWaLEjxoNT3FxcsGakEGdoRtetPf2vv6co6
+ Cjekr0uBJz_gJgwj2xOQo2lMDgefBWgUFZdea3WZ4xGQCmAD9hDafhEw2aOu1M_PK3COmjMIBJJI
+ exkxU5U9ojUnSKOET6y8dOuEUjVi3ZHpKrNKv3HhKRxEZ5qRXMCE13qSvwEBae7Xl4zvZLI7_j4j
+ 4IW1sNNBXwZswdzjOR2aOkQPT_XEgLfI7e2obBTwBw6JB.67qpzKIKUobKNBw31EntuNfwizVIqJ
+ FR5x0mnNMpXQfvJUzJ6gGlZIASX3wcePoo6PYdfwI53Y7UmRCPRzn9Oj7vO4OBXFDm.U2iKfXT9n
+ BYgC9eakWVCzqid.1uU1pDRbSZRxiJCi5NLe3OYa1IeBVROGMu565iH1n..Q-
+X-Sonic-MF: <tomasz.unger@yahoo.pl>
+X-Sonic-ID: 209d709a-ec78-4530-9249-138f12c970a3
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic307.consmr.mail.ir2.yahoo.com with HTTP; Sun, 1 Mar 2026 14:06:46 +0000
+Received: by hermes--production-ir2-bbcfb4457-d9ssk (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID c79d8117a70c015ed57ec99a8c51618c;
+          Sun, 01 Mar 2026 13:56:36 +0000 (UTC)
+From: tomasz.unger@yahoo.pl
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Tomasz Unger <tomasz.unger@yahoo.pl>
+Subject: [PATCH net-next v1] NFC: nxp-nci: Replace strcpy() with strscpy()
+Date: Sun,  1 Mar 2026 14:56:33 +0100
+Message-ID: <20260301135633.214497-1-tomasz.unger@yahoo.pl>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260301001453.lpd2rawy7bqxyivp@skbuf>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+References: <20260301135633.214497-1-tomasz.unger.ref@yahoo.pl>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[yahoo.pl,reject];
+	R_DKIM_ALLOW(-0.20)[yahoo.pl:s=s2048];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262399-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,yahoo.pl];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.157];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262400-lists,netdev=lfdr.de];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tomasz.unger@yahoo.pl,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[yahoo.pl:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,shell.armlinux.org.uk:mid,armlinux.org.uk:url]
-X-Rspamd-Queue-Id: 141A81D0046
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[yahoo.pl];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2E9411D0229
 X-Rspamd-Action: no action
 
-On Sun, Mar 01, 2026 at 02:14:53AM +0200, Vladimir Oltean wrote:
-> On Sat, Feb 28, 2026 at 08:31:11AM -0800, Jakub Kicinski wrote:
-> > On Fri, 27 Feb 2026 16:55:56 -0800 Jakub Kicinski wrote:
-> > > On Sat, 28 Feb 2026 00:11:29 +0000 Russell King (Oracle) wrote:
-> > > > The AI review for patch 7 says:
-> > > > 
-> > > >   This commit fixes a bug but lacks a Fixes: tag. The commit modifies
-> > > >   behavior introduced in 360000820ae2 ("phy: qcom-sgmii-eth: add
-> > > >   .set_mode() and .validate() methods") by making phy_power_on() call
-> > > >   qcom_dwmac_sgmii_phy_calibrate() to restore the previous setup, and by
-> > > >   making qcom_dwmac_sgmii_phy_set_mode() check if the PHY is powered on
-> > > >   before attempting calibration.
-> > > > 
-> > > >   Should this commit include:
-> > > > 
-> > > >   Fixes: 360000820ae2 ("phy: qcom-sgmii-eth: add .set_mode() and .validate() methods")
-> > > > 
-> > > > which is _wrong_, this isn't a bug fix.  
-> > > 
-> > > Yes, that's what I thought but then I saw the other thread..
-> > 
-> > Trying to apply this now but stmmac parts don't apply on Linus's tree,
-> > and Vinod wants a tag :( What do we do? 
-> > 
-> > Could you, perhaps, send us a PR with this on top of Linus's tree 
-> > (a resolution of the inevitable conflict with net-next would be helpful
-> > too).
-> > 
-> > Or do we give up on the tag?
-> 
-> Actually, I think it's mainly me who wants a stable tag. I'm working on
-> a series for phy-next which will conflict with this hunk from Russell's
-> patch 1:
+From: Tomasz Unger <tomasz.unger@yahoo.pl>
 
-Is this because of the issues I raised with the quality of generic PHY
-API implementation by drivers?
+Replace strcpy() with strscpy() which limits the copy to the size of
+the destination buffer. Since fw_info->name is an array, the
+two-argument variant of strscpy() is used - the compiler deduces
+the buffer size automatically.
 
+This is a defensive cleanup replacing the deprecated strcpy()
+with the preferred strscpy().
+
+Signed-off-by: Tomasz Unger <tomasz.unger@yahoo.pl>
+---
+Testing:
+- checkpatch.pl: 0 errors, 0 warnings
+- make M=drivers/nfc/nxp-nci/: compiled successfully, 0 errors, 0 warnings
+- Module loaded successfully in QEMU (x86_64) with buildroot:
+  modprobe nxp-nci - no errors, confirmed via lsmod
+
+ drivers/nfc/nxp-nci/firmware.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/nfc/nxp-nci/firmware.c b/drivers/nfc/nxp-nci/firmware.c
+index 381b5bb75477..a9533977aff8 100644
+--- a/drivers/nfc/nxp-nci/firmware.c
++++ b/drivers/nfc/nxp-nci/firmware.c
+@@ -211,7 +211,7 @@ int nxp_nci_fw_download(struct nci_dev *ndev, const char *firmware_name)
+ 		goto fw_download_exit;
+ 	}
+ 
+-	strcpy(fw_info->name, firmware_name);
++	strscpy(fw_info->name, firmware_name);
+ 
+ 	r = request_firmware(&fw_info->fw, firmware_name,
+ 			     ndev->nfc_dev->dev.parent);
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.53.0
+
 
