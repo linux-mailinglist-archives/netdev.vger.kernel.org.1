@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-262388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262389-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +Fk0OEEepGlkXgUAu9opvQ
-	(envelope-from <netdev+bounces-262388-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 12:08:49 +0100
+	id KNMKMYYepGlkXgUAu9opvQ
+	(envelope-from <netdev+bounces-262389-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 12:09:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48A701CF459
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 12:08:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2991B1CF469
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 12:09:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 32B9A3036749
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 11:06:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 488D630421CA
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 11:06:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1094E31714E;
-	Sun,  1 Mar 2026 11:06:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E4EB31714C;
+	Sun,  1 Mar 2026 11:06:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j7IUnT3h"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EGasVczi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D8AF2F2607
-	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 11:06:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8476130DEB5
+	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 11:06:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772363182; cv=none; b=mOe5MBkyTdCe2Z6kO66eurk0oL+UUke9DO7oMrkD4nm0oBYVf2mLl1FuEjpJCM0JbDeLahco9Cg3ieyP0m/9ic18Dhf4mjzn8WoDEgLC0hjaGLy03h/FzZy8jCKOjkOqrcTf+13BVtgm7DcYB/vn0CI6Ph+wQ2A22J7DkvaPC84=
+	t=1772363187; cv=none; b=X0RzMbZU0mKczMaGuVTbD5fX06bdncJ2S/2AIUpEoKwTOCN4tYgUG91eKyc4xtBK35w8Jus6bFVRInaYxnmBYs1UEI4NJisrU5RQHdpWXF4g30nNbSDvCAMV8SQ3qH9vyqzPZxyVKmz39m10k6jeM1741yrAAEqwEMYSroFqKPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772363182; c=relaxed/simple;
-	bh=TIvE4y4LuRiV70aS2fW22mvfHHc91g0ORgv1VYahyZU=;
+	s=arc-20240116; t=1772363187; c=relaxed/simple;
+	bh=QMJrFlWUxw3eCzl7CbbaUnvVP2sFPLmXBpj62mRAmvw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BKmrBhS6BNeVGXaJK3cqEkLzhXoDYXcqjTJM+QW84OT5nLxaxSexepxpuJOJ6Fcfj1kU6k9z5vsh6qav8U2vapVkQ62E68xK+JV8r9r579PI5NTt8LS6bWbgGwQGde2Wxno+15IE3dsrZzOBwnHaxTn1+tio49MYG/1H1ldldR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j7IUnT3h; arc=none smtp.client-ip=209.85.222.174
+	 MIME-Version; b=uH2aVEa/KSOiuD4i4v1NyDp+/HLNvq31OnVij4vtBd4XmGuGbJSRDotHLZG6EfkuMzgWGkMloRVupJAtZb/AQ1y7F53HpkTXO7NP0KfiCMITmvNl2FEcxr9IZq0/MuhWo99vjS8ZOroV2NOOs/QFdPx3KWtEk8FHwKEJvh3cluY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EGasVczi; arc=none smtp.client-ip=209.85.160.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-8cb3a8494c5so362384485a.2
-        for <netdev@vger.kernel.org>; Sun, 01 Mar 2026 03:06:20 -0800 (PST)
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-50334dd44d2so42987041cf.1
+        for <netdev@vger.kernel.org>; Sun, 01 Mar 2026 03:06:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772363180; x=1772967980; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1772363181; x=1772967981; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Rd12nlrpOUc6ulbomkWhJgpuZGNyjxegNqIZtOfR/6E=;
-        b=j7IUnT3hXVBby00l+/HbfABENPZifMURJKxbE83l8U6u/0aBqrbXslaq2EIWvXCNAC
-         wwJD682f5oVurDurmg7BXGuQ9i8tY0aJGB4FX15rgci7qQlSWYWpwTTNWSih9+NIDoBD
-         9s5/sXhgK9uivmlitpazjBMQS/v5o5UNJ74qdzkRxo6gKdsFMUH+cv378GcKLS/N0d6K
-         njHzH1lMWel2TeEVI1cuhdHmw7BLD9VqnyMOally6mbEukFKawd8DsL4QHulMpVnA/KK
-         loEIaN6gocndzKRWeIkktLB0/hwejmcHVmGqPv8A2x49llo9+Kvgyiw8Xj8pSiSrIMwM
-         ENCQ==
+        bh=e+nYx3bJb71EY0N2U95E2xjSNTPJeUPvPHdUZAbp4Fk=;
+        b=EGasVczincz8GCnYOK3VoRztMeQp2VTAGsJnt01ypwKa2E3tUxGBmu/DyW8s49u/u1
+         ktbRZHxj8MjYj3rR/HlgRkWHCz7w4xh+smcYPnEUDebH+5JkosaN2Ri4LfnvbK3PNovD
+         ZwmJH/OXWfRCiJz8OPF6S+nW8bAZentWoYlx80MFGOiKK0GZWP1eBwzPQK5wdEMZoDBG
+         e6PhxGHBnbCVjJiCxToClEvwcEONGZYb7WdohcU2313AQ8pKSzfWsuDMzCi2JwjjKIT3
+         6jhR4zVD8KnhPk9uyt0aSBVmxdIBWdzUxuw/tDZwhID/OJU/VgyyEDt2xTJgwhtfNSL7
+         /sxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772363180; x=1772967980;
+        d=1e100.net; s=20230601; t=1772363181; x=1772967981;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Rd12nlrpOUc6ulbomkWhJgpuZGNyjxegNqIZtOfR/6E=;
-        b=Gkjf/EUKACiajJZHAQwwI82+9GbI18Dc/diNkLKZWmlHliSVoupxTN9VjZ11pCSnAA
-         ZJx7BP1XCwBuHmYJg5rkRbiefeN2GdgTPv8xTUhrasw6u1AYn8DkH8igVUZTCfYw34fR
-         dvCgCy+YR3R9Ry5KFZbRNU9gLfzIzj+a7BfUdQn4PCvrkbOosfIO7ALKrTOO9Si/bQ3G
-         dKlwK4tTEZ2thcsjhPevP5PGQcf8lLXbM54/2Ro131vBK67YRxOkUKm2SG0c8M2LZTUD
-         OCTLG6z5FsZKNZYT0FFjKAhfZkTQ07rHxCCh4jZFm/QM8AV+o4QoBJ+annP6mYep2Piw
-         WT7g==
-X-Forwarded-Encrypted: i=1; AJvYcCVrO7Jzb8JR4QFK9SL0CuUJXjGlnHFFe3cn4768po5M5dAkcg5rWU8iaFwb77Ev/E473nbji5Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw67vTwmdy6dt/52Ov091hEqwy+8ZQwwqMPAi0fiHcAWPg3W6O3
-	ibtEneqL2orTQzriXr+wXyqz59pqC9GbTFCP37bX54PJWg9XVlvAKgov
-X-Gm-Gg: ATEYQzw/m9HhJ3GfMXnHM5KwFBuuji7fyjZUpSu0DoRFeNA3U/KeLyElYyd4OK+H2fJ
-	W/1j74hNUiuCNJLBpIXwTMLW+FOem+/4GG5XtvvCyydiPIU1o0rZTOa96Tk2v5WfUj7+dvfMk6k
-	pee68X8qJAiCCVt7arLBDEoO8zmeXRznJLqnIob++ggK67f4h5t3udZ5SLLAgHrzb2YpwdrwPht
-	cfEKYB+1I8El8qlKypm3jLG+1M3XJzVp+XD/pR7dcdfWJIyINpYOO3I2KvF+Omnymre1X/fwZxk
-	ZfEXdtLbXhyHB/hM8fOc67hbZhKVx6PVcsV+JlC5TpjBVEpRJjE5gAVCgB9rE3Bt6mA5JYMDdHa
-	aKnl7ySgU4jQwNyobHejlydtM226koC4WzYXjRP43S0qRWqcsh+lP4qMUPyBHTir9+P2ZBNzzVG
-	+c0ISvr9QCC6ImQ9fQpv1cUxenMGSaopf+uCrgqM+keqf82MOmUq4aXoyf1ujsYQKi2aAK0MSRa
-	vFRiQn/tAcfMMm4
-X-Received: by 2002:a05:6214:d09:b0:899:efd1:9e15 with SMTP id 6a1803df08f44-899efd1a067mr34565596d6.49.1772363179520;
-        Sun, 01 Mar 2026 03:06:19 -0800 (PST)
+        bh=e+nYx3bJb71EY0N2U95E2xjSNTPJeUPvPHdUZAbp4Fk=;
+        b=jYRLTj/PQ+kIkxrcVbgC5hOI2eVKahBtFzvLOM95hqrvscR1vw6bcSGe42r8l5PDcw
+         jmEbnNOuaHAtPkofhOrQCR1APwgiu++SVIZhx5kNtdODtBljRUMKedeNR2ligOkDOY7O
+         GD+v+su7MGi3+5s/x289zVgH8AscX/4xpiiTK5D5FT2KTf5M4l0oYkMmlXu4ejYj12EN
+         CpKKjsUcEMqw1Z1vBCtPoS9llIf43GLrhiaYEQMBOotmOgOEDhHw7+t0hZGlJXsxL2Km
+         9t494DdLhfpMvQjokpbwk91wl3VczXHfdZQadkEbozTHnPmoahOozi497EdWSrVb+/IV
+         eaxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWKxOWk9JlDhSEaOxZ4pAZ3J/GNMVwkiwFT0kwQJa8xxtcq6mYIjJM11rlBPWrr9Nc3v0VYFRw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/SACLRbbkdnCHBhJIQDxpvpR8AmOf97wcqRWStJWXd6E++/1r
+	NpjN/D9Qs1rXxdNraq+vUcBEDhIdKmW4+4BdK7QiEleW8+0ufKby4dRR
+X-Gm-Gg: ATEYQzw0ESXTz0Vy1xGehZRmOuYewxCneaZGgC1JNkbyU2VfgPmUiKcFrThP/ihfjWQ
+	T1PZWeMOmE6ZoYN2CDPGRNzsVsOgiE6o3Uycsv59grL7O7AS3VWI6ehFY0MNMAJAwdj8gaEj0Ig
+	CQBg0ltZgm5j7P/1XH+3IWeXFiCDuBXGVo7VqNVNnUO/J1LZJAjY0AoxEsHbDNRHs5ld05GChP4
+	oqHA0mrozhsFtvEi9bAGHdjViwc8dQYHDCJxmpZOoqoLJs+qWHRmMKh9RvSL9PCZ161YG748lgv
+	ByJnuN+JgHOzDPZhj03fcELnno2kJruK8bO7z9WSnbwPsOUP4kZWTLzX0m1ZLrBpavPxXXmIFKT
+	8uGK83ZhBH+cgfmPAbhb8YaqsofwwGdDYUfuwIpGOM3Gs73zKjM0OZSCtN+Hk+s6SQtUZU3ymIy
+	+a4S9qrVmGn/R/5qmYkxnQQwD/9OjPxC1+NwceuQ24vPLhb1a8buTF6B8ocRoiU3rkdbgaYyv7o
+	zWpHSjd8CcP+sfe
+X-Received: by 2002:ac8:57d2:0:b0:4ee:2352:1bb1 with SMTP id d75a77b69052e-5075273a9ebmr123554541cf.5.1772363181422;
+        Sun, 01 Mar 2026 03:06:21 -0800 (PST)
 Received: from PF5YBGDS.localdomain (70.15.25.19.res-cmts.sm3.ptd.net. [70.15.25.19])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-899c716caebsm83888876d6.15.2026.03.01.03.06.18
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-899c716caebsm83888876d6.15.2026.03.01.03.06.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Mar 2026 03:06:19 -0800 (PST)
+        Sun, 01 Mar 2026 03:06:21 -0800 (PST)
 From: mike.marciniszyn@gmail.com
 To: Alexander Duyck <alexanderduyck@fb.com>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -99,9 +99,9 @@ To: Alexander Duyck <alexanderduyck@fb.com>,
 Cc: mike.marciniszyn@gmail.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2.2 4/5] eth fbnic: TLV support for use by MBX self test
-Date: Sun,  1 Mar 2026 06:06:05 -0500
-Message-ID: <20260301110606.3739-5-mike.marciniszyn@gmail.com>
+Subject: [PATCH net-next v2.2 5/5] eth fbnic: Add mailbox self test
+Date: Sun,  1 Mar 2026 06:06:06 -0500
+Message-ID: <20260301110606.3739-6-mike.marciniszyn@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260301110606.3739-1-mike.marciniszyn@gmail.com>
 References: <20260301110606.3739-1-mike.marciniszyn@gmail.com>
@@ -118,13 +118,13 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262388-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262389-lists,netdev=lfdr.de];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[21];
@@ -142,362 +142,242 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 48A701CF459
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2991B1CF469
 X-Rspamd-Action: no action
 
 From: "Mike Marciniszyn (Meta)" <mike.marciniszyn@gmail.com>
 
-The TLV (Type-Value-Length) self uses a known set of data to create a
-TLV message.  These routines support the MBX self test by creating
-the test messages and parsing the response message coming back
-from the firmware.
+The mailbox self test ensures the interface to and from
+the firmware is healthy by sending a test message and
+fielding the response from the firmware.
+
+This patch uses the new completion API [1][2] that allocates a
+completion structure, binds the completion to the TEST
+message, and uses a new FW parsing routine that wraps the
+completion processing around the TLV parser.
+
+Link: https://patch.msgid.link/20250516164804.741348-1-lee@trager.us [1]
+Link: https://patch.msgid.link/20260115003353.4150771-6-mohsin.bashr@gmail.com [2]
 
 Signed-off-by: Mike Marciniszyn (Meta) <mike.marciniszyn@gmail.com>
 ---
-v2 - place forward of struct fbnic_dev after include with a blank line
+v2 - add enum for test return codes
 
- drivers/net/ethernet/meta/fbnic/fbnic_tlv.c | 276 ++++++++++++++++++++
- drivers/net/ethernet/meta/fbnic/fbnic_tlv.h |  27 ++
- 2 files changed, 303 insertions(+)
+ drivers/net/ethernet/meta/fbnic/fbnic.h       |  14 ++-
+ .../net/ethernet/meta/fbnic/fbnic_ethtool.c   |  15 +++
+ drivers/net/ethernet/meta/fbnic/fbnic_fw.c    | 100 ++++++++++++++++++
+ drivers/net/ethernet/meta/fbnic/fbnic_fw.h    |  27 +++++
+ 3 files changed, 142 insertions(+)
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_tlv.c b/drivers/net/ethernet/meta/fbnic/fbnic_tlv.c
-index 517ed8b2f1cb..c55d4f76a5fc 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_tlv.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_tlv.c
-@@ -551,6 +551,172 @@ int fbnic_tlv_parser_error(void *opaque, struct fbnic_tlv_msg **results)
- 	return -EBADMSG;
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
+index b0c8d1b069e2..251de64baa5a 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
+@@ -129,11 +129,13 @@ static const struct fbnic_stat fbnic_gstrings_xdp_stats[] = {
+ enum fbnic_self_test_results {
+ 	TEST_REG = 0,
+ 	TEST_MSIX,
++	TEST_MBX,
+ };
+
+ static const char fbnic_gstrings_self_test[][ETH_GSTRING_LEN] = {
+ 	[TEST_REG]	= "Register test (offline)",
+ 	[TEST_MSIX]	= "MSI-X Interrupt test (offline)",
++	[TEST_MBX]      = "FW mailbox test (on/offline)",
+ };
+
+ #define FBNIC_TEST_LEN ARRAY_SIZE(fbnic_gstrings_self_test)
+@@ -1525,11 +1527,24 @@ static int fbnic_ethtool_msix_test(struct net_device *netdev, u64 *data)
+ 	return !!*data;
  }
 
-+#define FBNIC_TLV_TEST_STRING_LEN	32
-+
-+struct fbnic_tlv_test {
-+	u64	test_u64;
-+	s64	test_s64;
-+	u32	test_u32;
-+	s32	test_s32;
-+	u16	test_u16;
-+	s16	test_s16;
-+	u8	test_mac[ETH_ALEN];
-+	u8	test_mac_array[4][ETH_ALEN];
-+	u8	test_true;
-+	u8	test_false;
-+	char	test_string[FBNIC_TLV_TEST_STRING_LEN];
-+};
-+
-+static struct fbnic_tlv_test test_struct;
-+
-+const struct fbnic_tlv_index fbnic_tlv_test_index[] = {
-+	FBNIC_TLV_ATTR_U64(FBNIC_TLV_TEST_MSG_U64),
-+	FBNIC_TLV_ATTR_S64(FBNIC_TLV_TEST_MSG_S64),
-+	FBNIC_TLV_ATTR_U32(FBNIC_TLV_TEST_MSG_U32),
-+	FBNIC_TLV_ATTR_S32(FBNIC_TLV_TEST_MSG_S32),
-+	FBNIC_TLV_ATTR_U32(FBNIC_TLV_TEST_MSG_U16),
-+	FBNIC_TLV_ATTR_S32(FBNIC_TLV_TEST_MSG_S16),
-+	FBNIC_TLV_ATTR_MAC_ADDR(FBNIC_TLV_TEST_MSG_MAC_ADDR),
-+	FBNIC_TLV_ATTR_FLAG(FBNIC_TLV_TEST_MSG_FLAG_TRUE),
-+	FBNIC_TLV_ATTR_FLAG(FBNIC_TLV_TEST_MSG_FLAG_FALSE),
-+	FBNIC_TLV_ATTR_STRING(FBNIC_TLV_TEST_MSG_STRING,
-+			      FBNIC_TLV_TEST_STRING_LEN),
-+	FBNIC_TLV_ATTR_ARRAY(FBNIC_TLV_TEST_MSG_ARRAY),
-+	FBNIC_TLV_ATTR_NESTED(FBNIC_TLV_TEST_MSG_NESTED),
-+	FBNIC_TLV_ATTR_LAST
-+};
-+
-+static void fbnic_tlv_test_struct_init(void)
++static int fbnic_ethtool_mbx_self_test(struct net_device *netdev, u64 *data)
 +{
-+	int i = FBNIC_TLV_TEST_STRING_LEN - 1;
++	struct fbnic_net *fbn = netdev_priv(netdev);
++	struct fbnic_dev *fbd = fbn->fbd;
 +
-+	/* Populate the struct with random data */
-+	get_random_once(&test_struct,
-+			offsetof(struct fbnic_tlv_test, test_string) + i);
++	*data = fbnic_fw_mbx_self_test(fbd);
 +
-+	/* Force true/false to their expected values */
-+	test_struct.test_false = false;
-+	test_struct.test_true = true;
-+
-+	/* Convert test_string to a true ASCII string */
-+	test_struct.test_string[i] = '\0';
-+	while (i--) {
-+		/* Force characters into displayable range */
-+		if (test_struct.test_string[i] < 64 ||
-+		    test_struct.test_string[i] >= 96) {
-+			test_struct.test_string[i] %= 32;
-+			test_struct.test_string[i] += 64;
-+		}
-+	}
++	return !!*data;
 +}
 +
-+static int fbnic_tlv_test_attr_data(struct fbnic_tlv_msg *msg)
+ static void fbnic_self_test(struct net_device *netdev,
+ 			    struct ethtool_test *eth_test, u64 *data)
+ {
+ 	bool if_running = netif_running(netdev);
+
++	if (fbnic_ethtool_mbx_self_test(netdev, &data[TEST_MBX]))
++		eth_test->flags |= ETH_TEST_FL_FAILED;
++
+ 	if (!(eth_test->flags & ETH_TEST_FL_OFFLINE)) {
+ 		data[TEST_REG] = 0;
+ 		data[TEST_MSIX] = 0;
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
+index 1f0b6350bef4..c2bad51bdde6 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
+@@ -378,6 +378,37 @@ fbnic_fw_get_cmpl_by_type(struct fbnic_dev *fbd, u32 msg_type)
+ 	return cmpl_data;
+ }
+
++/**
++ * fbnic_fw_xmit_test_msg - Create and transmit a test message to FW mailbox
++ * @fbd: FBNIC device structure
++ * @cmpl: fw completion struct
++ *
++ * Return: zero on success, negative value on failure
++ *
++ * Generates a single page mailbox test message and places it in the Tx
++ * mailbox queue. Expectation is that the FW will validate that the nested
++ * value matches the external values, and then will echo them back to us.
++ *
++ * Also sets a completion slot for use in the completion wait calls when
++ * the cmpl arg is non-NULL.
++ */
++int fbnic_fw_xmit_test_msg(struct fbnic_dev *fbd,
++			   struct fbnic_fw_completion *cmpl)
 +{
-+	struct fbnic_tlv_msg *array;
-+	int err, i;
++	struct fbnic_tlv_msg *test_msg;
++	int err;
 +
-+	err = fbnic_tlv_attr_put_int(msg, FBNIC_TLV_TEST_MSG_U64,
-+				     test_struct.test_u64);
++	test_msg = fbnic_tlv_test_create(fbd);
++	if (!test_msg)
++		return -ENOMEM;
++
++	err = fbnic_mbx_map_req_w_cmpl(fbd, test_msg, cmpl);
 +	if (err)
-+		return err;
++		free_page((unsigned long)test_msg);
 +
-+	err = fbnic_tlv_attr_put_int(msg, FBNIC_TLV_TEST_MSG_S64,
-+				     test_struct.test_s64);
-+	if (err)
-+		return err;
++	return err;
++}
 +
-+	err = fbnic_tlv_attr_put_int(msg, FBNIC_TLV_TEST_MSG_U32,
-+				     test_struct.test_u32);
-+	if (err)
-+		return err;
+ /**
+  * fbnic_fw_xmit_simple_msg - Transmit a simple single TLV message w/o data
+  * @fbd: FBNIC device structure
+@@ -1556,7 +1587,29 @@ int fbnic_fw_xmit_send_logs(struct fbnic_dev *fbd, bool enable,
+ 	return err;
+ }
+
++static int
++fbnic_fw_parser_test(void *opaque, struct fbnic_tlv_msg **results)
++{
++	struct fbnic_fw_completion *cmpl;
++	struct fbnic_dev *fbd = opaque;
++	int err;
 +
-+	err = fbnic_tlv_attr_put_int(msg, FBNIC_TLV_TEST_MSG_S32,
-+				     test_struct.test_s32);
-+	if (err)
-+		return err;
-+
-+	err = fbnic_tlv_attr_put_int(msg, FBNIC_TLV_TEST_MSG_U16,
-+				     test_struct.test_u16);
-+	if (err)
-+		return err;
-+
-+	err = fbnic_tlv_attr_put_int(msg, FBNIC_TLV_TEST_MSG_S16,
-+				     test_struct.test_s16);
-+	if (err)
-+		return err;
-+
-+	err = fbnic_tlv_attr_put_value(msg, FBNIC_TLV_TEST_MSG_MAC_ADDR,
-+				       test_struct.test_mac, ETH_ALEN);
-+	if (err)
-+		return err;
-+
-+	/* Start MAC address array */
-+	array = fbnic_tlv_attr_nest_start(msg, FBNIC_TLV_TEST_MSG_ARRAY);
-+	if (!array)
++	/* find cmpl */
++	cmpl = fbnic_fw_get_cmpl_by_type(fbd, FBNIC_TLV_MSG_ID_TEST);
++	if (!cmpl)
 +		return -ENOSPC;
 +
-+	for (i = 0; i < 4; i++) {
-+		err = fbnic_tlv_attr_put_value(array,
-+					       FBNIC_TLV_TEST_MSG_MAC_ADDR,
-+					       test_struct.test_mac_array[i],
-+					       ETH_ALEN);
-+		if (err)
-+			return err;
-+	}
++	err = fbnic_tlv_parser_test(opaque, results);
 +
-+	/* Close array */
-+	fbnic_tlv_attr_nest_stop(msg);
++	cmpl->result = err;
++	complete(&cmpl->done);
++	fbnic_fw_put_cmpl(cmpl);
 +
-+	err = fbnic_tlv_attr_put_flag(msg, FBNIC_TLV_TEST_MSG_FLAG_TRUE);
-+	if (err)
-+		return err;
-+
-+	return fbnic_tlv_attr_put_string(msg, FBNIC_TLV_TEST_MSG_STRING,
-+					 test_struct.test_string);
++	return err;
 +}
 +
-+/**
-+ * fbnic_tlv_test_create - Allocate a test message and fill it w/ data
-+ * @fbd: FBNIC device structure
-+ *
-+ * Return: NULL on failure to allocate or pointer to new TLV test message.
-+ **/
-+struct fbnic_tlv_msg *fbnic_tlv_test_create(struct fbnic_dev *fbd)
-+{
-+	struct fbnic_tlv_msg *msg, *nest;
-+	int err;
-+
-+	msg = fbnic_tlv_msg_alloc(FBNIC_TLV_MSG_ID_TEST);
-+	if (!msg)
-+		return NULL;
-+
-+	/* Randomize struct data */
-+	fbnic_tlv_test_struct_init();
-+
-+	/* Add first level of data to message */
-+	err = fbnic_tlv_test_attr_data(msg);
-+	if (err)
-+		goto free_message;
-+
-+	/* Start second level nested */
-+	nest = fbnic_tlv_attr_nest_start(msg, FBNIC_TLV_TEST_MSG_NESTED);
-+	if (!nest)
-+		goto free_message;
-+
-+	/* Add nested data */
-+	err = fbnic_tlv_test_attr_data(nest);
-+	if (err)
-+		goto free_message;
-+
-+	/* Close nest and report full message */
-+	fbnic_tlv_attr_nest_stop(msg);
-+
-+	return msg;
-+free_message:
-+	free_page((unsigned long)msg);
-+	return NULL;
-+}
-+
- void fbnic_tlv_attr_addr_copy(u8 *dest, struct fbnic_tlv_msg *src)
- {
- 	u8 *mac_addr;
-@@ -558,3 +724,113 @@ void fbnic_tlv_attr_addr_copy(u8 *dest, struct fbnic_tlv_msg *src)
- 	mac_addr = fbnic_tlv_attr_get_value_ptr(src);
- 	memcpy(dest, mac_addr, ETH_ALEN);
+ static const struct fbnic_tlv_parser fbnic_fw_tlv_parser[] = {
++	FBNIC_TLV_PARSER(TEST, fbnic_tlv_test_index, fbnic_fw_parser_test),
+ 	FBNIC_TLV_PARSER(FW_CAP_RESP, fbnic_fw_cap_resp_index,
+ 			 fbnic_fw_parse_cap_resp),
+ 	FBNIC_TLV_PARSER(OWNERSHIP_RESP, fbnic_ownership_resp_index,
+@@ -1787,6 +1840,53 @@ void fbnic_mbx_flush_tx(struct fbnic_dev *fbd)
+ 	} while (time_is_after_jiffies(timeout));
  }
+
++/**
++ * fbnic_fw_mbx_self_test() - verify firmware interface
++ * @fbd: device to test
++ *
++ * This function tests the interfaces to/from the firmware.
++ *
++ * Return: See enum fbnic_fw_self_test_codes
++ **/
++enum fbnic_fw_self_test_codes fbnic_fw_mbx_self_test(struct fbnic_dev *fbd)
++{
++	enum fbnic_fw_self_test_codes err;
++	struct fbnic_fw_completion *cmpl;
++
++	/* Skip test if FW interface is not present */
++	if (!fbnic_fw_present(fbd))
++		return FBNIC_TEST_FW_NO_FIRMWARE;
++
++	cmpl = fbnic_fw_alloc_cmpl(FBNIC_TLV_MSG_ID_TEST);
++	if (!cmpl)
++		return FBNIC_TEST_FW_NO_CMPL;
++
++	/* Load a test message onto the FW mailbox interface
++	 * and arm the completion.
++	 */
++	err = fbnic_fw_xmit_test_msg(fbd, cmpl);
++	if (err) {
++		err = FBNIC_TEST_FW_NO_XMIT;
++		goto exit_free;
++	}
++
++	/* Verify we received a message back */
++	if (!fbnic_mbx_wait_for_cmpl(cmpl)) {
++		err = FBNIC_TEST_FW_NO_MSG;
++		goto exit_cleanup;
++	}
++
++	/* Verify there were no parsing errors */
++	if (cmpl->result)
++		err = FBNIC_TEST_FW_PARSE;
++exit_cleanup:
++	fbnic_mbx_clear_cmpl(fbd, cmpl);
++exit_free:
++	fbnic_fw_put_cmpl(cmpl);
++
++	return err;
++}
++
+ int fbnic_fw_xmit_rpc_macda_sync(struct fbnic_dev *fbd)
+ {
+ 	struct fbnic_tlv_msg *mac_array;
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
+index 8f7218900562..d84723e4cfa3 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
+@@ -104,6 +104,33 @@ void fbnic_mbx_clear_cmpl(struct fbnic_dev *fbd,
+ void fbnic_mbx_poll(struct fbnic_dev *fbd);
+ int fbnic_mbx_poll_tx_ready(struct fbnic_dev *fbd);
+ void fbnic_mbx_flush_tx(struct fbnic_dev *fbd);
 +
 +/**
-+ * fbnic_tlv_parser_test_attr - Function loading test attributes into structure
-+ * @str: Test structure to load
-+ * @results: Pointer to results array
++ * enum fbnic_fw_self_test_codes - return codes from self test routines
 + *
-+ * Copies attributes into structure. Any attribute that doesn't exist in the
-+ * results array is not populated.
-+ **/
-+static void fbnic_tlv_parser_test_attr(struct fbnic_tlv_test *str,
-+				       struct fbnic_tlv_msg **results)
-+{
-+	struct fbnic_tlv_msg *array_results[4];
-+	struct fbnic_tlv_msg *attr;
-+	char *string = NULL;
-+	int i, err;
-+
-+	str->test_u64 = fta_get_uint(results, FBNIC_TLV_TEST_MSG_U64);
-+	str->test_u32 = fta_get_uint(results, FBNIC_TLV_TEST_MSG_U32);
-+	str->test_u16 = fta_get_uint(results, FBNIC_TLV_TEST_MSG_U16);
-+
-+	str->test_s64 = fta_get_sint(results, FBNIC_TLV_TEST_MSG_S64);
-+	str->test_s32 = fta_get_sint(results, FBNIC_TLV_TEST_MSG_S32);
-+	str->test_s16 = fta_get_sint(results, FBNIC_TLV_TEST_MSG_S16);
-+
-+	attr = results[FBNIC_TLV_TEST_MSG_MAC_ADDR];
-+	if (attr)
-+		fbnic_tlv_attr_addr_copy(str->test_mac, attr);
-+
-+	attr = results[FBNIC_TLV_TEST_MSG_ARRAY];
-+	if (attr) {
-+		int len = le16_to_cpu(attr->hdr.len) / sizeof(u32) - 1;
-+
-+		err = fbnic_tlv_attr_parse_array(&attr[1], len,
-+						 array_results,
-+						 fbnic_tlv_test_index,
-+						 FBNIC_TLV_TEST_MSG_MAC_ADDR,
-+						 4);
-+		if (!err) {
-+			for (i = 0; i < 4 && array_results[i]; i++)
-+				fbnic_tlv_attr_addr_copy(str->test_mac_array[i],
-+							 array_results[i]);
-+		}
-+	}
-+
-+	str->test_true = !!results[FBNIC_TLV_TEST_MSG_FLAG_TRUE];
-+	str->test_false = !!results[FBNIC_TLV_TEST_MSG_FLAG_FALSE];
-+
-+	attr = results[FBNIC_TLV_TEST_MSG_STRING];
-+	if (attr) {
-+		string = fbnic_tlv_attr_get_value_ptr(attr);
-+		strscpy(str->test_string, string, FBNIC_TLV_TEST_STRING_LEN);
-+	}
-+}
-+
-+static void fbnic_tlv_test_dump(struct fbnic_tlv_test *value, char *prefix)
-+{
-+	print_hex_dump(KERN_INFO, prefix, DUMP_PREFIX_OFFSET, 16, 1,
-+		       value, sizeof(*value), true);
-+}
-+
-+/**
-+ * fbnic_tlv_parser_test - Function for parsing and testing test message
-+ * @opaque: Unused value
-+ * @results: Results of parser output
++ * These are the codes returned from the self test routines and
++ * stored in the test result array indexed by the specific
++ * test name.
 + *
-+ * Return: negative value on error, or 0 on success.
-+ *
-+ * Parses attributes to structures and compares the structure to the
-+ * expected test value that should have been used to populate the message.
-+ *
-+ * Used to verify message generation and parser are working correctly.
-+ **/
-+int fbnic_tlv_parser_test(void *opaque, struct fbnic_tlv_msg **results)
-+{
-+	struct fbnic_tlv_msg *nest_results[FBNIC_TLV_RESULTS_MAX] = { 0 };
-+	struct fbnic_tlv_test result_struct;
-+	struct fbnic_tlv_msg *attr;
-+	int err;
-+
-+	memset(&result_struct, 0, sizeof(result_struct));
-+	fbnic_tlv_parser_test_attr(&result_struct, results);
-+
-+	if (memcmp(&test_struct, &result_struct, sizeof(test_struct))) {
-+		fbnic_tlv_test_dump(&result_struct, "fbnic: found - ");
-+		fbnic_tlv_test_dump(&test_struct, "fbnic: expected - ");
-+		return -EINVAL;
-+	}
-+
-+	attr = results[FBNIC_TLV_TEST_MSG_NESTED];
-+	if (!attr)
-+		return -EINVAL;
-+
-+	err = fbnic_tlv_attr_parse(&attr[1],
-+				   le16_to_cpu(attr->hdr.len) / sizeof(u32) - 1,
-+				   nest_results, fbnic_tlv_test_index);
-+	if (err)
-+		return err;
-+
-+	memset(&result_struct, 0, sizeof(result_struct));
-+	fbnic_tlv_parser_test_attr(&result_struct, nest_results);
-+
-+	if (memcmp(&test_struct, &result_struct, sizeof(test_struct))) {
-+		fbnic_tlv_test_dump(&result_struct, "fbnic: found - ");
-+		fbnic_tlv_test_dump(&test_struct, "fbnic: expected - ");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_tlv.h b/drivers/net/ethernet/meta/fbnic/fbnic_tlv.h
-index 3508b46ebdd0..9c4e4759394a 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_tlv.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_tlv.h
-@@ -9,6 +9,8 @@
- #include <linux/const.h>
- #include <linux/types.h>
-
-+struct fbnic_dev;
-+
- #define FBNIC_TLV_MSG_ALIGN(len)	ALIGN(len, sizeof(u32))
- #define FBNIC_TLV_MSG_SIZE(len)		\
- 		(FBNIC_TLV_MSG_ALIGN(len) / sizeof(u32))
-@@ -153,6 +155,31 @@ int fbnic_tlv_parser_error(void *opaque, struct fbnic_tlv_msg **results);
- #define fta_get_str(_results, _id, _dst, _dstsize) \
- 	fbnic_tlv_attr_get_string(_results[_id], _dst, _dstsize)
-
-+#define FBNIC_TLV_MSG_ID_TEST	0
-+
-+enum fbnic_tlv_test_attr_id {
-+	FBNIC_TLV_TEST_MSG_U64,
-+	FBNIC_TLV_TEST_MSG_S64,
-+	FBNIC_TLV_TEST_MSG_U32,
-+	FBNIC_TLV_TEST_MSG_S32,
-+	FBNIC_TLV_TEST_MSG_U16,
-+	FBNIC_TLV_TEST_MSG_S16,
-+	FBNIC_TLV_TEST_MSG_MAC_ADDR,
-+	FBNIC_TLV_TEST_MSG_FLAG_TRUE,
-+	FBNIC_TLV_TEST_MSG_FLAG_FALSE,
-+	FBNIC_TLV_TEST_MSG_STRING,
-+	FBNIC_TLV_TEST_MSG_NESTED,
-+	FBNIC_TLV_TEST_MSG_ARRAY,
-+	FBNIC_TLV_TEST_MSG_MAX
++ * @FBNIC_TEST_FW_SUCCESS: test success
++ * @FBNIC_TEST_FW_NO_FIRMWARE: FW interface not present
++ * @FBNIC_TEST_FW_NO_CMPL: No completion available
++ * @FBNIC_TEST_FW_NO_XMIT: Could not xmit message
++ * @FBNIC_TEST_FW_NO_MSG: no message returned
++ * @FBNIC_TEST_FW_PARSE: returned message had parsing error
++ */
++enum fbnic_fw_self_test_codes {
++	FBNIC_TEST_FW_SUCCESS = 0,
++	FBNIC_TEST_FW_NO_FIRMWARE = 10,
++	FBNIC_TEST_FW_NO_CMPL = 20,
++	FBNIC_TEST_FW_NO_XMIT = 30,
++	FBNIC_TEST_FW_NO_MSG = 40,
++	FBNIC_TEST_FW_PARSE = 50,
 +};
 +
-+extern const struct fbnic_tlv_index fbnic_tlv_test_index[];
-+struct fbnic_tlv_msg *fbnic_tlv_test_create(struct fbnic_dev *fbd);
-+int fbnic_tlv_parser_test(void *opaque, struct fbnic_tlv_msg **results);
-+
-+#define FBNIC_TLV_MSG_TEST \
-+	FBNIC_TLV_PARSER(TEST, fbnic_tlv_test_index, \
-+			 fbnic_tlv_parser_test)
- #define FBNIC_TLV_MSG_ERROR \
- 	FBNIC_TLV_PARSER(UNKNOWN, NULL, fbnic_tlv_parser_error)
- #endif /* _FBNIC_TLV_H_ */
++enum fbnic_fw_self_test_codes fbnic_fw_mbx_self_test(struct fbnic_dev *fbd);
++int fbnic_fw_xmit_test_msg(struct fbnic_dev *fbd,
++			   struct fbnic_fw_completion *c);
+ int fbnic_fw_xmit_ownership_msg(struct fbnic_dev *fbd, bool take_ownership);
+ int fbnic_fw_init_heartbeat(struct fbnic_dev *fbd, bool poll);
+ void fbnic_fw_check_heartbeat(struct fbnic_dev *fbd);
 --
 2.43.0
 
