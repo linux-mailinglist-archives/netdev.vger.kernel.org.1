@@ -1,269 +1,173 @@
-Return-Path: <netdev+bounces-262370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262371-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yK4NKx++o2mPLAUAu9opvQ
-	(envelope-from <netdev+bounces-262370-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 05:18:39 +0100
+	id gM5eFujVo2mdPAUAu9opvQ
+	(envelope-from <netdev+bounces-262371-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 07:00:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E96371CE7F1
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 05:18:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B082E1CE96D
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 07:00:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E0972300E251
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 04:18:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5FF65301BC2B
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 06:00:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A8522F4A18;
-	Sun,  1 Mar 2026 04:18:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D0B3090C5;
+	Sun,  1 Mar 2026 06:00:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="Mcga8lH1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UQ5nOPbv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2591C2264C7
-	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 04:18:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A7592E7F20
+	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 06:00:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772338715; cv=none; b=BxYOJgNMwlnjEldgrCutozteE/smN1tq8HPsDkH6+gBN6Njze/S6sG5MdFRAS6VEMnvVxKqIz+T1HkcI3oNHu92yVath6CIE5MEtWMe2nML3wGoKSlPaU7r+QlTM4kYOgPG+81WUBeitkw4XYps4tsN+KwkzLN8Bm+h7Nqq2epo=
+	t=1772344804; cv=none; b=Ntlukt663r5t61mBM65IP/5OWYzbGJp4+NoH5xpg/G0RwwY341QN+1ruT9wtTxeuHXsPOF5/UweCZd9miFK6eoLsq6qwvDOnuHH9qfhidgm0H2Vwhyx4d7LPIAviwlqqPitBv/BysBKHv95K9mMrlclj0YWnX7JNcA8yPmnRsTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772338715; c=relaxed/simple;
-	bh=pEpt7nrCP8JCCmw5lmsAvzsIU9AYYaoSSM5V+qdD5RI=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=GAt2oU0OZ0wmup26ExzKJ7PA89xjBgDIjsVWiAc2NPvQ0UfiApAGIM91RTQBFkv4k2enzzHklUfehwd0/F3mP3flOzy+V73i9Nh1hZBAaz3e4eviFi0PHkLcDMpnKoDF9S0j3u2/r056FWFfpNFZXwM9t63ZiAUJWlok5qZwGtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=Mcga8lH1; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-507373bffd9so31203441cf.2
-        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 20:18:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1772338713; x=1772943513; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=iHrK+sAG20wP+KjRjeg7ewN87L8WXpcr7a47/op8qGw=;
-        b=Mcga8lH1ZEdd6ynrGh4m2uwfrlJxGPvGVgzsMIuWHD6QtxPGRvOlpzBZyX5p4O8Alq
-         RvfeQj2vmHtWEQdF4YWf/jl/GWw0lgpJJW72jGcTEhefZ3V9XHdoBqVRKZgvdPe+ForJ
-         UnHSsm5arqeLLdDykdFpgQc91w+4Rzwkp4ur5GE2FXZaeDQguFZAmroA/sHgjtY3bCDF
-         JdndxljqqcoMxrnId5V789lIOcOrTDfIj/eCscCA8fb48c6klc7FGWutR+fSb2lFalcB
-         /4RjN5DeFIXnTN3btVOu9xEn6c/3pG+fVpAbuioJdt07HfIziUySM//jhOSiqimUICXp
-         s1dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772338713; x=1772943513;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iHrK+sAG20wP+KjRjeg7ewN87L8WXpcr7a47/op8qGw=;
-        b=shzm039wSvb8lzRXMO38QK39oHiUE/OQLwMbzU7A1ZvoloLY4SbgMiQBxsVxgamMpg
-         p6tJVOAvM8j+R5BlzwaAk7iYeeWumNhtzRHJ0bVNvyVMvREYkHzTX7ux/lcToYcVlRl9
-         4VEpJoJbT9hiTqD6R9hiAYK/2sCr9FsNwFxd2SoDPXZZ+HMG9VGUJNaxFqWCyrfiYzvU
-         3A7BudJjarLpWjjFu9byAFwj9HP4gUAte0ET1eKGVS2vf8FwwyS0GD66WPID3SsToy28
-         WpqDFquEAqCKVowMHRedj448y6vvfKoqV/C3aGEhVUPrR3iX8MYIwx6+InHvs51xagEq
-         L5mA==
-X-Gm-Message-State: AOJu0YzvuVR1I89LoIB6luKPZTpLTq2aWVWKFjSl70OmYJY6uh/OHG1p
-	CuHQpgBtT+o/6/imbBBhjVgP7TqAc+LVmkOTV0LgVwi24QSckkvzslkD07r9C2hB3kg=
-X-Gm-Gg: ATEYQzxPcfKVhVoMNkzfYtDNNuoSbNAbvoF3L6V3jYHxSqPFwEKsTmHr2dhQcalVx/G
-	+Sng7OwTGbTNJXFhywEqt6OjhC7ogA873nALBnObG52MxgHFX5Zi11nn5Fk1iExfppkUA8GIdaY
-	y9aBv4vL/6VaAlOBcGVFkW4gHl6bQzmKc4QL2MCVY6kkfDk3hgUV//M+2LIS3dv6Q3hYiDy7ZEg
-	uIZ94wybjfM/MVjPLOfXduTCUW4dps+IdHQrcOe3/NK1ZcdBqSl6gNLH4k/MGeEbEqXysl/lFL0
-	ki8MRIyQW1nU7jkUqmiON/pEA8Nt6/2ct5fkMka1OEgoaqRgyCfx5tECFohpXiq7aVoFYbBQajB
-	Ac8LoGsmijxMAUORptucFsTZA7RtBvDccMjb3In03yFoTMeCCC5Dc32fVqbZFqYaGAxLzGBsBmy
-	xLAXXLTUAN94LEQN9FdPCe5vXj8ICXpVk6c3grgHBf/5Ol+jirACYr/q29WVAo/kbyJA==
-X-Received: by 2002:a05:622a:11cf:b0:4ee:43e1:e591 with SMTP id d75a77b69052e-507529be42bmr102804831cf.58.1772338712856;
-        Sat, 28 Feb 2026 20:18:32 -0800 (PST)
-Received: from [192.168.86.87] ([136.27.45.11])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-899c71a23bdsm75605766d6.22.2026.02.28.20.18.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 28 Feb 2026 20:18:32 -0800 (PST)
-Message-ID: <eda2e2da-6f22-4c8e-9b63-837bc349599e@davidwei.uk>
-Date: Sat, 28 Feb 2026 20:18:30 -0800
+	s=arc-20240116; t=1772344804; c=relaxed/simple;
+	bh=QKni47SVW9Uu35RdotBA7722dJSKwDszVsr/Cmo+eIU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=g4s9jncwMxOyyd0KMPkyBdJ1aCG7VSxcTDcruc8+c6/bv0TI4NCB1w4y3jVn2qeD0RnJOHcVgyUpasqeGhRd7dfBZ/d2/oTGnRgWeMa6q4paO4F69+lXp8al9sztlq/B1D12yz2IWM++dYvdP5NaJLYOA/0hRT3Ry6xGFsNIwDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UQ5nOPbv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00559C116C6
+	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 06:00:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772344804;
+	bh=QKni47SVW9Uu35RdotBA7722dJSKwDszVsr/Cmo+eIU=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=UQ5nOPbvJlle9K2ewrCfaXDlMF3/CnrPh10KwTwRpi2D0LMPy+je0uCUAsvXqqNix
+	 lNx1yibvd0/qry8SfG6cxIc92vbq+vTTo2BsKc9Ni21+ueStrli0CqoT2x3vO7wv4z
+	 xZJQkCuee+gJYzc0nQQv5BImFGv0K7nVa78wqZ/ybG0/LD5jADhMXHodNnFsDMNM3I
+	 qTGGD6i7GgbJVwIk7GAfN/1gtMF1ylZSJ44hKqogooCFEMOVpChR5774HprQPfjnas
+	 WMpL/F/d6uJ59bZHAbJdiPXBeJTcH9Vz88oy9mhGxgLFgb0FFQAWDBV82LiWc+ANR3
+	 kw+sJEtg4zm3w==
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-65f980cea07so4876363a12.0
+        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 22:00:03 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCV6yN+BiaY5JaeCTAXh5daNKzQKlkDtPzLlsEn6KhKZS4Cg8UxycrufNoGlNXiy0JgBG6J3BJk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwsP8bvenWOQK/YwIAcsNOth3tZjcM/r7mYRtrz/X392BSBM6Xn
+	6yVodbMVVzzRKN2BX/xRI6QjWve6gv1eourb4fAPexzlL7OkvBVgGI33ugGMGhQ9jMeWDVIYNlv
+	/dnhwhh15P+fR/ZVA18zkpaCju+nXkgo=
+X-Received: by 2002:a05:6402:42c4:b0:65b:ec2d:e60d with SMTP id
+ 4fb4d7f45d1cf-65fde2d08c7mr5450438a12.32.1772344802355; Sat, 28 Feb 2026
+ 22:00:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: David Wei <dw@davidwei.uk>
-Subject: Re: [PATCH net-next 3/9] selftests/net: Add env for container based
- tests
-To: Bobby Eshleman <bobbyeshleman@gmail.com>, Wei Wang <weibunny@fb.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
- Daniel Zahka <daniel.zahka@gmail.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Daniel Borkmann <daniel@iogearbox.net>
-References: <20260224002410.1553838-1-weibunny@fb.com>
- <20260224002410.1553838-4-weibunny@fb.com>
- <aZ3pl177Q6+uJCCN@devvm11784.nha0.facebook.com>
-Content-Language: en-US
-In-Reply-To: <aZ3pl177Q6+uJCCN@devvm11784.nha0.facebook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20260301012606.1683431-1-sashal@kernel.org>
+In-Reply-To: <20260301012606.1683431-1-sashal@kernel.org>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Sun, 1 Mar 2026 13:59:51 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H7QMmww2E2yZECuW=La0i3s1nKbbQvpODgPzrPci3f0HQ@mail.gmail.com>
+X-Gm-Features: AaiRm50WuaIawTrIMUAzic5HCfeMGfAec2UkDWc3Lhbmb5tQfUpf37UwpYVyxss
+Message-ID: <CAAhV-H7QMmww2E2yZECuW=La0i3s1nKbbQvpODgPzrPci3f0HQ@mail.gmail.com>
+Subject: Re: FAILED: Patch "net: stmmac: dwmac-loongson: Set clk_csr_i to
+ 100-150MHz" failed to apply to 6.12-stable tree
+To: Sasha Levin <sashal@kernel.org>
+Cc: stable@vger.kernel.org, Hongliang Wang <wanghongliang@loongson.cn>, 
+	Huacai Chen <chenhuacai@loongson.cn>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[davidwei-uk.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262370-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,gmail.com,lunn.ch,davemloft.net,google.com,iogearbox.net];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[davidwei.uk];
-	FREEMAIL_TO(0.00)[gmail.com,fb.com];
-	DKIM_TRACE(0.00)[davidwei-uk.20230601.gappssmtp.com:+];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262371-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dw@davidwei.uk,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[chenhuacai@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[davidwei.uk:mid,davidwei.uk:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,davidwei-uk.20230601.gappssmtp.com:dkim,iogearbox.net:email]
-X-Rspamd-Queue-Id: E96371CE7F1
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,msgid.link:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,loongson.cn:email]
+X-Rspamd-Queue-Id: B082E1CE96D
 X-Rspamd-Action: no action
 
-On 2026-02-24 10:10, Bobby Eshleman wrote:
-> On Mon, Feb 23, 2026 at 04:24:03PM -0800, Wei Wang wrote:
->> From: David Wei <dw@davidwei.uk>
->>
->> Add an env NetDrvContEnv for container based selftests. This automates
->> the setup of a netns, netkit pair with one inside the netns, and a BPF
->> program that forwards skbs from the NETIF host inside the container.
->>
->> Currently only netkit is used, but other virtual netdevs e.g. veth can
->> be used too.
->>
->> Expect netkit container datapath selftests to have a publicly routable
->> IP prefix to assign to netkit in a container, such that packets will
->> land on eth0. The BPF skb forward program will then forward such packets
->> from the host netns to the container netns.
->>
->> Signed-off-by: David Wei <dw@davidwei.uk>
->> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
->> ---
->>   .../testing/selftests/drivers/net/README.rst  |  19 ++
->>   .../drivers/net/hw/lib/py/__init__.py         |   7 +-
->>   .../selftests/drivers/net/lib/py/__init__.py  |   7 +-
->>   .../selftests/drivers/net/lib/py/env.py       | 163 ++++++++++++++++++
->>   4 files changed, 190 insertions(+), 6 deletions(-)
->>
->> diff --git a/tools/testing/selftests/drivers/net/README.rst b/tools/testing/selftests/drivers/net/README.rst
->> index eb838ae94844..39370a83f238 100644
->> --- a/tools/testing/selftests/drivers/net/README.rst
->> +++ b/tools/testing/selftests/drivers/net/README.rst
->> @@ -62,6 +62,25 @@ LOCAL_V4, LOCAL_V6, REMOTE_V4, REMOTE_V6
->>   
->>   Local and remote endpoint IP addresses.
->>   
->> +LOCAL_PREFIX_V4, LOCAL_PREFIX_V6
->> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> Still not sure we want LOCAL_PREFIX_V4 here, since it is not supported?
+Hi, Sasha,
 
-Thanks, I'll remove LOCAL_PREFIX_V4.
+On Sun, Mar 1, 2026 at 9:26=E2=80=AFAM Sasha Levin <sashal@kernel.org> wrot=
+e:
+>
+> The patch below does not apply to the 6.12-stable tree.
+> If someone wants it applied there, or to any other stable or longterm
+> tree, then please email the backport, including the original git commit
+> id to <stable@vger.kernel.org>.
+I have already submit a patch for 6.12 some days ago:
+https://lore.kernel.org/loongarch/20260218121219.2545107-1-chenhuacai@loong=
+son.cn/T/#u
 
-> 
->> +
->> +Local IP prefix/subnet which can be used to allocate extra IP addresses (for
->> +network name spaces behind macvlan, veth, netkit devices). DUT must be
->> +reachable using these addresses from the endpoint.
->> +
->> +  +-------------+        +----------------------------+
->> +  | INIT NS     |        | TEST NS                    |
->> +  | +---------+ |        | +------------------------+ |
->> +  | | NETIF   | |  bpf   | | Netkit                 | |
->> +  | |         |-|--------|>| nk_guest               | |
->> +  | +---------+ |        | | {LOCAL_PREFIX_V6}::2:2 | |
->> +  | +---------+ |        | +------------------------+ |
->> +  | | Netkit  | |        +----------------------------+
->> +  | | nk_host | |
->> +  | +---------+ |
->> +  +-------------+
->> +
-> 
-> One thing I noticed when I tested this was the flow broke down when
-> NETIF's address happened to match LOCAL_PREFIX_V6. I didn't fully reason
-> through why this was the case, but maybe it's worth mentioning in the
-> docs here?
+Huacai
 
-If NETIF's address matches LOCAL_PREFIX_V6, the installed bpf prog is
-going to forward _all_ packets to Netkit in the netns. That's likely why
-it doesn't work.
-
-I'll mention that NETIF must not match LOCAL_PREFIX_V6 in the kdocs and
-the diagram, then assert that in NetDrvContEnv as well. Thanks.
-
-> 
->>   REMOTE_TYPE
->>   ~~~~~~~~~~~
->>   
-[...]
->> diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
->> index 41cc248ac848..857ae0f37516 100644
->> --- a/tools/testing/selftests/drivers/net/lib/py/env.py
->> +++ b/tools/testing/selftests/drivers/net/lib/py/env.py
-[...]
->> @@ -289,3 +292,163 @@ class NetDrvEpEnv(NetDrvEnvBase):
->>                   data.get('stats-block-usecs', 0) / 1000 / 1000
->>   
->>           time.sleep(self._stats_settle_time)
->> +
->> +
->> +class NetDrvContEnv(NetDrvEpEnv):
->> +    """
->> +    Class for an environment with a netkit pair setup for forwarding traffic
->> +    between the physical interface and a network namespace.
->> +    +-------------+        +----------------------------+
->> +    | INIT NS     |        | TEST NS                    |
->> +    | +---------+ |        | +------------------------+ |
->> +    | | NETIF   | |  bpf   | | Netkit                 | |
->> +    | |         |-|--------|>| nk_guest               | |
->> +    | +---------+ |        | | {LOCAL_PREFIX_V6}::2:2 | |
->> +    | +---------+ |        | +------------------------+ |
->> +    | | Netkit  | |        +----------------------------+
->> +    | | nk_host | |
->> +    | +---------+ |
->> +    +-------------+
->> +    """
->> +
->> +    def __init__(self, src_path, rxqueues=1, **kwargs):
->> +        super().__init__(src_path, **kwargs)
->> +
->> +        self.netns = None
->> +        self._nk_host_ifname = None
->> +        self._nk_guest_ifname = None
->> +        self._tc_clsact_added = False
->> +        self._tc_attached = False
->> +        self._bpf_prog_pref = None
->> +        self._bpf_prog_id = None
->> +        self._init_ns_attached = False
-> 
-> One problem with these attrs is that if super().__init__() fails
-> (NetDrvEpEnv.__init__()) then these will raise attribute errors in
-> __del__().
-> 
-> This can happen if NetDrvEpEnv.remote_remote_ifc() (for example) throws
-> an exception because it couldn't find the address the user configured.
-> 
-> One alternative to getattr() is moving these assignments before
-> super().__init__()?
-
-Sounds good, I'll move it above super().__init__().
-
-> 
-> Best,
-> Bobby
-> 
+>
+> Thanks,
+> Sasha
+>
+> ------------------ original commit in Linus's tree ------------------
+>
+> From e1aa5ef892fb4fa9014a25e87b64b97347919d37 Mon Sep 17 00:00:00 2001
+> From: Huacai Chen <chenhuacai@loongson.cn>
+> Date: Tue, 3 Feb 2026 14:29:01 +0800
+> Subject: [PATCH] net: stmmac: dwmac-loongson: Set clk_csr_i to 100-150MHz
+>
+> Current clk_csr_i setting of Loongson STMMAC (including LS7A1000/2000
+> and LS2K1000/2000/3000) are copy & paste from other drivers. In fact,
+> Loongson STMMAC use 125MHz clocks and need 62 freq division to within
+> 2.5MHz, meeting most PHY MDC requirement. So fix by setting clk_csr_i
+> to 100-150MHz, otherwise some PHYs may link fail.
+>
+> Cc: stable@vger.kernel.org
+> Fixes: 30bba69d7db40e7 ("stmmac: pci: Add dwmac support for Loongson")
+> Signed-off-by: Hongliang Wang <wanghongliang@loongson.cn>
+> Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
+> Link: https://patch.msgid.link/20260203062901.2158236-1-chenhuacai@loongs=
+on.cn
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drive=
+rs/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> index 107a7c84ace80..c05e3e7a539cf 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> @@ -91,8 +91,8 @@ static void loongson_default_data(struct pci_dev *pdev,
+>         /* Get bus_id, this can be overwritten later */
+>         plat->bus_id =3D pci_dev_id(pdev);
+>
+> -       /* clk_csr_i =3D 20-35MHz & MDC =3D clk_csr_i/16 */
+> -       plat->clk_csr =3D STMMAC_CSR_20_35M;
+> +       /* clk_csr_i =3D 100-150MHz & MDC =3D clk_csr_i/62 */
+> +       plat->clk_csr =3D STMMAC_CSR_100_150M;
+>         plat->core_type =3D DWMAC_CORE_GMAC;
+>         plat->force_sf_dma_mode =3D 1;
+>
+> --
+> 2.51.0
+>
+>
+>
+>
 
