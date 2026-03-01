@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-262291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262292-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YMiCDpeWo2l7HQUAu9opvQ
-	(envelope-from <netdev+bounces-262291-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 02:29:59 +0100
+	id 0G1ZGP2lo2mWJAUAu9opvQ
+	(envelope-from <netdev+bounces-262292-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:35:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0066F1CAD0E
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 02:29:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B87101CDB55
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:35:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E1FDF302FE79
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:28:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1BFA931997CA
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:28:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4886B28AAEB;
-	Sun,  1 Mar 2026 01:27:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA73D2727EB;
+	Sun,  1 Mar 2026 01:28:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lAbeDDmX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e6yTueKO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2537B285C84;
-	Sun,  1 Mar 2026 01:27:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C769E259C80;
+	Sun,  1 Mar 2026 01:28:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772328478; cv=none; b=eJdUZMEmKjwdTos+YFvfDe7YgSVbfYdfv5qSLB2tBi62cvUp8U6UlHGyIlSc+sd6M0g9Edum/RPzeGIG8dFTkumKRtxQ2YadVe4vbvVMVluJrzkur8OOVe9rQ0BPzCRTfJFGGrbtvVCwRgeqT1eK5LNwnXEaqGQgU9rC38IcFsc=
+	t=1772328482; cv=none; b=OSBOGI+ySA0elylV60nc5NBPpv3KlIT2L0hUFAWPNDwlrlS1ZYSzT0bQVWmVpIi7gkgPMVd/LxaulE6HYKNIcdmLmW9AYP43TJprk+UNhtbH5ARx7hZihwew0/SqYdEignTXaG0p0rbEfkaGbe6T07RwaK23KzJoCndIMAbRU/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772328478; c=relaxed/simple;
-	bh=MmtJWNnu3f1+1GqtsL/LcOyTGtnGPEeZyfimyyh8N9c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=My/VurKR7i8WtgQLcq3r7AEVC0jh2okotQC+4SBNMOQQDxLGE/NAyth2r16SHowpYKNKE88Oa635s9hUzMabES2nlZhv3w7MX/ECxJqHDOPJW8ucf4fCR5DTeVr34nYbKm2qwR7CmOLm/HjmRV28g18rsNoJnb0TiD9SrBZ3E3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lAbeDDmX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81B6AC19421;
-	Sun,  1 Mar 2026 01:27:57 +0000 (UTC)
+	s=arc-20240116; t=1772328482; c=relaxed/simple;
+	bh=8xTBrAocLKgPAxEKf+2uwXIvi1s1FWU6/eqpO035Ax4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LZ/3AQ3rIqFfbPe1Nvlkdebf0znk2Y1tUoDNMs0r7vnEX9+vDHkIbMLqStxW8i8PlQb1dzaenhKOtT+HGaCRQUHp9n36I5/W34U65x9RkCoVWvMae06gJRH/YDucRnQ4ZZUm8k/MwkpO33zEmYYn42IQmUH/n+JQQxRm5BoM7U0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e6yTueKO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C229C19421;
+	Sun,  1 Mar 2026 01:28:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772328478;
-	bh=MmtJWNnu3f1+1GqtsL/LcOyTGtnGPEeZyfimyyh8N9c=;
+	s=k20201202; t=1772328482;
+	bh=8xTBrAocLKgPAxEKf+2uwXIvi1s1FWU6/eqpO035Ax4=;
 	h=From:To:Cc:Subject:Date:From;
-	b=lAbeDDmXN9t/FtkYfnjq8jNEXob9i3kyq6XBifVsWGuWouny4uDS9VJmolEELP39p
-	 /yRxyRv6hNxv93VjulqTY1J6UrTNVF2LPgbkH4DzfjThez8rjbBgDHhHJkU2mywO8a
-	 8N9AAUr8RGSx2BWusVCQUK+eyffegkrb/jFfjHyE38ZZy4RYu2oIIAWfHGef4JnZ6n
-	 mHcUXaPOTAQPL1/NdUEow6LU2cETfSKmTQK7e0AkMoFJtiaaBuloX5x/nlZ75WFHsj
-	 bnAuW0DXIoZtK1ko5zIBNG3tlUlxankfeuFXLrsUKtp1PYeilz6Vk/xRsxdOx8yLEJ
-	 Osx4/IuyG7wDA==
+	b=e6yTueKOnsa4BTKKlx4CN32i5NMky+a+N6tfgF+1VIXWT8QRx7QCRV0PknJj4G/Hy
+	 7ACqRvFPl8fFegFaOpJRm63M6ja8DxCbMTHkHchITsmdoFdYNx3fbLE/nGmQm4mK9S
+	 nDqUeIdGbDVAmVGyWnyBOXPYISeGHvhzqrQMonYGoQcOxJ2LA1a3INh1nHOFAkSidy
+	 H1SHlgfKzKhmseVB6RFL3B6IYmpYSc4ckJduZdTu6nYNGChbdRivk0BpBxxF+5B5JZ
+	 +04AdIE4kb52LCbIxEFc3iQH7q9lwXnvKJ9qfX1+jbPjgbXK6C8xBH9eekH7zrzxGS
+	 /Lz8mOTQyDIsg==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
-	haokexin@gmail.com
+	enelsonmoore@gmail.com
 Cc: Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org
-Subject: FAILED: Patch "net: ti: icssg-prueth: Add optional dependency on HSR" failed to apply to 6.12-stable tree
-Date: Sat, 28 Feb 2026 20:27:55 -0500
-Message-ID: <20260301012756.1685565-1-sashal@kernel.org>
+Subject: FAILED: Patch "net: ethernet: marvell: skge: remove incorrect conflicting PCI ID" failed to apply to 6.12-stable tree
+Date: Sat, 28 Feb 2026 20:28:00 -0500
+Message-ID: <20260301012800.1685661-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -67,7 +67,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -75,7 +75,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262291-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262292-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -88,9 +88,9 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,msgid.link:url]
-X-Rspamd-Queue-Id: 0066F1CAD0E
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,msgid.link:url]
+X-Rspamd-Queue-Id: B87101CDB55
 X-Rspamd-Action: no action
 
 The patch below does not apply to the 6.12-stable tree.
@@ -103,56 +103,47 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From e3998b6e90f875f19bf758053d79ccfd41880173 Mon Sep 17 00:00:00 2001
-From: Kevin Hao <haokexin@gmail.com>
-Date: Sat, 7 Feb 2026 14:21:46 +0800
-Subject: [PATCH] net: ti: icssg-prueth: Add optional dependency on HSR
+From d01103fdcb871fd83fd06ef5803d576507c6a801 Mon Sep 17 00:00:00 2001
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Date: Thu, 5 Feb 2026 23:17:14 -0800
+Subject: [PATCH] net: ethernet: marvell: skge: remove incorrect conflicting
+ PCI ID
 
-Commit 95540ad6747c ("net: ti: icssg-prueth: Add support for HSR frame
-forward offload") introduced support for offloading HSR frame forwarding,
-which relies on functions such as is_hsr_master() provided by the HSR
-module. Although HSR provides stubs for configurations with HSR
-disabled, this driver still requires an optional dependency on HSR.
-Otherwise, build failures will occur when icssg-prueth is built-in
-while HSR is configured as a module.
-  ld.lld: error: undefined symbol: is_hsr_master
-  >>> referenced by icssg_prueth.c:710 (drivers/net/ethernet/ti/icssg/icssg_prueth.c:710)
-  >>>               drivers/net/ethernet/ti/icssg/icssg_prueth.o:(icssg_prueth_hsr_del_mcast) in archive vmlinux.a
-  >>> referenced by icssg_prueth.c:681 (drivers/net/ethernet/ti/icssg/icssg_prueth.c:681)
-  >>>               drivers/net/ethernet/ti/icssg/icssg_prueth.o:(icssg_prueth_hsr_add_mcast) in archive vmlinux.a
-  >>> referenced by icssg_prueth.c:1812 (drivers/net/ethernet/ti/icssg/icssg_prueth.c:1812)
-  >>>               drivers/net/ethernet/ti/icssg/icssg_prueth.o:(prueth_netdevice_event) in archive vmlinux.a
+The ID 1186:4302 is matched by both r8169 and skge. The same device ID
+should not be in more than one driver, because in that case, which
+driver is used is unpredictable. I downloaded the latest drivers for
+all hardware revisions of the D-Link DGE-530T from D-Link's website,
+and the only drivers which contain this ID are Realtek drivers.
+Therefore, remove this device ID from skge.
 
-  ld.lld: error: undefined symbol: hsr_get_port_ndev
-  >>> referenced by icssg_prueth.c:712 (drivers/net/ethernet/ti/icssg/icssg_prueth.c:712)
-  >>>               drivers/net/ethernet/ti/icssg/icssg_prueth.o:(icssg_prueth_hsr_del_mcast) in archive vmlinux.a
-  >>> referenced by icssg_prueth.c:712 (drivers/net/ethernet/ti/icssg/icssg_prueth.c:712)
-  >>>               drivers/net/etherneteth_hsr_del_mcast) in archive vmlinux.a
-  >>> referenced by icssg_prueth.c:683 (drivers/net/ethernet/ti/icssg/icssg_prueth.c:683)
-  >>>               drivers/net/ethernet/ti/icssg/icssg_prueth.o:(icssg_prueth_hsr_add_mcast) in archive vmlinux.a
-  >>> referenced 1 more times
+In the kernel bug report which requested addition of this device ID,
+someone created a patch to add the ID to skge. Then, it was pointed
+out that this device is an "r8169 in disguise", and a patch was created
+to add it to r8169. Somehow, both of these patches got merged. See the
+link below.
 
-Fixes: 95540ad6747c ("net: ti: icssg-prueth: Add support for HSR frame forward offload")
-Signed-off-by: Kevin Hao <haokexin@gmail.com>
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=38862
+Fixes: c074304c2bcf ("add pci-id for DGE-530T")
 Cc: stable@vger.kernel.org
-Link: https://patch.msgid.link/20260207-icssg-dep-v3-1-8c47c1937f81@gmail.com
+Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Link: https://patch.msgid.link/20260206071724.15268-1-enelsonmoore@gmail.com
 Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
- drivers/net/ethernet/ti/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/ethernet/marvell/skge.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
-index fe5b2926d8ab0..c60b04921c62c 100644
---- a/drivers/net/ethernet/ti/Kconfig
-+++ b/drivers/net/ethernet/ti/Kconfig
-@@ -192,6 +192,7 @@ config TI_ICSSG_PRUETH
- 	depends on NET_SWITCHDEV
- 	depends on ARCH_K3 && OF && TI_K3_UDMA_GLUE_LAYER
- 	depends on PTP_1588_CLOCK_OPTIONAL
-+	depends on HSR || !HSR
- 	help
- 	  Support dual Gigabit Ethernet ports over the ICSSG PRU Subsystem.
- 	  This subsystem is available starting with the AM65 platform.
+diff --git a/drivers/net/ethernet/marvell/skge.c b/drivers/net/ethernet/marvell/skge.c
+index 05349a0b2db1c..cf4e26d337bb5 100644
+--- a/drivers/net/ethernet/marvell/skge.c
++++ b/drivers/net/ethernet/marvell/skge.c
+@@ -78,7 +78,6 @@ static const struct pci_device_id skge_id_table[] = {
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_SYSKONNECT, 0x4320) }, /* SK-98xx V2.0 */
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_DLINK, 0x4b01) },	  /* D-Link DGE-530T (rev.B) */
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_DLINK, 0x4c00) },	  /* D-Link DGE-530T */
+-	{ PCI_DEVICE(PCI_VENDOR_ID_DLINK, 0x4302) },	  /* D-Link DGE-530T Rev C1 */
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_MARVELL, 0x4320) },	  /* Marvell Yukon 88E8001/8003/8010 */
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_MARVELL, 0x5005) },	  /* Belkin */
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_CNET, 0x434E) }, 	  /* CNet PowerG-2000 */
 -- 
 2.51.0
 
