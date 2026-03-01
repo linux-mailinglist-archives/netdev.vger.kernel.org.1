@@ -1,56 +1,57 @@
-Return-Path: <netdev+bounces-262300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262301-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iBeYLMyYo2neHgUAu9opvQ
-	(envelope-from <netdev+bounces-262300-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 02:39:24 +0100
+	id 6KDyOBiZo2neHgUAu9opvQ
+	(envelope-from <netdev+bounces-262301-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 02:40:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6D1C1CB3E2
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 02:39:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 757941CB4C7
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 02:40:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9ABE8305E1C4
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:29:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 17108312D188
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:29:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D62A528851C;
-	Sun,  1 Mar 2026 01:29:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90212296BD3;
+	Sun,  1 Mar 2026 01:29:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r/HJ5NhG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mpdi2GCH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B3B18E02A;
-	Sun,  1 Mar 2026 01:29:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D4F0285CB3;
+	Sun,  1 Mar 2026 01:29:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772328572; cv=none; b=Y1hk0S+PM0mr0oq24B2BL2hvaRjRgQnGU0y0QT3ekr4l/raBybl3MxyIehEOV5LP8eeCUmRfQNWH8WsHONRgSXq0FG1p+7gm18WrfuzN3fXP2/b6psUtMxoi7Pp5q90tg9FD6m6eb44zrhbuq1lPgCg2RHdS0+bJI0KNvE+1CCc=
+	t=1772328582; cv=none; b=BrhE92fseJwWlCxUi96RLQakqe+UebhESkizkHBm2Y0v0F2L06r9WZ4vjZS/3w07zmetdVr/T0p/wfJVPJ0uZ0KDPlRpimTypS8LuEgQUDbVd/o7zNaZKoqJnQRkLj6g4PNCQ8Ga4ksh/aoYN7o1XwEgr0913/OoDCvmtwIGfaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772328572; c=relaxed/simple;
-	bh=M+zI4eYL7YLs3m4YazUH2ZwRBQXskG7rZsEymWKFGeA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cviucObxooDnTAqgk6wPX+wTMSdmKmM0UeFXvsEKLjW5ED36+a2UIwlpxKhNKCryW2Y0XpgA2dMLURgHyiZWkIqJNbpfQATWp/GPVrM7qY5LBAqX+QO+2iTNbq5jfO7sAHeYRKyvTtBYBTiLIg5mAVEsCTMte2cBECNiKN22MGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r/HJ5NhG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B342C19421;
-	Sun,  1 Mar 2026 01:29:32 +0000 (UTC)
+	s=arc-20240116; t=1772328582; c=relaxed/simple;
+	bh=7yA31demRzUqPOUckJwX3NFtyDSR5bWn83tmelXrYUQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rnOBoBCEg75gDhGzyFpb7Dn4ZORY4xjQPCLwpf/JpoerLaFE9PyzY+NmaDr8p3HlsygsRNxAhhFdaVUGrv3+D5EqAuScj8Wu4Y5DNp6I6CYbOPaeQJxMWWlvZgLW2xUT4SVnoB7UR9loWKySDYHCBumU1GfO04Bv4QvbhoF/IW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mpdi2GCH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9027DC19425;
+	Sun,  1 Mar 2026 01:29:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772328572;
-	bh=M+zI4eYL7YLs3m4YazUH2ZwRBQXskG7rZsEymWKFGeA=;
+	s=k20201202; t=1772328582;
+	bh=7yA31demRzUqPOUckJwX3NFtyDSR5bWn83tmelXrYUQ=;
 	h=From:To:Cc:Subject:Date:From;
-	b=r/HJ5NhGfeb2lV3uiIhUi490OueYp2yGlI7QnPdNG5OjAIqQRx3TDDVdGhTbcZBFQ
-	 qJb4xRllYioCmwDqFE8a6H/B3rmdYd8ESUPJX50i1AwhH0gmu95QrHeVCs1q/fQYVw
-	 9gmonsMLaH93MoROAB/n5fdsqkMxVghGzA16t/yWBITcA6nnsFGn6N35+YypeZmsWo
-	 tYrjLxWPgRkP5vZPoaf3YRAAO4M8H12+vbtiKGSfVuywfCtdMRit5G8rKqLM0SG0qA
-	 yqL2JZYcKeGtJkVZXiSVuTwPg08Y/eHeGsaih6PBJwqNHrLfiLfAp6wVZfl1qgsQNg
-	 uUWEt9wYqNvGA==
+	b=mpdi2GCH3lnPF5vu+9+DqTxybUKbtVpBdLqqm7XZH+asx/FZB5+E+qbXto9X4Xuie
+	 EfjTS1VJrmjqTZSiLGOmMMzFY+l2K17E9xYFKULAvahAkZhqSGu/UlJ6FK3RbfvKwZ
+	 QKfMQiokq66MxS31OcJR6JSzX0bAUIEheMMDclA9/PBmIb6w0MN8vnJn4CurysSSbY
+	 UkOpKzkaJZYEjuXJ6Ld74QxfTFgopXwCO96deB4JSzF/0nyLmCRHHZPLjWeJWHLG59
+	 V5nVl34teQ0Yx1Hv1AZlGwCj0DRYZzZMUGzkmUrknJN2m+Pj03dvrfOj4j2Rqecka2
+	 IiUQT1ODdTUGg==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
-	fourier.thomas@gmail.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
+	michael.thalmeier@hale.at
+Cc: syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com,
+	Jakub Kicinski <kuba@kernel.org>,
 	netdev@vger.kernel.org
-Subject: FAILED: Patch "net: ethernet: ec_bhf: Fix dma_free_coherent() dma handle" failed to apply to 6.12-stable tree
-Date: Sat, 28 Feb 2026 20:29:30 -0500
-Message-ID: <20260301012930.1687295-1-sashal@kernel.org>
+Subject: FAILED: Patch "net: nfc: nci: Fix parameter validation for packet data" failed to apply to 6.12-stable tree
+Date: Sat, 28 Feb 2026 20:29:40 -0500
+Message-ID: <20260301012940.1687494-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,34 +63,34 @@ X-Patchwork-Hint: ignore
 X-stable: review
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-262300-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262301-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-0.978];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,740e04c2a93467a0f8c8];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: C6D1C1CB3E2
+X-Rspamd-Queue-Id: 757941CB4C7
 X-Rspamd-Action: no action
 
 The patch below does not apply to the 6.12-stable tree.
@@ -102,38 +103,356 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From ffe68c3766997d82e9ccaf1cdbd47eba269c4aa2 Mon Sep 17 00:00:00 2001
-From: Thomas Fourier <fourier.thomas@gmail.com>
-Date: Fri, 13 Feb 2026 17:43:39 +0100
-Subject: [PATCH] net: ethernet: ec_bhf: Fix dma_free_coherent() dma handle
+From 571dcbeb8e635182bb825ae758399831805693c2 Mon Sep 17 00:00:00 2001
+From: Michael Thalmeier <michael.thalmeier@hale.at>
+Date: Wed, 18 Feb 2026 09:30:00 +0100
+Subject: [PATCH] net: nfc: nci: Fix parameter validation for packet data
 
-dma_free_coherent() in error path takes priv->rx_buf.alloc_len as
-the dma handle. This would lead to improper unmapping of the buffer.
+Since commit 9c328f54741b ("net: nfc: nci: Add parameter validation for
+packet data") communication with nci nfc chips is not working any more.
 
-Change the dma handle to priv->rx_buf.alloc_phys.
+The mentioned commit tries to fix access of uninitialized data, but
+failed to understand that in some cases the data packet is of variable
+length and can therefore not be compared to the maximum packet length
+given by the sizeof(struct).
 
-Fixes: 6af55ff52b02 ("Driver for Beckhoff CX5020 EtherCAT master module.")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
-Link: https://patch.msgid.link/20260213164340.77272-2-fourier.thomas@gmail.com
+Fixes: 9c328f54741b ("net: nfc: nci: Add parameter validation for packet data")
+Cc: stable@vger.kernel.org
+Signed-off-by: Michael Thalmeier <michael.thalmeier@hale.at>
+Reported-by: syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com
+Link: https://patch.msgid.link/20260218083000.301354-1-michael.thalmeier@hale.at
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/ethernet/ec_bhf.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/nfc/nci/ntf.c | 159 ++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 141 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/net/ethernet/ec_bhf.c b/drivers/net/ethernet/ec_bhf.c
-index 67275aa4f65b2..0c86cbb0313c3 100644
---- a/drivers/net/ethernet/ec_bhf.c
-+++ b/drivers/net/ethernet/ec_bhf.c
-@@ -423,7 +423,7 @@ static int ec_bhf_open(struct net_device *net_dev)
+diff --git a/net/nfc/nci/ntf.c b/net/nfc/nci/ntf.c
+index 418b84e2b2605..c96512bb86531 100644
+--- a/net/nfc/nci/ntf.c
++++ b/net/nfc/nci/ntf.c
+@@ -58,7 +58,7 @@ static int nci_core_conn_credits_ntf_packet(struct nci_dev *ndev,
+ 	struct nci_conn_info *conn_info;
+ 	int i;
  
- error_rx_free:
- 	dma_free_coherent(dev, priv->rx_buf.alloc_len, priv->rx_buf.alloc,
--			  priv->rx_buf.alloc_len);
-+			  priv->rx_buf.alloc_phys);
- out:
- 	return err;
+-	if (skb->len < sizeof(struct nci_core_conn_credit_ntf))
++	if (skb->len < offsetofend(struct nci_core_conn_credit_ntf, num_entries))
+ 		return -EINVAL;
+ 
+ 	ntf = (struct nci_core_conn_credit_ntf *)skb->data;
+@@ -68,6 +68,10 @@ static int nci_core_conn_credits_ntf_packet(struct nci_dev *ndev,
+ 	if (ntf->num_entries > NCI_MAX_NUM_CONN)
+ 		ntf->num_entries = NCI_MAX_NUM_CONN;
+ 
++	if (skb->len < offsetofend(struct nci_core_conn_credit_ntf, num_entries) +
++			ntf->num_entries * sizeof(struct conn_credit_entry))
++		return -EINVAL;
++
+ 	/* update the credits */
+ 	for (i = 0; i < ntf->num_entries; i++) {
+ 		ntf->conn_entries[i].conn_id =
+@@ -138,23 +142,48 @@ static int nci_core_conn_intf_error_ntf_packet(struct nci_dev *ndev,
+ static const __u8 *
+ nci_extract_rf_params_nfca_passive_poll(struct nci_dev *ndev,
+ 					struct rf_tech_specific_params_nfca_poll *nfca_poll,
+-					const __u8 *data)
++					const __u8 *data, ssize_t data_len)
+ {
++	/* Check if we have enough data for sens_res (2 bytes) */
++	if (data_len < 2)
++		return ERR_PTR(-EINVAL);
++
+ 	nfca_poll->sens_res = __le16_to_cpu(*((__le16 *)data));
+ 	data += 2;
++	data_len -= 2;
++
++	/* Check if we have enough data for nfcid1_len (1 byte) */
++	if (data_len < 1)
++		return ERR_PTR(-EINVAL);
+ 
+ 	nfca_poll->nfcid1_len = min_t(__u8, *data++, NFC_NFCID1_MAXSIZE);
++	data_len--;
+ 
+ 	pr_debug("sens_res 0x%x, nfcid1_len %d\n",
+ 		 nfca_poll->sens_res, nfca_poll->nfcid1_len);
+ 
++	/* Check if we have enough data for nfcid1 */
++	if (data_len < nfca_poll->nfcid1_len)
++		return ERR_PTR(-EINVAL);
++
+ 	memcpy(nfca_poll->nfcid1, data, nfca_poll->nfcid1_len);
+ 	data += nfca_poll->nfcid1_len;
++	data_len -= nfca_poll->nfcid1_len;
++
++	/* Check if we have enough data for sel_res_len (1 byte) */
++	if (data_len < 1)
++		return ERR_PTR(-EINVAL);
+ 
+ 	nfca_poll->sel_res_len = *data++;
++	data_len--;
++
++	if (nfca_poll->sel_res_len != 0) {
++		/* Check if we have enough data for sel_res (1 byte) */
++		if (data_len < 1)
++			return ERR_PTR(-EINVAL);
+ 
+-	if (nfca_poll->sel_res_len != 0)
+ 		nfca_poll->sel_res = *data++;
++	}
+ 
+ 	pr_debug("sel_res_len %d, sel_res 0x%x\n",
+ 		 nfca_poll->sel_res_len,
+@@ -166,12 +195,21 @@ nci_extract_rf_params_nfca_passive_poll(struct nci_dev *ndev,
+ static const __u8 *
+ nci_extract_rf_params_nfcb_passive_poll(struct nci_dev *ndev,
+ 					struct rf_tech_specific_params_nfcb_poll *nfcb_poll,
+-					const __u8 *data)
++					const __u8 *data, ssize_t data_len)
+ {
++	/* Check if we have enough data for sensb_res_len (1 byte) */
++	if (data_len < 1)
++		return ERR_PTR(-EINVAL);
++
+ 	nfcb_poll->sensb_res_len = min_t(__u8, *data++, NFC_SENSB_RES_MAXSIZE);
++	data_len--;
+ 
+ 	pr_debug("sensb_res_len %d\n", nfcb_poll->sensb_res_len);
+ 
++	/* Check if we have enough data for sensb_res */
++	if (data_len < nfcb_poll->sensb_res_len)
++		return ERR_PTR(-EINVAL);
++
+ 	memcpy(nfcb_poll->sensb_res, data, nfcb_poll->sensb_res_len);
+ 	data += nfcb_poll->sensb_res_len;
+ 
+@@ -181,14 +219,29 @@ nci_extract_rf_params_nfcb_passive_poll(struct nci_dev *ndev,
+ static const __u8 *
+ nci_extract_rf_params_nfcf_passive_poll(struct nci_dev *ndev,
+ 					struct rf_tech_specific_params_nfcf_poll *nfcf_poll,
+-					const __u8 *data)
++					const __u8 *data, ssize_t data_len)
+ {
++	/* Check if we have enough data for bit_rate (1 byte) */
++	if (data_len < 1)
++		return ERR_PTR(-EINVAL);
++
+ 	nfcf_poll->bit_rate = *data++;
++	data_len--;
++
++	/* Check if we have enough data for sensf_res_len (1 byte) */
++	if (data_len < 1)
++		return ERR_PTR(-EINVAL);
++
+ 	nfcf_poll->sensf_res_len = min_t(__u8, *data++, NFC_SENSF_RES_MAXSIZE);
++	data_len--;
+ 
+ 	pr_debug("bit_rate %d, sensf_res_len %d\n",
+ 		 nfcf_poll->bit_rate, nfcf_poll->sensf_res_len);
+ 
++	/* Check if we have enough data for sensf_res */
++	if (data_len < nfcf_poll->sensf_res_len)
++		return ERR_PTR(-EINVAL);
++
+ 	memcpy(nfcf_poll->sensf_res, data, nfcf_poll->sensf_res_len);
+ 	data += nfcf_poll->sensf_res_len;
+ 
+@@ -198,22 +251,49 @@ nci_extract_rf_params_nfcf_passive_poll(struct nci_dev *ndev,
+ static const __u8 *
+ nci_extract_rf_params_nfcv_passive_poll(struct nci_dev *ndev,
+ 					struct rf_tech_specific_params_nfcv_poll *nfcv_poll,
+-					const __u8 *data)
++					const __u8 *data, ssize_t data_len)
+ {
++	/* Skip 1 byte (reserved) */
++	if (data_len < 1)
++		return ERR_PTR(-EINVAL);
++
+ 	++data;
++	data_len--;
++
++	/* Check if we have enough data for dsfid (1 byte) */
++	if (data_len < 1)
++		return ERR_PTR(-EINVAL);
++
+ 	nfcv_poll->dsfid = *data++;
++	data_len--;
++
++	/* Check if we have enough data for uid (8 bytes) */
++	if (data_len < NFC_ISO15693_UID_MAXSIZE)
++		return ERR_PTR(-EINVAL);
++
+ 	memcpy(nfcv_poll->uid, data, NFC_ISO15693_UID_MAXSIZE);
+ 	data += NFC_ISO15693_UID_MAXSIZE;
++
+ 	return data;
  }
+ 
+ static const __u8 *
+ nci_extract_rf_params_nfcf_passive_listen(struct nci_dev *ndev,
+ 					  struct rf_tech_specific_params_nfcf_listen *nfcf_listen,
+-					  const __u8 *data)
++					  const __u8 *data, ssize_t data_len)
+ {
++	/* Check if we have enough data for local_nfcid2_len (1 byte) */
++	if (data_len < 1)
++		return ERR_PTR(-EINVAL);
++
+ 	nfcf_listen->local_nfcid2_len = min_t(__u8, *data++,
+ 					      NFC_NFCID2_MAXSIZE);
++	data_len--;
++
++	/* Check if we have enough data for local_nfcid2 */
++	if (data_len < nfcf_listen->local_nfcid2_len)
++		return ERR_PTR(-EINVAL);
++
+ 	memcpy(nfcf_listen->local_nfcid2, data, nfcf_listen->local_nfcid2_len);
+ 	data += nfcf_listen->local_nfcid2_len;
+ 
+@@ -364,7 +444,7 @@ static int nci_rf_discover_ntf_packet(struct nci_dev *ndev,
+ 	const __u8 *data;
+ 	bool add_target = true;
+ 
+-	if (skb->len < sizeof(struct nci_rf_discover_ntf))
++	if (skb->len < offsetofend(struct nci_rf_discover_ntf, rf_tech_specific_params_len))
+ 		return -EINVAL;
+ 
+ 	data = skb->data;
+@@ -380,26 +460,42 @@ static int nci_rf_discover_ntf_packet(struct nci_dev *ndev,
+ 	pr_debug("rf_tech_specific_params_len %d\n",
+ 		 ntf.rf_tech_specific_params_len);
+ 
++	if (skb->len < (data - skb->data) +
++			ntf.rf_tech_specific_params_len + sizeof(ntf.ntf_type))
++		return -EINVAL;
++
+ 	if (ntf.rf_tech_specific_params_len > 0) {
+ 		switch (ntf.rf_tech_and_mode) {
+ 		case NCI_NFC_A_PASSIVE_POLL_MODE:
+ 			data = nci_extract_rf_params_nfca_passive_poll(ndev,
+-				&(ntf.rf_tech_specific_params.nfca_poll), data);
++				&(ntf.rf_tech_specific_params.nfca_poll), data,
++				ntf.rf_tech_specific_params_len);
++			if (IS_ERR(data))
++				return PTR_ERR(data);
+ 			break;
+ 
+ 		case NCI_NFC_B_PASSIVE_POLL_MODE:
+ 			data = nci_extract_rf_params_nfcb_passive_poll(ndev,
+-				&(ntf.rf_tech_specific_params.nfcb_poll), data);
++				&(ntf.rf_tech_specific_params.nfcb_poll), data,
++				ntf.rf_tech_specific_params_len);
++			if (IS_ERR(data))
++				return PTR_ERR(data);
+ 			break;
+ 
+ 		case NCI_NFC_F_PASSIVE_POLL_MODE:
+ 			data = nci_extract_rf_params_nfcf_passive_poll(ndev,
+-				&(ntf.rf_tech_specific_params.nfcf_poll), data);
++				&(ntf.rf_tech_specific_params.nfcf_poll), data,
++				ntf.rf_tech_specific_params_len);
++			if (IS_ERR(data))
++				return PTR_ERR(data);
+ 			break;
+ 
+ 		case NCI_NFC_V_PASSIVE_POLL_MODE:
+ 			data = nci_extract_rf_params_nfcv_passive_poll(ndev,
+-				&(ntf.rf_tech_specific_params.nfcv_poll), data);
++				&(ntf.rf_tech_specific_params.nfcv_poll), data,
++				ntf.rf_tech_specific_params_len);
++			if (IS_ERR(data))
++				return PTR_ERR(data);
+ 			break;
+ 
+ 		default:
+@@ -596,7 +692,7 @@ static int nci_rf_intf_activated_ntf_packet(struct nci_dev *ndev,
+ 	const __u8 *data;
+ 	int err = NCI_STATUS_OK;
+ 
+-	if (skb->len < sizeof(struct nci_rf_intf_activated_ntf))
++	if (skb->len < offsetofend(struct nci_rf_intf_activated_ntf, rf_tech_specific_params_len))
+ 		return -EINVAL;
+ 
+ 	data = skb->data;
+@@ -628,26 +724,41 @@ static int nci_rf_intf_activated_ntf_packet(struct nci_dev *ndev,
+ 	if (ntf.rf_interface == NCI_RF_INTERFACE_NFCEE_DIRECT)
+ 		goto listen;
+ 
++	if (skb->len < (data - skb->data) + ntf.rf_tech_specific_params_len)
++		return -EINVAL;
++
+ 	if (ntf.rf_tech_specific_params_len > 0) {
+ 		switch (ntf.activation_rf_tech_and_mode) {
+ 		case NCI_NFC_A_PASSIVE_POLL_MODE:
+ 			data = nci_extract_rf_params_nfca_passive_poll(ndev,
+-				&(ntf.rf_tech_specific_params.nfca_poll), data);
++				&(ntf.rf_tech_specific_params.nfca_poll), data,
++				ntf.rf_tech_specific_params_len);
++			if (IS_ERR(data))
++				return -EINVAL;
+ 			break;
+ 
+ 		case NCI_NFC_B_PASSIVE_POLL_MODE:
+ 			data = nci_extract_rf_params_nfcb_passive_poll(ndev,
+-				&(ntf.rf_tech_specific_params.nfcb_poll), data);
++				&(ntf.rf_tech_specific_params.nfcb_poll), data,
++				ntf.rf_tech_specific_params_len);
++			if (IS_ERR(data))
++				return -EINVAL;
+ 			break;
+ 
+ 		case NCI_NFC_F_PASSIVE_POLL_MODE:
+ 			data = nci_extract_rf_params_nfcf_passive_poll(ndev,
+-				&(ntf.rf_tech_specific_params.nfcf_poll), data);
++				&(ntf.rf_tech_specific_params.nfcf_poll), data,
++				ntf.rf_tech_specific_params_len);
++			if (IS_ERR(data))
++				return -EINVAL;
+ 			break;
+ 
+ 		case NCI_NFC_V_PASSIVE_POLL_MODE:
+ 			data = nci_extract_rf_params_nfcv_passive_poll(ndev,
+-				&(ntf.rf_tech_specific_params.nfcv_poll), data);
++				&(ntf.rf_tech_specific_params.nfcv_poll), data,
++				ntf.rf_tech_specific_params_len);
++			if (IS_ERR(data))
++				return -EINVAL;
+ 			break;
+ 
+ 		case NCI_NFC_A_PASSIVE_LISTEN_MODE:
+@@ -657,7 +768,9 @@ static int nci_rf_intf_activated_ntf_packet(struct nci_dev *ndev,
+ 		case NCI_NFC_F_PASSIVE_LISTEN_MODE:
+ 			data = nci_extract_rf_params_nfcf_passive_listen(ndev,
+ 				&(ntf.rf_tech_specific_params.nfcf_listen),
+-				data);
++				data, ntf.rf_tech_specific_params_len);
++			if (IS_ERR(data))
++				return -EINVAL;
+ 			break;
+ 
+ 		default:
+@@ -668,6 +781,13 @@ static int nci_rf_intf_activated_ntf_packet(struct nci_dev *ndev,
+ 		}
+ 	}
+ 
++	if (skb->len < (data - skb->data) +
++			sizeof(ntf.data_exch_rf_tech_and_mode) +
++			sizeof(ntf.data_exch_tx_bit_rate) +
++			sizeof(ntf.data_exch_rx_bit_rate) +
++			sizeof(ntf.activation_params_len))
++		return -EINVAL;
++
+ 	ntf.data_exch_rf_tech_and_mode = *data++;
+ 	ntf.data_exch_tx_bit_rate = *data++;
+ 	ntf.data_exch_rx_bit_rate = *data++;
+@@ -679,6 +799,9 @@ static int nci_rf_intf_activated_ntf_packet(struct nci_dev *ndev,
+ 	pr_debug("data_exch_rx_bit_rate 0x%x\n", ntf.data_exch_rx_bit_rate);
+ 	pr_debug("activation_params_len %d\n", ntf.activation_params_len);
+ 
++	if (skb->len < (data - skb->data) + ntf.activation_params_len)
++		return -EINVAL;
++
+ 	if (ntf.activation_params_len > 0) {
+ 		switch (ntf.rf_interface) {
+ 		case NCI_RF_INTERFACE_ISO_DEP:
 -- 
 2.51.0
 
