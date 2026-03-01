@@ -1,155 +1,156 @@
-Return-Path: <netdev+bounces-262419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262420-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gLUeEENspGmmgQUAu9opvQ
-	(envelope-from <netdev+bounces-262419-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 17:41:39 +0100
+	id iKdRH9dspGmmgQUAu9opvQ
+	(envelope-from <netdev+bounces-262420-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 17:44:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B09481D0AB6
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 17:41:38 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2132F1D0AFC
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 17:44:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 15EC8300E252
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 16:41:37 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8E1413008258
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 16:44:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EDB2335095;
-	Sun,  1 Mar 2026 16:41:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2B303358B2;
+	Sun,  1 Mar 2026 16:44:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LCEqx7Z5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fEmttWyV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05B3332ECB;
-	Sun,  1 Mar 2026 16:41:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF26F33554D;
+	Sun,  1 Mar 2026 16:44:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772383294; cv=none; b=s1IHay3eIwWcnXPR+cSo0Sgd9QfdMsqoQtYt4mbEJfjP8CAT9byd2W0p17ka3ihiBVqv6sVcVIRau1VRU8VC/6Uu4Un5LFKVttjpmWAF+hyadAZnX44x0AvxpVfl7der9Wv7JEYsXPxQLUZQfn96qfOiYYtG5J9iLlzPUCucfZw=
+	t=1772383444; cv=none; b=D+qnSKR5p7OzlWdF+eVziSAJD0+0XPTdhbehGscMJd8ALthaCBPr1Gr0nRYGHYq+HgnhdwZNR5d/5y1s64ciyJCwlUYb6C7NNtOx8Kq6iPvNKqeev+xubOSoJnUN4WYSBLIKuTM14UqAcckKnyjyFHjzQqzGprVj8ONQyURYQTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772383294; c=relaxed/simple;
-	bh=Lhw6y9gr6xwGO8OAR1p1JEDus6x1O3Q9UHjcsImSwxk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HePZfh6/jzqmOi6cQa+vjkTbaiiFRE050fh2xpyRNVcdl+4ShTwEj/IPTjqb4ri9NEF3YCGayYiiQJxAmnDJPGMOXj2b8tEfeS64mKLDHWj5s6CUY4lM0vRTDefoEPh4lH7mVzFpZey//eB2TOzA4GdLyJegriUFNx+n6Gg5IO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LCEqx7Z5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29BD0C116C6;
-	Sun,  1 Mar 2026 16:41:30 +0000 (UTC)
+	s=arc-20240116; t=1772383444; c=relaxed/simple;
+	bh=cRN94qau4dabl+mLyi1CeYP6hYQaknPN7zhms8QxuIg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SZjX7qGdJjLyMwrcuju3xwmtHFIq5So3WJRO8XzGyBoav/lsTNzFnLcLT8wPRyvS78MrZ5ijCbtq0/g7oKutpTok3RjLr7OtXH54MKFPyuRGq2YFV3E2GmAuxLu/Ok2HI9KNgOMzWqsHrWaPlR7fduczjhBXlzzOMQgQkLdE2Yo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fEmttWyV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D806C116C6;
+	Sun,  1 Mar 2026 16:44:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772383293;
-	bh=Lhw6y9gr6xwGO8OAR1p1JEDus6x1O3Q9UHjcsImSwxk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LCEqx7Z5/FdZC7Fx5FshWKSJACjHYBu3q3IAyCk+0MbipHN7spLuH1LbDfLntABCx
-	 T6KZ6nSqVSwxhv6PTzE4OnEOq7yksFbl1lazTHGdldbphO8L/Jk1qEwyjho+9ZTixS
-	 OAqBm6DgyqU+/GS71e5wMva7YRz/9UktfDrBFRKyb+wkg/9tkZn+FSizRlmTPZxLmt
-	 VvoIDUZivPIsY0NDIucmOip2zQevNB0TkRpubJMBonpzj3W30zk+WmpZ74JqMCkDEu
-	 MaDo1cHg5O7APyu2M2oNEdrfeVk6mrU8cfT1pnPconINJwAe2DnV56b4vsnrD0anP0
-	 jwQHBIO6xKcxw==
-Date: Sun, 1 Mar 2026 16:41:27 +0000
-From: Simon Horman <horms@kernel.org>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, longli@microsoft.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, dipayanroy@linux.microsoft.com,
-	shirazsaleem@microsoft.com, ssengar@linux.microsoft.com,
-	shradhagupta@linux.microsoft.com, gargaditya@linux.microsoft.com,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4] net: mana: Add MAC address to vPort logs and
- clarify error messages
-Message-ID: <aaRsN8FDf8aH54QB@horms.kernel.org>
-References: <20260225192252.943534-1-ernis@linux.microsoft.com>
+	s=k20201202; t=1772383444;
+	bh=cRN94qau4dabl+mLyi1CeYP6hYQaknPN7zhms8QxuIg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=fEmttWyVu1yM2IHK7ZiqV49k92zf7efVBg7OU5P91+lG3VmOKpB/0HNdI9JuS0aqQ
+	 iFC2Qdc9P/H6y17shO7emsnI4KHIVT5hcQu2H4nXsc7ydu5vDiBbR7Wwj38HCDM5q5
+	 8g299eE0ZnO+WHdn9472RCEpF3Ch1kZFSGVxkcMtzkoEbLqN9M8yzjQt7W4TiN1sy1
+	 F5cywR4bicxIJbOe/IIo10tEpEZkLC4+0sqP+QCc2o7SLJE6NUz6GDwlp5yJFuC3+n
+	 jFsw7pFnh3hX29ZfKV1Z/4T2eRqrBE/MG2G75B7nVL1dg5vzJJ5ITfaffHerSO8jEa
+	 fWZ7FVpcVpp7w==
+Message-ID: <402a5add-a1eb-4d1f-a5d4-3c7d59a82411@kernel.org>
+Date: Sun, 1 Mar 2026 17:44:01 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260225192252.943534-1-ernis@linux.microsoft.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1] NFC: s3fwrn5: Replace strcpy() with strscpy()
+To: tomasz.unger@yahoo.pl
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260301143237.217397-1-tomasz.unger.ref@yahoo.pl>
+ <20260301143237.217397-1-tomasz.unger@yahoo.pl>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20260301143237.217397-1-tomasz.unger@yahoo.pl>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262419-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[yahoo.pl];
+	TAGGED_FROM(0.00)[bounces-262420-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_THREE(0.00)[3];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B09481D0AB6
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,qualcomm.com:email,yahoo.pl:email]
+X-Rspamd-Queue-Id: 2132F1D0AFC
 X-Rspamd-Action: no action
 
-On Wed, Feb 25, 2026 at 11:22:41AM -0800, Erni Sri Satya Vennela wrote:
-> Add MAC address to vPort configuration success message and update error
-> message to be more specific about HWC message errors in
-> mana_send_request.
+On 01/03/2026 15:32, tomasz.unger@yahoo.pl wrote:
+> From: Tomasz Unger <tomasz.unger@yahoo.pl>
 > 
-> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+> Replace strcpy() with strscpy() which limits the copy to the size of
+> the destination buffer. Since fw_info->fw_name is an array, the
 
-...
+"an array with a fixed, declared size"
 
-> diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
 
-...
+See similar comment here:
+https://lore.kernel.org/all/8e68e02a-2c58-485c-a13e-a4b52616e63e@kernel.org/
 
-> @@ -893,8 +895,8 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
->  	if (!wait_for_completion_timeout(&ctx->comp_event,
->  					 (msecs_to_jiffies(hwc->hwc_timeout)))) {
->  		if (hwc->hwc_timeout != 0)
-> -			dev_err(hwc->dev, "HWC: Request timed out: %u ms\n",
-> -				hwc->hwc_timeout);
-> +			dev_err(hwc->dev, "%s:%d: Command 0x%x timed out: %u ms\n",
-> +				__func__, __LINE__, command, hwc->hwc_timeout);
 
-I have reservations about the usefulness of including __func__ and __LINE__
-in debug messages. In a nutshell, it requires the logs to be correlated
-(exactly?) with the source used to build the driver. And at that point
-I think other mechanism - e.g. dynamic trace points - are going to be
-useful if the debug message (without function and line information)
-is insufficient to pinpoint the problem.
-
-This is a general statement, rather than something specifically
-about this code. But nonetheless I'd advise against adding this
-information here.
-
->  
->  		/* Reduce further waiting if HWC no response */
->  		if (hwc->hwc_timeout > 1)
-> @@ -914,9 +916,9 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
->  			err = -EOPNOTSUPP;
->  			goto out;
->  		}
-> -		if (req_msg->req.msg_type != MANA_QUERY_PHY_STAT)
-> -			dev_err(hwc->dev, "HWC: Failed hw_channel req: 0x%x\n",
-> -				ctx->status_code);
-> +		if (command != MANA_QUERY_PHY_STAT)
-> +			dev_err(hwc->dev, "%s:%d: Command 0x%x failed with status: 0x%x\n",
-> +				__func__, __LINE__, command, ctx->status_code);
-
->  		err = -EPROTO;
->  		goto out;
->  	}
-
-...
+Best regards,
+Krzysztof
 
