@@ -1,219 +1,131 @@
-Return-Path: <netdev+bounces-262458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262459-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KOezN6O/pGmPqgUAu9opvQ
-	(envelope-from <netdev+bounces-262458-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 23:37:23 +0100
+	id 0l+4JJjMpGkCrwUAu9opvQ
+	(envelope-from <netdev+bounces-262459-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 00:32:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 484241D1E2B
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 23:37:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C92A41D1EF5
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 00:32:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C42503011760
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 22:36:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 25586301017C
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 23:32:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2583331ED83;
-	Sun,  1 Mar 2026 22:36:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DC73277C81;
+	Sun,  1 Mar 2026 23:32:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yunyoo-cc.20200929.dkim.larksuite.com header.i=@yunyoo-cc.20200929.dkim.larksuite.com header.b="ReklLlYs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AJmmGUhG"
 X-Original-To: netdev@vger.kernel.org
-Received: from va-2-35.ptr.blmpb.com (va-2-35.ptr.blmpb.com [209.127.231.35])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9220030EF92
-	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 22:36:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AFE71990C7
+	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 23:32:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772404612; cv=none; b=L2LvPh3phaZM3r2cnyOOQYdCu8BqSM+xTz2rUh0jNYDHYIEvkRitdx8Sq9OWKYmxyQDUydwj+vLEGj4Cf3lsjz8gl8+ZwnbUjNJurJ++kmz6KYa7nfrB/tgZovL7oJ2InYEirsnUYPf2pO+iRVAZJc+B5wVKXBc0gn9WH9ggYg8=
+	t=1772407956; cv=none; b=kt0vesFZBBxBJg2uthAu6e50ROr7nT+mM3PskaGTF6w8RFQenIyzDvY4z11jnMNAsYreG3BCGmr13yaeWs8UkpjNvQNZH+QVMF7c0cCMi/7K484YIlLUWiFtGXnGafGoBSQSnrHRJ/x1cNx5SnIV01GpOlY7d26n5LfLBjsuSu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772404612; c=relaxed/simple;
-	bh=HGNPxjZdXQ0CIKGWXj8Xf/gkL80A5tRaqqvffEvQZ9U=;
-	h=Content-Type:Date:Cc:From:Message-Id:To:Subject:Mime-Version; b=n/tv0+95I/pigdUoKHrtvuFM8BIQQ9gWaa7LUfVj2cd4WZycxHU2k5fFjILaKraSrWmoTqJdAhcdKh/8H3sO8l4JLx5l7hc4rH154LQsWblbAq/nr1r7ty6p74tQSWugkYACGwyf8/Ki88VYaUZm0zIDxqEIOXkqpTlZosuxmzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunyoo.cc; spf=pass smtp.mailfrom=yunyoo.cc; dkim=pass (2048-bit key) header.d=yunyoo-cc.20200929.dkim.larksuite.com header.i=@yunyoo-cc.20200929.dkim.larksuite.com header.b=ReklLlYs; arc=none smtp.client-ip=209.127.231.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunyoo.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunyoo.cc
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=yunyoo-cc.20200929.dkim.larksuite.com; t=1772404600;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=HGNPxjZdXQ0CIKGWXj8Xf/gkL80A5tRaqqvffEvQZ9U=;
- b=ReklLlYsZq6N9rHbN+UvjY1WVz0sgfHqhTapusMtOqRGvw98ox/BbZVDww2mDt7wZLYkmq
- HP+9/590d4yIHvdVlVcUKUcQr3LJQ/6zlZkg77HwPfb0lj1dLiZ56XKlUEtbpsJhXagWwd
- fXhOePiHbPuQ/vOg023YLLTjjSuV486OSZehQwQ0i0PvXBRhyeg7yCbfhCYupL0eiFAysA
- Bz0Fnlsp9Mb/95GHj2TNRbUHwS2AscwtRw0d/EwvnBvUgLVFRR5rO11wkWW9t7msuY/GGg
- wfmO9hi0lkDR1uj4PDhUhyVR+qtE1tKV7lL5TUpRcD7Xm/tgQFpt6fB0px5RSQ==
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 01 Mar 2026 22:36:39 +0000
-Cc: "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
-From: "ShuangYu" <shuangyu@yunyoo.cc>
-X-Lms-Return-Path: <lba+169a4bf77+b50de7+vger.kernel.org+shuangyu@yunyoo.cc>
-Message-Id: <9ac0a071e79e9da8128523ddeba19085f4f8c9aa.decbd9ef.1293.41c3.bf27.48cdc12b9ce6@larksuite.com>
-To: "mst@redhat.com" <mst@redhat.com>, 
-	"jasowang@redhat.com" <jasowang@redhat.com>
-Subject: [BUG] vhost_net: livelock in handle_rx() when GRO packet exceeds virtqueue capacity
+	s=arc-20240116; t=1772407956; c=relaxed/simple;
+	bh=E9+8K5X4PFgbviQ5fbMMaqHuGnu5jFGcIv4+c8sTzig=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=r+kj9Hb1tRZwBAHNVb6CxYXrR0RuToXpbEKua8+tpdgq2zaD2dXXamU0kt0T9sS8lRDeM2VgtPiICFnIdT3J54+lMYx9Zzit+XtD2I4FtHaw62RJvf2U4YB9iahyDZ3ZT8Q8FsLXBpXRRdrjeuxNX5Te3S5OoQJfBObfGCgf4/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AJmmGUhG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C4DDC2BCB5
+	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 23:32:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772407956;
+	bh=E9+8K5X4PFgbviQ5fbMMaqHuGnu5jFGcIv4+c8sTzig=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=AJmmGUhG+Rx3fYegXZkYQxzrbXkY0+7ai+ephpaQ+mcXYzC4deYFqxoUp3RTj6hp+
+	 fyZhNniW60GBr0NvI1O84JAeiONxRyfdooBaL8onkEBr5LNvbt0jpHULyMAVMN3Ce1
+	 p/cPnB3+X1C9/jbXam72Im6OISmUaN1VZSZwRtr27bprrRaCLTqR37+aWT3CET2PYf
+	 yaQKNlvOaXIr1kKKVOjyYK4/C5PQBliOE5txlU5Z0EAoOrYBNokYEo6qo4oCW25uLV
+	 j0bNcAO+C3kaThi9Cj2Ej/jUrVUE/DzCvZTNd15Fl7JRr+a464j+oDjDCaXJmKrIec
+	 yGdA4EU9BGL5A==
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-79495b1aaa7so33019727b3.1
+        for <netdev@vger.kernel.org>; Sun, 01 Mar 2026 15:32:36 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUENWvnWZIfgAsVnYbJa2rCmAyRRr0tAMfluw/B1DlwQi/Fgd/w6PCT4lqFntEC+cfJefCyc10=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTIuQU/5jmppoWVyasjI0yUH0U1h/2bInq7IP+9W0zT3ebXtMU
+	Qnye4j489alW2aZ/rlwWHqOlnOyBjGBAonKa7GxVuwi65s5SyrBa5ou8cBDovGRShvQBOL1S2iG
+	S8sIyV51DNCAAbN0dBjiHa9zn085tNv0=
+X-Received: by 2002:a05:690c:890:b0:796:5a14:87c3 with SMTP id
+ 00721157ae682-798855df177mr85506547b3.40.1772407955381; Sun, 01 Mar 2026
+ 15:32:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+References: <20260301-realtek_namiltd_fix1-v1-1-43a6bb707f9c@gmail.com>
+In-Reply-To: <20260301-realtek_namiltd_fix1-v1-1-43a6bb707f9c@gmail.com>
+From: Linus Walleij <linusw@kernel.org>
+Date: Mon, 2 Mar 2026 00:32:24 +0100
+X-Gmail-Original-Message-ID: <CAD++jL=_HO3fWntEJ9=qM6t=L1qT41dNWRU5LYGR7_2z7G_hCw@mail.gmail.com>
+X-Gm-Features: AaiRm51FHqD_Cy7PkXkrgv3GLB0glL1EistMVS8VTEFO-XqofykOvqymFuZj1Js
+Message-ID: <CAD++jL=_HO3fWntEJ9=qM6t=L1qT41dNWRU5LYGR7_2z7G_hCw@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: dsa: realtek: rtl8365mb: fix
+ rtl8365mb_phy_ocp_write return value
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Cc: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Mieczyslaw Nalewaj <namiltd@yahoo.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[yunyoo-cc.20200929.dkim.larksuite.com:s=s1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[bang-olufsen.dk,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,yahoo.com];
+	TAGGED_FROM(0.00)[bounces-262459-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[yunyoo.cc];
-	TAGGED_FROM(0.00)[bounces-262458-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_ALL(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shuangyu@yunyoo.cc,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[yunyoo-cc.20200929.dkim.larksuite.com:+];
+	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 484241D1E2B
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid]
+X-Rspamd-Queue-Id: C92A41D1EF5
 X-Rspamd-Action: no action
 
-Hi,
+On Sun, Mar 1, 2026 at 10:13=E2=80=AFPM Luiz Angelo Daros de Luca
+<luizluca@gmail.com> wrote:
 
-We have hit a severe livelock in vhost_net on 6.18.x. The vhost
-kernel thread spins at 100% CPU indefinitely in handle_rx(), and
-QEMU becomes unkillable (stuck in D state).
-[This is a text/plain messages]
+> From: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+>
+> Function rtl8365mb_phy_ocp_write() always returns 0, even when an error
+> occurs during register access. This patch fixes the return value to
+> propagate the actual error code from regmap operations.
+>
+> Link: https://lore.kernel.org/netdev/a2dfde3c-d46f-434b-9d16-1e251e449068=
+@yahoo.com/
+> Fixes: 2796728460b8 ("net: dsa: realtek: rtl8365mb: serialize indirect PH=
+Y register access")
+> Signed-off-by: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+> Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 
-Environment
------------
-=C2=A0 Kernel:=C2=A0 6.18.10-1.el8.elrepo.x86_64
-=C2=A0 QEMU: =C2=A0=C2=A0 7.2.19
-=C2=A0 Virtio:=C2=A0 VIRTIO_F_IN_ORDER is negotiated
-=C2=A0 Backend: vhost (kernel)
+Reviewed-by: Linus Walleij <linusw@kernel.org>
 
-Symptoms
---------
-=C2=A0 - vhost-<pid> kernel thread at 100% CPU (R state, never yields)
-=C2=A0 - QEMU stuck in D state at vhost_dev_flush() after receiving SIGTERM
-=C2=A0 - kill -9 has no effect on the QEMU process
-=C2=A0 - libvirt management plane deadlocks ("cannot acquire state change l=
-ock")
-
-Root Cause
-----------
-The livelock is triggered when a GRO-merged packet on the host TAP
-interface (e.g., ~60KB) exceeds the remaining free capacity of the
-guest's RX virtqueue (e.g., ~40KB of available buffers).
-
-The loop in handle_rx() (drivers/vhost/net.c) proceeds as follows:
-
-=C2=A0 1. get_rx_bufs() calls vhost_get_vq_desc_n() to fetch descriptors.
-=C2=A0=C2=A0=C2=A0 It advances vq->last_avail_idx and vq->next_avail_head a=
-s it
-=C2=A0=C2=A0=C2=A0 consumes buffers, but runs out before satisfying datalen=
-.
-
-=C2=A0 2. get_rx_bufs() jumps to err: and calls
-=C2=A0=C2=A0=C2=A0 vhost_discard_vq_desc(vq, headcount, n), which rolls bac=
-k
-=C2=A0=C2=A0=C2=A0 vq->last_avail_idx and vq->next_avail_head.
-
-=C2=A0=C2=A0=C2=A0 Critically, vq->avail_idx (the cached copy of the guest'=
-s
-=C2=A0=C2=A0=C2=A0 avail->idx) is NOT rolled back. This is correct behavior=
- in
-=C2=A0=C2=A0=C2=A0 isolation, but creates a persistent mismatch:
-
-=C2=A0=C2=A0 =C2=A0=C2=A0 vq->avail_idx =C2=A0 =C2=A0=C2=A0 =3D 108=C2=A0 (=
-cached, unchanged)
-=C2=A0=C2=A0 =C2=A0=C2=A0 vq->last_avail_idx =3D 104=C2=A0 (rolled back)
-
-=C2=A0 3. handle_rx() sees headcount =3D=3D 0 and calls vhost_enable_notify=
-().
-=C2=A0=C2=A0=C2=A0 Inside, vhost_get_avail_idx() finds:
-
-=C2=A0=C2=A0 =C2=A0=C2=A0 vq->avail_idx (108) !=3D vq->last_avail_idx (104)
-
-=C2=A0=C2=A0=C2=A0 It returns 1 (true), indicating "new buffers available."
-=C2=A0=C2=A0=C2=A0 But these are the SAME buffers that were just discarded.
-
-=C2=A0 4. handle_rx() hits `continue`, restarting the loop.
-
-=C2=A0 5. In the next iteration, vhost_get_vq_desc_n() checks:
-
-=C2=A0=C2=A0 =C2=A0=C2=A0 if (vq->avail_idx =3D=3D vq->last_avail_idx)
-
-=C2=A0=C2=A0=C2=A0 This is FALSE (108 !=3D 104), so it skips re-reading the=
- guest's
-=C2=A0=C2=A0=C2=A0 actual avail->idx and directly fetches the same descript=
-ors.
-
-=C2=A0 6. The exact same sequence repeats: fetch -> too small -> discard
-=C2=A0=C2=A0=C2=A0 -> rollback -> "new buffers!" -> continue. Indefinitely.
-
-This appears to be a regression introduced by the VIRTIO_F_IN_ORDER
-support, which added vhost_get_vq_desc_n() with the cached avail_idx
-short-circuit check, and the two-argument vhost_discard_vq_desc()
-with next_avail_head rollback. The mismatch between the rollback
-scope (last_avail_idx, next_avail_head) and the check scope
-(avail_idx vs last_avail_idx) was not present before this change.
-
-bpftrace Evidence
------------------
-During the 100% CPU lockup, we traced:
-
-=C2=A0 @get_rx_ret[0]: =C2=A0 =C2=A0=C2=A0 4468052 =C2=A0 // get_rx_bufs() =
-returns 0 every time
-=C2=A0 @peek_ret[60366]: =C2=A0=C2=A0 4385533 =C2=A0 // same 60KB packet se=
-en every iteration
-=C2=A0 @sock_err[recvmsg]: =C2=A0 =C2=A0 =C2=A0=C2=A0 0 =C2=A0 // tun_recvm=
-sg() is never reached
-
-vhost_get_vq_desc_n() was observed iterating over the exact same 11
-descriptor addresses millions of times per second.
-
-Workaround
-----------
-Either of the following avoids the livelock:
-
-=C2=A0 - Disable GRO/GSO on the TAP interface:
-=C2=A0=C2=A0 =C2=A0 ethtool -K <tap> gro off gso off
-
-=C2=A0 - Switch from kernel vhost to userspace QEMU backend:
-=C2=A0=C2=A0 =C2=A0 <driver name=3D'qemu'/> in libvirt XML
-
-Bisect
-------
-We have not yet completed a full git bisect, but the issue does not
-occur on 6.17.x kernels which lack the VIRTIO_F_IN_ORDER vhost
-support. We will follow up with a Fixes: tag if we can identify the
-exact commit.
-
-Suggested Fix Direction
------------------------
-In handle_rx(), when get_rx_bufs() returns 0 (headcount =3D=3D 0) due to
-insufficient buffers (not because the queue is truly empty), the code
-should break out of the loop rather than relying on
-vhost_enable_notify() to make that determination. For example, when
-get_rx_bufs() returns r =3D=3D 0 with datalen still > 0, this indicates a
-"packet too large" condition, not a "queue empty" condition, and
-should be handled differently.
-
-Thanks,
-ShuangYu
+Yours,
+Linus Walleij
 
