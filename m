@@ -1,152 +1,182 @@
-Return-Path: <netdev+bounces-262449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262450-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qMELOrGQpGnZkQUAu9opvQ
-	(envelope-from <netdev+bounces-262449-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 20:17:05 +0100
+	id wBtLH2KSpGktkwUAu9opvQ
+	(envelope-from <netdev+bounces-262450-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 20:24:18 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BCB41D138D
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 20:17:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D30B31D1485
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 20:24:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 08C5C300B462
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 19:17:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 32892300B9E6
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 19:24:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C7492E0B48;
-	Sun,  1 Mar 2026 19:17:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DABC3112BD;
+	Sun,  1 Mar 2026 19:24:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="I0usXRHJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HPFNlxPZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-014.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-014.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.83.148.184])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 350254C97
-	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 19:17:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.83.148.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B88F2E92D2
+	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 19:24:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772392623; cv=none; b=pwM/GNTpO4s3K5Gs4ERmtgH5o08K0LIxRaawYERRBZJcc09/pphl5ueUo4qOVIYEpxTuSueyV675pVl3/zUkNr2vg1FlwWfYYTj2rO6whvnV8vXXUnQe6q7zg+TI59EJugLDj9otL1pdJlByy4/hUoxu9k/9oGCO7FVZNi9x4Oo=
+	t=1772393055; cv=none; b=aSrk1Q+OOkGcLSu4A0cj+wHd53KBZmecSjow5Bjm7FnSJrmSrhSqUI+YLlB92vyHLwfOuep720hxZNAH+B/C7we6XVN2S0eBFIGP3PNlS2O7ljqryP2A5Qsg4B0Trkox45XOmosSfOxgSU3zRq2pEFlpa0inpio+G6MFZHMr7qY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772392623; c=relaxed/simple;
-	bh=GpOb4LGrFdAq9mAafD+Qnt+TboL5vrOKeZdHvAgZ0ng=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=h2haNhzK/FfHaznfEWrgRVHnbqzh9EKoDkseWGpnyqusUly+mL7uQmMF8p2KWU7ZSV8HrIcVsE7yW6Idm30GMMqNasBz6LfX/WdWE2mSkqBA+M9pU7T91sahyF99M9b9EPW90c/f7s8cH/jkHe7mCW09PBFpCb37oyp4JgoBYnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=I0usXRHJ; arc=none smtp.client-ip=35.83.148.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1772392622; x=1803928622;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=c9HRLeMaruSCu91Dhqimd63v2xXJrc18d9JUlbHAUw0=;
-  b=I0usXRHJ/Eztj/L3vR7wTCZwYblHSI7QhiPGhCwOrC8q7m+deTmiBXeW
-   8dfrkzt1CS2irs1S3wEegoU3g9FPvpw6dDdolF22XPsKH0Svlu2NPruRx
-   aeMjYSiQ/H1OUJ+M+Bd/pI7qdybRzETz+w5v5NXBTq2u19874m04ZrCmP
-   5TZWGj+WV9QDznH9GaS37R9vxdktwBHrCIjsp/WYlNIOENf1n29exe7Kt
-   ntPG8q99yD0aqF+Pw6W2DgKL/RCSuWO+2PmqyPJkJzehbD0aiRnl+Dkcl
-   n6JgXFL6ae8QAgvCFkpfRvsOohhGaJT4GLFjoDC+JGPN4Zp0zPebN56AQ
-   A==;
-X-CSE-ConnectionGUID: iut9V1UmR+Cjl2qFBWQc+w==
-X-CSE-MsgGUID: 5OmW93UTRYqCfqInxtmhSA==
-X-IronPort-AV: E=Sophos;i="6.21,318,1763424000"; 
-   d="scan'208";a="13830849"
-Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
-  by internal-pdx-out-014.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2026 19:16:59 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [205.251.233.111:10900]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.31.3:2525] with esmtp (Farcaster)
- id 48a9ce61-14c7-4f10-93fa-6ee7fba1eb52; Sun, 1 Mar 2026 19:16:59 +0000 (UTC)
-X-Farcaster-Flow-ID: 48a9ce61-14c7-4f10-93fa-6ee7fba1eb52
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Sun, 1 Mar 2026 19:16:59 +0000
-Received: from dev-dsk-akiyano-1c-2138b29d.eu-west-1.amazon.com (172.19.83.6)
- by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Sun, 1 Mar 2026 19:16:55 +0000
-From: Arthur Kiyanovski <akiyano@amazon.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	<netdev@vger.kernel.org>
-CC: Arthur Kiyanovski <akiyano@amazon.com>, Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Woodhouse, David"
-	<dwmw@amazon.com>, "Matushevsky, Alexander" <matua@amazon.com>, Saeed Bshara
-	<saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>, "Liguori, Anthony"
-	<aliguori@amazon.com>, "Bshara, Nafea" <nafea@amazon.com>, "Schmeilin,
- Evgeny" <evgenys@amazon.com>, "Belgazal, Netanel" <netanel@amazon.com>,
-	"Saidi, Ali" <alisaidi@amazon.com>, "Herrenschmidt, Benjamin"
-	<benh@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Agroskin, Shay"
-	<shayagr@amazon.com>, "Arinzon, David" <darinzon@amazon.com>, "Ostrovsky,
- Evgeny" <evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>
-Subject: [PATCH v1 net] MAINTAINERS: ena: update AMAZON ETHERNET maintainers
-Date: Sun, 1 Mar 2026 19:16:51 +0000
-Message-ID: <20260301191652.5916-1-akiyano@amazon.com>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1772393055; c=relaxed/simple;
+	bh=5Z4kx/J5JbFJ7iMjvmctwY1eSfmHmHpsdSoeb58SehA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pMq4m9hcXn4v+2hgW6T7IzjxiFp9nv6JyiHXWKcyBFrPENri1xWdO9BiC729dsWCp3quougdQ/Bynkf/WSwj2Y/z8q+2F757VsAw7IRmQx+kQ7yKwTmRAT+IyWtbnn+QHhmaA5CXDNXycGswY4kJJOIu33CB8n1nowrY218ZT3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HPFNlxPZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F61CC116C6;
+	Sun,  1 Mar 2026 19:24:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772393055;
+	bh=5Z4kx/J5JbFJ7iMjvmctwY1eSfmHmHpsdSoeb58SehA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HPFNlxPZMnsfly3WrRZebY0m3y3pRKT3NTIKovjo5stuz+Kdk0+3wwyc1PbLCTWc0
+	 pLH5CirquMiyZawgQdzOi4Dvszg4FFCMrHDhAdKFppo298oYg9yMichLtgbUF5nRcH
+	 DXh3bShgh+vme8Qt9Z4w+cYKleRqD2JzjTMLsyvK1P+10p5vUStDRUCxtBEjU4ewm+
+	 Rq1UKGgH/IGKoa1Lilj8GEcp7dSBtYEFOX24VzA/0RmEJvs2l9m9PVLTI7CAiHuSJh
+	 PvtrwcwNcm12sgoSbXF+zfHz8MqdJW5pzgmKA+bJr8ov3EmHAQb7xCQbe+59H+5Vq6
+	 ysyLF/FcC2khg==
+Date: Sun, 1 Mar 2026 11:24:13 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, David Ahern
+ <dsahern@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, Ido Schimmel
+ <idosch@nvidia.com>
+Subject: Re: [PATCH net-next] ipv6: add IPV6_CALL() helper
+Message-ID: <20260301112413.1b6c785e@kernel.org>
+In-Reply-To: <20260301162514.3347319-1-edumazet@google.com>
+References: <20260301162514.3347319-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWB004.ant.amazon.com (10.13.139.177) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262449-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,redhat.com,kernel.org,google.com,vger.kernel.org,gmail.com,nvidia.com];
+	TAGGED_FROM(0.00)[bounces-262450-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FROM_NEQ_ENVFROM(0.00)[akiyano@amazon.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[amazon.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 4BCB41D138D
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D30B31D1485
 X-Rspamd-Action: no action
 
-Remove Shay Agroskin and Saeed Bishara.
-Promote David Arinzon to maintainer.
+On Sun,  1 Mar 2026 16:25:14 +0000 Eric Dumazet wrote:
+> ipv6_stub use is racy, we should add READ_ONCE() and WRITE_ONCE(),
+> even if this pointer can only change once.
+> 
+> Add IPV6_CALL() macro to factorize the READ_ONCE(), and perform
+> direct calls when CONFIG_IPV6=y.
 
-Signed-off-by: Arthur Kiyanovski <akiyano@amazon.com>
----
- MAINTAINERS | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+Some crashiness detected here, I think
+pw-bot: cr
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 2265e2c9bfbe..7829ff2180ae 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -993,10 +993,8 @@ F:	Documentation/devicetree/bindings/thermal/amazon,al-thermal.yaml
- F:	drivers/thermal/thermal_mmio.c
- 
- AMAZON ETHERNET DRIVERS
--M:	Shay Agroskin <shayagr@amazon.com>
- M:	Arthur Kiyanovski <akiyano@amazon.com>
--R:	David Arinzon <darinzon@amazon.com>
--R:	Saeed Bishara <saeedb@amazon.com>
-+M:	David Arinzon <darinzon@amazon.com>
- L:	netdev@vger.kernel.org
- S:	Maintained
- F:	Documentation/networking/device_drivers/ethernet/amazon/ena.rst
--- 
-2.47.3
-
+[ 1831.476440][ T4627] =============================
+[ 1831.476614][ T4627] WARNING: suspicious RCU usage
+[ 1831.476776][ T4627] 7.0.0-rc1-virtme #1 Not tainted
+[ 1831.476955][ T4627] -----------------------------
+[ 1831.477119][ T4627] net/ipv6/ip6_fib.c:111 suspicious rcu_dereference_protected() usage!
+[ 1831.477338][ T4627] 
+[ 1831.477338][ T4627] other info that might help us debug this:
+[ 1831.477338][ T4627] 
+[ 1831.477613][ T4627] 
+[ 1831.477613][ T4627] rcu_scheduler_active = 2, debug_locks = 1
+[ 1831.477831][ T4627] 1 lock held by ip/4627:
+[ 1831.477975][ T4627]  #0: ffffffff950a1d28 (rtnl_mutex){+.+.}-{4:4}, at: rtm_new_nexthop+0x1a6/0x8c0
+[ 1831.478234][ T4627] 
+[ 1831.478234][ T4627] stack backtrace:
+[ 1831.478423][ T4627] CPU: 2 UID: 0 PID: 4627 Comm: ip Not tainted 7.0.0-rc1-virtme #1 PREEMPT(full) 
+[ 1831.478427][ T4627] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+[ 1831.478429][ T4627] Call Trace:
+[ 1831.478431][ T4627]  <TASK>
+[ 1831.478433][ T4627]  dump_stack_lvl+0x6f/0xa0
+[ 1831.478440][ T4627]  lockdep_rcu_suspicious.cold+0x4f/0xad
+[ 1831.478445][ T4627]  fib6_update_sernum+0xfb/0x130
+[ 1831.478450][ T4627]  nh_rt_cache_flush+0x8d/0x380
+[ 1831.478454][ T4627]  replace_nexthop+0x347/0x6e0
+[ 1831.478458][ T4627]  insert_nexthop+0x41e/0x7a0
+[ 1831.478460][ T4627]  ? nexthop_create+0x307/0x770
+[ 1831.478463][ T4627]  rtm_new_nexthop+0x3a0/0x8c0
+[ 1831.478467][ T4627]  ? insert_nexthop+0x7a0/0x7a0
+[ 1831.478468][ T4627]  ? lock_acquire.part.0+0xbc/0x260
+[ 1831.478471][ T4627]  ? find_held_lock+0x2b/0x80
+[ 1831.478478][ T4627]  ? lock_acquire.part.0+0xbc/0x260
+[ 1831.478479][ T4627]  ? find_held_lock+0x2b/0x80
+[ 1831.478485][ T4627]  ? find_held_lock+0x2b/0x80
+[ 1831.478487][ T4627]  ? insert_nexthop+0x7a0/0x7a0
+[ 1831.478489][ T4627]  ? __lock_release.isra.0+0x59/0x170
+[ 1831.478492][ T4627]  ? insert_nexthop+0x7a0/0x7a0
+[ 1831.478494][ T4627]  rtnetlink_rcv_msg+0x6fe/0xb90
+[ 1831.478499][ T4627]  ? rtnl_fdb_dump+0x620/0x620
+[ 1831.478501][ T4627]  ? __lock_acquire+0x577/0xc10
+[ 1831.478511][ T4627]  ? lock_acquire.part.0+0xbc/0x260
+[ 1831.478513][ T4627]  ? find_held_lock+0x2b/0x80
+[ 1831.478516][ T4627]  netlink_rcv_skb+0x123/0x380
+[ 1831.478519][ T4627]  ? rtnl_fdb_dump+0x620/0x620
+[ 1831.478522][ T4627]  ? netlink_ack+0xce0/0xce0
+[ 1831.478527][ T4627]  ? netlink_deliver_tap+0xc5/0x330
+[ 1831.478529][ T4627]  ? netlink_deliver_tap+0x13f/0x330
+[ 1831.478533][ T4627]  netlink_unicast+0x4a3/0x770
+[ 1831.478536][ T4627]  ? netlink_attachskb+0x810/0x810
+[ 1831.478537][ T4627]  ? __alloc_skb+0x4c4/0x5f0
+[ 1831.478540][ T4627]  ? napi_skb_cache_get+0x7a0/0x7a0
+[ 1831.478542][ T4627]  ? lock_acquire.part.0+0xbc/0x260
+[ 1831.478544][ T4627]  ? __lock_acquire+0x577/0xc10
+[ 1831.478547][ T4627]  netlink_sendmsg+0x735/0xc60
+[ 1831.478550][ T4627]  ? netlink_unicast+0x770/0x770
+[ 1831.478553][ T4627]  ? __might_fault+0x97/0x140
+[ 1831.478559][ T4627]  ____sys_sendmsg+0x419/0x850
+[ 1831.478561][ T4627]  ? copy_msghdr_from_user+0x270/0x430
+[ 1831.478563][ T4627]  ? get_timestamp.constprop.0+0x390/0x390
+[ 1831.478564][ T4627]  ? move_addr_to_kernel+0x40/0x40
+[ 1831.478567][ T4627]  ? stack_depot_save_flags+0x30d/0x6e0
+[ 1831.478571][ T4627]  ? rcu_read_lock_any_held+0x3c/0x90
+[ 1831.478576][ T4627]  ___sys_sendmsg+0xfd/0x180
+[ 1831.478578][ T4627]  ? __call_rcu_common.constprop.0+0xa6/0xa00
+[ 1831.478581][ T4627]  ? copy_msghdr_from_user+0x430/0x430
+[ 1831.478595][ T4627]  __sys_sendmsg+0x124/0x1c0
+[ 1831.478597][ T4627]  ? __sys_sendmsg_sock+0x20/0x20
+[ 1831.478599][ T4627]  ? lockdep_hardirqs_on+0x84/0x130
+[ 1831.478603][ T4627]  ? __call_rcu_common.constprop.0+0x3bd/0xa00
+[ 1831.478608][ T4627]  ? do_raw_spin_unlock+0x59/0x250
+[ 1831.478610][ T4627]  ? rcu_is_watching+0x15/0xd0
+[ 1831.478613][ T4627]  do_syscall_64+0x117/0xfc0
+[ 1831.478615][ T4627]  ? exc_page_fault+0xaf/0xd0
+[ 1831.478617][ T4627]  entry_SYSCALL_64_after_hwframe+0x4b/0x53
 
