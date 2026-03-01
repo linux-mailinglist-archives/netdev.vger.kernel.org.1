@@ -1,235 +1,192 @@
-Return-Path: <netdev+bounces-262447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262448-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MDAmBvSGpGlsjQUAu9opvQ
-	(envelope-from <netdev+bounces-262447-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 19:35:32 +0100
+	id MCg9MzaHpGlsjQUAu9opvQ
+	(envelope-from <netdev+bounces-262448-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 19:36:38 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C4BD1D11B8
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 19:35:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 20E881D11D5
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 19:36:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D5A5F300DDF1
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 18:35:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9DA053011BE1
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 18:36:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DFE4308F07;
-	Sun,  1 Mar 2026 18:35:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA9213112BD;
+	Sun,  1 Mar 2026 18:36:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="L+1g2+I8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com [209.85.161.69])
+Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD048175A6A
-	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 18:35:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5004D3043D6
+	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 18:36:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772390129; cv=none; b=RTdY1AFMoVq6l/u/1N6amZO74c5chJ3uI02r5xrJERsvHfVfIgNGphS/HSRyuAmiv/dP1ye/hjEyFW5rn8wi6uqRILFgn5cskwaqEgK3z6esEtDsdB+OhqgOsfS+oS/laQu57lRaoOEtv6Uw3Mhz3cd97I/LEQ13VrlVHTk5n9c=
+	t=1772390187; cv=none; b=N+AxJXsZGAyUMlLvQ2SDCEMzhJnWyGAHb3gCkEaGBndU1FZhQA4CwG4V4n0c51Ojr00B/PCJDcVHgVVKvKkhXNGBS8q4nfBTKpdP8tD2FDnDSDatbOjb7q2GhS6VRRvP+iLn+lljUWCBz0UtINCBqr5aCSh0NL8b9HE3XAlaz8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772390129; c=relaxed/simple;
-	bh=Sx2qiZCmvyZr1+x0tQ30Z1GMVAY2u8hJ+Oun+qEC7oQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=AA7U1JqUQtRz/ON08TTMVlSVhxIZGHBT7ldrxUp9ZAaI+4zW8/xH4xpwHLPifC8d1gJak8JcPZm0DGgCLrstcaF4Eo+J1y3x9C5E5URfuFyUPjGZgPjvfd+80g2WvmXqAiIcMGix45lyA7SY7j0YVODgeEQy3dNHQpvVGMdUu9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-679c6ef1538so78153370eaf.3
-        for <netdev@vger.kernel.org>; Sun, 01 Mar 2026 10:35:27 -0800 (PST)
+	s=arc-20240116; t=1772390187; c=relaxed/simple;
+	bh=1ObvqHsTsalxqDbL21MtuhPVcgQdYauVsk3uuRKAByM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=twukguXAEjiunuWZA13YpvWZKjBOvyus4DmWvuevqgHoIFbZxFlOYzbZ9oFWyHxPmoSUrvo/AC4CgSKegFw6/CSE6YekKGhc2BKYnYO19NHy0sUa3A1BF0JBuRY1lrBnMYmCzDcZW2t3abTwYPE1gS6ayYCPfGfjwpemdrIisjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=L+1g2+I8; arc=none smtp.client-ip=74.125.82.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-12713e56abdso2155882c88.1
+        for <netdev@vger.kernel.org>; Sun, 01 Mar 2026 10:36:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1772390185; x=1772994985; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=L8iKVITopDTVtBsFNrs/1a92xZRkWVvA1ZIYWlvVsSA=;
+        b=L+1g2+I83OcqfrG3Fv6xz1HGQ/nD92l9oM+H282ZgEMLoeqHGt+baWy0+0VTNuuPxy
+         DcRWBm93T35TarlXzDvz5iQrsr9U1ctRv445nvIcJyUhKyG7qnxZkE0RUfD3YIUwrZXb
+         YC4tPQqqjwGnF60F+xlcp0o5EqeasW2qYXc6j8OKUqOxxMuQ984vqYBBCyt07Z+x+y9M
+         OPHArTLWi0DHOw1qzv/S+amAEnW4/1J79Myf+8hpJfb4PUTjVG9ED4vOctJGkt0be+cs
+         fgzmpHHamBhfcR3Vxgk+LgZQjH2TGr/PtH5UX3iicOqqY92CecjAMYCba2gXx7GZWPfK
+         uzXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772390127; x=1772994927;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=G1UYv/jtRxH/t46qvbmQtlpVvuiG18i64ydB7qEvuG8=;
-        b=Pi6ecfZGb54q7Sh8hDqrutW8SF/0bByvvyWZF3l8g2iCtA+zitJl0ZfeLwILuBZQiz
-         yF2r+nuu50JLPBlSTEzufaBEdpX1bWKkrDdzk8+piCU3FOs40WEX1ECAf/HLQQhBLMW7
-         g1Ua2BjYSFhO3FMSUQawtLBkIDVXP/m2bs9hfpA9M4O1fNJtopgYdTfsaUMOmpuMQPS/
-         thfgY2FRj2S9bxmloxD+vjEL9INFIYNeBZ51I6GD4+2N+NyMt4Tsv+VXYkQ18A1wCelB
-         H+wkq5E/LJBFeLGzA5dKkcFEegnrDMIH5jOfysYDWjuk1wJhve5YJMhTlBh12zZCuDyi
-         pTIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVq3lHQIYVa4vzuwZaadiawdZN6O4NVqVvtzGVUivwpCWmqeIE8JJoYPNF1JxKhwDzwf+O5C4k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoqOJYnS/fJYMI/YzdZzuTeC5cFtIWXgUksKnfsqDv/9EKZXY6
-	DarefMsyK2i13x8UH4bVWrmG5cHlFxIKW3jZT+y9qiLDpeIte35SAkea5n5A5l9CHSCNFIJmSbA
-	/NbMU5pGuTW8BhmuhwBpgK1A3mf/6X0hpC4hxiNelNmsv3k2ue9iGP3L9oec=
+        d=1e100.net; s=20230601; t=1772390185; x=1772994985;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=L8iKVITopDTVtBsFNrs/1a92xZRkWVvA1ZIYWlvVsSA=;
+        b=vhNzzIP9E885U5VC+UzA5U7uZKHuikI7mlE1rN5Vx/fNdV+BviMEUXN4POk+SMbiSa
+         QX8jUx7wWEyRksSajVyHHKWqcMRxjW1M16zej+udNOlxDdHT6U3EqON6r2cZbOS0+YzG
+         SH4crbGwfyloMEjm2cK0GP502AZGQy2YGHN4YwCxQNbWjKxp7oS16aLqcxkKW8P76Tbt
+         cis2WaohwsHqJIgk7KKzI30aWL2KNS75O9uBTP5yC/i4Y4gP1A4gvoiMRdjGTbvPGUq+
+         LIdgc3+cDztPmSU3OJ18Vx4DMvY9sNpl50OdG/T9Bi/nsLgsY7IzFYkbjrWpqVoPKqos
+         sJVg==
+X-Forwarded-Encrypted: i=1; AJvYcCVnrt0DD8zHWC0bUz6LNKbb59BPb5OUjhOi9WZihIP8UPPNZNGXJ92/igzh1ziaJ5jaarIRs+U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2MP6+hcuUUmQvk2WwPpMiVsYb0KdUFhkes5cBoTV/RLOsbTBb
+	vPht/KAjceXq6UuRwaFG/t2hchtjONwCsVBtVzhvK4Qks3ynbkIhUx3tyIJ9LYCM30M=
+X-Gm-Gg: ATEYQzwYepW54WQnGhrRLU3XJGE/MALWS5mhEuFSbt/6Kl5uoD6BzxurFLfB2blx8pP
+	WXwCJTWObYpv0zipoUSPDGUIk4x3OpsOSRIAvfsHG3ng/ObR04VeEp3+Y4IoeM2W6ukyb+KQHUe
+	3hQz9qPTYow4kPMJ4NxDNR2G8cglBEXhh+6qfNADNwRaaIann7Kmx3WgfVfh3IbCqPL2poM7y9L
+	iPCkiRokh704Ckh5Bm92pud6idEFPzj9XOp7cZ4xQxSWfAXGaa33Csw7iLWpLlx7n+03V3fhsh/
+	fWoOx06gOlVis3QrSLI9EFJSJFI6HUOgApc7yi1S4ZDwsV7IqSv42N+IWtmGR0Mq5DYj2eUPeTa
+	csoob6N4KVArsElVYoTtxQD9fIy1fwyAXR8rGjn407uiWEkOBl4+5+VCOQYb0VhlqtjdClJL8k1
+	VA6vVz/uG7j4Tw3xfMuygbMzkreTomAxyOqR6blUbzPoRWVI+3HA6lMkzQiDuEUMHB
+X-Received: by 2002:a05:7022:618e:b0:123:3a91:f563 with SMTP id a92af1059eb24-1278906bebbmr5013655c88.8.1772390185264;
+        Sun, 01 Mar 2026 10:36:25 -0800 (PST)
+Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-127899eab46sm11003870c88.8.2026.03.01.10.36.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 01 Mar 2026 10:36:25 -0800 (PST)
+Date: Sun, 1 Mar 2026 10:36:22 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Yedaya Katsman <yedaya.ka@gmail.com>
+Cc: David Ahern <dsahern@kernel.org>, Petr Machata <petrm@nvidia.com>,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH] ip: Make 'ip stats help' exit with -1
+Message-ID: <20260301103622.44ef19d7@phoenix.local>
+In-Reply-To: <20260301-ip-stats-exit-code-v1-1-2b59f0704f2c@gmail.com>
+References: <20260301-ip-stats-exit-code-v1-1-2b59f0704f2c@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:2503:b0:67a:422:d24 with SMTP id
- 006d021491bc7-67a04221235mr2401092eaf.70.1772390126842; Sun, 01 Mar 2026
- 10:35:26 -0800 (PST)
-Date: Sun, 01 Mar 2026 10:35:26 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69a486ee.050a0220.3a55be.0067.GAE@google.com>
-Subject: [syzbot] [kernel?] INFO: task hung in ret_from_fork (4)
-From: syzbot <syzbot+7c11975a7e4a2735d529@syzkaller.appspotmail.com>
-To: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
-	linux-kernel@vger.kernel.org, mingo@redhat.com, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, tglx@kernel.org, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [-0.06 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=665cbf0979cda6c5];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[networkplumber-org.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
+	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-262448-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-262447-lists,netdev=lfdr.de,7c11975a7e4a2735d529];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[networkplumber-org.20230601.gappssmtp.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
 	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,storage.googleapis.com:url,syzkaller.appspot.com:url,googlegroups.com:email]
-X-Rspamd-Queue-Id: 6C4BD1D11B8
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,phoenix.local:mid,networkplumber-org.20230601.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: 20E881D11D5
 X-Rspamd-Action: no action
 
-Hello,
+On Sun, 01 Mar 2026 16:12:03 +0200
+Yedaya Katsman <yedaya.ka@gmail.com> wrote:
 
-syzbot found the following issue on:
+> ip <subcommand> help exits with -1 for all commands except for stats, make
+> it match.
+> This removes a goto err, which is redundant since "enabled" gets
+> allocated only if we find a level, but we enter do_help only if we didn't.
+>=20
+> Fixes: df0b2c6d0098 ("ipstats: Add a shell of "show" command")
+> Signed-off-by: Yedaya Katsman <yedaya.ka@gmail.com>
 
-HEAD commit:    2f61f38a2174 net: stmmac: fix timestamping configuration a..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=16824d5a580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=665cbf0979cda6c5
-dashboard link: https://syzkaller.appspot.com/bug?extid=7c11975a7e4a2735d529
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10e9955a580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16b928d6580000
+You raise a good point, but not sure that fixing just one corner is the
+right answer here. Most of iproute2 gets this wrong already.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f3c4b4ab812f/disk-2f61f38a.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/a662c736eab0/vmlinux-2f61f38a.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/345dc74120a7/bzImage-2f61f38a.xz
+The (poorly documented) convention for help in Unix commands:
+Output destination: stdout (not stderr).=20
+Help text is expected, requested output =E2=80=94 not an error.
+This matters for piping, e.g. command --help | grep something.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+7c11975a7e4a2735d529@syzkaller.appspotmail.com
+Exit code: 0 (success).
+The user asked for help and got it =E2=80=94 that's a successful operation.
 
-INFO: task kworker/1:8:5970 blocked for more than 159 seconds.
-      Not tainted syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/1:8     state:D stack:30744 pid:5970  tgid:5970  ppid:2      task_flags:0x4208040 flags:0x00080000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5295 [inline]
- __schedule+0x1585/0x5340 kernel/sched/core.c:6907
- __schedule_loop kernel/sched/core.c:6989 [inline]
- schedule+0x164/0x360 kernel/sched/core.c:7004
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:7061
- kthread+0x260/0x470 kernel/kthread.c:451
- ret_from_fork+0x51e/0xb90 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
+Contrast with error cases:
+When a user provides an invalid flag or misuses the command,=20
+the usage/error message should go to stderr with a non-zero exit code
+(typically 1 or 2 =E2=80=94 2 is common convention from many GNU tools for =
+usage errors).
 
-Showing all locks held in the system:
-2 locks held by kworker/0:0/9:
-1 lock held by kworker/0:1/10:
- #0: ffffffff8e5fec68 (wq_pool_attach_mutex){+.+.}-{4:4}, at: worker_attach_to_pool+0x2e/0x3a0 kernel/workqueue.c:2691
-2 locks held by kworker/u8:0/12:
-2 locks held by kworker/u8:1/13:
-1 lock held by kworker/R-mm_pe/14:
- #0: ffffffff8e5fec68 (wq_pool_attach_mutex){+.+.}-{4:4}, at: worker_detach_from_pool kernel/workqueue.c:2749 [inline]
- #0: ffffffff8e5fec68 (wq_pool_attach_mutex){+.+.}-{4:4}, at: rescuer_thread+0xc4a/0x1120 kernel/workqueue.c:3610
-3 locks held by kworker/1:0/24:
- #0: ffff88813fe0f548 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3250 [inline]
- #0: ffff88813fe0f548 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x9ea/0x1830 kernel/workqueue.c:3358
- #1: ffffc900001e7c40 ((work_completion)(&data->fib_event_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3251 [inline]
- #1: ffffc900001e7c40 ((work_completion)(&data->fib_event_work)){+.+.}-{0:0}, at: process_scheduled_works+0xa25/0x1830 kernel/workqueue.c:3358
- #2: ffff88807c222240 (&data->fib_lock){+.+.}-{4:4}, at: nsim_fib_event_work+0x202/0x3d0 drivers/net/netdevsim/fib.c:1490
-1 lock held by khungtaskd/30:
- #0: ffffffff8e7602e0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:312 [inline]
- #0: ffffffff8e7602e0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:850 [inline]
- #0: ffffffff8e7602e0 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x2e/0x180 kernel/locking/lockdep.c:6775
-8 locks held by kworker/u8:2/35:
-3 locks held by kworker/1:1/42:
-3 locks held by kworker/u8:3/49:
- #0: ffff88813fe4c148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3250 [inline]
- #0: ffff88813fe4c148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_scheduled_works+0x9ea/0x1830 kernel/workqueue.c:3358
- #1: ffffc90000b97c40 ((work_completion)(&pool->idle_cull_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3251 [inline]
- #1: ffffc90000b97c40 ((work_completion)(&pool->idle_cull_work)){+.+.}-{0:0}, at: process_scheduled_works+0xa25/0x1830 kernel/workqueue.c:3358
- #2: ffffffff8e5fec68 (wq_pool_attach_mutex){+.+.}-{4:4}, at: idle_cull_fn+0xd2/0x740 kernel/workqueue.c:2973
-2 locks held by kworker/u8:4/77:
-3 locks held by kworker/u8:5/86:
- #0: ffff88813fe4c148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3250 [inline]
- #0: ffff88813fe4c148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_scheduled_works+0x9ea/0x1830 kernel/workqueue.c:3358
- #1: ffffc900025dfc40 ((linkwatch_work).work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3251 [inline]
- #1: ffffc900025dfc40 ((linkwatch_work).work){+.+.}-{0:0}, at: process_scheduled_works+0xa25/0x1830 kernel/workqueue.c:3358
- #2: ffffffff8fbcb888 (rtnl_mutex){+.+.}-{4:4}, at: linkwatch_event+0xe/0x60 net/core/link_watch.c:313
-2 locks held by kworker/u8:6/146:
-2 locks held by kworker/0:2/796:
-2 locks held by kworker/u8:7/1116:
-1 lock held by kworker/u8:8/1147:
- #0: ffffffff8e5fec68 (wq_pool_attach_mutex){+.+.}-{4:4}, at: worker_attach_to_pool+0x2e/0x3a0 kernel/workqueue.c:2691
-2 locks held by kworker/u8:9/1168:
-1 lock held by kworker/1:2/1997:
- #0: ffffffff8e5fec68 (wq_pool_attach_mutex){+.+.}-{4:4}, at: worker_attach_to_pool+0x2e/0x3a0 kernel/workqueue.c:2691
-3 locks held by kworker/u8:10/2990:
-2 locks held by getty/5581:
- #0: ffff888036c110a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
- #1: ffffc9000332b2f0 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x45c/0x13c0 drivers/tty/n_tty.c:2211
-3 locks held by kworker/1:3/5810:
-2 locks held by syz-executor210/5855:
- #0: ffffffff8fbcb888 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
- #0: ffffffff8fbcb888 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock net/core/rtnetlink.c:341 [inline]
- #0: ffffffff8fbcb888 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0x8a1/0x1be0 net/core/rtnetlink.c:4071
- #1: ffff88806d1a5528 (&wg->device_update_lock){+.+.}-{4:4}, at: wg_open+0x227/0x420 drivers/net/wireguard/device.c:50
-1 lock held by syz-executor210/5856:
- #0: ffffffff8fbcb888 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
- #0: ffffffff8fbcb888 (rtnl_mutex){+.+.}-{4:4}, at: rtnetlink_rcv_msg+0x722/0xbe0 net/core/rtnetlink.c:6964
-3 locks held by kworker/1:4/5865:
-7 locks held by kworker/u9:3/5869:
- #0: ffff88807a26f948 ((wq_completion)hci2){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3250 [inline]
- #0: ffff88807a26f948 ((wq_completion)hci2){+.+.}-{0:0}, at: process_scheduled_works+0x9ea/0x1830 kernel/workqueue.c:3358
- #1: ffffc90003ba7c40 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3251 [inline]
- #1: ffffc90003ba7c40 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_scheduled_works+0xa25/0x1830 kernel/workqueue.c:3358
- #2: ffff888076408ec0 (&hdev->req_lock){+.+.}-{4:4}, at: hci_cmd_sync_work+0x1d3/0x400 net/bluetooth/hci_sync.c:331
- #3: ffff8880764080c0 (&hdev->lock){+.+.}-{4:4}, at: hci_abort_conn_sync+0xa6f/0x1190 net/bluetooth/hci_sync.c:5734
- #4: ffffffff8fd57f28 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2136 [inline]
- #4: ffffffff8fd57f28 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_conn_failed+0x165/0x340 net/bluetooth/hci_conn.c:1342
- #5: ffff888057b3caf8 (&conn->lock#2){+.+.}-{4:4}, at: l2cap_conn_del+0x7b/0x5c0 net/bluetooth/l2cap_core.c:1755
- #6: ffffffff8e766578 (rcu_state.exp_mutex){+.+.}-{4:4}, at: exp_funnel_lock kernel/rcu/tree_exp.h:343 [inline]
- #6: ffffffff8e766578 (rcu_state.exp_mutex){+.+.}-{4:4}, at: synchronize_rcu_expedited+0x38d/0x770 kernel/rcu/tree_exp.h:961
-5 locks held by kworker/u9:4/5870:
- #0: ffff88807c3fa148 ((wq_completion)hci4){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3250 [inline]
- #0: ffff88807c3fa148 ((wq_completion)hci4){+.+.}-{0:0}, at: process_scheduled_works+0x9ea/0x1830 kernel/workqueue.c:3358
+In practice, this is codified in the GNU Coding Standards,=20
+which explicitly state that --help should print to stdout and exit with sta=
+tus 0.
+POSIX doesn't mandate -h specifically, but the GNU convention is widely fol=
+lowed and expected.
+A surprising number of tools historically got this wrong (sending help to s=
+tderr or returning non-zero).
+
+But iproute2 does not follow this convention.
+Fixing it might be a good idea, the kind of thing AI refactoring might help=
+ at.
+
+An example which should print nothing!
+$ ip help >/dev/null || echo broken=20
+Usage: ip [ OPTIONS ] OBJECT { COMMAND | help }
+       ip [ -force ] -batch filename
+where  OBJECT :=3D { address | addrlabel | fou | help | ila | ioam | l2tp |=
+ link |
+                   macsec | maddress | monitor | mptcp | mroute | mrule |
+                   neighbor | neighbour | netconf | netns | nexthop | ntabl=
+e |
+                   ntbl | route | rule | sr | stats | tap | tcpmetrics |
+                   token | tunnel | tuntap | vrf | xfrm }
+       OPTIONS :=3D { -V[ersion] | -s[tatistics] | -d[etails] | -r[esolve] |
+                    -h[uman-readable] | -iec | -j[son] | -p[retty] |
+                    -f[amily] { inet | inet6 | mpls | bridge | link } |
+                    -4 | -6 | -M | -B | -0 |
+                    -l[oops] { maximum-addr-flush-attempts } | -echo | -br[=
+ief] |
+                    -o[neline] | -t[imestamp] | -ts[hort] | -b[atch] [filen=
+ame] |
+                    -rc[vbuf] [size] | -n[etns] name | -N[umeric] | -a[ll] |
+                    -c[olor]}
+broken
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
