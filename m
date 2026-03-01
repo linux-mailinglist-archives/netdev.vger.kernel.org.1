@@ -1,130 +1,164 @@
-Return-Path: <netdev+bounces-262433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262434-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0IIqAEaBpGliiwUAu9opvQ
-	(envelope-from <netdev+bounces-262433-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 19:11:18 +0100
+	id 8MtRC52BpGliiwUAu9opvQ
+	(envelope-from <netdev+bounces-262434-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 19:12:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E72B81D10A1
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 19:11:16 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92C961D10BE
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 19:12:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E29FB3006035
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 18:11:13 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C8926300B5BE
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 18:12:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A643320CCC;
-	Sun,  1 Mar 2026 18:11:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8D1C2E7648;
+	Sun,  1 Mar 2026 18:12:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ksm3Brv4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bEMndagJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 070C428C87C;
-	Sun,  1 Mar 2026 18:11:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94BF2175A89;
+	Sun,  1 Mar 2026 18:12:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772388671; cv=none; b=Xvkc3BGi+de24bp3A5hEL0lcP8s0IMz/49flYs4P6xPgVVwOWTEFKz2AuYrwiKxIc5JyYHouLpPqM1xVIu2kODahe0wWGQ3UbcWrrUcl/HjkvR4KwEhY/IynJ6A3ah2RQPpTg7BT4uupb4kBd3quWxRBTEkmcyjnqH3xO5Tqi+k=
+	t=1772388761; cv=none; b=oV9F8vSEsc5qP0Wf3eThxJQsCuKOzq6V4OIpwt5jhCh02C20FZNQRjZR85nmqhx7+fPmkH/Q8HEikQMhlrgkIINYYkssWlHvugIx37Zz6HVEX3q3WKNbapiwvdhavAnGw7C5j/zPAmcJzO/hwRhnKrdTGIhUGcWkk6x2Izyr0mM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772388671; c=relaxed/simple;
-	bh=NiyZ/P/wWqXWdm4jfNvH5gJbsCSPXe72r/2jIcLBWAg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ovtEm3hu9yXw0/LBNzNBPrjd2UnPHsTaPv+p4jy9VNhTvN47xsOct3oket05BuMWDP9rtdYpnZncO1aZUMF3pCpXGS3QWTjIAo4ssCiphDx8vYmDhAa98xEzgaBvCgoAoF/luyv+FicRYdD1lJRuAWIC0ckBF7cIJ3tY0w9qazo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ksm3Brv4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45E82C116C6;
-	Sun,  1 Mar 2026 18:11:10 +0000 (UTC)
+	s=arc-20240116; t=1772388761; c=relaxed/simple;
+	bh=2tBYxDnTTDmwYplUfxuZm8q55vkRHX1ktadnQoNR0rQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CF8x1k5lZiW/Fzgwndjar2D/JJyNDtYYOhSJaUh9AeobreOY1zQ9TlKVdLFrBt00vyP3lKDB1+hLG/PY3xmZQOpLLT2ZqyU9NTTV8VkUtrCo7TDEBVybJyobzsmAXpCEL2rtHmlkbFvjvVmVVhUUGmdEd8HPaVWp+WahM7SojGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bEMndagJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D20A8C116C6;
+	Sun,  1 Mar 2026 18:12:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772388670;
-	bh=NiyZ/P/wWqXWdm4jfNvH5gJbsCSPXe72r/2jIcLBWAg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ksm3Brv4AhmDE7TWipj7KuKGfwAj225hQX8QdKATXOeuFAX5tD7v6ODjO70ea5oas
-	 iYWvFYMyFv4Xya7ANU7QCETcQq8lLrjkKkdgfOrIcNk0IVftXg9MS5Ry7Uuq2yd6j5
-	 EA/Ir6LYw9RABA2UKGD816+wfXtzK6fsyAnJ5zEm913I4eUSPCbxn4ec938LZ+aD3s
-	 R5odmHtUUTv5Pt4yF+7RdmodOGPk7Dkx/Tl9lVaEPz6e1fJplX+pkEz+GCSxKcchQU
-	 yygaLWvIIITBHCyMqD5OapSYMLIP+rjVj23j/NdHLaXFhXTDrrH6b8GlhZnunWmLF2
-	 dpC9LN4slNAAQ==
-Message-ID: <d4baf286-3ecd-42e1-aae1-d7727a68176e@kernel.org>
-Date: Sun, 1 Mar 2026 11:11:09 -0700
+	s=k20201202; t=1772388761;
+	bh=2tBYxDnTTDmwYplUfxuZm8q55vkRHX1ktadnQoNR0rQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bEMndagJnw30yQE+6GEDfRZo6V64zCPvYR6jfCNLWmxRqLfBWlrQhzu1QVZVoOPb/
+	 Ddvcdhs9LVG1JSilSt0TYdu6UVJj7lX+nm65zYRwKnNdKL0A1AMIyQiLa0dgLXU4VE
+	 XhsDLjsDlQYrkYKVw0fOW+ojc+aE5tNbS93bZXDvIxYgOmSNClDOrSoJyk11oSsFgR
+	 zD87GosuvuycJ6n4lUYNeoXgnxVBkMd4YnXJ1TSOfQpytje26ch8QmxzHdhAto+Dnj
+	 fJ3emgzcGlTLPn3SjTH9ai16xRuLTbSmBtfRsiwg+ekJiFajw5MieEGQSeFVrx01/h
+	 KHr32JdamrivA==
+Date: Sun, 1 Mar 2026 18:12:33 +0000
+From: Simon Horman <horms@kernel.org>
+To: Conor Dooley <conor@kernel.org>
+Cc: netdev@vger.kernel.org, Conor Dooley <conor.dooley@microchip.com>,
+	Valentina.FernandezAlanis@microchip.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Daire McNamara <daire.mcnamara@microchip.com>,
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Samuel Holland <samuel.holland@sifive.com>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	Neil Armstrong <narmstrong@baylibre.com>,
+	Dave Stevenson <dave.stevenson@raspberrypi.com>,
+	Sean Anderson <sean.anderson@linux.dev>,
+	Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
+	Abin Joseph <abin.joseph@amd.com>,
+	=?utf-8?B?VGjDqW8=?= Lebrun <theo.lebrun@bootlin.com>
+Subject: Re: [PATCH net-next v2 5/8] net: macb: timer adjust mode is not
+ supported
+Message-ID: <aaSBkVkhNTbQHkmI@horms.kernel.org>
+References: <20260226-snowshoe-amusable-6716d4ddea11@spud>
+ <20260226-dollop-maturing-9e3c83192ee5@spud>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v1] net: nexthop: fix panic when IPv4 route references
- IPv6 nexthop
-Content-Language: en-US
-To: Jiayuan Chen <jiayuan.chen@linux.dev>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Jiayuan Chen <jiayuan.chen@shopee.com>,
- syzbot+334190e097a98a1b81bb@syzkaller.appspotmail.com,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
-References: <20260228031400.163009-1-jiayuan.chen@linux.dev>
- <20260228073959.0ef1b33f@kernel.org>
- <3a00c5bf-6740-47c3-b885-c1e0cfe62289@kernel.org>
- <CANn89iJjjNW4U6ZxVcuRxWaKPbo1wfEyBD4Etkf+f6CWyhAHFg@mail.gmail.com>
- <d3722ec10046a2fde021a2b8a51a83431c8bcbac@linux.dev>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <d3722ec10046a2fde021a2b8a51a83431c8bcbac@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260226-dollop-maturing-9e3c83192ee5@spud>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262433-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-262434-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,tuxon.dev,gmail.com,sifive.com,lists.infradead.org,baylibre.com,raspberrypi.com,linux.dev,amd.com,bootlin.com];
+	RCPT_COUNT_TWELVE(0.00)[30];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,334190e097a98a1b81bb];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E72B81D10A1
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,microchip.com:email]
+X-Rspamd-Queue-Id: 92C961D10BE
 X-Rspamd-Action: no action
 
-On 2/28/26 6:57 PM, Jiayuan Chen wrote:
-> The crash actually only happens with loopback nexthops, e.g.:
+On Thu, Feb 26, 2026 at 11:03:20AM +0000, Conor Dooley wrote:
+> From: Conor Dooley <conor.dooley@microchip.com>
 > 
->     ip nexthop add id 100 via fe80::1 dev lo
+> The ptp portion of this driver controls the tsu's timer using the
+> controls for "increment mode", which is not compatible with the hardware
+> trying to control it via the gem_tsu_inc_ctrl and gem_tsu_ms inputs in
+> "timer adjust mode". Abort probe if the property signalling that the
+> relevant signals have been wired up is present.
 > 
-> In fib6_nh_init(), nexthop objects always have fc_dst=:: (no
-> destination prefix), so fib6_is_reject() returns true for any
-> nexthop using loopback device. This causes it to skip
-> fib_nh_common_init(), leaving nhc_pcpu_rth_output, nhc_exceptions
-> and nhc_rth_input all NULL. When an IPv4 route later references
-> this nexthop, __mkroute_output() hits raw_cpu_ptr(NULL) and crashes.
+> Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
+> ---
+>  drivers/net/ethernet/cadence/macb_main.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
-> The simplest fix is just allocating nhc_pcpu_rth_output in the
-> reject path of fib6_nh_init(). The release path already handles
-> it correctly.
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+> index ddbb0c327b303..fa55e6e7036f2 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -5535,6 +5535,12 @@ static int macb_probe(struct platform_device *pdev)
+>  
+>  	bp->usrio = macb_config->usrio;
+>  
+> +	if (of_property_read_bool(bp->pdev->dev.of_node, "cdns,timer-adjust") &&
+> +			IS_ENABLED(CONFIG_MACB_USE_HWSTAMP)) {
+> +		dev_err(&pdev->dev, "Timer adjust mode is not supported\n");
 
-should have read this before that last response. fib_nh_common_init
-exists to avoid putting ipv4 logic in ipv6 code, so your proposed patch
-is wrong.
+Hi Conor,
 
-Perhaps the better change is to not use fib6_is_reject in fib6_nh_init
-or relax the loopback check or move the jump label pcpu_alloc to still
-call fib_nh_common_init.
+Assuming this is an error condition I think that err should
+be set to an negative error value here. Else the function will return 0.
 
-Also, a test should be added to the nexthops test for this case.
+Flagged by Smatch.
+
+> +		goto err_out_free_netdev;
+> +	}
+> +
+>  	/* By default we set to partial store and forward mode for zynqmp.
+>  	 * Disable if not set in devicetree.
+>  	 */
+> -- 
+> 2.51.0
+> 
+> 
 
