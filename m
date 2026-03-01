@@ -1,193 +1,145 @@
-Return-Path: <netdev+bounces-262380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262381-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WJ1zBcr7o2lPTgUAu9opvQ
-	(envelope-from <netdev+bounces-262380-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 09:41:46 +0100
+	id k9hdNFD+o2lZUAUAu9opvQ
+	(envelope-from <netdev+bounces-262381-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 09:52:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64B0E1CEE23
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 09:41:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C01F1CEE75
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 09:52:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E265F3018D57
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 08:41:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6C9903018099
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 08:52:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29F68296BCD;
-	Sun,  1 Mar 2026 08:41:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99018430B96;
+	Sun,  1 Mar 2026 08:52:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fdjJ3l8Y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WC6tqmpG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04CA9A932;
-	Sun,  1 Mar 2026 08:41:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3925315539A
+	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 08:52:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772354503; cv=none; b=ZS/F8bffZElABzeB2AnDzuZoTt3hwmXp/xpNSmOQK+7ExGeCJbtK9SbFLJ5rZGM1LkR8Xxa9ooYXYpPKfS/ucgjc6rRrod+cdrcWhdDOUkLs8OG9pkWlSeWNJ7tQyLkniV6jtH9VMjsTxazXZAAPXWy7zX5P/UrXwUhgjQiDIp0=
+	t=1772355149; cv=none; b=msqZOIr/ZFMN8MOQAeM3zqCvH/sNIj27pIERJKj03rEvBGJltXSSYWC0HFmE2hl7NTMdP2ifqBk3HCjGfUH6BDWSlWaHyjJACiRZrxzrXLb9+PMQzhjQ3M71Wl9v5BSUU+mm3hqTt9hjHK0AAgyxx4GYUWD3RpRXmch58Dri7LM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772354503; c=relaxed/simple;
-	bh=lCipjIFtZ7gKyzq5btTB15yO0keo4NhyPRosOJ2MUIQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=m+7s1dCXivdWwyJC0fFcuIRsZq1ogLdGyA6PbHCmYP1fjWBfLyJvtI71TDNnaYmALmZYoNb62w41rkFWLzBstmPNM/2gfMtoqxsfp/B4BOBP9+ZB6Tv1fGrXswaMlDoBZPauTxkvokX7RwEOFqQn8Hvvofm08WUT6kUbh4e4HmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fdjJ3l8Y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 94AF8C116C6;
-	Sun,  1 Mar 2026 08:41:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772354502;
-	bh=lCipjIFtZ7gKyzq5btTB15yO0keo4NhyPRosOJ2MUIQ=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=fdjJ3l8YzX7SQ6atzcxngUN3M93TwVYTJIEYOyVXFRPKDU6Pee1OaKx/kYUtxHuyo
-	 d6/18pUY5CMR7VLMPdZ0Z2jWXZNJ6bsPN+cy7nNDedV6lloOv4xT17yUEbmzc7gqN2
-	 WPfVBGfyfyV1dTveq+vv6RYgJYC/3KKQW66PqH0n/NzHw5JGTzhfIDtZ+Rbs2uCxZb
-	 eiz65KwamZ+9gmE4PfYPKAxvtlAV1uGam/l6CwUwog5MjgMjZQUkTa7E2LYpk2k8X9
-	 VrzgguYnBjl006UCiIbjBgWoKUQUvsShsLBC7eLAD1QUc82c63ol3DOkUuQT+1HNoO
-	 R6JD/MNP6RyoA==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FFCDFD0040;
-	Sun,  1 Mar 2026 08:41:42 +0000 (UTC)
-From: Simon Baatz via B4 Relay <devnull+gmbnomis.gmail.com@kernel.org>
-Date: Sun, 01 Mar 2026 09:41:33 +0100
-Subject: [PATCH] selftests/net: packetdrill: restore tcp_rcv_big_endseq.pkt
+	s=arc-20240116; t=1772355149; c=relaxed/simple;
+	bh=GJpcX8Gxu3fGxfkLg5G9RaM7wjzfxC9oJxZIo5UCpSs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pyU42pzmwcYVhUyatLfGIteHZUvICtsnjJYT25lODUaBzlt5kPwCbOsjV8EhieReto5nnAFEBanF8y56it0sKWZ4JEK5G2Icosp7tgIDKeuVDgMV8PHeQ1SA+Ut0RV6e2sf13+xVxAlQwcIWjXzYW7WNbRSoOnnjS2366YcQ/YQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WC6tqmpG; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4806ce0f97bso28923155e9.0
+        for <netdev@vger.kernel.org>; Sun, 01 Mar 2026 00:52:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772355146; x=1772959946; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8TBO61xL5CrUk+VccUJrq/FWiDp9XAo/yD/ZujB6gzE=;
+        b=WC6tqmpGyxe7kTn5uEavkFvPOs0WQIBibL3t+qLJ0/k2xYdAyqoKSCLkkNxNckHFxm
+         PiyqtUpR1JN39bLjxfaiYclzJImRdXA2y2NAIB1nWtshuhfESmr6coHhaZSS+aqHR1nn
+         2ODt3db6cWi5oZdwiATTKBnjDudElqHmV7xH9g6RofBbEdfAd3RCIf2dpSzYUMGxQvOZ
+         DfUlNAbHTuxpKs+OOJ5qwi9+scny6EFa5a3F4kVNTDuwVyIpNxBaePgIsQc66ERkKjur
+         NHFWBXkwjtE1sxA4QFGv56AjoXyhlHtFITlZC2EXsAYYsCD/7dAQCtFDgmM5mMiDph94
+         HoqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772355146; x=1772959946;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8TBO61xL5CrUk+VccUJrq/FWiDp9XAo/yD/ZujB6gzE=;
+        b=QRWqLYVmMbIhMGVR9MnWZ1lvWwDNVFM8Elo0gr1QK1hewvb8E1wFEQGCrkWCRrBejx
+         sImuvaYDq+XAFt6jAYy8/2ZW/Haw/08DbkYD3bKpQvrd7+eK178sCnbRh/dWonr3Mxq2
+         RXMEf+s42Y9OEvRwQltlUhzUO8IzYlmWrFc76fDDXUl0NSHw3xarPEemMI8C3fhMCeu1
+         HBhyDg/6L5phW2n5tuDKgpGbv+hk1/76INHsx6GJxspUFHUHYNN7SK1BKMb13wrq+zhs
+         XmCuRphBVYIDgcokcKXlARXLaWZFELmMLCZWmoNrH0Y692ZhkPYDBeUgquAURdm7gljs
+         kmlw==
+X-Forwarded-Encrypted: i=1; AJvYcCVPKWsQQ8Qav7+ePjxAEykPmKnA067FHTHvtam/lZUbxCrWYzva8U0INE2+iEsQI8w9g5SmBrg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLp9tvAatJ0WqE/D9oPtCj2A+8zcHGlk62fgYtl7/xBZfmH+48
+	z74V37jbiSBCFDC8tVfTCcs3BcePhBYpcELI4khtZ3ysHE53oxl1tNKC
+X-Gm-Gg: ATEYQzyRS3wI/4uWDPV/gqsu4Fgs2jAOks286iK4WeJ/hluVomjif2ZWy0lxaplxpE9
+	kQ3gvW0oMFDdYK8StuZAZYEXLgqulQArbKhl9v6ALkvvjQ98W+i0WqYDZPrVclqMyS8izgdwrS7
+	6UKA5qX637gU9dUeXN7th0xL+MmC6fvZGQ2UdFJ9scjE+W2KdDUyJYxPx+lbT5jiwtYkD2/VoRI
+	86sd9CGsI9Td0MmYjF8m6+bk9HYoevsP3JTwviiDmrfuVB/yNaQftTO9SBPwWLE2V2DH9J17iH0
+	QAMOCxMyhyw86MLDq1ZpBte1io6vDlLa1ZFL5qw9ikvQmZeYK7RM4slD9mHIfAT048yloajsJmO
+	qh69MQ2uPdWMyNbKWbJ7Qn4J0/RGAdJXADoQJvD53UaMnt3eJMdHIwFjcZ0Tn9Zx+JLeR4MoJCP
+	BWBobHcVRVzDbXhDBTIZghhPV9N5xsnUs0VcGfUJdxO5ZYBmok//3jcYQU41Vw01l45cHC/7LB2
+	N5MlQrPjjMDETKhO8AGsag=
+X-Received: by 2002:a05:600c:1486:b0:483:348a:d3f3 with SMTP id 5b1f17b1804b1-483c9beabf1mr95588785e9.18.1772355146198;
+        Sun, 01 Mar 2026 00:52:26 -0800 (PST)
+Received: from gandalf.schnuecks.de (p200300c14f1996009e6b00fffe39b8a7.dip0.t-ipconnect.de. [2003:c1:4f19:9600:9e6b:ff:fe39:b8a7])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bfb2c5a8sm153891165e9.0.2026.03.01.00.52.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 01 Mar 2026 00:52:25 -0800 (PST)
+Received: by gandalf.schnuecks.de (Postfix, from userid 500)
+	id 071B52FED6D6; Sun, 01 Mar 2026 09:52:25 +0100 (CET)
+Date: Sun, 1 Mar 2026 09:52:24 +0100
+From: Simon Baatz <gmbnomis@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org
+Subject: Re: [PATCH net] selftests/net: packetdrill: remove tests for
+ tcp_rcv_*big
+Message-ID: <aaP-SGo8GGbDAVI9@gandalf.schnuecks.de>
+References: <20260227033446.2596457-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260301-tcp_rcv_big_endseq-v1-1-86ab7415ab58@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x3MTQqAIBBA4avIrBNSor+rRIjpaLMx05AgunvS8
- lu890DGRJhhZg8kLJTpCBWiYWB2HTxystUgW9m3Uo78MlElU9RGXmGwGU9uRidwmESnBws1jAk
- d3f90Wd/3AzlIkn9kAAAA
-X-Change-ID: 20260228-tcp_rcv_big_endseq-c8f1e7914a7d
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Shuah Khan <shuah@kernel.org>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, Simon Baatz <gmbnomis@gmail.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1772354501; l=2571;
- i=gmbnomis@gmail.com; s=20260220; h=from:subject:message-id;
- bh=y5Qga6QOLux9usDOxXwZ0c1UWnBSsfdcWFsVJAvrhHI=;
- b=o5FudX9jHGh+XH4xjuB9TRyfPib3PPUV14pl2IJlNizXNWR68+AE0ZA5cQNh2KDpZiUPNUAj7
- hISaYNu4DUhDqv4NtAg/77TOI+mb7VHW+0Ra/aVGtPHIWTTmk3GALw2
-X-Developer-Key: i=gmbnomis@gmail.com; a=ed25519;
- pk=T/JIz/6F5bf1uQJr69lmyi7czVG+F9TVZ/8x5z9Wtqw=
-X-Endpoint-Received: by B4 Relay for gmbnomis@gmail.com/20260220 with
- auth_id=641
-X-Original-From: Simon Baatz <gmbnomis@gmail.com>
-Reply-To: gmbnomis@gmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260227033446.2596457-1-kuba@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	FREEMAIL_REPLYTO_NEQ_FROM(2.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262380-lists,netdev=lfdr.de,gmbnomis.gmail.com];
+	TAGGED_FROM(0.00)[bounces-262381-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_REPLYTO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	HAS_REPLYTO(0.00)[gmbnomis@gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[gmbnomis@gmail.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 64B0E1CEE23
+X-Rspamd-Queue-Id: 2C01F1CEE75
 X-Rspamd-Action: no action
 
-From: Simon Baatz <gmbnomis@gmail.com>
+Hi Jakub,
 
-Commit 1cc93c48b5d7 ("selftests/net: packetdrill: remove tests for
-tcp_rcv_*big") removed the test for the reverted commit 1d2fbaad7cd8
-("tcp: stronger sk_rcvbuf checks") but also the one for commit
-9ca48d616ed7 ("tcp: do not accept packets beyond window").
+On Thu, Feb 26, 2026 at 07:34:46PM -0800, Jakub Kicinski wrote:
+> Since commit 1d2fbaad7cd8 ("tcp: stronger sk_rcvbuf checks")
+> has been reverted we need to remove the corresponding tests.
 
-Restore the test with the necessary adaptation: expect a delayed ACK
-instead of an immediate one, since tcp_can_ingest() does not fail
-anymore for the last data packet.
+tcp_rcv_big_endseq.pkt actually belongs to a different commit and
+needs a small tweak to run again. I have posted a patch at
+https://lore.kernel.org/netdev/20260301-tcp_rcv_big_endseq-v1-1-86ab7415ab58@gmail.com/
 
-Signed-off-by: Simon Baatz <gmbnomis@gmail.com>
----
- .../net/packetdrill/tcp_rcv_big_endseq.pkt         | 44 ++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
+- Simon
 
-diff --git a/tools/testing/selftests/net/packetdrill/tcp_rcv_big_endseq.pkt b/tools/testing/selftests/net/packetdrill/tcp_rcv_big_endseq.pkt
-new file mode 100644
-index 0000000000000000000000000000000000000000..6c0f32c40f19be2a750fc9d69bbf64250cd7b525
---- /dev/null
-+++ b/tools/testing/selftests/net/packetdrill/tcp_rcv_big_endseq.pkt
-@@ -0,0 +1,44 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+--mss=1000
-+
-+`./defaults.sh`
-+
-+    0 `nstat -n`
-+
-+// Establish a connection.
-+   +0 socket(..., SOCK_STREAM, IPPROTO_TCP) = 3
-+   +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
-+   +0 setsockopt(3, SOL_SOCKET, SO_RCVBUF, [10000], 4) = 0
-+   +0 bind(3, ..., ...) = 0
-+   +0 listen(3, 1) = 0
-+
-+   +0 < S 0:0(0) win 32792 <mss 1000,nop,wscale 7>
-+   +0 > S. 0:0(0) ack 1 <mss 1460,nop,wscale 0>
-+  +.1 < . 1:1(0) ack 1 win 257
-+
-+  +0 accept(3, ..., ...) = 4
-+
-+  +0 < P. 1:4001(4000) ack 1 win 257
-+  +0 > .  1:1(0) ack 4001 win 5000
-+
-+// packet in sequence : SKB_DROP_REASON_TCP_INVALID_END_SEQUENCE / LINUX_MIB_BEYOND_WINDOW
-+  +0 < P. 4001:54001(50000) ack 1 win 257
-+  +0 > .  1:1(0) ack 4001 win 5000
-+
-+// ooo packet. : SKB_DROP_REASON_TCP_INVALID_END_SEQUENCE / LINUX_MIB_BEYOND_WINDOW
-+  +1 < P. 5001:55001(50000) ack 1 win 257
-+  +0 > .  1:1(0) ack 4001 win 5000
-+
-+// SKB_DROP_REASON_TCP_INVALID_SEQUENCE / LINUX_MIB_BEYOND_WINDOW
-+  +0 < P. 70001:80001(10000) ack 1 win 257
-+  +0 > .  1:1(0) ack 4001 win 5000
-+
-+  +0 read(4, ..., 100000) = 4000
-+
-+// If queue is empty, accept a packet even if its end_seq is above wup + rcv_wnd
-+  +0 < P. 4001:54001(50000) ack 1 win 257
-+   * > .  1:1(0) ack 54001 win 0
-+
-+// Check LINUX_MIB_BEYOND_WINDOW has been incremented 3 times.
-++0 `nstat | grep TcpExtBeyondWindow | grep -q " 3 "`
-
----
-base-commit: 9439a661c2e80485406ce2c90b107ca17858382d
-change-id: 20260228-tcp_rcv_big_endseq-c8f1e7914a7d
-
-Best regards,
 -- 
 Simon Baatz <gmbnomis@gmail.com>
-
-
 
