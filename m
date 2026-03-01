@@ -1,56 +1,60 @@
-Return-Path: <netdev+bounces-262347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262348-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yNKRFPqeo2mZIgUAu9opvQ
-	(envelope-from <netdev+bounces-262347-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:05:46 +0100
+	id qNM5HQKfo2mZIgUAu9opvQ
+	(envelope-from <netdev+bounces-262348-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:05:54 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A7E01CCEF4
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:05:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EF0D11CCF14
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:05:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2C87B3118910
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:56:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 67B5F311A4EC
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:56:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE2D32FE577;
-	Sun,  1 Mar 2026 01:55:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D178F2C08AD;
+	Sun,  1 Mar 2026 01:55:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SDqv5h99"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WmarwLhG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC11A2FCC0E;
-	Sun,  1 Mar 2026 01:55:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE0302D6407;
+	Sun,  1 Mar 2026 01:55:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772330131; cv=none; b=DfkmTuIxHDaSu5wTLk1WzR+yi28ngpPdo408C7J4V0E13xvAZ/MEWSngXwDAW7lW2HyvCuiiFuEF+tcleqvZnK9sdlluEbniyKjTPkuxdcBCiA7uBmK3fgawjHrhLW0CMswvmP3FwYmw9wglPSiX3oO423hbsVK2FxfO9k6O+j8=
+	t=1772330141; cv=none; b=XSbYdIA5VvVVK1nuddUNpUvNgjNDLvRjUgzyp1uBezJiGFUrvzBbRihCvFPKrXpUc2W7RkZ+gl8zohZcNEvNjSarMMRbaheZ4dTE0XZfRsJQK/65JDozq+DqFaYorG3YroK9iq1L1uJDPaRSqUPJrfccZ9Dx9Kr0Ecjrwnt5gDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772330131; c=relaxed/simple;
-	bh=HeQEw+4cZDGdtUl8Hf0+gc+uk9kxJOZhB/FlPTCdUuo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n75IgC5xw31jvCaFyhkoTvQECTsnJsEgakGnBFpb61rooS5exQSqU1fDVtL3XG3FN24HeYev0XJfOuFAB2AW5utmKdkC8yC6SW18sdStpuqYrIg5VQ7wv/nF2yspK9guYXoevlptxdyS0xAz/GahHHtxJBr2NWz0Z7GH/ukBl+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SDqv5h99; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C52DC19421;
-	Sun,  1 Mar 2026 01:55:31 +0000 (UTC)
+	s=arc-20240116; t=1772330141; c=relaxed/simple;
+	bh=EVBcl/sC5fLFNg0p5i5KgIdHfSMMJfUfmmYFLj/VAK4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IxN5LMda0aSsGLJxNa1Weso7uCC/JUDk+y9iToREahiEWa76W/+4avxfwD8FVW5GuhjRwQ6REjjJMPD/VxAlvnMYVgXYCIFdPbew3fixObjHxAn8471sHAzoB4FabF+3W34nF+fzc+F5NH5sdzL+0pgUKhLglKXq9J8/OadjZs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WmarwLhG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC48EC19424;
+	Sun,  1 Mar 2026 01:55:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772330131;
-	bh=HeQEw+4cZDGdtUl8Hf0+gc+uk9kxJOZhB/FlPTCdUuo=;
+	s=k20201202; t=1772330141;
+	bh=EVBcl/sC5fLFNg0p5i5KgIdHfSMMJfUfmmYFLj/VAK4=;
 	h=From:To:Cc:Subject:Date:From;
-	b=SDqv5h99WLieyWgidpiLdZ5MDaf7c0NokXFVQIwKEkVE6eIpvR9ah4usHX3Cwe7R1
-	 cG0idaTLoQTbH4i4T+yeFdp/85jQ13u9SFBPxStEU94UXbT8CVwclgoQ5ONHibm731
-	 jPEmpeVc9HZeI7taADxE7rTEy98O7F/T1cXLuywY03SHFFE+MPsQhcroPZGdO5NyHB
-	 Hh2DxM52SX5Jrd5keByfICTAPoLy7qKvMWoo1i9k3WrBFq1OLMiTKQbKhtpmLkdu5Y
-	 E5EQWeQUN/PmKCl4Rk/nuuGzAZL63hsGPYdKPIQMzT5gHweepT+AAs9H79PfvS0KUf
-	 SWflFgVf2tcJQ==
+	b=WmarwLhG+tNhuv7lCj8bA/8RRLK12ZRmXv3VEVYc9u1I+QByU1pRc3jCDAIuq+W2/
+	 aqZfnDKvHdX6eswfRFYMm2whewTydTtCZQKi5/zatNHwlInZ5B7WiwwjtozPvnNg4a
+	 R2ZAQGyvdHxA9lzjTY5saaEwpKQUcQyqboN1fx4+9UOWWzfF5jl6RvC+BXSxNRwJhE
+	 wv6T47TdAPRqQJdBYZkTgLsAt9EkCog8z0iTyjnj8qnwU6OVkUOuvvBh8WWqR1ePup
+	 UF8rB5ylnBBbqq6f+BWW7m50g4BBI8qoCZaCZ+mXIvbeyo8gFdU+RPerYtqJq0U07X
+	 RvamCkv8T4aQg==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
 	enelsonmoore@gmail.com
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: FAILED: Patch "net: ethernet: marvell: skge: remove incorrect conflicting PCI ID" failed to apply to 5.15-stable tree
-Date: Sat, 28 Feb 2026 20:55:29 -0500
-Message-ID: <20260301015530.1722731-1-sashal@kernel.org>
+Cc: Johannes Berg <johannes@sipsolutions.net>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org
+Subject: FAILED: Patch "net: intel: fix PCI device ID conflict between i40e and ipw2200" failed to apply to 5.15-stable tree
+Date: Sat, 28 Feb 2026 20:55:39 -0500
+Message-ID: <20260301015539.1722955-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -63,34 +67,34 @@ X-stable: review
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-262348-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262347-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0A7E01CCEF4
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sipsolutions.net:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,msgid.link:url,intel.com:email]
+X-Rspamd-Queue-Id: EF0D11CCF14
 X-Rspamd-Action: no action
 
 The patch below does not apply to the 5.15-stable tree.
@@ -103,47 +107,68 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From d01103fdcb871fd83fd06ef5803d576507c6a801 Mon Sep 17 00:00:00 2001
+From d03e094473ecdeb68d853752ba467abe13e1de44 Mon Sep 17 00:00:00 2001
 From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Date: Thu, 5 Feb 2026 23:17:14 -0800
-Subject: [PATCH] net: ethernet: marvell: skge: remove incorrect conflicting
- PCI ID
+Date: Mon, 9 Feb 2026 18:12:34 -0800
+Subject: [PATCH] net: intel: fix PCI device ID conflict between i40e and
+ ipw2200
 
-The ID 1186:4302 is matched by both r8169 and skge. The same device ID
-should not be in more than one driver, because in that case, which
-driver is used is unpredictable. I downloaded the latest drivers for
-all hardware revisions of the D-Link DGE-530T from D-Link's website,
-and the only drivers which contain this ID are Realtek drivers.
-Therefore, remove this device ID from skge.
+The ID 8086:104f is matched by both i40e and ipw2200. The same device
+ID should not be in more than one driver, because in that case, which
+driver is used is unpredictable. Fix this by taking advantage of the
+fact that i40e devices use PCI_CLASS_NETWORK_ETHERNET and ipw2200
+devices use PCI_CLASS_NETWORK_OTHER to differentiate the devices.
 
-In the kernel bug report which requested addition of this device ID,
-someone created a patch to add the ID to skge. Then, it was pointed
-out that this device is an "r8169 in disguise", and a patch was created
-to add it to r8169. Somehow, both of these patches got merged. See the
-link below.
-
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=38862
-Fixes: c074304c2bcf ("add pci-id for DGE-530T")
+Fixes: 2e45d3f4677a ("i40e: Add support for X710 B/P & SFP+ cards")
 Cc: stable@vger.kernel.org
+Acked-by: Johannes Berg <johannes@sipsolutions.net>
 Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Link: https://patch.msgid.link/20260206071724.15268-1-enelsonmoore@gmail.com
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Link: https://patch.msgid.link/20260210021235.16315-1-enelsonmoore@gmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/ethernet/marvell/skge.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/net/ethernet/intel/i40e/i40e_main.c  | 8 +++++++-
+ drivers/net/wireless/intel/ipw2x00/ipw2200.c | 8 +++++++-
+ 2 files changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/marvell/skge.c b/drivers/net/ethernet/marvell/skge.c
-index 05349a0b2db1c..cf4e26d337bb5 100644
---- a/drivers/net/ethernet/marvell/skge.c
-+++ b/drivers/net/ethernet/marvell/skge.c
-@@ -78,7 +78,6 @@ static const struct pci_device_id skge_id_table[] = {
- 	{ PCI_DEVICE(PCI_VENDOR_ID_SYSKONNECT, 0x4320) }, /* SK-98xx V2.0 */
- 	{ PCI_DEVICE(PCI_VENDOR_ID_DLINK, 0x4b01) },	  /* D-Link DGE-530T (rev.B) */
- 	{ PCI_DEVICE(PCI_VENDOR_ID_DLINK, 0x4c00) },	  /* D-Link DGE-530T */
--	{ PCI_DEVICE(PCI_VENDOR_ID_DLINK, 0x4302) },	  /* D-Link DGE-530T Rev C1 */
- 	{ PCI_DEVICE(PCI_VENDOR_ID_MARVELL, 0x4320) },	  /* Marvell Yukon 88E8001/8003/8010 */
- 	{ PCI_DEVICE(PCI_VENDOR_ID_MARVELL, 0x5005) },	  /* Belkin */
- 	{ PCI_DEVICE(PCI_VENDOR_ID_CNET, 0x434E) }, 	  /* CNet PowerG-2000 */
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+index d3bc3207054f9..02de186dcc8f5 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+@@ -75,7 +75,13 @@ static const struct pci_device_id i40e_pci_tbl[] = {
+ 	{PCI_VDEVICE(INTEL, I40E_DEV_ID_10G_BASE_T4), 0},
+ 	{PCI_VDEVICE(INTEL, I40E_DEV_ID_10G_BASE_T_BC), 0},
+ 	{PCI_VDEVICE(INTEL, I40E_DEV_ID_10G_SFP), 0},
+-	{PCI_VDEVICE(INTEL, I40E_DEV_ID_10G_B), 0},
++	/*
++	 * This ID conflicts with ipw2200, but the devices can be differentiated
++	 * because i40e devices use PCI_CLASS_NETWORK_ETHERNET and ipw2200
++	 * devices use PCI_CLASS_NETWORK_OTHER.
++	 */
++	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, I40E_DEV_ID_10G_B),
++		PCI_CLASS_NETWORK_ETHERNET << 8, 0xffff00, 0},
+ 	{PCI_VDEVICE(INTEL, I40E_DEV_ID_KX_X722), 0},
+ 	{PCI_VDEVICE(INTEL, I40E_DEV_ID_QSFP_X722), 0},
+ 	{PCI_VDEVICE(INTEL, I40E_DEV_ID_SFP_X722), 0},
+diff --git a/drivers/net/wireless/intel/ipw2x00/ipw2200.c b/drivers/net/wireless/intel/ipw2x00/ipw2200.c
+index 09035a77e775f..b0e769da94156 100644
+--- a/drivers/net/wireless/intel/ipw2x00/ipw2200.c
++++ b/drivers/net/wireless/intel/ipw2x00/ipw2200.c
+@@ -11387,7 +11387,13 @@ static const struct pci_device_id card_ids[] = {
+ 	{PCI_VENDOR_ID_INTEL, 0x1043, 0x8086, 0x2754, 0, 0, 0},
+ 	{PCI_VENDOR_ID_INTEL, 0x1043, 0x8086, 0x2761, 0, 0, 0},
+ 	{PCI_VENDOR_ID_INTEL, 0x1043, 0x8086, 0x2762, 0, 0, 0},
+-	{PCI_VDEVICE(INTEL, 0x104f), 0},
++	/*
++	 * This ID conflicts with i40e, but the devices can be differentiated
++	 * because i40e devices use PCI_CLASS_NETWORK_ETHERNET and ipw2200
++	 * devices use PCI_CLASS_NETWORK_OTHER.
++	 */
++	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, 0x104f),
++		PCI_CLASS_NETWORK_OTHER << 8, 0xffff00, 0},
+ 	{PCI_VDEVICE(INTEL, 0x4220), 0},	/* BG */
+ 	{PCI_VDEVICE(INTEL, 0x4221), 0},	/* BG */
+ 	{PCI_VDEVICE(INTEL, 0x4223), 0},	/* ABG */
 -- 
 2.51.0
 
