@@ -1,143 +1,209 @@
-Return-Path: <netdev+bounces-262372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262373-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wN9hCC7bo2kNQAUAu9opvQ
-	(envelope-from <netdev+bounces-262372-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 07:22:38 +0100
+	id 0BHID87eo2mGQgUAu9opvQ
+	(envelope-from <netdev+bounces-262373-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 07:38:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACE201CE9A8
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 07:22:37 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DB141CEA4D
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 07:38:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7DFCE300F580
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 06:22:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A73E3300D91D
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 06:38:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 713153126BF;
-	Sun,  1 Mar 2026 06:22:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AFA3312819;
+	Sun,  1 Mar 2026 06:38:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2Wjmniqe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4E62DC783
-	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 06:22:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 269F320E702
+	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 06:37:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772346153; cv=none; b=qqx6FhJxO5LwB9rZ1oyTxT56uppNEFeaHgY9r+mSchoYDeiNlOS6WGrjOGposGf3NEHT/Y3h9EeBFsrmpKxjL0svHGESEFe5XPAUL1D4A/FrTdjcYoaDGOKgW2pDJlM+W18wa4eoIxcM2kVkMqeG4qFOPPxzKlR6JaZn+h0ScOQ=
+	t=1772347081; cv=none; b=mfOn8QMylkZg8gf+SJRZCDvGYNfeQaIYjdGsprzZJmOLmkGIoUpSu6P40yDWQASlryMb/Ar6rgJIbH6vXZE6rwdsIACzAFJ6HY4dNN1Lcs2rNwAz3nFZmE0pWGfxA124bQeq05SIicGim6ClRH2kdYIrLa5GomaLrQ69HImOk/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772346153; c=relaxed/simple;
-	bh=f1FiQs+aGJ//S8Y94Kii5k1eQ7Z3X8sngnQBQI91bmQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Kd+TK19sJHT1mu6QRjTs8CHJJe86I3NqDTPbF3/0MSNyKYo2iAc7sNc+TVzJjMjNljnq+KNwQJhRy10GXXr5zxqAvzIrlnsyn5yLKL0MePxvNyjJFi0ByxJFVVoSg/BH6ANkrK3RI5QT1nHmI1deIK7zyEouylQzC+SPBOsG3o0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-6798747187eso62315929eaf.1
-        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 22:22:32 -0800 (PST)
+	s=arc-20240116; t=1772347081; c=relaxed/simple;
+	bh=1TqWtdJ0fZgTw3GfP+Jo4Umt4rKMuKWMCVMdOWbE+Uo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ciKoLVJr+Aq6oOdQACvh6s9KJrnK/Rip0kLqFv+0KRob06vpXujKS4r1gtk9YnqsyH8Rt2bhl1gXyezmDMyBoCt/WjUlXFYZxiIyiB21b1qEE827TKdiQ3diuz2Rq1mM5ssq1vRZHIm2DZPgNdae6m6ypbxl9ca82RdMVVHjBQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2Wjmniqe; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2ab4de9580dso218070855ad.3
+        for <netdev@vger.kernel.org>; Sat, 28 Feb 2026 22:37:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772347079; x=1772951879; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=0AirRdgRcZEpGcbg+qfMhsdqvrv4kIVCsLWbYUaEsJQ=;
+        b=2WjmniqeMEU/YS6USOJ1srFia2MMnYSYiX3RLWXjVXLSVskPEfDPBRv+DkKp5KORTv
+         2QUs/bEZ4gJo1WcdJjUHdtlLTTQxEikHvR+Hy/bZK8eG2Ya6h3iw1dHgC0SeD4IAPjBF
+         cSlo4xKleCD7dcURxc4Ce+Os+H/b/FJtbxmjQeEnZHHPucNM+AxgZr7sh7XCk86sNMbt
+         xEg4FkXfBgMk7DQkaXEeRA/nh+cmlqJ1QtjE7u/SkeRw3+d4RkqoE15uFdFzON1dKhLH
+         C10h0WYFrlrsu6j0+a1AElLmZ2xrwNs6gJzUOrlVOZatD3NMnnqPBSBAFlQE09YzoywH
+         knsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772346151; x=1772950951;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+        d=1e100.net; s=20230601; t=1772347079; x=1772951879;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=TCkTIOkqY5tRrpKdFM8F2itNl2AA74quBHKheHKTgHQ=;
-        b=BB3xZOkfvOAaRApf5yLR6V3wYTqbRbZpZM2MSLPvmHT2P3Sx9DMGabfFtRQXsjH3K9
-         qgNmlFhS3lVwCBBPUV8/UQ1J3EYFQqsqWWiomVDDrhJ70wU2RmuV7eaWxzGdfHEprXVH
-         0Slc9epVg9n6f4RyCikFl6q9VKcslodfGlUXg04bZvU2au1fyY3yybL/7x2TbGtQW0Ii
-         NyEIcmMKLuxN9ZhPwLbFVk30+fTsU5UIT7oooC824SMJWe/zLwU2cDD3CbmiB7loAjTB
-         aQTVjU+1NHh0toMIZFDkdIaLLKhVc7EkX/PynjbH4z4KCXezmRhAeLnfQLkNmpAXQNsc
-         pPzg==
-X-Forwarded-Encrypted: i=1; AJvYcCVNLKHtQkM/awNJMnFMHdc2646Dxhdfqdv/b8r8qhvUh52GnywCVTnATdBI+xaffG07Z3POVX0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzakI9IMQ9qYP9LA4x4KdsyW1KJO6oCgUpl/pcODiykPpblKUXQ
-	5hQFz9B3WWpPMYBzXrh05OnhMVhkVwnvXi0UazeiPbwbEAeMKnMNOIQuAdyI5NjMdkcA/IGPgBE
-	K3vAaUDzGfsAakXHrQR1A7hbMKru/BM/+WEB8WgBeS0iLG2vuoHY8w29hV+I=
+        bh=0AirRdgRcZEpGcbg+qfMhsdqvrv4kIVCsLWbYUaEsJQ=;
+        b=EIY2C3h1h72ja5RA84No+ZlURsobiUUUBfNYO1Jn4YJzEE54QGMtFkMG6v41/34EQt
+         qOlrUIYJdRWUg3IGoZbxeQHUFAP3QHkNimILruaOLwCBvUrTSCvPaC7XwN20d7tS7pNR
+         HMYq+CfKmecrWI/w/tJna63AEjzp1TgkkUUNES4vUEUZ7Z0BSHsDEkZT96bohE7dAsd3
+         F4rddLL++8G4PH4Bh1MvZ+SbuiqFZA01rGGDUhtgCNbU8t8lrr3J1+QPGNdPwkJzdsnx
+         9Gq4CfXNJ0l+wBUUJS6VijCeaXNp+TGLNXmIDX57fFA+1s4S8KTsng8WkC4NHQ4tDKCQ
+         hp/g==
+X-Forwarded-Encrypted: i=1; AJvYcCWrk1wUOmEkzfsEWbiW+E5UezU/JLOYflaZOWi6U0HjaK2RueAuyYJ2wdkF7XBLUTPCjRHvVZQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+/ZcXsa+Kd0LhGyEpSLysO3yPIF9WXSyfsf0cjS4M6dgId6Yp
+	G2it7gaCvkBjKDUGjkEhJrRI4nsj/55pLdK7q7jXsXrivEiJkHxJf2w2P7+VWeZMNMabLd6Or8F
+	5TlFHDA==
+X-Received: from plge5.prod.google.com ([2002:a17:902:cf45:b0:2ad:d57f:64f4])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:22c3:b0:2ad:da86:f6a6
+ with SMTP id d9443c01a7336-2ae2e4bc5c3mr80699665ad.49.1772347079263; Sat, 28
+ Feb 2026 22:37:59 -0800 (PST)
+Date: Sun,  1 Mar 2026 06:37:55 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6820:1b10:b0:672:a49f:128e with SMTP id
- 006d021491bc7-679fadbb765mr5581714eaf.8.1772346151442; Sat, 28 Feb 2026
- 22:22:31 -0800 (PST)
-Date: Sat, 28 Feb 2026 22:22:31 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69a3db27.050a0220.3a55be.0053.GAE@google.com>
-Subject: [syzbot] Monthly wireless report (Mar 2026)
-From: syzbot <syzbot+list618a5750a9ad1341b093@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+Message-ID: <20260301063756.1581685-1-kuniyu@google.com>
+Subject: [PATCH v1 net-next] dccp Remove inet_hashinfo2_init_mod().
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.36 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	MID_CONTAINS_FROM(1.00)[];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-262372-lists,netdev=lfdr.de,list618a5750a9ad1341b093];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262373-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FROM_HAS_DN(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[googlegroups.com:email]
-X-Rspamd-Queue-Id: ACE201CE9A8
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9DB141CEA4D
 X-Rspamd-Action: no action
 
-Hello wireless maintainers/developers,
+Commit c92c81df93df ("net: dccp: fix kernel crash on module load")
+added inet_hashinfo2_init_mod() for DCCP.
 
-This is a 31-day syzbot report for the wireless subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/wireless
+Commit 22d6c9eebf2e ("net: Unexport shared functions for DCCP.")
+removed EXPORT_SYMBOL_GPL() it but forgot to remove the function
+itself.
 
-During the period, 4 new issues were detected and 1 were fixed.
-In total, 51 issues are still open and 172 have already been fixed.
+Let's remove inet_hashinfo2_init_mod().
 
-Some of the still happening issues:
-
-Ref  Crashes Repro Title
-<1>  26998   Yes   WARNING in rate_control_rate_init (3)
-                   https://syzkaller.appspot.com/bug?extid=9bdc0c5998ab45b05030
-<2>  10549   Yes   WARNING in __rate_control_send_low (3)
-                   https://syzkaller.appspot.com/bug?extid=34463a129786910405dd
-<3>  10251   No    WARNING in kcov_remote_start (6)
-                   https://syzkaller.appspot.com/bug?extid=3f51ad7ac3ae57a6fdcc
-<4>  6932    Yes   WARNING in __cfg80211_ibss_joined (2)
-                   https://syzkaller.appspot.com/bug?extid=7f064ba1704c2466e36d
-<5>  1226    Yes   WARNING in ieee80211_start_next_roc
-                   https://syzkaller.appspot.com/bug?extid=c3a167b5615df4ccd7fb
-<6>  1043    Yes   INFO: task hung in reg_process_self_managed_hints
-                   https://syzkaller.appspot.com/bug?extid=1f16507d9ec05f64210a
-<7>  864     Yes   INFO: task hung in reg_check_chans_work (7)
-                   https://syzkaller.appspot.com/bug?extid=a2de4763f84f61499210
-<8>  790     Yes   INFO: rcu detected stall in ieee80211_handle_queued_frames
-                   https://syzkaller.appspot.com/bug?extid=1c991592da3ef18957c0
-<9>  691     Yes   WARNING in ieee80211_tx_h_rate_ctrl
-                   https://syzkaller.appspot.com/bug?extid=0d516b33238bd97ee864
-<10> 354     Yes   WARNING in ieee80211_tx_skb_tid
-                   https://syzkaller.appspot.com/bug?extid=8bd4574e8c52c48c2595
-
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ include/net/inet_hashtables.h |  1 -
+ net/ipv4/inet_hashtables.c    | 34 ++++++++--------------------------
+ 2 files changed, 8 insertions(+), 27 deletions(-)
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtables.h
+index ac05a52d9e13..8bddf58b1a85 100644
+--- a/include/net/inet_hashtables.h
++++ b/include/net/inet_hashtables.h
+@@ -286,7 +286,6 @@ void inet_hashinfo2_init(struct inet_hashinfo *h, const char *name,
+ 			 unsigned long numentries, int scale,
+ 			 unsigned long low_limit,
+ 			 unsigned long high_limit);
+-int inet_hashinfo2_init_mod(struct inet_hashinfo *h);
+ 
+ bool inet_ehash_insert(struct sock *sk, struct sock *osk, bool *found_dup_sk);
+ bool inet_ehash_nolisten(struct sock *sk, struct sock *osk,
+diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+index fca980772c81..52847950b28a 100644
+--- a/net/ipv4/inet_hashtables.c
++++ b/net/ipv4/inet_hashtables.c
+@@ -1246,22 +1246,13 @@ int inet_hash_connect(struct inet_timewait_death_row *death_row,
+ 				   __inet_check_established);
+ }
+ 
+-static void init_hashinfo_lhash2(struct inet_hashinfo *h)
+-{
+-	int i;
+-
+-	for (i = 0; i <= h->lhash2_mask; i++) {
+-		spin_lock_init(&h->lhash2[i].lock);
+-		INIT_HLIST_NULLS_HEAD(&h->lhash2[i].nulls_head,
+-				      i + LISTENING_NULLS_BASE);
+-	}
+-}
+-
+ void __init inet_hashinfo2_init(struct inet_hashinfo *h, const char *name,
+ 				unsigned long numentries, int scale,
+ 				unsigned long low_limit,
+ 				unsigned long high_limit)
+ {
++	unsigned int i;
++
+ 	h->lhash2 = alloc_large_system_hash(name,
+ 					    sizeof(*h->lhash2),
+ 					    numentries,
+@@ -1271,7 +1262,12 @@ void __init inet_hashinfo2_init(struct inet_hashinfo *h, const char *name,
+ 					    &h->lhash2_mask,
+ 					    low_limit,
+ 					    high_limit);
+-	init_hashinfo_lhash2(h);
++
++	for (i = 0; i <= h->lhash2_mask; i++) {
++		spin_lock_init(&h->lhash2[i].lock);
++		INIT_HLIST_NULLS_HEAD(&h->lhash2[i].nulls_head,
++				      i + LISTENING_NULLS_BASE);
++	}
+ 
+ 	/* this one is used for source ports of outgoing connections */
+ 	table_perturb = alloc_large_system_hash("Table-perturb",
+@@ -1282,20 +1278,6 @@ void __init inet_hashinfo2_init(struct inet_hashinfo *h, const char *name,
+ 						INET_TABLE_PERTURB_SIZE);
+ }
+ 
+-int inet_hashinfo2_init_mod(struct inet_hashinfo *h)
+-{
+-	h->lhash2 = kmalloc_objs(*h->lhash2, INET_LHTABLE_SIZE);
+-	if (!h->lhash2)
+-		return -ENOMEM;
+-
+-	h->lhash2_mask = INET_LHTABLE_SIZE - 1;
+-	/* INET_LHTABLE_SIZE must be a power of 2 */
+-	BUG_ON(INET_LHTABLE_SIZE & h->lhash2_mask);
+-
+-	init_hashinfo_lhash2(h);
+-	return 0;
+-}
+-
+ int inet_ehash_locks_alloc(struct inet_hashinfo *hashinfo)
+ {
+ 	unsigned int locksz = sizeof(spinlock_t);
+-- 
+2.53.0.473.g4a7958ca14-goog
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
 
