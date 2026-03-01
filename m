@@ -1,207 +1,151 @@
-Return-Path: <netdev+bounces-262430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262431-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UNkZFyN+pGl5iQUAu9opvQ
-	(envelope-from <netdev+bounces-262430-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 18:57:55 +0100
+	id FMeaI6F+pGl+igUAu9opvQ
+	(envelope-from <netdev+bounces-262431-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 19:00:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B59621D1019
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 18:57:54 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2040D1D102B
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 19:00:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EA8453008D17
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 17:57:01 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id F38253006788
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 17:59:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EE88337B87;
-	Sun,  1 Mar 2026 17:57:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E71337B87;
+	Sun,  1 Mar 2026 17:59:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mxk1FoL4"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="QGpbxEMw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A74B33506D;
-	Sun,  1 Mar 2026 17:56:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4BF32FA38
+	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 17:59:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772387820; cv=none; b=T4dFNYlyyiDNF1EemEqU4yhvYOf68JuXetpgF2c0IrKCqJRnn4P93upwEQK4kw2oLnmuRDUnyC1gLmpZ0dnloWX6j+KhRl4tXGlGW6H0vKnOyhEk9jCY0V5TMGx6Z2fD0C7dx0MTG7LY92jVY1ohBSXLWHbgUSLrDiQ4HJ/YMuE=
+	t=1772387998; cv=none; b=MdMtEGbZjoAnZiGU+dSMnM1IWIMifsZwyz205ObwoiwEHB75cG/IC+CQmRgq0aDy2m7B4WY+39sPlwLdEsFfyUkowrPQF7CDQ1FOLCNgSDx7PR6dv/agHAFfEG9GfdYBqGDR2YhvAgBZD+dMtMiw+nktBuvoGOI2YDRBjOP4Ot4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772387820; c=relaxed/simple;
-	bh=cqANQIFxzkqSaJ6siL7W4biLzm/UdiW8OZDehsSUzBo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KodgvNiuPACMs6noIsnsEMsgq5gX27oGSXH+j2Pk91TPbYLjrlgx0GKfaDP1PS1FB9+y4wCib9RteiQKuvaIvgu2RVcummgUUlW2aROEdqrvKmcU9aj7EbuZy8OSW0wSF2Q6R3FPCGRsYLJG6/L+z9sSl+NjRW8/CFVcPumj+Ko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mxk1FoL4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 895D4C116C6;
-	Sun,  1 Mar 2026 17:56:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772387819;
-	bh=cqANQIFxzkqSaJ6siL7W4biLzm/UdiW8OZDehsSUzBo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Mxk1FoL4TXCGfECR6lVyFMsAdc0RvnZ/+50hSH0YyKBiFP/gnRUVHxSIQHGUU4zjA
-	 3LR3D9eWuAO1g7pEFS2ALKpCOnBE+P3MLpXX3Qa1lSp2iagbNDBb7tvOZVGfzSF75P
-	 h7p/17X7N9uOmZfUZAwOLJEx5R/p5MOelx7cc0aNOve0hys9jX/4enIywy3bY88FWb
-	 r2pNFUm8b0AfdwPzWAYp3aoJevAC6WFtHuP1cOTlbA6reQ3BVLSOwxQoC+87iUlBiv
-	 jUzgq0TsCib0MrklhLwCZJ1eLWpznbGtBttLwCoBxeLvqq4Rhz5wNf7ano+dqT97e4
-	 zWrjzK2FZjdbw==
-Date: Sun, 1 Mar 2026 17:56:55 +0000
-From: Simon Horman <horms@kernel.org>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Sagi Maimon <maimon.sagi@gmail.com>, jonathan.lemon@gmail.com,
-	richardcochran@gmail.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v1] ptp: ocp: Add support for Xilinx-based Adva TimeCard
- variant
-Message-ID: <aaR955MXsV8B1BQw@horms.kernel.org>
-References: <20260225102938.4131-1-maimon.sagi@gmail.com>
- <aaA6f5xS5yONVlmE@horms.kernel.org>
- <02670ff0-36c7-4735-aa90-4cd908cfc46c@linux.dev>
+	s=arc-20240116; t=1772387998; c=relaxed/simple;
+	bh=waHuXg1cR/lNxdO7JwWx5WCgUHMStoTszzOXqaMK+2A=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Xoui8dG+I4TmTfxWh3ScUD8M1qLSLBtRv9a0Bzsz4C3lOmxLYmBQJIKsWHHa2lK5YeR5QfjLBIkxQXXboEF+lFtT3NmcGXJXM8XGp7XclJz7DwsFM4T4ieudXv6VRrSqfyqH72r8/MFrB4Wd2mdnNd/4lYAb6p1kdDd9RQrtLp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=QGpbxEMw; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-65a43a512b0so4115243a12.3
+        for <netdev@vger.kernel.org>; Sun, 01 Mar 2026 09:59:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1772387996; x=1772992796; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bUriLEKIKpf7k3NxTjsJxgBlXx8URXMNCEQZ8pvmz+I=;
+        b=QGpbxEMwqmSi8MXhx1v2I3f6cbO6LbepsKDKJTqf57NMkiqfF2TmtRdLpl6HMe20si
+         jyEWuXHOYsXfui+AsgbyTLoUyePaYxiwfXS7IHbXdyu2opV2GKAn+air1H67kUKGn6uL
+         HCruFoMuv2AccDJ4Ck35qJ/uRtyNTHpGdhOgD+dt2GQ3QKSn26poFFdY7BWs6ITqZ0Jj
+         VhkVjUvVOhMtyAXu3TBQ/VmdYaZAD/Hgdx5uVaFFIMClcdBPPeQvvY+QZRB+Yd6vuRKB
+         xyNPnXZGyXDWGpsWZ/VdA/45gpBPzkFJrn242l0UAb0qtJltWrA16YMyhlUvVgm3SYWl
+         RxUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772387996; x=1772992796;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bUriLEKIKpf7k3NxTjsJxgBlXx8URXMNCEQZ8pvmz+I=;
+        b=JuQxKv/eJ6hdV8KTpPNhjaZb/Km1WKn3Y0E17t06qAbCjybj7SQ3tljeOXsj7VlBsN
+         p8+vOjtqcfR1+LdyzVRVbhJcWXj8w2fNqyjB2VuaZvEP9U23HTAWUpvyfIhaePahcmnS
+         SDc1hf3jLu/Xmphh55y0xK8o/B/t03wsu1UmyJpqWdYFl2oariHNfxyUh2Vf++uUcrXY
+         Ay+ysdI7G6wlbwaCMDcAraAbQZkqycZEoDkmMxwhWCYYBVO7xepkqwnz2E5KvrdGuerp
+         QRN4SmyRX9k22tq4bIt42II4tFaKEfCSSLqwbr1KYHmzJrpxbBOZ28IYoQCynjEdAUM5
+         QLIA==
+X-Forwarded-Encrypted: i=1; AJvYcCWhaQMIjI03EQEAlTyIu1GnTmimN2epcDOdANlw7jRNIvS1zC6cAFsEydOvZ0c//ihzOCPl8P0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFF3DHIx970FlyeIIqE9MlckeEPrqCo2VC3Qzv97auz4FYxn7t
+	FRpgK6PwfQJ83HYpwdz68ZBg40yw/jO+x96FwzICDceQIMYK3QBOynXn4S+pzsKypSw0RxMymHr
+	5KrqA0IHRxQ==
+X-Gm-Gg: ATEYQzx4Jr4niQxzGuMu4oSX2/XTYOK0qGcl45WmMcr1EmzaoojfOaLcYszThhvCGzX
+	ykdZ8vHMMUSHj1xe3SDFQhg0FclHjeQIv7MgoNP58lV7dEA3l89NGZAY5gJ+ynD5oQodXsybeWQ
+	pyQFa9fn1suXpNTtrHYqYl/op85cX+gcXzwxfBcAknAamu2eP6dCI+ylxnVFti3RNrBpv7Y6Ggh
+	/jNSZ2+lMuh7BF7oH6PesJKstDkruX0pyoneEAb9i2jPQgdVPb+BiVcKU2+tMWhAb2fmdGTHIHw
+	pvMXP6G/QKFWdpczfw4eT4zbStIExMu1HGdOEzmqIVXOrARNzqPw8JQYg9LPXWhUYI/bXjUh7pc
+	lgs/drMqKw7+Rq+X8mXkYhE/B3+HujDB5CNP6tWN2AWIwbGmrC2+KxgeeFqy+VCDTB7gYrlfnvj
+	R9SmGaHO5yOB3Bg4Fr+M0W3bUCruU=
+X-Received: by 2002:a17:906:6cf:b0:b8e:796a:fd5d with SMTP id a640c23a62f3a-b93765110ecmr474922066b.39.1772387995610;
+        Sun, 01 Mar 2026 09:59:55 -0800 (PST)
+Received: from cloudflare.com ([104.28.193.182])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b935aec3ea3sm381222466b.57.2026.03.01.09.59.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 01 Mar 2026 09:59:55 -0800 (PST)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,  Alexei Starovoitov
+ <alexei.starovoitov@gmail.com>,  bpf <bpf@vger.kernel.org>,  Martin KaFai
+ Lau <martin.lau@linux.dev>,  Network Development <netdev@vger.kernel.org>,
+  kernel-team <kernel-team@cloudflare.com>
+Subject: Re: [PATCH RFC bpf-next 0/5] skb extension for BPF local storage
+In-Reply-To: <20260228155021.1dc9b127@kernel.org> (Jakub Kicinski's message of
+	"Sat, 28 Feb 2026 15:50:21 -0800")
+References: <20260226-skb-local-storage-v1-0-4ca44f0dd9d1@cloudflare.com>
+	<CAADnVQKVfyh3_OZshvYf7GJUF-ph2eMfmaQsxNgwBJd1AJgXTQ@mail.gmail.com>
+	<87wlzydk12.fsf@cloudflare.com> <20260228155021.1dc9b127@kernel.org>
+Date: Sun, 01 Mar 2026 18:59:54 +0100
+Message-ID: <87seaje8h1.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <02670ff0-36c7-4735-aa90-4cd908cfc46c@linux.dev>
+Content-Type: text/plain
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-7.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[cloudflare.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
+	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-262430-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[cloudflare.com:+];
+	TAGGED_FROM(0.00)[bounces-262431-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[redhat.com,gmail.com,vger.kernel.org,linux.dev,cloudflare.com];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_ALL(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B59621D1019
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jakub@cloudflare.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2040D1D102B
 X-Rspamd-Action: no action
 
-On Thu, Feb 26, 2026 at 01:42:31PM +0000, Vadim Fedorenko wrote:
-> On 26/02/2026 12:20, Simon Horman wrote:
-> > On Wed, Feb 25, 2026 at 12:29:38PM +0200, Sagi Maimon wrote:
-> > > Add support for the Adva TimeCard model built on a Xilinx-based design.
-> > > This patch enables detection and integration of the new hardware within
-> > > the existing OCP timecard framework.
-> > > 
-> > > The Xilinx variant relies on the shared driver infrastructure, requiring
-> > > only small, targeted additions to accommodate its specific
-> > > characteristics.
-> > > 
-> > > Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
-> > > ---
-> > >   drivers/ptp/ptp_ocp.c | 318 ++++++++++++++++++++++++++++++++++++++++++
-> > >   1 file changed, 318 insertions(+)
-> > > 
-> > > diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
-> > 
-> > ...
-> > 
-> > > @@ -2926,6 +3168,45 @@ ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
-> > >   	return ptp_ocp_init_clock(bp, r->extra);
-> > >   }
-> > > +/* ADVA specific board X initializers; last "resource" registered. */
-> > > +static int
-> > > +ptp_ocp_adva_board_x1_init(struct ptp_ocp *bp, struct ocp_resource *r)
-> > > +{
-> > > +	int err;
-> > > +	u32 version;
-> > > +
-> > > +	bp->flash_start = 0x1000000;
-> > > +	bp->eeprom_map = fb_eeprom_map;
-> > > +	bp->sma_op = &ocp_adva_x1_sma_op;
-> > > +	bp->signals_nr = 4;
-> > > +	bp->freq_in_nr = 4;
-> > > +
-> > > +	version = ioread32(&bp->image->version);
-> > > +	/* if lower 16 bits are empty, this is the fw loader. */
-> > > +	if ((version & 0xffff) == 0) {
-> > > +		version = version >> 16;
-> > > +		bp->fw_loader = true;
-> > > +	}
-> > > +	bp->fw_tag = 3;
-> > > +	bp->fw_version = version & 0xffff;
-> > > +	bp->fw_cap = OCP_CAP_BASIC | OCP_CAP_SIGNAL | OCP_CAP_FREQ;
-> > > +
-> > > +	ptp_ocp_tod_init(bp);
-> > > +	ptp_ocp_nmea_out_init(bp);
-> > > +	ptp_ocp_signal_init(bp);
-> > > +
-> > > +	err = ptp_ocp_attr_group_add(bp, adva_timecard_x1_groups);
-> > > +	if (err)
-> > > +		return err;
-> > > +
-> > > +	err = ptp_ocp_set_pins(bp);
-> > > +	if (err)
-> > > +		return err;
-> > > +	ptp_ocp_sma_init(bp);
-> > > +
-> > > +	return ptp_ocp_init_clock(bp, r->extra);
-> > > +}
-> > 
-> > Hi Sagi,
-> > 
-> > I see similar patterns elsewhere in this driver. So I assume that I'm
-> > overlooking something obvious. But it strikes me that
-> > ptp_ocp_attr_group_add() and ptp_ocp_set_pins() allocate memory. Shouldn't
-> > that be cleaned up if an error subsequently occurs in this function?
-> > 
-> > And also, shouldn't ptp_ocp_attr_group_add() relase the memory it
-> > allocates if an error occurs in that function?
-> 
-> Well, ptp_ocp_attr_group_add() error is not critical for device init, so
-> I believe it's ok to keep it and free in ptp_ocp_detach(), there is no
-> leak. But I agree it goes against common code style of kernel. I'll do
-> cleanup patch once I have some cycles.
-> 
-> Situation with ptp_ocp_set_pins() is a bit different, but still we end
-> up with calling ptp_ocp_detach() in error path, which cleans up all
-> allocated memory. Changing *init() code to unroll everything is actually
-> a code duplication of ptp_ocp_detach() - I don't think we have to spend
-> time it.
+On Sat, Feb 28, 2026 at 03:50 PM -08, Jakub Kicinski wrote:
+> On Fri, 27 Feb 2026 21:11:05 +0100 Jakub Sitnicki wrote:
+>> So to exhaust all alternatives I gotta ask - would you and Jakub be open
+>> to the idea of a plain byte buffer embedded in skb_ext and exposed as a
+>> bpf_dynptr?
+>
+> I'm fine with that, but admittedly I (like you?) live in 
+> the comfortable universe of controlling which .config options
+> are suitable for the narrow use cases I care about.
+> So I don't really trust my judgment. Adding Paolo..
 
-Thanks. I now see that ptp_ocp_detach() is called which handles cleaning
-up these resources on error. So I agree there is no leak.
+Good point. Distro's would have to pick one-size-fits-all which won't
+work. This needs to be at least a boot-time configurable, which looks
+doable with minimal changes to skb_ext setup code.
 
-> > Lastly, the AI generated code review suggests that there may be
-> > some scope for sharing code:
-> > 
-> >    This isn't a bug, but ptp_ocp_adva_board_x1_init() is nearly identical to
-> >    ptp_ocp_adva_board_init(), differing only in flash_start (0x1000000 vs
-> >    0xA00000), sma_op assignment, signals_nr (4 vs 2), freq_in_nr (4 vs 2),
-> >    and the attr group passed to ptp_ocp_attr_group_add(). The version-reading
-> >    logic and the entire initialization call sequence are duplicated.
-> 
-> That's what I also asked in my response.
-
-Yes, sorry for missing that.
-
-> >    Looking at the existing driver convention, each board variant (fb, art,
-> >    adva) uses this same pattern with separate init functions. Would it be
-> >    worth parameterizing these differences in a future cleanup?
-> > 
-> > ...
+Thanks for feedback.
 
