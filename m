@@ -1,56 +1,57 @@
-Return-Path: <netdev+bounces-262318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262319-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EBPdNtCZo2kwIAUAu9opvQ
-	(envelope-from <netdev+bounces-262318-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 02:43:44 +0100
+	id iOAiBtGoo2nfJQUAu9opvQ
+	(envelope-from <netdev+bounces-262319-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:47:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 857A31CB79B
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 02:43:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CDE61CDEDF
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:47:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C4963304930B
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:40:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1EEB631AA9CD
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:40:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ACB12DC32E;
-	Sun,  1 Mar 2026 01:39:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BEB62DB7B7;
+	Sun,  1 Mar 2026 01:39:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IvCmHDe3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="af81VBTV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67BB42DB799;
-	Sun,  1 Mar 2026 01:39:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC9E22DB799;
+	Sun,  1 Mar 2026 01:39:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772329159; cv=none; b=uZkWrMsnYCX+ZNQQH/wYP+tnx2N1yIxoL/pwz7EFrFj2TxMW7FmDIMOrTxN5/W2TVv7BE3iT2cWvIgr9XLAymKgQX9EG56NTAYIQ8xqeo0jejEoLHzXaEmoXDs+X0qrwpr0TcAYTmFbunm6frNhp+KGwDwVJtOGINEg4hoKzVMw=
+	t=1772329164; cv=none; b=Pu8VsB1YhPovBrS/YUupPaNJexOFITVDRAZzfscViW35XCtUo/DEAKfKs3gtx5wmcDu0mRQFf5nZOKpaVAKkkiylnOfk680R95XA+bdqfsNl57cDfDFkwK4vp9AYS3vkTPbvF+FdGi77IeX12OGTYYqUlkRnknwn1djZPeTRnGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772329159; c=relaxed/simple;
-	bh=AyiKFNuAPGcp1cKB8OHfwUhAGRjcr3aAvgJp9HKMWA0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LF9hDhSnxWE5aL9eZVw1swFjEWL4PiaXMWgmtaivTqouckjARwYk7c7huv0gvV05XYZUQzQla16IG5M58VW+D8KuyD11OwlN+YH/g6Cx455+yUdJgzAwmu4OjAOAltjuJNCngGOK5tqo073mjOgl9SewgOOS7gFySD9BiNygXB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IvCmHDe3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC7DDC19421;
-	Sun,  1 Mar 2026 01:39:18 +0000 (UTC)
+	s=arc-20240116; t=1772329164; c=relaxed/simple;
+	bh=VTpq4CWM28DCA71wIRauoonICyCr4dkdbTiEsPKOqQQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HXfbk8DrodqOahP7bIbOJ8fug7wazB6t/M1nXu1IKdxJ2L6OzWd1rV83II8sWLb2PJ6OHvmXWhI2CWf1J6ECsmSFrCi6bjuq0u5SahpCciIJKEk/tQfr1XiH/Y+d93g0ZamWU2eVe7/au1dzMztKF6Efr2lOv4HJyZCmZzx8JNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=af81VBTV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48DEAC19421;
+	Sun,  1 Mar 2026 01:39:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772329159;
-	bh=AyiKFNuAPGcp1cKB8OHfwUhAGRjcr3aAvgJp9HKMWA0=;
+	s=k20201202; t=1772329163;
+	bh=VTpq4CWM28DCA71wIRauoonICyCr4dkdbTiEsPKOqQQ=;
 	h=From:To:Cc:Subject:Date:From;
-	b=IvCmHDe3fMWmSR3Uq0R1bzYiG40HqWdT/3xFo5UC4zvhfG4SFfbaq2mkrwQvLZc1G
-	 VoSwJgp0Qmm82ylSAhYhDO8K1E1i5p7ZeozDZJ/aEoPEkmnulB9VUpKRInWih6vcxZ
-	 RjvotA2OhsFOMWul07/D5fPXLwB0UEeFINlqCVvQlOOaYYhIeSYB1hGCMVf+ZvF7tv
-	 H8kbX3onjVV3GP8XShBtXjGdXzXNAXu/hyTdyXOCZ1BIYUq81HxlXTIayI+7RLol5U
-	 TS5Uv1UbX9rceG2sMK7dVHn+30NSPbtOs1yWD5ND+wIm05/230AyHLgmPEdzYSu2yA
-	 bZ6/uaf3/ETPA==
+	b=af81VBTVSBw9FrbQXx6VNk2J8yzuUH1awqWnM2LWVKj20vhGlfVpGfIUG+EU+ypCN
+	 s2oVpPlvPwkxGDBTffRkrMTZSB7w2AHPJbEpcY25mecuEgJaTefhKudxzxX1gVWsVB
+	 USi1FM9svNwuHPpFwVSuoqogjGIpb9O84GjXGe+g8TCImTl2CzyPhrNj2qdZenI57V
+	 XW2hctFYooerVmk9aqENQ6i2z/14REFwO0Z0oT97TsAvWWj+nkgOPD8SYbCOFu+Hto
+	 3AapXr6NYVzH6cYlUjBNGBJIPS8K7BfJqPwMkTORsLhJOpoztQXxgAnFfi+U31sGod
+	 gl5ezPXiKcFzQ==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
-	cnitlrt@gmail.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
+	enelsonmoore@gmail.com
+Cc: Simon Horman <horms@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org
-Subject: FAILED: Patch "net/sched: act_skbedit: fix divide-by-zero in tcf_skbedit_hash()" failed to apply to 6.6-stable tree
-Date: Sat, 28 Feb 2026 20:39:17 -0500
-Message-ID: <20260301013917.1700213-1-sashal@kernel.org>
+Subject: FAILED: Patch "net: arcnet: com20020-pci: fix support for 2.5Mbit cards" failed to apply to 6.6-stable tree
+Date: Sat, 28 Feb 2026 20:39:21 -0500
+Message-ID: <20260301013922.1700312-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -67,30 +68,30 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262318-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262319-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.998];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 857A31CB79B
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,msgid.link:url]
+X-Rspamd-Queue-Id: 6CDE61CDEDF
 X-Rspamd-Action: no action
 
 The patch below does not apply to the 6.6-stable tree.
@@ -103,61 +104,79 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From be054cc66f739a9ba615dba9012a07fab8e7dd6f Mon Sep 17 00:00:00 2001
-From: Ruitong Liu <cnitlrt@gmail.com>
-Date: Sat, 14 Feb 2026 01:59:48 +0800
-Subject: [PATCH] net/sched: act_skbedit: fix divide-by-zero in
- tcf_skbedit_hash()
+From c7d9be66b71af490446127c6ffcb66d6bb71b8b9 Mon Sep 17 00:00:00 2001
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Date: Thu, 12 Feb 2026 20:55:09 -0800
+Subject: [PATCH] net: arcnet: com20020-pci: fix support for 2.5Mbit cards
 
-Commit 38a6f0865796 ("net: sched: support hash selecting tx queue")
-added SKBEDIT_F_TXQ_SKBHASH support. The inclusive range size is
-computed as:
+Commit 8c14f9c70327 ("ARCNET: add com20020 PCI IDs with metadata")
+converted the com20020-pci driver to use a card info structure instead
+of a single flag mask in driver_data. However, it failed to take into
+account that in the original code, driver_data of 0 indicates a card
+with no special flags, not a card that should not have any card info
+structure. This introduced a null pointer dereference when cards with
+no flags were probed.
 
-mapping_mod = queue_mapping_max - queue_mapping + 1;
+Commit bd6f1fd5d33d ("net: arcnet: com20020: Fix null-ptr-deref in
+com20020pci_probe()") then papered over this issue by rejecting cards
+with no driver_data instead of resolving the problem at its source.
 
-The range size can be 65536 when the requested range covers all possible
-u16 queue IDs (e.g. queue_mapping=0 and queue_mapping_max=U16_MAX).
-That value cannot be represented in a u16 and previously wrapped to 0,
-so tcf_skbedit_hash() could trigger a divide-by-zero:
+Fix the original issue by introducing a new card info structure for
+2.5Mbit cards that does not set any flags and using it if no
+driver_data is present.
 
-queue_mapping += skb_get_hash(skb) % params->mapping_mod;
-
-Compute mapping_mod in a wider type and reject ranges larger than U16_MAX
-to prevent params->mapping_mod from becoming 0 and avoid the crash.
-
-Fixes: 38a6f0865796 ("net: sched: support hash selecting tx queue")
-Cc: stable@vger.kernel.org # 6.12+
-Signed-off-by: Ruitong Liu <cnitlrt@gmail.com>
-Link: https://patch.msgid.link/20260213175948.1505257-1-cnitlrt@gmail.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Fixes: 8c14f9c70327 ("ARCNET: add com20020 PCI IDs with metadata")
+Fixes: bd6f1fd5d33d ("net: arcnet: com20020: Fix null-ptr-deref in com20020pci_probe()")
+Cc: stable@vger.kernel.org
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Link: https://patch.msgid.link/20260213045510.32368-1-enelsonmoore@gmail.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
- net/sched/act_skbedit.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ drivers/net/arcnet/com20020-pci.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/net/sched/act_skbedit.c b/net/sched/act_skbedit.c
-index 8c1d1554f6575..5450c1293eb50 100644
---- a/net/sched/act_skbedit.c
-+++ b/net/sched/act_skbedit.c
-@@ -126,7 +126,7 @@ static int tcf_skbedit_init(struct net *net, struct nlattr *nla,
- 	struct tcf_skbedit *d;
- 	u32 flags = 0, *priority = NULL, *mark = NULL, *mask = NULL;
- 	u16 *queue_mapping = NULL, *ptype = NULL;
--	u16 mapping_mod = 1;
-+	u32 mapping_mod = 1;
- 	bool exists = false;
- 	int ret = 0, err;
- 	u32 index;
-@@ -194,6 +194,10 @@ static int tcf_skbedit_init(struct net *net, struct nlattr *nla,
- 			}
+diff --git a/drivers/net/arcnet/com20020-pci.c b/drivers/net/arcnet/com20020-pci.c
+index 19e411b2e3a77..dbadda08dce23 100644
+--- a/drivers/net/arcnet/com20020-pci.c
++++ b/drivers/net/arcnet/com20020-pci.c
+@@ -115,6 +115,8 @@ static const struct attribute_group com20020_state_group = {
+ 	.attrs = com20020_state_attrs,
+ };
  
- 			mapping_mod = *queue_mapping_max - *queue_mapping + 1;
-+			if (mapping_mod > U16_MAX) {
-+				NL_SET_ERR_MSG_MOD(extack, "The range of queue_mapping is invalid.");
-+				return -EINVAL;
-+			}
- 			flags |= SKBEDIT_F_TXQ_SKBHASH;
- 		}
- 		if (*pure_flags & SKBEDIT_F_INHERITDSFIELD)
++static struct com20020_pci_card_info card_info_2p5mbit;
++
+ static void com20020pci_remove(struct pci_dev *pdev);
+ 
+ static int com20020pci_probe(struct pci_dev *pdev,
+@@ -140,7 +142,7 @@ static int com20020pci_probe(struct pci_dev *pdev,
+ 
+ 	ci = (struct com20020_pci_card_info *)id->driver_data;
+ 	if (!ci)
+-		return -EINVAL;
++		ci = &card_info_2p5mbit;
+ 
+ 	priv->ci = ci;
+ 	mm = &ci->misc_map;
+@@ -347,6 +349,18 @@ static struct com20020_pci_card_info card_info_5mbit = {
+ 	.flags = ARC_IS_5MBIT,
+ };
+ 
++static struct com20020_pci_card_info card_info_2p5mbit = {
++	.name = "ARC-PCI",
++	.devcount = 1,
++	.chan_map_tbl = {
++		{
++			.bar = 2,
++			.offset = 0x00,
++			.size = 0x08,
++		},
++	},
++};
++
+ static struct com20020_pci_card_info card_info_sohard = {
+ 	.name = "SOHARD SH ARC-PCI",
+ 	.devcount = 1,
 -- 
 2.51.0
 
