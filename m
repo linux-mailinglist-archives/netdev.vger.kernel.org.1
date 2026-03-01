@@ -1,58 +1,56 @@
-Return-Path: <netdev+bounces-262331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262332-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oIgEN2ifo2mZIgUAu9opvQ
-	(envelope-from <netdev+bounces-262331-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:07:36 +0100
+	id ICNuHLubo2k3IQUAu9opvQ
+	(envelope-from <netdev+bounces-262332-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 02:51:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33FD11CD052
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:07:36 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 366741CC119
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 02:51:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1B215337B398
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:47:45 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 07CD83081C0B
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:47:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7DE62DF13E;
-	Sun,  1 Mar 2026 01:47:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 364B82D8795;
+	Sun,  1 Mar 2026 01:47:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AJzBCTOX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="adOfaWN8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55261DF271;
-	Sun,  1 Mar 2026 01:47:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1337A2C21F2;
+	Sun,  1 Mar 2026 01:47:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772329636; cv=none; b=Yj3FCNgXJain95qvokQjiE14K0deFMsu/1R19Y4lIQaHMvUhhwq/D9mtkAPhME1qQC/c+qd0LERZkm46VLjiALEkNglOpBODQgx3pq/RzUitG/X6pufe/DjCx2ka+x/UUiVWGFvsvdjJ6P9+UKft7nXRj4lLgUxzsjPuPAnYdn0=
+	t=1772329641; cv=none; b=PmjuZGVCQx5U/JzYlL+tMER9XIYMmbot3vuo/TBQSb9PaswZwNx3urvidaa7vMzeihyE2sUPmmVYSCM3GgwtKWGBFUu16hMvzpWbnnnLLWD8hBbmdZ0TIDDWmMPyuNxtKro5ioatUIILl3xtgN1olq9M3H/I3Rtw2a2swFHei/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772329636; c=relaxed/simple;
-	bh=RG29AMRQkbD+HBxmUE6Pd611IaQuu8JZJ6r6RjWaTdA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M9D5Hzr4swJkpyXZ3ZT2C1pnQFGWNgSM23TGkqTdtMR8lLgNkiOmrfdeMmv/gahPy19/dG8Bn8S9r+04HxyioabO9/5rKHmfZBy7PKHM1h+vnCLMeupS/3bAlWlcHwo8yAFbvRbt7Egoe+at2v5q4BX58A0K5CqH7XvDh7vCxYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AJzBCTOX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D76D6C19421;
-	Sun,  1 Mar 2026 01:47:15 +0000 (UTC)
+	s=arc-20240116; t=1772329641; c=relaxed/simple;
+	bh=1trQEGkKTKRdzT5fnsVduQTOCtCVju6e1vyMNymHyfE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=C/MKlwxOGXW2DGVvpwli/wnkxf1GSGLOv166Cg5FO9gkiq9ZLjFCy8Py6RiEELe+/sjnjV+jK7QzJil1uUniEmxVw2XbMUPWdPi+OJlUs+GhYBTig2Uv8Vg4UlVSHCA0EkIm67fkph96aG+RE6d4IvjnKKLURsYxsBhYXNg0PUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=adOfaWN8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72C02C19421;
+	Sun,  1 Mar 2026 01:47:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772329636;
-	bh=RG29AMRQkbD+HBxmUE6Pd611IaQuu8JZJ6r6RjWaTdA=;
+	s=k20201202; t=1772329641;
+	bh=1trQEGkKTKRdzT5fnsVduQTOCtCVju6e1vyMNymHyfE=;
 	h=From:To:Cc:Subject:Date:From;
-	b=AJzBCTOXcweYOwVVJOnXdkTVDmX581GGXMDTp52GDq6CdFAOc0mLi060LJP6mwCfp
-	 tlARmGs4BpBZ3h3CuRXXMHSdn+r5L7OkLbAevK+D4N70a9zywfbFEdqhECCxicSqJi
-	 5N2bf7wJYZkQ9+Fctp52MLmUfyz2sPwYT8sLlZRfYy/qztdE2Af0uwwvUk0V1LYxee
-	 p9IDkeO46k/Crneaeb9XtAIGVQccK1EjL6j39TPthQKmq872UBgUrNHLxjijR/g3Iv
-	 JFtAmwSn11B1J6HgA9UNfnYHRiZojRjbrye0Nmcin5aYg6FcS+uox/uvQswTZCIq7X
-	 Cl1oylHSHIYew==
+	b=adOfaWN8AnhRUrIcWkI5N5Gcy6PlQRzxlYBaNy2HUvppXSijHvwfLdL9XA1ZsISoE
+	 Od0N5QZbv6PE+PfPAbHSQphEIV/SLDEleA1+I14FZUMZ54+8Vf88L/1iPWYVcqTrpe
+	 UyepBpUVbwxQ+GwAIhxFn0JTo5jeL3BYqY20lfKc2LSYisBwtrw2iPKjYGwvfFY1kg
+	 xQiJnzj5Z/uufhlLgkN2h5Uxu39bOymqg+r4a08iA50FTNcG1dVC6x3NCqZYjpx4rt
+	 X/6lhxyHed3yGOnflYINkIYGS4Ue0G7nNLw76Br9t2rQhTPkPL1/mef8Cq1R9TDIYB
+	 03W3N76wPmEfg==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
-	fourier.thomas@gmail.com
-Cc: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org
-Subject: FAILED: Patch "net: wan/fsl_ucc_hdlc: Fix dma_free_coherent() in uhdlc_memclean()" failed to apply to 6.1-stable tree
-Date: Sat, 28 Feb 2026 20:47:14 -0500
-Message-ID: <20260301014714.1711149-1-sashal@kernel.org>
+	haokexin@gmail.com
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: FAILED: Patch "net: macb: Fix tx/rx malfunction after phy link down and up" failed to apply to 6.1-stable tree
+Date: Sat, 28 Feb 2026 20:47:18 -0500
+Message-ID: <20260301014719.1711250-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -64,36 +62,35 @@ X-Patchwork-Hint: ignore
 X-stable: review
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
 	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-262331-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262332-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_THREE(0.00)[4];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.894];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,msgid.link:url]
-X-Rspamd-Queue-Id: 33FD11CD052
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,amd.com:url]
+X-Rspamd-Queue-Id: 366741CC119
 X-Rspamd-Action: no action
 
 The patch below does not apply to the 6.1-stable tree.
@@ -106,54 +103,77 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From 36bd7d5deef936c4e1e3cd341598140e5c14c1d3 Mon Sep 17 00:00:00 2001
-From: Thomas Fourier <fourier.thomas@gmail.com>
-Date: Fri, 6 Feb 2026 09:53:33 +0100
-Subject: [PATCH] net: wan/fsl_ucc_hdlc: Fix dma_free_coherent() in
- uhdlc_memclean()
+From bf9cf80cab81e39701861a42877a28295ade266f Mon Sep 17 00:00:00 2001
+From: Kevin Hao <haokexin@gmail.com>
+Date: Sun, 8 Feb 2026 16:45:52 +0800
+Subject: [PATCH] net: macb: Fix tx/rx malfunction after phy link down and up
 
-The priv->rx_buffer and priv->tx_buffer are alloc'd together as
-contiguous buffers in uhdlc_init() but freed as two buffers in
-uhdlc_memclean().
+In commit 99537d5c476c ("net: macb: Relocate mog_init_rings() callback
+from macb_mac_link_up() to macb_open()"), the mog_init_rings() callback
+was moved from macb_mac_link_up() to macb_open() to resolve a deadlock
+issue. However, this change introduced a tx/rx malfunction following
+phy link down and up events. The issue arises from a mismatch between
+the software queue->tx_head, queue->tx_tail, queue->rx_prepared_head,
+and queue->rx_tail values and the hardware's internal tx/rx queue
+pointers.
 
-Change the cleanup to only call dma_free_coherent() once on the whole
-buffer.
+According to the Zynq UltraScale TRM [1], when tx/rx is disabled, the
+internal tx queue pointer resets to the value in the tx queue base
+address register, while the internal rx queue pointer remains unchanged.
+The following is quoted from the Zynq UltraScale TRM:
+  When transmit is disabled, with bit [3] of the network control register
+  set low, the transmit-buffer queue pointer resets to point to the address
+  indicated by the transmit-buffer queue base address register. Disabling
+  receive does not have the same effect on the receive-buffer queue
+  pointer.
 
-Reviewed-by: Christophe Leroy (CS GROUP) <chleroy@kernel.org>
-Fixes: c19b6d246a35 ("drivers/net: support hdlc function for QE-UCC")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
-Link: https://patch.msgid.link/20260206085334.21195-2-fourier.thomas@gmail.com
+Additionally, there is no need to reset the RBQP and TBQP registers in a
+phy event callback. Therefore, move macb_init_buffers() to macb_open().
+In a phy link up event, the only required action is to reset the tx
+software head and tail pointers to align with the hardware's behavior.
+
+[1] https://docs.amd.com/v/u/en-US/ug1085-zynq-ultrascale-trm
+
+Fixes: 99537d5c476c ("net: macb: Relocate mog_init_rings() callback from macb_mac_link_up() to macb_open()")
+Signed-off-by: Kevin Hao <haokexin@gmail.com>
+Cc: stable@vger.kernel.org
+Link: https://patch.msgid.link/20260208-macb-init-ring-v1-1-939a32c14635@gmail.com
 Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
- drivers/net/wan/fsl_ucc_hdlc.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/cadence/macb_main.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/wan/fsl_ucc_hdlc.c b/drivers/net/wan/fsl_ucc_hdlc.c
-index f999798a56127..dff84731343cc 100644
---- a/drivers/net/wan/fsl_ucc_hdlc.c
-+++ b/drivers/net/wan/fsl_ucc_hdlc.c
-@@ -790,18 +790,14 @@ static void uhdlc_memclean(struct ucc_hdlc_private *priv)
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index 6511ecd5856bd..4ebb40adfab37 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -705,14 +705,12 @@ static void macb_mac_link_up(struct phylink_config *config,
+ 		if (rx_pause)
+ 			ctrl |= MACB_BIT(PAE);
  
- 	if (priv->rx_buffer) {
- 		dma_free_coherent(priv->dev,
--				  RX_BD_RING_LEN * MAX_RX_BUF_LENGTH,
-+				  (RX_BD_RING_LEN + TX_BD_RING_LEN) * MAX_RX_BUF_LENGTH,
- 				  priv->rx_buffer, priv->dma_rx_addr);
- 		priv->rx_buffer = NULL;
- 		priv->dma_rx_addr = 0;
--	}
- 
--	if (priv->tx_buffer) {
--		dma_free_coherent(priv->dev,
--				  TX_BD_RING_LEN * MAX_RX_BUF_LENGTH,
--				  priv->tx_buffer, priv->dma_tx_addr);
- 		priv->tx_buffer = NULL;
- 		priv->dma_tx_addr = 0;
-+
+-		/* Initialize rings & buffers as clearing MACB_BIT(TE) in link down
+-		 * cleared the pipeline and control registers.
+-		 */
+-		macb_init_buffers(bp);
+-
+-		for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue)
++		for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
++			queue->tx_head = 0;
++			queue->tx_tail = 0;
+ 			queue_writel(queue, IER,
+ 				     bp->rx_intr_mask | MACB_TX_INT_FLAGS | MACB_BIT(HRESP));
++		}
  	}
- }
  
+ 	macb_or_gem_writel(bp, NCFGR, ctrl);
+@@ -2954,6 +2952,7 @@ static int macb_open(struct net_device *dev)
+ 	}
+ 
+ 	bp->macbgem_ops.mog_init_rings(bp);
++	macb_init_buffers(bp);
+ 
+ 	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
+ 		napi_enable(&queue->napi_rx);
 -- 
 2.51.0
 
