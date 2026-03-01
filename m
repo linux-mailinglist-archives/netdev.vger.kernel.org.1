@@ -1,100 +1,63 @@
-Return-Path: <netdev+bounces-262429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262430-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4H2VIAl+pGl5iQUAu9opvQ
-	(envelope-from <netdev+bounces-262429-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 18:57:29 +0100
+	id UNkZFyN+pGl5iQUAu9opvQ
+	(envelope-from <netdev+bounces-262430-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 18:57:55 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C52341D1002
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 18:57:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B59621D1019
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 18:57:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8A0383017784
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 17:55:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EA8453008D17
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 17:57:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67DB119EED3;
-	Sun,  1 Mar 2026 17:55:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EE88337B87;
+	Sun,  1 Mar 2026 17:57:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="dIrerKPj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mxk1FoL4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EDFE325726
-	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 17:55:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A74B33506D;
+	Sun,  1 Mar 2026 17:56:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772387755; cv=none; b=uClCgq2tGLMyhFQfZHk7Z8M6fpyWhxJYU5PPYihyylWzBQwJFZ7avTcTL0+jgPND70CWu2bRdAFt18lvJVF7lSsyKfHUYk07lT9qrqn9DrO/pq/ruYsu8MaxdtKY1aTZXvY6k/0G+BqG3A7xoN9/nK9JAB1w+5ZQ8vni55AzcaI=
+	t=1772387820; cv=none; b=T4dFNYlyyiDNF1EemEqU4yhvYOf68JuXetpgF2c0IrKCqJRnn4P93upwEQK4kw2oLnmuRDUnyC1gLmpZ0dnloWX6j+KhRl4tXGlGW6H0vKnOyhEk9jCY0V5TMGx6Z2fD0C7dx0MTG7LY92jVY1ohBSXLWHbgUSLrDiQ4HJ/YMuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772387755; c=relaxed/simple;
-	bh=yhgi5eMSXsQDCYKm+CXjR4bsxzX9U+ECNX3EnREIBps=;
+	s=arc-20240116; t=1772387820; c=relaxed/simple;
+	bh=cqANQIFxzkqSaJ6siL7W4biLzm/UdiW8OZDehsSUzBo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fh8s2AbQM+yZLZKEVNgwAqWyJtgWQzusydPkrfMPDgeCXGxD4G5ikxvUn+iM0yIWN6vMpo+/0ARFXJovCD7HEyRuJ2Ko/0M0Qa2uvnV6sf2tTlJ4s6llOnqMyLW2HN+zpUX9f6jahOAccxXiwsFIfl+FJfla5h0rnbwFzodOXiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=dIrerKPj; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-8c9f6b78ca4so507120885a.0
-        for <netdev@vger.kernel.org>; Sun, 01 Mar 2026 09:55:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1772387753; x=1772992553; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YCd8bTN0yDfsSyi6ZA8FG9Faz13YGXHzhnf02MTH1b8=;
-        b=dIrerKPjtw6iWP+dBwRH0Ci9RBi4QAE8rVnJeoI2Fg76E9IxhSGUNGqi7RaYvdv+BF
-         cZ702ssNmV2/pOwLexFowpgH6EL4LUzOHaC2R6E8TzPUi9QeXSoD6n6qBMcuL9b5BtY/
-         EqtmxRRyZgK7KcguiqjyPckkhPiR7qmPGHkDJY/PfLmhsdxIgoRE+5ESWp6Ub4opPveW
-         CzSnh2rO8m8xGo4U1XzDl+YjYutgBUPTCKBDw61xlT2gVgnUYu9iSJXQj+7BpRya9cHB
-         1nzkKljJH+32/UTRhGKxtMmAVXIhiIM5KGt7w5niHzF1uhkiZkN3rkRqdZDkkgbLQH4m
-         ykgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772387753; x=1772992553;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YCd8bTN0yDfsSyi6ZA8FG9Faz13YGXHzhnf02MTH1b8=;
-        b=YxxlyxyK4RgQxeULy2HQFKR30H74MvccXefBkou8qub/ZZfsTOh7BN+Jy/fGlFJxVz
-         gvLlIIYlA/BQBASNiu4p4FquqB8K+jl3F0YQO9Kg9FagY9M2dxvk33ssPHMT9V7xs0nB
-         8gQ+wcYV6zp7q8/putrgmtK5AwzZFP2JWWzHo0Hu65ecLxamMRKfFtov+dwIAaodUC4M
-         BlGmMj55+GujgxBe6Cn2EZxf7+jUtfctZqfhnUDH7KwxWr2XidVRFz/kwsNa+7sO56Yi
-         wwXt2wizYmG4jYNjPWqstpRAG+2ge9NT5BVT4EdB8s2CMx5kZ7K889KPpvpou4dtRSQX
-         /aYA==
-X-Forwarded-Encrypted: i=1; AJvYcCUnrqXNEVRNGEOFo5P77dZiiGsyJHlfRnJnWSRNRVY28I0K8weoNQM9EoGGaB5mBYZoF3gGSQs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkA82UDFpRSf34qObPwkjitW+hz8cJTWNWB3g2UMOqbd756q7C
-	ZRCY/9VciGOKVBp1KYlmDzrNawlk8XDO6AsqmkYO4loWYpuvaEdwiPlrllxd6PuDHnM=
-X-Gm-Gg: ATEYQzxEb0qSiikam0sjPq4j8BSKLDSH+dVVPBRdnTE8zKtQyucyY2zoVT9zJl+QF1O
-	GXTammvbjZu30dEOccTXtvlQ29DJGaabvermMscLFrjDCs5GQgSMpQZDTw8KLATpCYExfJFTdly
-	HVO0UPwm+tKf89mJy62QZ4raYSXsyMoZHHLTv65xS14C2Kox8Fkk16SqGZEyhdklSZXXCt/TyBv
-	JLl1e2H7fDuOBCDPNIbLfo322vruP7R+rMh3ItIeCUy+GSlaupjfUEpdIELFsta5aooJeUoC1QS
-	WDrWN8K8qPD6rVDTDNnPnKRzght5w0IF1CofFvpx9u/F/qNo+MrnAhHSyWuW+wLRCQsnt3LfEfk
-	cc1cZpDGeAIJ2BubbuVCcwZL3CpNP7f5zbpFjNeJAv0TnTopEJ+CDktWi18mW8/9rWaXrGYxvJX
-	htkz5LrH7bvBtSy8B5Y7BSfUHtBenTdpsW6VvOiCcXwjqu26nLuOsgjo0912ObetQTxNHann06U
-	O5PlhijbLDeYlr6aCE=
-X-Received: by 2002:a05:620a:2802:b0:8c7:155a:6d04 with SMTP id af79cd13be357-8cbc8e6817cmr1277844485a.54.1772387752963;
-        Sun, 01 Mar 2026 09:55:52 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cbbf6f873dsm1033539385a.25.2026.03.01.09.55.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Mar 2026 09:55:52 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vwl1D-00000002dJu-0Hxd;
-	Sun, 01 Mar 2026 13:55:51 -0400
-Date: Sun, 1 Mar 2026 13:55:51 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Zhiping Zhang <zhipingz@meta.com>, Leon Romanovsky <leon@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-rdma@vger.kernel.org,
-	linux-pci@vger.kernel.org, netdev@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, Yochai Cohen <yochai@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Bjorn Helgaas <helgaas@kernel.org>
-Subject: Re: [RFC 2/2] RMDA MLX5: get tph for p2p access when registering
- dmabuf mr
-Message-ID: <20260301175551.GT44359@ziepe.ca>
-References: <20260210194014.2147481-1-zhipingz@meta.com>
- <20260210194014.2147481-3-zhipingz@meta.com>
- <aaDxmGoqpjnvmVs9@kbusch-mbp>
+	 Content-Type:Content-Disposition:In-Reply-To; b=KodgvNiuPACMs6noIsnsEMsgq5gX27oGSXH+j2Pk91TPbYLjrlgx0GKfaDP1PS1FB9+y4wCib9RteiQKuvaIvgu2RVcummgUUlW2aROEdqrvKmcU9aj7EbuZy8OSW0wSF2Q6R3FPCGRsYLJG6/L+z9sSl+NjRW8/CFVcPumj+Ko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mxk1FoL4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 895D4C116C6;
+	Sun,  1 Mar 2026 17:56:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772387819;
+	bh=cqANQIFxzkqSaJ6siL7W4biLzm/UdiW8OZDehsSUzBo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Mxk1FoL4TXCGfECR6lVyFMsAdc0RvnZ/+50hSH0YyKBiFP/gnRUVHxSIQHGUU4zjA
+	 3LR3D9eWuAO1g7pEFS2ALKpCOnBE+P3MLpXX3Qa1lSp2iagbNDBb7tvOZVGfzSF75P
+	 h7p/17X7N9uOmZfUZAwOLJEx5R/p5MOelx7cc0aNOve0hys9jX/4enIywy3bY88FWb
+	 r2pNFUm8b0AfdwPzWAYp3aoJevAC6WFtHuP1cOTlbA6reQ3BVLSOwxQoC+87iUlBiv
+	 jUzgq0TsCib0MrklhLwCZJ1eLWpznbGtBttLwCoBxeLvqq4Rhz5wNf7ano+dqT97e4
+	 zWrjzK2FZjdbw==
+Date: Sun, 1 Mar 2026 17:56:55 +0000
+From: Simon Horman <horms@kernel.org>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Sagi Maimon <maimon.sagi@gmail.com>, jonathan.lemon@gmail.com,
+	richardcochran@gmail.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v1] ptp: ocp: Add support for Xilinx-based Adva TimeCard
+ variant
+Message-ID: <aaR955MXsV8B1BQw@horms.kernel.org>
+References: <20260225102938.4131-1-maimon.sagi@gmail.com>
+ <aaA6f5xS5yONVlmE@horms.kernel.org>
+ <02670ff0-36c7-4735-aa90-4cd908cfc46c@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,72 +66,142 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aaDxmGoqpjnvmVs9@kbusch-mbp>
+In-Reply-To: <02670ff0-36c7-4735-aa90-4cd908cfc46c@linux.dev>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[ziepe.ca:+];
-	TAGGED_FROM(0.00)[bounces-262429-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-262430-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[ziepe.ca];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ziepe.ca:mid,ziepe.ca:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C52341D1002
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B59621D1019
 X-Rspamd-Action: no action
 
-On Thu, Feb 26, 2026 at 06:21:28PM -0700, Keith Busch wrote:
-> On Tue, Feb 10, 2026 at 11:39:55AM -0800, Zhiping Zhang wrote:
-> > +static void get_tph_mr_dmabuf(struct mlx5_ib_dev *dev, int fd, u16 *st_index,
-> > +							  u8 *ph)
-> > +{
-> > +	int ret;
-> > +	struct dma_buf *dmabuf;
-> > +
-> > +	dmabuf = dma_buf_get(fd);
-> > +	if (IS_ERR(dmabuf))
-> > +		return;
-> > +
-> > +	if (!dif there's any implication mabuf->ops->get_tph)
-> > +		goto end_dbuf_put;
-> > +
-> > +	ret = dmabuf->ops->get_tph(dmabuf, st_index, ph);
+On Thu, Feb 26, 2026 at 01:42:31PM +0000, Vadim Fedorenko wrote:
+> On 26/02/2026 12:20, Simon Horman wrote:
+> > On Wed, Feb 25, 2026 at 12:29:38PM +0200, Sagi Maimon wrote:
+> > > Add support for the Adva TimeCard model built on a Xilinx-based design.
+> > > This patch enables detection and integration of the new hardware within
+> > > the existing OCP timecard framework.
+> > > 
+> > > The Xilinx variant relies on the shared driver infrastructure, requiring
+> > > only small, targeted additions to accommodate its specific
+> > > characteristics.
+> > > 
+> > > Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
+> > > ---
+> > >   drivers/ptp/ptp_ocp.c | 318 ++++++++++++++++++++++++++++++++++++++++++
+> > >   1 file changed, 318 insertions(+)
+> > > 
+> > > diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+> > 
+> > ...
+> > 
+> > > @@ -2926,6 +3168,45 @@ ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
+> > >   	return ptp_ocp_init_clock(bp, r->extra);
+> > >   }
+> > > +/* ADVA specific board X initializers; last "resource" registered. */
+> > > +static int
+> > > +ptp_ocp_adva_board_x1_init(struct ptp_ocp *bp, struct ocp_resource *r)
+> > > +{
+> > > +	int err;
+> > > +	u32 version;
+> > > +
+> > > +	bp->flash_start = 0x1000000;
+> > > +	bp->eeprom_map = fb_eeprom_map;
+> > > +	bp->sma_op = &ocp_adva_x1_sma_op;
+> > > +	bp->signals_nr = 4;
+> > > +	bp->freq_in_nr = 4;
+> > > +
+> > > +	version = ioread32(&bp->image->version);
+> > > +	/* if lower 16 bits are empty, this is the fw loader. */
+> > > +	if ((version & 0xffff) == 0) {
+> > > +		version = version >> 16;
+> > > +		bp->fw_loader = true;
+> > > +	}
+> > > +	bp->fw_tag = 3;
+> > > +	bp->fw_version = version & 0xffff;
+> > > +	bp->fw_cap = OCP_CAP_BASIC | OCP_CAP_SIGNAL | OCP_CAP_FREQ;
+> > > +
+> > > +	ptp_ocp_tod_init(bp);
+> > > +	ptp_ocp_nmea_out_init(bp);
+> > > +	ptp_ocp_signal_init(bp);
+> > > +
+> > > +	err = ptp_ocp_attr_group_add(bp, adva_timecard_x1_groups);
+> > > +	if (err)
+> > > +		return err;
+> > > +
+> > > +	err = ptp_ocp_set_pins(bp);
+> > > +	if (err)
+> > > +		return err;
+> > > +	ptp_ocp_sma_init(bp);
+> > > +
+> > > +	return ptp_ocp_init_clock(bp, r->extra);
+> > > +}
+> > 
+> > Hi Sagi,
+> > 
+> > I see similar patterns elsewhere in this driver. So I assume that I'm
+> > overlooking something obvious. But it strikes me that
+> > ptp_ocp_attr_group_add() and ptp_ocp_set_pins() allocate memory. Shouldn't
+> > that be cleaned up if an error subsequently occurs in this function?
+> > 
+> > And also, shouldn't ptp_ocp_attr_group_add() relase the memory it
+> > allocates if an error occurs in that function?
 > 
-> You defined the "get_tph" function to take a pointer to a raw steering
-> tag value, but you're passing in the steering index to it's table.
+> Well, ptp_ocp_attr_group_add() error is not critical for device init, so
+> I believe it's ok to keep it and free in ptp_ocp_detach(), there is no
+> leak. But I agree it goes against common code style of kernel. I'll do
+> cleanup patch once I have some cycles.
+> 
+> Situation with ptp_ocp_set_pins() is a bit different, but still we end
+> up with calling ptp_ocp_detach() in error path, which cleans up all
+> allocated memory. Changing *init() code to unroll everything is actually
+> a code duplication of ptp_ocp_detach() - I don't think we have to spend
+> time it.
 
-Yeah that's weird, there should be one TPH for a DMABUF, not many.
+Thanks. I now see that ptp_ocp_detach() is called which handles cleaning
+up these resources on error. So I agree there is no leak.
 
-> But in general, since you're letting the user put whatever they want in
-> the vfio private area, should there be some validation that it's in the
-> valid range? I'm also not quite sure how user space comes to know what
-> steering tag to use, or what harm might happen if the wrong one is used.
+> > Lastly, the AI generated code review suggests that there may be
+> > some scope for sharing code:
+> > 
+> >    This isn't a bug, but ptp_ocp_adva_board_x1_init() is nearly identical to
+> >    ptp_ocp_adva_board_init(), differing only in flash_start (0x1000000 vs
+> >    0xA00000), sma_op assignment, signals_nr (4 vs 2), freq_in_nr (4 vs 2),
+> >    and the attr group passed to ptp_ocp_attr_group_add(). The version-reading
+> >    logic and the entire initialization call sequence are duplicated.
+> 
+> That's what I also asked in my response.
 
-If the device is VFIO compatible then it needs to ensure that whatever
-it does with its steering tags fit the security model of VFIO. You
-can't harm the device - you can't reach outside the VFIO sandbox (eg
-into another VF or something) and so on.
+Yes, sorry for missing that.
 
-Under these conditions the kernel doesn't care what TPH is used, just
-let userspace specify the raw bits on the wire.
-
-Jason
+> >    Looking at the existing driver convention, each board variant (fb, art,
+> >    adva) uses this same pattern with separate init functions. Would it be
+> >    worth parameterizing these differences in a future cleanup?
+> > 
+> > ...
 
