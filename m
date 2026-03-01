@@ -1,384 +1,239 @@
-Return-Path: <netdev+bounces-262389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262390-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KNMKMYYepGlkXgUAu9opvQ
-	(envelope-from <netdev+bounces-262389-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 12:09:58 +0100
+	id X/A/LgIipGmMYAUAu9opvQ
+	(envelope-from <netdev+bounces-262390-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 12:24:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2991B1CF469
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 12:09:57 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24A1B1CF4E1
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 12:24:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 488D630421CA
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 11:06:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CCBCD3013EFB
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 11:24:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E4EB31714C;
-	Sun,  1 Mar 2026 11:06:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12AA92D738A;
+	Sun,  1 Mar 2026 11:24:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EGasVczi"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="TfJ3eAq/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8476130DEB5
-	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 11:06:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A7919EED3
+	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 11:24:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772363187; cv=none; b=X0RzMbZU0mKczMaGuVTbD5fX06bdncJ2S/2AIUpEoKwTOCN4tYgUG91eKyc4xtBK35w8Jus6bFVRInaYxnmBYs1UEI4NJisrU5RQHdpWXF4g30nNbSDvCAMV8SQ3qH9vyqzPZxyVKmz39m10k6jeM1741yrAAEqwEMYSroFqKPY=
+	t=1772364286; cv=none; b=kW+cdQ4rwQT7AZz4FK18YU69XbIabufPnJtF69u4sb6aluqFZXGgVdFLqZpxFQtzOdnF60BpcF2SYQ1dDNGiJ1Qx3BpzaD3f+p7mUavzDUzRhqnpywtXalInQLHMkvoT2+bHSSiMG4WYj3fqmmG9eBvhbLM5BReZUk/sd981NJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772363187; c=relaxed/simple;
-	bh=QMJrFlWUxw3eCzl7CbbaUnvVP2sFPLmXBpj62mRAmvw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uH2aVEa/KSOiuD4i4v1NyDp+/HLNvq31OnVij4vtBd4XmGuGbJSRDotHLZG6EfkuMzgWGkMloRVupJAtZb/AQ1y7F53HpkTXO7NP0KfiCMITmvNl2FEcxr9IZq0/MuhWo99vjS8ZOroV2NOOs/QFdPx3KWtEk8FHwKEJvh3cluY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EGasVczi; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-50334dd44d2so42987041cf.1
-        for <netdev@vger.kernel.org>; Sun, 01 Mar 2026 03:06:22 -0800 (PST)
+	s=arc-20240116; t=1772364286; c=relaxed/simple;
+	bh=rw8fm1QBFBlYpvs0lvKeEaHr3iU1o700icBZixujDgs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LrZQhKL5fxPLpXBci7w6sfWn6cKQULNRGSrUZWVg0WwTVKDbiX5IU2wvgjnnLnZSJ63lHrjDr5acXZmOuNCKfZicIEjSWk8cUEh5kpAxmk9+e72+wFAM0jc30yWJ+SHJzndNFMh+xaTAa0WEJNxMGEwgDxKpHiyTczqFHhpRcY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=TfJ3eAq/; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-483708b697cso4053735e9.3
+        for <netdev@vger.kernel.org>; Sun, 01 Mar 2026 03:24:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772363181; x=1772967981; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e+nYx3bJb71EY0N2U95E2xjSNTPJeUPvPHdUZAbp4Fk=;
-        b=EGasVczincz8GCnYOK3VoRztMeQp2VTAGsJnt01ypwKa2E3tUxGBmu/DyW8s49u/u1
-         ktbRZHxj8MjYj3rR/HlgRkWHCz7w4xh+smcYPnEUDebH+5JkosaN2Ri4LfnvbK3PNovD
-         ZwmJH/OXWfRCiJz8OPF6S+nW8bAZentWoYlx80MFGOiKK0GZWP1eBwzPQK5wdEMZoDBG
-         e6PhxGHBnbCVjJiCxToClEvwcEONGZYb7WdohcU2313AQ8pKSzfWsuDMzCi2JwjjKIT3
-         6jhR4zVD8KnhPk9uyt0aSBVmxdIBWdzUxuw/tDZwhID/OJU/VgyyEDt2xTJgwhtfNSL7
-         /sxA==
+        d=suse.com; s=google; t=1772364283; x=1772969083; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Bl4aZfTNKgTxCzAwFVHIT8LFNEV2L78bSM6cZ8P+v2s=;
+        b=TfJ3eAq/wmzDnkgXFgRKIeH2DbByxjkq0JPNGhOWMnbZpgtqK8dK+woDUWURVnF82f
+         DMvxI7ESmDsbsYW8Vh7wizFuQisvhWNpczCgcnOUqIIzhGr7qapT5pvPmwUVVkavuyuS
+         U6G61hk11N9eK+I4Lj5KJRPHbuc57iEZx8Nmypnc1KL1Si0vIYBwSjptw0k0AIexRtgi
+         4eIhmgZpuB82ALMP0Las7OieWMCmzkkAQj4PDJG61YPjrDmxPpx0l6D0KUXxMTIny5YX
+         O8aUrm9WjskgI/JHyi3Un+IPCwXx7+CDr/kur5b61N9I6zln2bL5xyj+Kw5QyNwuvSWK
+         BVtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772363181; x=1772967981;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=e+nYx3bJb71EY0N2U95E2xjSNTPJeUPvPHdUZAbp4Fk=;
-        b=jYRLTj/PQ+kIkxrcVbgC5hOI2eVKahBtFzvLOM95hqrvscR1vw6bcSGe42r8l5PDcw
-         jmEbnNOuaHAtPkofhOrQCR1APwgiu++SVIZhx5kNtdODtBljRUMKedeNR2ligOkDOY7O
-         GD+v+su7MGi3+5s/x289zVgH8AscX/4xpiiTK5D5FT2KTf5M4l0oYkMmlXu4ejYj12EN
-         CpKKjsUcEMqw1Z1vBCtPoS9llIf43GLrhiaYEQMBOotmOgOEDhHw7+t0hZGlJXsxL2Km
-         9t494DdLhfpMvQjokpbwk91wl3VczXHfdZQadkEbozTHnPmoahOozi497EdWSrVb+/IV
-         eaxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWKxOWk9JlDhSEaOxZ4pAZ3J/GNMVwkiwFT0kwQJa8xxtcq6mYIjJM11rlBPWrr9Nc3v0VYFRw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/SACLRbbkdnCHBhJIQDxpvpR8AmOf97wcqRWStJWXd6E++/1r
-	NpjN/D9Qs1rXxdNraq+vUcBEDhIdKmW4+4BdK7QiEleW8+0ufKby4dRR
-X-Gm-Gg: ATEYQzw0ESXTz0Vy1xGehZRmOuYewxCneaZGgC1JNkbyU2VfgPmUiKcFrThP/ihfjWQ
-	T1PZWeMOmE6ZoYN2CDPGRNzsVsOgiE6o3Uycsv59grL7O7AS3VWI6ehFY0MNMAJAwdj8gaEj0Ig
-	CQBg0ltZgm5j7P/1XH+3IWeXFiCDuBXGVo7VqNVNnUO/J1LZJAjY0AoxEsHbDNRHs5ld05GChP4
-	oqHA0mrozhsFtvEi9bAGHdjViwc8dQYHDCJxmpZOoqoLJs+qWHRmMKh9RvSL9PCZ161YG748lgv
-	ByJnuN+JgHOzDPZhj03fcELnno2kJruK8bO7z9WSnbwPsOUP4kZWTLzX0m1ZLrBpavPxXXmIFKT
-	8uGK83ZhBH+cgfmPAbhb8YaqsofwwGdDYUfuwIpGOM3Gs73zKjM0OZSCtN+Hk+s6SQtUZU3ymIy
-	+a4S9qrVmGn/R/5qmYkxnQQwD/9OjPxC1+NwceuQ24vPLhb1a8buTF6B8ocRoiU3rkdbgaYyv7o
-	zWpHSjd8CcP+sfe
-X-Received: by 2002:ac8:57d2:0:b0:4ee:2352:1bb1 with SMTP id d75a77b69052e-5075273a9ebmr123554541cf.5.1772363181422;
-        Sun, 01 Mar 2026 03:06:21 -0800 (PST)
-Received: from PF5YBGDS.localdomain (70.15.25.19.res-cmts.sm3.ptd.net. [70.15.25.19])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-899c716caebsm83888876d6.15.2026.03.01.03.06.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Mar 2026 03:06:21 -0800 (PST)
-From: mike.marciniszyn@gmail.com
-To: Alexander Duyck <alexanderduyck@fb.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	kernel-team@meta.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Lee Trager <lee@trager.us>,
-	Mohsin Bashir <mohsin.bashr@gmail.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Pei Xiao <xiaopei01@kylinos.cn>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Samiullah Khawaja <skhawaja@google.com>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Cc: mike.marciniszyn@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2.2 5/5] eth fbnic: Add mailbox self test
-Date: Sun,  1 Mar 2026 06:06:06 -0500
-Message-ID: <20260301110606.3739-6-mike.marciniszyn@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260301110606.3739-1-mike.marciniszyn@gmail.com>
-References: <20260301110606.3739-1-mike.marciniszyn@gmail.com>
+        d=1e100.net; s=20230601; t=1772364283; x=1772969083;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Bl4aZfTNKgTxCzAwFVHIT8LFNEV2L78bSM6cZ8P+v2s=;
+        b=Ot0MtqPKL12HG4aDACNUwtx2bUaz51VqHvL84IYFs3AmtHYbVWEZehvhFRh1NpQsEm
+         cKTfR6AqWMcCb9FZXsjZnI2GsOmhRzE1WHAqKDmmIY+eZcmo83MNArg7Zv4gM3E3mFEF
+         YpiYEwTSVKW8I5yBtUEeVCkJgDShZ+ZAC0UhgSYdJxZl583Jgspj7wDHqpI0wwPJQqK6
+         v/V3ckLWxDbWN4VojabGrBXaq416Awt+xF2+jt4zKbE8gxV1mUptd6YHE6bbDN6dlmZw
+         KCGZnkTOoqZMCXFpeW95AN491ExNl+Dd5cmEgnWxBHnF0YeTrrbNmgWOHk6OnyAInWQ5
+         cu1g==
+X-Forwarded-Encrypted: i=1; AJvYcCWzvaJWyABkOZ7EFP0/IefXn44cW0+B4a2nLR6llpaYMSAdr6aHWvr9nP7OMNHG+babU6vB4ng=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxwYfTH0ILaiPwMqJA6TxI955caLek1cQo1bQerX9zMH2XgmVc
+	6qbZZZnPreObUKDyBRGDEeUyvhedJLg4MpILt03E1L3rJaGYglgW6nLjS+i1YynbkFA=
+X-Gm-Gg: ATEYQzz1FldA/1O4rSZt7gseNBa6QG+d8/LPMOIxC4hpsI5ZWbJRphvQZoRtUBKBzpN
+	9KNPmreU8Uzr18MfrF2JrnDdy4IM8+KMn8cnyr8Doj3ZjHlqi8JY0GfjmXnAxwUMUeQf5Lot6eB
+	ynxZQDVHIiySycwDRShPYghQwMWBYGaRf0wXxn8HdtqYkTty/ESHdAGcVamOEWpL5g+XB0IvZKc
+	0RpGZ3cang2bXLdCHstZ+GTIiiYCw/mvp4SaIpnEs3OvSZoJAzspmgldVXxZdUUSNGVrXcosX6H
+	tm6LwigyO2/OSfmS3zKpevg12b0n7yTucbf5FYYJjv7XGT4oCNGOs4TlBxQieibPIejbcOfR1bu
+	kAreMRUU+l7flcs+3YVpHDJ0qirzhQVXRVtDRmZ2smqZO2Wu6UvQ3f77pa1XXci6r/WDuQNKt9i
+	cZg1F2GpivvS4kJB3IOuGSczICe2tM1LmBF0DFTTy4m7z6AkA289HcZOSonQ==
+X-Received: by 2002:a05:600c:1d1a:b0:480:1f6b:d4a2 with SMTP id 5b1f17b1804b1-483c9c32c36mr87984125e9.7.1772364282573;
+        Sun, 01 Mar 2026 03:24:42 -0800 (PST)
+Received: from ?IPV6:2001:1a48:8:903:1ed6:4f73:ce38:f9d4? ([2001:1a48:8:903:1ed6:4f73:ce38:f9d4])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bfcb4f8bsm257802705e9.4.2026.03.01.03.24.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 01 Mar 2026 03:24:42 -0800 (PST)
+Message-ID: <31a14f1c-7d20-4b0f-a039-9e034762ed98@suse.com>
+Date: Sun, 1 Mar 2026 12:24:41 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: adopt SLUB sheaves for skbuff_small_head
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ Vlastimil Babka <vbabka@suse.cz>, David Rientjes <rientjes@google.com>,
+ Roman Gushchin <roman.gushchin@linux.dev>, Harry Yoo <harry.yoo@oracle.com>,
+ Hao Li <hao.li@linux.dev>
+References: <20260228141252.435509-1-edumazet@google.com>
+From: Vlastimil Babka <vbabka@suse.com>
+In-Reply-To: <20260228141252.435509-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com,suse.cz,linux.dev,oracle.com];
+	TAGGED_FROM(0.00)[bounces-262390-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262389-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[fb.com,kernel.org,meta.com,lunn.ch,davemloft.net,google.com,redhat.com,armlinux.org.uk,intel.com,trager.us,gmail.com,linaro.org,kylinos.cn,fomichev.me];
-	FROM_NO_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[suse.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mikemarciniszyn@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[vbabka@suse.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2991B1CF469
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:email]
+X-Rspamd-Queue-Id: 24A1B1CF4E1
 X-Rspamd-Action: no action
 
-From: "Mike Marciniszyn (Meta)" <mike.marciniszyn@gmail.com>
+On 2/28/26 15:12, Eric Dumazet wrote:
+> skbuff_small_head is used both on receive and send paths,
+> serving potentially 80 million allocations and frees per second.
+> 
+> Tuning it on large servers has been problematic, especially
+> on AMD Turins platforms, where "lock cmpxch16b" latency can
+> be over 30,000 cycles.
 
-The mailbox self test ensures the interface to and from
-the firmware is healthy by sending a test message and
-fielding the response from the firmware.
+Huh, really? That sounds insane. Any pointers about that?
 
-This patch uses the new completion API [1][2] that allocates a
-completion structure, binds the completion to the TEST
-message, and uses a new FW parsing routine that wraps the
-completion processing around the TLV parser.
+> Switching to SLUB sheaves fixes the issue nicely.
+> 
+> tcp_rr benchmark with 10,000 flows goes from 25 Mpps to 40 Mpps
+> on AMD Turin.
+> 
+> Other platforms show benefits with tcp_rr with more than 30,000
+> flows.
 
-Link: https://patch.msgid.link/20250516164804.741348-1-lee@trager.us [1]
-Link: https://patch.msgid.link/20260115003353.4150771-6-mohsin.bashr@gmail.com [2]
+That's nice, thanks!
 
-Signed-off-by: Mike Marciniszyn (Meta) <mike.marciniszyn@gmail.com>
----
-v2 - add enum for test return codes
+However I must point out some caveates. I assume you did this on 6.19, where
+sheaves are still opt-in. But also, when you opt-in, the pre-existing
+per-cpu caching layer of percpu slab and percpu partial slabs is also still
+there, so effectively the amount of percpu cached slab objects increase,
+which can be the main performance difference for some workloads, and not the
+difference between sheaves and percpu (partial) slabs implementation.
 
- drivers/net/ethernet/meta/fbnic/fbnic.h       |  14 ++-
- .../net/ethernet/meta/fbnic/fbnic_ethtool.c   |  15 +++
- drivers/net/ethernet/meta/fbnic/fbnic_fw.c    | 100 ++++++++++++++++++
- drivers/net/ethernet/meta/fbnic/fbnic_fw.h    |  27 +++++
- 3 files changed, 142 insertions(+)
+Note: but hopefully for your workload it's really the implementation.
+"(lock) cmpxch16b" should be avoided, until you start freeing NUMA-remote
+(to the freeing cpu) objects in significant volumes.
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-index b0c8d1b069e2..251de64baa5a 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-@@ -129,11 +129,13 @@ static const struct fbnic_stat fbnic_gstrings_xdp_stats[] = {
- enum fbnic_self_test_results {
- 	TEST_REG = 0,
- 	TEST_MSIX,
-+	TEST_MBX,
- };
+In 7.0-rc1 sheaves are enabled for every cache automatically, and cpu
+(partial) caches are gone completely. Their size is calculated to roughly
+match the average amount of percpu caching the old scheme achieved (but that
+effectively depended on the workload too, so can't be exactly translated)
+and the result is visible in /sys/kernel/slab/$cache/sheaf_capacity
+the args.sheaf_capacity can override that automatic sizing, if the specified
+one is larger.
 
- static const char fbnic_gstrings_self_test[][ETH_GSTRING_LEN] = {
- 	[TEST_REG]	= "Register test (offline)",
- 	[TEST_MSIX]	= "MSI-X Interrupt test (offline)",
-+	[TEST_MBX]      = "FW mailbox test (on/offline)",
- };
+So what I would suggest is checking the performance betwen 6.19 and 7.0-rc1
+without this patch (hope there won't be any other factors in the upgrade
+influencing this much), noting the auto-calculated capacity. If it still
+looks good, you don't need to do anything, otherwise you can try making the
+capacity larger and see what happens.
 
- #define FBNIC_TEST_LEN ARRAY_SIZE(fbnic_gstrings_self_test)
-@@ -1525,11 +1527,24 @@ static int fbnic_ethtool_msix_test(struct net_device *netdev, u64 *data)
- 	return !!*data;
- }
-
-+static int fbnic_ethtool_mbx_self_test(struct net_device *netdev, u64 *data)
-+{
-+	struct fbnic_net *fbn = netdev_priv(netdev);
-+	struct fbnic_dev *fbd = fbn->fbd;
-+
-+	*data = fbnic_fw_mbx_self_test(fbd);
-+
-+	return !!*data;
-+}
-+
- static void fbnic_self_test(struct net_device *netdev,
- 			    struct ethtool_test *eth_test, u64 *data)
- {
- 	bool if_running = netif_running(netdev);
-
-+	if (fbnic_ethtool_mbx_self_test(netdev, &data[TEST_MBX]))
-+		eth_test->flags |= ETH_TEST_FL_FAILED;
-+
- 	if (!(eth_test->flags & ETH_TEST_FL_OFFLINE)) {
- 		data[TEST_REG] = 0;
- 		data[TEST_MSIX] = 0;
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-index 1f0b6350bef4..c2bad51bdde6 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-@@ -378,6 +378,37 @@ fbnic_fw_get_cmpl_by_type(struct fbnic_dev *fbd, u32 msg_type)
- 	return cmpl_data;
- }
-
-+/**
-+ * fbnic_fw_xmit_test_msg - Create and transmit a test message to FW mailbox
-+ * @fbd: FBNIC device structure
-+ * @cmpl: fw completion struct
-+ *
-+ * Return: zero on success, negative value on failure
-+ *
-+ * Generates a single page mailbox test message and places it in the Tx
-+ * mailbox queue. Expectation is that the FW will validate that the nested
-+ * value matches the external values, and then will echo them back to us.
-+ *
-+ * Also sets a completion slot for use in the completion wait calls when
-+ * the cmpl arg is non-NULL.
-+ */
-+int fbnic_fw_xmit_test_msg(struct fbnic_dev *fbd,
-+			   struct fbnic_fw_completion *cmpl)
-+{
-+	struct fbnic_tlv_msg *test_msg;
-+	int err;
-+
-+	test_msg = fbnic_tlv_test_create(fbd);
-+	if (!test_msg)
-+		return -ENOMEM;
-+
-+	err = fbnic_mbx_map_req_w_cmpl(fbd, test_msg, cmpl);
-+	if (err)
-+		free_page((unsigned long)test_msg);
-+
-+	return err;
-+}
-+
- /**
-  * fbnic_fw_xmit_simple_msg - Transmit a simple single TLV message w/o data
-  * @fbd: FBNIC device structure
-@@ -1556,7 +1587,29 @@ int fbnic_fw_xmit_send_logs(struct fbnic_dev *fbd, bool enable,
- 	return err;
- }
-
-+static int
-+fbnic_fw_parser_test(void *opaque, struct fbnic_tlv_msg **results)
-+{
-+	struct fbnic_fw_completion *cmpl;
-+	struct fbnic_dev *fbd = opaque;
-+	int err;
-+
-+	/* find cmpl */
-+	cmpl = fbnic_fw_get_cmpl_by_type(fbd, FBNIC_TLV_MSG_ID_TEST);
-+	if (!cmpl)
-+		return -ENOSPC;
-+
-+	err = fbnic_tlv_parser_test(opaque, results);
-+
-+	cmpl->result = err;
-+	complete(&cmpl->done);
-+	fbnic_fw_put_cmpl(cmpl);
-+
-+	return err;
-+}
-+
- static const struct fbnic_tlv_parser fbnic_fw_tlv_parser[] = {
-+	FBNIC_TLV_PARSER(TEST, fbnic_tlv_test_index, fbnic_fw_parser_test),
- 	FBNIC_TLV_PARSER(FW_CAP_RESP, fbnic_fw_cap_resp_index,
- 			 fbnic_fw_parse_cap_resp),
- 	FBNIC_TLV_PARSER(OWNERSHIP_RESP, fbnic_ownership_resp_index,
-@@ -1787,6 +1840,53 @@ void fbnic_mbx_flush_tx(struct fbnic_dev *fbd)
- 	} while (time_is_after_jiffies(timeout));
- }
-
-+/**
-+ * fbnic_fw_mbx_self_test() - verify firmware interface
-+ * @fbd: device to test
-+ *
-+ * This function tests the interfaces to/from the firmware.
-+ *
-+ * Return: See enum fbnic_fw_self_test_codes
-+ **/
-+enum fbnic_fw_self_test_codes fbnic_fw_mbx_self_test(struct fbnic_dev *fbd)
-+{
-+	enum fbnic_fw_self_test_codes err;
-+	struct fbnic_fw_completion *cmpl;
-+
-+	/* Skip test if FW interface is not present */
-+	if (!fbnic_fw_present(fbd))
-+		return FBNIC_TEST_FW_NO_FIRMWARE;
-+
-+	cmpl = fbnic_fw_alloc_cmpl(FBNIC_TLV_MSG_ID_TEST);
-+	if (!cmpl)
-+		return FBNIC_TEST_FW_NO_CMPL;
-+
-+	/* Load a test message onto the FW mailbox interface
-+	 * and arm the completion.
-+	 */
-+	err = fbnic_fw_xmit_test_msg(fbd, cmpl);
-+	if (err) {
-+		err = FBNIC_TEST_FW_NO_XMIT;
-+		goto exit_free;
-+	}
-+
-+	/* Verify we received a message back */
-+	if (!fbnic_mbx_wait_for_cmpl(cmpl)) {
-+		err = FBNIC_TEST_FW_NO_MSG;
-+		goto exit_cleanup;
-+	}
-+
-+	/* Verify there were no parsing errors */
-+	if (cmpl->result)
-+		err = FBNIC_TEST_FW_PARSE;
-+exit_cleanup:
-+	fbnic_mbx_clear_cmpl(fbd, cmpl);
-+exit_free:
-+	fbnic_fw_put_cmpl(cmpl);
-+
-+	return err;
-+}
-+
- int fbnic_fw_xmit_rpc_macda_sync(struct fbnic_dev *fbd)
- {
- 	struct fbnic_tlv_msg *mac_array;
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
-index 8f7218900562..d84723e4cfa3 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
-@@ -104,6 +104,33 @@ void fbnic_mbx_clear_cmpl(struct fbnic_dev *fbd,
- void fbnic_mbx_poll(struct fbnic_dev *fbd);
- int fbnic_mbx_poll_tx_ready(struct fbnic_dev *fbd);
- void fbnic_mbx_flush_tx(struct fbnic_dev *fbd);
-+
-+/**
-+ * enum fbnic_fw_self_test_codes - return codes from self test routines
-+ *
-+ * These are the codes returned from the self test routines and
-+ * stored in the test result array indexed by the specific
-+ * test name.
-+ *
-+ * @FBNIC_TEST_FW_SUCCESS: test success
-+ * @FBNIC_TEST_FW_NO_FIRMWARE: FW interface not present
-+ * @FBNIC_TEST_FW_NO_CMPL: No completion available
-+ * @FBNIC_TEST_FW_NO_XMIT: Could not xmit message
-+ * @FBNIC_TEST_FW_NO_MSG: no message returned
-+ * @FBNIC_TEST_FW_PARSE: returned message had parsing error
-+ */
-+enum fbnic_fw_self_test_codes {
-+	FBNIC_TEST_FW_SUCCESS = 0,
-+	FBNIC_TEST_FW_NO_FIRMWARE = 10,
-+	FBNIC_TEST_FW_NO_CMPL = 20,
-+	FBNIC_TEST_FW_NO_XMIT = 30,
-+	FBNIC_TEST_FW_NO_MSG = 40,
-+	FBNIC_TEST_FW_PARSE = 50,
-+};
-+
-+enum fbnic_fw_self_test_codes fbnic_fw_mbx_self_test(struct fbnic_dev *fbd);
-+int fbnic_fw_xmit_test_msg(struct fbnic_dev *fbd,
-+			   struct fbnic_fw_completion *c);
- int fbnic_fw_xmit_ownership_msg(struct fbnic_dev *fbd, bool take_ownership);
- int fbnic_fw_init_heartbeat(struct fbnic_dev *fbd, bool poll);
- void fbnic_fw_check_heartbeat(struct fbnic_dev *fbd);
---
-2.43.0
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Vlastimil Babka <vbabka@suse.cz>
+> Cc: David Rientjes <rientjes@google.com>
+> Cc: Roman Gushchin <roman.gushchin@linux.dev>
+> ---
+>  net/core/skbuff.c | 31 ++++++++++++++++++++-----------
+>  1 file changed, 20 insertions(+), 11 deletions(-)
+> 
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index 513cbfed19bc34bbb6767cdd7a50dad68be430fb..79eb7eb6eea9aa4a76c555e6ddd33bf0bc84c921 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -5174,6 +5174,19 @@ static void skb_extensions_init(void) {}
+>  
+>  void __init skb_init(void)
+>  {
+> +	struct kmem_cache_args kmem_args_small_head = {
+> +		.align		= 0,
+> +		.ctor		= NULL,
+> +		/* usercopy should only access first SKB_SMALL_HEAD_HEADROOM
+> +		 * bytes.
+> +		 * struct skb_shared_info is located at the end of skb->head,
+> +		 * and should not be copied to/from user.
+> +		 */
+> +		.useroffset	= 0,
+> +		.usersize	= SKB_SMALL_HEAD_HEADROOM,
+> +		.sheaf_capacity = 32,
+> +	};
+> +
+>  	net_hotdata.skbuff_cache = kmem_cache_create_usercopy("skbuff_head_cache",
+>  					      sizeof(struct sk_buff),
+>  					      0,
+> @@ -5189,17 +5202,13 @@ void __init skb_init(void)
+>  						0,
+>  						SLAB_HWCACHE_ALIGN|SLAB_PANIC,
+>  						NULL);
+> -	/* usercopy should only access first SKB_SMALL_HEAD_HEADROOM bytes.
+> -	 * struct skb_shared_info is located at the end of skb->head,
+> -	 * and should not be copied to/from user.
+> -	 */
+> -	net_hotdata.skb_small_head_cache = kmem_cache_create_usercopy("skbuff_small_head",
+> -						SKB_SMALL_HEAD_CACHE_SIZE,
+> -						0,
+> -						SLAB_HWCACHE_ALIGN | SLAB_PANIC,
+> -						0,
+> -						SKB_SMALL_HEAD_HEADROOM,
+> -						NULL);
+> +
+> +	net_hotdata.skb_small_head_cache = kmem_cache_create(
+> +			"skbuff_small_head",
+> +			SKB_SMALL_HEAD_CACHE_SIZE,
+> +			&kmem_args_small_head,
+> +			SLAB_HWCACHE_ALIGN | SLAB_PANIC);
+> +
+>  	skb_extensions_init();
+>  }
+>  
 
 
