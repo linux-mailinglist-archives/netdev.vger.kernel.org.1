@@ -1,142 +1,219 @@
-Return-Path: <netdev+bounces-262457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262458-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gFgHDJW8pGkeqQUAu9opvQ
-	(envelope-from <netdev+bounces-262457-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 23:24:21 +0100
+	id KOezN6O/pGmPqgUAu9opvQ
+	(envelope-from <netdev+bounces-262458-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 23:37:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26B381D1D8B
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 23:24:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 484241D1E2B
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 23:37:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1F0BB3002528
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 22:24:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C42503011760
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 22:36:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3541D375AB3;
-	Sun,  1 Mar 2026 22:24:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2583331ED83;
+	Sun,  1 Mar 2026 22:36:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RPV+CLmz"
+	dkim=pass (2048-bit key) header.d=yunyoo-cc.20200929.dkim.larksuite.com header.i=@yunyoo-cc.20200929.dkim.larksuite.com header.b="ReklLlYs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+Received: from va-2-35.ptr.blmpb.com (va-2-35.ptr.blmpb.com [209.127.231.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0432F36F419
-	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 22:24:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9220030EF92
+	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 22:36:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772403853; cv=none; b=PHfQABXtuGvO8MR0oDdFqudGBTbRNjmUXXykG81eImwOJl2F8FaoEPnxd3w9aFbqmKur+/Escyr6CuSHkKed/8g31N58iXPj0tpbO1Cb4Gbydmipmvc2zZIsTPdmygR2hBeoq4QV/AGgQcigwb4Y9xVDyfBTGLJmZDMLr2I0iwI=
+	t=1772404612; cv=none; b=L2LvPh3phaZM3r2cnyOOQYdCu8BqSM+xTz2rUh0jNYDHYIEvkRitdx8Sq9OWKYmxyQDUydwj+vLEGj4Cf3lsjz8gl8+ZwnbUjNJurJ++kmz6KYa7nfrB/tgZovL7oJ2InYEirsnUYPf2pO+iRVAZJc+B5wVKXBc0gn9WH9ggYg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772403853; c=relaxed/simple;
-	bh=S2LpXTKHH3FqjAlSHSXSnNqRgaeuF6Syz7u6a1kowMI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Ev3asNXVB4Rl+KL8tWHxwxKgbaRt3Pa3dAI9aH7y64NWxQZWce9hHM7TkkBOZL+bwmHQ/gS/WVO7y6z+CkBy+whnyQv9U/XTk0fUolRSl+l4T81WRS0+jYLLoPeuhWkULeNAAFP6xEs3KKeqrlkW4KMpISaH/1KKqbjJ5VwnICI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RPV+CLmz; arc=none smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-899c3441177so66380076d6.0
-        for <netdev@vger.kernel.org>; Sun, 01 Mar 2026 14:24:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772403851; x=1773008651; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S2LpXTKHH3FqjAlSHSXSnNqRgaeuF6Syz7u6a1kowMI=;
-        b=RPV+CLmzQRh1ZIEgmoQtqde3nWUvANjOf30O8bNIZX4OKBLy1Hnz/17aHHelnre+kq
-         1TnYBVjDN4GnZX6FHTYoe03qZQKb0FGihR8eRogchK3pdOIHJZuk6sSkO80DDvheYXcM
-         4VJ0UcHEZVZTvR0jQJ+Tahmet1yPGJJitUOuYSnOhYqbWJw+eaIKk8h03aM8PNd0TbDG
-         9aDW4tkNMlOSgV5qp91CIHIVN91uU41mWxoHexMV7wHBm+aYy8JESxuHyqBqzkS2Yy+N
-         XmmjJOZvJ4bafM/J9CNwsS6jZcBfrThsfebuCT6HSjpwrHJTFviA5yA3481xRuN8Neh+
-         m1/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772403851; x=1773008651;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=S2LpXTKHH3FqjAlSHSXSnNqRgaeuF6Syz7u6a1kowMI=;
-        b=s7KnkAJGUVciN0GE3YMBVftZZsqJ6wGigIcvRH+JPlrChsNFoqxgtE6+SPwWODOait
-         IsBzCtu9HWvNuk72UGMp1omSulsligM7GBcPlvtgMpsXh1j/45Jk0X+r7yD4dHbYmm0w
-         pgC63HuCPaPur4lCUczSHnYIGI6W9Xw8U9dNBQaBHpLHaZrjTJtP9lCYbwEuMHp44635
-         fP7hvVpj35O5XddslDLU8Mdcbx3U7aCSE07s2t45Djw6CV0XxycQnsctd+gxFHPf/dfS
-         aLZHri204H2nEUysQqxQbAPYgNyUU0jKkszmqO/JuI2SBLugQaVwiXzw9Mgrv2LCcyC8
-         IMdw==
-X-Gm-Message-State: AOJu0YyeKM0x7Y+e9ivle1tM7W2kY1hxvabEnyqGpQ7uJNnLaJYM49PQ
-	NOewuwbe/gcbvHhBn6Pm/5llZTHZK17ykbbOSaGInyoY7krtLO3Tk4Ma
-X-Gm-Gg: ATEYQzwSg8shYXqYIsKDI9PbD5qxW3a8KmnKfiIS8cnTTFAF3ke1pSmjs+RmspcPe2r
-	2QsxHJ4YUAN27KvFFZE7PV8smBpInqcWEfmI1CnlvS8ryGVKfFwZEON7dC5nLVRAmvAhjEspLln
-	+Qwebau7BWly5QiwHzHfdPfPY0it1lesbpPHyTDgRtg8bxcWelUs8AUnBYYOyH/T+tZLk7MitZZ
-	OggS2P83fsGNRO7fDX8jB+dtqU9dvfBtX5OqQ6cmGxGYPkRwSHiFmddjouWAg4ImQyJUxw10f9k
-	+LdRqdIWoMwzfFsv1YpNBO5DQuXN6+VNfxG4wlSVboiNpy62bphEfN6ahOQ2wcA8vGWLPe7KC9G
-	NYy87IvdkIJr+vvCAYDRd/FVVxYhVepnejoD3hX1JIIJAhrhDiIZbN+VZKb1PgyvkFLlnVSDlr8
-	DrgEOC48MhpTMFZZVzSQeFHXEbgdf04WwpMYl1TjjJc1Dqnj2Q2J+dYw==
-X-Received: by 2002:ad4:5fce:0:b0:894:6112:457c with SMTP id 6a1803df08f44-899d1e77906mr138637646d6.56.1772403850873;
-        Sun, 01 Mar 2026 14:24:10 -0800 (PST)
-Received: from I4-L-HQH5357-01.ad.psu.edu ([130.203.159.160])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cbbf7175c6sm1027263785a.37.2026.03.01.14.24.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Mar 2026 14:24:10 -0800 (PST)
-From: Shuangpeng Bai <shuangpeng.kernel@gmail.com>
-To: kuba@kernel.org
-Cc: netdev@vger.kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org,
-	hdanton@sina.com,
-	vadim.fedorenko@linux.dev,
-	horms@kernel.org
-Subject: Re: [PATCH net v3 1/1] serial: caif: hold tty->link reference in ldisc_open and ser_release
-Date: Sun,  1 Mar 2026 17:24:09 -0500
-Message-Id: <20260301222409.1553551-1-shuangpeng.kernel@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260228094741.1e248271@kernel.org>
-References: <20260228094741.1e248271@kernel.org>
+	s=arc-20240116; t=1772404612; c=relaxed/simple;
+	bh=HGNPxjZdXQ0CIKGWXj8Xf/gkL80A5tRaqqvffEvQZ9U=;
+	h=Content-Type:Date:Cc:From:Message-Id:To:Subject:Mime-Version; b=n/tv0+95I/pigdUoKHrtvuFM8BIQQ9gWaa7LUfVj2cd4WZycxHU2k5fFjILaKraSrWmoTqJdAhcdKh/8H3sO8l4JLx5l7hc4rH154LQsWblbAq/nr1r7ty6p74tQSWugkYACGwyf8/Ki88VYaUZm0zIDxqEIOXkqpTlZosuxmzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunyoo.cc; spf=pass smtp.mailfrom=yunyoo.cc; dkim=pass (2048-bit key) header.d=yunyoo-cc.20200929.dkim.larksuite.com header.i=@yunyoo-cc.20200929.dkim.larksuite.com header.b=ReklLlYs; arc=none smtp.client-ip=209.127.231.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunyoo.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunyoo.cc
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=yunyoo-cc.20200929.dkim.larksuite.com; t=1772404600;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=HGNPxjZdXQ0CIKGWXj8Xf/gkL80A5tRaqqvffEvQZ9U=;
+ b=ReklLlYsZq6N9rHbN+UvjY1WVz0sgfHqhTapusMtOqRGvw98ox/BbZVDww2mDt7wZLYkmq
+ HP+9/590d4yIHvdVlVcUKUcQr3LJQ/6zlZkg77HwPfb0lj1dLiZ56XKlUEtbpsJhXagWwd
+ fXhOePiHbPuQ/vOg023YLLTjjSuV486OSZehQwQ0i0PvXBRhyeg7yCbfhCYupL0eiFAysA
+ Bz0Fnlsp9Mb/95GHj2TNRbUHwS2AscwtRw0d/EwvnBvUgLVFRR5rO11wkWW9t7msuY/GGg
+ wfmO9hi0lkDR1uj4PDhUhyVR+qtE1tKV7lL5TUpRcD7Xm/tgQFpt6fB0px5RSQ==
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 01 Mar 2026 22:36:39 +0000
+Cc: "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
+From: "ShuangYu" <shuangyu@yunyoo.cc>
+X-Lms-Return-Path: <lba+169a4bf77+b50de7+vger.kernel.org+shuangyu@yunyoo.cc>
+Message-Id: <9ac0a071e79e9da8128523ddeba19085f4f8c9aa.decbd9ef.1293.41c3.bf27.48cdc12b9ce6@larksuite.com>
+To: "mst@redhat.com" <mst@redhat.com>, 
+	"jasowang@redhat.com" <jasowang@redhat.com>
+Subject: [BUG] vhost_net: livelock in handle_rx() when GRO packet exceeds virtqueue capacity
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[yunyoo-cc.20200929.dkim.larksuite.com:s=s1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,redhat.com,sina.com,linux.dev,kernel.org];
-	FROM_NEQ_ENVFROM(0.00)[shuangpengkernel@gmail.com,netdev@vger.kernel.org];
-	TO_DN_NONE(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262457-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	DMARC_NA(0.00)[yunyoo.cc];
+	TAGGED_FROM(0.00)[bounces-262458-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_EQ_ADDR_ALL(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shuangyu@yunyoo.cc,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[yunyoo-cc.20200929.dkim.larksuite.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 26B381D1D8B
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 484241D1E2B
 X-Rspamd-Action: no action
 
-Hi Jakub,
+Hi,
 
-Thanks for the guidance. I've reposted as v4 without a cover letter and
-CC'd everyone pointed out by get_maintainer.pl, including the taggers of
-the Fixes commit. I also fixed the horms@kernel.org address.
+We have hit a severe livelock in vhost_net on 6.18.x. The vhost
+kernel thread spins at 100% CPU indefinitely in handle_rx(), and
+QEMU becomes unkillable (stuck in D state).
+[This is a text/plain messages]
+
+Environment
+-----------
+=C2=A0 Kernel:=C2=A0 6.18.10-1.el8.elrepo.x86_64
+=C2=A0 QEMU: =C2=A0=C2=A0 7.2.19
+=C2=A0 Virtio:=C2=A0 VIRTIO_F_IN_ORDER is negotiated
+=C2=A0 Backend: vhost (kernel)
+
+Symptoms
+--------
+=C2=A0 - vhost-<pid> kernel thread at 100% CPU (R state, never yields)
+=C2=A0 - QEMU stuck in D state at vhost_dev_flush() after receiving SIGTERM
+=C2=A0 - kill -9 has no effect on the QEMU process
+=C2=A0 - libvirt management plane deadlocks ("cannot acquire state change l=
+ock")
+
+Root Cause
+----------
+The livelock is triggered when a GRO-merged packet on the host TAP
+interface (e.g., ~60KB) exceeds the remaining free capacity of the
+guest's RX virtqueue (e.g., ~40KB of available buffers).
+
+The loop in handle_rx() (drivers/vhost/net.c) proceeds as follows:
+
+=C2=A0 1. get_rx_bufs() calls vhost_get_vq_desc_n() to fetch descriptors.
+=C2=A0=C2=A0=C2=A0 It advances vq->last_avail_idx and vq->next_avail_head a=
+s it
+=C2=A0=C2=A0=C2=A0 consumes buffers, but runs out before satisfying datalen=
+.
+
+=C2=A0 2. get_rx_bufs() jumps to err: and calls
+=C2=A0=C2=A0=C2=A0 vhost_discard_vq_desc(vq, headcount, n), which rolls bac=
+k
+=C2=A0=C2=A0=C2=A0 vq->last_avail_idx and vq->next_avail_head.
+
+=C2=A0=C2=A0=C2=A0 Critically, vq->avail_idx (the cached copy of the guest'=
+s
+=C2=A0=C2=A0=C2=A0 avail->idx) is NOT rolled back. This is correct behavior=
+ in
+=C2=A0=C2=A0=C2=A0 isolation, but creates a persistent mismatch:
+
+=C2=A0=C2=A0 =C2=A0=C2=A0 vq->avail_idx =C2=A0 =C2=A0=C2=A0 =3D 108=C2=A0 (=
+cached, unchanged)
+=C2=A0=C2=A0 =C2=A0=C2=A0 vq->last_avail_idx =3D 104=C2=A0 (rolled back)
+
+=C2=A0 3. handle_rx() sees headcount =3D=3D 0 and calls vhost_enable_notify=
+().
+=C2=A0=C2=A0=C2=A0 Inside, vhost_get_avail_idx() finds:
+
+=C2=A0=C2=A0 =C2=A0=C2=A0 vq->avail_idx (108) !=3D vq->last_avail_idx (104)
+
+=C2=A0=C2=A0=C2=A0 It returns 1 (true), indicating "new buffers available."
+=C2=A0=C2=A0=C2=A0 But these are the SAME buffers that were just discarded.
+
+=C2=A0 4. handle_rx() hits `continue`, restarting the loop.
+
+=C2=A0 5. In the next iteration, vhost_get_vq_desc_n() checks:
+
+=C2=A0=C2=A0 =C2=A0=C2=A0 if (vq->avail_idx =3D=3D vq->last_avail_idx)
+
+=C2=A0=C2=A0=C2=A0 This is FALSE (108 !=3D 104), so it skips re-reading the=
+ guest's
+=C2=A0=C2=A0=C2=A0 actual avail->idx and directly fetches the same descript=
+ors.
+
+=C2=A0 6. The exact same sequence repeats: fetch -> too small -> discard
+=C2=A0=C2=A0=C2=A0 -> rollback -> "new buffers!" -> continue. Indefinitely.
+
+This appears to be a regression introduced by the VIRTIO_F_IN_ORDER
+support, which added vhost_get_vq_desc_n() with the cached avail_idx
+short-circuit check, and the two-argument vhost_discard_vq_desc()
+with next_avail_head rollback. The mismatch between the rollback
+scope (last_avail_idx, next_avail_head) and the check scope
+(avail_idx vs last_avail_idx) was not present before this change.
+
+bpftrace Evidence
+-----------------
+During the 100% CPU lockup, we traced:
+
+=C2=A0 @get_rx_ret[0]: =C2=A0 =C2=A0=C2=A0 4468052 =C2=A0 // get_rx_bufs() =
+returns 0 every time
+=C2=A0 @peek_ret[60366]: =C2=A0=C2=A0 4385533 =C2=A0 // same 60KB packet se=
+en every iteration
+=C2=A0 @sock_err[recvmsg]: =C2=A0 =C2=A0 =C2=A0=C2=A0 0 =C2=A0 // tun_recvm=
+sg() is never reached
+
+vhost_get_vq_desc_n() was observed iterating over the exact same 11
+descriptor addresses millions of times per second.
+
+Workaround
+----------
+Either of the following avoids the livelock:
+
+=C2=A0 - Disable GRO/GSO on the TAP interface:
+=C2=A0=C2=A0 =C2=A0 ethtool -K <tap> gro off gso off
+
+=C2=A0 - Switch from kernel vhost to userspace QEMU backend:
+=C2=A0=C2=A0 =C2=A0 <driver name=3D'qemu'/> in libvirt XML
+
+Bisect
+------
+We have not yet completed a full git bisect, but the issue does not
+occur on 6.17.x kernels which lack the VIRTIO_F_IN_ORDER vhost
+support. We will follow up with a Fixes: tag if we can identify the
+exact commit.
+
+Suggested Fix Direction
+-----------------------
+In handle_rx(), when get_rx_bufs() returns 0 (headcount =3D=3D 0) due to
+insufficient buffers (not because the queue is truly empty), the code
+should break out of the loop rather than relying on
+vhost_enable_notify() to make that determination. For example, when
+get_rx_bufs() returns r =3D=3D 0 with datalen still > 0, this indicates a
+"packet too large" condition, not a "queue empty" condition, and
+should be handled differently.
 
 Thanks,
-Shuangpeng
+ShuangYu
 
