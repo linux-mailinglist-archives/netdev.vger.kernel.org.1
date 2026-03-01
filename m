@@ -1,57 +1,60 @@
-Return-Path: <netdev+bounces-262316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262317-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2I1WDCOco2k3IQUAu9opvQ
-	(envelope-from <netdev+bounces-262316-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 02:53:39 +0100
+	id wHllHyGdo2nFIQUAu9opvQ
+	(envelope-from <netdev+bounces-262317-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 02:57:53 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3099F1CC243
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 02:53:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E0DF1CC650
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 02:57:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1C4183060BEB
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:39:50 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 43EAE3061B4E
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:39:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DE622E54A2;
-	Sun,  1 Mar 2026 01:38:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D1BE2E541E;
+	Sun,  1 Mar 2026 01:39:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GTDuocVC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="grbuYWtq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AB7C82899;
-	Sun,  1 Mar 2026 01:38:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A422D9798;
+	Sun,  1 Mar 2026 01:39:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772329131; cv=none; b=m+OL6790WSpn5qWkXIURzvDSiPEVteBmwusJB8zTcMVNdpjhXqi5PRwgHLdpi7SGK38sUxHqMi3v6hOlLHwbAe9ECoT1XLazp9tsJik57x5c1jkQaauSgi2JFKw2PaXnthNXbLEdIkBbBVpi3ZWagqu4t6tkcBAf6GFOE/2eMO4=
+	t=1772329140; cv=none; b=lYaGCJWe1w6CK/9aN0AE6u55nHR7ooIXCR8eiUOvrGkpP2PRFB4WCBtXK6epHnKN9koNT9VirJH+JaqRnV/8PKeekXqZgksajNhBlINAYDnz59Xcm9+fRa9Lpc36+HpzPuhMsfrggjaRM3vhd5wUQ3pdIunIAuYfd/00t4vtlZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772329131; c=relaxed/simple;
-	bh=ZhK6U5qwHO3sJZysQ9ORJakOb1Q0NcuWM4sQRVaRPKU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qplxwHZXtjWhFdZB+0GTLmdfFyNHEMSkB2mhaE6mrGtqCfJTRLlrEnxBqSKXi1mAtcMoQ5yO8KgVDx4sRo1mB0vf0bh5Z8RPHqMMVHmIheNkEIixgFv1trOBE+JjrPZQm0TVXt2ubWEoLP8gyq5+s3PAFfZp9WUWxM6u5xcFsU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GTDuocVC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FC89C19421;
-	Sun,  1 Mar 2026 01:38:50 +0000 (UTC)
+	s=arc-20240116; t=1772329140; c=relaxed/simple;
+	bh=5zZBWc4+MMNO6TCIa/a30QL812Llyass7IEU/aIMgd0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CeDADkG4N0NDwuHy7oNLn4qKzxuBt/uoY80tURbJdIZijIijV+ycc5BpL+Ge/jpd3nuRaqvezDOMeoFPdoHWMRrjFHctOym6Gb1hqQNkl3hM9OZzoWA6LpexcSgIAZOWK7DXABR7C0KFsfGZQ4iV50SDYGWMPan5e8tBYW1ZCKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=grbuYWtq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CF43C19421;
+	Sun,  1 Mar 2026 01:38:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772329130;
-	bh=ZhK6U5qwHO3sJZysQ9ORJakOb1Q0NcuWM4sQRVaRPKU=;
+	s=k20201202; t=1772329140;
+	bh=5zZBWc4+MMNO6TCIa/a30QL812Llyass7IEU/aIMgd0=;
 	h=From:To:Cc:Subject:Date:From;
-	b=GTDuocVCiQt3j6k2L1VlJev7EMWLTIdUq3koPt1j+cXkbHY03r+IuAJ4H7L4KKW66
-	 z2T2hs+lOO3W/liHBAYLUuiT+5N64+YGYcWp2Kx+R4ga1TL0OVa8N8e6qLacG/Xcse
-	 CIwRvrY9MVSmryjQRnvXBeWGF6PwtFkKG6Bl+pldtNjBaNfLLbodrMAn19iYIcHPbV
-	 0FzNkCyvU6PHbcRcDNwSohJHn891bMc1hbQM5ZYqWlAomLXf0ctVMsaYNsf42Xlp9g
-	 kC+RS5OBRiRbPwwK+MhKCzWu2/qqKTZClt7h5XPep7zER+IVnt3PnUxmd3yKw/oF89
-	 QcpIgb/xhGO4Q==
+	b=grbuYWtqUITJ/SczW9vyWlAKJb3/y+VAr/wGdDcJoOEgaHichVY1wOjl+i1KpLQ3O
+	 K0fwQ4vPAQQm50ifDCmMOBPuhDMF6kRA+EbiJvJBT1VPYAc9yj9sAsjVp04bCYqqqU
+	 +gzSb8wHKDaSB5bRjIxGYXwhzwv7Va/2E3qKjCz6Pnu2XXszTtFe6ojiF31Lq/eXla
+	 sPdYkTHfeCXPpKEnNLU4cpR9moOecl3CMc1UkIyWBPWMtLS+hgsxlxEKkGtxjwq6f+
+	 wRdLKeiVpNtOpTZ0MQ1uHmCe+ZxM4dlh/o95v5OetE3tTLuvRjMO/JoarFb4p3VD3s
+	 jqPbpjP4jFfZA==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
-	qjx1298677004@gmail.com
-Cc: Justin Iurman <justin.iurman@gmail.com>,
+	duoming@zju.edu.cn
+Cc: stable@kernel.org,
+	Jijie Shao <shaojijie@huawei.com>,
+	Simon Horman <horms@kernel.org>,
 	Jakub Kicinski <kuba@kernel.org>,
+	linux-atm-general@lists.sourceforge.net,
 	netdev@vger.kernel.org
-Subject: FAILED: Patch "ipv6: ioam: fix heap buffer overflow in __ioam6_fill_trace_data()" failed to apply to 6.6-stable tree
-Date: Sat, 28 Feb 2026 20:38:48 -0500
-Message-ID: <20260301013849.1699600-1-sashal@kernel.org>
+Subject: FAILED: Patch "atm: fore200e: fix use-after-free in tasklets during device removal" failed to apply to 6.6-stable tree
+Date: Sat, 28 Feb 2026 20:38:55 -0500
+Message-ID: <20260301013858.1699747-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -64,35 +67,33 @@ X-stable: review
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-262316-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262317-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,msgid.link:url]
-X-Rspamd-Queue-Id: 3099F1CC243
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,huawei.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,zju.edu.cn:email]
+X-Rspamd-Queue-Id: 7E0DF1CC650
 X-Rspamd-Action: no action
 
 The patch below does not apply to the 6.6-stable tree.
@@ -105,130 +106,65 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From 6db8b56eed62baacaf37486e83378a72635c04cc Mon Sep 17 00:00:00 2001
-From: Qanux <qjx1298677004@gmail.com>
-Date: Wed, 11 Feb 2026 12:04:12 +0800
-Subject: [PATCH] ipv6: ioam: fix heap buffer overflow in
- __ioam6_fill_trace_data()
+From 8930878101cd40063888a68af73b1b0f8b6c79bc Mon Sep 17 00:00:00 2001
+From: Duoming Zhou <duoming@zju.edu.cn>
+Date: Tue, 10 Feb 2026 17:45:37 +0800
+Subject: [PATCH] atm: fore200e: fix use-after-free in tasklets during device
+ removal
 
-On the receive path, __ioam6_fill_trace_data() uses trace->nodelen
-to decide how much data to write for each node. It trusts this field
-as-is from the incoming packet, with no consistency check against
-trace->type (the 24-bit field that tells which data items are
-present). A crafted packet can set nodelen=0 while setting type bits
-0-21, causing the function to write ~100 bytes past the allocated
-region (into skb_shared_info), which corrupts adjacent heap memory
-and leads to a kernel panic.
+When the PCA-200E or SBA-200E adapter is being detached, the fore200e
+is deallocated. However, the tx_tasklet or rx_tasklet may still be running
+or pending, leading to use-after-free bug when the already freed fore200e
+is accessed again in fore200e_tx_tasklet() or fore200e_rx_tasklet().
 
-Add a shared helper ioam6_trace_compute_nodelen() in ioam6.c to
-derive the expected nodelen from the type field, and use it:
+One of the race conditions can occur as follows:
 
-  - in ioam6_iptunnel.c (send path, existing validation) to replace
-    the open-coded computation;
-  - in exthdrs.c (receive path, ipv6_hop_ioam) to drop packets whose
-    nodelen is inconsistent with the type field, before any data is
-    written.
+CPU 0 (cleanup)           | CPU 1 (tasklet)
+fore200e_pca_remove_one() | fore200e_interrupt()
+  fore200e_shutdown()     |   tasklet_schedule()
+    kfree(fore200e)       | fore200e_tx_tasklet()
+                          |   fore200e-> // UAF
 
-Per RFC 9197, bits 12-21 are each short (4-octet) fields, so they
-are included in IOAM6_MASK_SHORT_FIELDS (changed from 0xff100000 to
-0xff1ffc00).
+Fix this by ensuring tx_tasklet or rx_tasklet is properly canceled before
+the fore200e is released. Add tasklet_kill() in fore200e_shutdown() to
+synchronize with any pending or running tasklets. Moreover, since
+fore200e_reset() could prevent further interrupts or data transfers,
+the tasklet_kill() should be placed after fore200e_reset() to prevent
+the tasklet from being rescheduled in fore200e_interrupt(). Finally,
+it only needs to do tasklet_kill() when the fore200e state is greater
+than or equal to FORE200E_STATE_IRQ, since tasklets are uninitialized
+in earlier states. In a word, the tasklet_kill() should be placed in
+the FORE200E_STATE_IRQ branch within the switch...case structure.
 
-Fixes: 9ee11f0fff20 ("ipv6: ioam: Data plane support for Pre-allocated Trace")
-Cc: stable@vger.kernel.org
-Signed-off-by: Junxi Qian <qjx1298677004@gmail.com>
-Reviewed-by: Justin Iurman <justin.iurman@gmail.com>
-Link: https://patch.msgid.link/20260211040412.86195-1-qjx1298677004@gmail.com
+This bug was identified through static analysis.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Cc: stable@kernel.org
+Suggested-by: Jijie Shao <shaojijie@huawei.com>
+Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
+Reviewed-by: Jijie Shao <shaojijie@huawei.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Link: https://patch.msgid.link/20260210094537.9767-1-duoming@zju.edu.cn
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- include/net/ioam6.h       |  2 ++
- net/ipv6/exthdrs.c        |  5 +++++
- net/ipv6/ioam6.c          | 14 ++++++++++++++
- net/ipv6/ioam6_iptunnel.c | 10 +---------
- 4 files changed, 22 insertions(+), 9 deletions(-)
+ drivers/atm/fore200e.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/include/net/ioam6.h b/include/net/ioam6.h
-index 2cbbee6e806aa..a75912fe247e6 100644
---- a/include/net/ioam6.h
-+++ b/include/net/ioam6.h
-@@ -60,6 +60,8 @@ void ioam6_fill_trace_data(struct sk_buff *skb,
- 			   struct ioam6_trace_hdr *trace,
- 			   bool is_input);
+diff --git a/drivers/atm/fore200e.c b/drivers/atm/fore200e.c
+index f62e385714403..fec081db36dc4 100644
+--- a/drivers/atm/fore200e.c
++++ b/drivers/atm/fore200e.c
+@@ -373,6 +373,10 @@ fore200e_shutdown(struct fore200e* fore200e)
+ 	fallthrough;
+     case FORE200E_STATE_IRQ:
+ 	free_irq(fore200e->irq, fore200e->atm_dev);
++#ifdef FORE200E_USE_TASKLET
++	tasklet_kill(&fore200e->tx_tasklet);
++	tasklet_kill(&fore200e->rx_tasklet);
++#endif
  
-+u8 ioam6_trace_compute_nodelen(u32 trace_type);
-+
- int ioam6_init(void);
- void ioam6_exit(void);
- 
-diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
-index 209fdf1b1aa9b..5e3610a926cfb 100644
---- a/net/ipv6/exthdrs.c
-+++ b/net/ipv6/exthdrs.c
-@@ -931,6 +931,11 @@ static bool ipv6_hop_ioam(struct sk_buff *skb, int optoff)
- 		if (hdr->opt_len < 2 + sizeof(*trace) + trace->remlen * 4)
- 			goto drop;
- 
-+		/* Inconsistent Pre-allocated Trace header */
-+		if (trace->nodelen !=
-+		    ioam6_trace_compute_nodelen(be32_to_cpu(trace->type_be32)))
-+			goto drop;
-+
- 		/* Ignore if the IOAM namespace is unknown */
- 		ns = ioam6_namespace(dev_net(skb->dev), trace->namespace_id);
- 		if (!ns)
-diff --git a/net/ipv6/ioam6.c b/net/ipv6/ioam6.c
-index 9553a32000813..08b7ac8c99b7e 100644
---- a/net/ipv6/ioam6.c
-+++ b/net/ipv6/ioam6.c
-@@ -690,6 +690,20 @@ struct ioam6_namespace *ioam6_namespace(struct net *net, __be16 id)
- 	return rhashtable_lookup_fast(&nsdata->namespaces, &id, rht_ns_params);
- }
- 
-+#define IOAM6_MASK_SHORT_FIELDS 0xff1ffc00
-+#define IOAM6_MASK_WIDE_FIELDS  0x00e00000
-+
-+u8 ioam6_trace_compute_nodelen(u32 trace_type)
-+{
-+	u8 nodelen = hweight32(trace_type & IOAM6_MASK_SHORT_FIELDS)
-+				* (sizeof(__be32) / 4);
-+
-+	nodelen += hweight32(trace_type & IOAM6_MASK_WIDE_FIELDS)
-+				* (sizeof(__be64) / 4);
-+
-+	return nodelen;
-+}
-+
- static void __ioam6_fill_trace_data(struct sk_buff *skb,
- 				    struct ioam6_namespace *ns,
- 				    struct ioam6_trace_hdr *trace,
-diff --git a/net/ipv6/ioam6_iptunnel.c b/net/ipv6/ioam6_iptunnel.c
-index 1fe7894f14dd9..b9f6d892a566c 100644
---- a/net/ipv6/ioam6_iptunnel.c
-+++ b/net/ipv6/ioam6_iptunnel.c
-@@ -22,9 +22,6 @@
- #include <net/ip6_route.h>
- #include <net/addrconf.h>
- 
--#define IOAM6_MASK_SHORT_FIELDS 0xff100000
--#define IOAM6_MASK_WIDE_FIELDS 0xe00000
--
- struct ioam6_lwt_encap {
- 	struct ipv6_hopopt_hdr eh;
- 	u8 pad[2];			/* 2-octet padding for 4n-alignment */
-@@ -93,13 +90,8 @@ static bool ioam6_validate_trace_hdr(struct ioam6_trace_hdr *trace)
- 	    trace->type.bit21 | trace->type.bit23)
- 		return false;
- 
--	trace->nodelen = 0;
- 	fields = be32_to_cpu(trace->type_be32);
--
--	trace->nodelen += hweight32(fields & IOAM6_MASK_SHORT_FIELDS)
--				* (sizeof(__be32) / 4);
--	trace->nodelen += hweight32(fields & IOAM6_MASK_WIDE_FIELDS)
--				* (sizeof(__be64) / 4);
-+	trace->nodelen = ioam6_trace_compute_nodelen(fields);
- 
- 	return true;
- }
+ 	fallthrough;
+     case FORE200E_STATE_ALLOC_BUF:
 -- 
 2.51.0
 
