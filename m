@@ -1,199 +1,153 @@
-Return-Path: <netdev+bounces-262356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262330-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UJ9wGKujo2mRIwUAu9opvQ
-	(envelope-from <netdev+bounces-262356-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:25:47 +0100
+	id AD2TDFefo2mZIgUAu9opvQ
+	(envelope-from <netdev+bounces-262330-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:07:19 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B68671CD8A9
-	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:25:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 758841CD036
+	for <lists+netdev@lfdr.de>; Sun, 01 Mar 2026 03:07:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E392A3516D8F
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 02:02:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3C0693373C2D
+	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 01:47:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807172FDC27;
-	Sun,  1 Mar 2026 02:02:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4497F2F360A;
+	Sun,  1 Mar 2026 01:47:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="A4g0gTbk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HOKHyZwq"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.virtuozzo.com (relay.virtuozzo.com [130.117.225.111])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D119C2FE577
-	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 02:02:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.117.225.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21ED52F25F5;
+	Sun,  1 Mar 2026 01:47:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772330562; cv=none; b=OTp6A02jjRmyymYKPu5HDdUnSQCqiOo1PDOmAOSqHyJbOct3z8ZFl8QK63EU9dMxjhl4ktyS5KEQC2IFFvyoNIrJWRd+gEveWhlWwmhbNTSKpCLJFnDL7BM7SzGasQkR4u0d7gt9OnYfDJRLKpZSUIKdIw/k85kNdhurOr0OnAE=
+	t=1772329630; cv=none; b=i/C+ArtNVo7WhJNu+kXA16bzhAleBqVhT+Nbzvb8jkoWO7noZ2K12fLnTgDwEDBmFaH6vg39CmnbLms0Kbm19Rins6KnrUjEt8HaTVYUQVf8354pUmGlHiPwoySJwJEikv44pX0cM4fnvCWZV2Jr/3zQSgyeM3swdcM8nCvVrzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772330562; c=relaxed/simple;
-	bh=Kdg7Xf8W1Cmbmj0cjpTRVWbmr3wrfz0FHa1eGLUS4zQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZrHIHeGxJiTgNaI1m6K+PnCNQCYIPmgbwdTa+068Wccs5OKRyBWuzEsuiwCgZl01wPkTXH+CSlSswypxUbrxoEQRIwZABcTVZQlWynLtos/1cFqUQYVxVVL9mzt9HZiGyInnU/FSXqZBZA3wTiAhz2cMoIxBVGhkvP8QhbGcpp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=A4g0gTbk; arc=none smtp.client-ip=130.117.225.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=virtuozzo.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=virtuozzo.com; s=relay; h=MIME-Version:Message-ID:Date:Subject:From:
-	Content-Type; bh=01eX58DYYoF4zbyQXiM2CCggLRdSBFTsTJlkXC7cPSE=; b=A4g0gTbk5dlo
-	f0nmr/r6zigMNmvllTv5gUilTp+A2zf7veiNjUtKJUATngEfEcY/Rn0khrUcYOCL93j33FVBQEEDq
-	NJTDNIevIEpTTkVzs1Rm52AcixSdC6CPU3HLasew9raoucMipU1YIjZNSvfWCOdqtsx81vEy8V/en
-	MS/pPH3YwknoUJDrbqsUUBdRzr+wMhnyM1EMJ3LJ+pHAuavuBa8gr1zMlyvzTufgHWBrqR7BCIS1t
-	P0Z+WvS3axeK3e9BeAjbtE/uSgcTDPl7SCLgUUy0BENOCxgZvUH+cL7RCUj6c0UEjSQU5Z+dIdlcl
-	qw/K7RGGdYeU35GfQblqhQ==;
-Received: from [130.117.225.5] (helo=dev004.aci.vzint.dev)
-	by relay.virtuozzo.com with esmtps  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <aleksey.oladko@virtuozzo.com>)
-	id 1vwVsS-00CZeA-01;
-	Sun, 01 Mar 2026 02:47:09 +0100
-Received: from dev004.aci.vzint.dev (localhost [127.0.0.1])
-	by dev004.aci.vzint.dev (8.16.1/8.16.1) with ESMTPS id 6211lDgb454254
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Sun, 1 Mar 2026 01:47:13 GMT
-Received: (from root@localhost)
-	by dev004.aci.vzint.dev (8.16.1/8.16.1/Submit) id 6211lB0i454253;
-	Sun, 1 Mar 2026 01:47:11 GMT
-From: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
-To: "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Shuah Khan <shuah@kernel.org>, Petr Machata <petrm@nvidia.com>,
-        Ido Schimmel <idosch@nvidia.com>, Nir Dotan <nird@mellanox.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Aleksei Oladko <aleksey.oladko@virtuozzo.com>
-Subject: [PATCH net] selftests: net: forwarding: fix IPv6 address leak in cleanup
-Date: Sun,  1 Mar 2026 01:47:06 +0000
-Message-ID: <20260301014706.454243-1-aleksey.oladko@virtuozzo.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1772329630; c=relaxed/simple;
+	bh=3SSeFCCfAkqeNnx3CbQeqwJZweZyXC2JCytdjnmDrzs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PzR5LjZ025llCHtg2S2Dk4KQtK0GfV4mjSjmW8g8DG3FrhNR38w75HmUo1YkZnX1+Up8Mx5+0JXgpEDHDHATyk40OYvY7lcXlARGmVsWLkcw/qBr25HmxhMxs6ZUOjTQdH2yT6oziV/UR1+umrmFO1EE4M5PkEAR510/1u5hA4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HOKHyZwq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26784C19421;
+	Sun,  1 Mar 2026 01:47:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772329629;
+	bh=3SSeFCCfAkqeNnx3CbQeqwJZweZyXC2JCytdjnmDrzs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=HOKHyZwqtFKbALDW4K5GqoJ6gPSXhRIOsrWNN2w2MVx+ieLYQU8NxoYrQZiv+7fo8
+	 wof/z+Kpc24lGcHoMQA/C51o98H4WbMARoaPG8Nr5Bc2uPEz9bGp6lS7cXalWMOh3c
+	 pMuHEqScPOxxdBzF9A9Fecz+e7Sd0PF9QJKfGkDl4b8jFdYrAQrV9OxR/dG2Vek6eh
+	 o4nVY3NM8E2DbJJ/THFkl6BGgL3nFdcM7rpyVAyWBl4Azf1kPB/nEbCcxU9bqs4c3+
+	 WVfgFkbqdtOJch2tkzxEqH1xAHkzrKqxoC1H8XgfMVskEX6v/a7tgdOY293Sfq19pB
+	 gFJnV2d9OXsMA==
+From: Sasha Levin <sashal@kernel.org>
+To: stable@vger.kernel.org,
+	enelsonmoore@gmail.com
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: FAILED: Patch "net: ethernet: marvell: skge: remove incorrect conflicting PCI ID" failed to apply to 6.1-stable tree
+Date: Sat, 28 Feb 2026 20:47:07 -0500
+Message-ID: <20260301014708.1710461-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Patchwork-Hint: ignore
+X-stable: review
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[virtuozzo.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[virtuozzo.com:s=relay];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262356-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksey.oladko@virtuozzo.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[virtuozzo.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262330-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: B68671CD8A9
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,msgid.link:url]
+X-Rspamd-Queue-Id: 758841CD036
 X-Rspamd-Action: no action
 
-Several forwarding tests (e.g., gre_multipath.sh) initialize both IPv4
-and IPv6 addresses using simple_if_init, but only clean up IPv4
-in simple_if_fini. This leaves stale IPv6 addresses on the interfaces,
-which causes subsequent tests to fail when they encounter unexpected
-address configuration.
+The patch below does not apply to the 6.1-stable tree.
+If someone wants it applied there, or to any other stable or longterm
+tree, then please email the backport, including the original git commit
+id to <stable@vger.kernel.org>.
 
-The issue can be reproduced by running tests in sequence:
-  # run_kselftest.sh -t net/forwarding:ipip_hier_gre.sh
-  # run_kselftest.sh -t net/forwarding:min_max_mtu.sh
-  TAP version 13
-  1..1
-  # timeout set to 0
-  # selftests: net/forwarding: min_max_mtu.sh
-  # TEST: ping                                                          [ OK ]
-  # TEST: ping6                                                         [ OK ]
-  # TEST: Test maximum MTU configuration                                [ OK ]
-  # TEST: Test traffic, packet size is maximum MTU                      [FAIL]
-  #       Ping6, packet size: 65487 succeeded, but should have failed
-  # TEST: Test minimum MTU configuration                                [ OK ]
-  # TEST: Test traffic, packet size is minimum MTU                      [ OK ]
-  not ok 1 selftests: net/forwarding: min_max_mtu.sh # exit=1
+Thanks,
+Sasha
 
-Fix this by adding the missing IPv6 argument to simple_if_fini in
-all affected tests.
+------------------ original commit in Linus's tree ------------------
 
-Fixes: fed926d4f64c ("selftests: forwarding: Add IP tunneling lib")
-Fixes: 902280cacc03 ("selftests: forwarding: Add resilient multipath tunneling nexthop test")
-Fixes: 54818c4c4b93 ("selftests: forwarding: Test multipath tunneling")
-Fixes: e035146d6560 ("selftests: forwarding: Add multipath tunneling nexthop test")
+From d01103fdcb871fd83fd06ef5803d576507c6a801 Mon Sep 17 00:00:00 2001
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Date: Thu, 5 Feb 2026 23:17:14 -0800
+Subject: [PATCH] net: ethernet: marvell: skge: remove incorrect conflicting
+ PCI ID
 
-Signed-off-by: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
+The ID 1186:4302 is matched by both r8169 and skge. The same device ID
+should not be in more than one driver, because in that case, which
+driver is used is unpredictable. I downloaded the latest drivers for
+all hardware revisions of the D-Link DGE-530T from D-Link's website,
+and the only drivers which contain this ID are Realtek drivers.
+Therefore, remove this device ID from skge.
+
+In the kernel bug report which requested addition of this device ID,
+someone created a patch to add the ID to skge. Then, it was pointed
+out that this device is an "r8169 in disguise", and a patch was created
+to add it to r8169. Somehow, both of these patches got merged. See the
+link below.
+
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=38862
+Fixes: c074304c2bcf ("add pci-id for DGE-530T")
+Cc: stable@vger.kernel.org
+Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Link: https://patch.msgid.link/20260206071724.15268-1-enelsonmoore@gmail.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
- tools/testing/selftests/net/forwarding/gre_multipath.sh        | 2 +-
- tools/testing/selftests/net/forwarding/gre_multipath_nh.sh     | 2 +-
- tools/testing/selftests/net/forwarding/gre_multipath_nh_res.sh | 2 +-
- tools/testing/selftests/net/forwarding/ipip_lib.sh             | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/marvell/skge.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/tools/testing/selftests/net/forwarding/gre_multipath.sh b/tools/testing/selftests/net/forwarding/gre_multipath.sh
-index 57531c1d884d..397422cd5aea 100755
---- a/tools/testing/selftests/net/forwarding/gre_multipath.sh
-+++ b/tools/testing/selftests/net/forwarding/gre_multipath.sh
-@@ -72,7 +72,7 @@ h1_create()
- h1_destroy()
- {
- 	ip route del vrf v$h1 192.0.2.16/28 via 192.0.2.2
--	simple_if_fini $h1 192.0.2.1/28
-+	simple_if_fini $h1 192.0.2.1/28 2001:db8:1::1/64
- }
- 
- sw1_create()
-diff --git a/tools/testing/selftests/net/forwarding/gre_multipath_nh.sh b/tools/testing/selftests/net/forwarding/gre_multipath_nh.sh
-index 7d5b2b9cc133..c667b81da37f 100755
---- a/tools/testing/selftests/net/forwarding/gre_multipath_nh.sh
-+++ b/tools/testing/selftests/net/forwarding/gre_multipath_nh.sh
-@@ -80,7 +80,7 @@ h1_destroy()
- {
- 	ip route del vrf v$h1 2001:db8:2::/64 via 2001:db8:1::2
- 	ip route del vrf v$h1 192.0.2.16/28 via 192.0.2.2
--	simple_if_fini $h1 192.0.2.1/28
-+	simple_if_fini $h1 192.0.2.1/28 2001:db8:1::1/64
- }
- 
- sw1_create()
-diff --git a/tools/testing/selftests/net/forwarding/gre_multipath_nh_res.sh b/tools/testing/selftests/net/forwarding/gre_multipath_nh_res.sh
-index 370f9925302d..d04bad58a96a 100755
---- a/tools/testing/selftests/net/forwarding/gre_multipath_nh_res.sh
-+++ b/tools/testing/selftests/net/forwarding/gre_multipath_nh_res.sh
-@@ -80,7 +80,7 @@ h1_destroy()
- {
- 	ip route del vrf v$h1 2001:db8:2::/64 via 2001:db8:1::2
- 	ip route del vrf v$h1 192.0.2.16/28 via 192.0.2.2
--	simple_if_fini $h1 192.0.2.1/28
-+	simple_if_fini $h1 192.0.2.1/28 2001:db8:1::1/64
- }
- 
- sw1_create()
-diff --git a/tools/testing/selftests/net/forwarding/ipip_lib.sh b/tools/testing/selftests/net/forwarding/ipip_lib.sh
-index 01e62c4ac94d..a5c23a28d50e 100644
---- a/tools/testing/selftests/net/forwarding/ipip_lib.sh
-+++ b/tools/testing/selftests/net/forwarding/ipip_lib.sh
-@@ -151,7 +151,7 @@ h1_create()
- h1_destroy()
- {
- 	ip route del vrf v$h1 192.0.2.16/28 via 192.0.2.2
--	simple_if_fini $h1 192.0.2.1/28
-+	simple_if_fini $h1 192.0.2.1/28 2001:db8:1::1/64
- }
- 
- h2_create()
+diff --git a/drivers/net/ethernet/marvell/skge.c b/drivers/net/ethernet/marvell/skge.c
+index 05349a0b2db1c..cf4e26d337bb5 100644
+--- a/drivers/net/ethernet/marvell/skge.c
++++ b/drivers/net/ethernet/marvell/skge.c
+@@ -78,7 +78,6 @@ static const struct pci_device_id skge_id_table[] = {
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_SYSKONNECT, 0x4320) }, /* SK-98xx V2.0 */
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_DLINK, 0x4b01) },	  /* D-Link DGE-530T (rev.B) */
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_DLINK, 0x4c00) },	  /* D-Link DGE-530T */
+-	{ PCI_DEVICE(PCI_VENDOR_ID_DLINK, 0x4302) },	  /* D-Link DGE-530T Rev C1 */
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_MARVELL, 0x4320) },	  /* Marvell Yukon 88E8001/8003/8010 */
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_MARVELL, 0x5005) },	  /* Belkin */
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_CNET, 0x434E) }, 	  /* CNet PowerG-2000 */
 -- 
-2.43.0
+2.51.0
+
+
+
 
 
