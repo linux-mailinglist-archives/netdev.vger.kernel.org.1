@@ -1,268 +1,206 @@
-Return-Path: <netdev+bounces-262612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262613-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4Cx3CM9upWlXAgYAu9opvQ
-	(envelope-from <netdev+bounces-262612-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 12:04:47 +0100
+	id ILeEMMpvpWlXAgYAu9opvQ
+	(envelope-from <netdev+bounces-262613-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 12:08:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A03E1D728F
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 12:04:46 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA3381D735B
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 12:08:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E3000304A6F8
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 11:03:07 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BB6F83004DB2
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 11:08:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBA8B35F5F5;
-	Mon,  2 Mar 2026 11:03:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE9BF35AC16;
+	Mon,  2 Mar 2026 11:08:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="Z3E8ZKfz"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qxvr5OBz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx-relay107-hz1.antispameurope.com (mx-relay107-hz1.antispameurope.com [94.100.132.98])
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010050.outbound.protection.outlook.com [52.101.193.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6E015539A
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 11:03:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=94.100.132.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4D3355F56
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 11:08:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.50
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772449386; cv=pass; b=GqHtR2CSKpD+MJaMAALEci5ihIs/FmvuIcUpJX9vpG5k+MsVHtw3O3WPjMiWz/BXA590J5hP4lUl7iqsSUm7fUbYf3T/zC9ZX+w1Y02ov65Xu+HHWY5BcbtNeUBiE+HNS3iP9du+BBQcrkona0lbB6YXVDwUdr69aRNhm+A3xzw=
+	t=1772449733; cv=fail; b=WK9i9BeaiMnH/cNMRGeosPJNBkwcOpgg0QHlmGfbY3PPEcqOYqRh5bfMv+yuJC+rB301PGrVBmrdV061LO5zy9rWYp2FGV1ziJT3lxnFkXkIv72iEcfHp3bKB9bpN9J5P4EGZ7sZOnbO7M8ZaL2ecz8H1pjEyny8JJ7zsRRg3hg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772449386; c=relaxed/simple;
-	bh=MxiV6mapVloNChkU3ii/v4Yd/ZIgovMph1qmaLzZ1bo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OWQVfZIZcYqn04bndIuQntQmY7nHYfFeESiUdXOPD8xzfbhV5FZ0jea1OlKLSHyu6qe18BchIUcgrloPPd6rxBw4n04PztrwX2lHwAED6dH7sja8FH3CnfEmyX9YJC8ABaIHcJkGGtxqOwRUNTUiXY9C5OULFHzTwn37HUS24AQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=Z3E8ZKfz; arc=pass smtp.client-ip=94.100.132.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
-ARC-Authentication-Results: i=1; mx-gate107-hz1.hornetsecurity.com 1;
- spf=pass reason=mailfrom (ip=94.100.132.6, headerfrom=ew.tq-group.com)
- smtp.mailfrom=ew.tq-group.com smtp.helo=smtp-out01-hz1.hornetsecurity.com;
- dmarc=pass header.from=ew.tq-group.com orig.disposition=pass
-ARC-Message-Signature: a=rsa-sha256;
- bh=9ZxrUskpYeFswvDKCa4H56tpH9cNXMNrZmlNnULEJ4Q=; c=relaxed/relaxed;
- d=hornetsecurity.com; h=from:to:date:subject:mime-version:; i=1; s=hse1;
- t=1772449332;
- b=hM5/a/9nYafKl5b/aZ2B+ek2RlcBzIXThwuVsP48AdedZeZD5DiCauDr7VxtdUqLhnOz/i83
- ko+SrsCfZmXYfDDW/nCXIjRARrIX0wYs+TW8EBXvjUrzHjl1gxE4WrkSups0zJqf6zLaGWEiADa
- /0SFvIghh+ad9+nh1vfskDkn4oEOpqBmLqnin3AcbNGi6QLnsPzGAwdCFHw779F/vzNVj0YtHiu
- 4WsolpthXaTJrUPlnegj2kG3g2M1VY9d6l3ISuPnEEEOzl6Cai8smdUDfqmx+2j1UlGp8ko+joX
- AI5KiC/kG9vrlVYU8j6pYHCRh1Mqi6evArYutf42eYcAQ==
-ARC-Seal: a=rsa-sha256; cv=none; d=hornetsecurity.com; i=1; s=hse1;
- t=1772449332;
- b=pxRXVlTj8asJVE2BqE8el7zJ6ZFuN/JjInKZw+0vSGae+MdPHnHZcne1wDD//YsQFqvUpApY
- 8pe5ujbCDtgTnuPl5RAu3TW90uRllJLifF2evsS7MJUwHKP/zeuGG+vln47EokMJmydLmMp8Fy3
- uhne/6Ps3Zo7NYSnXJOUnGg5PTDyxqy2x3AhY5tkEtrePVaf+306rD4gEcQbny8CsSoEp7fjZ03
- 2hDcEdj2ZdgOMt9FIi8MAnUgO8YZYvsIeta72LigdRJazr0qConaVIL/5W/uCNra29lnK44Aal2
- 2OYAqK1fkHJQ5JdAzR6SNLwaKh0oeblCodqlUF/tzqnyw==
-Received: from he-nlb01-hz1.hornetsecurity.com ([94.100.132.6]) by mx-relay107-hz1.antispameurope.com;
- Mon, 02 Mar 2026 12:02:12 +0100
-Received: from steina-w.localnet (host-82-135-125-110.customer.m-online.net [82.135.125.110])
-	(Authenticated sender: alexander.stein@ew.tq-group.com)
-	by smtp-out01-hz1.hornetsecurity.com (Postfix) with ESMTPSA id B5E77A416E0;
-	Mon,  2 Mar 2026 12:01:57 +0100 (CET)
-From: Alexander Stein <alexander.stein@ew.tq-group.com>
-To: Claudiu Manoil <claudiu.manoil@nxp.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- Clark Wang <xiaoning.wang@nxp.com>,
- "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
- Wei Fang <wei.fang@nxp.com>
-Cc: Aziz Sellami <aziz.sellami@nxp.com>,
- "imx@lists.linux.dev" <imx@lists.linux.dev>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject:
- Re: [PATCH v3 net-next 1/3] net: enetc: set the external PHY address in IERB
- for port MDIO usage
-Date: Mon, 02 Mar 2026 12:01:57 +0100
-Message-ID: <2256661.irdbgypaU6@steina-w>
-Organization: TQ-Systems GmbH
-In-Reply-To:
- <PAXPR04MB85104CDE52FE824736E44ACB887EA@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References:
- <20251119102557.1041881-1-wei.fang@nxp.com> <5972322.DvuYhMxLoT@steina-w>
- <PAXPR04MB85104CDE52FE824736E44ACB887EA@PAXPR04MB8510.eurprd04.prod.outlook.com>
+	s=arc-20240116; t=1772449733; c=relaxed/simple;
+	bh=uEZRksU1h0TTz3dozw6wOyjg0wt4yyhqlkJgygo/3o0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=JCL8WzAxSnvzKD6UjJnLnXy/gBKUnJtM9WNRvDqvwXrHrcfYgnCN4coh6yzR6CYDBfqCRNbIQdc3HKau/mLiHKv4XHNOt7aUQwEZwJhKd1MoGJoh4pjJSvK+jjTop/qap6Qlld8JenDaSS7cZVSG391tKOHeKE2WjcfbAhYkSzE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qxvr5OBz; arc=fail smtp.client-ip=52.101.193.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qCvdeh93bteu5NqRvVP8w1T7OOy2ckeVhOe1Nhm7CUVJbRT8U0Ko6gPfWxsQK8yI7wNyC+DdwRHnv1U8PeuKccgGE3nHLZZAGjUOsrE6foI88aYmr6eQ1jWB0R5x4BcErE/hZZn+5elMDH2PAY9JfELXEQOrirmT/LUTuIiCoZilR1XI2Sksmqu1XNbGba5Q4/tcc68/vrJuc4ZyPxImE3m2shad2XjwpoahU7WfEZ1aGbF10kpU2zju650LA8aBt7aVD7mPVBDLFtBdaex8pLoZe3svRn8MyzlTFYp9zS5Bhou5bG1JIRcXAQ/vk1dC6nt8mcqG8QFzeQH1c3610Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=klAPqytZy51XvibB410Yfz/MaeqU0MWMb8nw0lVxg+o=;
+ b=opgdL3xHwBePCYgBct5EDFkpW1BvUr8t5ArcnTA76sPbIQeRfXdvFkCc5JcSOYar/Jpg2ysr70mQCWqTMka63wIA7s+Wj8q6Oq1mM4XrRnQj38YDXllJ3gIcccyPq9VpeFrLNHbTy62VHYJRLrcT+oYm/1YfJjde2f/ylzPFh9uEvJ3AjOU6TBYoa0G5sxQ48bL0NMXngqBBC730o9kXrPKMRsh8xDT43xbS4GUI7dplHQ1Gn5L+N1XeESw0pknEEh5doFarM8eVlZ/sAR8XBi3jTsEIPOg6QLD8RRmwopPHc0ZAmFR5X14nL9NyHukjA7npK0aZzVk+0H3VtvyVFw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=klAPqytZy51XvibB410Yfz/MaeqU0MWMb8nw0lVxg+o=;
+ b=qxvr5OBzlMiQge8YWFk+wLURx6F1Exww1nDeZsdIXRmyUAYQNjgygxHWLtYTSL34bleIPTgSjakjEy7GmQ+rN/DJvKdl12bIHGrK+4zxnJF75Hw1mRwkl5UIfil/+Z1Sl35IZKobx9tsdg3JlefkWUQexpbMHh9yjiM1SxzduZi52t1JtYM4KVZvhIGImVLUIcX8gB5VyOLhvn+c0bfj5AFCNU/6XXud6ByJJi4D2EIZEaYWxgA5sFn+rqd2D0Nwzb1M6o+RBASDp1qphsbFt04bbguMEZJvGnRpuYp7nothk/pV63xDmCJR3Oy4NKYxAkl7kkXJx3/mmcLoVVejzg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DS0PR12MB7900.namprd12.prod.outlook.com (2603:10b6:8:14e::10)
+ by MW4PR12MB5666.namprd12.prod.outlook.com (2603:10b6:303:188::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.14; Mon, 2 Mar
+ 2026 11:08:48 +0000
+Received: from DS0PR12MB7900.namprd12.prod.outlook.com
+ ([fe80::3033:67fc:3646:c62f]) by DS0PR12MB7900.namprd12.prod.outlook.com
+ ([fe80::3033:67fc:3646:c62f%5]) with mapi id 15.20.9654.014; Mon, 2 Mar 2026
+ 11:08:48 +0000
+Date: Mon, 2 Mar 2026 13:08:38 +0200
+From: Ido Schimmel <idosch@nvidia.com>
+To: Fernando Fernandez Mancera <fmancera@suse.de>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	bridge@lists.linux.dev, roopa@cumulusnetworks.com, horms@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, davem@davemloft.net,
+	razor@blackwall.org
+Subject: Re: [PATCH net] net: bridge: fix nd_tbl NULL dereference when IPv6
+ is disabled
+Message-ID: <20260302110838.GA875420@shredder>
+References: <20260226234059.19402-1-fmancera@suse.de>
+ <20260228123057.14050980@kernel.org>
+ <a09581fb-a3ad-4c0b-aa60-f16a75779756@suse.de>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a09581fb-a3ad-4c0b-aa60-f16a75779756@suse.de>
+X-ClientProxiedBy: TL2P290CA0014.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:2::17) To DS0PR12MB7900.namprd12.prod.outlook.com
+ (2603:10b6:8:14e::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
-X-cloud-security-sender:alexander.stein@ew.tq-group.com
-X-cloud-security-recipient:netdev@vger.kernel.org
-X-cloud-security-crypt: load encryption module
-X-cloud-security-Mailarchiv: E-Mail archived for: alexander.stein@ew.tq-group.com
-X-cloud-security-Mailarchivtype:outbound
-X-cloud-security-Virusscan:CLEAN
-X-cloud-security-disclaimer: This E-Mail was scanned by E-Mailservice on mx-relay107-hz1.antispameurope.com with 4fPbbp36hWztb6p
-X-cloud-security-connect: he-nlb01-hz1.hornetsecurity.com[94.100.132.6], TLS=1, IP=94.100.132.6
-X-cloud-security-Digest:0b20e9b68fb8ec71c1947e3bd310989b
-X-cloud-security:scantime:1.650
-DKIM-Signature: a=rsa-sha256;
- bh=9ZxrUskpYeFswvDKCa4H56tpH9cNXMNrZmlNnULEJ4Q=; c=relaxed/relaxed;
- d=ew.tq-group.com;
- h=content-type:mime-version:subject:from:to:message-id:date; s=hse1;
- t=1772449332; v=1;
- b=Z3E8ZKfzztVcS7oqV7lKIGogNBirr7M68snj1O76ONX3UOSDhAwUpih8NihV3htGeB212UDJ
- zRH2aFD7gCuNS0vyh6Dk481tz2965P5XoeF8NJhARAGenjQnACCTyRXvnNeU2lOs5qCgFaz/PMg
- EHqfjuin9cLE99hAMPdWjVbMvxBM71X3f9iqZZGscRVrGpDMYRvGBc3rGUHeLRL78IX0GN2Ivvn
- UhXwEXv9o5tWgTJP65vJGPV4QLGvkvHMJno0FXOY7amMcIVaLeEzxfeOWdQ0d3g+VkUTcA8f7L/
- JcC8iaWm1Ooce07ClnGtFSDT4Hu3o0Ukm9RhnUTLV4tJA==
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB7900:EE_|MW4PR12MB5666:EE_
+X-MS-Office365-Filtering-Correlation-Id: 01597252-3263-400e-9ff5-08de784c13ed
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	q2wjj0fwjHMYr8w/vduF08xJk/y5dQYLry6b59LBBF/T8HQr25UZzcO1HJ4hwlu/yj9UEnLFe/a3Oz69q+3ygMvSf93KhBACN/YED2pyZ/Ep574wSPjfKzaM6Onf0os9tXhU9I92lTit1t30uGyvLLdwsMbRiYtnJRcUCNXUi/flimL5Zef3NtEtGxLxo0TV/2Q+WNv02XrqUMGAmNzJzPTWpWWs/v1bTF9suyeWM3v9Q0j/Op4Gq+1V/aOqz4kFGrqY5tdwHvbHS2mVsiwHLCfjkj0IQokDlGGOeRlDvBp0W81wBazcBOwh77EgihsSvhN+i6PyUwP4YWIRxngutNDwV6zhsf8N7kSLPQKYLkoufiXMaav68hQRfnj5njl4mg99eL9z+aNwPnVMGNuIynZhaXM5gTLlsL1+8u1NcJnkKDzceMhZOS7Cs/sFarv2eI0/u76bekL4kwGlIEB8BASB0OprQhyN5O9dg/tAVj0wRDs4ktok3Vs9QeXeihVQH3cOj8wbYCoLiO8EQSpD7mD2XZYg0soJ+TF5nqA9CzOidOBKFb/zbM7BRv6Eaa8KO3dtou47z4+kNL51tmIDQnSd0a+QVBkJHYICm8nfZFfvaXRKSlg7vo6CANZXK0qHWvliggxgND+MKWWU5GCkbjW1DT0h1QyjkdkfxR6PL7F01zY8cyb5A14vjtGGIf81AfI568Tu1PSTirJp+tHaYPn1CzEiGtGC5skidTbEULk=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB7900.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?lXDHYZlH6q7kzlkOTu6relGc13/USnijSzXBwgx6H5UmKUOhGsrYyM6Ih3WV?=
+ =?us-ascii?Q?cF+Vlv1ea4HI+Kl9EYBGUSIU0S4cBErzyTQoMDuP9hTgwMtpxO5PPJ8u7IKj?=
+ =?us-ascii?Q?xE2gO5WJjx7C9WicNDuxeuetZPkyEYIiCGPoBH1G09TQYfJYj4y5ZpHPw30Q?=
+ =?us-ascii?Q?DAYRaPl/SMIMahrMPL+iyJ767J1xQkIUFEt7K1rbBKeMp12dLWtvhpWLskcP?=
+ =?us-ascii?Q?hp7UPSD8rNNgrNzBG8l2IGXYyerpvNw+foEvdsCsq8W9+3oMXpRytXH8TcWY?=
+ =?us-ascii?Q?XkbNSgT30WOpnZHzvlLOgh788G63H3M9Hnw/nRnB6pwwAlWym9XdCnC0fv9p?=
+ =?us-ascii?Q?0m9QqNssPFb17hw0pCytvlqhwEp1+8HWsXS+UxjBxMAp3yIpb3x6veSppmuE?=
+ =?us-ascii?Q?TfaCcqIbcEQaRFZxAOD+INL5MPvFOAmMJ6uZRUaJcWk/DC4zlPSe7rBMXwJt?=
+ =?us-ascii?Q?mmi+9vG34ARReBP1ynpaYJfFir43cvpoEMdxPnwyCGA9fMgqwbs2kx3am9uq?=
+ =?us-ascii?Q?eF+8xEkufdbnvAgNNR08wBlPOTWlz7yB3tq0I7ev8XLDE9S3QO5tEfui2z1O?=
+ =?us-ascii?Q?+vYgGoWOL/kOGQztrjxB/lYq89oE++BsHDW4BZ3hcOvBVTyBgGAQZNujabZE?=
+ =?us-ascii?Q?UYeqO9Gg0DEexCxz7Zf2Wj/sPA7+kmYSLK3DbN0T3bw/ASlslOYB7xv46Bm6?=
+ =?us-ascii?Q?QbmIxA1PMG8qhny/gbMWrw+YJ65LH1ZfMpBsIbJhv+RFpv+yMQS1PBD7qAA9?=
+ =?us-ascii?Q?tGAcLcMiL2IRwOzd6S4ao7j0c3gqhTlSKz72Wswhf2SpskZ0/6YrXmkToacg?=
+ =?us-ascii?Q?BiK/aVozwWA7a/y/KdTTWDZEH/Mrq6e1L9p3V9lwc2FmfMth1/i3uJ1xtcCb?=
+ =?us-ascii?Q?kruu2Sh0RFy137BImGvYyZM7Q43bqOx6r9Vj0BkQVkY8Jc5Msn8Z1KA5aKYa?=
+ =?us-ascii?Q?YdLMW+rsWHqiokfd2ilCDbrxhPlH2N9UzElCeGd8UGvghetrnuxmcYkWd9jd?=
+ =?us-ascii?Q?/C06h7nS4qyJV+dWYP0XzlH5rhzz/9y5JibllZJTE1YaQh7HJgw/quTKrhEc?=
+ =?us-ascii?Q?Ax1BwAY6Zai+2mhyIIRUCyMcWnlaG2Rm5/gvR7jyusauRCLBXszzE0amfq1h?=
+ =?us-ascii?Q?+OrejH/rYqG/emnTwbCg9nobnpyVVDZP1tEYUycE6YolrYaXw5uc2e1PhXP4?=
+ =?us-ascii?Q?IrkQrYTRly0PPolvvi2WLMwWgaotkqAo3E/CTTuCYchAnORv6FV5yufoWnx9?=
+ =?us-ascii?Q?+n79/hiGuvn0Uj5m7DJVrrM4xGos5OGaUWW6gQypIZtLYaBpfxN8qX58zKow?=
+ =?us-ascii?Q?DU8ju58Ewko3P019K+HEfODoV79mmAonUfLnjxNuqRklzoLrCVxz20SP6XqS?=
+ =?us-ascii?Q?qfJb7od6cJWMHhsmKRNrt/egzIzqem4F5Ej+W5ubJk7BtvDwWZes54yo5H/H?=
+ =?us-ascii?Q?noZDSnUG3K8Apsl0iReh0/akR/PLK7jXWKknLNwrLcIFpnsnkD8CzqGxG3Ag?=
+ =?us-ascii?Q?D7aZkkFc6HTj3/f4KSGoW9UseDFXx2W1LPyH64OUQVk2oZq+KwHSQ7jMSCVD?=
+ =?us-ascii?Q?Nlv/mOPJYZx3fHDi7rT6F60vaPmV039SkMNab+hJEFvF2/XjFvAdJqcCJbWd?=
+ =?us-ascii?Q?0ARfBXzd9DxHUNw0UBNwcRQr66scG+j9xLvn2XhiZMLs8AonuseqHAxs0EOO?=
+ =?us-ascii?Q?MhAYGQy7mAZIS+nYsfW56YguLg8RpHL5VXDnaC1kE+gfCg5ET5SdQIWjR/pP?=
+ =?us-ascii?Q?El0kOy/PvQ=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 01597252-3263-400e-9ff5-08de784c13ed
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB7900.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Mar 2026 11:08:48.3789
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ckj9/0njdHgA8kMf90uwSyz6D2zfFKjjB9sb01qbaIub66omX71fzNlpXAAstekLY7ocVaQgqqe6WU69955U8Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5666
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[ew.tq-group.com,reject];
-	R_DKIM_ALLOW(-0.20)[ew.tq-group.com:s=hse1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262612-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262613-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[ew.tq-group.com:+];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alexander.stein@ew.tq-group.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[0.0.0.0:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ew.tq-group.com:dkim,tq-group.com:url]
-X-Rspamd-Queue-Id: 6A03E1D728F
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,Nvidia.com:dkim]
+X-Rspamd-Queue-Id: CA3381D735B
 X-Rspamd-Action: no action
 
-Am Montag, 2. M=E4rz 2026, 10:24:14 CET schrieb Wei Fang:
-> > Am Samstag, 28. Februar 2026, 04:52:01 CET schrieb Wei Fang:
-> > > > > +static int imx95_enetc_mdio_phyaddr_config(struct platform_device
-> > > > > +*pdev) {
-> > > > > +	struct netc_blk_ctrl *priv =3D platform_get_drvdata(pdev);
-> > > > > +	struct device_node *np =3D pdev->dev.of_node;
-> > > > > +	struct device *dev =3D &pdev->dev;
-> > > > > +	int bus_devfn, addr, err;
-> > > > > +	u32 phy_mask =3D 0;
-> > > > > +
-> > > > > +	err =3D netc_get_emdio_phy_mask(np, &phy_mask);
-> > > > > +	if (err) {
-> > > > > +		dev_err(dev, "Failed to get PHY address mask\n");
-> > > > > +		return err;
-> > > > > +	}
-> > > > > +
-> > > > > +	/* Update the port EMDIO PHY address through parsing phy
-> > properties.
-> > > > > +	 * This is needed when using the port EMDIO but it's harmless w=
-hen
-> > > > > +	 * using the central EMDIO. So apply it on all cases.
-> > > > > +	 */
-> > > > > +	for_each_child_of_node_scoped(np, child) {
-> > > > > +		for_each_child_of_node_scoped(child, gchild) {
-> > > > > +			if (!of_device_is_compatible(gchild, "pci1131,e101"))
-> > > > > +				continue;
-> > > > > +
-> > > > > +			bus_devfn =3D netc_of_pci_get_bus_devfn(gchild);
-> > > > > +			if (bus_devfn < 0) {
-> > > > > +				dev_err(dev, "Failed to get BDF number\n");
-> > > > > +				return bus_devfn;
-> > > > > +			}
-> > > > > +
-> > > > > +			addr =3D netc_get_phy_addr(gchild);
-> > > > > +			if (addr < 0) {
-> > > > > +				dev_err(dev, "Failed to get PHY address\n");
-> > > > > +				return addr;
-> > > > > +			}
-> > > > > +
-> > > > > +			if (phy_mask & BIT(addr)) {
-> > > >
-> > > > ... which will break here if there is an Ethernet PHY using address=
- 0 in
-> > > > 'netc_emdio' node.
-> > > > See arch/arm64/boot/dts/freescale/imx95-tqma9596sa.dtsi node
-> > > > ethernet-phy@0.
-> > >
-> > > AFAIU, the PHY address 0 is a special address, below is the descripti=
-on of
-> > > PHYAD from IEEE 802.3 Clause 22.
-> > >
-> > > A PHY that is connected to the station management entity via the
-> > > mechanical interface defined in 22.6 shall always respond to transact=
-ions
-> > > addressed to PHY Address zero <00000>. A station management entity
-> > > that is attached to multiple PHYs must have prior knowledge of the
-> > > appropriate PHY Address for each PHY.
-> > >
-> > > Therefore, for most PHYs, PHY address 0 is typically used as the broa=
-dcast
-> > > address or default response address. In designs that control multiple=
- PHYs
-> > > via EMDIO, it is recommended to avoid setting a specific PHY to addre=
-ss 0
-> > > to prevent bus conflicts.
-> >=20
-> > I know about this special meaning, but there are hardware design which =
-do not
-> > take this into account.
->=20
-> This might cause potential issues, as all PHYs attached to the same MDIO =
-bus will
-> respond to the accesses to PHY address 0.
+On Sun, Mar 01, 2026 at 07:27:56PM +0100, Fernando Fernandez Mancera wrote:
+> On 2/28/26 9:30 PM, Jakub Kicinski wrote:
+> > On Fri, 27 Feb 2026 00:40:59 +0100 Fernando Fernandez Mancera wrote:
+> > > Fix this by adding a check before br_is_local_ip6() or neigh_lookup()
+> > > call. If ipv6_stub->nd_tbl is NULL, return immediately.
+> > 
+> > The problem should probably be fixed by replacing IS_ENABLED(IPV6) in
+> > the callers with ipv6_mod_enabled(), rather than randomly sprinkling
+> > null checks?
+> > 
+> 
+> I agree about using ipv6__mod_enabled() instead of the NULL check. Thanks
+> for that recommendation, although I do not agree with replacing
+> IS_ENABLED(IPV6) because here there is some ND message suppression that can
+> be applied and at the end bridge should not be look to L3 unless necessary.
+> 
+> E.g NUD is still being suppressed even if ipv6 is disabled on boot.
+> 
+> What do you think? Thanks.
 
-Is that really the case? So far we didn't have any problems with
-PHYAD 0 and 3 on the same bus. I did a bit of research but couldn't find any
-information backing that PHYAD 0 is actually a broadcast address. All I cou=
-ld
-find is the case with just a single PHY on a MDIO bus, defaulting to 0.
+I agree with Jakub and I believe it makes sense to not do any NS/NA
+suppression when IPv6 is disabled. You are right that some messages can
+be suppressed when IPv6 is disabled, but:
 
-> Is this problem unfixable?
+1. We are planning to send a patch to prevent the unconditional
+suppression of ARP probes (DAD NS). Pending testing.
 
-Right now our problem is that the software doesn't work any more.
+2. There are some cases where GARP (unsolicited NA) should not be
+suppressed (see RFC 9161) and we plan to add a knob to control that.
 
-> >=20
-> > > If the PHY on your board does not use PHY address 0 as the broadcast =
-address
-> > > or the default response address, then we should check the PHY address=
- first
-> > and
-> > > then check the phy_mask in imx95_enetc_mdio_phyaddr_config(), just the
-> > same
-> > > as imx94_enetc_mdio_phyaddr_config().
-> >=20
-> > I'm not sure if this is the right fix. What about the case where phy_ma=
-sk is
-> > supposed to be 0, because there are no PHY subnodes of netc_emdio. Inst=
-ead
-> > the PHY with address is a subnode of the enet_portX is supposed to have
-> > netc_get_phy_addr() return 0 because that's the actual address. But with
-> > the current flow from imx94_enetc_mdio_phyaddr_config() and your sugges=
-tion
-> > for i.MX95 case we erroneously skip that node.
-> >=20
->=20
-> The hardware default value is 0, so no need to configure it. I can send a
-> fix patch this week.
+3. It's unlikely that anyone is actually relying on this behavior.
+Blamed commit is from 2017 and we only got a report now.
 
-Okay, thanks.
-
-Best regards,
-Alexander
-=2D-=20
-TQ-Systems GmbH | M=FChlstra=DFe 2, Gut Delling | 82229 Seefeld, Germany
-Amtsgericht M=FCnchen, HRB 105018
-Gesch=E4ftsf=FChrer: Detlef Schneider, R=FCdiger Stahl, Stefan Schneider
-http://www.tq-group.com/
-
-
+4. Suppression that can be done without the IPv6 module being loaded can
+probably be achieved using stateless egress filters.
 
