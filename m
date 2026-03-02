@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-262687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262688-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kF2PGaKopWmpDgAAu9opvQ
-	(envelope-from <netdev+bounces-262687-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:11:30 +0100
+	id 0PPXIryopWmpDgAAu9opvQ
+	(envelope-from <netdev+bounces-262688-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:11:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C65A91DB873
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:11:29 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 839BA1DB89D
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:11:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6A422307A098
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 15:05:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 897BC300B50E
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 15:05:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95D2B407573;
-	Mon,  2 Mar 2026 15:05:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35B6E40B6ED;
+	Mon,  2 Mar 2026 15:05:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aTpBTrrN"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LtiQJZDB"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D59AE280035;
-	Mon,  2 Mar 2026 15:05:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FA0C3FD15D
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 15:05:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772463905; cv=none; b=L0/y7pkLTELH1EgwoNWEsEL97kphr8Zbf9fewXUUoRm1NVLrTXZl/BL1jcyx5M9mC2dwAiiKlwPlwhed18C6jQePkeNaOmVVnbNzPVSiy0e2znQrnbaKJVlCJgVb9ngRdz4HD31RAEta9HcsiinTxrqKHZ1occl8UNZM2zdjmBI=
+	t=1772463906; cv=none; b=DJJoWBZ/qiWuXYg8MvmEyL746s/eOAhhKOzrrr1oVMTD0sVZ9J9m2s1AkfGj1vbI4VeTGfUcvLH3L37BpKgyyC99op6G3MiqQ5xq93jjedGOgv2vrXAglipqZ2z24v/W187Uvrpc1Mn7TzPwlI+pCKubLaPJihb7dmjcYyMf3x0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772463905; c=relaxed/simple;
-	bh=0L0CZRR5yaZjUnkGUuTJtr8n6o/HzHfEIlbHobJvreM=;
+	s=arc-20240116; t=1772463906; c=relaxed/simple;
+	bh=g8iFQt8PutO9ez9QZhPdi2ZlJazN1/pZxoozXBn3C6Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jyohTtJf9vw8S4Zgxxa3lVZEPA+3F2gFsBmpYWhTRFxdJJnYA5uxvkHzZOpJ3Il+Y6diBgPGoP0GZdug5PWJUnAdueBjJT+3CYTHSSw/Ss17JUv7gwTVXzzwRCl8ubt6ngiOklTnpL+Wx7dM3bcFn5e6IzRk3ITSz2gtRFWHCAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aTpBTrrN; arc=none smtp.client-ip=91.218.175.185
+	 MIME-Version; b=baoWRvYuVdbz8UtfwITHZtIHdv0GcoC90jKN9/sUIdOQ8YjInuKCDgkkuJ4gFw28rsk8cQuB5kB0UxH92Q7PHmrBGc0Fx4aI2WdCKFObDh1ffoL9j8lRQtsFYNDHlYLRaNG7UCR2jBNQHYbDBFDLFIlpdsTsGEmlNaoNz9DObUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LtiQJZDB; arc=none smtp.client-ip=91.218.175.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772463891;
+	t=1772463901;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Q3gwaQ0eVXEyMgQ4Qe+myf5VQ4j4Q5VbSSpgZqEgTR8=;
-	b=aTpBTrrNFjTaFvIbBzdOLCJWm6Dx9XTMAfWNbsOmKnTKVEkf2xBX3Vf1mIuAHdsPxAl8Zv
-	wOkTDmTIXlqLiSbTlY2t4kzZxd+bkMprc/oiYGOYktdFhhSVFWT/LSenbCx+31zltiXXYw
-	enIf99xJopvWMF+8keEzmPhiF2vCkME=
+	bh=P+PWWkwazjgxzegEXu2v7YMpb7U2FHOXq8Nh1mdAOFE=;
+	b=LtiQJZDBVu1SJwdRRouZ70fq6wxNk92yLmHsbbZ+531nmHWqAS5Vuy9FtkOVQq/fEJPjt/
+	GvdbEkqNLGv0ovEBqlw88Tu+fPMfKPVIqxoGA4h3/LjH9oIJsxylPoQpvVV/rueIIauCIe
+	lilecwkNCo6/TixA2a9GJJoCvK9HMVs=
 From: Leon Hwang <leon.hwang@linux.dev>
 To: bpf@vger.kernel.org
 Cc: Alexei Starovoitov <ast@kernel.org>,
@@ -70,9 +70,9 @@ Cc: Alexei Starovoitov <ast@kernel.org>,
 	linux-kselftest@vger.kernel.org,
 	netdev@vger.kernel.org,
 	kernel-patches-bot@fb.com
-Subject: [PATCH bpf-next v2 3/6] bpf: Disallow !kprobe_write_ctx progs tail-calling kprobe_write_ctx progs
-Date: Mon,  2 Mar 2026 23:03:39 +0800
-Message-ID: <20260302150342.55709-4-leon.hwang@linux.dev>
+Subject: [PATCH bpf-next v2 4/6] bpf: Disallow !call_get_func_ip progs tail-calling call_get_func_ip progs
+Date: Mon,  2 Mar 2026 23:03:40 +0800
+Message-ID: <20260302150342.55709-5-leon.hwang@linux.dev>
 In-Reply-To: <20260302150342.55709-1-leon.hwang@linux.dev>
 References: <20260302150342.55709-1-leon.hwang@linux.dev>
 Precedence: bulk
@@ -83,7 +83,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: C65A91DB873
+X-Rspamd-Queue-Id: 839BA1DB89D
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -91,12 +91,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262687-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262688-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -111,21 +111,21 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,linux.dev:dkim,linux.dev:email,linux.dev:mid]
 X-Rspamd-Action: no action
 
-Uprobe programs that modify regs require different runtime assumptions
-than those that do not. Mixing !kprobe_write_ctx progs with
-kprobe_write_ctx progs via tail calls could break these assumptions.
+Trampoline-based tracing programs that call bpf_get_func_ip() rely on
+the func IP stored on the stack. Mixing !call_get_func_ip progs with
+call_get_func_ip progs via tail calls could break this assumption.
 
-To address this, reject the combination of !kprobe_write_ctx progs with
-kprobe_write_ctx progs in bpf_map_owner_matches(), which prevents the
-tail callee from modifying regs unexpectedly.
+To address this, reject the combination of !call_get_func_ip progs with
+call_get_func_ip progs in bpf_map_owner_matches(), which prevents the
+tail callee from getting a bogus func IP.
 
-Also reject kprobe_write_ctx mismatches during initialization to
+Also reject call_get_func_ip mismatches during initialization to
 prevent bypassing the above restriction.
 
 Without this check, the above restriction can be bypassed as follows.
@@ -133,145 +133,86 @@ Without this check, the above restriction can be bypassed as follows.
 struct {
 	__uint(type, BPF_MAP_TYPE_PROG_ARRAY);
 	__uint(max_entries, 1);
-	__uint(key_size, 4);
-	__uint(value_size, 4);
+	__uint(key_size, sizeof(__u32));
+	__uint(value_size, sizeof(__u32));
 } jmp_table SEC(".maps");
 
-SEC("?kprobe")
-int prog_a(struct pt_regs *regs)
+SEC("?fentry")
+int BPF_PROG(prog_a)
 {
-	regs->ax = 0;
-	bpf_tail_call_static(regs, &jmp_table, 0);
+	bpf_printk("FUNC IP: 0x%llx\n", bpf_get_func_ip());
+	bpf_tail_call_static(ctx, &jmp_table, 0);
 	return 0;
 }
 
-SEC("?kprobe")
-int prog_b(struct pt_regs *regs)
+SEC("?fentry")
+int BPF_PROG(prog_b)
 {
-	bpf_tail_call_static(regs, &jmp_table, 0);
+	bpf_tail_call_static(ctx, &jmp_table, 0);
 	return 0;
 }
 
 The jmp_table is shared between prog_a and prog_b.
 
-* Load prog_a.
-  At this point, owner->kprobe_write_ctx=true.
-* Load prog_b.
+* Load prog_a first.
+  At this point, owner->call_get_func_ip=true.
+* Load prog_b next.
   At this point, prog_b passes the compatibility check.
 * Add prog_a to jmp_table.
 * Attach prog_b to a kernel function.
 
-When the kernel function runs, prog_a will unexpectedly modify regs.
+When the kernel function runs, prog_a will get a bogus func IP because
+no func IP is prepared on the trampoline stack.
 
-Fixes: 7384893d970e ("bpf: Allow uprobe program to change context registers")
+Fixes: 1e37392cccde ("bpf: Enable BPF_TRAMP_F_IP_ARG for trampolines with call_get_func_ip")
 Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
 ---
- include/linux/bpf.h |  7 ++++---
- kernel/bpf/core.c   | 30 +++++++++++++++++++++++++-----
- 2 files changed, 29 insertions(+), 8 deletions(-)
+ include/linux/bpf.h | 1 +
+ kernel/bpf/core.c   | 7 +++++++
+ 2 files changed, 8 insertions(+)
 
 diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-index 05b34a6355b0..dbafed52b2ba 100644
+index dbafed52b2ba..fb978650b169 100644
 --- a/include/linux/bpf.h
 +++ b/include/linux/bpf.h
-@@ -285,9 +285,10 @@ struct bpf_list_node_kern {
-  */
- struct bpf_map_owner {
- 	enum bpf_prog_type type;
--	bool jited;
--	bool xdp_has_frags;
--	bool sleepable;
-+	u32 jited:1;
-+	u32 xdp_has_frags:1;
-+	u32 sleepable:1;
-+	u32 kprobe_write_ctx:1;
+@@ -289,6 +289,7 @@ struct bpf_map_owner {
+ 	u32 xdp_has_frags:1;
+ 	u32 sleepable:1;
+ 	u32 kprobe_write_ctx:1;
++	u32 call_get_func_ip:1;
  	u64 storage_cookie[MAX_BPF_CGROUP_STORAGE_TYPE];
  	const struct btf_type *attach_func_proto;
  	enum bpf_attach_type expected_attach_type;
 diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
-index b24a613d99f2..121a697d4da5 100644
+index 121a697d4da5..1b88878fe5c5 100644
 --- a/kernel/bpf/core.c
 +++ b/kernel/bpf/core.c
-@@ -2390,6 +2390,7 @@ static void bpf_map_owner_init(struct bpf_map_owner *owner, const struct bpf_pro
- 	owner->jited = fp->jited;
+@@ -2391,6 +2391,7 @@ static void bpf_map_owner_init(struct bpf_map_owner *owner, const struct bpf_pro
  	owner->xdp_has_frags = aux->xdp_has_frags;
  	owner->sleepable = fp->sleepable;
-+	owner->kprobe_write_ctx = aux->kprobe_write_ctx;
+ 	owner->kprobe_write_ctx = aux->kprobe_write_ctx;
++	owner->call_get_func_ip = fp->call_get_func_ip;
  	owner->expected_attach_type = fp->expected_attach_type;
  	owner->attach_func_proto = aux->attach_func_proto;
  	for_each_cgroup_storage_type(i)
-@@ -2397,8 +2398,14 @@ static void bpf_map_owner_init(struct bpf_map_owner *owner, const struct bpf_pro
- 			aux->cgroup_storage[i]->cookie : 0;
- }
- 
-+enum bpf_map_owner_match_type {
-+	BPF_MAP_OWNER_MATCH_FOR_INIT,
-+	BPF_MAP_OWNER_MATCH_FOR_UPDATE,
-+};
-+
- static bool bpf_map_owner_matches(const struct bpf_map *map, const struct bpf_prog *fp,
--				  enum bpf_prog_type prog_type)
-+				  enum bpf_prog_type prog_type,
-+				  enum bpf_map_owner_match_type match)
- {
- 	struct bpf_map_owner *owner = map->owner;
- 	struct bpf_prog_aux *aux = fp->aux;
-@@ -2411,6 +2418,18 @@ static bool bpf_map_owner_matches(const struct bpf_map *map, const struct bpf_pr
- 	    owner->sleepable != fp->sleepable)
- 		return false;
- 
-+	switch (match) {
-+	case BPF_MAP_OWNER_MATCH_FOR_INIT:
-+		if (owner->kprobe_write_ctx != aux->kprobe_write_ctx)
+@@ -2422,11 +2423,17 @@ static bool bpf_map_owner_matches(const struct bpf_map *map, const struct bpf_pr
+ 	case BPF_MAP_OWNER_MATCH_FOR_INIT:
+ 		if (owner->kprobe_write_ctx != aux->kprobe_write_ctx)
+ 			return false;
++		if (owner->call_get_func_ip != fp->call_get_func_ip)
 +			return false;
-+		break;
-+
-+	case BPF_MAP_OWNER_MATCH_FOR_UPDATE:
-+		if (!owner->kprobe_write_ctx && aux->kprobe_write_ctx)
-+			return false;
-+		break;
-+	}
-+
- 	if (map->map_type == BPF_MAP_TYPE_PROG_ARRAY &&
- 	    owner->expected_attach_type != fp->expected_attach_type)
- 		return false;
-@@ -2436,7 +2455,8 @@ static bool bpf_map_owner_matches(const struct bpf_map *map, const struct bpf_pr
- }
+ 		break;
  
- static bool __bpf_prog_map_compatible(struct bpf_map *map,
--				      const struct bpf_prog *fp)
-+				      const struct bpf_prog *fp,
-+				      enum bpf_map_owner_match_type match)
- {
- 	enum bpf_prog_type prog_type = resolve_prog_type(fp);
- 	bool ret = false;
-@@ -2453,7 +2473,7 @@ static bool __bpf_prog_map_compatible(struct bpf_map *map,
- 		bpf_map_owner_init(map->owner, fp, prog_type);
- 		ret = true;
- 	} else {
--		ret = bpf_map_owner_matches(map, fp, prog_type);
-+		ret = bpf_map_owner_matches(map, fp, prog_type, match);
+ 	case BPF_MAP_OWNER_MATCH_FOR_UPDATE:
+ 		if (!owner->kprobe_write_ctx && aux->kprobe_write_ctx)
+ 			return false;
++		if (bpf_prog_has_trampoline(fp)) {
++			if (!owner->call_get_func_ip && fp->call_get_func_ip)
++				return false;
++		}
+ 		break;
  	}
- err:
- 	spin_unlock(&map->owner_lock);
-@@ -2470,7 +2490,7 @@ bool bpf_prog_map_compatible(struct bpf_map *map, const struct bpf_prog *fp)
- 	if (bpf_prog_is_dev_bound(fp->aux))
- 		return false;
  
--	return __bpf_prog_map_compatible(map, fp);
-+	return __bpf_prog_map_compatible(map, fp, BPF_MAP_OWNER_MATCH_FOR_UPDATE);
- }
- 
- static int bpf_check_tail_call(const struct bpf_prog *fp)
-@@ -2485,7 +2505,7 @@ static int bpf_check_tail_call(const struct bpf_prog *fp)
- 		if (!map_type_contains_progs(map))
- 			continue;
- 
--		if (!__bpf_prog_map_compatible(map, fp)) {
-+		if (!__bpf_prog_map_compatible(map, fp, BPF_MAP_OWNER_MATCH_FOR_INIT)) {
- 			ret = -EINVAL;
- 			goto out;
- 		}
 -- 
 2.52.0
 
