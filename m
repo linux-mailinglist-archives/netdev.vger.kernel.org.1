@@ -1,117 +1,116 @@
-Return-Path: <netdev+bounces-262519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262520-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IJYuID8opWla4wUAu9opvQ
-	(envelope-from <netdev+bounces-262519-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 07:03:43 +0100
+	id RLizNjwqpWnY4wUAu9opvQ
+	(envelope-from <netdev+bounces-262520-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 07:12:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE5E51D35BC
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 07:03:42 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 269121D360F
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 07:12:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1128A301DECE
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 06:03:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 715C5300E273
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 06:12:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C35D63806BB;
-	Mon,  2 Mar 2026 06:03:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ACCA33344A;
+	Mon,  2 Mar 2026 06:12:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fV852mfP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sjNsJ10l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB35377022
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 06:03:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 676CB37B417
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 06:12:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.181
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772431397; cv=pass; b=qMMpHGaMa4zRlj9MngF4CfK+ZTZbnjhlitW4so+RaByP59lwAMlqzJO3yCXfiEo+5z9G7ukJnKKmmTJKfmTDkYFeu7peDuuBeqGEShGEf/KZSzWDz8zUhlKHy07bZPgxKFpSXDFtc206UBzQTzoo9WlhAh+jP020zjOLQgeQlYo=
+	t=1772431928; cv=pass; b=LvVKT3HUFX/UaSWtYgNOG2sL4WWwsFeBbbR9Z/6LWt/dGImlwap3M1Yxpj9fal0Q1xKxzCzcXRtMO9BCSU8qHuaYv9gkYkYZui1ZtHNO7/4cbBCK8/y1kgP4XjLDSjShsuxQxGvN5LAjZr1PSg37NwoIT1jcSVe8v8hK7n1ontI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772431397; c=relaxed/simple;
-	bh=VoL9+Q5vKBh/stH6CbzLSnBWXCrGTyp5hmi39PUL9ZM=;
+	s=arc-20240116; t=1772431928; c=relaxed/simple;
+	bh=UZhBqkq7sme1gXCpbJjFrKz8FxqcGe2wY6C+t/7f/v8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fOoOdv3vR7h2XySg+ewE0/xLK4MRtGRrigeIYKtLt7h775dlpl1ogAIMtNkDjDzM98phYCFTrNIWKAiOqu6r8yQYPP/4GRBEGR9a/AAI/qEwCfzSBPks06k2OGVGN7N0H/Zkqu0y0BQp+1Vkk1tA77likM+BqQeNGVLc0oDPRLM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fV852mfP; arc=pass smtp.client-ip=209.85.160.176
+	 To:Cc:Content-Type; b=lq7n3ISrP1axlUvl24ttWOTValJnxMrIoilOxfzb0n87MZHo9MPZcw1dQleK/N+gvgzRwJDKSZpaaAznUvDRtXuBVptFActbGtZONngWa/fscXcKSBgFG3yCBgxJGi288JHV6hbMqV78k3QXa7hss7H4FbZjtANKzz+1pBZRLu0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sjNsJ10l; arc=pass smtp.client-ip=209.85.222.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-50336cffef9so36701131cf.0
-        for <netdev@vger.kernel.org>; Sun, 01 Mar 2026 22:03:08 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772431388; cv=none;
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-8c6f21c2d81so397186885a.2
+        for <netdev@vger.kernel.org>; Sun, 01 Mar 2026 22:12:04 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772431923; cv=none;
         d=google.com; s=arc-20240605;
-        b=cGT/857nShqjcPc6Wf0GIL0X2BA7QmM3D3TQDGEoZT7FACvaf+fh0gM9Vd40AUeGXR
-         Fayr3ElBMJTJlr6birHwBRz8rN7jND09+aHyrz0ywkjQlt1cIhbItNJNL6CEfzNt6aE6
-         2MJM9yJq9y9jvecjAcQgphncQAIOvyKihdljyR7gCiLF6oWzftBuR+nLya67ES+XYPaZ
-         VEdfAakToei8aXbDvLia+7X8Q/fpPMLvFm5djroNxjwkno+KYQqlsFGZmbDDYVMLTCSu
-         6vXzC7IeTE2V4TmayKJf2+G2fLv8O2jsR0gMtgh6Blj6hobg4ZHfqyEfzXNKYnpHjZem
-         UXbw==
+        b=Vad1cpH2lRHSf9EvVKLTu1qtepoZ3DWYPxMbR+I7viETsRPI6ayZGg2HD+J10gCYoN
+         4cyCZhdl5KKdMhbF7GxkXdUYLF9mt36zkJW2g63VWsGv4vM64PHA3Ics4wKEBDUi8Nc8
+         Kyx4wSXvU0nmH+IptFZoOM1LLhfZ1Ol6RAqh7wCV2LzjeDTCroIChg5bOOhrmN1pgGO3
+         9xjmcP/W0lvZ2Qcx8fyuGzk+SQfCpMIfXOJNBDA0PwMzc+Gqqojork4VGOHhCgQ0KIm0
+         XGIfjDZpHtRqDCEwLlqql7koAL/+MMoSWA2BFC/rIkrXbkw9WuT+odcbaojG35kiUEQr
+         lkbQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=UjR2Jso0hAuDoeUEgb8RQHlOodoa5Tiq2cd7ca0LZWk=;
-        fh=byS6zz0kO2UXjcJjvt6Y70eBR/P6748xxnRHf04cpfA=;
-        b=d2rZyJWX7erVzUHu2yaieBNL8A/4CmdfoqtN3ZP+86LDaK2fR+JHgCDxMT0I4H3oq8
-         BcjCNG6h/0SBStm5Ln7XzW9X4fvXLvK7F/F2o5SPiBQhPGxeeTT3N3uMbtd94RvpDiHU
-         /49f+QA0c37RsO1B+8Vcju8Rq1CsAFUjx+RdVCqbKTHM6vwarL3ueEHBVnDMolD08Uq2
-         RD4Nc+0eYt0dY+j2/Uk2JFa07DbeQ14aRAo0HhMaYPOQt8k1BD6io4NWg0WgeSQ1fYfm
-         M2aPwsdaAGFu0vvScybXnZSWNYAMF+nDaUPJfJNyD0qeqGYv7hWciyedmRmCktrKorm8
-         DOzQ==;
+        bh=Ski89AnwaWBeS16R9OsWU00+Wyrl3eVXwV/RiRDK3rk=;
+        fh=3Y5GW5XVtJEB0gP7NdIhLgWVGKOFzNBWGKDtaVg6rHE=;
+        b=I2wdEyDbuI0vkOb9wo+RrxEDzoOrAx3l4cvdcJhiSMwIad1c9mZ/6Y/q1kF7CJZIoi
+         P/3d14TxT25+oRgd1HatWF4p+Rz4g9dtejTtlbgVaJHhAblqNgRAjqN14DZyzHtZ8OI8
+         YlA3FGGTgCboN/k19uYL8gEK1ix5edUt4qE/u/+aWkgjadYaALxzSOUpiSj88P6LZOmh
+         sr9J5KpU45BAi2E0D1ydi/ZutnWwlAeJXFVQbh6M/G1gpn99V11Ww9B0cfiCeHZMZ5xa
+         xLitd2RTzDNvHhT/h/IDq83DuBk6RcxqDj6CD6fr61F9zNlZkbZkUtc4GWhAoK5OHs3Z
+         P9QQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772431388; x=1773036188; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772431923; x=1773036723; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UjR2Jso0hAuDoeUEgb8RQHlOodoa5Tiq2cd7ca0LZWk=;
-        b=fV852mfPlO1kd0tk8vuAlyOMCw3RgCcI90Ok33kFctyvy6yMj71hc/397JQ82Nx47r
-         2CIksUAU71apTmyT2XrlGQ+S8XZN/WzAeCIoIf57K3PFap5iMFt+kmhE5AT1CIPefSOo
-         u//W0d3sT3MIJNkZXFvJigPi4T6DoPqDLk/qluIfRSiaD3JR9XTQuH8g1bgMNOZObEDf
-         xIRHnHgSupvAfansKxiAPVDSZnpG08YVrwcbjVhs3ftgeDYiDBFxn/qrX/F1W8pMuHup
-         TM5Ea+de1N/pt5o1D56yUBovTBKRsq7YiE2Xt30W541KCCCtiGCeYBcuu3lo8Q8zJI3I
-         mhxw==
+        bh=Ski89AnwaWBeS16R9OsWU00+Wyrl3eVXwV/RiRDK3rk=;
+        b=sjNsJ10lnKTQWzXEoGmoFE1wA6nt3Mg7B495lT+3YZm3sxwnvtjqA65T8a76b+ltEb
+         wO3GJf/1k85dHhp0u7esIxRAswMUIqeUws6ehD5n3fwSC08q4D0Z+XPy3aRMZ3RB/7nR
+         30PPlDaZ4xdRE5cXNbCYIrzwCfeGyHRhyoYYLsy+FiwV1Y8Sn9pSn0cE1x/vh6Txar7R
+         xN3qvqYaQTIJKZKJKiPHZIJxKjk9O5MwFN3yIoQcouQkOJhMl5LHgdqiFt4wHWGXxbva
+         US6OPkHJiii6wDWPSiT/obCbjd7zg0jwW0JIsIP/kJEYgDcRBickww8eQoNYcnTQnBVf
+         +XAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772431388; x=1773036188;
+        d=1e100.net; s=20230601; t=1772431923; x=1773036723;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=UjR2Jso0hAuDoeUEgb8RQHlOodoa5Tiq2cd7ca0LZWk=;
-        b=tEu3utbQ5zi9RFWbtT1+jVy2r4Cq9w39BEeCY6t37LTA1Xb0aovBO87FMHlz7XIhd7
-         n4O5IClpoRO4xFTuSbyCcm46t2qheP7Dsp1xo+s9hJ6EnFxFKWmxSMLiCC436ZDZFx5V
-         46+1Obei7o7DrciSkXepiMQGELvS4zPiVf58zN1/QXka7aJcWCS7WKaPbfqdMgf9orvO
-         IdZULJqKnKQe5DAbjHR0l6HI99dxYvlF6ATkp/w1vIDc+wD9kPVlZEteScNbajhqEWoo
-         bdU+ugLxQ72qmdb3KbPEGBA3z6xSkXfDgSajcqAQsJp4vrJRYKtojJTx8fXKt9HWJb8b
-         uceA==
-X-Forwarded-Encrypted: i=1; AJvYcCUwbw2l2fpWQjk3InlqToJIehMpnZwm81MOQj2bBiDPEBOp19nlexYFkVHBqrjO7MiENLOwFd4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGf9ySa88qXuca1bBIWHT48msvmQ3U0140EYUwAa9d877AsH5X
-	Bl+QT2Zz+jKuH+9LStwOiO2e8aw0K+mQY/rj6d25AyLo3thulRbEGGc7TLeHBxAAi6mXBETLDuX
-	EUcqFoM/BD8oKQV6DhAhqm7YCmAUes6kVwEXjHWTb
-X-Gm-Gg: ATEYQzzeuPMUtErXs/hPnDO4zxOwJ0j6FBsoZK4izf6KUpKF3MFlj+1xvMYA+bYSYMb
-	UHd158X/bJnNWplNM1eeeGIgR/2M/qYw8V2pelQoGM8ojkEyA4bG0LwBgIeDNTUE20CkvIefeDj
-	RLyzulC9BxFfYx3kgt+rWuBhcZZMYCJHqYHS2jE1g1X90uPum3mVQ7i3pWekMcgyrzpnOHIBp4K
-	CS8x6vIj0UdksLjomZdzLVrmhQAJh+FZlEcK8YOxUhf1VpQdppEu4WmpFGOzASJ4asmw/dZPes9
-	Ih8ww5I=
-X-Received: by 2002:a05:622a:5ca:b0:4ee:bac:e3a9 with SMTP id
- d75a77b69052e-50752a0a185mr159644611cf.68.1772431387431; Sun, 01 Mar 2026
- 22:03:07 -0800 (PST)
+        bh=Ski89AnwaWBeS16R9OsWU00+Wyrl3eVXwV/RiRDK3rk=;
+        b=hnAgVBwI2v1Ybbo5A+JWKDeoO3eKYO7gVlL0oi4rMgisMsh+7t12akIuMUPUFN/lm6
+         YbNWRktXEd1ulwf7KzXO2cNe9ktPZENCohsfsMOxc8ppTaO4GhUxYNL3jazhZCvk5Kca
+         x2ZSk3H7QpR6QE1tXQ1eje7lx/mQTND5toy2ngA+CXTZMb5xRnvwHv3wRauGj1xMur/O
+         5pNqGz28KtEXmCipCS9B1yeF7PxmGEV22vln4XVrJpONYKAEXX6GD5mBeT3QtpldJwpL
+         To6jkTonhsJ1/aDgq38sXfkZormjyE/HXR0RBd+5CoHtk3XmOShrYt8FhUmr1ygCzUiF
+         /Jyg==
+X-Forwarded-Encrypted: i=1; AJvYcCUOP2R1ZZxXnI63PUE9x1m/ay4wx0OTszEKuQGWWIbQcEcEkvGbs7fDD1XHKzK91DDtlsppkiY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeHbRbSYDuzwwpVldalvUc2ruWmwE8gE5jk18DMSlFOq2jt2nj
+	+yDY77BEvsaBwb8IlVVXkwSERMK8Xa2dLSSGdw3rbdlpNXnERyx+zTszPSEU1guaajRaTFHI5n3
+	rqQNTjx8c7vpKuGC/UFAiD/ZvebyepY6McJxDdX3G
+X-Gm-Gg: ATEYQzy1Z4mBUVUaGKUnT+YGzb8/GItcDKFC6fI0fotBDAc/5fwNo5fTgqsijphfWpK
+	KjlzAHrK2nom8VbcRbJWIKNDDhkygqeDliFLi48ojmX5gcFhxwADocIFewDYNWWH5I+c+Kohf7L
+	vmzuoKj43JUn/6ptoq/NHtTXjtb+aM9PRd8IHPv5pOTeP02NBzVChWUKsvKZjji4hx//wiJ+gFC
+	ZJcLzRi5x6V6EwYVb49o2H30cNjHPE3SD5RKtqUkxeknS/1J1i0op7nQBef65xoAp/ZQfYjssZd
+	aW7gQ/0=
+X-Received: by 2002:ac8:7f03:0:b0:4f4:de04:2434 with SMTP id
+ d75a77b69052e-50752879a78mr134210271cf.11.1772431922428; Sun, 01 Mar 2026
+ 22:12:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260301181457.3539105-8-edumazet@google.com> <202603020743.NEL0agrx-lkp@intel.com>
-In-Reply-To: <202603020743.NEL0agrx-lkp@intel.com>
+References: <20260302060247.7066-1-yuuchihsu@gmail.com>
+In-Reply-To: <20260302060247.7066-1-yuuchihsu@gmail.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 2 Mar 2026 07:02:55 +0100
-X-Gm-Features: AaiRm53wQGM3WwCV3bQMeh1Dn2GLN-C3-snKzACE_E-q2yOPyIOVSeKUAVhiYKE
-Message-ID: <CANn89iLCXFOuMSrNQY27CfOwTfzUoVMkq1Zd+-O50YtCMSEmDw@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 7/7] net-sysfs: use rps_tag_ptr and remove
- metadata from rps_dev_flow_table
-To: kernel test robot <lkp@intel.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, 
-	Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
+Date: Mon, 2 Mar 2026 07:11:51 +0100
+X-Gm-Features: AaiRm526yfhoI165ArwRJdmaMofXDk3Rnllb3dqCYKcPLy11uSawO1K2SmrpcQ0
+Message-ID: <CANn89i+O5b0xfcP5GLtUopqHz2ppewK9zSr4995jsjCPM+3AFQ@mail.gmail.com>
+Subject: Re: [PATCH v2] net: ipv4: fix ARM64 alignment fault in multipath hash seed
+To: Yung Chih Su <yuuchihsu@gmail.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, nathan@kernel.org, 
+	nick.desaulniers+lkml@gmail.com, morbo@google.com, justinstitt@google.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, llvm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
@@ -119,68 +118,91 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-262520-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,lists.linux.dev,google.com,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-262519-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	DKIM_TRACE(0.00)[google.com:+];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.987];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,mail.gmail.com:mid,01.org:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DE5E51D35BC
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,gmail.com,google.com,vger.kernel.org,lists.linux.dev];
+	TAGGED_RCPT(0.00)[netdev,lkml];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 269121D360F
 X-Rspamd-Action: no action
 
-On Mon, Mar 2, 2026 at 12:39=E2=80=AFAM kernel test robot <lkp@intel.com> w=
+On Mon, Mar 2, 2026 at 7:03=E2=80=AFAM Yung Chih Su <yuuchihsu@gmail.com> w=
 rote:
 >
-> Hi Eric,
+> `struct sysctl_fib_multipath_hash_seed` contains two u32 fields
+> (user_seed and mp_seed), making it an 8-byte structure with a 4-byte
+> alignment requirement.
 >
-> kernel test robot noticed the following build errors:
+> In `fib_multipath_hash_from_keys()`, the code evaluates the entire
+> struct atomically via `READ_ONCE()`:
 >
-> [auto build test ERROR on net-next/main]
+>     mp_seed =3D READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed).mp_se=
+ed;
 >
-> url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/net-a=
-dd-rps_tag_ptr-type-and-helpers/20260302-021900
-> base:   net-next/main
-> patch link:    https://lore.kernel.org/r/20260301181457.3539105-8-edumaze=
-t%40google.com
-> patch subject: [PATCH v2 net-next 7/7] net-sysfs: use rps_tag_ptr and rem=
-ove metadata from rps_dev_flow_table
-> config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/202=
-60302/202603020743.NEL0agrx-lkp@intel.com/config)
-> compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009=
-708b4367171ccdbf4b5905cb6a803753fe18)
-> reproduce (this is a W=3D1 build): (https://download.01.org/0day-ci/archi=
-ve/20260302/202603020743.NEL0agrx-lkp@intel.com/reproduce)
+> While this silently works on GCC by falling back to unaligned regular
+> loads which the ARM64 kernel tolerates, it causes a fatal kernel panic
+> when compiled with Clang and LTO enabled.
 >
-> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
-ion of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202603020743.NEL0agrx-lkp=
-@intel.com/
+> Commit e35123d83ee3 ("arm64: lto: Strengthen READ_ONCE() to acquire
+> when CONFIG_LTO=3Dy") strengthens `READ_ONCE()` to use Load-Acquire
+> instructions (`ldar` / `ldapr`) to prevent compiler reordering bugs
+> under Clang LTO. Since the macro evaluates the full 8-byte struct,
+> Clang emits a 64-bit `ldar` instruction. ARM64 architecture strictly
+> requires `ldar` to be naturally aligned, thus executing it on a 4-byte
+> aligned address triggers a strict Alignment Fault (FSC =3D 0x21).
+>
+> Fix the read side by moving the `READ_ONCE()` directly to the `u32`
+> member, which emits a safe 32-bit `ldar Wn`.
+>
+> Furthermore, Eric Dumazet pointed out that `WRITE_ONCE()` on the entire
+> struct in `proc_fib_multipath_hash_set_seed()` is also flawed. Analysis
+> shows that Clang splits this 8-byte write into two separate 32-bit
+> `str` instructions. While this avoids an alignment fault, it destroys
+> atomicity and exposes a tear-write vulnerability. Fix this by
+> explicitly splitting the write into two 32-bit `WRITE_ONCE()`
+> operations.
+>
+> Finally, add the missing `READ_ONCE()` when reading `user_seed` in
+> `proc_fib_multipath_hash_seed()` to ensure proper pairing and
+> concurrency safety.
+>
+> Fixes: 4ee2a8cace3f ("net: ipv4: Add a sysctl to set multipath hash seed"=
+)
+> Suggested-by: Eric Dumazet <edumazet@google.com>
 
-Yeah, in V3 I will remove the BITS_PER_LONG distinction, prone to
-errors like this one.
+Nit: Use of Suggested-by: implies I made the original suggestion for
+this patch (before the V1)
+I simply gave a feedback on your V1. The idea of the patch came from you :)
 
- #if BITS_PER_LONG > 32
- ...
-#else
-  ...
-#endif
+So next time, do not add a "Suggested-by:", as the expected step is
+that I add a Reviewed-by tag when I am happy with a new version,
+if I see it in time before it is merged.
+
+No need for a V3, this is simply a reminder for your next patches.
+
+> Signed-off-by: Yung Chih Su <yuuchihsu@gmail.com>
+> ---
+
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+
+Thanks !
 
