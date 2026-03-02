@@ -1,125 +1,139 @@
-Return-Path: <netdev+bounces-262913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262914-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6FwQKKQFpmkzJAAAu9opvQ
-	(envelope-from <netdev+bounces-262913-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 22:48:20 +0100
+	id aAe4Hg4GpmlVJAAAu9opvQ
+	(envelope-from <netdev+bounces-262914-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 22:50:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 815F81E40D9
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 22:48:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C529E1E420E
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 22:50:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3839530A11CA
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 21:42:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C0C3D30209D6
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 21:42:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 084F837188C;
-	Mon,  2 Mar 2026 21:24:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB27D372EE4;
+	Mon,  2 Mar 2026 21:26:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uH2ct0S9"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="FENQnDM2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F8B33F5B7;
-	Mon,  2 Mar 2026 21:24:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE99D311973;
+	Mon,  2 Mar 2026 21:26:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772486678; cv=none; b=L/JsgWZFKHk1oQhxVdVLpceE65J5TzfVnMxeInii05eYGHM5lOrKHuGEhuelGQo/zMHkciL/TS4p4UhWpYnljESTPrb5SmYmud9FjfZebdOchD4XG06l/AHJZnSuTRxuD063kAJrTlwWC1z9g34DGZ7Ut443LD6b1ONnQb9J4lo=
+	t=1772486813; cv=none; b=DoH4s9EwFm62NErJMWgMAvb9/CxTAHOGCFfOXrNl34tdJjiFHD4kzFcnMruJfuEg8f0rGOONMZHTbPbOkGMbZMYkQBVSye53XChhVJ7lAvJC7F4ptxtR+IaMYi4GrGK0CfxCyv0QWGX3e4DWe36fVWj+gTxneAaymv/b5k8nmek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772486678; c=relaxed/simple;
-	bh=2Cfkijj60alvXH5PPm4F14EP0ye+11LCUdDUZbJ1uKQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HeZIiH3ogaMJRr1I+qhYe3R81InOYRUVCMcLnvBnFiIujdCOSTQfZmq3F/IWvGI+GYqJNiaseRmuH3gEtqphfSkgvsz3unUhtt9TYxrRS3jYi37Q6Mz/GV/kSac9Lg60V7Lqp7CB2x8GXn1Ix6GxPtUpaCgg8Su1Oni+ywSJAaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uH2ct0S9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4412C19423;
-	Mon,  2 Mar 2026 21:24:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772486678;
-	bh=2Cfkijj60alvXH5PPm4F14EP0ye+11LCUdDUZbJ1uKQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uH2ct0S9vThZrVYPTo1AjSucjyZYdGuzlYMo05oHkUUY5kG3ZAIutgb6FypGcHUAz
-	 MkXU8HIrMPUt1d3gNCI9ii9UNBrKW/Ny1OItVX6gDP6IEeR68jtBmq9jBZzHnjfohe
-	 ybXawuYnEHk79HsO9CWtuVis0sVbpU8eU8bmo33mC1p43VAwHpk4faGXWFdQ514QrH
-	 /qbWA8GPtbOsAQBeD0TFF+YAEFMidWMEPqTLszAH80QsR3QQnyD8MbHZZ1zmj4gaC0
-	 lJTbg/7rANC5j1w1t35t9Z3/ZUw7ZOYPOFmL+txxIkQT9TDQYQvVkE38WQ5O4bNIUP
-	 lOJKQUkcREDAA==
-Date: Mon, 2 Mar 2026 13:24:36 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Dmitry Safonov <0x7f454c46@gmail.com>
-Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net] net/tcp-ao: Fix MAC comparison to be constant-time
-Message-ID: <20260302212436.GB2143@quark>
-References: <20260302203600.13561-1-ebiggers@kernel.org>
- <CAJwJo6Yt9v8pscqFB7mfuHGhwNSOE2no4Y5fu8o67atn=EtnUA@mail.gmail.com>
+	s=arc-20240116; t=1772486813; c=relaxed/simple;
+	bh=wCbiKpSuM+Y2Tev+vgu0NocaBsr9LObSpGSJZxBalas=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Hsy4J92yWNBHVSZ66yz/KsfC1gwSDB88XQ5I/gW1qIuaGruzV/4Ks0gkn3yQva3DXtlCPiap1Ch4Rc+CEIUXb1Z/o7iMV0aFkgXRIJzpzLoV9QCcdSGpUTcHSd7yM4fWQtOQzOdxlsBnrvjygbleEmdKqiNMl1M5ppyJG3c91u4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=FENQnDM2; arc=none smtp.client-ip=213.97.179.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
+	To:From:Sender:Reply-To:Cc:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=HIY0/QhmjXMLqc/7+DI6IQB27NYnFLrMfhd++B8Q+yo=; b=FENQnDM20xwRKTgS5hHaA+4n1r
+	D+dD1r90GcuvnIv+zwPJndL/vGdV7ZJrytujvuw0H9G3e2QuOTOu7epVmvltkk0mm466f4h9otnai
+	g9qmNIyxjk6R2QrADCu8gQcTb9EZuDQvfdWqB+8iDsJRW6r3qMSZeDrtghxNCJS5/JMkio+/tP6A5
+	TR2PYL9CG+Us6F0PRQp67YgPM95xJMICqPhKS/OvjB/DQOGpscJlbjfjRTntonTT0f8ljUwq+1e2P
+	UowXuV3slvqUDPXUSRTuhddmUGZ5IE9mnB92DW/oMnKsA9WsLk5QOArLE3sZE4fjwoCG9HA8AD/x/
+	aARwXSwg==;
+Received: from [179.221.50.217] (helo=toolbx)
+	by fanzine2.igalia.com with esmtpsa 
+	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
+	id 1vxAmp-0089NM-Fk; Mon, 02 Mar 2026 22:26:43 +0100
+From: Helen Koike <koike@igalia.com>
+To: pablo@netfilter.org,
+	fw@strlen.de,
+	phil@nwl.cc,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kernel-dev@igalia.com,
+	koike@igalia.com
+Subject: [PATCH] netfilter: nf_tables: fix use-after-free on ops->dev
+Date: Mon,  2 Mar 2026 18:26:05 -0300
+Message-ID: <20260302212605.689909-1-koike@igalia.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJwJo6Yt9v8pscqFB7mfuHGhwNSOE2no4Y5fu8o67atn=EtnUA@mail.gmail.com>
-X-Rspamd-Queue-Id: 815F81E40D9
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: C529E1E420E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_REJECT(1.00)[igalia.com:s=20170329];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[igalia.com : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[igalia.com:-];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262913-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262914-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.995];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ebiggers@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[koike@igalia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-0.969];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,igalia.com:mid,igalia.com:email,syzkaller.appspot.com:url]
 X-Rspamd-Action: no action
 
-On Mon, Mar 02, 2026 at 08:59:50PM +0000, Dmitry Safonov wrote:
-> On Mon, 2 Mar 2026 at 20:36, Eric Biggers <ebiggers@kernel.org> wrote:
-> >
-> > To prevent timing attacks, MACs need to be compared in constant
-> > time.  Use the appropriate helper function for this.
-> >
-> > Fixes: 0a3a809089eb ("net/tcp: Verify inbound TCP-AO signed segments")
-> > Cc: stable@vger.kernel.org
-> > Cc: Dmitry Safonov <0x7f454c46@gmail.com>
-> > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> 
-> Thanks, Eric, LGTM.
-> 
-> Reviewed-by: Dmitry Safonov <0x7f454c46@gmail.com>
-> 
-> Could you also send a similar patch for TCP-MD5?
-> tcp_inbound_md5_hash(), tcp_v{4,6}_send_reset() would need the same change.
+struct nf_hook_ops has a pointer to dev, which can be used by
+__nf_unregister_net_hook() after it has been freed by tun_chr_close().
 
-Already done, it was the first one I sent:
-https://lore.kernel.org/netdev/20260302203409.13388-1-ebiggers@kernel.org/
+Fix it  by calling dev_hold() when saving dev to ops struct.
 
-- Eric
+Reported-by: syzbot+bb9127e278fa198e110c@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=bb9127e278fa198e110c
+Signed-off-by: Helen Koike <koike@igalia.com>
+---
+ net/netfilter/nf_tables_api.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
+index fd7f7e4e2a43..00b5f900a51d 100644
+--- a/net/netfilter/nf_tables_api.c
++++ b/net/netfilter/nf_tables_api.c
+@@ -352,6 +352,7 @@ static void nft_netdev_hook_free_ops(struct nft_hook *hook)
+ 
+ 	list_for_each_entry_safe(ops, next, &hook->ops_list, list) {
+ 		list_del(&ops->list);
++		dev_put(ops->dev);
+ 		kfree(ops);
+ 	}
+ }
+@@ -2374,6 +2375,7 @@ static struct nft_hook *nft_netdev_hook_alloc(struct net *net,
+ 			err = -ENOMEM;
+ 			goto err_hook_free;
+ 		}
++		dev_hold(dev);
+ 		ops->dev = dev;
+ 		list_add_tail(&ops->list, &hook->ops_list);
+ 	}
+-- 
+2.53.0
+
 
