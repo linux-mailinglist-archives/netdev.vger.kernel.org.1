@@ -1,177 +1,120 @@
-Return-Path: <netdev+bounces-262679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262680-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sAoSGrmipWngCwAAu9opvQ
-	(envelope-from <netdev+bounces-262679-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 15:46:17 +0100
+	id KLoYHkKjpWngCwAAu9opvQ
+	(envelope-from <netdev+bounces-262680-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 15:48:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1F9B1DB1B3
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 15:46:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id F09AA1DB241
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 15:48:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EF83430300FA
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 14:41:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9A1CF30557EC
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 14:43:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40AB12798F3;
-	Mon,  2 Mar 2026 14:41:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37F1C38F654;
+	Mon,  2 Mar 2026 14:43:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="JP9GFH1J"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XNUQdBxF"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A58633FFADF;
-	Mon,  2 Mar 2026 14:41:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13A203E5581
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 14:43:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772462480; cv=none; b=lHvX6VYYNWjKedYju1stMrUenbVSyGAQ0NxTA8JvPrZz/T3IXxeHDDdld6Q5JT61UrZgiRieXDQE2Ju4aUI8+e39L+qQIbCHGW6qoJlIbeeV8mXQ1eJrPPUTp898Z+evQN2EgjOL3N9jWjVSgtUOA6Tpaz7phEUKhFUI7J7Fmos=
+	t=1772462600; cv=none; b=ErLvAyZT3BvJFwK09ITlagrFZTxva4Tg0YlpXbYEcBOZeKGWiLzhLF5hYxkECs21CW29Tw4hmVPa17VrHpIbXwojYc/mPX8Hg5bpLPDTGrzF7jWZU/0vq2em1ORrsTJoP8q4wedZDjeZSo6TzCjw0ZEVivPJlGGcc0BGWETqBcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772462480; c=relaxed/simple;
-	bh=gUtBimJLIFo6sIA9f0hJB7P71LFYZn4wPVh7PIdBYGA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=K96uJ/K21e37Pvn0BY7+kcMpcZNAM2sHiKn+wSFUyhZy8O0OKMFRKtaK3Ypeglr69aMk6H+2jLaGxXSD0WBCG03L88wsvQ9kpn6qaFNRuePFq6Oh635OHU8WK/xTCtcmCtgh1Dd/Kjr86FsXEnCAd4jxBtqJUjva1vJtAfNZ618=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=JP9GFH1J; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Message-Id:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:
-	Reply-To:Content-ID:Content-Description:In-Reply-To:References;
-	bh=6G25lhpEJo6nNMrx0cNvKtFHnOheQyRYCZz/rYYTiWg=; b=JP9GFH1JG7HS8WcfafZ9KbRbsG
-	e60S4iPYIAI4JdNSTW+TJJ48J4Vp0j4m411bXOPpqOBSfIf42rfysBD+v75ehIrI1massOhohZUua
-	VonDNT6+jKFpzd5d1b0Ykz7nSi6M8phTeZt6UaZU+uEdOBELQ6HjD8UHGZhUmXbjzYHkFeZrsuSmQ
-	pC/PvfvmWHTjW1d2Ri7qNs10tDzfEPcte6+PAuNUrTpizE4PvDrWulssCFzPccMlX0Pl/M+5c6z1d
-	H9InSgJpXIE7s0zgDSRn+9E9t8st02MtH8/jxvYQU3i6Sms4ZVYEnzCauwzbPwjOkzmTEIsykZfoe
-	/McUvbWw==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <leitao@debian.org>)
-	id 1vx4SO-00ETX5-Fd; Mon, 02 Mar 2026 14:41:12 +0000
-From: Breno Leitao <leitao@debian.org>
-Date: Mon, 02 Mar 2026 06:40:39 -0800
-Subject: [PATCH net-next] selftests: netconsole: print diagnostic on
- busywait timeout in netcons_basic
+	s=arc-20240116; t=1772462600; c=relaxed/simple;
+	bh=HyZ/X+XkjYMqup66IEVA1KUZDRvk694MUw+2hwZ/CIQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iqPdbjVzPw9mxPQFwaFRzCCmHZRS4xlDTNpUm0amxMHfUHpCIng+UP9usodwYww9xAEusXoYdXY0Ce6njkn2ftl5gfmUUOzB+Cv6mGnaPxwM98hpZ3OeWV5eSAj3Wt7u+ceYPUmlU4xCCMlFnweuZuyyi1EU0EcwBHYFYnhmI2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XNUQdBxF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AFBEC19423;
+	Mon,  2 Mar 2026 14:43:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772462599;
+	bh=HyZ/X+XkjYMqup66IEVA1KUZDRvk694MUw+2hwZ/CIQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XNUQdBxF+L+WpkeliCDi37gjxI2Xxcb+C6qKxF8j6gFPpm1oYuWAP9DJyjhj9xXdd
+	 JIwwAa8dAle6+q6/zxaonsxTd5IyqJfR7cIBbvWO/yJEQBcKaCr3Td/g9c0lJAh6Ve
+	 S47m3S3kkhJhy+LcRM+l4JbetZObLJ08U+SDadjMzZ7ZD2uEVA228LtFpI/PXk0/vL
+	 lUF97JrH6q7OZK73yQwXwB49PcTt+gFUmNMoLgw488wWjM19qrMYFV8C8WCpBItGHm
+	 wC4iJxYqvDt0dNPJtoNjpgj5kaH+kfQH1tAlMkQsdt8Fevl9nRIDWRmKi0NZnGNBXt
+	 SGJox18ymFoVA==
+Date: Mon, 2 Mar 2026 06:43:18 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Ahern <dsahern@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org
+Subject: Re: [PATCH net] ipv6: fix NULL pointer deref in
+ ip6_rt_get_dev_rcu()
+Message-ID: <20260302064318.6d55533d@kernel.org>
+In-Reply-To: <859d39ff-cb1e-4f3f-b154-d8bf2c7997c9@kernel.org>
+References: <20260301194548.927324-1-kuba@kernel.org>
+	<859d39ff-cb1e-4f3f-b154-d8bf2c7997c9@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260302-netconsole_test_verbose-v1-1-b1be5d30cd7d@debian.org>
-X-B4-Tracking: v=1; b=H4sIAGahpWkC/yXM0QqCMBQG4FcZ59rBmqG0V4mQ6X5rEWexcxRBf
- Peorj/4dhLUDKFgdqpYs+TCFMypMTQ9It9hc6JgyDvfudZ5y9CpsJQXBoXosKKORWDbro9zwiX
- 26UyNoXfFnLfffCWGWsamdPuLLOMTk35jOo4PG/4lRIUAAAA=
-X-Change-ID: 20260302-netconsole_test_verbose-367afde9a7d4
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, kernel-team@meta.com, 
- Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.15-dev-f4305
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2235; i=leitao@debian.org;
- h=from:subject:message-id; bh=gUtBimJLIFo6sIA9f0hJB7P71LFYZn4wPVh7PIdBYGA=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBppaGEUIubXetIwMN8yAdPidt9eqi5YMJK3tF2z
- F0AD2q8XFmJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaaWhhAAKCRA1o5Of/Hh3
- bWzbD/9yODDQMaTErk/dXpdr3gyNTGNM7geS+H1LyCQHmZOgUr6EI8x5tPQBYRI68B7COrCRYAE
- S26QEhNCeN1Dnz7dYWHjt9zMyjoQONNWVuiqWO3lxr88F8rjZeJBYHqoT+R2YPbTDQgcBEaIeua
- +RxXPPYZUl47HVIQa8E/fMqALWlbd6b4YkG2Dzq8JR4+XuDGvVlpackbvzLbwoly33eKMYr5POx
- s+pwBQkctz4gWCNWVixfBXlrJxJG1kS9ATD4hSECxVltdxvzXqYBC/fgf9q2SAj+3jH19pqs5AC
- eFEnBbNZS5VsN+HzR2jieB4DSwF8hvyox/A8ByBIttsVLPjDreEiRC7MB3PZN6XusthtfvRdzS5
- a4DyavZ/5BJtNZSBD1kLQUSSZVf5mZvq3ysS7yOgMft0O55IwCba0HgXysYhYdVlfcmqpm8Al47
- 8CcdPjfKnPD0r12R5VeVeNotn2fVCzTEp7X5f6cxHkzypDd894NgEiWOn0V2JTm4o41YMWQTYUi
- nYxg4SC/8bvddpSNHWiwiVPrZSvEvMq5ijVvQwCruXyarlbU77ACySYp7kpribYdpIeLNJOyffl
- 1jGxSAHSeWvBGM4F23Be/o6bKXQN15PrhbJnhrOYiG37ZMudKs0MxHpLwbQICCwmVSiAMaZhCXr
- Gr+otGZ2QISKxlA==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
-X-Debian-User: leitao
-X-Rspamd-Queue-Id: D1F9B1DB1B3
+X-Rspamd-Queue-Id: F09AA1DB241
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-262680-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262679-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[debian.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[debian.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-The script uses set -euo pipefail, so when busywait times out waiting
-for the netconsole message to arrive, it returns 1 and the script exits
-immediately without printing any error message. As reported by Jakub,
-this makes failures hard to diagnose since the test reports exit=1 with
-no explanation.
+On Sun, 1 Mar 2026 18:38:53 -0700 David Ahern wrote:
+> > @@ -1063,7 +1063,8 @@ static struct net_device *ip6_rt_get_dev_rcu(const struct fib6_result *res)
+> >  		 */
+> >  		if (netif_is_l3_slave(dev) &&
+> >  		    !rt6_need_strict(&res->f6i->fib6_dst.addr))
+> > -			dev = l3mdev_master_dev_rcu(dev);
+> > +			dev = l3mdev_master_dev_rcu(dev) ? :
+> > +			      dev_net(dev)->loopback_dev;  
+> 
+> how can the flag on the netdev say there is L3 master, yet the device
+> not be there within an rcu window?
 
-Handle the busywait failure explicitly so that a FAIL message is printed
-before exiting. This is how it looks like now:
+1) We call netif_is_l3_slave() twice, once here and then again in 
+l3mdev_master_dev_rcu(), the flag may get cleared in between the two.
 
-	Running with target mode: basic (ipv6)
-	[  167.452561] netconsole selftest: netcons_QdMay
-	FAIL: Timed out waiting (20000 ms) for netconsole message in /tmp/netcons_QdMay
+2)
 
-The remaining silent failures under set -e can only happen during the
-setup phase (netdevsim creation, interface configuration, configfs
-writes). So, it is not expected to have any silent failure once the test
-starts.
-
-Note that this issue might be less frequent now, since commit
-a68a9bd086c28 ("selftests: netconsole: Increase port listening timeout")
-increased the timeout that _might_ have been the root cause of these
-random failures in NIPA.
-
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- tools/testing/selftests/drivers/net/netconsole/netcons_basic.sh | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/drivers/net/netconsole/netcons_basic.sh b/tools/testing/selftests/drivers/net/netconsole/netcons_basic.sh
-index 59cf10013ecd5..7976206523b2c 100755
---- a/tools/testing/selftests/drivers/net/netconsole/netcons_basic.sh
-+++ b/tools/testing/selftests/drivers/net/netconsole/netcons_basic.sh
-@@ -58,7 +58,11 @@ do
- 		# Send the message
- 		echo "${MSG}: ${TARGET}" > /dev/kmsg
- 		# Wait until socat saves the file to disk
--		busywait "${BUSYWAIT_TIMEOUT}" test -s "${OUTPUT_FILE}"
-+		if ! busywait "${BUSYWAIT_TIMEOUT}" test -s "${OUTPUT_FILE}"
-+		then
-+			echo "FAIL: Timed out waiting (${BUSYWAIT_TIMEOUT} ms) for netconsole message in ${OUTPUT_FILE}" >&2
-+			exit "${ksft_fail}"
-+		fi
- 
- 		# Make sure the message was received in the dst part
- 		# and exit
-
----
-base-commit: 01857fc712f6469cab9cc578120cdc80f1c2a634
-change-id: 20260302-netconsole_test_verbose-367afde9a7d4
-
-Best regards,
---  
-Breno Leitao <leitao@debian.org>
-
+static int do_vrf_del_slave(struct net_device *dev, struct net_device *port_dev)
+{
+        netdev_upper_dev_unlink(port_dev, dev);
+	// No sync RCU here, also I'd say the order is inverted?
+        port_dev->priv_flags &= ~IFF_L3MDEV_SLAVE;
 
