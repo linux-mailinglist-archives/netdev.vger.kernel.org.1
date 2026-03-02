@@ -1,150 +1,237 @@
-Return-Path: <netdev+bounces-262576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262577-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aJf0EKhUpWnR9AUAu9opvQ
-	(envelope-from <netdev+bounces-262576-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 10:13:12 +0100
+	id wJIcJxhUpWnR9AUAu9opvQ
+	(envelope-from <netdev+bounces-262577-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 10:10:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D2B11D55A5
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 10:13:11 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CFF11D552F
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 10:10:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C6A80302D51C
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 09:09:23 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 643283015103
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 09:10:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38BBD38D00B;
-	Mon,  2 Mar 2026 09:09:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 275D938D009;
+	Mon,  2 Mar 2026 09:10:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="AMVKFmcg"
+	dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="EZWEg5lo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx-relay49-hz3.antispameurope.com (mx-relay49-hz3.antispameurope.com [94.100.134.238])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25CE3327BF4
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 09:09:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772442563; cv=none; b=ngPa3jPUng6WGHsPv+fcAm5jR9mFzYlEgkfnQN1Snk3mxfYBSnGKnaEqYc4TBp33gOsmtmheF6Dal8E+9QwIy5bt/E+ta9i60dGNMRayaMA0mm+d4GdYkRHH0O7M2SYDpashqZRg3AUed4goWSFnzSfzwjS+PSV4grdj6mo81/k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772442563; c=relaxed/simple;
-	bh=ilMQGVCasLEyuVKt3xmPGLbzaexBUt4hoMGNq/qop6c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GrX/NUVqTkxvVxa03Fl/idv1WwMb6rVQd02KLWbF97RIDhrZjdwmAZzcBpX/TAMh/175lDLK6BSlXqUsxkwwSGckwAQ2aBgUJRbGfWUW/QnY8NgwJIfpdYw0dGskIZYrI/heB9QAmYS7v9U1YbstR+KtY7BkSXSpA9SUY8ry1jA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=AMVKFmcg; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4837f27cf2dso36896395e9.2
-        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 01:09:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1772442558; x=1773047358; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ilMQGVCasLEyuVKt3xmPGLbzaexBUt4hoMGNq/qop6c=;
-        b=AMVKFmcg4l39oJMarm/bn5uahr/tJ9jjFRlKIlqA9xsQAKkyq4jjrLZRY6EEKLVk8f
-         xm7DzBNyWrw6PnPJnMUyxa8fDXWDkd8ikJiYnewReUGwhNSdcPaqzdkTh6nUAvU+XU2T
-         xEsQjdgHgZQCq3TBUyCudQXI88B6yGIyRoc08x7bPK6sTBOhcrwOyMpJHJtf9zMxdAEE
-         QMiaeRLSCNLbfbu1ATqdUGq80PwNz7MUeHUKzeoLegcsotBwwzziUtrw+eDaOcHeuN51
-         U0K225TJgdXRYsu3xyaxvFsHcSPZuouu8gMh5cDO+e0FIFlHLaU7hO2qumGnjIGFVGs0
-         1LDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772442558; x=1773047358;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ilMQGVCasLEyuVKt3xmPGLbzaexBUt4hoMGNq/qop6c=;
-        b=AeNjkQitWp3lpHV2ZwlWAISCfavkDTBi9efOuBgB+u+mBvZiwhHL0C/ST61ekQlS9a
-         /A7kzwC/3K4YLZMJKPiyKAJLyIytykUBXNiAVczoAswYe5U4UHYpbxdjOHqlDcCy+gWS
-         yyDzNEAVwgzsD4H/AxbmmosMzQ8goSEQLagcnp8tOWL/mzdNlloAltU8+cEEnBgQivod
-         GWVSykga1d5I4PZiJ2ukwA/jNEGcE79Py5wB2BvkeH12uQ/Sg4aS4MOLPcrmblOJIgmA
-         wgP/05u5bTU51Onk26HqL+ABYuJ3RKRxaImGTzfbIYFceqSpatnMA2l4Sm/rrgIBBJ4g
-         4vEg==
-X-Gm-Message-State: AOJu0YyZ4QADhR7Vrf3vjXDRBOZadNqI4r/+2Feradab2VKrZ72pJNoz
-	IlqLqEjrPs1BQmw80NFf54faG8UTN2DhXPrCfCsDAWVMw8uP4LX6AUL9VodK8cp0kbqBDoHdLhB
-	ltNjZ
-X-Gm-Gg: ATEYQzztfDZ/giewS0QtzOyZptBPyUAjvV4KavFaEPZoB2FNMRFzPKnwlRo5KGbtXGb
-	xrcTo6r8Ts+X/ud3w0BvbU9NozmpWJ/rXLP+c6xaY0C1qxnzsvV2CL6H46L0CbqBXvRzwsS8oVs
-	9eajHhcEWzkLhceWdTj7CtPM1DhF/dCzWbXLt9DTU6Ve0mrcQjE9ppOU7JcmIyrVwEWNrnUUo+Q
-	s6gU5woBirAQCzVVcQFz3+JXaqwI4aobHSPdJMxzPlScmrXnqIrwTrOUMfRnktmdSh/wp7sTpjc
-	GmuH76yCMMhctJgqXag6mkmQEplDksyRJgVwH5uaceyCvNbV5SYpGJduTTkIeuY2T3i0UQWijcG
-	yrnX+ptRKDZgclMl9Fad4T8EWV0IyVKokbljtArUfBuPhnr6mO7KaYu7zh0x58TCfAYzAGSGPqU
-	kHR1o5SvUVKtlmmMNkMmlxPIbo4RVevfZu4CuZrNlxIH3s
-X-Received: by 2002:a05:600c:3b18:b0:483:7631:befa with SMTP id 5b1f17b1804b1-483c9bc55d6mr190142375e9.5.1772442558003;
-        Mon, 02 Mar 2026 01:09:18 -0800 (PST)
-Received: from FV6GYCPJ69 ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bd68826asm633954365e9.0.2026.03.02.01.09.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Mar 2026 01:09:17 -0800 (PST)
-Date: Mon, 2 Mar 2026 10:09:15 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, horms@kernel.org, donald.hunter@gmail.com, corbet@lwn.net, 
-	skhan@linuxfoundation.org, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com, 
-	mbloch@nvidia.com, przemyslaw.kitszel@intel.com, mschmidt@redhat.com, 
-	andrew+netdev@lunn.ch, rostedt@goodmis.org, mhiramat@kernel.org, 
-	mathieu.desnoyers@efficios.com, chuck.lever@oracle.com, matttbe@kernel.org, cjubran@nvidia.com, 
-	daniel.zahka@gmail.com, linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 09/10] documentation: networking: add shared
- devlink documentation
-Message-ID: <wukj2sqty6p54lsedkquvija4fm3xjgit53ukomnx4pgymxpsb@pwbyampuhj6k>
-References: <20260225133422.290965-1-jiri@resnulli.us>
- <20260225133422.290965-10-jiri@resnulli.us>
- <20260228150558.46f3be36@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 777AB1C84A0
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 09:10:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=94.100.134.238
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772442646; cv=pass; b=oLaqwHIPQ44r/X4R6Bcac9l2RfELwS8tSvotT3tLH7v3pDeW0311zcSW7QLJbCFYaiwzMCPRxLFOrTp1m97QG/OmHbrpSh+3QU4GOT8S4nme6rjdw6rHDTayvQRNGAZf0bRJJanJDRRvTFZaaRIsbB/FEXVkTGC3Lhzd7qYP8k4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772442646; c=relaxed/simple;
+	bh=fiekTzta8FUtdjWmFwchlMc1/hwvvAsJRm4WsZfyc4o=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=e6GkRtTuChQchzGO0gPEAB+lZ2eLRDG5mj7H8kUYw+ltd7k8qbeItGpNA14QXMymCXnJBIySvQdvxRqpGKVe66dMat2A/MCLtJ7xFUKtqju05xOih37ZbRXxwlBG+uhadVyVv6jdcSL+p71VdZUO2nLBItaPX3SE0WgGSu6TUPQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=EZWEg5lo; arc=pass smtp.client-ip=94.100.134.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+ARC-Authentication-Results: i=1; mx-gate49-hz3.hornetsecurity.com 1; spf=pass
+ reason=mailfrom (ip=94.100.132.6, headerfrom=ew.tq-group.com)
+ smtp.mailfrom=ew.tq-group.com
+ smtp.helo=hmail-p-smtp01-out04-hz1.hornetsecurity.com; dmarc=pass
+ header.from=ew.tq-group.com orig.disposition=pass
+ARC-Message-Signature: a=rsa-sha256;
+ bh=QcbWatSyM5oJiH06wT/NbGgAxv1T51q/29A9brK2e6w=; c=relaxed/relaxed;
+ d=hornetsecurity.com; h=from:to:date:subject:mime-version:; i=1; s=hse1;
+ t=1772442630;
+ b=B8brLB6KZFGnWoe1AgSIpI11ofVl53Ux5lkwr5cHkP4E1ktPiTR19ny4MAtHJN4iO2M+JaFX
+ be+LKCJo8TaIar8qq0nGP8TkSK+YUfK/xvEv/GTr4cPOkCK9TMvk0MZx5NFAluOnOVFW8HfSQy5
+ UhPKLgUajp/Lm9+0isdqnVIhzlg6k8BdYT3UQkyy5BTYEd/lkrRjTRqqQwKcs95euiSgM4bg3m+
+ H122T6WecWUbAAfz7+WBQ9oT2hFePYuYBelPjdPJO4NW3opejKsTZQR58gVEielh1AC5I50f8wK
+ alut4ZmkPC6Tjkr3kDp4Lnees7hKu6fC7zp6OaHkdDQfw==
+ARC-Seal: a=rsa-sha256; cv=none; d=hornetsecurity.com; i=1; s=hse1;
+ t=1772442630;
+ b=ooZFvD3FMxg+MsdpcUH4t6Iy0KaAKUuZVrW9tljVbSxaNq+jpALPrpAfaufu7I3y/Qn0QuBl
+ QLfyf/sD4q0mFCN2i0kvfp2irTbe1bxprFy0p/Ogb9jPzNbf17goUGcmuD/gjs4cwZRdguBUe46
+ 9J8Hj/EB4+pkaNU0mHC5OLJZHVY9f4xoKG+6EAwyhOZOVrpZnHDZEsIdvxUX5OrfZk4xGv2hcWr
+ Kc36/fxW4n/yM7LFn+GVvdjvL7P4qhdh14eSdcJJv66j7xSzFndlZ8f+8Wwqg11sdvLdA3ALOtZ
+ Fsz6mbgv7OmqNgqgHcHyZgbNlE8YF+TBe8bPhD7S/SjyA==
+Received: from he-nlb01-hz1.hornetsecurity.com ([94.100.132.6]) by mx-relay49-hz3.antispameurope.com;
+ Mon, 02 Mar 2026 10:10:30 +0100
+Received: from steina-w.localnet (host-82-135-125-110.customer.m-online.net [82.135.125.110])
+	(Authenticated sender: alexander.stein@ew.tq-group.com)
+	by hmail-p-smtp01-out04-hz1.hornetsecurity.com (Postfix) with ESMTPSA id 5373D220490;
+	Mon,  2 Mar 2026 10:10:16 +0100 (CET)
+From: Alexander Stein <alexander.stein@ew.tq-group.com>
+To: Claudiu Manoil <claudiu.manoil@nxp.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Clark Wang <xiaoning.wang@nxp.com>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+ Wei Fang <wei.fang@nxp.com>
+Cc: Aziz Sellami <aziz.sellami@nxp.com>,
+ "imx@lists.linux.dev" <imx@lists.linux.dev>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject:
+ Re: [PATCH v3 net-next 1/3] net: enetc: set the external PHY address in IERB
+ for port MDIO usage
+Date: Mon, 02 Mar 2026 10:10:16 +0100
+Message-ID: <5972322.DvuYhMxLoT@steina-w>
+Organization: TQ-Systems GmbH
+In-Reply-To:
+ <PAXPR04MB8510765552BAC289BD5466DB8870A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References:
+ <20251119102557.1041881-1-wei.fang@nxp.com> <7825188.GXAFRqVoOG@steina-w>
+ <PAXPR04MB8510765552BAC289BD5466DB8870A@PAXPR04MB8510.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260228150558.46f3be36@kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
+X-cloud-security-sender:alexander.stein@ew.tq-group.com
+X-cloud-security-recipient:netdev@vger.kernel.org
+X-cloud-security-crypt: load encryption module
+X-cloud-security-Mailarchiv: E-Mail archived for: alexander.stein@ew.tq-group.com
+X-cloud-security-Mailarchivtype:outbound
+X-cloud-security-Virusscan:CLEAN
+X-cloud-security-disclaimer: This E-Mail was scanned by E-Mailservice on mx-relay49-hz3.antispameurope.com with 4fPY6x0V46z3ybLB
+X-cloud-security-connect: he-nlb01-hz1.hornetsecurity.com[94.100.132.6], TLS=1, IP=94.100.132.6
+X-cloud-security-Digest:4664428a919562c3da657dd102324f35
+X-cloud-security:scantime:2.540
+DKIM-Signature: a=rsa-sha256;
+ bh=QcbWatSyM5oJiH06wT/NbGgAxv1T51q/29A9brK2e6w=; c=relaxed/relaxed;
+ d=ew.tq-group.com;
+ h=content-type:mime-version:subject:from:to:message-id:date; s=hse1;
+ t=1772442630; v=1;
+ b=EZWEg5loECgIu6axr30VcRlCLqRW80He/1vBOpdxMPwVr8FaxAavOpbj3SIYw2md8gugiLw3
+ Mzp2zbs0Z3GIPP7mm1N/pjVTadOTDrcNkwOqc9NcjkCyRhcS8rn6mpt9WZSBh9SAB0cZJaoSEzz
+ fc6RjUeErFVZkJ8cLa3JXhHYaNJGVABcGJwfJ02JMiS0UNMMHD0aSvTSU9fkDKBNVA4KJlbdOj3
+ joJrnfOg6yObzcZw37Z7S5mD74ZrdCkP3kb0xozVaouP56KUDleGRVT/rCGddloJr9c0gw1I058
+ N+zbW0YVQpf1xyvyviC8iDOSmd/larHdwACuOPlmDpJJw==
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[ew.tq-group.com,reject];
+	R_DKIM_ALLOW(-0.20)[ew.tq-group.com:s=hse1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262576-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262577-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[resnulli.us];
+	HAS_ORG_HEADER(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,lwn.net,linuxfoundation.org,nvidia.com,intel.com,lunn.ch,goodmis.org,efficios.com,oracle.com];
+	DKIM_TRACE(0.00)[ew.tq-group.com:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[resnulli-us.20230601.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alexander.stein@ew.tq-group.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9D2B11D55A5
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,0.0.0.0:email,ew.tq-group.com:dkim,tq-group.com:url]
+X-Rspamd-Queue-Id: 3CFF11D552F
 X-Rspamd-Action: no action
 
-Sun, Mar 01, 2026 at 12:05:58AM +0100, kuba@kernel.org wrote:
->On Wed, 25 Feb 2026 14:34:21 +0100 Jiri Pirko wrote:
->> +Shared devlink instances allow multiple physical functions (PFs) on the same
->> +chip to share an additional devlink instance for chip-wide operations. This
->> +is implemented within individual drivers alongside the individual PF devlink
->> +instances, not replacing them.
->
->Sounds like you want to preclude what was the goal in the discussion
->with Przemek you quoted - a shared instance _only_ case. We don't have
->to implement it today, but I think it's an entirely sane direction.
->So the docs should not state otherwise.
+Hi,
 
-Fair enough, I can do it.
+Am Samstag, 28. Februar 2026, 04:52:01 CET schrieb Wei Fang:
+> > > +static int imx95_enetc_mdio_phyaddr_config(struct platform_device
+> > > +*pdev) {
+> > > +	struct netc_blk_ctrl *priv =3D platform_get_drvdata(pdev);
+> > > +	struct device_node *np =3D pdev->dev.of_node;
+> > > +	struct device *dev =3D &pdev->dev;
+> > > +	int bus_devfn, addr, err;
+> > > +	u32 phy_mask =3D 0;
+> > > +
+> > > +	err =3D netc_get_emdio_phy_mask(np, &phy_mask);
+> > > +	if (err) {
+> > > +		dev_err(dev, "Failed to get PHY address mask\n");
+> > > +		return err;
+> > > +	}
+> > > +
+> > > +	/* Update the port EMDIO PHY address through parsing phy properties.
+> > > +	 * This is needed when using the port EMDIO but it's harmless when
+> > > +	 * using the central EMDIO. So apply it on all cases.
+> > > +	 */
+> > > +	for_each_child_of_node_scoped(np, child) {
+> > > +		for_each_child_of_node_scoped(child, gchild) {
+> > > +			if (!of_device_is_compatible(gchild, "pci1131,e101"))
+> > > +				continue;
+> > > +
+> > > +			bus_devfn =3D netc_of_pci_get_bus_devfn(gchild);
+> > > +			if (bus_devfn < 0) {
+> > > +				dev_err(dev, "Failed to get BDF number\n");
+> > > +				return bus_devfn;
+> > > +			}
+> > > +
+> > > +			addr =3D netc_get_phy_addr(gchild);
+> > > +			if (addr < 0) {
+> > > +				dev_err(dev, "Failed to get PHY address\n");
+> > > +				return addr;
+> > > +			}
+> > > +
+> > > +			if (phy_mask & BIT(addr)) {
+> >=20
+> > ... which will break here if there is an Ethernet PHY using address 0 in
+> > 'netc_emdio' node.
+> > See arch/arm64/boot/dts/freescale/imx95-tqma9596sa.dtsi node
+> > ethernet-phy@0.
+>=20
+> AFAIU, the PHY address 0 is a special address, below is the description of
+> PHYAD from IEEE 802.3 Clause 22.
+>=20
+> A PHY that is connected to the station management entity via the
+> mechanical interface defined in 22.6 shall always respond to transactions
+> addressed to PHY Address zero <00000>. A station management entity
+> that is attached to multiple PHYs must have prior knowledge of the=20
+> appropriate PHY Address for each PHY.
+>=20
+> Therefore, for most PHYs, PHY address 0 is typically used as the broadcast
+> address or default response address. In designs that control multiple PHYs
+> via EMDIO, it is recommended to avoid setting a specific PHY to address 0
+> to prevent bus conflicts.
+
+I know about this special meaning, but there are hardware design which do n=
+ot
+take this into account.
+
+> If the PHY on your board does not use PHY address 0 as the broadcast addr=
+ess
+> or the default response address, then we should check the PHY address fir=
+st and
+> then check the phy_mask in imx95_enetc_mdio_phyaddr_config(), just the sa=
+me
+> as imx94_enetc_mdio_phyaddr_config().
+
+I'm not sure if this is the right fix. What about the case where phy_mask is
+supposed to be 0, because there are no PHY subnodes of netc_emdio. Instead
+the PHY with address is a subnode of the enet_portX is supposed to have
+netc_get_phy_addr() return 0 because that's the actual address. But with
+the current flow from imx94_enetc_mdio_phyaddr_config() and your suggestion
+for i.MX95 case we erroneously skip that node.
+
+Best regards,
+Alexander
+=2D-=20
+TQ-Systems GmbH | M=FChlstra=DFe 2, Gut Delling | 82229 Seefeld, Germany
+Amtsgericht M=FCnchen, HRB 105018
+Gesch=E4ftsf=FChrer: Detlef Schneider, R=FCdiger Stahl, Stefan Schneider
+http://www.tq-group.com/
+
+
 
