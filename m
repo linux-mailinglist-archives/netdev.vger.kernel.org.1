@@ -1,211 +1,346 @@
-Return-Path: <netdev+bounces-262472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262473-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id BCw2LA/tpGngvwUAu9opvQ
-	(envelope-from <netdev+bounces-262472-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 02:51:11 +0100
+	id wKliM9fupGlpwAUAu9opvQ
+	(envelope-from <netdev+bounces-262473-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 02:58:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5DE81D25D8
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 02:51:10 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E309D1D262B
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 02:58:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B4793300E38C
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 01:51:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BD105300D168
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 01:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F2071E9B37;
-	Mon,  2 Mar 2026 01:51:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73F0C25A2A2;
+	Mon,  2 Mar 2026 01:58:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=yunyoo-cc.20200929.dkim.larksuite.com header.i=@yunyoo-cc.20200929.dkim.larksuite.com header.b="oI3Hh2kl"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from lf-2-36.ptr.blmpb.com (lf-2-36.ptr.blmpb.com [101.36.218.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A82071391;
-	Mon,  2 Mar 2026 01:51:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEE72288D6
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 01:58:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.36.218.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772416266; cv=none; b=etAt+ZQYGYrs3o7FbVK7D9jj15w0qcUSsfUrQoRDKmJA7h9tm9rbIhHGPW5Sz+ndLxabxJ6x6TNnfwVzC7EYp0Xbm6F7KYq10IXZTk6pf8rbVrlZDlUKE5DV4ObBLA7nkWlj2BVQ7gT3x5/jDz67RQ8mMrwo3bpnkzFBmOCyjCQ=
+	t=1772416723; cv=none; b=UaOyg3oMc3QhZRufax/JVjukR9zEbabXYkS4hkP+UhsZK3xDj5IA+VhtsW1pXjQGI7NDbDYGQpwobqQrKO3lGwo9sGgb0YVFGl2TNWfmKI3PvjQPUa6Ew1rIIYcIsZn/LZsj6sfwEr7WCKyRS2LC5N5nSE5h8D093QXc300Fu4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772416266; c=relaxed/simple;
-	bh=pH7k0jAjI2209NTnfbW5xztmHM86D8DPTsfXNM5tzc0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=umJR8dwS/ZUH6TKoH6pK8fTB3PFvqarEf93z+XUudGXBbm2f7pPvFj0vvaXUCmOeGJb61moViQUTuSowKn1avINdGUq6RrvEtlISeATgXbZVdI9bbw0Klii7vlLanWkT8ngduc3LVvXeCmFfordDd5kHkYySo+ZvFzu160eOYeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.177])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4fPMMM6YH8zYQtgY;
-	Mon,  2 Mar 2026 09:50:23 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 56AD94058F;
-	Mon,  2 Mar 2026 09:50:55 +0800 (CST)
-Received: from [10.67.111.176] (unknown [10.67.111.176])
-	by APP4 (Coremail) with SMTP id gCh0CgAHtPT97KRp5TUGJQ--.53758S2;
-	Mon, 02 Mar 2026 09:50:55 +0800 (CST)
-Message-ID: <40c77bba-0862-4422-b23e-2a10cd01c728@huaweicloud.com>
-Date: Mon, 2 Mar 2026 09:50:53 +0800
+	s=arc-20240116; t=1772416723; c=relaxed/simple;
+	bh=Adqf0zh2hayDMj7FF1I0bgPXD9fxuN4yMCe2P+dI7vg=;
+	h=References:Content-Type:To:Cc:Subject:From:Mime-Version:Date:
+	 Message-Id:In-Reply-To; b=O1DLLPe+u15vXQYG4LfgoJ8XkPl49/AC3i8R+VHENNGVPSYidSm7EHluzPDmCtEbGbBL5QcXDHdQAP1X+ty1Dc80yCGDNrLGunSvu+rBz9/QX9jaTLbhCPKNLtDQStuD3n6yBiR/aAdaw6EPn9KblU5bi82ipREjXm6IdaHErFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunyoo.cc; spf=pass smtp.mailfrom=yunyoo.cc; dkim=pass (2048-bit key) header.d=yunyoo-cc.20200929.dkim.larksuite.com header.i=@yunyoo-cc.20200929.dkim.larksuite.com header.b=oI3Hh2kl; arc=none smtp.client-ip=101.36.218.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunyoo.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunyoo.cc
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=yunyoo-cc.20200929.dkim.larksuite.com; t=1772416673;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=Adqf0zh2hayDMj7FF1I0bgPXD9fxuN4yMCe2P+dI7vg=;
+ b=oI3Hh2klncXn9VySxG53E47EvKfmKXi9QnSgDZHHPb5WzOPD1vg4yPWwsfGHF5AQGo/YAY
+ MiFugChHTtB5rqzURRdMydjiLAtCe47Y/BlQ4O6nXTMw7auoRS1MbJH90UWaVRHFSReFry
+ xTzHl8VgLR8Bs8plZSViFJnbQCgOQqjamL2CJdUKYHI3C/8nNJmye1xK0CEwAqYexKlyKn
+ iLXUp8bE1i4jLQrmJP9JCDlUysHXP6mOe7aGon5SK2E5vV7ICDIDWLmiq4zMrFLM47mEBD
+ KeIEFCgm5nZcJvE3ZAUFKvu8MWJE/97MFvOu9/PzkKZ//Dki1eo77tGUDQ4S4A==
+References: <9ac0a071e79e9da8128523ddeba19085f4f8c9aa.decbd9ef.1293.41c3.bf27.48cdc12b9ce6@larksuite.com> <20260301190906-mutt-send-email-mst@kernel.org> <20260301193655-mutt-send-email-mst@kernel.org>
+	<20260301194456-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "jasowang@redhat.com" <jasowang@redhat.com>, 
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [BUG] vhost_net: livelock in handle_rx() when GRO packet exceeds virtqueue capacity
+From: "ShuangYu" <shuangyu@yunyoo.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] cgroup: add lockless fast-path checks to
- cgroup_file_notify()
-To: Shakeel Butt <shakeel.butt@linux.dev>, Tejun Heo <tj@kernel.org>
-Cc: Johannes Weiner <hannes@cmpxchg.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
- <mkoutny@suse.com>, Roman Gushchin <roman.gushchin@linux.dev>,
- Kuniyuki Iwashima <kuniyu@google.com>,
- Daniel Sedlak <daniel.sedlak@cdn77.com>,
- Meta kernel team <kernel-team@meta.com>, linux-mm@kvack.org,
- netdev@vger.kernel.org, cgroups@vger.kernel.org,
- linux-kernel@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
-References: <20260228142018.3178529-1-shakeel.butt@linux.dev>
- <20260228142018.3178529-3-shakeel.butt@linux.dev>
-Content-Language: en-US
-From: Chen Ridong <chenridong@huaweicloud.com>
-In-Reply-To: <20260228142018.3178529-3-shakeel.butt@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:gCh0CgAHtPT97KRp5TUGJQ--.53758S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxZFyUXryxJF17CF4ruFWkXrb_yoW5uF1kpa
-	98CrZaka1YgFyj9wn2qa4jgFyrW397WrWUXrZ7X340yF47Cw12vayxCr1UWFyUArs7Wr47
-	JrWavrW7Cw1qya7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
-	14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
-	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8
-	ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
-	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
-	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1
-	7KsUUUUUU==
-X-CM-SenderInfo: hfkh02xlgr0w46kxt4xhlfz01xgou0bp/
+Mime-Version: 1.0
+Date: Mon, 02 Mar 2026 01:57:51 +0000
+Message-Id: <9ac0a071e79e9da8128523ddeba19085f4f8c9aa.8ae4e890.449b.4397.8e81.d58ff010ba07@larksuite.com>
+In-Reply-To: <20260301194456-mutt-send-email-mst@kernel.org>
+X-Lms-Return-Path: <lba+169a4eea0+db670e+vger.kernel.org+shuangyu@yunyoo.cc>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[yunyoo-cc.20200929.dkim.larksuite.com:s=s1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	DMARC_NA(0.00)[yunyoo.cc];
 	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[chenridong@huaweicloud.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262472-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[huaweicloud.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email]
-X-Rspamd-Queue-Id: E5DE81D25D8
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262473-lists,netdev=lfdr.de];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shuangyu@yunyoo.cc,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[yunyoo-cc.20200929.dkim.larksuite.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,larksuite.com:mid,linux.dev:email,yunyoo-cc.20200929.dkim.larksuite.com:dkim]
+X-Rspamd-Queue-Id: E309D1D262B
 X-Rspamd-Action: no action
 
 
-Hi Shakeel,
+> From: "Michael S. Tsirkin"<mst@redhat.com>
+> Date:=C2=A0 Mon, Mar 2, 2026, 08:45
+> Subject:=C2=A0 Re: [BUG] vhost_net: livelock in handle_rx() when GRO pack=
+et exceeds virtqueue capacity
+> To: "ShuangYu"<shuangyu@yunyoo.cc>
+> Cc: "jasowang@redhat.com"<jasowang@redhat.com>, "virtualization@lists.lin=
+ux.dev"<virtualization@lists.linux.dev>, "netdev@vger.kernel.org"<netdev@vg=
+er.kernel.org>, "linux-kernel@vger.kernel.org"<linux-kernel@vger.kernel.org=
+>, "kvm@vger.kernel.org"<kvm@vger.kernel.org>
+> On Sun, Mar 01, 2026 at 07:39:30PM -0500, Michael S. Tsirkin wrote:
+> > On Sun, Mar 01, 2026 at 07:10:06PM -0500, Michael S. Tsirkin wrote:
+> > > On Sun, Mar 01, 2026 at 10:36:39PM +0000, ShuangYu wrote:
+> > > > Hi,
+> > > >=C2=A0
+> > > > We have hit a severe livelock in vhost_net on 6.18.x. The vhost
+> > > > kernel thread spins at 100% CPU indefinitely in handle_rx(), and
+> > > > QEMU becomes unkillable (stuck in D state).
+> > > > [This is a text/plain messages]
+> > > >=C2=A0
+> > > > Environment
+> > > > -----------
+> > > > =C2=A0 Kernel:=C2=A0 6.18.10-1.el8.elrepo.x86_64
+> > > > =C2=A0 QEMU: =C2=A0=C2=A0 7.2.19
+> > > > =C2=A0 Virtio:=C2=A0 VIRTIO_F_IN_ORDER is negotiated
+> > > > =C2=A0 Backend: vhost (kernel)
+> > > >=C2=A0
+> > > > Symptoms
+> > > > --------
+> > > > =C2=A0 - vhost-<pid> kernel thread at 100% CPU (R state, never yiel=
+ds)
+> > > > =C2=A0 - QEMU stuck in D state at vhost_dev_flush() after receiving=
+ SIGTERM
+> > > > =C2=A0 - kill -9 has no effect on the QEMU process
+> > > > =C2=A0 - libvirt management plane deadlocks ("cannot acquire state =
+change lock")
+> > > >=C2=A0
+> > > > Root Cause
+> > > > ----------
+> > > > The livelock is triggered when a GRO-merged packet on the host TAP
+> > > > interface (e.g., ~60KB) exceeds the remaining free capacity of the
+> > > > guest's RX virtqueue (e.g., ~40KB of available buffers).
+> > > >=C2=A0
+> > > > The loop in handle_rx() (drivers/vhost/net.c) proceeds as follows:
+> > > >=C2=A0
+> > > > =C2=A0 1. get_rx_bufs() calls vhost_get_vq_desc_n() to fetch descri=
+ptors.
+> > > > =C2=A0=C2=A0=C2=A0 It advances vq->last_avail_idx and vq->next_avai=
+l_head as it
+> > > > =C2=A0=C2=A0=C2=A0 consumes buffers, but runs out before satisfying=
+ datalen.
+> > > >=C2=A0
+> > > > =C2=A0 2. get_rx_bufs() jumps to err: and calls
+> > > > =C2=A0=C2=A0=C2=A0 vhost_discard_vq_desc(vq, headcount, n), which r=
+olls back
+> > > > =C2=A0=C2=A0=C2=A0 vq->last_avail_idx and vq->next_avail_head.
+> > > >=C2=A0
+> > > > =C2=A0=C2=A0=C2=A0 Critically, vq->avail_idx (the cached copy of th=
+e guest's
+> > > > =C2=A0=C2=A0=C2=A0 avail->idx) is NOT rolled back. This is correct =
+behavior in
+> > > > =C2=A0=C2=A0=C2=A0 isolation, but creates a persistent mismatch:
+> > > >=C2=A0
+> > > > =C2=A0=C2=A0 =C2=A0=C2=A0 vq->avail_idx =C2=A0 =C2=A0=C2=A0 =3D 108=
+=C2=A0 (cached, unchanged)
+> > > > =C2=A0=C2=A0 =C2=A0=C2=A0 vq->last_avail_idx =3D 104=C2=A0 (rolled =
+back)
+> > > >=C2=A0
+> > > > =C2=A0 3. handle_rx() sees headcount =3D=3D 0 and calls vhost_enabl=
+e_notify().
+> > > > =C2=A0=C2=A0=C2=A0 Inside, vhost_get_avail_idx() finds:
+> > > >=C2=A0
+> > > > =C2=A0=C2=A0 =C2=A0=C2=A0 vq->avail_idx (108) !=3D vq->last_avail_i=
+dx (104)
+> > > >=C2=A0
+> > > > =C2=A0=C2=A0=C2=A0 It returns 1 (true), indicating "new buffers ava=
+ilable."
+> > > > =C2=A0=C2=A0=C2=A0 But these are the SAME buffers that were just di=
+scarded.
+> > > >=C2=A0
+> > > > =C2=A0 4. handle_rx() hits `continue`, restarting the loop.
+> > > >=C2=A0
+> > > > =C2=A0 5. In the next iteration, vhost_get_vq_desc_n() checks:
+> > > >=C2=A0
+> > > > =C2=A0=C2=A0 =C2=A0=C2=A0 if (vq->avail_idx =3D=3D vq->last_avail_i=
+dx)
+> > > >=C2=A0
+> > > > =C2=A0=C2=A0=C2=A0 This is FALSE (108 !=3D 104), so it skips re-rea=
+ding the guest's
+> > > > =C2=A0=C2=A0=C2=A0 actual avail->idx and directly fetches the same =
+descriptors.
+> > > >=C2=A0
+> > > > =C2=A0 6. The exact same sequence repeats: fetch -> too small -> di=
+scard
+> > > > =C2=A0=C2=A0=C2=A0 -> rollback -> "new buffers!" -> continue. Indef=
+initely.
+> > > >=C2=A0
+> > > > This appears to be a regression introduced by the VIRTIO_F_IN_ORDER
+> > > > support, which added vhost_get_vq_desc_n() with the cached avail_id=
+x
+> > > > short-circuit check, and the two-argument vhost_discard_vq_desc()
+> > > > with next_avail_head rollback. The mismatch between the rollback
+> > > > scope (last_avail_idx, next_avail_head) and the check scope
+> > > > (avail_idx vs last_avail_idx) was not present before this change.
+> > > >=C2=A0
+> > > > bpftrace Evidence
+> > > > -----------------
+> > > > During the 100% CPU lockup, we traced:
+> > > >=C2=A0
+> > > > =C2=A0 @get_rx_ret[0]: =C2=A0 =C2=A0=C2=A0 4468052 =C2=A0 // get_rx=
+_bufs() returns 0 every time
+> > > > =C2=A0 @peek_ret[60366]: =C2=A0=C2=A0 4385533 =C2=A0 // same 60KB p=
+acket seen every iteration
+> > > > =C2=A0 @sock_err[recvmsg]: =C2=A0 =C2=A0 =C2=A0=C2=A0 0 =C2=A0 // t=
+un_recvmsg() is never reached
+> > > >=C2=A0
+> > > > vhost_get_vq_desc_n() was observed iterating over the exact same 11
+> > > > descriptor addresses millions of times per second.
+> > > >=C2=A0
+> > > > Workaround
+> > > > ----------
+> > > > Either of the following avoids the livelock:
+> > > >=C2=A0
+> > > > =C2=A0 - Disable GRO/GSO on the TAP interface:
+> > > > =C2=A0=C2=A0 =C2=A0 ethtool -K <tap> gro off gso off
+> > > >=C2=A0
+> > > > =C2=A0 - Switch from kernel vhost to userspace QEMU backend:
+> > > > =C2=A0=C2=A0 =C2=A0 <driver name=3D'qemu'/> in libvirt XML
+> > > >=C2=A0
+> > > > Bisect
+> > > > ------
+> > > > We have not yet completed a full git bisect, but the issue does not
+> > > > occur on 6.17.x kernels which lack the VIRTIO_F_IN_ORDER vhost
+> > > > support. We will follow up with a Fixes: tag if we can identify the
+> > > > exact commit.
+> > > >=C2=A0
+> > > > Suggested Fix Direction
+> > > > -----------------------
+> > > > In handle_rx(), when get_rx_bufs() returns 0 (headcount =3D=3D 0) d=
+ue to
+> > > > insufficient buffers (not because the queue is truly empty), the co=
+de
+> > > > should break out of the loop rather than relying on
+> > > > vhost_enable_notify() to make that determination. For example, when
+> > > > get_rx_bufs() returns r =3D=3D 0 with datalen still > 0, this indic=
+ates a
+> > > > "packet too large" condition, not a "queue empty" condition, and
+> > > > should be handled differently.
+> > > >=C2=A0
+> > > > Thanks,
+> > > > ShuangYu
+> > >=C2=A0
+> > > Hmm. On a hunch, does the following help? completely untested,
+> > > it is night here, sorry.
+> > >=C2=A0
+> > >=C2=A0
+> > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> > > index 2f2c45d20883..aafae15d5156 100644
+> > > --- a/drivers/vhost/vhost.c
+> > > +++ b/drivers/vhost/vhost.c
+> > > @@ -1522,6 +1522,7 @@ static void vhost_dev_unlock_vqs(struct vhost_d=
+ev *d)
+> > > =C2=A0static inline int vhost_get_avail_idx(struct vhost_virtqueue *v=
+q)
+> > > =C2=A0{
+> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0__virtio16 idx;
+> > > + =C2=A0 =C2=A0 =C2=A0 =C2=A0u16 avail_idx;
+> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0int r;
+> > > =C2=A0
+> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0r =3D vhost_get_avail(vq, idx, &vq-=
+>avail->idx);
+> > > @@ -1532,17 +1533,19 @@ static inline int vhost_get_avail_idx(struct =
+vhost_virtqueue *vq)
+> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}
+> > > =C2=A0
+> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* Check it isn't doing very strang=
+e thing with available indexes */
+> > > - =C2=A0 =C2=A0 =C2=A0 =C2=A0vq->avail_idx =3D vhost16_to_cpu(vq, idx=
+);
+> > > - =C2=A0 =C2=A0 =C2=A0 =C2=A0if (unlikely((u16)(vq->avail_idx - vq->l=
+ast_avail_idx) > vq->num)) {
+> > > + =C2=A0 =C2=A0 =C2=A0 =C2=A0avail_idx =3D vhost16_to_cpu(vq, idx);
+> > > + =C2=A0 =C2=A0 =C2=A0 =C2=A0if (unlikely((u16)(avail_idx - vq->last_=
+avail_idx) > vq->num)) {
+> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0vq_err(=
+vq, "Invalid available index change from %u to %u",
+> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 vq->last_avail_idx, vq->avail_idx);
+> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return =
+-EINVAL;
+> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}
+> > > =C2=A0
+> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* We're done if there is nothing n=
+ew */
+> > > - =C2=A0 =C2=A0 =C2=A0 =C2=A0if (vq->avail_idx =3D=3D vq->last_avail_=
+idx)
+> > > + =C2=A0 =C2=A0 =C2=A0 =C2=A0if (avail_idx =3D=3D vq->avail_idx)
+> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return =
+0;
+> > > =C2=A0
+> > > + =C2=A0 =C2=A0 =C2=A0 =C2=A0vq->avail_idx =3D=3D avail_idx;
+> > > +
+> >=C2=A0
+> > meaning=C2=A0
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 vq->avail_idx =3D avail_idx;=C2=A0
+> > of course
+> >=C2=A0
+> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/*
+> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 * We updated vq->avail_idx so we n=
+eed a memory barrier between
+> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 * the index read above and the cal=
+ler reading avail ring entries.
+>=C2=A0
+>=C2=A0
+> and the change this is fixing was done in d3bb267bbdcba199568f1325743d9d5=
+01dea0560
+>=C2=A0
+> --=C2=A0
+> MST
+>=C2=A0
 
-Good series to move away from the global lock.
+Thank you for the quick fix and for identifying the root commit.
 
-On 2026/2/28 22:20, Shakeel Butt wrote:
-> Add two lockless checks before acquiring the lock:
-> 
-> 1. READ_ONCE(cfile->kn) NULL check to skip torn-down files.
-> 2. READ_ONCE(cfile->notified_at) check to skip when within the
->    rate-limit window (~10ms).
-> 
-> Both checks have safe error directions -- a stale read can only cause
-> unnecessary lock acquisition, never a missed notification.  Annotate
-> all write sites with WRITE_ONCE() to pair with the lockless readers.
-> 
-> The trade-off is that trailing timer_reduce() calls during bursts are
-> skipped, so the deferred notification that delivers the final state
-> may be lost.  This is acceptable for the primary callers like
-> __memcg_memory_event() where events keep arriving.
-> 
-> Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
-> Reported-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  kernel/cgroup/cgroup.c | 21 ++++++++++++++-------
->  1 file changed, 14 insertions(+), 7 deletions(-)
-> 
-> diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
-> index 33282c7d71e4..5473ebd0f6c1 100644
-> --- a/kernel/cgroup/cgroup.c
-> +++ b/kernel/cgroup/cgroup.c
-> @@ -1749,7 +1749,7 @@ static void cgroup_rm_file(struct cgroup *cgrp, const struct cftype *cft)
->  		struct cgroup_file *cfile = (void *)css + cft->file_offset;
->  
->  		spin_lock_irq(&cgroup_file_kn_lock);
-> -		cfile->kn = NULL;
-> +		WRITE_ONCE(cfile->kn, NULL);
->  		spin_unlock_irq(&cgroup_file_kn_lock);
->  
->  		timer_delete_sync(&cfile->notify_timer);
-> @@ -4430,7 +4430,7 @@ static int cgroup_add_file(struct cgroup_subsys_state *css, struct cgroup *cgrp,
->  		timer_setup(&cfile->notify_timer, cgroup_file_notify_timer, 0);
->  
->  		spin_lock_irq(&cgroup_file_kn_lock);
-> -		cfile->kn = kn;
-> +		WRITE_ONCE(cfile->kn, kn);
->  		spin_unlock_irq(&cgroup_file_kn_lock);
->  	}
->  
-> @@ -4686,20 +4686,27 @@ int cgroup_add_legacy_cftypes(struct cgroup_subsys *ss, struct cftype *cfts)
->   */
->  void cgroup_file_notify(struct cgroup_file *cfile)
->  {
-> -	unsigned long flags;
-> +	unsigned long flags, last, next;
->  	struct kernfs_node *kn = NULL;
->  
-> +	if (!READ_ONCE(cfile->kn))
-> +		return;
-> +
-> +	last = READ_ONCE(cfile->notified_at);
-> +	if (time_before_eq(jiffies, last + CGROUP_FILE_NOTIFY_MIN_INTV))
-> +		return;
-> +
+I've reviewed the patch and I believe the logic is correct =E2=80=94 changi=
+ng
+the "nothing new" check in vhost_get_avail_idx() from comparing
+against vq->last_avail_idx to comparing against the cached
+vq->avail_idx makes it immune to the rollback done by
+vhost_discard_vq_desc(), which is exactly what breaks the loop.
 
-Previously, if a notification arrived within the rate-limit window, we would
-still call timer_reduce(&cfile->notify_timer, next) to schedule a deferred
-notification.
+One minor nit: the vq_err message on the sanity check path still
+references vq->avail_idx before it has been updated:
 
-With this change, returning early here bypasses that timer scheduling entirely.
-Does this risk missing notifications that would have been delivered by the timer?
+=C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 vq_err(vq, "Invalid available index change=
+ from %u to %u",
+- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 vq->last_avail_idx, vq->a=
+vail_idx);
++ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 vq->last_avail_idx, avail=
+_idx);
 
->  	spin_lock_irqsave(&cgroup_file_kn_lock, flags);
->  	if (cfile->kn) {
-> -		unsigned long last = cfile->notified_at;
-> -		unsigned long next = last + CGROUP_FILE_NOTIFY_MIN_INTV;
-> +		last = cfile->notified_at;
-> +		next = last + CGROUP_FILE_NOTIFY_MIN_INTV;
->  
-> -		if (time_in_range(jiffies, last, next)) {
-> +		if (time_before_eq(jiffies, next)) {
->  			timer_reduce(&cfile->notify_timer, next);
->  		} else {
->  			kn = cfile->kn;
->  			kernfs_get(kn);
-> -			cfile->notified_at = jiffies;
-> +			WRITE_ONCE(cfile->notified_at, jiffies);
->  		}
->  	}
->  	spin_unlock_irqrestore(&cgroup_file_kn_lock, flags);
 
--- 
-Best regards,
-Ridong
+Since this issue was found in production, I need some time to prepare a tes=
+t setup to verify the patch
 
+Thanks,
+ShuangYu
 
