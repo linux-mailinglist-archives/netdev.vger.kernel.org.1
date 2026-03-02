@@ -1,211 +1,212 @@
-Return-Path: <netdev+bounces-262464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262465-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cIVAFbHjpGmquwUAu9opvQ
-	(envelope-from <netdev+bounces-262464-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 02:11:13 +0100
+	id uLFHNevjpGmquwUAu9opvQ
+	(envelope-from <netdev+bounces-262465-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 02:12:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF5021D23B4
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 02:11:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39FF11D23BD
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 02:12:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 23C673015464
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 01:11:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CD0E93013A94
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 01:12:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA87C20E702;
-	Mon,  2 Mar 2026 01:11:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F4B41E1A3B;
+	Mon,  2 Mar 2026 01:12:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="0YZ49CiR"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ZFA0/fc2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010055.outbound.protection.outlook.com [52.101.56.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75EA114B08A
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 01:11:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772413867; cv=none; b=TAngXh8tGrjdm5dCQ8LSMT8J4JJjkmYRjzZFzbYJzDbA4uu0NBL5qZZYMgfF4lUJwnzMpV+ESduMQrBRxT407t9JXLCXAj1JZDRJHZ5QMlVVcYaQ9R9TpczQmZbHBit4m2EKPy2ea8fm8XsK+ax2F2ev2xGmPGymf3SQWcBZQrc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772413867; c=relaxed/simple;
-	bh=WuNhENcX1fJwfoNDpI8nYniFOrFTNC2cD+1g8RgYTgg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GMgn5gIvh4+z1+/KKCt3A+Dim0dNl+r8WIi+DOrFNHgWjifjaESehjBQS0B1jP3M6L5g76Kf2rapFu/MFV5qkvXjgbsy5tDRYGWy7TAzJkl36kdhCAoS+Sdq4sxDPV+QtbvOznpVhn5dbHod2gVlH2PIu0MpKVfiro+CxOBn9Zw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=0YZ49CiR; arc=none smtp.client-ip=74.125.82.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-1271257ae53so4509275c88.1
-        for <netdev@vger.kernel.org>; Sun, 01 Mar 2026 17:11:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1772413865; x=1773018665; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mLzx4QloOR7w220ELbFdJo9+YB2Xr38O5JizyVmv14A=;
-        b=0YZ49CiRYI+llU7OGK0XJsvc/SyXDhIFEAFNyo2adxXRmcfQGtm08b9TrXy3mhEQS0
-         nttcKWsuIFjOQKVaZuqudSSCqYKZuBdV3ZhrK7uVo4yO/CAAJ7CZnH6tVwwt84t+P15r
-         IdGQPAlttl8JhIXJNjs6DAdO3c40p2N5TjELPhywimltCIjKLngn/RyVCSeuXJxtJcYJ
-         wzOLlKLmBTBlmMOeEMH7gdKIttBAyIRWukIAOSPbyDkktIia0zgxhZ6mcfOyAuJcZ7Mg
-         TnzNT9F6EIevyNnqpO5tzoT9Ow1u6z4xdoPIGL4MtzoLc01eOAtftlnKPpWzdBWwB3JV
-         MFdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772413865; x=1773018665;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=mLzx4QloOR7w220ELbFdJo9+YB2Xr38O5JizyVmv14A=;
-        b=falY5iljq+wouuoWcqcMBg78BNaC5HCfbazpu0A9DA5jyPV8FuSBw6b+iSKtK4EXaz
-         wc5jSYYlVop8hrWBsVbt7mEZu4ceuUfCwC1G/ixYD++SHp1KBGGhrwL1+vEuY1cmNwrD
-         c4TJ8qMQwm/kxsQ2/HRdN3RST+Fv0dbmAWU2WIvwKNQQTNroDrhQbi6Z0UysFgKd/XYE
-         XJV9NOsk9oeu0EGJGEhiui8/bavOw9/zoTq9vQtatiNbacRY8luOWXxRv3cZtb6F+RHW
-         zdO36kLFTxoxA1s/6Yi+5y5AkMX0NxRkcR/5Ia3Jp5wHxr8M25vxf2Ggz0BZ/LhQzvpw
-         3Uzw==
-X-Gm-Message-State: AOJu0YwPZaVN9iIQIkzBjm25iAMcVbmu8Vh8cPPl2Ux190dOFniEwxiK
-	NnHkaVziJpIcSTcdD+e4GVxkZ7LVIGehZ+pFiie4MzfcCP72KF7GzjMg6h17OMNBxUc=
-X-Gm-Gg: ATEYQzzs3nyeWHmdiQ5bADi8ni1zObxDY2t7XXKZDhWsJn+B2ginE+8zShYhrBmiIex
-	dQRouaoergx+W2Mi1S0p8Tu0cnG6bZDC0YtAmKgkhG/pux/Q3qMe/zNi96hSeh7MFmbb36qImPj
-	7Jcmlwmqe5GN5w2/YwGKfiBK/juv9u5YN9nyGMVFVLL178O03FHcgfS7O/8eg6EQm6ewUWrtDtX
-	i+WlL/0Os7S6lMht9vD3wn1eBuv9/gKe4jPrY8ayNTk9jfSwFWuMof5s4JUN+Q9bVarT77nrris
-	v2oYZPwYaPmFoD6qiWI0/Aejd8klOsMaadQlRqN30lyC4WRXl3dp9HOsCJKPszSraRw74XUnAJM
-	fsjXCHEaO63Xekox+xf88126pmbiZuOYFzS3emgGmfcgE2QtxhEiyFLMiNzxiiv6JXGytSdKMcs
-	96agzDrftQHFtVmT/FEFQsuW97NHukhEmB6gKr90uPzLlYAI6aI2lNd5k0YGM/1oPi
-X-Received: by 2002:a05:7022:4381:b0:11e:528:4185 with SMTP id a92af1059eb24-1278fc568a2mr4166249c88.38.1772413864497;
-        Sun, 01 Mar 2026 17:11:04 -0800 (PST)
-Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12789a43c12sm12792111c88.14.2026.03.01.17.11.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Mar 2026 17:11:04 -0800 (PST)
-Date: Sun, 1 Mar 2026 17:11:01 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org, Mirko Lindner
- <mlindner@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Thomas
- Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@kernel.org>
-Subject: Re: [PATCH] net: ethernet: marvell: skge: remove incorrect
- conflicting PCI ID
-Message-ID: <20260301171101.16d07cbe@phoenix.local>
-In-Reply-To: <20260206071724.15268-1-enelsonmoore@gmail.com>
-References: <20260206071724.15268-1-enelsonmoore@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7ED5632;
+	Mon,  2 Mar 2026 01:12:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.55
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772413929; cv=fail; b=tHDAl3dSrkIfSNV0ZavhZkbcIMdDGGoR1btZ85wtKFg+XqyozQmI2alwoe0f7KoAKSUuRIVVgzns82zd7waIYW8cWATu99URCf9MhpZdJMpuiFFL5AXik4YF5duul4dgm7Z0+h+Q5V+DuerPUXAcpFOYKrzaJyVxQNKXQ+MxPG4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772413929; c=relaxed/simple;
+	bh=Ah6REklwFDmyOIXBvdwuxt6vxZbkwWxWy+rAiLC7ojw=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=DRYL7eO5X/aDWu9uhHEXglxuSJxU42yVebEaABdr6uGWv7maB2Rl/Ek8VF5G2pw9KS+mhis33D8gXdVHQdaAUbSSBWromflWKW3RiUC1rOalb8+hv9Kvf0QnIR/7TKx036mQ6/pHNoTpakjtcoVTNRQesVeASg5vy+IilOIg/UI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ZFA0/fc2; arc=fail smtp.client-ip=52.101.56.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=s2PF5/HgZgGdfe3RcxgAFcqR858Wu4MJ7sqfYLy9BImyoAmdLyF1XDBAy8zri9zLQqh1UEeAeTppSs5kWQmqAR5QV4too+7gdk3q7BmO1EDgIKkWccPS/MKIPznUF8Gu98TuhMPcQy6Lf3CeNcnE1v3IGZTaiYHQ0bmp5xRodn3BcvEZb33PcuPA1pw4XSKt6mGsdHhAbQ10Emhnd9xyXewC4S6TVslrTCY/7JAyUarSRoIWOlauvflwQS++CH91EJdMH4TKwX699s3uvFPGXMrVaLXal0qA8VIvUD89OdYWQrW5q4kG1e1DCMy28EOLEnOsOy9wPdgmJIpG7en3gw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=I4tbw8NUukGoz166fJjNDQf4QJoPo9TRqkxvU3MOA88=;
+ b=q+6Hc8YuOVI3Sxirg+15OiyXBQosSLZ1oG0sVv5SmpI1QGYQ7qboTceMvweko4Zextp8KhU/TEtkupTgSSh9BFgXHi4L4VjpNuzqQno9ppyCa+ygYaLVVxArVH4GQOx8tqDxSjcm2wdN/Xw7ikJJ9S52m6hEHPDrfHIzzeF4va2u3Zikst+QVK+7MqSE5e/AJPbItnb7dVswXJHbBbL9kD6k04tgAwYW0ZDeHE/p+RGjjN7XxrkVFaCkmNn6R3PN0n/hP7m+9raEnPXKkr+jRvCVcnsuq6dWAdCp03CFvrOUu+UklNS42SGeQ8NH50WERz2NBm235/suVaSxWxQ4MQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=I4tbw8NUukGoz166fJjNDQf4QJoPo9TRqkxvU3MOA88=;
+ b=ZFA0/fc24R0NyWLGRdo/6UKf1usFTVX2bQsZ7mAcfW5jbr9C+ryE71t2J7DgSRB8C1WIN0D4CWcbLs2mnuR5USWfDcbmhPpGtDqlG2PFjQJ/S6paXwjtHLWFvv9h8Bfb+pvMj4VF1uRY7BrSvPBRUdBeiGoR7P05Wf/i0RkFuhCVwVnhz2DyxkYipNDfr34GbY78kKOdCnwROvuQ/prGLc+033M/qIfAckgM1Yo+FvzKGXLbbhuR/ojRm0hHzMnFHp9urvV5T4ShMDOg/VsrIib3oq9hls9ypPv8mVRjDfRrUQycfM2phgEUIGvFDx+UTmfaP+kgHbNDjLRrw3hoYQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from PH0PR12MB8800.namprd12.prod.outlook.com (2603:10b6:510:26f::12)
+ by PH8PR12MB7184.namprd12.prod.outlook.com (2603:10b6:510:227::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.22; Mon, 2 Mar
+ 2026 01:12:02 +0000
+Received: from PH0PR12MB8800.namprd12.prod.outlook.com
+ ([fe80::f79d:ddc5:2ad7:762d]) by PH0PR12MB8800.namprd12.prod.outlook.com
+ ([fe80::f79d:ddc5:2ad7:762d%4]) with mapi id 15.20.9654.015; Mon, 2 Mar 2026
+ 01:12:02 +0000
+From: Yury Norov <ynorov@nvidia.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	David Airlie <airlied@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Matthew Brost <matthew.brost@intel.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	Yury Norov <yury.norov@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	dri-devel@lists.freedesktop.org,
+	intel-xe@lists.freedesktop.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org
+Cc: Yury Norov <ynorov@nvidia.com>,
+	Simon Horman <horms@kernel.org>,
+	David Laight <david.laight.linux@gmail.com>
+Subject: [PATCH v2 0/4] ice: use better bitmap API
+Date: Sun,  1 Mar 2026 20:11:54 -0500
+Message-ID: <20260302011159.61778-1-ynorov@nvidia.com>
+X-Mailer: git-send-email 2.43.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BN8PR04CA0046.namprd04.prod.outlook.com
+ (2603:10b6:408:d4::20) To PH0PR12MB8800.namprd12.prod.outlook.com
+ (2603:10b6:510:26f::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB8800:EE_|PH8PR12MB7184:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3eacefb4-204d-42b1-e989-08de77f8b622
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|10070799003|376014|7416014|921020;
+X-Microsoft-Antispam-Message-Info:
+	pMgV88tFcK1/7utVFrzhpxX1tsV9h7m7HPQI7sbmbmi7TOxP3kgbQb0WzJc4gzOS503jSBTaPq65w2Ox+eVzuCY7ujDqZqEvsyGc9Mlmfn2zG/64JTToc9BzV3Z9bO3Jcm3W+mpW9P+mbEsMfOJStnFHPLAAmQY6ALD9HtOoDLdOgJjXBeR2iqi9pBPcG5VYQeXgNWCybtnZQN+9TNr/LEPWP48y59vr+0ZB9s2O18Achvqfv1UZIjfkuxxy43Tq9cWaotLmW2xMrmKHu94nTScAcmCUY0JpfkVhOetCAEkb1TIcXgv5iwN/XeH7a/kFk+pwiIQG3jkDW0P6egWgxi4C5QTq69J5DCrr8/MYt1Hae8EKdlj2WLLkEFo4zOl8DxKIlLHkA9JykzoqMCjBzJTzdQJBkMjWRsXSSrtsGNQzUQizUi7qv13XG5j2QjyoZc6bY2zxVxwzUmfcu6RDQRYh6GFa4UL4daqtkbNFYB9tlUdNK5vb+3uM8E3QIf8rwV0qVlDAMqC2UMS8HtoybPX1pvCydqn5yIZdmvoeMbMv4DdEF5bdWRyawrOIs8Knd6hKkgNZkmxxA4s/8uNQ/bOThQKk80BOGxW0Ky3UR3Eo4A0p8egVEBfVSaCC72/Lv0C0/QtA6dboMb3xsromkLs8Ap+WjwIhG62cyr3RTwYfUoqYKjJ30R2rtPDdpCofhcmEYLtwwTtLw2HgSwAa1djy6QVCc8R+xyDNiYpk9dLFYLqrZsyS/Uf73MGn4+ZSYm5Ls8BU3dNI7oO3jW0153mEPYyFh8RzvruyQb7zdzE=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB8800.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(10070799003)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?NdZaKTMFR4fZwm2n2hlIIEFrGD2kl3qY/j7vGw1CJGCm1tvVTUJKZ7z9vHzF?=
+ =?us-ascii?Q?wFm/f2paaDrUuB8kSFWMFQQevMQaH0e98MDY5DQWDohOrb1Yz9yWnKrw5Kow?=
+ =?us-ascii?Q?Gqzjidq67KZwxYo9GKoet1dwES5oUX+skIcqtUGeImV+/HB2BRkHaLnOMmv4?=
+ =?us-ascii?Q?fPYmh3G8gaK91Rteh5crCRjkPXrwo/m7+pXUO6uOb91N7FDBnqqbWl9K5Jh1?=
+ =?us-ascii?Q?5lIgk8TXaPiBunGJyECcEoMB51YlB2THZbHn0oNyN64bsj7y4Bk6LpiJ0NqN?=
+ =?us-ascii?Q?KyxV1GV1ArnJY9oz6zniAic8opBteej8vSBKvEHXBbzthqmQpjYpi95BhOqB?=
+ =?us-ascii?Q?81IwR4yQH892HLebUY7vALL9IPO9DpsulzyZ/MOTCemMni+AKlhwCw+Cn5X6?=
+ =?us-ascii?Q?v/S6xD5fFjPtBvCxWKiVO6gmtoNaQj73FBR4n7vBo2waIJfbPsSHCpFNh9lt?=
+ =?us-ascii?Q?sS/fzqPFgcKbcKDb6RKqS/cfl8T6yt8W7aZbTOyiEW8TM5pWNpv+lTVKBU2D?=
+ =?us-ascii?Q?YYQIu8drxJEwkESNgKDG8yeMZBgEl9rzhtjm7lELlbFsSQykgZoh8yAVdPMw?=
+ =?us-ascii?Q?Z7Vl2LjQ0J+j1V7Z0rlIDNRgzqpZRvkq/Ok7GwJouMjZ2gEUMjAW7ot7xNee?=
+ =?us-ascii?Q?07ve8SyaEbyYMxvWiLOA1CPR0DCJzSgri7CyCMYdOSEd7cC3diLSjdi0yEwQ?=
+ =?us-ascii?Q?L1N4BmQ/93ZJglehjm9iVYrg4cq+0OeiW7uFXH65SB5o8u3Q16UUTMig4mDc?=
+ =?us-ascii?Q?PbjNsIPHg2L033QIEHy4M/otMDP453zEQCey+6fP7iZ5CNC+KRiL4J8cPASQ?=
+ =?us-ascii?Q?W6/LekcSOl4X83DNmpUFtABL46afZQKxiVhJe20XD1hTqjGdWWzElXwGijhv?=
+ =?us-ascii?Q?YFodx1NSdGWAHXeDi1Dkdf4SOITgWZuiol0oOfzLfrzLaLmPgp1eFuO3FVPW?=
+ =?us-ascii?Q?58CRCvpxVoR656MiTisRzCXWQUN8mCa7hIUO8eAdJsMk7P6MyV2JlxeG4f6Q?=
+ =?us-ascii?Q?12HY5PAoWQCmkJBRywFBjuHgBDzZXP7bvr27ILtN+twP4cTU3or9V4TLzfMP?=
+ =?us-ascii?Q?CX3olBC42m9DjTPj78txaELOLjSgslKi65B/a6of4lgP4DsUzkHLE9XDHTo8?=
+ =?us-ascii?Q?GLgeEIVJ1TCDLcZuGPKmxPhmj35aoFPVqt6t41WrXoNV1aPXfUYklByDdMXc?=
+ =?us-ascii?Q?urcD4jTW3y8j/89ZPu4dn+SbtckB972pZ4u1xTfdaPopWRbQUzrXk5Gq3TK/?=
+ =?us-ascii?Q?SE1JZN7c5Vn0qW6iDYyH+M/AVz56wvyBGFm1w4NFBOKxTZk4Xkt4geL8pOmG?=
+ =?us-ascii?Q?yHqwdigGVuWsSk0GYIiVvxEcazkL5eKuhuPUodcsuxN8nWx+W5xdIvAenK0P?=
+ =?us-ascii?Q?dO4VeriOq/sF+dpVf18RVxxDBzPmYcjC20aqfExFY/PCBv2JQe8ciSCNgaja?=
+ =?us-ascii?Q?h+3afTeqS9KrCpxxXtsOP6TSyTsajeDI+gkVXd30ryOHqF8QfvYUMYJ9pxbL?=
+ =?us-ascii?Q?4zM7ELjuJD0KJLvQYo1gUx08/gFX71bXmZlOTC9aO11oscx5Z/rpCKMl+5nJ?=
+ =?us-ascii?Q?DoBaKtatmBUgK5XIFDIcPdguTLzNUXVYMrhzrwIRbo8QSoaVSxdrDiz1SuID?=
+ =?us-ascii?Q?y4Fvm5eXXae+23XgNtsoajdzisuyH/aqwZVIn19wCrUd5+P0ZSoVi2HVathm?=
+ =?us-ascii?Q?+8V7ycfjGQTKFVGJ/pXnH20WnPoqFZ26dJvnp0WQ/XXkgc++3JBi4gxI8Zba?=
+ =?us-ascii?Q?NPQwDO9+goyFGvbQ6IpnYEx9A10o++u+weSAnQMS85Pzb0AwTGlj?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3eacefb4-204d-42b1-e989-08de77f8b622
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB8800.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Mar 2026 01:12:02.6198
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JBU/dR4ch7jFNqNSXXvSk66sgtr0y11AvHmIWbXzdBLAQOZSf+beuP4cQtmG3Q9GopPujo395pAClUXTR9qEPQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7184
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.06 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[networkplumber-org.20230601.gappssmtp.com:s=20230601];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262464-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[networkplumber-org.20230601.gappssmtp.com:+];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262465-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[intel.com,davemloft.net,linux.intel.com,lunn.ch,linux-foundation.org,gmail.com,google.com,kernel.org,redhat.com,ffwll.ch,rasmusvillemoes.dk,lists.freedesktop.org,vger.kernel.org,lists.osuosl.org];
+	FREEMAIL_CC(0.00)[nvidia.com,kernel.org,gmail.com];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ynorov@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.994];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,networkplumber-org.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: EF5021D23B4
+	NEURAL_HAM(-0.00)[-0.998];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:mid,Nvidia.com:dkim]
+X-Rspamd-Queue-Id: 39FF11D23BD
 X-Rspamd-Action: no action
 
-On Thu,  5 Feb 2026 23:17:14 -0800
-Ethan Nelson-Moore <enelsonmoore@gmail.com> wrote:
+Use better bitmap API where appropriate. Patches #3,4 may be applied
+separately.
 
-> The ID 1186:4302 is matched by both r8169 and skge. The same device ID
-> should not be in more than one driver, because in that case, which
-> driver is used is unpredictable. I downloaded the latest drivers for
-> all hardware revisions of the D-Link DGE-530T from D-Link's website,
-> and the only drivers which contain this ID are Realtek drivers.
-> Therefore, remove this device ID from skge.
->=20
-> In the kernel bug report which requested addition of this device ID,
-> someone created a patch to add the ID to skge. Then, it was pointed
-> out that this device is an "r8169 in disguise", and a patch was created
-> to add it to r8169. Somehow, both of these patches got merged. See the
-> link below.
->=20
-> Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D38862
-> Fixes: c074304c2bcf ("add pci-id for DGE-530T")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+v1: https://lore.kernel.org/all/20251223162303.434659-1-yury.norov@gmail.com/
+v2:
+ - new v2#4;
+ - add documentation line (Simon);
 
-I was intrigued as to how this happened, and sent of AI to find out.
+Yury Norov (4):
+  bitmap: introduce bitmap_weighted_xor()
+  ice: use bitmap_weighted_xor() in ice_find_free_recp_res_idx()
+  ice: use bitmap_empty() in ice_vf_has_no_qs_ena
+  drm/xe: switch xe_pagefault_queue_init() to using bitmap_weighted_or()
 
-D-Link DGE-530T: Chipset History and Driver Confusion
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
+ drivers/gpu/drm/xe/xe_pagefault.c           |  3 +--
+ drivers/net/ethernet/intel/ice/ice_switch.c |  4 +---
+ drivers/net/ethernet/intel/ice/ice_vf_lib.c |  4 ++--
+ include/linux/bitmap.h                      | 15 +++++++++++++++
+ lib/bitmap.c                                |  7 +++++++
+ 5 files changed, 26 insertions(+), 7 deletions(-)
 
-D-Link shipped multiple hardware revisions of the DGE-530T under the
-same product name and packaging, but with completely different chipsets:
+-- 
+2.43.0
 
-  Rev A1 - Marvell 88E8003 (SysKonnect Yukon)
-  Rev B1 - Marvell 88E8001 (SysKonnect Yukon)
-  Rev B2 - Marvell 88E8001-LKJ1 (SysKonnect Yukon)
-  Rev C1 - D-Link DLG10028C, a rebadged Realtek RTL8169
-
-The Marvell-based revisions (A/B) used PCI ID 1186:4b01 and were
-driven by skge (the SysKonnect/Marvell Yukon driver, originally
-sk98lin). The Realtek-based Rev C1 used PCI ID 1186:4302 and
-required the r8169 driver.
-
-So the PCI device IDs were actually different across chipset families,
-but they shared the same D-Link vendor ID (1186) and identical product
-branding.
-
-Driver history and the VPD problem
------------------------------------
-
-The original SysKonnect vendor driver (sk98lin) had the D-Link
-1186:4c00 entry commented out in its PCI table:
-
-  /* DLink card does not have valid VPD so this driver gags
-   * { PCI_VENDOR_ID_DLINK, 0x4c00, PCI_ANY_ID, PCI_ANY_ID, 0, 0, 0 },
-   */
-
-The issue wasn't really that the card had bad VPD =E2=80=94 D-Link simply
-didn't populate the Vital Product Data fields the way SysKonnect's
-own boards did, and sk98lin's probe path depended on reading VPD
-during initialization. When skge was written as a clean replacement
-for sk98lin, it had no VPD dependency, so the D-Link entry (1186:4c00)
-went in unconditionally. The 1186:4b01 entry for Rev B was added
-later as users reported it.
-
-When the Rev C1 appeared with a Realtek RTL8169 chip, the 1186:4302
-PCI ID was added to both the r8169 driver (by Lennart Sorensen in
-commit 93a3aa25933461d, July 2011) and to skge's PCI table. This
-meant both modules would match the Rev C1 card, even though skge
-could never actually drive it =E2=80=94 the probe would bail out when it
-read the chip ID and got something that wasn't a Yukon. The result
-was that lspci would report "Kernel modules: skge, r8169" for the
-C1, which was harmless but untidy.
-
-The bogus 1186:4302 entry has since been removed from skge upstream,
-though it's unlikely any DGE-530T cards of any revision still exist
-in the wild at this point.
-
-The chipset swap was widely regarded as a cost-cutting move that
-degraded performance significantly. The Marvell Yukon was well
-respected; the Realtek 8169 was not. Many users and integrators
-stopped recommending the DGE-530T after the C1 appeared.
 
