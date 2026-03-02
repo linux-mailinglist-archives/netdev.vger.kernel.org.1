@@ -1,211 +1,188 @@
-Return-Path: <netdev+bounces-262560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262562-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6IyuNsNPpWll8gUAu9opvQ
-	(envelope-from <netdev+bounces-262560-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 09:52:19 +0100
+	id 2EaPAdZRpWmU8wUAu9opvQ
+	(envelope-from <netdev+bounces-262562-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 10:01:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E657B1D4F3F
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 09:52:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C35C1D52A2
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 10:01:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 83CAE300B9E6
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 08:52:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6FD1E304DF35
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 08:58:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB16F38BF6E;
-	Mon,  2 Mar 2026 08:51:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0CDB38CFEB;
+	Mon,  2 Mar 2026 08:58:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bp9Obh7n";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ORYhLeps"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="jF2Msk6g"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EB4E38B7D2
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 08:51:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7522A38A73E;
+	Mon,  2 Mar 2026 08:58:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772441516; cv=none; b=USC9t5Q0u/RBOA6AFmVhaaN6KfcgH3QFGOHZi6qKSIOsPX5HIkcVGhPdamI99MVtC7GRIGx9CNh2QmVbqu/LZ5KiZyK2/OlnIhnao+OoNjL2rRUmcX/UCwWQDIQ2JkuB6MyxAm0SsV1SzDSux/XRMESDD6i/wuBLMELNWgtYRSg=
+	t=1772441919; cv=none; b=iT0L7RLPD8ZH+IBxfSoF9GpnD8nAV3iIZ7SK2w3VWvnq7nFAFHkmPArJ5a+UDZFeUY1pMqxIhKq6qX3DhLp7shWzFTMdhv5i11mkO9+JY+Bhb06J6JmDaxfEMh+2bWdoaoossKhM1hl/fFmzC4xtSJuAKp4xcTbYNQhuxuQJeIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772441516; c=relaxed/simple;
-	bh=ejoxH+LGsx0lf40D7kcEz2BR8ZKftH4l7JfUa0+NqoQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ja6Wvlw53HQl57SCsZXmkttrxfUPL8YAi1UtWJ4Aiqtu8tQZz8HIZjbx8vQ3Src7M6/cJwnBmZTr5AXFSCRb3RgpHH1rTg3i2fWnyWKmmXxznuR25cEmjAeOS655qwWu5ku0FDLA8ouC/zZLjC4WFvImZ2iVQVI2/WLvU9ardAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bp9Obh7n; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ORYhLeps; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772441514;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=Z9WT3KJPKaJS7kZ732QoTptenX1xk5GVKXR5OHJOtrk=;
-	b=bp9Obh7nfrHbjYjVYv0f970o+ITLfuFKNDREhM4a2PiM4zMEC2sJWNn6/GDcV+Xx6GRPH6
-	UY8mCi5PZoSYAG3TXEt6YqN1hId5G5ZvCfJ2BxesIN2OCWMQcoCc6LpV8UBpco1K4K8gUs
-	anpl0QXLZmjlcWX13YpDl2konnofQt4=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-130-yqH4aNoYOT-lleL3W0_31g-1; Mon, 02 Mar 2026 03:51:53 -0500
-X-MC-Unique: yqH4aNoYOT-lleL3W0_31g-1
-X-Mimecast-MFC-AGG-ID: yqH4aNoYOT-lleL3W0_31g_1772441512
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4837b9913c9so29955325e9.0
-        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 00:51:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1772441512; x=1773046312; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Z9WT3KJPKaJS7kZ732QoTptenX1xk5GVKXR5OHJOtrk=;
-        b=ORYhLepsLZhmUY8NiCMWZzli7YpKTEQFZ+FYkAqOscemomwxu0+96eJBFtJ33Lx6Pn
-         FCpj+u210l1JleaxCFb9u81b97+oy0nxuzjtOVPiSaqqVfXMWwx8ITWyWcx1Aj0P3Vzb
-         wiWw2DD7TM2RCKA6oK1+ZYN3eMnaDSktzGuSlD1lSrJTmN5yPK+gf2KLu5HQ54NG6pxK
-         8NNq/W6fA/13MBGOgRoybFqof3Rjx8g5GywwDnm96nvNWGmwVp1Q0XKdxEyShorz/rbx
-         /ZAsqwAPlG1YqVWT6XeDttkH/6J54cTrsGAugvYuQUxmW03oCMv5NK6Xxll4jGM61DM8
-         8nUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772441512; x=1773046312;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Z9WT3KJPKaJS7kZ732QoTptenX1xk5GVKXR5OHJOtrk=;
-        b=J979vSOM7OIxlNbW20/3iJ2wFm3Hn0WBDTty3wsTPJUPygRdDo3waWAo8DPXhrj0rk
-         weJHjfZ8524wPmuUMygSusX2XnUSV66tpfioot1Lpxb5QJXXj2Be6/uWB9C1LgC4UocN
-         1vLrMPEeDB17InG/5oGbDxWCo6TZkzvxe0TT6gPXCv2WOgaLjNY3ygngWyp+ig9FSles
-         gVqnFxLbjqY8iNkNbeqJxyAg/RlUFRHmvuYNiQ4mtFRyhhE+vldTBfkCF2kPXzwHRSjz
-         05t1nOs/lW60FW3xv2Qziwu56I4jm/TMYmsBCH1+Pnzjgf5F1b5KR4PuEe2V2gEV8Zow
-         fXFg==
-X-Forwarded-Encrypted: i=1; AJvYcCUO/nUB5nb+KTXjplj+63dsYYaUrArxZqv80p28m66SkED8PKKJ6Ba6F0epcLgbtldf+k0XokA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8TV8EQi0rcRPTBw6T9TZsB5KBb6EZfRVvvHG/wbAmKPrb77H2
-	Mk9hcz2+q+S7FP9z+oyhJOrDZvasOgFh/LMiFe9BnU8OIIxrYpTMFfrOkenfZ4SxjLqm1H+d2fJ
-	7PAtr1wTcOi7WJX0RHY05I3u15Fx8NKkWRq6b3pjGVjVG8/y3erJJcYTjdA==
-X-Gm-Gg: ATEYQzxfNFxIR3pMdmqLjc+31kuq3ApPd5JVVjUnseByerRoVY7u9nusF6bkrl/holT
-	MjubuRFodirdY73Jym6nnee6xi8Hw7+CvGEuW1MThXfb0nwu78W2Bc4O3fU2glEWouJ/jN1txp+
-	Z9CSV9QZJW9OZ/N7CWoIeXI7Nx8oX0+QIAliQyBUOE1zU5ZkZqWm+eEgMr0SX8J195B8Gan4SD0
-	PA0XTjWRSFaK9r11Wx/QPhzdgXjz5c0BBZFKxLwKHma8N7PfI6+5JPy78pbq8qKet+DyaDu/k5B
-	IgW+/DzXff143bxmkE8ioifHiEkWQ9kybeLDIDXDwUtRMUxRtuEVo41J1E0CYl0pBxe5Tb3jRvP
-	SKeOJNFIsdx1wFCtFyeUA8+xI/xpccXh6+cCULBJ5sLMM/A==
-X-Received: by 2002:a05:600c:4fc8:b0:483:6f37:1b51 with SMTP id 5b1f17b1804b1-483c9bedb07mr228267895e9.23.1772441512160;
-        Mon, 02 Mar 2026 00:51:52 -0800 (PST)
-X-Received: by 2002:a05:600c:4fc8:b0:483:6f37:1b51 with SMTP id 5b1f17b1804b1-483c9bedb07mr228267415e9.23.1772441511572;
-        Mon, 02 Mar 2026 00:51:51 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-79-166.inter.net.il. [80.230.79.166])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bfcbd781sm233836855e9.8.2026.03.02.00.51.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Mar 2026 00:51:51 -0800 (PST)
-Date: Mon, 2 Mar 2026 03:51:49 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: ShuangYu <shuangyu@yunyoo.cc>, Stefano Garzarella <sgarzare@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: [PATCH RFC] vhost: fix vhost_get_avail_idx for a non empty ring
-Message-ID: <559b04ae6ce52973c535dc47e461638b7f4c3d63.1772441455.git.mst@redhat.com>
+	s=arc-20240116; t=1772441919; c=relaxed/simple;
+	bh=JlXCVofsQIzOfaJB0628zEDKjj2XSvW/j7NZYEqGRJI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eQqHQiicReCoQZElmEsdjVuSlo/+jrFcO3W/4ye1eTNT8jg9vr4MEBF8zxYn9lXzDBP/d+dr57iN9PNEVmD451fdJiR+k0FX9924aZxRUK0rKVy4r8U0lYnNzW7WYrgQAR2tuJuTQ6+Znzq6bZU94PZEaiPdM3QL7WvmAjTdznc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=jF2Msk6g; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 621MWZrD1434187;
+	Mon, 2 Mar 2026 00:58:16 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=QweyjosiKEdK28e5y/P3kTm
+	PDBEDXn5HbM0kGUSGfNA=; b=jF2Msk6gqb/xkw+L4WlOwqmOPQSCpslEg2OJsUD
+	6SJkSXCOYQY1j2XceKdjqa2/DFUveYSgRdrW3nZP77z+Q9Da9KRMpiig5UKb+4v8
+	AweCcXjBhym+z4Q/AafctUg9UBAACcnOIzhPrKUdYPzQSa/XMChL2WWGjgMs8cxI
+	s3xEFIEYRk5S9WQKBjBwb8+s5t/uN4ze726h/NVPfgKgBY3jFTdnvSYymaaKKoWb
+	11Rg15BB/MKG3JybljG8RWxEQqFPiY+ZgrTux11ZxXU55QVOuCSPS6C1/MPaqpYm
+	X8+Bs2/w9KFP98de6epOBR5F4nyUMVQHN6kUnvgh6+64uWw==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4ckxkp2xuk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 02 Mar 2026 00:58:15 -0800 (PST)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 2 Mar 2026 00:58:14 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Mon, 2 Mar 2026 00:58:14 -0800
+Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id CB23B3F7064;
+	Mon,  2 Mar 2026 00:58:09 -0800 (PST)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+        <donald.hunter@gmail.com>, <jiri@resnulli.us>,
+        <chuck.lever@oracle.com>, <matttbe@kernel.org>, <cjubran@nvidia.com>,
+        <shshitrit@nvidia.com>, "Ratheesh
+ Kannoth" <rkannoth@marvell.com>
+Subject: [PATCH net-next 0/5] octeontx2-af: npc: Enhancements.
+Date: Mon, 2 Mar 2026 14:27:58 +0530
+Message-ID: <20260302085803.2449828-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: XrTQSZB3W1CZmD7olABXHiYwygDI3pmT
+X-Authority-Analysis: v=2.4 cv=eYUwvrEH c=1 sm=1 tr=0 ts=69a55127 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
+ a=EAYMVhzMl8SCOHhVQcBL:22 a=hejfvb9J70K0_1iCNg8A:9
+X-Proofpoint-ORIG-GUID: XrTQSZB3W1CZmD7olABXHiYwygDI3pmT
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzAyMDA3NyBTYWx0ZWRfX8lGd/S2YRK48
+ R5Et5EoaeW0nEXIqL815Za+5SS+vNMVTpS8SY4tiyMGo02Ftrr5pp7KjhDmZ7jwrRZCNTn0bb5o
+ 6PP9ve3blMbiaNVlO8AZT6S0sdrIoLkHUCqqW/CklkuOEJVrwHZwX3aL/DtkHtqy3+syKFUQdC4
+ Kd99X7MOsUMOEJEUi2ni6OzQGWs49KLi0y7oF3N/EAq9F0AsF22ibTB4lGbCW8taMpbTzQcX4mG
+ ZRTMk7hQDb0jwqfghUmW+czMRq1Fqes6uNU+I2m2/pZNnF5ElSDfDRrvvbwg59RNHW5FUcH4dyg
+ kMB/hCzc7UhJ6/elxJ0nlPmAf7MbJy2qFI5p7X4QPke4PbmmjX7XmL90ta5KSPD1YL/PGMas51u
+ 8iv/Jt1ylmvtd/vfqQ5I3DWjUfQZ0p5mSFnW/M5Cj1Ch4is32cLumpvPJDff/7JwrcEDlwNqM00
+ 9RLrUSsWEF6VmI2VT+A==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-02_02,2026-02-27_03,2025-10-01_01
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[marvell.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,resnulli.us,oracle.com,nvidia.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	TAGGED_FROM(0.00)[bounces-262562-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262560-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,marvell.com:mid,marvell.com:dkim];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E657B1D4F3F
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 5C35C1D52A2
 X-Rspamd-Action: no action
 
-vhost_get_avail_idx is supposed to report whether it has updated
-vq->avail_idx. Instead, it returns whether all entries have been
-consumed, which is usually the same. But not always - in
-drivers/vhost/net.c and when mergeable buffers have been enabled, the
-driver checks whether the combined entries are big enough to store an
-incoming packet. If not, the driver re-enables notifications with
-available entries still in the ring. The incorrect return value from
-vhost_get_avail_idx propagates through vhost_enable_notify and causes
-the host to livelock if the guest is not making progress, as vhost will
-immediately disable notifications and retry using the available entries.
+This series adds features in NPC HW block in the OcteonTX2 AF driver
+for better observability, configuration, and resource management.
 
-The obvious fix is to make vhost_get_avail_idx do what the comment
-says it does and report whether new entries have been added.
+Patch 1 adds debugfs enhancements for CN20K: mcam_layout now shows
+enabled/disabled state per MCAM entry; a new "dstats" entry reports hit
+counts with delta semantics; and "mismatch" lists entries that are
+enabled but not explicitly allocated.
 
-Reported-by: ShuangYu <shuangyu@yunyoo.cc>
-Fixes: d3bb267bbdcb ("vhost: cache avail index in vhost_enable_notify()")
-Cc: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
+Patch 2 (from Saeed) extends devlink with DEVLINK_PARAM_TYPE_U32_ARRAY
+so params can accept multiple u32 values in a single value. This is
+used by patch 3 for subbank search order.
 
-Lightly tested, posting early to simplify testing for the reporter.
+Patch 3 adds a devlink parameter "srch_order" for CN20K to control
+the order in which NPC subbanks are searched during MCAM allocation,
+allowing users to tune rule priority without firmware changes.
 
- drivers/vhost/vhost.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+Patch 4 ties default MCAM entries (broadcast, multicast, promisc, ucast)
+to NIX LF lifetime: they are allocated when a NIX LF is allocated and
+freed when it is released, improving MCAM utilization.
+NIX_LF_DONT_FREE_DFT_IDXS lets the kernel PF retain default entries
+across suspend/resume.
 
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index 2f2c45d20883..db329a6f6145 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -1522,6 +1522,7 @@ static void vhost_dev_unlock_vqs(struct vhost_dev *d)
- static inline int vhost_get_avail_idx(struct vhost_virtqueue *vq)
- {
- 	__virtio16 idx;
-+	u16 avail_idx;
- 	int r;
- 
- 	r = vhost_get_avail(vq, idx, &vq->avail->idx);
-@@ -1532,17 +1533,19 @@ static inline int vhost_get_avail_idx(struct vhost_virtqueue *vq)
- 	}
- 
- 	/* Check it isn't doing very strange thing with available indexes */
--	vq->avail_idx = vhost16_to_cpu(vq, idx);
--	if (unlikely((u16)(vq->avail_idx - vq->last_avail_idx) > vq->num)) {
-+	avail_idx = vhost16_to_cpu(vq, idx);
-+	if (unlikely((u16)(avail_idx - vq->last_avail_idx) > vq->num)) {
- 		vq_err(vq, "Invalid available index change from %u to %u",
--		       vq->last_avail_idx, vq->avail_idx);
-+		       vq->last_avail_idx, avail_idx);
- 		return -EINVAL;
- 	}
- 
- 	/* We're done if there is nothing new */
--	if (vq->avail_idx == vq->last_avail_idx)
-+	if (avail_idx == vq->avail_idx)
- 		return 0;
- 
-+	vq->avail_idx = avail_idx;
-+
- 	/*
- 	 * We updated vq->avail_idx so we need a memory barrier between
- 	 * the index read above and the caller reading avail ring entries.
--- 
-MST
+Patch 5 allows loading a custom KPU profile from the filesystem via
+a module parameter (kpu_profile=), avoiding firmware flashes for
+profile updates.
 
+Ratheesh Kannoth (4):
+  octeontx2-af: npc: cn20k: debugfs enhancements
+  octeontx2-af: npc: cn20k: Add devlink support for search order
+  octeontx2-af: npc: cn20k: dynamically allocate and free default MCAM
+    entries
+  octeontx2-af: Add support for loading custom KPU profile from
+    filesystem
+
+Saeed Mahameed (1):
+  devlink: Implement devlink param multi attribute nested data values
+
+ Documentation/netlink/specs/devlink.yaml      |   4 +
+ .../marvell/octeontx2/af/cn20k/debugfs.c      | 120 +++++++-
+ .../ethernet/marvell/octeontx2/af/cn20k/npc.c | 192 ++++++++++---
+ .../ethernet/marvell/octeontx2/af/cn20k/npc.h |   9 +
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |   1 +
+ .../net/ethernet/marvell/octeontx2/af/npc.h   |  14 +
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |   3 +-
+ .../marvell/octeontx2/af/rvu_devlink.c        |  88 +++++-
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  14 +
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   | 269 ++++++++++++++----
+ .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   1 +
+ .../marvell/octeontx2/nic/otx2_pf.c          |   6 +-
+ include/net/devlink.h                         |   8 +
+ include/uapi/linux/devlink.h                 |   1 +
+ net/devlink/netlink_gen.c                     |   2 +
+ net/devlink/param.c                           |  78 +++--
+ 16 files changed, 674 insertions(+), 136 deletions(-)
+
+--
+2.43.0
 
