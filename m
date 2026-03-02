@@ -1,169 +1,197 @@
-Return-Path: <netdev+bounces-262592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262593-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UFvyIMxhpWmx+wUAu9opvQ
-	(envelope-from <netdev+bounces-262592-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 11:09:16 +0100
+	id uEXkCTZhpWlX/AUAu9opvQ
+	(envelope-from <netdev+bounces-262593-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 11:06:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01E021D613A
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 11:09:15 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 468321D609E
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 11:06:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0803E30364D1
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 10:02:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 32A033028C38
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 10:03:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2EFF395D8C;
-	Mon,  2 Mar 2026 10:02:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A93739527E;
+	Mon,  2 Mar 2026 10:03:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EfQfNc66"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AeQ55TbE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6D729D29F
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 10:02:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15F92394464
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 10:03:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772445741; cv=none; b=Oi3TYXCb4Mp2aii9MLZmMD+/WdgyJRp3lJuPhJ2c9soA03sGBYZ7I4exszX05KiT6eio1JDf3TYyQ6cie0qLPpVyQquAhYUgn+tFgyudaWtqqk4G+9lY8s4Ri2OXYKZGdXzfmjk1csUFIZKxdZGnJT8DkTIbXYAsNMQPHkYNilU=
+	t=1772445788; cv=none; b=AuiJ9qAHVVMH612PwJaPLfkKCZbdwDaPIQX36Msfy9fgUSurAg0c6yIQvg2u1ojmSPp0W0o11d1kXZf1Hf38DplYpnNio/E8HcSrWcG/p5m2aWhQKQxdolF65wGSIR076m0ifCd/P0Geic+w7KzAJ5RB3JW9EknAaNNHE+rZx9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772445741; c=relaxed/simple;
-	bh=rcnS7IdkUDdkrozKgEJrZX4dzQsaJ6e9KijTjrwQa7c=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=uELXgTVEUMCuDaBR+UFSMxeXK2bhrf/WV2ouXbilbzVDlCMInTyFKN6tEPCCxcarpIHA3jRNU+QtemM+17acsnbrTQNptxZaHTsqL8H1NGr+auRhVyBe92kZTgVkqPUXzAwM5/Ih8GZoBvPMVm72z95a5pYPDe0oZDsOkPs/Elw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EfQfNc66; arc=none smtp.client-ip=209.85.215.172
+	s=arc-20240116; t=1772445788; c=relaxed/simple;
+	bh=57fRY/uldheHXz8pZoqfNhRreb762+PjD5Xu/G23mGs=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=qES6GsmduRECPiN4TJJIrBk5J7Qa9caYcAkxqI6TyWtxVBtKXeekRLgj4cS9xdJ5efE/GAycf/nCC1gmhQjPvm+naWsowxxD7Ziv+l4FszIVn0qtUzJ6IMdoHjKTiBgw//h15zzgWb8HXNNnvuSZzbaAcU4ukg3kABJ7V3tfjn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AeQ55TbE; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-c6e1f417918so1185881a12.3
-        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 02:02:20 -0800 (PST)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4806ce0f97bso36374045e9.0
+        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 02:03:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772445740; x=1773050540; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fyc4r+7xdW5UIIQv/i0wzsrtOCUobKuGa1F7pXMAHjQ=;
-        b=EfQfNc66TS02ScyzZELKlHVg0wNXX3nUY3XqP+98U5wuLOmOr5a8rHiXnF3YPqkGMI
-         dPCSi3eAg95rxWjfaNm7TfuFHSz5PkM9YmBvs4dDi97pM2XxfZKPNBWdUBw/WFYGrD8P
-         fcVD6UB1mCaT8pVDiCIUN/f5dag2GYyg15Fm4M86M5S2ldlDUea/DOgtwffJEkQEiAhv
-         AqEPuI69d1Aai9R+4FCHc1/E54xCoT6YZeS2Do7LHMDXZXDO5BPPqglNIVanUGLER94L
-         Z1ceCINeXToueKUv94A9mVhJP8O0HwznspyylDelc4tzGfO2WBwWwEN3NMZ/590x8T/O
-         eRUw==
+        d=gmail.com; s=20230601; t=1772445785; x=1773050585; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=kTyW8POl7cRW2tLQQUG/rmH31BNr8DtkbGHz9hqNo+Y=;
+        b=AeQ55TbEJ4+BNiv3stRXgs5A3PNsqv4J+3uGvPgvE9/abEtWwXB7x3rC6Gb7UMlsQ6
+         fHP5LJfTSQmY6iAjAFjZhtEtlrKxygz+PUmjsRd3QFSckT9JZdxkI6Ny6PzMkC9uHyWT
+         oVUcTaFGtSokkpgdmtlvk9NJOyub/S3Nk3BdfOgjOvLsPIJeOWhsfHEfqgzECs1IjWO6
+         VJkLuQGxSNZI8gXsR5OFNxlWfKJsiBqpN3Zk7UnFEOtIC9PyMzy+ddnVpktn/oCDXGFy
+         6LCZbTtPjFVTwEfsB8EVWQGwHAeVAoQ2deOGqNT3osJwD+TlzLS1Xrj1nEBFDzFliyi9
+         fGHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772445740; x=1773050540;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fyc4r+7xdW5UIIQv/i0wzsrtOCUobKuGa1F7pXMAHjQ=;
-        b=pkKCiDKaw7UXA72jwraRZqByb3W2Y93r4n2l4V9SACDcn7RWwFNXAvGxbfVIps6QgM
-         kqxSdo5+O7Xu6MLF0F9GsxsfeUJIA+fPndGF7mQeX4AjMZ6YhQzsmImvI36maApxFL6c
-         xi1cYyejuif03IlsKRzxA8gvKQBliIpAup6DWgILhN99MqDL7zszg0Bi4cdqAUJiM5VI
-         YpTClptorMKwcYPlGTJU3ht+QoOq80XUnmuCPtDCNMF5jAPK39ANrmOTPNoxjep2DUwQ
-         wbzNgHaRLyvFVT9S8mtOXRE1RMeBBr+761eVIFr1bUTQWQQUTMHtSyfw4JpUS/zJYbIj
-         pPBg==
-X-Gm-Message-State: AOJu0YxjnW522LQvmDCBYbesHVfm8epO5AtatijQzUBPZ/9zqOBESlmF
-	X9YCzoZY4dV25clbb+z8uhvphLNV0Q2vOmd+bI4Lr1b/qraIRIsuSIXj
-X-Gm-Gg: ATEYQzwdimf0H5jAkO7OA2NakVFj4Yhlm6+GB3YnFWhndTzAUN8hiYI1sRf8yIkHSgc
-	C9bpBGjYlB70+OK3Efc0k3h17edxM8XOswJEH9DD4gFmYSzO/wmy09CAwl5XFlZl0WwMr9pNMYP
-	Tqm2GZlnFaH3+1IYpQgPvYryy62bsuONm17IqYzB7Kgk1Jgg9V9GddWWyq3NxrV3JVj6OLqg15j
-	ptnH7r7U03djvANeEKTGuJfk22Z9s1INaviZ7CQ1VpegL2dAzDfhrLJWDU51n4GNk37KrezDPpA
-	CZpQkmh/2uACGn7ZM5w+4VbuIWjoHz6F4j4s0TKDeNHEoQfPoTDWnFTBt9JZyhWn2xr6nFXTFpZ
-	9ALdiIeAIdVKpFNm05sY+LqBo4uNSFjU5naA5+tN8tM7PYenIAolXrYIabkoF6Get6ill/BTJNp
-	K2e5UfOUnQxVB7Ni0gsdSuXtt3Ho8Jz0FIuDrwKWjZag==
-X-Received: by 2002:a17:903:2289:b0:2a0:e223:f6e6 with SMTP id d9443c01a7336-2ae2e4d6622mr127702525ad.46.1772445739588;
-        Mon, 02 Mar 2026 02:02:19 -0800 (PST)
-Received: from v4bel ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae534088c4sm27256985ad.26.2026.03.02.02.02.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Mar 2026 02:02:19 -0800 (PST)
-Date: Mon, 2 Mar 2026 19:02:15 +0900
-From: Hyunwoo Kim <imv4bel@gmail.com>
-To: antonio@openvpn.net, sd@queasysnail.net, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org, imv4bel@gmail.com
-Subject: [PATCH net] ovpn: Fix race condition in ovpn_dellink()
-Message-ID: <aaVgJ16edTfQkYbx@v4bel>
+        d=1e100.net; s=20230601; t=1772445785; x=1773050585;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kTyW8POl7cRW2tLQQUG/rmH31BNr8DtkbGHz9hqNo+Y=;
+        b=BXVlyBPFNAbGwmLjQoNBsQB54ico2/m25y6azAO6oNr+IiPQiy85XuG3BB26QVfFd2
+         itvgu4zDEvXBXqPPQjpF59xueBKcuJ0FEB/dadntqqpWfRtb1/pGID5O76MxhSgGauxf
+         bKVIfnmlgLUi9blzCyeTKP/AWshuNLZYqjOpxgXY+NkYJ4O9CbQnSkPN1wLavwjqP5AH
+         X7sb7BIx55N5Mpx4VYMPogEHX/TscCaNrj8hMvqGeYFOEy6oDdw1HXsabkiGR7Y5udBT
+         gU7SDcdc9Zd5TvFei0HScusHaT8gxfceUeLY5xycS/FjjFKMrRuku0XEjb+yqTaIGeI0
+         jCyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWcASeENs2dvHeFcY+Lh5Q78maGj0E80euPSsWwH98dFXx0raANT+lKrzdbuWx1LrUU3O9py3A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxax7qWU9he4qn8+x3em4UXUH3z+OJ/luJ95apumhwsMSNcAzAL
+	x9wb5Fsh+c56zWoPf6JnxJf5ktwv7f2F75FPld3S5wdDDaoacfPSAdE3SIUB/A==
+X-Gm-Gg: ATEYQzxo38el9hXwY5BLvFsrrtPgmXSLx9Z5YwIWo1HGfxw6lKWyB6HG3lMEBw1UJLP
+	cXGlOt74AXYVwfZBIAybqZvOh86d0FxmI4rtsx9CqGCQ66B+lBbCQud0lSbpwjskM6Kr3tVRMHp
+	pF+JoK4UqE67QWPxyZiG+pTAwMuHnfSCLEhvKi6Vj93PvEpbqAZvaXSaReieSn3h/o0UaD9WFPT
+	imV3kkvpewWjItWckS+4HiVAB5lDSyimj+4iVR81oGMEc+b+VJZwyIWLgN7llpsOz/w5lQQ9eqM
+	d2O+yQCMPKF7O34YQ66ir8v4qyGhnZrqOT28uTy7Sx3da+tijbgmz99eC1NY0yIpj8i7m5grWiL
+	U6lIfuyu47pqEim85W7gZIPbWm8jFGBpuHHCfXqtw5cNd2roz3ijODcQDWFkEHq5Ue6yywK2di8
+	cFfCsT0WTbe61xE6KfGcB7bciCU5A57EMS0j+Yk2B/tVAyckYWSQfr4RjyYpmgPy7ATJXmBjXB6
+	U4dzhxeug8NKEWfHQO/hcfVidc3WoK2CVwa+nFP3oJIy5WeamxQAB75A/w=
+X-Received: by 2002:a05:600c:8b11:b0:483:6f7c:19f4 with SMTP id 5b1f17b1804b1-483c9c0b6c4mr201046285e9.30.1772445785317;
+        Mon, 02 Mar 2026 02:03:05 -0800 (PST)
+Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:773b])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4399c765c67sm28190288f8f.32.2026.03.02.02.03.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Mar 2026 02:03:04 -0800 (PST)
+Message-ID: <53896290-9a0a-4822-854f-945595a19fe0@gmail.com>
+Date: Mon, 2 Mar 2026 10:02:59 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+From: Pavel Begunkov <asml.silence@gmail.com>
+Subject: Re: FAILED: Patch "io_uring/zcrx: fix post open error handling"
+ failed to apply to 6.18-stable tree
+To: Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+ stable@vger.kernel.org
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org
+References: <20260301011746.1671806-1-sashal@kernel.org>
+ <002c2bb8-3304-40e0-b8c6-8eee7dcb7710@kernel.dk>
+Content-Language: en-US
+In-Reply-To: <002c2bb8-3304-40e0-b8c6-8eee7dcb7710@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262593-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262592-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com]
-X-Rspamd-Queue-Id: 01E021D613A
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 468321D609E
 X-Rspamd-Action: no action
 
-When ovpn_dellink() is called, it invokes
-cancel_delayed_work_sync() to stop keepalive_work before freeing
-the device.
-However, ovpn_nl_peer_new_doit() runs without any lock shared
-with the RTNL path, so keepalive_work can be scheduled after
-cancel_delayed_work_sync() returns.
+On 3/1/26 13:22, Jens Axboe wrote:
+> On 2/28/26 6:17 PM, Sasha Levin wrote:
+>> The patch below does not apply to the 6.18-stable tree.
+>> If someone wants it applied there, or to any other stable or longterm
+>> tree, then please email the backport, including the original git commit
+>> id to <stable@vger.kernel.org>.
+> 
+> Looks like this has dependencies on parts of this:
+> 
+> https://lore.kernel.org/io-uring/cover.1763029704.git.asml.silence@gmail.com/
+> 
+> series. But seems easier to just do a variant for the 6.18 base,
+> I'll leave that to Pavel.
 
-The following is a simple race scenario:
+I was thinking to remove post open error handling. xarray is preallocated
+and shouldn't fail. And copy_to_user can be moved earlier. Should be safer
+than taking all deps.
 
-          cpu0                            cpu1
+diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+index c524be7109c2..c6ac7365acae 100644
+--- a/io_uring/zcrx.c
++++ b/io_uring/zcrx.c
+@@ -625,6 +625,14 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
+  	if (ret)
+  		goto netdev_put_unlock;
+  
++	reg.zcrx_id = id;
++	if (copy_to_user(arg, &reg, sizeof(reg)) ||
++	    copy_to_user(u64_to_user_ptr(reg.region_ptr), &rd, sizeof(rd)) ||
++	    copy_to_user(u64_to_user_ptr(reg.area_ptr), &area, sizeof(area))) {
++		ret = -EFAULT;
++		goto err;
++	}
++
+  	mp_param.mp_ops = &io_uring_pp_zc_ops;
+  	mp_param.mp_priv = ifq;
+  	ret = __net_mp_open_rxq(ifq->netdev, reg.if_rxq, &mp_param, NULL);
+@@ -633,21 +641,11 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
+  	netdev_unlock(ifq->netdev);
+  	ifq->if_rxq = reg.if_rxq;
+  
+-	reg.zcrx_id = id;
+-
+  	scoped_guard(mutex, &ctx->mmap_lock) {
+  		/* publish ifq */
+-		ret = -ENOMEM;
+-		if (xa_store(&ctx->zcrx_ctxs, id, ifq, GFP_KERNEL))
+-			goto err;
++		xa_store(&ctx->zcrx_ctxs, id, ifq, GFP_KERNEL);
+  	}
+  
+-	if (copy_to_user(arg, &reg, sizeof(reg)) ||
+-	    copy_to_user(u64_to_user_ptr(reg.region_ptr), &rd, sizeof(rd)) ||
+-	    copy_to_user(u64_to_user_ptr(reg.area_ptr), &area, sizeof(area))) {
+-		ret = -EFAULT;
+-		goto err;
+-	}
+  	return 0;
+  netdev_put_unlock:
+  	netdev_put(ifq->netdev, &ifq->netdev_tracker);
 
-ovpn_dellink(dev)
-  cancel_delayed_work_sync(keepalive_work)
-                                   ovpn_nl_peer_new_doit()
-                                     ovpn_nl_peer_modify()
-                                       ovpn_peer_keepalive_set()
-                                         mod_delayed_work(keepalive_work)
-
-To prevent this race condition, cancel_delayed_work_sync() is
-replaced with disable_delayed_work_sync().
-
-Fixes: 3ecfd9349f40 ("ovpn: implement keepalive mechanism")
-Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
----
- drivers/net/ovpn/main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
-index 2e0420febda0..ada73dd35ba4 100644
---- a/drivers/net/ovpn/main.c
-+++ b/drivers/net/ovpn/main.c
-@@ -212,7 +212,7 @@ static void ovpn_dellink(struct net_device *dev, struct list_head *head)
- {
- 	struct ovpn_priv *ovpn = netdev_priv(dev);
- 
--	cancel_delayed_work_sync(&ovpn->keepalive_work);
-+	disable_delayed_work_sync(&ovpn->keepalive_work);
- 	ovpn_peers_free(ovpn, NULL, OVPN_DEL_PEER_REASON_TEARDOWN);
- 	unregister_netdevice_queue(dev, head);
- }
+  
 -- 
-2.43.0
+Pavel Begunkov
 
 
