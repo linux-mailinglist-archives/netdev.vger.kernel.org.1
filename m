@@ -1,283 +1,159 @@
-Return-Path: <netdev+bounces-262731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262732-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wOt7LeW5pWmoFQAAu9opvQ
-	(envelope-from <netdev+bounces-262731-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 17:25:09 +0100
+	id QKz7MDq9pWn8FQAAu9opvQ
+	(envelope-from <netdev+bounces-262732-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 17:39:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C7581DCBED
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 17:25:09 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAA801DD0A5
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 17:39:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5B4E8305F300
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 16:18:37 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3E6813098CE6
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 16:18:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 340D32FD660;
-	Mon,  2 Mar 2026 16:18:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F8C52EBBA9;
+	Mon,  2 Mar 2026 16:18:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ozvc3BXp"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="xA/PqcUs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E67272F6900
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 16:18:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9E12FC874
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 16:18:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772468314; cv=none; b=sFSxzL/BjTLWVyF2NeXZxyQbTGQJxUvN7d4UbXYli8dV+yheMdFBQA7RdQrKehZmPVFzKRzKdKs3Xpp+ogVS88+1EXRpgF3dgCTzPc2r6Fredo53slPt/va5tR9j/5NNNNERPRakpzt5PiydBjO0DgxGG1Pso8z/Dhcq2k3DF9s=
+	t=1772468328; cv=none; b=ietJ/g+RqZG6ebzGjWB064Cwu8ZIykY2pkW5CsMws07Hm/CO9oV65vWCRge4qttVDn4mbdrKJDZ+Yf2+kWQLfmGaZ96+9TdzeHEJp33TjBE/vnk1Xr9zo8o7oitrPDpfMgDY8+DXkpUENum28m38DKNXpJ3TKa3s2gYvKkXQa5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772468314; c=relaxed/simple;
-	bh=3RyZw1J33eIoZOy7izeY54Rk6a6ye5Bzt8iY6XpOGr0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RmMlcapmjpe1YaDh/hHWa8yKdpZXZvi5kofk2h0d2zDDXw0gU2zcBH+HsLpMDnP6jVsCAl2cqLuzVb6IOOkBUF5TkynXoY4OoEhLl1nD86ZuPcdmm2s9+XtFHla3y5jKpq3gx8Tws/pHw/Jr/DuA1xKqYKOYuyuvbYCkC7tLtBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ozvc3BXp; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-827390e8a3cso3004898b3a.0
-        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 08:18:32 -0800 (PST)
+	s=arc-20240116; t=1772468328; c=relaxed/simple;
+	bh=z3qZiu3TUBUnuOjgx/v4RhppBC8n3v5ASQqyFs1TYmY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gpqHtiRrCnvu2KhJ95EayEQ0bs+SFTnYbtc9hTdmE1AP72+6H2yYXKKyrDcqah8q43O2Qt+jhM6cG2WX8LB/ZuOrOvBQl24VAey5qs55g1rFtXDnn9tpx0qID5Zanvce5M7sTM7tHasFGHSJ/bNQ4uTNRvuV5HfTS2bp3DyfyU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=xA/PqcUs; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-8cb4097794dso455379085a.3
+        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 08:18:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772468312; x=1773073112; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/n5FdJUguFV7iKwaO9oDyh+DvXwYdzvA1C7E2VBJBfk=;
-        b=Ozvc3BXpneokbe6KbtH45nsGIvPWtKkHwO58Jadeqi7vTgvLiiUVIM1tBqHx8ALq8A
-         WJzrUjB5m51087G5bHlg5+M/EVwikeO5GTrKwJdxPA+Jd9Tq6p+FUkepSUJmympBcljK
-         tqNBkzBikJccfFJxpJ/EuaQyXZ9Lwg9EwdGbxFnOAqD7+troZZiyakacAT0BddIbJNaI
-         NtXlCX5tzercuTT5/HsUQ7ZP+CNEIyamE71xPxjJzvTWpq5VhXXrHsCpRtiBR/sUIWn5
-         IvVLVvWU4TbfU6sHLY0YEWODlA1G8HMt9CYy3xnna3WQKVE2LBuQKSKyP73Ynp3Y+esM
-         qpMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772468312; x=1773073112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1772468325; x=1773073125; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/n5FdJUguFV7iKwaO9oDyh+DvXwYdzvA1C7E2VBJBfk=;
-        b=w/GOCP2QrUnq0ugBN6Vdr1u6yZa0kQOdR9UPC+7NeBbxMucPCdfm4T6r1V3fJMD5c/
-         CwP329rVjAJARS6iuPoJbVviu9XVGseOAyYOk8iRPXA9YZNbbi7XHmdJNootTRXdglOm
-         iNz7ADBqmTpRyuaz6BfpKW4r0goz2OwasczkcmO05GCH7J6Z+eqElurm+pr+R7NXkRHK
-         rE1gqyl5XedhgCCYrjnDr6XR1pDYacxUXEYygJ7S7ZQh4myyydilPdWAoatN40CUOKw3
-         mn/guVbnMrmjq3De6KthrY7JWrQ/SiVpH4nI5+YNjRFYZTdvSkSBdke5UjYlaq74U2WN
-         HH8w==
-X-Gm-Message-State: AOJu0YyufgVbKqk51eLzUypvzpyNC/i4q1KMeD9B0+hS2zgnFe9IofKj
-	zIGN4VEXKAZz5LShR3kFer0FqwLu554xeOmZsyncFJx2E3EgB3m6NTXJ
-X-Gm-Gg: ATEYQzxzWgwAdywjnXhKJXRBwxfrZuMg/ldCpAaDlIE8SAuIIkZQoRLbt2WtCeFy0sw
-	2hCuIPHXygkC2HmL7MuFrPMw2tSUFNbzxYf7rCQRJwPq+uPkUwkbZ8ORApu4Z7589ZmV4jqVr/j
-	yVz3wz6yG9bHF96O5WmwMbnKSmJBxR8rohENygePMBFaS4OhkpoRe2JDzNmTXQdzGsL5YNS5w5N
-	+YvzQdeyVtaCmuUeUU8KfgLreVBBZMV3XGxeVUTzBlt0+7pscT6v0DMBgYwlOknunSnN515kymw
-	V5Me2iYI1Zb0zUPG7PRXVlrbpRK41NBDErHJqiNgUXXMx+cdNcfqgSCctaM4n0K8lmei1XZX5jn
-	bPbFLS13xP4EioemEPJqiun3C0QgR/SuyejxRoxkUb1bloW32YZzpCAyTQ1+sLlvVk8wAfMJZoI
-	4cOheVIE3CaDmKUnIaR0np3oh5clSzMY1BZzZapQjT8lky5IV5K/uByOop3x+ozW5m2kKg
-X-Received: by 2002:a05:6a21:594:b0:394:6440:c13 with SMTP id adf61e73a8af0-395c476ef25mr11709902637.29.1772468312103;
-        Mon, 02 Mar 2026 08:18:32 -0800 (PST)
-Received: from sean-All-Series.. (1-160-230-14.dynamic-ip.hinet.net. [1.160.230.14])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2adfb69fa5asm147567775ad.60.2026.03.02.08.18.29
+        bh=WdENma7XyRiM1pk81VTBz0JZaRtvfd/A0PJpVeBK5lc=;
+        b=xA/PqcUsjRjFY+Zewu54wueQSO6vuP/DiKOh+CeXR3lRuuG8W04UoibX5F8IkoQkBc
+         zVh9aGYlRmqvWP3bcfWgLujtG76PHqBaWYGpj2hbYbx+mz9HZ0kBxvowQLOFxyZcY/2N
+         fuVVVYHVpD3iRRK30lYNRT4M3nNxp2U7Kl7FZpxRiizQ+KviBuIz0OnKZqrxZ6rS6cvj
+         3a3m1mtrjSwyee+k91s9VPYFktx6y06iD70NL87Cju4nTb/4Cd6OKUPWeidBTX2zLCYy
+         Gl/eXDTusfSRtqk8PqxL3ThSixVVpsmI7wNU3PPvvnVlrPwUVUbU5RnwJWcCF26arMlN
+         KkDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772468325; x=1773073125;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=WdENma7XyRiM1pk81VTBz0JZaRtvfd/A0PJpVeBK5lc=;
+        b=Qzl4cicnC50aRknhiY0BsVbpOAodaz8sxYd91CssJp70XeT0BnbrXtAQ3P+bUKFYxy
+         Du5UF4yBCDzHrPACOHliRo626Nktq3hUbyciv4cEb5WpMr1JMYwVm3JFvFlIJTerLn7T
+         4RljNdG4kUfm6t1yzyuet4Qc8/oGJR1Qebp2pHBWj+xCI5AJ+bcOn6lNtHw7dAH8deje
+         0x9fYsAKhvEjkJlZSWwJFlthCOeB2/rPPKTwJCdryBQ0TPBDuXEFrL2L9p6i3OLednMk
+         xXMIlYmrfFxA5LR1okHWNbfqIGyWPd7vih6XFbMh5/wgd1pPmBpIe0P+2I0ZIYblhFkA
+         1ebg==
+X-Forwarded-Encrypted: i=1; AJvYcCXvLiJbF56IYGr5AuXqop9aVb18yfwddKSjitFaaFF6gE2dTJS08mjBLi9tuctrYiJ/scKZUWA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQllVD8RCalZ6d8f09BHtfF0297xUV6X7+H9kQ6AVunJa8gnuw
+	GZ/q0h4qYtMXKtXet6VNVnIuSuv5NkX5dnIxk04toZsvRSmjM98ml8Y2npufKheAt7s=
+X-Gm-Gg: ATEYQzyfMa9rof74tXzq5O9fYXtfD5bWF1FIVl6qJ4W9Dch8v7FkDgnGMFfCZB/1FBE
+	tlu7jD2uRgnzdx+RLRZ6n2gH4d2sFvtudXbReT2B1jcoRb3DySfSMdxSTgG6jl9uV9q/9+6TwxX
+	UNBqbJiEPHxU3YqeePff6bfbExxDIYOWOY7f7Nb3vYylzpVHZK2VrKJJqmO/4DolzXFT0Rg/O1g
+	wR32IQvjyR+R10v/+Jr+wQopmRN7DQs+q+goJ57YECVUzw+earV33+ozzxFazx3ijHQI5p9GcoV
+	j/qXAUXx/VhkVnejZMcyGm2QlfZUiF3gU4NgMx7VQJ9TowuZ2695mV1GRl1+ZJssKTy74TKzzOi
+	Mn0vCoqvlI0LEoT5pndcnvJkHriwNp/Gl2Tc7Aj/eje8HxOnBdbQiy91/PWjHwxf6UO4biXZHTX
+	cqFRRmtMHwJxswDRIxTJKPFyJV4HxDeR+feRs8T1iBFOfXp0GIu3pOeNUrJA4MTrpr
+X-Received: by 2002:a05:620a:460f:b0:8b2:ec1e:fe24 with SMTP id af79cd13be357-8cbc8de8509mr1373887585a.42.1772468325469;
+        Mon, 02 Mar 2026 08:18:45 -0800 (PST)
+Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cbbf6f940fsm1208727485a.23.2026.03.02.08.18.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Mar 2026 08:18:31 -0800 (PST)
-From: Sean Chang <seanwascoding@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	David Laight <david.laight.linux@gmail.com>,
-	Anna Schumaker <anna@kernel.org>,
-	Andy Shevchenko <andriy.shevchenko@intel.com>
-Cc: netdev@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Sean Chang <seanwascoding@gmail.com>
-Subject: [PATCH] sunrpc: simplify dprintk macros and cleanup redundant debug guards
-Date: Tue,  3 Mar 2026 00:18:18 +0800
-Message-Id: <20260302161818.63651-1-seanwascoding@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Mon, 02 Mar 2026 08:18:45 -0800 (PST)
+Date: Mon, 2 Mar 2026 08:18:42 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Yedaya Katsman <yedaya.ka@gmail.com>
+Cc: David Ahern <dsahern@kernel.org>, Andrea Claudi <aclaudi@redhat.com>,
+ Luca Boccassi <luca.boccassi@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH] Update old references to /usr/lib/iproute2
+Message-ID: <20260302081842.17003c8a@phoenix.local>
+In-Reply-To: <20260228-usr-lib-to-usr-share-v1-1-a09da2a7675e@gmail.com>
+References: <20260228-usr-lib-to-usr-share-v1-1-a09da2a7675e@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 2C7581DCBED
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: DAA801DD0A5
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.06 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[networkplumber-org.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[lunn.ch,oracle.com,gmail.com,kernel.org,intel.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-262732-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-262731-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[seanwascoding@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,gmail.com,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[networkplumber-org.20230601.gappssmtp.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.990];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,lunn.ch:email]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5]
 X-Rspamd-Action: no action
 
-Following David Laight's suggestion, simplify the macro definitions by
-removing the unnecessary 'fmt' argument and using no_printk(__VA_ARGS__)
-directly. This ensures the compiler performs type checking and "sees"
-the variables, silencing the warnings without emitting any code.
+On Sat, 28 Feb 2026 23:03:59 +0200
+Yedaya Katsman <yedaya.ka@gmail.com> wrote:
 
-Verification with .lst files under -O2 confirms that the compiler
-successfully performs "dead code elimination". Even when variables
-(like char buf[] in nfsfh.c) or static helper functions (like
-nlmdbg_cookie2a in svclock.c) are declared without #ifdef, they are
-completely optimized out (no stack allocation, no symbol references in
-the final executable) as they are only referenced within no_printk().
+> In 962692356a1c ("Makefile: use /usr/share/iproute2 for config files")
+> The path was changed to /usr/share/, but a comment and a define were still
+> using the old path, Update them.
+> 
+> Signed-off-by: Yedaya Katsman <yedaya.ka@gmail.com>
 
-This allows for significant cleanup:
-- Remove redundant #if IS_ENABLED(CONFIG_SUNRPC_DEBUG) from
-  fs/nfsd/nfsfh.c and net/sunrpc/xprtrdma/svc_rdma_transport.c
-- Remove the #if IS_ENABLED(CONFIG_SUNRPC_DEBUG) guard around
-  nlmdbg_cookie2a and stub function in fs/lockd/svclock.c
-- Consolidate the dprintk definition to be more idiomatic.
+I would rather remove the #define's in include/utils.h
+The file is internal, and everywhere is using the values that
+are in the Makefile.
 
-Suggested-by: Andrew Lunn <andrew@lunn.ch>
-Suggested-by: David Laight <david.laight.linux@gmail.com>
-Signed-off-by: Sean Chang <seanwascoding@gmail.com>
----
- fs/lockd/svclock.c                       |  7 -------
- fs/nfsd/nfsfh.c                          |  8 +++-----
- include/linux/sunrpc/debug.h             |  8 ++------
- net/sunrpc/xprtrdma/svc_rdma_transport.c | 25 +++++++++++-------------
- 4 files changed, 16 insertions(+), 32 deletions(-)
-
-diff --git a/fs/lockd/svclock.c b/fs/lockd/svclock.c
-index ee23f5802af1..9b978a087b3c 100644
---- a/fs/lockd/svclock.c
-+++ b/fs/lockd/svclock.c
-@@ -47,7 +47,6 @@ static const struct rpc_call_ops nlmsvc_grant_ops;
- static LIST_HEAD(nlm_blocked);
- static DEFINE_SPINLOCK(nlm_blocked_lock);
+diff --git a/include/utils.h b/include/utils.h
+index e0a9c780..adf6a581 100644
+--- a/include/utils.h
++++ b/include/utils.h
+@@ -39,13 +39,6 @@ extern bool do_all;
+ extern int echo_request;
+ extern int use_iec;
  
--#if IS_ENABLED(CONFIG_SUNRPC_DEBUG)
- static const char *nlmdbg_cookie2a(const struct nlm_cookie *cookie)
- {
- 	/*
-@@ -74,12 +73,6 @@ static const char *nlmdbg_cookie2a(const struct nlm_cookie *cookie)
- 
- 	return buf;
- }
--#else
--static inline const char *nlmdbg_cookie2a(const struct nlm_cookie *cookie)
--{
--	return "???";
--}
+-#ifndef CONF_USR_DIR
+-#define CONF_USR_DIR "/usr/lib/iproute2"
 -#endif
- 
- /*
-  * Insert a blocked lock into the global list
-diff --git a/fs/nfsd/nfsfh.c b/fs/nfsd/nfsfh.c
-index 68b629fbaaeb..91514326d1b4 100644
---- a/fs/nfsd/nfsfh.c
-+++ b/fs/nfsd/nfsfh.c
-@@ -105,12 +105,10 @@ static __be32 nfsd_setuser_and_check_port(struct svc_rqst *rqstp,
- {
- 	/* Check if the request originated from a secure port. */
- 	if (rqstp && !nfsd_originating_port_ok(rqstp, cred, exp)) {
--		if (IS_ENABLED(CONFIG_SUNRPC_DEBUG)) {
--			char buf[RPC_MAX_ADDRBUFLEN];
-+		char buf[RPC_MAX_ADDRBUFLEN];
- 
--			dprintk("nfsd: request from insecure port %s!\n",
--			        svc_print_addr(rqstp, buf, sizeof(buf)));
--		}
-+		dprintk("nfsd: request from insecure port %s!\n",
-+			svc_print_addr(rqstp, buf, sizeof(buf)));
- 		return nfserr_perm;
- 	}
- 
-diff --git a/include/linux/sunrpc/debug.h b/include/linux/sunrpc/debug.h
-index ab61bed2f7af..f6f2a106eeaf 100644
---- a/include/linux/sunrpc/debug.h
-+++ b/include/linux/sunrpc/debug.h
-@@ -38,8 +38,6 @@ extern unsigned int		nlm_debug;
- do {									\
- 	ifdebug(fac)							\
- 		__sunrpc_printk(fmt, ##__VA_ARGS__);			\
--	else								\
--		no_printk(fmt, ##__VA_ARGS__);				\
- } while (0)
- 
- # define dfprintk_rcu(fac, fmt, ...)					\
-@@ -48,15 +46,13 @@ do {									\
- 		rcu_read_lock();					\
- 		__sunrpc_printk(fmt, ##__VA_ARGS__);			\
- 		rcu_read_unlock();					\
--	} else {							\
--		no_printk(fmt, ##__VA_ARGS__);				\
- 	}								\
- } while (0)
- 
- #else
- # define ifdebug(fac)		if (0)
--# define dfprintk(fac, fmt, ...)	no_printk(fmt, ##__VA_ARGS__)
--# define dfprintk_rcu(fac, fmt, ...)	no_printk(fmt, ##__VA_ARGS__)
-+# define dfprintk(fac, ...)		no_printk(__VA_ARGS__)
-+# define dfprintk_rcu(fac, ...)	no_printk(__VA_ARGS__)
- #endif
- 
- /*
-diff --git a/net/sunrpc/xprtrdma/svc_rdma_transport.c b/net/sunrpc/xprtrdma/svc_rdma_transport.c
-index f2d72181a6fe..ba6fe0fd387d 100644
---- a/net/sunrpc/xprtrdma/svc_rdma_transport.c
-+++ b/net/sunrpc/xprtrdma/svc_rdma_transport.c
-@@ -414,6 +414,7 @@ static struct svc_xprt *svc_rdma_accept(struct svc_xprt *xprt)
- 	struct ib_qp_init_attr qp_attr;
- 	struct ib_device *dev;
- 	int ret = 0;
-+	struct sockaddr *sap;
- 
- 	listen_rdma = container_of(xprt, struct svcxprt_rdma, sc_xprt);
- 	clear_bit(XPT_CONN, &xprt->xpt_flags);
-@@ -559,20 +560,16 @@ static struct svc_xprt *svc_rdma_accept(struct svc_xprt *xprt)
- 		goto errout;
- 	}
- 
--	if (IS_ENABLED(CONFIG_SUNRPC_DEBUG)) {
--		struct sockaddr *sap;
+-#ifndef CONF_ETC_DIR
+-#define CONF_ETC_DIR "/etc/iproute2"
+-#endif
 -
--		dprintk("svcrdma: new connection accepted on device %s:\n", dev->name);
--		sap = (struct sockaddr *)&newxprt->sc_cm_id->route.addr.src_addr;
--		dprintk("    local address   : %pIS:%u\n", sap, rpc_get_port(sap));
--		sap = (struct sockaddr *)&newxprt->sc_cm_id->route.addr.dst_addr;
--		dprintk("    remote address  : %pIS:%u\n", sap, rpc_get_port(sap));
--		dprintk("    max_sge         : %d\n", newxprt->sc_max_send_sges);
--		dprintk("    sq_depth        : %d\n", newxprt->sc_sq_depth);
--		dprintk("    rdma_rw_ctxs    : %d\n", ctxts);
--		dprintk("    max_requests    : %d\n", newxprt->sc_max_requests);
--		dprintk("    ord             : %d\n", conn_param.initiator_depth);
--	}
-+	dprintk("svcrdma: new connection accepted on device %s:\n", dev->name);
-+	sap = (struct sockaddr *)&newxprt->sc_cm_id->route.addr.src_addr;
-+	dprintk("    local address   : %pIS:%u\n", sap, rpc_get_port(sap));
-+	sap = (struct sockaddr *)&newxprt->sc_cm_id->route.addr.dst_addr;
-+	dprintk("    remote address  : %pIS:%u\n", sap, rpc_get_port(sap));
-+	dprintk("    max_sge         : %d\n", newxprt->sc_max_send_sges);
-+	dprintk("    sq_depth        : %d\n", newxprt->sc_sq_depth);
-+	dprintk("    rdma_rw_ctxs    : %d\n", ctxts);
-+	dprintk("    max_requests    : %d\n", newxprt->sc_max_requests);
-+	dprintk("    ord             : %d\n", conn_param.initiator_depth);
+ #define SPRINT_BSIZE 64
+ #define SPRINT_BUF(x)  char x[SPRINT_BSIZE]
  
- 	return &newxprt->sc_xprt;
- 
--- 
-2.34.1
-
 
