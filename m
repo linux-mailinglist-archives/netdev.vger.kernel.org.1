@@ -1,236 +1,230 @@
-Return-Path: <netdev+bounces-262522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262518-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SHgYIv4spWlU5AUAu9opvQ
-	(envelope-from <netdev+bounces-262522-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 07:23:58 +0100
+	id 6EI/EyEopWla4wUAu9opvQ
+	(envelope-from <netdev+bounces-262518-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 07:03:13 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1B101D36D3
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 07:23:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B7A251D35AE
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 07:03:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D26BD3002E6E
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 06:23:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A0742300071B
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 06:03:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BEE1231C91;
-	Mon,  2 Mar 2026 06:23:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0195375ADE;
+	Mon,  2 Mar 2026 06:03:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="VwLbdIak"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c7qPq3QZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C29D430BA2;
-	Mon,  2 Mar 2026 06:23:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C233C32572D
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 06:03:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772432635; cv=none; b=IROPTicgm5JhLsuDqU3RIQ+h4YbjCpamgixqwzlIq0hVv55neSsNHDm68XrCLUAcRth442T9LsAwd2GQFmCUngeDQhe+tdUR93Gq3HvN/xGvAWQsYSXUAExhFIWusWEEdcEKwbaXbAuh3yg0zRdvWC8TutmbwOzu4pbqs29C/PA=
+	t=1772431388; cv=none; b=izdOPxZovVjPi8MPWJpr8/OEnp3/Za2McTr1HraNCiFyL1d0gQuVgzC6uxj2YHiGrHJqF0iCYDawLnwFQo3vogykofku0ninnOIUgA/z3AoET4R5jFJX+kB4UI+LjPMAAzdZlg8eCtTx9lInLQ0GEmhxSP1XfY9zrCbZ6e0oQzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772432635; c=relaxed/simple;
-	bh=ETFAMKvM2p+aTqiHy/mq+6EI4H7X8Cu5PUgu/h3dUVE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fOVG5GS6wJtCVmgBkT9c89i1/8Zw4jJnhlqYQzY598lOCUhb7sm1Z1SSX/3LWIhRy9A6CsUvz0zGaU7lP51lRnLTGWNiBQJcAjiA6/1mWVvugDoF82Mz4lmEAXRfnhWqMdqGbYEKt+pdSD/d8FQRkebRKuzvREaC5ohnxxV7xag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=VwLbdIak; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=el70PQUy5TDt030EAxyWMSUU/k9z7ERBjTCSg7M8Na0=; b=VwLbdIakXpCpmLaFT52E/b6VME
-	szGqKfUR9tCmoPsPwrrqO//KJhRs7ViAVKa/VOtWppWzGoPQLkhmlh/vXdlb+rr77k4+KdTDG8Ulv
-	cCUe8xn+DTeU4BiSfTf+gRm3cYv5WGkkSN+kniFlUkFGxlwdnGVen2NxnWDu1/X7QSoGP0tC7VYqH
-	QKTIUrwir0flKtPc0ben86Mdg/CB0doC5aW3e35GmDlLsj/+KeMM+8l4Jn2V4mrMkcEmhGld8cnrm
-	PPuwqjeP+DDwZxdDpIPhg7kkhSvyKLFBU9nZmr1f2mC7vl0Vxpz3auwOhjvasuY22rijwJF2gVtk3
-	kVUqdSRw==;
-Received: from sslproxy07.your-server.de ([78.47.199.104])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1vwwJG-0000C3-33;
-	Mon, 02 Mar 2026 06:59:15 +0100
-Received: from localhost ([127.0.0.1])
-	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1vwwJE-000L55-2d;
-	Mon, 02 Mar 2026 06:59:13 +0100
-Message-ID: <0b52257d-d557-4f26-9931-34c81ab621bc@iogearbox.net>
-Date: Mon, 2 Mar 2026 06:58:46 +0100
+	s=arc-20240116; t=1772431388; c=relaxed/simple;
+	bh=UMbmZ++93Ph/NbVyX9t23zZtrAjeMmfIxj4l+jZAYNg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HtDD/zD2cIr8aHdBUHoCYz2y1JtmdryK3G4nKckWtxpQVqmYnw7Cx/fL0Fe+jj+zzDCGIYSd5BtNb/qqAz/dPppmNKwKYCC9U93KGoR8tddjBqp3uEosFEFYMrufTM68maX1DK2Z2negD1wkdHorHo3zSSdE7DK+uQulUjtoi1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c7qPq3QZ; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-824a3509a12so1808608b3a.2
+        for <netdev@vger.kernel.org>; Sun, 01 Mar 2026 22:03:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772431381; x=1773036181; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3wSCMIgFyPDN8ZsWOziBhAMpjDkgcKvVXQMlKIyyHF0=;
+        b=c7qPq3QZqfTWYiVrpTlnQ4EUA8LeutFk2nliRNCIEc85lyNKk73QTD1OLZ7cl7X4zN
+         VCwlU3ZhZbKcs8r8nKZ98jqrXlWcGvCvXHhxA3BUCQugAMYUo7JgtU01MhtlQCbi/4hN
+         TRCXJiu0aeF6GcNzWbnNQWEiqtHvBOyi53wT1dbRo9UJCJ9r8hZk+MuQjsPIyAROFZRs
+         3mEtCxiie91SlVNrZ7XRb8EfF6xMFjuXAtPx3x5V1FA9vfaRv0+3tvTQb2rNPLq5yVMJ
+         IhqFhpf1wio36ZN0lP73E3oSvGkZIr6PaYH/JKM7M6w7E7M8tX7/Ql5kMrB8T+JAvzHd
+         BhwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772431381; x=1773036181;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3wSCMIgFyPDN8ZsWOziBhAMpjDkgcKvVXQMlKIyyHF0=;
+        b=I99TCUsF2EcvTmhWIzkxgIOVc3uPBy3COKhqgco9tAumqbom3T9Eh9/NWb8io/Qewj
+         qQh66QFz5AvykLuzVFwzjJoSRhTNOtvvucsx6Fdm+b0UzEXe/qfJqjzYMdSz15uDQ9DU
+         KJJrCbsBKmVGBQ6DY9GTWawRtoStqyTcT52z5GKNZt30DSgDBYmZe6vKzqml9t2xYRo7
+         3J8RJ5xU0TVsut+BS5CYZfocqgLlgRbtQ8gyn8olxcSMY6+ef8i9n3I1uo4Yby2hgF00
+         lB+gb0pSW/vAyxQYUrgyea/RjmIdcbs3QAEpeKuPReunMTvStrei7vy5cGAGcdzUxyvp
+         rYXA==
+X-Gm-Message-State: AOJu0YwhhfFzIv0wLLy61Xz85FkhfEQFX5qHiy78obCzSdhAzmns9aSg
+	3taM+s26ZudelC11beCRo/kUDEjQ0kkpzXGNtzptWSJMA/zNG1A7AmyL
+X-Gm-Gg: ATEYQzwzORTATCmJgwXOKH6Ok6RceVwCen71BmoSDkShnmG2R9KGAgLJLZNEeFanj4S
+	hxJeEcgA15dmEcIRp7GzdK6nWwflvGpwGt2ZLFMLjdeVmrdzBQuqtpZPgpb+JEsmC6DIatl0BNJ
+	59Aty3GLIKH4EwLItW2WxpaG2qXED/tBZHK+yc2M627KUObjBUlopZJQjBRH1WCK1qvLJ08kM81
+	4TkkXzXz68ScOrL9cNz0wcwIdh7sukgT0CCNQTQ82dPqo4xnujiA2l2uLRd7jhSUYoZse5O7lRP
+	Nx91hTNR4Fk2Z+PbhB4Yx3AqjU/yuxi0ez3lf6Q35KQvHUhSSR+UP3TNe9p2AGI1IAonew6KH7J
+	kBdgBJPl/ni1wzZRWsBPuQVDnzZQzaiOiZUpFpvQo1/qDU+Vgc99OzLyZRgqEKitKvAZIaJjrE4
+	CzNQjtAi00s4DGr5gGzrHkoayjJy7MrrvEeCK4H4jNG24M/VMBj1jA5oGXBmSFPv7wrXRJhz78B
+	EU9qSUt4PXajE/2hfwKlz+N/+mQPY2k8oG2LWLVbYjIq+3V8bU+HipPDrP4VsaVg3fgWyLmseUy
+	GMBSXGssxA==
+X-Received: by 2002:a05:6a00:bc83:b0:824:3bd9:aac6 with SMTP id d2e1a72fcca58-8274d95b7f0mr8512139b3a.16.1772431380848;
+        Sun, 01 Mar 2026 22:03:00 -0800 (PST)
+Received: from yuu-U24E.. (2001-b400-e3d7-5aaf-ef7e-1255-80c7-27e1.emome-ip6.hinet.net. [2001:b400:e3d7:5aaf:ef7e:1255:80c7:27e1])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8273a060331sm11521915b3a.62.2026.03.01.22.02.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 01 Mar 2026 22:03:00 -0800 (PST)
+From: Yung Chih Su <yuuchihsu@gmail.com>
+To: davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	nathan@kernel.org,
+	nick.desaulniers+lkml@gmail.com,
+	morbo@google.com,
+	justinstitt@google.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev,
+	Yung Chih Su <yuuchihsu@gmail.com>
+Subject: [PATCH v2] net: ipv4: fix ARM64 alignment fault in multipath hash seed
+Date: Mon,  2 Mar 2026 14:02:47 +0800
+Message-ID: <20260302060247.7066-1-yuuchihsu@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/3] bpf: bpf_out_neigh_v4: Fix nd_tbl NULL
- dereference when IPv6 is disabled
-To: =?UTF-8?Q?Ricardo_B=2E_Marli=C3=A8re?= <rbm@suse.com>,
- Martin KaFai Lau <martin.lau@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- David Ahern <dsahern@kernel.org>, Jay Vosburgh <jv@jvosburgh.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Hangbin Liu <liuhangbin@gmail.com>
-Cc: Fernando Fernandez Mancera <fmancera@suse.de>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260228-net-nd_tbl_fixes-v1-0-2b2a274df9bb@suse.com>
- <20260228-net-nd_tbl_fixes-v1-1-2b2a274df9bb@suse.com>
-Content-Language: en-US
-From: Daniel Borkmann <daniel@iogearbox.net>
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- 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
-In-Reply-To: <20260228-net-nd_tbl_fixes-v1-1-2b2a274df9bb@suse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: Clear (ClamAV 1.4.3/27927/Sun Mar  1 08:24:39 2026)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
-	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262522-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-262518-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[suse.com,linux.dev,gmail.com,fomichev.me,kernel.org,google.com,davemloft.net,redhat.com,jvosburgh.net,lunn.ch];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[iogearbox.net:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yuuchihsu@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev,lkml];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: F1B101D36D3
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B7A251D35AE
 X-Rspamd-Action: no action
 
-Hi Ricardo,
+`struct sysctl_fib_multipath_hash_seed` contains two u32 fields
+(user_seed and mp_seed), making it an 8-byte structure with a 4-byte
+alignment requirement.
 
-On 2/28/26 6:46 PM, Ricardo B. Marlière wrote:
-> When booting with the 'ipv6.disable=1' parameter, the nd_tbl is never
-> initialized because inet6_init() exits before ndisc_init() is called which
-> initializes it. If bpf_redirect_neigh() is called from tc with an explicit
-> nexthop of nh_family == AF_INET6, bpf_out_neigh_v4() takes the AF_INET6
-> branch and calls ip_neigh_gw6(), which relies on ipv6_stub->nd_tbl.
-> 
->   BUG: kernel NULL pointer dereference, address: 0000000000000248
->   Oops: Oops: 0000 [#1] SMP NOPTI
->   RIP: 0010:skb_do_redirect+0xb93/0xf00
->   Call Trace:
->    <TASK>
->    ? srso_alias_return_thunk+0x5/0xfbef5
->    ? __tcf_classify.constprop.0+0x83/0x160
->    ? srso_alias_return_thunk+0x5/0xfbef5
->    ? tcf_classify+0x2b/0x50
->    ? srso_alias_return_thunk+0x5/0xfbef5
->    ? tc_run+0xb8/0x120
->    ? srso_alias_return_thunk+0x5/0xfbef5
->    __dev_queue_xmit+0x6fa/0x1000
->    ? srso_alias_return_thunk+0x5/0xfbef5
->    ? srso_alias_return_thunk+0x5/0xfbef5
->    ? alloc_skb_with_frags+0x58/0x200
->    packet_sendmsg+0x10da/0x1700
->    ? srso_alias_return_thunk+0x5/0xfbef5
->    __sys_sendto+0x1f3/0x220
->    __x64_sys_sendto+0x24/0x30
->    do_syscall_64+0x101/0xf80
->    ? exc_page_fault+0x6e/0x170
->    ? srso_alias_return_thunk+0x5/0xfbef5
->    entry_SYSCALL_64_after_hwframe+0x77/0x7f
->    </TASK>
-> 
-> Fix this by adding an early check in the AF_INET6 branch of
-> bpf_out_neigh_v4(). If ipv6_stub->nd_tbl is NULL, unlock RCU and drop the
-> packet.
-> 
-> Suggested-by: Fernando Fernandez Mancera <fmancera@suse.de>
-> Fixes: ba452c9e996d ("bpf: Fix bpf_redirect_neigh helper api to support supplying nexthop")
-> Signed-off-by: Ricardo B. Marlière <rbm@suse.com>
-> ---
->   net/core/filter.c | 4 ++++
->   1 file changed, 4 insertions(+)
-> 
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 0d5d5a17acb2..9ab2fae3a0d9 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -2335,6 +2335,10 @@ static int bpf_out_neigh_v4(struct net *net, struct sk_buff *skb,
->   
->   		neigh = ip_neigh_for_gw(rt, skb, &is_v6gw);
->   	} else if (nh->nh_family == AF_INET6) {
-> +		if (!ipv6_stub->nd_tbl) {
-> +			rcu_read_unlock();
-> +			goto out_drop;
-> +		}
+In `fib_multipath_hash_from_keys()`, the code evaluates the entire
+struct atomically via `READ_ONCE()`:
 
-Can we just completely get rid of allowing IPv6 as a module?
-So either its built-in or not available at all, and then we
-can get rid of the stub completely rather than adding checks
-in various places which also brings a small performance benefit
-of not having indirect calls in some places.
+    mp_seed = READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed).mp_seed;
 
-Thanks,
-Daniel
+While this silently works on GCC by falling back to unaligned regular
+loads which the ARM64 kernel tolerates, it causes a fatal kernel panic
+when compiled with Clang and LTO enabled.
+
+Commit e35123d83ee3 ("arm64: lto: Strengthen READ_ONCE() to acquire
+when CONFIG_LTO=y") strengthens `READ_ONCE()` to use Load-Acquire
+instructions (`ldar` / `ldapr`) to prevent compiler reordering bugs
+under Clang LTO. Since the macro evaluates the full 8-byte struct,
+Clang emits a 64-bit `ldar` instruction. ARM64 architecture strictly
+requires `ldar` to be naturally aligned, thus executing it on a 4-byte
+aligned address triggers a strict Alignment Fault (FSC = 0x21).
+
+Fix the read side by moving the `READ_ONCE()` directly to the `u32`
+member, which emits a safe 32-bit `ldar Wn`.
+
+Furthermore, Eric Dumazet pointed out that `WRITE_ONCE()` on the entire
+struct in `proc_fib_multipath_hash_set_seed()` is also flawed. Analysis
+shows that Clang splits this 8-byte write into two separate 32-bit
+`str` instructions. While this avoids an alignment fault, it destroys
+atomicity and exposes a tear-write vulnerability. Fix this by
+explicitly splitting the write into two 32-bit `WRITE_ONCE()`
+operations.
+
+Finally, add the missing `READ_ONCE()` when reading `user_seed` in
+`proc_fib_multipath_hash_seed()` to ensure proper pairing and
+concurrency safety.
+
+Fixes: 4ee2a8cace3f ("net: ipv4: Add a sysctl to set multipath hash seed")
+Suggested-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Yung Chih Su <yuuchihsu@gmail.com>
+---
+v2:
+  - Split WRITE_ONCE(struct) into two 32-bit WRITE_ONCE()s in 
+    proc_fib_multipath_hash_set_seed() to fix a tear-write vulnerability.
+  - Add missing READ_ONCE() for user_seed in proc_fib_multipath_hash_seed()
+    per Eric Dumazet's suggestion.
+  - Update Fixes tag to use the standard 12-char abbreviated format
+    per Jakub Kicinski's suggestion.
+
+ include/net/ip_fib.h       | 2 +-
+ net/ipv4/sysctl_net_ipv4.c | 5 +++--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/include/net/ip_fib.h b/include/net/ip_fib.h
+index b4495c38e0a0..318593743b6e 100644
+--- a/include/net/ip_fib.h
++++ b/include/net/ip_fib.h
+@@ -559,7 +559,7 @@ static inline u32 fib_multipath_hash_from_keys(const struct net *net,
+ 	siphash_aligned_key_t hash_key;
+ 	u32 mp_seed;
+ 
+-	mp_seed = READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed).mp_seed;
++	mp_seed = READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed.mp_seed);
+ 	fib_multipath_hash_construct_key(&hash_key, mp_seed);
+ 
+ 	return flow_hash_from_keys_seed(keys, &hash_key);
+diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
+index 643763bc2142..5654cc9c8a0b 100644
+--- a/net/ipv4/sysctl_net_ipv4.c
++++ b/net/ipv4/sysctl_net_ipv4.c
+@@ -486,7 +486,8 @@ static void proc_fib_multipath_hash_set_seed(struct net *net, u32 user_seed)
+ 			    proc_fib_multipath_hash_rand_seed),
+ 	};
+ 
+-	WRITE_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed, new);
++	WRITE_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed.user_seed, new.user_seed);
++	WRITE_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed.mp_seed, new.mp_seed);
+ }
+ 
+ static int proc_fib_multipath_hash_seed(const struct ctl_table *table, int write,
+@@ -500,7 +501,7 @@ static int proc_fib_multipath_hash_seed(const struct ctl_table *table, int write
+ 	int ret;
+ 
+ 	mphs = &net->ipv4.sysctl_fib_multipath_hash_seed;
+-	user_seed = mphs->user_seed;
++	user_seed = READ_ONCE(mphs->user_seed);
+ 
+ 	tmp = *table;
+ 	tmp.data = &user_seed;
+-- 
+2.43.0
+
 
