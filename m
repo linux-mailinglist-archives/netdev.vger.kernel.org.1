@@ -1,319 +1,211 @@
-Return-Path: <netdev+bounces-262463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262464-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cBnVFKvdpGmSugUAu9opvQ
-	(envelope-from <netdev+bounces-262463-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 01:45:31 +0100
+	id cIVAFbHjpGmquwUAu9opvQ
+	(envelope-from <netdev+bounces-262464-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 02:11:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C111D1D22A6
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 01:45:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF5021D23B4
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 02:11:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 42A153012CCD
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 00:45:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 23C673015464
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 01:11:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4447B221721;
-	Mon,  2 Mar 2026 00:45:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA87C20E702;
+	Mon,  2 Mar 2026 01:11:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gwkNQ3Fq";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ehIn3Uke"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="0YZ49CiR"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5971DD889
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 00:45:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75EA114B08A
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 01:11:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772412325; cv=none; b=k2G1N5bkFB8A8z7UA1poKolaQ2MiIPV/aIJoKL4Ixv/cAXssheSi2c3WkVXZDCXvRUsQqeCNB6QigX+hOiAJVBZoHgeBQm3oNTjUsR5CIkkKeffvjytoCjVIlWD+Innlyu19qpoMdBX/v9lm+3eUDWNo2RINUOTARZUaTcZgxEA=
+	t=1772413867; cv=none; b=TAngXh8tGrjdm5dCQ8LSMT8J4JJjkmYRjzZFzbYJzDbA4uu0NBL5qZZYMgfF4lUJwnzMpV+ESduMQrBRxT407t9JXLCXAj1JZDRJHZ5QMlVVcYaQ9R9TpczQmZbHBit4m2EKPy2ea8fm8XsK+ax2F2ev2xGmPGymf3SQWcBZQrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772412325; c=relaxed/simple;
-	bh=4u5xVp5TnwLZTh7dIRHY4bKsceG8AE3TAWJalgr5Ac4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EQy0JMNqmpRfUVr1RS5VrYC/BIM/IHIBbNafChsXebT5fKSaYwmHqFsbhNE+WeBvUmO3ynMHk8lJbA2RvleYhV1a9si3rMQMnWu1qZNTuNPh6VFfYYM+dFVjnsJZrENh2n1lidS1mNvnFLPlrvU0g7iO91hahWmn5uUcEFhdrBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gwkNQ3Fq; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ehIn3Uke; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772412322;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vv0k8lngNVzpQy1IMYA5foV0UbEwsl2jdcB0vqaVFDY=;
-	b=gwkNQ3FqcL0Cd5mGxaD9VaCMRPLyVRjVIFmrmOYo8dakHRBJxifiRkKrocM70BxIYnmtIg
-	DmF7AmKjA9KQID/b3PnaTVX1cA+jdCdHkeh4y+9apKFGIvnR2U5LNn/mNsPFyl7GQegThu
-	H5ATxYXJoBmVUrFE2w7a6bvZn0b44Mo=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-681-zNMvoTdxM66bfosKoeQPNQ-1; Sun, 01 Mar 2026 19:45:19 -0500
-X-MC-Unique: zNMvoTdxM66bfosKoeQPNQ-1
-X-Mimecast-MFC-AGG-ID: zNMvoTdxM66bfosKoeQPNQ_1772412318
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-439b4e653d2so441598f8f.1
-        for <netdev@vger.kernel.org>; Sun, 01 Mar 2026 16:45:19 -0800 (PST)
+	s=arc-20240116; t=1772413867; c=relaxed/simple;
+	bh=WuNhENcX1fJwfoNDpI8nYniFOrFTNC2cD+1g8RgYTgg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GMgn5gIvh4+z1+/KKCt3A+Dim0dNl+r8WIi+DOrFNHgWjifjaESehjBQS0B1jP3M6L5g76Kf2rapFu/MFV5qkvXjgbsy5tDRYGWy7TAzJkl36kdhCAoS+Sdq4sxDPV+QtbvOznpVhn5dbHod2gVlH2PIu0MpKVfiro+CxOBn9Zw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=0YZ49CiR; arc=none smtp.client-ip=74.125.82.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-1271257ae53so4509275c88.1
+        for <netdev@vger.kernel.org>; Sun, 01 Mar 2026 17:11:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1772412318; x=1773017118; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=vv0k8lngNVzpQy1IMYA5foV0UbEwsl2jdcB0vqaVFDY=;
-        b=ehIn3Uked6EUx+JwUEzwdVjjTeDKSuWu7QcMsa2CqsjY/O1ol4fxJmzvLfXSqtz9e4
-         eKdsGgNE4gGRu4uWkylQFo3OR6IPlInbwMRP0F93HX5ne8HcG4IW5n0EBdJHQmfI+TU1
-         cepv+0z/mNKQeEKVo8sbJzF/YDhXrOBfvVaQuXA/0lgRt6ta5N+ekGoM/cMfMY0V6mXk
-         BL9zO7G0GPURzyG+PLHjATPwh9h8RhM3tkOXCmqJ4lujBjSMS1TsU5mZGvFUlIW2ETFl
-         eKyeb2xUoPd/tsTxb5JWjlpyuZKtbn4FF/8ZDQbo9c3suQDSVIDqV+cPMb3s3fRK6mEu
-         0NSA==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1772413865; x=1773018665; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mLzx4QloOR7w220ELbFdJo9+YB2Xr38O5JizyVmv14A=;
+        b=0YZ49CiRYI+llU7OGK0XJsvc/SyXDhIFEAFNyo2adxXRmcfQGtm08b9TrXy3mhEQS0
+         nttcKWsuIFjOQKVaZuqudSSCqYKZuBdV3ZhrK7uVo4yO/CAAJ7CZnH6tVwwt84t+P15r
+         IdGQPAlttl8JhIXJNjs6DAdO3c40p2N5TjELPhywimltCIjKLngn/RyVCSeuXJxtJcYJ
+         wzOLlKLmBTBlmMOeEMH7gdKIttBAyIRWukIAOSPbyDkktIia0zgxhZ6mcfOyAuJcZ7Mg
+         TnzNT9F6EIevyNnqpO5tzoT9Ow1u6z4xdoPIGL4MtzoLc01eOAtftlnKPpWzdBWwB3JV
+         MFdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772412318; x=1773017118;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vv0k8lngNVzpQy1IMYA5foV0UbEwsl2jdcB0vqaVFDY=;
-        b=oy0zovNRu/UFWSXmm+sCDpk5HS1COT3dtA0xS3IeCt+XxYr3bdqKT6ECOnYoCzEXfj
-         Vd1DmQZcRoKqLw5sF1rGMdETfIMQxGrdDqaWsZwloyGZCphp/sZal8KQuXUZ1o5CXkt4
-         UF+33okXJFQSMPd+uArAZit6iYyizvy2z7IYaGwpS4MwNPC/x0Bjhe/1kH/PrZbhm2GJ
-         TepjVa/XDltSVraCLJbUpEtjXySW3JjXdAa4GCBBoEjOVSI4DshvDgyCVYmRYumSff21
-         wU8Fu5uHMtmM6ggSeG/xYn6sTvAa/o9mqfk+CSOI1+o+OyPmisLCGmUsTUzj2LLs6FOV
-         02cQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUgGqB7YIL02Efc3UQbrMF3CMSw7kDEpgLEPyuZjtMF1ge+OK0UWUyxW7B5CUB/CZf63ing/Po=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyb9y1NXElf/c2y/qn3Sy8XDY53RbITSBsc0uMpkQkhaiU7csPt
-	lWxHL38o/dwOvUptEWG9wEmkGjb5UO7yK2fK0XvjQYOSY1pAqR61GXr1ZzCc/dB9A2hGNutfBpH
-	aTpz/hUlZ+yAXqNeT/K/RlsikO29w2WEHEYICiPtKfyW8J7q4Pd8OJva4+Q==
-X-Gm-Gg: ATEYQzzdaQw0Rk7wzsZXObWiLUB5kXQxG7XzTb1l+tC3gIkLHg4eEd6zb/OpNZemg79
-	7CDl9lT/ZkuFDEVirWDuhF6vYdLi592UccgpCDOt0wBt1cx2LsiPH6gSFlE37zssG8mhZL/uraJ
-	tFNe6xRNRTBD9P1WyYAYIA7BtxCvWu+tTrELhbOqMmFe7S/DkoUsfMSjWdmjDedVEIAAp8yUNKD
-	Uq9Qi9ToKrwgOaSr+KP/5sBgDepCaaDptN8ti2DdjobT7L4E1RDLv0vrj2q+38KP7H9Tpwhc5PX
-	Xq837zQ7q1dDSD5i4jXPgKYsqa2YWociGOCjvISRd0j8f16CK7FeawuQwKtLVpzEukpj5u8C2du
-	BjOWVUpxgTqNAbJaj9WZXBKbFpXKk7NjmFYnsuQhuc9D4ZQ==
-X-Received: by 2002:a05:600c:530c:b0:483:afbb:a077 with SMTP id 5b1f17b1804b1-483c9b971a3mr177121105e9.1.1772412318363;
-        Sun, 01 Mar 2026 16:45:18 -0800 (PST)
-X-Received: by 2002:a05:600c:530c:b0:483:afbb:a077 with SMTP id 5b1f17b1804b1-483c9b971a3mr177120815e9.1.1772412317848;
-        Sun, 01 Mar 2026 16:45:17 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-79-166.inter.net.il. [80.230.79.166])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bd6f2f88sm357274885e9.2.2026.03.01.16.45.16
+        d=1e100.net; s=20230601; t=1772413865; x=1773018665;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=mLzx4QloOR7w220ELbFdJo9+YB2Xr38O5JizyVmv14A=;
+        b=falY5iljq+wouuoWcqcMBg78BNaC5HCfbazpu0A9DA5jyPV8FuSBw6b+iSKtK4EXaz
+         wc5jSYYlVop8hrWBsVbt7mEZu4ceuUfCwC1G/ixYD++SHp1KBGGhrwL1+vEuY1cmNwrD
+         c4TJ8qMQwm/kxsQ2/HRdN3RST+Fv0dbmAWU2WIvwKNQQTNroDrhQbi6Z0UysFgKd/XYE
+         XJV9NOsk9oeu0EGJGEhiui8/bavOw9/zoTq9vQtatiNbacRY8luOWXxRv3cZtb6F+RHW
+         zdO36kLFTxoxA1s/6Yi+5y5AkMX0NxRkcR/5Ia3Jp5wHxr8M25vxf2Ggz0BZ/LhQzvpw
+         3Uzw==
+X-Gm-Message-State: AOJu0YwPZaVN9iIQIkzBjm25iAMcVbmu8Vh8cPPl2Ux190dOFniEwxiK
+	NnHkaVziJpIcSTcdD+e4GVxkZ7LVIGehZ+pFiie4MzfcCP72KF7GzjMg6h17OMNBxUc=
+X-Gm-Gg: ATEYQzzs3nyeWHmdiQ5bADi8ni1zObxDY2t7XXKZDhWsJn+B2ginE+8zShYhrBmiIex
+	dQRouaoergx+W2Mi1S0p8Tu0cnG6bZDC0YtAmKgkhG/pux/Q3qMe/zNi96hSeh7MFmbb36qImPj
+	7Jcmlwmqe5GN5w2/YwGKfiBK/juv9u5YN9nyGMVFVLL178O03FHcgfS7O/8eg6EQm6ewUWrtDtX
+	i+WlL/0Os7S6lMht9vD3wn1eBuv9/gKe4jPrY8ayNTk9jfSwFWuMof5s4JUN+Q9bVarT77nrris
+	v2oYZPwYaPmFoD6qiWI0/Aejd8klOsMaadQlRqN30lyC4WRXl3dp9HOsCJKPszSraRw74XUnAJM
+	fsjXCHEaO63Xekox+xf88126pmbiZuOYFzS3emgGmfcgE2QtxhEiyFLMiNzxiiv6JXGytSdKMcs
+	96agzDrftQHFtVmT/FEFQsuW97NHukhEmB6gKr90uPzLlYAI6aI2lNd5k0YGM/1oPi
+X-Received: by 2002:a05:7022:4381:b0:11e:528:4185 with SMTP id a92af1059eb24-1278fc568a2mr4166249c88.38.1772413864497;
+        Sun, 01 Mar 2026 17:11:04 -0800 (PST)
+Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12789a43c12sm12792111c88.14.2026.03.01.17.11.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Mar 2026 16:45:17 -0800 (PST)
-Date: Sun, 1 Mar 2026 19:45:15 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: ShuangYu <shuangyu@yunyoo.cc>
-Cc: "jasowang@redhat.com" <jasowang@redhat.com>,
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [BUG] vhost_net: livelock in handle_rx() when GRO packet exceeds
- virtqueue capacity
-Message-ID: <20260301194456-mutt-send-email-mst@kernel.org>
-References: <9ac0a071e79e9da8128523ddeba19085f4f8c9aa.decbd9ef.1293.41c3.bf27.48cdc12b9ce6@larksuite.com>
- <20260301190906-mutt-send-email-mst@kernel.org>
- <20260301193655-mutt-send-email-mst@kernel.org>
+        Sun, 01 Mar 2026 17:11:04 -0800 (PST)
+Date: Sun, 1 Mar 2026 17:11:01 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org, Mirko Lindner
+ <mlindner@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Thomas
+ Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@kernel.org>
+Subject: Re: [PATCH] net: ethernet: marvell: skge: remove incorrect
+ conflicting PCI ID
+Message-ID: <20260301171101.16d07cbe@phoenix.local>
+In-Reply-To: <20260206071724.15268-1-enelsonmoore@gmail.com>
+References: <20260206071724.15268-1-enelsonmoore@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260301193655-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.06 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[networkplumber-org.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262463-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262464-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[networkplumber-org.20230601.gappssmtp.com:+];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.994];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C111D1D22A6
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,networkplumber-org.20230601.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: EF5021D23B4
 X-Rspamd-Action: no action
 
-On Sun, Mar 01, 2026 at 07:39:30PM -0500, Michael S. Tsirkin wrote:
-> On Sun, Mar 01, 2026 at 07:10:06PM -0500, Michael S. Tsirkin wrote:
-> > On Sun, Mar 01, 2026 at 10:36:39PM +0000, ShuangYu wrote:
-> > > Hi,
-> > > 
-> > > We have hit a severe livelock in vhost_net on 6.18.x. The vhost
-> > > kernel thread spins at 100% CPU indefinitely in handle_rx(), and
-> > > QEMU becomes unkillable (stuck in D state).
-> > > [This is a text/plain messages]
-> > > 
-> > > Environment
-> > > -----------
-> > >   Kernel:  6.18.10-1.el8.elrepo.x86_64
-> > >   QEMU:    7.2.19
-> > >   Virtio:  VIRTIO_F_IN_ORDER is negotiated
-> > >   Backend: vhost (kernel)
-> > > 
-> > > Symptoms
-> > > --------
-> > >   - vhost-<pid> kernel thread at 100% CPU (R state, never yields)
-> > >   - QEMU stuck in D state at vhost_dev_flush() after receiving SIGTERM
-> > >   - kill -9 has no effect on the QEMU process
-> > >   - libvirt management plane deadlocks ("cannot acquire state change lock")
-> > > 
-> > > Root Cause
-> > > ----------
-> > > The livelock is triggered when a GRO-merged packet on the host TAP
-> > > interface (e.g., ~60KB) exceeds the remaining free capacity of the
-> > > guest's RX virtqueue (e.g., ~40KB of available buffers).
-> > > 
-> > > The loop in handle_rx() (drivers/vhost/net.c) proceeds as follows:
-> > > 
-> > >   1. get_rx_bufs() calls vhost_get_vq_desc_n() to fetch descriptors.
-> > >     It advances vq->last_avail_idx and vq->next_avail_head as it
-> > >     consumes buffers, but runs out before satisfying datalen.
-> > > 
-> > >   2. get_rx_bufs() jumps to err: and calls
-> > >     vhost_discard_vq_desc(vq, headcount, n), which rolls back
-> > >     vq->last_avail_idx and vq->next_avail_head.
-> > > 
-> > >     Critically, vq->avail_idx (the cached copy of the guest's
-> > >     avail->idx) is NOT rolled back. This is correct behavior in
-> > >     isolation, but creates a persistent mismatch:
-> > > 
-> > >       vq->avail_idx      = 108  (cached, unchanged)
-> > >       vq->last_avail_idx = 104  (rolled back)
-> > > 
-> > >   3. handle_rx() sees headcount == 0 and calls vhost_enable_notify().
-> > >     Inside, vhost_get_avail_idx() finds:
-> > > 
-> > >       vq->avail_idx (108) != vq->last_avail_idx (104)
-> > > 
-> > >     It returns 1 (true), indicating "new buffers available."
-> > >     But these are the SAME buffers that were just discarded.
-> > > 
-> > >   4. handle_rx() hits `continue`, restarting the loop.
-> > > 
-> > >   5. In the next iteration, vhost_get_vq_desc_n() checks:
-> > > 
-> > >       if (vq->avail_idx == vq->last_avail_idx)
-> > > 
-> > >     This is FALSE (108 != 104), so it skips re-reading the guest's
-> > >     actual avail->idx and directly fetches the same descriptors.
-> > > 
-> > >   6. The exact same sequence repeats: fetch -> too small -> discard
-> > >     -> rollback -> "new buffers!" -> continue. Indefinitely.
-> > > 
-> > > This appears to be a regression introduced by the VIRTIO_F_IN_ORDER
-> > > support, which added vhost_get_vq_desc_n() with the cached avail_idx
-> > > short-circuit check, and the two-argument vhost_discard_vq_desc()
-> > > with next_avail_head rollback. The mismatch between the rollback
-> > > scope (last_avail_idx, next_avail_head) and the check scope
-> > > (avail_idx vs last_avail_idx) was not present before this change.
-> > > 
-> > > bpftrace Evidence
-> > > -----------------
-> > > During the 100% CPU lockup, we traced:
-> > > 
-> > >   @get_rx_ret[0]:      4468052   // get_rx_bufs() returns 0 every time
-> > >   @peek_ret[60366]:    4385533   // same 60KB packet seen every iteration
-> > >   @sock_err[recvmsg]:        0   // tun_recvmsg() is never reached
-> > > 
-> > > vhost_get_vq_desc_n() was observed iterating over the exact same 11
-> > > descriptor addresses millions of times per second.
-> > > 
-> > > Workaround
-> > > ----------
-> > > Either of the following avoids the livelock:
-> > > 
-> > >   - Disable GRO/GSO on the TAP interface:
-> > >      ethtool -K <tap> gro off gso off
-> > > 
-> > >   - Switch from kernel vhost to userspace QEMU backend:
-> > >      <driver name='qemu'/> in libvirt XML
-> > > 
-> > > Bisect
-> > > ------
-> > > We have not yet completed a full git bisect, but the issue does not
-> > > occur on 6.17.x kernels which lack the VIRTIO_F_IN_ORDER vhost
-> > > support. We will follow up with a Fixes: tag if we can identify the
-> > > exact commit.
-> > > 
-> > > Suggested Fix Direction
-> > > -----------------------
-> > > In handle_rx(), when get_rx_bufs() returns 0 (headcount == 0) due to
-> > > insufficient buffers (not because the queue is truly empty), the code
-> > > should break out of the loop rather than relying on
-> > > vhost_enable_notify() to make that determination. For example, when
-> > > get_rx_bufs() returns r == 0 with datalen still > 0, this indicates a
-> > > "packet too large" condition, not a "queue empty" condition, and
-> > > should be handled differently.
-> > > 
-> > > Thanks,
-> > > ShuangYu
-> > 
-> > Hmm. On a hunch, does the following help? completely untested,
-> > it is night here, sorry.
-> > 
-> > 
-> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > index 2f2c45d20883..aafae15d5156 100644
-> > --- a/drivers/vhost/vhost.c
-> > +++ b/drivers/vhost/vhost.c
-> > @@ -1522,6 +1522,7 @@ static void vhost_dev_unlock_vqs(struct vhost_dev *d)
-> >  static inline int vhost_get_avail_idx(struct vhost_virtqueue *vq)
-> >  {
-> >  	__virtio16 idx;
-> > +	u16 avail_idx;
-> >  	int r;
-> >  
-> >  	r = vhost_get_avail(vq, idx, &vq->avail->idx);
-> > @@ -1532,17 +1533,19 @@ static inline int vhost_get_avail_idx(struct vhost_virtqueue *vq)
-> >  	}
-> >  
-> >  	/* Check it isn't doing very strange thing with available indexes */
-> > -	vq->avail_idx = vhost16_to_cpu(vq, idx);
-> > -	if (unlikely((u16)(vq->avail_idx - vq->last_avail_idx) > vq->num)) {
-> > +	avail_idx = vhost16_to_cpu(vq, idx);
-> > +	if (unlikely((u16)(avail_idx - vq->last_avail_idx) > vq->num)) {
-> >  		vq_err(vq, "Invalid available index change from %u to %u",
-> >  		       vq->last_avail_idx, vq->avail_idx);
-> >  		return -EINVAL;
-> >  	}
-> >  
-> >  	/* We're done if there is nothing new */
-> > -	if (vq->avail_idx == vq->last_avail_idx)
-> > +	if (avail_idx == vq->avail_idx)
-> >  		return 0;
-> >  
-> > +	vq->avail_idx == avail_idx;
-> > +
-> 
-> meaning 
-> 	vq->avail_idx = avail_idx; 
-> of course
-> 
-> >  	/*
-> >  	 * We updated vq->avail_idx so we need a memory barrier between
-> >  	 * the index read above and the caller reading avail ring entries.
+On Thu,  5 Feb 2026 23:17:14 -0800
+Ethan Nelson-Moore <enelsonmoore@gmail.com> wrote:
 
+> The ID 1186:4302 is matched by both r8169 and skge. The same device ID
+> should not be in more than one driver, because in that case, which
+> driver is used is unpredictable. I downloaded the latest drivers for
+> all hardware revisions of the D-Link DGE-530T from D-Link's website,
+> and the only drivers which contain this ID are Realtek drivers.
+> Therefore, remove this device ID from skge.
+>=20
+> In the kernel bug report which requested addition of this device ID,
+> someone created a patch to add the ID to skge. Then, it was pointed
+> out that this device is an "r8169 in disguise", and a patch was created
+> to add it to r8169. Somehow, both of these patches got merged. See the
+> link below.
+>=20
+> Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D38862
+> Fixes: c074304c2bcf ("add pci-id for DGE-530T")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
 
-and the change this is fixing was done in d3bb267bbdcba199568f1325743d9d501dea0560
+I was intrigued as to how this happened, and sent of AI to find out.
 
--- 
-MST
+D-Link DGE-530T: Chipset History and Driver Confusion
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
 
+D-Link shipped multiple hardware revisions of the DGE-530T under the
+same product name and packaging, but with completely different chipsets:
+
+  Rev A1 - Marvell 88E8003 (SysKonnect Yukon)
+  Rev B1 - Marvell 88E8001 (SysKonnect Yukon)
+  Rev B2 - Marvell 88E8001-LKJ1 (SysKonnect Yukon)
+  Rev C1 - D-Link DLG10028C, a rebadged Realtek RTL8169
+
+The Marvell-based revisions (A/B) used PCI ID 1186:4b01 and were
+driven by skge (the SysKonnect/Marvell Yukon driver, originally
+sk98lin). The Realtek-based Rev C1 used PCI ID 1186:4302 and
+required the r8169 driver.
+
+So the PCI device IDs were actually different across chipset families,
+but they shared the same D-Link vendor ID (1186) and identical product
+branding.
+
+Driver history and the VPD problem
+-----------------------------------
+
+The original SysKonnect vendor driver (sk98lin) had the D-Link
+1186:4c00 entry commented out in its PCI table:
+
+  /* DLink card does not have valid VPD so this driver gags
+   * { PCI_VENDOR_ID_DLINK, 0x4c00, PCI_ANY_ID, PCI_ANY_ID, 0, 0, 0 },
+   */
+
+The issue wasn't really that the card had bad VPD =E2=80=94 D-Link simply
+didn't populate the Vital Product Data fields the way SysKonnect's
+own boards did, and sk98lin's probe path depended on reading VPD
+during initialization. When skge was written as a clean replacement
+for sk98lin, it had no VPD dependency, so the D-Link entry (1186:4c00)
+went in unconditionally. The 1186:4b01 entry for Rev B was added
+later as users reported it.
+
+When the Rev C1 appeared with a Realtek RTL8169 chip, the 1186:4302
+PCI ID was added to both the r8169 driver (by Lennart Sorensen in
+commit 93a3aa25933461d, July 2011) and to skge's PCI table. This
+meant both modules would match the Rev C1 card, even though skge
+could never actually drive it =E2=80=94 the probe would bail out when it
+read the chip ID and got something that wasn't a Yukon. The result
+was that lspci would report "Kernel modules: skge, r8169" for the
+C1, which was harmless but untidy.
+
+The bogus 1186:4302 entry has since been removed from skge upstream,
+though it's unlikely any DGE-530T cards of any revision still exist
+in the wild at this point.
+
+The chipset swap was widely regarded as a cost-cutting move that
+degraded performance significantly. The Marvell Yukon was well
+respected; the Realtek 8169 was not. Many users and integrators
+stopped recommending the DGE-530T after the C1 appeared.
 
