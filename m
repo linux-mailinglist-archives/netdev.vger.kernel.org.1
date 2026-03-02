@@ -1,185 +1,169 @@
-Return-Path: <netdev+bounces-262591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262592-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KEdpLGZgpWmx+wUAu9opvQ
-	(envelope-from <netdev+bounces-262591-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 11:03:18 +0100
+	id UFvyIMxhpWmx+wUAu9opvQ
+	(envelope-from <netdev+bounces-262592-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 11:09:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A1431D5F7F
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 11:03:18 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01E021D613A
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 11:09:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B05A8301A40B
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 10:01:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0803E30364D1
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 10:02:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FCB1395D84;
-	Mon,  2 Mar 2026 10:01:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2EFF395D8C;
+	Mon,  2 Mar 2026 10:02:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pKcMeK5z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EfQfNc66"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E89B1394470
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 10:01:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6D729D29F
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 10:02:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772445675; cv=none; b=MBuVgux7K+jy2RWdK3kEC/RH9ikraVNyRdtPqYa9tNlRdOPwtsW1MB5v5+/jtwi6imkKtmdrh3zrq+5ZPFn9x4qUKAOHqe9NQr9rw+zzyL7Ze88tzbCnjrKOY4nbROnJ/fjiQBOAE826bDxJIjpstehXNK14uybe5GIUKnV1fv4=
+	t=1772445741; cv=none; b=Oi3TYXCb4Mp2aii9MLZmMD+/WdgyJRp3lJuPhJ2c9soA03sGBYZ7I4exszX05KiT6eio1JDf3TYyQ6cie0qLPpVyQquAhYUgn+tFgyudaWtqqk4G+9lY8s4Ri2OXYKZGdXzfmjk1csUFIZKxdZGnJT8DkTIbXYAsNMQPHkYNilU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772445675; c=relaxed/simple;
-	bh=XcDBiF+tm+FToq8gICWmU+m/nRh9Ny7buWewqeSSE5s=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sUNRtkBRF7quAylRkJDJsCWMenZDNMjP3voZh/dljqtafnC7dTSbqMxexQlu6DlhMj1UAOmU3VYZjFRt1pN2DSmBP6cYSWguMuZ9mf9Yu4xlgV666Kh5Hc26moT7GpjGhN/Gwg8SCvSm+Ker/r7SkKb1lbbdHvZSbSru362p5GM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pKcMeK5z; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4836b7c302fso43405975e9.1
-        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 02:01:13 -0800 (PST)
+	s=arc-20240116; t=1772445741; c=relaxed/simple;
+	bh=rcnS7IdkUDdkrozKgEJrZX4dzQsaJ6e9KijTjrwQa7c=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=uELXgTVEUMCuDaBR+UFSMxeXK2bhrf/WV2ouXbilbzVDlCMInTyFKN6tEPCCxcarpIHA3jRNU+QtemM+17acsnbrTQNptxZaHTsqL8H1NGr+auRhVyBe92kZTgVkqPUXzAwM5/Ih8GZoBvPMVm72z95a5pYPDe0oZDsOkPs/Elw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EfQfNc66; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-c6e1f417918so1185881a12.3
+        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 02:02:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772445672; x=1773050472; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tjS8FX592qmj/rFkafjn+lojx6cnlsSGWxK3ppaLTGU=;
-        b=pKcMeK5zFCeuyEDqN9uC2KaA70X8zgbgjnqAslsyyaFYEXtkS9V6COy+BZIyCzxSmQ
-         pOEovWK8dwfeI8hGnwiaqcOR0b2SAyvlou6AEigYeorhF6m2bin/+hJiFLV9gNI5yJ9X
-         5VbDb+pbUiHmxG/B6jxauf6w66cmYQoGlfDcBBhNz9g73G6Xfxxfk2cqgDlaiRQTKaSH
-         2TMAEi4ATjIBTiC2y3HnwO5ZQIREWjEyEayiTutzK8+3fCDcwXrIjy29bqj+MgfJewS+
-         TQdyTuXurfVHvukuPqLt4qL+/V7ElyQD1yki55tyknaGoKa4sg5MjKF7WPiUKOM217sF
-         9gCQ==
+        d=gmail.com; s=20230601; t=1772445740; x=1773050540; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fyc4r+7xdW5UIIQv/i0wzsrtOCUobKuGa1F7pXMAHjQ=;
+        b=EfQfNc66TS02ScyzZELKlHVg0wNXX3nUY3XqP+98U5wuLOmOr5a8rHiXnF3YPqkGMI
+         dPCSi3eAg95rxWjfaNm7TfuFHSz5PkM9YmBvs4dDi97pM2XxfZKPNBWdUBw/WFYGrD8P
+         fcVD6UB1mCaT8pVDiCIUN/f5dag2GYyg15Fm4M86M5S2ldlDUea/DOgtwffJEkQEiAhv
+         AqEPuI69d1Aai9R+4FCHc1/E54xCoT6YZeS2Do7LHMDXZXDO5BPPqglNIVanUGLER94L
+         Z1ceCINeXToueKUv94A9mVhJP8O0HwznspyylDelc4tzGfO2WBwWwEN3NMZ/590x8T/O
+         eRUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772445672; x=1773050472;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tjS8FX592qmj/rFkafjn+lojx6cnlsSGWxK3ppaLTGU=;
-        b=Y4vqq8vZglaCNYOGyQPuSz6itIkMJnDviOE1EBRubrQ/RolxM5U1Jqvn2idtPO9KFv
-         DEUJcGYPolUxKZ3XLI+Yj9i7tF4pBEWXWq0gw8QIIorT9p+JMBg8WHGCijKXB6Unh5Yg
-         2wCQK7m1+8dxekruKPevCNZcMcrGBqdbqZOWzJGgd2U2nS5EfTrev+NavgCRuS4X7BXl
-         zPO/JMMK6kSePt6iWv+4yXiMpBGg7duO0uMHz/t0wukFMSZovoBvDD41rGmIVzqpKZCm
-         ZtZeKjNskMkp9X8zlMs/46/INm9gqZqjqi6avf/xSfag4hAuM6u+V3XSlBAuaomtQr5o
-         kcGw==
-X-Forwarded-Encrypted: i=1; AJvYcCX5PzUoP+wkpdSl58dNbH+tffKRjQ8o8TcwPxGUO3KFXnP9E0AE35P/RCCWo9iK/AJLCq9etQw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxneV9jaEccPmk4gPNPyia2muQrmOByxTwoohEiCrRAyumzRMbj
-	LvQJ0w+xbL5G7bcx8QxEa/nafF2ELISQDiKQaRzEQLl6kkOuOIET6aPI1G+RiqX47niex0Efvbo
-	qe4Zrd3oytd471P03Kw==
-X-Received: from wmbg9.prod.google.com ([2002:a05:600c:a409:b0:483:7827:ade4])
- (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:3110:b0:480:2521:4d92 with SMTP id 5b1f17b1804b1-483c9c23ffbmr196674855e9.24.1772445671732;
- Mon, 02 Mar 2026 02:01:11 -0800 (PST)
-Date: Mon, 2 Mar 2026 10:01:10 +0000
-In-Reply-To: <8a27e9ac-2025-4724-a46d-0a7c90894ba7@kernel.org>
+        d=1e100.net; s=20230601; t=1772445740; x=1773050540;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fyc4r+7xdW5UIIQv/i0wzsrtOCUobKuGa1F7pXMAHjQ=;
+        b=pkKCiDKaw7UXA72jwraRZqByb3W2Y93r4n2l4V9SACDcn7RWwFNXAvGxbfVIps6QgM
+         kqxSdo5+O7Xu6MLF0F9GsxsfeUJIA+fPndGF7mQeX4AjMZ6YhQzsmImvI36maApxFL6c
+         xi1cYyejuif03IlsKRzxA8gvKQBliIpAup6DWgILhN99MqDL7zszg0Bi4cdqAUJiM5VI
+         YpTClptorMKwcYPlGTJU3ht+QoOq80XUnmuCPtDCNMF5jAPK39ANrmOTPNoxjep2DUwQ
+         wbzNgHaRLyvFVT9S8mtOXRE1RMeBBr+761eVIFr1bUTQWQQUTMHtSyfw4JpUS/zJYbIj
+         pPBg==
+X-Gm-Message-State: AOJu0YxjnW522LQvmDCBYbesHVfm8epO5AtatijQzUBPZ/9zqOBESlmF
+	X9YCzoZY4dV25clbb+z8uhvphLNV0Q2vOmd+bI4Lr1b/qraIRIsuSIXj
+X-Gm-Gg: ATEYQzwdimf0H5jAkO7OA2NakVFj4Yhlm6+GB3YnFWhndTzAUN8hiYI1sRf8yIkHSgc
+	C9bpBGjYlB70+OK3Efc0k3h17edxM8XOswJEH9DD4gFmYSzO/wmy09CAwl5XFlZl0WwMr9pNMYP
+	Tqm2GZlnFaH3+1IYpQgPvYryy62bsuONm17IqYzB7Kgk1Jgg9V9GddWWyq3NxrV3JVj6OLqg15j
+	ptnH7r7U03djvANeEKTGuJfk22Z9s1INaviZ7CQ1VpegL2dAzDfhrLJWDU51n4GNk37KrezDPpA
+	CZpQkmh/2uACGn7ZM5w+4VbuIWjoHz6F4j4s0TKDeNHEoQfPoTDWnFTBt9JZyhWn2xr6nFXTFpZ
+	9ALdiIeAIdVKpFNm05sY+LqBo4uNSFjU5naA5+tN8tM7PYenIAolXrYIabkoF6Get6ill/BTJNp
+	K2e5UfOUnQxVB7Ni0gsdSuXtt3Ho8Jz0FIuDrwKWjZag==
+X-Received: by 2002:a17:903:2289:b0:2a0:e223:f6e6 with SMTP id d9443c01a7336-2ae2e4d6622mr127702525ad.46.1772445739588;
+        Mon, 02 Mar 2026 02:02:19 -0800 (PST)
+Received: from v4bel ([58.123.110.97])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae534088c4sm27256985ad.26.2026.03.02.02.02.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Mar 2026 02:02:19 -0800 (PST)
+Date: Mon, 2 Mar 2026 19:02:15 +0900
+From: Hyunwoo Kim <imv4bel@gmail.com>
+To: antonio@openvpn.net, sd@queasysnail.net, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org, imv4bel@gmail.com
+Subject: [PATCH net] ovpn: Fix race condition in ovpn_dellink()
+Message-ID: <aaVgJ16edTfQkYbx@v4bel>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260227200848.114019-1-david@kernel.org> <20260227200848.114019-3-david@kernel.org>
- <aaLh2BxSgC9Jl5iS@google.com> <8a27e9ac-2025-4724-a46d-0a7c90894ba7@kernel.org>
-Message-ID: <aaVf5gv4XjV6Ddt-@google.com>
-Subject: Re: [PATCH v1 02/16] mm/memory: remove "zap_details" parameter from zap_page_range_single()
-From: Alice Ryhl <aliceryhl@google.com>
-To: "David Hildenbrand (Arm)" <david@kernel.org>
-Cc: linux-kernel@vger.kernel.org, 
-	"linux-mm @ kvack . org" <linux-mm@kvack.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
-	Vlastimil Babka <vbabka@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Jann Horn <jannh@google.com>, 
-	Pedro Falcato <pfalcato@suse.de>, David Rientjes <rientjes@google.com>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, Jarkko Sakkinen <jarkko@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Arve =?utf-8?B?SGrDuG5uZXbDpWc=?=" <arve@android.com>, Todd Kjos <tkjos@android.com>, 
-	Christian Brauner <brauner@kernel.org>, Carlos Llamas <cmllamas@google.com>, Ian Abbott <abbotti@mev.co.uk>, 
-	H Hartley Sweeten <hsweeten@visionengravers.com>, Jani Nikula <jani.nikula@linux.intel.com>, 
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-	Tvrtko Ursulin <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>, 
-	Simona Vetter <simona@ffwll.ch>, Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
-	Dimitri Sivanich <dimitri.sivanich@hpe.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Andy Lutomirski <luto@kernel.org>, 
-	Vincenzo Frascino <vincenzo.frascino@arm.com>, Eric Dumazet <edumazet@google.com>, 
-	Neal Cardwell <ncardwell@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
-	linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org, 
-	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, x86@kernel.org
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kvack.org,linux-foundation.org,oracle.com,kernel.org,google.com,suse.com,suse.de,linux.dev,infradead.org,linux.ibm.com,ellerman.id.au,redhat.com,alien8.de,linuxfoundation.org,android.com,mev.co.uk,visionengravers.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,ziepe.ca,hpe.com,arndb.de,iogearbox.net,arm.com,davemloft.net,lists.ozlabs.org,lists.freedesktop.org];
-	TAGGED_FROM(0.00)[bounces-262591-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[73];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262592-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3A1431D5F7F
+	FREEMAIL_FROM(0.00)[gmail.com]
+X-Rspamd-Queue-Id: 01E021D613A
 X-Rspamd-Action: no action
 
-On Mon, Mar 02, 2026 at 09:18:45AM +0100, David Hildenbrand (Arm) wrote:
-> On 2/28/26 13:38, Alice Ryhl wrote:
-> > On Fri, Feb 27, 2026 at 09:08:33PM +0100, David Hildenbrand (Arm) wrote:
-> >> Nobody except memory.c should really set that parameter to non-NULL. So
-> >> let's just drop it and make unmap_mapping_range_vma() use
-> >> zap_page_range_single_batched() instead.
-> >>
-> >> Signed-off-by: David Hildenbrand (Arm) <david@kernel.org>
-> > 
-> >> diff --git a/rust/kernel/mm/virt.rs b/rust/kernel/mm/virt.rs
-> >> index da21d65ccd20..b8e59e4420f3 100644
-> >> --- a/rust/kernel/mm/virt.rs
-> >> +++ b/rust/kernel/mm/virt.rs
-> >> @@ -124,7 +124,7 @@ pub fn zap_page_range_single(&self, address: usize, size: usize) {
-> >>          // sufficient for this method call. This method has no requirements on the vma flags. The
-> >>          // address range is checked to be within the vma.
-> >>          unsafe {
-> >> -            bindings::zap_page_range_single(self.as_ptr(), address, size, core::ptr::null_mut())
-> >> +            bindings::zap_page_range_single(self.as_ptr(), address, size)
-> >>          };
-> > 
-> > Please run rustfmt on Rust changes. Here, rustfmt leads to this being
-> > formatted on a single line:
-> 
-> Having to run tooling I don't even have installed when removing a single
-> function parameter; did not expect that :)
+When ovpn_dellink() is called, it invokes
+cancel_delayed_work_sync() to stop keepalive_work before freeing
+the device.
+However, ovpn_nl_peer_new_doit() runs without any lock shared
+with the RTNL path, so keepalive_work can be scheduled after
+cancel_delayed_work_sync() returns.
 
-Well, rustfmt comes with the compiler, and it would be ideal to build
-test changes before sending them :)
+The following is a simple race scenario:
 
-But no worries, I took care of testing it. Thanks for taking the time to
-update the Rust code as well.
+          cpu0                            cpu1
 
-Documentation/rust/quick-start.rst has details for most distros.
+ovpn_dellink(dev)
+  cancel_delayed_work_sync(keepalive_work)
+                                   ovpn_nl_peer_new_doit()
+                                     ovpn_nl_peer_modify()
+                                       ovpn_peer_keepalive_set()
+                                         mod_delayed_work(keepalive_work)
 
-Alice
+To prevent this race condition, cancel_delayed_work_sync() is
+replaced with disable_delayed_work_sync().
+
+Fixes: 3ecfd9349f40 ("ovpn: implement keepalive mechanism")
+Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+---
+ drivers/net/ovpn/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
+index 2e0420febda0..ada73dd35ba4 100644
+--- a/drivers/net/ovpn/main.c
++++ b/drivers/net/ovpn/main.c
+@@ -212,7 +212,7 @@ static void ovpn_dellink(struct net_device *dev, struct list_head *head)
+ {
+ 	struct ovpn_priv *ovpn = netdev_priv(dev);
+ 
+-	cancel_delayed_work_sync(&ovpn->keepalive_work);
++	disable_delayed_work_sync(&ovpn->keepalive_work);
+ 	ovpn_peers_free(ovpn, NULL, OVPN_DEL_PEER_REASON_TEARDOWN);
+ 	unregister_netdevice_queue(dev, head);
+ }
+-- 
+2.43.0
+
 
