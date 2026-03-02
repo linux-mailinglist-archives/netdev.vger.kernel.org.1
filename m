@@ -1,158 +1,190 @@
-Return-Path: <netdev+bounces-262758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262759-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KFc8OsfIpWnEFgAAu9opvQ
-	(envelope-from <netdev+bounces-262758-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 18:28:39 +0100
+	id ICk4EMDJpWnEFgAAu9opvQ
+	(envelope-from <netdev+bounces-262759-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 18:32:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95DD31DDCC5
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 18:28:39 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE8611DDD80
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 18:32:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4FC94301DAD5
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 17:28:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BD29D3014740
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 17:32:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F1F241B37F;
-	Mon,  2 Mar 2026 17:28:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3475431280D;
+	Mon,  2 Mar 2026 17:32:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="FJtcbwY7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iOCI1e9j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C99B361DA1
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 17:28:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E07B2836A0;
+	Mon,  2 Mar 2026 17:32:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772472481; cv=none; b=qnoraAIBIbpXGAacplPlFIZHHHl32wGfqXuz9GPhElHlyEiflSTAPzKFA1OYH9LwK9Kapq4y/xlqSQuGSwDfwr2jlULPixyzjgoF9MHLLBvLS/J4bV5shOB2pHObdMBsPeCaUeN1dMigVPMjlf2U2EDUo8+NowPrKGS5pr6eBn0=
+	t=1772472762; cv=none; b=rtZ2pHGzqzTh5NpR3siXjhGlkTH8041UsiXrQGhEY+McfdVN9KYq6shX+qSqRxd5XzpCnXfN+zvCmq1cRSWgvNf7TFAudgCrJt7XHUGBid6tvMQsYx3PJMV36pfpfPswicrjTJhwoCNpYAgVDRS9EyDXxVhK+DlnK9yeN5XRpjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772472481; c=relaxed/simple;
-	bh=T0x134goV8WQ2DtQCgAvc8s6JF2xNTUe3NSOgLXKr10=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rfamzHjvRSDCrINaL3M65Y+hOxhwxyz2Gu3ecXsEsiccpm1Hqgc//RUbn35UD3HaBiNxLjNi0DNfsKcLY6Ksmw0/UTypBFuOGXbaaMqcrKHsjg5G1AI4evjt3t/duuA8YR9Df3DrDCfn3KTAuPSCZBpNyiIXhD2piM2m5t2sLnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=FJtcbwY7; arc=none smtp.client-ip=209.85.219.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-89a05955720so6464086d6.2
-        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 09:28:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1772472479; x=1773077279; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3MhoPaUqG9JgKSvFCYNz3zMTwzdLO4nZWUPMhCrKY1E=;
-        b=FJtcbwY7fAVy9zCcO5sMCUZhOSIhnfTWHiYHaBsWd3+zbLAFXGUXCHpo+UWzcYeuI7
-         AbD2nYto+onlPwjsYGM8dumpp25l545TakUNuKY+Upmw7hDCnZLqxmDzMmCLVQ0GMqjw
-         8DMBK80pR8pQvitBLb8SRFVeI96uMEKIlQbDeZCOeZ7tkarUu0UoBJ1aTsNZMJaiqduq
-         Df8tBFjek58tIV6XNr6TsHUTckk2MI8xUD00fHEetR4XnOXEvnP7KnCJu/WSeqnJykyP
-         AZfFpDx9rehHezOWlr5Tms5JPc+3uQDgCJ69AMMp1yIqu0QpQNacWlhfT1Ww6jL0BuTG
-         rtIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772472479; x=1773077279;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3MhoPaUqG9JgKSvFCYNz3zMTwzdLO4nZWUPMhCrKY1E=;
-        b=jx8JO6bj9seGvOLRSpwvQdg41jrXlY6kn6OB0sd1kExjs0huORfuUNL1mv3o7bgTU0
-         jGduxj/3NW9KCfxctl0TmfdYEqnbO29jZaUA+8YJWPVLxGTwbTqXSWox/4uVyMy6YxYY
-         mhFrRgMeEnGYcRexNo35c898KJeisjxvlw5uElC9Llfg8AuiKZaVICRgIpi72vsS4YDS
-         HyeLTaFaXE/MhHY3jKw69nhGR0HHMIyn/BDWxXecOzYilOLk1bWOaJC2vFOgfzYOsv/Q
-         5tUvsHLsjcx/B7YTrFr2lwic+MvaB0BP1EwzF1DNukNyN/kW8h8nqchtQK/bkCsTY71Y
-         1GnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXo7tNDiAvk5retnPETMLi38g8gl1TV3bOfvPNeK0Asu/QgWIl+dfePP7169BOiyvJOpIh4Rgg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxytOJWABZqDeCaqG65Boagwyef+edvhtt7wua1ZGt6SJo1DLdA
-	mmCeSEqLdMii4rPYnjz0W35sK4lz6uZmEaCEyjj17l8tYBZNubFyFBH4p2e3J/0ftnU=
-X-Gm-Gg: ATEYQzzvOLLTLriGOsq7d8TCIgkG2KCoIJnpqrkr5AhKUi7b+m+tOXwpLaWAEFxmb+c
-	yE2LMXj3FeFzvT53HhI8dhP3DsCpzMxMgNdVVd1jvnJkJc0H1iuUGkRrx2BzgUSnJ5IAKOXKdYf
-	abtn39HG2BeJKeCYKnK/Fge+NyTCJMo4OBqXkSFxObv1UpSeXiIQAwEgPmWpLIkCQSblBh4vCS3
-	x0UJc/jNSjijFsjes3oWsdvmuXzT5Yg9IQ6oGrJ6he56fwnjjcVrV87Xn7XFiNnVTDGca/h9Hi7
-	5Gs0+0DHTC/tQmcFSmNbi+NiA6camMzEzSgCKy5C1FBxLSenzEypjXcEg0q0YulqaDUbfYua+d8
-	QgQOC1nLWZbclLRM1i7BiyTo1jn+oh4f+tdW7Lo/qDBtPpXARodjAfI2fukDrQyXBoLkIZFdDA7
-	JTTpksMmBpit6adsM0wPjFQpn+KwLO6bmXDN5rzgQ2+sAdE5JMIq38Y3tmYsnhsuVQL3OGAOB5m
-	ULSzMjV
-X-Received: by 2002:a05:6214:2a4a:b0:899:c5ba:d5ce with SMTP id 6a1803df08f44-899d1e3293amr194502336d6.22.1772472479148;
-        Mon, 02 Mar 2026 09:27:59 -0800 (PST)
-Received: from [192.168.1.102] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cbbf717301sm1185035785a.36.2026.03.02.09.27.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Mar 2026 09:27:58 -0800 (PST)
-Message-ID: <68bec573-eceb-4d87-bf93-6c76ec578c7a@kernel.dk>
-Date: Mon, 2 Mar 2026 10:27:57 -0700
+	s=arc-20240116; t=1772472762; c=relaxed/simple;
+	bh=tnpn0LaJUMgqytRuDhKqOEYHDYHlXW9Sposq8jF6yqc=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=fZoj5tagoh5B0+RS+AItIaS/yBm8Dc5g5KECCz0/tpAk/wPztqSSV3MbwfgyCEeMKqijyIgGhdO3CTdCnivKC4rmyGHuz3uopL0aZB6CclQuWdx2DtBf32++4suIItUrOzFtNa2NvNAViia36KaPaxBRx25JL+oHTtBuOkvn748=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iOCI1e9j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05836C19423;
+	Mon,  2 Mar 2026 17:32:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772472761;
+	bh=tnpn0LaJUMgqytRuDhKqOEYHDYHlXW9Sposq8jF6yqc=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=iOCI1e9j41WFatME/LLVC5T1+T/WcxsPTAnOYO9sprUHt1kELdT+C2dRHK4rFRust
+	 x+epksgA5XRcUa7gGWVY1MzYB8CPLAXW8KSCqSKlzgRlBw4D8icLQQuNcNNnLp8V6e
+	 +zKAVEaS5gK5BgGkBZ6OfWM6cZAhnkeqaNvkI1Ip0pRwugn9T0W0jJxILMq+QELrxn
+	 hcYnbvH3SPn+vWTxasUExKSAfkQlWAj0jl8rPu7QS7u96cKFuJIxCMJdHjOjirfa4L
+	 L0jicTT98m6eZAlrsniOazXvil57Ovsu1Bf9RdQCQM7BFSb58lKO0zAHdB+hAnRD7M
+	 PylBsJsJjSyVg==
+Content-Type: multipart/mixed; boundary="===============7315119925973411465=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: FAILED: Patch "io_uring/zcrx: fix post open error handling"
- failed to apply to 6.18-stable tree
-To: Pavel Begunkov <asml.silence@gmail.com>, Sasha Levin <sashal@kernel.org>,
- stable@vger.kernel.org
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org
-References: <20260301011746.1671806-1-sashal@kernel.org>
- <002c2bb8-3304-40e0-b8c6-8eee7dcb7710@kernel.dk>
- <53896290-9a0a-4822-854f-945595a19fe0@gmail.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <53896290-9a0a-4822-854f-945595a19fe0@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 95DD31DDCC5
+Message-Id: <392614bc3c9c3a8b2c42e263181431dd0484f5cc41b0b9831e53d1bcdcb4b6ed@mail.kernel.org>
+In-Reply-To: <20260302161723.858616-7-larysa.zaremba@intel.com>
+References: <20260302161723.858616-7-larysa.zaremba@intel.com>
+Subject: Re: [PATCH bpf v4 6/9] i40e: use xdp.frame_sz as XDP RxQ info frag_size
+From: bot+bpf-ci@kernel.org
+To: larysa.zaremba@intel.com,bpf@vger.kernel.org
+Cc: larysa.zaremba@intel.com,claudiu.manoil@nxp.com,vladimir.oltean@nxp.com,wei.fang@nxp.com,xiaoning.wang@nxp.com,andrew+netdev@lunn.ch,davem@davemloft.net,edumazet@google.com,kuba@kernel.org,pabeni@redhat.com,anthony.l.nguyen@intel.com,przemyslaw.kitszel@intel.com,ast@kernel.org,daniel@iogearbox.net,hawk@kernel.org,john.fastabend@gmail.com,sdf@fomichev.me,andrii@kernel.org,martin.lau@linux.dev,eddyz87@gmail.com,song@kernel.org,yonghong.song@linux.dev,kpsingh@kernel.org,haoluo@google.com,jolsa@kernel.org,horms@kernel.org,shuah@kernel.org,aleksander.lobakin@intel.com,maciej.fijalkowski@intel.com,bastien.curutchet@bootlin.com,tushar.vyavahare@intel.com,kernelxing@tencent.com,rbm@suse.com,echaudro@redhat.com,lorenzo@kernel.org,toke@redhat.com,imx@lists.linux.dev,netdev@vger.kernel.org,linux-kernel@vger.kernel.org,intel-wired-lan@lists.osuosl.org,linux-kselftest@vger.kernel.org,aleksandr.loktionov@intel.com,dtatulea@nvidia.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin
+ .lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Mon,  2 Mar 2026 17:32:41 +0000 (UTC)
+X-Rspamd-Queue-Id: AE8611DDD80
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel-dk.20230601.gappssmtp.com:s=20230601];
+X-Spamd-Result: default: False [2.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	CTYPE_MIXED_BOGUS(1.00)[];
+	ARC_REJECT(1.00)[signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262758-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[intel.com,nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,linux.dev,bootlin.com,tencent.com,suse.com,lists.linux.dev,vger.kernel.org,lists.osuosl.org,nvidia.com,meta.com];
+	R_DKIM_REJECT(0.00)[kernel.org:s=k20201202];
+	TAGGED_FROM(0.00)[bounces-262759-lists,netdev=lfdr.de,bpf-ci];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[kernel.dk];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel-dk.20230601.gappssmtp.com:+];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	NEURAL_SPAM(0.00)[0.993];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[kernel.org:-];
+	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+,1:+];
+	RCPT_COUNT_GT_50(0.00)[53];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[axboe@kernel.dk,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.997];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[kernel-dk.20230601.gappssmtp.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	FROM_NO_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.kernel.org:mid]
 X-Rspamd-Action: no action
 
-On 3/2/26 3:02 AM, Pavel Begunkov wrote:
-> On 3/1/26 13:22, Jens Axboe wrote:
->> On 2/28/26 6:17 PM, Sasha Levin wrote:
->>> The patch below does not apply to the 6.18-stable tree.
->>> If someone wants it applied there, or to any other stable or longterm
->>> tree, then please email the backport, including the original git commit
->>> id to <stable@vger.kernel.org>.
->>
->> Looks like this has dependencies on parts of this:
->>
->> https://lore.kernel.org/io-uring/cover.1763029704.git.asml.silence@gmail.com/
->>
->> series. But seems easier to just do a variant for the 6.18 base,
->> I'll leave that to Pavel.
-> 
-> I was thinking to remove post open error handling. xarray is preallocated
-> and shouldn't fail. And copy_to_user can be moved earlier. Should be safer
-> than taking all deps.
+--===============7315119925973411465==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Agree, that looks good to me.
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> @@ -3567,6 +3567,7 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
+>  	struct i40e_vsi *vsi = ring->vsi;
+>  	u32 chain_len = vsi->back->hw.func_caps.rx_buf_chain_len;
+>  	u16 pf_q = vsi->base_queue + ring->queue_index;
+> +	u32 xdp_frame_sz = i40e_rx_pg_size(ring) / 2;
+>  	struct i40e_hw *hw = &vsi->back->hw;
 
--- 
-Jens Axboe
+On PAGE_SIZE < 8192 systems, i40e_rx_pg_size() calls
+i40e_rx_pg_order() which checks ring->rx_buf_len:
 
+i40e_txrx.h:i40e_rx_pg_order() {
+    #if (PAGE_SIZE < 8192)
+        if (ring->rx_buf_len > (PAGE_SIZE / 2))
+            return 1;
+    #endif
+        return 0;
+}
+
+At this point in the function, ring->rx_buf_len still holds the
+value from the previous configuration. It is not updated until
+later in the function body:
+
+i40e_main.c:i40e_configure_rx_ring() {
+    ...
+    u32 xdp_frame_sz = i40e_rx_pg_size(ring) / 2;  // stale rx_buf_len
+    ...
+    ring->rx_buf_len = vsi->rx_buf_len;  // updated here, after init
+    ...
+}
+
+Could this lead to a wrong xdp_frame_sz on 4K page systems when
+ring->rx_buf_len changes across the PAGE_SIZE/2 (2048) boundary
+between configurations?
+
+For example, after AF_XDP ZC teardown on a standard MTU interface,
+the previous rx_buf_len from XSK (~3840 with default 4K chunks) is
+above 2048, giving pg_order=1 and xdp_frame_sz=4096. But the new
+vsi->rx_buf_len for standard MTU is 1534, which would give
+pg_order=0 and the correct xdp_frame_sz=2048.
+
+With frag_size set to 4096 but actual buffers only 2048 bytes,
+bpf_xdp_frags_increase_tail() would see frag_size > frame_sz and
+return -EOPNOTSUPP.
+
+The previous code computed i40e_rx_pg_size(ring) / 2 at the skip
+label, after ring->rx_buf_len was already updated, so this ordering
+issue did not exist before.
+
+Would it work to move the computation after the rx_buf_len
+assignment, for example:
+
+    ring->rx_buf_len = vsi->rx_buf_len;
+
+    xdp_frame_sz = i40e_rx_pg_size(ring) / 2;
+
+    if (ring->vsi->type != I40E_VSI_MAIN)
+        goto skip;
+
+> [ ... ]
+
+> @@ -3616,7 +3618,7 @@
+>  	}
+>
+>  skip:
+> -	xdp_init_buff(&ring->xdp, i40e_rx_pg_size(ring) / 2, &ring->xdp_rxq);
+> +	xdp_init_buff(&ring->xdp, xdp_frame_sz, &ring->xdp_rxq);
+
+> [ ... ]
+
+
+
+---
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/22586694870
+
+AI-authorship-score: low
+AI-authorship-explanation: The commit shows domain-specific driver knowledge, targeted fix with minimal changes, and a natural commit message style consistent with human kernel developers.
+issues-found: 1
+issue-severity-score: low
+issue-severity-explanation: Variable initialization order causes wrong xdp_frame_sz on 4K page systems when rx_buf_len crosses the PAGE_SIZE/2 boundary between reconfigurations, leading to bpf_xdp_adjust_tail returning -EOPNOTSUPP incorrectly but no memory corruption.
+
+--===============7315119925973411465==--
 
