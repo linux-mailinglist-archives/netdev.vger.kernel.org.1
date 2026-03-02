@@ -1,97 +1,100 @@
-Return-Path: <netdev+bounces-262626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262627-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EIAdEQx6pWm6CAYAu9opvQ
-	(envelope-from <netdev+bounces-262626-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 12:52:44 +0100
+	id ULzZHhN6pWm6CAYAu9opvQ
+	(envelope-from <netdev+bounces-262627-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 12:52:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B237E1D7E27
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 12:52:43 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E53DF1D7E2F
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 12:52:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A26C83002E58
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 11:52:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EDEBA300D910
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 11:52:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 834353603C3;
-	Mon,  2 Mar 2026 11:52:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E015E363C62;
+	Mon,  2 Mar 2026 11:52:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PK2rNJob";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="gruKAFf8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aufUzV9O";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="jOQ6bbEY"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 075D71448D5
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 11:52:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77809332916
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 11:52:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772452361; cv=none; b=YRR0A9XlztkgAxNIm4RU6kSw3/FAzv1a4oiLcT1bW/GJ8dErI/b1xI45xFuR3z0laqlKyHXahBAZE66tc5VwfBva0B7E8PIvmkNNXccL7Q38NtaB0gkbw6W5T+WiR6RrW/dcrf73mD1tkuhU0U91dtENZakPQMkQ6r5TLLz5FSw=
+	t=1772452362; cv=none; b=n61jIJyfughmb/HNBFhInlesqNkAbqP4fADeXA992bSsxbKKIjbsBkTAF4pOarXazQfgzZUKeUSHhDCNtohCwnGpk0B9taL4PKMcKJrND2Mz5WOlbbZSuYLWXvlaPShTPPkxc5SWzcRGlf+CvEPBkk52JyhVQYf8HIP8gGfxe2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772452361; c=relaxed/simple;
-	bh=NbzPcaTSWpnMBHobBcGEV8fINXHt9qRFIi77OCLle1A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BSrdg3WAJ3dajHvNGkl0xi38IRSS2mvxOMVhzFal4oKg6balQeSu7B4oQx7vtVajAJ6ITjNQS1u7bT+CverOh5FtRHI2v1Rcsig0HSqhOo+Ek8E2NY3kurxbH1MiBI4zqXZeuCQ9XSKgUKHqRRQ/KPpNeCLmoHBAWxUtwgip+EE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PK2rNJob; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=gruKAFf8; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1772452362; c=relaxed/simple;
+	bh=NAo8WbkQhQlvoF9NAPZlhjIkkbXHboA/iYGe9Opk9bk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VQ8+9YcxIjSY51L1ECFz9gFYEPXOH37SryxgMCJmJnbZGNsKkpTRFnH9QHEp6IJYGPD2g7VHLraNRmfnZ1WSnNuXMj/xL1QiW7zPFR4jftrjIqfmIeaYxLpi5U7m1h3iHTW6DzOoQuNG2zRUH/BYmJpedhUSdNMN4aroR91EiXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aufUzV9O; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=jOQ6bbEY; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772452359;
+	s=mimecast20190719; t=1772452360;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=JkyxFtCf+Tx/eB5rWy5yXZrfx0kjKqqBUP+zVstmXzI=;
-	b=PK2rNJobc9PvCfdWhYTsXMFE/bwIColDy3uzIz5EpNH4py0Xu7SVKGiUKS6ZYog+pRJAAQ
-	uloWZb+Z2GUnkm1/2oibYdHLBkB2iGl+g8VeYQTG2rE03nzUd+13ViRh67ELPFgDgIEZYE
-	XaUbzgGU4b/HbEXFHnl72l2GRVEKuUk=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rPXzaqYHVOdQI/EmldXUl2eV5QyUkc40ihgDPEjYWTY=;
+	b=aufUzV9OYi9Dv6stEG28veDaL51IL/JEYmZpZC94WdpqZYxMHNFOgvPzFnwWKvbvCePrlT
+	3LozVzT+G+CLgBu+uS7iuGOkDeiWaDviPKY/EvfGCf9cDS6ioOiH142uOGsUhYaYLJOHtC
+	TS2LWWSp4hNsV4PuXSGZASSYl3whUPE=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-650-Rom9RoHUMtKHLscjZqBRwA-1; Mon, 02 Mar 2026 06:52:38 -0500
-X-MC-Unique: Rom9RoHUMtKHLscjZqBRwA-1
-X-Mimecast-MFC-AGG-ID: Rom9RoHUMtKHLscjZqBRwA_1772452357
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-439b50320a0so841784f8f.1
-        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 03:52:37 -0800 (PST)
+ us-mta-301-CmHthmZrPcy7tCUI3CTzLA-1; Mon, 02 Mar 2026 06:52:39 -0500
+X-MC-Unique: CmHthmZrPcy7tCUI3CTzLA-1
+X-Mimecast-MFC-AGG-ID: CmHthmZrPcy7tCUI3CTzLA_1772452358
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-48069a43217so42864575e9.1
+        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 03:52:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1772452356; x=1773057156; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JkyxFtCf+Tx/eB5rWy5yXZrfx0kjKqqBUP+zVstmXzI=;
-        b=gruKAFf8EG+QZQbrKzXYW65gCgwExssWiZdl09JzZFaeg8ytkKzS1aiLHWxCqRzTCw
-         9TnLF/LofK7UZoa/M8TaM4d8kISnxNfPnK00RvB838f5I9s3SUOMSsZvQvzca8zuGo1z
-         /s6ptF/yIf9jxOLNs0xrGKvKo3Fhl1Ke/AMb3k5t5teI2ZhNK9mYc0iklY/6UjtvdhSh
-         thd69m9vYfn66NWQmXAOglkMojWwvweuIivIXAx+KHWqm91cz276LDmNDFyCR+6m/EAu
-         N2/NcHgToTOXkXbBucVBdeHj2GNQeAVGdJZsFEyClYqhsmwJBB54O7CvQ1hQ/W4HS71a
-         sZMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772452356; x=1773057156;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=redhat.com; s=google; t=1772452357; x=1773057157; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JkyxFtCf+Tx/eB5rWy5yXZrfx0kjKqqBUP+zVstmXzI=;
-        b=DgtsNVFTEbSNxeIvV2M7tljKb8kwhRolx3ZcCt9a2ql/k1zDgKwfDE3LNQwEA65Zn5
-         xVr06qBBj7/1yDS4vXYBHCGn8ehS1/6IlPVpUFQ45e55N+N0NrUZftdjfytTp/fyXVcO
-         0ktUlkXf2dLu7QaV7qCCricmyfhEkSciWleRVbSBB/FsSb70XWGeCmk+46i9+26ZQiyR
-         H6gJa3CSbMd74AsElDWlOgbU3JCoBmqJxHozjcAWy7/uIuV0rcOCarQvfBBtFwltysY0
-         usUNBwAQbGwCyw24u7542x2O51DYZN8KcdAJ9LMqDhbH5bXg2KKV0Pv+e79RL5vWRYd0
-         74dw==
-X-Gm-Message-State: AOJu0YyI7skjakXihBsS3qPM00k6ZkkZ2aE42pei7UhprHyadtuULHdZ
-	0OIlLQy6ItlZVVmXv4tWLpj3nKJR+4xes4/fmPyxk+Lr2xKtsWsCacyogYDaOH3TuGPYUuR4u83
-	q/8yjyjT+eocB3pv4ReKwaHFvL2iWa3ddQD/TGTad8w41+NCpucikqySC4Fxj/Lw9cmD/O8oQux
-	NXpQlFnJGnnlIzTWuiz63FSaMW+XI3/0ZSQ4PB4GTjjg==
-X-Gm-Gg: ATEYQzzy4ZnynlyPqva0sYv2n6LveTH2MoxFMtxqJSxSWUzrgM3OHbmYWjs+IhQwn2k
-	ItkBLQ4hlKxm2imfNGkrNwLU/+saHJL298vabCoVw56H4dDO3hb8JN5hOJzsa4IaYHZRwnqAECO
-	Zasp7TQiODoOpSH6ZkRabMqmVbhsQMRQQxfLEH6oweXU7vGKcvfZcOEM2Y3WM5NheveRki/RqcL
-	tap9yFWR/lfmGGRCcAOY2ZGXIC6nYd3y4iE7copnyMl08eYRM0s97K2+Ykx2G6U3llkeFjYDpL3
-	ze/Po1Sj/9h8lRkIW6c3ds6PmbV9vH7tvSAsjj8nnc5lUpFL5g6oWfxBJr5FSRxz13Yyp7iBQRO
-	fg7/uG+/BPcmP52i9qBKlMPxi14JSyHLNUEvLxjZsyKc88Nu350tiDknZCQE=
-X-Received: by 2002:a05:6000:2dc6:b0:439:b79d:b9a6 with SMTP id ffacd0b85a97d-439b79dbc2amr5809327f8f.11.1772452356137;
+        bh=rPXzaqYHVOdQI/EmldXUl2eV5QyUkc40ihgDPEjYWTY=;
+        b=jOQ6bbEYeZ4nlMXYqOGBm9Urv8FmHqfNMYsS6TV8HH2jozxfbssqvX/DcPfNSAWLfh
+         u4E65guYjdcJrJV+DcMrznAAtvN0r9u/2AqIG/xhZiPsccekBXIqUo07glGiQD6uHwIO
+         abJ7Ou89tNGdwDJo0z40aBImvMwNz8jS8qcDrH21zqFHvqVpRovzynwvEXb32UT1dRge
+         Fy5mP9xtr3zRQumBZR+lpuvRFrU1xNpiXAyyMYVrT6O3VDOrtLanyGCPievZSXQKJOSJ
+         npjhVxeiBxh9KrrwmILSDidBBRVUO3/LE94qXY+4EJn0GGIt/QP86OVSmJ8WbIlPbZnR
+         KLNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772452357; x=1773057157;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=rPXzaqYHVOdQI/EmldXUl2eV5QyUkc40ihgDPEjYWTY=;
+        b=EXD3Liv2fzJTmKzuLGIHDIHDj/D9C1MnmBaq8rPjI0GhuEKBG+SwNuuKpF800hx29j
+         rshAFrPmC3AdzpPE1MhrKlqYcnBPkbMEYuVw1guoEmkass0zY5Q+kZ/dnhiNHfeQm2MR
+         fMT6Ct8xy/eH8C0B/Z8h/+te4UjKGDxZ8SqysvFGXqZyloV+jOQaL1UM3VJJEFRYOYBH
+         N8RdCFvwQA3I08ZfT/Dr+5WTXQK4t8E/Lc7BOxzhfFE3Vcyz2aXIDaEjFG14m+RUPCCe
+         ROwEa+059qx3DX8TgeJmTI3K7e7kEaWQxClnt4v0wygzdIp+itEpvN0b/P9lICbUa0ae
+         a6qQ==
+X-Gm-Message-State: AOJu0YzQaY64dwQME0VtffTe0DUKhJa8MDNU7MX2z/+zaXLi/eY14Imx
+	u6WSyzVf1rWnEOtMvqIO1wKv6jhkmfmVTNb6i+zzcbAGL+Y0n69yOV+yJYeGcNxoBl9+qoeXE6s
+	IBTpPXK8Az1kso1JFTUBbvpjx/MKeVbor6rvKE7blm38y7fwWfuYU80P3GUMAiyC7DhznJZjNV8
+	YwtkDMRJ8bUTei8P4rc38FjvZKs8WA+67OMPAOFeWivQ==
+X-Gm-Gg: ATEYQzwvYsoDTSS1jfau465ZiGL+vb9vIUyvnnNTMp/y53fLHXaYfhwTW0azV99L6XI
+	SY0S88YZaUMYcbQr6GB3UrxrMFUPf0Zwkf2BaRroRc4+deQNhIdqn3jn/pQXxLkG4NifNOcudX0
+	Xw2pXgz4TbUdISu1YEP5k3zsV3B+th6Tzq49Z5GpvAW5xraeaIlnaL3Jrnl/bkvy1ooiIMivyXF
+	QY+vpeP9ag9UFpnhIVV2IJ1+2CZoAkl09+yPrHPB9/0tFiDLk0lkDVJtjuqRK05l4eQO0Z7CDaS
+	1mArWZSIJfdytfEoVLirF5sTbYhVrJcON3UYx/hr44U1ZAo1CEyyUVn6hOzd8vjJlKZt8fG/zup
+	MQwLU+rrys+t0sjk0A13FTaScSa20oUWa3vtSwrA4kj00nugp4EboCEeGtFg=
+X-Received: by 2002:a05:600c:3509:b0:47a:81b7:9a20 with SMTP id 5b1f17b1804b1-483c9b9d9admr191259595e9.9.1772452357071;
+        Mon, 02 Mar 2026 03:52:37 -0800 (PST)
+X-Received: by 2002:a05:600c:3509:b0:47a:81b7:9a20 with SMTP id 5b1f17b1804b1-483c9b9d9admr191258955e9.9.1772452356507;
         Mon, 02 Mar 2026 03:52:36 -0800 (PST)
-X-Received: by 2002:a05:6000:2dc6:b0:439:b79d:b9a6 with SMTP id ffacd0b85a97d-439b79dbc2amr5809259f8f.11.1772452355519;
-        Mon, 02 Mar 2026 03:52:35 -0800 (PST)
 Received: from localhost (net-93-146-155-42.cust.vodafonedsl.it. [93.146.155.42])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439b503424fsm10336136f8f.22.2026.03.02.03.52.34
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bffc17dasm240210935e9.2.2026.03.02.03.52.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Mar 2026 03:52:34 -0800 (PST)
+        Mon, 02 Mar 2026 03:52:36 -0800 (PST)
 From: Paolo Valerio <pvalerio@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
@@ -103,10 +106,12 @@ Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Lorenzo Bianconi <lorenzo@kernel.org>,
 	=?UTF-8?q?Th=C3=A9o=20Lebrun?= <theo.lebrun@bootlin.com>
-Subject: [PATCH net-next v3 0/8] net: macb: Add XDP support and page pool integration
-Date: Mon,  2 Mar 2026 12:52:24 +0100
-Message-ID: <20260302115232.1430640-1-pvalerio@redhat.com>
+Subject: [PATCH net-next v3 1/8] net: macb: move Rx buffers alloc from link up to open
+Date: Mon,  2 Mar 2026 12:52:25 +0100
+Message-ID: <20260302115232.1430640-2-pvalerio@redhat.com>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260302115232.1430640-1-pvalerio@redhat.com>
+References: <20260302115232.1430640-1-pvalerio@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -121,19 +126,19 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262626-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262627-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
@@ -144,196 +149,172 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B237E1D7E27
+X-Rspamd-Queue-Id: E53DF1D7E2F
 X-Rspamd-Action: no action
 
-Tested on Raspberry Pi 5.
-With rpi5 is not possible to test the !RSC case. It would be nice
-to test it, as it potentially changes the offset of the first frame
-(hw shifts of NET_IP_ALIGN bytes on rx).
+From: Théo Lebrun <theo.lebrun@bootlin.com>
 
-All the changes are intended for gem only.
+mog_alloc_rx_buffers(), getting called at open, does not do rx buffer
+alloc on GEM. The bulk of the work is done by gem_rx_refill() filling
+up all slots with valid buffers.
 
-The series consists of two main changes:
+gem_rx_refill() is called at link up by
+gem_init_rings() == bp->macbgem_ops.mog_init_rings().
 
-- Migration from netdev_alloc_skb() to page pool allocation model,
-  enabling skb recycling.
-  This also adds support for multi-descriptor frame reception,
-  removing the previous single-descriptor approach and avoiding
-  potentially large contiguous allocations for e.g. jumbo frames
-  with CONFIG_PAGE_SIZE_4KB.
+Move operation to macb_open(), mostly to allow it to fail early and
+loudly rather than init the device with Rx mostly broken.
 
-- XDP support: Initial XDP implementation supporting major
-  verdicts (XDP_PASS, XDP_DROP, XDP_REDIRECT, XDP_TX) along with
-  the ndo_xdp_xmit function for packet redirection.
+About `bool fail_early`:
+ - When called from macb_open(), ring init fails as soon as a queue
+   cannot be refilled.
+ - When called from macb_hresp_error_task(), we do our best to reinit
+   the device: we still iterate over all queues and try refilling all
+   even if a previous queue failed.
 
-The driver now advertises NETDEV_XDP_ACT_BASIC, NETDEV_XDP_ACT_REDIRECT,
-NETDEV_XDP_ACT_NDO_XMIT capabilities.
+Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
+Signed-off-by: Paolo Valerio <pvalerio@redhat.com>
+---
+ drivers/net/ethernet/cadence/macb.h      |  2 +-
+ drivers/net/ethernet/cadence/macb_main.c | 35 ++++++++++++++++++------
+ 2 files changed, 28 insertions(+), 9 deletions(-)
 
-Some numbers (Andrew)
-=====================
-
-  Initially reported numbers (Mbps, w/ drops on the rx side):
-  
-  https://lore.kernel.org/netdev/b0bff7a8-a004-4eb7-bf1d-2137182e59f9@lunn.ch/
-  
-  The numbers are essentially always the same with these two packet sizes.
-  cpu0 doesn't appear overloaded. Not sure if there's a bottlneck at the
-  interface level on my hw, but it seems cpu can handle more.
-  
-  Second test run (with no drops on the rx side):
-  
-  tx side: iperf3 sending UDP (256B) packets roughly at line rate (no drops
-  on the receiving side).
-  
-  rx side:
-  - fixed cpu frequency
-  - single rxq on cpu 0
-  - iperf3 server on cpu 1-3
-  - average w/ mpstat 20s interval 20s count
-  
-  Baseline:
-  
-  Average:     CPU    %usr    %sys    %soft  %idle
-  Average:     all    3.64   15.05     0.87  80.42
-  Average:       0    0.05    0.15    10.23  89.56
-  Average:       1    4.20   16.98     0.00  78.81
-  Average:       2    3.67   15.53     0.00  80.79
-  Average:       3    4.07   16.83     0.00  79.09
-  
-  Page pool:
-  
-  Average:     CPU    %usr    %sys    %soft  %idle
-  Average:     all    3.76   14.91     0.74  80.57
-  Average:       0    0.05    0.12     7.81  91.98
-  Average:       1    3.88   15.53     0.00  80.58
-  Average:       2    4.35   17.23     0.00  78.42
-  Average:       3    4.22   16.63     0.00  79.11
-
-
-Previous versions
-=================
-  - v2: https://lore.kernel.org/netdev/20260223182632.1681809-1-pvalerio@redhat.com/
-  - v1: https://lore.kernel.org/netdev/20260115222531.313002-1-pvalerio@redhat.com/
-  - RFC v2: https://lore.kernel.org/netdev/20251220235135.1078587-1-pvalerio@redhat.com/
-  - RFC v1: https://lore.kernel.org/netdev/20251119135330.551835-1-pvalerio@redhat.com/
-
-v2 -> v3
-========
-  - Drop mog_init_rings() call in macb_open() reintroduced by mistake while
-    rebasing (Jakub Kicinski)
-  - Move [5/8] down in the series (was [6/8])
-  - s/void/sk_buff for the skb parameter instead of updating the documentation
-    because of its void type as this seems to better fit the scope of the
-    patch (Jakub Kicinski)
-  - Move [6/8] down in the series (was [7/8])
-  - Remove misleading check on tx buff type (MACB_TYPE_SKB) to improve
-    clarity as all buffers are MACB_TYPE_SKB (Jakub Kicinski)
-  - Update commit message to better fit with the patch content
-  - Move [7/8] up in the series (was [5/8]) as XDP_TX has now been folded in
-    this patch honoring the advertised features (Jakub Kicinski)
-  - explicitly return 0 in gem_create_page_pool() instead of err (Jakub Kicinski)
-  - Revisit gem_xdp_valid_mtu() and related helpers lifting the dependency with
-    bp->rx_headroom. It now always uses XDP_PACKET_HEADROOM (Jakub Kicinski)
-  - Use xdp_return_frame() in workqueue context (Jakub Kicinski)
-  - macb_tx_error_task() now locks tx_ptr_lock (Jakub Kicinski)
-  - Remove redundant check for clarity (Jakub Kicinski)
-  - Take into account head adjustment in macb_xdp_submit_frame() while syncing
-    in the XDP_TX path and for the XDP_PASS codepath.
-  - Some helpers renaming for clarity
-  - Do not to leave bp->prog pointer in gem_setup_xdp dangling on failure
-  - Revisit rx_buffer_size to better handle the RSC/non-RSC case
-  - Return error in ndo_xdp_xmit if the interface is not operating
-  - Handle packets count in macb_tx_complete() for the xdp case
-
-v1 -> v2
-========
-  - Fix potential NULL pointer dereference in gem_rx() when receiving an
-    unexpected non-starting frame without an active skb (Jakub Kicinski).
-  - Make sure to release both the pending skb and the current buff in fragment
-    overflow error path (Jakub Kicinski).
-  - Reuse the existing page pool instead of creating a new one in HRESP error
-    recovery (Jakub Kicinski).
-  - s/page/buffer/ in netdev_err() print out (Théo Lebrun)
-  - Ensure pending queue->skb is released in gem_free_rx_buffers() (Théo Lebrun).
-  - Use NET_SKB_PAD for the headroom when no xdp program is attached
-  - Add netdev to pp_params (for pp stats)
-  - Move ip_summed handling when RX_EOF is set as RX_SUM may not be reliable when
-    RX_EOF is not set.
-  - Sync for device no longer relies on PP_FLAG_DMA_SYNC_DEV reducing the
-    sync size.
-  - Introduce rx_ip_align field in struct macb
-  - Fix incorrect DMA direction for page pool when attaching XDP program by 
-    restoring close/open sequence as in a previous version (Jakub Kicinski).
-  - Rename release_buff() to macb_tx_release_buff() for clarity (Théo Lebrun).
-  - Do not unmap dma for XDP_TX buffers by ensuring tx_buff->mapping is zero for
-    MACB_TYPE_XDP_TX buff_type (Jakub Kicinski).
-  - Always return memory to pool on xdp_convert_buff_to_frame()
-    failure (Jakub Kicinski).
-  - Remove skip_xdp label (Théo, this is a bit different from your suggestion,
-    let me know if you have a strong preference here)
-
-RFC v2 -> v1
-============
-  - Removed bp->macbgem_ops.mog_init_rings(bp) call from macb_open()
-  - Fixed includes (remove unneeded, moved one from header to macb_main.c)
-  - Reverse xmas tree ordering (gem_rx, gem_rx_refill)
-  - print_hex_dump_debug() instead of print_hex_dump()
-  - Replaced rx frame length check with MACB_BIT(RX_EOF) for data_len
-    calculation
-  - Removed NET_IP_ALIGN handling in rx buffer size calculation
-  - Updated debug format string to include rx_headroom and total size
-  - Changed types to unsigned int in helper functions and variable
-  - Removed unneeded line break
-
-RFC v1 -> RFC v2
-================
-  - Squashed 1/6 and 2/6
-  - Reworked rx_buffer_size computation. It no longer takes into
-    accounts extra room.
-  - A bunch of renaming (rx_offset => rx_headroom, removed MACB_MAX_PAD,
-    MACB_PP_HEADROOM => XDP_PACKET_HEADROOM, data => ptr, xdp_q => xdp_rxq,
-    macb_xdp() => gem_xdp(), macb_xdp_xmit() => gem_xdp_xmit())
-  - Deduplicated buffer size computation in gem_xdp_valid_mtu()
-    and gem_xdp_setup()
-  - gem_xdp_setup() no longer close()/open()
-  - Renaming from rx_skbuff to rx_buff is now got split in a separate commit
-  - Open-coded gem_page_pool_get_buff()
-  - Added missing rx_buff re-initialization in the error path during rx
-  - Page pool creation failure now fails the device open
-  - Moved xdp buff preparation inside gem_xdp_run()
-  - Added missing rcu_access_pointer()
-  - Turned return value in -EOPNOTSUPP for macb_xdp() on failure
-  - moved tx_skb to tx_buff renaming to a separate commit
-  - Removed some unneeded code and set MACB_TYPE_SKB for lp->rm9200_txq[desc].type as well
-  - Replaced !!addr with a dedicated bool in macb_xdp_submit_frame()
-
-Paolo Valerio (7):
-  net: macb: rename rx_skbuff into rx_buff
-  net: macb: Add page pool support handle multi-descriptor frame rx
-  net: macb: use the current queue number for stats
-  net: macb: make macb_tx_skb generic
-  net: macb: generalize tx buffer handling
-  net: macb: add XDP support for gem
-  net: macb: introduce ndo_xdp_xmit support
-
-Paolo Valerio (7):
-  net: macb: rename rx_skbuff into rx_buff
-  net: macb: Add page pool support handle multi-descriptor frame rx
-  net: macb: use the current queue number for stats
-  net: macb: make macb_tx_skb generic
-  net: macb: generalize tx buffer handling
-  net: macb: add XDP support for gem
-  net: macb: introduce ndo_xdp_xmit support
-
-Théo Lebrun (1):
-  net: macb: move Rx buffers alloc from link up to open
-
- drivers/net/ethernet/cadence/Kconfig     |   1 +
- drivers/net/ethernet/cadence/macb.h      |  43 +-
- drivers/net/ethernet/cadence/macb_main.c | 918 ++++++++++++++++++-----
- 3 files changed, 748 insertions(+), 214 deletions(-)
-
+diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
+index 87414a2ddf6e..2cb65ec37d44 100644
+--- a/drivers/net/ethernet/cadence/macb.h
++++ b/drivers/net/ethernet/cadence/macb.h
+@@ -1180,7 +1180,7 @@ struct macb_queue;
+ struct macb_or_gem_ops {
+ 	int	(*mog_alloc_rx_buffers)(struct macb *bp);
+ 	void	(*mog_free_rx_buffers)(struct macb *bp);
+-	void	(*mog_init_rings)(struct macb *bp);
++	int	(*mog_init_rings)(struct macb *bp, bool fail_early);
+ 	int	(*mog_rx)(struct macb_queue *queue, struct napi_struct *napi,
+ 			  int budget);
+ };
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index 02eab26fd98b..347b510c0c25 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -1263,13 +1263,14 @@ static int macb_tx_complete(struct macb_queue *queue, int budget)
+ 	return packets;
+ }
+ 
+-static void gem_rx_refill(struct macb_queue *queue)
++static int gem_rx_refill(struct macb_queue *queue)
+ {
+ 	unsigned int		entry;
+ 	struct sk_buff		*skb;
+ 	dma_addr_t		paddr;
+ 	struct macb *bp = queue->bp;
+ 	struct macb_dma_desc *desc;
++	int err = 0;
+ 
+ 	while (CIRC_SPACE(queue->rx_prepared_head, queue->rx_tail,
+ 			bp->rx_ring_size) > 0) {
+@@ -1286,6 +1287,7 @@ static void gem_rx_refill(struct macb_queue *queue)
+ 			if (unlikely(!skb)) {
+ 				netdev_err(bp->dev,
+ 					   "Unable to allocate sk_buff\n");
++				err = -ENOMEM;
+ 				break;
+ 			}
+ 
+@@ -1335,6 +1337,7 @@ static void gem_rx_refill(struct macb_queue *queue)
+ 
+ 	netdev_vdbg(bp->dev, "rx ring: queue: %p, prepared head %d, tail %d\n",
+ 			queue, queue->rx_prepared_head, queue->rx_tail);
++	return err;
+ }
+ 
+ /* Mark DMA descriptors from begin up to and not including end as unused */
+@@ -1787,7 +1790,7 @@ static void macb_hresp_error_task(struct work_struct *work)
+ 	netif_tx_stop_all_queues(dev);
+ 	netif_carrier_off(dev);
+ 
+-	bp->macbgem_ops.mog_init_rings(bp);
++	bp->macbgem_ops.mog_init_rings(bp, false);
+ 
+ 	/* Initialize TX and RX buffers */
+ 	macb_init_buffers(bp);
+@@ -2560,8 +2563,6 @@ static int macb_alloc_consistent(struct macb *bp)
+ 		if (!queue->tx_skb)
+ 			goto out_err;
+ 	}
+-	if (bp->macbgem_ops.mog_alloc_rx_buffers(bp))
+-		goto out_err;
+ 
+ 	/* Required for tie off descriptor for PM cases */
+ 	if (!(bp->caps & MACB_CAPS_QUEUE_DISABLE)) {
+@@ -2573,6 +2574,11 @@ static int macb_alloc_consistent(struct macb *bp)
+ 			goto out_err;
+ 	}
+ 
++	if (bp->macbgem_ops.mog_alloc_rx_buffers(bp))
++		goto out_err;
++	if (bp->macbgem_ops.mog_init_rings(bp, true))
++		goto out_err;
++
+ 	return 0;
+ 
+ out_err:
+@@ -2593,11 +2599,13 @@ static void macb_init_tieoff(struct macb *bp)
+ 	desc->ctrl = 0;
+ }
+ 
+-static void gem_init_rings(struct macb *bp)
++static int gem_init_rings(struct macb *bp, bool fail_early)
+ {
+ 	struct macb_queue *queue;
+ 	struct macb_dma_desc *desc = NULL;
++	int last_err = 0;
+ 	unsigned int q;
++	int err;
+ 	int i;
+ 
+ 	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
+@@ -2613,13 +2621,24 @@ static void gem_init_rings(struct macb *bp)
+ 		queue->rx_tail = 0;
+ 		queue->rx_prepared_head = 0;
+ 
+-		gem_rx_refill(queue);
++		/* We get called in two cases:
++		 *  - open: we can propagate alloc errors (so fail early),
++		 *  - HRESP error: cannot propagate, we attempt to reinit
++		 *    all queues in case of failure.
++		 */
++		err = gem_rx_refill(queue);
++		if (err) {
++			last_err = err;
++			if (fail_early)
++				break;
++		}
+ 	}
+ 
+ 	macb_init_tieoff(bp);
++	return last_err;
+ }
+ 
+-static void macb_init_rings(struct macb *bp)
++static int macb_init_rings(struct macb *bp, bool fail_early)
+ {
+ 	int i;
+ 	struct macb_dma_desc *desc = NULL;
+@@ -2636,6 +2655,7 @@ static void macb_init_rings(struct macb *bp)
+ 	desc->ctrl |= MACB_BIT(TX_WRAP);
+ 
+ 	macb_init_tieoff(bp);
++	return 0;
+ }
+ 
+ static void macb_reset_hw(struct macb *bp)
+@@ -2967,7 +2987,6 @@ static int macb_open(struct net_device *dev)
+ 		goto pm_exit;
+ 	}
+ 
+-	bp->macbgem_ops.mog_init_rings(bp);
+ 	macb_init_buffers(bp);
+ 
+ 	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
 -- 
 2.52.0
 
