@@ -1,76 +1,63 @@
-Return-Path: <netdev+bounces-262666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262667-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YIBlAM6apWnxEgYAu9opvQ
-	(envelope-from <netdev+bounces-262666-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 15:12:30 +0100
+	id 6BmiFe+apWnxEgYAu9opvQ
+	(envelope-from <netdev+bounces-262667-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 15:13:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FAF81DA728
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 15:12:29 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9D5C1DA74E
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 15:13:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4195D3002F9D
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 14:06:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 879EE3041D7D
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 14:07:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A655F3FB075;
-	Mon,  2 Mar 2026 14:06:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E754C3FD145;
+	Mon,  2 Mar 2026 14:06:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b="EkgfyN/Z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A7y2s0JM"
 X-Original-To: netdev@vger.kernel.org
-Received: from oak.phenome.org (unknown [193.110.157.52])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2D23FB066;
-	Mon,  2 Mar 2026 14:06:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.110.157.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3ACD3FD13F;
+	Mon,  2 Mar 2026 14:06:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772460415; cv=none; b=YiD1TrcZ0XMtgQ1H9S8wSyvUReU12KC7vds5scPvyermbXCRaRux/fimaU4Q8XCiuP/+Xk/Ql9TGxVoasuhJ4kDoRxU7hclt54NwG/ZXgjH2zAYTuB1ICu/6t5uCqXSFCFE+P4DJxXKGCSZH5FFfj5ZqPc0dF+TGKt/cv/VCLpA=
+	t=1772460416; cv=none; b=Bs2X/q/ROe73Z44UaI3IaC6avkAOvEWbo+NpyZ9u/X/gikD6gAnGpeq2MErhGmpYgMFqto42n+JmegYP9NslAsCQ9EIfWEhXX7vDjKFKgps6GZsD9voqjFaojJSu0Ku6yEs+7/aOZne4F2dQhb+C+m07wmLGajmb+z/DgVEkXvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772460415; c=relaxed/simple;
-	bh=qz+MRlLnx404EUH9IVSOOgg1u89pJ72HWWqf0TPGV9o=;
+	s=arc-20240116; t=1772460416; c=relaxed/simple;
+	bh=qQvKyY355WiiUZ5PDr+CWS9ETxDQZyTIWeRmwyfhO5A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RpWXPTA440ZieKqNTWVIA+wUK7sXb1m8Xcs6MuPd0yW6Y4C0uzU1A8d67CLYqa/bYfWm7JcMcJ+93wYDPcuepdqNyrNcHUBZ6tfJVe+IVlRhfSgrhRGqJZoGnAuIw2uL33Q5/NOZ/TYKg5AYaeXd8vMvrW+bqrZoi99NeAgFji0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org; spf=pass smtp.mailfrom=phenome.org; dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b=EkgfyN/Z; arc=none smtp.client-ip=193.110.157.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=phenome.org
-Authentication-Results: oak.phenome.org (amavisd); dkim=pass (2048-bit key)
- reason="pass (just generated, assumed good)" header.d=phenome.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=phenome.org; h=
-	in-reply-to:content-disposition:content-type:content-type
-	:mime-version:references:message-id:subject:subject:from:from
-	:date:date:received; s=oak1; t=1772460404; x=1773324405; bh=qz+M
-	RlLnx404EUH9IVSOOgg1u89pJ72HWWqf0TPGV9o=; b=EkgfyN/ZxULzXmokVX81
-	7fNEE3w8BvikCNwIOtT4ZQQM87hqLef4W4R6wD/ckMiVaTxp7xpxtd7GJgwD4ZXa
-	t88gIsMC3wxPg/ioGxqpX/tkzfSQ5Ya88sPlRJuSupyPsgGxuP7/lK+1FbhXStTn
-	1pa7GvaKcFzUrn22Kiu+grNFK9gI1adFfq4GvHV7o1T5aLKGWzPLXngnY6TBZkiS
-	uRb8DIPyt6j+wKNRvF9kZafzjOk1WFS+Uv/lYVzCIgNOMiiXTKCMaKzob9Cf2A0G
-	sYzv8DCtSLqBbMHFp6d+A15zsRtH93tDiDDjrwzoBzmaS5gbYF5AlLy+xb3a2iwY
-	7Q==
-X-Virus-Scanned: amavisd at oak.phenome.org
-Received: by oak.phenome.org (Postfix);
-	Mon, 02 Mar 2026 15:06:41 +0100 (CET)
-Date: Mon, 2 Mar 2026 15:06:40 +0100
-From: Antony Antony <antony@phenome.org>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: Antony Antony <antony@phenome.org>,
-	Antony Antony <antony.antony@secunet.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Chiachang Wang <chiachangwang@google.com>,
-	Yan Yan <evitayan@google.com>, devel@linux-ipsec.org,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [devel-ipsec] Re: [PATCH ipsec-next v5 7/8] xfrm: add error
- messages to state migration
-Message-ID: <aaWZcLZzdydDsQX_@Antony2201.local>
-References: <cover.1769509130.git.antony.antony@secunet.com>
- <dd1d5b341323d6e0f93057c214adf4fc51c3cbd1.1769509131.git.antony.antony@secunet.com>
- <aXygrzQrsQxGdDG5@krikkit>
- <aaBqGgkGWfjPdJRv@Antony2201.local>
- <aaB8CL1uZ8_PzyLA@krikkit>
+	 Content-Type:Content-Disposition:In-Reply-To; b=NVi139C0dLrQCNBazZ7FzSN0BLtJSiWkMmYvpQnRwCyaDsqZuzDAAXGFtx3S5vUAKABosVC7cvZfvtZXrQBb25vUSTrrZ4ql9lFMd5gzXhmeFXAa37HVHmSOGzryYPGmsWlcuKkIQzoyzZgydq1mBtAg/Y5Pb2AioR9/+5YmFSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A7y2s0JM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16E99C2BC87;
+	Mon,  2 Mar 2026 14:06:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772460416;
+	bh=qQvKyY355WiiUZ5PDr+CWS9ETxDQZyTIWeRmwyfhO5A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=A7y2s0JMNbE3IzW0gV/VicaMP+jY2VZhuMzDEyqCe/clINZ6iRrjF1r3yX/h38EuD
+	 HKhtfnrO1+7BGOZRtuBKJCrgrH7M1/BsjR2bwkkFJt+2Y0cfsVuHeOr1O0ySwcI+Pu
+	 QcG6UI53+tTQJ/EXpboNu+rUSSftw9E5JG2cklNoeOULTdkAW3+s2hpp5KPi3evdz3
+	 ci/ARygrF0ZVyegNUtNqXWkw0GX/lAYwDv9pxrlwJVrK2rzV4xkaamOaLk0YfObQPV
+	 +iy+E/A5R1kmhEVdN/AV5XpkjhGfipTzxb70+tHTWGGtFZ2qtFiJgdeMFrqDtKZPd4
+	 5wvrQhI+g7Udg==
+Date: Mon, 2 Mar 2026 16:06:52 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Maher Sanalla <msanalla@nvidia.com>
+Subject: Re: [PATCH rdma-next 0/6] Add support for TLP emulation
+Message-ID: <20260302140652.GQ12611@unreal>
+References: <20260225-var-tlp-v1-0-fe14a7ac7731@nvidia.com>
+ <20260226173434.62c82688@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,150 +66,93 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aaB8CL1uZ8_PzyLA@krikkit>
+In-Reply-To: <20260226173434.62c82688@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[phenome.org,none];
-	R_DKIM_ALLOW(-0.20)[phenome.org:s=oak1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262666-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262667-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[antony@phenome.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[phenome.org:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,Antony2201.local:mid,secunet.com:email,phenome.org:dkim]
-X-Rspamd-Queue-Id: 5FAF81DA728
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C9D5C1DA74E
 X-Rspamd-Action: no action
 
-On Thu, Feb 26, 2026 at 05:59:52PM +0100, Sabrina Dubroca via Devel wrote:
-> 2026-02-26, 16:43:22 +0100, Antony Antony wrote:
-> > On Fri, Jan 30, 2026 at 01:14:39PM +0100, Sabrina Dubroca via Devel wrote:
-> > > 2026-01-27, 11:43:42 +0100, Antony Antony wrote:
-> > > > Add descriptive(extack) error messages for all error paths
-> > > > in state migration. This improves diagnostics by
-> > > > providing clear feedback when migration fails.
-> > > > 
-> > > > Signed-off-by: Antony Antony <antony.antony@secunet.com>
-> > > > ---
-> > > > v4->v5: - added this patch
-> > > > ---
-> > > >  net/xfrm/xfrm_state.c | 13 ++++++++++---
-> > > >  1 file changed, 10 insertions(+), 3 deletions(-)
-> > > > 
-> > > > diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-> > > > index 88a362e46972..2e03871ae872 100644
-> > > > --- a/net/xfrm/xfrm_state.c
-> > > > +++ b/net/xfrm/xfrm_state.c
-> > > > @@ -2129,15 +2129,21 @@ struct xfrm_state *xfrm_state_migrate_create(struct xfrm_state *x,
-> > > >  	struct xfrm_state *xc;
-> > > > 
-> > > >  	xc = xfrm_state_clone_and_setup(x, encap, m);
-> > > > -	if (!xc)
-> > > > +	if (!xc) {
-> > > > +		NL_SET_ERR_MSG(extack, "Failed to clone and setup state");
-> > > 
-> > > When xfrm_state_clone_and_setup fails it's because some allocation
-> > > failed and the user won't be able to do much about this, right? I
-> > > don't feel extack in those situations is super helpful.
+On Thu, Feb 26, 2026 at 05:34:34PM -0800, Jakub Kicinski wrote:
+> On Wed, 25 Feb 2026 16:19:30 +0200 Leon Romanovsky wrote:
+> > This series adds support for Transaction Layer Packet (TLP) emulation
+> > response gateway regions, enabling userspace device emulation software
+> > to write TLP responses directly to lower layers without kernel driver
+> > involvement.
 > > 
-> > I felt it was usefaul to know, and to log this happened. May not a great 
-> > idea.
+> > Currently, the mlx5 driver exposes VirtIO emulation access regions via
+> > the MLX5_IB_METHOD_VAR_OBJ_ALLOC ioctl. This series extends that
+> > ioctl to also support allocating TLP response gateway channels for
+> > PCI device emulation use cases.
 > 
-> I don't have a super strong opinion. IIRC that was the approach I
-> picked when I added extack (no extack for kernel events that the user
-> can't do anything about and don't result from an invalid netlink
-> message), but maybe that kind of stuff deserves an extack too.
-> 
-> Also, I thought that something that ends up returning ENOMEM to
-> userspace is explicit enough, without adding a string "failed to
-> allocate memory for $object" in extack. But I don't work on *swan, so
-> maybe it's more useful than I think.
+> Why is this an RDMA thing if it's a PCIe feature indented for VirtIO?
 
-*swans are slowly catching up with extack. For years we ignored it
-due to two reasons: lower coverage and lack of documentation.
-Both are improving over time, so I think it's worth embracing more broadly now.
-I hope we add a better extack support in xfrm_init_state().
+This is the result of a long path of evolution.
 
-E* errors I find hard to figure out as user, may be *swans log them as 
-numbers not as friendly names!
+Early on, we had VDPA emulation implemented entirely within the RDMA
+stack. The idea was to build something similar to a tun/tap pair, where
+a native RDMA QP could be connected to RDMA QPs carrying WQEs formatted
+in the VirtIO layout. With some QEMU-side handling, this produced a
+virtio-net device.
 
-> (Steffen has the final word, and you're closer to him than I am :))
-> 
-> 
-> > > >  		return NULL;
-> > > > +	}
-> > > > 
-> > > > -	if (xfrm_init_state(xc) < 0)
-> > > > +	if (xfrm_init_state(xc) < 0) {
-> > > > +		NL_SET_ERR_MSG(extack, "Failed to initialize migrated state");
-> > > 
-> > > xfrm_init_state itself doesn't handle extack, but it's just a wrapper
-> > > around functions that do. Maybe better to make xfrm_init_state
-> > > propagate extack?
-> > 
-> > That is a great idea. May be in a future patch set. For now, I will drop 
-> > this patch from this series. To move forward quickly.
-> 
-> Ok. Or keep the patch with just the fixup right below this, I'm not
-> NACKing it.
+Later, this model was adapted for a DPU configuration. In that setup,
+the DPU's RDMA block held the native QPs, while the x86 host exposed the
+VirtIO-formatted QPs, still with QEMU involved. The DPU controlled the
+x86-side "tun/tap" through RDMA-linked operations on the associated
+objects.
 
-thanks for clarifying.  I will keep the patch without xfrm_dev_state_add() 
-case. 
+Next, the DPU evolved to instantiate a full VirtIO PCI function on its
+own, removing the need for x86 to run QEMU. The DPU continued to manage
+the tun/tap via RDMA operations, with some extensions to cover PCI-
+related details.
 
-> 
-> > > >  		goto error;
-> > > > +	}
-> > > > 
-> > > >  	/* configure the hardware if offload is requested */
-> > > > -	if (xuo && xfrm_dev_state_add(net, xc, xuo, extack))
-> > > > +	if (xuo && xfrm_dev_state_add(net, xc, xuo, extack)) {
-> > > > +		NL_SET_ERR_MSG(extack, "Failed to initialize state offload");
-> > > 
-> > > We already set an extack in xfrm_dev_state_add, this chunk should be
-> > > dropped to avoid overwriting the more specific info we got.
-> > > 
-> > > >  		goto error;
-> > > > +	}
-> > > > 
-> > > >  	return xc;
-> > > >  error:
-> > > > @@ -2161,6 +2167,7 @@ int xfrm_state_migrate_install(const struct xfrm_state *x,
-> > > >  		xfrm_state_insert(xc);
-> > > >  	} else {
-> > > >  		if (xfrm_state_add(xc) < 0) {
-> > > > +			NL_SET_ERR_MSG(extack, "Failed to add migrated state");
-> > > 
-> > > Not a strong objection, but this case would be the EEXIST situation
-> > > from xfrm_state_add, and there's not much the user can do about this?
-> > 
-> > Fair point, but logging it still has value too, userspace can track these
-> > over time and adapt. Let's revisit when we add extack to xfrm_init_state.
-> 
-> Ok.
-> 
-> > > >  			if (xuo)
-> > > >  				xfrm_dev_state_delete(xc);
-> > > >  			xc->km.state = XFRM_STATE_DEAD;
-> > > 
-> 
-> -- 
-> Sabrina
+Eventually, the DPU gained general-purpose programmable co-processors
+capable of executing various RDMA and non-RDMA operations. As a result,
+the RDMA subsystem also became responsible for loading programs onto
+these co-processors and managing them within RDMA context and PD
+security constraints.
 
-thanks,
--antony
+Now we have reached a stage where these co-processors can manage a much
+larger portion of the PCI-side behavior, including delegating some
+responsibilities back to the host CPU. This produces an odd situation
+where a privileged RDMA user can:
+
+- Claim an "emulation" PCI function
+- Load a co-processor program associated with that PCI function
+- Use RDMA-mediated queues and security controls to interact with the
+  co-processor program
+- Use the co-processor and related mechanisms to capture and respond to
+  TLPs directed to that PCI function
+
+There are many tightly coupled components in this design, but the TLP
+handling cannot be separated from the RDMA-related logic that enables
+it.
+
+Thanks
 
