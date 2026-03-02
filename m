@@ -1,241 +1,156 @@
-Return-Path: <netdev+bounces-262945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262946-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oEJNEVoZpmmeKQAAu9opvQ
-	(envelope-from <netdev+bounces-262945-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 00:12:26 +0100
+	id 6KCaHXwepmmeKQAAu9opvQ
+	(envelope-from <netdev+bounces-262946-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 00:34:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9328E1E6642
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 00:12:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 203911E6B3A
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 00:34:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 53217301468C
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 23:10:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3C82F30DAB3C
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 23:29:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 401E73242B1;
-	Mon,  2 Mar 2026 23:10:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCD3732F757;
+	Mon,  2 Mar 2026 23:29:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="vsTFM2Pw";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="y0FTGXLp"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="TSxh7FtX"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b8-smtp.messagingengine.com (fout-b8-smtp.messagingengine.com [202.12.124.151])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00D8E320A24
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 23:10:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870DE175A8B;
+	Mon,  2 Mar 2026 23:29:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772493040; cv=none; b=j8RDG3doqbauot5WvsF8jjHHj36AMreg5kB4djYsou31FegifAjJyHQ8r7eEjMNp2l+8kVbExNR64UfYSv2cb3EL0KmsGS6HerY7PuchnhQYf+EIIwy0dVxTQkKpOBAXej0QMcDx5BcZvcmRR5CNlAwXON5+/62nntYbfQT2i+8=
+	t=1772494178; cv=none; b=T5sItySvKP35+nTfA0ia3EYtXzWEfvdFzfefTDNCfKvz8smG6JAerDCr+hFxVnRsVhTn8jFu7FsefBHWVwVh6xKPn+oiDHQI5yPzsQUqvckRQBmYLgeDvGs1pgelbdNzx3nwvwslFVGR1AIgyRb+3GlF5leOjsbE32sNh2NLlgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772493040; c=relaxed/simple;
-	bh=02gCBRYaWQlYwxHoiKkNwYL9LacOTkCYPTHqtEX+yWI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fatn69hZVJqVadX4TQeb9wV/HVBuT6LRggW/CmPXE8lbu6/fkC+j/uOQb2ouIdRFNwnjPbNV76+icVMZP2sNBnMcM9O1WeBPf12oSUttmQzl8v8lNlCJrTD+xMyhIWl0FiDWw1MBPbEe3tx7QToO3up7so0AJxuLjaskByOzQOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=vsTFM2Pw; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=y0FTGXLp; arc=none smtp.client-ip=202.12.124.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
-	by mailfout.stl.internal (Postfix) with ESMTP id B267F1D0024F;
-	Mon,  2 Mar 2026 18:10:35 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-12.internal (MEProxy); Mon, 02 Mar 2026 18:10:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1772493035; x=
-	1772579435; bh=DZduqcPpsaRBEcwyysHlY2Q6cAizvxFsjtpDxUHnXpk=; b=v
-	sTFM2Pwu/GEaRVjmW7P4/fBYXYPVwh/JUMgOpd2fdGhsR3PomIfh9KYfjMYttgmf
-	/cUQ/zQmXs4yA4pdZY4T5/k7EVdFMl1dVf0+Tkt9n1MsVpN4Y1amLc6w2s5/82TH
-	qSqnn5PXqgiu32jQg6f92DFHe9N9mphaS4KL3n2Ekqj1eYxvELD4bdjCGgyEXHeH
-	uByc0XvjULLPyDde1PwNXGuXIBGbHuMVr8hp8xItEgKe2O1kn53YXEl9nQHgtIp0
-	t3DJalxh2RfLYubpaKdKAs4Bk3THs7o9oXtXG/m1IJihEAwck76EexgtI2Xo214Z
-	XVYYth2MBKmnBYahrYgDA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1772493035; x=1772579435; bh=DZduqcPpsaRBEcwyysHlY2Q6cAizvxFsjtp
-	DxUHnXpk=; b=y0FTGXLpaOG5haTv20DV/VicpNWioN8AEAELqjEBY30HFl1xB5S
-	qsqCzLtQHsgRkM/yQSwXPEGzmVQ9aeDhZ/Rcc1dIjRd7GrNcowRhJ1KDF3GwCKOg
-	q7obxu+vgcO+e+vGXQdvLooCJGXfeOUHsCdtvmQPnNbEQ/lYUUEg0BBjuSbdYu+2
-	GSv9U+cmIQPCcoVugP+PRPN2Fa7KPNzQ6boZ+nGYVCKtQfabJLRwSlPCk8cUDpFK
-	7cRJnuVpLpVbn+qwtbmqJl2ypYDB7carDzDZT2iCF62BiOWyAUK1rU0pSrDO0osI
-	MSkC/kVn5FiPPW8F0Yq547hRn1nXkTLp4TA==
-X-ME-Sender: <xms:6himacmmQ9ti2iQhhLp9MEiPSnxpGevN9xWAVcGsQ6Dy7uGXmrwXGg>
-    <xme:6himaYaAvqrtymzkN2fJ-mGltaQh7-y71r-DtxZsHeJhqV832r3L1SByivupvRIx2
-    rg2pKYQiL_B5kvKJF4VNxdD7fwb94D3xNeS2lyGyMtsrQzcsTOxCg>
-X-ME-Received: <xmr:6himafFVw_1_N664069yIABmANH2Ifc8OUgYjcgWyJLM4tG0TVUj7d5dTwuE>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvheekleejucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfhfgggtuggjsehttdertd
-    dttdejnecuhfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghs
-    hihsnhgrihhlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuieduge
-    dtfefhkeegteehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedt
-    necurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvth
-    dpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehi
-    mhhvgegsvghlsehgmhgrihhlrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmh
-    hlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhm
-    pdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvg
-    hnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdho
-    rhhgpdhrtghpthhtohepjhhulhhirgdrlhgrfigrlhhlsehinhhrihgrrdhfrhdprhgtph
-    htthhopehlihhnuhigsehtrhgvsghlihhgrdhorhhgpdhrtghpthhtohepnhgrthgvrdhk
-    rghrshhtvghnshesghgrrhhmihhnrdgtohhm
-X-ME-Proxy: <xmx:6himafYeA_TcE7D-X59kQ9HN13yDmWKiyLKkY-emMsq-gzvLlujOeQ>
-    <xmx:6himabwKC-4A3lTsr-5G7w0nusNsI-wcv288VU9gMsClXxeJ-LcfRA>
-    <xmx:6himaZTxqgwTesF-LUmCktLsLW-2HICli5RMLuq6yWbI5PIGw9phVg>
-    <xmx:6himaQI9BJrq8hGs6xCC4JgU1F3hfEm9V-6BIJRM__aU3eIYsDAQjw>
-    <xmx:6ximadw2httO_28vZ-RnlzHczTT0n_M3UXJzxMolpw1QdlmpcuauclIQ>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 2 Mar 2026 18:10:34 -0500 (EST)
-Date: Tue, 3 Mar 2026 00:10:33 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Hyunwoo Kim <imv4bel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, Julia.Lawall@inria.fr,
-	linux@treblig.org, nate.karstens@garmin.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net v2] strparser: Fix race condition in strp_done()
-Message-ID: <aaYY6UiXSppOig9Q@krikkit>
-References: <aZgpkyTDU3aXe_V0@v4bel>
- <aZyMejqTbkI7o_VM@krikkit>
- <aaDATohaW62X_pxk@v4bel>
+	s=arc-20240116; t=1772494178; c=relaxed/simple;
+	bh=cGbDhS0SYNM7ywiKo18nxPHughICS0VYorf2j+DgiJI=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=g3hHH+zDDTxkJyHJkey9uTFiwg8Buuc2kdMjBcIzqTb4uwdJKGbZ3baEEkmiTw1MBJy98twra857rLTxrDTGZJmUooBbBjMAGkhymbOHN2w9lR4Xci8UI54puscRomys/MBLyb/QbBMR/mxC0z/bTIeKRQiLV/S2oCG2ym9rR+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=TSxh7FtX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67948C2BC86;
+	Mon,  2 Mar 2026 23:29:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1772494178;
+	bh=cGbDhS0SYNM7ywiKo18nxPHughICS0VYorf2j+DgiJI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TSxh7FtXeAjmq+kHAoxRq7blbJce7OjcAyo5efUABhyEIDg5ECsbidW5Mcj6tsYRQ
+	 DzsG6rRpbWkeoTG5vogARAaO0jUDloWcC8I+5NMkdmsuNVjw9kdp+VtHQVYC7rwOhD
+	 vT8qcareSz2ZYaJdXKgw++Ul/6kRr6+5kG6+y49U=
+Date: Mon, 2 Mar 2026 15:29:34 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+To: "David Hildenbrand (Arm)" <david@kernel.org>
+Cc: linux-kernel@vger.kernel.org, "linux-mm @ kvack . org"
+ <linux-mm@kvack.org>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>, Vlastimil Babka
+ <vbabka@kernel.org>, Mike Rapoport <rppt@kernel.org>, Suren Baghdasaryan
+ <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Jann Horn
+ <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, David Rientjes
+ <rientjes@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>, Alice Ryhl
+ <aliceryhl@google.com>, Madhavan Srinivasan <maddy@linux.ibm.com>, Michael
+ Ellerman <mpe@ellerman.id.au>, Christian Borntraeger
+ <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Claudio
+ Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Jarkko Sakkinen <jarkko@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Arve =?ISO-8859-1?Q?Hj=F8nnev?=
+ =?ISO-8859-1?Q?=E5g?= <arve@android.com>, Todd Kjos <tkjos@android.com>,
+ Christian Brauner <brauner@kernel.org>, Carlos Llamas
+ <cmllamas@google.com>, Ian Abbott <abbotti@mev.co.uk>, H Hartley Sweeten
+ <hsweeten@visionengravers.com>, Jani Nikula <jani.nikula@linux.intel.com>,
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi
+ <rodrigo.vivi@intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>, David
+ Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Jason
+ Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Dimitri
+ Sivanich <dimitri.sivanich@hpe.com>, Arnd Bergmann <arnd@arndb.de>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim
+ <namhyung@kernel.org>, Andy Lutomirski <luto@kernel.org>, Vincenzo Frascino
+ <vincenzo.frascino@arm.com>, Eric Dumazet <edumazet@google.com>, Neal
+ Cardwell <ncardwell@google.com>, "David S. Miller" <davem@davemloft.net>,
+ David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Miguel Ojeda <ojeda@kernel.org>,
+ linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org,
+ intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+ linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH v1 00/16] mm: cleanups around unmapping / zapping
+Message-Id: <20260302152934.eba1cfede1c9b8cebdf45b09@linux-foundation.org>
+In-Reply-To: <20260227200848.114019-1-david@kernel.org>
+References: <20260227200848.114019-1-david@kernel.org>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aaDATohaW62X_pxk@v4bel>
-X-Rspamd-Queue-Id: 9328E1E6642
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 203911E6B3A
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[linux-foundation.org:s=korg];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262945-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	FREEMAIL_TO(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-262946-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kvack.org,oracle.com,kernel.org,google.com,suse.com,suse.de,linux.dev,infradead.org,linux.ibm.com,ellerman.id.au,redhat.com,alien8.de,linuxfoundation.org,android.com,mev.co.uk,visionengravers.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,ziepe.ca,hpe.com,arndb.de,iogearbox.net,arm.com,davemloft.net,lists.ozlabs.org,lists.freedesktop.org];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[linux-foundation.org:+];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[linux-foundation.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_GT_50(0.00)[73];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.994];
+	FROM_NEQ_ENVFROM(0.00)[akpm@linux-foundation.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,messagingengine.com:dkim,queasysnail.net:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux-foundation.org:dkim,linux-foundation.org:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-2026-02-27, 06:51:10 +0900, Hyunwoo Kim wrote:
-> On Mon, Feb 23, 2026 at 06:20:58PM +0100, Sabrina Dubroca wrote:
-> > 2026-02-20, 18:29:55 +0900, Hyunwoo Kim wrote:
-> > > This issue was discovered during a code audit.
-> > > 
-> > > When strp_stop() and strp_done() are called without holding lock_sock(), 
-> > > they can race with worker-scheduling paths such as the Delayed ACK handler 
-> > > and ksoftirqd.
-> > > Specifically, after cancel_delayed_work_sync() and cancel_work_sync() are 
-> > > invoked from strp_done(), the workers may still be scheduled.
-> > > As a result, the workers may dereference freed objects.
-> > > 
-> > > The following is a simple race scenario:
-> > > 
-> > >           cpu0                      cpu1
-> > > 
-> > > espintcp_close()
-> > >                            espintcp_data_ready()
-> > >                              strp_data_ready()
-> > >                                if (unlikely(strp->stopped)) return;
-> > >   strp_stop()
-> > >     strp->stopped = 1;
-> > >   strp_done()
-> > >     cancel_delayed_work_sync(&strp->msg_timer_work);
-> > >                                strp_read_sock()
-> > >                                  tcp_read_sock()
-> > >                                    __tcp_read_sock()
-> > >                                      strp_recv()
-> > >                                        __strp_recv()
-> > >                                          strp_start_timer()
-> > >                                            mod_delayed_work(&strp->msg_timer_work);
-> > > 
-> > > To prevent these races, the cancellation APIs are replaced with 
-> > > worker-disabling APIs.
-> > 
-> > I'm still not totally convinced by this patch. The comment for
-> > strp_done says the function expects to be called at a time when
-> > strp_recv cannot happen in parallel:
-> > 
-> >     strp must already be stopped so that strp_recv will no longer be called
-> 
-> OK, I understand.
-> More specifically, it seems that an issue could occur if strp->skb_head is 
-> accessed under the following scenario.
+On Fri, 27 Feb 2026 21:08:31 +0100 "David Hildenbrand (Arm)" <david@kernel.org> wrote:
 
-Yes.
+> A bunch of cleanups around unmapping and zapping. Mostly simplifications,
+> code movements, documentation and renaming of zapping functions.
 
-> ```
->                  cpu0                                cpu1
-> 
-> espintcp_close()
->                                          espintcp_data_ready()
->                                            strp_data_ready()
->                                              if (unlikely(strp->stopped)) return;
->   strp_stop()
->     strp->stopped = 1;
->   strp_done()
->     disable_delayed_work_sync(&strp->msg_timer_work);
->     kfree_skb(strp->skb_head);
->                                              strp_read_sock()
->                                                tcp_read_sock()
->                                                  __tcp_read_sock()
->                                                    strp_recv()
->                                                      __strp_recv()
->                                                        head = strp->skb_head;
->                                                        ...
-> ```
-> 
-> > 
-> > "strp stopped" is not really enough, I think we'd also need to reset
-> > the CBs, and then grab bh_lock_sock to make sure a previously-running
-> > ->sk_data_ready has completed. This is what kcm does, at least.
-> 
-> It seems that this is not something that should be handled inside strp itself, 
-> but rather something that each caller of strp_stop() is expected to take care 
-> of individually. Would that be the right direction?
+Thanks, I added this (and the below) to mm.git
 
-Agree.
+I suppressed the dded-to-mm emails to protect the innocent.
 
-> It also appears that ovpn and kcm handle this by implementing their own callback 
-> restoration logic.
+--- a/rust/kernel/mm/virt.rs~mm-memory-remove-zap_details-parameter-from-zap_page_range_single-fix
++++ a/rust/kernel/mm/virt.rs
+@@ -123,9 +123,7 @@ impl VmaRef {
+         // SAFETY: By the type invariants, the caller has read access to this VMA, which is
+         // sufficient for this method call. This method has no requirements on the vma flags. The
+         // address range is checked to be within the vma.
+-        unsafe {
+-            bindings::zap_page_range_single(self.as_ptr(), address, size)
+-        };
++        unsafe { bindings::zap_page_range_single(self.as_ptr(), address, size) };
+     }
+ 
+     /// If the [`VM_MIXEDMAP`] flag is set, returns a [`VmaMixedMap`] to this VMA, otherwise
+_
 
-Right. I tried to look at skmsg/psock (the other user of strp), but
-didn't get far enough to verify if it's handling this correctly.
-
-> > Without that, if strp_recv runs in parallel (not from strp->work) with
-> > strp_done, cleaning up skb_head in strp_done seems problematic.
-> 
-> From the espintcp perspective, how about applying a patch along the following lines?
-
-This is what I was thinking about, yes.
-
-Thanks.
-
--- 
-Sabrina
 
