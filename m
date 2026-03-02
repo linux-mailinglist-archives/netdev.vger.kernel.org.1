@@ -1,33 +1,34 @@
-Return-Path: <netdev+bounces-262696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262700-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EA48D7qtpWmpDgAAu9opvQ
-	(envelope-from <netdev+bounces-262696-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:33:14 +0100
+	id eCufA/StpWleEQAAu9opvQ
+	(envelope-from <netdev+bounces-262700-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:34:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A864C1DBE5E
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:33:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 708911DBED5
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:34:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CBC9B308010D
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 15:28:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 555F230EB6C4
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 15:28:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEA413FFAD9;
-	Mon,  2 Mar 2026 15:28:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D55A5413256;
+	Mon,  2 Mar 2026 15:28:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2EDB40149B
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 15:28:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC71407566
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 15:28:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772465285; cv=none; b=QjIex6a97M/EIFUfFn2Vv616Ssk+QGnBDzO9Ps71m261GVEp3QPdPTSzDYz/yHqyZy6SuWa4Af/hKmfG7hLM0TWiXTUYt7Ky07NTfrzebsU6Kixy/Ibzp7DG+/uiC/vCM9lF6ocyqGvmYMwrjuCPXpyMmpqIhguGG58z19XPEAQ=
+	t=1772465294; cv=none; b=sMl6PxXiK5bCVpwflRsIr6AkILUwvFyporD6cjA6yGsUNI4NawBQBQZAZt6Tw9EfVAN5yXoAPCcAao9t1ppRFYbAh40S7O+ENT0rVsnwBGrS/pg7IrNeMLlYLtLqmmSO6h9hzF0H+nnyWd3m160Iw0JZLF7ppdLnHjCHsh+N1Hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772465285; c=relaxed/simple;
-	bh=oqYcm4znyuBVn5r4q35HNh3DKu9LmXNyIkDdANcPCZw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s20tfWBJyfQ0gaJp8mCObift+EtpHJhyGJwZg7rnfhUIBdrFt8loDM92kOk9RoT/DKfDE+ZL/ZlWRisFmt5WneF8RilRcuKKt1Xt2xOaPFiqrBTjUOwA8Gx/wM2zLCucvR4oWdrofkDYpyGrsMYEsmiCpgx7S89WBhhukK/fd9w=
+	s=arc-20240116; t=1772465294; c=relaxed/simple;
+	bh=X9u3E5XH1NT5ojXk3VDLa4paTMladaDW2C5ixjXM96Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=qycLXsZAS6kG3SX/bzSmZVP1d52JULQ4aMqTB0tdaFeUHQPXQ88vShM1nyAgwZ6iFILUQysLihKPS+ruKVWBiEW9rFCslYeqcvuko7w44fhray+H7uiEfZqcA7sbZ6LFa7qMLoyEP7OcL1gqaZH93aaP8nawgVW2wiSi29236L8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -35,30 +36,35 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1vx5Be-0004kH-Ki; Mon, 02 Mar 2026 16:27:58 +0100
+	id 1vx5Be-0004kI-TB; Mon, 02 Mar 2026 16:27:58 +0100
 Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1vx5Bc-003P0Y-11;
+	id 1vx5Bc-003P0Z-1D;
 	Mon, 02 Mar 2026 16:27:57 +0100
 Received: from blackshift.org (p4ffb2dc6.dip0.t-ipconnect.de [79.251.45.198])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
 	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 674A44F5469;
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 712B44F546A;
 	Mon, 02 Mar 2026 15:27:57 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	linux-can@vger.kernel.org,
-	kernel@pengutronix.de
-Subject: [PATCH net 0/12] pull-request: can 2026-03-02
-Date: Mon,  2 Mar 2026 16:16:06 +0100
-Message-ID: <20260302152755.1700177-1-mkl@pengutronix.de>
+	kernel@pengutronix.de,
+	Oliver Hartkopp <socketcan@hartkopp.net>,
+	syzbot+5b11eccc403dd1cea9f8@syzkaller.appspotmail.com,
+	Marc Kleine-Budde <mkl@pengutronix.de>
+Subject: [PATCH net 01/12] can: bcm: fix locking for bcm_op runtime updates
+Date: Mon,  2 Mar 2026 16:16:07 +0100
+Message-ID: <20260302152755.1700177-2-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260302152755.1700177-1-mkl@pengutronix.de>
+References: <20260302152755.1700177-1-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,117 +76,75 @@ X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
 X-SA-Exim-Mail-From: mkl@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Rspamd-Queue-Id: A864C1DBE5E
+X-Rspamd-Queue-Id: 708911DBED5
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262696-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[6];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262700-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DMARC_NA(0.00)[pengutronix.de];
-	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[mkl@pengutronix.de,netdev@vger.kernel.org];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	NEURAL_HAM(-0.00)[-0.921];
-	TO_DN_NONE(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	PRECEDENCE_BULK(0.00)[];
 	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[pengutronix.de:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	NEURAL_HAM(-0.00)[-0.974];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,5b11eccc403dd1cea9f8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[pengutronix.de:mid,pengutronix.de:email,msgid.link:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,appspotmail.com:email,hartkopp.net:email]
 X-Rspamd-Action: no action
 
-Hello netdev-team,
+From: Oliver Hartkopp <socketcan@hartkopp.net>
 
-this is a pull request of 12 patches for net/main.
+Commit c2aba69d0c36 ("can: bcm: add locking for bcm_op runtime updates")
+added a locking for some variables that can be modified at runtime when
+updating the sending bcm_op with a new TX_SETUP command in bcm_tx_setup().
 
-The first 2 patches are by Oliver Hartkopp. The first fixes the
-locking for CAN Broadcast Manager op runtime updates, the second fixes
-the packet statisctics for the CAN dummy driver.
+Usually the RX_SETUP only handles and filters incoming traffic with one
+exception: When the RX_RTR_FRAME flag is set a predefined CAN frame is
+sent when a specific RTR frame is received. Therefore the rx bcm_op uses
+bcm_can_tx() which uses the bcm_tx_lock that was only initialized in
+bcm_tx_setup(). Add the missing spin_lock_init() when allocating the
+bcm_op in bcm_rx_setup() to handle the RTR case properly.
 
-Alban Bedel's patch fixes a potential problem in the error path of the
-mcp251x's ndo_open callback.
-
-A patch by Ziyi Guo add USB endpoint type validation to the esd_usb
-driver.
-
-The next 6 patches are by Greg Kroah-Hartman and fix URB data parsing
-for the ems_usb and ucan driver, fix URB anchoring in the etas_es58x,
-and in the f81604 driver fix URB data parsing, add URB error handling
-and fix URB anchoring.
-
-A patch by me targets the gs_usb driver and fixes interoperability
-with the CANable-2.5 firmware by always configuring the bit rate
-before starting the device.
-
-The last patch is by Frank Li and fixes a CHECK_DTBS warning for the
-nxp,sja1000 dt-binding.
-
-regards,
-Marc
-
+Fixes: c2aba69d0c36 ("can: bcm: add locking for bcm_op runtime updates")
+Reported-by: syzbot+5b11eccc403dd1cea9f8@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/linux-can/699466e4.a70a0220.2c38d7.00ff.GAE@google.com/
+Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
+Link: https://patch.msgid.link/20260218-bcm_spin_lock_init-v1-1-592634c8a5b5@hartkopp.net
+Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
+ net/can/bcm.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-The following changes since commit 9439a661c2e80485406ce2c90b107ca17858382d:
+diff --git a/net/can/bcm.c b/net/can/bcm.c
+index b7324e9c955b..fd9fa072881e 100644
+--- a/net/can/bcm.c
++++ b/net/can/bcm.c
+@@ -1176,6 +1176,7 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
+ 		if (!op)
+ 			return -ENOMEM;
+ 
++		spin_lock_init(&op->bcm_tx_lock);
+ 		op->can_id = msg_head->can_id;
+ 		op->nframes = msg_head->nframes;
+ 		op->cfsiz = CFSIZ(msg_head->flags);
 
-  amd-xgbe: fix MAC_TCR_SS register width for 2.5G and 10M speeds (2026-02-28 14:22:34 -0800)
+base-commit: 9439a661c2e80485406ce2c90b107ca17858382d
+-- 
+2.51.0
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can.git tags/linux-can-fixes-for-7.0-20260302
-
-for you to fetch changes up to 7e1e6d6845329adb2da75110a061557e9c26d9b7:
-
-  dt-bindings: net: can: nxp,sja1000: add reference to mc-peripheral-props.yaml (2026-03-02 11:23:40 +0100)
-
-----------------------------------------------------------------
-linux-can-fixes-for-7.0-20260302
-
-----------------------------------------------------------------
-Alban Bedel (1):
-      can: mcp251x: fix deadlock in error path of mcp251x_open
-
-Frank Li (1):
-      dt-bindings: net: can: nxp,sja1000: add reference to mc-peripheral-props.yaml
-
-Greg Kroah-Hartman (6):
-      can: ems_usb: ems_usb_read_bulk_callback(): check the proper length of a message
-      can: ucan: Fix infinite loop from zero-length messages
-      can: usb: etas_es58x: correctly anchor the urb in the read bulk callback
-      can: usb: f81604: handle short interrupt urb messages properly
-      can: usb: f81604: handle bulk write errors properly
-      can: usb: f81604: correctly anchor the urb in the read bulk callback
-
-Marc Kleine-Budde (2):
-      Merge patch series "can: usb: f81604: handle short interrupt urb messages properly"
-      can: gs_usb: gs_can_open(): always configure bitrates before starting device
-
-Oliver Hartkopp (2):
-      can: bcm: fix locking for bcm_op runtime updates
-      can: dummy_can: dummy_can_init(): fix packet statistics
-
-Ziyi Guo (1):
-      can: esd_usb: add endpoint type validation
-
- .../devicetree/bindings/net/can/nxp,sja1000.yaml   |  1 +
- drivers/net/can/dummy_can.c                        |  1 +
- drivers/net/can/spi/mcp251x.c                      | 15 +++++++-
- drivers/net/can/usb/ems_usb.c                      |  7 +++-
- drivers/net/can/usb/esd_usb.c                      | 30 ++++++++-------
- drivers/net/can/usb/etas_es58x/es58x_core.c        |  8 +++-
- drivers/net/can/usb/f81604.c                       | 45 +++++++++++++++++++---
- drivers/net/can/usb/gs_usb.c                       | 22 ++++++++---
- drivers/net/can/usb/ucan.c                         |  2 +-
- net/can/bcm.c                                      |  1 +
- 10 files changed, 104 insertions(+), 28 deletions(-)
 
