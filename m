@@ -1,231 +1,330 @@
-Return-Path: <netdev+bounces-262743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262756-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2L/JL3XCpWnEFgAAu9opvQ
-	(envelope-from <netdev+bounces-262743-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 18:01:41 +0100
+	id UMC7FVDHpWnEFgAAu9opvQ
+	(envelope-from <netdev+bounces-262756-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 18:22:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FA351DD6D4
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 18:01:36 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 677B41DDBC0
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 18:22:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 993F33147CDA
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 16:45:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 57C91300D70B
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 17:22:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6068425CDD;
-	Mon,  2 Mar 2026 16:42:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0622421F07;
+	Mon,  2 Mar 2026 17:22:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bBL1MUMc"
+	dkim=pass (2048-bit key) header.d=ga.com header.i=@ga.com header.b="aBWjD6UH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from USG02-BN3-obe.outbound.protection.office365.us (mail-bn3usg02on0051.outbound.protection.office365.us [23.103.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AED50425CCF
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 16:42:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772469739; cv=none; b=ZWpLRpsR26MIw5+mvPxyylU6NmqljCwNyGY5PPEoA1fKzLb0Q3YwMrcO/2gsAOKcyDKpc+wRoWoVxbDjHHqhxO8R36njlKL2QWsy/78tRWIOQy7OVl1hOPx1EcAqdsvXRn4wHoeL2gbk26sYTQ6NKumHYI7UGYmF6R38PteY/Gk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772469739; c=relaxed/simple;
-	bh=VFASPJvhciehL7F+IA6+SdXs77TNKb/sys4Vs9JnaxA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=E6U20Iy7i5tfVKQLBdDXtCBsXSe8B4ov2LF45/lcGNLAxzYFA/IB9/KIzJcw2rTN7yy2gi6A0u8LqLe1iN2h/KtnYk2TWGjQkdg/T90FJtQ6DZRF6wzRGAYwSHX3fVtyqfSu2HkF2woOGd0hpJvNXZaDYTJkLiFrMOEND5ry0os=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bBL1MUMc; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-8273e0fb87aso2550096b3a.1
-        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 08:42:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772469738; x=1773074538; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=IZaKRJcz+mujuLo0S8DFt3UkN8fu6YsunVoMPBDL58A=;
-        b=bBL1MUMcATKeHSlLaFfPJ0G65MBtqUjujyU55x6acpvbQI9mGKIFtD/UV7vzhAPeFx
-         hDIRO8MeSnghj8Aos22qJugse5zw90Yv5KYFg4eUPfl4VW32OTmvfjPwJG+G98K6zssF
-         7PJBrb0QyskUX57K3CnpCcoPhoS6uHAXGOGgH7xuKml2s52VhnjsLZzAz0KwJzM02I50
-         7h0WVYdjs5PZF34ZMhYCOKaRUhYRXlQID5OpUjxMjkFCURzeWbePvzsECg42xhLvFL3n
-         FYda5Elz+MsBGBRFDYH0ShcFPHi9QSm6GECKqgiz17bSvbJsTGVUlMDr5MuxpQMCbtOz
-         78Vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772469738; x=1773074538;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IZaKRJcz+mujuLo0S8DFt3UkN8fu6YsunVoMPBDL58A=;
-        b=gQ6mKCtC7G57kNOBtdxX9yVoFQEvBQ6GMCy7lzV8mqDk4huqzvptfivrQ0mIkdZssi
-         UgUifyBVA3k3uuPQKmiNKQmcFbM+13ufrjELm1wHZJsyjGXel4cETshkCHxpR53Kff7E
-         syyo0xggDshDQZH0kN5eAnCHXLyXHW3ggl3WmW/KYTaW2zYfPFaZMkv9tOgkG+z8IvDr
-         VneLymmtvEpM4+7so/Y+wp52oetY9lQqHNvYZH57AQ/KYukzvvJIVhPYhRJQATf/cq3R
-         ZaYROWl8am4Eko+P7DRgYd4Hg1Krz0MSSOXffKRYbpKhdAm0IoRQZipC8eraChf2Obk5
-         I2PQ==
-X-Gm-Message-State: AOJu0YwljUnvuv6kNExBjKPRsQ7gsD78VMteS7Y5d14cgHknLrAu0w5u
-	ZcwxRctH/Ll+1k2mtlrcn1i2+znaASN8B33G9ph0LFiFcMw6W/fIvL84NQsXaC/hcLE=
-X-Gm-Gg: ATEYQzy7EgkCKRDHeSPP83wvJ9YwBDwHcTiIO1m7xImdKq9SOXLK4VzpG9n2ALivHzK
-	EezfBU1EaAtdT2PufOTNx8LlcaYb5JJ3BXhkdC6gBSAc6zoNKQOTuvXwbinGdhu883hz/ICgGgU
-	iLGB+tqxSUkAC0iBjiWdpEMEt5ChUrRQJD5UoWKTVRRlAZ6wEVl5GUv2ymO6za7ANN8n4ag9n4V
-	D7+NOxt0rxDyOayHgD/iHxxUPp1gpGmfGWPz/EA+8RmRfHFE3eVyOjjDE2IIMeXPfhSlpEWRF1B
-	WN0Zws2XOjx7HIG4h1EKIAKeqNxal5hddLJmmp2zKDgHylo1XVziLnpKI2WaUbi9n64MRM/NT+R
-	m+MYMIN96Q1r3nRN/iAYeOZl2ElkZ427cVZXKJ2h0RFe0YBSafsax5DmbERto143puawc4uazaN
-	0omEA72jx1zwIxfFn6vEI=
-X-Received: by 2002:a05:6a20:a10d:b0:38d:efcb:2e84 with SMTP id adf61e73a8af0-395c3a86fb2mr12074081637.32.1772469737400;
-        Mon, 02 Mar 2026 08:42:17 -0800 (PST)
-Received: from minh.192.168.1.1 ([2a09:bac1:31c0:8::246:f5])
-        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-c70fa801849sm12681295a12.20.2026.03.02.08.42.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Mar 2026 08:42:15 -0800 (PST)
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-To: netdev@vger.kernel.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Bui Quang Minh <minhquangbui99@gmail.com>
-Subject: [PATCH net-next v2] virtio-net: xsk: Support wakeup on RX side
-Date: Mon,  2 Mar 2026 23:41:58 +0700
-Message-ID: <20260302164158.4394-1-minhquangbui99@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989F236C9CD
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 17:22:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=23.103.208.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772472141; cv=fail; b=nX6kYZDA6XNr6qPXfic8Ze7aitpLV+YGldhkTuRRLjNLHMEFHh0DkZi3hkMGbdGqdqJhtHXXc8yB4jITayGArMc/9c5dM1yehSEieXI5570OwnyKSZ8bC0H0qpeBzvWYTJenWICNW5hs8L/+HYcQnIlQetIMICmt6LmBNNUYgqY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772472141; c=relaxed/simple;
+	bh=oCr6GegVwXYMGPRlhWZumZhHm+bslriZWlRqyj0z3IQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Wm2ycDE0QLHuZC+0eAK96zvlkGCNe70lp8pgrcMSK4/IcpK2N1pamPOTzWzl4WAc4OEj3/pq2dRoREanFlNGLdR5amP0w+J7XXHtt6VBZFoKTYjcAE3E80GiebluE8kr5MBPJZm8AR3BS4k84SPm+N4rrpLG6z0PkdbFQBIrI0g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ga.com; spf=pass smtp.mailfrom=ga.com; dkim=pass (2048-bit key) header.d=ga.com header.i=@ga.com header.b=aBWjD6UH; arc=fail smtp.client-ip=23.103.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ga.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ga.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector5401; d=microsoft.com; cv=none;
+ b=r2PHl9Fxi2ZTLj7oxfg2krX1GNFI0U1OIqzlwaxoma+TyJ9KABAhew5fAa/8Qdv9BInM5ybF3PcQlWlwdlgqpHoI+PnvjEtPIs4whie/xX1bHrWyUh87BcwasvDeuRaNT56M2knD6SYZC/ora0epu2U/7Hkldfj/uyl9Lyen+ifA+zC1VsMl8vADawQOtlf7dNOxeGY4poNZdl9q/0DhsrL/m0UD/k7FpU6puNYhsVuoGQbsTL9Qp4jPDl+ZRlcRfWy2tluqM2NWx35Qhkrsld6EuISYAUCV8lMeaJxL3mwUPukDi720Y39UzTB/reeMiIvbsUgLleA2TvGtgxxAhw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector5401;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=smEF7XYMGoNbfdU2BLYdn/Yf9G2VQZDzU5JOx9Uv4SE=;
+ b=ts3CtUPFIw/OfKYZtoveTkkWkC6RwvVswmQCsna3F76HVGARjWZYXrgVGqH8sN5y0W9m7UpBaODZRNAurmxnpmx60N7wvsNEmsUcSHtfqHOtHaRqdTyUJx0EXR6a3rBL3uTTOYV82RTh/FDZdOAnDzb2Ux4xyahW+x5ZxVLdOnm/URt++uGQIPMNG/KFdCAO7AWFo4wTCArGy6sNXgTsfZ5qez2R+c/WeG3KtfgAl+qxQc4Co7Pj67GuIlOOy69jD16G6mVaAoGrZ4vWqqNsyGcTVnjIN1wOV+ktFzs3vx3yND5iu0FTS1ZImsSwHmQICcOcOzegTsMsjZc0Sqbspw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=ga.com; dmarc=pass action=none header.from=ga.com; dkim=pass
+ header.d=ga.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ga.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=smEF7XYMGoNbfdU2BLYdn/Yf9G2VQZDzU5JOx9Uv4SE=;
+ b=aBWjD6UH0LD5Pqn29MSVuEJ/SWXl96Q34VQDaytOTr3rcNbeo/KiOwmHHnw7BhteHDwKZNoG41ke9/qXVLUGN7Hvrt5f1ZZtxeGEGzCjPeNj3z2ty6yAWeZgbLl/YXVGrIIDAjq9XWLnHAEXjY7erdmXp5/qCy1s03ttgz/WgFguQMvhvDTONLbRTxpsyU07RzwvwsIfHChexFblI9Mjj28rffKBW+NylWluRfdWgTXBBUeuxxQDf1EYBK7D2UOYqkd6n2GXhn2h+6Mk8JurB71US1v/+eapT0f/B63vxCVFiQj2B6DowajGZ5i+O9AoEvpzeUpjzahe/zNXQGfX6w==
+Received: from SN5P110MB0848.NAMP110.PROD.OUTLOOK.COM (2001:489a:200:429::17)
+ by SA1P110MB2008.NAMP110.PROD.OUTLOOK.COM (2001:489a:200:1ab::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.20; Mon, 2 Mar
+ 2026 16:49:20 +0000
+Received: from SN5P110MB0848.NAMP110.PROD.OUTLOOK.COM
+ ([fe80::6e97:4555:2019:b375]) by SN5P110MB0848.NAMP110.PROD.OUTLOOK.COM
+ ([fe80::6e97:4555:2019:b375%3]) with mapi id 15.20.9632.025; Mon, 2 Mar 2026
+ 16:49:19 +0000
+From: "Soderlund, David" <David.Soderlund@ga.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-rt-devel@lists.linux.dev" <linux-rt-devel@lists.linux.dev>
+CC: "David S. Miller" <davem@davemloft.net>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, Bert Karwatzki <spasswolf@web.de>, Clark Williams
+	<clrkwllms@kernel.org>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>
+Subject: RE: -EXT-[PATCH net] net: Provide a PREEMPT_RT specific check for
+ netdev_queue::_xmit_lock
+Thread-Topic: -EXT-[PATCH net] net: Provide a PREEMPT_RT specific check for
+ netdev_queue::_xmit_lock
+Thread-Index: AQHcqmOxryFcHgEwzk66wXf5AsWaCLWbdBsw
+Date: Mon, 2 Mar 2026 16:49:19 +0000
+Message-ID:
+ <SN5P110MB0848D42085BBED56246C59789F7EA@SN5P110MB0848.NAMP110.PROD.OUTLOOK.COM>
+References: <20260302162631.uGUyIqDT@linutronix.de>
+In-Reply-To: <20260302162631.uGUyIqDT@linutronix.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=ga.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN5P110MB0848:EE_|SA1P110MB2008:EE_
+x-ms-office365-filtering-correlation-id: 252fae21-a6cd-4ed1-50a0-08de787ba64a
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|7416014|366016|1800799024|38070700021;
+x-microsoft-antispam-message-info:
+ Lh+1mRDiceM2ylGyC7yjQ5sbprMQaYaPJjkWIZFb6iKV4JzEGclnE1dC0gAB+IwkM03mF6pll2MiLEmEH0PN+mwMMcSw5/ve4IqQZX62Ydnw/9VAt3+CmshIFKnNd2j8yQ9BJObTdxaXcU6Uwy6Kv9uW1b9VprufHeBsuHkMQ2KTOYoQ8U2DossV/fdBg5q1julkX8bVtw7FnrIazMLsOJKcF06RgazCaNLPF70ifQm2pXaqbaT7pAYXoUl+nH0YGV8R3WdIkKzOecowwUwAJxH459gN1x0zLf/ex/WWnHFb8ABxZIiQ37Vefr1HKvcMRBw0+FSQXFFSsTcxVSvfu3IIwhHiF9Hrq/kv1YiSX2eDqNE0gHiTj3ZA+8b+5j+YUJSOnx+jW3nCQ6gYI929/NUicFk3sd6PWH1ensuy3ngUovLBoFsMs1FKodaBxz9rT5mDP+mByKwpHESYTfem9NxvxrEGDf/e1Cu822gB52u3hyvBLJFRNcfW8kwM6L7FIm/GZgh/Y2icAnZ8iBiwRaeUsEqMp/9ildbbQcxqZTNBh8fGq7OaeDcuPonbe2kcmsNBeFvSzmkOoX7LmzGP1Zmzrmctle4SnYMLiPiij5t5HXmWkCvB4wJBWiYBiKl/VtHmajrZSWyZuPYvFluIapHKhh6oRwtcVOU3ZfzRm/BAhgpUuDER22bNSj9FPGug+WIp36RTSk2qrzGTEl13uCw8e/N7XmgSaFcRIYrWhW9/3REPKgBat6BDG9HS+pUMIDIEFEjQbKORNSKcPe3/RuPU817sxtpZrPLY+eMNzzM=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN5P110MB0848.NAMP110.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(1800799024)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?Ms944swEJxU9asWtgYocFO6d0tIB90yrzQ1nKI/qR8+dS7ULYfqElCgLNSjt?=
+ =?us-ascii?Q?CqSRvgxw1sZUvwTwb+Eh574wzAri/HpJ9DzL8TTIfzVdEiovK7FSzEkrnpq2?=
+ =?us-ascii?Q?AvOiH29/eEBqlXtVuulx7vYi+9agwWGkEOQvA8Sht2I2ofsuBoeLk/Znd+5M?=
+ =?us-ascii?Q?B97K1fdsH7QLFEZuszMlAw1uz7CvdEk0mcQ9D8Zp4majHvnRo4565QroaGDi?=
+ =?us-ascii?Q?c7dqis5AO/UVCl8N2naGDJsSjHOijsLGIYs4yr0lMKslPJsXqsfNvL9Cohbt?=
+ =?us-ascii?Q?vyVLqypapsF8LXrImicv3swi2czHJiECMIDSH/qpqIcBmjNU6z0YSD2dCXB7?=
+ =?us-ascii?Q?gymfp7kF5iRCPTX/Qypv8dGKgGXtBB30Y44LQKXFHSFNb49/QmMMp5vqS0al?=
+ =?us-ascii?Q?efw0DE6DX0M94HEsgTWlpn1TFKmmYBdbQPq0ZT5tOfN50/2yAkHYzbUJOnnQ?=
+ =?us-ascii?Q?kHNccgngh4wRVCd0f0iLSWkviXD1c8V1vqS8j3mn/6XqSph6NuA6oialvN2Y?=
+ =?us-ascii?Q?neNI9YCQUr774pJ9h86cDsH1rvItuOVqpJdey/9SdfZMumphFRIXCKYy3KgA?=
+ =?us-ascii?Q?P7GED1DFs20MhcsxOaolvi8MwVBZe8yD6xmQo615rllsl2qEuLa1xje/maLc?=
+ =?us-ascii?Q?tfEP0r68OtiEBSwIjgiD5hZJNr4KHQPqpEfrLZgwRPKdvN96JVBTNpNVUU6R?=
+ =?us-ascii?Q?85MDOPRnTDRu2ONJ1LrzL2H1WtBIhEqUs8Lh0uU5sCYnwv645FOEMNjGOjp/?=
+ =?us-ascii?Q?0IsNgwwQeYB15KWm5rvgIq4uN3Tea4sgZ2wBlCWKPIS2dHL44gedAQxVJoxk?=
+ =?us-ascii?Q?U22tbyYpKkhE34RlQKwmB9BwCJGwUPc192PK0RkKBrK+qOPceJrwm44qKhEE?=
+ =?us-ascii?Q?VDKe78yH5XHsJrpOBWjl7Uhlp8TITYjbyG7gJSAlgXBLrPsgzZskNM5/EqAG?=
+ =?us-ascii?Q?sF1rcE8H65BtKoWkyiMHQ8YmZ++K3cHree0AwRaQDMb0bZQfdnssA7N6/Qdc?=
+ =?us-ascii?Q?q0oPW0s8jA0BcYHZaXUK5BRFJwNXpocxDJgw9Fhs3o2F3LRMnLcvd3pNOtQv?=
+ =?us-ascii?Q?KZBBU+3+h8GrKu3H1LB6VIcy0fPvNGBgBKVSAVMZ5cjilPW3r5AhtHMnCGxt?=
+ =?us-ascii?Q?13CZ+g3o1MfVqaXdmWlO1LMtUDu1WlqR7aBAYdWN1bN/egN3aeYveiOpHdh7?=
+ =?us-ascii?Q?mEac4xxZ82AMQHjt/TMNQlgWvQ+akEZuEiAPvVGaBMeidddA/KYMxV6locjh?=
+ =?us-ascii?Q?P+91B2CDDfAwPtOd3+4ip9mOQgDRn7pSHfoSZ1Ct4l3fVR2x+4s8kBsSRAYJ?=
+ =?us-ascii?Q?MKfsBHCNkT8KpdgtGBWBY4FI6XUYoqNQ6Nr2ZocR8TX7mNkeLWuo3k413QHl?=
+ =?us-ascii?Q?lgOGIbu75eoEysRJO5sziCCS1kwJIpQu88w4mYMREMXdG5ucGkrk2GYDeEXZ?=
+ =?us-ascii?Q?tyb/o1qoFbmppOnTUtqt2wQny7GlW92lBBY/ueK2vnN4G5SqaSEQ65HUDJJe?=
+ =?us-ascii?Q?NLBWjFKaEn9G824=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 6FA351DD6D4
+X-OriginatorOrg: ga.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN5P110MB0848.NAMP110.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 252fae21-a6cd-4ed1-50a0-08de787ba64a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Mar 2026 16:49:19.9029
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 05e53887-e4b3-4595-87f7-3ae79f0e723e
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1P110MB2008
+X-Rspamd-Queue-Id: 677B41DDBC0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[ga.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[ga.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,linux.alibaba.com,lunn.ch,davemloft.net,google.com,kernel.org,lists.linux.dev,vger.kernel.org,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-262743-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262756-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,lunn.ch,web.de,kernel.org,google.com,redhat.com,goodmis.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[minhquangbui99@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[David.Soderlund@ga.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	DKIM_TRACE(0.00)[ga.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	NEURAL_HAM(-0.00)[-0.997];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:email,linutronix.de:email,SN5P110MB0848.NAMP110.PROD.OUTLOOK.COM:mid]
 X-Rspamd-Action: no action
 
-When XDP_USE_NEED_WAKEUP is used and the fill ring is empty so no buffer
-is allocated on RX side, allow RX NAPI to be descheduled. This avoids
-wasting CPU cycles on polling. Users will be notified and they need to
-make a wakeup call after refilling the ring.
+Please remove from list
+  Thanks,
+     David
 
-Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
----
-Changes in v2:
-- Fix the flag check in virtnet_xsk_wakeup
-- Link to v1: https://lore.kernel.org/netdev/20260227150949.13089-1-minhquangbui99@gmail.com/
----
- drivers/net/virtio_net.c | 35 +++++++++++++++++++++++++++--------
- 1 file changed, 27 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index db88dcaefb20..3614002fc87c 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -1454,8 +1454,19 @@ static int virtnet_add_recvbuf_xsk(struct virtnet_info *vi, struct receive_queue
- 	xsk_buffs = rq->xsk_buffs;
- 
- 	num = xsk_buff_alloc_batch(pool, xsk_buffs, rq->vq->num_free);
--	if (!num)
-+	if (!num) {
-+		if (xsk_uses_need_wakeup(pool)) {
-+			xsk_set_rx_need_wakeup(pool);
-+			/* Return 0 instead of -ENOMEM so that NAPI is
-+			 * descheduled.
-+			 */
-+			return 0;
-+		}
-+
- 		return -ENOMEM;
-+	} else {
-+		xsk_clear_rx_need_wakeup(pool);
-+	}
- 
- 	len = xsk_pool_get_rx_frame_size(pool) + vi->hdr_len;
- 
-@@ -1588,20 +1599,19 @@ static bool virtnet_xsk_xmit(struct send_queue *sq, struct xsk_buff_pool *pool,
- 	return sent;
+-----Original Message-----
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Sent: Monday, March 2, 2026 9:27 AM
+To: netdev@vger.kernel.org; linux-rt-devel@lists.linux.dev
+Cc: David S. Miller <davem@davemloft.net>; Andrew Lunn <andrew+netdev@lunn.=
+ch>; Bert Karwatzki <spasswolf@web.de>; Clark Williams <clrkwllms@kernel.or=
+g>; Eric Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; P=
+aolo Abeni <pabeni@redhat.com>; Simon Horman <horms@kernel.org>; Steven Ros=
+tedt <rostedt@goodmis.org>
+Subject: -EXT-[PATCH net] net: Provide a PREEMPT_RT specific check for netd=
+ev_queue::_xmit_lock
+
+WARNING:  This message is from an external source.  Evaluate the message ca=
+refully BEFORE clicking on links or opening attachments.
+
+After acquiring netdev_queue::_xmit_lock the number of the CPU owning the l=
+ock is recorded in netdev_queue::xmit_lock_owner. This works as long as the=
+ BH context is not preemptible.
+
+On PREEMPT_RT the softirq context is preemptible and without the softirq-lo=
+ck it is possible to have multiple user in __dev_queue_xmit() submitting a =
+skb on the same CPU. This is fine in general but this means also that the c=
+urrent CPU is recorded as netdev_queue::xmit_lock_owner.
+This in turn leads to the recursion alert and the skb is dropped.
+
+Instead checking the for CPU number, that owns the lock, PREEMPT_RT can che=
+ck if the lockowner matches the current task.
+
+Add netif_tx_owned() which returns true if the current context owns the loc=
+k by comparing the provided CPU number with the recorded number. This resem=
+bles the current check by negating the condition (the current check returns=
+ true if the lock is not owned).
+On PREEMPT_RT use rt_mutex_owner() to return the lock owner and compare the=
+ current task against it.
+Use the new helper in __dev_queue_xmit() and netif_local_xmit_active() whic=
+h provides a similar check.
+Update comments regarding pairing READ_ONCE().
+
+Reported-by: Bert Karwatzki <spasswolf@web.de>
+Closes: https://lore.kernel.org/all/20260216134333.412332-1-spasswolf@web.d=
+e
+Fixes: 3253cb49cbad4 ("softirq: Allow to drop the softirq-BKL lock on PREEM=
+PT_RT")
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ include/linux/netdevice.h | 27 ++++++++++++++++++++++-----
+ net/core/dev.c            |  5 +----
+ net/core/netpoll.c        |  2 +-
+ 3 files changed, 24 insertions(+), 10 deletions(-)
+
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h index d4=
+e6e00bb90a7..67e25f6d15a47 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -4711,7 +4711,7 @@ static inline u32 netif_msg_init(int debug_value, int=
+ default_msg_enable_bits)  static inline void __netif_tx_lock(struct netdev=
+_queue *txq, int cpu)  {
+        spin_lock(&txq->_xmit_lock);
+-       /* Pairs with READ_ONCE() in __dev_queue_xmit() */
++       /* Pairs with READ_ONCE() in netif_tx_owned() */
+        WRITE_ONCE(txq->xmit_lock_owner, cpu);  }
+
+@@ -4729,7 +4729,7 @@ static inline void __netif_tx_release(struct netdev_q=
+ueue *txq)  static inline void __netif_tx_lock_bh(struct netdev_queue *txq)=
+  {
+        spin_lock_bh(&txq->_xmit_lock);
+-       /* Pairs with READ_ONCE() in __dev_queue_xmit() */
++       /* Pairs with READ_ONCE() in netif_tx_owned() */
+        WRITE_ONCE(txq->xmit_lock_owner, smp_processor_id());  }
+
+@@ -4738,7 +4738,7 @@ static inline bool __netif_tx_trylock(struct netdev_q=
+ueue *txq)
+        bool ok =3D spin_trylock(&txq->_xmit_lock);
+
+        if (likely(ok)) {
+-               /* Pairs with READ_ONCE() in __dev_queue_xmit() */
++               /* Pairs with READ_ONCE() in netif_tx_owned() */
+                WRITE_ONCE(txq->xmit_lock_owner, smp_processor_id());
+        }
+        return ok;
+@@ -4746,14 +4746,14 @@ static inline bool __netif_tx_trylock(struct netdev=
+_queue *txq)
+
+ static inline void __netif_tx_unlock(struct netdev_queue *txq)  {
+-       /* Pairs with READ_ONCE() in __dev_queue_xmit() */
++       /* Pairs with READ_ONCE() in netif_tx_owned() */
+        WRITE_ONCE(txq->xmit_lock_owner, -1);
+        spin_unlock(&txq->_xmit_lock);
  }
- 
--static void xsk_wakeup(struct send_queue *sq)
-+static void xsk_wakeup(struct napi_struct *napi, struct virtqueue *vq)
- {
--	if (napi_if_scheduled_mark_missed(&sq->napi))
-+	if (napi_if_scheduled_mark_missed(napi))
- 		return;
- 
- 	local_bh_disable();
--	virtqueue_napi_schedule(&sq->napi, sq->vq);
-+	virtqueue_napi_schedule(napi, vq);
- 	local_bh_enable();
+
+ static inline void __netif_tx_unlock_bh(struct netdev_queue *txq)  {
+-       /* Pairs with READ_ONCE() in __dev_queue_xmit() */
++       /* Pairs with READ_ONCE() in netif_tx_owned() */
+        WRITE_ONCE(txq->xmit_lock_owner, -1);
+        spin_unlock_bh(&txq->_xmit_lock);  } @@ -4846,6 +4846,23 @@ static =
+inline void netif_tx_disable(struct net_device *dev)
+        local_bh_enable();
  }
- 
- static int virtnet_xsk_wakeup(struct net_device *dev, u32 qid, u32 flag)
- {
- 	struct virtnet_info *vi = netdev_priv(dev);
--	struct send_queue *sq;
- 
- 	if (!netif_running(dev))
- 		return -ENETDOWN;
-@@ -1609,9 +1619,18 @@ static int virtnet_xsk_wakeup(struct net_device *dev, u32 qid, u32 flag)
- 	if (qid >= vi->curr_queue_pairs)
- 		return -EINVAL;
- 
--	sq = &vi->sq[qid];
-+	if (flag & XDP_WAKEUP_TX) {
-+		struct send_queue *sq = &vi->sq[qid];
+
++#ifndef CONFIG_PREEMPT_RT
++static inline bool netif_tx_owned(struct netdev_queue *txq, unsigned
++int cpu) {
++       /* Other cpus might concurrently change txq->xmit_lock_owner
++        * to -1 or to their cpu id, but not to our id.
++        */
++       return READ_ONCE(txq->xmit_lock_owner) =3D=3D cpu; }
 +
-+		xsk_wakeup(&sq->napi, sq->vq);
-+	}
++#else
++static inline bool netif_tx_owned(struct netdev_queue *txq, unsigned
++int cpu) {
++       return rt_mutex_owner(&txq->_xmit_lock.lock) =3D=3D current; }
 +
-+	if (flag & XDP_WAKEUP_RX) {
-+		struct receive_queue *rq = &vi->rq[qid];
++#endif
 +
-+		xsk_wakeup(&rq->napi, rq->vq);
-+	}
- 
--	xsk_wakeup(sq);
- 	return 0;
- }
- 
-@@ -1623,7 +1642,7 @@ static void virtnet_xsk_completed(struct send_queue *sq, int num)
- 	 * wakeup the tx napi to consume the xsk tx queue, because the tx
- 	 * interrupt may not be triggered.
- 	 */
--	xsk_wakeup(sq);
-+	xsk_wakeup(&sq->napi, sq->vq);
- }
- 
- static int __virtnet_xdp_xmit_one(struct virtnet_info *vi,
--- 
-2.43.0
+ static inline void netif_addr_lock(struct net_device *dev)  {
+        unsigned char nest_level =3D 0;
+diff --git a/net/core/dev.c b/net/core/dev.c index c1a9f7fdcffa9..e9ca0b1fd=
+7900 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -4818,10 +4818,7 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net=
+_device *sb_dev)
+        if (dev->flags & IFF_UP) {
+                int cpu =3D smp_processor_id(); /* ok because BHs are off *=
+/
+
+-               /* Other cpus might concurrently change txq->xmit_lock_owne=
+r
+-                * to -1 or to their cpu id, but not to our id.
+-                */
+-               if (READ_ONCE(txq->xmit_lock_owner) !=3D cpu) {
++               if (!netif_tx_owned(txq, cpu)) {
+                        bool is_list =3D false;
+
+                        if (dev_xmit_recursion()) diff --git a/net/core/net=
+poll.c b/net/core/netpoll.c index a8558a52884f9..cd74beffd209c 100644
+--- a/net/core/netpoll.c
++++ b/net/core/netpoll.c
+@@ -132,7 +132,7 @@ static int netif_local_xmit_active(struct net_device *d=
+ev)
+        for (i =3D 0; i < dev->num_tx_queues; i++) {
+                struct netdev_queue *txq =3D netdev_get_tx_queue(dev, i);
+
+-               if (READ_ONCE(txq->xmit_lock_owner) =3D=3D smp_processor_id=
+())
++               if (netif_tx_owned(txq, smp_processor_id()))
+                        return 1;
+        }
+
+--
+2.53.0
+
 
 
