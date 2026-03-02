@@ -1,236 +1,171 @@
-Return-Path: <netdev+bounces-262740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262741-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AMVkF7m+pWknFgAAu9opvQ
-	(envelope-from <netdev+bounces-262740-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 17:45:45 +0100
+	id SLiiJfa+pWknFgAAu9opvQ
+	(envelope-from <netdev+bounces-262741-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 17:46:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB5A51DD25F
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 17:45:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04B941DD2B2
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 17:46:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B900B30A8E6A
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 16:38:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4A45A3076B6A
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 16:39:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35CC4421A13;
-	Mon,  2 Mar 2026 16:38:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1044E41C308;
+	Mon,  2 Mar 2026 16:39:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="h1IdLLjh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wZGtvRTa"
 X-Original-To: netdev@vger.kernel.org
-Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11020073.outbound.protection.outlook.com [52.101.56.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE1712B94;
-	Mon,  2 Mar 2026 16:38:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.73
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772469515; cv=fail; b=RMouayb9WiU3ur5+RxpJv58pPYbAmF/1Z70l//9TWNcwbZPwGayNUOkBoJKW3+FXDGX80KLdeS/N+5aPe4PkE0Y4FLserIfFoMDF8RAJNMdhRsnlm0CqgssV3F2g2iMObshO1/PJQ0DBNYMvWkKJmapzv2R1UzKSWHDZrZ1GhlM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772469515; c=relaxed/simple;
-	bh=6RokbGdvWpa+YTRLO7TVz0weCH9yp0EW3sWonBnuEAo=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=lfE5qmSbMB5wAmaG+HhY6tN8h0CR2jlhFBIkVoXgTVJsSp/2Hq90ePEDcxueWdKeUTx9qkOmGmcfsSxywea7ymjlxcd5Mjp9yLvDUJIxu53JDbf/8djU7SjZrI5MtXwl6GKqKmuGDqe1bqm0deTRObhsq93rIvTKl++HugTvgdg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=h1IdLLjh; arc=fail smtp.client-ip=52.101.56.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=RZc7vMDtbHkcZVenXgu/3g4eNMkuOEPjcDHFedeFWjMqIS3XSVqThwHUfwTm/goleoblRMaB/6LeYvVkerjSYjKptuqbWV2aFXmuCkaWDIzSYdkztGrvggjPRvR+HTr6uyzyz9yVP7SnXN6KVWCRljqvjXItFzRVt4lRc4+SXn99HXU6QrtVTvsgG9hdU86gYjvja6nXgueuPeOTacTRuNkDjgyvWspPr19dfGocoO0JL99/5kOvsyAU/+cKa9K04RL6YyzE6nNeQP00vQJfYEkl5/YUYer6791byJoUVXT+wY7GSgnj3EFYjLZO44hl6PJuEODvvr41CGXKg38cFw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jT9jxC9Eu71JqOjnCNMnfti3qhP8k7faMWbLPEvfNrw=;
- b=ad7vSrHR4Xt8wICGSqky7QqHDHEWwL2azp2IualeCwTEmVWMYgdIUObQ9LSb1YmfTP9bLytsCMsAafQID/J7m/KJu1mXW1UxO56zMvIleOLQm+QeCilzcdzMUaTelTOVRlDQl4uPoOtSeBlrAFNc9NALXFjSYKigksdPT6c8H3cD1ZW6ILeOrSZqG46yujUmK8LSoMDGV9RYzj31oL6R0A09c0Rk2dlWKQp4+FeSnLcT+/RwXUsybX3gtBp1f2SYauOYHiHu94khYT9guV7Jz5EBE3JHBwnWOgX28RbXgtGT80wHLutF2j8HbyuCRVnoHN9kG5IKOkmnIWI3yf9mnQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jT9jxC9Eu71JqOjnCNMnfti3qhP8k7faMWbLPEvfNrw=;
- b=h1IdLLjhKdSK7STI8NKBcCN12LWeV9gKU1HwJP7TUNDwM9wOaHpotEMglCEgzEO04MTat5CB0dGaPYy+jU5UwA8dq8OJ+tkABZQdCKAd7oxdNFXp92U0nbEoIgWXHMlUYCCCG3JNU+zAw2t55cK6tg41j2tnXFdXCI8SbvTPPCs=
-Received: from SA3PR21MB3867.namprd21.prod.outlook.com (2603:10b6:806:2fc::15)
- by LV0PR21MB6597.namprd21.prod.outlook.com (2603:10b6:408:338::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.9; Mon, 2 Mar
- 2026 16:38:30 +0000
-Received: from SA3PR21MB3867.namprd21.prod.outlook.com
- ([fe80::70ff:4d3:2cb6:92a3]) by SA3PR21MB3867.namprd21.prod.outlook.com
- ([fe80::70ff:4d3:2cb6:92a3%6]) with mapi id 15.20.9678.009; Mon, 2 Mar 2026
- 16:38:30 +0000
-From: Haiyang Zhang <haiyangz@microsoft.com>
-To: Dipayaan Roy <dipayanroy@linux.microsoft.com>, KY Srinivasan
-	<kys@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui
-	<DECUI@microsoft.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "leon@kernel.org" <leon@kernel.org>,
-	Long Li <longli@microsoft.com>, Konstantin Taranov <kotaranov@microsoft.com>,
-	"horms@kernel.org" <horms@kernel.org>, "shradhagupta@linux.microsoft.com"
-	<shradhagupta@linux.microsoft.com>, "ssengar@linux.microsoft.com"
-	<ssengar@linux.microsoft.com>, "ernis@linux.microsoft.com"
-	<ernis@linux.microsoft.com>, Shiraz Saleem <shirazsaleem@microsoft.com>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, Dipayaan Roy
-	<dipayanroy@microsoft.com>
-Subject: RE: [PATCH net-next] net: mana: Force full-page RX buffers for 4K
- page size on specific systems.
-Thread-Topic: [PATCH net-next] net: mana: Force full-page RX buffers for 4K
- page size on specific systems.
-Thread-Index: AQHcp9H4wCTe+Gu2bUGZgZ0a5XoGnLWbdgnw
-Date: Mon, 2 Mar 2026 16:38:30 +0000
-Message-ID:
- <SA3PR21MB3867F70563A30975A6CB5FDACA7EA@SA3PR21MB3867.namprd21.prod.outlook.com>
-References:
- <aaFusIxdbVkUqIpd@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-In-Reply-To:
- <aaFusIxdbVkUqIpd@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=52b16135-4a6a-4a8f-9985-b7a647e444f7;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2026-03-02T16:37:19Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
- 3, 0, 1;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA3PR21MB3867:EE_|LV0PR21MB6597:EE_
-x-ms-office365-filtering-correlation-id: 289aca05-331f-44b3-9c9f-08de787a2319
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|7416014|376014|366016|7053199007|921020|38070700021;
-x-microsoft-antispam-message-info:
- LUBjasQ8Jd5Ftx/JJpPumaNGtNp1hajoJyuXkxEmnDkbnIVs0jJOkPzZWuy5MkVNmjpMT46iKtRR21GKClacwG/XyK57LWImaga56l+XO9e7zBbJcXsTESf+XjPhIpYekA6k4Thmcge7AUR8MDwF+J6Vh4z2i0LrmgSaNUP+nFmd8QWavN99fOm8DCPrW8AOKY2qm6vgQg9igYRooA48ymh+K/ozWB01uVbC3ivvFjKNI8b13XMsNYtstRjO7DsmkkghEz3BD1nzQfxDYtORqdZlCzHFGom8pJjOqjtLpA4ECgWUlLEjwsUS7uj9TfUjardfhmzvUg1m1t0wVN3c2bYnFgYHRuywgxOfWNVpQ1td8p+HShdk5/JfGIjwW0NK3adkbL9MEvcEe4+4V3CJ9ebaGNPYReV2E9ofrsS68n0Je8+8cKT2fdMYX1o8N+wt6kJ499D66TIuqCTkm9fwP6PMne3wSI5MFSb52PMBoY5NY0Mu0+6SZZLFHoVlfAhJOt/E99o7c5YJjV76xS8oaryrktC+978tvNU0dZ9zcQvcqc7eutzplCjbHTGru5fyYTzHv44SXLMfou662tOyLR4mkX3WBw4o9CVdm5CaaKy3uNSNZBpYyzIU4DwzX3MhXl0vHZSrNKFtXnFzXZh3INTkayku3SvOMjEJzK+CU5Ee9uWC+PIAnyVK7EZeWk8Tu3XELnJ73ZF+MRYCgItFQA9g1TzDVcGdY4I0t1Co1bMFn/WlsGlaqDE3yecEtwPUND6NaX53ZHgBPuXp5MnCCGXmmOvq7JwhHDQVA0JNua1QedFWCp9RPRxOIKoUckdc
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR21MB3867.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(7053199007)(921020)(38070700021);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?bxtQbgX7uX65MnyREqFCsov6+ZFXo27JuhVqocXe2t0paCXkr/kZWiYxbyH+?=
- =?us-ascii?Q?Ht/eej8Ay7wbBku3Vqt089FZs8xQhxdq6Hvke3Di32lW3n+A6ovmuNGjenvW?=
- =?us-ascii?Q?JgGKTl0mpjacGHGKjtUjn931DxhNGLBJUUjGvFCUdg7Bzkhd/3RpDJql4NJD?=
- =?us-ascii?Q?T+iRQ/eiHsLe8/67hWtt4qDAfHfqM4Fc5wHofTMi6wNxO7rAyY/E7MwCoodA?=
- =?us-ascii?Q?wU9kyVRweO5S12okFEJ4HE8NuGomwlEqmYCM5e00e8rSrhnBktAy7yaqsUB6?=
- =?us-ascii?Q?LEWnIjnkpdYMf7hT5NGlfMAS/gHCtbrXpLGSd86wp+tgBKWl7jTncRpmV2cI?=
- =?us-ascii?Q?na4QaTlFQbXb+XMLgOmpMjExqGOddkXUWzeSVJT3cVd0KP6ZK+wjAFEatOM0?=
- =?us-ascii?Q?H375g9XMAboQEj658w6qxClCgc5fniVzwM5zzi/z8kD8nRL3K82iQ+R5BmLb?=
- =?us-ascii?Q?QsTjZOBnmVtqqIO8EHHa9fthhLcfAzT2Wr/qjdM0y3SFet78lsOIhDjXYaYM?=
- =?us-ascii?Q?pDAK+p+4NTpfx3TCd1KHWbiudCr8LlvDwHl9bZ2bGNsQJdrP8CfsO6J3TrRS?=
- =?us-ascii?Q?f2vYwHR4vWc1/l9/j0unv/YLn4HzGGZWQbckambmuSZJSDCyez1sZ9n1SU9s?=
- =?us-ascii?Q?ObGNRusbsv3jawNo5Kf+U5L4hG4g6uCoStlwY+L7xXoV8XogIK9+yXVFwfyY?=
- =?us-ascii?Q?zgkb0oFmvKlvl67zONnCZ3Nj54imjdgwEzOMGEmbfWsiO9UvBSAj25RC1xlK?=
- =?us-ascii?Q?xxSp7GlnkOCRln8+ZIKQ5cG1MEAVJugHX1ddDJ7Uq6GiSxuqrXbElGqRNhqD?=
- =?us-ascii?Q?MZGTI0Y0QBrDEMx/QAevhxlbIwnC2+n5ir6SNGntZlD4pUxmMcgFshyHeIlZ?=
- =?us-ascii?Q?2oYgRxvoAF4IBdOwWO3ed23g1w2gdo55GPTB8/7lT1dwh4xktbXELeuJZK4P?=
- =?us-ascii?Q?8kRWbZow9HmzOpM/BZEmtmduCUeuI0HPX7CHvZMt1I4uQsKaJCbiIpv5ZZJU?=
- =?us-ascii?Q?aGWGkGQq2BFnIOflXHJCcJkkQPEhoMLgeatLO75Ad2kITjcbmXTDoSsh6YCy?=
- =?us-ascii?Q?kn1juXbB5Vtu5g1qxyl9lJLkM6yK99G+erSY4a6IWY6m3ig3NWQxUFRmIJJ8?=
- =?us-ascii?Q?ZsAPys4ZxYw3vkt6q+W65qTdD2hRGnBhdenow7x1g0TxZAfV1SqjmrG6T25Z?=
- =?us-ascii?Q?15+siUs9EsKaeIVYUWB4kLALawReTSSAvP/4/0nLd5z6Cqz7HneN5G7CY9cd?=
- =?us-ascii?Q?XZbUiI62nIN9ie2z5E+bAGXtOvVXdEGsc/Obf8uOabT/tD0wjxO2Ozd1gBma?=
- =?us-ascii?Q?W5obWQUbVYq8byOsf6vHEz/NMp847qxxnUTYWUKLUXwJBd9Q8Z21PfOBtYZJ?=
- =?us-ascii?Q?yPZvkGwgYjs1vAfZGK6KyuV9LBCqflv12fqVgaj0QMb9cTGclKrFhL/52qOj?=
- =?us-ascii?Q?3PEaPKUAFI3yiMOYdLic7k6BBLSbbK897pwJXUPfeeodzgzxPajvX7BEj8eS?=
- =?us-ascii?Q?g9AtdG0cy6UJz0LJ3zmFUw+XshCIOby/DqkIIBnd9lHfJ4IeCQmEW4kmFofR?=
- =?us-ascii?Q?ywJ6JhuXVNkQ/noHHaxLQbvX8yrI/KgVUMNoTFdu7F67+nXxo/a9AwAgTQLG?=
- =?us-ascii?Q?mkb84Ek7GN+0RTPZmihhlLwIBFxE70l4oua+faaUz2PIg/y/YzPVOOLgDk1+?=
- =?us-ascii?Q?cpOm5pcoU85uokNoGZW7kgaEbA2tey7NljY7qe3SjRZqI5VOm2BOZCrnXgDA?=
- =?us-ascii?Q?YI5BKFPGAQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B69CE35FF5B
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 16:39:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772469578; cv=none; b=l1/z2i+qu1hthH/sFzyp8UPhAVtVE1uR8AiuPiLi+NkVRf4Ldb38ikuBc7nB3MxLGy9k8ZL9ZImj2beZxAajf5ZeJBA4j8LJ38jjVWoiZOpK+1cOXXu3+ohMJeLf9+j7etoY9Le6zU9x7aO8YVcPNetOxFsAE8NRgvPA8iBLnC0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772469578; c=relaxed/simple;
+	bh=uC6/vplQaR/Nl+sf9eIp5Vu1ztYNCKErjypTlH4knNg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=l74awC/AfVrx7UIGRY7eGykSg8rXvwqEErpuwduYuMKHd5XDNBiMPQ4udQV+uoWYAgtXFn3rNOsWenwCQsbNiKws2HNsLX5sAg0+NLEdushkb64B43S2pO0F5zoOd3v99O5HTHkFVL9f2JztEco2ivSg9O4AphVLk/osJIjs4bY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wZGtvRTa; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8cb3b0d938dso3932659885a.2
+        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 08:39:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772469576; x=1773074376; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Lsd7w/YwUfDuZqvwGO4uzCIEQrC3e9zbAgcIypwwWLY=;
+        b=wZGtvRTa0DriyF0aAtC3nJXF7ziKbqGmfEovqBTNHhRZkFMDhij2b43/8jdVJzfbRu
+         H46FdXVa9CUjpkg1l8rUFtV+jU195AHmxCs+1lBJeymoYsN5Bz1Nz8VlI0m2WMy7MfDv
+         sHFRpuBMYioKlo3ZAdCNxt286Xii+YWn6wVvoYRNXRUF86jNSS7HpIvl+J4Z/3xQWObu
+         2VYLrZ9y3k6bE7LX53V+1qimSOrYfUEA8mFVi3jlnGEYhMLjxNDd5SEXb2bvmBG9m3on
+         x0Zi7DseH0LQYfCFstYPyVJ52SKeh5KEv3akQ+z7DicLgDMHFOxn61NYKIQ7VK29KiHy
+         bh3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772469576; x=1773074376;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Lsd7w/YwUfDuZqvwGO4uzCIEQrC3e9zbAgcIypwwWLY=;
+        b=ckLwDFI1iLN+ieJMf9+dQCWTV9uaLsxEhWyiFHuZfex6zN58VqqSLhAWFDDGge0FkH
+         KIZpsSYH6zuH+/fPgVkRXGMww0GZsiLB/f5ybeP/Q45f/cdRyRdwqz8DLBNYYcvXyrSQ
+         myrqmZkimiIAMTU7Gg0QLajrTK+xD55hp2aJnV24kkpPVCtLeTX6W8iWlo539IallPE9
+         6J+yL+en4M/6N5CcQYseLWGukuJiLcN1ru7/EG+a9vZdOcfGASHBkaGhpQeNeQ93Gecm
+         NHiuIp4XL+x9TxzHYpDzNLVKmJwFUmZ1yn88HozFa5ktff1BoammW08gMT99QLjgsjJ0
+         UUuA==
+X-Forwarded-Encrypted: i=1; AJvYcCVHrWu+pGxa+WpT+7URolIz1DK7S3Lksxfv8CN8R1c17hECdfU5KW+Qg5RLSohRqAVO/Fal+AI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1/CS5PHMryOLjZjdQYq1rEvAiVk3Y3f3lbO+oMBTmN63/88TH
+	/nUxbPGkTrq+dAzQMjCK9k4q5mQOIdZ6vEyXtHtxzW7qzr3RmmmyHMGClDD3pNQEw7z+hgReDge
+	9wrPf4B4RZxSEOQ==
+X-Received: from qklm2.prod.google.com ([2002:a05:620a:26c2:b0:8cb:3fad:e583])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:280b:b0:8cb:5176:f00 with SMTP id af79cd13be357-8cbc8ef6df0mr1584405385a.45.1772469575309;
+ Mon, 02 Mar 2026 08:39:35 -0800 (PST)
+Date: Mon,  2 Mar 2026 16:39:33 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR21MB3867.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 289aca05-331f-44b3-9c9f-08de787a2319
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Mar 2026 16:38:30.2792
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pJVUAjyrfMSHgegCMXtqDocmn33ffpmJrydsxysvmAqyksn1/K7yAJOWdXT6jDP7+tDgB8M7Zjj9Y33rL80XvQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV0PR21MB6597
-X-Rspamd-Queue-Id: CB5A51DD25F
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+Message-ID: <20260302163933.1754393-1-edumazet@google.com>
+Subject: [PATCH net-next] net: fix off-by-one in udp_flow_src_port() / psp_write_headers()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 04B941DD2B2
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[microsoft.com,reject];
-	R_DKIM_ALLOW(-0.20)[microsoft.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262740-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[microsoft.com:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[haiyangz@microsoft.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-262741-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
+udp_flow_src_port() and psp_write_headers() use ip_local_port_range.
 
+ip_local_port_range is inclusive : all ports between min and max
+can be used.
 
-> -----Original Message-----
-> From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-> Sent: Friday, February 27, 2026 5:15 AM
-> To: KY Srinivasan <kys@microsoft.com>; Haiyang Zhang
-> <haiyangz@microsoft.com>; wei.liu@kernel.org; Dexuan Cui
-> <DECUI@microsoft.com>; andrew+netdev@lunn.ch; davem@davemloft.net;
-> edumazet@google.com; kuba@kernel.org; pabeni@redhat.com; leon@kernel.org;
-> Long Li <longli@microsoft.com>; Konstantin Taranov
-> <kotaranov@microsoft.com>; horms@kernel.org;
-> shradhagupta@linux.microsoft.com; ssengar@linux.microsoft.com;
-> ernis@linux.microsoft.com; Shiraz Saleem <shirazsaleem@microsoft.com>;
-> linux-hyperv@vger.kernel.org; netdev@vger.kernel.org; linux-
-> kernel@vger.kernel.org; linux-rdma@vger.kernel.org; Dipayaan Roy
-> <dipayanroy@microsoft.com>
-> Subject: [PATCH net-next] net: mana: Force full-page RX buffers for 4K
-> page size on specific systems.
->=20
-> On certain systems configured with 4K PAGE_SIZE, utilizing page_pool
-> fragments for RX buffers results in a significant throughput regression.
-> Profiling reveals that this regression correlates with high overhead in
-> the
-> fragment allocation and reference counting paths on these specific
-> platforms, rendering the multi-buffer-per-page strategy counterproductive=
-.
->=20
-> To mitigate this, bypass the page_pool fragment path and force a single R=
-X
-> packet per page allocation when all the following conditions are met:
->   1. The system is configured with a 4K PAGE_SIZE.
->   2. A processor-specific quirk is detected via SMBIOS Type 4 data.
->=20
-> This approach restores expected line-rate performance by ensuring
-> predictable RX refill behavior on affected hardware.
->=20
-> There is no behavioral change for systems using larger page sizes
-> (16K/64K), or platforms where this processor-specific quirk do not
-> apply.
->=20
-> Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+Before this patch, if ip_local_port_range was set to 40000-40001
+40001 would not be used as a source port.
 
-Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-Thanks.
+Use reciprocal_scale() to help code readability.
+
+Not tagged for stable trees, as this change could break user
+expectations.
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ include/net/udp.h  | 3 ++-
+ net/psp/psp_main.c | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/include/net/udp.h b/include/net/udp.h
+index da68702ddf6edc6a28440490be07be7eef2d1a4e..b648003e5792a167822f28aeb728c3d64a2141f4 100644
+--- a/include/net/udp.h
++++ b/include/net/udp.h
+@@ -29,6 +29,7 @@
+ #include <linux/seq_file.h>
+ #include <linux/poll.h>
+ #include <linux/indirect_call_wrapper.h>
++#include <linux/math.h>
+ 
+ /**
+  *	struct udp_skb_cb  -  UDP(-Lite) private variables
+@@ -376,7 +377,7 @@ static inline __be16 udp_flow_src_port(struct net *net, struct sk_buff *skb,
+ 	 */
+ 	hash ^= hash << 16;
+ 
+-	return htons((((u64) hash * (max - min)) >> 32) + min);
++	return htons(reciprocal_scale(hash, max - min + 1) + min);
+ }
+ 
+ static inline int udp_rqueue_get(struct sock *sk)
+diff --git a/net/psp/psp_main.c b/net/psp/psp_main.c
+index d4c04c923c5ac6aead8b5bac41c54ae1143f4110..9508b6c380038b311a9b778933789b5c4cb61007 100644
+--- a/net/psp/psp_main.c
++++ b/net/psp/psp_main.c
+@@ -202,7 +202,7 @@ static void psp_write_headers(struct net *net, struct sk_buff *skb, __be32 spi,
+ 		 * reciprocal divide.
+ 		 */
+ 		hash ^= hash << 16;
+-		uh->source = htons((((u64)hash * (max - min)) >> 32) + min);
++		uh->source = htons(reciprocal_scale(hash, max - min + 1) + min);
+ 	} else {
+ 		uh->source = udp_flow_src_port(net, skb, 0, 0, false);
+ 	}
+-- 
+2.53.0.473.g4a7958ca14-goog
 
 
