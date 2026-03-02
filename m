@@ -1,230 +1,160 @@
-Return-Path: <netdev+bounces-262536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262537-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0DfgA5k0pWmh5gUAu9opvQ
-	(envelope-from <netdev+bounces-262536-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 07:56:25 +0100
+	id SNx4KzQ4pWnt5wUAu9opvQ
+	(envelope-from <netdev+bounces-262537-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 08:11:48 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9125C1D39FE
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 07:56:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EC2FD1D3ADB
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 08:11:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B6C19302D94D
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 06:55:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2902E300F5FE
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 07:11:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A3843815D7;
-	Mon,  2 Mar 2026 06:55:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57CC6383C61;
+	Mon,  2 Mar 2026 07:11:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b="njVd3+Qr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cDEnjBC/"
 X-Original-To: netdev@vger.kernel.org
-Received: from n169-113.mail.139.com (n169-113.mail.139.com [120.232.169.113])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F344933344A;
-	Mon,  2 Mar 2026 06:55:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=120.232.169.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D20937702F;
+	Mon,  2 Mar 2026 07:11:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772434534; cv=none; b=GNDPWk6G4F9dUr8Mn4Wg5p9kxbuaHLwJoizcvadUpEdhqKFs7COKWl9Rw78jlfuLQ32ZJzEfEutemSu7NktX/7xiLVorbCgYCydEHBdI3sXAejWjFRyXg6tZg64+LV/AOYRj5yvdlM+vHE0qQWMVODhMYPI9om2kmwbBMEXsDyA=
+	t=1772435504; cv=none; b=XKzh+N0lNYP8Zv0slcKdwYpt8Y1P0rPrGfQ4AsANRSYgisBcA/P4HoSN7AjAQu6ocOoX5r6uAXRJoaVht5rlJxcleRtrsUWHAByqDZoKoB8ClYvNzZrOsVUWrDMk70rD4hM3wOIQVpH3nw9dL+qUgVACS4THX7/tVN6yodKZzf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772434534; c=relaxed/simple;
-	bh=p2Hd5KZUM5VO2Y0qFIU10X/K9TN2KCzvSm1h4lowBw0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ty4JHd7I1hj8C2CRpHvo2+xulkqbzouPX29VzZ3neUCVCWKK3uu1dQO2lOyoMts53eQVIvawAdxGmG7C4BVlU77zIieLQU7jquU+iGb6P+2CpwEwbusF5BIW9BQj/TxP82Mqo7TVNvDnAh/3KZ9Zv/oT7wnB13eeEO/xwSuYhZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com; spf=pass smtp.mailfrom=139.com; dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b=njVd3+Qr; arc=none smtp.client-ip=120.232.169.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=139.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=139.com; s=dkim; l=0;
-	h=from:subject:message-id:to:cc:mime-version;
-	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
-	b=njVd3+QrdgnT0B7ZLjgLu6mVTYUNO447XUnFyx33b0bmxaacxfW0geBNvZCiABpi84IFkIx2Z6QAh
-	 04mH0nHPCJn57nngesIQeVJLAKXtGYOQ3/9zmIw0h8mtngofF4PS2L6gHMEuP/6JpODYV5l+mfeFzH
-	 6ijS5+70zoQlElcQ=
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM:                                                                                        
-X-RM-SPAM-FLAG:00000000
-Received:from NTT-kernel-dev (unknown[60.247.85.88])
-	by rmsmtp-lg-appmail-33-12047 (RichMail) with SMTP id 2f0f69a5345f04b-01060;
-	Mon, 02 Mar 2026 14:55:30 +0800 (CST)
-X-RM-TRANSID:2f0f69a5345f04b-01060
-From: Li hongliang <1468888505@139.com>
-To: gregkh@linuxfoundation.org,
-	stable@vger.kernel.org,
-	jibin.zhang@mediatek.com
-Cc: patches@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	song@kernel.org,
-	yhs@fb.com,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@google.com,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	yoshfuji@linux-ipv6.org,
-	dsahern@kernel.org,
-	matthias.bgg@gmail.com,
-	willemb@google.com,
-	steffen.klassert@secunet.com,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH 6.6.y 3/3] net: fix segmentation of forwarding fraglist GRO
-Date: Mon,  2 Mar 2026 14:55:28 +0800
-Message-Id: <20260302065528.2695652-1-1468888505@139.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1772435504; c=relaxed/simple;
+	bh=dw3y0ZYsmbmXggZenP0NempbD26buVG5VGWsEkxE7pg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EEXUrdT+4WaX6Pf/F8kuLsP0uUdBouXhFP027924hCl/2kXqBNPMCDh5KPCGfyUmpEvPk+D2Qo2dZft4Xw/mn2U+gPQI08nfVcZcyYwTJcCqVEXdClnpFw10XduBceR5ZLvBEMkMSKeymUfdq+LSaePlVdJ1cOVTrNk/hfyGzOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cDEnjBC/; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772435501; x=1803971501;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=dw3y0ZYsmbmXggZenP0NempbD26buVG5VGWsEkxE7pg=;
+  b=cDEnjBC/6lM3ONhMxKpvz9aWB7q2jIwQx2W/76Y2TqnoJzPK7Lm2yW3K
+   He2AyoGVSgrN6ViOtdfqsyUZvwckvDXuG7bCnrJBemVGdAIebTZXLV9Vq
+   Q8r+TyZB1u1TWUIWZvruRpfIJUy0AyuIXNSfU6wGvmzjunlQHY9H2phMr
+   rRhkys0iJ16FfaWmDvqNSZfRou87MPVymcpDIAI3ukrJ8mK/+5At4tiYx
+   kDoSl8EU5kqG3zECih5QKxIwdb/eMSVOaWmfDSov1bYdulQ6E/xYQ7I+e
+   XZIvqyrFqcDMOr9WSuTG1cmub/Rve4V+SNlI2KdYMzEP89gkx8kgfaCZf
+   w==;
+X-CSE-ConnectionGUID: 4VoHbrjCQ12X/FP3XHxHgw==
+X-CSE-MsgGUID: zty68Ck7Q76RhwlOJxQYcA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11716"; a="84901544"
+X-IronPort-AV: E=Sophos;i="6.21,319,1763452800"; 
+   d="scan'208";a="84901544"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2026 23:11:40 -0800
+X-CSE-ConnectionGUID: ba4D5QFXRH+vlpV/hQieQQ==
+X-CSE-MsgGUID: O7XdcXJmS/6H4IZriEXdWQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,319,1763452800"; 
+   d="scan'208";a="217465832"
+Received: from dalessan-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.244.52])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2026 23:11:34 -0800
+Date: Mon, 2 Mar 2026 09:11:31 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Chuck Lever <cel@kernel.org>
+Cc: Jeff Layton <jlayton@kernel.org>, NeilBrown <neil@brown.name>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
+	linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, llvm@lists.linux.dev,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>
+Subject: Re: [PATCH v3 0/3] sunrpc: Fix `make W=1` build issues
+Message-ID: <aaU4I1l5RiZWMNZR@ashevche-desk.local>
+References: <20260204202437.2762161-1-andriy.shevchenko@linux.intel.com>
+ <177024270291.126397.9981743455921781902.b4-ty@oracle.com>
+ <aYXDpqqM0qrEVzvy@smile.fi.intel.com>
+ <aaLNTpODbiNCwmps@ashevche-desk.local>
+ <bf983b54-6a1d-4520-b07b-29cba47d5665@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bf983b54-6a1d-4520-b07b-29cba47d5665@app.fastmail.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.54 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[139.com:s=dkim];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[139.com];
-	TAGGED_FROM(0.00)[bounces-262536-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[29];
+	FREEMAIL_CC(0.00)[kernel.org,brown.name,hammerspace.com,vger.kernel.org,lists.linux.dev,oracle.com,redhat.com,talpey.com,davemloft.net,google.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-262537-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,kernel.org,iogearbox.net,linux.dev,fb.com,gmail.com,google.com,davemloft.net,redhat.com,linux-ipv6.org,secunet.com,lists.infradead.org];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[139.com];
-	FROM_NEQ_ENVFROM(0.00)[1468888505@139.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[139.com:-];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.989];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev,lkml];
+	NEURAL_HAM(-0.00)[-0.999];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,139.com:mid,139.com:email,mediatek.com:email]
-X-Rspamd-Queue-Id: 9125C1D39FE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EC2FD1D3ADB
 X-Rspamd-Action: no action
 
-From: Jibin Zhang <jibin.zhang@mediatek.com>
+On Sat, Feb 28, 2026 at 12:02:53PM -0500, Chuck Lever wrote:
+> On Sat, Feb 28, 2026, at 6:11 AM, Andy Shevchenko wrote:
+> > On Fri, Feb 06, 2026 at 12:34:21PM +0200, Andy Shevchenko wrote:
+> >> On Wed, Feb 04, 2026 at 05:05:35PM -0500, Chuck Lever wrote:
+> >> > On Wed, 04 Feb 2026 21:21:48 +0100, Andy Shevchenko wrote:
 
-[ Upstream commit 426ca15c7f6cb6562a081341ca88893a50c59fa2 ]
+[...]
 
-This patch enhances GSO segment handling by properly checking
-the SKB_GSO_DODGY flag for frag_list GSO packets, addressing
-low throughput issues observed when a station accesses IPv4
-servers via hotspots with an IPv6-only upstream interface.
+> >> > Applied to nfsd-testing, thanks!
+> >> 
+> >> Thanks!
+> >> 
+> >> FWIW, I have got a success report from LKP.
+> >
+> > Any estimations when this appears in Linux Next (or even vanilla)?
+> 
+> Applied to nfsd-next just now. Should appear in linux-next the next
+> time nfsd-next is pulled (Sunday night US/Eastern, maybe?)
 
-Specifically, it fixes a bug in GSO segmentation when forwarding
-GRO packets containing a frag_list. The function skb_segment_list
-cannot correctly process GRO skbs that have been converted by XLAT,
-since XLAT only translates the header of the head skb. Consequently,
-skbs in the frag_list may remain untranslated, resulting in protocol
-inconsistencies and reduced throughput.
+Yep, I think it will be in today's Linux Next, thank you!
 
-To address this, the patch explicitly sets the SKB_GSO_DODGY flag
-for GSO packets in XLAT's IPv4/IPv6 protocol translation helpers
-(bpf_skb_proto_4_to_6 and bpf_skb_proto_6_to_4). This marks GSO
-packets as potentially modified after protocol translation. As a
-result, GSO segmentation will avoid using skb_segment_list and
-instead falls back to skb_segment for packets with the SKB_GSO_DODGY
-flag. This ensures that only safe and fully translated frag_list
-packets are processed by skb_segment_list, resolving protocol
-inconsistencies and improving throughput when forwarding GRO packets
-converted by XLAT.
-
-Signed-off-by: Jibin Zhang <jibin.zhang@mediatek.com>
-Fixes: 9fd1ff5d2ac7 ("udp: Support UDP fraglist GRO/GSO.")
-Cc: stable@vger.kernel.org
-Link: https://patch.msgid.link/20260126152114.1211-1-jibin.zhang@mediatek.com
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Li hongliang <1468888505@139.com>
----
- net/core/filter.c        | 2 ++
- net/ipv4/tcp_offload.c   | 3 ++-
- net/ipv4/udp_offload.c   | 3 ++-
- net/ipv6/tcpv6_offload.c | 3 ++-
- 4 files changed, 8 insertions(+), 3 deletions(-)
-
-diff --git a/net/core/filter.c b/net/core/filter.c
-index ddb6d3dd34de..1732358b96ad 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -3340,6 +3340,7 @@ static int bpf_skb_proto_4_to_6(struct sk_buff *skb)
- 			shinfo->gso_type &= ~SKB_GSO_TCPV4;
- 			shinfo->gso_type |=  SKB_GSO_TCPV6;
- 		}
-+		shinfo->gso_type |=  SKB_GSO_DODGY;
- 	}
- 
- 	bpf_skb_change_protocol(skb, ETH_P_IPV6);
-@@ -3370,6 +3371,7 @@ static int bpf_skb_proto_6_to_4(struct sk_buff *skb)
- 			shinfo->gso_type &= ~SKB_GSO_TCPV6;
- 			shinfo->gso_type |=  SKB_GSO_TCPV4;
- 		}
-+		shinfo->gso_type |=  SKB_GSO_DODGY;
- 	}
- 
- 	bpf_skb_change_protocol(skb, ETH_P_IP);
-diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
-index 36595709279c..7b09f6d0818b 100644
---- a/net/ipv4/tcp_offload.c
-+++ b/net/ipv4/tcp_offload.c
-@@ -107,7 +107,8 @@ static struct sk_buff *tcp4_gso_segment(struct sk_buff *skb,
- 	if (skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST) {
- 		struct tcphdr *th = tcp_hdr(skb);
- 
--		if (skb_pagelen(skb) - th->doff * 4 == skb_shinfo(skb)->gso_size)
-+		if ((skb_pagelen(skb) - th->doff * 4 == skb_shinfo(skb)->gso_size) &&
-+		    !(skb_shinfo(skb)->gso_type & SKB_GSO_DODGY))
- 			return __tcp4_gso_segment_list(skb, features);
- 
- 		skb->ip_summed = CHECKSUM_NONE;
-diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index 9be9df2caf65..cd860d8d497b 100644
---- a/net/ipv4/udp_offload.c
-+++ b/net/ipv4/udp_offload.c
-@@ -352,7 +352,8 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
- 
- 	if (skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST) {
- 		 /* Detect modified geometry and pass those to skb_segment. */
--		if (skb_pagelen(gso_skb) - sizeof(*uh) == skb_shinfo(gso_skb)->gso_size)
-+		if ((skb_pagelen(gso_skb) - sizeof(*uh) == skb_shinfo(gso_skb)->gso_size) &&
-+		    !(skb_shinfo(gso_skb)->gso_type & SKB_GSO_DODGY))
- 			return __udp_gso_segment_list(gso_skb, features, is_ipv6);
- 
- 		ret = __skb_linearize(gso_skb);
-diff --git a/net/ipv6/tcpv6_offload.c b/net/ipv6/tcpv6_offload.c
-index 7567c32670c6..10025c9e07d3 100644
---- a/net/ipv6/tcpv6_offload.c
-+++ b/net/ipv6/tcpv6_offload.c
-@@ -109,7 +109,8 @@ static struct sk_buff *tcp6_gso_segment(struct sk_buff *skb,
- 	if (skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST) {
- 		struct tcphdr *th = tcp_hdr(skb);
- 
--		if (skb_pagelen(skb) - th->doff * 4 == skb_shinfo(skb)->gso_size)
-+		if ((skb_pagelen(skb) - th->doff * 4 == skb_shinfo(skb)->gso_size) &&
-+		    !(skb_shinfo(skb)->gso_type & SKB_GSO_DODGY))
- 			return __tcp6_gso_segment_list(skb, features);
- 
- 		skb->ip_summed = CHECKSUM_NONE;
 -- 
-2.34.1
+With Best Regards,
+Andy Shevchenko
 
 
 
