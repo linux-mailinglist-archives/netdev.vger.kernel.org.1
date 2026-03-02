@@ -1,72 +1,84 @@
-Return-Path: <netdev+bounces-262714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262715-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4MdxHSuypWk8EgAAu9opvQ
-	(envelope-from <netdev+bounces-262714-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:52:11 +0100
+	id uNJGFXiypWlMEgAAu9opvQ
+	(envelope-from <netdev+bounces-262715-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:53:28 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF7F91DC2E6
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:52:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A13501DC341
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:53:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BB5AF303CE21
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 15:48:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D802830859E7
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 15:49:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1182D41324B;
-	Mon,  2 Mar 2026 15:48:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30C88411603;
+	Mon,  2 Mar 2026 15:49:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="inwvzoRc"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="uj9wYsAM"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.245.243.92])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4C1441162B;
-	Mon,  2 Mar 2026 15:48:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.245.243.92
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6343E0C49
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 15:49:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772466525; cv=none; b=N91g1/Eroo37AvDeQpwfkp5FDZCeiasqay4op19KQBGxBRr/IELcbzglEG1ULBHnNAOWQykJRPwqVTuTuXTucs56znHzkRavct1bu+KviofUJ/X2CoCGhws7PdBcStdxmHIh8w6kGGenffPJdTpFOIxIAGyPT9IHXEKMb8og6xg=
+	t=1772466550; cv=none; b=jiPM1UlASnsdxJcoW71ICvl0Kuec7opK7c1O+X5jyKDEWSTjulAyHiaSbRydDHOxjUnry16vKg4Ua0UqevpSOEgzkr0OAFsMD2e+t8WKL9p2pDrTxqq6IPWmZqc96NCgOzifjHdkuWJjbNNebcphKhyX2nI2tfQtrf0bnWAXeWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772466525; c=relaxed/simple;
-	bh=8EQMj4FmOrOw4J9iY2p0liDTdDrXYJ6nkvLeacokY2Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=qJHGSsfwwGyAkM2uy+4lNpZw1ykkfazKXFJIV+ZWfMr6+Dc7Krn3L+ZM8sCJoBED6gNxQO+LwdEUQDwI6hDLquvMWwFpJg0n2+lbCTAD+59WEBtj0i0BPlwdnMZrmRQ1ObgJXrVvbLd+/NUM1bQIQr0IrnJX4qPBp+Pq9fECc/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=inwvzoRc; arc=none smtp.client-ip=44.245.243.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+	s=arc-20240116; t=1772466550; c=relaxed/simple;
+	bh=GmZVrQsPKyO0mE+7f3nSOvSJIW9k/uVI5rYijR2wkjw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MhT0MMEn6zvBoQjxp5BnMHtswSY0Xf48efgKJI8ImvgIt6e7WF/qZBTjwaGGArBDT0OoplKt1NaCbRJLktW4BX6EgeB3zyJtD+T6ta/n7+WD690DacVsDBhhNW2mEjRuO9NSW/C1uHN/G/vctuDaEV5BUM4gbQR9x3yCCnKhpdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=uj9wYsAM; arc=none smtp.client-ip=74.125.82.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-1275750cf9cso3579821c88.0
+        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 07:49:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1772466523; x=1804002523;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=8EQMj4FmOrOw4J9iY2p0liDTdDrXYJ6nkvLeacokY2Y=;
-  b=inwvzoRc6qOZ9KCqu7QEuNNsO1COVlkmal8KFqHRLfiknlqY1dCPZyEx
-   3APnC2EPHd69lv86QjA/2aTbSuMCFT0FOxHF56rpIe4DEFAMSUBDJy4FV
-   Y0rWBK8L8EnOiIvblWak3Dy6d+jK7RIt6SlGRskPAMOqHqNXYXKBSFI2f
-   k61g1Dk/iwq8RrKooK/AQCt/4T9FTZnLKCa2xSbRjxPOF4NF0rpgsgskr
-   cVOWw7RQ7FQE0TwbNYMPCTcEv5Dr5T1/4wK1uDB5h7/xqWkIAhXBmOnnL
-   xEePJUGvM44JYUTO/cAID47rX+cCtc57cueBc4G+h4uukfejgw+9kW8gz
-   A==;
-X-CSE-ConnectionGUID: wrPx9B80SO+qSMCxotxE0Q==
-X-CSE-MsgGUID: G+phJaZHQpK6pXjaSzrRrQ==
-X-IronPort-AV: E=Sophos;i="6.21,320,1763424000"; 
-   d="scan'208";a="13639279"
-Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
-  by internal-pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 15:48:39 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.111:21011]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.26.67:2525] with esmtp (Farcaster)
- id c892480c-87df-4e06-bb74-5f135ad59b16; Mon, 2 Mar 2026 15:48:38 +0000 (UTC)
-X-Farcaster-Flow-ID: c892480c-87df-4e06-bb74-5f135ad59b16
-Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Mon, 2 Mar 2026 15:48:38 +0000
-Received: from [0.0.0.0] (172.19.99.218) by EX19D020UWC004.ant.amazon.com
- (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37; Mon, 2 Mar 2026
- 15:48:35 +0000
-Message-ID: <17d63837-6028-475a-90df-6966329a0fc2@amazon.com>
-Date: Mon, 2 Mar 2026 16:48:33 +0100
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1772466547; x=1773071347; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hKcLgp4ecTYImMNgqgWm4N1laI6U5+FQMPbSa6L123Q=;
+        b=uj9wYsAMTqN4Orqw1jAf0xMIBj/akw7Kueq6HOwpTdyvUcSDLQ6Ao5U6WcDy0T15BW
+         kMQ28DwarlYMF+PkuI2ITSxkxyi6+3n8B+ePLFfCvvmM0ORywI80MgV3rNuc9NhKibGt
+         eVknKfjkd5Ciz8m051nWFI65NBh2NXkZqV+nEIeAkf52ftrjLMr4MSzpM+6y29noRj4q
+         5HcZm3qQbWI0ig24BfyzmixGYCm/usuzbjNq0FAUrgUZvqFV8xyXrm4PE7nl2te6bIM7
+         8Sa/J2PndioGfHmROC/M1eopLDZeLxMvcdjWNdWJ5LRU3paCXqyHVVWRogYqy2s75wu8
+         SRvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772466547; x=1773071347;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hKcLgp4ecTYImMNgqgWm4N1laI6U5+FQMPbSa6L123Q=;
+        b=rR0JwpbXaqJt5PXOKVgVMpfRgCKKMgLJ3wxp6iSKeTyraDIAi2O7aS/6J5d1zxqUQ5
+         lZqr77YIwAswIHidpizA8/OnErBLfogknPu3VPG1RYkgMdvxDN7QeP/2HbJ5VgNERcjr
+         5V3dSh94uv8yTFsm289o20ZatfWhutk/W8RiETCr5P4d3h3Dzxm3xr9jNgQUL1tggkhY
+         rkGcj/y1lPukqtXq60N25yXJoqR0pDC3wzt91L0LQL3XGFNKThBbyMrxDEGFWvmhbl45
+         dn09iQlLyokN0HyqjJJDC4UI/mGFt+S0D4i9L52I+dnUyuBEVNkPVzR0vLqHs/Vdx+OE
+         itKg==
+X-Gm-Message-State: AOJu0YxnTKoKUgJhFSCYDD7ysowtMycwjDwSwRCH7we2zHqk+vd2LF++
+	pWF/27LdWS1tKzWqqQ2ekWhME7MJhlL797BJnYESxSZ9W2dh4rniWADeFpukf2vRgv0=
+X-Gm-Gg: ATEYQzzcgvTpj4ELm42mP5T60mktj2jFLIwK/ZYW56/dsBSivsAp7EsHlMR3guk3Tyx
+	2cEq4Nam+YphhCX1+0Mi+iUMlVOnbIgs9Z8pX9NvqBxSerHq0FUDMsFKs9/hjzwAB8EwsTZtfMo
+	Gv0o+9K7CGEQHzku7Hwpp5LEPaUEt71nXdDnQwheMdvLkqgx26Blg0tCDiS1quhLpqRfQsIpz+T
+	hC3EnoCw9mN6bqUFesh4UF7D4VszbhYLtHZwmodM9CnU04cEUXl10ygmnkmWXrwafz6y2Osep/H
+	amwGHXzu5bp2oSDza3g7/KSvlvUArnRWD6fQ/5xFcEh0ObyFIeZCK7u80l2OFZOL2n7uIiBBHIw
+	pyCnhYVOL/lrTtZCTQbGJgYzlXQbDJR6R0+Z8t29dB7Zs6U3KbuwzDak0HvQhMju2clEEyu+CVs
+	Wn1ooZe+H7DHEs0sYoBtJ2HZV8ODfmI5bvTF/zyUqcjwWxgK6n4eq5vCjxb3ta29O0nc3ZiCSp6
+	42gt0/sGh+lRylKTcMOuA==
+X-Received: by 2002:a05:7022:f83:b0:127:366c:8727 with SMTP id a92af1059eb24-1278fc915a9mr4984202c88.40.1772466546711;
+        Mon, 02 Mar 2026 07:49:06 -0800 (PST)
+Received: from ?IPV6:2a03:83e0:1156:1:c8f:b917:4342:fa09? ([2620:10d:c090:500::badb])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12789a32dabsm16392875c88.11.2026.03.02.07.49.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Mar 2026 07:49:06 -0800 (PST)
+Message-ID: <8489fcbf-ab76-48a9-a21f-d7f6873b9a2f@davidwei.uk>
+Date: Mon, 2 Mar 2026 07:49:01 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,164 +86,107 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] vsock: Enable H2G override
-To: Stefano Garzarella <sgarzare@redhat.com>, Bryan Tan
-	<bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, Broadcom
- internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
-CC: <virtualization@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <kvm@vger.kernel.org>, <eperezma@redhat.com>, Jason
- Wang <jasowang@redhat.com>, <mst@redhat.com>, Stefan Hajnoczi
-	<stefanha@redhat.com>, <nh-open-source@amazon.com>
-References: <20260302104138.77555-1-graf@amazon.com>
- <aaVrsXMmULivV4Se@sgarzare-redhat> <aaV80wWlpjEtYCQJ@sgarzare-redhat>
+Subject: Re: [PATCH net-next 1/3] selftests: drv-net: iou-zcrx: wait for
+ memory provider cleanup
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, jdamato@fastly.com,
+ asml.silence@gmail.com, io-uring@vger.kernel.org, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20260227171305.2848240-1-kuba@kernel.org>
+ <20260227171305.2848240-2-kuba@kernel.org>
 Content-Language: en-US
-From: Alexander Graf <graf@amazon.com>
-In-Reply-To: <aaV80wWlpjEtYCQJ@sgarzare-redhat>
-X-ClientProxiedBy: EX19D038UWB002.ant.amazon.com (10.13.139.185) To
- EX19D020UWC004.ant.amazon.com (10.13.138.149)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
-X-Rspamd-Queue-Id: EF7F91DC2E6
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20260227171305.2848240-2-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: A13501DC341
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-9.06 / 15.00];
-	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
+	R_DKIM_ALLOW(-0.20)[davidwei-uk.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-262714-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[amazon.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[graf@amazon.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262715-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[davidwei.uk];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,fastly.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[davidwei-uk.20230601.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dw@davidwei.uk,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[davidwei-uk.20230601.gappssmtp.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,fastly.com:email,davidwei.uk:mid,davidwei.uk:email,lib.py:url]
 X-Rspamd-Action: no action
 
-Ck9uIDAyLjAzLjI2IDEzOjA2LCBTdGVmYW5vIEdhcnphcmVsbGEgd3JvdGU6Cj4gQ0NpbmcgQnJ5
-YW4sIFZpc2hudSwgYW5kIEJyb2FkY29tIGxpc3QuCj4KPiBPbiBNb24sIE1hciAwMiwgMjAyNiBh
-dCAxMjo0NzowNVBNICswMTAwLCBTdGVmYW5vIEdhcnphcmVsbGEgd3JvdGU6Cj4+Cj4+IFBsZWFz
-ZSB0YXJnZXQgbmV0LW5leHQgdHJlZSBmb3IgdGhpcyBuZXcgZmVhdHVyZS4KPj4KPj4gT24gTW9u
-LCBNYXIgMDIsIDIwMjYgYXQgMTA6NDE6MzhBTSArMDAwMCwgQWxleGFuZGVyIEdyYWYgd3JvdGU6
-Cj4+PiBWc29jayBtYWludGFpbnMgYSBzaW5nbGUgQ0lEIG51bWJlciBzcGFjZSB3aGljaCBjYW4g
-YmUgdXNlZCB0bwo+Pj4gY29tbXVuaWNhdGUgdG8gdGhlIGhvc3QgKEcySCkgb3IgdG8gYSBjaGls
-ZC1WTSAoSDJHKS4gVGhlIGN1cnJlbnQgbG9naWMKPj4+IHRyaXZpYWxseSBhc3N1bWVzIHRoYXQg
-RzJIIGlzIG9ubHkgcmVsZXZhbnQgZm9yIENJRCA8PSAyIGJlY2F1c2UgdGhlc2UKPj4+IHRhcmdl
-dCB0aGUgaHlwZXJ2aXNvci7CoCBIb3dldmVyLCBpbiBlbnZpcm9ubWVudHMgbGlrZSBOaXRybyAK
-Pj4+IEVuY2xhdmVzLCBhbgo+Pj4gaW5zdGFuY2UgdGhhdCBob3N0cyB2aG9zdF92c29jayBwb3dl
-cmVkIFZNcyBtYXkgc3RpbGwgd2FudCB0byAKPj4+IGNvbW11bmljYXRlCj4+PiB0byBFbmNsYXZl
-cyB0aGF0IGFyZSByZWFjaGFibGUgYXQgaGlnaGVyIENJRHMgdGhyb3VnaCB2aXJ0aW8tdnNvY2st
-cGNpLgo+Pj4KPj4+IFRoYXQgbWVhbnMgdGhhdCBmb3IgQ0lEID4gMiwgd2UgcmVhbGx5IHdhbnQg
-YW4gb3ZlcmxheS4gQnkgZGVmYXVsdCwgYWxsCj4+PiBDSURzIGFyZSBvd25lZCBieSB0aGUgaHlw
-ZXJ2aXNvci4gQnV0IGlmIHZob3N0IHJlZ2lzdGVycyBhIENJRCwgaXQgCj4+PiB0YWtlcwo+Pj4g
-cHJlY2VkZW5jZS7CoCBJbXBsZW1lbnQgdGhhdCBsb2dpYy4gVmhvc3QgYWxyZWFkeSBrbm93cyB3
-aGljaCBDSURzIGl0Cj4+PiBzdXBwb3J0cyBhbnl3YXkuCj4+Pgo+Pj4gV2l0aCB0aGlzIGxvZ2lj
-LCBJIGNhbiBydW4gYSBOaXRybyBFbmNsYXZlIGFzIHdlbGwgYXMgYSBuZXN0ZWQgVk0gd2l0aAo+
-Pj4gdmhvc3QtdnNvY2sgc3VwcG9ydCBpbiBwYXJhbGxlbCwgd2l0aCB0aGUgcGFyZW50IGluc3Rh
-bmNlIGFibGUgdG8KPj4+IGNvbW11bmljYXRlIHRvIGJvdGggc2ltdWx0YW5lb3VzbHkuCj4+Cj4+
-IEkgaG9uZXN0bHkgZG9uJ3QgdW5kZXJzdGFuZCB3aHkgVk1BRERSX0ZMQUdfVE9fSE9TVCAoYWRk
-ZWQgCj4+IHNwZWNpZmljYWxseSBmb3IgTml0cm8gSUlSQykgaXNuJ3QgZW5vdWdoIGZvciB0aGlz
-IHNjZW5hcmlvIGFuZCB3ZSAKPj4gaGF2ZSB0byBhZGQgdGhpcyBjaGFuZ2UuwqAgQ2FuIHlvdSBl
-bGFib3JhdGUgYSBiaXQgbW9yZSBhYm91dCB0aGUgCj4+IHJlbGF0aW9uc2hpcCBiZXR3ZWVuIHRo
-aXMgY2hhbmdlIGFuZCBWTUFERFJfRkxBR19UT19IT1NUIHdlIGFkZGVkPyAKCgpUaGUgbWFpbiBw
-cm9ibGVtIEkgaGF2ZSB3aXRoIFZNQUREUl9GTEFHX1RPX0hPU1QgZm9yIGNvbm5lY3QoKSBpcyB0
-aGF0IAppdCBwdW50cyB0aGUgY29tcGxleGl0eSB0byB0aGUgdXNlci4gSW5zdGVhZCBvZiBhIHNp
-bmdsZSBDSUQgYWRkcmVzcyAKc3BhY2UsIHlvdSBub3cgZWZmZWN0aXZlbHkgY3JlYXRlIDIgc3Bh
-Y2VzOiBPbmUgZm9yIFRPX0hPU1QgKG5lZWRzIGEgCmZsYWcpIGFuZCBvbmUgZm9yIFRPX0dVRVNU
-IChubyBmbGFnKS4gQnV0IGV2ZXJ5IHVzZXIgc3BhY2UgdG9vbCBuZWVkcyB0byAKbGVhcm4gYWJv
-dXQgdGhpcyBmbGFnLiBUaGF0IG1heSB3b3JrIGZvciBzdXBlciBzcGVjaWFsLWNhc2UgCmFwcGxp
-Y2F0aW9ucy4gQnV0IHByb3BhZ2F0aW5nIHRoYXQgYWxsIHRoZSB3YXkgaW50byBzb2NhdCwgaXBl
-cmYsIGV0YyAKZXRjPyBJdCdzIGp1c3QgY3JlYXRpbmcgZnJpY3Rpb24uCgpJTUhPIHRoZSBtb3N0
-IG5hdHVyYWwgZXhwZXJpZW5jZSBpcyB0byBoYXZlIGEgc2luZ2xlIENJRCBzcGFjZSwgCnBvdGVu
-dGlhbGx5IG1hbnVhbGx5IHNlZ21lbnRlZCBieSBsYXVuY2hpbmcgVk1zIG9mIG9uZSBraW5kIHdp
-dGhpbiBhIApjZXJ0YWluIHJhbmdlLgoKQXQgdGhlIGVuZCBvZiB0aGUgZGF5LCB0aGUgaG9zdCB2
-cyBndWVzdCBwcm9ibGVtIGlzIHN1cGVyIHNpbWlsYXIgdG8gYSAKcm91dGluZyB0YWJsZS4KCgo+
-Pgo+Pj4KPj4+IFNpZ25lZC1vZmYtYnk6IEFsZXhhbmRlciBHcmFmIDxncmFmQGFtYXpvbi5jb20+
-Cj4+PiAtLS0KPj4+IGRyaXZlcnMvdmhvc3QvdnNvY2suY8KgwqDCoCB8IDExICsrKysrKysrKysr
-Cj4+PiBpbmNsdWRlL25ldC9hZl92c29jay5owqDCoCB8wqAgMyArKysKPj4+IG5ldC92bXdfdnNv
-Y2svYWZfdnNvY2suYyB8wqAgMyArKysKPj4+IDMgZmlsZXMgY2hhbmdlZCwgMTcgaW5zZXJ0aW9u
-cygrKQo+Pj4KPj4+IGRpZmYgLS1naXQgYS9kcml2ZXJzL3Zob3N0L3Zzb2NrLmMgYi9kcml2ZXJz
-L3Zob3N0L3Zzb2NrLmMKPj4+IGluZGV4IDA1NGY3YTcxOGY1MC4uMjIzZGE4MTdlMzA1IDEwMDY0
-NAo+Pj4gLS0tIGEvZHJpdmVycy92aG9zdC92c29jay5jCj4+PiArKysgYi9kcml2ZXJzL3Zob3N0
-L3Zzb2NrLmMKPj4+IEBAIC05MSw2ICs5MSwxNiBAQCBzdGF0aWMgc3RydWN0IHZob3N0X3Zzb2Nr
-ICp2aG9zdF92c29ja19nZXQodTMyIAo+Pj4gZ3Vlc3RfY2lkLCBzdHJ1Y3QgbmV0ICpuZXQpCj4+
-PiDCoMKgwqDCoHJldHVybiBOVUxMOwo+Pj4gfQo+Pj4KPj4+ICtzdGF0aWMgYm9vbCB2aG9zdF90
-cmFuc3BvcnRfaGFzX2NpZCh1MzIgY2lkKQo+Pj4gK3sKPj4+ICvCoMKgwqAgYm9vbCBmb3VuZDsK
-Pj4+ICsKPj4+ICvCoMKgwqAgcmN1X3JlYWRfbG9jaygpOwo+Pj4gK8KgwqDCoCBmb3VuZCA9IHZo
-b3N0X3Zzb2NrX2dldChjaWQpICE9IE5VTEw7Cj4+Cj4+IFdlIHJlY2VudGx5IGFkZGVkIG5hbWVz
-cGFjZXMgc3VwcG9ydCB0aGF0IGNoYW5nZWQgdmhvc3RfdnNvY2tfZ2V0KCkgCj4+IHBhcmFtcy4g
-VGhpcyBpcyBhbHNvIGluIG5ldCB0cmVlIG5vdyBhbmQgaW4gTGludXMnIHRyZWUsIHNvIG5vdCBz
-dXJlIAo+PiB3aGVyZSB0aGlzIHBhdGNoIGlzIGJhc2VkLCBidXQgdGhpcyBuZWVkcyB0byBiZSBy
-ZWJhc2VkIHNpbmNlIGl0IGlzIAo+PiBub3QgYnVpbGRpbmc6Cj4+Cj4+IC4uL2RyaXZlcnMvdmhv
-c3QvdnNvY2suYzogSW4gZnVuY3Rpb24g4oCYdmhvc3RfdHJhbnNwb3J0X2hhc19jaWTigJk6Cj4+
-IC4uL2RyaXZlcnMvdmhvc3QvdnNvY2suYzo5OToxNzogZXJyb3I6IHRvbyBmZXcgYXJndW1lbnRz
-IHRvIGZ1bmN0aW9uIAo+PiDigJh2aG9zdF92c29ja19nZXTigJk7IGV4cGVjdGVkIDIsIGhhdmUg
-MQo+PiDCoCA5OSB8wqDCoMKgwqDCoMKgwqDCoCBmb3VuZCA9IHZob3N0X3Zzb2NrX2dldChjaWQp
-ICE9IE5VTEw7Cj4+IMKgwqDCoMKgIHzCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBe
-fn5+fn5+fn5+fn5+fn4KPj4gLi4vZHJpdmVycy92aG9zdC92c29jay5jOjc0OjI4OiBub3RlOiBk
-ZWNsYXJlZCBoZXJlCj4+IMKgIDc0IHwgc3RhdGljIHN0cnVjdCB2aG9zdF92c29jayAqdmhvc3Rf
-dnNvY2tfZ2V0KHUzMiBndWVzdF9jaWQsIAo+PiBzdHJ1Y3QgbmV0ICpuZXQpCj4+IMKgwqDCoMKg
-IHwKCgpEJ29oLiBTb3JyeSwgSSBidWlsdCB0aGlzIG9uIDYuMTkgYW5kIG9ubHkgcmVhbGl6ZWQg
-YWZ0ZXIgdGhlIHNlbmQgdGhhdCAKbmFtZXNwYWNlIHN1cHBvcnQgZ290IGluLiBXaWxsIGZpeCB1
-cCBmb3IgdjIuCgoKPj4KPj4+ICvCoMKgwqAgcmN1X3JlYWRfdW5sb2NrKCk7Cj4+PiArwqDCoMKg
-IHJldHVybiBmb3VuZDsKPj4+ICt9Cj4+PiArCj4+PiBzdGF0aWMgdm9pZAo+Pj4gdmhvc3RfdHJh
-bnNwb3J0X2RvX3NlbmRfcGt0KHN0cnVjdCB2aG9zdF92c29jayAqdnNvY2ssCj4+PiDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgc3RydWN0IHZob3N0X3ZpcnRxdWV1ZSAqdnEpCj4+PiBA
-QCAtNDI0LDYgKzQzNCw3IEBAIHN0YXRpYyBzdHJ1Y3QgdmlydGlvX3RyYW5zcG9ydCB2aG9zdF90
-cmFuc3BvcnQgPSB7Cj4+PiDCoMKgwqDCoMKgwqDCoCAubW9kdWxlwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgID0gVEhJU19NT0RVTEUsCj4+Pgo+Pj4gwqDCoMKgwqDCoMKgwqAg
-LmdldF9sb2NhbF9jaWTCoMKgwqDCoMKgwqDCoMKgwqDCoMKgID0gdmhvc3RfdHJhbnNwb3J0X2dl
-dF9sb2NhbF9jaWQsCj4+PiArwqDCoMKgwqDCoMKgwqAgLmhhc19jaWTCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgID0gdmhvc3RfdHJhbnNwb3J0X2hhc19jaWQsCj4+Pgo+Pj4gwqDC
-oMKgwqDCoMKgwqAgLmluaXTCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-ID0gdmlydGlvX3RyYW5zcG9ydF9kb19zb2NrZXRfaW5pdCwKPj4+IMKgwqDCoMKgwqDCoMKgIC5k
-ZXN0cnVjdMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgID0gdmlydGlvX3RyYW5zcG9y
-dF9kZXN0cnVjdCwKPj4+IGRpZmYgLS1naXQgYS9pbmNsdWRlL25ldC9hZl92c29jay5oIGIvaW5j
-bHVkZS9uZXQvYWZfdnNvY2suaAo+Pj4gaW5kZXggNTMzZDhlNzVmN2JiLi40Y2RjYjcyZjk3NjUg
-MTAwNjQ0Cj4+PiAtLS0gYS9pbmNsdWRlL25ldC9hZl92c29jay5oCj4+PiArKysgYi9pbmNsdWRl
-L25ldC9hZl92c29jay5oCj4+PiBAQCAtMTc5LDYgKzE3OSw5IEBAIHN0cnVjdCB2c29ja190cmFu
-c3BvcnQgewo+Pj4gwqDCoMKgwqAvKiBBZGRyZXNzaW5nLiAqLwo+Pj4gwqDCoMKgwqB1MzIgKCpn
-ZXRfbG9jYWxfY2lkKSh2b2lkKTsKPj4+Cj4+PiArwqDCoMKgIC8qIENoZWNrIGlmIHRoaXMgdHJh
-bnNwb3J0IHNlcnZlcyBhIHNwZWNpZmljIHJlbW90ZSBDSUQuICovCj4+PiArwqDCoMKgIGJvb2wg
-KCpoYXNfY2lkKSh1MzIgY2lkKTsKPj4KPj4gV2hhdCBhYm91dCAiaGFzX3JlbW90ZV9jaWQiID8K
-Pj4KPj4+ICsKPj4+IMKgwqDCoMKgLyogUmVhZCBhIHNpbmdsZSBza2IgKi8KPj4+IMKgwqDCoMKg
-aW50ICgqcmVhZF9za2IpKHN0cnVjdCB2c29ja19zb2NrICosIHNrYl9yZWFkX2FjdG9yX3QpOwo+
-Pj4KPj4+IGRpZmYgLS1naXQgYS9uZXQvdm13X3Zzb2NrL2FmX3Zzb2NrLmMgYi9uZXQvdm13X3Zz
-b2NrL2FmX3Zzb2NrLmMKPj4+IGluZGV4IDJmN2Q5NGQ2ODJjYi4uOGIzNGIyNjRiMjQ2IDEwMDY0
-NAo+Pj4gLS0tIGEvbmV0L3Ztd192c29jay9hZl92c29jay5jCj4+PiArKysgYi9uZXQvdm13X3Zz
-b2NrL2FmX3Zzb2NrLmMKPj4+IEBAIC01ODQsNiArNTg0LDkgQEAgaW50IHZzb2NrX2Fzc2lnbl90
-cmFuc3BvcnQoc3RydWN0IHZzb2NrX3NvY2sgCj4+PiAqdnNrLCBzdHJ1Y3QgdnNvY2tfc29jayAq
-cHNrKQo+Pj4gwqDCoMKgwqDCoMKgwqAgZWxzZSBpZiAocmVtb3RlX2NpZCA8PSBWTUFERFJfQ0lE
-X0hPU1QgfHwgIXRyYW5zcG9ydF9oMmcgfHwKPj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAo
-cmVtb3RlX2ZsYWdzICYgVk1BRERSX0ZMQUdfVE9fSE9TVCkpCj4+PiDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgIG5ld190cmFuc3BvcnQgPSB0cmFuc3BvcnRfZzJoOwo+Pj4gK8KgwqDCoMKgwqDCoMKg
-IGVsc2UgaWYgKHRyYW5zcG9ydF9oMmctPmhhc19jaWQgJiYKPj4+ICvCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqAgIXRyYW5zcG9ydF9oMmctPmhhc19jaWQocmVtb3RlX2NpZCkpCj4+PiArwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoCBuZXdfdHJhbnNwb3J0ID0gdHJhbnNwb3J0X2cyaDsKPj4KPj4gV2Ug
-c2hvdWxkIHVwZGF0ZSB0aGUgY29tbWVudCBvbiB0b3Agb2YgdGhpcyBmdWN0aW9uLCBhbmQgbWF5
-YmUgYWxzbyAKPj4gdHJ5IHRvIHN1cHBvcnQgdGhlIG90aGVyIEgyRyB0cmFuc3BvcnQgKGkuZS4g
-Vk1DSSkuCj4+Cj4+IEBCcnlhbiBAVmlzaG51IGNhbiB0aGUgbmV3IGhhc19jaWQoKS9oYXNfcmVt
-b3RlX2NpZCgpIGJlIHN1cHBvcnRlZCBieSAKPj4gVk1DSSB0b28/Cj4KPiBPb3BzLCBJIGZvcmdv
-dCB0byBDQyB0aGVtLCBub3cgdGhleSBzaG91bGQgYmUgaW4gY29weS4KCgpBY2suIEkgY2FuIGFs
-c28gdGFrZSBhIHF1aWNrIGxvb2sgaWYgaXQncyB0cml2aWFsIHRvIGFkZC4KCgpBbGV4CgoKCgoK
-QW1hem9uIFdlYiBTZXJ2aWNlcyBEZXZlbG9wbWVudCBDZW50ZXIgR2VybWFueSBHbWJIClRhbWFy
-YS1EYW56LVN0ci4gMTMKMTAyNDMgQmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0b2Yg
-SGVsbG1pcywgQW5kcmVhcyBTdGllZ2VyCkVpbmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0IENoYXJs
-b3R0ZW5idXJnIHVudGVyIEhSQiAyNTc3NjQgQgpTaXR6OiBCZXJsaW4KVXN0LUlEOiBERSAzNjUg
-NTM4IDU5Nwo=
+On 2026-02-27 09:13, Jakub Kicinski wrote:
+> io_uring defers zcrx context teardown to the iou_exit workqueue.
+> 
+>    # ps aux | grep iou
+>    ...    07:58   0:00 [kworker/u19:0-iou_exit]
+>    ... 07:58   0:00 [kworker/u18:2-iou_exit]
+> 
+> When the test's receiver process exits, bkg() returns but the memory
+> provider may still be attached to the rx queue. The subsequent defer()
+> that restores tcp-data-split then fails:
+> 
+>    # Exception while handling defer / cleanup (callback 3 of 3)!
+>    # Defer Exception| net.ynl.pyynl.lib.ynl.NlError:
+>        Netlink error: can't disable tcp-data-split while device has
+>                       memory provider enabled: Invalid argument
+>    not ok 1 iou-zcrx.test_zcrx.single
+> 
+> Add a helper that polls netdev queue-get until no rx queue reports
+> the io-uring memory provider attribute. Register it as a defer()
+> just before tcp-data-split is restored as a "barrier".
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: shuah@kernel.org
+> CC: dw@davidwei.uk
+> CC: jdamato@fastly.com
+> CC: linux-kselftest@vger.kernel.org
+> ---
+>   .../selftests/drivers/net/hw/iou-zcrx.py       | 18 +++++++++++++++++-
+>   1 file changed, 17 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
+> index c63d6d6450d2..c27c2064701d 100755
+> --- a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
+> +++ b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
+> @@ -2,14 +2,27 @@
+>   # SPDX-License-Identifier: GPL-2.0
+>   
+>   import re
+> +import time
+>   from os import path
+>   from lib.py import ksft_run, ksft_exit, KsftSkipEx, ksft_variants, KsftNamedVariant
+>   from lib.py import NetDrvEpEnv
+>   from lib.py import bkg, cmd, defer, ethtool, rand_port, wait_port_listen
+> -from lib.py import EthtoolFamily
+> +from lib.py import EthtoolFamily, NetdevFamily
+>   
+>   SKIP_CODE = 42
+>   
+> +
+> +def mp_clear_wait(cfg):
+> +    """Wait for io_uring memory providers to clear from all device queues."""
+> +    deadline = time.time() + 5
 
+This is potentially a very long time to wait if code is buggy, as I
+found out when debugging netkit queue lease. How about reducing this to
+say 1 second?
 
