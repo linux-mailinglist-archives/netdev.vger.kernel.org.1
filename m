@@ -1,173 +1,287 @@
-Return-Path: <netdev+bounces-262681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262682-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KDmFBVijpWngCwAAu9opvQ
-	(envelope-from <netdev+bounces-262681-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 15:48:56 +0100
+	id 8Ga9Io2jpWngCwAAu9opvQ
+	(envelope-from <netdev+bounces-262682-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 15:49:49 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30B071DB24D
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 15:48:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF7D51DB299
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 15:49:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 388A93071A5D
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 14:43:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 61CC530136B1
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 14:45:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 360733F075A;
-	Mon,  2 Mar 2026 14:43:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9971401485;
+	Mon,  2 Mar 2026 14:45:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="dlPF4pya";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="xcANsfwI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NfjNxJe8"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b5-smtp.messagingengine.com (fout-b5-smtp.messagingengine.com [202.12.124.148])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB6EE3FD13E
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 14:43:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C69E13FFAD5;
+	Mon,  2 Mar 2026 14:45:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772462632; cv=none; b=VTcnk2zFLaWbFE5AeH+cFkyyf505vVLCdyC/AcaGQK1yOiqVg13dw2D16wwolWLaH/CEVqtF2t5hFWeZgT6mCfEVWYU7nRXy5hBjTVkAyFajRyb9FAnibQosoeBn533J4jZ1z4FqkDkuEyk7gv3zR0AnsZ7k5EiyrdC4krg4cvo=
+	t=1772462703; cv=none; b=YaPXKZzASR9ssdt4ujmnYH5y/Kv3RqDAWDb0fgZ3+nEXcKdpA1QYaFEDUAVn2yvzUuw49FIPJrQBRncs1AnYd0rqT5Opf7ZdmLKuPM97xGjgzOq51K2nQvW3HqSPU08o3sYIWpbP+NjYgrhfGqySThdbUNsYom7wAV0g7gkFvmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772462632; c=relaxed/simple;
-	bh=RQGmZZ8CEhR1S209GcP/TlrZH674Q1jePi2YgB5Jt2w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VBmVqT7mhSP3qdD02liWZNIfnPA2X6bHxzZCQLhc1AZATeFLqJWbshYlnfI3+/VQrgtP9t349EXDdU1lY99+2TEafGLcIL2TiTUXRCs4qeicl7P/sbv8gas+PHMarheFZ3lpzGq8KM2Mq+r9vqHHKuJnZda8DIm8vZFBF75texo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=dlPF4pya; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=xcANsfwI; arc=none smtp.client-ip=202.12.124.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.stl.internal (Postfix) with ESMTP id 9F9C91D001AD;
-	Mon,  2 Mar 2026 09:43:47 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-04.internal (MEProxy); Mon, 02 Mar 2026 09:43:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1772462627; x=
-	1772549027; bh=MARMD3Ck8MulvZzKCwCpHskTpJ6yye/yw1QtgDrg/18=; b=d
-	lPF4pyapd3EDMVErw2Tgn0x8CsF4xk88rZKfvFo3xMwQPmNV+ESECJCH588KYGF5
-	l2FYorsLXFFliX+zGucUlBvAvs0W/DDKM2UwfVV6JXSf00kgFkjGkjLMnw4PuI1u
-	cSSqpq0Sulkv2jGkc3bwvNI/mkmhIJ/mjqvYBegwTaEg8b2ht7tp+bPTp1W93uUp
-	HX5Ribe0lW0gj4AevCBKhjoWR8WjGTBlgRU+g5QXU9LFD9uzUAje0MZTG9LKLvBR
-	H58NL84ZTkLJZQ6mVpKaC3Y9fM4EWvPTDfsEG2e3NVRtDVew2+sIOs8spgj4LQtK
-	osou8EXUl5eLRbe66theQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1772462627; x=1772549027; bh=MARMD3Ck8MulvZzKCwCpHskTpJ6yye/yw1Q
-	tgDrg/18=; b=xcANsfwIttP5RZzLLoCMyW0i4hCiizPspwj0CkCJFevoh6zVf4e
-	aGADnmhqqzl7a1r9u3wXGcLsJVtJ/qtjyGRPcH4ev1Nvr7yue5yWhY+7fv+kjnkE
-	EdQAEw1WcFOKEryngGSUgDoJZOuQBlRmXDKRy11u0J2tA6qbKueoZrswdPOtM21E
-	lqV6kbSi091DR3FMWLBAH0fA+jaj7RmBCtR17sBd0yiUs9zkVUYuB2r6+5ou1vLY
-	dBR9ZGdsnoQljbzaeFo0JlrrJxnupCuaYqSDYm0DDzDDN5lcsxFomSTFvr3G6DmY
-	M4JqmrLx9tVTZAfcxBzkwYXyxZ4D7X7wO0w==
-X-ME-Sender: <xms:IqKlaWfVtWVB6rOHJZmjwr6UgaFqL9kKxst15ehBvJmy2_GWrc_4ZQ>
-    <xme:IqKlaevuhNhHLBei-r9rfC2-BtDKJ-jFAzcj-xP8tMi_R01FkGKM5Kjhn82NrUFyS
-    p0MGGvGX7TdDOTA2q4UPekkO4QsXQ8rFKdg9_4Vj4vqQSILD5nqR-E>
-X-ME-Received: <xmr:IqKlaTAbA0gKQHeEzPxDjM1fFIsxjICPuBisYuqF7nmsTSSb3sXnomYxuahj>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvheejleegucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedugedpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtohepfhhmrghntggvrhgrsehsuhhsvgdruggvpd
-    hrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
-    ohepsghrihgughgvsehlihhsthhsrdhlihhnuhigrdguvghvpdhrtghpthhtoheprhhooh
-    hprgestghumhhulhhushhnvghtfihorhhkshdrtghomhdprhgtphhtthhopehsughfsehf
-    ohhmihgthhgvvhdrmhgvpdhrtghpthhtohepphgvthhrmhesnhhvihguihgrrdgtohhmpd
-    hrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepihguohhs
-    tghhsehnvhhiughirgdrtghomhdprhgtphhtthhopehrrgiiohhrsegslhgrtghkfigrlh
-    hlrdhorhhg
-X-ME-Proxy: <xmx:IqKlaeFGewbUEyu1s6_Zrf2FsddK5ftcwDTk_XKCatBIoaDzkrO-Rg>
-    <xmx:IqKlabvTdzoGfXDJ4VzcbTUt3m8NT-kKF3iUdpAbds0YumEoczQQhQ>
-    <xmx:IqKlacm5XirjKiuFF3qDWpmZgNnSCRokEtF5jD2masfUErU4fW7yKg>
-    <xmx:IqKlaWPFwD_EX_v8NSs-oYmr2zteG9rMNqUOgmvT_SULDuN7Rit8UA>
-    <xmx:I6KlaWGE2v_-VX5oe3GRkNCSnsbCG1L2i-LBmDflGZr5VDZhWMWGVbGz>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 2 Mar 2026 09:43:45 -0500 (EST)
-Date: Mon, 2 Mar 2026 15:43:43 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Fernando Fernandez Mancera <fmancera@suse.de>
-Cc: netdev@vger.kernel.org, bridge@lists.linux.dev,
-	roopa@cumulusnetworks.com, sdf@fomichev.me, petrm@nvidia.com,
-	horms@kernel.org, idosch@nvidia.com, razor@blackwall.org,
-	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
-	davem@davemloft.net, andrew+netdev@lunn.ch
-Subject: Re: [PATCH 2/2 net v2] net: vxlan: fix nd_tbl NULL dereference when
- IPv6 is disabled
-Message-ID: <aaWiH5KBf-n1NxAR@krikkit>
-References: <20260302140847.5941-1-fmancera@suse.de>
- <20260302140847.5941-2-fmancera@suse.de>
+	s=arc-20240116; t=1772462703; c=relaxed/simple;
+	bh=Nx8e9ImpKfl1Xmp/jb3AnFN0qerg/qMataBRWy7eFoY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IXP1d+FIGXu8Qui806mNWRUyKZmUZqmwavySLS1LC07P+WqtYRionXaLtf4yKIF/k8+LOxyh7nDTNJHsk1gU5dYH6VNAs4qWWJdZ/jRUOPUwFq5ZcACTKM52zEZW43BcrRNZxHBuK6A8hFRhUh54QGoTj4akRIgeASUj8ycrN8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NfjNxJe8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DEEFC19423;
+	Mon,  2 Mar 2026 14:45:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772462703;
+	bh=Nx8e9ImpKfl1Xmp/jb3AnFN0qerg/qMataBRWy7eFoY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=NfjNxJe80eSbLMNI+9ecgLfrvkFcjT2UW5TdK9TbnzYeJC3jjDq1V2E40XiEu1mtB
+	 jO0FM8ttExBsrkESGAgpfJr0xUYLEDT/lEi6992skVT+oCsHb4YNnilAxcZ8VW+9Tj
+	 1MhLdtXO34adjm65as9fs7iZPi1tpqJM2yKqJsB+aA0jKW3KwipaY1Ri+40HhEuLax
+	 1h7hYSin9yt4tBns/FQR0EUujDjsnG8wWxhfaqeugIS3FGq6MflILnZCKQCCshbeHv
+	 owIsIEc/HPKIhm47ZyHX8JAf24x1fnIN6VmKgW+gx2Y3Uga7or0TEq0Dhx2MpfNWs9
+	 1QLx9905kAvTg==
+Received: by wens.tw (Postfix, from userid 1000)
+	id 996B05FCAC; Mon, 02 Mar 2026 22:45:00 +0800 (CST)
+From: Chen-Yu Tsai <wens@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Chen-Yu Tsai <wens@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: phy: Handle PHY reset during initial PHY ID read
+Date: Mon,  2 Mar 2026 22:44:57 +0800
+Message-ID: <20260302144458.3180702-1-wens@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260302140847.5941-2-fmancera@suse.de>
-X-Rspamd-Queue-Id: 30B071DB24D
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: DF7D51DB299
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262681-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-262682-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,queasysnail.net:dkim]
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[wens@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.997];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-2026-03-02, 15:08:47 +0100, Fernando Fernandez Mancera wrote:
-> When booting with the 'ipv6.disable=1' parameter, the nd_tbl is never
-> initialized because inet6_init() exits before ndisc_init() is called
-> which initializes it. If an IPv6 packet is injected into the interface,
-> route_shortcircuit() is called and a NULL pointer dereference happens on
-> neigh_lookup().
+The mdio device core handles reset GPIOs and controls for PHYs and
+MDIOs after the MDIO or PHY device is created. However this does not
+cover the initial PHY ID read _before_ the PHY device is created, since
+the PHY ID is needed for the PHY device. This causes PHY devices that
+have reset GPIOs or controls to not work after a reboot if the GPIO
+is left in the reset state; neither will it work if the reset GPIO is
+by default (for example, missing a pull-up) in the reset state.
 
-VXLAN can be built-in even when IPv6 is built as a module, and then
-ipv6_mod_enabled can't be used in VXLAN:
+One possible workaround is to place the reset GPIO or control property
+under the MDIO bus instead of under the PHY. However the common PHY
+device tree bindings already allow a reset for the PHY, so we should
+make some effort to support this.
 
-ld: drivers/net/vxlan/vxlan_core.o: in function `route_shortcircuit':
-drivers/net/vxlan/vxlan_core.c:2133:(.text+0x116e0): undefined reference to `ipv6_mod_enabled'
+Rework get_phy_device() to allow passing in a fwnode handle for the PHY
+device, and use the handle to acquire the reset GPIO, control and delay
+timings for it. Before reading the PHY ID, deassert the reset. This
+reworked version is renamed to fwnode_get_phy_device(), with
+get_phy_device() calling the new version.
 
+Use this new version in fwnode_mdiobus_register_phy() so that PHY reset
+is handled. This allows the reset GPIO and reset control in the common
+Ethernet PHY device tree to be correctly handled without any gotchas.
 
-GENEVE has a Kconfig tweak to prevent this since 094be0927ff3
-("geneve: fix build with modular IPV6"):
+Signed-off-by: Chen-Yu Tsai <wens@kernel.org>
+---
+This work was the result of Russell mentioning [1] that placing the
+reset GPIO under the PHY node in the device tree might result in it
+not working.
 
-    depends on IPV6 || !IPV6
+I also talked about this at Plumbers in Tokyo last year during the
+Device Tree MC. There a few people mentioned that MDIO reset handling
+has been a pain point.
 
-but VXLAN doesn't.
+[1] https://lore.kernel.org/linux-sunxi/aJy_qUbmqoOG-GBC@shell.armlinux.org.uk/
 
-But then I think we don't need to use ipv6_stub at all.
+ drivers/net/mdio/fwnode_mdio.c |  2 +-
+ drivers/net/phy/phy_device.c   | 47 +++++++++++++++++++++++++++++++---
+ include/linux/phy.h            | 10 +++++++-
+ 3 files changed, 53 insertions(+), 6 deletions(-)
 
+diff --git a/drivers/net/mdio/fwnode_mdio.c b/drivers/net/mdio/fwnode_mdio.c
+index ba7091518265..f62a48583404 100644
+--- a/drivers/net/mdio/fwnode_mdio.c
++++ b/drivers/net/mdio/fwnode_mdio.c
+@@ -130,7 +130,7 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
+ 
+ 	is_c45 = fwnode_device_is_compatible(child, "ethernet-phy-ieee802.3-c45");
+ 	if (is_c45 || fwnode_get_phy_id(child, &phy_id))
+-		phy = get_phy_device(bus, addr, is_c45);
++		phy = fwnode_get_phy_device(bus, addr, child, is_c45);
+ 	else
+ 		phy = phy_device_create(bus, addr, phy_id, 0, NULL);
+ 	if (IS_ERR(phy)) {
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 3bd415710bf3..62304fcacc7b 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -15,6 +15,7 @@
+ #include <linux/errno.h>
+ #include <linux/etherdevice.h>
+ #include <linux/ethtool.h>
++#include <linux/gpio/consumer.h>
+ #include <linux/init.h>
+ #include <linux/interrupt.h>
+ #include <linux/io.h>
+@@ -34,6 +35,7 @@
+ #include <linux/pse-pd/pse.h>
+ #include <linux/property.h>
+ #include <linux/ptp_clock_kernel.h>
++#include <linux/reset.h>
+ #include <linux/rtnetlink.h>
+ #include <linux/sfp.h>
+ #include <linux/skbuff.h>
+@@ -1050,14 +1052,17 @@ int fwnode_get_phy_id(struct fwnode_handle *fwnode, u32 *phy_id)
+ EXPORT_SYMBOL(fwnode_get_phy_id);
+ 
+ /**
+- * get_phy_device - reads the specified PHY device and returns its @phy_device
+- *		    struct
++ * fwnode_get_phy_device - reads the specified PHY device and returns its
++ *			   @phy_device struct
+  * @bus: the target MII bus
+  * @addr: PHY address on the MII bus
++ * @fwnode: PHY fwnode handle
+  * @is_c45: If true the PHY uses the 802.3 clause 45 protocol
+  *
+  * Probe for a PHY at @addr on @bus.
+  *
++ * Transparently handle any reset GPIOs.
++ *
+  * When probing for a clause 22 PHY, then read the ID registers. If we find
+  * a valid ID, allocate and return a &struct phy_device.
+  *
+@@ -1068,21 +1073,55 @@ EXPORT_SYMBOL(fwnode_get_phy_id);
+  * Returns an allocated &struct phy_device on success, %-ENODEV if there is
+  * no PHY present, or %-EIO on bus access error.
+  */
+-struct phy_device *get_phy_device(struct mii_bus *bus, int addr, bool is_c45)
++struct phy_device *fwnode_get_phy_device(struct mii_bus *bus, int addr,
++					 struct fwnode_handle *fwnode, bool is_c45)
+ {
+ 	struct phy_c45_device_ids c45_ids;
++	struct gpio_desc *gpiod = NULL;
++	struct reset_control *rstc = NULL;
+ 	u32 phy_id = 0;
++	u32 delay = 0;
+ 	int r;
+ 
+ 	c45_ids.devices_in_package = 0;
+ 	c45_ids.mmds_present = 0;
+ 	memset(c45_ids.device_ids, 0xff, sizeof(c45_ids.device_ids));
+ 
++	if (fwnode) {
++		/* Deassert the optional reset signal */
++		gpiod = fwnode_gpiod_get_index(fwnode, "reset", 0,
++					       GPIOD_OUT_LOW, "PHY reset");
++		if (IS_ERR(gpiod)) {
++			if (PTR_ERR(gpiod) == -ENOENT)
++				gpiod = NULL;
++			else if (PTR_ERR(gpiod) == -ENOSYS)
++				gpiod = NULL;
++			else
++				return ERR_CAST(gpiod);
++		}
++
++		if (is_of_node(fwnode)) {
++			rstc = of_reset_control_get_optional_exclusive(to_of_node(fwnode), "phy");
++			if (IS_ERR(rstc))
++				return ERR_CAST(rstc);
++			reset_control_deassert(rstc);
++		}
++
++		/* Wait for PHY to come out of reset if needed */
++		if (!fwnode_property_read_u32(fwnode, "reset-deassert-us", &delay))
++			fsleep(delay);
++	}
++
+ 	if (is_c45)
+ 		r = get_phy_c45_ids(bus, addr, &c45_ids);
+ 	else
+ 		r = get_phy_c22_id(bus, addr, &phy_id);
+ 
++	if (!IS_ERR_OR_NULL(rstc))
++		reset_control_put(rstc);
++	if (!IS_ERR_OR_NULL(gpiod))
++		gpiod_put(gpiod);
++
+ 	if (r)
+ 		return ERR_PTR(r);
+ 
+@@ -1100,7 +1139,7 @@ struct phy_device *get_phy_device(struct mii_bus *bus, int addr, bool is_c45)
+ 
+ 	return phy_device_create(bus, addr, phy_id, is_c45, &c45_ids);
+ }
+-EXPORT_SYMBOL(get_phy_device);
++EXPORT_SYMBOL(fwnode_get_phy_device);
+ 
+ /**
+  * phy_device_register - Register the phy device on the MDIO bus
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index 6f9979a26892..3bd3bbc1b281 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -2142,7 +2142,15 @@ int fwnode_get_phy_id(struct fwnode_handle *fwnode, u32 *phy_id);
+ struct mdio_device *fwnode_mdio_find_device(struct fwnode_handle *fwnode);
+ struct phy_device *fwnode_phy_find_device(struct fwnode_handle *phy_fwnode);
+ struct fwnode_handle *fwnode_get_phy_node(const struct fwnode_handle *fwnode);
+-struct phy_device *get_phy_device(struct mii_bus *bus, int addr, bool is_c45);
++struct phy_device *fwnode_get_phy_device(struct mii_bus *bus, int addr,
++					 struct fwnode_handle *fwnode, bool is_c45);
++
++static inline
++struct phy_device *get_phy_device(struct mii_bus *bus, int addr, bool is_c45)
++{
++	return fwnode_get_phy_device(bus, addr, NULL, is_c45);
++}
++
+ int phy_device_register(struct phy_device *phy);
+ void phy_device_free(struct phy_device *phydev);
+ void phy_device_remove(struct phy_device *phydev);
 -- 
-Sabrina
+2.47.3
+
 
