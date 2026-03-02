@@ -1,158 +1,220 @@
-Return-Path: <netdev+bounces-262667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262668-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6BmiFe+apWnxEgYAu9opvQ
-	(envelope-from <netdev+bounces-262667-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 15:13:03 +0100
+	id CAp7LDSbpWmfEwYAu9opvQ
+	(envelope-from <netdev+bounces-262668-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 15:14:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9D5C1DA74E
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 15:13:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33ED81DA7EF
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 15:14:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 879EE3041D7D
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 14:07:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 45F42306B08E
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 14:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E754C3FD145;
-	Mon,  2 Mar 2026 14:06:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E9193FD12C;
+	Mon,  2 Mar 2026 14:09:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A7y2s0JM"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="JaeFBun9";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Voe/0HsX";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="JaeFBun9";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Voe/0HsX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3ACD3FD13F;
-	Mon,  2 Mar 2026 14:06:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC1E13FB066
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 14:08:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772460416; cv=none; b=Bs2X/q/ROe73Z44UaI3IaC6avkAOvEWbo+NpyZ9u/X/gikD6gAnGpeq2MErhGmpYgMFqto42n+JmegYP9NslAsCQ9EIfWEhXX7vDjKFKgps6GZsD9voqjFaojJSu0Ku6yEs+7/aOZne4F2dQhb+C+m07wmLGajmb+z/DgVEkXvo=
+	t=1772460541; cv=none; b=kwfO1FtgQ79OQQVmfN40VOcW+4nVlxjD2yQNCALzfg9z8whFq8ZxfG5c/m9jUwn5M6oc6QaXBvfHXT4w3ZJ6ifZQA5Qdvsnf1GHRdG7GcgkLIGa/cMFAjyaU/mjyv96TK/FOFq0Zu9D36edh657AGImHH+cVkhbUsvH4GT3WuHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772460416; c=relaxed/simple;
-	bh=qQvKyY355WiiUZ5PDr+CWS9ETxDQZyTIWeRmwyfhO5A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NVi139C0dLrQCNBazZ7FzSN0BLtJSiWkMmYvpQnRwCyaDsqZuzDAAXGFtx3S5vUAKABosVC7cvZfvtZXrQBb25vUSTrrZ4ql9lFMd5gzXhmeFXAa37HVHmSOGzryYPGmsWlcuKkIQzoyzZgydq1mBtAg/Y5Pb2AioR9/+5YmFSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A7y2s0JM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16E99C2BC87;
-	Mon,  2 Mar 2026 14:06:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772460416;
-	bh=qQvKyY355WiiUZ5PDr+CWS9ETxDQZyTIWeRmwyfhO5A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=A7y2s0JMNbE3IzW0gV/VicaMP+jY2VZhuMzDEyqCe/clINZ6iRrjF1r3yX/h38EuD
-	 HKhtfnrO1+7BGOZRtuBKJCrgrH7M1/BsjR2bwkkFJt+2Y0cfsVuHeOr1O0ySwcI+Pu
-	 QcG6UI53+tTQJ/EXpboNu+rUSSftw9E5JG2cklNoeOULTdkAW3+s2hpp5KPi3evdz3
-	 ci/ARygrF0ZVyegNUtNqXWkw0GX/lAYwDv9pxrlwJVrK2rzV4xkaamOaLk0YfObQPV
-	 +iy+E/A5R1kmhEVdN/AV5XpkjhGfipTzxb70+tHTWGGtFZ2qtFiJgdeMFrqDtKZPd4
-	 5wvrQhI+g7Udg==
-Date: Mon, 2 Mar 2026 16:06:52 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
-	Mark Bloch <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Maher Sanalla <msanalla@nvidia.com>
-Subject: Re: [PATCH rdma-next 0/6] Add support for TLP emulation
-Message-ID: <20260302140652.GQ12611@unreal>
-References: <20260225-var-tlp-v1-0-fe14a7ac7731@nvidia.com>
- <20260226173434.62c82688@kernel.org>
+	s=arc-20240116; t=1772460541; c=relaxed/simple;
+	bh=uPreQEHq9ukyJi/SHI78nygBsAkjt6qfk+gBXPEkZEQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oPZ3BiUBqOHS2wQ8Pa5ktHW/FdC6nhYiNy/lLPHnYgqVzXn+9NHvbeZE+xg68kpiabFCY/xs/Kf2B7iUGvlrSh73kC4CMTdaoDfOWDnZdhAr9WoBRQUrbqYRCEGIuazOiThyA3EcyLrOJU5u/yf/3qFmJgZkGdmCR3ndHTPcpwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=JaeFBun9; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Voe/0HsX; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=JaeFBun9; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Voe/0HsX; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 1E3395BD5C;
+	Mon,  2 Mar 2026 14:08:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772460537; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=gw8Ce3X5Yy4lAreif+jpgOyQBGbaxECN3fO3+N84yE0=;
+	b=JaeFBun9T+mVvH9X387jtLhvcxznyQo5XRQHbepKAOrnHs7EvPcOwJfvspXeC43kxZj29n
+	ErmyIeWZKIXuOvYs8/0Poyuox6puyTw+1zlLDwW6W4rP1tKxgNVicuIBt/Gb0jf+SyH+IN
+	a61LKMkfrg3ihJRZl/pWXoLUm0MlUA8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772460537;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=gw8Ce3X5Yy4lAreif+jpgOyQBGbaxECN3fO3+N84yE0=;
+	b=Voe/0HsXgDDQ8B6FrdtiaHm4HiG3x5s5NnWj/C7KH99PL9akSR3g4SxDHIVCDL8rPpmuho
+	iQPZ7jtPeFii0hCg==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=JaeFBun9;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="Voe/0HsX"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772460537; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=gw8Ce3X5Yy4lAreif+jpgOyQBGbaxECN3fO3+N84yE0=;
+	b=JaeFBun9T+mVvH9X387jtLhvcxznyQo5XRQHbepKAOrnHs7EvPcOwJfvspXeC43kxZj29n
+	ErmyIeWZKIXuOvYs8/0Poyuox6puyTw+1zlLDwW6W4rP1tKxgNVicuIBt/Gb0jf+SyH+IN
+	a61LKMkfrg3ihJRZl/pWXoLUm0MlUA8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772460537;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=gw8Ce3X5Yy4lAreif+jpgOyQBGbaxECN3fO3+N84yE0=;
+	b=Voe/0HsXgDDQ8B6FrdtiaHm4HiG3x5s5NnWj/C7KH99PL9akSR3g4SxDHIVCDL8rPpmuho
+	iQPZ7jtPeFii0hCg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3F6323EA69;
+	Mon,  2 Mar 2026 14:08:56 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id O56TDPiZpWnCJAAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Mon, 02 Mar 2026 14:08:56 +0000
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+To: netdev@vger.kernel.org
+Cc: bridge@lists.linux.dev,
+	roopa@cumulusnetworks.com,
+	sdf@fomichev.me,
+	petrm@nvidia.com,
+	horms@kernel.org,
+	idosch@nvidia.com,
+	razor@blackwall.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	andrew+netdev@lunn.ch,
+	Fernando Fernandez Mancera <fmancera@suse.de>,
+	Guruprasad C P <gurucp2005@gmail.com>
+Subject: [PATCH 1/2 net v2] net: bridge: fix nd_tbl NULL dereference when IPv6 is disabled
+Date: Mon,  2 Mar 2026 15:08:46 +0100
+Message-ID: <20260302140847.5941-1-fmancera@suse.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260226173434.62c82688@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Score: -1.51
+X-Spam-Level: 
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262667-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[lists.linux.dev,cumulusnetworks.com,fomichev.me,nvidia.com,kernel.org,blackwall.org,redhat.com,google.com,davemloft.net,lunn.ch,suse.de,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-262668-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C9D5C1DA74E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,suse.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 33ED81DA7EF
 X-Rspamd-Action: no action
 
-On Thu, Feb 26, 2026 at 05:34:34PM -0800, Jakub Kicinski wrote:
-> On Wed, 25 Feb 2026 16:19:30 +0200 Leon Romanovsky wrote:
-> > This series adds support for Transaction Layer Packet (TLP) emulation
-> > response gateway regions, enabling userspace device emulation software
-> > to write TLP responses directly to lower layers without kernel driver
-> > involvement.
-> > 
-> > Currently, the mlx5 driver exposes VirtIO emulation access regions via
-> > the MLX5_IB_METHOD_VAR_OBJ_ALLOC ioctl. This series extends that
-> > ioctl to also support allocating TLP response gateway channels for
-> > PCI device emulation use cases.
-> 
-> Why is this an RDMA thing if it's a PCIe feature indented for VirtIO?
+When booting with the 'ipv6.disable=1' parameter, the nd_tbl is never
+initialized because inet6_init() exits before ndisc_init() is called
+which initializes it. Then, if neigh_suppress is enabled and an ICMPv6
+Neighbor Discovery packet reaches the bridge, br_do_suppress_nd() will
+dereference ipv6_stub->nd_tbl which is NULL, passing it to
+neigh_lookup(). This causes a kernel NULL pointer dereference.
 
-This is the result of a long path of evolution.
+ BUG: kernel NULL pointer dereference, address: 0000000000000268
+ Oops: 0000 [#1] PREEMPT SMP NOPTI
+ [...]
+ RIP: 0010:neigh_lookup+0x16/0xe0
+ [...]
+ Call Trace:
+  <IRQ>
+  ? neigh_lookup+0x16/0xe0
+  br_do_suppress_nd+0x160/0x290 [bridge]
+  br_handle_frame_finish+0x500/0x620 [bridge]
+  br_handle_frame+0x353/0x440 [bridge]
+  __netif_receive_skb_core.constprop.0+0x298/0x1110
+  __netif_receive_skb_one_core+0x3d/0xa0
+  process_backlog+0xa0/0x140
+  __napi_poll+0x2c/0x170
+  net_rx_action+0x2c4/0x3a0
+  handle_softirqs+0xd0/0x270
+  do_softirq+0x3f/0x60
 
-Early on, we had VDPA emulation implemented entirely within the RDMA
-stack. The idea was to build something similar to a tun/tap pair, where
-a native RDMA QP could be connected to RDMA QPs carrying WQEs formatted
-in the VirtIO layout. With some QEMU-side handling, this produced a
-virtio-net device.
+Fix this by replacing IS_ENABLED(IPV6) call with ipv6_mod_enabled() in
+the callers. This is in essence disabling NS/NA suppression when IPv6 is
+disabled.
 
-Later, this model was adapted for a DPU configuration. In that setup,
-the DPU's RDMA block held the native QPs, while the x86 host exposed the
-VirtIO-formatted QPs, still with QEMU involved. The DPU controlled the
-x86-side "tun/tap" through RDMA-linked operations on the associated
-objects.
+Fixes: ed842faeb2bd ("bridge: suppress nd pkts on BR_NEIGH_SUPPRESS ports")
+Reported-by: Guruprasad C P <gurucp2005@gmail.com>
+Closes: https://lore.kernel.org/netdev/CAHXs0ORzd62QOG-Fttqa2Cx_A_VFp=utE2H2VTX5nqfgs7LDxQ@mail.gmail.com/
+Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+---
+v2: use ipv6_mod_enabled() instead of a null check and replace the check
+on the caller
+---
+ net/bridge/br_device.c | 2 +-
+ net/bridge/br_input.c  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-Next, the DPU evolved to instantiate a full VirtIO PCI function on its
-own, removing the need for x86 to run QEMU. The DPU continued to manage
-the tun/tap via RDMA operations, with some extensions to cover PCI-
-related details.
+diff --git a/net/bridge/br_device.c b/net/bridge/br_device.c
+index ee01122f466f..f7502e62dd35 100644
+--- a/net/bridge/br_device.c
++++ b/net/bridge/br_device.c
+@@ -74,7 +74,7 @@ netdev_tx_t br_dev_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	     eth_hdr(skb)->h_proto == htons(ETH_P_RARP)) &&
+ 	    br_opt_get(br, BROPT_NEIGH_SUPPRESS_ENABLED)) {
+ 		br_do_proxy_suppress_arp(skb, br, vid, NULL);
+-	} else if (IS_ENABLED(CONFIG_IPV6) &&
++	} else if (ipv6_mod_enabled() &&
+ 		   skb->protocol == htons(ETH_P_IPV6) &&
+ 		   br_opt_get(br, BROPT_NEIGH_SUPPRESS_ENABLED) &&
+ 		   pskb_may_pull(skb, sizeof(struct ipv6hdr) +
+diff --git a/net/bridge/br_input.c b/net/bridge/br_input.c
+index 1405f1061a54..2cbae0f9ae1f 100644
+--- a/net/bridge/br_input.c
++++ b/net/bridge/br_input.c
+@@ -170,7 +170,7 @@ int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb
+ 	    (skb->protocol == htons(ETH_P_ARP) ||
+ 	     skb->protocol == htons(ETH_P_RARP))) {
+ 		br_do_proxy_suppress_arp(skb, br, vid, p);
+-	} else if (IS_ENABLED(CONFIG_IPV6) &&
++	} else if (ipv6_mod_enabled() &&
+ 		   skb->protocol == htons(ETH_P_IPV6) &&
+ 		   br_opt_get(br, BROPT_NEIGH_SUPPRESS_ENABLED) &&
+ 		   pskb_may_pull(skb, sizeof(struct ipv6hdr) +
+-- 
+2.53.0
 
-Eventually, the DPU gained general-purpose programmable co-processors
-capable of executing various RDMA and non-RDMA operations. As a result,
-the RDMA subsystem also became responsible for loading programs onto
-these co-processors and managing them within RDMA context and PD
-security constraints.
-
-Now we have reached a stage where these co-processors can manage a much
-larger portion of the PCI-side behavior, including delegating some
-responsibilities back to the host CPU. This produces an odd situation
-where a privileged RDMA user can:
-
-- Claim an "emulation" PCI function
-- Load a co-processor program associated with that PCI function
-- Use RDMA-mediated queues and security controls to interact with the
-  co-processor program
-- Use the co-processor and related mechanisms to capture and respond to
-  TLPs directed to that PCI function
-
-There are many tightly coupled components in this design, but the TLP
-handling cannot be separated from the RDMA-related logic that enables
-it.
-
-Thanks
 
