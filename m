@@ -1,378 +1,179 @@
-Return-Path: <netdev+bounces-262673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262674-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CKoIGMegpWmyCwAAu9opvQ
-	(envelope-from <netdev+bounces-262673-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 15:37:59 +0100
+	id eLktGXuhpWmuCAAAu9opvQ
+	(envelope-from <netdev+bounces-262674-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 15:40:59 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C23181DAFD4
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 15:37:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB5951DB0A0
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 15:40:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 10C083046BB9
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 14:23:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C6690312EF32
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 14:29:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF4533E7163;
-	Mon,  2 Mar 2026 14:23:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A5603FD13B;
+	Mon,  2 Mar 2026 14:29:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hvwquiQ9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YQ09nBsB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 945F432142B;
-	Mon,  2 Mar 2026 14:23:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772461433; cv=fail; b=oohH2bF8e29OVJADUUZ/U4BlFMBF8cEBWld8XUK3h1du+vHah0+b+eVlZz5YdqPRoSCQdIZtGJhnA+PS7tCszTjtRTorywavavgta/Z3KxWpEr3+rTCyWTQwdukkLDNY8VyZ0/cP137cLjLAth/ydQ/pYR5AXB+xwAZs2RaYbVo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772461433; c=relaxed/simple;
-	bh=ngAs0F/HPIWvv++5BGVra7FCYbwuox7QxsdLmbRc0GA=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=ChjLW/LLT7IBOsEoe/6gl49yUL6XMNs4uGp8DzOe/zkNhAMeOvvAuAflwP6VhAlw3JLUWLw9oe0jvNxKEC7gDwrhr2P08YVdx5lbH57b2B6JMtirHE/yhyPzMb0v0gWDrJfpy9bpMA8XYxRTrCo93/Fe8B48jr7ZG+zgprkkPP4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hvwquiQ9; arc=fail smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772461432; x=1803997432;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=ngAs0F/HPIWvv++5BGVra7FCYbwuox7QxsdLmbRc0GA=;
-  b=hvwquiQ9qZOvhOoXRsoZBv6KEOEpw2/NYKMI5S2lco1i4f69n+dbMzwa
-   92HzsCHMwuIdQBkIEhmVi4A7kfr1oSIBJslvIv/wZU+i782yYqzzpZaDo
-   EeVe2LU+sVSgA/tneQLTUnBx2nnHWAeZ/AdPvfBhFElajVPUWrP8r/gol
-   LIqMJy9vybVpjk8+TNwAsS6nO73vcn1rZVPnYAMhX/7tmQzc+nLg+WikK
-   tQz0pMwxzTeK3lUwWwhc6zPcSl2OoPR0xtMY637a1lDdC7ImZ6yXuYYC3
-   XQq8l4+iQ1LK1e7/AxjpqZ0eC9603hqnoZpvWaXo/1DDbQi09EASMdw77
-   g==;
-X-CSE-ConnectionGUID: tIVGV1P2Q2+/vRUO91B4tg==
-X-CSE-MsgGUID: BUe2/fU9SW6yyMl35iPhFA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11717"; a="76069763"
-X-IronPort-AV: E=Sophos;i="6.21,320,1763452800"; 
-   d="scan'208";a="76069763"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 06:23:51 -0800
-X-CSE-ConnectionGUID: Dsu19VLeS5GL1MsyBsefCQ==
-X-CSE-MsgGUID: 9wM73wKmRfWhUF7+P+NP/Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,320,1763452800"; 
-   d="scan'208";a="216804484"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 06:23:51 -0800
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Mon, 2 Mar 2026 06:23:50 -0800
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Mon, 2 Mar 2026 06:23:50 -0800
-Received: from CH1PR05CU001.outbound.protection.outlook.com (52.101.193.12) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Mon, 2 Mar 2026 06:23:50 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TFxNOAp0EoyVBs1grfP/HOSqUwZJqtIbiCYsdRsfKgxt3jrgbZlbrEr8/cG07iVRDorpkqTTSSTOniydc0F2ewLCdC9hhygklvpG6ROCiSY574pzgXy260r4jMM58BvlX+bHU/K4liJ2rwm9nMes69BmOnwo+cjfN8hILJMq9LYLEObkZEwleleYYZs/EapH8teeo6diiEBAKdYVYIDJHCsdldRlvzOZGqpcU49wq3U00WPrMD9bQDtj5ctmj3FkkP/WQQlacG6hySIy+Qnnb5cv/r5KtEmtJFO+XgqnvXIOQ5DammsOSqqRNShXQo9LVPS5j+RjNOJ7/ywRfZpAqw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pmj5XsF2m3O5MSyrUcWb5Xu9g6zTKfbODESxPWppAks=;
- b=R7XXhJyVu2iZ+oOjG697b+wHsMU6f7ngYqwuR3LSLc4MDv+NA/B0b1DgWQc6G9Hrf7FavBQGXAmteBDp15ns2PYonZZ3LhzFsALTpG6k7kvCqeOi7nIm+PBrECdQq9wDUJoaHM2OZeAyFPzBCbdXiIzjJcL8zgDYoJ2wOj61cPXFIU5+dCvZvXqteZzH3v0P/T7VJ08wB2eoRoEzLb8t6YK1GrvfPClngxd/ZtadQJcM7dkRUOebkh9w/w8D9RMJEbeJJW9gNPx1NnyqQXcZYP+NBmNL3Jp2Aa6dpxgEqv7TIcy+1kZcHDCtJ0e12E9xwOQawCUneeYc5NmJM7E8zg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
- by BN9PR11MB5323.namprd11.prod.outlook.com (2603:10b6:408:118::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.21; Mon, 2 Mar
- 2026 14:23:47 +0000
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::2edd:5c6d:169c:389b]) by SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::2edd:5c6d:169c:389b%6]) with mapi id 15.20.9654.015; Mon, 2 Mar 2026
- 14:23:46 +0000
-Date: Mon, 2 Mar 2026 15:23:27 +0100
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-CC: <bpf@vger.kernel.org>, Claudiu Manoil <claudiu.manoil@nxp.com>, "Vladimir
- Oltean" <vladimir.oltean@nxp.com>, Wei Fang <wei.fang@nxp.com>, Clark Wang
-	<xiaoning.wang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
-	<john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, "Andrii
- Nakryiko" <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
-	"Eduard Zingerman" <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong
- Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Hao Luo
-	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Simon Horman
-	<horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Alexander Lobakin
-	<aleksander.lobakin@intel.com>, "Bastien Curutchet (eBPF Foundation)"
-	<bastien.curutchet@bootlin.com>, Tushar Vyavahare
-	<tushar.vyavahare@intel.com>, Jason Xing <kernelxing@tencent.com>, Ricardo
- =?iso-8859-1?Q?B=2E_Marli=E8re?= <rbm@suse.com>, Eelco Chaudron
-	<echaudro@redhat.com>, Lorenzo Bianconi <lorenzo@kernel.org>, "Toke
- Hoiland-Jorgensen" <toke@redhat.com>, <imx@lists.linux.dev>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>, <linux-kselftest@vger.kernel.org>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>, Dragos Tatulea
-	<dtatulea@nvidia.com>
-Subject: Re: [PATCH bpf v3 5/9] i40e: fix registering XDP RxQ info
-Message-ID: <aaWdX7f3yxi8gd6s@soc-5CG4396X81.clients.intel.com>
-References: <20260217132450.1936200-1-larysa.zaremba@intel.com>
- <20260217132450.1936200-6-larysa.zaremba@intel.com>
- <aZb7RZMA+7bxcmrL@boxer>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <aZb7RZMA+7bxcmrL@boxer>
-X-ClientProxiedBy: VI1P195CA0083.EURP195.PROD.OUTLOOK.COM
- (2603:10a6:802:59::36) To SN7PR11MB7540.namprd11.prod.outlook.com
- (2603:10b6:806:340::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5899E3FD130
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 14:29:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772461787; cv=none; b=r9cfeuIyjx627dVLziHemVsW2i36nkO1z/rJLuNzTZeCVeie3ZBHIT6bvfLL+0+Qea2YAi2NT+to/3WyjTbthPo49bQmjzWdPFqXKCMQVehU1Eh4eQqcNiaKm4s0mzJ7VeHg+PRWoPNg1yj0un7povx65nukXjRIHOeM8v4vV3A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772461787; c=relaxed/simple;
+	bh=eqdCcUzztg9dkFVpWVnXbBGIb5ze2YX8fLD1r9Emzz8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QRKDv+zNR0L6Ah4Zjm6GWdAciibuXcEQ5HqkMp2GR5xthHVEDA8mR8iJ8rhb3s2Sx+36hDK9WVh/SV0bFTLyjYAc8BLjl0IQLzWKXu7qUF2PURfND5wLDyfnwphl8UiNi8O/426lJPRuhVdLLvZ2TeZvaSh42n7C35+YFnFS5WM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YQ09nBsB; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-359866a1d02so1190038a91.0
+        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 06:29:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772461786; x=1773066586; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HXRhGulAtt197gYnJyd1BzBdmELAPmcsmWWQm7dKai8=;
+        b=YQ09nBsBnsqHj4+iBuUXZ8RvqYXXm90wO3RFXS8GECmyJ3ZPih6fqyugk0Oba5cGW2
+         JxABJkppu+51fsG+WMV2YXuB2Jb9yXqPTtY2uwFKcXtf7srwLC74XbSCos/8Yo0fNU5a
+         H8M8XuSKZ099ZoW/GyRItZLCFEFrqKLKuj2Z+gyjqjT8owOd06izGBU1ORrTj8piDGYE
+         hWExg4rkvChH2LqmlHxe04CI+3ryZ7sHfmeHwoCIuVaYyiCtz9RCfMU0CA+Ie1RZon8I
+         o8CoZwMX4sRjoe3uMgW9FbEzqJ5K6NhPjbQl1MAlFfe3Kh6D4IJ/PFrjj/olpQQsMYi4
+         Rpng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772461786; x=1773066586;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HXRhGulAtt197gYnJyd1BzBdmELAPmcsmWWQm7dKai8=;
+        b=a02XbQD2kdn64wJAk0TAwNHmWHXLxEsfbqhARuzf5IwKqBIDjZXY5H7Rw7ShbUScF5
+         nF9/1nU/WHNYvHIJ5cuYIx1GOQDVMGREEu8Lux5RI9zfSyCa3uzLqMFTvdpslBMIkbv+
+         i3JwZYn59sGNIxCNULACuaAQhTZrVdbKdmwwmMFk9EZBQRppah7yyvLCSoVC18c6/4W2
+         NJmNFKdCnjZif548z+dWAMZQrptK66t6gYZtLRp36rzfnieKYOKi29vNl1mNbIfXRz+D
+         yueNxdNDZnOYm25nYaEKFBFwFEvDWqKMxYzZDx3EI/jS/nyDRRhNtDr0Mnt3o/a8Ae+7
+         JtOA==
+X-Gm-Message-State: AOJu0Yxs5PvKsXtJmqtrYuaMOafuj9gSAoqmopSl0vDV7JcogsnmZ7ME
+	G0HfrTxZNm5Udhz5pAntH9jqqR/iGIKYCICHyRKYZrIZLwFQ5L3UOgaT
+X-Gm-Gg: ATEYQzzl9HRMqmpIs8qBdXXXowr5FNKES4xVBvm0IJk9sYA14oq1cHn43XUIvyEb6jW
+	jgEBymzGxK/Jmv2+3qpsD87ILS/7ZUPjtk7JhqXf551DkjbTPLwYCHH4p+APPZ43zWmuRTJRTRC
+	8+za+c212vZLvQc3ctwoTUVLw+bY3HlFA9ExaovWvIxAFqZv5veEGJDIRdnHrmUYe0otNt60HNe
+	NHwZJsqOhsEd0tNXNWJ5OHurDKbR/Ao0yh6i5r0ziXABONEMD9+/Ibah/joBk1HpjSw9FxcKPQh
+	KvQ3N5tsng0iDvqdRwp/Nie/2NiscRu6vmHR9QihdnOvU8hhGnWJrLJal+8yWCZ8Ap8cJ+Myyrr
+	q2vMM33kgfgO0vCLP4xFSkWd18u+LHBwDE7+KtnTv6ZRC5X3DYlVluVu2BXwqmU5RuTgmbmpKk0
+	ikTZ4ntfUUJIxfx1UJ2W47qFzv2BEX6etUo/rm4qrkyICn80X6x85TYBkbHb42ApOpsIsE
+X-Received: by 2002:a17:90b:2fce:b0:359:8c21:ef51 with SMTP id 98e67ed59e1d1-3598c21f1dfmr3561329a91.4.1772461785578;
+        Mon, 02 Mar 2026 06:29:45 -0800 (PST)
+Received: from sean-All-Series.. (1-160-230-14.dynamic-ip.hinet.net. [1.160.230.14])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35912fbc363sm11341251a91.2.2026.03.02.06.29.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Mar 2026 06:29:45 -0800 (PST)
+From: Sean Chang <seanwascoding@gmail.com>
+To: Andy Shevchenko <andriy.shevchenko@intel.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Sean Chang <seanwascoding@gmail.com>
+Subject: [PATCH] net: macb: use ethtool_sprintf to fill ethtool stats strings
+Date: Mon,  2 Mar 2026 22:29:31 +0800
+Message-Id: <20260302142931.49108-1-seanwascoding@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|BN9PR11MB5323:EE_
-X-MS-Office365-Filtering-Correlation-Id: 414b664e-9fa8-4413-570d-08de786750c6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|10070799003|366016|1800799024|7416014|376014|7142099003;
-X-Microsoft-Antispam-Message-Info: sYX2AqFyjQupd/gDWbmb7CiK4qUDNKfbfco71EUr8VthvwU3zCoRK0jCc8ehhwz4PZEAJ/aDUdpHfjXjSnxzVidY4hZhbnGj4el3yXQL8BWirkXYau626Mr1HVPz4hcTUwy7YlnBczFGAJERier17tIbdGJjWuieAISIAqwQnYx1RAUVnLUANjpUOBGWKupPHc15BWJd+FNJDYIDm9SxNf7UoIw9+zE61TjWla9xazV8uNPLwomViTlmEvNOJxgyymEbqNglNVtq5qX+mA7IKrgKPDTGgCEYpsH8jAVNNECOfZv1gY/vwGEyt6+DqW6CWgDolNV0JefwPnrTLoyGInR6BzdZpslehoNASpdtIjkSk1tDW0hmrBCsK61u6Q6bFPOl531kWhylGaFohW+hnbJL1rki734/gIw2s3ZV0Y7P6HnOqWFdNjLGfrFOs8p7ZBzb0CWPhixD/AVzRIc22OLg6imBtIjl3+4nOe48zIUIUeNxP6n2VfydsCS1Yn6nye99EMAD/Ym0RJ1XDwMOfY3jCXJVoR8XmN24PS7+/5kC9feu2qLRPmO8DwOwoFtP6onDz5e66v8no2dniCZ9hRdtwkwNuj2XGsdjCiDOuOj40yG2J2i7e0vLxUirVBPV+1B3rzEXFPaPXymJeBPDQfRkHhont37XCebhA9h+ZqP9BaTo8FLuHS86URBJnf0Ij53rXrB5Wh/O1O4KW88dY1fnO0ua//+oj6QmBx9G8A4=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(366016)(1800799024)(7416014)(376014)(7142099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?yC+dSIedwV4syeB8GFxX17GyeUR2J1JC4Jpn1ZzbMG2vamtp6/MzH5u2rEXb?=
- =?us-ascii?Q?lLJEAuVJAlSPZkwfJP5W6iG7Zgdl9SV59Bo+OnMjOsBZdqoRG8fNn+jVZ726?=
- =?us-ascii?Q?Eqr3PFCKFR7MPzao5jXJuKIssPhv4WU2Ibd9U1Ca0P8sPRQfZLoCeG228BrR?=
- =?us-ascii?Q?FYncKeDdjxst2RlpfQR0186M0l9Z4gxej8JEItsDEH4/UYzT2rNWuMcLqasH?=
- =?us-ascii?Q?tbu/8Lw4XrDQ4O6ExX+dLCCtTojzm36kvzIKuSurRCmTzSCgpNJ0uMAYeI3Q?=
- =?us-ascii?Q?Z+lY9Wi6V9KAbXQUqGJqBYHwKy4UAukadGTH8WbGoJGf7pitYLmJEG6BIpIX?=
- =?us-ascii?Q?4TUgXfod5ICRqQ9pzGZZR/Du7fQdtASWjwfCtmMT2LhizYIc75O9jNB16WPT?=
- =?us-ascii?Q?hif36oD3pJBdJoQ8VmBWDKenpvAYgoysOuCtm+SyRrGeayqYen/BpgPSswrn?=
- =?us-ascii?Q?mPcV5iLJmjDfmyMwUwXLYjhDkriF0lZYiNHS9xV+V8l60sF0asD8Yl6MJYXS?=
- =?us-ascii?Q?RnU+JK9gDLX1BN6s++I1HT9dFEQ3HEkgJBudKAk2T3sdOmYGwv+nh33dcJat?=
- =?us-ascii?Q?mDip2f85L/c4eXElAfiddOJQkBSOMl9jS78X38S5nAy9FLHRSdbOBeObMMX6?=
- =?us-ascii?Q?5b0HF3sAxpi8RRLEZJOl1EiRJc2c4zL2MHNvMskSwX5MTiwoQO9j/t3w4I5C?=
- =?us-ascii?Q?w//veg2v8C0NNd9vWGmD4TUFMe0pUejKSIMHfMrmyl0ojKdYKf9a2DiLJHgI?=
- =?us-ascii?Q?csLI1J1iSolxPVQgvO1fDJFEP954XfR7tWxtiLQwZEPFf5aK+ccupTWIyIY9?=
- =?us-ascii?Q?ghPBTmu8s43DVbbwjIaqDQJs4qigM0IyQ5HyAPN6STIFG673RLynq8ObIShe?=
- =?us-ascii?Q?ocJpAD5SKsXE40YLy600DC5iAWQic6GBgBsq4qjQkRARvlF0ZOW3Zc04fn40?=
- =?us-ascii?Q?4ne78mRDZTco1+vcA69b7t9MuOdq7wkPyHkax/MmsUmgGkzYlG/DeGCoKaUw?=
- =?us-ascii?Q?VN7H4lY5qeJ1Tz0CYX84NBNr9En5p8aJbUakxReB0zrUCOhYZul46HadOuzl?=
- =?us-ascii?Q?wh5RVZEtXIGzh6tbQPaMGTbngqy3gJaPu6TByoYmaMBiWOcrkO+Tq5Vns223?=
- =?us-ascii?Q?0gMRknhwN9UrW3CcByobopP1IQDzaFwSX0rVUKAQWC45dUcV8nW+cUrBTLQR?=
- =?us-ascii?Q?TYvTYcpvGXUt/C58hHaGmW/m5NMLsmxo7x6OxL1htjriwv3k9OE5IJtFcPRe?=
- =?us-ascii?Q?AaZxb4Wxy4zWsZ9HXrDK5zV186gjUR2QSpZQPFOh1Dpq4T3FPtH4Y5XHXnQg?=
- =?us-ascii?Q?xlkbbjLPV+BD3qX2s40/8CV9HmwNlgUsptyHoQ6+tjfUBjeOyuMBg3agtMN8?=
- =?us-ascii?Q?feCwR3DX8/0Jc5LgDx5WZwta00ALpuz61WmlbEWRU7VJZRE8ceCU6osp4INA?=
- =?us-ascii?Q?ThFKSQGos+HnjCJ9eb1NTTCzy+MHQtRc34mSDOdtfQDUTwBn9EI5K+9pl1e9?=
- =?us-ascii?Q?ooKq6Jo5je2ndnHgPDkLbDeA2va6Q5s7Icy66JDUBYq1nb8ZFenZnvro0052?=
- =?us-ascii?Q?JM7vJpEpQxMFUzuJH7s0zEEhS9tN/xxiY3PVGBShirwwFU5ayMcwjkJVq4jG?=
- =?us-ascii?Q?H7DQFpnhVrpoEgzct57aY6elVHDVbYIULFWLViKmumz5tIEr8ek4HZEVIRJt?=
- =?us-ascii?Q?7e6QyblGc2XAG/o/3Yl+2+tp6Yx7/Q1yKwP6r6XgbDOupHz7wCyrRSGgmG2m?=
- =?us-ascii?Q?S0MudOWbSobFcEX/RfklVNJSzi/8t5D6MUF6RiRCvw+6otstQ89Wmf/U9pKQ?=
-X-MS-Exchange-AntiSpam-MessageData-1: k8pfDQ9+hdMFdB78uDAfHvcORDFOoJBV1yo=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 414b664e-9fa8-4413-570d-08de786750c6
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Mar 2026 14:23:46.8315
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: y1/HFY+lblX2WhRg0UE/2J6K2Q0s3uo1hm0e9ITLBZQueNcC5Nm8ow/taK4GXpGv1vNPw3JG+wObXmhOweWICcqVj6B2lECtKWcTVwkpMxU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5323
-X-OriginatorOrg: intel.com
-X-Rspamd-Queue-Id: C23181DAFD4
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: BB5951DB0A0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[43];
-	FREEMAIL_CC(0.00)[vger.kernel.org,nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,intel.com,iogearbox.net,gmail.com,fomichev.me,linux.dev,bootlin.com,tencent.com,suse.com,lists.linux.dev,lists.osuosl.org,nvidia.com];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-262674-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262673-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	FROM_NEQ_ENVFROM(0.00)[seanwascoding@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[larysa.zaremba@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lunn.ch:email]
 X-Rspamd-Action: no action
 
-On Thu, Feb 19, 2026 at 01:00:05PM +0100, Maciej Fijalkowski wrote:
-> On Tue, Feb 17, 2026 at 02:24:43PM +0100, Larysa Zaremba wrote:
-> > Current way of handling XDP RxQ info in i40e has following problems:
-> > * when xsk_buff_pool is detached, memory model is not unregistered before
-> >   registering a new one, this leads to a dangling xsk_buff_pool in the
-> >   memory model table
-> 
-> What is 'memory model table' in this context?
->
+The RISC-V toolchain triggers a stringop-truncation warning when using
+snprintf() with a fixed ETH_GSTRING_LEN (32 bytes) buffer.
 
-I mean the hash table where we register the allocator when registering XDP RxQ 
-info.
+Convert the driver to use the modern ethtool_sprintf() API from
+linux/ethtool.h. This removes the need for manual snprintf() and
+memcpy() calls, handles the 32-byte padding automatically, and
+simplifies the logic by removing manual pointer arithmetic.
 
-The paragraph is wrong, we do not have such problem currently, as we do not 
-register pass any non-NULL values as allocator. So I will correct the commit 
-message.
+Suggested-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@intel.com>
+Signed-off-by: Sean Chang <seanwascoding@gmail.com>
+---
+his patch was previously part of a SUNRPC/NFSD series [1], but is now
+sent as a standalone cleanup as suggested by Andy Shevchenko to avoid
+cross-subsystem dependencies.
 
-> I believe you are referring to a case where XDP prog is kept alive on
-> interface put you close one socket and then bind the other one?
-> 
-> > * frag_size is not updated when xsk_buff_pool is detached or when MTU is
-> >   changed, this leads to growing tail always failing for multi-buffer
-> >   packets.
-> 
-> Good catch, i now see that i40e_change_mtu() only does the link flap and
-> i40e_free_rx_resources() is not called in this path.
-> 
-> > 
-> > Couple XDP RxQ info registering with buffer allocations and unregistering
-> > with cleaning the ring.
-> > 
-> > Fixes: a045d2f2d03d ("i40e: set xdp_rxq_info::frag_size")
-> > Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-> > ---
-> >  drivers/net/ethernet/intel/i40e/i40e_main.c | 34 ++++++++++++---------
-> >  drivers/net/ethernet/intel/i40e/i40e_txrx.c |  5 +--
-> >  2 files changed, 22 insertions(+), 17 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> > index d3bc3207054f..eaa5b65e6daf 100644
-> > --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-> > +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> > @@ -3577,18 +3577,8 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
-> >  	if (ring->vsi->type != I40E_VSI_MAIN)
-> >  		goto skip;
-> >  
-> > -	if (!xdp_rxq_info_is_reg(&ring->xdp_rxq)) {
-> > -		err = __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
-> > -					 ring->queue_index,
-> > -					 ring->q_vector->napi.napi_id,
-> > -					 ring->rx_buf_len);
-> > -		if (err)
-> > -			return err;
-> > -	}
-> > -
-> >  	ring->xsk_pool = i40e_xsk_pool(ring);
-> >  	if (ring->xsk_pool) {
-> > -		xdp_rxq_info_unreg(&ring->xdp_rxq);
-> >  		ring->rx_buf_len = xsk_pool_get_rx_frame_size(ring->xsk_pool);
-> >  		err = __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
-> >  					 ring->queue_index,
-> > @@ -3600,17 +3590,23 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
-> >  						 MEM_TYPE_XSK_BUFF_POOL,
-> >  						 NULL);
-> >  		if (err)
-> > -			return err;
-> > +			goto unreg_xdp;
-> >  		dev_info(&vsi->back->pdev->dev,
-> >  			 "Registered XDP mem model MEM_TYPE_XSK_BUFF_POOL on Rx ring %d\n",
-> >  			 ring->queue_index);
-> >  
-> >  	} else {
-> > +		err = __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
-> > +					 ring->queue_index,
-> > +					 ring->q_vector->napi.napi_id,
-> > +					 ring->rx_buf_len);
-> > +		if (err)
-> > +			return err;
-> >  		err = xdp_rxq_info_reg_mem_model(&ring->xdp_rxq,
-> >  						 MEM_TYPE_PAGE_SHARED,
-> >  						 NULL);
-> >  		if (err)
-> > -			return err;
-> > +			goto unreg_xdp;
-> >  	}
-> >  
-> >  skip:
-> > @@ -3648,7 +3644,8 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
-> >  		dev_info(&vsi->back->pdev->dev,
-> >  			 "Failed to clear LAN Rx queue context on Rx ring %d (pf_q %d), error: %d\n",
-> >  			 ring->queue_index, pf_q, err);
-> > -		return -ENOMEM;
-> > +		err = -ENOMEM;
-> > +		goto unreg_xdp;
-> >  	}
-> >  
-> >  	/* set the context in the HMC */
-> > @@ -3657,7 +3654,8 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
-> >  		dev_info(&vsi->back->pdev->dev,
-> >  			 "Failed to set LAN Rx queue context on Rx ring %d (pf_q %d), error: %d\n",
-> >  			 ring->queue_index, pf_q, err);
-> > -		return -ENOMEM;
-> > +		err = -ENOMEM;
-> > +		goto unreg_xdp;
-> >  	}
-> >  
-> >  	/* configure Rx buffer alignment */
-> > @@ -3665,7 +3663,8 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
-> >  		if (I40E_2K_TOO_SMALL_WITH_PADDING) {
-> >  			dev_info(&vsi->back->pdev->dev,
-> >  				 "2k Rx buffer is too small to fit standard MTU and skb_shared_info\n");
-> > -			return -EOPNOTSUPP;
-> > +			err = -EOPNOTSUPP;
-> > +			goto unreg_xdp;
-> >  		}
-> >  		clear_ring_build_skb_enabled(ring);
-> >  	} else {
-> > @@ -3695,6 +3694,11 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
-> >  	}
-> >  
-> >  	return 0;
-> > +unreg_xdp:
-> > +	if (ring->vsi->type == I40E_VSI_MAIN)
-> > +		xdp_rxq_info_unreg(&ring->xdp_rxq);
-> > +
-> > +	return err;
-> >  }
-> >  
-> >  /**
-> > diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.c b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-> > index cc0b9efc2637..816179c7e271 100644
-> > --- a/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-> > +++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-> > @@ -1470,6 +1470,9 @@ void i40e_clean_rx_ring(struct i40e_ring *rx_ring)
-> >  	if (!rx_ring->rx_bi)
-> >  		return;
-> >  
-> > +	if (xdp_rxq_info_is_reg(&rx_ring->xdp_rxq))
-> > +		xdp_rxq_info_unreg(&rx_ring->xdp_rxq);
-> > +
-> >  	if (rx_ring->xsk_pool) {
-> >  		i40e_xsk_clean_rx_ring(rx_ring);
-> >  		goto skip_free;
-> > @@ -1527,8 +1530,6 @@ void i40e_clean_rx_ring(struct i40e_ring *rx_ring)
-> >  void i40e_free_rx_resources(struct i40e_ring *rx_ring)
-> >  {
-> >  	i40e_clean_rx_ring(rx_ring);
-> > -	if (rx_ring->vsi->type == I40E_VSI_MAIN)
-> > -		xdp_rxq_info_unreg(&rx_ring->xdp_rxq);
-> >  	rx_ring->xdp_prog = NULL;
-> >  	kfree(rx_ring->rx_bi);
-> >  	rx_ring->rx_bi = NULL;
-> > -- 
-> > 2.52.0
-> > 
+[1] https://lore.kernel.org/all/20260301161709.1365975-1-seanwascoding@gmail.com/
+
+ drivers/net/ethernet/cadence/macb_main.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index 5bc35f651ebd..dadfedd6d799 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -3145,7 +3145,6 @@ static int gem_get_sset_count(struct net_device *dev, int sset)
+ 
+ static void gem_get_ethtool_strings(struct net_device *dev, u32 sset, u8 *p)
+ {
+-	char stat_string[ETH_GSTRING_LEN];
+ 	struct macb *bp = netdev_priv(dev);
+ 	struct macb_queue *queue;
+ 	unsigned int i;
+@@ -3158,11 +3157,8 @@ static void gem_get_ethtool_strings(struct net_device *dev, u32 sset, u8 *p)
+ 			       ETH_GSTRING_LEN);
+ 
+ 		for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
+-			for (i = 0; i < QUEUE_STATS_LEN; i++, p += ETH_GSTRING_LEN) {
+-				snprintf(stat_string, ETH_GSTRING_LEN, "q%d_%s",
+-						q, queue_statistics[i].stat_string);
+-				memcpy(p, stat_string, ETH_GSTRING_LEN);
+-			}
++			for (i = 0; i < QUEUE_STATS_LEN; i++)
++				ethtool_sprintf(&p, "q%u_%s", q, queue_statistics[i].stat_string);
+ 		}
+ 		break;
+ 	}
+-- 
+2.34.1
+
 
