@@ -1,282 +1,155 @@
-Return-Path: <netdev+bounces-262597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262599-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kBvtIIdkpWn0/QUAu9opvQ
-	(envelope-from <netdev+bounces-262597-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 11:20:55 +0100
+	id +LeKLvtmpWmx+wUAu9opvQ
+	(envelope-from <netdev+bounces-262599-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 11:31:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ACA81D6589
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 11:20:54 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CD841D68C2
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 11:31:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7AEA230200F2
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 10:15:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BFA3E300955A
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 10:23:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 565A638F62E;
-	Mon,  2 Mar 2026 10:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1E4239C636;
+	Mon,  2 Mar 2026 10:23:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aERnsOFL"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="qejSHz/m"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944F0394483
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 10:15:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AC0239B95E
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 10:23:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772446544; cv=none; b=jdmQOmaucmKaSl0rgBrj3Pn2a60TBHjEBO1ucKg6a4vAlCcl6rHqqi6wgPZ6kbXVCw3u6GmCX/uZPu6DMgxwHdKAPDd30VzMbqSRYqV9f9IVfPpeXAtP4I0Yn5K0qgGFB8CcqTnWxjP8IOQOPaT/1RzNlJ79g8w+n8FVBUUMMkE=
+	t=1772447004; cv=none; b=cEJ93L00Q5DTdfywuqGRPMTnl4CY7EgCRDS+lIfVDhjVlDRjxNh/4YUAdGN2ok8rHBbWF6p6On8UddPz5IrZQxQIQIJyEzcuzs78DPq6V3bpQbHvmV4O4QdUVq4cqvaSe2Wbh6YaO5UxJ50PEHtV8D0cvBEbtrOHYhznfnqKD84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772446544; c=relaxed/simple;
-	bh=VM2a2BeuVgfGi1ShAXDtMB92p4B/RtLDTkk5cGM+saY=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=VH2qhUEXyMlikQqG8YOt3bdAzK9kThdTAduA/nSwmYg6Y5jGcOA5J/85UWHp38VKdSADZTCNjJMaCSwutZ5M/1ZImey5/t1hIEQthW4ow36JzQFuxEWnqkIZWyFZk/51qU3VlsOkg+FmuxsJGeSWDojCu7rEzOsj9CFFv5FxPr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aERnsOFL; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1772447004; c=relaxed/simple;
+	bh=DxIjiuRLSsy1tFjfqwnUtZGdPPrFPa2emHdfIPwLGaA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CKUq//8CLnOJLqR58SJB46LfXBNAzq9if6Lw/Fe5Ne6wHqiIMfzvxCe7OfZy5VQNPcNePq5tKgbZdp6cRlRzUqtgOw/W2jkfs3biJSjhc/14s3tT5Un8XADf74lsbyjpGuARjNi7TTmAS/Llj2TmDbdpTl2UIOReAc6xS1BYauE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=qejSHz/m; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-439aa2f8ebaso998019f8f.2
+        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 02:23:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1772447000; x=1773051800; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xyf5aAwmciBE7QFfA+/PpQQaPUYccIgX3fQYsSxVl+U=;
+        b=qejSHz/mv7HaqVvybUq9mMdRh91/klcPbrp8m9TDyN6bXhHdCoYkRcI+r0+jbsLuON
+         7V780DKi5GhyAkBytjq2KpvODxTn0X03VlsAQQpYS6py12jJWPQrJU7/rm3LBHu7lD7i
+         UjCVZcSmmNp9mKBlkHOADSXgpl8s9AyI1yxAK1XFCzUbfbotkL1mOYOqvkD2AjRVQ+RF
+         53EouXoHMx31/vSAx9ke/y4E26GeiroFmRLRGzYCSy169dWOQmA9ViMFPosIwtLRY8kX
+         1mfWQ4UXY5lnssavO4yvfLH+vmR2Zt/3QzPiKwI8xtJiuEaxHRgMNv+JLyrRZdMDBTru
+         SN/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772447000; x=1773051800;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xyf5aAwmciBE7QFfA+/PpQQaPUYccIgX3fQYsSxVl+U=;
+        b=ZeqeIQOBJZELGpsMsHK7YzvAMnIpr0S5Y1gqflLrq4dR4QGSDuryAd8LJI+6ZdMry3
+         m4QGHPUiEp5vzCV7cAW4JfkceVHxvg7Iiueo2sjSHoi7/IKviGWK1n2LhOB1ZsA7KVqF
+         TFaHhnmudksJVoLPaN9ZJAIb1Ig9MIB5jBJn7MLAbdSOOLoLLm/zP1asKdGkzZzOz+Ys
+         KIB3uSDtkxAq9Am1k+4RmHqHz/De+L3UghHDvcE7PAqK57uzuf+SUejFYllqdPPSjdE6
+         jtymSSJj837S4Lu3XSZy9qllSF/DpynT5/cawS74mjUNynPMSiYHSC+G4Y+3nOjn7H3U
+         Wpkw==
+X-Gm-Message-State: AOJu0YwAfEVHeLz4FLD14Ge2uDiKSzUeRsqIhZ+cheV69hFfyrc8/J2j
+	UGYVedYk44VAHUIwec4rZpDeQg+FBLg9HK2H1GsaBcpkWjxdHkJv0D3x/EY4LeSBEp7/mUWQPtK
+	sX1V6
+X-Gm-Gg: ATEYQzwwOW5waL6ZkS+823WDBNH4yzCRfe1y+xvWAs5fa2pCWf6A1NLhKFLLCGh7+Lu
+	8hRYEvoOLyQ/p2QWBBz5vyRHxTn/6+WNWb1ep+Jz2Fs7yI2cqxJrTFQVWlZ6I/p5oxilF4KVzfv
+	czHcb2FTchxo5aAes0K4tsEq5QkoVYYqyeSAR+UvY43cLxZ1dRZ/KN7b1GN+ngGyTV9Suw7YNjs
+	VSLIq3egmM1tecEyE5KkkkBCaC3F82kvs6FzCA4a+hUMDjwsgG4OuidSrsz2vAZ0Wm7ySbD0QwT
+	zME6DGgcxeboX48DIKyuw2+jMYJWVqnb7RLknAMmnnVKP9Xr9DFeBWwRzitygprLM3efruIc9YT
+	GvMcs+weqRk3W5EoGv2EmUgd9FnWTKZB+Gqoa9yui1HbGPbK5f4XAot0rgsy0Khuo/j/QsYStzx
+	P/GP0vUuTmTtF6D5mZV/cOrsWChRK5fj4=
+X-Received: by 2002:a05:6000:186e:b0:439:b374:c6d3 with SMTP id ffacd0b85a97d-439b374c7b0mr7633629f8f.32.1772447000348;
+        Mon, 02 Mar 2026 02:23:20 -0800 (PST)
+Received: from FV6GYCPJ69 ([85.163.81.98])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439b1116698sm12378754f8f.16.2026.03.02.02.23.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Mar 2026 02:23:19 -0800 (PST)
+Date: Mon, 2 Mar 2026 11:23:16 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, horms@kernel.org, donald.hunter@gmail.com, corbet@lwn.net, 
+	skhan@linuxfoundation.org, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com, 
+	mbloch@nvidia.com, przemyslaw.kitszel@intel.com, mschmidt@redhat.com, 
+	andrew+netdev@lunn.ch, rostedt@goodmis.org, mhiramat@kernel.org, 
+	mathieu.desnoyers@efficios.com, chuck.lever@oracle.com, matttbe@kernel.org, cjubran@nvidia.com, 
+	daniel.zahka@gmail.com, linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 04/10] devlink: allow to use devlink index as
+ a command handle
+Message-ID: <onwmw7ql5g2xqacrqnawcphdlzfu5v5ohgslsbvoeraszm7m4m@2ywv2ql37wu7>
+References: <20260225133422.290965-1-jiri@resnulli.us>
+ <20260225133422.290965-5-jiri@resnulli.us>
+ <20260228144846.40f5dfeb@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772446530;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CSeL517KPCXAMzvziO2NinmrAr+nMWkzlUfOO21t6Vc=;
-	b=aERnsOFLNEAqLlHB/bLDI13cu6rZN8FFkuVi6DTSGcbPUom+ThQEt2Hcr2k/fHnDr3RQoF
-	6XerNbJjSsQGJEeUa5C7MU77RVHEXfDonFAjzT8ANp6fzkr6ewMEFyUqqxXEOUG6oKpw1m
-	7ceXuMVeLXMxz2+c3sHcWH+CDafnvKE=
-Date: Mon, 02 Mar 2026 10:15:22 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Message-ID: <e4a2a652784ec206728eb3a929a9892238c61f06@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH net v3 1/2] bonding: fix null-ptr-deref in
- bond_rr_gen_slave_id()
-To: "Sebastian Andrzej Siewior" <bigeasy@linutronix.de>
-Cc: "Jay Vosburgh" <jv@jvosburgh.net>, netdev@vger.kernel.org,
- jiayuna.chen@linux.dev, jiayuna.chen@shopee.com, "Jiayuan Chen"
- <jiayuan.chen@shopee.com>,
- syzbot+80e046b8da2820b6ba73@syzkaller.appspotmail.com, "Andrew Lunn"
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Alexei Starovoitov" <ast@kernel.org>,
- "Daniel Borkmann" <daniel@iogearbox.net>, "Jesper Dangaard Brouer"
- <hawk@kernel.org>, "John Fastabend" <john.fastabend@gmail.com>,
- "Stanislav Fomichev" <sdf@fomichev.me>, "Andrii Nakryiko"
- <andrii@kernel.org>, "Eduard Zingerman" <eddyz87@gmail.com>, "Martin
- KaFai Lau" <martin.lau@linux.dev>, "Song Liu" <song@kernel.org>,
- "Yonghong Song" <yonghong.song@linux.dev>, "KP Singh"
- <kpsingh@kernel.org>, "Hao Luo" <haoluo@google.com>, "Jiri Olsa"
- <jolsa@kernel.org>, "Shuah Khan" <shuah@kernel.org>, "Clark Williams"
- <clrkwllms@kernel.org>, "Steven Rostedt" <rostedt@goodmis.org>, "Jussi
- Maki" <joamaki@gmail.com>, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-rt-devel@lists.linux.dev
-In-Reply-To: <20260302081021.MiQQ_LQr@linutronix.de>
-References: <20260228021918.141002-1-jiayuan.chen@linux.dev>
- <20260228021918.141002-2-jiayuan.chen@linux.dev>
- <999129.1772247707@famine>
- <08041bd78c06981b18b3de90a95e0c951bf1623c@linux.dev>
- <20260302081021.MiQQ_LQr@linutronix.de>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260228144846.40f5dfeb@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262597-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[jvosburgh.net,vger.kernel.org,linux.dev,shopee.com,syzkaller.appspotmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,goodmis.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[33];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-262599-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,80e046b8da2820b6ba73];
+	DMARC_NA(0.00)[resnulli.us];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,lwn.net,linuxfoundation.org,nvidia.com,intel.com,lunn.ch,goodmis.org,efficios.com,oracle.com];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linutronix.de:email]
-X-Rspamd-Queue-Id: 7ACA81D6589
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[resnulli-us.20230601.gappssmtp.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3CD841D68C2
 X-Rspamd-Action: no action
 
-March 2, 2026 at 16:10, "Sebastian Andrzej Siewior" <bigeasy@linutronix.d=
-e mailto:bigeasy@linutronix.de?to=3D%22Sebastian%20Andrzej%20Siewior%22%2=
-0%3Cbigeasy%40linutronix.de%3E > wrote:
-
-
->=20
->=20On 2026-02-28 03:36:24 [+0000], Jiayuan Chen wrote:
->=20
->=20>=20
->=20> My only concern is that this will waste a percpu u32 per bond
-> >  device for the majority of bonding use cases (which use modes other =
-than
-> >  balance-rr), which could be a few hundred bytes on a large machine.
-> >=20=20
->=20>  Does everything work reliably if the rr_tx_counter allocation
-> >  happens conditionally on mode =3D=3D BOND_MODE_ROUNDROBIN in bond_se=
-tup, as
-> >  well as in bond_option_mode_set?
-> >=20
->=20=E2=80=A6
->=20
->=20>=20
->=20> An alternative would be to allocate conditionally in bond_init() (s=
-ince the default mode is round-robin)
-> >  and manage allocation/deallocation in bond_option_mode_set() when th=
-e mode changes.
-> >=20
->=20This sounds reasonable.
->=20
->=20>=20
->=20> This is a trade-off between the added complexity of conditional all=
-oc/free across multiple code
-> >  paths and saving a per-CPU u32 for non-round-robin bonds.
-> >=20=20
->=20>  For the per-CPU u32 overhead, it's only 4 extra bytes per CPU per =
-bond device =E2=80=94 and machines with
-> >  that many CPUs tend to have plenty of memory to match.
-> >=20
->=204 bytes is the minimum allocation for per-CPU memory. The memory is
-> already "there" it is just not assigned. So for the 4 byte allocation i=
-t
-> is needed to find a single area (the smallest allocation size).
-> In case there no free block, a new block will be allocated and mapped
-> for each CPU which the part that costs memory.
-> That said, we should not waste memory but it is not _that_ expensive
-> either for a bond device. Things change if here are hundreds of devices=
-.
-
-
-Hi Jay, Sebastian,
-
-Sorry, the conditional alloc/free approach in bond_option_mode_set()
-I suggested earlier doesn't work well on closer inspection.
-
-Since bond_option_mode_set() requires the bond to be down, and as this
-bug shows, the XDP redirect path can still reach a downed bond device,
-we need to carefully order the operations:
-
-when switching to RR, alloc rr_tx_counter before setting mode;
-when switching away, set mode before freeing rr_tx_counter.
-
-Strictly speaking, this also requires smp_wmb()/smp_rmb() pairs to
-guarantee the ordering is visible to other CPUs =E2=80=94 the write side =
-in
-bond_option_mode_set() and the read side in the XDP path.
-
-In practice the race window is very small and unlikely to trigger, but
-leaving out the barriers would look incorrect, and adding them to the
-XDP hot path feels wrong for saving only 4 bytes per CPU per bond device.
-
-
-smp_wmb()/smp_rmb() (no test):=20
-
-diff=20--git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond=
-_main.c
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -4279,12 +4279,6 @@ static int bond_open(struct net_device *bond_dev)
-	struct list_head *iter;
-	struct slave *slave;
-
--     if (BOND_MODE(bond) =3D=3D BOND_MODE_ROUNDROBIN && !bond->rr_tx_cou=
-nter) {
--             bond->rr_tx_counter =3D alloc_percpu(u32);
--             if (!bond->rr_tx_counter)
--                     return -ENOMEM;
--     }
--
-	/* reset slave->backup and slave->inactive */
-	if (bond_has_slaves(bond)) {
-			bond_for_each_slave(bond, slave, iter) {
-@@ -5532,6 +5526,8 @@ bond_xdp_get_xmit_slave(struct net_device *bond_dev=
-, struct xdp_buff *xdp)
-
-	switch (BOND_MODE(bond)) {
-	case BOND_MODE_ROUNDROBIN:
-+             /* Pairs with smp_wmb() in bond_option_mode_set() */
-+             smp_rmb();
-			slave =3D bond_xdp_xmit_roundrobin_slave_get(bond, xdp);
-			break;
-
-@@ -6411,6 +6407,14 @@ static int bond_init(struct net_device *bond_dev)
-	if (!bond->wq)
-			return -ENOMEM;
-
-+     /* Default mode is round-robin, allocate rr_tx_counter for it.
-+      * For mode changes, bond_option_mode_set() manages the lifecycle.
-+      */
-+     bond->rr_tx_counter =3D alloc_percpu(u32);
-+     if (!bond->rr_tx_counter) {
-+             destroy_workqueue(bond->wq);
-+             return -ENOMEM;
-+     }
-+
-	bond->notifier_ctx =3D false;
-
-diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bon=
-d_options.c
---- a/drivers/net/bonding/bond_options.c
-+++ b/drivers/net/bonding/bond_options.c
-@@ -918,7 +918,27 @@ static int bond_option_mode_set(struct bonding *bond=
-,
-	/* don't cache arp_validate between modes */
-	bond->params.arp_validate =3D BOND_ARP_VALIDATE_NONE;
--     bond->params.mode =3D newval->value;
-+
-+     if (newval->value =3D=3D BOND_MODE_ROUNDROBIN) {
-+             /* Switching to round-robin: allocate before setting mode,
-+              * so XDP path seeing BOND_MODE_ROUNDROBIN always finds
-+              * rr_tx_counter allocated.
-+              */
-+             if (!bond->rr_tx_counter) {
-+                     bond->rr_tx_counter =3D alloc_percpu(u32);
-+                     if (!bond->rr_tx_counter)
-+                             return -ENOMEM;
-+             }
-+             /* Pairs with smp_rmb() in bond_xdp_get_xmit_slave() */
-+             smp_wmb();
-+             bond->params.mode =3D newval->value;
-+     } else {
-+             /* Switching away: set mode first so XDP no longer
-+              * enters RR branch before we free rr_tx_counter.
-+              */
-+             bond->params.mode =3D newval->value;
-+             /* Pairs with smp_rmb() in bond_xdp_get_xmit_slave() */
-+             smp_wmb();
-+             free_percpu(bond->rr_tx_counter);
-+             bond->rr_tx_counter =3D NULL;
-+     }
-
-Thanks,
-Jiayuan
-
-
-> >=20
->=20> Thanks
-> >=20=20
->=20>  -J
-> >=20
->=20Sebastian
+Sat, Feb 28, 2026 at 11:48:46PM +0100, kuba@kernel.org wrote:
+>On Wed, 25 Feb 2026 14:34:16 +0100 Jiri Pirko wrote:
+>> +	if (attrs[DEVLINK_ATTR_INDEX]) {
+>> +		index = nla_get_uint(attrs[DEVLINK_ATTR_INDEX]);
+>> +		devlink = devlinks_xa_lookup_get(net, index);
+>> +		if (!devlink)
+>> +			return ERR_PTR(-ENODEV);
+>> +		goto found;
+>> +	}
+>> +
+>>  	if (!attrs[DEVLINK_ATTR_BUS_NAME] || !attrs[DEVLINK_ATTR_DEV_NAME])
+>>  		return ERR_PTR(-EINVAL);
 >
+>If both INDEX and BUS_NAME + DEV_NAME are provided we should check
+>that they point to the same device? Or reject user space passing both?
+
+I implemented reject. I don't see much of value of allowing both. The
+code that would do the checking is too much for this hypothetical case.
 
