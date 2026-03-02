@@ -1,198 +1,210 @@
-Return-Path: <netdev+bounces-262569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262572-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uHdwFDxTpWkR9AUAu9opvQ
-	(envelope-from <netdev+bounces-262569-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 10:07:08 +0100
+	id qJbEC0dTpWkR9AUAu9opvQ
+	(envelope-from <netdev+bounces-262572-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 10:07:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C95221D53DE
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 10:07:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C4221D53EC
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 10:07:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5DC97300567B
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 09:04:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E39F9300578E
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 09:06:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B58A038A70E;
-	Mon,  2 Mar 2026 09:04:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1060332AAA7;
+	Mon,  2 Mar 2026 09:06:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="MuADD4L1"
+	dkim=pass (2048-bit key) header.d=thorsis.com header.i=@thorsis.com header.b="irWNKPM6"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+Received: from mail.thorsis.com (mail.thorsis.com [217.92.40.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79065313520
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 09:04:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFDD9430B8B;
+	Mon,  2 Mar 2026 09:06:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.92.40.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772442260; cv=none; b=ccZzBvJihvYDhGL5JEwTO/QN0RAdDANuD6XCwQXsVTcpIFeOs9jxocCtoRx4RV7ERyD68tFR2qghL+pB9Deg0QMmSQPP0Kuyg0zugsBgFUYYQmOU50pKAfjq/ZJz2jpHlVa+5YG9+awGdWjloykghpz8nnVkim3gWYfSVLhWTng=
+	t=1772442383; cv=none; b=sSsXcSDYu54DlF+cwYGVvn++IUgV3L9DRbld8p0/A138vSK3vCgpWdqmcAWvekwDgQ/WdU6ps3yqMwhirUJ4vopDXw874zVOLrhg2W2fRtsYiJAb2YGE7r4hNNKoulB/uc6nz60nuP5J7cJ0zLZ4JMiEv1RzG2KR0dYZr6+f/Gg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772442260; c=relaxed/simple;
-	bh=qs5px/UxujnucZ9qwyAOvbcd9+BtDKZc/LkcPUQjYtY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tynBASM3EtEpTiYoe+pp6X5nte3sS9IskiTu2DnciqnyRvC1uSsiUDfw8p1c3TQQWBCtGDs3CFTk5JWCoK/dIzLoqmF7wWKZOY0hesBUI2I2F3AQtQYMag3WfCBFa2v+vTpNJLI3GZhZWktqRp5dRY/cpzeiYG0LGq88QPurHtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=MuADD4L1; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1772442256; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=rxlPX0OvoZIotLN2GYZBhe+6cISZ5dyHktquYK9IguM=;
-	b=MuADD4L1vrtXhRq0NHzFBE0+jM3jriq60epKOXKokHVSsbcMc92WVdBiMBpKcyXJyKWbkq63kJu79cq8tpSyeR3zAu24P92cnQ8fZ7Z92+NkInEQq+yDvvmfyDPJynnCE+Nc+8OTrntt/GFL4nEGAUx5s/TwMza1i1rPbJMnkKE=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X-3.d7r_1772442254 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 02 Mar 2026 17:04:15 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Alvaro Karsz <alvaro.karsz@solid-run.com>,
-	virtualization@lists.linux.dev
-Subject: [PATCH net v7 2/2] virtio-net: correct hdr_len handling for tunnel gso
-Date: Mon,  2 Mar 2026 17:04:13 +0800
-Message-Id: <20260302090413.86471-3-xuanzhuo@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20260302090413.86471-1-xuanzhuo@linux.alibaba.com>
-References: <20260302090413.86471-1-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1772442383; c=relaxed/simple;
+	bh=r0rUJ79XcHw2ctvPIG/bEBzM1XM+kCL7v2UyEDImRrA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VfhIh2qCaunmq7Bug80j4RjYww9Xo2njwPLS3sLnrpGufjrkf/iCIljsqcYWsjxyd02WN0oV2gwHfS1agP6c2lvKFW7ZMIbgIm+jh/AvwDfZdGPhiTCsrWlkEbAcNlZMlop2MKOcVjhvvYEOJyrNvfl4UvDEW/NpULcNxiwrouw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorsis.com; spf=pass smtp.mailfrom=thorsis.com; dkim=pass (2048-bit key) header.d=thorsis.com header.i=@thorsis.com header.b=irWNKPM6; arc=none smtp.client-ip=217.92.40.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorsis.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=thorsis.com
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4418B1486B3E;
+	Mon,  2 Mar 2026 10:06:10 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=thorsis.com; s=dkim;
+	t=1772442371; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=+lsuT024m5YlWSyMVvPIE+Thxn5KQ85ifvO/KH6mvxg=;
+	b=irWNKPM6vLX1zRPhRfcyiOsxZj+EmMdaq/iHt2CJPLyV1rBPR5KfIFFtX+HqKr4vOnkLZP
+	RuLXVRvkuzI0BpbK63/bwtiTSEYEJAW5f7wtin1AAWjmVZpTLdqXoROYsdXMIbyjO767MM
+	VbZGC1rKY1P91+1fv0RQrXiwGcpSOKX0yA6D3oUX+ScoVf5znsfwpqvxGfQo+EkkREKFcR
+	7ornFY+EU7HAr8hnzMzel65PMYpFLuv30GJVSoYAGK6+ldVyU3xfNsmEQ19T5n+E+Mm5mX
+	bToNbi9iU5xc5H4PUizJEI6OyjKVkycyt8LT2+5idgG5/xb0OMWPLelFq/TPkQ==
+Date: Mon, 2 Mar 2026 10:06:05 +0100
+From: Alexander Dahl <ada@thorsis.com>
+To: Sasha Levin <sashal@kernel.org>
+Cc: stable@vger.kernel.org, haokexin@gmail.com,
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Subject: Re: FAILED: Patch "net: macb: Fix tx/rx malfunction after phy link
+ down and up" failed to apply to 6.12-stable tree
+Message-ID: <20260302-afloat-stubbly-1858603fbb0c@thorsis.com>
+Mail-Followup-To: Sasha Levin <sashal@kernel.org>, stable@vger.kernel.org,
+	haokexin@gmail.com, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+References: <20260301012805.1685772-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Git-Hash: 411d21554521
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260301012805.1685772-1-sashal@kernel.org>
+User-Agent: Mutt/2.2.13 (2024-03-09)
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-6.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[thorsis.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[thorsis.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-262569-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[gmail.com,redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,linux.alibaba.com,resnulli.us,solid-run.com,lists.linux.dev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262572-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,redhat.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ada@thorsis.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[thorsis.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.alibaba.com:mid,linux.alibaba.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,alibaba.com:email]
-X-Rspamd-Queue-Id: C95221D53DE
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amd.com:url,msgid.link:url]
+X-Rspamd-Queue-Id: 7C4221D53EC
 X-Rspamd-Action: no action
 
-The commit a2fb4bc4e2a6a03 ("net: implement virtio helpers to handle UDP
-GSO tunneling.") introduces support for the UDP GSO tunnel feature in
-virtio-net.
+Hello Sasha,
 
-The virtio spec says:
+Am Sat, Feb 28, 2026 at 08:28:05PM -0500 schrieb Sasha Levin:
+> The patch below does not apply to the 6.12-stable tree.
+> If someone wants it applied there, or to any other stable or longterm
+> tree, then please email the backport, including the original git commit
+> id to <stable@vger.kernel.org>.
 
-    If the \field{gso_type} has the VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV4 bit or
-    VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV6 bit set, \field{hdr_len} accounts for
-    all the headers up to and including the inner transport.
+I tried cherry-pick the upstream commit
+bf9cf80cab81e39701861a42877a28295ade266f on top of v6.12.74 (current
+state of the linux-6.12.y branch) and it produced no conflicts.
+In fact the diff is very much the same as below, so I'm a little
+puzzled why it failed at your side?
 
-The commit did not update the hdr_len to include the inner transport.
+I'd like to see this fix in 6.12 stable, because it fixes an actual
+problem for us (see msg ids below [1] [2]).  How to proceed here?
+E-mail as suggested above?
 
-I observed that the "hdr_len" is 116 for this packet:
+Greets
+Alex
 
-    17:36:18.241105 52:55:00:d1:27:0a > 2e:2c:df:46:a9:e1, ethertype IPv4 (0x0800), length 2912: (tos 0x0, ttl 64, id 45197, offset 0, flags [none], proto UDP (17), length 2898)
-        192.168.122.100.50613 > 192.168.122.1.4789: [bad udp cksum 0x8106 -> 0x26a0!] VXLAN, flags [I] (0x08), vni 1
-    fa:c3:ba:82:05:ee > ce:85:0c:31:77:e5, ethertype IPv4 (0x0800), length 2862: (tos 0x0, ttl 64, id 14678, offset 0, flags [DF], proto TCP (6), length 2848)
-        192.168.3.1.49880 > 192.168.3.2.9898: Flags [P.], cksum 0x9266 (incorrect -> 0xaa20), seq 515667:518463, ack 1, win 64, options [nop,nop,TS val 2990048824 ecr 2798801412], length 2796
+[1] <20260219-knapsack-thirteen-7d9e83451a40@thorsis.com>
+[2] <20260219-raffle-unvisited-891b68df5aef@thorsis.com>
 
-116 = 14(mac) + 20(ip) + 8(udp) + 8(vxlan) + 14(inner mac) + 20(inner ip) + 32(innner tcp)
-
-Fixes: a2fb4bc4e2a6a03 ("net: implement virtio helpers to handle UDP GSO tunneling.")
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
----
- include/linux/virtio_net.h | 28 ++++++++++++++++++----------
- 1 file changed, 18 insertions(+), 10 deletions(-)
-
-diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
-index d31c9af1f3d6..906157779955 100644
---- a/include/linux/virtio_net.h
-+++ b/include/linux/virtio_net.h
-@@ -209,18 +209,29 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
- 
- static inline void virtio_net_set_hdrlen(const struct sk_buff *skb,
- 					 struct virtio_net_hdr *hdr,
-+					 struct skb_shared_info *sinfo,
- 					 bool little_endian,
- 					 bool feature_hdrlen)
- {
- 	u16 hdr_len;
- 
- 	if (feature_hdrlen) {
--		hdr_len = skb_transport_offset(skb);
--
--		if (hdr->gso_type == VIRTIO_NET_HDR_GSO_UDP_L4)
--			hdr_len += sizeof(struct udphdr);
--		else
--			hdr_len += tcp_hdrlen(skb);
-+		if (sinfo->gso_type & (SKB_GSO_UDP_TUNNEL |
-+				       SKB_GSO_UDP_TUNNEL_CSUM)) {
-+			hdr_len = skb_inner_transport_offset(skb);
-+
-+			if (hdr->gso_type == VIRTIO_NET_HDR_GSO_UDP_L4)
-+				hdr_len += sizeof(struct udphdr);
-+			else
-+				hdr_len += inner_tcp_hdrlen(skb);
-+		} else {
-+			hdr_len = skb_transport_offset(skb);
-+
-+			if (hdr->gso_type == VIRTIO_NET_HDR_GSO_UDP_L4)
-+				hdr_len += sizeof(struct udphdr);
-+			else
-+				hdr_len += tcp_hdrlen(skb);
-+		}
- 	} else {
- 		/* This is a hint as to how much should be linear. */
- 		hdr_len = skb_headlen(skb);
-@@ -252,7 +263,7 @@ static inline int __virtio_net_hdr_from_skb(const struct sk_buff *skb,
- 		else
- 			return -EINVAL;
- 
--		virtio_net_set_hdrlen(skb, hdr, little_endian,
-+		virtio_net_set_hdrlen(skb, hdr, sinfo, little_endian,
- 				      feature_hdrlen);
- 
- 		if (sinfo->gso_type & SKB_GSO_TCP_ECN)
-@@ -443,11 +454,8 @@ virtio_net_hdr_tnl_from_skb(const struct sk_buff *skb,
-         vhdr->hash_hdr.hash_report = 0;
-         vhdr->hash_hdr.padding = 0;
- 
--	/* Let the basic parsing deal with plain GSO features. */
--	skb_shinfo(skb)->gso_type &= ~tnl_gso_type;
- 	ret = __virtio_net_hdr_from_skb(skb, hdr, true, false,
- 					feature_hdrlen, vlan_hlen);
--	skb_shinfo(skb)->gso_type |= tnl_gso_type;
- 	if (ret)
- 		return ret;
- 
--- 
-2.32.0.3.g01195cf9f
-
+> 
+> Thanks,
+> Sasha
+> 
+> ------------------ original commit in Linus's tree ------------------
+> 
+> From bf9cf80cab81e39701861a42877a28295ade266f Mon Sep 17 00:00:00 2001
+> From: Kevin Hao <haokexin@gmail.com>
+> Date: Sun, 8 Feb 2026 16:45:52 +0800
+> Subject: [PATCH] net: macb: Fix tx/rx malfunction after phy link down and up
+> 
+> In commit 99537d5c476c ("net: macb: Relocate mog_init_rings() callback
+> from macb_mac_link_up() to macb_open()"), the mog_init_rings() callback
+> was moved from macb_mac_link_up() to macb_open() to resolve a deadlock
+> issue. However, this change introduced a tx/rx malfunction following
+> phy link down and up events. The issue arises from a mismatch between
+> the software queue->tx_head, queue->tx_tail, queue->rx_prepared_head,
+> and queue->rx_tail values and the hardware's internal tx/rx queue
+> pointers.
+> 
+> According to the Zynq UltraScale TRM [1], when tx/rx is disabled, the
+> internal tx queue pointer resets to the value in the tx queue base
+> address register, while the internal rx queue pointer remains unchanged.
+> The following is quoted from the Zynq UltraScale TRM:
+>   When transmit is disabled, with bit [3] of the network control register
+>   set low, the transmit-buffer queue pointer resets to point to the address
+>   indicated by the transmit-buffer queue base address register. Disabling
+>   receive does not have the same effect on the receive-buffer queue
+>   pointer.
+> 
+> Additionally, there is no need to reset the RBQP and TBQP registers in a
+> phy event callback. Therefore, move macb_init_buffers() to macb_open().
+> In a phy link up event, the only required action is to reset the tx
+> software head and tail pointers to align with the hardware's behavior.
+> 
+> [1] https://docs.amd.com/v/u/en-US/ug1085-zynq-ultrascale-trm
+> 
+> Fixes: 99537d5c476c ("net: macb: Relocate mog_init_rings() callback from macb_mac_link_up() to macb_open()")
+> Signed-off-by: Kevin Hao <haokexin@gmail.com>
+> Cc: stable@vger.kernel.org
+> Link: https://patch.msgid.link/20260208-macb-init-ring-v1-1-939a32c14635@gmail.com
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> ---
+>  drivers/net/ethernet/cadence/macb_main.c | 11 +++++------
+>  1 file changed, 5 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+> index 6511ecd5856bd..4ebb40adfab37 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -705,14 +705,12 @@ static void macb_mac_link_up(struct phylink_config *config,
+>  		if (rx_pause)
+>  			ctrl |= MACB_BIT(PAE);
+>  
+> -		/* Initialize rings & buffers as clearing MACB_BIT(TE) in link down
+> -		 * cleared the pipeline and control registers.
+> -		 */
+> -		macb_init_buffers(bp);
+> -
+> -		for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue)
+> +		for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
+> +			queue->tx_head = 0;
+> +			queue->tx_tail = 0;
+>  			queue_writel(queue, IER,
+>  				     bp->rx_intr_mask | MACB_TX_INT_FLAGS | MACB_BIT(HRESP));
+> +		}
+>  	}
+>  
+>  	macb_or_gem_writel(bp, NCFGR, ctrl);
+> @@ -2954,6 +2952,7 @@ static int macb_open(struct net_device *dev)
+>  	}
+>  
+>  	bp->macbgem_ops.mog_init_rings(bp);
+> +	macb_init_buffers(bp);
+>  
+>  	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
+>  		napi_enable(&queue->napi_rx);
+> -- 
+> 2.51.0
+> 
+> 
+> 
+> 
+> 
 
