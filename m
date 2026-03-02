@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-262511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262509-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iBnOHAIlpWm14AUAu9opvQ
-	(envelope-from <netdev+bounces-262511-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 06:49:54 +0100
+	id EOylIeskpWm14AUAu9opvQ
+	(envelope-from <netdev+bounces-262509-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 06:49:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC7761D33D8
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 06:49:53 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02AB21D33B1
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 06:49:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2922D300A58B
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 05:49:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7E50A3015A7E
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 05:49:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4218126E706;
-	Mon,  2 Mar 2026 05:49:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D37EE37700F;
+	Mon,  2 Mar 2026 05:49:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.aperture-lab.de (mail.aperture-lab.de [116.203.183.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B3E7349B0A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C1FC800;
 	Mon,  2 Mar 2026 05:49:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.183.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772430566; cv=none; b=mqn3OznumOzV9PzhQfAAQOwPMZ7tXM3bJvNL/xP7Ou013kNEOFy/h8X+ic9Q29eVY+T0ju+t7S5E8S/P/9Y5cTuf763Q5NRNYF6BKquMpMgJHxBVh+BTKi+tDYGd39w99pFWhP+XU4ScJwVLVuFni7IzjofKsO7vOvmJOYu5kc4=
+	t=1772430565; cv=none; b=JIVD8qpnRmXhd/LZP4PpEGap8viKRPDFlUIKeEuWpVPOr94iaPM5vd08kyo2fZg8Sh3hoDeYl9dytFX+YQ+4zMT5kQnr4/k3XhfWjZKm6FNlsPJbSwbd3yWdM+qcxqiiH4E0WWjGarD5kZJ7qtiJwAXuoEBPHHfmTMjs8m5tbW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772430566; c=relaxed/simple;
-	bh=CsPiObc6vB6XHvCTeAuWifwBKN5qSXcv9aMPYf58DAA=;
+	s=arc-20240116; t=1772430565; c=relaxed/simple;
+	bh=SbsONLiS8QHCIdQItshvBsw32uRRwWjCowxMnBA8FFE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DJtZOaFALpi8JcTymbnpwt1dybD03EyuFeJ0AfrMFey5FI57A/X/4iUKag2CSBKSrZqX4HEI95eTijQK3pgtOKhqj0oLZf2wZp6w17aAywmqUZSmvD/sg+qOuZyEjBr0fRKpL8hjV/bYePQKPZRoqTuRUXnu/4otMU4fMXXMXtU=
+	 MIME-Version:Content-Type; b=cdn8BLXgG1bgjNi2re8p0OWy8DMROVZC3OQVioTpeizA+2eMrtFXNjwKvIFVOuisBnVj5CElvQmI/4i/fXdftuW4fsrMmZSpsYiQYwdOh+ysA57WY8sQDBxvW1BM5uvmBu4mYdgzHILrnC15SyOu8ha0EjdmiNmcgMynerq4J1E=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c0d3.blue; spf=pass smtp.mailfrom=c0d3.blue; arc=none smtp.client-ip=116.203.183.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c0d3.blue
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=c0d3.blue
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C632754CC60;
-	Mon,  2 Mar 2026 06:40:44 +0100 (CET)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2643B54CC61;
+	Mon,  2 Mar 2026 06:40:46 +0100 (CET)
 From: =?UTF-8?q?Linus=20L=C3=BCssing?= <linus.luessing@c0d3.blue>
 To: bridge@lists.linux.dev
 Cc: netdev@vger.kernel.org,
@@ -52,9 +52,9 @@ Cc: netdev@vger.kernel.org,
 	Xiao Liang <shaw.leon@gmail.com>,
 	shuah@kernel.org,
 	=?UTF-8?q?Linus=20L=C3=BCssing?= <linus.luessing@c0d3.blue>
-Subject: [PATCH net-next v3 03/14] net: bridge: mcast: avoid sleeping on bridge-down
-Date: Mon,  2 Mar 2026 06:39:57 +0100
-Message-ID: <20260302054008.21638-4-linus.luessing@c0d3.blue>
+Subject: [PATCH net-next v3 04/14] net: bridge: mcast: track active state, IGMP/MLD querier appearance
+Date: Mon,  2 Mar 2026 06:39:58 +0100
+Message-ID: <20260302054008.21638-5-linus.luessing@c0d3.blue>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260302054008.21638-1-linus.luessing@c0d3.blue>
 References: <20260302054008.21638-1-linus.luessing@c0d3.blue>
@@ -72,11 +72,11 @@ X-Spamd-Result: default: False [1.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262511-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262509-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -94,374 +94,207 @@ X-Spamd-Result: default: False [1.04 / 15.00];
 	R_DKIM_NA(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,c0d3.blue:mid,c0d3.blue:email]
-X-Rspamd-Queue-Id: BC7761D33D8
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,c0d3.blue:mid,c0d3.blue:email]
+X-Rspamd-Queue-Id: 02AB21D33B1
 X-Rspamd-Action: no action
 
-We later want to use the multicast lock when setting the bridge
-interface up or down, to be able to atomically both check all conditions
-to toggle the multicast active state and to subsequently toggle it.
-While most variables we check / contexts we check from are serialized
-(toggled variables through netlink/sysfs) the timer_pending() check is
-not and might run in parallel.
+This is the first step to track in dedicated, per protocol family
+variables if we can actively and safely use multicast snooping.
+To later use these in the fast/data path instead of performing
+all these checks for every packet and to later notify DSA/switchdev
+about this state.
 
-However so far we are not allowed to spinlock __br_multicast_stop() as
-its call to timer_delete_sync() might sleep. Therefore replacing the
-sleeping variant with the non-sleeping timer_shutdown(). It is sufficient
-to only wait for any timer callback to finish when we are freeing the
-multicast context.
+This toggles these new variables to true after a Maximum Response Delay
+(default: 10 seconds) if a new IGMP or MLD querier has appeared. This
+can be triggered either through receiving an IGMP/MLD query from another
+host or by a user enabling our own IGMP/MLD querier.
 
-While the disadvantage of using a non-syncing variant might lead us to
-race and still execute its timer callback just after timer_shutdown() was
-called timer_shutdown() also has the following additional advantage(s):
-It for one thing clears the callback function pointer and by that avoids
-rearming. For another a missing function pointer allows us to detect
-early in the timer callback if we, this timer, were just canceled.
+This is the first of several requirements, similar to what
+br_multicast_querier_exists() already checks so far, to be able to
+reliably receive IGMP/MLD reports, which in turn are needed to build
+a complete multicast database.
 
-In other words, this also allows us to make sure that once
-timer_shutdown() was called while we do potentially enter its timer
-callback briefly we never run the main task of this timer. Similar to
-what a timer_delete_sync() would have avoided, too. Except we are not
-waiting/sleeping/syncing in br_multicast_stop() but instead (in rare cases)
-briefly busy-wait/sync a bit later when grabbing the multicast spinlock
-in the timer callback.
-
-This new check also makes the netif_running() check redundant/obsolete
-in these contexts.
+No functional change for the fast/data path yet.
 
 Signed-off-by: Linus Lüssing <linus.luessing@c0d3.blue>
 ---
- net/bridge/br_multicast.c | 128 +++++++++++++++++++++++++++-----------
- net/bridge/br_private.h   |   5 ++
- net/bridge/br_vlan.c      |   5 ++
- 3 files changed, 100 insertions(+), 38 deletions(-)
+ net/bridge/br_multicast.c | 109 ++++++++++++++++++++++++++++++++++++--
+ net/bridge/br_private.h   |   2 +
+ 2 files changed, 108 insertions(+), 3 deletions(-)
 
 diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
-index 881d866d687a..b90f0e149c40 100644
+index b90f0e149c40..83c1331843f3 100644
 --- a/net/bridge/br_multicast.c
 +++ b/net/bridge/br_multicast.c
-@@ -1663,6 +1663,14 @@ static void br_multicast_router_expired(struct net_bridge_mcast_port *pmctx,
- 	spin_unlock(&br->multicast_lock);
+@@ -1067,6 +1067,81 @@ static struct sk_buff *br_ip4_multicast_alloc_query(struct net_bridge_mcast *brm
+ 	return skb;
  }
  
-+static bool br_multicast_is_stopping(struct net_bridge *br,
-+				     struct timer_list *timer)
++static bool br_ip4_multicast_querier_exists(struct net_bridge_mcast *brmctx)
 +{
-+	lockdep_assert_held_once(&br->multicast_lock);
-+
-+	return !timer->function;
++	return __br_multicast_querier_exists(brmctx, &brmctx->ip4_other_query, false);
 +}
 +
- static void br_ip4_multicast_router_expired(struct timer_list *t)
- {
- 	struct net_bridge_mcast_port *pmctx = timer_container_of(pmctx, t,
-@@ -1698,7 +1706,8 @@ static void br_multicast_local_router_expired(struct net_bridge_mcast *brmctx,
- 					      struct timer_list *timer)
- {
- 	spin_lock(&brmctx->br->multicast_lock);
--	if (brmctx->multicast_router == MDB_RTR_TYPE_DISABLED ||
-+	if (br_multicast_is_stopping(brmctx->br, timer) ||
-+	    brmctx->multicast_router == MDB_RTR_TYPE_DISABLED ||
- 	    brmctx->multicast_router == MDB_RTR_TYPE_PERM ||
- 	    br_ip4_multicast_is_router(brmctx) ||
- 	    br_ip6_multicast_is_router(brmctx))
-@@ -1728,10 +1737,11 @@ static void br_ip6_multicast_local_router_expired(struct timer_list *t)
- #endif
- 
- static void br_multicast_querier_expired(struct net_bridge_mcast *brmctx,
--					 struct bridge_mcast_own_query *query)
-+					 struct bridge_mcast_own_query *query,
-+					 struct timer_list *timer)
- {
- 	spin_lock(&brmctx->br->multicast_lock);
--	if (!netif_running(brmctx->br->dev) ||
-+	if (br_multicast_is_stopping(brmctx->br, timer) ||
- 	    br_multicast_ctx_vlan_global_disabled(brmctx) ||
- 	    !br_opt_get(brmctx->br, BROPT_MULTICAST_ENABLED))
- 		goto out;
-@@ -1747,7 +1757,7 @@ static void br_ip4_multicast_querier_expired(struct timer_list *t)
- 	struct net_bridge_mcast *brmctx = timer_container_of(brmctx, t,
- 							     ip4_other_query.timer);
- 
--	br_multicast_querier_expired(brmctx, &brmctx->ip4_own_query);
-+	br_multicast_querier_expired(brmctx, &brmctx->ip4_own_query, t);
- }
- 
++#if IS_ENABLED(CONFIG_IPV6)
++static bool br_ip6_multicast_querier_exists(struct net_bridge_mcast *brmctx)
++{
++	return __br_multicast_querier_exists(brmctx, &brmctx->ip6_other_query, true);
++}
++#endif
++
++static void br_ip4_multicast_update_active(struct net_bridge_mcast *brmctx,
++					   bool force_inactive)
++{
++	if (force_inactive)
++		brmctx->ip4_active = false;
++	else
++		brmctx->ip4_active = br_ip4_multicast_querier_exists(brmctx);
++}
++
++static void br_ip6_multicast_update_active(struct net_bridge_mcast *brmctx,
++					   bool force_inactive)
++{
++#if IS_ENABLED(CONFIG_IPV6)
++	if (force_inactive)
++		brmctx->ip6_active = false;
++	else
++		brmctx->ip6_active = br_ip6_multicast_querier_exists(brmctx);
++#endif
++}
++
++static void br_multicast_notify_active(struct net_bridge_mcast *brmctx,
++				       bool ip4_active_old, bool ip6_active_old)
++{
++	if (brmctx->ip4_active == ip4_active_old &&
++	    brmctx->ip6_active == ip6_active_old)
++		return;
++
++	br_debug(brmctx->br, "mc_active changed, vid: %i: v4: %i->%i, v6: %i->%i\n",
++		 brmctx->vlan ? brmctx->vlan->vid : -1,
++		 ip4_active_old, brmctx->ip4_active,
++		 ip6_active_old, brmctx->ip6_active);
++}
++
++/**
++ * br_multicast_update_active() - update mcast active state
++ * @brmctx: the bridge multicast context to check
++ *
++ * This (potentially) updates the IPv4/IPv6 multicast active state. And by
++ * that enables or disables snooping of multicast payload traffic in fast
++ * path.
++ *
++ * The multicast active state is set, per protocol family, if:
++ *
++ * - an IGMP/MLD querier is present
++ *
++ * And is unset otherwise.
++ *
++ * This function should be called by anything that changes one of the
++ * above prerequisites.
++ */
++static void br_multicast_update_active(struct net_bridge_mcast *brmctx)
++{
++	bool ip4_active_old = brmctx->ip4_active, ip6_active_old = brmctx->ip6_active;
++	bool force_inactive = false;
++
++	lockdep_assert_held_once(&brmctx->br->multicast_lock);
++
++	br_ip4_multicast_update_active(brmctx, force_inactive);
++	br_ip6_multicast_update_active(brmctx, force_inactive);
++
++	br_multicast_notify_active(brmctx, ip4_active_old, ip6_active_old);
++}
++
  #if IS_ENABLED(CONFIG_IPV6)
-@@ -1756,7 +1766,7 @@ static void br_ip6_multicast_querier_expired(struct timer_list *t)
- 	struct net_bridge_mcast *brmctx = timer_container_of(brmctx, t,
- 							     ip6_other_query.timer);
- 
--	br_multicast_querier_expired(brmctx, &brmctx->ip6_own_query);
-+	br_multicast_querier_expired(brmctx, &brmctx->ip6_own_query, t);
+ static struct sk_buff *br_ip6_multicast_alloc_query(struct net_bridge_mcast *brmctx,
+ 						    struct net_bridge_mcast_port *pmctx,
+@@ -1770,10 +1845,36 @@ static void br_ip6_multicast_querier_expired(struct timer_list *t)
  }
  #endif
  
-@@ -4040,10 +4050,12 @@ int br_multicast_rcv(struct net_bridge_mcast **brmctx,
- }
- 
- static void br_multicast_query_expired(struct net_bridge_mcast *brmctx,
--				       struct bridge_mcast_own_query *query)
-+				       struct bridge_mcast_own_query *query,
-+				       struct timer_list *timer)
+-static void br_multicast_query_delay_expired(struct timer_list *t)
++static void br_ip4_multicast_query_delay_expired(struct timer_list *t)
  {
- 	spin_lock(&brmctx->br->multicast_lock);
--	if (br_multicast_ctx_vlan_disabled(brmctx))
-+	if (br_multicast_is_stopping(brmctx->br, timer) ||
-+	    br_multicast_ctx_vlan_disabled(brmctx))
- 		goto out;
- 
- 	if (query->startup_sent < brmctx->multicast_startup_query_count)
-@@ -4059,7 +4071,7 @@ static void br_ip4_multicast_query_expired(struct timer_list *t)
- 	struct net_bridge_mcast *brmctx = timer_container_of(brmctx, t,
- 							     ip4_own_query.timer);
- 
--	br_multicast_query_expired(brmctx, &brmctx->ip4_own_query);
-+	br_multicast_query_expired(brmctx, &brmctx->ip4_own_query, t);
++	struct net_bridge_mcast *brmctx = timer_container_of(brmctx, t,
++							     ip4_other_query.delay_timer);
++
++	spin_lock(&brmctx->br->multicast_lock);
++	if (!br_multicast_is_stopping(brmctx->br, t))
++		/* an own or other IGMP querier appeared some seconds ago and all
++		 * reports should have arrived by now, maybe set multicast state to active
++		 */
++		br_multicast_update_active(brmctx);
++	spin_unlock(&brmctx->br->multicast_lock);
  }
  
++#if IS_ENABLED(CONFIG_IPV6)
++static void br_ip6_multicast_query_delay_expired(struct timer_list *t)
++{
++	struct net_bridge_mcast *brmctx = timer_container_of(brmctx, t,
++							     ip6_other_query.delay_timer);
++
++	spin_lock(&brmctx->br->multicast_lock);
++	if (!br_multicast_is_stopping(brmctx->br, t))
++		/* an own or other MLD querier appeared some seconds ago and all
++		 * reports should have arrived, maybe set multicast state to active
++		 */
++		br_multicast_update_active(brmctx);
++	spin_unlock(&brmctx->br->multicast_lock);
++}
++#endif
++
+ static void br_multicast_select_own_querier(struct net_bridge_mcast *brmctx,
+ 					    struct br_ip *ip,
+ 					    struct sk_buff *skb)
+@@ -4115,11 +4216,13 @@ void br_multicast_ctx_init(struct net_bridge *br,
+ 	brmctx->multicast_membership_interval = 260 * HZ;
+ 
+ 	brmctx->ip4_querier.port_ifidx = 0;
++	brmctx->ip4_active = 0;
+ 	seqcount_spinlock_init(&brmctx->ip4_querier.seq, &br->multicast_lock);
+ 	brmctx->multicast_igmp_version = 2;
  #if IS_ENABLED(CONFIG_IPV6)
-@@ -4068,7 +4080,7 @@ static void br_ip6_multicast_query_expired(struct timer_list *t)
- 	struct net_bridge_mcast *brmctx = timer_container_of(brmctx, t,
- 							     ip6_own_query.timer);
- 
--	br_multicast_query_expired(brmctx, &brmctx->ip6_own_query);
-+	br_multicast_query_expired(brmctx, &brmctx->ip6_own_query, t);
- }
- #endif
- 
-@@ -4111,29 +4123,30 @@ void br_multicast_ctx_init(struct net_bridge *br,
+ 	brmctx->multicast_mld_version = 1;
+ 	brmctx->ip6_querier.port_ifidx = 0;
++	brmctx->ip6_active = 0;
  	seqcount_spinlock_init(&brmctx->ip6_querier.seq, &br->multicast_lock);
  #endif
  
--	timer_setup(&brmctx->ip4_mc_router_timer,
--		    br_ip4_multicast_local_router_expired, 0);
--	timer_setup(&brmctx->ip4_other_query.timer,
--		    br_ip4_multicast_querier_expired, 0);
--	timer_setup(&brmctx->ip4_other_query.delay_timer,
--		    br_multicast_query_delay_expired, 0);
--	timer_setup(&brmctx->ip4_own_query.timer,
--		    br_ip4_multicast_query_expired, 0);
-+	timer_setup(&brmctx->ip4_mc_router_timer, NULL, 0);
-+	timer_setup(&brmctx->ip4_other_query.timer, NULL, 0);
-+	timer_setup(&brmctx->ip4_other_query.delay_timer, NULL, 0);
-+	timer_setup(&brmctx->ip4_own_query.timer, NULL, 0);
+@@ -4232,12 +4335,12 @@ void br_multicast_reset_timer_cbs(struct net_bridge_mcast *brmctx)
+ 
+ 	brmctx->ip4_mc_router_timer.function = br_ip4_multicast_local_router_expired;
+ 	brmctx->ip4_other_query.timer.function = br_ip4_multicast_querier_expired;
+-	brmctx->ip4_other_query.delay_timer.function = br_multicast_query_delay_expired;
++	brmctx->ip4_other_query.delay_timer.function = br_ip4_multicast_query_delay_expired;
+ 	brmctx->ip4_own_query.timer.function = br_ip4_multicast_query_expired;
  #if IS_ENABLED(CONFIG_IPV6)
--	timer_setup(&brmctx->ip6_mc_router_timer,
--		    br_ip6_multicast_local_router_expired, 0);
--	timer_setup(&brmctx->ip6_other_query.timer,
--		    br_ip6_multicast_querier_expired, 0);
--	timer_setup(&brmctx->ip6_other_query.delay_timer,
--		    br_multicast_query_delay_expired, 0);
--	timer_setup(&brmctx->ip6_own_query.timer,
--		    br_ip6_multicast_query_expired, 0);
-+	timer_setup(&brmctx->ip6_mc_router_timer, NULL, 0);
-+	timer_setup(&brmctx->ip6_other_query.timer, NULL, 0);
-+	timer_setup(&brmctx->ip6_other_query.delay_timer, NULL, 0);
-+	timer_setup(&brmctx->ip6_own_query.timer, NULL, 0);
+ 	brmctx->ip6_mc_router_timer.function = br_ip6_multicast_local_router_expired;
+ 	brmctx->ip6_other_query.timer.function = br_ip6_multicast_querier_expired;
+-	brmctx->ip6_other_query.delay_timer.function = br_multicast_query_delay_expired;
++	brmctx->ip6_other_query.delay_timer.function = br_ip6_multicast_query_delay_expired;
+ 	brmctx->ip6_own_query.timer.function = br_ip6_multicast_query_expired;
  #endif
  }
- 
- void br_multicast_ctx_deinit(struct net_bridge_mcast *brmctx)
- {
--	__br_multicast_stop(brmctx);
-+	timer_shutdown_sync(&brmctx->ip4_mc_router_timer);
-+	timer_shutdown_sync(&brmctx->ip4_other_query.timer);
-+	timer_shutdown_sync(&brmctx->ip4_other_query.delay_timer);
-+	timer_shutdown_sync(&brmctx->ip4_own_query.timer);
-+#if IS_ENABLED(CONFIG_IPV6)
-+	timer_shutdown_sync(&brmctx->ip6_mc_router_timer);
-+	timer_shutdown_sync(&brmctx->ip6_other_query.timer);
-+	timer_shutdown_sync(&brmctx->ip6_other_query.delay_timer);
-+	timer_shutdown_sync(&brmctx->ip6_own_query.timer);
-+#endif
- }
- 
- void br_multicast_init(struct net_bridge *br)
-@@ -4213,9 +4226,27 @@ void br_multicast_leave_snoopers(struct net_bridge *br)
- 	br_ip6_multicast_leave_snoopers(br);
- }
- 
-+void br_multicast_reset_timer_cbs(struct net_bridge_mcast *brmctx)
-+{
-+	lockdep_assert_held_once(&brmctx->br->multicast_lock);
-+
-+	brmctx->ip4_mc_router_timer.function = br_ip4_multicast_local_router_expired;
-+	brmctx->ip4_other_query.timer.function = br_ip4_multicast_querier_expired;
-+	brmctx->ip4_other_query.delay_timer.function = br_multicast_query_delay_expired;
-+	brmctx->ip4_own_query.timer.function = br_ip4_multicast_query_expired;
-+#if IS_ENABLED(CONFIG_IPV6)
-+	brmctx->ip6_mc_router_timer.function = br_ip6_multicast_local_router_expired;
-+	brmctx->ip6_other_query.timer.function = br_ip6_multicast_querier_expired;
-+	brmctx->ip6_other_query.delay_timer.function = br_multicast_query_delay_expired;
-+	brmctx->ip6_own_query.timer.function = br_ip6_multicast_query_expired;
-+#endif
-+}
-+
- static void __br_multicast_open_query(struct net_bridge *br,
- 				      struct bridge_mcast_own_query *query)
- {
-+	lockdep_assert_held_once(&br->multicast_lock);
-+
- 	query->startup_sent = 0;
- 
- 	if (!br_opt_get(br, BROPT_MULTICAST_ENABLED))
-@@ -4226,13 +4257,15 @@ static void __br_multicast_open_query(struct net_bridge *br,
- 
- static void __br_multicast_open(struct net_bridge_mcast *brmctx)
- {
-+	br_multicast_reset_timer_cbs(brmctx);
-+
- 	__br_multicast_open_query(brmctx->br, &brmctx->ip4_own_query);
- #if IS_ENABLED(CONFIG_IPV6)
- 	__br_multicast_open_query(brmctx->br, &brmctx->ip6_own_query);
- #endif
- }
- 
--void br_multicast_open(struct net_bridge *br)
-+static void br_multicast_open_locked(struct net_bridge *br)
- {
- 	ASSERT_RTNL();
- 
-@@ -4256,17 +4289,26 @@ void br_multicast_open(struct net_bridge *br)
- 	}
- }
- 
-+void br_multicast_open(struct net_bridge *br)
-+{
-+	spin_lock_bh(&br->multicast_lock);
-+	br_multicast_open_locked(br);
-+	spin_unlock_bh(&br->multicast_lock);
-+}
-+
- static void __br_multicast_stop(struct net_bridge_mcast *brmctx)
- {
--	timer_delete_sync(&brmctx->ip4_mc_router_timer);
--	timer_delete_sync(&brmctx->ip4_other_query.timer);
--	timer_delete_sync(&brmctx->ip4_other_query.delay_timer);
--	timer_delete_sync(&brmctx->ip4_own_query.timer);
-+	lockdep_assert_held_once(&brmctx->br->multicast_lock);
-+
-+	timer_shutdown(&brmctx->ip4_mc_router_timer);
-+	timer_shutdown(&brmctx->ip4_other_query.timer);
-+	timer_shutdown(&brmctx->ip4_other_query.delay_timer);
-+	timer_shutdown(&brmctx->ip4_own_query.timer);
- #if IS_ENABLED(CONFIG_IPV6)
--	timer_delete_sync(&brmctx->ip6_mc_router_timer);
--	timer_delete_sync(&brmctx->ip6_other_query.timer);
--	timer_delete_sync(&brmctx->ip6_other_query.delay_timer);
--	timer_delete_sync(&brmctx->ip6_own_query.timer);
-+	timer_shutdown(&brmctx->ip6_mc_router_timer);
-+	timer_shutdown(&brmctx->ip6_other_query.timer);
-+	timer_shutdown(&brmctx->ip6_other_query.delay_timer);
-+	timer_shutdown(&brmctx->ip6_own_query.timer);
- #endif
- }
- 
-@@ -4317,12 +4359,12 @@ void br_multicast_toggle_one_vlan(struct net_bridge_vlan *vlan, bool on)
- 
- 		spin_lock_bh(&br->multicast_lock);
- 		vlan->priv_flags ^= BR_VLFLAG_MCAST_ENABLED;
--		spin_unlock_bh(&br->multicast_lock);
- 
- 		if (on)
- 			__br_multicast_open(&vlan->br_mcast_ctx);
- 		else
- 			__br_multicast_stop(&vlan->br_mcast_ctx);
-+		spin_unlock_bh(&br->multicast_lock);
- 	} else {
- 		struct net_bridge_mcast *brmctx;
- 
-@@ -4380,6 +4422,7 @@ int br_multicast_toggle_vlan_snooping(struct net_bridge *br, bool on,
- 	if (!vg)
- 		return 0;
- 
-+	spin_lock_bh(&br->multicast_lock);
- 	br_opt_toggle(br, BROPT_MCAST_VLAN_SNOOPING_ENABLED, on);
- 
- 	/* disable/enable non-vlan mcast contexts based on vlan snooping */
-@@ -4387,6 +4430,8 @@ int br_multicast_toggle_vlan_snooping(struct net_bridge *br, bool on,
- 		__br_multicast_stop(&br->multicast_ctx);
- 	else
- 		__br_multicast_open(&br->multicast_ctx);
-+	spin_unlock_bh(&br->multicast_lock);
-+
- 	list_for_each_entry(p, &br->port_list, list) {
- 		if (on)
- 			br_multicast_disable_port_ctx(&p->multicast_ctx);
-@@ -4416,7 +4461,7 @@ bool br_multicast_toggle_global_vlan(struct net_bridge_vlan *vlan, bool on)
- 	return true;
- }
- 
--void br_multicast_stop(struct net_bridge *br)
-+static void br_multicast_stop_locked(struct net_bridge *br)
- {
- 	ASSERT_RTNL();
- 
-@@ -4440,6 +4485,13 @@ void br_multicast_stop(struct net_bridge *br)
- 	}
- }
- 
-+void br_multicast_stop(struct net_bridge *br)
-+{
-+	spin_lock_bh(&br->multicast_lock);
-+	br_multicast_stop_locked(br);
-+	spin_unlock_bh(&br->multicast_lock);
-+}
-+
- void br_multicast_dev_del(struct net_bridge *br)
- {
- 	struct net_bridge_mdb_entry *mp;
-@@ -4675,7 +4727,7 @@ int br_multicast_toggle(struct net_bridge *br, unsigned long val,
- 	if (!netif_running(br->dev))
- 		goto unlock;
- 
--	br_multicast_open(br);
-+	br_multicast_open_locked(br);
- 	list_for_each_entry(port, &br->port_list, list)
- 		__br_multicast_enable_port_ctx(&port->multicast_ctx);
- 
 diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
-index 4ab6a1f58116..a181a27aa559 100644
+index a181a27aa559..4cc59abdb8e1 100644
 --- a/net/bridge/br_private.h
 +++ b/net/bridge/br_private.h
-@@ -976,6 +976,7 @@ void br_multicast_disable_port(struct net_bridge_port *port);
- void br_multicast_init(struct net_bridge *br);
- void br_multicast_join_snoopers(struct net_bridge *br);
- void br_multicast_leave_snoopers(struct net_bridge *br);
-+void br_multicast_reset_timer_cbs(struct net_bridge_mcast *brmctx);
- void br_multicast_open(struct net_bridge *br);
- void br_multicast_stop(struct net_bridge *br);
- void br_multicast_dev_del(struct net_bridge *br);
-@@ -1416,6 +1417,10 @@ static inline void br_multicast_leave_snoopers(struct net_bridge *br)
- {
- }
- 
-+static inline void br_multicast_reset_timer_cbs(struct net_bridge_mcast *brmctx)
-+{
-+}
-+
- static inline void br_multicast_open(struct net_bridge *br)
- {
- }
-diff --git a/net/bridge/br_vlan.c b/net/bridge/br_vlan.c
-index 326933b455b3..3facb4eda306 100644
---- a/net/bridge/br_vlan.c
-+++ b/net/bridge/br_vlan.c
-@@ -325,7 +325,12 @@ static int __vlan_add(struct net_bridge_vlan *v, u16 flags,
- 			if (err && err != -EOPNOTSUPP)
- 				goto out;
- 		}
-+
- 		br_multicast_ctx_init(br, v, &v->br_mcast_ctx);
-+
-+		spin_lock_bh(&br->multicast_lock);
-+		br_multicast_reset_timer_cbs(&v->br_mcast_ctx);
-+		spin_unlock_bh(&br->multicast_lock);
- 		v->priv_flags |= BR_VLFLAG_GLOBAL_MCAST_ENABLED;
- 	}
- 
+@@ -160,12 +160,14 @@ struct net_bridge_mcast {
+ 	struct bridge_mcast_other_query	ip4_other_query;
+ 	struct bridge_mcast_own_query	ip4_own_query;
+ 	struct bridge_mcast_querier	ip4_querier;
++	bool				ip4_active;
+ #if IS_ENABLED(CONFIG_IPV6)
+ 	struct hlist_head		ip6_mc_router_list;
+ 	struct timer_list		ip6_mc_router_timer;
+ 	struct bridge_mcast_other_query	ip6_other_query;
+ 	struct bridge_mcast_own_query	ip6_own_query;
+ 	struct bridge_mcast_querier	ip6_querier;
++	bool				ip6_active;
+ #endif /* IS_ENABLED(CONFIG_IPV6) */
+ #endif /* CONFIG_BRIDGE_IGMP_SNOOPING */
+ };
 -- 
 2.51.0
 
