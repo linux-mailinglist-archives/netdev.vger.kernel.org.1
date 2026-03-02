@@ -1,197 +1,238 @@
-Return-Path: <netdev+bounces-262691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262692-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kKdUBZqopWngCwAAu9opvQ
-	(envelope-from <netdev+bounces-262691-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:11:22 +0100
+	id IH/6EPuopWmpDgAAu9opvQ
+	(envelope-from <netdev+bounces-262692-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:12:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B4221DB85C
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:11:21 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCA681DB911
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:12:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6FA8A30217C5
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 15:11:13 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 03BF0302FB28
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 15:12:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D42A4014BE;
-	Mon,  2 Mar 2026 15:11:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7828940B6ED;
+	Mon,  2 Mar 2026 15:12:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GANvyKan"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PblpajQg";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="FiKaHq+2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 199C24014A6;
-	Mon,  2 Mar 2026 15:11:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 165533BA23F
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 15:12:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772464269; cv=none; b=Naa64EOmsZhiaau2djuBEkC69b6e+uXXA06o63qSQYnvrSa57UclwTRQPM8E+YiAx8yNVRDafiJbYjBb2a8LQe0W3ID3C59p0ELT1LIE/keuv86G++ryfSCtsrCwKPOv6SIcukl9Tv0CmPolQiDvROm/a3gOu9qzy9xVB4R2fyc=
+	t=1772464340; cv=none; b=VOAkqnV07ut8wpkJerXyHEVjDFGJ4RohJA17L6exlQtgDD3QjvgM/DcP8PMQ2vtJevKE1XFMzzJ6Y+AvMrnb6T2WeCQYNkDg+URFWO5HXzcMLsvg5UnnemMOO4AlxtMkrrpqx+zN5TP+oqbmbNEIGe3CWqno3K2IjH/nRE/a+qk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772464269; c=relaxed/simple;
-	bh=S3mnSMmtPzmTVzhJoUQ4a7SdRnoDLgRFvId3NK4J+mQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=goG89pmQJtd+MakaBqh+8CewZ8TdZ3MpQtoNi6eJmHL8xX7hHivq4HvZXBQSJBWQMTqDTGdu+E0VLPNh1H1BM9xhAqBZ/+YYLgSX6thALulAWqE4sXaodr7bpqiUr453aAxGFeYUYW2gqJSx6KoVJcvURWuQ/2PgFXysEP3v0so=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GANvyKan; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9EA9DC19423;
-	Mon,  2 Mar 2026 15:11:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772464268;
-	bh=S3mnSMmtPzmTVzhJoUQ4a7SdRnoDLgRFvId3NK4J+mQ=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=GANvyKan2IXX5CoTA/nIinryeNHadthB+SeeSGMA5NaIRuXxhlDfXKs4O26IzPdNj
-	 ZteGK24msw3tQ7mBYkMVNdC9SQGnXAL3kYA+0xw4Lsr3hyZ8uSbEQUfDpVKzzQ9Xf/
-	 8L5gOly59uFEmiyuNlX9dfpXVGz+7q6b0B1dbc49y+lCaq+SusQ26aFU/E8Rl85OTC
-	 GLxAutvwlrhFw5ZUkdTOFn+ebiRPCKfAW05brmYUehV/dSEYlj1Rf7o1FxI+PTaW7E
-	 ql/0lHKzgnpOHqwY00nuXmloKILvzUn1w0F4WlG0vRZz0py0+pgKxFzw2XSi2ZGzUJ
-	 2EWkAL1aOK6LQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86BE8EA4E0A;
-	Mon,  2 Mar 2026 15:11:08 +0000 (UTC)
-From: Serapheim Dimitropoulos via B4 Relay <devnull+sdimitropoulos.coreweave.com@kernel.org>
-Date: Mon, 02 Mar 2026 10:10:59 -0500
-Subject: [PATCH net-next] net: mdio: add fwnode compatible matching to
- mdio_bus_match()
+	s=arc-20240116; t=1772464340; c=relaxed/simple;
+	bh=op0liavrrZXpHIYFE8b5murCMpJBWBYITF7jRogwVXU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iDTmViJaGtRGNkfsSZ2xxCisMno+K3YqdqJlM0ukXdqDXOWscAmMCEBcB50ivDHKxA8GVFcgA5VSGIOA4lXLYnetMVsrSIShu3LBxDeQB2y8PqqbRUo4lPcUbtK48Am/nxHicL8c6cXLJRPb1ce8cYcjco3CJK5YC3vSUydLEa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PblpajQg; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=FiKaHq+2; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772464338;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RF0n2SJ1RvllNep2fFvHq0JPMVeIU4OKpnJDj8ItlsE=;
+	b=PblpajQgsZ/jY4gZ0pl6X+2keNeiW7LebN6X4vdrjMFx91WBrJNYXK1Lq0aB2yB7gY634E
+	BZpVcldh7vpyvyvbX0Xh9fuKhbmrB4f0wLkWEkRKPMiyC5IENt2GeWGQeh2lWz+XsmDt05
+	qNLuOg+7xwW+M3Sk+axVmka+N5NugKQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-445-5hDDJb-VPze6HnbyyJzTfw-1; Mon, 02 Mar 2026 10:12:16 -0500
+X-MC-Unique: 5hDDJb-VPze6HnbyyJzTfw-1
+X-Mimecast-MFC-AGG-ID: 5hDDJb-VPze6HnbyyJzTfw_1772464336
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4806cfffca6so45697465e9.2
+        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 07:12:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1772464335; x=1773069135; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RF0n2SJ1RvllNep2fFvHq0JPMVeIU4OKpnJDj8ItlsE=;
+        b=FiKaHq+2tyH8zoTrCU34EKgaF6VI4eGrN7Cpbgpl+PK5i9Xi1gzBpVkXVTuX0/q+a0
+         GrU8h9k5AzbcY92nNVQACuup3wznw+f/TOJ1Dc5QUwJMgS/3gUHhyvOFMOw+SKm/jmAa
+         7vwIfA2H4OV8wzoSeCRzOKTBwyFtVgHf+qkV3silkj5mu1YfM4P+q/evcNISgDe5MiMV
+         lmm3qELJZMuLhM74D257VLkImoXcgGS/tVtoQm++PHkshiu8gSx8VvdOBrU3UvvtxzpZ
+         nIzYn0LoiPHZR9xsY1hAI0CCwwM8DHzHmYdaWSQzVcBdWNrlRJVWcxQtELEQHGcZahdd
+         /9GA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772464335; x=1773069135;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RF0n2SJ1RvllNep2fFvHq0JPMVeIU4OKpnJDj8ItlsE=;
+        b=sSaYFF28TnlnDlOTEMONydr61iIw8QmheyTXYMUE9k/XQMyqapS09vJRk627rmMsYp
+         VhSrUiGjreY1jcyJeix5hMYn+yh+6u77XLw/npFaoFE5suFxLAlYg+418TM9BOqzQk8o
+         ArY1UabLmdCPAB87ddk73JCbnIGDLJDq9oOsK4ym1ezYsUPFp+/PnYxqt602ORy3Ph5+
+         cM5Bvh3VQrYuVkXpsn2TOTEDLYQPuV5+elR5ggqmKd6YF+OTwLvFAczW6chFr40SUgnv
+         WUmjYglMnQSOCdWiwryaSzE8Yik9xZM0pfszmNEENYlbcBcSh3UqUPXzbHYi6h+a8lbh
+         75ug==
+X-Forwarded-Encrypted: i=1; AJvYcCU/tXBGQchVdBh67HIlaumYyWFacclJVur5wZB+3Tn5BztR3UscqV52ntfgK3ku0ZGopUZbh1U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzdk2R8hrY7R/TXixeUnM19P7+8LXB9C2OG8uA13phRXuQBK/+D
+	6HIDfkiFKoGG0ohngUZNHL9LlAO0hkzqnJmnYMP4lU6H+h6LPOiBzaJl3US1xuVD9fELmaGm4uN
+	MWrDF8cB8TqDN2qZE51bttCQv/fsABPosBWG5kc1YvKw8TTJY/l9ym9q0E6zGsN0VeQ==
+X-Gm-Gg: ATEYQzwDOeO5DyeI+blGmP+yJvahiAlSQgirxh7cglS/Xx3cvUAHOh8mRXvx1/apUwr
+	NwVnMIFhhtnP+Glc4rjDkatC5o0Dv/QvJTdmfuoR5CoRp0P1uEXdKHvD5qIoDwe58gtrV2RISFq
+	3rIf0NG84u3Sm2wqJk6zivIApeRmYxm6C+ykQUrxG4VlOpkUu/SfBnbjAMaHOyVfa+/YaGHiuV3
+	9JomLowdQfs/+Nltw8EZXiwgrV7EnKZjWamae14a2w1S3KcfI8HEAqfRdefq/cioiOZvth6N+P5
+	HsJyghBqEnUifggh85k5JYWvtSrruFdsPsShHopXSEK+umCLOgFZ/DumogCPcU/2P4DlbziCKZB
+	KT6EioNoq8yNwFQ07aqWmWBoDMD59UxuzhdsswN30Ud0r1A==
+X-Received: by 2002:a05:600c:8106:b0:46f:c55a:5a8d with SMTP id 5b1f17b1804b1-483c9bb6559mr206067785e9.4.1772464335149;
+        Mon, 02 Mar 2026 07:12:15 -0800 (PST)
+X-Received: by 2002:a05:600c:8106:b0:46f:c55a:5a8d with SMTP id 5b1f17b1804b1-483c9bb6559mr206067215e9.4.1772464334575;
+        Mon, 02 Mar 2026 07:12:14 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-79-166.inter.net.il. [80.230.79.166])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bd765604sm360962425e9.15.2026.03.02.07.12.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Mar 2026 07:12:13 -0800 (PST)
+Date: Mon, 2 Mar 2026 10:12:11 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: linux-kernel@vger.kernel.org, ShuangYu <shuangyu@yunyoo.cc>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH RFC] vhost: fix vhost_get_avail_idx for a non empty ring
+Message-ID: <20260302101125-mutt-send-email-mst@kernel.org>
+References: <559b04ae6ce52973c535dc47e461638b7f4c3d63.1772441455.git.mst@redhat.com>
+ <aaWTjPXDqhMZlwLr@sgarzare-redhat>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260302-mdio-fwnode-match-v1-1-ac542b7c53a3@coreweave.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x3MQQqDMBBG4avIrDsQh1Jpr1JcRPOnzsJJSUIri
- Hc3uPwW7+1UkBWFXt1OGT8tmqyhv3U0L94+YA3NJE4eTmTgNWji+LcUwKuv88KTPDHdAwYfHbX
- umxF1u55vMlQ2bJXG4zgBis//TG0AAAA=
-X-Change-ID: 20260227-mdio-fwnode-match-b29eb4de7af0
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Serapheim Dimitropoulos <sdimitropoulos@coreweave.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1772464267; l=3051;
- i=sdimitropoulos@coreweave.com; s=20260302; h=from:subject:message-id;
- bh=MRrfkvAZ3+WAdPSLi3xHODK806e9I/kLyRuqHAkQMlg=;
- b=iZTvmuUSjDogsrbLldqRhLOUPu/mEq40ouAS0VkuZRPW137iZthkyPR4iDj22HW0h/iCpsk46
- 7+yVlk6K3FCC2c+1+Ro8u0JB4vACBjTuaIfDZs4X7R0FUW7lRCquRMZ
-X-Developer-Key: i=sdimitropoulos@coreweave.com; a=ed25519;
- pk=Qysvg7jaTIU0posaYFtqa5SKJlFwqzil4X0U1p1zo/g=
-X-Endpoint-Received: by B4 Relay for sdimitropoulos@coreweave.com/20260302
- with auth_id=655
-X-Original-From: Serapheim Dimitropoulos <sdimitropoulos@coreweave.com>
-Reply-To: sdimitropoulos@coreweave.com
-X-Rspamd-Queue-Id: 8B4221DB85C
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aaWTjPXDqhMZlwLr@sgarzare-redhat>
+X-Rspamd-Queue-Id: DCA681DB911
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262691-lists,netdev=lfdr.de,sdimitropoulos.coreweave.com];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262692-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	HAS_REPLYTO(0.00)[sdimitropoulos@coreweave.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,yunyoo.cc:email]
 X-Rspamd-Action: no action
 
-From: Serapheim Dimitropoulos <sdimitropoulos@coreweave.com>
+On Mon, Mar 02, 2026 at 03:30:53PM +0100, Stefano Garzarella wrote:
+> On Mon, Mar 02, 2026 at 03:51:49AM -0500, Michael S. Tsirkin wrote:
+> > vhost_get_avail_idx is supposed to report whether it has updated
+> > vq->avail_idx. Instead, it returns whether all entries have been
+> > consumed, which is usually the same. But not always - in
+> > drivers/vhost/net.c and when mergeable buffers have been enabled, the
+> > driver checks whether the combined entries are big enough to store an
+> > incoming packet. If not, the driver re-enables notifications with
+> > available entries still in the ring. The incorrect return value from
+> > vhost_get_avail_idx propagates through vhost_enable_notify and causes
+> > the host to livelock if the guest is not making progress, as vhost will
+> > immediately disable notifications and retry using the available entries.
+> 
+> Here I'd add something like this just to make it clear the full picture,
+> because I spent quite some time to understand how it was related to the
+> Fixes tag (which I agree is the right one to use).
+> 
+>   This goes back to commit d3bb267bbdcb ("vhost: cache avail index in
+>   vhost_enable_notify()") which changed vhost_enable_notify() to compare
+>   the freshly read avail index against vq->last_avail_idx instead of the
+>   previously cached vq->avail_idx. Commit 7ad472397667 ("vhost: move
+>   smp_rmb() into vhost_get_avail_idx()") then carried over the same
+>   comparison when refactoring vhost_enable_notify() to call the unified
+>   vhost_get_avail_idx().
 
-The MDIO bus match function currently only supports Device Tree
-(of_driver_match_device) and PHY-ID-based matching (bus_match callback).
-This means MDIO drivers that rely on compatible-string matching, such as
-the mv88e6xxx DSA switch driver, cannot bind on systems that describe
-hardware topology via firmware nodes (fwnode/software nodes) rather than
-Device Tree.
+Indeed.
 
-This is a problem for x86/ACPI platforms where MDIO buses are created
-dynamically (e.g., USB-to-MDIO bridges) and have no Device Tree
-representation. On these systems, kernel modules or ACPI tables can
-describe the MDIO device topology using software nodes with a
-"compatible" property, but mdio_bus_match() never checks it.
-
-Add a fallback matching path that iterates the driver's of_match_table
-and checks each compatible string against the device's fwnode using the
-existing device_is_compatible() helper. This is placed after the OF
-match (which handles DT natively) and before the bus_match callback
-(which handles PHY-ID matching), so existing match behavior is
-unchanged.
-
-This enables DSA switch drivers like mv88e6xxx to bind on x86 systems
-where the switch topology is described via software nodes or ACPI,
-closing a gap in MDIO bus support for non-DT platforms.
-
-Signed-off-by: Serapheim Dimitropoulos <sdimitropoulos@coreweave.com>
----
- drivers/net/phy/mdio_bus.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
-
-diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
-index afdf1ad6c0e61..4575122edb475 100644
---- a/drivers/net/phy/mdio_bus.c
-+++ b/drivers/net/phy/mdio_bus.c
-@@ -23,6 +23,7 @@
- #include <linux/of_device.h>
- #include <linux/of_mdio.h>
- #include <linux/phy.h>
-+#include <linux/property.h>
- #include <linux/reset.h>
- #include <linux/slab.h>
- #include <linux/spinlock.h>
-@@ -959,6 +960,7 @@ static int mdio_bus_match(struct device *dev, const struct device_driver *drv)
- {
- 	const struct mdio_driver *mdiodrv = to_mdio_driver(drv);
- 	struct mdio_device *mdio = to_mdio_device(dev);
-+	const struct of_device_id *id;
- 
- 	/* Both the driver and device must type-match */
- 	if (!(mdiodrv->mdiodrv.flags & MDIO_DEVICE_IS_PHY) !=
-@@ -968,6 +970,19 @@ static int mdio_bus_match(struct device *dev, const struct device_driver *drv)
- 	if (of_driver_match_device(dev, drv))
- 		return 1;
- 
-+	/*
-+	 * Fall back to fwnode compatible matching for non-DT systems.
-+	 * This enables MDIO drivers (e.g., DSA switch drivers) to bind
-+	 * on platforms using software nodes or ACPI to describe the
-+	 * MDIO device topology.
-+	 */
-+	if (dev_fwnode(dev) && !dev->of_node && drv->of_match_table) {
-+		for (id = drv->of_match_table; id->compatible[0]; id++) {
-+			if (device_is_compatible(dev, id->compatible))
-+				return 1;
-+		}
-+	}
-+
- 	if (mdio->bus_match)
- 		return mdio->bus_match(dev, drv);
- 
-
----
-base-commit: fd6dad4e1ae296b67b87291256878a58dad36c93
-change-id: 20260227-mdio-fwnode-match-b29eb4de7af0
-
-Best regards,
--- 
-Serapheim Dimitropoulos <sdimitropoulos@coreweave.com>
-
+> > 
+> > The obvious fix is to make vhost_get_avail_idx do what the comment
+> > says it does and report whether new entries have been added.
+> > 
+> > Reported-by: ShuangYu <shuangyu@yunyoo.cc>
+> > Fixes: d3bb267bbdcb ("vhost: cache avail index in vhost_enable_notify()")
+> > Cc: Stefano Garzarella <sgarzare@redhat.com>
+> > Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> > 
+> > Lightly tested, posting early to simplify testing for the reporter.
+> 
+> Tested with vhost-vsock and I didn't see any issue.
+> 
+> Thanks!
+> 
+> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> 
+> > 
+> > drivers/vhost/vhost.c | 11 +++++++----
+> > 1 file changed, 7 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> > index 2f2c45d20883..db329a6f6145 100644
+> > --- a/drivers/vhost/vhost.c
+> > +++ b/drivers/vhost/vhost.c
+> > @@ -1522,6 +1522,7 @@ static void vhost_dev_unlock_vqs(struct vhost_dev *d)
+> > static inline int vhost_get_avail_idx(struct vhost_virtqueue *vq)
+> > {
+> > 	__virtio16 idx;
+> > +	u16 avail_idx;
+> > 	int r;
+> > 
+> > 	r = vhost_get_avail(vq, idx, &vq->avail->idx);
+> > @@ -1532,17 +1533,19 @@ static inline int vhost_get_avail_idx(struct vhost_virtqueue *vq)
+> > 	}
+> > 
+> > 	/* Check it isn't doing very strange thing with available indexes */
+> > -	vq->avail_idx = vhost16_to_cpu(vq, idx);
+> > -	if (unlikely((u16)(vq->avail_idx - vq->last_avail_idx) > vq->num)) {
+> > +	avail_idx = vhost16_to_cpu(vq, idx);
+> > +	if (unlikely((u16)(avail_idx - vq->last_avail_idx) > vq->num)) {
+> > 		vq_err(vq, "Invalid available index change from %u to %u",
+> > -		       vq->last_avail_idx, vq->avail_idx);
+> > +		       vq->last_avail_idx, avail_idx);
+> > 		return -EINVAL;
+> > 	}
+> > 
+> > 	/* We're done if there is nothing new */
+> > -	if (vq->avail_idx == vq->last_avail_idx)
+> > +	if (avail_idx == vq->avail_idx)
+> > 		return 0;
+> > 
+> > +	vq->avail_idx = avail_idx;
+> > +
+> > 	/*
+> > 	 * We updated vq->avail_idx so we need a memory barrier between
+> > 	 * the index read above and the caller reading avail ring entries.
+> > -- 
+> > MST
+> > 
 
 
