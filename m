@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-262513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262511-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MDxdOx8lpWm14AUAu9opvQ
-	(envelope-from <netdev+bounces-262513-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 06:50:23 +0100
+	id iBnOHAIlpWm14AUAu9opvQ
+	(envelope-from <netdev+bounces-262511-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 06:49:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6886B1D33FF
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 06:50:23 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC7761D33D8
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 06:49:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BE6EC3022932
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 05:49:56 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2922D300A58B
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 05:49:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DDAA378D80;
-	Mon,  2 Mar 2026 05:49:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4218126E706;
+	Mon,  2 Mar 2026 05:49:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.aperture-lab.de (mail.aperture-lab.de [116.203.183.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 193FE37700D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B3E7349B0A;
 	Mon,  2 Mar 2026 05:49:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.183.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772430567; cv=none; b=QzwZlOljk9KGdohifA0ojxsdDNTShS2dD9o1BqLwruRPmPmWatrZwN7+swJzy+s2cRHi0jkjpbBn+l2ed19N5RM1w3eulvz1+l/fXZd81UyLmdbF2H9ktQSmRE3BfMR+PsOw2u9rCrZT0WU4RlziAKp3/jECHueP4LG7i9MALpw=
+	t=1772430566; cv=none; b=mqn3OznumOzV9PzhQfAAQOwPMZ7tXM3bJvNL/xP7Ou013kNEOFy/h8X+ic9Q29eVY+T0ju+t7S5E8S/P/9Y5cTuf763Q5NRNYF6BKquMpMgJHxBVh+BTKi+tDYGd39w99pFWhP+XU4ScJwVLVuFni7IzjofKsO7vOvmJOYu5kc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772430567; c=relaxed/simple;
-	bh=V050GCjejq31W/9Ha43gZfKPtsQINZkypMaioaOkFhs=;
+	s=arc-20240116; t=1772430566; c=relaxed/simple;
+	bh=CsPiObc6vB6XHvCTeAuWifwBKN5qSXcv9aMPYf58DAA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gjDSfEU/57hbDKlwfvLGzPaQ+QZsmCAzYDMgeoc3qUkhpWdLHfFOyb1WPPErwoAz/ZY2uXYdZ4pPQ5Ic7NEOYaxuMpa9oq247VGZ6bnntgrf8gzBUeE6yhCMAi3pGZIh8n7w7c1Qv1h/VQx5d3LBVfbwaTen4IlV7BhuGigjPnA=
+	 MIME-Version:Content-Type; b=DJtZOaFALpi8JcTymbnpwt1dybD03EyuFeJ0AfrMFey5FI57A/X/4iUKag2CSBKSrZqX4HEI95eTijQK3pgtOKhqj0oLZf2wZp6w17aAywmqUZSmvD/sg+qOuZyEjBr0fRKpL8hjV/bYePQKPZRoqTuRUXnu/4otMU4fMXXMXtU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c0d3.blue; spf=pass smtp.mailfrom=c0d3.blue; arc=none smtp.client-ip=116.203.183.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c0d3.blue
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=c0d3.blue
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 07F7D54CC5F;
-	Mon,  2 Mar 2026 06:40:42 +0100 (CET)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C632754CC60;
+	Mon,  2 Mar 2026 06:40:44 +0100 (CET)
 From: =?UTF-8?q?Linus=20L=C3=BCssing?= <linus.luessing@c0d3.blue>
 To: bridge@lists.linux.dev
 Cc: netdev@vger.kernel.org,
@@ -52,9 +52,9 @@ Cc: netdev@vger.kernel.org,
 	Xiao Liang <shaw.leon@gmail.com>,
 	shuah@kernel.org,
 	=?UTF-8?q?Linus=20L=C3=BCssing?= <linus.luessing@c0d3.blue>
-Subject: [PATCH net-next v3 02/14] net: bridge: mcast: track active state, adding tests
-Date: Mon,  2 Mar 2026 06:39:56 +0100
-Message-ID: <20260302054008.21638-3-linus.luessing@c0d3.blue>
+Subject: [PATCH net-next v3 03/14] net: bridge: mcast: avoid sleeping on bridge-down
+Date: Mon,  2 Mar 2026 06:39:57 +0100
+Message-ID: <20260302054008.21638-4-linus.luessing@c0d3.blue>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260302054008.21638-1-linus.luessing@c0d3.blue>
 References: <20260302054008.21638-1-linus.luessing@c0d3.blue>
@@ -72,11 +72,11 @@ X-Spamd-Result: default: False [1.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262513-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262511-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -87,750 +87,381 @@ X-Spamd-Result: default: False [1.04 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.948];
+	NEURAL_HAM(-0.00)[-0.950];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[linus.luessing@c0d3.blue,netdev@vger.kernel.org];
 	FREEMAIL_CC(0.00)[vger.kernel.org,blackwall.org,nvidia.com,lunn.ch,kernel.org,redhat.com,google.com,davemloft.net,fomichev.me,gmail.com,c0d3.blue];
 	R_DKIM_NA(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lib.sh:url,bridge_mdb_active.sh:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,c0d3.blue:mid,c0d3.blue:email]
-X-Rspamd-Queue-Id: 6886B1D33FF
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,c0d3.blue:mid,c0d3.blue:email]
+X-Rspamd-Queue-Id: BC7761D33D8
 X-Rspamd-Action: no action
 
-Before making any significant changes to the internals of the Linux
-bridge add some tests regarding the multicast activity. This is
-also to verify that we have the semantics of the new
-*_MCAST_ACTIVE_{V4,V6} netlink attributes as expected.
+We later want to use the multicast lock when setting the bridge
+interface up or down, to be able to atomically both check all conditions
+to toggle the multicast active state and to subsequently toggle it.
+While most variables we check / contexts we check from are serialized
+(toggled variables through netlink/sysfs) the timer_pending() check is
+not and might run in parallel.
+
+However so far we are not allowed to spinlock __br_multicast_stop() as
+its call to timer_delete_sync() might sleep. Therefore replacing the
+sleeping variant with the non-sleeping timer_shutdown(). It is sufficient
+to only wait for any timer callback to finish when we are freeing the
+multicast context.
+
+While the disadvantage of using a non-syncing variant might lead us to
+race and still execute its timer callback just after timer_shutdown() was
+called timer_shutdown() also has the following additional advantage(s):
+It for one thing clears the callback function pointer and by that avoids
+rearming. For another a missing function pointer allows us to detect
+early in the timer callback if we, this timer, were just canceled.
+
+In other words, this also allows us to make sure that once
+timer_shutdown() was called while we do potentially enter its timer
+callback briefly we never run the main task of this timer. Similar to
+what a timer_delete_sync() would have avoided, too. Except we are not
+waiting/sleeping/syncing in br_multicast_stop() but instead (in rare cases)
+briefly busy-wait/sync a bit later when grabbing the multicast spinlock
+in the timer callback.
+
+This new check also makes the netif_running() check redundant/obsolete
+in these contexts.
 
 Signed-off-by: Linus Lüssing <linus.luessing@c0d3.blue>
 ---
- .../testing/selftests/net/forwarding/Makefile |   1 +
- .../net/forwarding/bridge_mdb_active.sh       | 702 ++++++++++++++++++
- 2 files changed, 703 insertions(+)
- create mode 100755 tools/testing/selftests/net/forwarding/bridge_mdb_active.sh
+ net/bridge/br_multicast.c | 128 +++++++++++++++++++++++++++-----------
+ net/bridge/br_private.h   |   5 ++
+ net/bridge/br_vlan.c      |   5 ++
+ 3 files changed, 100 insertions(+), 38 deletions(-)
 
-diff --git a/tools/testing/selftests/net/forwarding/Makefile b/tools/testing/selftests/net/forwarding/Makefile
-index ff4a00d91a26..a92eee17f3c5 100644
---- a/tools/testing/selftests/net/forwarding/Makefile
-+++ b/tools/testing/selftests/net/forwarding/Makefile
-@@ -10,6 +10,7 @@ TEST_PROGS := \
- 	bridge_mdb_host.sh \
- 	bridge_mdb_max.sh \
- 	bridge_mdb_port_down.sh \
-+	bridge_mdb_active.sh \
- 	bridge_mld.sh \
- 	bridge_port_isolation.sh \
- 	bridge_sticky_fdb.sh \
-diff --git a/tools/testing/selftests/net/forwarding/bridge_mdb_active.sh b/tools/testing/selftests/net/forwarding/bridge_mdb_active.sh
-new file mode 100755
-index 000000000000..f4bf565bd3f0
---- /dev/null
-+++ b/tools/testing/selftests/net/forwarding/bridge_mdb_active.sh
-@@ -0,0 +1,702 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# +-------+      +---------+
-+# | brq0  |      | br0     |
-+# | + $h1 |      | + $swp1 |
-+# +----|--+      +----|----+
-+#      |              |
-+#      \--------------/
-+#
-+#
-+# This script checks if we have the expected mcast_active_v{4,6} state
-+# on br0 in a variety of scenarios. This state determines if ultimately
-+# multicast snooping is applied to multicast data packets
-+# (multicast snooping active) or if they are (by default) flooded instead
-+# (multicast snooping inactive).
-+#
-+# Notably, multicast snooping can be enabled but still be inactive if not all
-+# requirements to safely apply multicast snooping to multicast data packets
-+# are met.
-+#
-+# Depending on the test case an IGMP/MLD querier might be on brq0, on br0
-+# or neither.
-+
-+
-+ALL_TESTS="
-+	test_inactive
-+	test_active_other_querier
-+	test_active_own_querier
-+	test_inactive_brdown
-+	test_inactive_nov6
-+	test_inactive_snooping_off
-+	test_inactive_querier_off
-+	test_inactive_other_querier_norespdelay
-+	test_inactive_own_querier_norespdelay
-+	test_inactive
-+	test_vlan_inactive
-+	test_vlan_active_other_querier
-+	test_vlan_active_own_querier
-+	test_vlan_inactive_brdown
-+	test_vlan_inactive_nov6
-+	test_vlan_inactive_snooping_off
-+	test_vlan_inactive_vlans_snooping_off
-+	test_vlan_inactive_vlan_snooping_off
-+	test_vlan_inactive_other_querier_norespdelay
-+	test_vlan_inactive_own_querier_norespdelay
-+"
-+
-+NUM_NETIFS=2
-+MCAST_MAX_RESP_IVAL_SEC=1
-+MCAST_VLAN_ID=42
-+source lib.sh
-+
-+switch_create()
+diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
+index 881d866d687a..b90f0e149c40 100644
+--- a/net/bridge/br_multicast.c
++++ b/net/bridge/br_multicast.c
+@@ -1663,6 +1663,14 @@ static void br_multicast_router_expired(struct net_bridge_mcast_port *pmctx,
+ 	spin_unlock(&br->multicast_lock);
+ }
+ 
++static bool br_multicast_is_stopping(struct net_bridge *br,
++				     struct timer_list *timer)
 +{
-+	ip link add dev br0 type bridge\
-+		vlan_filtering 0 \
-+		mcast_query_response_interval $((MCAST_MAX_RESP_IVAL_SEC*100))\
-+		mcast_snooping 0 \
-+		mcast_vlan_snooping 0
-+	ip link add dev brq0 type bridge\
-+		vlan_filtering 0 \
-+		mcast_query_response_interval $((MCAST_MAX_RESP_IVAL_SEC*100))\
-+		mcast_snooping 0 \
-+		mcast_vlan_snooping 0
++	lockdep_assert_held_once(&br->multicast_lock);
 +
-+	echo 1 > /proc/sys/net/ipv6/conf/br0/disable_ipv6
-+	echo 1 > /proc/sys/net/ipv6/conf/brq0/disable_ipv6
-+
-+	ip link set dev "$swp1" master br0
-+	ip link set dev "$h1" master brq0
-+
-+	ip link set dev "$h1" up
-+	ip link set dev "$swp1" up
++	return !timer->function;
 +}
 +
-+switch_destroy()
+ static void br_ip4_multicast_router_expired(struct timer_list *t)
+ {
+ 	struct net_bridge_mcast_port *pmctx = timer_container_of(pmctx, t,
+@@ -1698,7 +1706,8 @@ static void br_multicast_local_router_expired(struct net_bridge_mcast *brmctx,
+ 					      struct timer_list *timer)
+ {
+ 	spin_lock(&brmctx->br->multicast_lock);
+-	if (brmctx->multicast_router == MDB_RTR_TYPE_DISABLED ||
++	if (br_multicast_is_stopping(brmctx->br, timer) ||
++	    brmctx->multicast_router == MDB_RTR_TYPE_DISABLED ||
+ 	    brmctx->multicast_router == MDB_RTR_TYPE_PERM ||
+ 	    br_ip4_multicast_is_router(brmctx) ||
+ 	    br_ip6_multicast_is_router(brmctx))
+@@ -1728,10 +1737,11 @@ static void br_ip6_multicast_local_router_expired(struct timer_list *t)
+ #endif
+ 
+ static void br_multicast_querier_expired(struct net_bridge_mcast *brmctx,
+-					 struct bridge_mcast_own_query *query)
++					 struct bridge_mcast_own_query *query,
++					 struct timer_list *timer)
+ {
+ 	spin_lock(&brmctx->br->multicast_lock);
+-	if (!netif_running(brmctx->br->dev) ||
++	if (br_multicast_is_stopping(brmctx->br, timer) ||
+ 	    br_multicast_ctx_vlan_global_disabled(brmctx) ||
+ 	    !br_opt_get(brmctx->br, BROPT_MULTICAST_ENABLED))
+ 		goto out;
+@@ -1747,7 +1757,7 @@ static void br_ip4_multicast_querier_expired(struct timer_list *t)
+ 	struct net_bridge_mcast *brmctx = timer_container_of(brmctx, t,
+ 							     ip4_other_query.timer);
+ 
+-	br_multicast_querier_expired(brmctx, &brmctx->ip4_own_query);
++	br_multicast_querier_expired(brmctx, &brmctx->ip4_own_query, t);
+ }
+ 
+ #if IS_ENABLED(CONFIG_IPV6)
+@@ -1756,7 +1766,7 @@ static void br_ip6_multicast_querier_expired(struct timer_list *t)
+ 	struct net_bridge_mcast *brmctx = timer_container_of(brmctx, t,
+ 							     ip6_other_query.timer);
+ 
+-	br_multicast_querier_expired(brmctx, &brmctx->ip6_own_query);
++	br_multicast_querier_expired(brmctx, &brmctx->ip6_own_query, t);
+ }
+ #endif
+ 
+@@ -4040,10 +4050,12 @@ int br_multicast_rcv(struct net_bridge_mcast **brmctx,
+ }
+ 
+ static void br_multicast_query_expired(struct net_bridge_mcast *brmctx,
+-				       struct bridge_mcast_own_query *query)
++				       struct bridge_mcast_own_query *query,
++				       struct timer_list *timer)
+ {
+ 	spin_lock(&brmctx->br->multicast_lock);
+-	if (br_multicast_ctx_vlan_disabled(brmctx))
++	if (br_multicast_is_stopping(brmctx->br, timer) ||
++	    br_multicast_ctx_vlan_disabled(brmctx))
+ 		goto out;
+ 
+ 	if (query->startup_sent < brmctx->multicast_startup_query_count)
+@@ -4059,7 +4071,7 @@ static void br_ip4_multicast_query_expired(struct timer_list *t)
+ 	struct net_bridge_mcast *brmctx = timer_container_of(brmctx, t,
+ 							     ip4_own_query.timer);
+ 
+-	br_multicast_query_expired(brmctx, &brmctx->ip4_own_query);
++	br_multicast_query_expired(brmctx, &brmctx->ip4_own_query, t);
+ }
+ 
+ #if IS_ENABLED(CONFIG_IPV6)
+@@ -4068,7 +4080,7 @@ static void br_ip6_multicast_query_expired(struct timer_list *t)
+ 	struct net_bridge_mcast *brmctx = timer_container_of(brmctx, t,
+ 							     ip6_own_query.timer);
+ 
+-	br_multicast_query_expired(brmctx, &brmctx->ip6_own_query);
++	br_multicast_query_expired(brmctx, &brmctx->ip6_own_query, t);
+ }
+ #endif
+ 
+@@ -4111,29 +4123,30 @@ void br_multicast_ctx_init(struct net_bridge *br,
+ 	seqcount_spinlock_init(&brmctx->ip6_querier.seq, &br->multicast_lock);
+ #endif
+ 
+-	timer_setup(&brmctx->ip4_mc_router_timer,
+-		    br_ip4_multicast_local_router_expired, 0);
+-	timer_setup(&brmctx->ip4_other_query.timer,
+-		    br_ip4_multicast_querier_expired, 0);
+-	timer_setup(&brmctx->ip4_other_query.delay_timer,
+-		    br_multicast_query_delay_expired, 0);
+-	timer_setup(&brmctx->ip4_own_query.timer,
+-		    br_ip4_multicast_query_expired, 0);
++	timer_setup(&brmctx->ip4_mc_router_timer, NULL, 0);
++	timer_setup(&brmctx->ip4_other_query.timer, NULL, 0);
++	timer_setup(&brmctx->ip4_other_query.delay_timer, NULL, 0);
++	timer_setup(&brmctx->ip4_own_query.timer, NULL, 0);
+ #if IS_ENABLED(CONFIG_IPV6)
+-	timer_setup(&brmctx->ip6_mc_router_timer,
+-		    br_ip6_multicast_local_router_expired, 0);
+-	timer_setup(&brmctx->ip6_other_query.timer,
+-		    br_ip6_multicast_querier_expired, 0);
+-	timer_setup(&brmctx->ip6_other_query.delay_timer,
+-		    br_multicast_query_delay_expired, 0);
+-	timer_setup(&brmctx->ip6_own_query.timer,
+-		    br_ip6_multicast_query_expired, 0);
++	timer_setup(&brmctx->ip6_mc_router_timer, NULL, 0);
++	timer_setup(&brmctx->ip6_other_query.timer, NULL, 0);
++	timer_setup(&brmctx->ip6_other_query.delay_timer, NULL, 0);
++	timer_setup(&brmctx->ip6_own_query.timer, NULL, 0);
+ #endif
+ }
+ 
+ void br_multicast_ctx_deinit(struct net_bridge_mcast *brmctx)
+ {
+-	__br_multicast_stop(brmctx);
++	timer_shutdown_sync(&brmctx->ip4_mc_router_timer);
++	timer_shutdown_sync(&brmctx->ip4_other_query.timer);
++	timer_shutdown_sync(&brmctx->ip4_other_query.delay_timer);
++	timer_shutdown_sync(&brmctx->ip4_own_query.timer);
++#if IS_ENABLED(CONFIG_IPV6)
++	timer_shutdown_sync(&brmctx->ip6_mc_router_timer);
++	timer_shutdown_sync(&brmctx->ip6_other_query.timer);
++	timer_shutdown_sync(&brmctx->ip6_other_query.delay_timer);
++	timer_shutdown_sync(&brmctx->ip6_own_query.timer);
++#endif
+ }
+ 
+ void br_multicast_init(struct net_bridge *br)
+@@ -4213,9 +4226,27 @@ void br_multicast_leave_snoopers(struct net_bridge *br)
+ 	br_ip6_multicast_leave_snoopers(br);
+ }
+ 
++void br_multicast_reset_timer_cbs(struct net_bridge_mcast *brmctx)
 +{
-+	ip link set dev "$swp1" down
-+	ip link set dev "$h1" down
++	lockdep_assert_held_once(&brmctx->br->multicast_lock);
 +
-+	ip link del dev brq0
-+	ip link del dev br0
++	brmctx->ip4_mc_router_timer.function = br_ip4_multicast_local_router_expired;
++	brmctx->ip4_other_query.timer.function = br_ip4_multicast_querier_expired;
++	brmctx->ip4_other_query.delay_timer.function = br_multicast_query_delay_expired;
++	brmctx->ip4_own_query.timer.function = br_ip4_multicast_query_expired;
++#if IS_ENABLED(CONFIG_IPV6)
++	brmctx->ip6_mc_router_timer.function = br_ip6_multicast_local_router_expired;
++	brmctx->ip6_other_query.timer.function = br_ip6_multicast_querier_expired;
++	brmctx->ip6_other_query.delay_timer.function = br_multicast_query_delay_expired;
++	brmctx->ip6_own_query.timer.function = br_ip6_multicast_query_expired;
++#endif
 +}
 +
-+setup_prepare()
+ static void __br_multicast_open_query(struct net_bridge *br,
+ 				      struct bridge_mcast_own_query *query)
+ {
++	lockdep_assert_held_once(&br->multicast_lock);
++
+ 	query->startup_sent = 0;
+ 
+ 	if (!br_opt_get(br, BROPT_MULTICAST_ENABLED))
+@@ -4226,13 +4257,15 @@ static void __br_multicast_open_query(struct net_bridge *br,
+ 
+ static void __br_multicast_open(struct net_bridge_mcast *brmctx)
+ {
++	br_multicast_reset_timer_cbs(brmctx);
++
+ 	__br_multicast_open_query(brmctx->br, &brmctx->ip4_own_query);
+ #if IS_ENABLED(CONFIG_IPV6)
+ 	__br_multicast_open_query(brmctx->br, &brmctx->ip6_own_query);
+ #endif
+ }
+ 
+-void br_multicast_open(struct net_bridge *br)
++static void br_multicast_open_locked(struct net_bridge *br)
+ {
+ 	ASSERT_RTNL();
+ 
+@@ -4256,17 +4289,26 @@ void br_multicast_open(struct net_bridge *br)
+ 	}
+ }
+ 
++void br_multicast_open(struct net_bridge *br)
 +{
-+	h1=${NETIFS[p1]}
-+	swp1=${NETIFS[p2]}
-+
-+	switch_create
++	spin_lock_bh(&br->multicast_lock);
++	br_multicast_open_locked(br);
++	spin_unlock_bh(&br->multicast_lock);
 +}
 +
-+cleanup()
+ static void __br_multicast_stop(struct net_bridge_mcast *brmctx)
+ {
+-	timer_delete_sync(&brmctx->ip4_mc_router_timer);
+-	timer_delete_sync(&brmctx->ip4_other_query.timer);
+-	timer_delete_sync(&brmctx->ip4_other_query.delay_timer);
+-	timer_delete_sync(&brmctx->ip4_own_query.timer);
++	lockdep_assert_held_once(&brmctx->br->multicast_lock);
++
++	timer_shutdown(&brmctx->ip4_mc_router_timer);
++	timer_shutdown(&brmctx->ip4_other_query.timer);
++	timer_shutdown(&brmctx->ip4_other_query.delay_timer);
++	timer_shutdown(&brmctx->ip4_own_query.timer);
+ #if IS_ENABLED(CONFIG_IPV6)
+-	timer_delete_sync(&brmctx->ip6_mc_router_timer);
+-	timer_delete_sync(&brmctx->ip6_other_query.timer);
+-	timer_delete_sync(&brmctx->ip6_other_query.delay_timer);
+-	timer_delete_sync(&brmctx->ip6_own_query.timer);
++	timer_shutdown(&brmctx->ip6_mc_router_timer);
++	timer_shutdown(&brmctx->ip6_other_query.timer);
++	timer_shutdown(&brmctx->ip6_other_query.delay_timer);
++	timer_shutdown(&brmctx->ip6_own_query.timer);
+ #endif
+ }
+ 
+@@ -4317,12 +4359,12 @@ void br_multicast_toggle_one_vlan(struct net_bridge_vlan *vlan, bool on)
+ 
+ 		spin_lock_bh(&br->multicast_lock);
+ 		vlan->priv_flags ^= BR_VLFLAG_MCAST_ENABLED;
+-		spin_unlock_bh(&br->multicast_lock);
+ 
+ 		if (on)
+ 			__br_multicast_open(&vlan->br_mcast_ctx);
+ 		else
+ 			__br_multicast_stop(&vlan->br_mcast_ctx);
++		spin_unlock_bh(&br->multicast_lock);
+ 	} else {
+ 		struct net_bridge_mcast *brmctx;
+ 
+@@ -4380,6 +4422,7 @@ int br_multicast_toggle_vlan_snooping(struct net_bridge *br, bool on,
+ 	if (!vg)
+ 		return 0;
+ 
++	spin_lock_bh(&br->multicast_lock);
+ 	br_opt_toggle(br, BROPT_MCAST_VLAN_SNOOPING_ENABLED, on);
+ 
+ 	/* disable/enable non-vlan mcast contexts based on vlan snooping */
+@@ -4387,6 +4430,8 @@ int br_multicast_toggle_vlan_snooping(struct net_bridge *br, bool on,
+ 		__br_multicast_stop(&br->multicast_ctx);
+ 	else
+ 		__br_multicast_open(&br->multicast_ctx);
++	spin_unlock_bh(&br->multicast_lock);
++
+ 	list_for_each_entry(p, &br->port_list, list) {
+ 		if (on)
+ 			br_multicast_disable_port_ctx(&p->multicast_ctx);
+@@ -4416,7 +4461,7 @@ bool br_multicast_toggle_global_vlan(struct net_bridge_vlan *vlan, bool on)
+ 	return true;
+ }
+ 
+-void br_multicast_stop(struct net_bridge *br)
++static void br_multicast_stop_locked(struct net_bridge *br)
+ {
+ 	ASSERT_RTNL();
+ 
+@@ -4440,6 +4485,13 @@ void br_multicast_stop(struct net_bridge *br)
+ 	}
+ }
+ 
++void br_multicast_stop(struct net_bridge *br)
 +{
-+	pre_cleanup
-+	switch_destroy
++	spin_lock_bh(&br->multicast_lock);
++	br_multicast_stop_locked(br);
++	spin_unlock_bh(&br->multicast_lock);
 +}
 +
-+mcast_active_check_ret()
+ void br_multicast_dev_del(struct net_bridge *br)
+ {
+ 	struct net_bridge_mdb_entry *mp;
+@@ -4675,7 +4727,7 @@ int br_multicast_toggle(struct net_bridge *br, unsigned long val,
+ 	if (!netif_running(br->dev))
+ 		goto unlock;
+ 
+-	br_multicast_open(br);
++	br_multicast_open_locked(br);
+ 	list_for_each_entry(port, &br->port_list, list)
+ 		__br_multicast_enable_port_ctx(&port->multicast_ctx);
+ 
+diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
+index 4ab6a1f58116..a181a27aa559 100644
+--- a/net/bridge/br_private.h
++++ b/net/bridge/br_private.h
+@@ -976,6 +976,7 @@ void br_multicast_disable_port(struct net_bridge_port *port);
+ void br_multicast_init(struct net_bridge *br);
+ void br_multicast_join_snoopers(struct net_bridge *br);
+ void br_multicast_leave_snoopers(struct net_bridge *br);
++void br_multicast_reset_timer_cbs(struct net_bridge_mcast *brmctx);
+ void br_multicast_open(struct net_bridge *br);
+ void br_multicast_stop(struct net_bridge *br);
+ void br_multicast_dev_del(struct net_bridge *br);
+@@ -1416,6 +1417,10 @@ static inline void br_multicast_leave_snoopers(struct net_bridge *br)
+ {
+ }
+ 
++static inline void br_multicast_reset_timer_cbs(struct net_bridge_mcast *brmctx)
 +{
-+	local ret="$1"
-+	local af="$2"
-+	local state="$3"
-+	local vlan="$4"
-+	local lineno="$5"
-+
-+	if [ "$state" -eq 0 ]; then
-+		if [ "$ret" -eq 0 ]; then
-+			check_err 1 "$lineno: Mcast ${vlan}inactive check failed ($af)"
-+		fi
-+	elif [ "$state" -eq 1 ]; then
-+		if [ "$ret" -ne 0 ]; then
-+			check_err 1 "$lineno: Mcast ${vlan}active check failed ($af)"
-+		fi
-+	fi
 +}
 +
-+mcast_active_check()
-+{
-+	local af="$1"
-+	local state="$2"
-+	local lineno="$3"
-+
-+	ip -d -j link show dev br0\
-+		| jq -e ".[] | select(.linkinfo.info_data.mcast_active_$af == 1)"\
-+		&> /dev/null
-+	mcast_active_check_ret "$?" "$af" "$state" "" "$lineno"
-+}
-+
-+mcast_vlan_active_check()
-+{
-+	local af="$1"
-+	local state="$2"
-+	local lineno="$3"
-+	local vid="${MCAST_VLAN_ID}"
-+
-+	bridge -j vlan global show dev br0\
-+		| jq -e ".[].vlans.[] | select(.vlan == $vid and .mcast_active_$af == 1)"\
-+		&> /dev/null
-+	mcast_active_check_ret "$?" "$af" "$state" "VLAN " "$lineno"
-+}
-+
-+mcast_assert_active_v4()
-+{
-+	mcast_active_check "v4" "1" "$1"
-+}
-+
-+mcast_assert_active_v6()
-+{
-+	mcast_active_check "v6" "1" "$1"
-+}
-+
-+mcast_assert_inactive_v4()
-+{
-+	mcast_active_check "v4" "0" "$1"
-+}
-+
-+mcast_assert_inactive_v6()
-+{
-+	mcast_active_check "v6" "0" "$1"
-+}
-+
-+mcast_vlan_assert_active_v4()
-+{
-+	mcast_vlan_active_check "v4" "1" "$1"
-+}
-+
-+mcast_vlan_assert_active_v6()
-+{
-+	mcast_vlan_active_check "v6" "1" "$1"
-+}
-+
-+mcast_vlan_assert_inactive_v4()
-+{
-+	mcast_vlan_active_check "v4" "0" "$1"
-+}
-+
-+mcast_vlan_assert_inactive_v6()
-+{
-+	mcast_vlan_active_check "v6" "0" "$1"
-+}
-+
-+test_inactive_nolog()
-+{
-+	ip link set dev br0 down
-+	ip link set dev brq0 down
-+	ip link set dev br0 type bridge mcast_snooping 0
-+	ip link set dev brq0 type bridge mcast_snooping 0
-+	ip link set dev br0 type bridge mcast_querier 0
-+	ip link set dev brq0 type bridge mcast_querier 0
-+	ip link set dev br0 type bridge mcast_vlan_snooping 0
-+	ip link set dev br0 type bridge vlan_filtering 0
-+
-+	echo 1 > /proc/sys/net/ipv6/conf/br0/disable_ipv6
-+	echo 1 > /proc/sys/net/ipv6/conf/brq0/disable_ipv6
-+
-+	mcast_assert_inactive_v4 "$1"
-+	mcast_assert_inactive_v6 "$1"
-+}
-+
-+test_inactive()
-+{
-+	RET=0
-+
-+	test_inactive_nolog "$1"
-+	log_test "Mcast inactive test"
-+}
-+
-+wait_lladdr_dad() {
-+	local check_tentative
-+
-+	check_tentative="map(select(.scope == \"link\" and ((.tentative == true) | not))) | .[]"
-+
-+	ip -6 -j a s dev "$1"\
-+		| jq -e ".[].addr_info | ${check_tentative}" &> /dev/null
-+}
-+
-+test_active_setup_bridge()
-+{
-+	[ -n "$1" ] && echo 0 > /proc/sys/net/ipv6/conf/br0/disable_ipv6
-+	[ -n "$2" ] && echo 0 > /proc/sys/net/ipv6/conf/brq0/disable_ipv6
-+
-+	[ -n "$3" ] && ip link set dev br0 up
-+	[ -n "$4" ] && ip link set dev brq0 up
-+	[ -n "$5" ] && slowwait 3 wait_lladdr_dad br0
-+	[ -n "$6" ] && slowwait 3 wait_lladdr_dad brq0
-+}
-+
-+test_active_setup_config()
-+{
-+	[ -n "$1" ] && ip link set dev br0 type bridge mcast_snooping 1
-+	[ -n "$2" ] && ip link set dev brq0 type bridge mcast_snooping 1
-+	[ -n "$3" ] && ip link set dev br0 type bridge mcast_querier 1
-+	[ -n "$4" ] && ip link set dev brq0 type bridge mcast_querier 1
-+}
-+
-+test_active_setup_wait()
-+{
-+	sleep $((MCAST_MAX_RESP_IVAL_SEC * 2))
-+}
-+
-+test_active_setup_reset_own_querier()
-+{
-+	ip link set dev br0 type bridge mcast_querier 0
-+	ip link set dev br0 type bridge mcast_querier 1
-+
-+	test_active_setup_wait
-+}
-+
-+test_vlan_active_setup_config()
-+{
-+	[ -n "$1" ] && ip link set dev br0 type bridge vlan_filtering 1
-+	[ -n "$2" ] && ip link set dev brq0 type bridge vlan_filtering 1
-+	[ -n "$3" ] && ip link set dev br0 type bridge mcast_vlan_snooping 1
-+	[ -n "$4" ] && ip link set dev brq0 type bridge mcast_vlan_snooping 1
-+}
-+
-+test_vlan_active_setup_add_vlan()
-+{
-+	bridge vlan add vid "${MCAST_VLAN_ID}" dev "$swp1"
-+	bridge vlan add vid "${MCAST_VLAN_ID}" dev "$h1"
-+	bridge vlan global set vid "${MCAST_VLAN_ID}" dev br0\
-+		mcast_query_response_interval $((MCAST_MAX_RESP_IVAL_SEC*100))
-+	bridge vlan global set vid "${MCAST_VLAN_ID}" dev brq0\
-+		mcast_query_response_interval $((MCAST_MAX_RESP_IVAL_SEC*100))
-+	bridge vlan global set vid "${MCAST_VLAN_ID}" dev br0 mcast_snooping 0
-+	bridge vlan global set vid "${MCAST_VLAN_ID}" dev brq0 mcast_snooping 0
-+	bridge vlan global set vid "${MCAST_VLAN_ID}" dev br0 mcast_querier 0
-+	bridge vlan global set vid "${MCAST_VLAN_ID}" dev brq0 mcast_querier 0
-+}
-+
-+test_vlan_active_setup_config_vlan()
-+{
-+	[ -n "$1" ] && bridge vlan global set vid "${MCAST_VLAN_ID}" dev br0 mcast_snooping 1
-+	[ -n "$2" ] && bridge vlan global set vid "${MCAST_VLAN_ID}" dev brq0 mcast_snooping 1
-+	[ -n "$3" ] && bridge vlan global set vid "${MCAST_VLAN_ID}" dev br0 mcast_querier 1
-+	[ -n "$4" ] && bridge vlan global set vid "${MCAST_VLAN_ID}" dev brq0 mcast_querier 1
-+}
-+
-+test_vlan_teardown()
-+{
-+	bridge vlan del vid "${MCAST_VLAN_ID}" dev "$swp1"
-+	bridge vlan del vid "${MCAST_VLAN_ID}" dev "$h1"
-+	mcast_assert_inactive_v4 "$1"
-+	mcast_assert_inactive_v6 "$1"
-+	mcast_vlan_assert_inactive_v4 "$1"
-+	mcast_vlan_assert_inactive_v6 "$1"
-+}
-+
-+test_vlan_active_setup_reset_own_querier()
-+{
-+	bridge vlan global set vid "${MCAST_VLAN_ID}" dev br0 mcast_querier 0
-+	bridge vlan global set vid "${MCAST_VLAN_ID}" dev br0 mcast_querier 1
-+
-+	test_active_setup_wait
-+}
-+
-+test_active_other_querier_nolog()
-+{
-+	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
-+	test_active_setup_config "1" "2" ""  "4"
-+	test_active_setup_wait
-+
-+	mcast_assert_active_v4 "$1"
-+	mcast_assert_active_v6 "$1"
-+}
-+
-+test_active_other_querier()
-+{
-+	RET=0
-+
-+	test_active_other_querier_nolog "$LINENO"
-+	test_inactive_nolog "$LINENO"
-+	log_test "Mcast active with other querier test"
-+}
-+
-+test_active_own_querier_nolog()
-+{
-+	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
-+	test_active_setup_config "1" "2" "3" ""
-+	test_active_setup_wait
-+
-+	mcast_assert_active_v4 "$1"
-+	mcast_assert_active_v6 "$1"
-+}
-+
-+test_active_own_querier()
-+{
-+	RET=0
-+
-+	test_active_own_querier_nolog "$LINENO"
-+	test_inactive_nolog "$LINENO"
-+	log_test "Mcast active with own querier test"
-+}
-+
-+test_active_final()
-+{
-+	mcast_assert_active_v4 "$1"
-+	mcast_assert_active_v6 "$1"
-+
-+	test_inactive_nolog "$1"
-+}
-+
-+test_inactive_brdown()
-+{
-+	RET=0
-+
-+	test_active_setup_bridge "1" "2" ""  "4" ""  "6"
-+	test_active_setup_config "1" "2" "3" ""
-+	test_active_setup_wait
-+
-+	mcast_assert_inactive_v4 "$LINENO"
-+	mcast_assert_inactive_v6 "$LINENO"
-+
-+	test_active_setup_bridge ""  ""  "3" ""  ""  ""
-+	mcast_assert_active_v4 "$LINENO"
-+	mcast_assert_inactive_v6 "$LINENO"
-+
-+	test_active_setup_bridge ""  ""  ""  ""  "5" ""
-+	test_active_setup_reset_own_querier
-+	test_active_final "$LINENO"
-+
-+	log_test "Mcast inactive, bridge down test"
-+}
-+
-+test_inactive_nov6()
-+{
-+	RET=0
-+
-+	test_active_setup_bridge ""  "2" "3" "4" "5" "6"
-+	test_active_setup_config "1" "2" "3" ""
-+	test_active_setup_wait
-+
-+	mcast_assert_active_v4 "$LINENO"
-+	mcast_assert_inactive_v6 "$LINENO"
-+
-+	test_active_setup_bridge "1" ""  ""  ""  "5" ""
-+	test_active_setup_reset_own_querier
-+	test_active_final "$LINENO"
-+
-+	log_test "Mcast inactive, own querier, no IPv6 address test"
-+}
-+
-+test_inactive_snooping_off()
-+{
-+	RET=0
-+
-+	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
-+	test_active_setup_config ""  "2" "3" ""
-+	test_active_setup_wait
-+
-+	mcast_assert_inactive_v4 "$LINENO"
-+	mcast_assert_inactive_v6 "$LINENO"
-+
-+	test_active_setup_config "1" ""  ""  ""
-+	test_active_setup_reset_own_querier
-+	test_active_final "$LINENO"
-+
-+	log_test "Mcast inactive, snooping disabled test"
-+}
-+
-+test_inactive_querier_off()
-+{
-+	RET=0
-+
-+	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
-+	test_active_setup_config "1" "2" ""  ""
-+	test_active_setup_wait
-+
-+	mcast_assert_inactive_v4 "$LINENO"
-+	mcast_assert_inactive_v6 "$LINENO"
-+
-+	test_active_setup_config ""  ""  "3" ""
-+	test_active_setup_wait
-+	test_active_final "$LINENO"
-+
-+	log_test "Mcast inactive, no querier test"
-+}
-+
-+test_inactive_other_querier_norespdelay()
-+{
-+	RET=0
-+
-+	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
-+	test_active_setup_config "1" "2" "3" ""
-+	# skipping: test_active_setup_wait
-+
-+	mcast_assert_inactive_v4 "$LINENO"
-+	mcast_assert_inactive_v6 "$LINENO"
-+
-+	test_active_setup_wait
-+	test_active_final "$LINENO"
-+
-+	log_test "Mcast inactive, other querier, no response delay test"
-+}
-+
-+test_inactive_own_querier_norespdelay()
-+{
-+	RET=0
-+
-+	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
-+	test_active_setup_config "1" "2" ""  "4"
-+	# skipping: test_active_setup_wait
-+
-+	mcast_assert_inactive_v4 "$LINENO"
-+	mcast_assert_inactive_v6 "$LINENO"
-+
-+	test_active_setup_wait
-+	test_active_final "$LINENO"
-+
-+	log_test "Mcast inactive, own querier, no response delay test"
-+}
-+
-+test_vlan_inactive()
-+{
-+	RET=0
-+
-+	test_inactive_nolog "$LINENO"
-+	mcast_vlan_assert_inactive_v4 "$LINENO"
-+	mcast_vlan_assert_inactive_v6 "$LINENO"
-+
-+	ip link set dev br0 type bridge vlan_filtering 1
-+	ip link set dev br0 type bridge mcast_vlan_snooping 1
-+	mcast_vlan_assert_inactive_v4 "$LINENO"
-+	mcast_vlan_assert_inactive_v6 "$LINENO"
-+	mcast_assert_inactive_v4 "$LINENO"
-+	mcast_assert_inactive_v6 "$LINENO"
-+
-+	ip link set dev br0 type bridge mcast_vlan_snooping 0
-+	ip link set dev br0 type bridge vlan_filtering 0
-+	test_active_own_querier_nolog "$LINENO"
-+	ip link set dev br0 type bridge vlan_filtering 1
-+	mcast_assert_active_v4 "$LINENO"
-+	mcast_assert_active_v6 "$LINENO"
-+
-+	ip link set dev br0 type bridge mcast_vlan_snooping 1
-+	mcast_assert_inactive_v4 "$LINENO"
-+	mcast_assert_inactive_v6 "$LINENO"
-+
-+	test_inactive_nolog "$LINENO"
-+	log_test "Mcast VLAN inactive test"
-+}
-+
-+test_vlan_active_final()
-+{
-+	mcast_assert_inactive_v4 "$1"
-+	mcast_assert_inactive_v6 "$1"
-+	mcast_vlan_assert_active_v4 "$1"
-+	mcast_vlan_assert_active_v6 "$1"
-+
-+	test_vlan_teardown "$1"
-+	test_inactive_nolog "$1"
-+}
-+
-+test_vlan_active_other_querier()
-+{
-+	RET=0
-+
-+	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
-+	test_active_setup_config "1" "2" ""  ""
-+	test_vlan_active_setup_config "1" "2" "3" "4"
-+	test_vlan_active_setup_add_vlan
-+	test_vlan_active_setup_config_vlan "1" "2" ""  "4"
-+	test_active_setup_wait
-+	test_vlan_active_final "$LINENO"
-+
-+	log_test "Mcast VLAN active, other querier test"
-+}
-+
-+test_vlan_active_own_querier()
-+{
-+	RET=0
-+
-+	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
-+	test_active_setup_config "1" "2" ""  ""
-+	test_vlan_active_setup_config "1" "2" "3" "4"
-+	test_vlan_active_setup_add_vlan
-+	test_vlan_active_setup_config_vlan "1" "2" "3" ""
-+	test_active_setup_wait
-+	test_vlan_active_final "$LINENO"
-+
-+	log_test "Mcast VLAN active, own querier test"
-+}
-+
-+test_vlan_inactive_brdown()
-+{
-+	RET=0
-+
-+	test_active_setup_bridge "1" "2" ""  "4" ""  "6"
-+	test_active_setup_config "1" "2" ""  ""
-+	test_vlan_active_setup_config "1" "2" "3" "4"
-+	test_vlan_active_setup_add_vlan
-+	test_vlan_active_setup_config_vlan "1" "2" "3" ""
-+	test_active_setup_wait
-+
-+	mcast_assert_inactive_v4 "$LINENO"
-+	mcast_assert_inactive_v6 "$LINENO"
-+	mcast_vlan_assert_inactive_v4 "$LINENO"
-+	mcast_vlan_assert_inactive_v6 "$LINENO"
-+
-+	test_active_setup_bridge ""  ""  "3" ""  ""  ""
-+	test_active_setup_wait
-+	mcast_vlan_assert_active_v4 "$LINENO"
-+	mcast_assert_inactive_v6 "$LINENO"
-+
-+	test_active_setup_bridge ""  ""  ""  ""  "5" ""
-+	test_vlan_active_setup_reset_own_querier
-+	test_vlan_active_final "$LINENO, RET: $RET"
-+
-+	log_test "Mcast VLAN inactive, bridge down test"
-+}
-+
-+test_vlan_inactive_nov6()
-+{
-+	RET=0
-+
-+	test_active_setup_bridge ""  "2" "3" "4" "5" "6"
-+	test_active_setup_config "1" "2" ""  ""
-+	test_vlan_active_setup_config "1" "2" "3" "4"
-+	test_vlan_active_setup_add_vlan
-+	test_vlan_active_setup_config_vlan "1" "2" "3" ""
-+	test_active_setup_wait
-+
-+	mcast_assert_inactive_v4 "$LINENO"
-+	mcast_assert_inactive_v6 "$LINENO"
-+	mcast_vlan_assert_active_v4 "$LINENO"
-+	mcast_vlan_assert_inactive_v6 "$LINENO"
-+
-+	test_active_setup_bridge "1" ""  ""  ""  "5" ""
-+	test_vlan_active_setup_reset_own_querier
-+	test_vlan_active_final "$LINENO"
-+
-+	log_test "Mcast VLAN inactive, own querier, no IPv6 address test"
-+}
-+
-+test_vlan_inactive_snooping_off()
-+{
-+	RET=0
-+
-+	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
-+	test_active_setup_config ""  "2" ""  ""
-+	test_vlan_active_setup_config "1" "2" "3" "4"
-+	test_vlan_active_setup_add_vlan
-+	test_vlan_active_setup_config_vlan "1" "2" "3" ""
-+	test_active_setup_wait
-+
-+	mcast_assert_inactive_v4 "$LINENO"
-+	mcast_assert_inactive_v6 "$LINENO"
-+	mcast_vlan_assert_inactive_v4 "$LINENO"
-+	mcast_vlan_assert_inactive_v6 "$LINENO"
-+
-+	test_active_setup_config "1" ""  ""  ""
-+	test_vlan_active_setup_reset_own_querier
-+	test_vlan_active_final "$LINENO"
-+
-+	log_test "Mcast VLAN inactive, snooping disabled test"
-+}
-+
-+test_vlan_inactive_vlans_snooping_off()
-+{
-+	RET=0
-+
-+	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
-+	test_active_setup_config "1" "2" ""  ""
-+	test_vlan_active_setup_config "1" "2" ""  "4"
-+	test_vlan_active_setup_add_vlan
-+	test_vlan_active_setup_config_vlan "1" "2" "3" ""
-+	test_active_setup_wait
-+
-+	mcast_assert_inactive_v4 "$LINENO"
-+	mcast_assert_inactive_v6 "$LINENO"
-+	mcast_vlan_assert_inactive_v4 "$LINENO"
-+	mcast_vlan_assert_inactive_v6 "$LINENO"
-+
-+	test_vlan_active_setup_config ""  ""  "3" ""
-+	test_vlan_active_setup_reset_own_querier
-+	test_vlan_active_final "$LINENO"
-+
-+	log_test "Mcast VLAN inactive, snooping for VLANs disabled test"
-+}
-+
-+test_vlan_inactive_vlan_snooping_off()
-+{
-+	RET=0
-+
-+	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
-+	test_active_setup_config "1" "2" ""  ""
-+	test_vlan_active_setup_config "1" "2" "3" "4"
-+	test_vlan_active_setup_add_vlan
-+	test_vlan_active_setup_config_vlan ""  "2" "3" ""
-+	test_active_setup_wait
-+
-+	mcast_assert_inactive_v4 "$LINENO"
-+	mcast_assert_inactive_v6 "$LINENO"
-+	mcast_vlan_assert_inactive_v4 "$LINENO"
-+	mcast_vlan_assert_inactive_v6 "$LINENO"
-+
-+	test_vlan_active_setup_config_vlan "1" ""  ""  ""
-+	test_vlan_active_setup_reset_own_querier
-+	test_vlan_active_final "$LINENO"
-+
-+	log_test "Mcast VLAN inactive, snooping for this VLAN disabled test"
-+}
-+
-+test_vlan_inactive_other_querier_norespdelay()
-+{
-+	RET=0
-+
-+	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
-+	test_active_setup_config "1" "2" ""  ""
-+	test_vlan_active_setup_config "1" "2" "3" "4"
-+	test_vlan_active_setup_add_vlan
-+	test_vlan_active_setup_config_vlan "1" "2" ""  "4"
-+	# skipping: test_active_setup_wait
-+
-+	mcast_assert_inactive_v4 "$LINENO"
-+	mcast_assert_inactive_v6 "$LINENO"
-+	mcast_vlan_assert_inactive_v4 "$LINENO"
-+	mcast_vlan_assert_inactive_v6 "$LINENO"
-+
-+	test_active_setup_wait
-+	test_vlan_active_final "$LINENO"
-+
-+	log_test "Mcast VLAN inactive, other querier, no response delay test"
-+}
-+
-+test_vlan_inactive_own_querier_norespdelay()
-+{
-+	RET=0
-+
-+	test_active_setup_bridge "1" "2" "3" "4" "5" "6"
-+	test_active_setup_config "1" "2" ""  ""
-+	test_vlan_active_setup_config "1" "2" "3" "4"
-+	test_vlan_active_setup_add_vlan
-+	test_vlan_active_setup_config_vlan "1" "2" "3" ""
-+	# skipping: test_active_setup_wait
-+
-+	mcast_assert_inactive_v4 "$LINENO"
-+	mcast_assert_inactive_v6 "$LINENO"
-+	mcast_vlan_assert_inactive_v4 "$LINENO"
-+	mcast_vlan_assert_inactive_v6 "$LINENO"
-+
-+	test_active_setup_wait
-+	test_vlan_active_final "$LINENO"
-+
-+	log_test "Mcast VLAN inactive, own querier, no response delay test"
-+}
-+
-+trap cleanup EXIT
-+
-+setup_prepare
-+
-+if ! ip -d link show dev br0 2>&1 | grep -q "mcast_active"; then
-+	echo "SKIP: iproute2 too old, missing mcast_active support"
-+	exit "$ksft_skip"
-+fi
-+
-+setup_wait
-+tests_run
-+
-+exit "$EXIT_STATUS"
+ static inline void br_multicast_open(struct net_bridge *br)
+ {
+ }
+diff --git a/net/bridge/br_vlan.c b/net/bridge/br_vlan.c
+index 326933b455b3..3facb4eda306 100644
+--- a/net/bridge/br_vlan.c
++++ b/net/bridge/br_vlan.c
+@@ -325,7 +325,12 @@ static int __vlan_add(struct net_bridge_vlan *v, u16 flags,
+ 			if (err && err != -EOPNOTSUPP)
+ 				goto out;
+ 		}
++
+ 		br_multicast_ctx_init(br, v, &v->br_mcast_ctx);
++
++		spin_lock_bh(&br->multicast_lock);
++		br_multicast_reset_timer_cbs(&v->br_mcast_ctx);
++		spin_unlock_bh(&br->multicast_lock);
+ 		v->priv_flags |= BR_VLFLAG_GLOBAL_MCAST_ENABLED;
+ 	}
+ 
 -- 
 2.51.0
 
