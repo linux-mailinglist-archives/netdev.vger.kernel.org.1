@@ -1,213 +1,174 @@
-Return-Path: <netdev+bounces-262507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262508-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8EiBGFYkpWm14AUAu9opvQ
-	(envelope-from <netdev+bounces-262507-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 06:47:02 +0100
+	id OEoLE2EkpWm14AUAu9opvQ
+	(envelope-from <netdev+bounces-262508-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 06:47:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE8EE1D337E
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 06:47:01 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 515231D338C
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 06:47:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 153813064F39
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 05:41:22 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3B15D3007AFE
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 05:47:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C89F366055;
-	Mon,  2 Mar 2026 05:41:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A6C0376498;
+	Mon,  2 Mar 2026 05:47:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="VUEX2y+d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.aperture-lab.de (mail.aperture-lab.de [116.203.183.178])
+Received: from sg-1-103.ptr.blmpb.com (sg-1-103.ptr.blmpb.com [118.26.132.103])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED53342CB1;
-	Mon,  2 Mar 2026 05:41:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.183.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F15792D5436
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 05:47:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.103
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772430063; cv=none; b=qKwat1GrbuRZlB/pqarDv4tqXFiwRP8QSSSsAgXL4Sy1rGxBh69OBXDE5att9Qk8XRNpR5VvT8ViR8R9I3dMdhbofksWjHeDXjUrobPmS3mVsbP+wt6D+tCVYoVymUsYWSAKAoALHQcd/SePc7zu7IKHq0YahnJqJwMNRETR0wY=
+	t=1772430427; cv=none; b=HlLnQ2Wzv8JvqYsF9Zs4b/jaRd5nalSPKPLnwwh4ijheTrtUU6CX9mP3RC9tnm5l9fTwX3c/zUEa0Bt7vlA1Cu26t5K0ghxCP+D2uYVOjVX+NJjknsDENdrI8PWzzRRe/TX37Px+QX5rheBfdFGq5nqv8hSgT1rD+xNwLiThqXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772430063; c=relaxed/simple;
-	bh=ckJkKdCtJpGg8xp1DRlDCVvsAYTBhMh/XF5zBhQcRI8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u1GIjTM9ZX9Dx/sly10MUXZcv/P6onuPip1dNkuJTgSmiiOSSi7k5VNOQzlEFg4yE/B+Z6ZNRPeY8wybbMLAdJJZgUzE7SfyNFKXv3ZQ4ARJQvb8g4XpjRwzU6ZTSsYK6VUfUpS869PRF0zh4fgb0oqRXrenmORGhDCT8thUtUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c0d3.blue; spf=pass smtp.mailfrom=c0d3.blue; arc=none smtp.client-ip=116.203.183.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c0d3.blue
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=c0d3.blue
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7FA9954CC65;
-	Mon,  2 Mar 2026 06:40:59 +0100 (CET)
-From: =?UTF-8?q?Linus=20L=C3=BCssing?= <linus.luessing@c0d3.blue>
-To: bridge@lists.linux.dev
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Xiao Liang <shaw.leon@gmail.com>,
-	shuah@kernel.org,
-	=?UTF-8?q?Linus=20L=C3=BCssing?= <linus.luessing@c0d3.blue>
-Subject: [PATCH net-next v3 14/14] net: bridge: mcast: add inactive state assertions
-Date: Mon,  2 Mar 2026 06:40:08 +0100
-Message-ID: <20260302054008.21638-15-linus.luessing@c0d3.blue>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260302054008.21638-1-linus.luessing@c0d3.blue>
-References: <20260302054008.21638-1-linus.luessing@c0d3.blue>
+	s=arc-20240116; t=1772430427; c=relaxed/simple;
+	bh=FBUj8CXqrMmWiCJ6H5cfj4MYT+crFnEv2ztcbGdjJyQ=;
+	h=Date:From:Mime-Version:Content-Type:To:Subject:Message-Id; b=YuXeLZDCZSAg+RiVTM5GhWGVVpMkov6JTF1qNoxfS8ti6cAXooD/+/eXt7MqK917z/f7ovP2rg6EEGoD7y/iw19uukh++m1Jzothe0Fj6KB3UCR3QbHzIItG3aEsbyDUpPWQKeBCKpNxpJhac9y17tpUNbV5ePQlyWJ7r77oPJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=VUEX2y+d; arc=none smtp.client-ip=118.26.132.103
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=2212171451; d=bytedance.com; t=1772430403; h=from:subject:
+ mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
+ mime-version:in-reply-to:message-id;
+ bh=D4s3Y/dQGNCVxUUgdzoFPBIj3DOlIkW5R8WMjLUI9yM=;
+ b=VUEX2y+dAFt5rCkT/ocb/U8e+AnrTr3b3+7uKtEGuPXoFD3iLGNCp3Q3D7nH72uUo71Oo4
+ WLMbbuOhYLbFnglh59xOhw56s6oMMEtLtywSmD3tGQDEsby3Tv006MDDP1l8jHKdVvbWpV
+ O6JbAyul31ZRigF1V9dvQl74EbS5ZjtdBEcTnSZHKw6Z4+5vZepr6T+OiYAzvnoVb+RG1c
+ c2y6YAnR/1ua6mpMo7jkdtKHjXkqgJUIRPVD1VpaAiVAkAvJTebKkwUordlCtt/xRcMpdj
+ JQbWOaNQ4j/iaGKnS+Tc8xDLESy+riH0GdSz0DdVGm3xl66BuVuK8Y7grVh0Pg==
+Date: Mon,  2 Mar 2026 13:46:29 +0800
+X-Mailer: git-send-email 2.20.1
+From: "Jian Zhang" <zhangjian.3032@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+X-Original-From: Jian Zhang <zhangjian.3032@bytedance.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+To: "Samuel Mendoza-Jonas" <sam@mendozajonas.com>, 
+	"Paul Fertser" <fercerpav@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, 
+	"Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, 
+	"Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>, 
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH net] net: ncsi: fix skb leak in error paths
+Message-Id: <20260302054629.1347119-1-zhangjian.3032@bytedance.com>
+Content-Transfer-Encoding: 7bit
+X-Lms-Return-Path: <lba+269a52441+210b70+vger.kernel.org+zhangjian.3032@bytedance.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[bytedance.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[bytedance.com:s=2212171451];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262507-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-262508-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[mendozajonas.com,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[c0d3.blue];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.953];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linus.luessing@c0d3.blue,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,blackwall.org,nvidia.com,lunn.ch,kernel.org,redhat.com,google.com,davemloft.net,fomichev.me,gmail.com,c0d3.blue];
-	R_DKIM_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zhangjian.3032@bytedance.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bytedance.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,c0d3.blue:mid,c0d3.blue:email]
-X-Rspamd-Queue-Id: BE8EE1D337E
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 515231D338C
 X-Rspamd-Action: no action
 
-To avoid packetloss and as it is very hard from a user's perspective to
-debug multicast snooping related issues it is even more crucial to properly
-switch from an active to an inactive multicast snooping state than the
-other way around.
+Early return paths in NCSI RX and AEN handlers fail to release
+the received skb, resulting in a memory leak.
 
-Therefore adding a few kernel warnings if any of our assertions to be in
-an inactive state would fail.
+Specifically, ncsi_aen_handler() returns on invalid AEN packets
+without consuming the skb. Similarly, ncsi_rcv_rsp() exits early
+when failing to resolve the NCSI device, response handler, or
+request, leaving the skb unfreed.
 
-Signed-off-by: Linus Lüssing <linus.luessing@c0d3.blue>
+Signed-off-by: Jian Zhang <zhangjian.3032@bytedance.com>
 ---
- net/bridge/br_multicast.c | 43 +++++++++++++++++++++++++++++++++++----
- 1 file changed, 39 insertions(+), 4 deletions(-)
+ net/ncsi/ncsi-aen.c |  3 ++-
+ net/ncsi/ncsi-rsp.c | 16 ++++++++++++----
+ 2 files changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
-index 4a1005bb68f1..106d6dd78328 100644
---- a/net/bridge/br_multicast.c
-+++ b/net/bridge/br_multicast.c
-@@ -1421,10 +1421,29 @@ static struct sk_buff *br_multicast_alloc_query(struct net_bridge_mcast *brmctx,
- 	return NULL;
- }
- 
-+static void br_ip4_multicast_assert_inactive(struct net_bridge_mcast *brmctx)
-+{
-+	WARN_ON_ONCE(br_multicast_snooping_active(brmctx, htons(ETH_P_IP), NULL));
-+}
-+
-+static void br_ip6_multicast_assert_inactive(struct net_bridge_mcast *brmctx)
-+{
-+	WARN_ON_ONCE(br_multicast_snooping_active(brmctx, htons(ETH_P_IPV6), NULL));
-+}
-+
-+static void br_multicast_assert_inactive(struct net_bridge_mcast *brmctx)
-+{
-+	br_ip4_multicast_assert_inactive(brmctx);
-+	br_ip6_multicast_assert_inactive(brmctx);
-+}
-+
- static void br_multicast_toggle_enabled(struct net_bridge *br, bool on)
- {
- 	br_opt_toggle(br, BROPT_MULTICAST_ENABLED, on);
- 	br_multicast_update_active(&br->multicast_ctx);
-+
-+	if (!on)
-+		br_multicast_assert_inactive(&br->multicast_ctx);
- }
- 
- struct net_bridge_mdb_entry *br_multicast_new_group(struct net_bridge *br,
-@@ -1894,9 +1913,7 @@ static void br_multicast_querier_expired(struct net_bridge_mcast *brmctx,
- 					 struct bridge_mcast_own_query *query,
- 					 struct timer_list *timer)
- {
--	spin_lock(&brmctx->br->multicast_lock);
--	if (br_multicast_is_stopping(brmctx->br, timer) ||
--	    br_multicast_ctx_vlan_global_disabled(brmctx) ||
-+	if (br_multicast_ctx_vlan_global_disabled(brmctx) ||
- 	    !br_opt_get(brmctx->br, BROPT_MULTICAST_ENABLED))
- 		goto out;
- 
-@@ -1907,7 +1924,6 @@ static void br_multicast_querier_expired(struct net_bridge_mcast *brmctx,
- 	 * if our own querier is disabled, too
- 	 */
- 	br_multicast_update_active(brmctx);
--	spin_unlock(&brmctx->br->multicast_lock);
- }
- 
- static void br_ip4_multicast_querier_expired(struct timer_list *t)
-@@ -1915,7 +1931,16 @@ static void br_ip4_multicast_querier_expired(struct timer_list *t)
- 	struct net_bridge_mcast *brmctx = timer_container_of(brmctx, t,
- 							     ip4_other_query.timer);
- 
-+	spin_lock(&brmctx->br->multicast_lock);
-+	if (br_multicast_is_stopping(brmctx->br, t))
+diff --git a/net/ncsi/ncsi-aen.c b/net/ncsi/ncsi-aen.c
+index 62fb1031763d..040a31557201 100644
+--- a/net/ncsi/ncsi-aen.c
++++ b/net/ncsi/ncsi-aen.c
+@@ -224,7 +224,8 @@ int ncsi_aen_handler(struct ncsi_dev_priv *ndp, struct sk_buff *skb)
+ 	if (!nah) {
+ 		netdev_warn(ndp->ndev.dev, "Invalid AEN (0x%x) received\n",
+ 			    h->type);
+-		return -ENOENT;
++		ret = -ENOENT;
 +		goto out;
+ 	}
+ 
+ 	ret = ncsi_validate_aen_pkt(h, nah->payload);
+diff --git a/net/ncsi/ncsi-rsp.c b/net/ncsi/ncsi-rsp.c
+index 271ec6c3929e..9d3ca1c020b6 100644
+--- a/net/ncsi/ncsi-rsp.c
++++ b/net/ncsi/ncsi-rsp.c
+@@ -1176,8 +1176,10 @@ int ncsi_rcv_rsp(struct sk_buff *skb, struct net_device *dev,
+ 	/* Find the NCSI device */
+ 	nd = ncsi_find_dev(orig_dev);
+ 	ndp = nd ? TO_NCSI_DEV_PRIV(nd) : NULL;
+-	if (!ndp)
+-		return -ENODEV;
++	if (!ndp) {
++		ret = -ENODEV;
++		goto bail;
++	}
+ 
+ 	/* Check if it is AEN packet */
+ 	hdr = (struct ncsi_pkt_hdr *)skb_network_header(skb);
+@@ -1199,7 +1201,8 @@ int ncsi_rcv_rsp(struct sk_buff *skb, struct net_device *dev,
+ 	if (!nrh) {
+ 		netdev_err(nd->dev, "Received unrecognized packet (0x%x)\n",
+ 			   hdr->type);
+-		return -ENOENT;
++		ret = -ENOENT;
++		goto bail;
+ 	}
+ 
+ 	/* Associate with the request */
+@@ -1207,7 +1210,8 @@ int ncsi_rcv_rsp(struct sk_buff *skb, struct net_device *dev,
+ 	nr = &ndp->requests[hdr->id];
+ 	if (!nr->used) {
+ 		spin_unlock_irqrestore(&ndp->lock, flags);
+-		return -ENODEV;
++		ret = -ENODEV;
++		goto bail;
+ 	}
+ 
+ 	nr->rsp = skb;
+@@ -1261,4 +1265,8 @@ int ncsi_rcv_rsp(struct sk_buff *skb, struct net_device *dev,
+ out:
+ 	ncsi_free_request(nr);
+ 	return ret;
 +
- 	br_multicast_querier_expired(brmctx, &brmctx->ip4_own_query, t);
-+
-+	if (!brmctx->multicast_querier)
-+		br_ip4_multicast_assert_inactive(brmctx);
-+out:
-+	spin_unlock(&brmctx->br->multicast_lock);
++bail:
++	consume_skb(skb);
++	return ret;
  }
- 
- #if IS_ENABLED(CONFIG_IPV6)
-@@ -1924,7 +1949,16 @@ static void br_ip6_multicast_querier_expired(struct timer_list *t)
- 	struct net_bridge_mcast *brmctx = timer_container_of(brmctx, t,
- 							     ip6_other_query.timer);
- 
-+	spin_lock(&brmctx->br->multicast_lock);
-+	if (br_multicast_is_stopping(brmctx->br, t))
-+		goto out;
-+
- 	br_multicast_querier_expired(brmctx, &brmctx->ip6_own_query, t);
-+
-+	if (!brmctx->multicast_querier)
-+		br_ip6_multicast_assert_inactive(brmctx);
-+out:
-+	spin_unlock(&brmctx->br->multicast_lock);
- }
- #endif
- 
-@@ -4502,6 +4536,7 @@ static void __br_multicast_stop(struct net_bridge_mcast *brmctx)
- 
- 	/* bridge interface is down, set multicast state to inactive */
- 	br_multicast_update_active(brmctx);
-+	br_multicast_assert_inactive(brmctx);
- }
- 
- void br_multicast_update_vlan_mcast_ctx(struct net_bridge_vlan *v, u8 state)
 -- 
-2.51.0
-
+2.20.1
 
