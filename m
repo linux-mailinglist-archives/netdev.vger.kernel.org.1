@@ -1,476 +1,254 @@
-Return-Path: <netdev+bounces-262952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262953-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CMPFHjUgpmkuKwAAu9opvQ
-	(envelope-from <netdev+bounces-262952-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 00:41:41 +0100
+	id qKYNMI4hpmlQKwAAu9opvQ
+	(envelope-from <netdev+bounces-262953-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 00:47:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 091251E6BF7
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 00:41:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D2441E6D19
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 00:47:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 04B9F30217DB
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 23:41:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 48D8730DB746
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 23:45:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C87833F390;
-	Mon,  2 Mar 2026 23:41:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D307F336ECC;
+	Mon,  2 Mar 2026 23:45:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ictE2Rk3"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="Jlohau7m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A2C33F5B0
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 23:41:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772494875; cv=none; b=jO3IxnjxXDE1hIacurMop1nzsUHxTVo+JIuF96n32pKjNNXG7LWAbaNYfmfZKoruSYlSXr5koXNDk1nek3ZBGKe6nl3cWJTQf6+XYiADdRY2nJ+YYYkizsj5HoVeJqOmviiAgPs0Vk8cTzuRb7cnMcQG+OAaHU4UKiHdMIutccc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772494875; c=relaxed/simple;
-	bh=MqQ/foMj2ZT0HfPo/0S8hOjT/UVG0HKrl5XQiZ9pUNU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=exdAt+KDTfw5dpJjEaOb2R6/1I9xAejId0hGmZ9bFfb6hvXbZjMhrGY8Eb3QsqAvIRsd4Al3FQa62CzNEuL+7ZPNlIIIy6axN+NL3aER79Ir+SPcQpmpFbQVKaazKezP3CCDw6ABwDdCTd+eTcRM2S9Nl1s07fsAKuTM0GgL2hw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ictE2Rk3; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772494873; x=1804030873;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=MqQ/foMj2ZT0HfPo/0S8hOjT/UVG0HKrl5XQiZ9pUNU=;
-  b=ictE2Rk3VeXYQ9fNoN3wRK2pqsTKI3+VCphgNPzUaETAi7DVu6FDRLFZ
-   AZgYDJ4JwAMMAVm3n1+ChP4azyl9Z62KWj3Ufg6dK2mk0ENiVhqyih5RB
-   13FMAiChq71+rl5Z+PphbrJLBR0jVCKrABXwp772wZjVFcNpy3bz3fk9O
-   vxwVuFOqZ2wHyghgke7PczPAzyVCFZgTwpgBzlOWBCxw0J7AgW4j1Z8qd
-   z7PXvALK9VIDGy4AvRnIzfM4FhDgfGDyUc1XOIa+NGQngfiNwsLB5rJzn
-   jnEW/sDY4S+BpfT4hy/GWrjv3ojNoWW8cXTFa5kzf/HCX/xVwG2Q9MQML
-   g==;
-X-CSE-ConnectionGUID: Q8RFY5LiR+m5cIq4VWzCIw==
-X-CSE-MsgGUID: c06D7t+OR0qrCoKgUh2DUA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11717"; a="73585751"
-X-IronPort-AV: E=Sophos;i="6.21,321,1763452800"; 
-   d="scan'208";a="73585751"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 15:41:10 -0800
-X-CSE-ConnectionGUID: 9WTBh/ZkQVOKY+TNf0pIzQ==
-X-CSE-MsgGUID: MsZgOTGhR/azyC/HVhJd0Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,321,1763452800"; 
-   d="scan'208";a="216233675"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa008.fm.intel.com with ESMTP; 02 Mar 2026 15:41:10 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	anthony.l.nguyen@intel.com,
-	Marcin Szycik <marcin.szycik@linux.intel.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Rinitha S <sx.rinitha@intel.com>
-Subject: [PATCH net-next 4/4] ixgbe: refactor: use DECLARE_BITMAP for ring state field
-Date: Mon,  2 Mar 2026 15:41:02 -0800
-Message-ID: <20260302234105.2658400-5-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20260302234105.2658400-1-anthony.l.nguyen@intel.com>
-References: <20260302234105.2658400-1-anthony.l.nguyen@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC646342509
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 23:45:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772495107; cv=pass; b=aq51Cl2mTeQoQhr+A51yAlO0Cc7go5x6WtQ3HOONNhtUwbRPxj02rYqwCF1MU31xMKMXWq8btEvJ/RT4M48PBhHsawzTZA4ovzuB37zFO15BSCOUo70epwoPyz8njCsyvr6m4frUZp+AAUrIp5yBOLbf4tLVyx1ETwmg5RuEK18=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772495107; c=relaxed/simple;
+	bh=gI6mzU+h6MF7rNPJ4817XIF1lxMBARF2p+anpiUg0wA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VYufT7itpKHn6V7OTqGuDhZ9abDyHTzmGOyth/ATmKCto/4x8DiaaRuxNgzJdvk+Em3dMtQsN9BGo1TVbiOheajWo+ZaU6kEWA+/ewcmnmgFjxs9DX/zV4Jxx2TYTW7Z12ECnBMXbx+NALscAKsQpcaezw20Gxl2gTIxwMIUreo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=Jlohau7m; arc=pass smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-3598581ed7bso714124a91.2
+        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 15:45:03 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772495103; cv=none;
+        d=google.com; s=arc-20240605;
+        b=iLW/i7Afd1ijKjbjQTCvEp9WezaUGO02KVVU5592AHWqfQgjXDIWEQgLN6M86+VxyY
+         fKO4SEbCMFOmdxu7Hhc4Or+6fltT+DMeYZWfKKXfaUuiMotxebFhcJ9OQ8jVFABagAYC
+         kb1LRx28aYrHx59Sy0/rZCLccIIOqAlKhBu1b19/htTDku3ouavXYc+fOFE1PFPf5pm0
+         EOTFvDkkDsKwWITVA5BRt+tpmQ9hu7D2jq0CP+2VO+m3flz59tZswhOVmNYLng8RN7/5
+         cJNjIYLnKUExJ2iWqMwu2a4//6EToEDwjNW4CTsB+vmG1BVBb7lWakexBdScwEPWSNlJ
+         HApg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=u082M2vpZx7MrZkmV/F7ZdAH+CJQSjxHglDjea1+awA=;
+        fh=ATsGJQRpFBOJoURLsYcoXzhU2D5bxnWMUKm5PsgH8M4=;
+        b=ikrRfiJi0FwgBjSe2jZsG8QiG9/Vhcsu+4dt7GqPSv8FWtb6KEgnPTFWEiBzcEF8oW
+         Js1+e/3geDJDbiHdLFbfXUOyFJB+Yu/B+3KMd1Nvth49ldmtmP8Un/cvvTcmbMlF8AMK
+         RsvKKPzlvReixEaAlcHniFLg/Zn1Y5RckKY/WsOEXG7w/EsxQLhZcDF7MLGwdXNu6PVy
+         iqfMtVqaz2AhFCd+IrOwcbelH/jLV8u0YxLMcMmpmj6509R4rehvr4/pKFwFq2xiCLkP
+         e1ajphpbe/ZFz/TTAOTSk4dhpPBVWvOfwIMggWsiOAKCttD/CJBsaXGuL/ZNJl+75d5O
+         +3wg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1772495103; x=1773099903; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u082M2vpZx7MrZkmV/F7ZdAH+CJQSjxHglDjea1+awA=;
+        b=Jlohau7m2sNM8GDzyvqU0a0nTQuf+qu3cuCrmzz+AyGIWXH4qCokGvv5cpbrkijbZ8
+         WRwHFHj16LfTWXlm4WMp2oskushe2aU51Uf7iEueAYb6Sf/iKTWkVDV0yWPIhOTx5azz
+         wqKhHTD6zu6NK3iV9QENRuadm6NkylGySmoWALotgY0ISXxjFj3wo67dI2BlvAkRV5XI
+         ZG+JJTzsKRSqI6u414/leBczUk5iRfk5XanaLpsPgJXqPgS32lVIvQ1ORDilRKNbPL56
+         zMkNc4huJ1L0FnaFxSjIE56/MA83Mo4T1IgNkG8jcxE29WJVn/oMGzZv9kp5nJLzeDQi
+         pIvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772495103; x=1773099903;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=u082M2vpZx7MrZkmV/F7ZdAH+CJQSjxHglDjea1+awA=;
+        b=glJhkGrW+MFjddl9tp2/nBvnJjuB0LjlDlqQHpjVmfMwU03heMYh/pC0QdyaffpYud
+         QpITF75gyzEai0PwmlTb8aEGZKTp8b+L4Z09wow8wzeqrzCp3OxtAggsYbaL+cd29lpf
+         iphVJroU0aeBqaja4Ou9+H1NkY2pUqsOIGE1pBRTzSTzPfQl6gF4Hyen0Kv2fA1STOZv
+         zm2SVN5u7wZxVu+ySKogQQHLLtdtAAOCSrFnVdDdp00r9JW1BJSt97HKqOVsMO7PCrrF
+         OWng5wcqajYCXVR6XVIasHBsEbk50BTosMMnOIbeyDps+CiU5gL7DHCVpQXZ04ydl7nr
+         f8Zw==
+X-Forwarded-Encrypted: i=1; AJvYcCWwoo4J6+OI5SK4Clv+/3xx73egt0HO+x/0w034rM9Qbx6sq9g+Kc8Uue/Pm8J//nCFO7QOoYw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzA6uHXQr5zF5fPBHT8ysTnlqJCr5vKITkh0+Bb+cu00fssho7b
+	Nu+XPC1klA39Gn1niTQ1aj47vojkkzTWvHOJdcwsIx9g6bVTdyV4EUss9W4sm2kxCqGq3e7RN7x
+	om5xg78cqH1tyuBQuAXPRsTLeke8MLgiVPe/5nwYf
+X-Gm-Gg: ATEYQzzKs1nz/XT6KgfO4Zi7cnzU9GMXr/6z7C+Q4/6rexvRDWv3GJNSSArXW72O/u9
+	iQgUXOBMu83qbw4vcNpHvVRGQQyk4xemCUWVg3mEMcjGwcgO9Hmsbz8VX3qhrqsT2vaccr3PIU3
+	1KPW6XB01WOVhocDkHaeRdIwMUAe/iw7eUEMJCgxhD0eovIItDsGSgJ6jPqiCGfd4raB+L/4BKf
+	RB9Tg3zfJrHEjRIY9dOe8Wl3E4Qiin+pivCvT5ALip/Rrr0I8HDY165nzlEtM4nhOfutFjMVUbx
+	nVWlpMc=
+X-Received: by 2002:a17:90b:578e:b0:356:2eff:df05 with SMTP id
+ 98e67ed59e1d1-35965c9d15dmr12730172a91.16.1772495102745; Mon, 02 Mar 2026
+ 15:45:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 091251E6BF7
+References: <20260302-iino-u64-v2-0-e5388800dae0@kernel.org> <20260302-iino-u64-v2-3-e5388800dae0@kernel.org>
+In-Reply-To: <20260302-iino-u64-v2-3-e5388800dae0@kernel.org>
+From: Paul Moore <paul@paul-moore.com>
+Date: Mon, 2 Mar 2026 18:44:51 -0500
+X-Gm-Features: AaiRm51Sffi2V1GbWbKQK3xjBHaGrjaqO3h4_HvI_INFaL56ZEFyr07E1_3tePs
+Message-ID: <CAHC9VhRnmBuXEKkUPQhJ_LDzcksjoAJL-ne6mFoJdR1hnDdzsg@mail.gmail.com>
+Subject: Re: [PATCH v2 003/110] audit: widen ino fields to u64
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Dan Williams <dan.j.williams@intel.com>, 
+	Matthew Wilcox <willy@infradead.org>, Eric Biggers <ebiggers@kernel.org>, 
+	"Theodore Y. Ts'o" <tytso@mit.edu>, Muchun Song <muchun.song@linux.dev>, 
+	Oscar Salvador <osalvador@suse.de>, David Hildenbrand <david@kernel.org>, 
+	David Howells <dhowells@redhat.com>, Paulo Alcantara <pc@manguebit.org>, 
+	Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>, 
+	Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>, 
+	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
+	Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>, 
+	Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
+	Steve French <sfrench@samba.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+	Shyam Prasad N <sprasad@microsoft.com>, Bharath SM <bharathsm@microsoft.com>, 
+	Alexander Aring <alex.aring@gmail.com>, Ryusuke Konishi <konishi.ryusuke@gmail.com>, 
+	Viacheslav Dubeyko <slava@dubeyko.com>, Eric Van Hensbergen <ericvh@kernel.org>, 
+	Latchesar Ionkov <lucho@ionkov.net>, Dominique Martinet <asmadeus@codewreck.org>, 
+	Christian Schoenebeck <linux_oss@crudebyte.com>, David Sterba <dsterba@suse.com>, 
+	Marc Dionne <marc.dionne@auristor.com>, Ian Kent <raven@themaw.net>, 
+	Luis de Bethencourt <luisbg@kernel.org>, Salah Triki <salah.triki@gmail.com>, 
+	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>, Ilya Dryomov <idryomov@gmail.com>, 
+	Alex Markuze <amarkuze@redhat.com>, Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu, 
+	Nicolas Pitre <nico@fluxnic.net>, Tyler Hicks <code@tyhicks.com>, Amir Goldstein <amir73il@gmail.com>, 
+	Christoph Hellwig <hch@infradead.org>, 
+	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Yangtao Li <frank.li@vivo.com>, 
+	Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>, David Woodhouse <dwmw2@infradead.org>, 
+	Richard Weinberger <richard@nod.at>, Dave Kleikamp <shaggy@kernel.org>, 
+	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>, Mark Fasheh <mark@fasheh.com>, 
+	Joel Becker <jlbec@evilplan.org>, Joseph Qi <joseph.qi@linux.alibaba.com>, 
+	Mike Marshall <hubcap@omnibond.com>, Martin Brandenburg <martin@omnibond.com>, 
+	Miklos Szeredi <miklos@szeredi.hu>, Anders Larsen <al@alarsen.net>, 
+	Zhihao Cheng <chengzhihao1@huawei.com>, Damien Le Moal <dlemoal@kernel.org>, 
+	Naohiro Aota <naohiro.aota@wdc.com>, Johannes Thumshirn <jth@kernel.org>, 
+	John Johansen <john.johansen@canonical.com>, James Morris <jmorris@namei.org>, 
+	"Serge E. Hallyn" <serge@hallyn.com>, Mimi Zohar <zohar@linux.ibm.com>, 
+	Roberto Sassu <roberto.sassu@huawei.com>, Dmitry Kasatkin <dmitry.kasatkin@gmail.com>, 
+	Eric Snowberg <eric.snowberg@oracle.com>, Fan Wu <wufan@kernel.org>, 
+	Stephen Smalley <stephen.smalley.work@gmail.com>, Ondrej Mosnacek <omosnace@redhat.com>, 
+	Casey Schaufler <casey@schaufler-ca.com>, Alex Deucher <alexander.deucher@amd.com>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, Eric Dumazet <edumazet@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, 
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
+	James Clark <james.clark@linaro.org>, "Darrick J. Wong" <djwong@kernel.org>, 
+	Martin Schiller <ms@dev.tdt.de>, Eric Paris <eparis@redhat.com>, Joerg Reuter <jreuter@yaina.de>, 
+	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Oliver Hartkopp <socketcan@hartkopp.net>, 
+	Marc Kleine-Budde <mkl@pengutronix.de>, David Ahern <dsahern@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Remi Denis-Courmont <courmisch@gmail.com>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Xin Long <lucien.xin@gmail.com>, 
+	Magnus Karlsson <magnus.karlsson@intel.com>, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, nvdimm@lists.linux.dev, 
+	fsverity@lists.linux.dev, linux-mm@kvack.org, netfs@lists.linux.dev, 
+	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net, 
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
+	samba-technical@lists.samba.org, linux-nilfs@vger.kernel.org, 
+	v9fs@lists.linux.dev, linux-afs@lists.infradead.org, autofs@vger.kernel.org, 
+	ceph-devel@vger.kernel.org, codalist@coda.cs.cmu.edu, 
+	ecryptfs@vger.kernel.org, linux-mtd@lists.infradead.org, 
+	jfs-discussion@lists.sourceforge.net, ntfs3@lists.linux.dev, 
+	ocfs2-devel@lists.linux.dev, devel@lists.orangefs.org, 
+	linux-unionfs@vger.kernel.org, apparmor@lists.ubuntu.com, 
+	linux-security-module@vger.kernel.org, linux-integrity@vger.kernel.org, 
+	selinux@vger.kernel.org, amd-gfx@lists.freedesktop.org, 
+	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org, 
+	linaro-mm-sig@lists.linaro.org, netdev@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, linux-fscrypt@vger.kernel.org, 
+	linux-xfs@vger.kernel.org, linux-hams@vger.kernel.org, 
+	linux-x25@vger.kernel.org, audit@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org, 
+	linux-sctp@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 5D2441E6D19
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[paul-moore.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[paul-moore.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262952-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[zeniv.linux.org.uk,kernel.org,suse.cz,goodmis.org,efficios.com,intel.com,infradead.org,mit.edu,linux.dev,suse.de,redhat.com,manguebit.org,dilger.ca,suse.com,oracle.com,brown.name,talpey.com,samba.org,gmail.com,microsoft.com,dubeyko.com,ionkov.net,codewreck.org,crudebyte.com,auristor.com,themaw.net,cs.cmu.edu,fluxnic.net,tyhicks.com,physik.fu-berlin.de,vivo.com,artax.karlin.mff.cuni.cz,nod.at,paragon-software.com,fasheh.com,evilplan.org,linux.alibaba.com,omnibond.com,szeredi.hu,alarsen.net,huawei.com,wdc.com,canonical.com,namei.org,hallyn.com,linux.ibm.com,schaufler-ca.com,amd.com,ffwll.ch,linaro.org,google.com,davemloft.net,arm.com,linux.intel.com,dev.tdt.de,yaina.de,holtmann.org,hartkopp.net,pengutronix.de,secunet.com,gondor.apana.org.au,fomichev.me,iogearbox.net,vger.kernel.org,lists.linux.dev,kvack.org,lists.sourceforge.net,lists.samba.org,lists.infradead.org,coda.cs.cmu.edu,lists.orangefs.org,lists.ubuntu.com,lists.freedesktop.org,lists.linaro.org];
+	TAGGED_FROM(0.00)[bounces-262953-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_GT_50(0.00)[171];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[paul@paul-moore.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[paul-moore.com:+];
+	NEURAL_HAM(-0.00)[-0.997];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mpg.de:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[paul-moore.com:dkim,paul-moore.com:url,mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+On Mon, Mar 2, 2026 at 3:25=E2=80=AFPM Jeff Layton <jlayton@kernel.org> wro=
+te:
+>
+> inode->i_ino is being widened from unsigned long to u64. The audit
+> subsystem uses unsigned long ino in struct fields, function parameters,
+> and local variables that store inode numbers from arbitrary filesystems.
+> On 32-bit platforms this truncates inode numbers that exceed 32 bits,
+> which will cause incorrect audit log entries and broken watch/mark
+> comparisons.
+>
+> Widen all audit ino fields, parameters, and locals to u64, and update
+> the inode format string from %lu to %llu to match.
+>
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> ---
+>  include/linux/audit.h   | 2 +-
+>  kernel/audit.h          | 9 ++++-----
+>  kernel/audit_fsnotify.c | 4 ++--
+>  kernel/audit_watch.c    | 8 ++++----
+>  kernel/auditsc.c        | 2 +-
+>  5 files changed, 12 insertions(+), 13 deletions(-)
 
-Convert the ring state field from 'unsigned long' to a proper bitmap
-using DECLARE_BITMAP macro, aligning with the implementation pattern
-already used in the i40e driver.
+We should also update audit_hash_ino() in kernel/audit.h.  It is a
+*very* basic hash function, so I think leaving the function as-is and
+just changing the inode parameter from u32 to u64 should be fine.
 
-This change:
-- Adds __IXGBE_RING_STATE_NBITS as the bitmap size sentinel to enum
-  ixgbe_ring_state_t (consistent with i40e's __I40E_RING_STATE_NBITS)
-- Changes 'unsigned long state' to 'DECLARE_BITMAP(state,
-  __IXGBE_RING_STATE_NBITS)' in struct ixgbe_ring
-- Removes the address-of operator (&) when passing ring->state to bit
-  manipulation functions, as bitmap arrays naturally decay to pointers
-
-The change maintains functional equivalence while using the
-more appropriate kernel bitmap API, consistent with other Intel Ethernet
-drivers.
-
-Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/ixgbe/ixgbe.h      | 27 ++++-----
- drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c  |  4 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 56 +++++++++----------
- drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c  |  2 +-
- 4 files changed, 45 insertions(+), 44 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-index dce4936708eb..59a1cee40b43 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-@@ -322,10 +322,11 @@ enum ixgbe_ring_state_t {
- 	__IXGBE_HANG_CHECK_ARMED,
- 	__IXGBE_TX_XDP_RING,
- 	__IXGBE_TX_DISABLED,
-+	__IXGBE_RING_STATE_NBITS, /* must be last */
- };
- 
- #define ring_uses_build_skb(ring) \
--	test_bit(__IXGBE_RX_BUILD_SKB_ENABLED, &(ring)->state)
-+	test_bit(__IXGBE_RX_BUILD_SKB_ENABLED, (ring)->state)
- 
- struct ixgbe_fwd_adapter {
- 	unsigned long active_vlans[BITS_TO_LONGS(VLAN_N_VID)];
-@@ -336,23 +337,23 @@ struct ixgbe_fwd_adapter {
- };
- 
- #define check_for_tx_hang(ring) \
--	test_bit(__IXGBE_TX_DETECT_HANG, &(ring)->state)
-+	test_bit(__IXGBE_TX_DETECT_HANG, (ring)->state)
- #define set_check_for_tx_hang(ring) \
--	set_bit(__IXGBE_TX_DETECT_HANG, &(ring)->state)
-+	set_bit(__IXGBE_TX_DETECT_HANG, (ring)->state)
- #define clear_check_for_tx_hang(ring) \
--	clear_bit(__IXGBE_TX_DETECT_HANG, &(ring)->state)
-+	clear_bit(__IXGBE_TX_DETECT_HANG, (ring)->state)
- #define ring_is_rsc_enabled(ring) \
--	test_bit(__IXGBE_RX_RSC_ENABLED, &(ring)->state)
-+	test_bit(__IXGBE_RX_RSC_ENABLED, (ring)->state)
- #define set_ring_rsc_enabled(ring) \
--	set_bit(__IXGBE_RX_RSC_ENABLED, &(ring)->state)
-+	set_bit(__IXGBE_RX_RSC_ENABLED, (ring)->state)
- #define clear_ring_rsc_enabled(ring) \
--	clear_bit(__IXGBE_RX_RSC_ENABLED, &(ring)->state)
-+	clear_bit(__IXGBE_RX_RSC_ENABLED, (ring)->state)
- #define ring_is_xdp(ring) \
--	test_bit(__IXGBE_TX_XDP_RING, &(ring)->state)
-+	test_bit(__IXGBE_TX_XDP_RING, (ring)->state)
- #define set_ring_xdp(ring) \
--	set_bit(__IXGBE_TX_XDP_RING, &(ring)->state)
-+	set_bit(__IXGBE_TX_XDP_RING, (ring)->state)
- #define clear_ring_xdp(ring) \
--	clear_bit(__IXGBE_TX_XDP_RING, &(ring)->state)
-+	clear_bit(__IXGBE_TX_XDP_RING, (ring)->state)
- struct ixgbe_ring {
- 	struct ixgbe_ring *next;	/* pointer to next ring in q_vector */
- 	struct ixgbe_q_vector *q_vector; /* backpointer to host q_vector */
-@@ -364,7 +365,7 @@ struct ixgbe_ring {
- 		struct ixgbe_tx_buffer *tx_buffer_info;
- 		struct ixgbe_rx_buffer *rx_buffer_info;
- 	};
--	unsigned long state;
-+	DECLARE_BITMAP(state, __IXGBE_RING_STATE_NBITS);
- 	u8 __iomem *tail;
- 	dma_addr_t dma;			/* phys. address of descriptor ring */
- 	unsigned int size;		/* length in bytes */
-@@ -453,7 +454,7 @@ struct ixgbe_ring_feature {
-  */
- static inline unsigned int ixgbe_rx_bufsz(struct ixgbe_ring *ring)
- {
--	if (test_bit(__IXGBE_RX_3K_BUFFER, &ring->state))
-+	if (test_bit(__IXGBE_RX_3K_BUFFER, ring->state))
- 		return IXGBE_RXBUFFER_3K;
- #if (PAGE_SIZE < 8192)
- 	if (ring_uses_build_skb(ring))
-@@ -465,7 +466,7 @@ static inline unsigned int ixgbe_rx_bufsz(struct ixgbe_ring *ring)
- static inline unsigned int ixgbe_rx_pg_order(struct ixgbe_ring *ring)
- {
- #if (PAGE_SIZE < 8192)
--	if (test_bit(__IXGBE_RX_3K_BUFFER, &ring->state))
-+	if (test_bit(__IXGBE_RX_3K_BUFFER, ring->state))
- 		return 1;
- #endif
- 	return 0;
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c
-index 87abb36f50c1..1db4bd5cc2ba 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c
-@@ -976,7 +976,7 @@ static int ixgbe_alloc_q_vector(struct ixgbe_adapter *adapter,
- 		 * can be marked as checksum errors.
- 		 */
- 		if (adapter->hw.mac.type == ixgbe_mac_82599EB)
--			set_bit(__IXGBE_RX_CSUM_UDP_ZERO_ERR, &ring->state);
-+			set_bit(__IXGBE_RX_CSUM_UDP_ZERO_ERR, ring->state);
- 
- #ifdef IXGBE_FCOE
- 		if (adapter->netdev->fcoe_mtu) {
-@@ -984,7 +984,7 @@ static int ixgbe_alloc_q_vector(struct ixgbe_adapter *adapter,
- 			f = &adapter->ring_feature[RING_F_FCOE];
- 			if ((rxr_idx >= f->offset) &&
- 			    (rxr_idx < f->offset + f->indices))
--				set_bit(__IXGBE_RX_FCOE, &ring->state);
-+				set_bit(__IXGBE_RX_FCOE, ring->state);
- 		}
- 
- #endif /* IXGBE_FCOE */
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index e4101c59074d..0bc806aaed90 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -968,7 +968,7 @@ static void ixgbe_update_xoff_rx_lfc(struct ixgbe_adapter *adapter)
- 
- 	for (i = 0; i < adapter->num_tx_queues; i++)
- 		clear_bit(__IXGBE_HANG_CHECK_ARMED,
--			  &adapter->tx_ring[i]->state);
-+			  adapter->tx_ring[i]->state);
- }
- 
- static void ixgbe_update_xoff_received(struct ixgbe_adapter *adapter)
-@@ -1011,7 +1011,7 @@ static void ixgbe_update_xoff_received(struct ixgbe_adapter *adapter)
- 
- 		tc = tx_ring->dcb_tc;
- 		if (xoff[tc])
--			clear_bit(__IXGBE_HANG_CHECK_ARMED, &tx_ring->state);
-+			clear_bit(__IXGBE_HANG_CHECK_ARMED, tx_ring->state);
- 	}
- 
- 	for (i = 0; i < adapter->num_xdp_queues; i++) {
-@@ -1019,7 +1019,7 @@ static void ixgbe_update_xoff_received(struct ixgbe_adapter *adapter)
- 
- 		tc = xdp_ring->dcb_tc;
- 		if (xoff[tc])
--			clear_bit(__IXGBE_HANG_CHECK_ARMED, &xdp_ring->state);
-+			clear_bit(__IXGBE_HANG_CHECK_ARMED, xdp_ring->state);
- 	}
- }
- 
-@@ -1103,11 +1103,11 @@ static bool ixgbe_check_tx_hang(struct ixgbe_ring *tx_ring)
- 	if (tx_done_old == tx_done && tx_pending)
- 		/* make sure it is true for two checks in a row */
- 		return test_and_set_bit(__IXGBE_HANG_CHECK_ARMED,
--					&tx_ring->state);
-+					tx_ring->state);
- 	/* update completed stats and continue */
- 	tx_ring->tx_stats.tx_done_old = tx_done;
- 	/* reset the countdown */
--	clear_bit(__IXGBE_HANG_CHECK_ARMED, &tx_ring->state);
-+	clear_bit(__IXGBE_HANG_CHECK_ARMED, tx_ring->state);
- 
- 	return false;
- }
-@@ -1660,7 +1660,7 @@ static inline bool ixgbe_rx_is_fcoe(struct ixgbe_ring *ring,
- {
- 	__le16 pkt_info = rx_desc->wb.lower.lo_dword.hs_rss.pkt_info;
- 
--	return test_bit(__IXGBE_RX_FCOE, &ring->state) &&
-+	return test_bit(__IXGBE_RX_FCOE, ring->state) &&
- 	       ((pkt_info & cpu_to_le16(IXGBE_RXDADV_PKTTYPE_ETQF_MASK)) ==
- 		(cpu_to_le16(IXGBE_ETQF_FILTER_FCOE <<
- 			     IXGBE_RXDADV_PKTTYPE_ETQF_SHIFT)));
-@@ -1708,7 +1708,7 @@ static inline void ixgbe_rx_checksum(struct ixgbe_ring *ring,
- 		 * checksum errors.
- 		 */
- 		if ((pkt_info & cpu_to_le16(IXGBE_RXDADV_PKTTYPE_UDP)) &&
--		    test_bit(__IXGBE_RX_CSUM_UDP_ZERO_ERR, &ring->state))
-+		    test_bit(__IXGBE_RX_CSUM_UDP_ZERO_ERR, ring->state))
- 			return;
- 
- 		ring->rx_stats.csum_err++;
-@@ -3526,7 +3526,7 @@ static irqreturn_t ixgbe_msix_other(int irq, void *data)
- 			for (i = 0; i < adapter->num_tx_queues; i++) {
- 				struct ixgbe_ring *ring = adapter->tx_ring[i];
- 				if (test_and_clear_bit(__IXGBE_TX_FDIR_INIT_DONE,
--						       &ring->state))
-+						       ring->state))
- 					reinit_count++;
- 			}
- 			if (reinit_count) {
-@@ -3952,13 +3952,13 @@ void ixgbe_configure_tx_ring(struct ixgbe_adapter *adapter,
- 	if (adapter->flags & IXGBE_FLAG_FDIR_HASH_CAPABLE) {
- 		ring->atr_sample_rate = adapter->atr_sample_rate;
- 		ring->atr_count = 0;
--		set_bit(__IXGBE_TX_FDIR_INIT_DONE, &ring->state);
-+		set_bit(__IXGBE_TX_FDIR_INIT_DONE, ring->state);
- 	} else {
- 		ring->atr_sample_rate = 0;
- 	}
- 
- 	/* initialize XPS */
--	if (!test_and_set_bit(__IXGBE_TX_XPS_INIT_DONE, &ring->state)) {
-+	if (!test_and_set_bit(__IXGBE_TX_XPS_INIT_DONE, ring->state)) {
- 		struct ixgbe_q_vector *q_vector = ring->q_vector;
- 
- 		if (q_vector)
-@@ -3967,7 +3967,7 @@ void ixgbe_configure_tx_ring(struct ixgbe_adapter *adapter,
- 					    ring->queue_index);
- 	}
- 
--	clear_bit(__IXGBE_HANG_CHECK_ARMED, &ring->state);
-+	clear_bit(__IXGBE_HANG_CHECK_ARMED, ring->state);
- 
- 	/* reinitialize tx_buffer_info */
- 	memset(ring->tx_buffer_info, 0,
-@@ -4173,7 +4173,7 @@ static void ixgbe_configure_srrctl(struct ixgbe_adapter *adapter,
- 			srrctl |= PAGE_SIZE >> IXGBE_SRRCTL_BSIZEPKT_SHIFT;
- 		else
- 			srrctl |= xsk_buf_len >> IXGBE_SRRCTL_BSIZEPKT_SHIFT;
--	} else if (test_bit(__IXGBE_RX_3K_BUFFER, &rx_ring->state)) {
-+	} else if (test_bit(__IXGBE_RX_3K_BUFFER, rx_ring->state)) {
- 		srrctl |= IXGBE_RXBUFFER_3K >> IXGBE_SRRCTL_BSIZEPKT_SHIFT;
- 	} else {
- 		srrctl |= IXGBE_RXBUFFER_2K >> IXGBE_SRRCTL_BSIZEPKT_SHIFT;
-@@ -4558,7 +4558,7 @@ void ixgbe_configure_rx_ring(struct ixgbe_adapter *adapter,
- 		 * higher than the MTU of the PF.
- 		 */
- 		if (ring_uses_build_skb(ring) &&
--		    !test_bit(__IXGBE_RX_3K_BUFFER, &ring->state))
-+		    !test_bit(__IXGBE_RX_3K_BUFFER, ring->state))
- 			rxdctl |= IXGBE_MAX_2K_FRAME_BUILD_SKB |
- 				  IXGBE_RXDCTL_RLPML_EN;
- #endif
-@@ -4733,27 +4733,27 @@ static void ixgbe_set_rx_buffer_len(struct ixgbe_adapter *adapter)
- 		rx_ring = adapter->rx_ring[i];
- 
- 		clear_ring_rsc_enabled(rx_ring);
--		clear_bit(__IXGBE_RX_3K_BUFFER, &rx_ring->state);
--		clear_bit(__IXGBE_RX_BUILD_SKB_ENABLED, &rx_ring->state);
-+		clear_bit(__IXGBE_RX_3K_BUFFER, rx_ring->state);
-+		clear_bit(__IXGBE_RX_BUILD_SKB_ENABLED, rx_ring->state);
- 
- 		if (adapter->flags2 & IXGBE_FLAG2_RSC_ENABLED)
- 			set_ring_rsc_enabled(rx_ring);
- 
--		if (test_bit(__IXGBE_RX_FCOE, &rx_ring->state))
--			set_bit(__IXGBE_RX_3K_BUFFER, &rx_ring->state);
-+		if (test_bit(__IXGBE_RX_FCOE, rx_ring->state))
-+			set_bit(__IXGBE_RX_3K_BUFFER, rx_ring->state);
- 
- 		if (adapter->flags2 & IXGBE_FLAG2_RX_LEGACY)
- 			continue;
- 
--		set_bit(__IXGBE_RX_BUILD_SKB_ENABLED, &rx_ring->state);
-+		set_bit(__IXGBE_RX_BUILD_SKB_ENABLED, rx_ring->state);
- 
- #if (PAGE_SIZE < 8192)
- 		if (adapter->flags2 & IXGBE_FLAG2_RSC_ENABLED)
--			set_bit(__IXGBE_RX_3K_BUFFER, &rx_ring->state);
-+			set_bit(__IXGBE_RX_3K_BUFFER, rx_ring->state);
- 
- 		if (IXGBE_2K_TOO_SMALL_WITH_PADDING ||
- 		    (max_frame > (ETH_FRAME_LEN + ETH_FCS_LEN)))
--			set_bit(__IXGBE_RX_3K_BUFFER, &rx_ring->state);
-+			set_bit(__IXGBE_RX_3K_BUFFER, rx_ring->state);
- #endif
- 	}
- }
-@@ -7944,10 +7944,10 @@ static void ixgbe_fdir_reinit_subtask(struct ixgbe_adapter *adapter)
- 	if (ixgbe_reinit_fdir_tables_82599(hw) == 0) {
- 		for (i = 0; i < adapter->num_tx_queues; i++)
- 			set_bit(__IXGBE_TX_FDIR_INIT_DONE,
--				&(adapter->tx_ring[i]->state));
-+				adapter->tx_ring[i]->state);
- 		for (i = 0; i < adapter->num_xdp_queues; i++)
- 			set_bit(__IXGBE_TX_FDIR_INIT_DONE,
--				&adapter->xdp_ring[i]->state);
-+				adapter->xdp_ring[i]->state);
- 		/* re-enable flow director interrupts */
- 		IXGBE_WRITE_REG(hw, IXGBE_EIMS, IXGBE_EIMS_FLOW_DIR);
- 	} else {
-@@ -9488,7 +9488,7 @@ netdev_tx_t ixgbe_xmit_frame_ring(struct sk_buff *skb,
- 		ixgbe_tx_csum(tx_ring, first, &ipsec_tx);
- 
- 	/* add the ATR filter if ATR is on */
--	if (test_bit(__IXGBE_TX_FDIR_INIT_DONE, &tx_ring->state))
-+	if (test_bit(__IXGBE_TX_FDIR_INIT_DONE, tx_ring->state))
- 		ixgbe_atr(tx_ring, first);
- 
- #ifdef IXGBE_FCOE
-@@ -9528,7 +9528,7 @@ static netdev_tx_t __ixgbe_xmit_frame(struct sk_buff *skb,
- 		return NETDEV_TX_OK;
- 
- 	tx_ring = ring ? ring : adapter->tx_ring[skb_get_queue_mapping(skb)];
--	if (unlikely(test_bit(__IXGBE_TX_DISABLED, &tx_ring->state)))
-+	if (unlikely(test_bit(__IXGBE_TX_DISABLED, tx_ring->state)))
- 		return NETDEV_TX_BUSY;
- 
- 	return ixgbe_xmit_frame_ring(skb, adapter, tx_ring);
-@@ -11013,7 +11013,7 @@ static int ixgbe_xdp_xmit(struct net_device *dev, int n,
- 	if (unlikely(!ring))
- 		return -ENXIO;
- 
--	if (unlikely(test_bit(__IXGBE_TX_DISABLED, &ring->state)))
-+	if (unlikely(test_bit(__IXGBE_TX_DISABLED, ring->state)))
- 		return -ENXIO;
- 
- 	if (static_branch_unlikely(&ixgbe_xdp_locking_key))
-@@ -11119,7 +11119,7 @@ static void ixgbe_disable_txr_hw(struct ixgbe_adapter *adapter,
- static void ixgbe_disable_txr(struct ixgbe_adapter *adapter,
- 			      struct ixgbe_ring *tx_ring)
- {
--	set_bit(__IXGBE_TX_DISABLED, &tx_ring->state);
-+	set_bit(__IXGBE_TX_DISABLED, tx_ring->state);
- 	ixgbe_disable_txr_hw(adapter, tx_ring);
- }
- 
-@@ -11273,9 +11273,9 @@ void ixgbe_txrx_ring_enable(struct ixgbe_adapter *adapter, int ring)
- 		ixgbe_configure_tx_ring(adapter, xdp_ring);
- 	ixgbe_configure_rx_ring(adapter, rx_ring);
- 
--	clear_bit(__IXGBE_TX_DISABLED, &tx_ring->state);
-+	clear_bit(__IXGBE_TX_DISABLED, tx_ring->state);
- 	if (xdp_ring)
--		clear_bit(__IXGBE_TX_DISABLED, &xdp_ring->state);
-+		clear_bit(__IXGBE_TX_DISABLED, xdp_ring->state);
- 
- 	/* Rx/Tx/XDP Tx share the same napi context. */
- 	napi_enable(&rx_ring->q_vector->napi);
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-index 7b941505a9d0..89f96c463f02 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-@@ -524,7 +524,7 @@ int ixgbe_xsk_wakeup(struct net_device *dev, u32 qid, u32 flags)
- 
- 	ring = adapter->xdp_ring[qid];
- 
--	if (test_bit(__IXGBE_TX_DISABLED, &ring->state))
-+	if (test_bit(__IXGBE_TX_DISABLED, ring->state))
- 		return -ENETDOWN;
- 
- 	if (!ring->xsk_pool)
--- 
-2.47.1
-
+--=20
+paul-moore.com
 
