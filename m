@@ -1,150 +1,201 @@
-Return-Path: <netdev+bounces-262584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262585-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UCAkAtZYpWnj9wUAu9opvQ
-	(envelope-from <netdev+bounces-262584-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 10:31:02 +0100
+	id KJXbAjpbpWlc+QUAu9opvQ
+	(envelope-from <netdev+bounces-262585-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 10:41:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E48121D5922
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 10:31:01 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BECE1D5ADC
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 10:41:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 54AAB300832C
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 09:31:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C67463027365
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 09:41:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFFC338F621;
-	Mon,  2 Mar 2026 09:30:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="xxCY8N+f"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1B7A38F63B;
+	Mon,  2 Mar 2026 09:41:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 646C8330642
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 09:30:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3504A1A2C0B
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 09:41:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772443857; cv=none; b=cG46x2XuXA4t9ENQb7/wBZqbo1FHRytW6bYfzYgWaKrq7v+Rj6f1jqPJxHfp7xZQkYrtcCLmj452//nVg2kUASQHjgOrfdVgPtUIO9FZOR+TyePml7vWT5V1K0+7qrsQhSG1GRm4rGJv4eGKxzy6HRZE5WMyEAJcXweW6g21NQ8=
+	t=1772444469; cv=none; b=itI06b/HqjkrlJYO51lF1/K3q6ngIaAFEtikfyhIcClE3VLgxpeXxyzXcjU9ELezsyQnUW4T6hY4s76HwjXMZYUdzu4jdfF+B1r2RU5QswknQUWt4Olg7Ohdlb2rhlfUhVHuMCGxnI+6YaNaCsSzmLePIXFI8Fc8wwOHDLegnTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772443857; c=relaxed/simple;
-	bh=SkQS32P2isxsZzN0Tpf5AFFSNZCHU5H1VsWyGV3O950=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C+JxwhkT9/lCa9lSNxOzPiJlh7tE971pRJECVJlkkUWZ1XvSaFCQmnqrMu01Amx0XCS31MqdZRjzfdePZOnZx2UY0s5RE28lsWAjs4DAqToE8MLc2RKSHy5tUfusMTA28RYRM52zf9Gu/7c07z9WpmZebnUaJXrDmXijddzdJYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=xxCY8N+f; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-4376acce52eso2811158f8f.1
-        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 01:30:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1772443855; x=1773048655; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9G+3cg9egGGuETeZt9ogez9f+d5U3nrYRpciNbV9ROE=;
-        b=xxCY8N+fbsjMfrshhj4gYM+chOalJaRweaJrL2wTpoGwmLZlUbumL7awGab7yxbwRV
-         0mUaxq4c7qj1jSTnk3EAuIK6lSDxxdADCvoZL53octj513wTDSnRi4/R5cdaOh0EHvX4
-         DGk6gTh2QKF990FGOy3pDqZQXPQ4Eyp2TM2CNZXQXLZShRMd//Y2twlzATk7O5n9oQev
-         vkpPyzwkB82N5P/erQPzm165G7oovxqcTaqbSTAprF205+73zG3jdrNDP9/h9iAZcnG6
-         GEwT8qqD5tqVlJ8g2KjgdD0phbqxtqX6t2w5BM7ieSuIOuD9fLRS9AwTGY2Sghwz6Dno
-         c4LQ==
+	s=arc-20240116; t=1772444469; c=relaxed/simple;
+	bh=Ez64KVPyUYsQ2awF9e6vDqNmteH/+x0+y1/m+pgXlFM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iVcNxnhtSXEHQRmVl1BYqWEOaTDCKkEk4WJunrI2uT47LZds/tpGd1fDimV4T3AnG2F7/eT0eSx7cu7+E+L26VjolZhkhR8Lzsc3rxXfW7UASzT3g3A2VLZlIm+ekXKnenyq/YUjvhUCfQRfF50JIO2m2a0d9gKKYJZAactEln4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-56a87d7c5d7so3461711e0c.3
+        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 01:41:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772443855; x=1773048655;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9G+3cg9egGGuETeZt9ogez9f+d5U3nrYRpciNbV9ROE=;
-        b=DTm2vq77w5WkYE9I+V3vRSALslccnnHm42ybsWJqXWgZ7SX1ieVc3cEOPeuZ/R9Rp7
-         vuey9PRYGLfu1KlszYMxPYWWIEEJ+imA+RleH5FpUG6cGTnxteU24oZu63FG13eRxA2G
-         lf1WKqvQPYb6DzFecgaTa0GLr/flLjmCcRoOLoY1u5LjqnW7Dr/fIEMo3+yDFwRDXki3
-         MH8BEfo8o68wRJfDAbO+7V4Y8GbTFwVS0SC+BLBRrRcRC05UrQAUIrumHloiGarOput5
-         FOVsedS3uXY3t08nbaqknUZk9eXD/SNk34xhlNnXJDSj/ztik5RM4qGhr40w2kFVm5C8
-         iU0Q==
-X-Gm-Message-State: AOJu0YyeTL5dlZV14YhACsdd3GJjWXlAl25MuhySOGIk/wePGEJDWf4e
-	fNuc9WkHWbxvJnkH4nfnfLjkiHI1qa9cUBWuzax/puLBkQGWA+8ax0Qu1nw7owfrHkg=
-X-Gm-Gg: ATEYQzwVNCbAiOHt7J3zaH3Jqn0c1EyrHMIhbeawKRlBZwRqkUAdKrk9MVcnvuJVJ6W
-	c6Ezegv1EiUD09qMWYToSt7jdkAP2SPcATganMy3Tb3PW8UZldzgDv0psxyV/q7RwhphZ7Sbqok
-	aNy1XZZVDXYfbu0ZBXfs0O4XdJzJaBOTd2U3d7hry2U+s6f/Ug+Gd9RFoRh2LyW71Y6iLc0GUnV
-	LlTHq6xVlfZLxPzZfTDaPFRNZbiWU2mteUn0uQL2yJxKTrVZwHMK534d7MJoOIpPKXw0Ie/NVff
-	zsxd+tBQTpvDYM/UtHyGa1VU1ZVt4Gn3SqD4AErSAd6SiDstC9N5CChl2kf9LKcRhFwD51UuXJh
-	UDWTMY2eGTrLgEo7JcMMhUA+But9PSQqB+DRwgJpecbcrU8Ox3sQvKx8NI09qjwK75ruIYKWUCK
-	zJ32hjiKJoAVQcBy3kY1KksTbmeZnEGUA=
-X-Received: by 2002:a05:6000:601:b0:439:9550:fc57 with SMTP id ffacd0b85a97d-4399dde551dmr19370651f8f.18.1772443854545;
-        Mon, 02 Mar 2026 01:30:54 -0800 (PST)
-Received: from FV6GYCPJ69 ([85.163.81.98])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439abdf5430sm15422817f8f.5.2026.03.02.01.30.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Mar 2026 01:30:54 -0800 (PST)
-Date: Mon, 2 Mar 2026 10:30:51 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, horms@kernel.org, donald.hunter@gmail.com, corbet@lwn.net, 
-	skhan@linuxfoundation.org, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com, 
-	mbloch@nvidia.com, przemyslaw.kitszel@intel.com, mschmidt@redhat.com, 
-	andrew+netdev@lunn.ch, rostedt@goodmis.org, mhiramat@kernel.org, 
-	mathieu.desnoyers@efficios.com, chuck.lever@oracle.com, matttbe@kernel.org, cjubran@nvidia.com, 
-	daniel.zahka@gmail.com, linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 08/10] devlink: introduce shared devlink
- instance for PFs on same chip
-Message-ID: <cic5snbhrc4lvs5iyuddepj66nyttzpajgcjal4etqebjxlgqo@hwwtlbmczhr6>
-References: <20260225133422.290965-1-jiri@resnulli.us>
- <20260225133422.290965-9-jiri@resnulli.us>
- <20260228150311.1a1ded74@kernel.org>
+        d=1e100.net; s=20230601; t=1772444466; x=1773049266;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BVUkTgXHkbBKhiDnIN0oTaONlF7U4tUeTKHJdKgOm5w=;
+        b=cfIhQTniFIMWbNy9/VLfZiJNiiSHcSKHC/oZ3y4wYn3zJRrGC/hBsosa15cGcFYZZq
+         5fIOIuI1lvU4sfH/74ZxM+g2sbhY0EdzUxJixnXQydyi5LVDMeWYyoMNa90qJuv6D6d5
+         zip2Zk86y1EUQi5+IALZBRPylWlZtz9T5YxlsF/oQ/i7eFwTw0kfCXVoAqM3HP/iftl1
+         lpvTFptCDMBjfia8W0TuCBvWnpJ+kSzgnlu9j1MNhoYD1Maa05QuJ1OGVgcSech7t2W0
+         LYZXiJF8hJTBtKlWw6l8DaCmQp8ZjdYe7X9Uwel01TxyG9H0uH+6nzcOtQtNijeyzo8R
+         kL3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXBFY3U5vo+/idbmRv5BI9ADhHnSoV9lR3r3zlb/HqT6gWr+wbmBFCsGWLolUD8TihS8ksmpD8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxb4A0ES+NFXsWhH67PgiYgwcZSOEQPyq9wcqepVQkbwDA83rvs
+	ZhQ0aPfqUWy4LDQwTbVRSv89jayoyXnfxVC66f153fCufCS/2+KPKkHgWj+GniNI
+X-Gm-Gg: ATEYQzyNHApvqWdiEvalThxYxk+5HFeQhRxpiMXvbWsSlcYys5ebo42IwsXgrnuckBW
+	LfBrd0q5br/VceG5TVVOM5SkXa7YdAaR8O+HWp/ni/VEfJdpem7Qr0tYrHpo51zymrz+XcJY+gf
+	yBrCpolLkCRmhM/sF40q9JFAWsN0aH2pFOu82+uVwUmScOToO1mq5B1P7wMr+JIaVRWdg/I7F1+
+	r7a9xys6nLYyAqHLQgLDEZyyei+/3dXwFS/nVQ9LrG8eiDw/x9WqEs5+QFQ9+R5wriOrmBpRB9P
+	1uoCyGYjguA/q+BMgfarHmQ82J2MQNL39fZ7ZGXnlsu3dBt3ZebEVYGcwTScGjRBGvFAWy4ja5p
+	OQVVCqkxAdMQldju2IeibJSSJCtAGdTXT8ZSugBaT2LRUg4lBDHcTejm2yfLffA8cm10K08Q6Df
+	apIOWfCT4g2omu/Jg8y6VKIgJ3keb+G0SMYwfjs9CJscARwOjKS/Y7GRvuv96h5Vqzwrazu5DM7
+	Yw=
+X-Received: by 2002:a05:6102:3747:b0:5f5:3619:8bd1 with SMTP id ada2fe7eead31-5ff32494193mr5490530137.25.1772444466007;
+        Mon, 02 Mar 2026 01:41:06 -0800 (PST)
+Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com. [209.85.221.170])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-94df63d6f03sm11470580241.3.2026.03.02.01.41.05
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Mar 2026 01:41:05 -0800 (PST)
+Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-56a976305b3so2899076e0c.1
+        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 01:41:05 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXPhY8Q4AlJ/2QkMqQQJ140ubtORgVEi+tD0ht4TrTM+ItYBrapId8uUkZMMJD5QzxFjH39a/U=@vger.kernel.org
+X-Received: by 2002:a05:6102:3747:b0:5f5:3619:8bd1 with SMTP id
+ ada2fe7eead31-5ff32494193mr5490525137.25.1772444465487; Mon, 02 Mar 2026
+ 01:41:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260228150311.1a1ded74@kernel.org>
+References: <20260228180821.811683-1-seanwascoding@gmail.com> <20260228180821.811683-2-seanwascoding@gmail.com>
+In-Reply-To: <20260228180821.811683-2-seanwascoding@gmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Mon, 2 Mar 2026 10:40:54 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdUvynCH_eqNWr6EWusCWc7z6s-0b6gwQ1B_=mDkkxMd4w@mail.gmail.com>
+X-Gm-Features: AaiRm50IkzgTnKIsbY1hU9x7p3C6C39FPDtFYhWApldWfRRArQZieFo-6dS1RfY
+Message-ID: <CAMuHMdUvynCH_eqNWr6EWusCWc7z6s-0b6gwQ1B_=mDkkxMd4w@mail.gmail.com>
+Subject: Re: [PATCH v5 1/2] sunrpc: simplify dfprintk macros and fix nfsd
+ build error
+To: Sean Chang <seanwascoding@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Chuck Lever <chuck.lever@oracle.com>, 
+	David Laight <david.laight.linux@gmail.com>, nicolas.ferre@microchip.com, 
+	claudiu.beznea@tuxon.dev, trond.myklebust@hammerspace.com, anna@kernel.org, 
+	netdev@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262584-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[resnulli.us];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,lwn.net,linuxfoundation.org,nvidia.com,intel.com,lunn.ch,goodmis.org,efficios.com,oracle.com];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,oracle.com,gmail.com,microchip.com,tuxon.dev,hammerspace.com,kernel.org,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-262585-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[linux-m68k.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[resnulli-us.20230601.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	NEURAL_SPAM(0.00)[0.186];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,resnulli-us.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: E48121D5922
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux-m68k.org:email,lunn.ch:email]
+X-Rspamd-Queue-Id: 7BECE1D5ADC
 X-Rspamd-Action: no action
 
-Sun, Mar 01, 2026 at 12:03:11AM +0100, kuba@kernel.org wrote:
->On Wed, 25 Feb 2026 14:34:20 +0100 Jiri Pirko wrote:
->> +struct devlink_shd {
->> +	struct list_head list; /* Node in shd list */
->> +	const char *id; /* Identifier string (e.g., serial number) */
->> +	refcount_t refcount; /* Reference count */
->> +	char priv[] __aligned(NETDEV_ALIGN); /* Driver private data */
->> +};
->
->As pointed out by AI you promised a size member and a __counted_by()
->annotation :)
+Hi Sean,
 
-Yeah, somehow I got false impression this is not needed for priv. My
-bad, sorry, adding it.
+On Sat, 28 Feb 2026 at 22:29, Sean Chang <seanwascoding@gmail.com> wrote:
+> When CONFIG_SUNRPC_DEBUG is disabled, the dfprintk() macros currently
+> expand to empty do-while loops. This causes variables used solely
+> within these calls to appear unused, triggering -Wunused-variable
+> warnings.
+>
+> Following David Laight's suggestion, simplify the macro definitions by
+> removing the unnecessary 'fmt' argument and using no_printk(__VA_ARGS__)
+> directly. This ensures the compiler performs type checking and "sees"
+> the variables, silencing the warnings without emitting any code.
+>
+> Additionally, fix a build error in fs/nfsd/nfsfh.c reported by syzbot.
+> In nfsd_setuser_and_check_port(), the variable 'buf' is conditionally
+> defined via RPC_IFDEBUG. Since no_printk() now performs type checking,
+> it triggers an 'undeclared identifier' error when debug is disabled.
+> Wrap the dprintk call in an #if block to synchronize its lifecycle
+> with 'buf', following the pattern in svc_rdma_transport.c.
+>
+> Link: https://lore.kernel.org/all/69a2e269.050a0220.3a55be.003e.GAE@google.com/
+> Suggested-by: Andrew Lunn <andrew@lunn.ch>
+> Suggested-by: David Laight <david.laight.linux@gmail.com>
+> Signed-off-by: Sean Chang <seanwascoding@gmail.com>
+
+This should have been fixed alteady, cfr.
+"Re: [PATCH v3 0/3] sunrpc: Fix `make W=1` build issues"?
+https://lore.kernel.org/177024270291.126397.9981743455921781902.b4-ty@oracle.com
+
+> ---
+>  fs/nfsd/nfsfh.c              | 2 ++
+>  include/linux/sunrpc/debug.h | 4 ++--
+>  2 files changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/fs/nfsd/nfsfh.c b/fs/nfsd/nfsfh.c
+> index ed85dd43da18..f7386fd483a6 100644
+> --- a/fs/nfsd/nfsfh.c
+> +++ b/fs/nfsd/nfsfh.c
+> @@ -106,8 +106,10 @@ static __be32 nfsd_setuser_and_check_port(struct svc_rqst *rqstp,
+>         /* Check if the request originated from a secure port. */
+>         if (rqstp && !nfsd_originating_port_ok(rqstp, cred, exp)) {
+>                 RPC_IFDEBUG(char buf[RPC_MAX_ADDRBUFLEN]);
+> +#if IS_ENABLED(CONFIG_SUNRPC_DEBUG)
+>                 dprintk("nfsd: request from insecure port %s!\n",
+>                         svc_print_addr(rqstp, buf, sizeof(buf)));
+> +#endif
+>                 return nfserr_perm;
+>         }
+>
+> diff --git a/include/linux/sunrpc/debug.h b/include/linux/sunrpc/debug.h
+> index eb4bd62df319..cb33c7e1f370 100644
+> --- a/include/linux/sunrpc/debug.h
+> +++ b/include/linux/sunrpc/debug.h
+> @@ -52,8 +52,8 @@ do {                                                                  \
+>  # define RPC_IFDEBUG(x)                x
+>  #else
+>  # define ifdebug(fac)          if (0)
+> -# define dfprintk(fac, fmt, ...)       do {} while (0)
+> -# define dfprintk_rcu(fac, fmt, ...)   do {} while (0)
+> +# define dfprintk(fac, ...)            no_printk(__VA_ARGS__)
+> +# define dfprintk_rcu(fac, ...)        no_printk(__VA_ARGS__)
+>  # define RPC_IFDEBUG(x)
+>  #endif
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
