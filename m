@@ -1,129 +1,197 @@
-Return-Path: <netdev+bounces-262711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262712-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kHwDLMqwpWkiEgAAu9opvQ
-	(envelope-from <netdev+bounces-262711-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:46:18 +0100
+	id IK/lJ7yvpWleEQAAu9opvQ
+	(envelope-from <netdev+bounces-262712-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:41:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42A701DC1E4
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:46:17 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48FCC1DC09D
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:41:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6040C3000515
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 15:40:06 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 809D23005A9E
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 15:41:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FD263FD15F;
-	Mon,  2 Mar 2026 15:40:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 589C841162A;
+	Mon,  2 Mar 2026 15:41:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ej5RzryF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NpcLcN9z"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C9791A2C0B
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 15:40:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD17840149C
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 15:41:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772466005; cv=none; b=IPuBtG+rei18AELWfsB4u79tQ4UJAfrbIIMOaWLQfW7jW+goS4hhZtd0m+idmWtZRfjnej2iMRI7Lltx6fnbIaMhiLhzzf7l+ohwLCOv1uP2VwXb4+3N9oV/sic+9jkry3D8BQBY5Wol9cJnNfy7R3XOi3M+JrZmtyIgr6goZqk=
+	t=1772466106; cv=none; b=CeGEl/PuwXYyBEuGbhCbsMER472KiaF27A1jc04Zk09sx30QVzYjI9KJN8jWB+NIy1zJHTpKk5hjF/+pcplPDOCdEHNknveoTojYa2HpTREVfWuLPMZiytNW9X8b6pBz98ywbgk92bzLdKrdxDTaHk9/tFVyg4XKFEGXBQKH12U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772466005; c=relaxed/simple;
-	bh=DdxTTElwDNYWHjAp3aYYb6EtGUL5ViIOYxk7oyjbiMI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SgJZSmEqCZQaDztNo4wyhTZ6zvsisKaV0sRr0kmSfsIPYom3E10AyBoP53WqwCQOrYyKavDI4rNVc6TumSxWzgc5JrxzO+AG+BYpOSEj1SeEzDBuCoT2B2kRFKXPfRg0SKJlmX7n8xgSdb7zGvw1e/EuFiIxevz7n8eUbWhQodw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ej5RzryF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8F08C19423;
-	Mon,  2 Mar 2026 15:40:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772466004;
-	bh=DdxTTElwDNYWHjAp3aYYb6EtGUL5ViIOYxk7oyjbiMI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ej5RzryFUSnHYNU2KoxIusMi6mWgUNxV/wHoW0Soosau3F/PBiMXp/cEw+Vcejjy8
-	 jJ/L/QvntH7Ajh36K2ah8Ht0WNjNSeTdoaBAnSKjUMUIN8pGE0scdqBVL9soh3ikS1
-	 YpseCr0Zo0bLkF9BslFPxEV6GuUTStNZiDMKmpj7VJrRkkm+gnURDIOm0qozSUDqkB
-	 sACDzfNJz9aV+QwWloC1sJ3pHQCiPY9EQvFaY5Yp6LGsDwTa6OQ2Io0ezEgEC0oCrh
-	 n6oqYYijCZ4/5XoDq9Ha3ufO5OjS5CijguK73qI0oHRwXWBy7H0BA7VZXe8EK8vgrW
-	 P54ZbhQZtdIxQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02D89393089A;
-	Mon,  2 Mar 2026 15:40:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1772466106; c=relaxed/simple;
+	bh=V5eDYyeSzEe01Qy0X2d3YjmdmOm2DlobDKTfwH81yIk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=NUsio2EFPgOjY1KiADrTXK43zEWSZELS+uhK9+s/LVdjtEw7KI9iDtap/fCjWfMmAJKQaLUQloL4uADIpejBat9EP4bZphEEnEYVjmnSmXbLVeOy1gnlRy/0/4YZAMyuuIuvvhdAXSEbSPQNmtx5YwDurOh/EE3rPAZKDmc6/ZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NpcLcN9z; arc=none smtp.client-ip=209.85.128.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4837bfcfe0dso58425065e9.1
+        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 07:41:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772466103; x=1773070903; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fvJ4Pj0Wo9ryI9xJ6mJ9OBJG9CVcmeBhutvadxQnZZs=;
+        b=NpcLcN9zaHs6viT1xkKDJ6JmpmAjvhKns6ydmfiwCNU5XOvLSWikyNvN/hsLBDVKJz
+         CQQPekhDUK//hEnOaLL8NjKhpzzxiWvoWaI4iDzJQ6VvtfYDpc2SIo7ODSRQiiQb7rqY
+         T9pBkMdn8THxrSV2LAPfXGfKwuuA6tvQsEkDmBikv2i/8u0CaDqNDDwZ4e1s1FsnJO69
+         W3EqubJd3HDoLvp5I9MGEIOo2Qcwmg2YaPYpkcCM/kWWdJ5gcy7yhiwmQqY4q76okx0C
+         xa7i0vCr56hW1eHA53+8TLarCTCI/Ivx3qE0J7nXzkaUQbXbHUIOfhT7j+CJYJPjammY
+         XWeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772466103; x=1773070903;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fvJ4Pj0Wo9ryI9xJ6mJ9OBJG9CVcmeBhutvadxQnZZs=;
+        b=JcrxmJyNtDigTk2SVPawU0JNodJEIk671kH8WsO1B+uMSu6DuoZqRACEEfKvCNqmDp
+         h+oo4B0wPHUhQmtl8LY+nSzTarA0T5NYYroO6fn/lrvTXQ1qliRFtjiI0jddbQCWgAqs
+         yHS34/ABUe3fk25TGuyfcZam26F9VBKY8RdAwmxxw5TguNjDPDhgayAmrE0zN7omuQsH
+         e9qCgTVvxq8r/h40G8N2cWL1CSr/Y6rqnmfJBdbumRHMsCN3RUaO+dnhWUvsv9zMViAk
+         uUYV/E3NeJrQqVaOCIU630aDuCxTZ3grcE3KzkIsqgitcNZ5Zky7DAeQrefbYO9c84CG
+         YyeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW0oE7Q9AlNNSzpN5ZA6B9gyYsoMWVdTMHAzO4GWIIH/o3vQJNJUT1eoRnJra/nKSW7RBx7E2E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTxEiQXTL4VIoszR/4GY0gCyW/iPyXakhHYlUIo0OpBNlhAP1u
+	k31h98z0HZA2gMDkQo58dyeOCUS8QDqTGQLm5mdhT1GWWWkLx28qJcC9iF6XZNJTtaVSllGok6g
+	55kQkSHoYpN71PH35eg==
+X-Received: from wmby19.prod.google.com ([2002:a05:600c:c053:b0:480:690c:88de])
+ (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:3b18:b0:483:7432:a761 with SMTP id 5b1f17b1804b1-483c9bc558bmr213622465e9.24.1772466102970;
+ Mon, 02 Mar 2026 07:41:42 -0800 (PST)
+Date: Mon, 2 Mar 2026 15:41:42 +0000
+In-Reply-To: <5f8dcb7f-9e4f-4484-b160-3a9ce541d63c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCHv2 iproute2-next] iplink: bond_slave: print actor and
- partner
- churn state
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177246600680.367674.4544648974792192730.git-patchwork-notify@kernel.org>
-Date: Mon, 02 Mar 2026 15:40:06 +0000
-References: <20260226033844.18244-1-liuhangbin@gmail.com>
-In-Reply-To: <20260226033844.18244-1-liuhangbin@gmail.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, jv@jvosburgh.net, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- dsahern@kernel.org, stephen@networkplumber.org
-X-Rspamd-Queue-Id: 42A701DC1E4
+Mime-Version: 1.0
+References: <20260227200848.114019-1-david@kernel.org> <20260227200848.114019-3-david@kernel.org>
+ <aaLh2BxSgC9Jl5iS@google.com> <8a27e9ac-2025-4724-a46d-0a7c90894ba7@kernel.org>
+ <aaVf5gv4XjV6Ddt-@google.com> <f2f3a8a1-3dbf-4ef9-a89a-a6ec20791d1c@kernel.org>
+ <aaVnifbdxKhBddQp@google.com> <5f8dcb7f-9e4f-4484-b160-3a9ce541d63c@kernel.org>
+Message-ID: <aaWvtn48X8UizaaN@google.com>
+Subject: Re: [PATCH v1 02/16] mm/memory: remove "zap_details" parameter from zap_page_range_single()
+From: Alice Ryhl <aliceryhl@google.com>
+To: "David Hildenbrand (Arm)" <david@kernel.org>
+Cc: linux-kernel@vger.kernel.org, 
+	"linux-mm @ kvack . org" <linux-mm@kvack.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
+	Vlastimil Babka <vbabka@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
+	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Jann Horn <jannh@google.com>, 
+	Pedro Falcato <pfalcato@suse.de>, David Rientjes <rientjes@google.com>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Madhavan Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
+	Vasily Gorbik <gor@linux.ibm.com>, Jarkko Sakkinen <jarkko@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Arve =?utf-8?B?SGrDuG5uZXbDpWc=?=" <arve@android.com>, Todd Kjos <tkjos@android.com>, 
+	Christian Brauner <brauner@kernel.org>, Carlos Llamas <cmllamas@google.com>, Ian Abbott <abbotti@mev.co.uk>, 
+	H Hartley Sweeten <hsweeten@visionengravers.com>, Jani Nikula <jani.nikula@linux.intel.com>, 
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+	Tvrtko Ursulin <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>, 
+	Simona Vetter <simona@ffwll.ch>, Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
+	Dimitri Sivanich <dimitri.sivanich@hpe.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Andy Lutomirski <luto@kernel.org>, 
+	Vincenzo Frascino <vincenzo.frascino@arm.com>, Eric Dumazet <edumazet@google.com>, 
+	Neal Cardwell <ncardwell@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
+	linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org, 
+	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, x86@kernel.org
+Content-Type: text/plain; charset="utf-8"
+X-Rspamd-Queue-Id: 48FCC1DC09D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262711-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kvack.org,linux-foundation.org,oracle.com,kernel.org,google.com,suse.com,suse.de,linux.dev,infradead.org,linux.ibm.com,ellerman.id.au,redhat.com,alien8.de,linuxfoundation.org,android.com,mev.co.uk,visionengravers.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,ziepe.ca,hpe.com,arndb.de,iogearbox.net,arm.com,davemloft.net,lists.ozlabs.org,lists.freedesktop.org];
+	TAGGED_FROM(0.00)[bounces-262712-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[73];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-0.998];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Hello:
-
-This patch was applied to iproute2/iproute2-next.git (main)
-by David Ahern <dsahern@kernel.org>:
-
-On Thu, 26 Feb 2026 03:38:44 +0000 you wrote:
-> Add ability to print both actor and partner port churn states
-> (MONITOR/CHURN/NO_CHURN) via netlink attributes. This provides
-> visibility into the LACP churn detection state for bond slaves.
+On Mon, Mar 02, 2026 at 04:01:44PM +0100, David Hildenbrand (Arm) wrote:
+> On 3/2/26 11:33, Alice Ryhl wrote:
+> > On Mon, Mar 02, 2026 at 11:27:40AM +0100, David Hildenbrand (Arm) wrote:
+> >> On 3/2/26 11:01, Alice Ryhl wrote:
+> >>>
+> >>> Well, rustfmt comes with the compiler, and it would be ideal to build
+> >>> test changes before sending them :)
+> >>
+> >> At least on Ubuntu on my notebook where I do most of the coding+patch
+> >> submissions it's a separate package?
+> >>
+> >> I do all my builds on a different (more powerful) machine where the
+> >> whole rust machinery's in place. Further, build bots that run on my
+> >> private branches did not report any issues.
+> > 
+> > There are some build bots that check for rustfmt, though not all of
+> > them.
+> > 
+> >>> But no worries, I took care of testing it. Thanks for taking the time to
+> >>> update the Rust code as well.
+> >>
+> >> I just did an allyesconfig and it does not report any warnings.
+> >>
+> >> So apparently, rustfmt problems not result in the compiler complaining?
+> >>
+> >> Or something else is off here that rust/kernel/mm/virt.rs won't get
+> >> compiled on my machine, even with allyesconfig. I can definitely see
+> >> some RUSTC stuff happening in the logs, like
+> >>
+> >> 	RUSTC L rust/kernel.o
+> >>
+> >> Thanks for the review and for pointing out rustfmt!
+> > 
+> > Similar to kerneldoc and other similar targets, formatting isn't checked
+> > in the normal build, but make can be invoked on the rustfmtcheck target
+> > to check it.
 > 
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
-> 
-> [...]
+> Thanks adding that to my cross-compile chain.
 
-Here is the summary with links:
-  - [PATCHv2,iproute2-next] iplink: bond_slave: print actor and partner churn state
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=e092ff4c9b1b
+Awesome, thanks!
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+It's not relevant in this patch, but another thing that may be useful is
+to add CLIPPY=1 to the make invocation when building normally. This
+causes additional warnings to be checked using a tool called clippy.
 
-
+Alice
 
