@@ -1,51 +1,48 @@
-Return-Path: <netdev+bounces-262471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262472-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6fzkEDbqpGmhvgUAu9opvQ
-	(envelope-from <netdev+bounces-262471-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 02:39:02 +0100
+	id BCw2LA/tpGngvwUAu9opvQ
+	(envelope-from <netdev+bounces-262472-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 02:51:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 370C81D2557
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 02:39:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5DE81D25D8
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 02:51:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C28C930055FC
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 01:38:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B4793300E38C
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 01:51:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F5731A9F90;
-	Mon,  2 Mar 2026 01:38:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m0EnvhAd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F2071E9B37;
+	Mon,  2 Mar 2026 01:51:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE9B013B58C
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 01:38:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A82071391;
+	Mon,  2 Mar 2026 01:51:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772415534; cv=none; b=i2MsMPWuNmPypErhqmtos04of7NhDv7bG8OX309hCbpPNQdn7n65HBXVxJJF0uJWlEJ2IgLyFPFWgP1/OpS4OvwXNMJFng5wMxNj57vd6CK6SnrFfX7d/xpJtTy8MxwHxVdqFpiinpKiCcyAdMgKQ9Te3i9fDmHl35MtJHweOto=
+	t=1772416266; cv=none; b=etAt+ZQYGYrs3o7FbVK7D9jj15w0qcUSsfUrQoRDKmJA7h9tm9rbIhHGPW5Sz+ndLxabxJ6x6TNnfwVzC7EYp0Xbm6F7KYq10IXZTk6pf8rbVrlZDlUKE5DV4ObBLA7nkWlj2BVQ7gT3x5/jDz67RQ8mMrwo3bpnkzFBmOCyjCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772415534; c=relaxed/simple;
-	bh=gCR/VUAdErCYtTJeVNqXaOxY519eMv9wYj2Rl/+Pn+0=;
+	s=arc-20240116; t=1772416266; c=relaxed/simple;
+	bh=pH7k0jAjI2209NTnfbW5xztmHM86D8DPTsfXNM5tzc0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uadk86hh5c2DsdLrMXpbEE4GjXL66IqnedDIp2+sTHk6oHM3CtWd4/fJ9KfeOwTsjjf/As2mYUNHdIl5hD016wB6C76JS3TRc8k/hLIBCxo66fqb7oFPLJyUqA90B+e0qM5Z06VbonxiejxI7bV+wD9ZueE3h6bi5Q7Op6q6mA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m0EnvhAd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B046C116C6;
-	Mon,  2 Mar 2026 01:38:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772415534;
-	bh=gCR/VUAdErCYtTJeVNqXaOxY519eMv9wYj2Rl/+Pn+0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=m0EnvhAd9gwism0gztuQKDUv6J64W3T6l70v/vXnre9+LWC0lEWo9px71AusljJ0t
-	 xdWtl76w9feoDJq3LVIXfNHYLeNjoRu1JYmfyzes5LjlJwM6QLGTYbSsWFudNYFzBX
-	 HjhrLJBUAp/eUWYkfa1FqkHtA34Wg3VUcIn81anpwjgdeHjpnPyfslWdKA05kOMppe
-	 B1SzaesFncIoTkFEscerRpgz6YnzhRiNgYHeoNRJgC+W2/WgSBYa2yf3XY/t2hAy47
-	 qWC6o6I0YdwGamJ9vCzUrqNTNafdUH/wMda+8UM5QZPewtDTLR2JKSIKV1B3XEin9d
-	 Af91ThuTtACcA==
-Message-ID: <859d39ff-cb1e-4f3f-b154-d8bf2c7997c9@kernel.org>
-Date: Sun, 1 Mar 2026 18:38:53 -0700
+	 In-Reply-To:Content-Type; b=umJR8dwS/ZUH6TKoH6pK8fTB3PFvqarEf93z+XUudGXBbm2f7pPvFj0vvaXUCmOeGJb61moViQUTuSowKn1avINdGUq6RrvEtlISeATgXbZVdI9bbw0Klii7vlLanWkT8ngduc3LVvXeCmFfordDd5kHkYySo+ZvFzu160eOYeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.177])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4fPMMM6YH8zYQtgY;
+	Mon,  2 Mar 2026 09:50:23 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 56AD94058F;
+	Mon,  2 Mar 2026 09:50:55 +0800 (CST)
+Received: from [10.67.111.176] (unknown [10.67.111.176])
+	by APP4 (Coremail) with SMTP id gCh0CgAHtPT97KRp5TUGJQ--.53758S2;
+	Mon, 02 Mar 2026 09:50:55 +0800 (CST)
+Message-ID: <40c77bba-0862-4422-b23e-2a10cd01c728@huaweicloud.com>
+Date: Mon, 2 Mar 2026 09:50:53 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,66 +50,162 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] ipv6: fix NULL pointer deref in ip6_rt_get_dev_rcu()
+Subject: Re: [PATCH 2/3] cgroup: add lockless fast-path checks to
+ cgroup_file_notify()
+To: Shakeel Butt <shakeel.butt@linux.dev>, Tejun Heo <tj@kernel.org>
+Cc: Johannes Weiner <hannes@cmpxchg.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
+ <mkoutny@suse.com>, Roman Gushchin <roman.gushchin@linux.dev>,
+ Kuniyuki Iwashima <kuniyu@google.com>,
+ Daniel Sedlak <daniel.sedlak@cdn77.com>,
+ Meta kernel team <kernel-team@meta.com>, linux-mm@kvack.org,
+ netdev@vger.kernel.org, cgroups@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
+References: <20260228142018.3178529-1-shakeel.butt@linux.dev>
+ <20260228142018.3178529-3-shakeel.butt@linux.dev>
 Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org
-References: <20260301194548.927324-1-kuba@kernel.org>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20260301194548.927324-1-kuba@kernel.org>
+From: Chen Ridong <chenridong@huaweicloud.com>
+In-Reply-To: <20260228142018.3178529-3-shakeel.butt@linux.dev>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:gCh0CgAHtPT97KRp5TUGJQ--.53758S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxZFyUXryxJF17CF4ruFWkXrb_yoW5uF1kpa
+	98CrZaka1YgFyj9wn2qa4jgFyrW397WrWUXrZ7X340yF47Cw12vayxCr1UWFyUArs7Wr47
+	JrWavrW7Cw1qya7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
+	14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
+	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8
+	ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
+	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
+	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1
+	7KsUUUUUU==
+X-CM-SenderInfo: hfkh02xlgr0w46kxt4xhlfz01xgou0bp/
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262471-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 370C81D2557
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[chenridong@huaweicloud.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262472-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[huaweicloud.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email]
+X-Rspamd-Queue-Id: E5DE81D25D8
 X-Rspamd-Action: no action
 
-On 3/1/26 12:45 PM, Jakub Kicinski wrote:
-> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-> index 85df25c36409..7db0c837196c 100644
-> --- a/net/ipv6/route.c
-> +++ b/net/ipv6/route.c
-> @@ -1063,7 +1063,8 @@ static struct net_device *ip6_rt_get_dev_rcu(const struct fib6_result *res)
->  		 */
->  		if (netif_is_l3_slave(dev) &&
->  		    !rt6_need_strict(&res->f6i->fib6_dst.addr))
-> -			dev = l3mdev_master_dev_rcu(dev);
-> +			dev = l3mdev_master_dev_rcu(dev) ? :
-> +			      dev_net(dev)->loopback_dev;
 
-how can the flag on the netdev say there is L3 master, yet the device
-not be there within an rcu window?
+Hi Shakeel,
 
+Good series to move away from the global lock.
 
->  		else if (!netif_is_l3_master(dev))
->  			dev = dev_net(dev)->loopback_dev;
->  		/* last case is netif_is_l3_master(dev) is true in which
+On 2026/2/28 22:20, Shakeel Butt wrote:
+> Add two lockless checks before acquiring the lock:
+> 
+> 1. READ_ONCE(cfile->kn) NULL check to skip torn-down files.
+> 2. READ_ONCE(cfile->notified_at) check to skip when within the
+>    rate-limit window (~10ms).
+> 
+> Both checks have safe error directions -- a stale read can only cause
+> unnecessary lock acquisition, never a missed notification.  Annotate
+> all write sites with WRITE_ONCE() to pair with the lockless readers.
+> 
+> The trade-off is that trailing timer_reduce() calls during bursts are
+> skipped, so the deferred notification that delivers the final state
+> may be lost.  This is acceptable for the primary callers like
+> __memcg_memory_event() where events keep arriving.
+> 
+> Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
+> Reported-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  kernel/cgroup/cgroup.c | 21 ++++++++++++++-------
+>  1 file changed, 14 insertions(+), 7 deletions(-)
+> 
+> diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
+> index 33282c7d71e4..5473ebd0f6c1 100644
+> --- a/kernel/cgroup/cgroup.c
+> +++ b/kernel/cgroup/cgroup.c
+> @@ -1749,7 +1749,7 @@ static void cgroup_rm_file(struct cgroup *cgrp, const struct cftype *cft)
+>  		struct cgroup_file *cfile = (void *)css + cft->file_offset;
+>  
+>  		spin_lock_irq(&cgroup_file_kn_lock);
+> -		cfile->kn = NULL;
+> +		WRITE_ONCE(cfile->kn, NULL);
+>  		spin_unlock_irq(&cgroup_file_kn_lock);
+>  
+>  		timer_delete_sync(&cfile->notify_timer);
+> @@ -4430,7 +4430,7 @@ static int cgroup_add_file(struct cgroup_subsys_state *css, struct cgroup *cgrp,
+>  		timer_setup(&cfile->notify_timer, cgroup_file_notify_timer, 0);
+>  
+>  		spin_lock_irq(&cgroup_file_kn_lock);
+> -		cfile->kn = kn;
+> +		WRITE_ONCE(cfile->kn, kn);
+>  		spin_unlock_irq(&cgroup_file_kn_lock);
+>  	}
+>  
+> @@ -4686,20 +4686,27 @@ int cgroup_add_legacy_cftypes(struct cgroup_subsys *ss, struct cftype *cfts)
+>   */
+>  void cgroup_file_notify(struct cgroup_file *cfile)
+>  {
+> -	unsigned long flags;
+> +	unsigned long flags, last, next;
+>  	struct kernfs_node *kn = NULL;
+>  
+> +	if (!READ_ONCE(cfile->kn))
+> +		return;
+> +
+> +	last = READ_ONCE(cfile->notified_at);
+> +	if (time_before_eq(jiffies, last + CGROUP_FILE_NOTIFY_MIN_INTV))
+> +		return;
+> +
+
+Previously, if a notification arrived within the rate-limit window, we would
+still call timer_reduce(&cfile->notify_timer, next) to schedule a deferred
+notification.
+
+With this change, returning early here bypasses that timer scheduling entirely.
+Does this risk missing notifications that would have been delivered by the timer?
+
+>  	spin_lock_irqsave(&cgroup_file_kn_lock, flags);
+>  	if (cfile->kn) {
+> -		unsigned long last = cfile->notified_at;
+> -		unsigned long next = last + CGROUP_FILE_NOTIFY_MIN_INTV;
+> +		last = cfile->notified_at;
+> +		next = last + CGROUP_FILE_NOTIFY_MIN_INTV;
+>  
+> -		if (time_in_range(jiffies, last, next)) {
+> +		if (time_before_eq(jiffies, next)) {
+>  			timer_reduce(&cfile->notify_timer, next);
+>  		} else {
+>  			kn = cfile->kn;
+>  			kernfs_get(kn);
+> -			cfile->notified_at = jiffies;
+> +			WRITE_ONCE(cfile->notified_at, jiffies);
+>  		}
+>  	}
+>  	spin_unlock_irqrestore(&cgroup_file_kn_lock, flags);
+
+-- 
+Best regards,
+Ridong
 
 
