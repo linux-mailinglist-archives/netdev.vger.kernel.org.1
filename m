@@ -1,346 +1,308 @@
-Return-Path: <netdev+bounces-262473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262475-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wKliM9fupGlpwAUAu9opvQ
-	(envelope-from <netdev+bounces-262473-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 02:58:47 +0100
+	id EHjcIv75pGlIxQUAu9opvQ
+	(envelope-from <netdev+bounces-262475-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 03:46:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E309D1D262B
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 02:58:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E04D51D284E
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 03:46:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BD105300D168
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 01:58:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CC68D3011132
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 02:46:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73F0C25A2A2;
-	Mon,  2 Mar 2026 01:58:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 275C92848A1;
+	Mon,  2 Mar 2026 02:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yunyoo-cc.20200929.dkim.larksuite.com header.i=@yunyoo-cc.20200929.dkim.larksuite.com header.b="oI3Hh2kl"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="DCCOjUyh"
 X-Original-To: netdev@vger.kernel.org
-Received: from lf-2-36.ptr.blmpb.com (lf-2-36.ptr.blmpb.com [101.36.218.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEE72288D6
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 01:58:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.36.218.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B487D76025
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 02:46:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772416723; cv=none; b=UaOyg3oMc3QhZRufax/JVjukR9zEbabXYkS4hkP+UhsZK3xDj5IA+VhtsW1pXjQGI7NDbDYGQpwobqQrKO3lGwo9sGgb0YVFGl2TNWfmKI3PvjQPUa6Ew1rIIYcIsZn/LZsj6sfwEr7WCKyRS2LC5N5nSE5h8D093QXc300Fu4A=
+	t=1772419577; cv=none; b=QUXGRRIxOCE2O3NzeP1/rzMl4DuJKDwwSyx+5vB/YoKZK+qkktsqvTPpMlvkTpnHRkUhp0Nn1w9jRCCzIIgg5jsCtpnAHIqICnj7XWZ+khbxAzOXfo42aTSB7c3BIa6ecp96081PQMMuAOj0FResublrunCC63adCFH1A5SHilE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772416723; c=relaxed/simple;
-	bh=Adqf0zh2hayDMj7FF1I0bgPXD9fxuN4yMCe2P+dI7vg=;
-	h=References:Content-Type:To:Cc:Subject:From:Mime-Version:Date:
-	 Message-Id:In-Reply-To; b=O1DLLPe+u15vXQYG4LfgoJ8XkPl49/AC3i8R+VHENNGVPSYidSm7EHluzPDmCtEbGbBL5QcXDHdQAP1X+ty1Dc80yCGDNrLGunSvu+rBz9/QX9jaTLbhCPKNLtDQStuD3n6yBiR/aAdaw6EPn9KblU5bi82ipREjXm6IdaHErFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunyoo.cc; spf=pass smtp.mailfrom=yunyoo.cc; dkim=pass (2048-bit key) header.d=yunyoo-cc.20200929.dkim.larksuite.com header.i=@yunyoo-cc.20200929.dkim.larksuite.com header.b=oI3Hh2kl; arc=none smtp.client-ip=101.36.218.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunyoo.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunyoo.cc
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=yunyoo-cc.20200929.dkim.larksuite.com; t=1772416673;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=Adqf0zh2hayDMj7FF1I0bgPXD9fxuN4yMCe2P+dI7vg=;
- b=oI3Hh2klncXn9VySxG53E47EvKfmKXi9QnSgDZHHPb5WzOPD1vg4yPWwsfGHF5AQGo/YAY
- MiFugChHTtB5rqzURRdMydjiLAtCe47Y/BlQ4O6nXTMw7auoRS1MbJH90UWaVRHFSReFry
- xTzHl8VgLR8Bs8plZSViFJnbQCgOQqjamL2CJdUKYHI3C/8nNJmye1xK0CEwAqYexKlyKn
- iLXUp8bE1i4jLQrmJP9JCDlUysHXP6mOe7aGon5SK2E5vV7ICDIDWLmiq4zMrFLM47mEBD
- KeIEFCgm5nZcJvE3ZAUFKvu8MWJE/97MFvOu9/PzkKZ//Dki1eo77tGUDQ4S4A==
-References: <9ac0a071e79e9da8128523ddeba19085f4f8c9aa.decbd9ef.1293.41c3.bf27.48cdc12b9ce6@larksuite.com> <20260301190906-mutt-send-email-mst@kernel.org> <20260301193655-mutt-send-email-mst@kernel.org>
-	<20260301194456-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "jasowang@redhat.com" <jasowang@redhat.com>, 
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [BUG] vhost_net: livelock in handle_rx() when GRO packet exceeds virtqueue capacity
-From: "ShuangYu" <shuangyu@yunyoo.cc>
+	s=arc-20240116; t=1772419577; c=relaxed/simple;
+	bh=fCop+IqQtmb3IMu8EHz2GRAT0IXUeX9BCqyh+k4q7RA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ke68MVj+BnBUKd881Dl6s5rB1E2SbNLbXGeG1rL0Ln9s+7bkHgm36tC3OqttL4mskFg6NrhqKicBGkfYuCZX09cinoza5/6sFW6xsNRw+dhuvlCai+WIpZLfFTU3STEG+CdXFXBhZEeoU/oB3E/MtDA4raGshLRyevwPp7F/RUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=DCCOjUyh; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1772419565; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=Tym8B8QFXUzGI2DOftvDplHtHidbasFL3CjPRXE304Q=;
+	b=DCCOjUyhrLHWPlAgGgERfWvpLoAzNT923pz+AvL1FsNE9f9QO4HHGsOufJ7wk/P1mL62uX4x/93R8IPTdwX0aSIQ45ySoZxzBIKXhU49GCDQhAslcLwC217DspasFQjJIBnIoujZ64bVgCDClugny/F6vOKUN7b6w95uv27fjwI=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X-.vG9Y_1772419564 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 02 Mar 2026 10:46:04 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	Philo Lu <lulie@linux.alibaba.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Dong Yibo <dong100@mucse.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
+	Dust Li <dust.li@linux.alibaba.com>
+Subject: [PATCH net-next v28 0/8] eea: Add basic driver framework for Alibaba Elastic Ethernet Adaptor
+Date: Mon,  2 Mar 2026 10:45:56 +0800
+Message-Id: <20260302024604.25354-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Date: Mon, 02 Mar 2026 01:57:51 +0000
-Message-Id: <9ac0a071e79e9da8128523ddeba19085f4f8c9aa.8ae4e890.449b.4397.8e81.d58ff010ba07@larksuite.com>
-In-Reply-To: <20260301194456-mutt-send-email-mst@kernel.org>
-X-Lms-Return-Path: <lba+169a4eea0+db670e+vger.kernel.org+shuangyu@yunyoo.cc>
+MIME-Version: 1.0
+X-Git-Hash: 1928c291f6f8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-6.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[yunyoo-cc.20200929.dkim.larksuite.com:s=s1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	DMARC_NA(0.00)[yunyoo.cc];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-262475-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262473-lists,netdev=lfdr.de];
-	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.alibaba.com,linux.dev,mucse.com,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shuangyu@yunyoo.cc,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[yunyoo-cc.20200929.dkim.larksuite.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,larksuite.com:mid,linux.dev:email,yunyoo-cc.20200929.dkim.larksuite.com:dkim]
-X-Rspamd-Queue-Id: E309D1D262B
+	NEURAL_HAM(-0.00)[-0.997];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E04D51D284E
 X-Rspamd-Action: no action
 
+Add a driver framework for EEA that will be available in the future.
 
-> From: "Michael S. Tsirkin"<mst@redhat.com>
-> Date:=C2=A0 Mon, Mar 2, 2026, 08:45
-> Subject:=C2=A0 Re: [BUG] vhost_net: livelock in handle_rx() when GRO pack=
-et exceeds virtqueue capacity
-> To: "ShuangYu"<shuangyu@yunyoo.cc>
-> Cc: "jasowang@redhat.com"<jasowang@redhat.com>, "virtualization@lists.lin=
-ux.dev"<virtualization@lists.linux.dev>, "netdev@vger.kernel.org"<netdev@vg=
-er.kernel.org>, "linux-kernel@vger.kernel.org"<linux-kernel@vger.kernel.org=
->, "kvm@vger.kernel.org"<kvm@vger.kernel.org>
-> On Sun, Mar 01, 2026 at 07:39:30PM -0500, Michael S. Tsirkin wrote:
-> > On Sun, Mar 01, 2026 at 07:10:06PM -0500, Michael S. Tsirkin wrote:
-> > > On Sun, Mar 01, 2026 at 10:36:39PM +0000, ShuangYu wrote:
-> > > > Hi,
-> > > >=C2=A0
-> > > > We have hit a severe livelock in vhost_net on 6.18.x. The vhost
-> > > > kernel thread spins at 100% CPU indefinitely in handle_rx(), and
-> > > > QEMU becomes unkillable (stuck in D state).
-> > > > [This is a text/plain messages]
-> > > >=C2=A0
-> > > > Environment
-> > > > -----------
-> > > > =C2=A0 Kernel:=C2=A0 6.18.10-1.el8.elrepo.x86_64
-> > > > =C2=A0 QEMU: =C2=A0=C2=A0 7.2.19
-> > > > =C2=A0 Virtio:=C2=A0 VIRTIO_F_IN_ORDER is negotiated
-> > > > =C2=A0 Backend: vhost (kernel)
-> > > >=C2=A0
-> > > > Symptoms
-> > > > --------
-> > > > =C2=A0 - vhost-<pid> kernel thread at 100% CPU (R state, never yiel=
-ds)
-> > > > =C2=A0 - QEMU stuck in D state at vhost_dev_flush() after receiving=
- SIGTERM
-> > > > =C2=A0 - kill -9 has no effect on the QEMU process
-> > > > =C2=A0 - libvirt management plane deadlocks ("cannot acquire state =
-change lock")
-> > > >=C2=A0
-> > > > Root Cause
-> > > > ----------
-> > > > The livelock is triggered when a GRO-merged packet on the host TAP
-> > > > interface (e.g., ~60KB) exceeds the remaining free capacity of the
-> > > > guest's RX virtqueue (e.g., ~40KB of available buffers).
-> > > >=C2=A0
-> > > > The loop in handle_rx() (drivers/vhost/net.c) proceeds as follows:
-> > > >=C2=A0
-> > > > =C2=A0 1. get_rx_bufs() calls vhost_get_vq_desc_n() to fetch descri=
-ptors.
-> > > > =C2=A0=C2=A0=C2=A0 It advances vq->last_avail_idx and vq->next_avai=
-l_head as it
-> > > > =C2=A0=C2=A0=C2=A0 consumes buffers, but runs out before satisfying=
- datalen.
-> > > >=C2=A0
-> > > > =C2=A0 2. get_rx_bufs() jumps to err: and calls
-> > > > =C2=A0=C2=A0=C2=A0 vhost_discard_vq_desc(vq, headcount, n), which r=
-olls back
-> > > > =C2=A0=C2=A0=C2=A0 vq->last_avail_idx and vq->next_avail_head.
-> > > >=C2=A0
-> > > > =C2=A0=C2=A0=C2=A0 Critically, vq->avail_idx (the cached copy of th=
-e guest's
-> > > > =C2=A0=C2=A0=C2=A0 avail->idx) is NOT rolled back. This is correct =
-behavior in
-> > > > =C2=A0=C2=A0=C2=A0 isolation, but creates a persistent mismatch:
-> > > >=C2=A0
-> > > > =C2=A0=C2=A0 =C2=A0=C2=A0 vq->avail_idx =C2=A0 =C2=A0=C2=A0 =3D 108=
-=C2=A0 (cached, unchanged)
-> > > > =C2=A0=C2=A0 =C2=A0=C2=A0 vq->last_avail_idx =3D 104=C2=A0 (rolled =
-back)
-> > > >=C2=A0
-> > > > =C2=A0 3. handle_rx() sees headcount =3D=3D 0 and calls vhost_enabl=
-e_notify().
-> > > > =C2=A0=C2=A0=C2=A0 Inside, vhost_get_avail_idx() finds:
-> > > >=C2=A0
-> > > > =C2=A0=C2=A0 =C2=A0=C2=A0 vq->avail_idx (108) !=3D vq->last_avail_i=
-dx (104)
-> > > >=C2=A0
-> > > > =C2=A0=C2=A0=C2=A0 It returns 1 (true), indicating "new buffers ava=
-ilable."
-> > > > =C2=A0=C2=A0=C2=A0 But these are the SAME buffers that were just di=
-scarded.
-> > > >=C2=A0
-> > > > =C2=A0 4. handle_rx() hits `continue`, restarting the loop.
-> > > >=C2=A0
-> > > > =C2=A0 5. In the next iteration, vhost_get_vq_desc_n() checks:
-> > > >=C2=A0
-> > > > =C2=A0=C2=A0 =C2=A0=C2=A0 if (vq->avail_idx =3D=3D vq->last_avail_i=
-dx)
-> > > >=C2=A0
-> > > > =C2=A0=C2=A0=C2=A0 This is FALSE (108 !=3D 104), so it skips re-rea=
-ding the guest's
-> > > > =C2=A0=C2=A0=C2=A0 actual avail->idx and directly fetches the same =
-descriptors.
-> > > >=C2=A0
-> > > > =C2=A0 6. The exact same sequence repeats: fetch -> too small -> di=
-scard
-> > > > =C2=A0=C2=A0=C2=A0 -> rollback -> "new buffers!" -> continue. Indef=
-initely.
-> > > >=C2=A0
-> > > > This appears to be a regression introduced by the VIRTIO_F_IN_ORDER
-> > > > support, which added vhost_get_vq_desc_n() with the cached avail_id=
-x
-> > > > short-circuit check, and the two-argument vhost_discard_vq_desc()
-> > > > with next_avail_head rollback. The mismatch between the rollback
-> > > > scope (last_avail_idx, next_avail_head) and the check scope
-> > > > (avail_idx vs last_avail_idx) was not present before this change.
-> > > >=C2=A0
-> > > > bpftrace Evidence
-> > > > -----------------
-> > > > During the 100% CPU lockup, we traced:
-> > > >=C2=A0
-> > > > =C2=A0 @get_rx_ret[0]: =C2=A0 =C2=A0=C2=A0 4468052 =C2=A0 // get_rx=
-_bufs() returns 0 every time
-> > > > =C2=A0 @peek_ret[60366]: =C2=A0=C2=A0 4385533 =C2=A0 // same 60KB p=
-acket seen every iteration
-> > > > =C2=A0 @sock_err[recvmsg]: =C2=A0 =C2=A0 =C2=A0=C2=A0 0 =C2=A0 // t=
-un_recvmsg() is never reached
-> > > >=C2=A0
-> > > > vhost_get_vq_desc_n() was observed iterating over the exact same 11
-> > > > descriptor addresses millions of times per second.
-> > > >=C2=A0
-> > > > Workaround
-> > > > ----------
-> > > > Either of the following avoids the livelock:
-> > > >=C2=A0
-> > > > =C2=A0 - Disable GRO/GSO on the TAP interface:
-> > > > =C2=A0=C2=A0 =C2=A0 ethtool -K <tap> gro off gso off
-> > > >=C2=A0
-> > > > =C2=A0 - Switch from kernel vhost to userspace QEMU backend:
-> > > > =C2=A0=C2=A0 =C2=A0 <driver name=3D'qemu'/> in libvirt XML
-> > > >=C2=A0
-> > > > Bisect
-> > > > ------
-> > > > We have not yet completed a full git bisect, but the issue does not
-> > > > occur on 6.17.x kernels which lack the VIRTIO_F_IN_ORDER vhost
-> > > > support. We will follow up with a Fixes: tag if we can identify the
-> > > > exact commit.
-> > > >=C2=A0
-> > > > Suggested Fix Direction
-> > > > -----------------------
-> > > > In handle_rx(), when get_rx_bufs() returns 0 (headcount =3D=3D 0) d=
-ue to
-> > > > insufficient buffers (not because the queue is truly empty), the co=
-de
-> > > > should break out of the loop rather than relying on
-> > > > vhost_enable_notify() to make that determination. For example, when
-> > > > get_rx_bufs() returns r =3D=3D 0 with datalen still > 0, this indic=
-ates a
-> > > > "packet too large" condition, not a "queue empty" condition, and
-> > > > should be handled differently.
-> > > >=C2=A0
-> > > > Thanks,
-> > > > ShuangYu
-> > >=C2=A0
-> > > Hmm. On a hunch, does the following help? completely untested,
-> > > it is night here, sorry.
-> > >=C2=A0
-> > >=C2=A0
-> > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > > index 2f2c45d20883..aafae15d5156 100644
-> > > --- a/drivers/vhost/vhost.c
-> > > +++ b/drivers/vhost/vhost.c
-> > > @@ -1522,6 +1522,7 @@ static void vhost_dev_unlock_vqs(struct vhost_d=
-ev *d)
-> > > =C2=A0static inline int vhost_get_avail_idx(struct vhost_virtqueue *v=
-q)
-> > > =C2=A0{
-> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0__virtio16 idx;
-> > > + =C2=A0 =C2=A0 =C2=A0 =C2=A0u16 avail_idx;
-> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0int r;
-> > > =C2=A0
-> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0r =3D vhost_get_avail(vq, idx, &vq-=
->avail->idx);
-> > > @@ -1532,17 +1533,19 @@ static inline int vhost_get_avail_idx(struct =
-vhost_virtqueue *vq)
-> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}
-> > > =C2=A0
-> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* Check it isn't doing very strang=
-e thing with available indexes */
-> > > - =C2=A0 =C2=A0 =C2=A0 =C2=A0vq->avail_idx =3D vhost16_to_cpu(vq, idx=
-);
-> > > - =C2=A0 =C2=A0 =C2=A0 =C2=A0if (unlikely((u16)(vq->avail_idx - vq->l=
-ast_avail_idx) > vq->num)) {
-> > > + =C2=A0 =C2=A0 =C2=A0 =C2=A0avail_idx =3D vhost16_to_cpu(vq, idx);
-> > > + =C2=A0 =C2=A0 =C2=A0 =C2=A0if (unlikely((u16)(avail_idx - vq->last_=
-avail_idx) > vq->num)) {
-> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0vq_err(=
-vq, "Invalid available index change from %u to %u",
-> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 vq->last_avail_idx, vq->avail_idx);
-> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return =
--EINVAL;
-> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}
-> > > =C2=A0
-> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* We're done if there is nothing n=
-ew */
-> > > - =C2=A0 =C2=A0 =C2=A0 =C2=A0if (vq->avail_idx =3D=3D vq->last_avail_=
-idx)
-> > > + =C2=A0 =C2=A0 =C2=A0 =C2=A0if (avail_idx =3D=3D vq->avail_idx)
-> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return =
-0;
-> > > =C2=A0
-> > > + =C2=A0 =C2=A0 =C2=A0 =C2=A0vq->avail_idx =3D=3D avail_idx;
-> > > +
-> >=C2=A0
-> > meaning=C2=A0
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 vq->avail_idx =3D avail_idx;=C2=A0
-> > of course
-> >=C2=A0
-> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/*
-> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 * We updated vq->avail_idx so we n=
-eed a memory barrier between
-> > > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 * the index read above and the cal=
-ler reading avail ring entries.
->=C2=A0
->=C2=A0
-> and the change this is fixing was done in d3bb267bbdcba199568f1325743d9d5=
-01dea0560
->=C2=A0
-> --=C2=A0
-> MST
->=C2=A0
+This driver is currently quite minimal, implementing only fundamental
+core functionalities. Key features include: I/O queue management via
+adminq, basic PCI-layer operations, and essential RX/TX data
+communication capabilities. It also supports the creation,
+initialization, and management of network devices (netdev). Furthermore,
+the ring structures for both I/O queues and adminq have been abstracted
+into a simple, unified, and reusable library implementation,
+facilitating future extension and maintenance.
 
-Thank you for the quick fix and for identifying the root commit.
+v28:
+    Address AI-generated review suggestions from the previous version.
 
-I've reviewed the patch and I believe the logic is correct =E2=80=94 changi=
-ng
-the "nothing new" check in vhost_get_avail_idx() from comparing
-against vq->last_avail_idx to comparing against the cached
-vq->avail_idx makes it immune to the rollback done by
-vhost_discard_vq_desc(), which is exactly what breaks the loop.
+v27:
+    Address AI-generated review suggestions from the previous version.
 
-One minor nit: the vq_err message on the sanity check path still
-references vq->avail_idx before it has been updated:
+v26:
+    Adopting suggestions from the previous AI review, another significant
+    change is the introduction of an IRQ block to implement IRQ proxying. With
+    this design, when an IRQ occurs, we no longer invoke the RX data structure
+    directly -- instead, the IRQ block serves as an intermediary proxy. This
+    approach offers several advantages: IRQ resources no longer need to be
+    reallocated during reset operations, and IRQs are decoupled from RX
+    structures. Consequently, when certain errors occur, we can fall back and
+    safely reuse the original memory resources.
 
-=C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 vq_err(vq, "Invalid available index change=
- from %u to %u",
-- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 vq->last_avail_idx, vq->a=
-vail_idx);
-+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 vq->last_avail_idx, avail=
-_idx);
+v25:
+    I have adopted most of the suggestions from the AI's feedback. However, I
+    believe some of the feedback is incorrect. I have already replied in the
+    previous thread. http://lore.kernel.org/all/1770002612.3297296-2-xuanzhuo@linux.alibaba.com
+
+v24:
+    1. Add null checks for enet->rx and enet->tx in eea_get_ethtool_stat to
+       prevent errors when reading rx = enet->rx[i] in case enet->rx is null.
+       tx is similar. With rtnl protection in place, this check is sufficient.
+    2. Use 'received' as the return value in eea_poll.
+
+v23:
+    I have moved netif_set_real_num_queues() out of eea_start_rxtx(), so
+    eea_start_rxtx() is now a void function. I believe enet_bind_new_q_and_cfg()
+    is a more suitable place to include netif_set_real_num_queues(). In
+    eea_active_ring_and_irq(), I first execute request_irq() before interacting
+    with the hardware to create queues. Therefore, during the NIC setup process,
+    all driver-internal operations (memory allocation, IRQ initialization, sysfs
+    configuration, etc.) will be completed before the final notification to the
+    hardware.
+
+v22:
+    1. Use the budget from the NAPI poll function as the parameter for
+       napi_consume_skb.
+    2. Stop the TX queue when the remaining ring slots cannot hold an SKB.
+
+v21:
+    Fix two issues from the previous version:
+    1, a DMA unmap operation was missing.
+    2, RCU APIs were not used in eea_stats. Although the standard practice when
+        using RCU would require adding the __rcu annotation to both the rx and
+        tx fields, in many cases these fields are read without needing RCU
+        protection.  Therefore, I do not want to add the __rcu annotation.
+        Instead, I use a spin lock to protect modifications to rx and tx.
+
+v20:
+    Fix the partially initialized structure passed to db. @Jakub
+    http://lore.kernel.org/all/20260113172353.2ae6ef81@kernel.org
+
+v19:
+    fix the comments from @Simon Horman
+
+v18:
+    v17 with [PATCH] prefix.
+
+v17:
+    1. In `eea_adminq_dev_status`, uniformly use `enet->cfg.rx_ring_num`.
+    2. Add a `struct eea_net_cfg *cfg` parameter to `eea_free_rx` and
+        `eea_free_tx`. When called in the normal path, pass `enet->cfg` as
+        the argument; when called during initialization, pass the temporary
+        `cfg` instead.
+    3. Move the `.ndo_get_stats64` callback into `eea_net.c`.
+    4. In the `.ndo_get_stats64` callback, add a comment explaining how the TX
+        and RX statistics are protected by RCU.
+
+       /* This function is protected by RCU. Here uses enet->tx and enet->rx
+        * to check whether the TX and RX structures are safe to access. In
+        * eea_free_rxtx_q_mem, before freeing the TX and RX resources, enet->rx
+        * and enet->tx are set to NULL, and synchronize_net is called.
+        */
 
 
-Since this issue was found in production, I need some time to prepare a tes=
-t setup to verify the patch
+v16:
+    1. follow the advices from @ALOK TIWARI
+       http://lore.kernel.org/all/5ff95a71-69e5-4cb6-9b2a-5224c983bdc2@oracle.com
 
-Thanks,
-ShuangYu
+v15:
+    1. remove 'default m' from eea kconfig
+    2. free the resources when open failed.
+
+v14:
+    1. some tiny fixes
+
+v13:
+    1. fix some tiny fixes @Simon
+
+v12:
+    I encountered some issues with sending the v11 patches, as they were quite
+    messy. Therefore, I'm resending them as v12.
+
+v11:
+    1. remove auto clean __free(kfree)
+    2. some tiny fixes
+
+v10:
+    1. name the jump labels after the target @Jakub
+    2. rm __GFP_ZERO from dma_alloc_coherent @Jakub
+v9:
+    1. some fixes for ethtool from http://lore.kernel.org/all/20251027183754.52fe2a2c@kernel.org
+
+v8: 1. rename eea_net_tmp to eea_net_init_ctx
+    2. rm code that allocs memory to destroy queues
+    3. some other minor changes
+
+v7: 1. remove the irrelative code from ethtool commit
+    2. build every commits with W12
+
+v6: Split the big one commit to five commits
+v5: Thanks for the comments from Kalesh Anakkur Purayil, ALOK TIWARI
+v4: Thanks for the comments from Troy Mitchell, Przemek Kitszel, Andrew Lunn, Kalesh Anakkur Purayil
+v3: Thanks for the comments from Paolo Abenchi
+v2: Thanks for the comments from Simon Horman and Andrew Lunn
+v1: Thanks for the comments from Simon Horman and Andrew Lunn
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Xuan Zhuo (8):
+  eea: introduce PCI framework
+  eea: introduce ring and descriptor structures
+  eea: probe the netdevice and create adminq
+  eea: create/destroy rx,tx queues for netdevice open and stop
+  eea: implement packet receive logic
+  eea: implement packet transmit logic
+  eea: introduce ethtool support
+  eea: introduce callback for ndo_get_stats64
+
+ MAINTAINERS                                   |   8 +
+ drivers/net/ethernet/Kconfig                  |   1 +
+ drivers/net/ethernet/Makefile                 |   1 +
+ drivers/net/ethernet/alibaba/Kconfig          |  28 +
+ drivers/net/ethernet/alibaba/Makefile         |   5 +
+ drivers/net/ethernet/alibaba/eea/Makefile     |   9 +
+ drivers/net/ethernet/alibaba/eea/eea_adminq.c | 442 ++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_adminq.h |  75 ++
+ drivers/net/ethernet/alibaba/eea/eea_desc.h   | 134 +++
+ .../net/ethernet/alibaba/eea/eea_ethtool.c    | 243 ++++++
+ .../net/ethernet/alibaba/eea/eea_ethtool.h    |  49 ++
+ drivers/net/ethernet/alibaba/eea/eea_net.c    | 784 ++++++++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_net.h    | 194 +++++
+ drivers/net/ethernet/alibaba/eea/eea_pci.c    | 590 +++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_pci.h    |  66 ++
+ drivers/net/ethernet/alibaba/eea/eea_ring.c   | 271 ++++++
+ drivers/net/ethernet/alibaba/eea/eea_ring.h   |  89 ++
+ drivers/net/ethernet/alibaba/eea/eea_rx.c     | 748 +++++++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_tx.c     | 391 +++++++++
+ 19 files changed, 4128 insertions(+)
+ create mode 100644 drivers/net/ethernet/alibaba/Kconfig
+ create mode 100644 drivers/net/ethernet/alibaba/Makefile
+ create mode 100644 drivers/net/ethernet/alibaba/eea/Makefile
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_adminq.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_adminq.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_desc.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_net.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_net.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_rx.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_tx.c
+
+--
+2.32.0.3.g01195cf9f
+
 
