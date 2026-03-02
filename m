@@ -1,256 +1,245 @@
-Return-Path: <netdev+bounces-262783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262784-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yLF6OBrdpWkvHgAAu9opvQ
-	(envelope-from <netdev+bounces-262783-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 19:55:22 +0100
+	id 8EY1AknfpWkvHgAAu9opvQ
+	(envelope-from <netdev+bounces-262784-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 20:04:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D2B21DE80A
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 19:55:22 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04F321DE999
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 20:04:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5C0CF300361D
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 18:53:18 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C31183003BFB
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 19:04:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4FA93382E8;
-	Mon,  2 Mar 2026 18:53:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB7D631B131;
+	Mon,  2 Mar 2026 19:04:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D0dONb+i";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="aYFm85rY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AtxPzpXk"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBFCF3382DC
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 18:53:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772477597; cv=none; b=FwIlSvib7phwx0sMOVHyiM/1oTSE5/PXR6TuvcQZuKJTJpNmI4PfnSOH+O+vTuT0svIbVpYrYuOzdX7uaknqSNEBrkyR4d80oXazhJqs8mEgdbeNEni+Z6Ti/b92ZWmagOjozyNIucIt5W3DDxVREHq2UqaiPZxdNYoIO9P5OVU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772477597; c=relaxed/simple;
-	bh=rGb+d3eXV4/WG6UZVYz2+NJz33h47kbcneDn0cpgFpE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OXVusZZBwp2NZ6hmaaKhX5Qe94vWoXbPgSVU8K4UcGGgG+FG7fvgHzYzVRaa7YpyflATgQxH53saMMPfNX5+6aiTB5Y5Rlls9SBvm+kJ/Xn6Yq4U+qfeE8wDhnZ68u6uRKdn4FPfp23OJl8QN2kYInhRh/RDDAgDjNICYK+DSVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D0dONb+i; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=aYFm85rY; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772477594;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=X5Qbo2pQOAmuJWNlaaVNuPWK+hvBjNdcsVen+Csw5XQ=;
-	b=D0dONb+ig5RNKI9F2dqhQ634Qd2ZqPfxsGY89KpUEDlzN9y+aN/ZVk+4f6UmUtv5TrJIPh
-	DyW8yIq6LE+ncCoEpktYLS0zPkqljk6xV4CmwFgrGInT772DDdR9X/1QJPEPS4a/0KXNah
-	34ARXPir4pifKPEd7zx/SE5o15YwJ88=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-612-xw_OwKGeMmWUZ6jRqU9Mig-1; Mon, 02 Mar 2026 13:53:13 -0500
-X-MC-Unique: xw_OwKGeMmWUZ6jRqU9Mig-1
-X-Mimecast-MFC-AGG-ID: xw_OwKGeMmWUZ6jRqU9Mig_1772477592
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-48378df3469so33353495e9.1
-        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 10:53:13 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B90330D27
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 19:04:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772478274; cv=pass; b=ld3GJYhgm7uj+RMKfSs+yFSzlSgGUFTntxBYdEF66KGeSXmbqnqK6WbaB9MfRR+8soJcLrS3YqIvP6we9uEICE8IkNFvWl4QvQtXNifl3CEOdBimROwq2PeLV5umoNKPw/BMbxR3DOX52Zs6sWTJpLDHNSzaE00D/NeVd+AYkJ0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772478274; c=relaxed/simple;
+	bh=iaV4ZZSm5IfDxIWbZdv1Xe5KHTf3l7PSHCaE09Zv0/g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZsbZEKwDKqb2cwl4anEE8rxw0lKTyoAri5cjIMcREf4qx3QeWQMif1dgWGWaQ1kuNPxk4Bnr/KU+IZDBhYih0sJqb3bfhOa8tEiiQZKIZokPE2EQv3tOrrdYEvVYBHPt0aFAVsgP7n6OIaFmck3IsErRaabL/pW3rn8eitoTq4c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AtxPzpXk; arc=pass smtp.client-ip=74.125.82.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-1275750cfc7so899324c88.0
+        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 11:04:29 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772478268; cv=none;
+        d=google.com; s=arc-20240605;
+        b=A1bWqqAPzLVtWE9VzvqSUziGkQOXvqn1EKU2cpY+X+ANCOYl+niufbQteeI36SvlfF
+         qtexqBhXOStRzX5KDjMjIDMkhtgroZaSfmqsdQsJ9TX+11gRalvrFB4CkIHA3qxdxWbv
+         CwABEynH7Ql008GltaM7o03TC6bO+xWMKDAIunSxX6e4PwYGdyB346oM7TmCNWiOhYZX
+         HI7ZtcQzXizyU4iLvm6y3F5IjQKxKGAY9hksEBzb50dT/JBHx9kICaDaa2cAlI0AtJyw
+         CRT6ZFi+y/9Os1W0NkzBoJrwOZFEV1jghOzJ4Z5zapsxiqDp/FUqWskst7M2thV8LgZ4
+         Y16g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=CnTgWycVTJcgSF7BZ25W3n3Ihq0kMTnpBefWNp/Qjq8=;
+        fh=36/VSJVVKLbIvlHy2ZZlnU83RLnzPS8vYNGT192JU7g=;
+        b=CO3SEMxqxh3b5Hw240uGLaMyS/whmgVZKnXsjLMgaTejx9cLVL2g+tj6kWa+ehh28L
+         TXA1ux+t0V37xq3V1FfPsFhL1gZNTyQzQ9e47gikZzOT2ZwMAGqlb0V/sKQULBksba8A
+         9sHnBpJmgYpGl3KGjOS6rk9VuiQGfsBzrZQ4gJk33XQYcSYi68o3rhzp1RTcJ0k+Mu4T
+         I0vTYMrjI9RiW1vF/9J0bjmnuxBDKmpm9dKCccm7FhJ1U6QXgT8+TMTv/sx6+aFYSVAz
+         O0X//qFGCLVPrSLJdFUMwZep2MC5QgSrSedu45VrsCsmxFUAqhs9s/PexN2tOOvLfw9O
+         VWTg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1772477592; x=1773082392; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=X5Qbo2pQOAmuJWNlaaVNuPWK+hvBjNdcsVen+Csw5XQ=;
-        b=aYFm85rY2FrG2xizcvQRKsz4QRMVa+iXxBkQEMJsQcfg6h1oc5KgABc1ofIuJiMvaY
-         AFfTIU69Q1ILtGh5q8lQ0E13WrOJQYePq00UKiqaBufPpE+Pci1hf7f+vQD9bf2QNMrf
-         xtPplSUly7R20zIhsCKuUtwlJZJfE8MdUysXMwceEL1rsj3/LnS1Euy6xsu6zrZn1Nh0
-         5EbdwE7Sz/lmIzk4Q6b84XwAfGwxncLPr/hWzJOgkSzqsZzNJG+FUJ4EA/O5SU6sePuI
-         dlBzOeUzUDM7eu3gewWFq1akrIl+0D/vmnkOXeX+eePMpx/I7mvgdrTlSy9AuOc6DamT
-         b8cw==
+        d=google.com; s=20230601; t=1772478268; x=1773083068; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CnTgWycVTJcgSF7BZ25W3n3Ihq0kMTnpBefWNp/Qjq8=;
+        b=AtxPzpXkFSXzOncKBgHKYHZqwTD/wBngutWJxGuCPsoQoJraFE4BTOFByL6StqWw2J
+         x3xYf1HklLptppspH50IrazjZYR+GsWQAOBdd1+MxlRGR5WvZs5p/t9LPOohK2eYeMQC
+         21tPHUd4hWs2JXt/hZDNZwK3SRlCaBjsO1ofHWvRgdrdAgyFjkmIOFh8We5UU/eCq6HE
+         U/d9dXbFyy6l5fb/lEYyKdGIxtCuZM3UnkHQ7xTHvytXUWLmS70AhiKEZJarHLUmFJ0A
+         0Nt/pBUk/tvwdT4IzNDHtlWuQxuvmPMwWZURGySxmAvVOkKWuytjKk4WkfUGCAm/Qiia
+         3+4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772477592; x=1773082392;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=X5Qbo2pQOAmuJWNlaaVNuPWK+hvBjNdcsVen+Csw5XQ=;
-        b=iXYTvFZJ4VcfZCLGrwJ/K1JS7AFGyvkwpB/7NS3zaexv6ycVSSxwXvlAulLrCh15wa
-         jgU1FltwjlzGj6c97Tu9/DpzwPvxCSkbmx1us7m4NEnl3STiqnziAgUPXINDGF7tasYp
-         TbTYmwLoYf303mHjlYPDTNIutrIYWS5lhEpSppfLIZMIMzuyaU8jcgy3OnDpmZvuTbGW
-         etuoUBibMeDuAeQ7iH1lBxsd4Ef25Zrpl7T1JtfrF+eHu3ww3YHCoeBe2r8byiICz7Au
-         QuIRgAzqhZjiHK+B1xXQ6cdT98MNDHE/syNhkja9YgvxaHk9yw5U6bpvZZ/udgD+wrtk
-         fveQ==
-X-Gm-Message-State: AOJu0Yy/kmiGhZLUw1WNwJvKcphEdpZR9NeUGLWxd+/jMbk3idF7rs/+
-	A8ZWLGncvsWYbUgfc+G9/AAcBjGDXAWl+Hh4iOpnB+bLaTzAO8gYK/mHh6YQdo0FWBg5rE5dec9
-	qsUtJek9xjH16nzCzuzkIPFOI4I9Vv/7zd+lpNBMvCAULd2S7R+crzrlQrQ==
-X-Gm-Gg: ATEYQzySiAqHEe6V/sFc/vyR9CYoY5SUo+jI3qf/YFPuXN4eMTnZYnseJ0n2/JJ+Wbz
-	ju2hPrlnKA8cic9TV9y0z8HQR8EsoWL2o3Xz6ABaoIOwrh+VgENM6ySKg5m3H8id/j2J5rl4dMr
-	vN6raIIaLcI2sDuU5pDi9pze6ZbL4nnOJFMPsCzzxjOb+y3c6FLShudNeNTI30K5ChaWykqeGmM
-	zf0r1rD1KVP4di74DXDAz6ct+qacfYiSeJuqj88kxRhFn1h8pcoxJS2f/GZ9V/4Te8jhmi/QwAS
-	lEJVvc0sDTwNhcIdC39fhDlVsMmaImrgA05XtPH3EiIvYgmO4gWK77hF0fjKQiZjHZgnjXdn2n/
-	BqOhpTqxskkKjpQzk9cVR6oDYJ5OP9GCKUbQ1Hq/CWm67Tw==
-X-Received: by 2002:a05:600c:820c:b0:479:13e9:3d64 with SMTP id 5b1f17b1804b1-483c9937b2dmr210989095e9.15.1772477592373;
-        Mon, 02 Mar 2026 10:53:12 -0800 (PST)
-X-Received: by 2002:a05:600c:820c:b0:479:13e9:3d64 with SMTP id 5b1f17b1804b1-483c9937b2dmr210988605e9.15.1772477591814;
-        Mon, 02 Mar 2026 10:53:11 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-79-166.inter.net.il. [80.230.79.166])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483c3b44207sm315022535e9.7.2026.03.02.10.53.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Mar 2026 10:53:11 -0800 (PST)
-Date: Mon, 2 Mar 2026 13:53:08 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] virtio-net: xsk: Support wakeup on RX side
-Message-ID: <20260302135032-mutt-send-email-mst@kernel.org>
-References: <20260302164158.4394-1-minhquangbui99@gmail.com>
+        d=1e100.net; s=20230601; t=1772478268; x=1773083068;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=CnTgWycVTJcgSF7BZ25W3n3Ihq0kMTnpBefWNp/Qjq8=;
+        b=AXGEYDpLKchMuzdFVihCAJo6qq5ApZ32rgfRzfHUGnuo4YP9IDcvaOsQ7n2SVFz80V
+         Lx3bSixA1riFI87+yqQXsBkyeJOr7ExqUaqqSw3TZWsCtZvlYIokGjIMey4hwcKvEdOs
+         ubrd/GhpGncoPbb46vGCl7HU65s0BNY/+Wd2juoiK9mEdP/EmIfapS+DCzlWVFiwQceP
+         7EY6FaIqjuAOOF1UYlwLyzr+Rj43f08NO4Fx6/yjN+h2ajRoHl9AGi92aEZpSlWFwyjC
+         SrjJghaOgTEr5ysTXN5wfiWIGLfvFJIj5xiIbtVYsDZIeGMZ9Ys5UQnyrEKwQONGxuxe
+         wkVg==
+X-Forwarded-Encrypted: i=1; AJvYcCWpj6KN2YIGhqRd8d7Jg/v7CAAWQuB4LQUpJXknzEGS8nU8fMB3DrH7PJ1U5HK80aPb/ImWFss=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxcQtIKeOmdTVNh+WVLezH/q9edOU01m4NDaIhHUM/I153nWOAM
+	rgorI/fdMvFTH4EHxjYczo7NzLQ82sQTUGUTC/ePO52LDuCV70NmdIlndCtoYlDGU5rpy5/q0uu
+	W4My2/7hCp5Avp1ttwyCK40YPoWR3yZPQHGrk+Dlq
+X-Gm-Gg: ATEYQzyVqQFxsJ7vtVnBVDSUDXaicw5qCmR0OZmLK7ksje34DeJ1quJ15QRGyUcESBN
+	x38n4+lFVr7f5d5Xsbcv2yuOJm9ebnMcQaK2hTyaTdqp35ADTGb1nMIVgQ+/z0aS+HEfy5ge+bs
+	Eh/81qEgs5cIKXhGmktanrSn+L/WUCjcXcFrAaawRwn0HEqiX3fOI5jFt7/Vby9tr9hnKW7e8IZ
+	GjRFQgMHR3oMo/jsQ3slW5pduBmlU2aaHTZG0Ua+yWyd0SaVuFGtmCitQzgfvGFBUnAPDWb11Q+
+	c9WZUUOzdmkLqbxZCqqhpwX0mOS2fAiz41tkTnAMJVwOKH110Bor5D9wFdMIOm/jBksowm6D
+X-Received: by 2002:a05:7022:4583:b0:127:5cda:fb7d with SMTP id
+ a92af1059eb24-1278fc2c5fbmr6725903c88.6.1772478267810; Mon, 02 Mar 2026
+ 11:04:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260302164158.4394-1-minhquangbui99@gmail.com>
-X-Rspamd-Queue-Id: 4D2B21DE80A
+References: <20260228221800.1082070-9-kuniyu@google.com> <20260302131218.679806-2-horms@kernel.org>
+In-Reply-To: <20260302131218.679806-2-horms@kernel.org>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Mon, 2 Mar 2026 11:04:16 -0800
+X-Gm-Features: AaiRm52f4neOROzS8PSpA-Ua4K4XoMGuAP4z2XAso4A5gDKi-QEm07GtG0vvHDg
+Message-ID: <CAAVpQUBPkufdBby+WdQx4Tsbz_UwaziENX6V1tW64ao2v79qhQ@mail.gmail.com>
+Subject: Re: [v3,net-next,08/15] ipmr: Move unregister_netdevice_many() out of ipmr_free_table().
+To: Simon Horman <horms@kernel.org>
+Cc: edumazet@google.com, pabeni@redhat.com, dsahern@kernel.org, 
+	netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net, 
+	kuni1840@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 04F321DE999
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[google.com,redhat.com,kernel.org,vger.kernel.org,davemloft.net,gmail.com];
+	TAGGED_FROM(0.00)[bounces-262784-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262783-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	DKIM_TRACE(0.00)[google.com:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-0.991];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,linux.dev:url]
 X-Rspamd-Action: no action
 
-On Mon, Mar 02, 2026 at 11:41:58PM +0700, Bui Quang Minh wrote:
-> When XDP_USE_NEED_WAKEUP is used and the fill ring is empty so no buffer
-> is allocated on RX side, allow RX NAPI to be descheduled. This avoids
-> wasting CPU cycles on polling. Users will be notified and they need to
-> make a wakeup call after refilling the ring.
-> 
-> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+On Mon, Mar 2, 2026 at 5:12=E2=80=AFAM Simon Horman <horms@kernel.org> wrot=
+e:
+>
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+>
+> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-loca=
+l.html
 > ---
-> Changes in v2:
-> - Fix the flag check in virtnet_xsk_wakeup
-> - Link to v1: https://lore.kernel.org/netdev/20260227150949.13089-1-minhquangbui99@gmail.com/
-> ---
->  drivers/net/virtio_net.c | 35 +++++++++++++++++++++++++++--------
->  1 file changed, 27 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index db88dcaefb20..3614002fc87c 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -1454,8 +1454,19 @@ static int virtnet_add_recvbuf_xsk(struct virtnet_info *vi, struct receive_queue
->  	xsk_buffs = rq->xsk_buffs;
->  
->  	num = xsk_buff_alloc_batch(pool, xsk_buffs, rq->vq->num_free);
-> -	if (!num)
-> +	if (!num) {
-> +		if (xsk_uses_need_wakeup(pool)) {
-> +			xsk_set_rx_need_wakeup(pool);
-> +			/* Return 0 instead of -ENOMEM so that NAPI is
-> +			 * descheduled.
-> +			 */
-> +			return 0;
+> ipmr: Move unregister_netdevice_many() out of ipmr_free_table().
+>
+> This commit refactors network device cleanup in the IP multicast routing
+> code by moving unregister_netdevice_many() from ipmr_free_table() to its
+> callers, enabling batched cleanup across multiple tables per netns.
+>
+> > diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
+> > index d15e05662b09..7e2aa2026f01 100644
+> > --- a/net/ipv4/ipmr.c
+> > +++ b/net/ipv4/ipmr.c
+>
+> [ ... ]
+>
+> > @@ -349,8 +355,13 @@ static int __net_init ipmr_rules_init(struct net *=
+net)
+> >
+> >  static void __net_exit ipmr_rules_exit(struct net *net)
+> >  {
+> > +     LIST_HEAD(dev_kill_list);
+> > +
+> >       ASSERT_RTNL();
+> > -     ipmr_free_table(net->ipv4.mrt);
+> > +
+> > +     ipmr_free_table(net->ipv4.mrt, &dev_kill_list);
+> > +     unregister_netdevice_many(&dev_kill_list);
+> > +
+> >       net->ipv4.mrt =3D NULL;
+> >  }
+>
+> In the !CONFIG_IP_MROUTE_MULTIPLE_TABLES version of ipmr_rules_exit(),
+> does this sequence lead to a use-after-free?
+>
+> ipmr_free_table() calls kfree(mrt) to free the table:
+>
+> net/ipv4/ipmr.c:ipmr_free_table() {
+>     ...
+>     rhltable_destroy(&mrt->mfc_hash);
+>     kfree(mrt);
+> }
+>
+> Then unregister_netdevice_many() is called, which triggers NETDEV_UNREGIS=
+TER
+> notifications. The global notifier ipmr_device_event() handles this event
+> and calls ipmr_for_each_table().
+>
+> In the non-MULTIPLE_TABLES case, ipmr_for_each_table() expands to:
+>
+>     for (mrt =3D net->ipv4.mrt; mrt; mrt =3D NULL)
+>
+> Since net->ipv4.mrt still points to the freed memory at this point (it's
+> only set to NULL after unregister_netdevice_many() completes), won't
+> ipmr_device_event() access mrt->vif_table and mrt->maxvif from a freed
+> slab object?
+>
+> The CONFIG_IP_MROUTE_MULTIPLE_TABLES version appears safe because
+> list_del(&mrt->list) removes the table from the iteration list before
+> kfree().
+>
+> Should net->ipv4.mrt =3D NULL be moved before calling
+> unregister_netdevice_many(), or before calling ipmr_free_table()?
 
-With this change, try_fill_recv() can return true even though zero RX
-buffers were posted in need_wakeup mode, which contradicts its
-documentation ("Returns false if we couldn't fill entirely (OOM)").
+Exactly, although the bug disappears in the next patch,
+I'll fix this in v4.
 
-Methinks we need to at least update the comment near try_fill_recv.
-
+Thanks !
 
 
-> +		}
-> +
->  		return -ENOMEM;
-> +	} else {
-> +		xsk_clear_rx_need_wakeup(pool);
-> +	}
->  
->  	len = xsk_pool_get_rx_frame_size(pool) + vi->hdr_len;
->  
-> @@ -1588,20 +1599,19 @@ static bool virtnet_xsk_xmit(struct send_queue *sq, struct xsk_buff_pool *pool,
->  	return sent;
->  }
->  
-> -static void xsk_wakeup(struct send_queue *sq)
-> +static void xsk_wakeup(struct napi_struct *napi, struct virtqueue *vq)
->  {
-> -	if (napi_if_scheduled_mark_missed(&sq->napi))
-> +	if (napi_if_scheduled_mark_missed(napi))
->  		return;
->  
->  	local_bh_disable();
-> -	virtqueue_napi_schedule(&sq->napi, sq->vq);
-> +	virtqueue_napi_schedule(napi, vq);
->  	local_bh_enable();
->  }
->  
->  static int virtnet_xsk_wakeup(struct net_device *dev, u32 qid, u32 flag)
->  {
->  	struct virtnet_info *vi = netdev_priv(dev);
-> -	struct send_queue *sq;
->  
->  	if (!netif_running(dev))
->  		return -ENETDOWN;
-> @@ -1609,9 +1619,18 @@ static int virtnet_xsk_wakeup(struct net_device *dev, u32 qid, u32 flag)
->  	if (qid >= vi->curr_queue_pairs)
->  		return -EINVAL;
->  
-> -	sq = &vi->sq[qid];
-> +	if (flag & XDP_WAKEUP_TX) {
-> +		struct send_queue *sq = &vi->sq[qid];
-> +
-> +		xsk_wakeup(&sq->napi, sq->vq);
-> +	}
-> +
-> +	if (flag & XDP_WAKEUP_RX) {
-> +		struct receive_queue *rq = &vi->rq[qid];
-> +
-> +		xsk_wakeup(&rq->napi, rq->vq);
-> +	}
->  
-> -	xsk_wakeup(sq);
->  	return 0;
->  }
->  
-> @@ -1623,7 +1642,7 @@ static void virtnet_xsk_completed(struct send_queue *sq, int num)
->  	 * wakeup the tx napi to consume the xsk tx queue, because the tx
->  	 * interrupt may not be triggered.
->  	 */
-> -	xsk_wakeup(sq);
-> +	xsk_wakeup(&sq->napi, sq->vq);
->  }
->  
->  static int __virtnet_xdp_xmit_one(struct virtnet_info *vi,
-> -- 
-> 2.43.0
-
+>
+> > @@ -425,18 +436,16 @@ static struct mr_table *ipmr_new_table(struct net=
+ *net, u32 id)
+> >                             ipmr_expire_process, ipmr_new_table_set);
+> >  }
+> >
+> > -static void ipmr_free_table(struct mr_table *mrt)
+> > +static void ipmr_free_table(struct mr_table *mrt, struct list_head *de=
+v_kill_list)
+> >  {
+> >       struct net *net =3D read_pnet(&mrt->net);
+> > -     LIST_HEAD(dev_kill_list);
+> >
+> >       WARN_ON_ONCE(!mr_can_free_table(net));
+> >
+> >       timer_shutdown_sync(&mrt->ipmr_expire_timer);
+> >       mroute_clean_tables(mrt, MRT_FLUSH_VIFS | MRT_FLUSH_VIFS_STATIC |
+> >                           MRT_FLUSH_MFC | MRT_FLUSH_MFC_STATIC,
+> > -                         &dev_kill_list);
+> > -     unregister_netdevice_many(&dev_kill_list);
+> > +                         dev_kill_list);
+> >       rhltable_destroy(&mrt->mfc_hash);
+> >       kfree(mrt);
+> >  }
 
