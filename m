@@ -1,155 +1,182 @@
-Return-Path: <netdev+bounces-262599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262600-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +LeKLvtmpWmx+wUAu9opvQ
-	(envelope-from <netdev+bounces-262599-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 11:31:23 +0100
+	id 0J53I35npWmx+wUAu9opvQ
+	(envelope-from <netdev+bounces-262600-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 11:33:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CD841D68C2
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 11:31:22 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A9141D6941
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 11:33:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BFA3E300955A
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 10:23:31 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 309EA3013CBE
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 10:24:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1E4239C636;
-	Mon,  2 Mar 2026 10:23:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="qejSHz/m"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD98C39B95E;
+	Mon,  2 Mar 2026 10:24:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AC0239B95E
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 10:23:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D865F39A81C;
+	Mon,  2 Mar 2026 10:24:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772447004; cv=none; b=cEJ93L00Q5DTdfywuqGRPMTnl4CY7EgCRDS+lIfVDhjVlDRjxNh/4YUAdGN2ok8rHBbWF6p6On8UddPz5IrZQxQIQIJyEzcuzs78DPq6V3bpQbHvmV4O4QdUVq4cqvaSe2Wbh6YaO5UxJ50PEHtV8D0cvBEbtrOHYhznfnqKD84=
+	t=1772447080; cv=none; b=mkSNqLHzpS2vuCB6hIuoYqvcbpYaVx8bfc1TJUEqwAKCQePGwZZ9W1yGNFNc5vS4Ax6IZhaB/SMZtCBxDkR3xVE68eEolYBFhZuLnOJVqpUQLyKLh+QBwL1irnwNbFwTv7nn2rjAKy/G4tMdqMDYWyE3SjhHaAm5myvyKL6Hu8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772447004; c=relaxed/simple;
-	bh=DxIjiuRLSsy1tFjfqwnUtZGdPPrFPa2emHdfIPwLGaA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CKUq//8CLnOJLqR58SJB46LfXBNAzq9if6Lw/Fe5Ne6wHqiIMfzvxCe7OfZy5VQNPcNePq5tKgbZdp6cRlRzUqtgOw/W2jkfs3biJSjhc/14s3tT5Un8XADf74lsbyjpGuARjNi7TTmAS/Llj2TmDbdpTl2UIOReAc6xS1BYauE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=qejSHz/m; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-439aa2f8ebaso998019f8f.2
-        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 02:23:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1772447000; x=1773051800; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xyf5aAwmciBE7QFfA+/PpQQaPUYccIgX3fQYsSxVl+U=;
-        b=qejSHz/mv7HaqVvybUq9mMdRh91/klcPbrp8m9TDyN6bXhHdCoYkRcI+r0+jbsLuON
-         7V780DKi5GhyAkBytjq2KpvODxTn0X03VlsAQQpYS6py12jJWPQrJU7/rm3LBHu7lD7i
-         UjCVZcSmmNp9mKBlkHOADSXgpl8s9AyI1yxAK1XFCzUbfbotkL1mOYOqvkD2AjRVQ+RF
-         53EouXoHMx31/vSAx9ke/y4E26GeiroFmRLRGzYCSy169dWOQmA9ViMFPosIwtLRY8kX
-         1mfWQ4UXY5lnssavO4yvfLH+vmR2Zt/3QzPiKwI8xtJiuEaxHRgMNv+JLyrRZdMDBTru
-         SN/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772447000; x=1773051800;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xyf5aAwmciBE7QFfA+/PpQQaPUYccIgX3fQYsSxVl+U=;
-        b=ZeqeIQOBJZELGpsMsHK7YzvAMnIpr0S5Y1gqflLrq4dR4QGSDuryAd8LJI+6ZdMry3
-         m4QGHPUiEp5vzCV7cAW4JfkceVHxvg7Iiueo2sjSHoi7/IKviGWK1n2LhOB1ZsA7KVqF
-         TFaHhnmudksJVoLPaN9ZJAIb1Ig9MIB5jBJn7MLAbdSOOLoLLm/zP1asKdGkzZzOz+Ys
-         KIB3uSDtkxAq9Am1k+4RmHqHz/De+L3UghHDvcE7PAqK57uzuf+SUejFYllqdPPSjdE6
-         jtymSSJj837S4Lu3XSZy9qllSF/DpynT5/cawS74mjUNynPMSiYHSC+G4Y+3nOjn7H3U
-         Wpkw==
-X-Gm-Message-State: AOJu0YwAfEVHeLz4FLD14Ge2uDiKSzUeRsqIhZ+cheV69hFfyrc8/J2j
-	UGYVedYk44VAHUIwec4rZpDeQg+FBLg9HK2H1GsaBcpkWjxdHkJv0D3x/EY4LeSBEp7/mUWQPtK
-	sX1V6
-X-Gm-Gg: ATEYQzwwOW5waL6ZkS+823WDBNH4yzCRfe1y+xvWAs5fa2pCWf6A1NLhKFLLCGh7+Lu
-	8hRYEvoOLyQ/p2QWBBz5vyRHxTn/6+WNWb1ep+Jz2Fs7yI2cqxJrTFQVWlZ6I/p5oxilF4KVzfv
-	czHcb2FTchxo5aAes0K4tsEq5QkoVYYqyeSAR+UvY43cLxZ1dRZ/KN7b1GN+ngGyTV9Suw7YNjs
-	VSLIq3egmM1tecEyE5KkkkBCaC3F82kvs6FzCA4a+hUMDjwsgG4OuidSrsz2vAZ0Wm7ySbD0QwT
-	zME6DGgcxeboX48DIKyuw2+jMYJWVqnb7RLknAMmnnVKP9Xr9DFeBWwRzitygprLM3efruIc9YT
-	GvMcs+weqRk3W5EoGv2EmUgd9FnWTKZB+Gqoa9yui1HbGPbK5f4XAot0rgsy0Khuo/j/QsYStzx
-	P/GP0vUuTmTtF6D5mZV/cOrsWChRK5fj4=
-X-Received: by 2002:a05:6000:186e:b0:439:b374:c6d3 with SMTP id ffacd0b85a97d-439b374c7b0mr7633629f8f.32.1772447000348;
-        Mon, 02 Mar 2026 02:23:20 -0800 (PST)
-Received: from FV6GYCPJ69 ([85.163.81.98])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439b1116698sm12378754f8f.16.2026.03.02.02.23.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Mar 2026 02:23:19 -0800 (PST)
-Date: Mon, 2 Mar 2026 11:23:16 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, horms@kernel.org, donald.hunter@gmail.com, corbet@lwn.net, 
-	skhan@linuxfoundation.org, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com, 
-	mbloch@nvidia.com, przemyslaw.kitszel@intel.com, mschmidt@redhat.com, 
-	andrew+netdev@lunn.ch, rostedt@goodmis.org, mhiramat@kernel.org, 
-	mathieu.desnoyers@efficios.com, chuck.lever@oracle.com, matttbe@kernel.org, cjubran@nvidia.com, 
-	daniel.zahka@gmail.com, linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 04/10] devlink: allow to use devlink index as
- a command handle
-Message-ID: <onwmw7ql5g2xqacrqnawcphdlzfu5v5ohgslsbvoeraszm7m4m@2ywv2ql37wu7>
-References: <20260225133422.290965-1-jiri@resnulli.us>
- <20260225133422.290965-5-jiri@resnulli.us>
- <20260228144846.40f5dfeb@kernel.org>
+	s=arc-20240116; t=1772447080; c=relaxed/simple;
+	bh=eWVFKW3A7MKx5p5Dxot9aQIkqN7okMarVB1Y+6uExOA=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=kjekh/pd7jfGcKDVmm5JXMQUb5FdvgzKsYwMVtAu4feAVd/9WqKDMvTkT6llhK94wG/rrBeiYHUcGMKzlz/S8/DRyU83La6oaTEf5bc9+1RzgknG9VaFDn/2ZQ9T8E3HZKtQMV1a6C1ixJugJ9VC+hzm7UyBJvkpAUuJ7//m7wk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
+Received: from TWMBX01.aspeed.com (192.168.0.62) by TWMBX01.aspeed.com
+ (192.168.0.62) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Mon, 2 Mar
+ 2026 18:24:30 +0800
+Received: from [127.0.1.1] (192.168.10.13) by TWMBX01.aspeed.com
+ (192.168.0.62) with Microsoft SMTP Server id 15.2.1748.10 via Frontend
+ Transport; Mon, 2 Mar 2026 18:24:30 +0800
+From: Jacky Chou <jacky_chou@aspeedtech.com>
+Subject: [PATCH net-next v6 0/5] Add AST2600 RGMII delay into ftgmac100
+Date: Mon, 2 Mar 2026 18:24:27 +0800
+Message-ID: <20260302-rgmii_delay_2600-v6-0-68319a4c4110@aspeedtech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260228144846.40f5dfeb@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAFtlpWkC/4XRwWrDMAwG4FcpPs9BlmM73WnvMUpwbaXx1iZdk
+ oaGkneflsI6aGAnI8T/GUk30VOXqBevm5voaEx9ahsu7MtGhNo3B5Ipci0Q0CjQSnaHU0plpKO
+ fSrQA0gPsAfMiOLKCY+eOqnRdyHfR0CAbug5ix5069UPbTctfo1r6Pyyrjp8tYqYM2q12UskPH
+ z6nMtTt5c33Z6I4UKiz0J4WacRHulAarNagMq2Lwqj/w/o3rHik54lGLUES+gqtsZWLblXJ/yg
+ KVpScFRN81BicZWdVMQ8FwawohpV9xAKBpeiflfm+846+Lny94b743Tx/A56cdT3bAQAA
+X-Change-ID: 20251031-rgmii_delay_2600-a00b0248c7e6
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Po-Yu Chuang <ratbert@faraday-tech.com>, Joel Stanley
+	<joel@jms.id.au>, Andrew Jeffery <andrew@codeconstruct.com.au>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-aspeed@lists.ozlabs.org>, <taoren@meta.com>, Jacky Chou
+	<jacky_chou@aspeedtech.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1772447070; l=3669;
+ i=jacky_chou@aspeedtech.com; s=20251031; h=from:subject:message-id;
+ bh=eWVFKW3A7MKx5p5Dxot9aQIkqN7okMarVB1Y+6uExOA=;
+ b=6pvceYIVye2BfNotK79vvawC/nSneY5yAm8dVU1hEUqBkfrHg+QV7ZvBEiOwZWteK1lI8d4dj
+ t2y1LsqEvh8CXYR6CroaDyZjuU05z/WnPqtcLMfjh4Y1sMdAk1GhQIu
+X-Developer-Key: i=jacky_chou@aspeedtech.com; a=ed25519;
+ pk=8XBx7KFM1drEsfCXTH9QC2lbMlGU4XwJTA6Jt9Mabdo=
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	DMARC_POLICY_QUARANTINE(1.50)[aspeedtech.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262599-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[resnulli.us];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,lwn.net,linuxfoundation.org,nvidia.com,intel.com,lunn.ch,goodmis.org,efficios.com,oracle.com];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262600-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[resnulli-us.20230601.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[jacky_chou@aspeedtech.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3CD841D68C2
+	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.967];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,aspeedtech.com:mid,aspeedtech.com:email]
+X-Rspamd-Queue-Id: 9A9141D6941
 X-Rspamd-Action: no action
 
-Sat, Feb 28, 2026 at 11:48:46PM +0100, kuba@kernel.org wrote:
->On Wed, 25 Feb 2026 14:34:16 +0100 Jiri Pirko wrote:
->> +	if (attrs[DEVLINK_ATTR_INDEX]) {
->> +		index = nla_get_uint(attrs[DEVLINK_ATTR_INDEX]);
->> +		devlink = devlinks_xa_lookup_get(net, index);
->> +		if (!devlink)
->> +			return ERR_PTR(-ENODEV);
->> +		goto found;
->> +	}
->> +
->>  	if (!attrs[DEVLINK_ATTR_BUS_NAME] || !attrs[DEVLINK_ATTR_DEV_NAME])
->>  		return ERR_PTR(-EINVAL);
->
->If both INDEX and BUS_NAME + DEV_NAME are provided we should check
->that they point to the same device? Or reject user space passing both?
+This patch series adds support for configuring RGMII internal delays for the
+Aspeed AST2600 FTGMAC100 Ethernet MACs. It introduces new compatible strings to
+distinguish between MAC0/1 and MAC2/3, as their delay chains and configuration
+units differ.
+The device tree bindings are updated to restrict the allowed phy-mode and delay
+properties for each MAC type. Corresponding changes are made to the device tree
+source files and the FTGMAC100 driver to support the new delay configuration.
 
-I implemented reject. I don't see much of value of allowing both. The
-code that would do the checking is too much for this hypothetical case.
+This enables precise RGMII timing configuration for AST2600-based platforms,
+improving interoperability with various PHYs
+
+Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
+---
+Changes in v6:
+- Adjustments made according to net: ftgmac100: Various probe cleanups.
+- Split [net-next,v5,3/4] net: ftgmac100: Add RGMII delay support for AST2600.
+  1. Confgure RGMII delay value according to rx/tx-internal-delay-ps from dts
+  2. Keep RGMII delay value for old dts
+- Link to v5: https://lore.kernel.org/r/20251205-rgmii_delay_2600-v5-0-bd2820ad3da7@aspeedtech.com
+
+Changes in v5:
+- Remove the new property, "aspeed,rgmii-delay-ps" from yaml and driver
+- Add aspeed,scu to aspeed-g6 dtsi back
+- Determine delay value from bootloader and tx/rx-internal-delay-ps to
+  configure RGMII delay value with phy-mode
+- Add a helper for AST2600 to get phy driver handle
+- Link to v4: https://lore.kernel.org/r/20251110-rgmii_delay_2600-v4-0-5cad32c766f7@aspeedtech.com
+
+Changes in v4:
+- Remove the compatible "aspeed,ast2600-mac01" and
+  "aspeed,ast2600-mac23"
+- Add new property to specify the RGMII delay step for each MACs
+- Add default value of rx/tx-internal-delay-ps
+- For legacy dts, a warning message reminds users to update phy-mode
+- If lack rx/tx-internal-delay-ps, driver will use default value to
+  configure the RGMII delay
+- Link to v3: https://lore.kernel.org/r/20251103-rgmii_delay_2600-v3-0-e2af2656f7d7@aspeedtech.com
+
+Changes in v3:
+- Add new item on compatible property for new compatible strings
+- Remove the new compatible and scu handle of MAC from aspeed-g6.dtsi
+- Add new compatible and scu handle to MAC node in
+  aspeed-ast2600-evb.dts
+- Change all phy-mode of MACs to "rgmii-id"
+- Keep "aspeed,ast2600-mac" compatible in ftgmac100.c and configure the
+  rgmii delay with "aspeed,ast2600-mac01" and "aspeed,ast2600-mac23"
+- Link to v2: https://lore.kernel.org/r/20250813063301.338851-1-jacky_chou@aspeedtech.com
+
+Changes in v2:
+- added new compatible strings for MAC0/1 and MAC2/3
+- updated device tree bindings to restrict phy-mode and delay properties
+- refactored driver code to handle rgmii delay configuration
+- Link to v1: https://lore.kernel.org/r/20250317025922.1526937-1-jacky_chou@aspeedtech.com
+
+---
+Jacky Chou (5):
+      dt-bindings: net: ftgmac100: Add delay properties for AST2600
+      ARM: dts: aspeed-g6: add aspeed,scu property for MAC
+      net: ftgmac100: Add RGMII delay support for AST2600
+      net: ftgmac100: Support rgmii delay in old dts with AST2600
+      ARM: dts: aspeed: ast2600-evb: Configure RGMII delay for MAC
+
+ .../devicetree/bindings/net/faraday,ftgmac100.yaml |  42 ++-
+ arch/arm/boot/dts/aspeed/aspeed-ast2600-evb.dts    |  20 +-
+ arch/arm/boot/dts/aspeed/aspeed-g6.dtsi            |   4 +
+ drivers/net/ethernet/faraday/ftgmac100.c           | 318 ++++++++++++++++++++-
+ drivers/net/ethernet/faraday/ftgmac100.h           |  25 ++
+ 5 files changed, 388 insertions(+), 21 deletions(-)
+---
+base-commit: 01857fc712f6469cab9cc578120cdc80f1c2a634
+change-id: 20251031-rgmii_delay_2600-a00b0248c7e6
+
+Best regards,
+-- 
+Jacky Chou <jacky_chou@aspeedtech.com>
+
 
