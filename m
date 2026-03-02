@@ -1,222 +1,304 @@
-Return-Path: <netdev+bounces-262460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262461-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GALDCUPOpGl9rwUAu9opvQ
-	(envelope-from <netdev+bounces-262460-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 00:39:47 +0100
+	id 8B2QLWjVpGmyswUAu9opvQ
+	(envelope-from <netdev+bounces-262461-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 01:10:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D51411D1F32
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 00:39:45 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FE731D206F
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 01:10:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8FA28300FEDA
-	for <lists+netdev@lfdr.de>; Sun,  1 Mar 2026 23:39:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0608E300F797
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 00:10:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1007E2F693B;
-	Sun,  1 Mar 2026 23:39:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65B99EEC0;
+	Mon,  2 Mar 2026 00:10:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jsSzz6Vc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JxruV2Et";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="nViAaVNJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B7762E62C0
-	for <netdev@vger.kernel.org>; Sun,  1 Mar 2026 23:39:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE2C6FC3
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 00:10:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772408383; cv=none; b=K9cjgpkr4qHwGpxuEJG9MFOpTOPYFCiAvtpwrjHl4Z4qL7fBx38jwHbqJ+Js4rcuI4oa5Vng6+WPHMgNHkrLN6TpHP+y72yXPSMCTblcqgV+99vN6SOTP6RuSoGDqRHIcsltG127ZfOdokGQyGfpJRD1rRpG0wQlIbXTO9C6wJk=
+	t=1772410213; cv=none; b=TtvR0/Dzj7O7L1Up3rJFnDawcP0YgLJK61l3VfPg5xfjCoqQwo4vRoMgtyGRXgW1UaQcLqwEJPjnRj2PhjMk9kkaS6H8/rgQV11yCkMfUsEe6lWc4j76V3ljs0kPLMr4+0iv5T+9NRNMYDSjyogNNCvgIA3UkRA0niMimh/BmmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772408383; c=relaxed/simple;
-	bh=75ghLzIOfIDBzynrxoYUERTC5CLRBdIOamqsL3VsFYY=;
+	s=arc-20240116; t=1772410213; c=relaxed/simple;
+	bh=d3go857C3XICc8MKrQoqnJS5JBMZD9L2ydEsTsmHHY4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NFGqUv4IRgzulEeAv6BA99uDfuT4pENGAjkaziFrObJWBBbTWf54vIaF7ncMtUG3l2d3ZSHxggzU3yj44CylBvmgn2FCsWgDVDu9Ma/FEVX9QFmJiqPVfQHnCbTXNXWEF2noElAhMpnnevRFM0GWN53O8lqSj6myDeenTn7u6sU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jsSzz6Vc; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772408382; x=1803944382;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=75ghLzIOfIDBzynrxoYUERTC5CLRBdIOamqsL3VsFYY=;
-  b=jsSzz6Vc5Ewx65ym3eJvM7KP2Ahdsm30wTWFdtNUsqnYxC5puRZRjOEZ
-   o8pKf4H34JHE7tUAENs6CJ3E0jnEjblvq72GlrUtAb56YEGEQ31BxVHwE
-   yqkCtmfoSfMmT9F5DhcGgHfZb8CGAduN6S4AhrDxO13Voebx1u/rZWPLF
-   omlVtWCWQxwu77QBviJDGnHwJKFn065k5aO6MTqqkpyVv9MfKUsbyqioE
-   MaioYUgnBRMEGWVMd/UgbOEg6mWhMIqlLzcHzWI2cSIMnO5ewZc3JeOMn
-   QePj9+p3uVfEwhxaiFIVF37Abd/hign3zbvj+ht9V3ik2A+aBWekU3CyN
-   Q==;
-X-CSE-ConnectionGUID: K85AnJKNSgaOEmPlG23KdQ==
-X-CSE-MsgGUID: 6dA3b2GZQuevh6puffZ6xw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11716"; a="84049597"
-X-IronPort-AV: E=Sophos;i="6.21,319,1763452800"; 
-   d="scan'208";a="84049597"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2026 15:39:41 -0800
-X-CSE-ConnectionGUID: Ga3PUchuS/iY6FTarH1vDg==
-X-CSE-MsgGUID: T4uzM2c/Qbm1GzdLCsjGJA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,319,1763452800"; 
-   d="scan'208";a="220580295"
-Received: from lkp-server01.sh.intel.com (HELO f27a57aa7a36) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 01 Mar 2026 15:39:39 -0800
-Received: from kbuild by f27a57aa7a36 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vwqNs-0000000005h-1bR4;
-	Sun, 01 Mar 2026 23:39:36 +0000
-Date: Mon, 2 Mar 2026 07:38:51 +0800
-From: kernel test robot <lkp@intel.com>
-To: Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH v2 net-next 7/7] net-sysfs: use rps_tag_ptr and remove
- metadata from rps_dev_flow_table
-Message-ID: <202603020743.NEL0agrx-lkp@intel.com>
-References: <20260301181457.3539105-8-edumazet@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=gohs0ITSdvrR/v7l2kF4aSdgLBX0eLVgXHgjlYqqol52E8ts1K+ko8zZamdCfgtqVTZOcP3TYaG0TZUTtcbgkTPSN9mvRd6/llCoEzI7eHdLiweDzM3G05TZqg2DbH9YxhunVhfj7Rqj5O3hClfw9MwlXZ/UjhVPPb1Q8kRzINQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JxruV2Et; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=nViAaVNJ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772410209;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MpxCTRSJjeW1MLXWf2X8Dcr2BcSTB+ElcgetpkYQgRE=;
+	b=JxruV2EtD+TTzdOO6A3UPzuUiy6FqJIZSodCGcBmx/sbafU3rtOitc0tHFX1IPIlfLHNOz
+	tgeCuWeyTgCsaVlhnxg6BO7sot0xtcg1IPJNqI9ToYWZYrIuino35EIAWlKZeInV1UBGEC
+	P8gAPD4dQTLi3R0SgSXv33uD5VnVePA=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-606-lRGcCa5iMDKE6-8mTaH23g-1; Sun, 01 Mar 2026 19:10:08 -0500
+X-MC-Unique: lRGcCa5iMDKE6-8mTaH23g-1
+X-Mimecast-MFC-AGG-ID: lRGcCa5iMDKE6-8mTaH23g_1772410207
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-439a9182148so672344f8f.2
+        for <netdev@vger.kernel.org>; Sun, 01 Mar 2026 16:10:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1772410207; x=1773015007; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=MpxCTRSJjeW1MLXWf2X8Dcr2BcSTB+ElcgetpkYQgRE=;
+        b=nViAaVNJaUN+ppLz25WThrSX7QKYxfegwrqipHksJaqyUqzceLj6Y9OW+9bd6/xtZC
+         +HGn7d/JDwLQa9eQI6odY3kwMoYZOQR7zLxAYNl8Vhrr2/865Rxox1zmj1Nfqn3ZmrvC
+         J4Au3t1QU0EnZAO4tx66wXzqt8pMC+QJGuKapZlh0b7vxk4ONJNFnzsWaBJpv/nm+nEU
+         ILeTfF4o0K+mZUcX9pZO6LU3xS4jIN3kvdTM/viZlyKFN2udte+LTT9N0t+aQxdRaCUU
+         1XI3IvkuX0y97fyZ8Bbkoj/2nDZzmOX6RdTPZ9KFwXwbVgfao7C+KHPl8Reg3NG6wjSi
+         pEUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772410207; x=1773015007;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MpxCTRSJjeW1MLXWf2X8Dcr2BcSTB+ElcgetpkYQgRE=;
+        b=MZgQdmQ0cJhNuVvC6yiVFPLLjCbSaYK487rwsodeVvcpi9TR1G+I0WCkvQ3KZXA2/2
+         y6WTb8acrrcJsSSNHv6UvfjYc7CtMggxy2Csf7DyaOw8xUDGO3uJYGpDK3i8y0odzLRG
+         0UFLNTy9Yoi5gwEHXflSHQTTS5iXXs0r9EzKVKi9OL1daTWe8P+jK6/xAab5waB25kWM
+         0EH6Y+2gRjV1V+xiJOr6HS9KURU2DmFOlyddd8r27/UmaEgqvrbqm0oFIMNl7j1MmJI6
+         l3SaWG2BA9hpvuqhGxB4NkDvfigiCgQeVwLcgIiOxilPgj4Luqo+zQ9ELEs8b/5r1z3Z
+         UOFA==
+X-Forwarded-Encrypted: i=1; AJvYcCVrSpAgbvk6ERYRy/Glpanjbf8dpS6zfX2S+frop9LZo1suy3u5kw18yA7Trz/5Y77QfWKU/So=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyO5pLqQj18WcT6t5+JLdpa0SXpe/VW8yH7dJa018e4ZwQeLUiu
+	s9Zw3WmlFD2fHnnOl3pGjVAhb/pj9mToNAoPzZKIRiMeYMmB+MVElPuZ+ZTEkT6YIiik5nvucr3
+	9EFHd8nvh5dNL01IeVC7AzJeNlgC2V6bfuV0/HyVfl/B7D1abJ4ovEIpiCA==
+X-Gm-Gg: ATEYQzxkviuqCqEDXCO/5krh5987633afN2x0z/f4M+CtLEQLM2+F/UYVFUGtCmgfKF
+	Mdkq/ALTIG/tTC9kNgQ5ssDNeU2/8X2WdfM0BHQTZQnQwpRenC9QEE+8U1QYUbBe1ugVV/kQgAK
+	LFJAt3QuXoBSvhklP8RP4rHniXt0Hl9Xl8qYb0PNCxUEJB1L9ZJ1VHdr5wFHb19A84BtoyPRp7B
+	wsAvWktGYEZ/5v1ZHuOqnsXyN0viVlmyWSoGxgfKHiw6ROC0K9S7q23kfrN2Opz+YmiCkME8etl
+	wjbLe8IasQ0xku4A80ioFpGT12rRvhPT6qfzNC5XE5xpbpDCGNzoeNzNzl64NykUxk74GB+Dulq
+	tlXXMcwKKfR2pav53gXHaxGLcqYk7mLlC649GKlimSp9FxQ==
+X-Received: by 2002:a05:6000:1889:b0:439:afcc:8a2f with SMTP id ffacd0b85a97d-439afcc8ab6mr6991041f8f.18.1772410207233;
+        Sun, 01 Mar 2026 16:10:07 -0800 (PST)
+X-Received: by 2002:a05:6000:1889:b0:439:afcc:8a2f with SMTP id ffacd0b85a97d-439afcc8ab6mr6991008f8f.18.1772410206755;
+        Sun, 01 Mar 2026 16:10:06 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-79-166.inter.net.il. [80.230.79.166])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4399c75a523sm23000888f8f.19.2026.03.01.16.10.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 01 Mar 2026 16:10:05 -0800 (PST)
+Date: Sun, 1 Mar 2026 19:10:02 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: ShuangYu <shuangyu@yunyoo.cc>
+Cc: "jasowang@redhat.com" <jasowang@redhat.com>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [BUG] vhost_net: livelock in handle_rx() when GRO packet exceeds
+ virtqueue capacity
+Message-ID: <20260301190906-mutt-send-email-mst@kernel.org>
+References: <9ac0a071e79e9da8128523ddeba19085f4f8c9aa.decbd9ef.1293.41c3.bf27.48cdc12b9ce6@larksuite.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20260301181457.3539105-8-edumazet@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <9ac0a071e79e9da8128523ddeba19085f4f8c9aa.decbd9ef.1293.41c3.bf27.48cdc12b9ce6@larksuite.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lists.linux.dev,kernel.org,google.com,vger.kernel.org,gmail.com];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262461-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262460-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim,intel.com:email,01.org:url]
-X-Rspamd-Queue-Id: D51411D1F32
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1FE731D206F
 X-Rspamd-Action: no action
 
-Hi Eric,
+On Sun, Mar 01, 2026 at 10:36:39PM +0000, ShuangYu wrote:
+> Hi,
+> 
+> We have hit a severe livelock in vhost_net on 6.18.x. The vhost
+> kernel thread spins at 100% CPU indefinitely in handle_rx(), and
+> QEMU becomes unkillable (stuck in D state).
+> [This is a text/plain messages]
+> 
+> Environment
+> -----------
+>   Kernel:  6.18.10-1.el8.elrepo.x86_64
+>   QEMU:    7.2.19
+>   Virtio:  VIRTIO_F_IN_ORDER is negotiated
+>   Backend: vhost (kernel)
+> 
+> Symptoms
+> --------
+>   - vhost-<pid> kernel thread at 100% CPU (R state, never yields)
+>   - QEMU stuck in D state at vhost_dev_flush() after receiving SIGTERM
+>   - kill -9 has no effect on the QEMU process
+>   - libvirt management plane deadlocks ("cannot acquire state change lock")
+> 
+> Root Cause
+> ----------
+> The livelock is triggered when a GRO-merged packet on the host TAP
+> interface (e.g., ~60KB) exceeds the remaining free capacity of the
+> guest's RX virtqueue (e.g., ~40KB of available buffers).
+> 
+> The loop in handle_rx() (drivers/vhost/net.c) proceeds as follows:
+> 
+>   1. get_rx_bufs() calls vhost_get_vq_desc_n() to fetch descriptors.
+>     It advances vq->last_avail_idx and vq->next_avail_head as it
+>     consumes buffers, but runs out before satisfying datalen.
+> 
+>   2. get_rx_bufs() jumps to err: and calls
+>     vhost_discard_vq_desc(vq, headcount, n), which rolls back
+>     vq->last_avail_idx and vq->next_avail_head.
+> 
+>     Critically, vq->avail_idx (the cached copy of the guest's
+>     avail->idx) is NOT rolled back. This is correct behavior in
+>     isolation, but creates a persistent mismatch:
+> 
+>       vq->avail_idx      = 108  (cached, unchanged)
+>       vq->last_avail_idx = 104  (rolled back)
+> 
+>   3. handle_rx() sees headcount == 0 and calls vhost_enable_notify().
+>     Inside, vhost_get_avail_idx() finds:
+> 
+>       vq->avail_idx (108) != vq->last_avail_idx (104)
+> 
+>     It returns 1 (true), indicating "new buffers available."
+>     But these are the SAME buffers that were just discarded.
+> 
+>   4. handle_rx() hits `continue`, restarting the loop.
+> 
+>   5. In the next iteration, vhost_get_vq_desc_n() checks:
+> 
+>       if (vq->avail_idx == vq->last_avail_idx)
+> 
+>     This is FALSE (108 != 104), so it skips re-reading the guest's
+>     actual avail->idx and directly fetches the same descriptors.
+> 
+>   6. The exact same sequence repeats: fetch -> too small -> discard
+>     -> rollback -> "new buffers!" -> continue. Indefinitely.
+> 
+> This appears to be a regression introduced by the VIRTIO_F_IN_ORDER
+> support, which added vhost_get_vq_desc_n() with the cached avail_idx
+> short-circuit check, and the two-argument vhost_discard_vq_desc()
+> with next_avail_head rollback. The mismatch between the rollback
+> scope (last_avail_idx, next_avail_head) and the check scope
+> (avail_idx vs last_avail_idx) was not present before this change.
+> 
+> bpftrace Evidence
+> -----------------
+> During the 100% CPU lockup, we traced:
+> 
+>   @get_rx_ret[0]:      4468052   // get_rx_bufs() returns 0 every time
+>   @peek_ret[60366]:    4385533   // same 60KB packet seen every iteration
+>   @sock_err[recvmsg]:        0   // tun_recvmsg() is never reached
+> 
+> vhost_get_vq_desc_n() was observed iterating over the exact same 11
+> descriptor addresses millions of times per second.
+> 
+> Workaround
+> ----------
+> Either of the following avoids the livelock:
+> 
+>   - Disable GRO/GSO on the TAP interface:
+>      ethtool -K <tap> gro off gso off
+> 
+>   - Switch from kernel vhost to userspace QEMU backend:
+>      <driver name='qemu'/> in libvirt XML
+> 
+> Bisect
+> ------
+> We have not yet completed a full git bisect, but the issue does not
+> occur on 6.17.x kernels which lack the VIRTIO_F_IN_ORDER vhost
+> support. We will follow up with a Fixes: tag if we can identify the
+> exact commit.
+> 
+> Suggested Fix Direction
+> -----------------------
+> In handle_rx(), when get_rx_bufs() returns 0 (headcount == 0) due to
+> insufficient buffers (not because the queue is truly empty), the code
+> should break out of the loop rather than relying on
+> vhost_enable_notify() to make that determination. For example, when
+> get_rx_bufs() returns r == 0 with datalen still > 0, this indicates a
+> "packet too large" condition, not a "queue empty" condition, and
+> should be handled differently.
+> 
+> Thanks,
+> ShuangYu
 
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/net-add-rps_tag_ptr-type-and-helpers/20260302-021900
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260301181457.3539105-8-edumazet%40google.com
-patch subject: [PATCH v2 net-next 7/7] net-sysfs: use rps_tag_ptr and remove metadata from rps_dev_flow_table
-config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/20260302/202603020743.NEL0agrx-lkp@intel.com/config)
-compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260302/202603020743.NEL0agrx-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603020743.NEL0agrx-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> net/core/net-sysfs.c:1104:27: error: call to undeclared function 'RPS_DEV_FLOW_TABLE_SIZE'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-    1104 |                 if (mask > (ULONG_MAX - RPS_DEV_FLOW_TABLE_SIZE(1))
-         |                                         ^
-   1 error generated.
+Hmm. On a hunch, does the following help? completely untested,
+it is night here, sorry.
 
 
-vim +/RPS_DEV_FLOW_TABLE_SIZE +1104 net/core/net-sysfs.c
+diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+index 2f2c45d20883..aafae15d5156 100644
+--- a/drivers/vhost/vhost.c
++++ b/drivers/vhost/vhost.c
+@@ -1522,6 +1522,7 @@ static void vhost_dev_unlock_vqs(struct vhost_dev *d)
+ static inline int vhost_get_avail_idx(struct vhost_virtqueue *vq)
+ {
+ 	__virtio16 idx;
++	u16 avail_idx;
+ 	int r;
+ 
+ 	r = vhost_get_avail(vq, idx, &vq->avail->idx);
+@@ -1532,17 +1533,19 @@ static inline int vhost_get_avail_idx(struct vhost_virtqueue *vq)
+ 	}
+ 
+ 	/* Check it isn't doing very strange thing with available indexes */
+-	vq->avail_idx = vhost16_to_cpu(vq, idx);
+-	if (unlikely((u16)(vq->avail_idx - vq->last_avail_idx) > vq->num)) {
++	avail_idx = vhost16_to_cpu(vq, idx);
++	if (unlikely((u16)(avail_idx - vq->last_avail_idx) > vq->num)) {
+ 		vq_err(vq, "Invalid available index change from %u to %u",
+ 		       vq->last_avail_idx, vq->avail_idx);
+ 		return -EINVAL;
+ 	}
+ 
+ 	/* We're done if there is nothing new */
+-	if (vq->avail_idx == vq->last_avail_idx)
++	if (avail_idx == vq->avail_idx)
+ 		return 0;
+ 
++	vq->avail_idx == avail_idx;
++
+ 	/*
+ 	 * We updated vq->avail_idx so we need a memory barrier between
+ 	 * the index read above and the caller reading avail ring entries.
 
-fec5e652e58fa60 Tom Herbert       2010-04-16  1072  
-f5acb907dc24c38 Eric Dumazet      2010-04-19  1073  static ssize_t store_rps_dev_flow_table_cnt(struct netdev_rx_queue *queue,
-fec5e652e58fa60 Tom Herbert       2010-04-16  1074  					    const char *buf, size_t len)
-fec5e652e58fa60 Tom Herbert       2010-04-16  1075  {
-5b629854b594cdb Eric Dumazet      2026-03-01  1076  	struct rps_dev_flow *table;
-5b629854b594cdb Eric Dumazet      2026-03-01  1077  	rps_tag_ptr otag, tag_ptr = 0UL;
-60b778ce5196251 Eric Dumazet      2011-12-24  1078  	unsigned long mask, count;
-5b629854b594cdb Eric Dumazet      2026-03-01  1079  	size_t sz;
-60b778ce5196251 Eric Dumazet      2011-12-24  1080  	int rc;
-fec5e652e58fa60 Tom Herbert       2010-04-16  1081  
-fec5e652e58fa60 Tom Herbert       2010-04-16  1082  	if (!capable(CAP_NET_ADMIN))
-fec5e652e58fa60 Tom Herbert       2010-04-16  1083  		return -EPERM;
-fec5e652e58fa60 Tom Herbert       2010-04-16  1084  
-60b778ce5196251 Eric Dumazet      2011-12-24  1085  	rc = kstrtoul(buf, 0, &count);
-60b778ce5196251 Eric Dumazet      2011-12-24  1086  	if (rc < 0)
-60b778ce5196251 Eric Dumazet      2011-12-24  1087  		return rc;
-fec5e652e58fa60 Tom Herbert       2010-04-16  1088  
-fec5e652e58fa60 Tom Herbert       2010-04-16  1089  	if (count) {
-60b778ce5196251 Eric Dumazet      2011-12-24  1090  		mask = count - 1;
-60b778ce5196251 Eric Dumazet      2011-12-24  1091  		/* mask = roundup_pow_of_two(count) - 1;
-60b778ce5196251 Eric Dumazet      2011-12-24  1092  		 * without overflows...
-60b778ce5196251 Eric Dumazet      2011-12-24  1093  		 */
-60b778ce5196251 Eric Dumazet      2011-12-24  1094  		while ((mask | (mask >> 1)) != mask)
-60b778ce5196251 Eric Dumazet      2011-12-24  1095  			mask |= (mask >> 1);
-60b778ce5196251 Eric Dumazet      2011-12-24  1096  		/* On 64 bit arches, must check mask fits in table->mask (u32),
-8e3bff96afa6736 stephen hemminger 2013-12-08  1097  		 * and on 32bit arches, must check
-8e3bff96afa6736 stephen hemminger 2013-12-08  1098  		 * RPS_DEV_FLOW_TABLE_SIZE(mask + 1) doesn't overflow.
-60b778ce5196251 Eric Dumazet      2011-12-24  1099  		 */
-60b778ce5196251 Eric Dumazet      2011-12-24  1100  #if BITS_PER_LONG > 32
-60b778ce5196251 Eric Dumazet      2011-12-24  1101  		if (mask > (unsigned long)(u32)mask)
-a0a129f8b6cff54 Xi Wang           2011-12-22  1102  			return -EINVAL;
-60b778ce5196251 Eric Dumazet      2011-12-24  1103  #else
-60b778ce5196251 Eric Dumazet      2011-12-24 @1104  		if (mask > (ULONG_MAX - RPS_DEV_FLOW_TABLE_SIZE(1))
-a0a129f8b6cff54 Xi Wang           2011-12-22  1105  				/ sizeof(struct rps_dev_flow)) {
-fec5e652e58fa60 Tom Herbert       2010-04-16  1106  			/* Enforce a limit to prevent overflow */
-fec5e652e58fa60 Tom Herbert       2010-04-16  1107  			return -EINVAL;
-fec5e652e58fa60 Tom Herbert       2010-04-16  1108  		}
-60b778ce5196251 Eric Dumazet      2011-12-24  1109  #endif
-5b629854b594cdb Eric Dumazet      2026-03-01  1110  		sz = max_t(size_t, sizeof(*table) * (mask + 1),
-5b629854b594cdb Eric Dumazet      2026-03-01  1111  			   PAGE_SIZE);
-5b629854b594cdb Eric Dumazet      2026-03-01  1112  		if (sz <= (PAGE_SIZE << PAGE_ALLOC_COSTLY_ORDER) ||
-5b629854b594cdb Eric Dumazet      2026-03-01  1113  		    is_power_of_2(sz))
-5b629854b594cdb Eric Dumazet      2026-03-01  1114  			table = kvmalloc(sz, GFP_KERNEL);
-5b629854b594cdb Eric Dumazet      2026-03-01  1115  		else
-5b629854b594cdb Eric Dumazet      2026-03-01  1116  			table = vmalloc(sz);
-fec5e652e58fa60 Tom Herbert       2010-04-16  1117  		if (!table)
-fec5e652e58fa60 Tom Herbert       2010-04-16  1118  			return -ENOMEM;
-5b629854b594cdb Eric Dumazet      2026-03-01  1119  		tag_ptr = (rps_tag_ptr)table;
-5b629854b594cdb Eric Dumazet      2026-03-01  1120  		if (rps_tag_to_log(tag_ptr)) {
-5b629854b594cdb Eric Dumazet      2026-03-01  1121  			pr_err_once("store_rps_dev_flow_table_cnt() got a non page aligned allocation.\n");
-5b629854b594cdb Eric Dumazet      2026-03-01  1122  			kvfree(table);
-5b629854b594cdb Eric Dumazet      2026-03-01  1123  			return -ENOMEM;
-5b629854b594cdb Eric Dumazet      2026-03-01  1124  		}
-5b629854b594cdb Eric Dumazet      2026-03-01  1125  		tag_ptr |= (ilog2(mask) + 1);
-97bcc5b6f45425a Krishna Kumar     2025-08-25  1126  		for (count = 0; count <= mask; count++) {
-5b629854b594cdb Eric Dumazet      2026-03-01  1127  			table[count].cpu = RPS_NO_CPU;
-5b629854b594cdb Eric Dumazet      2026-03-01  1128  			table[count].filter = RPS_NO_FILTER;
-97bcc5b6f45425a Krishna Kumar     2025-08-25  1129  		}
-6648c65e7ea72c3 stephen hemminger 2017-08-18  1130  	}
-fec5e652e58fa60 Tom Herbert       2010-04-16  1131  
-5b629854b594cdb Eric Dumazet      2026-03-01  1132  	otag = xchg(&queue->rps_flow_table, tag_ptr);
-5b629854b594cdb Eric Dumazet      2026-03-01  1133  	if (otag)
-5b629854b594cdb Eric Dumazet      2026-03-01  1134  		kvfree_rcu_mightsleep(rps_tag_to_table(otag));
-fec5e652e58fa60 Tom Herbert       2010-04-16  1135  
-fec5e652e58fa60 Tom Herbert       2010-04-16  1136  	return len;
-fec5e652e58fa60 Tom Herbert       2010-04-16  1137  }
-fec5e652e58fa60 Tom Herbert       2010-04-16  1138  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
