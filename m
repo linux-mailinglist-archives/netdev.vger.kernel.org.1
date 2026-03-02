@@ -1,450 +1,256 @@
-Return-Path: <netdev+bounces-262782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262783-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iH2TKvTTpWmvHAAAu9opvQ
-	(envelope-from <netdev+bounces-262782-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 19:16:20 +0100
+	id yLF6OBrdpWkvHgAAu9opvQ
+	(envelope-from <netdev+bounces-262783-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 19:55:22 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93AB61DE516
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 19:16:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D2B21DE80A
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 19:55:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 54E7330574A8
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 18:14:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5C0CF300361D
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 18:53:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F35E333CEA9;
-	Mon,  2 Mar 2026 18:14:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4FA93382E8;
+	Mon,  2 Mar 2026 18:53:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JndjNf21"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D0dONb+i";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="aYFm85rY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69951342523
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 18:14:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBFCF3382DC
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 18:53:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772475288; cv=none; b=TlQxICQpC+HHKGQmar99C2fAtcQOdChHHcZvSvrQg/WnA8aPRW9uI3mjCnEAgD5mTJgWhUa1WXP5wQCn6APbxBFHqlqC94VziJ4zAITQsxA0QgcH0EHrlymEaLpHUZ+yyK0W2I1cyyFFs/fKJIYikmIxv0cWSAzOoZtWQitK/Fg=
+	t=1772477597; cv=none; b=FwIlSvib7phwx0sMOVHyiM/1oTSE5/PXR6TuvcQZuKJTJpNmI4PfnSOH+O+vTuT0svIbVpYrYuOzdX7uaknqSNEBrkyR4d80oXazhJqs8mEgdbeNEni+Z6Ti/b92ZWmagOjozyNIucIt5W3DDxVREHq2UqaiPZxdNYoIO9P5OVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772475288; c=relaxed/simple;
-	bh=Df30hmavVzN0/FXA+7BZmHATlvy/QV9+vhhGP6hHNzM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=eYHN4JrgpmrR+zg15I2rxWdvAoAFP/+3VJXGXfXZ3afIDH0ahegLMIDvNZ9lQa7B8HEjThwBwTnAK8t15e8yje4LkBHWjTIXtOfp3OZPO8kt7gminI/7RCKe2FMKD+WaIEUnpUxwUTZ47IaNjR/DtuRzBhQOoiPgxe0ca/BkMOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JndjNf21; arc=none smtp.client-ip=209.85.222.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8cb42f56c4aso3838637085a.3
-        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 10:14:47 -0800 (PST)
+	s=arc-20240116; t=1772477597; c=relaxed/simple;
+	bh=rGb+d3eXV4/WG6UZVYz2+NJz33h47kbcneDn0cpgFpE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OXVusZZBwp2NZ6hmaaKhX5Qe94vWoXbPgSVU8K4UcGGgG+FG7fvgHzYzVRaa7YpyflATgQxH53saMMPfNX5+6aiTB5Y5Rlls9SBvm+kJ/Xn6Yq4U+qfeE8wDhnZ68u6uRKdn4FPfp23OJl8QN2kYInhRh/RDDAgDjNICYK+DSVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D0dONb+i; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=aYFm85rY; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772477594;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=X5Qbo2pQOAmuJWNlaaVNuPWK+hvBjNdcsVen+Csw5XQ=;
+	b=D0dONb+ig5RNKI9F2dqhQ634Qd2ZqPfxsGY89KpUEDlzN9y+aN/ZVk+4f6UmUtv5TrJIPh
+	DyW8yIq6LE+ncCoEpktYLS0zPkqljk6xV4CmwFgrGInT772DDdR9X/1QJPEPS4a/0KXNah
+	34ARXPir4pifKPEd7zx/SE5o15YwJ88=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-612-xw_OwKGeMmWUZ6jRqU9Mig-1; Mon, 02 Mar 2026 13:53:13 -0500
+X-MC-Unique: xw_OwKGeMmWUZ6jRqU9Mig-1
+X-Mimecast-MFC-AGG-ID: xw_OwKGeMmWUZ6jRqU9Mig_1772477592
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-48378df3469so33353495e9.1
+        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 10:53:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772475286; x=1773080086; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yqVaQhTqCJKvnTtt2vzLzPbMU+b0aiqKuCsE82aKmBs=;
-        b=JndjNf21+sUkRZA7NmyNW3lYIIfY7gcG15fLni5k0PI5fjV4LFmKhIKJYdtkc+59Ah
-         jc0RKelA7zai0OGZTFp0SfCBWZd9469ecKRXWnNq48KYIwubc3a52a/GB9oQauVnpcN9
-         22LbwatKUfLnSnhrDbUY/xryrnWNjWA4RSl67sY1z6TR5v4lPnRbfmX6nLO1neU+IdtF
-         /7J9u1o1kP6N8kJ22lG5/CQCJZEfbHgz+/dGBG5Hnc+VyiTYTDEvLuAoK6fOvw+8JPou
-         Z03JQKIAQhDPv3rZ7pr7mIqPdf7i3VinkAsbJLrNok3xwkaSh9yirt7FK5CqfBIN8Mxi
-         p/iQ==
+        d=redhat.com; s=google; t=1772477592; x=1773082392; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=X5Qbo2pQOAmuJWNlaaVNuPWK+hvBjNdcsVen+Csw5XQ=;
+        b=aYFm85rY2FrG2xizcvQRKsz4QRMVa+iXxBkQEMJsQcfg6h1oc5KgABc1ofIuJiMvaY
+         AFfTIU69Q1ILtGh5q8lQ0E13WrOJQYePq00UKiqaBufPpE+Pci1hf7f+vQD9bf2QNMrf
+         xtPplSUly7R20zIhsCKuUtwlJZJfE8MdUysXMwceEL1rsj3/LnS1Euy6xsu6zrZn1Nh0
+         5EbdwE7Sz/lmIzk4Q6b84XwAfGwxncLPr/hWzJOgkSzqsZzNJG+FUJ4EA/O5SU6sePuI
+         dlBzOeUzUDM7eu3gewWFq1akrIl+0D/vmnkOXeX+eePMpx/I7mvgdrTlSy9AuOc6DamT
+         b8cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772475286; x=1773080086;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yqVaQhTqCJKvnTtt2vzLzPbMU+b0aiqKuCsE82aKmBs=;
-        b=In7hs3YRLJ4PFbYd1U6TNps3ItJMtJM5PdsENSYMhA30b9I9lsihsttjjzVCwR9nEe
-         MJ51bTg1gf6F/AEXted4zrIJe3m3exCevSttjp17mYli4OfF6U7OkhcHk5rvG+CpBdVP
-         +ZWRHFMLQyjLvjAVUjUoKlaLsQjc9lZdHfARDWHcclgCSAT9se1qM7tQi0rddVRRTGrm
-         j7aPMo9QdJoVHcMF8ukH39spzdiwbUgSn7yoCkIQLpuioxVTkYQ7y9UtTdVyGyJjvEFf
-         xOL5VdMlMDdXcTI2y5pxF2DQz/DRi/lIt8GmXA2f6JyOh078EBJPAmSurcVvW5jJTkG0
-         qv2A==
-X-Forwarded-Encrypted: i=1; AJvYcCW6EqoEopvvGKm5wdygtlYp2p4ELYP9GWopfXSqztOb8p6SkRZAmJ702E6bEXHLyxa8qk7NACg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYr7CYgXXCBNR1S3oe2BzQIevnYXS+m3UnTnuPIuEqv6MrCFyS
-	WF+WUjo1wvQ9uuH2hpeZL+Gvq1An9SyGLov9mDT22sCjqqswghvQFJ3R0y3pJ6OkQDyFVFj9Q6U
-	rWNPsFw6YiLjnmA==
-X-Received: from qknpa19.prod.google.com ([2002:a05:620a:8313:b0:8cb:3acc:b0cc])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:199f:b0:8b2:e922:5297 with SMTP id af79cd13be357-8cbc8e7e8bamr1555124685a.21.1772475286120;
- Mon, 02 Mar 2026 10:14:46 -0800 (PST)
-Date: Mon,  2 Mar 2026 18:14:32 +0000
-In-Reply-To: <20260302181432.1836150-1-edumazet@google.com>
+        d=1e100.net; s=20230601; t=1772477592; x=1773082392;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X5Qbo2pQOAmuJWNlaaVNuPWK+hvBjNdcsVen+Csw5XQ=;
+        b=iXYTvFZJ4VcfZCLGrwJ/K1JS7AFGyvkwpB/7NS3zaexv6ycVSSxwXvlAulLrCh15wa
+         jgU1FltwjlzGj6c97Tu9/DpzwPvxCSkbmx1us7m4NEnl3STiqnziAgUPXINDGF7tasYp
+         TbTYmwLoYf303mHjlYPDTNIutrIYWS5lhEpSppfLIZMIMzuyaU8jcgy3OnDpmZvuTbGW
+         etuoUBibMeDuAeQ7iH1lBxsd4Ef25Zrpl7T1JtfrF+eHu3ww3YHCoeBe2r8byiICz7Au
+         QuIRgAzqhZjiHK+B1xXQ6cdT98MNDHE/syNhkja9YgvxaHk9yw5U6bpvZZ/udgD+wrtk
+         fveQ==
+X-Gm-Message-State: AOJu0Yy/kmiGhZLUw1WNwJvKcphEdpZR9NeUGLWxd+/jMbk3idF7rs/+
+	A8ZWLGncvsWYbUgfc+G9/AAcBjGDXAWl+Hh4iOpnB+bLaTzAO8gYK/mHh6YQdo0FWBg5rE5dec9
+	qsUtJek9xjH16nzCzuzkIPFOI4I9Vv/7zd+lpNBMvCAULd2S7R+crzrlQrQ==
+X-Gm-Gg: ATEYQzySiAqHEe6V/sFc/vyR9CYoY5SUo+jI3qf/YFPuXN4eMTnZYnseJ0n2/JJ+Wbz
+	ju2hPrlnKA8cic9TV9y0z8HQR8EsoWL2o3Xz6ABaoIOwrh+VgENM6ySKg5m3H8id/j2J5rl4dMr
+	vN6raIIaLcI2sDuU5pDi9pze6ZbL4nnOJFMPsCzzxjOb+y3c6FLShudNeNTI30K5ChaWykqeGmM
+	zf0r1rD1KVP4di74DXDAz6ct+qacfYiSeJuqj88kxRhFn1h8pcoxJS2f/GZ9V/4Te8jhmi/QwAS
+	lEJVvc0sDTwNhcIdC39fhDlVsMmaImrgA05XtPH3EiIvYgmO4gWK77hF0fjKQiZjHZgnjXdn2n/
+	BqOhpTqxskkKjpQzk9cVR6oDYJ5OP9GCKUbQ1Hq/CWm67Tw==
+X-Received: by 2002:a05:600c:820c:b0:479:13e9:3d64 with SMTP id 5b1f17b1804b1-483c9937b2dmr210989095e9.15.1772477592373;
+        Mon, 02 Mar 2026 10:53:12 -0800 (PST)
+X-Received: by 2002:a05:600c:820c:b0:479:13e9:3d64 with SMTP id 5b1f17b1804b1-483c9937b2dmr210988605e9.15.1772477591814;
+        Mon, 02 Mar 2026 10:53:11 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-79-166.inter.net.il. [80.230.79.166])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483c3b44207sm315022535e9.7.2026.03.02.10.53.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Mar 2026 10:53:11 -0800 (PST)
+Date: Mon, 2 Mar 2026 13:53:08 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Bui Quang Minh <minhquangbui99@gmail.com>
+Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] virtio-net: xsk: Support wakeup on RX side
+Message-ID: <20260302135032-mutt-send-email-mst@kernel.org>
+References: <20260302164158.4394-1-minhquangbui99@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260302181432.1836150-1-edumazet@google.com>
-X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260302181432.1836150-8-edumazet@google.com>
-Subject: [PATCH v3 net-next 7/7] net-sysfs: use rps_tag_ptr and remove
- metadata from rps_dev_flow_table
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 93AB61DE516
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260302164158.4394-1-minhquangbui99@gmail.com>
+X-Rspamd-Queue-Id: 4D2B21DE80A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262783-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262782-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Instead of storing the @log at the beginning of rps_dev_flow_table
-use 5 low order bits of the rps_tag_ptr to store the log of the size.
+On Mon, Mar 02, 2026 at 11:41:58PM +0700, Bui Quang Minh wrote:
+> When XDP_USE_NEED_WAKEUP is used and the fill ring is empty so no buffer
+> is allocated on RX side, allow RX NAPI to be descheduled. This avoids
+> wasting CPU cycles on polling. Users will be notified and they need to
+> make a wakeup call after refilling the ring.
+> 
+> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+> ---
+> Changes in v2:
+> - Fix the flag check in virtnet_xsk_wakeup
+> - Link to v1: https://lore.kernel.org/netdev/20260227150949.13089-1-minhquangbui99@gmail.com/
+> ---
+>  drivers/net/virtio_net.c | 35 +++++++++++++++++++++++++++--------
+>  1 file changed, 27 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index db88dcaefb20..3614002fc87c 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -1454,8 +1454,19 @@ static int virtnet_add_recvbuf_xsk(struct virtnet_info *vi, struct receive_queue
+>  	xsk_buffs = rq->xsk_buffs;
+>  
+>  	num = xsk_buff_alloc_batch(pool, xsk_buffs, rq->vq->num_free);
+> -	if (!num)
+> +	if (!num) {
+> +		if (xsk_uses_need_wakeup(pool)) {
+> +			xsk_set_rx_need_wakeup(pool);
+> +			/* Return 0 instead of -ENOMEM so that NAPI is
+> +			 * descheduled.
+> +			 */
+> +			return 0;
 
-This removes a potential cache line miss (for light traffic).
+With this change, try_fill_recv() can return true even though zero RX
+buffers were posted in need_wakeup mode, which contradicts its
+documentation ("Returns false if we couldn't fill entirely (OOM)").
 
-This allows us to switch to one high-order allocation instead of vmalloc()
-when CONFIG_RFS_ACCEL is not set.
+Methinks we need to at least update the comment near try_fill_recv.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/netdev_rx_queue.h |  3 +-
- include/net/rps.h             | 10 -----
- net/core/dev.c                | 53 +++++++++++++++-----------
- net/core/net-sysfs.c          | 70 +++++++++++++++++------------------
- 4 files changed, 67 insertions(+), 69 deletions(-)
 
-diff --git a/include/net/netdev_rx_queue.h b/include/net/netdev_rx_queue.h
-index cfa72c4853876c6fcb84b5c551580d9205f7b29d..08f81329fc11dc86767f9da661be8c7194dc1da2 100644
---- a/include/net/netdev_rx_queue.h
-+++ b/include/net/netdev_rx_queue.h
-@@ -8,13 +8,14 @@
- #include <net/xdp.h>
- #include <net/page_pool/types.h>
- #include <net/netdev_queues.h>
-+#include <net/rps-types.h>
- 
- /* This structure contains an instance of an RX queue. */
- struct netdev_rx_queue {
- 	struct xdp_rxq_info		xdp_rxq;
- #ifdef CONFIG_RPS
- 	struct rps_map __rcu		*rps_map;
--	struct rps_dev_flow_table __rcu	*rps_flow_table;
-+	rps_tag_ptr			rps_flow_table;
- #endif
- 	struct kobject			kobj;
- 	const struct attribute_group	**groups;
-diff --git a/include/net/rps.h b/include/net/rps.h
-index e900480e828b487c721b3ef392f4abb427ad442c..e33c6a2fa8bbca3555ecccbbf9132d01cc433c36 100644
---- a/include/net/rps.h
-+++ b/include/net/rps.h
-@@ -39,16 +39,6 @@ struct rps_dev_flow {
- };
- #define RPS_NO_FILTER 0xffff
- 
--/*
-- * The rps_dev_flow_table structure contains a table of flow mappings.
-- */
--struct rps_dev_flow_table {
--	u8			log;
--	struct rps_dev_flow	flows[];
--};
--#define RPS_DEV_FLOW_TABLE_SIZE(_num) (sizeof(struct rps_dev_flow_table) + \
--    ((_num) * sizeof(struct rps_dev_flow)))
--
- /*
-  * The rps_sock_flow_table contains mappings of flows to the last CPU
-  * on which they were processed by the application (set in recvmsg).
-diff --git a/net/core/dev.c b/net/core/dev.c
-index d4837b058b2ff02e94f9590e310edbcb06dad0f2..053a30a8c0ea4464d3b61c7dde8ad916eeef1c19 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -4968,16 +4968,16 @@ EXPORT_SYMBOL(rps_needed);
- struct static_key_false rfs_needed __read_mostly;
- EXPORT_SYMBOL(rfs_needed);
- 
--static u32 rfs_slot(u32 hash, const struct rps_dev_flow_table *flow_table)
-+static u32 rfs_slot(u32 hash, rps_tag_ptr tag_ptr)
- {
--	return hash_32(hash, flow_table->log);
-+	return hash_32(hash, rps_tag_to_log(tag_ptr));
- }
- 
- #ifdef CONFIG_RFS_ACCEL
- /**
-  * rps_flow_is_active - check whether the flow is recently active.
-  * @rflow: Specific flow to check activity.
-- * @flow_table: per-queue flowtable that @rflow belongs to.
-+ * @log: ilog2(hashsize).
-  * @cpu: CPU saved in @rflow.
-  *
-  * If the CPU has processed many packets since the flow's last activity
-@@ -4986,7 +4986,7 @@ static u32 rfs_slot(u32 hash, const struct rps_dev_flow_table *flow_table)
-  * Return: true if flow was recently active.
-  */
- static bool rps_flow_is_active(struct rps_dev_flow *rflow,
--			       struct rps_dev_flow_table *flow_table,
-+			       u8 log,
- 			       unsigned int cpu)
- {
- 	unsigned int flow_last_active;
-@@ -4999,7 +4999,7 @@ static bool rps_flow_is_active(struct rps_dev_flow *rflow,
- 	flow_last_active = READ_ONCE(rflow->last_qtail);
- 
- 	return (int)(sd_input_head - flow_last_active) <
--		(int)(10 << flow_table->log);
-+		(int)(10 << log);
- }
- #endif
- 
-@@ -5011,9 +5011,10 @@ set_rps_cpu(struct net_device *dev, struct sk_buff *skb,
- 		u32 head;
- #ifdef CONFIG_RFS_ACCEL
- 		struct netdev_rx_queue *rxqueue;
--		struct rps_dev_flow_table *flow_table;
-+		struct rps_dev_flow *flow_table;
- 		struct rps_dev_flow *old_rflow;
- 		struct rps_dev_flow *tmp_rflow;
-+		rps_tag_ptr q_tag_ptr;
- 		unsigned int tmp_cpu;
- 		u16 rxq_index;
- 		u32 flow_id;
-@@ -5028,16 +5029,18 @@ set_rps_cpu(struct net_device *dev, struct sk_buff *skb,
- 			goto out;
- 
- 		rxqueue = dev->_rx + rxq_index;
--		flow_table = rcu_dereference(rxqueue->rps_flow_table);
--		if (!flow_table)
-+		q_tag_ptr = READ_ONCE(rxqueue->rps_flow_table);
-+		if (!q_tag_ptr)
- 			goto out;
- 
--		flow_id = rfs_slot(hash, flow_table);
--		tmp_rflow = &flow_table->flows[flow_id];
-+		flow_id = rfs_slot(hash, q_tag_ptr);
-+		flow_table = rps_tag_to_table(q_tag_ptr);
-+		tmp_rflow = flow_table + flow_id;
- 		tmp_cpu = READ_ONCE(tmp_rflow->cpu);
- 
- 		if (READ_ONCE(tmp_rflow->filter) != RPS_NO_FILTER) {
--			if (rps_flow_is_active(tmp_rflow, flow_table,
-+			if (rps_flow_is_active(tmp_rflow,
-+					       rps_tag_to_log(q_tag_ptr),
- 					       tmp_cpu)) {
- 				if (hash != READ_ONCE(tmp_rflow->hash) ||
- 				    next_cpu == tmp_cpu)
-@@ -5076,8 +5079,7 @@ static int get_rps_cpu(struct net_device *dev, struct sk_buff *skb,
- 		       struct rps_dev_flow **rflowp)
- {
- 	struct netdev_rx_queue *rxqueue = dev->_rx;
--	struct rps_dev_flow_table *flow_table;
--	rps_tag_ptr global_tag_ptr;
-+	rps_tag_ptr global_tag_ptr, q_tag_ptr;
- 	struct rps_map *map;
- 	int cpu = -1;
- 	u32 tcpu;
-@@ -5098,9 +5100,9 @@ static int get_rps_cpu(struct net_device *dev, struct sk_buff *skb,
- 
- 	/* Avoid computing hash if RFS/RPS is not active for this rxqueue */
- 
--	flow_table = rcu_dereference(rxqueue->rps_flow_table);
-+	q_tag_ptr = READ_ONCE(rxqueue->rps_flow_table);
- 	map = rcu_dereference(rxqueue->rps_map);
--	if (!flow_table && !map)
-+	if (!q_tag_ptr && !map)
- 		goto done;
- 
- 	skb_reset_network_header(skb);
-@@ -5109,8 +5111,9 @@ static int get_rps_cpu(struct net_device *dev, struct sk_buff *skb,
- 		goto done;
- 
- 	global_tag_ptr = READ_ONCE(net_hotdata.rps_sock_flow_table);
--	if (flow_table && global_tag_ptr) {
-+	if (q_tag_ptr && global_tag_ptr) {
- 		struct rps_sock_flow_table *sock_flow_table;
-+		struct rps_dev_flow *flow_table;
- 		struct rps_dev_flow *rflow;
- 		u32 next_cpu;
- 		u32 flow_id;
-@@ -5130,7 +5133,9 @@ static int get_rps_cpu(struct net_device *dev, struct sk_buff *skb,
- 		/* OK, now we know there is a match,
- 		 * we can look at the local (per receive queue) flow table
- 		 */
--		rflow = &flow_table->flows[rfs_slot(hash, flow_table)];
-+		flow_id = rfs_slot(hash, q_tag_ptr);
-+		flow_table = rps_tag_to_table(q_tag_ptr);
-+		rflow = flow_table + flow_id;
- 		tcpu = rflow->cpu;
- 
- 		/*
-@@ -5190,19 +5195,23 @@ bool rps_may_expire_flow(struct net_device *dev, u16 rxq_index,
- 			 u32 flow_id, u16 filter_id)
- {
- 	struct netdev_rx_queue *rxqueue = dev->_rx + rxq_index;
--	struct rps_dev_flow_table *flow_table;
-+	struct rps_dev_flow *flow_table;
- 	struct rps_dev_flow *rflow;
-+	rps_tag_ptr q_tag_ptr;
- 	bool expire = true;
-+	u8 log;
- 
- 	rcu_read_lock();
--	flow_table = rcu_dereference(rxqueue->rps_flow_table);
--	if (flow_table && flow_id < (1UL << flow_table->log)) {
-+	q_tag_ptr = READ_ONCE(rxqueue->rps_flow_table);
-+	log = rps_tag_to_log(q_tag_ptr);
-+	if (q_tag_ptr && flow_id < (1UL << log)) {
- 		unsigned int cpu;
- 
--		rflow = &flow_table->flows[flow_id];
-+		flow_table = rps_tag_to_table(q_tag_ptr);
-+		rflow = flow_table + flow_id;
- 		cpu = READ_ONCE(rflow->cpu);
- 		if (READ_ONCE(rflow->filter) == filter_id &&
--		    rps_flow_is_active(rflow, flow_table, cpu))
-+		    rps_flow_is_active(rflow, log, cpu))
- 			expire = false;
- 	}
- 	rcu_read_unlock();
-diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index fd6f81930bc6437957f32206c84db87ee242fede..2ce011fae2490b3bd950cf8d9089e7d71cc0fd7a 100644
---- a/net/core/net-sysfs.c
-+++ b/net/core/net-sysfs.c
-@@ -1060,14 +1060,12 @@ static ssize_t store_rps_map(struct netdev_rx_queue *queue,
- static ssize_t show_rps_dev_flow_table_cnt(struct netdev_rx_queue *queue,
- 					   char *buf)
- {
--	struct rps_dev_flow_table *flow_table;
- 	unsigned long val = 0;
-+	rps_tag_ptr tag_ptr;
- 
--	rcu_read_lock();
--	flow_table = rcu_dereference(queue->rps_flow_table);
--	if (flow_table)
--		val = 1UL << flow_table->log;
--	rcu_read_unlock();
-+	tag_ptr = READ_ONCE(queue->rps_flow_table);
-+	if (tag_ptr)
-+		val = 1UL << rps_tag_to_log(tag_ptr);
- 
- 	return sysfs_emit(buf, "%lu\n", val);
- }
-@@ -1075,8 +1073,10 @@ static ssize_t show_rps_dev_flow_table_cnt(struct netdev_rx_queue *queue,
- static ssize_t store_rps_dev_flow_table_cnt(struct netdev_rx_queue *queue,
- 					    const char *buf, size_t len)
- {
-+	rps_tag_ptr otag, tag_ptr = 0UL;
-+	struct rps_dev_flow *table;
- 	unsigned long mask, count;
--	struct rps_dev_flow_table *table, *old_table;
-+	size_t sz;
- 	int rc;
- 
- 	if (!capable(CAP_NET_ADMIN))
-@@ -1093,38 +1093,36 @@ static ssize_t store_rps_dev_flow_table_cnt(struct netdev_rx_queue *queue,
- 		 */
- 		while ((mask | (mask >> 1)) != mask)
- 			mask |= (mask >> 1);
--		/* On 64 bit arches, must check mask fits in table->mask (u32),
--		 * and on 32bit arches, must check
--		 * RPS_DEV_FLOW_TABLE_SIZE(mask + 1) doesn't overflow.
--		 */
--#if BITS_PER_LONG > 32
--		if (mask > (unsigned long)(u32)mask)
--			return -EINVAL;
--#else
--		if (mask > (ULONG_MAX - RPS_DEV_FLOW_TABLE_SIZE(1))
--				/ sizeof(struct rps_dev_flow)) {
--			/* Enforce a limit to prevent overflow */
-+
-+		/* Do not accept too large tables. */
-+		if (mask > (INT_MAX / sizeof(*table) - 1))
- 			return -EINVAL;
--		}
--#endif
--		table = vmalloc(RPS_DEV_FLOW_TABLE_SIZE(mask + 1));
-+
-+		sz = max_t(size_t, sizeof(*table) * (mask + 1),
-+			   PAGE_SIZE);
-+		if (sz <= (PAGE_SIZE << PAGE_ALLOC_COSTLY_ORDER) ||
-+		    is_power_of_2(sizeof(*table)))
-+			table = kvmalloc(sz, GFP_KERNEL);
-+		else
-+			table = vmalloc(sz);
- 		if (!table)
- 			return -ENOMEM;
--
--		table->log = ilog2(mask) + 1;
-+		tag_ptr = (rps_tag_ptr)table;
-+		if (rps_tag_to_log(tag_ptr)) {
-+			pr_err_once("store_rps_dev_flow_table_cnt() got a non page aligned allocation.\n");
-+			kvfree(table);
-+			return -ENOMEM;
-+		}
-+		tag_ptr |= (ilog2(mask) + 1);
- 		for (count = 0; count <= mask; count++) {
--			table->flows[count].cpu = RPS_NO_CPU;
--			table->flows[count].filter = RPS_NO_FILTER;
-+			table[count].cpu = RPS_NO_CPU;
-+			table[count].filter = RPS_NO_FILTER;
- 		}
--	} else {
--		table = NULL;
- 	}
- 
--	old_table = unrcu_pointer(xchg(&queue->rps_flow_table,
--				       RCU_INITIALIZER(table)));
--
--	if (old_table)
--		kvfree_rcu_mightsleep(old_table);
-+	otag = xchg(&queue->rps_flow_table, tag_ptr);
-+	if (otag)
-+		kvfree_rcu_mightsleep(rps_tag_to_table(otag));
- 
- 	return len;
- }
-@@ -1150,7 +1148,7 @@ static void rx_queue_release(struct kobject *kobj)
- {
- 	struct netdev_rx_queue *queue = to_rx_queue(kobj);
- #ifdef CONFIG_RPS
--	struct rps_dev_flow_table *old_table;
-+	rps_tag_ptr tag_ptr;
- 	struct rps_map *map;
- 
- 	map = rcu_dereference_protected(queue->rps_map, 1);
-@@ -1159,9 +1157,9 @@ static void rx_queue_release(struct kobject *kobj)
- 		kfree_rcu(map, rcu);
- 	}
- 
--	old_table = unrcu_pointer(xchg(&queue->rps_flow_table, NULL));
--	if (old_table)
--		kvfree_rcu_mightsleep(old_table);
-+	tag_ptr = xchg(&queue->rps_flow_table, 0UL);
-+	if (tag_ptr)
-+		kvfree_rcu_mightsleep(rps_tag_to_table(tag_ptr));
- #endif
- 
- 	memset(kobj, 0, sizeof(*kobj));
--- 
-2.53.0.473.g4a7958ca14-goog
+
+> +		}
+> +
+>  		return -ENOMEM;
+> +	} else {
+> +		xsk_clear_rx_need_wakeup(pool);
+> +	}
+>  
+>  	len = xsk_pool_get_rx_frame_size(pool) + vi->hdr_len;
+>  
+> @@ -1588,20 +1599,19 @@ static bool virtnet_xsk_xmit(struct send_queue *sq, struct xsk_buff_pool *pool,
+>  	return sent;
+>  }
+>  
+> -static void xsk_wakeup(struct send_queue *sq)
+> +static void xsk_wakeup(struct napi_struct *napi, struct virtqueue *vq)
+>  {
+> -	if (napi_if_scheduled_mark_missed(&sq->napi))
+> +	if (napi_if_scheduled_mark_missed(napi))
+>  		return;
+>  
+>  	local_bh_disable();
+> -	virtqueue_napi_schedule(&sq->napi, sq->vq);
+> +	virtqueue_napi_schedule(napi, vq);
+>  	local_bh_enable();
+>  }
+>  
+>  static int virtnet_xsk_wakeup(struct net_device *dev, u32 qid, u32 flag)
+>  {
+>  	struct virtnet_info *vi = netdev_priv(dev);
+> -	struct send_queue *sq;
+>  
+>  	if (!netif_running(dev))
+>  		return -ENETDOWN;
+> @@ -1609,9 +1619,18 @@ static int virtnet_xsk_wakeup(struct net_device *dev, u32 qid, u32 flag)
+>  	if (qid >= vi->curr_queue_pairs)
+>  		return -EINVAL;
+>  
+> -	sq = &vi->sq[qid];
+> +	if (flag & XDP_WAKEUP_TX) {
+> +		struct send_queue *sq = &vi->sq[qid];
+> +
+> +		xsk_wakeup(&sq->napi, sq->vq);
+> +	}
+> +
+> +	if (flag & XDP_WAKEUP_RX) {
+> +		struct receive_queue *rq = &vi->rq[qid];
+> +
+> +		xsk_wakeup(&rq->napi, rq->vq);
+> +	}
+>  
+> -	xsk_wakeup(sq);
+>  	return 0;
+>  }
+>  
+> @@ -1623,7 +1642,7 @@ static void virtnet_xsk_completed(struct send_queue *sq, int num)
+>  	 * wakeup the tx napi to consume the xsk tx queue, because the tx
+>  	 * interrupt may not be triggered.
+>  	 */
+> -	xsk_wakeup(sq);
+> +	xsk_wakeup(&sq->napi, sq->vq);
+>  }
+>  
+>  static int __virtnet_xdp_xmit_one(struct virtnet_info *vi,
+> -- 
+> 2.43.0
 
 
