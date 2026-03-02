@@ -1,192 +1,204 @@
-Return-Path: <netdev+bounces-262715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262716-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uNJGFXiypWlMEgAAu9opvQ
-	(envelope-from <netdev+bounces-262715-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:53:28 +0100
+	id dBYTLfOypWlaEgAAu9opvQ
+	(envelope-from <netdev+bounces-262716-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:55:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A13501DC341
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:53:27 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3022B1DC3C0
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:55:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D802830859E7
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 15:49:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 871D03054BA4
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 15:52:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30C88411603;
-	Mon,  2 Mar 2026 15:49:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A35474014A7;
+	Mon,  2 Mar 2026 15:52:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="uj9wYsAM"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="LJIiS86N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010004.outbound.protection.outlook.com [52.101.56.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6343E0C49
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 15:49:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772466550; cv=none; b=jiPM1UlASnsdxJcoW71ICvl0Kuec7opK7c1O+X5jyKDEWSTjulAyHiaSbRydDHOxjUnry16vKg4Ua0UqevpSOEgzkr0OAFsMD2e+t8WKL9p2pDrTxqq6IPWmZqc96NCgOzifjHdkuWJjbNNebcphKhyX2nI2tfQtrf0bnWAXeWA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772466550; c=relaxed/simple;
-	bh=GmZVrQsPKyO0mE+7f3nSOvSJIW9k/uVI5rYijR2wkjw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MhT0MMEn6zvBoQjxp5BnMHtswSY0Xf48efgKJI8ImvgIt6e7WF/qZBTjwaGGArBDT0OoplKt1NaCbRJLktW4BX6EgeB3zyJtD+T6ta/n7+WD690DacVsDBhhNW2mEjRuO9NSW/C1uHN/G/vctuDaEV5BUM4gbQR9x3yCCnKhpdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=uj9wYsAM; arc=none smtp.client-ip=74.125.82.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-1275750cf9cso3579821c88.0
-        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 07:49:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1772466547; x=1773071347; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hKcLgp4ecTYImMNgqgWm4N1laI6U5+FQMPbSa6L123Q=;
-        b=uj9wYsAMTqN4Orqw1jAf0xMIBj/akw7Kueq6HOwpTdyvUcSDLQ6Ao5U6WcDy0T15BW
-         kMQ28DwarlYMF+PkuI2ITSxkxyi6+3n8B+ePLFfCvvmM0ORywI80MgV3rNuc9NhKibGt
-         eVknKfjkd5Ciz8m051nWFI65NBh2NXkZqV+nEIeAkf52ftrjLMr4MSzpM+6y29noRj4q
-         5HcZm3qQbWI0ig24BfyzmixGYCm/usuzbjNq0FAUrgUZvqFV8xyXrm4PE7nl2te6bIM7
-         8Sa/J2PndioGfHmROC/M1eopLDZeLxMvcdjWNdWJ5LRU3paCXqyHVVWRogYqy2s75wu8
-         SRvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772466547; x=1773071347;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hKcLgp4ecTYImMNgqgWm4N1laI6U5+FQMPbSa6L123Q=;
-        b=rR0JwpbXaqJt5PXOKVgVMpfRgCKKMgLJ3wxp6iSKeTyraDIAi2O7aS/6J5d1zxqUQ5
-         lZqr77YIwAswIHidpizA8/OnErBLfogknPu3VPG1RYkgMdvxDN7QeP/2HbJ5VgNERcjr
-         5V3dSh94uv8yTFsm289o20ZatfWhutk/W8RiETCr5P4d3h3Dzxm3xr9jNgQUL1tggkhY
-         rkGcj/y1lPukqtXq60N25yXJoqR0pDC3wzt91L0LQL3XGFNKThBbyMrxDEGFWvmhbl45
-         dn09iQlLyokN0HyqjJJDC4UI/mGFt+S0D4i9L52I+dnUyuBEVNkPVzR0vLqHs/Vdx+OE
-         itKg==
-X-Gm-Message-State: AOJu0YxnTKoKUgJhFSCYDD7ysowtMycwjDwSwRCH7we2zHqk+vd2LF++
-	pWF/27LdWS1tKzWqqQ2ekWhME7MJhlL797BJnYESxSZ9W2dh4rniWADeFpukf2vRgv0=
-X-Gm-Gg: ATEYQzzcgvTpj4ELm42mP5T60mktj2jFLIwK/ZYW56/dsBSivsAp7EsHlMR3guk3Tyx
-	2cEq4Nam+YphhCX1+0Mi+iUMlVOnbIgs9Z8pX9NvqBxSerHq0FUDMsFKs9/hjzwAB8EwsTZtfMo
-	Gv0o+9K7CGEQHzku7Hwpp5LEPaUEt71nXdDnQwheMdvLkqgx26Blg0tCDiS1quhLpqRfQsIpz+T
-	hC3EnoCw9mN6bqUFesh4UF7D4VszbhYLtHZwmodM9CnU04cEUXl10ygmnkmWXrwafz6y2Osep/H
-	amwGHXzu5bp2oSDza3g7/KSvlvUArnRWD6fQ/5xFcEh0ObyFIeZCK7u80l2OFZOL2n7uIiBBHIw
-	pyCnhYVOL/lrTtZCTQbGJgYzlXQbDJR6R0+Z8t29dB7Zs6U3KbuwzDak0HvQhMju2clEEyu+CVs
-	Wn1ooZe+H7DHEs0sYoBtJ2HZV8ODfmI5bvTF/zyUqcjwWxgK6n4eq5vCjxb3ta29O0nc3ZiCSp6
-	42gt0/sGh+lRylKTcMOuA==
-X-Received: by 2002:a05:7022:f83:b0:127:366c:8727 with SMTP id a92af1059eb24-1278fc915a9mr4984202c88.40.1772466546711;
-        Mon, 02 Mar 2026 07:49:06 -0800 (PST)
-Received: from ?IPV6:2a03:83e0:1156:1:c8f:b917:4342:fa09? ([2620:10d:c090:500::badb])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12789a32dabsm16392875c88.11.2026.03.02.07.49.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Mar 2026 07:49:06 -0800 (PST)
-Message-ID: <8489fcbf-ab76-48a9-a21f-d7f6873b9a2f@davidwei.uk>
-Date: Mon, 2 Mar 2026 07:49:01 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 503FDA59;
+	Mon,  2 Mar 2026 15:52:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.4
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772466775; cv=fail; b=MvOd/S6FUwX2wiKdRmqUDGeugr+lzHZM4zKhsZiqmYT7MBJg4YYQ2jN78c7EsRaSjR9h1uh3jGFQBiBkPUKSXWMV7tr9TDSEomeWLHSRbM7OZ5uZqx/WQQJy+QdgqwI4Hzcvv5+qwazzZFGGUCOpLSPCUstqfBiIan70ALYLy3g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772466775; c=relaxed/simple;
+	bh=rcu2N2OwXhg1Z1tKe9dpL+3xCH0r8chgmFvxeEQ05/E=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=B1pPh8/h+t8xTkvQQO86ObSvdqMfAUv+75wCV915p1dvXlSDjJ+NeGbx7Xh59c2WZ0gmBxj9ZdQiK+8mXHHbbftpQegcach2SVmF7yyBvIGNYKqhz8AMxzSZLa01Hm1fdNh4OHGTlVj1LSUm4mBA8eMrfSZVzZmPgJD7HYd1NqA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=LJIiS86N; arc=fail smtp.client-ip=52.101.56.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=X7KCKIQyJukvJY5w7FR07/+5pQN8/CjGA3phsi3ah4vji6K7mp8OkgwgMkXdKszib9n6T9bW1KcHiccSFVujA0VWrC7Wl69E5TJqI4y/5us6WE45RqjqdFjZMWPYNiw9N+r68Sw0/8/R0F0OMH+YzqX4Eit1TsJBiVh3Hc948jXjUqoXoXezGehPDWH7qEs+ICJK7B9doQj5fuvU1R+7uMumML0mcXAOxxsQAjlEYdvMBAuv3ADxrOYCziJEOL0YFcpfU9Vp0iJGytSA6dmw2YI97qU/EBVtzKADkbSvl/OUxQI0Itq8B++H/ma0HhmGP5Ul7V3GvwtfQvvlujg1Tw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GAR490Vxj8oXnWGubPvDRiOyIgmBT46gp9GpXKPlM0Q=;
+ b=BBWhZ4hDvGVmD446Ek4Z6m5sa1NvFbuFaMtDFLEc67nKejM6mDBgjVJGQa4Is+AfWfiFisW31JQOPSx1i4loFZHCvvDXz953ON0gqkoAIVdIjVi5kHCDGABDrrDP5ytynGVeLtl97pkPqUJLBCWK5I1Tv2ehu6uNeGNIaSEXbl+iZLKXmZAbZ/yDQx73OwmisIj5BvEeCfKDB21PAjcVwaqxNf0Iq5e+bSjo9wn2DWTZ69HCRjfrdnXclzOJvJE33VN9LdROqvY8PG5jivVyqb3L5eTQG7zqp4iqdf3YeLlUWhGsDYpGAE6D8eilObNkdrK+L2Tx/jykS3TUCLneKw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GAR490Vxj8oXnWGubPvDRiOyIgmBT46gp9GpXKPlM0Q=;
+ b=LJIiS86NbZo47wJpFLGqDgz4JI3rdM2oLgN+emc7JcWYHxvYvg0So23tL5qOGywPxys39jph9ovcom/6WXB8QGeJQyht+l6VMczL9aWXnYg/QIQI0BSmH8aQKbmLsHWTgCFUpG7pSKMlNcfzYM/GejYEQ9DPZsV86oM4mkNpRankyV7ElyWCwyGijJcweD28BCR6PJG9GWiZle3eaPSv7/bU60ODhEqFcbLeRQB99jwvYDi2W6cZ3HJBeA5KDU37JEwlhAtiANSHD8HiYDnI7pDltwIDv0OaJatw7RXFI8V9Xlnens+2VvdxgKvZvknhXvZ22aN1LpMA5mC36wRfAA==
+Received: from SJ0PR05CA0017.namprd05.prod.outlook.com (2603:10b6:a03:33b::22)
+ by BL1PR12MB5825.namprd12.prod.outlook.com (2603:10b6:208:394::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.20; Mon, 2 Mar
+ 2026 15:52:47 +0000
+Received: from MWH0EPF000C6189.namprd02.prod.outlook.com
+ (2603:10b6:a03:33b:cafe::de) by SJ0PR05CA0017.outlook.office365.com
+ (2603:10b6:a03:33b::22) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9654.16 via Frontend Transport; Mon,
+ 2 Mar 2026 15:52:44 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ MWH0EPF000C6189.mail.protection.outlook.com (10.167.249.121) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9654.16 via Frontend Transport; Mon, 2 Mar 2026 15:52:46 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 2 Mar
+ 2026 07:52:25 -0800
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 2 Mar
+ 2026 07:52:24 -0800
+Received: from vdi.nvidia.com (10.127.8.13) by mail.nvidia.com (10.129.68.10)
+ with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Mon, 2 Mar
+ 2026 07:52:22 -0800
+From: Chiara Meiohas <cmeiohas@nvidia.com>
+To: <leon@kernel.org>, <dsahern@gmail.com>, <stephen@networkplumber.org>
+CC: <michaelgur@nvidia.com>, <jgg@nvidia.com>, <linux-rdma@vger.kernel.org>,
+	<netdev@vger.kernel.org>, Chiara Meiohas <cmeiohas@nvidia.com>
+Subject: [PATCH iproute2-next 0/4] Introduce FRMR pools 
+Date: Mon, 2 Mar 2026 17:51:56 +0200
+Message-ID: <20260302155200.2611098-1-cmeiohas@nvidia.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/3] selftests: drv-net: iou-zcrx: wait for
- memory provider cleanup
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, jdamato@fastly.com,
- asml.silence@gmail.com, io-uring@vger.kernel.org, shuah@kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20260227171305.2848240-1-kuba@kernel.org>
- <20260227171305.2848240-2-kuba@kernel.org>
-Content-Language: en-US
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20260227171305.2848240-2-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: A13501DC341
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MWH0EPF000C6189:EE_|BL1PR12MB5825:EE_
+X-MS-Office365-Filtering-Correlation-Id: b955f161-de2e-4132-ff54-08de7873bf8e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|1800799024|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	bqZvCe4DCvCyf9U/TgBqVKfI7jXgJ6XkIlT5DyrjQdK3VT+rGEUMt2sumcCM5rB+EJuYFQiYSkg7OUS4d2+EsSIRYMZf3NP3tj8Kfbb0ULvgCBXZLB8XoAdPA9f2sJY8RuAAPm0TjZPryEIDbjONpUNDAepFcue6A1lfFP4nJqXeXiKagQcQw5xzg/vweHMbGivsjL/sJrISvMan1QhUwn4JhnL0laJi1GeUyJ8sttcNkTDXo3JnVL9jF8x1f4stl307DphWCYpXS+N044bPah2snHJtqKjmYP5rWPdr6pE5k0ifwDenHm51+2x54uSnSyMzIc/y3eqVOoqc85CKJ+Nt8WmZMpFXGyJ8CsisCbO62c1UKQMEN881eAd3lwAaKWRiIha3j+KpgslZZ0G3oKCXQquWaEnrrVSpdPxbH+J8CG8lKUqEYTzlwsUdWDcfYJWjoluKhbZhfylxsBRLprw21Nl9GiGTP02zx/PYdOAWKik37Y90/P2bDMCcKC4qCLGhuH8ndueKCUkgrWI5O0z8mkx3ophJ3KQ43qxgAY9LW2txs72XpC5PbkPV9p5MMkrsdfKQm83dBeynwXXomnR1l7Z/UTHnTomNa/yNcu/z0faO84XOQ73LoLlzWmY32H350PnD32U30G7v4INhktweEeFgwxn3nNzZlWyu0G2wfY/PvIyTaraTOB7m8+IEEOI7u9lLG3ABYUiddJYgrufgn8P+/3lCNv503DRBq1Zgvg/Qp8yEZgLQrVKg8bQ5BpY+F5KyOCyvAS87d7t5lwZaJDf9gNqQXvSoTASGB2Ocr6dsHZLmx0lIQKT7jyxHQbAOb9Bs7eYCyReAlUtPWg==
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	cr17PhNWMUV5W5J/CUUj0GvGO3W1VJNNWlK4KhzbvtjohVq46dSZxqrj/5GKQG6ljKVMEOcLXKo2FFmxdShPTxdn8kbeze/so/Y54ICxJ7NIggp+EQutbYUZQjsLXMOlrn6yBf+Cc164VA2xydEnTUjQS2K88vvw41+rs08VWCefueDU33qrBhVDw2fyKiqH5zYzUmKlsXLLOoFjjvx45FXYOC7yD1JMuTY8leiOw0qb/xWad6y4H8niFoFpzkt155txxwVEoqn3bFt6aUu2FdeTxsNhcYvB7u07qiBGY4j8YulxfbwLz0L9QYmJJglnnjkoeqOwubDSG4FMzPywwVG96ndDMxKPAYtMteECg9cP1DLZeOTizKab+hwEDwmK6p/Chv8MbllWxqEE5TPF/7CP1oJzSmoM0tfLZqLASG36DgoYrEFr2hZpkUGahR0p
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Mar 2026 15:52:46.2578
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b955f161-de2e-4132-ff54-08de7873bf8e
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MWH0EPF000C6189.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5825
+X-Rspamd-Queue-Id: 3022B1DC3C0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[davidwei-uk.20230601.gappssmtp.com:s=20230601];
+X-Spamd-Result: default: False [1.84 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	SUBJECT_ENDS_SPACES(0.50)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262715-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[davidwei.uk];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,fastly.com,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[davidwei-uk.20230601.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262716-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[kernel.org,gmail.com,networkplumber.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dw@davidwei.uk,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[cmeiohas@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,Nvidia.com:dkim,nvidia.com:mid];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-0.997];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[davidwei-uk.20230601.gappssmtp.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,fastly.com:email,davidwei.uk:mid,davidwei.uk:email,lib.py:url]
+	RCVD_COUNT_SEVEN(0.00)[9]
 X-Rspamd-Action: no action
 
-On 2026-02-27 09:13, Jakub Kicinski wrote:
-> io_uring defers zcrx context teardown to the iou_exit workqueue.
-> 
->    # ps aux | grep iou
->    ...    07:58   0:00 [kworker/u19:0-iou_exit]
->    ... 07:58   0:00 [kworker/u18:2-iou_exit]
-> 
-> When the test's receiver process exits, bkg() returns but the memory
-> provider may still be attached to the rx queue. The subsequent defer()
-> that restores tcp-data-split then fails:
-> 
->    # Exception while handling defer / cleanup (callback 3 of 3)!
->    # Defer Exception| net.ynl.pyynl.lib.ynl.NlError:
->        Netlink error: can't disable tcp-data-split while device has
->                       memory provider enabled: Invalid argument
->    not ok 1 iou-zcrx.test_zcrx.single
-> 
-> Add a helper that polls netdev queue-get until no rx queue reports
-> the io-uring memory provider attribute. Register it as a defer()
-> just before tcp-data-split is restored as a "barrier".
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: shuah@kernel.org
-> CC: dw@davidwei.uk
-> CC: jdamato@fastly.com
-> CC: linux-kselftest@vger.kernel.org
-> ---
->   .../selftests/drivers/net/hw/iou-zcrx.py       | 18 +++++++++++++++++-
->   1 file changed, 17 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-> index c63d6d6450d2..c27c2064701d 100755
-> --- a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-> +++ b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-> @@ -2,14 +2,27 @@
->   # SPDX-License-Identifier: GPL-2.0
->   
->   import re
-> +import time
->   from os import path
->   from lib.py import ksft_run, ksft_exit, KsftSkipEx, ksft_variants, KsftNamedVariant
->   from lib.py import NetDrvEpEnv
->   from lib.py import bkg, cmd, defer, ethtool, rand_port, wait_port_listen
-> -from lib.py import EthtoolFamily
-> +from lib.py import EthtoolFamily, NetdevFamily
->   
->   SKIP_CODE = 42
->   
-> +
-> +def mp_clear_wait(cfg):
-> +    """Wait for io_uring memory providers to clear from all device queues."""
-> +    deadline = time.time() + 5
+From Michael:
 
-This is potentially a very long time to wait if code is buggy, as I
-found out when debugging netkit queue lease. How about reducing this to
-say 1 second?
+This series adds support for managing Fast Registration Memory Region
+(FRMR) pools in rdma tool, enabling users to monitor and configure FRMR
+pool behavior.
+
+FRMR pools are used to cache and reuse Fast Registration Memory Region
+handles to improve performance by avoiding the overhead of repeated
+memory region creation and destruction. This series introduces commands
+to view FRMR pool statistics and configure pool parameters such as
+aging time and pinned handle count.
+
+The 'show' command allows users to display FRMR pools created on
+devices, their properties, and usage statistics. Each pool is identified
+by a unique key (hex-encoded properties) for easy reference in
+subsequent operations.
+
+The aging 'set' command allows users to modify the aging time parameter,
+which controls how long unused FRMR handles remain in the pool before
+being released.
+
+The pinned 'set' command allows users to configure the number of pinned
+handles in a pool. Pinned handles are exempt from aging and remain
+permanently available for reuse, which is useful for workloads with
+predictable memory region usage patterns.
+
+Command usage and examples are included in the commits and man pages.
+
+Michael Guralnik (4):
+  rdma: Update headers
+  rdma: Add resource FRMR pools show command
+  rdma: Add FRMR pools set aging command
+  rdma: Add FRMR pools set pinned command
+
+ man/man8/rdma-resource.8              |  51 +++-
+ rdma/Makefile                         |   2 +-
+ rdma/include/uapi/rdma/rdma_netlink.h |  22 ++
+ rdma/res-frmr-pools.c                 | 342 ++++++++++++++++++++++++++
+ rdma/res.c                            |  19 +-
+ rdma/res.h                            |  20 ++
+ 6 files changed, 453 insertions(+), 3 deletions(-)
+ create mode 100644 rdma/res-frmr-pools.c
+
+-- 
+2.38.1
+
 
