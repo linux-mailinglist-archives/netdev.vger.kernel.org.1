@@ -1,226 +1,259 @@
-Return-Path: <netdev+bounces-262552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262553-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WEcnG2dGpWkg7AUAu9opvQ
-	(envelope-from <netdev+bounces-262552-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 09:12:23 +0100
+	id mIfWMf9HpWk87wUAu9opvQ
+	(envelope-from <netdev+bounces-262553-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 09:19:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C7B71D479C
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 09:12:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74ABE1D48DD
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 09:19:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7349830066B0
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 08:12:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E9C71300F9D4
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 08:19:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50357379EE0;
-	Mon,  2 Mar 2026 08:12:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DECE331203;
+	Mon,  2 Mar 2026 08:19:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="X+7PA92T"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VtcHjAcd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D994334C1D
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 08:12:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7368B430BA2;
+	Mon,  2 Mar 2026 08:19:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772439139; cv=none; b=tMmnnq/QtiSxepjc+aCCGRSt3kbaueTGIsFvYtzhhOomodP9qFUq4cKp6JUmKQucSkdHanT4iJ0CMss//b1TLHqhign7uL9RI9d9mCMHdx0prGfWxiW3vMOflNWh/E9/vz/OoPk5GJDzfKy+Evs/ujWQMwRR6ue5e8xMEGC2ZtU=
+	t=1772439545; cv=none; b=uoG02ZI+c72RhpjMz0Mkjz83Ua2E5zloUxHX6u/McGqeedrlMLlJFZGo9qizZwt8vonda/0yOjzd6pstW5p31xt9+Azc0IbmLHY3qQoIfkCMJimt4+XMt6x6wePn1eFuJhaBnY7k7dnAO3aUVN4zsUVx8x28hBDQUibGrcH03O0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772439139; c=relaxed/simple;
-	bh=X77En7xbeHjFDrS+w4CWnvDLXPc8ARQ1VrLC49Cx6C8=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m5wdqasgkRVc71POMwzYWvb4nHN2yKKmtVsn8G29QUyabQNHsNy8H9giKgp8hJ/MVP2Ps09esvJqabh6UJvyvoUZqtP8LME7LzTSCRixNyKqxw57GDRDLCCYr3lEWsLTThi3VjlvewPGZAFYwwditDNaR3F+jfNvcgW7+gInt+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=X+7PA92T; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 76689207AC;
-	Mon,  2 Mar 2026 09:12:08 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kDiy8e5Fro0m; Mon,  2 Mar 2026 09:12:07 +0100 (CET)
-Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 53B092053D;
-	Mon,  2 Mar 2026 09:12:07 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 53B092053D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1772439127;
-	bh=e49YRe/j876GJh/yjOn6GVk655K45hW0/aQ+jFAZzXg=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=X+7PA92TgClY5bLyQVfcRkE0ckNQwcnWjAOJZ7qZVXDRDF+DDNcji4EkAahfq3ToR
-	 dCwLvPrLqNQVugos/jYlAcj1qFiQGryQgcb6lBHZhqmLcUs6ORohMsdl9sdWMHCe89
-	 omTKvhEloc+St1TrgMT0ljfqfYATNdObKpoOFXojpLyA8NCpfmvf3nURGHyjerHjE9
-	 muMKjdnrvPAOvO05GVfnPOnWG0mVCtJfIpdPhXMVae63FTzLF+robRPRFbW0TlsGIc
-	 TmgtlivdligoKcX6le7j0j5tlkQUhaSOBectar97zsbSWljyhRWbJuIaC1tFSNOYZu
-	 GitCOa232xkwQ==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 2 Mar
- 2026 09:12:06 +0100
-Received: (nullmailer pid 2830039 invoked by uid 1000);
-	Mon, 02 Mar 2026 08:12:05 -0000
-Date: Mon, 2 Mar 2026 09:12:05 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Hao Long <me@imlonghao.com>, Christian Hopps <chopps@labn.net>
-CC: netdev <netdev@vger.kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [BUG] Kernel Panic in iptfs_reassem_cont when handling large
- packets
-Message-ID: <aaVGVTelUZ9gFhkT@secunet.com>
-References: <DGRCO9SL0T5U.JTINSHJQ9KPK@imlonghao.com>
+	s=arc-20240116; t=1772439545; c=relaxed/simple;
+	bh=WmUymOIJMfyfhcBz2h3rfkkfmDcPbAvC1z+3AaqwZ0g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qsjhumQiL1xvt0k7jILd+XOFUPEtAsTvi3Udp6k8izk+jolHMdXtTAv/VmmTzFrBoJLrqums7GB62UHlj/vHyYmNoBod+m7oeEosDOPQ7KCjxFi1LKpbNpUYtNwygsCuLTbsLYBwlOeDnk6GB+Oe8rANwRjOR3eiY0SqJZ0XLNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VtcHjAcd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A42C3C19423;
+	Mon,  2 Mar 2026 08:18:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772439545;
+	bh=WmUymOIJMfyfhcBz2h3rfkkfmDcPbAvC1z+3AaqwZ0g=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=VtcHjAcdNUspXks9MnWnffCAOqhBHNybP+7Ni7w8KdFY/trDOnhcMQKmf8ZqBAo9v
+	 2oPq6TzzmlTs/C9RNRmZ/bhgByD+u1nfj6UxwxomjOQCu2sY9HuCtu0I3smP44soG1
+	 z3JiHjnOWXVROlMpnAOszR6Llw0KBEFBuQA/dpMNDX95fR6stQpR5WnTZjAG5K+8C3
+	 J8dr/QWrvH7T+g/mBKT5sBlBT5fQFIHiyIyYAdI/Wil4qScmZd5DeCh046NcNpwp9+
+	 rTrW2LUZVcITpNBX5owhZeWoh57rxakj8ZFLJUaCvflED3tgx9mlEtXGwa4FzT086v
+	 UCdEEMmXLFPAA==
+Message-ID: <8a27e9ac-2025-4724-a46d-0a7c90894ba7@kernel.org>
+Date: Mon, 2 Mar 2026 09:18:45 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <DGRCO9SL0T5U.JTINSHJQ9KPK@imlonghao.com>
-X-ClientProxiedBy: EXCH-04.secunet.de (10.32.0.184) To EXCH-01.secunet.de
- (10.32.0.171)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 02/16] mm/memory: remove "zap_details" parameter from
+ zap_page_range_single()
+To: Alice Ryhl <aliceryhl@google.com>
+Cc: linux-kernel@vger.kernel.org, "linux-mm @ kvack . org"
+ <linux-mm@kvack.org>, Andrew Morton <akpm@linux-foundation.org>,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Vlastimil Babka <vbabka@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+ Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
+ Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>,
+ David Rientjes <rientjes@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Jarkko Sakkinen <jarkko@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ =?UTF-8?Q?Arve_Hj=C3=B8nnev=C3=A5g?= <arve@android.com>,
+ Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>,
+ Carlos Llamas <cmllamas@google.com>, Ian Abbott <abbotti@mev.co.uk>,
+ H Hartley Sweeten <hsweeten@visionengravers.com>,
+ Jani Nikula <jani.nikula@linux.intel.com>,
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin
+ <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Leon Romanovsky <leon@kernel.org>,
+ Dimitri Sivanich <dimitri.sivanich@hpe.com>, Arnd Bergmann <arnd@arndb.de>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Andy Lutomirski <luto@kernel.org>,
+ Vincenzo Frascino <vincenzo.frascino@arm.com>,
+ Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Miguel Ojeda <ojeda@kernel.org>, linuxppc-dev@lists.ozlabs.org,
+ kvm@vger.kernel.org, linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org,
+ intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+ linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, x86@kernel.org
+References: <20260227200848.114019-1-david@kernel.org>
+ <20260227200848.114019-3-david@kernel.org> <aaLh2BxSgC9Jl5iS@google.com>
+From: "David Hildenbrand (Arm)" <david@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=david@kernel.org; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <aaLh2BxSgC9Jl5iS@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,secunet.com:mid,secunet.com:dkim];
-	TAGGED_FROM(0.00)[bounces-262552-lists,netdev=lfdr.de];
-	TO_DN_ALL(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kvack.org,linux-foundation.org,oracle.com,kernel.org,google.com,suse.com,suse.de,linux.dev,infradead.org,linux.ibm.com,ellerman.id.au,redhat.com,alien8.de,linuxfoundation.org,android.com,mev.co.uk,visionengravers.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,ziepe.ca,hpe.com,arndb.de,iogearbox.net,arm.com,davemloft.net,lists.ozlabs.org,lists.freedesktop.org];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[secunet.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262553-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[73];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[david@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 0C7B71D479C
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 74ABE1D48DD
 X-Rspamd-Action: no action
 
-Add Chris, the author of IPTFS, to the Cc.
+On 2/28/26 13:38, Alice Ryhl wrote:
+> On Fri, Feb 27, 2026 at 09:08:33PM +0100, David Hildenbrand (Arm) wrote:
+>> Nobody except memory.c should really set that parameter to non-NULL. So
+>> let's just drop it and make unmap_mapping_range_vma() use
+>> zap_page_range_single_batched() instead.
+>>
+>> Signed-off-by: David Hildenbrand (Arm) <david@kernel.org>
+> 
+>> diff --git a/rust/kernel/mm/virt.rs b/rust/kernel/mm/virt.rs
+>> index da21d65ccd20..b8e59e4420f3 100644
+>> --- a/rust/kernel/mm/virt.rs
+>> +++ b/rust/kernel/mm/virt.rs
+>> @@ -124,7 +124,7 @@ pub fn zap_page_range_single(&self, address: usize, size: usize) {
+>>          // sufficient for this method call. This method has no requirements on the vma flags. The
+>>          // address range is checked to be within the vma.
+>>          unsafe {
+>> -            bindings::zap_page_range_single(self.as_ptr(), address, size, core::ptr::null_mut())
+>> +            bindings::zap_page_range_single(self.as_ptr(), address, size)
+>>          };
+> 
+> Please run rustfmt on Rust changes. Here, rustfmt leads to this being
+> formatted on a single line:
 
-On Sun, Mar 01, 2026 at 05:49:19PM +0800, Hao Long wrote:
-> Hello,
-> 
-> Recently I set up a strongSwan tunnel in AGGFRAG mode[1] in order to see
-> how it fragments large packets.
-> 
-> Later I found out the receiver node will kernel panic when handling
-> large packets, I tested in different distro and both panic.
-> 
-> Tested environment:
-> - Arch Linux 6.18.13-arch1-1 strongswan-6.0.4-2
-> - Arch Linux 7.0.0-rc1-1-mainline strongswan-6.0.4-2
-> - NixOS 6.18.13 strongswan-6.0.4
-> 
-> Step to reproduce:
-> 1. install strongSwan and create tunnel interface in vm1, see the
-> attachment init_env.sh
-> 2. do step1 in vm2, but remember to switch local_addrs and remote_addrs,
-> also the ip assignment
-> 3. run `ping -s 3333 10.0.1.2` in vm1, 10.0.1.2 is the ip from vm2
-> 4. kernel panic in vm2
-> 
-> I'm not familiar in C programming and kernel developing, so sorry I can't
-> provide a useful root case analyze and a fix.
-> 
-> Regards,
-> Hao Long
-> 
-> [1] https://docs.strongswan.org/docs/latest/features/iptfs.html
+Having to run tooling I don't even have installed when removing a single
+function parameter; did not expect that :)
 
-> [  412.126912] ------------[ cut here ]------------
-> [  412.126945] kernel BUG at net/core/skbuff.c:2651!
-> [  412.126974] Oops: invalid opcode: 0000 [#1] SMP PTI
-> [  412.127009] CPU: 2 UID: 0 PID: 0 Comm: swapper/2 Not tainted 7.0.0-rc1-1-mainline #1 PREEMPT(full)  b84afef9bed61122840347d0d1295877239d5881
-> [  412.127061] Hardware name: Vultr VC2, BIOS  
-> [  412.127076] RIP: 0010:skb_put+0x3c/0x40
-> [  412.127122] Code: bc 00 00 00 01 77 70 48 89 c2 48 03 87 c8 00 00 00 01 f2 89 97 bc 00 00 00 39 97 c0 00 00 00 0f 82 c0 c2 14 ff e9 c4 a0 2f 00 <0f> 0b 66 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f
-> [  412.127154] RSP: 0018:ffffcdee80120788 EFLAGS: 00010202
-> [  412.127167] RAX: 000000000000056e RBX: ffff8ac7cef2c400 RCX: 0000000000000030
-> [  412.127184] RDX: ffff8ac7cef94000 RSI: 0000000000000030 RDI: ffff8ac7c266a700
-> [  412.127197] RBP: ffffcdee801207b0 R08: 0000000000000004 R09: 0000000000000030
-> [  412.127210] R10: 0000000000000030 R11: 0000000000000030 R12: ffff8ac7c7160a00
-> [  412.127222] R13: ffff8ac7c266a700 R14: ffffcdee80120978 R15: ffffcdee80120950
-> [  412.127241] FS:  0000000000000000(0000) GS:ffff8ac995998000(0000) knlGS:0000000000000000
-> [  412.127256] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [  412.127271] CR2: 000055b8aa3f3b80 CR3: 0000000104500001 CR4: 00000000001706f0
-> [  412.127288] Call Trace:
-> [  412.127298]  <IRQ>
-> [  412.127308]  iptfs_reassem_cont+0x12d/0x5f0 [xfrm_iptfs 7ea53a8d87342a9b7c66159e6b7baa8136dff23a]
-> [  412.127335]  iptfs_input_ordered+0x260/0x310 [xfrm_iptfs 7ea53a8d87342a9b7c66159e6b7baa8136dff23a]
-> [  412.127356]  iptfs_input+0x128/0x3d0 [xfrm_iptfs 7ea53a8d87342a9b7c66159e6b7baa8136dff23a]
-> [  412.127373]  ? esp_input+0x1f7/0x330 [esp4 f354ef309189db0d9825bb990cd4d8b0a86a0bf3]
-> [  412.127399]  xfrm_input+0x8d3/0x16a0
-> [  412.127449]  xfrm4_esp_rcv+0x38/0x80
-> [  412.127473]  ip_protocol_deliver_rcu+0x169/0x170
-> [  412.127497]  ip_local_deliver_finish+0x85/0x100
-> [  412.127509]  __netif_receive_skb_core.constprop.0+0xa14/0xe30
-> [  412.127529]  ? kmalloc_reserve+0x86/0x100
-> [  412.127540]  ? __alloc_skb+0xf4/0x2e0
-> [  412.127551]  ? napi_alloc_skb+0x35/0x270
-> [  412.127568]  ? page_to_skb+0x2a9/0x400 [virtio_net 07b3b182c5b7f88384b07163f6c3d83152f6c13c]
-> [  412.127610]  __netif_receive_skb_list_core+0x13d/0x2d0
-> [  412.127628]  netif_receive_skb_list_internal+0x1d5/0x310
-> [  412.127645]  napi_complete_done+0x7f/0x1b0
-> [  412.127660]  ? virtnet_rq_get_buf+0x2d/0x60 [virtio_net 07b3b182c5b7f88384b07163f6c3d83152f6c13c]
-> [  412.127684]  virtnet_poll+0x6de/0xdbd [virtio_net 07b3b182c5b7f88384b07163f6c3d83152f6c13c]
-> [  412.127710]  __napi_poll+0x30/0x200
-> [  412.127723]  ? skb_defer_free_flush+0x9c/0xc0
-> [  412.127745]  net_rx_action+0x2fd/0x390
-> [  412.127761]  handle_softirqs+0xe4/0x2c0
-> [  412.127802]  __irq_exit_rcu+0xcb/0xf0
-> [  412.127817]  common_interrupt+0x85/0xa0
-> [  412.127848]  </IRQ>
-> [  412.127858]  <TASK>
-> [  412.127867]  asm_common_interrupt+0x26/0x40
-> [  412.127904] RIP: 0010:pv_native_safe_halt+0xf/0x20
-> [  412.127926] Code: 20 d0 e9 c4 3c 01 00 0f 1f 40 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa eb 07 0f 00 2d c3 e9 1f 00 fb f4 <c3> cc cc cc cc 90 66 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90
-> [  412.128324] RSP: 0018:ffffcdee800dbeb8 EFLAGS: 00000286
-> [  412.128644] RAX: 0000000000000002 RBX: ffff8ac7c085b600 RCX: 4000000000000000
-> [  412.128930] RDX: 00000000000b70bc RSI: ffff8ac7c085b600 RDI: 00000000000b70bc
-> [  412.129210] RBP: 0000000000000002 R08: ffffcdee800dbe30 R09: ffff8ac937d21820
-> [  412.129486] R10: 0000005ff80573c0 R11: 0000000000000002 R12: 0000000000000000
-> [  412.129743] R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-> [  412.130001]  default_idle+0x9/0x20
-> [  412.130263]  default_idle_call+0x2f/0x130
-> [  412.130546]  do_idle+0x1c7/0x210
-> [  412.130891]  cpu_startup_entry+0x29/0x30
-> [  412.131263]  start_secondary+0x119/0x150
-> [  412.131600]  common_startup_64+0x13e/0x141
-> [  412.131859]  </TASK>
-> [  412.132137] Modules linked in: xfrm_iptfs seqiv geniv esp4 xfrm_interface xfrm6_tunnel tunnel4 tunnel6 xfrm_user xfrm_algo snd_hda_codec_generic snd_hda_intel snd_hda_codec intel_rapl_msr intel_rapl_common snd_hda_core ghash_clmulni_intel snd_intel_dspcfg aesni_intel snd_intel_sdw_acpi rapl snd_hwdep i2c_i801 snd_pcm psmouse i2c_smbus i2c_mux pcspkr iTCO_wdt snd_timer intel_pmc_bxt snd soundcore vfat fat qemu_fw_cfg i6300esb joydev mousedev mac_hid cfg80211 rfkill dm_mod nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vmw_vsock_vmci_transport vsock vmw_vmci sr_mod cdrom lpc_ich virtio_balloon virtio_net net_failover failover bochs intel_agp intel_gtt serio_raw virtio_rng
-> [  412.133499] ---[ end trace 0000000000000000 ]---
-> [  412.133807] RIP: 0010:skb_put+0x3c/0x40
-> [  412.134092] Code: bc 00 00 00 01 77 70 48 89 c2 48 03 87 c8 00 00 00 01 f2 89 97 bc 00 00 00 39 97 c0 00 00 00 0f 82 c0 c2 14 ff e9 c4 a0 2f 00 <0f> 0b 66 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f
-> [  412.134654] RSP: 0018:ffffcdee80120788 EFLAGS: 00010202
-> [  412.134935] RAX: 000000000000056e RBX: ffff8ac7cef2c400 RCX: 0000000000000030
-> [  412.135282] RDX: ffff8ac7cef94000 RSI: 0000000000000030 RDI: ffff8ac7c266a700
-> [  412.135583] RBP: ffffcdee801207b0 R08: 0000000000000004 R09: 0000000000000030
-> [  412.135951] R10: 0000000000000030 R11: 0000000000000030 R12: ffff8ac7c7160a00
-> [  412.136389] R13: ffff8ac7c266a700 R14: ffffcdee80120978 R15: ffffcdee80120950
-> [  412.136721] FS:  0000000000000000(0000) GS:ffff8ac995998000(0000) knlGS:0000000000000000
-> [  412.137015] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [  412.137480] CR2: 000055b8aa3f3b80 CR3: 0000000104500001 CR4: 00000000001706f0
-> [  412.137825] Kernel panic - not syncing: Fatal exception in interrupt
-> [  412.138095] Kernel Offset: 0x1de00000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+> 
+> unsafe { bindings::zap_page_range_single(self.as_ptr(), address, size) };
+> 
+
+@Andrew, can you squash:
+
+From 5128f2e34d219722a8883c1fa94e057bd34601f2 Mon Sep 17 00:00:00 2001
+From: "David Hildenbrand (Arm)" <david@kernel.org>
+Date: Mon, 2 Mar 2026 09:17:19 +0100
+Subject: [PATCH] fixup: mm/memory: remove zap_details parameter from
+ zap_page_range_single()
+
+Signed-off-by: David Hildenbrand (Arm) <david@kernel.org>
+---
+ rust/kernel/mm/virt.rs | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/rust/kernel/mm/virt.rs b/rust/kernel/mm/virt.rs
+index b8e59e4420f3..6bfd91cfa1f4 100644
+--- a/rust/kernel/mm/virt.rs
++++ b/rust/kernel/mm/virt.rs
+@@ -123,9 +123,7 @@ pub fn zap_page_range_single(&self, address: usize, size: usize) {
+         // SAFETY: By the type invariants, the caller has read access to this VMA, which is
+         // sufficient for this method call. This method has no requirements on the vma flags. The
+         // address range is checked to be within the vma.
+-        unsafe {
+-            bindings::zap_page_range_single(self.as_ptr(), address, size)
+-        };
++        unsafe { bindings::zap_page_range_single(self.as_ptr(), address, size) };
+     }
+ 
+     /// If the [`VM_MIXEDMAP`] flag is set, returns a [`VmaMixedMap`] to this VMA, otherwise
+-- 
+2.43.0
 
 
+
+> with the above changed:
+> 
+> Acked-by: Alice Ryhl <aliceryhl@google.com> # Rust and Binder
+
+Thanks!
+
+-- 
+Cheers,
+
+David
 
