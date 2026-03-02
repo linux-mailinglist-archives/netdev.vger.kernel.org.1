@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-262701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262703-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GKgAF/WtpWleEQAAu9opvQ
-	(envelope-from <netdev+bounces-262701-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:34:13 +0100
+	id OMhaLAaupWmpDgAAu9opvQ
+	(envelope-from <netdev+bounces-262703-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:34:30 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B13EB1DBEDC
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:34:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 197EF1DBEEB
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 16:34:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A706730EB6F8
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 15:28:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7DAB330EF696
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 15:28:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5DF41325B;
-	Mon,  2 Mar 2026 15:28:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 811A041B351;
+	Mon,  2 Mar 2026 15:28:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9238240149C
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 15:28:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2737C411625
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 15:28:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772465294; cv=none; b=K/eCIelrx2qcAlqaWmxvyOjRn6aFRS8oMZzAMx2tUCMOZhmv9SQj0vkzbtt27a4TrGS+1oJ5DvRm5SFbHn4nSwZBD+CsjXEhFawRdoMsl2DnxRsnU11ZKKMac/II8ABE769SVY/shKgvzn/ZNALek8hvxTEHOw8zEz0w+6a3dbo=
+	t=1772465295; cv=none; b=MmNP64sUnJM2JBlIRnlP0mQKY9jmQ9AVZKFDjCrXdz42Xoa5MQ61PoSnYDM9/HBTCWBY94Vzn4A1BK8Y1mDyVCsmnCSYIdR0PTzpmrbEyljQOHFXtG2APz7NYtQyOh1wBTY6/IHsC+xADUxJFuO3XTYH0MNbv28DRR+vQPVhOlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772465294; c=relaxed/simple;
-	bh=3mZYEsDbDr9pGbHA3lo0cd5gHLsYCxXiw9738mCq+R4=;
+	s=arc-20240116; t=1772465295; c=relaxed/simple;
+	bh=diS5TUW926RW8wWUUKUqyVhUPEJ5JEskuMP+cfk/Un4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KuYqIn4ag/Qp7gTNjcPUaWK8F/UMhUhCj8bG2NTWlljukSw7W1dJ0j2WsAjK1m+lm/QcXhEp73yXXbxZzd1etBlQbjm6nJRyXmgc1APIvoGyWFqQw15ebFoSUZTrt0qFR/1wULOxvPpVnuCIbND2MRO/ox608TEFtG8IrNEpV/Q=
+	 MIME-Version; b=ZaJG/Ew5rSER/kmmU/ItpsVtegU+qE0V4stqHRT7fpivq0GsJO6Htt/fvMCqSnFygAqgj3Dx3EhM4ZVbwPBFrwcAh+5igZvuAZ0TALVYNKd/kRcug+ZeHeY/8+arNxpjpaJ2ry3g71B9P2cRt+vFFEX4Ioh1vTXFb343T+C97Fk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -36,19 +36,19 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1vx5Be-0004kL-SH; Mon, 02 Mar 2026 16:27:58 +0100
+	id 1vx5Be-0004kM-Lt; Mon, 02 Mar 2026 16:27:58 +0100
 Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1vx5Bc-003P0e-1m;
+	id 1vx5Bc-003P0h-1y;
 	Mon, 02 Mar 2026 16:27:57 +0100
 Received: from blackshift.org (p4ffb2dc6.dip0.t-ipconnect.de [79.251.45.198])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
 	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 9AF994F546D;
+	by smtp.blackshift.org (Postfix) with ESMTPSA id B1D3C4F546E;
 	Mon, 02 Mar 2026 15:27:57 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
@@ -56,12 +56,13 @@ Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	linux-can@vger.kernel.org,
 	kernel@pengutronix.de,
-	Ziyi Guo <n7l8m4@u.northwestern.edu>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Vincent Mailhol <mailhol@kernel.org>,
-	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net 04/12] can: esd_usb: add endpoint type validation
-Date: Mon,  2 Mar 2026 16:16:10 +0100
-Message-ID: <20260302152755.1700177-5-mkl@pengutronix.de>
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	stable@kernel.org
+Subject: [PATCH net 05/12] can: ems_usb: ems_usb_read_bulk_callback(): check the proper length of a message
+Date: Mon,  2 Mar 2026 16:16:11 +0100
+Message-ID: <20260302152755.1700177-6-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260302152755.1700177-1-mkl@pengutronix.de>
 References: <20260302152755.1700177-1-mkl@pengutronix.de>
@@ -76,7 +77,7 @@ X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
 X-SA-Exim-Mail-From: mkl@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Rspamd-Queue-Id: B13EB1DBEDC
+X-Rspamd-Queue-Id: 197EF1DBEEB
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -88,7 +89,7 @@ X-Spamd-Result: default: False [0.04 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_FROM(0.00)[bounces-262701-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262703-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -98,140 +99,63 @@ X-Spamd-Result: default: False [0.04 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[mkl@pengutronix.de,netdev@vger.kernel.org];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.906];
+	NEURAL_HAM(-0.00)[-0.913];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,pengutronix.de:mid,pengutronix.de:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,northwestern.edu:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,pengutronix.de:mid,pengutronix.de:email,linuxfoundation.org:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-From: Ziyi Guo <n7l8m4@u.northwestern.edu>
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-esd_usb_probe() constructs bulk pipes for two endpoints without
-verifying their transfer types:
+When looking at the data in a USB urb, the actual_length is the size of
+the buffer passed to the driver, not the transfer_buffer_length which is
+set by the driver as the max size of the buffer.
 
-  - usb_rcvbulkpipe(dev->udev, 1) for RX (version reply, async RX data)
-  - usb_sndbulkpipe(dev->udev, 2) for TX (version query, CAN frames)
+When parsing the messages in ems_usb_read_bulk_callback() properly check
+the size both at the beginning of parsing the message to make sure it is
+big enough for the expected structure, and at the end of the message to
+make sure we don't overflow past the end of the buffer for the next
+message.
 
-A malformed USB device can present these endpoints with transfer types
-that differ from what the driver assumes, triggering the WARNING in
-usb_submit_urb().
-
-Use usb_find_common_endpoints() to discover and validate the first
-bulk IN and bulk OUT endpoints at probe time, before any allocation.
-Found pipes are saved to struct esd_usb and code uses them directly
-instead of making pipes in place.
-
-Similar to
-- commit 136bed0bfd3b ("can: mcba_usb: properly check endpoint type")
-  which established the usb_find_common_endpoints() + stored pipes
-  pattern for CAN USB drivers.
-
-Fixes: 96d8e90382dc ("can: Add driver for esd CAN-USB/2 device")
-Suggested-by: Vincent Mailhol <mailhol@kernel.org>
-Signed-off-by: Ziyi Guo <n7l8m4@u.northwestern.edu>
-Reviewed-by: Vincent Mailhol <mailhol@kernel.org>
-Link: https://patch.msgid.link/20260213203927.599163-1-n7l8m4@u.northwestern.edu
+Cc: Vincent Mailhol <mailhol@kernel.org>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: stable@kernel.org
+Assisted-by: gkh_clanker_2000
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Link: https://patch.msgid.link/2026022316-answering-strainer-a5db@gregkh
+Fixes: 702171adeed3 ("ems_usb: Added support for EMS CPC-USB/ARM7 CAN/USB interface")
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- drivers/net/can/usb/esd_usb.c | 30 +++++++++++++++++-------------
- 1 file changed, 17 insertions(+), 13 deletions(-)
+ drivers/net/can/usb/ems_usb.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/can/usb/esd_usb.c b/drivers/net/can/usb/esd_usb.c
-index 2892a68f510a..d257440fa01f 100644
---- a/drivers/net/can/usb/esd_usb.c
-+++ b/drivers/net/can/usb/esd_usb.c
-@@ -272,6 +272,9 @@ struct esd_usb {
+diff --git a/drivers/net/can/usb/ems_usb.c b/drivers/net/can/usb/ems_usb.c
+index 4c219a5b139b..9b25dda7c183 100644
+--- a/drivers/net/can/usb/ems_usb.c
++++ b/drivers/net/can/usb/ems_usb.c
+@@ -445,6 +445,11 @@ static void ems_usb_read_bulk_callback(struct urb *urb)
+ 		start = CPC_HEADER_SIZE;
  
- 	struct usb_anchor rx_submitted;
- 
-+	unsigned int rx_pipe;
-+	unsigned int tx_pipe;
+ 		while (msg_count) {
++			if (start + CPC_MSG_HEADER_LEN > urb->actual_length) {
++				netdev_err(netdev, "format error\n");
++				break;
++			}
 +
- 	int net_count;
- 	u32 version;
- 	int rxinitdone;
-@@ -537,7 +540,7 @@ static void esd_usb_read_bulk_callback(struct urb *urb)
- 	}
+ 			msg = (struct ems_cpc_msg *)&ibuf[start];
  
- resubmit_urb:
--	usb_fill_bulk_urb(urb, dev->udev, usb_rcvbulkpipe(dev->udev, 1),
-+	usb_fill_bulk_urb(urb, dev->udev, dev->rx_pipe,
- 			  urb->transfer_buffer, ESD_USB_RX_BUFFER_SIZE,
- 			  esd_usb_read_bulk_callback, dev);
+ 			switch (msg->type) {
+@@ -474,7 +479,7 @@ static void ems_usb_read_bulk_callback(struct urb *urb)
+ 			start += CPC_MSG_HEADER_LEN + msg->length;
+ 			msg_count--;
  
-@@ -626,9 +629,7 @@ static int esd_usb_send_msg(struct esd_usb *dev, union esd_usb_msg *msg)
- {
- 	int actual_length;
- 
--	return usb_bulk_msg(dev->udev,
--			    usb_sndbulkpipe(dev->udev, 2),
--			    msg,
-+	return usb_bulk_msg(dev->udev, dev->tx_pipe, msg,
- 			    msg->hdr.len * sizeof(u32), /* convert to # of bytes */
- 			    &actual_length,
- 			    1000);
-@@ -639,12 +640,8 @@ static int esd_usb_wait_msg(struct esd_usb *dev,
- {
- 	int actual_length;
- 
--	return usb_bulk_msg(dev->udev,
--			    usb_rcvbulkpipe(dev->udev, 1),
--			    msg,
--			    sizeof(*msg),
--			    &actual_length,
--			    1000);
-+	return usb_bulk_msg(dev->udev, dev->rx_pipe, msg,
-+			    sizeof(*msg), &actual_length, 1000);
- }
- 
- static int esd_usb_setup_rx_urbs(struct esd_usb *dev)
-@@ -677,8 +674,7 @@ static int esd_usb_setup_rx_urbs(struct esd_usb *dev)
- 
- 		urb->transfer_dma = buf_dma;
- 
--		usb_fill_bulk_urb(urb, dev->udev,
--				  usb_rcvbulkpipe(dev->udev, 1),
-+		usb_fill_bulk_urb(urb, dev->udev, dev->rx_pipe,
- 				  buf, ESD_USB_RX_BUFFER_SIZE,
- 				  esd_usb_read_bulk_callback, dev);
- 		urb->transfer_flags |= URB_NO_TRANSFER_DMA_MAP;
-@@ -903,7 +899,7 @@ static netdev_tx_t esd_usb_start_xmit(struct sk_buff *skb,
- 	/* hnd must not be 0 - MSB is stripped in txdone handling */
- 	msg->tx.hnd = BIT(31) | i; /* returned in TX done message */
- 
--	usb_fill_bulk_urb(urb, dev->udev, usb_sndbulkpipe(dev->udev, 2), buf,
-+	usb_fill_bulk_urb(urb, dev->udev, dev->tx_pipe, buf,
- 			  msg->hdr.len * sizeof(u32), /* convert to # of bytes */
- 			  esd_usb_write_bulk_callback, context);
- 
-@@ -1298,10 +1294,16 @@ static int esd_usb_probe_one_net(struct usb_interface *intf, int index)
- static int esd_usb_probe(struct usb_interface *intf,
- 			 const struct usb_device_id *id)
- {
-+	struct usb_endpoint_descriptor *ep_in, *ep_out;
- 	struct esd_usb *dev;
- 	union esd_usb_msg *msg;
- 	int i, err;
- 
-+	err = usb_find_common_endpoints(intf->cur_altsetting, &ep_in, &ep_out,
-+					NULL, NULL);
-+	if (err)
-+		return err;
-+
- 	dev = kzalloc_obj(*dev);
- 	if (!dev) {
- 		err = -ENOMEM;
-@@ -1309,6 +1311,8 @@ static int esd_usb_probe(struct usb_interface *intf,
- 	}
- 
- 	dev->udev = interface_to_usbdev(intf);
-+	dev->rx_pipe = usb_rcvbulkpipe(dev->udev, ep_in->bEndpointAddress);
-+	dev->tx_pipe = usb_sndbulkpipe(dev->udev, ep_out->bEndpointAddress);
- 
- 	init_usb_anchor(&dev->rx_submitted);
- 
+-			if (start > urb->transfer_buffer_length) {
++			if (start > urb->actual_length) {
+ 				netdev_err(netdev, "format error\n");
+ 				break;
+ 			}
 -- 
 2.51.0
 
