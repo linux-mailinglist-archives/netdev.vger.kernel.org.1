@@ -1,230 +1,186 @@
-Return-Path: <netdev+bounces-262518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262519-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6EI/EyEopWla4wUAu9opvQ
-	(envelope-from <netdev+bounces-262518-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 07:03:13 +0100
+	id IJYuID8opWla4wUAu9opvQ
+	(envelope-from <netdev+bounces-262519-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 07:03:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7A251D35AE
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 07:03:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE5E51D35BC
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 07:03:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A0742300071B
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 06:03:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1128A301DECE
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 06:03:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0195375ADE;
-	Mon,  2 Mar 2026 06:03:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C35D63806BB;
+	Mon,  2 Mar 2026 06:03:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c7qPq3QZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fV852mfP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C233C32572D
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 06:03:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772431388; cv=none; b=izdOPxZovVjPi8MPWJpr8/OEnp3/Za2McTr1HraNCiFyL1d0gQuVgzC6uxj2YHiGrHJqF0iCYDawLnwFQo3vogykofku0ninnOIUgA/z3AoET4R5jFJX+kB4UI+LjPMAAzdZlg8eCtTx9lInLQ0GEmhxSP1XfY9zrCbZ6e0oQzs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772431388; c=relaxed/simple;
-	bh=UMbmZ++93Ph/NbVyX9t23zZtrAjeMmfIxj4l+jZAYNg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HtDD/zD2cIr8aHdBUHoCYz2y1JtmdryK3G4nKckWtxpQVqmYnw7Cx/fL0Fe+jj+zzDCGIYSd5BtNb/qqAz/dPppmNKwKYCC9U93KGoR8tddjBqp3uEosFEFYMrufTM68maX1DK2Z2negD1wkdHorHo3zSSdE7DK+uQulUjtoi1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c7qPq3QZ; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-824a3509a12so1808608b3a.2
-        for <netdev@vger.kernel.org>; Sun, 01 Mar 2026 22:03:01 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB35377022
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 06:03:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.176
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772431397; cv=pass; b=qMMpHGaMa4zRlj9MngF4CfK+ZTZbnjhlitW4so+RaByP59lwAMlqzJO3yCXfiEo+5z9G7ukJnKKmmTJKfmTDkYFeu7peDuuBeqGEShGEf/KZSzWDz8zUhlKHy07bZPgxKFpSXDFtc206UBzQTzoo9WlhAh+jP020zjOLQgeQlYo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772431397; c=relaxed/simple;
+	bh=VoL9+Q5vKBh/stH6CbzLSnBWXCrGTyp5hmi39PUL9ZM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fOoOdv3vR7h2XySg+ewE0/xLK4MRtGRrigeIYKtLt7h775dlpl1ogAIMtNkDjDzM98phYCFTrNIWKAiOqu6r8yQYPP/4GRBEGR9a/AAI/qEwCfzSBPks06k2OGVGN7N0H/Zkqu0y0BQp+1Vkk1tA77likM+BqQeNGVLc0oDPRLM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fV852mfP; arc=pass smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-50336cffef9so36701131cf.0
+        for <netdev@vger.kernel.org>; Sun, 01 Mar 2026 22:03:08 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772431388; cv=none;
+        d=google.com; s=arc-20240605;
+        b=cGT/857nShqjcPc6Wf0GIL0X2BA7QmM3D3TQDGEoZT7FACvaf+fh0gM9Vd40AUeGXR
+         Fayr3ElBMJTJlr6birHwBRz8rN7jND09+aHyrz0ywkjQlt1cIhbItNJNL6CEfzNt6aE6
+         2MJM9yJq9y9jvecjAcQgphncQAIOvyKihdljyR7gCiLF6oWzftBuR+nLya67ES+XYPaZ
+         VEdfAakToei8aXbDvLia+7X8Q/fpPMLvFm5djroNxjwkno+KYQqlsFGZmbDDYVMLTCSu
+         6vXzC7IeTE2V4TmayKJf2+G2fLv8O2jsR0gMtgh6Blj6hobg4ZHfqyEfzXNKYnpHjZem
+         UXbw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=UjR2Jso0hAuDoeUEgb8RQHlOodoa5Tiq2cd7ca0LZWk=;
+        fh=byS6zz0kO2UXjcJjvt6Y70eBR/P6748xxnRHf04cpfA=;
+        b=d2rZyJWX7erVzUHu2yaieBNL8A/4CmdfoqtN3ZP+86LDaK2fR+JHgCDxMT0I4H3oq8
+         BcjCNG6h/0SBStm5Ln7XzW9X4fvXLvK7F/F2o5SPiBQhPGxeeTT3N3uMbtd94RvpDiHU
+         /49f+QA0c37RsO1B+8Vcju8Rq1CsAFUjx+RdVCqbKTHM6vwarL3ueEHBVnDMolD08Uq2
+         RD4Nc+0eYt0dY+j2/Uk2JFa07DbeQ14aRAo0HhMaYPOQt8k1BD6io4NWg0WgeSQ1fYfm
+         M2aPwsdaAGFu0vvScybXnZSWNYAMF+nDaUPJfJNyD0qeqGYv7hWciyedmRmCktrKorm8
+         DOzQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772431381; x=1773036181; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3wSCMIgFyPDN8ZsWOziBhAMpjDkgcKvVXQMlKIyyHF0=;
-        b=c7qPq3QZqfTWYiVrpTlnQ4EUA8LeutFk2nliRNCIEc85lyNKk73QTD1OLZ7cl7X4zN
-         VCwlU3ZhZbKcs8r8nKZ98jqrXlWcGvCvXHhxA3BUCQugAMYUo7JgtU01MhtlQCbi/4hN
-         TRCXJiu0aeF6GcNzWbnNQWEiqtHvBOyi53wT1dbRo9UJCJ9r8hZk+MuQjsPIyAROFZRs
-         3mEtCxiie91SlVNrZ7XRb8EfF6xMFjuXAtPx3x5V1FA9vfaRv0+3tvTQb2rNPLq5yVMJ
-         IhqFhpf1wio36ZN0lP73E3oSvGkZIr6PaYH/JKM7M6w7E7M8tX7/Ql5kMrB8T+JAvzHd
-         BhwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772431381; x=1773036181;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1772431388; x=1773036188; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3wSCMIgFyPDN8ZsWOziBhAMpjDkgcKvVXQMlKIyyHF0=;
-        b=I99TCUsF2EcvTmhWIzkxgIOVc3uPBy3COKhqgco9tAumqbom3T9Eh9/NWb8io/Qewj
-         qQh66QFz5AvykLuzVFwzjJoSRhTNOtvvucsx6Fdm+b0UzEXe/qfJqjzYMdSz15uDQ9DU
-         KJJrCbsBKmVGBQ6DY9GTWawRtoStqyTcT52z5GKNZt30DSgDBYmZe6vKzqml9t2xYRo7
-         3J8RJ5xU0TVsut+BS5CYZfocqgLlgRbtQ8gyn8olxcSMY6+ef8i9n3I1uo4Yby2hgF00
-         lB+gb0pSW/vAyxQYUrgyea/RjmIdcbs3QAEpeKuPReunMTvStrei7vy5cGAGcdzUxyvp
-         rYXA==
-X-Gm-Message-State: AOJu0YwhhfFzIv0wLLy61Xz85FkhfEQFX5qHiy78obCzSdhAzmns9aSg
-	3taM+s26ZudelC11beCRo/kUDEjQ0kkpzXGNtzptWSJMA/zNG1A7AmyL
-X-Gm-Gg: ATEYQzwzORTATCmJgwXOKH6Ok6RceVwCen71BmoSDkShnmG2R9KGAgLJLZNEeFanj4S
-	hxJeEcgA15dmEcIRp7GzdK6nWwflvGpwGt2ZLFMLjdeVmrdzBQuqtpZPgpb+JEsmC6DIatl0BNJ
-	59Aty3GLIKH4EwLItW2WxpaG2qXED/tBZHK+yc2M627KUObjBUlopZJQjBRH1WCK1qvLJ08kM81
-	4TkkXzXz68ScOrL9cNz0wcwIdh7sukgT0CCNQTQ82dPqo4xnujiA2l2uLRd7jhSUYoZse5O7lRP
-	Nx91hTNR4Fk2Z+PbhB4Yx3AqjU/yuxi0ez3lf6Q35KQvHUhSSR+UP3TNe9p2AGI1IAonew6KH7J
-	kBdgBJPl/ni1wzZRWsBPuQVDnzZQzaiOiZUpFpvQo1/qDU+Vgc99OzLyZRgqEKitKvAZIaJjrE4
-	CzNQjtAi00s4DGr5gGzrHkoayjJy7MrrvEeCK4H4jNG24M/VMBj1jA5oGXBmSFPv7wrXRJhz78B
-	EU9qSUt4PXajE/2hfwKlz+N/+mQPY2k8oG2LWLVbYjIq+3V8bU+HipPDrP4VsaVg3fgWyLmseUy
-	GMBSXGssxA==
-X-Received: by 2002:a05:6a00:bc83:b0:824:3bd9:aac6 with SMTP id d2e1a72fcca58-8274d95b7f0mr8512139b3a.16.1772431380848;
-        Sun, 01 Mar 2026 22:03:00 -0800 (PST)
-Received: from yuu-U24E.. (2001-b400-e3d7-5aaf-ef7e-1255-80c7-27e1.emome-ip6.hinet.net. [2001:b400:e3d7:5aaf:ef7e:1255:80c7:27e1])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8273a060331sm11521915b3a.62.2026.03.01.22.02.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Mar 2026 22:03:00 -0800 (PST)
-From: Yung Chih Su <yuuchihsu@gmail.com>
-To: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	nathan@kernel.org,
-	nick.desaulniers+lkml@gmail.com,
-	morbo@google.com,
-	justinstitt@google.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev,
-	Yung Chih Su <yuuchihsu@gmail.com>
-Subject: [PATCH v2] net: ipv4: fix ARM64 alignment fault in multipath hash seed
-Date: Mon,  2 Mar 2026 14:02:47 +0800
-Message-ID: <20260302060247.7066-1-yuuchihsu@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        bh=UjR2Jso0hAuDoeUEgb8RQHlOodoa5Tiq2cd7ca0LZWk=;
+        b=fV852mfPlO1kd0tk8vuAlyOMCw3RgCcI90Ok33kFctyvy6yMj71hc/397JQ82Nx47r
+         2CIksUAU71apTmyT2XrlGQ+S8XZN/WzAeCIoIf57K3PFap5iMFt+kmhE5AT1CIPefSOo
+         u//W0d3sT3MIJNkZXFvJigPi4T6DoPqDLk/qluIfRSiaD3JR9XTQuH8g1bgMNOZObEDf
+         xIRHnHgSupvAfansKxiAPVDSZnpG08YVrwcbjVhs3ftgeDYiDBFxn/qrX/F1W8pMuHup
+         TM5Ea+de1N/pt5o1D56yUBovTBKRsq7YiE2Xt30W541KCCCtiGCeYBcuu3lo8Q8zJI3I
+         mhxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772431388; x=1773036188;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=UjR2Jso0hAuDoeUEgb8RQHlOodoa5Tiq2cd7ca0LZWk=;
+        b=tEu3utbQ5zi9RFWbtT1+jVy2r4Cq9w39BEeCY6t37LTA1Xb0aovBO87FMHlz7XIhd7
+         n4O5IClpoRO4xFTuSbyCcm46t2qheP7Dsp1xo+s9hJ6EnFxFKWmxSMLiCC436ZDZFx5V
+         46+1Obei7o7DrciSkXepiMQGELvS4zPiVf58zN1/QXka7aJcWCS7WKaPbfqdMgf9orvO
+         IdZULJqKnKQe5DAbjHR0l6HI99dxYvlF6ATkp/w1vIDc+wD9kPVlZEteScNbajhqEWoo
+         bdU+ugLxQ72qmdb3KbPEGBA3z6xSkXfDgSajcqAQsJp4vrJRYKtojJTx8fXKt9HWJb8b
+         uceA==
+X-Forwarded-Encrypted: i=1; AJvYcCUwbw2l2fpWQjk3InlqToJIehMpnZwm81MOQj2bBiDPEBOp19nlexYFkVHBqrjO7MiENLOwFd4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGf9ySa88qXuca1bBIWHT48msvmQ3U0140EYUwAa9d877AsH5X
+	Bl+QT2Zz+jKuH+9LStwOiO2e8aw0K+mQY/rj6d25AyLo3thulRbEGGc7TLeHBxAAi6mXBETLDuX
+	EUcqFoM/BD8oKQV6DhAhqm7YCmAUes6kVwEXjHWTb
+X-Gm-Gg: ATEYQzzeuPMUtErXs/hPnDO4zxOwJ0j6FBsoZK4izf6KUpKF3MFlj+1xvMYA+bYSYMb
+	UHd158X/bJnNWplNM1eeeGIgR/2M/qYw8V2pelQoGM8ojkEyA4bG0LwBgIeDNTUE20CkvIefeDj
+	RLyzulC9BxFfYx3kgt+rWuBhcZZMYCJHqYHS2jE1g1X90uPum3mVQ7i3pWekMcgyrzpnOHIBp4K
+	CS8x6vIj0UdksLjomZdzLVrmhQAJh+FZlEcK8YOxUhf1VpQdppEu4WmpFGOzASJ4asmw/dZPes9
+	Ih8ww5I=
+X-Received: by 2002:a05:622a:5ca:b0:4ee:bac:e3a9 with SMTP id
+ d75a77b69052e-50752a0a185mr159644611cf.68.1772431387431; Sun, 01 Mar 2026
+ 22:03:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260301181457.3539105-8-edumazet@google.com> <202603020743.NEL0agrx-lkp@intel.com>
+In-Reply-To: <202603020743.NEL0agrx-lkp@intel.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 2 Mar 2026 07:02:55 +0100
+X-Gm-Features: AaiRm53wQGM3WwCV3bQMeh1Dn2GLN-C3-snKzACE_E-q2yOPyIOVSeKUAVhiYKE
+Message-ID: <CANn89iLCXFOuMSrNQY27CfOwTfzUoVMkq1Zd+-O50YtCMSEmDw@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 7/7] net-sysfs: use rps_tag_ptr and remove
+ metadata from rps_dev_flow_table
+To: kernel test robot <lkp@intel.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, 
+	Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,gmail.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-262518-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yuuchihsu@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,lists.linux.dev,google.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-262519-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,lkml];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B7A251D35AE
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,mail.gmail.com:mid,01.org:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DE5E51D35BC
 X-Rspamd-Action: no action
 
-`struct sysctl_fib_multipath_hash_seed` contains two u32 fields
-(user_seed and mp_seed), making it an 8-byte structure with a 4-byte
-alignment requirement.
+On Mon, Mar 2, 2026 at 12:39=E2=80=AFAM kernel test robot <lkp@intel.com> w=
+rote:
+>
+> Hi Eric,
+>
+> kernel test robot noticed the following build errors:
+>
+> [auto build test ERROR on net-next/main]
+>
+> url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/net-a=
+dd-rps_tag_ptr-type-and-helpers/20260302-021900
+> base:   net-next/main
+> patch link:    https://lore.kernel.org/r/20260301181457.3539105-8-edumaze=
+t%40google.com
+> patch subject: [PATCH v2 net-next 7/7] net-sysfs: use rps_tag_ptr and rem=
+ove metadata from rps_dev_flow_table
+> config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/202=
+60302/202603020743.NEL0agrx-lkp@intel.com/config)
+> compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009=
+708b4367171ccdbf4b5905cb6a803753fe18)
+> reproduce (this is a W=3D1 build): (https://download.01.org/0day-ci/archi=
+ve/20260302/202603020743.NEL0agrx-lkp@intel.com/reproduce)
+>
+> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
+ion of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202603020743.NEL0agrx-lkp=
+@intel.com/
 
-In `fib_multipath_hash_from_keys()`, the code evaluates the entire
-struct atomically via `READ_ONCE()`:
+Yeah, in V3 I will remove the BITS_PER_LONG distinction, prone to
+errors like this one.
 
-    mp_seed = READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed).mp_seed;
-
-While this silently works on GCC by falling back to unaligned regular
-loads which the ARM64 kernel tolerates, it causes a fatal kernel panic
-when compiled with Clang and LTO enabled.
-
-Commit e35123d83ee3 ("arm64: lto: Strengthen READ_ONCE() to acquire
-when CONFIG_LTO=y") strengthens `READ_ONCE()` to use Load-Acquire
-instructions (`ldar` / `ldapr`) to prevent compiler reordering bugs
-under Clang LTO. Since the macro evaluates the full 8-byte struct,
-Clang emits a 64-bit `ldar` instruction. ARM64 architecture strictly
-requires `ldar` to be naturally aligned, thus executing it on a 4-byte
-aligned address triggers a strict Alignment Fault (FSC = 0x21).
-
-Fix the read side by moving the `READ_ONCE()` directly to the `u32`
-member, which emits a safe 32-bit `ldar Wn`.
-
-Furthermore, Eric Dumazet pointed out that `WRITE_ONCE()` on the entire
-struct in `proc_fib_multipath_hash_set_seed()` is also flawed. Analysis
-shows that Clang splits this 8-byte write into two separate 32-bit
-`str` instructions. While this avoids an alignment fault, it destroys
-atomicity and exposes a tear-write vulnerability. Fix this by
-explicitly splitting the write into two 32-bit `WRITE_ONCE()`
-operations.
-
-Finally, add the missing `READ_ONCE()` when reading `user_seed` in
-`proc_fib_multipath_hash_seed()` to ensure proper pairing and
-concurrency safety.
-
-Fixes: 4ee2a8cace3f ("net: ipv4: Add a sysctl to set multipath hash seed")
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Yung Chih Su <yuuchihsu@gmail.com>
----
-v2:
-  - Split WRITE_ONCE(struct) into two 32-bit WRITE_ONCE()s in 
-    proc_fib_multipath_hash_set_seed() to fix a tear-write vulnerability.
-  - Add missing READ_ONCE() for user_seed in proc_fib_multipath_hash_seed()
-    per Eric Dumazet's suggestion.
-  - Update Fixes tag to use the standard 12-char abbreviated format
-    per Jakub Kicinski's suggestion.
-
- include/net/ip_fib.h       | 2 +-
- net/ipv4/sysctl_net_ipv4.c | 5 +++--
- 2 files changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/include/net/ip_fib.h b/include/net/ip_fib.h
-index b4495c38e0a0..318593743b6e 100644
---- a/include/net/ip_fib.h
-+++ b/include/net/ip_fib.h
-@@ -559,7 +559,7 @@ static inline u32 fib_multipath_hash_from_keys(const struct net *net,
- 	siphash_aligned_key_t hash_key;
- 	u32 mp_seed;
- 
--	mp_seed = READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed).mp_seed;
-+	mp_seed = READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed.mp_seed);
- 	fib_multipath_hash_construct_key(&hash_key, mp_seed);
- 
- 	return flow_hash_from_keys_seed(keys, &hash_key);
-diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
-index 643763bc2142..5654cc9c8a0b 100644
---- a/net/ipv4/sysctl_net_ipv4.c
-+++ b/net/ipv4/sysctl_net_ipv4.c
-@@ -486,7 +486,8 @@ static void proc_fib_multipath_hash_set_seed(struct net *net, u32 user_seed)
- 			    proc_fib_multipath_hash_rand_seed),
- 	};
- 
--	WRITE_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed, new);
-+	WRITE_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed.user_seed, new.user_seed);
-+	WRITE_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed.mp_seed, new.mp_seed);
- }
- 
- static int proc_fib_multipath_hash_seed(const struct ctl_table *table, int write,
-@@ -500,7 +501,7 @@ static int proc_fib_multipath_hash_seed(const struct ctl_table *table, int write
- 	int ret;
- 
- 	mphs = &net->ipv4.sysctl_fib_multipath_hash_seed;
--	user_seed = mphs->user_seed;
-+	user_seed = READ_ONCE(mphs->user_seed);
- 
- 	tmp = *table;
- 	tmp.data = &user_seed;
--- 
-2.43.0
-
+ #if BITS_PER_LONG > 32
+ ...
+#else
+  ...
+#endif
 
