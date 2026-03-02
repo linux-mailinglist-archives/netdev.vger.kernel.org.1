@@ -1,171 +1,171 @@
-Return-Path: <netdev+bounces-262741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262742-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SLiiJfa+pWknFgAAu9opvQ
-	(envelope-from <netdev+bounces-262741-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 17:46:46 +0100
+	id 0CYsHgm/pWknFgAAu9opvQ
+	(envelope-from <netdev+bounces-262742-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 17:47:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04B941DD2B2
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 17:46:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A86461DD2C7
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 17:47:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4A45A3076B6A
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 16:39:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DD39B303B7C2
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 16:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1044E41C308;
-	Mon,  2 Mar 2026 16:39:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52E94421880;
+	Mon,  2 Mar 2026 16:40:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wZGtvRTa"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="WWARWsAp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B69CE35FF5B
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 16:39:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021CE218ADD
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 16:40:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772469578; cv=none; b=l1/z2i+qu1hthH/sFzyp8UPhAVtVE1uR8AiuPiLi+NkVRf4Ldb38ikuBc7nB3MxLGy9k8ZL9ZImj2beZxAajf5ZeJBA4j8LJ38jjVWoiZOpK+1cOXXu3+ohMJeLf9+j7etoY9Le6zU9x7aO8YVcPNetOxFsAE8NRgvPA8iBLnC0=
+	t=1772469632; cv=none; b=e0fdafGKYbsPGKNyWNitwIUpTrDH2/nUj44h96ATz0aph6SnMuvh2gcrGgMVhmSMdGf3Pc+giRL0X9NITc+xP6ROiHmYyGXddDE6OKo/1WTY7VpTolUDgDJKbT656Je2lvKKtHEQRz5hL2P8p4pNzD/RROvy/oqSELUWGENx59o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772469578; c=relaxed/simple;
-	bh=uC6/vplQaR/Nl+sf9eIp5Vu1ztYNCKErjypTlH4knNg=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=l74awC/AfVrx7UIGRY7eGykSg8rXvwqEErpuwduYuMKHd5XDNBiMPQ4udQV+uoWYAgtXFn3rNOsWenwCQsbNiKws2HNsLX5sAg0+NLEdushkb64B43S2pO0F5zoOd3v99O5HTHkFVL9f2JztEco2ivSg9O4AphVLk/osJIjs4bY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wZGtvRTa; arc=none smtp.client-ip=209.85.222.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8cb3b0d938dso3932659885a.2
-        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 08:39:36 -0800 (PST)
+	s=arc-20240116; t=1772469632; c=relaxed/simple;
+	bh=fjsc9vyZ19KtkwnKH8TjW0htsBZuXq/E0/oa7rIXL88=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dk6vrji6kkUl2sWN8q0SuBiiinVOK+O7G3U7dN+avwsA3Jy71FP4G8sA2SvrwZEzKodWv8xFgTa8Yej+UlXLxBcjupW2Csvmz02xuMYj9dbexUZVsN4+gWT/ep5uTCQAsaZ/4aYnXnC2IztJKbwyMVwQU65IeXTcK964ROVaexo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=WWARWsAp; arc=none smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-89a06bc2f1bso4370416d6.1
+        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 08:40:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772469576; x=1773074376; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Lsd7w/YwUfDuZqvwGO4uzCIEQrC3e9zbAgcIypwwWLY=;
-        b=wZGtvRTa0DriyF0aAtC3nJXF7ziKbqGmfEovqBTNHhRZkFMDhij2b43/8jdVJzfbRu
-         H46FdXVa9CUjpkg1l8rUFtV+jU195AHmxCs+1lBJeymoYsN5Bz1Nz8VlI0m2WMy7MfDv
-         sHFRpuBMYioKlo3ZAdCNxt286Xii+YWn6wVvoYRNXRUF86jNSS7HpIvl+J4Z/3xQWObu
-         2VYLrZ9y3k6bE7LX53V+1qimSOrYfUEA8mFVi3jlnGEYhMLjxNDd5SEXb2bvmBG9m3on
-         x0Zi7DseH0LQYfCFstYPyVJ52SKeh5KEv3akQ+z7DicLgDMHFOxn61NYKIQ7VK29KiHy
-         bh3w==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1772469630; x=1773074430; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DM9NFuWETcIWlEM/IPDNqxvAmEH49hmaVXstn1YxIuw=;
+        b=WWARWsAppJJv5LwI7gW9FbNgFZmB8oy8BdeAJRisXfqFF8ACS1INCVGHKx2otfFnkg
+         BRQqXx88HS0W+G6VW9D29orM63SaI53QJi/texs6SBa8tk2rGYRyRH4uVktygTr6zGxy
+         j5BENM2TECn268cuvFTwxrdfMY9VIA7htapA8s2pYhMh9Imndfz5EY8hStfXt4pbUgap
+         LL5I2MWAYLUZoQEhgYfpO3dB0xBElLzsEdWe/9jU5ewNoSKFTAvqbt3Q61nL4BpsTdho
+         NQ/zj2Kqu0ykIQ9SH4b0A0hJL0c+ZIMh7xo+mzMTek1uP65h1MESpInzLGJ0yGphmENa
+         7aKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772469576; x=1773074376;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Lsd7w/YwUfDuZqvwGO4uzCIEQrC3e9zbAgcIypwwWLY=;
-        b=ckLwDFI1iLN+ieJMf9+dQCWTV9uaLsxEhWyiFHuZfex6zN58VqqSLhAWFDDGge0FkH
-         KIZpsSYH6zuH+/fPgVkRXGMww0GZsiLB/f5ybeP/Q45f/cdRyRdwqz8DLBNYYcvXyrSQ
-         myrqmZkimiIAMTU7Gg0QLajrTK+xD55hp2aJnV24kkpPVCtLeTX6W8iWlo539IallPE9
-         6J+yL+en4M/6N5CcQYseLWGukuJiLcN1ru7/EG+a9vZdOcfGASHBkaGhpQeNeQ93Gecm
-         NHiuIp4XL+x9TxzHYpDzNLVKmJwFUmZ1yn88HozFa5ktff1BoammW08gMT99QLjgsjJ0
-         UUuA==
-X-Forwarded-Encrypted: i=1; AJvYcCVHrWu+pGxa+WpT+7URolIz1DK7S3Lksxfv8CN8R1c17hECdfU5KW+Qg5RLSohRqAVO/Fal+AI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1/CS5PHMryOLjZjdQYq1rEvAiVk3Y3f3lbO+oMBTmN63/88TH
-	/nUxbPGkTrq+dAzQMjCK9k4q5mQOIdZ6vEyXtHtxzW7qzr3RmmmyHMGClDD3pNQEw7z+hgReDge
-	9wrPf4B4RZxSEOQ==
-X-Received: from qklm2.prod.google.com ([2002:a05:620a:26c2:b0:8cb:3fad:e583])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:280b:b0:8cb:5176:f00 with SMTP id af79cd13be357-8cbc8ef6df0mr1584405385a.45.1772469575309;
- Mon, 02 Mar 2026 08:39:35 -0800 (PST)
-Date: Mon,  2 Mar 2026 16:39:33 +0000
+        d=1e100.net; s=20230601; t=1772469630; x=1773074430;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DM9NFuWETcIWlEM/IPDNqxvAmEH49hmaVXstn1YxIuw=;
+        b=tgRUMGQOq0fi/+Nu67K9H9DdDOIUuIB5jTRku1wBpCr+R/CHtWOsqjyixPeMnCpJaO
+         eQufT4+XuqR4Kh+b9R+vsga5RJ9r5EZipJwmY77y2aJFC41RM2bCeqfLwjYVi7e5NVBW
+         adn2/dp0MhiTjp80FnMCKsqfqcW3vae/T3k9+cmf4Jgk8dLxDEta5wyqIbNDH+yjfoYG
+         zGwqVGjR2wSfifL1BJKAz5y4KrL0KwLHrXpUxTHuCU2pnm+FjKtIYf7uS0fGAuAxikMs
+         3qBAWaQ5NqPtG+qFHy7cDl9GcxRhmUXKd2lHIa15txiPN+E1hkh9ISXzcT/NTPlOdMwV
+         On9Q==
+X-Gm-Message-State: AOJu0YxwfjZ6jNc4BpXPn5s6ejQv8lu3X8YksdXXMfvzo6ho4VoEWPy0
+	wAl/gXjb0rhORS0IzD5RVJEYicsFHuhhLCH/qUGoTXZEvALaMdlUuaDrQfMEKDuueD5QDtv+tmm
+	SM9GxGa0=
+X-Gm-Gg: ATEYQzzWax8YeXQ1MGzBPx9VL34h5tf6WVkQVnmrTGzNP83SXkt8cGT2o28GCREyrVF
+	OCY5HwBZ+DpiO0rK95FLf++d0TjPrq3Xp5QO+YvZKo5lZpUO3zlp3T8y0CH7t7UJu7x1lV7f/Iw
+	etzRuUEVtoAWt2d6qkNQTF4+aO68hpNSgjlQs0J+x2gkojSg1SBWDds3pslVjmH2fEOh337XavY
+	7mBG7IEew5H55NCbqcDGvIKGj3ZZe7W1KR+RzMQufykGCbfX77pvT39fWB9n6XN1LiUOhBI6nzM
+	gJx7Cn8XVqwCT+ghUUGX4jpU7sXAwiTPGyd1u+jJg2k2X8QrTFjyKB5tfKnWonHwzl0lBAbXoEd
+	Hwl4H9qByFCaPe53kKaoaak/8SZ2WwML3h8kKNkaBEt6J/9iKYyyrxS3bsIpXlfWcpAiCbkdl5L
+	Jy25PobkfrFZdCFfUuteB8+IYjWwLS5bzI3qfX54yis1xYXrNkagvev6HzluPs5g==
+X-Received: by 2002:ad4:4ea5:0:b0:899:fab4:7301 with SMTP id 6a1803df08f44-899fab4752fmr65529336d6.35.1772469629891;
+        Mon, 02 Mar 2026 08:40:29 -0800 (PST)
+Received: from phoenix.lan (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89a0684c1d2sm5180336d6.21.2026.03.02.08.40.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Mar 2026 08:40:29 -0800 (PST)
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+	Yedaya Katsman <yedaya.ka@gmail.com>
+Subject: [PATCH iproute2] remove leftover references to /usr/lib/route2
+Date: Mon,  2 Mar 2026 08:40:07 -0800
+Message-ID: <20260302164026.112728-1-stephen@networkplumber.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260302163933.1754393-1-edumazet@google.com>
-Subject: [PATCH net-next] net: fix off-by-one in udp_flow_src_port() / psp_write_headers()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 04B941DD2B2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: A86461DD2C7
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.06 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[networkplumber-org.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262741-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_CC(0.00)[networkplumber.org,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[]
+	TAGGED_FROM(0.00)[bounces-262742-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_THREE(0.00)[3];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[networkplumber-org.20230601.gappssmtp.com:+];
+	NEURAL_HAM(-0.00)[-0.997];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Action: no action
 
-udp_flow_src_port() and psp_write_headers() use ip_local_port_range.
+Since commit 962692356a1c ("Makefile: use /usr/share/iproute2 for config
+files") the path was moved to /usr/share in Makefile; but there
+were leftover references.
 
-ip_local_port_range is inclusive : all ports between min and max
-can be used.
-
-Before this patch, if ip_local_port_range was set to 40000-40001
-40001 would not be used as a source port.
-
-Use reciprocal_scale() to help code readability.
-
-Not tagged for stable trees, as this change could break user
-expectations.
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reported-by: Yedaya Katsman <yedaya.ka@gmail.com>
+Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 ---
- include/net/udp.h  | 3 ++-
- net/psp/psp_main.c | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ include/utils.h | 7 -------
+ lib/rt_names.c  | 5 ++++-
+ 2 files changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/include/net/udp.h b/include/net/udp.h
-index da68702ddf6edc6a28440490be07be7eef2d1a4e..b648003e5792a167822f28aeb728c3d64a2141f4 100644
---- a/include/net/udp.h
-+++ b/include/net/udp.h
-@@ -29,6 +29,7 @@
- #include <linux/seq_file.h>
- #include <linux/poll.h>
- #include <linux/indirect_call_wrapper.h>
-+#include <linux/math.h>
+diff --git a/include/utils.h b/include/utils.h
+index e0a9c780..adf6a581 100644
+--- a/include/utils.h
++++ b/include/utils.h
+@@ -39,13 +39,6 @@ extern bool do_all;
+ extern int echo_request;
+ extern int use_iec;
  
- /**
-  *	struct udp_skb_cb  -  UDP(-Lite) private variables
-@@ -376,7 +377,7 @@ static inline __be16 udp_flow_src_port(struct net *net, struct sk_buff *skb,
- 	 */
- 	hash ^= hash << 16;
+-#ifndef CONF_USR_DIR
+-#define CONF_USR_DIR "/usr/lib/iproute2"
+-#endif
+-#ifndef CONF_ETC_DIR
+-#define CONF_ETC_DIR "/etc/iproute2"
+-#endif
+-
+ #define SPRINT_BSIZE 64
+ #define SPRINT_BUF(x)	char x[SPRINT_BSIZE]
  
--	return htons((((u64) hash * (max - min)) >> 32) + min);
-+	return htons(reciprocal_scale(hash, max - min + 1) + min);
- }
+diff --git a/lib/rt_names.c b/lib/rt_names.c
+index 7dc194b1..3dba9642 100644
+--- a/lib/rt_names.c
++++ b/lib/rt_names.c
+@@ -208,7 +208,10 @@ rtnl_tabhash_initialize_dir(const char *ddir, const struct tabhash tabhash, cons
+ 	snprintf(dirpath_usr, sizeof(dirpath_usr), "%s/%s", CONF_USR_DIR, ddir);
+ 	snprintf(dirpath_etc, sizeof(dirpath_etc), "%s/%s", CONF_ETC_DIR, ddir);
  
- static inline int udp_rqueue_get(struct sock *sk)
-diff --git a/net/psp/psp_main.c b/net/psp/psp_main.c
-index d4c04c923c5ac6aead8b5bac41c54ae1143f4110..9508b6c380038b311a9b778933789b5c4cb61007 100644
---- a/net/psp/psp_main.c
-+++ b/net/psp/psp_main.c
-@@ -202,7 +202,7 @@ static void psp_write_headers(struct net *net, struct sk_buff *skb, __be32 spi,
- 		 * reciprocal divide.
- 		 */
- 		hash ^= hash << 16;
--		uh->source = htons((((u64)hash * (max - min)) >> 32) + min);
-+		uh->source = htons(reciprocal_scale(hash, max - min + 1) + min);
- 	} else {
- 		uh->source = udp_flow_src_port(net, skb, 0, 0, false);
- 	}
+-	/* load /usr/lib/iproute2/foo.d/X conf files, unless /etc/iproute2/foo.d/X exists */
++	/*
++	 * load CONF_USR_DIR/iproute2/foo.d/X conf files
++	 * unless CONF_ETC_DIR/iproute2/foo.d/X exists
++	 */
+ 	rtnl_tabhash_readdir(dirpath_usr, dirpath_etc, tabhash, size);
+ 
+ 	/* load /etc/iproute2/foo.d/X conf files */
 -- 
-2.53.0.473.g4a7958ca14-goog
+2.51.0
 
 
