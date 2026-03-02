@@ -1,194 +1,353 @@
-Return-Path: <netdev+bounces-262615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262616-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uD9aNY90pWnfBgYAu9opvQ
-	(envelope-from <netdev+bounces-262615-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 12:29:19 +0100
+	id GASSH9tzpWkNBgYAu9opvQ
+	(envelope-from <netdev+bounces-262616-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 12:26:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B3BB1D7800
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 12:29:19 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA6681D771C
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 12:26:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 715183070146
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 11:25:04 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3D2E33016ED6
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 11:26:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAF51361DDB;
-	Mon,  2 Mar 2026 11:25:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86F44362130;
+	Mon,  2 Mar 2026 11:26:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="waGS+jDI";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="svhlnLeR";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FBQ3Ggik";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="91kPCGgA"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="K2+r/Le+";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="aRzIV7bS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FB9D361DA7
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 11:25:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F4DB199EAD
+	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 11:26:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772450703; cv=none; b=dXKwBnyba+MGEwo9jJrCfhOEl8E7KNl33GBcmnH+4YVtMNzsv+8/z9zchKo6ZBV2USf5lFN2QGau1Sz0G18Qcv3FIfhG0n92T+PJ671lrEW51uusd94St6zwfbw4I+ofST3s1sU95Nde2y5TWoQjGKobbqEiWeo64FaVvKIZdvg=
+	t=1772450776; cv=none; b=hrkBi4NzegH2JOl/0zbyZcmbYa6fIfSiiS9lYdGxYhTLmM5RMX3Fdg1kKYpZzrRxFn6nf4wUp3zptd54zeZLt2IV6hAvXchgNZmW/vD/n7s7Oz20Qv9xvRaCHp5ZNNGj17+m+P2ronnIoA1Oq/NRYI5u6KCNf4A71f1MuBmwpic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772450703; c=relaxed/simple;
-	bh=bdcBgnoNrwSBua7z5lr5qTjWw01ndENdX4WyAIM4u9g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m3sG0OGRP5cHA/ZYa2DzwpSos98hSriaL1sdTdZgnI6m0Ph/6vGy4QOYQcTZmK2d72wuj6Y7/VSeX7sANfUmE9o9rmz65+LEIz7HC/2kHkoi+ymcJbnop4EmtJJszVVjzn2KH3vNmhCGN2uLO7uQp5SF7mgrMLnPhU+Kr6Vacvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=waGS+jDI; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=svhlnLeR; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FBQ3Ggik; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=91kPCGgA; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 754035BD1E;
-	Mon,  2 Mar 2026 11:24:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772450700; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rSzmkusbaMDPE3u9tJ8poO4+zjSt6klBfcovU0vZuEc=;
-	b=waGS+jDIXDJIo0mShDWDoLfiYEXZK3qT4WOPY/6vcNVbUr89JDWx9fjj9rvX5UelFRfdlW
-	mZKXzhO4lAJPQLXTQybPbzQdb/xNZWlnNouJH4cnBgoaArFqKwt8I4CgHxM/sCjQ2Awqhb
-	2ZdUUOToYRBNza2W7XZvFlmuaTihJcI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772450700;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rSzmkusbaMDPE3u9tJ8poO4+zjSt6klBfcovU0vZuEc=;
-	b=svhlnLeReDHL+fDZFlY0889lmkZ/ZmUoIADBxwdixhZ8KlR0KWfqiS8ZIjAkhPMTbWwhIp
-	PbrP466lPwvHXDCA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772450698; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rSzmkusbaMDPE3u9tJ8poO4+zjSt6klBfcovU0vZuEc=;
-	b=FBQ3Ggikx46ortHYWy0OwSOU/LgRP5qQprAAZcmv0sECEcGAzbgVI2zaUj5a3QCC0bwr2Q
-	xijAT5FA6Io9Qr4jUaTdmGbZrGzEpp3RnPfVmC+Ssp9/4blwDiPTzndsg/ELRsl9Nhx5/b
-	jEqxECZukC0oOXsbesKUei+JdXYrHZs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772450698;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rSzmkusbaMDPE3u9tJ8poO4+zjSt6klBfcovU0vZuEc=;
-	b=91kPCGgAEawVSe1Cuo9U/BEXj5Uu250eLQ6/sb2jY+x9quW3bZOEqX2NGKuxxf2KKd9vMX
-	CXcVEeT85sgtXJCw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id DB5B03EA69;
-	Mon,  2 Mar 2026 11:24:57 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id FaQ4MolzpWlZcgAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Mon, 02 Mar 2026 11:24:57 +0000
-Message-ID: <a0f4db13-9f18-4fcb-a6ab-73833cb0de3f@suse.de>
-Date: Mon, 2 Mar 2026 12:24:37 +0100
+	s=arc-20240116; t=1772450776; c=relaxed/simple;
+	bh=lCUzj0wrPvIj/RAFom1OT7zDz2gIPv1xsVe2Hd0Tym8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ml9V6BrKhk1tDnDETXQVIRlimv91Ts38VU4JHoFBxAaQDBsQQC1VptUKdG0lnCQZ0L7I19q52s+6Y49a1O8Q1aefmSQocF5gRCA/M2daJzL8QsfgMyll+8nc1ajurLq6RRW0qM7/ct2EEc4zB1F95dLaazg2mvxyaROlYF+cKfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=K2+r/Le+; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=aRzIV7bS; arc=none smtp.client-ip=103.168.172.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
+	by mailfout.phl.internal (Postfix) with ESMTP id 48E53EC05D1;
+	Mon,  2 Mar 2026 06:26:11 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-09.internal (MEProxy); Mon, 02 Mar 2026 06:26:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1772450771; x=
+	1772537171; bh=fR777Bm+TPENdmLm+vwFU3y9vWoFsIPtmEonhVffb6U=; b=K
+	2+r/Le+uV/BOcNyEZbF9UcgS3+Pizh0iVs7fjpuOzW5CLTs18qI3PVZgtFhawWuC
+	fqIwMGjlOgSxfFnIwyntnmNu6UOAZ+W1SE+htQKO2putOnb0yqnbJS6A9zEje//p
+	HYX8xB6OdCAhf9uTJLV7SITlE7cbaqaa9vk23PZjnbz1m3o13CAG0/KgHK+qk3zo
+	HBkrh4sUbZ25ObEBxjKlsy1T5AG9U5/If3H5lhy4PD/1LqXr3hccE3M0iCBbRuCH
+	t/09InyLf1doYjKl0NA1dqmx/Si8AbUsNFtdS2TVnZSDCmnbunPs07UrHd6x3qZQ
+	LidyS0z4iTkCHP2f6XU4w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1772450771; x=1772537171; bh=fR777Bm+TPENdmLm+vwFU3y9vWoFsIPtmEo
+	nhVffb6U=; b=aRzIV7bSTycF02le8vhUaBTqdDW54Gg2YOVCd+vYBxpif78tnpc
+	3RioUPzZRID9DT+4m9r8wgavBs51av+blEten3OgXjs8cPMtgd+pntITrB0NMG+R
+	OJQOWtAD5Wgoo5l9pJIk9/JktpPG3Hh3zWGb/yoEpN/bJuLDCIKeau7xrvWpK0uA
+	uGM8qPaaIg0ETdihGrVI9ivH9H9Nwj7y76ZFB7FB4Ai8yG/K/pWawytYpq58dEuW
+	YMKw3bFRKC0AqwNQRgVjFdR41XwQ5QwJbIdpCO0bJKQeZRJr34r27aq1V6ZH26HS
+	/EuwvVCerF6xAVWlr7qh6iaxe/rwlDZgYOg==
+X-ME-Sender: <xms:0XOlaeRvcEzlOI1mnEiPtl6psPx1ns-VDqAt4WLQXUkPzHoPGCIFcQ>
+    <xme:0XOlabLynny6zoK22as5KS-Yidfw_UTv0SUgCg8J9dKwg3lOMCyp5DZNGGO-wSCgd
+    p2qnCPkUPjCn_RdUDwmZM41Y8d2plINj21hgf0YU02gCDvNipv97Svd>
+X-ME-Received: <xmr:0XOlaRZGn_TAA9ESN94K82rqiGbV4uQ_uk5T1gvVVy5zKIjyV0Bt6zwM5pQ1>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvheejheegucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeeipdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopehsthgvfhhfvghnrdhklhgrshhsvghrthessh
+    gvtghunhgvthdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgv
+    lhdrohhrghdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtth
+    hopehtohgsihgrshesshhtrhhonhhgshifrghnrdhorhhgpdhrtghpthhtohephhgvrhgs
+    vghrthesghhonhguohhrrdgrphgrnhgrrdhorhhgrdgruhdprhgtphhtthhopeguvghvvg
+    hlsehlihhnuhigqdhiphhsvggtrdhorhhg
+X-ME-Proxy: <xmx:0XOlaV93VNwPCDKIt4YIfCXP2cRTbrXaHMp3L_B0Uf6_1cC-dCiSTA>
+    <xmx:0XOlaaabea_xdNnAfTo8-Y7wphzHIdJMK1Bn0GzmTxVw91phR00xtA>
+    <xmx:0XOlaRM-W7F2IxZ0PXLzoM42exjm-OgewEpT0uyEn2OGdQN0lfQROA>
+    <xmx:0XOlaeDfb4MsITyGlkGf36r1hNbltJ8O2Cu1O9bhnYaklNlMGgnb1w>
+    <xmx:03OlaQ45G1WLBqhW5LGKEJBSlCaTKRrxHrUs_yLUtJ1VWCHsgT4ridQp>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 2 Mar 2026 06:26:09 -0500 (EST)
+Date: Mon, 2 Mar 2026 12:26:07 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	Tobias Brunner <tobias@strongswan.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>, devel@linux-ipsec.org
+Subject: Re: [PATCH ipsec-next] esp: Consolidate esp4 and esp6.
+Message-ID: <aaVzz834HRXnR-to@krikkit>
+References: <aZ_8Adz1m47-yzhp@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: bridge: fix nd_tbl NULL dereference when IPv6 is
- disabled
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
- bridge@lists.linux.dev, roopa@cumulusnetworks.com, horms@kernel.org,
- pabeni@redhat.com, edumazet@google.com, davem@davemloft.net,
- razor@blackwall.org
-References: <20260226234059.19402-1-fmancera@suse.de>
- <20260228123057.14050980@kernel.org>
- <a09581fb-a3ad-4c0b-aa60-f16a75779756@suse.de>
- <20260302110838.GA875420@shredder>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20260302110838.GA875420@shredder>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Score: -4.30
-X-Spam-Level: 
-X-Spam-Flag: NO
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aZ_8Adz1m47-yzhp@secunet.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262615-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262616-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3B3BB1D7800
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,messagingengine.com:dkim,queasysnail.net:dkim]
+X-Rspamd-Queue-Id: CA6681D771C
 X-Rspamd-Action: no action
 
-On 3/2/26 12:08 PM, Ido Schimmel wrote:
-> On Sun, Mar 01, 2026 at 07:27:56PM +0100, Fernando Fernandez Mancera wrote:
->> On 2/28/26 9:30 PM, Jakub Kicinski wrote:
->>> On Fri, 27 Feb 2026 00:40:59 +0100 Fernando Fernandez Mancera wrote:
->>>> Fix this by adding a check before br_is_local_ip6() or neigh_lookup()
->>>> call. If ipv6_stub->nd_tbl is NULL, return immediately.
->>>
->>> The problem should probably be fixed by replacing IS_ENABLED(IPV6) in
->>> the callers with ipv6_mod_enabled(), rather than randomly sprinkling
->>> null checks?
->>>
->>
->> I agree about using ipv6__mod_enabled() instead of the NULL check. Thanks
->> for that recommendation, although I do not agree with replacing
->> IS_ENABLED(IPV6) because here there is some ND message suppression that can
->> be applied and at the end bridge should not be look to L3 unless necessary.
->>
->> E.g NUD is still being suppressed even if ipv6 is disabled on boot.
->>
->> What do you think? Thanks.
+2026-02-26, 08:53:37 +0100, Steffen Klassert wrote:
+> This patch merges common code of esp4.c and esp6.c into
+> xfrm_esp.c. This almost halves the size of the ESP
+> implementation for the price of three indirect calls
+> on UDP/TCP encapsulation. No functional changes.
 > 
-> I agree with Jakub and I believe it makes sense to not do any NS/NA
-> suppression when IPv6 is disabled. You are right that some messages can
-> be suppressed when IPv6 is disabled, but:
+> Changes from the RFC version:
 > 
-> 1. We are planning to send a patch to prevent the unconditional
-> suppression of ARP probes (DAD NS). Pending testing.
-> 
-> 2. There are some cases where GARP (unsolicited NA) should not be
-> suppressed (see RFC 9161) and we plan to add a knob to control that.
-> 
-> 3. It's unlikely that anyone is actually relying on this behavior.
-> Blamed commit is from 2017 and we only got a report now.
-> 
-> 4. Suppression that can be done without the IPv6 module being loaded can
-> probably be achieved using stateless egress filters.
+> - Fix a typo in the commit mesage.
 
-All right, given these arguments let's replace IS_ENABLED(IPV6) with 
-ipv6_mod_enabled().
+the commit "mesage"? :)
 
-Thank you for all the feedback!
-Fernando.
+> - Remove some old comments that don't make sense anymore.
+> 
+> - Let the ->input_encap functions return the needed offsets.
+> 
+> - Remove the IP_MAX_MTU check from UDP/TCP encap.
+>   The IPv4/IPv6 local_out function will do that ceck later.
+> 
+> - The comment on IPv4 ESP offload with UDP encapsulation
+>   is true for IPv4 and IPv6, so remove the IPv4 from the
+>   comment.
+> 
+> Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+> Tested-by: Tobias Brunner <tobias@strongswan.org>
+> ---
+>  include/net/esp.h       |    6 +
+>  include/net/xfrm.h      |    4 +
+>  net/ipv4/esp4.c         | 1065 ++------------------------------------
+>  net/ipv6/esp6.c         | 1081 ++-------------------------------------
+>  net/ipv6/esp6_offload.c |    6 +-
+>  net/xfrm/Makefile       |    1 +
+>  net/xfrm/xfrm_esp.c     | 1017 ++++++++++++++++++++++++++++++++++++
+>  7 files changed, 1132 insertions(+), 2048 deletions(-)
+>  create mode 100644 net/xfrm/xfrm_esp.c
+> 
+> diff --git a/include/net/esp.h b/include/net/esp.h
+> index 322950727dd0..5761c762c69a 100644
+> --- a/include/net/esp.h
+> +++ b/include/net/esp.h
+> @@ -47,4 +47,10 @@ int esp_input_done2(struct sk_buff *skb, int err);
+>  int esp6_output_head(struct xfrm_state *x, struct sk_buff *skb, struct esp_info *esp);
+>  int esp6_output_tail(struct xfrm_state *x, struct sk_buff *skb, struct esp_info *esp);
+>  int esp6_input_done2(struct sk_buff *skb, int err);
+
+Those 3 are gone now and can be removed.
+
+> +int esp_init_aead(struct xfrm_state *x, struct netlink_ext_ack *extack);
+> +int esp_init_authenc(struct xfrm_state *x, struct netlink_ext_ack *extack);
+> +void esp_destroy(struct xfrm_state *x);
+> +int esp_input(struct xfrm_state *x, struct sk_buff *skb);
+> +int esp_output(struct xfrm_state *x, struct sk_buff *skb);
+> +
+>  #endif
+> diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+> index 0a14daaa5dd4..e3217cafe582 100644
+> --- a/include/net/xfrm.h
+> +++ b/include/net/xfrm.h
+> @@ -455,7 +455,11 @@ struct xfrm_type {
+>  					      struct netlink_ext_ack *extack);
+>  	void			(*destructor)(struct xfrm_state *);
+>  	int			(*input)(struct xfrm_state *, struct sk_buff *skb);
+> +	int			(*input_encap)(struct sk_buff *skb, struct xfrm_state *x);
+>  	int			(*output)(struct xfrm_state *, struct sk_buff *pskb);
+> +	struct sock		*(*find_tcp_sk)(struct xfrm_state *x);
+> +	void			(*output_encap_csum)(struct sk_buff *skb);
+> +	int			(*output_tcp_encap)(struct xfrm_state *x, struct sk_buff *skb);
+
+This CB is unused.
+
+
+> diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
+> index 2c922afadb8f..6c5568a96f0a 100644
+> --- a/net/ipv4/esp4.c
+> +++ b/net/ipv4/esp4.c
+[...]
+> +static int esp4_input_encap(struct sk_buff *skb, struct xfrm_state *x)
+>  {
+> +	const struct iphdr *iph = ip_hdr(skb);
+> +	int ihl = iph->ihl * 4;
+>  	struct xfrm_encap_tmpl *encap = x->encap;
+[...]
+> +	struct tcphdr *th = (void *)(skb_network_header(skb) + ihl);
+> +	struct udphdr *uh = (void *)(skb_network_header(skb) + ihl);
+> +	int ret = 0;
+> +	__be16 source;
+>  
+> +	switch (x->encap->encap_type) {
+>  	case TCP_ENCAP_ESPINTCP:
+> -		esph = esp_output_tcp_encap(x, skb, esp);
+> +		source = th->source;
+> +		ret -= sizeof(struct tcphdr);
+
+I'm trying to check how all those offset combine, isn't that
+susceptible to the same problem as 17175d1a27c6 ("xfrm: esp6: fix
+encapsulation header offset computation")?
+
+Also, since those new ->input_encap should return a negative value on
+success, the "return -1" for error is a bit confusing.
+Maybe:
+ - make them return +1 on error, without going through "goto out"
+   (return -1 on error should be fine since that's not an expected
+   offset)
+ - make the final return (the one that returns the negative offset)
+   have a DEBUG_NET_WARN_ON_ONCE(ret >= 0)
+
+Or if my math is correct, the caller's hdr_len after adding
+->input_encap's return value is the full length of the ipv* header
+including options/extensions, so let ->input_encap return that
+directly instead of doing the "hdr_len += ret" dance (and keep the
+return -1 on error)? That would make things a bit clearer than
+"skb_network_header_len + skb_network_offset + [whatever
+ipv6_skip_exthdr returns]".
+
+
+[...]
+> @@ -1164,13 +194,16 @@ static int esp4_rcv_cb(struct sk_buff *skb, int err)
+>  
+>  static const struct xfrm_type esp_type =
+>  {
+> -	.owner		= THIS_MODULE,
+> -	.proto	     	= IPPROTO_ESP,
+> -	.flags		= XFRM_TYPE_REPLAY_PROT,
+> -	.init_state	= esp_init_state,
+> -	.destructor	= esp_destroy,
+> -	.input		= esp_input,
+> -	.output		= esp_output,
+> +	.owner			= THIS_MODULE,
+> +	.proto	     		= IPPROTO_ESP,
+
+nit: since you're reworking the whitespace, this is:
+
+\t.proto\t     \t\t= IPPROTO_ESP,
+
+(with a few spaces in the middle)
+
+[...]
+> diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
+> index e75da98f5283..b90e93fc1a70 100644
+> --- a/net/ipv6/esp6.c
+> +++ b/net/ipv6/esp6.c
+[...]
+> -int esp6_input_done2(struct sk_buff *skb, int err)
+> -{
+[...]
+> -		/*
+> -		 * 2) ignore UDP/TCP checksums in case
+> -		 *    of NAT-T in Transport Mode, or
+> -		 *    perform other post-processing fixes
+> -		 *    as per draft-ietf-ipsec-udp-encaps-06,
+> -		 *    section 3.1.2
+> -		 */
+> -		if (x->props.mode == XFRM_MODE_TRANSPORT)
+> -			skb->ip_summed = CHECKSUM_UNNECESSARY;
+>  	}
+>  
+> -	skb_postpull_rcsum(skb, skb_network_header(skb),
+> -			   skb_network_header_len(skb));
+
+This doesn't get carried over to the new common function
+esp_input_done2. It originally came from commit a9b28c2bf05d ("esp6:
+Fix RX checksum after header pull"), not sure if it's still needed but
+I guess so?
+
+
+> -	skb_pull_rcsum(skb, hlen);
+> -	if (x->props.mode == XFRM_MODE_TUNNEL ||
+> -	    x->props.mode == XFRM_MODE_IPTFS)
+> -		skb_reset_transport_header(skb);
+> -	else
+> -		skb_set_transport_header(skb, -hdr_len);
+> -
+> -	/* RFC4303: Drop dummy packets without any error */
+> -	if (err == IPPROTO_NONE)
+> -		err = -EINVAL;
+> -
+> -out:
+> -	return err;
+> -}
+> -EXPORT_SYMBOL_GPL(esp6_input_done2);
+
+[...]
+> diff --git a/net/xfrm/xfrm_esp.c b/net/xfrm/xfrm_esp.c
+> new file mode 100644
+> index 000000000000..f277dc114ba6
+> --- /dev/null
+> +++ b/net/xfrm/xfrm_esp.c
+[...]
+> +
+> +
+> +#ifdef CONFIG_INET_ESPINTCP
+> +static struct ip_esp_hdr *esp_output_tcp_encap(struct xfrm_state *x,
+> +						    struct sk_buff *skb,
+> +						    struct esp_info *esp)
+
+nit: alignment
+
+(checkpatch complains about this and a few other whitespace things in
+this new file, probably all carried over from the existing code)
+
+
+[...]
+> +EXPORT_SYMBOL_GPL(esp_init_authenc);
+> +
+> +MODULE_LICENSE("GPL");
+> +MODULE_DESCRIPTION("Generic ESP");
+> +
+
+nit: git complains about the empty line
+
+-- 
+Sabrina
 
