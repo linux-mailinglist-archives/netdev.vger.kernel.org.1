@@ -1,170 +1,177 @@
-Return-Path: <netdev+bounces-262556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262557-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CN2LIP9JpWn17wUAu9opvQ
-	(envelope-from <netdev+bounces-262556-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 09:27:43 +0100
+	id kC9DIIhKpWn17wUAu9opvQ
+	(envelope-from <netdev+bounces-262557-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 09:30:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA3581D49DF
-	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 09:27:42 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 036EB1D4A55
+	for <lists+netdev@lfdr.de>; Mon, 02 Mar 2026 09:29:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 317C4300F9D0
-	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 08:27:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 81098300C9A6
+	for <lists+netdev@lfdr.de>; Mon,  2 Mar 2026 08:29:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAF49379EFA;
-	Mon,  2 Mar 2026 08:27:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 838A3379EFB;
+	Mon,  2 Mar 2026 08:29:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="OfONxUxC";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="DeVR/7o6";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="OfONxUxC";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="DeVR/7o6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fXBo/Dig"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FBC0379EE9
-	for <netdev@vger.kernel.org>; Mon,  2 Mar 2026 08:27:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60178350D74;
+	Mon,  2 Mar 2026 08:29:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772440035; cv=none; b=nidiZkkEOQLgxVd9e7epl5lqg1N2owrP2nSY0/XAc25CSoiC00iiBtLhJwD5cRTezlndsRDnBhNasEuxNos0eBO8fH+OaWTr68UprHGz8JGHdI9q+kTbDtahtsmj2qMO1ZDkraAPRGKJMdTv5tp+MGsr91whYLaicHTG3uQzCmE=
+	t=1772440150; cv=none; b=QUHhC0Hx1Y816TfWFJ/zIi2EY2tNNh+cqdr6RarkXKhyhYaJ4J6zAznXGi+D/8jbqJr81vb06FlpfbuIQrmu4Y0AJSzDdDjrJ/P1ZdJWJ90trcFa4vT25Eeo0g3sseufcvxuECxGAO15ds90dOcG9U2U4UgeLSht5T6ltEQPodc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772440035; c=relaxed/simple;
-	bh=abl639WzpFQrR9CsLzLZvpA2dEn59beOrRf7yzNvngg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uZxrwJk2L9GvzKjIbSs9h7op0Kow7wLBCTc9wxrEfdVHpdHWmzpfLaZTzHdxDNOSKpuSh2lHeB2NXfhigx/DBmGr2axyyGfjWl6zQdCxm+5dL46u2Tygc9lNZqJhHsf7ZmqpczbW/cTOVLy0HhqDBzZiK/atfK8wB2puTKnOj9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=OfONxUxC; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=DeVR/7o6; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=OfONxUxC; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=DeVR/7o6; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id C68AD5BD0E;
-	Mon,  2 Mar 2026 08:27:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772440032; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kV1vbnGXh04kFzK1MuebINiw2OSlvF2TcWr6i4Oav/Y=;
-	b=OfONxUxCs5rYaBnwubUaZdpN716zwjgmqHQeBJJpQZRSxABadsBK2TkhbhwjZoJZM+Shut
-	XtPuOU/xjl/pHUT/rGKb5WW30i3SQhVrcyE49TSQ9BWsmRbn/XGn3n3AOznby01ZVsxz1W
-	PN1RYFND1VRgf8Vf4bMz2RGObAdoV3s=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772440032;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kV1vbnGXh04kFzK1MuebINiw2OSlvF2TcWr6i4Oav/Y=;
-	b=DeVR/7o6L/t5dwf/fQhC2+CsoyfEcG3bCnJKl0IoEJswC4hzp3YVMHpT7pZhVUOHAj2b1b
-	2bQctWxEzOiurOCw==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772440032; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kV1vbnGXh04kFzK1MuebINiw2OSlvF2TcWr6i4Oav/Y=;
-	b=OfONxUxCs5rYaBnwubUaZdpN716zwjgmqHQeBJJpQZRSxABadsBK2TkhbhwjZoJZM+Shut
-	XtPuOU/xjl/pHUT/rGKb5WW30i3SQhVrcyE49TSQ9BWsmRbn/XGn3n3AOznby01ZVsxz1W
-	PN1RYFND1VRgf8Vf4bMz2RGObAdoV3s=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772440032;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kV1vbnGXh04kFzK1MuebINiw2OSlvF2TcWr6i4Oav/Y=;
-	b=DeVR/7o6L/t5dwf/fQhC2+CsoyfEcG3bCnJKl0IoEJswC4hzp3YVMHpT7pZhVUOHAj2b1b
-	2bQctWxEzOiurOCw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 517D73EA69;
-	Mon,  2 Mar 2026 08:27:12 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id JJbPEOBJpWmsMAAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Mon, 02 Mar 2026 08:27:12 +0000
-Message-ID: <65e44884-2db7-4db0-8f48-138983314450@suse.de>
-Date: Mon, 2 Mar 2026 09:27:04 +0100
+	s=arc-20240116; t=1772440150; c=relaxed/simple;
+	bh=XgmEFlrgoVM5GMVUfVwni7U+ozETMqLPAUtrEhHKUlg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DrpCgwViu/3IJ9QXfuV339hWiICLymZvtvNxDJKyynyVg1ji6Hy6YaDt5oOtH7KzTeGIy2jUP8nEI9zDAiRRCn9tDKyk1+GG0nZInjeMau3Pk2iWBx3H5yIaTo3n2PZ7evCLpb5xImMzZsygkRFT2AkB1N7uRdYgg9DZBTo5Ok4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fXBo/Dig; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF7F0C19423;
+	Mon,  2 Mar 2026 08:29:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772440150;
+	bh=XgmEFlrgoVM5GMVUfVwni7U+ozETMqLPAUtrEhHKUlg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fXBo/DigZu51VHzi2LFmo685MmuAj62mJplY7NnjAVeOMa8YFM+xe3BF49g2gCzXF
+	 33uHVS6tcWYQUpips0r9N0PoCgGFxV+T8bDd/12fwPFJvYzM3r//mGnKLc3Uux0Zml
+	 Wj7MBPazyYZ1B1/qbnlxRP+oajV/QzuV1vH6ZQzaqTcBGCBXia2gW4qW5L1FYOMkiP
+	 E4+rj78K10ii+E7D0VEtSSjDVbQuiMgfTOVJZSjYBpUQNN5JtmQA1laMpEsTYyF5N1
+	 cMwY9zJoIlDfT2sIhwPN4VhgkbJjrWnmxkswgx7O4uuUbuK3omFLaqXDxLOz9n4Kb9
+	 5hleWfv6hGlIg==
+Date: Mon, 2 Mar 2026 08:29:06 +0000
+From: Simon Horman <horms@kernel.org>
+To: tobgaertner <tob.gaertner@me.com>
+Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	gregkh@linuxfoundation.org, oneukum@suse.com, bjorn@mork.no
+Subject: Re: [PATCH] net: usb: cdc_ncm: add ndpoffset to nframes bounds check
+Message-ID: <aaVKUp4pDjfo5EYm@horms.kernel.org>
+References: <20260227072241.566212-1-tob.gaertner@me.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2 net-next v2] ipv4: bump rt_genid when a relevant
- devconf value changes through netlink
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, tgraf@infradead.org, horms@kernel.org,
- pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org,
- davem@davemloft.net
-References: <20260226133949.17070-1-fmancera@suse.de>
- <20260226133949.17070-2-fmancera@suse.de>
- <20260228104547.56186b2d@kernel.org>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20260228104547.56186b2d@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
-X-Spam-Level: 
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260227072241.566212-1-tob.gaertner@me.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262557-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[me.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262556-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-0.993];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,suse.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EA3581D49DF
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[me.com:email,horms.kernel.org:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 036EB1D4A55
 X-Rspamd-Action: no action
 
-On 2/28/26 7:45 PM, Jakub Kicinski wrote:
-> On Thu, 26 Feb 2026 14:39:49 +0100 Fernando Fernandez Mancera wrote:
->> When modifying IPv4 devconf values using netlink for some relevant
->> fields the rt_cache_flush() call was missing. In addition, if forwarding
->> is enabled on the interface then disable LRO.
->>
->> This is needed to avoid possible connectivity issues and ease the
->> responsabilities of user space tools.
->>
->> Fixes: 9f0f7272ac95 ("ipv4: AF_INET link address family")
->> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+On Thu, Feb 26, 2026 at 11:22:41PM -0800, tobgaertner wrote:
+> From: Tobi Gaertner <tob.gaertner@me.com>
 > 
-> This OTOH probably deserves to be a real fix for net?
+> cdc_ncm_rx_verify_ndp16() and cdc_ncm_rx_verify_ndp32() validate that
+> the NDP header and its DPE entries fit within the skb. The first check
+> correctly accounts for ndpoffset:
+> 
+>   if ((ndpoffset + sizeof(struct usb_cdc_ncm_ndp16)) > skb_in->len)
+> 
+> but the second check omits it:
+> 
+>   if ((sizeof(struct usb_cdc_ncm_ndp16) +
+>        ret * (sizeof(struct usb_cdc_ncm_dpe16))) > skb_in->len)
+> 
+> This validates the DPE array size against the total skb length as if
+> the NDP were at offset 0, rather than at ndpoffset. When the NDP is
+> placed near the end of the NTB (large wNdpIndex), the DPE entries can
+> extend past the skb data buffer even though the check passes.
+> cdc_ncm_rx_fixup() then reads out-of-bounds memory when iterating
+> the DPE array.
+> 
+> Add ndpoffset to the nframes bounds check in both the NDP16 and NDP32
+> verification functions.
+> 
+> Found by coverage-guided fuzzing with QEMU system-mode emulation.
+> 
+> Fixes: ff06ab13a4cc ("net: cdc_ncm: splitting rx_fixup for code reuse")
 
-Okay, makes sense. Let me re-send this to net.git without relying on the 
-previous patch. Then once is merged and net-next is synced I will 
-re-send the validation one.
+Hi Tobi,
 
-Thanks,
-Fernando.
+I think the tag above covers the ndp16 case.
+But that it would be appropriate to also have the following tag
+for the ndp32 case.
+
+Fixes: 0fa81b304a79 ("cdc_ncm: Implement the 32-bit version of NCM Transfer Block")
+
+Which does make me lean towards a patchset with two patches.
+
+> Signed-off-by: Tobi Gaertner <tob.gaertner@me.com>
+> ---
+>  drivers/net/usb/cdc_ncm.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/usb/cdc_ncm.c b/drivers/net/usb/cdc_ncm.c
+> index 5d123df0a..39d2ad95d 100644
+> --- a/drivers/net/usb/cdc_ncm.c
+> +++ b/drivers/net/usb/cdc_ncm.c
+> @@ -1675,7 +1675,7 @@ int cdc_ncm_rx_verify_ndp16(struct sk_buff *skb_in, int ndpoffset)
+>  					sizeof(struct usb_cdc_ncm_dpe16));
+>  	ret--; /* we process NDP entries except for the last one */
+>  
+> -	if ((sizeof(struct usb_cdc_ncm_ndp16) +
+> +	if ((ndpoffset + sizeof(struct usb_cdc_ncm_ndp16) +
+>  	     ret * (sizeof(struct usb_cdc_ncm_dpe16))) > skb_in->len) {
+
+Perhaps out of scope for a strict bug fix. But I think this can be
+expressed more succinctly using struct_size_t and fewer parentheses.
+(compile tested only!)
+
+	if (ndpoffset + struct_size_t(struct usb_cdc_ncm_ndp16,
+				      dpe16, ret) > skb_in->len) {
+
+
+>  		netif_dbg(dev, rx_err, dev->net, "Invalid nframes = %d\n", ret);
+>  		ret = -EINVAL;
+> @@ -1711,7 +1711,7 @@ int cdc_ncm_rx_verify_ndp32(struct sk_buff *skb_in, int ndpoffset)
+>  					sizeof(struct usb_cdc_ncm_dpe32));
+>  	ret--; /* we process NDP entries except for the last one */
+>  
+> -	if ((sizeof(struct usb_cdc_ncm_ndp32) +
+> +	if ((ndpoffset + sizeof(struct usb_cdc_ncm_ndp32) +
+>  	     ret * (sizeof(struct usb_cdc_ncm_dpe32))) > skb_in->len) {
+
+Likewise here.
+
+>  		netif_dbg(dev, rx_err, dev->net, "Invalid nframes = %d\n", ret);
+>  		ret = -EINVAL;
+> -- 
+> 2.43.0
+> 
+> 
 
