@@ -1,80 +1,83 @@
-Return-Path: <netdev+bounces-263333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263334-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UK2ADh0Vp2ncdQAAu9opvQ
-	(envelope-from <netdev+bounces-263333-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 18:06:37 +0100
+	id oGpBBPcTp2kMdgAAu9opvQ
+	(envelope-from <netdev+bounces-263334-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 18:01:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 949431F4651
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 18:06:36 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54CEB1F4582
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 18:01:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BFBEF3075E83
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 17:01:11 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9AF143026DB5
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 17:01:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B0523BED30;
-	Tue,  3 Mar 2026 17:01:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFD8D3D34BE;
+	Tue,  3 Mar 2026 17:01:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2wBqH2qq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W8uCb1tZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0035D72631
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 17:01:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA5FC3358C2
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 17:01:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772557271; cv=none; b=Bj/ocl+TjqrsmuJc24UgE9PHB3DDppcmhNVukUrV1pTLTYJA5hIk4LavGZYCf9PXNfac4aLzQm1DkIqdB9EoKH97DZhh6ko6dJ6B+AA7EII7HNWtVLjFotXmuzo0VRSm91OsBGbX+ZmwEkwd5Abq+N2yRqTPsTNqoXD+nyd69Xg=
+	t=1772557272; cv=none; b=Gtt7uiCC4rdIK5sAlt3c5tMuJLUGSep4ybfL23Tg+Sk60ngDEJzoHCebOs1+9dmltrRrnUdInbcvSqXAbhmCBtCBYyxl77OQVUspOzfew/FYWyMAr+uLWv01nfx8LnWbLAtmAtDZN4elubthd5FPxprWwdMxjDGkP9Olnp95Law=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772557271; c=relaxed/simple;
-	bh=BLatzjqVvtRsincIhVbebxR/E15+tJc7XPVTRhg/sOA=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=h6M/OzdCyiVenDPySQfn1PRBmdK7IiZj/mk3bch7m1bahHiqx8gZMtiODwkplTyQDIyc6xYupDKe6NgSIuS1nZWEfRG1oTjMqkJXtlYZ023mlBbKn0Eef2oJFbjv9Ofr2uU0w7j2TyhV1KMwtMIi/f247B9RvFJufh1zKb1qt4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2wBqH2qq; arc=none smtp.client-ip=209.85.214.201
+	s=arc-20240116; t=1772557272; c=relaxed/simple;
+	bh=+xr/8cP1YmUhYlqNJcGc2rtUKBHvlfAXWLvjH6aqTzE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=kIZNjJDKG6OzoycSgCUEDaTFmrDr9jkpinRORN/tmjBizoPR9lRYobMsiA3fWpp10X5grRGLBw0i2mjeHTq+9/yiKgu6OtDXmfyy9F3k4EUVJjvbj5ChMWhjj375sTZHxvM4926J5eKL59CMt1C0IiWYkIjij3PdJ5b6yK2E8PE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=W8uCb1tZ; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2adef9d486bso53030645ad.2
-        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 09:01:09 -0800 (PST)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c70ea91bfe1so3777083a12.1
+        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 09:01:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772557269; x=1773162069; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=3W9msYejfIcxyZd2zRSvO+gfVN6T58KsrkSE6malUmY=;
-        b=2wBqH2qqXp70k3QpPRUCGSBNul+e6Kq29ZYea3P3cYm+xuyaXEaton5qX91wONraSj
-         5vZdbdEkgi+wtGNe2vF5mtIdfCfhkzWJDHLdIE0tcO1TZmJCtIqxcTT7fv1hIo2MGzjX
-         A7picmfgB5DQYvLJ+01fN7xfRjPZ+SrijCUSjqr+ufU/sQg1SMIyTGaTNjDcBoRJVmT/
-         jPtxdcqgHPAXUbtOyRdtkBYQlR3Ek+BThpOJKNza9rrXqA7J9d06K8+krX+cE40hcfMO
-         8QSAJcJyECLkf60j6L3RUWAIbpngVINw8MYirc1/7G8t6HnTupReKSYKAtUUfxGTx2ok
-         7t2g==
+        d=google.com; s=20230601; t=1772557271; x=1773162071; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GjQGo/Bm/mzaEwWNBUTkUEEoY/bSeVQ1lxMEw0MvYk4=;
+        b=W8uCb1tZd9dREQeElLfg9eOBISvtDGVh21QhjyOMruc0SM4SDjCTb0pOEnWMZ1yk5X
+         GoXnvaP3GejhlEZo35qQydSy2EJmALJZlOq4OZ6smE6b5sS89J8y76JhEubygAa93Cmk
+         jhK+IvbX5sv/Ik/r/Z8ZqiFTgcGicrIoKQCS9RM+BYaucyfSkAfMo/W/GO1Vc68m0x1/
+         hTf9+zuWCvXOU3lnwit8AK6ksSA8X8Ma0rIreMip/tHnFradFUu/mpQdJPShYCzIUrg7
+         gUHZDy9D4C8axhxIRnTKMPM/JAl4XMm93lY9mMM846pcT9Tj1mjKf9uR3i1/jGOP36/w
+         EVOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772557269; x=1773162069;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3W9msYejfIcxyZd2zRSvO+gfVN6T58KsrkSE6malUmY=;
-        b=ACna0DTiVkU6kgGJxFVK1iIzubT84bUmt9wAO8lCsfyDmLgbuoMENung3Z1cdsGDgE
-         AiR+mMHo9lIqfOfQipYKMd4NxmJdNAUx23MxYfJzXy1CfqPVz/RFlRjHgO3uSRhraVwd
-         nzJ7juWDdHDyoZhZMY6SCIkNTH5Z0nlvL1wzwr6xyJBdnLbPj/D4rbcuocUVQiakSBSv
-         3pypPmJ00i4X+f7RZsfQicWkgAGuyXemGXCJ+GkN3z08PS2KyudSXVLXpMGzOrbw6MWJ
-         B4+6cwUTQ26YV4k0LcQlxFtXyTG9dHQksNoq6OGWvlfOD/WTridJ5ls+0/JNR1L8o0rg
-         Magw==
-X-Gm-Message-State: AOJu0Yx4D5iemBD4PlxIuVGTCIsJmg9mlKrDM7bvB973L5dO6dlLU2Dw
-	FXNVkV1HNAyf91+m6FTEgdf1y60PpqJGYJ4qrzGT+WEPDDq1cJsWjPUuc6ypOSGLYFmvipijIoN
-	0D4Q/Kt2PjFaZQFaFbnm/X+hSl+h88+mPZm2yZAPziaFnr71H2M5dy0FaktKIbqqKBLyywggFCD
-	ZBHxbSMBCLI104cVeWDZ4J1XyjlT4lDfw=
-X-Received: from pgbr11.prod.google.com ([2002:a63:5d0b:0:b0:c70:e705:e5b2])
- (user=jrife job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5747:b0:340:25f0:a9b
- with SMTP id 98e67ed59e1d1-35965ce437amr14974704a91.33.1772557268887; Tue, 03
- Mar 2026 09:01:08 -0800 (PST)
-Date: Tue,  3 Mar 2026 17:01:01 +0000
+        d=1e100.net; s=20230601; t=1772557271; x=1773162071;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GjQGo/Bm/mzaEwWNBUTkUEEoY/bSeVQ1lxMEw0MvYk4=;
+        b=WHm1G7zdQtlr+DM+E97dhgMagDdrUbfCb99hTh3Hlmr/Polir69utVTlxGhnEqSZBd
+         CLruxmuDkEtG2IdYw+w5/ujXaGtWQVzjFbGJnMu7WZXm06jkkcVFkmBtuiLAkDgHXql7
+         bSdcGvnotnPqfwt8SaCh27d5LGLPrOK3SJYNqboMHxBTUPtrv8/RzwGJdhO+NEdw2dtC
+         5rvyHY8LgQIuoMj3WhUakU8TL+W4kH6WdGrpFc5zBLZeUu5oXkDqvhHkHz+m0JAOEQNY
+         zanZc2VL2suVRc2BZ6BPLRrCBBixAG/rgowDQo+aG7f40tCb0lyC2JyGBASIGzivcFSB
+         Zicg==
+X-Gm-Message-State: AOJu0YyRaBb4fvd0H+YkvD/EMLYnjBJ1e5LQBSJ2AJsGnHDA+J4WR8+n
+	/gUaePatwNcYm0oRx4sh4Efqm3p8TD/Ryg8eODDNMA9oNNudKupICy6GBlKPG3uebsFrNStbwWA
+	SeyVQTDUavyatVCBufMcA8JAK4TB2AggcYXcbn0NeI71fzhPTOP4OCQjlWVVo1TVvl3TFLwW+bY
+	W5J8RrP8yKphcIi2m4PlLQNr3ZOU/iIR8=
+X-Received: from pgkc18.prod.google.com ([2002:a63:ef52:0:b0:c6e:22cb:d319])
+ (user=jrife job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:6f0a:b0:38e:676a:f3e
+ with SMTP id adf61e73a8af0-395c3a5f7cbmr15863153637.29.1772557270810; Tue, 03
+ Mar 2026 09:01:10 -0800 (PST)
+Date: Tue,  3 Mar 2026 17:01:02 +0000
+In-Reply-To: <20260303170106.129698-1-jrife@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260303170106.129698-1-jrife@google.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260303170106.129698-1-jrife@google.com>
-Subject: [PATCH net-next v2 0/2] Preserve UDP socket addresses on abort
+Message-ID: <20260303170106.129698-2-jrife@google.com>
+Subject: [PATCH net-next v2 1/2] udp: Preserve UDP socket addresses on abort
 From: Jordan Rife <jrife@google.com>
 To: netdev@vger.kernel.org
 Cc: Jordan Rife <jrife@google.com>, bpf@vger.kernel.org, 
@@ -83,117 +86,77 @@ Cc: Jordan Rife <jrife@google.com>, bpf@vger.kernel.org,
 	Stanislav Fomichev <sdf@fomichev.me>, Andrii Nakryiko <andrii@kernel.org>, 
 	Yusuke Suzuki <yusuke.suzuki@isovalent.com>, Jakub Kicinski <kuba@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 949431F4651
+X-Rspamd-Queue-Id: 54CEB1F4582
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[google.com,vger.kernel.org,gmail.com,iogearbox.net,linux.dev,fomichev.me,kernel.org,isovalent.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263334-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263333-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RSPAMD_URIBL_FAIL(0.00)[isovalent.com:query timed out];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[jrife@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RSPAMD_EMAILBL_FAIL(0.00)[jrife.google.com:query timed out,yusuke.suzuki.isovalent.com:query timed out];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,isovalent.com:email]
 X-Rspamd-Action: no action
 
-BPF cgroup/sock_release hooks can be useful for performing cleanup,
-map maintenance, or other bookkeeping when sockets are released. Cilium
-uses cgroup/sock_release hooks to do just that, cleaning up maps keyed
-by socket destination addresses. This works fine for TCP and connected
-UDP sockets when they're closed gracefully, but Yusuke reported that
-this fails for connected UDP when sockets are aborted prior to closing
-the socket. Cilium in particular actively destroys/aborts connected UDP
-sockets, so this scenario can happen easily.
+Currently, udp_abort() invokes __udp_disconnect() which clears out
+socket fields like inet_daddr and inet_dport. This makes fields like
+dst_ip4, dst_ip6, and dst_port useless inside cgroup/sock_release BPF
+hooks following an abort on a connected UDP socket, since they'll always
+equal zero. This differs from the behavior for TCP sockets where a
+cgroup/sock_release hook will see the address and port that the socket
+was connected to at the time it was aborted. This causes issues in
+Cilium where a sock_release hook is used to perform map maintenance when
+sockets are released, since Cilium actively destroys connected UDP
+sockets in some cases.
 
-From Yusuke's testing results in [1]:
+Make the behavior consistent between TCP and UDP sockets by not clearing
+out these fields in udp_abort(). Instead, just unhash the socket, mark
+its state as TCP_CLOSE, and preserve the state of the other fields.
 
-1. socket connects to "127.0.0.1:8000"
-2. socket aborted - diag_destroy (tcp_abort/udp_abort)
-3. close(sock_fd)
-4. BPF_CGROUP_RUN_PROG_INET_SOCK_RELEASE(sk) runs my_sock_release()
+Fixes: f5836749c9c0 ("bpf: Add BPF_CGROUP_INET_SOCK_RELEASE hook")
+Reported-by: Yusuke Suzuki <yusuke.suzuki@isovalent.com>
+Signed-off-by: Jordan Rife <jrife@google.com>
+---
+ net/ipv4/udp.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-__section("cgroup/sock_release")
-int my_sock_release(struct bpf_sock *ctx)
-{
-    ...
-    /* For TCP, dst_ip4 == "127.0.0.1" but for connected UDP
-     * dst_ip4 == 0.
-     */
-    ...
-}
-
-Case  Protocol        IP Family  Type	        Result
-1     TCP             IPv4       Regular close  Cleaned up
-2     TCP	      IPv4       Abort          Cleaned up
-3     TCP	      IPv6       Regular close  Cleaned up
-4     TCP             IPv6       Abort          Cleaned up
-5     UDP (Connected) IPv4       Regular close  Cleaned up
-6     UDP (Connected) IPv4       Abort          Not cleaned up
-7     UDP (Connected) IPv6       Regular close  Cleaned up
-8     UDP (Connected) IPv6       Abort          Not cleaned up
-
-This patch aims to make the behavior consistent between TCP and
-connected UDP by preserving the socket destination address and port
-through to the sock_release hook.
-
-Regarding my approach:
-
-Currently, udp_abort() calls __udp_disconnect(), but this seems like
-overkill in the case of a socket abort. __udp_disconnect() handles two
-special cases:
-
-1. When a socket binds to 0.0.0.0, connects, then disconnects using
-   AF_UNSPEC it needs to be rehashed as described in commit 303d0403b8c2
-   ("udp: rehash on disconnect").
-2. Avoids unhashing the socket in cases where it was bound to a specific
-   port.
-
-This makes sense in the case of a graceful disconnect (AF_UNSPEC) where
-the socket remains intact and may be used in the future, but it seemed
-sufficient in the case of a socket abort to simply set sk_err so that
-future operations on that socket fail and to unconditionally unhash the
-socket if it is currently hashed, thus avoiding any of the field
-manipulation that __udp_disconnect() would otherwise do.
-
-[1]: https://github.com/cilium/cilium/issues/42649
-
-CHANGES
-=======
-
-v1 -> v2:
-* Set connect_fd back to -1 after calling destroy() in the selftest
-  (Jakub).
-
-Jordan Rife (2):
-  udp: Preserve UDP socket addresses on abort
-  selftests/bpf: Ensure dst addr/port are preserved after socket abort
-
- net/ipv4/udp.c                                |   4 +-
- .../bpf/prog_tests/sock_destroy_release.c     | 136 ++++++++++++++++++
- .../bpf/progs/sock_destroy_release.c          |  59 ++++++++
- 3 files changed, 198 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/sock_destroy_release.c
- create mode 100644 tools/testing/selftests/bpf/progs/sock_destroy_release.c
-
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index b96e47f1c8a2..01a0a0fbcd56 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -3247,7 +3247,9 @@ int udp_abort(struct sock *sk, int err)
+ 
+ 	sk->sk_err = err;
+ 	sk_error_report(sk);
+-	__udp_disconnect(sk, 0);
++	sk->sk_state = TCP_CLOSE;
++	sk->sk_prot->unhash(sk);
++	sk_dst_reset(sk);
+ 
+ out:
+ 	if (!has_current_bpf_ctx())
 -- 
 2.53.0.473.g4a7958ca14-goog
 
