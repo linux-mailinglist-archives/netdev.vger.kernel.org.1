@@ -1,143 +1,200 @@
-Return-Path: <netdev+bounces-263332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263333-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uLuTL/MSp2mfdQAAu9opvQ
-	(envelope-from <netdev+bounces-263332-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 17:57:23 +0100
+	id UK2ADh0Vp2ncdQAAu9opvQ
+	(envelope-from <netdev+bounces-263333-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 18:06:37 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28F181F4340
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 17:57:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 949431F4651
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 18:06:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3FDE030659F5
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 16:53:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BFBEF3075E83
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 17:01:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B8A34A2E0E;
-	Tue,  3 Mar 2026 16:53:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B0523BED30;
+	Tue,  3 Mar 2026 17:01:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PJVK+nle"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2wBqH2qq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E26C5492532;
-	Tue,  3 Mar 2026 16:53:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0035D72631
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 17:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772556802; cv=none; b=Ilxe9HdpSkOHl2OfwNbtgiZAdF6GxyzNAgSw7mHK1qGSydnKvJuFjcbP6kY4J2Zv8kX5Y3cAJv9Lf47gcNSx+t6V1M004TpSJhYhJ4AM7bQB4jIioONVMmPqGc4Wli4RKMEgSzM5NaZ1iuFyGa+20RPbstpLzF7n5ruuMpSIc9Y=
+	t=1772557271; cv=none; b=Bj/ocl+TjqrsmuJc24UgE9PHB3DDppcmhNVukUrV1pTLTYJA5hIk4LavGZYCf9PXNfac4aLzQm1DkIqdB9EoKH97DZhh6ko6dJ6B+AA7EII7HNWtVLjFotXmuzo0VRSm91OsBGbX+ZmwEkwd5Abq+N2yRqTPsTNqoXD+nyd69Xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772556802; c=relaxed/simple;
-	bh=wDCqvZbR20asayvEi/uyZYCGSa8bb8CktOtFLgsbc/E=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cX7pkN6uRtE8b36VSka9xt1FCjRIkMctx/tfpfr9z83HNKEKwOdKzMqVukS/LeMbTl2xSiUaXIFtPAjHNmaz2RDi3gh969vdgHpauipDmS/Rlg/C/3Gn0K3u7r5pXUVAeHKSJcAxTEvkpgF3hAlCyBWvGTk5Oc534NfiYpL+VVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PJVK+nle; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19092C116C6;
-	Tue,  3 Mar 2026 16:53:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772556801;
-	bh=wDCqvZbR20asayvEi/uyZYCGSa8bb8CktOtFLgsbc/E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PJVK+nleKUV+VCQsIfBf8pE8r1RQBWeGKvZbcp/Txjz9tyQnNVEeVq+FAq+pLTA9W
-	 SD7Kt4WrO3fzCOkBnoCFmmJQEYM3mszcwqyE2MMZuVIFkPP+iIJRmOaT8uxc14oFcC
-	 hgEr4vyovkctSwLYZG6WAVMm90V5xctttxJwdjlEJvi82ii+1Z5hOBiJQzU6VwjM0d
-	 uM7IVzgAZpno3rbRg6w+n1ABn4Dgso1q5I52WwP/8sg/wKZYVETLu/6OhGImTubChS
-	 p6XrM+QXwhmKhhjij3cyiI6g9oeOIVlp/3Xnz8ZTBhxVAQgHDetlB5tuRrzDY31V1U
-	 HxQ+YbNFPTZsA==
-Date: Tue, 3 Mar 2026 08:53:20 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?VGjDqW8=?= Lebrun <theo.lebrun@bootlin.com>
-Cc: "Nicolai Buchwitz" <nb@tipi-net.de>, <netdev@vger.kernel.org>,
- <davem@davemloft.net>, <andrew+netdev@lunn.ch>, <edumazet@google.com>,
- <pabeni@redhat.com>, <linux@armlinux.org.uk>, <claudiu.beznea@tuxon.dev>,
- <nicolas.ferre@microchip.com>, <linux-kernel@vger.kernel.org>,
- <phil@raspberrypi.com>, =?UTF-8?B?R3LDqWdvcnk=?= Clement
- <gregory.clement@bootlin.com>, "Thomas Petazzoni"
- <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH net-next v5 2/5] net: cadence: macb: implement EEE TX
- LPI support
-Message-ID: <20260303085320.4a2c2da6@kernel.org>
-In-Reply-To: <DGSZWWKDJOFM.CCG4PBOJIRW1@bootlin.com>
-References: <20260227150610.242215-1-nb@tipi-net.de>
-	<20260227150610.242215-3-nb@tipi-net.de>
-	<20260302181522.068f4715@kernel.org>
-	<DGSZWWKDJOFM.CCG4PBOJIRW1@bootlin.com>
+	s=arc-20240116; t=1772557271; c=relaxed/simple;
+	bh=BLatzjqVvtRsincIhVbebxR/E15+tJc7XPVTRhg/sOA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=h6M/OzdCyiVenDPySQfn1PRBmdK7IiZj/mk3bch7m1bahHiqx8gZMtiODwkplTyQDIyc6xYupDKe6NgSIuS1nZWEfRG1oTjMqkJXtlYZ023mlBbKn0Eef2oJFbjv9Ofr2uU0w7j2TyhV1KMwtMIi/f247B9RvFJufh1zKb1qt4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2wBqH2qq; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2adef9d486bso53030645ad.2
+        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 09:01:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772557269; x=1773162069; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=3W9msYejfIcxyZd2zRSvO+gfVN6T58KsrkSE6malUmY=;
+        b=2wBqH2qqXp70k3QpPRUCGSBNul+e6Kq29ZYea3P3cYm+xuyaXEaton5qX91wONraSj
+         5vZdbdEkgi+wtGNe2vF5mtIdfCfhkzWJDHLdIE0tcO1TZmJCtIqxcTT7fv1hIo2MGzjX
+         A7picmfgB5DQYvLJ+01fN7xfRjPZ+SrijCUSjqr+ufU/sQg1SMIyTGaTNjDcBoRJVmT/
+         jPtxdcqgHPAXUbtOyRdtkBYQlR3Ek+BThpOJKNza9rrXqA7J9d06K8+krX+cE40hcfMO
+         8QSAJcJyECLkf60j6L3RUWAIbpngVINw8MYirc1/7G8t6HnTupReKSYKAtUUfxGTx2ok
+         7t2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772557269; x=1773162069;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3W9msYejfIcxyZd2zRSvO+gfVN6T58KsrkSE6malUmY=;
+        b=ACna0DTiVkU6kgGJxFVK1iIzubT84bUmt9wAO8lCsfyDmLgbuoMENung3Z1cdsGDgE
+         AiR+mMHo9lIqfOfQipYKMd4NxmJdNAUx23MxYfJzXy1CfqPVz/RFlRjHgO3uSRhraVwd
+         nzJ7juWDdHDyoZhZMY6SCIkNTH5Z0nlvL1wzwr6xyJBdnLbPj/D4rbcuocUVQiakSBSv
+         3pypPmJ00i4X+f7RZsfQicWkgAGuyXemGXCJ+GkN3z08PS2KyudSXVLXpMGzOrbw6MWJ
+         B4+6cwUTQ26YV4k0LcQlxFtXyTG9dHQksNoq6OGWvlfOD/WTridJ5ls+0/JNR1L8o0rg
+         Magw==
+X-Gm-Message-State: AOJu0Yx4D5iemBD4PlxIuVGTCIsJmg9mlKrDM7bvB973L5dO6dlLU2Dw
+	FXNVkV1HNAyf91+m6FTEgdf1y60PpqJGYJ4qrzGT+WEPDDq1cJsWjPUuc6ypOSGLYFmvipijIoN
+	0D4Q/Kt2PjFaZQFaFbnm/X+hSl+h88+mPZm2yZAPziaFnr71H2M5dy0FaktKIbqqKBLyywggFCD
+	ZBHxbSMBCLI104cVeWDZ4J1XyjlT4lDfw=
+X-Received: from pgbr11.prod.google.com ([2002:a63:5d0b:0:b0:c70:e705:e5b2])
+ (user=jrife job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5747:b0:340:25f0:a9b
+ with SMTP id 98e67ed59e1d1-35965ce437amr14974704a91.33.1772557268887; Tue, 03
+ Mar 2026 09:01:08 -0800 (PST)
+Date: Tue,  3 Mar 2026 17:01:01 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 28F181F4340
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+Message-ID: <20260303170106.129698-1-jrife@google.com>
+Subject: [PATCH net-next v2 0/2] Preserve UDP socket addresses on abort
+From: Jordan Rife <jrife@google.com>
+To: netdev@vger.kernel.org
+Cc: Jordan Rife <jrife@google.com>, bpf@vger.kernel.org, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Eric Dumazet <edumazet@google.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Andrii Nakryiko <andrii@kernel.org>, 
+	Yusuke Suzuki <yusuke.suzuki@isovalent.com>, Jakub Kicinski <kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 949431F4651
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263332-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[google.com,vger.kernel.org,gmail.com,iogearbox.net,linux.dev,fomichev.me,kernel.org,isovalent.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263333-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jrife@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Tue, 03 Mar 2026 09:14:41 +0100 Th=C3=A9o Lebrun wrote:
-> >> +/* Wake from LPI before transmitting. The MAC must deassert TXLPIEN
-> >> + * and wait for the PHY to exit LPI before any frame can be sent.
-> >> + * IEEE 802.3az Tw_sys is ~17us for 1000BASE-T, ~30us for 100BASE-TX;
-> >> + * we use a conservative 50us.
-> >> + */
-> >> +static void macb_tx_lpi_wake(struct macb *bp)
-> >> +{
-> >> +	if (!macb_tx_lpi_set(bp, false)) =20
-> >
-> > Does this lpi_set() not have a relatively high cost, even if eee_active
-> > is disabled? Reading registers is usually pretty slow. Can we add=20
-> > a eee_active check here as well to short cut the lpi check?=20
-> > If we do we probably want to make sure that the code paths setting
-> > eee_active are also under bp->lock, otherwise this new check will be
-> > racy. =20
->=20
-> Funny how this discussion keeps coming up! I made the same remark on V3:
-> https://lore.kernel.org/netdev/DGOXXGNSSMYK.2XNU9AQ6E077P@bootlin.com/
->=20
-> And it had been discussed in a previous iteration before.
->=20
-> In theory I agree, in practice the optimization was statistically
-> insignificant on my platform. The total time spent in macb_start_xmit()
-> is tiny, so any optimization inside of it is even more so.
+BPF cgroup/sock_release hooks can be useful for performing cleanup,
+map maintenance, or other bookkeeping when sockets are released. Cilium
+uses cgroup/sock_release hooks to do just that, cleaning up maps keyed
+by socket destination addresses. This works fine for TCP and connected
+UDP sockets when they're closed gracefully, but Yusuke reported that
+this fails for connected UDP when sockets are aborted prior to closing
+the socket. Cilium in particular actively destroys/aborts connected UDP
+sockets, so this scenario can happen easily.
 
-TBH I started looking around because the v5 implementation seems racy.
-Probably not in practice but in theory on a multiple queue device you
-clear LPI, release the lock, then another queue may schedule LPI again,
-if the xmit path is delayed for a long time the LPI work may turn idle
-on before xmit rings the doorbell.
+From Yusuke's testing results in [1]:
 
-The rework I suggested is not only more optimal (dare I say logical to
-an experienced developer) but also I think it'd be more correct.
+1. socket connects to "127.0.0.1:8000"
+2. socket aborted - diag_destroy (tcp_abort/udp_abort)
+3. close(sock_fd)
+4. BPF_CGROUP_RUN_PROG_INET_SOCK_RELEASE(sk) runs my_sock_release()
 
-macb has a crazy number of locks so maybe i'm missing something.
-But sooner or later someone will hopefully start removing those locks,
-cause this driver gotta be dog slow right now :/
+__section("cgroup/sock_release")
+int my_sock_release(struct bpf_sock *ctx)
+{
+    ...
+    /* For TCP, dst_ip4 == "127.0.0.1" but for connected UDP
+     * dst_ip4 == 0.
+     */
+    ...
+}
+
+Case  Protocol        IP Family  Type	        Result
+1     TCP             IPv4       Regular close  Cleaned up
+2     TCP	      IPv4       Abort          Cleaned up
+3     TCP	      IPv6       Regular close  Cleaned up
+4     TCP             IPv6       Abort          Cleaned up
+5     UDP (Connected) IPv4       Regular close  Cleaned up
+6     UDP (Connected) IPv4       Abort          Not cleaned up
+7     UDP (Connected) IPv6       Regular close  Cleaned up
+8     UDP (Connected) IPv6       Abort          Not cleaned up
+
+This patch aims to make the behavior consistent between TCP and
+connected UDP by preserving the socket destination address and port
+through to the sock_release hook.
+
+Regarding my approach:
+
+Currently, udp_abort() calls __udp_disconnect(), but this seems like
+overkill in the case of a socket abort. __udp_disconnect() handles two
+special cases:
+
+1. When a socket binds to 0.0.0.0, connects, then disconnects using
+   AF_UNSPEC it needs to be rehashed as described in commit 303d0403b8c2
+   ("udp: rehash on disconnect").
+2. Avoids unhashing the socket in cases where it was bound to a specific
+   port.
+
+This makes sense in the case of a graceful disconnect (AF_UNSPEC) where
+the socket remains intact and may be used in the future, but it seemed
+sufficient in the case of a socket abort to simply set sk_err so that
+future operations on that socket fail and to unconditionally unhash the
+socket if it is currently hashed, thus avoiding any of the field
+manipulation that __udp_disconnect() would otherwise do.
+
+[1]: https://github.com/cilium/cilium/issues/42649
+
+CHANGES
+=======
+
+v1 -> v2:
+* Set connect_fd back to -1 after calling destroy() in the selftest
+  (Jakub).
+
+Jordan Rife (2):
+  udp: Preserve UDP socket addresses on abort
+  selftests/bpf: Ensure dst addr/port are preserved after socket abort
+
+ net/ipv4/udp.c                                |   4 +-
+ .../bpf/prog_tests/sock_destroy_release.c     | 136 ++++++++++++++++++
+ .../bpf/progs/sock_destroy_release.c          |  59 ++++++++
+ 3 files changed, 198 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/sock_destroy_release.c
+ create mode 100644 tools/testing/selftests/bpf/progs/sock_destroy_release.c
+
+-- 
+2.53.0.473.g4a7958ca14-goog
+
 
