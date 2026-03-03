@@ -1,528 +1,269 @@
-Return-Path: <netdev+bounces-263002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262997-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AJSSKedLpmm1NgAAu9opvQ
-	(envelope-from <netdev+bounces-263002-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 03:48:07 +0100
+	id SH6IJANLpmm1NgAAu9opvQ
+	(envelope-from <netdev+bounces-262997-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 03:44:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1516D1E8305
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 03:48:07 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FF351E824F
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 03:44:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F2649308DBA8
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 02:46:01 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0EF6E3007B16
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 02:44:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D251E375AAF;
-	Tue,  3 Mar 2026 02:46:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD46B3750D0;
+	Tue,  3 Mar 2026 02:44:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Jt7wn0Bw"
+	dkim=pass (2048-bit key) header.d=aspeedtech.com header.i=@aspeedtech.com header.b="kigc4Zp4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f67.google.com (mail-oo1-f67.google.com [209.85.161.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SEYPR02CU001.outbound.protection.outlook.com (mail-koreacentralazon11023074.outbound.protection.outlook.com [40.107.44.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78723375AB0
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 02:45:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.67
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772505961; cv=none; b=h2cnBDqJQ9QR3Qi8cRjHmo5Omob1bPLHuujzo1vG4S1dYf2TQBwdxmm/l98SZIfA67sLOIcfjY4wg/T5wU9QM/70VkEAYDUBJFJbNoQSUfrLrCvdqGGOxKBO/9Aq1sVVLxhHuq7nAQQuASlUaFDoaIveX+BoxUpg0FDSVXSOiRs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772505961; c=relaxed/simple;
-	bh=dHF3KSB1sbsp73+zPDWjiD02+CUMEjJMUasDN5aNl18=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nS0sWjbje/goPGvuJwQfF0GY3e8/a79Anv3a2Jvfm90Q34zoEpOiGBbKdRJnhKUqvxko9OEsZ1BS0O1wmbq7wln9Zrk/NA2HBtU8QZ3dhDkT8QQVir1LPYK3z++4TVlPle2+2CxeFVa7PVWG1rxz1zkDZhn/EaeQ+ObvNY1bi8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=Jt7wn0Bw; arc=none smtp.client-ip=209.85.161.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-oo1-f67.google.com with SMTP id 006d021491bc7-679efb9eb0dso4212012eaf.2
-        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 18:45:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1772505957; x=1773110757; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xZcoqF52XejvSkZeB79WNNfha0/GAF3LwXAyaRfyLi0=;
-        b=Jt7wn0Bw1o9pAxqcGClvi4Zdd7PxeVFv+dQhk1PAX9QOGwU/9u/bIIFjVCvtBTckDT
-         fOAIt+4U8E7XbtqkpQdD1ZCtXkrwb2F9nx0nisHsJ55uYxR6fyePKHNUjnWBOfHAVCBb
-         Mm2QVHMR3JPGwXz7bbD8fxaOSZ6HBzs7bMUr72m7ITLLBpVDVx4JamM3/QHYXVxeh0Ty
-         yOeKthcQb3xLz7rc0ntgrDDto/SBPt1r0QyV1zpldCZveDSn/7TqY8h5Lohq/xhm7ZJW
-         dXNaPevYktad2+LSTPnzYq1dtITXUb9x1O3xhsPa6jU7p/jbtaY5Sw+inDORz/ZQEGPh
-         +70g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772505957; x=1773110757;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=xZcoqF52XejvSkZeB79WNNfha0/GAF3LwXAyaRfyLi0=;
-        b=rSoedZRKuyz2iRD3mjuIShq3LjSYTeDf9Zrvd7wim0AdXg9byi46LyKG0/lJ++X3X4
-         wCOMQt6yOfWzf9NtB+lAoFQjXni9me8a4CZVp12jSfXK8RZQhX3cn6D8lLp8TUljxlMm
-         KbK5EPrBZNHCAKR7KqB6d41wh3h60FL1+qVJQBthhHSGZJWooRisGu7WVTfhSioVFcfy
-         87f4n3TaDOnIGurUJrDtBW3BsB25W81o2cbxGENu3swrMvuV4hwg10z7UGp8JNCzD6RB
-         ZjkL7a2eczrtPsa0dhOniI2LZduZz1IdqUHKiNwGCAlYDkQf0Cpxx1xpqpd6Cjj1eYcs
-         4mMw==
-X-Forwarded-Encrypted: i=1; AJvYcCXoqxeqwFWYJtw10olbm0FuZyF07GhOKuUb1Qp+y7HcxgB2HqmNEHYf00Jl5NErxmcbjFrI4dw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysH/W2QN26IkT4HHuJ9ilrljPT/GiB9vDVce3l+f2/JFBhm5v2
-	ert7U2mPRI74RBf+TWKEfLvvl4MNq2oxaqmf5qXSahM5eoSyjHk2TaJp/HqS1ww6JNo=
-X-Gm-Gg: ATEYQzxfT2v9i255JaswHnhqlwhakwOjFUDtXlr4x7PqnTs0fq5Tbk14hQL9KNIUyaF
-	2u6x49w9UCc1sNlePhN1qz0ftXfSWGUEYDZ2hie2xJ5lgWChjpTPJEH/xvKZOLazCDK5hKLAg7U
-	/+CKCDLhOP9ieTR9dEYaHjxGGQbeuBDEom3sbEwFRfK5KZZssU6F2+TtuBUyeI5rpd2d53f7v6O
-	F8LWr1cf3/2HknOG4g/PSH0C4AalwgPoaTvIQG4w3px/vbUksjbVoxKAHNb0ziuZh5WPFFdzZgA
-	ffQYiLvvOMgRkJwvpQTafJE3JwQyK2qqG5N5k/OyONCNQ2EavZrqFspvm8+AZEJ3Y551Z+sJRzv
-	K41c4U049IIB8RS42iOevGgHZ4dNdzT2uNE1XP0M86qVoSAZAlzk6I3KwX8N2+onOfu1SMrqQbT
-	Y7jkk5NGtzyIhjzuBsxg==
-X-Received: by 2002:a05:6820:a28c:10b0:67a:3dd:3fe7 with SMTP id 006d021491bc7-67a03dd4182mr4225097eaf.47.1772505957339;
-        Mon, 02 Mar 2026 18:45:57 -0800 (PST)
-Received: from 20HS2G4.. ([2a09:bac1:76c0:540::a2:70])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-679f2d84dacsm10205642eaf.9.2026.03.02.18.45.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Mar 2026 18:45:56 -0800 (PST)
-From: Chris J Arges <carges@cloudflare.com>
-To: michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com,
-	joe@dama.to,
-	kuba@kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>
-Cc: kernel-team@cloudflare.com,
-	Chris J Arges <carges@cloudflare.com>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH net-next v2 4/4] selftests: drv-net: xdp: Add rss_hash metadata tests
-Date: Mon,  2 Mar 2026 20:43:52 -0600
-Message-ID: <20260303024510.644962-5-carges@cloudflare.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260303024510.644962-1-carges@cloudflare.com>
-References: <20260213192449.1294830-1-carges@cloudflare.com>
- <20260303024510.644962-1-carges@cloudflare.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D1431F1534;
+	Tue,  3 Mar 2026 02:44:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.44.74
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772505853; cv=fail; b=kvWgu8zKLNniKwCmJ0ThILJT8liEDWyzdDQN5hlaGipcVNqHbJ6F0TqXx1zy5m+M5XO3O2XfHSAuW3ow+RG8XS6rIDg5GiBOpfstWJ3yLFPYtp0XLS1Mzn63MPd/9ZWGUfiemMih3loBR++YOu8+LP7A7PKV/DKy+fHQ7syux8o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772505853; c=relaxed/simple;
+	bh=xI47GvGx+LBmFVceJqaBfu/TZwFpzmEjZRwkYkieSx8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=UBiI2aUPytOeQkPgFzepLfK5y3NPcoV9SDQlP9D8ADzdp0Q18ar6jtpFOHlUEh7Xn3dMBLzicxjbYNcD5ggg59QEuU7XogCK+ESYxatIY2aVmHKf0FO+r8lxUHITWP7cfhQURvdUiV6xAr75CHK3oj2QeCqOn6Lg1sWf3jiZCCY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; dkim=pass (2048-bit key) header.d=aspeedtech.com header.i=@aspeedtech.com header.b=kigc4Zp4; arc=fail smtp.client-ip=40.107.44.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=iYsbOdVejakr4ye8Un8YV6prSqTPCQVNIsClOObp/61MI/laLOhKbDkBTGHrdJHyo5uXdRe9VQpD8h0Eqy0n672K1s0BcoT24g/J6mzIAZ5fBO9gRadxBx8n6v9XinPAF8WQch7lXJ8H4mdNzrVEvlUFMMtJnqi+FUwXB7p3K6rpaQq0kqdfLfZNDokzZQjAUEOX/Nj1/5NUB7gCrek7MDdu3SYwU4bOQ35AWLwSxvFYljyT7SpeuVB8IK42O0VGkNEwCFayB9t9j1e441JhlkEOSmFaIM9lM/+CQRQNCoI5oERPm3rVj2/RN+LdJW6SNIJzZA/eHiz2r7TX70ccpA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xI47GvGx+LBmFVceJqaBfu/TZwFpzmEjZRwkYkieSx8=;
+ b=sfQIHG756k2kvAWYTC0UnFAzMe+mlbMPcKczkRgYkzd61du/p7LdacGEgyeOG/6MT4+0kPzUPTJ7Ro3U009ysydD7/8EpiVQ9nMulIaevGYd0A9/C71XGdZ6oBeSpCQar3/4ny9BGzAlUBvWYRxIb7lC8k5380OmUNngEXaNJLJRGlYzxTeuQkRCtYofAEe9RkVbqvtNqBNkxp2soGYe87h999xAt1GMWbo+jR/IeIMSNFIUykT3jCrVVHRWE54urjA9LecgmMgOxFuIZ8PhT/F+GKQieJ38oxloIn9DMh2nYU2XZH5QeM93Ozzeu/ylewtV4Hkl4sCa4mnb5t0Dzg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=aspeedtech.com; dmarc=pass action=none
+ header.from=aspeedtech.com; dkim=pass header.d=aspeedtech.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aspeedtech.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xI47GvGx+LBmFVceJqaBfu/TZwFpzmEjZRwkYkieSx8=;
+ b=kigc4Zp4R0lpWTZ2mNjabDGUfHR2yB6vm/238zTC1sDjJqIocUwJyHrqHy/31O3cTf7qs1q3Y0g/ml5iVRvAyAWgp/eS8UQwmW/dsiHNdNPyt68VZkgcWuIxcmXu67Up/EcdsG3HbecgbTyGapdhnRPwEsbjCuNHlxXP91KCwJfYeXbCUNeDeUv8YbSHZ5NUP6/s/8dEdWpQ1EWNs2quJ9FW/tYI1gYA9hCFLyksAtFvQROtefF35uK4w56fQp15swldXFJMgpIlVp6SwOs8qvy4N6jy+UbKQ+uVImY+uWpmLBa5NGFeeM0bmuJq9+A4gO+bl4VYgqAv+Ajax//ggw==
+Received: from SEYPR06MB5134.apcprd06.prod.outlook.com (2603:1096:101:5a::12)
+ by SG2PR06MB5105.apcprd06.prod.outlook.com (2603:1096:4:1c8::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.21; Tue, 3 Mar
+ 2026 02:44:05 +0000
+Received: from SEYPR06MB5134.apcprd06.prod.outlook.com
+ ([fe80::f53d:547a:8c11:fc6c]) by SEYPR06MB5134.apcprd06.prod.outlook.com
+ ([fe80::f53d:547a:8c11:fc6c%4]) with mapi id 15.20.9654.020; Tue, 3 Mar 2026
+ 02:44:05 +0000
+From: Jacky Chou <jacky_chou@aspeedtech.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Po-Yu Chuang <ratbert@faraday-tech.com>, Joel Stanley
+	<joel@jms.id.au>, Andrew Jeffery <andrew@codeconstruct.com.au>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-aspeed@lists.ozlabs.org"
+	<linux-aspeed@lists.ozlabs.org>, "taoren@meta.com" <taoren@meta.com>
+Subject:
+ =?big5?B?pl7C0DogW1BBVENIIG5ldC1uZXh0IHY2IDAvNV0gQWRkIEFTVDI2MDAgUkdNSUkg?=
+ =?big5?Q?delay_into_ftgmac100?=
+Thread-Topic: [PATCH net-next v6 0/5] Add AST2600 RGMII delay into ftgmac100
+Thread-Index: AQHcqi7Dn3EPiYw+mU61Mm1b5sdx4rWcBk+AgAATRHA=
+Date: Tue, 3 Mar 2026 02:44:04 +0000
+Message-ID:
+ <SEYPR06MB513446282E752E9458F0FD1E9D7FA@SEYPR06MB5134.apcprd06.prod.outlook.com>
+References: <20260302-rgmii_delay_2600-v6-0-68319a4c4110@aspeedtech.com>
+ <ef88bb50-9f2c-458d-a7e5-dc5ecb9c777a@lunn.ch>
+In-Reply-To: <ef88bb50-9f2c-458d-a7e5-dc5ecb9c777a@lunn.ch>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=aspeedtech.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SEYPR06MB5134:EE_|SG2PR06MB5105:EE_
+x-ms-office365-filtering-correlation-id: 210e8167-0bb0-4f78-c21f-08de78cebc4d
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|7416014|376014|1800799024|366016|38070700021;
+x-microsoft-antispam-message-info:
+ iD57YpDP7/zPiv5uy6XiqW+3ydU4WZObVRX8MnzIJGBDmG5KiV+Hpf/oMgOcERbrdBDaQiiV+66UW3g+H7AUWwoUFDHVjOEUFmzdVb2fM7oZcQ3Irw3RiZ7jkNLIxo5xd9y1I/kTnA+b7U9UjfAUT/4t7yz1DfMkCxWaKpbOKjjhkQz8J9dVC98DpTaIfDXYXkuDH9I+ZR7E9K5X4xgdG8RxZQbtXB6+xuH2W+lB3i/Z6zCYlcD61cYYN8x2P9sYcdRS4nQLxH6u2KAqRhh1wPDJ0zINbbEz73Ll4Caa0tt47x7vFAAv74GTCTGMp3/a1tojEveppnEvt0n8VYeiLH10qj5XIcZaW5RRpWNl7Axc/YmUDrOS3z29xYONukYeZZheOFHI482PGzNYGfx8nJxA79bOhNNmsyXxrVDndF0kcZB+okWVu8nRjtnwkhfI+WmRvym6gSwBr7ZHrDghdvktT94R1fksf6VxsvDGqrQqdrr9q5dv5yv4aSemHjuLWbDEoscDolS4euBDV7Oj2GP92V30RSs3gEVj8PW7BJbB24AzF+KXFLCGa39YfWb/kgPz3hKlz2gOS88AxKpMgGBjr84R+cvpDG5f9jm9UYh4EBtFa2d0dX20+xcClMUJTNJ+YfwtZl+gZwC+Mnzm4fFgqFDZviNi4ZwIQR5lHQMoL5vJitL1Kcv72wYH4cEnBa+/R0r0YMBrItuS/PW1sVfO96WcjDX0M3xf/8sxzdsHQrh0vymeBvWPcEOPzi3GOLDbIzoBDkk5kTk+qxUhYUbufMvkispYZ4vlSWEwHJ0=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:zh-tw;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEYPR06MB5134.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(38070700021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?big5?B?YXR3UDVDcDZ5VTNMYy9QYVJYODZrMWorU3d0SExVVG4wMXN6bHZQWCt2VTRlSzlB?=
+ =?big5?B?TlFKcEdrTUpHV1NLcVpENTNPNERXWFlvVmNwRU9iV1VIZnEwMXdRQWthMVJEanBF?=
+ =?big5?B?ZjhYNWRmMlRlbC9Ycm8wR1ZzZ1NZK3F0clRIS2kxbGVBczBwb29YZXBkWi9LNFNr?=
+ =?big5?B?VStoYWVRdjNyWld2K1pJRG9mSXpFYTJ4ZnR2dEV1ZWw2cW1JQnpRczRWcmNHeW5l?=
+ =?big5?B?ODQxcGpOOFBySEQ2eFZwcUhHcE1vUnY2YUlQUzd1NVdYNGZxZXFlNUJzNUhMM3BO?=
+ =?big5?B?RFlIeVI1M0Nsb1loNURIYjNCUzBmbzNNVnJ2enNGeVFvbDhkQUxDV2VtcEszQ0Rr?=
+ =?big5?B?S0dNUTRmZXcvL3VkMDF0ZEtpSEhScWNGOW0zckpyZkc1cUlNZ2VEYmhBQzlvQXda?=
+ =?big5?B?cHMyei9JY0sxN0tyNXk3QTJhMEs3dU5VZGJaLytXL2k1cjV6UEVrcmZQdkttSjlU?=
+ =?big5?B?U0JuNkZrc2JkSEVnRmxoZTd4RThrSTNxR2dyWXlJY29YdytvbmtUTG9jMzR0TlR1?=
+ =?big5?B?TlBZS3R0UWc0eHp0aUcyY0l0MjZvVUQzOWRUblBRaG1sazdpekx3TkdTdmJKWVlS?=
+ =?big5?B?aFkzWXAwVWZKSlVaeWhmbCtrOEJWV1QrSnU2NHY4UmJ3KzFWSW4zcXNNd0RHNWZw?=
+ =?big5?B?VnJYdU05MDQ1TG00S0YvTXJ2eHRRV1N4UFY3MFBNZUwwY1lCSGI4YUdRb0ZyNzUz?=
+ =?big5?B?QVBMTGx1Sk5meTd4R0w4eXA0RVRncVNjd0wvcHJxKzJZREVoQUFhMHFwVWRzUVRH?=
+ =?big5?B?MHhNTm05aFl2TGpzd1F2cVpQcWxoSWhHcDY2UkRUZkNEa2hRYm9yY0pWVWo3MkpD?=
+ =?big5?B?NkdXR1MvK05GcUtTVVNvbktHV2p2Sjd1eVZjZSswSkxVYzFlUUhMZTJ0SFVnc1Na?=
+ =?big5?B?WW93a2RaVmV0WkdtamMzZ1BWVmVQUFVXZUtNUUdKN1lzckxTV2xDSjJnMDhLTnp4?=
+ =?big5?B?RmZlNXdXK3UzTDQ0T0FSVjVqWU5LK3hzcTRCZ2FIU2xHNlAzNXZBSHl1dUNrOWdr?=
+ =?big5?B?R2E3bWZVQ2dCQ0FHSUQ5MlBrdGZYK3hMTnZrdEVDeitkWnl0cnBPUEJidDdXdytU?=
+ =?big5?B?M0F6bCsySWVaWDdUTWhNakdJU083K3BqNmNXditJMDVlTHV4K3NwbVVSWVF1NFZu?=
+ =?big5?B?YW1zNUZKWlhVT2t5K1oxL3c0Z0FGcEE5MC9lSU9xK0t2bUw4TUJGbWV5WE1SeWh3?=
+ =?big5?B?OFB0TEdzamFuUC9yd3lUVmZ1Y0xXQ2h4WjZldmZEVGJ6bWZ6MkVwOHBILytUeDdy?=
+ =?big5?B?c3llbDloOE5SUDZCbXVNdHk0RnRYVFNTQUVBc2lrRWpYcVNLU2xHRkdDc2kxcHhI?=
+ =?big5?B?Z1Qrcm9Vak9OZDd3cTVqWGkzNktsa2tpSlVYVW9pOGg4YzdvMVhZSG8zWU5wWG1h?=
+ =?big5?B?d2t1Y0gwVDVRNS9CVUlESG8rMzllaWllVGFUNGRXRzlwenh1Q3pmWlhGSldxSzZK?=
+ =?big5?B?d1l1U2ttemFmVGlQcnlTSzg1MjJlRS9OYldyRVBpU1VXMjRna09Dc1dOU1NCT2Rv?=
+ =?big5?B?TThrcHkrY1EzMjBBYUplNm5iSXFUS1lnamV6emlHMk5WU3I1YXdGSDJrdlBDbHdE?=
+ =?big5?B?eEU3R0N2NjZVRmtBSkZBdE1iREVqYjZlMER2SGlmcXBaeHBIVnZEdE5DSWJzeGRa?=
+ =?big5?B?MHh0WGs3S1FmMEJqZVNXUmFGNE5DTDJuQVpHYlNMUU9MSXVZUFhOSVp0bGhJVkRp?=
+ =?big5?B?QTAyN2xlbGlFMDlaekFTOTk2TlcrTC82bDhJcEgwS1FhaGlvYTB6emFPaTdZTVQx?=
+ =?big5?B?RVA4M3luN0x1TXJTbFFRYkhNVDVCTGFWdWYxdVFOVUtTZHJlQjBkVDZ6OHZOa1Nq?=
+ =?big5?B?NS9MelVJc0d0d0FHclpBT1Vjc1loRTR6cW92WS9HbW9oQjZnOEtEdGhmc0RJeTdv?=
+ =?big5?B?cUF2VzZaYW9lMzV6VFArdmlObGV1bEMxYjFMMm9SZlRTWnZmcHl4OTBxOU1RejQ5?=
+ =?big5?B?WFh0bGhYUnA2QjFkSjJ4Q0d4RC9vak9ZSGZIYXpYNEl0M05meUZFQjZRTmhsd29s?=
+ =?big5?B?ZFdmZGFrU2cwK3E1aEhnVmZMVnBjcjVleXQrWjkyK1FwbTl4VW1TNlRjK2RjVURN?=
+ =?big5?B?aXA3RHJqQ1ZXYkNlSUlXSU9zYmRtZ1NEQ0tKK2ZqWXNSUTBXMFFCbHljcWtUK3FH?=
+ =?big5?B?OVQ0L3hIczRKWlc0Q3BtWU8rUCs5OTNJUkhFekpvRi9xSzNBRnliQ3dUK1BVL3d2?=
+ =?big5?B?RlhRcW1vSWpkVXRXOVRKNzhOMFE2UT09?=
+Content-Type: text/plain; charset="big5"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 1516D1E8305
+X-OriginatorOrg: aspeedtech.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SEYPR06MB5134.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 210e8167-0bb0-4f78-c21f-08de78cebc4d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Mar 2026 02:44:05.0604
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43d4aa98-e35b-4575-8939-080e90d5a249
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: pEaEt1YMCUCi4s03pj2U6APchybuY+5xgWKL2bEyqmxe0Pi5qYKpkCsqF3uTfTjpqefd7YEchKR52KfAAIcdF3BRQ0aEhle9LGkBWOKanxE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SG2PR06MB5105
+X-Rspamd-Queue-Id: 9FF351E824F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-6.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[cloudflare.com:D:+];
+X-Spamd-Result: default: False [1.44 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
-	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[aspeedtech.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[aspeedtech.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	TAGGED_FROM(0.00)[bounces-262997-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-263002-lists,netdev=lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[broadcom.com,dama.to,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,iogearbox.net,gmail.com,fomichev.me];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[carges@cloudflare.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[cloudflare.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[cloudflare.com:dkim,cloudflare.com:email,cloudflare.com:mid,lib.py:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jacky_chou@aspeedtech.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[aspeedtech.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	NEURAL_HAM(-0.00)[-0.999];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-This test loads xdp_metadata.bpf which calls bpf_xdp_metadata_rx_hash() on
-incoming packets. The metadata from that packet is then sent to a BPF
-map for validation. It borrows structure from xdp.py, reusing common
-functions.
-
-The test checks the device's xdp-rx-metadata-features via netlink
-before running and skips on devices that do not advertise hash support.
-This can be run on veth devices as well as real hardware.
-
-The test is fairly simple and just verifies that a TCP or UDP packet can be
-identified as an L4 flow. This minimal test also passes if run on a veth
-device.
-
-Signed-off-by: Chris J Arges <carges@cloudflare.com>
----
- .../testing/selftests/drivers/net/hw/Makefile |   1 +
- .../drivers/net/hw/lib/py/__init__.py         |   2 +
- .../selftests/drivers/net/hw/xdp_metadata.py  | 146 ++++++++++++++++
- .../selftests/net/lib/xdp_metadata.bpf.c      | 163 ++++++++++++++++++
- 4 files changed, 312 insertions(+)
- create mode 100644 tools/testing/selftests/drivers/net/hw/xdp_metadata.py
- create mode 100644 tools/testing/selftests/net/lib/xdp_metadata.bpf.c
-
-diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-index a64140333a46..9db5b8a62286 100644
---- a/tools/testing/selftests/drivers/net/hw/Makefile
-+++ b/tools/testing/selftests/drivers/net/hw/Makefile
-@@ -40,6 +40,7 @@ TEST_PROGS = \
- 	rss_input_xfrm.py \
- 	toeplitz.py \
- 	tso.py \
-+	xdp_metadata.py \
- 	xsk_reconfig.py \
- 	#
- 
-diff --git a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-index 1971577d47e9..ac4a0a9cf0f2 100644
---- a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-+++ b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-@@ -24,6 +24,7 @@ try:
-     from net.lib.py import bkg, cmd, bpftool, bpftrace, defer, ethtool, \
-         fd_read_timeout, ip, rand_port, rand_ports, wait_port_listen, \
-         wait_file, tool
-+    from net.lib.py import bpf_map_set, bpf_map_dump, bpf_prog_map_ids
-     from net.lib.py import KsftSkipEx, KsftFailEx, KsftXfailEx
-     from net.lib.py import ksft_disruptive, ksft_exit, ksft_pr, ksft_run, \
-         ksft_setup, ksft_variants, KsftNamedVariant
-@@ -39,6 +40,7 @@ try:
-                "bkg", "cmd", "bpftool", "bpftrace", "defer", "ethtool",
-                "fd_read_timeout", "ip", "rand_port", "rand_ports",
-                "wait_port_listen", "wait_file", "tool",
-+               "bpf_map_set", "bpf_map_dump", "bpf_prog_map_ids",
-                "KsftSkipEx", "KsftFailEx", "KsftXfailEx",
-                "ksft_disruptive", "ksft_exit", "ksft_pr", "ksft_run",
-                "ksft_setup", "ksft_variants", "KsftNamedVariant",
-diff --git a/tools/testing/selftests/drivers/net/hw/xdp_metadata.py b/tools/testing/selftests/drivers/net/hw/xdp_metadata.py
-new file mode 100644
-index 000000000000..33a1985356d9
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/xdp_metadata.py
-@@ -0,0 +1,146 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+"""
-+Tests for XDP metadata kfuncs (e.g. bpf_xdp_metadata_rx_hash).
-+
-+These tests load device-bound XDP programs from xdp_metadata.bpf.o
-+that call metadata kfuncs, send traffic, and verify the extracted
-+metadata via BPF maps.
-+"""
-+from lib.py import ksft_run, ksft_eq, ksft_exit, ksft_ge, ksft_ne, ksft_pr
-+from lib.py import KsftNamedVariant, ksft_variants
-+from lib.py import CmdExitFailure, KsftSkipEx, NetDrvEpEnv
-+from lib.py import NetdevFamily
-+from lib.py import bkg, cmd, rand_port, wait_port_listen
-+from lib.py import ip, bpftool, defer
-+from lib.py import bpf_map_set, bpf_map_dump, bpf_prog_map_ids
-+
-+
-+def _load_xdp_metadata_prog(cfg, prog_name, bpf_file="xdp_metadata.bpf.o"):
-+    """Load a device-bound XDP metadata program and return prog/map info.
-+
-+    Returns:
-+        dict with 'id', 'name', and 'maps' (name -> map_id).
-+    """
-+    abs_path = cfg.net_lib_dir / bpf_file
-+    pin_dir = "/sys/fs/bpf/xdp_metadata_test"
-+
-+    cmd(f"rm -rf {pin_dir}", shell=True, fail=False)
-+    cmd(f"mkdir -p {pin_dir}", shell=True)
-+
-+    try:
-+        bpftool(f"prog loadall {abs_path} {pin_dir} type xdp "
-+                f"xdpmeta_dev {cfg.ifname}")
-+    except CmdExitFailure as e:
-+        cmd(f"rm -rf {pin_dir}", shell=True, fail=False)
-+        raise KsftSkipEx(
-+            f"Failed to load device-bound XDP program '{prog_name}'"
-+        ) from e
-+    defer(cmd, f"rm -rf {pin_dir}", shell=True, fail=False)
-+
-+    pin_path = f"{pin_dir}/{prog_name}"
-+    ip(f"link set dev {cfg.ifname} xdpdrv pinned {pin_path}")
-+    defer(ip, f"link set dev {cfg.ifname} xdpdrv off")
-+
-+    xdp_info = ip(f"-d link show dev {cfg.ifname}", json=True)[0]
-+    prog_id = xdp_info["xdp"]["prog"]["id"]
-+
-+    return {"id": prog_id,
-+            "name": xdp_info["xdp"]["prog"]["name"],
-+            "maps": bpf_prog_map_ids(prog_id)}
-+
-+
-+def _send_probe(cfg, port, proto="tcp"):
-+    """Send a single payload from the remote end using socat.
-+
-+    Args:
-+        cfg: Configuration object containing network settings.
-+        port: Port number for the exchange.
-+        proto: Protocol to use, either "tcp" or "udp".
-+    """
-+    cfg.require_cmd("socat", remote=True)
-+
-+    if proto == "tcp":
-+        rx_cmd = f"socat -{cfg.addr_ipver} -T 2 TCP-LISTEN:{port},reuseport STDOUT"
-+        tx_cmd = f"echo -n rss_hash_test | socat -t 2 -u STDIN TCP:{cfg.baddr}:{port}"
-+    else:
-+        rx_cmd = f"socat -{cfg.addr_ipver} -T 2 -u UDP-RECV:{port},reuseport STDOUT"
-+        tx_cmd = f"echo -n rss_hash_test | socat -t 2 -u STDIN UDP:{cfg.baddr}:{port}"
-+
-+    with bkg(rx_cmd, exit_wait=True):
-+        wait_port_listen(port, proto=proto)
-+        cmd(tx_cmd, host=cfg.remote, shell=True)
-+
-+
-+# BPF map keys matching the enums in xdp_metadata.bpf.c
-+_SETUP_KEY_PORT = 1
-+
-+_RSS_KEY_HASH = 0
-+_RSS_KEY_TYPE = 1
-+_RSS_KEY_PKT_CNT = 2
-+_RSS_KEY_ERR_CNT = 3
-+
-+XDP_RSS_L4 = 0x8  # BIT(3) from enum xdp_rss_hash_type
-+
-+
-+@ksft_variants([
-+    KsftNamedVariant("tcp", "tcp"),
-+    KsftNamedVariant("udp", "udp"),
-+])
-+def test_xdp_rss_hash(cfg, proto):
-+    """Test RSS hash metadata extraction via bpf_xdp_metadata_rx_hash().
-+
-+    This test will only run on devices that support xdp-rx-metadata-features.
-+
-+    Loads the xdp_rss_hash program from xdp_metadata, sends a packet using
-+    the specified protocol, and verifies that the program extracted a non-zero
-+    hash with an L4 hash type.
-+    """
-+    dev_info = cfg.netnl.dev_get({"ifindex": cfg.ifindex})
-+    rx_meta = dev_info.get("xdp-rx-metadata-features", [])
-+    if "hash" not in rx_meta:
-+        raise KsftSkipEx("device does not support XDP rx hash metadata")
-+
-+    prog_info = _load_xdp_metadata_prog(cfg, "xdp_rss_hash")
-+
-+    port = rand_port()
-+    bpf_map_set("map_xdp_setup", _SETUP_KEY_PORT, port)
-+
-+    rss_map_id = prog_info["maps"]["map_rss"]
-+
-+    _send_probe(cfg, port, proto=proto)
-+
-+    rss = bpf_map_dump(rss_map_id)
-+
-+    pkt_cnt = rss.get(_RSS_KEY_PKT_CNT, 0)
-+    err_cnt = rss.get(_RSS_KEY_ERR_CNT, 0)
-+    hash_val = rss.get(_RSS_KEY_HASH, 0)
-+    hash_type = rss.get(_RSS_KEY_TYPE, 0)
-+
-+    ksft_ge(pkt_cnt, 1, comment="should have received at least one packet")
-+    ksft_eq(err_cnt, 0, comment=f"RSS hash error count: {err_cnt}")
-+
-+    ksft_ne(hash_val, 0,
-+            f"RSS hash should be non-zero for {proto.upper()} traffic")
-+    ksft_pr(f"  RSS hash: {hash_val:#010x}")
-+
-+    ksft_pr(f"  RSS hash type: {hash_type:#06x}")
-+    ksft_ne(hash_type & XDP_RSS_L4, 0,
-+            f"RSS hash type should include L4 for {proto.upper()} traffic")
-+
-+
-+def main():
-+    """Run XDP metadata kfunc tests against a real device."""
-+    with NetDrvEpEnv(__file__) as cfg:
-+        cfg.netnl = NetdevFamily()
-+        ksft_run(
-+            [
-+                test_xdp_rss_hash,
-+            ],
-+            args=(cfg,))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
-diff --git a/tools/testing/selftests/net/lib/xdp_metadata.bpf.c b/tools/testing/selftests/net/lib/xdp_metadata.bpf.c
-new file mode 100644
-index 000000000000..f71f59215239
---- /dev/null
-+++ b/tools/testing/selftests/net/lib/xdp_metadata.bpf.c
-@@ -0,0 +1,163 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <stddef.h>
-+#include <linux/bpf.h>
-+#include <linux/in.h>
-+#include <linux/if_ether.h>
-+#include <linux/ip.h>
-+#include <linux/ipv6.h>
-+#include <linux/udp.h>
-+#include <linux/tcp.h>
-+#include <bpf/bpf_endian.h>
-+#include <bpf/bpf_helpers.h>
-+
-+enum {
-+	XDP_PORT = 1,
-+	XDP_PROTO = 4,
-+} xdp_map_setup_keys;
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__uint(max_entries, 5);
-+	__type(key, __u32);
-+	__type(value, __s32);
-+} map_xdp_setup SEC(".maps");
-+
-+/* RSS hash results: key 0 = hash, key 1 = hash type,
-+ * key 2 = packet count, key 3 = error count.
-+ */
-+enum {
-+	RSS_KEY_HASH = 0,
-+	RSS_KEY_TYPE = 1,
-+	RSS_KEY_PKT_CNT = 2,
-+	RSS_KEY_ERR_CNT = 3,
-+};
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__type(key, __u32);
-+	__type(value, __u32);
-+	__uint(max_entries, 4);
-+} map_rss SEC(".maps");
-+
-+/* Mirror of enum xdp_rss_hash_type from include/net/xdp.h.
-+ * Needed because the enum is not part of UAPI headers.
-+ */
-+enum xdp_rss_hash_type {
-+	XDP_RSS_L3_IPV4 = 1U << 0,
-+	XDP_RSS_L3_IPV6 = 1U << 1,
-+	XDP_RSS_L3_DYNHDR = 1U << 2,
-+	XDP_RSS_L4 = 1U << 3,
-+	XDP_RSS_L4_TCP = 1U << 4,
-+	XDP_RSS_L4_UDP = 1U << 5,
-+	XDP_RSS_L4_SCTP = 1U << 6,
-+	XDP_RSS_L4_IPSEC = 1U << 7,
-+	XDP_RSS_L4_ICMP = 1U << 8,
-+};
-+
-+extern int bpf_xdp_metadata_rx_hash(const struct xdp_md *ctx, __u32 *hash,
-+				    enum xdp_rss_hash_type *rss_type) __ksym;
-+
-+static __always_inline __u16 get_dest_port(void *l4, void *data_end,
-+					   __u8 protocol)
-+{
-+	if (protocol == IPPROTO_UDP) {
-+		struct udphdr *udp = l4;
-+
-+		if ((void *)(udp + 1) > data_end)
-+			return 0;
-+		return udp->dest;
-+	} else if (protocol == IPPROTO_TCP) {
-+		struct tcphdr *tcp = l4;
-+
-+		if ((void *)(tcp + 1) > data_end)
-+			return 0;
-+		return tcp->dest;
-+	}
-+
-+	return 0;
-+}
-+
-+SEC("xdp")
-+int xdp_rss_hash(struct xdp_md *ctx)
-+{
-+	void *data_end = (void *)(long)ctx->data_end;
-+	void *data = (void *)(long)ctx->data;
-+	enum xdp_rss_hash_type rss_type = 0;
-+	struct ethhdr *eth = data;
-+	__u8 l4_proto = 0;
-+	__u32 hash = 0;
-+	__u32 key, val;
-+	void *l4 = NULL;
-+	__u32 *cnt;
-+	int ret;
-+
-+	if ((void *)(eth + 1) > data_end)
-+		return XDP_PASS;
-+
-+	if (eth->h_proto == bpf_htons(ETH_P_IP)) {
-+		struct iphdr *iph = (void *)(eth + 1);
-+
-+		if ((void *)(iph + 1) > data_end)
-+			return XDP_PASS;
-+		l4_proto = iph->protocol;
-+		l4 = (void *)(iph + 1);
-+	} else if (eth->h_proto == bpf_htons(ETH_P_IPV6)) {
-+		struct ipv6hdr *ip6h = (void *)(eth + 1);
-+
-+		if ((void *)(ip6h + 1) > data_end)
-+			return XDP_PASS;
-+		l4_proto = ip6h->nexthdr;
-+		l4 = (void *)(ip6h + 1);
-+	}
-+
-+	if (!l4)
-+		return XDP_PASS;
-+
-+	/* Filter on the configured protocol (map_xdp_setup key XDP_PROTO).
-+	 * When set, only process packets matching the requested L4 protocol.
-+	 */
-+	key = XDP_PROTO;
-+	__s32 *proto_cfg = bpf_map_lookup_elem(&map_xdp_setup, &key);
-+
-+	if (proto_cfg && *proto_cfg != 0 && l4_proto != (__u8)*proto_cfg)
-+		return XDP_PASS;
-+
-+	/* Filter on the configured port (map_xdp_setup key XDP_PORT).
-+	 * Only applies to protocols with ports (UDP, TCP).
-+	 */
-+	key = XDP_PORT;
-+	__s32 *port_cfg = bpf_map_lookup_elem(&map_xdp_setup, &key);
-+
-+	if (port_cfg && *port_cfg != 0) {
-+		__u16 dest = get_dest_port(l4, data_end, l4_proto);
-+
-+		if (!dest || bpf_ntohs(dest) != (__u16)*port_cfg)
-+			return XDP_PASS;
-+	}
-+
-+	ret = bpf_xdp_metadata_rx_hash(ctx, &hash, &rss_type);
-+	if (ret < 0) {
-+		key = RSS_KEY_ERR_CNT;
-+		cnt = bpf_map_lookup_elem(&map_rss, &key);
-+		if (cnt)
-+			__sync_fetch_and_add(cnt, 1);
-+		return XDP_PASS;
-+	}
-+
-+	key = RSS_KEY_HASH;
-+	bpf_map_update_elem(&map_rss, &key, &hash, BPF_ANY);
-+
-+	key = RSS_KEY_TYPE;
-+	val = (__u32)rss_type;
-+	bpf_map_update_elem(&map_rss, &key, &val, BPF_ANY);
-+
-+	key = RSS_KEY_PKT_CNT;
-+	cnt = bpf_map_lookup_elem(&map_rss, &key);
-+	if (cnt)
-+		__sync_fetch_and_add(cnt, 1);
-+
-+	return XDP_PASS;
-+}
-+
-+char _license[] SEC("license") = "GPL";
--- 
-2.43.0
-
+SGkgQW5kcmV3LA0KDQpUaGFuayB5b3UgZm9yIHlvdXIgcmVwbHkuDQoNCj4gT24gTW9uLCBNYXIg
+MDIsIDIwMjYgYXQgMDY6MjQ6MjdQTSArMDgwMCwgSmFja3kgQ2hvdSB3cm90ZToNCj4gPiBUaGlz
+IHBhdGNoIHNlcmllcyBhZGRzIHN1cHBvcnQgZm9yIGNvbmZpZ3VyaW5nIFJHTUlJIGludGVybmFs
+IGRlbGF5cw0KPiA+IGZvciB0aGUgQXNwZWVkIEFTVDI2MDAgRlRHTUFDMTAwIEV0aGVybmV0IE1B
+Q3MuDQo+IA0KPiBJJ3ZlIGJlZW4gdGhpbmtpbmcgYWJvdXQgdGhpcyBzb21lIG1vcmUuIEFuZCBp
+IHdvdWxkIGxpa2UgdG8gcHJvcG9zZSBhDQo+IGNvbXBsZXRlbHkgZGlmZmVyZW50IHNvbHV0aW9u
+Lg0KPiANCj4gV2hhdCB3ZSBhcmUgdHJ5aW5nIHRvIGFjaGlldmUgaXMgYWxsb3dpbmcgdGhlIGNv
+cnJlY3QgcGh5LW1vZGUgdG8gYmUgdXNlZCBpbg0KPiBEVCwgcmdtaWktaWQuIEJlaW5nIGFibGUg
+dG8gc3BlY2lmeSBpbnRlcm5hbCBkZWxheXMgaXMgbmljZSB0byBoYXZlLCBidXQgZm9yIG1vc3QN
+Cj4gcGxhdGZvcm1zIHNob3VsZCBub3QgYmUgbmVlZGVkLiBJdCBpcyBvbmx5IG5lZWRlZCBmb3Ig
+YmFkbHkgZGVzaWduZWQgYm9hcmRzDQo+IHdoZXJlIHRoZSBkZXNpZ25lciBvZiB0aGUgUENCIGRp
+ZCBub3QgdGFrZSBjYXJlIHdpdGggdGhlIGxlbmd0aCBvZiB0aGUgdHJhY2VzLg0KPiANCj4gUGFy
+dCBvZiB0aGUgcHJvYmxlbSBpcyB0aGF0IHRoZSBNQUMgZHJpdmVyIGlzIG5vdCBhY3R1YWxseSAi
+YnJva2VuIi4gSXQgZG9lcw0KPiB3aGF0IHdlIHJlY29tbWVuZCwgcmVhZCB0aGUgcGh5LW1vZGUg
+dmFsdWUgZnJvbSBEVCwgYW5kIHBhc3MgaXQgdG8gdGhlIFBIWS4NCj4gVGhlIHJlYWwgaXNzdWUg
+aXMgdGhhdCB0aGUgYm9vdGxvYWRlciBlbmFibGVkIGRlbGF5cyBpbiB0aGUgTUFDLCBiZWhpbmQg
+dGhlDQo+IE1BQyBkcml2ZXJzIGJhY2suIEJlY2F1c2UgdGhlIE1BQyBkcml2ZXIgaXMgbm90ICJi
+cm9rZW4iLCBpdCBpcyBoYXJkIHRvICJmaXgiDQo+IHRoZSBpc3N1ZSBpbiB0aGUgTUFDIGRyaXZl
+ci4NCj4gDQo+IFNvIGxldHMgc29sdmUgdGhpcyBpbiB0aGUgYm9vdGxvYWRlci4gSSBzdWdnZXN0
+IHlvdSBwYXRjaCB0aGUgYm9vdGxvYWRlciB0byBubw0KPiBsb25nZXIgZW5hYmxlIHRoZSBkZWxh
+eXMgaW4gdGhlIE1BQy4gSXQgYWxzbyBuZWVkcyB0byBwYXRjaCB0aGUgRFQgYmxvYi4gSWYgdGhl
+DQo+IGJsb2Igc2F5cyAicmdtaWkiLCBjaGFuZ2UgaXQgdG8gInJnbWlpLWlkIi4gdS1ib290IHNo
+b3VsZCBiZSBhYmxlIHRvIGRvIHRoaXMuDQo+IA0KPiBUaGF0IHNob3VsZCBnaXZlIGJhY2t3YXJk
+cyBjb21wYXRpYmlsaXR5Og0KPiANCj4gKiBFeGlzdGluZyBEVCBibG9icyB3aXRoIG9sZCBib290
+bG9hZGVyIGdhaW4gdGhlIGRlbGF5cyBpbiB0aGUgTUFDLg0KPiANCj4gKiBFeGlzdGluZyBEVCBi
+bG9icyB3aXRoIHRoZSBuZXcgYm9vdGxvYWRlciBnYWluIGRlbGF5cyBpbiB0aGUgUEhZLg0KPiAN
+Cj4gKiBGb3IgbmV3IGJvYXJkcyBiZWluZyBhZGRlZCB0byBMaW51eCwgd2UgTkFDSyB0aGVtIHdp
+dGggInJnbWlpIiwgdGVsbA0KPiAgIHRoZSBkZXZlbG9wZXIgdG8gdXBncmFkZSB0aGUgYm9vdGxv
+YWRlciwgYW5kIHVzZSB0aGUgY29ycmVjdA0KPiAgIHJnbWlpLWlkLiBUaGlzIGlzIGEgcG93ZXIg
+d2UgZG8gaGF2ZS4NCj4gDQo+ICogRGV2ZWxvcGVycyBvZiBleGlzdGluZyAuZHRzIGZpbGVzIGNh
+biBzdWJtaXQgcGF0Y2hlcyB0byByZXBsYWNlDQo+ICAgInJnbWlpIiB3aXRoICJyZ21paS1pZCIg
+b25jZSB0aGV5IGFyZSBoYXBweSBhbGwgcGxhdGZvcm1zIGhhdmUgaGFkDQo+ICAgdGhlaXIgYm9v
+dGxvYWRlciB1cGdyYWRlZC4gVGhhdCBtaWdodCBiZSBuZXZlciwgc2luY2UgZGV2ZWxvcGVycyBh
+cmUNCj4gICBsYXp5LCBhbmQgd2UgY2Fubm90IGZvcmNlIHRoaXMgb24gdGhlbS4NCj4gDQoNCklu
+IHRoZSBjdXJyZW50IGZ0Z21hYzEwMCBkcml2ZXIsIHRoZXJlIGlzIG5vIGxvZ2ljIHRvIGNvbmZp
+Z3VyZSBNQUMgaW50ZXJuYWwgZGVsYXkuDQpBbGwgTUFDIGRlbGF5IHNldHRpbmdzIGFyZSBjb25m
+aWd1cmVkIGluIFUtQm9vdCwgYW5kIHRob3NlIGRlbGF5IHZhbHVlcyBhcmUgZGVyaXZlZCBmcm9t
+IHRoZSBEVCB1c2VkIGluIFUtQm9vdC4NCg0KQXMgYSByZXN1bHQ6DQoqVGhlIHBoeS1tb2RlIGlu
+IHRoZSBMaW51eCBEVCBtYXRjaGVzIHRoZSBvbmUgdXNlZCBpbiBVLUJvb3QuDQoqRXhpc3Rpbmcg
+QVNUMjYwMCBkZXZpY2UgdHJlZXMgoVggaW5jbHVkaW5nIEFzcGVlZKGmcyBFVkIgRFQgoVggZG8g
+bm90IHVzZSAicmdtaWktaWQiLg0KDQpCZWZvcmUgdjYgb2YgdGhpcyBzZXJpZXMsIHdlIGRpc2N1
+c3NlZCBpbnRyb2R1Y2luZyBNQUMgaW50ZXJuYWwgZGVsYXkgY29uZmlndXJhdGlvbiBpbnRvIHRo
+ZSBmdGdtYWMxMDAgZHJpdmVyLg0KSG93ZXZlciwgdGhpcyBjaGFuZ2Ugd291bGQgYWZmZWN0IGFs
+bCBleGlzdGluZyBEVHMsIGJlY2F1c2U6DQpJZiByeC1pbnRlcm5hbC1kZWxheS1ucyAvIHR4LWlu
+dGVybmFsLWRlbGF5LW5zIGFyZSBub3QgcHJlc2VudCwgYWNjb3JkaW5nIHRvIHRoZSBZQU1MIGJp
+bmRpbmcgZGVmYXVsdHMsDQpNQUMgaW50ZXJuYWwgZGVsYXkgd291bGQgYmUgZGlzYWJsZWQuDQoN
+ClRoaXMgd291bGQgdW5pbnRlbnRpb25hbGx5IGNoYW5nZSB0aGUgYmVoYXZpb3Igb2YgZXhpc3Rp
+bmcgcGxhdGZvcm1zLg0KVGhlcmVmb3JlLCBzdGFydGluZyBmcm9tIHY2LCB0aGUgYXBwcm9hY2gg
+ZXZvbHZlZCBpbnRvOg0KKiBDaGVja2luZyB0aGUgcmVsYXRpb25zaGlwIGJldHdlZW4gdGhlIGN1
+cnJlbnQgTUFDIGRlbGF5IGFuZCB0aGUgcGh5LW1vZGUNCiogRGVjaWRpbmcgd2hldGhlciB0bzoN
+CiAqIE1vZGlmeSB0aGUgTUFDIGRlbGF5LCBvcg0KICogUHJlc2VydmUgdGhlIGV4aXN0aW5nIE1B
+QyBkZWxheSBzZXR0aW5nDQoNCkluIGZhY3QsIGluIG91ciBTREsgKFUtQm9vdCk6DQpUaGUgQVNU
+MjYwMCBFVkIgRFQgaGFzIGFscmVhZHkgYmVlbiB1cGRhdGVkIHRvIHVzZSAicmdtaWktaWQiLg0K
+TUFDIGludGVybmFsIGRlbGF5IGlzIGV4cGxpY2l0bHkgZGlzYWJsZWQgKHNldCB0byAwIG5zKS4N
+Ckhvd2V2ZXIsIGV4aXN0aW5nIGRlcGxveWVkIHBsYXRmb3JtcyB3aWxsIG5vdCB1cGRhdGUgdGhl
+aXIgTUFDIGRlbGF5IGNvbmZpZ3VyYXRpb24gc2ltcGx5IGJlY2F1c2Ugb2YgdGhlc2UgY2hhbmdl
+cy4NCg0KRm9yIEFTVDI2MDAsIHdlIG5lZWQgdG8gbWFpbnRhaW4gYmFja3dhcmQgY29tcGF0aWJp
+bGl0eSBpbiB0aGUgTGludXggZnRnbWFjMTAwIGRyaXZlci4NClRoZSBiZWhhdmlvciBpczoNCkZv
+ciBvbGQgRFRzOg0KVGhlIGRyaXZlciBkZXRlcm1pbmVzIHdoZXRoZXIgdGhlIGV4aXN0aW5nIE1B
+QyBkZWxheSBzaG91bGQgYmUgcHJlc2VydmVkLg0KSXQgbWF5IGF0dGVtcHQgdG8gY29udmVydCB0
+byAicmdtaWktaWQiIGFuZCBkaXNhYmxlIE1BQyBpbnRlcm5hbCBkZWxheSBvbmx5IHdoZW4gc2Fm
+ZS4NCkhvd2V2ZXIsIGlmIHRoZSBvbGQgRFQgdXNlcyBmaXhlZC1saW5rLCB3ZSBtdXN0IHByZXNl
+cnZlIHRoZSBvcmlnaW5hbCBNQUMgZGVsYXksDQpCZWNhdXNlIHdlIGNhbm5vdCBwcm9wYWdhdGUg
+cGh5LW1vZGUgdG8gbW9kaWZ5IHRoZSBleHRlcm5hbCBkZXZpY2WhpnMgc3RhdGUuDQpGb3IgbmV3
+IERUczoNClRoZSBkcml2ZXIgY29uZmlndXJlcyBNQUMgaW50ZXJuYWwgZGVsYXkgYmFzZWQgb246
+DQpyeC1pbnRlcm5hbC1kZWxheS1ucw0KdHgtaW50ZXJuYWwtZGVsYXktbnMNClRoZSBkcml2ZXIg
+dGhlbiBwcm9wYWdhdGVzIHRoZSBwaHktbW9kZSB0byB0aGUgUEhZLg0KDQpBZnRlciBjb21wbGV0
+aW5nIEFTVDI2MDAgUkdNSUkgZGVsYXkgaGFuZGxpbmcsIHdlIHBsYW4gdG8gcGF0Y2ggdGhlIEFT
+VDI3MDAgcGxhdGZvcm0uDQpGb3IgQVNUMjcwMDoNClUtQm9vdCB3aWxsIGNvbnNpc3RlbnRseSB1
+c2UgInJnbWlpLWlkIi4NCk1BQyBpbnRlcm5hbCBkZWxheSB3aWxsIGJlIGRpc2FibGVkIGluIFUt
+Qm9vdC4NCkxpbnV4IHdpbGwgZm9sbG93IHRoZSBBU1QyNjAwICJuZXcgRFQiIG1vZGVsOg0KKiBD
+b25maWd1cmUgTUFDIGludGVybmFsIGRlbGF5IGFjY29yZGluZyB0byByeC90eC1pbnRlcm5hbC1k
+ZWxheS1ucw0KKiBQcm9wYWdhdGUgcGh5LW1vZGUgdG8gdGhlIFBIWQ0KVGhpcyBlbnN1cmVzIHRo
+ZSBwbGF0Zm9ybSBpcyBpbXBsZW1lbnRlZCBjbGVhbmx5IGFjY29yZGluZyB0byB0aGUgZGlzY3Vz
+c2VkIGRpcmVjdGlvbiwgd2l0aG91dCBsZWdhY3kgY29tcGF0aWJpbGl0eSBjb25zdHJhaW50cy4N
+Cg0KVGhhbmtzLA0KSmFja3kNCg0K
 
