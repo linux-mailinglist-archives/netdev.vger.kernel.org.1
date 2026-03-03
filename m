@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-263040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263041-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oIzWBtFnpmljPQAAu9opvQ
-	(envelope-from <netdev+bounces-263040-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 05:47:13 +0100
+	id cDteGdVnpmljPQAAu9opvQ
+	(envelope-from <netdev+bounces-263041-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 05:47:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C1031E90A7
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 05:47:12 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B9081E90AE
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 05:47:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 60D25304D14B
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 04:47:02 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2D3933019E21
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 04:47:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20EDC36EAAB;
-	Tue,  3 Mar 2026 04:47:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEE89313E2B;
+	Tue,  3 Mar 2026 04:47:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B3lNlvcS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F5x6ARhp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2AFF3603D4
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 04:47:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C2932E06E4;
+	Tue,  3 Mar 2026 04:47:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772513222; cv=none; b=Dlim/2YEfLd7NNt/SrBTCLSzqtGiBHzm44HxKJqVcsWOqyGYoBhlJJgOpTnpWkMtdoETfDA16COMDEo1tP6HuQpYoxGXfkd99EypqOdf9RDsorfns3yZXETrpvVI2Rhk6XL5h+Pc4RzclA9/dCcG2/6qnJSsUCJe+npb+Ddosjo=
+	t=1772513223; cv=none; b=c7FdncdkuYea5u3tUEBQUlrsU05AttinHjCghKAa5Hd7dzyQ6/TVDVMi0YIozYTsm7N5sN/qf0vZTC8hd4KlLKG5Zaic9FH/I0et7QESiqcGZiGZcB4s5BKFCTTykHjj5v5axkVsV6IkhLAi/xUz0pvZNg0dAhjo1CMKhKk0p1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772513222; c=relaxed/simple;
-	bh=vj+3M3PLxjwcWXquns4pXjUbSAndqJWRP+3XCK2AL4M=;
+	s=arc-20240116; t=1772513223; c=relaxed/simple;
+	bh=8p6I4ZbJF82/s3rO0jdePvWcfOlktsnXETNNgKHgesE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZzbXTGC7A9YLoDr1dwk3gdfCX/FUHa1JY34keYldjbmQHe/9OkfDspv5O/MC+DzEKpZZZVC2MioZuq4T+j2TLfbYt2p9ZtGh3wJU3Ls7tQ45vJ4toMc0xGkJj6HxyH14wbpF00drjvid8BlNevrU65bDLS5ydUCDUxPp6e7r44U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B3lNlvcS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1785C19422;
-	Tue,  3 Mar 2026 04:47:01 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=OzSsJs2goloKCrU6RlVJL9laXX6pg7zpNJUUBreaEJDFbSFWduVFGRVwXx+x6e8r/JtnONvk6guVziDwxm0fGIPKE1Nn4lwIIyY9WlfxoXxlp93gDdFxOF9VQuHMs6fHI53Z6ydDyH5BvUq+U0zpDUQdBRQz2oyFygXH4ySiH3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F5x6ARhp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B375C2BCAF;
+	Tue,  3 Mar 2026 04:47:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772513221;
-	bh=vj+3M3PLxjwcWXquns4pXjUbSAndqJWRP+3XCK2AL4M=;
+	s=k20201202; t=1772513223;
+	bh=8p6I4ZbJF82/s3rO0jdePvWcfOlktsnXETNNgKHgesE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=B3lNlvcSUq3Mz6z39HEL89v4cQBUJvhvt268QK2LF/vfxGMzr78PvWjr3oUFm71sp
-	 WNFKfznMEaVyjDA2FbnIbXdMU+6TUJLIhpaL6xAUVzhdbPmUY0skVua9VYJ0r2Nc+b
-	 ykLgwaq5bDmMCkLZU5CIGAt5fWiuQAGhbv7OsnxtbCnE2NiNZ8FqAqXUlL9EAku8U8
-	 wQpM0Z7NRFZ5pb+6mSb5xExNnl735nfflMOuetys3tu8Qpy+doPegwUdKEhOR2Jfyj
-	 PaevsHg+UoxdA+GBwX8xxQM/22VWzHik8DrgYfbnGlOERBEJlU18yEeks8LE9KAsyw
-	 cocHJ0UP0G+Cw==
+	b=F5x6ARhpK8h1ESlXGqhJY08jwOS0NojF0PKXAXvgHWzr92E5zqMYIYY/yWFfxxyRP
+	 wWgQvidZSJZWdcbaUly+sHNSiLDd3MHi9Fxqbh535qf8V7pxa0LSgn6euOTTPwzwOL
+	 aoOtXp8rrnx5m7h6iDozg41izePTnZoz/R8+3qUhTcxQQ9M0gKg+irkcqgplZbAGWX
+	 RX7nyBhcUiOtQbu274r7f2gzcL1WemsAEvHWUjp8KxW1J63my8k9jZ+4FYwLxFPImm
+	 W7QrjVc0wByqIlY5oOL88rZt/ylvmkFY7V+DqyAdaFRv7npkdB3vFlTXap8Pv8Jr5j
+	 PPkwh0TvurSdA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CDA83809A80;
-	Tue,  3 Mar 2026 04:47:04 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02CAF3809A80;
+	Tue,  3 Mar 2026 04:47:06 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,92 +55,75 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: remove addr_len argument of recvmsg()
- handlers
+Subject: Re: [PATCH net-next 0/3] selftests: drv-net: iou-zcrx: improve
+ stability
+ and make the large chunk test work
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177251322304.625663.12519588393329554160.git-patchwork-notify@kernel.org>
-Date: Tue, 03 Mar 2026 04:47:03 +0000
-References: <20260227151120.1346573-1-edumazet@google.com>
-In-Reply-To: <20260227151120.1346573-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- kuniyu@google.com, netdev@vger.kernel.org, eric.dumazet@gmail.com
-X-Rspamd-Queue-Id: 8C1031E90A7
+ <177251322454.625663.6934806010207310713.git-patchwork-notify@kernel.org>
+Date: Tue, 03 Mar 2026 04:47:04 +0000
+References: <20260227171305.2848240-1-kuba@kernel.org>
+In-Reply-To: <20260227171305.2848240-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, dw@davidwei.uk,
+ jdamato@fastly.com, asml.silence@gmail.com, io-uring@vger.kernel.org
+X-Rspamd-Queue-Id: 6B9081E90AE
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-263040-lists,netdev=lfdr.de,netdevbpf];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-263041-lists,netdev=lfdr.de,netdevbpf];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FROM_NO_DN(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,davidwei.uk,fastly.com,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	NEURAL_HAM(-0.00)[-0.998];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FROM_NO_DN(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 27 Feb 2026 15:11:20 +0000 you wrote:
-> Use msg->msg_namelen as a place holder instead of a
-> temporary variable, notably in inet[6]_recvmsg().
+On Fri, 27 Feb 2026 09:13:02 -0800 you wrote:
+> The iou-zcrx test hasn't been passing in NIPA, I assumed it's because
+> we're missing iouring changes, but it's still failing after the merge
+> window. Turns out there was a bug in the implementation which was fixed
+> separately via the iouring tree. With that out of the way the tests
+> are passing but flaky. Patch 1 deals with the flakiness.
 > 
-> This removes stack canaries and allows tail-calls.
-> 
-> $ scripts/bloat-o-meter -t vmlinux.old vmlinux
-> add/remove: 0/0 grow/shrink: 2/19 up/down: 26/-532 (-506)
-> Function                                     old     new   delta
-> rawv6_recvmsg                                744     767     +23
-> vsock_dgram_recvmsg                           55      58      +3
-> vsock_connectible_recvmsg                     50      47      -3
-> unix_stream_recvmsg                          161     158      -3
-> unix_seqpacket_recvmsg                        62      59      -3
-> unix_dgram_recvmsg                            42      39      -3
-> tcp_recvmsg                                  546     543      -3
-> mptcp_recvmsg                               1568    1565      -3
-> ping_recvmsg                                 806     800      -6
-> tcp_bpf_recvmsg_parser                       983     974      -9
-> ip_recv_error                                588     576     -12
-> ipv6_recv_rxpmtu                             442     428     -14
-> udp_recvmsg                                 1243    1224     -19
-> ipv6_recv_error                             1046    1024     -22
-> udpv6_recvmsg                               1487    1461     -26
-> raw_recvmsg                                  465     437     -28
-> udp_bpf_recvmsg                             1027     984     -43
-> sock_common_recvmsg                          103      27     -76
-> inet_recvmsg                                 257     175     -82
-> inet6_recvmsg                                257     175     -82
-> tcp_bpf_recvmsg                              663     568     -95
-> Total: Before=25143834, After=25143328, chg -0.00%
+> While looking at this I also noticed that the large chunk test isn't
+> running at all. So fix and enable it (patches 2 and 3).
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: remove addr_len argument of recvmsg() handlers
-    https://git.kernel.org/netdev/net-next/c/8341c989ac77
+  - [net-next,1/3] selftests: drv-net: iou-zcrx: wait for memory provider cleanup
+    https://git.kernel.org/netdev/net-next/c/27c4ab943882
+  - [net-next,2/3] selftests: drv-net: iou-zcrx: rework large chunks test to use common setup
+    https://git.kernel.org/netdev/net-next/c/67792dde27a6
+  - [net-next,3/3] selftests: drv-net: iou-zcrx: allocate hugepages for large chunks test
+    https://git.kernel.org/netdev/net-next/c/c7b228418e8b
 
 You are awesome, thank you!
 -- 
