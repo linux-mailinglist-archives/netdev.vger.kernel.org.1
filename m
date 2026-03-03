@@ -1,191 +1,190 @@
-Return-Path: <netdev+bounces-263200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263204-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EI+aG4TepmlkYAAAu9opvQ
-	(envelope-from <netdev+bounces-263200-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:13:40 +0100
+	id INU9O/DfpmkPYQAAu9opvQ
+	(envelope-from <netdev+bounces-263204-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:19:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C142C1F0030
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:13:39 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECA721F0164
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:19:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 47A3E3130E26
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 13:08:23 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id EA2DA3019FCD
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 13:19:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAB09425CD2;
-	Tue,  3 Mar 2026 13:08:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="k2OSEZNg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A6C633F5AB;
+	Tue,  3 Mar 2026 13:19:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC358421A11
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 13:08:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.178
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772543302; cv=pass; b=p7LEfkfeCIJuMbGKpes3x9yCWL8rOQaCiOtJrbTYSx3m7ipS/uRs93KTIQb7e3jqn01yWMsa18xED9/zWkc5FuMbQUAIT+lWDAUnSOsScjFkBsYlmRK6Enl2/Z5+8TJrd+lATdgaoTjPZ/cJl2HvokoyW1bL8jFzJYkcZZde0E0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772543302; c=relaxed/simple;
-	bh=fEKulSd1PmTL8WxGU61UMjkUJvtTae79rFbx+6mxzoc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UHXZ6rzgp4nAAy+xc9KPrP8iw6CkwMjRFi6gOg/1rhwkBmS4Dt5+97sqP6NdCDHmv2SstU8HizbBQP1JYW4aAp6mkp/4Sju8cGS1Wk1/5nTnhrmPUkqfZKoZEgjG7AKkQM6yGYFmDOsg4DhqQ94HFyGXeIXRYuJwQOfaIqj34MI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=k2OSEZNg; arc=pass smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-79860421382so52816797b3.0
-        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 05:08:20 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772543300; cv=none;
-        d=google.com; s=arc-20240605;
-        b=W4fW3zpvwkt7XnX7NxZiC73jSG80N97FitbqGajQwOeqWGEllL/wZ42s7t8WkE+qHd
-         LS4tCs2Y3v5fLW0bDd7hWSpcHpi001SvHlWg8WeYhaHDwIRwL5+Pzm4C1bPu6BWgwUQZ
-         6Zy8gvZWxMbgIxUIFxJRKO1sCHOb/zcAOW7dx7QbMKdud9aVRcNr+exNn7w+zb/gwAqu
-         zv2g/WBlAtLHEMPIwa+xqe3vU8+3wM4YyZ24EiQziAr1/J/M96gvQYt/z9xNgi2Oza4K
-         aj1HYK7V8tv3+M9AgPji7DP2EsV+HGzOO0kB/moFHsX6IYsSVSjcpxiQOiZVJJ5eG6Fw
-         3Jxg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=zzHyJu1zsXD5QTAUauHKQsg8XWyFjizwJkcjUH3f8pI=;
-        fh=Fi9N6eQ3N/AvAiCSRAJz3QfscejVU/ANMZqRLq0N2qc=;
-        b=RznHVLTdu5MXWsDeIxfvzRInPs6pVPWeCC7DrEamX3WAKlWvsFR6IlA6DFnMHOwdKB
-         DkW/LUqq/ooaH+5pMEBrMjMO/NDSlP0ToaCq7Fosy7YNh2c/3AvUgurbxulpwF6WzCo9
-         DhAfJKlRp74eBq9u6G7Bl25HZgV4Ogbw4oIxDwn64KRD+5WOXBPD658prYUEFxdhJMmS
-         VPPW8bjV46J2v15usTrGYVT9pYSny4SjRQh4tIcDkWjoiN+Zn+XDRxuXsAhpatFyfMqi
-         tnpqyX8hDKchcb6PtWg36XUdR7+zE5MVZtwLDgmEwaka5FEZDNyh3DrS/raj/e1uwk3/
-         FzYQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1772543300; x=1773148100; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zzHyJu1zsXD5QTAUauHKQsg8XWyFjizwJkcjUH3f8pI=;
-        b=k2OSEZNgvl8+8d55qdCe6ArRWJ0BhAywf+anDFW4eQI/wGaelUBpT62RGRUqxenKf1
-         7nVznTOqSHQEsLV3MEByVSZ3qGxvOYoTiLAcyzvUAi9eqwtCzGLxGuleTiaFW6GljQ8L
-         23ddf8y28OzM1zqPCgmkwwzjG8BJ8/xWJC9ThjZfVclyjhVboMa9JrrHZqutb1nCKzyk
-         XMPHMrythgzmP2jlppVigdDUfnSU7TmugVavinUxHrQQOqkatN9lDH1kSN413J6z9LAu
-         7IoigmG/KP78XBIgLSjUWy+BXdP/jmNnflX1O2QtUZmrSuB02SPOcuIevU4LaC+Lk6tG
-         bZ7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772543300; x=1773148100;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=zzHyJu1zsXD5QTAUauHKQsg8XWyFjizwJkcjUH3f8pI=;
-        b=YarDiY1IO4WYGHU5U/ZkzG1GlHfCvAKunYnUM+pbBnbf44aWyfTlNXqjThHM+uwPRu
-         frCuzyHP+Bzq1d9R+uoEYCY+oL+ExNCvqa/ZbeUUkYSGQAAVphg9gZkJ0AIl9wkjlYxa
-         1O0OC/BCbTB0Mtua+LLze56jpnp9QX74WZcMPyo7GB9r7WRDrAROEu6D4HgVlH2I1A7/
-         iQVCYP0N69eBuYx/M2/65tVAyshfI5zFzIV7p5pfTea+IeHttJaeHPDYgUaDwtbghidf
-         QRdxzuYcMNOKYJ2eHNUWIVyKoR6Trd7NQwz4U3qyeUIPB7EGtR2567e2EF4UoKpOyRv7
-         SN+A==
-X-Forwarded-Encrypted: i=1; AJvYcCXlEmNpc9qYfxCwqwL+JuLu5AwWfkaE1iVomaN6nQ7oSGxBBbtGD9/RWoscl+07pGFic5ztz5M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpWUBZMvd4bxivDc9Y7EkWKTMaY+Ns8eFA9O05foj4ubrbPAa9
-	ge6jxvTC8aZZeSG4JW3eL3LahSh/ghTEkr1td/pI2Q0NaobWeSUmC03Gojs79+6C+LUO80aP8FD
-	BloiTRgdfqoapXvRHUevnyfuD+ysYWPM+NLURNhemDtOztRCMO/0=
-X-Gm-Gg: ATEYQzwtkg5B3KQaPSy7XxfOJ+3G1dHtulRcwejBnYoyiKQGNSzAN/4qnNdJTqxdsZV
-	n13+g6rD/3M9MDoy14L1Y/SY7pvhrOfq9xpsXbsvtptCIGvvX1wOLi5p6pTIxuP04X3bBg8uHle
-	1XQ0QAX+LZDqRw0AjZHEGecGU2a5CZq+oPcP16Tp3uu7BAFEqggTgn3fQbYamg40qOnoyQmdGBT
-	FNtPrNiOQD0znUeCKXcAAD6AqriliL1hWiWkaMZQZ3Foa3dXddnKRY90+mjh7AjRHjX82SxYfqH
-	A8poAesnxqY3rinTZYW8UQ==
-X-Received: by 2002:a05:690c:e3e9:b0:798:5cab:cb70 with SMTP id
- 00721157ae682-79885508bbamr125655137b3.21.1772543299950; Tue, 03 Mar 2026
- 05:08:19 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A71E1946DA;
+	Tue,  3 Mar 2026 13:19:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772543977; cv=none; b=gDhD7EYXecLaveKAtYnRGgNnAeM8hfYHJ/AKMP/Amd7CPbsllGDUV3lCwDA0j5tMFnMznHfj5dUOKHCznd8ynSILO+LXlgy1APPfGoS9GqfPErCrGA0XgrmkqOIkwPxKv+JiABks3/icBFeqVeF7PSUIDx3gsDds4FS5uSIUF/U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772543977; c=relaxed/simple;
+	bh=JeETUM50RezrqM2Bv0bJk4qh+t9LBTzGYmLdO7iEb2g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GsuYAB0OS7WTvpmr1TZUsAEWRc4X0K9aT2LMXt1s6QG2ZqU/0hoPH/cfWwC29Cg/i8jn5d+SLLuhkY17vXLdq9LB54Lf39GIRiZrZLU1oC2ZkNWCYSko5dpLzGZguM/9WAeSBeTJulyVK7FLccgpylbAESdJgD/egWnLWj0t2PM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.13.172] (g427.RadioFreeInternet.molgen.mpg.de [141.14.13.172])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 83BC74C2C37D6F;
+	Tue, 03 Mar 2026 14:18:05 +0100 (CET)
+Message-ID: <9805389e-9ea4-4e7a-a122-65f733ead33c@molgen.mpg.de>
+Date: Tue, 3 Mar 2026 14:18:03 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260211170725.1514427-1-victor@mojatatu.com> <20260225132623.0395441f@phoenix.local>
-In-Reply-To: <20260225132623.0395441f@phoenix.local>
-From: Victor Nogueira <victor@mojatatu.com>
-Date: Tue, 3 Mar 2026 10:08:08 -0300
-X-Gm-Features: AaiRm50EyCTEPDcr6AUXLMxJ27vPuyrGVeJ5tAdanHPFgLZcex7MUnGfXnQ31vQ
-Message-ID: <CA+NMeC8P7RPudNkDm6kUWjxEZKJDZZg0oNDr2Y7K00NUzhOXbg@mail.gmail.com>
-Subject: Re: [PATCH iproute2 0/3] Add JSON output support to the remaining qdiscs
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: dsahern@kernel.org, jhs@mojatatu.com, deren.teo@outlook.com, 
-	andrew@lunn.ch, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: C142C1F0030
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v4] igb: Retrieve Tx timestamp from BH workqueue
+To: Kurt Kanzenbach <kurt@linutronix.de>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Miroslav Lichvar <mlichvar@redhat.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260303-igb_irq_ts-v4-1-cbae7f127061@linutronix.de>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20260303-igb_irq_ts-v4-1-cbae7f127061@linutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: ECA721F0164
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263204-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[mpg.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263200-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de,linux.dev,lists.osuosl.org,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,outlook.com,lunn.ch,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.818];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-0.992];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,networkplumber.org:email,mojatatu-com.20230601.gappssmtp.com:dkim]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,msgid.link:url,linutronix.de:email,mpg.de:email,molgen.mpg.de:mid]
 X-Rspamd-Action: no action
 
-On Wed, Feb 25, 2026 at 6:26=E2=80=AFPM Stephen Hemminger
-<stephen@networkplumber.org> wrote:
->
-> On Wed, 11 Feb 2026 14:07:22 -0300
-> Victor Nogueira <victor@mojatatu.com> wrote:
->
-> > Since qdisc core already assumes all qdiscs are able to output JSON,
-> > add JSON output support to the remaning qdiscs (HFSC, QFQ, muiltiq)
-> > so that a JSON qdisc dump outputs valid JSON.
-> >
-> > Victor Nogueira (3):
-> >   tc: Add JSON output support to HFSC
-> >   tc: Add JSON output support to QFQ
-> >   tc: Add JSON output support to multiq
-> >
-> >  tc/q_hfsc.c   | 29 ++++++++++++++++++-----------
-> >  tc/q_multiq.c |  4 +++-
-> >  tc/q_qfq.c    |  8 ++++----
-> >  3 files changed, 25 insertions(+), 16 deletions(-)
-> >
->
-> Good start but some minor issues found by AI patch review
->
-> Must-fix bug in patch 1/3 (HFSC): Copy-paste error on line printing
-> level =E2=80=94 it uses st->period instead of st->level, silently emittin=
-g
-> wrong data in both text and JSON modes.
->
-> Design concerns worth discussing:
->
-> HFSC d (delay) field is emitted as a human-readable string in JSON
-> ("5ms") rather than a raw numeric value (microseconds), which goes
-> against the iproute2 JSON convention that JSON should carry raw values
-> for script consumption
->
-> HFSC service curve keys use flat compound names with spaces ("rt m1")
-> rather than nested JSON objects =E2=80=94 functional but awkward for cons=
-umers
->
-> multiq bands emits a compound string ("3/16") rather than separate
-> numeric fields =E2=80=94 once this JSON format ships it becomes API
+Dear Kurt,
 
-Thank you for reviewing.
-I sent a v2 with the fixes you suggested.
 
-cheers,
-Victor
+Thank you for the patch.
+
+Am 03.03.26 um 12:48 schrieb Kurt Kanzenbach:
+> Retrieve Tx timestamp from system BH instead of regular system workqueue.
+> 
+> The current implementation uses schedule_work() which is executed by the
+> system work queue and kworkers to retrieve Tx timestamps. This increases
+> latency and can lead to timeouts in case of heavy system load. i210 is
+> often used in industrial systems, where timestamp timeouts can be fatal.
+> 
+> Therefore, switch to the system BH workqueues which are executed directly
+> at the end of the IRQ handler.
+
+Thank you for implementing this.
+
+> Tested on Intel i210 and i350 with ptp4l.
+
+It would be great, if you shared the numbers. Did Miroslav already test 
+this?
+
+Also, if you could add a comment/summary, that doing this in the IRQ 
+path with your theory on why, that’d be great.
+
+> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+> ---
+> Changes in v4:
+> - Use BH workqueue (tasklet) instead of doing timestamping in IRQ path (Jakub Kicinski)
+> - Link to v3: https://patch.msgid.link/20260205-igb_irq_ts-v3-1-2efc7bc4b885@linutronix.de
+> 
+> Changes in v3:
+> - Switch back to IRQ, but for i210 only
+> - Keep kworker for all other NICs like i350 (Miroslav)
+> - Link to v2: https://lore.kernel.org/r/20250822-igb_irq_ts-v2-1-1ac37078a7a4@linutronix.de
+> 
+> Changes in v2:
+> - Switch from IRQ to PTP aux worker due to NTP performance regression (Miroslav)
+> - Link to v1: https://lore.kernel.org/r/20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de
+> ---
+>   drivers/net/ethernet/intel/igb/igb_main.c | 4 ++--
+>   drivers/net/ethernet/intel/igb/igb_ptp.c  | 2 +-
+>   2 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+> index ee99fd8fd513..9fd29fedb9f5 100644
+> --- a/drivers/net/ethernet/intel/igb/igb_main.c
+> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
+> @@ -6572,7 +6572,7 @@ netdev_tx_t igb_xmit_frame_ring(struct sk_buff *skb,
+>   			adapter->ptp_tx_skb = skb_get(skb);
+>   			adapter->ptp_tx_start = jiffies;
+>   			if (adapter->hw.mac.type == e1000_82576)
+> -				schedule_work(&adapter->ptp_tx_work);
+> +				queue_work(system_bh_wq, &adapter->ptp_tx_work);
+>   		} else {
+>   			adapter->tx_hwtstamp_skipped++;
+>   		}
+> @@ -7076,7 +7076,7 @@ static void igb_tsync_interrupt(struct igb_adapter *adapter)
+>   
+>   	if (tsicr & E1000_TSICR_TXTS) {
+>   		/* retrieve hardware timestamp */
+> -		schedule_work(&adapter->ptp_tx_work);
+> +		queue_work(system_bh_wq, &adapter->ptp_tx_work);
+>   	}
+>   
+>   	if (tsicr & TSINTR_TT0)
+> diff --git a/drivers/net/ethernet/intel/igb/igb_ptp.c b/drivers/net/ethernet/intel/igb/igb_ptp.c
+> index bd85d02ecadd..7b44f9090631 100644
+> --- a/drivers/net/ethernet/intel/igb/igb_ptp.c
+> +++ b/drivers/net/ethernet/intel/igb/igb_ptp.c
+> @@ -832,7 +832,7 @@ static void igb_ptp_tx_work(struct work_struct *work)
+>   		igb_ptp_tx_hwtstamp(adapter);
+>   	else
+>   		/* reschedule to check later */
+> -		schedule_work(&adapter->ptp_tx_work);
+> +		queue_work(system_bh_wq, &adapter->ptp_tx_work);
+>   }
+>   
+>   static void igb_ptp_overflow_check(struct work_struct *work)
+The diff looks fine.
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+
+Kind regards,
+
+Paul
 
