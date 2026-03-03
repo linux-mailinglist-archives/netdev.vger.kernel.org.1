@@ -1,184 +1,170 @@
-Return-Path: <netdev+bounces-263376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263377-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iJ5WFEIvp2mbfgAAu9opvQ
-	(envelope-from <netdev+bounces-263376-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 19:58:10 +0100
+	id OHDKAK8wp2kjfwAAu9opvQ
+	(envelope-from <netdev+bounces-263377-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 20:04:15 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68D1C1F58B0
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 19:58:09 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F31781F59D6
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 20:04:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C9C1F302CB11
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 18:58:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CB891300D4F5
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 19:04:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85361372683;
-	Tue,  3 Mar 2026 18:58:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C74913845AE;
+	Tue,  3 Mar 2026 19:04:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="CruXrtCo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dIQSYG+r"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D61B372675;
-	Tue,  3 Mar 2026 18:58:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3CA4377EA1;
+	Tue,  3 Mar 2026 19:04:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772564287; cv=none; b=aCW6/ru3Y0EoJZ0hljQ7wdes8zTIKY3yz9rmqY2+mx/hNYelznNzhfJBsq7XW1QDJyJiiVMlePCaTa7Skk90WD5YelJ/NsG80NMuPF6g0UfVCnS8JseNsnMwKPW63LVcpryg75hG+hFj7II5Luu4k6wdz3keBT15s+maLljeTsg=
+	t=1772564649; cv=none; b=Gb9/UvkMk6wF80NmHyi+ILvUk587Bf8/Jm8qhIfdVIRTdPwTGxCOJ+HOJIGCCQ5u99b8I7PeEuAEN8V8VLI0zbMtuv5bOKJU5WF1nvy04QIh7pL/NfbnI+79ewpBR/72b+AqjCvzvaq7ImwLo2fWvWng2xTJ019Gdsc0LUTejR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772564287; c=relaxed/simple;
-	bh=EtWg3YLmhHTWZkHEIg3KBpU5XI/TYRzQlO5nZlf3s5k=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j1KzsPmJE4Sr1brGaKUz8V38MMDBeDrDE+gsxXijpOpJbLQ4yUcMNlsT1fTqn2xaL3e/WYMSAQ1st1tl7KjxbXnYlT60JBQRu9LOAgIYtGi7QFiRSZgXP3Mr1xU65/lEgqIHtoA12ARblnBzhtISnre+LWXGXj+lFvEpzyL3gXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=CruXrtCo; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1772564286; x=1804100286;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=EtWg3YLmhHTWZkHEIg3KBpU5XI/TYRzQlO5nZlf3s5k=;
-  b=CruXrtCoxvlUN59G7n5Ymwb0xoARqoBAVw6xFqPBDZ9sKsVH8FJR0fGN
-   MnTUiyrz4v6qRDMgyPPocShACdxTSAq/4q3LJ6cHdGORIKBZLKEjHgIpg
-   e7cj/DcSYpEj+2TmHLvYzhzdv146+fzhzX/6u8CArQVG0u/Z5LW0Ony7Y
-   zGfDJC8OxO+1NMFfSm9jRDUlcSv2u7aeZhiIn/0J+X2TND1fDHXPI9nAY
-   DX3HsKItaCHPYCqZv3vXA/6c2FbaEvtBCmkYnLJz+deYSaySJlTAWdoQP
-   +4HGh9+S3+pwXPlThIDhc4cqgepFQsAvMJ4+7UdVswISepFVoo4c7jZ3T
-   w==;
-X-CSE-ConnectionGUID: aWWa6EwYSd6QIkRSx1rNnQ==
-X-CSE-MsgGUID: rR7sdMFvTq+4mgPvp6cXog==
-X-IronPort-AV: E=Sophos;i="6.21,322,1763449200"; 
-   d="scan'208";a="54163067"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2026 11:58:05 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.87.71) by
- chn-vm-ex2.mchp-main.com (10.10.87.31) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.35; Tue, 3 Mar 2026 11:57:44 -0700
-Received: from bby-cbu-swbuild03.eng.microchip.com (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58 via Frontend Transport; Tue, 3 Mar 2026 11:57:43 -0700
-Date: Tue, 3 Mar 2026 10:57:42 -0800
-From: Charles Perry <charles.perry@microchip.com>
-To: Conor Dooley <conor@kernel.org>
-CC: <netdev@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
-	<conor+dt@kernel.org>, Nicolas Ferre <nicolas.ferre@microchip.com>, "Claudiu
- Beznea" <claudiu.beznea@tuxon.dev>, <devicetree@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <charles.perry@microchip.com>
-Subject: Re: [PATCH net-next 2/4] dt-bindings: net: cdns,macb: forbid phy
- nodes for Microchip p64h
-Message-ID: <aacvJsma52VAFDrQ@bby-cbu-swbuild03.eng.microchip.com>
-References: <20260303180318.1814791-1-charles.perry@microchip.com>
- <20260303180318.1814791-3-charles.perry@microchip.com>
- <20260303-curse-shudder-9bd286fa6cd0@spud>
+	s=arc-20240116; t=1772564649; c=relaxed/simple;
+	bh=Ls5d0F6utRyv7s9aWgBon26Vc6hhPSXQBepnMUYJc28=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dNljJph+6qppgFS9ztWK0/N7X1YsiGH4jfTGjeOLbVOgBWSL3r6w07Qa1retO5p4QHukIXXy0mh0UEZkzE7yTeRjjaoOwaQeyN06TR8l5G3c7OB4H8fLr7WFr5RSruD/Z14BX/0k+T/rvA6QCbJNbGf618RxRSkVIW4v0KBUnVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dIQSYG+r; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B64B2C116C6;
+	Tue,  3 Mar 2026 19:04:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772564649;
+	bh=Ls5d0F6utRyv7s9aWgBon26Vc6hhPSXQBepnMUYJc28=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dIQSYG+rFjYV7pnNtO/c6aFPT2Pnk5SSDc4JN83WBDNm/g1VUtfDR2tt097i+kJSQ
+	 kzJp6tJI1sXZoGkVZ34ue6qqtUqzgVxS6bX84EW2fwHPPaOB8ByhqWjOjaWj+avr6p
+	 cGyx4cDOwsqeWjT3vJuS7nsGacsulHiS/swKh9Zd2DHdLwmxFVRpImIStoY9gnX59/
+	 AmX9fESwe1twnsyznXH5YedP325ZQoNUVJgTfN9X/7mzfj2FdLHp0n6VWydgBHbUtN
+	 4j0AfU4DlC33N37s26ZbVSQHrGyS5MCQytDq1mmlAlK19cKX1Oz34MckK5lPKUY3MK
+	 DHRUxpzks7ANA==
+Date: Tue, 3 Mar 2026 19:04:03 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jens Emil Schulz =?iso-8859-1?Q?=D8stergaard?= <jensemil.schulzostergaard@microchip.com>,
+	UNGLinuxDriver@microchip.com, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next 2/8] dt-bindings: net: lan9645x: add LAN9645X
+ switch bindings
+Message-ID: <20260303-mosaic-debate-90cf8c8bbb33@spud>
+References: <20260303-dsa_lan9645x_switch_driver_base-v1-0-bff8ca1396f5@microchip.com>
+ <20260303-dsa_lan9645x_switch_driver_base-v1-2-bff8ca1396f5@microchip.com>
+ <4088b0ff-b718-4137-8518-4c9b9764d56d@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="mDeycmnSpjEBNjAk"
 Content-Disposition: inline
-In-Reply-To: <20260303-curse-shudder-9bd286fa6cd0@spud>
-X-Rspamd-Queue-Id: 68D1C1F58B0
+In-Reply-To: <4088b0ff-b718-4137-8518-4c9b9764d56d@lunn.ch>
+X-Rspamd-Queue-Id: F31781F59D6
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263376-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-263377-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_CC(0.00)[microchip.com,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[charles.perry@microchip.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	DBL_PROHIBIT(0.00)[80.111.88.32:email];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,devicetree.org:url,bby-cbu-swbuild03.eng.microchip.com:mid,microchip.com:dkim,microchip.com:email,0.0.0.0:email]
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Tue, Mar 03, 2026 at 06:11:42PM +0000, Conor Dooley wrote:
-> On Tue, Mar 03, 2026 at 10:03:16AM -0800, Charles Perry wrote:
-> > The GEM IPs within Microchip p64h have their MDIO controllers
-> > unconnected from any physical pin.
-> > 
-> > When compiling a p64h device tree with a phy on a GEM node with
-> > CHECK_DTBS=1, this generates an error like:
-> > 
-> > ```
-> > linux/arch/riscv/boot/dts/microchip/p64h-hb130x.dtb:
-> > ethernet@40004180000 (microchip,p64h-gem): ethernet-phy@0: False
-> > schema does not allow {'reg': [[0]]}
-> > 	from schema $id:
-> > http://devicetree.org/schemas/net/cdns,macb.yaml#
-> > ```
-> 
-> This should just be part of the patch adding the compatible. Adding it
-> incorrectly only to fix it up one patch later doesn't make sense.
-> Additionally, remove this information about the error adding this
-> produces, all you need here is the justification for it.
-> 
 
-Ok
+--mDeycmnSpjEBNjAk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
-Charles
-
-> pw-bot: changes-requested
-> 
-> > 
-> > Signed-off-by: Charles Perry <charles.perry@microchip.com>
-> > ---
-> >  Documentation/devicetree/bindings/net/cdns,macb.yaml | 11 +++++++++++
-> >  1 file changed, 11 insertions(+)
-> > 
-> > diff --git a/Documentation/devicetree/bindings/net/cdns,macb.yaml b/Documentation/devicetree/bindings/net/cdns,macb.yaml
-> > index dff350302098..be66cc9a42fd 100644
-> > --- a/Documentation/devicetree/bindings/net/cdns,macb.yaml
-> > +++ b/Documentation/devicetree/bindings/net/cdns,macb.yaml
-> > @@ -197,6 +197,17 @@ allOf:
-> >        required:
-> >          - phys
-> >  
-> > +  - if:
-> > +      properties:
-> > +        compatible:
-> > +          contains:
-> > +            const: microchip,p64h-gem
-> > +    then:
-> > +      patternProperties:
-> > +        "^ethernet-phy@[0-9a-f]$": false
-> > +      properties:
-> > +        mdio: false
+On Tue, Mar 03, 2026 at 03:18:45PM +0100, Andrew Lunn wrote:
+> > +        properties:
+> > +          microchip,led-drive-mode:
+> > +            $ref: /schemas/types.yaml#/definitions/uint32
+> > +            description: |
+> > +              Set the LED drive mode for the copper PHY associated with
+> > +              this port.
 > > +
-> >  unevaluatedProperties: false
-> >  
-> >  examples:
-> > -- 
-> > 2.47.3
-> > 
+> > +                0 - LED1 and LED2 in open-drain mode
+> > +                1 - LED1 in active drive mode (can be used for single-=
+LED
+> > +                    configurations requiring active drive)
+> > +                2 - Reserved
+> > +                3 - LED1 and LED2 in active drive mode
+> > +            minimum: 0
+> > +            maximum: 3
+>=20
+> I doubt the DT Maintainers will accept that. This looks a lot like a
+> value you write into a register. How are active drive and open-drain
+> described in other DT bindings? Is there something you can reuse?
 
+I had a quick look and I didn't see anything really that stood out to me
+that would be a drop-in replacement.
+I also tried looking in the datasheet for more information on these
+modes, but I couldn't see anything obvious. For example, there were zero
+hits for "drain" in either LAN9645xS or LAN9645xF datasheets.
 
+That said, yea you're right about DT maintainer feelings about it.
+There's a couple things I could suggest, but I'd like to know about what
+mode 1 means for LED2 first. If there's actually nothing similar, what
+about representing each led with a child node and having open-drain be
+the default with a property in the child for active-drive?
+
+>=20
+> For 1, what happens to LED2? Not used at all?
+>=20
+>     Andrew
+
+--mDeycmnSpjEBNjAk
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaacwowAKCRB4tDGHoIJi
+0gb4AQCWkWkmTIM8GJfJTP4My3dFk7rkxfSKzGAagdkb2xu+ywEA2x8Xwh4vxcOV
+1olqF8zATG33o0OYhTOjUbJtGGAfbgM=
+=iHFd
+-----END PGP SIGNATURE-----
+
+--mDeycmnSpjEBNjAk--
 
