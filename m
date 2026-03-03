@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-263393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263394-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yCwRJ1I9p2kNgAAAu9opvQ
-	(envelope-from <netdev+bounces-263393-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 20:58:10 +0100
+	id aHvIJgE9p2kNgAAAu9opvQ
+	(envelope-from <netdev+bounces-263394-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 20:56:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39B4A1F67F8
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 20:58:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22C1C1F67A6
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 20:56:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 66DFD30A4CFB
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 19:56:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AF7B830D36D3
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 19:56:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E858C386551;
-	Tue,  3 Mar 2026 19:55:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D7A386450;
+	Tue,  3 Mar 2026 19:56:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UlXFTzEk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C4Ox95DJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5088A389105
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 19:55:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F59389113
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 19:55:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772567758; cv=none; b=D/dQoFDY47RBHqmGHv5kOJyNxPMQjyXamVqsLnInxqohrVy9J9ZDvcbrAqN+S9yk84x18CdTTkFavHhsWIz9nJs7tKQO9V+BWZaC07V68idMzq8pBXj4osCkajFGN1D2MnPB7T2FoT4ui5uzX2HGd/vDqlg5pk9imouofyq9Izw=
+	t=1772567761; cv=none; b=duair1bkqIw8jazNLsUSLElXMkIJV8Beu8Vx5zcd0unW6V/DFchH5jZzhkz1WmVGAwm/WgdWMeUv4sKnhD9QOOfXHIjqR4ol6cu14qPImWy4Dc7om+cP7ClH2b0adI+I4epn4QoL++jSSX8QWDDHzjtFBsFsmVQni9N4/Pp+o9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772567758; c=relaxed/simple;
-	bh=tBrXfsph2RTre7AKwb6XSwlXm3BvBH5Y/qhSnej/G7o=;
+	s=arc-20240116; t=1772567761; c=relaxed/simple;
+	bh=lAeoYgBQM1LTZWAFlAqqO4VQEX8bViSlLynqua3uy0E=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LDWk7AdSTab7QAcfiXg9R8BtgjQYMrAsucxeMCA9mgdEowmOqFC5iYoLLWbXe4+giNTCj5tWweX63v9xQUzgJXOMtxXp9Lyu/W9G7dOnmu+PwKnKJxxBwWGkGd2UEtCJ6WfZFnOnlBisC+H2NG8X8/CgsLSl6uoFvzm1JsaIAvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UlXFTzEk; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=pug0MdMxgj/ja23zFX0b3nAe0WNrOMiMQ+Z9l76DZsry+qanC5dqo/MIS+V7WN5CmVB2QjNKpeQXxSE559QLSyiE/oU0PTbLNq9byjkkKgsFO2jtthRPYIZ26QF6n6d5Sfj2IQ4u7rkIo1sbLJneYi3NW/gARvHA4hkjn1URBg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C4Ox95DJ; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3594620fe97so29239434a91.1
-        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 11:55:56 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2ae57228f64so22438355ad.0
+        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 11:55:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772567756; x=1773172556; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772567757; x=1773172557; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=js0eM5dF9ShUt2Ha+FRxZ4vQ9tkmpGaVXJ30nrzMkdw=;
-        b=UlXFTzEkVCJVQuffgndGajqk+RBsDHl7WOx2WKUJloiDvuiCHksJxaX5Wvcrpw0Yj2
-         BHGZYqKTW7TR1J1rG+raOwVswupYoiV17UmRmiNh5+sZkiWsOKHNqEhDsy+0I4YYqGil
-         jTY/jXEy7OT2yXabzc/4PJJte6vte/mu2fDc12+vlfZaqtFvN/ebxRiApqiYq6RgSyc2
-         VwLpN/qabwS+CUbCUaJgdYEfaxDdUIdbNEYFRMIX0fJUSSq75JBJkECuYWL+bVFuFyHC
-         lbL8/dx0n7KsS+0q96ACn9SbFhDaQonmPCCipdge3p1imsog3Cg87xHE+OGTl95/dbQ4
-         lUQg==
+        bh=P8wBZYOjVx1PhHvmvhSvpE8PvzwVvcrdiZixhCtvqCs=;
+        b=C4Ox95DJEU4xS4hut7ebGN7EhQuj5gI5uyqv8ZG3MykMA0+D6qSI00Y2sUqQ4/MFzp
+         1es9iKGyLyN+8+ZsqqNpWeEl2lPaEw5+dfYzNb5xKxv/cOgohvnNk1jgUUaejXjGSzvS
+         R7CdhQm171QVnmftcC0Spv/JIuDdRuw6KeZkwCXHbzLivJwc5HwxGvx0B7gtWrF3YWuH
+         tJ+9+3qZkCV47mD1EMoHkABcQMvsPEFxHpRbCkA5AChg7yHNOCAMPkncQfNn7nYlAD5i
+         o5O13KWsSW0kOmkPs19p+Ge9a5PWpXeCtCulzwWOVgtagzuRNxQRUBlNh7sR0oP1SwMO
+         AllA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772567756; x=1773172556;
+        d=1e100.net; s=20230601; t=1772567757; x=1773172557;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=js0eM5dF9ShUt2Ha+FRxZ4vQ9tkmpGaVXJ30nrzMkdw=;
-        b=EqoBtkmXWKN0BKvEFEfDG/jN1/5W4NILHJ+Dw59lLA6773ypvZz1t5eO0wIXPqPstR
-         LUp+iKGPRoBUMRxNsdIuCVc4TTbUxqFnYJ7mo9UneQS6/3vvv9/XpIC/eHcH8e8zyBsT
-         maXyQT52CoarVK/oct4bkQrx/O9kcHdUhmmFUBjUxMtai14wFdZqgX6uraq/vEhp7n5O
-         /Oxq45lTQLWlrnGrBrH3wUqjbjclujVOm1oLLeum3g5e3rwR87WWOJeUlYnUo3krlAMp
-         TJMSeQ+6p3ZDuBJqxRrhzdYGJKaZlyduWKp3Ix67wzW3sHKdPVvLB15gKdQFSNck6/Z5
-         R79A==
-X-Gm-Message-State: AOJu0YyaVP1rSQSqTcC5JWDKfdPeF9RTJtXhjHSk8lCfUVylOJ9ELBmu
-	ZI5y0TtYy8vI2SmN+jpXkKu2iynyhgpy3InYT88IFd70TlSHUuM+5+XG91XYwAxQ43qL0atS/X7
-	nyOja0FYYfHWLIoPJGfnpDx3rZanqBxwYITDM3kNI8L5Nf//r8F2pjWAlWlkckd4f34/eWkjci+
-	N4O13AnbzS5eYJ48aV0Q3UM81WsVLx2da055ylcYJ+o/FTH/A=
-X-Received: from pjop12.prod.google.com ([2002:a17:90a:930c:b0:359:79d6:387a])
+        bh=P8wBZYOjVx1PhHvmvhSvpE8PvzwVvcrdiZixhCtvqCs=;
+        b=EVjKGOp1t/NUpgFQqne5Mc0bUPjnLV0o7jBnJjZUrZ8+uuqUg+6N8MENxoOXyl21Lj
+         SvpdaEvMANr9A07sXASmZPZBORAlzS10fuBvTlgAd/l1vq3rjNJF51lUgOR+MqZ5DAc3
+         hYF5grt7LOVvvBZbBZMCuM7Hz6M0yAURLWqu5R3HEchVWA9twqrEcTmDvTyfoS9nq7nw
+         GrJfCzMsAF23DpxGbX2++nQu8cRCqpLsXAGayCXMVosVSfpwKpnKxsa8JczSYvolHYxl
+         pYA6cHdBv3Xm2VyAEV1egC1L0JIbNk8xtrM9bo7IeBSIkCz998boBvhXy8NTwRVO7+hv
+         ZaBg==
+X-Gm-Message-State: AOJu0YysSCK3ABa9zhlmUqmYtAdDTzh4fZHck4sO4DLU8kwVqeaktMVA
+	OtWzk4HiwhOPAVABgy7yGn28/RDijxf6Xq4vIdg0+gqiQqq2TM/+hUk6g9AAmtrPHSs116q53xZ
+	+v5SEBQCmK4JiO3iuVtrxlebbysZhTYynY1EodKDEi7h/56iEUCciql6k1lLtgXxYxH3cSbrVol
+	ori3hKW8W3Yg5RQbZLcbDgIAvzpS2ma1wc40y3fReYMjQe2LE=
+X-Received: from plrd24.prod.google.com ([2002:a17:902:aa98:b0:2ae:4655:2b3b])
  (user=joshwash job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:2496:b0:359:8726:3fb0 with SMTP id 98e67ed59e1d1-3598726419dmr4606668a91.22.1772567755368;
- Tue, 03 Mar 2026 11:55:55 -0800 (PST)
-Date: Tue,  3 Mar 2026 11:55:46 -0800
+ 2002:a17:903:2ac7:b0:2ae:3afc:eb38 with SMTP id d9443c01a7336-2ae3afcefb0mr135265005ad.41.1772567757193;
+ Tue, 03 Mar 2026 11:55:57 -0800 (PST)
+Date: Tue,  3 Mar 2026 11:55:47 -0800
 In-Reply-To: <20260303195549.2679070-1-joshwash@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260303195549.2679070-1-joshwash@google.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260303195549.2679070-2-joshwash@google.com>
-Subject: [PATCH net-next 1/4] gve: Advertise NETIF_F_GRO_HW instead of NETIF_F_LRO
+Message-ID: <20260303195549.2679070-3-joshwash@google.com>
+Subject: [PATCH net-next 2/4] gve: fix SW coalescing when hw-GRO is used
 From: Joshua Washington <joshwash@google.com>
 To: netdev@vger.kernel.org
 Cc: Joshua Washington <joshwash@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
@@ -91,7 +91,7 @@ Cc: Joshua Washington <joshwash@google.com>, Harshitha Ramamurthy <hramamurthy@g
 	Matt Olson <maolson@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
 	Tim Hostetler <thostet@google.com>, linux-kernel@vger.kernel.org, bpf@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 39B4A1F67F8
+X-Rspamd-Queue-Id: 22C1C1F67A6
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -99,12 +99,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263393-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-263394-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
@@ -117,88 +117,80 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[joshwash@google.com,netdev@vger.kernel.org];
 	FREEMAIL_CC(0.00)[google.com,lunn.ch,davemloft.net,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
 From: Ankit Garg <nktgrg@google.com>
 
-The device behind DQO format has always coalesced packets per stricter
-hardware GRO spec even though it was being advertised as LRO.
+Leaving gso_segs unpopulated on hardware GRO packet prevents further
+coalescing by software stack because the kernel's GRO logic marks the
+SKB for flush because the expected length of all segments doesn't match
+actual payload length.
 
-Update advertised capability to match device behavior.
+Setting gso_segs correctly results in significantly more segments being
+coalesced as measured by the result of dev_gro_receive().
+
+gso_segs are derived from payload length. When header-split is enabled,
+payload is in the non-linear portion of skb. And when header-split is
+disabled, we have to parse the headers to determine payload length.
 
 Signed-off-by: Ankit Garg <nktgrg@google.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Jordan Rhee <jordanrhee@google.com>
 Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
 Signed-off-by: Joshua Washington <joshwash@google.com>
 ---
- drivers/net/ethernet/google/gve/gve_adminq.c |  6 +++---
- drivers/net/ethernet/google/gve/gve_main.c   | 15 ++++++++-------
- 2 files changed, 11 insertions(+), 10 deletions(-)
+ drivers/net/ethernet/google/gve/gve_rx_dqo.c | 23 +++++++++++++++++++++--
+ 1 file changed, 21 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/ethernet/google/gve/gve_adminq.c
-index b72cc0fa..873672f6 100644
---- a/drivers/net/ethernet/google/gve/gve_adminq.c
-+++ b/drivers/net/ethernet/google/gve/gve_adminq.c
-@@ -791,7 +791,7 @@ static void gve_adminq_get_create_rx_queue_cmd(struct gve_priv *priv,
- 		cmd->create_rx_queue.rx_buff_ring_size =
- 			cpu_to_be16(priv->rx_desc_cnt);
- 		cmd->create_rx_queue.enable_rsc =
--			!!(priv->dev->features & NETIF_F_LRO);
-+			!!(priv->dev->features & NETIF_F_GRO_HW);
- 		if (priv->header_split_enabled)
- 			cmd->create_rx_queue.header_buffer_size =
- 				cpu_to_be16(priv->header_buf_size);
-@@ -1127,9 +1127,9 @@ int gve_adminq_describe_device(struct gve_priv *priv)
+diff --git a/drivers/net/ethernet/google/gve/gve_rx_dqo.c b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+index 63a96106..5ba893e5 100644
+--- a/drivers/net/ethernet/google/gve/gve_rx_dqo.c
++++ b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+@@ -945,11 +945,16 @@ static int gve_rx_complete_rsc(struct sk_buff *skb,
+ 			       struct gve_ptype ptype)
+ {
+ 	struct skb_shared_info *shinfo = skb_shinfo(skb);
++	int rsc_segments, rsc_seg_len, hdr_len;
  
- 	gve_set_default_rss_sizes(priv);
+-	/* Only TCP is supported right now. */
++	/* HW-GRO only coalesces TCP. */
+ 	if (ptype.l4_type != GVE_L4_TYPE_TCP)
+ 		return -EINVAL;
  
--	/* DQO supports LRO. */
-+	/* DQO supports HW-GRO. */
- 	if (!gve_is_gqi(priv))
--		priv->dev->hw_features |= NETIF_F_LRO;
-+		priv->dev->hw_features |= NETIF_F_GRO_HW;
- 
- 	priv->max_registered_pages =
- 				be64_to_cpu(descriptor->max_registered_pages);
-diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-index 0ee864b0..ee963c98 100644
---- a/drivers/net/ethernet/google/gve/gve_main.c
-+++ b/drivers/net/ethernet/google/gve/gve_main.c
-@@ -1718,9 +1718,9 @@ static int gve_verify_xdp_configuration(struct net_device *dev,
- 	struct gve_priv *priv = netdev_priv(dev);
- 	u16 max_xdp_mtu;
- 
--	if (dev->features & NETIF_F_LRO) {
-+	if (dev->features & NETIF_F_GRO_HW) {
- 		NL_SET_ERR_MSG_MOD(extack,
--				   "XDP is not supported when LRO is on.");
-+				   "XDP is not supported when HW-GRO is on.");
- 		return -EOPNOTSUPP;
++	rsc_seg_len = le16_to_cpu(desc->rsc_seg_len);
++	if (!rsc_seg_len)
++		return 0;
++
+ 	switch (ptype.l3_type) {
+ 	case GVE_L3_TYPE_IPV4:
+ 		shinfo->gso_type = SKB_GSO_TCPV4;
+@@ -961,7 +966,21 @@ static int gve_rx_complete_rsc(struct sk_buff *skb,
+ 		return -EINVAL;
  	}
  
-@@ -2137,12 +2137,13 @@ static int gve_set_features(struct net_device *netdev,
+-	shinfo->gso_size = le16_to_cpu(desc->rsc_seg_len);
++	if (skb_headlen(skb)) {
++		/* With header-split, payload is in the non-linear part */
++		rsc_segments = DIV_ROUND_UP(skb->data_len, rsc_seg_len);
++	} else {
++		/* HW-GRO packets are guaranteed to have complete TCP/IP
++		 * headers in frag[0] when header-split is not enabled.
++		 */
++		hdr_len = eth_get_headlen(skb->dev,
++					  skb_frag_address(&shinfo->frags[0]),
++					  skb_frag_size(&shinfo->frags[0]));
++		rsc_segments = DIV_ROUND_UP(skb->len - hdr_len, rsc_seg_len);
++	}
++	shinfo->gso_size = rsc_seg_len;
++	shinfo->gso_segs = rsc_segments;
++
+ 	return 0;
+ }
  
- 	gve_get_curr_alloc_cfgs(priv, &tx_alloc_cfg, &rx_alloc_cfg);
- 
--	if ((netdev->features & NETIF_F_LRO) != (features & NETIF_F_LRO)) {
--		netdev->features ^= NETIF_F_LRO;
--		if (priv->xdp_prog && (netdev->features & NETIF_F_LRO)) {
-+	if ((netdev->features & NETIF_F_GRO_HW) !=
-+	    (features & NETIF_F_GRO_HW)) {
-+		netdev->features ^= NETIF_F_GRO_HW;
-+		if (priv->xdp_prog && (netdev->features & NETIF_F_GRO_HW)) {
- 			netdev_warn(netdev,
--				    "XDP is not supported when LRO is on.\n");
--			err =  -EOPNOTSUPP;
-+				    "HW-GRO is not supported when XDP is on.");
-+			err = -EOPNOTSUPP;
- 			goto revert_features;
- 		}
- 		if (netif_running(netdev)) {
 -- 
 2.53.0.473.g4a7958ca14-goog
 
