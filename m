@@ -1,89 +1,87 @@
-Return-Path: <netdev+bounces-262964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262965-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CA4uFnYvpmkrLwAAu9opvQ
-	(envelope-from <netdev+bounces-262964-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 01:46:46 +0100
+	id 2DKQMlowpmkrLwAAu9opvQ
+	(envelope-from <netdev+bounces-262965-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 01:50:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDDC91E75A6
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 01:46:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 697051E763E
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 01:50:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EEB44312F0B0
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 00:38:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EE9813034E3F
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 00:46:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B205E1A4F2F;
-	Tue,  3 Mar 2026 00:38:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EC001DF26E;
+	Tue,  3 Mar 2026 00:46:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m4v/bEa1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZWGTnQWy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F13E12CDA5;
-	Tue,  3 Mar 2026 00:38:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C2C71CD1E4;
+	Tue,  3 Mar 2026 00:46:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772498337; cv=none; b=uz60GRFPQshBdwfhXW92b4m/48YIR+rqqCbUYhzOFSUYChCEg1S3CWNrsGajImluSeAqKUbOLsRLazuW5fnU2dwsjeGQhPbMhn356D6M7DRv8Tm8Llic+L53g26hIj1BmmaMxZRhYsoVVfhln2rARU1JE7kS5rJfegQq+zRGMxY=
+	t=1772498804; cv=none; b=W57A1RbXMb+O7Ba4LuDp3A9VfxyeDkOR9c7XjQrv6B9oBkBtDzsBtSWbTbmBXCzNgK/RaW97hd/towpvZcqvdbyYdhkE/noryo8GrSBAaVTETzY0afayC+smaEeMvqN6YyWfYLRthLWRVxCjtwsfI4H9Nn0MTWTX4x8PyUAwYWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772498337; c=relaxed/simple;
-	bh=ZJHabJONOLZQQhdXft+4aN6LhCa9A7dKtACrRqLZDD8=;
+	s=arc-20240116; t=1772498804; c=relaxed/simple;
+	bh=zVa/l8Fm42yEeXCdiqomVcsJChFKyuQE2mXRBuJYV0A=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PNdQOU3Ae12cwUFiPlplCD9r9AYRN1PJlfPSHTJAJ0mHjbxnSDLBRaPlqUNPr27HCzDcGDMzg30QbaPmMl0V84x23qa0lTUbWdTjDnN1pJAmkwtAivy6VkX8JpI6h5pX4DELgIfuS8dlvq515s4yz6z+YDvudvmdBxyw9oZpj/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m4v/bEa1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BFB9C19423;
-	Tue,  3 Mar 2026 00:38:56 +0000 (UTC)
+	 MIME-Version:Content-Type; b=dxdVrcU4rqMGbQ5UCx57nnY6qo57B2YaE8zWjRe0ru5aVMZBZOYwD5U7SCRnJqV6f6tK4AsHQ/tHTeqdGOlQ82mPtmZDNDQk/KT/dB6kqyLp527lP2AAUfy+6/r9EaJkthSKa0BdEKf1//dmAHAuXmsZPRHj2JK8MskpZhM/Uf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZWGTnQWy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D11CC19423;
+	Tue,  3 Mar 2026 00:46:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772498337;
-	bh=ZJHabJONOLZQQhdXft+4aN6LhCa9A7dKtACrRqLZDD8=;
+	s=k20201202; t=1772498804;
+	bh=zVa/l8Fm42yEeXCdiqomVcsJChFKyuQE2mXRBuJYV0A=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=m4v/bEa10bWCrY8m5G2CaC/gR4eUKBr8K0fu/OtiChgTFjQdV5BSlqGqSXQdL/ZJg
-	 5zjmq8NXg4cLW4KfbwIQ+514GjfGVGlKK45pHDDwxhpD6z+PRiCH5aCpXPc2uoD8Ke
-	 1WA1nOadVSI4Ena8GCoPABg9kalFnSQ7iRoPsCERi0jvQeqCYZ5xzqXSUVkZgEEqU5
-	 VvAODJi74KNHgrACM7iBVqHM8Ze9KdFFLpP+16lm0aWcvpHLztrEvPn6q2fBh4tP7b
-	 9boM0VD4nMWWuuhVqe8LrGKYcNIIS5iVwwwZe8jrx3ponyqBnt1IDd6lSklegaKMD1
-	 4PjZDAxI+4AjA==
-Date: Mon, 2 Mar 2026 16:38:55 -0800
+	b=ZWGTnQWyCGsQS/I5f/ABd9t+YJ0EVy1wHUUuw8/NnLoEbYwZQ3lpkZGrfxbJDYoFC
+	 uoykwAsSyJvyQx1CltER7670pgqolWKCp9Z9KU7Tuf5SoaU+1CgiJzZGipYTFViS82
+	 kXOoRk8xh9TUR83yUeFbYraJM4mXUGuXfCzfD1kKa3mbNr6j7Q/gDIfSrimEwhXBKF
+	 ZQN5Ea2CLLrLP6N2IQjZkjck2DqkJxTgyX4wWcEy353Y2v8ReWPhmYFps3PY4sODPq
+	 tUvRveJ939s74+QeET0FG5Ms1g7UPG7CGlONxV9CZSYXwKRvgx+qbJVcZnJXJco0ZT
+	 XAG2qwFK9NpRA==
+Date: Mon, 2 Mar 2026 16:46:42 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Cc: netdev@vger.kernel.org, "Jiayuan Chen" <jiayuan.chen@shopee.com>,
- syzbot+ca1345cca66556f3d79b@syzkaller.appspotmail.com, "John Fastabend"
- <john.fastabend@gmail.com>, "Sabrina Dubroca" <sd@queasysnail.net>, "David
- S.  Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Paolo  Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
- "Vakul Garg" <vakul.garg@nxp.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v1] tls: fix hung task in tx_work_handler by using
- non-blocking sends
-Message-ID: <20260302163855.28d12a65@kernel.org>
-In-Reply-To: <f85c8e268a8384fe14ba5b0033b9f9b931afc122@linux.dev>
-References: <20260227063231.168520-1-jiayuan.chen@linux.dev>
-	<20260228091545.412a9a2d@kernel.org>
-	<f85c8e268a8384fe14ba5b0033b9f9b931afc122@linux.dev>
+To: David Wei <dw@davidwei.uk>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ jdamato@fastly.com, asml.silence@gmail.com, io-uring@vger.kernel.org,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 1/3] selftests: drv-net: iou-zcrx: wait for
+ memory provider cleanup
+Message-ID: <20260302164642.43375391@kernel.org>
+In-Reply-To: <8489fcbf-ab76-48a9-a21f-d7f6873b9a2f@davidwei.uk>
+References: <20260227171305.2848240-1-kuba@kernel.org>
+	<20260227171305.2848240-2-kuba@kernel.org>
+	<8489fcbf-ab76-48a9-a21f-d7f6873b9a2f@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: EDDC91E75A6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 697051E763E
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262964-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262965-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,shopee.com,syzkaller.appspotmail.com,gmail.com,queasysnail.net,davemloft.net,google.com,redhat.com,kernel.org,nxp.com];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,fastly.com,gmail.com];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
@@ -95,75 +93,26 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,ca1345cca66556f3d79b];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Sun, 01 Mar 2026 06:52:00 +0000 Jiayuan Chen wrote:
-> > On Fri, 27 Feb 2026 14:32:31 +0800 Jiayuan Chen wrote:
-> > > tx_work_handler calls tls_tx_records with flags=3D-1, which preserves
-> > >  each record's original tx_flags but results in tcp_sendmsg_locked
-> > >  using an infinite send timeout. When the peer is unresponsive and the
-> > >  send buffer is full, tcp_sendmsg_locked blocks indefinitely in
-> > >  sk_stream_wait_memory. This causes tls_sk_proto_close to hang in
-> > >  cancel_delayed_work_sync waiting for tx_work_handler to finish,
-> > >  leading to a hung task:
-> > > =20
-> > >  INFO: task ...: blocked for more than ... seconds.
-> > >  Call Trace:
-> > >  cancel_delayed_work_sync
-> > >  tls_sw_cancel_work_tx
-> > >  tls_sk_proto_close
-> > > =20
-> > >  A workqueue handler should never block indefinitely. Fix this by
-> > >  introducing __tls_tx_records() with an extra_flags parameter that
-> > >  gets OR'd into each record's tx_flags. tx_work_handler uses this to
-> > >  pass MSG_DONTWAIT so tcp_sendmsg_locked returns -EAGAIN immediately
-> > >  when the send buffer is full, without overwriting the original
-> > >  per-record flags (MSG_MORE, MSG_NOSIGNAL, etc.). On -EAGAIN, the
-> > >  existing reschedule mechanism retries after a short delay.
-> > > =20
-> > >  Also consolidate the two identical reschedule paths (lock contention
-> > >  and -EAGAIN) into one.
-> > >  =20
-> > It's not that simple. The default semantics for TCP sockets is that
-> > queuing data and then calling close() is a legitimate thing to do
-> > and the data should be sent cleanly, followed by a normal FIN in such
-> > case.
-> >=20
-> > Maybe we should explore trying to make sure we have enough wmem before
-> > we start creating records. Get rid of the entire workqueue mess? =20
->=20
-> Regarding wmem pre-check: the async crypto path is not triggered by
-> wmem shortage =E2=80=94 it's triggered when the crypto operation itself is
-> asynchronous (e.g. cryptd fallback when SIMD is unavailable). At the
-> time tls_do_encryption() returns -EINPROGRESS, wmem may be perfectly
-> fine. The problem occurs later when tls_encrypt_done() fires and
-> tx_work_handler tries to push the completed records =E2=80=94 by that poi=
-nt
-> the send buffer may have filled up. Since these are two different
-> points in time, pre-checking wmem at record creation wouldn't help.
+On Mon, 2 Mar 2026 07:49:01 -0800 David Wei wrote:
+> > +def mp_clear_wait(cfg):
+> > +    """Wait for io_uring memory providers to clear from all device queues."""
+> > +    deadline = time.time() + 5  
+> 
+> This is potentially a very long time to wait if code is buggy, as I
+> found out when debugging netkit queue lease. How about reducing this to
+> say 1 second?
 
-My recollection is that the work scheduling in the async encrypt path
-is just a duct-tape fix for some old race. The sendmsg() paths should
-normally wait for the async crypto to finish before returning to user
-space.
+Just to be clear -- you're saying that 5 seconds is a long time to wait?
+Please note that if this wait times out we're going to fail the test,
+the timeout does not impact the length of a successful run.
 
-> > Regarding your patch I think all callers passing -1 as flags are on=20
-> > the close path, you could have just added | DONTWAIT if the flags=20
-> > are -1. =20
->=20
-> Regarding adding MSG_DONTWAIT unconditionally when flags =3D=3D -1:
-> tls_sw_release_resources_tx() also calls tls_tx_records(sk, -1).
-> That's in the close path where we actually want to block and flush
-> remaining records to honour the "close() should send data cleanly"
-> semantics you mentioned. Making that non-blocking would cause data
-> loss. So we do need to distinguish between the two callers, which
-> is why I introduced __tls_tx_records() with the extra_flags parameter.
-
-Possible, I didn't look very closely.
-
-The extra_flags argument you're adding is extremely inelegant.
+I picked 5 sec because with all the debugs enabled and under QEMU
+scheduling latency spikes can be pretty brutal. I guess I could make it
+3 seconds if it matters a lot?
 
