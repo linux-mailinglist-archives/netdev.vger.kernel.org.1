@@ -1,181 +1,176 @@
-Return-Path: <netdev+bounces-263065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263066-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QN7tKkSUpmnmRQAAu9opvQ
-	(envelope-from <netdev+bounces-263065-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 08:56:52 +0100
+	id 4MsvGsKUpmnmRQAAu9opvQ
+	(envelope-from <netdev+bounces-263066-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 08:58:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 242ED1EA6EF
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 08:56:52 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7B871EA782
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 08:58:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 08CDE303478B
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 07:55:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A7980309C297
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 07:55:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CABB3383C75;
-	Tue,  3 Mar 2026 07:55:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="efTva1fZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A7153815C1;
+	Tue,  3 Mar 2026 07:55:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20638340273
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 07:55:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E767B30DEB5
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 07:55:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772524538; cv=none; b=CdnXd0Lnb4eFqbDu4j4pUqCj4KYs4saeoTi6b9X7SJhKlpfrxMVTUBFg0ujmXkJCOQBgMEXZmKvtSFNlLfM7zl7fTUAw7rwsWXS12Ry/jkYFlw7kTmYvP3mYS0vfyEshkMHUON+s2Fv8HcFk2k4T6JsCDuj29whPBPG9IYPkfjo=
+	t=1772524558; cv=none; b=Imz4LzKWwrplrYiiNfY5mx9MYCIHbnOsdIxmet+68iY7Kn35HXqvMS7uyQS5x1SbaalNWKdmN2VPDPD2kY913dUZM6ehWRPTjs2h/oj3/XdGnIlPpEbey307mH+lPbXIBQnWOCOmw5PpDkeGlqKyjMRtOBi5MRiECAOru0/pHmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772524538; c=relaxed/simple;
-	bh=w6kLN9l16em167id7+XiLiiASwbQTBDLSgzxoVs13GE=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=bctIGo6c6X+zA4koSiuoA7Yr+mPkiHF9XzLgDErkXchYijRpVEJQ+nMGGOslWCzCtGUBimJlZ0mgccHwvWoGk7YNs4FyalAWzpt7WRdrFYOHyfUKe1iLMf6iRUacnI3H7d7ihDF4ol+7T6aSG/xA7leVoFhOI+3g0grhKHoGN/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=efTva1fZ; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <c582ab1c-8a2d-4c0f-ad7b-7d44fe4296f6@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772524524;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bxG9CBSKXqMOaX3Bqq09GBqHI5tqsiwgqZYokMmDM48=;
-	b=efTva1fZ6QGsh+dwZLtRd470YngV5PSD6btzU8G3iGgirf758luOfMxD3fmP4T5xQXbQuM
-	e18/8rsGbD23Yt+JEeW8juFd17Fv4wVFBRTkUcG2VMgett51Zqeo3BfJauHsDLEjHQEqe1
-	SH70VH3CNpv5cWF8qZMspU+FrGdmhE8=
-Date: Tue, 3 Mar 2026 15:55:13 +0800
+	s=arc-20240116; t=1772524558; c=relaxed/simple;
+	bh=Gji/OjmRu0DwoNZkvvQ+kxjDH0bpk0ZgWsanNwBiuF4=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=QPxcdI/Ckkcse4gkUIxatTeddVG7HDyprmu5lbWZ5V0N9/7RhDBacpXM/n/c3XgfO/HcYFxPRoHZDV+L19MfTmJLGQ47i+fgb4aPCg9qw4nuRKS6x9nImE1JM7fHCCG6JysGetlXAE7oi9Qv0htxdcKkGGqG8vAdShfNAdvsxfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-7d4c2b7f4caso39496615a34.2
+        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 23:55:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772524556; x=1773129356;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FgQSOpB+ewXh4n0VbeXUwNcBjIkpybIpFZepNJXEjKc=;
+        b=vqIynE0ymmcOq3Xi3KcUYJP6+F1aZ1sdDyrYIyip8XlCovrHZf61yjpF4iF2XHwdau
+         FvQpMCGAXpRs1GBFeky3Ms9HqUXkz3nhkI6Pn1Ngmo8GBEKuxgisY3nMEahVchA82mnB
+         3V7bS6XkWOLToNyl+O3yyZUzQDh3AMXElCnAYsfDk0Ix8erArGJG0MI5ViTn8QCqsQ7T
+         K59eA887LSgtaMYhlf/2c+QQMq95nGD2E2uSW197nneF7V2X1BaW/jFpIrL7SkBplDCl
+         iYnKDR4pLam3aW7zQqdz0UKdZLZk3XpG29NiSnnz0ytlDdHzMA/orYZWz82ex+Je/ttS
+         VttA==
+X-Forwarded-Encrypted: i=1; AJvYcCXxzuTdgk4yIhde002XEu8gV14crXenR29qbCCYerCE9dHFySpG3KubeB1AB4WDKFIcDn9KOZg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfyTb4wI61DwoZJjavZ01cMP8vUwL8bqRmXIPNJpmUsiXLY4F+
+	z/h7+fm8ySBaoxGETGNqZOVJ2Aj6HYmKCP61tJ0XPtQ9YU87pXxBZ9dOYwItHen587MUjirkGCB
+	n6mJ8qW9lTaJ6ZiXfiSu8fCWz4P/xdYGMMHZjb3/eVjDw2yQAe+hjkgmF4Bs=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH net-next] tcp: Add net.ipv4.tcp_purge_receive_queue
- sysctl
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Leon Hwang <leon.hwang@linux.dev>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Leon Hwang <leon.huangfu@shopee.com>,
- netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
- David Ahern <dsahern@kernel.org>, Neal Cardwell <ncardwell@google.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?=
- <ij@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
- kerneljasonxing@gmail.com, lance.yang@linux.dev, jiayuan.chen@linux.dev,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260225074633.149590-1-leon.huangfu@shopee.com>
- <20260225174354.5a698ddb@kernel.org>
- <f611be70-8280-44c8-86af-5866c0b302be@linux.dev>
- <20260302162251.733b520e@kernel.org>
- <3a623176-fc5f-4dd4-bbfc-64d211f53645@linux.dev>
- <CANn89iJ0=Tx0i+1UXEdcoFuk1F_MfP41-L-kgGDTN+RcLTRcFA@mail.gmail.com>
- <d7f3dabd-e6da-496d-927e-590a41dee009@linux.dev>
-In-Reply-To: <d7f3dabd-e6da-496d-927e-590a41dee009@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 242ED1EA6EF
+X-Received: by 2002:a05:6820:1895:b0:663:1b8:9c74 with SMTP id
+ 006d021491bc7-679faf8da8emr7462390eaf.68.1772524555798; Mon, 02 Mar 2026
+ 23:55:55 -0800 (PST)
+Date: Mon, 02 Mar 2026 23:55:55 -0800
+In-Reply-To: <20260302194926.90378-1-graf@amazon.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69a6940b.a70a0220.135158.0007.GAE@google.com>
+Subject: [syzbot ci] Re: vsock: add G2H fallback for CIDs not owned by H2G transport
+From: syzbot ci <syzbot+cid397fd2b137e247c@syzkaller.appspotmail.com>
+To: arnd@arndb.de, bcm-kernel-feedback-list@broadcom.com, 
+	bryan-bt.tan@broadcom.com, corbet@lwn.net, eperezma@redhat.com, 
+	graf@amazon.com, gregkh@linuxfoundation.org, jasowang@redhat.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mst@redhat.com, 
+	netdev@vger.kernel.org, nh-open-source@amazon.com, sgarzare@redhat.com, 
+	stefanha@redhat.com, virtualization@lists.linux.dev, vishnu.dasa@broadcom.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: B7B871EA782
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263065-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[googlesource.com:url,googlegroups.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,appspotmail.com:email,syzbot.org:url];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,shopee.com,vger.kernel.org,davemloft.net,redhat.com,lwn.net,linuxfoundation.org,google.com,nvidia.com,gmail.com,linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.992];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon.hwang@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-0.848];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263066-lists,netdev=lfdr.de,cid397fd2b137e247c];
+	TO_DN_NONE(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[]
 X-Rspamd-Action: no action
 
+syzbot ci has tested the following series
+
+[v2] vsock: add G2H fallback for CIDs not owned by H2G transport
+https://lore.kernel.org/all/20260302194926.90378-1-graf@amazon.com
+* [PATCH v2] vsock: add G2H fallback for CIDs not owned by H2G transport
+
+and found the following issue:
+WARNING in register_net_sysctl_sz
+
+Full report is available here:
+https://ci.syzbot.org/series/8be7b007-32ae-447a-bb92-b169bb844054
+
+***
+
+WARNING in register_net_sysctl_sz
+
+tree:      net-next
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
+base:      01857fc712f6469cab9cc578120cdc80f1c2a634
+arch:      amd64
+compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+config:    https://ci.syzbot.org/builds/5374f01b-dc57-486a-a2a6-2fb66c003b70/config
+
+------------[ cut here ]------------
+sysctl net/vsock/g2h_fallback: data points to kernel global data: vsock_g2h_fallback
+WARNING: net/sysctl_net.c:156 at register_net_sysctl_sz+0x163/0x440, CPU#0: syz-executor/5808
+Modules linked in:
+CPU: 0 UID: 0 PID: 5808 Comm: syz-executor Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:register_net_sysctl_sz+0x1ad/0x440
+Code: 00 00 00 fc ff df 41 80 3c 06 00 74 08 4c 89 ef e8 88 36 c8 f6 4d 8b 44 24 f0 48 89 df 48 8b 74 24 10 4c 89 fa 48 8b 4c 24 18 <67> 48 0f b9 3a 49 bf 00 00 00 00 00 fc ff df 42 0f b6 44 3d 00 84
+RSP: 0018:ffffc90005357ab0 EFLAGS: 00010246
+RAX: dffffc0000000000 RBX: ffffffff90234820 RCX: ffffffff8d01a100
+RDX: ffffffff8d05e680 RSI: ffffffff8d05e620 RDI: ffffffff90234820
+RBP: 1ffff110212d6810 R08: ffffffff8ff4f0c0 R09: ffffffff8e7602e0
+R10: 0000012400000008 R11: ffffffff9a79ce5c R12: ffff8881096b4088
+R13: ffff8881096b4078 R14: 1ffff110212d680f R15: ffffffff8d05e680
+FS:  000055556a136500(0000) GS:ffff88818de66000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f0c19e52af8 CR3: 0000000112a0e000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ vsock_sysctl_init_net+0x13f/0x2f0
+ ops_init+0x35c/0x5c0
+ setup_net+0x118/0x340
+ copy_net_ns+0x50e/0x730
+ create_new_namespaces+0x3e7/0x6a0
+ unshare_nsproxy_namespaces+0x11a/0x160
+ ksys_unshare+0x51d/0x930
+ __x64_sys_unshare+0x38/0x50
+ do_syscall_64+0x14d/0xf80
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fd97459da67
+Code: 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 b8 10 01 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fffee0fc138 EFLAGS: 00000246 ORIG_RAX: 0000000000000110
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fd97459da67
+RDX: 00007fd97459c799 RSI: 00007fffee0fc100 RDI: 0000000040000000
+RBP: 00007fffee0fc190 R08: 00007fd9747d9610 R09: 00007fd9747d9610
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007fffee0fc198
+R13: 0000000000000002 R14: 00007fffee0fc378 R15: 0000000000000000
+ </TASK>
 
 
-On 3/3/26 14:26, Leon Hwang wrote:
-> 
-> 
-> On 3/3/26 11:55, Eric Dumazet wrote:
->> On Tue, Mar 3, 2026 at 3:12 AM Leon Hwang <leon.hwang@linux.dev> wrote:
->>>
->>>
->>>
->>> On 3/3/26 08:22, Jakub Kicinski wrote:
->>>> On Mon, 2 Mar 2026 17:55:59 +0800 Leon Hwang wrote:
->>>>> On 26/2/26 09:43, Jakub Kicinski wrote:
->>>>>> On Wed, 25 Feb 2026 15:46:33 +0800 Leon Hwang wrote:
->>>>>>> Issue:
->>>>>>> When a TCP socket in the CLOSE_WAIT state receives a RST packet, the
->>>>>>> current implementation does not clear the socket's receive queue. This
->>>>>>> causes SKBs in the queue to remain allocated until the socket is
->>>>>>> explicitly closed by the application. As a consequence:
->>>>>>>
->>>>>>> 1. The page pool pages held by these SKBs are not released.
->>>>>>
->>>>>> On what kernel version and driver are you observing this?
->>>>>
->>>>> # uname -r
->>>>> 6.19.0-061900-generic
->>>>>
->>>>> # ethtool -i eth0
->>>>> driver: mlx5_core
->>>>> version: 6.19.0-061900-generic
->>>>> firmware-version: 26.43.2566 (MT_0000000531)
->>>>
->>>> Okay... this kernel + driver should just patiently wait for the page
->>>> pool to go away.
->>>>
->>>> What is the actual, end user problem that you're trying to solve?
->>>> A few kB of data waiting to be freed is not a huge problem..
->>>
->>> Yes, it is not a huge problem.
->>>
->>> The actual end-user issue was discussed in
->>> "page_pool: Add page_pool_release_stalled tracepoint" [1].
->>>
->>> I think it would be useful to provide a way for SREs to purge the
->>> receive queue when CLOSE_WAIT TCP sockets receive RST packets. If the
->>> NIC, e.g., Mellanox, flaps, the underlying page pool and pages can be
->>> released at the same time.
->>>
->>> Links:
->>> [1]
->>> https://lore.kernel.org/netdev/b676baa0-2044-4a74-900d-f471620f2896@linux.dev/
->>
->> Perhaps SRE could use this in an emergency?
->>
->> ss -t -a state close-wait -K
-> 
-> This ss command is acceptable in an emergency.
-> 
+***
 
-However, once a CLOSE_WAIT TCP socket receives an RST packet, it
-transitions to the CLOSE state. A socket in the CLOSE state cannot be
-killed using the ss approach.
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
 
-The SKBs remain in the receive queue of the CLOSE socket until it is
-closed by the user-space application.
-
-Thanks,
-Leon
-
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
