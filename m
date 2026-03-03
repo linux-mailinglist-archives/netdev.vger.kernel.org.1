@@ -1,88 +1,102 @@
-Return-Path: <netdev+bounces-262996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262998-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oDGUF4tKpmleNgAAu9opvQ
-	(envelope-from <netdev+bounces-262996-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 03:42:19 +0100
+	id aBIZEmJLpmm1NgAAu9opvQ
+	(envelope-from <netdev+bounces-262998-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 03:45:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F0051E8237
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 03:42:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A09601E8288
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 03:45:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EF8DF302DE17
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 02:42:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1732B3081BC8
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 02:45:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9413C3750D4;
-	Tue,  3 Mar 2026 02:42:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 922D8267714;
+	Tue,  3 Mar 2026 02:45:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="Np2dVMar"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="ffauuUDS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37CD22F851
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 02:42:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F00918E025
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 02:45:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772505735; cv=none; b=BQngB6IHDZsYKDJcGTXZ6B6hREjT51RcFd/bJF/9prcWmaN5a2W3kRQCGa3+92/1kTuYsC45v81CueKZtlcHi+KU6uvp+5giI+6lNf9xvVmm8xRw2jMuYs2XoD7fiJTb1kQ+Gz/RkQ3amdNYj/iVzCX4duUe+TXDlNu2TwbS/QE=
+	t=1772505946; cv=none; b=i4Q4js/2g3VwIIjTkUOqcRVXn5XURpNeKci5OWDzKG2yp4dhRvjH1ZrBJXSurofVCiEn7pZwOL9A6yIHvY6yjqbccbd2b46bSnVLPsI5N2OUgzRBmRHXNLEUYWqHK6qX6D7He6CbEZmj5AHoU3W6iCdun5seu4nN7ifecwGTqTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772505735; c=relaxed/simple;
-	bh=nPHvYWIyTpes84UYMM9k1Pnv8YqRO4x+er3yMBzuJUw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RgmAzAGEZHpt2R3jsZ/HWoJJIUcyC0Wm3mj2fgTR/0GVR5Po0fgr+2mEaTtwcKkJjPM88ouqHNaLtmdEiRug/+ciPigqM6z9xAX/SydlX3HcJPvBaslUnoZwjfHtv1LMZuk/sUloqtbiWsz4RGlhPcFELJpSCd+QrE9oUeGVtsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=Np2dVMar; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-823c56765fdso2509608b3a.1
-        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 18:42:14 -0800 (PST)
+	s=arc-20240116; t=1772505946; c=relaxed/simple;
+	bh=b+0Ff/pUDhFe+rGVzYVSp1+4DBYWUSZiCFvSNbPgMUE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=lcmvkCZKCKu9/kJn+U21gRwc4FYhlSjHWVz+FHdG3jVuRUBM8RC6GC+5P9QGSL2jUaMtFkTYehz+GIj4YdPxTg/9pa3Xd5uxigkh2NQRdgRaCNWvINBla+CLmTgMvAUh0sf7W+EuncJg5m/img7l3ZKODrU2YvAbPD+8DhsYtug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=ffauuUDS; arc=none smtp.client-ip=209.85.161.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-662f9aeb782so4206106eaf.3
+        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 18:45:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1772505733; x=1773110533; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=qoKys6T11lMf1hgDGtK7vu1+Ox23J7OSlzLZflNqFkg=;
-        b=Np2dVMargdb+PJOwcJE3P1v35uAdoi/jJZdGkU6iE/+E/QrC/XbZcZZVWfc3TaODDr
-         13cZXuJintJYmiONtqtXqxSgjz7jGLYaKkwiaUi394FM1Dd8tje41UMRsLB81d2sUo5I
-         8BRl/GTdYZPLwteQo2uYPLpkibTO0wiVrXHoh8eAR4GpqTMug96W2V2dtn7TSki+Qz39
-         uW/JYyn8kgtFS830Sg0oJMLpquDNYNnkZqfp3sDri05xwLjnSb26kJMeJmm6E2j9zuQo
-         +zcV5+dm/kiVBRS5nxCMRUtZ6Q9Kom1Otso2PrG3G2mzdmsLi9BROK830PAakqfv8tmV
-         5NZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772505733; x=1773110533;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=cloudflare.com; s=google09082023; t=1772505943; x=1773110743; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qoKys6T11lMf1hgDGtK7vu1+Ox23J7OSlzLZflNqFkg=;
-        b=mQ67SQR/GfRyM0piXhaL6mQc8f29odBT0DaFXD+McBnIzg7fYYDy+f5cO4MyxqmOnC
-         9TCGl/jauTgK5ovSuCp9b9HzG8ujlNVDQUSN8WiFhXrH6orGaAkP1f8iUXg70d4Ep+Jn
-         oSdpCDGbC9huz8Va7EQAAyR/ZmZsynXPXyXRGFXqp8J746K+RlJusDcbXO53mDQW4fJj
-         u/Aw9JmgSTEl1oLWEozGPmIOXsVqoGUwlYxmxBkn2IPjcfKZ77EZ6VGSDwyJ5KnITn0J
-         XwgM6D+Ehk2ekxrlFKHZl3TDcYqg9QK6TmqXyKiDan0HKv8HvKhgMQG/RHOGDgY4b+fR
-         w4/g==
-X-Gm-Message-State: AOJu0Yy193TS+5GRrsVfAEY7jM/zBS4VkbqZFT9sq1pxZgldW8EoB69o
-	lfD99zoezWsUrddj/ypHDFN2quoGjEn64y+hr5LGQiPhTeSAvGPJohjk3RwSkQbsrDnEsNB+SE4
-	+EW47
-X-Gm-Gg: ATEYQzwkplm6FkBV8NyBeysB1YBYsmdjEXWTdMpdZ2MPwQdzPs1Hpgpr1BG4s3TUl2M
-	aKSeEpQfQ2VMLBsu0ZaRzlFLKc9xU5rSZXIqDMphsPySIu5wgURdAtW73ebDfBXkINpfvOdjiQA
-	P59gMw3C7N9xJOiuKu39Y7RbUIeO1qNjxS1JefjBkjCDrX+vEBg3uYTGu1OxbRm6XKECCsOvihj
-	l16EverEpsWs1132tfZT5Ohn/mFhZmAwbI92IbPMMdLfMvNSv3BwwhmnRJ+eJiAki6iHT6IKTVj
-	Xile7ZKEy7q8j1AottdL5e31TttTFGNVdimHQg1zC3ITVvXi1T/fZ5pgFpRw3LUNpkN1TjghdPQ
-	RSoBpDVl/F64GASF3KXN2Irmv4AR9c0JmkDMIEhtRIWWDVC24lysv8Jhs6O9rnRJzpFP6rrs4mL
-	chi3c=
-X-Received: by 2002:a05:6a00:9518:b0:81a:b602:daf6 with SMTP id d2e1a72fcca58-8274da04c23mr10808437b3a.48.1772505733570;
-        Mon, 02 Mar 2026 18:42:13 -0800 (PST)
-Received: from localhost ([2a03:2880:2ff:7::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82739d8c7aesm18082418b3a.21.2026.03.02.18.42.12
+        bh=zopse3Rf+kKizvyvuRBVQ7DWejIScda9vW//LITHTBk=;
+        b=ffauuUDSI18B5wnMPdSGdU34iEGOz3MV9NTaBrYmFZQytzq9TwRiYF3qyJy01YcGEO
+         hj8xnqHi0yn44h9z0SIR38OkwrjqSWc+lzkdNVJevrxhiFCrRRqq7xKMpMc9JM6x+tiN
+         J1sXlXbbBWcSejDNxFwpNVcUeTO3TpP4/pAXGgC9+33p/w5mayIYgE6QRlavGE95TcK/
+         thzEIZAoiB5tASvqVyq3tz6tjGd8k4FBzcLkOK4MU8/ryhdTuuGHH2EPGMTH0UKY5HWL
+         qc+R5Fily8rvV4GpMyZwOZViUViuIgmYxITCY8xZVBq56QWYx9mM0CpLgO2IgGdlB9wc
+         AHfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772505943; x=1773110743;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=zopse3Rf+kKizvyvuRBVQ7DWejIScda9vW//LITHTBk=;
+        b=bsmnap9eJgKxO+rOd1FhquOwuu6xHaF0tk5Bib+tHSDRGv7KH3mI1DqHf02E0DQzBm
+         MZ3YaT3Psbs+s4mN9j0/dQmOfmc0imeEx6H6w9OYwHp86SOILX4AJK1fnZsYWpIZxSUh
+         du4cfVJgqA2EH2PAnEoWLOiMnOsy4KlDwwt86XpBk6ftjk+5lihllLc/KsMIAS0KLWP+
+         UiAjDexe8jslcMjKdik394tXZCuImcItZkm6guspXNVrvhdL2Z3HQMIwoUFIAUlreyDx
+         xcMwB0+Agay3h0B4ZUbXotJQ/Ym9NzmPq+invNyGJwDCmDz6KyBfkTUd/f9K3ZwMg8Ga
+         WlNw==
+X-Forwarded-Encrypted: i=1; AJvYcCUoPRIZ7S741adEF69ld/Oy1IaBKFI5EKBZbQE+fw9qPS7l5gDPMn10opUPE4q2Jxz0f9nFadU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/LpizvrsVm3of0njAazjQl++S4ZdfKzbWh2poDbi3Ym5DLj06
+	Ton7ROF52Vjv3W5tl2i6jEOgP5jbM28D8bLs4vfsNughu2meMvoMekIR5j/BGm++NUk=
+X-Gm-Gg: ATEYQzx09w7wQAx9+PJCH2bTmZQMftOBmR8zARXuagiZJ8XbNY5U30n/j/1I0XjI9v0
+	WZ0xW8ftqRY8O5+70DG8uZEwt6OfvN2BKISmD13OD7kkwhf6mFpKV7ExeUqPgW2wY+Qvt2w4dIA
+	6WmEWwvlqi2T5TvWO3Sj3SSzYpqtzhfNoKI92R8Zb39aw5I1oBx2I+36VCcXb+/+fWbByDkxKh3
+	iDMaDmweE7+23DAQw0Nt9Q+smMMJEu/KlF+nviqf4YsFSN9atUTb60o64j/EqyDa+dVcBblu2mm
+	y7Pqv4CEC4E27QfsIA0qgAWTuToiepgE9CTxRNmfKaStMvbIEafcC9+h7rLzG+NE76qSYyVF9p/
+	NP7leUnzQhaO50Qo9ip+u2ZTmplyidR/pU60B5gLsZP2HmHkDu0ZzXZIFLEln2eHKv7hlqS2hNN
+	CtCz7jbjA=
+X-Received: by 2002:a05:6820:1747:b0:677:e78d:223b with SMTP id 006d021491bc7-679faefa6dfmr9051694eaf.36.1772505943148;
+        Mon, 02 Mar 2026 18:45:43 -0800 (PST)
+Received: from 20HS2G4.. ([2a09:bac1:76c0:540::a2:70])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-679f2d84dacsm10205642eaf.9.2026.03.02.18.45.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Mar 2026 18:42:13 -0800 (PST)
-From: Joe Damato <joe@dama.to>
-To: linux-kernel@vger.kernel.org
-Cc: netdev@vger.kernel.org,
+        Mon, 02 Mar 2026 18:45:42 -0800 (PST)
+From: Chris J Arges <carges@cloudflare.com>
+To: michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	joe@dama.to,
 	kuba@kernel.org,
-	Joe Damato <joe@dama.to>
-Subject: [PATCH] mailmap: Add entry for Joe Damato
-Date: Mon,  2 Mar 2026 18:42:01 -0800
-Message-ID: <20260303024202.2526604-1-joe@dama.to>
-X-Mailer: git-send-email 2.47.3
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>
+Cc: kernel-team@cloudflare.com,
+	Chris J Arges <carges@cloudflare.com>,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH net-next v2 0/4] bnxt_en: add XDP RSS hash metadata support
+Date: Mon,  2 Mar 2026 20:43:48 -0600
+Message-ID: <20260303024510.644962-1-carges@cloudflare.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260213192449.1294830-1-carges@cloudflare.com>
+References: <20260213192449.1294830-1-carges@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,60 +104,83 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 8F0051E8237
+X-Rspamd-Queue-Id: A09601E8288
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-6.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[cloudflare.com:D:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
+	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	URIBL_MULTI_FAIL(0.00)[dama.to:server fail,marvell.com:server fail,dama-to.20230601.gappssmtp.com:server fail,muni.cz:server fail,hovoldconsulting.com:server fail,tor.lore.kernel.org:server fail,samsung.com:server fail,fastly.com:server fail,quicinc.com:server fail,codeaurora.org:server fail,synaptics.com:server fail];
-	TAGGED_FROM(0.00)[bounces-262996-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-262998-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[broadcom.com,dama.to,kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[dama.to];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCPT_COUNT_THREE(0.00)[4];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[carges@cloudflare.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
+	DKIM_TRACE(0.00)[cloudflare.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.997];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[cloudflare.com:dkim,cloudflare.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,xdp.py:url]
 X-Rspamd-Action: no action
 
-My Fastly email address is no longer used. Add a mailmap entry to
-reflect that.
+This series adds XDP RSS hash metadata extraction support for the bnxt_en
+driver and includes selftests to validate the functionality. I was able
+to test this on a BCM57414 NIC.
 
-Signed-off-by: Joe Damato <joe@dama.to>
----
- .mailmap | 1 +
- 1 file changed, 1 insertion(+)
+The driver changes introduce a bnxt_xdp_buff wrapper that carries
+hardware RX completion descriptors alongside the xdp_buff, then use it
+to implement bpf_xdp_metadata_rx_hash().
 
-diff --git a/.mailmap b/.mailmap
-index e1cf6bb85d33..a02e9aa9aed4 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -396,6 +396,7 @@ Jiri Slaby <jirislaby@kernel.org> <xslaby@fi.muni.cz>
- Jisheng Zhang <jszhang@kernel.org> <jszhang@marvell.com>
- Jisheng Zhang <jszhang@kernel.org> <Jisheng.Zhang@synaptics.com>
- Jishnu Prakash <quic_jprakash@quicinc.com> <jprakash@codeaurora.org>
-+Joe Damato <joe@dama.to> <jdamato@fastly.com>
- Joel Granados <joel.granados@kernel.org> <j.granados@samsung.com>
- Johan Hovold <johan@kernel.org> <jhovold@gmail.com>
- Johan Hovold <johan@kernel.org> <johan@hovoldconsulting.com>
+The selftest changes refactor common XDP/BPF helpers into a shared
+library and add a new xdp_metadata test that verifies RSS hash
+extraction for TCP and UDP traffic via device-bound XDP programs.
+
+Changes from v1:
+- selftests: moved tests into net/hw
+- selftests: fix pylinter errors
+- selftests: add check for no error count
+- bnxt_xdp: followed RCT for variable declaration
+- rebased on net-next 
+
+Chris J Arges (4):
+  bnxt_en: use bnxt_xdp_buff for xdp context
+  bnxt_en: Implement XDP RSS hash metadata extraction
+  selftests: net: move common xdp.py functions into lib
+  selftests: drv-net: xdp: Add rss_hash metadata tests
+
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  30 ++--
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   2 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |  47 +++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h |  10 ++
+ .../testing/selftests/drivers/net/hw/Makefile |   1 +
+ .../drivers/net/hw/lib/py/__init__.py         |   2 +
+ .../selftests/drivers/net/hw/xdp_metadata.py  | 146 ++++++++++++++++
+ .../selftests/drivers/net/lib/py/__init__.py  |   2 +
+ tools/testing/selftests/drivers/net/xdp.py    |  95 +++-------
+ .../testing/selftests/net/lib/py/__init__.py  |   2 +
+ tools/testing/selftests/net/lib/py/bpf.py     |  68 ++++++++
+ .../selftests/net/lib/xdp_metadata.bpf.c      | 163 ++++++++++++++++++
+ 12 files changed, 486 insertions(+), 82 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/hw/xdp_metadata.py
+ create mode 100644 tools/testing/selftests/net/lib/py/bpf.py
+ create mode 100644 tools/testing/selftests/net/lib/xdp_metadata.bpf.c
+
 -- 
-2.47.3
+2.43.0
 
 
