@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-263436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263437-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uC9RMHtYp2lsgwAAu9opvQ
-	(envelope-from <netdev+bounces-263436-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 22:54:03 +0100
+	id oA4aFH9Yp2lsgwAAu9opvQ
+	(envelope-from <netdev+bounces-263437-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 22:54:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BC0C1F7C96
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 22:54:03 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E0CB1F7C9D
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 22:54:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D8D5830747B6
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 21:53:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5FF583032D6A
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 21:53:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 714F43DA5DC;
-	Tue,  3 Mar 2026 21:53:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0394548B399;
+	Tue,  3 Mar 2026 21:53:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oYU0K+i0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B0CUpErG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F5CB3C6A5C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D44BE481FA5
 	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 21:53:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772574824; cv=none; b=hlMf/yMCyY66fHwqvQbvOzP0KrebwjpGu2xWq1SKlPZ2pNvP9R81SeLJMCufgTWvFQ1aAYsPWueVJ010f1uK59Vapoj4dVlfZWQ7M6swMLZEejYmJwy/E8jjuZ2t22EOx4LkS2YZLyVrDm/8wCJqUJTWJey/5SkBy23QoEm9wbs=
+	t=1772574824; cv=none; b=PWdECptMaBOIdFgOI1wJZDe2c2KKljmPQ6OutgInSAiSDxNhQmm0Cs1KY+w56XqsDlQnOt05v74MC+oDDaa5CL5e0oG+VEQpWRM277ngywXBEBWmU5I99v0CNAGdpoGydFbITCXFdGTKig8Q4zYPgdP+Yrcd4vLrWfJaqdHLlTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1772574824; c=relaxed/simple;
-	bh=v9wEHXWRY/i3hTpcQtXV0JCh1rcZgu1fLOoptDzBCys=;
+	bh=9e1i+bE2pcchT9fdCIwej6LX2yc1+tVOzQKsKrm1DFw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cDZoeyikkAjBol1SfQYiJx6PTLcBDSVFmC59RhlIMqkqmR78EB5x2yYZ44VuR3/ScE4mquZV5LTYTf+O0k665Lrv1QmfGwRiW1X3AK4KCxX0sgbwZ70yh4T7lHtDp0P0qIgKryhno2yfqaTKxFIrUOmU2/yGqQv1NE9LRfbQ2NQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oYU0K+i0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8B29C2BC87;
-	Tue,  3 Mar 2026 21:53:43 +0000 (UTC)
+	 MIME-Version; b=mON0Jc2u8FrD+oVtclElC80y5WjmXl8XVLgjT7gQaZ70mhHQkn9MsLXIXi06jAld8kPSnqCfdxa49oTspsxkvYL3D+I9/+KM6co9GpirM+mYMTTjtDSS/mW4CjY8CI3VAryLZVFg/2atV2ygwqaFu5rvLeOiYGRjvbxYQHrpqZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B0CUpErG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E2F3C2BCAF;
+	Tue,  3 Mar 2026 21:53:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1772574824;
-	bh=v9wEHXWRY/i3hTpcQtXV0JCh1rcZgu1fLOoptDzBCys=;
+	bh=9e1i+bE2pcchT9fdCIwej6LX2yc1+tVOzQKsKrm1DFw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oYU0K+i0Oaazi6JA8H7x6XMWj65mkaT9gv4RLuAijvfE21la3yG65vMKbsDpPIhfq
-	 P2KiJTJ7QXzMHMiJR5M6OZC9trlkpEnlkYiQ+aLDeftJXhCpmpozlGDQzFy0BLLtJO
-	 MtYCtVjlDZSaie8i4weImOpuOPOgxfd/hyyxlh5NUW/aHKXZgRNVKXnWEklZGK7tOA
-	 11hrmjzLO1HZCrlXnVmCpTuo5UhGV2ekhB+g9Uhp2Pf5YG7Vmv4XiiAVCK2dTgRY5G
-	 jaHtZKqNg1DynklfWKDb98nBLtnG6jF/tHI5LpTnuJAWy/3Ld6frqk32CIGZI/Wvyn
-	 NJVzSzeT6FCKA==
+	b=B0CUpErGxBDoT1Y++eapcnsH/0IrtDoN0Wm4L6QCZhaD3DFHJMxf6Iy9Wy4Kav+4l
+	 IS2ClsfO5ZQRTinNg+oiBlqJRZWGnC+2uLV+bdFSnPDPNaFO0MY/OUkSKK/R4t/2QM
+	 oCVvlvghgCXC0Wmg2xLHQMQ6GOdqiTpAaRFhUzUiuCT/+81flBQkDh952yDfvk2NAV
+	 OQNtLntxjIKKDdGBan29Y+JzgZv0pbjukceS5cN56EKSpHfnPsN5rX41W0tU4eHpL3
+	 R57XuSOfbrKtTUIzEVKFnkr3ukeLVbWAX+dp9aJGwBDp66IEJul9n9YpSV9Blvruop
+	 zpEArjPMyRzNQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -52,10 +52,15 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	horms@kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
-	manishc@marvell.com
-Subject: [PATCH net 02/11] MAINTAINERS: remove Manish Chopra from QLogic QL4xxx (now orphan)
-Date: Tue,  3 Mar 2026 13:53:02 -0800
-Message-ID: <20260303215339.2333548-3-kuba@kernel.org>
+	sgoutham@marvell.com,
+	lcherian@marvell.com,
+	gakula@marvell.com,
+	jerinj@marvell.com,
+	hkelam@marvell.com,
+	sbhatta@marvell.com
+Subject: [PATCH net 03/11] MAINTAINERS: remove Jerin Jacob from Marvell OcteonTX2
+Date: Tue,  3 Mar 2026 13:53:03 -0800
+Message-ID: <20260303215339.2333548-4-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260303215339.2333548-1-kuba@kernel.org>
 References: <20260303215339.2333548-1-kuba@kernel.org>
@@ -66,78 +71,95 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 3BC0C1F7C96
+X-Rspamd-Queue-Id: 5E0CB1F7C9D
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-263437-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263436-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,amd.com:email,intel.com:email,marvell.com:email,bootlin.com:email]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,huawei.com:email,nvidia.com:email,marvell.com:email]
 X-Rspamd-Action: no action
 
-We have not seen tags from Manish for the QL4xxx driver in over 5 years,
-and there is no mailing list activity since Oct 2023. There has been
-no maintainer activity in this subsystem at all.
+We have not seen tags from Jerin for OcteonTX2 in over 5 years.
+Recent lore activity is in DPDK (non-kernel), not Linux.
+Sunil, Linu, Geetha, hariprasad, and Subbaraya are active,
+though the review coverage isn't great (38%).
 
-Since there is no other maintainer for this driver it becomes an Orphan.
-
-Subsystem QLOGIC QL4xxx ETHERNET DRIVER
-  Changes 40 / 74 (54%)
-  (No activity)
+Subsystem MARVELL OCTEONTX2 RVU ADMIN FUNCTION DRIVER
+  Changes 53 / 138 (38%)
+  Last activity: 2026-02-18
+  Sunil Goutham <sgoutham@marvell.com>:
+    Author fc1b2901e0fe 2024-03-08 00:00:00 1
+    Tags 70f8986ecef1 2025-06-16 00:00:00 9
+  Linu Cherian <lcherian@marvell.com>:
+    Author a861e5809f3e 2025-10-30 00:00:00 7
+    Tags a861e5809f3e 2025-10-30 00:00:00 7
+  Geetha sowjanya <gakula@marvell.com>:
+    Author 70e9a5760abf 2026-01-29 00:00:00 16
+    Tags 70e9a5760abf 2026-01-29 00:00:00 20
+  Jerin Jacob <jerinj@marvell.com>:
+  hariprasad <hkelam@marvell.com>:
+    Author 45be47bf5d7d 2026-02-18 00:00:00 22
+    Tags 45be47bf5d7d 2026-02-18 00:00:00 25
+  Subbaraya Sundeep <sbhatta@marvell.com>:
+    Author 47a1208776d7 2025-10-30 00:00:00 20
+    Tags 47a1208776d7 2025-10-30 00:00:00 30
   Top reviewers:
-    [30]: horms@kernel.org
+    [36]: horms@kernel.org
+    [4]: jacob.e.keller@intel.com
+    [4]: kalesh-anakkur.purayil@broadcom.com
+    [3]: vadim.fedorenko@linux.dev
+    [2]: shaojijie@huawei.com
     [2]: jiri@nvidia.com
-    [2]: shannon.nelson@amd.com
-    [1]: saeedm@nvidia.com
-    [1]: aleksandr.loktionov@intel.com
-    [1]: kory.maincent@bootlin.com
-  INACTIVE MAINTAINER Manish Chopra <manishc@marvell.com>
+  INACTIVE MAINTAINER Jerin Jacob <jerinj@marvell.com>
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-Cc: manishc@marvell.com
+Cc: sgoutham@marvell.com
+Cc: lcherian@marvell.com
+Cc: gakula@marvell.com
+Cc: jerinj@marvell.com
+Cc: hkelam@marvell.com
+Cc: sbhatta@marvell.com
 ---
- MAINTAINERS | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ MAINTAINERS | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 0c9b69df9204..c939a76b9a2b 100644
+index c939a76b9a2b..49eb81ec3709 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -21455,9 +21455,8 @@ S:	Supported
- F:	drivers/scsi/qedi/
- 
- QLOGIC QL4xxx ETHERNET DRIVER
--M:	Manish Chopra <manishc@marvell.com>
+@@ -15473,7 +15473,6 @@ MARVELL OCTEONTX2 RVU ADMIN FUNCTION DRIVER
+ M:	Sunil Goutham <sgoutham@marvell.com>
+ M:	Linu Cherian <lcherian@marvell.com>
+ M:	Geetha sowjanya <gakula@marvell.com>
+-M:	Jerin Jacob <jerinj@marvell.com>
+ M:	hariprasad <hkelam@marvell.com>
+ M:	Subbaraya Sundeep <sbhatta@marvell.com>
  L:	netdev@vger.kernel.org
--S:	Maintained
-+S:	Orphan
- F:	drivers/net/ethernet/qlogic/qed/
- F:	drivers/net/ethernet/qlogic/qede/
- F:	include/linux/qed/
 -- 
 2.53.0
 
