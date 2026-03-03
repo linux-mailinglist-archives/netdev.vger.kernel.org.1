@@ -1,154 +1,157 @@
-Return-Path: <netdev+bounces-262987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262989-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EAQ9HcI+pmkZNAAAu9opvQ
-	(envelope-from <netdev+bounces-262987-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 02:52:02 +0100
+	id aGB8Kf9DpmlyNQAAu9opvQ
+	(envelope-from <netdev+bounces-262989-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 03:14:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE5551E7D60
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 02:52:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E51461E7E8D
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 03:14:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ADBB9307A0BE
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 01:51:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 37B32305D1FC
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 02:12:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D571374199;
-	Tue,  3 Mar 2026 01:51:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD5D34E765;
+	Tue,  3 Mar 2026 02:12:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Bm5NO3tr"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="u+o66kkY"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84325373C0A
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 01:51:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C8F33D515
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 02:12:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772502689; cv=none; b=CfW5xB6mIUjl474M88FRdaE70dnquDJy48bXaZlG3SwLvf2/Axwtb1dOvcsHxJp8yk5acs2x4+c0h8cHEHFCp/rXXn04v5xdRGPzLVSjtGOEpGd2ntl2HVCdTw/7Z/FDn7VTXsuJ7BvYZlM3rL8j34D8YWJDylUTCtNam+hd5d0=
+	t=1772503944; cv=none; b=qThVFKA3+NOL0u+MbmO/gIfaT+ddQ/De0w+R9/5ZbBUUXXn2u3kICJz2fehrJEiOM+QtUa+fvflzt99ERbjtYM2gMX2PWJho1nKWjb8x+QR99yfwhVb9meLO/YfVG641xox0XNRzlnDbYTWWcVjAz3YEfkeM94aguVBAogakgkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772502689; c=relaxed/simple;
-	bh=QR9xC+LbZjTEcw2B3g6RGPgRmzHv4fIjmH/+ye7UnDs=;
+	s=arc-20240116; t=1772503944; c=relaxed/simple;
+	bh=FHUL99jkKiS7cQaGg74n2ztrYjf9Ch0zqo+Qxm0uyNw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IL6rykrnwNPmWo6z+BNN+URnoLUyjEH6dqxQSXBUnYkJAaVcFMMCJEc6sqC254/YMIkFiwA+1zEiyrwi/6/Ss0c6ljgu80X/dhIzkKDL/aQAKOYqe3iczqy/KVdgiqJcWilOkqQK4OVcGR6ShqQ6oNmZycdE3CmFVALe0Mz8Um4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Bm5NO3tr; arc=none smtp.client-ip=91.218.175.186
+	 In-Reply-To:Content-Type; b=Jabmtj/VWXT/qR/FBU74RKEo6fbs8hj6/ADPuv+O3jE6dbcIn1hAm5isPvC+30cXGYtTYEz7DGRb+/mlJZ82jAUvAOt+6NNAIWj+AVY05WsVasZwi5RutWrB4nV+ZffgE/L/FVn69Z3BTbS8UrzyZKOXFxFtglZv6FKcEfl4ivQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=u+o66kkY; arc=none smtp.client-ip=95.215.58.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <f38608e1-4e85-4bc4-8872-c9ecf38e5d7e@linux.dev>
+Message-ID: <3a623176-fc5f-4dd4-bbfc-64d211f53645@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772502686;
+	t=1772503940;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=H6veD8qM4F+WyZg576UBUjZ2Qmn0u8K3QCi47PEsWrI=;
-	b=Bm5NO3trAPfude3N6WDHXMoo5/emzVqA759MZb7U4Ltx4YakxOrYeuBn5F/zsr8qmw538h
-	Pvgjz5Y+vsWw7ahEeJjuB+JU++N4PnCPLfZo55eb/ypkGWnJ5NWLnmfQsZcZ/A3leEt8Sw
-	S83EC/8fTfoiwKGlHYh7+RS/u8VNsWY=
-Date: Mon, 2 Mar 2026 17:51:18 -0800
+	bh=ITXnpAu02JzlvG8ACcNMa7Prj6k5bTC+ixlzn4YbRcI=;
+	b=u+o66kkYvU/0WatYofey3kIxheT7EhEdcdrwhowxk7SPBm8AEWiQkPGbhM0tHR25/boTw/
+	9kptLRzgw+xw3BFcJFoqyGW8vtJfhpDG5gBg+VCSYmnYCQiXAnkboVreb5BYYgQTNRRS/v
+	FVTRKtvQouWDk5qN5Kg5tMzYfRbgJAQ=
+Date: Tue, 3 Mar 2026 10:12:07 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf v2 3/4] bpf, sockmap: Adapt for the af_unix-specific
- lock
-To: Michal Luczaj <mhal@rbox.co>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>,
- John Fastabend <john.fastabend@gmail.com>,
- Jakub Sitnicki <jakub@cloudflare.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Willem de Bruijn <willemb@google.com>, Cong Wang <cong.wang@bytedance.com>,
- Alexei Starovoitov <ast@kernel.org>, Yonghong Song <yhs@fb.com>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20260207-unix-proto-update-null-ptr-deref-v2-0-9f091330e7cd@rbox.co>
- <20260207-unix-proto-update-null-ptr-deref-v2-3-9f091330e7cd@rbox.co>
- <CAAVpQUA+8GL_j63CaKb8hbxoL21izD58yr1NvhOhU=j+35+3og@mail.gmail.com>
- <c4eaead1-ad69-42f0-9699-5f2d555a7693@rbox.co>
- <a2f2c260-38e8-4ba3-8655-cffbee046259@linux.dev>
- <b75bbc3f-85fd-4209-9ce1-3bf685ba62ff@rbox.co>
- <d122ed8b-ebfb-4d59-96ce-10c361e76676@linux.dev>
- <1022fcaf-ca38-43d2-84cb-f66a504335e1@rbox.co>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
+Subject: Re: [RFC PATCH net-next] tcp: Add net.ipv4.tcp_purge_receive_queue
+ sysctl
 Content-Language: en-US
-In-Reply-To: <1022fcaf-ca38-43d2-84cb-f66a504335e1@rbox.co>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Leon Hwang <leon.huangfu@shopee.com>, netdev@vger.kernel.org,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>, David Ahern <dsahern@kernel.org>,
+ Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
+ =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ij@kernel.org>,
+ Ido Schimmel <idosch@nvidia.com>, kerneljasonxing@gmail.com,
+ lance.yang@linux.dev, jiayuan.chen@linux.dev, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260225074633.149590-1-leon.huangfu@shopee.com>
+ <20260225174354.5a698ddb@kernel.org>
+ <f611be70-8280-44c8-86af-5866c0b302be@linux.dev>
+ <20260302162251.733b520e@kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Leon Hwang <leon.hwang@linux.dev>
+In-Reply-To: <20260302162251.733b520e@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: CE5551E7D60
+X-Rspamd-Queue-Id: E51461E7E8D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-262989-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-262987-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[google.com,gmail.com,cloudflare.com,davemloft.net,kernel.org,redhat.com,iogearbox.net,bytedance.com,fb.com,linux.dev,fomichev.me,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[27];
+	FREEMAIL_CC(0.00)[shopee.com,vger.kernel.org,davemloft.net,google.com,redhat.com,kernel.org,lwn.net,linuxfoundation.org,nvidia.com,gmail.com,linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
+	NEURAL_HAM(-0.00)[-0.992];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[leon.hwang@linux.dev,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[linux.dev:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:dkim,linux.dev:mid]
 X-Rspamd-Action: no action
 
-On 2/24/26 7:28 AM, Michal Luczaj wrote:
-> On 2/23/26 22:43, Martin KaFai Lau wrote:
+
+
+On 3/3/26 08:22, Jakub Kicinski wrote:
+> On Mon, 2 Mar 2026 17:55:59 +0800 Leon Hwang wrote:
+>> On 26/2/26 09:43, Jakub Kicinski wrote:
+>>> On Wed, 25 Feb 2026 15:46:33 +0800 Leon Hwang wrote:  
+>>>> Issue:
+>>>> When a TCP socket in the CLOSE_WAIT state receives a RST packet, the
+>>>> current implementation does not clear the socket's receive queue. This
+>>>> causes SKBs in the queue to remain allocated until the socket is
+>>>> explicitly closed by the application. As a consequence:
+>>>>
+>>>> 1. The page pool pages held by these SKBs are not released.  
+>>>
+>>> On what kernel version and driver are you observing this?  
 >>
->> On 2/11/26 2:02 AM, Michal Luczaj wrote:
->>>> It should also be helpful to be consistent with tcp/udp iter and use
->>>> lock_sock() instead of lock_sock_fast() in bpf_iter_unix_seq_show().
->>> OK, I'll tweak that in v3.
+>> # uname -r
+>> 6.19.0-061900-generic
 >>
->> Hi, Michal. Are you planning to send v3 soon? I don't think the
->> sock_owned_by_user for the non-tracing prog needs to be addressed in the
->> same set.
+>> # ethtool -i eth0
+>> driver: mlx5_core
+>> version: 6.19.0-061900-generic
+>> firmware-version: 26.43.2566 (MT_0000000531)
 > 
-> Yes, I'm working on it. Sorry for the delay, I'm taking my sweet time to
-> come up with a selftest.
+> Okay... this kernel + driver should just patiently wait for the page
+> pool to go away. 
 > 
-> I think I can neatly fit the sock_owned_by_user()-related stuff in this
-> series, but let me know if you'd rather have it separately. Whichever way,
-> I don't mind.
+> What is the actual, end user problem that you're trying to solve?
+> A few kB of data waiting to be freed is not a huge problem..
 
-I think sock_owned_by_user() is not related to the AF_UNIX's sockmap 
-fix. If it is not, it's better to separate it. I think one thing at a 
-time is easier to review.
+Yes, it is not a huge problem.
 
-If they are related somewhat or it's easier to review them together, see 
-if it makes sense to structure them in a way such that the AF_UNIX's 
-sockmap-related fixes and tests are at the beginning of the patch set so 
-that they can be applied first if others need more discussion.
+The actual end-user issue was discussed in
+"page_pool: Add page_pool_release_stalled tracepoint" [1].
 
-Regarding the "Keeping sparse annotations in 
-sock_map_sk_{acquire,release}() required some
-hackery...". Maybe just remove the annotations?
-[ btw, from commit 5b63d0ae94cc, the sparse support is removed and it
-   depends solely on clang now (?). If it is the case, what does clang do
-   on the "sock_or_unix_lock"? ]
+I think it would be useful to provide a way for SREs to purge the
+receive queue when CLOSE_WAIT TCP sockets receive RST packets. If the
+NIC, e.g., Mellanox, flaps, the underlying page pool and pages can be
+released at the same time.
+
+Links:
+[1]
+https://lore.kernel.org/netdev/b676baa0-2044-4a74-900d-f471620f2896@linux.dev/
+
+Thanks,
+Leon
 
 
