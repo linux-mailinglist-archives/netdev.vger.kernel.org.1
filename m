@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-263255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263256-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IG46Leb3pmk7bgAAu9opvQ
-	(envelope-from <netdev+bounces-263255-lists+netdev=lfdr.de@vger.kernel.org>)
+	id EB8FMOb3pmmgawAAu9opvQ
+	(envelope-from <netdev+bounces-263256-lists+netdev=lfdr.de@vger.kernel.org>)
 	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 16:01:58 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FF091F1F27
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 16:01:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F2C51F1F28
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 16:01:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B797E314B6C9
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 14:53:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 03DEA31A900A
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 14:53:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A18847DD6C;
-	Tue,  3 Mar 2026 14:53:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A762B47DD65;
+	Tue,  3 Mar 2026 14:53:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="XIVXFK8N";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="XIVXFK8N"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="U2drvnmL";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="U2drvnmL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3269447CC8A
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 14:53:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16D0A47CC8A
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 14:53:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772549612; cv=none; b=owJNRvfY9LsMdXIjV+6Xue8Z0XoyK/OToAdBDupVYNe/0np5HmJQ9/f/hzuYxKSydYix8mRvCOr1GUnkegwlrxmcKuAf5delMrMZ6HqCvlvfbQTeRtfqpuUI7zffck+UoXPjRDy2/ogkGFBn1bpSIDmnhK3sPeyqF2oL/fn7Md0=
+	t=1772549618; cv=none; b=F8truNxmlrDP934PupGk93nZAPXGkAqnMHiKl81Q/CVvfyuctWl1rzk4RjcgZp+yMAlfqMU3jze9xFV1PgRQkYBdgFfDcbsCUdlOPumoQrg18j6eDyQX1ZIepdm6JAwywGVlllqXVp5u6LmLZ7SJ4a6z3w7Vys064jTOWI9nuH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772549612; c=relaxed/simple;
-	bh=39LUWq4/wVA5QMbHVx/YW5S0o8yPzhP2B6uZHTD+tsM=;
+	s=arc-20240116; t=1772549618; c=relaxed/simple;
+	bh=Qk0wqQ25gzMOj0PsbOdB7eKxBIVmw+5oVZuPEg8P4ds=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ospJ+AWKw4frcED2qXzuQvKOKkjhD3HK0TfOJ7jx2bHJmMdegnGxMCnYGYSTSz5NP0sUZENZrP4RfvjjsG93MSy4EsON+liJMTOUXoOdIbuYy22n2S+HRRjxORF+rUxDAIWV1QQxp/+rMV8Rafl8O+d9QnkNT61+IsOemgLmuCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=XIVXFK8N; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=XIVXFK8N; arc=none smtp.client-ip=195.135.223.131
+	 MIME-Version; b=sGHuDsEIPDytJ1iFpxmIl01inIeuj/zS9EMyWL9QRqmC4ud2T3nxMr86fEm9b8hmzgbs6REr4I9F+0lSX78ucZXiurFhtMA9dvOgbzP+6ZCwFsVfa1nzTcgMlweFBm5JLvRm4UesXAE+gN3j4q54zge1VCdwjxhfhX0HhgKjkOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=U2drvnmL; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=U2drvnmL; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 6E21E5BE1B;
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 983195BE1C;
 	Tue,  3 Mar 2026 14:52:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
 	t=1772549572; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=B2MUuyc1pGUVAFE0ilYhZv2KYBshTqF6eJ6skfWYg78=;
-	b=XIVXFK8NzHFtiRJ3K7BZEAR0oOSZ8vY5fcsufeeCzNgXO1Ic1nRYeTmReP1/Dyy9zIU0Mq
-	36TDSPv29ilAehcreG9CPDhAOPrOQ+0L6V8yqRrC10TD3WmOBCqHNqpoLV4ae12zkUdQWl
-	fax52yOvWrA99+KN0OTjf+K0kt49EsM=
+	bh=RRPjYXz0Q7h/sXX3IBje00pdLmd5LIVSd8zrGG4A7qs=;
+	b=U2drvnmLMSk3hPfPaA8mJPLcKDfNHKjPSkg4qAhMmvJqI4guDycQR7UTtr+6owC00H+nZk
+	t4C4I1O8TX+AJVg+ynu1jRplQBJ1t3RyeedDhNke6M8GKP8+xiA+DbTpjeSbNAcc1JQY8j
+	9Ar7XyKjtxx1lIbhqMSxIW1X74mcVMI=
 Authentication-Results: smtp-out2.suse.de;
 	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
@@ -57,28 +57,28 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=B2MUuyc1pGUVAFE0ilYhZv2KYBshTqF6eJ6skfWYg78=;
-	b=XIVXFK8NzHFtiRJ3K7BZEAR0oOSZ8vY5fcsufeeCzNgXO1Ic1nRYeTmReP1/Dyy9zIU0Mq
-	36TDSPv29ilAehcreG9CPDhAOPrOQ+0L6V8yqRrC10TD3WmOBCqHNqpoLV4ae12zkUdQWl
-	fax52yOvWrA99+KN0OTjf+K0kt49EsM=
+	bh=RRPjYXz0Q7h/sXX3IBje00pdLmd5LIVSd8zrGG4A7qs=;
+	b=U2drvnmLMSk3hPfPaA8mJPLcKDfNHKjPSkg4qAhMmvJqI4guDycQR7UTtr+6owC00H+nZk
+	t4C4I1O8TX+AJVg+ynu1jRplQBJ1t3RyeedDhNke6M8GKP8+xiA+DbTpjeSbNAcc1JQY8j
+	9Ar7XyKjtxx1lIbhqMSxIW1X74mcVMI=
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4A2C83EA6C;
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 74AA33EA69;
 	Tue,  3 Mar 2026 14:52:52 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 0N4IEcT1pmmPKQAAD6G6ig
+	id 8JV3G8T1pmmPKQAAD6G6ig
 	(envelope-from <oneukum@suse.com>); Tue, 03 Mar 2026 14:52:52 +0000
 From: Oliver Neukum <oneukum@suse.com>
 To: andrew@lunn.ch,
 	bjorn@mork.no,
 	netdev@vger.kernel.org
 Cc: Oliver Neukum <oneukum@suse.com>
-Subject: [RFCv2 11/13] net: usb: cdc_ncm: use dynamic private allocation
-Date: Tue,  3 Mar 2026 15:50:31 +0100
-Message-ID: <20260303145242.1377514-11-oneukum@suse.com>
+Subject: [RFCv2 12/13] net: usb: smsc95xx: use dynamic private allocation
+Date: Tue,  3 Mar 2026 15:50:32 +0100
+Message-ID: <20260303145242.1377514-12-oneukum@suse.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260303145242.1377514-1-oneukum@suse.com>
 References: <20260303145242.1377514-1-oneukum@suse.com>
@@ -92,397 +92,322 @@ Content-Transfer-Encoding: 8bit
 X-Spam-Flag: NO
 X-Spam-Score: -2.80
 X-Spam-Level: 
-X-Rspamd-Queue-Id: 5FF091F1F27
+X-Rspamd-Queue-Id: 4F2C51F1F28
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[suse.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263255-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-263256-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[oneukum@suse.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	RSPAMD_EMAILBL_FAIL(0.00)[oneukum.suse.com:query timed out];
 	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[oneukum@suse.com,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[suse.com:+];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,suse.com:dkim,suse.com:email,suse.com:mid]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:dkim,suse.com:email,suse.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-The old style private room was too small for cdc_ncm.
+The old style private room was too small for smsc95xx
 With dynamic allocation that factor is gone.
 Remove handling private allocations in the driver.
 
 Signed-off-by: Oliver Neukum <oneukum@suse.com>
 ---
- drivers/net/usb/cdc_ncm.c | 78 +++++++++++++++++----------------------
- 1 file changed, 34 insertions(+), 44 deletions(-)
+ drivers/net/usb/smsc95xx.c | 65 ++++++++++++++++----------------------
+ 1 file changed, 28 insertions(+), 37 deletions(-)
 
-diff --git a/drivers/net/usb/cdc_ncm.c b/drivers/net/usb/cdc_ncm.c
-index 7057c6c0cfc6..91da42a778f4 100644
---- a/drivers/net/usb/cdc_ncm.c
-+++ b/drivers/net/usb/cdc_ncm.c
-@@ -107,7 +107,7 @@ static void cdc_ncm_get_ethtool_stats(struct net_device *netdev,
- 				    u64 *data)
+diff --git a/drivers/net/usb/smsc95xx.c b/drivers/net/usb/smsc95xx.c
+index 42e4048b574b..447c0c6bbd11 100644
+--- a/drivers/net/usb/smsc95xx.c
++++ b/drivers/net/usb/smsc95xx.c
+@@ -84,7 +84,7 @@ MODULE_PARM_DESC(turbo_mode, "Enable multiple frames per Rx transaction");
+ static int __must_check smsc95xx_read_reg(struct usbnet *dev, u32 index,
+ 					  u32 *data)
+ {
+-	struct smsc95xx_priv *pdata = dev->driver_priv;
++	struct smsc95xx_priv *pdata = usbnet_priv(dev);
+ 	u32 buf;
+ 	int ret;
+ 	int (*fn)(struct usbnet *, u8, u8, u16, u16, void *, u16);
+@@ -115,7 +115,7 @@ static int __must_check smsc95xx_read_reg(struct usbnet *dev, u32 index,
+ static int __must_check smsc95xx_write_reg(struct usbnet *dev, u32 index,
+ 					   u32 data)
+ {
+-	struct smsc95xx_priv *pdata = dev->driver_priv;
++	struct smsc95xx_priv *pdata = usbnet_priv(dev);
+ 	u32 buf;
+ 	int ret;
+ 	int (*fn)(struct usbnet *, u8, u8, u16, u16, const void *, u16);
+@@ -265,7 +265,7 @@ static int smsc95xx_mdiobus_reset(struct mii_bus *bus)
+ 	int ret;
+ 
+ 	dev = bus->priv;
+-	pdata = dev->driver_priv;
++	pdata = usbnet_priv(dev);
+ 
+ 	if (pdata->is_internal_phy)
+ 		return 0;
+@@ -481,7 +481,7 @@ static unsigned int smsc95xx_hash(char addr[ETH_ALEN])
+ static void smsc95xx_set_multicast(struct net_device *netdev)
  {
  	struct usbnet *dev = netdev_priv(netdev);
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
- 	int i;
- 	char *p = NULL;
+-	struct smsc95xx_priv *pdata = dev->driver_priv;
++	struct smsc95xx_priv *pdata = usbnet_priv(dev);
+ 	unsigned long flags;
+ 	int ret;
  
-@@ -149,7 +149,7 @@ static const struct ethtool_ops cdc_ncm_ethtool_ops = {
+@@ -539,7 +539,7 @@ static void smsc95xx_set_multicast(struct net_device *netdev)
  
- static u32 cdc_ncm_check_rx_max(struct usbnet *dev, u32 new_rx)
+ static int smsc95xx_phy_update_flowcontrol(struct usbnet *dev)
  {
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
- 	u32 val, max, min;
+-	struct smsc95xx_priv *pdata = dev->driver_priv;
++	struct smsc95xx_priv *pdata = usbnet_priv(dev);
+ 	u32 flow = 0, afc_cfg;
  
- 	/* clamp new_rx to sane values */
-@@ -172,7 +172,7 @@ static u32 cdc_ncm_check_rx_max(struct usbnet *dev, u32 new_rx)
+ 	int ret = smsc95xx_read_reg(dev, AFC_CFG, &afc_cfg);
+@@ -584,7 +584,7 @@ static int smsc95xx_phy_update_flowcontrol(struct usbnet *dev)
  
- static u32 cdc_ncm_check_tx_max(struct usbnet *dev, u32 new_tx)
+ static void smsc95xx_mac_update_fullduplex(struct usbnet *dev)
  {
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
- 	u32 val, max, min;
+-	struct smsc95xx_priv *pdata = dev->driver_priv;
++	struct smsc95xx_priv *pdata = usbnet_priv(dev);
+ 	unsigned long flags;
+ 	int ret;
  
- 	/* clamp new_tx to sane values */
-@@ -202,7 +202,7 @@ static ssize_t min_tx_pkt_show(struct device *d,
- 			       struct device_attribute *attr, char *buf)
+@@ -613,7 +613,7 @@ static void smsc95xx_mac_update_fullduplex(struct usbnet *dev)
+ 
+ static void smsc95xx_status(struct usbnet *dev, struct urb *urb)
  {
- 	struct usbnet *dev = netdev_priv(to_net_dev(d));
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
+-	struct smsc95xx_priv *pdata = dev->driver_priv;
++	struct smsc95xx_priv *pdata = usbnet_priv(dev);
+ 	unsigned long flags;
+ 	u32 intdata;
  
- 	return sprintf(buf, "%u\n", ctx->min_tx_pkt);
- }
-@@ -211,7 +211,7 @@ static ssize_t rx_max_show(struct device *d,
- 			   struct device_attribute *attr, char *buf)
+@@ -730,7 +730,7 @@ static void smsc95xx_ethtool_get_wol(struct net_device *net,
+ 				     struct ethtool_wolinfo *wolinfo)
  {
- 	struct usbnet *dev = netdev_priv(to_net_dev(d));
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
+ 	struct usbnet *dev = netdev_priv(net);
+-	struct smsc95xx_priv *pdata = dev->driver_priv;
++	struct smsc95xx_priv *pdata = usbnet_priv(dev);
  
- 	return sprintf(buf, "%u\n", ctx->rx_max);
- }
-@@ -220,7 +220,7 @@ static ssize_t tx_max_show(struct device *d,
- 			   struct device_attribute *attr, char *buf)
+ 	wolinfo->supported = SUPPORTED_WAKE;
+ 	wolinfo->wolopts = pdata->wolopts;
+@@ -740,7 +740,7 @@ static int smsc95xx_ethtool_set_wol(struct net_device *net,
+ 				    struct ethtool_wolinfo *wolinfo)
  {
- 	struct usbnet *dev = netdev_priv(to_net_dev(d));
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
+ 	struct usbnet *dev = netdev_priv(net);
+-	struct smsc95xx_priv *pdata = dev->driver_priv;
++	struct smsc95xx_priv *pdata = usbnet_priv(dev);
+ 	int ret;
  
- 	return sprintf(buf, "%u\n", ctx->tx_max);
- }
-@@ -229,7 +229,7 @@ static ssize_t tx_timer_usecs_show(struct device *d,
- 				   struct device_attribute *attr, char *buf)
+ 	if (wolinfo->wolopts & ~SUPPORTED_WAKE)
+@@ -788,7 +788,7 @@ static void smsc95xx_get_pauseparam(struct net_device *ndev,
+ 	struct usbnet *dev;
+ 
+ 	dev = netdev_priv(ndev);
+-	pdata = dev->driver_priv;
++	pdata = usbnet_priv(dev);
+ 
+ 	pause->autoneg = pdata->pause_autoneg;
+ 	pause->rx_pause = pdata->pause_rx;
+@@ -804,7 +804,7 @@ static int smsc95xx_set_pauseparam(struct net_device *ndev,
+ 	struct usbnet *dev;
+ 
+ 	dev = netdev_priv(ndev);
+-	pdata = dev->driver_priv;
++	pdata = usbnet_priv(dev);
+ 	phydev = ndev->phydev;
+ 
+ 	if (!phydev)
+@@ -898,7 +898,7 @@ static int smsc95xx_set_mac_address(struct usbnet *dev)
+ /* starts the TX path */
+ static int smsc95xx_start_tx_path(struct usbnet *dev)
  {
- 	struct usbnet *dev = netdev_priv(to_net_dev(d));
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
+-	struct smsc95xx_priv *pdata = dev->driver_priv;
++	struct smsc95xx_priv *pdata = usbnet_priv(dev);
+ 	unsigned long flags;
+ 	int ret;
  
- 	return sprintf(buf, "%u\n", ctx->timer_interval / (u32)NSEC_PER_USEC);
- }
-@@ -239,7 +239,7 @@ static ssize_t min_tx_pkt_store(struct device *d,
- 				const char *buf, size_t len)
+@@ -918,7 +918,7 @@ static int smsc95xx_start_tx_path(struct usbnet *dev)
+ /* Starts the Receive path */
+ static int smsc95xx_start_rx_path(struct usbnet *dev)
  {
- 	struct usbnet *dev = netdev_priv(to_net_dev(d));
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
- 	unsigned long val;
+-	struct smsc95xx_priv *pdata = dev->driver_priv;
++	struct smsc95xx_priv *pdata = usbnet_priv(dev);
+ 	unsigned long flags;
  
- 	/* no need to restrict values - anything from 0 to infinity is OK */
-@@ -255,7 +255,7 @@ static ssize_t rx_max_store(struct device *d,
- 			    const char *buf, size_t len)
+ 	spin_lock_irqsave(&pdata->mac_cr_lock, flags);
+@@ -930,7 +930,7 @@ static int smsc95xx_start_rx_path(struct usbnet *dev)
+ 
+ static int smsc95xx_reset(struct usbnet *dev)
  {
- 	struct usbnet *dev = netdev_priv(to_net_dev(d));
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
- 	unsigned long val;
+-	struct smsc95xx_priv *pdata = dev->driver_priv;
++	struct smsc95xx_priv *pdata = usbnet_priv(dev);
+ 	u32 read_buf, burst_cap;
+ 	int ret = 0, timeout;
  
- 	if (kstrtoul(buf, 0, &val) || cdc_ncm_check_rx_max(dev, val) != val)
-@@ -270,7 +270,7 @@ static ssize_t tx_max_store(struct device *d,
- 			    const char *buf, size_t len)
- {
- 	struct usbnet *dev = netdev_priv(to_net_dev(d));
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
- 	unsigned long val;
+@@ -1157,12 +1157,6 @@ static int smsc95xx_bind(struct usbnet *dev, struct usb_interface *intf)
+ 		return ret;
+ 	}
  
- 	if (kstrtoul(buf, 0, &val) || cdc_ncm_check_tx_max(dev, val) != val)
-@@ -285,7 +285,7 @@ static ssize_t tx_timer_usecs_store(struct device *d,
- 				    const char *buf, size_t len)
- {
- 	struct usbnet *dev = netdev_priv(to_net_dev(d));
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
- 	ssize_t ret;
- 	unsigned long val;
- 
-@@ -311,7 +311,7 @@ static DEVICE_ATTR_RW(tx_timer_usecs);
- static ssize_t ndp_to_end_show(struct device *d, struct device_attribute *attr, char *buf)
- {
- 	struct usbnet *dev = netdev_priv(to_net_dev(d));
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
- 
- 	return sprintf(buf, "%c\n", ctx->drvflags & CDC_NCM_FLAG_NDP_TO_END ? 'Y' : 'N');
- }
-@@ -319,7 +319,7 @@ static ssize_t ndp_to_end_show(struct device *d, struct device_attribute *attr,
- static ssize_t ndp_to_end_store(struct device *d,  struct device_attribute *attr, const char *buf, size_t len)
- {
- 	struct usbnet *dev = netdev_priv(to_net_dev(d));
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
- 	bool enable;
- 
- 	if (kstrtobool(buf, &enable))
-@@ -361,7 +361,7 @@ static DEVICE_ATTR_RW(ndp_to_end);
- static ssize_t cdc_ncm_show_##name(struct device *d, struct device_attribute *attr, char *buf) \
- { \
- 	struct usbnet *dev = netdev_priv(to_net_dev(d)); \
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0]; \
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev); \
- 	return sprintf(buf, format "\n", tocpu(ctx->ncm_parm.name));	\
- } \
- static DEVICE_ATTR(name, 0444, cdc_ncm_show_##name, NULL)
-@@ -404,7 +404,7 @@ static const struct attribute_group cdc_ncm_sysfs_attr_group = {
- /* handle rx_max and tx_max changes */
- static void cdc_ncm_update_rxtx_max(struct usbnet *dev, u32 new_rx, u32 new_tx)
- {
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
- 	u8 iface_no = ctx->control->cur_altsetting->desc.bInterfaceNumber;
- 	u32 val;
- 
-@@ -476,7 +476,7 @@ static void cdc_ncm_update_rxtx_max(struct usbnet *dev, u32 new_rx, u32 new_tx)
- /* helpers for NCM and MBIM differences */
- static u8 cdc_ncm_flags(struct usbnet *dev)
- {
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
- 
- 	if (cdc_ncm_comm_intf_is_mbim(dev->intf->cur_altsetting) && ctx->mbim_desc)
- 		return ctx->mbim_desc->bmNetworkCapabilities;
-@@ -501,7 +501,7 @@ static u32 cdc_ncm_min_dgram_size(struct usbnet *dev)
- 
- static u32 cdc_ncm_max_dgram_size(struct usbnet *dev)
- {
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
- 
- 	if (cdc_ncm_comm_intf_is_mbim(dev->intf->cur_altsetting) && ctx->mbim_desc)
- 		return le16_to_cpu(ctx->mbim_desc->wMaxSegmentSize);
-@@ -515,7 +515,7 @@ static u32 cdc_ncm_max_dgram_size(struct usbnet *dev)
-  */
- static int cdc_ncm_init(struct usbnet *dev)
- {
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
- 	u8 iface_no = ctx->control->cur_altsetting->desc.bInterfaceNumber;
- 	int err;
- 
-@@ -608,7 +608,7 @@ static int cdc_ncm_init(struct usbnet *dev)
- /* set a new max datagram size */
- static void cdc_ncm_set_dgram_size(struct usbnet *dev, int new_size)
- {
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
- 	u8 iface_no = ctx->control->cur_altsetting->desc.bInterfaceNumber;
- 	__le16 max_datagram_size;
- 	u16 mbim_mtu;
-@@ -656,7 +656,7 @@ static void cdc_ncm_set_dgram_size(struct usbnet *dev, int new_size)
- 
- static void cdc_ncm_fix_modulus(struct usbnet *dev)
- {
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
- 	u32 val;
- 
- 	/*
-@@ -700,7 +700,7 @@ static void cdc_ncm_fix_modulus(struct usbnet *dev)
- 
- static int cdc_ncm_setup(struct usbnet *dev)
- {
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
- 	u32 def_rx, def_tx;
- 
- 	/* be conservative when selecting initial buffer size to
-@@ -769,9 +769,6 @@ cdc_ncm_find_endpoints(struct usbnet *dev, struct usb_interface *intf)
- 
- static void cdc_ncm_free(struct cdc_ncm_ctx *ctx)
- {
--	if (ctx == NULL)
--		return;
--
- 	if (ctx->tx_rem_skb != NULL) {
- 		dev_kfree_skb_any(ctx->tx_rem_skb);
- 		ctx->tx_rem_skb = NULL;
-@@ -786,8 +783,6 @@ static void cdc_ncm_free(struct cdc_ncm_ctx *ctx)
- 		kfree(ctx->delayed_ndp16);
- 	else
- 		kfree(ctx->delayed_ndp32);
--
--	kfree(ctx);
- }
- 
- /* we need to override the usbnet change_mtu ndo for two reasons:
-@@ -819,7 +814,7 @@ static const struct net_device_ops cdc_ncm_netdev_ops = {
- 
- int cdc_ncm_bind_common(struct usbnet *dev, struct usb_interface *intf, u8 data_altsetting, int drvflags)
- {
--	struct cdc_ncm_ctx *ctx;
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
- 	struct usb_driver *driver;
- 	u8 *buf;
- 	int len;
-@@ -827,10 +822,6 @@ int cdc_ncm_bind_common(struct usbnet *dev, struct usb_interface *intf, u8 data_
- 	u8 iface_no;
- 	struct usb_cdc_parsed_header hdr;
- 
--	ctx = kzalloc_obj(*ctx);
--	if (!ctx)
+-	pdata = kzalloc_obj(*pdata);
+-	if (!pdata)
 -		return -ENOMEM;
 -
- 	ctx->dev = dev;
- 
- 	hrtimer_setup(&ctx->tx_timer, &cdc_ncm_tx_timer_cb, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
-@@ -838,9 +829,6 @@ int cdc_ncm_bind_common(struct usbnet *dev, struct usb_interface *intf, u8 data_
- 	atomic_set(&ctx->stop, 0);
- 	spin_lock_init(&ctx->mtx);
- 
--	/* store ctx pointer in device data field */
--	dev->data[0] = (unsigned long)ctx;
+-	dev->driver_priv = pdata;
 -
- 	/* only the control interface can be successfully probed */
- 	ctx->control = intf;
+ 	spin_lock_init(&pdata->mac_cr_lock);
  
-@@ -988,8 +976,7 @@ int cdc_ncm_bind_common(struct usbnet *dev, struct usb_interface *intf, u8 data_
- 	if (ctx->data != ctx->control)
- 		usb_driver_release_interface(driver, ctx->data);
- error:
--	cdc_ncm_free((struct cdc_ncm_ctx *)dev->data[0]);
--	dev->data[0] = 0;
-+	cdc_ncm_free(usbnet_priv(dev));
- 	dev_info(&intf->dev, "bind() failure\n");
- 	return -ENODEV;
+ 	/* LAN95xx devices do not alter the computed checksum of 0 to 0xffff.
+@@ -1185,14 +1179,14 @@ static int smsc95xx_bind(struct usbnet *dev, struct usb_interface *intf)
+ 	/* Init all registers */
+ 	ret = smsc95xx_reset(dev);
+ 	if (ret)
+-		goto free_pdata;
++		goto bail_out;
+ 
+ 	/* create irq domain for use by PHY driver and GPIO consumers */
+ 	usb_make_path(dev->udev, usb_path, sizeof(usb_path));
+ 	pdata->irqfwnode = irq_domain_alloc_named_fwnode(usb_path);
+ 	if (!pdata->irqfwnode) {
+ 		ret = -ENOMEM;
+-		goto free_pdata;
++		goto bail_out;
+ 	}
+ 
+ 	pdata->irqdomain = irq_domain_create_linear(pdata->irqfwnode,
+@@ -1309,14 +1303,13 @@ static int smsc95xx_bind(struct usbnet *dev, struct usb_interface *intf)
+ free_irqfwnode:
+ 	irq_domain_free_fwnode(pdata->irqfwnode);
+ 
+-free_pdata:
+-	kfree(pdata);
++bail_out:
+ 	return ret;
  }
-@@ -997,12 +984,9 @@ EXPORT_SYMBOL_GPL(cdc_ncm_bind_common);
  
- void cdc_ncm_unbind(struct usbnet *dev, struct usb_interface *intf)
+ static void smsc95xx_unbind(struct usbnet *dev, struct usb_interface *intf)
  {
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
- 	struct usb_driver *driver = driver_of(intf);
+-	struct smsc95xx_priv *pdata = dev->driver_priv;
++	struct smsc95xx_priv *pdata = usbnet_priv(dev);
  
--	if (ctx == NULL)
--		return;		/* no setup */
--
- 	atomic_set(&ctx->stop, 1);
+ 	phy_disconnect(dev->net->phydev);
+ 	mdiobus_unregister(pdata->mdiobus);
+@@ -1324,8 +1317,6 @@ static void smsc95xx_unbind(struct usbnet *dev, struct usb_interface *intf)
+ 	irq_dispose_mapping(irq_find_mapping(pdata->irqdomain, PHY_HWIRQ));
+ 	irq_domain_remove(pdata->irqdomain);
+ 	irq_domain_free_fwnode(pdata->irqfwnode);
+-	netif_dbg(dev, ifdown, dev->net, "free pdata\n");
+-	kfree(pdata);
+ }
  
- 	hrtimer_cancel(&ctx->tx_timer);
-@@ -1203,7 +1187,7 @@ static struct usb_cdc_ncm_ndp32 *cdc_ncm_ndp32(struct cdc_ncm_ctx *ctx, struct s
- struct sk_buff *
- cdc_ncm_fill_tx_frame(struct usbnet *dev, struct sk_buff *skb, __le32 sign)
+ static int smsc95xx_start_phy(struct usbnet *dev)
+@@ -1350,7 +1341,7 @@ static u32 smsc_crc(const u8 *buffer, size_t len, int filter)
+ 
+ static int smsc95xx_link_ok(struct usbnet *dev)
  {
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
- 	union {
- 		struct usb_cdc_ncm_nth16 *nth16;
- 		struct usb_cdc_ncm_nth32 *nth32;
-@@ -1523,7 +1507,7 @@ struct sk_buff *
- cdc_ncm_tx_fixup(struct usbnet *dev, struct sk_buff *skb, gfp_t flags)
+-	struct smsc95xx_priv *pdata = dev->driver_priv;
++	struct smsc95xx_priv *pdata = usbnet_priv(dev);
+ 	int ret;
+ 
+ 	/* first, a dummy read, needed to latch some MII phys */
+@@ -1367,7 +1358,7 @@ static int smsc95xx_link_ok(struct usbnet *dev)
+ 
+ static int smsc95xx_enter_suspend0(struct usbnet *dev)
  {
- 	struct sk_buff *skb_out;
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
+-	struct smsc95xx_priv *pdata = dev->driver_priv;
++	struct smsc95xx_priv *pdata = usbnet_priv(dev);
+ 	u32 val;
+ 	int ret;
  
- 	/*
- 	 * The Ethernet API we are using does not support transmitting
-@@ -1725,7 +1709,7 @@ EXPORT_SYMBOL_GPL(cdc_ncm_rx_verify_ndp32);
- int cdc_ncm_rx_fixup(struct usbnet *dev, struct sk_buff *skb_in)
+@@ -1406,7 +1397,7 @@ static int smsc95xx_enter_suspend0(struct usbnet *dev)
+ 
+ static int smsc95xx_enter_suspend1(struct usbnet *dev)
  {
- 	struct sk_buff *skb;
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
- 	unsigned int len;
- 	int nframes;
- 	int x;
-@@ -1904,7 +1888,7 @@ static void cdc_ncm_status(struct usbnet *dev, struct urb *urb)
+-	struct smsc95xx_priv *pdata = dev->driver_priv;
++	struct smsc95xx_priv *pdata = usbnet_priv(dev);
+ 	int ret, phy_id = pdata->phydev->mdio.addr;
+ 	u32 val;
  
- static void cdc_ncm_update_filter(struct usbnet *dev)
+@@ -1453,7 +1444,7 @@ static int smsc95xx_enter_suspend1(struct usbnet *dev)
+ 
+ static int smsc95xx_enter_suspend2(struct usbnet *dev)
  {
--	struct cdc_ncm_ctx *ctx = (struct cdc_ncm_ctx *)dev->data[0];
-+	struct cdc_ncm_ctx *ctx = usbnet_priv(dev);
+-	struct smsc95xx_priv *pdata = dev->driver_priv;
++	struct smsc95xx_priv *pdata = usbnet_priv(dev);
+ 	u32 val;
+ 	int ret;
  
- 	if (ctx->filtering_supported)
- 		usbnet_cdc_update_filter(dev);
-@@ -1921,6 +1905,7 @@ static const struct driver_info cdc_ncm_info = {
- 	.rx_fixup = cdc_ncm_rx_fixup,
- 	.tx_fixup = cdc_ncm_tx_fixup,
- 	.set_rx_mode = cdc_ncm_update_filter,
-+	.required_room = sizeof(struct cdc_ncm_ctx),
- };
+@@ -1475,7 +1466,7 @@ static int smsc95xx_enter_suspend2(struct usbnet *dev)
  
- /* Same as cdc_ncm_info, but with FLAG_SEND_ZLP  */
-@@ -1935,6 +1920,7 @@ static const struct driver_info cdc_ncm_zlp_info = {
- 	.rx_fixup = cdc_ncm_rx_fixup,
- 	.tx_fixup = cdc_ncm_tx_fixup,
- 	.set_rx_mode = cdc_ncm_update_filter,
-+	.required_room = sizeof(struct cdc_ncm_ctx),
- };
+ static int smsc95xx_enter_suspend3(struct usbnet *dev)
+ {
+-	struct smsc95xx_priv *pdata = dev->driver_priv;
++	struct smsc95xx_priv *pdata = usbnet_priv(dev);
+ 	u32 val;
+ 	int ret;
  
- /* Same as cdc_ncm_info, but with FLAG_SEND_ZLP */
-@@ -1949,6 +1935,7 @@ static const struct driver_info apple_tethering_interface_info = {
- 	.rx_fixup = cdc_ncm_rx_fixup,
- 	.tx_fixup = cdc_ncm_tx_fixup,
- 	.set_rx_mode = usbnet_cdc_update_filter,
-+	.required_room = sizeof(struct cdc_ncm_ctx),
- };
+@@ -1514,7 +1505,7 @@ static int smsc95xx_enter_suspend3(struct usbnet *dev)
  
- /* Same as apple_tethering_interface_info, but without FLAG_LINK_INTR */
-@@ -1963,6 +1950,7 @@ static const struct driver_info apple_private_interface_info = {
- 	.rx_fixup = cdc_ncm_rx_fixup,
- 	.tx_fixup = cdc_ncm_tx_fixup,
- 	.set_rx_mode = usbnet_cdc_update_filter,
-+	.required_room = sizeof(struct cdc_ncm_ctx),
- };
+ static int smsc95xx_autosuspend(struct usbnet *dev, u32 link_up)
+ {
+-	struct smsc95xx_priv *pdata = dev->driver_priv;
++	struct smsc95xx_priv *pdata = usbnet_priv(dev);
  
- /* Same as cdc_ncm_info, but with FLAG_WWAN */
-@@ -1977,6 +1965,7 @@ static const struct driver_info wwan_info = {
- 	.rx_fixup = cdc_ncm_rx_fixup,
- 	.tx_fixup = cdc_ncm_tx_fixup,
- 	.set_rx_mode = cdc_ncm_update_filter,
-+	.required_room = sizeof(struct cdc_ncm_ctx),
- };
+ 	if (!netif_running(dev->net)) {
+ 		/* interface is ifconfig down so fully power down hw */
+@@ -1544,7 +1535,7 @@ static int smsc95xx_autosuspend(struct usbnet *dev, u32 link_up)
+ static int smsc95xx_suspend(struct usb_interface *intf, pm_message_t message)
+ {
+ 	struct usbnet *dev = usb_get_intfdata(intf);
+-	struct smsc95xx_priv *pdata = dev->driver_priv;
++	struct smsc95xx_priv *pdata = usbnet_priv(dev);
+ 	u32 val, link_up;
+ 	int ret;
  
- /* Same as wwan_info, but with FLAG_NOARP  */
-@@ -1991,6 +1980,7 @@ static const struct driver_info wwan_noarp_info = {
- 	.rx_fixup = cdc_ncm_rx_fixup,
- 	.tx_fixup = cdc_ncm_tx_fixup,
- 	.set_rx_mode = cdc_ncm_update_filter,
-+	.required_room = sizeof(struct cdc_ncm_ctx),
- };
+@@ -1805,7 +1796,7 @@ static int smsc95xx_resume(struct usb_interface *intf)
+ 	u32 val;
  
- static const struct usb_device_id cdc_devs[] = {
+ 	BUG_ON(!dev);
+-	pdata = dev->driver_priv;
++	pdata = usbnet_priv(dev);
+ 	suspend_flags = pdata->suspend_flags;
+ 
+ 	netdev_dbg(dev->net, "resume suspend_flags=0x%02x\n", suspend_flags);
+@@ -1854,7 +1845,7 @@ static int smsc95xx_resume(struct usb_interface *intf)
+ static int smsc95xx_reset_resume(struct usb_interface *intf)
+ {
+ 	struct usbnet *dev = usb_get_intfdata(intf);
+-	struct smsc95xx_priv *pdata = dev->driver_priv;
++	struct smsc95xx_priv *pdata = usbnet_priv(dev);
+ 	int ret;
+ 
+ 	pdata->pm_task = current;
+@@ -2038,7 +2029,7 @@ static struct sk_buff *smsc95xx_tx_fixup(struct usbnet *dev,
+ 
+ static int smsc95xx_manage_power(struct usbnet *dev, int on)
+ {
+-	struct smsc95xx_priv *pdata = dev->driver_priv;
++	struct smsc95xx_priv *pdata = usbnet_priv(dev);
+ 
+ 	dev->intf->needs_remote_wakeup = on;
+ 
 -- 
 2.53.0
 
