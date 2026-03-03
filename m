@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-263359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263360-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2JKUBc0lp2k3fAAAu9opvQ
-	(envelope-from <netdev+bounces-263359-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 19:17:49 +0100
+	id uA0EIrEmp2k3fAAAu9opvQ
+	(envelope-from <netdev+bounces-263360-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 19:21:37 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 178341F5248
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 19:17:48 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00BF61F537B
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 19:21:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C569D302B644
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 18:16:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8773530D67E0
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 18:16:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A75023D5649;
-	Tue,  3 Mar 2026 18:16:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22CF13E556A;
+	Tue,  3 Mar 2026 18:16:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YdHeLzqt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p+pdF+Ex"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84001347535;
-	Tue,  3 Mar 2026 18:16:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2F48358371;
+	Tue,  3 Mar 2026 18:16:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772561760; cv=none; b=RpGuv4Hv5oXRom0KX0dW6pDKU2rDazXIuYTRDc1Mfr7R/QfeWhLX7pxDbKR1XRHS/OXpXgOSSGbo3yvuUbblsQt6RurUE6c/kEUvqgpuEggtdbjCBmhTOvYO9H/ETXaGGujoq1Qs+96s9lLAkm52cOrVd3mUMtOWiRPWQMleAMM=
+	t=1772561764; cv=none; b=McA41AJpHsMKQvKkYZBw+8r3VzAQgOJRSb7i47ecaMNEVhlPnnLivYFRurzUfOS/qmUKy/CoZABu+NtNHTAbmGj1WnFo/UzZCG+cwr1ERSQoIpCP2sCegr4VDHMgcgoIhd0gaQ8UXmtVvKMjIg9izAruiOvjBLydn6o6bUTvvvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772561760; c=relaxed/simple;
-	bh=uUhxZ0J1Eu9/Ziu2SM/gMWoasgQd3w0iAby7RKC+bP0=;
+	s=arc-20240116; t=1772561764; c=relaxed/simple;
+	bh=vaae6bB7vBAa0A22NTCzZ3Js4GLopWv7MnqhKAcM0n8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qIKva7c9az4qeWSdLRrk7ULnBgnh1v1xp4sw3T+gYtbGM+7HD3MGqnud9Bnq5bhkk23J/QV9i37A6GNxZb/3bZFFjU8bzW4sStYJpbJMzOgYWBjbPCdEgWgJ9R4FZtidVII8dTVn6DHFwkwsBxolME1U7efwzPA7woZVzVYRTZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YdHeLzqt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71047C116C6;
-	Tue,  3 Mar 2026 18:15:57 +0000 (UTC)
+	 MIME-Version:Content-Type; b=pYzjBUH0PAE1cZWNGHo6t7DbJk+IepIlDMY+PE9n/0oBYNNZnHO1VizFaeNkugMHi5LdZ3uafGRnAYCWhCcwJ27n8YzXwJ33qUKZ6y/BFT4HD3Sfyn/YUl5/yJca8ik7GSctgz1/u9YFIN5O0OrR0s+sp/x+11Sx+t4SvvMmsro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p+pdF+Ex; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C08ECC116C6;
+	Tue,  3 Mar 2026 18:16:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772561760;
-	bh=uUhxZ0J1Eu9/Ziu2SM/gMWoasgQd3w0iAby7RKC+bP0=;
+	s=k20201202; t=1772561763;
+	bh=vaae6bB7vBAa0A22NTCzZ3Js4GLopWv7MnqhKAcM0n8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YdHeLzqt2qcHm0AGZKHwfMzbYrzJfoO60OJwBhZHQX7GH5dlcYiTjczruaE6GRDTf
-	 JMKJsZzuD24lBq51n66vv5E2hT9DI1Eu2Rp63+TZkckCYPx26ZX80p/JtngZWOusPm
-	 eEtZF3E/4TFlJ1+i5p+RfjmmQsj+xQT1mzvVBSuUlQqgEwexFiqWEICJDDTRIoazvX
-	 FLiYHVfaQvgEdyihPQN5O7/0WxZF9C8bWN+CAxLfuAtdZQdqE5EH4VAhutXykr8i6n
-	 5/j/TfDA659CUyDUpeilUfiPtub61izZGEO0QbDm89qBpLJ1JMFcM/pz+W/V5rj/D3
-	 s23h3kT/bErdQ==
+	b=p+pdF+ExNF5nXkWcz/tZ1LYXHOxDfwWNf4JWdnwtlBPwAK3n9IVHCQyNnLKK+iTRm
+	 KYWBGjusJD62F/FFK8bHK+MbSLTkD6pg9ZJq2wdEJAKqqKy5yEwhOP4yKj2Cq50H/1
+	 WFBNL72IgGoaUKAJa7xJLblpvuUY4VtzBoGUvhMs4Furk6+J5QkU/NGPvX2wHzt275
+	 wtw5ADeTrGPKR8l0MuzfTJCzumbpV4i9AcYc86njhlwzs0QPy+MN8mOEF6RKRmjZ3I
+	 LER53gh7nSl4hxiYKHgo+ar3RzyRmD5elWFDho6wSS3I5gnWF4FKQEh3sfJM9fYCem
+	 aDJ8cx2ff2t1w==
 From: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>
 To: Michael Chan <michael.chan@broadcom.com>,
 	Pavan Chebbi <pavan.chebbi@broadcom.com>,
@@ -58,9 +58,9 @@ To: Michael Chan <michael.chan@broadcom.com>,
 	linux-kselftest@vger.kernel.org
 Cc: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
 	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net-next 4/5] selftests: netdevsim: Add RSS indirection table resize test
-Date: Tue,  3 Mar 2026 19:15:32 +0100
-Message-ID: <20260303181535.2671734-5-bjorn@kernel.org>
+Subject: [PATCH net-next 5/5] selftests: rss_drv: Add RSS indirection table resize tests
+Date: Tue,  3 Mar 2026 19:15:33 +0100
+Message-ID: <20260303181535.2671734-6-bjorn@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260303181535.2671734-1-bjorn@kernel.org>
 References: <20260303181535.2671734-1-bjorn@kernel.org>
@@ -72,7 +72,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 178341F5248
+X-Rspamd-Queue-Id: 00BF61F537B
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.96 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -81,12 +81,12 @@ X-Spamd-Result: default: False [0.96 / 15.00];
 	R_MIXED_CHARSET(0.63)[subject];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263359-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-263360-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -100,168 +100,157 @@ X-Spamd-Result: default: False [0.96 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,ethtool-rss.sh:url,ethtool-common.sh:url]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[rss_drv.py:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,lib.py:url]
 X-Rspamd-Action: no action
 
-Test fold/unfold of RSS indirection tables on channel changes
-using netdevsim:
+Add resize tests to rss_drv.py. Devices without dynamic table
+sizing are skipped via _require_dynamic_indir_size().
 
- - default table regenerates on channel change
- - periodic table folds on shrink and unfolds on grow
- - non-periodic table blocks channel reduction
- - non-default RSS context resizes on channel change
- - non-periodic non-default context blocks fold
- - table and channel count unchanged after failed reduction
+resize_periodic: set a periodic table (equal 2), shrink
+channels to fold, grow back to unfold. Check the pattern is
+preserved. Has main and non-default context variants.
+
+resize_nonperiodic_reject: set a non-periodic table (equal N),
+verify that channel reduction is rejected.
+
+Pass queue_count=8 to NetDrvEnv so netdevsim is created with
+enough queues for the resize tests.
 
 Signed-off-by: Björn Töpel <bjorn@kernel.org>
 ---
- .../selftests/drivers/net/netdevsim/Makefile  |   1 +
- .../drivers/net/netdevsim/ethtool-rss.sh      | 123 ++++++++++++++++++
- 2 files changed, 124 insertions(+)
- create mode 100755 tools/testing/selftests/drivers/net/netdevsim/ethtool-rss.sh
+ .../selftests/drivers/net/hw/rss_drv.py       | 101 +++++++++++++++++-
+ 1 file changed, 96 insertions(+), 5 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/Makefile b/tools/testing/selftests/drivers/net/netdevsim/Makefile
-index 1a228c5430f5..d764d08dff1a 100644
---- a/tools/testing/selftests/drivers/net/netdevsim/Makefile
-+++ b/tools/testing/selftests/drivers/net/netdevsim/Makefile
-@@ -8,6 +8,7 @@ TEST_PROGS := \
- 	ethtool-features.sh \
- 	ethtool-fec.sh \
- 	ethtool-pause.sh \
-+	ethtool-rss.sh \
- 	fib.sh \
- 	fib_notifications.sh \
- 	hw_stats_l3.sh \
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/ethtool-rss.sh b/tools/testing/selftests/drivers/net/netdevsim/ethtool-rss.sh
-new file mode 100755
-index 000000000000..1c1876f888ba
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/netdevsim/ethtool-rss.sh
-@@ -0,0 +1,123 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0-only
-+#
-+# Test RSS indirection table resize on channel count changes.
-+# Exercises ethtool_rxfh_indir_resize() and
-+# ethtool_rxfh_contexts_resize_all() via netdevsim.
+diff --git a/tools/testing/selftests/drivers/net/hw/rss_drv.py b/tools/testing/selftests/drivers/net/hw/rss_drv.py
+index 2d1a33189076..8725500f2955 100755
+--- a/tools/testing/selftests/drivers/net/hw/rss_drv.py
++++ b/tools/testing/selftests/drivers/net/hw/rss_drv.py
+@@ -5,9 +5,9 @@
+ Driver-related behavior tests for RSS.
+ """
+ 
+-from lib.py import ksft_run, ksft_exit, ksft_ge
+-from lib.py import ksft_variants, KsftNamedVariant, KsftSkipEx
+-from lib.py import defer, ethtool
++from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_ge
++from lib.py import ksft_variants, KsftNamedVariant, KsftSkipEx, KsftFailEx
++from lib.py import defer, ethtool, CmdExitFailure
+ from lib.py import EthtoolFamily, NlError
+ from lib.py import NetDrvEnv
+ 
+@@ -45,6 +45,18 @@ def _maybe_create_context(cfg, create_context):
+     return ctx_id
+ 
+ 
++def _require_dynamic_indir_size(cfg, ch_max):
++    """Skip if the device does not dynamically size its indirection table."""
++    ethtool(f"-X {cfg.ifname} default")
++    ethtool(f"-L {cfg.ifname} combined 2")
++    small = len(_get_rss(cfg)['rss-indirection-table'])
++    ethtool(f"-L {cfg.ifname} combined {ch_max}")
++    large = len(_get_rss(cfg)['rss-indirection-table'])
 +
-+source ethtool-common.sh
++    if small == large:
++        raise KsftSkipEx("Device does not dynamically size indirection table")
 +
-+# Create device with 8 queues
-+NSIM_NETDEV=$(make_netdev 1 8)
 +
-+set -o pipefail
+ @ksft_variants([
+     KsftNamedVariant("main", False),
+     KsftNamedVariant("ctx", True),
+@@ -76,11 +88,90 @@ def indir_size_4x(cfg, create_context):
+         _test_rss_indir_size(cfg, test_max, context=ctx_id)
+ 
+ 
++@ksft_variants([
++    KsftNamedVariant("main", False),
++    KsftNamedVariant("ctx", True),
++])
++def resize_periodic(cfg, create_context):
++    """Test that a periodic indirection table survives channel changes.
 +
-+# --- Test 1: Default table regenerates on channel change ---
-+s=$(ethtool --json -x $NSIM_NETDEV | jq '.[0]["rss-indirection-table"] | length')
-+check $? "$s" "128" # roundup_pow_of_two(8) * 16 = 128
++    Set a periodic table (equal 2), reduce channels to trigger a
++    fold, then increase to trigger an unfold. Verify the table pattern
++    is preserved and the size tracks the channel count.
++    """
++    channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
++    ch_max = channels.get('combined-max', 0)
++    qcnt = channels['combined-count']
 +
-+ethtool -L $NSIM_NETDEV combined 2
-+s=$(ethtool --json -x $NSIM_NETDEV | jq '.[0]["rss-indirection-table"] | length')
-+check $? "$s" "32" # roundup_pow_of_two(2) * 16 = 32
++    if ch_max < 4:
++        raise KsftSkipEx(f"Not enough queues for the test: max={ch_max}")
 +
-+ethtool -L $NSIM_NETDEV combined 8
++    defer(ethtool, f"-L {cfg.ifname} combined {qcnt}")
++    ethtool(f"-L {cfg.ifname} combined {ch_max}")
 +
-+# --- Test 2: Periodic context 0 table folds on channel reduction ---
-+ethtool -X $NSIM_NETDEV equal 2
-+s=$(ethtool --json -x $NSIM_NETDEV | jq '[.[0]["rss-indirection-table"][]] | max')
-+check $? "$s" "1"
++    _require_dynamic_indir_size(cfg, ch_max)
 +
-+ethtool -L $NSIM_NETDEV combined 2
-+s=$(ethtool --json -x $NSIM_NETDEV | jq '.[0]["rss-indirection-table"] | length')
-+check $? "$s" "32"
-+s=$(ethtool --json -x $NSIM_NETDEV | jq '[.[0]["rss-indirection-table"][]] | max')
-+check $? "$s" "1"
++    ctx_id = _maybe_create_context(cfg, create_context)
++    ctx_ref = f"context {ctx_id}" if ctx_id else ""
 +
-+# Grow back — should unfold
-+ethtool -L $NSIM_NETDEV combined 8
-+s=$(ethtool --json -x $NSIM_NETDEV | jq '.[0]["rss-indirection-table"] | length')
-+check $? "$s" "128"
-+s=$(ethtool --json -x $NSIM_NETDEV | jq '[.[0]["rss-indirection-table"][]] | max')
-+check $? "$s" "1"
++    ethtool(f"-X {cfg.ifname} {ctx_ref} equal 2")
++    if not create_context:
++        defer(ethtool, f"-X {cfg.ifname} default")
 +
-+ethtool -X $NSIM_NETDEV default
++    orig_size = len(_get_rss(cfg, context=ctx_id)['rss-indirection-table'])
 +
-+# --- Test 3: Non-periodic context 0 table blocks fold ---
-+ethtool -X $NSIM_NETDEV equal 8
++    # Shrink — should fold
++    ethtool(f"-L {cfg.ifname} combined 2")
++    rss = _get_rss(cfg, context=ctx_id)
++    indir = rss['rss-indirection-table']
 +
-+ethtool -L $NSIM_NETDEV combined 2 2>/dev/null
-+if [ $? -ne 0 ]; then
-+    ((num_passes++))
-+else
-+    echo "Expected channel reduction to fail with non-periodic table"
-+    ((num_errors++))
-+fi
++    ksft_ge(orig_size, len(indir), "Table did not shrink")
++    ksft_eq(set(indir), {0, 1}, "Folded table has wrong queues")
 +
-+ethtool -X $NSIM_NETDEV default
++    # Grow back — should unfold
++    ethtool(f"-L {cfg.ifname} combined {ch_max}")
++    rss = _get_rss(cfg, context=ctx_id)
++    indir = rss['rss-indirection-table']
 +
-+# --- Test 4: Non-default context resizes on channel change ---
-+ctx_id=$(ethtool -X $NSIM_NETDEV context new equal 2 2>/dev/null | awk '{print $NF}')
-+if [ -z "$ctx_id" ]; then
-+    echo "SKIP: context creation failed"
-+else
-+    s=$(ethtool --json -x $NSIM_NETDEV context $ctx_id | jq '.[0]["rss-indirection-table"] | length')
-+    check $? "$s" "128"
++    ksft_eq(len(indir), orig_size, "Table size not restored")
++    ksft_eq(set(indir), {0, 1}, "Unfolded table has wrong queues")
 +
-+    ethtool -L $NSIM_NETDEV combined 2
-+    s=$(ethtool --json -x $NSIM_NETDEV context $ctx_id | jq '.[0]["rss-indirection-table"] | length')
-+    check $? "$s" "32"
-+    s=$(ethtool --json -x $NSIM_NETDEV context $ctx_id | jq '[.[0]["rss-indirection-table"][]] | max')
-+    check $? "$s" "1"
 +
-+    # Grow back
-+    ethtool -L $NSIM_NETDEV combined 8
-+    s=$(ethtool --json -x $NSIM_NETDEV context $ctx_id | jq '.[0]["rss-indirection-table"] | length')
-+    check $? "$s" "128"
-+    s=$(ethtool --json -x $NSIM_NETDEV context $ctx_id | jq '[.[0]["rss-indirection-table"][]] | max')
-+    check $? "$s" "1"
++def resize_nonperiodic_reject(cfg):
++    """Test that a non-periodic table blocks channel reduction.
 +
-+    ethtool -X $NSIM_NETDEV context $ctx_id delete
-+fi
++    Set equal weight across all queues so the table is not periodic
++    at any smaller size, then verify channel reduction is rejected.
++    """
++    channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
++    ch_max = channels.get('combined-max', 0)
++    qcnt = channels['combined-count']
 +
-+# --- Test 5: Non-periodic non-default context blocks fold ---
-+ctx_id=$(ethtool -X $NSIM_NETDEV context new equal 8 2>/dev/null | awk '{print $NF}')
-+if [ -z "$ctx_id" ]; then
-+    echo "SKIP: context creation failed"
-+else
-+    ethtool -L $NSIM_NETDEV combined 2 2>/dev/null
-+    if [ $? -ne 0 ]; then
-+        ((num_passes++))
-+    else
-+        echo "Expected channel reduction to fail with non-periodic context"
-+        ((num_errors++))
-+    fi
++    if ch_max < 4:
++        raise KsftSkipEx(f"Not enough queues for the test: max={ch_max}")
 +
-+    ethtool -X $NSIM_NETDEV context $ctx_id delete
-+fi
++    defer(ethtool, f"-L {cfg.ifname} combined {qcnt}")
++    ethtool(f"-L {cfg.ifname} combined {ch_max}")
 +
-+# --- Test 6: Table unchanged after failed channel reduction ---
-+ethtool -X $NSIM_NETDEV equal 8
-+s_before=$(ethtool --json -x $NSIM_NETDEV | jq '.[0]["rss-indirection-table"]')
++    _require_dynamic_indir_size(cfg, ch_max)
 +
-+ethtool -L $NSIM_NETDEV combined 2 2>/dev/null
-+s_after=$(ethtool --json -x $NSIM_NETDEV | jq '.[0]["rss-indirection-table"]')
-+check $? "$s_after" "$s_before"
++    ethtool(f"-X {cfg.ifname} equal {ch_max}")
++    defer(ethtool, f"-X {cfg.ifname} default")
 +
-+ethtool -X $NSIM_NETDEV default
++    try:
++        ethtool(f"-L {cfg.ifname} combined 2")
++    except CmdExitFailure:
++        pass
++    else:
++        raise KsftFailEx("Channel reduction should fail with non-periodic table")
 +
-+# --- Test 7: Channel count unchanged after failed reduction ---
-+ethtool -X $NSIM_NETDEV equal 8
-+ethtool -L $NSIM_NETDEV combined 2 2>/dev/null
-+s=$(ethtool --json -l $NSIM_NETDEV | jq '.[0]["combined-count"]')
-+check $? "$s" "8"
 +
-+ethtool -X $NSIM_NETDEV default
-+
-+# --- Results ---
-+if [ $num_errors -eq 0 ]; then
-+    echo "PASSED all $((num_passes)) checks"
-+    exit 0
-+else
-+    echo "FAILED $num_errors/$((num_errors+num_passes)) checks"
-+    exit 1
-+fi
+ def main() -> None:
+     """ Ksft boiler plate main """
+-    with NetDrvEnv(__file__) as cfg:
++    with NetDrvEnv(__file__, queue_count=8) as cfg:
+         cfg.ethnl = EthtoolFamily()
+-        ksft_run([indir_size_4x], args=(cfg, ))
++        ksft_run([indir_size_4x, resize_periodic,
++                  resize_nonperiodic_reject], args=(cfg, ))
+     ksft_exit()
+ 
+ 
 -- 
 2.53.0
 
