@@ -1,620 +1,334 @@
-Return-Path: <netdev+bounces-263165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263166-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sBU4Ah7Mpmk0TwAAu9opvQ
-	(envelope-from <netdev+bounces-263165-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 12:55:10 +0100
+	id kKQ+KPHRpmnHWgAAu9opvQ
+	(envelope-from <netdev+bounces-263166-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 13:20:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83E881EEB5D
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 12:55:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47C7F1EF456
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 13:20:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2581731C2F2B
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 11:44:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EF8153400A69
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 11:45:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BCC8423158;
-	Tue,  3 Mar 2026 11:40:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C3E43E4BF;
+	Tue,  3 Mar 2026 11:42:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JsDy82/J";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="klgmATDF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y2OMrGoA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4639F3BD62F
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 11:40:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D124439012;
+	Tue,  3 Mar 2026 11:42:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772538019; cv=none; b=V4eU9YbomPay9Op6QKm+2uURMoHllZS2fjDTpopfkN8OUN5VD2CnJwRJkwRE/vVwzPE7JQvBULN/tuLskSsHLLgsIMyNMAa+74mcZPpCyxu5nELiVAs0YlWwmsMhtXd9M+h7b/Xzq6Fxp1MlBRmbUDYEAjWs61bIkWFwNdG+Xy0=
+	t=1772538129; cv=none; b=m6h1FCHOvi4k0QrPN4WyrQCMTkC4ZKU6GrsEgzDg5GrLHRtB9BUmajD6V7k78cutGMNjca95nPoLvKmfSJ1Vwi1OLOruC0ligQJ5qO836BkzrxxMXgmpqT4qBjH7mkwjAhtlYhKkgrXN97KGfQq6p5CZ+vvTMhSLaHlRMgW07Ag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772538019; c=relaxed/simple;
-	bh=FB1H1bYPfRo0l1AZR+g9a4rGWIneluw8K3NlXPs8LFY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VbCbyqZCcd0iWo7koSq7NO/GH4UahbLrUKjzc149UvxeYBkvFFujkvsuOZLCrtwOZDt5hphJ93Q7tWK0l7T79c4u+WqU3QIrnmy4dI9TWeuYuiH2st+G59/17CZNSo2b+NmWjb8/c+H6tqik2OdLDDoXxJbQ9JP9qEk8XHJJmUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JsDy82/J; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=klgmATDF; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772538016;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UXN4uN03dt3iGK+UzX0iN4D4fHvi9Hm4rvLipzFnq+Q=;
-	b=JsDy82/Jp3Lnf1c1c5o2nKO6ez2vzZxFruNMnAHWnHtmvcxs3lqVaPdPiNe+McdnXDijFZ
-	6yxrvFvnIZ8I18k2nSBEQiL5IOnneKlk46k0m03LrRdJEa7poXjSqFWVZje1wWPH+ZD3+j
-	bgpWWffbylboDCInSgTJHiLo6ZIC0SY=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-684-sYIo4w35N5Kv5TwfTxHeNA-1; Tue, 03 Mar 2026 06:40:15 -0500
-X-MC-Unique: sYIo4w35N5Kv5TwfTxHeNA-1
-X-Mimecast-MFC-AGG-ID: sYIo4w35N5Kv5TwfTxHeNA_1772538014
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-483101623e9so49813305e9.3
-        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 03:40:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1772538014; x=1773142814; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UXN4uN03dt3iGK+UzX0iN4D4fHvi9Hm4rvLipzFnq+Q=;
-        b=klgmATDFDppR0i7poUvsn9bqfdbvMdBHAaNGHcDSHW6qP452tYEaPUUu7xo850nT65
-         Lf95k81ITI/vgchDKrsC7+IAbAN+1MgSGVeZ3iqF4XN4K3Ucxsjir6XpXZcc1S2YWC2T
-         5s3puyoLHV3W9P4t7Y2filaIfJqSyvtZRn3jgE48tDFjuKuzNbTtVxtnSVg69yNtOj8B
-         n5ru2ZGHW3ukfps0zBMFC3vGbQ+L14XWkGkD4o1xHCmQitYTPm2ytjIF5rdTYVxagVGM
-         NRiV5+XNpPIaaEY0cj9KL2cDdCooENjISWrxOjRCyOheh1/8ZHYzfmnHWx9ZdpBwVlzH
-         ThTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772538014; x=1773142814;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UXN4uN03dt3iGK+UzX0iN4D4fHvi9Hm4rvLipzFnq+Q=;
-        b=O/KmZKH2IgxSSaq2l8qyTpzUnx/grrdGnZSfMCQJPoQ1ZxGJ66PkSRYnoAKC5LL9FZ
-         cM84aXoqAem6Nlb0JEFQj8ypkdBsCxLeAaCFbbJB+Hx73Xujrb0D0suoJ4iYvHLB8mkx
-         vz1/kW/5ZpSSj5+BSiwPGlGnnBVpl+vUR6jaobNTmNEjfkrvEiOGFMOM8fK2d3XxBqIp
-         vEDVjXVtHghJH4Ezgidk0d4pJPu1XYZNPmyNi5rRBsYGTwFpQ6K3S6699WhetwATZrmy
-         RgUVvdyEhpYOd/KUMor+n5FBYp1D4F7NdRJXh02Zdj6RmZ6/pqDxD+J9oxEsCTpxRkV3
-         hGAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWx6yGtYXxyJGlyIsu3YMpstVBdW+9J6CazcgQTsQZ260XICrrvtw4oCrGxoqYtqoKSyYbKY2Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZQlZY3IL0K7p2yYWm5JR7mCrIsdlqMHKDKdjUbcd/xZqy9M8I
-	n7tIQA+dg1jG6hwn0uxYaoAwmZC+EQb71MtBP56oBZqXgBDqXuymKefseHrr+QGLFV+n19ykHUS
-	EebCh1rVAwnStU7VDnu4wvZ0A+Q9oYGEaePKIBEg4cvs14iKU2/kXD+eRfA==
-X-Gm-Gg: ATEYQzwzidafCgRKSQiz1o2MsSEtxbgZvp6SkIIWQMCJr4zc56fhEoY9uUXb9B3TNcl
-	XZlCGG7sv3lZMOv1l8p7t9nFaacq4sMkbIugbrQDQWKKEKTjmxFWW8ExgNpm1eYb9wr61YgQPvt
-	DhA8yIq9NgGUrtInK1AbZZ2JNtU0e08w5X+Nw6/4g7VyI8b2zZqMZZzi4kqYuxQGnxqFf7M35KU
-	C5Zwg/AulIxfQk2EEQIetnvKm6WNA629ycdNnF/L2VQAsV7U5wCzOtoqEu8ZGlrYKyWF5zBG5zS
-	t3TbH0Yukpu9etibBSwDxcQ/zoegPgta0lHToPSFDsN5M1eA7xGzTOP6lQI6WU3O1GHBsqa7kMb
-	5+J4lHPgiMVBbIS7o0+jh5GmO
-X-Received: by 2002:a05:600c:a4a:b0:477:5b0a:e616 with SMTP id 5b1f17b1804b1-483c9bb7c31mr276327805e9.5.1772538013783;
-        Tue, 03 Mar 2026 03:40:13 -0800 (PST)
-X-Received: by 2002:a05:600c:a4a:b0:477:5b0a:e616 with SMTP id 5b1f17b1804b1-483c9bb7c31mr276327355e9.5.1772538013272;
-        Tue, 03 Mar 2026 03:40:13 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.73])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bd75df9fsm561235755e9.13.2026.03.03.03.40.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Mar 2026 03:40:12 -0800 (PST)
-Message-ID: <ef76d148-79d1-4c14-af92-448803e83ac2@redhat.com>
-Date: Tue, 3 Mar 2026 12:40:11 +0100
+	s=arc-20240116; t=1772538129; c=relaxed/simple;
+	bh=3g8wya1NSO/cAGYrlJWOY/tBvbnElrj2OT6s+HdRca0=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=m0HT9C6VVlc4/luZ/vomqjlDSD6wImDejYx/8pVt83Aq9CXD5+kiUASxoH9+tfOnbDgsq+BkZ83L4eiQ5tVAWd8odq0e2o6Dw9vCBWWBwUQPmhRycrSPLH8vCD843xN+gP2nL2l3irHKAclZfd/OIKQlushVZH+2nnyXQ/RNz/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y2OMrGoA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F732C2BC9E;
+	Tue,  3 Mar 2026 11:41:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772538129;
+	bh=3g8wya1NSO/cAGYrlJWOY/tBvbnElrj2OT6s+HdRca0=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=Y2OMrGoAYXyhBIZLmCU9xP/ANC4LE7odOyfggFTwlpHW2a02GVf2qaYiZflTjWtV/
+	 I8znxkvCz6IWh5nXF/rgw9YfAYTVyjcarRulecbyRH3N+zneK+ffF1UH1yXEzl51vf
+	 XZ54zBF22cl5uktNYsiwxWPxbzYgY1E+U5QiaZm1WdUHLfWOA5aZgRIOMftpOdLMN1
+	 KaoLsvRpZYfZ1yUzLe56J4BgyyDjhmF4Q14GlC8OLKY09GND7rasmTWMAOCmwRWXRC
+	 Yd8gu0Chr47o9W4VqzN/YTU2a1n9gkGS31e6Od8P13UwPQ6Qrv7W6P/UjkCyeO3XSq
+	 Rpx9o8nQ4vf5w==
+Message-ID: <bcc1509aeef23909ac91707d9663b477e5bbc1f5.camel@kernel.org>
+Subject: Re: [PATCH v2 007/110] ext4: use PRIino format for i_ino
+From: Jeff Layton <jlayton@kernel.org>
+To: Jan Kara <jack@suse.cz>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner	
+ <brauner@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, Masami
+ Hiramatsu	 <mhiramat@kernel.org>, Mathieu Desnoyers
+ <mathieu.desnoyers@efficios.com>,  Dan Williams <dan.j.williams@intel.com>,
+ Matthew Wilcox <willy@infradead.org>, Eric Biggers	 <ebiggers@kernel.org>,
+ "Theodore Y. Ts'o" <tytso@mit.edu>, Muchun Song	 <muchun.song@linux.dev>,
+ Oscar Salvador <osalvador@suse.de>, David Hildenbrand	 <david@kernel.org>,
+ David Howells <dhowells@redhat.com>, Paulo Alcantara	 <pc@manguebit.org>,
+ Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara	 <jack@suse.com>,
+ Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,  Trond
+ Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, Chuck
+ Lever <chuck.lever@oracle.com>,  NeilBrown <neil@brown.name>, Olga
+ Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>,  Tom
+ Talpey <tom@talpey.com>, Steve French <sfrench@samba.org>, Ronnie Sahlberg
+ <ronniesahlberg@gmail.com>,  Shyam Prasad N <sprasad@microsoft.com>,
+ Bharath SM <bharathsm@microsoft.com>, Alexander Aring	
+ <alex.aring@gmail.com>, Ryusuke Konishi <konishi.ryusuke@gmail.com>, 
+ Viacheslav Dubeyko	 <slava@dubeyko.com>, Eric Van Hensbergen
+ <ericvh@kernel.org>, Latchesar Ionkov	 <lucho@ionkov.net>, Dominique
+ Martinet <asmadeus@codewreck.org>, Christian Schoenebeck
+ <linux_oss@crudebyte.com>, David Sterba <dsterba@suse.com>, Marc Dionne	
+ <marc.dionne@auristor.com>, Ian Kent <raven@themaw.net>, Luis de
+ Bethencourt	 <luisbg@kernel.org>, Salah Triki <salah.triki@gmail.com>,
+ "Tigran A. Aivazian"	 <aivazian.tigran@gmail.com>, Ilya Dryomov
+ <idryomov@gmail.com>, Alex Markuze	 <amarkuze@redhat.com>, Jan Harkes
+ <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,  Nicolas Pitre <nico@fluxnic.net>,
+ Tyler Hicks <code@tyhicks.com>, Amir Goldstein <amir73il@gmail.com>, 
+ Christoph Hellwig	 <hch@infradead.org>, John Paul Adrian Glaubitz
+ <glaubitz@physik.fu-berlin.de>,  Yangtao Li <frank.li@vivo.com>, Mikulas
+ Patocka <mikulas@artax.karlin.mff.cuni.cz>, David Woodhouse	
+ <dwmw2@infradead.org>, Richard Weinberger <richard@nod.at>, Dave Kleikamp	
+ <shaggy@kernel.org>, Konstantin Komarov	
+ <almaz.alexandrovich@paragon-software.com>, Mark Fasheh <mark@fasheh.com>, 
+ Joel Becker <jlbec@evilplan.org>, Joseph Qi <joseph.qi@linux.alibaba.com>,
+ Mike Marshall	 <hubcap@omnibond.com>, Martin Brandenburg
+ <martin@omnibond.com>, Miklos Szeredi	 <miklos@szeredi.hu>, Anders Larsen
+ <al@alarsen.net>, Zhihao Cheng	 <chengzhihao1@huawei.com>, Damien Le Moal
+ <dlemoal@kernel.org>, Naohiro Aota	 <naohiro.aota@wdc.com>, Johannes
+ Thumshirn <jth@kernel.org>, John Johansen	 <john.johansen@canonical.com>,
+ Paul Moore <paul@paul-moore.com>, James Morris	 <jmorris@namei.org>, "Serge
+ E. Hallyn" <serge@hallyn.com>, Mimi Zohar	 <zohar@linux.ibm.com>, Roberto
+ Sassu <roberto.sassu@huawei.com>, Dmitry Kasatkin
+ <dmitry.kasatkin@gmail.com>, Eric Snowberg <eric.snowberg@oracle.com>, Fan
+ Wu	 <wufan@kernel.org>, Stephen Smalley <stephen.smalley.work@gmail.com>,
+ Ondrej Mosnacek <omosnace@redhat.com>, Casey Schaufler
+ <casey@schaufler-ca.com>, Alex Deucher	 <alexander.deucher@amd.com>,
+ Christian =?ISO-8859-1?Q?K=F6nig?=	 <christian.koenig@amd.com>, David
+ Airlie <airlied@gmail.com>, Simona Vetter	 <simona@ffwll.ch>, Sumit Semwal
+ <sumit.semwal@linaro.org>, Eric Dumazet	 <edumazet@google.com>, Kuniyuki
+ Iwashima <kuniyu@google.com>, Paolo Abeni	 <pabeni@redhat.com>, Willem de
+ Bruijn <willemb@google.com>, "David S. Miller"	 <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman	 <horms@kernel.org>, Oleg
+ Nesterov <oleg@redhat.com>, Peter Zijlstra	 <peterz@infradead.org>, Ingo
+ Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Mark Rutland	 <mark.rutland@arm.com>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,  Jiri Olsa
+ <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, Adrian Hunter
+ <adrian.hunter@intel.com>,  James Clark <james.clark@linaro.org>, "Darrick
+ J. Wong" <djwong@kernel.org>, Martin Schiller <ms@dev.tdt.de>,  Eric Paris
+ <eparis@redhat.com>, Joerg Reuter <jreuter@yaina.de>, Marcel Holtmann
+ <marcel@holtmann.org>,  Johan Hedberg <johan.hedberg@gmail.com>, Luiz
+ Augusto von Dentz <luiz.dentz@gmail.com>, Oliver Hartkopp	
+ <socketcan@hartkopp.net>, Marc Kleine-Budde <mkl@pengutronix.de>, David
+ Ahern	 <dsahern@kernel.org>, Neal Cardwell <ncardwell@google.com>, Steffen
+ Klassert	 <steffen.klassert@secunet.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>,  Remi Denis-Courmont	 <courmisch@gmail.com>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,  Xin Long
+ <lucien.xin@gmail.com>, Magnus Karlsson <magnus.karlsson@intel.com>, Maciej
+ Fijalkowski	 <maciej.fijalkowski@intel.com>, Stanislav Fomichev
+ <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Jesper Dangaard Brouer	 <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, 	linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org, 	linux-trace-kernel@vger.kernel.org,
+ nvdimm@lists.linux.dev, 	fsverity@lists.linux.dev, linux-mm@kvack.org,
+ netfs@lists.linux.dev, 	linux-ext4@vger.kernel.org,
+ linux-f2fs-devel@lists.sourceforge.net, 	linux-nfs@vger.kernel.org,
+ linux-cifs@vger.kernel.org, 	samba-technical@lists.samba.org,
+ linux-nilfs@vger.kernel.org, 	v9fs@lists.linux.dev,
+ linux-afs@lists.infradead.org, autofs@vger.kernel.org, 
+	ceph-devel@vger.kernel.org, codalist@coda.cs.cmu.edu,
+ ecryptfs@vger.kernel.org, 	linux-mtd@lists.infradead.org,
+ jfs-discussion@lists.sourceforge.net, 	ntfs3@lists.linux.dev,
+ ocfs2-devel@lists.linux.dev, devel@lists.orangefs.org, 
+	linux-unionfs@vger.kernel.org, apparmor@lists.ubuntu.com, 
+	linux-security-module@vger.kernel.org, linux-integrity@vger.kernel.org, 
+	selinux@vger.kernel.org, amd-gfx@lists.freedesktop.org, 
+	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org, 
+	linaro-mm-sig@lists.linaro.org, netdev@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, linux-fscrypt@vger.kernel.org, 
+	linux-xfs@vger.kernel.org, linux-hams@vger.kernel.org,
+ linux-x25@vger.kernel.org, 	audit@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, 	linux-can@vger.kernel.org,
+ linux-sctp@vger.kernel.org, bpf@vger.kernel.org
+Date: Tue, 03 Mar 2026 06:41:52 -0500
+In-Reply-To: <eb56qw5rblcnlqupj5lftynq2vts2idha54xpegrfgx45znfuz@mdjzriuawmfn>
+References: <20260302-iino-u64-v2-0-e5388800dae0@kernel.org>
+	 <20260302-iino-u64-v2-7-e5388800dae0@kernel.org>
+	 <eb56qw5rblcnlqupj5lftynq2vts2idha54xpegrfgx45znfuz@mdjzriuawmfn>
+Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
+ keydata=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
+ QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 2/2] net: dsa: yt921x: Use u64_stats_t for MIB
- stats
-To: David Yang <mmyangfl@gmail.com>, netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org
-References: <20260227135057.2730254-1-mmyangfl@gmail.com>
- <20260227135057.2730254-3-mmyangfl@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260227135057.2730254-3-mmyangfl@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 83E881EEB5D
+X-Rspamd-Queue-Id: 47C7F1EF456
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[zeniv.linux.org.uk,kernel.org,goodmis.org,efficios.com,intel.com,infradead.org,mit.edu,linux.dev,suse.de,redhat.com,manguebit.org,dilger.ca,suse.com,oracle.com,brown.name,talpey.com,samba.org,gmail.com,microsoft.com,dubeyko.com,ionkov.net,codewreck.org,crudebyte.com,auristor.com,themaw.net,cs.cmu.edu,fluxnic.net,tyhicks.com,physik.fu-berlin.de,vivo.com,artax.karlin.mff.cuni.cz,nod.at,paragon-software.com,fasheh.com,evilplan.org,linux.alibaba.com,omnibond.com,szeredi.hu,alarsen.net,huawei.com,wdc.com,canonical.com,paul-moore.com,namei.org,hallyn.com,linux.ibm.com,schaufler-ca.com,amd.com,ffwll.ch,linaro.org,google.com,davemloft.net,arm.com,linux.intel.com,dev.tdt.de,yaina.de,holtmann.org,hartkopp.net,pengutronix.de,secunet.com,gondor.apana.org.au,fomichev.me,iogearbox.net,vger.kernel.org,lists.linux.dev,kvack.org,lists.sourceforge.net,lists.samba.org,lists.infradead.org,coda.cs.cmu.edu,lists.orangefs.org,lists.ubuntu.com,lists.freedesktop.org,lists.linaro.org];
+	TAGGED_FROM(0.00)[bounces-263166-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-263165-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_GT_50(0.00)[171];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.987];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	FROM_NEQ_ENVFROM(0.00)[jlayton@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,suse.cz:email]
 X-Rspamd-Action: no action
 
+On Tue, 2026-03-03 at 12:20 +0100, Jan Kara wrote:
+> On Mon 02-03-26 15:23:51, Jeff Layton wrote:
+> > Convert ext4 i_ino format strings to use the PRIino format
+> > macro in preparation for the widening of i_ino via kino_t.
+> >=20
+> > In trace events, change __field(ino_t, ...) to __field(u64, ...)
+> > and update TP_printk format strings to %llu/%llx to match the
+> > widened field type.
+> >=20
+> > Update local variables and function parameters that hold i_ino
+> > values from unsigned long to kino_t.
+> >=20
+> > Signed-off-by: Jeff Layton <jlayton@kernel.org>
+>=20
+> Two small comments. Otherwise feel free to add:
+>=20
+> Reviewed-by: Jan Kara <jack@suse.cz>
+>=20
+> > diff --git a/fs/ext4/migrate.c b/fs/ext4/migrate.c
+> > index 96ab95167bd6e10ba86e61a60cb0be9fbafe157f..43103816b80ef4901858bcd=
+789acb0ffb2612317 100644
+> > --- a/fs/ext4/migrate.c
+> > +++ b/fs/ext4/migrate.c
+> > @@ -455,7 +455,7 @@ int ext4_ext_migrate(struct inode *inode)
+> >  	 * log, so disable fast commits for this transaction.
+> >  	 */
+> >  	ext4_fc_mark_ineligible(inode->i_sb, EXT4_FC_REASON_MIGRATE, handle);
+> > -	goal =3D (((inode->i_ino - 1) / EXT4_INODES_PER_GROUP(inode->i_sb)) *
+> > +	goal =3D (div_u64(inode->i_ino - 1, EXT4_INODES_PER_GROUP(inode->i_sb=
+)) *
+>=20
+> Ext4 doesn't support more than 2^32 inodes (due to on-disk format). Thus
+> i_ino is always guaranteed to be a number that fits in 32-bits. Thus I'd
+> here just type i_ino to (unsigned int) and be done with it like you've do=
+ne
+> it at other places.
+>=20
+> ...
+>=20
 
+Thanks. Fixed both places. I ended up casting the above to a u32 since
+this patchset has given me a stronger affinity for explicit-width
+types.
 
-On 2/27/26 2:50 PM, David Yang wrote:
-> 64-bit variables might not be atomic on 32-bit architectures, and could
-> lead to load/store tearing. Use u64_stats_t to ensure consistency.
-> 
-> Signed-off-by: David Yang <mmyangfl@gmail.com>
-> ---
->  drivers/net/dsa/yt921x.c | 197 +++++++++++++++++++++++----------------
->  drivers/net/dsa/yt921x.h | 114 ++++++++++++----------
->  2 files changed, 178 insertions(+), 133 deletions(-)
-> 
-> diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
-> index a968a3fb56f8..8129c278e224 100644
-> --- a/drivers/net/dsa/yt921x.c
-> +++ b/drivers/net/dsa/yt921x.c
-> @@ -20,6 +20,7 @@
->  #include <linux/of_mdio.h>
->  #include <linux/of_net.h>
->  #include <linux/sort.h>
-> +#include <linux/u64_stats_sync.h>
->  
->  #include <net/dsa.h>
->  #include <net/dscp.h>
-> @@ -670,22 +671,20 @@ yt921x_mbus_ext_init(struct yt921x_priv *priv, struct device_node *mnp)
->  static int yt921x_read_mib(struct yt921x_priv *priv, int port)
->  {
->  	struct yt921x_port *pp = &priv->ports[port];
-> +	struct yt921x_mib *mib_new = &pp->mib_new;
->  	struct device *dev = to_device(priv);
->  	struct yt921x_mib *mib = &pp->mib;
-> +	u64 rx_frames;
-> +	u64 tx_frames;
->  	int res = 0;
->  
-> -	/* Reading of yt921x_port::mib is not protected by a lock and it's vain
-> -	 * to keep its consistency, since we have to read registers one by one
-> -	 * and there is no way to make a snapshot of MIB stats.
-> -	 *
-> -	 * Writing (by this function only) is and should be protected by
-> -	 * reg_lock.
-> +	/* u64_stats_read/set is redundant for mib_new, but I don't want to
-> +	 * declare a plain u64 yt921x_mib variant.
->  	 */
->  
->  	for (size_t i = 0; i < ARRAY_SIZE(yt921x_mib_descs); i++) {
->  		const struct yt921x_mib_desc *desc = &yt921x_mib_descs[i];
->  		u32 reg = YT921X_MIBn_DATA0(port) + desc->offset;
-> -		u64 *valp = &((u64 *)mib)[i];
->  		u32 val0;
->  		u64 val;
->  
-> @@ -694,7 +693,7 @@ static int yt921x_read_mib(struct yt921x_priv *priv, int port)
->  			break;
->  
->  		if (desc->size <= 1) {
-> -			u64 old_val = *valp;
-> +			u64 old_val = u64_stats_read(&mib->stats[i]);
->  
->  			val = (old_val & ~(u64)U32_MAX) | val0;
->  			if (val < old_val)
-> @@ -708,7 +707,7 @@ static int yt921x_read_mib(struct yt921x_priv *priv, int port)
->  			val = ((u64)val1 << 32) | val0;
->  		}
->  
-> -		WRITE_ONCE(*valp, val);
-> +		u64_stats_set(&mib_new->stats[i], val);
->  	}
->  
->  	if (res) {
-> @@ -717,14 +716,29 @@ static int yt921x_read_mib(struct yt921x_priv *priv, int port)
->  		return res;
->  	}
->  
-> -	pp->rx_frames = mib->rx_64byte + mib->rx_65_127byte +
-> -			mib->rx_128_255byte + mib->rx_256_511byte +
-> -			mib->rx_512_1023byte + mib->rx_1024_1518byte +
-> -			mib->rx_jumbo;
-> -	pp->tx_frames = mib->tx_64byte + mib->tx_65_127byte +
-> -			mib->tx_128_255byte + mib->tx_256_511byte +
-> -			mib->tx_512_1023byte + mib->tx_1024_1518byte +
-> -			mib->tx_jumbo;
-> +	rx_frames = u64_stats_read(&mib_new->rx_64byte) +
-> +		    u64_stats_read(&mib_new->rx_65_127byte) +
-> +		    u64_stats_read(&mib_new->rx_128_255byte) +
-> +		    u64_stats_read(&mib_new->rx_256_511byte) +
-> +		    u64_stats_read(&mib_new->rx_512_1023byte) +
-> +		    u64_stats_read(&mib_new->rx_1024_1518byte) +
-> +		    u64_stats_read(&mib_new->rx_jumbo);
-> +	tx_frames = u64_stats_read(&mib_new->tx_64byte) +
-> +		    u64_stats_read(&mib_new->tx_65_127byte) +
-> +		    u64_stats_read(&mib_new->tx_128_255byte) +
-> +		    u64_stats_read(&mib_new->tx_256_511byte) +
-> +		    u64_stats_read(&mib_new->tx_512_1023byte) +
-> +		    u64_stats_read(&mib_new->tx_1024_1518byte) +
-> +		    u64_stats_read(&mib_new->tx_jumbo);
-> +
-> +	u64_stats_update_begin(&pp->syncp);
-> +	for (size_t i = 0; i < ARRAY_SIZE(yt921x_mib_descs); i++) {
-> +		u64_stats_set(&mib->stats[i],
-> +			      u64_stats_read(&mib_new->stats[i]));
-> +	}
-> +	u64_stats_set(&pp->rx_frames, rx_frames);
-> +	u64_stats_set(&pp->tx_frames, tx_frames);
-> +	u64_stats_update_end(&pp->syncp);
->  
->  	return 0;
->  }
-> @@ -772,8 +786,8 @@ yt921x_dsa_get_ethtool_stats(struct dsa_switch *ds, int port, uint64_t *data)
->  	size_t j;
->  
->  	mutex_lock(&priv->reg_lock);
-> +
->  	yt921x_read_mib(priv, port);
-> -	mutex_unlock(&priv->reg_lock);
->  
->  	j = 0;
->  	for (size_t i = 0; i < ARRAY_SIZE(yt921x_mib_descs); i++) {
-> @@ -782,9 +796,11 @@ yt921x_dsa_get_ethtool_stats(struct dsa_switch *ds, int port, uint64_t *data)
->  		if (!desc->name)
->  			continue;
->  
-> -		data[j] = ((u64 *)mib)[i];
-> +		data[j] = u64_stats_read(&((u64_stats_t *)mib)[i]);
->  		j++;
->  	}
-> +
-> +	mutex_unlock(&priv->reg_lock);
->  }
->  
->  static int yt921x_dsa_get_sset_count(struct dsa_switch *ds, int port, int sset)
-> @@ -813,31 +829,33 @@ yt921x_dsa_get_eth_mac_stats(struct dsa_switch *ds, int port,
->  	struct yt921x_mib *mib = &pp->mib;
->  
->  	mutex_lock(&priv->reg_lock);
-> +
->  	yt921x_read_mib(priv, port);
-> -	mutex_unlock(&priv->reg_lock);
->  
-> -	mac_stats->FramesTransmittedOK = pp->tx_frames;
-> -	mac_stats->SingleCollisionFrames = mib->tx_single_collisions;
-> -	mac_stats->MultipleCollisionFrames = mib->tx_multiple_collisions;
-> -	mac_stats->FramesReceivedOK = pp->rx_frames;
-> -	mac_stats->FrameCheckSequenceErrors = mib->rx_crc_errors;
-> -	mac_stats->AlignmentErrors = mib->rx_alignment_errors;
-> -	mac_stats->OctetsTransmittedOK = mib->tx_good_bytes;
-> -	mac_stats->FramesWithDeferredXmissions = mib->tx_deferred;
-> -	mac_stats->LateCollisions = mib->tx_late_collisions;
-> -	mac_stats->FramesAbortedDueToXSColls = mib->tx_aborted_errors;
-> +	mac_stats->FramesTransmittedOK = u64_stats_read(&pp->tx_frames);
-> +	mac_stats->SingleCollisionFrames = u64_stats_read(&mib->tx_single_collisions);
-> +	mac_stats->MultipleCollisionFrames = u64_stats_read(&mib->tx_multiple_collisions);
-> +	mac_stats->FramesReceivedOK = u64_stats_read(&pp->rx_frames);
-> +	mac_stats->FrameCheckSequenceErrors = u64_stats_read(&mib->rx_crc_errors);
-> +	mac_stats->AlignmentErrors = u64_stats_read(&mib->rx_alignment_errors);
-> +	mac_stats->OctetsTransmittedOK = u64_stats_read(&mib->tx_good_bytes);
-> +	mac_stats->FramesWithDeferredXmissions = u64_stats_read(&mib->tx_deferred);
-> +	mac_stats->LateCollisions = u64_stats_read(&mib->tx_late_collisions);
-> +	mac_stats->FramesAbortedDueToXSColls = u64_stats_read(&mib->tx_aborted_errors);
->  	/* mac_stats->FramesLostDueToIntMACXmitError */
->  	/* mac_stats->CarrierSenseErrors */
-> -	mac_stats->OctetsReceivedOK = mib->rx_good_bytes;
-> +	mac_stats->OctetsReceivedOK = u64_stats_read(&mib->rx_good_bytes);
->  	/* mac_stats->FramesLostDueToIntMACRcvError */
-> -	mac_stats->MulticastFramesXmittedOK = mib->tx_multicast;
-> -	mac_stats->BroadcastFramesXmittedOK = mib->tx_broadcast;
-> +	mac_stats->MulticastFramesXmittedOK = u64_stats_read(&mib->tx_multicast);
-> +	mac_stats->BroadcastFramesXmittedOK = u64_stats_read(&mib->tx_broadcast);
->  	/* mac_stats->FramesWithExcessiveDeferral */
-> -	mac_stats->MulticastFramesReceivedOK = mib->rx_multicast;
-> -	mac_stats->BroadcastFramesReceivedOK = mib->rx_broadcast;
-> +	mac_stats->MulticastFramesReceivedOK = u64_stats_read(&mib->rx_multicast);
-> +	mac_stats->BroadcastFramesReceivedOK = u64_stats_read(&mib->rx_broadcast);
->  	/* mac_stats->InRangeLengthErrors */
->  	/* mac_stats->OutOfRangeLengthField */
-> -	mac_stats->FrameTooLongErrors = mib->rx_oversize_errors;
-> +	mac_stats->FrameTooLongErrors = u64_stats_read(&mib->rx_oversize_errors);
-> +
-> +	mutex_unlock(&priv->reg_lock);
->  }
->  
->  static void
-> @@ -849,12 +867,14 @@ yt921x_dsa_get_eth_ctrl_stats(struct dsa_switch *ds, int port,
->  	struct yt921x_mib *mib = &pp->mib;
->  
->  	mutex_lock(&priv->reg_lock);
-> +
->  	yt921x_read_mib(priv, port);
-> -	mutex_unlock(&priv->reg_lock);
->  
-> -	ctrl_stats->MACControlFramesTransmitted = mib->tx_pause;
-> -	ctrl_stats->MACControlFramesReceived = mib->rx_pause;
-> +	ctrl_stats->MACControlFramesTransmitted = u64_stats_read(&mib->tx_pause);
-> +	ctrl_stats->MACControlFramesReceived = u64_stats_read(&mib->rx_pause);
->  	/* ctrl_stats->UnsupportedOpcodesReceived */
-> +
-> +	mutex_unlock(&priv->reg_lock);
->  }
->  
->  static const struct ethtool_rmon_hist_range yt921x_rmon_ranges[] = {
-> @@ -878,31 +898,33 @@ yt921x_dsa_get_rmon_stats(struct dsa_switch *ds, int port,
->  	struct yt921x_mib *mib = &pp->mib;
->  
->  	mutex_lock(&priv->reg_lock);
-> +
->  	yt921x_read_mib(priv, port);
-> -	mutex_unlock(&priv->reg_lock);
->  
->  	*ranges = yt921x_rmon_ranges;
->  
-> -	rmon_stats->undersize_pkts = mib->rx_undersize_errors;
-> -	rmon_stats->oversize_pkts = mib->rx_oversize_errors;
-> -	rmon_stats->fragments = mib->rx_alignment_errors;
-> +	rmon_stats->undersize_pkts = u64_stats_read(&mib->rx_undersize_errors);
-> +	rmon_stats->oversize_pkts = u64_stats_read(&mib->rx_oversize_errors);
-> +	rmon_stats->fragments = u64_stats_read(&mib->rx_alignment_errors);
->  	/* rmon_stats->jabbers */
->  
-> -	rmon_stats->hist[0] = mib->rx_64byte;
-> -	rmon_stats->hist[1] = mib->rx_65_127byte;
-> -	rmon_stats->hist[2] = mib->rx_128_255byte;
-> -	rmon_stats->hist[3] = mib->rx_256_511byte;
-> -	rmon_stats->hist[4] = mib->rx_512_1023byte;
-> -	rmon_stats->hist[5] = mib->rx_1024_1518byte;
-> -	rmon_stats->hist[6] = mib->rx_jumbo;
-> +	rmon_stats->hist[0] = u64_stats_read(&mib->rx_64byte);
-> +	rmon_stats->hist[1] = u64_stats_read(&mib->rx_65_127byte);
-> +	rmon_stats->hist[2] = u64_stats_read(&mib->rx_128_255byte);
-> +	rmon_stats->hist[3] = u64_stats_read(&mib->rx_256_511byte);
-> +	rmon_stats->hist[4] = u64_stats_read(&mib->rx_512_1023byte);
-> +	rmon_stats->hist[5] = u64_stats_read(&mib->rx_1024_1518byte);
-> +	rmon_stats->hist[6] = u64_stats_read(&mib->rx_jumbo);
-> +
-> +	rmon_stats->hist_tx[0] = u64_stats_read(&mib->tx_64byte);
-> +	rmon_stats->hist_tx[1] = u64_stats_read(&mib->tx_65_127byte);
-> +	rmon_stats->hist_tx[2] = u64_stats_read(&mib->tx_128_255byte);
-> +	rmon_stats->hist_tx[3] = u64_stats_read(&mib->tx_256_511byte);
-> +	rmon_stats->hist_tx[4] = u64_stats_read(&mib->tx_512_1023byte);
-> +	rmon_stats->hist_tx[5] = u64_stats_read(&mib->tx_1024_1518byte);
-> +	rmon_stats->hist_tx[6] = u64_stats_read(&mib->tx_jumbo);
->  
-> -	rmon_stats->hist_tx[0] = mib->tx_64byte;
-> -	rmon_stats->hist_tx[1] = mib->tx_65_127byte;
-> -	rmon_stats->hist_tx[2] = mib->tx_128_255byte;
-> -	rmon_stats->hist_tx[3] = mib->tx_256_511byte;
-> -	rmon_stats->hist_tx[4] = mib->tx_512_1023byte;
-> -	rmon_stats->hist_tx[5] = mib->tx_1024_1518byte;
-> -	rmon_stats->hist_tx[6] = mib->tx_jumbo;
-> +	mutex_unlock(&priv->reg_lock);
->  }
->  
->  static void
-> @@ -912,33 +934,41 @@ yt921x_dsa_get_stats64(struct dsa_switch *ds, int port,
->  	struct yt921x_priv *priv = to_yt921x_priv(ds);
->  	struct yt921x_port *pp = &priv->ports[port];
->  	struct yt921x_mib *mib = &pp->mib;
-> +	unsigned int start;
-> +
-> +	do {
-> +		start = u64_stats_fetch_begin(&pp->syncp);
-> +
-> +		stats->rx_length_errors = u64_stats_read(&mib->rx_undersize_errors) +
-> +					  u64_stats_read(&mib->rx_fragment_errors);
-> +		stats->rx_over_errors = u64_stats_read(&mib->rx_oversize_errors);
-> +		stats->rx_crc_errors = u64_stats_read(&mib->rx_crc_errors);
-> +		stats->rx_frame_errors = u64_stats_read(&mib->rx_alignment_errors);
-> +		/* stats->rx_fifo_errors */
-> +		/* stats->rx_missed_errors */
-> +
-> +		stats->tx_aborted_errors = u64_stats_read(&mib->tx_aborted_errors);
-> +		/* stats->tx_carrier_errors */
-> +		stats->tx_fifo_errors = u64_stats_read(&mib->tx_undersize_errors);
-> +		/* stats->tx_heartbeat_errors */
-> +		stats->tx_window_errors = u64_stats_read(&mib->tx_late_collisions);
-> +
-> +		stats->rx_packets = u64_stats_read(&pp->rx_frames);
-> +		stats->tx_packets = u64_stats_read(&pp->tx_frames);
-> +		stats->rx_bytes = u64_stats_read(&mib->rx_good_bytes) -
-> +				  ETH_FCS_LEN * stats->rx_packets;
-> +		stats->tx_bytes = u64_stats_read(&mib->tx_good_bytes) -
-> +				  ETH_FCS_LEN * stats->tx_packets;
-> +		stats->rx_dropped = u64_stats_read(&mib->rx_dropped);
-> +		/* stats->tx_dropped */
-> +		stats->multicast = u64_stats_read(&mib->rx_multicast);
-> +		stats->collisions = u64_stats_read(&mib->tx_collisions);
-> +	} while (u64_stats_fetch_retry(&pp->syncp, start));
->  
-> -	stats->rx_length_errors = mib->rx_undersize_errors +
-> -				  mib->rx_fragment_errors;
-> -	stats->rx_over_errors = mib->rx_oversize_errors;
-> -	stats->rx_crc_errors = mib->rx_crc_errors;
-> -	stats->rx_frame_errors = mib->rx_alignment_errors;
-> -	/* stats->rx_fifo_errors */
-> -	/* stats->rx_missed_errors */
-> -
-> -	stats->tx_aborted_errors = mib->tx_aborted_errors;
-> -	/* stats->tx_carrier_errors */
-> -	stats->tx_fifo_errors = mib->tx_undersize_errors;
-> -	/* stats->tx_heartbeat_errors */
-> -	stats->tx_window_errors = mib->tx_late_collisions;
-> -
-> -	stats->rx_packets = pp->rx_frames;
-> -	stats->tx_packets = pp->tx_frames;
-> -	stats->rx_bytes = mib->rx_good_bytes - ETH_FCS_LEN * stats->rx_packets;
-> -	stats->tx_bytes = mib->tx_good_bytes - ETH_FCS_LEN * stats->tx_packets;
->  	stats->rx_errors = stats->rx_length_errors + stats->rx_over_errors +
->  			   stats->rx_crc_errors + stats->rx_frame_errors;
->  	stats->tx_errors = stats->tx_aborted_errors + stats->tx_fifo_errors +
->  			   stats->tx_window_errors;
-> -	stats->rx_dropped = mib->rx_dropped;
-> -	/* stats->tx_dropped */
-> -	stats->multicast = mib->rx_multicast;
-> -	stats->collisions = mib->tx_collisions;
->  }
->  
->  static void
-> @@ -950,11 +980,13 @@ yt921x_dsa_get_pause_stats(struct dsa_switch *ds, int port,
->  	struct yt921x_mib *mib = &pp->mib;
->  
->  	mutex_lock(&priv->reg_lock);
-> +
->  	yt921x_read_mib(priv, port);
-> -	mutex_unlock(&priv->reg_lock);
->  
-> -	pause_stats->tx_pause_frames = mib->tx_pause;
-> -	pause_stats->rx_pause_frames = mib->rx_pause;
-> +	pause_stats->tx_pause_frames = u64_stats_read(&mib->tx_pause);
-> +	pause_stats->rx_pause_frames = u64_stats_read(&mib->rx_pause);
-> +
-> +	mutex_unlock(&priv->reg_lock);
->  }
->  
->  static int
-> @@ -3423,6 +3455,7 @@ static int yt921x_mdio_probe(struct mdio_device *mdiodev)
->  
->  		pp->index = i;
->  		INIT_DELAYED_WORK(&pp->mib_read, yt921x_poll_mib);
-> +		u64_stats_init(&pp->syncp);
->  	}
->  
->  	ds = &priv->ds;
-> diff --git a/drivers/net/dsa/yt921x.h b/drivers/net/dsa/yt921x.h
-> index 3f129b8d403f..0f4231accf3e 100644
-> --- a/drivers/net/dsa/yt921x.h
-> +++ b/drivers/net/dsa/yt921x.h
-> @@ -6,6 +6,8 @@
->  #ifndef __YT921X_H
->  #define __YT921X_H
->  
-> +#include <linux/u64_stats_sync.h>
-> +
->  #include <net/dsa.h>
->  
->  #define YT921X_SMI_SWITCHID_M		GENMASK(3, 2)
-> @@ -530,55 +532,61 @@ enum yt921x_fdb_entry_status {
->  #define yt921x_port_is_external(port) (8 <= (port) && (port) < 9)
->  
->  struct yt921x_mib {
-> -	u64 rx_broadcast;
-> -	u64 rx_pause;
-> -	u64 rx_multicast;
-> -	u64 rx_crc_errors;
-> -
-> -	u64 rx_alignment_errors;
-> -	u64 rx_undersize_errors;
-> -	u64 rx_fragment_errors;
-> -	u64 rx_64byte;
-> -
-> -	u64 rx_65_127byte;
-> -	u64 rx_128_255byte;
-> -	u64 rx_256_511byte;
-> -	u64 rx_512_1023byte;
-> -
-> -	u64 rx_1024_1518byte;
-> -	u64 rx_jumbo;
-> -	u64 rx_good_bytes;
-> -
-> -	u64 rx_bad_bytes;
-> -	u64 rx_oversize_errors;
-> -
-> -	u64 rx_dropped;
-> -	u64 tx_broadcast;
-> -	u64 tx_pause;
-> -	u64 tx_multicast;
-> -
-> -	u64 tx_undersize_errors;
-> -	u64 tx_64byte;
-> -	u64 tx_65_127byte;
-> -	u64 tx_128_255byte;
-> -
-> -	u64 tx_256_511byte;
-> -	u64 tx_512_1023byte;
-> -	u64 tx_1024_1518byte;
-> -	u64 tx_jumbo;
-> -
-> -	u64 tx_good_bytes;
-> -	u64 tx_collisions;
-> -
-> -	u64 tx_aborted_errors;
-> -	u64 tx_multiple_collisions;
-> -	u64 tx_single_collisions;
-> -	u64 tx_good;
-> -
-> -	u64 tx_deferred;
-> -	u64 tx_late_collisions;
-> -	u64 rx_oam;
-> -	u64 tx_oam;
-> +	union {
-> +		struct {
-> +			u64_stats_t rx_broadcast;
-> +			u64_stats_t rx_pause;
-> +			u64_stats_t rx_multicast;
-> +			u64_stats_t rx_crc_errors;
-> +
-> +			u64_stats_t rx_alignment_errors;
-> +			u64_stats_t rx_undersize_errors;
-> +			u64_stats_t rx_fragment_errors;
-> +			u64_stats_t rx_64byte;
-> +
-> +			u64_stats_t rx_65_127byte;
-> +			u64_stats_t rx_128_255byte;
-> +			u64_stats_t rx_256_511byte;
-> +			u64_stats_t rx_512_1023byte;
-> +
-> +			u64_stats_t rx_1024_1518byte;
-> +			u64_stats_t rx_jumbo;
-> +			u64_stats_t rx_good_bytes;
-> +
-> +			u64_stats_t rx_bad_bytes;
-> +			u64_stats_t rx_oversize_errors;
-> +
-> +			u64_stats_t rx_dropped;
-> +			u64_stats_t tx_broadcast;
-> +			u64_stats_t tx_pause;
-> +			u64_stats_t tx_multicast;
-> +
-> +			u64_stats_t tx_undersize_errors;
-> +			u64_stats_t tx_64byte;
-> +			u64_stats_t tx_65_127byte;
-> +			u64_stats_t tx_128_255byte;
-> +
-> +			u64_stats_t tx_256_511byte;
-> +			u64_stats_t tx_512_1023byte;
-> +			u64_stats_t tx_1024_1518byte;
-> +			u64_stats_t tx_jumbo;
-> +
-> +			u64_stats_t tx_good_bytes;
-> +			u64_stats_t tx_collisions;
-> +
-> +			u64_stats_t tx_aborted_errors;
-> +			u64_stats_t tx_multiple_collisions;
-> +			u64_stats_t tx_single_collisions;
-> +			u64_stats_t tx_good;
-> +
-> +			u64_stats_t tx_deferred;
-> +			u64_stats_t tx_late_collisions;
-> +			u64_stats_t rx_oam;
-> +			u64_stats_t tx_oam;
-> +		};
-> +
-> +		u64_stats_t stats[39];
+> > @@ -1823,7 +1823,7 @@ TRACE_EVENT(ext4_journal_start_inode,
+> >  	TP_ARGS(inode, blocks, rsv_blocks, revoke_creds, type, IP),
+> > =20
+> >  	TP_STRUCT__entry(
+> > -		__field(	unsigned long,	ino		)
+> > +		__field(	u64,		ino		)
+> >  		__field(	dev_t,		dev		)
+> >  		__field(	unsigned long,	ip		)
+> >  		__field(	int,		blocks		)
+> > @@ -1843,9 +1843,10 @@ TRACE_EVENT(ext4_journal_start_inode,
+> >  	),
+> > =20
+> >  	TP_printk("dev %d,%d blocks %d, rsv_blocks %d, revoke_creds %d,"
+> > -		  " type %d, ino %lu, caller %pS", MAJOR(__entry->dev),
+> > +		  " type %d, ino %llu, caller %pS", MAJOR(__entry->dev),
+> >  		  MINOR(__entry->dev), __entry->blocks, __entry->rsv_blocks,
+> > -		  __entry->revoke_creds, __entry->type, __entry->ino,
+> > +		  __entry->revoke_creds, __entry->type,
+> > +		  (unsigned long long) __entry->ino,
+>=20
+> Not point in the type cast?
+>=20
+> 								Honza
 
-The above looks bug prone if the future chip revisions will support more
-stats.
-
-/P
-
+--=20
+Jeff Layton <jlayton@kernel.org>
 
