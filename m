@@ -1,216 +1,147 @@
-Return-Path: <netdev+bounces-263206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263207-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oC2mIoThpmkPYQAAu9opvQ
-	(envelope-from <netdev+bounces-263206-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:26:28 +0100
+	id uMvxESfipmlAYgAAu9opvQ
+	(envelope-from <netdev+bounces-263207-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:29:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96A841F02B6
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:26:27 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B95881F03BA
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:29:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id AA96E303D7C3
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 13:24:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CD74630E4A07
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 13:24:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F7FB42883C;
-	Tue,  3 Mar 2026 13:23:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8B2E39D6CF;
+	Tue,  3 Mar 2026 13:24:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RUqskrCw"
+	dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b="Lt46NKK7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 274F6345CD3;
-	Tue,  3 Mar 2026 13:23:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E82C426EAD
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 13:24:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772544224; cv=none; b=eQHQONCdbku/dIBWMvUxSYgOC2LTupXX8Ij/8Qo55efTAJ9/fyMVpc458aUxB09meYSj+sD0AmqGr/jgpfwYwFKgbQUIBeD5apPL9ruDRin3HxigyBezEFXNsGI2p43KBK3GBy53hBVSod4mfXV7p4sk+Pvz/7gvXpRN7cuExVI=
+	t=1772544243; cv=none; b=qMUHKdeDIC7hSEUak2Oo7R0CSflgYMk4blXFvt5lQpNs9KwEUsKO+uLtqwY+ipTIk4EyGN0oygTSvw1fCIsgTIpWfvcW0DU19Xi8e3d3J9bDuwswwBtkkZoQIHz11TemhNNY3dzAASyIsJ5XO6LiKktUL4BKJWD75lBf4RWz3Ec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772544224; c=relaxed/simple;
-	bh=QXKFZaIGCPMx+aACFmMjJlQcbli93BFDeSlduovypIE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oYvFByKF4oBMoOxG2Fuk6yJDlbM2xNVjCXLjge33phcmrdHQLtAKBL1VW6lYO0xw85tymfAdh/G7pLvE8ABx/1CFqwDV01zM/GocT2kaHa3YWr6Y7qkufXcl36gXmOoXnXoAD/M3V0fWdfv2995hgcNm+dvnGfAqoQmPeYb7u7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RUqskrCw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D507C116C6;
-	Tue,  3 Mar 2026 13:23:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772544223;
-	bh=QXKFZaIGCPMx+aACFmMjJlQcbli93BFDeSlduovypIE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=RUqskrCwytKCoz7NpxBgmM4C3jhH3crzoSTNxyVDDTwdv8G6ut6sKfUyApTW2XPoX
-	 9WHaPeALwgD1XPhAKHOr8dE5Mmp1hV0mv0icFbbVLyfqOMlB3UFv/NkSMzIy7aazPM
-	 LdTVjsG8/D2BW2Zl/G9fcDN8ulWmHcRG52y8mHgO0MyvHUIjhvPYk2YZ18z0zXPDpj
-	 yuJOHNq8K+qFXpcELSHkihdCXpjX+HOVnTo0OJK69xLWZ/AgFFQfFspe14PlLLfoZJ
-	 NKogQHOeytqZA3J7+vluUG0QdVF0rs6keDsM4BukFNuOL5XGuuFpvWPQbjoNvL4Gc4
-	 iY8vhh/W4qIcw==
-Message-ID: <29d38308-e8ae-42aa-8eeb-1c3b347c284b@kernel.org>
-Date: Tue, 3 Mar 2026 14:23:32 +0100
+	s=arc-20240116; t=1772544243; c=relaxed/simple;
+	bh=mxEJh++ORjPtHJhNSRW2+jHvlU5fkP6Q/PC2E1J+bcY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=NBjXL9cTPYqbPki7/OMdZXBt/ZPR61I1hZjvuN5CcMCkyGZeBlPI++YMsHHHRn2oqG23srCG4D8zNvFplPyRD25+pnKCaqTZVgusuwcfHuDAQ4gXFfiHTReU+aUx1/OgO0hV1WfH3Dn/aIZFyO6Y1DRkRSqyTJv1PbspCz9fvvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl; spf=pass smtp.mailfrom=xs4all.nl; dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b=Lt46NKK7; arc=none smtp.client-ip=195.121.94.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xs4all.nl
+X-KPN-MessageId: 3a780c94-1704-11f1-afd5-005056994fde
+Received: from mta.kpnmail.nl (unknown [10.31.161.191])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id 3a780c94-1704-11f1-afd5-005056994fde;
+	Tue, 03 Mar 2026 14:23:55 +0100 (CET)
+Received: from mtaoutbound.kpnmail.nl (unknown [10.128.135.190])
+	by mta.kpnmail.nl (Halon) with ESMTP
+	id 3a76ec76-1704-11f1-83d4-00505699891e;
+	Tue, 03 Mar 2026 14:23:55 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=xs4all.nl; s=xs4all01;
+	h=content-type:mime-version:subject:message-id:to:from:date;
+	bh=ylW3O/pSrSR3YafEdqlMn9+eER3lS4nH5esxRzdgSzs=;
+	b=Lt46NKK7xW1qXDVOb7vtuVqp5IgpIn00soDC8aVDeWI9KWYuwD7kO90AOLioR6o4YWHkASlsy0VRE
+	 VrPQivYAQYtg52AAsE5NfSfXRZoTs9FRVryJcmZ6BgLzhMRRDEdJ9+W8yziYib9bPYnSztJH9f+emQ
+	 7RDPow5DQmWNGCuYXImdnzxfgkyyW373+CDgnFiwD6pO93sXdGJn3L6jyCX5SkauwhtEHOBkc0Y967
+	 wzPWxrKTjxk2PV4kB6bTF7Nvmt2ITaCBTGGp/P6g3aJkXjvHr/k9/McxWuj+vbkDnq5l16N2OxONK3
+	 JKFdbuOESdMGLoWEp8p+BhTBy6n1uaA==
+X-KPN-MID: 33|1RmVKGg+OMjyUl5nfPJlF1kgNbg2BmiXjH6ATKO4FJPBgAxYxYUFgvTIXTPJ/Hz
+ kFg98mjMdpwEN2dcFeGQ3RrTkBL4nHV5MEbTbjXUT5As=
+X-CMASSUN: 33|IKN2CCa3ZcXzetgOTgxkagMLPITjPsWayu5Xwg44M6Z44m++N2Ydj5P1FtibBo9
+ TD+9bfzMcxEnutu7YNCoNXQ==
+X-KPN-VerifiedSender: Yes
+Received: from cpxoxapps-mh06 (cpxoxapps-mh06.personalcloud.so.kpn.org [10.128.135.212])
+	by mtaoutbound.kpnmail.nl (Halon) with ESMTPSA
+	id 3a6cbc8b-1704-11f1-b8d7-005056995d6c;
+	Tue, 03 Mar 2026 14:23:55 +0100 (CET)
+Date: Tue, 3 Mar 2026 14:23:55 +0100 (CET)
+From: Jori Koolstra <jkoolstra@xs4all.nl>
+To: Alexandra Winter <wintera@linux.ibm.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: 
+	"open list:DIBS (DIRECT INTERNAL BUFFER SHARING)" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Message-ID: <1787125475.222946.1772544235267@kpc.webmail.kpnmail.nl>
+In-Reply-To: <b4804b53-c25c-485e-8cb3-9ade70a6f625@linux.ibm.com>
+References: <20260302163103.3324304-1-jkoolstra@xs4all.nl>
+ <2026030246-savor-hardener-6102@gregkh>
+ <b4804b53-c25c-485e-8cb3-9ade70a6f625@linux.ibm.com>
+Subject: Re: [PATCH] dibs: change dibs_class to a const struct
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups, RCU
- stalls, timeout
-Content-Language: en-GB, fr-BE
-To: Jiri Slaby <jirislaby@kernel.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev,
- Netdev <netdev@vger.kernel.org>, rcu@vger.kernel.org,
- MPTCP Linux <mptcp@lists.linux.dev>,
- Linux Kernel <linux-kernel@vger.kernel.org>,
- Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- Dave Hansen <dave.hansen@linux.intel.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, "luto@kernel.org" <luto@kernel.org>,
- Stefano Garzarella <sgarzare@redhat.com>
-References: <b24ffcb3-09d5-4e48-9070-0b69bc654281@kernel.org>
- <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 96A841F02B6
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+Importance: Normal
+X-Rspamd-Queue-Id: B95881F03BA
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[xs4all.nl,reject];
+	R_DKIM_ALLOW(-0.20)[xs4all.nl:s=xs4all01];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263206-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	HAS_X_PRIO_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-263207-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_ALL(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[xs4all.nl:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[xs4all.nl];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jkoolstra@xs4all.nl,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:url,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,xs4all.nl:dkim,kpc.webmail.kpnmail.nl:mid]
 X-Rspamd-Action: no action
 
-Hi Jiri,
+Hi Alexandra,
 
-On 26/02/2026 11:37, Jiri Slaby wrote:
-> On 06. 02. 26, 12:54, Matthieu Baerts wrote:
->> Our CI for the MPTCP subsystem is now regularly hitting various stalls
->> before even starting the MPTCP test suite. These issues are visible on
->> top of the latest net and net-next trees, which have been sync with
->> Linus' tree yesterday. All these issues have been seen on a "public CI"
->> using GitHub-hosted runners with KVM support, where the tested kernel is
->> launched in a nested (I suppose) VM. I can see the issue with or without
->> debug.config. According to the logs, it might have started around
->> v6.19-rc0, but I was unavailable for a few weeks, and I couldn't react
->> quicker, sorry for that. Unfortunately, I cannot reproduce this locally,
->> and the CI doesn't currently have the ability to execute bisections.
 > 
-> Hmm, after the switch of the qemu guest kernels to 6.19, our (opensuse)
-> build service is stalling in smp_call_function_many_cond() randomly too:
-> https://bugzilla.suse.com/show_bug.cgi?id=1258936
+> Thank you for the patch Jori.
+> Would you mind adding a link to explain the "as the driver core now allows"?
+> Maybe
+> Link: https://lore.kernel.org/all/2023040248-outrage-obsolete-5a9a@gregkh/
 > 
-> The attachment from there contains sysrq-t logs too:
-> https://bugzilla.suse.com/attachment.cgi?id=888612
 
-I'm glad I'm not the only one with this issue :)
+Yes, see this one indeed:
+https://lore.kernel.org/all/2023040244-duffel-pushpin-f738@gregkh/
 
-In your case, do you also have nested VMs with KVM support?
-
-Are you able to easily reproduce the issue and change the guest kernel
-in your build service?
-
-On my side, any debugging steps need to be automated. Lately, it looks
-like the issue is more easily triggered on a stable 6.19 kernel, than on
-the last RC.
-
->> The stalls happen before starting the MPTCP test suite. The init program
->> creates a VSOCK listening socket via socat [1], and different hangs are
->> then visible: RCU stalls followed by a soft lockup [2], only a soft
->> lockup [3], sometimes the soft lockup comes with a delay [4] [5], or
->> there is no RCU stalls or soft lockups detected after one minute, but VM
->> is stalled [6]. In the last case, the VM is stopped after having
->> launched GDB to get more details about what was being executed.
->>
->> It feels like the issue is not directly caused by the VSOCK listening
->> socket, but the stalls always happen after having started the socat
->> command [1] in the background.
 > 
-> It fails randomly while building random packages (go, libreoffice,
-> bayle, ...). I don't think it is VSOCK related in those cases, but who
-> knows what the builds do...
+> For my education: How could I have noticed that class_create() call has been deprecated?
+> Is that marked somewhere somehow?
+>
 
-Indeed, unlikely to be VSOCK then.
+I think this is for Greg to answer, but my guess would be that you maybe could
+not have. I don't know if there is a formal deprecation procedure.
 
-> I cannot reproduce locally either.
-> 
-> I came across:
->   614da1d3d4cd x86: make page fault handling disable interrupts properly
-> but I have no idea if it could have impact on this at all.
+This is just cleanup work that has been laying around for a
+while and some beginners like me have progressed this to gain kernel patching
+experience. I see that this was already being worked on in 2023. I am now
+removing the last references to class_create() in drivers so that the API
+can finally be retired.
 
-Did it help to revert it?
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
+Thanks,
+Jori.
 
