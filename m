@@ -1,167 +1,173 @@
-Return-Path: <netdev+bounces-263236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263237-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KPR5KHTypmmSagAAu9opvQ
-	(envelope-from <netdev+bounces-263236-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 15:38:44 +0100
+	id SOdQIJHypmkzawAAu9opvQ
+	(envelope-from <netdev+bounces-263237-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 15:39:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCF7F1F1A21
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 15:38:43 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 458431F1A3E
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 15:39:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 680683079C63
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 14:33:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D7E5030162B7
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 14:34:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6078F4301CA;
-	Tue,  3 Mar 2026 14:33:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="pnYZdilU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE6F93E51E4;
+	Tue,  3 Mar 2026 14:34:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05EB120459A;
-	Tue,  3 Mar 2026 14:33:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD731374197
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 14:34:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772548398; cv=none; b=PohAlt6dOjxQIU8vCyv9/6HbHLyL2fCJQ66rK3F7nIFllFodUMDtD3upNRkLlhVJBBWk6Fzjx0GOyMtpePNH+tLJQIAH5jFFyn7Wh6Cztt89LxskAc8AktSfP/6v8GHtPwmp3RNGCZ0p9tOgUWs/qp63Kyt9ZeTQNXCwI3dqdKU=
+	t=1772548457; cv=none; b=fJ1GHE1GRIis3x+XI0Nh48EOV/LPWh8FHg63hTF3LkZ+o4xJ/ioocokvzY3J0Bvd0yWQ94WYoYxFoyvorgQhdvQUJ05EySu5KF5vLjUE+td9wjW9DkhzSfY6F3e53mtYBZZb0vu2BjqPemcSDroYUEQ2efw657N4LKjC68MMP5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772548398; c=relaxed/simple;
-	bh=PjWyDSd5WomT81wByfr6IDXbpi/XzD1CgaiR0aNlW7c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=alebMjNwD4w6oQMOw8ONAKta9eZBFCfZCc676O7lnycIyImzOiNDpPjKzGGxaef+PPYRelGCRcwwuqcASJDBTo6saRtnLhbjvOmMop3lEZ4zAeQD9RpkGWWJpkWfsR/n//SBA5EGTYhwadfaSKDF9elN3yVphO/HULHAhp7NUK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=pnYZdilU; arc=none smtp.client-ip=213.97.179.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=CUQAAVECoBJi0Kov1oaEaou0IrJG+pWBgq47m69jWOc=; b=pnYZdilUNkk2nna/V/4oLWzEq7
-	XewgrN54GhFjueQ2vnc51G/QbZ/vnmr4egV/lMWTk8JPaHnwJPz7Y0n8Z1jDNuZCJIXLSJTtMFZ01
-	X/n8yK6xjeBF6j5CVpqYK+CHcsaBzbklgpokTwe569Tj5f6cNhJNc2u1GbZlJezf5DzHKx6s3dYkP
-	BSy5ML8WoIzQCwiMGgX8HI+P0K1JoERHE68WFkgns8pQaNjGejEw59LjQ01fbXPemuqgEga+YPBNq
-	QumQWb07J5GVO3bAK9uSnRg+ifD/Ww0TjIH3Detv0da/1r3y1i45kFw15Ozgju+mCvQ0VXbpXxftH
-	vGjrcVPg==;
-Received: from [179.221.50.217] (helo=[192.168.0.108])
-	by fanzine2.igalia.com with esmtpsa 
-	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128) (Exim)
-	id 1vxQoB-008USJ-20; Tue, 03 Mar 2026 15:33:11 +0100
-Message-ID: <17499d82-ad03-44a9-ab3a-429d2ebea02f@igalia.com>
-Date: Tue, 3 Mar 2026 11:33:04 -0300
+	s=arc-20240116; t=1772548457; c=relaxed/simple;
+	bh=FUhXqTSNIMEp8iaYn8OBWSOCIM/X7x4hwk5d9Rx1uCQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aKxoYU+pqMO2ZHzIOwchQvhN+wDloVDQH3PvmszuzVcTvlewkG795isB5iryOXaE+8UTbmYKu76/8XfOLTjOrKAYePPtnRBSd7+/BzahgXPiAvkB5JqmB4uvnEYgnFxw6ki4tLR4U6wj/g2bCCvje3YUHvHF+Unf7u8NTfnVn6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vxQoz-0000xn-LC; Tue, 03 Mar 2026 15:34:01 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vxQox-003YuD-0E;
+	Tue, 03 Mar 2026 15:34:00 +0100
+Received: from pengutronix.de (p4ffb2dc6.dip0.t-ipconnect.de [79.251.45.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 213AD4F696F;
+	Tue, 03 Mar 2026 14:34:00 +0000 (UTC)
+Date: Tue, 3 Mar 2026 15:33:59 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	linux-can@vger.kernel.org, kernel@pengutronix.de, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Vincent Mailhol <mailhol@kernel.org>, stable@kernel.org
+Subject: Re: [PATCH net 05/12] can: ems_usb: ems_usb_read_bulk_callback():
+ check the proper length of a message
+Message-ID: <20260303-independent-fair-bullmastiff-d8a994-mkl@pengutronix.de>
+X-AI: stop_reason: "refusal"
+References: <20260302152755.1700177-1-mkl@pengutronix.de>
+ <20260302152755.1700177-6-mkl@pengutronix.de>
+ <7c39c1dd-dd49-4847-9238-d6cf147598da@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] netfilter: nf_tables: fix use-after-free on ops->dev
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: fw@strlen.de, phil@nwl.cc, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-dev@igalia.com
-References: <20260302212605.689909-1-koike@igalia.com>
- <aaYYiPTO5JYOlhhY@chamomile>
-Content-Language: en-US
-From: Helen Koike <koike@igalia.com>
-In-Reply-To: <aaYYiPTO5JYOlhhY@chamomile>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: BCF7F1F1A21
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="dcotyxahcferzui3"
+Content-Disposition: inline
+In-Reply-To: <7c39c1dd-dd49-4847-9238-d6cf147598da@redhat.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Rspamd-Queue-Id: 458431F1A3E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
-	R_DKIM_REJECT(1.00)[igalia.com:s=20170329];
+X-Spamd-Result: default: False [-2.56 / 15.00];
+	SIGNED_PGP(-2.00)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[igalia.com : SPF not aligned (relaxed),none];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[igalia.com:-];
-	TAGGED_FROM(0.00)[bounces-263236-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[pengutronix.de];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[koike@igalia.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-263237-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.961];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mkl@pengutronix.de,netdev@vger.kernel.org];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-0.852];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-Hi Pablo,
 
-Thanks for your quick reply, please see my comments below.
+--dcotyxahcferzui3
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net 05/12] can: ems_usb: ems_usb_read_bulk_callback():
+ check the proper length of a message
+MIME-Version: 1.0
 
-On 3/2/26 8:08 PM, Pablo Neira Ayuso wrote:
-> On Mon, Mar 02, 2026 at 06:26:05PM -0300, Helen Koike wrote:
->> struct nf_hook_ops has a pointer to dev, which can be used by
->> __nf_unregister_net_hook() after it has been freed by tun_chr_close().
->>
->> Fix it  by calling dev_hold() when saving dev to ops struct.
-> 
-> Sorry, I don't think this patch works, dev_hold()/dev_put() use
-> per_cpu area.
+On 03.03.2026 15:20:01, Paolo Abeni wrote:
+> AI noticed the following:
+> ---
+> Does the check validate enough of the message? The code checks that the
+> 11-byte header (CPC_MSG_HEADER_LEN) fits in the buffer, but
+> ems_usb_rx_can_msg() and ems_usb_rx_err() both access fields in the
+> msg->msg union payload starting at offset 11.
+>
+> For example, ems_usb_rx_can_msg() reads:
+> - msg->msg.can_msg.id (4 bytes at offset 11)
+> - msg->msg.can_msg.length (1 byte at offset 15)
+> - msg->msg.can_msg.msg[i] (up to 8 bytes at offset 16)
+>
+> Similarly, ems_usb_rx_err() reads:
+> - msg->msg.can_state (1 byte at offset 11)
+> - msg->msg.error.cc.regs.sja1000.{ecc,txerr,rxerr} (3 bytes at offset 11+)
+>
+> A malicious USB device could send a packet where actual_length equals
+> CPC_HEADER_SIZE + CPC_MSG_HEADER_LEN (15 bytes total), which would pass
+> this check but provide zero payload bytes. The callees would then read
+> beyond the received buffer before reaching the second check at the end
+> of the loop.
+>
+> Should the validation check that both the header and payload
+> (msg->length bytes) fit within actual_length before calling the
+> processing functions?
+> ---
+> I guess this patch could need a follow-up? Not blocking the PR, as
+> AFAICS worst case this patch still improves the current situation.
 
-In my understanding, being a percpu_ref shouldn't affect the behavior, 
-since after a percpu_ref_kill() it switches to the usual mode with 
-shared atomic_t counter.
+Yes, Greg said he'll look into this
 
-But if I understood correctly from your comment below, the proper 
-solution would be to fix the order that the hooks are released, is my 
-understanding correct?
+| https://lore.kernel.org/all/2026030253-lather-pulse-3bb5@gregkh/
 
-> 
-> The nf_tables_flowtable_event() function used to release the hook, but
-> now things have changed since there is auto-hook registration.
+Marc
 
-I'll investigate this further. Thanks a lot for the pointer (and sorry 
-for the noise).
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
-Regards,
-Helen
+--dcotyxahcferzui3
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> 
->> Reported-by: syzbot+bb9127e278fa198e110c@syzkaller.appspotmail.com
->> Closes: https://syzkaller.appspot.com/bug?extid=bb9127e278fa198e110c
->> Signed-off-by: Helen Koike <koike@igalia.com>
->> ---
->>   net/netfilter/nf_tables_api.c | 2 ++
->>   1 file changed, 2 insertions(+)
->>
->> diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
->> index fd7f7e4e2a43..00b5f900a51d 100644
->> --- a/net/netfilter/nf_tables_api.c
->> +++ b/net/netfilter/nf_tables_api.c
->> @@ -352,6 +352,7 @@ static void nft_netdev_hook_free_ops(struct nft_hook *hook)
->>   
->>   	list_for_each_entry_safe(ops, next, &hook->ops_list, list) {
->>   		list_del(&ops->list);
->> +		dev_put(ops->dev);
->>   		kfree(ops);
->>   	}
->>   }
->> @@ -2374,6 +2375,7 @@ static struct nft_hook *nft_netdev_hook_alloc(struct net *net,
->>   			err = -ENOMEM;
->>   			goto err_hook_free;
->>   		}
->> +		dev_hold(dev);
->>   		ops->dev = dev;
->>   		list_add_tail(&ops->list, &hook->ops_list);
->>   	}
->> -- 
->> 2.53.0
->>
+-----BEGIN PGP SIGNATURE-----
 
+iHUEABYKAB0WIQSl+MghEFFAdY3pYJLMOmT6rpmt0gUCaabxVQAKCRDMOmT6rpmt
+0nhJAP9HVgQ5h+hdpOg4OLZ+pCb6wosQZm+cqIlVtwwjBktXegEAzH6QhssQ7+lu
+y4eZx9nPL+PPtGe7/uYimKWiO+Ft8As=
+=S/L9
+-----END PGP SIGNATURE-----
+
+--dcotyxahcferzui3--
 
