@@ -1,236 +1,211 @@
-Return-Path: <netdev+bounces-263109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263110-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yMSeLniypmkqTAAAu9opvQ
-	(envelope-from <netdev+bounces-263109-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 11:05:44 +0100
+	id CH+DHa6ypmn9SgAAu9opvQ
+	(envelope-from <netdev+bounces-263110-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 11:06:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 646941EC521
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 11:05:44 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E363F1EC587
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 11:06:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 60EC2306F957
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 10:04:19 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AB7CA30747B9
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 10:04:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B6ED390218;
-	Tue,  3 Mar 2026 10:04:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14B3739023E;
+	Tue,  3 Mar 2026 10:04:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zp3LHtWE"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7FDC390214
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 10:04:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395AA390227
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 10:04:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772532257; cv=none; b=AlZvprqS9R1bMnn8R8iFI/D3CYUKtVbksfghXwwxdoT5z5SWc1OfPDhiIZlP/MhPhlEHdSo3NIKdHSg/qrLfwKjapO8dz6cGfTmwyA479386IiegtavQUWGyzEm8kbcI4FIQT/0+memY8MKvRRv1ZVZtNAffuUQApD7XRBO96QQ=
+	t=1772532290; cv=none; b=tpxf2xr681YnYiw3m7luln1eMHk4hTaZNOvQGeKCIhlc1aRHaiUbvi8kApDUpksKHtgLgLH2nel8NSlwjGiISalLuRYyfqv+LlL8OYTszBlM8OjEohzvh7CPgNeeHJ1SBS2CfHOFndQrlI8yn/nEhK91yiDXFPKKl8YKE0WChDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772532257; c=relaxed/simple;
-	bh=KGFR6GPIehO6zIdn2CFtuE4synSr/5rzwVcLZPCowm8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l/QWKZWQIrUrdvwAnhIfCHLrIMag9oXdlgbOa6S85XIMUL36p1RK21VYZy9Mx3JPzt58PENd0kfa/RyX8vTFf+r7exYLuncoM4u4SDKSxJZmFFo3m60S4PkrFVZgTwV3bXYUQMJiHC0CAKD/NoVIH71BiGB4YIP/0FZFWtC/AFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1vxMbR-0007dp-7S; Tue, 03 Mar 2026 11:03:45 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1vxMbP-003WdD-12;
-	Tue, 03 Mar 2026 11:03:44 +0100
-Received: from pengutronix.de (p4ffb2dc6.dip0.t-ipconnect.de [79.251.45.198])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 23B2F4F64B1;
-	Tue, 03 Mar 2026 10:03:43 +0000 (UTC)
-Date: Tue, 3 Mar 2026 11:03:42 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Dan Williams <dan.j.williams@intel.com>, Matthew Wilcox <willy@infradead.org>, 
-	Eric Biggers <ebiggers@kernel.org>, "Theodore Y. Ts'o" <tytso@mit.edu>, 
-	Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, 
-	David Hildenbrand <david@kernel.org>, David Howells <dhowells@redhat.com>, 
-	Paulo Alcantara <pc@manguebit.org>, Andreas Dilger <adilger.kernel@dilger.ca>, 
-	Jan Kara <jack@suse.com>, Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>, 
-	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
-	Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>, 
-	Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
-	Steve French <sfrench@samba.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
-	Shyam Prasad N <sprasad@microsoft.com>, Bharath SM <bharathsm@microsoft.com>, 
-	Alexander Aring <alex.aring@gmail.com>, Ryusuke Konishi <konishi.ryusuke@gmail.com>, 
-	Viacheslav Dubeyko <slava@dubeyko.com>, Eric Van Hensbergen <ericvh@kernel.org>, 
-	Latchesar Ionkov <lucho@ionkov.net>, Dominique Martinet <asmadeus@codewreck.org>, 
-	Christian Schoenebeck <linux_oss@crudebyte.com>, David Sterba <dsterba@suse.com>, 
-	Marc Dionne <marc.dionne@auristor.com>, Ian Kent <raven@themaw.net>, 
-	Luis de Bethencourt <luisbg@kernel.org>, Salah Triki <salah.triki@gmail.com>, 
-	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>, Ilya Dryomov <idryomov@gmail.com>, 
-	Alex Markuze <amarkuze@redhat.com>, Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu, 
-	Nicolas Pitre <nico@fluxnic.net>, Tyler Hicks <code@tyhicks.com>, 
-	Amir Goldstein <amir73il@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
-	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Yangtao Li <frank.li@vivo.com>, 
-	Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>, David Woodhouse <dwmw2@infradead.org>, 
-	Richard Weinberger <richard@nod.at>, Dave Kleikamp <shaggy@kernel.org>, 
-	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>, Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>, 
-	Joseph Qi <joseph.qi@linux.alibaba.com>, Mike Marshall <hubcap@omnibond.com>, 
-	Martin Brandenburg <martin@omnibond.com>, Miklos Szeredi <miklos@szeredi.hu>, 
-	Anders Larsen <al@alarsen.net>, Zhihao Cheng <chengzhihao1@huawei.com>, 
-	Damien Le Moal <dlemoal@kernel.org>, Naohiro Aota <naohiro.aota@wdc.com>, 
-	Johannes Thumshirn <jth@kernel.org>, John Johansen <john.johansen@canonical.com>, 
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, Mimi Zohar <zohar@linux.ibm.com>, 
-	Roberto Sassu <roberto.sassu@huawei.com>, Dmitry Kasatkin <dmitry.kasatkin@gmail.com>, 
-	Eric Snowberg <eric.snowberg@oracle.com>, Fan Wu <wufan@kernel.org>, 
-	Stephen Smalley <stephen.smalley.work@gmail.com>, Ondrej Mosnacek <omosnace@redhat.com>, 
-	Casey Schaufler <casey@schaufler-ca.com>, Alex Deucher <alexander.deucher@amd.com>, 
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>, David Airlie <airlied@gmail.com>, 
-	Simona Vetter <simona@ffwll.ch>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Simon Horman <horms@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, 
-	Adrian Hunter <adrian.hunter@intel.com>, James Clark <james.clark@linaro.org>, 
-	"Darrick J. Wong" <djwong@kernel.org>, Martin Schiller <ms@dev.tdt.de>, Eric Paris <eparis@redhat.com>, 
-	Joerg Reuter <jreuter@yaina.de>, Marcel Holtmann <marcel@holtmann.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Oliver Hartkopp <socketcan@hartkopp.net>, David Ahern <dsahern@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Remi Denis-Courmont <courmisch@gmail.com>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Xin Long <lucien.xin@gmail.com>, 
-	Magnus Karlsson <magnus.karlsson@intel.com>, Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, nvdimm@lists.linux.dev, fsverity@lists.linux.dev, 
-	linux-mm@kvack.org, netfs@lists.linux.dev, linux-ext4@vger.kernel.org, 
-	linux-f2fs-devel@lists.sourceforge.net, linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org, linux-nilfs@vger.kernel.org, v9fs@lists.linux.dev, 
-	linux-afs@lists.infradead.org, autofs@vger.kernel.org, ceph-devel@vger.kernel.org, 
-	codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org, linux-mtd@lists.infradead.org, 
-	jfs-discussion@lists.sourceforge.net, ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev, 
-	devel@lists.orangefs.org, linux-unionfs@vger.kernel.org, apparmor@lists.ubuntu.com, 
-	linux-security-module@vger.kernel.org, linux-integrity@vger.kernel.org, selinux@vger.kernel.org, 
-	amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org, 
-	linaro-mm-sig@lists.linaro.org, netdev@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	linux-fscrypt@vger.kernel.org, linux-xfs@vger.kernel.org, linux-hams@vger.kernel.org, 
-	linux-x25@vger.kernel.org, audit@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-can@vger.kernel.org, linux-sctp@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH v2 004/110] net: change sock.sk_ino and sock_i_ino() to
- u64
-Message-ID: <20260303-tall-fictional-tench-7c5f66-mkl@pengutronix.de>
-X-AI: stop_reason: "refusal"
-References: <20260302-iino-u64-v2-0-e5388800dae0@kernel.org>
- <20260302-iino-u64-v2-4-e5388800dae0@kernel.org>
+	s=arc-20240116; t=1772532290; c=relaxed/simple;
+	bh=j8x8rSyHICY5qcHKtJbgh2Wkn2gcq92t1omfvouCwNY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=T18QIh3kX4C1Plqzmvgu8Rkhin6MquU+ha+VmsL83a6I9lrCsE8Wrze2lUVGau0aKFC471zIQ/ZIIAffk8kYMdqR1Ja8/g1qoknVJhXznLnZ+nQeBrFH5NjcZLAbRRRtAUy/H8aRSV3KZnTddYaKPLJRmc64MLnrV/iydIEv2Kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zp3LHtWE; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2ad9516a653so22862825ad.0
+        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 02:04:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772532287; x=1773137087; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UfAHCrUtdxDkRhQeZ2MUII7KbpuuMok/pw78xOx4c/E=;
+        b=Zp3LHtWEy5JRZlPE3D/tWYPg0dJztNAv2cZuWiNM+sC5ZXdDR3thyjofDAwC8uogeH
+         ltlzDBS9Rk9XX2gxJqbUlciYSjDfYsZpfyvIvX3jyQEQszcV6t6vQldfaJi9a04mRGpQ
+         g+IqbZtoedBfHGsj6CXHuEphXP0qEQENY8FDQOKIUr6NPbTqi9SlT2utpV9kdFpiIXH7
+         Serl/WejCaRVQECECjn1fqAwXV/OWqc93B3j4tNpeMH6qbJx3FIz3Ek1nmuGtaj1hwyX
+         2/rKfUqntNQdNHYplhxzLoNQ2H4JrAGMcLjFolrawycNCy58IFT242BZU0VJLRZG5pZO
+         NOwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772532287; x=1773137087;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UfAHCrUtdxDkRhQeZ2MUII7KbpuuMok/pw78xOx4c/E=;
+        b=VEFnPthZBzFK3lfU/shSXXMaGPOO6k7kJtZNqqrP/A83TuhtDEAsuvgnJx3k8JFbVB
+         ZjJuqQiVBBO5VZCPxQQkqxXl11da7x5mU535OGqlF+flUlyRB8fPpt9jQ9kltPCpe2fl
+         7s9cRto5fGAX9iMms5PXQioud8ZXAdmqWavPKkRQAbAEbCFqzd/WZDUrxDNeT64Sl0Wa
+         QLB/YcmnUbLvfrpJnTUmbZpJxY3JmJBrMTFAWYVHPu9a6rI8ZQR1bF28kjbhW7kgSX45
+         eC8jnD0RskEdnI9HRgxy7ZKZhMhXokNvtJh1S0ntb8JtJ3wleCBCl12roxZSkE/9GSW6
+         aNZg==
+X-Forwarded-Encrypted: i=1; AJvYcCX0WVQE4mFDd9JKcyZunQpoZ6q9zBXoUcuXKTfWBAIclFqp7Ill67kiqj0gtQBorFpcz/t4VJs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVXi8n6r6Tqr8TmGRVfZ6ux2Z0Y4o2V+6MJxWY0WxnVE18xcQ0
+	MnxP5ckxGgpwb/XY7/FWGHWc3N2FDW6H/eq98WS5ba8W6EvAWduG6oed
+X-Gm-Gg: ATEYQzwMQkQu9yMG+JAYFn+49hA1Es9fMlitOY5+RhaiZDVA3yf6pyubXqchKwIh8Mb
+	wgSZ0EoWaTisSOXBMPahRcU667CE95dCNt3cCXqogoVwnWHiYwyHwOzs8V9OgRNAnncPkV8JE7q
+	ZR9csx2nHD+WawsPZFn2EepUR3XSxyCeWLPs8JCKMAK7GEBg7BDeqDNtR1IBB6t5m84/9TM6O2d
+	dnk2HEo+w0QGtY3bTp20uFTAhPsiY3A07UMMSD/ZiIXr3iQVQE0fA2UBuVFgPUeI6QngVsENFx/
+	9LapMQq3i0CubfCH/NiE54a8/889fcs2yLK9c+UnCbnZZeeVmKyRBEkfojzzFt8PtDwGadVs56B
+	pabnIWL8kynzFQsust5lb5Hj5SeGqr2WDRpYiHb0d4Gkt74+pwfvPS7T3VwKsmnsljJgqqrelRq
+	pvMJzN1zxXViRjACFg43/94Rpuagk/4DFzWpCsvbGcOwehN/6YSF1k8m0pmCQ7aff5eE9ycQvrJ
+	nAXyTFKIdAx
+X-Received: by 2002:a17:902:c951:b0:2a0:fb1c:144c with SMTP id d9443c01a7336-2ae2e3e3e93mr154800025ad.5.1772532287501;
+        Tue, 03 Mar 2026 02:04:47 -0800 (PST)
+Received: from dpc2500057.. (fsb6a9315e.tkyc502.ap.nuro.jp. [182.169.49.94])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2adfb6b5813sm166283095ad.63.2026.03.03.02.04.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Mar 2026 02:04:47 -0800 (PST)
+From: Keita Morisaki <kmta1236@gmail.com>
+To: Eric Dumazet <edumazet@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Keita Morisaki <kmta1236@gmail.com>
+Subject: [PATCH net-next v2] tcp: shrink per-packet memset in __tcp_transmit_skb()
+Date: Tue,  3 Mar 2026 19:04:39 +0900
+Message-Id: <20260303100439.3172296-1-kmta1236@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="w7xntzjnabubqe7a"
-Content-Disposition: inline
-In-Reply-To: <20260302-iino-u64-v2-4-e5388800dae0@kernel.org>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Rspamd-Queue-Id: 646941EC521
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: E363F1EC587
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.06 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[zeniv.linux.org.uk,kernel.org,suse.cz,goodmis.org,efficios.com,intel.com,infradead.org,mit.edu,linux.dev,suse.de,redhat.com,manguebit.org,dilger.ca,suse.com,oracle.com,brown.name,talpey.com,samba.org,gmail.com,microsoft.com,dubeyko.com,ionkov.net,codewreck.org,crudebyte.com,auristor.com,themaw.net,cs.cmu.edu,fluxnic.net,tyhicks.com,physik.fu-berlin.de,vivo.com,artax.karlin.mff.cuni.cz,nod.at,paragon-software.com,fasheh.com,evilplan.org,linux.alibaba.com,omnibond.com,szeredi.hu,alarsen.net,huawei.com,wdc.com,canonical.com,paul-moore.com,namei.org,hallyn.com,linux.ibm.com,schaufler-ca.com,amd.com,ffwll.ch,linaro.org,google.com,davemloft.net,arm.com,linux.intel.com,dev.tdt.de,yaina.de,holtmann.org,hartkopp.net,secunet.com,gondor.apana.org.au,fomichev.me,iogearbox.net,vger.kernel.org,lists.linux.dev,kvack.org,lists.sourceforge.net,lists.samba.org,lists.infradead.org,coda.cs.cmu.edu,lists.orangefs.org,lists.ubuntu.com,lists.freedesktop.org,lists.linaro.org];
-	TAGGED_FROM(0.00)[bounces-263109-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-263110-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[pengutronix.de];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mkl@pengutronix.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_GT_50(0.00)[171];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.706];
+	FROM_NEQ_ENVFROM(0.00)[kmta1236@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,pengutronix.de:mid,pengutronix.de:email,pengutronix.de:url]
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
+Use struct_group() to group the three fields in tcp_out_options that are
+read unconditionally by tcp_options_write() and bpf_skops_write_hdr_opt()
+(mss, bpf_opt_len, num_sack_blocks), then replace the full-struct memset
+with a targeted memset of only that group.
 
---w7xntzjnabubqe7a
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v2 004/110] net: change sock.sk_ino and sock_i_ino() to
- u64
-MIME-Version: 1.0
+struct tcp_out_options is 40 bytes without MPTCP and 96 bytes with
+CONFIG_MPTCP=y (typical distro config). Every remaining field is either
+assigned before first use by tcp_established_options()/tcp_syn_options(),
+or gated behind its OPTION_* flag in tcp_options_write(). This memset
+runs on every transmitted TCP packet, so shrinking it from 96 (or 40)
+bytes to 4 bytes reduces per-packet overhead on the hot path.
 
-On 02.03.2026 15:23:48, Jeff Layton wrote:
-> inode->i_ino is being converted to a u64. sock.sk_ino (which caches the
-> inode number) must also be widened to avoid truncation on 32-bit
-> architectures where unsigned long is only 32 bits.
->
-> Change sk_ino from unsigned long to u64, and update the return type
-> of sock_i_ino() to match. Fix all format strings that print the
-> result of sock_i_ino() (%lu -> %llu), and widen the intermediate
-> variables and function parameters in the diag modules that were
-> using int to hold the inode number.
->
-> Note that the UAPI socket diag structures (inet_diag_msg.idiag_inode,
-> unix_diag_msg.udiag_ino, etc.) are all __u32 and cannot be changed
-> without breaking the ABI. The assignments to those fields will
-> silently truncate, which is the existing behavior.
->
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> ---
->  net/can/bcm.c                | 2 +-
+Assembly comparison (x86-64, GCC 13, CONFIG_MPTCP=y):
 
-Acked-by: Marc Kleine-Budde <mkl@pengutronix.de> # for net/can
+  Before: rep stos zeroing 96 bytes (5 instructions, 12 8-byte stores)
+  After:  movl $0x0 zeroing 4 bytes (1 instruction, 1 store)
 
-regards,
-Marc
+Also add opts->options = 0 at the top of tcp_syn_options(), which
+already used |= without a prior clear. tcp_established_options() already
+clears opts->options at its top.
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+Signed-off-by: Keita Morisaki <kmta1236@gmail.com>
+---
+ net/ipv4/tcp_output.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
---w7xntzjnabubqe7a
-Content-Type: application/pgp-signature; name="signature.asc"
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index 326b58ff1118d..63ee037f46e50 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -429,14 +429,19 @@ static void smc_options_write(__be32 *ptr, u16 *options)
+ }
+ 
+ struct tcp_out_options {
++	/* Following group is cleared in __tcp_transmit_skb() */
++	struct_group(cleared,
++		u16 mss;		/* 0 to disable */
++		u8 bpf_opt_len;		/* length of BPF hdr option */
++		u8 num_sack_blocks;	/* number of SACK blocks to include */
++	);
++
++	/* Caution: following fields are not cleared in __tcp_transmit_skb() */
+ 	u16 options;		/* bit field of OPTION_* */
+-	u16 mss;		/* 0 to disable */
+ 	u8 ws;			/* window scale, 0 to disable */
+-	u8 num_sack_blocks;	/* number of SACK blocks to include */
+ 	u8 num_accecn_fields:7,	/* number of AccECN fields needed */
+ 	   use_synack_ecn_bytes:1; /* Use synack_ecn_bytes or not */
+ 	u8 hash_size;		/* bytes in hash_location */
+-	u8 bpf_opt_len;		/* length of BPF hdr option */
+ 	__u8 *hash_location;	/* temporary pointer, overloaded */
+ 	__u32 tsval, tsecr;	/* need to include OPTION_TS */
+ 	struct tcp_fastopen_cookie *fastopen_cookie;	/* Fast open cookie */
+@@ -965,6 +970,8 @@ static unsigned int tcp_syn_options(struct sock *sk, struct sk_buff *skb,
+ 	struct tcp_fastopen_request *fastopen = tp->fastopen_req;
+ 	bool timestamps;
+ 
++	opts->options = 0;
++
+ 	/* Better than switch (key.type) as it has static branches */
+ 	if (tcp_key_is_md5(key)) {
+ 		timestamps = false;
+@@ -1549,7 +1556,7 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
+ 
+ 	inet = inet_sk(sk);
+ 	tcb = TCP_SKB_CB(skb);
+-	memset(&opts, 0, sizeof(opts));
++	memset(&opts.cleared, 0, sizeof(opts.cleared));
+ 
+ 	tcp_get_current_key(sk, &key);
+ 	if (unlikely(tcb->tcp_flags & TCPHDR_SYN)) {
 
------BEGIN PGP SIGNATURE-----
+base-commit: af4e9ef3d78420feb8fe58cd9a1ab80c501b3c08
+-- 
+2.34.1
 
-iHUEABYKAB0WIQSl+MghEFFAdY3pYJLMOmT6rpmt0gUCaaax+QAKCRDMOmT6rpmt
-0hl7AQCzPgPTWe6ol8KwtKBDfHnqkx4Ku1cIiwlQY4Hnx5jz1wD5ASVd5abGOb50
-lF4hQNIazRvyjJwKRF+va5JwX/SN2go=
-=y8vr
------END PGP SIGNATURE-----
-
---w7xntzjnabubqe7a--
 
