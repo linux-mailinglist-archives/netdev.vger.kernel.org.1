@@ -1,197 +1,221 @@
-Return-Path: <netdev+bounces-263296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263297-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eEihL0sFp2k7bgAAu9opvQ
-	(envelope-from <netdev+bounces-263296-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 16:59:07 +0100
+	id oFDqLpUFp2k7bgAAu9opvQ
+	(envelope-from <netdev+bounces-263297-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 17:00:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBA0E1F319D
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 16:59:06 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 335B61F31E7
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 17:00:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E025F303F08C
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 15:55:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 97E2B304EA5C
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 15:59:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26C34492520;
-	Tue,  3 Mar 2026 15:55:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AF13492529;
+	Tue,  3 Mar 2026 15:59:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="woXOvWDl"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="ggDR9wFY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DBB2492501
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 15:55:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A0D43597B;
+	Tue,  3 Mar 2026 15:59:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772553311; cv=none; b=MflEfKLvMd3tQsGO88mNlO5WGC4ombVIFB5VJWVsP+VFBKLIe4EEdCrP9MdDvCfqe8GCDqTvsVw9K9v1OD3kTzj4htg+cJ63TJkm7B9xd3X5LJl4k5FGHmK6S0HVKBxBV2knKbzhd980LZmjMu3ScIx2wE+QVaPQcwaBW5IoCtw=
+	t=1772553557; cv=none; b=GUSydA+LxFcP2fXxElKqjth4vZsK4ZLtIV7dBrcHg60dmM2ZfiFfmJLcoWakSw+tW/Rfxybf5/7OIdLYB+jTDPNtuwRE37o7PbfxZCE0rF25CFW1CRUlPw5KGnP6FHR+09FrWcbI2nyQW13S8zDYdZblb2xQJ54WYhO0gL6Stp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772553311; c=relaxed/simple;
-	bh=7b8F1HaCkpN6fayVr7HNxwpvh017ORH7b3smsXK8+0s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CkhA9iZo32Qztb+2KRIOFHFTMVa5PMADxdwtBlPEswM3f6s/OV3m4lcYwjLV4OQjaWRdFexvj/opoguxY9aKqNbbwtcWdwOM8huCvHsXbB/e/ah8kOTzS4f5jsBhFE4gawPuoRCXkXT/Tdr7rbzc1Zj4kdKsVgEi5rCG/94LTh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=woXOvWDl; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id EAF35C40FAF;
-	Tue,  3 Mar 2026 15:55:23 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 374305FF29;
-	Tue,  3 Mar 2026 15:55:06 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 823341036915A;
-	Tue,  3 Mar 2026 16:55:01 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1772553305; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=SH5CVKmEIbnVEu71258fPU3XMEnF0AcPei/4hXDNKko=;
-	b=woXOvWDlKUBjnhuOi/e1OGikcft5vpeuygIsCNkvN1tsXPHf+Lfw/KgOnxveeki9Eoiyb9
-	AKMH/InS9g+yX9oOEPzwV+iZWv2+NVAB+FExPvuoeksDdqIEqHIAokikSvLaT2qkqBWI4D
-	TvQDeB/UcsKVIUwxnNTS6a9/NznBF30sGWDzhUm3WANLH/3QnC9h884Wg3frFDjVdiG1w6
-	98MCuCeIkV8BJGqMcNSU/JfqPdDON0XhQq784puj/8x0f6f0KH3bVBPPrhAu06qMpOVayp
-	YohGh713fBhUAj//3xNE4WCBimRQsQOpJUG5kp8gcNl7ZGVOdQsTKXD/35xdTA==
-From: Romain Gantois <romain.gantois@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Liam Girdwood <lgirdwood@gmail.com>,
- Mark Brown <broonie@kernel.org>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 0/2] net: sfp: Describe and handle regulators
-Date: Tue, 03 Mar 2026 16:54:56 +0100
-Message-ID: <9586950.CDJkKcVGEf@fw-rgant>
-In-Reply-To: <aab51KbpIq72wtSU@shell.armlinux.org.uk>
-References:
- <20260303-sfp-regulators-v1-0-7101ae34cb84@bootlin.com>
- <aab51KbpIq72wtSU@shell.armlinux.org.uk>
+	s=arc-20240116; t=1772553557; c=relaxed/simple;
+	bh=2Znm2hKjnv23W5ZRgd7ir3fctbTedgRdOChcu0QH9A8=;
+	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=QGhtFd2mNqGzVIZuHFUgW0kiVqcuG6bUKa8EzsRPK+unYPG0zCrPOuGhCPkaXUZxVHancZRxVnGfwZATgqPC/kEpY7GK/wZQhLomMqLFxd31zTsCUxfjPhWl/kijvB66g77BCP5HE07PclsKBlr3uhlZEom2ppZ0ubKYBVEo0MA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=ggDR9wFY; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1772553556; x=1804089556;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=2Znm2hKjnv23W5ZRgd7ir3fctbTedgRdOChcu0QH9A8=;
+  b=ggDR9wFYcL7oQ8ijHOEH2dY9gi2dftJpFYVCyinJ6IAk9gmq8rNBXyOJ
+   bMep+1WDapY4Vn8T5geAjfIDHxh4VDaRVaKFaEcJ1AymFQCRdhrUxPYYZ
+   rnja/89KY+lFyhNgKekU45TT1tNPnKC5b9BYAU9mapCy4uLA43w2ZETHb
+   sUPQwn6wiEoYRpD1B+creb61NoddAPz5zUpTfr45iP8HLXwpxXbz26syk
+   zK+ytuEk0eSqVD7U3srsWNtDpTV14lVmdyfJu/RQml3YhUAIFZ7qQmWpG
+   yQYCyHNxXyurvdR9+w5j6dh7z6udhq00vLeC7XuTHmb1EQy99aZN5CEjM
+   g==;
+X-CSE-ConnectionGUID: 9GrmsO/UR6GTr11tFUNC4A==
+X-CSE-MsgGUID: agjHm55oSKid2moc5j8eLQ==
+X-IronPort-AV: E=Sophos;i="6.21,322,1763449200"; 
+   d="scan'208";a="53407437"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 03 Mar 2026 08:59:09 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Tue, 3 Mar 2026 08:58:52 -0700
+Received: from DEN-DL-M77643.microsemi.net (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Tue, 3 Mar 2026 08:58:48 -0700
+Message-ID: <1ceeb7fb0abc89f4b384c9d73b7d29c73bb8d53b.camel@microchip.com>
+Subject: Re: [PATCH net-next 1/8] net: dsa: add tag driver for LAN9645X
+From: Jens Emil Schulz Ostergaard <jensemil.schulzostergaard@microchip.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: <UNGLinuxDriver@microchip.com>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Simon
+ Horman" <horms@kernel.org>, Rob Herring <robh@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Woojung
+ Huh <woojung.huh@microchip.com>, Russell King <linux@armlinux.org.uk>, "Steen
+ Hegelund" <Steen.Hegelund@microchip.com>, Daniel Machon
+	<daniel.machon@microchip.com>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>
+Date: Tue, 3 Mar 2026 16:58:48 +0100
+In-Reply-To: <c0213890-ef36-435c-aa73-869ee5e849d5@lunn.ch>
+References: <20260303-dsa_lan9645x_switch_driver_base-v1-0-bff8ca1396f5@microchip.com>
+	 <20260303-dsa_lan9645x_switch_driver_base-v1-1-bff8ca1396f5@microchip.com>
+	 <c0213890-ef36-435c-aa73-869ee5e849d5@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart3331196.5fSG56mABF";
- micalg="pgp-sha512"; protocol="application/pgp-signature"
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: CBA0E1F319D
+X-Rspamd-Queue-Id: 335B61F31E7
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263296-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,bootlin.com,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[18];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263297-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[microchip.com,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[romain.gantois@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	FROM_NEQ_ENVFROM(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[microchip.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,bootlin.com:dkim,bootlin.com:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
---nextPart3331196.5fSG56mABF
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
-From: Romain Gantois <romain.gantois@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Date: Tue, 03 Mar 2026 16:54:56 +0100
-Message-ID: <9586950.CDJkKcVGEf@fw-rgant>
-In-Reply-To: <aab51KbpIq72wtSU@shell.armlinux.org.uk>
-MIME-Version: 1.0
+On Tue, 2026-03-03 at 15:13 +0100, Andrew Lunn wrote:
+>=20
+> > +#define LAN9645X_VALIDATE_FIELD(_fld, _fld_sz)                        =
+       \
+> > +do {                                                                 \
+> > +     BUILD_BUG_ON_MSG((_fld_sz) > 32, "IFH field size wider than 32.")=
+;\
+> > +     BUILD_BUG_ON_MSG((_fld_sz) =3D=3D 0, "IFH field size of 0.");    =
+   \
+> > +     BUILD_BUG_ON_MSG((_fld) + (_fld_sz) > LAN9645X_IFH_BITS,        \
+> > +                      "IFH field overflows IFH");                    \
+> > +} while (0)
+> > +
+> > +#define LAN9645X_IFH_GET(_ifh, _fld) \
+> > +({ \
+> > +     LAN9645X_VALIDATE_FIELD(_fld, _fld##_SZ);\
+> > +     lan9645x_ifh_get((_ifh), (_fld), _fld##_SZ); \
+> > +})
+> > +
+> > +#define LAN9645X_IFH_SET(_ifh, _fld, _val) \
+> > +({ \
+> > +     LAN9645X_VALIDATE_FIELD(_fld, _fld##_SZ);\
+> > +     lan9645x_ifh_set((_ifh), (_val), (_fld), _fld##_SZ); \
+> > +})
+>=20
+> If you change the BUILD_BUG_ON_MSG() to static_assert(), you can do
+> the checks in global scope, rather than in a function call.  You can
+> then call lan9645x_ifh_set() directly, without the macro.
+>=20
 
-Hi Russell,
+Do you mean global scope static_assert() for all fields, and then remove
+the SET/GET macros? My idea here was to get the validation for the fields
+used, provided the macros are used at least. Can I do something similar
+with static_assert or would I have to do all the fields globally up front?
 
-On Tuesday, 3 March 2026 16:10:12 CET Russell King (Oracle) wrote:
-> On Tue, Mar 03, 2026 at 02:54:25PM +0100, Romain Gantois wrote:
-> > Hi everyone,
-> > 
-> > This series describes regulators supplying the VccT and VccR pins of an
-> > SFP
-> > cage or soldered-down transceiver.
-> > 
-> > These regulators can then be turned on only when the SFP device is probed,
-> > thus saving power on systems which only load SFP cage support at certain
-> > times, or load SFP device descriptions via device tree overlays.
-> > 
-> > Please let me know what you think.
-> 
-> As ever, I don't want to be adding support for stuff into mainline
-> which doesn't ever get used - historically, we've had a lot of that.
-> So, any patch set which adds some kind of facility like this needs to
-> be accompanied by a user of it.
-> 
+> > +static inline void lan9645x_ifh_set(u8 *ifh, u32 val, size_t pos, size=
+_t length)
+>=20
+> These functions are big enough i would place them into the .c file.
+> Then, normally, i would say, please don't use inline in a C file. But
+> here we are in the fast path. Have you tried this with and without the
+> inline? How does it change the object size and performance?
+>=20
 
-I understand, though I'm dealing with an out-of-tree board but I understand 
-that this doesn't really count as a valid first use case.
+I did test performance back when I first implemented this. I had some issue=
+s
+getting gcc to inline the functions, and that hurt performance quite a bit.
+But I did not look at object size though. I moved them to the header so I c=
+ould
+add the inline. I can move them to the .c file in the next version.
 
-> This is especially true in this case, because I want to see why you're
-> wanting to have two regulators, when INF-8074 suggests that both VccT
-> and VccR should be derived from the same supply. The reason the
-> modules have separate supplies for the transmitter and receiver is
-> because the host side has the supply filtering networks to ensure
-> cross-talk between each is kept to a minimum.
+> > diff --git a/net/dsa/Kconfig b/net/dsa/Kconfig
+> > index 5ed8c704636d..8592cccde7ff 100644
+> > --- a/net/dsa/Kconfig
+> > +++ b/net/dsa/Kconfig
+> > @@ -211,4 +211,14 @@ config NET_DSA_TAG_YT921X
+> >         Say Y or M if you want to enable support for tagging frames for
+> >         Motorcomm YT921x switches.
+> >=20
+> > +config NET_DSA_TAG_LAN9645X
+> > +     tristate "Tag driver for Lan9645x switches"
+> > +     help
+> > +       Say Y or M if you want to enable NPI tagging for the Lan9645x s=
+witches.
+> > +       In this mode, the frames over the Ethernet CPU port are prepend=
+ed with
+> > +       a hardware-defined injection/extraction frame header.
+> > +       On injection a 28 byte internal frame header (IFH) is used. On
+> > +       extraction a 16 byte prefix is prepended before the internal fr=
+ame
+> > +       header. This prefix starts with a broadcast MAC, to ease passag=
+e
+> > +       through the host side RX filter.
+>=20
+> The sorting in DSA is a bit hit and miss. The Kconfig file is however
+> sorted. Please insert before the Lantiq tag driver.
+>=20
 
-Interesting, I wasn't aware of this. I thought it was something like "being 
-able to shut down the transmitter side only while waiting for a WoL packet".
+I will move it before the Lantiq (NET_DSA_TAG_GSWIP) in the next version.
 
-It seems like there won't be a v2 anyway but I just wanted to explain why I 
-went with two regulators in the first place.
+> >  endif
+> > diff --git a/net/dsa/Makefile b/net/dsa/Makefile
+> > index bf7247759a64..dddcd85c81ce 100644
+> > --- a/net/dsa/Makefile
+> > +++ b/net/dsa/Makefile
+> > @@ -42,6 +42,7 @@ obj-$(CONFIG_NET_DSA_TAG_TRAILER) +=3D tag_trailer.o
+> >  obj-$(CONFIG_NET_DSA_TAG_VSC73XX_8021Q) +=3D tag_vsc73xx_8021q.o
+> >  obj-$(CONFIG_NET_DSA_TAG_XRS700X) +=3D tag_xrs700x.o
+> >  obj-$(CONFIG_NET_DSA_TAG_YT921X) +=3D tag_yt921x.o
+> > +obj-$(CONFIG_NET_DSA_TAG_LAN9645X) +=3D tag_lan9645x.o
+>=20
+> Also sorted.
+>=20
+>         Andrew
+
+I will move this before the MTK in the next version.
 
 Thanks,
-
--- 
-Romain Gantois, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
---nextPart3331196.5fSG56mABF
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEIcCsAScRrtr7W0x0KCYAIARzeA4FAmmnBFAACgkQKCYAIARz
-eA4vBg/9E05YtpfuVD6K6O/qoRgoBV79Ne0/MmCdsIQGo39YkLlJOMkJdP6M3hkD
-teYVSQdBdlF3+0gJv0JyzlV5o6yiIzGLVjKZ7GkS1CSXbn2CgUvw4Tuqdy+ExmAb
-q8phnrFep3qUlxXbqXb8lVW0++JBx8ci+fyxCUO7SvWkXM7TlgfFNb3DkuHwlpO+
-NqzxBDZ5/i+4JjEMhESlGV+YEVKToeUcIrhSBVnskQbBnPNaepJWVaCEf0Y3HBw1
-RV3XQf0B6lEdjAlzMJRr3Uoj9RlHsNYw5tuDBjzjhuhLo7Zjk30u0EahSf7bHeOu
-9oiTxreZiGfmKoROElaLxJW4hnPBJk49uHuJ9ZEA3piy4vyXNcDkamVX1KNirrx0
-DAa0wmOm/c1Shh7YPcM49190QwqMBhq8gzj08zqgFGrGYtgC+zctmrWrdhYCH5et
-jrYZzk92SjrzRA1sTSUjb389D1FVZlNMSSw0wVuKplah43Df6Igj2yukQ/kpcOCk
-9lB3SL9riKr9T10PJDcrFPoqkEOaMbcdfjRByIlOHLIMvf4k3AM4Od6PSJi/TQ9S
-XL5mCULfyxrBAd8sniXcZyhzP531Xv88KqD8tknk5OfSw35xvfWmQzoXEElr34hf
-ZAi9MzKythZOiU/0xU2NSTMBY7Y+WD1RaO1LV9XUaEDwU8ih1No=
-=u1tT
------END PGP SIGNATURE-----
-
---nextPart3331196.5fSG56mABF--
-
-
-
+Emil
 
