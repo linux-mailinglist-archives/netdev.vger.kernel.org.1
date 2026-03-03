@@ -1,166 +1,179 @@
-Return-Path: <netdev+bounces-263421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263422-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mNz7JcNPp2k0gwAAu9opvQ
-	(envelope-from <netdev+bounces-263421-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 22:16:51 +0100
+	id OAkrDFRRp2nKggAAu9opvQ
+	(envelope-from <netdev+bounces-263422-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 22:23:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37DD21F7557
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 22:16:51 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86FF31F7759
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 22:23:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8187A3101DD9
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 21:14:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BEB113013A73
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 21:18:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 491133C279D;
-	Tue,  3 Mar 2026 21:14:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 303CF38C2DD;
+	Tue,  3 Mar 2026 21:18:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sPd6IZY5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1I12xVRm"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73AD63CD8AB
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 21:14:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772572462; cv=none; b=Iy1+qMG9byQo6/TbKypwDyg6UHwalSHru5Mp7Zb0MJHZ4eWNlnXR5x2r6coIS2vHAZ9tMsAnJEyNnY0gjwIbLsyIeiw9/MRKBK8D4Ubt6iotFVAIwB54JX8gLmvzagPQ3gARjJ7qnbV6RNz8EVTvl0AoLrRLQ4oMGl5ViznvJf4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772572462; c=relaxed/simple;
-	bh=aU8I06Byo+0ZrO9kKuYwRLdqMdSB/u++Mp9DqrpLlHA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PoujGAThkTu9+jvmThx91QV/fi7bDIHfSScCPDqyH5FNzbrxUJ11NNVv9kqAYvDwX5dbVBRS2L2TdfhiUFYKV79WVkWPal4Z7LJErT/l0tVHYWVi8JPHqWxgAYQeC2LouDRSSziABX2fn4XV8yjiTMzw5ZvKoFGBi1k7YYt/9wE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sPd6IZY5; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <6302ae47-88b0-40cf-9b02-ff35f7292ec1@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772572455;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HcApNV65xllvWnEY+rPw944sQYzISRxzIQ3ebOilVOg=;
-	b=sPd6IZY5BwhSavOZfUXvUe8VRuPQz+7hK1dLTG0NrL0SWePSqnA1hrIbpDT8U07bKu804S
-	LhCTcL/+8T0kpBl2lOss+Y2k7DZwF9fChFNX/exWsmjjMofIQhmich8CsVoBXAjlFl+yf5
-	WyeZbswUwzHOEax6ZNhTDaJk2dvqnOQ=
-Date: Tue, 3 Mar 2026 13:13:59 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EED2332AAD1
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 21:18:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772572722; cv=pass; b=IhLU0sGxgbtYW5s1avPE2S2B3pbAJ+Rq8kNnQnHdXw+DlCeO/qT8ZpRxM1tkT1AFJQQ3KlSByu3DipfvTGyJFMtQDaNhhptoWsYw+0+wZM83Po8feuYjO3L7joKGJ7jbpmGZjslIvlpTafWLEeD9PMxz9QXrBEdaHmeCTS63gVI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772572722; c=relaxed/simple;
+	bh=kqBekaqTLUTuIqVLl/Xn32stOU/skKJREqaiqK/UiSk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sNkagcQWAImTvU3gaL1CWN5iUR/RJ+49N/CGY7xThvuqLgsogdpnrid5H8gWur3z7SmcZ3IrmRnUxGbdfF8D6z8pk8KXU3Mgs4zP7WHRDqZKMfKXkOJVH+VuXPdo+oHGAOcKP1Pcaz4GRahPoMhszRINSj1/TjB1axIHlp7fCQQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1I12xVRm; arc=pass smtp.client-ip=74.125.82.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-1273349c56bso7474311c88.0
+        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 13:18:40 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772572720; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Q4CgckNU0KdSIWnjMdgrnloTVOoZESissqLP52RN7fHVTs3SDly3F37cj5I2vV5vxo
+         sp1640Ea8Y1+PCDQjCZPNig3Lt+JOalizDz+nlsTKRrB6Oo93tpB5cz426vownMEhcK/
+         JPqdMw/PrwAQU+5w9wWMYrSDnpmRwvdTTUnSbN+b4Mx4Ch0w7ufxMLGzYvAdO2+yAXfg
+         y9j2hgCD3YL6LGhUZCwfvtbQ6R2qdba2oFN+j1LPFZTA3Ve9BUtxL9uXe3vK+VvzV8Jv
+         2mgVg/lQZboKGcOYPujObEYuxyZQPeldAPTuVJQfG8HJYvyBBZG8xf9pDmhQTBXwQDzS
+         DwDg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=kqBekaqTLUTuIqVLl/Xn32stOU/skKJREqaiqK/UiSk=;
+        fh=ktmI7hFceuhXePnl4dWcEZcMra6tLg/XBb6PPrxxW8Q=;
+        b=HGBjqriBGI2kapzb+y39etsfDgMjxIde8eXjH/wsdnE7l16Z+3YnfbMUH+boroz7EQ
+         QLlvHC19gdM6p8k09zAn/SwF3jh+cKZ2vHUcQr4g4tmBaPotbr5yd8CV65fGEffBShOX
+         yDCsR6Y8znxix9O6xAR4QaYyolqgtrn302UcRZKuzQ8CkMHmJv0FKLQa0Rvrz2tL+74P
+         Xjk5AmL2PifpDhB98O6fEwzzppocIoFeP1UUzl782jjOeiPhBfvrlBmOu+MyOxg7iyWu
+         ScBVSLrzFnU1Dz0iNaDFUNMLR4OTrD9L4u4tMU3deDATJBbz+Q9ylMbuf6LpQG8ynaRG
+         cXkg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772572720; x=1773177520; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kqBekaqTLUTuIqVLl/Xn32stOU/skKJREqaiqK/UiSk=;
+        b=1I12xVRmn9uobgGaWVjr9pwNSbKzIKJdprYqNuuPOWwmJ0FRvmg9dxPWqjnl+rJaZu
+         Zq1trqIDdyLl1qt6N9zdQiBESsoBD5BhsMntKLIgt2G+LrmTehl2Opu1LoW/YeEMPtr/
+         szYM408h1lxFhK46Ydg75MmVd8DX6HugvDgt6M/eWlfMWAJ9C1bEnduKaoy99nXWJiVk
+         EHlNVduPZQAiHlsOUYL0fL1FYp0CumscV6f+Y6u9ATv13fWW9JqSdVMjLF/Ap+i8KfYC
+         4zaiD4j0WtDkVJpdZE8dAXoww6YhBiRMRQ/0YScHz09mK8SuUxobl67S95ZtmJUz+QxO
+         ++mQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772572720; x=1773177520;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=kqBekaqTLUTuIqVLl/Xn32stOU/skKJREqaiqK/UiSk=;
+        b=fngVKEnLpQtblLmmyYkP3Lp8DsEs6pXyj+uXoejashhF53CGochD/J8XNL0dr0wnD/
+         V8sHZzCtV2bF9jL4pMtr78rvD7Mbw8KQX3s11DP3gntfyOdVIWMMZ/wTT1EQpCAK5Loj
+         Nz6hSM8487NJZcq/93SLjjDvJtTXpU1qcH4MyKoLriwoaK23gxQIrs56IwMp/U/wiNAD
+         04VW108wX/HjtGiQno4MG6HOCsXMVM0t5BjeZMrtfrPmx4MszuFXoCHPw/B/12ji8LZh
+         cQESrV3LiQT2pC/ZhQ+afBZFodoMnRgJYkHJIFVYr4B2K11T4nu0ImMlU5js+8H84cg7
+         Zy6w==
+X-Gm-Message-State: AOJu0YxXqqFnPTWoIOCafzdYLLfOpsldBYDPIxhdVwZWxAJNB3g2lOCn
+	SXx4fK7HK9YA5Pp2u/hehPmWgFLGRFjiFp8hTcYp4xtErFhC1yWipFYVVMhx9CCfGaUqj3KBPOj
+	V3V8gtKxnaKc1caOq8fPUxE90ziwStbHeMl/QUR30
+X-Gm-Gg: ATEYQzzszi7nZh5tD44bTIAfNQiN6UOuP61pm3QXeTad2dx8vROck/MvwFqcUDAPJXW
+	W20xkkM8Sk/nUst2zjaEFGElSO2GT4g+O4t/57k2pUDALIbvpeUP79gMvqLhj6/MjKMIeEGqfKu
+	srNtk5VBaity1QpimdipNbuw3GdUKIPjs1BGVICzWNtMN3WUTWvuRNrTsVtZ/EV6Dft5dme1yQx
+	W2H5s8myiv6HkpCgWImP3J5MtndlFSWuKuPLgvHiNtOc84dUNjxUAjSZX/aKCFe5lurd3t3AE52
+	h6PL+q7kiGHY9iGbUk6G5gSnwmcvjIAdMaAz0PzFDUDoNhiuIumJJpnhbUTHySeg7gxm8A==
+X-Received: by 2002:a05:7022:20e:b0:127:5c57:cffc with SMTP id
+ a92af1059eb24-1278fc1f980mr5546302c88.26.1772572719385; Tue, 03 Mar 2026
+ 13:18:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v9 bpf-next 2/2] selftests/bpf: Add selftests for the
- invocation of bpf_lwt_xmit_push_encap
-To: Feng Yang <yangfeng59949@163.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, posk@google.com, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com,
- bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20260303074423.172680-1-yangfeng59949@163.com>
- <20260303074423.172680-3-yangfeng59949@163.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20260303074423.172680-3-yangfeng59949@163.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 37DD21F7557
+References: <20260303172949.4741-1-fmancera@suse.de>
+In-Reply-To: <20260303172949.4741-1-fmancera@suse.de>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Tue, 3 Mar 2026 13:18:28 -0800
+X-Gm-Features: AaiRm50uYKOI7nxXxDuzBrnNN3EjwAriC15_wrOdsD4-O8mxMJY_UZ265TaI5So
+Message-ID: <CAAVpQUChu=Wr91kjQz9cWzFmJwrWXz-SsLoD75J3prEKswE43g@mail.gmail.com>
+Subject: Re: [PATCH net-next v3] inet: add ip_local_port_step_width sysctl to
+ improve port usage distribution
+To: Fernando Fernandez Mancera <fmancera@suse.de>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, chia-yu.chang@nokia-bell-labs.com, 
+	idosch@nvidia.com, willemb@google.com, dsahern@kernel.org, 
+	ncardwell@google.com, skhan@linuxfoundation.org, corbet@lwn.net, 
+	horms@kernel.org, pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, 
+	davem@davemloft.net
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 86FF31F7759
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263421-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[163.com];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	RCVD_COUNT_THREE(0.00)[3];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263422-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:dkim,linux.dev:mid]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,suse.de:email,mail.gmail.com:mid,0xffsoftware.com:url]
 X-Rspamd-Action: no action
 
+On Tue, Mar 3, 2026 at 9:30=E2=80=AFAM Fernando Fernandez Mancera
+<fmancera@suse.de> wrote:
+>
+> With the current port selection algorithm, ports after a reserved port
+> range or long time used port are used more often than others [1]. This
+> causes an uneven port usage distribution. This combines with cloud
+> environments blocking connections between the application server and the
+> database server if there was a previous connection with the same source
+> port, leading to connectivity problems between applications on cloud
+> environments.
+>
+> The real issue here is that these firewalls cannot cope with
+> standards-compliant port reuse. This is a workaround for such situations
+> and an improvement on the distribution of ports selected.
+>
+> The proposed solution is to implement a variant of RFC 6056 Algorithm 5.
+> The step size is selected randomly on every connect() call ensuring it
+> is a coprime with respect to the size of the range of ports we want to
+> scan. This way, we can ensure that all ports within the range are
+> scanned before returning an error. To enable this algorithm, the user
+> must configure the new sysctl option "net.ipv4.ip_local_port_step_width".
+>
+> In addition, on graphs generated we can observe that the distribution of
+> source ports is more even with the proposed approach. [2]
+>
+> [1] https://0xffsoftware.com/port_graph_current_alg.html
+>
+> [2] https://0xffsoftware.com/port_graph_random_step_alg.html
+>
+> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
 
-
-On 3/2/26 11:44 PM, Feng Yang wrote:
-> From: Feng Yang <yangfeng@kylinos.cn>
-> 
-> Calling bpf_lwt_xmit_push_encap will not cause a crash when dst is missing.
-> 
-> Signed-off-by: Feng Yang <yangfeng@kylinos.cn>
-> ---
->   .../selftests/bpf/progs/verifier_lwt.c        | 20 +++++++++++++++++++
->   1 file changed, 20 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/bpf/progs/verifier_lwt.c b/tools/testing/selftests/bpf/progs/verifier_lwt.c
-> index 5ab746307309..9cef07e6eceb 100644
-> --- a/tools/testing/selftests/bpf/progs/verifier_lwt.c
-> +++ b/tools/testing/selftests/bpf/progs/verifier_lwt.c
-> @@ -231,4 +231,24 @@ __naked void not_permitted_for_lwt_prog(void)
->   	: __clobber_all);
->   }
->   
-> +SEC("lwt_xmit")
-> +__description("missing dst when calling bpf_lwt_xmit_push_encap")
-> +__success __retval(0)
-> +__naked void missing_dst_call_bpf_lwt_xmit_push_encap(void)
-> +{
-> +	asm volatile ("					\
-> +	r9 = 69;					\
-
-hmm... I just noticed this.
-
-69 is the ip version and ihl?
-
-> +	r3 = r10;					\
-> +	r3 += -32;					\
-> +	*(u64 *)(r3 + 0) = r9;				\
-
-This will not work in big endian. Although x86 arch is enough to cover 
-this test, these little things (e.g., the value 69, unnecessary asm 
-...etc) make this test hard to read.
-
-Let's bite the bullet and move this bpf test prog out of verifier_lwt.c. 
-It is not testing the verifier to begin with. No need to write in asm 
-either. Create its own progs/lwt_misc.c test file for misc lwt tests. 
-Create a corresponding prog_tests/lwt_misc.c also. Write the bpf prog in 
-C instead of asm. Use "char iph[20];" for the iph and init "iph[0] = 
-0x45". Search for RUN_TESTS() usage in prog_tests/. It is pretty 
-straightforward.
-
-pw-bot: cr
-
-> +	r2 = 2;						\
-> +	r4 = 20;					\
-> +	call %[bpf_lwt_push_encap];			\
-> +	r0 = 0;						\
-> +	exit;						\
-> +"	:
-> +	: __imm(bpf_lwt_push_encap)
-> +	: __clobber_all);
-> +}
-> +
->   char _license[] SEC("license") = "GPL";
-
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
