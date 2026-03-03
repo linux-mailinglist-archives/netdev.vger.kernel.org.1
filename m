@@ -1,149 +1,427 @@
-Return-Path: <netdev+bounces-263189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263190-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YOaJDCbVpmnHWgAAu9opvQ
-	(envelope-from <netdev+bounces-263189-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 13:33:42 +0100
+	id aBoXIAjXpmltXgAAu9opvQ
+	(envelope-from <netdev+bounces-263190-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 13:41:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1E8B1EF7DF
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 13:33:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26C4F1EF9E1
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 13:41:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2BE47300E5C4
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 12:30:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0A0A3312C770
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 12:32:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 107B51AF4EF;
-	Tue,  3 Mar 2026 12:30:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F45A346A1C;
+	Tue,  3 Mar 2026 12:32:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MkXJzJh0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SXaaPb9D";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="L7Mfx8Tf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E11201A704B
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 12:30:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6D19344D92
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 12:32:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772541015; cv=none; b=ZEtzTj/lJo3fKA9KNEqwGZByv9ODNbeXn7gsrj7EWPUtWj8pccZD800enDEdw72CatQ03VrRGYUtAySUSnTO7ZaL1oZsYZGaBQ2gdnJzc6L3GuK9R+tjWIyWfnnzPi0xs1q9ou5zA4CBnHiCruV3CCtAcsekchPa0qd22CIUebU=
+	t=1772541155; cv=none; b=lm+0aGHyeQcNPrX3wn5kX765L2lG6Pp80TeIocspLQuOOeH0hqF2KQMw1mSuYQyiyEgs325PazXQvxi2gV/VcYugsdbPqxBRFwov6a31hHqAfPvIONXQI8u0wO0ypYVCc1YNY/NKgIwrFAOEWOiEQXhvlOpJPTDZfpajIfITADY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772541015; c=relaxed/simple;
-	bh=Hb99zZEnfXUWFcCZg0RwqomnFr/1bYLm8adSEDZXJ4I=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=O0jKtDT4Tj0STWl7bnw4aegJkILXPo6zl59p+rmCXVvfNd3snzspG7ZdJBF34sLmJ7Jb7H5kXCBsvZse1U79UcjeY612zMonM8hkaBw9/zCFBfsKuPLFzI5NeKe48b3sihhfzdPC41NdVZA2LQ/zpJpXub4KXIZK0VVQyiHjr0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MkXJzJh0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E8E3C116C6;
-	Tue,  3 Mar 2026 12:30:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772541014;
-	bh=Hb99zZEnfXUWFcCZg0RwqomnFr/1bYLm8adSEDZXJ4I=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MkXJzJh01K4AdnyDXCxtSMHGZnkVj4a5Ks1sVEwei6MkdjQYsl5D4dWJERhFV2TfE
-	 l6m9iUNes/d6ONDZpXXMSTLNdYib57JHafdo0OWbU+Eb38T4yDnZR9oe6JRWmO3TuW
-	 +0Tt9jxY5jY1srtah3MK2/C4k8Gk8TMzkyXA2Cn9dz+lmHVBlcCcn//9XJs0r1TLGs
-	 XHESqQfWlDmiyorm0wLaVs2OpxLUyAf8kbndZdafneRIRUiCu3SogWWFTczbUwomOQ
-	 6vcO3786TuwreWlYOfEHZD2HZwdJ7aqZjpJiZLVflabKemesyRS14FsiLoaxXiavKQ
-	 X3z4zGJTRoY0A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02EC8380A966;
-	Tue,  3 Mar 2026 12:30:17 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1772541155; c=relaxed/simple;
+	bh=vMNiiAt1Fwy9Teu2yIb26JC5dV3q4DvAFgv8ItOJHfA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=koAgh5v2s6zRTAnboxbGtOzyZNm9/bzjg6FT6GrQEHATrF0EdQPI+0FPLma7VwVfHuTfOPpBR3Ya4MciTIb3xfT8sDL+bAmp4l5DltvgUOgAS9H0d5Xc+WJDOe1ki+pgWIK63PI6PmJHbEGumdAkFTRjwu25V6wVaM2ow0c/b9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SXaaPb9D; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=L7Mfx8Tf; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772541152;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=33vOBPb9YBeaZHuv0n0JQPoCQUrGGFAN/nM5xsJK9iY=;
+	b=SXaaPb9Dj+H8CayS2k7Y9zkczKf5kgovdsWZtpouQ8htFgqpv9ZQcJb6LUWIiEu/cDKCYP
+	d6BlpWOpLk5B44Z0pzPGtTSorGYxUdLjL+YSecZEeGSb0MgrKW79JNsXoEpDPIgSeiklGT
+	5k9M0liU8UTi4VO6FudSXXZeFSZQORs=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-564-Z5bYHNA_N1aE9biVOBO9PA-1; Tue, 03 Mar 2026 07:32:29 -0500
+X-MC-Unique: Z5bYHNA_N1aE9biVOBO9PA-1
+X-Mimecast-MFC-AGG-ID: Z5bYHNA_N1aE9biVOBO9PA_1772541148
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4836b7c302fso55324595e9.1
+        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 04:32:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1772541148; x=1773145948; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=33vOBPb9YBeaZHuv0n0JQPoCQUrGGFAN/nM5xsJK9iY=;
+        b=L7Mfx8Tf7UoOHamY1uAizJjtgx+vbogGy79NU9OCE+iEx1j1EVs+WVFQHv+xGIBt9G
+         oWialC8rA0nldnegfhM6dAMAZ7YfRQSQ6NJaZ4GRWOVeMjlR0H/ahMB0E2Wk0jamtTS3
+         +SD7Jk9Ai8dGa872W6oCn3NupOzne+BkPGvi18wLD7wbEgFvwWtRphGVSAA6E+6IIkTS
+         9BXOrUV/uWki6+izVXWFezdjj5izvGFsq6KE5OUlW6lkmDxzlJDSC/eAZiWjjyd0VmqZ
+         FnvxS0/ipms3yG9pu6xDPoKM7gpyjdckJxuRs4ZDurgt0bRtoSuSy44Dz+iFniVN45ER
+         SzEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772541148; x=1773145948;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=33vOBPb9YBeaZHuv0n0JQPoCQUrGGFAN/nM5xsJK9iY=;
+        b=k2KGWF/TFQJiwxWoeyn7AvV2V3QQ0Fe6efKq8L20kfS01FFNFCeWyJc/EKGzMyH3BW
+         /2sC5mzJs3mL9PLDDBMv+/NMHxy9qNQDNAJ/W0fFaMJNwXr3tMXxelU0wuwuWfMAfA1H
+         vNI0nLSZnaWa9NoC5W6RMUzIXZnxCBNSiz5zVxFOVx7lGyg3Sro4M+pK9oJzTMX0iSGh
+         n3qE+3OrHwJIQTjQfnY8ed6eAPRbk0Iz2lsb81mizTVVWxFur1RoJHXGooZcAb9I+04a
+         Udzv46uej1bktz2G78jRyGm+Rmb8XWt4BYTWMaw3ZrrzB9qkABP82p4Sb1Vgq61GCSZQ
+         goEg==
+X-Forwarded-Encrypted: i=1; AJvYcCXLBsOKs1nt9ebGu7a/IC0QubIDo6vIaMXpTuXnOssTrSBMKUiO91x0FHN0HHRZriQpMOHO5gA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9YARHMAdZcidZ/2Dkj8eOYogA/DOFeimerIV9rCoIB6ymHzBV
+	1HBg+UY9n1jfthCV9CZ0XFrFgtvmc+O/bAhjvPNfVK56BtCfjvP1Pae9Adlx34mrEpUzay1XuVz
+	kvvUFw8f2EJAD0+3BFubMNorDAvups9yhuNJCnVDT2bHij77KoHbB7nMpFA==
+X-Gm-Gg: ATEYQzzuzvZABmWgDAUGZ2OeplvEjBxZbAOcalId2utcBZ8ZhyCDXnPlLiuzg3S7nNB
+	2GBVtaqZkJv8XzeoUfbtVhZhMMmQPVnmFZWCbVwJ/XdY8qtokopsZWThwDUNaCLnajL3Q1lEjmc
+	wu5vQF54SDBA/WfO8Zx53pCa64dxIk6lHXPPDLJVVNCK26Y05tlo+dYVra4xUzqHR0HZPKHImsr
+	UWnuDT3kvzxOCwk9Y/9gcvB9fyIpKHVgO3bhPBeSqvlpN2BYvV8dyr5N8yrhL4zyfOMkWppJVN7
+	UUCgG0iFxwoQB7vJA48gOEUIhLXwJUqQelp80Oik4qWobzKnJMQsm6M8QkFAr2QwM27f75DmmR4
+	e0sZWjZQWooTwINLvyznXiSol0O3+tYuzPhjvhLWIbZfTuhnNq+JnK+OJrsD6LG3QCpuHKks=
+X-Received: by 2002:a05:600c:3b22:b0:479:35e7:a0e3 with SMTP id 5b1f17b1804b1-483c9c2d29amr255124585e9.30.1772541148151;
+        Tue, 03 Mar 2026 04:32:28 -0800 (PST)
+X-Received: by 2002:a05:600c:3b22:b0:479:35e7:a0e3 with SMTP id 5b1f17b1804b1-483c9c2d29amr255123855e9.30.1772541147625;
+        Tue, 03 Mar 2026 04:32:27 -0800 (PST)
+Received: from sgarzare-redhat (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4851262ee4asm24386825e9.1.2026.03.03.04.32.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Mar 2026 04:32:25 -0800 (PST)
+Date: Tue, 3 Mar 2026 13:32:20 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Alexander Graf <graf@amazon.com>
+Cc: virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, kvm@vger.kernel.org, eperezma@redhat.com, 
+	Jason Wang <jasowang@redhat.com>, mst@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, 
+	bcm-kernel-feedback-list@broadcom.com, Arnd Bergmann <arnd@arndb.de>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	nh-open-source@amazon.com
+Subject: Re: [PATCH v2] vsock: add G2H fallback for CIDs not owned by H2G
+ transport
+Message-ID: <aabUfziQhUFeZZx9@sgarzare-redhat>
+References: <20260302194926.90378-1-graf@amazon.com>
+ <aaa0UCkzFRyuVp4N@sgarzare-redhat>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/8] net: phy: improve stats handling in
- mdio_bus.c
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177254101579.850080.3261786515806089217.git-patchwork-notify@kernel.org>
-Date: Tue, 03 Mar 2026 12:30:15 +0000
-References: <799114be-1456-442b-b479-142e7ee9d254@gmail.com>
-In-Reply-To: <799114be-1456-442b-b479-142e7ee9d254@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: andrew@lunn.ch, andrew+netdev@lunn.ch, linux@armlinux.org.uk,
- pabeni@redhat.com, edumazet@google.com, davem@davemloft.net, kuba@kernel.org,
- netdev@vger.kernel.org
-X-Rspamd-Queue-Id: A1E8B1EF7DF
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <aaa0UCkzFRyuVp4N@sgarzare-redhat>
+X-Rspamd-Queue-Id: 26C4F1EF9E1
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263189-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263190-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Hello:
+On Tue, Mar 03, 2026 at 11:28:20AM +0100, Stefano Garzarella wrote:
+>Please mark this as `net-next` material. AF_VSOCK core changes are 
+>queued by net maintainers and that will help them to get the right 
+>tree:
+>https://docs.kernel.org/process/maintainer-netdev.html#git-trees-and-patch-flow
+>
+>On Mon, Mar 02, 2026 at 07:49:26PM +0000, Alexander Graf wrote:
+>>Vsock maintains a single CID number space which can be used to
+>>communicate to the host (G2H) or to a child-VM (H2G). The current logic
+>>assumes that G2H is only relevant for CID <= 2 because these target the
+>>hypervisor. However, in environments like Nitro Enclaves, an instance
+>>that hosts vhost_vsock powered VMs may still want to communicate to
+>>Enclaves that are reachable at higher CIDs through virtio-vsock-pci.
+>>
+>>Vsock introduced VMADDR_FLAG_TO_HOST to allow user space applications
+>>to clearly express a desire to talk to the host instead of a guest via
+>>the passed target CID. However, users may not actually know which one
+>>they want to talk to and the application ecosystem has not picked up a
+>>way for users to specify that desire.
+>>
+>>Instead, make it easy for users and introduce a G2H fallback mechanism:
+>>when user space attempts to connect to a CID and the H2G transport
+>>(vhost-vsock / VMCI) does not own it, automatically route the connection
+>>through the G2H transport. This provides a single unified CID address
+>>space where vhost-registered CIDs go to nested VMs and all other CIDs
+>>are routed to the hypervisor.
+>>
+>>To give user space at least a hint that the kernel applied this logic,
+>>automatically set the VMADDR_FLAG_TO_HOST on the remote address so it
+>>can determine the path taken via getpeername().
+>>
+>>To force the system back into old behavior, provide a sysctl
+>>(net.vsock.g2h_fallback, defaults to 1).
+>
+>I'm still concerned about this change. Perhaps we should document the 
+>fact that if H2G is not loaded, we already behave in this way, and 
+>sysctl helps us definitively to better define this behavior.
+>
+>>
+>>Signed-off-by: Alexander Graf <graf@amazon.com>
+>>
+>>---
+>>
+>>v1 -> v2:
+>>
+>> - Rebase on 7.0, include namespace support
+>> - Add net.vsock.g2h_fallback sysctl
+>> - Rework description
+>> - Set VMADDR_FLAG_TO_HOST automatically
+>> - Add VMCI support
+>> - Update vsock_assign_transport() comment
+>>---
+>>Documentation/admin-guide/sysctl/net.rst | 22 ++++++++++++++++++++++
+>>drivers/misc/vmw_vmci/vmci_context.c     |  1 +
+>>drivers/vhost/vsock.c                    | 13 +++++++++++++
+>>include/linux/vmw_vmci_api.h             |  1 +
+>>include/net/af_vsock.h                   |  3 +++
+>>net/vmw_vsock/af_vsock.c                 | 20 +++++++++++++++++++-
+>>net/vmw_vsock/vmci_transport.c           |  6 ++++++
+>>7 files changed, 65 insertions(+), 1 deletion(-)
+>>
+>>diff --git a/Documentation/admin-guide/sysctl/net.rst b/Documentation/admin-guide/sysctl/net.rst
+>>index 3b2ad61995d4..cc364baa9021 100644
+>>--- a/Documentation/admin-guide/sysctl/net.rst
+>>+++ b/Documentation/admin-guide/sysctl/net.rst
+>>@@ -602,3 +602,25 @@ it does not modify the current namespace or any existing children.
+>>
+>>A namespace with ``ns_mode`` set to ``local`` cannot change
+>>``child_ns_mode`` to ``global`` (returns ``-EPERM``).
+>>+
+>>+g2h_fallback
+>>+------------
+>>+
+>>+Controls whether connections to CIDs not owned by the host-to-guest (H2G)
+>>+transport automatically fall back to the guest-to-host (G2H) transport.
+>>+
+>>+When enabled, if a connect targets a CID that the H2G transport (e.g.
+>>+vhost-vsock) does not serve, the connection is routed via the G2H transport
+>>+(e.g. virtio-vsock) instead. This allows a host running both nested VMs
+>>+(via vhost-vsock) and sibling VMs reachable through the hypervisor (e.g.
+>>+Nitro Enclaves) to address both using a single CID space, without requiring
+>>+applications to set ``VMADDR_FLAG_TO_HOST``.
+>>+
+>>+When the fallback is taken, ``VMADDR_FLAG_TO_HOST`` is automatically set on
+>>+the remote address so that userspace can determine the path via
+>>+``getpeername()``.
+>>+
+>>+Values:
+>>+
+>>+	- 0 - Connections to CIDs < 3 get handled by G2H, others by H2G.
+>>+	- 1 - Connections to CIDs not owned by H2G fall back to G2H. (default)
+>>diff --git a/drivers/misc/vmw_vmci/vmci_context.c b/drivers/misc/vmw_vmci/vmci_context.c
+>>index 19ca00feed6e..577296784df5 100644
+>>--- a/drivers/misc/vmw_vmci/vmci_context.c
+>>+++ b/drivers/misc/vmw_vmci/vmci_context.c
+>>@@ -364,6 +364,7 @@ bool vmci_ctx_exists(u32 cid)
+>>	rcu_read_unlock();
+>>	return exists;
+>>}
+>>+EXPORT_SYMBOL_GPL(vmci_ctx_exists);
+>>
+>>/*
+>> * Retrieves VMCI context corresponding to the given cid.
+>>diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>>index 054f7a718f50..319e3a690108 100644
+>>--- a/drivers/vhost/vsock.c
+>>+++ b/drivers/vhost/vsock.c
+>>@@ -91,6 +91,18 @@ static struct vhost_vsock *vhost_vsock_get(u32 guest_cid, struct net *net)
+>>	return NULL;
+>>}
+>>
+>>+static bool vhost_transport_has_remote_cid(struct vsock_sock *vsk, u32 cid)
+>>+{
+>>+	struct sock *sk = sk_vsock(vsk);
+>>+	struct net *net = sock_net(sk);
+>>+	bool found;
+>>+
+>>+	rcu_read_lock();
+>>+	found = vhost_vsock_get(cid, net) != NULL;
+>>+	rcu_read_unlock();
+>>+	return found;
+>>+}
+>>+
+>>static void
+>>vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+>>			    struct vhost_virtqueue *vq)
+>>@@ -424,6 +436,7 @@ static struct virtio_transport vhost_transport = {
+>>		.module                   = THIS_MODULE,
+>>
+>>		.get_local_cid            = vhost_transport_get_local_cid,
+>>+		.has_remote_cid           = vhost_transport_has_remote_cid,
+>>
+>>		.init                     = virtio_transport_do_socket_init,
+>>		.destruct                 = virtio_transport_destruct,
+>>diff --git a/include/linux/vmw_vmci_api.h b/include/linux/vmw_vmci_api.h
+>>index 41764a684423..c412d17c572f 100644
+>>--- a/include/linux/vmw_vmci_api.h
+>>+++ b/include/linux/vmw_vmci_api.h
+>>@@ -37,6 +37,7 @@ int vmci_doorbell_create(struct vmci_handle *handle, u32 flags,
+>>int vmci_doorbell_destroy(struct vmci_handle handle);
+>>u32 vmci_get_context_id(void);
+>>bool vmci_is_context_owner(u32 context_id, kuid_t uid);
+>>+bool vmci_ctx_exists(u32 cid);
+>>int vmci_register_vsock_callback(vmci_vsock_cb callback);
+>>
+>>int vmci_event_subscribe(u32 event,
+>>diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+>>index 533d8e75f7bb..0aeb25642827 100644
+>>--- a/include/net/af_vsock.h
+>>+++ b/include/net/af_vsock.h
+>>@@ -179,6 +179,9 @@ struct vsock_transport {
+>>	/* Addressing. */
+>>	u32 (*get_local_cid)(void);
+>>
+>>+	/* Check if this transport serves a specific remote CID. */
+>>+	bool (*has_remote_cid)(struct vsock_sock *vsk, u32 remote_cid);
+>>+
+>>	/* Read a single skb */
+>>	int (*read_skb)(struct vsock_sock *, skb_read_actor_t);
+>>
+>>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>>index 2f7d94d682cb..b41bc734d6c0 100644
+>>--- a/net/vmw_vsock/af_vsock.c
+>>+++ b/net/vmw_vsock/af_vsock.c
+>>@@ -210,6 +210,8 @@ static const struct vsock_transport *transport_dgram;
+>>static const struct vsock_transport *transport_local;
+>>static DEFINE_MUTEX(vsock_register_mutex);
+>>
+>>+static int vsock_g2h_fallback = 1;
+>>+
+>>/**** UTILS ****/
+>>
+>>/* Each bound VSocket is stored in the bind hash table and each connected
+>>@@ -547,7 +549,8 @@ static void vsock_deassign_transport(struct vsock_sock *vsk)
+>> *    g2h is not loaded, will use local transport;
+>> *  - remote CID <= VMADDR_CID_HOST or h2g is not loaded or remote flags field
+>> *    includes VMADDR_FLAG_TO_HOST flag value, will use guest->host transport;
+>>- *  - remote CID > VMADDR_CID_HOST will use host->guest transport;
+>>+ *  - remote CID > VMADDR_CID_HOST will use host->guest transport if h2g has
+>>+ *    registered that CID, otherwise will use guest->host transport (overlay);
+>> */
+>>int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+>>{
+>>@@ -584,6 +587,12 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+>>		else if (remote_cid <= VMADDR_CID_HOST || !transport_h2g ||
+>>			 (remote_flags & VMADDR_FLAG_TO_HOST))
+>>			new_transport = transport_g2h;
+>>+		else if (vsock_g2h_fallback &&
+>
+>IMO `vsock_g2h_fallback` should also control the fallback when 
+>transport_h2g == NULL. In this way is easiest to justify why the 
+>default is to have the fallback enabled.
+>
+>>+			 transport_h2g->has_remote_cid &&
+>>+			 !transport_h2g->has_remote_cid(vsk, remote_cid)) {
+>>+			vsk->remote_addr.svm_flags |= VMADDR_FLAG_TO_HOST;
+>>+			new_transport = transport_g2h;
+>>+		}
+>>		else
+>>			new_transport = transport_h2g;
+>>		break;
+>>@@ -2879,6 +2888,15 @@ static struct ctl_table vsock_table[] = {
+>>		.mode		= 0644,
+>>		.proc_handler	= vsock_net_child_mode_string
+>>	},
+>>+	{
+>>+		.procname	= "g2h_fallback",
+>>+		.data		= &vsock_g2h_fallback,
+>>+		.maxlen		= sizeof(int),
+>>+		.mode		= 0644,
+>>+		.proc_handler	= proc_dointvec_minmax,
+>>+		.extra1		= SYSCTL_ZERO,
+>>+		.extra2		= SYSCTL_ONE,
+>>+	},
+>
+>syzbot is reporting a warning with this change:
+>https://lore.kernel.org/netdev/69a6940b.a70a0220.135158.0007.GAE@google.com/
+>    sysctl net/vsock/g2h_fallback: data points to kernel global data:     
+>vsock_g2h_fallback
+>
+>IIUC because vsock_table is per-netns stuff, while `g2h_fallback` is a 
+>global setting, so I guess we need to use another ctl_table for that.
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Oh right, as Michael pointed out maybe it is better to have this 
+per-netns and inherit the value from the parent while init_ns will have 
+the default.
 
-On Fri, 27 Feb 2026 23:04:20 +0100 you wrote:
-> Improve stats handling in mdio_bus.c.
-> 
-> Heiner Kallweit (8):
->   net: mdio: extend struct mdio_bus_stat_attr instead of using
->     dev_ext_attribute
->   net: mdio: use macro __ATTR to simplify the code
->   net: phy: consider that mdio_bus_device_stat_field_show doesn't use
->     member address
->   net: phy: avoid extra casting in mdio_bus_get_stat
->   net: mdio: constify attributes and attribute arrays
->   net: mdio: use macro __ATTRIBUTE_GROUPS
->   net: phy: inline helper mdio_bus_get_global_stat
->   net: phy: improve mdiobus_stats_acct
-> 
-> [...]
+Stefano
 
-Here is the summary with links:
-  - [net-next,1/8] net: mdio: extend struct mdio_bus_stat_attr instead of using dev_ext_attribute
-    https://git.kernel.org/netdev/net-next/c/5c494f404a3f
-  - [net-next,2/8] net: mdio: use macro __ATTR to simplify the code
-    https://git.kernel.org/netdev/net-next/c/807d8addc3ec
-  - [net-next,3/8] net: phy: consider that mdio_bus_device_stat_field_show doesn't use member address
-    https://git.kernel.org/netdev/net-next/c/8068acaff125
-  - [net-next,4/8] net: phy: avoid extra casting in mdio_bus_get_stat
-    https://git.kernel.org/netdev/net-next/c/c599649d05a0
-  - [net-next,5/8] net: mdio: constify attributes and attribute arrays
-    https://git.kernel.org/netdev/net-next/c/a4c08b701559
-  - [net-next,6/8] net: mdio: use macro __ATTRIBUTE_GROUPS
-    https://git.kernel.org/netdev/net-next/c/8e0bdf30be75
-  - [net-next,7/8] net: phy: inline helper mdio_bus_get_global_stat
-    https://git.kernel.org/netdev/net-next/c/7f97ca5f9858
-  - [net-next,8/8] net: phy: improve mdiobus_stats_acct
-    https://git.kernel.org/netdev/net-next/c/1afccc5a201e
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+>
+>Thanks,
+>Stefano
+>
+>>};
+>>
+>>static int __net_init vsock_sysctl_register(struct net *net)
+>>diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
+>>index 4296ca1183f1..de3dff52c566 100644
+>>--- a/net/vmw_vsock/vmci_transport.c
+>>+++ b/net/vmw_vsock/vmci_transport.c
+>>@@ -2045,6 +2045,11 @@ static u32 vmci_transport_get_local_cid(void)
+>>	return vmci_get_context_id();
+>>}
+>>
+>>+static bool vmci_transport_has_remote_cid(struct vsock_sock *vsk, u32 cid)
+>>+{
+>>+	return vmci_ctx_exists(cid);
+>>+}
+>>+
+>>static struct vsock_transport vmci_transport = {
+>>	.module = THIS_MODULE,
+>>	.init = vmci_transport_socket_init,
+>>@@ -2074,6 +2079,7 @@ static struct vsock_transport vmci_transport = {
+>>	.notify_send_post_enqueue = vmci_transport_notify_send_post_enqueue,
+>>	.shutdown = vmci_transport_shutdown,
+>>	.get_local_cid = vmci_transport_get_local_cid,
+>>+	.has_remote_cid = vmci_transport_has_remote_cid,
+>>};
+>>
+>>static bool vmci_check_transport(struct vsock_sock *vsk)
+>>-- 
+>>2.47.1
+>>
+>>
+>>
+>>
+>>Amazon Web Services Development Center Germany GmbH
+>>Tamara-Danz-Str. 13
+>>10243 Berlin
+>>Geschaeftsfuehrung: Christof Hellmis, Andreas Stieger
+>>Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+>>Sitz: Berlin
+>>Ust-ID: DE 365 538 597
+>>
+>>
 
 
