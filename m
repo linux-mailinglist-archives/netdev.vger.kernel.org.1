@@ -1,317 +1,187 @@
-Return-Path: <netdev+bounces-263102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263103-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wPeSFMOupmn9SgAAu9opvQ
-	(envelope-from <netdev+bounces-263102-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 10:49:55 +0100
+	id wHuCKDSwpmn9SgAAu9opvQ
+	(envelope-from <netdev+bounces-263103-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 10:56:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED1591EC181
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 10:49:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16C191EC2A4
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 10:56:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 624E6302D727
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 09:49:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 86EC8303F064
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 09:54:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA4B638E13F;
-	Tue,  3 Mar 2026 09:49:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4D8138D01F;
+	Tue,  3 Mar 2026 09:54:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fa1QPRwu";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="e8Ef/vA0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J5kyLqHk"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1850238C419
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 09:49:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98D3038C408
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 09:54:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772531392; cv=none; b=LucxDs+ai5hJVbOhQTFtYwUiJom/Z7lkzf2REhYVJ2nDJutRNx/kyiHA/miyx9oQ2YM66TiaZGNsiA5Za96J4Rd0mLMGQHgHoFewRxEiTCbk60Vpv/Oeri9ifGGDtVI4aTjRlhpXO8m2UHysoa17qB9yzbzvGYFdpQCrT7y5ypo=
+	t=1772531654; cv=none; b=G6SD7HuHupPq4m7k5y5HSBCwAg1jRRFfLSTXRO6akwKtg12nNK3LOryx05kdE3MDI1ruVjtkQd0rPB6fHhujCkWUKVBfsZQuIqhdeIwwoTojLLiQigEyi6Ui+WsGqamVDAnwDUEoKVjf9McrrCQFTbTGS319zkydQg/Y5aa/S3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772531392; c=relaxed/simple;
-	bh=D82we1/S7CpQEwb5p/LRrkMntBwk09K9srnJc17tQ1M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bsq/bdummAhhzRhtJ+e9Rf48p65eE/hia28g7N2pbvgybIWHsnQnIXM43Q4J9zOUncBVJartfbTsz6wy2Ao4nid09DxdKeSSJuE/0q6Ajp7cYvuLh6vil/oKErcDcszGXZia4nMBGYexTWSie2zgMtWWpocQQHamy11yMQ+Pax0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Fa1QPRwu; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=e8Ef/vA0; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772531390;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nr4K8j7YtMX/4S/mJWMk637aePMGr7h3tPxcdH4coBg=;
-	b=Fa1QPRwuACYHH1DSP9HjCwrwcpfR2LKTL90oP1cYoj6v2XgFAL6MK+bZKQv3/DXiRsjP4N
-	fi7Pg1ApKjY7p1dA/ocCwNGCz6qBrZlyrry+wP6Lu16dwVsAYBg/2KAfl8eBr0gLDV0K4M
-	DzDXVstXc4bKJ4x/Pbdz6qOWI3dMDNM=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-320-HvWI0MXINIq8ZcruaJf0Og-1; Tue, 03 Mar 2026 04:49:49 -0500
-X-MC-Unique: HvWI0MXINIq8ZcruaJf0Og-1
-X-Mimecast-MFC-AGG-ID: HvWI0MXINIq8ZcruaJf0Og_1772531388
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-439b20722e3so1015406f8f.0
-        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 01:49:48 -0800 (PST)
+	s=arc-20240116; t=1772531654; c=relaxed/simple;
+	bh=6zEHfs6NVagrKkHTQrtRq0DKa/7gfElvLcDsqQCnjmM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=XJgQOJODqAL0Yz+5cM7fd9VeKorlIB5eWqWjWY0wp8VxH24yqD70PAeo83Ietmlm+Q+MLKcN3X5o+NmEt43DXE4z354TiVmZ+hJBrbfRz3aXl0iYWHgHr7kBwSUBahKczFvXe9lgig2Lgoyhf5zc6vxqlXJwR+h0trNFOwN0xk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J5kyLqHk; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2ad4d639db3so25140835ad.0
+        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 01:54:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1772531388; x=1773136188; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=nr4K8j7YtMX/4S/mJWMk637aePMGr7h3tPxcdH4coBg=;
-        b=e8Ef/vA0N98SjZ2vR1mGydT8Ye1wlhQJS2/TnAhR4l8bPxLHLbVyU3q1yvh3/Kwtam
-         OeG2tVxQPXQbKsI5qX+Yh52oWh/dfG/ZmzseWs7D0mPHm+a1cwvRgkC4Q6ALNZK4pqdA
-         XCReHTo22CK/rP/xweewB6p9IBeJ0uhe4zzlutMZLexR+lwLy6Nt5EslALOkTZr8BID4
-         qKGIaKjHfk3HlfHFMMHIT1L/lKz1F5O221cvlBcGTv8QYFf4MG7orE4Ijh/U/rUMBkC0
-         nd3+X1SkPWancAZzdHgxkL+En2xCXPz2wx4F4aq85b6186ncnzAY8FJeqIPOMlYFfosK
-         ZrSw==
+        d=gmail.com; s=20230601; t=1772531653; x=1773136453; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+6+Ol++dwc5uQY0FUuFGmKhf/l4t1CM8X/CyOEISVX4=;
+        b=J5kyLqHkS+06mMDoIC7ijss8AXm3EXmgj9/Tdv8CnL/fAaqEqpoJ5RmF8AAGwta2Gr
+         9ZTkF8NtEIuNmsu05VbVxiHFyZshxu5q5Wmqn5cF42UZxpJ2/xOVnkA8WwbRMGfJJss1
+         cLagcRqIHWWjHNoEPPGebOFVMVE8Kkjev05Yql7cLCLKKVrmKxXiYtYMsP+QnFZWdZdE
+         emeTxt3PhsMAHqpJbQ9obFwQK/iVGXRfN+PPaB+i3crxl4pXkZXNtX8W/jQL4YdyDg4D
+         uRLWbzHQSC7Wk9ludbDFFOofWth0trOvi9l2vuNJKeuMs/LfSQ8DJWKZiqdIWDs+U3kK
+         FN2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772531388; x=1773136188;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nr4K8j7YtMX/4S/mJWMk637aePMGr7h3tPxcdH4coBg=;
-        b=V6a1EmDJ4LnNPi47YwmwUx7eXcVxEZZ+zeNcLiod8ziZFK5l+5MqONcpzaUxvnABSS
-         yk8T69jFuFTquzBAQ6q0gdkSrqcLGW8UF1xn4ERMJRhAsYzhPoWbnNYTVX/Lj4m4w4ES
-         iC5EbFstmkvnAxL5LmEtylnaDM1TmT/yeIIFb6tAyA8NSTJ9vjGze8mHEehx4JedJ5pV
-         RetFR9kBwMV4LnJGsOKJJX70VC60+Moj5CIHEY4BiM+J+Cj7KyQVicLrRTjEE6zvff5x
-         YP0ox+CzJvlYo2wn+JBOOlIKn6yLUEBsQ9HRMlgEPe4kASq1ECaRPDfADYciEkbhUlkz
-         SFeA==
-X-Forwarded-Encrypted: i=1; AJvYcCVayJ51e1b9yKomdJUPrHUCz2s3e6eEKJTbMGurdjP/YVFPx6ch79dXzTPMkK3vffvuhYGaeQ0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4eTin+QlSymRlqgkOHU6uO8qbhk5UclW3qSlv3JNeg27nh3xQ
-	cICAb8Bt+/r8Nei1YwIGe/lWUWzzz4KUBgU91LmiXHVfG+nuvtcWALElSpeZSyc2MbeJ6a74Sgf
-	w/f9cuCyG6lW7ZeNF6lgQ5E70XEKwRJqrtfcTUi7nQX2yQPDEIjNgWJaofg==
-X-Gm-Gg: ATEYQzzzW0/EcAZ7hkpfeHjJ/SFoxvIRr8vl1Yn0d5oGispwhUAFP5KHBBuPx5omYjc
-	J01hhq2IRPiiOFtuWrg/Eo2er+oVQ6voJP05YSwi4FcL8BQKyTp3NsyqgafKOqVrehe2qFaxwca
-	738oTIotrN476ux4uKW6xWT/rTMUzKV6FCpyoB6HEY63T1+O8bW4PO5HeCBMjUIu3L4BrBRYWo6
-	k5e/Mr1SK6WK3/qkqyRdusAWXUwRKTw1uekXwfYyk+trcuVzaDMa+MJUfZYPaz2h/L8xCYqzBM/
-	OQpvcD5vpBinkEHKjhpqxnb5K85xUV1JQv+UBZt+ljFtBtJQ40/8gz0p8tndi0O2lsr1PlLv0If
-	BmJDILD2wio5A4YqW+0YvPG/54H+SO/KewTdyuKp7cMKKETgzTw5LhnRdYZfUYtV2IkrtfNA=
-X-Received: by 2002:a5d:4a84:0:b0:439:b636:1fa4 with SMTP id ffacd0b85a97d-439b63620admr9237362f8f.48.1772531387592;
-        Tue, 03 Mar 2026 01:49:47 -0800 (PST)
-X-Received: by 2002:a5d:4a84:0:b0:439:b636:1fa4 with SMTP id ffacd0b85a97d-439b63620admr9237323f8f.48.1772531387058;
-        Tue, 03 Mar 2026 01:49:47 -0800 (PST)
-Received: from sgarzare-redhat (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439c2f8c0e7sm1250362f8f.29.2026.03.03.01.49.45
+        d=1e100.net; s=20230601; t=1772531653; x=1773136453;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=+6+Ol++dwc5uQY0FUuFGmKhf/l4t1CM8X/CyOEISVX4=;
+        b=rhI0MQq7wPnLdrNYzvRaMQCWEf8z0AW3AOUoc/ar5MMayLzHQEg0IFejVGYqV3X5G0
+         zb+c8nQnEKDfn/+m8MQlLeQsySHG4rqM73T9qiEcmZ05ChVVr7AaaO6NjqUvd3f3vZ7X
+         6RHDdbLVA+6bffsOwIj9YV5qqDf+cevbgxDy027wY8EYwvEzPIrW+2GuNwP/+8rYNwpF
+         1LB485+TAtykg4bMmWinP9msI8Elgg0CKScJBUFC8APaZ8wTUXs6J/y3QGWODjYaTX0E
+         xVmFyXUfQ5qFJg2qA3nbFiB3Yug64imESIhHTpxJMBRvduP8Uqt8byso14y/2Kij8bLx
+         tuhg==
+X-Forwarded-Encrypted: i=1; AJvYcCW8aseA3/iRcIAtlFU7hANlEN6/zlq5ncSdBxiibX90tg+4+mN6YkwNUCFiKog8DOFuxwASQ/A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXJ5oHSnoxMqU3PSjwlvhrZ8JIe1LCWtQn64UPuQrquWQtODce
+	QMcszmEnnhqeJ+ygBoVuYF/oUBRNraP4wUPkfnzUUn9TVmoVeh08bFOl
+X-Gm-Gg: ATEYQzwfW1YreCMkIYpqrpMI/zcLjPw2jbs2gRfQY2pxyuzWo13DI0wTASN3jBCk9s4
+	XcX0sL5fJrZApp6KGE6JuC+MQ2oN0J7xGkSBhU64bblLX/uULFxx6XNa/uUejigm8EvPws7sfar
+	IZntfkJoIYHuwgJvjTQ0v8lKx+YVAhO8Uqao4mdWbkIRvlJGWf4QBsgaBFBYVxUBQqlxFY96JBx
+	58Xr6RPlDUBPsdlLEhB/ai5fvvtihEvuL/lb4oLNy3Xx713gh6sMRA12qZRYvHiUQzIbFbZmP/t
+	luf5Bp6m9Wqvz13elVc+R7yMne7G6FH1dGlMrNF+M09ZG3Ni0anIlmMDOLHl6j9Y11qFnLHwU4p
+	p97cxs+c8cpuVDwOBPXxXURDMsm4RwRsi3c+xV4aKRZpCm23Cz5dhc2656y2SGu+qK5KFfY+6Ts
+	2xmpn62kw+Gr2OCPYxTrxVyNqeUVfmrHuVBgRSnT5dUcALYXJ928dbSkI7fPHVH+A6sdjwFSo2L
+	gHteeDfHVRZ
+X-Received: by 2002:a17:902:ec8d:b0:2ae:63a4:3baf with SMTP id d9443c01a7336-2ae63a4420dmr6105535ad.46.1772531652863;
+        Tue, 03 Mar 2026 01:54:12 -0800 (PST)
+Received: from dpc2500057.. (fsb6a9315e.tkyc502.ap.nuro.jp. [182.169.49.94])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae4e571b90sm60596445ad.62.2026.03.03.01.54.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Mar 2026 01:49:46 -0800 (PST)
-Date: Tue, 3 Mar 2026 10:49:41 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Alexander Graf <graf@amazon.com>
-Cc: Bryan Tan <bryan-bt.tan@broadcom.com>, 
-	Vishnu Dasa <vishnu.dasa@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, kvm@vger.kernel.org, eperezma@redhat.com, 
-	Jason Wang <jasowang@redhat.com>, mst@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, 
-	nh-open-source@amazon.com
-Subject: Re: [PATCH] vsock: Enable H2G override
-Message-ID: <aaaqLbRNmoRHNTkh@sgarzare-redhat>
-References: <20260302104138.77555-1-graf@amazon.com>
- <aaVrsXMmULivV4Se@sgarzare-redhat>
- <aaV80wWlpjEtYCQJ@sgarzare-redhat>
- <17d63837-6028-475a-90df-6966329a0fc2@amazon.com>
- <aaW2FgoaXIJEymyR@sgarzare-redhat>
- <27dcad4e-d658-4b6b-93b2-44c64fcbeb11@amazon.com>
+        Tue, 03 Mar 2026 01:54:12 -0800 (PST)
+From: Keita Morisaki <kmta1236@gmail.com>
+To: edumazet@google.com
+Cc: bpf@vger.kernel.org,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	horms@kernel.org,
+	kmta1236@gmail.com,
+	kuba@kernel.org,
+	kuniyu@google.com,
+	linux-kernel@vger.kernel.org,
+	ncardwell@google.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com
+Subject: Re: [PATCH net-next] tcp: replace per-packet memset in __tcp_transmit_skb()
+Date: Tue,  3 Mar 2026 18:54:03 +0900
+Message-Id: <20260303095403.3141135-1-kmta1236@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <CANn89i+10Jz0BpOPdajdLccfBz5UNq9ay7qcXS0LwDaU-07ozQ@mail.gmail.com>
+References: <CANn89i+10Jz0BpOPdajdLccfBz5UNq9ay7qcXS0LwDaU-07ozQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <27dcad4e-d658-4b6b-93b2-44c64fcbeb11@amazon.com>
-X-Rspamd-Queue-Id: ED1591EC181
+X-Rspamd-Queue-Id: 16C191EC2A4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263102-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-263103-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,gmail.com,google.com,redhat.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_NEQ_ENVFROM(0.00)[kmta1236@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Mon, Mar 02, 2026 at 08:04:22PM +0100, Alexander Graf wrote:
+> Interesting idea, but the implementation is a bit fragile.
 >
->On 02.03.26 17:25, Stefano Garzarella wrote:
->>On Mon, Mar 02, 2026 at 04:48:33PM +0100, Alexander Graf wrote:
->>>
->>>On 02.03.26 13:06, Stefano Garzarella wrote:
->>>>CCing Bryan, Vishnu, and Broadcom list.
->>>>
->>>>On Mon, Mar 02, 2026 at 12:47:05PM +0100, Stefano Garzarella wrote:
->>>>>
->>>>>Please target net-next tree for this new feature.
->>>>>
->>>>>On Mon, Mar 02, 2026 at 10:41:38AM +0000, Alexander Graf wrote:
->>>>>>Vsock maintains a single CID number space which can be used to
->>>>>>communicate to the host (G2H) or to a child-VM (H2G). The 
->>>>>>current logic
->>>>>>trivially assumes that G2H is only relevant for CID <= 2 
->>>>>>because these
->>>>>>target the hypervisor.  However, in environments like Nitro 
->>>>>>Enclaves, an
->>>>>>instance that hosts vhost_vsock powered VMs may still want 
->>>>>>to communicate
->>>>>>to Enclaves that are reachable at higher CIDs through 
->>>>>>virtio-vsock-pci.
->>>>>>
->>>>>>That means that for CID > 2, we really want an overlay. By 
->>>>>>default, all
->>>>>>CIDs are owned by the hypervisor. But if vhost registers a 
->>>>>>CID, it takes
->>>>>>precedence.  Implement that logic. Vhost already knows which CIDs it
->>>>>>supports anyway.
->>>>>>
->>>>>>With this logic, I can run a Nitro Enclave as well as a 
->>>>>>nested VM with
->>>>>>vhost-vsock support in parallel, with the parent instance able to
->>>>>>communicate to both simultaneously.
->>>>>
->>>>>I honestly don't understand why VMADDR_FLAG_TO_HOST (added 
->>>>>specifically for Nitro IIRC) isn't enough for this scenario 
->>>>>and we have to add this change.  Can you elaborate a bit more 
->>>>>about the relationship between this change and 
->>>>>VMADDR_FLAG_TO_HOST we added?
->>>
->>>
->>>The main problem I have with VMADDR_FLAG_TO_HOST for connect() is 
->>>that it punts the complexity to the user. Instead of a single CID 
->>>address space, you now effectively create 2 spaces: One for 
->>>TO_HOST (needs a flag) and one for TO_GUEST (no flag). But every 
->>>user space tool needs to learn about this flag. That may work for 
->>>super special-case applications. But propagating that all the way 
->>>into socat, iperf, etc etc? It's just creating friction.
->>
->>Okay, I would like to have this (or part of it) in the commit 
->>message to better explain why we want this change.
->>
->>>
->>>IMHO the most natural experience is to have a single CID space, 
->>>potentially manually segmented by launching VMs of one kind within 
->>>a certain range.
->>
->>I see, but at this point, should the kernel set VMADDR_FLAG_TO_HOST 
->>in the remote address if that path is taken "automagically" ?
->>
->>So in that way the user space can have a way to understand if it's 
->>talking with a nested guest or a sibling guest.
->>
->>
->>That said, I'm concerned about the scenario where an application 
->>does not even consider communicating with a sibling VM.
->
->
->If that's really a realistic concern, then we should add a 
->VMADDR_FLAG_TO_GUEST that the application can set. Default behavior of 
->an application that provides no flags is "route to whatever you can 
->find": If vhost is loaded, it routes to vhost. If a vsock backend 
+> I would instead add a group in struct tcp_out_options to clearly mark
+> which group is zeroed in  __tcp_transmit_skb().
 
-mmm, we have always documented this simple behavior:
-- CID = 2 talks to the host
-- CID >= 3 talks to the guest
-
-Now we are changing this by adding fallback. I don't think we should 
-change the default behavior, but rather provide new ways to enable this 
-new behavior.
-
-I find it strange that an application running on Linux 7.0 has a default 
-behavior where using CID=42 always talks to a nested VM, but starting 
-with Linux 7.1, it also starts talking to a sibling VM.
-
->driver is loaded, it routes there. But the application has no say in 
->where it goes: It's purely a system configuration thing.
-
-This is true for complex things like IP, but for VSOCK we have always 
-wanted to keep the default behavior very simple (as written above). 
-Everything else must be explicitly enabled IMHO.
+That's a great idea.
 
 >
+> Partial patch to give the idea :
 >
->>Until now, it knew that by not setting that flag, it could only talk 
->>to nested VMs, so if there was no VM with that CID, the connection 
->>simply failed. Whereas from this patch onwards, if the device in the 
->>host supports sibling VMs and there is a VM with that CID, the 
->>application finds itself talking to a sibling VM instead of a nested 
->>one, without having any idea.
+> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> index 46bd48cf776a6a37e6ab2664245cd1e35a88d4f8..b96168f50170b7359d26de2389128bc80d4d549e
+> 100644
+> --- a/net/ipv4/tcp_output.c
+> +++ b/net/ipv4/tcp_output.c
+> @@ -429,14 +429,19 @@ static void smc_options_write(__be32 *ptr, u16 *options)
+>  }
 >
+>  struct tcp_out_options {
+> +       /* Following group is cleared in __tcp_transmit_skb() */
+> +       struct_group(cleared,
+> +               u16 mss;                /* 0 to disable */
+> +               u8 bpf_opt_len;         /* length of BPF hdr option */
+> +               u8 num_sack_blocks;     /* number of SACK blocks to include */
+> +       );
+> +
+> +       /* Caution : Following fields are not cleared in
+> __tcp_transmit_skb(). */
+>         u16 options;            /* bit field of OPTION_* */
+> -       u16 mss;                /* 0 to disable */
+>         u8 ws;                  /* window scale, 0 to disable */
+> -       u8 num_sack_blocks;     /* number of SACK blocks to include */
+>         u8 num_accecn_fields:7, /* number of AccECN fields needed */
+>            use_synack_ecn_bytes:1; /* Use synack_ecn_bytes or not */
+>         u8 hash_size;           /* bytes in hash_location */
+> -       u8 bpf_opt_len;         /* length of BPF hdr option */
+>         __u8 *hash_location;    /* temporary pointer, overloaded */
+>         __u32 tsval, tsecr;     /* need to include OPTION_TS */
+>         struct tcp_fastopen_cookie *fastopen_cookie;    /* Fast open cookie */
+> @@ -1565,7 +1570,7 @@ static int __tcp_transmit_skb(struct sock *sk,
+> struct sk_buff *skb,
 >
->I'd say an application that attempts to talk to a CID that it does now 
->know whether it's vhost routed or not is running into "undefined" 
->territory. If you rmmod the vhost driver, it would also talk to the 
->hypervisor provided vsock.
+>         inet = inet_sk(sk);
+>         tcb = TCP_SKB_CB(skb);
+> -       memset(&opts, 0, sizeof(opts));
+> +       memset(&opts.cleared, 0, sizeof(opts.cleared));
 
-Oh, I missed that. And I also fixed that behaviour with commit 
-65b422d9b61b ("vsock: forward all packets to the host when no H2G is 
-registered") after I implemented the multi-transport support.
-
-mmm, this could change my position ;-) (although, to be honest, I don't 
-understand why it was like that in the first place, but that's how it is 
-now).
-
-Please document also this in the new commit message, is a good point.
-Although when H2G is loaded, we behave differently. However, it is true 
-that sysctl helps us standardize this behavior.
-
-I don't know whether to see it as a regression or not.
-
->
->
->>Should we make this feature opt-in in some way, such as sockopt or 
->>sysctl? (I understand that there is the previous problem, but 
->>honestly, it seems like a significant change to the behavior of 
->>AF_VSOCK).
->
->
->We can create a sysctl to enable behavior with default=on. But I'm 
->against making the cumbersome does-not-work-out-of-the-box experience 
->the default. Will include it in v2.
-
-The opposite point of view is that we would not want to have different 
-default behavior between 7.0 and 7.1 when H2G is loaded.
-
->
->
->>
->>>
->>>At the end of the day, the host vs guest problem is super similar 
->>>to a routing table.
->>
->>Yeah, but the point of AF_VSOCK is precisely to avoid complexities 
->>such as routing tables as much as possible; otherwise, AF_INET is 
->>already there and ready to be used. In theory, we only want 
->>communication between host and guest.
->
->
->Yes, but nesting is a thing and nobody thought about it :). In 
->retrospect, it would have been to annotate the CID with the direction: 
->H5 goes to CID5 on host and G5 goes to CID5 on guest. But I see no 
->chance to change that by now.
-
-Yep, this is why we added the VMADDR_FLAG_TO_HOST.
-
-Stefano
-
+Will send V2 with this change. Thank you for the review!
 
