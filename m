@@ -1,63 +1,64 @@
-Return-Path: <netdev+bounces-263458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263457-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aHK6C8dqp2mYhQAAu9opvQ
-	(envelope-from <netdev+bounces-263458-lists+netdev=lfdr.de@vger.kernel.org>)
+	id ExpUCMdqp2mWhQAAu9opvQ
+	(envelope-from <netdev+bounces-263457-lists+netdev=lfdr.de@vger.kernel.org>)
 	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 00:12:07 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0656D1F8474
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 00:12:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E6071F8473
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 00:12:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5E241303CB30
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 23:12:06 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4D910303AE66
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 23:12:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAE273976A4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD08639185F;
 	Tue,  3 Mar 2026 23:12:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kEdFIvNc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EvMksDlS"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCBD2386575
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 23:11:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 454D63932FD
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 23:12:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772579522; cv=none; b=hjPjFEdeM1ORBYrSjcwCL38LzGw+AyG20K1ryZIhvh1h3vS5bkuBZ98toYxWPQNdBp2BR4ihX/bbSFs76naBhdwXnq2oAiLUswmm1PRI/37+VDmP7e7AGQY84gUPQY3zk2tpZ19cIA+FukCexAhsGWfyBueT0Buf7r+oyz4WaTs=
+	t=1772579522; cv=none; b=oarboKuBXB4P/RF4u51s34mU8gc+FDsykZmDqft8T1Ug5PaooMMtHZep/hq5JR/WwiAkVng+//ngbmVJgUv93bX8tWtM9hTsiwarofBPPQXRZ/ffahf3cKvxTO4ADy8bC2vlZ0ZBooJsdpltG0kfKydtesxRgKlLPH4Gqu9G82s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1772579522; c=relaxed/simple;
-	bh=HwG7wQDiUdhPcNN4taA5Px3Q3Ke9KAzMdvuAs3cNFKE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NJIVc0qZ25Zjq4PXyx1XUiKxqJT2HLbjJYd1edaHTCdCSs0/aH4Mx/oWKwLaSEimy7l2YSdU1Kie652oAVQ2Zq+97MiLeWPzdKgyFZN0LuOHXVCZesRRO+C4c3nMWVtl6IyISTeiCvkvZpEGCa5Vm9+zO+sxiwjexAkjwy5yEZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kEdFIvNc; arc=none smtp.client-ip=198.175.65.15
+	bh=iXA5oGXc/zYj9mOtlwqVvYFTCXZ3t4pHavmfO5nNuEQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Y1Y5+5Q+mXWMI5yINUImnTyzOFhIkcJ7TF7fVZsHrlDa5oYC0LvUlq+sU0KP3OlPYal9mhwD3hnRdoV4BPFthjK0NPVKqjOD9ZcjToSvD3pbFtRpy0vY08fLwAdf5ga1pacy6xwtw1UJLYdW8oFl+wkAIq7NLAeDFTg5u+9kpTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EvMksDlS; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772579519; x=1804115519;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=HwG7wQDiUdhPcNN4taA5Px3Q3Ke9KAzMdvuAs3cNFKE=;
-  b=kEdFIvNc1l5QNGy3dmDAHcn70m90A7khGV9ZeVcpRtTj501YES7AO7ek
-   2VfY6yp73RkrBu/plfZgEC/Hnna/SjJqDU/rDenAlqeHXgTH+2h6xx7Kr
-   z0O9j0zq8HiAkJbiTCITJ53LQcNHGCog/qqbybGSa751EhFjCICQSOYS0
-   rqUcIurHVjxV7g5+MBOJrISVJ9avcVspktrMGwskOE8dRSRZIjb19WLCC
-   6qwIGl0kudcCq1xR9k1aFYbSsRbVTmGW3GT92yGnNJ4deQsY4CBNLTxaE
-   FkiIv2RIhL/s9gwT1rvT4sY+UZMHAOVrzt7hsNiW+rQJERvJMH6YRzdeI
-   w==;
-X-CSE-ConnectionGUID: QJQpsry4RFiYi8Q4NKp4PQ==
-X-CSE-MsgGUID: W8sHqbhzQvm0Gu2H/Yyz8w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11718"; a="77238787"
+  t=1772579520; x=1804115520;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=iXA5oGXc/zYj9mOtlwqVvYFTCXZ3t4pHavmfO5nNuEQ=;
+  b=EvMksDlSaDFqvuLHcha5irU6q3lujovFE6xDTaIDqLhIXNya3pBT3S2O
+   MKdex2T1At58oW3Zf1gLv3wL/c6Qm9q1qcK4bu6JUFqvhAyLiRwNMKVjL
+   JY4nNhnptAltUas8suh0zp2gn5BPHjSJJ8VrBDyhVFv95Q3g7jPQkkO2P
+   ZNKUsiunktdiQL4ZwMLE2T7iUaJG9owOHFNFqQUnbCHx0N+rliU0OZdFj
+   wyPiNMLw+SiGPiWGnmD51Ha8SOgiz85vpkfu2Z6BXKmgb4quHcB4e42k5
+   4JpbE+0NOjY3EpXCe89qE/v0FAyuA4ArmQvbw/LQgf0AaHjUkjwFxbkpi
+   A==;
+X-CSE-ConnectionGUID: nsJ3E3mwRxmvPTQyQf6BIw==
+X-CSE-MsgGUID: WVtt5O6KQR26Knxy4zc1PQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11718"; a="77238789"
 X-IronPort-AV: E=Sophos;i="6.21,322,1763452800"; 
-   d="scan'208";a="77238787"
+   d="scan'208";a="77238789"
 Received: from orviesa002.jf.intel.com ([10.64.159.142])
   by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2026 15:11:58 -0800
-X-CSE-ConnectionGUID: iY/4tSaMRk6gSsQ7p+VKzA==
-X-CSE-MsgGUID: RyGJhE+hTcS+qP8mBbIGTA==
+X-CSE-ConnectionGUID: HSoX9SKrRG+ts85SLh5efA==
+X-CSE-MsgGUID: AVEpCak3SlG1sN0L/mFk8w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,322,1763452800"; 
-   d="scan'208";a="248633793"
+   d="scan'208";a="248633796"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa002.jf.intel.com with ESMTP; 03 Mar 2026 15:11:59 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -67,11 +68,19 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
-Subject: [PATCH net 0/8][pull request] Intel Wired LAN Driver Updates 2026-03-03 (ice, libie, iavf, igb, igc)
-Date: Tue,  3 Mar 2026 15:11:46 -0800
-Message-ID: <20260303231155.2895065-1-anthony.l.nguyen@intel.com>
+Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
+	anthony.l.nguyen@intel.com,
+	michal.swiatkowski@linux.intel.com,
+	przemyslaw.kitszel@intel.com,
+	horms@kernel.org,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Rafal Romanowski <rafal.romanowski@intel.com>
+Subject: [PATCH net 1/8] ice: fix adding AQ LLDP filter for VF
+Date: Tue,  3 Mar 2026 15:11:47 -0800
+Message-ID: <20260303231155.2895065-2-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20260303231155.2895065-1-anthony.l.nguyen@intel.com>
+References: <20260303231155.2895065-1-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,87 +88,75 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 0656D1F8474
+X-Rspamd-Queue-Id: 4E6071F8473
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-263457-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263458-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FROM_HAS_DN(0.00)[]
 X-Rspamd-Action: no action
 
-Larysa removes VF restriction for LLDP filters on ice to allow for LLDP
-traffic to reach the correct destination.
+From: Larysa Zaremba <larysa.zaremba@intel.com>
 
-Jakub adds retry mechanism for AdminQ Read/Write SFF EEPROM call to
-follow hardware specification on ice.
+The referenced commit came from a misunderstanding of the FW LLDP filter
+AQ (Admin Queue) command due to the error in the internal documentation.
+Contrary to the assumptions in the original commit, VFs can be added and
+deleted from this filter without any problems. Introduced dev_info message
+proved to be useful, so reverting the whole commit does not make sense.
 
-Zilin Guan adds cleanup path to free XDP rings on failure in
-ice_set_ringparam().
+Without this fix, trusted VFs do not receive LLDP traffic, if there is an
+AQ LLDP filter on PF. When trusted VF attempts to add an LLDP multicast
+MAC address, the following message can be seen in dmesg on host:
 
-Michal bypasses firmware logging unroll in libie when it isn't supported.
+ice 0000:33:00.0: Failed to add Rx LLDP rule on VSI 20 error: -95
 
-Kohei Enju fixes iavf to take into account hardware MTU support when
-setting max MTU values.
+Revert checking VSI type when adding LLDP filter through AQ.
 
-Vivek Behera fixes issues on igb and igc using incorrect IRQs when Tx/Rx
-queues do not share the same IRQ.
+Fixes: 4d5a1c4e6d49 ("ice: do not add LLDP-specific filter if not necessary")
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The following are changes since commit 1a86a1f7d88996085934139fa4c063b6299a2dd3:
-  net: Fix rcu_tasks stall in threaded busypoll
-and are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 100GbE
-
-Jakub Staniszewski (2):
-  ice: reintroduce retry mechanism for indirect AQ
-  ice: fix retry for AQ command 0x06EE
-
-Kohei Enju (1):
-  iavf: fix netdev->max_mtu to respect actual hardware limit
-
-Larysa Zaremba (1):
-  ice: fix adding AQ LLDP filter for VF
-
-Michal Swiatkowski (1):
-  libie: don't unroll if fwlog isn't supported
-
-Vivek Behera (2):
-  igb: Fix trigger of incorrect irq in igb_xsk_wakeup
-  igc: Fix trigger of incorrect irq in igc_xsk_wakeup function
-
-Zilin Guan (1):
-  ice: Fix memory leak in ice_set_ringparam()
-
- drivers/net/ethernet/intel/iavf/iavf_main.c  | 17 +++++++-
- drivers/net/ethernet/intel/ice/ice_common.c  | 15 +++++--
- drivers/net/ethernet/intel/ice/ice_ethtool.c | 46 ++++++++++----------
- drivers/net/ethernet/intel/igb/igb_xsk.c     | 38 ++++++++++++----
- drivers/net/ethernet/intel/igc/igc_main.c    | 34 ++++++++++-----
- drivers/net/ethernet/intel/igc/igc_ptp.c     |  3 +-
- drivers/net/ethernet/intel/libie/fwlog.c     |  4 ++
- 7 files changed, 110 insertions(+), 47 deletions(-)
-
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index 6cd63190f55d..74fe74225277 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -6391,7 +6391,7 @@ int ice_lldp_fltr_add_remove(struct ice_hw *hw, struct ice_vsi *vsi, bool add)
+ 	struct ice_aqc_lldp_filter_ctrl *cmd;
+ 	struct libie_aq_desc desc;
+ 
+-	if (vsi->type != ICE_VSI_PF || !ice_fw_supports_lldp_fltr_ctrl(hw))
++	if (!ice_fw_supports_lldp_fltr_ctrl(hw))
+ 		return -EOPNOTSUPP;
+ 
+ 	cmd = libie_aq_raw(&desc);
 -- 
 2.47.1
+
 
