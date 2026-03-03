@@ -1,159 +1,232 @@
-Return-Path: <netdev+bounces-263451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263452-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qBRdBNNkp2mghAAAu9opvQ
-	(envelope-from <netdev+bounces-263451-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 23:46:43 +0100
+	id IAG8CVNlp2mghAAAu9opvQ
+	(envelope-from <netdev+bounces-263452-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 23:48:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1AEB1F822D
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 23:46:42 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 949601F8280
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 23:48:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 91C3B30039BF
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 22:46:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D6D3030138AC
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 22:48:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98F0A31E823;
-	Tue,  3 Mar 2026 22:46:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="kiCEoxfi"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C74F339022C;
+	Tue,  3 Mar 2026 22:48:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4764A26D4F9
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 22:46:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 571A9370D66
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 22:48:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772578000; cv=none; b=C0EBkG2kWz7zUIQfNvcXjcwE1wl5x+Oize9AKWdMnzwmCRfcoTfSxVbSoAycxSN7OMLVjKl1IyCTdP0miJZ53puVZ1LE+ifDTBCn7K6hlhhIzrpEDUtL+bjv6DeI015zEkX6edP6t9YArPZiss7X0S3zhcYP1vCing/Y1Ji+v7s=
+	t=1772578109; cv=none; b=Srer2xZy6MiMHuXyLBUqpP7su0tO1fy7/sLcR7oBBfJfVHw760LIOVefxRIYO7VIIGudx8LmPaOWllZ0HdGH5Ao06gVO/piqlgOGTbjZxjmi0HofsISjTCdt/gef/KvCvqDgxrAm6ZCVO/Z7jUrCh9uau19jlMOJvop+CnS1E0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772578000; c=relaxed/simple;
-	bh=15mPY02rEf1D69+S/sAF/O63FAH6R1FZWTAOmIK2dug=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tER5f4PJRtUkMq/dEkSyiyswUQkEoIi3QzpQjFaXpk5dW0qjA+YZ+OYuH7IfP1aP+bi8/sHTk7XVHAxBmusfFcUOc/chVC16BJoe9L2uFDQkrJS9i8d+N6CtrD96TJ/XZPO6RsMb69XcmLYmztH/1OlQSdf8VtRVcpG5HLK2OSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=kiCEoxfi; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-8272a56b91cso5250866b3a.1
-        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 14:46:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1772577998; x=1773182798; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EIi+fDs163v4iN74yp1Z2WnYLFdEvhtUhAdwwnO5ji4=;
-        b=kiCEoxfi2cUvN8W1oSqVfvVp0vBiPajqD/aAPhgwdB4bSdRyeeIhUyVlpydtVZRSf/
-         P/P8gPPAESs4kWwO6Rnpxc+DOXlnzWq5sKSvXbppaNJcrvlGBlswFFgAA6FhwQbny0AR
-         K2J/BagA4g7zs5aFjvbxKMBZ4Mpmx26a+nIGSfaYntkU3sXdgVwM3ye+Txxbz/s565cK
-         Nfn7FhNvRQ4o8EWqLQ4PO0pbRRzezkCe3gr+fjcNbllffxA+p3Xdt8ERRNlbW3G4VTrW
-         QolaGaLTSRGwIh4cJZggtka7w7Y7VS57N0yGfcsHvPyCnOZfT1KlqVERgZyJXH4+UzYR
-         XupQ==
+	s=arc-20240116; t=1772578109; c=relaxed/simple;
+	bh=SLzG06fmnXklYyYJYWanS18GEPD4baSzZphAPsqBB6c=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=JIB5+ylL1WvD6QVX/PXsVI21g38f6Dc0Vo3+2Mat0PzQQbQpvWZzpjfISvfzpMablROwtJ2WI7mXGi6byqDPabCeIMleyWc1l09UOBKu9VaqltMdZ8/tzOAxjsnuGSYnjWtTVf2yh1JC18YjdGNK8miAhXduhSC7wTWshdqBjPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-679a409a175so114969380eaf.1
+        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 14:48:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772577998; x=1773182798;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EIi+fDs163v4iN74yp1Z2WnYLFdEvhtUhAdwwnO5ji4=;
-        b=SbNXmuzd1ah38IU+QaiF4ivtocbvXnZrR51agr3CtfOwYjrmIXPQbeLr5gvMuyglyZ
-         o1HPjGaVgQD0Bun5ZFzh6CWs5t5sRja+yiOUoeqdHJNKehOkw6tq5Fhkq5lXoZEv6ZcW
-         4cevfSnqVEeExaribaW42YCK/txWAiTKM+jg4LWaY9eoTPCOla3OzOcDD5hwKMs0iSM2
-         eEJPxHk7jKwCJovkSwSofh6PTB0Tx68t6ksP3omo/wY6o8LwvF0YS1rYnSc2wlX5XgaG
-         OO6Yk/g0D9DHk2UKY62UoPDJTCa/wx0fmiyaBkKJDfZZYhiEmCnx6FTgQsb/Y0Yz2OYQ
-         TpMA==
-X-Forwarded-Encrypted: i=1; AJvYcCWYmAOtflefejvWzXCM37WqHUdOKdC6RV1hr7I7RXj5astHCBB0ineDATVIlTpPVFVlBG1BTZM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXn2BW3Gl+xs+rJu/hXSOw1MgvRDKREyoNraa70rXDf/3Fjzv4
-	XMXDDz1Mgz4sijekxPQ2i4yNpof+jxl10nZc5BSFYDpuWGvqXFFTxicFkAeKzHaf4Rs=
-X-Gm-Gg: ATEYQzw6Jx1UVs18aiw8yKvVMXy1QHzzWeLW/piuHYeGKee618KExtAYuaSsRpxXCxw
-	E/G3tXzyjor2k53dYpa46JkgCXRqnltJ9imECeaPWHoI7X0unPYNKGFGFyeGMtMzhBU6k/oRRzc
-	kVCFdvT35t/ARdNg06jTYqmWQLIjP2DLO0duH8vgJb1Tz8x3VXWlx/QkW6GlTwtDiDzNIpOaRE9
-	GjrsqYlcTNXFqTkFBUEwqb8DDGv09TOT9XJpg9HAPS/c1UNq6GP3ClYzH6brq1cdWrixkUvQRJB
-	WSMikU3NoaT26FP4Mszjk1N4xkAojwWHv3dH6TKv+gcx8TelOM2ZfvUAu/6h7kYS5TMaxt7I0Mj
-	pKB/nldaH3cbV7A8bWU3ZqXyYhNc/an+AZOoMOVc8ovY6IcBtEp8P1JYi5pyaUVuUK14dge1kyl
-	51yGw=
-X-Received: by 2002:a05:6a00:464e:b0:806:12ff:3877 with SMTP id d2e1a72fcca58-8274d9082ccmr15638720b3a.4.1772577998626;
-        Tue, 03 Mar 2026 14:46:38 -0800 (PST)
-Received: from localhost ([2a03:2880:2ff:4::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82739d5689csm21411917b3a.13.2026.03.03.14.46.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Mar 2026 14:46:38 -0800 (PST)
-Date: Tue, 3 Mar 2026 14:46:36 -0800
-From: Joe Damato <joe@dama.to>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org
-Subject: Re: [PATCH net 4/5] nfc: nci: clear NCI_DATA_EXCHANGE before calling
- completion callback
-Message-ID: <aadkzLW8Ba1Ej46V@devvm20253.cco0.facebook.com>
-Mail-Followup-To: Joe Damato <joe@dama.to>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org
-References: <20260303162346.2071888-1-kuba@kernel.org>
- <20260303162346.2071888-5-kuba@kernel.org>
+        d=1e100.net; s=20230601; t=1772578107; x=1773182907;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zyfmorJRasI8+9qvadPfl1VjzCk+3pZrlG6H9/L3uPY=;
+        b=QdJPq351aAGenwL9/maHmYNvnSN6fFsMTakSgGO/C+b6x9w7eNki+L6Zs6YMkRfidb
+         AAESLWfwxmwGK/FdkA03Z8mc6LPA3JtkUcQ2a1p20Q4LBHpYisbUNk/REq0uGCeTHJvp
+         jIs4cgOmPKLUE6CCf+VqySWy2cwL8xCOkYd8OkoK4fFnQK4HNTESnruGMp3L9cvvnR8T
+         eeQPRMAP6Ybrmn/4Rbs9MV3uV3DZJkl1dwc601zeWpmYTB4/Syb3ZMGqeRFXixKhKnaH
+         JcliKHFLjEeMvqJ4kbiC/bFQtNgeV7uCz/ozDIJ9MFFR9RQPyoY0pKlILeyrX3veRuKc
+         iyWw==
+X-Forwarded-Encrypted: i=1; AJvYcCW3XBA9De1ddreIncO0vcbgkCgyQwd75vxccsn4RAD0VDXo08NLIaj/6Qbj1NLwRwXw3fSDthA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynhNItzKAOJB/Bi9BYLOVWBG0nwY6zbEazUR0Hu47CuhGk/gg/
+	6Xgjimb7uo2uWPtfhwhNfHwhXQN1oSBC1RgNPqHJwpn3irumOYGXucVDxNo+V2odhqwZntaWD/Y
+	CaXFaBobqv/xViIy7d6mmsDoFJDGs/XNsCHT6ru40TwpdcbdIBetI7rDmm4s=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260303162346.2071888-5-kuba@kernel.org>
-X-Rspamd-Queue-Id: A1AEB1F822D
+X-Received: by 2002:a4a:ec4c:0:b0:679:e765:dafc with SMTP id
+ 006d021491bc7-67b177035f1mr104406eaf.19.1772578107324; Tue, 03 Mar 2026
+ 14:48:27 -0800 (PST)
+Date: Tue, 03 Mar 2026 14:48:27 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69a7653b.050a0220.21ae90.000f.GAE@google.com>
+Subject: [syzbot] [wireless?] WARNING: refcount bug in rsi_91x_deinit
+From: syzbot <syzbot+ba76f6da746fd674d311@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 949601F8280
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
-	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=f1500201919951cc];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263451-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DMARC_NA(0.00)[dama.to];
-	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-263452-lists,netdev=lfdr.de,ba76f6da746fd674d311];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	SUBJECT_HAS_QUESTION(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dama-to.20230601.gappssmtp.com:dkim,dama.to:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[goo.gl:url,appspotmail.com:email,googlegroups.com:email,storage.googleapis.com:url,syzkaller.appspot.com:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Tue, Mar 03, 2026 at 08:23:44AM -0800, Jakub Kicinski wrote:
-> Move clear_bit(NCI_DATA_EXCHANGE) before invoking the data exchange
-> callback in nci_data_exchange_complete().
-> 
-> The callback (e.g. rawsock_data_exchange_complete) may immediately
-> schedule another data exchange via schedule_work(tx_work).  On a
-> multi-CPU system, tx_work can run and reach nci_transceive() before
-> the current nci_data_exchange_complete() clears the flag, causing
-> test_and_set_bit(NCI_DATA_EXCHANGE) to return -EBUSY and the new
-> transfer to fail.
-> 
-> This causes intermittent flakes in nci/nci_dev in NIPA:
-> 
->   # #  RUN           NCI.NCI1_0.t4t_tag_read ...
->   # # t4t_tag_read: Test terminated by timeout
->   # #          FAIL  NCI.NCI1_0.t4t_tag_read
->   # not ok 3 NCI.NCI1_0.t4t_tag_read
-> 
-> Fixes: 38f04c6b1b68 ("NFC: protect nci_data_exchange transactions")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  net/nfc/nci/data.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
+Hello,
 
-Reviewed-by: Joe Damato <joe@dama.to>
+syzbot found the following issue on:
+
+HEAD commit:    bb375c251ab4 dt-bindings: usb: st,st-ohci-300x: convert to..
+git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-testing
+console output: https://syzkaller.appspot.com/x/log.txt?x=1416c5aa580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f1500201919951cc
+dashboard link: https://syzkaller.appspot.com/bug?extid=ba76f6da746fd674d311
+compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/2475c3172471/disk-bb375c25.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/30449aa672dd/vmlinux-bb375c25.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/46d3937d1c16/bzImage-bb375c25.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+ba76f6da746fd674d311@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+refcount_t: addition on 0; use-after-free.
+WARNING: lib/refcount.c:25 at refcount_warn_saturate+0x111/0x130 lib/refcount.c:25, CPU#0: kworker/0:1/10
+Modules linked in:
+CPU: 0 UID: 0 PID: 10 Comm: kworker/0:1 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2026
+Workqueue: usb_hub_wq hub_event
+RIP: 0010:refcount_warn_saturate+0x111/0x130 lib/refcount.c:25
+Code: cc e8 43 d8 e5 fe 48 8d 3d 4c 6c 28 08 67 48 0f b9 3a e8 32 d8 e5 fe 5b 5d e9 cb 88 9f 04 e8 26 d8 e5 fe 48 8d 3d 3f 6c 28 08 <67> 48 0f b9 3a e8 15 d8 e5 fe 5b 5d c3 cc cc cc cc 48 89 df e8 46
+RSP: 0018:ffffc900000aef30 EFLAGS: 00010246
+RAX: 0000000000100000 RBX: ffff88811d6f9d28 RCX: ffffc90015361000
+RDX: 0000000000100000 RSI: ffffffff82cbe1da RDI: ffffffff8af44e20
+RBP: 0000000000000002 R08: 0000000000000005 R09: 0000000000000004
+R10: 0000000000000002 R11: ffff8881f5639708 R12: ffff88811bdf0000
+R13: ffff88811d6f9d28 R14: 0000000000000000 R15: 0000000000000002
+FS:  0000000000000000(0000) GS:ffff8882686d3000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f04409cb6b0 CR3: 0000000121146000 CR4: 00000000003506f0
+Call Trace:
+ <TASK>
+ __refcount_add include/linux/refcount.h:289 [inline]
+ __refcount_inc include/linux/refcount.h:366 [inline]
+ refcount_inc include/linux/refcount.h:383 [inline]
+ get_task_struct include/linux/sched/task.h:116 [inline]
+ kthread_stop+0x602/0x680 kernel/kthread.c:785
+ rsi_kill_thread drivers/net/wireless/rsi/rsi_common.h:78 [inline]
+ rsi_91x_deinit+0x102/0x1f0 drivers/net/wireless/rsi/rsi_91x_main.c:405
+ rsi_probe+0xd27/0x1aa0 drivers/net/wireless/rsi/rsi_91x_usb.c:861
+ usb_probe_interface+0x303/0x8f0 drivers/usb/core/driver.c:396
+ call_driver_probe drivers/base/dd.c:583 [inline]
+ really_probe+0x241/0xa60 drivers/base/dd.c:661
+ __driver_probe_device+0x1de/0x400 drivers/base/dd.c:803
+ driver_probe_device+0x4c/0x1b0 drivers/base/dd.c:833
+ __device_attach_driver+0x1ff/0x3e0 drivers/base/dd.c:961
+ bus_for_each_drv+0x159/0x1e0 drivers/base/bus.c:500
+ __device_attach+0x1e4/0x4d0 drivers/base/dd.c:1033
+ device_initial_probe+0xaf/0xd0 drivers/base/dd.c:1088
+ bus_probe_device+0x64/0x160 drivers/base/bus.c:574
+ device_add+0x11d9/0x1950 drivers/base/core.c:3689
+ usb_set_configuration+0xd97/0x1c60 drivers/usb/core/message.c:2208
+ usb_generic_driver_probe+0xa1/0xe0 drivers/usb/core/generic.c:250
+ usb_probe_device+0xef/0x400 drivers/usb/core/driver.c:291
+ call_driver_probe drivers/base/dd.c:583 [inline]
+ really_probe+0x241/0xa60 drivers/base/dd.c:661
+ __driver_probe_device+0x1de/0x400 drivers/base/dd.c:803
+ driver_probe_device+0x4c/0x1b0 drivers/base/dd.c:833
+ __device_attach_driver+0x1ff/0x3e0 drivers/base/dd.c:961
+ bus_for_each_drv+0x159/0x1e0 drivers/base/bus.c:500
+ __device_attach+0x1e4/0x4d0 drivers/base/dd.c:1033
+ device_initial_probe+0xaf/0xd0 drivers/base/dd.c:1088
+ bus_probe_device+0x64/0x160 drivers/base/bus.c:574
+ device_add+0x11d9/0x1950 drivers/base/core.c:3689
+ usb_new_device.cold+0x685/0x115c drivers/usb/core/hub.c:2695
+ hub_port_connect drivers/usb/core/hub.c:5567 [inline]
+ hub_port_connect_change drivers/usb/core/hub.c:5707 [inline]
+ port_event drivers/usb/core/hub.c:5871 [inline]
+ hub_event+0x314d/0x4af0 drivers/usb/core/hub.c:5953
+ process_one_work+0x9d7/0x1920 kernel/workqueue.c:3275
+ process_scheduled_works kernel/workqueue.c:3358 [inline]
+ worker_thread+0x5da/0xe40 kernel/workqueue.c:3439
+ kthread+0x370/0x450 kernel/kthread.c:467
+ ret_from_fork+0x6c3/0xcb0 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	cc                   	int3
+   1:	e8 43 d8 e5 fe       	call   0xfee5d849
+   6:	48 8d 3d 4c 6c 28 08 	lea    0x8286c4c(%rip),%rdi        # 0x8286c59
+   d:	67 48 0f b9 3a       	ud1    (%edx),%rdi
+  12:	e8 32 d8 e5 fe       	call   0xfee5d849
+  17:	5b                   	pop    %rbx
+  18:	5d                   	pop    %rbp
+  19:	e9 cb 88 9f 04       	jmp    0x49f88e9
+  1e:	e8 26 d8 e5 fe       	call   0xfee5d849
+  23:	48 8d 3d 3f 6c 28 08 	lea    0x8286c3f(%rip),%rdi        # 0x8286c69
+* 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
+  2f:	e8 15 d8 e5 fe       	call   0xfee5d849
+  34:	5b                   	pop    %rbx
+  35:	5d                   	pop    %rbp
+  36:	c3                   	ret
+  37:	cc                   	int3
+  38:	cc                   	int3
+  39:	cc                   	int3
+  3a:	cc                   	int3
+  3b:	48 89 df             	mov    %rbx,%rdi
+  3e:	e8                   	.byte 0xe8
+  3f:	46                   	rex.RX
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
