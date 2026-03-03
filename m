@@ -1,166 +1,247 @@
-Return-Path: <netdev+bounces-263417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263418-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mN/mHmRMp2l2ggAAu9opvQ
-	(envelope-from <netdev+bounces-263417-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 22:02:28 +0100
+	id sDV4LpBMp2l2ggAAu9opvQ
+	(envelope-from <netdev+bounces-263418-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 22:03:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D99C1F7100
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 22:02:27 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51BE21F7153
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 22:03:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E820D302965A
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 21:02:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 978F9306ABD8
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 21:02:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D70025F994;
-	Tue,  3 Mar 2026 21:02:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F1B233D507;
+	Tue,  3 Mar 2026 21:02:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="Ue6Pj4CG"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="PYeLBOpF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7B2831F99F
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 21:02:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 842C138C2C1
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 21:02:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772571743; cv=none; b=NgB4+v1IJYGbE0aZCmFQ7KnGtCBwo+FfBZpy658rGoUTZI+INfBU62f8IsrQhx6VE3aSl8gezd+aFu+sAlFTxhj/haIT78+/xRV0goRJ5bCbpavE5GGoNM5h+yvaaKiT3w6vcI6KWuBjsHY34mqSlWrwNNVYwz6wD5e37QYIQew=
+	t=1772571752; cv=none; b=ilVIQCoIPHJ7FExdir3+3Sx/jwYU5fHR1T9w4AweF8s+oBpx7NryBdYDphUBs26wCzKbQUXJJv33nRqKdzKOJERedLYBqgWWgdGkC1MVIejfgW7ikQnyauY/xEt6bsRhteyLCvj4Tnfa5nBUiSKYrzU9J9bqSzSX3nirgl8iIls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772571743; c=relaxed/simple;
-	bh=ORvWY5lou6kfxS7HEbwUwWtrjMJe6cBzwfq5Lcsus2Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EODMFjnmVX/YP2DFQtcZxPaSssAM6oUGE1531tBUceo/RyXA+3s+TTpNHRbAc52JrzJYRtylB+Q1UCAneh+dt1yMbe4tYNxGP10CBXebh2CnJe/V+xlQlvVUPZOHYocHAgIlx48/c1peoa6GsQExNXGcnhhny5uzFzQIOEFzvyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=Ue6Pj4CG; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-82735a41985so3686244b3a.2
-        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 13:02:19 -0800 (PST)
+	s=arc-20240116; t=1772571752; c=relaxed/simple;
+	bh=f/+1RBFwBccQqW3tCR3yuiRjDYKCX/PF0bqKRX9TlKc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=T8XjOXK4y+JYUE3ROyy9TkR+omAK8Go2GUJGwf8A+IedUPlDx2XRlcShJMG3gG00iXFEcxW8foYUUNW3VRq3wKdibzs4RlHxWr9yzMsSYq/YZAXkQvGKUgWyieUhw2jzPcgqzpBeOov1K0afMrbLfBi54PKTB7eIxFnMx22jdac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=PYeLBOpF; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-483abed83b6so51242125e9.0
+        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 13:02:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1772571739; x=1773176539; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QK28LuLqQ+GK7ESZCGOcUnyt8e+LKU3myYEiDkza/GY=;
-        b=Ue6Pj4CGwkY9Akv6ICzg6J6sjamJtP7XZobtohTEcjUPPndZMKkt2aapNZWgQeI+Ue
-         fIB3Z1ME/Iw+OMTeWv4NrdM/938+q9Q80ycwiUM03FNJ41U55jH2LnnkgjwvwqYXjv22
-         bU8OqYpSG8pOfvHDpnf8kn2ZKAzcObLNSuUxiOC/7RMl/8hDM2HNmubkfHt8vRxGPpwQ
-         KJD9uxLVouECcvlDPP2TsLMdtGKNexs+u5fT6XSPoJWuJDN73dU6eyIAMSlrMbrSaRpw
-         TIBCiaAxRw9HHtMnw663a7bEly15m1xwJT5qxsArEh9Opya7xP/opnLQoBHFer9/30Ib
-         yusQ==
+        d=openvpn.net; s=google; t=1772571747; x=1773176547; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=/GbS8PQU6G4qit6IliiyF3U5xjyHPftLIsLjIMv3Bko=;
+        b=PYeLBOpF/EePrGptBlbryytVbBPDTEAUFhvIw6OXidUi2L9NpsmLZmhcnClNxX34Ch
+         nwQTteZrPvZKxAQvPDVgA+Ve7M7aqLFqyiIEmJoTEs2hjxrYFZyrPsD6kYfb9DtihSi+
+         GUBf0IcJJCV/2qc+eyeZIu2+UoR5yBz/mH9YHK+/eCxQZz2fVgke86/5m8xJC9fhfhr3
+         x7OXYHNIqxPA8GEW24aeSOD3yX5IioHrjKOATRm+MO7TVY8vTiDJ6cfkqK5lNbZ1nfRP
+         qHKDGGOdJpH0U2Xgv7ZKB9+LpZ043Iwuhy5hxBUGpppT5ieKrhEMmWqXBDa5G0OOaEI0
+         75TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772571739; x=1773176539;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QK28LuLqQ+GK7ESZCGOcUnyt8e+LKU3myYEiDkza/GY=;
-        b=DJJadVyYkHD9QjL1h90q1rIFfmJH8MEDTJLufErlJkv0yTPJdtX6VnUIhBbgsUTDRk
-         7e5KWDF7x++IUUlzoo8LZIj9B/AFOLUhvQBtI5c2LKrXFKyituyX7CkgwcWLUvMUxzHA
-         jxi+dfaW+WlNftIVrif/ID1bNCua8Xex7IfqosXIoew92+pFjWBn6MA9E4FCPs1tVqIf
-         CPe7EFax4QuolskyFEFDi60wDNJRCuXPKVuujMn7Qc3dPF82mjBac5eUqtSDeLrg/S6d
-         l8Y/8hEBvS2Q0mDO1sV8heDV5i62H43pjX/45lJnvd/nKetV6Vg7dIUux50iSLM5yKWg
-         SHuA==
-X-Forwarded-Encrypted: i=1; AJvYcCX0coD4jcZve2F6lRwTPp2kQX1OAaQ7gCfOA+NITFSGAu1IuOgUBcx3UPoUnBWerIAZ91dUMxY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzo550OU3wheAuVEznRw+GhtV5kjwyckdoh2gIKPW5vze9pMMOh
-	Yi5K4ROkvT03bpOnIBk3syDYeW8+/AbcucvCzcRN7jDI2KtIXtRCbE2ZzbjKl+wCODfrL4WUCh0
-	DppqHirk=
-X-Gm-Gg: ATEYQzwkrMu37wX+RHCWz95f7c5qgtVTWx8+2xFZonfxXOAo4Iz+1XF78OyZWIcgVJD
-	cu3lYdMXicMwJ+xSow4AIGv/s/HAZaMOhv48BPdHPPmsM+imPnvKHSyieBx4r5gaF+vNtkifvVX
-	wbOUEMgxGqcd0+x3EGFJi+q2lvOFrirxA20fXgJ+5y9KA/ZwGCPgDvZmagCOZM6ky5Wzf1OKU6h
-	CateupwTNMoYUCILTSShc5U7AZedf13r9nn5VnYUQxth9faOM1XFo+eFomqpj1PHoqUABXs2bPp
-	iQdSGUoIO656nqy0XKiPfldAuInNHYxO5PQeNIPi48qDjUX5nFknta9kFcs2eIh1IMyrbB2cJG7
-	HwPTgTgjTFDiz4cBj2Q2/ImHG4KMdBthRQVexn186ZGybH78IpPNbegGl5dS4XkrSrArGudxegJ
-	iQeJw=
-X-Received: by 2002:a17:90b:524a:b0:33b:b078:d6d3 with SMTP id 98e67ed59e1d1-35965ccfe99mr15513265a91.23.1772571739013;
-        Tue, 03 Mar 2026 13:02:19 -0800 (PST)
-Received: from localhost ([2a03:2880:2ff:5::])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3599c4c0f80sm4057328a91.16.2026.03.03.13.02.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Mar 2026 13:02:18 -0800 (PST)
-Date: Tue, 3 Mar 2026 13:02:17 -0800
-From: Joe Damato <joe@dama.to>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org
-Subject: Re: [PATCH net 1/5] nfc: nci: free skb on nci_transceive early error
- paths
-Message-ID: <aadMWe0YaCdgFxKF@devvm20253.cco0.facebook.com>
-Mail-Followup-To: Joe Damato <joe@dama.to>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org
-References: <20260303162346.2071888-1-kuba@kernel.org>
- <20260303162346.2071888-2-kuba@kernel.org>
+        d=1e100.net; s=20230601; t=1772571747; x=1773176547;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/GbS8PQU6G4qit6IliiyF3U5xjyHPftLIsLjIMv3Bko=;
+        b=oFsvlOj2KmfZk2vrUsMgLVc2il4zyzMRRjhbj4jFpbk2KSEh539HdVPoruaYHFfRH9
+         ENaUAnBO5DSIzsT9wydZsx6AObwIP/lAsbiJ2EXYvUP2D4nXzP4MCUZdZvl/L7/vXPmg
+         IxQLsNVIwPKZ+91qQ2YG1jScElEcKwxTB89rrhACxa81PCzJYP+pTTCUcIu2mUmkoDfE
+         CI+XTtsFQJ/sQnnj+RElS1RW97jLdrjRW9Pur0Tvyv2yAsQdgXMX2ZsSUXQ9CT+dtpV0
+         mOqP8FHflFt5MF3tIoO6NGsMOxM9ZZnCc0b032g4UpDIWVX42mXStYEM0NLWAWKnP+du
+         cdqA==
+X-Gm-Message-State: AOJu0YxOBC1H7Lg4Z2BY9ZalJIUqx0nO+B7RAn67082/3dMLjbrc9R2c
+	TSEMbUhPhmgAAF71JWs8125Vin1tLTbbvZusqzjW/CMkxLHgtCWkq7pGipNwDCe52iFPeAeJgYi
+	OananQ+n+lnE79VCZkqFSPp0R434MKQNZD0bHLKeHTCJmnKPGDjI=
+X-Gm-Gg: ATEYQzwLjmTzn3s3F+jy45DQkfm7NKxc0fFkddtmkt5qzx/PYirSNLtRmv+JI2EQXLY
+	h+NkXrTmgyJQP08WjfupaCFagKlf+AZjHE5f8Z8DrcsItRRgeJSVuCWmLnOlFgJndL9dYFP2XGU
+	iSx07p2NqNbN1DnUZSb0bZ1fuvaX0xa26HJAhuzg3wohJIuhiK4OC4DGCCZpbNAnadCf04V/ty3
+	U/f2QAvrKjmG/w0riAwOOfOn3gL0o6nS58OCOUztNMc5RHnC1r3REENo5PpdHQQr2g6sP3bsaRs
+	wnYb5k+y/Oo203yFf/YzCzVYjMmqE4uVoajLNiBLJMleEOLnZy/BFKaYezfn3lym83E9D1SFQ8E
+	ZnZY/pWUtoH8Dlyul52WqnQBEBkevQPOyVQacM+G4JqWgjiPsv6RZbURYFgOZBFV3j4b0Ikxjc9
+	nPBJGTSMxt6giyTkRwZyvzOvk1VUAhBE58cPw+nhu0phTgbC3TJAcX0i2vf43yNA==
+X-Received: by 2002:a05:600c:4fc8:b0:483:6f37:1b51 with SMTP id 5b1f17b1804b1-483c9bedb07mr348191455e9.23.1772571746722;
+        Tue, 03 Mar 2026 13:02:26 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:8c1b:8bca:3273:e279? ([2001:67c:2fbc:1:8c1b:8bca:3273:e279])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4851880724esm7472085e9.9.2026.03.03.13.02.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Mar 2026 13:02:26 -0800 (PST)
+Message-ID: <74f8c9d9-eac7-4681-b3ee-8ab2b20b7904@openvpn.net>
+Date: Tue, 3 Mar 2026 22:02:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260303162346.2071888-2-kuba@kernel.org>
-X-Rspamd-Queue-Id: 7D99C1F7100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/9] pull request: ovpn 2026-02-28
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Sabrina Dubroca <sd@queasysnail.net>,
+ Paolo Abeni <pabeni@redhat.com>, Ralf Lici <ralf@mandelbit.com>
+References: <20260227235955.660-1-antonio@openvpn.net>
+ <433139b8-3aea-4db1-8ed6-959ac445cd27@openvpn.net>
+ <20260228170104.1ec4c133@kernel.org>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <20260228170104.1ec4c133@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 51BE21F7153
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263417-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-263418-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
+	HAS_ORG_HEADER(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DKIM_TRACE(0.00)[openvpn.net:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[dama.to];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,openvpn.net:dkim,openvpn.net:mid]
 X-Rspamd-Action: no action
 
-On Tue, Mar 03, 2026 at 08:23:41AM -0800, Jakub Kicinski wrote:
-> nci_transceive() takes ownership of the skb passed by the caller,
-> but the -EPROTO, -EINVAL, and -EBUSY error paths return without
-> freeing it.
-> 
-> Due to issues clearing NCI_DATA_EXCHANGE fixed by subsequent changes
-> the nci/nci_dev selftest hits the error path occasionally in NIPA,
-> and kmemleak detects leaks:
-> 
-> unreferenced object 0xff11000015ce6a40 (size 640):
->   comm "nci_dev", pid 3954, jiffies 4295441246
->   hex dump (first 32 bytes):
->     6b 6b 6b 6b 00 a4 00 0c 02 e1 03 6b 6b 6b 6b 6b  kkkk.......kkkkk
->     6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b  kkkkkkkkkkkkkkkk
->   backtrace (crc 7c40cc2a):
->     kmem_cache_alloc_node_noprof+0x492/0x630
->     __alloc_skb+0x11e/0x5f0
->     alloc_skb_with_frags+0xc6/0x8f0
->     sock_alloc_send_pskb+0x326/0x3f0
->     nfc_alloc_send_skb+0x94/0x1d0
->     rawsock_sendmsg+0x162/0x4c0
->     do_syscall_64+0x117/0xfc0
-> 
-> Fixes: 6a2968aaf50c ("NFC: basic NCI protocol implementation")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  net/nfc/nci/core.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
-> 
+Hi!
 
-Reviewed-by: Joe Damato <joe@dama.to>
+On 01/03/2026 02:01, Jakub Kicinski wrote:
+> On Sat, 28 Feb 2026 21:49:08 +0100 Antonio Quartulli wrote:
+>> On 28/02/2026 00:59, Antonio Quartulli wrote:
+>>> Hello netdev team!
+>>> Here is our first batch of new features for ovpn.
+>>
+>> Please drop this PR.
+>>
+>> The automatic checks on patchwork have highlighted a few things worth
+>> fixing (and the AI even found a real bug in the selftest Makefile!).
+>>
+>> Will resend the PR after fixing all issues.
+> 
+> Hi! I am trying to add ovpn to our netdev CI (Fedora 43).
+
+Oh that's great!
+
+> This is what I see without this series applied:
+> 
+> TAP version 13
+> 1..7
+> # timeout set to 45
+> # selftests: net/ovpn: test-chachapoly.sh
+> # Creating interface tun0 with mode 1
+> # Creating interface tun1 with mode 0
+> # Creating interface tun2 with mode 0
+> # Creating interface tun3 with mode 0
+> # Creating interface tun4 with mode 0
+> # Creating interface tun5 with mode 0
+> # Creating interface tun6 with mode 0
+> # unexpected base64 error1: BASE64 - Invalid character in input (-44)
+> # Error: invalid arguments.
+
+Yeah, this is an issue with mbedtls3, and patch 1 is indeed fixing also 
+this.
+
+> #
+> 
+> And then it hangs. When I run the tests with this series applied
+> its still broken but at least doesn't hang (see below)
+> 
+> What am I missing?
+> 
+> # make -C tools/testing/selftests/ TARGETS=net/ovpn run_tests
+> make: Entering directory '/srv/vmksft/testing/wt-test/tools/testing/selftests'
+> make[1]: Entering directory '/srv/vmksft/testing/wt-test/tools/testing/selftests/net/ovpn'
+> make[1]: Nothing to be done for 'all'.
+> make[1]: Leaving directory '/srv/vmksft/testing/wt-test/tools/testing/selftests/net/ovpn'
+> make[1]: Entering directory '/srv/vmksft/testing/wt-test/tools/testing/selftests/net/ovpn'
+> TAP version 13
+> 1..8
+> # timeout set to 45
+> # selftests: net/ovpn: test-chachapoly.sh
+> # Creating interface tun0 with mode 1
+> # Creating interface tun1 with mode 0
+> # Creating interface tun2 with mode 0
+> # Creating interface tun3 with mode 0
+> # Creating interface tun4 with mode 0
+> # Creating interface tun5 with mode 0
+> # Creating interface tun6 with mode 0
+> # kernel error: Unknown attribute type
+
+Maybe you didn't unload the ovpn.ko you built *without* the patchset 
+applied?
+
+This line above makes me think you are using the newer selftests (from 
+the patchset), but without kernel support for a new attribute, 
+introduced in patch 6.
+
+
+Regards,
+
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
+
 
