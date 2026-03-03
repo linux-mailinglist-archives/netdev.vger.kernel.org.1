@@ -1,78 +1,105 @@
-Return-Path: <netdev+bounces-263454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263455-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8EyTB0lnp2mghAAAu9opvQ
-	(envelope-from <netdev+bounces-263454-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 23:57:13 +0100
+	id GDxgCvZpp2l/hQAAu9opvQ
+	(envelope-from <netdev+bounces-263455-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 00:08:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3AB21F8372
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 23:57:06 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26D001F8444
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 00:08:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A283230523F7
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 22:55:22 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 34C84302511C
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 23:08:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D14A390224;
-	Tue,  3 Mar 2026 22:55:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E71F390238;
+	Tue,  3 Mar 2026 23:08:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g2uw9J4n"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="i7OaPcjn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC90A3644CB
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 22:55:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B7638836B
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 23:08:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772578521; cv=none; b=AXAmQ2ASsTGsUFJvKRc+66ZiDKItZ4wdGk9+F45y+D2F5otiF9akih2J0J91xvXd1Fu8c1YJs77SrOytYK5jlPv5mm6C5ViMLDMEH4uc4Um/icVo11aeamRz4rgEclP5uGne067inxDPhnHFozdIhPVdjTisZOC3tFK4QIWca6g=
+	t=1772579311; cv=none; b=rX/mZbEMVQd5Lyyoe+RrRVELVle/MTfdVQHL8Wu6zp6ukd3PbyvIcE1Z/A6BU5hh3j2DpWZ6x3driS3zHbN+EQ6IIAjjp4TZ0l0aQxd8HWjd9duglwuJUW6xrd4i0vdp7n/D9zBgGXClEZMIfeCKgm4di8KY70r1C3KLSLaPXnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772578521; c=relaxed/simple;
-	bh=VGKG2ImUg34B0C6o1nUVQQpbbrDIgsJoShVgk68zd9w=;
+	s=arc-20240116; t=1772579311; c=relaxed/simple;
+	bh=HUX0i0I7PlBuLWWVstQ2H5vKS+AgS7G2dCyg2A81XU0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UQ2V4jwDDOqUhp22Tpvx3hkNHq9a+/8DA2M4LRtdAu+LOAMcG6uMdNUaJipqN0UDVpmClhP+5Injvt5HZArgCgYtZkj7AwWtTiVvWJTUiHW8dKp/jQ7p5m/54CAelawXJRkTEMagOz+8fhOhsy+XM4VsFVwD7YZl6fih0zBshek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g2uw9J4n; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772578520; x=1804114520;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=VGKG2ImUg34B0C6o1nUVQQpbbrDIgsJoShVgk68zd9w=;
-  b=g2uw9J4n/8uvZ4iPMQw03b2B+FMd4Z8Y1OjVARIuRmj50IjGKd8JfHs1
-   pvO+hQgoZ4tkrF+UNPlc8C6Qicm+vC3HmGMaydiRKcsqWP8aGmutmIp5F
-   pc/x5UQPIgTEd34ZWwp0WeJMZfjYXvqyeLM7CPRSheD+AjIS8t4P1G5R7
-   cO9QMf8gxe50mNKCLFoHqh0oy/t06V6J4UEdO3nRh99LCQNHMzAM3tWBq
-   rLlFu06pxIXDgpEoRRMWgeLJbM081M/X1flGdg9umGTWcP2Ml8phPJQbs
-   GGoUpaajBz1mvOz7yNoq8T4qUmoV0Ips39X0xpiZ7acfFz7Gu/PQox4Wy
-   g==;
-X-CSE-ConnectionGUID: Bh+njRcGR+iBXQiEZKAqUA==
-X-CSE-MsgGUID: LNFMc7jYQwK3oagjXu1PaQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11718"; a="73547943"
-X-IronPort-AV: E=Sophos;i="6.21,322,1763452800"; 
-   d="scan'208";a="73547943"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2026 14:55:19 -0800
-X-CSE-ConnectionGUID: LoWXKm9/SEKsrfaX9rkAkw==
-X-CSE-MsgGUID: UlLP56elSZSO6XuI64meaA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,322,1763452800"; 
-   d="scan'208";a="223149268"
-Received: from dalessan-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.245.32])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2026 14:55:17 -0800
-Date: Wed, 4 Mar 2026 00:55:14 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: Re: [PATCH net-next 3/4] i40e: Add missing header
-Message-ID: <aadm0q5QuWM3hGNx@ashevche-desk.local>
-References: <20260302234105.2658400-1-anthony.l.nguyen@intel.com>
- <20260302234105.2658400-4-anthony.l.nguyen@intel.com>
- <aaaVnmx_QHcpiVbG@ashevche-desk.local>
- <39f4c46c-4db9-4178-99e0-8e3f3a452ab4@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=iXRJXDy+u5tH/aY5nPvXA+Hp4040JzihRqk+aDjW0XWyCxx+6j8fojimYz+Lc4Im9Py7M4kL8oCdXkMbdKcyC1CGWlL7oj5IwSTWIY41Z8Jm54RR/Pc50H9ZXNkUuA6Xhl1KdiRaYUfcZl0bONQSYc8D2/95FMwnybPhOUjl4i0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=i7OaPcjn; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-82748095963so3106975b3a.2
+        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 15:08:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1772579310; x=1773184110; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hyGTuCWGO45jPKeyWUndsgiqo1yT0pSCCNty9r3XSng=;
+        b=i7OaPcjn20DCNz6lbUAWeHdkRg7dUSKjEWzTwdn909x0ZYKaUIe4Wtmuey5x0ThjbV
+         5I30rNE1mlvKt1fPq0lxReuNEbsQ0nf5NnA8V1yVXXhBrWGDZ+hABjyAMc6py+yFLnQj
+         NNxfoIoUVi0WNp+vxumzDdDCRShLIrZmtyXjKh9a4AD6IRpwaL8xm+RvoNRuYvZ9cWbe
+         Z62stx7WU9ruYYgQ9VOF3EVQVOHRls4eWoNvWHUZh4OfjU4zxiEA40rZs4IcoAMOP/uK
+         KepnM+/UKpuI7xZFyKdLCnyww5j62bnRs0PV+8LHgL7WWVnduudIsVOz5Pmtk3LChwsk
+         zN8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772579310; x=1773184110;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hyGTuCWGO45jPKeyWUndsgiqo1yT0pSCCNty9r3XSng=;
+        b=b80Nl36l8J0HiJDqA9vxENN6XY1eCQkvOB1ajeoyqimGUEA0g2VSsZg9VGxPafGKb0
+         2WronBEWMoPcNxvmmbFfb0uNesWdtVENhvrtJgeZgqf3JUYPZAw1fTBlK48D94mEiSGT
+         FKS+QHPCMV1t6TtdakPlrXstAfXZthf3YZT2X/TDwA8Q7tiPDT2U+miB8yOPDR6jz7W5
+         x7GmALjhMm/eKuGHNpTUqYwOlOf8pmkEl2pZ1jRA1QVKUoL+0Ltnuv3bMJ/79XZm7QkC
+         7hz9hxr4IPCXxhObUKNmthTymSLN6T8Yp4TDm/kEtjJO1TLm/fU1ntWidSPe5F4gOlxY
+         usjw==
+X-Forwarded-Encrypted: i=1; AJvYcCWp1gMSt43hz85fTBXnsQjNkUhHL9uVmU04EaMd7kkCNhRR8NbYxbcVgp9Yl6wYut5wV2r6kKo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZD5LnqU4XJcJ4la2GDJkLPe6i48VzKtwSCnh3aBAGZmPERnsU
+	n6+B+mohJLR6R5OF24ptLDAM440OMwG4NVJUvnh7y4bYPTkHd4Zci553hySdrVHKw60=
+X-Gm-Gg: ATEYQzzk2HDp4145iGP4hSEKYOJ/oQZHn5SWpuzKn4M73Z7flvZ2GjLpTaRnW/J2T/h
+	Dh+NavKXF0r0WjUanjmWlVRyJGeAmS4Tu24ixT1lk6z/lwMd30egioFDNiJ/U/VksdBrvAAuvdE
+	MHUtSnRQetcMCLCeIAzdQ/+RRvjjMr9zqLJ9APi+bpkaefqVLXnaszffq7mlCP1bClHmPpffQKD
+	bdMxiGtZkU40pC1ABj5TFTJ5QQfcyzmRjHfvkCCKwQ9p9K6XfkLLz8gtGHcac6OvBFoe07Q4qnK
+	qSwAG3qiga1u45isOEJO22a9OCLBmXCrtUKZLjLuqdr8nMIKu8XWQW9O4TFsvPn86tJvHepppOP
+	CRchbisMEeqQJ1iRVlHnX6kseVLgDetLzzfDErkKoXRSflPd1v+qdfo1fGJ/0XKKtx481mdgXE4
+	B8Lpk8
+X-Received: by 2002:a05:6a00:9193:b0:829:6f7d:3093 with SMTP id d2e1a72fcca58-8296f7d3294mr201387b3a.48.1772579310080;
+        Tue, 03 Mar 2026 15:08:30 -0800 (PST)
+Received: from localhost ([2a03:2880:2ff:5c::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82739d8c7aesm21018686b3a.21.2026.03.03.15.08.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Mar 2026 15:08:29 -0800 (PST)
+Date: Tue, 3 Mar 2026 15:08:28 -0800
+From: Joe Damato <joe@dama.to>
+To: maximilianpezzullo@gmail.com
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] igb: fix typos in comments
+Message-ID: <aadp7PhlQMV7BFhC@devvm20253.cco0.facebook.com>
+Mail-Followup-To: Joe Damato <joe@dama.to>, maximilianpezzullo@gmail.com,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+References: <20260303-master-v1-0-f180b1ad98b5@gmail.com>
+ <20260303-master-v1-1-f180b1ad98b5@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,66 +108,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <39f4c46c-4db9-4178-99e0-8e3f3a452ab4@intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
-X-Rspamd-Queue-Id: E3AB21F8372
+In-Reply-To: <20260303-master-v1-1-f180b1ad98b5@gmail.com>
+X-Rspamd-Queue-Id: 26D001F8444
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
+	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:?];
-	TAGGED_FROM(0.00)[bounces-263454-lists,netdev=lfdr.de];
-	HAS_ORG_HEADER(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263455-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DMARC_NA(0.00)[dama.to];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.419];
-	R_DKIM_TEMPFAIL(0.00)[intel.com:s=Intel];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DMARC_DNSFAIL(0.00)[intel.com : SPF/DKIM temp error,none];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_SENDER_MAILLIST(0.00)[]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-On Tue, Mar 03, 2026 at 08:37:40AM -0800, Tony Nguyen wrote:
-> On 3/3/2026 12:02 AM, Andy Shevchenko wrote:
-> > On Mon, Mar 02, 2026 at 03:41:01PM -0800, Tony Nguyen wrote:
-> > 
-> > > When cleaning up another header I have met this build error:
-> > > 
-> > > drivers/net/ethernet/intel/i40e/i40e_hmc.h:105:22: error: implicit declaration of function 'upper_32_bits' [-Wimplicit-function-declaration]
-> > >    105 |         val1 = (u32)(upper_32_bits(pa));                                \
-> > > 
-> > > This is due to missing header, add it to fix the possible issue.
-> > 
-> > There was a v2 with the other (missing here) tag is added (it was given against
-> > v1 conditionally) and Subject amendeded.
+On Tue, Mar 03, 2026 at 10:38:20PM +0100, Maximilian Pezzullo via B4 Relay wrote:
+> From: Maximilian Pezzullo <maximilianpezzullo@gmail.com>
 > 
-> I assumed you had found another missing header with that other patch; guess
-> I should've looked closer :(
+> Fix spelling errors in code comments:
+>  - e1000_nvm.c: 'likley' -> 'likely'
+>  - e1000_mac.c: 'auto-negotitation' -> 'auto-negotiation'
+>  - e1000_mbx.h: 'exra' -> 'extra'
 
-I was talking about commit message tag and an updated Subject. The code is
-the same.
+These changes seem fine, but codespell noted another spelling error in
+e1000_defines.h ("Device Reset Aserted").
 
-> I'll update the PR with the new one.
+Maybe worthwhile to get that one too?
 
-Thanks!
+At any rate:
 
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+Reviewed-by: Joe Damato <joe@dama.to>
 
