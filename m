@@ -1,179 +1,342 @@
-Return-Path: <netdev+bounces-263209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263210-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2DxJBhrjpmnpYgAAu9opvQ
-	(envelope-from <netdev+bounces-263209-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:33:14 +0100
+	id 4KjAKbPlpmnjZAAAu9opvQ
+	(envelope-from <netdev+bounces-263210-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:44:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 765FB1F04F4
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:33:13 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 202571F0901
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 14:44:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7B74030848D1
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 13:32:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 45ED43075AB6
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 13:36:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CFA02405E7;
-	Tue,  3 Mar 2026 13:32:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="lgzo+OHi"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02A71258EE0;
+	Tue,  3 Mar 2026 13:36:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013048.outbound.protection.outlook.com [40.93.201.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com [209.85.128.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26829258EE0;
-	Tue,  3 Mar 2026 13:32:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772544745; cv=fail; b=ES6xUsA/fDBFSpk0IxBBH+SYyFV1fHqrVv9YDK89Rfyh4Pr2oFNd1rsIOULQzVjKAEW4FdIOzaNHXReY/0z4XybEdo4weHUmQ3ZHoR0KhlWk0+Oh+70xixBSp/++6A7w9H3Fvwuaw1Z3Zzn8IfydFbwBW6zKCaiobGif8NJ6/0A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772544745; c=relaxed/simple;
-	bh=YDADcnaSmSQXn8ztjSQGQgPTRUbAUGkcgHiHq7c/ipc=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=KxyLspGlDGFBHu8G/rPw3eliJmso27rYLeQMo4ybJYFZ4LhgYZ+C/8UN1tKvPvmRGLst0+s34olLb2q33imG4R0qRZ2jCEImkEPgq2nn6MgGPyjdSDnybHtsTaUrh9ZB7J2GOlX+PE1QsgFmjs32UH9vKkhc1DuiBu1wn0ccefY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=lgzo+OHi; arc=fail smtp.client-ip=40.93.201.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YLrk9VIIxC9Rdrw8rY+JBjHIfEkyi8wiXC8Zaf7N4EYQ0FWEKlCyG6KnQkEYnFsrN5YE4lHl/OgeSmVUs7i8POcOHNkfOePuAqv6ZSrcDjbOPNpeLs117CQx9/lLfsPpTpb/2kQmtHoERbArraGX0EL+yo5Eiqd1b1rzwosn9uufhtGAthxLOZC8cq1FSWTQ8yFIqtHe37vpOEsa8VwV7p3PObOiRaUwpkehBvvMLIr+QBv1x3w5cw6pVy1JtCnvm2UdWXNo8BjjZZPlHNaUBZ/GQRzAqkYh4dxzwk4e+5XBj8inxxEUbWQmt4+jTEXehMLgK7I9GtS8tj2l1r7qnQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9CNA2AfmFzYF7Eg+3PLhCO8ZT6Dy8qekV5duh3FlvWM=;
- b=xMl2EwrJY63qTeGm+akuKDV1x3gvN3tSkOoE/1h5dY4j0GAYfu6GHssvnox0OfkxBCKI7iGfFBs5ME+yzRusfKRlbUTQeLtmWxWAVa37JFwlvystC/Sqa1owkRkZ9hQu99770ZoRm7osBvjlWJ0B9jdMhj8pHSj13M8KhINcFcb1OTTddx9lf1O1e2+lDosgA5sTBwZRoleZhYYYyoPFAs3cehRQ+L+m3I1FZHInty64jqbHOcBGr0kGkhxX1svNwPU4sFm17NrphCT5M1ldzgNdqcl/eQUe0oRDObzxospQhKDVr7uwgjhIQE0r4N0M2Uk7dusCWRiqVUjAeKNahg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9CNA2AfmFzYF7Eg+3PLhCO8ZT6Dy8qekV5duh3FlvWM=;
- b=lgzo+OHiD9xjBarCYLIlsU2En1X7sUK/G4jzmcz90TuGZriM9rrjFKdPBbUjChSzt4Rh7qqItUqNzV0t7Ac05xfL1WCtbkPAgCkK/gU1gYXYnk9PJtQbIRKYGRspmYDK6UQ4L5oxxWqPuvnbC82OVmXsQNdUYC7b0z/6XzfpVxSFVke/hvVcg7R3lb+tBY262iN9NaSd4rSgIGX2mAtGs+nR8Efe6ET/3Zbx+bQEKGi6gKp+x4WV5Cz7NxJU8A1pBzLZCAwhajJGVuXeonf2k9M6l3IW+8rfn0rVMPkpYGBgvdTwxEziWyKi3QOHl92kwLUu9XB1ZCZC7rEOS1goXA==
-Received: from SA1P222CA0036.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:2d0::21)
- by PH8PR12MB7159.namprd12.prod.outlook.com (2603:10b6:510:229::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.21; Tue, 3 Mar
- 2026 13:32:19 +0000
-Received: from SN1PEPF0002636C.namprd02.prod.outlook.com
- (2603:10b6:806:2d0:cafe::4d) by SA1P222CA0036.outlook.office365.com
- (2603:10b6:806:2d0::21) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9654.22 via Frontend Transport; Tue,
- 3 Mar 2026 13:32:16 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SN1PEPF0002636C.mail.protection.outlook.com (10.167.241.137) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9654.16 via Frontend Transport; Tue, 3 Mar 2026 13:32:19 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 3 Mar
- 2026 05:31:54 -0800
-Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 3 Mar
- 2026 05:31:49 -0800
-References: <20260225150648.1542206-1-ioana.ciornei@nxp.com>
- <20260225150648.1542206-6-ioana.ciornei@nxp.com>
- <87fr6mf8gb.fsf@nvidia.com>
- <skvfdukic45r43yqw5wzzubqslrfdepcnghbspwvp7jtmjp2zx@6bqapqyjcpe7>
-User-agent: mu4e 1.8.14; emacs 30.2
-From: Petr Machata <petrm@nvidia.com>
-To: Ioana Ciornei <ioana.ciornei@nxp.com>
-CC: Petr Machata <petrm@nvidia.com>, <netdev@vger.kernel.org>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S.  Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Simon Horman
-	<horms@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH net-next 5/5] selftests: drivers: hw: add tests for the
- ethtool standard counters
-Date: Tue, 3 Mar 2026 14:30:15 +0100
-In-Reply-To: <skvfdukic45r43yqw5wzzubqslrfdepcnghbspwvp7jtmjp2zx@6bqapqyjcpe7>
-Message-ID: <87y0k9doou.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55A531DE8BB
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 13:36:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.67
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772544995; cv=none; b=SmvokkXZrhc9jHTDTnAcVxTOFAKyo6sFxph3r5l0q7Oopb7qyOw5a5cEOXO6E7bXBjdYpXF+JwHO6kwrSIwiOrtWeOiOiINGgjTtRoTJtAV1BeqhAwaT0rjFgprw9yVms5NUjBgnHWnogoVdsGZd/wmFb41tAQ+ibfBtR/+yYEo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772544995; c=relaxed/simple;
+	bh=tCnqC+170NJFb/oOFJQ/CHcUJGs65+aWaHGP52a7jz4=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=fbygJbn3Yd5O/G+IG39MH7a3D0pM/G8/fqb3wnvnwxFl9ySnF8G6sAW54zb665B8i6gdzJR5RcIPIBO08IWSMTMf/OZJT0f8HZPGhLQ7pWD1VvuH+5R2TKpHYDlMXpHN/EflxRU+rZbqMMrXJJ/t4Tma6dxUnW9UQugLATDzjv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f67.google.com with SMTP id 5b1f17b1804b1-483703e4b08so51947785e9.1
+        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 05:36:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772544993; x=1773149793;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:cc:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f5luiAfSAj/kG9+4CRrPULEuJaq0EdAn0SaqDgSj+ro=;
+        b=qS5iunvpBmBAz2mG1UDI8jvRcyxsKVpmY7jO/EX95Rjd3H8YStSlOOJOhtfTLNqeHM
+         pmHcm/OGo6AjCcZahSfHA/nOsZon3wrgDjQ2QTLpb8UJvdV/gAPzd8eIPElnjHHjFxZx
+         oAmkBEVgCzxoylQ3moS8ajbVQS/v/StWaoaY0l+fDTijdtFlxr7eLFc+LZZS2ttZCmBU
+         7O7omRo9CJKunP3+8VGKykJK2xeksQTSWnBGJh4RP6hf3QNq/3LAqXwrAEMnDnjuMSsZ
+         lNRqWEMLeeVItZYvO1+wE8O/njGaxteDAzXiOPFRTsD+nnCg+cEjB5eOWK8KcaArxptJ
+         YH+g==
+X-Forwarded-Encrypted: i=1; AJvYcCX3qUr4Gh+hTdDqJEwPqCYGc+9NPHxxg4eRG1FdYnB3NcaafArH1t1V71Gi4eHLUxWiUmiusjI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzh+PwhtZlgzVI1z2AWFOu64srAWyUHMKPvtvayWEu23cyKBw1R
+	RzgB9flKF3NzVPb+l35/zWY6iPY5o5Of5BYWv4A4ahQLmBrk5wguCABC
+X-Gm-Gg: ATEYQzyYxxGJ3bY89DmBZM7DpMogZ6WC8mukg9IIIwfeYUEM5ezW7Pp2QlGEOdHULSJ
+	3xXSuNSPPCIP84Ul1PE/h1CXNt645vuwb76bq8jxrj3Rq6sn4RuY/WulN525vmCvTxjD8VH4LPU
+	actMgtLCd9vBgzHVeVyG6NrWMiPksVpS/LmEpFRhIfFIu866olia0z0JC+aDIwDJ2zwvcJPENc9
+	fkQzl6k3LFhHPz51EhGCrZbheBX83Pmhysr/E8ft2CftlUkhrjriJBbjXT8YhbtWo1OZXIeRMD0
+	FGFnBeeltvNt4AHtCEHLwr8SAxvEM51jgEV+m9iLmwJEL8hhIwR13SbChauEqBj8+Y1rWJmCf4C
+	gmMfQ3W24iIC5sovcKt++ZTNPoE6G5nVyn33VyqV+WVNfzYvvAacPPy/uvtJmbqxvpqCtZ7mVwa
+	IxQVXQ6wTTaqNmFWqrVpYhqWvcWE55XZBJA+Y23BNq2WKXfkLFkhoRQ34=
+X-Received: by 2002:a05:600c:8b8b:b0:477:a53c:8ca1 with SMTP id 5b1f17b1804b1-48513e9cc65mr37605575e9.14.1772544992339;
+        Tue, 03 Mar 2026 05:36:32 -0800 (PST)
+Received: from [192.168.88.241] (89-24-32-126.nat.epc.tmcz.cz. [89.24.32.126])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439b34b6252sm19043271f8f.10.2026.03.03.05.36.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Mar 2026 05:36:31 -0800 (PST)
+Message-ID: <966e73e0-f661-4413-b722-9bb9140f69c4@ovn.org>
+Date: Tue, 3 Mar 2026 14:36:29 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002636C:EE_|PH8PR12MB7159:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6730d6cb-9bac-4f4d-7c58-08de79294af8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|376014|7416014|82310400026|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	v9k8tCF9VeOfflJ/K4q1yifCVEgiRlVV3VezksLenVVfbvfBqNiyp7HAZs3j531ovyuDi0jX2WwW/GlU60RPn7c680metY6kapfWT5yN6slCkvBothpnjr28ES1BovG1tBRA+5VO1HNQaMIMd1BgWDTPlxARyc5X3MzCizFhHKDFiUhllim763F+EtnFVm6j6bwSsT0ggILY8OaqWJl/8lxuvgRptzQ0E3Gfz2GNjdCbTARcNjhBwuJSRB8pGOrKrr++0v1ZD6yDDEb/B/BqewLhxTPUmoIOA1x38V5pKZ6ZFYqT2pSSDTfVzqc+6PnhCJtZuovNBe0pCoCGDDNkrqrtOtpQGQPqAD8s6fenJGyJvg9lar5Xzsb2xMMfMx9Ajqbsnx4oeL1z2dRDE8j37BONEJUMDYX+0YZoMV3kZ70yxAKrppQ2h1+2nw345RToCoBQ3x9bCnCXo7fVyhv78IDciewsjbBAD+SO37ePalTit0LCyDWLch9lRLTJPvDMx0IEZ+6tYtuCayz6Sd57XfgksJuR8am9q/t7sfEclmtyjbzqnn/hUlrkhCXGLMP+LRntOTBvuz6qJKaN2d9Va0gJ4QEPrS9EpKdRJWt8Fhit5fFd91abrUX3pRDNoGrHfeh3wCzjuZNCt4ebPOkJZqEobl94K9fJOybhaJCzIrB7LLnrY26P/XMP2oBkfjLhQew5KfQ+fKhKL4973nRO9Ml2MzGYkL3YWq4wCMflFyHw6it0LIVmtmWqwyVCWsVV4D0iPkQzQpOsTN9ShQOwY0m/GllmKmSEWqhnko7WuNc6t2fCB23Dgr/U6bGXt5lmWUeyhoH9Q5Ipm9WuN98Npw==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(7416014)(82310400026)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	1PwxtYphOmcbiGu/CK8cAebJgXQFcUFwZ6g0XGtZy1fI8Lo4+Zv4CordE9OzDplqDM4y7DPOECAh6KZPEhY2DqOYuUUdvUACyYRY1TFgC3FzdFvUXTNgCRiSiwreyr0s8SBY5hbaoAbHMLjmPTpQgDhVC4+KKvS7l+Z9QIIFgOzThN8kZa2FIlXTEoXXg2XsFCL4MUnmxe0CqGSfFDljHbrJcYtydBzpqEbISFDlTmXQXx88zqrqE0vugpsGFCuCCx7mo+rwStSkt8SAyCC56nvHhNiCEeApOBgcajbDp2Hkiafv7vbMeR3q34rpg1nV7h/dK8fb61b5dRPkzoLAIHG0S0OXRPmKKsEdPNWLBB4Io8iWmIByM0By7jFp4YDFcSgAbv77YPZW5x2YqNZ9XaGajca79jiV7B9KPxqMqDPXkm2nCyGOsL3CuOX6Tw5T
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2026 13:32:19.0180
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6730d6cb-9bac-4f4d-7c58-08de79294af8
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002636C.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7159
-X-Rspamd-Queue-Id: 765FB1F04F4
+User-Agent: Mozilla Thunderbird
+Cc: i.maximets@ovn.org, Aaron Conole <aconole@redhat.com>,
+ Eelco Chaudron <echaudro@redhat.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, dev@openvswitch.org
+Subject: Re: [PATCH net-next v4] net: openvswitch: clean up some kernel-doc
+ warnings
+To: Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org
+References: <20260303012052.4065482-1-rdunlap@infradead.org>
+Content-Language: en-US
+From: Ilya Maximets <i.maximets@ovn.org>
+Autocrypt: addr=i.maximets@ovn.org; keydata=
+ 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
+In-Reply-To: <20260303012052.4065482-1-rdunlap@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 202571F0901
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-1.46 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-263209-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[petrm@nvidia.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,nxp.com:email];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-263210-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[ovn.org];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.934];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,infradead.org:email,openvswitch.org:email]
 X-Rspamd-Action: no action
 
+On 3/3/26 2:20 AM, Randy Dunlap wrote:
+> Fix some kernel-doc warnings in openvswitch.h:
+> 
+> Mark enum placeholders that are not used as "private" so that kernel-doc
+> comments are not needed for them.
+> 
+> Correct names for 2 enum values:
+> Warning: include/uapi/linux/openvswitch.h:300 Excess enum value
+>  '@OVS_VPORT_UPCALL_SUCCESS' description in 'ovs_vport_upcall_attr'
+> Warning: include/uapi/linux/openvswitch.h:300 Excess enum value
+>  '@OVS_VPORT_UPCALL_FAIL' description in 'ovs_vport_upcall_attr'
+> 
+> Convert one comment from "/**" kernel-doc to a plain C "/*" comment:
+> Warning: include/uapi/linux/openvswitch.h:638 This comment starts with
+>  '/**', but isn't a kernel-doc comment.
+>  * Omit attributes for notifications.
+> 
+> Add more kernel-doc:
+> - add kernel-doc for kernel-only enums;
+> - add missing kernel-doc for enum ovs_datapath_attr;
+> - add missing kernel-doc for enum ovs_flow_attr;
+> - add missing kernel-doc for enum ovs_sample_attr;
+> - add kernel-doc for enum ovs_check_pkt_len_attr;
+> - add kernel-doc for enum ovs_action_attr;
+> - add kernel-doc for enum ovs_action_push_eth;
+> - add kernel-doc for enum ovs_vport_attr;
+> 
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> ---
+> v4: more updates/corrections from Ilya (Thanks!);
+>     use "net-next" (Jakub);
+> v3: update descriptions based on Ilya's feedback;
+> v2: correct -net to net for tree destination/designation;
+>     add more kernel-doc for various enums;
+> 
+> Cc: Aaron Conole <aconole@redhat.com>
+> Cc: Eelco Chaudron <echaudro@redhat.com>
+> Cc: Ilya Maximets <i.maximets@ovn.org>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Simon Horman <horms@kernel.org>
+> Cc: dev@openvswitch.org
+> 
+>  include/uapi/linux/openvswitch.h |   76 +++++++++++++++++++++++++----
+>  1 file changed, 68 insertions(+), 8 deletions(-)
+> 
+> --- linux-next-20260227.orig/include/uapi/linux/openvswitch.h
+> +++ linux-next-20260227/include/uapi/linux/openvswitch.h
+> @@ -70,12 +70,15 @@ enum ovs_datapath_cmd {
+>   * set on the datapath port (for OVS_ACTION_ATTR_MISS).  Only valid on
+>   * %OVS_DP_CMD_NEW requests. A value of zero indicates that upcalls should
+>   * not be sent.
+> + * @OVS_DP_ATTR_MASKS_CACHE_SIZE: Number of the entries in the flow table
+> + * masks cache.
+>   * @OVS_DP_ATTR_PER_CPU_PIDS: Per-cpu array of PIDs for upcalls when
+>   * OVS_DP_F_DISPATCH_UPCALL_PER_CPU feature is set.
+>   * @OVS_DP_ATTR_STATS: Statistics about packets that have passed through the
+>   * datapath.  Always present in notifications.
+>   * @OVS_DP_ATTR_MEGAFLOW_STATS: Statistics about mega flow masks usage for the
+>   * datapath. Always present in notifications.
+> + * @OVS_DP_ATTR_USER_FEATURES: OVS_DP_F_* flags.
+>   * @OVS_DP_ATTR_IFINDEX: Interface index for a new datapath netdev. Only
+>   * valid for %OVS_DP_CMD_NEW requests.
+>   *
+> @@ -83,18 +86,23 @@ enum ovs_datapath_cmd {
+>   * payload for %OVS_DP_* commands.
+>   */
+>  enum ovs_datapath_attr {
+> +	/* private: */
+>  	OVS_DP_ATTR_UNSPEC,
+> +	/* public: */
+>  	OVS_DP_ATTR_NAME,		/* name of dp_ifindex netdev */
+>  	OVS_DP_ATTR_UPCALL_PID,		/* Netlink PID to receive upcalls */
+>  	OVS_DP_ATTR_STATS,		/* struct ovs_dp_stats */
+>  	OVS_DP_ATTR_MEGAFLOW_STATS,	/* struct ovs_dp_megaflow_stats */
+>  	OVS_DP_ATTR_USER_FEATURES,	/* OVS_DP_F_*  */
+> +	/* private: */
+>  	OVS_DP_ATTR_PAD,
+> +	/* public: */
+>  	OVS_DP_ATTR_MASKS_CACHE_SIZE,
+>  	OVS_DP_ATTR_PER_CPU_PIDS,   /* Netlink PIDS to receive upcalls in
+>  				     * per-cpu dispatch mode
+>  				     */
+>  	OVS_DP_ATTR_IFINDEX,
+> +	/* private: */
+>  	__OVS_DP_ATTR_MAX
+>  };
+>  
+> @@ -181,6 +189,7 @@ enum ovs_packet_cmd {
+>   * %OVS_USERSPACE_ATTR_EGRESS_TUN_PORT attribute, which is sent only if the
+>   * output port is actually a tunnel port. Contains the output tunnel key
+>   * extracted from the packet as nested %OVS_TUNNEL_KEY_ATTR_* attributes.
+> + * @OVS_PACKET_ATTR_PROBE: Packet operation is a feature probe.
+>   * @OVS_PACKET_ATTR_MRU: Present for an %OVS_PACKET_CMD_ACTION and
+>   * @OVS_PACKET_ATTR_LEN: Packet size before truncation.
+>   * %OVS_PACKET_ATTR_USERSPACE action specify the Maximum received fragment
+> @@ -196,21 +205,26 @@ enum ovs_packet_cmd {
+>   * payload for %OVS_PACKET_* commands.
+>   */
+>  enum ovs_packet_attr {
+> +	/* private: */
+>  	OVS_PACKET_ATTR_UNSPEC,
+> +	/* public: */
+>  	OVS_PACKET_ATTR_PACKET,      /* Packet data. */
+>  	OVS_PACKET_ATTR_KEY,         /* Nested OVS_KEY_ATTR_* attributes. */
+>  	OVS_PACKET_ATTR_ACTIONS,     /* Nested OVS_ACTION_ATTR_* attributes. */
+>  	OVS_PACKET_ATTR_USERDATA,    /* OVS_ACTION_ATTR_USERSPACE arg. */
+>  	OVS_PACKET_ATTR_EGRESS_TUN_KEY,  /* Nested OVS_TUNNEL_KEY_ATTR_*
+>  					    attributes. */
+> +	/* private: */
+>  	OVS_PACKET_ATTR_UNUSED1,
+>  	OVS_PACKET_ATTR_UNUSED2,
+> +	/* public: */
+>  	OVS_PACKET_ATTR_PROBE,      /* Packet operation is a feature probe,
+>  				       error logging should be suppressed. */
+>  	OVS_PACKET_ATTR_MRU,	    /* Maximum received IP fragment size. */
+>  	OVS_PACKET_ATTR_LEN,	    /* Packet size before truncation. */
+>  	OVS_PACKET_ATTR_HASH,	    /* Packet hash. */
+>  	OVS_PACKET_ATTR_UPCALL_PID, /* u32 Netlink PID. */
+> +	/* private: */
+>  	__OVS_PACKET_ATTR_MAX
+>  };
+>  
+> @@ -257,6 +271,11 @@ enum ovs_vport_type {
+>   * upcalls should not be sent.
+>   * @OVS_VPORT_ATTR_STATS: A &struct ovs_vport_stats giving statistics for
+>   * packets sent or received through the vport.
+> + * @OVS_VPORT_ATTR_IFINDEX: Get the vport ifindex or put the desired ifindex.
+> + * Only valid for vport type %OVS_VPORT_TYPE_INTERNAL.
 
-Ioana Ciornei <ioana.ciornei@nxp.com> writes:
+This one is still a bit misleading.  How about:
 
-> On Fri, Feb 27, 2026 at 04:45:47PM +0100, Petr Machata wrote:
->> 
->> Ioana Ciornei <ioana.ciornei@nxp.com> writes:
->> 
->> > +	for i in "${!counters[@]}"; do
->> 
->> There should be a RET=0 here, so that the check_err below gets a clean slate.
->
-> You want me to move the RET=0 from some lines below to here, right?
+"Provides the ifindex of a vport, or sets the desired ifindex while
+creating a new vport with type %OVS_VPORT_TYPE_INTERNAL." ?
 
-My bad, I missed that there is a RET=0 below. Keep it as it is.
+> + * @OVS_VPORT_ATTR_NETNSID: Provides the netns id of the vport if it's not local.
+> + * @OVS_VPORT_ATTR_UPCALL_STATS: Provides upcall statistics for a vport.
+> + * Contains nested %OVS_VPORT_UPCALL_ATTR_* attributes.
+>   *
+>   * These attributes follow the &struct ovs_header within the Generic Netlink
+>   * payload for %OVS_VPORT_* commands.
+> @@ -272,7 +291,9 @@ enum ovs_vport_type {
+>   * ovs_header plus %OVS_VPORT_ATTR_PORT_NO determine the vport.
+>   */
+>  enum ovs_vport_attr {
+> +	/* private: */
+>  	OVS_VPORT_ATTR_UNSPEC,
+> +	/* public: */
+>  	OVS_VPORT_ATTR_PORT_NO,	/* u32 port number within datapath */
+>  	OVS_VPORT_ATTR_TYPE,	/* u32 OVS_VPORT_TYPE_* constant. */
+>  	OVS_VPORT_ATTR_NAME,	/* string name, up to IFNAMSIZ bytes long */
+> @@ -280,23 +301,27 @@ enum ovs_vport_attr {
+>  	OVS_VPORT_ATTR_UPCALL_PID, /* array of u32 Netlink socket PIDs for */
+>  				/* receiving upcalls */
+>  	OVS_VPORT_ATTR_STATS,	/* struct ovs_vport_stats */
+> +	/* private: */
+>  	OVS_VPORT_ATTR_PAD,
+> +	/* public: */
+>  	OVS_VPORT_ATTR_IFINDEX,
+>  	OVS_VPORT_ATTR_NETNSID,
+>  	OVS_VPORT_ATTR_UPCALL_STATS,
+> +	/* private: */
+>  	__OVS_VPORT_ATTR_MAX
+>  };
+>  
+>  #define OVS_VPORT_ATTR_MAX (__OVS_VPORT_ATTR_MAX - 1)
+>  
+>  /**
+> - * enum ovs_vport_upcall_attr - attributes for %OVS_VPORT_UPCALL* commands
+> - * @OVS_VPORT_UPCALL_SUCCESS: 64-bit upcall success packets.
+> - * @OVS_VPORT_UPCALL_FAIL: 64-bit upcall fail packets.
+> + * enum ovs_vport_upcall_attr - attributes for %OVS_VPORT_ATTR_UPCALL_STATS
+
+nit: May be good to add a period at the end.
+
+> + * @OVS_VPORT_UPCALL_ATTR_SUCCESS: 64-bit upcall success packets.
+> + * @OVS_VPORT_UPCALL_ATTR_FAIL: 64-bit upcall fail packets.
+>   */
+Best regards, Ilya Maximets.
 
