@@ -1,144 +1,138 @@
-Return-Path: <netdev+bounces-262955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-262956-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iHKMKIskpmlrLAAAu9opvQ
-	(envelope-from <netdev+bounces-262955-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 01:00:11 +0100
+	id wG0NLlQmpmnwLAAAu9opvQ
+	(envelope-from <netdev+bounces-262956-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 01:07:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4F6F1E6E41
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 01:00:10 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 612FD1E6F94
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 01:07:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0601E3005160
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 00:00:08 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 74DF63019C83
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 00:07:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E67E33C53D;
-	Tue,  3 Mar 2026 00:00:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E9025474F;
+	Tue,  3 Mar 2026 00:07:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fdju579P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bK7CARNE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BE453382C3;
-	Tue,  3 Mar 2026 00:00:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ACC02628D;
+	Tue,  3 Mar 2026 00:07:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772496006; cv=none; b=ZU345fFijrobhYulHZW0/p+8D+Igx10j4eJE2X35TE3KBCBKB61H8UfmMC9xJP79GdEOYH6hCQYDrJYQkyLIR/XVfZkPEqfk5l4stflQoGc60R90wvXbf5W4DjYQuhyASEXFD/s5gkJxdcvaqLHjcmBKLJT/THWloAcEjw197rU=
+	t=1772496465; cv=none; b=mqYRSVTkh90tbsY6LMgGQ3aCnR7vws81vf9Rd05FKQHuGg/2/cN3uMpUi05Y5Pluot+KYkZF2dOW4ffrHTLBBVWBu5hI9R++7jPny/djAAmOJVpoyuEpspa3KpR/dp/oGITGQ70ls3jOV++04drL3i2cp4MNvg7MX76z1LtRE9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772496006; c=relaxed/simple;
-	bh=9WFEYNOuqCrSyAGA3CeVfGc+jKdXN1vYdI9bNg/0Pq0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=K2FmheTcnwPeQMSfuvgOKyJ5jXRG79N+Tf3HF69ZyEc3VES8esDEQflTco78l/uIKrBcmgS5XXjmHY0EF9irL+meu6scXG+EdLmASi4OgbN8ZB7yIo4g5nHkz5Pt1+5st25bDzXCfOzU1AWOfjn9rNLF8IsMaL6qyk+xeISphwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fdju579P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 095EFC19423;
-	Tue,  3 Mar 2026 00:00:06 +0000 (UTC)
+	s=arc-20240116; t=1772496465; c=relaxed/simple;
+	bh=EThN0d1uq2Lnup4NHkAJwhWfP9oJjh6mVRffnmzFeZk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cPlLOGXcSLp7hcc8WDr1H5RW37pK9sT2GW8m2vf5yYkEqjNuuOVWQVN4EtwBsAvuonP1OwjXP6vL82Es04wbxizJA66/kkfh5UMcs/wPbz2Px/fI/I4GY9jHEvPdSAw8wpE8OVm0AeHXOrxIx3Qi3e09xprubXiloqp+XN+jCfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bK7CARNE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38D45C19423;
+	Tue,  3 Mar 2026 00:07:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772496006;
-	bh=9WFEYNOuqCrSyAGA3CeVfGc+jKdXN1vYdI9bNg/0Pq0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Fdju579PUyOlYvVyU0vSlZB4C1SEcSwQtNObDG1EPO+lSO1gswy2HDmiL89aaeRJM
-	 BQwdSqsvkbKrRdVO3v3GAxqNaZLzscsulYinu8mp40L8QBAeTohyt+lpKsBjkmFQQb
-	 djTIktJmVZDz+TcY5T7Rvs5Sp/n/dBFGGAdzcb04hQ0uRDwFh3jg3tCAsRZ0SaDJTU
-	 fUwW1vLp/K3JoO+X3nERh8bqE+Z0fW4AT/+umaW657zVvwE1sOP+NeZOBB/VkXqOTs
-	 7xKAy1oH3liZcoAMdd1VScjlecDeP7Lqxum6sfTesiySXuzG+r0vkjmaefthjsPUbb
-	 fL0mdaDPzDJ2A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id BA09D3809A80;
-	Tue,  3 Mar 2026 00:00:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1772496464;
+	bh=EThN0d1uq2Lnup4NHkAJwhWfP9oJjh6mVRffnmzFeZk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bK7CARNE6FxRDwasyLC8hfczkmXG6BxyoZseuFifxv8j/9ClAKS9eG51voK2HGx9P
+	 oseYtanuSWKrbFTDA52ZzfvcvIKNHqjgK2m5iBlCIRAldDniJ6jEVkZXvmaFqecmtZ
+	 ENxZaC1cSs0bUNNGXIbQe9HTzviTAt1zmBUIPvvItHvSe8uhdOBLq1eNRFYPuaHDsV
+	 eFtEpdPfUAzSE4UOuOpZK9RX14oTiVqVpCmoQYAaM6z8Rohq5drekptgDFg75NgMm0
+	 6dPu6/Ks5KVZ50YDGjPLm7/t6AAPGics97qg96nrT0Z0g4yqzPyPHg47hHa8IF8oSG
+	 GYs6oLHE8amgQ==
+Date: Mon, 2 Mar 2026 16:07:43 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ioana Ciornei <ioana.ciornei@nxp.com>
+Cc: Petr Machata <me@pmachata.org>, Petr Machata <petrm@nvidia.com>,
+ netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Simon Horman
+ <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 5/5] selftests: drivers: hw: add tests for the
+ ethtool standard counters
+Message-ID: <20260302160743.124531f8@kernel.org>
+In-Reply-To: <7hct7o4rzgygef536al6if2jl45p32ad3tdswyqf25uu5wy5re@2ltu2ems47q7>
+References: <20260225150648.1542206-1-ioana.ciornei@nxp.com>
+	<20260225150648.1542206-6-ioana.ciornei@nxp.com>
+	<20260226182223.5eb1b10f@kernel.org>
+	<87ms0ufc0p.fsf@nvidia.com>
+	<20260227164348.63afcc43@kernel.org>
+	<877brxf272.fsf@nvidia.com>
+	<7hct7o4rzgygef536al6if2jl45p32ad3tdswyqf25uu5wy5re@2ltu2ems47q7>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH RESEND2 net-next 0/8] net: stmmac: qcom-ethqos: further
- serdes reorganisation
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177249600754.587100.4626990163271059988.git-patchwork-notify@kernel.org>
-Date: Tue, 03 Mar 2026 00:00:07 +0000
-References: <aaDSJAc-x2-klvHJ@shell.armlinux.org.uk>
-In-Reply-To: <aaDSJAc-x2-klvHJ@shell.armlinux.org.uk>
-To: Russell King (Oracle) <linux@armlinux.org.uk>
-Cc: andrew@lunn.ch, alexandre.torgue@foss.st.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
- linux-phy@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com,
- mohd.anwar@oss.qualcomm.com, neil.armstrong@linaro.org,
- netdev@vger.kernel.org, pabeni@redhat.com, vkoul@kernel.org
-X-Rspamd-Queue-Id: E4F6F1E6E41
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 612FD1E6F94
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-262955-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-262956-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 26 Feb 2026 23:07:16 +0000 you wrote:
-> This is part 2 of the qcom-ethqos series, part 1 has now been merged.
+On Mon, 2 Mar 2026 14:11:21 +0200 Ioana Ciornei wrote:
+> > I agree that adherence to the drivers/net/README protocol is valuable to
+> > some users and would be good to uphold if reasonable in a given tests.
+> > If that's what you have in mind.
+> > 
+> > There are going to be tests where it's not a great fit, but I think that
+> > of those NUM_NETIFS=2 tests that we currently have, maybe
+> > ethtool_extended_state has a good reason to be obstinate, because it
+> > sets up negotiations and needs an extra unplugged netdevice.  
 > 
-> This part of the series focuses on the generic PHY driver, but these
-> changes have dependencies on the ethernet driver, hence why
-> it will need to go via net-next. Furthermore, subsequent changes
-> depend on these patches.
-> 
-> [...]
+> I would add here even ethtool_rmon.sh and this new test that I
 
-Here is the summary with links:
-  - [RESEND2,net-next,1/8] net: stmmac: qcom-ethqos: move ethqos_set_serdes_speed()
-    (no matching commit)
-  - [RESEND2,net-next,2/8] phy: qcom-sgmii-eth: add .set_mode() and .validate() methods
-    https://git.kernel.org/netdev/net-next/c/4ff5801f45b4
-  - [RESEND2,net-next,3/8] net: stmmac: qcom-ethqos: convert to use phy_set_mode_ext()
-    (no matching commit)
-  - [RESEND2,net-next,4/8] phy: qcom-sgmii-eth: remove .set_speed() implementation
-    (no matching commit)
-  - [RESEND2,net-next,5/8] phy: qcom-sgmii-eth: use PHY interface mode for SerDes settings
-    (no matching commit)
-  - [RESEND2,net-next,6/8] phy: qcom-sgmii-eth: remove qcom_dwmac_sgmii_phy_interface()
-    (no matching commit)
-  - [RESEND2,net-next,7/8] phy: qcom-sgmii-eth: relax order of .power_on() vs .set_mode*()
-    (no matching commit)
-  - [RESEND2,net-next,8/8] net: stmmac: qcom-ethqos: remove phy_set_mode_ext() after phy_power_on()
-    (no matching commit)
+I think I already told you that ethool_rmon predates the NIC tests
+and bringing it up in this discussion is irrelevant.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> submitted. If you are running with a traffic generator on another board
+> then you can no longer check that the counter's value is as expected
+> (with a 1% tolerance), you can only check the lower bound.
 
+1% tolerance is impractical for any CI with high test count.
+The test will be flaky. And I really doubt that the 1% tolerance
+is really necessary to catch most bugs. We're not trying to validate
+silicon here.
 
+> Additionally, if you are using the same single port also for control
+> traffic towards the remote traffic generator, then you surely cannot
+> reliably check that counters that should not be incremented are indeed
+> not incremented.
+
+I both told you in this conversation how to check the counters,
+and written some existing tests for counters.
 
