@@ -1,48 +1,50 @@
-Return-Path: <netdev+bounces-263264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263265-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gIpMDfP6pmltbwAAu9opvQ
-	(envelope-from <netdev+bounces-263264-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 16:14:59 +0100
+	id QA3ZBuH5pmk7bgAAu9opvQ
+	(envelope-from <netdev+bounces-263265-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 16:10:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E6191F2446
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 16:14:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D0151F21B0
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 16:10:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2B33E300CC80
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 15:07:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1147730E6CB1
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 15:07:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 922F047F2E6;
-	Tue,  3 Mar 2026 15:07:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA86F48034E;
+	Tue,  3 Mar 2026 15:07:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vV1d/3cB"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JF39+mVn"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C2447F2DB
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 15:07:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C61048033C
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 15:07:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772550449; cv=none; b=ua/r/u+o28dsY1x6oHsZvm/AbxI1rWvfIR7MOFIOylbAftyCkSLQMMTUyqVqaQIW/v12MiDyUlkg6pJPOvRxIN3G9JqeqyV+fEgjyRldGA/1jBrDeJ4H/zjNya0ZeF1XLMXK1FlnfJYGXmZNua+zZegZkno7m39/GxqUltmpMw4=
+	t=1772550455; cv=none; b=bPp5s7UGI2Il+kt3qAGSuB7SdKjRzROPFhOctyuetS33ScoyUZ4OVtC2XdHLX0DehlKlKRwQnAAhuso8ofLe47GhS6Xy+xYurFNgKgQjBEqYR1viie8bOJsBdERyiWJACvD3glqwljATMiPgo8qzIsHvlYmtyZUHc6jiZ3AspEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772550449; c=relaxed/simple;
-	bh=og5BGeFrQ30Aqrda3hTixvdjugHX91yV1mpgepgzpaA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T7wMh5/5ZVQ6TNIPKL6ADd9pMFtw8jbrnE6bqZ0FffRkMi/7Xu0734/L4cnTZjgYipS/8yvhwzyy9V73unVIyiNpnLrH3S5j2XfbMKQGsixcptBI2DjU/EiaBBbKweFDvN263+9HpdX/hqr/vWXyv6njvPS5EohCAYoFcqDVCsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vV1d/3cB; arc=none smtp.client-ip=95.215.58.188
+	s=arc-20240116; t=1772550455; c=relaxed/simple;
+	bh=/n9d+NC8JOM19qYu10Vbdt4z3rtQyN0QXnMlGzk4p90=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=suJMjH4i136LaBJB2jGRdaeMvxEI47KzDXpwWkg3050XJ9T39B/hBdQlMSw3yeOOo2sw0kNlXJ8ii6Mt3ZOePzbj6jM0XMKI7CtbPQi//lTvx9hPn7zDrj6dST5hoDhZu1/sks4wgClInFVMls732gtKDyN/e5cMiVUW3tCfzNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JF39+mVn; arc=none smtp.client-ip=95.215.58.186
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772550445;
+	t=1772550452;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=5h/Luh3nfXV7UEzDnO3fH1YL4eWophs4aupwotkiXUk=;
-	b=vV1d/3cBhWQeLop0t2aqFtKHQDZvJMgnpK6nyWiidpr8ShtOIvHjUPKO2gByc0l9t4e3Vq
-	8O/UmIQV5QBRdEmUI65WlpIvVO2ix3kCbtErQyeDcQMCd1ns9cgHI/9sU9HgwYruSjeNRg
-	D26XK7PbN+1mgo0LgUTvszXQ1XMRkUQ=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PxXd5uD0uoa/0anu8jDjtKQ562RChNx+PmdQxbvuGhg=;
+	b=JF39+mVnN4ftSUMPrk5F1ElabRyimfvki28MDVChHanYg9cgmOtuFYSqKIrFdkFdOOs6wK
+	317rc4gmder5jcZ5PCZInDa3Amnx0uhZHKGXE1g7sCEqWMXeaPXjDN3mRilO5wxYeFKP7w
+	1gCIJWlMjc0C6diXQDY9nc8jbJnCpV8=
 From: Leon Hwang <leon.hwang@linux.dev>
 To: bpf@vger.kernel.org
 Cc: Alexei Starovoitov <ast@kernel.org>,
@@ -68,9 +70,11 @@ Cc: Alexei Starovoitov <ast@kernel.org>,
 	linux-kselftest@vger.kernel.org,
 	netdev@vger.kernel.org,
 	kernel-patches-bot@fb.com
-Subject: [PATCH bpf-next v3 0/6] bpf: Enhance __bpf_prog_map_compatible()
-Date: Tue,  3 Mar 2026 23:06:33 +0800
-Message-ID: <20260303150639.85007-1-leon.hwang@linux.dev>
+Subject: [PATCH bpf-next v3 1/6] bpf: Add fsession to verbose log in check_get_func_ip()
+Date: Tue,  3 Mar 2026 23:06:34 +0800
+Message-ID: <20260303150639.85007-2-leon.hwang@linux.dev>
+In-Reply-To: <20260303150639.85007-1-leon.hwang@linux.dev>
+References: <20260303150639.85007-1-leon.hwang@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,7 +83,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 9E6191F2446
+X-Rspamd-Queue-Id: 5D0151F21B0
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -88,14 +92,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,kylinos.cn,huawei.com,vger.kernel.org,fb.com];
 	RCVD_COUNT_THREE(0.00)[3];
 	RCPT_COUNT_TWELVE(0.00)[24];
-	TAGGED_FROM(0.00)[bounces-263264-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-263265-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -106,74 +110,35 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[linux.dev:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Following discussion in the "bpf: tail calls in sleepable programs" [1],
-this series extends __bpf_prog_map_compatible() with additional per-program
-compatibility checks.
+Since bpf_get_func_ip() is supported for fsession, add fsession to the
+verbose log message in check_get_func_ip().
 
-The series validates these attributes:
+No functional change intended.
 
-* kprobe_write_ctx: for uprobe programs that can update pt_regs.
-* call_get_func_ip: for tracing programs using bpf_get_func_ip().
-* call_session_cookie: for fsession programs using bpf_session_cookie().
+Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
+---
+ kernel/bpf/verifier.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-kprobe_write_ctx progs can be abused to modify pt_regs of kprobe progs via
-tail calls. As in the test in patch #6, a kprobe prog can "regs->di = 0;"
-when it runs as a tail callee. Thus, bpf_prog_test_run_opts() gets -EFAULT
-instead of success.
-
-call_get_func_ip progs could get a bogus func IP when they run as tail
-callees, because the tail caller does not prepare the func IP on the
-trampoline stack. As in the test in patch #6, it gets the RBX value on
-stack instead of the true func IP.
-
-call_session_cookie progs can modify the first arg value on the trampoline
-stack. As in the test in patch #6, bpf_prog_test_run_opts() also gets -EFAULT
-because the first arg is modified by "*cookie = 0;".
-
-Links:
-[1] https://lore.kernel.org/bpf/20260130081208.1130204-1-jolsa@kernel.org/
-
-Changes:
-v2 -> v3:
-* Address comment from bot+bpf-ci:
-  * Guard call_get_func_ip and call_session_cookie with "has_trampoline" for
-    BPF_MAP_OWNER_MATCH_FOR_INIT.
-* v2: https://lore.kernel.org/bpf/20260302150342.55709-1-leon.hwang@linux.dev/
-
-v1 -> v2:
-* Factor out bpf_map_owner_init() and bpf_map_owner_matches() helpers.
-* Drop the "call_session_is_return" case, because the "is_return" value is
-  always prepared for fsession progs.
-* Address comments from Alexei:
-  * Use bitfields like 'u32 jited:1;'.
-  * Reimplement selftests.
-* v1: https://lore.kernel.org/bpf/20260224154024.12504-1-leon.hwang@linux.dev/
-
-Leon Hwang (6):
-  bpf: Add fsession to verbose log in check_get_func_ip()
-  bpf: Factor out bpf_map_owner_[init,matches]() helpers
-  bpf: Disallow !kprobe_write_ctx progs tail-calling kprobe_write_ctx
-    progs
-  bpf: Disallow !call_get_func_ip progs tail-calling call_get_func_ip
-    progs
-  bpf: Disallow !call_session_cookie progs tail-calling
-    call_session_cookie progs
-  selftests/bpf: Add tests to verify prog_array map compatibility
-
- include/linux/bpf.h                           |   9 +-
- kernel/bpf/core.c                             | 141 +++++---
- kernel/bpf/verifier.c                         |   2 +-
- .../selftests/bpf/prog_tests/tailcalls.c      | 319 ++++++++++++++++++
- .../bpf/progs/tailcall_map_compatible.c       | 103 ++++++
- 5 files changed, 524 insertions(+), 50 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/progs/tailcall_map_compatible.c
-
+diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+index fc4ccd1de569..636836a315b7 100644
+--- a/kernel/bpf/verifier.c
++++ b/kernel/bpf/verifier.c
+@@ -11493,7 +11493,7 @@ static int check_get_func_ip(struct bpf_verifier_env *env)
+ 
+ 	if (type == BPF_PROG_TYPE_TRACING) {
+ 		if (!bpf_prog_has_trampoline(env->prog)) {
+-			verbose(env, "func %s#%d supported only for fentry/fexit/fmod_ret programs\n",
++			verbose(env, "func %s#%d supported only for fentry/fexit/fsession/fmod_ret programs\n",
+ 				func_id_name(func_id), func_id);
+ 			return -ENOTSUPP;
+ 		}
 -- 
 2.52.0
 
