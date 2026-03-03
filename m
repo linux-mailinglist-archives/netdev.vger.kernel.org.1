@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-263455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263456-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GDxgCvZpp2l/hQAAu9opvQ
-	(envelope-from <netdev+bounces-263455-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 00:08:38 +0100
+	id IKjRLitqp2l/hQAAu9opvQ
+	(envelope-from <netdev+bounces-263456-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 00:09:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26D001F8444
-	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 00:08:37 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B7021F845B
+	for <lists+netdev@lfdr.de>; Wed, 04 Mar 2026 00:09:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 34C84302511C
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 23:08:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AA1233049447
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 23:09:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E71F390238;
-	Tue,  3 Mar 2026 23:08:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58B00391836;
+	Tue,  3 Mar 2026 23:09:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="i7OaPcjn"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="nNlCkWH4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B7638836B
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 23:08:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28D0339098C
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 23:09:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772579311; cv=none; b=rX/mZbEMVQd5Lyyoe+RrRVELVle/MTfdVQHL8Wu6zp6ukd3PbyvIcE1Z/A6BU5hh3j2DpWZ6x3driS3zHbN+EQ6IIAjjp4TZ0l0aQxd8HWjd9duglwuJUW6xrd4i0vdp7n/D9zBgGXClEZMIfeCKgm4di8KY70r1C3KLSLaPXnk=
+	t=1772579368; cv=none; b=SPThdguL7r9OLdjv4FD8h6xHBd3qMVuNa6SghgKhV+1rRdiBdBNxyI/GQ932fyaYQe3/NmuYqPoKi+8Zpre7Y7RNMfhcyn2U1gHls580CbIaRP3TZ8cep84AW2R/mWv0m3AnVhsoL/zD9ut7YrQdxWpVg5lC8u2iTl6OFBupSwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772579311; c=relaxed/simple;
-	bh=HUX0i0I7PlBuLWWVstQ2H5vKS+AgS7G2dCyg2A81XU0=;
+	s=arc-20240116; t=1772579368; c=relaxed/simple;
+	bh=tQBclTQoEFogvOvzg1NNYMQjkLHMah5juUwioIlFtyA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iXRJXDy+u5tH/aY5nPvXA+Hp4040JzihRqk+aDjW0XWyCxx+6j8fojimYz+Lc4Im9Py7M4kL8oCdXkMbdKcyC1CGWlL7oj5IwSTWIY41Z8Jm54RR/Pc50H9ZXNkUuA6Xhl1KdiRaYUfcZl0bONQSYc8D2/95FMwnybPhOUjl4i0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=i7OaPcjn; arc=none smtp.client-ip=209.85.210.174
+	 Content-Type:Content-Disposition:In-Reply-To; b=niSiUgKjbAzhaVJHyj8QAefOtKDPnmsg6HA3khwErY1KBQEEBpvFcJecxNitBZDjmkDodSg7ZIILLsOrZEA1jOEhkBgBQHJJffhE8P5m1mcB6rxkiyjZSa/69Az6/Zakkwpqw1xo/58xNCG3YvtGlW2ky+no0KPHZ6mODS6TJKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=nNlCkWH4; arc=none smtp.client-ip=209.85.216.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-82748095963so3106975b3a.2
-        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 15:08:30 -0800 (PST)
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-3598c008455so1637365a91.3
+        for <netdev@vger.kernel.org>; Tue, 03 Mar 2026 15:09:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1772579310; x=1773184110; darn=vger.kernel.org;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1772579365; x=1773184165; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hyGTuCWGO45jPKeyWUndsgiqo1yT0pSCCNty9r3XSng=;
-        b=i7OaPcjn20DCNz6lbUAWeHdkRg7dUSKjEWzTwdn909x0ZYKaUIe4Wtmuey5x0ThjbV
-         5I30rNE1mlvKt1fPq0lxReuNEbsQ0nf5NnA8V1yVXXhBrWGDZ+hABjyAMc6py+yFLnQj
-         NNxfoIoUVi0WNp+vxumzDdDCRShLIrZmtyXjKh9a4AD6IRpwaL8xm+RvoNRuYvZ9cWbe
-         Z62stx7WU9ruYYgQ9VOF3EVQVOHRls4eWoNvWHUZh4OfjU4zxiEA40rZs4IcoAMOP/uK
-         KepnM+/UKpuI7xZFyKdLCnyww5j62bnRs0PV+8LHgL7WWVnduudIsVOz5Pmtk3LChwsk
-         zN8w==
+        bh=4F+wvsg+rCfB+Xgc2i771Wn+E0HEDYAO2XFtN4tcCqo=;
+        b=nNlCkWH46EwoJa8jGLd3miZLBYcqhvkst78l2V0tTlYL9JDiyUjMc9LsdAs+dmtdlU
+         SbIeyWDGaIow83vojk1LaycyiK8Uvo6xmn47jDbe64LzNNCzj63F7LA6r0C6M+oUFHHp
+         3B65LkopYhvSaqw0B2N1+ygj76BKZjCiKsAHZgR/ZCWB9UT7qX5aQvqQN5XcLZEuDzx2
+         5n7lhD4nWxk5DZRcfcCJoBewyF3VzKbrnyiBTi1wMNI5GdM7GY9ytGXOVjeC9xwRD7XW
+         iv5Sy2uYaFCKp8he6fDxy3Je/T7l3gwaIhThxgsDdfVonVB8Wt34pvmzaoYDugMO5NWu
+         Cewg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772579310; x=1773184110;
+        d=1e100.net; s=20230601; t=1772579365; x=1773184165;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hyGTuCWGO45jPKeyWUndsgiqo1yT0pSCCNty9r3XSng=;
-        b=b80Nl36l8J0HiJDqA9vxENN6XY1eCQkvOB1ajeoyqimGUEA0g2VSsZg9VGxPafGKb0
-         2WronBEWMoPcNxvmmbFfb0uNesWdtVENhvrtJgeZgqf3JUYPZAw1fTBlK48D94mEiSGT
-         FKS+QHPCMV1t6TtdakPlrXstAfXZthf3YZT2X/TDwA8Q7tiPDT2U+miB8yOPDR6jz7W5
-         x7GmALjhMm/eKuGHNpTUqYwOlOf8pmkEl2pZ1jRA1QVKUoL+0Ltnuv3bMJ/79XZm7QkC
-         7hz9hxr4IPCXxhObUKNmthTymSLN6T8Yp4TDm/kEtjJO1TLm/fU1ntWidSPe5F4gOlxY
-         usjw==
-X-Forwarded-Encrypted: i=1; AJvYcCWp1gMSt43hz85fTBXnsQjNkUhHL9uVmU04EaMd7kkCNhRR8NbYxbcVgp9Yl6wYut5wV2r6kKo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZD5LnqU4XJcJ4la2GDJkLPe6i48VzKtwSCnh3aBAGZmPERnsU
-	n6+B+mohJLR6R5OF24ptLDAM440OMwG4NVJUvnh7y4bYPTkHd4Zci553hySdrVHKw60=
-X-Gm-Gg: ATEYQzzk2HDp4145iGP4hSEKYOJ/oQZHn5SWpuzKn4M73Z7flvZ2GjLpTaRnW/J2T/h
-	Dh+NavKXF0r0WjUanjmWlVRyJGeAmS4Tu24ixT1lk6z/lwMd30egioFDNiJ/U/VksdBrvAAuvdE
-	MHUtSnRQetcMCLCeIAzdQ/+RRvjjMr9zqLJ9APi+bpkaefqVLXnaszffq7mlCP1bClHmPpffQKD
-	bdMxiGtZkU40pC1ABj5TFTJ5QQfcyzmRjHfvkCCKwQ9p9K6XfkLLz8gtGHcac6OvBFoe07Q4qnK
-	qSwAG3qiga1u45isOEJO22a9OCLBmXCrtUKZLjLuqdr8nMIKu8XWQW9O4TFsvPn86tJvHepppOP
-	CRchbisMEeqQJ1iRVlHnX6kseVLgDetLzzfDErkKoXRSflPd1v+qdfo1fGJ/0XKKtx481mdgXE4
-	B8Lpk8
-X-Received: by 2002:a05:6a00:9193:b0:829:6f7d:3093 with SMTP id d2e1a72fcca58-8296f7d3294mr201387b3a.48.1772579310080;
-        Tue, 03 Mar 2026 15:08:30 -0800 (PST)
-Received: from localhost ([2a03:2880:2ff:5c::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82739d8c7aesm21018686b3a.21.2026.03.03.15.08.29
+        bh=4F+wvsg+rCfB+Xgc2i771Wn+E0HEDYAO2XFtN4tcCqo=;
+        b=V5U6V4xfmu/0TS038a8fY11ysiT+KmCkvbOa2loRrIFrp5pQetUdB1z06P1vBdjBIG
+         s9M/ULwos1M28WNTMEH/QyUXYRXp+MLcS3lKod1t/B8+AAcMS6/YZmPmz2Qc8jrdvbOw
+         r5PgIILrVq4XcgcCSQsa3EGpT65nKdl7FE297UXvVFH6NJQ2sdbeXv10H2OrwXtn1jus
+         gXcLJEZMx7xUBhpp214CTSXqZ0CmW4t7OzFmdPD3GGkiCIHc7baoKMx4eUGl05vHF3ak
+         jHmG7b438oIN4o1cLCk4h9rrGy7/Ef9G9Z1jXUAa2elDfOxboa937OG2EfJhiKNb8eXc
+         upHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW1xVyy65s3zYORbOjCz7/R7+mBFaRCY7f0gye2UiT3AcGIZxsUbIq6C5eZBypvDKNYR1PJ0MY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6YcHMlaK3lvf6I4oF56iwj8GYUmFlkjreMRDxEOSZDv9vMJjl
+	XX5MgqJupG7lP5vGYAGqF5J9SmIfcwJfSq9YZdDDEWuBCyhtwnzUvYUXZIsvezNIGy8=
+X-Gm-Gg: ATEYQzynusQGHM7LWhPnnsRB/5F+G9KeAHKavY/xLhkcmrNnRwkwZMBFRU3kBZTI4hT
+	WR30Z5ZhhUzOuXt6+KqkHpFIYhokeGJf2P067/x5AzyXqXtvbs+Q/1w2kRVTxM1vEBMNAFvKr2I
+	kXBxyeT+Lt3dwCSLCLT6V68kpKhWQEfAXcNJGNecbStlnobWJ6umkO1tf8RwKxJuRepsRZ4lquv
+	iWzBEuY6f1nUNiDoBfHmDUupcIOhYGkCgFIvnr6pAEpWNCQWg+SoIu1P8oZQOQd+QM5gv5nJph8
+	mBhRnmD+KAyyAZCcXLFy62VcnQgj6UbQDOQB3DtGMLfgtTH7xaF2kiKaOl3PfvPw+gBQFbSUcI+
+	Ut8tnmV+AELLqUbQTqhElv7qbY1lSN20M9XcW2QzNYodEpGF0suGyhAHNsUvRAaKABcq3LRgsHH
+	3SBvWF
+X-Received: by 2002:a17:90b:3e4b:b0:33b:be31:8194 with SMTP id 98e67ed59e1d1-359a6a7d267mr67210a91.34.1772579365311;
+        Tue, 03 Mar 2026 15:09:25 -0800 (PST)
+Received: from localhost ([2a03:2880:2ff:58::])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3599c39db5bsm3340289a91.9.2026.03.03.15.09.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Mar 2026 15:08:29 -0800 (PST)
-Date: Tue, 3 Mar 2026 15:08:28 -0800
+        Tue, 03 Mar 2026 15:09:24 -0800 (PST)
+Date: Tue, 3 Mar 2026 15:09:24 -0800
 From: Joe Damato <joe@dama.to>
 To: maximilianpezzullo@gmail.com
 Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
@@ -87,8 +87,8 @@ Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] igb: fix typos in comments
-Message-ID: <aadp7PhlQMV7BFhC@devvm20253.cco0.facebook.com>
+Subject: Re: [PATCH 2/2] igc: fix typos in comments
+Message-ID: <aadqJKC8MagHA1de@devvm20253.cco0.facebook.com>
 Mail-Followup-To: Joe Damato <joe@dama.to>, maximilianpezzullo@gmail.com,
 	Tony Nguyen <anthony.l.nguyen@intel.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
@@ -99,7 +99,7 @@ Mail-Followup-To: Joe Damato <joe@dama.to>, maximilianpezzullo@gmail.com,
 	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 References: <20260303-master-v1-0-f180b1ad98b5@gmail.com>
- <20260303-master-v1-1-f180b1ad98b5@gmail.com>
+ <20260303-master-v1-2-f180b1ad98b5@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -108,27 +108,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260303-master-v1-1-f180b1ad98b5@gmail.com>
-X-Rspamd-Queue-Id: 26D001F8444
+In-Reply-To: <20260303-master-v1-2-f180b1ad98b5@gmail.com>
+X-Rspamd-Queue-Id: 2B7021F845B
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263455-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-263456-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	DMARC_NA(0.00)[dama.to];
-	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
@@ -141,20 +141,18 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-On Tue, Mar 03, 2026 at 10:38:20PM +0100, Maximilian Pezzullo via B4 Relay wrote:
+On Tue, Mar 03, 2026 at 10:38:21PM +0100, Maximilian Pezzullo via B4 Relay wrote:
 > From: Maximilian Pezzullo <maximilianpezzullo@gmail.com>
 > 
 > Fix spelling errors in code comments:
->  - e1000_nvm.c: 'likley' -> 'likely'
->  - e1000_mac.c: 'auto-negotitation' -> 'auto-negotiation'
->  - e1000_mbx.h: 'exra' -> 'extra'
-
-These changes seem fine, but codespell noted another spelling error in
-e1000_defines.h ("Device Reset Aserted").
-
-Maybe worthwhile to get that one too?
-
-At any rate:
+>  - igc_diag.c: 'autonegotioation' -> 'autonegotiation'
+>  - igc_main.c: 'revisons' -> 'revisions' (two occurrences)
+> 
+> Signed-off-by: Maximilian Pezzullo <maximilianpezzullo@gmail.com>
+> ---
+>  drivers/net/ethernet/intel/igc/igc_diag.c | 2 +-
+>  drivers/net/ethernet/intel/igc/igc_main.c | 4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 
 Reviewed-by: Joe Damato <joe@dama.to>
 
