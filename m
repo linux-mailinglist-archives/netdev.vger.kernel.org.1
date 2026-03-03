@@ -1,216 +1,204 @@
-Return-Path: <netdev+bounces-263029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263030-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8DibIrFYpmmJOQAAu9opvQ
-	(envelope-from <netdev+bounces-263029-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 04:42:41 +0100
+	id UAnhM8ZbpmlnOgAAu9opvQ
+	(envelope-from <netdev+bounces-263030-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 04:55:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBD471E8875
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 04:42:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B32F1E8992
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 04:55:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A0D33305A437
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 03:42:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9249A305DAAB
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 03:55:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CA4337CD25;
-	Tue,  3 Mar 2026 03:42:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7A8137DE9E;
+	Tue,  3 Mar 2026 03:55:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l9jJ5N9o"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ioJT4qp+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90AF279917
-	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 03:42:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641D137DE89
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 03:55:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772509359; cv=pass; b=MmPSVpK7B+qhNBWdkDnbw88TJHA/ybUBNSs4BKDjiNM5WJXuoa/uHHPNg5gschk+/d7/RFE9yxmfjBxWMg40r/XKYcEekFpP+BdKMrzxw24pBPqpwDXy+fSTA3fbxf4Dlpn9WhfLciqcH50m4N5Xq+f1yjF0h82H7Ulka/Mqp88=
+	t=1772510119; cv=pass; b=Nz0AvWXYP5lB6qnScGP3LnWxeyibwIdkPSO/bIw9eslJsEaWQmjDMNVYmWUwfQFw1TbEMnerU3JkQgd48F2l/013lcs2l3id6ETUhYqMkuGa1KkSsNC9DTA4ueQgBYguQDg3I/QuXqqp1KZ2huJZSsDJ0fxXFV0UqgoWDtJImG4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772509359; c=relaxed/simple;
-	bh=ZVUB3wC73Wr2MuOVBaapP/i3oiFMYOER/R+aajNTd6Y=;
+	s=arc-20240116; t=1772510119; c=relaxed/simple;
+	bh=ejc1Nj9JSexTn5t/j4wyckbSfdpkEdCAy4NmiTGXn2w=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GozBxY0biLrIMuDmxISQKBJ3oW33je3wXstvdGz9x/w0ZxwGnGxVNQgHpPCN4aXuJ2MmxVCREMAhvS4SEGOHE+IsdNmdymC5jIZirnlbe2APd1I4Q+05OC4gh1PnB3mvTVfvK5sdeVRNFMIAEoDuhO7w1KxKb04ubdTC0tbIdBE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=l9jJ5N9o; arc=pass smtp.client-ip=209.85.160.169
+	 To:Cc:Content-Type; b=mia9Soa5Hha+2qi/hUnfC0S3gS0e2XNjxbPfXLEeumtdh9KpHFm0IGFIvzBzE49WwxN8hx8zJpwJ1vomgT30qHf/vBPGL5h4dQAyitJASAUhfrTJTrA3USEmy4wGEDlLQshmXRWg35JXjhbD8zOzRv9JqRrW9JOjPff5aGhmxFo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ioJT4qp+; arc=pass smtp.client-ip=209.85.160.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-503347e8715so65106311cf.2
-        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 19:42:37 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772509356; cv=none;
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-50334dd44d2so61407821cf.1
+        for <netdev@vger.kernel.org>; Mon, 02 Mar 2026 19:55:18 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772510117; cv=none;
         d=google.com; s=arc-20240605;
-        b=kVGsiAHfDDRm3oTXy5l8OBQhQ+Uhwr+fPrTgP1KP/u6J718ry1eqDsBozS5c/CDSKT
-         4wah39WfQSxqtkly8QjnXHEl953Eizf8ba4J8JOPaz6VneMGza5CPG4SnQQERiysA5UH
-         IPpTUV6eCb7POiA0PFUOyNaDL7kRvxC8tG+kASE9Ti3jqst7tBGfFU7NX+B2ztccZ9tk
-         pCVuq1n1ZAPg7Y8cTrquEyYOUjRCrzUCBKO/Zu7CoREMc7mbCZN6jQtvp5JvosKSpV4t
-         5LHwZ+ahfAto3ppzqP/kQqK5Wz90nWBux/kmLAT1yKr0tN3cpYG3ziAF7NEnTU5ITKfP
-         ATLg==
+        b=QH+sH+lWcV70kl3eiVu0ucu6Kvs0jem+vjfkhAqu4j1xtO7D2Oi7vk4OMWk2N125WE
+         r6ueN6N+hNijmu6hF+faW4DAxs58ni7024xXKbbgrhWtC6c9V2uSJKFRc7paFBEfRT9G
+         LELS/BMV9prsEP82gSf0rBKlDnJg1uG5R4dW8GPpJZqetG21cWrtSteJ0pXEoGssYtyA
+         4vPn4aGbxKGPHA2FVklNxsMgcdDa/Tlk1IZD0JYTh3gnqD11v2fOaY1/Iup/CPk3q8Zi
+         rHpHAy5poRMGzM66CKbcZ5brMG9dl/bCfjDl3PLJtGZ0oa1G0NEz8emkwVbiIqmn/rgz
+         HRUg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=jM5Sv380XGPgNQlH+xzbk/R1aBRRcKgA4UxlgomEWiM=;
-        fh=WCtIeRLGJ+375wtaHZlVgVl4NPlUpmkpULBIrXLCx98=;
-        b=U7tiwJESN4HaLr9p8Np0hD4BzEmuCnESNraCeVHnhUqaADuVWhh8a463xt/8rDALm6
-         UtqsV44pxqyikAYku8Ko7l1UeKTHeOvT0xVs9n9K0NMTUDZs4bZiNLl/Ju+KVkO2AZ8C
-         jgtYf+6P44dXUws3TQRopuxPyi3vzzeJrtid2V8j4ecfPMTuzTHRlrYs/TS8+UwFxQeU
-         A59bBBRTFzfQaHzCBA7i3PzzpcEHVdxL6k2TYbZUxbJdADhuujPEZzTgLICQNyBU0JU1
-         uTIB59ZXspvq1h1Qv26wi79xBvg7YI1wU5TRb+62XfYXkkJjZsy+rUR1V0VjVI1ugdDJ
-         Nb2w==;
+        bh=ejc1Nj9JSexTn5t/j4wyckbSfdpkEdCAy4NmiTGXn2w=;
+        fh=F/O7CDH8ZgraapkW6TqZmGBDQ1JJgJ4NNA92XqhSu0o=;
+        b=gG/N6Yj7aWzeRM3cQeolH/64bM8jH2rhIXkPHDriQkoDiUN4dJckwQJRlysKAyUsJr
+         H7YEn6FN18Vrm2mENKq0cNrxXfazPlQ8hrrIYOpKiHxXH9Q78NBR0mBf7SoswTD572CX
+         YQxg7SeZDJYT9WDZJkigHoDSVZEvqfhKcpRRVk0DmLB/oHQPgvM99ugXprp+49nD5gnx
+         x+LOA65kFhZneHAz8RETNj3gIO5LJugyEr5ZPwRPaHVzGt1g3MpKJr3+sulylE0SmOOc
+         s7kQiQ4fBVYtl0DblVJ4rtlbZKp8/Ok7vWHYUecXWn4U5yfoZa2Wp3VcondJIZajCmp7
+         LHzA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772509356; x=1773114156; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772510117; x=1773114917; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jM5Sv380XGPgNQlH+xzbk/R1aBRRcKgA4UxlgomEWiM=;
-        b=l9jJ5N9o0QFhtQlXgnqkh+1iiklkD0hCAQkWVjWmX/GYtXKWu/pRxvJU3QDzHLHvee
-         BCP3MnP8sKXiRZ8OLfA8DzkLDIwDOKYdarnJRTEQkDQ7BxkD2fJUqmJ6YDerTpoomAuy
-         vHPvJxHYQ0UTkXLba5XqHfZmBSghq/qYQYxV/mEUwL3L3lcAiPbbJ3e/Ob5HYIWa0Xzv
-         VhKtXRHVVkFNXovj+DHiUcPzz8K3xVF5rzrV/XFj8j3PYRlc9XK0P15G8onv1I4AndaW
-         8cVSLAc3web0hjBEUD1djDeUYlROWE+0vnmUlMfXmXQhPwaXval1lgaJud12siIRs/Tg
-         nhBg==
+        bh=ejc1Nj9JSexTn5t/j4wyckbSfdpkEdCAy4NmiTGXn2w=;
+        b=ioJT4qp+Bka9DieWPGsi5DF+PSUYMp6RyPtNiLaQwT6cD+gmfR78uj7C5RL9+GQMwJ
+         bRQSWOcXnJ1zQ6R211Q6VSTYpm/dtJay8rSUJ1Hq34+cy0Zreoac427VoRZ+ev9VCP5q
+         /UurnMLpbHiuoxzWIPe8bS8pDmNIl/CJ1CWtBArIJnHyHEWrLgB35eWa1eDX282X4rf7
+         IktbzZ6KCGkYMp4R4dfvsaSISFFj2WnqBYYiX/iC6+Nv6S7le2IPR9IvqSoE2GxOf9ng
+         p8nVMSIufWOnzwlIxnMK9rW0rfllaEq0oEOfD2dTGVdhjuls+Tq8wvLmDWgZpYXZXVAc
+         5OxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772509356; x=1773114156;
+        d=1e100.net; s=20230601; t=1772510117; x=1773114917;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=jM5Sv380XGPgNQlH+xzbk/R1aBRRcKgA4UxlgomEWiM=;
-        b=Ulm9l3Iv//eozHGb6TUaCcl5Ocelk53sbbBFjuFp5T4UJVQsbE1E7KcoNJjhz/ucsu
-         RuPsDR1H4NuEHAoXfDkENGqoTiZScrGrqstoOTepltaDKNJVNWDISDalamse/+LCADVs
-         xyMkFJvlb1tueKAV1HvnOYm0oVGsPLRiOMr09RGPlpJEzfRwIlxj4a5sKfcLqrrzhdYs
-         LjwgKkRdfZlSl5n3wOB4MJEOUl4B73r2vsIv+FiDA81tKEyvQM1iQVpiLz4iN4RUWXBQ
-         CbV9hxm0wQvwpUvA/VZvZzipZqT+OV2L+rDAYPq65RJfBNFI0AZjAkLkiuUAo7Cl9Nbs
-         rckA==
-X-Forwarded-Encrypted: i=1; AJvYcCUbuIIa9zLvc6SWa8Yn12ul6tSqa8KDJ6Fm+/4clE741AceHM9vzwbniB7decZccpc7UTh0+30=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6zf8yLqk692A6iiHiEpdkuIcMPKmqgwi4PAbCefzAn+6R3mSw
-	fjSJSedCjS7xAWB38SHFZWbZsCVbcendVol2p883u1uK3IxTOum0+NKJDBk3bHlrPMibY/DJ+W1
-	jpAPXXixUNDtVCC2vpr7/mG/TbBPbOhjUgIkxizEtZOZYskeQ+ZrrE6Ld+cc=
-X-Gm-Gg: ATEYQzy5D/qw0IchAzAbsxkTdaSLHIIH/iaoH6Fiq2Z3cQmTPAfBya4YMwcFZleqBfo
-	5clEe3q4ffKmjhzi9ki6vdTH/tENvNCXWQ8Udekp8zYbftUlzeF1d8ZuTK8pl69rebpvc69pRYd
-	7k6/si9yrq4cQohxWEoNJkocKyW6VvQWAz4pXWTeFR9Z8WiCFhIssFfS6JBqu2mi5h4Ka30ed29
-	C79UJZCtlj+noZxWOp2dgoTInihq6e/IAJOqz61aw7Da5sEgVzJ3oDaA4AoWtj2sYXBm1y78dUh
-	hO8BRx56LXYtKf57
-X-Received: by 2002:ac8:7dc7:0:b0:506:9d3e:67e3 with SMTP id
- d75a77b69052e-50752923a15mr186396371cf.70.1772509356200; Mon, 02 Mar 2026
- 19:42:36 -0800 (PST)
+        bh=ejc1Nj9JSexTn5t/j4wyckbSfdpkEdCAy4NmiTGXn2w=;
+        b=tgH4G4s+GG7Vj4D5+HJ/iLV4mddDJMvi2nhICgLjggwEGk6rwgwEUU6JGVZViBq147
+         4MS3LakTVH8sqv+pCVkL1hq2i13jdmW0B3aGmLu4MNyamddSHHNFfA53A+kE84WtV2sJ
+         9W71GJD4dJHmGRD2yFNGf+vWg0AwfB/3P/XgDmoMtpVadi/FI5IYevwIzZ5xK4Trm8nE
+         PLNAAT3ZVIe9VN/oolbhALakTmRJTi7z2Tirt/vWjSaCvtkrXz9HyjyzBOZ3y9UjL5Et
+         Vcq619FojatH4Z/YRU1UTVW4t0sRuzwVJRogaNuFv7EEHn41TwKoU7EI51VI9UzeZC77
+         20ZA==
+X-Forwarded-Encrypted: i=1; AJvYcCXw2cusYZBbdem2dft9o219ahkbyyu55Xi4oANP0n4y1+80I/s26CL2EMXnhDAZj3inRWMWKDA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbLCxIvPVTJzaFgXrY9wwbLsROLUPij2ijmwkwsBOsbBuJ2vWB
+	14eMW/J44hwX0ytULbwsJ3z6d3LNv/7Gehw58d8AL7/ZYn2vKj9FmGy79oUnoux/SdUgw5xaarL
+	j2qefrggntMjjpXew6x5SnaTD78rPXEFpKAUkGtvM
+X-Gm-Gg: ATEYQzza6NwTklEMtS46lMXMkS+eCfgEAmPA7zaW6f5vy2AIS7qd+CuPnb9cS6RCNiK
+	xuY8iT+ZUHXNDHziVksCvjielkOZ2kqtknFviIP1aN+sUgGuq9HTVXwZNY6GgtBsBK2kxO2Y5xG
+	BlNOGq45WdSNdo79BDSxotLSbt59TxDRSygyLhnaO3c/P4R1uBtx1eWvyuLFqs4D4rk9b0rcXVV
+	D/lEMRvfPiSJCjq8r/6SI+OMD/On2yiv0moKLJ2cRhB6bhtnzGFNO+L+g9HjAhiKXGCiieFcuoS
+	Cd5XuA==
+X-Received: by 2002:a05:622a:1808:b0:4ff:9737:dd15 with SMTP id
+ d75a77b69052e-507528e0544mr204798791cf.60.1772510116881; Mon, 02 Mar 2026
+ 19:55:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260302205156.1213225-1-kuniyu@google.com>
-In-Reply-To: <20260302205156.1213225-1-kuniyu@google.com>
+References: <20260225074633.149590-1-leon.huangfu@shopee.com>
+ <20260225174354.5a698ddb@kernel.org> <f611be70-8280-44c8-86af-5866c0b302be@linux.dev>
+ <20260302162251.733b520e@kernel.org> <3a623176-fc5f-4dd4-bbfc-64d211f53645@linux.dev>
+In-Reply-To: <3a623176-fc5f-4dd4-bbfc-64d211f53645@linux.dev>
 From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 3 Mar 2026 04:42:24 +0100
-X-Gm-Features: AaiRm50jMWb1CgnvJFeTi-TGJHCTU3g-zkFnX_yIogUSyL-Roq2QNQYBXMUFImY
-Message-ID: <CANn89i+5gC3Wr2jAOG0=Sp1H2tJ7_ZufHcp1B7t7SdfgY+JmeA@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next] tcp: Initialise ehash secrets during
- connect() and listen().
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
-	Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Date: Tue, 3 Mar 2026 04:55:05 +0100
+X-Gm-Features: AaiRm52DDhLLpoDehAr1KJ6oYz7Y6Nl096pl0WNYjHph9qwo9g7s3_ZXePnqW6c
+Message-ID: <CANn89iJ0=Tx0i+1UXEdcoFuk1F_MfP41-L-kgGDTN+RcLTRcFA@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next] tcp: Add net.ipv4.tcp_purge_receive_queue sysctl
+To: Leon Hwang <leon.hwang@linux.dev>
+Cc: Jakub Kicinski <kuba@kernel.org>, Leon Hwang <leon.huangfu@shopee.com>, netdev@vger.kernel.org, 
+	"David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, 
+	David Ahern <dsahern@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ij@kernel.org>, 
+	Ido Schimmel <idosch@nvidia.com>, kerneljasonxing@gmail.com, lance.yang@linux.dev, 
+	jiayuan.chen@linux.dev, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: EBD471E8875
+X-Rspamd-Queue-Id: 2B32F1E8992
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,gmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-263029-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-263030-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,shopee.com,vger.kernel.org,davemloft.net,redhat.com,lwn.net,linuxfoundation.org,google.com,nvidia.com,gmail.com,linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.992];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-0.991];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-On Mon, Mar 2, 2026 at 9:51=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.com=
-> wrote:
->
-> inet_ehashfn() and inet6_ehashfn() initialise random secrets
-> on the first call by net_get_random_once().
->
-> While the init part is patched out using static keys, with
-> CONFIG_STACKPROTECTOR_STRONG=3Dy, this causes a compiler to
-> generate a stack canary due to an automatic variable,
-> unsigned long ___flags, in the DO_ONCE() macro being passed
-> to __do_once_start().
->
-> With FDO, this is visible in __inet_lookup_established() and
-> __inet6_lookup_established() too.
->
-> Let's move net_get_random_once() to the slow paths: inet_hash()
-> for listen(), and inet_hash_connect() and inet6_hash_connect()
-> for connect().
->
-> Note that IPv6 listener will initialise both IPv4 & IPv6 secrets
-> in inet_hash() for IPv4-mapped IPv6 address.
->
-> With the patch, the stack size is reduced by 16 bytes (___flags
->  + a stack canary) and NOPs for the static key go away.
->
-> Before: __inet6_lookup_established()
+On Tue, Mar 3, 2026 at 3:12=E2=80=AFAM Leon Hwang <leon.hwang@linux.dev> wr=
+ote:
 >
 >
 >
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> ---
->  include/net/inet6_hashtables.h |  2 ++
->  net/ipv4/inet_hashtables.c     | 16 ++++++++++++++--
->  net/ipv6/inet6_hashtables.c    | 11 ++++++++---
->  3 files changed, 24 insertions(+), 5 deletions(-)
+> On 3/3/26 08:22, Jakub Kicinski wrote:
+> > On Mon, 2 Mar 2026 17:55:59 +0800 Leon Hwang wrote:
+> >> On 26/2/26 09:43, Jakub Kicinski wrote:
+> >>> On Wed, 25 Feb 2026 15:46:33 +0800 Leon Hwang wrote:
+> >>>> Issue:
+> >>>> When a TCP socket in the CLOSE_WAIT state receives a RST packet, the
+> >>>> current implementation does not clear the socket's receive queue. Th=
+is
+> >>>> causes SKBs in the queue to remain allocated until the socket is
+> >>>> explicitly closed by the application. As a consequence:
+> >>>>
+> >>>> 1. The page pool pages held by these SKBs are not released.
+> >>>
+> >>> On what kernel version and driver are you observing this?
+> >>
+> >> # uname -r
+> >> 6.19.0-061900-generic
+> >>
+> >> # ethtool -i eth0
+> >> driver: mlx5_core
+> >> version: 6.19.0-061900-generic
+> >> firmware-version: 26.43.2566 (MT_0000000531)
+> >
+> > Okay... this kernel + driver should just patiently wait for the page
+> > pool to go away.
+> >
+> > What is the actual, end user problem that you're trying to solve?
+> > A few kB of data waiting to be freed is not a huge problem..
 >
-> diff --git a/include/net/inet6_hashtables.h b/include/net/inet6_hashtable=
-s.h
-> index 282e29237d93..c17e0d874808 100644
-> --- a/include/net/inet6_hashtables.h
-> +++ b/include/net/inet6_hashtables.h
-> @@ -24,6 +24,8 @@
+> Yes, it is not a huge problem.
 >
->  struct inet_hashinfo;
+> The actual end-user issue was discussed in
+> "page_pool: Add page_pool_release_stalled tracepoint" [1].
 >
-> +void inet6_init_ehash_secret(void);
-> +
->  static inline unsigned int __inet6_ehashfn(const u32 lhash,
->                                     const u16 lport,
->                                     const u32 fhash,
-> diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-> index fca980772c81..2c2cac5b0f1a 100644
-> --- a/net/ipv4/inet_hashtables.c
-> +++ b/net/ipv4/inet_hashtables.c
-> @@ -30,12 +30,15 @@
->  #include <net/sock_reuseport.h>
->  #include <net/tcp.h>
+> I think it would be useful to provide a way for SREs to purge the
+> receive queue when CLOSE_WAIT TCP sockets receive RST packets. If the
+> NIC, e.g., Mellanox, flaps, the underlying page pool and pages can be
+> released at the same time.
 >
-> +static void inet_init_ehash_secret(void)
-> +{
-> +       net_get_random_once(&inet_ehash_secret, sizeof(inet_ehash_secret)=
-);
-> +}
+> Links:
+> [1]
+> https://lore.kernel.org/netdev/b676baa0-2044-4a74-900d-f471620f2896@linux=
+.dev/
 
-Could this use get_random_sleepable_once()?
-We are running in process context here.
-Same remark for  inet6_init_ehash_secret()
+Perhaps SRE could use this in an emergency?
 
-Thanks.
+ss -t -a state close-wait -K
 
