@@ -1,51 +1,99 @@
-Return-Path: <netdev+bounces-263138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-263139-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WGQ8L9TBpmlDTQAAu9opvQ
-	(envelope-from <netdev+bounces-263138-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 12:11:16 +0100
+	id CMNUHOHCpmn3TQAAu9opvQ
+	(envelope-from <netdev+bounces-263139-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 12:15:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B68EA1ED7CB
-	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 12:11:15 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D63041ED98F
+	for <lists+netdev@lfdr.de>; Tue, 03 Mar 2026 12:15:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 95B963002936
-	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 11:11:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B6A873022936
+	for <lists+netdev@lfdr.de>; Tue,  3 Mar 2026 11:15:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 879C33AE6FF;
-	Tue,  3 Mar 2026 11:11:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8AFE38C2BB;
+	Tue,  3 Mar 2026 11:15:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HgbHRMsg"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="H8hL8+rM";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="4S+Tgb/I";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="kLw0MJbO";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="+yWksISm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62202282F0D;
-	Tue,  3 Mar 2026 11:11:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FA2532143D
+	for <netdev@vger.kernel.org>; Tue,  3 Mar 2026 11:15:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772536269; cv=none; b=pdHFNWK0iUgU/K6eMI+5FJ0TUNcLHKhiekdPJ8o7fgf09LaNc2JiiyAbWY1qM0Cyx7gFH++bKhH4/GUiaw/YrsJSuWQjTbB94MB6rZesrrEVhYcMU7Ny7/EQZJJMJPrbf9wai3KIFY0L1DHHeAWyMaDOo9DrrrTEMSMSOI8WCT4=
+	t=1772536528; cv=none; b=gnJT4xoXQ/Z7KTa9D/PoPlTmdghuIZL/BirrOnvQpNKxf/IsnY+nJeCxgru2A2cC5xx53Hy+3Cp1AtOlS2//OqpqwUVoTs41N0JuKXeaCCxkGcfpqQ8phPyw6GN/VzMP75rN11f0lHncluTpXH1ULo6g0NbaXZw3xnH16SihAvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772536269; c=relaxed/simple;
-	bh=0TSpOc9D2Wj95zXSWmDsD58zBEEa5vv0K0RaJljTMbg=;
+	s=arc-20240116; t=1772536528; c=relaxed/simple;
+	bh=5vE8M1dbYKWF7k7fikSx4Ui4/vpuw9KlLc+R61FZqwU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=soWhV32LKQcgupko+GdYxnSpAprx1EZIVeO2oSjSjHhWd69+x4JNQFj4/0OvyD/U3PXek3YbpYo+tw8EgbCr3lR1mTLREwGZ17Ny5QralU+UWpDHpFmvQWbR9wdRkFKZ6WuSYD/ouvavBRZZL2wrG6ndQZB779DBcwqshkEvGik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HgbHRMsg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9AE0C116C6;
-	Tue,  3 Mar 2026 11:08:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772536269;
-	bh=0TSpOc9D2Wj95zXSWmDsD58zBEEa5vv0K0RaJljTMbg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=HgbHRMsgy3e4LlaKKFBtIsNEWhMkvVTtbpS2zXQ45CHSPazktDU1ttLDnQmRLPPV1
-	 kfn9vdnQYbxxy/E1CUUtuG0VwCXndoQJO+gI8x3nO6sBVKWwxQpFZEd8MjtczKNfIu
-	 CSoN1ZPj6rXqm+BYx6CMIqMzpe2J0mgq2j4wikeqBgNh5JPya7DTmiJJO8UDc/7PN8
-	 T6AwecUVEMpnautr1hbpNMdtunlrdjE/RdUPcvOBa4kk/wA+Sg1iWGoxkyse1mG7Af
-	 D6BfyVAHRGzHQv2QdpIIWYf2pQal0OcY8GCdkzXhuO3pSws+dANWTfJo7LjCYcu7Dy
-	 TU2Ry9gZ5KAnA==
-Message-ID: <2fc4d789-5ee4-4618-8cb7-06a560d8c659@kernel.org>
-Date: Tue, 3 Mar 2026 12:08:49 +0100
+	 In-Reply-To:Content-Type; b=aGfbEYeIdtsOc2cvIKtiXRT9pQXrHbVYGHnjepgpTuQ9KzJ7gjAPqaj2jhN82+eayVaZpUecBCPAVbtf0MFC0JurcbwXYayCB9Npc2QfGc7KFBX6nynOs5DoFUlxfEMiCXYkaMEXI28uLxOtVckBi/uOuyRPyw8/v90J8DP/75w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=H8hL8+rM; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=4S+Tgb/I; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=kLw0MJbO; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=+yWksISm; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id C27023F7A7;
+	Tue,  3 Mar 2026 11:15:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772536525; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mTOPM5JVrkLBQv0U5x4Nb+Byop940gIykarVp2oKr6c=;
+	b=H8hL8+rM4H0Lso7K2UjsoxN1tMevM29KUSW26blmIzum7gq1EcW93Dl8Nwda2uBI1/QRaJ
+	Rj8J2fo+/zwGOVPXtFvAOnv7/l8UckYaCv+jwz2sq6WgfNLCy6kA6srEQK2T8tcnpTsalK
+	F72s13G/3LJYyx02fwa5L4RoFVtWjto=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772536525;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mTOPM5JVrkLBQv0U5x4Nb+Byop940gIykarVp2oKr6c=;
+	b=4S+Tgb/IgJp6XCTx7ZskfVTSdoQ0Ex2u4QB4xxplhW2BVMnKhXfMAbyp5u7Gc4fDM6KlyB
+	1rGWViM9DqufYuDA==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=kLw0MJbO;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=+yWksISm
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772536524; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mTOPM5JVrkLBQv0U5x4Nb+Byop940gIykarVp2oKr6c=;
+	b=kLw0MJbOHIfj4QFeUQRtcekTj/WzDT918zlk7sd0CUhVS5bLFAuETyZPydSPpxjTwePxvG
+	ql8wTrZOuPCm/ZWOc75KNdG+35I2G6wFfI5+9T54swUvfUzB43VQr6DHpehVvq3I9+akWK
+	DeW04cVi+V0u9U+MlzZkSq0UUezmPnk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772536524;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mTOPM5JVrkLBQv0U5x4Nb+Byop940gIykarVp2oKr6c=;
+	b=+yWksISmPOF6cCIBZElnX8ox+mDPn4IR4bpVJXQ6DV1MQJ5na60miLew3Lo8iYvDE/vnIH
+	Le3F85wMy5+fuyDw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0001F3EA69;
+	Tue,  3 Mar 2026 11:15:23 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id NUqTOMvCpmlKQAAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Tue, 03 Mar 2026 11:15:23 +0000
+Message-ID: <a3dd2b4f-28d6-43b8-a262-da98be9796c6@suse.de>
+Date: Tue, 3 Mar 2026 12:15:23 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,116 +101,148 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] mptcp: fix soft lockup in mptcp_recvmsg()
-Content-Language: en-GB, fr-BE
-To: Li Xiasong <lixiasong1@huawei.com>, martineau@kernel.org,
- geliang@kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev,
- linux-kernel@vger.kernel.org, weiyongjun1@huawei.com, yuehaibing@huawei.com,
- zhangchangzhong@huawei.com
-References: <20260302052651.1466983-1-lixiasong1@huawei.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20260302052651.1466983-1-lixiasong1@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: B68EA1ED7CB
+Subject: Re: [PATCH 2/2 net v2] net: vxlan: fix nd_tbl NULL dereference when
+ IPv6 is disabled
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
+ bridge@lists.linux.dev, roopa@cumulusnetworks.com, sdf@fomichev.me,
+ petrm@nvidia.com, horms@kernel.org, razor@blackwall.org, pabeni@redhat.com,
+ kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+ andrew+netdev@lunn.ch
+References: <20260302140847.5941-1-fmancera@suse.de>
+ <20260302140847.5941-2-fmancera@suse.de> <aaWiH5KBf-n1NxAR@krikkit>
+ <c2e08123-9338-4836-82e7-f47eb344f41f@suse.de>
+ <20260302163643.GA971179@shredder>
+ <fd8370d6-b163-45ac-9e6c-24046f46539e@suse.de>
+ <853cf5a5-1c4e-43e5-b1fb-38c986488ba8@suse.de> <aaYXIkHH4xsP_YDx@krikkit>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <aaYXIkHH4xsP_YDx@krikkit>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Score: -3.01
+X-Spam-Level: 
+X-Rspamd-Queue-Id: D63041ED98F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-263138-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-263139-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,suse.de:dkim,suse.de:mid]
 X-Rspamd-Action: no action
 
-Hi Li,
-
-On 02/03/2026 06:26, Li Xiasong wrote:
-> syzbot reported a soft lockup in mptcp_recvmsg() [0].
+On 3/3/26 12:02 AM, Sabrina Dubroca wrote:
+> 2026-03-02, 19:04:14 +0100, Fernando Fernandez Mancera wrote:
+>> On 3/2/26 6:44 PM, Fernando Fernandez Mancera wrote:
+>>> On 3/2/26 5:36 PM, Ido Schimmel wrote:
+>>>> On Mon, Mar 02, 2026 at 04:13:14PM +0100, Fernando Fernandez Mancera
+>>>> wrote:
+>>>>> On 3/2/26 3:43 PM, Sabrina Dubroca wrote:
+>>>>>> 2026-03-02, 15:08:47 +0100, Fernando Fernandez Mancera wrote:
+>>>>>>> When booting with the 'ipv6.disable=1' parameter, the nd_tbl is never
+>>>>>>> initialized because inet6_init() exits before ndisc_init() is called
+>>>>>>> which initializes it. If an IPv6 packet is injected into
+>>>>>>> the interface,
+>>>>>>> route_shortcircuit() is called and a NULL pointer
+>>>>>>> dereference happens on
+>>>>>>> neigh_lookup().
+>>>>>>
+>>>>>> VXLAN can be built-in even when IPv6 is built as a module, and then
+>>>>>> ipv6_mod_enabled can't be used in VXLAN:
+>>>>>>
+>>>>>> ld: drivers/net/vxlan/vxlan_core.o: in function `route_shortcircuit':
+>>>>>> drivers/net/vxlan/vxlan_core.c:2133:(.text+0x116e0):
+>>>>>> undefined reference to `ipv6_mod_enabled'
+>>>>>>
+>>>>>>
+>>>>>> GENEVE has a Kconfig tweak to prevent this since 094be0927ff3
+>>>>>> ("geneve: fix build with modular IPV6"):
+>>>>>>
+>>>>>>        depends on IPV6 || !IPV6
+>>>>>>
+>>>>>> but VXLAN doesn't.
+>>>>>>
+>>>>>
+>>>>> Ugh, good catch. Thanks Sabrina.
+>>>>>
+>>>>>> But then I think we don't need to use ipv6_stub at all.
+>>>>>
+>>>>> If we enforce "depends on IPV6 || IPV6=n" on VXLAN we could get rid of
+>>>>> ipv6_stub completely and use direct calls instead.
+>>>>
+>>>> I just noticed that this is already enforced for the bridge, so maybe
+>>>> you can just remove ipv6_stub in patch #1?
+>>>>
+>>>
+>>> Yes, after Sabrina mentioned it that was what I planned to do. But on
+>>> VXLAN I want to avoid such patch for net tree as a fix. Instead I
+>>> propose to use the __in6_dev_get() check as neigh_reduce() does.
 > 
-> When receiving data with MSG_PEEK | MSG_WAITALL flags, the skb is not
-> removed from the sk_receive_queue. This causes sk_wait_data() to always
-> find available data and never perform actual waiting, leading to a soft
-> lockup.
+> I'm not convinced __in6_dev_get() makes more sense. It's also pretty
+> much a random NULL check to me, and at least with checking nd_tbl
+> directly it's clearly related to the code that follows.
 > 
-> Fix this by adding a 'last' parameter to track the last peeked skb.
-> This allows sk_wait_data() to make informed waiting decisions and prevent
-> infinite loops when MSG_PEEK is used.
+> In neigh_reduce(), __in6_dev_get() seems to have been present from the
+> start, and back then in6_dev was used in the function. Now, it might
+> easily be removed by a clean-up patch that doesn't notice it's useful.
+> 
 
-Thank you for the patch! I will check why sk_wait_data() was not used
-with the last SKB before.
+Fair enough, let's just stick to the nd_tbl NULL check for now on VXLAN. 
+I will send a patch on net-next tree once this is merged to enforce 
+"depends on IPV6 || IPV6=n" and remove ipv6_stub from there.
 
-By chance, do you have a reproducer that you could eventually share please?
+I hope that sounds good to you all.
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+> 
+> Should there be a helper ipv6_mod_available() (or a better name) in
+> net/ipv6/addrconf_core.c (so always available) to wrap those checks in
+> a way that doesn't rely on Kconfig magic nor non-obvious NULL checks?
+> (maybe even replacing ipv6_mod_enabled()?)
+> 
+
+Maybe yes, but not sure if it is worth it. As discussed here [1] 
+dropping IPv6 as a module seems like a good idea. Anyway, let's discuss 
+that topic there!
+
+[1] https://lore.kernel.org/netdev/20260302171131.28373ccb@kernel.org/
+
+Thanks,
+Fernando.
+
+>>> Later,
+>>> do a follow-up patch on net-next tree removing ipv6_stub and enforcing
+>>> "depends on IPV6 || IPV6=n".
+>>>
+>>
+>> FWIW; removing the ipv6_stub won't keep us from checking ipv6_mod_enabled()
+>> as ipv6.disable=1 can still be set at booting time and therefore nd_tbl will
+>> still be non-initialized because ndisc_init() and neigh_table_init() are
+>> never called.
+> 
+> Ok.
+> 
 
 
